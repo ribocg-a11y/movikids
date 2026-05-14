@@ -653,6 +653,7 @@ async function sincronizarServidor() {
 
     renderCards();
     updateStats();
+    loadCustosHoje(); // Atualiza custos em background
   } catch {
     setStatus(false);
     // Fallback: mantém o que estava em cache
@@ -1325,6 +1326,7 @@ function showPage(name) {
 
   if (name === 'nova') resetNova();
   if (name === 'historico') buscarHistorico();
+  if (name === 'custos') loadCustosHoje();
 }
 
 // ═══════════════════════════════════════════════════════════
