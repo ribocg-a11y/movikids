@@ -645,8 +645,10 @@ async function loadAtivas() {
 
     sessions = d.locacoes.map(s => {
       const local = storedMap[s.rowIndex] || {};
-      // Reconstruct startTimestamp from horaInicio + data
-      const st = local.startTimestamp || calcStartTimestamp(s.data, s.horaInicio);
+      // Prefer server-side Unix timestamp (col P), then localStorage, then reconstruct
+      const st = (s.startTimestamp && s.startTimestamp > 0)
+        ? s.startTimestamp
+        : (local.startTimestamp || calcStartTimestamp(s.data, s.horaInicio));
       return {
         ...s,
         startTimestamp: st,
@@ -971,11 +973,11 @@ async function confirmarLocacao() {
 
     if (!d.ok) { toast('Erro: ' + d.erro, 'error'); return; }
 
-    // Add to local sessions
+    // Add to local sessions (startTimestamp comes from server API response)
     const newSession = {
       ...d,
       rowIndex:       d.id + 10, // approximate, will sync on reload
-      startTimestamp: Date.now(),
+      startTimestamp: d.startTimestamp || Date.now(),
       alertFired5:    false,
       alertFiredExp:  false,
     };
