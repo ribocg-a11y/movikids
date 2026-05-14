@@ -995,20 +995,36 @@ async function confirmarLocacao() {
 
     if (!d.ok) { toast('Erro: ' + d.erro, 'error'); return; }
 
-    // Add to local sessions (startTimestamp comes from server API response)
-    const newSession = {
-      ...d,
-      rowIndex:       d.id + 10, // approximate, will sync on reload
-      startTimestamp: d.startTimestamp || Date.now(),
-      alertFired5:    false,
-      alertFiredExp:  false,
+    // Adiciona IMEDIATAMENTE ao estado local — sem segunda chamada API
+    // rowIndex aproximado: DATA_ROW (11) + id - 1
+    const approxRow = 10 + Number(d.id);
+    const novaSession = {
+      rowIndex:        approxRow,
+      id:              d.id,
+      tipo:            novaState.tipo,
+      plano:           novaState.plano,
+      mins:            d.mins,
+      valorPlano:      d.valorPlano,
+      adicionalPorMin: d.adicionalPorMin,
+      responsavel:     resp,
+      crianca:         cri,
+      telefone:        tel,
+      horaInicio:      d.horaInicio,
+      data:            d.data,
+      startTimestamp:  d.startTimestamp || Date.now(),
+      alertFired5:     false,
+      alertFiredExp:   false,
+      status:          'Ativa'
     };
+    sessions.push(novaSession);
+    saveSessions();
 
-    // Reload from server to get real rowIndex
-    await loadAtivas();
     resetNova();
     showPage('home');
     toast(`🚀 Locação de ${cri} iniciada!`, 'success');
+
+    // Sync em background para confirmar rowIndex real (sem bloquear o timer)
+    setTimeout(() => sincronizarServidor(), 1000);
 
   } catch(e) {
     toast('Erro de conexão. Tente novamente.', 'error');
