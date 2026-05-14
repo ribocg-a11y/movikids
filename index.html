@@ -10,6 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="Movi Kids">
 <title>Movi Kids</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
 <style>
@@ -46,6 +47,7 @@ html,body{height:100%;background:var(--bg);color:var(--txt);overflow:hidden}
   border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 #splash.hide{opacity:0;pointer-events:none}
+#splash.gone{display:none}
 
 /* ── APP SHELL ────────────────────────────────────────────── */
 #app{display:flex;flex-direction:column;height:100dvh;max-width:430px;margin:0 auto;
@@ -621,7 +623,9 @@ async function init() {
     updateStats();
   }
   startTimerLoop();
-  document.getElementById('splash').classList.add('hide');
+  const splash = document.getElementById('splash');
+  splash.classList.add('hide');
+  setTimeout(() => splash.classList.add('gone'), 550); // remove after fade
 
   // PASSO 2: sincroniza com servidor em background (1 única chamada)
   sincronizarServidor();
@@ -1419,7 +1423,7 @@ function toast(msg, type = '') {
 // ═══════════════════════════════════════════════════════════
 // START
 // ═══════════════════════════════════════════════════════════
-window.addEventListener('load', init);
+document.addEventListener('DOMContentLoaded', init);
 </script>
 </body>
 </html>
