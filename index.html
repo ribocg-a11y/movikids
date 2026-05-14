@@ -653,7 +653,14 @@ async function sincronizarServidor() {
 
     renderCards();
     updateStats();
-    loadCustosHoje(); // Atualiza custos em background
+
+    // FIX #5: usar custosHoje já incluído na resposta (zero chamadas extras)
+    if (d.custosHoje) {
+      custosHoje = d.custosHoje;
+      renderCustos();
+    } else {
+      loadCustosHoje(); // fallback se servidor antigo
+    }
   } catch {
     setStatus(false);
     // Fallback: mantém o que estava em cache
@@ -779,7 +786,7 @@ function buildCard(s) {
   let timerDisplay, timerLabel, extraCost = '';
   if (isOver) {
     const extraSec = Math.abs(rem);
-    const extraMin = Math.ceil(extraSec / 60);
+    const extraMin = Math.floor(extraSec / 60); // FIX #4: consistente com pedirEncerrar
     const custo    = (extraMin * s.adicionalPorMin).toFixed(2).replace('.',',');
     timerDisplay   = '+' + fmtTime(extraSec);
     timerLabel     = 'TEMPO EXTRA';
@@ -869,25 +876,15 @@ function updateStats() {
 }
 
 async function loadCustosHoje() {
+  // FIX #7: apenas busca custos (stats já vêm de carregarInicio/sincronizarServidor)
   try {
-    const hoje = new Date();
-    const dd = String(hoje.getDate()).padStart(2,'0');
-    const mm = String(hoje.getMonth()+1).padStart(2,'0');
-    const yyyy = hoje.getFullYear();
-    const dataHoje = `${dd}/${mm}/${yyyy}`;
-
-    const d = await api({ action: 'listarHistorico', data: dataHoje });
-    if (d.ok) {
-      statsHoje.fat = d.locacoes
-        .filter(l => l.status === 'Encerrada')
-        .reduce((acc, l) => acc + Number(l.valorTotal), 0);
-      statsHoje.n   = d.locacoes.filter(l => l.status === 'Encerrada').length;
-      updateStats();
-    }
-
-    const dc = await api({ action: 'listarCustos', mes: mm, ano: yyyy });
+    const hoje  = new Date();
+    const mm    = String(hoje.getMonth()+1).padStart(2,'0');
+    const yyyy  = hoje.getFullYear();
+    const dc    = await api({ action: 'listarCustos', mes: mm, ano: yyyy });
     if (dc.ok) {
-      custosHoje = dc.custos;
+      const dataHoje = String(hoje.getDate()).padStart(2,'0') + '/' + mm + '/' + yyyy;
+      custosHoje = dc.custos.filter(c => String(c.data) === dataHoje);
       renderCustos();
     }
   } catch {}
