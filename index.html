@@ -604,22 +604,74 @@ async function init() {
   requestNotificationPermission();
   setDefaultDate();
 
-  try {
-    const d = await api({ action: 'ping' });
-    if (d.ok) setStatus(true);
-    else setStatus(false);
-  } catch { setStatus(false); }
-
-  await loadAtivas();
-  await loadCustosHoje();
+  // PASSO 1: mostra cache local imediatamente (app parece instantâneo)
+  const cached = JSON.parse(localStorage.getItem('mk_sessions') || '[]');
+  if (cached.length > 0) {
+    sessions = cached;
+    renderCards();
+    updateStats();
+  }
   startTimerLoop();
-
   document.getElementById('splash').classList.add('hide');
+
+  // PASSO 2: sincroniza com servidor em background (1 única chamada)
+  sincronizarServidor();
+}
+
+async function sincronizarServidor() {
+  try {
+    setStatus(null); // "atualizando"
+    const d = await api({ action: 'carregarInicio' });
+    if (!d.ok) { setStatus(false); return; }
+
+    setStatus(true);
+
+    // Atualiza sessões ativas
+    const stored = JSON.parse(localStorage.getItem('mk_sessions') || '[]');
+    const storedMap = {};
+    stored.forEach(s => storedMap[s.rowIndex] = s);
+
+    sessions = d.ativos.map(s => {
+      const local = storedMap[s.rowIndex] || {};
+      const st = (s.startTimestamp && s.startTimestamp > 0)
+        ? s.startTimestamp
+        : (local.startTimestamp || calcStartTimestamp(s.data, s.horaInicio));
+      return {
+        ...s,
+        startTimestamp: st,
+        alertFired5:   local.alertFired5 || false,
+        alertFiredExp: local.alertFiredExp || false,
+      };
+    });
+    saveSessions();
+
+    // Atualiza stats
+    if (d.statsHoje) {
+      statsHoje.fat = d.statsHoje.fat;
+      statsHoje.n   = d.statsHoje.n;
+    }
+
+    renderCards();
+    updateStats();
+  } catch {
+    setStatus(false);
+    // Fallback: mantém o que estava em cache
+  }
 }
 
 function setStatus(online) {
-  document.getElementById('status-dot').className = online ? 'dot-online' : 'dot-offline';
-  document.getElementById('status-txt').textContent = online ? 'Online' : 'Offline';
+  const dot = document.getElementById('status-dot');
+  const txt = document.getElementById('status-txt');
+  if (online === null) {
+    dot.className = 'dot-online'; dot.style.background = '#FFB74D';
+    txt.textContent = 'Atualizando...';
+  } else if (online) {
+    dot.className = 'dot-online'; dot.style.background = '';
+    txt.textContent = 'Online';
+  } else {
+    dot.className = 'dot-offline'; dot.style.background = '';
+    txt.textContent = 'Offline';
+  }
 }
 
 function setDefaultDate() {
@@ -634,36 +686,8 @@ function setDefaultDate() {
 // SESSIONS
 // ═══════════════════════════════════════════════════════════
 async function loadAtivas() {
-  try {
-    const d = await api({ action: 'listarAtivas' });
-    if (!d.ok) return;
-
-    // Merge server data with localStorage (localStorage has startTimestamp)
-    const stored = JSON.parse(localStorage.getItem('mk_sessions') || '[]');
-    const storedMap = {};
-    stored.forEach(s => storedMap[s.rowIndex] = s);
-
-    sessions = d.locacoes.map(s => {
-      const local = storedMap[s.rowIndex] || {};
-      // Prefer server-side Unix timestamp (col P), then localStorage, then reconstruct
-      const st = (s.startTimestamp && s.startTimestamp > 0)
-        ? s.startTimestamp
-        : (local.startTimestamp || calcStartTimestamp(s.data, s.horaInicio));
-      return {
-        ...s,
-        startTimestamp: st,
-        alertFired5: local.alertFired5 || false,
-        alertFiredExp: local.alertFiredExp || false,
-      };
-    });
-
-    saveSessions();
-    updateUI();
-  } catch(e) {
-    // Offline: load from localStorage
-    sessions = JSON.parse(localStorage.getItem('mk_sessions') || '[]');
-    updateUI();
-  }
+  // Mantido para compatibilidade — usa sincronizarServidor
+  await sincronizarServidor();
 }
 
 function calcStartTimestamp(data, horaInicio) {
