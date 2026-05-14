@@ -339,6 +339,15 @@ nav button .nav-badge{
 .page::-webkit-scrollbar{width:3px}
 .page::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
 
+/* ── PENDING CARD (aguardando início) ─────────────────────────────────── */
+.session-card.pending{border-color:var(--border);background:var(--card)}
+.session-card.pending::before{background:var(--txt3)}
+.frozen-timer{text-align:center;padding:16px 0 20px}
+.frozen-time{font-size:44px;font-weight:900;color:var(--txt3);font-variant-numeric:tabular-nums;line-height:1}
+.frozen-label{font-size:12px;color:var(--txt3);margin-top:6px;font-weight:600}
+.btn-iniciar{background:linear-gradient(135deg,var(--green),#1B5E20);color:#fff;
+  width:100%;padding:16px;font-size:15px;border-radius:var(--radius)}
+
 /* Loading skeleton */
 .skeleton{background:linear-gradient(90deg,var(--border) 25%,#F0F6FF 50%,var(--border) 75%);
   background-size:200% 100%;animation:shimmer 1.2s infinite;border-radius:8px;height:80px;margin-bottom:8px}
@@ -632,15 +641,15 @@ async function sincronizarServidor() {
     stored.forEach(s => storedMap[s.rowIndex] = s);
 
     sessions = d.ativos.map(s => {
-      const local = storedMap[s.rowIndex] || {};
-      const st = (s.startTimestamp && s.startTimestamp > 0)
-        ? s.startTimestamp
-        : (local.startTimestamp || calcStartTimestamp(s.data, s.horaInicio));
+      const local   = storedMap[s.rowIndex] || {};
+      const started = (s.startTimestamp && s.startTimestamp > 0);
+      const st      = started ? s.startTimestamp : 0;
       return {
         ...s,
         startTimestamp: st,
-        alertFired5:   local.alertFired5 || false,
-        alertFiredExp: local.alertFiredExp || false,
+        started:        started || (local.started || false),
+        alertFired5:    (local.alertFired5  || false),
+        alertFiredExp:  (local.alertFiredExp || false),
       };
     });
     saveSessions();
@@ -729,6 +738,7 @@ function calcRemaining(s) {
 }
 
 function checkTimer(s) {
+  if (!s.started) return; // Aguardando início
   const rem = calcRemaining(s);
 
   // 5 min warning
@@ -771,12 +781,40 @@ function renderCards() {
 }
 
 function buildCard(s) {
+  const cls     = s.tipo === 'Carro' ? 'carro' : 'pelucia';
+  const badgeCls= s.tipo === 'Pelúcia' ? 'pelucia' : '';
+  const icon    = s.tipo === 'Carro' ? '🚗' : '🧸';
+
+  // ── Card pendente (aguardando início) ────────────────────────────────
+  if (!s.started) {
+    const vPlano = PRECOS[s.tipo]?.[s.plano]?.v || 0;
+    return `<div class="session-card pending" id="card-${s.rowIndex}">
+      <div class="sc-top">
+        <div class="sc-tipo">
+          <span class="sc-tipo-icon">${icon}</span>
+          <span class="sc-tipo-name">${s.tipo}</span>
+        </div>
+        <span class="sc-plano-badge ${badgeCls}">${s.plano}</span>
+      </div>
+      <div class="sc-names">
+        <div class="sc-crianca">${escHtml(s.crianca)}</div>
+        <div class="sc-resp">👤 ${escHtml(s.responsavel)} ${s.telefone ? '· ' + s.telefone : ''}</div>
+      </div>
+      <div class="frozen-timer">
+        <div class="frozen-time">${fmtTime(s.mins * 60)}</div>
+        <div class="frozen-label">⏸ Cadastro salvo · aguardando início</div>
+      </div>
+      <button class="btn btn-iniciar" onclick="iniciarContagem(${s.rowIndex})">
+        ▶ INICIAR CONTAGEM
+      </button>
+    </div>`;
+  }
+
+  // ── Card ativo (timer rodando) ───────────────────────────────────────
   const rem     = calcRemaining(s);
   const total   = s.mins * 60;
   const isOver  = rem <= 0;
   const isWarn  = rem <= 300 && !isOver;
-  const cls     = s.tipo === 'Carro' ? 'carro' : 'pelucia';
-  const badgeCls= s.tipo === 'Pelúcia' ? 'pelucia' : '';
 
   let cardCls = 'session-card ' + cls;
   if (isOver)  cardCls += ' danger';
@@ -995,10 +1033,9 @@ async function confirmarLocacao() {
 
     if (!d.ok) { toast('Erro: ' + d.erro, 'error'); return; }
 
-    // Adiciona IMEDIATAMENTE ao estado local — sem segunda chamada API
-    // rowIndex aproximado: DATA_ROW (11) + id - 1
+    // Adiciona IMEDIATAMENTE com started=false (aguardando botão Iniciar)
     const approxRow = 10 + Number(d.id);
-    const novaSession = {
+    sessions.push({
       rowIndex:        approxRow,
       id:              d.id,
       tipo:            novaState.tipo,
@@ -1011,20 +1048,20 @@ async function confirmarLocacao() {
       telefone:        tel,
       horaInicio:      d.horaInicio,
       data:            d.data,
-      startTimestamp:  d.startTimestamp || Date.now(),
+      startTimestamp:  0,
+      started:         false,
       alertFired5:     false,
       alertFiredExp:   false,
       status:          'Ativa'
-    };
-    sessions.push(novaSession);
+    });
     saveSessions();
 
     resetNova();
     showPage('home');
-    toast(`🚀 Locação de ${cri} iniciada!`, 'success');
+    toast(`✅ Cadastro salvo! Aperte ▶ para iniciar a contagem.`, 'success');
 
-    // Sync em background para confirmar rowIndex real (sem bloquear o timer)
-    setTimeout(() => sincronizarServidor(), 1000);
+    // Sync silencioso para confirmar rowIndex real
+    setTimeout(() => sincronizarServidor(), 800);
 
   } catch(e) {
     toast('Erro de conexão. Tente novamente.', 'error');
@@ -1182,6 +1219,31 @@ function abrirWaMsg(s) {
 function encerrarDireto() {
   if (alertSession) pedirEncerrar(alertSession.rowIndex);
   fecharAlerta();
+}
+
+// ═══════════════════════════════════════════════════════════
+// INICIAR CONTAGEM
+// ═══════════════════════════════════════════════════════════
+async function iniciarContagem(rowIndex) {
+  const ts = Date.now(); // Momento exato do clique
+
+  // 1. Atualiza estado local IMEDIATAMENTE (sem esperar servidor)
+  const s = sessions.find(x => x.rowIndex === rowIndex);
+  if (!s) return;
+  s.startTimestamp = ts;
+  s.started        = true;
+  saveSessions();
+  renderCards();
+
+  toast('⏱ Contagem iniciada!', 'success');
+
+  // 2. Atualiza servidor em background (não bloqueia o timer)
+  try {
+    await api({ action: 'iniciarTimer', rowIndex, timestamp: ts });
+  } catch {}
+
+  // 3. Sync para confirmar rowIndex real se necessário
+  setTimeout(() => sincronizarServidor(), 500);
 }
 
 // ═══════════════════════════════════════════════════════════
