@@ -1002,12 +1002,15 @@ function pedirEncerrar(rowIndex) {
   encSession = sessions.find(s => s.rowIndex === rowIndex);
   if (!encSession) return;
 
-  const rem      = calcRemaining(encSession);
-  const elapsed  = Math.ceil(((Date.now() - encSession.startTimestamp) / 1000) / 60); // min
-  const minExtra = Math.max(0, elapsed - encSession.mins);
-  const vExtra   = (minExtra * encSession.adicionalPorMin).toFixed(2).replace('.',',');
-  const vBase    = PRECOS[encSession.tipo]?.[encSession.plano]?.v || encSession.valorPlano;
-  const vTotal   = (vBase + minExtra * encSession.adicionalPorMin).toFixed(2).replace('.',',');
+  const rem           = calcRemaining(encSession);
+  const elapsedSec    = Math.floor((Date.now() - encSession.startTimestamp) / 1000);
+  const contratSec    = encSession.mins * 60;
+  // Cobra minuto adicional apenas após completar cada minuto extra (Math.floor)
+  const minExtra      = Math.max(0, Math.floor((elapsedSec - contratSec) / 60));
+  const minUsadosReal = encSession.mins + minExtra;
+  const vExtra        = (minExtra * encSession.adicionalPorMin).toFixed(2).replace('.',',');
+  const vBase         = PRECOS[encSession.tipo]?.[encSession.plano]?.v || encSession.valorPlano;
+  const vTotal        = (vBase + minExtra * encSession.adicionalPorMin).toFixed(2).replace('.',',');
   const icon     = encSession.tipo === 'Carro' ? '🚗' : '🧸';
 
   document.getElementById('enc-info').innerHTML = `
@@ -1021,7 +1024,7 @@ function pedirEncerrar(rowIndex) {
     <div class="modal-info-row total"><span>TOTAL A COBRAR</span><span>R$ ${vTotal}</span></div>`;
 
   document.getElementById('enc-modal').classList.add('show');
-  encSession._minUsados = elapsed;
+  encSession._minUsados = minUsadosReal;
 }
 
 function fecharEncModal() {
