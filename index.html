@@ -844,7 +844,6 @@ function buildCard(s) {
   const offset   = CIRCUM * (1 - progress);
   const ringColor= isOver ? '#B71C1C' : isWarn ? '#E65100' : (s.tipo === 'Carro' ? '#1565C0' : '#C2185B');
 
-  const icon  = s.tipo === 'Carro' ? '🚗' : '🧸';
   const vPlano= PRECOS[s.tipo]?.[s.plano]?.v || 0;
   const vFmt  = 'R$ ' + String(vPlano).replace('.',',') + ',00';
 
