@@ -645,15 +645,28 @@ async function sincronizarServidor() {
     stored.forEach(s => storedMap[s.rowIndex] = s);
 
     sessions = d.ativos.map(s => {
-      const local   = storedMap[s.rowIndex] || {};
-      const started = (s.startTimestamp && s.startTimestamp > 0);
-      const st      = started ? s.startTimestamp : 0;
+      const local       = storedMap[s.rowIndex] || {};
+      const hasTsServer = (s.startTimestamp && s.startTimestamp > 0);
+
+      // Se localStorage tem 'started' explícito → usa ele (operador controlou)
+      // Senão → deriva do timestamp do servidor (compatibilidade com frontend antigo)
+      let started, st;
+      if (local.hasOwnProperty('started')) {
+        started = local.started;
+        // Se started=true usa ts do localStorage (mais preciso); fallback para server
+        st = started ? (local.startTimestamp || s.startTimestamp || 0) : 0;
+      } else {
+        // Sem registro local: usa ts do servidor como indicador
+        started = hasTsServer;
+        st      = hasTsServer ? s.startTimestamp : 0;
+      }
+
       return {
         ...s,
         startTimestamp: st,
-        started:        started || (local.started || false),
-        alertFired5:    (local.alertFired5  || false),
-        alertFiredExp:  (local.alertFiredExp || false),
+        started,
+        alertFired5:   (local.alertFired5  || false),
+        alertFiredExp: (local.alertFiredExp || false),
       };
     });
     saveSessions();
@@ -1051,7 +1064,7 @@ async function confirmarLocacao() {
       telefone:        tel,
       horaInicio:      d.horaInicio,
       data:            d.data,
-      startTimestamp:  0,
+      startTimestamp:  0,   // explicitamente 0 = aguardando Iniciar
       started:         false,
       alertFired5:     false,
       alertFiredExp:   false,
@@ -1233,9 +1246,9 @@ async function iniciarContagem(rowIndex) {
   // 1. Atualiza estado local IMEDIATAMENTE (sem esperar servidor)
   const s = sessions.find(x => x.rowIndex === rowIndex);
   if (!s) return;
-  s.startTimestamp = ts;
+  s.startTimestamp = ts;    // timestamp real do clique
   s.started        = true;
-  saveSessions();
+  saveSessions();           // localStorage agora tem started=true + ts correto
   renderCards();
 
   toast('⏱ Contagem iniciada!', 'success');
