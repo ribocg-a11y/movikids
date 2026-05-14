@@ -1,0 +1,1319 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#1565C0">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Movi Kids">
+<title>Movi Kids</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+<style>
+/* ── RESET & VARS ─────────────────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --blue:#1565C0;--blue-lt:#E3F2FD;--blue-dk:#0D47A1;
+  --pink:#C2185B;--pink-lt:#FCE4EC;
+  --green:#2E7D32;--green-lt:#E8F5E9;
+  --amber:#E65100;--amber-lt:#FFF3E0;
+  --red:#B71C1C;--red-lt:#FFEBEE;
+  --purple:#6A1B9A;
+  --bg:#F0F6FF;--card:#FFFFFF;--border:#E0E8F4;
+  --txt:#1A2340;--txt2:#5A6680;--txt3:#9AAAC0;
+  --radius:16px;--radius-sm:10px;
+  --shadow:0 4px 20px rgba(21,101,192,.12);
+  --shadow-sm:0 2px 8px rgba(21,101,192,.08);
+  font-family:'Nunito',sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+
+html,body{height:100%;background:var(--bg);color:var(--txt);overflow:hidden}
+
+/* ── SPLASH ──────────────────────────────────────────────── */
+#splash{
+  position:fixed;inset:0;z-index:999;
+  background:linear-gradient(135deg,var(--blue),var(--pink));
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;
+  transition:opacity .5s;
+}
+#splash h1{font-family:'Fredoka One',cursive;font-size:42px;color:#fff;letter-spacing:2px}
+#splash p{color:rgba(255,255,255,.8);font-size:14px}
+.spinner{width:32px;height:32px;border:3px solid rgba(255,255,255,.3);
+  border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+#splash.hide{opacity:0;pointer-events:none}
+
+/* ── APP SHELL ────────────────────────────────────────────── */
+#app{display:flex;flex-direction:column;height:100dvh;max-width:430px;margin:0 auto;
+  background:var(--bg);overflow:hidden}
+
+/* ── HEADER ───────────────────────────────────────────────── */
+header{
+  flex-shrink:0;padding:12px 16px 10px;
+  background:linear-gradient(135deg,var(--blue),var(--blue-dk));
+  box-shadow:0 2px 12px rgba(21,101,192,.3);
+}
+.hd-row{display:flex;align-items:center;justify-content:space-between}
+.logo{font-family:'Fredoka One',cursive;font-size:24px;color:#fff;letter-spacing:1px;line-height:1}
+.logo span{color:#FFD54F}
+.hd-status{display:flex;align-items:center;gap:6px;font-size:12px;color:rgba(255,255,255,.8)}
+.dot-online{width:7px;height:7px;border-radius:50%;background:#69F0AE;animation:pulse-g 2s infinite}
+@keyframes pulse-g{0%,100%{opacity:1}50%{opacity:.4}}
+.dot-offline{background:#EF9A9A;animation:none}
+
+/* ── NAV ──────────────────────────────────────────────────── */
+nav{
+  flex-shrink:0;
+  display:grid;grid-template-columns:repeat(4,1fr);
+  background:#fff;border-bottom:1px solid var(--border);
+  box-shadow:var(--shadow-sm);
+}
+nav button{
+  border:none;background:none;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  padding:8px 4px;font-size:10px;font-weight:700;
+  color:var(--txt3);transition:color .2s;
+  font-family:'Nunito',sans-serif;
+}
+nav button.active{color:var(--blue)}
+nav button .nav-icon{font-size:20px;line-height:1}
+nav button .nav-badge{
+  position:relative;display:inline-block;
+}
+.badge{
+  position:absolute;top:-6px;right:-10px;
+  background:var(--pink);color:#fff;border-radius:99px;
+  font-size:9px;font-weight:800;padding:1px 5px;min-width:16px;text-align:center;
+}
+
+/* ── PAGES ────────────────────────────────────────────────── */
+.page{flex:1;overflow-y:auto;display:none;padding:16px;gap:12px;flex-direction:column}
+.page.active{display:flex}
+
+/* ── SECTION TITLE ────────────────────────────────────────── */
+.sec-title{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--txt3);padding:4px 0 8px}
+
+/* ── STATS BAR ────────────────────────────────────────────── */
+.stats-bar{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stat-card{background:var(--card);border-radius:var(--radius-sm);padding:12px 10px;
+  text-align:center;box-shadow:var(--shadow-sm);border:1px solid var(--border)}
+.stat-val{font-size:18px;font-weight:900;color:var(--blue);line-height:1}
+.stat-lbl{font-size:10px;color:var(--txt3);margin-top:2px;font-weight:600}
+
+/* ── SESSION CARD ─────────────────────────────────────────── */
+.session-card{
+  background:var(--card);border-radius:var(--radius);
+  padding:16px;box-shadow:var(--shadow);
+  border:2px solid transparent;
+  transition:border-color .3s,background .3s;
+  position:relative;overflow:hidden;
+}
+.session-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:4px;
+  background:linear-gradient(90deg,var(--blue),var(--pink));
+}
+.session-card.carro::before{background:var(--blue)}
+.session-card.pelucia::before{background:var(--pink)}
+.session-card.warning{border-color:var(--amber);background:var(--amber-lt)}
+.session-card.warning::before{background:var(--amber)}
+.session-card.danger{border-color:var(--red);background:var(--red-lt);animation:shake .5s ease-in-out}
+.session-card.danger::before{background:var(--red)}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+
+.sc-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}
+.sc-tipo{display:flex;align-items:center;gap:6px}
+.sc-tipo-icon{font-size:24px;line-height:1}
+.sc-tipo-name{font-size:13px;font-weight:800;color:var(--txt2);text-transform:uppercase;letter-spacing:.05em}
+.sc-plano-badge{
+  font-size:11px;font-weight:700;padding:3px 8px;border-radius:99px;
+  background:var(--blue-lt);color:var(--blue);
+}
+.sc-plano-badge.pelucia{background:var(--pink-lt);color:var(--pink)}
+
+.sc-names{margin-bottom:14px}
+.sc-crianca{font-size:18px;font-weight:900;color:var(--txt);line-height:1.2}
+.sc-resp{font-size:12px;color:var(--txt3);font-weight:600;margin-top:2px}
+
+/* Timer ring */
+.sc-timer-area{display:flex;align-items:center;gap:16px;margin-bottom:14px}
+.timer-ring-wrap{position:relative;width:80px;height:80px;flex-shrink:0}
+.timer-ring-wrap svg{transform:rotate(-90deg);width:80px;height:80px}
+.ring-bg{fill:none;stroke:#E0E8F4;stroke-width:6}
+.ring-progress{fill:none;stroke-width:6;stroke-linecap:round;
+  stroke-dasharray:220;stroke-dashoffset:0;transition:stroke-dashoffset .9s linear,stroke .3s}
+.timer-text{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+}
+.timer-countdown{font-size:17px;font-weight:900;color:var(--txt);font-variant-numeric:tabular-nums;line-height:1}
+.timer-extra{font-size:10px;font-weight:700;color:var(--red);margin-top:2px}
+
+.sc-timer-info{flex:1}
+.sc-timer-label{font-size:11px;color:var(--txt3);font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+.sc-timer-big{font-size:26px;font-weight:900;color:var(--txt);font-variant-numeric:tabular-nums;line-height:1;margin:2px 0}
+.sc-timer-extra-cost{font-size:13px;font-weight:700;color:var(--red)}
+.sc-valor{font-size:13px;color:var(--txt2);font-weight:600;margin-top:4px}
+
+/* Card buttons */
+.sc-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.btn{
+  border:none;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:800;
+  border-radius:var(--radius-sm);padding:10px 8px;font-size:13px;
+  transition:transform .1s,opacity .2s;display:flex;align-items:center;justify-content:center;gap:6px;
+}
+.btn:active{transform:scale(.96)}
+.btn-wa{background:#25D366;color:#fff}
+.btn-encerrar{background:var(--blue);color:#fff}
+.btn-encerrar.danger{background:var(--red)}
+.btn-primary{background:var(--blue);color:#fff;width:100%;padding:14px}
+.btn-secondary{background:var(--border);color:var(--txt);width:100%;padding:14px}
+.btn-pink{background:var(--pink);color:#fff;width:100%;padding:14px}
+.btn-sm{padding:8px 12px;font-size:12px}
+
+/* Empty state */
+.empty{text-align:center;padding:40px 20px;color:var(--txt3)}
+.empty-icon{font-size:56px;margin-bottom:12px;opacity:.6}
+.empty h3{font-size:18px;font-weight:800;color:var(--txt2);margin-bottom:6px}
+.empty p{font-size:14px;line-height:1.6}
+
+/* ── NOVA LOCAÇÃO ─────────────────────────────────────────── */
+.steps{display:flex;gap:4px;justify-content:center;margin-bottom:20px}
+.step-dot{width:8px;height:8px;border-radius:50%;background:var(--border);transition:all .3s}
+.step-dot.active{background:var(--blue);width:24px;border-radius:4px}
+
+.step-page{display:none}
+.step-page.active{display:block}
+
+.tipo-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.tipo-btn{
+  background:var(--card);border:2px solid var(--border);border-radius:var(--radius);
+  padding:20px 12px;text-align:center;cursor:pointer;transition:all .2s;
+  font-family:'Nunito',sans-serif;
+}
+.tipo-btn:hover,.tipo-btn.sel{border-color:var(--blue);background:var(--blue-lt)}
+.tipo-btn.pelucia:hover,.tipo-btn.pelucia.sel{border-color:var(--pink);background:var(--pink-lt)}
+.tipo-btn .tb-icon{font-size:36px;margin-bottom:8px}
+.tipo-btn .tb-name{font-size:14px;font-weight:800;color:var(--txt)}
+.tipo-btn .tb-sub{font-size:11px;color:var(--txt3);margin-top:2px}
+
+.plano-list{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
+.plano-btn{
+  background:var(--card);border:2px solid var(--border);border-radius:var(--radius-sm);
+  padding:12px 16px;display:flex;justify-content:space-between;align-items:center;
+  cursor:pointer;font-family:'Nunito',sans-serif;transition:all .2s;
+}
+.plano-btn:hover,.plano-btn.sel{border-color:var(--blue);background:var(--blue-lt)}
+.plano-btn .pb-nome{font-size:15px;font-weight:800;color:var(--txt)}
+.plano-btn .pb-det{font-size:11px;color:var(--txt3);margin-top:2px}
+.plano-btn .pb-val{font-size:18px;font-weight:900;color:var(--blue)}
+.plano-btn.pelucia:hover,.plano-btn.pelucia.sel{border-color:var(--pink);background:var(--pink-lt)}
+.plano-btn.pelucia .pb-val{color:var(--pink)}
+
+/* Form inputs */
+.form-group{margin-bottom:14px}
+.form-label{font-size:12px;font-weight:700;color:var(--txt2);display:block;margin-bottom:6px;
+  text-transform:uppercase;letter-spacing:.04em}
+.form-input{
+  width:100%;padding:13px 14px;border:2px solid var(--border);
+  border-radius:var(--radius-sm);font-family:'Nunito',sans-serif;font-size:15px;
+  color:var(--txt);background:var(--card);outline:none;transition:border-color .2s;
+}
+.form-input:focus{border-color:var(--blue)}
+.form-input.pink:focus{border-color:var(--pink)}
+
+/* Review card */
+.review-card{background:linear-gradient(135deg,var(--blue),var(--blue-dk));
+  border-radius:var(--radius);padding:20px;margin-bottom:16px;color:#fff}
+.review-card.pelucia{background:linear-gradient(135deg,var(--pink),#880E4F)}
+.rc-tipo{font-size:12px;opacity:.8;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+.rc-plano{font-size:28px;font-weight:900;margin-bottom:2px}
+.rc-valor{font-size:14px;opacity:.9}
+.rc-names{font-size:13px;opacity:.85;margin-top:10px;line-height:1.6}
+
+/* ── HISTÓRICO ────────────────────────────────────────────── */
+.hist-filter{display:flex;gap:8px;margin-bottom:14px}
+.hist-filter input{flex:1;padding:10px 12px;border:2px solid var(--border);border-radius:var(--radius-sm);
+  font-family:'Nunito',sans-serif;font-size:14px;outline:none}
+.hist-filter input:focus{border-color:var(--blue)}
+.hist-filter button{padding:10px 16px;background:var(--blue);color:#fff;border:none;
+  border-radius:var(--radius-sm);font-family:'Nunito',sans-serif;font-weight:700;font-size:13px;cursor:pointer}
+
+.hist-item{background:var(--card);border-radius:var(--radius-sm);padding:12px 14px;
+  box-shadow:var(--shadow-sm);border:1px solid var(--border);
+  display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.hi-left{}
+.hi-tipo{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;
+  color:var(--txt3);text-transform:uppercase;margin-bottom:2px}
+.hi-names{font-size:14px;font-weight:800;color:var(--txt)}
+.hi-det{font-size:11px;color:var(--txt3);margin-top:2px}
+.hi-right{text-align:right;flex-shrink:0}
+.hi-valor{font-size:18px;font-weight:900;color:var(--green)}
+.hi-extra{font-size:10px;color:var(--amber);font-weight:700}
+.hi-status{font-size:10px;padding:2px 8px;border-radius:99px;font-weight:700;margin-top:4px;display:inline-block}
+.hi-status.ativa{background:var(--green-lt);color:var(--green)}
+.hi-status.encerrada{background:var(--blue-lt);color:var(--blue)}
+
+/* ── CUSTOS ───────────────────────────────────────────────── */
+.custo-form{background:var(--card);border-radius:var(--radius);padding:16px;
+  box-shadow:var(--shadow-sm);border:1px solid var(--border);margin-bottom:16px}
+
+.cats{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px}
+.cat-btn{
+  padding:5px 12px;border:2px solid var(--border);border-radius:99px;
+  font-family:'Nunito',sans-serif;font-size:12px;font-weight:700;cursor:pointer;
+  background:var(--card);color:var(--txt2);transition:all .2s;
+}
+.cat-btn.sel{background:var(--blue);color:#fff;border-color:var(--blue)}
+
+/* ── DASHBOARD ────────────────────────────────────────────── */
+.dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.dash-card{background:var(--card);border-radius:var(--radius-sm);padding:14px;
+  box-shadow:var(--shadow-sm);border:1px solid var(--border)}
+.dash-card.full{grid-column:1/-1}
+.dc-label{font-size:10px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+.dc-val{font-size:22px;font-weight:900;color:var(--txt)}
+.dc-val.blue{color:var(--blue)}
+.dc-val.green{color:var(--green)}
+.dc-val.pink{color:var(--pink)}
+.dc-val.amber{color:var(--amber)}
+.dc-val.red{color:var(--red)}
+.dc-sub{font-size:11px;color:var(--txt3);margin-top:2px}
+
+/* CTO card */
+.cto-card{background:linear-gradient(135deg,#E65100,#BF360C);border-radius:var(--radius);
+  padding:16px;color:#fff;box-shadow:var(--shadow)}
+.cto-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;font-size:13px}
+.cto-row.big{font-size:17px;font-weight:900;border-top:1px solid rgba(255,255,255,.3);margin-top:6px;padding-top:10px}
+
+/* ── ALERT MODAL ──────────────────────────────────────────── */
+.modal-overlay{
+  position:fixed;inset:0;z-index:900;
+  background:rgba(0,0,0,.6);backdrop-filter:blur(4px);
+  display:none;align-items:flex-end;justify-content:center;
+}
+.modal-overlay.show{display:flex;animation:fadeIn .3s}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+.modal-sheet{
+  width:100%;max-width:430px;background:var(--card);
+  border-radius:24px 24px 0 0;padding:24px 20px 36px;
+  animation:slideUp .35s ease-out;
+}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.modal-handle{width:40px;height:4px;background:var(--border);border-radius:2px;
+  margin:0 auto 20px}
+.modal-icon{font-size:52px;text-align:center;margin-bottom:12px}
+.modal-title{font-size:22px;font-weight:900;text-align:center;margin-bottom:6px;color:var(--txt)}
+.modal-sub{font-size:14px;color:var(--txt3);text-align:center;margin-bottom:20px;line-height:1.6}
+.modal-info{background:var(--bg);border-radius:var(--radius-sm);padding:14px;margin-bottom:20px}
+.modal-info-row{display:flex;justify-content:space-between;font-size:13px;padding:3px 0}
+.modal-info-row span:first-child{color:var(--txt2)}
+.modal-info-row span:last-child{font-weight:700;color:var(--txt)}
+.modal-info-row.total span{font-size:16px;font-weight:900;color:var(--green)}
+.modal-btns{display:flex;flex-direction:column;gap:10px}
+
+/* Alert specific */
+.alert-modal .modal-sheet{background:var(--amber-lt);border-top:4px solid var(--amber)}
+.alert-modal.danger .modal-sheet{background:var(--red-lt);border-top:4px solid var(--red)}
+
+/* ── TOAST ────────────────────────────────────────────────── */
+.toast-container{position:fixed;top:80px;left:50%;transform:translateX(-50%);
+  z-index:950;display:flex;flex-direction:column;gap:8px;width:90%;max-width:400px}
+.toast{
+  background:#1A2340;color:#fff;border-radius:var(--radius-sm);
+  padding:12px 16px;font-size:13px;font-weight:700;
+  box-shadow:0 4px 20px rgba(0,0,0,.3);
+  animation:toastIn .3s ease-out;
+}
+.toast.success{background:var(--green)}
+.toast.error{background:var(--red)}
+.toast.warning{background:var(--amber)}
+@keyframes toastIn{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:translateY(0)}}
+
+/* Scrollbars */
+.page::-webkit-scrollbar{width:3px}
+.page::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+
+/* Loading skeleton */
+.skeleton{background:linear-gradient(90deg,var(--border) 25%,#F0F6FF 50%,var(--border) 75%);
+  background-size:200% 100%;animation:shimmer 1.2s infinite;border-radius:8px;height:80px;margin-bottom:8px}
+@keyframes shimmer{to{background-position:-200% 0}}
+</style>
+</head>
+
+<body>
+
+<!-- Splash -->
+<div id="splash">
+  <h1>🚗 Movi <span>Kids</span></h1>
+  <div class="spinner"></div>
+  <p>Carregando sistema...</p>
+</div>
+
+<!-- App -->
+<div id="app">
+
+  <!-- Header -->
+  <header>
+    <div class="hd-row">
+      <div class="logo">🚗 Movi <span>Kids</span></div>
+      <div class="hd-status">
+        <div id="status-dot" class="dot-online"></div>
+        <span id="status-txt">Online</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Nav -->
+  <nav>
+    <button class="active" onclick="showPage('home')">
+      <div class="nav-icon">🏠</div>Home
+    </button>
+    <button onclick="showPage('nova')">
+      <div class="nav-icon nav-badge">➕<span id="badge-nova" class="badge" style="display:none">!</span></div>Nova
+    </button>
+    <button onclick="showPage('historico')">
+      <div class="nav-icon">📋</div>Histórico
+    </button>
+    <button onclick="showPage('custos')">
+      <div class="nav-icon">💰</div>Custos
+    </button>
+  </nav>
+
+  <!-- ──────── PAGE: HOME ──────── -->
+  <div id="page-home" class="page active">
+
+    <div class="stats-bar">
+      <div class="stat-card">
+        <div class="stat-val" id="stat-ativas">0</div>
+        <div class="stat-lbl">Ativas agora</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val" id="stat-hoje" style="font-size:13px">R$ 0</div>
+        <div class="stat-lbl">Hoje</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val" id="stat-nloc">0</div>
+        <div class="stat-lbl">Locações hoje</div>
+      </div>
+    </div>
+
+    <div class="sec-title">Sessões ativas</div>
+    <div id="sessions-container">
+      <div class="skeleton"></div>
+      <div class="skeleton"></div>
+    </div>
+
+  </div>
+
+  <!-- ──────── PAGE: NOVA ──────── -->
+  <div id="page-nova" class="page">
+
+    <div class="steps">
+      <div class="step-dot active" id="dot-0"></div>
+      <div class="step-dot" id="dot-1"></div>
+      <div class="step-dot" id="dot-2"></div>
+    </div>
+
+    <!-- Step 1: Tipo -->
+    <div id="step-0" class="step-page active">
+      <div class="sec-title">Escolha o veículo</div>
+      <div class="tipo-grid">
+        <div class="tipo-btn" onclick="selectTipo('Carro',this)">
+          <div class="tb-icon">🚗</div>
+          <div class="tb-name">Carro Elétrico</div>
+          <div class="tb-sub">3 disponíveis</div>
+        </div>
+        <div class="tipo-btn pelucia" onclick="selectTipo('Pelúcia',this)">
+          <div class="tb-icon">🧸</div>
+          <div class="tb-name">Pelúcia Elétrica</div>
+          <div class="tb-sub">4 disponíveis</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2: Plano -->
+    <div id="step-1" class="step-page">
+      <div class="sec-title">Escolha o plano</div>
+      <div class="plano-list" id="plano-list"></div>
+    </div>
+
+    <!-- Step 3: Dados -->
+    <div id="step-2" class="step-page">
+      <div id="review-card-wrap"></div>
+      <div class="form-group">
+        <label class="form-label">Nome do Responsável *</label>
+        <input id="inp-resp" class="form-input" type="text" placeholder="Ex: João Silva" autocomplete="off">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Nome da Criança *</label>
+        <input id="inp-cri" class="form-input" type="text" placeholder="Ex: Ana Silva" autocomplete="off">
+      </div>
+      <div class="form-group">
+        <label class="form-label">WhatsApp do Responsável *</label>
+        <input id="inp-tel" class="form-input" type="tel" placeholder="(98) 9 9999-9999" autocomplete="off">
+      </div>
+      <button class="btn btn-primary" onclick="confirmarLocacao()" id="btn-confirmar">
+        🚀 Iniciar Locação
+      </button>
+      <button class="btn btn-secondary" onclick="backStep()" style="margin-top:8px">
+        ← Voltar
+      </button>
+    </div>
+
+  </div>
+
+  <!-- ──────── PAGE: HISTÓRICO ──────── -->
+  <div id="page-historico" class="page">
+    <div class="hist-filter">
+      <input id="hist-data" type="date">
+      <button onclick="buscarHistorico()">Buscar</button>
+    </div>
+    <div id="hist-container">
+      <div class="empty">
+        <div class="empty-icon">📋</div>
+        <h3>Histórico vazio</h3>
+        <p>Busque por data para ver as locações</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ──────── PAGE: CUSTOS ──────── -->
+  <div id="page-custos" class="page">
+    <div class="custo-form">
+      <div class="sec-title">Registrar despesa</div>
+      <div class="form-group">
+        <label class="form-label">Descrição *</label>
+        <input id="custo-desc" class="form-input" type="text" placeholder="Ex: Carga das baterias">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Categoria</label>
+        <div class="cats">
+          <div class="cat-btn sel" onclick="selCat(this,'Energia')">⚡ Energia</div>
+          <div class="cat-btn" onclick="selCat(this,'Manutenção')">🔧 Manutenção</div>
+          <div class="cat-btn" onclick="selCat(this,'Material')">📦 Material</div>
+          <div class="cat-btn" onclick="selCat(this,'Aluguel')">🏬 Aluguel</div>
+          <div class="cat-btn" onclick="selCat(this,'Outros')">📌 Outros</div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Valor (R$) *</label>
+        <input id="custo-val" class="form-input" type="number" step="0.01" placeholder="0,00">
+      </div>
+      <button class="btn btn-primary" onclick="salvarCusto()" id="btn-custo">💾 Salvar Custo</button>
+    </div>
+
+    <div class="sec-title">Custos do dia</div>
+    <div id="custo-list">
+      <div class="empty">
+        <div class="empty-icon">💰</div>
+        <h3>Sem custos hoje</h3>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /app -->
+
+<!-- ──────── ALERT MODAL (5min / expired) ──────── -->
+<div id="alert-modal" class="modal-overlay alert-modal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-icon" id="alert-icon">⏰</div>
+    <div class="modal-title" id="alert-title">Tempo quase no fim!</div>
+    <div class="modal-sub" id="alert-sub">Faltam 5 minutos para encerrar a locação.</div>
+    <div class="modal-info" id="alert-info"></div>
+    <div class="modal-btns">
+      <button class="btn btn-wa" onclick="abrirWhatsApp()" id="btn-wa">
+        📱 Enviar WhatsApp ao responsável
+      </button>
+      <button class="btn btn-encerrar" onclick="encerrarDireto()" id="btn-enc-alert">
+        ✓ Encerrar locação
+      </button>
+      <button class="btn btn-secondary btn-sm" onclick="fecharAlerta()">
+        Fechar e continuar monitorando
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ──────── ENCERRAR MODAL ──────── -->
+<div id="enc-modal" class="modal-overlay">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-icon">✅</div>
+    <div class="modal-title">Encerrar locação</div>
+    <div class="modal-info" id="enc-info"></div>
+    <div class="modal-btns">
+      <button class="btn btn-primary" onclick="confirmarEncerrar()" id="btn-enc-confirm">
+        ✓ Confirmar encerramento
+      </button>
+      <button class="btn btn-secondary" onclick="fecharEncModal()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast container -->
+<div class="toast-container" id="toast-container"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// CONFIG
+// ═══════════════════════════════════════════════════════════
+const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec';
+
+const PRECOS = {
+  'Carro':   { '10min':{v:12,m:10,a:1.00},'20min':{v:22,m:20,a:1.00},'30min':{v:30,m:30,a:1.00},
+               '40min':{v:40,m:40,a:1.00},'60min':{v:55,m:60,a:1.00},'3h':{v:130,m:180,a:1.00} },
+  'Pelúcia': { '10min':{v:15,m:10,a:1.20},'20min':{v:25,m:20,a:1.20},'30min':{v:35,m:30,a:1.20},
+               '40min':{v:45,m:40,a:1.20},'60min':{v:65,m:60,a:1.20},'3h':{v:150,m:180,a:1.20} }
+};
+
+const PLANO_LABELS = { '10min':'10 minutos','20min':'20 minutos','30min':'30 minutos',
+                        '40min':'40 minutos','60min':'1 hora','3h':'3 horas' };
+
+// ═══════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════
+let sessions    = [];   // active sessions with timer data
+let timerInterv = null;
+let alertSession= null; // session triggering alert modal
+let encSession  = null; // session in encerrar modal
+let novaState   = { tipo: null, plano: null, step: 0 };
+let catSel      = 'Energia';
+let custosHoje  = [];
+let statsHoje   = { fat: 0, n: 0 };
+
+// ═══════════════════════════════════════════════════════════
+// API
+// ═══════════════════════════════════════════════════════════
+async function api(params) {
+  const qs = new URLSearchParams(params).toString();
+  const r  = await fetch(`${WEBAPP_URL}?${qs}`);
+  return r.json();
+}
+
+// ═══════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════
+async function init() {
+  requestNotificationPermission();
+  setDefaultDate();
+
+  try {
+    const d = await api({ action: 'ping' });
+    if (d.ok) setStatus(true);
+    else setStatus(false);
+  } catch { setStatus(false); }
+
+  await loadAtivas();
+  await loadCustosHoje();
+  startTimerLoop();
+
+  document.getElementById('splash').classList.add('hide');
+}
+
+function setStatus(online) {
+  document.getElementById('status-dot').className = online ? 'dot-online' : 'dot-offline';
+  document.getElementById('status-txt').textContent = online ? 'Online' : 'Offline';
+}
+
+function setDefaultDate() {
+  const hoje = new Date();
+  const y = hoje.getFullYear();
+  const m = String(hoje.getMonth()+1).padStart(2,'0');
+  const d = String(hoje.getDate()).padStart(2,'0');
+  document.getElementById('hist-data').value = `${y}-${m}-${d}`;
+}
+
+// ═══════════════════════════════════════════════════════════
+// SESSIONS
+// ═══════════════════════════════════════════════════════════
+async function loadAtivas() {
+  try {
+    const d = await api({ action: 'listarAtivas' });
+    if (!d.ok) return;
+
+    // Merge server data with localStorage (localStorage has startTimestamp)
+    const stored = JSON.parse(localStorage.getItem('mk_sessions') || '[]');
+    const storedMap = {};
+    stored.forEach(s => storedMap[s.rowIndex] = s);
+
+    sessions = d.locacoes.map(s => {
+      const local = storedMap[s.rowIndex] || {};
+      // Reconstruct startTimestamp from horaInicio + data
+      const st = local.startTimestamp || calcStartTimestamp(s.data, s.horaInicio);
+      return {
+        ...s,
+        startTimestamp: st,
+        alertFired5: local.alertFired5 || false,
+        alertFiredExp: local.alertFiredExp || false,
+      };
+    });
+
+    saveSessions();
+    updateUI();
+  } catch(e) {
+    // Offline: load from localStorage
+    sessions = JSON.parse(localStorage.getItem('mk_sessions') || '[]');
+    updateUI();
+  }
+}
+
+function calcStartTimestamp(data, horaInicio) {
+  // data = "dd/MM/yyyy", horaInicio = "HH:mm"
+  if (!data || !horaInicio) return Date.now();
+  const [dd,mm,yyyy] = data.split('/').map(Number);
+  const [hh,mi] = horaInicio.split(':').map(Number);
+  return new Date(yyyy, mm-1, dd, hh, mi, 0).getTime();
+}
+
+function saveSessions() {
+  localStorage.setItem('mk_sessions', JSON.stringify(sessions));
+}
+
+// ═══════════════════════════════════════════════════════════
+// TIMER LOOP
+// ═══════════════════════════════════════════════════════════
+function startTimerLoop() {
+  if (timerInterv) clearInterval(timerInterv);
+  timerInterv = setInterval(() => {
+    sessions.forEach(s => checkTimer(s));
+    renderCards();
+    updateStats();
+  }, 1000);
+}
+
+function calcRemaining(s) {
+  const elapsed = (Date.now() - s.startTimestamp) / 1000; // seconds
+  const total   = s.mins * 60;
+  return Math.floor(total - elapsed); // can be negative
+}
+
+function checkTimer(s) {
+  const rem = calcRemaining(s);
+
+  // 5 min warning
+  if (rem <= 300 && rem > 0 && !s.alertFired5) {
+    s.alertFired5 = true;
+    saveSessions();
+    triggerAlert5(s);
+  }
+
+  // Expired (0 min)
+  if (rem <= 0 && !s.alertFiredExp) {
+    s.alertFiredExp = true;
+    saveSessions();
+    triggerAlertExpired(s);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════════════════════
+function updateUI() {
+  renderCards();
+  updateStats();
+}
+
+function renderCards() {
+  const container = document.getElementById('sessions-container');
+
+  if (sessions.length === 0) {
+    container.innerHTML = `
+      <div class="empty">
+        <div class="empty-icon">${'🚗'}</div>
+        <h3>Nenhuma locação ativa</h3>
+        <p>Toque em <strong>Nova</strong> para iniciar uma locação</p>
+      </div>`;
+    return;
+  }
+
+  container.innerHTML = sessions.map(s => buildCard(s)).join('');
+}
+
+function buildCard(s) {
+  const rem     = calcRemaining(s);
+  const total   = s.mins * 60;
+  const isOver  = rem <= 0;
+  const isWarn  = rem <= 300 && !isOver;
+  const cls     = s.tipo === 'Carro' ? 'carro' : 'pelucia';
+  const badgeCls= s.tipo === 'Pelúcia' ? 'pelucia' : '';
+
+  let cardCls = 'session-card ' + cls;
+  if (isOver)  cardCls += ' danger';
+  else if (isWarn) cardCls += ' warning';
+
+  // Countdown display
+  let timerDisplay, timerLabel, extraCost = '';
+  if (isOver) {
+    const extraSec = Math.abs(rem);
+    const extraMin = Math.ceil(extraSec / 60);
+    const custo    = (extraMin * s.adicionalPorMin).toFixed(2).replace('.',',');
+    timerDisplay   = '+' + fmtTime(extraSec);
+    timerLabel     = 'TEMPO EXTRA';
+    extraCost      = `<div class="sc-timer-extra-cost">+${extraMin}min = R$ ${custo}</div>`;
+  } else {
+    timerDisplay = fmtTime(rem);
+    timerLabel   = 'RESTANTE';
+  }
+
+  // Progress ring
+  const CIRCUM   = 220;
+  const progress = isOver ? 0 : Math.max(0, rem / total);
+  const offset   = CIRCUM * (1 - progress);
+  const ringColor= isOver ? '#B71C1C' : isWarn ? '#E65100' : (s.tipo === 'Carro' ? '#1565C0' : '#C2185B');
+
+  const icon  = s.tipo === 'Carro' ? '🚗' : '🧸';
+  const vPlano= PRECOS[s.tipo]?.[s.plano]?.v || 0;
+  const vFmt  = 'R$ ' + String(vPlano).replace('.',',') + ',00';
+
+  return `<div class="${cardCls}" id="card-${s.rowIndex}">
+    <div class="sc-top">
+      <div class="sc-tipo">
+        <span class="sc-tipo-icon">${icon}</span>
+        <span class="sc-tipo-name">${s.tipo}</span>
+      </div>
+      <span class="sc-plano-badge ${badgeCls}">${s.plano}</span>
+    </div>
+
+    <div class="sc-names">
+      <div class="sc-crianca">${escHtml(s.crianca)}</div>
+      <div class="sc-resp">👤 ${escHtml(s.responsavel)} ${s.telefone ? '· ' + s.telefone : ''}</div>
+    </div>
+
+    <div class="sc-timer-area">
+      <div class="timer-ring-wrap">
+        <svg viewBox="0 0 80 80">
+          <circle class="ring-bg" cx="40" cy="40" r="35"/>
+          <circle class="ring-progress" cx="40" cy="40" r="35"
+            stroke="${ringColor}"
+            stroke-dashoffset="${offset.toFixed(1)}"
+            stroke-dasharray="${CIRCUM}"/>
+        </svg>
+        <div class="timer-text">
+          <div style="font-size:9px;font-weight:700;color:${ringColor};text-transform:uppercase;letter-spacing:.03em">${isOver?'EXTRA':'LEFT'}</div>
+        </div>
+      </div>
+      <div class="sc-timer-info">
+        <div class="sc-timer-label">${timerLabel}</div>
+        <div class="sc-timer-big" style="color:${ringColor}">${timerDisplay}</div>
+        ${extraCost}
+        <div class="sc-valor">${s.plano} · ${vFmt}</div>
+        <div class="sc-valor" style="font-size:11px;color:var(--txt3)">Início: ${s.horaInicio}</div>
+      </div>
+    </div>
+
+    <div class="sc-btns">
+      <button class="btn btn-wa" onclick="abrirWhatsAppCard(${s.rowIndex})">
+        📱 WhatsApp
+      </button>
+      <button class="btn btn-encerrar ${isOver?'danger':''}" onclick="pedirEncerrar(${s.rowIndex})">
+        ✓ Encerrar
+      </button>
+    </div>
+  </div>`;
+}
+
+function fmtTime(totalSec) {
+  const abs = Math.abs(totalSec);
+  const h   = Math.floor(abs / 3600);
+  const m   = Math.floor((abs % 3600) / 60);
+  const s   = abs % 60;
+  if (h > 0) return `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
+
+function escHtml(t) {
+  return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ═══════════════════════════════════════════════════════════
+// STATS
+// ═══════════════════════════════════════════════════════════
+function updateStats() {
+  document.getElementById('stat-ativas').textContent = sessions.length;
+  document.getElementById('stat-hoje').textContent = 'R$ ' + statsHoje.fat.toFixed(0);
+  document.getElementById('stat-nloc').textContent = statsHoje.n;
+}
+
+async function loadCustosHoje() {
+  try {
+    const hoje = new Date();
+    const dd = String(hoje.getDate()).padStart(2,'0');
+    const mm = String(hoje.getMonth()+1).padStart(2,'0');
+    const yyyy = hoje.getFullYear();
+    const dataHoje = `${dd}/${mm}/${yyyy}`;
+
+    const d = await api({ action: 'listarHistorico', data: dataHoje });
+    if (d.ok) {
+      statsHoje.fat = d.locacoes
+        .filter(l => l.status === 'Encerrada')
+        .reduce((acc, l) => acc + Number(l.valorTotal), 0);
+      statsHoje.n   = d.locacoes.filter(l => l.status === 'Encerrada').length;
+      updateStats();
+    }
+
+    const dc = await api({ action: 'listarCustos', mes: mm, ano: yyyy });
+    if (dc.ok) {
+      custosHoje = dc.custos;
+      renderCustos();
+    }
+  } catch {}
+}
+
+// ═══════════════════════════════════════════════════════════
+// NOVA LOCAÇÃO
+// ═══════════════════════════════════════════════════════════
+function selectTipo(tipo, el) {
+  document.querySelectorAll('.tipo-btn').forEach(b => b.classList.remove('sel'));
+  el.classList.add('sel');
+  novaState.tipo = tipo;
+
+  // Build plano list
+  const container = document.getElementById('plano-list');
+  container.innerHTML = Object.entries(PRECOS[tipo]).map(([k,v]) => {
+    const badgeCls = tipo === 'Pelúcia' ? 'pelucia' : '';
+    const adicFmt  = 'R$ ' + String(v.a).replace('.',',') + '/min extra';
+    return `<div class="plano-btn ${badgeCls}" onclick="selectPlano('${k}',this)">
+      <div>
+        <div class="pb-nome">${PLANO_LABELS[k]}</div>
+        <div class="pb-det">${v.m} min · ${adicFmt}</div>
+      </div>
+      <div class="pb-val">R$ ${v.v}</div>
+    </div>`;
+  }).join('');
+
+  nextStep();
+}
+
+function selectPlano(plano, el) {
+  document.querySelectorAll('.plano-btn').forEach(b => b.classList.remove('sel'));
+  el.classList.add('sel');
+  novaState.plano = plano;
+
+  // Build review card
+  const tipo  = novaState.tipo;
+  const cfg   = PRECOS[tipo][plano];
+  const cls   = tipo === 'Pelúcia' ? 'pelucia' : '';
+  document.getElementById('review-card-wrap').innerHTML = `
+    <div class="review-card ${cls}">
+      <div class="rc-tipo">${tipo === 'Carro' ? '🚗' : '🧸'} ${tipo}</div>
+      <div class="rc-plano">${PLANO_LABELS[plano]}</div>
+      <div class="rc-valor">R$ ${cfg.v} · adicional R$ ${cfg.a}/min</div>
+    </div>`;
+
+  document.getElementById('inp-resp').value = '';
+  document.getElementById('inp-cri').value  = '';
+  document.getElementById('inp-tel').value  = '';
+
+  // Set input class by tipo
+  const cls2 = tipo === 'Pelúcia' ? 'pink' : '';
+  ['inp-resp','inp-cri','inp-tel'].forEach(id => {
+    const el2 = document.getElementById(id);
+    el2.className = 'form-input ' + cls2;
+  });
+
+  nextStep();
+}
+
+function nextStep() {
+  const cur = novaState.step;
+  document.getElementById(`step-${cur}`).classList.remove('active');
+  document.getElementById(`dot-${cur}`).classList.remove('active');
+  novaState.step++;
+  document.getElementById(`step-${novaState.step}`).classList.add('active');
+  document.getElementById(`dot-${novaState.step}`).classList.add('active');
+}
+
+function backStep() {
+  const cur = novaState.step;
+  document.getElementById(`step-${cur}`).classList.remove('active');
+  document.getElementById(`dot-${cur}`).classList.remove('active');
+  novaState.step--;
+  document.getElementById(`step-${novaState.step}`).classList.add('active');
+  document.getElementById(`dot-${novaState.step}`).classList.add('active');
+}
+
+function resetNova() {
+  document.querySelectorAll('.step-page').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.step-dot').forEach(d => d.classList.remove('active'));
+  document.getElementById('step-0').classList.add('active');
+  document.getElementById('dot-0').classList.add('active');
+  document.querySelectorAll('.tipo-btn').forEach(b => b.classList.remove('sel'));
+  document.querySelectorAll('.plano-btn').forEach(b => b.classList.remove('sel'));
+  novaState = { tipo: null, plano: null, step: 0 };
+}
+
+async function confirmarLocacao() {
+  const resp = document.getElementById('inp-resp').value.trim();
+  const cri  = document.getElementById('inp-cri').value.trim();
+  const tel  = document.getElementById('inp-tel').value.trim().replace(/\D/g,'');
+
+  if (!resp || !cri || !tel) { toast('Preencha todos os campos!', 'error'); return; }
+
+  const btn = document.getElementById('btn-confirmar');
+  btn.textContent = '⏳ Iniciando...'; btn.disabled = true;
+
+  try {
+    const d = await api({
+      action: 'salvarLocacao',
+      tipo:         novaState.tipo,
+      plano:        novaState.plano,
+      responsavel:  resp,
+      crianca:      cri,
+      telefone:     tel
+    });
+
+    if (!d.ok) { toast('Erro: ' + d.erro, 'error'); return; }
+
+    // Add to local sessions
+    const newSession = {
+      ...d,
+      rowIndex:       d.id + 10, // approximate, will sync on reload
+      startTimestamp: Date.now(),
+      alertFired5:    false,
+      alertFiredExp:  false,
+    };
+
+    // Reload from server to get real rowIndex
+    await loadAtivas();
+    resetNova();
+    showPage('home');
+    toast(`🚀 Locação de ${cri} iniciada!`, 'success');
+
+  } catch(e) {
+    toast('Erro de conexão. Tente novamente.', 'error');
+  } finally {
+    btn.textContent = '🚀 Iniciar Locação'; btn.disabled = false;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// ENCERRAR
+// ═══════════════════════════════════════════════════════════
+function pedirEncerrar(rowIndex) {
+  encSession = sessions.find(s => s.rowIndex === rowIndex);
+  if (!encSession) return;
+
+  const rem      = calcRemaining(encSession);
+  const elapsed  = Math.ceil(((Date.now() - encSession.startTimestamp) / 1000) / 60); // min
+  const minExtra = Math.max(0, elapsed - encSession.mins);
+  const vExtra   = (minExtra * encSession.adicionalPorMin).toFixed(2).replace('.',',');
+  const vBase    = PRECOS[encSession.tipo]?.[encSession.plano]?.v || encSession.valorPlano;
+  const vTotal   = (vBase + minExtra * encSession.adicionalPorMin).toFixed(2).replace('.',',');
+  const icon     = encSession.tipo === 'Carro' ? '🚗' : '🧸';
+
+  document.getElementById('enc-info').innerHTML = `
+    <div class="modal-info-row"><span>${icon} Tipo</span><span>${encSession.tipo}</span></div>
+    <div class="modal-info-row"><span>Plano</span><span>${encSession.plano}</span></div>
+    <div class="modal-info-row"><span>Criança</span><span>${encSession.crianca}</span></div>
+    <div class="modal-info-row"><span>Responsável</span><span>${encSession.responsavel}</span></div>
+    <div class="modal-info-row"><span>Tempo utilizado</span><span>${elapsed} min</span></div>
+    ${minExtra > 0 ? `<div class="modal-info-row"><span>Min. adicionais</span><span>${minExtra} min</span></div>
+    <div class="modal-info-row"><span>Valor adicional</span><span>R$ ${vExtra}</span></div>` : ''}
+    <div class="modal-info-row total"><span>TOTAL A COBRAR</span><span>R$ ${vTotal}</span></div>`;
+
+  document.getElementById('enc-modal').classList.add('show');
+  encSession._minUsados = elapsed;
+}
+
+function fecharEncModal() {
+  document.getElementById('enc-modal').classList.remove('show');
+  encSession = null;
+}
+
+async function confirmarEncerrar() {
+  if (!encSession) return;
+  const btn = document.getElementById('btn-enc-confirm');
+  btn.textContent = '⏳ Encerrando...'; btn.disabled = true;
+
+  try {
+    const d = await api({
+      action:    'encerrarLocacao',
+      rowIndex:  encSession.rowIndex,
+      minUsados: encSession._minUsados
+    });
+
+    if (!d.ok) { toast('Erro: ' + d.erro, 'error'); return; }
+
+    // Remove from local sessions
+    sessions = sessions.filter(s => s.rowIndex !== encSession.rowIndex);
+    saveSessions();
+
+    const vT = Number(d.valorTotal).toFixed(2).replace('.',',');
+    toast(`✅ Encerrado! Total: R$ ${vT}`, 'success');
+
+    // Update today stats
+    statsHoje.fat += Number(d.valorTotal);
+    statsHoje.n++;
+
+    fecharEncModal();
+    fecharAlerta();
+    renderCards();
+    updateStats();
+
+  } catch(e) {
+    toast('Erro de conexão.', 'error');
+  } finally {
+    btn.textContent = '✓ Confirmar encerramento'; btn.disabled = false;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// ALERTS
+// ═══════════════════════════════════════════════════════════
+function triggerAlert5(s) {
+  alertSession = s;
+  playBeep();
+  showNotification(`⏰ ${s.crianca} — 5 minutos!`, `Hora de avisar o responsável: ${s.responsavel}`);
+  showAlertModal(s, false);
+}
+
+function triggerAlertExpired(s) {
+  alertSession = s;
+  playBeep(3);
+  showNotification(`🔴 ${s.crianca} — Tempo esgotado!`, `Minutos extras sendo cobrados!`);
+  showAlertModal(s, true);
+}
+
+function showAlertModal(s, expired) {
+  const modal = document.getElementById('alert-modal');
+  modal.className = 'modal-overlay alert-modal' + (expired ? ' danger show' : ' show');
+
+  document.getElementById('alert-icon').textContent   = expired ? '🔴' : '⏰';
+  document.getElementById('alert-title').textContent  = expired ? 'Tempo esgotado!' : 'Faltam 5 minutos!';
+  document.getElementById('alert-sub').textContent    = expired
+    ? `Minutos extras sendo cobrados para ${s.crianca}.`
+    : `Avise ${s.responsavel} que o tempo de ${s.crianca} está acabando.`;
+
+  const vPlano = PRECOS[s.tipo]?.[s.plano]?.v || s.valorPlano;
+  const icon   = s.tipo === 'Carro' ? '🚗' : '🧸';
+  document.getElementById('alert-info').innerHTML = `
+    <div class="modal-info-row"><span>${icon} Tipo</span><span>${s.tipo}</span></div>
+    <div class="modal-info-row"><span>Plano</span><span>${s.plano}</span></div>
+    <div class="modal-info-row"><span>Criança</span><span>${s.crianca}</span></div>
+    <div class="modal-info-row"><span>Responsável</span><span>${s.responsavel}</span></div>
+    <div class="modal-info-row"><span>Valor base</span><span>R$ ${vPlano}</span></div>
+    <div class="modal-info-row"><span>Adicional/min</span><span>R$ ${s.adicionalPorMin}</span></div>`;
+
+  document.getElementById('btn-enc-alert').className = 'btn btn-encerrar' + (expired ? ' danger' : '');
+}
+
+function fecharAlerta() {
+  document.getElementById('alert-modal').classList.remove('show');
+  if (!encSession) alertSession = null;
+}
+
+function abrirWhatsApp() {
+  const s = alertSession;
+  if (!s || !s.telefone) { toast('Telefone não cadastrado', 'error'); return; }
+  abrirWaMsg(s);
+}
+
+function abrirWhatsAppCard(rowIndex) {
+  const s = sessions.find(x => x.rowIndex === rowIndex);
+  if (!s) return;
+  abrirWaMsg(s);
+}
+
+function abrirWaMsg(s) {
+  const rem   = calcRemaining(s);
+  const fmin  = rem > 0 ? `⏰ Faltam apenas ${Math.ceil(rem/60)} minuto(s)!` : '🔴 O tempo já esgotou!';
+  const msg   = encodeURIComponent(
+    `Olá ${s.responsavel}! ${s.tipo === 'Carro' ? '🚗' : '🧸'}\n\n` +
+    `A locação de *${s.crianca}* está chegando ao fim.\n` +
+    `${fmin}\n\n` +
+    `Caso queira mais tempo, o valor adicional é R$ ${String(s.adicionalPorMin).replace('.',',')} por minuto.\n\n` +
+    `Obrigado por escolher a Movi Kids! 🌟`
+  );
+  const tel   = String(s.telefone).replace(/\D/g,'');
+  const prefx = tel.startsWith('55') ? '' : '55';
+  window.open(`https://wa.me/${prefx}${tel}?text=${msg}`, '_blank');
+}
+
+function encerrarDireto() {
+  if (alertSession) pedirEncerrar(alertSession.rowIndex);
+  fecharAlerta();
+}
+
+// ═══════════════════════════════════════════════════════════
+// AUDIO
+// ═══════════════════════════════════════════════════════════
+function playBeep(n = 2) {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    let t = ctx.currentTime;
+    for (let i = 0; i < n; i++) {
+      const osc  = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.type      = 'sine';
+      osc.frequency.value = i === 0 ? 880 : 660;
+      gain.gain.setValueAtTime(.4, t);
+      gain.gain.exponentialRampToValueAtTime(.01, t + .3);
+      osc.start(t); osc.stop(t + .3);
+      t += .4;
+    }
+  } catch {}
+}
+
+// ═══════════════════════════════════════════════════════════
+// NOTIFICATIONS
+// ═══════════════════════════════════════════════════════════
+function requestNotificationPermission() {
+  if ('Notification' in window && Notification.permission === 'default') {
+    Notification.requestPermission();
+  }
+}
+
+function showNotification(title, body) {
+  if ('Notification' in window && Notification.permission === 'granted') {
+    new Notification(title, { body, icon: '' });
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// HISTÓRICO
+// ═══════════════════════════════════════════════════════════
+async function buscarHistorico() {
+  const dateVal = document.getElementById('hist-data').value; // yyyy-MM-dd
+  if (!dateVal) return;
+  const [y,m,d] = dateVal.split('-');
+  const data = `${d}/${m}/${y}`;
+
+  const container = document.getElementById('hist-container');
+  container.innerHTML = '<div class="skeleton"></div><div class="skeleton"></div>';
+
+  try {
+    const res = await api({ action: 'listarHistorico', data });
+    if (!res.ok) { container.innerHTML = '<div class="empty"><p>Erro ao buscar histórico.</p></div>'; return; }
+
+    if (res.locacoes.length === 0) {
+      container.innerHTML = `<div class="empty"><div class="empty-icon">📋</div><h3>Sem locações neste dia</h3></div>`;
+      return;
+    }
+
+    container.innerHTML = res.locacoes.map(l => {
+      const icon = l.tipo === 'Carro' ? '🚗' : '🧸';
+      const vT   = Number(l.valorTotal).toFixed(2).replace('.',',');
+      const vE   = Number(l.valorAdicional);
+      const statusCls = l.status === 'Ativa' ? 'ativa' : 'encerrada';
+      return `<div class="hist-item">
+        <div class="hi-left">
+          <div class="hi-tipo">${icon} ${l.tipo}</div>
+          <div class="hi-names">${escHtml(l.crianca)}</div>
+          <div class="hi-det">👤 ${escHtml(l.responsavel)} · ${l.plano}</div>
+          <div class="hi-det">⏰ ${l.horaInicio}${l.horaFim ? ' → ' + l.horaFim : ''}</div>
+        </div>
+        <div class="hi-right">
+          <div class="hi-valor">R$ ${vT}</div>
+          ${vE > 0 ? `<div class="hi-extra">+${l.minAdicionais}min extra</div>` : ''}
+          <span class="hi-status ${statusCls}">${l.status}</span>
+        </div>
+      </div>`;
+    }).join('');
+  } catch {
+    container.innerHTML = '<div class="empty"><p>Erro de conexão.</p></div>';
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// CUSTOS
+// ═══════════════════════════════════════════════════════════
+function selCat(el, cat) {
+  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('sel'));
+  el.classList.add('sel');
+  catSel = cat;
+}
+
+async function salvarCusto() {
+  const desc = document.getElementById('custo-desc').value.trim();
+  const val  = parseFloat(document.getElementById('custo-val').value);
+
+  if (!desc)        { toast('Digite uma descrição', 'error'); return; }
+  if (!val || val <= 0) { toast('Valor inválido', 'error'); return; }
+
+  const btn = document.getElementById('btn-custo');
+  btn.textContent = '⏳ Salvando...'; btn.disabled = true;
+
+  try {
+    const d = await api({
+      action:    'salvarCusto',
+      descricao: desc,
+      categoria: catSel,
+      valor:     val
+    });
+
+    if (!d.ok) { toast('Erro: ' + d.erro, 'error'); return; }
+
+    document.getElementById('custo-desc').value = '';
+    document.getElementById('custo-val').value  = '';
+    toast('✅ Custo registrado!', 'success');
+    await loadCustosHoje();
+  } catch {
+    toast('Erro de conexão.', 'error');
+  } finally {
+    btn.textContent = '💾 Salvar Custo'; btn.disabled = false;
+  }
+}
+
+function renderCustos() {
+  const container = document.getElementById('custo-list');
+  if (!custosHoje || custosHoje.length === 0) {
+    container.innerHTML = `<div class="empty"><div class="empty-icon">💰</div><h3>Sem custos hoje</h3></div>`;
+    return;
+  }
+  container.innerHTML = custosHoje.slice().reverse().map(c => {
+    const v = Number(c.valor).toFixed(2).replace('.',',');
+    return `<div class="hist-item">
+      <div class="hi-left">
+        <div class="hi-tipo">${c.categoria}</div>
+        <div class="hi-names">${escHtml(c.descricao)}</div>
+        <div class="hi-det">📅 ${c.data} · ${c.hora}</div>
+      </div>
+      <div class="hi-right">
+        <div class="hi-valor" style="color:var(--red)">R$ ${v}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════════════════
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+
+  document.getElementById('page-' + name).classList.add('active');
+  const idx = ['home','nova','historico','custos'].indexOf(name);
+  document.querySelectorAll('nav button')[idx].classList.add('active');
+
+  if (name === 'nova') resetNova();
+  if (name === 'historico') buscarHistorico();
+}
+
+// ═══════════════════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════════════════
+function toast(msg, type = '') {
+  const c = document.getElementById('toast-container');
+  const t = document.createElement('div');
+  t.className = 'toast ' + type;
+  t.textContent = msg;
+  c.appendChild(t);
+  setTimeout(() => { t.style.opacity = '0'; t.style.transition = 'opacity .4s'; setTimeout(() => t.remove(), 400); }, 3000);
+}
+
+// ═══════════════════════════════════════════════════════════
+// START
+// ═══════════════════════════════════════════════════════════
+window.addEventListener('load', init);
+</script>
+</body>
+</html>
