@@ -13,6 +13,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 /* ── RESET & VARS ─────────────────────────────────────────── */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -430,6 +431,94 @@ nav button .nav-badge{
   }
 }
 
+
+/* ── PIN MODAL ────────────────────────────────────────────── */
+.pin-display{display:flex;justify-content:center;gap:14px;margin:20px 0 24px}
+.pin-dot{width:16px;height:16px;border-radius:50%;border:2px solid var(--border);transition:all .15s}
+.pin-dot.filled{background:var(--blue);border-color:var(--blue)}
+.pin-dot.error{background:var(--red);border-color:var(--red)}
+.pin-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:0 auto;max-width:240px}
+.pin-btn{
+  height:56px;border:2px solid var(--border);border-radius:12px;
+  background:var(--card);font-family:'Nunito',sans-serif;
+  font-size:20px;font-weight:700;cursor:pointer;color:var(--txt);
+  transition:all .1s;display:flex;align-items:center;justify-content:center;
+}
+.pin-btn:active{background:var(--blue-lt);border-color:var(--blue);transform:scale(.94)}
+.pin-btn.del{font-size:16px;color:var(--txt3)}
+.pin-btn.ok{background:var(--blue);color:#fff;border-color:var(--blue)}
+
+/* ── ADMIN BADGE ──────────────────────────────────────────── */
+.admin-badge{
+  background:linear-gradient(135deg,var(--blue),var(--blue-dk));
+  color:#fff;padding:10px 16px;border-radius:var(--radius-sm);
+  display:flex;justify-content:space-between;align-items:center;
+  font-size:12px;font-weight:700;margin-bottom:4px;
+}
+.admin-badge-left{display:flex;align-items:center;gap:8px}
+.admin-timer{font-size:10px;opacity:.75;font-variant-numeric:tabular-nums}
+.btn-sair{border:1.5px solid rgba(255,255,255,.4);background:transparent;
+  color:#fff;font-family:'Nunito',sans-serif;font-weight:700;font-size:11px;
+  border-radius:6px;padding:4px 10px;cursor:pointer;}
+.btn-sair:active{opacity:.7}
+
+/* ── KPI CARDS (admin) ────────────────────────────────────── */
+.kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.kpi-card{
+  background:var(--card);border-radius:var(--radius-sm);
+  padding:14px 12px;box-shadow:var(--shadow-sm);border:1px solid var(--border);
+}
+.kpi-val{font-size:20px;font-weight:900;line-height:1;margin-bottom:3px}
+.kpi-lbl{font-size:10px;color:var(--txt3);font-weight:600}
+.kpi-sub{font-size:10px;font-weight:600;margin-top:3px}
+.kpi-card.blue .kpi-val{color:var(--blue)}
+.kpi-card.green .kpi-val{color:var(--green)}
+.kpi-card.red .kpi-val{color:var(--red)}
+.kpi-card.amber .kpi-val{color:var(--amber)}
+.kpi-card.purple .kpi-val{color:var(--purple)}
+
+/* ── ADMIN ACTION CARDS ───────────────────────────────────── */
+.admin-cards{display:flex;flex-direction:column;gap:10px;margin-top:8px}
+.admin-action-card{
+  background:var(--card);border-radius:var(--radius);
+  padding:16px 18px;box-shadow:var(--shadow-sm);border:1px solid var(--border);
+  display:flex;align-items:center;gap:14px;cursor:pointer;
+  transition:all .15s;text-decoration:none;
+}
+.admin-action-card:active{transform:scale(.98);box-shadow:none}
+.aac-icon{font-size:28px;line-height:1;flex-shrink:0}
+.aac-body{flex:1}
+.aac-title{font-size:15px;font-weight:800;color:var(--txt);margin-bottom:2px}
+.aac-sub{font-size:12px;color:var(--txt3);font-weight:600}
+.aac-arrow{font-size:18px;color:var(--txt3);flex-shrink:0}
+
+/* ── DASHBOARD ────────────────────────────────────────────── */
+.dash-back{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;
+  color:var(--txt2);cursor:pointer;padding:4px 0 12px;user-select:none}
+.chart-card{background:var(--card);border-radius:var(--radius-sm);padding:14px;
+  box-shadow:var(--shadow-sm);border:1px solid var(--border);margin-bottom:10px}
+.chart-title{font-size:12px;font-weight:700;color:var(--txt2);text-transform:uppercase;
+  letter-spacing:.05em;margin-bottom:10px}
+.charts-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+/* ── RELATÓRIO ────────────────────────────────────────────── */
+.rel-mes-sel{display:flex;gap:8px;margin-bottom:14px}
+.rel-mes-sel select{
+  flex:1;padding:10px 12px;border:2px solid var(--border);
+  border-radius:var(--radius-sm);font-family:'Nunito',sans-serif;
+  font-size:14px;outline:none;background:var(--card);color:var(--txt);
+}
+.rel-mes-sel select:focus{border-color:var(--blue)}
+.rel-preview{background:var(--bg);border-radius:var(--radius-sm);
+  padding:14px;margin-bottom:14px;border:1px solid var(--border)}
+.rel-row{display:flex;justify-content:space-between;font-size:13px;padding:4px 0;border-bottom:1px solid var(--border)}
+.rel-row:last-child{border:none;font-size:15px;font-weight:900;color:var(--green);padding-top:10px}
+.rel-hist-item{background:var(--card);border-radius:var(--radius-sm);
+  padding:10px 12px;margin-bottom:6px;font-size:12px;
+  box-shadow:var(--shadow-sm);border:1px solid var(--border);
+  display:flex;justify-content:space-between;align-items:center}
+.rel-hist-link{color:var(--blue);font-weight:700;font-size:11px;cursor:pointer}
+
 /* Loading skeleton */
 .skeleton{background:linear-gradient(90deg,var(--border) 25%,#F0F6FF 50%,var(--border) 75%);
   background-size:200% 100%;animation:shimmer 1.2s infinite;border-radius:8px;height:80px;margin-bottom:8px}
@@ -500,8 +589,8 @@ nav button .nav-badge{
     <button onclick="showPage('nova')">
       <div class="nav-icon nav-badge">➕<span id="badge-nova" class="badge" style="display:none">!</span></div>Nova
     </button>
-    <button onclick="showPage('historico')">
-      <div class="nav-icon">📋</div>Histórico
+    <button id="nav-admin" onclick="abrirAdmin()">
+      <div class="nav-icon">🔐</div>Gerenciar
     </button>
     <button onclick="showPage('custos')">
       <div class="nav-icon">💰</div>Custos
@@ -516,10 +605,7 @@ nav button .nav-badge{
         <div class="stat-val" id="stat-ativas">0</div>
         <div class="stat-lbl">Ativas agora</div>
       </div>
-      <div class="stat-card">
-        <div class="stat-val" id="stat-hoje" style="font-size:13px">R$ 0</div>
-        <div class="stat-lbl">Hoje</div>
-      </div>
+
       <div class="stat-card">
         <div class="stat-val" id="stat-nloc">0</div>
         <div class="stat-lbl">Locações hoje</div>
@@ -640,6 +726,130 @@ nav button .nav-badge{
     </div>
   </div>
 
+
+  <!-- ──────── PAGE: ADMIN ──────── -->
+  <div id="page-admin" class="page">
+    <div class="admin-badge">
+      <div class="admin-badge-left">🔐 <span>Modo Administrador</span></div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span class="admin-timer" id="admin-timer-display">1:00</span>
+        <button class="btn-sair" onclick="adminLogout()">Sair</button>
+      </div>
+    </div>
+
+    <div class="sec-title">Visão geral</div>
+    <div class="kpi-grid" id="admin-kpi-grid">
+      <div class="kpi-card blue"><div class="kpi-val" id="k-fathoje">...</div><div class="kpi-lbl">Faturamento hoje</div></div>
+      <div class="kpi-card red"><div class="kpi-val" id="k-cushoje">...</div><div class="kpi-lbl">Custos hoje</div></div>
+      <div class="kpi-card green"><div class="kpi-val" id="k-fatmes">...</div><div class="kpi-lbl">Faturamento mês</div><div class="kpi-sub" id="k-nmes" style="color:var(--green)"></div></div>
+      <div class="kpi-card purple"><div class="kpi-val" id="k-resultado">...</div><div class="kpi-lbl">Resultado mês</div><div class="kpi-sub" id="k-margem" style="color:var(--purple)"></div></div>
+    </div>
+
+    <div class="sec-title">Gestão</div>
+    <div class="admin-cards">
+      <div class="admin-action-card" onclick="irAdmin('dashboard')">
+        <div class="aac-icon">📊</div>
+        <div class="aac-body">
+          <div class="aac-title">Dashboard</div>
+          <div class="aac-sub">Gráficos por dia, tipo e plano</div>
+        </div>
+        <div class="aac-arrow">›</div>
+      </div>
+      <div class="admin-action-card" onclick="irAdmin('relatorio')">
+        <div class="aac-icon">📋</div>
+        <div class="aac-body">
+          <div class="aac-title">Relatório Mensal</div>
+          <div class="aac-sub">Enviar e salvar PDF no Drive</div>
+        </div>
+        <div class="aac-arrow">›</div>
+      </div>
+      <div class="admin-action-card" onclick="irAdmin('historico')">
+        <div class="aac-icon">📈</div>
+        <div class="aac-body">
+          <div class="aac-title">Histórico de Locações</div>
+          <div class="aac-sub">Buscar por data</div>
+        </div>
+        <div class="aac-arrow">›</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ──────── PAGE: DASHBOARD ──────── -->
+  <div id="page-dashboard" class="page">
+    <div class="dash-back" onclick="irAdmin('admin')">← Voltar</div>
+    <div class="sec-title" id="dash-title">Dashboard</div>
+
+    <div class="chart-card">
+      <div class="chart-title">Faturamento diário</div>
+      <canvas id="chart-diario" height="180"></canvas>
+    </div>
+
+    <div class="charts-row">
+      <div class="chart-card">
+        <div class="chart-title">Por tipo</div>
+        <canvas id="chart-tipo" height="160"></canvas>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Por plano</div>
+        <canvas id="chart-plano" height="160"></canvas>
+      </div>
+    </div>
+
+    <div class="chart-card">
+      <div class="chart-title">Horários de pico</div>
+      <canvas id="chart-horas" height="160"></canvas>
+    </div>
+  </div>
+
+  <!-- ──────── PAGE: RELATÓRIO ──────── -->
+  <div id="page-relatorio" class="page">
+    <div class="dash-back" onclick="irAdmin('admin')">← Voltar</div>
+    <div class="sec-title">Relatório Mensal</div>
+
+    <div class="rel-mes-sel">
+      <select id="rel-mes">
+        <option value="1">Janeiro</option><option value="2">Fevereiro</option>
+        <option value="3">Março</option><option value="4">Abril</option>
+        <option value="5">Maio</option><option value="6">Junho</option>
+        <option value="7">Julho</option><option value="8">Agosto</option>
+        <option value="9">Setembro</option><option value="10">Outubro</option>
+        <option value="11">Novembro</option><option value="12">Dezembro</option>
+      </select>
+      <select id="rel-ano"></select>
+      <button onclick="carregarPreviewRelatorio()" style="padding:10px 14px;background:var(--blue);color:#fff;border:none;border-radius:var(--radius-sm);font-family:'Nunito',sans-serif;font-weight:700;cursor:pointer;font-size:13px;">Ver</button>
+    </div>
+
+    <div class="rel-preview" id="rel-preview">
+      <div style="text-align:center;color:var(--txt3);font-size:13px;">Selecione o mês e clique em Ver</div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+      <button class="btn btn-primary" onclick="enviarRelatorioEmail()" id="btn-rel-email" style="font-size:13px">📧 Enviar Email</button>
+      <button class="btn" onclick="salvarRelatorioDrive()" id="btn-rel-drive" style="font-size:13px;background:var(--green);color:#fff;border-radius:var(--radius-sm);padding:14px;font-weight:800;border:none;cursor:pointer;">💾 Salvar PDF</button>
+    </div>
+
+    <div class="sec-title">Histórico de relatórios</div>
+    <div id="rel-hist-container">
+      <div class="empty"><div class="empty-icon">📋</div><h3>Nenhum relatório enviado</h3></div>
+    </div>
+  </div>
+
+  <!-- ──────── PAGE: HISTÓRICO (admin) ──────── -->
+  <div id="page-historico" class="page">
+    <div class="dash-back" onclick="irAdmin('admin')">← Voltar</div>
+    <div class="hist-filter">
+      <input id="hist-data" type="date">
+      <button onclick="buscarHistorico()">Buscar</button>
+    </div>
+    <div id="hist-container">
+      <div class="empty">
+        <div class="empty-icon">📋</div>
+        <h3>Histórico vazio</h3>
+        <p>Busque por data para ver as locações</p>
+      </div>
+    </div>
+  </div>
+
 </div><!-- /app -->
 
 <!-- ──────── ALERT MODAL (5min / expired) ──────── -->
@@ -682,6 +892,37 @@ nav button .nav-badge{
 
 <!-- Toast container -->
 <div class="toast-container" id="toast-container"></div>
+
+
+<!-- ──────── PIN MODAL ──────── -->
+<div id="pin-modal" class="modal-overlay">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-icon">🔐</div>
+    <div class="modal-title">Área Administrativa</div>
+    <div class="modal-sub">Digite a senha de acesso</div>
+    <div class="pin-display">
+      <div class="pin-dot" id="pd0"></div>
+      <div class="pin-dot" id="pd1"></div>
+      <div class="pin-dot" id="pd2"></div>
+      <div class="pin-dot" id="pd3"></div>
+    </div>
+    <div class="pin-grid">
+      <button class="pin-btn" onclick="pinKey('1')">1</button>
+      <button class="pin-btn" onclick="pinKey('2')">2</button>
+      <button class="pin-btn" onclick="pinKey('3')">3</button>
+      <button class="pin-btn" onclick="pinKey('4')">4</button>
+      <button class="pin-btn" onclick="pinKey('5')">5</button>
+      <button class="pin-btn" onclick="pinKey('6')">6</button>
+      <button class="pin-btn" onclick="pinKey('7')">7</button>
+      <button class="pin-btn" onclick="pinKey('8')">8</button>
+      <button class="pin-btn" onclick="pinKey('9')">9</button>
+      <button class="pin-btn del" onclick="pinDel()">⌫</button>
+      <button class="pin-btn" onclick="pinKey('0')">0</button>
+      <button class="pin-btn" onclick="fecharPin()">✕</button>
+    </div>
+  </div>
+</div>
 
 <script>
 // ═══════════════════════════════════════════════════════════
@@ -1037,7 +1278,6 @@ function escHtml(t) {
 // ═══════════════════════════════════════════════════════════
 function updateStats() {
   document.getElementById('stat-ativas').textContent = sessions.length;
-  document.getElementById('stat-hoje').textContent = 'R$ ' + statsHoje.fat.toFixed(0);
   document.getElementById('stat-nloc').textContent = statsHoje.n;
 }
 
@@ -1555,6 +1795,300 @@ function toast(msg, type = '') {
 // ═══════════════════════════════════════════════════════════
 // START
 // ═══════════════════════════════════════════════════════════
+
+// ═══════════════════════════════════════════════════════════
+// ADMIN — Estado, PIN, Timeout
+// ═══════════════════════════════════════════════════════════
+let isAdmin         = false;
+let adminTimerInt   = null;
+let adminCountdown  = 60;
+let kpiData         = null;
+let chartsRendered  = false;
+let chartDiario=null,chartTipo=null,chartPlano=null,chartHoras=null;
+const ADMIN_PIN     = '1321';
+let pinBuffer       = '';
+
+// ── PIN ──────────────────────────────────────────────────────
+function abrirAdmin() {
+  if (isAdmin) { showPage('admin'); return; }
+  pinBuffer = '';
+  atualizarDots();
+  document.getElementById('pin-modal').classList.add('show');
+}
+
+function fecharPin() {
+  document.getElementById('pin-modal').classList.remove('show');
+  pinBuffer = '';
+  atualizarDots();
+}
+
+function pinKey(d) {
+  if (pinBuffer.length >= 4) return;
+  pinBuffer += d;
+  atualizarDots();
+  if (pinBuffer.length === 4) setTimeout(verificarPin, 150);
+}
+
+function pinDel() {
+  pinBuffer = pinBuffer.slice(0, -1);
+  atualizarDots();
+}
+
+function atualizarDots(erro) {
+  for (let i=0;i<4;i++) {
+    const el = document.getElementById('pd'+i);
+    el.className = 'pin-dot';
+    if (erro) el.classList.add('error');
+    else if (i < pinBuffer.length) el.classList.add('filled');
+  }
+}
+
+function verificarPin() {
+  if (pinBuffer === ADMIN_PIN) {
+    fecharPin();
+    adminLogin();
+  } else {
+    atualizarDots(true);
+    navigator.vibrate && navigator.vibrate([80,40,80]);
+    setTimeout(() => { pinBuffer=''; atualizarDots(); }, 800);
+  }
+}
+
+// ── LOGIN/LOGOUT ─────────────────────────────────────────────
+function adminLogin() {
+  isAdmin = true;
+  adminCountdown = 60;
+  document.addEventListener('click',    resetAdminTimer);
+  document.addEventListener('touchstart', resetAdminTimer);
+  adminTimerInt = setInterval(tickAdmin, 1000);
+  carregarKPIs();
+  showPage('admin');
+  carregarHistRelatorios();
+}
+
+function adminLogout() {
+  isAdmin = false;
+  clearInterval(adminTimerInt);
+  document.removeEventListener('click',    resetAdminTimer);
+  document.removeEventListener('touchstart', resetAdminTimer);
+  showPage('home');
+  toast('Sessão administrativa encerrada', 'warning');
+}
+
+function resetAdminTimer() {
+  adminCountdown = 60;
+}
+
+function tickAdmin() {
+  if (!isAdmin) return;
+  adminCountdown--;
+  const el = document.getElementById('admin-timer-display');
+  if (el) el.textContent = '0:' + String(adminCountdown).padStart(2,'0');
+  if (adminCountdown <= 0) adminLogout();
+}
+
+function irAdmin(page) {
+  resetAdminTimer();
+  showPage(page);
+  if (page === 'dashboard' && kpiData) renderCharts(kpiData);
+  if (page === 'relatorio') {
+    initRelMesSel();
+    carregarHistRelatorios();
+  }
+}
+
+// ── KPIs ─────────────────────────────────────────────────────
+async function carregarKPIs() {
+  try {
+    const d = await api({ action: 'buscarKPIsAdmin' });
+    if (!d.ok) return;
+    kpiData = d;
+    const R = v => 'R$ ' + Number(v).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    document.getElementById('k-fathoje').textContent  = R(d.fatHoje);
+    document.getElementById('k-cushoje').textContent  = R(d.cusHoje);
+    document.getElementById('k-fatmes').textContent   = R(d.fatMes);
+    document.getElementById('k-nmes').textContent     = d.nMes + ' locações';
+    document.getElementById('k-resultado').textContent = R(d.resultado);
+    document.getElementById('k-margem').textContent   = 'margem ' + d.margem + '%';
+  } catch {}
+}
+
+// ── CHARTS ───────────────────────────────────────────────────
+function renderCharts(d) {
+  if (!window.Chart) return;
+
+  // Destroy previous
+  [chartDiario,chartTipo,chartPlano,chartHoras].forEach(c => c && c.destroy());
+
+  const BLUE='#1565C0',PINK='#C2185B',PURPLE='#6A1B9A',GREEN='#2E7D32',AMBER='#E65100';
+
+  // Gráfico 1: Faturamento diário
+  const fatDia = d.fatPorDia || [];
+  const hoje   = new Date().getDate();
+  const fatLabels = fatDia.filter(x=>x.dia<=hoje).map(x=>x.dia+'°');
+  const fatValues = fatDia.filter(x=>x.dia<=hoje).map(x=>x.valor);
+  chartDiario = new Chart(document.getElementById('chart-diario'), {
+    type:'line',
+    data:{
+      labels:fatLabels,
+      datasets:[{label:'R$',data:fatValues,borderColor:BLUE,backgroundColor:BLUE+'22',
+        fill:true,tension:.35,pointRadius:3,pointBackgroundColor:BLUE}]
+    },
+    options:{responsive:true,plugins:{legend:{display:false}},scales:{
+      x:{grid:{display:false},ticks:{font:{size:10}}},
+      y:{grid:{color:'#f0f0f0'},ticks:{callback:v=>'R$'+v,font:{size:10}}}
+    }}
+  });
+
+  // Gráfico 2: Por tipo (pizza)
+  const tipoData = d.fatPorTipo || {};
+  chartTipo = new Chart(document.getElementById('chart-tipo'), {
+    type:'doughnut',
+    data:{
+      labels:['🚗 Carro','🧸 Pelúcia'],
+      datasets:[{data:[tipoData['Carro']||0,tipoData['Pelúcia']||0],
+        backgroundColor:[BLUE,PINK],borderWidth:0}]
+    },
+    options:{responsive:true,plugins:{legend:{position:'bottom',labels:{font:{size:10},padding:8}}},
+      cutout:'65%'}
+  });
+
+  // Gráfico 3: Por plano (barras)
+  const plano = d.fatPorPlano || {};
+  const planoKeys = ['10min','20min','30min','40min','60min','3h'].filter(k=>plano[k]>0);
+  chartPlano = new Chart(document.getElementById('chart-plano'), {
+    type:'bar',
+    data:{
+      labels:planoKeys,
+      datasets:[{label:'R$',data:planoKeys.map(k=>plano[k]||0),
+        backgroundColor:PURPLE,borderRadius:4}]
+    },
+    options:{responsive:true,plugins:{legend:{display:false}},scales:{
+      x:{grid:{display:false},ticks:{font:{size:10}}},
+      y:{grid:{color:'#f0f0f0'},ticks:{callback:v=>'R$'+v,font:{size:10}}}
+    }}
+  });
+
+  // Gráfico 4: Horários de pico
+  const horas = (d.horasPico||[]).map((v,i)=>({h:(9+i)+'h',v})).filter(x=>x.v>0||true);
+  chartHoras = new Chart(document.getElementById('chart-horas'), {
+    type:'bar',
+    data:{
+      labels:horas.map(x=>x.h),
+      datasets:[{label:'R$',data:horas.map(x=>x.v),
+        backgroundColor:horas.map(x=>x.v>0?AMBER+99:AMBER+'33'),borderRadius:3}]
+    },
+    options:{responsive:true,plugins:{legend:{display:false}},scales:{
+      x:{grid:{display:false},ticks:{font:{size:10}}},
+      y:{grid:{color:'#f0f0f0'},ticks:{callback:v=>'R$'+v,font:{size:10}}}
+    }}
+  });
+
+  // Update dashboard title
+  const el = document.getElementById('dash-title');
+  if(el && d.mesAtual && d.anoAtual) {
+    const MESES=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+    el.textContent = 'Dashboard — '+MESES[d.mesAtual-1]+'/'+d.anoAtual;
+  }
+}
+
+// ── RELATÓRIO ────────────────────────────────────────────────
+function initRelMesSel() {
+  const hoje = new Date();
+  document.getElementById('rel-mes').value = hoje.getMonth()+1;
+  const anoSel = document.getElementById('rel-ano');
+  if (!anoSel.options.length) {
+    for (let a=hoje.getFullYear();a>=2026;a--) {
+      anoSel.add(new Option(a,a,a===hoje.getFullYear()));
+    }
+  }
+}
+
+async function carregarPreviewRelatorio() {
+  const mes  = document.getElementById('rel-mes').value;
+  const ano  = document.getElementById('rel-ano').value;
+  const prev = document.getElementById('rel-preview');
+  prev.innerHTML = '<div style="text-align:center;color:var(--txt3);font-size:13px;">Carregando...</div>';
+  try {
+    const d = await api({ action:'buscarKPIsAdmin' });
+    if (!d.ok) return;
+    const f = v => 'R$ '+Number(v).toFixed(2).replace('.',',');
+    prev.innerHTML = `
+      <div class="rel-row"><span>Faturamento</span><span><b>${f(d.fatMes)}</b></span></div>
+      <div class="rel-row"><span>Custos operacionais</span><span>${f(d.cusMes)}</span></div>
+      <div class="rel-row"><span>CTO a pagar</span><span>${f(d.ctoPagar)}</span></div>
+      <div class="rel-row"><span>Locações</span><span>${d.nMes}</span></div>
+      <div class="rel-row"><span>Resultado</span><span style="color:${d.resultado>=0?'var(--green)':'var(--red)'}"><b>${f(d.resultado)}</b></span></div>
+    `;
+  } catch { prev.innerHTML = '<div style="color:var(--red);font-size:13px">Erro ao carregar</div>'; }
+}
+
+async function enviarRelatorioEmail() {
+  const btn = document.getElementById('btn-rel-email');
+  btn.textContent = '⏳ Enviando...'; btn.disabled = true;
+  try {
+    const d = await api({ action:'gerarRelatorio' });
+    if (d.ok) { toast('✅ Relatório enviado por email!','success'); carregarHistRelatorios(); }
+    else toast('Erro: '+d.erro,'error');
+  } catch { toast('Erro de conexão','error'); }
+  finally { btn.textContent='📧 Enviar Email'; btn.disabled=false; }
+}
+
+async function salvarRelatorioDrive() {
+  const mes = document.getElementById('rel-mes').value;
+  const ano = document.getElementById('rel-ano').value;
+  const btn = document.getElementById('btn-rel-drive');
+  btn.textContent = '⏳ Salvando...'; btn.disabled = true;
+  try {
+    const d = await api({ action:'salvarRelatorioDrive', mes, ano });
+    if (d.ok) {
+      toast('✅ PDF salvo no Drive!','success');
+      carregarHistRelatorios();
+      window.open(d.link,'_blank');
+    } else toast('Erro: '+d.erro,'error');
+  } catch { toast('Erro de conexão','error'); }
+  finally { btn.textContent='💾 Salvar PDF'; btn.disabled=false; }
+}
+
+async function carregarHistRelatorios() {
+  const container = document.getElementById('rel-hist-container');
+  if (!container) return;
+  try {
+    const d = await api({ action:'listarRelatorios' });
+    if (!d.ok || !d.relatorios.length) {
+      container.innerHTML='<div class="empty"><div class="empty-icon">📋</div><h3>Nenhum relatório enviado</h3></div>';
+      return;
+    }
+    container.innerHTML = d.relatorios.map(r=>`
+      <div class="rel-hist-item">
+        <div>
+          <div style="font-weight:700;color:var(--txt)">${r.mesAno}</div>
+          <div style="color:var(--txt3)">${r.dataEnvio} · ${r.tipo}</div>
+        </div>
+        ${r.link&&r.link!=='(email)'?`<span class="rel-hist-link" onclick="window.open('${r.link}','_blank')">📄 PDF</span>`:'📧'}
+      </div>`).join('');
+  } catch {}
+}
+
+// ── OVERRIDE showPage for admin pages ────────────────────────
+const _origShowPage = showPage;
+function showPage(name) {
+  const adminPages = ['admin','dashboard','relatorio','historico'];
+  if (adminPages.includes(name) && !isAdmin) {
+    abrirAdmin();
+    return;
+  }
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  const navIdx = ['home','nova','historico','custos'].indexOf(name);
+  if (navIdx >= 0) document.querySelectorAll('nav button')[navIdx].classList.add('active');
+  if (name==='nova') resetNova();
+  if (name==='custos') loadCustosHoje();
+  if (name==='historico') { setDefaultDate(); buscarHistorico(); }
+  if (name==='admin' && isAdmin) { resetAdminTimer(); carregarKPIs(); }
+}
+
 document.addEventListener('DOMContentLoaded', init);
 </script>
 </body>
