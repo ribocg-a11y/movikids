@@ -362,12 +362,14 @@ nav button .nav-badge{
     );
   }
   body{background:transparent;display:flex;justify-content:center;}
-  
-  /* App ocupa a tela toda normalmente — sem frame de celular */
+
+  /* Largura fixa e explícita — impede encolhimento entre páginas */
   #app{
+    width:600px !important;
+    max-width:600px !important;
+    flex-shrink:0;
     box-shadow:0 0 80px rgba(0,0,0,.35),0 0 0 1px rgba(255,255,255,.06);
     position:relative;z-index:10;
-    flex-shrink:0;
   }
 
   #desktop-bg{
