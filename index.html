@@ -360,21 +360,14 @@ nav button .nav-badge{
       #060d1f 0%,#0d2a5c 20%,#1565C0 38%,
       #3a1070 58%,#6a0f8e 72%,#a01060 88%,#c2185b 100%
     );
-    min-height:100vh;
   }
-  body{background:transparent;display:flex;align-items:center;justify-content:center;min-height:100vh}
+  body{background:transparent;display:flex;justify-content:center;}
   
+  /* App ocupa a tela toda normalmente — sem frame de celular */
   #app{
-    border-radius:44px;
-    box-shadow:
-      0 0 0 1px rgba(255,255,255,.14),
-      0 0 0 2px rgba(255,255,255,.05),
-      0 40px 100px rgba(0,0,0,.75),
-      0 0 80px rgba(21,101,192,.25);
-    height:calc(100vh - 48px);
-    max-height:920px;
-    flex-shrink:0;
+    box-shadow:0 0 80px rgba(0,0,0,.35),0 0 0 1px rgba(255,255,255,.06);
     position:relative;z-index:10;
+    flex-shrink:0;
   }
 
   #desktop-bg{
