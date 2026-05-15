@@ -1337,10 +1337,18 @@ function abrirWhatsAppCard(rowIndex) {
 function abrirWaMsg(s) {
   const rem   = calcRemaining(s);
   const fmin  = rem > 0 ? `⏰ Faltam apenas ${Math.ceil(rem/60)} minuto(s)!` : '🔴 O tempo já esgotou!';
+
+  // Link de acompanhamento para o responsável
+  const trackUrl = 'https://ribocg-a11y.github.io/movikids/track.html' +
+    `?r=${s.rowIndex}&ts=${s.startTimestamp}&m=${s.mins}` +
+    `&v=${encodeURIComponent(s.tipo)}&c=${encodeURIComponent(s.crianca)}` +
+    `&p=${encodeURIComponent(s.responsavel)}`;
+
   const msg   = encodeURIComponent(
     `Olá ${s.responsavel}! ${s.tipo === 'Carro' ? '🚗' : '🧸'}\n\n` +
     `A locação de *${s.crianca}* está chegando ao fim.\n` +
     `${fmin}\n\n` +
+    `📱 Acompanhe o cronômetro em tempo real:\n${trackUrl}\n\n` +
     `Caso queira mais tempo, o valor adicional é R$ ${String(s.adicionalPorMin).replace('.',',')} por minuto.\n\n` +
     `Obrigado por escolher a Movi Kids! 🌟`
   );
