@@ -350,6 +350,91 @@ nav button .nav-badge{
 .btn-iniciar{background:linear-gradient(135deg,var(--green),#1B5E20);color:#fff;
   width:100%;padding:16px;font-size:15px;border-radius:var(--radius)}
 
+
+/* ── DESKTOP CENÁRIO (viewport > 450px) ────────────────────────────────── */
+@media (max-width:449px){#desktop-bg{display:none}}
+
+@media (min-width:450px){
+  html{
+    background:linear-gradient(145deg,
+      #060d1f 0%,#0d2a5c 20%,#1565C0 38%,
+      #3a1070 58%,#6a0f8e 72%,#a01060 88%,#c2185b 100%
+    );
+    min-height:100vh;
+  }
+  body{background:transparent;display:flex;align-items:center;justify-content:center;min-height:100vh}
+  
+  #app{
+    border-radius:44px;
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,.14),
+      0 0 0 2px rgba(255,255,255,.05),
+      0 40px 100px rgba(0,0,0,.75),
+      0 0 80px rgba(21,101,192,.25);
+    height:calc(100vh - 48px);
+    max-height:920px;
+    flex-shrink:0;
+    position:relative;z-index:10;
+  }
+
+  #desktop-bg{
+    display:block;position:fixed;inset:0;
+    pointer-events:none;z-index:0;overflow:hidden;
+  }
+
+  .orb{position:absolute;border-radius:50%;filter:blur(80px);opacity:.35}
+  .orb-blue{width:500px;height:500px;top:-100px;left:-100px;background:#1565C0}
+  .orb-pink{width:600px;height:600px;bottom:-150px;right:-150px;background:#c2185b}
+  .orb-purple{width:400px;height:400px;top:30%;left:50%;transform:translateX(-50%);background:#6a1b9a}
+
+  .deco{
+    position:absolute;
+    left:var(--x);top:var(--y);
+    font-size:var(--s);
+    opacity:.55;
+    animation:floatDeco var(--dur) ease-in-out infinite var(--del);
+    text-shadow:0 4px 20px rgba(0,0,0,.3);
+    filter:drop-shadow(0 4px 12px rgba(0,0,0,.25));
+  }
+  @keyframes floatDeco{
+    0%,100%{transform:translateY(0) rotate(0deg) scale(1)}
+    33%{transform:translateY(-18px) rotate(6deg) scale(1.05)}
+    66%{transform:translateY(-8px) rotate(-4deg) scale(0.97)}
+  }
+
+  .brand-left,.brand-right{
+    position:absolute;top:50%;transform:translateY(-50%);
+    color:rgba(255,255,255,.9);
+  }
+  .brand-left{left:0;right:calc(50% + 230px);text-align:center;padding:0 16px}
+  .brand-right{left:calc(50% + 230px);right:0;text-align:center;padding:0 16px}
+
+  .brand-logo{
+    font-family:'Fredoka One',cursive;font-size:clamp(16px,2.2vw,28px);
+    color:#fff;letter-spacing:1px;margin-bottom:8px;
+  }
+  .brand-logo span{color:#FFD54F}
+  .brand-sub{font-size:clamp(10px,1.2vw,13px);color:rgba(255,255,255,.65);font-weight:600;line-height:1.6}
+  .feat{
+    font-size:clamp(10px,1.1vw,13px);color:rgba(255,255,255,.7);
+    font-weight:600;padding:6px 0;line-height:1.4;
+  }
+
+  /* Pontos de luz decorativos */
+  #desktop-bg::before{
+    content:'';position:absolute;inset:0;
+    background:
+      radial-gradient(1.5px 1.5px at 15% 20%, rgba(255,255,255,.6) 0%, transparent 100%),
+      radial-gradient(1px 1px at 30% 60%, rgba(255,255,255,.4) 0%, transparent 100%),
+      radial-gradient(2px 2px at 8% 75%, rgba(255,255,255,.5) 0%, transparent 100%),
+      radial-gradient(1px 1px at 22% 40%, rgba(255,255,255,.3) 0%, transparent 100%),
+      radial-gradient(1.5px 1.5px at 80% 15%, rgba(255,255,255,.6) 0%, transparent 100%),
+      radial-gradient(1px 1px at 90% 45%, rgba(255,255,255,.4) 0%, transparent 100%),
+      radial-gradient(2px 2px at 70% 80%, rgba(255,255,255,.5) 0%, transparent 100%),
+      radial-gradient(1px 1px at 85% 60%, rgba(255,255,255,.3) 0%, transparent 100%);
+  }
+}
+
 /* Loading skeleton */
 .skeleton{background:linear-gradient(90deg,var(--border) 25%,#F0F6FF 50%,var(--border) 75%);
   background-size:200% 100%;animation:shimmer 1.2s infinite;border-radius:8px;height:80px;margin-bottom:8px}
@@ -358,6 +443,38 @@ nav button .nav-badge{
 </head>
 
 <body>
+
+<!-- Desktop background decoration -->
+<div id="desktop-bg" aria-hidden="true">
+  <div class="orb orb-blue"></div>
+  <div class="orb orb-pink"></div>
+  <div class="orb orb-purple"></div>
+  <div class="deco" style="--x:5%;--y:12%;--s:2.4rem;--dur:7s;--del:0s">🚗</div>
+  <div class="deco" style="--x:8%;--y:38%;--s:1.6rem;--dur:9s;--del:1.5s">🧸</div>
+  <div class="deco" style="--x:3%;--y:62%;--s:2rem;--dur:8s;--del:3s">🚗</div>
+  <div class="deco" style="--x:12%;--y:80%;--s:1.4rem;--dur:11s;--del:0.8s">🧸</div>
+  <div class="deco" style="--x:16%;--y:20%;--s:1.2rem;--dur:13s;--del:2s">✦</div>
+  <div class="deco" style="--x:7%;--y:50%;--s:0.9rem;--dur:10s;--del:4s">✦</div>
+  <div class="deco" style="--x:18%;--y:70%;--s:1rem;--dur:12s;--del:1s">✦</div>
+  <div class="deco" style="--x:75%;--y:10%;--s:2.2rem;--dur:8.5s;--del:0.5s">🧸</div>
+  <div class="deco" style="--x:82%;--y:35%;--s:2.6rem;--dur:7.5s;--del:2.5s">🚗</div>
+  <div class="deco" style="--x:78%;--y:58%;--s:1.8rem;--dur:9.5s;--del:1s">🧸</div>
+  <div class="deco" style="--x:88%;--y:75%;--s:2rem;--dur:10.5s;--del:3.5s">🚗</div>
+  <div class="deco" style="--x:72%;--y:88%;--s:1.5rem;--dur:11s;--del:0s">🧸</div>
+  <div class="deco" style="--x:70%;--y:22%;--s:1rem;--dur:14s;--del:2s">✦</div>
+  <div class="deco" style="--x:85%;--y:50%;--s:0.8rem;--dur:12s;--del:4.5s">✦</div>
+  <div class="deco" style="--x:92%;--y:30%;--s:1.1rem;--dur:9s;--del:1.5s">✦</div>
+  <div class="brand-left">
+    <div class="brand-logo">🚗 Movi <span>Kids</span></div>
+    <div class="brand-sub">Locação de Veículos Elétricos</div>
+    <div class="brand-sub" style="opacity:.5;font-size:11px;margin-top:4px">Golden Shopping Calhau</div>
+  </div>
+  <div class="brand-right">
+    <div class="feat">🏎️ 3 carros elétricos</div>
+    <div class="feat">🧸 4 pelúcias elétricas</div>
+    <div class="feat">⚡ Entretenimento infantil</div>
+  </div>
+</div>
 
 <!-- Splash -->
 <div id="splash">
