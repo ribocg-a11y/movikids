@@ -1226,7 +1226,12 @@ function setDefaultDate() {
   const y = hoje.getFullYear();
   const m = String(hoje.getMonth()+1).padStart(2,'0');
   const d = String(hoje.getDate()).padStart(2,'0');
-  document.getElementById('hist-data').value = `${y}-${m}-${d}`;
+  const iso = `${y}-${m}-${d}`;
+  // hist-data foi substituído por hist-start/hist-end
+  const s = document.getElementById('hist-start');
+  const e = document.getElementById('hist-end');
+  if (s) s.value = iso;
+  if (e) e.value = iso;
 }
 
 // ═══════════════════════════════════════════════════════════
