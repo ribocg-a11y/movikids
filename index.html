@@ -640,6 +640,7 @@ nav button .nav-badge{
   display:flex;justify-content:space-between;align-items:center}
 .rel-hist-link{color:var(--blue);font-weight:700;font-size:11px;cursor:pointer}
 
+.admin-kpis-hidden{display:none}
 /* Loading skeleton */
 .skeleton{background:linear-gradient(90deg,var(--border) 25%,#F0F6FF 50%,var(--border) 75%);
   background-size:200% 100%;animation:shimmer 1.2s infinite;border-radius:8px;height:80px;margin-bottom:8px}
@@ -753,14 +754,14 @@ nav button .nav-badge{
       <div class="stat-card"><div class="stat-val" id="stat-ativas">0</div><div class="stat-lbl">Ativas agora</div></div>
       <div class="stat-card"><div class="stat-val" id="stat-nloc">0</div><div class="stat-lbl">Encerradas hoje</div></div>
     </div>
-    <div id="admin-home-kpis" style="display:none">
+    <div id="admin-home-kpis" class="admin-kpis-hidden">
       <div class="kpi-grid" style="margin-bottom:10px">
         <div class="kpi-card blue"><div class="kpi-val" id="h-fathoje">R$0</div><div class="kpi-lbl">Fat. hoje</div></div>
         <div class="kpi-card red"><div class="kpi-val" id="h-cushoje">R$0</div><div class="kpi-lbl">Custos hoje</div></div>
         <div class="kpi-card green"><div class="kpi-val" id="h-fatmes">R$0</div><div class="kpi-lbl">Fat. mês</div><div class="kpi-sub" id="h-nmes"></div></div>
         <div class="kpi-card purple"><div class="kpi-val" id="h-resultado">R$0</div><div class="kpi-lbl">Resultado mês</div><div class="kpi-sub" id="h-margem"></div></div>
       </div>
-      <div class="ranking-card" id="h-ranking" style="display:none;margin-bottom:10px"><div class="chart-title">Ranking — mês atual</div><div id="h-rank-rows"></div></div>
+      <div class="ranking-card" id="h-ranking" style="margin-bottom:10px;display:none"><div class="chart-title">Ranking — mês atual</div><div id="h-rank-rows"></div></div>
     </div>
     <div class="sec-title">Sessões ativas</div>
     <div id="sessions-container"><div class="skeleton"></div><div class="skeleton"></div></div>
@@ -2028,7 +2029,7 @@ function adminLogout() {
   document.removeEventListener('touchstart', resetAdminTimer);
   hideAdminSidebar();
   const kpiEl = document.getElementById('admin-home-kpis');
-  if(kpiEl) kpiEl.classList.remove('visible');
+  if(kpiEl) kpiEl.style.display = 'none';
   showPage('home');
   toast('Sessão administrativa encerrada', 'warning');
 }
@@ -2059,7 +2060,7 @@ function irAdmin(page) {
 // ── KPIs ─────────────────────────────────────────────────────
 async function carregarKPIs() {
   try {
-    const d = await api(params);
+    const d = await api({ action: 'buscarKPIsAdmin' });
     if (!d.ok) return;
     kpiData = d;
     const R = v => 'R$ ' + Number(v).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
@@ -2244,7 +2245,7 @@ function showPage(name) {
   if (name==='nova') resetNova();
   if (name==='custos') loadCustosHoje();
   if (name==='historico') { if(!currentPeriod) setPeriod('hoje',null); else buscarHistorico(); }
-  if (name==='admin' && isAdmin) { resetAdminTimer(); carregarKPIs(); }
+  if (name==='admin' && isAdmin) { resetAdminTimer(); if(!kpiData) carregarKPIs(); }
   if (name==='dashboard' && kpiData) renderCharts(kpiData);
 }
 
@@ -2329,7 +2330,7 @@ function renderEncHoje(list) {
 function showAdminHomeKpis(d) {
   const el = document.getElementById('admin-home-kpis');
   if (!el) return;
-  el.classList.add('visible');
+  el.style.display = 'block';
   const R = v=>'R$ '+Number(v).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,'.');
   const set = (id,v) => { const e=document.getElementById(id); if(e) e.textContent=v; };
   set('h-fathoje', R(d.fatHoje));
