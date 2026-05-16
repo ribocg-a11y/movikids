@@ -397,7 +397,7 @@ nav button .nav-badge{
     height:100dvh;
   }
   header{display:none} /* sidebar handles branding */
-  nav{display:none!important} /* sidebar handles nav */
+  #main-content nav{display:none!important} /* hide bottom nav only */
   .stats-bar{grid-template-columns:repeat(4,1fr)}
   .kpi-grid{grid-template-columns:repeat(4,1fr)!important}
   .charts-row{grid-template-columns:1fr 1fr}
@@ -696,11 +696,11 @@ nav button .nav-badge{
     <div class="sb-logo">🚗 Movi <span>Kids</span>
       <div class="sb-status"><span id="sb-dot" class="dot-online"></span><span id="sb-txt">Online</span></div>
     </div>
-    <nav class="sb-nav" id="sb-nav">
+    <div class="sb-nav" id="sb-nav">
       <button class="sb-btn active" id="sbn-home" onclick="showPage('home')"><span class="sb-icon">🏠</span>Home</button>
       <button class="sb-btn" id="sbn-nova" onclick="showPage('nova')"><span class="sb-icon">➕</span>Nova Locação</button>
       <button class="sb-btn" id="sbn-custos" onclick="showPage('custos')"><span class="sb-icon">💰</span>Registrar Custo</button>
-    </nav>
+    </div>
     <div class="sb-admin-section" id="sb-admin-section">
       <div class="sb-divider">Administração</div>
       <button class="sb-btn" id="sbn-adm" onclick="irAdmin('admin')"><span class="sb-icon">📊</span>Painel Admin</button>
@@ -749,25 +749,22 @@ nav button .nav-badge{
 
   <!-- ──────── PAGE: HOME ──────── -->
   <div id="page-home" class="page active">
-
     <div class="stats-bar">
-      <div class="stat-card">
-        <div class="stat-val" id="stat-ativas">0</div>
-        <div class="stat-lbl">Ativas agora</div>
-      </div>
-
-      <div class="stat-card">
-        <div class="stat-val" id="stat-nloc">0</div>
-        <div class="stat-lbl">Locações hoje</div>
-      </div>
+      <div class="stat-card"><div class="stat-val" id="stat-ativas">0</div><div class="stat-lbl">Ativas agora</div></div>
+      <div class="stat-card"><div class="stat-val" id="stat-nloc">0</div><div class="stat-lbl">Encerradas hoje</div></div>
     </div>
-
+    <div id="admin-home-kpis" style="display:none">
+      <div class="kpi-grid" style="margin-bottom:10px">
+        <div class="kpi-card blue"><div class="kpi-val" id="h-fathoje">R$0</div><div class="kpi-lbl">Fat. hoje</div></div>
+        <div class="kpi-card red"><div class="kpi-val" id="h-cushoje">R$0</div><div class="kpi-lbl">Custos hoje</div></div>
+        <div class="kpi-card green"><div class="kpi-val" id="h-fatmes">R$0</div><div class="kpi-lbl">Fat. mês</div><div class="kpi-sub" id="h-nmes"></div></div>
+        <div class="kpi-card purple"><div class="kpi-val" id="h-resultado">R$0</div><div class="kpi-lbl">Resultado mês</div><div class="kpi-sub" id="h-margem"></div></div>
+      </div>
+      <div class="ranking-card" id="h-ranking" style="display:none;margin-bottom:10px"><div class="chart-title">Ranking — mês atual</div><div id="h-rank-rows"></div></div>
+    </div>
     <div class="sec-title">Sessões ativas</div>
-    <div id="sessions-container">
-      <div class="skeleton"></div>
-      <div class="skeleton"></div>
-    </div>
-
+    <div id="sessions-container"><div class="skeleton"></div><div class="skeleton"></div></div>
+    <div id="enc-hoje-section" style="display:none"><div class="sec-title">Encerradas hoje</div><div id="enc-hoje-list"></div></div>
   </div>
 
   <!-- ──────── PAGE: NOVA ──────── -->
@@ -825,21 +822,6 @@ nav button .nav-badge{
       </button>
     </div>
 
-  </div>
-
-  <!-- ──────── PAGE: HISTÓRICO ──────── -->
-  <div id="page-historico" class="page">
-    <div class="hist-filter">
-      <input id="hist-data" type="date">
-      <button onclick="buscarHistorico()">Buscar</button>
-    </div>
-    <div id="hist-container">
-      <div class="empty">
-        <div class="empty-icon">📋</div>
-        <h3>Histórico vazio</h3>
-        <p>Busque por data para ver as locações</p>
-      </div>
-    </div>
   </div>
 
   <!-- ──────── PAGE: CUSTOS ──────── -->
@@ -1945,18 +1927,7 @@ function renderCustos() {
 // ═══════════════════════════════════════════════════════════
 // NAVIGATION
 // ═══════════════════════════════════════════════════════════
-function showPage(name) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
-
-  document.getElementById('page-' + name).classList.add('active');
-  const idx = ['home','nova','historico','custos'].indexOf(name);
-  document.querySelectorAll('nav button')[idx].classList.add('active');
-
-  if (name === 'nova') resetNova();
-  if (name === 'historico') buscarHistorico();
-  if (name === 'custos') loadCustosHoje();
-}
+// showPage — see admin section below
 
 // ═══════════════════════════════════════════════════════════
 // TOAST
