@@ -342,6 +342,127 @@ nav button .nav-badge{
 .page::-webkit-scrollbar{width:3px}
 .page::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
 
+
+/* ══ SIDEBAR ════════════════════════════════════════════════ */
+#sidebar{
+  display:none;width:230px;flex-shrink:0;
+  background:linear-gradient(180deg,#060d1f 0%,#0a1e4a 40%,#0d2a5c 100%);
+  flex-direction:column;height:100dvh;position:sticky;top:0;
+  border-right:1px solid rgba(255,255,255,.08);
+  box-shadow:4px 0 24px rgba(0,0,0,.4);z-index:20;
+}
+.sb-logo{
+  padding:22px 18px 16px;
+  font-family:'Fredoka One',cursive;font-size:19px;color:#fff;letter-spacing:1px;
+  border-bottom:1px solid rgba(255,255,255,.1);
+}
+.sb-logo span{color:#FFD54F}
+.sb-status{display:flex;align-items:center;gap:5px;margin-top:5px;
+  font-size:11px;color:rgba(255,255,255,.5);font-family:'Nunito',sans-serif;font-weight:600}
+.sb-nav{flex:1;padding:12px 10px;display:flex;flex-direction:column;gap:3px;overflow-y:auto}
+.sb-btn{
+  display:flex;align-items:center;gap:11px;padding:11px 13px;border:none;
+  background:transparent;color:rgba(255,255,255,.6);
+  font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;
+  border-radius:10px;cursor:pointer;transition:all .15s;text-align:left;width:100%;
+}
+.sb-btn:hover{background:rgba(255,255,255,.1);color:#fff}
+.sb-btn.active{background:rgba(255,255,255,.16);color:#fff}
+.sb-icon{font-size:17px;line-height:1;flex-shrink:0}
+.sb-divider{font-size:10px;font-weight:700;color:rgba(255,255,255,.3);
+  text-transform:uppercase;letter-spacing:.08em;padding:14px 13px 5px}
+.sb-admin-section{display:none}
+.sb-admin-section.visible{display:block}
+.sb-footer{padding:12px 10px;border-top:1px solid rgba(255,255,255,.1)}
+.sb-admin-bar{display:flex;justify-content:space-between;align-items:center;
+  padding:8px 13px;background:rgba(255,255,255,.1);border-radius:8px;
+  color:rgba(255,255,255,.8);font-size:12px;font-weight:700;margin-bottom:6px}
+.sb-sair{border:1.5px solid rgba(255,255,255,.35);background:transparent;
+  color:#fff;font-family:'Nunito',sans-serif;font-weight:700;font-size:11px;
+  border-radius:6px;padding:3px 9px;cursor:pointer}
+.sb-gerenciar{width:100%;justify-content:center;border:1.5px solid rgba(255,255,255,.2);
+  color:rgba(255,255,255,.7)}
+.sb-gerenciar:hover{border-color:rgba(255,255,255,.5);color:#fff}
+
+/* ══ MAIN-CONTENT ══════════════════════════════════════════ */
+#main-content{flex:1;min-width:0;display:flex;flex-direction:column;overflow:hidden}
+
+/* ══ RESPONSIVE BREAKPOINTS ════════════════════════════════ */
+@media(min-width:768px){
+  #sidebar{display:flex}
+  #app{
+    flex-direction:row!important;
+    width:min(1400px,100vw)!important;
+    max-width:min(1400px,100vw)!important;
+    height:100dvh;
+  }
+  header{display:none} /* sidebar handles branding */
+  nav{display:none!important} /* sidebar handles nav */
+  .stats-bar{grid-template-columns:repeat(4,1fr)}
+  .kpi-grid{grid-template-columns:repeat(4,1fr)!important}
+  .charts-row{grid-template-columns:1fr 1fr}
+  .tipo-grid{grid-template-columns:repeat(4,1fr)}
+  .stat-card .stat-val{font-size:22px}
+  /* analytics */
+  .analytics-grid{grid-template-columns:repeat(4,1fr)!important}
+}
+
+/* ══ ADMIN HOME KPI (hidden until admin) ════════════════════ */
+#admin-home-kpis{display:none}
+#admin-home-kpis.visible{display:block}
+
+/* ══ ENCERRADAS HOJE ════════════════════════════════════════ */
+.enc-item{
+  background:var(--card);border-radius:var(--radius-sm);
+  padding:10px 14px;box-shadow:var(--shadow-sm);border:1px solid var(--border);
+  display:flex;justify-content:space-between;align-items:center;gap:8px;
+  margin-bottom:6px;
+}
+.enc-left .enc-crianca{font-size:14px;font-weight:800;color:var(--txt)}
+.enc-left .enc-det{font-size:11px;color:var(--txt3);margin-top:1px}
+.enc-right{text-align:right;flex-shrink:0}
+.enc-valor{font-size:15px;font-weight:900;color:var(--blue)}
+.enc-horario{font-size:10px;color:var(--txt3)}
+
+/* ══ ANALYTICS (historico) ══════════════════════════════════ */
+.period-filters{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.period-btn{
+  padding:7px 13px;border:2px solid var(--border);border-radius:99px;
+  font-family:'Nunito',sans-serif;font-size:12px;font-weight:700;cursor:pointer;
+  background:var(--card);color:var(--txt2);transition:all .15s;
+}
+.period-btn.active,.period-btn:hover{background:var(--blue);color:#fff;border-color:var(--blue)}
+.period-custom{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.period-custom input{
+  flex:1;min-width:120px;padding:8px 10px;border:2px solid var(--border);
+  border-radius:var(--radius-sm);font-family:'Nunito',sans-serif;font-size:13px;outline:none;
+}
+.period-custom input:focus{border-color:var(--blue)}
+.period-custom button{
+  padding:8px 14px;background:var(--blue);color:#fff;border:none;
+  border-radius:var(--radius-sm);font-family:'Nunito',sans-serif;font-weight:700;cursor:pointer;
+}
+.analytics-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.analytics-card{
+  background:var(--card);border-radius:var(--radius-sm);padding:14px 12px;
+  box-shadow:var(--shadow-sm);border:1px solid var(--border);
+}
+.ac-val{font-size:20px;font-weight:900;line-height:1;margin-bottom:3px}
+.ac-lbl{font-size:10px;color:var(--txt3);font-weight:600}
+.analytics-card.blue .ac-val{color:var(--blue)}
+.analytics-card.green .ac-val{color:var(--green)}
+.analytics-card.amber .ac-val{color:var(--amber)}
+.analytics-card.purple .ac-val{color:var(--purple)}
+.ranking-card{
+  background:var(--card);border-radius:var(--radius-sm);padding:16px;
+  box-shadow:var(--shadow-sm);border:1px solid var(--border);margin-bottom:12px;
+}
+.rank-row{margin-bottom:12px}
+.rank-label{display:flex;justify-content:space-between;font-size:12px;font-weight:700;color:var(--txt);margin-bottom:5px}
+.rank-bar-bg{background:var(--border);border-radius:99px;height:8px;overflow:hidden}
+.rank-bar{height:8px;border-radius:99px;transition:width .6s ease}
+.rank-insight{font-size:12px;color:var(--txt3);font-style:italic;margin-top:8px;padding-top:8px;border-top:1px solid var(--border)}
+
 /* ── PENDING CARD (aguardando início) ─────────────────────────────────── */
 .session-card.pending{border-color:var(--border);background:var(--card)}
 .session-card.pending::before{background:var(--txt3)}
@@ -570,7 +691,36 @@ nav button .nav-badge{
 <!-- App -->
 <div id="app">
 
-  <!-- Header -->
+  <!-- ══ SIDEBAR (desktop only) ══ -->
+  <aside id="sidebar">
+    <div class="sb-logo">🚗 Movi <span>Kids</span>
+      <div class="sb-status"><span id="sb-dot" class="dot-online"></span><span id="sb-txt">Online</span></div>
+    </div>
+    <nav class="sb-nav" id="sb-nav">
+      <button class="sb-btn active" id="sbn-home" onclick="showPage('home')"><span class="sb-icon">🏠</span>Home</button>
+      <button class="sb-btn" id="sbn-nova" onclick="showPage('nova')"><span class="sb-icon">➕</span>Nova Locação</button>
+      <button class="sb-btn" id="sbn-custos" onclick="showPage('custos')"><span class="sb-icon">💰</span>Registrar Custo</button>
+    </nav>
+    <div class="sb-admin-section" id="sb-admin-section">
+      <div class="sb-divider">Administração</div>
+      <button class="sb-btn" id="sbn-adm" onclick="irAdmin('admin')"><span class="sb-icon">📊</span>Painel Admin</button>
+      <button class="sb-btn" id="sbn-dash" onclick="irAdmin('dashboard')"><span class="sb-icon">📈</span>Dashboard</button>
+      <button class="sb-btn" id="sbn-rel" onclick="irAdmin('relatorio')"><span class="sb-icon">📋</span>Relatório</button>
+      <button class="sb-btn" id="sbn-hist" onclick="irAdmin('historico')"><span class="sb-icon">🗂️</span>Histórico</button>
+    </div>
+    <div class="sb-footer">
+      <div class="sb-admin-bar" id="sb-admin-bar" style="display:none">
+        <span>🔐 Admin <span id="sb-timer">1:00</span></span>
+        <button class="sb-sair" onclick="adminLogout()">Sair</button>
+      </div>
+      <button class="sb-btn sb-gerenciar" id="sb-gerenciar-btn" onclick="abrirAdmin()"><span class="sb-icon">🔐</span>Gerenciar</button>
+    </div>
+  </aside>
+
+  <!-- ══ MAIN CONTENT ══ -->
+  <div id="main-content">
+
+  <!-- Header (mobile only) -->
   <header>
     <div class="hd-row">
       <div class="logo">🚗 Movi <span>Kids</span></div>
@@ -589,11 +739,11 @@ nav button .nav-badge{
     <button onclick="showPage('nova')">
       <div class="nav-icon nav-badge">➕<span id="badge-nova" class="badge" style="display:none">!</span></div>Nova
     </button>
-    <button id="nav-admin" onclick="abrirAdmin()">
-      <div class="nav-icon">🔐</div>Gerenciar
-    </button>
     <button onclick="showPage('custos')">
       <div class="nav-icon">💰</div>Custos
+    </button>
+    <button id="nav-admin" onclick="abrirAdmin()">
+      <div class="nav-icon">🔐</div>Gerenciar
     </button>
   </nav>
 
@@ -834,22 +984,55 @@ nav button .nav-badge{
     </div>
   </div>
 
-  <!-- ──────── PAGE: HISTÓRICO (admin) ──────── -->
+  <!-- ──────── PAGE: HISTÓRICO ANALYTICS (admin) ──────── -->
   <div id="page-historico" class="page">
     <div class="dash-back" onclick="irAdmin('admin')">← Voltar</div>
-    <div class="hist-filter">
-      <input id="hist-data" type="date">
+    <div class="sec-title">Histórico & Analytics</div>
+
+    <!-- Filtros rápidos -->
+    <div class="period-filters">
+      <button class="period-btn active" onclick="setPeriod('hoje',this)">Hoje</button>
+      <button class="period-btn" onclick="setPeriod('ontem',this)">Ontem</button>
+      <button class="period-btn" onclick="setPeriod('7d',this)">7 dias</button>
+      <button class="period-btn" onclick="setPeriod('mes',this)">Este mês</button>
+      <button class="period-btn" onclick="setPeriod('mesant',this)">Mês anterior</button>
+      <button class="period-btn" onclick="setPeriod('custom',this)">Personalizado</button>
+    </div>
+
+    <!-- Período personalizado -->
+    <div class="period-custom" id="period-custom-row" style="display:none">
+      <input type="date" id="hist-start">
+      <span style="align-self:center;font-size:13px;color:var(--txt3)">até</span>
+      <input type="date" id="hist-end">
       <button onclick="buscarHistorico()">Buscar</button>
     </div>
+
+    <!-- Cards de resumo do período -->
+    <div class="analytics-grid" id="analytics-cards" style="display:none">
+      <div class="analytics-card blue"><div class="ac-val" id="ac-fat">R$0</div><div class="ac-lbl">Faturamento</div></div>
+      <div class="analytics-card green"><div class="ac-val" id="ac-n">0</div><div class="ac-lbl">Atendimentos</div></div>
+      <div class="analytics-card amber"><div class="ac-val" id="ac-ticket">R$0</div><div class="ac-lbl">Ticket médio</div></div>
+      <div class="analytics-card purple"><div class="ac-val" id="ac-extras">R$0</div><div class="ac-lbl">Extras cobrados</div></div>
+    </div>
+
+    <!-- Ranking por tipo -->
+    <div class="ranking-card" id="ranking-card" style="display:none">
+      <div class="chart-title">Ranking por tipo de veículo</div>
+      <div id="ranking-rows"></div>
+      <div class="rank-insight" id="rank-insight"></div>
+    </div>
+
+    <!-- Lista de transações -->
     <div id="hist-container">
       <div class="empty">
-        <div class="empty-icon">📋</div>
-        <h3>Histórico vazio</h3>
-        <p>Busque por data para ver as locações</p>
+        <div class="empty-icon">🗂️</div>
+        <h3>Selecione um período acima</h3>
+        <p>Use os botões de filtro para visualizar os dados</p>
       </div>
     </div>
   </div>
 
+  </div><!-- /main-content -->
 </div><!-- /app -->
 
 <!-- ──────── ALERT MODAL (5min / expired) ──────── -->
@@ -1033,13 +1216,12 @@ async function sincronizarServidor() {
     renderCards();
     updateStats();
 
-    // FIX #5: usar custosHoje já incluído na resposta (zero chamadas extras)
-    if (d.custosHoje) {
-      custosHoje = d.custosHoje;
-      renderCustos();
-    } else {
-      loadCustosHoje(); // fallback se servidor antigo
-    }
+    // Encerradas hoje para operador ver na home
+    if (d.encHoje) renderEncHoje(d.encHoje);
+
+    // Custos do dia
+    if (d.custosHoje) { custosHoje = d.custosHoje; renderCustos(); }
+    else loadCustosHoje();
   } catch {
     setStatus(false);
     // Fallback: mantém o que estava em cache
@@ -1049,16 +1231,12 @@ async function sincronizarServidor() {
 function setStatus(online) {
   const dot = document.getElementById('status-dot');
   const txt = document.getElementById('status-txt');
-  if (online === null) {
-    dot.className = 'dot-online'; dot.style.background = '#FFB74D';
-    txt.textContent = 'Atualizando...';
-  } else if (online) {
-    dot.className = 'dot-online'; dot.style.background = '';
-    txt.textContent = 'Online';
-  } else {
-    dot.className = 'dot-offline'; dot.style.background = '';
-    txt.textContent = 'Offline';
+  if (dot && txt) {
+    if (online===null) { dot.className='dot-online';dot.style.background='#FFB74D';txt.textContent='Atualizando...'; }
+    else if (online)   { dot.className='dot-online';dot.style.background='';txt.textContent='Online'; }
+    else               { dot.className='dot-offline';dot.style.background='';txt.textContent='Offline'; }
   }
+  syncSidebarStatus(online);
 }
 
 function setDefaultDate() {
@@ -1277,8 +1455,9 @@ function escHtml(t) {
 // STATS
 // ═══════════════════════════════════════════════════════════
 function updateStats() {
-  document.getElementById('stat-ativas').textContent = sessions.length;
-  document.getElementById('stat-nloc').textContent = statsHoje.n;
+  const ativas = sessions.filter(s => s.started).length;
+  document.getElementById('stat-ativas').textContent = ativas;
+  // stat-nloc is updated by renderEncHoje
 }
 
 async function loadCustosHoje() {
@@ -1662,44 +1841,43 @@ function showNotification(title, body) {
 // HISTÓRICO
 // ═══════════════════════════════════════════════════════════
 async function buscarHistorico() {
-  const dateVal = document.getElementById('hist-data').value; // yyyy-MM-dd
-  if (!dateVal) return;
-  const [y,m,d] = dateVal.split('-');
-  const data = `${d}/${m}/${y}`;
-
+  const dates = getDates();
+  if (!dates) { toast('Selecione as datas','error'); return; }
   const container = document.getElementById('hist-container');
+  if(!container) return;
   container.innerHTML = '<div class="skeleton"></div><div class="skeleton"></div>';
 
   try {
-    const res = await api({ action: 'listarHistorico', data });
-    if (!res.ok) { container.innerHTML = '<div class="empty"><p>Erro ao buscar histórico.</p></div>'; return; }
+    const res = await api({ action:'listarHistorico', startDate:dates.s, endDate:dates.e });
+    if (!res.ok) { container.innerHTML='<div class="empty"><p>Erro.</p></div>'; return; }
 
-    if (res.locacoes.length === 0) {
-      container.innerHTML = `<div class="empty"><div class="empty-icon">📋</div><h3>Sem locações neste dia</h3></div>`;
+    renderAnalyticsCards(res.stats);
+
+    if (!res.locacoes.length) {
+      container.innerHTML=`<div class="empty"><div class="empty-icon">📋</div><h3>Sem locações neste período</h3></div>`;
       return;
     }
-
-    container.innerHTML = res.locacoes.map(l => {
-      const icon = l.tipo === 'Carro' ? '🚗' : '🧸';
-      const vT   = Number(l.valorTotal).toFixed(2).replace('.',',');
-      const vE   = Number(l.valorAdicional);
-      const statusCls = l.status === 'Ativa' ? 'ativa' : 'encerrada';
+    container.innerHTML = res.locacoes.map(l=>{
+      const icon=l.tipo==='Carro'?'🚗':'🧸';
+      const vT=Number(l.valorTotal).toFixed(2).replace('.',',');
+      const vE=Number(l.valorAdicional);
+      const sc=l.status==='Ativa'?'ativa':'encerrada';
       return `<div class="hist-item">
         <div class="hi-left">
           <div class="hi-tipo">${icon} ${l.tipo}</div>
           <div class="hi-names">${escHtml(l.crianca)}</div>
           <div class="hi-det">👤 ${escHtml(l.responsavel)} · ${l.plano}</div>
-          <div class="hi-det">⏰ ${l.horaInicio}${l.horaFim ? ' → ' + l.horaFim : ''}</div>
+          <div class="hi-det">⏰ ${l.horaInicio}${l.horaFim?' → '+l.horaFim:''} · ${l.data}</div>
         </div>
         <div class="hi-right">
           <div class="hi-valor">R$ ${vT}</div>
-          ${vE > 0 ? `<div class="hi-extra">+${l.minAdicionais}min extra</div>` : ''}
-          <span class="hi-status ${statusCls}">${l.status}</span>
+          ${vE>0?`<div class="hi-extra">+${l.minAdicionais}min extra</div>`:''}
+          <span class="hi-status ${sc}">${l.status}</span>
         </div>
       </div>`;
     }).join('');
   } catch {
-    container.innerHTML = '<div class="empty"><p>Erro de conexão.</p></div>';
+    container.innerHTML='<div class="empty"><p>Erro de conexão.</p></div>';
   }
 }
 
@@ -1861,6 +2039,7 @@ function adminLogin() {
   document.addEventListener('click',    resetAdminTimer);
   document.addEventListener('touchstart', resetAdminTimer);
   adminTimerInt = setInterval(tickAdmin, 1000);
+  showAdminSidebar();
   carregarKPIs();
   showPage('admin');
   carregarHistRelatorios();
@@ -1871,6 +2050,9 @@ function adminLogout() {
   clearInterval(adminTimerInt);
   document.removeEventListener('click',    resetAdminTimer);
   document.removeEventListener('touchstart', resetAdminTimer);
+  hideAdminSidebar();
+  const kpiEl = document.getElementById('admin-home-kpis');
+  if(kpiEl) kpiEl.classList.remove('visible');
   showPage('home');
   toast('Sessão administrativa encerrada', 'warning');
 }
@@ -1884,6 +2066,7 @@ function tickAdmin() {
   adminCountdown--;
   const el = document.getElementById('admin-timer-display');
   if (el) el.textContent = '0:' + String(adminCountdown).padStart(2,'0');
+  updateAdminTimer(adminCountdown);
   if (adminCountdown <= 0) adminLogout();
 }
 
@@ -1900,7 +2083,7 @@ function irAdmin(page) {
 // ── KPIs ─────────────────────────────────────────────────────
 async function carregarKPIs() {
   try {
-    const d = await api({ action: 'buscarKPIsAdmin' });
+    const d = await api(params);
     if (!d.ok) return;
     kpiData = d;
     const R = v => 'R$ ' + Number(v).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
@@ -2010,7 +2193,7 @@ async function carregarPreviewRelatorio() {
   const prev = document.getElementById('rel-preview');
   prev.innerHTML = '<div style="text-align:center;color:var(--txt3);font-size:13px;">Carregando...</div>';
   try {
-    const d = await api({ action:'buscarKPIsAdmin' });
+    const d = await api({ action:'buscarKPIsAdmin', mes, ano });
     if (!d.ok) return;
     const f = v => 'R$ '+Number(v).toFixed(2).replace('.',',');
     prev.innerHTML = `
@@ -2019,6 +2202,7 @@ async function carregarPreviewRelatorio() {
       <div class="rel-row"><span>CTO a pagar</span><span>${f(d.ctoPagar)}</span></div>
       <div class="rel-row"><span>Locações</span><span>${d.nMes}</span></div>
       <div class="rel-row"><span>Resultado</span><span style="color:${d.resultado>=0?'var(--green)':'var(--red)'}"><b>${f(d.resultado)}</b></span></div>
+      ${d.resultado<0?'<div style="font-size:11px;color:var(--amber);margin-top:8px;padding:8px;background:var(--amber-lt);border-radius:6px">⚠️ Resultado negativo: CTO mínimo contratual maior que faturamento. Normal nos primeiros meses.</div>':''}
     `;
   } catch { prev.innerHTML = '<div style="color:var(--red);font-size:13px">Erro ao carregar</div>'; }
 }
@@ -2071,22 +2255,223 @@ async function carregarHistRelatorios() {
 }
 
 // ── OVERRIDE showPage for admin pages ────────────────────────
-const _origShowPage = showPage;
 function showPage(name) {
   const adminPages = ['admin','dashboard','relatorio','historico'];
-  if (adminPages.includes(name) && !isAdmin) {
-    abrirAdmin();
-    return;
-  }
+  if (adminPages.includes(name) && !isAdmin) { abrirAdmin(); return; }
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
-  document.getElementById('page-'+name).classList.add('active');
-  const navIdx = ['home','nova','historico','custos'].indexOf(name);
-  if (navIdx >= 0) document.querySelectorAll('nav button')[navIdx].classList.add('active');
+  const pg = document.getElementById('page-'+name);
+  if(pg) pg.classList.add('active');
+  const navIdx = ['home','nova','custos','historico'].indexOf(name);
+  if (navIdx >= 0) document.querySelectorAll('nav button')[navIdx]?.classList.add('active');
+  syncSidebar(name);
   if (name==='nova') resetNova();
   if (name==='custos') loadCustosHoje();
-  if (name==='historico') { setDefaultDate(); buscarHistorico(); }
+  if (name==='historico') { if(!currentPeriod) setPeriod('hoje',null); else buscarHistorico(); }
   if (name==='admin' && isAdmin) { resetAdminTimer(); carregarKPIs(); }
+  if (name==='dashboard' && kpiData) renderCharts(kpiData);
+}
+
+
+// ════════════════════════════════════════════════════════════
+// SIDEBAR — sync com estado atual
+// ════════════════════════════════════════════════════════════
+function syncSidebar(page) {
+  document.querySelectorAll('.sb-btn').forEach(b => b.classList.remove('active'));
+  const map = {
+    'home':'sbn-home','nova':'sbn-nova','custos':'sbn-custos',
+    'admin':'sbn-adm','dashboard':'sbn-dash','relatorio':'sbn-rel','historico':'sbn-hist'
+  };
+  if (map[page]) { const el=document.getElementById(map[page]); if(el) el.classList.add('active'); }
+}
+
+function syncSidebarStatus(online) {
+  const dot=document.getElementById('sb-dot');
+  const txt=document.getElementById('sb-txt');
+  if (!dot||!txt) return;
+  if (online===null) { dot.style.background='#FFB74D'; txt.textContent='Atualizando...'; }
+  else if (online)   { dot.style.background=''; txt.textContent='Online'; }
+  else               { dot.className='dot-offline'; txt.textContent='Offline'; }
+}
+
+// ════════════════════════════════════════════════════════════
+// ADMIN — sidebar updates
+// ════════════════════════════════════════════════════════════
+function showAdminSidebar() {
+  const sec = document.getElementById('sb-admin-section');
+  const bar = document.getElementById('sb-admin-bar');
+  const btn = document.getElementById('sb-gerenciar-btn');
+  if(sec) sec.classList.add('visible');
+  if(bar) bar.style.display='flex';
+  if(btn) btn.style.display='none';
+}
+
+function hideAdminSidebar() {
+  const sec = document.getElementById('sb-admin-section');
+  const bar = document.getElementById('sb-admin-bar');
+  const btn = document.getElementById('sb-gerenciar-btn');
+  if(sec) sec.classList.remove('visible');
+  if(bar) bar.style.display='none';
+  if(btn) btn.style.display='';
+}
+
+function updateAdminTimer(s) {
+  const el = document.getElementById('sb-timer');
+  if(el) el.textContent = '0:'+String(s).padStart(2,'0');
+}
+
+// ════════════════════════════════════════════════════════════
+// HOME — encerradas hoje + admin KPIs
+// ════════════════════════════════════════════════════════════
+let encHojeData = [];
+
+function renderEncHoje(list) {
+  encHojeData = list || [];
+  const section = document.getElementById('enc-hoje-section');
+  const container = document.getElementById('enc-hoje-list');
+  const nLoc = document.getElementById('stat-nloc');
+  if(nLoc) nLoc.textContent = encHojeData.length;
+  if (!section||!container) return;
+  if (!encHojeData.length) { section.style.display='none'; return; }
+  section.style.display='block';
+  container.innerHTML = encHojeData.map(e=>{
+    const icon = e.tipo==='Carro'?'🚗':'🧸';
+    const v = isAdmin ? `<div class="enc-valor">R$ ${Number(e.valorTotal).toFixed(2).replace('.',',')}</div>` : '';
+    return `<div class="enc-item">
+      <div class="enc-left">
+        <div class="enc-crianca">${icon} ${escHtml(e.crianca)}</div>
+        <div class="enc-det">👤 ${escHtml(e.responsavel)} · ${e.plano}</div>
+      </div>
+      <div class="enc-right">
+        ${v}
+        <div class="enc-horario">${e.horaInicio} → ${e.horaFim||'--:--'}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function showAdminHomeKpis(d) {
+  const el = document.getElementById('admin-home-kpis');
+  if (!el) return;
+  el.classList.add('visible');
+  const R = v=>'R$ '+Number(v).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,'.');
+  const set = (id,v) => { const e=document.getElementById(id); if(e) e.textContent=v; };
+  set('h-fathoje', R(d.fatHoje));
+  set('h-cushoje', R(d.cusHoje));
+  set('h-fatmes',  R(d.fatMes));
+  set('h-nmes',    d.nMes+' locações');
+  set('h-resultado', R(d.resultado));
+  set('h-margem',  'margem '+d.margem+'%');
+
+  // Ranking carro vs pelúcia
+  const ranking = document.getElementById('h-ranking');
+  const rows    = document.getElementById('h-rank-rows');
+  if (!ranking||!rows) return;
+  const pt = d.fatPorTipo||{};
+  const total = (pt['Carro']||0)+(pt['Pelúcia']||0);
+  if (!total) return;
+  ranking.style.display='block';
+  const pct = v => total>0 ? Math.round(v/total*100) : 0;
+  rows.innerHTML = [['🚗 Carros','Carro','#1565C0'],['🧸 Pelúcias','Pelúcia','#C2185B']].map(([label,key,color])=>{
+    const n = pt[key]||0, p = pct(n);
+    return `<div class="rank-row">
+      <div class="rank-label"><span>${label}</span><span>${p}% — R$ ${n.toFixed(0)}</span></div>
+      <div class="rank-bar-bg"><div class="rank-bar" style="width:${p}%;background:${color}"></div></div>
+    </div>`;
+  }).join('');
+}
+
+// ════════════════════════════════════════════════════════════
+// ANALYTICS — período e histórico
+// ════════════════════════════════════════════════════════════
+let currentPeriod = 'hoje';
+
+function setPeriod(period, btn) {
+  currentPeriod = period;
+  document.querySelectorAll('.period-btn').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  const custom = document.getElementById('period-custom-row');
+  if(custom) custom.style.display = period==='custom' ? 'flex' : 'none';
+  if(period!=='custom') buscarHistorico();
+}
+
+function getDates() {
+  const hoje = new Date();
+  const fmt = d => {
+    const dd=String(d.getDate()).padStart(2,'0');
+    const mm=String(d.getMonth()+1).padStart(2,'0');
+    return dd+'/'+mm+'/'+d.getFullYear();
+  };
+  const fmtInput = d => {
+    return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  };
+  switch(currentPeriod) {
+    case 'hoje':   return {s:fmt(hoje),e:fmt(hoje)};
+    case 'ontem':  const on=new Date(hoje);on.setDate(on.getDate()-1);return {s:fmt(on),e:fmt(on)};
+    case '7d':     const s7=new Date(hoje);s7.setDate(s7.getDate()-6);return {s:fmt(s7),e:fmt(hoje)};
+    case 'mes':    const sm=new Date(hoje.getFullYear(),hoje.getMonth(),1);return {s:fmt(sm),e:fmt(hoje)};
+    case 'mesant': const pm=new Date(hoje.getFullYear(),hoje.getMonth()-1,1);
+                   const em=new Date(hoje.getFullYear(),hoje.getMonth(),0);
+                   return {s:fmt(pm),e:fmt(em)};
+    case 'custom': {
+      const si=document.getElementById('hist-start')?.value;
+      const ei=document.getElementById('hist-end')?.value;
+      if(!si||!ei) return null;
+      const parse=v=>{const[y,m,d]=v.split('-');return d+'/'+m+'/'+y;};
+      return {s:parse(si),e:parse(ei)};
+    }
+    default: return {s:fmt(hoje),e:fmt(hoje)};
+  }
+}
+
+function renderAnalyticsCards(stats) {
+  const cards = document.getElementById('analytics-cards');
+  const ranking = document.getElementById('ranking-card');
+  const rankRows = document.getElementById('ranking-rows');
+  const rankInsight = document.getElementById('rank-insight');
+  if(!cards) return;
+  if(!stats||!stats.n) { cards.style.display='none'; if(ranking) ranking.style.display='none'; return; }
+
+  cards.style.display='grid';
+  const R = v=>'R$ '+Number(v).toFixed(2).replace('.',',');
+  const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+  set('ac-fat', R(stats.totalFat));
+  set('ac-n', stats.n);
+  set('ac-ticket', R(stats.ticketMedio));
+  set('ac-extras', R(stats.totalExt));
+
+  // Ranking
+  if(!ranking||!rankRows) return;
+  const pt = stats.porTipo||{};
+  const total = Object.values(pt).reduce((s,v)=>s+(v.n||0),0);
+  if(!total) { ranking.style.display='none'; return; }
+  ranking.style.display='block';
+  const sorted = Object.entries(pt).sort((a,b)=>b[1].n-a[1].n);
+  rankRows.innerHTML = sorted.map(([tipo,d])=>{
+    const icon=tipo==='Carro'?'🚗':'🧸';
+    const pct=total>0?Math.round(d.n/total*100):0;
+    const color=tipo==='Carro'?'#1565C0':'#C2185B';
+    return `<div class="rank-row">
+      <div class="rank-label"><span>${icon} ${tipo}</span><span>${d.n} atten. · ${pct}% · ${R(d.fat)}</span></div>
+      <div class="rank-bar-bg"><div class="rank-bar" style="width:${pct}%;background:${color}"></div></div>
+    </div>`;
+  }).join('');
+
+  // Insight estratégico
+  const lider = sorted[0];
+  const insights = {
+    'Carro': '🚗 Carros lideram — considere ampliar a frota de carros.',
+    'Pelúcia': '🧸 Pelúcias lideram — invista em mais pelúcias elétricas.'
+  };
+  if(rankInsight) rankInsight.textContent = insights[lider[0]] || '';
+
+  // Planos mais vendidos
+  const pp = stats.porPlano||{};
+  const topPlanos = Object.entries(pp).sort((a,b)=>b[1].n-a[1].n).slice(0,3);
+  if(topPlanos.length) {
+    rankInsight.innerHTML += '<br>📊 Top planos: '+topPlanos.map(([pl,d],i)=>
+      `${i+1}° ${pl} (${d.n}×)`).join(' · ');
+  }
 }
 
 document.addEventListener('DOMContentLoaded', init);
