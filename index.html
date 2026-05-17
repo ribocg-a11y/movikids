@@ -2070,7 +2070,8 @@ async function carregarKPIs() {
     document.getElementById('k-nmes').textContent     = d.nMes + ' locações';
     document.getElementById('k-resultado').textContent = R(d.resultado);
     document.getElementById('k-margem').textContent   = 'margem ' + d.margem + '%';
-  } catch {}
+    showAdminHomeKpis(d); // FIX BUG-006: exibe KPIs financeiros na Home admin
+  } catch(e) { console.error('carregarKPIs:', e); } // FIX Regra#2: nunca catch{}vazio
 }
 
 // ── CHARTS ───────────────────────────────────────────────────
@@ -2244,7 +2245,7 @@ function showPage(name) {
   syncSidebar(name);
   if (name==='nova') resetNova();
   if (name==='custos') loadCustosHoje();
-  if (name==='historico') { if(!currentPeriod) setPeriod('hoje',null); else buscarHistorico(); }
+  if (name==='historico') buscarHistorico(); // FIX BUG-007: if(!currentPeriod) sempre false pois currentPeriod='hoje' na declaração
   if (name==='admin' && isAdmin) { resetAdminTimer(); if(!kpiData) carregarKPIs(); }
   if (name==='dashboard' && kpiData) renderCharts(kpiData);
 }
