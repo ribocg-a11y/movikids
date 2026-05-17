@@ -1,0 +1,35 @@
+{
+  "name": "Movi Kids",
+  "short_name": "Movi Kids",
+  "description": "Sistema de Locação de Veículos Elétricos Infantis — Golden Shopping Calhau",
+  "start_url": "/movikids/",
+  "scope": "/movikids/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#1565C0",
+  "theme_color": "#1565C0",
+  "lang": "pt-BR",
+  "categories": ["business", "utilities"],
+  "icons": [
+    {
+      "src": "apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [],
+  "prefer_related_applications": false
+}
