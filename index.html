@@ -1808,8 +1808,13 @@ function abrirWhatsAppCard(rowIndex) {
 }
 
 function abrirWaMsg(s) {
-  const rem   = calcRemaining(s);
-  const fmin  = rem > 0 ? `⏰ Faltam apenas ${Math.ceil(rem/60)} minuto(s)!` : '🔴 O tempo já esgotou!';
+  // FIX: emojis removidos — encodeURIComponent trata 4-byte Unicode incorretamente
+  // em alguns dispositivos iOS, resultando em caractere ◆ no WhatsApp.
+  const rem  = calcRemaining(s);
+  const tipo = s.tipo === 'Carro' ? 'Carro Eletrico' : 'Pelucia Eletrica';
+  const fmin = rem > 0
+    ? `Faltam apenas ${Math.ceil(rem/60)} minuto(s)!`
+    : 'O tempo esgotou!';
 
   // Link de acompanhamento para o responsável
   const trackUrl = 'https://ribocg-a11y.github.io/movikids/track.html' +
@@ -1817,13 +1822,13 @@ function abrirWaMsg(s) {
     `&v=${encodeURIComponent(s.tipo)}&c=${encodeURIComponent(s.crianca)}` +
     `&p=${encodeURIComponent(s.responsavel)}`;
 
-  const msg   = encodeURIComponent(
-    `Olá ${s.responsavel}! ${s.tipo === 'Carro' ? '🚗' : '🧸'}\n\n` +
-    `A locação de *${s.crianca}* está chegando ao fim.\n` +
+  const msg = encodeURIComponent(
+    `Ola ${s.responsavel}!\n\n` +
+    `A locacao de *${s.crianca}* esta chegando ao fim.\n` +
     `${fmin}\n\n` +
-    `📱 Acompanhe o cronômetro em tempo real:\n${trackUrl}\n\n` +
-    `Caso queira mais tempo, o valor adicional é R$ ${String(s.adicionalPorMin).replace('.',',')} por minuto.\n\n` +
-    `Obrigado por escolher a Movi Kids! 🌟`
+    `Acompanhe o cronometro em tempo real:\n${trackUrl}\n\n` +
+    `Caso queira mais tempo, o valor adicional e R$ ${String(s.adicionalPorMin).replace('.',',')} por minuto.\n\n` +
+    `Obrigado por escolher a Movi Kids!`
   );
   const tel   = String(s.telefone).replace(/\D/g,'');
   const prefx = tel.startsWith('55') ? '' : '55';
