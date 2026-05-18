@@ -1817,10 +1817,12 @@ function abrirWaMsg(s) {
     : 'O tempo esgotou!';
 
   // Link de acompanhamento para o responsável
+  // vp = valorPlano (base), a = adicionalPorMin (extra)
   const trackUrl = 'https://ribocg-a11y.github.io/movikids/track.html' +
     `?r=${s.rowIndex}&ts=${s.startTimestamp}&m=${s.mins}` +
     `&v=${encodeURIComponent(s.tipo)}&c=${encodeURIComponent(s.crianca)}` +
-    `&p=${encodeURIComponent(s.responsavel)}`;
+    `&p=${encodeURIComponent(s.responsavel)}` +
+    `&vp=${s.valorPlano}&a=${s.adicionalPorMin}`;
 
   const msg = encodeURIComponent(
     `Ola ${s.responsavel}!\n\n` +
