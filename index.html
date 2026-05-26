@@ -1531,7 +1531,7 @@ async function loadCustosHoje() {
       custosHoje = dc.custos.filter(c => String(c.data) === dataHoje);
       renderCustos();
     }
-  } catch {}
+  } catch(e) { console.error('loadCustosHoje:', e); } // BUG4-FIX
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -2095,8 +2095,7 @@ function adminLogin() {
   document.addEventListener('touchstart', resetAdminTimer);
   adminTimerInt = setInterval(tickAdmin, 1000);
   showAdminSidebar();
-  carregarKPIs();
-  showPage('admin');
+  showPage('admin'); // BUG1-FIX: showPage já chama carregarKPIs se !kpiData — sem race condition
   carregarHistRelatorios();
 }
 
@@ -2307,7 +2306,7 @@ async function carregarHistRelatorios() {
         </div>
         ${r.link&&r.link!=='(email)'?`<span class="rel-hist-link" onclick="window.open('${r.link}','_blank')">📄 PDF</span>`:'📧'}
       </div>`).join('');
-  } catch {}
+  } catch(e) { console.error('carregarHistRelatorios:', e); if(container) container.innerHTML='<div class="empty"><div class="empty-icon">⚠️</div><h3>Erro ao carregar relatórios</h3><p>Verifique a conexão</p></div>'; }
 }
 
 // ── OVERRIDE showPage for admin pages ────────────────────────
@@ -2325,7 +2324,10 @@ function showPage(name) {
   if (name==='custos') loadCustosHoje();
   if (name==='historico') buscarHistorico(); // FIX BUG-007: if(!currentPeriod) sempre false pois currentPeriod='hoje' na declaração
   if (name==='admin' && isAdmin) { resetAdminTimer(); if(!kpiData) carregarKPIs(); }
-  if (name==='dashboard' && kpiData) renderCharts(kpiData);
+  if (name==='dashboard') {
+    if (kpiData) renderCharts(kpiData);
+    else carregarKPIs().then(() => { if (kpiData) renderCharts(kpiData); }); // BUG3-FIX: carrega KPIs se ainda não carregou
+  }
 }
 
 
