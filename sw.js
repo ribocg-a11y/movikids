@@ -1,9 +1,9 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Service Worker v1.0
-// Habilita comportamento de app nativo (instalável, offline básico)
+// MOVI KIDS — Service Worker v1.3.0
+// Atualizado: força limpeza do cache antigo
 // ═══════════════════════════════════════════════════════════
 
-const CACHE_NAME = 'movikids-v1.1';
+const CACHE_NAME = 'movikids-v1.3.0';
 const STATIC_CACHE = [
   '/movikids/',
   '/movikids/index.html',
@@ -14,7 +14,7 @@ const STATIC_CACHE = [
   '/movikids/track.html',
 ];
 
-// ── INSTALL: pré-cacheia os arquivos estáticos ────────────────
+// ── INSTALL ───────────────────────────────────────────────
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => {
@@ -23,40 +23,53 @@ self.addEventListener('install', event => {
   );
 });
 
-// ── ACTIVATE: remove caches antigos ──────────────────────────
+// ── ACTIVATE: remove TODOS os caches antigos ─────────────
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(keys =>
       Promise.all(
-        keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
+        keys.filter(k => k !== CACHE_NAME).map(k => {
+          console.log('[SW] Removendo cache antigo:', k);
+          return caches.delete(k);
+        })
       )
     ).then(() => self.clients.claim())
   );
 });
 
-// ── FETCH: network-first para API, cache-first para estáticos ─
+// ── FETCH: network-first para HTML, cache para estáticos ─
 self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
 
-  // Sempre buscar do servidor para chamadas à API do GAS
+  // API GAS — sempre da rede
   if (url.hostname.includes('script.google.com')) {
     event.respondWith(fetch(event.request));
     return;
   }
 
-  // Para tudo mais: cache-first com fallback de rede
+  // HTML principal — sempre da rede para garantir versão atualizada
+  if (event.request.destination === 'document') {
+    event.respondWith(
+      fetch(event.request).then(response => {
+        const clone = response.clone();
+        caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
+        return response;
+      }).catch(() => caches.match('/movikids/index.html'))
+    );
+    return;
+  }
+
+  // Demais estáticos — cache-first
   event.respondWith(
     caches.match(event.request).then(cached => {
       if (cached) return cached;
       return fetch(event.request).then(response => {
-        // Cacheia respostas válidas
         if (response && response.status === 200 && response.type === 'basic') {
           const clone = response.clone();
           caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
         }
         return response;
       }).catch(() => {
-        // Offline fallback
         if (event.request.destination === 'document') {
           return caches.match('/movikids/index.html');
         }
