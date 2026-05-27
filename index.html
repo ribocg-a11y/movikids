@@ -1645,36 +1645,18 @@ function atualizarVeiculoGrid() {
 }
 
 function selectVeiculo(el, veiculo, tipo) {
-  // Bloqueia se estiver em uso
   if (el.classList.contains('vc-busy') || el.classList.contains('vc-busy-pink')) return;
-  // Remove seleção anterior
-  document.querySelectorAll('.vc-card').forEach(c => c.classList.remove('vc-sel','vc-sel-pink'));
+  document.querySelectorAll('.vc-card').forEach(function(c) { c.classList.remove('vc-sel','vc-sel-pink'); });
   el.classList.add(tipo === 'Pelúcia' ? 'vc-sel-pink' : 'vc-sel');
   novaState.veiculo = veiculo;
   novaState.tipo    = tipo;
-
-  // Constrói a lista de planos para o tipo selecionado (igual ao selectTipo original)
-  const container = document.getElementById('plano-list');
-  if (container) {
-    container.innerHTML = Object.entries(PRECOS[tipo]).map(([k,v]) => {
-      const badgeCls = tipo === 'Pelúcia' ? 'pelucia' : '';
-      const adicFmt  = 'R$ ' + String(v.a).replace('.',',') + '/min extra';
-      return `<div class="plano-btn ${badgeCls}" onclick="selectPlano('${k}',this)">
-        <div>
-          <div class="pb-nome">${PLANO_LABELS[k]}</div>
-          <div class="pb-det">${v.m} min · ${adicFmt}</div>
-        </div>
-        <div class="pb-val">R$ ${v.v}</div>
-      </div>`;
-    }).join('');
-  }
-
-  nextStep(); // avança para step-1 (plano)
+  // Reutiliza selectTipo para construir planos (código testado e funcional)
+  selectTipo(tipo, null);
 }
 
 function selectTipo(tipo, el) {
   document.querySelectorAll('.tipo-btn').forEach(b => b.classList.remove('sel'));
-  el.classList.add('sel');
+  if (el) el.classList.add('sel');
   novaState.tipo = tipo;
 
   // Build plano list
