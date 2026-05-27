@@ -817,7 +817,7 @@ nav button .nav-badge{
   <!-- ══ SIDEBAR (desktop only) ══ -->
   <aside id="sidebar">
     <div class="sb-logo">🚗 Movi <span>Kids</span>
-      <div class="sb-status"><span id="sb-dot" class="dot-online"></span><span id="sb-txt">Online</span><span style="font-size:10px;opacity:.85;margin-left:5px;color:rgba(255,255,255,.7);font-family:monospace">v1.4.1</span></div>
+      <div class="sb-status"><span id="sb-dot" class="dot-online"></span><span id="sb-txt">Online</span><span style="font-size:10px;opacity:.85;margin-left:5px;color:rgba(255,255,255,.7);font-family:monospace">v1.4.2</span></div>
     </div>
     <div class="sb-nav" id="sb-nav">
       <button class="sb-btn active" id="sbn-home" onclick="showPage('home')"><span class="sb-icon">🏠</span>Home</button>
@@ -850,7 +850,7 @@ nav button .nav-badge{
       <div class="hd-status">
         <div id="status-dot" class="dot-online"></div>
         <span id="status-txt">Online</span>
-        <span id="app-version" style="font-size:10px;opacity:.85;margin-left:4px;font-family:monospace">v1.4.1</span>
+        <span id="app-version" style="font-size:10px;opacity:.85;margin-left:4px;font-family:monospace">v1.4.2</span>
       </div>
     </div>
   </header>
@@ -1281,7 +1281,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = 'v1.4.1';
+const APP_VERSION = 'v1.4.2';
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec';
 
 const PRECOS = {
@@ -1334,8 +1334,11 @@ async function init() {
   splash.classList.add('hide');
   setTimeout(() => splash.classList.add('gone'), 550); // remove after fade
 
-  // PASSO 2: sincroniza com servidor em background (1 única chamada)
+  // PASSO 2: sincroniza com servidor em background
   sincronizarServidor();
+
+  // PASSO 3: polling periódico a cada 30s (mantém dados frescos)
+  setInterval(() => sincronizarServidor(), 30000);
 }
 
 async function sincronizarServidor() {
@@ -1389,6 +1392,7 @@ async function sincronizarServidor() {
 
     // Encerradas hoje para operador ver na home
     if (d.encHoje) renderEncHoje(d.encHoje);
+    atualizarVeiculoGrid(); // Atualiza disponibilidade após sync com servidor
 
     // Custos do dia
     if (d.custosHoje) { custosHoje = d.custosHoje; renderCustos(); }
@@ -1486,7 +1490,7 @@ function checkTimer(s) {
 function updateUI() {
   renderCards();
   updateStats();
-  atualizarVeiculoGrid(); // v1.3 — atualiza disponibilidade dos veículos
+  // atualizarVeiculoGrid: chamada apenas quando necessário (não a cada 1s)
 }
 
 function renderCards() {
@@ -1973,8 +1977,29 @@ async function confirmarEncerrar() {
 
     fecharEncModal();
     fecharAlerta();
+
+    // Atualiza encHoje localmente SEM esperar servidor (UX imediato)
+    const agora = new Date();
+    const hh = String(agora.getHours()).padStart(2,'0');
+    const mm2 = String(agora.getMinutes()).padStart(2,'0');
+    encHojeData.push({
+      id:          d.id || encSession.id,
+      tipo:        d.tipo,
+      plano:       d.plano,
+      veiculo:     d.veiculo || encSession.veiculo || '',
+      crianca:     d.crianca,
+      responsavel: d.responsavel,
+      horaInicio:  d.horaInicio,
+      horaFim:     hh + ':' + mm2,
+      valorTotal:  d.valorTotal
+    });
+    renderEncHoje(encHojeData);
     renderCards();
     updateStats();
+    atualizarVeiculoGrid();
+
+    // Sincroniza servidor em background para confirmar dados reais
+    setTimeout(() => sincronizarServidor(), 1500);
 
   } catch(e) {
     toast('Erro de conexão.', 'error');
