@@ -248,6 +248,9 @@ nav button .nav-badge{
 .pag-resumo{background:var(--bg2);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:14px;border:1px solid var(--border)}
 .pag-resumo-row{display:flex;justify-content:space-between;font-size:13px;padding:3px 0;color:var(--txt2)}
 .pag-resumo-row.total{font-size:15px;font-weight:800;color:var(--txt);border-top:1px solid var(--border);margin-top:6px;padding-top:8px}
+.wa-preview{background:#e9fbe9;border:1px solid #a5d6a7;border-radius:12px;padding:14px 16px;margin:12px 0;font-size:13px;color:#1b5e20;line-height:1.7;white-space:pre-wrap;word-break:break-word;font-family:var(--font-sans);max-height:260px;overflow-y:auto}
+.btn-wa{background:#25D366;color:#fff;border:none}
+.btn-wa:hover{background:#1ebe57}
 .tipo-btn{
   background:var(--card);border:2px solid var(--border);border-radius:var(--radius);
   padding:20px 12px;text-align:center;cursor:pointer;transition:all .2s;
@@ -817,7 +820,7 @@ nav button .nav-badge{
   <!-- ══ SIDEBAR (desktop only) ══ -->
   <aside id="sidebar">
     <div class="sb-logo">🚗 Movi <span>Kids</span>
-      <div class="sb-status"><span id="sb-dot" class="dot-online"></span><span id="sb-txt">Online</span><span style="font-size:10px;opacity:.85;margin-left:5px;color:rgba(255,255,255,.7);font-family:monospace">v1.4.2</span></div>
+      <div class="sb-status"><span id="sb-dot" class="dot-online"></span><span id="sb-txt">Online</span><span style="font-size:10px;opacity:.85;margin-left:5px;color:rgba(255,255,255,.7);font-family:monospace">v1.4.3</span></div>
     </div>
     <div class="sb-nav" id="sb-nav">
       <button class="sb-btn active" id="sbn-home" onclick="showPage('home')"><span class="sb-icon">🏠</span>Home</button>
@@ -850,7 +853,7 @@ nav button .nav-badge{
       <div class="hd-status">
         <div id="status-dot" class="dot-online"></div>
         <span id="status-txt">Online</span>
-        <span id="app-version" style="font-size:10px;opacity:.85;margin-left:4px;font-family:monospace">v1.4.2</span>
+        <span id="app-version" style="font-size:10px;opacity:.85;margin-left:4px;font-family:monospace">v1.4.3</span>
       </div>
     </div>
   </header>
@@ -1220,8 +1223,27 @@ nav button .nav-badge{
       <button class="btn btn-encerrar" onclick="encerrarDireto()" id="btn-enc-alert">
         ✓ Encerrar locação
       </button>
-      <button class="btn btn-secondary btn-sm" onclick="fecharAlerta()">
-        Fechar e continuar monitorando
+      <button class="btn btn-secondary btn-sm" id="btn-pular-alerta" onclick="fecharAlerta()">
+        Pular mensagem e continuar monitorando
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ──────── MODAL BOAS-VINDAS WHATSAPP ──────── -->
+<div id="wa-bv-modal" class="modal-overlay">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-icon">📱</div>
+    <div class="modal-title">Enviar boas-vindas</div>
+    <div class="modal-sub">Revise a mensagem e envie ao responsável antes de iniciar a contagem.</div>
+    <div class="wa-preview" id="wa-bv-preview"></div>
+    <div class="modal-btns">
+      <button class="btn btn-wa" id="btn-wa-bv-send" onclick="enviarBvEIniciar()">
+        📲 Enviar pelo WhatsApp e Iniciar
+      </button>
+      <button class="btn btn-secondary btn-sm" onclick="pularBvEIniciar()">
+        Pular mensagem e iniciar
       </button>
     </div>
   </div>
@@ -1281,7 +1303,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = 'v1.4.2';
+const APP_VERSION = 'v1.4.3';
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec';
 
 const PRECOS = {
@@ -1533,7 +1555,7 @@ function buildCard(s) {
         <div class="frozen-time">${fmtTime(s.mins * 60)}</div>
         <div class="frozen-label">⏸ Cadastro salvo · aguardando início</div>
       </div>
-      <button class="btn btn-iniciar" onclick="iniciarContagem(${s.rowIndex})">
+      <button class="btn btn-iniciar" onclick="abrirModalBv(${s.rowIndex})">
         ▶ INICIAR CONTAGEM
       </button>
     </div>`;
@@ -1897,11 +1919,7 @@ async function confirmarLocacao() {
     showPage('home');
     toast(`✅ Cadastro salvo! Aperte ▶ para iniciar a contagem.`, 'success');
 
-    // MSG 1: Boas-vindas ao responsável
-    const sessaoNova = sessions[sessions.length - 1];
-    if (sessaoNova && sessaoNova.telefone) {
-      setTimeout(() => waBoasVindas(sessaoNova), 1200);
-    }
+    // MSG 1: disparada pelo operador no modal de boas-vindas (antes de iniciar contagem)
 
     // Sync silencioso para confirmar rowIndex real
     setTimeout(() => sincronizarServidor(), 800);
@@ -2015,43 +2033,62 @@ function triggerAlert5(s) {
   alertSession = s;
   playBeep();
   showNotification(`⏰ ${s.crianca} — 5 minutos!`, `Hora de avisar o responsável: ${s.responsavel}`);
-  showAlertModal(s, false);
-  waAlertaTempo(s); // MSG 2 automática ao chegar nos 5 min
+  showAlertModal(s, false); // Operador decide se envia (MSG 2 é opcional)
 }
 
 function triggerAlertExpired(s) {
   alertSession = s;
   playBeep(3);
   showNotification(`🔴 ${s.crianca} — Tempo esgotado!`, `Minutos extras sendo cobrados!`);
-  showAlertModal(s, true);
-  waTempoEsgotado(s); // MSG 3 automática ao esgotar
+  showAlertModal(s, true); // MSG 3 obrigatória — operador deve enviar antes de fechar
 }
 
 function showAlertModal(s, expired) {
   const modal = document.getElementById('alert-modal');
   modal.className = 'modal-overlay alert-modal' + (expired ? ' danger show' : ' show');
 
-  document.getElementById('alert-icon').textContent   = expired ? '🔴' : '⏰';
-  document.getElementById('alert-title').textContent  = expired ? 'Tempo esgotado!' : 'Faltam 5 minutos!';
-  document.getElementById('alert-sub').textContent    = expired
-    ? `Minutos extras sendo cobrados para ${s.crianca}.`
-    : `Avise ${s.responsavel} que o tempo de ${s.crianca} está acabando.`;
+  document.getElementById('alert-icon').textContent  = expired ? '🔴' : '⏰';
+  document.getElementById('alert-title').textContent = expired ? 'Tempo esgotado!' : 'Faltam 5 minutos!';
+  document.getElementById('alert-sub').textContent   = expired
+    ? 'Envie a mensagem ao responsável informando que minutos extras serão cobrados.'
+    : 'Avise ' + s.responsavel + ' que o tempo de ' + s.crianca + ' está acabando.';
 
   const vPlano = PRECOS[s.tipo]?.[s.plano]?.v || s.valorPlano;
   const icon   = s.tipo === 'Carro' ? '🚗' : '🧸';
-  document.getElementById('alert-info').innerHTML = `
-    <div class="modal-info-row"><span>${icon} Tipo</span><span>${s.tipo}</span></div>
-    <div class="modal-info-row"><span>Plano</span><span>${s.plano}</span></div>
-    <div class="modal-info-row"><span>Criança</span><span>${s.crianca}</span></div>
-    <div class="modal-info-row"><span>Responsável</span><span>${s.responsavel}</span></div>
-    <div class="modal-info-row"><span>Valor base</span><span>R$ ${vPlano}</span></div>
-    <div class="modal-info-row"><span>Adicional/min</span><span>R$ ${s.adicionalPorMin}</span></div>`;
+  document.getElementById('alert-info').innerHTML =
+    '<div class="modal-info-row"><span>' + icon + ' ' + (s.veiculo||s.tipo) + '</span><span>' + s.plano + '</span></div>' +
+    '<div class="modal-info-row"><span>Criança</span><span>' + s.crianca + '</span></div>' +
+    '<div class="modal-info-row"><span>Responsável</span><span>' + s.responsavel + '</span></div>' +
+    '<div class="modal-info-row"><span>Extra/min</span><span>R$ ' + s.adicionalPorMin + '</span></div>';
 
   document.getElementById('btn-enc-alert').className = 'btn btn-encerrar' + (expired ? ' danger' : '');
+
+  // MSG expirado: WA obrigatório — esconde botão pular
+  const btnPular = document.getElementById('btn-pular-alerta');
+  const btnWa    = document.getElementById('btn-wa');
+  if (expired) {
+    if (btnPular) btnPular.style.display = 'none';
+    if (btnWa) {
+      btnWa.textContent = '📲 Enviar aviso de cobrança (obrigatório)';
+      btnWa.onclick = function() { waTempoEsgotado(s); fecharAlerta(); };
+    }
+  } else {
+    if (btnPular) btnPular.style.display = '';
+    if (btnWa) {
+      btnWa.textContent = '📱 Enviar WhatsApp ao responsável';
+      btnWa.onclick = function() { abrirWhatsApp(); };
+    }
+  }
 }
 
 function fecharAlerta() {
-  document.getElementById('alert-modal').classList.remove('show');
+  // Bloqueia fechar se expirado — operador deve enviar MSG 3 primeiro
+  const modal = document.getElementById('alert-modal');
+  if (modal.classList.contains('danger')) {
+    toast('Envie o aviso de cobrança antes de fechar!', 'error');
+    return;
+  }
+  modal.classList.remove('show');
   if (!encSession) alertSession = null;
 }
 
@@ -2163,6 +2200,50 @@ function encerrarDireto() {
 // ═══════════════════════════════════════════════════════════
 // INICIAR CONTAGEM
 // ═══════════════════════════════════════════════════════════
+let bvRowIndex = null; // rowIndex da sessão aguardando início
+
+function abrirModalBv(rowIndex) {
+  const s = sessions.find(x => x.rowIndex === rowIndex);
+  if (!s) return;
+  bvRowIndex = rowIndex;
+
+  // Monta preview da mensagem (sem emojis unicode para visualização)
+  const veiculo   = s.veiculo || s.tipo;
+  const plano     = PLANO_LABELS[s.plano] || s.plano;
+  const valor     = 'R$ ' + String(s.valorPlano).replace('.',',');
+  const adicional = String(s.adicionalPorMin).replace('.',',');
+  const pag       = s.pagamento ? '\nPagamento: ' + s.pagamento : '';
+  const track     = gerarTrackUrl(s);
+
+  const preview =
+    'Ola, ' + s.responsavel + '!\n\n' +
+    s.crianca + ' acabou de comecar sua aventura aqui na Movi Kids!\n\n' +
+    'Detalhes da locacao:\n' +
+    'Veiculo: ' + veiculo + '\n' +
+    'Plano: ' + plano + '\n' +
+    'Valor: ' + valor + pag + '\n\n' +
+    'Acompanhe o tempo em tempo real:\n' + track + '\n\n' +
+    'Qualquer duvida, estamos aqui!\n' +
+    'Movi Kids -- diversao com seguranca!';
+
+  document.getElementById('wa-bv-preview').textContent = preview;
+  document.getElementById('wa-bv-modal').classList.add('show');
+}
+
+function enviarBvEIniciar() {
+  const s = sessions.find(x => x.rowIndex === bvRowIndex);
+  if (s) waBoasVindas(s);
+  document.getElementById('wa-bv-modal').classList.remove('show');
+  iniciarContagem(bvRowIndex);
+  bvRowIndex = null;
+}
+
+function pularBvEIniciar() {
+  document.getElementById('wa-bv-modal').classList.remove('show');
+  iniciarContagem(bvRowIndex);
+  bvRowIndex = null;
+}
+
 async function iniciarContagem(rowIndex) {
   const ts = Date.now(); // Momento exato do clique
 
