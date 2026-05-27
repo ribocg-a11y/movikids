@@ -817,7 +817,7 @@ nav button .nav-badge{
   <!-- ══ SIDEBAR (desktop only) ══ -->
   <aside id="sidebar">
     <div class="sb-logo">🚗 Movi <span>Kids</span>
-      <div class="sb-status"><span id="sb-dot" class="dot-online"></span><span id="sb-txt">Online</span><span style="font-size:10px;opacity:.85;margin-left:5px;color:rgba(255,255,255,.7);font-family:monospace">v1.4.0</span></div>
+      <div class="sb-status"><span id="sb-dot" class="dot-online"></span><span id="sb-txt">Online</span><span style="font-size:10px;opacity:.85;margin-left:5px;color:rgba(255,255,255,.7);font-family:monospace">v1.4.1</span></div>
     </div>
     <div class="sb-nav" id="sb-nav">
       <button class="sb-btn active" id="sbn-home" onclick="showPage('home')"><span class="sb-icon">🏠</span>Home</button>
@@ -850,7 +850,7 @@ nav button .nav-badge{
       <div class="hd-status">
         <div id="status-dot" class="dot-online"></div>
         <span id="status-txt">Online</span>
-        <span id="app-version" style="font-size:10px;opacity:.85;margin-left:4px;font-family:monospace">v1.4.0</span>
+        <span id="app-version" style="font-size:10px;opacity:.85;margin-left:4px;font-family:monospace">v1.4.1</span>
       </div>
     </div>
   </header>
@@ -1281,7 +1281,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = 'v1.4.0';
+const APP_VERSION = 'v1.4.1';
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec';
 
 const PRECOS = {
@@ -1893,6 +1893,12 @@ async function confirmarLocacao() {
     showPage('home');
     toast(`✅ Cadastro salvo! Aperte ▶ para iniciar a contagem.`, 'success');
 
+    // MSG 1: Boas-vindas ao responsável
+    const sessaoNova = sessions[sessions.length - 1];
+    if (sessaoNova && sessaoNova.telefone) {
+      setTimeout(() => waBoasVindas(sessaoNova), 1200);
+    }
+
     // Sync silencioso para confirmar rowIndex real
     setTimeout(() => sincronizarServidor(), 800);
 
@@ -1985,6 +1991,7 @@ function triggerAlert5(s) {
   playBeep();
   showNotification(`⏰ ${s.crianca} — 5 minutos!`, `Hora de avisar o responsável: ${s.responsavel}`);
   showAlertModal(s, false);
+  waAlertaTempo(s); // MSG 2 automática ao chegar nos 5 min
 }
 
 function triggerAlertExpired(s) {
@@ -1992,6 +1999,7 @@ function triggerAlertExpired(s) {
   playBeep(3);
   showNotification(`🔴 ${s.crianca} — Tempo esgotado!`, `Minutos extras sendo cobrados!`);
   showAlertModal(s, true);
+  waTempoEsgotado(s); // MSG 3 automática ao esgotar
 }
 
 function showAlertModal(s, expired) {
@@ -2034,34 +2042,92 @@ function abrirWhatsAppCard(rowIndex) {
   abrirWaMsg(s);
 }
 
+// ── Gera link de acompanhamento ───────────────────────────────────────────
+function gerarTrackUrl(s) {
+  return 'https://ribocg-a11y.github.io/movikids/track.html' +
+    '?r=' + s.rowIndex +
+    '&ts=' + s.startTimestamp +
+    '&m='  + s.mins +
+    '&v='  + encodeURIComponent(s.veiculo || s.tipo) +
+    '&c='  + encodeURIComponent(s.crianca) +
+    '&p='  + encodeURIComponent(s.responsavel) +
+    '&vp=' + s.valorPlano +
+    '&a='  + s.adicionalPorMin;
+}
+
+function enviarWaTel(tel, msg) {
+  const t = String(tel).replace(/\D/g,'');
+  const p = t.startsWith('55') ? '' : '55';
+  window.open('https://wa.me/' + p + t + '?text=' + encodeURIComponent(msg), '_blank');
+}
+
+// ── MSG 1: Boas-vindas (logo após confirmar locação) ──────────────────────
+function waBoasVindas(s) {
+  if (!s || !s.telefone) return;
+  const veiculo  = s.veiculo || s.tipo;
+  const plano    = PLANO_LABELS[s.plano] || s.plano;
+  const valor    = 'R$ ' + String(s.valorPlano).replace('.',',');
+  const adicional= String(s.adicionalPorMin).replace('.',',');
+  const pag      = s.pagamento || '';
+  const track    = gerarTrackUrl(s);
+
+  const msg =
+    'Ola, ' + s.responsavel + '! \u{1F44B}\n\n' +
+    s.crianca + ' acabou de comecar sua aventura aqui na *Movi Kids*! \u{1F697}\u{2728}\n\n' +
+    'Aqui estao os detalhes da locacao:\n' +
+    '\u{1F3AF} Veiculo: ' + veiculo + '\n' +
+    '\u{23F1} Plano: ' + plano + '\n' +
+    '\u{1F4B0} Valor: ' + valor + '\n' +
+    (pag ? '\u{1F4B3} Pagamento: ' + pag + '\n' : '') +
+    '\nVoce pode acompanhar o tempo em tempo real pelo link abaixo:\n' +
+    '\u{1F517} ' + track + '\n\n' +
+    'Qualquer duvida, estamos aqui! \u{1F60A}\n' +
+    '*Movi Kids -- diversao com seguranca!* \u{1F9F8}';
+
+  enviarWaTel(s.telefone, msg);
+}
+
+// ── MSG 2: Alerta de tempo (faltam ~5 min) ────────────────────────────────
+function waAlertaTempo(s) {
+  if (!s || !s.telefone) return;
+  const rem   = Math.max(0, Math.ceil(calcRemaining(s) / 60));
+  const track = gerarTrackUrl(s);
+
+  const msg =
+    'Oi, ' + s.responsavel + '! \u{23F0}\n\n' +
+    'O tempo de ' + s.crianca + ' esta quase acabando -- ' +
+    '*faltam apenas ' + rem + ' minuto' + (rem !== 1 ? 's' : '') + '!*\n\n' +
+    'Se quiser continuar a diversao, fale com o nosso operador antes do tempo encerrar. \u{1F609}\n\n' +
+    'Acompanhe o cronometro em tempo real:\n' +
+    '\u{1F517} ' + track + '\n\n' +
+    '*Movi Kids -- cada minuto e uma memoria!* \u{1F697}';
+
+  enviarWaTel(s.telefone, msg);
+}
+
+// ── MSG 3: Tempo esgotado com extra ──────────────────────────────────────
+function waTempoEsgotado(s) {
+  if (!s || !s.telefone) return;
+  const adicional = String(s.adicionalPorMin).replace('.',',');
+  const track     = gerarTrackUrl(s);
+
+  const msg =
+    'Oi, ' + s.responsavel + '! \u{1F534}\n\n' +
+    'O tempo contratado de ' + s.crianca + ' *ja encerrou* e os minutos extras estao sendo contados a partir de agora.\n\n' +
+    '\u{23F1} Extra: R$ ' + adicional + ' por minuto adicional\n\n' +
+    'Por favor, dirija-se ao operador para encerrar a locacao. \u{1F64F}\n\n' +
+    'Veja quanto tempo extra acumulou pelo link:\n' +
+    '\u{1F517} ' + track + '\n\n' +
+    '*Movi Kids -- obrigado pela preferencia!* \u{1F9F8}';
+
+  enviarWaTel(s.telefone, msg);
+}
+
+// ── Compatibilidade: botão WhatsApp no card e no alerta ───────────────────
 function abrirWaMsg(s) {
-  // FIX: emojis removidos — encodeURIComponent trata 4-byte Unicode incorretamente
-  // em alguns dispositivos iOS, resultando em caractere ◆ no WhatsApp.
-  const rem  = calcRemaining(s);
-  const tipo = s.tipo === 'Carro' ? 'Carro Eletrico' : 'Pelucia Eletrica';
-  const fmin = rem > 0
-    ? `Faltam apenas ${Math.ceil(rem/60)} minuto(s)!`
-    : 'O tempo esgotou!';
-
-  // Link de acompanhamento para o responsável
-  // vp = valorPlano (base), a = adicionalPorMin (extra)
-  const trackUrl = 'https://ribocg-a11y.github.io/movikids/track.html' +
-    `?r=${s.rowIndex}&ts=${s.startTimestamp}&m=${s.mins}` +
-    `&v=${encodeURIComponent(s.tipo)}&c=${encodeURIComponent(s.crianca)}` +
-    `&p=${encodeURIComponent(s.responsavel)}` +
-    `&vp=${s.valorPlano}&a=${s.adicionalPorMin}`;
-
-  const msg = encodeURIComponent(
-    `Ola ${s.responsavel}!\n\n` +
-    `A locacao de *${s.crianca}* esta chegando ao fim.\n` +
-    `${fmin}\n\n` +
-    `Acompanhe o cronometro em tempo real:\n${trackUrl}\n\n` +
-    `Caso queira mais tempo, o valor adicional e R$ ${String(s.adicionalPorMin).replace('.',',')} por minuto.\n\n` +
-    `Obrigado por escolher a Movi Kids!`
-  );
-  const tel   = String(s.telefone).replace(/\D/g,'');
-  const prefx = tel.startsWith('55') ? '' : '55';
-  window.open(`https://wa.me/${prefx}${tel}?text=${msg}`, '_blank');
+  const rem = calcRemaining(s);
+  if (rem <= 0) { waTempoEsgotado(s); }
+  else          { waAlertaTempo(s);   }
 }
 
 function encerrarDireto() {
