@@ -1652,6 +1652,23 @@ function selectVeiculo(el, veiculo, tipo) {
   el.classList.add(tipo === 'Pelúcia' ? 'vc-sel-pink' : 'vc-sel');
   novaState.veiculo = veiculo;
   novaState.tipo    = tipo;
+
+  // Constrói a lista de planos para o tipo selecionado (igual ao selectTipo original)
+  const container = document.getElementById('plano-list');
+  if (container) {
+    container.innerHTML = Object.entries(PRECOS[tipo]).map(([k,v]) => {
+      const badgeCls = tipo === 'Pelúcia' ? 'pelucia' : '';
+      const adicFmt  = 'R$ ' + String(v.a).replace('.',',') + '/min extra';
+      return `<div class="plano-btn ${badgeCls}" onclick="selectPlano('${k}',this)">
+        <div>
+          <div class="pb-nome">${PLANO_LABELS[k]}</div>
+          <div class="pb-det">${v.m} min · ${adicFmt}</div>
+        </div>
+        <div class="pb-val">R$ ${v.v}</div>
+      </div>`;
+    }).join('');
+  }
+
   nextStep(); // avança para step-1 (plano)
 }
 
