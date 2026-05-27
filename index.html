@@ -17,6 +17,28 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
+<script>
+// ── CACHE BUSTER v1.3.0 ─────────────────────────────────
+// Força limpeza do SW antigo e recarga com versão nova
+(function(){
+  const CURRENT = 'movikids-v1.3.0';
+  if ('serviceWorker' in navigator) {
+    // Desregistra SWs antigos
+    navigator.serviceWorker.getRegistrations().then(function(regs) {
+      var needsReload = false;
+      regs.forEach(function(reg) { reg.unregister(); needsReload = true; });
+      // Limpa todos os caches
+      if (window.caches) {
+        caches.keys().then(function(keys) {
+          keys.forEach(function(k) {
+            if (k !== CURRENT) { caches.delete(k); needsReload = true; }
+          });
+        });
+      }
+    });
+  }
+})();
+</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 /* ── RESET & VARS ─────────────────────────────────────────── */
