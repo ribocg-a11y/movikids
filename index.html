@@ -197,6 +197,26 @@ nav button .nav-badge{
 .step-page.active{display:block}
 
 .tipo-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.veiculo-grid-carros{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}
+.veiculo-grid-pelucias{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px}
+.vc-card{border:1.5px solid var(--border);border-radius:12px;padding:10px 6px 8px;text-align:center;cursor:pointer;transition:border-color .15s,background .15s;background:var(--card);position:relative}
+.vc-card:hover:not(.vc-busy):not(.vc-busy-pink){border-color:var(--blue);background:var(--blue-lt)}
+.vc-card.vc-busy{background:var(--bg2);cursor:not-allowed;border-color:var(--border)}
+.vc-card.vc-busy-pink{background:#FFF0F6;cursor:not-allowed;border-color:#F4C0D1}
+.vc-card.vc-sel{border-color:var(--blue);background:var(--blue-lt)}
+.vc-card.vc-sel-pink{border-color:var(--pink);background:var(--pink-lt)}
+.vc-icon{font-size:22px;margin-bottom:3px}
+.vc-name{font-size:11px;font-weight:800;color:var(--txt)}
+.vc-status{font-size:10px;margin-top:2px}
+.vc-status.livre{color:var(--green)}
+.vc-status.em-uso{color:var(--danger)}
+.vc-status.em-uso-pink{color:var(--pink)}
+.vc-timer{margin-top:4px;background:rgba(0,0,0,.07);border-radius:6px;padding:3px 5px}
+.vc-timer-time{font-size:11px;font-weight:700;color:var(--danger);font-family:monospace}
+.vc-timer-time.extra{color:#854F0B}
+.vc-timer-extra{font-size:9px;color:#854F0B;margin-top:1px}
+.vc-section-label{font-size:11px;color:var(--txt3);margin-bottom:6px;margin-top:4px}
+.vc-hint{font-size:10px;color:var(--txt3);text-align:center;padding:4px 0 2px;grid-column:1/-1}
 .tipo-btn{
   background:var(--card);border:2px solid var(--border);border-radius:var(--radius);
   padding:20px 12px;text-align:center;cursor:pointer;transition:all .2s;
@@ -766,7 +786,7 @@ nav button .nav-badge{
   <!-- ══ SIDEBAR (desktop only) ══ -->
   <aside id="sidebar">
     <div class="sb-logo">🚗 Movi <span>Kids</span>
-      <div class="sb-status"><span id="sb-dot" class="dot-online"></span><span id="sb-txt">Online</span><span style="font-size:10px;opacity:.55;margin-left:5px">v1.2.0</span></div>
+      <div class="sb-status"><span id="sb-dot" class="dot-online"></span><span id="sb-txt">Online</span><span style="font-size:10px;opacity:.55;margin-left:5px">v1.3.0</span></div>
     </div>
     <div class="sb-nav" id="sb-nav">
       <button class="sb-btn active" id="sbn-home" onclick="showPage('home')"><span class="sb-icon">🏠</span>Home</button>
@@ -799,7 +819,7 @@ nav button .nav-badge{
       <div class="hd-status">
         <div id="status-dot" class="dot-online"></div>
         <span id="status-txt">Online</span>
-        <span id="app-version" style="font-size:10px;opacity:.6;margin-left:4px">v1.2.0</span>
+        <span id="app-version" style="font-size:10px;opacity:.6;margin-left:4px">v1.3.0</span>
       </div>
     </div>
   </header>
@@ -852,16 +872,45 @@ nav button .nav-badge{
     <!-- Step 1: Tipo -->
     <div id="step-0" class="step-page active">
       <div class="sec-title">Escolha o veículo</div>
-      <div class="tipo-grid">
-        <div class="tipo-btn" onclick="selectTipo('Carro',this)">
-          <div class="tb-icon">🚗</div>
-          <div class="tb-name">Carro Elétrico</div>
-          <div class="tb-sub">3 disponíveis</div>
+      <div class="vc-section-label">Carros elétricos</div>
+      <div class="veiculo-grid-carros" id="vc-grid-carros">
+        <div class="vc-card" id="vc-Carro 01" onclick="selectVeiculo(this,'Carro 01','Carro')">
+          <div class="vc-icon">🚗</div>
+          <div class="vc-name">Carro 01</div>
+          <div class="vc-status livre" id="vc-st-Carro 01">✓ Livre</div>
         </div>
-        <div class="tipo-btn pelucia" onclick="selectTipo('Pelúcia',this)">
-          <div class="tb-icon">🧸</div>
-          <div class="tb-name">Pelúcia Elétrica</div>
-          <div class="tb-sub">4 disponíveis</div>
+        <div class="vc-card" id="vc-Carro 02" onclick="selectVeiculo(this,'Carro 02','Carro')">
+          <div class="vc-icon">🚗</div>
+          <div class="vc-name">Carro 02</div>
+          <div class="vc-status livre" id="vc-st-Carro 02">✓ Livre</div>
+        </div>
+        <div class="vc-card" id="vc-Carro 03" onclick="selectVeiculo(this,'Carro 03','Carro')">
+          <div class="vc-icon">🚗</div>
+          <div class="vc-name">Carro 03</div>
+          <div class="vc-status livre" id="vc-st-Carro 03">✓ Livre</div>
+        </div>
+      </div>
+      <div class="vc-section-label">Pelúcias elétricas</div>
+      <div class="veiculo-grid-pelucias" id="vc-grid-pelucias">
+        <div class="vc-card" id="vc-Pelúcia 01" onclick="selectVeiculo(this,'Pelúcia 01','Pelúcia')">
+          <div class="vc-icon">🧸</div>
+          <div class="vc-name">Pelúcia 01</div>
+          <div class="vc-status livre" id="vc-st-Pelúcia 01">✓ Livre</div>
+        </div>
+        <div class="vc-card" id="vc-Pelúcia 02" onclick="selectVeiculo(this,'Pelúcia 02','Pelúcia')">
+          <div class="vc-icon">🧸</div>
+          <div class="vc-name">Pelúcia 02</div>
+          <div class="vc-status livre" id="vc-st-Pelúcia 02">✓ Livre</div>
+        </div>
+        <div class="vc-card" id="vc-Pelúcia 03" onclick="selectVeiculo(this,'Pelúcia 03','Pelúcia')">
+          <div class="vc-icon">🧸</div>
+          <div class="vc-name">Pelúcia 03</div>
+          <div class="vc-status livre" id="vc-st-Pelúcia 03">✓ Livre</div>
+        </div>
+        <div class="vc-card" id="vc-Pelúcia 04" onclick="selectVeiculo(this,'Pelúcia 04','Pelúcia')">
+          <div class="vc-icon">🧸</div>
+          <div class="vc-name">Pelúcia 04</div>
+          <div class="vc-status livre" id="vc-st-Pelúcia 04">✓ Livre</div>
         </div>
       </div>
     </div>
@@ -1166,7 +1215,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = 'v1.2.0';
+const APP_VERSION = 'v1.3.0';
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec';
 
 const PRECOS = {
@@ -1186,7 +1235,7 @@ let sessions    = [];   // active sessions with timer data
 let timerInterv = null;
 let alertSession= null; // session triggering alert modal
 let encSession  = null; // session in encerrar modal
-let novaState   = { tipo: null, plano: null, step: 0 };
+let novaState   = { tipo: null, plano: null, veiculo: null, step: 0 };
 let catSel      = 'Energia';
 let custosHoje  = [];
 let statsHoje   = { fat: 0, n: 0 };
@@ -1371,6 +1420,7 @@ function checkTimer(s) {
 function updateUI() {
   renderCards();
   updateStats();
+  atualizarVeiculoGrid(); // v1.3 — atualiza disponibilidade dos veículos
 }
 
 function renderCards() {
@@ -1401,7 +1451,7 @@ function buildCard(s) {
       <div class="sc-top">
         <div class="sc-tipo">
           <span class="sc-tipo-icon">${icon}</span>
-          <span class="sc-tipo-name">${s.tipo}</span>
+          <span class="sc-tipo-name">${s.veiculo || s.tipo}</span>
         </div>
         <span class="sc-plano-badge ${badgeCls}">${s.plano}</span>
       </div>
@@ -1539,6 +1589,70 @@ async function loadCustosHoje() {
 // ═══════════════════════════════════════════════════════════
 // NOVA LOCAÇÃO
 // ═══════════════════════════════════════════════════════════
+function atualizarVeiculoGrid() {
+  // Veículos em uso = sessions ativas com veiculo definido
+  const emUso = {};
+  sessions.forEach(s => {
+    if (s.status === 'Ativa' && s.veiculo) {
+      const rem = s.started ? calcRemaining(s) : s.mins * 60;
+      const isOver = rem <= 0;
+      emUso[s.veiculo] = { rem, isOver, s };
+    }
+  });
+
+  const todosVeiculos = ['Carro 01','Carro 02','Carro 03','Pelúcia 01','Pelúcia 02','Pelúcia 03','Pelúcia 04'];
+  todosVeiculos.forEach(nome => {
+    const card = document.getElementById('vc-' + nome);
+    const stEl = document.getElementById('vc-st-' + nome);
+    if (!card || !stEl) return;
+    const isPink = nome.startsWith('Pelúcia');
+    const info   = emUso[nome];
+
+    // Remover timer antigo se existir
+    const oldTimer = card.querySelector('.vc-timer');
+    if (oldTimer) oldTimer.remove();
+
+    if (info) {
+      // Em uso
+      card.classList.add(isPink ? 'vc-busy-pink' : 'vc-busy');
+      card.classList.remove('vc-sel','vc-sel-pink');
+      card.style.pointerEvents = 'none';
+      stEl.className = 'vc-status ' + (isPink ? 'em-uso-pink' : 'em-uso');
+      stEl.textContent = '⏳ Em uso';
+
+      // Timer
+      const timerDiv = document.createElement('div');
+      timerDiv.className = 'vc-timer';
+      const { rem, isOver, s } = info;
+      if (isOver) {
+        const extraSec = Math.abs(rem);
+        const extraMin = Math.floor(extraSec / 60);
+        const custo    = (extraMin * (s.adicionalPorMin || 1)).toFixed(2).replace('.',',');
+        timerDiv.innerHTML = `<div class="vc-timer-time extra">+${fmtTime(extraSec)}</div><div class="vc-timer-extra">R$ ${custo} extra</div>`;
+      } else {
+        const isWarn = rem <= 120;
+        timerDiv.innerHTML = `<div class="vc-timer-time${isWarn?' warn':''}">${fmtTime(rem)}</div>`;
+      }
+      card.appendChild(timerDiv);
+    } else {
+      // Livre
+      card.classList.remove('vc-busy','vc-busy-pink');
+      card.style.pointerEvents = '';
+      stEl.className = 'vc-status livre';
+      stEl.textContent = '✓ Livre';
+    }
+  });
+}
+
+function selectVeiculo(el, veiculo, tipo) {
+  // Bloqueia se estiver em uso
+  if (el.classList.contains('vc-busy') || el.classList.contains('vc-busy-pink')) return;
+  // Remove seleção anterior
+  document.querySelectorAll('.vc-card').forEach(c => c.classList.remove('vc-sel','vc-sel-pink'));
+  el.classList.add(tipo === 'Pelúcia' ? 'vc-sel-pink' : 'vc-sel');
+  novaState.veiculo = veiculo;
+  novaState.tipo    = tipo;
+
 function selectTipo(tipo, el) {
   document.querySelectorAll('.tipo-btn').forEach(b => b.classList.remove('sel'));
   el.classList.add('sel');
@@ -1622,7 +1736,7 @@ function resetNova() {
   document.getElementById('dot-0').classList.add('active');
   document.querySelectorAll('.tipo-btn').forEach(b => b.classList.remove('sel'));
   document.querySelectorAll('.plano-btn').forEach(b => b.classList.remove('sel'));
-  novaState = { tipo: null, plano: null, step: 0 };
+  novaState = { tipo: null, plano: null, veiculo: null, step: 0 };
 }
 
 async function confirmarLocacao() {
@@ -1630,6 +1744,7 @@ async function confirmarLocacao() {
   const cri  = document.getElementById('inp-cri').value.trim();
   const tel  = document.getElementById('inp-tel').value.trim().replace(/\D/g,'');
 
+  if (!novaState.veiculo) { toast('Selecione um veículo!', 'error'); return; }
   if (!resp || !cri || !tel) { toast('Preencha todos os campos!', 'error'); return; }
 
   const btn = document.getElementById('btn-confirmar');
@@ -1640,6 +1755,7 @@ async function confirmarLocacao() {
       action: 'salvarLocacao',
       tipo:         novaState.tipo,
       plano:        novaState.plano,
+      veiculo:      novaState.veiculo,
       responsavel:  resp,
       crianca:      cri,
       telefone:     tel
@@ -1654,6 +1770,7 @@ async function confirmarLocacao() {
       id:              d.id,
       tipo:            novaState.tipo,
       plano:           novaState.plano,
+      veiculo:         novaState.veiculo,
       mins:            d.mins,
       valorPlano:      d.valorPlano,
       adicionalPorMin: d.adicionalPorMin,
@@ -2328,7 +2445,7 @@ function showPage(name) {
   const navIdx = ['home','nova','custos','historico'].indexOf(name);
   if (navIdx >= 0) document.querySelectorAll('nav button')[navIdx]?.classList.add('active');
   syncSidebar(name);
-  if (name==='nova') resetNova();
+  if (name==='nova') { resetNova(); atualizarVeiculoGrid(); }
   if (name==='custos') loadCustosHoje();
   if (name==='historico') buscarHistorico(); // FIX BUG-007: if(!currentPeriod) sempre false pois currentPeriod='hoje' na declaração
   if (name==='admin' && isAdmin) { resetAdminTimer(); if(!kpiData) carregarKPIs(); }
