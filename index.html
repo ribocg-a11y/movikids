@@ -1652,6 +1652,8 @@ function selectVeiculo(el, veiculo, tipo) {
   el.classList.add(tipo === 'Pelúcia' ? 'vc-sel-pink' : 'vc-sel');
   novaState.veiculo = veiculo;
   novaState.tipo    = tipo;
+  nextStep(); // avança para step-1 (plano)
+}
 
 function selectTipo(tipo, el) {
   document.querySelectorAll('.tipo-btn').forEach(b => b.classList.remove('sel'));
