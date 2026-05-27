@@ -876,11 +876,11 @@ nav button .nav-badge{
       <div id="review-card-wrap"></div>
       <div class="form-group">
         <label class="form-label">Nome do Responsável *</label>
-        <input id="inp-resp" class="form-input" type="text" placeholder="Ex: João Silva" autocomplete="off">
+        <input id="inp-resp" class="form-input" type="text" placeholder="Ex: João Silva" autocomplete="off" autocapitalize="words" oninput="capitalizarNome(this)">
       </div>
       <div class="form-group">
         <label class="form-label">Nome da Criança *</label>
-        <input id="inp-cri" class="form-input" type="text" placeholder="Ex: Ana Silva" autocomplete="off">
+        <input id="inp-cri" class="form-input" type="text" placeholder="Ex: Ana Silva" autocomplete="off" autocapitalize="words" oninput="capitalizarNome(this)">
       </div>
       <div class="form-group">
         <label class="form-label">WhatsApp do Responsável *</label>
@@ -1605,6 +1605,12 @@ function backStep() {
   novaState.step--;
   document.getElementById(`step-${novaState.step}`).classList.add('active');
   document.getElementById(`dot-${novaState.step}`).classList.add('active');
+}
+
+function capitalizarNome(el) {
+  const pos = el.selectionStart;
+  el.value = el.value.replace(/(?:^|\s)\S/g, c => c.toUpperCase());
+  el.setSelectionRange(pos, pos);
 }
 
 function resetNova() {
