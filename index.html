@@ -21,7 +21,7 @@
 // ── CACHE BUSTER v1.3.0 ─────────────────────────────────
 // Força limpeza do SW antigo e recarga com versão nova
 (function(){
-  const CURRENT = 'movikids-v1.6.7';
+  const CURRENT = 'movikids-v1.6.8';
   if ('serviceWorker' in navigator) {
     // Desregistra SWs antigos
     navigator.serviceWorker.getRegistrations().then(function(regs) {
@@ -1748,7 +1748,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = 'v1.6.7';
+const APP_VERSION = 'v1.6.8';
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec';
 
 const PRECOS = {
@@ -1909,7 +1909,9 @@ async function sincronizarServidor(force = false) {
       try { localStorage.removeItem('mk_inicio_cache'); } catch(e) {}
     }
 
-    setStatus(null); // "atualizando"
+    // Só mostra "Verificando..." se estava Offline ou nunca sincronizou
+    // Evita piscar entre Online→Verificando→Online a cada poll de 25s
+    if (_syncFailCount > 0) setStatus(null);
     const d = await api({ action: 'carregarInicio' });
 
     if (!d.ok) {
