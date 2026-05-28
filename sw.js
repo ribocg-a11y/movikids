@@ -1,5 +1,5 @@
-// MOVI KIDS — Service Worker v1.6.6
-const CACHE = 'movikids-v1.6.6';
+// MOVI KIDS — Service Worker v1.6.7
+const CACHE = 'movikids-v1.6.7';
 
 self.addEventListener('install', e => {
   self.skipWaiting();
@@ -14,12 +14,24 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
-  if (e.request.destination === 'document' ||
-      e.request.url.includes('script.google.com') ||
-      e.request.url.includes('index.html')) {
-    e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
+  // GAS: sempre vai para rede — sem cache, sem fallback
+  // caches.match para GAS retorna undefined (sem cache) = resposta inválida = erro
+  if (e.request.url.includes('script.google.com') ||
+      e.request.url.includes('script.googleusercontent.com')) {
+    e.respondWith(fetch(e.request));
     return;
   }
+
+  // Documentos e index.html: rede primeiro
+  if (e.request.destination === 'document' ||
+      e.request.url.includes('index.html')) {
+    e.respondWith(
+      fetch(e.request).catch(() => caches.match(e.request))
+    );
+    return;
+  }
+
+  // Assets estáticos: cache first
   e.respondWith(
     caches.match(e.request).then(cached => {
       return cached || fetch(e.request).then(r => {
