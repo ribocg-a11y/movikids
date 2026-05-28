@@ -21,7 +21,7 @@
 // ── CACHE BUSTER v1.3.0 ─────────────────────────────────
 // Força limpeza do SW antigo e recarga com versão nova
 (function(){
-  const CURRENT = 'movikids-v1.6.2';
+  const CURRENT = 'movikids-v1.6.3';
   if ('serviceWorker' in navigator) {
     // Desregistra SWs antigos
     navigator.serviceWorker.getRegistrations().then(function(regs) {
@@ -220,6 +220,7 @@ nav button .nav-badge{
 
 .tipo-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
 .veiculo-grid-carros{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}
+.veiculo-grid-triciclos{display:grid;grid-template-columns:1fr;gap:8px;margin-bottom:10px}
 .veiculo-grid-pelucias{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px}
 .vc-card{border:1.5px solid var(--border);border-radius:12px;padding:10px 6px 8px;text-align:center;cursor:pointer;transition:border-color .15s,background .15s;background:var(--card);position:relative}
 .vc-card:hover:not(.vc-busy):not(.vc-busy-pink){border-color:var(--blue);background:var(--blue-lt)}
@@ -1747,7 +1748,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = 'v1.6.2';
+const APP_VERSION = 'v1.6.3';
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec';
 
 const PRECOS = {
