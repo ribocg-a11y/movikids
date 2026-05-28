@@ -1,6 +1,5 @@
-// MOVI KIDS — Service Worker v1.3.0
-// Estratégia: network-first para tudo (sem cache de HTML)
-const CACHE = 'movikids-v1.3.0';
+// MOVI KIDS — Service Worker v1.5.1
+const CACHE = 'movikids-v1.5.1';
 
 self.addEventListener('install', e => {
   self.skipWaiting();
@@ -15,14 +14,12 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
-  // Sempre busca da rede — sem cache de documentos
-  if (e.request.destination === 'document' || 
+  if (e.request.destination === 'document' ||
       e.request.url.includes('script.google.com') ||
       e.request.url.includes('index.html')) {
     e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
     return;
   }
-  // Imagens e fontes: cache-first
   e.respondWith(
     caches.match(e.request).then(cached => {
       return cached || fetch(e.request).then(r => {
