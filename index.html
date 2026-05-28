@@ -21,7 +21,7 @@
 // ── CACHE BUSTER v1.3.0 ─────────────────────────────────
 // Força limpeza do SW antigo e recarga com versão nova
 (function(){
-  const CURRENT = 'movikids-v1.6.5';
+  const CURRENT = 'movikids-v1.6.6';
   if ('serviceWorker' in navigator) {
     // Desregistra SWs antigos
     navigator.serviceWorker.getRegistrations().then(function(regs) {
@@ -1062,7 +1062,7 @@ nav button .nav-badge{
   <!-- ══ SIDEBAR (desktop only) ══ -->
   <aside id="sidebar">
     <div class="sb-logo">🚗 Movi <span>Kids</span>
-      <div class="sb-status"><span id="sb-dot" class="dot-online"></span><span id="sb-txt">Online</span><span style="font-size:10px;opacity:.85;margin-left:5px;color:rgba(255,255,255,.7);font-family:monospace">v1.5.4</span></div>
+      <div class="sb-status"><span id="sb-dot" class="dot-online"></span><span id="sb-txt">Online</span><span id="sb-version" style="font-size:10px;opacity:.85;margin-left:5px;color:rgba(255,255,255,.7);font-family:monospace">v1.5.4</span></div>
     </div>
     <div class="sb-nav" id="sb-nav">
       <button class="sb-btn active" id="sbn-home" onclick="showPage('home')"><span class="sb-icon">🏠</span>Home</button>
@@ -1748,7 +1748,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = 'v1.6.5';
+const APP_VERSION = 'v1.6.6';
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec';
 
 const PRECOS = {
@@ -1778,16 +1778,31 @@ let statsHoje   = { fat: 0, n: 0 };
 // ═══════════════════════════════════════════════════════════
 // API
 // ═══════════════════════════════════════════════════════════
-async function api(params) {
-  const qs = new URLSearchParams(params).toString();
-  const r  = await fetch(`${WEBAPP_URL}?${qs}`);
-  return r.json();
+async function api(params, timeoutMs = 8000) {
+  const qs  = new URLSearchParams(params).toString();
+  const ctl = new AbortController();
+  const tid = setTimeout(() => ctl.abort(), timeoutMs);
+  try {
+    const r = await fetch(`${WEBAPP_URL}?${qs}`, { signal: ctl.signal });
+    clearTimeout(tid);
+    return r.json();
+  } catch(e) {
+    clearTimeout(tid);
+    if (e.name === 'AbortError') throw new Error('timeout');
+    throw e;
+  }
 }
 
 // ═══════════════════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════════════════
 async function init() {
+  // Atualiza versão exibida IMEDIATAMENTE — antes de qualquer chamada assíncrona
+  ['app-version','sb-version'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = APP_VERSION;
+  });
+
   requestNotificationPermission();
   setDefaultDate();
 
