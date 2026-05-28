@@ -823,7 +823,7 @@ nav button .nav-badge{
   <!-- ══ SIDEBAR (desktop only) ══ -->
   <aside id="sidebar">
     <div class="sb-logo">🚗 Movi <span>Kids</span>
-      <div class="sb-status"><span id="sb-dot" class="dot-online"></span><span id="sb-txt">Online</span><span style="font-size:10px;opacity:.85;margin-left:5px;color:rgba(255,255,255,.7);font-family:monospace">v1.4.4</span></div>
+      <div class="sb-status"><span id="sb-dot" class="dot-online"></span><span id="sb-txt">Online</span><span style="font-size:10px;opacity:.85;margin-left:5px;color:rgba(255,255,255,.7);font-family:monospace">v1.5.0</span></div>
     </div>
     <div class="sb-nav" id="sb-nav">
       <button class="sb-btn active" id="sbn-home" onclick="showPage('home')"><span class="sb-icon">🏠</span>Home</button>
@@ -856,7 +856,7 @@ nav button .nav-badge{
       <div class="hd-status">
         <div id="status-dot" class="dot-online"></div>
         <span id="status-txt">Online</span>
-        <span id="app-version" style="font-size:10px;opacity:.85;margin-left:4px;font-family:monospace">v1.4.4</span>
+        <span id="app-version" style="font-size:10px;opacity:.85;margin-left:4px;font-family:monospace">v1.5.0</span>
       </div>
     </div>
   </header>
@@ -973,6 +973,10 @@ nav button .nav-badge{
       <div class="form-group">
         <label class="form-label">WhatsApp do Responsável *</label>
         <input id="inp-tel" class="form-input" type="tel" placeholder="(98) 9 9999-9999" autocomplete="off">
+      </div>
+      <div class="form-group">
+        <label class="form-label" style="color:var(--txt2)">Observação <span style="font-size:11px;font-style:italic;color:var(--txt3)">(opcional)</span></label>
+        <textarea id="inp-obs" class="form-input" rows="2" placeholder="Ex: capacete rosa, cadeirinha especial..." style="resize:none;font-family:var(--font-sans)"></textarea>
       </div>
       <button class="btn btn-primary" onclick="irParaPagamento()" id="btn-continuar">
         Continuar →
@@ -1124,6 +1128,17 @@ nav button .nav-badge{
     <div class="chart-card">
       <div class="chart-title">Horários de pico</div>
       <canvas id="chart-horas" height="160"></canvas>
+    </div>
+
+    <div class="charts-row">
+      <div class="chart-card">
+        <div class="chart-title">Por veículo 🚗🧸</div>
+        <canvas id="chart-veiculo" height="180"></canvas>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Por pagamento 💳</div>
+        <canvas id="chart-pagamento" height="180"></canvas>
+      </div>
     </div>
   </div>
 
@@ -1311,7 +1326,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = 'v1.4.4';
+const APP_VERSION = 'v1.5.0';
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec';
 
 const PRECOS = {
@@ -1331,7 +1346,7 @@ let sessions    = [];   // active sessions with timer data
 let timerInterv = null;
 let alertSession= null; // session triggering alert modal
 let encSession  = null; // session in encerrar modal
-let novaState   = { tipo: null, plano: null, veiculo: null, pagamento: null, step: 0 };
+let novaState   = { tipo: null, plano: null, veiculo: null, pagamento: null, observacao: '', step: 0 };
 let catSel      = 'Energia';
 let custosHoje  = [];
 let statsHoje   = { fat: 0, n: 0 };
@@ -1868,6 +1883,8 @@ function irParaPagamento() {
   // Monta resumo no step-3
   const tipo = novaState.tipo, plano = novaState.plano, veiculo = novaState.veiculo;
   const cfg  = PRECOS[tipo] && PRECOS[tipo][plano] ? PRECOS[tipo][plano] : {};
+  const obs  = (document.getElementById('inp-obs') ? document.getElementById('inp-obs').value.trim() : '');
+  novaState.observacao = obs;
   const wrap = document.getElementById('pag-review-wrap');
   if (wrap) {
     const icon = tipo === 'Carro' ? '🚗' : '🧸';
@@ -1876,6 +1893,7 @@ function irParaPagamento() {
       '<div class="pag-resumo-row"><span>Plano</span><span>' + (PLANO_LABELS[plano]||plano) + '</span></div>' +
       '<div class="pag-resumo-row"><span>Responsável</span><span>' + resp + '</span></div>' +
       '<div class="pag-resumo-row"><span>Criança</span><span>' + cri + '</span></div>' +
+      (obs ? '<div class="pag-resumo-row"><span>Obs</span><span style="font-style:italic">' + obs + '</span></div>' : '') +
       '<div class="pag-resumo-row total"><span>Total</span><span>R$ ' + (cfg.v||0) + '</span></div>' +
     '</div>';
   }
@@ -1903,7 +1921,8 @@ function resetNova() {
   document.getElementById('dot-0').classList.add('active');
   document.querySelectorAll('.tipo-btn').forEach(b => b.classList.remove('sel'));
   document.querySelectorAll('.plano-btn').forEach(b => b.classList.remove('sel'));
-  novaState = { tipo: null, plano: null, veiculo: null, pagamento: null, step: 0 };
+  novaState = { tipo: null, plano: null, veiculo: null, pagamento: null, observacao: '', step: 0 };
+  const obsEl = document.getElementById('inp-obs'); if(obsEl) obsEl.value = '';
   document.querySelectorAll('.pag-btn').forEach(b => b.classList.remove('sel'));
   const bc = document.getElementById('btn-confirmar'); if(bc) bc.style.display='none';
 }
@@ -1927,6 +1946,7 @@ async function confirmarLocacao() {
       plano:        novaState.plano,
       veiculo:      novaState.veiculo,
       pagamento:    novaState.pagamento,
+      observacao:   novaState.observacao || '',
       responsavel:  resp,
       crianca:      cri,
       telefone:     tel
@@ -1943,6 +1963,7 @@ async function confirmarLocacao() {
       plano:           novaState.plano,
       veiculo:         novaState.veiculo,
       pagamento:       novaState.pagamento,
+      observacao:      novaState.observacao || '',
       mins:            d.mins,
       valorPlano:      d.valorPlano,
       adicionalPorMin: d.adicionalPorMin,
@@ -2664,6 +2685,38 @@ function renderCharts(d) {
       y:{grid:{color:'#f0f0f0'},ticks:{callback:v=>'R$'+v,font:{size:10}}}
     }}
   });
+
+  // Gráfico 5: Por veículo
+  if (d.fatPorVeiculo && Object.keys(d.fatPorVeiculo).length > 0) {
+    const vLabels = Object.keys(d.fatPorVeiculo).sort();
+    const vData   = vLabels.map(k => d.fatPorVeiculo[k]);
+    const vColors = vLabels.map(k => k.startsWith('Carro') ? BLUE : PINK);
+    if (window.chartVeiculo) window.chartVeiculo.destroy();
+    window.chartVeiculo = new Chart(document.getElementById('chart-veiculo'), {
+      type:'bar',
+      data:{ labels:vLabels, datasets:[{label:'R$',data:vData,backgroundColor:vColors,borderRadius:4}]},
+      options:{indexAxis:'y',responsive:true,plugins:{legend:{display:false}},
+        scales:{x:{ticks:{callback:v=>'R$'+v,font:{size:10}}},y:{ticks:{font:{size:10}}}}}
+    });
+  }
+
+  // Gráfico 6: Por pagamento
+  if (d.fatPorPagamento && Object.keys(d.fatPorPagamento).length > 0) {
+    const pLabels = Object.keys(d.fatPorPagamento);
+    const pData   = pLabels.map(k => d.fatPorPagamento[k]);
+    const pColors = [BLUE,'#534AB7',GREEN,AMBER];
+    if (window.chartPagamento) window.chartPagamento.destroy();
+    window.chartPagamento = new Chart(document.getElementById('chart-pagamento'), {
+      type:'doughnut',
+      data:{ labels:pLabels, datasets:[{data:pData,backgroundColor:pColors,borderWidth:0}]},
+      options:{responsive:true,cutout:'60%',
+        plugins:{legend:{position:'bottom',labels:{font:{size:10},padding:8}},
+          tooltip:{callbacks:{label:ctx=>{
+            const tot=ctx.dataset.data.reduce((a,b)=>a+b,0);
+            return ctx.label+': R$'+ctx.parsed.toFixed(2)+' ('+Math.round(ctx.parsed/tot*100)+'%)';
+          }}}}}
+    });
+  }
 
   // Update dashboard title
   const el = document.getElementById('dash-title');
