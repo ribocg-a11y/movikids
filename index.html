@@ -21,7 +21,7 @@
 // ── CACHE BUSTER v1.3.0 ─────────────────────────────────
 // Força limpeza do SW antigo e recarga com versão nova
 (function(){
-  const CURRENT = 'movikids-v1.6.10';
+  const CURRENT = 'movikids-v1.6.11';
   if ('serviceWorker' in navigator) {
     // Desregistra SWs antigos
     navigator.serviceWorker.getRegistrations().then(function(regs) {
@@ -1867,7 +1867,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = 'v1.6.10';
+const APP_VERSION = 'v1.6.11';
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec';
 
 const PRECOS = {
@@ -3519,29 +3519,39 @@ function renderCharts(d) {
     mesPill.textContent = diff + 'º mês de contrato';
   }
 
-  // Faturamento diário — mostra só a partir do 1º dia com movimento
+  // Faturamento diário — mostra APENAS dias com receita + hoje
   const fatDia = d.fatPorDia || [];
   const hojeD  = d.mesAtual === new Date().getMonth()+1 ? new Date().getDate() : 31;
   const todosD = fatDia.filter(x => x.dia <= hojeD);
-  const firstNZ= todosD.findIndex(x => x.valor > 0);
-  const dias   = firstNZ >= 0 ? todosD.slice(firstNZ) : todosD.slice(-14); // começa no 1º dia com dado
+  // Só exibe dias com valor > 0; se nenhum, mostra aviso
+  const dias   = todosD.filter(x => x.valor > 0);
   const vals   = dias.map(x => x.valor);
-  const comMov = vals.filter(v => v > 0);
-  const avgDia = comMov.length > 0 ? Math.round(comMov.reduce((a,b)=>a+b,0)/comMov.length) : 0;
-  setText2('nk-avg-label', comMov.length > 0 ? 'média R$' + avgDia + '/dia com movimento (' + comMov.length + ' dias)' : 'sem dados ainda');
-  chartDiario = new Chart(document.getElementById('chart-diario'), {
-    type:'bar',
-    data:{ labels: dias.map(x=>x.dia+'/'+String(d.mesAtual||5).padStart(2,'0')),
-      datasets:[
-        {label:'Faturamento',data:vals,backgroundColor:vals.map(v=>v>0?'#B5D4F4':'rgba(0,0,0,0)'),borderRadius:3,order:2},
-        ...(avgDia>0?[{label:'Média',data:dias.map(()=>avgDia),type:'line',borderColor:BLUE,borderWidth:1.5,pointRadius:0,tension:0,borderDash:[4,3],order:1}]:[])
-      ]},
-    options:{responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false,
-        callbacks:{label:ctx=>ctx.dataset.label==='Média'?'Média: R$'+ctx.parsed.y:'R$ '+ctx.parsed.y}}},
-      scales:{x:{grid:{display:false},ticks:{font:{size:9},color:'#888',maxRotation:45}},
-        y:{grid:{color:GRID},ticks:{font:{size:9},color:'#888',callback:v=>'R$'+v},min:0}}}
-  });
+  const avgDia = dias.length > 0 ? Math.round(vals.reduce((a,b)=>a+b,0)/dias.length) : 0;
+  setText2('nk-avg-label', dias.length > 0
+    ? 'total ' + dias.length + ' dias operando — média R$' + avgDia + '/dia'
+    : 'sem movimento registrado ainda');
+  if (dias.length === 0) {
+    const cv = document.getElementById('chart-diario');
+    if (cv) { const ctx=cv.getContext('2d'); ctx.clearRect(0,0,cv.width,cv.height); ctx.fillStyle='#888'; ctx.font='13px system-ui'; ctx.textAlign='center'; ctx.fillText('Sem faturamento registrado neste mês', cv.width/2, 80); }
+  } else {
+    const mesStr = String(d.mesAtual||5).padStart(2,'0');
+    chartDiario = new Chart(document.getElementById('chart-diario'), {
+      type:'bar',
+      data:{ labels: dias.map(x=>x.dia+'/'+mesStr),
+        datasets:[
+          {label:'Faturamento',data:vals,backgroundColor:'#B5D4F4',borderRadius:4,order:2},
+          {label:'Média',data:dias.map(()=>avgDia),type:'line',borderColor:BLUE,
+           borderWidth:1.5,pointRadius:0,tension:0,borderDash:[4,3],order:1}
+        ]},
+      options:{responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false,
+          callbacks:{label:ctx=>ctx.dataset.label==='Média'?'Média: R$'+ctx.parsed.y:'R$ '+ctx.parsed.y}}},
+        scales:{
+          x:{grid:{display:false},ticks:{font:{size:9},color:'#888',maxRotation:0}},
+          y:{grid:{color:GRID},ticks:{font:{size:9},color:'#888',callback:v=>'R$'+v},min:0}
+        }}
+    });
+  }
 
   // Horários de pico
   const horasDat = (d.horasPico||[]).map((v,i)=>({h:(9+i)+'h',v:Number(v)||0}));
