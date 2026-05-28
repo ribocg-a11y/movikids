@@ -842,7 +842,7 @@ nav button .nav-badge{
   <!-- ══ SIDEBAR (desktop only) ══ -->
   <aside id="sidebar">
     <div class="sb-logo">🚗 Movi <span>Kids</span>
-      <div class="sb-status"><span id="sb-dot" class="dot-online"></span><span id="sb-txt">Online</span><span style="font-size:10px;opacity:.85;margin-left:5px;color:rgba(255,255,255,.7);font-family:monospace">v1.5.3</span></div>
+      <div class="sb-status"><span id="sb-dot" class="dot-online"></span><span id="sb-txt">Online</span><span style="font-size:10px;opacity:.85;margin-left:5px;color:rgba(255,255,255,.7);font-family:monospace">v1.5.4</span></div>
     </div>
     <div class="sb-nav" id="sb-nav">
       <button class="sb-btn active" id="sbn-home" onclick="showPage('home')"><span class="sb-icon">🏠</span>Home</button>
@@ -876,7 +876,7 @@ nav button .nav-badge{
       <div class="hd-status">
         <div id="status-dot" class="dot-online"></div>
         <span id="status-txt">Online</span>
-        <span id="app-version" style="font-size:10px;opacity:.85;margin-left:4px;font-family:monospace">v1.5.3</span>
+        <span id="app-version" style="font-size:10px;opacity:.85;margin-left:4px;font-family:monospace">v1.5.4</span>
       </div>
     </div>
   </header>
@@ -1407,7 +1407,7 @@ nav button .nav-badge{
 
 <!-- Toast container -->
 <div id="update-banner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:9999;background:#1565C0;color:#fff;padding:10px 16px;align-items:center;justify-content:space-between;font-size:13px;font-weight:600;gap:12px">
-  <span>🔄 Nova versão disponível!</span>
+  <span>🔄 Nova versão disponível — atualizando em <span id="update-countdown">10</span>s</span>
   <button onclick="location.reload(true)" style="background:#fff;color:#1565C0;border:none;border-radius:6px;padding:6px 14px;font-weight:700;cursor:pointer">Atualizar agora</button>
 </div>
 
@@ -1448,7 +1448,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = 'v1.5.3';
+const APP_VERSION = 'v1.5.4';
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec';
 
 const PRECOS = {
@@ -1507,6 +1507,18 @@ async function init() {
   // PASSO 3: polling periódico a cada 15s (multi-usuário)
   setInterval(() => sincronizarServidor(), 15000);
 
+  // PASSO 6: BroadcastChannel — sync instantâneo entre abas do mesmo dispositivo
+  try {
+    const bc = new BroadcastChannel('movikids_sync');
+    bc.onmessage = (e) => {
+      if (e.data === 'sync') {
+        try { localStorage.removeItem('mk_inicio_cache'); } catch(er) {}
+        sincronizarServidor();
+      }
+    };
+    window._bc = bc;
+  } catch(e) {}
+
   // PASSO 4: sync ao recuperar foco (tab/janela)
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible') sincronizarServidor();
@@ -1514,14 +1526,14 @@ async function init() {
   window.addEventListener('focus', () => sincronizarServidor());
 
   // PASSO 5: verificar nova versão a cada 5 min
-  setInterval(() => verificarNovaVersao(), 300000);
+  setInterval(() => verificarNovaVersao(), 60000); // a cada 60s
 }
 
 async function sincronizarServidor() {
   try {
     // ── Stale-while-revalidate: mostra cache na hora, atualiza em background ──
     const CACHE_KEY = 'mk_inicio_cache';
-    const CACHE_TTL = 15000; // 15s — igual ao polling
+    const CACHE_TTL = 10000; // 10s — menor que polling, garante chamada API
     const cached = localStorage.getItem(CACHE_KEY);
     if (cached) {
       try {
@@ -1659,7 +1671,17 @@ async function verificarNovaVersao() {
     const m = html.match(/APP_VERSION = '([^']+)'/);
     if (m && m[1] !== APP_VERSION) {
       const banner = document.getElementById('update-banner');
-      if (banner) banner.style.display = 'flex';
+      if (banner && banner.style.display === 'none') {
+        banner.style.display = 'flex';
+        // Countdown de 10s e recarrega automaticamente
+        let secs = 10;
+        const cd = document.getElementById('update-countdown');
+        const iv = setInterval(() => {
+          secs--;
+          if (cd) cd.textContent = secs;
+          if (secs <= 0) { clearInterval(iv); location.reload(true); }
+        }, 1000);
+      }
     }
   } catch(e) { /* silencioso */ }
 }
@@ -2138,6 +2160,9 @@ async function confirmarLocacao() {
     showPage('home');
     toast(`✅ Cadastro salvo! Aperte ▶ para iniciar a contagem.`, 'success');
 
+    // Invalida cache local para sync imediato em outros dispositivos
+    try { localStorage.removeItem('mk_inicio_cache'); } catch(e) {}
+    try { if(window._bc) window._bc.postMessage('sync'); } catch(e) {}
     // MSG 1: disparada pelo operador no modal de boas-vindas (antes de iniciar contagem)
 
     // Sync silencioso para confirmar rowIndex real
@@ -2214,6 +2239,8 @@ async function confirmarEncerrar() {
 
     fecharEncModal();
     fecharAlerta();
+    // Invalida cache para outros dispositivos verem encerramento imediatamente
+    try { localStorage.removeItem('mk_inicio_cache'); } catch(e) {}
 
     // Atualiza encHoje localmente SEM esperar servidor (UX imediato)
     const agora = new Date();
@@ -2476,10 +2503,14 @@ async function iniciarContagem(rowIndex) {
 
   toast('⏱ Contagem iniciada!', 'success');
 
+  // Invalida cache + broadcast para outros dispositivos verem
+  try { localStorage.removeItem('mk_inicio_cache'); } catch(e) {}
+  try { if(window._bc) window._bc.postMessage('sync'); } catch(e) {}
+
   // 2. Atualiza servidor em background (não bloqueia o timer)
   try {
     await api({ action: 'iniciarTimer', rowIndex, timestamp: ts });
-  } catch {}
+  } catch(e) {}
 
   // 3. Sync para confirmar rowIndex real se necessário
   setTimeout(() => sincronizarServidor(), 500);
