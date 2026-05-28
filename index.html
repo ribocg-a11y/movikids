@@ -251,6 +251,9 @@ nav button .nav-badge{
 .wa-preview{background:#e9fbe9;border:1px solid #a5d6a7;border-radius:12px;padding:14px 16px;margin:12px 0;font-size:13px;color:#1b5e20;line-height:1.7;white-space:pre-wrap;word-break:break-word;font-family:var(--font-sans);max-height:260px;overflow-y:auto}
 .btn-wa{background:#25D366;color:#fff;border:none}
 .btn-wa:hover{background:#1ebe57}
+@keyframes shake{0%,100%{transform:translateX(0)}10%,30%,50%,70%,90%{transform:translateX(-6px)}20%,40%,60%,80%{transform:translateX(6px)}}
+.card-shake{animation:shake 0.6s ease-in-out infinite}
+.btn-wa:hover{background:#1ebe57}
 .tipo-btn{
   background:var(--card);border:2px solid var(--border);border-radius:var(--radius);
   padding:20px 12px;text-align:center;cursor:pointer;transition:all .2s;
@@ -820,7 +823,7 @@ nav button .nav-badge{
   <!-- ══ SIDEBAR (desktop only) ══ -->
   <aside id="sidebar">
     <div class="sb-logo">🚗 Movi <span>Kids</span>
-      <div class="sb-status"><span id="sb-dot" class="dot-online"></span><span id="sb-txt">Online</span><span style="font-size:10px;opacity:.85;margin-left:5px;color:rgba(255,255,255,.7);font-family:monospace">v1.4.3</span></div>
+      <div class="sb-status"><span id="sb-dot" class="dot-online"></span><span id="sb-txt">Online</span><span style="font-size:10px;opacity:.85;margin-left:5px;color:rgba(255,255,255,.7);font-family:monospace">v1.4.4</span></div>
     </div>
     <div class="sb-nav" id="sb-nav">
       <button class="sb-btn active" id="sbn-home" onclick="showPage('home')"><span class="sb-icon">🏠</span>Home</button>
@@ -853,7 +856,7 @@ nav button .nav-badge{
       <div class="hd-status">
         <div id="status-dot" class="dot-online"></div>
         <span id="status-txt">Online</span>
-        <span id="app-version" style="font-size:10px;opacity:.85;margin-left:4px;font-family:monospace">v1.4.3</span>
+        <span id="app-version" style="font-size:10px;opacity:.85;margin-left:4px;font-family:monospace">v1.4.4</span>
       </div>
     </div>
   </header>
@@ -1266,6 +1269,11 @@ nav button .nav-badge{
 </div>
 
 <!-- Toast container -->
+<div id="update-banner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:9999;background:#1565C0;color:#fff;padding:10px 16px;align-items:center;justify-content:space-between;font-size:13px;font-weight:600;gap:12px">
+  <span>🔄 Nova versão disponível!</span>
+  <button onclick="location.reload(true)" style="background:#fff;color:#1565C0;border:none;border-radius:6px;padding:6px 14px;font-weight:700;cursor:pointer">Atualizar agora</button>
+</div>
+
 <div class="toast-container" id="toast-container"></div>
 
 
@@ -1303,7 +1311,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = 'v1.4.3';
+const APP_VERSION = 'v1.4.4';
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec';
 
 const PRECOS = {
@@ -1359,8 +1367,17 @@ async function init() {
   // PASSO 2: sincroniza com servidor em background
   sincronizarServidor();
 
-  // PASSO 3: polling periódico a cada 30s (mantém dados frescos)
-  setInterval(() => sincronizarServidor(), 30000);
+  // PASSO 3: polling periódico a cada 15s (multi-usuário)
+  setInterval(() => sincronizarServidor(), 15000);
+
+  // PASSO 4: sync ao recuperar foco (tab/janela)
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') sincronizarServidor();
+  });
+  window.addEventListener('focus', () => sincronizarServidor());
+
+  // PASSO 5: verificar nova versão a cada 5 min
+  setInterval(() => verificarNovaVersao(), 300000);
 }
 
 async function sincronizarServidor() {
@@ -1388,9 +1405,10 @@ async function sincronizarServidor() {
         // Se started=true usa ts do localStorage (mais preciso); fallback para server
         st = started ? (local.startTimestamp || s.startTimestamp || 0) : 0;
       } else {
-        // Sem registro local: usa ts do servidor como indicador
-        started = hasTsServer;
-        st      = hasTsServer ? s.startTimestamp : 0;
+        // Sem registro local (outro dispositivo): timer só inicia se col Y > 0
+        // Col Y = 0 até operador pressionar iniciar (fix: GAS v1.4.4)
+        started = hasTsServer && s.startTimestamp > 1000000000000; // ts válido > 0
+        st      = started ? s.startTimestamp : 0;
       }
 
       return {
@@ -1465,6 +1483,18 @@ function calcStartTimestamp(data, horaInicio) {
   return new Date(yyyy, mm-1, dd, hh, mi, 0).getTime();
 }
 
+async function verificarNovaVersao() {
+  try {
+    const r = await fetch(location.href + '?nocache=' + Date.now(), { cache: 'no-store' });
+    const html = await r.text();
+    const m = html.match(/APP_VERSION = '([^']+)'/);
+    if (m && m[1] !== APP_VERSION) {
+      const banner = document.getElementById('update-banner');
+      if (banner) banner.style.display = 'flex';
+    }
+  } catch(e) { /* silencioso */ }
+}
+
 function saveSessions() {
   localStorage.setItem('mk_sessions', JSON.stringify(sessions));
 }
@@ -1476,6 +1506,7 @@ function startTimerLoop() {
   if (timerInterv) clearInterval(timerInterv);
   timerInterv = setInterval(() => {
     sessions.forEach(s => checkTimer(s));
+    sessions.forEach(s => checkShake(s));
     renderCards();
     updateStats();
   }, 1000);
@@ -1485,6 +1516,19 @@ function calcRemaining(s) {
   const elapsed = (Date.now() - s.startTimestamp) / 1000; // seconds
   const total   = s.mins * 60;
   return Math.floor(total - elapsed); // can be negative
+}
+
+function checkShake(s) {
+  // Card treme após 40s aguardando início sem operador apertar o botão
+  if (s.started) return;
+  const criado = s.startTimestamp || s._criado || 0;
+  if (!criado) return;
+  const elapsed = (Date.now() - criado) / 1000;
+  const card = document.querySelector('[data-row="' + s.rowIndex + '"]');
+  if (!card) return;
+  if (elapsed > 40 && !card.classList.contains('card-shake')) {
+    card.classList.add('card-shake');
+  }
 }
 
 function checkTimer(s) {
@@ -1539,7 +1583,7 @@ function buildCard(s) {
   // ── Card pendente (aguardando início) ────────────────────────────────
   if (!s.started) {
     const vPlano = PRECOS[s.tipo]?.[s.plano]?.v || 0;
-    return `<div class="session-card pending" id="card-${s.rowIndex}">
+    return `<div class="session-card pending" id="card-${s.rowIndex}" data-row="${s.rowIndex}">
       <div class="sc-top">
         <div class="sc-tipo">
           <span class="sc-tipo-icon">${icon}</span>
