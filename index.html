@@ -21,7 +21,7 @@
 // ── CACHE BUSTER v1.3.0 ─────────────────────────────────
 // Força limpeza do SW antigo e recarga com versão nova
 (function(){
-  const CURRENT = 'movikids-v1.3.0';
+  const CURRENT = 'movikids-v1.6.0';
   if ('serviceWorker' in navigator) {
     // Desregistra SWs antigos
     navigator.serviceWorker.getRegistrations().then(function(regs) {
@@ -97,7 +97,7 @@ header{
 /* ── NAV ──────────────────────────────────────────────────── */
 nav{
   flex-shrink:0;
-  display:grid;grid-template-columns:repeat(4,1fr);
+  display:grid;grid-template-columns:repeat(5,1fr);
   background:#fff;border-bottom:1px solid var(--border);
   box-shadow:var(--shadow-sm);
 }
@@ -109,7 +109,7 @@ nav button{
   font-family:'Nunito',sans-serif;
 }
 nav button.active{color:var(--blue)}
-nav button .nav-icon{font-size:20px;line-height:1}
+nav button .nav-icon{font-size:17px;line-height:1}
 nav button .nav-badge{
   position:relative;display:inline-block;
 }
@@ -792,6 +792,146 @@ nav button .nav-badge{
   .period-btn{padding:5px 10px!important;font-size:11px!important}
 }
 /* ═════════════════════════════════════════════════════════════════════════ */
+
+/* ── PAINEL DE OPERAÇÃO AO VIVO v1.6.0 ──────────────────── */
+.painel-summary{
+  display:flex;gap:10px;padding:12px 16px 4px;justify-content:center;
+}
+.ph-item{
+  flex:1;max-width:110px;background:var(--surface);border-radius:12px;
+  padding:10px 8px;text-align:center;box-shadow:var(--shadow-sm);
+  border:1.5px solid var(--border);
+}
+.ph-item span{
+  display:block;font-size:28px;font-weight:800;line-height:1;color:var(--blue);
+  font-family:'Nunito',sans-serif;
+}
+.ph-item label{font-size:10px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.04em}
+.ph-item.enc span{color:#2E7D32}
+.ph-item.pend span{color:#E65100}
+
+.painel-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:12px 16px 90px;
+}
+@media(min-width:480px){.painel-grid{grid-template-columns:repeat(3,1fr)}}
+@media(min-width:768px){.painel-grid{grid-template-columns:repeat(4,1fr);padding-bottom:20px}}
+
+.pcard{
+  border-radius:16px;padding:14px 12px 12px;
+  box-shadow:var(--shadow);display:flex;flex-direction:column;gap:8px;
+  border:2px solid transparent;transition:border-color .3s,background .3s;
+  position:relative;overflow:hidden;
+}
+.pcard-label{
+  font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;
+  opacity:.75;margin-bottom:2px;
+}
+.pcard-name{font-size:16px;font-weight:800;color:inherit;font-family:'Nunito',sans-serif}
+.pcard-icon{font-size:28px;line-height:1}
+
+/* LIVRE */
+.pcard.livre{
+  background:linear-gradient(135deg,#E8F5E9,#C8E6C9);
+  border-color:#81C784;color:#1B5E20;
+}
+.pcard.livre .pcard-status{
+  font-size:13px;font-weight:800;color:#2E7D32;
+  display:flex;align-items:center;gap:4px;
+}
+
+/* PENDENTE (cadastrado, aguardando iniciar) */
+.pcard.pendente{
+  background:linear-gradient(135deg,#FFF8E1,#FFE0B2);
+  border-color:#FFB74D;color:#4E2700;
+}
+.pcard.pendente .pcard-status{
+  font-size:12px;font-weight:700;color:#E65100;
+}
+
+/* EM USO */
+.pcard.em-uso-carro{
+  background:linear-gradient(135deg,#E3F2FD,#BBDEFB);
+  border-color:#42A5F5;color:#0D47A1;
+}
+.pcard.em-uso-pelucia{
+  background:linear-gradient(135deg,#FCE4EC,#F8BBD9);
+  border-color:#F48FB1;color:#880E4F;
+}
+.pcard.em-uso-carro.warn,.pcard.em-uso-pelucia.warn{
+  background:linear-gradient(135deg,#FFF3E0,#FFE0B2);
+  border-color:#FF9800;color:#E65100;
+}
+
+/* EXTRA (tempo esgotado) */
+.pcard.extra{
+  background:linear-gradient(135deg,#FFEBEE,#FFCDD2);
+  border-color:#EF5350;color:#B71C1C;
+  animation:pcard-pulse 1.4s ease-in-out infinite;
+}
+@keyframes pcard-pulse{
+  0%,100%{box-shadow:0 0 0 0 rgba(239,83,80,.35),var(--shadow)}
+  50%{box-shadow:0 0 0 8px rgba(239,83,80,0),var(--shadow)}
+}
+
+/* Progress bar */
+.pcard-progress{
+  height:6px;border-radius:99px;background:rgba(0,0,0,.12);overflow:hidden;
+}
+.pcard-bar{
+  height:100%;border-radius:99px;transition:width .5s,background .5s;
+}
+
+/* Timer */
+.pcard-timer{font-size:24px;font-weight:800;font-family:'Nunito',sans-serif;line-height:1.1}
+.pcard-timer.warn{color:#E65100}
+.pcard-timer.extra-time{color:#C62828}
+.pcard-sublabel{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;opacity:.75}
+
+/* Criança */
+.pcard-crianca{font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pcard-resp{font-size:10px;opacity:.75;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* Buttons inside card */
+.pcard-btns{display:flex;gap:6px;margin-top:2px}
+.pcard-btn{
+  flex:1;border:none;border-radius:10px;padding:8px 6px;font-size:11px;font-weight:800;
+  cursor:pointer;font-family:'Nunito',sans-serif;transition:opacity .15s;
+}
+.pcard-btn:active{opacity:.7}
+.pcard-btn.enc{background:#EF5350;color:#fff}
+.pcard-btn.est{background:rgba(0,0,0,.12);color:inherit}
+.pcard-btn.nova{
+  width:100%;padding:10px;font-size:12px;font-weight:800;
+  background:rgba(0,0,0,.1);color:inherit;border-radius:10px;border:none;cursor:pointer;
+  font-family:'Nunito',sans-serif;
+}
+.pcard-btn.iniciar{
+  width:100%;padding:10px;font-size:12px;font-weight:800;
+  background:#FF6F00;color:#fff;border-radius:10px;border:none;cursor:pointer;
+  font-family:'Nunito',sans-serif;
+}
+
+/* Frozen timer display */
+.pcard-frozen{
+  font-size:20px;font-weight:800;font-family:'Nunito',sans-serif;
+  opacity:.7;letter-spacing:.02em;
+}
+
+/* Estender modal opts */
+.est-opts{display:flex;flex-wrap:wrap;gap:8px;padding:8px 0 4px;justify-content:center}
+.est-opt-btn{
+  padding:10px 18px;border:2px solid var(--border);border-radius:12px;
+  background:var(--surface);font-size:14px;font-weight:700;cursor:pointer;
+  font-family:'Nunito',sans-serif;transition:all .15s;color:var(--txt);
+}
+.est-opt-btn.sel{background:var(--blue);color:#fff;border-color:var(--blue)}
+
+/* Section labels in painel */
+.painel-sec-label{
+  grid-column:1/-1;font-size:11px;font-weight:800;color:var(--txt3);
+  text-transform:uppercase;letter-spacing:.06em;margin-top:4px;
+}
+
 </style>
 </head>
 
@@ -848,6 +988,7 @@ nav button .nav-badge{
       <button class="sb-btn active" id="sbn-home" onclick="showPage('home')"><span class="sb-icon">🏠</span>Home</button>
       <button class="sb-btn" id="sbn-nova" onclick="showPage('nova')"><span class="sb-icon">➕</span>Nova Locação</button>
       <button class="sb-btn" id="sbn-custos" onclick="showPage('custos')"><span class="sb-icon">💰</span>Registrar Custo</button>
+      <button class="sb-btn" id="sbn-painel" onclick="showPage('painel')"><span class="sb-icon">📺</span>Painel ao Vivo</button>
     </div>
     <div class="sb-admin-section" id="sb-admin-section">
       <div class="sb-divider">Administração</div>
@@ -892,8 +1033,11 @@ nav button .nav-badge{
     <button onclick="showPage('custos')">
       <div class="nav-icon">💰</div>Custos
     </button>
+    <button id="nav-painel" onclick="showPage('painel')">
+      <div class="nav-icon">📺</div>Painel
+    </button>
     <button id="nav-admin" onclick="abrirAdmin()">
-      <div class="nav-icon">🔐</div>Gerenciar
+      <div class="nav-icon">🔐</div>Admin
     </button>
   </nav>
 
@@ -1133,6 +1277,28 @@ nav button .nav-badge{
   </div>
 
   <!-- ──────── PAGE: CAIXA ──────── -->
+
+  <!-- ──────── PAGE: PAINEL AO VIVO ──────── -->
+  <div id="page-painel" class="page">
+    <div class="painel-summary">
+      <div class="ph-item">
+        <span id="ph-ativos">0</span>
+        <label>Ativos</label>
+      </div>
+      <div class="ph-item pend">
+        <span id="ph-pendentes">0</span>
+        <label>Aguardando</label>
+      </div>
+      <div class="ph-item enc">
+        <span id="ph-enc-hoje">0</span>
+        <label>Encerrados</label>
+      </div>
+    </div>
+    <div class="painel-grid" id="painel-grid">
+      <!-- Renderizado por renderPainel() -->
+    </div>
+  </div>
+
   <div id="page-caixa" class="page">
     <div class="dash-back" onclick="irAdmin('admin')">← Voltar</div>
     <div class="sec-title">Caixa do dia</div>
@@ -1405,6 +1571,22 @@ nav button .nav-badge{
   </div>
 </div>
 
+
+<!-- ──────── ESTENDER MODAL ──────── -->
+<div id="est-modal" class="modal-overlay">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-icon">⏱</div>
+    <div class="modal-title">Estender tempo</div>
+    <div class="modal-info" id="est-info"></div>
+    <div class="est-opts" id="est-opts"></div>
+    <div class="modal-btns">
+      <button class="btn btn-primary" id="btn-est-confirm" onclick="confirmarEstender()">⏱ Confirmar extensão</button>
+      <button class="btn btn-secondary" onclick="fecharEstModal()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
 <!-- Toast container -->
 <div id="update-banner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:9999;background:#1565C0;color:#fff;padding:10px 16px;align-items:center;justify-content:space-between;font-size:13px;font-weight:600;gap:12px">
   <span>🔄 Nova versão disponível — atualizando em <span id="update-countdown">10</span>s</span>
@@ -1448,7 +1630,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = 'v1.5.4';
+const APP_VERSION = 'v1.6.0';
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec';
 
 const PRECOS = {
@@ -1592,12 +1774,15 @@ function aplicarDadosInicio(d) {
         st      = started ? s.startTimestamp : 0;
       }
 
+      const extMins = local.extendedMins || 0;
       return {
         ...s,
+        mins:          s.mins + extMins,          // restaura extensão após sync
         startTimestamp: st,
         started,
         alertFired5:   (local.alertFired5  || false),
         alertFiredExp: (local.alertFiredExp || false),
+        extendedMins:  extMins,
       };
     });
     saveSessions();
@@ -1700,6 +1885,9 @@ function startTimerLoop() {
     sessions.forEach(s => checkShake(s));
     renderCards();
     updateStats();
+    // Painel ao vivo: atualiza se visível
+    const painelPage = document.getElementById('page-painel');
+    if (painelPage && painelPage.classList.contains('active')) renderPainel();
   }, 1000);
 }
 
@@ -3180,6 +3368,7 @@ function showPage(name) {
   if (navIdx >= 0) document.querySelectorAll('nav button')[navIdx]?.classList.add('active');
   syncSidebar(name);
   if (name==='nova') { resetNova(); atualizarVeiculoGrid(); }
+  if (name==='painel') renderPainel();
   if (name==='custos') loadCustosHoje();
   if (name==='historico') buscarHistorico(); // FIX BUG-007: if(!currentPeriod) sempre false pois currentPeriod='hoje' na declaração
   if (name==='admin' && isAdmin) { resetAdminTimer(); if(!kpiData) carregarKPIs(); }
@@ -3196,7 +3385,7 @@ function showPage(name) {
 function syncSidebar(page) {
   document.querySelectorAll('.sb-btn').forEach(b => b.classList.remove('active'));
   const map = {
-    'home':'sbn-home','nova':'sbn-nova','custos':'sbn-custos',
+    'home':'sbn-home','nova':'sbn-nova','custos':'sbn-custos','painel':'sbn-painel',
     'admin':'sbn-adm','dashboard':'sbn-dash','relatorio':'sbn-rel','historico':'sbn-hist','caixa':'sbn-caixa'
   };
   if (map[page]) { const el=document.getElementById(map[page]); if(el) el.classList.add('active'); }
@@ -3236,6 +3425,209 @@ function updateAdminTimer(s) {
   const el = document.getElementById('sb-timer');
   if(el) el.textContent = '0:'+String(s).padStart(2,'0');
 }
+
+
+// ═══════════════════════════════════════════════════════════
+// FASE 3 — PAINEL DE OPERAÇÃO AO VIVO (v1.6.0)
+// ═══════════════════════════════════════════════════════════
+
+const TODOS_VEICULOS_DEF = [
+  {nome:'Carro 01',   tipo:'Carro'},
+  {nome:'Carro 02',   tipo:'Carro'},
+  {nome:'Carro 03',   tipo:'Carro'},
+  {nome:'Pelúcia 01', tipo:'Pelúcia'},
+  {nome:'Pelúcia 02', tipo:'Pelúcia'},
+  {nome:'Pelúcia 03', tipo:'Pelúcia'},
+  {nome:'Pelúcia 04', tipo:'Pelúcia'},
+];
+
+function renderPainel() {
+  const grid = document.getElementById('painel-grid');
+  if (!grid) return;
+
+  // Mapa veiculo → session ativa
+  const sessMap = {};
+  sessions.forEach(s => {
+    if (s.veiculo && s.status === 'Ativa') sessMap[s.veiculo] = s;
+  });
+
+  // Resumo do dia
+  const ativos    = sessions.filter(s => s.started && s.status === 'Ativa').length;
+  const pendentes = sessions.filter(s => !s.started && s.status === 'Ativa').length;
+  const encHoje   = encHojeData ? encHojeData.length : 0;
+
+  const phAtivos  = document.getElementById('ph-ativos');
+  const phEnc     = document.getElementById('ph-enc-hoje');
+  const phPend    = document.getElementById('ph-pendentes');
+  if (phAtivos) phAtivos.textContent = ativos;
+  if (phEnc)    phEnc.textContent    = encHoje;
+  if (phPend)   phPend.textContent   = pendentes;
+
+  // Rebuild grid
+  const carros   = TODOS_VEICULOS_DEF.filter(v => v.tipo === 'Carro');
+  const pelucias = TODOS_VEICULOS_DEF.filter(v => v.tipo === 'Pelúcia');
+
+  grid.innerHTML =
+    '<div class="painel-sec-label">🚗 Carros elétricos</div>' +
+    carros.map(v => buildPainelCard(v.nome, v.tipo, sessMap[v.nome])).join('') +
+    '<div class="painel-sec-label">🧸 Pelúcias elétricas</div>' +
+    pelucias.map(v => buildPainelCard(v.nome, v.tipo, sessMap[v.nome])).join('');
+}
+
+function buildPainelCard(nome, tipo, s) {
+  const icon    = tipo === 'Carro' ? '🚗' : '🧸';
+  const nomeShort = nome.replace('Pelúcia', 'Pel.'); // abreviação para card compacto
+
+  // ── LIVRE ───────────────────────────────────────────────
+  if (!s) {
+    return `<div class="pcard livre">
+      <div class="pcard-icon">${icon}</div>
+      <div class="pcard-name">${nome}</div>
+      <div class="pcard-status">✓ Livre</div>
+      <button class="pcard-btn nova" onclick="iniciarNovaPeloVeiculo('${escHtml(nome)}','${tipo}')">➕ Nova</button>
+    </div>`;
+  }
+
+  // ── PENDENTE (cadastrado, aguardando iniciar) ───────────
+  if (!s.started) {
+    return `<div class="pcard pendente">
+      <div class="pcard-icon">${icon}</div>
+      <div class="pcard-name">${nome}</div>
+      <div class="pcard-status">⏸ Aguardando</div>
+      <div class="pcard-frozen">${fmtTime(s.mins * 60)}</div>
+      <div class="pcard-crianca">${escHtml(s.crianca)}</div>
+      <button class="pcard-btn iniciar" onclick="abrirModalBv(${s.rowIndex})">▶ Iniciar</button>
+    </div>`;
+  }
+
+  // ── ATIVO (timer rodando) ────────────────────────────────
+  const rem     = calcRemaining(s);
+  const total   = s.mins * 60;
+  const isOver  = rem <= 0;
+  const isWarn  = !isOver && rem <= 300;
+
+  let cardCls, timerTxt, timerCls, subLbl, progressPct, barColor;
+
+  if (isOver) {
+    const extraSec = Math.abs(rem);
+    const extraMin = Math.floor(extraSec / 60);
+    const custo    = (extraMin * s.adicionalPorMin).toFixed(2).replace('.',',');
+    cardCls   = 'pcard extra';
+    timerTxt  = '+' + fmtTime(extraSec);
+    timerCls  = 'pcard-timer extra-time';
+    subLbl    = `+${extraMin}min · R$ ${custo}`;
+    progressPct = 0;
+    barColor  = '#E53935';
+  } else if (isWarn) {
+    cardCls   = tipo === 'Carro' ? 'pcard em-uso-carro warn' : 'pcard em-uso-pelucia warn';
+    timerTxt  = fmtTime(rem);
+    timerCls  = 'pcard-timer warn';
+    subLbl    = 'Restante ⚠️';
+    progressPct = Math.max(0, (rem / total) * 100);
+    barColor  = '#FF9800';
+  } else {
+    cardCls   = tipo === 'Carro' ? 'pcard em-uso-carro' : 'pcard em-uso-pelucia';
+    timerTxt  = fmtTime(rem);
+    timerCls  = 'pcard-timer';
+    subLbl    = 'Restante';
+    progressPct = Math.max(0, (rem / total) * 100);
+    barColor  = progressPct > 50 ? '#43A047' : progressPct > 25 ? '#FB8C00' : '#E53935';
+  }
+
+  const progressBar = isOver ? '' : `
+    <div class="pcard-progress">
+      <div class="pcard-bar" style="width:${progressPct.toFixed(1)}%;background:${barColor}"></div>
+    </div>`;
+
+  return `<div class="${cardCls}">
+    <div class="pcard-icon">${icon}</div>
+    <div class="pcard-name">${nome}</div>
+    ${progressBar}
+    <div class="${timerCls}">${timerTxt}</div>
+    <div class="pcard-sublabel">${subLbl}</div>
+    <div class="pcard-crianca">${escHtml(s.crianca)}</div>
+    <div class="pcard-resp">👤 ${escHtml(s.responsavel)}</div>
+    <div class="pcard-btns">
+      <button class="pcard-btn enc" onclick="pedirEncerrar(${s.rowIndex})">✓ Enc.</button>
+      <button class="pcard-btn est" onclick="abrirEstender(${s.rowIndex})">⏱ +Tempo</button>
+    </div>
+  </div>`;
+}
+
+function iniciarNovaPeloVeiculo(veiculo, tipo) {
+  // Pré-seleciona o veículo e navega para Nova
+  showPage('nova');
+  // Aguarda render do step-0 e clica no card correto
+  setTimeout(() => {
+    const card = document.getElementById('vc-' + veiculo);
+    if (card && !card.classList.contains('vc-busy') && !card.classList.contains('vc-busy-pink')) {
+      selectVeiculo(card, veiculo, tipo);
+    }
+  }, 80);
+}
+
+// ── ESTENDER LOCAÇÃO ────────────────────────────────────────
+let estSession = null;
+let estMins    = 0;
+
+function abrirEstender(rowIndex) {
+  estSession = sessions.find(s => s.rowIndex === rowIndex);
+  if (!estSession) return;
+  estMins = 0;
+
+  const icon = estSession.tipo === 'Carro' ? '🚗' : '🧸';
+  document.getElementById('est-info').innerHTML =
+    '<div class="modal-info-row"><span>' + icon + ' ' + escHtml(estSession.veiculo || estSession.tipo) + '</span><span>' + estSession.plano + '</span></div>' +
+    '<div class="modal-info-row"><span>Criança</span><span>' + escHtml(estSession.crianca) + '</span></div>' +
+    '<div class="modal-info-row"><span>Tempo contratado</span><span>' + estSession.mins + ' min</span></div>';
+
+  const rem = calcRemaining(estSession);
+  const remFmt = rem <= 0 ? 'Esgotado' : fmtTime(rem) + ' restante';
+  document.getElementById('est-info').innerHTML +=
+    '<div class="modal-info-row"><span>Situação</span><span>' + remFmt + '</span></div>';
+
+  const opts = [5, 10, 15, 20, 30];
+  document.getElementById('est-opts').innerHTML = opts.map(m =>
+    '<button class="est-opt-btn" onclick="selecionarEstender(' + m + ')" id="est-opt-' + m + '">+' + m + ' min</button>'
+  ).join('');
+
+  document.getElementById('est-modal').classList.add('show');
+}
+
+function selecionarEstender(mins) {
+  estMins = mins;
+  document.querySelectorAll('.est-opt-btn').forEach(b => b.classList.remove('sel'));
+  const btn = document.getElementById('est-opt-' + mins);
+  if (btn) btn.classList.add('sel');
+}
+
+function fecharEstModal() {
+  document.getElementById('est-modal').classList.remove('show');
+  estSession = null;
+  estMins    = 0;
+}
+
+function confirmarEstender() {
+  if (!estSession) return;
+  if (!estMins) { toast('Selecione o tempo a adicionar.', 'error'); return; }
+
+  // Atualiza local: incrementa mins e salva extendedMins para sobreviver ao sync
+  estSession.mins        += estMins;
+  estSession.extendedMins = (estSession.extendedMins || 0) + estMins;
+
+  // Zera os alertas para não disparar novamente com o tempo estendido
+  estSession.alertFired5   = false;
+  estSession.alertFiredExp = false;
+
+  saveSessions();
+  toast('⏱ +' + estMins + ' min adicionados!', 'success');
+  fecharEstModal();
+
+  renderCards();
+  const painelPage = document.getElementById('page-painel');
+  if (painelPage && painelPage.classList.contains('active')) renderPainel();
+}
+
 
 // ════════════════════════════════════════════════════════════
 // HOME — encerradas hoje + admin KPIs
