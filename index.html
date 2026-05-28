@@ -21,7 +21,7 @@
 // ── CACHE BUSTER v1.3.0 ─────────────────────────────────
 // Força limpeza do SW antigo e recarga com versão nova
 (function(){
-  const CURRENT = 'movikids-v1.6.6';
+  const CURRENT = 'movikids-v1.6.7';
   if ('serviceWorker' in navigator) {
     // Desregistra SWs antigos
     navigator.serviceWorker.getRegistrations().then(function(regs) {
@@ -1748,7 +1748,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = 'v1.6.6';
+const APP_VERSION = 'v1.6.7';
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec';
 
 const PRECOS = {
@@ -1778,19 +1778,17 @@ let statsHoje   = { fat: 0, n: 0 };
 // ═══════════════════════════════════════════════════════════
 // API
 // ═══════════════════════════════════════════════════════════
-async function api(params, timeoutMs = 8000) {
-  const qs  = new URLSearchParams(params).toString();
-  const ctl = new AbortController();
-  const tid = setTimeout(() => ctl.abort(), timeoutMs);
-  try {
-    const r = await fetch(`${WEBAPP_URL}?${qs}`, { signal: ctl.signal });
-    clearTimeout(tid);
-    return r.json();
-  } catch(e) {
-    clearTimeout(tid);
-    if (e.name === 'AbortError') throw new Error('timeout');
-    throw e;
-  }
+async function api(params, timeoutMs = 25000) {
+  // Usa Promise.race ao invés de AbortController:
+  // AbortController + Service Worker causa conflito — o SW cria uma fetch
+  // interna sem o signal, então o abort dispara na página mas o GAS
+  // continua sem responder, acumulando falhas mesmo que o GAS esteja online.
+  const qs = new URLSearchParams(params).toString();
+  const fetchP = fetch(`${WEBAPP_URL}?${qs}`)
+    .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); });
+  const timer = new Promise((_, rej) =>
+    setTimeout(() => rej(new Error('timeout-' + timeoutMs + 'ms')), timeoutMs));
+  return Promise.race([fetchP, timer]);
 }
 
 // ═══════════════════════════════════════════════════════════
