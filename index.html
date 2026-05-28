@@ -682,6 +682,25 @@ nav button .nav-badge{
 .chart-title{font-size:12px;font-weight:700;color:var(--txt2);text-transform:uppercase;
   letter-spacing:.05em;margin-bottom:10px}
 .charts-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+/* Caixa — tabelas sem padding conflitante */
+.cx-card{background:var(--card);border-radius:var(--radius-sm);box-shadow:var(--shadow-sm);border:1px solid var(--border);margin-bottom:14px;overflow:hidden}
+.cx-card-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border)}
+.cx-card-header span:first-child{font-size:13px;font-weight:500;color:var(--txt)}
+.cx-table{width:100%;border-collapse:collapse;font-size:13px}
+.cx-table thead tr{background:var(--bg2)}
+.cx-table th{padding:8px 12px;text-align:left;font-weight:500;color:var(--txt2);font-size:12px;white-space:nowrap}
+.cx-table th:last-child{text-align:right}
+.cx-table td{padding:9px 12px;border-bottom:0.5px solid var(--border);color:var(--txt);vertical-align:middle}
+.cx-table td:last-child{text-align:right;font-weight:500}
+.cx-table tr:last-child td{border-bottom:none}
+.cx-conf{background:var(--card);border-radius:var(--radius-sm);box-shadow:var(--shadow-sm);border:1px solid var(--border);padding:14px}
+.cx-conf-title{font-size:13px;font-weight:500;margin-bottom:10px;display:flex;align-items:center;gap:6px;color:var(--txt)}
+.cx-conf-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:0.5px solid var(--border);font-size:13px}
+.cx-conf-row:last-child{border-bottom:none;font-weight:600;font-size:14px;padding-top:8px;margin-top:4px}
+.cx-conf-row span:first-child{color:var(--txt2)}
+.cx-conf-hint{font-size:11px;color:var(--txt3);margin-top:8px}
+.cx-grid-conf{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+@media(max-width:560px){.cx-grid-conf{grid-template-columns:1fr}}
 
 /* ── RELATÓRIO ────────────────────────────────────────────── */
 .rel-mes-sel{display:flex;gap:8px;margin-bottom:14px}
@@ -823,7 +842,7 @@ nav button .nav-badge{
   <!-- ══ SIDEBAR (desktop only) ══ -->
   <aside id="sidebar">
     <div class="sb-logo">🚗 Movi <span>Kids</span>
-      <div class="sb-status"><span id="sb-dot" class="dot-online"></span><span id="sb-txt">Online</span><span style="font-size:10px;opacity:.85;margin-left:5px;color:rgba(255,255,255,.7);font-family:monospace">v1.5.2</span></div>
+      <div class="sb-status"><span id="sb-dot" class="dot-online"></span><span id="sb-txt">Online</span><span style="font-size:10px;opacity:.85;margin-left:5px;color:rgba(255,255,255,.7);font-family:monospace">v1.5.3</span></div>
     </div>
     <div class="sb-nav" id="sb-nav">
       <button class="sb-btn active" id="sbn-home" onclick="showPage('home')"><span class="sb-icon">🏠</span>Home</button>
@@ -857,7 +876,7 @@ nav button .nav-badge{
       <div class="hd-status">
         <div id="status-dot" class="dot-online"></div>
         <span id="status-txt">Online</span>
-        <span id="app-version" style="font-size:10px;opacity:.85;margin-left:4px;font-family:monospace">v1.5.2</span>
+        <span id="app-version" style="font-size:10px;opacity:.85;margin-left:4px;font-family:monospace">v1.5.3</span>
       </div>
     </div>
   </header>
@@ -1139,45 +1158,31 @@ nav button .nav-badge{
     </div>
 
     <!-- Conferência -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px" id="cx-conf-grid">
-      <div class="chart-card" style="padding:14px">
-        <div style="font-size:13px;font-weight:500;margin-bottom:10px;display:flex;align-items:center;gap:6px">
-          💳 Conferência maquininha
-        </div>
+    <div class="cx-grid-conf" id="cx-conf-grid">
+      <div class="cx-conf">
+        <div class="cx-conf-title">💳 Conferência maquininha</div>
         <div id="cx-conf-maq"></div>
-        <div style="font-size:11px;color:var(--txt3);margin-top:8px">
-          ✓ Bater com o total na maquininha
-        </div>
+        <div class="cx-conf-hint">✓ Bater com o total na maquininha</div>
       </div>
-      <div class="chart-card" style="padding:14px">
-        <div style="font-size:13px;font-weight:500;margin-bottom:10px;display:flex;align-items:center;gap:6px">
-          💵 Conferência dinheiro
-        </div>
+      <div class="cx-conf">
+        <div class="cx-conf-title">💵 Conferência dinheiro</div>
         <div id="cx-conf-din"></div>
-        <div style="font-size:11px;color:var(--txt3);margin-top:8px">
-          ✓ Contar o dinheiro em espécie
-        </div>
+        <div class="cx-conf-hint">✓ Contar o dinheiro em espécie</div>
       </div>
     </div>
 
     <!-- Tabela Entradas -->
-    <div class="chart-card" style="padding:0;margin-bottom:14px;overflow:hidden">
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border)">
-        <span style="font-size:13px;font-weight:500">↑ Entradas — locações do dia</span>
-        <span style="font-size:14px;font-weight:500;color:var(--green)" id="cx-total-ent">R$ 0,00</span>
+    <div class="cx-card">
+      <div class="cx-card-header">
+        <span>↑ Entradas — locações do dia</span>
+        <span style="font-weight:500;color:var(--green)" id="cx-total-ent">R$ 0,00</span>
       </div>
       <div style="overflow-x:auto">
-        <table id="cx-tabela-ent" style="width:100%;border-collapse:collapse;font-size:13px">
-          <thead>
-            <tr style="background:var(--bg2)">
-              <th style="padding:8px 12px;text-align:left;font-weight:500;color:var(--txt2);font-size:12px">Horário</th>
-              <th style="padding:8px 12px;text-align:left;font-weight:500;color:var(--txt2);font-size:12px">Veículo</th>
-              <th style="padding:8px 12px;text-align:left;font-weight:500;color:var(--txt2);font-size:12px">Plano</th>
-              <th style="padding:8px 12px;text-align:left;font-weight:500;color:var(--txt2);font-size:12px">Responsável</th>
-              <th style="padding:8px 12px;text-align:left;font-weight:500;color:var(--txt2);font-size:12px">Pagamento</th>
-              <th style="padding:8px 12px;text-align:right;font-weight:500;color:var(--txt2);font-size:12px">Valor</th>
-            </tr>
-          </thead>
+        <table class="cx-table" id="cx-tabela-ent">
+          <thead><tr>
+            <th>Horário</th><th>Veículo</th><th>Plano</th>
+            <th>Responsável</th><th>Pagamento</th><th style="text-align:right">Valor</th>
+          </tr></thead>
           <tbody id="cx-body-ent">
             <tr><td colspan="6" style="padding:20px;text-align:center;color:var(--txt3)">Carregando...</td></tr>
           </tbody>
@@ -1186,21 +1191,16 @@ nav button .nav-badge{
     </div>
 
     <!-- Tabela Saídas -->
-    <div class="chart-card" style="padding:0;margin-bottom:14px;overflow:hidden">
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border)">
-        <span style="font-size:13px;font-weight:500">↓ Saídas — custos do dia</span>
-        <span style="font-size:14px;font-weight:500;color:var(--danger)" id="cx-total-sai">R$ 0,00</span>
+    <div class="cx-card">
+      <div class="cx-card-header">
+        <span>↓ Saídas — custos do dia</span>
+        <span style="font-weight:500;color:var(--danger)" id="cx-total-sai">R$ 0,00</span>
       </div>
       <div style="overflow-x:auto">
-        <table id="cx-tabela-sai" style="width:100%;border-collapse:collapse;font-size:13px">
-          <thead>
-            <tr style="background:var(--bg2)">
-              <th style="padding:8px 12px;text-align:left;font-weight:500;color:var(--txt2);font-size:12px">Horário</th>
-              <th style="padding:8px 12px;text-align:left;font-weight:500;color:var(--txt2);font-size:12px">Descrição</th>
-              <th style="padding:8px 12px;text-align:left;font-weight:500;color:var(--txt2);font-size:12px">Categoria</th>
-              <th style="padding:8px 12px;text-align:right;font-weight:500;color:var(--txt2);font-size:12px">Valor</th>
-            </tr>
-          </thead>
+        <table class="cx-table" id="cx-tabela-sai">
+          <thead><tr>
+            <th>Horário</th><th>Descrição</th><th>Categoria</th><th style="text-align:right">Valor</th>
+          </tr></thead>
           <tbody id="cx-body-sai">
             <tr><td colspan="4" style="padding:20px;text-align:center;color:var(--txt3)">Carregando...</td></tr>
           </tbody>
@@ -1448,7 +1448,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = 'v1.5.2';
+const APP_VERSION = 'v1.5.3';
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec';
 
 const PRECOS = {
@@ -2991,12 +2991,12 @@ async function carregarCaixa() {
           const temExtra = Number(l.minAdicionais) > 0;
           const planoStr = (PLANO_LABELS[l.plano]||l.plano) + (temExtra ? ` +${l.minAdicionais}min extra` : '');
           return `<tr>
-            <td style="padding:8px 12px;border-bottom:0.5px solid var(--border);color:var(--txt)">${l.horaInicio||'—'}</td>
-            <td style="padding:8px 12px;border-bottom:0.5px solid var(--border);color:var(--txt)">${l.veiculo||l.tipo}</td>
-            <td style="padding:8px 12px;border-bottom:0.5px solid var(--border);color:var(--txt)">${planoStr}</td>
-            <td style="padding:8px 12px;border-bottom:0.5px solid var(--border);color:var(--txt)">${l.responsavel||'—'}</td>
-            <td style="padding:8px 12px;border-bottom:0.5px solid var(--border)">${pagPill(l.pagamento)}</td>
-            <td style="padding:8px 12px;border-bottom:0.5px solid var(--border);text-align:right;font-weight:500;color:var(--txt)">${fmtR(l.valorTotal)}</td>
+            <td>${l.horaInicio||'—'}</td>
+            <td>${l.veiculo||l.tipo}</td>
+            <td>${planoStr}</td>
+            <td>${l.responsavel||'—'}</td>
+            <td>${pagPill(l.pagamento)}</td>
+            <td>${fmtR(l.valorTotal)}</td>
           </tr>`;
         }).join('');
       }
@@ -3010,10 +3010,10 @@ async function carregarCaixa() {
       } else {
         tbodySai.innerHTML = custos.map(c =>
           `<tr>
-            <td style="padding:8px 12px;border-bottom:0.5px solid var(--border);color:var(--txt)">${c.hora||'—'}</td>
-            <td style="padding:8px 12px;border-bottom:0.5px solid var(--border);color:var(--txt)">${c.descricao}</td>
-            <td style="padding:8px 12px;border-bottom:0.5px solid var(--border);color:var(--txt)">${c.categoria||'—'}</td>
-            <td style="padding:8px 12px;border-bottom:0.5px solid var(--border);text-align:right;font-weight:500;color:#A32D2D">${fmtR(c.valor)}</td>
+            <td>${c.hora||'—'}</td>
+            <td>${c.descricao||'—'}</td>
+            <td>${c.categoria||'—'}</td>
+            <td style="color:#A32D2D">${fmtR(c.valor)}</td>
           </tr>`
         ).join('');
       }
