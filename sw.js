@@ -1,5 +1,5 @@
-// MOVI KIDS — Service Worker v1.6.5
-const CACHE = 'movikids-v1.6.5';
+// MOVI KIDS — Service Worker v1.6.6
+const CACHE = 'movikids-v1.6.6';
 
 self.addEventListener('install', e => {
   self.skipWaiting();
