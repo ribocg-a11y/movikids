@@ -21,7 +21,7 @@
 // ── CACHE BUSTER v1.3.0 ─────────────────────────────────
 // Força limpeza do SW antigo e recarga com versão nova
 (function(){
-  const CURRENT = 'movikids-v1.6.0';
+  const CURRENT = 'movikids-v1.6.1';
   if ('serviceWorker' in navigator) {
     // Desregistra SWs antigos
     navigator.serviceWorker.getRegistrations().then(function(regs) {
@@ -932,6 +932,74 @@ nav button .nav-badge{
   text-transform:uppercase;letter-spacing:.06em;margin-top:4px;
 }
 
+
+/* ── FASE 4 — ESTATÍSTICAS POR VEÍCULO (v1.6.1) ────────────── */
+.vf-filter-row{
+  display:flex;gap:8px;padding:10px 16px 4px;align-items:center;flex-wrap:wrap;
+}
+.vf-filter-row label{font-size:12px;font-weight:700;color:var(--txt3);white-space:nowrap}
+.vf-select{
+  flex:1;min-width:140px;padding:8px 10px;border:1.5px solid var(--border);
+  border-radius:10px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:600;
+  background:var(--surface);color:var(--txt);outline:none;cursor:pointer;
+}
+.vf-select:focus{border-color:var(--blue)}
+
+/* Ranking de veículos no Histórico */
+.vrank-grid{
+  display:grid;gap:8px;padding:0 16px 8px;
+  grid-template-columns:1fr 1fr;
+}
+@media(min-width:480px){.vrank-grid{grid-template-columns:repeat(4,1fr)}}
+.vrank-card{
+  background:var(--card);border-radius:12px;padding:12px 10px;
+  box-shadow:var(--shadow-sm);border:1.5px solid var(--border);
+  display:flex;flex-direction:column;gap:4px;position:relative;overflow:hidden;
+}
+.vrank-card .vr-rank{
+  position:absolute;top:8px;right:8px;font-size:10px;font-weight:800;
+  color:var(--txt3);background:var(--border);border-radius:99px;padding:1px 6px;
+}
+.vrank-card .vr-icon{font-size:22px;line-height:1}
+.vrank-card .vr-nome{font-size:12px;font-weight:800;color:var(--txt)}
+.vrank-card .vr-count{font-size:20px;font-weight:800;color:var(--blue);font-family:'Nunito',sans-serif}
+.vrank-card .vr-sub{font-size:10px;color:var(--txt3);font-weight:600}
+.vrank-card .vr-bar-wrap{height:4px;border-radius:99px;background:var(--border);margin-top:2px}
+.vrank-card .vr-bar{height:4px;border-radius:99px;background:var(--blue);transition:width .6s}
+.vrank-card.top1 .vr-count{color:#E65100}
+.vrank-card.top1 .vr-bar{background:#E65100}
+.vrank-card.top1 .vr-rank{background:#FFE0B2;color:#E65100}
+
+/* Insight de utilização */
+.vrank-insight{
+  margin:0 16px 12px;padding:10px 12px;background:var(--surface);
+  border-radius:10px;border:1.5px solid var(--border);
+  font-size:12px;color:var(--txt3);line-height:1.5;
+}
+.vrank-insight strong{color:var(--txt)}
+
+/* Dashboard: ranking table below chart */
+.veh-rank-table{width:100%;border-collapse:collapse;margin-top:10px}
+.veh-rank-table th{
+  font-size:10px;font-weight:800;color:var(--txt3);text-transform:uppercase;
+  letter-spacing:.05em;border-bottom:1.5px solid var(--border);padding-bottom:6px;text-align:left;
+}
+.veh-rank-table td{
+  padding:7px 0;font-size:12px;border-bottom:1px solid var(--border);
+  vertical-align:middle;
+}
+.veh-rank-table tr:last-child td{border-bottom:none}
+.veh-bar-wrap{display:flex;align-items:center;gap:6px}
+.veh-bar-bg{flex:1;height:6px;border-radius:99px;background:var(--border);min-width:30px}
+.veh-bar-fill{height:6px;border-radius:99px;transition:width .6s}
+.veh-pct{font-size:10px;font-weight:700;color:var(--txt3);min-width:28px;text-align:right}
+
+/* Section title inside a chart card */
+.chart-card .chart-sub-title{
+  font-size:11px;font-weight:700;color:var(--txt3);text-transform:uppercase;
+  letter-spacing:.04em;margin:14px 0 6px;
+}
+
 </style>
 </head>
 
@@ -1422,6 +1490,13 @@ nav button .nav-badge{
       <div class="chart-card">
         <div class="chart-title">Por veículo 🚗🧸</div>
         <canvas id="chart-veiculo" height="180"></canvas>
+        <div class="chart-sub-title">Ranking do mês</div>
+        <table class="veh-rank-table" id="dash-veh-rank">
+          <thead><tr><th>#</th><th>Veículo</th><th>Fat.</th><th style="width:90px">% do total</th></tr></thead>
+          <tbody id="dash-veh-rank-body">
+            <tr><td colspan="4" style="color:var(--txt3);font-size:12px;padding:8px 0">Carregando...</td></tr>
+          </tbody>
+        </table>
       </div>
       <div class="chart-card">
         <div class="chart-title">Por pagamento 💳</div>
@@ -1468,6 +1543,21 @@ nav button .nav-badge{
     <div class="dash-back" onclick="irAdmin('admin')">← Voltar</div>
     <div class="sec-title">Histórico & Analytics</div>
 
+    <!-- Filtro por veículo (Fase 4) -->
+    <div class="vf-filter-row">
+      <label>🚗🧸 Veículo:</label>
+      <select class="vf-select" id="hist-veiculo-filter" onchange="filtrarPorVeiculo()">
+        <option value="">Todos os veículos</option>
+        <option value="Carro 01">Carro 01</option>
+        <option value="Carro 02">Carro 02</option>
+        <option value="Carro 03">Carro 03</option>
+        <option value="Pelúcia 01">Pelúcia 01</option>
+        <option value="Pelúcia 02">Pelúcia 02</option>
+        <option value="Pelúcia 03">Pelúcia 03</option>
+        <option value="Pelúcia 04">Pelúcia 04</option>
+      </select>
+    </div>
+
     <!-- Filtros rápidos -->
     <div class="period-filters">
       <button class="period-btn active" onclick="setPeriod('hoje',this)">Hoje</button>
@@ -1499,6 +1589,13 @@ nav button .nav-badge{
       <div class="chart-title">Ranking por tipo de veículo</div>
       <div id="ranking-rows"></div>
       <div class="rank-insight" id="rank-insight"></div>
+    </div>
+
+    <!-- Ranking por veículo (Fase 4) -->
+    <div id="vrank-section" style="display:none">
+      <div class="sec-title" style="padding:8px 16px 4px">Ranking de uso — período</div>
+      <div class="vrank-grid" id="vrank-grid"></div>
+      <div class="vrank-insight" id="vrank-insight" style="display:none"></div>
     </div>
 
     <!-- Lista de transações -->
@@ -1630,7 +1727,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = 'v1.6.0';
+const APP_VERSION = 'v1.6.1';
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec';
 
 const PRECOS = {
@@ -2754,7 +2851,10 @@ async function buscarHistorico() {
     const res = await api({ action:'listarHistorico', startDate:dates.s, endDate:dates.e });
     if (!res.ok) { container.innerHTML='<div class="empty"><p>Erro.</p></div>'; return; }
 
+    histLocacoesAll = res.locacoes || []; // salva para filtro por veículo
+
     renderAnalyticsCards(res.stats);
+    renderVrankSection(histLocacoesAll);  // ranking por veículo (Fase 4)
 
     if (!res.locacoes.length) {
       container.innerHTML=`<div class="empty"><div class="empty-icon">📋</div><h3>Sem locações neste período</h3></div>`;
@@ -2867,6 +2967,144 @@ function toast(msg, type = '') {
 // ═══════════════════════════════════════════════════════════
 
 // ═══════════════════════════════════════════════════════════
+
+// ═══════════════════════════════════════════════════════════
+// FASE 4 — ESTATÍSTICAS POR VEÍCULO (v1.6.1)
+// ═══════════════════════════════════════════════════════════
+
+let histLocacoesAll = []; // todas as locações do período atual
+
+// ── Filtragem por veículo no Histórico ─────────────────────
+function filtrarPorVeiculo() {
+  const filtro    = document.getElementById('hist-veiculo-filter')?.value || '';
+  const container = document.getElementById('hist-container');
+  if (!container || !histLocacoesAll.length) return;
+
+  const lista = filtro
+    ? histLocacoesAll.filter(l => l.veiculo === filtro)
+    : histLocacoesAll;
+
+  if (!lista.length) {
+    container.innerHTML = `<div class="empty"><div class="empty-icon">🔍</div><h3>Sem locações para ${filtro || 'este período'}</h3></div>`;
+    return;
+  }
+
+  container.innerHTML = lista.map(l => {
+    const icon = l.tipo === 'Carro' ? '🚗' : '🧸';
+    const vT   = Number(l.valorTotal).toFixed(2).replace('.', ',');
+    const vE   = Number(l.valorAdicional);
+    const sc   = l.status === 'Ativa' ? 'ativa' : 'encerrada';
+    return `<div class="hist-item">
+      <div class="hi-left">
+        <div class="hi-tipo">${icon} ${l.tipo}${l.veiculo ? ' · ' + l.veiculo : ''}</div>
+        <div class="hi-names">${escHtml(l.crianca)}</div>
+        <div class="hi-det">👤 ${escHtml(l.responsavel)} · ${l.plano}</div>
+        <div class="hi-det">⏰ ${l.horaInicio}${l.horaFim ? ' → ' + l.horaFim : ''} · ${l.data}</div>
+      </div>
+      <div class="hi-right">
+        <div class="hi-valor">R$ ${vT}</div>
+        ${vE > 0 ? `<div class="hi-extra">+${l.minAdicionais}min extra</div>` : ''}
+        <span class="hi-status ${sc}">${l.status}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── Ranking por veículo no Histórico ───────────────────────
+function renderVrankSection(locacoes) {
+  const section = document.getElementById('vrank-section');
+  const grid    = document.getElementById('vrank-grid');
+  const insight = document.getElementById('vrank-insight');
+  if (!section || !grid) return;
+
+  if (!locacoes.length) { section.style.display = 'none'; return; }
+
+  // Computa contagem e faturamento por veículo
+  const countMap = {}, fatMap = {};
+  locacoes.forEach(l => {
+    const v = l.veiculo || (l.tipo + ' ?');
+    countMap[v] = (countMap[v] || 0) + 1;
+    fatMap[v]   = (fatMap[v] || 0) + Number(l.valorTotal || 0);
+  });
+
+  const veiculos = Object.keys(countMap);
+  if (!veiculos.length) { section.style.display = 'none'; return; }
+
+  // Ordena por contagem decrescente
+  veiculos.sort((a, b) => countMap[b] - countMap[a]);
+  const maxCount = countMap[veiculos[0]];
+
+  grid.innerHTML = veiculos.map((v, i) => {
+    const isCarro = v.startsWith('Carro');
+    const icon    = isCarro ? '🚗' : '🧸';
+    const pct     = maxCount > 0 ? Math.round(countMap[v] / maxCount * 100) : 0;
+    const fat     = 'R$ ' + fatMap[v].toFixed(2).replace('.', ',');
+    const cls     = i === 0 ? 'vrank-card top1' : 'vrank-card';
+    const barClr  = isCarro ? 'var(--blue)' : 'var(--pink)';
+    return `<div class="${cls}">
+      <span class="vr-rank">#${i + 1}</span>
+      <div class="vr-icon">${icon}</div>
+      <div class="vr-nome">${v}</div>
+      <div class="vr-count">${countMap[v]}</div>
+      <div class="vr-sub">${fat}</div>
+      <div class="vr-bar-wrap"><div class="vr-bar" style="width:${pct}%;background:${barClr}"></div></div>
+    </div>`;
+  }).join('');
+
+  // Insight automático
+  const top    = veiculos[0];
+  const bottom = veiculos[veiculos.length - 1];
+  const total  = locacoes.length;
+  const topPct = Math.round(countMap[top] / total * 100);
+  if (insight) {
+    insight.style.display = 'block';
+    insight.innerHTML =
+      `<strong>${top}</strong> é o mais requisitado: <strong>${countMap[top]} locações</strong> (${topPct}% do período). ` +
+      (veiculos.length > 1
+        ? `<strong>${bottom}</strong> teve menos uso: <strong>${countMap[bottom]} locações</strong>.`
+        : '');
+  }
+
+  section.style.display = 'block';
+}
+
+// ── Ranking na tabela do Dashboard ─────────────────────────
+function renderDashVehRank(fatPorVeiculo) {
+  const tbody = document.getElementById('dash-veh-rank-body');
+  if (!tbody || !fatPorVeiculo) return;
+
+  const veiculos = Object.keys(fatPorVeiculo).sort();
+  if (!veiculos.length) {
+    tbody.innerHTML = '<tr><td colspan="4" style="color:var(--txt3);font-size:12px;padding:8px 0">Sem dados este mês</td></tr>';
+    return;
+  }
+
+  const total = veiculos.reduce((acc, v) => acc + fatPorVeiculo[v], 0);
+  // Ordena por faturamento
+  veiculos.sort((a, b) => fatPorVeiculo[b] - fatPorVeiculo[a]);
+
+  tbody.innerHTML = veiculos.map((v, i) => {
+    const fat    = fatPorVeiculo[v] || 0;
+    const pct    = total > 0 ? (fat / total * 100) : 0;
+    const isCar  = v.startsWith('Carro');
+    const clr    = isCar ? '#1565C0' : '#C2185B';
+    return `<tr>
+      <td style="font-weight:800;color:var(--txt3);width:20px">${i + 1}</td>
+      <td style="font-weight:700">${isCar ? '🚗' : '🧸'} ${v}</td>
+      <td style="font-weight:700">R$${fat.toFixed(0)}</td>
+      <td>
+        <div class="veh-bar-wrap">
+          <div class="veh-bar-bg">
+            <div class="veh-bar-fill" style="width:${pct.toFixed(0)}%;background:${clr}"></div>
+          </div>
+          <span class="veh-pct">${pct.toFixed(0)}%</span>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+
 // ADMIN — Estado, PIN, Timeout
 // ═══════════════════════════════════════════════════════════
 let isAdmin         = false;
@@ -3073,6 +3311,9 @@ function renderCharts(d) {
         scales:{x:{ticks:{callback:v=>'R$'+v,font:{size:10}}},y:{ticks:{font:{size:10}}}}}
     });
   }
+
+  // Ranking de veículos na tabela do dashboard (Fase 4)
+  renderDashVehRank(d.fatPorVeiculo);
 
   // Gráfico 6: Por pagamento
   if (d.fatPorPagamento && Object.keys(d.fatPorPagamento).length > 0) {
