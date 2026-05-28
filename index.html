@@ -1066,8 +1066,8 @@ nav button .nav-badge{
     <div class="sb-nav" id="sb-nav">
       <button class="sb-btn active" id="sbn-home" onclick="showPage('home')"><span class="sb-icon">🏠</span>Home</button>
       <button class="sb-btn" id="sbn-nova" onclick="showPage('nova')"><span class="sb-icon">➕</span>Nova Locação</button>
+      <button class="sb-btn" id="sbn-painel" onclick="showPage('painel')"><span class="sb-icon">📺</span>Painel Operação</button>
       <button class="sb-btn" id="sbn-custos" onclick="showPage('custos')"><span class="sb-icon">💰</span>Registrar Custo</button>
-      <button class="sb-btn" id="sbn-painel" onclick="showPage('painel')"><span class="sb-icon">📺</span>Painel ao Vivo</button>
     </div>
     <div class="sb-admin-section" id="sb-admin-section">
       <div class="sb-divider">Administração</div>
@@ -1109,11 +1109,11 @@ nav button .nav-badge{
     <button onclick="showPage('nova')">
       <div class="nav-icon nav-badge">➕<span id="badge-nova" class="badge" style="display:none">!</span></div>Nova
     </button>
+    <button id="nav-painel" onclick="showPage('painel')">
+      <div class="nav-icon">📺</div>Operação
+    </button>
     <button onclick="showPage('custos')">
       <div class="nav-icon">💰</div>Custos
-    </button>
-    <button id="nav-painel" onclick="showPage('painel')">
-      <div class="nav-icon">📺</div>Painel
     </button>
     <button id="nav-admin" onclick="abrirAdmin()">
       <div class="nav-icon">🔐</div>Admin
