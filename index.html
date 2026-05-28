@@ -21,7 +21,7 @@
 // ── CACHE BUSTER v1.3.0 ─────────────────────────────────
 // Força limpeza do SW antigo e recarga com versão nova
 (function(){
-  const CURRENT = 'movikids-v1.6.8';
+  const CURRENT = 'movikids-v1.6.9';
   if ('serviceWorker' in navigator) {
     // Desregistra SWs antigos
     navigator.serviceWorker.getRegistrations().then(function(regs) {
@@ -1012,6 +1012,59 @@ nav button .nav-badge{
   border-color:#FF9800;color:#E65100;
 }
 
+
+/* ── NOVO DASHBOARD v1.6.9 ──────────────────────────────────── */
+.db-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:8px}
+.db-top-title{font-size:14px;font-weight:700;color:var(--txt)}
+.db-mes-sel{font-size:12px;padding:5px 10px;border-radius:var(--radius-sm);border:1.5px solid var(--border);
+  background:var(--surface);color:var(--txt);cursor:pointer;font-family:'Nunito',sans-serif}
+
+.new-kpi-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:12px}
+.new-kpi{background:var(--surface);border-radius:var(--radius);border:1.5px solid var(--border);
+  padding:12px 14px}
+.new-kpi label{display:block;font-size:10px;font-weight:700;color:var(--txt3);
+  text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px}
+.new-kpi .nkv{font-size:20px;font-weight:800;line-height:1;font-family:'Nunito',sans-serif}
+.new-kpi .nkv.blue{color:var(--blue)}.new-kpi .nkv.green{color:#2E7D32}
+.new-kpi .nkv.amber{color:#E65100}.new-kpi .nkv.red{color:#C62828}
+.new-kpi .nks{font-size:10px;color:var(--txt3);margin-top:4px;font-weight:600}
+.nk-badge-up{color:#2E7D32;background:#E8F5E9;padding:1px 6px;border-radius:4px;font-size:10px;font-weight:700}
+.nk-badge-dn{color:#C62828;background:#FFEBEE;padding:1px 6px;border-radius:4px;font-size:10px;font-weight:700}
+
+.cto-strip{background:var(--card);border:1.5px solid #EF9F27;border-radius:var(--radius);
+  padding:12px 14px;margin-bottom:12px}
+.cto-strip-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+.cto-strip-label{font-size:10px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.04em}
+.cto-strip-title{font-size:13px;font-weight:700;color:var(--txt);margin-top:3px}
+.cto-pill{font-size:10px;padding:2px 8px;border-radius:4px;background:#FAEEDA;color:#633806;font-weight:700}
+.cto-nums{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:8px}
+.cto-n{text-align:center}
+.cto-n-val{font-size:15px;font-weight:800;font-family:'Nunito',sans-serif}
+.cto-n-lbl{font-size:10px;color:var(--txt3);font-weight:600}
+.cto-bar-bg{height:6px;background:var(--border);border-radius:99px;overflow:hidden;margin-bottom:3px}
+.cto-bar-fill{height:6px;border-radius:99px;background:#E65100}
+.cto-note{font-size:10px;color:var(--txt3)}
+
+.new-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.new-row.wide{grid-template-columns:3fr 2fr}
+.new-chart-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);padding:14px}
+.new-chart-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;
+  color:var(--txt3);margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
+.new-chart-title .nct-note{font-size:10px;font-weight:600;color:var(--txt3);text-transform:none;letter-spacing:0}
+
+.nb-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border)}
+.nb-row:last-child{border:none}
+.nb-n{font-size:10px;color:var(--txt3);width:14px;text-align:center}
+.nb-name{font-size:11px;flex:1;color:var(--txt)}
+.nb-bar-bg{width:72px;height:5px;background:var(--border);border-radius:99px;overflow:hidden}
+.nb-bar-fill{height:5px;border-radius:99px}
+.nb-val{font-size:11px;font-weight:700;width:50px;text-align:right;color:var(--txt)}
+.nb-pct{font-size:10px;color:var(--txt3);width:28px;text-align:right}
+.nb-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+
+.db-insight{background:var(--surface);border-radius:var(--radius-sm);border-left:3px solid var(--blue);
+  padding:8px 10px;margin-top:8px;font-size:11px;color:var(--txt2);line-height:1.5}
+
 </style>
 </head>
 
@@ -1482,47 +1535,113 @@ nav button .nav-badge{
 
   <!-- ──────── PAGE: DASHBOARD ──────── -->
   <div id="page-dashboard" class="page">
-    <div class="dash-back" onclick="irAdmin('admin')">← Voltar</div>
-    <div class="sec-title" id="dash-title">Dashboard</div>
-
-    <div class="chart-card">
-      <div class="chart-title">Faturamento diário</div>
-      <canvas id="chart-diario" height="180"></canvas>
+    <!-- Header -->
+    <div class="db-top">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="dash-back" onclick="irAdmin('admin')" style="margin:0">← Voltar</div>
+        <div class="db-top-title" id="dash-title">Análise financeira</div>
+      </div>
+      <select class="db-mes-sel" id="dash-mes-sel" onchange="mudarMesDash()">
+        <option value="1">Janeiro</option><option value="2">Fevereiro</option>
+        <option value="3">Março</option><option value="4">Abril</option>
+        <option value="5" selected>Maio</option><option value="6">Junho</option>
+        <option value="7">Julho</option><option value="8">Agosto</option>
+        <option value="9">Setembro</option><option value="10">Outubro</option>
+        <option value="11">Novembro</option><option value="12">Dezembro</option>
+      </select>
     </div>
 
-    <div class="charts-row">
-      <div class="chart-card">
-        <div class="chart-title">Por tipo</div>
-        <canvas id="chart-tipo" height="160"></canvas>
+    <!-- KPIs -->
+    <div class="new-kpi-row">
+      <div class="new-kpi">
+        <label>Faturamento do mês</label>
+        <div class="nkv blue" id="nk-fatmes">...</div>
+        <div class="nks" id="nk-nloc">— locações</div>
       </div>
-      <div class="chart-card">
-        <div class="chart-title">Por plano</div>
-        <canvas id="chart-plano" height="160"></canvas>
+      <div class="new-kpi">
+        <label>Ticket médio</label>
+        <div class="nkv amber" id="nk-ticket">...</div>
+        <div class="nks" id="nk-cusmes">custos: —</div>
+      </div>
+      <div class="new-kpi">
+        <label>Resultado líquido</label>
+        <div class="nkv green" id="nk-resultado">...</div>
+        <div class="nks" id="nk-margem">margem —</div>
+      </div>
+      <div class="new-kpi">
+        <label>Faturamento hoje</label>
+        <div class="nkv blue" id="nk-fathoje">...</div>
+        <div class="nks" id="nk-cushoje">custos hoje: —</div>
       </div>
     </div>
 
-    <div class="chart-card">
-      <div class="chart-title">Horários de pico</div>
-      <canvas id="chart-horas" height="160"></canvas>
+    <!-- CTO -->
+    <div class="cto-strip" id="nk-cto-strip">
+      <div class="cto-strip-top">
+        <div>
+          <div class="cto-strip-label">CTO — Golden Shopping</div>
+          <div class="cto-strip-title" id="nk-cto-title">Calculando...</div>
+        </div>
+        <span class="cto-pill" id="nk-cto-mes">—º mês</span>
+      </div>
+      <div class="cto-nums">
+        <div class="cto-n"><div class="cto-n-val blue" id="nk-cto-fat">—</div><div class="cto-n-lbl">Faturamento</div></div>
+        <div class="cto-n"><div class="cto-n-val" style="color:#E65100" id="nk-cto-val">—</div><div class="cto-n-lbl">CTO a pagar</div></div>
+        <div class="cto-n"><div class="cto-n-val" style="color:#c62828" id="nk-cto-cus">—</div><div class="cto-n-lbl">Custos operac.</div></div>
+        <div class="cto-n"><div class="cto-n-val" style="color:#2E7D32" id="nk-cto-disp">—</div><div class="cto-n-lbl">Resultado</div></div>
+      </div>
+      <div class="cto-bar-bg"><div class="cto-bar-fill" id="nk-cto-bar" style="width:0%"></div></div>
+      <div class="cto-note" id="nk-cto-note">CTO = 0% do faturamento</div>
     </div>
 
-    <div class="charts-row">
-      <div class="chart-card">
-        <div class="chart-title">Por veículo 🚗🧸</div>
-        <canvas id="chart-veiculo" height="180"></canvas>
-        <div class="chart-sub-title">Ranking do mês</div>
-        <table class="veh-rank-table" id="dash-veh-rank">
-          <thead><tr><th>#</th><th>Veículo</th><th>Fat.</th><th style="width:90px">% do total</th></tr></thead>
-          <tbody id="dash-veh-rank-body">
-            <tr><td colspan="4" style="color:var(--txt3);font-size:12px;padding:8px 0">Carregando...</td></tr>
-          </tbody>
-        </table>
+    <!-- Faturamento diário -->
+    <div class="new-chart-card" style="margin-bottom:10px">
+      <div class="new-chart-title">
+        Faturamento diário
+        <span class="nct-note" id="nk-avg-label">média R$0/dia com movimento</span>
       </div>
-      <div class="chart-card">
-        <div class="chart-title">Por pagamento 💳</div>
-        <canvas id="chart-pagamento" height="180"></canvas>
+      <div style="position:relative;height:150px">
+        <canvas id="chart-diario" role="img" aria-label="Faturamento diário do mês">Faturamento diário.</canvas>
       </div>
     </div>
+
+    <!-- Por tipo + Pico -->
+    <div class="new-row">
+      <div class="new-chart-card">
+        <div class="new-chart-title">Por tipo de veículo</div>
+        <div id="nk-tipo-rows"><div class="nks" style="padding:8px 0">Carregando...</div></div>
+        <div class="db-insight" id="nk-tipo-insight" style="display:none"></div>
+      </div>
+      <div class="new-chart-card">
+        <div class="new-chart-title">Horários de pico</div>
+        <div style="position:relative;height:110px">
+          <canvas id="chart-horas" role="img" aria-label="Faturamento por horário do dia">Horários de pico.</canvas>
+        </div>
+        <div class="db-insight" id="nk-pico-insight" style="display:none"></div>
+      </div>
+    </div>
+
+    <!-- Ranking veículos + Pagamento+Plano -->
+    <div class="new-row">
+      <div class="new-chart-card">
+        <div class="new-chart-title">Ranking por veículo</div>
+        <div id="nk-veiculo-rank"><div class="nks" style="padding:8px 0">Carregando...</div></div>
+      </div>
+      <div class="new-chart-card">
+        <div class="new-chart-title">Forma de pagamento</div>
+        <div id="nk-pag-rows"><div class="nks" style="padding:8px 0">Carregando...</div></div>
+        <div class="new-chart-title" style="margin-top:14px">Por plano (locações)</div>
+        <div id="nk-plano-rows"></div>
+        <div class="db-insight" id="nk-plano-insight" style="display:none"></div>
+      </div>
+    </div>
+
+    <!-- hidden canvases for compat -->
+    <canvas id="chart-tipo" style="display:none"></canvas>
+    <canvas id="chart-plano" style="display:none"></canvas>
+    <canvas id="chart-veiculo" style="display:none"></canvas>
+    <canvas id="chart-pagamento" style="display:none"></canvas>
+    <table style="display:none"><tbody id="dash-veh-rank-body"></tbody></table>
   </div>
 
   <!-- ──────── PAGE: RELATÓRIO ──────── -->
@@ -1748,7 +1867,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = 'v1.6.8';
+const APP_VERSION = 'v1.6.9';
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec';
 
 const PRECOS = {
@@ -3312,132 +3431,171 @@ async function carregarKPIs() {
     const d = await api({ action: 'buscarKPIsAdmin' });
     if (!d.ok) return;
     kpiData = d;
-    const R = v => 'R$ ' + Number(v).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-    document.getElementById('k-fathoje').textContent  = R(d.fatHoje);
-    document.getElementById('k-cushoje').textContent  = R(d.cusHoje);
-    document.getElementById('k-fatmes').textContent   = R(d.fatMes);
-    document.getElementById('k-nmes').textContent     = d.nMes + ' locações';
-    document.getElementById('k-resultado').textContent = R(d.resultado);
-    document.getElementById('k-margem').textContent   = 'margem ' + d.margem + '%';
-    showAdminHomeKpis(d); // FIX BUG-006: exibe KPIs financeiros na Home admin
-  } catch(e) { console.error('carregarKPIs:', e); } // FIX Regra#2: nunca catch{}vazio
+    setText2('k-fathoje', R2(d.fatHoje));
+    setText2('k-cushoje', R2(d.cusHoje));
+    setText2('k-fatmes',  R2(d.fatMes));
+    setText2('k-nmes',    d.nMes + ' locações');
+    setText2('k-resultado', R2(d.resultado));
+    setText2('k-margem',  'margem ' + d.margem + '%');
+    showAdminHomeKpis(d);
+  } catch(e) { console.error('carregarKPIs:', e); }
+}
+// ── NOVO DASHBOARD v1.6.9 ────────────────────────────────────
+const MESES_DB = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+const R2 = v => 'R$ ' + Math.round(Number(v)).toString().replace(/\B(?=(\d{3})+(?!\d))/g,'.');
+const pct2 = (v, tot) => tot > 0 ? Math.round(v / tot * 100) : 0;
+const setText2 = (id, txt) => { const e = document.getElementById(id); if (e) e.textContent = txt; };
+
+function mudarMesDash() {
+  const sel = document.getElementById('dash-mes-sel');
+  if (!sel || !kpiData) return;
+  carregarKPIsComMes(parseInt(sel.value), kpiData.anoAtual || new Date().getFullYear());
 }
 
-// ── CHARTS ───────────────────────────────────────────────────
+async function carregarKPIsComMes(mes, ano) {
+  try {
+    const p = { action: 'buscarKPIsAdmin' };
+    if (mes) p.mes = mes;
+    if (ano) p.ano = ano;
+    const d = await api(p);
+    if (!d.ok) return;
+    kpiData = d;
+    renderCharts(d);
+    setText2('k-fathoje', R2(d.fatHoje));
+    setText2('k-cushoje', R2(d.cusHoje));
+    setText2('k-fatmes',  R2(d.fatMes));
+    setText2('k-nmes',    d.nMes + ' locações');
+    setText2('k-resultado', R2(d.resultado));
+    setText2('k-margem',  'margem ' + d.margem + '%');
+    if (typeof showAdminHomeKpis === 'function') showAdminHomeKpis(d);
+  } catch(e) { console.error('carregarKPIsComMes:', e); }
+}
+
 function renderCharts(d) {
   if (!window.Chart) return;
-
-  // Destroy previous
   [chartDiario,chartTipo,chartPlano,chartHoras].forEach(c => c && c.destroy());
+  if (window.chartVeiculo) window.chartVeiculo.destroy();
+  if (window.chartPagamento) window.chartPagamento.destroy();
 
-  const BLUE='#1565C0',PINK='#C2185B',PURPLE='#6A1B9A',GREEN='#2E7D32',AMBER='#E65100';
+  const BLUE='#185FA5',PINK='#C2185B',GREEN='#3B6D11',AMBER='#BA7517',GRID='rgba(0,0,0,.06)';
+  const PLAN_LABELS = {'10min':'10 min','20min':'20 min','30min':'30 min','40min':'40 min','60min':'1 hora','3h':'3 horas'};
 
-  // Gráfico 1: Faturamento diário
+  // título
+  if (d.mesAtual && d.anoAtual) {
+    setText2('dash-title', 'Análise financeira — ' + MESES_DB[d.mesAtual-1] + '/' + d.anoAtual);
+    const sel = document.getElementById('dash-mes-sel');
+    if (sel) sel.value = String(d.mesAtual);
+  }
+
+  // KPIs
+  const ticket = d.nMes > 0 ? d.fatMes / d.nMes : 0;
+  setText2('nk-fatmes',  R2(d.fatMes));
+  setText2('nk-nloc',    d.nMes + ' locações no mês');
+  setText2('nk-ticket',  R2(ticket));
+  setText2('nk-cusmes',  'custos: ' + R2(d.cusMes));
+  const resEl = document.getElementById('nk-resultado');
+  if (resEl) { resEl.textContent = R2(d.resultado); resEl.className = 'nkv ' + ((d.resultado||0) >= 0 ? 'green' : 'red'); }
+  setText2('nk-margem',  'margem ' + (d.margem||0) + '%');
+  setText2('nk-fathoje', R2(d.fatHoje));
+  setText2('nk-cushoje', 'custos hoje: ' + R2(d.cusHoje));
+
+  // CTO
+  setText2('nk-cto-fat',  R2(d.fatMes));
+  setText2('nk-cto-val',  R2(d.ctoPagar));
+  setText2('nk-cto-cus',  R2(d.cusMes));
+  setText2('nk-cto-disp', R2(d.resultado));
+  const ctoPct = d.fatMes > 0 ? Math.round(d.ctoPagar / d.fatMes * 100) : 0;
+  const ctoBar = document.getElementById('nk-cto-bar');
+  if (ctoBar) ctoBar.style.width = Math.min(ctoPct, 100) + '%';
+  setText2('nk-cto-note', 'CTO = ' + ctoPct + '% do faturamento');
+  const nm = d.mesAtual < 12 ? d.mesAtual + 1 : 1;
+  const ny = d.mesAtual < 12 ? d.anoAtual : d.anoAtual + 1;
+  setText2('nk-cto-title', R2(d.ctoPagar) + ' — vence 05/' + String(nm).padStart(2,'0') + '/' + ny);
+  const mesPill = document.getElementById('nk-cto-mes');
+  if (mesPill && d.mesAtual) {
+    const start = new Date(2026,3,29);
+    const cur   = new Date(d.anoAtual, d.mesAtual-1, 1);
+    const diff  = Math.max(1, Math.round((cur - start) / (1000*60*60*24*30)) + 1);
+    mesPill.textContent = diff + 'º mês de contrato';
+  }
+
+  // Faturamento diário
   const fatDia = d.fatPorDia || [];
-  const hoje   = new Date().getDate();
-  const fatLabels = fatDia.filter(x=>x.dia<=hoje).map(x=>x.dia+'°');
-  const fatValues = fatDia.filter(x=>x.dia<=hoje).map(x=>x.valor);
+  const hojeD  = d.mesAtual === new Date().getMonth()+1 ? new Date().getDate() : 31;
+  const dias   = fatDia.filter(x => x.dia <= hojeD);
+  const vals   = dias.map(x => x.valor);
+  const comMov = vals.filter(v => v > 0);
+  const avgDia = comMov.length > 0 ? Math.round(comMov.reduce((a,b)=>a+b,0)/comMov.length) : 0;
+  setText2('nk-avg-label', 'média R$' + avgDia + '/dia com movimento');
   chartDiario = new Chart(document.getElementById('chart-diario'), {
-    type:'line',
-    data:{
-      labels:fatLabels,
-      datasets:[{label:'R$',data:fatValues,borderColor:BLUE,backgroundColor:BLUE+'22',
-        fill:true,tension:.35,pointRadius:3,pointBackgroundColor:BLUE}]
-    },
-    options:{responsive:true,plugins:{legend:{display:false}},scales:{
-      x:{grid:{display:false},ticks:{font:{size:10}}},
-      y:{grid:{color:'#f0f0f0'},ticks:{callback:v=>'R$'+v,font:{size:10}}}
-    }}
-  });
-
-  // Gráfico 2: Por tipo (pizza)
-  const tipoData = d.fatPorTipo || {};
-  chartTipo = new Chart(document.getElementById('chart-tipo'), {
-    type:'doughnut',
-    data:{
-      labels:['🚗 Carro','🛺 Triciclo','🧸 Pelúcia'],
-      datasets:[{data:[tipoData['Carro']||0,tipoData['Triciclo']||0,tipoData['Pelúcia']||0],
-        backgroundColor:[BLUE,GREEN,PINK],borderWidth:0}]
-    },
-    options:{responsive:true,plugins:{legend:{position:'bottom',labels:{font:{size:10},padding:8}}},
-      cutout:'65%'}
-  });
-
-  // Gráfico 3: Por plano (barras)
-  const plano = d.fatPorPlano || {};
-  const planoKeys = ['10min','20min','30min','40min','60min','3h'].filter(k=>plano[k]>0);
-  chartPlano = new Chart(document.getElementById('chart-plano'), {
     type:'bar',
-    data:{
-      labels:planoKeys,
-      datasets:[{label:'R$',data:planoKeys.map(k=>plano[k]||0),
-        backgroundColor:PURPLE,borderRadius:4}]
-    },
-    options:{responsive:true,plugins:{legend:{display:false}},scales:{
-      x:{grid:{display:false},ticks:{font:{size:10}}},
-      y:{grid:{color:'#f0f0f0'},ticks:{callback:v=>'R$'+v,font:{size:10}}}
-    }}
+    data:{ labels: dias.map(x=>x.dia+''),
+      datasets:[
+        {label:'Faturamento',data:vals,backgroundColor:'#B5D4F4',borderRadius:3,order:2},
+        {label:'Média',data:dias.map(()=>avgDia),type:'line',borderColor:BLUE,borderWidth:1.5,pointRadius:0,tension:0,borderDash:[4,3],order:1}
+      ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false}},
+      scales:{x:{grid:{display:false},ticks:{font:{size:9},color:'#888',maxTicksLimit:16}},
+        y:{grid:{color:GRID},ticks:{font:{size:9},color:'#888',callback:v=>'R$'+v}}}}
   });
 
-  // Gráfico 4: Horários de pico
-  const horas = (d.horasPico||[]).map((v,i)=>({h:(9+i)+'h',v})).filter(x=>x.v>0||true);
+  // Horários de pico
+  const horasDat = (d.horasPico||[]).map((v,i)=>({h:(9+i)+'h',v}));
+  const maxH = Math.max(...horasDat.map(x=>x.v),1);
   chartHoras = new Chart(document.getElementById('chart-horas'), {
     type:'bar',
-    data:{
-      labels:horas.map(x=>x.h),
-      datasets:[{label:'R$',data:horas.map(x=>x.v),
-        backgroundColor:horas.map(x=>x.v>0?AMBER+99:AMBER+'33'),borderRadius:3}]
-    },
-    options:{responsive:true,plugins:{legend:{display:false}},scales:{
-      x:{grid:{display:false},ticks:{font:{size:10}}},
-      y:{grid:{color:'#f0f0f0'},ticks:{callback:v=>'R$'+v,font:{size:10}}}
-    }}
+    data:{labels:horasDat.map(x=>x.h),
+      datasets:[{label:'R$',data:horasDat.map(x=>x.v),
+        backgroundColor:horasDat.map(x=>x.v>=maxH*0.7?BLUE:x.v>=maxH*0.35?'#85B7EB':'#D3E8F8'),borderRadius:3}]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>'R$'+c.parsed.y}}},
+      scales:{x:{grid:{display:false},ticks:{font:{size:9},color:'#888'}},y:{display:false}}}
   });
+  const picoMax = horasDat.reduce((a,b)=>b.v>a.v?b:a,{h:'—',v:0});
+  const picoEl = document.getElementById('nk-pico-insight');
+  if (picoEl && picoMax.v > 0) { picoEl.style.display='block'; picoEl.textContent = picoMax.h + ' é o horário mais lucrativo (' + R2(picoMax.v) + ')'; }
 
-  // Gráfico 5: Por veículo
-  if (d.fatPorVeiculo && Object.keys(d.fatPorVeiculo).length > 0) {
-    const vLabels = Object.keys(d.fatPorVeiculo).sort();
-    const vData   = vLabels.map(k => d.fatPorVeiculo[k]);
-    const vColors = vLabels.map(k => k.startsWith('Carro') ? BLUE : k.startsWith('Triciclo') ? GREEN : PINK);
-    if (window.chartVeiculo) window.chartVeiculo.destroy();
-    window.chartVeiculo = new Chart(document.getElementById('chart-veiculo'), {
-      type:'bar',
-      data:{ labels:vLabels, datasets:[{label:'R$',data:vData,backgroundColor:vColors,borderRadius:4}]},
-      options:{indexAxis:'y',responsive:true,plugins:{legend:{display:false}},
-        scales:{x:{ticks:{callback:v=>'R$'+v,font:{size:10}}},y:{ticks:{font:{size:10}}}}}
-    });
-  }
+  // Por tipo
+  const tp = d.fatPorTipo || {};
+  const totTipo = (tp['Carro']||0)+(tp['Triciclo']||0)+(tp['Pelúcia']||0) || 1;
+  const maxTipo = Math.max(tp['Carro']||0, tp['Triciclo']||0, tp['Pelúcia']||0, 1);
+  const tiposArr = [{n:'Carros',k:'Carro',cor:BLUE},{n:'Triciclos',k:'Triciclo',cor:GREEN},{n:'Pelúcias',k:'Pelúcia',cor:PINK}].filter(t=>(tp[t.k]||0)>0);
+  const tipoEl = document.getElementById('nk-tipo-rows');
+  if (tipoEl) tipoEl.innerHTML = tiposArr.map(t=>{const v=tp[t.k]||0,p=pct2(v,totTipo),bw=Math.round(v/maxTipo*100);return `<div class="nb-row"><div class="nb-dot" style="background:${t.cor}"></div><div class="nb-name">${t.n}</div><div class="nb-bar-bg"><div class="nb-bar-fill" style="width:${bw}%;background:${t.cor}"></div></div><div class="nb-val">${R2(v)}</div><div class="nb-pct">${p}%</div></div>`;}).join('')||'<div class="nks">Sem dados</div>';
+  const tipInsEl = document.getElementById('nk-tipo-insight');
+  if (tipInsEl && tiposArr.length>0) { const top=tiposArr.reduce((a,b)=>(tp[b.k]||0)>(tp[a.k]||0)?b:a,tiposArr[0]); tipInsEl.style.display='block'; tipInsEl.textContent=top.n+' lideram com '+pct2(tp[top.k]||0,totTipo)+'% do faturamento.'; }
 
-  // Ranking de veículos na tabela do dashboard (Fase 4)
-  renderDashVehRank(d.fatPorVeiculo);
+  // Ranking veículos
+  const fv = d.fatPorVeiculo || {};
+  const totV = Object.values(fv).reduce((a,b)=>a+b,0) || 1;
+  const maxV = Math.max(...Object.values(fv),1);
+  const veics = Object.keys(fv).sort((a,b)=>fv[b]-fv[a]);
+  const veicEl = document.getElementById('nk-veiculo-rank');
+  if (veicEl) veicEl.innerHTML = veics.map((v,i)=>{const val=fv[v]||0,cor=v.startsWith('Carro')?BLUE:v.startsWith('Triciclo')?GREEN:PINK,bw=Math.round(val/maxV*100),p=pct2(val,totV);return `<div class="nb-row"><div class="nb-n">${i+1}</div><div class="nb-name">${v}</div><div class="nb-bar-bg"><div class="nb-bar-fill" style="width:${bw}%;background:${cor}"></div></div><div class="nb-val">${R2(val)}</div><div class="nb-pct">${p}%</div></div>`;}).join('')||'<div class="nks">Sem dados</div>';
 
-  // Gráfico 6: Por pagamento
-  if (d.fatPorPagamento && Object.keys(d.fatPorPagamento).length > 0) {
-    const pLabels = Object.keys(d.fatPorPagamento);
-    const pData   = pLabels.map(k => d.fatPorPagamento[k]);
-    const pColors = [BLUE,'#534AB7',GREEN,AMBER];
-    if (window.chartPagamento) window.chartPagamento.destroy();
-    window.chartPagamento = new Chart(document.getElementById('chart-pagamento'), {
-      type:'doughnut',
-      data:{ labels:pLabels, datasets:[{data:pData,backgroundColor:pColors,borderWidth:0}]},
-      options:{responsive:true,cutout:'60%',
-        plugins:{legend:{position:'bottom',labels:{font:{size:10},padding:8}},
-          tooltip:{callbacks:{label:ctx=>{
-            const tot=ctx.dataset.data.reduce((a,b)=>a+b,0);
-            return ctx.label+': R$'+ctx.parsed.toFixed(2)+' ('+Math.round(ctx.parsed/tot*100)+'%)';
-          }}}}}
-    });
-  }
+  // Pagamento
+  const fp = d.fatPorPagamento || {};
+  const totP = Object.values(fp).reduce((a,b)=>a+b,0) || 1;
+  const maxP = Math.max(...Object.values(fp),1);
+  const pagCorsD = {'Pix':BLUE,'Cartão':'#534AB7','Dinheiro':GREEN,'Crédito':'#534AB7','Débito':AMBER};
+  const pags = Object.keys(fp).sort((a,b)=>fp[b]-fp[a]);
+  const pagEl = document.getElementById('nk-pag-rows');
+  if (pagEl) pagEl.innerHTML = pags.map(p=>{const val=fp[p]||0,cor=pagCorsD[p]||AMBER,bw=Math.round(val/maxP*100),pcc=pct2(val,totP);return `<div class="nb-row"><div class="nb-dot" style="background:${cor}"></div><div class="nb-name">${p}</div><div class="nb-bar-bg"><div class="nb-bar-fill" style="width:${bw}%;background:${cor}"></div></div><div class="nb-val">${R2(val)}</div><div class="nb-pct">${pcc}%</div></div>`;}).join('')||'<div class="nks">Sem dados</div>';
 
-  // Update dashboard title
-  const el = document.getElementById('dash-title');
-  if(el && d.mesAtual && d.anoAtual) {
-    const MESES=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-    el.textContent = 'Dashboard — '+MESES[d.mesAtual-1]+'/'+d.anoAtual;
-  }
+  // Por plano
+  const pl = d.fatPorPlano || {};
+  const plOrder = ['10min','20min','30min','40min','60min','3h'];
+  const totPl = plOrder.reduce((a,k)=>a+(pl[k]||0),0) || 1;
+  const maxPl = Math.max(...plOrder.map(k=>pl[k]||0),1);
+  const plEl = document.getElementById('nk-plano-rows');
+  if (plEl) plEl.innerHTML = plOrder.filter(k=>(pl[k]||0)>0).map(k=>{const val=pl[k]||0,bw=Math.round(val/maxPl*100),pcc=pct2(val,totPl);return `<div class="nb-row"><div class="nb-name">${PLAN_LABELS[k]||k}</div><div class="nb-bar-bg"><div class="nb-bar-fill" style="width:${bw}%;background:${AMBER}"></div></div><div class="nb-val">R$${Math.round(val)}</div><div class="nb-pct">${pcc}%</div></div>`;}).join('')||'<div class="nks">Sem dados</div>';
+  const topPl = plOrder.filter(k=>pl[k]>0).reduce((a,b)=>(pl[b]||0)>(pl[a]||0)?b:a,'10min');
+  const plInsEl = document.getElementById('nk-plano-insight');
+  if (plInsEl && pl[topPl]) { plInsEl.style.display='block'; plInsEl.textContent = (PLAN_LABELS[topPl]||topPl)+' é o plano mais popular: '+pct2(pl[topPl],totPl)+'% do faturamento.'; }
+
+  chartTipo=null; chartPlano=null;
 }
-
-
 // ── CAIXA DO DIA ─────────────────────────────────────────────────────────
 const fmtR = v => 'R$ ' + Number(v).toFixed(2).replace('.',',').replace(/\B(?=(\d{3})+(?!\d))/g,'.');
 const pagCor = {'PIX':'background:#E6F1FB;color:#0C447C','Crédito':'background:#EEEDFE;color:#3C3489','Débito':'background:#EAF3DE;color:#27500A','Dinheiro':'background:#FAEEDA;color:#633806'};
