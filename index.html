@@ -21,7 +21,7 @@
 // ── CACHE BUSTER v1.3.0 ─────────────────────────────────
 // Força limpeza do SW antigo e recarga com versão nova
 (function(){
-  const CURRENT = 'movikids-v1.6.1';
+  const CURRENT = 'movikids-v1.6.2';
   if ('serviceWorker' in navigator) {
     // Desregistra SWs antigos
     navigator.serviceWorker.getRegistrations().then(function(regs) {
@@ -1000,6 +1000,17 @@ nav button .nav-badge{
   letter-spacing:.04em;margin:14px 0 6px;
 }
 
+
+/* Triciclo — Fase nova: mesmo preço do Carro, cor verde */
+.pcard.em-uso-triciclo{
+  background:linear-gradient(135deg,#E8F5E9,#C8E6C9);
+  border-color:#66BB6A;color:#1B5E20;
+}
+.pcard.em-uso-triciclo.warn{
+  background:linear-gradient(135deg,#FFF3E0,#FFE0B2);
+  border-color:#FF9800;color:#E65100;
+}
+
 </style>
 </head>
 
@@ -1158,6 +1169,14 @@ nav button .nav-badge{
           <div class="vc-icon">🚗</div>
           <div class="vc-name">Carro 03</div>
           <div class="vc-status livre" id="vc-st-Carro 03">✓ Livre</div>
+        </div>
+      </div>
+      <div class="vc-section-label">Triciclos elétricos</div>
+      <div class="veiculo-grid-triciclos" id="vc-grid-triciclos">
+        <div class="vc-card" id="vc-Triciclo 01" onclick="selectVeiculo(this,'Triciclo 01','Triciclo')">
+          <div class="vc-icon">🛺</div>
+          <div class="vc-name">Triciclo 01</div>
+          <div class="vc-status livre" id="vc-st-Triciclo 01">✓ Livre</div>
         </div>
       </div>
       <div class="vc-section-label">Pelúcias elétricas</div>
@@ -1551,6 +1570,7 @@ nav button .nav-badge{
         <option value="Carro 01">Carro 01</option>
         <option value="Carro 02">Carro 02</option>
         <option value="Carro 03">Carro 03</option>
+        <option value="Triciclo 01">Triciclo 01</option>
         <option value="Pelúcia 01">Pelúcia 01</option>
         <option value="Pelúcia 02">Pelúcia 02</option>
         <option value="Pelúcia 03">Pelúcia 03</option>
@@ -1727,11 +1747,13 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = 'v1.6.1';
+const APP_VERSION = 'v1.6.2';
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec';
 
 const PRECOS = {
   'Carro':   { '10min':{v:12,m:10,a:1.00},'20min':{v:22,m:20,a:1.00},'30min':{v:30,m:30,a:1.00},
+               '40min':{v:40,m:40,a:1.00},'60min':{v:55,m:60,a:1.00},'3h':{v:130,m:180,a:1.00} },
+  'Triciclo': { '10min':{v:12,m:10,a:1.00},'20min':{v:22,m:20,a:1.00},'30min':{v:30,m:30,a:1.00},
                '40min':{v:40,m:40,a:1.00},'60min':{v:55,m:60,a:1.00},'3h':{v:130,m:180,a:1.00} },
   'Pelúcia': { '10min':{v:15,m:10,a:1.20},'20min':{v:25,m:20,a:1.20},'30min':{v:35,m:30,a:1.20},
                '40min':{v:45,m:40,a:1.20},'60min':{v:65,m:60,a:1.20},'3h':{v:150,m:180,a:1.20} }
@@ -2052,9 +2074,9 @@ function renderCards() {
 }
 
 function buildCard(s) {
-  const cls     = s.tipo === 'Carro' ? 'carro' : 'pelucia';
+  const cls     = s.tipo === 'Pelúcia' ? 'pelucia' : 'carro'; // Triciclo usa tema carro
   const badgeCls= s.tipo === 'Pelúcia' ? 'pelucia' : '';
-  const icon    = s.tipo === 'Carro' ? '🚗' : '🧸';
+  const icon    = tipoIcon(s.tipo);
 
   // ── Card pendente (aguardando início) ────────────────────────────────
   if (!s.started) {
@@ -2109,7 +2131,7 @@ function buildCard(s) {
   const CIRCUM   = 220;
   const progress = isOver ? 0 : Math.max(0, rem / total);
   const offset   = CIRCUM * (1 - progress);
-  const ringColor= isOver ? '#B71C1C' : isWarn ? '#E65100' : (s.tipo === 'Carro' ? '#1565C0' : '#C2185B');
+  const ringColor= isOver ? '#B71C1C' : isWarn ? '#E65100' : tipoCor(s.tipo);
 
   const vPlano= PRECOS[s.tipo]?.[s.plano]?.v || 0;
   const vFmt  = 'R$ ' + String(vPlano).replace('.',',') + ',00';
@@ -2212,7 +2234,7 @@ function atualizarVeiculoGrid() {
     }
   });
 
-  const todosVeiculos = ['Carro 01','Carro 02','Carro 03','Pelúcia 01','Pelúcia 02','Pelúcia 03','Pelúcia 04'];
+  const todosVeiculos = ['Carro 01','Carro 02','Carro 03','Triciclo 01','Pelúcia 01','Pelúcia 02','Pelúcia 03','Pelúcia 04'];
   todosVeiculos.forEach(nome => {
     const card = document.getElementById('vc-' + nome);
     const stEl = document.getElementById('vc-st-' + nome);
@@ -2299,7 +2321,7 @@ function selectPlano(plano, el) {
   const cls   = tipo === 'Pelúcia' ? 'pelucia' : '';
   document.getElementById('review-card-wrap').innerHTML = `
     <div class="review-card ${cls}">
-      <div class="rc-tipo">${tipo === 'Carro' ? '🚗' : '🧸'} ${tipo}</div>
+      <div class="rc-tipo">${tipoIcon(tipo)} ${tipo}</div>
       <div class="rc-plano">${PLANO_LABELS[plano]}</div>
       <div class="rc-valor">R$ ${cfg.v} · adicional R$ ${cfg.a}/min</div>
     </div>`;
@@ -2348,7 +2370,7 @@ function irParaPagamento() {
   novaState.observacao = obs;
   const wrap = document.getElementById('pag-review-wrap');
   if (wrap) {
-    const icon = tipo === 'Carro' ? '🚗' : '🧸';
+    const icon = tipoIcon(tipo);
     wrap.innerHTML = '<div class="pag-resumo">' +
       '<div class="pag-resumo-row"><span>Veículo</span><span>' + icon + ' ' + (veiculo||tipo) + '</span></div>' +
       '<div class="pag-resumo-row"><span>Plano</span><span>' + (PLANO_LABELS[plano]||plano) + '</span></div>' +
@@ -2476,7 +2498,7 @@ function pedirEncerrar(rowIndex) {
   const vExtra        = (minExtra * encSession.adicionalPorMin).toFixed(2).replace('.',',');
   const vBase         = PRECOS[encSession.tipo]?.[encSession.plano]?.v || encSession.valorPlano;
   const vTotal        = (vBase + minExtra * encSession.adicionalPorMin).toFixed(2).replace('.',',');
-  const icon     = encSession.tipo === 'Carro' ? '🚗' : '🧸';
+  const icon     = tipoIcon(encSession.tipo);
 
   document.getElementById('enc-info').innerHTML = `
     <div class="modal-info-row"><span>${icon} Tipo</span><span>${encSession.tipo}</span></div>
@@ -2585,7 +2607,7 @@ function showAlertModal(s, expired) {
     : 'Avise ' + s.responsavel + ' que o tempo de ' + s.crianca + ' está acabando.';
 
   const vPlano = PRECOS[s.tipo]?.[s.plano]?.v || s.valorPlano;
-  const icon   = s.tipo === 'Carro' ? '🚗' : '🧸';
+  const icon   = tipoIcon(s.tipo);
   document.getElementById('alert-info').innerHTML =
     '<div class="modal-info-row"><span>' + icon + ' ' + (s.veiculo||s.tipo) + '</span><span>' + s.plano + '</span></div>' +
     '<div class="modal-info-row"><span>Criança</span><span>' + s.crianca + '</span></div>' +
@@ -2861,7 +2883,7 @@ async function buscarHistorico() {
       return;
     }
     container.innerHTML = res.locacoes.map(l=>{
-      const icon=l.tipo==='Carro'?'🚗':'🧸';
+      const icon=tipoIcon(l.tipo);
       const vT=Number(l.valorTotal).toFixed(2).replace('.',',');
       const vE=Number(l.valorAdicional);
       const sc=l.status==='Ativa'?'ativa':'encerrada';
@@ -2990,7 +3012,7 @@ function filtrarPorVeiculo() {
   }
 
   container.innerHTML = lista.map(l => {
-    const icon = l.tipo === 'Carro' ? '🚗' : '🧸';
+    const icon = tipoIcon(l.tipo);
     const vT   = Number(l.valorTotal).toFixed(2).replace('.', ',');
     const vE   = Number(l.valorAdicional);
     const sc   = l.status === 'Ativa' ? 'ativa' : 'encerrada';
@@ -3035,12 +3057,12 @@ function renderVrankSection(locacoes) {
   const maxCount = countMap[veiculos[0]];
 
   grid.innerHTML = veiculos.map((v, i) => {
-    const isCarro = v.startsWith('Carro');
-    const icon    = isCarro ? '🚗' : '🧸';
+    const tipo    = v.startsWith('Carro') ? 'Carro' : v.startsWith('Triciclo') ? 'Triciclo' : 'Pelúcia';
+    const icon    = tipoIcon(tipo);
     const pct     = maxCount > 0 ? Math.round(countMap[v] / maxCount * 100) : 0;
     const fat     = 'R$ ' + fatMap[v].toFixed(2).replace('.', ',');
     const cls     = i === 0 ? 'vrank-card top1' : 'vrank-card';
-    const barClr  = isCarro ? 'var(--blue)' : 'var(--pink)';
+    const barClr  = tipo === 'Carro' ? 'var(--blue)' : tipo === 'Triciclo' ? '#2E7D32' : 'var(--pink)';
     return `<div class="${cls}">
       <span class="vr-rank">#${i + 1}</span>
       <div class="vr-icon">${icon}</div>
@@ -3086,11 +3108,11 @@ function renderDashVehRank(fatPorVeiculo) {
   tbody.innerHTML = veiculos.map((v, i) => {
     const fat    = fatPorVeiculo[v] || 0;
     const pct    = total > 0 ? (fat / total * 100) : 0;
-    const isCar  = v.startsWith('Carro');
-    const clr    = isCar ? '#1565C0' : '#C2185B';
+    const tipoV  = v.startsWith('Carro') ? 'Carro' : v.startsWith('Triciclo') ? 'Triciclo' : 'Pelúcia';
+    const clr    = tipoCor(tipoV);
     return `<tr>
       <td style="font-weight:800;color:var(--txt3);width:20px">${i + 1}</td>
-      <td style="font-weight:700">${isCar ? '🚗' : '🧸'} ${v}</td>
+      <td style="font-weight:700">${tipoIcon(tipoV)} ${v}</td>
       <td style="font-weight:700">R$${fat.toFixed(0)}</td>
       <td>
         <div class="veh-bar-wrap">
@@ -3259,9 +3281,9 @@ function renderCharts(d) {
   chartTipo = new Chart(document.getElementById('chart-tipo'), {
     type:'doughnut',
     data:{
-      labels:['🚗 Carro','🧸 Pelúcia'],
-      datasets:[{data:[tipoData['Carro']||0,tipoData['Pelúcia']||0],
-        backgroundColor:[BLUE,PINK],borderWidth:0}]
+      labels:['🚗 Carro','🛺 Triciclo','🧸 Pelúcia'],
+      datasets:[{data:[tipoData['Carro']||0,tipoData['Triciclo']||0,tipoData['Pelúcia']||0],
+        backgroundColor:[BLUE,GREEN,PINK],borderWidth:0}]
     },
     options:{responsive:true,plugins:{legend:{position:'bottom',labels:{font:{size:10},padding:8}}},
       cutout:'65%'}
@@ -3302,7 +3324,7 @@ function renderCharts(d) {
   if (d.fatPorVeiculo && Object.keys(d.fatPorVeiculo).length > 0) {
     const vLabels = Object.keys(d.fatPorVeiculo).sort();
     const vData   = vLabels.map(k => d.fatPorVeiculo[k]);
-    const vColors = vLabels.map(k => k.startsWith('Carro') ? BLUE : PINK);
+    const vColors = vLabels.map(k => k.startsWith('Carro') ? BLUE : k.startsWith('Triciclo') ? GREEN : PINK);
     if (window.chartVeiculo) window.chartVeiculo.destroy();
     window.chartVeiculo = new Chart(document.getElementById('chart-veiculo'), {
       type:'bar',
@@ -3672,10 +3694,28 @@ function updateAdminTimer(s) {
 // FASE 3 — PAINEL DE OPERAÇÃO AO VIVO (v1.6.0)
 // ═══════════════════════════════════════════════════════════
 
+// ── Helpers de tipo (Carro / Triciclo / Pelúcia) ──────────────
+function tipoIcon(tipo) {
+  if (tipo === 'Carro')    return '🚗';
+  if (tipo === 'Triciclo') return '🛺';
+  return '🧸'; // Pelúcia
+}
+function tipoCor(tipo) {
+  if (tipo === 'Carro')    return '#1565C0';
+  if (tipo === 'Triciclo') return '#2E7D32';
+  return '#C2185B'; // Pelúcia
+}
+function tipoLabel(tipo) {
+  if (tipo === 'Carro')    return '🚗 Carros';
+  if (tipo === 'Triciclo') return '🛺 Triciclos';
+  return '🧸 Pelúcias';
+}
+
 const TODOS_VEICULOS_DEF = [
   {nome:'Carro 01',   tipo:'Carro'},
   {nome:'Carro 02',   tipo:'Carro'},
   {nome:'Carro 03',   tipo:'Carro'},
+  {nome:'Triciclo 01', tipo:'Triciclo'},
   {nome:'Pelúcia 01', tipo:'Pelúcia'},
   {nome:'Pelúcia 02', tipo:'Pelúcia'},
   {nome:'Pelúcia 03', tipo:'Pelúcia'},
@@ -3705,18 +3745,21 @@ function renderPainel() {
   if (phPend)   phPend.textContent   = pendentes;
 
   // Rebuild grid
-  const carros   = TODOS_VEICULOS_DEF.filter(v => v.tipo === 'Carro');
-  const pelucias = TODOS_VEICULOS_DEF.filter(v => v.tipo === 'Pelúcia');
+  const carros     = TODOS_VEICULOS_DEF.filter(v => v.tipo === 'Carro');
+  const triciclos  = TODOS_VEICULOS_DEF.filter(v => v.tipo === 'Triciclo');
+  const pelucias   = TODOS_VEICULOS_DEF.filter(v => v.tipo === 'Pelúcia');
 
   grid.innerHTML =
     '<div class="painel-sec-label">🚗 Carros elétricos</div>' +
     carros.map(v => buildPainelCard(v.nome, v.tipo, sessMap[v.nome])).join('') +
+    (triciclos.length ? '<div class="painel-sec-label">🛺 Triciclos elétricos</div>' +
+      triciclos.map(v => buildPainelCard(v.nome, v.tipo, sessMap[v.nome])).join('') : '') +
     '<div class="painel-sec-label">🧸 Pelúcias elétricas</div>' +
     pelucias.map(v => buildPainelCard(v.nome, v.tipo, sessMap[v.nome])).join('');
 }
 
 function buildPainelCard(nome, tipo, s) {
-  const icon    = tipo === 'Carro' ? '🚗' : '🧸';
+  const icon    = tipoIcon(tipo);
   const nomeShort = nome.replace('Pelúcia', 'Pel.'); // abreviação para card compacto
 
   // ── LIVRE ───────────────────────────────────────────────
@@ -3760,14 +3803,14 @@ function buildPainelCard(nome, tipo, s) {
     progressPct = 0;
     barColor  = '#E53935';
   } else if (isWarn) {
-    cardCls   = tipo === 'Carro' ? 'pcard em-uso-carro warn' : 'pcard em-uso-pelucia warn';
+    cardCls   = tipo === 'Carro' ? 'pcard em-uso-carro warn' : tipo === 'Triciclo' ? 'pcard em-uso-triciclo warn' : 'pcard em-uso-pelucia warn';
     timerTxt  = fmtTime(rem);
     timerCls  = 'pcard-timer warn';
     subLbl    = 'Restante ⚠️';
     progressPct = Math.max(0, (rem / total) * 100);
     barColor  = '#FF9800';
   } else {
-    cardCls   = tipo === 'Carro' ? 'pcard em-uso-carro' : 'pcard em-uso-pelucia';
+    cardCls   = tipo === 'Carro' ? 'pcard em-uso-carro' : tipo === 'Triciclo' ? 'pcard em-uso-triciclo' : 'pcard em-uso-pelucia';
     timerTxt  = fmtTime(rem);
     timerCls  = 'pcard-timer';
     subLbl    = 'Restante';
@@ -3816,7 +3859,7 @@ function abrirEstender(rowIndex) {
   if (!estSession) return;
   estMins = 0;
 
-  const icon = estSession.tipo === 'Carro' ? '🚗' : '🧸';
+  const icon = estSession.tipoIcon(tipo);
   document.getElementById('est-info').innerHTML =
     '<div class="modal-info-row"><span>' + icon + ' ' + escHtml(estSession.veiculo || estSession.tipo) + '</span><span>' + estSession.plano + '</span></div>' +
     '<div class="modal-info-row"><span>Criança</span><span>' + escHtml(estSession.crianca) + '</span></div>' +
@@ -3885,7 +3928,7 @@ function renderEncHoje(list) {
   if (!encHojeData.length) { section.style.display='none'; return; }
   section.style.display='block';
   container.innerHTML = encHojeData.map(e=>{
-    const icon = e.tipo==='Carro'?'🚗':'🧸';
+    const icon = tipoIcon(e.tipo);
     const v = isAdmin ? `<div class="enc-valor">R$ ${Number(e.valorTotal).toFixed(2).replace('.',',')}</div>` : '';
     return `<div class="enc-item">
       <div class="enc-left">
@@ -3918,11 +3961,11 @@ function showAdminHomeKpis(d) {
   const rows    = document.getElementById('h-rank-rows');
   if (!ranking||!rows) return;
   const pt = d.fatPorTipo||{};
-  const total = (pt['Carro']||0)+(pt['Pelúcia']||0);
+  const total = (pt['Carro']||0)+(pt['Triciclo']||0)+(pt['Pelúcia']||0);
   if (!total) return;
   ranking.style.display='block';
   const pct = v => total>0 ? Math.round(v/total*100) : 0;
-  rows.innerHTML = [['🚗 Carros','Carro','#1565C0'],['🧸 Pelúcias','Pelúcia','#C2185B']].map(([label,key,color])=>{
+  rows.innerHTML = [['🚗 Carros','Carro','#1565C0'],['🛺 Triciclos','Triciclo','#2E7D32'],['🧸 Pelúcias','Pelúcia','#C2185B']].map(([label,key,color])=>{
     const n = pt[key]||0, p = pct(n);
     return `<div class="rank-row">
       <div class="rank-label"><span>${label}</span><span>${p}% — R$ ${n.toFixed(0)}</span></div>
@@ -3998,9 +4041,9 @@ function renderAnalyticsCards(stats) {
   ranking.style.display='block';
   const sorted = Object.entries(pt).sort((a,b)=>b[1].n-a[1].n);
   rankRows.innerHTML = sorted.map(([tipo,d])=>{
-    const icon=tipo==='Carro'?'🚗':'🧸';
+    const icon=tipoIcon(tipo);
     const pct=total>0?Math.round(d.n/total*100):0;
-    const color=tipo==='Carro'?'#1565C0':'#C2185B';
+    const color=tipoCor(tipo);
     return `<div class="rank-row">
       <div class="rank-label"><span>${icon} ${tipo}</span><span>${d.n} atten. · ${pct}% · ${R(d.fat)}</span></div>
       <div class="rank-bar-bg"><div class="rank-bar" style="width:${pct}%;background:${color}"></div></div>
@@ -4010,8 +4053,9 @@ function renderAnalyticsCards(stats) {
   // Insight estratégico
   const lider = sorted[0];
   const insights = {
-    'Carro': '🚗 Carros lideram — considere ampliar a frota de carros.',
-    'Pelúcia': '🧸 Pelúcias lideram — invista em mais pelúcias elétricas.'
+    'Carro':    '🚗 Carros lideram — considere ampliar a frota de carros.',
+    'Triciclo': '🛺 Triciclos lideram — ótima adesão ao novo veículo!',
+    'Pelúcia':  '🧸 Pelúcias lideram — invista em mais pelúcias elétricas.'
   };
   if(rankInsight) rankInsight.textContent = insights[lider[0]] || '';
 
