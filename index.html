@@ -21,7 +21,7 @@
 // ── CACHE BUSTER v1.3.0 ─────────────────────────────────
 // Força limpeza do SW antigo e recarga com versão nova
 (function(){
-  const CURRENT = 'movikids-v1.6.3';
+  const CURRENT = 'movikids-v1.6.4';
   if ('serviceWorker' in navigator) {
     // Desregistra SWs antigos
     navigator.serviceWorker.getRegistrations().then(function(regs) {
@@ -1748,7 +1748,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = 'v1.6.3';
+const APP_VERSION = 'v1.6.4';
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec';
 
 const PRECOS = {
@@ -2424,6 +2424,9 @@ async function confirmarLocacao() {
   btn.textContent = '⏳ Iniciando...'; btn.disabled = true;
 
   try {
+    // Preço local como fallback caso GAS não conheça o tipo (ex: Triciclo em GAS antigo)
+    const cfgLocal = (PRECOS[novaState.tipo] && PRECOS[novaState.tipo][novaState.plano]) || {};
+
     const d = await api({
       action: 'salvarLocacao',
       tipo:         novaState.tipo,
@@ -2433,7 +2436,11 @@ async function confirmarLocacao() {
       observacao:   novaState.observacao || '',
       responsavel:  resp,
       crianca:      cri,
-      telefone:     tel
+      telefone:     tel,
+      // Enviado para que o GAS possa usar se o tipo for novo (Triciclo etc.)
+      valorPlano:      cfgLocal.v || 0,
+      mins:            cfgLocal.m || 0,
+      adicionalPorMin: cfgLocal.a || 1.00
     });
 
     if (!d.ok) { toast('Erro: ' + d.erro, 'error'); return; }
@@ -2448,9 +2455,9 @@ async function confirmarLocacao() {
       veiculo:         novaState.veiculo,
       pagamento:       novaState.pagamento,
       observacao:      novaState.observacao || '',
-      mins:            d.mins,
-      valorPlano:      d.valorPlano,
-      adicionalPorMin: d.adicionalPorMin,
+      mins:            d.mins            || cfgLocal.m,   // fallback local
+      valorPlano:      d.valorPlano      || cfgLocal.v,
+      adicionalPorMin: d.adicionalPorMin || cfgLocal.a,
       responsavel:     resp,
       crianca:         cri,
       telefone:        tel,
