@@ -3020,8 +3020,7 @@ function copiarFechamentoCaixa() {
     `${'─'.repeat(35)}`,
     `RESULTADO: ${fmtR(d.resultado)}`,
     `Locações: ${d.locacoes.length}`,
-  ].join('
-');
+  ].join('\n');
 
   navigator.clipboard.writeText(txt).then(() => toast('Fechamento copiado!', 'success'))
     .catch(() => toast('Não foi possível copiar', 'error'));
