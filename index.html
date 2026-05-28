@@ -823,7 +823,7 @@ nav button .nav-badge{
   <!-- ══ SIDEBAR (desktop only) ══ -->
   <aside id="sidebar">
     <div class="sb-logo">🚗 Movi <span>Kids</span>
-      <div class="sb-status"><span id="sb-dot" class="dot-online"></span><span id="sb-txt">Online</span><span style="font-size:10px;opacity:.85;margin-left:5px;color:rgba(255,255,255,.7);font-family:monospace">v1.5.0</span></div>
+      <div class="sb-status"><span id="sb-dot" class="dot-online"></span><span id="sb-txt">Online</span><span style="font-size:10px;opacity:.85;margin-left:5px;color:rgba(255,255,255,.7);font-family:monospace">v1.5.1</span></div>
     </div>
     <div class="sb-nav" id="sb-nav">
       <button class="sb-btn active" id="sbn-home" onclick="showPage('home')"><span class="sb-icon">🏠</span>Home</button>
@@ -836,6 +836,7 @@ nav button .nav-badge{
       <button class="sb-btn" id="sbn-dash" onclick="irAdmin('dashboard')"><span class="sb-icon">📈</span>Dashboard</button>
       <button class="sb-btn" id="sbn-rel" onclick="irAdmin('relatorio')"><span class="sb-icon">📋</span>Relatório</button>
       <button class="sb-btn" id="sbn-hist" onclick="irAdmin('historico')"><span class="sb-icon">🗂️</span>Histórico</button>
+<button class="sb-btn" id="sbn-caixa" onclick="irAdmin('caixa')"><span class="sb-icon">💰</span>Caixa</button>
     </div>
     <div class="sb-footer">
       <div class="sb-admin-bar" id="sb-admin-bar" style="display:none">
@@ -856,7 +857,7 @@ nav button .nav-badge{
       <div class="hd-status">
         <div id="status-dot" class="dot-online"></div>
         <span id="status-txt">Online</span>
-        <span id="app-version" style="font-size:10px;opacity:.85;margin-left:4px;font-family:monospace">v1.5.0</span>
+        <span id="app-version" style="font-size:10px;opacity:.85;margin-left:4px;font-family:monospace">v1.5.1</span>
       </div>
     </div>
   </header>
@@ -1101,7 +1102,128 @@ nav button .nav-badge{
         </div>
         <div class="aac-arrow">›</div>
       </div>
+      <div class="admin-action-card" onclick="irAdmin('caixa')">
+        <div class="aac-icon">💰</div>
+        <div class="aac-body">
+          <div class="aac-title">Caixa do Dia</div>
+          <div class="aac-sub">Fechamento, conferência e resultado</div>
+        </div>
+        <div class="aac-arrow">›</div>
+      </div>
     </div>
+  </div>
+
+  <!-- ──────── PAGE: CAIXA ──────── -->
+  <div id="page-caixa" class="page">
+    <div class="dash-back" onclick="irAdmin('admin')">← Voltar</div>
+    <div class="sec-title">Caixa do dia</div>
+
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px">
+      <div style="display:flex;align-items:center;gap:8px">
+        <label style="font-size:13px;color:var(--txt2)">Data:</label>
+        <input type="date" id="caixa-data" class="form-input" style="width:auto;padding:6px 10px;font-size:13px">
+      </div>
+      <button class="btn btn-primary" style="padding:8px 18px;font-size:13px" onclick="carregarCaixa()">
+        🔄 Atualizar
+      </button>
+    </div>
+
+    <!-- KPIs -->
+    <div class="kpi-grid" id="caixa-kpis" style="margin-bottom:16px">
+      <div class="kpi-card blue"><div class="kpi-val" id="cx-total">...</div><div class="kpi-lbl">Total do dia</div></div>
+      <div class="kpi-card" style="background:var(--blue-lt);border:1px solid var(--blue)"><div class="kpi-val" style="color:var(--blue)" id="cx-maq">...</div><div class="kpi-lbl">Maquininha</div></div>
+      <div class="kpi-card" style="background:#FFF8E1;border:1px solid #FFB300"><div class="kpi-val" style="color:#854F0B" id="cx-din">...</div><div class="kpi-lbl">Dinheiro</div></div>
+      <div class="kpi-card red"><div class="kpi-val" id="cx-cus">...</div><div class="kpi-lbl">Custos</div></div>
+      <div class="kpi-card green"><div class="kpi-val" id="cx-res">...</div><div class="kpi-lbl">Resultado</div></div>
+      <div class="kpi-card"><div class="kpi-val" id="cx-nloc">...</div><div class="kpi-lbl">Locações</div></div>
+    </div>
+
+    <!-- Conferência -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px" id="cx-conf-grid">
+      <div class="chart-card" style="padding:14px">
+        <div style="font-size:13px;font-weight:500;margin-bottom:10px;display:flex;align-items:center;gap:6px">
+          💳 Conferência maquininha
+        </div>
+        <div id="cx-conf-maq"></div>
+        <div style="font-size:11px;color:var(--txt3);margin-top:8px">
+          ✓ Bater com o total na maquininha
+        </div>
+      </div>
+      <div class="chart-card" style="padding:14px">
+        <div style="font-size:13px;font-weight:500;margin-bottom:10px;display:flex;align-items:center;gap:6px">
+          💵 Conferência dinheiro
+        </div>
+        <div id="cx-conf-din"></div>
+        <div style="font-size:11px;color:var(--txt3);margin-top:8px">
+          ✓ Contar o dinheiro em espécie
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabela Entradas -->
+    <div class="chart-card" style="padding:0;margin-bottom:14px;overflow:hidden">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border)">
+        <span style="font-size:13px;font-weight:500">↑ Entradas — locações do dia</span>
+        <span style="font-size:14px;font-weight:500;color:var(--green)" id="cx-total-ent">R$ 0,00</span>
+      </div>
+      <div style="overflow-x:auto">
+        <table id="cx-tabela-ent" style="width:100%;border-collapse:collapse;font-size:13px">
+          <thead>
+            <tr style="background:var(--bg2)">
+              <th style="padding:8px 12px;text-align:left;font-weight:500;color:var(--txt2);font-size:12px">Horário</th>
+              <th style="padding:8px 12px;text-align:left;font-weight:500;color:var(--txt2);font-size:12px">Veículo</th>
+              <th style="padding:8px 12px;text-align:left;font-weight:500;color:var(--txt2);font-size:12px">Plano</th>
+              <th style="padding:8px 12px;text-align:left;font-weight:500;color:var(--txt2);font-size:12px">Responsável</th>
+              <th style="padding:8px 12px;text-align:left;font-weight:500;color:var(--txt2);font-size:12px">Pagamento</th>
+              <th style="padding:8px 12px;text-align:right;font-weight:500;color:var(--txt2);font-size:12px">Valor</th>
+            </tr>
+          </thead>
+          <tbody id="cx-body-ent">
+            <tr><td colspan="6" style="padding:20px;text-align:center;color:var(--txt3)">Carregando...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Tabela Saídas -->
+    <div class="chart-card" style="padding:0;margin-bottom:14px;overflow:hidden">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border)">
+        <span style="font-size:13px;font-weight:500">↓ Saídas — custos do dia</span>
+        <span style="font-size:14px;font-weight:500;color:var(--danger)" id="cx-total-sai">R$ 0,00</span>
+      </div>
+      <div style="overflow-x:auto">
+        <table id="cx-tabela-sai" style="width:100%;border-collapse:collapse;font-size:13px">
+          <thead>
+            <tr style="background:var(--bg2)">
+              <th style="padding:8px 12px;text-align:left;font-weight:500;color:var(--txt2);font-size:12px">Horário</th>
+              <th style="padding:8px 12px;text-align:left;font-weight:500;color:var(--txt2);font-size:12px">Descrição</th>
+              <th style="padding:8px 12px;text-align:left;font-weight:500;color:var(--txt2);font-size:12px">Categoria</th>
+              <th style="padding:8px 12px;text-align:right;font-weight:500;color:var(--txt2);font-size:12px">Valor</th>
+            </tr>
+          </thead>
+          <tbody id="cx-body-sai">
+            <tr><td colspan="4" style="padding:20px;text-align:center;color:var(--txt3)">Carregando...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Resultado Final -->
+    <div style="background:var(--bg2);border-radius:var(--radius-sm);padding:16px;display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;border:1px solid var(--border)">
+      <div>
+        <div style="font-size:13px;color:var(--txt2)">Resultado do dia</div>
+        <div style="font-size:11px;color:var(--txt3);margin-top:2px">Total entradas − custos</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:22px;font-weight:500" id="cx-resultado-final">R$ 0,00</div>
+        <div style="font-size:11px;color:var(--txt3)" id="cx-resultado-calc"></div>
+      </div>
+    </div>
+
+    <!-- Botão copiar fechamento -->
+    <button class="btn btn-secondary" style="width:100%;padding:11px;font-size:13px" onclick="copiarFechamentoCaixa()">
+      📋 Copiar fechamento
+    </button>
   </div>
 
   <!-- ──────── PAGE: DASHBOARD ──────── -->
@@ -1326,7 +1448,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = 'v1.5.0';
+const APP_VERSION = 'v1.5.1';
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec';
 
 const PRECOS = {
@@ -2596,6 +2718,7 @@ function irAdmin(page) {
     initRelMesSel();
     carregarHistRelatorios();
   }
+  if (page === 'caixa') inicializarCaixa();
 }
 
 // ── KPIs ─────────────────────────────────────────────────────
@@ -2726,6 +2849,184 @@ function renderCharts(d) {
   }
 }
 
+
+// ── CAIXA DO DIA ─────────────────────────────────────────────────────────
+const fmtR = v => 'R$ ' + Number(v).toFixed(2).replace('.',',').replace(/\B(?=(\d{3})+(?!\d))/g,'.');
+const pagCor = {'PIX':'background:#E6F1FB;color:#0C447C','Crédito':'background:#EEEDFE;color:#3C3489','Débito':'background:#EAF3DE;color:#27500A','Dinheiro':'background:#FAEEDA;color:#633806'};
+const pagPill = p => `<span style="font-size:11px;padding:2px 8px;border-radius:20px;font-weight:500;${pagCor[p]||'background:var(--bg2);color:var(--txt)'}">${p||'—'}</span>`;
+
+function inicializarCaixa() {
+  const hoje = new Date();
+  const pad = n => String(n).padStart(2,'0');
+  document.getElementById('caixa-data').value = `${hoje.getFullYear()}-${pad(hoje.getMonth()+1)}-${pad(hoje.getDate())}`;
+  carregarCaixa();
+}
+
+async function carregarCaixa() {
+  const dataEl = document.getElementById('caixa-data');
+  if (!dataEl) return;
+  const [y,m,d] = dataEl.value.split('-');
+  const dataFmt = `${d}/${m}/${y}`;
+
+  // Atualiza KPIs com loading
+  ['cx-total','cx-maq','cx-din','cx-cus','cx-res','cx-nloc'].forEach(id => {
+    const el = document.getElementById(id); if(el) el.textContent = '...';
+  });
+
+  try {
+    // Buscar locações e custos em paralelo
+    const [rLoc, rCus] = await Promise.all([
+      api({ action:'listarHistorico', data: dataFmt }),
+      api({ action:'listarCustos' })
+    ]);
+
+    const locacoes = (rLoc.locacoes||[]).filter(l => l.status === 'Encerrada');
+    const mes = parseInt(m), ano = parseInt(y);
+    const custos = (rCus.custos||[]).filter(c => {
+      const [cd,cm,cy] = String(c.data).split('/');
+      return parseInt(cd) === parseInt(d) && parseInt(cm) === mes && parseInt(cy) === ano;
+    });
+
+    // Calcular totais por pagamento
+    const totPag = {};
+    let totalEnt = 0;
+    locacoes.forEach(l => {
+      const p = l.pagamento || 'Não informado';
+      totPag[p] = (totPag[p]||0) + Number(l.valorTotal);
+      totalEnt += Number(l.valorTotal);
+    });
+
+    const totalMaq = (totPag['PIX']||0) + (totPag['Crédito']||0) + (totPag['Débito']||0);
+    const totalDin  = totPag['Dinheiro'] || 0;
+    const totalCus  = custos.reduce((s,c) => s + Number(c.valor), 0);
+    const cusDin    = custos.filter(c => (c.categoria||'').toLowerCase().includes('dinheiro') || (c.obs||'').toLowerCase().includes('dinheiro')).reduce((s,c) => s+Number(c.valor), 0);
+    const saldoDin  = totalDin - cusDin;
+    const resultado = totalEnt - totalCus;
+
+    // KPIs
+    const setKpi = (id, val, cor) => { const el=document.getElementById(id); if(el){el.textContent=fmtR(val); if(cor)el.style.color=cor;} };
+    setKpi('cx-total', totalEnt, '#3B6D11');
+    setKpi('cx-maq',   totalMaq, '#185FA5');
+    setKpi('cx-din',   totalDin, '#854F0B');
+    setKpi('cx-cus',   totalCus, '#A32D2D');
+    setKpi('cx-res',   resultado, resultado >= 0 ? '#3B6D11' : '#A32D2D');
+    const nloc = document.getElementById('cx-nloc'); if(nloc) nloc.textContent = locacoes.length;
+    document.getElementById('cx-total-ent').textContent = fmtR(totalEnt);
+    document.getElementById('cx-total-sai').textContent = fmtR(totalCus);
+    document.getElementById('cx-resultado-final').textContent = fmtR(resultado);
+    document.getElementById('cx-resultado-final').style.color = resultado >= 0 ? '#3B6D11' : '#A32D2D';
+    document.getElementById('cx-resultado-calc').textContent = `${fmtR(totalEnt)} − ${fmtR(totalCus)}`;
+
+    // Conferência maquininha
+    const maqEl = document.getElementById('cx-conf-maq');
+    if(maqEl) {
+      const formasMaq = ['PIX','Crédito','Débito'];
+      maqEl.innerHTML = formasMaq.map(f =>
+        `<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:0.5px solid var(--border);font-size:13px">
+          <span style="color:var(--txt2)">${pagPill(f)} ${f}</span>
+          <span style="font-weight:500">${fmtR(totPag[f]||0)}</span>
+        </div>`
+      ).join('') +
+      `<div style="display:flex;justify-content:space-between;padding:8px 0 4px;font-size:14px;font-weight:500;border-top:1px solid var(--border);margin-top:4px">
+        <span>Total maquininha</span><span style="color:#185FA5">${fmtR(totalMaq)}</span>
+      </div>`;
+    }
+
+    // Conferência dinheiro
+    const dinEl = document.getElementById('cx-conf-din');
+    if(dinEl) {
+      dinEl.innerHTML =
+        `<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:0.5px solid var(--border);font-size:13px">
+          <span style="color:var(--txt2)">Entradas em dinheiro</span>
+          <span style="font-weight:500">${fmtR(totalDin)}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:0.5px solid var(--border);font-size:13px">
+          <span style="color:var(--txt2)">Custos em dinheiro</span>
+          <span style="font-weight:500;color:#A32D2D">− ${fmtR(cusDin)}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:8px 0 4px;font-size:14px;font-weight:500;border-top:1px solid var(--border);margin-top:4px">
+          <span>Saldo em espécie</span><span style="color:#854F0B">${fmtR(saldoDin)}</span>
+        </div>`;
+    }
+
+    // Tabela entradas
+    const tbody = document.getElementById('cx-body-ent');
+    if(tbody) {
+      if(!locacoes.length) {
+        tbody.innerHTML = '<tr><td colspan="6" style="padding:20px;text-align:center;color:var(--txt3)">Nenhuma locação encerrada neste dia</td></tr>';
+      } else {
+        tbody.innerHTML = [...locacoes].sort((a,b)=>a.horaInicio.localeCompare(b.horaInicio)).map(l => {
+          const temExtra = Number(l.minAdicionais) > 0;
+          const planoStr = (PLANO_LABELS[l.plano]||l.plano) + (temExtra ? ` +${l.minAdicionais}min extra` : '');
+          return `<tr>
+            <td style="padding:8px 12px;border-bottom:0.5px solid var(--border);color:var(--txt)">${l.horaInicio||'—'}</td>
+            <td style="padding:8px 12px;border-bottom:0.5px solid var(--border);color:var(--txt)">${l.veiculo||l.tipo}</td>
+            <td style="padding:8px 12px;border-bottom:0.5px solid var(--border);color:var(--txt)">${planoStr}</td>
+            <td style="padding:8px 12px;border-bottom:0.5px solid var(--border);color:var(--txt)">${l.responsavel||'—'}</td>
+            <td style="padding:8px 12px;border-bottom:0.5px solid var(--border)">${pagPill(l.pagamento)}</td>
+            <td style="padding:8px 12px;border-bottom:0.5px solid var(--border);text-align:right;font-weight:500;color:var(--txt)">${fmtR(l.valorTotal)}</td>
+          </tr>`;
+        }).join('');
+      }
+    }
+
+    // Tabela saídas
+    const tbodySai = document.getElementById('cx-body-sai');
+    if(tbodySai) {
+      if(!custos.length) {
+        tbodySai.innerHTML = '<tr><td colspan="4" style="padding:20px;text-align:center;color:var(--txt3)">Nenhum custo registrado neste dia</td></tr>';
+      } else {
+        tbodySai.innerHTML = custos.map(c =>
+          `<tr>
+            <td style="padding:8px 12px;border-bottom:0.5px solid var(--border);color:var(--txt)">${c.hora||'—'}</td>
+            <td style="padding:8px 12px;border-bottom:0.5px solid var(--border);color:var(--txt)">${c.descricao}</td>
+            <td style="padding:8px 12px;border-bottom:0.5px solid var(--border);color:var(--txt)">${c.categoria||'—'}</td>
+            <td style="padding:8px 12px;border-bottom:0.5px solid var(--border);text-align:right;font-weight:500;color:#A32D2D">${fmtR(c.valor)}</td>
+          </tr>`
+        ).join('');
+      }
+    }
+
+    // Guardar dados para copiar
+    window._caixaData = { dataFmt, totalEnt, totalMaq, totalDin, totalCus, saldoDin, resultado, totPag, locacoes, custos };
+
+  } catch(e) {
+    console.error('carregarCaixa:', e);
+    toast('Erro ao carregar caixa', 'error');
+  }
+}
+
+function copiarFechamentoCaixa() {
+  const d = window._caixaData;
+  if (!d) { toast('Carregue o caixa primeiro', 'error'); return; }
+  const txt = [
+    `FECHAMENTO DE CAIXA — ${d.dataFmt}`,
+    `${'─'.repeat(35)}`,
+    `FATURAMENTO`,
+    `  PIX:        ${fmtR(d.totPag['PIX']||0)}`,
+    `  Crédito:    ${fmtR(d.totPag['Crédito']||0)}`,
+    `  Débito:     ${fmtR(d.totPag['Débito']||0)}`,
+    `  Dinheiro:   ${fmtR(d.totPag['Dinheiro']||0)}`,
+    `  TOTAL:      ${fmtR(d.totalEnt)}`,
+    ``,
+    `CONFERÊNCIA MAQUININHA`,
+    `  PIX + Crédito + Débito = ${fmtR(d.totalMaq)}`,
+    ``,
+    `DINHEIRO EM ESPÉCIE`,
+    `  Entradas:   ${fmtR(d.totalDin)}`,
+    `  Saldo:      ${fmtR(d.saldoDin)}`,
+    ``,
+    `CUSTOS DO DIA: ${fmtR(d.totalCus)}`,
+    `${'─'.repeat(35)}`,
+    `RESULTADO: ${fmtR(d.resultado)}`,
+    `Locações: ${d.locacoes.length}`,
+  ].join('
+');
+
+  navigator.clipboard.writeText(txt).then(() => toast('Fechamento copiado!', 'success'))
+    .catch(() => toast('Não foi possível copiar', 'error'));
+}
+
 // ── RELATÓRIO ────────────────────────────────────────────────
 function initRelMesSel() {
   const hoje = new Date();
@@ -2807,7 +3108,7 @@ async function carregarHistRelatorios() {
 
 // ── OVERRIDE showPage for admin pages ────────────────────────
 function showPage(name) {
-  const adminPages = ['admin','dashboard','relatorio','historico'];
+  const adminPages = ['admin','dashboard','relatorio','historico','caixa'];
   if (adminPages.includes(name) && !isAdmin) { abrirAdmin(); return; }
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
@@ -2834,7 +3135,7 @@ function syncSidebar(page) {
   document.querySelectorAll('.sb-btn').forEach(b => b.classList.remove('active'));
   const map = {
     'home':'sbn-home','nova':'sbn-nova','custos':'sbn-custos',
-    'admin':'sbn-adm','dashboard':'sbn-dash','relatorio':'sbn-rel','historico':'sbn-hist'
+    'admin':'sbn-adm','dashboard':'sbn-dash','relatorio':'sbn-rel','historico':'sbn-hist','caixa':'sbn-caixa'
   };
   if (map[page]) { const el=document.getElementById(map[page]); if(el) el.classList.add('active'); }
 }
