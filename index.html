@@ -21,7 +21,7 @@
 // ── CACHE BUSTER v1.3.0 ─────────────────────────────────
 // Força limpeza do SW antigo e recarga com versão nova
 (function(){
-  const CURRENT = 'movikids-v1.6.18';
+  const CURRENT = 'movikids-v1.6.19';
   if ('serviceWorker' in navigator) {
     // Desregistra SWs antigos
     navigator.serviceWorker.getRegistrations().then(function(regs) {
@@ -1882,7 +1882,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = 'v1.6.18';
+const APP_VERSION = 'v1.6.19';
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec';
 
 const PRECOS = {
@@ -1988,6 +1988,15 @@ async function init() {
 
   // Foco da janela: sempre força sync (troca de aba/app)
   window.addEventListener('focus', () => sincronizarServidor(true));
+
+  // Auto-refresh do Dashboard a cada 60s (dados nunca ficam parados)
+  setInterval(() => {
+    const dashPage = document.getElementById('page-dashboard');
+    if (dashPage && dashPage.classList.contains('active') &&
+        document.visibilityState === 'visible') {
+      carregarKPIs();
+    }
+  }, 60000);
 
   // Watcher de ociosidade: a cada 60s verifica se idle > 5min
   // (dispara mesmo se o tab estiver ativo mas sem interação)
@@ -3432,7 +3441,10 @@ function tickAdmin() {
 function irAdmin(page) {
   resetAdminTimer();
   showPage(page);
-  if (page === 'dashboard' && kpiData) renderCharts(kpiData);
+  if (page === 'dashboard') {
+    // Busca dados frescos do servidor — re-renderiza gráficos ao terminar (fix race condition)
+    carregarKPIs();
+  }
   if (page === 'relatorio') {
     initRelMesSel();
     carregarHistRelatorios();
@@ -3446,6 +3458,9 @@ async function carregarKPIs() {
     const d = await api({ action: 'buscarKPIsAdmin' });
     if (!d.ok) return;
     kpiData = d;
+    // Re-renderiza gráficos com dados frescos (fix: gráficos ficavam com dados velhos)
+    const dashPage = document.getElementById('page-dashboard');
+    if (dashPage && dashPage.classList.contains('active')) renderCharts(d);
     setText2('k-fathoje', R2(d.fatHoje));
     setText2('k-cushoje', R2(d.cusHoje));
     setText2('k-fatmes',  R2(d.fatMes));
@@ -3922,6 +3937,7 @@ function showPage(name) {
   syncSidebar(name);
   if (name==='nova') { resetNova(); atualizarVeiculoGrid(); }
   if (name==='painel') renderPainel();
+  if (name==='dashboard') { if (kpiData && kpiData.ok) renderCharts(kpiData); carregarKPIs(); }
   if (name==='custos') loadCustosHoje();
   if (name==='historico') buscarHistorico(); // FIX BUG-007: if(!currentPeriod) sempre false pois currentPeriod='hoje' na declaração
   if (name==='admin' && isAdmin) { resetAdminTimer(); if(!kpiData) carregarKPIs(); }
