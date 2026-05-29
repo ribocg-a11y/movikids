@@ -21,7 +21,7 @@
 // ── CACHE BUSTER v1.3.0 ─────────────────────────────────
 // Força limpeza do SW antigo e recarga com versão nova
 (function(){
-  const CURRENT = 'movikids-v1.6.21';
+  const CURRENT = 'movikids-v1.6.22';
   if ('serviceWorker' in navigator) {
     // Desregistra SWs antigos
     navigator.serviceWorker.getRegistrations().then(function(regs) {
@@ -2035,7 +2035,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = 'v1.6.21';
+const APP_VERSION = 'v1.6.22';
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec';
 
 const PRECOS = {
@@ -3049,10 +3049,10 @@ function enviarWaTel(tel, msg) {
 // -- FASE 6: Config de mensagens --
 let appConfig = {};
 const MSG_DEF = {
-  msg_boasvindas:    'Ola, [nome]! Sua crianca [crianca] acabou de comecar na *Movi Kids*!\n\nVeiculo: [veiculo] | Plano: [plano] | Valor: [valor]\n\nAcompanhe o tempo:\n[link]\n\n*Movi Kids -- diversao com seguranca!*',
-  msg_alerta:        'Oi, [nome]! Faltam apenas *[minutos] minuto(s)* para o tempo de [crianca] encerrar!\n\nSe quiser continuar, fale com o operador. ;)\n\nCronometro: [link]\n\n*Movi Kids -- cada minuto e uma memoria!*',
-  msg_esgotado:      'Oi, [nome]! O tempo de [crianca] *ja encerrou*. O extra e de [adicional]/minuto.\n\nPor favor, dirija-se ao operador.\n\nVeja o tempo extra: [link]\n\n*Movi Kids -- obrigado!*',
-  msg_agradecimento: 'Oi, [nome]! Foi um prazer receber [crianca] na *Movi Kids* hoje!\n\nEsperamos que tenha se divertido muito!\n\n[link_avaliacao]\n\n*Ate a proxima! Movi Kids -- diversao com seguranca!*',
+  msg_boasvindas:    'Ola, [nome]! 👋\n\n[crianca] acabou de comecar sua aventura na *Movi Kids*! 🚗✨\n\n🎯 Veiculo: [veiculo]\n⏱ Plano: [plano]\n💰 Valor: [valor]\n\nAcompanhe o tempo em tempo real:\n🔗 [link]\n\nQualquer duvida, estamos aqui! 😊\n*Movi Kids -- diversao com seguranca!* 🧸',
+  msg_alerta:        'Oi, [nome]! ⏰\n\nO tempo de [crianca] esta quase acabando -- *faltam apenas [minutos] minuto(s)!*\n\nSe quiser continuar, fale com o operador antes do tempo encerrar. 😉\n\nCronometro:\n🔗 [link]\n\n*Movi Kids -- cada minuto e uma memoria!* 🚗',
+  msg_esgotado:      'Oi, [nome]! 🔴\n\nO tempo contratado de [crianca] *ja encerrou* e os minutos extras estao sendo contados.\n\n⏱ Extra: [adicional] por minuto\n\nPor favor, dirija-se ao operador. 🙏\n\n🔗 [link]\n\n*Movi Kids -- obrigado!* 🧸',
+  msg_agradecimento: 'Oi, [nome]! 🌟\n\nFoi um prazer receber [crianca] aqui na *Movi Kids* hoje! 🚗✨\n\n[link_avaliacao]\n\n*Ate a proxima aventura!\nMovi Kids -- diversao com seguranca!* 🧸',
   link_avaliacao: ''
 };
 
