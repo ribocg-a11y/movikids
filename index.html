@@ -21,7 +21,7 @@
 // ── CACHE BUSTER v1.3.0 ─────────────────────────────────
 // Força limpeza do SW antigo e recarga com versão nova
 (function(){
-  const CURRENT = 'movikids-v1.6.14';
+  const CURRENT = 'movikids-v1.6.15';
   if ('serviceWorker' in navigator) {
     // Desregistra SWs antigos
     navigator.serviceWorker.getRegistrations().then(function(regs) {
@@ -1628,7 +1628,7 @@ nav button .nav-badge{
         <div class="db-insight" id="nk-tipo-insight" style="display:none"></div>
       </div>
       <div class="new-chart-card">
-        <div class="new-chart-title">Horários de pico <span id="nk-pico-title-note" class="nct-note"></span></div>
+        <div class="new-chart-title">Horários de pico <span id="nk-pico-title-note" class="nct-note" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:160px"></span></div>
         <div style="position:relative;height:110px">
           <canvas id="chart-horas" role="img" aria-label="Faturamento por horário do dia">Horários de pico.</canvas>
         </div>
@@ -1882,7 +1882,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = 'v1.6.14';
+const APP_VERSION = 'v1.6.15';
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec';
 
 const PRECOS = {
@@ -3595,14 +3595,23 @@ function renderCharts(d) {
     chartHoras = new Chart(document.getElementById('chart-horas'), {
       type:'bar',
       data:{labels:horasDat.map(x=>x.h),
-        datasets:[{label:'R$',data:horasDat.map(x=>x.v),
-          backgroundColor:horasDat.map(x=>x.v>=maxH*0.65?BLUE:x.v>=maxH*0.3?'#85B7EB':'#D3E8F8'),borderRadius:3}]},
+        datasets:[{
+          label:'R$',
+          data:horasDat.map(x=>x.v),
+          backgroundColor:horasDat.map(x=>x.v>=maxH*0.65?BLUE:x.v>=maxH*0.3?'#85B7EB':'#D3E8F8'),
+          borderRadius:3,
+          minBarLength:3  // garante que barras com valor > 0 sempre aparecem
+        }]},
       options:{responsive:true,maintainAspectRatio:false,
-        plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>'R$'+c.parsed.y}}},
-        scales:{x:{grid:{display:false},ticks:{font:{size:9},color:'#888'}},y:{display:false}}}
+        plugins:{legend:{display:false},
+          tooltip:{callbacks:{label:c=>c.parsed.y>0?'R$ '+Math.round(c.parsed.y):'Sem movimento'}}},
+        scales:{
+          x:{grid:{display:false},ticks:{font:{size:9},color:'#888',maxRotation:0}},
+          y:{display:false}
+        }}
     });
     const picoMax = horasDat.reduce((a,b)=>b.v>a.v?b:a,{h:'—',v:0});
-    if (picoTitleEl && picoMax.v > 0) picoTitleEl.textContent = 'pico: ' + picoMax.h + ' (' + R2(picoMax.v) + ')';
+    if (picoTitleEl && picoMax.v > 0) picoTitleEl.textContent = picoMax.h + ' · R$ ' + Math.round(picoMax.v);
   }
 
   // Por tipo
