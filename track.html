@@ -13,7 +13,6 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{font-family:'Nunito',sans-serif;-webkit-font-smoothing:antialiased}
-
 html,body{
   height:100%;min-height:100dvh;
   background:linear-gradient(160deg,#0a1628 0%,#132050 25%,#1e1b6e 55%,#4a1060 80%,#6a1030 100%);
@@ -21,176 +20,67 @@ html,body{
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   padding:16px;
 }
-
-/* ── CARD ─────────────────────────────────────────────────── */
 .card{
   width:100%;max-width:360px;
   background:rgba(255,255,255,0.10);
   backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
-  border-radius:28px;
-  border:1px solid rgba(255,255,255,0.18);
+  border-radius:28px;border:1px solid rgba(255,255,255,0.18);
   box-shadow:0 8px 40px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.15);
-  padding:28px 24px;
-  text-align:center;
+  padding:28px 24px;text-align:center;
 }
-
-/* ── HEADER ───────────────────────────────────────────────── */
-.brand{
-  font-family:'Fredoka One',cursive;
-  font-size:18px;letter-spacing:1px;
-  color:#fff;opacity:.85;
-  margin-bottom:16px;
-  display:flex;align-items:center;justify-content:center;gap:8px;
-}
+.brand{font-family:'Fredoka One',cursive;font-size:18px;letter-spacing:1px;color:#fff;opacity:.85;margin-bottom:16px;display:flex;align-items:center;justify-content:center;gap:8px;}
 .brand span{color:#FFD54F}
-
-/* ── BADGE TIPO ───────────────────────────────────────────── */
-.tipo-badge{
-  display:inline-flex;align-items:center;gap:7px;
-  background:rgba(255,255,255,0.14);
-  border:1px solid rgba(255,255,255,0.2);
-  border-radius:99px;padding:6px 16px;
-  font-size:14px;font-weight:700;
-  margin-bottom:20px;
-}
-
-/* ── NOME ─────────────────────────────────────────────────── */
-.crianca-name{
-  font-size:36px;font-weight:900;
-  letter-spacing:-.5px;line-height:1;
-  margin-bottom:6px;
-}
-.resp-name{
-  font-size:13px;color:rgba(255,255,255,0.55);
-  font-weight:600;margin-bottom:24px;
-  display:flex;align-items:center;justify-content:center;gap:5px;
-}
-
-/* ── TIMER RING ───────────────────────────────────────────── */
-.ring-wrap{
-  position:relative;width:160px;height:160px;
-  margin:0 auto 20px;
-}
+.tipo-badge{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,0.14);border:1px solid rgba(255,255,255,0.2);border-radius:99px;padding:6px 16px;font-size:14px;font-weight:700;margin-bottom:20px;}
+.crianca-name{font-size:36px;font-weight:900;letter-spacing:-.5px;line-height:1;margin-bottom:6px;}
+.resp-name{font-size:13px;color:rgba(255,255,255,0.55);font-weight:600;margin-bottom:24px;display:flex;align-items:center;justify-content:center;gap:5px;}
+.ring-wrap{position:relative;width:160px;height:160px;margin:0 auto 20px;}
 .ring-wrap svg{transform:rotate(-90deg);width:160px;height:160px}
 .ring-bg{fill:none;stroke:rgba(255,255,255,0.12);stroke-width:10}
-.ring-prog{
-  fill:none;stroke-width:10;stroke-linecap:round;
-  stroke-dasharray:440;stroke-dashoffset:0;
-  transition:stroke-dashoffset 1s linear,stroke .4s;
-}
-.ring-center{
-  position:absolute;inset:0;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-}
-.ring-label{
-  font-size:10px;font-weight:800;
-  text-transform:uppercase;letter-spacing:.12em;
-  color:rgba(255,255,255,0.55);margin-bottom:4px;
-}
-.ring-time{
-  font-size:38px;font-weight:900;
-  font-variant-numeric:tabular-nums;line-height:1;
-  transition:color .4s;
-}
-.ring-extra-label{
-  font-size:11px;font-weight:700;
-  color:#FF8A65;margin-top:3px;
-}
+.ring-prog{fill:none;stroke-width:10;stroke-linecap:round;stroke-dasharray:440;stroke-dashoffset:0;transition:stroke-dashoffset 1s linear,stroke .4s;}
+.ring-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.ring-label{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,0.55);margin-bottom:4px;}
+.ring-time{font-size:38px;font-weight:900;font-variant-numeric:tabular-nums;line-height:1;transition:color .4s;}
+.ring-extra-label{font-size:11px;font-weight:700;color:#FF8A65;margin-top:3px;}
 
-/* ── INFO PLANO ───────────────────────────────────────────── */
-.plano-info{
-  font-size:12px;color:rgba(255,255,255,0.45);
-  font-weight:600;margin-bottom:14px;
-  letter-spacing:.02em;
-}
+/* Estado AGUARDANDO */
+.aguardando-msg{font-size:13px;color:rgba(255,255,255,0.55);margin-bottom:4px;animation:pulse-w 1.8s ease-in-out infinite;}
+@keyframes pulse-w{0%,100%{opacity:.4}50%{opacity:.9}}
+.ring-time.aguardando{font-size:32px;color:rgba(255,255,255,0.3);}
 
-/* ── SEÇÃO DE VALORES (discreta) ──────────────────────────── */
-.pricing{
-  margin-bottom:14px;
-  padding:12px 14px;
-  background:rgba(255,255,255,0.07);
-  border-radius:12px;
-  border:1px solid rgba(255,255,255,0.1);
-  text-align:left;
-  display:none; /* só aparece se vp > 0 */
-}
-.pricing-row{
-  display:flex;justify-content:space-between;align-items:center;
-  font-size:12px;padding:2px 0;
-  color:rgba(255,255,255,0.45);font-weight:600;
-}
+.plano-info{font-size:12px;color:rgba(255,255,255,0.45);font-weight:600;margin-bottom:14px;letter-spacing:.02em;}
+.pricing{margin-bottom:14px;padding:12px 14px;background:rgba(255,255,255,0.07);border-radius:12px;border:1px solid rgba(255,255,255,0.1);text-align:left;display:none;}
+.pricing-row{display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:2px 0;color:rgba(255,255,255,0.45);font-weight:600;}
 .pricing-row .lbl{flex:1}
-.pricing-row .val-paid{
-  font-weight:700;color:rgba(255,255,255,0.3);
-  font-size:12px;
-}
-.pricing-row .val-extra{
-  font-weight:800;color:#FF8A65;font-size:13px;
-}
-.pricing-divider{
-  height:1px;background:rgba(255,255,255,0.1);
-  margin:7px 0;
-}
-.pricing-total{
-  display:flex;justify-content:space-between;align-items:center;
-  font-size:13px;font-weight:800;
-  color:rgba(255,255,255,0.75);padding:1px 0;
-}
-.pricing-total .val-total{
-  color:#FF8A65;font-size:15px;
-}
-.pricing-note{
-  font-size:10px;color:rgba(255,255,255,0.3);
-  text-align:center;margin-top:7px;font-style:italic;
-}
-
-/* ── STATUS DOT ───────────────────────────────────────────── */
-.status-row{
-  display:flex;align-items:center;justify-content:center;gap:6px;
-  font-size:11px;color:rgba(255,255,255,0.4);font-weight:600;
-}
-.status-dot{
-  width:7px;height:7px;border-radius:50%;
-  background:#69F0AE;animation:pulse-g 2s infinite;flex-shrink:0;
-}
+.pricing-row .val-paid{font-weight:700;color:rgba(255,255,255,0.3);font-size:12px;}
+.pricing-row .val-extra{font-weight:800;color:#FF8A65;font-size:13px;}
+.pricing-divider{height:1px;background:rgba(255,255,255,0.1);margin:7px 0;}
+.pricing-total{display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:800;color:rgba(255,255,255,0.75);padding:1px 0;}
+.pricing-total .val-total{color:#FF8A65;font-size:15px;}
+.pricing-note{font-size:10px;color:rgba(255,255,255,0.3);text-align:center;margin-top:7px;font-style:italic;}
+.status-row{display:flex;align-items:center;justify-content:center;gap:6px;font-size:11px;color:rgba(255,255,255,0.4);font-weight:600;}
+.status-dot{width:7px;height:7px;border-radius:50%;background:#69F0AE;animation:pulse-g 2s infinite;flex-shrink:0;}
 @keyframes pulse-g{0%,100%{opacity:1}50%{opacity:.35}}
 .status-dot.off{background:#EF9A9A;animation:none}
-
-/* ── ENCERRADA ────────────────────────────────────────────── */
+.status-dot.waiting{background:#FFD54F;animation:pulse-g 1s infinite}
 .encerrada-card{display:none;text-align:center}
 .enc-icon{font-size:56px;margin-bottom:12px}
 .enc-title{font-size:26px;font-weight:900;margin-bottom:6px}
 .enc-sub{font-size:14px;color:rgba(255,255,255,0.55);line-height:1.5}
-
-/* ── FOOTER ───────────────────────────────────────────────── */
-footer{
-  margin-top:20px;
-  font-size:11px;color:rgba(255,255,255,0.25);
-  font-weight:600;letter-spacing:.03em;
-  display:flex;align-items:center;gap:6px;
-}
+.enc-total{font-size:22px;font-weight:800;color:#FFD54F;margin:12px 0 4px;}
+.enc-total-lbl{font-size:11px;color:rgba(255,255,255,0.4);}
+footer{margin-top:20px;font-size:11px;color:rgba(255,255,255,0.25);font-weight:600;letter-spacing:.03em;display:flex;align-items:center;gap:6px;}
 </style>
 </head>
 <body>
-
 <div class="card" id="main-card">
-
-  <!-- Header -->
   <div class="brand">🚗 Movi <span>Kids</span></div>
-
-  <!-- Badge tipo -->
-  <div class="tipo-badge" id="tipo-badge">🚗 —</div>
-
-  <!-- Nome da criança -->
+  <div class="tipo-badge" id="tipo-badge">— —</div>
   <div class="crianca-name" id="crianca-name">—</div>
   <div class="resp-name">👤 Responsável: <span id="resp-name">—</span></div>
-
-  <!-- Timer ring -->
   <div class="ring-wrap">
     <svg viewBox="0 0 160 160">
       <circle class="ring-bg" cx="80" cy="80" r="70"/>
-      <circle class="ring-prog" id="ring-prog" cx="80" cy="80" r="70"
-        stroke="#69F0AE" stroke-dasharray="440"/>
+      <circle class="ring-prog" id="ring-prog" cx="80" cy="80" r="70" stroke="#69F0AE" stroke-dasharray="440"/>
     </svg>
     <div class="ring-center">
       <div class="ring-label" id="ring-label">RESTANTE</div>
@@ -198,88 +88,89 @@ footer{
       <div class="ring-extra-label" id="ring-extra-label" style="display:none"></div>
     </div>
   </div>
-
-  <!-- Info plano -->
   <div class="plano-info" id="plano-info">Carregando...</div>
-
-  <!-- ── SEÇÃO DE VALORES (discreta) ── -->
   <div class="pricing" id="pricing-box">
-
-    <!-- Valor base (já pago) -->
     <div class="pricing-row">
       <span class="lbl">Plano base</span>
       <span class="val-paid" id="val-base">R$ 0,00 ✓</span>
     </div>
-
-    <!-- Tempo extra acumulando (só aparece quando há extra) -->
     <div class="pricing-row" id="extra-row" style="display:none">
       <span class="lbl" id="extra-lbl">+0 min extra</span>
       <span class="val-extra" id="val-extra">R$ 0,00</span>
     </div>
-
-    <!-- Separador + Total extra (só aparece quando há extra) -->
     <div class="pricing-divider" id="pricing-div" style="display:none"></div>
     <div class="pricing-total" id="total-row" style="display:none">
       <span>Total a pagar</span>
       <span class="val-total" id="val-total">R$ 0,00</span>
     </div>
-
-    <!-- Nota discreta -->
     <div class="pricing-note" id="pricing-note">Plano base ja pago no inicio da locacao</div>
-
   </div>
-
-  <!-- Status -->
   <div class="status-row" id="status-row">
     <div class="status-dot" id="status-dot"></div>
-    <span id="status-txt">Locação ativa · atualiza automaticamente</span>
+    <span id="status-txt">Carregando...</span>
   </div>
+</div>
 
-</div><!-- /main-card -->
-
-<!-- Card Encerrada -->
 <div class="card encerrada-card" id="enc-card">
   <div class="enc-icon">🏁</div>
   <div class="enc-title">Locação Encerrada</div>
-  <div class="enc-sub" id="enc-sub">Obrigado por escolher a Movi Kids!<br>Esperamos ver voce em breve.</div>
+  <div class="enc-total" id="enc-total" style="display:none"></div>
+  <div class="enc-total-lbl" id="enc-total-lbl" style="display:none">valor total</div>
+  <div class="enc-sub" id="enc-sub">Obrigado por escolher a Movi Kids!<br>Esperamos ver voce em breve. 🧸</div>
 </div>
 
-<footer>
-  🚗 Movi Kids · Golden Shopping Calhau
-</footer>
+<footer>🚗 Movi Kids · Golden Shopping Calhau</footer>
 
 <script>
-// ── PARAMS ─────────────────────────────────────────────────
+// ── PARAMS ────────────────────────────────────────────────────
 const P        = new URLSearchParams(location.search);
 const rowIndex = parseInt(P.get('r') || '0');
-const startTs  = parseInt(P.get('ts') || '0');
+let   startTs  = parseInt(P.get('ts') || '0');  // pode ser 0 — será atualizado via poll
 const planMin  = parseInt(P.get('m') || '10');
 const tipo     = decodeURIComponent(P.get('v') || 'Carro');
 const crianca  = decodeURIComponent(P.get('c') || '');
 const resp     = decodeURIComponent(P.get('p') || '');
-const vp       = parseFloat(P.get('vp') || '0');   // valorPlano
-const adic     = parseFloat(P.get('a')  || '1');   // adicionalPorMin
+const vp       = parseFloat(P.get('vp') || '0');
+const adic     = parseFloat(P.get('a')  || '1');
 
 const GAS_URL  = 'https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec';
+const CIRCUM   = 440;
 
-// ── ESTADO ─────────────────────────────────────────────────
-let encerrada = false;
-let timerInt  = null;
-let pollInt   = null;
+// ── ESTADO ────────────────────────────────────────────────────
+let encerrada  = false;
+let timerInt   = null;
+let pollInt    = null;
+let started    = false;  // true quando startTs > 0 e timer rodando
 
-// ── SETUP UI ────────────────────────────────────────────────
-const icon = tipo === 'Carro' ? '🚗' : '🧸';
-document.getElementById('tipo-badge').textContent  = icon + ' ' + tipo;
+// ── TIPO → ícone e cor (FIX Bug 2+3: comparação por includes, não ===) ──
+function tipoIcon(t) {
+  if (t.includes('Carro'))    return '🚗';
+  if (t.includes('Triciclo')) return '🛺';
+  return '🧸';
+}
+function tipoRingColor(t) {
+  if (t.includes('Carro'))    return '#29B6F6'; // azul
+  if (t.includes('Triciclo')) return '#69F0AE'; // verde
+  return '#F48FB1';                              // rosa — Pelúcia
+}
+
+// ── SETUP UI ──────────────────────────────────────────────────
+const icon      = tipoIcon(tipo);
+const ringColor = tipoRingColor(tipo);
+document.getElementById('tipo-badge').textContent   = icon + ' ' + tipo;
 document.getElementById('crianca-name').textContent = crianca || '—';
-document.getElementById('resp-name').textContent   = resp || '—';
+document.getElementById('resp-name').textContent    = resp || '—';
+document.getElementById('ring-prog').style.stroke   = ringColor;
 
-// Valor base
+// Mostrar plano base desde o início (FIX Bug 5: info visível mesmo aguardando)
 if (vp > 0) {
   document.getElementById('pricing-box').style.display = 'block';
   document.getElementById('val-base').textContent = 'R$ ' + vp.toFixed(2).replace('.', ',') + ' ✓';
 }
+document.getElementById('plano-info').textContent =
+  planMin + 'min · R$ ' + vp.toFixed(2).replace('.', ',');
 
-// ── FORMATO ─────────────────────────────────────────────────
+// ── FORMATOS ──────────────────────────────────────────────────
 function fmtTime(totalSec) {
   const abs = Math.abs(totalSec);
   const h   = Math.floor(abs / 3600);
@@ -288,20 +179,15 @@ function fmtTime(totalSec) {
   if (h > 0) return h + ':' + String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
   return String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
 }
-
-function fmtMoney(v) {
-  return 'R$ ' + v.toFixed(2).replace('.', ',');
-}
-
+function fmtMoney(v) { return 'R$ ' + v.toFixed(2).replace('.', ','); }
 function fmtHora(ts) {
   const d = new Date(ts);
   return String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
 }
 
-// ── TICK ────────────────────────────────────────────────────
+// ── TICK (countdown) ──────────────────────────────────────────
 function tick() {
-  if (encerrada) return;
-
+  if (encerrada || !started) return;
   const now       = Date.now();
   const elapsed   = Math.floor((now - startTs) / 1000);
   const planSec   = planMin * 60;
@@ -309,27 +195,22 @@ function tick() {
   const isOver    = remaining <= 0;
   const isWarn    = remaining <= 300 && !isOver;
 
-  // Ring progress
-  const CIRCUM  = 440;
-  const prog    = document.getElementById('ring-prog');
-  const timeEl  = document.getElementById('ring-time');
-  const labelEl = document.getElementById('ring-label');
-  const extraLbl= document.getElementById('ring-extra-label');
+  const prog     = document.getElementById('ring-prog');
+  const timeEl   = document.getElementById('ring-time');
+  const labelEl  = document.getElementById('ring-label');
+  const extraLbl = document.getElementById('ring-extra-label');
 
   if (isOver) {
-    const extraSec = Math.abs(remaining);
-    const extraMin = Math.floor(extraSec / 60);
-    const extraCost= extraMin * adic;
-
-    prog.style.stroke         = '#FF5252';
-    prog.style.strokeDashoffset = '0';
-    timeEl.textContent        = '+' + fmtTime(extraSec);
-    timeEl.style.color        = '#FF8A65';
-    labelEl.textContent       = 'TEMPO EXTRA';
-    extraLbl.style.display    = 'block';
-    extraLbl.textContent      = '+' + extraMin + 'min de tempo extra';
-
-    // Atualizar seção de valores (se disponível)
+    const extraSec  = Math.abs(remaining);
+    const extraMin  = Math.floor(extraSec / 60);
+    const extraCost = extraMin * adic;
+    prog.style.stroke          = '#FF5252';
+    prog.style.strokeDashoffset= '0';
+    timeEl.textContent         = '+' + fmtTime(extraSec);
+    timeEl.style.color         = '#FF8A65';
+    labelEl.textContent        = 'TEMPO EXTRA';
+    extraLbl.style.display     = 'block';
+    extraLbl.textContent       = '+' + extraMin + 'min de tempo extra';
     if (vp > 0 && extraMin > 0) {
       document.getElementById('extra-row').style.display   = 'flex';
       document.getElementById('pricing-div').style.display = 'block';
@@ -339,62 +220,115 @@ function tick() {
       document.getElementById('val-total').textContent     = fmtMoney(extraCost);
       document.getElementById('pricing-note').textContent  = 'Valor extra acumulado desde o fim do plano';
     }
-
-  } else if (isWarn) {
-    prog.style.stroke         = '#FF8A65';
-    const pct = Math.max(0, remaining / planSec);
-    prog.style.strokeDashoffset = (CIRCUM * (1 - pct)).toFixed(1);
-    timeEl.textContent        = fmtTime(remaining);
-    timeEl.style.color        = '#FF8A65';
-    labelEl.textContent       = 'RESTANTE';
-    extraLbl.style.display    = 'none';
   } else {
-    prog.style.stroke         = '#69F0AE';
     const pct = Math.max(0, remaining / planSec);
-    prog.style.strokeDashoffset = (CIRCUM * (1 - pct)).toFixed(1);
-    timeEl.textContent        = fmtTime(remaining);
-    timeEl.style.color        = '#ffffff';
-    labelEl.textContent       = 'RESTANTE';
-    extraLbl.style.display    = 'none';
+    prog.style.stroke          = isWarn ? '#FF8A65' : ringColor;
+    prog.style.strokeDashoffset= (CIRCUM * (1 - pct)).toFixed(1);
+    timeEl.textContent         = fmtTime(remaining);
+    timeEl.style.color         = isWarn ? '#FF8A65' : '#ffffff';
+    labelEl.textContent        = 'RESTANTE';
+    extraLbl.style.display     = 'none';
   }
-
-  // Info plano
-  const inicio = startTs > 0 ? fmtHora(startTs) : '--:--';
-  document.getElementById('plano-info').textContent = 'Plano ' + planMin + 'min · Inicio: ' + inicio;
+  document.getElementById('plano-info').textContent =
+    planMin + 'min · Início: ' + fmtHora(startTs);
 }
 
-// ── POLL STATUS ──────────────────────────────────────────────
+// ── ESTADO AGUARDANDO ─────────────────────────────────────────
+function setAguardando() {
+  document.getElementById('ring-time').textContent   = '--:--';
+  document.getElementById('ring-time').style.color   = 'rgba(255,255,255,0.3)';
+  document.getElementById('ring-label').textContent  = 'RESTANTE';
+  document.getElementById('plano-info').textContent  = 'Aguardando inicio da contagem...';
+  document.getElementById('status-dot').className    = 'status-dot waiting';
+  document.getElementById('status-txt').textContent  = 'Aguardando operador iniciar...';
+  // Manter anel zerado no estado correto
+  const prog = document.getElementById('ring-prog');
+  prog.style.stroke          = ringColor;
+  prog.style.strokeDashoffset= CIRCUM + '';
+}
+
+// ── INICIAR COUNTDOWN ─────────────────────────────────────────
+function iniciarCountdown(ts) {
+  startTs  = ts;
+  started  = true;
+  // Atualizar status dot
+  document.getElementById('status-dot').className   = 'status-dot';
+  document.getElementById('status-txt').textContent = 'Locação ativa · atualizando automaticamente';
+  // Iniciar tick imediatamente
+  tick();
+  if (!timerInt) timerInt = setInterval(tick, 1000);
+  // Mudar poll para intervalo mais lento (sessão ativa)
+  if (pollInt) { clearInterval(pollInt); pollInt = null; }
+  pollInt = setInterval(checkStatus, 15000);
+  checkStatus();
+}
+
+// ── POLL STATUS (FIX Bug 1+4+6+7: poll atualiza startTs, frequência adaptativa) ──
 async function checkStatus() {
   if (encerrada || !rowIndex) return;
   try {
-    const r  = await fetch(GAS_URL + '?action=verificarSessao&rowIndex=' + rowIndex);
+    const r  = await fetch(GAS_URL + '?action=verificarSessao&rowIndex=' + rowIndex,
+                           { cache: 'no-store' });
     const d  = await r.json();
-    if (d.ok && d.status === 'Encerrada') {
-      encerrarUI();
+    if (!d.ok) return;
+
+    if (d.status === 'Encerrada') {
+      encerrarUI(d);
+      return;
     }
-  } catch {}
+
+    // FIX Bug 1+4: receber startTimestamp do servidor e iniciar countdown
+    const serverTs = Number(d.startTimestamp || 0);
+    if (!started && serverTs > 1000000000000) {
+      iniciarCountdown(serverTs);
+    }
+    // FIX Bug 6: se já iniciado mas ts do servidor é mais recente, usar servidor
+    if (started && serverTs > 1000000000000 && Math.abs(serverTs - startTs) > 5000) {
+      startTs = serverTs; // correção de clock drift
+    }
+  } catch(e) {
+    // silencioso — conexão temporária
+  }
 }
 
-function encerrarUI() {
+function encerrarUI(d) {
   encerrada = true;
   clearInterval(timerInt);
   clearInterval(pollInt);
-  document.getElementById('main-card').style.display  = 'none';
-  document.getElementById('enc-card').style.display   = 'block';
+  document.getElementById('main-card').style.display = 'none';
+  const encCard = document.getElementById('enc-card');
+  encCard.style.display = 'block';
+  // FIX Bug 7: mostrar valor total final na tela de encerrada
+  if (d && d.valorTotal && d.valorTotal > 0) {
+    document.getElementById('enc-total').textContent = fmtMoney(d.valorTotal);
+    document.getElementById('enc-total').style.display = 'block';
+    document.getElementById('enc-total-lbl').style.display = 'block';
+  }
+  if (crianca) {
+    document.getElementById('enc-sub').innerHTML =
+      'Obrigado por escolher a Movi Kids, ' + crianca + '!<br>Esperamos ver voce em breve. 🧸';
+  }
 }
 
-// ── INIT ─────────────────────────────────────────────────────
-if (!startTs || startTs < 1000000000000) {
-  document.getElementById('ring-time').textContent  = '--:--';
-  document.getElementById('plano-info').textContent = 'Aguardando inicio da contagem...';
-  document.getElementById('status-dot').className   = 'status-dot off';
-  document.getElementById('status-txt').textContent = 'Aguardando';
-} else {
-  tick();
-  timerInt = setInterval(tick, 1000);
-  pollInt  = setInterval(checkStatus, 30000);
+// ── INIT ──────────────────────────────────────────────────────
+(function init() {
+  // FIX Bug 1+4: sempre verificar o servidor primeiro
+  // — não confiar só no ts da URL (pode ser 0 ou desatualizado)
+  if (!rowIndex) {
+    document.getElementById('status-dot').className   = 'status-dot off';
+    document.getElementById('status-txt').textContent = 'Link inválido';
+    document.getElementById('ring-time').textContent  = '?';
+    return;
+  }
+
+  setAguardando();
+
+  // Primeira verificação imediata
   checkStatus();
-}
+
+  // FIX Bug 7: poll rápido (5s) enquanto aguardando, automaticamente muda para 15s ao iniciar
+  pollInt = setInterval(checkStatus, 5000);
+})();
 </script>
 </body>
 </html>
