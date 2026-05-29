@@ -21,7 +21,7 @@
 // ── CACHE BUSTER v1.3.0 ─────────────────────────────────
 // Força limpeza do SW antigo e recarga com versão nova
 (function(){
-  const CURRENT = 'movikids-v1.6.19';
+  const CURRENT = 'movikids-v1.6.20';
   if ('serviceWorker' in navigator) {
     // Desregistra SWs antigos
     navigator.serviceWorker.getRegistrations().then(function(regs) {
@@ -1080,6 +1080,34 @@ nav button .nav-badge{
 .sparse-footer .sf{font-size:11px;color:var(--txt3)}
 .sparse-footer .sf strong{color:var(--txt);font-weight:700}
 
+
+/* ── FASE 5 — Gestão Financeira Avançada v1.6.20 ─────────────── */
+.alerta-banner{display:flex;align-items:center;gap:10px;border-radius:var(--radius);
+  padding:12px 16px;margin-bottom:14px;font-size:12px;font-weight:600;line-height:1.4}
+.alerta-banner.warn{background:#FFF3E0;border:1.5px solid #E65100;color:#E65100}
+.alerta-banner.good{background:#E8F5E9;border:1.5px solid #2E7D32;color:#2E7D32}
+.alerta-icon{font-size:18px;flex-shrink:0}
+
+.f5-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.f5-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);padding:16px}
+.f5-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;
+  color:var(--txt3);margin-bottom:10px}
+.f5-line{display:flex;justify-content:space-between;align-items:center;
+  padding:7px 0;border-bottom:1px solid var(--border)}
+.f5-line:last-child{border:none}
+.f5-lbl{font-size:12px;color:var(--txt2)}
+.f5-val{font-size:14px;font-weight:700;color:var(--txt);font-family:'Nunito',sans-serif}
+.f5-val.blue{color:var(--blue)}.f5-val.green{color:#2E7D32}.f5-val.red{color:#C62828}.f5-val.amber{color:#E65100}
+.f5-badge{font-size:10px;padding:2px 7px;border-radius:4px;margin-left:6px;font-weight:700}
+.f5-badge.up{background:#E8F5E9;color:#2E7D32}.f5-badge.dn{background:#FFEBEE;color:#C62828}
+.f5-badge.eq{background:#F5F5F5;color:#888}
+
+/* Relatório preview */
+.rel-iframe-wrap{border:1.5px solid var(--border);border-radius:var(--radius);
+  overflow:hidden;margin-bottom:14px}
+.rel-iframe-wrap iframe{width:100%;height:580px;border:none;display:block}
+.rel-send-bar{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+
 </style>
 </head>
 
@@ -1566,6 +1594,12 @@ nav button .nav-badge{
       </select>
     </div>
 
+    <!-- Alerta diário (Fase 5) -->
+    <div id="nk-alerta" class="alerta-banner warn" style="display:none">
+      <span class="alerta-icon">⚠️</span>
+      <span id="nk-alerta-msg">Faturamento hoje abaixo da média</span>
+    </div>
+
     <!-- KPIs -->
     <div class="new-kpi-row">
       <div class="new-kpi">
@@ -1607,6 +1641,44 @@ nav button .nav-badge{
       </div>
       <div class="cto-bar-bg"><div class="cto-bar-fill" id="nk-cto-bar" style="width:0%"></div></div>
       <div class="cto-note" id="nk-cto-note">CTO = 0% do faturamento</div>
+    </div>
+
+    <!-- Comparativo semanal + Projeção (Fase 5) -->
+    <div class="f5-row">
+      <div class="f5-card">
+        <div class="f5-title">Comparativo semanal</div>
+        <div class="f5-line">
+          <span class="f5-lbl">Esta semana</span>
+          <span><span class="f5-val blue" id="nk-sem-atual">—</span><span class="f5-badge" id="nk-sem-badge"></span></span>
+        </div>
+        <div class="f5-line">
+          <span class="f5-lbl">Semana anterior</span>
+          <span class="f5-val" id="nk-sem-ant">—</span>
+        </div>
+        <div class="f5-line">
+          <span class="f5-lbl">Mês anterior</span>
+          <span class="f5-val" id="nk-mes-ant">—</span>
+        </div>
+      </div>
+      <div class="f5-card">
+        <div class="f5-title">Projeção do mês</div>
+        <div class="f5-line">
+          <span class="f5-lbl">Dias operando</span>
+          <span class="f5-val" id="nk-dias-op">—</span>
+        </div>
+        <div class="f5-line">
+          <span class="f5-lbl">Média/dia</span>
+          <span class="f5-val amber" id="nk-med-dia">—</span>
+        </div>
+        <div class="f5-line">
+          <span class="f5-lbl">Faturamento projetado</span>
+          <span class="f5-val blue" id="nk-proj-fat">—</span>
+        </div>
+        <div class="f5-line">
+          <span class="f5-lbl">Resultado projetado</span>
+          <span class="f5-val" id="nk-proj-res">—</span>
+        </div>
+      </div>
     </div>
 
     <!-- Faturamento diário -->
@@ -1682,7 +1754,7 @@ nav button .nav-badge{
     </div>
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
-      <button class="btn btn-primary" onclick="enviarRelatorioEmail()" id="btn-rel-email" style="font-size:13px">📧 Enviar Email</button>
+      <button class="btn btn-primary" onclick="enviarRelatorioEmail()" id="btn-rel-email" style="font-size:13px;display:none">📧 Confirmar e Enviar</button>
       <button class="btn" onclick="salvarRelatorioDrive()" id="btn-rel-drive" style="font-size:13px;background:var(--green);color:#fff;border-radius:var(--radius-sm);padding:14px;font-weight:800;border:none;cursor:pointer;">💾 Salvar PDF</button>
     </div>
 
@@ -1882,7 +1954,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = 'v1.6.19';
+const APP_VERSION = 'v1.6.20';
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec';
 
 const PRECOS = {
@@ -3668,6 +3740,48 @@ function renderCharts(d) {
   if (plInsEl && pl[topPl]) { plInsEl.style.display='block'; plInsEl.textContent = (PLAN_LABELS[topPl]||topPl)+' é o plano mais popular: '+pct2(pl[topPl],totPl)+'% do faturamento.'; }
 
   chartTipo=null; chartPlano=null;
+
+  // ── FASE 5: Comparativo + Projeção + Alerta ──────────────────
+  // Alerta de faturamento baixo
+  const alertEl  = document.getElementById('nk-alerta');
+  const alertMsg = document.getElementById('nk-alerta-msg');
+  if (alertEl && d.mediaDiaria > 0) {
+    const threshold = d.mediaDiaria * 0.7;
+    if (d.fatHoje < threshold && d.fatHoje >= 0) {
+      alertEl.style.display = 'flex';
+      alertEl.className = 'alerta-banner warn';
+      alertMsg.textContent = 'Hoje: R$' + Math.round(d.fatHoje)
+        + ' — abaixo de 70% da média diária (R$' + Math.round(d.mediaDiaria) + '/dia)';
+    } else if (d.fatHoje >= d.mediaDiaria) {
+      alertEl.style.display = 'flex';
+      alertEl.className = 'alerta-banner good';
+      alertMsg.textContent = 'Hoje: R$' + Math.round(d.fatHoje)
+        + ' — acima da média diária (' + Math.round(d.fatHoje / d.mediaDiaria * 100) + '% da meta)';
+    } else {
+      alertEl.style.display = 'none';
+    }
+  }
+
+  // Comparativo semanal
+  setText2('nk-sem-atual', R2(d.fatSemana || 0));
+  setText2('nk-sem-ant',   R2(d.fatSemanaAnt || 0));
+  setText2('nk-mes-ant',   R2(d.fatMesAnt || 0) + ' (' + (d.nMesAnt||0) + ' loc)');
+  const badgeEl = document.getElementById('nk-sem-badge');
+  if (badgeEl && (d.fatSemanaAnt || 0) > 0) {
+    const diff = Math.round(((d.fatSemana||0) - d.fatSemanaAnt) / d.fatSemanaAnt * 100);
+    badgeEl.textContent = (diff >= 0 ? '+' : '') + diff + '%';
+    badgeEl.className = 'f5-badge ' + (diff > 0 ? 'up' : diff < 0 ? 'dn' : 'eq');
+  } else if (badgeEl) badgeEl.textContent = '';
+
+  // Projeção do mês
+  setText2('nk-dias-op',  (d.diasOperando || 0) + ' dias');
+  setText2('nk-med-dia',  R2(d.mediaDiaria || 0) + '/dia');
+  setText2('nk-proj-fat', R2(d.projecaoFat || 0));
+  const projResEl = document.getElementById('nk-proj-res');
+  if (projResEl) {
+    projResEl.textContent = R2(d.projecaoRes || 0);
+    projResEl.className = 'f5-val ' + ((d.projecaoRes||0) >= 0 ? 'green' : 'red');
+  }
 }
 // ── CAIXA DO DIA ─────────────────────────────────────────────────────────
 const fmtR = v => 'R$ ' + Number(v).toFixed(2).replace('.',',').replace(/\B(?=(\d{3})+(?!\d))/g,'.');
@@ -3861,28 +3975,48 @@ async function carregarPreviewRelatorio() {
   const mes  = document.getElementById('rel-mes').value;
   const ano  = document.getElementById('rel-ano').value;
   const prev = document.getElementById('rel-preview');
-  prev.innerHTML = '<div style="text-align:center;color:var(--txt3);font-size:13px;">Carregando...</div>';
+  const btnEnv = document.getElementById('btn-rel-email');
+  const btnDrv = document.getElementById('btn-rel-drive');
+  prev.innerHTML = '<div style="text-align:center;padding:40px;color:var(--txt3);font-size:13px">⏳ Gerando preview do relatório...</div>';
+  if (btnEnv) btnEnv.disabled = true;
+  if (btnDrv) btnDrv.disabled = true;
   try {
-    const d = await api({ action:'buscarKPIsAdmin', mes, ano });
-    if (!d.ok) return;
-    const f = v => 'R$ '+Number(v).toFixed(2).replace('.',',');
-    prev.innerHTML = `
-      <div class="rel-row"><span>Faturamento</span><span><b>${f(d.fatMes)}</b></span></div>
-      <div class="rel-row"><span>Custos operacionais</span><span>${f(d.cusMes)}</span></div>
-      <div class="rel-row"><span>CTO a pagar</span><span>${f(d.ctoPagar)}</span></div>
-      <div class="rel-row"><span>Locações</span><span>${d.nMes}</span></div>
-      <div class="rel-row"><span>Resultado</span><span style="color:${d.resultado>=0?'var(--green)':'var(--red)'}"><b>${f(d.resultado)}</b></span></div>
-      ${d.resultado<0?'<div style="font-size:11px;color:var(--amber);margin-top:8px;padding:8px;background:var(--amber-lt);border-radius:6px">⚠️ Resultado negativo: CTO mínimo contratual maior que faturamento. Normal nos primeiros meses.</div>':''}
-    `;
-  } catch { prev.innerHTML = '<div style="color:var(--red);font-size:13px">Erro ao carregar</div>'; }
+    // v1.6.20: preview com HTML real do email (Fase 5)
+    const d = await api({ action:'buscarPreviewRelatorio', mes, ano }, 30000);
+    if (!d.ok || !d.html) {
+      prev.innerHTML = '<div style="color:var(--red);padding:20px;text-align:center">Erro ao gerar preview</div>';
+      return;
+    }
+    // Renderiza o HTML completo do email num iframe via Blob
+    const blob = new Blob([d.html], { type:'text/html;charset=utf-8' });
+    const url  = URL.createObjectURL(blob);
+    prev.innerHTML = '<div class="rel-iframe-wrap"><iframe id="preview-iframe" title="Preview do relatório"></iframe></div>';
+    document.getElementById('preview-iframe').src = url;
+    setTimeout(() => URL.revokeObjectURL(url), 120000);
+    if (btnEnv) { btnEnv.disabled = false; btnEnv.style.display = ''; }
+    if (btnDrv) { btnDrv.disabled = false; }
+    _relPreviewMes = mes; _relPreviewAno = ano;
+  } catch(e) {
+    prev.innerHTML = '<div style="color:var(--red);padding:20px;text-align:center">Erro de conexão: '+e.message+'</div>';
+    if (btnEnv) btnEnv.disabled = false;
+    if (btnDrv) btnDrv.disabled = false;
+  }
 }
+let _relPreviewMes = null, _relPreviewAno = null;
 
 async function enviarRelatorioEmail() {
+  // v1.6.20: confirmação antes de enviar (Fase 5)
+  const mes = document.getElementById('rel-mes').value;
+  const ano = document.getElementById('rel-ano').value;
+  const meses = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho',
+                 'Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  const nomeMes = meses[parseInt(mes)-1] + '/' + ano;
+  if (!confirm('Enviar relatório de ' + nomeMes + ' para financeiro@goldenshoppingcalhau.com.br?')) return;
   const btn = document.getElementById('btn-rel-email');
   btn.textContent = '⏳ Enviando...'; btn.disabled = true;
   try {
-    const d = await api({ action:'gerarRelatorio' });
-    if (d.ok) { toast('✅ Relatório enviado por email!','success'); carregarHistRelatorios(); }
+    const d = await api({ action:'gerarRelatorio' }, 30000);
+    if (d.ok) { toast('✅ Relatório ' + nomeMes + ' enviado!','success'); carregarHistRelatorios(); }
     else toast('Erro: '+d.erro,'error');
   } catch { toast('Erro de conexão','error'); }
   finally { btn.textContent='📧 Enviar Email'; btn.disabled=false; }
