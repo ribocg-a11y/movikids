@@ -21,7 +21,7 @@
 // ── CACHE BUSTER v1.3.0 ─────────────────────────────────
 // Força limpeza do SW antigo e recarga com versão nova
 (function(){
-  const CURRENT = 'movikids-v1.6.12';
+  const CURRENT = 'movikids-v1.6.13';
   if ('serviceWorker' in navigator) {
     // Desregistra SWs antigos
     navigator.serviceWorker.getRegistrations().then(function(regs) {
@@ -1065,6 +1065,21 @@ nav button .nav-badge{
 .db-insight{background:var(--surface);border-radius:var(--radius-sm);border-left:3px solid var(--blue);
   padding:8px 10px;margin-top:8px;font-size:11px;color:var(--txt2);line-height:1.5}
 
+
+/* Faturamento diário — modo esparso (< 7 dias) */
+.sparse-wrap{display:flex;flex-direction:column;gap:8px}
+.day-row{display:flex;align-items:center;gap:10px;padding:10px 12px;
+  background:var(--surface);border-radius:8px;border-left:3px solid var(--blue)}
+.day-lbl{font-size:11px;font-weight:700;color:var(--txt3);width:50px;flex-shrink:0}
+.day-val{font-size:18px;font-weight:800;color:var(--blue);
+  font-family:'Nunito',sans-serif;font-variant-numeric:tabular-nums;width:72px;flex-shrink:0}
+.day-bar-bg{flex:1;height:5px;background:var(--border);border-radius:99px;overflow:hidden}
+.day-bar-fill{height:5px;background:#B5D4F4;border-radius:99px}
+.sparse-footer{display:flex;gap:16px;margin-top:8px;padding-top:8px;
+  border-top:1px solid var(--border);flex-wrap:wrap}
+.sparse-footer .sf{font-size:11px;color:var(--txt3)}
+.sparse-footer .sf strong{color:var(--txt);font-weight:700}
+
 </style>
 </head>
 
@@ -1613,7 +1628,7 @@ nav button .nav-badge{
         <div class="db-insight" id="nk-tipo-insight" style="display:none"></div>
       </div>
       <div class="new-chart-card">
-        <div class="new-chart-title">Horários de pico</div>
+        <div class="new-chart-title">Horários de pico <span id="nk-pico-title-note" class="nct-note"></span></div>
         <div style="position:relative;height:110px">
           <canvas id="chart-horas" role="img" aria-label="Faturamento por horário do dia">Horários de pico.</canvas>
         </div>
@@ -1867,7 +1882,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = 'v1.6.12';
+const APP_VERSION = 'v1.6.13';
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec';
 
 const PRECOS = {
@@ -3519,42 +3534,62 @@ function renderCharts(d) {
     mesPill.textContent = diff + 'º mês de contrato';
   }
 
-  // Faturamento diário — mostra APENAS dias com receita + hoje
+  // Faturamento diário — modo esparso (< 7 dias) ou gráfico (≥ 7 dias)
   const fatDia = d.fatPorDia || [];
   const hojeD  = d.mesAtual === new Date().getMonth()+1 ? new Date().getDate() : 31;
-  const todosD = fatDia.filter(x => x.dia <= hojeD);
-  // Só exibe dias com valor > 0; se nenhum, mostra aviso
-  const dias   = todosD.filter(x => x.valor > 0);
-  const vals   = dias.map(x => x.valor);
-  const avgDia = dias.length > 0 ? Math.round(vals.reduce((a,b)=>a+b,0)/dias.length) : 0;
-  setText2('nk-avg-label', dias.length > 0
-    ? 'total ' + dias.length + ' dias operando — média R$' + avgDia + '/dia'
-    : 'sem movimento registrado ainda');
+  const dias   = fatDia.filter(x => x.dia <= hojeD && x.valor > 0);
+  const total  = dias.reduce((a,b) => a + b.valor, 0);
+  const avgDia = dias.length > 0 ? Math.round(total / dias.length) : 0;
+  const mesStr = String(d.mesAtual || new Date().getMonth()+1).padStart(2,'0');
+  const cvEl   = document.getElementById('chart-diario');
+  const wrapEl = cvEl ? cvEl.parentElement : null;
+
+  setText2('nk-avg-label',
+    dias.length > 0
+      ? dias.length + ' dias operando — total R$' + Math.round(total) + ' — média R$' + avgDia + '/dia'
+      : 'sem dados ainda neste mês');
+
   if (dias.length === 0) {
-    const cv = document.getElementById('chart-diario');
-    if (cv) { const ctx=cv.getContext('2d'); ctx.clearRect(0,0,cv.width,cv.height); ctx.fillStyle='#888'; ctx.font='13px system-ui'; ctx.textAlign='center'; ctx.fillText('Sem faturamento registrado neste mês', cv.width/2, 80); }
+    if (wrapEl) wrapEl.innerHTML = '<p style="text-align:center;color:var(--txt3);padding:40px 0;font-size:13px">Sem faturamento registrado neste mês</p>';
+  } else if (dias.length < 7) {
+    // MODO ESPARSO: cartões por dia — mais legível do que gráfico com 2-3 barras
+    const maxVal = Math.max(...dias.map(x => x.valor), 1);
+    let sp = '<div class="sparse-wrap">';
+    dias.forEach(x => {
+      const pct = Math.round(x.valor / maxVal * 100);
+      sp += '<div class="day-row">'
+        + '<div class="day-lbl">' + x.dia + '/' + mesStr + '</div>'
+        + '<div class="day-val">R$\u00a0' + Math.round(x.valor) + '</div>'
+        + '<div class="day-bar-bg"><div class="day-bar-fill" style="width:' + pct + '%"></div></div>'
+        + '</div>';
+    });
+    sp += '</div><div class="sparse-footer">'
+      + '<span class="sf">Total: <strong>R$ ' + Math.round(total) + '</strong></span>'
+      + '<span class="sf">Dias: <strong>' + dias.length + '</strong></span>'
+      + '<span class="sf">Média: <strong>R$ ' + avgDia + '/dia</strong></span>'
+      + '</div>';
+    if (wrapEl) wrapEl.innerHTML = sp;
   } else {
-    const mesStr = String(d.mesAtual||5).padStart(2,'0');
-    const valsR  = vals.map(v => Math.round(v)); // arredondar — evita 331.200000005
-    const barW   = dias.length <= 4 ? 60 : dias.length <= 10 ? 40 : undefined; // barra fixa quando poucos dias
+    // MODO GRÁFICO: dados suficientes para barra com linha de média
+    if (!document.getElementById('chart-diario')) {
+      const cv2 = document.createElement('canvas');
+      cv2.id = 'chart-diario'; wrapEl.innerHTML = ''; wrapEl.appendChild(cv2);
+    }
+    const valsR = dias.map(x => Math.round(x.valor));
     chartDiario = new Chart(document.getElementById('chart-diario'), {
       type:'bar',
-      data:{ labels: dias.map(x=>x.dia+'/'+mesStr),
+      data:{ labels: dias.map(x => x.dia + '/' + mesStr),
         datasets:[
-          {label:'Faturamento',data:valsR,backgroundColor:'#B5D4F4',borderRadius:4,
-           maxBarThickness:barW||80, barThickness:barW, order:2},
-          {label:'Média',data:dias.map(()=>avgDia),type:'line',borderColor:BLUE,
-           borderWidth:1.5,pointRadius:0,tension:0,borderDash:[4,3],order:1}
+          {label:'Faturamento', data:valsR, backgroundColor:'#B5D4F4', borderRadius:4, order:2},
+          {label:'Média', data:dias.map(()=>avgDia), type:'line', borderColor:BLUE,
+           borderWidth:1.5, pointRadius:0, tension:0, borderDash:[4,3], order:1}
         ]},
-      options:{responsive:true,maintainAspectRatio:false,
-        plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false,
-          callbacks:{label:ctx=>{
-            const v = Math.round(ctx.parsed.y);
-            return ctx.dataset.label==='Média'?'Média: R$ '+v:'Faturamento: R$ '+v;
-          }}}},
+      options:{responsive:true, maintainAspectRatio:false,
+        plugins:{legend:{display:false},
+          tooltip:{mode:'index',intersect:false,callbacks:{label:ctx=>(ctx.dataset.label==='Média'?'Média':'Faturamento')+': R$ '+Math.round(ctx.parsed.y)}}},
         scales:{
-          x:{grid:{display:false},ticks:{font:{size:9},color:'#888',maxRotation:0}},
-          y:{grid:{color:GRID},ticks:{font:{size:9},color:'#888',callback:v=>'R$'+Math.round(v)},min:0}
+          x:{grid:{display:false},ticks:{font:{size:9},color:'#888',maxTicksLimit:14}},
+          y:{grid:{color:GRID},ticks:{font:{size:9},color:'#888',callback:v=>'R$'+v},min:0}
         }}
     });
   }
@@ -3564,6 +3599,8 @@ function renderCharts(d) {
   const totalPico = horasDat.reduce((a,b)=>a+b.v,0);
   const maxH = Math.max(...horasDat.map(x=>x.v),1);
   const picoEl = document.getElementById('nk-pico-insight');
+  if (picoEl) picoEl.style.display = 'none'; // insight now in chart title
+  const picoTitleEl = document.getElementById('nk-pico-title-note');
   if (totalPico === 0) {
     // GAS ainda nao tem dados de horario (bug de leitura de hora serial — deploy v1.5.3d resolve)
     const cv = document.getElementById('chart-horas');
@@ -3580,7 +3617,7 @@ function renderCharts(d) {
         scales:{x:{grid:{display:false},ticks:{font:{size:9},color:'#888'}},y:{display:false}}}
     });
     const picoMax = horasDat.reduce((a,b)=>b.v>a.v?b:a,{h:'—',v:0});
-    if (picoEl && picoMax.v > 0) { picoEl.style.display='block'; picoEl.textContent = picoMax.h + ' é o horário mais lucrativo (' + R2(picoMax.v) + ')'; }
+    if (picoTitleEl && picoMax.v > 0) picoTitleEl.textContent = 'pico: ' + picoMax.h + ' (' + R2(picoMax.v) + ')';
   }
 
   // Por tipo
