@@ -21,7 +21,7 @@
 // ── CACHE BUSTER v1.3.0 ─────────────────────────────────
 // Força limpeza do SW antigo e recarga com versão nova
 (function(){
-  const CURRENT = 'movikids-v1.6.16';
+  const CURRENT = 'movikids-v1.6.17';
   if ('serviceWorker' in navigator) {
     // Desregistra SWs antigos
     navigator.serviceWorker.getRegistrations().then(function(regs) {
@@ -1615,7 +1615,7 @@ nav button .nav-badge{
         Faturamento diário
         <span class="nct-note" id="nk-avg-label">média R$0/dia com movimento</span>
       </div>
-      <div style="position:relative;height:210px">
+      <div style="position:relative;height:240px">
         <canvas id="chart-diario" role="img" aria-label="Faturamento diário do mês">Faturamento diário.</canvas>
       </div>
     </div>
@@ -1629,7 +1629,7 @@ nav button .nav-badge{
       </div>
       <div class="new-chart-card">
         <div class="new-chart-title">Horários de pico <span id="nk-pico-title-note" class="nct-note" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:160px"></span></div>
-        <div style="position:relative;height:140px">
+        <div style="position:relative;height:160px">
           <canvas id="chart-horas" role="img" aria-label="Faturamento por horário do dia">Horários de pico.</canvas>
         </div>
         <div class="db-insight" id="nk-pico-insight" style="display:none"></div>
@@ -1882,7 +1882,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = 'v1.6.16';
+const APP_VERSION = 'v1.6.17';
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec';
 
 const PRECOS = {
@@ -3561,7 +3561,7 @@ function renderCharts(d) {
       type:'bar',
       data:{ labels: dias.map(x => x.dia + '/' + mesStr),
         datasets:[
-          {label:'Faturamento', data:valsR, backgroundColor:colors, borderRadius:3, order:2},
+          {label:'Faturamento', data:valsR, backgroundColor:colors, borderRadius:3, minBarLength:4, order:2},
           ...(avgDia > 0 ? [{label:'Média', data:dias.map(()=>avgDia), type:'line',
             borderColor:BLUE, borderWidth:1.5, pointRadius:0, tension:0, borderDash:[4,3], order:1}] : [])
         ]},
