@@ -21,7 +21,7 @@
 // ── CACHE BUSTER v1.3.0 ─────────────────────────────────
 // Força limpeza do SW antigo e recarga com versão nova
 (function(){
-  const CURRENT = 'movikids-v1.6.15';
+  const CURRENT = 'movikids-v1.6.16';
   if ('serviceWorker' in navigator) {
     // Desregistra SWs antigos
     navigator.serviceWorker.getRegistrations().then(function(regs) {
@@ -1019,7 +1019,7 @@ nav button .nav-badge{
 .db-mes-sel{font-size:12px;padding:5px 10px;border-radius:var(--radius-sm);border:1.5px solid var(--border);
   background:var(--surface);color:var(--txt);cursor:pointer;font-family:'Nunito',sans-serif}
 
-.new-kpi-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:12px}
+.new-kpi-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:14px}
 .new-kpi{background:var(--surface);border-radius:var(--radius);border:1.5px solid var(--border);
   padding:12px 14px}
 .new-kpi label{display:block;font-size:10px;font-weight:700;color:var(--txt3);
@@ -1045,9 +1045,9 @@ nav button .nav-badge{
 .cto-bar-fill{height:6px;border-radius:99px;background:#E65100}
 .cto-note{font-size:10px;color:var(--txt3)}
 
-.new-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.new-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
 .new-row.wide{grid-template-columns:3fr 2fr}
-.new-chart-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);padding:14px}
+.new-chart-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);padding:16px}
 .new-chart-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;
   color:var(--txt3);margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
 .new-chart-title .nct-note{font-size:10px;font-weight:600;color:var(--txt3);text-transform:none;letter-spacing:0}
@@ -1591,7 +1591,7 @@ nav button .nav-badge{
     </div>
 
     <!-- CTO -->
-    <div class="cto-strip" id="nk-cto-strip">
+    <div class="cto-strip" id="nk-cto-strip" style="margin-bottom:14px">
       <div class="cto-strip-top">
         <div>
           <div class="cto-strip-label">CTO — Golden Shopping</div>
@@ -1610,12 +1610,12 @@ nav button .nav-badge{
     </div>
 
     <!-- Faturamento diário -->
-    <div class="new-chart-card" style="margin-bottom:10px">
+    <div class="new-chart-card" style="margin-bottom:14px">
       <div class="new-chart-title">
         Faturamento diário
         <span class="nct-note" id="nk-avg-label">média R$0/dia com movimento</span>
       </div>
-      <div style="position:relative;height:150px">
+      <div style="position:relative;height:210px">
         <canvas id="chart-diario" role="img" aria-label="Faturamento diário do mês">Faturamento diário.</canvas>
       </div>
     </div>
@@ -1629,7 +1629,7 @@ nav button .nav-badge{
       </div>
       <div class="new-chart-card">
         <div class="new-chart-title">Horários de pico <span id="nk-pico-title-note" class="nct-note" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:160px"></span></div>
-        <div style="position:relative;height:110px">
+        <div style="position:relative;height:140px">
           <canvas id="chart-horas" role="img" aria-label="Faturamento por horário do dia">Horários de pico.</canvas>
         </div>
         <div class="db-insight" id="nk-pico-insight" style="display:none"></div>
@@ -1882,7 +1882,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = 'v1.6.15';
+const APP_VERSION = 'v1.6.16';
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec';
 
 const PRECOS = {
@@ -3573,7 +3573,7 @@ function renderCharts(d) {
               return ctx.parsed.y > 0 ? 'Faturamento: R$ ' + Math.round(ctx.parsed.y) : 'Sem movimento';
             }}}},
         scales:{
-          x:{grid:{display:false}, ticks:{font:{size:9}, color:'#888', maxTicksLimit:16}},
+          x:{grid:{display:false}, ticks:{font:{size:9}, color:'#888', maxTicksLimit:10, maxRotation:0}},
           y:{grid:{color:GRID}, ticks:{font:{size:9}, color:'#888', callback:v=>'R$'+v}, min:0}
         }}
     });
