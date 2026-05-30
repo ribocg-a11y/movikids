@@ -1,5 +1,5 @@
-// MOVI KIDS — Service Worker v1.6.30
-const CACHE = 'movikids-v1.6.30';
+// MOVI KIDS — Service Worker v1.6.31
+const CACHE = 'movikids-v1.6.31';
 
 self.addEventListener('install', e => {
   self.skipWaiting();
@@ -17,7 +17,9 @@ self.addEventListener('fetch', e => {
   // GAS: sempre vai para rede — sem cache, sem fallback
   // caches.match para GAS retorna undefined (sem cache) = resposta inválida = erro
   if (e.request.url.includes('script.google.com') ||
-      e.request.url.includes('script.googleusercontent.com')) {
+      e.request.url.includes('script.googleusercontent.com') ||
+      e.request.url.includes('firebaseio.com') ||
+      e.request.url.includes('firebasejs')) {
     e.respondWith(fetch(e.request));
     return;
   }
