@@ -21,7 +21,7 @@
 // ── CACHE BUSTER v1.3.0 ─────────────────────────────────
 // Força limpeza do SW antigo e recarga com versão nova
 (function(){
-  const CURRENT = 'movikids-v1.6.22';
+  const CURRENT = 'movikids-v1.6.23';
   if ('serviceWorker' in navigator) {
     // Desregistra SWs antigos
     navigator.serviceWorker.getRegistrations().then(function(regs) {
@@ -1132,6 +1132,36 @@ nav button .nav-badge{
 .retorno-btn{font-size:11px;padding:5px 10px;border-radius:4px;border:none;cursor:pointer;
   background:#25D366;color:#fff;font-weight:700;font-family:'Nunito',sans-serif;flex-shrink:0}
 
+
+/* ── FASE 7 — Fechamento + Diagnóstico ─────────────────────── */
+.fecha-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);
+  padding:14px;margin-bottom:14px}
+.fecha-row{display:flex;justify-content:space-between;align-items:center;
+  padding:7px 0;border-bottom:1px solid var(--border);font-size:13px}
+.fecha-row:last-of-type{border:none}
+.fecha-row .lbl{color:var(--txt2)}
+.fecha-row .val{font-weight:700;color:var(--txt)}
+.fecha-row .val.blue{color:var(--blue)}.fecha-row .val.red{color:#C62828}
+.fecha-row .val.green{color:#2E7D32}.fecha-row .val.amber{color:#E65100}
+.fecha-total{display:flex;justify-content:space-between;align-items:center;
+  padding:10px 0 4px;font-size:15px;font-weight:800}
+.fecha-total .val{font-size:20px}
+.fecha-copy-btn{width:100%;margin-top:12px;padding:11px;border:none;border-radius:var(--radius-sm);
+  background:var(--blue);color:#fff;font-size:13px;font-weight:700;cursor:pointer;
+  font-family:'Nunito',sans-serif;display:flex;align-items:center;justify-content:center;gap:6px}
+.fecha-copy-btn:active{opacity:.8}
+.fecha-alert{background:#FFF3E0;border:1.5px solid #E65100;border-radius:var(--radius-sm);
+  padding:8px 12px;margin-top:8px;font-size:11px;color:#E65100;font-weight:600}
+
+.diag-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);
+  padding:14px;margin-bottom:14px}
+.diag-row{display:flex;align-items:center;gap:8px;padding:5px 0;font-size:12px;color:var(--txt2)}
+.diag-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.diag-dot.ok{background:#2E7D32}.diag-dot.warn{background:#E65100}.diag-dot.err{background:#C62828}
+.diag-val{font-weight:700;color:var(--txt);margin-left:auto}
+.diag-alert{background:#FFEBEE;border-radius:6px;padding:8px 10px;margin-top:6px;
+  font-size:11px;color:#C62828;font-weight:600}
+
 </style>
 </head>
 
@@ -1446,6 +1476,32 @@ nav button .nav-badge{
       <div class="kpi-card red"><div class="kpi-val" id="k-cushoje">...</div><div class="kpi-lbl">Custos hoje</div></div>
       <div class="kpi-card green"><div class="kpi-val" id="k-fatmes">...</div><div class="kpi-lbl">Faturamento mês</div><div class="kpi-sub" id="k-nmes" style="color:var(--green)"></div></div>
       <div class="kpi-card purple"><div class="kpi-val" id="k-resultado">...</div><div class="kpi-lbl">Resultado mês</div><div class="kpi-sub" id="k-margem" style="color:var(--purple)"></div></div>
+    </div>
+
+    <!-- ── FECHAMENTO DO DIA (Fase 7) ── -->
+    <div class="sec-title">Fechamento do dia</div>
+    <div class="fecha-card">
+      <div class="fecha-row"><span class="lbl">📋 Locações realizadas</span><span class="val" id="fch-nloc">—</span></div>
+      <div class="fecha-row"><span class="lbl">💰 Faturamento</span><span class="val blue" id="fch-fat">—</span></div>
+      <div class="fecha-row"><span class="lbl">🧾 Custos registrados</span><span class="val" id="fch-cus">—</span></div>
+      <div class="fecha-row"><span class="lbl">🏢 CTO estimado (mín)</span><span class="val amber" id="fch-cto">—</span></div>
+      <div class="fecha-total">
+        <span>Resultado do dia</span>
+        <span class="val" id="fch-res">—</span>
+      </div>
+      <div class="fecha-alert" id="fch-alerta" style="display:none"></div>
+      <button class="fecha-copy-btn" onclick="copiarFechamentoDia()">📋 Copiar fechamento para WhatsApp</button>
+    </div>
+
+    <!-- ── DIAGNÓSTICO DO SISTEMA (Fase 7) ── -->
+    <div class="sec-title">🔧 Diagnóstico do sistema</div>
+    <div class="diag-card" id="diag-card">
+      <div class="diag-row"><div class="diag-dot ok" id="diag-dot-gas"></div><span>GAS / Servidor</span><span class="diag-val" id="diag-gas">—</span></div>
+      <div class="diag-row"><div class="diag-dot ok" id="diag-dot-sync"></div><span>Última sincronização</span><span class="diag-val" id="diag-sync">—</span></div>
+      <div class="diag-row"><div class="diag-dot ok" id="diag-dot-ver"></div><span>Versão frontend</span><span class="diag-val" id="diag-ver">—</span></div>
+      <div class="diag-row"><div class="diag-dot ok" id="diag-dot-sess"></div><span>Sessões ativas agora</span><span class="diag-val" id="diag-sess">—</span></div>
+      <div class="diag-row"><div class="diag-dot ok" id="diag-dot-extra"></div><span>Sessões em tempo extra</span><span class="diag-val" id="diag-extra">—</span></div>
+      <div class="diag-alert" id="diag-alert-over" style="display:none"></div>
     </div>
 
     <div class="sec-title">Gestão</div>
@@ -2035,7 +2091,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = 'v1.6.22';
+const APP_VERSION = 'v1.6.23';
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec';
 
 const PRECOS = {
@@ -3370,6 +3426,8 @@ function renderCustos() {
       </div>
     </div>`;
   }).join('');
+  // Fase 7: Fechamento do Dia
+  if (typeof atualizarFechamento === 'function') atualizarFechamento(d);
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -3640,6 +3698,7 @@ function irAdmin(page) {
   }
   if (page === 'config') { irParaConfig(); }
   if (page === 'caixa') inicializarCaixa();
+  if (page === 'admin') setTimeout(atualizarDiagnostico, 100);
 }
 
 // ── KPIs ─────────────────────────────────────────────────────
@@ -4549,6 +4608,160 @@ function renderEncHoje(list) {
     </div>`;
   }).join('');
 }
+
+
+// ── FASE 7: Fechamento do Dia + Diagnóstico ───────────────────
+let _lastSyncMs = 0;  // timestamp da última sync bem-sucedida
+
+function atualizarFechamento(d) {
+  const R   = v => 'R$ ' + Math.round(Number(v)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  const set = (id, v, cls) => {
+    const e = document.getElementById(id);
+    if (!e) return;
+    e.textContent = v;
+    if (cls) e.className = 'val ' + cls;
+  };
+  // KPIs do dia a partir dos dados do mês
+  const nHoje   = d.nHoje   || 0;
+  const fatHoje = d.fatHoje || 0;
+  const cusHoje = d.cusHoje || 0;
+  // CTO proporcional: CTO do mês ÷ dias operando × 1 dia
+  const diasOp  = d.diasOperando || 1;
+  const ctoHoje = diasOp > 0 ? Math.round((d.ctoPagar || 0) / Math.max(diasOp, 1)) : 0;
+  const resHoje = fatHoje - cusHoje - ctoHoje;
+
+  set('fch-nloc', nHoje + (nHoje === 1 ? ' locação' : ' locações'));
+  set('fch-fat',  R(fatHoje), 'blue');
+  set('fch-cus',  R(cusHoje));
+  set('fch-cto',  R(ctoHoje), 'amber');
+  const resEl = document.getElementById('fch-res');
+  if (resEl) {
+    resEl.textContent = R(resHoje);
+    resEl.className = 'val ' + (resHoje >= 0 ? 'green' : 'red');
+  }
+  // Alerta se faturamento hoje < média
+  const alertEl = document.getElementById('fch-alerta');
+  if (alertEl && (d.mediaDiaria || 0) > 0 && fatHoje < d.mediaDiaria * 0.7) {
+    alertEl.style.display = 'block';
+    alertEl.textContent = '⚠️ Faturamento hoje (' + R(fatHoje) + ') abaixo de 70% da média (' + R(d.mediaDiaria) + '/dia)';
+  } else if (alertEl) alertEl.style.display = 'none';
+
+  _lastSyncMs = Date.now();
+  atualizarDiagnostico();
+}
+
+function atualizarDiagnostico() {
+  const sessions = (typeof _sessoes !== 'undefined' ? _sessoes : null) ||
+                   (window.kpiData ? [] : []);
+  const ativos   = (typeof dadosLocais !== 'undefined' && dadosLocais.ativos) || [];
+  const agora    = Date.now();
+
+  // Status GAS
+  const gasStatus = document.querySelector('.status-badge-global')?.textContent || '';
+  const gasOnline = document.getElementById('status-dot')?.classList.contains('online') ||
+                   (typeof _syncFailCount !== 'undefined' && _syncFailCount === 0);
+  const dotGas = document.getElementById('diag-dot-gas');
+  const valGas = document.getElementById('diag-gas');
+  if (dotGas) dotGas.className = 'diag-dot ' + (gasOnline ? 'ok' : 'err');
+  if (valGas) valGas.textContent = gasOnline ? 'Online ✓' : 'Offline ✗';
+
+  // Última sync
+  const diffSec = _lastSyncMs > 0 ? Math.round((agora - _lastSyncMs) / 1000) : null;
+  const syncTxt = diffSec === null ? 'Nunca' :
+    diffSec < 60 ? diffSec + 's atrás' :
+    Math.floor(diffSec / 60) + 'min atrás';
+  const dotSync = document.getElementById('diag-dot-sync');
+  if (dotSync) dotSync.className = 'diag-dot ' + (diffSec !== null && diffSec < 120 ? 'ok' : 'warn');
+  const vSync = document.getElementById('diag-sync');
+  if (vSync) vSync.textContent = syncTxt;
+
+  // Versão
+  const verEl = document.getElementById('diag-ver');
+  if (verEl) verEl.textContent = (typeof APP_VERSION !== 'undefined' ? APP_VERSION : '—');
+
+  // Sessões ativas
+  const nAtivos = ativos.filter(s => s.startTimestamp > 0).length;
+  const nPend   = ativos.filter(s => !s.startTimestamp || s.startTimestamp === 0).length;
+  const vSess = document.getElementById('diag-sess');
+  if (vSess) vSess.textContent = nAtivos + ' em curso' + (nPend > 0 ? ' + ' + nPend + ' aguardando' : '');
+  const dotSess = document.getElementById('diag-dot-sess');
+  if (dotSess) dotSess.className = 'diag-dot ' + (nAtivos > 0 ? 'warn' : 'ok');
+
+  // Sessões em extra
+  const agora2 = Date.now();
+  const emExtra = ativos.filter(s => {
+    if (!s.startTimestamp || s.startTimestamp <= 0) return false;
+    const elapsed = (agora2 - s.startTimestamp) / 1000;
+    const planSec = (s.mins || 10) * 60;
+    return elapsed > planSec;
+  });
+  const vExtra = document.getElementById('diag-extra');
+  const dotExtra = document.getElementById('diag-dot-extra');
+  const alertOver = document.getElementById('diag-alert-over');
+  if (vExtra) vExtra.textContent = emExtra.length > 0 ? emExtra.length + ' em extra ⚠️' : '0 (nenhuma)';
+  if (dotExtra) dotExtra.className = 'diag-dot ' + (emExtra.length > 0 ? 'warn' : 'ok');
+  if (alertOver) {
+    if (emExtra.length > 0) {
+      alertOver.style.display = 'block';
+      alertOver.textContent = '⚠️ Em extra: ' + emExtra.map(s => (s.crianca || s.veiculo || '?')).join(', ');
+    } else {
+      alertOver.style.display = 'none';
+    }
+  }
+}
+
+function copiarFechamentoDia() {
+  const d = kpiData || {};
+  const R = v => 'R$ ' + Math.round(Number(v)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  const diasOp  = d.diasOperando || 1;
+  const ctoHoje = Math.round((d.ctoPagar || 0) / Math.max(diasOp, 1));
+  const fatHoje = d.fatHoje || 0;
+  const cusHoje = d.cusHoje || 0;
+  const resHoje = fatHoje - cusHoje - ctoHoje;
+  const MESES   = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+  const hoje    = new Date();
+  const data    = hoje.getDate() + '/' + MESES[hoje.getMonth()] + '/' + hoje.getFullYear();
+
+  const texto = [
+    '🚗 *Movi Kids — Fechamento do dia*',
+    '📅 ' + data,
+    '',
+    '📋 Locações: ' + (d.nHoje || 0),
+    '💰 Faturamento: ' + R(fatHoje),
+    '🧾 Custos: ' + R(cusHoje),
+    '🏢 CTO (est.): ' + R(ctoHoje),
+    '━━━━━━━━━━━━━━━',
+    (resHoje >= 0 ? '✅' : '⚠️') + ' Resultado: *' + R(resHoje) + '*',
+    '',
+    '📊 Acumulado mês: ' + R(d.fatMes || 0) + ' (' + (d.nMes || 0) + ' loc)',
+    '📈 Projeção mês: ' + R(d.projecaoFat || 0),
+    '',
+    '_Enviado pelo sistema Movi Kids_'
+  ].join('\n');
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(texto).then(() => {
+      toast('Fechamento copiado! Cole no WhatsApp 📱', 'success');
+    }).catch(() => copiarFallback(texto));
+  } else {
+    copiarFallback(texto);
+  }
+}
+
+function copiarFallback(texto) {
+  const ta = document.createElement('textarea');
+  ta.value = texto; ta.style.position = 'fixed'; ta.style.opacity = '0';
+  document.body.appendChild(ta); ta.focus(); ta.select();
+  try { document.execCommand('copy'); toast('Fechamento copiado!', 'success'); }
+  catch { toast('Não foi possível copiar — copie manualmente', 'error'); }
+  document.body.removeChild(ta);
+}
+
+// Atualizar diagnóstico a cada 30s quando na tela admin
+setInterval(() => {
+  const adminPage = document.getElementById('page-admin');
+  if (adminPage && adminPage.classList.contains('active')) atualizarDiagnostico();
+}, 30000);
 
 function showAdminHomeKpis(d) {
   const el = document.getElementById('admin-home-kpis');
