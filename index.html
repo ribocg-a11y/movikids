@@ -21,7 +21,7 @@
 // ── CACHE BUSTER v1.3.0 ─────────────────────────────────
 // Força limpeza do SW antigo e recarga com versão nova
 (function(){
-  const CURRENT = 'movikids-v1.6.25';
+  const CURRENT = 'movikids-v1.6.26';
   if ('serviceWorker' in navigator) {
     // Desregistra SWs antigos
     navigator.serviceWorker.getRegistrations().then(function(regs) {
@@ -1162,6 +1162,12 @@ nav button .nav-badge{
 .diag-alert{background:#FFEBEE;border-radius:6px;padding:8px 10px;margin-top:6px;
   font-size:11px;color:#C62828;font-weight:600}
 
+
+.danger-wa{background:#C62828!important;color:#fff!important;border-color:#C62828!important}
+.warn-wa{background:#E65100!important;color:#fff!important;border-color:#E65100!important}
+.warn-wa:hover{background:#BF360C!important}
+.danger-wa:hover{background:#B71C1C!important}
+
 </style>
 </head>
 
@@ -1853,7 +1859,10 @@ nav button .nav-badge{
     <div class="cfg-field">
       <div class="cfg-label">
         <span>🟢 Boas-vindas (enviada ao iniciar)</span>
-        <button class="btn-link" onclick="salvarCfgField('msg_boasvindas')">Salvar</button>
+        <div style="display:flex;gap:8px">
+          <button class="btn-link" style="color:var(--txt3);font-size:11px" onclick="restaurarPadrao('msg_boasvindas')">↺ Padrão</button>
+          <button class="btn-link" onclick="salvarCfgField('msg_boasvindas')">Salvar</button>
+        </div>
       </div>
       <textarea class="cfg-textarea" id="cfg-msg-boasvindas"></textarea>
       <div class="cfg-vars">Variáveis: <code>[nome]</code> <code>[crianca]</code> <code>[veiculo]</code> <code>[plano]</code> <code>[valor]</code> <code>[link]</code></div>
@@ -1862,7 +1871,10 @@ nav button .nav-badge{
     <div class="cfg-field">
       <div class="cfg-label">
         <span>⏰ Alerta de tempo (faltam ~5 min)</span>
-        <button class="btn-link" onclick="salvarCfgField('msg_alerta')">Salvar</button>
+        <div style="display:flex;gap:8px">
+          <button class="btn-link" style="color:var(--txt3);font-size:11px" onclick="restaurarPadrao('msg_alerta')">↺ Padrão</button>
+          <button class="btn-link" onclick="salvarCfgField('msg_alerta')">Salvar</button>
+        </div>
       </div>
       <textarea class="cfg-textarea" id="cfg-msg-alerta"></textarea>
       <div class="cfg-vars">Variáveis: <code>[nome]</code> <code>[crianca]</code> <code>[minutos]</code> <code>[link]</code></div>
@@ -1871,7 +1883,10 @@ nav button .nav-badge{
     <div class="cfg-field">
       <div class="cfg-label">
         <span>🔴 Tempo esgotado (extra)</span>
-        <button class="btn-link" onclick="salvarCfgField('msg_esgotado')">Salvar</button>
+        <div style="display:flex;gap:8px">
+          <button class="btn-link" style="color:var(--txt3);font-size:11px" onclick="restaurarPadrao('msg_esgotado')">↺ Padrão</button>
+          <button class="btn-link" onclick="salvarCfgField('msg_esgotado')">Salvar</button>
+        </div>
       </div>
       <textarea class="cfg-textarea" id="cfg-msg-esgotado"></textarea>
       <div class="cfg-vars">Variáveis: <code>[nome]</code> <code>[crianca]</code> <code>[adicional]</code> <code>[link]</code></div>
@@ -1880,7 +1895,10 @@ nav button .nav-badge{
     <div class="cfg-field">
       <div class="cfg-label">
         <span>⭐ Agradecimento pós-locação</span>
-        <button class="btn-link" onclick="salvarCfgField('msg_agradecimento')">Salvar</button>
+        <div style="display:flex;gap:8px">
+          <button class="btn-link" style="color:var(--txt3);font-size:11px" onclick="restaurarPadrao('msg_agradecimento')">↺ Padrão</button>
+          <button class="btn-link" onclick="salvarCfgField('msg_agradecimento')">Salvar</button>
+        </div>
       </div>
       <textarea class="cfg-textarea" id="cfg-msg-agradecimento"></textarea>
       <div class="cfg-vars">Variáveis: <code>[nome]</code> <code>[crianca]</code> <code>[veiculo]</code> <code>[link_avaliacao]</code></div>
@@ -2091,7 +2109,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = 'v1.6.25';
+const APP_VERSION = 'v1.6.26';
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec';
 
 const PRECOS = {
@@ -2693,9 +2711,18 @@ function buildCard(s) {
     </div>
 
     <div class="sc-btns">
-      <button class="btn btn-wa" onclick="abrirWhatsAppCard(${s.rowIndex})">
-        📱 WhatsApp
-      </button>
+      ${isOver
+        ? `<button class="btn btn-wa danger-wa" onclick="abrirWhatsAppCard(${s.rowIndex})" title="Avisar responsável sobre tempo extra">
+             🔴 Avisar extra
+           </button>`
+        : isWarn
+          ? `<button class="btn btn-wa warn-wa" onclick="abrirWhatsAppCard(${s.rowIndex})" title="Avisar que o tempo está acabando">
+               ⏰ Avisar — ${Math.ceil(rem/60)}min rest.
+             </button>`
+          : `<button class="btn btn-wa" onclick="abrirWhatsAppCard(${s.rowIndex})" title="Reenviar link de acompanhamento ao responsável">
+               📱 Reenviar link
+             </button>`
+      }
       <button class="btn btn-encerrar ${isOver?'danger':''}" onclick="pedirEncerrar(${s.rowIndex})">
         ✓ Encerrar
       </button>
@@ -3303,8 +3330,13 @@ function waMensagemRetorno(cliente) {
 // ── Compatibilidade: botão WhatsApp no card e no alerta ───────────────────
 function abrirWaMsg(s) {
   const rem = calcRemaining(s);
-  if (rem <= 0) { waTempoEsgotado(s); }
-  else          { waAlertaTempo(s);   }
+  if (rem <= 0)   { waTempoEsgotado(s); }
+  else if (rem <= 300) { waAlertaTempo(s); }
+  else {
+    // > 5 min restando: reenviar apenas o link de acompanhamento (boas-vindas)
+    // NÃO enviar alerta de "tempo acabando" quando a sessão mal começou
+    waBoasVindas(s);
+  }
 }
 
 function encerrarDireto() {
@@ -4647,6 +4679,19 @@ function confirmarEstender() {
 // HOME — encerradas hoje + admin KPIs
 // ════════════════════════════════════════════════════════════
 let encHojeData = [];
+
+async function restaurarPadrao(key) {
+  const val = MSG_DEF[key];
+  if (!val) return;
+  const elId = 'cfg-' + key.replace(/_/g, '-');
+  const el = document.getElementById(elId);
+  if (el) el.value = val;
+  try {
+    const d = await api({ action: 'salvarConfig', key, val });
+    if (d.ok) { appConfig[key] = val; toast('Mensagem restaurada para o padrão ✓', 'success'); }
+    else toast('Erro ao restaurar', 'error');
+  } catch { toast('Erro de conexão', 'error'); }
+}
 
 async function irParaConfig() {
   irAdmin('config');
