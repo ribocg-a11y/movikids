@@ -21,7 +21,7 @@
 // ── CACHE BUSTER v1.3.0 ─────────────────────────────────
 // Força limpeza do SW antigo e recarga com versão nova
 (function(){
-  const CURRENT = 'movikids-v1.6.27';
+  const CURRENT = 'movikids-v1.6.28';
   if ('serviceWorker' in navigator) {
     // Desregistra SWs antigos
     navigator.serviceWorker.getRegistrations().then(function(regs) {
@@ -2109,7 +2109,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = 'v1.6.27';
+const APP_VERSION = 'v1.6.28';
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec';
 
 const PRECOS = {
@@ -4766,14 +4766,18 @@ let encHojeData = [];
 async function restaurarPadrao(key) {
   const val = MSG_DEF[key];
   if (!val) return;
+  // 1. Atualiza UI e memória IMEDIATAMENTE — não depende do GAS
   const elId = 'cfg-' + key.replace(/_/g, '-');
   const el = document.getElementById(elId);
-  if (el) el.value = val;
-  try {
-    const d = await api({ action: 'salvarConfig', key, val });
-    if (d.ok) { appConfig[key] = val; toast('Mensagem restaurada para o padrão ✓', 'success'); }
-    else toast('Erro ao restaurar', 'error');
-  } catch { toast('Erro de conexão', 'error'); }
+  const valDisplay = val.replace(/\n/g, '\n'); // \n literal → newline real para textarea
+  if (el) el.value = valDisplay;
+  appConfig[key] = val;
+  toast('Padrão restaurado ✓', 'success');
+  // 2. Salva no GAS em background (best-effort)
+  const valSend = val.replace(/\n/g, '\\n'); // newlines → \n literal para URL segura
+  api({ action: 'salvarConfig', key, val: valSend })
+    .then(d => { if (!d.ok) console.warn('restaurar: GAS retornou ok=false'); })
+    .catch(e => console.warn('restaurar: GAS indisponível —', e.message));
 }
 
 async function irParaConfig() {
@@ -4783,7 +4787,11 @@ async function irParaConfig() {
   const fields = ['msg_boasvindas','msg_alerta','msg_esgotado','msg_agradecimento','msg_extensao'];
   fields.forEach(k => {
     const el = document.getElementById('cfg-' + k.replace(/_/g,'-'));
-    if (el) el.value = getMsgTemplate(k);
+    if (el) {
+      const tpl = getMsgTemplate(k);
+      // Converter \n literal → newline real para exibir corretamente na textarea
+      el.value = tpl.replace(/\\n/g, '\n').replace(/\n/g, '\n');
+    }
   });
   const linkEl = document.getElementById('cfg-link-avaliacao');
   if (linkEl) linkEl.value = appConfig.link_avaliacao || '';
@@ -4795,12 +4803,14 @@ async function salvarCfgField(key) {
   const elId = 'cfg-' + key.replace(/_/g, '-');
   const el = document.getElementById(elId);
   if (!el) return;
-  const val = el.value;
+  const val = el.value; // valor com newlines reais (da textarea)
+  // Codifica newlines como \n literal para URL segura (GAS decodifica de volta)
+  const valSend = val.replace(/\n/g, '\\n');
   try {
-    const d = await api({ action: 'salvarConfig', key, val });
+    const d = await api({ action: 'salvarConfig', key, val: valSend });
     if (d.ok) { appConfig[key] = val; toast('Salvo!', 'success'); }
-    else toast('Erro ao salvar', 'error');
-  } catch { toast('Erro de conexão', 'error'); }
+    else toast('Erro ao salvar — ' + (d.erro || 'verifique a planilha'), 'error');
+  } catch(e) { toast('Erro de conexão: ' + (e.message||''), 'error'); }
 }
 
 async function carregarRetorno() {
