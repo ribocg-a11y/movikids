@@ -346,6 +346,12 @@ function encerrarLocacao_(p) {
   sheet.getRange(rowIndex, 11).setNumberFormat('"R$" #,##0.00');
   try { CacheService.getScriptCache().remove('carregarInicio_v2'); } catch(e) {}
 
+  // Firebase: notificar todos os dispositivos que sessão encerrou
+  try {
+    const rowDataE = sheet.getRange(rowIndex, 1, 1, 28).getValues()[0];
+    firebaseSyncSessao_(rowIndex, fbDadosSessao_(rowDataE, 'Encerrada', rowIndex));
+  } catch(eFb) { console.warn('Firebase encerrar:', eFb.message); }
+  lockE.releaseLock();
   return resp_({
     id:            row[0],
     tipo,
@@ -364,10 +370,6 @@ function encerrarLocacao_(p) {
     adicionalPorMin,
     status: 'Encerrada'
   });
-  // Firebase: notificar todos os dispositivos que sessão encerrou
-  const rowDataE = sheet.getRange(rowIndex, 1, 1, 28).getValues()[0];
-  firebaseSyncSessao_(rowIndex, fbDadosSessao_(rowDataE, 'Encerrada', rowIndex));
-  lockE.releaseLock();
 }
 
 // ── LISTAR HISTÓRICO ──────────────────────────────────────────
