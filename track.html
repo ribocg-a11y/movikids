@@ -5,16 +5,31 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="theme-color" content="#1565C0">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>Movi Kids — Acompanhar</title>
+<meta name="apple-mobile-web-app-title" content="Movi Kids">
+<title>Movi Kids — Acompanhar Locação</title>
+<meta name="description" content="Acompanhe o tempo de locação do seu filho em tempo real. Movi Kids, Golden Shopping Calhau, São Luís.">
+<meta property="og:title" content="Movi Kids — Acompanhar Locação">
+<meta property="og:description" content="Acompanhe o cronômetro da locação do seu filho em tempo real. Movi Kids · Golden Shopping Calhau.">
+<meta property="og:image" content="https://ribocg-a11y.github.io/movikids/icon-192.png">
+<meta property="og:image:width" content="192">
+<meta property="og:image:height" content="192">
+<meta property="og:url" content="https://ribocg-a11y.github.io/movikids/">
+<meta property="og:site_name" content="Movi Kids">
+<meta property="og:type" content="website">
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;min-height:100dvh;background:linear-gradient(160deg,#0a1628 0%,#132050 25%,#1e1b6e 55%,#4a1060 80%,#6a1030 100%);
-  color:#fff;overflow-x:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;
-  padding:16px;font-family:'Nunito',sans-serif;-webkit-font-smoothing:antialiased}
+html,body{height:100%;min-height:100dvh;
+  background:linear-gradient(160deg,#0a1628 0%,#132050 25%,#1e1b6e 55%,#4a1060 80%,#6a1030 100%);
+  color:#fff;overflow-x:hidden;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;padding:16px;font-family:'Nunito',sans-serif;-webkit-font-smoothing:antialiased}
 .card{width:100%;max-width:360px;background:rgba(255,255,255,0.10);backdrop-filter:blur(24px);
   -webkit-backdrop-filter:blur(24px);border-radius:28px;border:1px solid rgba(255,255,255,0.18);
-  box-shadow:0 8px 40px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.15);padding:24px 20px;text-align:center}
+  box-shadow:0 8px 40px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.15);
+  padding:24px 20px;text-align:center}
 .brand{font-family:'Fredoka One',cursive;font-size:18px;letter-spacing:1px;color:#fff;opacity:.85;
   margin-bottom:12px;display:flex;align-items:center;justify-content:center;gap:8px}
 .brand span{color:#FFD54F}
@@ -31,17 +46,16 @@ html,body{height:100%;min-height:100dvh;background:linear-gradient(160deg,#0a162
 .ring-label{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,0.5);margin-bottom:3px}
 .ring-time{font-size:34px;font-weight:900;font-variant-numeric:tabular-nums;line-height:1}
 .ring-extra-label{font-size:10px;font-weight:700;color:#FF8A65;margin-top:2px}
-.plano-info{font-size:12px;color:rgba(255,255,255,0.4);font-weight:600;margin-bottom:12px;letter-spacing:.02em}
-.pricing{margin-bottom:12px;padding:12px 14px;background:rgba(255,255,255,0.07);border-radius:12px;
-  border:1px solid rgba(255,255,255,0.1);text-align:left}
+.plano-info{font-size:12px;color:rgba(255,255,255,0.4);font-weight:600;margin-bottom:12px}
+.pricing{margin-bottom:12px;padding:12px 14px;background:rgba(255,255,255,0.07);
+  border-radius:12px;border:1px solid rgba(255,255,255,0.1);text-align:left;display:none}
 .pr-row{display:flex;justify-content:space-between;align-items:center;padding:3px 0;font-size:12px}
-.pr-row .lbl{color:rgba(255,255,255,0.45);font-weight:600;display:flex;align-items:center;gap:4px}
-.pr-row .val-paid{font-weight:700;color:#69F0AE;font-size:12px}
-.pr-row .val-ext{font-weight:700;color:#FFD54F;font-size:12px}
-.pr-row .val-debt{font-weight:700;color:#FF8A65;font-size:12px}
-.pr-row .val-extra{font-weight:700;color:#FF5252;font-size:12px}
+.pr-row .lbl{color:rgba(255,255,255,0.45);font-weight:600}
+.pr-row .v-paid{font-weight:700;color:#69F0AE}
+.pr-row .v-ext{font-weight:700;color:#FFD54F}
+.pr-row .v-extra{font-weight:700;color:#FF5252}
 .pr-divider{height:1px;background:rgba(255,255,255,0.12);margin:6px 0}
-.pr-total{display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:800;color:rgba(255,255,255,0.8)}
+.pr-total{display:flex;justify-content:space-between;font-size:13px;font-weight:800;color:rgba(255,255,255,0.8)}
 .pr-total .val{color:#FFD54F;font-size:15px}
 .pr-note{font-size:10px;color:rgba(255,255,255,0.3);text-align:center;margin-top:5px;font-style:italic}
 .status-row{display:flex;align-items:center;justify-content:center;gap:6px;font-size:11px;color:rgba(255,255,255,0.4);font-weight:600}
@@ -49,23 +63,22 @@ html,body{height:100%;min-height:100dvh;background:linear-gradient(160deg,#0a162
 @keyframes pulse-g{0%,100%{opacity:1}50%{opacity:.35}}
 .status-dot.off{background:#EF9A9A;animation:none}
 .status-dot.waiting{background:#FFD54F;animation:pulse-g 1s infinite}
+.loading-text{font-size:13px;color:rgba(255,255,255,0.4);animation:pulse-g 1.5s infinite}
 .enc-card{display:none;text-align:center}
 .enc-icon{font-size:52px;margin-bottom:10px}
 .enc-title{font-size:24px;font-weight:900;margin-bottom:6px}
 .enc-total{font-size:20px;font-weight:800;color:#FFD54F;margin:10px 0 2px}
 .enc-total-lbl{font-size:11px;color:rgba(255,255,255,0.4)}
 .enc-sub{font-size:13px;color:rgba(255,255,255,0.5);line-height:1.5;margin-top:10px}
-footer{margin-top:18px;font-size:11px;color:rgba(255,255,255,0.2);font-weight:600;letter-spacing:.03em}
-@keyframes pulse-w{0%,100%{opacity:.4}50%{opacity:.9}}
-.waiting-anim{animation:pulse-w 1.8s ease-in-out infinite}
+footer{margin-top:18px;font-size:11px;color:rgba(255,255,255,0.2);font-weight:600;letter-spacing:.03em;text-align:center}
 </style>
 </head>
 <body>
 <div class="card" id="main-card">
   <div class="brand">🚗 Movi <span>Kids</span></div>
-  <div class="tipo-badge" id="tipo-badge">— —</div>
-  <div class="crianca-name" id="crianca-name">—</div>
-  <div class="resp-name">👤 <span id="resp-name">—</span></div>
+  <div class="tipo-badge" id="tipo-badge">Movi Kids</div>
+  <div class="crianca-name" id="crianca-name" style="font-size:20px;color:rgba(255,255,255,0.4)" class="loading-text">Carregando...</div>
+  <div class="resp-name" id="resp-name" style="display:none">👤 <span id="resp-span">—</span></div>
   <div class="ring-wrap">
     <svg viewBox="0 0 150 150">
       <circle class="ring-bg" cx="75" cy="75" r="65"/>
@@ -73,38 +86,22 @@ footer{margin-top:18px;font-size:11px;color:rgba(255,255,255,0.2);font-weight:60
     </svg>
     <div class="ring-center">
       <div class="ring-label" id="ring-label">RESTANTE</div>
-      <div class="ring-time" id="ring-time">--:--</div>
+      <div class="ring-time" id="ring-time" style="font-size:20px;color:rgba(255,255,255,0.3)">- - : - -</div>
       <div class="ring-extra-label" id="ring-extra-label" style="display:none"></div>
     </div>
   </div>
-  <div class="plano-info" id="plano-info">Carregando...</div>
-  <div class="pricing" id="pricing-box" style="display:none">
-    <div class="pr-row" id="row-base">
-      <span class="lbl">✅ Plano original</span>
-      <span class="val-paid" id="val-base">—</span>
-    </div>
-    <div class="pr-row" id="row-debt" style="display:none">
-      <span class="lbl" id="lbl-debt">⚠️ Extra antes da ext.</span>
-      <span class="val-debt" id="val-debt">—</span>
-    </div>
-    <div class="pr-row" id="row-ext" style="display:none">
-      <span class="lbl">📋 Novo plano (+<span id="ext-mins">0</span>min)</span>
-      <span class="val-ext" id="val-ext">—</span>
-    </div>
-    <div class="pr-row" id="row-extra" style="display:none">
-      <span class="lbl">🔴 Tempo extra atual</span>
-      <span class="val-extra" id="val-extra">—</span>
-    </div>
+  <div class="plano-info" id="plano-info">Golden Shopping Calhau · São Luís</div>
+  <div class="pricing" id="pricing-box">
+    <div class="pr-row" id="row-base"><span class="lbl">✅ Plano original</span><span class="v-paid" id="val-base">—</span></div>
+    <div class="pr-row" id="row-ext" style="display:none"><span class="lbl">📋 Extensão (+<span id="ext-mins">0</span>min)</span><span class="v-ext" id="val-ext">—</span></div>
+    <div class="pr-row" id="row-extra" style="display:none"><span class="lbl">🔴 Tempo extra atual</span><span class="v-extra" id="val-extra">—</span></div>
     <div class="pr-divider"></div>
-    <div class="pr-total">
-      <span>A pagar ao encerrar</span>
-      <span class="val" id="val-total">R$ 0,00</span>
-    </div>
+    <div class="pr-total"><span>A pagar ao encerrar</span><span class="val" id="val-total">R$ 0,00</span></div>
     <div class="pr-note" id="pr-note">Plano original já pago no início</div>
   </div>
   <div class="status-row" id="status-row">
-    <div class="status-dot" id="status-dot"></div>
-    <span id="status-txt">Carregando...</span>
+    <div class="status-dot waiting" id="status-dot"></div>
+    <span id="status-txt">Conectando ao servidor...</span>
   </div>
 </div>
 <div class="card enc-card" id="enc-card">
@@ -112,42 +109,43 @@ footer{margin-top:18px;font-size:11px;color:rgba(255,255,255,0.2);font-weight:60
   <div class="enc-title">Locação Encerrada</div>
   <div class="enc-total" id="enc-total" style="display:none"></div>
   <div class="enc-total-lbl" id="enc-total-lbl" style="display:none">valor total da locação</div>
-  <div class="enc-sub" id="enc-sub">Obrigado por escolher a Movi Kids! 🧸</div>
+  <div class="enc-sub" id="enc-sub">Obrigado por escolher a Movi Kids!<br>Esperamos ver você em breve. 🧸</div>
 </div>
-<footer>🚗 Movi Kids · Golden Shopping Calhau</footer>
+<footer>🚗 Movi Kids · Golden Shopping Calhau · São Luís</footer>
 <script>
-const P          = new URLSearchParams(location.search);
-const rowIndex   = parseInt(P.get('r') || '0');
-let   startTs    = parseInt(P.get('ts') || '0');
-const planMin    = parseInt(P.get('m')  || '10');   // total (original + ext do URL)
-const origMin    = parseInt(P.get('om') || planMin); // original
-const tipo       = decodeURIComponent(P.get('v') || 'Carro');
-const crianca    = decodeURIComponent(P.get('c') || '');
-const resp       = decodeURIComponent(P.get('p') || '');
-const vp         = parseFloat(P.get('vp') || '0');
-const adic       = parseFloat(P.get('a')  || '1');
-let   extMin     = parseInt(P.get('ext') || '0');     // minutos de extensão
-let   extVal     = parseFloat(P.get('ve') || '0');    // valor da extensão (R$)
+// v1.6.29: URL curta ?s=BASE36(rowIndex) — sem dados pessoais na URL
+const P        = new URLSearchParams(location.search);
+const rowB36   = P.get('s') || '';
+const rowIndex = rowB36 ? parseInt(rowB36, 36) : 0;
+const GAS_URL  = 'https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec';
+const CIRCUM   = 408;
 
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec';
-const CIRCUM  = 408;
-let encerrada = false;
-let timerInt  = null;
-let pollInt   = null;
-let started   = false;
-let totalMin  = planMin; // atualiza do servidor
+let startTs  = 0;
+let totalMin = 0;
+let origMin  = 0;
+let extMin   = 0;
+let extVal   = 0;
+let adic     = 1;
+let vp       = 0;
+let tipo     = '';
+let started  = false;
+let encerrada= false;
+let timerInt = null;
+let pollInt  = null;
+let dataLoaded = false;
 
-function tipoIcon(t) {
-  if (t.includes('Carro')) return '🚗';
-  if (t.includes('Triciclo')) return '🛺';
+function tipoIcon(t){
+  if(!t)return '🚗';
+  if(t.includes('Carro'))return '🚗';
+  if(t.includes('Triciclo'))return '🛺';
   return '🧸';
 }
-function tipoColor(t) {
-  if (t.includes('Carro')) return '#29B6F6';
-  if (t.includes('Triciclo')) return '#69F0AE';
+function tipoColor(t){
+  if(!t||t.includes('Carro'))return '#29B6F6';
+  if(t.includes('Triciclo'))return '#69F0AE';
   return '#F48FB1';
 }
-function fmtTime(s) {
+function fmtTime(s){
   const a=Math.abs(s),h=Math.floor(a/3600),m=Math.floor((a%3600)/60),sc=a%60;
   if(h>0)return h+':'+String(m).padStart(2,'0')+':'+String(sc).padStart(2,'0');
   return String(m).padStart(2,'0')+':'+String(sc).padStart(2,'0');
@@ -155,155 +153,150 @@ function fmtTime(s) {
 function fmtR(v){return 'R$ '+Number(v).toFixed(2).replace('.',',');}
 function fmtHora(ts){const d=new Date(ts);return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');}
 
-// Setup inicial
-const icon = tipoIcon(tipo);
-const col  = tipoColor(tipo);
-document.getElementById('tipo-badge').textContent = icon + ' ' + tipo;
-document.getElementById('crianca-name').textContent = crianca || '—';
-document.getElementById('resp-name').textContent = resp || '—';
-document.getElementById('ring-prog').style.stroke = col;
-if (vp > 0) {
-  document.getElementById('pricing-box').style.display = 'block';
-  document.getElementById('val-base').textContent = fmtR(vp) + ' ✓';
-}
-updateExtUI();
+function applySessionData(d) {
+  // Chamado na primeira resposta válida do servidor — popula toda a UI
+  if(!dataLoaded && d.crianca) {
+    dataLoaded = true;
+    tipo = d.tipo || d.veiculo || 'Carro';
+    adic = d.adicionalPorMin || 1;
+    vp   = d.valorPlano || 0;
+    extMin  = d.extendedMins  || 0;
+    extVal  = d.extendedValor || 0;
+    origMin = d.originalMins  || d.mins || 10;
+    totalMin= d.mins          || origMin;
 
-function updateExtUI() {
-  // Extensão
-  if (extMin > 0 && extVal > 0) {
+    const icon  = tipoIcon(tipo);
+    const color = tipoColor(tipo);
+    document.getElementById('ring-prog').style.stroke = color;
+    document.getElementById('tipo-badge').textContent = icon + ' ' + (d.veiculo || tipo);
+
+    const nameEl = document.getElementById('crianca-name');
+    nameEl.textContent = d.crianca || '—';
+    nameEl.style.fontSize = '';
+    nameEl.style.color    = '';
+
+    const respEl = document.getElementById('resp-span');
+    if(respEl) respEl.textContent = d.responsavel || '—';
+    const respRow = document.getElementById('resp-name');
+    if(respRow) respRow.style.display = '';
+
+    if(vp > 0) {
+      document.getElementById('pricing-box').style.display = 'block';
+      document.getElementById('val-base').textContent = fmtR(vp) + ' ✓';
+    }
+    if(extMin > 0 && extVal > 0) {
+      document.getElementById('row-ext').style.display = 'flex';
+      document.getElementById('ext-mins').textContent = extMin;
+      document.getElementById('val-ext').textContent = fmtR(extVal) + ' ⏳';
+      document.getElementById('pricing-box').style.display = 'block';
+    }
+    // Atualizar title da página com nome da criança
+    document.title = 'Movi Kids — ' + (d.crianca || 'Acompanhar');
+  }
+
+  // Atualizar extensão se mudou
+  if(d.extendedMins > extMin) {
+    extMin = d.extendedMins;
+    extVal = d.extendedValor || extVal;
+    totalMin = d.mins || (origMin + extMin);
     document.getElementById('row-ext').style.display = 'flex';
     document.getElementById('ext-mins').textContent = extMin;
     document.getElementById('val-ext').textContent = fmtR(extVal) + ' ⏳';
     document.getElementById('pricing-box').style.display = 'block';
   }
-  updateTotal();
-}
-
-function updateTotal(extraMin, extraVal, debtMin, debtVal) {
-  let pending = 0;
-  if (debtVal > 0) {
-    document.getElementById('row-debt').style.display = 'flex';
-    document.getElementById('val-debt').textContent = fmtR(debtVal) + ' ⚠️';
-    pending += debtVal;
-  }
-  if (extVal > 0) pending += extVal;
-  if (extraVal > 0) {
-    document.getElementById('row-extra').style.display = 'flex';
-    document.getElementById('val-extra').textContent = fmtR(extraVal);
-    pending += extraVal;
-  }
-  document.getElementById('val-total').textContent = fmtR(pending);
-  if (pending === 0) document.getElementById('val-total').textContent = 'R$ 0,00';
 }
 
 function tick() {
-  if (encerrada || !started) return;
-  const now     = Date.now();
-  const elapsed = Math.floor((now - startTs) / 1000);
-  const planSec = totalMin * 60;
-  const rem     = planSec - elapsed;
-  const isOver  = rem <= 0;
-  const isWarn  = rem <= 300 && !isOver;
+  if(encerrada || !started) return;
+  const now    = Date.now();
+  const elapsed= Math.floor((now - startTs) / 1000);
+  const planSec= totalMin * 60;
+  const rem    = planSec - elapsed;
+  const isOver = rem <= 0;
+  const isWarn = rem <= 300 && !isOver;
 
   const prog  = document.getElementById('ring-prog');
   const tEl   = document.getElementById('ring-time');
   const lEl   = document.getElementById('ring-label');
   const xLbl  = document.getElementById('ring-extra-label');
+  const color = tipoColor(tipo);
 
-  if (isOver) {
+  if(isOver) {
     const extSec = Math.abs(rem);
     const extM   = Math.floor(extSec / 60);
-    const extV   = extM * adic;
+    const extV   = parseFloat((extM * adic).toFixed(2));
     prog.style.strokeDashoffset = '0';
     prog.style.stroke = '#FF5252';
     tEl.textContent = '+' + fmtTime(extSec);
     tEl.style.color = '#FF8A65';
     lEl.textContent = 'TEMPO EXTRA';
     xLbl.style.display = 'block';
-    xLbl.textContent = '+' + extM + 'min extra (R$' + adic.toFixed(2).replace('.',',') + '/min)';
-    document.getElementById('pricing-box').style.display = 'block';
-    updateTotal(null, null, null, null, extM, extV);
+    xLbl.textContent = '+' + extM + 'min · ' + fmtR(adic) + '/min';
+    if(extM > 0) {
+      document.getElementById('row-extra').style.display = 'flex';
+      document.getElementById('val-extra').textContent = fmtR(extV);
+      document.getElementById('pricing-box').style.display = 'block';
+    }
+    const pending = extVal + extV;
+    document.getElementById('val-total').textContent = fmtR(pending);
   } else {
     const pct = Math.max(0, rem / planSec);
     prog.style.strokeDashoffset = (CIRCUM*(1-pct)).toFixed(1);
-    prog.style.stroke = isWarn ? '#FF8A65' : col;
+    prog.style.stroke = isWarn ? '#FF8A65' : color;
     tEl.textContent   = fmtTime(rem);
-    tEl.style.color   = isWarn ? '#FF8A65' : '#ffffff';
+    tEl.style.color   = isWarn ? '#FF8A65' : '#fff';
     lEl.textContent   = 'RESTANTE';
     xLbl.style.display = 'none';
-    updateTotal();
-  }
-
-  const planLabel = totalMin === origMin
-    ? origMin + 'min · Início: ' + fmtHora(startTs)
-    : origMin + 'min + ' + (totalMin - origMin) + 'min ext. · Início: ' + fmtHora(startTs);
-  document.getElementById('plano-info').textContent = planLabel;
-}
-
-function updateTotal(a,b,c,d,extraMin,extraVal) {
-  let pending = 0;
-  if (extVal > 0) {
-    document.getElementById('row-ext').style.display = 'flex';
-    document.getElementById('val-ext').textContent = fmtR(extVal) + ' ⏳';
-    pending += extVal;
-  }
-  if (extraMin > 0 && extraVal > 0) {
-    document.getElementById('row-extra').style.display = 'flex';
-    document.getElementById('val-extra').textContent = fmtR(extraVal);
-    pending += extraVal;
-  } else {
     document.getElementById('row-extra').style.display = 'none';
+    document.getElementById('val-total').textContent = fmtR(extVal);
   }
-  document.getElementById('val-total').textContent = fmtR(pending);
-  document.getElementById('pricing-box').style.display = (pending>0||vp>0) ? 'block':'none';
+
+  const planLabel = origMin === totalMin
+    ? origMin + 'min · Início: ' + fmtHora(startTs)
+    : origMin + 'min + ' + (totalMin-origMin) + 'min ext. · Início: ' + fmtHora(startTs);
+  document.getElementById('plano-info').textContent = planLabel;
 }
 
 function setAguardando() {
   document.getElementById('ring-time').textContent = '--:--';
   document.getElementById('ring-time').style.color = 'rgba(255,255,255,0.3)';
   document.getElementById('ring-label').textContent = 'RESTANTE';
-  document.getElementById('plano-info').textContent = 'Aguardando inicio da contagem...';
-  document.getElementById('plano-info').classList.add('waiting-anim');
   document.getElementById('status-dot').className = 'status-dot waiting';
   document.getElementById('status-txt').textContent = 'Aguardando operador iniciar...';
-  const prog = document.getElementById('ring-prog');
-  prog.style.stroke = col;
-  prog.style.strokeDashoffset = CIRCUM + '';
+  document.getElementById('plano-info').textContent = 'Aguardando início da contagem...';
 }
 
 function iniciarCountdown(ts) {
   startTs = ts; started = true;
-  document.getElementById('plano-info').classList.remove('waiting-anim');
   document.getElementById('status-dot').className = 'status-dot';
-  document.getElementById('status-txt').textContent = 'Locação ativa · atualiza automaticamente';
+  document.getElementById('status-txt').textContent = 'Locação ativa · atualizando automaticamente';
   tick();
-  if (!timerInt) timerInt = setInterval(tick, 1000);
+  if(!timerInt) timerInt = setInterval(tick, 1000);
   clearInterval(pollInt);
   pollInt = setInterval(checkStatus, 15000);
-  checkStatus();
 }
 
 async function checkStatus() {
-  if (encerrada || !rowIndex) return;
+  if(encerrada || !rowIndex) return;
   try {
     const r = await fetch(GAS_URL + '?action=verificarSessao&rowIndex=' + rowIndex, {cache:'no-store'});
     const d = await r.json();
-    if (!d.ok) return;
-    if (d.status === 'Encerrada') { encerrarUI(d); return; }
-    const serverTs = Number(d.startTimestamp || 0);
-    if (!started && serverTs > 1000000000000) iniciarCountdown(serverTs);
-    if (started && serverTs > 1000000000000 && Math.abs(serverTs - startTs) > 5000) startTs = serverTs;
-    // Atualizar extensão do servidor (pode ter mudado)
-    if (d.extendedMins > 0 && d.extendedMins !== extMin) {
-      extMin   = d.extendedMins;
-      extVal   = d.extendedValor || extVal;
-      totalMin = d.mins || (origMin + extMin);
-      document.getElementById('ext-mins').textContent = extMin;
-      document.getElementById('val-ext').textContent  = fmtR(extVal) + ' ⏳';
-      document.getElementById('row-ext').style.display = 'flex';
-      document.getElementById('pricing-box').style.display = 'block';
+    if(!d.ok) {
+      document.getElementById('status-txt').textContent = 'Aguardando servidor...';
+      return;
     }
-  } catch(e) {}
+    applySessionData(d);
+    if(d.status === 'Encerrada') { encerrarUI(d); return; }
+    const serverTs = Number(d.startTimestamp || 0);
+    if(!started && serverTs > 1000000000000) {
+      iniciarCountdown(serverTs);
+    } else if(started && serverTs > 1000000000000 && Math.abs(serverTs - startTs) > 5000) {
+      startTs = serverTs;
+    }
+    if(!started) setAguardando();
+  } catch(e) {
+    document.getElementById('status-txt').textContent = 'Reconectando...';
+  }
 }
 
 function encerrarUI(d) {
@@ -312,24 +305,24 @@ function encerrarUI(d) {
   document.getElementById('main-card').style.display = 'none';
   const ec = document.getElementById('enc-card');
   ec.style.display = 'block';
-  if (d && d.valorTotal > 0) {
+  if(d && d.valorTotal > 0) {
     document.getElementById('enc-total').textContent = fmtR(d.valorTotal);
     document.getElementById('enc-total').style.display = 'block';
     document.getElementById('enc-total-lbl').style.display = 'block';
   }
-  if (crianca) {
+  if(d.crianca) {
     document.getElementById('enc-sub').innerHTML =
-      'Obrigado por escolher a Movi Kids, ' + crianca + '!<br>Esperamos ver voce em breve! 🧸';
+      'Obrigado por escolher a Movi Kids, ' + d.crianca + '!<br>Esperamos ver você em breve. 🧸';
   }
 }
 
 (function init() {
-  if (!rowIndex) {
+  if(!rowIndex) {
+    document.getElementById('crianca-name').textContent = 'Link inválido';
     document.getElementById('status-dot').className = 'status-dot off';
-    document.getElementById('status-txt').textContent = 'Link inválido';
+    document.getElementById('status-txt').textContent = 'Verifique o link recebido';
     return;
   }
-  setAguardando();
   checkStatus();
   pollInt = setInterval(checkStatus, 5000);
 })();
