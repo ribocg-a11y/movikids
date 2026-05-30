@@ -21,7 +21,7 @@
 // ── CACHE BUSTER v1.3.0 ─────────────────────────────────
 // Força limpeza do SW antigo e recarga com versão nova
 (function(){
-  const CURRENT = 'movikids-v1.6.23';
+  const CURRENT = 'movikids-v1.6.24';
   if ('serviceWorker' in navigator) {
     // Desregistra SWs antigos
     navigator.serviceWorker.getRegistrations().then(function(regs) {
@@ -2091,7 +2091,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = 'v1.6.23';
+const APP_VERSION = 'v1.6.24';
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec';
 
 const PRECOS = {
@@ -3698,7 +3698,13 @@ function irAdmin(page) {
   }
   if (page === 'config') { irParaConfig(); }
   if (page === 'caixa') inicializarCaixa();
-  if (page === 'admin') setTimeout(atualizarDiagnostico, 100);
+  if (page === 'admin') {
+    setTimeout(atualizarDiagnostico, 100);
+    // Se já há dados em memória, preenche imediatamente sem esperar novo fetch
+    if (kpiData && kpiData.ok && typeof atualizarFechamento === 'function') {
+      atualizarFechamento(kpiData);
+    }
+  }
 }
 
 // ── KPIs ─────────────────────────────────────────────────────
@@ -3717,6 +3723,8 @@ async function carregarKPIs() {
     setText2('k-resultado', R2(d.resultado));
     setText2('k-margem',  'margem ' + d.margem + '%');
     showAdminHomeKpis(d);
+    // Fase 7: garantir fechamento mesmo se showAdminHomeKpis falhar
+    if (typeof atualizarFechamento === 'function') atualizarFechamento(d);
   } catch(e) { console.error('carregarKPIs:', e); }
 }
 // ── NOVO DASHBOARD v1.6.9 ────────────────────────────────────
@@ -3747,6 +3755,7 @@ async function carregarKPIsComMes(mes, ano) {
     setText2('k-resultado', R2(d.resultado));
     setText2('k-margem',  'margem ' + d.margem + '%');
     if (typeof showAdminHomeKpis === 'function') showAdminHomeKpis(d);
+    if (typeof atualizarFechamento === 'function') atualizarFechamento(d);
   } catch(e) { console.error('carregarKPIsComMes:', e); }
 }
 
@@ -4775,6 +4784,9 @@ function showAdminHomeKpis(d) {
   set('h-nmes',    d.nMes+' locações');
   set('h-resultado', R(d.resultado));
   set('h-margem',  'margem '+d.margem+'%');
+
+  // Fase 7: Fechamento sempre atualiza, independente de ter dados de tipo
+  if (typeof atualizarFechamento === 'function') atualizarFechamento(d);
 
   // Ranking carro vs pelúcia
   const ranking = document.getElementById('h-ranking');
