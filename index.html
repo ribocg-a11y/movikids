@@ -21,7 +21,7 @@
 // ── CACHE BUSTER v1.3.0 ─────────────────────────────────
 // Força limpeza do SW antigo e recarga com versão nova
 (function(){
-  const CURRENT = 'movikids-v1.6.30';
+  const CURRENT = 'movikids-v1.6.31';
   if ('serviceWorker' in navigator) {
     // Desregistra SWs antigos
     navigator.serviceWorker.getRegistrations().then(function(regs) {
@@ -1169,6 +1169,57 @@ nav button .nav-badge{
 .danger-wa:hover{background:#B71C1C!important}
 
 </style>
+<!-- Firebase SDK v1.6.31 — Realtime sync para todos os dispositivos -->
+<script type="module">
+  import { initializeApp }          from 'https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js';
+  import { getDatabase, ref, onValue } from 'https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js';
+
+  const fbApp = initializeApp({
+    apiKey: "AIzaSyBIZdsHHzeWjQzHPWBWIOMJUf1AYYYlykA",
+    authDomain: "movikids-fa3d7.firebaseapp.com",
+    databaseURL: "https://movikids-fa3d7-default-rtdb.firebaseio.com",
+    projectId: "movikids-fa3d7",
+    storageBucket: "movikids-fa3d7.firebasestorage.app",
+    messagingSenderId: "149994372494",
+    appId: "1:149994372494:web:eea86e5c248ccde95438df"
+  });
+  const fbDb  = getDatabase(fbApp);
+
+  // Ouvir mudanças em tempo real nas sessões
+  // Quando qualquer dispositivo escreve, todos recebem em <1s
+  onValue(ref(fbDb, 'sessoes'), (snapshot) => {
+    const sessoes = snapshot.val();
+    if (!sessoes) return;
+
+    const hoje = (() => {
+      const d = new Date();
+      const pad = n => String(n).padStart(2,'0');
+      return pad(d.getDate()) + '/' + pad(d.getMonth()+1) + '/' + d.getFullYear();
+    })();
+
+    // Separar ativos (Ativa/Pendente) de encerrados hoje
+    const ativos   = Object.values(sessoes).filter(s =>
+      s.status === 'Ativa' || s.status === 'Pendente'
+    );
+    const encHoje  = Object.values(sessoes).filter(s =>
+      s.status === 'Encerrada' && s.data === hoje
+    );
+
+    // Disparar sync para o app — mesma função do polling GAS
+    // mas agora chamada pelo Firebase em tempo real
+    if (typeof aplicarDadosInicio === 'function') {
+      aplicarDadosInicio({ ok: true, ativos, encHoje, fonte: 'firebase' });
+      if (typeof setStatus === 'function') setStatus(true);
+      if (typeof _lastSyncAt !== 'undefined') window._fbLastUpdate = Date.now();
+    }
+  }, (error) => {
+    // Firebase falhou — polling GAS continua como fallback
+    console.warn('[Firebase] Erro ao ouvir sessoes:', error.message);
+  });
+
+  // Expor para debug
+  window._firebaseDB = fbDb;
+</script>
 </head>
 
 <body>
@@ -2109,7 +2160,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = 'v1.6.30';
+const APP_VERSION = 'v1.6.31';
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec';
 
 const PRECOS = {
