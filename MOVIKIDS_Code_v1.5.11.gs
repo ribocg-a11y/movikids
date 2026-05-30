@@ -1334,29 +1334,33 @@ function firebaseToken_() {
 }
 
 function firebasePatch_(path, data) {
-  // PATCH via REST API autenticado com OAuth do GAS
+  // PATCH via REST API — access_token na URL (formato mais compatível com GAS)
   try {
-    const res = UrlFetchApp.fetch(FB_URL + path + '.json', {
+    const token = firebaseToken_();
+    const url   = FB_URL + path + '.json?access_token=' + encodeURIComponent(token);
+    const res   = UrlFetchApp.fetch(url, {
       method: 'patch',
       payload: JSON.stringify(data),
       contentType: 'application/json',
-      headers: { 'Authorization': 'Bearer ' + firebaseToken_() },
       muteHttpExceptions: true
     });
-    if (res.getResponseCode() >= 400) {
-      console.warn('Firebase patch erro:', res.getResponseCode(), res.getContentText().substring(0,100));
+    const code = res.getResponseCode();
+    if (code >= 400) {
+      Logger.log('Firebase patch erro ' + code + ': ' + res.getContentText().substring(0,200));
+    } else {
+      Logger.log('Firebase patch OK ' + code + ' path=' + path);
     }
-  } catch(e) { console.warn('Firebase patch:', e.message); }
+  } catch(e) {
+    Logger.log('Firebase patch excecao: ' + e.message);
+  }
 }
 
 function firebaseDelete_(path) {
   try {
-    UrlFetchApp.fetch(FB_URL + path + '.json', {
-      method: 'delete',
-      headers: { 'Authorization': 'Bearer ' + firebaseToken_() },
-      muteHttpExceptions: true
-    });
-  } catch(e) { console.warn('Firebase delete:', e.message); }
+    const token = firebaseToken_();
+    const url   = FB_URL + path + '.json?access_token=' + encodeURIComponent(token);
+    UrlFetchApp.fetch(url, { method: 'delete', muteHttpExceptions: true });
+  } catch(e) { Logger.log('Firebase delete: ' + e.message); }
 }
 
 function firebaseSyncSessao_(rowIndex, dados) {
