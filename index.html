@@ -21,7 +21,7 @@
 // ── CACHE BUSTER v1.3.0 ─────────────────────────────────
 // Força limpeza do SW antigo e recarga com versão nova
 (function(){
-  const CURRENT = 'movikids-v1.6.26';
+  const CURRENT = 'movikids-v1.6.27';
   if ('serviceWorker' in navigator) {
     // Desregistra SWs antigos
     navigator.serviceWorker.getRegistrations().then(function(regs) {
@@ -2109,7 +2109,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = 'v1.6.26';
+const APP_VERSION = 'v1.6.27';
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec';
 
 const PRECOS = {
@@ -3213,15 +3213,20 @@ function abrirWhatsAppCard(rowIndex) {
 
 // ── Gera link de acompanhamento ───────────────────────────────────────────
 function gerarTrackUrl(s) {
-  return 'https://ribocg-a11y.github.io/movikids/track.html' +
-    '?r=' + s.rowIndex +
+  // v1.6.27: inclui dados de extensão para track.html mostrar breakdown correto
+  let url = 'https://ribocg-a11y.github.io/movikids/track.html' +
+    '?r='  + s.rowIndex +
     '&ts=' + s.startTimestamp +
-    '&m='  + s.mins +
+    '&m='  + s.mins +          // total (original + extensoes)
+    '&om=' + (s.originalMins || (s.mins - (s.extendedMins||0))) + // original
     '&v='  + encodeURIComponent(s.veiculo || s.tipo) +
     '&c='  + encodeURIComponent(s.crianca) +
     '&p='  + encodeURIComponent(s.responsavel) +
     '&vp=' + s.valorPlano +
     '&a='  + s.adicionalPorMin;
+  if (s.extendedMins  > 0) url += '&ext=' + s.extendedMins;
+  if (s.extendedValor > 0) url += '&ve='  + s.extendedValor;
+  return url;
 }
 
 function enviarWaTel(tel, msg) {
@@ -3237,7 +3242,8 @@ const MSG_DEF = {
   msg_alerta:        'Oi, [nome]! ⏰\n\nO tempo de [crianca] esta quase acabando -- *faltam apenas [minutos] minuto(s)!*\n\nSe quiser continuar, fale com o operador antes do tempo encerrar. 😉\n\nCronometro:\n🔗 [link]\n\n*Movi Kids -- cada minuto e uma memoria!* 🚗',
   msg_esgotado:      'Oi, [nome]! 🔴\n\nO tempo contratado de [crianca] *ja encerrou* e os minutos extras estao sendo contados.\n\n⏱ Extra: [adicional] por minuto\n\nPor favor, dirija-se ao operador. 🙏\n\n🔗 [link]\n\n*Movi Kids -- obrigado!* 🧸',
   msg_agradecimento: 'Oi, [nome]! 🌟\n\nFoi um prazer receber [crianca] aqui na *Movi Kids* hoje! 🚗✨\n\n[link_avaliacao]\n\n*Ate a proxima aventura!\nMovi Kids -- diversao com seguranca!* 🧸',
-  link_avaliacao: ''
+  link_avaliacao: '',
+  msg_extensao: 'Oi, [nome]! ⏱\n\nO passeio de [crianca] foi estendido com um *novo plano*!\n\n🚗 [veiculo]\n📋 Extensão: [plano_novo] → [valor_novo]\n\n💰 Resumo financeiro:\n✅ Plano original ([plano_orig]): [valor_orig] — *ja pago*\n⏳ Extensão: [valor_novo] — *a pagar ao encerrar*[debt_line]\n\n*Total a pagar ao encerrar: [total_pendente]*\n\nAcompanhe o cronometro atualizado:\n🔗 [link]\n\n*Movi Kids — diversao com seguranca!* 🧸'
 };
 
 async function carregarConfig() {
@@ -3303,6 +3309,30 @@ function waTempoEsgotado(s) {
     adicional: 'R$ ' + adicional, link: track
   });
 
+  enviarWaTel(s.telefone, msg);
+}
+
+// -- MSG 6: Extensão de tempo (v1.6.27) — novo plano contratado ------
+function waExtensao(s, extMins, extValor, extPlano, extraAntes, debtAntes) {
+  if (!s || !s.telefone) { toast('Sem telefone para enviar WA', 'error'); return; }
+  const veiculo    = s.veiculo || s.tipo;
+  const planoOrig  = PLANO_LABELS[s.plano] || s.plano;
+  const valorOrig  = 'R$ ' + String(s.valorPlano || 0).replace('.',',') + ',00';
+  const planoNovo  = PLANO_LABELS[extPlano] || extPlano;
+  const valorNovo  = 'R\$ ' + extValor.toFixed(0) + ',00';
+  const totalPend  = 'R\$ ' + ((s.extendedValor || 0) + debtAntes).toFixed(2).replace('.',',');
+  const debtLine   = debtAntes > 0
+    ? '\n⚠️ Extra anterior: R$ ' + debtAntes.toFixed(2).replace('.',',') + ' (acumulado antes da extensão)'
+    : '';
+  const track = gerarTrackUrl(s);
+  const msg = renderTemplate(getMsgTemplate('msg_extensao'), {
+    nome: s.responsavel, crianca: s.crianca, veiculo,
+    plano_novo: planoNovo, valor_novo: valorNovo,
+    plano_orig: planoOrig, valor_orig: valorOrig,
+    debt_line:  debtLine,
+    total_pendente: totalPend,
+    link: track
+  });
   enviarWaTel(s.telefone, msg);
 }
 
@@ -4632,18 +4662,34 @@ function abrirEstender(rowIndex) {
   document.getElementById('est-info').innerHTML +=
     '<div class="modal-info-row"><span>Situação</span><span>' + remFmt + '</span></div>';
 
-  const opts = [5, 10, 15, 20, 30];
-  document.getElementById('est-opts').innerHTML = opts.map(m =>
-    '<button class="est-opt-btn" onclick="selecionarEstender(' + m + ')" id="est-opt-' + m + '">+' + m + ' min</button>'
+  // v1.6.27: opções são planos com preço real (novo contrato, não adicional/min)
+  const tipo = estSession.tipo || estSession.veiculo?.split(' ')[0] || 'Carro';
+  const tipoKey = Object.keys(PRECOS).find(k => tipo.includes(k)) || 'Carro';
+  const planosDisp = Object.entries(PRECOS[tipoKey]).filter(([k,v]) => k !== '3h');
+  document.getElementById('est-opts').innerHTML = planosDisp.map(([plano, cfg]) =>
+    `<button class="est-opt-btn" onclick="selecionarEstender('${plano}',${cfg.m},${cfg.v})" id="est-opt-${plano}">
+       <div style="font-size:13px;font-weight:700">+${cfg.m} min</div>
+       <div style="font-size:11px;opacity:.75">R$ ${cfg.v},00</div>
+     </button>`
   ).join('');
+  document.getElementById('est-opts').innerHTML +=
+    `<button class="est-opt-btn" onclick="selecionarEstender('3h',180,${PRECOS[tipoKey]['3h'].v})" id="est-opt-3h">
+       <div style="font-size:13px;font-weight:700">+3h</div>
+       <div style="font-size:11px;opacity:.75">R$ ${PRECOS[tipoKey]['3h'].v},00</div>
+     </button>`;
 
   document.getElementById('est-modal').classList.add('show');
 }
 
-function selecionarEstender(mins) {
-  estMins = mins;
+let estPlano = '';   // plano selecionado para extensão ('10min', '20min'...)
+let estValor = 0;    // valor em R$ do novo plano
+
+function selecionarEstender(plano, mins, valor) {
+  estPlano = plano;
+  estMins  = mins;
+  estValor = valor;
   document.querySelectorAll('.est-opt-btn').forEach(b => b.classList.remove('sel'));
-  const btn = document.getElementById('est-opt-' + mins);
+  const btn = document.getElementById('est-opt-' + plano);
   if (btn) btn.classList.add('sel');
 }
 
@@ -4651,27 +4697,64 @@ function fecharEstModal() {
   document.getElementById('est-modal').classList.remove('show');
   estSession = null;
   estMins    = 0;
+  estPlano   = '';
+  estValor   = 0;
 }
 
-function confirmarEstender() {
+async function confirmarEstender() {
   if (!estSession) return;
-  if (!estMins) { toast('Selecione o tempo a adicionar.', 'error'); return; }
+  if (!estMins || !estPlano || !estValor) {
+    toast('Selecione o plano a adicionar.', 'error'); return;
+  }
 
-  // Atualiza local: incrementa mins e salva extendedMins para sobreviver ao sync
-  estSession.mins        += estMins;
-  estSession.extendedMins = (estSession.extendedMins || 0) + estMins;
+  const btn = document.getElementById('btn-est-confirm');
+  if (btn) { btn.disabled = true; btn.textContent = 'Salvando...'; }
 
-  // Zera os alertas para não disparar novamente com o tempo estendido
-  estSession.alertFired5   = false;
-  estSession.alertFiredExp = false;
+  // Calcula extra acumulado ANTES da extensão (para mostrar no WA)
+  const remAntes = calcRemaining(estSession);
+  const extraAntes = remAntes < 0 ? Math.floor(Math.abs(remAntes) / 60) : 0;
+  const debtAntes  = parseFloat((extraAntes * estSession.adicionalPorMin).toFixed(2));
 
-  saveSessions();
-  toast('⏱ +' + estMins + ' min adicionados!', 'success');
-  fecharEstModal();
+  try {
+    // Salva extensão no GAS (novo plano contratado)
+    const d = await api({
+      action:   'estenderLocacao',
+      rowIndex: estSession.rowIndex,
+      extMins:  estMins,
+      extValor: estValor,
+      extPlano: estPlano
+    });
 
-  renderCards();
-  const painelPage = document.getElementById('page-painel');
-  if (painelPage && painelPage.classList.contains('active')) renderPainel();
+    if (!d.ok) { toast('Erro ao salvar extensão: ' + (d.erro||''), 'error'); return; }
+
+    // Atualiza estado local com dados do servidor
+    estSession.extendedMins  = d.extendedMins;
+    estSession.extendedValor = d.extendedValor;
+    estSession.mins          = d.totalMins;  // original + todas extensões
+
+    // Zera alertas para disparar corretamente com o novo tempo
+    estSession.alertFired5   = false;
+    estSession.alertFiredExp = false;
+
+    saveSessions();
+
+    // Envia WhatsApp com novo link e breakdown financeiro
+    waExtensao(estSession, estMins, estValor, estPlano, extraAntes, debtAntes);
+
+    toast('✅ +' + estMins + 'min adicionados! WA enviado.', 'success');
+
+    broadcastInvalidate();
+    syncController(true, 500);
+
+  } catch(e) {
+    toast('Erro ao estender: ' + e.message, 'error');
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = '⏱ Confirmar extensão'; }
+    fecharEstModal();
+    renderCards();
+    const painelPage = document.getElementById('page-painel');
+    if (painelPage && painelPage.classList.contains('active')) renderPainel();
+  }
 }
 
 
@@ -4697,7 +4780,7 @@ async function irParaConfig() {
   irAdmin('config');
   await carregarConfig();
   // Fill textareas
-  const fields = ['msg_boasvindas','msg_alerta','msg_esgotado','msg_agradecimento'];
+  const fields = ['msg_boasvindas','msg_alerta','msg_esgotado','msg_agradecimento','msg_extensao'];
   fields.forEach(k => {
     const el = document.getElementById('cfg-' + k.replace(/_/g,'-'));
     if (el) el.value = getMsgTemplate(k);
