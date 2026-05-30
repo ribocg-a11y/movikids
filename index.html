@@ -2168,10 +2168,23 @@ async function init() {
   // Padrão: stale-while-revalidate + request deduplication + exponential backoff
   // Ref: como Notion, Figma e sistemas de alta disponibilidade funcionam
 
-  // INTERVALO PRINCIPAL — 20s (era 15s; -25% calls ao GAS)
-  setInterval(() => {
-    if (document.visibilityState === 'visible') syncController();
-  }, 20000);
+  // FIX 5: Polling adaptativo — 10s com sessões ativas, 20s sem
+  // Reduz latência multi-dispositivo de 20s para 10s quando há locações em andamento
+  let _pollInterval = 20000;
+  const _POLL_ACTIVE = 10000;  // com sessões ativas
+  const _POLL_IDLE   = 20000;  // sem sessões ativas
+  let _mainPollTimer = null;
+
+  function agendarProximoPoll() {
+    clearTimeout(_mainPollTimer);
+    const temAtivos = Array.isArray(sessions) && sessions.some(s => s.startTimestamp > 0);
+    const intervalo = temAtivos ? _POLL_ACTIVE : _POLL_IDLE;
+    _mainPollTimer = setTimeout(() => {
+      if (document.visibilityState === 'visible') syncController();
+      agendarProximoPoll();
+    }, intervalo);
+  }
+  agendarProximoPoll(); // inicia polling adaptativo
 
   // BroadcastChannel — sync instantâneo entre abas no mesmo dispositivo
   try {
@@ -2181,6 +2194,8 @@ async function init() {
     };
     window._bc = bc;
   } catch(e) {}
+  // FIX 4: helper para emitir invalidate após qualquer write
+  window.broadcastInvalidate = () => { try { window._bc?.postMessage('invalidate'); } catch(e) {} };
 
   // VISIBILIDADE — só força sync se tab ficou oculta > 30s
   document.addEventListener('visibilitychange', () => {
@@ -2216,7 +2231,9 @@ async function init() {
     const idleMs = Date.now() - _lastActivity;
     if (idleMs > _IDLE_MS) {
       _lastActivity = Date.now();
-      syncController(true, 0);
+      // FIX 9: idle watcher respeita backoff — não sobrescreve tentativa de recuperação
+      if (_syncBackoffMs === 0) syncController(true, 0);
+      else syncController(false, 0); // suave se em backoff
     }
   }, 60000);
 
@@ -2230,18 +2247,20 @@ async function init() {
   }, 60000);
 } // fim inicializarApp
 
-// ── SYNC CONTROLLER STATE v1.6.25 ─────────────────────────────────────────
-let _syncFailCount  = 0;      // falhas consecutivas
-let _syncInFlight   = false;  // guard: evita chamadas duplicadas simultâneas
-let _syncPending    = false;  // fila: no máximo 1 chamada pendente
-let _syncDebounce   = null;   // debounce timer
-let _syncBackoffMs  = 0;      // exponential backoff: 0→5s→10s→20s→40s→60s
-let _lastSyncAt     = 0;      // timestamp da última sync bem-sucedida
+// ── SYNC CONTROLLER STATE v1.6.25 (overhaul) ──────────────────────────────
+let _syncFailCount  = 0;
+let _syncInFlight   = false;
+let _syncPending    = false;
+let _syncDebounce   = null;
+let _syncBackoffMs  = 0;
+let _lastSyncAt     = 0;
 let _lastActivity   = Date.now();
 let _wasHiddenAt    = null;
-const _FAIL_THRESH  = 3;      // mostra Offline só após 3 falhas seguidas
-const _BACKOFF_MAX  = 60000;  // máximo 60s entre tentativas após falha
-let _lastFailAt     = 0;      // timestamp da última falha (para calcular backoff)
+const _FAIL_THRESH  = 3;
+const _BACKOFF_MAX  = 60000;
+let _lastFailAt     = 0;
+// FIX 3: safety timeout — libera lock se api() travar além de 35s
+let _syncSafetyTimer = null;
 
 // SYNC CONTROLLER: ponto único de entrada para todas as sincronizações
 // Substitui chamadas diretas a sincronizarServidor() de múltiplos lugares
@@ -2269,30 +2288,43 @@ const _IDLE_MS      = 5 * 60 * 1000; // 5 minutos
 async function sincronizarServidor(force = false) {
   // ── GUARD 1: nunca duas chamadas GAS simultâneas ─────────────────────
   if (_syncInFlight) {
-    if (force) _syncPending = true; // fila de 1 — a mais urgente vence
+    if (force) _syncPending = true;
     return;
   }
   _syncInFlight = true;
+  // FIX 3: safety timeout — se api() travar, libera o lock após 35s
+  clearTimeout(_syncSafetyTimer);
+  _syncSafetyTimer = setTimeout(() => {
+    if (_syncInFlight) {
+      console.warn('[Sync] safety timeout — liberando lock travado');
+      _syncInFlight = false;
+      _syncFailCount++;
+      _lastFailAt = Date.now();
+      _syncBackoffMs = Math.min(_syncBackoffMs ? _syncBackoffMs * 2 : 5000, _BACKOFF_MAX);
+    }
+  }, 35000);
 
   try {
     const CACHE_KEY = 'mk_inicio_cache';
-    const CACHE_TTL = 18000; // 18s — cobre ciclo 20s com margem de 2s
+    // FIX 1: TTL = 22s (2s além do intervalo de 20s — cache sempre útil)
+    const CACHE_TTL = 22000;
 
     // ── STALE-WHILE-REVALIDATE ─────────────────────────────────────────
-    // Mostra dado cacheado IMEDIATAMENTE, sem piscar, enquanto busca fresco
     if (!force) {
       const raw = localStorage.getItem(CACHE_KEY);
       if (raw) {
         try {
           const { data, ts } = JSON.parse(raw);
           const age = Date.now() - ts;
+          // FIX 2: _lastSyncAt atualizado mesmo em cache hit
+          _lastSyncAt = Math.max(_lastSyncAt, ts);
           if (age < CACHE_TTL) {
-            // Cache fresco: serve imediatamente e encerra
             aplicarDadosInicio(data);
             setStatus(true);
+            _syncInFlight = false; // libera antes de retornar
             return;
           }
-          // Cache velho: serve imediatamente (sem piscar) e continua para GAS
+          // Cache stale: serve imediatamente e vai buscar fresco
           aplicarDadosInicio(data);
           setStatus(true);
         } catch(e) {}
@@ -2324,6 +2356,8 @@ async function sincronizarServidor(force = false) {
     _syncFailCount = 0;
     _syncBackoffMs = 0;
     _lastSyncAt    = Date.now();
+    // FIX 5: reescalonar poll imediatamente após sync (adapta à presença de ativos)
+    if (typeof agendarProximoPoll === 'function') agendarProximoPoll();
     try { localStorage.setItem(CACHE_KEY, JSON.stringify({ data: d, ts: Date.now() })); } catch(e) {}
     setStatus(true);
     aplicarDadosInicio(d);
@@ -2336,7 +2370,7 @@ async function sincronizarServidor(force = false) {
     if (_syncFailCount >= _FAIL_THRESH) setStatus(false);
 
   } finally {
-    // ── GUARD 2: libera lock e processa fila ───────────────────────────
+    clearTimeout(_syncSafetyTimer); // FIX 3: cancela safety se call terminou normal
     _syncInFlight = false;
     if (_syncPending) {
       _syncPending = false;
@@ -2351,6 +2385,13 @@ function aplicarDadosInicio(d) {
     const stored = JSON.parse(localStorage.getItem('mk_sessions') || '[]');
     const storedMap = {};
     stored.forEach(s => storedMap[s.rowIndex] = s);
+
+    // FIX 6: limpar entradas obsoletas — sessões que o servidor não retornou mais
+    const serverRows = new Set(d.ativos.map(s => s.rowIndex));
+    const cleanedStored = stored.filter(s => serverRows.has(s.rowIndex));
+    if (cleanedStored.length !== stored.length) {
+      try { localStorage.setItem('mk_sessions', JSON.stringify(cleanedStored)); } catch(e) {}
+    }
 
     sessions = d.ativos.map(s => {
       const local       = storedMap[s.rowIndex] || {};
@@ -2959,7 +3000,7 @@ async function confirmarLocacao() {
     // MSG 1: disparada pelo operador no modal de boas-vindas (antes de iniciar contagem)
 
     // Sync via controller (deduplicado, com debounce)
-    syncController(true, 800);
+    broadcastInvalidate(); syncController(true, 800);
 
   } catch(e) {
     toast('Erro de conexão. Tente novamente.', 'error');
@@ -3056,7 +3097,7 @@ async function confirmarEncerrar() {
     atualizarVeiculoGrid();
 
     // Sync via controller (deduplicado)
-    syncController(true, 1500);
+    broadcastInvalidate(); syncController(true, 1500);
 
   } catch(e) {
     toast('Erro de conexão.', 'error');
@@ -3341,7 +3382,7 @@ async function iniciarContagem(rowIndex) {
   } catch(e) {}
 
   // 3. Sync via controller (deduplicado, force=true pois sessão mudou)
-  syncController(true, 500);
+  broadcastInvalidate(); syncController(true, 500);
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -4737,8 +4778,8 @@ function atualizarDiagnostico() {
   if (dotGas) dotGas.className = 'diag-dot ' + (gasOnline ? 'ok' : 'err');
   if (valGas) valGas.textContent = gasOnline ? 'Online ✓' : 'Offline ✗';
 
-  // Última sync
-  const diffSec = _lastSyncMs > 0 ? Math.round((agora - _lastSyncMs) / 1000) : null;
+  // FIX 7: usar _lastSyncAt do syncController (não _lastSyncMs que nunca é atualizado)
+  const diffSec = _lastSyncAt > 0 ? Math.round((agora - _lastSyncAt) / 1000) : null;
   const syncTxt = diffSec === null ? 'Nunca' :
     diffSec < 60 ? diffSec + 's atrás' :
     Math.floor(diffSec / 60) + 'min atrás';
@@ -4829,11 +4870,22 @@ function copiarFallback(texto) {
   document.body.removeChild(ta);
 }
 
-// Atualizar diagnóstico a cada 30s quando na tela admin
+// FIX 10: diagnóstico atualiza a cada 5s — só recalcula diff, sem GAS call
+// Frequência 5s: "Última sync: 3s atrás" → "8s atrás" → etc. em tempo real
 setInterval(() => {
   const adminPage = document.getElementById('page-admin');
-  if (adminPage && adminPage.classList.contains('active')) atualizarDiagnostico();
-}, 30000);
+  if (!adminPage || !adminPage.classList.contains('active')) return;
+  // Só atualiza o campo de "última sync" em tempo real (sem recalcular tudo)
+  const diffSec = _lastSyncAt > 0 ? Math.round((Date.now() - _lastSyncAt) / 1000) : null;
+  const syncTxt = diffSec === null ? 'Nunca' :
+    diffSec < 60 ? diffSec + 's atrás' : Math.floor(diffSec / 60) + 'min atrás';
+  const el = document.getElementById('diag-sync');
+  if (el) el.textContent = syncTxt;
+  const dot = document.getElementById('diag-dot-sync');
+  if (dot) dot.className = 'diag-dot ' + (diffSec !== null && diffSec < 60 ? 'ok' : 'warn');
+  // Sessões em extra — recalcula a cada 5s (timer local, sem GAS)
+  if (typeof atualizarDiagnostico === 'function') atualizarDiagnostico();
+}, 5000);
 
 function showAdminHomeKpis(d) {
   const el = document.getElementById('admin-home-kpis');
