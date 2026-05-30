@@ -21,7 +21,7 @@
 // ── CACHE BUSTER v1.3.0 ─────────────────────────────────
 // Força limpeza do SW antigo e recarga com versão nova
 (function(){
-  const CURRENT = 'movikids-v1.6.28';
+  const CURRENT = 'movikids-v1.6.29';
   if ('serviceWorker' in navigator) {
     // Desregistra SWs antigos
     navigator.serviceWorker.getRegistrations().then(function(regs) {
@@ -2109,7 +2109,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = 'v1.6.28';
+const APP_VERSION = 'v1.6.29';
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec';
 
 const PRECOS = {
@@ -3213,20 +3213,11 @@ function abrirWhatsAppCard(rowIndex) {
 
 // ── Gera link de acompanhamento ───────────────────────────────────────────
 function gerarTrackUrl(s) {
-  // v1.6.27: inclui dados de extensão para track.html mostrar breakdown correto
-  let url = 'https://ribocg-a11y.github.io/movikids/track.html' +
-    '?r='  + s.rowIndex +
-    '&ts=' + s.startTimestamp +
-    '&m='  + s.mins +          // total (original + extensoes)
-    '&om=' + (s.originalMins || (s.mins - (s.extendedMins||0))) + // original
-    '&v='  + encodeURIComponent(s.veiculo || s.tipo) +
-    '&c='  + encodeURIComponent(s.crianca) +
-    '&p='  + encodeURIComponent(s.responsavel) +
-    '&vp=' + s.valorPlano +
-    '&a='  + s.adicionalPorMin;
-  if (s.extendedMins  > 0) url += '&ext=' + s.extendedMins;
-  if (s.extendedValor > 0) url += '&ve='  + s.extendedValor;
-  return url;
+  // v1.6.29: URL curta — só rowIndex em base36 (?s=1s)
+  // Nenhum dado pessoal na URL — track.html busca tudo do servidor
+  // Motivo: URLs longas com parâmetros são bloqueadas como golpe por WhatsApp/Android
+  const rowB36 = s.rowIndex.toString(36);
+  return 'https://ribocg-a11y.github.io/movikids/track.html?s=' + rowB36;
 }
 
 function enviarWaTel(tel, msg) {
