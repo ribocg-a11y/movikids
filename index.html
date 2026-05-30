@@ -21,7 +21,7 @@
 // ── CACHE BUSTER v1.3.0 ─────────────────────────────────
 // Força limpeza do SW antigo e recarga com versão nova
 (function(){
-  const CURRENT = 'movikids-v1.6.29';
+  const CURRENT = 'movikids-v1.6.30';
   if ('serviceWorker' in navigator) {
     // Desregistra SWs antigos
     navigator.serviceWorker.getRegistrations().then(function(regs) {
@@ -2109,7 +2109,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = 'v1.6.29';
+const APP_VERSION = 'v1.6.30';
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec';
 
 const PRECOS = {
@@ -2153,6 +2153,26 @@ async function api(params, timeoutMs = 25000) {
 }
 
 // ═══════════════════════════════════════════════════════════
+// POLLING ADAPTATIVO GLOBAL (v1.6.30)
+// Definido no escopo global para ser acessível de qualquer lugar
+// 5s com sessões ativas → lag máximo entre dispositivos = 5s
+// 15s sem sessões → mantém GAS aquecido, reduz consumo de quota
+// ═══════════════════════════════════════════════════════════
+const _POLL_ACTIVE = 5000;   // 5s com sessões em andamento
+const _POLL_IDLE   = 15000;  // 15s sem sessões ativas
+let   _mainPollTimer = null;
+
+function agendarProximoPoll() {
+  clearTimeout(_mainPollTimer);
+  const temAtivos = Array.isArray(sessions) && sessions.some(s => s.startTimestamp > 0);
+  const intervalo = temAtivos ? _POLL_ACTIVE : _POLL_IDLE;
+  _mainPollTimer = setTimeout(() => {
+    if (document.visibilityState !== 'hidden') syncController();
+    agendarProximoPoll();
+  }, intervalo);
+}
+
+// ═══════════════════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════════════════
 async function init() {
@@ -2186,23 +2206,8 @@ async function init() {
   // Padrão: stale-while-revalidate + request deduplication + exponential backoff
   // Ref: como Notion, Figma e sistemas de alta disponibilidade funcionam
 
-  // FIX 5: Polling adaptativo — 10s com sessões ativas, 20s sem
-  // Reduz latência multi-dispositivo de 20s para 10s quando há locações em andamento
-  let _pollInterval = 20000;
-  const _POLL_ACTIVE = 10000;  // com sessões ativas
-  const _POLL_IDLE   = 20000;  // sem sessões ativas
-  let _mainPollTimer = null;
-
-  function agendarProximoPoll() {
-    clearTimeout(_mainPollTimer);
-    const temAtivos = Array.isArray(sessions) && sessions.some(s => s.startTimestamp > 0);
-    const intervalo = temAtivos ? _POLL_ACTIVE : _POLL_IDLE;
-    _mainPollTimer = setTimeout(() => {
-      if (document.visibilityState === 'visible') syncController();
-      agendarProximoPoll();
-    }, intervalo);
-  }
-  agendarProximoPoll(); // inicia polling adaptativo
+  // Polling adaptativo iniciado — função global definida acima do init()
+  agendarProximoPoll();
 
   // BroadcastChannel — sync instantâneo entre abas no mesmo dispositivo
   try {
@@ -2458,6 +2463,8 @@ function aplicarDadosInicio(d) {
     // Custos do dia
     if (d.custosHoje) { custosHoje = d.custosHoje; renderCustos(); }
     else loadCustosHoje();
+  // Reagendar polling com intervalo correto (ativo=5s / idle=15s)
+  agendarProximoPoll();
   } catch(e) {
     console.error('aplicarDadosInicio:', e);
     setStatus(false);
