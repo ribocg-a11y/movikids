@@ -5,70 +5,59 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="theme-color" content="#1565C0">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Movi Kids">
-<title>Movi Kids — Acompanhar Locação</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<title>Movi Kids — Acompanhar</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-:root{font-family:'Nunito',sans-serif;-webkit-font-smoothing:antialiased}
-html,body{
-  height:100%;min-height:100dvh;
-  background:linear-gradient(160deg,#0a1628 0%,#132050 25%,#1e1b6e 55%,#4a1060 80%,#6a1030 100%);
-  color:#fff;overflow-x:hidden;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  padding:16px;
-}
-.card{
-  width:100%;max-width:360px;
-  background:rgba(255,255,255,0.10);
-  backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
-  border-radius:28px;border:1px solid rgba(255,255,255,0.18);
-  box-shadow:0 8px 40px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.15);
-  padding:28px 24px;text-align:center;
-}
-.brand{font-family:'Fredoka One',cursive;font-size:18px;letter-spacing:1px;color:#fff;opacity:.85;margin-bottom:16px;display:flex;align-items:center;justify-content:center;gap:8px;}
+html,body{height:100%;min-height:100dvh;background:linear-gradient(160deg,#0a1628 0%,#132050 25%,#1e1b6e 55%,#4a1060 80%,#6a1030 100%);
+  color:#fff;overflow-x:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:16px;font-family:'Nunito',sans-serif;-webkit-font-smoothing:antialiased}
+.card{width:100%;max-width:360px;background:rgba(255,255,255,0.10);backdrop-filter:blur(24px);
+  -webkit-backdrop-filter:blur(24px);border-radius:28px;border:1px solid rgba(255,255,255,0.18);
+  box-shadow:0 8px 40px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.15);padding:24px 20px;text-align:center}
+.brand{font-family:'Fredoka One',cursive;font-size:18px;letter-spacing:1px;color:#fff;opacity:.85;
+  margin-bottom:12px;display:flex;align-items:center;justify-content:center;gap:8px}
 .brand span{color:#FFD54F}
-.tipo-badge{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,0.14);border:1px solid rgba(255,255,255,0.2);border-radius:99px;padding:6px 16px;font-size:14px;font-weight:700;margin-bottom:20px;}
-.crianca-name{font-size:36px;font-weight:900;letter-spacing:-.5px;line-height:1;margin-bottom:6px;}
-.resp-name{font-size:13px;color:rgba(255,255,255,0.55);font-weight:600;margin-bottom:24px;display:flex;align-items:center;justify-content:center;gap:5px;}
-.ring-wrap{position:relative;width:160px;height:160px;margin:0 auto 20px;}
-.ring-wrap svg{transform:rotate(-90deg);width:160px;height:160px}
+.tipo-badge{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,0.14);
+  border:1px solid rgba(255,255,255,0.2);border-radius:99px;padding:5px 14px;font-size:13px;
+  font-weight:700;margin-bottom:16px}
+.crianca-name{font-size:32px;font-weight:900;letter-spacing:-.5px;line-height:1;margin-bottom:4px}
+.resp-name{font-size:12px;color:rgba(255,255,255,0.5);font-weight:600;margin-bottom:20px}
+.ring-wrap{position:relative;width:150px;height:150px;margin:0 auto 16px}
+.ring-wrap svg{transform:rotate(-90deg);width:150px;height:150px}
 .ring-bg{fill:none;stroke:rgba(255,255,255,0.12);stroke-width:10}
-.ring-prog{fill:none;stroke-width:10;stroke-linecap:round;stroke-dasharray:440;stroke-dashoffset:0;transition:stroke-dashoffset 1s linear,stroke .4s;}
-.ring-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
-.ring-label{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,0.55);margin-bottom:4px;}
-.ring-time{font-size:38px;font-weight:900;font-variant-numeric:tabular-nums;line-height:1;transition:color .4s;}
-.ring-extra-label{font-size:11px;font-weight:700;color:#FF8A65;margin-top:3px;}
-
-/* Estado AGUARDANDO */
-.aguardando-msg{font-size:13px;color:rgba(255,255,255,0.55);margin-bottom:4px;animation:pulse-w 1.8s ease-in-out infinite;}
-@keyframes pulse-w{0%,100%{opacity:.4}50%{opacity:.9}}
-.ring-time.aguardando{font-size:32px;color:rgba(255,255,255,0.3);}
-
-.plano-info{font-size:12px;color:rgba(255,255,255,0.45);font-weight:600;margin-bottom:14px;letter-spacing:.02em;}
-.pricing{margin-bottom:14px;padding:12px 14px;background:rgba(255,255,255,0.07);border-radius:12px;border:1px solid rgba(255,255,255,0.1);text-align:left;display:none;}
-.pricing-row{display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:2px 0;color:rgba(255,255,255,0.45);font-weight:600;}
-.pricing-row .lbl{flex:1}
-.pricing-row .val-paid{font-weight:700;color:rgba(255,255,255,0.3);font-size:12px;}
-.pricing-row .val-extra{font-weight:800;color:#FF8A65;font-size:13px;}
-.pricing-divider{height:1px;background:rgba(255,255,255,0.1);margin:7px 0;}
-.pricing-total{display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:800;color:rgba(255,255,255,0.75);padding:1px 0;}
-.pricing-total .val-total{color:#FF8A65;font-size:15px;}
-.pricing-note{font-size:10px;color:rgba(255,255,255,0.3);text-align:center;margin-top:7px;font-style:italic;}
-.status-row{display:flex;align-items:center;justify-content:center;gap:6px;font-size:11px;color:rgba(255,255,255,0.4);font-weight:600;}
-.status-dot{width:7px;height:7px;border-radius:50%;background:#69F0AE;animation:pulse-g 2s infinite;flex-shrink:0;}
+.ring-prog{fill:none;stroke-width:10;stroke-linecap:round;stroke-dasharray:408;stroke-dashoffset:0;transition:stroke-dashoffset 1s linear,stroke .4s}
+.ring-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ring-label{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,0.5);margin-bottom:3px}
+.ring-time{font-size:34px;font-weight:900;font-variant-numeric:tabular-nums;line-height:1}
+.ring-extra-label{font-size:10px;font-weight:700;color:#FF8A65;margin-top:2px}
+.plano-info{font-size:12px;color:rgba(255,255,255,0.4);font-weight:600;margin-bottom:12px;letter-spacing:.02em}
+.pricing{margin-bottom:12px;padding:12px 14px;background:rgba(255,255,255,0.07);border-radius:12px;
+  border:1px solid rgba(255,255,255,0.1);text-align:left}
+.pr-row{display:flex;justify-content:space-between;align-items:center;padding:3px 0;font-size:12px}
+.pr-row .lbl{color:rgba(255,255,255,0.45);font-weight:600;display:flex;align-items:center;gap:4px}
+.pr-row .val-paid{font-weight:700;color:#69F0AE;font-size:12px}
+.pr-row .val-ext{font-weight:700;color:#FFD54F;font-size:12px}
+.pr-row .val-debt{font-weight:700;color:#FF8A65;font-size:12px}
+.pr-row .val-extra{font-weight:700;color:#FF5252;font-size:12px}
+.pr-divider{height:1px;background:rgba(255,255,255,0.12);margin:6px 0}
+.pr-total{display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:800;color:rgba(255,255,255,0.8)}
+.pr-total .val{color:#FFD54F;font-size:15px}
+.pr-note{font-size:10px;color:rgba(255,255,255,0.3);text-align:center;margin-top:5px;font-style:italic}
+.status-row{display:flex;align-items:center;justify-content:center;gap:6px;font-size:11px;color:rgba(255,255,255,0.4);font-weight:600}
+.status-dot{width:7px;height:7px;border-radius:50%;background:#69F0AE;animation:pulse-g 2s infinite;flex-shrink:0}
 @keyframes pulse-g{0%,100%{opacity:1}50%{opacity:.35}}
 .status-dot.off{background:#EF9A9A;animation:none}
 .status-dot.waiting{background:#FFD54F;animation:pulse-g 1s infinite}
-.encerrada-card{display:none;text-align:center}
-.enc-icon{font-size:56px;margin-bottom:12px}
-.enc-title{font-size:26px;font-weight:900;margin-bottom:6px}
-.enc-sub{font-size:14px;color:rgba(255,255,255,0.55);line-height:1.5}
-.enc-total{font-size:22px;font-weight:800;color:#FFD54F;margin:12px 0 4px;}
-.enc-total-lbl{font-size:11px;color:rgba(255,255,255,0.4);}
-footer{margin-top:20px;font-size:11px;color:rgba(255,255,255,0.25);font-weight:600;letter-spacing:.03em;display:flex;align-items:center;gap:6px;}
+.enc-card{display:none;text-align:center}
+.enc-icon{font-size:52px;margin-bottom:10px}
+.enc-title{font-size:24px;font-weight:900;margin-bottom:6px}
+.enc-total{font-size:20px;font-weight:800;color:#FFD54F;margin:10px 0 2px}
+.enc-total-lbl{font-size:11px;color:rgba(255,255,255,0.4)}
+.enc-sub{font-size:13px;color:rgba(255,255,255,0.5);line-height:1.5;margin-top:10px}
+footer{margin-top:18px;font-size:11px;color:rgba(255,255,255,0.2);font-weight:600;letter-spacing:.03em}
+@keyframes pulse-w{0%,100%{opacity:.4}50%{opacity:.9}}
+.waiting-anim{animation:pulse-w 1.8s ease-in-out infinite}
 </style>
 </head>
 <body>
@@ -76,11 +65,11 @@ footer{margin-top:20px;font-size:11px;color:rgba(255,255,255,0.25);font-weight:6
   <div class="brand">🚗 Movi <span>Kids</span></div>
   <div class="tipo-badge" id="tipo-badge">— —</div>
   <div class="crianca-name" id="crianca-name">—</div>
-  <div class="resp-name">👤 Responsável: <span id="resp-name">—</span></div>
+  <div class="resp-name">👤 <span id="resp-name">—</span></div>
   <div class="ring-wrap">
-    <svg viewBox="0 0 160 160">
-      <circle class="ring-bg" cx="80" cy="80" r="70"/>
-      <circle class="ring-prog" id="ring-prog" cx="80" cy="80" r="70" stroke="#69F0AE" stroke-dasharray="440"/>
+    <svg viewBox="0 0 150 150">
+      <circle class="ring-bg" cx="75" cy="75" r="65"/>
+      <circle class="ring-prog" id="ring-prog" cx="75" cy="75" r="65" stroke="#29B6F6"/>
     </svg>
     <div class="ring-center">
       <div class="ring-label" id="ring-label">RESTANTE</div>
@@ -89,244 +78,259 @@ footer{margin-top:20px;font-size:11px;color:rgba(255,255,255,0.25);font-weight:6
     </div>
   </div>
   <div class="plano-info" id="plano-info">Carregando...</div>
-  <div class="pricing" id="pricing-box">
-    <div class="pricing-row">
-      <span class="lbl">Plano base</span>
-      <span class="val-paid" id="val-base">R$ 0,00 ✓</span>
+  <div class="pricing" id="pricing-box" style="display:none">
+    <div class="pr-row" id="row-base">
+      <span class="lbl">✅ Plano original</span>
+      <span class="val-paid" id="val-base">—</span>
     </div>
-    <div class="pricing-row" id="extra-row" style="display:none">
-      <span class="lbl" id="extra-lbl">+0 min extra</span>
-      <span class="val-extra" id="val-extra">R$ 0,00</span>
+    <div class="pr-row" id="row-debt" style="display:none">
+      <span class="lbl" id="lbl-debt">⚠️ Extra antes da ext.</span>
+      <span class="val-debt" id="val-debt">—</span>
     </div>
-    <div class="pricing-divider" id="pricing-div" style="display:none"></div>
-    <div class="pricing-total" id="total-row" style="display:none">
-      <span>Total a pagar</span>
-      <span class="val-total" id="val-total">R$ 0,00</span>
+    <div class="pr-row" id="row-ext" style="display:none">
+      <span class="lbl">📋 Novo plano (+<span id="ext-mins">0</span>min)</span>
+      <span class="val-ext" id="val-ext">—</span>
     </div>
-    <div class="pricing-note" id="pricing-note">Plano base ja pago no inicio da locacao</div>
+    <div class="pr-row" id="row-extra" style="display:none">
+      <span class="lbl">🔴 Tempo extra atual</span>
+      <span class="val-extra" id="val-extra">—</span>
+    </div>
+    <div class="pr-divider"></div>
+    <div class="pr-total">
+      <span>A pagar ao encerrar</span>
+      <span class="val" id="val-total">R$ 0,00</span>
+    </div>
+    <div class="pr-note" id="pr-note">Plano original já pago no início</div>
   </div>
   <div class="status-row" id="status-row">
     <div class="status-dot" id="status-dot"></div>
     <span id="status-txt">Carregando...</span>
   </div>
 </div>
-
-<div class="card encerrada-card" id="enc-card">
+<div class="card enc-card" id="enc-card">
   <div class="enc-icon">🏁</div>
   <div class="enc-title">Locação Encerrada</div>
   <div class="enc-total" id="enc-total" style="display:none"></div>
-  <div class="enc-total-lbl" id="enc-total-lbl" style="display:none">valor total</div>
-  <div class="enc-sub" id="enc-sub">Obrigado por escolher a Movi Kids!<br>Esperamos ver voce em breve. 🧸</div>
+  <div class="enc-total-lbl" id="enc-total-lbl" style="display:none">valor total da locação</div>
+  <div class="enc-sub" id="enc-sub">Obrigado por escolher a Movi Kids! 🧸</div>
 </div>
-
 <footer>🚗 Movi Kids · Golden Shopping Calhau</footer>
-
 <script>
-// ── PARAMS ────────────────────────────────────────────────────
-const P        = new URLSearchParams(location.search);
-const rowIndex = parseInt(P.get('r') || '0');
-let   startTs  = parseInt(P.get('ts') || '0');  // pode ser 0 — será atualizado via poll
-const planMin  = parseInt(P.get('m') || '10');
-const tipo     = decodeURIComponent(P.get('v') || 'Carro');
-const crianca  = decodeURIComponent(P.get('c') || '');
-const resp     = decodeURIComponent(P.get('p') || '');
-const vp       = parseFloat(P.get('vp') || '0');
-const adic     = parseFloat(P.get('a')  || '1');
+const P          = new URLSearchParams(location.search);
+const rowIndex   = parseInt(P.get('r') || '0');
+let   startTs    = parseInt(P.get('ts') || '0');
+const planMin    = parseInt(P.get('m')  || '10');   // total (original + ext do URL)
+const origMin    = parseInt(P.get('om') || planMin); // original
+const tipo       = decodeURIComponent(P.get('v') || 'Carro');
+const crianca    = decodeURIComponent(P.get('c') || '');
+const resp       = decodeURIComponent(P.get('p') || '');
+const vp         = parseFloat(P.get('vp') || '0');
+const adic       = parseFloat(P.get('a')  || '1');
+let   extMin     = parseInt(P.get('ext') || '0');     // minutos de extensão
+let   extVal     = parseFloat(P.get('ve') || '0');    // valor da extensão (R$)
 
-const GAS_URL  = 'https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec';
-const CIRCUM   = 440;
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec';
+const CIRCUM  = 408;
+let encerrada = false;
+let timerInt  = null;
+let pollInt   = null;
+let started   = false;
+let totalMin  = planMin; // atualiza do servidor
 
-// ── ESTADO ────────────────────────────────────────────────────
-let encerrada  = false;
-let timerInt   = null;
-let pollInt    = null;
-let started    = false;  // true quando startTs > 0 e timer rodando
-
-// ── TIPO → ícone e cor (FIX Bug 2+3: comparação por includes, não ===) ──
 function tipoIcon(t) {
-  if (t.includes('Carro'))    return '🚗';
+  if (t.includes('Carro')) return '🚗';
   if (t.includes('Triciclo')) return '🛺';
   return '🧸';
 }
-function tipoRingColor(t) {
-  if (t.includes('Carro'))    return '#29B6F6'; // azul
-  if (t.includes('Triciclo')) return '#69F0AE'; // verde
-  return '#F48FB1';                              // rosa — Pelúcia
+function tipoColor(t) {
+  if (t.includes('Carro')) return '#29B6F6';
+  if (t.includes('Triciclo')) return '#69F0AE';
+  return '#F48FB1';
 }
+function fmtTime(s) {
+  const a=Math.abs(s),h=Math.floor(a/3600),m=Math.floor((a%3600)/60),sc=a%60;
+  if(h>0)return h+':'+String(m).padStart(2,'0')+':'+String(sc).padStart(2,'0');
+  return String(m).padStart(2,'0')+':'+String(sc).padStart(2,'0');
+}
+function fmtR(v){return 'R$ '+Number(v).toFixed(2).replace('.',',');}
+function fmtHora(ts){const d=new Date(ts);return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');}
 
-// ── SETUP UI ──────────────────────────────────────────────────
-const icon      = tipoIcon(tipo);
-const ringColor = tipoRingColor(tipo);
-document.getElementById('tipo-badge').textContent   = icon + ' ' + tipo;
+// Setup inicial
+const icon = tipoIcon(tipo);
+const col  = tipoColor(tipo);
+document.getElementById('tipo-badge').textContent = icon + ' ' + tipo;
 document.getElementById('crianca-name').textContent = crianca || '—';
-document.getElementById('resp-name').textContent    = resp || '—';
-document.getElementById('ring-prog').style.stroke   = ringColor;
-
-// Mostrar plano base desde o início (FIX Bug 5: info visível mesmo aguardando)
+document.getElementById('resp-name').textContent = resp || '—';
+document.getElementById('ring-prog').style.stroke = col;
 if (vp > 0) {
   document.getElementById('pricing-box').style.display = 'block';
-  document.getElementById('val-base').textContent = 'R$ ' + vp.toFixed(2).replace('.', ',') + ' ✓';
+  document.getElementById('val-base').textContent = fmtR(vp) + ' ✓';
 }
-document.getElementById('plano-info').textContent =
-  planMin + 'min · R$ ' + vp.toFixed(2).replace('.', ',');
+updateExtUI();
 
-// ── FORMATOS ──────────────────────────────────────────────────
-function fmtTime(totalSec) {
-  const abs = Math.abs(totalSec);
-  const h   = Math.floor(abs / 3600);
-  const m   = Math.floor((abs % 3600) / 60);
-  const s   = abs % 60;
-  if (h > 0) return h + ':' + String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
-  return String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
-}
-function fmtMoney(v) { return 'R$ ' + v.toFixed(2).replace('.', ','); }
-function fmtHora(ts) {
-  const d = new Date(ts);
-  return String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+function updateExtUI() {
+  // Extensão
+  if (extMin > 0 && extVal > 0) {
+    document.getElementById('row-ext').style.display = 'flex';
+    document.getElementById('ext-mins').textContent = extMin;
+    document.getElementById('val-ext').textContent = fmtR(extVal) + ' ⏳';
+    document.getElementById('pricing-box').style.display = 'block';
+  }
+  updateTotal();
 }
 
-// ── TICK (countdown) ──────────────────────────────────────────
+function updateTotal(extraMin, extraVal, debtMin, debtVal) {
+  let pending = 0;
+  if (debtVal > 0) {
+    document.getElementById('row-debt').style.display = 'flex';
+    document.getElementById('val-debt').textContent = fmtR(debtVal) + ' ⚠️';
+    pending += debtVal;
+  }
+  if (extVal > 0) pending += extVal;
+  if (extraVal > 0) {
+    document.getElementById('row-extra').style.display = 'flex';
+    document.getElementById('val-extra').textContent = fmtR(extraVal);
+    pending += extraVal;
+  }
+  document.getElementById('val-total').textContent = fmtR(pending);
+  if (pending === 0) document.getElementById('val-total').textContent = 'R$ 0,00';
+}
+
 function tick() {
   if (encerrada || !started) return;
-  const now       = Date.now();
-  const elapsed   = Math.floor((now - startTs) / 1000);
-  const planSec   = planMin * 60;
-  const remaining = planSec - elapsed;
-  const isOver    = remaining <= 0;
-  const isWarn    = remaining <= 300 && !isOver;
+  const now     = Date.now();
+  const elapsed = Math.floor((now - startTs) / 1000);
+  const planSec = totalMin * 60;
+  const rem     = planSec - elapsed;
+  const isOver  = rem <= 0;
+  const isWarn  = rem <= 300 && !isOver;
 
-  const prog     = document.getElementById('ring-prog');
-  const timeEl   = document.getElementById('ring-time');
-  const labelEl  = document.getElementById('ring-label');
-  const extraLbl = document.getElementById('ring-extra-label');
+  const prog  = document.getElementById('ring-prog');
+  const tEl   = document.getElementById('ring-time');
+  const lEl   = document.getElementById('ring-label');
+  const xLbl  = document.getElementById('ring-extra-label');
 
   if (isOver) {
-    const extraSec  = Math.abs(remaining);
-    const extraMin  = Math.floor(extraSec / 60);
-    const extraCost = extraMin * adic;
-    prog.style.stroke          = '#FF5252';
-    prog.style.strokeDashoffset= '0';
-    timeEl.textContent         = '+' + fmtTime(extraSec);
-    timeEl.style.color         = '#FF8A65';
-    labelEl.textContent        = 'TEMPO EXTRA';
-    extraLbl.style.display     = 'block';
-    extraLbl.textContent       = '+' + extraMin + 'min de tempo extra';
-    if (vp > 0 && extraMin > 0) {
-      document.getElementById('extra-row').style.display   = 'flex';
-      document.getElementById('pricing-div').style.display = 'block';
-      document.getElementById('total-row').style.display   = 'flex';
-      document.getElementById('extra-lbl').textContent     = '+' + extraMin + ' min extra';
-      document.getElementById('val-extra').textContent     = fmtMoney(extraCost);
-      document.getElementById('val-total').textContent     = fmtMoney(extraCost);
-      document.getElementById('pricing-note').textContent  = 'Valor extra acumulado desde o fim do plano';
-    }
+    const extSec = Math.abs(rem);
+    const extM   = Math.floor(extSec / 60);
+    const extV   = extM * adic;
+    prog.style.strokeDashoffset = '0';
+    prog.style.stroke = '#FF5252';
+    tEl.textContent = '+' + fmtTime(extSec);
+    tEl.style.color = '#FF8A65';
+    lEl.textContent = 'TEMPO EXTRA';
+    xLbl.style.display = 'block';
+    xLbl.textContent = '+' + extM + 'min extra (R$' + adic.toFixed(2).replace('.',',') + '/min)';
+    document.getElementById('pricing-box').style.display = 'block';
+    updateTotal(null, null, null, null, extM, extV);
   } else {
-    const pct = Math.max(0, remaining / planSec);
-    prog.style.stroke          = isWarn ? '#FF8A65' : ringColor;
-    prog.style.strokeDashoffset= (CIRCUM * (1 - pct)).toFixed(1);
-    timeEl.textContent         = fmtTime(remaining);
-    timeEl.style.color         = isWarn ? '#FF8A65' : '#ffffff';
-    labelEl.textContent        = 'RESTANTE';
-    extraLbl.style.display     = 'none';
+    const pct = Math.max(0, rem / planSec);
+    prog.style.strokeDashoffset = (CIRCUM*(1-pct)).toFixed(1);
+    prog.style.stroke = isWarn ? '#FF8A65' : col;
+    tEl.textContent   = fmtTime(rem);
+    tEl.style.color   = isWarn ? '#FF8A65' : '#ffffff';
+    lEl.textContent   = 'RESTANTE';
+    xLbl.style.display = 'none';
+    updateTotal();
   }
-  document.getElementById('plano-info').textContent =
-    planMin + 'min · Início: ' + fmtHora(startTs);
+
+  const planLabel = totalMin === origMin
+    ? origMin + 'min · Início: ' + fmtHora(startTs)
+    : origMin + 'min + ' + (totalMin - origMin) + 'min ext. · Início: ' + fmtHora(startTs);
+  document.getElementById('plano-info').textContent = planLabel;
 }
 
-// ── ESTADO AGUARDANDO ─────────────────────────────────────────
+function updateTotal(a,b,c,d,extraMin,extraVal) {
+  let pending = 0;
+  if (extVal > 0) {
+    document.getElementById('row-ext').style.display = 'flex';
+    document.getElementById('val-ext').textContent = fmtR(extVal) + ' ⏳';
+    pending += extVal;
+  }
+  if (extraMin > 0 && extraVal > 0) {
+    document.getElementById('row-extra').style.display = 'flex';
+    document.getElementById('val-extra').textContent = fmtR(extraVal);
+    pending += extraVal;
+  } else {
+    document.getElementById('row-extra').style.display = 'none';
+  }
+  document.getElementById('val-total').textContent = fmtR(pending);
+  document.getElementById('pricing-box').style.display = (pending>0||vp>0) ? 'block':'none';
+}
+
 function setAguardando() {
-  document.getElementById('ring-time').textContent   = '--:--';
-  document.getElementById('ring-time').style.color   = 'rgba(255,255,255,0.3)';
-  document.getElementById('ring-label').textContent  = 'RESTANTE';
-  document.getElementById('plano-info').textContent  = 'Aguardando inicio da contagem...';
-  document.getElementById('status-dot').className    = 'status-dot waiting';
-  document.getElementById('status-txt').textContent  = 'Aguardando operador iniciar...';
-  // Manter anel zerado no estado correto
+  document.getElementById('ring-time').textContent = '--:--';
+  document.getElementById('ring-time').style.color = 'rgba(255,255,255,0.3)';
+  document.getElementById('ring-label').textContent = 'RESTANTE';
+  document.getElementById('plano-info').textContent = 'Aguardando inicio da contagem...';
+  document.getElementById('plano-info').classList.add('waiting-anim');
+  document.getElementById('status-dot').className = 'status-dot waiting';
+  document.getElementById('status-txt').textContent = 'Aguardando operador iniciar...';
   const prog = document.getElementById('ring-prog');
-  prog.style.stroke          = ringColor;
-  prog.style.strokeDashoffset= CIRCUM + '';
+  prog.style.stroke = col;
+  prog.style.strokeDashoffset = CIRCUM + '';
 }
 
-// ── INICIAR COUNTDOWN ─────────────────────────────────────────
 function iniciarCountdown(ts) {
-  startTs  = ts;
-  started  = true;
-  // Atualizar status dot
-  document.getElementById('status-dot').className   = 'status-dot';
-  document.getElementById('status-txt').textContent = 'Locação ativa · atualizando automaticamente';
-  // Iniciar tick imediatamente
+  startTs = ts; started = true;
+  document.getElementById('plano-info').classList.remove('waiting-anim');
+  document.getElementById('status-dot').className = 'status-dot';
+  document.getElementById('status-txt').textContent = 'Locação ativa · atualiza automaticamente';
   tick();
   if (!timerInt) timerInt = setInterval(tick, 1000);
-  // Mudar poll para intervalo mais lento (sessão ativa)
-  if (pollInt) { clearInterval(pollInt); pollInt = null; }
+  clearInterval(pollInt);
   pollInt = setInterval(checkStatus, 15000);
   checkStatus();
 }
 
-// ── POLL STATUS (FIX Bug 1+4+6+7: poll atualiza startTs, frequência adaptativa) ──
 async function checkStatus() {
   if (encerrada || !rowIndex) return;
   try {
-    const r  = await fetch(GAS_URL + '?action=verificarSessao&rowIndex=' + rowIndex,
-                           { cache: 'no-store' });
-    const d  = await r.json();
+    const r = await fetch(GAS_URL + '?action=verificarSessao&rowIndex=' + rowIndex, {cache:'no-store'});
+    const d = await r.json();
     if (!d.ok) return;
-
-    if (d.status === 'Encerrada') {
-      encerrarUI(d);
-      return;
-    }
-
-    // FIX Bug 1+4: receber startTimestamp do servidor e iniciar countdown
+    if (d.status === 'Encerrada') { encerrarUI(d); return; }
     const serverTs = Number(d.startTimestamp || 0);
-    if (!started && serverTs > 1000000000000) {
-      iniciarCountdown(serverTs);
+    if (!started && serverTs > 1000000000000) iniciarCountdown(serverTs);
+    if (started && serverTs > 1000000000000 && Math.abs(serverTs - startTs) > 5000) startTs = serverTs;
+    // Atualizar extensão do servidor (pode ter mudado)
+    if (d.extendedMins > 0 && d.extendedMins !== extMin) {
+      extMin   = d.extendedMins;
+      extVal   = d.extendedValor || extVal;
+      totalMin = d.mins || (origMin + extMin);
+      document.getElementById('ext-mins').textContent = extMin;
+      document.getElementById('val-ext').textContent  = fmtR(extVal) + ' ⏳';
+      document.getElementById('row-ext').style.display = 'flex';
+      document.getElementById('pricing-box').style.display = 'block';
     }
-    // FIX Bug 6: se já iniciado mas ts do servidor é mais recente, usar servidor
-    if (started && serverTs > 1000000000000 && Math.abs(serverTs - startTs) > 5000) {
-      startTs = serverTs; // correção de clock drift
-    }
-  } catch(e) {
-    // silencioso — conexão temporária
-  }
+  } catch(e) {}
 }
 
 function encerrarUI(d) {
   encerrada = true;
-  clearInterval(timerInt);
-  clearInterval(pollInt);
+  clearInterval(timerInt); clearInterval(pollInt);
   document.getElementById('main-card').style.display = 'none';
-  const encCard = document.getElementById('enc-card');
-  encCard.style.display = 'block';
-  // FIX Bug 7: mostrar valor total final na tela de encerrada
-  if (d && d.valorTotal && d.valorTotal > 0) {
-    document.getElementById('enc-total').textContent = fmtMoney(d.valorTotal);
+  const ec = document.getElementById('enc-card');
+  ec.style.display = 'block';
+  if (d && d.valorTotal > 0) {
+    document.getElementById('enc-total').textContent = fmtR(d.valorTotal);
     document.getElementById('enc-total').style.display = 'block';
     document.getElementById('enc-total-lbl').style.display = 'block';
   }
   if (crianca) {
     document.getElementById('enc-sub').innerHTML =
-      'Obrigado por escolher a Movi Kids, ' + crianca + '!<br>Esperamos ver voce em breve. 🧸';
+      'Obrigado por escolher a Movi Kids, ' + crianca + '!<br>Esperamos ver voce em breve! 🧸';
   }
 }
 
-// ── INIT ──────────────────────────────────────────────────────
 (function init() {
-  // FIX Bug 1+4: sempre verificar o servidor primeiro
-  // — não confiar só no ts da URL (pode ser 0 ou desatualizado)
   if (!rowIndex) {
-    document.getElementById('status-dot').className   = 'status-dot off';
+    document.getElementById('status-dot').className = 'status-dot off';
     document.getElementById('status-txt').textContent = 'Link inválido';
-    document.getElementById('ring-time').textContent  = '?';
     return;
   }
-
   setAguardando();
-
-  // Primeira verificação imediata
   checkStatus();
-
-  // FIX Bug 7: poll rápido (5s) enquanto aguardando, automaticamente muda para 15s ao iniciar
   pollInt = setInterval(checkStatus, 5000);
 })();
 </script>
