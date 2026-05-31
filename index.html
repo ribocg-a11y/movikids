@@ -21,7 +21,7 @@
 // ── CACHE BUSTER v1.3.0 ─────────────────────────────────
 // Força limpeza do SW antigo e recarga com versão nova
 (function(){
-  const CURRENT = 'v1.6.36-cache-refresh';
+  const CURRENT = 'v1.6.37-live-heal';
   const KEY = 'mk_loaded_version';
   try {
     if (localStorage.getItem(KEY) !== CURRENT) {
@@ -2213,7 +2213,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = 'v1.6.36-cache-refresh';
+const APP_VERSION = 'v1.6.37-live-heal';
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec';
 
 const PRECOS = {
@@ -2370,6 +2370,13 @@ async function init() {
   }, 60000);
 
   // VERIFICAR VERSÃO — a cada 5 min (era 60s; -80% calls)
+  // LIVE HEAL v1.6.37: telas abertas se corrigem sozinhas.
+  // Bypass do cache local para reduzir divergencia entre dispositivos em operacao.
+  setInterval(() => {
+    if (document.visibilityState !== 'visible') return;
+    syncController(true, 0);
+  }, 30000);
+
   setInterval(() => verificarNovaVersao(), 300000);
 
   // DIAGNÓSTICO ADMIN — a cada 60s (era 30s; -50% recalculos)
@@ -2438,8 +2445,8 @@ async function sincronizarServidor(force = false) {
 
   try {
     const CACHE_KEY = 'mk_inicio_cache';
-    // FIX 1: TTL = 22s (2s além do intervalo de 20s — cache sempre útil)
-    const CACHE_TTL = 22000;
+    // v1.6.37: TTL curto para nao mascarar alteracoes feitas em outro dispositivo.
+    const CACHE_TTL = 5000;
 
     // ── STALE-WHILE-REVALIDATE ─────────────────────────────────────────
     if (!force) {
