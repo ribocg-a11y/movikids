@@ -21,7 +21,7 @@
 // ── CACHE BUSTER v1.3.0 ─────────────────────────────────
 // Força limpeza do SW antigo e recarga com versão nova
 (function(){
-  const CURRENT = 'movikids-v1.6.31';
+  const CURRENT = 'movikids-v1.6.33-sync-safe';
   if ('serviceWorker' in navigator) {
     // Desregistra SWs antigos
     navigator.serviceWorker.getRegistrations().then(function(regs) {
@@ -1169,7 +1169,7 @@ nav button .nav-badge{
 .danger-wa:hover{background:#B71C1C!important}
 
 </style>
-<!-- Firebase SDK v1.6.31 — Realtime sync para todos os dispositivos -->
+<!-- Firebase SDK v1.6.33-sync-safe — Realtime sync canonico para todos os dispositivos -->
 <script type="module">
   import { initializeApp }          from 'https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js';
   import { getDatabase, ref, onValue } from 'https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js';
@@ -1208,7 +1208,7 @@ nav button .nav-badge{
     // Disparar sync para o app — mesma função do polling GAS
     // mas agora chamada pelo Firebase em tempo real
     if (typeof aplicarDadosInicio === 'function') {
-      aplicarDadosInicio({ ok: true, ativos, encHoje, fonte: 'firebase' });
+      aplicarDadosInicio({ ok: true, ativos, encHoje, fonte: 'firebase', canonical: true, parcial: true });
       if (typeof setStatus === 'function') setStatus(true);
       if (typeof _lastSyncAt !== 'undefined') window._fbLastUpdate = Date.now();
     }
@@ -1269,7 +1269,7 @@ nav button .nav-badge{
   <!-- ══ SIDEBAR (desktop only) ══ -->
   <aside id="sidebar">
     <div class="sb-logo">🚗 Movi <span>Kids</span>
-      <div class="sb-status"><span id="sb-dot" class="dot-online"></span><span id="sb-txt">Online</span><span id="sb-version" style="font-size:10px;opacity:.85;margin-left:5px;color:rgba(255,255,255,.7);font-family:monospace">v1.5.4</span></div>
+      <div class="sb-status"><span id="sb-dot" class="dot-online"></span><span id="sb-txt">Online</span><span id="sb-version" style="font-size:10px;opacity:.85;margin-left:5px;color:rgba(255,255,255,.7);font-family:monospace">v1.6.33-sync-safe</span></div>
     </div>
     <div class="sb-nav" id="sb-nav">
       <button class="sb-btn active" id="sbn-home" onclick="showPage('home')"><span class="sb-icon">🏠</span>Home</button>
@@ -1305,7 +1305,7 @@ nav button .nav-badge{
       <div class="hd-status">
         <div id="status-dot" class="dot-online"></div>
         <span id="status-txt">Online</span>
-        <span id="app-version" style="font-size:10px;opacity:.85;margin-left:4px;font-family:monospace">v1.5.4</span>
+        <span id="app-version" style="font-size:10px;opacity:.85;margin-left:4px;font-family:monospace">v1.6.33-sync-safe</span>
       </div>
     </div>
   </header>
@@ -2160,7 +2160,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = 'v1.6.31';
+const APP_VERSION = 'v1.6.33-sync-safe';
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec';
 
 const PRECOS = {
@@ -2453,8 +2453,40 @@ async function sincronizarServidor(force = false) {
   }
 }
 
+function mergeSessaoCanonica(serverSession, localSession = {}) {
+  const status = String(serverSession.status || '').trim();
+  const startTimestamp = Number(serverSession.startTimestamp || 0);
+  const serverMins = Number(serverSession.mins || 0);
+  const hasServerExtMins = Object.prototype.hasOwnProperty.call(serverSession, 'extendedMins');
+  const hasServerExtValor = Object.prototype.hasOwnProperty.call(serverSession, 'extendedValor');
+  const extendedMins = Number(hasServerExtMins ? serverSession.extendedMins || 0 : localSession.extendedMins || 0);
+  const extendedValor = Number(hasServerExtValor ? serverSession.extendedValor || 0 : localSession.extendedValor || 0);
+  const originalMins = Number(serverSession.originalMins || serverMins);
+  const totalMins = Number(serverSession.totalMins || (originalMins + extendedMins));
+
+  return {
+    ...serverSession,
+    status,
+    startTimestamp,
+    mins: totalMins,
+    originalMins,
+    extendedMins,
+    extendedValor,
+    started: startTimestamp > 0 || status === 'Ativa',
+
+    // Somente flags locais de UX podem sobreviver ao estado canonico.
+    alertFired5: Boolean(localSession.alertFired5),
+    alertFiredExp: Boolean(localSession.alertFiredExp)
+  };
+}
+
 function aplicarDadosInicio(d) {
   try {
+    if (!d || !Array.isArray(d.ativos)) return;
+    window._lastSyncSource = d.fonte || 'gas';
+    window._lastCanonicalRows = d.ativos.length;
+    if (d.fonte === 'firebase') window._fbLastUpdate = Date.now();
+
     // Atualiza sessões ativas
     const stored = JSON.parse(localStorage.getItem('mk_sessions') || '[]');
     const storedMap = {};
@@ -2467,35 +2499,7 @@ function aplicarDadosInicio(d) {
       try { localStorage.setItem('mk_sessions', JSON.stringify(cleanedStored)); } catch(e) {}
     }
 
-    sessions = d.ativos.map(s => {
-      const local       = storedMap[s.rowIndex] || {};
-      const hasTsServer = (s.startTimestamp && s.startTimestamp > 0);
-
-      // Se localStorage tem 'started' explícito → usa ele (operador controlou)
-      // Senão → deriva do timestamp do servidor (compatibilidade com frontend antigo)
-      let started, st;
-      if (local.hasOwnProperty('started')) {
-        started = local.started;
-        // Se started=true usa ts do localStorage (mais preciso); fallback para server
-        st = started ? (local.startTimestamp || s.startTimestamp || 0) : 0;
-      } else {
-        // Sem registro local (outro dispositivo): timer só inicia se col Y > 0
-        // Col Y = 0 até operador pressionar iniciar (fix: GAS v1.4.4)
-        started = hasTsServer && s.startTimestamp > 1000000000000; // ts válido > 0
-        st      = started ? s.startTimestamp : 0;
-      }
-
-      const extMins = local.extendedMins || 0;
-      return {
-        ...s,
-        mins:          s.mins + extMins,          // restaura extensão após sync
-        startTimestamp: st,
-        started,
-        alertFired5:   (local.alertFired5  || false),
-        alertFiredExp: (local.alertFiredExp || false),
-        extendedMins:  extMins,
-      };
-    });
+    sessions = d.ativos.map(s => mergeSessaoCanonica(s, storedMap[s.rowIndex] || {}));
     saveSessions();
 
     // Atualiza stats
@@ -2507,8 +2511,9 @@ function aplicarDadosInicio(d) {
     renderCards();
     updateStats();
 
-    // Encerradas hoje para operador ver na home
-    if (d.encHoje) renderEncHoje(d.encHoje);
+    // Encerradas hoje e KPIs do dia devem vir do GAS/planilha.
+    // O Firebase e um canal vivo parcial; se ele vier vazio, nao pode apagar o total do dia.
+    if (d.encHoje && d.fonte !== 'firebase') renderEncHoje(d.encHoje);
     atualizarVeiculoGrid(); // Atualiza disponibilidade após sync com servidor
 
     // Custos do dia
