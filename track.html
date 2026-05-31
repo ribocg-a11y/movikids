@@ -153,6 +153,28 @@ function fmtTime(s){
 function fmtR(v){return 'R$ '+Number(v).toFixed(2).replace('.',',');}
 function fmtHora(ts){const d=new Date(ts);return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');}
 
+function calcStartTimestamp(data, horaInicio) {
+  if(!data || !horaInicio) return 0;
+  const [dd,mm,yyyy] = String(data).split('/').map(Number);
+  const [hh,mi] = String(horaInicio).split(':').map(Number);
+  const ts = new Date(yyyy, mm-1, dd, hh, mi, 0).getTime();
+  return Number.isFinite(ts) ? ts : 0;
+}
+
+async function buscarInicioPeloResumo() {
+  try {
+    const r = await fetch(GAS_URL + '?action=carregarInicio&t=' + Date.now(), {cache:'no-store'});
+    const d = await r.json();
+    if(!d.ok || !Array.isArray(d.ativos)) return 0;
+    const s = d.ativos.find(x => Number(x.rowIndex) === Number(rowIndex));
+    if(!s) return 0;
+    applySessionData(s);
+    return Number(s.startTimestamp || 0) || calcStartTimestamp(s.data, s.horaInicio);
+  } catch(e) {
+    return 0;
+  }
+}
+
 function applySessionData(d) {
   // Chamado na primeira resposta válida do servidor — popula toda a UI
   if(!dataLoaded && d.crianca) {
@@ -287,7 +309,9 @@ async function checkStatus() {
     }
     applySessionData(d);
     if(d.status === 'Encerrada') { encerrarUI(d); return; }
-    const serverTs = Number(d.startTimestamp || 0);
+    let serverTs = Number(d.startTimestamp || 0);
+    if(serverTs > 0 && serverTs < 1000000000000) serverTs = 0;
+    if(!serverTs && d.status === 'Ativa') serverTs = await buscarInicioPeloResumo();
     if(!started && serverTs > 1000000000000) {
       iniciarCountdown(serverTs);
     } else if(started && serverTs > 1000000000000 && Math.abs(serverTs - startTs) > 5000) {

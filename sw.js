@@ -1,6 +1,6 @@
-// MOVI KIDS - Service Worker 1.6.44
+// MOVI KIDS - Service Worker 1.6.45
 // Hotfix: nao manter cache persistente do app. Rede sempre primeiro.
-const SW_VERSION = '1.6.44';
+const SW_VERSION = '1.6.45';
 
 self.addEventListener('install', event => {
   self.skipWaiting();
