@@ -21,7 +21,7 @@
 // ── CACHE BUSTER v1.3.0 ─────────────────────────────────
 // Força limpeza do SW antigo e recarga com versão nova
 (function(){
-  const CURRENT = '1.6.48';
+  const CURRENT = '1.6.49';
   const KEY = 'mk_loaded_version';
   try {
     if (localStorage.getItem(KEY) !== CURRENT) {
@@ -166,6 +166,7 @@ nav button .nav-badge{
   display:none;position:absolute;right:12px;top:44px;z-index:40;min-width:218px;background:#fff;
   border:1px solid var(--border);border-radius:8px;box-shadow:var(--shadow);padding:6px;
 }
+.pcard .sc-menu{right:0;top:38px;z-index:120}
 .sc-menu.show{display:block}
 .sc-menu button{
   width:100%;height:38px;border:0;border-radius:6px;background:#fff;color:var(--txt);
@@ -2198,7 +2199,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = '1.6.48';
+const APP_VERSION = '1.6.49';
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec';
 
 const PRECOS = {
@@ -2881,8 +2882,12 @@ function buildCard(s) {
   </div>`;
 }
 
+let menuLocacaoAbertoKey = null;
+
 function menuLocacaoHtml_(s, ativa) {
   const row = Number(s.rowIndex);
+  const menuKey = `${row}:${ativa ? 'ativa' : 'pendente'}`;
+  const showCls = menuLocacaoAbertoKey === menuKey ? ' show' : '';
   const itensAtiva = `
     <button onclick="abrirOperacaoLocacao(${row},'editar')">Editar dados</button>
     <button onclick="abrirOperacaoLocacao(${row},'pagamento')">Trocar pagamento</button>
@@ -2898,19 +2903,28 @@ function menuLocacaoHtml_(s, ativa) {
     <button onclick="abrirOperacaoLocacao(${row},'veiculo')">Trocar veiculo</button>
     <div class="sep"></div>
     <button class="danger" onclick="abrirOperacaoLocacao(${row},'cancelar')">Cancelar cadastro</button>`;
-  return `<button class="sc-more" onclick="toggleMenuLocacao(event,this)" title="Mais opcoes">...</button><div class="sc-menu">${ativa ? itensAtiva : itensPendente}</div>`;
+  return `<button class="sc-more" data-menu-key="${menuKey}" onclick="toggleMenuLocacao(event,this)" title="Mais opcoes">...</button><div class="sc-menu${showCls}" data-menu-key="${menuKey}" onclick="event.stopPropagation()">${ativa ? itensAtiva : itensPendente}</div>`;
 }
 
 function toggleMenuLocacao(ev, btn) {
-  if (ev) ev.stopPropagation();
+  if (ev) {
+    ev.preventDefault();
+    ev.stopPropagation();
+  }
   const menu = btn ? btn.nextElementSibling : null;
+  const key = btn ? btn.getAttribute('data-menu-key') : null;
   document.querySelectorAll('.sc-menu').forEach(m => { if (m !== menu) m.classList.remove('show'); });
-  if (menu) menu.classList.toggle('show');
+  if (menu) {
+    const willOpen = !menu.classList.contains('show');
+    menu.classList.toggle('show', willOpen);
+    menuLocacaoAbertoKey = willOpen ? key : null;
+  }
 }
 
 document.addEventListener('click', e => {
   if (!e.target.closest('.sc-menu') && !e.target.closest('.sc-more')) {
     document.querySelectorAll('.sc-menu').forEach(m => m.classList.remove('show'));
+    menuLocacaoAbertoKey = null;
   }
 });
 
@@ -3585,6 +3599,7 @@ function abrirOperacaoLocacao(rowIndex, tipo) {
   opSession = sessions.find(x => Number(x.rowIndex) === Number(rowIndex));
   opTipo = tipo;
   if (!opSession) { toast('Locacao nao encontrada', 'error'); return; }
+  menuLocacaoAbertoKey = null;
   document.querySelectorAll('.sc-menu').forEach(m => m.classList.remove('show'));
   const modal = document.getElementById('op-modal');
   const title = document.getElementById('op-title');
