@@ -21,7 +21,7 @@
 // ── CACHE BUSTER v1.3.0 ─────────────────────────────────
 // Força limpeza do SW antigo e recarga com versão nova
 (function(){
-  const CURRENT = 'v1.6.39-start-confirm';
+  const CURRENT = 'v1.6.40-stop-blink';
   const KEY = 'mk_loaded_version';
   try {
     if (localStorage.getItem(KEY) !== CURRENT) {
@@ -31,21 +31,6 @@
       if (!location.search.includes('force=' + CURRENT)) location.replace(location.pathname + '?force=' + CURRENT + '&t=' + Date.now());
     }
   } catch(e) {}
-  if ('serviceWorker' in navigator) {
-    // Desregistra SWs antigos
-    navigator.serviceWorker.getRegistrations().then(function(regs) {
-      var needsReload = false;
-      regs.forEach(function(reg) { reg.unregister(); needsReload = true; });
-      // Limpa todos os caches
-      if (window.caches) {
-        caches.keys().then(function(keys) {
-          keys.forEach(function(k) {
-            if (k !== CURRENT) { caches.delete(k); needsReload = true; }
-          });
-        });
-      }
-    });
-  }
 })();
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -2213,7 +2198,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = 'v1.6.39-start-confirm';
+const APP_VERSION = 'v1.6.40-stop-blink';
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec';
 
 const PRECOS = {
@@ -5599,7 +5584,8 @@ document.addEventListener('DOMContentLoaded', init);
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.addEventListener('message', event => {
     if (event.data && event.data.type === 'MK_UPDATE_READY') {
-      location.reload();
+      const swVersion = event.data.version || '';
+      if (swVersion && swVersion !== APP_VERSION) location.reload();
     }
   });
   window.addEventListener('load', () => {

@@ -1,6 +1,6 @@
-// MOVI KIDS - Service Worker v1.6.39-start-confirm
+// MOVI KIDS - Service Worker v1.6.40-stop-blink
 // Hotfix: nao manter cache persistente do app. Rede sempre primeiro.
-const SW_VERSION = 'v1.6.39-start-confirm';
+const SW_VERSION = 'v1.6.40-stop-blink';
 
 self.addEventListener('install', event => {
   self.skipWaiting();
