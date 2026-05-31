@@ -21,7 +21,7 @@
 // ── CACHE BUSTER v1.3.0 ─────────────────────────────────
 // Força limpeza do SW antigo e recarga com versão nova
 (function(){
-  const CURRENT = '1.6.42';
+  const CURRENT = '1.6.43';
   const KEY = 'mk_loaded_version';
   try {
     if (localStorage.getItem(KEY) !== CURRENT) {
@@ -2198,7 +2198,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = '1.6.42';
+const APP_VERSION = '1.6.43';
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec';
 
 const PRECOS = {
@@ -2531,7 +2531,8 @@ function mergeSessaoCanonica(serverSession, localSession = {}) {
 
     // Somente flags locais de UX podem sobreviver ao estado canonico.
     alertFired5: Boolean(localSession.alertFired5),
-    alertFiredExp: Boolean(localSession.alertFiredExp)
+    alertFiredExp: Boolean(localSession.alertFiredExp),
+    extraWaSentAt: localSession.extraWaSentAt || localStorage.getItem(extraWaKey_(serverSession)) || null
   };
 }
 
@@ -2649,6 +2650,23 @@ async function verificarNovaVersao() {
 
 function saveSessions() {
   localStorage.setItem('mk_sessions', JSON.stringify(sessions));
+}
+
+function extraWaKey_(s) {
+  return 'mk_extra_wa_sent_' + String((s && (s.rowIndex || s.id)) || '');
+}
+
+function extraWaFoiEnviado_(s) {
+  if (!s) return false;
+  return Boolean(s.extraWaSentAt || localStorage.getItem(extraWaKey_(s)));
+}
+
+function marcarExtraWaEnviado_(s) {
+  if (!s) return;
+  const ts = Date.now();
+  s.extraWaSentAt = ts;
+  try { localStorage.setItem(extraWaKey_(s), String(ts)); } catch(e) {}
+  saveSessions();
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -3369,6 +3387,12 @@ function pedirEncerrar(rowIndex) {
   if (!encSession) return;
 
   const rem           = calcRemaining(encSession);
+  if (rem <= 0 && !extraWaFoiEnviado_(encSession)) {
+    alertSession = encSession;
+    showAlertModal(encSession, true);
+    toast('Envie o aviso de minutos extras antes de encerrar.', 'error');
+    return;
+  }
   const elapsedSec    = Math.floor((Date.now() - encSession.startTimestamp) / 1000);
   const contratSec    = encSession.mins * 60;
   // Cobra minuto adicional apenas após completar cada minuto extra (Math.floor)
@@ -3480,6 +3504,7 @@ function triggerAlertExpired(s) {
 function showAlertModal(s, expired) {
   const modal = document.getElementById('alert-modal');
   modal.className = 'modal-overlay alert-modal' + (expired ? ' danger show' : ' show');
+  modal.dataset.extraWaSent = expired && extraWaFoiEnviado_(s) ? '1' : '0';
 
   document.getElementById('alert-icon').textContent  = expired ? '🔴' : '⏰';
   document.getElementById('alert-title').textContent = expired ? 'Tempo esgotado!' : 'Faltam 5 minutos!';
@@ -3504,7 +3529,14 @@ function showAlertModal(s, expired) {
     if (btnPular) btnPular.style.display = 'none';
     if (btnWa) {
       btnWa.textContent = '📲 Enviar aviso de cobrança (obrigatório)';
-      btnWa.onclick = function() { waTempoEsgotado(s); fecharAlerta(); };
+      btnWa.onclick = function() {
+        if (waTempoEsgotado(s) === false) return;
+        marcarExtraWaEnviado_(s);
+        modal.dataset.extraWaSent = '1';
+        modal.classList.remove('danger');
+        fecharAlerta();
+        toast('Aviso de minutos extras acionado.', 'success');
+      };
     }
   } else {
     if (btnPular) btnPular.style.display = '';
@@ -3518,7 +3550,7 @@ function showAlertModal(s, expired) {
 function fecharAlerta() {
   // Bloqueia fechar se expirado — operador deve enviar MSG 3 primeiro
   const modal = document.getElementById('alert-modal');
-  if (modal.classList.contains('danger')) {
+  if (modal.classList.contains('danger') && modal.dataset.extraWaSent !== '1') {
     toast('Envie o aviso de cobrança antes de fechar!', 'error');
     return;
   }
@@ -3709,7 +3741,7 @@ function waAlertaTempo(s) {
 
 // ── MSG 3: Tempo esgotado com extra ──────────────────────────────────────
 function waTempoEsgotado(s) {
-  if (!s || !s.telefone) return;
+  if (!s || !s.telefone) { toast('Telefone obrigatÃ³rio para aviso de extra.', 'error'); return false; }
   const adicional = String(s.adicionalPorMin).replace('.',',');
   const track     = gerarTrackUrl(s);
 
@@ -3719,6 +3751,7 @@ function waTempoEsgotado(s) {
   });
 
   enviarWaTel(s.telefone, msg);
+  return true;
 }
 
 // -- MSG 6: Extensão de tempo (v1.6.27) — novo plano contratado ------
@@ -3769,7 +3802,7 @@ function waMensagemRetorno(cliente) {
 // ── Compatibilidade: botão WhatsApp no card e no alerta ───────────────────
 function abrirWaMsg(s) {
   const rem = calcRemaining(s);
-  if (rem <= 0)   { waTempoEsgotado(s); }
+  if (rem <= 0)   { if (waTempoEsgotado(s) !== false) marcarExtraWaEnviado_(s); }
   else if (rem <= 300) { waAlertaTempo(s); }
   else {
     // > 5 min restando: reenviar apenas o link de acompanhamento (boas-vindas)
