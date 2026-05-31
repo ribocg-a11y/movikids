@@ -21,7 +21,7 @@
 // ── CACHE BUSTER v1.3.0 ─────────────────────────────────
 // Força limpeza do SW antigo e recarga com versão nova
 (function(){
-  const CURRENT = 'v1.6.37-live-heal';
+  const CURRENT = 'v1.6.38-live-watch';
   const KEY = 'mk_loaded_version';
   try {
     if (localStorage.getItem(KEY) !== CURRENT) {
@@ -2213,7 +2213,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = 'v1.6.37-live-heal';
+const APP_VERSION = 'v1.6.38-live-watch';
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec';
 
 const PRECOS = {
@@ -2369,7 +2369,7 @@ async function init() {
     }
   }, 60000);
 
-  // VERIFICAR VERSÃO — a cada 5 min (era 60s; -80% calls)
+  // VERIFICAR VERSAO — a cada 1 min durante estabilizacao operacional.
   // LIVE HEAL v1.6.37: telas abertas se corrigem sozinhas.
   // Bypass do cache local para reduzir divergencia entre dispositivos em operacao.
   setInterval(() => {
@@ -2377,7 +2377,8 @@ async function init() {
     syncController(true, 0);
   }, 30000);
 
-  setInterval(() => verificarNovaVersao(), 300000);
+  setTimeout(() => verificarNovaVersao(), 15000);
+  setInterval(() => verificarNovaVersao(), 60000);
 
   // DIAGNÓSTICO ADMIN — a cada 60s (era 30s; -50% recalculos)
   setInterval(() => {
@@ -2636,7 +2637,8 @@ function calcStartTimestamp(data, horaInicio) {
 
 async function verificarNovaVersao() {
   try {
-    const r = await fetch(location.href + '?nocache=' + Date.now(), { cache: 'no-store' });
+    const url = location.origin + location.pathname + '?nocache=' + Date.now();
+    const r = await fetch(url, { cache: 'no-store' });
     const html = await r.text();
     const m = html.match(/APP_VERSION = '([^']+)'/);
     if (m && m[1] !== APP_VERSION) {
