@@ -140,7 +140,7 @@ nav button .nav-badge{
   padding:16px;box-shadow:var(--shadow);
   border:2px solid transparent;
   transition:border-color .3s,background .3s;
-  position:relative;overflow:hidden;
+  position:relative;overflow:visible;
 }
 .session-card::before{
   content:'';position:absolute;top:0;left:0;right:0;height:4px;
@@ -163,6 +163,24 @@ nav button .nav-badge{
   background:var(--blue-lt);color:var(--blue);
 }
 .sc-plano-badge.pelucia{background:var(--pink-lt);color:var(--pink)}
+.sc-head-actions{display:flex;align-items:center;gap:6px}
+.sc-more{
+  width:32px;height:32px;border:1px solid var(--border);border-radius:8px;background:#fff;
+  color:var(--txt2);font-size:20px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;
+}
+.sc-menu{
+  display:none;position:absolute;right:12px;top:44px;z-index:40;min-width:218px;background:#fff;
+  border:1px solid var(--border);border-radius:8px;box-shadow:var(--shadow);padding:6px;
+}
+.sc-menu.show{display:block}
+.sc-menu button{
+  width:100%;height:38px;border:0;border-radius:6px;background:#fff;color:var(--txt);
+  font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;text-align:left;padding:0 10px;cursor:pointer;
+}
+.sc-menu button:hover{background:var(--blue-lt);color:var(--blue)}
+.sc-menu button.danger{color:var(--red)}
+.sc-menu button.danger:hover{background:var(--red-lt)}
+.sc-menu .sep{height:1px;background:var(--border);margin:6px}
 
 .sc-names{margin-bottom:14px}
 .sc-crianca{font-size:18px;font-weight:900;color:var(--txt);line-height:1.2}
@@ -381,6 +399,17 @@ nav button .nav-badge{
 .modal-info-row span:last-child{font-weight:700;color:var(--txt)}
 .modal-info-row.total span{font-size:16px;font-weight:900;color:var(--green)}
 .modal-btns{display:flex;flex-direction:column;gap:10px}
+.op-form{display:flex;flex-direction:column;gap:10px;margin-bottom:14px}
+.op-field label{display:block;font-size:11px;color:var(--txt3);font-weight:900;text-transform:uppercase;letter-spacing:.04em;margin:0 0 4px}
+.op-field input,.op-field select,.op-field textarea{
+  width:100%;border:1.5px solid var(--border);border-radius:8px;background:#fff;color:var(--txt);
+  font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;padding:10px 12px;outline:none;
+}
+.op-field textarea{min-height:70px;resize:vertical}
+.op-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.op-policy{background:var(--blue-lt);border:1px solid #CFE1FF;border-radius:8px;color:var(--txt2);font-size:12px;line-height:1.45;padding:10px;margin-bottom:12px}
+.op-policy.danger{background:var(--red-lt);border-color:#F3B7B7;color:#8A1F1F}
+.op-danger{background:var(--red)!important;color:#fff!important}
 
 /* Alert specific */
 .alert-modal .modal-sheet{background:var(--amber-lt);border-top:4px solid var(--amber)}
@@ -2117,6 +2146,21 @@ nav button .nav-badge{
   </div>
 </div>
 
+<!-- OPERACOES DA LOCACAO -->
+<div id="op-modal" class="modal-overlay">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-icon" id="op-icon">...</div>
+    <div class="modal-title" id="op-title">Editar locacao</div>
+    <div class="modal-sub" id="op-sub">Corrija dados operacionais com auditoria.</div>
+    <div id="op-body"></div>
+    <div class="modal-btns">
+      <button class="btn btn-primary" id="op-save" onclick="salvarOperacaoLocacao()">Salvar alteracao</button>
+      <button class="btn btn-secondary" onclick="fecharOperacaoLocacao()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
 <!-- Toast container -->
 <div id="update-banner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:9999;background:#1565C0;color:#fff;padding:10px 16px;align-items:center;justify-content:space-between;font-size:13px;font-weight:600;gap:12px">
   <span>🔄 Nova versão disponível — atualizando em <span id="update-countdown">10</span>s</span>
@@ -2160,7 +2204,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = 'v1.6.33-sync-safe';
+const APP_VERSION = 'v1.6.35-operacoes-safe';
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec';
 
 const PRECOS = {
@@ -2182,7 +2226,11 @@ let sessions    = [];   // active sessions with timer data
 let timerInterv = null;
 let alertSession= null; // session triggering alert modal
 let encSession  = null; // session in encerrar modal
+let opSession   = null; // session in edit/cancel modal
+let opTipo      = null;
 let novaState   = { tipo: null, plano: null, veiculo: null, pagamento: null, observacao: '', step: 0 };
+const NOVA_DRAFT_KEY = 'mk_nova_locacao_draft_v1';
+let _restoringNovaDraft = false;
 let catSel      = 'Energia';
 let custosHoje  = [];
 let statsHoje   = { fat: 0, n: 0 };
@@ -2235,6 +2283,7 @@ async function init() {
 
   requestNotificationPermission();
   setDefaultDate();
+  inicializarDraftNova_();
 
   // PASSO 1: mostra cache local imediatamente (app parece instantâneo)
   const cached = JSON.parse(localStorage.getItem('mk_sessions') || '[]');
@@ -2688,7 +2737,10 @@ function buildCard(s) {
           <span class="sc-tipo-icon">${icon}</span>
           <span class="sc-tipo-name">${s.veiculo || s.tipo}</span>
         </div>
-        <span class="sc-plano-badge ${badgeCls}">${s.plano}</span>
+        <div class="sc-head-actions">
+          <span class="sc-plano-badge ${badgeCls}">${s.plano}</span>
+          ${menuLocacaoHtml_(s, false)}
+        </div>
       </div>
       <div class="sc-names">
         <div class="sc-crianca">${escHtml(s.crianca)}</div>
@@ -2743,7 +2795,10 @@ function buildCard(s) {
         <span class="sc-tipo-icon">${icon}</span>
         <span class="sc-tipo-name">${s.tipo}</span>
       </div>
-      <span class="sc-plano-badge ${badgeCls}">${s.plano}</span>
+      <div class="sc-head-actions">
+        <span class="sc-plano-badge ${badgeCls}">${s.plano}</span>
+        ${menuLocacaoHtml_(s, true)}
+      </div>
     </div>
 
     <div class="sc-names">
@@ -2793,6 +2848,39 @@ function buildCard(s) {
   </div>`;
 }
 
+function menuLocacaoHtml_(s, ativa) {
+  const row = Number(s.rowIndex);
+  const itensAtiva = `
+    <button onclick="abrirOperacaoLocacao(${row},'editar')">Editar dados</button>
+    <button onclick="abrirOperacaoLocacao(${row},'pagamento')">Trocar pagamento</button>
+    <button onclick="abrirOperacaoLocacao(${row},'veiculo')">Trocar veiculo</button>
+    <button onclick="abrirOperacaoLocacao(${row},'observacao')">Observacao</button>
+    <div class="sep"></div>
+    <button onclick="abrirEstender(${row})">Estender tempo</button>
+    <button class="danger" onclick="abrirOperacaoLocacao(${row},'cancelar')">Cancelar</button>`;
+  const itensPendente = `
+    <button onclick="abrirOperacaoLocacao(${row},'editar')">Editar cadastro</button>
+    <button onclick="abrirOperacaoLocacao(${row},'plano')">Trocar plano</button>
+    <button onclick="abrirOperacaoLocacao(${row},'pagamento')">Trocar pagamento</button>
+    <button onclick="abrirOperacaoLocacao(${row},'veiculo')">Trocar veiculo</button>
+    <div class="sep"></div>
+    <button class="danger" onclick="abrirOperacaoLocacao(${row},'cancelar')">Cancelar cadastro</button>`;
+  return `<button class="sc-more" onclick="toggleMenuLocacao(event,this)" title="Mais opcoes">...</button><div class="sc-menu">${ativa ? itensAtiva : itensPendente}</div>`;
+}
+
+function toggleMenuLocacao(ev, btn) {
+  if (ev) ev.stopPropagation();
+  const menu = btn ? btn.nextElementSibling : null;
+  document.querySelectorAll('.sc-menu').forEach(m => { if (m !== menu) m.classList.remove('show'); });
+  if (menu) menu.classList.toggle('show');
+}
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('.sc-menu') && !e.target.closest('.sc-more')) {
+    document.querySelectorAll('.sc-menu').forEach(m => m.classList.remove('show'));
+  }
+});
+
 function fmtTime(totalSec) {
   const abs = Math.abs(totalSec);
   const h   = Math.floor(abs / 3600);
@@ -2804,6 +2892,164 @@ function fmtTime(totalSec) {
 
 function escHtml(t) {
   return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function novaDraftCampos_() {
+  const val = id => {
+    const el = document.getElementById(id);
+    return el ? el.value : '';
+  };
+  return {
+    responsavel: val('inp-resp'),
+    crianca: val('inp-cri'),
+    telefone: val('inp-tel'),
+    observacao: val('inp-obs')
+  };
+}
+
+function hasNovaDraft_() {
+  try { return !!localStorage.getItem(NOVA_DRAFT_KEY); } catch(e) { return false; }
+}
+
+function isNovaDirty_() {
+  const c = novaDraftCampos_();
+  return !!(
+    novaState.tipo || novaState.plano || novaState.veiculo || novaState.pagamento ||
+    c.responsavel.trim() || c.crianca.trim() || c.telefone.trim() || c.observacao.trim()
+  );
+}
+
+function salvarNovaDraft_() {
+  if (_restoringNovaDraft) return;
+  if (!isNovaDirty_()) return;
+  const c = novaDraftCampos_();
+  const draft = {
+    state: Object.assign({}, novaState, { observacao: c.observacao }),
+    campos: c,
+    updatedAt: Date.now()
+  };
+  try { localStorage.setItem(NOVA_DRAFT_KEY, JSON.stringify(draft)); } catch(e) {}
+}
+
+function limparNovaDraft_() {
+  try { localStorage.removeItem(NOVA_DRAFT_KEY); } catch(e) {}
+}
+
+function aplicarStepNova_(step) {
+  const safeStep = Math.max(0, Math.min(Number(step) || 0, 3));
+  document.querySelectorAll('.step-page').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.step-dot').forEach(d => d.classList.remove('active'));
+  const pg = document.getElementById('step-' + safeStep);
+  const dot = document.getElementById('dot-' + safeStep);
+  if (pg) pg.classList.add('active');
+  if (dot) dot.classList.add('active');
+  novaState.step = safeStep;
+}
+
+function renderPlanosNova_(tipo) {
+  const container = document.getElementById('plano-list');
+  if (!container || !tipo || !PRECOS[tipo]) return;
+  container.innerHTML = Object.entries(PRECOS[tipo]).map(([k,v]) => {
+    const badgeCls = tipo === 'PelÃºcia' ? 'pelucia' : '';
+    const adicFmt  = 'R$ ' + String(v.a).replace('.',',') + '/min extra';
+    return `<div class="plano-btn ${badgeCls}" onclick="selectPlano('${k}',this)">
+      <div>
+        <div class="pb-nome">${PLANO_LABELS[k]}</div>
+        <div class="pb-det">${v.m} min Â· ${adicFmt}</div>
+      </div>
+      <div class="pb-val">R$ ${v.v}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderReviewNova_(plano) {
+  const tipo = novaState.tipo;
+  if (!tipo || !plano || !PRECOS[tipo] || !PRECOS[tipo][plano]) return;
+  const cfg = PRECOS[tipo][plano];
+  const cls = tipo === 'PelÃºcia' ? 'pelucia' : '';
+  const wrap = document.getElementById('review-card-wrap');
+  if (wrap) {
+    wrap.innerHTML = `
+      <div class="review-card ${cls}">
+        <div class="rc-tipo">${tipoIcon(tipo)} ${tipo}</div>
+        <div class="rc-plano">${PLANO_LABELS[plano]}</div>
+        <div class="rc-valor">R$ ${cfg.v} Â· adicional R$ ${cfg.a}/min</div>
+      </div>`;
+  }
+  const cls2 = tipo === 'PelÃºcia' ? 'pink' : '';
+  ['inp-resp','inp-cri','inp-tel'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.className = 'form-input ' + cls2;
+  });
+}
+
+function renderPagamentoResumo_() {
+  const resp = document.getElementById('inp-resp')?.value.trim() || '';
+  const cri  = document.getElementById('inp-cri')?.value.trim() || '';
+  const obs  = document.getElementById('inp-obs')?.value.trim() || '';
+  const tipo = novaState.tipo, plano = novaState.plano, veiculo = novaState.veiculo;
+  const cfg  = PRECOS[tipo] && PRECOS[tipo][plano] ? PRECOS[tipo][plano] : {};
+  const wrap = document.getElementById('pag-review-wrap');
+  if (!wrap) return;
+  const icon = tipoIcon(tipo);
+  wrap.innerHTML = '<div class="pag-resumo">' +
+    '<div class="pag-resumo-row"><span>VeÃ­culo</span><span>' + icon + ' ' + escHtml(veiculo||tipo) + '</span></div>' +
+    '<div class="pag-resumo-row"><span>Plano</span><span>' + escHtml(PLANO_LABELS[plano]||plano) + '</span></div>' +
+    '<div class="pag-resumo-row"><span>ResponsÃ¡vel</span><span>' + escHtml(resp) + '</span></div>' +
+    '<div class="pag-resumo-row"><span>CrianÃ§a</span><span>' + escHtml(cri) + '</span></div>' +
+    (obs ? '<div class="pag-resumo-row"><span>Obs</span><span style="font-style:italic">' + escHtml(obs) + '</span></div>' : '') +
+    '<div class="pag-resumo-row total"><span>Total</span><span>R$ ' + (cfg.v||0) + '</span></div>' +
+  '</div>';
+}
+
+function restaurarNovaDraft_() {
+  let draft = null;
+  try { draft = JSON.parse(localStorage.getItem(NOVA_DRAFT_KEY) || 'null'); } catch(e) {}
+  if (!draft || !draft.state) return false;
+
+  _restoringNovaDraft = true;
+  try {
+    novaState = Object.assign({ tipo:null, plano:null, veiculo:null, pagamento:null, observacao:'', step:0 }, draft.state);
+    if (novaState.tipo) renderPlanosNova_(novaState.tipo);
+    if (novaState.veiculo) {
+      const card = document.getElementById('vc-' + novaState.veiculo);
+      if (card && !card.classList.contains('vc-busy') && !card.classList.contains('vc-busy-pink')) {
+        card.classList.add(novaState.tipo === 'PelÃºcia' ? 'vc-sel-pink' : 'vc-sel');
+      }
+    }
+    if (novaState.plano) {
+      document.querySelectorAll('.plano-btn').forEach(b => {
+        const onclick = b.getAttribute('onclick') || '';
+        if (onclick.includes("'" + novaState.plano + "'")) b.classList.add('sel');
+      });
+      renderReviewNova_(novaState.plano);
+    }
+    const c = draft.campos || {};
+    const set = (id, value) => { const el = document.getElementById(id); if (el) el.value = value || ''; };
+    set('inp-resp', c.responsavel);
+    set('inp-cri', c.crianca);
+    set('inp-tel', c.telefone);
+    set('inp-obs', c.observacao || novaState.observacao);
+    novaState.observacao = c.observacao || novaState.observacao || '';
+    renderPagamentoResumo_();
+    document.querySelectorAll('.pag-btn').forEach(b => {
+      b.classList.toggle('sel', !!(novaState.pagamento && b.textContent.includes(novaState.pagamento)));
+    });
+    const btn = document.getElementById('btn-confirmar');
+    if (btn && novaState.pagamento) btn.style.display = 'block';
+    aplicarStepNova_(novaState.step || 0);
+  } finally {
+    _restoringNovaDraft = false;
+  }
+  return true;
+}
+
+function inicializarDraftNova_() {
+  ['inp-resp','inp-cri','inp-tel','inp-obs'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) ['input','change'].forEach(ev => el.addEventListener(ev, salvarNovaDraft_));
+  });
+  window.addEventListener('beforeunload', salvarNovaDraft_);
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -2896,6 +3142,7 @@ function selectVeiculo(el, veiculo, tipo) {
   novaState.tipo    = tipo;
   // Reutiliza selectTipo para construir planos (código testado e funcional)
   selectTipo(tipo, null);
+  salvarNovaDraft_();
 }
 
 function selectTipo(tipo, el) {
@@ -2936,9 +3183,7 @@ function selectPlano(plano, el) {
       <div class="rc-valor">R$ ${cfg.v} · adicional R$ ${cfg.a}/min</div>
     </div>`;
 
-  document.getElementById('inp-resp').value = '';
-  document.getElementById('inp-cri').value  = '';
-  document.getElementById('inp-tel').value  = '';
+  // Preserva dados ja digitados ao trocar ou revisar o plano.
 
   // Set input class by tipo
   const cls2 = tipo === 'Pelúcia' ? 'pink' : '';
@@ -2957,6 +3202,7 @@ function nextStep() {
   novaState.step++;
   document.getElementById(`step-${novaState.step}`).classList.add('active');
   document.getElementById(`dot-${novaState.step}`).classList.add('active');
+  salvarNovaDraft_();
 }
 
 function backStep() {
@@ -2966,6 +3212,7 @@ function backStep() {
   novaState.step--;
   document.getElementById(`step-${novaState.step}`).classList.add('active');
   document.getElementById(`dot-${novaState.step}`).classList.add('active');
+  salvarNovaDraft_();
 }
 
 function irParaPagamento() {
@@ -2999,25 +3246,30 @@ function selPagamento(el, forma) {
   novaState.pagamento = forma;
   const btn = document.getElementById('btn-confirmar');
   if (btn) btn.style.display = 'block';
+  salvarNovaDraft_();
 }
 
 function capitalizarNome(el) {
   const pos = el.selectionStart;
   el.value = el.value.replace(/(?:^|\s)\S/g, c => c.toUpperCase());
   el.setSelectionRange(pos, pos);
+  salvarNovaDraft_();
 }
 
-function resetNova() {
+function resetNova(opts = {}) {
   document.querySelectorAll('.step-page').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.step-dot').forEach(d => d.classList.remove('active'));
   document.getElementById('step-0').classList.add('active');
   document.getElementById('dot-0').classList.add('active');
   document.querySelectorAll('.tipo-btn').forEach(b => b.classList.remove('sel'));
   document.querySelectorAll('.plano-btn').forEach(b => b.classList.remove('sel'));
+  document.querySelectorAll('.vc-card').forEach(c => c.classList.remove('vc-sel','vc-sel-pink'));
   novaState = { tipo: null, plano: null, veiculo: null, pagamento: null, observacao: '', step: 0 };
+  ['inp-resp','inp-cri','inp-tel'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
   const obsEl = document.getElementById('inp-obs'); if(obsEl) obsEl.value = '';
   document.querySelectorAll('.pag-btn').forEach(b => b.classList.remove('sel'));
   const bc = document.getElementById('btn-confirmar'); if(bc) bc.style.display='none';
+  if (!opts.preserveDraft) limparNovaDraft_();
 }
 
 async function confirmarLocacao() {
@@ -3200,6 +3452,7 @@ async function confirmarEncerrar() {
 // ALERTS
 // ═══════════════════════════════════════════════════════════
 function triggerAlert5(s) {
+  salvarNovaDraft_();
   alertSession = s;
   playBeep();
   showNotification(`⏰ ${s.crianca} — 5 minutos!`, `Hora de avisar o responsável: ${s.responsavel}`);
@@ -3207,6 +3460,7 @@ function triggerAlert5(s) {
 }
 
 function triggerAlertExpired(s) {
+  salvarNovaDraft_();
   alertSession = s;
   playBeep(3);
   showNotification(`🔴 ${s.crianca} — Tempo esgotado!`, `Minutos extras sendo cobrados!`);
@@ -3260,6 +3514,8 @@ function fecharAlerta() {
   }
   modal.classList.remove('show');
   if (!encSession) alertSession = null;
+  const novaPage = document.getElementById('page-nova');
+  if (novaPage && novaPage.classList.contains('active')) restaurarNovaDraft_();
 }
 
 function abrirWhatsApp() {
@@ -3272,6 +3528,95 @@ function abrirWhatsAppCard(rowIndex) {
   const s = sessions.find(x => x.rowIndex === rowIndex);
   if (!s) return;
   abrirWaMsg(s);
+}
+
+function normalizarTxt_(s) {
+  return String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+}
+
+function abrirOperacaoLocacao(rowIndex, tipo) {
+  opSession = sessions.find(x => Number(x.rowIndex) === Number(rowIndex));
+  opTipo = tipo;
+  if (!opSession) { toast('Locacao nao encontrada', 'error'); return; }
+  document.querySelectorAll('.sc-menu').forEach(m => m.classList.remove('show'));
+  const modal = document.getElementById('op-modal');
+  const title = document.getElementById('op-title');
+  const sub = document.getElementById('op-sub');
+  const body = document.getElementById('op-body');
+  const icon = document.getElementById('op-icon');
+  const save = document.getElementById('op-save');
+  const ativa = !!opSession.started;
+  icon.textContent = tipo === 'cancelar' ? '!' : tipo === 'pagamento' ? '$' : '...';
+  save.className = 'btn btn-primary' + (tipo === 'cancelar' ? ' op-danger' : '');
+  save.textContent = tipo === 'cancelar' ? 'Confirmar cancelamento' : 'Salvar alteracao';
+  if (tipo === 'pagamento') {
+    title.textContent = 'Trocar pagamento';
+    sub.textContent = 'Atualiza caixa, card e relatorios com auditoria.';
+    body.innerHTML = `<div class="op-policy">Use quando o responsavel pagou em outra forma.</div><div class="op-form"><div class="op-grid"><div class="op-field"><label>Atual</label><input value="${escHtml(opSession.pagamento || 'Nao informado')}" disabled></div><div class="op-field"><label>Novo</label><select id="op-pagamento">${['PIX','Credito','Debito','Dinheiro'].map(p=>`<option ${normalizarTxt_(opSession.pagamento)===normalizarTxt_(p)?'selected':''}>${p}</option>`).join('')}</select></div></div><div class="op-field"><label>Motivo</label><textarea id="op-motivo">Responsavel alterou a forma de pagamento.</textarea></div></div>`;
+  } else if (tipo === 'veiculo') {
+    title.textContent = 'Trocar veiculo';
+    sub.textContent = ativa ? 'Mantem o tempo correndo e registra a troca.' : 'Permitido antes do inicio sem impacto financeiro.';
+    body.innerHTML = `<div class="op-policy">A troca nao reinicia timer nem altera valores automaticamente.</div><div class="op-form"><div class="op-grid"><div class="op-field"><label>Atual</label><input value="${escHtml(opSession.veiculo || opSession.tipo || '')}" disabled></div><div class="op-field"><label>Novo</label><select id="op-veiculo">${['Carro 01','Carro 02','Carro 03','Triciclo 01','Pelucia 01','Pelucia 02','Pelucia 03','Pelucia 04'].map(v=>`<option ${normalizarTxt_(opSession.veiculo)===normalizarTxt_(v)?'selected':''}>${v}</option>`).join('')}</select></div></div><div class="op-field"><label>Motivo</label><textarea id="op-motivo">Troca solicitada pelo responsavel ou por operacao.</textarea></div></div>`;
+  } else if (tipo === 'plano') {
+    if (ativa) { toast('Plano so pode ser trocado antes de iniciar. Use Estender tempo.', 'warning'); return; }
+    title.textContent = 'Trocar plano';
+    sub.textContent = 'Permitido apenas antes da contagem iniciar.';
+    const planos = Object.keys(PRECOS[opSession.tipo] || {});
+    body.innerHTML = `<div class="op-policy">Depois do inicio, use extensao para preservar faturamento.</div><div class="op-form"><div class="op-field"><label>Novo plano</label><select id="op-plano">${planos.map(p=>`<option ${p===opSession.plano?'selected':''}>${p}</option>`).join('')}</select></div><div class="op-field"><label>Motivo</label><textarea id="op-motivo">Cliente pediu alteracao antes de iniciar.</textarea></div></div>`;
+  } else if (tipo === 'cancelar') {
+    title.textContent = ativa ? 'Cancelar locacao em andamento' : 'Cancelar cadastro';
+    sub.textContent = 'Nao apaga a linha: marca como Cancelada e preserva auditoria.';
+    body.innerHTML = `<div class="op-policy danger">${ativa ? 'Informe o motivo para nao quebrar caixa e historico.' : 'Cadastro nao iniciado sera marcado como Cancelada.'}</div><div class="op-form"><div class="op-field"><label>Tipo</label><select id="op-motivo-tipo"><option>Erro de cadastro</option><option>Cliente desistiu</option><option>Manutencao do veiculo</option><option>Cortesia autorizada</option></select></div><div class="op-field"><label>Justificativa obrigatoria</label><textarea id="op-motivo">Descreva o motivo do cancelamento.</textarea></div></div>`;
+  } else {
+    title.textContent = tipo === 'observacao' ? 'Observacao da locacao' : 'Editar dados';
+    sub.textContent = ativa ? 'Corrige dados textuais sem alterar tempo/valor.' : 'Corrige dados principais do cadastro.';
+    body.innerHTML = `<div class="op-policy">Toda alteracao sera sincronizada e registrada.</div><div class="op-form"><div class="op-field"><label>Crianca</label><input id="op-crianca" value="${escHtml(opSession.crianca || '')}"></div><div class="op-field"><label>Responsavel</label><input id="op-responsavel" value="${escHtml(opSession.responsavel || '')}"></div><div class="op-field"><label>Telefone</label><input id="op-telefone" value="${escHtml(opSession.telefone || '')}"></div><div class="op-field"><label>Observacao</label><textarea id="op-observacao">${escHtml(opSession.observacao || '')}</textarea></div><div class="op-field"><label>Motivo</label><textarea id="op-motivo">Correcao operacional solicitada no atendimento.</textarea></div></div>`;
+  }
+  modal.classList.add('show');
+}
+
+function fecharOperacaoLocacao() {
+  document.getElementById('op-modal').classList.remove('show');
+  opSession = null;
+  opTipo = null;
+}
+
+async function salvarOperacaoLocacao() {
+  if (!opSession || !opTipo) return;
+  const btn = document.getElementById('op-save');
+  const oldText = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'Salvando...';
+  try {
+    const motivo = document.getElementById('op-motivo')?.value || '';
+    const payload = { action: opTipo === 'cancelar' ? 'cancelarLocacao' : 'editarLocacao', rowIndex: opSession.rowIndex, motivo };
+    if (opTipo === 'pagamento') payload.pagamento = document.getElementById('op-pagamento')?.value || '';
+    else if (opTipo === 'veiculo') payload.veiculo = document.getElementById('op-veiculo')?.value || '';
+    else if (opTipo === 'plano') payload.plano = document.getElementById('op-plano')?.value || '';
+    else if (opTipo === 'cancelar') payload.tipoCancelamento = document.getElementById('op-motivo-tipo')?.value || 'Cancelamento operacional';
+    else {
+      payload.crianca = document.getElementById('op-crianca')?.value || '';
+      payload.responsavel = document.getElementById('op-responsavel')?.value || '';
+      payload.telefone = document.getElementById('op-telefone')?.value || '';
+      payload.observacao = document.getElementById('op-observacao')?.value || '';
+    }
+    const d = await api(payload);
+    if (!d.ok) { toast('Erro: ' + (d.erro || 'falha ao salvar'), 'error'); return; }
+    if (opTipo === 'cancelar') sessions = sessions.filter(s => Number(s.rowIndex) !== Number(opSession.rowIndex));
+    else {
+      const idx = sessions.findIndex(s => Number(s.rowIndex) === Number(opSession.rowIndex));
+      if (idx >= 0) sessions[idx] = Object.assign({}, sessions[idx], d.locacao || {});
+    }
+    saveSessions(); renderCards(); updateStats(); atualizarVeiculoGrid();
+    fecharOperacaoLocacao();
+    toast(opTipo === 'cancelar' ? 'Locacao cancelada com auditoria.' : 'Alteracao salva e sincronizada.', 'success');
+    broadcastInvalidate(); syncController(true, 400);
+  } catch(e) {
+    toast('Erro de conexao ao salvar.', 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = oldText;
+  }
 }
 
 // ── Gera link de acompanhamento ───────────────────────────────────────────
@@ -4468,6 +4813,7 @@ async function carregarHistRelatorios() {
 function showPage(name) {
   const adminPages = ['admin','dashboard','relatorio','historico','caixa'];
   if (adminPages.includes(name) && !isAdmin) { abrirAdmin(); return; }
+  const wasNovaActive = !!document.getElementById('page-nova')?.classList.contains('active');
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
   const pg = document.getElementById('page-'+name);
@@ -4475,7 +4821,18 @@ function showPage(name) {
   const navIdx = ['home','nova','custos','historico'].indexOf(name);
   if (navIdx >= 0) document.querySelectorAll('nav button')[navIdx]?.classList.add('active');
   syncSidebar(name);
-  if (name==='nova') { resetNova(); atualizarVeiculoGrid(); }
+  if (name==='nova') {
+    if (hasNovaDraft_()) {
+      resetNova({ preserveDraft: true });
+      atualizarVeiculoGrid();
+      restaurarNovaDraft_();
+    } else if (!wasNovaActive) {
+      resetNova();
+      atualizarVeiculoGrid();
+    } else {
+      atualizarVeiculoGrid();
+    }
+  }
   if (name==='painel') renderPainel();
   if (name==='dashboard') { if (kpiData && kpiData.ok) renderCharts(kpiData); carregarKPIs(); }
   if (name==='custos') loadCustosHoje();
@@ -4620,7 +4977,8 @@ function buildPainelCard(nome, tipo, s) {
 
   // ── PENDENTE (cadastrado, aguardando iniciar) ───────────
   if (!s.started) {
-    return `<div class="pcard pendente">
+    return `<div class="pcard pendente" style="position:relative;overflow:visible">
+      <div style="position:absolute;right:6px;top:6px">${menuLocacaoHtml_(s, false)}</div>
       <div class="pcard-icon">${icon}</div>
       <div class="pcard-name">${nome}</div>
       <div class="pcard-status">⏸ Aguardando</div>
@@ -4669,7 +5027,8 @@ function buildPainelCard(nome, tipo, s) {
       <div class="pcard-bar" style="width:${progressPct.toFixed(1)}%;background:${barColor}"></div>
     </div>`;
 
-  return `<div class="${cardCls}">
+  return `<div class="${cardCls}" style="position:relative;overflow:visible">
+    <div style="position:absolute;right:6px;top:6px">${menuLocacaoHtml_(s, true)}</div>
     <div class="pcard-icon">${icon}</div>
     <div class="pcard-name">${nome}</div>
     ${progressBar}
