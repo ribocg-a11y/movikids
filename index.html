@@ -21,7 +21,16 @@
 // ── CACHE BUSTER v1.3.0 ─────────────────────────────────
 // Força limpeza do SW antigo e recarga com versão nova
 (function(){
-  const CURRENT = 'movikids-v1.6.33-sync-safe';
+  const CURRENT = 'v1.6.36-cache-refresh';
+  const KEY = 'mk_loaded_version';
+  try {
+    if (localStorage.getItem(KEY) !== CURRENT) {
+      localStorage.setItem(KEY, CURRENT);
+      if (window.caches) caches.keys().then(keys => keys.forEach(k => caches.delete(k)));
+      if ('serviceWorker' in navigator) navigator.serviceWorker.getRegistrations().then(regs => regs.forEach(r => r.unregister()));
+      if (!location.search.includes('force=' + CURRENT)) location.replace(location.pathname + '?force=' + CURRENT + '&t=' + Date.now());
+    }
+  } catch(e) {}
   if ('serviceWorker' in navigator) {
     // Desregistra SWs antigos
     navigator.serviceWorker.getRegistrations().then(function(regs) {
@@ -2204,7 +2213,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = 'v1.6.35-operacoes-safe';
+const APP_VERSION = 'v1.6.36-cache-refresh';
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec';
 
 const PRECOS = {
@@ -5570,8 +5579,13 @@ document.addEventListener('DOMContentLoaded', init);
 
 // ── SERVICE WORKER (PWA) ──────────────────────────────────────
 if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.addEventListener('message', event => {
+    if (event.data && event.data.type === 'MK_UPDATE_READY') {
+      location.reload();
+    }
+  });
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/movikids/sw.js')
+    navigator.serviceWorker.register('/movikids/sw.js?v=' + APP_VERSION)
       .then(reg => console.log('SW registrado:', reg.scope))
       .catch(err => console.warn('SW erro:', err));
   });
