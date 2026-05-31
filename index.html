@@ -21,7 +21,7 @@
 // ── CACHE BUSTER v1.3.0 ─────────────────────────────────
 // Força limpeza do SW antigo e recarga com versão nova
 (function(){
-  const CURRENT = '1.6.46';
+  const CURRENT = '1.6.47';
   const KEY = 'mk_loaded_version';
   try {
     if (localStorage.getItem(KEY) !== CURRENT) {
@@ -2198,7 +2198,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = '1.6.46';
+const APP_VERSION = '1.6.47';
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec';
 
 const PRECOS = {
@@ -2307,7 +2307,7 @@ async function init() {
   try {
     const bc = new BroadcastChannel('movikids_sync');
     bc.onmessage = (e) => {
-      if (e.data === 'invalidate') syncController(true, 0);
+      if (e.data === 'invalidate' || e.data === 'sync') syncController(true, 0);
     };
     window._bc = bc;
   } catch(e) {}
