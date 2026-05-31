@@ -21,7 +21,7 @@
 // ── CACHE BUSTER v1.3.0 ─────────────────────────────────
 // Força limpeza do SW antigo e recarga com versão nova
 (function(){
-  const CURRENT = '1.6.43';
+  const CURRENT = '1.6.44';
   const KEY = 'mk_loaded_version';
   try {
     if (localStorage.getItem(KEY) !== CURRENT) {
@@ -2198,7 +2198,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = '1.6.43';
+const APP_VERSION = '1.6.44';
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec';
 
 const PRECOS = {
@@ -2508,7 +2508,8 @@ function mergeSessaoCanonica(serverSession, localSession = {}) {
   const status = String(serverSession.status || '').trim();
   let startTimestamp = Number(serverSession.startTimestamp || 0);
   const nowTs = Date.now();
-  if (startTimestamp > 0 && (startTimestamp < 1000000000000 || startTimestamp > nowTs + 300000)) {
+  if ((status === 'Ativa' && (!startTimestamp || startTimestamp < 1000000000000)) ||
+      (startTimestamp > 0 && startTimestamp > nowTs + 300000)) {
     startTimestamp = calcStartTimestamp(serverSession.data, serverSession.horaInicio);
   }
   const serverMins = Number(serverSession.mins || 0);
