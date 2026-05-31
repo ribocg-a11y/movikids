@@ -21,7 +21,7 @@
 // ── CACHE BUSTER v1.3.0 ─────────────────────────────────
 // Força limpeza do SW antigo e recarga com versão nova
 (function(){
-  const CURRENT = 'v1.6.38-live-watch';
+  const CURRENT = 'v1.6.39-start-confirm';
   const KEY = 'mk_loaded_version';
   try {
     if (localStorage.getItem(KEY) !== CURRENT) {
@@ -2213,7 +2213,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = 'v1.6.38-live-watch';
+const APP_VERSION = 'v1.6.39-start-confirm';
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec';
 
 const PRECOS = {
@@ -3855,10 +3855,19 @@ async function iniciarContagem(rowIndex) {
   try { localStorage.removeItem('mk_inicio_cache'); } catch(e) {}
   try { if(window._bc) window._bc.postMessage('sync'); } catch(e) {}
 
-  // 2. Atualiza servidor em background (não bloqueia o timer)
+  // 2. Confirma no servidor. Se falhar, nao mantem estado local divergente.
   try {
-    await api({ action: 'iniciarTimer', rowIndex, timestamp: ts });
-  } catch(e) {}
+    const d = await api({ action: 'iniciarTimer', rowIndex, timestamp: ts });
+    if (!d.ok) throw new Error(d.erro || 'Servidor nao confirmou o inicio.');
+  } catch(e) {
+    s.startTimestamp = 0;
+    s.started        = false;
+    saveSessions();
+    renderCards();
+    toast('Inicio nao confirmado no servidor. Tente iniciar novamente.', 'error');
+    syncController(true, 0);
+    return;
+  }
 
   // 3. Sync via controller (deduplicado, force=true pois sessão mudou)
   broadcastInvalidate(); syncController(true, 500);
