@@ -21,7 +21,7 @@
 // ── CACHE BUSTER v1.3.0 ─────────────────────────────────
 // Força limpeza do SW antigo e recarga com versão nova
 (function(){
-  const CURRENT = '1.6.47';
+  const CURRENT = '1.6.48';
   const KEY = 'mk_loaded_version';
   try {
     if (localStorage.getItem(KEY) !== CURRENT) {
@@ -2198,7 +2198,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = '1.6.47';
+const APP_VERSION = '1.6.48';
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec';
 
 const PRECOS = {
@@ -2508,7 +2508,11 @@ function mergeSessaoCanonica(serverSession, localSession = {}) {
   const status = String(serverSession.status || '').trim();
   let startTimestamp = Number(serverSession.startTimestamp || 0);
   const nowTs = Date.now();
-  if ((status === 'Ativa' && (!startTimestamp || startTimestamp < 1000000000000)) ||
+  const isAtiva = status === 'Ativa';
+  const isPendente = status === 'Pendente';
+  if (isPendente) {
+    startTimestamp = 0;
+  } else if ((isAtiva && (!startTimestamp || startTimestamp < 1000000000000)) ||
       (startTimestamp > 0 && startTimestamp > nowTs + 300000)) {
     startTimestamp = calcStartTimestamp(serverSession.data, serverSession.horaInicio);
   }
@@ -2528,7 +2532,7 @@ function mergeSessaoCanonica(serverSession, localSession = {}) {
     originalMins,
     extendedMins,
     extendedValor,
-    started: startTimestamp > 0 || status === 'Ativa',
+    started: isAtiva && startTimestamp > 0,
 
     // Somente flags locais de UX podem sobreviver ao estado canonico.
     alertFired5: Boolean(localSession.alertFired5),
@@ -3112,7 +3116,7 @@ function atualizarVeiculoGrid() {
   // Veículos em uso = sessions ativas com veiculo definido
   const emUso = {};
   sessions.forEach(s => {
-    if (s.status === 'Ativa' && s.veiculo) {
+    if ((s.status === 'Ativa' || s.status === 'Pendente') && s.veiculo) {
       const rem = s.started ? calcRemaining(s) : s.mins * 60;
       const isOver = rem <= 0;
       emUso[s.veiculo] = { rem, isOver, s };
@@ -3357,7 +3361,7 @@ async function confirmarLocacao() {
       started:         false,
       alertFired5:     false,
       alertFiredExp:   false,
-      status:          'Ativa'
+      status:          d.status || 'Pendente'
     });
     saveSessions();
 
@@ -3870,8 +3874,10 @@ async function iniciarContagem(rowIndex) {
   // 1. Atualiza estado local IMEDIATAMENTE (sem esperar servidor)
   const s = sessions.find(x => x.rowIndex === rowIndex);
   if (!s) return;
+  const prevStatus = s.status || 'Pendente';
   s.startTimestamp = ts;    // timestamp real do clique
   s.started        = true;
+  s.status         = 'Ativa';
   saveSessions();           // localStorage agora tem started=true + ts correto
   renderCards();
 
@@ -3888,6 +3894,7 @@ async function iniciarContagem(rowIndex) {
   } catch(e) {
     s.startTimestamp = 0;
     s.started        = false;
+    s.status         = prevStatus;
     saveSessions();
     renderCards();
     toast('Inicio nao confirmado no servidor. Tente iniciar novamente.', 'error');
@@ -4985,12 +4992,12 @@ function renderPainel() {
   // Mapa veiculo → session ativa
   const sessMap = {};
   sessions.forEach(s => {
-    if (s.veiculo && s.status === 'Ativa') sessMap[s.veiculo] = s;
+    if (s.veiculo && (s.status === 'Ativa' || s.status === 'Pendente')) sessMap[s.veiculo] = s;
   });
 
   // Resumo do dia
   const ativos    = sessions.filter(s => s.started && s.status === 'Ativa').length;
-  const pendentes = sessions.filter(s => !s.started && s.status === 'Ativa').length;
+  const pendentes = sessions.filter(s => s.status === 'Pendente' || (!s.started && s.status === 'Ativa')).length;
   const encHoje   = encHojeData ? encHojeData.length : 0;
 
   const phAtivos  = document.getElementById('ph-ativos');
