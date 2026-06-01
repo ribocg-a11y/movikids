@@ -21,7 +21,7 @@
 // ── CACHE BUSTER v1.3.0 ─────────────────────────────────
 // Força limpeza do SW antigo e recarga com versão nova
 (function(){
-  const CURRENT = '1.6.52';
+  const CURRENT = '1.6.53';
   const KEY = 'mk_loaded_version';
   try {
     if (localStorage.getItem(KEY) !== CURRENT) {
@@ -2204,6 +2204,27 @@ nav button .nav-badge{
   </div>
 </div>
 
+<!-- CADASTRO DE RESPONSAVEL -->
+<div id="rel-modal" class="modal-overlay">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-icon">👥</div>
+    <div class="modal-title">Cadastro do responsavel</div>
+    <div class="modal-sub">Cadastro opcional para acelerar proximas locacoes.</div>
+    <div class="op-form">
+      <div class="op-field"><label>Responsavel</label><input id="rel-edit-nome"></div>
+      <div class="op-field"><label>Telefone</label><input id="rel-edit-tel"></div>
+      <div class="op-field"><label>Criancas</label><input id="rel-edit-criancas" placeholder="Separe por virgula"></div>
+      <div class="op-field"><label>Observacao</label><textarea id="rel-edit-obs" placeholder="Preferencias, restricoes ou observacoes"></textarea></div>
+      <div class="op-field"><label>Motivo</label><textarea id="rel-edit-motivo">Atualizacao do cadastro de relacionamento.</textarea></div>
+    </div>
+    <div class="modal-btns">
+      <button class="btn btn-primary" id="rel-save" onclick="salvarResponsavelRel()">Salvar cadastro</button>
+      <button class="btn btn-secondary" onclick="fecharResponsavelRel()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
 <!-- Toast container -->
 <div id="update-banner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:9999;background:#1565C0;color:#fff;padding:10px 16px;align-items:center;justify-content:space-between;font-size:13px;font-weight:600;gap:12px">
   <span>🔄 Nova versão disponível — atualizando em <span id="update-countdown">10</span>s</span>
@@ -2247,7 +2268,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = '1.6.52';
+const APP_VERSION = '1.6.53';
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec';
 
 const PRECOS = {
@@ -2279,6 +2300,7 @@ let catSel      = 'Energia';
 let custosHoje  = [];
 let statsHoje   = { fat: 0, n: 0 };
 let relacionamentoCache = [];
+let relEditCurrent = null;
 
 // ═══════════════════════════════════════════════════════════
 // API
@@ -4104,6 +4126,56 @@ function relToggleHist(idx) {
   if (el) el.classList.toggle('show');
 }
 
+function abrirEditarResponsavel(idx) {
+  const r = relacionamentoCache[idx];
+  if (!r) return;
+  relEditCurrent = r;
+  const set = (id, v) => { const el = document.getElementById(id); if (el) el.value = v || ''; };
+  set('rel-edit-nome', r.responsavel || '');
+  set('rel-edit-tel', r.telefone || '');
+  set('rel-edit-criancas', (r.criancas || []).join(', '));
+  set('rel-edit-obs', r.observacao || '');
+  set('rel-edit-motivo', 'Atualizacao do cadastro de relacionamento.');
+  document.getElementById('rel-modal')?.classList.add('show');
+}
+
+function fecharResponsavelRel() {
+  document.getElementById('rel-modal')?.classList.remove('show');
+  relEditCurrent = null;
+}
+
+async function salvarResponsavelRel() {
+  const btn = document.getElementById('rel-save');
+  const nome = document.getElementById('rel-edit-nome')?.value.trim() || '';
+  const tel = document.getElementById('rel-edit-tel')?.value.replace(/\D/g,'') || '';
+  const criancas = document.getElementById('rel-edit-criancas')?.value || '';
+  const obs = document.getElementById('rel-edit-obs')?.value.trim() || '';
+  const motivo = document.getElementById('rel-edit-motivo')?.value.trim() || 'Atualizacao do cadastro de relacionamento.';
+  if (!nome || !tel) { toast('Nome e telefone sao obrigatorios.', 'error'); return; }
+  if (btn) { btn.textContent = 'Salvando...'; btn.disabled = true; }
+  try {
+    const res = await api({
+      action: 'salvarResponsavel',
+      responsavel: nome,
+      telefone: tel,
+      criancas,
+      observacao: obs,
+      motivo
+    }, 25000);
+    if (!res.ok) {
+      toast('Atualize o Apps Script para v1.5.24: ' + (res.erro || 'acao indisponivel'), 'error');
+      return;
+    }
+    toast('Cadastro do responsavel salvo.', 'success');
+    fecharResponsavelRel();
+    carregarRelacionamento();
+  } catch(e) {
+    toast('Falha ao salvar cadastro. Verifique internet e Apps Script v1.5.24.', 'error');
+  } finally {
+    if (btn) { btn.textContent = 'Salvar cadastro'; btn.disabled = false; }
+  }
+}
+
 async function carregarRelacionamento() {
   const q = document.getElementById('rel-busca')?.value.trim() || '';
   const container = document.getElementById('rel-container');
@@ -4140,6 +4212,7 @@ async function carregarRelacionamento() {
         <div class="rel-last">Ultima visita: ${escHtml(r.ultimaData || '-')} ${escHtml(r.ultimaHora || '')}<br>Ultimo: ${escHtml(r.ultimoVeiculo || '-')} · ${escHtml(r.ultimoPlano || '-')} · ${escHtml(r.ultimoPagamento || '-')}</div>
         <div class="rel-actions">
           <button class="rel-primary" onclick="abrirNovaComResponsavel(relacionamentoCache[${idx}])">Nova locacao</button>
+          <button class="rel-secondary" onclick="abrirEditarResponsavel(${idx})">Editar</button>
           <button class="rel-secondary" onclick="relToggleHist(${idx})">Historico</button>
         </div>
         <div class="rel-history" id="rel-hist-${idx}">${hist || '<div class="rel-hitem"><span>Sem historico detalhado</span></div>'}</div>
