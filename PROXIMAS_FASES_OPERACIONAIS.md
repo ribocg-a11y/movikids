@@ -68,7 +68,41 @@ Objetivo:
 - impedir pular aviso de minuto extra;
 - reduzir risco de link suspeito usando texto mais limpo e link curto consistente.
 
-## Fase 5 - Testes permanentes
+## Fase 5 - Relacionamento / Responsaveis
+
+Status: nova fase planejada.
+
+Objetivo:
+
+- criar uma pagina de relacionamento para consultar responsaveis recorrentes;
+- localizar responsavel por nome ou telefone;
+- abrir um card do responsavel com historico resumido;
+- iniciar uma nova locacao a partir do card, preenchendo responsavel/telefone/criancas conhecidas;
+- reduzir tempo de cadastro quando o cliente volta no mesmo dia, horas depois ou no dia seguinte.
+
+Primeira entrega segura:
+
+- montar a busca usando o historico atual da aba `LOCACOES`;
+- consolidar responsaveis por telefone normalizado;
+- mostrar ultimo atendimento, criancas vinculadas, total de visitas e total gasto;
+- botao `Nova locacao com este responsavel`;
+- nao criar ainda uma nova aba obrigatoria.
+
+Segunda entrega:
+
+- criar cadastro canonico de responsaveis em aba propria, exemplo `RESPONSAVEIS`;
+- permitir editar nome, telefone, observacao e criancas vinculadas;
+- registrar auditoria em alteracoes de cadastro;
+- permitir vincular locacoes antigas ao responsavel.
+
+Cuidados:
+
+- telefone deve ser tratado como identificador operacional principal;
+- nao duplicar responsaveis por diferenca de espaco, mascara ou DDD;
+- nao bloquear locacao se responsavel nao existir no cadastro;
+- relacionamento deve acelerar o cadastro, nao virar etapa obrigatoria.
+
+## Fase 6 - Testes permanentes
 
 Status: iniciado e precisa virar rotina obrigatoria antes de cada deploy.
 
@@ -99,7 +133,7 @@ Proxima cobertura:
 
 Esses testes devem ser executados em janela controlada, porque iniciar/encerrar gera movimento real na planilha.
 
-## Fase 6 - Modo seguro
+## Fase 7 - Modo seguro
 
 Status: parcialmente publicado.
 
@@ -115,7 +149,7 @@ Proximo:
 - aviso claro quando Firebase ou Apps Script falhar;
 - botao administrativo de reconciliacao manual.
 
-## Fase 7 - Frota e configuracao dinamica
+## Fase 8 - Frota e configuracao dinamica
 
 Status: ajuste pontual publicado.
 

@@ -180,6 +180,30 @@ O sistema deve degradar com clareza:
 - WhatsApp nao abriu: mostrar acao manual.
 - Dados inconsistentes: bloquear fechamento critico e pedir verificacao.
 
+### 9. Relacionamento e recorrencia
+
+Objetivo:
+
+- reduzir atrito quando um responsavel retorna;
+- permitir iniciar nova locacao a partir de um responsavel ja conhecido;
+- criar base de relacionamento sem travar a operacao.
+
+Funcionalidade esperada:
+
+- pagina `Relacionamento`;
+- busca por nome ou telefone do responsavel;
+- card do responsavel com telefone, criancas ja atendidas, ultima visita, total de visitas e historico resumido;
+- acao rapida `Nova locacao com este responsavel`;
+- reaproveitamento dos dados do responsavel e da crianca;
+- possibilidade futura de observacoes e preferencias.
+
+Regra:
+
+- telefone normalizado deve ser o identificador operacional principal;
+- cadastro de responsavel nao pode ser obrigatorio para locar;
+- se houver duplicidade, o sistema deve sugerir mesclar, nao apagar automaticamente;
+- toda edicao futura de cadastro deve ter auditoria.
+
 ## Ordem Correta De Execucao
 
 ### Fase 1 - Confiabilidade imediata
@@ -224,7 +248,15 @@ Status em 01/06/2026:
 - Cobrir cache e sync.
 - Rodar antes de cada deploy.
 
-### Fase 6 - Reforma modular estilo ZapClin
+### Fase 6 - Relacionamento operacional
+
+- Criar busca de responsaveis baseada no historico de locacoes.
+- Criar card do responsavel.
+- Criar fluxo `Nova locacao com este responsavel`.
+- Depois criar aba canonica `RESPONSAVEIS`.
+- Auditar edicoes e mesclas.
+
+### Fase 7 - Reforma modular estilo ZapClin
 
 - Separar API.
 - Separar sync.
@@ -255,13 +287,12 @@ Depois de qualquer mudanca:
 
 ## Proxima Acao Correta
 
-A proxima acao deve continuar pela Fase 4, mas respeitando a base atual:
+Sequencia correta a partir de agora:
 
-- criar `v1.5.22` a partir de `v1.5.21`;
-- incorporar apenas leitura e diagnostico de configuracao;
-- nao trocar ainda a origem real de precos/veiculos/mensagens;
-- publicar frontend somente se houver necessidade visual;
-- testar antes de qualquer troca operacional.
+1. Reimplantar e validar `v1.5.22` se ainda nao estiver em producao.
+2. Testar as actions de diagnostico de configuracao.
+3. Preparar a primeira versao da pagina `Relacionamento` usando historico existente, sem criar dependencia obrigatoria.
+4. So depois criar a aba canonica `RESPONSAVEIS`.
 
 Nada de nova feature fora dessa ordem sem aprovacao explicita.
 
@@ -283,6 +314,7 @@ Nao concluido:
 - Frota dinamica via CONFIG.
 - Precos dinamicos via CONFIG.
 - Mensagens dinamicas robustas via CONFIG.
+- Pagina de relacionamento / responsaveis recorrentes.
 - Teste automatizado completo de iniciar/estender/encerrar.
 
 ## Historico - Fase 1 Cache/Versionamento
