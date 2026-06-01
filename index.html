@@ -21,7 +21,7 @@
 // ── CACHE BUSTER v1.3.0 ─────────────────────────────────
 // Força limpeza do SW antigo e recarga com versão nova
 (function(){
-  const CURRENT = '1.6.51';
+  const CURRENT = '1.6.52';
   const KEY = 'mk_loaded_version';
   try {
     if (localStorage.getItem(KEY) !== CURRENT) {
@@ -91,7 +91,7 @@ header{
 /* ── NAV ──────────────────────────────────────────────────── */
 nav{
   flex-shrink:0;
-  display:grid;grid-template-columns:repeat(5,1fr);
+  display:grid;grid-template-columns:repeat(6,1fr);
   background:#fff;border-bottom:1px solid var(--border);
   box-shadow:var(--shadow-sm);
 }
@@ -335,6 +335,32 @@ nav button .nav-badge{
 .hi-status{font-size:10px;padding:2px 8px;border-radius:99px;font-weight:700;margin-top:4px;display:inline-block}
 .hi-status.ativa{background:var(--green-lt);color:var(--green)}
 .hi-status.encerrada{background:var(--blue-lt);color:var(--blue)}
+
+/* ── RELACIONAMENTO ───────────────────────────────────── */
+.rel-search{display:flex;gap:8px;margin-bottom:10px}
+.rel-search input{flex:1;padding:11px 12px;border:2px solid var(--border);border-radius:var(--radius-sm);
+  font-family:'Nunito',sans-serif;font-size:14px;outline:none;background:var(--card);color:var(--txt)}
+.rel-search input:focus{border-color:var(--blue)}
+.rel-search button{padding:10px 14px;background:var(--blue);color:#fff;border:0;border-radius:var(--radius-sm);
+  font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;cursor:pointer}
+.rel-grid{display:grid;gap:10px}
+.rel-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);box-shadow:var(--shadow-sm);
+  padding:14px;display:grid;gap:10px}
+.rel-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.rel-name{font-size:18px;font-weight:900;color:var(--txt);line-height:1.15}
+.rel-phone{font-size:13px;color:var(--txt3);font-weight:700;margin-top:2px}
+.rel-metrics{text-align:right;font-size:12px;color:var(--txt3);font-weight:700;white-space:nowrap}
+.rel-kids{display:flex;flex-wrap:wrap;gap:6px}
+.rel-kid{font-size:12px;background:var(--blue-lt);color:var(--blue);border-radius:99px;padding:4px 9px;font-weight:800}
+.rel-last{font-size:12px;color:var(--txt3);line-height:1.45}
+.rel-actions{display:flex;gap:8px;flex-wrap:wrap}
+.rel-actions button{border:0;border-radius:var(--radius-sm);padding:10px 12px;font-family:'Nunito',sans-serif;
+  font-weight:900;font-size:13px;cursor:pointer}
+.rel-primary{background:var(--green);color:#fff}
+.rel-secondary{background:var(--blue-lt);color:var(--blue)}
+.rel-history{display:none;border-top:1px solid var(--border);padding-top:8px;gap:6px}
+.rel-history.show{display:grid}
+.rel-hitem{font-size:12px;color:var(--txt2);display:flex;justify-content:space-between;gap:8px}
 
 /* ── CUSTOS ───────────────────────────────────────────────── */
 .custo-form{background:var(--card);border-radius:var(--radius);padding:16px;
@@ -1298,6 +1324,7 @@ nav button .nav-badge{
     <div class="sb-nav" id="sb-nav">
       <button class="sb-btn active" id="sbn-home" onclick="showPage('home')"><span class="sb-icon">🏠</span>Home</button>
       <button class="sb-btn" id="sbn-nova" onclick="abrirNovaLocacao()"><span class="sb-icon">➕</span>Nova Locação</button>
+      <button class="sb-btn" id="sbn-relacionamento" onclick="showPage('relacionamento')"><span class="sb-icon">👥</span>Relacionamento</button>
       <button class="sb-btn" id="sbn-painel" onclick="showPage('painel')"><span class="sb-icon">📺</span>Painel Operação</button>
       <button class="sb-btn" id="sbn-custos" onclick="showPage('custos')"><span class="sb-icon">💰</span>Registrar Custo</button>
     </div>
@@ -1341,6 +1368,9 @@ nav button .nav-badge{
     </button>
     <button onclick="abrirNovaLocacao()">
       <div class="nav-icon nav-badge">➕<span id="badge-nova" class="badge" style="display:none">!</span></div>Nova
+    </button>
+    <button onclick="showPage('relacionamento')">
+      <div class="nav-icon">👥</div>Resp.
     </button>
     <button id="nav-painel" onclick="showPage('painel')">
       <div class="nav-icon">📺</div>Operação
@@ -1509,6 +1539,18 @@ nav button .nav-badge{
       </button>
     </div>
 
+  </div>
+
+  <!-- ──────── PAGE: RELACIONAMENTO ──────── -->
+  <div id="page-relacionamento" class="page">
+    <div class="sec-title">Relacionamento / Responsaveis</div>
+    <div class="rel-search">
+      <input id="rel-busca" type="search" placeholder="Buscar por responsavel, crianca ou telefone" onkeydown="if(event.key==='Enter') carregarRelacionamento()">
+      <button onclick="carregarRelacionamento()">Buscar</button>
+    </div>
+    <div id="rel-container" class="rel-grid">
+      <div class="empty"><div class="empty-icon">👥</div><h3>Busque um responsavel</h3><p>Use nome, crianca ou telefone.</p></div>
+    </div>
   </div>
 
   <!-- ──────── PAGE: CUSTOS ──────── -->
@@ -2205,7 +2247,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = '1.6.51';
+const APP_VERSION = '1.6.52';
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec';
 
 const PRECOS = {
@@ -2230,11 +2272,13 @@ let encSession  = null; // session in encerrar modal
 let opSession   = null; // session in edit/cancel modal
 let opTipo      = null;
 let novaState   = { tipo: null, plano: null, veiculo: null, pagamento: null, observacao: '', step: 0 };
+let novaPrefillResponsavel = null;
 const NOVA_DRAFT_KEY = 'mk_nova_locacao_draft_v1';
 let _restoringNovaDraft = false;
 let catSel      = 'Energia';
 let custosHoje  = [];
 let statsHoje   = { fat: 0, n: 0 };
+let relacionamentoCache = [];
 
 // ═══════════════════════════════════════════════════════════
 // API
@@ -2997,6 +3041,20 @@ function aplicarStepNova_(step) {
   if (pg) pg.classList.add('active');
   if (dot) dot.classList.add('active');
   novaState.step = safeStep;
+  if (safeStep === 2) aplicarPrefillResponsavel_();
+}
+
+function aplicarPrefillResponsavel_() {
+  if (!novaPrefillResponsavel) return;
+  const setIfEmpty = (id, value) => {
+    const el = document.getElementById(id);
+    if (el && !String(el.value || '').trim() && value) el.value = value;
+  };
+  const criancas = Array.isArray(novaPrefillResponsavel.criancas) ? novaPrefillResponsavel.criancas : [];
+  setIfEmpty('inp-resp', novaPrefillResponsavel.responsavel || '');
+  setIfEmpty('inp-tel', novaPrefillResponsavel.telefone || '');
+  setIfEmpty('inp-cri', criancas[0] || '');
+  salvarNovaDraft_();
 }
 
 function renderPlanosNova_(tipo) {
@@ -3106,6 +3164,7 @@ function inicializarDraftNova_() {
 }
 
 function abrirNovaLocacao() {
+  novaPrefillResponsavel = null;
   limparNovaDraft_();
   resetNova({ preserveDraft: true });
   showPage('nova', { freshNova: true });
@@ -3261,6 +3320,7 @@ function nextStep() {
   novaState.step++;
   document.getElementById(`step-${novaState.step}`).classList.add('active');
   document.getElementById(`dot-${novaState.step}`).classList.add('active');
+  if (novaState.step === 2) aplicarPrefillResponsavel_();
   salvarNovaDraft_();
 }
 
@@ -3329,6 +3389,14 @@ function resetNova(opts = {}) {
   document.querySelectorAll('.pag-btn').forEach(b => b.classList.remove('sel'));
   const bc = document.getElementById('btn-confirmar'); if(bc) bc.style.display='none';
   if (!opts.preserveDraft) limparNovaDraft_();
+}
+
+function abrirNovaComResponsavel(resp) {
+  novaPrefillResponsavel = resp || null;
+  limparNovaDraft_();
+  resetNova({ preserveDraft: true });
+  showPage('nova', { freshNova: true });
+  toast('Responsavel selecionado. Escolha o veiculo e o plano.', '');
 }
 
 async function confirmarLocacao() {
@@ -4013,6 +4081,72 @@ async function buscarHistorico() {
     }).join('');
   } catch {
     container.innerHTML='<div class="empty"><p>Erro de conexão.</p></div>';
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// RELACIONAMENTO
+// ═══════════════════════════════════════════════════════════
+function relPhone_(tel) {
+  const d = String(tel || '').replace(/\D/g, '');
+  if (d.length === 11) return `(${d.slice(0,2)}) ${d.slice(2,7)}-${d.slice(7)}`;
+  if (d.length === 10) return `(${d.slice(0,2)}) ${d.slice(2,6)}-${d.slice(6)}`;
+  return d || '-';
+}
+
+function relMoney_(v) {
+  const n = Number(v || 0);
+  return 'R$ ' + n.toFixed(2).replace('.', ',');
+}
+
+function relToggleHist(idx) {
+  const el = document.getElementById('rel-hist-' + idx);
+  if (el) el.classList.toggle('show');
+}
+
+async function carregarRelacionamento() {
+  const q = document.getElementById('rel-busca')?.value.trim() || '';
+  const container = document.getElementById('rel-container');
+  if (!container) return;
+  container.innerHTML = '<div class="skeleton"></div><div class="skeleton"></div>';
+
+  try {
+    const res = await api({ action:'listarResponsaveis', q, limite: 80 }, 25000);
+    if (!res.ok) {
+      container.innerHTML = '<div class="empty"><div class="empty-icon">⚠️</div><h3>Atualize o Apps Script</h3><p>Esta pagina precisa da v1.5.23 ou superior.</p></div>';
+      return;
+    }
+    relacionamentoCache = res.responsaveis || [];
+    if (!relacionamentoCache.length) {
+      container.innerHTML = '<div class="empty"><div class="empty-icon">👥</div><h3>Nenhum responsavel encontrado</h3><p>Tente outro nome ou telefone.</p></div>';
+      return;
+    }
+    container.innerHTML = relacionamentoCache.map((r, idx) => {
+      const kids = (r.criancas || []).map(c => `<span class="rel-kid">${escHtml(c)}</span>`).join('') || '<span class="rel-kid">Sem crianca</span>';
+      const hist = (r.historico || []).map(h => `
+        <div class="rel-hitem">
+          <span>${escHtml(h.data || '')} ${escHtml(h.horaInicio || '')} · ${escHtml(h.crianca || '')} · ${escHtml(h.plano || '')}</span>
+          <strong>${relMoney_(h.valorTotal)}</strong>
+        </div>`).join('');
+      return `<div class="rel-card">
+        <div class="rel-top">
+          <div>
+            <div class="rel-name">${escHtml(r.responsavel || 'Responsavel sem nome')}</div>
+            <div class="rel-phone">📱 ${relPhone_(r.telefone)}</div>
+          </div>
+          <div class="rel-metrics">${Number(r.totalLocacoes || 0)} loc.<br>${relMoney_(r.faturamento)}</div>
+        </div>
+        <div class="rel-kids">${kids}</div>
+        <div class="rel-last">Ultima visita: ${escHtml(r.ultimaData || '-')} ${escHtml(r.ultimaHora || '')}<br>Ultimo: ${escHtml(r.ultimoVeiculo || '-')} · ${escHtml(r.ultimoPlano || '-')} · ${escHtml(r.ultimoPagamento || '-')}</div>
+        <div class="rel-actions">
+          <button class="rel-primary" onclick="abrirNovaComResponsavel(relacionamentoCache[${idx}])">Nova locacao</button>
+          <button class="rel-secondary" onclick="relToggleHist(${idx})">Historico</button>
+        </div>
+        <div class="rel-history" id="rel-hist-${idx}">${hist || '<div class="rel-hitem"><span>Sem historico detalhado</span></div>'}</div>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    container.innerHTML = '<div class="empty"><div class="empty-icon">⚠️</div><h3>Falha ao carregar</h3><p>Verifique internet e se o Apps Script v1.5.23 foi reimplantado.</p></div>';
   }
 }
 
@@ -4905,7 +5039,7 @@ function showPage(name, opts = {}) {
   document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
   const pg = document.getElementById('page-'+name);
   if(pg) pg.classList.add('active');
-  const navIdx = ['home','nova','custos','historico'].indexOf(name);
+  const navIdx = ['home','nova','relacionamento','painel','custos'].indexOf(name);
   if (navIdx >= 0) document.querySelectorAll('nav button')[navIdx]?.classList.add('active');
   syncSidebar(name);
   if (name==='nova') {
@@ -4925,6 +5059,7 @@ function showPage(name, opts = {}) {
     }
   }
   if (name==='painel') renderPainel();
+  if (name==='relacionamento') carregarRelacionamento();
   if (name==='dashboard') { if (kpiData && kpiData.ok) renderCharts(kpiData); carregarKPIs(); }
   if (name==='custos') loadCustosHoje();
   if (name==='historico') buscarHistorico(); // FIX BUG-007: if(!currentPeriod) sempre false pois currentPeriod='hoje' na declaração
@@ -4942,7 +5077,7 @@ function showPage(name, opts = {}) {
 function syncSidebar(page) {
   document.querySelectorAll('.sb-btn').forEach(b => b.classList.remove('active'));
   const map = {
-    'home':'sbn-home','nova':'sbn-nova','custos':'sbn-custos','painel':'sbn-painel',
+    'home':'sbn-home','nova':'sbn-nova','relacionamento':'sbn-relacionamento','custos':'sbn-custos','painel':'sbn-painel',
     'admin':'sbn-adm','dashboard':'sbn-dash','relatorio':'sbn-rel','historico':'sbn-hist','caixa':'sbn-caixa'
   };
   if (map[page]) { const el=document.getElementById(map[page]); if(el) el.classList.add('active'); }
