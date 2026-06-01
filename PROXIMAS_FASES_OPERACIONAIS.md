@@ -3,9 +3,9 @@
 Estado atual em 01/06/2026:
 
 - Apps Script em producao: `v1.5.23`
-- Frontend em producao: `v1.6.54`
-- Service Worker em producao: `v1.6.54`
-- Ultima mudanca publicada: `Relacionamento / Responsaveis - nova crianca no retorno`
+- Frontend em producao: `v1.6.55`
+- Service Worker em producao: `v1.6.55`
+- Ultima mudanca publicada: `WhatsApp seguro para tablet/PWA`
 - Proximo candidato backend correto: `v1.5.24`, sempre baseado em `v1.5.23`
 
 ## Fase 1 - Status canonico e timer
@@ -59,7 +59,21 @@ Primeiro passo seguro:
 
 ## Fase 4 - Regras de WhatsApp
 
-Status: pendente.
+Status: parcialmente publicado.
+
+Correcao ja publicada:
+
+- `v1.6.55` corrigiu o envio em tablet/PWA.
+- Em dispositivos touch ou PWA, nao usar `window.open(..., '_blank')` para WhatsApp.
+- Em tablet/PWA, abrir WhatsApp por `window.location.href`.
+- Usar `https://api.whatsapp.com/send?phone=...&text=...` como rota padrao.
+- Nao voltar para `wa.me` como solucao principal em fluxo operacional.
+- Copiar a mensagem para a area de transferencia como fallback quando possivel.
+
+Motivo:
+
+- Alguns tablets/PWAs bloqueiam popup, nao transferem corretamente para WhatsApp/WhatsApp Business ou falham silenciosamente com `window.open`.
+- O problema pode parecer internet, mas pode ser associacao de link/popup no dispositivo.
 
 Objetivo:
 

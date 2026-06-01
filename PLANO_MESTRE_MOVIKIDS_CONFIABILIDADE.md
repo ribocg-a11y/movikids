@@ -180,6 +180,16 @@ O sistema deve degradar com clareza:
 - WhatsApp nao abriu: mostrar acao manual.
 - Dados inconsistentes: bloquear fechamento critico e pedir verificacao.
 
+Regra especifica de WhatsApp em tablet/PWA:
+
+- Nao usar `window.open(..., '_blank')` como caminho principal para enviar mensagens em tablet, celular ou PWA.
+- Nao depender de `wa.me` como rota principal no fluxo operacional.
+- Usar `https://api.whatsapp.com/send?phone=...&text=...`.
+- Em tablet/celular/PWA, abrir na mesma aba com `window.location.href`.
+- No desktop, pode tentar nova aba, mas deve cair para mesma aba se o popup for bloqueado.
+- Sempre que possivel, copiar a mensagem para a area de transferencia antes de abrir o WhatsApp.
+- Esse aprendizado veio da correcao `v1.6.55`, apos falha de envio somente no tablet.
+
 ### 9. Relacionamento e recorrencia
 
 Objetivo:
@@ -306,9 +316,9 @@ Apps Script:
 
 Frontend:
 
-- GitHub Pages: `v1.6.54`.
-- Service Worker: `v1.6.54`.
-- Inclui `Triciclo 02`, pagina `Relacionamento / Resp.` e atalho `Nova crianca`.
+- GitHub Pages: `v1.6.55`.
+- Service Worker: `v1.6.55`.
+- Inclui `Triciclo 02`, pagina `Relacionamento / Resp.`, atalho `Nova crianca` e WhatsApp seguro para tablet/PWA.
 
 Nao concluido:
 
