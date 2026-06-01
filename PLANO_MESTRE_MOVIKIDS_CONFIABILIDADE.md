@@ -250,11 +250,11 @@ Status em 01/06/2026:
 
 ### Fase 6 - Relacionamento operacional
 
-- Criar busca de responsaveis baseada no historico de locacoes.
-- Criar card do responsavel.
-- Criar fluxo `Nova locacao com este responsavel`.
-- Depois criar aba canonica `RESPONSAVEIS`.
-- Auditar edicoes e mesclas.
+- Concluido: busca de responsaveis baseada no historico de locacoes.
+- Concluido: card do responsavel.
+- Concluido: fluxo `Nova locacao` a partir do responsavel.
+- Proximo: criar aba canonica `RESPONSAVEIS`.
+- Proximo: auditar edicoes e mesclas.
 
 ### Fase 7 - Reforma modular estilo ZapClin
 
@@ -289,10 +289,10 @@ Depois de qualquer mudanca:
 
 Sequencia correta a partir de agora:
 
-1. Reimplantar e validar `v1.5.22` se ainda nao estiver em producao.
-2. Testar as actions de diagnostico de configuracao.
-3. Preparar a primeira versao da pagina `Relacionamento` usando historico existente, sem criar dependencia obrigatoria.
-4. So depois criar a aba canonica `RESPONSAVEIS`.
+1. `v1.5.23` + `v1.6.52` publicados e validados.
+2. Primeira versao da pagina `Relacionamento` entregue usando historico existente, sem dependencia obrigatoria.
+3. Proximo passo: preparar `v1.5.24` + `v1.6.53` com aba canonica `RESPONSAVEIS`.
+4. A aba `RESPONSAVEIS` deve nascer opcional: se falhar, a locacao continua funcionando pelo fluxo atual.
 
 Nada de nova feature fora dessa ordem sem aprovacao explicita.
 
@@ -300,21 +300,21 @@ Nada de nova feature fora dessa ordem sem aprovacao explicita.
 
 Apps Script:
 
-- Producao informada pelo operador: `v1.5.21`.
-- Inclui auditoria ampliada, status canonico e `Triciclo 02`.
+- Producao validada: `v1.5.23`.
+- Inclui auditoria ampliada, status canonico, `Triciclo 02`, diagnostico de configuracao e `listarResponsaveis`.
 
 Frontend:
 
-- GitHub Pages: `v1.6.51`.
-- Service Worker: `v1.6.51`.
-- Inclui `Triciclo 02` na tela de nova locacao, filtros, grid operacional e troca de veiculo.
+- GitHub Pages: `v1.6.52`.
+- Service Worker: `v1.6.52`.
+- Inclui `Triciclo 02` e pagina `Relacionamento / Resp.`.
 
 Nao concluido:
 
 - Frota dinamica via CONFIG.
 - Precos dinamicos via CONFIG.
 - Mensagens dinamicas robustas via CONFIG.
-- Pagina de relacionamento / responsaveis recorrentes.
+- Cadastro canonico editavel de responsaveis em aba `RESPONSAVEIS`.
 - Teste automatizado completo de iniciar/estender/encerrar.
 
 ## Historico - Fase 1 Cache/Versionamento

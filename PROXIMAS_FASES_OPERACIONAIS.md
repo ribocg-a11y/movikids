@@ -2,11 +2,11 @@
 
 Estado atual em 01/06/2026:
 
-- Apps Script em producao: `v1.5.21`
-- Frontend em producao: `v1.6.51`
-- Service Worker em producao: `v1.6.51`
-- Ultima mudanca publicada: `Triciclo 02`
-- Proximo candidato backend correto: `v1.5.22`, sempre baseado em `v1.5.21`
+- Apps Script em producao: `v1.5.23`
+- Frontend em producao: `v1.6.52`
+- Service Worker em producao: `v1.6.52`
+- Ultima mudanca publicada: `Relacionamento / Responsaveis - primeira entrega`
+- Proximo candidato backend correto: `v1.5.24`, sempre baseado em `v1.5.23`
 
 ## Fase 1 - Status canonico e timer
 
@@ -36,7 +36,7 @@ Inclui auditoria para:
 
 ## Fase 3 - Configuracao operacional
 
-Status: candidato antigo preparado, ainda nao incorporado na producao atual.
+Status: diagnostico seguro publicado na `v1.5.22` e preservado na `v1.5.23`.
 
 Observacao importante:
 
@@ -70,7 +70,7 @@ Objetivo:
 
 ## Fase 5 - Relacionamento / Responsaveis
 
-Status: nova fase planejada.
+Status: primeira entrega publicada e validada em producao.
 
 Objetivo:
 
@@ -82,11 +82,18 @@ Objetivo:
 
 Primeira entrega segura:
 
-- montar a busca usando o historico atual da aba `LOCACOES`;
-- consolidar responsaveis por telefone normalizado;
-- mostrar ultimo atendimento, criancas vinculadas, total de visitas e total gasto;
-- botao `Nova locacao com este responsavel`;
-- nao criar ainda uma nova aba obrigatoria.
+- concluido em `v1.5.23` + `v1.6.52`;
+- busca usando o historico atual da aba `LOCACOES`;
+- consolidacao de responsaveis por telefone normalizado;
+- card com ultimo atendimento, criancas vinculadas, total de visitas e total gasto;
+- botao `Nova locacao` a partir do responsavel;
+- sem nova aba obrigatoria.
+
+Validacao de producao:
+
+- `ping` retornou `v1.5.23`;
+- `listarResponsaveis&limite=5` retornou `ok:true`;
+- total inicial consolidado: `132` responsaveis.
 
 Segunda entrega:
 
@@ -94,6 +101,7 @@ Segunda entrega:
 - permitir editar nome, telefone, observacao e criancas vinculadas;
 - registrar auditoria em alteracoes de cadastro;
 - permitir vincular locacoes antigas ao responsavel.
+- preparar importacao inicial a partir de `LOCACOES`, sem travar locacao se houver erro nessa aba.
 
 Cuidados:
 
@@ -157,6 +165,7 @@ Concluido:
 
 - `Triciclo 02` adicionado no frontend `v1.6.51`;
 - `Triciclo 02` aceito no backend `v1.5.21`;
+- preservado na producao atual `v1.5.23` + `v1.6.52`;
 - mesmo tipo `Triciclo`;
 - mesma tabela de precos dos carros, conforme regra existente.
 
