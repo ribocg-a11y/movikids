@@ -21,7 +21,7 @@
 // ── CACHE BUSTER v1.3.0 ─────────────────────────────────
 // Força limpeza do SW antigo e recarga com versão nova
 (function(){
-  const CURRENT = '1.6.49';
+  const CURRENT = '1.6.50';
   const KEY = 'mk_loaded_version';
   try {
     if (localStorage.getItem(KEY) !== CURRENT) {
@@ -1297,7 +1297,7 @@ nav button .nav-badge{
     </div>
     <div class="sb-nav" id="sb-nav">
       <button class="sb-btn active" id="sbn-home" onclick="showPage('home')"><span class="sb-icon">🏠</span>Home</button>
-      <button class="sb-btn" id="sbn-nova" onclick="showPage('nova')"><span class="sb-icon">➕</span>Nova Locação</button>
+      <button class="sb-btn" id="sbn-nova" onclick="abrirNovaLocacao()"><span class="sb-icon">➕</span>Nova Locação</button>
       <button class="sb-btn" id="sbn-painel" onclick="showPage('painel')"><span class="sb-icon">📺</span>Painel Operação</button>
       <button class="sb-btn" id="sbn-custos" onclick="showPage('custos')"><span class="sb-icon">💰</span>Registrar Custo</button>
     </div>
@@ -1339,7 +1339,7 @@ nav button .nav-badge{
     <button class="active" onclick="showPage('home')">
       <div class="nav-icon">🏠</div>Home
     </button>
-    <button onclick="showPage('nova')">
+    <button onclick="abrirNovaLocacao()">
       <div class="nav-icon nav-badge">➕<span id="badge-nova" class="badge" style="display:none">!</span></div>Nova
     </button>
     <button id="nav-painel" onclick="showPage('painel')">
@@ -2199,7 +2199,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = '1.6.49';
+const APP_VERSION = '1.6.50';
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec';
 
 const PRECOS = {
@@ -3097,6 +3097,12 @@ function inicializarDraftNova_() {
     if (el) ['input','change'].forEach(ev => el.addEventListener(ev, salvarNovaDraft_));
   });
   window.addEventListener('beforeunload', salvarNovaDraft_);
+}
+
+function abrirNovaLocacao() {
+  limparNovaDraft_();
+  resetNova({ preserveDraft: true });
+  showPage('nova', { freshNova: true });
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -4885,7 +4891,7 @@ async function carregarHistRelatorios() {
 }
 
 // ── OVERRIDE showPage for admin pages ────────────────────────
-function showPage(name) {
+function showPage(name, opts = {}) {
   const adminPages = ['admin','dashboard','relatorio','historico','caixa'];
   if (adminPages.includes(name) && !isAdmin) { abrirAdmin(); return; }
   const wasNovaActive = !!document.getElementById('page-nova')?.classList.contains('active');
@@ -4897,7 +4903,11 @@ function showPage(name) {
   if (navIdx >= 0) document.querySelectorAll('nav button')[navIdx]?.classList.add('active');
   syncSidebar(name);
   if (name==='nova') {
-    if (hasNovaDraft_()) {
+    if (opts.freshNova) {
+      limparNovaDraft_();
+      resetNova({ preserveDraft: true });
+      atualizarVeiculoGrid();
+    } else if (hasNovaDraft_()) {
       resetNova({ preserveDraft: true });
       atualizarVeiculoGrid();
       restaurarNovaDraft_();
@@ -5120,7 +5130,7 @@ function buildPainelCard(nome, tipo, s) {
 
 function iniciarNovaPeloVeiculo(veiculo, tipo) {
   // Pré-seleciona o veículo e navega para Nova
-  showPage('nova');
+  abrirNovaLocacao();
   // Aguarda render do step-0 e clica no card correto
   setTimeout(() => {
     const card = document.getElementById('vc-' + veiculo);
