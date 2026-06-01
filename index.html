@@ -21,7 +21,7 @@
 // ── CACHE BUSTER v1.3.0 ─────────────────────────────────
 // Força limpeza do SW antigo e recarga com versão nova
 (function(){
-  const CURRENT = '1.6.54';
+  const CURRENT = '1.6.55';
   const KEY = 'mk_loaded_version';
   try {
     if (localStorage.getItem(KEY) !== CURRENT) {
@@ -2268,7 +2268,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = '1.6.54';
+const APP_VERSION = '1.6.55';
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec';
 
 const PRECOS = {
@@ -3796,9 +3796,27 @@ function gerarTrackUrl(s) {
 }
 
 function enviarWaTel(tel, msg) {
-  const t = String(tel).replace(/\D/g,'');
-  const p = t.startsWith('55') ? '' : '55';
-  window.open('https://wa.me/' + p + t + '?text=' + encodeURIComponent(msg), '_blank');
+  const raw = String(tel || '').replace(/\D/g,'');
+  if (!raw || raw.length < 10) { toast('Telefone invalido para WhatsApp.', 'error'); return false; }
+  const phone = raw.startsWith('55') ? raw : '55' + raw;
+  const text = encodeURIComponent(msg || '');
+  const url = 'https://api.whatsapp.com/send?phone=' + phone + '&text=' + text;
+  const ua = navigator.userAgent || '';
+  const isTouch = (navigator.maxTouchPoints || 0) > 0;
+  const isTabletOrMobile = /Android|iPad|iPhone|Mobile|Tablet/i.test(ua) || isTouch;
+  const isStandalone = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone;
+
+  try {
+    if (navigator.clipboard && msg) navigator.clipboard.writeText(msg).catch(() => {});
+  } catch(e) {}
+
+  if (isTabletOrMobile || isStandalone) {
+    window.location.href = url;
+  } else {
+    const w = window.open(url, '_blank', 'noopener');
+    if (!w) window.location.href = url;
+  }
+  return true;
 }
 
 // -- FASE 6: Config de mensagens --
