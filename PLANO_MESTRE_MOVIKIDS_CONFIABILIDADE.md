@@ -1,6 +1,6 @@
 # MOVI KIDS - Plano Mestre de Confiabilidade
 
-Data: 31/05/2026
+Data: 01/06/2026
 
 Este e o plano-mestre atual do projeto. Ele substitui desvios pontuais e reorganiza o trabalho para transformar o MOVI KIDS de um app operacional que funciona em um sistema confiavel, auditavel e seguro para operacao diaria.
 
@@ -211,6 +211,12 @@ O sistema deve degradar com clareza:
 - Mover mensagens para CONFIG.
 - Criar validacao de configuracao.
 
+Status em 01/06/2026:
+
+- Existe candidato seguro `v1.5.20` para leitura/diagnostico de configuracao.
+- Como a producao ja esta em `v1.5.21`, esse candidato nao deve ser implantado diretamente.
+- A proxima versao correta e `v1.5.22`, baseada em `v1.5.21`, incorporando apenas configuracao diagnostica primeiro.
+
 ### Fase 5 - Testes automatizados
 
 - Criar suite local.
@@ -249,18 +255,39 @@ Depois de qualquer mudanca:
 
 ## Proxima Acao Correta
 
-A proxima acao deve voltar para a Fase 1:
+A proxima acao deve continuar pela Fase 4, mas respeitando a base atual:
 
-- consolidar cache/versionamento;
-- verificar sync tela aberta;
-- validar fallback Firebase -> Apps Script;
-- documentar e testar o modo operacao segura.
+- criar `v1.5.22` a partir de `v1.5.21`;
+- incorporar apenas leitura e diagnostico de configuracao;
+- nao trocar ainda a origem real de precos/veiculos/mensagens;
+- publicar frontend somente se houver necessidade visual;
+- testar antes de qualquer troca operacional.
 
 Nada de nova feature fora dessa ordem sem aprovacao explicita.
 
-## Andamento - Fase 1 Cache/Versionamento
+## Estado Atual Da Producao
 
-Status: correcao local preparada, nao publicada.
+Apps Script:
+
+- Producao informada pelo operador: `v1.5.21`.
+- Inclui auditoria ampliada, status canonico e `Triciclo 02`.
+
+Frontend:
+
+- GitHub Pages: `v1.6.51`.
+- Service Worker: `v1.6.51`.
+- Inclui `Triciclo 02` na tela de nova locacao, filtros, grid operacional e troca de veiculo.
+
+Nao concluido:
+
+- Frota dinamica via CONFIG.
+- Precos dinamicos via CONFIG.
+- Mensagens dinamicas robustas via CONFIG.
+- Teste automatizado completo de iniciar/estender/encerrar.
+
+## Historico - Fase 1 Cache/Versionamento
+
+Status: publicado em versoes posteriores.
 
 Achado:
 
@@ -268,11 +295,10 @@ Achado:
 - `sw.js` estava em `1.6.45`.
 - Esse desalinhamento pode causar tentativa de atualizacao repetida ou tela presa em estado instavel.
 
-Correcao local preparada:
+Correcao aplicada em versoes posteriores:
 
-- `CURRENT = 1.6.46`
-- `APP_VERSION = 1.6.46`
-- `SW_VERSION = 1.6.46`
+- `CURRENT`, `APP_VERSION` e `SW_VERSION` devem sempre subir juntos.
+- Versao atual: `1.6.51`.
 
 Arquivos locais alterados:
 
@@ -283,7 +309,7 @@ Documento criado:
 
 - `FASE1_CACHE_VERSIONAMENTO_v1.6.46.md`
 
-Nao alterado:
+Nao alterado nessa linha de trabalho:
 
 - Apps Script.
 - `track.html`.
