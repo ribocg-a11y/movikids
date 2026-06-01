@@ -300,9 +300,9 @@ Depois de qualquer mudanca:
 
 Sequencia correta a partir de agora:
 
-1. `v1.5.23` + `v1.6.52` publicados e validados.
+1. `v1.5.24` + `v1.6.55` publicados e validados.
 2. Primeira versao da pagina `Relacionamento` entregue usando historico existente, sem dependencia obrigatoria.
-3. Proximo passo: preparar `v1.5.24` + `v1.6.53` com aba canonica `RESPONSAVEIS`.
+3. Proximo passo: preparar `v1.5.25` com validacoes/diagnostico da aba canonica `RESPONSAVEIS`.
 4. A aba `RESPONSAVEIS` deve nascer opcional: se falhar, a locacao continua funcionando pelo fluxo atual.
 
 Nada de nova feature fora dessa ordem sem aprovacao explicita.
@@ -311,8 +311,8 @@ Nada de nova feature fora dessa ordem sem aprovacao explicita.
 
 Apps Script:
 
-- Producao validada: `v1.5.23`.
-- Inclui auditoria ampliada, status canonico, `Triciclo 02`, diagnostico de configuracao e `listarResponsaveis`.
+- Producao validada: `v1.5.24`.
+- Inclui auditoria ampliada, status canonico, `Triciclo 02`, diagnostico de configuracao, `listarResponsaveis` e cadastro canonico opcional de responsaveis.
 
 Frontend:
 

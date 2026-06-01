@@ -2,11 +2,11 @@
 
 Estado atual em 01/06/2026:
 
-- Apps Script em producao: `v1.5.23`
+- Apps Script em producao: `v1.5.24`
 - Frontend em producao: `v1.6.55`
 - Service Worker em producao: `v1.6.55`
 - Ultima mudanca publicada: `WhatsApp seguro para tablet/PWA`
-- Proximo candidato backend correto: `v1.5.24`, sempre baseado em `v1.5.23`
+- Proximo candidato backend correto: `v1.5.25`, sempre baseado em `v1.5.24`
 
 ## Fase 1 - Status canonico e timer
 
@@ -106,9 +106,12 @@ Primeira entrega segura:
 
 Validacao de producao:
 
-- `ping` retornou `v1.5.23`;
+- `ping` retornou `v1.5.24`;
 - `listarResponsaveis&limite=5` retornou `ok:true`;
 - total inicial consolidado: `132` responsaveis.
+- teste read-only `TESTE_RELACIONAMENTO_MOVIKIDS_READONLY.ps1` passou em 01/06/2026;
+- total consolidado no teste: `137` responsaveis;
+- contrato atual do retorno usa `responsavel`, `telefone`, `criancas`, `totalLocacoes` e `faturamento`.
 
 Segunda entrega:
 
@@ -133,6 +136,10 @@ Script atual:
 
 `TESTE_REGRESSAO_MOVIKIDS_PROD_SAFE.ps1`
 
+Teste read-only de relacionamento:
+
+`TESTE_RELACIONAMENTO_MOVIKIDS_READONLY.ps1`
+
 Cobertura atual:
 
 - ping;
@@ -145,6 +152,8 @@ Cobertura atual:
 
 Proxima cobertura:
 
+- validar `listarResponsaveis` sem escrita;
+- validar campos minimos do card de responsavel;
 - iniciar timer;
 - estender;
 - encerrar;
