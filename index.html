@@ -21,7 +21,7 @@
 // ── CACHE BUSTER v1.3.0 ─────────────────────────────────
 // Força limpeza do SW antigo e recarga com versão nova
 (function(){
-  const CURRENT = '1.6.53';
+  const CURRENT = '1.6.54';
   const KEY = 'mk_loaded_version';
   try {
     if (localStorage.getItem(KEY) !== CURRENT) {
@@ -2268,7 +2268,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = '1.6.53';
+const APP_VERSION = '1.6.54';
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec';
 
 const PRECOS = {
@@ -3413,12 +3413,15 @@ function resetNova(opts = {}) {
   if (!opts.preserveDraft) limparNovaDraft_();
 }
 
-function abrirNovaComResponsavel(resp) {
+function abrirNovaComResponsavel(resp, novaCrianca = false) {
   novaPrefillResponsavel = resp || null;
+  if (novaPrefillResponsavel && novaCrianca) {
+    novaPrefillResponsavel = Object.assign({}, novaPrefillResponsavel, { criancas: [] });
+  }
   limparNovaDraft_();
   resetNova({ preserveDraft: true });
   showPage('nova', { freshNova: true });
-  toast('Responsavel selecionado. Escolha o veiculo e o plano.', '');
+  toast(novaCrianca ? 'Responsavel selecionado. Cadastre a nova crianca apos escolher o plano.' : 'Responsavel selecionado. Escolha o veiculo e o plano.', '');
 }
 
 async function confirmarLocacao() {
@@ -4212,6 +4215,7 @@ async function carregarRelacionamento() {
         <div class="rel-last">Ultima visita: ${escHtml(r.ultimaData || '-')} ${escHtml(r.ultimaHora || '')}<br>Ultimo: ${escHtml(r.ultimoVeiculo || '-')} · ${escHtml(r.ultimoPlano || '-')} · ${escHtml(r.ultimoPagamento || '-')}</div>
         <div class="rel-actions">
           <button class="rel-primary" onclick="abrirNovaComResponsavel(relacionamentoCache[${idx}])">Nova locacao</button>
+          <button class="rel-primary" onclick="abrirNovaComResponsavel(relacionamentoCache[${idx}], true)">Nova crianca</button>
           <button class="rel-secondary" onclick="abrirEditarResponsavel(${idx})">Editar</button>
           <button class="rel-secondary" onclick="relToggleHist(${idx})">Historico</button>
         </div>

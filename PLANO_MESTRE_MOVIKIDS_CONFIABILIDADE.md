@@ -253,6 +253,7 @@ Status em 01/06/2026:
 - Concluido: busca de responsaveis baseada no historico de locacoes.
 - Concluido: card do responsavel.
 - Concluido: fluxo `Nova locacao` a partir do responsavel.
+- Concluido: fluxo `Nova crianca` a partir do responsavel, sem reaproveitar crianca anterior.
 - Proximo: criar aba canonica `RESPONSAVEIS`.
 - Proximo: auditar edicoes e mesclas.
 
@@ -305,9 +306,9 @@ Apps Script:
 
 Frontend:
 
-- GitHub Pages: `v1.6.52`.
-- Service Worker: `v1.6.52`.
-- Inclui `Triciclo 02` e pagina `Relacionamento / Resp.`.
+- GitHub Pages: `v1.6.54`.
+- Service Worker: `v1.6.54`.
+- Inclui `Triciclo 02`, pagina `Relacionamento / Resp.` e atalho `Nova crianca`.
 
 Nao concluido:
 

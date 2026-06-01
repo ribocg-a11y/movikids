@@ -3,9 +3,9 @@
 Estado atual em 01/06/2026:
 
 - Apps Script em producao: `v1.5.23`
-- Frontend em producao: `v1.6.52`
-- Service Worker em producao: `v1.6.52`
-- Ultima mudanca publicada: `Relacionamento / Responsaveis - primeira entrega`
+- Frontend em producao: `v1.6.54`
+- Service Worker em producao: `v1.6.54`
+- Ultima mudanca publicada: `Relacionamento / Responsaveis - nova crianca no retorno`
 - Proximo candidato backend correto: `v1.5.24`, sempre baseado em `v1.5.23`
 
 ## Fase 1 - Status canonico e timer
@@ -87,6 +87,7 @@ Primeira entrega segura:
 - consolidacao de responsaveis por telefone normalizado;
 - card com ultimo atendimento, criancas vinculadas, total de visitas e total gasto;
 - botao `Nova locacao` a partir do responsavel;
+- botao `Nova crianca` a partir do responsavel, mantendo nome/telefone e deixando crianca em branco;
 - sem nova aba obrigatoria.
 
 Validacao de producao:
