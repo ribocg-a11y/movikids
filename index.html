@@ -21,7 +21,7 @@
 // ── CACHE BUSTER v1.3.0 ─────────────────────────────────
 // Força limpeza do SW antigo e recarga com versão nova
 (function(){
-  const CURRENT = '1.6.55';
+  const CURRENT = '1.6.56';
   const KEY = 'mk_loaded_version';
   try {
     if (localStorage.getItem(KEY) !== CURRENT) {
@@ -2268,7 +2268,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = '1.6.55';
+const APP_VERSION = '1.6.56';
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec';
 
 const PRECOS = {
@@ -4209,7 +4209,11 @@ async function carregarRelacionamento() {
       container.innerHTML = '<div class="empty"><div class="empty-icon">⚠️</div><h3>Atualize o Apps Script</h3><p>Esta pagina precisa da v1.5.23 ou superior.</p></div>';
       return;
     }
-    relacionamentoCache = res.responsaveis || [];
+    relacionamentoCache = (res.responsaveis || []).slice().sort((a, b) => {
+      const an = String(a.responsavel || '').trim();
+      const bn = String(b.responsavel || '').trim();
+      return an.localeCompare(bn, 'pt-BR', { sensitivity: 'base' });
+    });
     if (!relacionamentoCache.length) {
       container.innerHTML = '<div class="empty"><div class="empty-icon">👥</div><h3>Nenhum responsavel encontrado</h3><p>Tente outro nome ou telefone.</p></div>';
       return;
@@ -4221,18 +4225,20 @@ async function carregarRelacionamento() {
           <span>${escHtml(h.data || '')} ${escHtml(h.horaInicio || '')} · ${escHtml(h.crianca || '')} · ${escHtml(h.plano || '')}</span>
           <strong>${relMoney_(h.valorTotal)}</strong>
         </div>`).join('');
+      const totalLoc = Number(r.totalLocacoes || 0);
+      const locLabel = totalLoc === 1 ? 'locação' : 'locações';
       return `<div class="rel-card">
         <div class="rel-top">
           <div>
             <div class="rel-name">${escHtml(r.responsavel || 'Responsavel sem nome')}</div>
             <div class="rel-phone">📱 ${relPhone_(r.telefone)}</div>
           </div>
-          <div class="rel-metrics">${Number(r.totalLocacoes || 0)} loc.<br>${relMoney_(r.faturamento)}</div>
+          <div class="rel-metrics">${totalLoc} ${locLabel}<br>${relMoney_(r.faturamento)}</div>
         </div>
         <div class="rel-kids">${kids}</div>
         <div class="rel-last">Ultima visita: ${escHtml(r.ultimaData || '-')} ${escHtml(r.ultimaHora || '')}<br>Ultimo: ${escHtml(r.ultimoVeiculo || '-')} · ${escHtml(r.ultimoPlano || '-')} · ${escHtml(r.ultimoPagamento || '-')}</div>
         <div class="rel-actions">
-          <button class="rel-primary" onclick="abrirNovaComResponsavel(relacionamentoCache[${idx}])">Nova locacao</button>
+          <button class="rel-primary" onclick="abrirNovaComResponsavel(relacionamentoCache[${idx}])">Nova locação</button>
           <button class="rel-primary" onclick="abrirNovaComResponsavel(relacionamentoCache[${idx}], true)">Nova crianca</button>
           <button class="rel-secondary" onclick="abrirEditarResponsavel(${idx})">Editar</button>
           <button class="rel-secondary" onclick="relToggleHist(${idx})">Historico</button>
