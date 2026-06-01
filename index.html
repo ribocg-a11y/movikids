@@ -21,7 +21,7 @@
 // ── CACHE BUSTER v1.3.0 ─────────────────────────────────
 // Força limpeza do SW antigo e recarga com versão nova
 (function(){
-  const CURRENT = '1.6.50';
+  const CURRENT = '1.6.51';
   const KEY = 'mk_loaded_version';
   try {
     if (localStorage.getItem(KEY) !== CURRENT) {
@@ -1411,6 +1411,11 @@ nav button .nav-badge{
           <div class="vc-name">Triciclo 01</div>
           <div class="vc-status livre" id="vc-st-Triciclo 01">✓ Livre</div>
         </div>
+        <div class="vc-card" id="vc-Triciclo 02" onclick="selectVeiculo(this,'Triciclo 02','Triciclo')">
+          <div class="vc-icon">🛺</div>
+          <div class="vc-name">Triciclo 02</div>
+          <div class="vc-status livre" id="vc-st-Triciclo 02">✓ Livre</div>
+        </div>
       </div>
       <div class="vc-section-label">Pelúcias elétricas</div>
       <div class="veiculo-grid-pelucias" id="vc-grid-pelucias">
@@ -2008,6 +2013,7 @@ nav button .nav-badge{
         <option value="Carro 02">Carro 02</option>
         <option value="Carro 03">Carro 03</option>
         <option value="Triciclo 01">Triciclo 01</option>
+        <option value="Triciclo 02">Triciclo 02</option>
         <option value="Pelúcia 01">Pelúcia 01</option>
         <option value="Pelúcia 02">Pelúcia 02</option>
         <option value="Pelúcia 03">Pelúcia 03</option>
@@ -2199,7 +2205,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = '1.6.50';
+const APP_VERSION = '1.6.51';
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec';
 
 const PRECOS = {
@@ -3143,7 +3149,7 @@ function atualizarVeiculoGrid() {
     }
   });
 
-  const todosVeiculos = ['Carro 01','Carro 02','Carro 03','Triciclo 01','Pelúcia 01','Pelúcia 02','Pelúcia 03','Pelúcia 04'];
+  const todosVeiculos = ['Carro 01','Carro 02','Carro 03','Triciclo 01','Triciclo 02','Pelúcia 01','Pelúcia 02','Pelúcia 03','Pelúcia 04'];
   todosVeiculos.forEach(nome => {
     const card = document.getElementById('vc-' + nome);
     const stEl = document.getElementById('vc-st-' + nome);
@@ -3624,7 +3630,7 @@ function abrirOperacaoLocacao(rowIndex, tipo) {
   } else if (tipo === 'veiculo') {
     title.textContent = 'Trocar veiculo';
     sub.textContent = ativa ? 'Mantem o tempo correndo e registra a troca.' : 'Permitido antes do inicio sem impacto financeiro.';
-    body.innerHTML = `<div class="op-policy">A troca nao reinicia timer nem altera valores automaticamente.</div><div class="op-form"><div class="op-grid"><div class="op-field"><label>Atual</label><input value="${escHtml(opSession.veiculo || opSession.tipo || '')}" disabled></div><div class="op-field"><label>Novo</label><select id="op-veiculo">${['Carro 01','Carro 02','Carro 03','Triciclo 01','Pelucia 01','Pelucia 02','Pelucia 03','Pelucia 04'].map(v=>`<option ${normalizarTxt_(opSession.veiculo)===normalizarTxt_(v)?'selected':''}>${v}</option>`).join('')}</select></div></div><div class="op-field"><label>Motivo</label><textarea id="op-motivo">Troca solicitada pelo responsavel ou por operacao.</textarea></div></div>`;
+    body.innerHTML = `<div class="op-policy">A troca nao reinicia timer nem altera valores automaticamente.</div><div class="op-form"><div class="op-grid"><div class="op-field"><label>Atual</label><input value="${escHtml(opSession.veiculo || opSession.tipo || '')}" disabled></div><div class="op-field"><label>Novo</label><select id="op-veiculo">${['Carro 01','Carro 02','Carro 03','Triciclo 01','Triciclo 02','Pelucia 01','Pelucia 02','Pelucia 03','Pelucia 04'].map(v=>`<option ${normalizarTxt_(opSession.veiculo)===normalizarTxt_(v)?'selected':''}>${v}</option>`).join('')}</select></div></div><div class="op-field"><label>Motivo</label><textarea id="op-motivo">Troca solicitada pelo responsavel ou por operacao.</textarea></div></div>`;
   } else if (tipo === 'plano') {
     if (ativa) { toast('Plano so pode ser trocado antes de iniciar. Use Estender tempo.', 'warning'); return; }
     title.textContent = 'Trocar plano';
@@ -5004,6 +5010,7 @@ const TODOS_VEICULOS_DEF = [
   {nome:'Carro 02',   tipo:'Carro'},
   {nome:'Carro 03',   tipo:'Carro'},
   {nome:'Triciclo 01', tipo:'Triciclo'},
+  {nome:'Triciclo 02', tipo:'Triciclo'},
   {nome:'Pelúcia 01', tipo:'Pelúcia'},
   {nome:'Pelúcia 02', tipo:'Pelúcia'},
   {nome:'Pelúcia 03', tipo:'Pelúcia'},
