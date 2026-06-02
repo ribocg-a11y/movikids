@@ -21,7 +21,7 @@
 // ── CACHE BUSTER v1.3.0 ─────────────────────────────────
 // Força limpeza do SW antigo e recarga com versão nova
 (function(){
-  const CURRENT = '1.6.65';
+  const CURRENT = '1.6.66';
   const KEY = 'mk_loaded_version';
   try {
     if (localStorage.getItem(KEY) !== CURRENT) {
@@ -2287,7 +2287,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = '1.6.65';
+const APP_VERSION = '1.6.66';
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec';
 
 const PRECOS = {
@@ -2360,7 +2360,7 @@ function whatsappModeAtual_() {
 }
 
 function whatsappModeLabel_(mode) {
-  return ({ auto:'Auto', web:'Web', app:'App', api:'API' })[mode || whatsappModeAtual_()] || 'Auto';
+  return ({ auto:'Auto', web:'Web', app:'App', api:'API', 'auto-app':'Auto/App', 'auto-web':'Auto/Web' })[mode || whatsappModeAtual_()] || 'Auto';
 }
 
 function atualizarWhatsAppUI_() {
@@ -3967,12 +3967,24 @@ function urlsWhatsApp_(phone, text) {
   };
 }
 
+function deveUsarAppWhatsAppAuto_() {
+  try {
+    const ua = navigator.userAgent || '';
+    const mobileUa = /Android|iPhone|iPad|iPod|Mobile|Tablet/i.test(ua);
+    const touch = navigator.maxTouchPoints && navigator.maxTouchPoints > 1;
+    const narrow = window.matchMedia && window.matchMedia('(max-width: 1024px)').matches;
+    return !!(mobileUa || (touch && narrow));
+  } catch(e) { return false; }
+}
+
 function escolherUrlWhatsApp_(urls) {
   const mode = whatsappModeAtual_();
   if (mode === 'web') return { mode, url: urls.web };
   if (mode === 'app') return { mode, url: urls.app };
   if (mode === 'api') return { mode, url: urls.api };
-  return { mode: 'auto', url: urls.web };
+  return deveUsarAppWhatsAppAuto_()
+    ? { mode: 'auto-app', url: urls.app }
+    : { mode: 'auto-web', url: urls.web };
 }
 
 function enviarWaTel(tel, msg) {
