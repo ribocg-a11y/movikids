@@ -3,10 +3,11 @@
 Estado atual em 01/06/2026:
 
 - Apps Script em producao: `v1.5.25`
-- Frontend em producao: `v1.6.58`
-- Service Worker em producao: `v1.6.58`
-- Ultima mudanca publicada: `P0 - rascunho protegido e WhatsApp extra rastreado localmente/remotamente`
+- Frontend em producao: `v1.6.59`
+- Service Worker em producao: `v1.6.59`
+- Ultima mudanca publicada: `P1 - operador local enviado para auditoria`
 - Backend validado: `v1.5.25`, baseado em `v1.5.24`
+- Proximo candidato backend: `v1.5.26`, operador nas auditorias operacionais
 
 ## Fase 1 - Status canonico e timer
 
@@ -121,6 +122,25 @@ Validacao de producao:
 Segunda entrega:
 
 - criar cadastro canonico de responsaveis em aba propria, exemplo `RESPONSAVEIS`;
+
+## Fase 6 - Operadores e seguranca ADM
+
+Status: iniciado.
+
+Entrega segura inicial:
+
+- `v1.6.59` adiciona operador local por dispositivo.
+- O operador aparece no rodape lateral e pode ser trocado sem entrar no admin.
+- Acoes criticas enviam `operador` para o backend.
+- Candidato backend `v1.5.26` grava esse operador na coluna `Usuario` da aba `AUDITORIA`.
+- A operacao nao bloqueia se o operador ainda nao estiver definido.
+
+Proxima etapa:
+
+- criar cadastro real de operadores;
+- substituir PIN unico por login de operador/admin;
+- separar permissoes: operador, supervisor, admin;
+- registrar operador tambem em custos, configuracoes e relatorios.
 - permitir editar nome, telefone, observacao e criancas vinculadas;
 - registrar auditoria em alteracoes de cadastro;
 - permitir vincular locacoes antigas ao responsavel.

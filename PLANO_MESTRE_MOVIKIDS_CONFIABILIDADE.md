@@ -433,9 +433,9 @@ Apps Script:
 
 Frontend:
 
-- Service Worker: `v1.6.58`.
-- GitHub Pages: `v1.6.58`.
-- Inclui `Triciclo 02`, pagina `Relacionamento / Resp.`, atalho `Nova crianca`, WhatsApp seguro para tablet/PWA, rascunho protegido ao sair da tela Nova e rastreio local/remoto de WhatsApp de tempo extra.
+- Service Worker: `v1.6.59`.
+- GitHub Pages: `v1.6.59`.
+- Inclui `Triciclo 02`, pagina `Relacionamento / Resp.`, atalho `Nova crianca`, WhatsApp seguro para tablet/PWA, rascunho protegido ao sair da tela Nova, rastreio local/remoto de WhatsApp de tempo extra e operador local enviado para auditoria.
 
 Nao concluido:
 
@@ -483,3 +483,20 @@ Nao alterado nessa linha de trabalho:
 - WhatsApp.
 - Planilha.
 - GitHub Pages/producao.
+
+## P1 - Operadores e seguranca ADM
+
+Primeira entrega segura:
+
+- Frontend `v1.6.59` adiciona identificacao local de operador por dispositivo.
+- O operador e enviado nas acoes criticas de locacao.
+- Apps Script candidato `v1.5.26` grava esse operador na aba `AUDITORIA`.
+- A operacao permanece liberada se o operador nao estiver definido, para nao travar o balcao.
+
+Proximas entregas:
+
+- cadastro canonico de operadores;
+- login individual por operador;
+- admin com permissao separada;
+- remocao gradual do PIN unico;
+- dashboard de auditoria por operador.
