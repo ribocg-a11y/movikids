@@ -214,6 +214,108 @@ Regra:
 - se houver duplicidade, o sistema deve sugerir mesclar, nao apagar automaticamente;
 - toda edicao futura de cadastro deve ter auditoria.
 
+### 10. Login por operador e rastreabilidade
+
+Objetivo:
+
+- cada operador deve entrar no sistema com seu proprio acesso;
+- nenhuma acao operacional importante deve ficar sem responsavel identificado;
+- auditoria deve registrar qual operador fez cadastro, inicio, edicao, cancelamento, extensao, encerramento e envio obrigatorio de WhatsApp.
+
+Funcionalidade esperada:
+
+- cadastro de operadores;
+- login individual;
+- perfil de permissao;
+- sessao com expiracao;
+- troca de operador sem recarregar o sistema inteiro;
+- bloqueio de acoes administrativas para operador comum.
+
+Perfis minimos:
+
+- `Operador`: cadastrar, iniciar, avisar, encerrar e registrar custo simples;
+- `Supervisor`: editar/cancelar com motivo, corrigir pagamento, reconciliar sessoes;
+- `Admin`: configurar sistema, ver auditoria, ajustar precos/frota/mensagens e relatorios sensiveis.
+
+Regra:
+
+- senha/admin compartilhado e apenas uma etapa provisoria;
+- a meta correta e todo movimento operacional ter operador identificado.
+
+### 11. Seguranca ADM
+
+Objetivo:
+
+- proteger configuracoes, relatorios financeiros, auditoria e correcoes sensiveis;
+- reduzir risco de erro operacional ou acesso indevido.
+
+Funcionalidade esperada:
+
+- area ADM separada;
+- permissao por perfil;
+- reautenticacao para acoes criticas;
+- registro de tentativas de acesso;
+- bloqueio de sessoes expiradas;
+- logs de mudanca de configuracao;
+- painel de auditoria.
+
+Acoes criticas que exigem seguranca maior:
+
+- alterar precos;
+- alterar frota;
+- alterar mensagens;
+- cancelar locacao ativa;
+- corrigir pagamento;
+- editar responsavel canonico;
+- mesclar responsaveis;
+- apagar/arquivar dados;
+- gerar relatorios financeiros sensiveis;
+- reconciliar Firebase/Sheets.
+
+### 12. Relatorios e KPIs modernos
+
+Objetivo:
+
+- transformar os dados operacionais em painel gerencial claro;
+- permitir decisao rapida sobre faturamento, frota, horarios, operadores, retorno de clientes e custos.
+
+KPIs esperados:
+
+- faturamento diario, semanal, mensal e por periodo;
+- ticket medio;
+- numero de locacoes;
+- locacoes por tipo de veiculo;
+- locacoes por veiculo individual;
+- ocupacao da frota;
+- horarios de pico;
+- plano mais vendido;
+- forma de pagamento;
+- receita extra por minutos adicionais;
+- custos por categoria;
+- resultado operacional;
+- CTO;
+- clientes recorrentes;
+- ranking de responsaveis/criancas por retorno;
+- desempenho por operador;
+- cancelamentos por motivo;
+- edicoes/correcoes por operador;
+- alertas de inconsistencia.
+
+Relatorios esperados:
+
+- fechamento diario;
+- relatorio mensal financeiro;
+- relatorio de frota;
+- relatorio de operadores;
+- relatorio de relacionamento/retorno;
+- relatorio de auditoria;
+- relatorio de divergencias.
+
+Regra:
+
+- relatorio gerencial nao deve depender de edicao manual na planilha;
+- todo numero sensivel deve ser rastreavel ate as locacoes de origem.
+
 ## Ordem Correta De Execucao
 
 ### Fase 1 - Confiabilidade imediata
@@ -277,6 +379,21 @@ Status em 01/06/2026:
 - Separar UI.
 - Modernizar sem reescrever tudo de uma vez.
 
+### Fase 8 - Login, seguranca e ADM
+
+- Criar cadastro de operadores.
+- Criar login por operador.
+- Separar permissao de operador, supervisor e admin.
+- Vincular auditoria ao operador logado.
+- Proteger acoes criticas com permissao e motivo.
+
+### Fase 9 - Relatorios e KPIs gerenciais
+
+- Modernizar dashboard.
+- Criar KPIs por periodo, veiculo, operador e forma de pagamento.
+- Criar relatorios de fechamento, frota, relacionamento, auditoria e divergencias.
+- Permitir exportacao/compartilhamento controlado.
+
 ## Regra De Trabalho Daqui Em Diante
 
 Antes de qualquer mudanca:
@@ -327,6 +444,10 @@ Nao concluido:
 - Mensagens dinamicas robustas via CONFIG.
 - Cadastro canonico editavel de responsaveis em aba `RESPONSAVEIS`.
 - Teste automatizado completo de iniciar/estender/encerrar.
+- Login individual por operador.
+- Permissoes reais de operador/supervisor/admin.
+- Seguranca ADM com reautenticacao para acoes criticas.
+- Relatorios e KPIs modernos por operador, frota, periodo, relacionamento e divergencias.
 
 ## Historico - Fase 1 Cache/Versionamento
 

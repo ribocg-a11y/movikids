@@ -197,3 +197,78 @@ Ponto de atencao:
 
 - A frota ainda esta hardcoded no frontend e no Apps Script.
 - A solucao definitiva e mover a frota para CONFIG validada, com fallback seguro.
+
+## Fase 9 - Login por operador e seguranca ADM
+
+Status: planejado, ainda nao publicado.
+
+Objetivo:
+
+- cada operador deve ter seu proprio login;
+- toda acao operacional deve registrar operador;
+- area ADM deve ser protegida por permissao real;
+- acoes sensiveis devem exigir perfil correto e motivo.
+
+Perfis minimos:
+
+- `Operador`: cadastrar, iniciar, avisar, encerrar e registrar custo simples;
+- `Supervisor`: editar/cancelar, corrigir pagamento e reconciliar sessoes;
+- `Admin`: configurar frota, precos, mensagens, usuarios, auditoria e relatorios sensiveis.
+
+Primeira entrega segura:
+
+- criar camada de sessao local sem quebrar o fluxo atual;
+- registrar `operador` nas auditorias novas;
+- manter fallback para o modo atual enquanto os usuarios sao cadastrados;
+- nao bloquear locacao se o modulo de usuarios ainda nao estiver pronto.
+
+Cuidados:
+
+- nao usar senha unica de admin como solucao definitiva;
+- nao expor relatorios financeiros para operador comum;
+- nao permitir alterar preco/frota/mensagem sem admin;
+- toda acao critica precisa de motivo.
+
+## Fase 10 - Relatorios e KPIs modernos
+
+Status: planejado, ainda nao publicado.
+
+Objetivo:
+
+- modernizar painel gerencial;
+- transformar dados da planilha em decisao operacional;
+- permitir fechamento e acompanhamento sem edicao manual.
+
+KPIs obrigatorios:
+
+- faturamento por dia, semana, mes e periodo;
+- ticket medio;
+- locacoes por veiculo e tipo;
+- ocupacao da frota;
+- horarios de pico;
+- planos mais vendidos;
+- formas de pagamento;
+- receita extra;
+- custos por categoria;
+- resultado operacional e CTO;
+- recorrencia de clientes;
+- desempenho por operador;
+- cancelamentos e edicoes por motivo;
+- divergencias e inconsistencias.
+
+Relatorios:
+
+- fechamento diario;
+- mensal financeiro;
+- frota;
+- operadores;
+- relacionamento/retorno;
+- auditoria;
+- divergencias.
+
+Primeira entrega segura:
+
+- criar diagnostico de KPIs usando dados existentes;
+- nao alterar caixa;
+- nao alterar formulas da planilha;
+- depois criar dashboard visual no app.
