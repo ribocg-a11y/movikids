@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>Movi Kids - Portal do Responsavel</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{min-height:100vh;background:#eef4fb;color:#07122b;font-family:Arial,sans-serif;padding:18px}
+.wrap{max-width:760px;margin:0 auto}
+.brand{font-size:26px;font-weight:900;color:#102b5c;margin:10px 0 4px}.brand span{color:#f6c400}
+.sub{color:#65758d;margin-bottom:18px;line-height:1.4}
+.card{background:#fff;border:1px solid #dbe6f3;border-radius:14px;box-shadow:0 10px 30px rgba(21,50,94,.08);padding:18px;margin-bottom:14px}
+label{display:block;font-weight:800;font-size:13px;margin-bottom:8px;color:#33445f}
+.row{display:flex;gap:10px}input{height:52px;border:2px solid #d8e4f2;border-radius:10px;padding:0 14px;font-size:18px;font-weight:800;flex:1;outline:none}
+button{height:52px;border:0;border-radius:10px;padding:0 18px;background:#1967c2;color:#fff;font-weight:900;font-size:15px;cursor:pointer}
+.hint{font-size:12px;color:#7b8ba5;margin-top:9px}.status{font-size:14px;color:#52637f;margin-top:12px}
+.loc{display:grid;grid-template-columns:118px 1fr;gap:15px;align-items:center}.ring{width:112px;height:112px;border:9px solid #1967c2;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-direction:column;background:#f8fbff}
+.ring small{font-size:10px;color:#7788a3;font-weight:900}.ring b{font-size:27px;color:#1967c2}
+.kid{font-size:25px;font-weight:900}.meta{color:#52637f;line-height:1.7;margin-top:4px}.pill{display:inline-block;background:#e8f2ff;color:#1967c2;border-radius:999px;padding:6px 10px;font-weight:900;font-size:12px;margin-top:8px}
+.warn{border-left:5px solid #e65300;background:#fff3e8;padding:11px;border-radius:10px;color:#8f3500;font-weight:800;margin-top:12px}
+.empty{text-align:center;color:#65758d;padding:26px 10px}.empty b{display:block;color:#102b5c;font-size:20px;margin-bottom:6px}
+.foot{font-size:12px;color:#7b8ba5;text-align:center;margin-top:18px;line-height:1.45}
+@media(max-width:560px){.row{display:block}button{width:100%;margin-top:8px}.loc{grid-template-columns:1fr}.ring{margin:auto}}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <div class="brand">Movi <span>Kids</span></div>
+  <div class="sub">Portal do responsavel. Digite o telefone com DDD usado no cadastro para acompanhar apenas suas locacoes ativas.</div>
+
+  <section class="card">
+    <label for="telefone">Telefone com DDD</label>
+    <div class="row">
+      <input id="telefone" inputmode="tel" autocomplete="tel" placeholder="Ex.: 98 98206-8696">
+      <button id="btn" onclick="buscar()">Entrar</button>
+    </div>
+    <div class="hint">O telefone funciona como senha simples. Nao compartilhe com terceiros.</div>
+    <div class="status" id="status"></div>
+  </section>
+
+  <section id="resultado"></section>
+
+  <div class="foot">
+    WhatsApp continua como canal alternativo. Se o WhatsApp estiver restrito, use este portal por QR Code.
+  </div>
+</main>
+
+<script>
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec';
+let locacoes = [];
+
+function esc(v){return String(v == null ? '' : v).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function digits(v){return String(v||'').replace(/\D/g,'')}
+function fmt(sec){
+  sec = Math.max(0, Math.floor(sec || 0));
+  const m = Math.floor(sec / 60), s = sec % 60;
+  return String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+}
+function inicioMs(l){
+  if (Number(l.startTimestamp || 0) > 0) return Number(l.startTimestamp);
+  return 0;
+}
+function restante(l){
+  if (l.status === 'Pendente') return Number(l.mins || 0) * 60;
+  const ini = inicioMs(l);
+  if (!ini) return Number(l.mins || 0) * 60;
+  return (Number(l.mins || 0) * 60) - Math.floor((Date.now() - ini) / 1000);
+}
+function render(){
+  const box = document.getElementById('resultado');
+  if (!locacoes.length) {
+    box.innerHTML = '<div class="card empty"><b>Nenhuma locacao ativa encontrada</b><span>Confira se o telefone digitado e o mesmo informado ao operador.</span></div>';
+    return;
+  }
+  box.innerHTML = locacoes.map((l, i) => {
+    const rem = restante(l);
+    const extra = rem < 0;
+    const titulo = extra ? 'TEMPO EXTRA' : (l.status === 'Pendente' ? 'AGUARDANDO' : 'RESTANTE');
+    return `<div class="card loc">
+      <div class="ring"><small>${titulo}</small><b id="tempo-${i}">${extra ? '+' + fmt(Math.abs(rem)) : fmt(rem)}</b></div>
+      <div>
+        <div class="kid">${esc(l.crianca)}</div>
+        <div class="meta">Responsavel: ${esc(l.responsavel)}<br>${esc(l.veiculo || l.tipo)} - ${esc(l.plano)}<br>Status: ${esc(l.status)}</div>
+        <span class="pill">${esc(l.mins)} min</span>
+        ${extra ? '<div class="warn">O tempo contratado encerrou. Minutos extras estao sendo contados.</div>' : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+async function buscar(){
+  const tel = digits(document.getElementById('telefone').value);
+  const status = document.getElementById('status');
+  if (tel.length < 10) { status.textContent = 'Digite o telefone com DDD.'; return; }
+  status.textContent = 'Buscando locacoes...';
+  document.getElementById('btn').disabled = true;
+  try {
+    const url = GAS_URL + '?action=buscarPortalResponsavel&telefone=' + encodeURIComponent(tel) + '&t=' + Date.now();
+    const r = await fetch(url, { cache:'no-store' });
+    const d = await r.json();
+    if (!d.ok) throw new Error(d.erro || 'Falha no portal');
+    locacoes = d.locacoes || [];
+    status.textContent = locacoes.length ? 'Locacao encontrada.' : '';
+    render();
+  } catch(e) {
+    status.textContent = 'Portal ainda nao esta disponivel. Verifique com o operador.';
+  } finally {
+    document.getElementById('btn').disabled = false;
+  }
+}
+setInterval(() => { if (locacoes.length) render(); }, 1000);
+</script>
+</body>
+</html>
