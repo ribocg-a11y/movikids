@@ -3,9 +3,9 @@
 Estado atual em 01/06/2026:
 
 - Apps Script em producao: `v1.5.24`
-- Frontend em producao: `v1.6.57`
-- Service Worker em producao: `v1.6.57`
-- Ultima mudanca publicada: `P0 - rascunho protegido e WhatsApp extra rastreado localmente`
+- Frontend em producao: `v1.6.58`
+- Service Worker em producao: `v1.6.58`
+- Ultima mudanca publicada: `P0 - rascunho protegido e WhatsApp extra rastreado localmente/remotamente quando backend v1.5.25 estiver implantado`
 - Proximo candidato backend correto: `v1.5.25`, sempre baseado em `v1.5.24`
 
 ## Fase 1 - Status canonico e timer
@@ -66,6 +66,8 @@ Correcao ja publicada:
 - `v1.6.55` corrigiu o envio em tablet/PWA.
 - `v1.6.57` passou a registrar localmente tentativas de WhatsApp de tempo extra.
 - `v1.6.57` salva rascunho da nova locacao ao sair da tela Nova.
+- `v1.6.58` tenta registrar o evento tambem no Apps Script, sem bloquear a operacao se o backend ainda nao estiver em `v1.5.25`.
+- Candidato backend `v1.5.25` cria a aba `AUD_WHATSAPP` e a action `registrarWhatsAppEvento`.
 - Em dispositivos touch ou PWA, nao usar `window.open(..., '_blank')` para WhatsApp.
 - Em tablet/PWA, abrir WhatsApp por `window.location.href`.
 - Usar `https://api.whatsapp.com/send?phone=...&text=...` como rota padrao.

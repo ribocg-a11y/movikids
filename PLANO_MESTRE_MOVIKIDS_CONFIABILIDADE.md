@@ -417,9 +417,9 @@ Depois de qualquer mudanca:
 
 Sequencia correta a partir de agora:
 
-1. `v1.5.24` + `v1.6.55` publicados e validados.
+1. `v1.5.24` + `v1.6.58` publicados e validados.
 2. Primeira versao da pagina `Relacionamento` entregue usando historico existente, sem dependencia obrigatoria.
-3. Proximo passo: preparar `v1.5.25` com validacoes/diagnostico da aba canonica `RESPONSAVEIS`.
+3. Proximo passo: implantar `v1.5.25` com auditoria de WhatsApp obrigatorio na aba `AUD_WHATSAPP`.
 4. A aba `RESPONSAVEIS` deve nascer opcional: se falhar, a locacao continua funcionando pelo fluxo atual.
 
 Nada de nova feature fora dessa ordem sem aprovacao explicita.
@@ -433,9 +433,9 @@ Apps Script:
 
 Frontend:
 
-- Service Worker: `v1.6.57`.
-- GitHub Pages: `v1.6.57`.
-- Inclui `Triciclo 02`, pagina `Relacionamento / Resp.`, atalho `Nova crianca`, WhatsApp seguro para tablet/PWA, rascunho protegido ao sair da tela Nova e rastreio local de WhatsApp de tempo extra.
+- Service Worker: `v1.6.58`.
+- GitHub Pages: `v1.6.58`.
+- Inclui `Triciclo 02`, pagina `Relacionamento / Resp.`, atalho `Nova crianca`, WhatsApp seguro para tablet/PWA, rascunho protegido ao sair da tela Nova e rastreio local/remoto de WhatsApp de tempo extra quando Apps Script v1.5.25 estiver implantado.
 
 Nao concluido:
 
