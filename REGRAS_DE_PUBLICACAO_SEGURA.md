@@ -50,6 +50,12 @@ deve ser tratada como risco operacional alto.
 ### Regras obrigatorias do WhatsApp
 
 - Nunca mudar o metodo de abertura do WhatsApp sem declarar isso no resumo.
+- Nunca enviar telefone cru para o WhatsApp sem normalizacao e validacao.
+- Para numeros do Brasil, todo envio deve sair em formato internacional `55 + DDD + numero`.
+- Se o numero nacional vier com 10 digitos e o terceiro digito for `9`, exemplo `98 9242-8208`, tratar como celular antigo e completar o nono digito: `98 99242-8208`.
+- Se o numero ja vier com 11 digitos nacionais, exemplo `98 99242-8208`, nao duplicar o `9`.
+- Se o numero ja vier com `55`, remover o prefixo apenas para validar e remontar no formato final correto.
+- Bloquear envio quando o telefone nao tiver 10 ou 11 digitos nacionais apos normalizacao.
 - Sempre copiar a mensagem para a area de transferencia antes de tentar abrir o WhatsApp, quando o navegador permitir.
 - Sempre manter fallback de abertura.
 - Sempre preservar o link curto do responsavel.
@@ -62,6 +68,11 @@ deve ser tratada como risco operacional alto.
 
 Antes de considerar fechado:
 
+- Telefone `98 9242-8208` deve virar `5598992428208`.
+- Telefone `55 98 9242-8208` deve virar `5598992428208`.
+- Telefone `98 99242-8208` deve continuar `5598992428208`.
+- Telefone `55 98 99242-8208` deve continuar `5598992428208`.
+- Telefone claramente invalido deve bloquear envio.
 - Desktop: botao abre WhatsApp Web ou tela de envio.
 - Celular: botao abre WhatsApp/WhatsApp Business ou permite envio.
 - Tablet: botao abre WhatsApp/WhatsApp Business ou deixa mensagem copiada com instrucao clara.
@@ -104,6 +115,8 @@ Erros cometidos neste projeto que nao devem se repetir:
 
 - publicar pacote sem deixar claro todos os arquivos alterados;
 - tratar tablet como igual ao desktop no fluxo de WhatsApp;
+- enviar telefone para WhatsApp sem normalizacao brasileira completa;
+- aceitar DDD + 8 digitos de celular sem completar o nono digito;
 - mexer em cache/versionamento sem validar efeito em tela ja aberta;
 - deixar documento antigo contradizer hotfix novo;
 - entregar mudanca sem regra de rollback curta;
@@ -133,4 +146,3 @@ Toda resposta depois de publicar deve conter:
 - proximo passo.
 
 Se algum desses itens faltar, a entrega nao esta completa.
-

@@ -185,10 +185,14 @@ Regra especifica de WhatsApp em tablet/PWA:
 - Nao usar `window.open(..., '_blank')` como unico caminho para enviar mensagens em tablet, celular ou PWA.
 - Nao assumir que `wa.me`, `api.whatsapp.com`, `window.open` ou `window.location` funcionam igual em todos os dispositivos.
 - Qualquer troca de rota ou metodo de abertura exige validacao em desktop, celular, tablet e PWA.
+- Nao enviar telefone cru para WhatsApp.
+- Todo telefone brasileiro deve ser normalizado para `55 + DDD + numero`.
+- Celular antigo com DDD + 8 digitos iniciando por `9`, exemplo `98 9242-8208`, deve ser corrigido para DDD + nono digito, exemplo `98 99242-8208`, antes do envio.
+- Numero invalido deve bloquear o envio antes de abrir WhatsApp.
 - Sempre manter fallback de abertura.
 - Sempre que possivel, copiar a mensagem para a area de transferencia antes de abrir o WhatsApp.
 - Se o tablet falhar, a correcao deve ser cirurgica no disparo do WhatsApp, sem mexer em timer, financeiro, Apps Script ou status.
-- Esse aprendizado veio das correcoes `v1.6.55` e `v1.6.60`, apos falha de envio somente no tablet.
+- Esse aprendizado veio das correcoes `v1.6.55`, `v1.6.60` e `v1.6.61`, apos falha de envio somente no tablet e falha por telefone sem nono digito.
 
 ### 9. Relacionamento e recorrencia
 

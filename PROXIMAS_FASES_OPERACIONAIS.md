@@ -67,6 +67,7 @@ Correcao ja publicada:
 
 - `v1.6.55` corrigiu o envio em tablet/PWA.
 - `v1.6.60` corrigiu regressao de abertura no tablet usando `wa.me` com clique real em link e fallback para `api.whatsapp.com`.
+- `v1.6.61` corrigiu normalizacao de celular brasileiro para WhatsApp, completando o nono digito em numeros como `98 9242-8208`.
 - `v1.6.57` passou a registrar localmente tentativas de WhatsApp de tempo extra.
 - `v1.6.57` salva rascunho da nova locacao ao sair da tela Nova.
 - `v1.6.58` tenta registrar o evento tambem no Apps Script, sem bloquear a operacao se houver falha de rede.
@@ -75,6 +76,7 @@ Correcao ja publicada:
 - Em dispositivos touch ou PWA, nao usar `window.open(..., '_blank')` como unico caminho para WhatsApp.
 - Em tablet/PWA, usar clique real em link e manter fallback.
 - A rota pode ser `wa.me` ou `api.whatsapp.com`, mas qualquer troca exige validacao no tablet.
+- Telefone deve ser validado antes do envio: `98 9242-8208` deve virar `5598992428208`; telefone invalido deve bloquear a abertura.
 - Copiar a mensagem para a area de transferencia como fallback quando possivel.
 
 Motivo:
