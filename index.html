@@ -21,7 +21,7 @@
 // ── CACHE BUSTER v1.3.0 ─────────────────────────────────
 // Força limpeza do SW antigo e recarga com versão nova
 (function(){
-  const CURRENT = '1.6.56';
+  const CURRENT = '1.6.57';
   const KEY = 'mk_loaded_version';
   try {
     if (localStorage.getItem(KEY) !== CURRENT) {
@@ -2268,7 +2268,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = '1.6.56';
+const APP_VERSION = '1.6.57';
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec';
 
 const PRECOS = {
@@ -2295,6 +2295,7 @@ let opTipo      = null;
 let novaState   = { tipo: null, plano: null, veiculo: null, pagamento: null, observacao: '', step: 0 };
 let novaPrefillResponsavel = null;
 const NOVA_DRAFT_KEY = 'mk_nova_locacao_draft_v1';
+const WA_EVENT_LOG_KEY = 'mk_wa_event_log_v1';
 let _restoringNovaDraft = false;
 let catSel      = 'Energia';
 let custosHoje  = [];
@@ -2744,7 +2745,26 @@ function marcarExtraWaEnviado_(s) {
   const ts = Date.now();
   s.extraWaSentAt = ts;
   try { localStorage.setItem(extraWaKey_(s), String(ts)); } catch(e) {}
+  registrarWaEvento_('tempo_extra', s, 'acionado');
   saveSessions();
+}
+
+function registrarWaEvento_(tipo, s, status) {
+  try {
+    const list = JSON.parse(localStorage.getItem(WA_EVENT_LOG_KEY) || '[]');
+    list.unshift({
+      tipo,
+      status,
+      rowIndex: s && s.rowIndex,
+      id: s && s.id,
+      crianca: s && s.crianca,
+      responsavel: s && s.responsavel,
+      telefone: s && s.telefone,
+      at: Date.now(),
+      versao: APP_VERSION
+    });
+    localStorage.setItem(WA_EVENT_LOG_KEY, JSON.stringify(list.slice(0, 200)));
+  } catch(e) {}
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -3893,7 +3913,11 @@ function waTempoEsgotado(s) {
     adicional: 'R$ ' + adicional, link: track
   });
 
-  enviarWaTel(s.telefone, msg);
+  if (enviarWaTel(s.telefone, msg) === false) {
+    registrarWaEvento_('tempo_extra', s, 'falha_abertura');
+    return false;
+  }
+  registrarWaEvento_('tempo_extra', s, 'whatsapp_aberto');
   return true;
 }
 
@@ -5136,6 +5160,7 @@ function showPage(name, opts = {}) {
   const adminPages = ['admin','dashboard','relatorio','historico','caixa'];
   if (adminPages.includes(name) && !isAdmin) { abrirAdmin(); return; }
   const wasNovaActive = !!document.getElementById('page-nova')?.classList.contains('active');
+  if (wasNovaActive && name !== 'nova') salvarNovaDraft_();
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
   const pg = document.getElementById('page-'+name);

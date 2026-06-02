@@ -433,9 +433,9 @@ Apps Script:
 
 Frontend:
 
-- GitHub Pages: `v1.6.55`.
-- Service Worker: `v1.6.55`.
-- Inclui `Triciclo 02`, pagina `Relacionamento / Resp.`, atalho `Nova crianca` e WhatsApp seguro para tablet/PWA.
+- Service Worker: `v1.6.57`.
+- GitHub Pages: `v1.6.57`.
+- Inclui `Triciclo 02`, pagina `Relacionamento / Resp.`, atalho `Nova crianca`, WhatsApp seguro para tablet/PWA, rascunho protegido ao sair da tela Nova e rastreio local de WhatsApp de tempo extra.
 
 Nao concluido:
 
