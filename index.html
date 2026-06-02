@@ -21,7 +21,7 @@
 // ── CACHE BUSTER v1.3.0 ─────────────────────────────────
 // Força limpeza do SW antigo e recarga com versão nova
 (function(){
-  const CURRENT = '1.6.63';
+  const CURRENT = '1.6.64';
   const KEY = 'mk_loaded_version';
   try {
     if (localStorage.getItem(KEY) !== CURRENT) {
@@ -2279,7 +2279,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = '1.6.63';
+const APP_VERSION = '1.6.64';
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec';
 
 const PRECOS = {
@@ -3924,8 +3924,9 @@ function enviarWaTel(tel, msg) {
   const phone = telOk.phone;
   const msgLimpa = sanitizarMensagemWhatsApp_(msg);
   const text = encodeURIComponent(msgLimpa || '');
-  const url = 'https://wa.me/' + phone + '?text=' + text;
-  const fallbackUrl = 'https://api.whatsapp.com/send?phone=' + phone + '&text=' + text;
+  const url = 'https://web.whatsapp.com/send?phone=' + phone + '&text=' + text;
+  const fallbackUrl = 'https://wa.me/' + phone + '?text=' + text;
+  const fallbackApiUrl = 'https://api.whatsapp.com/send?phone=' + phone + '&text=' + text;
 
   try {
     if (navigator.clipboard && msgLimpa) navigator.clipboard.writeText(msgLimpa).catch(() => {});
@@ -3942,7 +3943,7 @@ function enviarWaTel(tel, msg) {
     toast(telOk.ajustado ? 'WhatsApp aberto com telefone ajustado. Mensagem copiada.' : 'WhatsApp aberto. Se nao abrir, a mensagem ja foi copiada.', 'success');
   } catch(e) {
     try { window.location.assign(fallbackUrl); }
-    catch(e2) { window.location.href = fallbackUrl; }
+    catch(e2) { window.location.href = fallbackApiUrl; }
   }
   return true;
 }
