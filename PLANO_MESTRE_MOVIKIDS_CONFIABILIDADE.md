@@ -182,13 +182,13 @@ O sistema deve degradar com clareza:
 
 Regra especifica de WhatsApp em tablet/PWA:
 
-- Nao usar `window.open(..., '_blank')` como caminho principal para enviar mensagens em tablet, celular ou PWA.
-- Nao depender de `wa.me` como rota principal no fluxo operacional.
-- Usar `https://api.whatsapp.com/send?phone=...&text=...`.
-- Em tablet/celular/PWA, abrir na mesma aba com `window.location.href`.
-- No desktop, pode tentar nova aba, mas deve cair para mesma aba se o popup for bloqueado.
+- Nao usar `window.open(..., '_blank')` como unico caminho para enviar mensagens em tablet, celular ou PWA.
+- Nao assumir que `wa.me`, `api.whatsapp.com`, `window.open` ou `window.location` funcionam igual em todos os dispositivos.
+- Qualquer troca de rota ou metodo de abertura exige validacao em desktop, celular, tablet e PWA.
+- Sempre manter fallback de abertura.
 - Sempre que possivel, copiar a mensagem para a area de transferencia antes de abrir o WhatsApp.
-- Esse aprendizado veio da correcao `v1.6.55`, apos falha de envio somente no tablet.
+- Se o tablet falhar, a correcao deve ser cirurgica no disparo do WhatsApp, sem mexer em timer, financeiro, Apps Script ou status.
+- Esse aprendizado veio das correcoes `v1.6.55` e `v1.6.60`, apos falha de envio somente no tablet.
 
 ### 9. Relacionamento e recorrencia
 
@@ -396,6 +396,10 @@ Status em 01/06/2026:
 
 ## Regra De Trabalho Daqui Em Diante
 
+Documento obrigatorio:
+
+- `REGRAS_DE_PUBLICACAO_SEGURA.md`
+
 Antes de qualquer mudanca:
 
 1. Dizer qual prioridade do plano ela atende.
@@ -412,6 +416,10 @@ Depois de qualquer mudanca:
 4. Informar se `sw.js` mudou.
 5. Informar se GitHub Pages/documentacao publicada mudou.
 6. Informar o que foi testado.
+
+Regra adicional:
+
+- Qualquer mudanca em WhatsApp, tablet, PWA, cache, service worker ou link do responsavel deve seguir a matriz de validacao do documento de publicacao segura.
 
 ## Proxima Acao Correta
 
@@ -433,9 +441,9 @@ Apps Script:
 
 Frontend:
 
-- Service Worker: `v1.6.59`.
-- GitHub Pages: `v1.6.59`.
-- Inclui `Triciclo 02`, pagina `Relacionamento / Resp.`, atalho `Nova crianca`, WhatsApp seguro para tablet/PWA, rascunho protegido ao sair da tela Nova, rastreio local/remoto de WhatsApp de tempo extra e operador local enviado para auditoria.
+- Service Worker: `v1.6.60`.
+- GitHub Pages: `v1.6.60`.
+- Inclui `Triciclo 02`, pagina `Relacionamento / Resp.`, atalho `Nova crianca`, hotfix de abertura WhatsApp em tablet/PWA com fallback, rascunho protegido ao sair da tela Nova, rastreio local/remoto de WhatsApp de tempo extra e operador local enviado para auditoria.
 
 Nao concluido:
 
