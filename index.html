@@ -21,7 +21,7 @@
 // ── CACHE BUSTER v1.3.0 ─────────────────────────────────
 // Força limpeza do SW antigo e recarga com versão nova
 (function(){
-  const CURRENT = '1.6.59';
+  const CURRENT = '1.6.60';
   const KEY = 'mk_loaded_version';
   try {
     if (localStorage.getItem(KEY) !== CURRENT) {
@@ -2279,7 +2279,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = '1.6.59';
+const APP_VERSION = '1.6.60';
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec';
 
 const PRECOS = {
@@ -3877,21 +3877,25 @@ function enviarWaTel(tel, msg) {
   if (!raw || raw.length < 10) { toast('Telefone invalido para WhatsApp.', 'error'); return false; }
   const phone = raw.startsWith('55') ? raw : '55' + raw;
   const text = encodeURIComponent(msg || '');
-  const url = 'https://api.whatsapp.com/send?phone=' + phone + '&text=' + text;
-  const ua = navigator.userAgent || '';
-  const isTouch = (navigator.maxTouchPoints || 0) > 0;
-  const isTabletOrMobile = /Android|iPad|iPhone|Mobile|Tablet/i.test(ua) || isTouch;
-  const isStandalone = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone;
+  const url = 'https://wa.me/' + phone + '?text=' + text;
+  const fallbackUrl = 'https://api.whatsapp.com/send?phone=' + phone + '&text=' + text;
 
   try {
     if (navigator.clipboard && msg) navigator.clipboard.writeText(msg).catch(() => {});
   } catch(e) {}
 
-  if (isTabletOrMobile || isStandalone) {
-    window.location.href = url;
-  } else {
-    const w = window.open(url, '_blank', 'noopener');
-    if (!w) window.location.href = url;
+  try {
+    const a = document.createElement('a');
+    a.href = url;
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => { try { a.remove(); } catch(e) {} }, 500);
+    toast('WhatsApp aberto. Se nao abrir, a mensagem ja foi copiada.', 'success');
+  } catch(e) {
+    try { window.location.assign(fallbackUrl); }
+    catch(e2) { window.location.href = fallbackUrl; }
   }
   return true;
 }
