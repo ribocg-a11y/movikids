@@ -21,7 +21,7 @@
 // ── CACHE BUSTER v1.3.0 ─────────────────────────────────
 // Força limpeza do SW antigo e recarga com versão nova
 (function(){
-  const CURRENT = '1.6.60';
+  const CURRENT = '1.6.61';
   const KEY = 'mk_loaded_version';
   try {
     if (localStorage.getItem(KEY) !== CURRENT) {
@@ -2279,7 +2279,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = '1.6.60';
+const APP_VERSION = '1.6.61';
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec';
 
 const PRECOS = {
@@ -3872,10 +3872,35 @@ function gerarTrackUrl(s) {
   return 'https://ribocg-a11y.github.io/movikids/track.html?s=' + rowB36;
 }
 
+function normalizarTelefoneWhatsApp_(tel) {
+  let raw = String(tel || '').replace(/\D/g,'');
+  if (!raw) return { ok:false, erro:'Telefone vazio.' };
+
+  if (raw.startsWith('00')) raw = raw.replace(/^00+/, '');
+
+  let nacional = raw;
+  if (raw.startsWith('55')) nacional = raw.slice(2);
+
+  // Brasil: DDD + celular moderno tem 11 digitos. Se vier DDD + 8 digitos
+  // iniciando por 9, completa o nono digito apos o DDD para evitar destino WA invalido.
+  let ajustado = false;
+  if (nacional.length === 10 && nacional[2] === '9') {
+    nacional = nacional.slice(0, 2) + '9' + nacional.slice(2);
+    ajustado = true;
+  }
+
+  if (nacional.length !== 10 && nacional.length !== 11) {
+    return { ok:false, erro:'Telefone invalido para WhatsApp: ' + raw };
+  }
+
+  const phone = '55' + nacional;
+  return { ok:true, phone, nacional, ajustado };
+}
+
 function enviarWaTel(tel, msg) {
-  const raw = String(tel || '').replace(/\D/g,'');
-  if (!raw || raw.length < 10) { toast('Telefone invalido para WhatsApp.', 'error'); return false; }
-  const phone = raw.startsWith('55') ? raw : '55' + raw;
+  const telOk = normalizarTelefoneWhatsApp_(tel);
+  if (!telOk.ok) { toast(telOk.erro || 'Telefone invalido para WhatsApp.', 'error'); return false; }
+  const phone = telOk.phone;
   const text = encodeURIComponent(msg || '');
   const url = 'https://wa.me/' + phone + '?text=' + text;
   const fallbackUrl = 'https://api.whatsapp.com/send?phone=' + phone + '&text=' + text;
@@ -3892,7 +3917,7 @@ function enviarWaTel(tel, msg) {
     document.body.appendChild(a);
     a.click();
     setTimeout(() => { try { a.remove(); } catch(e) {} }, 500);
-    toast('WhatsApp aberto. Se nao abrir, a mensagem ja foi copiada.', 'success');
+    toast(telOk.ajustado ? 'WhatsApp aberto com telefone ajustado. Mensagem copiada.' : 'WhatsApp aberto. Se nao abrir, a mensagem ja foi copiada.', 'success');
   } catch(e) {
     try { window.location.assign(fallbackUrl); }
     catch(e2) { window.location.href = fallbackUrl; }
