@@ -62,11 +62,18 @@ function inicioMs(l){
   if (Number(l.startTimestamp || 0) > 0) return Number(l.startTimestamp);
   return 0;
 }
+function totalMins(l){
+  // v1.1: extendedMins acumulado pelo operador (estensoes de plano)
+  const base = Number(l.mins || 0);
+  const ext  = Number(l.extendedMins || 0);
+  return base + ext;
+}
 function restante(l){
-  if (l.status === 'Pendente') return Number(l.mins || 0) * 60;
+  const total = totalMins(l);
+  if (l.status === 'Pendente') return total * 60;
   const ini = inicioMs(l);
-  if (!ini) return Number(l.mins || 0) * 60;
-  return (Number(l.mins || 0) * 60) - Math.floor((Date.now() - ini) / 1000);
+  if (!ini) return total * 60;
+  return (total * 60) - Math.floor((Date.now() - ini) / 1000);
 }
 function render(){
   const box = document.getElementById('resultado');
@@ -83,7 +90,7 @@ function render(){
       <div>
         <div class="kid">${esc(l.crianca)}</div>
         <div class="meta">Responsavel: ${esc(l.responsavel)}<br>${esc(l.veiculo || l.tipo)} - ${esc(l.plano)}<br>Status: ${esc(l.status)}</div>
-        <span class="pill">${esc(l.mins)} min</span>
+        <span class="pill">${totalMins(l)} min${Number(l.extendedMins||0)>0?' (+'+l.extendedMins+' ext)':''}</span>
         ${extra ? '<div class="warn">O tempo contratado encerrou. Minutos extras estao sendo contados.</div>' : ''}
       </div>
     </div>`;
