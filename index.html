@@ -21,7 +21,7 @@
 // ── CACHE BUSTER v1.3.0 ─────────────────────────────────
 // Força limpeza do SW antigo e recarga com versão nova
 (function(){
-  const CURRENT = '1.6.67';
+  const CURRENT = '1.6.68';
   const KEY = 'mk_loaded_version';
   try {
     if (localStorage.getItem(KEY) !== CURRENT) {
@@ -200,6 +200,11 @@ nav button .nav-badge{
 .sc-timer-big{font-size:26px;font-weight:900;color:var(--txt);font-variant-numeric:tabular-nums;line-height:1;margin:2px 0}
 .sc-timer-extra-cost{font-size:13px;font-weight:700;color:var(--red)}
 .sc-valor{font-size:13px;color:var(--txt2);font-weight:600;margin-top:4px}
+.sms-status{display:inline-flex;align-items:center;margin-top:7px;padding:4px 8px;border-radius:999px;font-size:11px;font-weight:900;border:1px solid transparent}
+.sms-ok{background:#E8F5E9;color:#1B5E20;border-color:#A5D6A7}
+.sms-err{background:#FFEBEE;color:#B71C1C;border-color:#EF9A9A}
+.sms-sent{background:#E3F2FD;color:#0D47A1;border-color:#90CAF9}
+.sms-wait{background:#FFF8E1;color:#8A5A00;border-color:#FFE082}
 
 /* Card buttons */
 .sc-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px}
@@ -2287,7 +2292,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = '1.6.67';
+const APP_VERSION = '1.6.68';
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec';
 
 const PRECOS = {
@@ -2683,7 +2688,8 @@ function mergeSessaoCanonica(serverSession, localSession = {}) {
     // Somente flags locais de UX podem sobreviver ao estado canonico.
     alertFired5: Boolean(localSession.alertFired5),
     alertFiredExp: Boolean(localSession.alertFiredExp),
-    extraWaSentAt: localSession.extraWaSentAt || localStorage.getItem(extraWaKey_(serverSession)) || null
+    extraWaSentAt: localSession.extraWaSentAt || localStorage.getItem(extraWaKey_(serverSession)) || null,
+    smsStatus: localSession.smsStatus || null
   };
 }
 
@@ -2818,6 +2824,68 @@ function marcarExtraWaEnviado_(s) {
   s.extraWaSentAt = ts;
   try { localStorage.setItem(extraWaKey_(s), String(ts)); } catch(e) {}
   saveSessions();
+}
+
+function smsStatusLabel_(state) {
+  const st = String(state || '').toLowerCase();
+  if (st === 'delivered') return { cls:'ok', txt:'Entregue SMS' };
+  if (st === 'failed') return { cls:'err', txt:'Falha SMS' };
+  if (st === 'sent') return { cls:'sent', txt:'SMS enviado' };
+  if (st === 'processed') return { cls:'wait', txt:'SMS processando' };
+  if (st === 'pending' || st === 'accepted') return { cls:'wait', txt:'SMS na fila' };
+  return { cls:'wait', txt:'SMS pendente' };
+}
+
+function smsStatusHtml_(s) {
+  const sms = s && s.smsStatus;
+  if (!sms || !sms.gatewayId) return '';
+  const label = smsStatusLabel_(sms.state);
+  const title = sms.error ? ' title="' + escHtml(sms.error) + '"' : '';
+  return '<div class="sms-status sms-' + label.cls + '"' + title + '>' + label.txt + '</div>';
+}
+
+function atualizarSmsStatusLocal_(rowIndex, patch) {
+  const s = sessions.find(x => Number(x.rowIndex) === Number(rowIndex));
+  if (!s) return null;
+  s.smsStatus = { ...(s.smsStatus || {}), ...patch, updatedAt: Date.now() };
+  saveSessions();
+  renderCards();
+  return s;
+}
+
+function agendarConsultaSms_(rowIndex, gatewayId, delays) {
+  (delays || [5000, 12000, 25000]).forEach(delay => {
+    setTimeout(() => consultarSmsStatusSessao_(rowIndex, gatewayId), delay);
+  });
+}
+
+async function consultarSmsStatusSessao_(rowIndex, gatewayId) {
+  if (!gatewayId) return null;
+  try {
+    const d = await api({
+      action: 'consultarSmsStatus',
+      gatewayId,
+      rowIndex,
+      origem: 'frontend',
+      versao: APP_VERSION,
+      ...operadorApiParams_()
+    }, 20000);
+    if (!d.ok) throw new Error(d.erro || 'Falha ao consultar SMS');
+    const sms = d.sms || {};
+    const s = atualizarSmsStatusLocal_(rowIndex, {
+      gatewayId,
+      state: sms.state || 'Pending',
+      error: sms.error || '',
+      telefoneHash: sms.telefoneHash || ''
+    });
+    if (s && String(s.smsStatus.state).toLowerCase() === 'failed') {
+      toast('Falha SMS: confirme telefone ou use alternativa.', 'error');
+    }
+    return sms;
+  } catch(e) {
+    atualizarSmsStatusLocal_(rowIndex, { gatewayId, state:'Pending', error: e.message || 'Erro consulta SMS' });
+    return null;
+  }
 }
 
 function registrarWaEvento_(tipo, s, status) {
@@ -3036,6 +3104,7 @@ function buildCard(s) {
         ${extraCost}
         <div class="sc-valor">${s.plano} · ${vFmt}</div>
         <div class="sc-valor" style="font-size:11px;color:var(--txt3)">Início: ${s.horaInicio}</div>
+        ${smsStatusHtml_(s)}
       </div>
     </div>
 
@@ -3823,7 +3892,17 @@ async function enviarSmsResponsavel_(s, tipo) {
       ...operadorApiParams_()
     }, 30000);
     if (!d.ok) throw new Error(d.erro || 'Falha ao enviar SMS');
-    toast('SMS enviado ao responsavel.', 'success');
+    const sms = d.sms || {};
+    if (sms.gatewayId) {
+      atualizarSmsStatusLocal_(s.rowIndex, {
+        gatewayId: sms.gatewayId,
+        state: 'Accepted',
+        error: '',
+        telefone: sms.telefone || ''
+      });
+      agendarConsultaSms_(s.rowIndex, sms.gatewayId);
+    }
+    toast('SMS enviado para a fila.', 'success');
     return true;
   } catch(e) {
     toast('SMS nao enviado: ' + (e.message || 'erro'), 'error');
