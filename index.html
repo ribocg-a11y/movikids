@@ -21,7 +21,7 @@
 // ── CACHE BUSTER v1.3.0 ─────────────────────────────────
 // Força limpeza do SW antigo e recarga com versão nova
 (function(){
-  const CURRENT = '1.6.66';
+  const CURRENT = '1.6.67';
   const KEY = 'mk_loaded_version';
   try {
     if (localStorage.getItem(KEY) !== CURRENT) {
@@ -1354,8 +1354,8 @@ nav button .nav-badge{
         <button class="sb-operator-btn" onclick="trocarOperador()">Trocar</button>
       </div>
       <div class="sb-wa-bar" id="sb-wa-bar">
-        <span>WA: <span class="sb-wa-mode" id="sb-wa-mode">Auto</span></span>
-        <button class="sb-operator-btn" onclick="trocarModoWhatsApp()">Modo</button>
+        <span>SMS: <span class="sb-wa-mode" id="sb-wa-mode">Gateway</span></span>
+        <button class="sb-operator-btn" onclick="trocarModoWhatsApp()">Info</button>
       </div>
       <div class="sb-admin-bar" id="sb-admin-bar" style="display:none">
         <span>🔐 Admin <span id="sb-timer">1:00</span></span>
@@ -1509,7 +1509,7 @@ nav button .nav-badge{
         <input id="inp-cri" class="form-input" type="text" placeholder="Ex: Ana Silva" autocomplete="off" autocapitalize="words" oninput="capitalizarNome(this)">
       </div>
       <div class="form-group">
-        <label class="form-label">WhatsApp do Responsável *</label>
+        <label class="form-label">Telefone do Responsável *</label>
         <input id="inp-tel" class="form-input" type="tel" placeholder="(98) 9 9999-9999" autocomplete="off">
       </div>
       <div class="form-group">
@@ -1637,7 +1637,7 @@ nav button .nav-badge{
         <span class="val" id="fch-res">—</span>
       </div>
       <div class="fecha-alert" id="fch-alerta" style="display:none"></div>
-      <button class="fecha-copy-btn" onclick="copiarFechamentoDia()">📋 Copiar fechamento para WhatsApp</button>
+      <button class="fecha-copy-btn" onclick="copiarFechamentoDia()">Copiar fechamento do dia</button>
     </div>
 
     <!-- ── DIAGNÓSTICO DO SISTEMA (Fase 7) ── -->
@@ -2145,7 +2145,7 @@ nav button .nav-badge{
     <div class="modal-info" id="alert-info"></div>
     <div class="modal-btns">
       <button class="btn btn-wa" onclick="abrirWhatsApp()" id="btn-wa">
-        📱 Enviar WhatsApp ao responsável
+        Enviar SMS ao responsável
       </button>
       <button class="btn btn-encerrar" onclick="encerrarDireto()" id="btn-enc-alert">
         ✓ Encerrar locação
@@ -2157,17 +2157,17 @@ nav button .nav-badge{
   </div>
 </div>
 
-<!-- ──────── MODAL BOAS-VINDAS WHATSAPP ──────── -->
+<!-- ──────── MODAL BOAS-VINDAS SMS ──────── -->
 <div id="wa-bv-modal" class="modal-overlay">
   <div class="modal-sheet">
     <div class="modal-handle"></div>
-    <div class="modal-icon">📱</div>
+    <div class="modal-icon">SMS</div>
     <div class="modal-title">Enviar boas-vindas</div>
     <div class="modal-sub">Revise a mensagem e envie ao responsável antes de iniciar a contagem.</div>
     <div class="wa-preview" id="wa-bv-preview"></div>
     <div class="modal-btns">
       <button class="btn btn-wa" id="btn-wa-bv-send" onclick="enviarBvEIniciar()">
-        📲 Enviar pelo WhatsApp e Iniciar
+        Enviar SMS e Iniciar
       </button>
       <button class="btn btn-secondary btn-sm" onclick="pularBvEIniciar()">
         Pular mensagem e iniciar
@@ -2287,7 +2287,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = '1.6.66';
+const APP_VERSION = '1.6.67';
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec';
 
 const PRECOS = {
@@ -2365,22 +2365,12 @@ function whatsappModeLabel_(mode) {
 
 function atualizarWhatsAppUI_() {
   const el = document.getElementById('sb-wa-mode');
-  if (el) el.textContent = whatsappModeLabel_(whatsappModeAtual_());
+  if (el) el.textContent = 'Gateway';
 }
 
 function trocarModoWhatsApp() {
-  const atual = whatsappModeAtual_();
-  const txt = prompt('Modo WhatsApp deste dispositivo:\n1 = Auto\n2 = Web Chrome\n3 = App WhatsApp\n4 = API fallback', whatsappModeLabel_(atual));
-  if (txt === null) return;
-  const v = String(txt || '').trim().toLowerCase();
-  const mode = v === '1' || v === 'auto' ? 'auto'
-    : v === '2' || v === 'web' || v.includes('chrome') ? 'web'
-    : v === '3' || v === 'app' || v.includes('whatsapp') ? 'app'
-    : v === '4' || v === 'api' ? 'api'
-    : atual;
-  try { localStorage.setItem(WA_MODE_KEY, mode); } catch(e) {}
   atualizarWhatsAppUI_();
-  toast('Modo WhatsApp: ' + whatsappModeLabel_(mode), 'success');
+  toast('Canal principal: SMS Gateway.', 'success');
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -2827,7 +2817,6 @@ function marcarExtraWaEnviado_(s) {
   const ts = Date.now();
   s.extraWaSentAt = ts;
   try { localStorage.setItem(extraWaKey_(s), String(ts)); } catch(e) {}
-  registrarWaEvento_('tempo_extra', s, 'acionado');
   saveSessions();
 }
 
@@ -3052,15 +3041,15 @@ function buildCard(s) {
 
     <div class="sc-btns">
       ${isOver
-        ? `<button class="btn btn-wa danger-wa" onclick="abrirWhatsAppCard(${s.rowIndex})" title="Avisar responsável sobre tempo extra">
-             🔴 Avisar extra
+        ? `<button class="btn btn-wa danger-wa" onclick="abrirWhatsAppCard(${s.rowIndex})" title="Enviar SMS sobre tempo extra">
+             SMS extra
            </button>`
         : isWarn
-          ? `<button class="btn btn-wa warn-wa" onclick="abrirWhatsAppCard(${s.rowIndex})" title="Avisar que o tempo está acabando">
-               ⏰ Avisar — ${Math.ceil(rem/60)}min rest.
+          ? `<button class="btn btn-wa warn-wa" onclick="abrirWhatsAppCard(${s.rowIndex})" title="Enviar SMS avisando que o tempo está acabando">
+               SMS - ${Math.ceil(rem/60)}min
              </button>`
-          : `<button class="btn btn-wa" onclick="abrirWhatsAppCard(${s.rowIndex})" title="Reenviar link de acompanhamento ao responsável">
-               📱 Reenviar link
+          : `<button class="btn btn-wa" onclick="abrirWhatsAppCard(${s.rowIndex})" title="Enviar SMS com o portal do responsável">
+               Enviar SMS
              </button>`
       }
       <button class="btn btn-encerrar ${isOver?'danger':''}" onclick="pedirEncerrar(${s.rowIndex})">
@@ -3764,15 +3753,15 @@ function showAlertModal(s, expired) {
 
   document.getElementById('btn-enc-alert').className = 'btn btn-encerrar' + (expired ? ' danger' : '');
 
-  // MSG expirado: WA obrigatório — esconde botão pular
+  // SMS de extra obrigatorio: esconde botao pular
   const btnPular = document.getElementById('btn-pular-alerta');
   const btnWa    = document.getElementById('btn-wa');
   if (expired) {
     if (btnPular) btnPular.style.display = 'none';
     if (btnWa) {
-      btnWa.textContent = '📲 Enviar aviso de cobrança (obrigatório)';
-      btnWa.onclick = function() {
-        if (waTempoEsgotado(s) === false) return;
+      btnWa.textContent = 'Enviar SMS de cobranca (obrigatorio)';
+      btnWa.onclick = async function() {
+        if (await waTempoEsgotado(s) === false) return;
         marcarExtraWaEnviado_(s);
         modal.dataset.extraWaSent = '1';
         modal.classList.remove('danger');
@@ -3783,17 +3772,17 @@ function showAlertModal(s, expired) {
   } else {
     if (btnPular) btnPular.style.display = '';
     if (btnWa) {
-      btnWa.textContent = '📱 Enviar WhatsApp ao responsável';
+      btnWa.textContent = 'Enviar SMS ao responsável';
       btnWa.onclick = function() { abrirWhatsApp(); };
     }
   }
 }
 
 function fecharAlerta() {
-  // Bloqueia fechar se expirado — operador deve enviar MSG 3 primeiro
+  // Bloqueia fechar se expirado — operador deve enviar SMS de extra primeiro
   const modal = document.getElementById('alert-modal');
   if (modal.classList.contains('danger') && modal.dataset.extraWaSent !== '1') {
-    toast('Envie o aviso de cobrança antes de fechar!', 'error');
+    toast('Envie o SMS de cobranca antes de fechar!', 'error');
     return;
   }
   modal.classList.remove('show');
@@ -3812,6 +3801,58 @@ function abrirWhatsAppCard(rowIndex) {
   const s = sessions.find(x => x.rowIndex === rowIndex);
   if (!s) return;
   abrirWaMsg(s);
+}
+
+function tipoSmsPorSessao_(s) {
+  const rem = calcRemaining(s);
+  if (rem <= 0) return 'esgotado';
+  if (rem <= 300) return 'alerta';
+  return 'portal';
+}
+
+async function enviarSmsResponsavel_(s, tipo) {
+  if (!s || !s.telefone) { toast('Telefone nao cadastrado', 'error'); return false; }
+  const smsTipo = tipo || tipoSmsPorSessao_(s);
+  try {
+    const d = await api({
+      action: 'enviarSmsResponsavel',
+      rowIndex: s.rowIndex,
+      tipo: smsTipo,
+      origem: 'frontend',
+      versao: APP_VERSION,
+      ...operadorApiParams_()
+    }, 30000);
+    if (!d.ok) throw new Error(d.erro || 'Falha ao enviar SMS');
+    toast('SMS enviado ao responsavel.', 'success');
+    return true;
+  } catch(e) {
+    toast('SMS nao enviado: ' + (e.message || 'erro'), 'error');
+    return false;
+  }
+}
+
+async function enviarSmsAvulso_(dados, tipo) {
+  const telefone = dados && (dados.telefone || dados.tel);
+  if (!telefone) { toast('Telefone nao cadastrado', 'error'); return false; }
+  try {
+    const d = await api({
+      action: 'enviarSmsAvulso',
+      tipo: tipo || 'agradecimento',
+      telefone,
+      responsavel: dados.responsavel || dados.nome || '',
+      nome: dados.nome || dados.responsavel || '',
+      crianca: dados.crianca || '',
+      origem: 'frontend',
+      versao: APP_VERSION,
+      ...operadorApiParams_()
+    }, 30000);
+    if (!d.ok) throw new Error(d.erro || 'Falha ao enviar SMS');
+    toast('SMS enviado.', 'success');
+    return true;
+  } catch(e) {
+    toast('SMS nao enviado: ' + (e.message || 'erro'), 'error');
+    return false;
+  }
 }
 
 function normalizarTxt_(s) {
@@ -4050,108 +4091,51 @@ function getMsgTemplate(key) {
 
 // ── MSG 1: Boas-vindas (logo após confirmar locação) ──────────────────────
 function waBoasVindas(s) {
-  if (!s || !s.telefone) return;
-  const veiculo  = s.veiculo || s.tipo;
-  const plano    = PLANO_LABELS[s.plano] || s.plano;
-  const valor    = 'R$ ' + String(s.valorPlano).replace('.',',');
-  const adicional= String(s.adicionalPorMin).replace('.',',');
-  const pag      = s.pagamento || '';
-  const track    = gerarTrackUrl(s);
-
-  const msg = renderTemplate(getMsgTemplate('msg_boasvindas'), {
-    nome: s.responsavel, crianca: s.crianca, veiculo,
-    plano, valor, adicional, link: track
-  });
-
-  enviarWaTel(s.telefone, msg);
+  if (!s || !s.telefone) { toast('Telefone nao cadastrado', 'error'); return false; }
+  return enviarSmsResponsavel_(s, 'portal');
 }
 
 // ── MSG 2: Alerta de tempo (faltam ~5 min) ────────────────────────────────
 function waAlertaTempo(s) {
-  if (!s || !s.telefone) return;
-  const rem   = Math.max(0, Math.ceil(calcRemaining(s) / 60));
-  const track = gerarTrackUrl(s);
-
-  const msg = renderTemplate(getMsgTemplate('msg_alerta'), {
-    nome: s.responsavel, crianca: s.crianca, minutos: String(rem), link: track
-  });
-
-  enviarWaTel(s.telefone, msg);
+  if (!s || !s.telefone) { toast('Telefone nao cadastrado', 'error'); return false; }
+  return enviarSmsResponsavel_(s, 'alerta');
 }
 
 // ── MSG 3: Tempo esgotado com extra ──────────────────────────────────────
 function waTempoEsgotado(s) {
-  if (!s || !s.telefone) { toast('Telefone obrigatÃ³rio para aviso de extra.', 'error'); return false; }
-  const adicional = String(s.adicionalPorMin).replace('.',',');
-  const track     = gerarTrackUrl(s);
-
-  const msg = renderTemplate(getMsgTemplate('msg_esgotado'), {
-    nome: s.responsavel, crianca: s.crianca,
-    adicional: 'R$ ' + adicional, link: track
-  });
-
-  if (enviarWaTel(s.telefone, msg) === false) {
-    registrarWaEvento_('tempo_extra', s, 'falha_abertura');
-    return false;
-  }
-  registrarWaEvento_('tempo_extra', s, 'whatsapp_aberto');
-  return true;
+  if (!s || !s.telefone) { toast('Telefone obrigatorio para aviso de extra.', 'error'); return false; }
+  return enviarSmsResponsavel_(s, 'esgotado');
 }
 
 // -- MSG 6: Extensão de tempo (v1.6.27) — novo plano contratado ------
 function waExtensao(s, extMins, extValor, extPlano, extraAntes, debtAntes) {
-  if (!s || !s.telefone) { toast('Sem telefone para enviar WA', 'error'); return; }
-  const veiculo    = s.veiculo || s.tipo;
-  const planoOrig  = PLANO_LABELS[s.plano] || s.plano;
-  const valorOrig  = 'R$ ' + String(s.valorPlano || 0).replace('.',',') + ',00';
-  const planoNovo  = PLANO_LABELS[extPlano] || extPlano;
-  const valorNovo  = 'R\$ ' + extValor.toFixed(0) + ',00';
-  const totalPend  = 'R\$ ' + ((s.extendedValor || 0) + debtAntes).toFixed(2).replace('.',',');
-  const debtLine   = debtAntes > 0
-    ? '\n⚠️ Extra anterior: R$ ' + debtAntes.toFixed(2).replace('.',',') + ' (acumulado antes da extensão)'
-    : '';
-  const track = gerarTrackUrl(s);
-  const msg = renderTemplate(getMsgTemplate('msg_extensao'), {
-    nome: s.responsavel, crianca: s.crianca, veiculo,
-    plano_novo: planoNovo, valor_novo: valorNovo,
-    plano_orig: planoOrig, valor_orig: valorOrig,
-    debt_line:  debtLine,
-    total_pendente: totalPend,
-    link: track
-  });
-  enviarWaTel(s.telefone, msg);
+  if (!s || !s.telefone) { toast('Sem telefone para enviar SMS', 'error'); return false; }
+  return enviarSmsResponsavel_(s, 'extensao');
 }
 
 // -- MSG 4: Agradecimento pos-locacao (Fase 6) ------
 function waAgradecimento(e) {
   if (!e || !e.telefone) { toast('Telefone nao cadastrado', 'error'); return; }
-  const veiculo = e.veiculo || e.tipo;
-  const plano   = PLANO_LABELS[e.plano] || e.plano;
-  const valor   = 'R$ ' + String(e.valorTotal).replace('.', ',');
-  const msg = renderTemplate(getMsgTemplate('msg_agradecimento'), {
-    nome: e.responsavel, crianca: e.crianca, veiculo, plano, valor
-  });
-  enviarWaTel(e.telefone, msg);
+  if (e.rowIndex) return enviarSmsResponsavel_(e, 'agradecimento');
+  return enviarSmsAvulso_(e, 'agradecimento');
 }
 
 // -- MSG 5: Retorno de clientes (Fase 6) -------
 function waMensagemRetorno(cliente) {
-  const msg = renderTemplate(getMsgTemplate('msg_agradecimento'), {
-    nome: cliente.nome, crianca: cliente.crianca,
-    veiculo: '', plano: '', valor: ''
-  });
-  enviarWaTel(cliente.tel, msg);
+  return enviarSmsAvulso_(cliente, 'retorno');
 }
 
 // ── Compatibilidade: botão WhatsApp no card e no alerta ───────────────────
-function abrirWaMsg(s) {
+async function abrirWaMsg(s) {
   const rem = calcRemaining(s);
-  if (rem <= 0)   { if (waTempoEsgotado(s) !== false) marcarExtraWaEnviado_(s); }
-  else if (rem <= 300) { waAlertaTempo(s); }
+  if (rem <= 0) {
+    if (await waTempoEsgotado(s) !== false) marcarExtraWaEnviado_(s);
+  }
+  else if (rem <= 300) { await waAlertaTempo(s); }
   else {
     // > 5 min restando: reenviar apenas o link de acompanhamento (boas-vindas)
     // NÃO enviar alerta de "tempo acabando" quando a sessão mal começou
-    waBoasVindas(s);
+    await waBoasVindas(s);
   }
 }
 
@@ -4170,32 +4154,18 @@ function abrirModalBv(rowIndex) {
   if (!s) return;
   bvRowIndex = rowIndex;
 
-  // Monta preview da mensagem (sem emojis unicode para visualização)
-  const veiculo   = s.veiculo || s.tipo;
-  const plano     = PLANO_LABELS[s.plano] || s.plano;
-  const valor     = 'R$ ' + String(s.valorPlano).replace('.',',');
-  const adicional = String(s.adicionalPorMin).replace('.',',');
-  const pag       = s.pagamento ? '\nPagamento: ' + s.pagamento : '';
-  const track     = gerarTrackUrl(s);
-
   const preview =
-    'Ola, ' + s.responsavel + '!\n\n' +
-    s.crianca + ' acabou de comecar sua aventura aqui na Movi Kids!\n\n' +
-    'Detalhes da locacao:\n' +
-    'Veiculo: ' + veiculo + '\n' +
-    'Plano: ' + plano + '\n' +
-    'Valor: ' + valor + pag + '\n\n' +
-    'Acompanhe o tempo em tempo real:\n' + track + '\n\n' +
-    'Qualquer duvida, estamos aqui!\n' +
-    'Movi Kids -- diversao com seguranca!';
+    'MOVI KIDS: acompanhe a locacao de ' + (s.crianca || 'sua crianca') +
+    ' pelo portal:\nhttps://ribocg-a11y.github.io/movikids/acompanhar.html\n\n' +
+    'Use o telefone com DDD informado no cadastro.';
 
   document.getElementById('wa-bv-preview').textContent = preview;
   document.getElementById('wa-bv-modal').classList.add('show');
 }
 
-function enviarBvEIniciar() {
+async function enviarBvEIniciar() {
   const s = sessions.find(x => x.rowIndex === bvRowIndex);
-  if (s) waBoasVindas(s);
+  if (s && await waBoasVindas(s) === false) return;
   document.getElementById('wa-bv-modal').classList.remove('show');
   iniciarContagem(bvRowIndex);
   bvRowIndex = null;
@@ -5682,10 +5652,10 @@ async function confirmarEstender() {
 
     saveSessions();
 
-    // Envia WhatsApp com novo link e breakdown financeiro
+    // Envia SMS com link do portal do responsavel
     waExtensao(estSession, estMins, estValor, estPlano, extraAntes, debtAntes);
 
-    toast('✅ +' + estMins + 'min adicionados! WA enviado.', 'success');
+    toast('+' + estMins + 'min adicionados! SMS solicitado.', 'success');
 
     broadcastInvalidate();
     syncController(true, 500);
@@ -5773,7 +5743,7 @@ async function carregarRetorno() {
           <div class="retorno-nome">${escHtml(c.nome)}</div>
           <div class="retorno-det">👶 ${escHtml(c.crianca)} · ${c.n} locação(ões) · R$ ${Number(c.fat).toFixed(2).replace('.',',')} · Última: ${c.data}</div>
         </div>
-        <button class="retorno-btn" onclick='waMensagemRetorno(${JSON.stringify(c)})'>📱 Enviar</button>
+        <button class="retorno-btn" onclick='waMensagemRetorno(${JSON.stringify(c)})'>Enviar SMS</button>
       </div>`).join('');
   } catch(e) { cont.innerHTML = '<div style="color:var(--red)">Erro ao carregar</div>'; }
 }
@@ -5798,7 +5768,7 @@ function renderEncHoje(list) {
       <div class="enc-right">
         ${v}
         <div class="enc-horario">${e.horaInicio} → ${e.horaFim||'--:--'}</div>
-        ${isAdmin && e.telefone ? '<button class="enc-wa-btn" onclick=\'waAgradecimento(' + JSON.stringify(e).replace(/\'/g,"\\\'")+')\'>📱 Agradecer</button>' : ''}
+        ${isAdmin && e.telefone ? '<button class="enc-wa-btn" onclick=\'waAgradecimento(' + JSON.stringify(e).replace(/\'/g,"\\\'")+')\'>SMS agradecer</button>' : ''}
       </div>
     </div>`;
   }).join('');
@@ -5936,7 +5906,7 @@ function copiarFechamentoDia() {
 
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(texto).then(() => {
-      toast('Fechamento copiado! Cole no WhatsApp 📱', 'success');
+      toast('Fechamento copiado.', 'success');
     }).catch(() => copiarFallback(texto));
   } else {
     copiarFallback(texto);
