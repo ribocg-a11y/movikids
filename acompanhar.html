@@ -110,13 +110,43 @@ async function buscar(){
     locacoes = d.locacoes || [];
     status.textContent = locacoes.length ? 'Locacao encontrada.' : '';
     render();
+    if (locacoes.length) iniciarAutoRefresh(tel);
   } catch(e) {
     status.textContent = 'Portal ainda nao esta disponivel. Verifique com o operador.';
   } finally {
     document.getElementById('btn').disabled = false;
   }
 }
+// Render a cada 1s (timer ao vivo)
 setInterval(() => { if (locacoes.length) render(); }, 1000);
+
+// Auto-refresh do servidor a cada 30s — detecta encerramento e extensões
+let _telAtual = '';
+let _refreshTimer = null;
+function iniciarAutoRefresh(tel) {
+  _telAtual = tel;
+  clearInterval(_refreshTimer);
+  _refreshTimer = setInterval(async () => {
+    if (!_telAtual) return;
+    try {
+      const url = GAS_URL + '?action=buscarPortalResponsavel&telefone=' + encodeURIComponent(_telAtual) + '&t=' + Date.now();
+      const r = await fetch(url, { cache:'no-store' });
+      const d = await r.json();
+      if (!d.ok) return;
+      const novas = d.locacoes || [];
+      // Se quantidade mudou ou status mudou, atualiza
+      const mudou = novas.length !== locacoes.length ||
+        novas.some((l, i) => !locacoes[i] || l.status !== locacoes[i].status ||
+          Number(l.extendedMins||0) !== Number((locacoes[i]||{}).extendedMins||0));
+      if (mudou) {
+        locacoes = novas;
+        const status = document.getElementById('status');
+        if (status) status.textContent = locacoes.length ? 'Atualizado.' : '';
+        render();
+      }
+    } catch(e) {}
+  }, 30000);
+}
 </script>
 </body>
 </html>
