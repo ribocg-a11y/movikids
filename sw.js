@@ -1,6 +1,6 @@
-// MOVI KIDS - Service Worker 1.6.69
+// MOVI KIDS - Service Worker 1.6.70
 // Hotfix: nao manter cache persistente do app. Rede sempre primeiro.
-const SW_VERSION = '1.6.69';
+const SW_VERSION = '1.6.70';
 
 self.addEventListener('install', event => {
   self.skipWaiting();
@@ -11,15 +11,21 @@ self.addEventListener('activate', event => {
     const keys = await caches.keys();
     await Promise.all(keys.map(k => caches.delete(k)));
     await self.clients.claim();
-    const clients = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
-    clients.forEach(client => client.postMessage({ type: 'MK_UPDATE_READY', version: SW_VERSION }));
   })());
 });
 
 self.addEventListener('fetch', event => {
-  const req = event.request;
-  if (req.method !== 'GET') return;
-  event.respondWith(
-    fetch(req, { cache: 'no-store' }).catch(() => caches.match(req))
-  );
+  const url = event.request.url;
+  if (
+    url.includes('script.google.com') ||
+    url.includes('index.html') ||
+    url.includes('acompanhar.html') ||
+    event.request.mode === 'navigate'
+  ) {
+    event.respondWith(
+      fetch(event.request).catch(() => caches.match(event.request))
+    );
+    return;
+  }
+  event.respondWith(fetch(event.request));
 });
