@@ -2292,7 +2292,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = '1.6.69';
+const APP_VERSION = '1.6.70';
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec';
 const PORTAL_RESPONSAVEL_URL = 'https://ribocg-a11y.github.io/movikids/acompanhar.html';
 
@@ -2693,7 +2693,7 @@ function mergeSessaoCanonica(serverSession, localSession = {}) {
     alertFired5: Boolean(localSession.alertFired5),
     alertFiredExp: Boolean(localSession.alertFiredExp),
     extraWaSentAt: localSession.extraWaSentAt || localStorage.getItem(extraWaKey_(serverSession)) || null,
-    smsStatus: localSession.smsStatus || null
+    smsStatus: serverSession.smsStatus || localSession.smsStatus || null
   };
 }
 
