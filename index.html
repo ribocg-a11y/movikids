@@ -2292,7 +2292,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = '1.6.70';
+const APP_VERSION = '1.6.71';
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec';
 const PORTAL_RESPONSAVEL_URL = 'https://ribocg-a11y.github.io/movikids/acompanhar.html';
 
@@ -3813,6 +3813,22 @@ async function confirmarEncerrar() {
     updateStats();
     atualizarVeiculoGrid();
 
+    // SMS automático de agradecimento (v1.6.71) — fire-and-forget
+    try {
+      const encDados = {
+        rowIndex:    encSession.rowIndex,
+        telefone:    d.telefone || encSession.telefone || '',
+        responsavel: d.responsavel || encSession.responsavel || '',
+        crianca:     d.crianca    || encSession.crianca    || '',
+      };
+      if (encDados.telefone) {
+        enviarSmsResponsavel_(
+          { ...encSession, ...encDados },
+          'agradecimento'
+        ).catch(() => {});
+      }
+    } catch(eSmsEnc) {}
+
     // Sync via controller (deduplicado)
     broadcastInvalidate(); syncController(true, 1500);
 
@@ -4344,7 +4360,18 @@ async function iniciarContagem(rowIndex) {
     return;
   }
 
-  // 3. Sync via controller (deduplicado, force=true pois sessão mudou)
+  // 3. SMS automático de boas-vindas (v1.6.71) — disparo sem clique do operador
+  // Não bloqueia a UI: fire-and-forget com toast discreto
+  try {
+    const sAtual = sessions.find(x => x.rowIndex === rowIndex);
+    if (sAtual && sAtual.telefone) {
+      enviarSmsResponsavel_(sAtual, 'portal').then(ok => {
+        if (ok) toast('📱 SMS de boas-vindas enviado automaticamente.', 'info');
+      }).catch(() => {});
+    }
+  } catch(eSms) {}
+
+  // 4. Sync via controller (deduplicado, force=true pois sessão mudou)
   broadcastInvalidate(); syncController(true, 500);
 }
 
