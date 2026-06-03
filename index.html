@@ -21,7 +21,7 @@
 // ── CACHE BUSTER v1.3.0 ─────────────────────────────────
 // Força limpeza do SW antigo e recarga com versão nova
 (function(){
-  const CURRENT = '1.6.68';
+  const CURRENT = '1.6.69';
   const KEY = 'mk_loaded_version';
   try {
     if (localStorage.getItem(KEY) !== CURRENT) {
@@ -2292,8 +2292,9 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = '1.6.68';
+const APP_VERSION = '1.6.69';
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec';
+const PORTAL_RESPONSAVEL_URL = 'https://ribocg-a11y.github.io/movikids/acompanhar.html';
 
 const PRECOS = {
   'Carro':   { '10min':{v:12,m:10,a:1.00},'20min':{v:22,m:20,a:1.00},'30min':{v:30,m:30,a:1.00},
@@ -2322,6 +2323,8 @@ const NOVA_DRAFT_KEY = 'mk_nova_locacao_draft_v1';
 const WA_EVENT_LOG_KEY = 'mk_wa_event_log_v1';
 const OPERADOR_KEY = 'mk_operador_atual_v1';
 const WA_MODE_KEY = 'mk_whatsapp_mode_v1';
+const SMS_CHECK_DELAYS = [15000, 60000, 180000, 300000];
+const SMS_UNCONFIRMED_MS = 5 * 60 * 1000;
 let _restoringNovaDraft = false;
 let catSel      = 'Energia';
 let custosHoje  = [];
@@ -2532,6 +2535,7 @@ let _syncBackoffMs  = 0;
 let _lastSyncAt     = 0;
 let _lastActivity   = Date.now();
 let _wasHiddenAt    = null;
+let _smsStatusSweepAt = 0;
 const _FAIL_THRESH  = 3;
 const _BACKOFF_MAX  = 60000;
 let _lastFailAt     = 0;
@@ -2830,6 +2834,7 @@ function smsStatusLabel_(state) {
   const st = String(state || '').toLowerCase();
   if (st === 'delivered') return { cls:'ok', txt:'Entregue SMS' };
   if (st === 'failed') return { cls:'err', txt:'Falha SMS' };
+  if (st === 'unconfirmed') return { cls:'sent', txt:'SMS sem confirmacao' };
   if (st === 'sent') return { cls:'sent', txt:'SMS enviado' };
   if (st === 'processed') return { cls:'wait', txt:'SMS processando' };
   if (st === 'pending' || st === 'accepted') return { cls:'wait', txt:'SMS na fila' };
@@ -2839,9 +2844,16 @@ function smsStatusLabel_(state) {
 function smsStatusHtml_(s) {
   const sms = s && s.smsStatus;
   if (!sms || !sms.gatewayId) return '';
-  const label = smsStatusLabel_(sms.state);
+  const sentAt = Number(sms.sentAt || sms.updatedAt || 0);
+  const state = sentAt && !smsStatusFinal_(sms.state) && (Date.now() - sentAt > SMS_UNCONFIRMED_MS)
+    ? 'Unconfirmed'
+    : sms.state;
+  const label = smsStatusLabel_(state);
   const title = sms.error ? ' title="' + escHtml(sms.error) + '"' : '';
-  return '<div class="sms-status sms-' + label.cls + '"' + title + '>' + label.txt + '</div>';
+  const fallback = String(state || '').toLowerCase() === 'failed'
+    ? '<button class="btn btn-wa" onclick="abrirWhatsAppFallback(' + Number(s.rowIndex || 0) + ')" title="Abrir WhatsApp como alternativa">WhatsApp fallback</button>'
+    : '';
+  return '<div class="sms-status sms-' + label.cls + '"' + title + '>' + label.txt + '</div>' + fallback;
 }
 
 function atualizarSmsStatusLocal_(rowIndex, patch) {
@@ -2854,13 +2866,38 @@ function atualizarSmsStatusLocal_(rowIndex, patch) {
 }
 
 function agendarConsultaSms_(rowIndex, gatewayId, delays) {
-  (delays || [5000, 12000, 25000]).forEach(delay => {
+  (delays || SMS_CHECK_DELAYS).forEach(delay => {
     setTimeout(() => consultarSmsStatusSessao_(rowIndex, gatewayId), delay);
+  });
+}
+
+function smsStatusFinal_(state) {
+  const st = String(state || '').toLowerCase();
+  return st === 'delivered' || st === 'failed';
+}
+
+function reconsultarSmsPendentes_() {
+  const now = Date.now();
+  if (now - _smsStatusSweepAt < 30000) return;
+  _smsStatusSweepAt = now;
+  sessions.forEach(s => {
+    const sms = s && s.smsStatus;
+    if (!sms || !sms.gatewayId || smsStatusFinal_(sms.state)) return;
+    const last = Number(sms.updatedAt || sms.sentAt || 0);
+    const sentAt = Number(sms.sentAt || last || now);
+    const checks = Number(sms.checks || 0);
+    if (checks >= 8) {
+      if (now - sentAt > SMS_UNCONFIRMED_MS) atualizarSmsStatusLocal_(s.rowIndex, { state:'Unconfirmed' });
+      return;
+    }
+    if (!last || now - last >= 45000) consultarSmsStatusSessao_(s.rowIndex, sms.gatewayId);
   });
 }
 
 async function consultarSmsStatusSessao_(rowIndex, gatewayId) {
   if (!gatewayId) return null;
+  const atual = sessions.find(x => Number(x.rowIndex) === Number(rowIndex));
+  if (atual && atual.smsStatus && smsStatusFinal_(atual.smsStatus.state)) return atual.smsStatus;
   try {
     const d = await api({
       action: 'consultarSmsStatus',
@@ -2872,11 +2909,14 @@ async function consultarSmsStatusSessao_(rowIndex, gatewayId) {
     }, 20000);
     if (!d.ok) throw new Error(d.erro || 'Falha ao consultar SMS');
     const sms = d.sms || {};
+    const anterior = sessions.find(x => Number(x.rowIndex) === Number(rowIndex));
+    const checks = Number((anterior && anterior.smsStatus && anterior.smsStatus.checks) || 0) + 1;
     const s = atualizarSmsStatusLocal_(rowIndex, {
       gatewayId,
       state: sms.state || 'Pending',
       error: sms.error || '',
-      telefoneHash: sms.telefoneHash || ''
+      telefoneHash: sms.telefoneHash || '',
+      checks
     });
     if (s && String(s.smsStatus.state).toLowerCase() === 'failed') {
       toast('Falha SMS: confirme telefone ou use alternativa.', 'error');
@@ -2928,6 +2968,7 @@ function startTimerLoop() {
   timerInterv = setInterval(() => {
     sessions.forEach(s => checkTimer(s));
     sessions.forEach(s => checkShake(s));
+    reconsultarSmsPendentes_();
     renderCards();
     updateStats();
     // Painel ao vivo: atualiza se visível
@@ -3898,7 +3939,10 @@ async function enviarSmsResponsavel_(s, tipo) {
         gatewayId: sms.gatewayId,
         state: 'Accepted',
         error: '',
-        telefone: sms.telefone || ''
+        telefone: sms.telefone || '',
+        tipo: smsTipo,
+        sentAt: Date.now(),
+        checks: 0
       });
       agendarConsultaSms_(s.rowIndex, sms.gatewayId);
     }
@@ -4134,6 +4178,16 @@ function enviarWaTel(tel, msg) {
     catch(e2) { window.location.href = urls.api; }
   }
   return true;
+}
+
+function abrirWhatsAppFallback(rowIndex) {
+  const s = sessions.find(x => Number(x.rowIndex) === Number(rowIndex));
+  if (!s || !s.telefone) { toast('Telefone nao cadastrado para fallback.', 'error'); return false; }
+  const link = PORTAL_RESPONSAVEL_URL || 'https://ribocg-a11y.github.io/movikids/acompanhar.html';
+  const msg = 'MOVI KIDS: acompanhe a locacao de ' + (s.crianca || 'sua crianca') +
+    ' pelo portal: ' + link + '. Use o telefone com DDD informado no cadastro.';
+  registrarWaEvento_('fallback_sms_failed', s, 'aberto');
+  return enviarWaTel(s.telefone, msg);
 }
 
 // -- FASE 6: Config de mensagens --
