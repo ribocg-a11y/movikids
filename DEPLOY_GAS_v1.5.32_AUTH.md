@@ -26,6 +26,9 @@ Colar no projeto Apps Script (mesmo projeto, **mesmo Deploy ID**):
 | `cadastrarOperadorSistema` | ADM cadastra operador (requer `adminPin`) |
 | `listarOperadoresAdmin` | Lista para painel admin |
 | `salvarLancamentoAvulso` | Locação exceção + `motivo` obrigatório |
+| `editarOperadorSistema` | Renomear operador (ADM + `adminPin`) |
+| `excluirOperadorSistema` | Desativa operador (ADM) |
+| `resetarPinOperadorAdmin` | Limpa PIN para recriar no login (ADM) |
 
 ## Planilha
 

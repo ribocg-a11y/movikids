@@ -1,4 +1,4 @@
-/* MOVI KIDS — Login operadores v1.6.73 */
+/* MOVI KIDS — Login operadores v1.6.75 */
 (function () {
   const SESSION_KEY = 'mk_auth_session_v1';
   const LEGACY_OPERADOR_KEY = 'mk_operador_atual_v1';
@@ -399,6 +399,79 @@
     }
   };
 
+  function fecharMenusOperador_() {
+    document.querySelectorAll('.mk-op-menu.open').forEach(m => m.classList.remove('open'));
+  }
+
+  window.mkOpToggleMenu = function mkOpToggleMenu(ev, id) {
+    ev.stopPropagation();
+    const menu = document.getElementById('mk-op-menu-' + id);
+    if (!menu) return;
+    const abrir = !menu.classList.contains('open');
+    fecharMenusOperador_();
+    if (abrir) menu.classList.add('open');
+  };
+
+  document.addEventListener('click', () => fecharMenusOperador_());
+
+  async function opAdminApi_(action, extra) {
+    return api({ action, ...mkAuthAdminPinParams_(), ...extra });
+  }
+
+  window.mkOpEditar = async function mkOpEditar(id, nomeAtual) {
+    fecharMenusOperador_();
+    const nome = prompt('Novo nome do operador:', nomeAtual || '');
+    if (nome === null) return;
+    const limpo = String(nome).trim();
+    if (!limpo) {
+      toast('Nome invalido', 'warning');
+      return;
+    }
+    try {
+      const d = await opAdminApi_('editarOperadorSistema', { operadorId: id, nome: limpo });
+      if (!d.ok) {
+        toast(d.erro || 'Erro', 'error');
+        return;
+      }
+      toast('Operador atualizado: ' + d.operador.nome, 'success');
+      await refreshOperadoresAdmin_();
+    } catch (e) {
+      toast('Erro de conexao', 'error');
+    }
+  };
+
+  window.mkOpResetarPin = async function mkOpResetarPin(id, nome) {
+    fecharMenusOperador_();
+    if (!confirm('Resetar PIN de ' + nome + '?\n\nNo proximo login sera necessario criar um PIN novo.')) return;
+    try {
+      const d = await opAdminApi_('resetarPinOperadorAdmin', { operadorId: id });
+      if (!d.ok) {
+        toast(d.erro || 'Erro', 'error');
+        return;
+      }
+      toast(d.mensagem || 'PIN resetado', 'success');
+      await refreshOperadoresAdmin_();
+    } catch (e) {
+      toast('Erro de conexao', 'error');
+    }
+  };
+
+  window.mkOpExcluir = async function mkOpExcluir(id, nome) {
+    fecharMenusOperador_();
+    if (!confirm('Excluir operador ' + nome + '?\n\nEle nao podera mais fazer login.')) return;
+    try {
+      const d = await opAdminApi_('excluirOperadorSistema', { operadorId: id });
+      if (!d.ok) {
+        toast(d.erro || 'Erro', 'error');
+        return;
+      }
+      toast('Operador removido', 'success');
+      await refreshOperadoresAdmin_();
+    } catch (e) {
+      toast('Erro de conexao', 'error');
+    }
+  };
+
   window.refreshOperadoresAdmin_ = async function refreshOperadoresAdmin_() {
     const el = document.getElementById('mk-admin-ops-list');
     if (!el) return;
@@ -408,10 +481,30 @@
         el.innerHTML = '<p style="color:var(--txt3)">' + escapeHtml_(d.erro || 'Erro') + '</p>';
         return;
       }
-      el.innerHTML = (d.operadores || []).map(op =>
-        `<div class="mk-admin-op-row"><span>${escapeHtml_(op.nome)}</span>
-         <span class="mk-op-meta">${op.hasPin ? 'PIN ok' : 'Sem PIN'}</span></div>`
-      ).join('') || '<p style="color:var(--txt3)">Nenhum operador</p>';
+      const ops = d.operadores || [];
+      if (!ops.length) {
+        el.innerHTML = '<p style="color:var(--txt3)">Nenhum operador cadastrado</p>';
+        return;
+      }
+      el.innerHTML = ops.map(op => {
+        const badgeCls = op.hasPin ? 'ok' : 'warn';
+        const badgeTxt = op.hasPin ? 'PIN definido' : 'Sem PIN';
+        const nomeJs = JSON.stringify(op.nome || '');
+        return `<div class="mk-op-card" data-id="${op.id}">
+          <div class="mk-op-card-main">
+            <span class="mk-op-card-name">${escapeHtml_(op.nome)}</span>
+            <span class="mk-op-card-badge ${badgeCls}">${badgeTxt}</span>
+          </div>
+          <div class="mk-op-card-actions">
+            <button type="button" class="mk-op-menu-btn" aria-label="Acoes" onclick="mkOpToggleMenu(event, ${op.id})">⋮</button>
+            <div class="mk-op-menu" id="mk-op-menu-${op.id}">
+              <button type="button" onclick="event.stopPropagation(); mkOpEditar(${op.id}, ${nomeJs})">✏️ Editar</button>
+              <button type="button" onclick="event.stopPropagation(); mkOpResetarPin(${op.id}, ${nomeJs})">🔑 Resetar PIN</button>
+              <button type="button" class="danger" onclick="event.stopPropagation(); mkOpExcluir(${op.id}, ${nomeJs})">🗑️ Excluir</button>
+            </div>
+          </div>
+        </div>`;
+      }).join('');
     } catch (e) {
       el.innerHTML = '<p style="color:var(--txt3)">Erro ao listar</p>';
     }

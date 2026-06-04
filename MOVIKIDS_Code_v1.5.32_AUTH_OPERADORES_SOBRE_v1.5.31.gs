@@ -229,6 +229,9 @@ function doGet(e) {
       case 'loginAdmin':           return loginAdmin_(p);
       case 'cadastrarOperadorSistema': return cadastrarOperadorSistema_(p);
       case 'listarOperadoresAdmin': return listarOperadoresAdmin_(p);
+      case 'editarOperadorSistema': return editarOperadorSistema_(p);
+      case 'excluirOperadorSistema': return excluirOperadorSistema_(p);
+      case 'resetarPinOperadorAdmin': return resetarPinOperadorAdmin_(p);
       case 'salvarLancamentoAvulso': return salvarLancamentoAvulso_(p);
       default:
         return err_('Ação desconhecida: ' + action, 400);
@@ -2775,6 +2778,61 @@ function cadastrarOperadorSistema_(p) {
   const id = nextIdOperador_(sh);
   sh.appendRow([id, fmtData_(agora) + ' ' + fmtHoraLocal_(agora), nome, '', '', 'SIM', '']);
   return resp_({ operador: { id, nome, hasPin: false, ativo: true } });
+}
+
+function operadorNomeDuplicado_(sh, nome, ignorarId) {
+  const last = sh.getLastRow();
+  if (last < OP_DATA_ROW) return false;
+  const rows = sh.getRange(OP_DATA_ROW, 1, last - OP_DATA_ROW + 1, 7).getValues();
+  const alvo = nome.toLowerCase();
+  return rows.some(r => {
+    const id = Number(r[0]);
+    const n = String(r[2] || '').trim().toLowerCase();
+    const ativo = String(r[5] || 'SIM').toUpperCase() !== 'NAO';
+    return ativo && n === alvo && id !== Number(ignorarId);
+  });
+}
+
+function editarOperadorSistema_(p) {
+  if (!adminPinOk_(p)) return err_('Acesso negado', 403);
+  const found = operadorRowById_(p.operadorId || p.id);
+  if (!found) return err_('Operador nao encontrado', 404);
+  const nome = String(p.nome || '').trim().slice(0, 40);
+  if (!nome) return err_('Nome do operador obrigatorio', 400);
+  const sh = operadoresSheet_();
+  if (operadorNomeDuplicado_(sh, nome, found.data[0])) return err_('Ja existe operador com este nome', 409);
+  sh.getRange(found.row, 3).setValue(nome);
+  const op = operadorObjFromRow_(sh.getRange(found.row, 1, 1, 7).getValues()[0]);
+  return resp_({ operador: op });
+}
+
+function excluirOperadorSistema_(p) {
+  if (!adminPinOk_(p)) return err_('Acesso negado', 403);
+  const found = operadorRowById_(p.operadorId || p.id);
+  if (!found) return err_('Operador nao encontrado', 404);
+  const sh = operadoresSheet_();
+  const last = sh.getLastRow();
+  let ativos = 0;
+  if (last >= OP_DATA_ROW) {
+    const rows = sh.getRange(OP_DATA_ROW, 1, last - OP_DATA_ROW + 1, 7).getValues();
+    rows.forEach(r => {
+      if (String(r[5] || 'SIM').toUpperCase() !== 'NAO' && String(r[2] || '').trim()) ativos++;
+    });
+  }
+  if (ativos <= 1) return err_('Deve existir pelo menos um operador ativo', 409);
+  sh.getRange(found.row, 6).setValue('NAO');
+  sh.getRange(found.row, 4, 1, 2).setValues([['', '']]);
+  return resp_({ ok: true, id: Number(found.data[0]) });
+}
+
+function resetarPinOperadorAdmin_(p) {
+  if (!adminPinOk_(p)) return err_('Acesso negado', 403);
+  const found = operadorRowById_(p.operadorId || p.id);
+  if (!found) return err_('Operador nao encontrado', 404);
+  const sh = operadoresSheet_();
+  sh.getRange(found.row, 4, 1, 2).setValues([['', '']]);
+  const op = operadorObjFromRow_(sh.getRange(found.row, 1, 1, 7).getValues()[0]);
+  return resp_({ operador: op, mensagem: 'PIN resetado. Operador criara novo PIN no proximo login.' });
 }
 
 function salvarLancamentoAvulso_(p) {
