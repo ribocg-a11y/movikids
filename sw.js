@@ -1,5 +1,5 @@
-// MOVI KIDS - Service Worker 1.6.71
-const SW_VERSION = '1.6.71';
+// MOVI KIDS - Service Worker 1.6.72
+const SW_VERSION = '1.6.72';
 
 self.addEventListener('install', event => {
   self.skipWaiting();
@@ -19,6 +19,7 @@ self.addEventListener('fetch', event => {
     url.includes('script.google.com') ||
     url.includes('index.html') ||
     url.includes('acompanhar.html') ||
+    url.includes('mk-auth.js') ||
     event.request.mode === 'navigate'
   ) {
     event.respondWith(

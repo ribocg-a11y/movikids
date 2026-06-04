@@ -6,14 +6,16 @@ Referencia unica para alinhamento local x producao.
 
 | Camada | Versao | URL / ID |
 |--------|--------|----------|
-| Apps Script | v1.5.31 | Deploy `AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw` |
-| Frontend | v1.6.71 | https://ribocg-a11y.github.io/movikids/ |
+| Apps Script | v1.5.31 prod / **v1.5.32 pronto** | Deploy `AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw` |
+| Frontend | **v1.6.72** (repo) / v1.6.71 Pages até push | https://ribocg-a11y.github.io/movikids/ |
 | Portal | publicado | https://ribocg-a11y.github.io/movikids/acompanhar.html |
 | Planilha | MOVIKIDS_Planilha_Base | `1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618` |
 
 ## Arquivo canonico no repositorio
 
 - **GAS producao:** `MOVIKIDS_Code_v1.5.31_PRODUCAO.gs`
+- **GAS proximo deploy:** `MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs` — ver `DEPLOY_GAS_v1.5.32_AUTH.md`
+- **Login operadores:** `mk-auth.js` + gate em `index.html`
 - **Nao implantar:** `arquivo-historico/` e versoes antigas `MOVIKIDS_Code_v1.5.2x` salvo deploy documentado
 
 ## Validacao (04/06/2026)

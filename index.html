@@ -21,7 +21,7 @@
 // ── CACHE BUSTER v1.3.0 ─────────────────────────────────
 // Força limpeza do SW antigo e recarga com versão nova
 (function(){
-  const CURRENT = '1.6.69';
+  const CURRENT = '1.6.72';
   const KEY = 'mk_loaded_version';
   try {
     if (localStorage.getItem(KEY) !== CURRENT) {
@@ -69,6 +69,41 @@ html,body{height:100%;background:var(--bg);color:var(--txt);overflow:hidden}
 @keyframes spin{to{transform:rotate(360deg)}}
 #splash.hide{opacity:0;pointer-events:none}
 #splash.gone{display:none}
+
+/* ── LOGIN OPERADORES v1.6.72 ─────────────────────────────── */
+#mk-auth-gate{
+  position:fixed;inset:0;z-index:998;
+  background:var(--bg);
+  display:flex;align-items:flex-start;justify-content:center;
+  overflow-y:auto;padding:20px 16px 40px;
+}
+#mk-auth-gate .mk-auth-inner{max-width:420px;width:100%}
+#mk-auth-gate .mk-logo{text-align:center;margin-bottom:18px}
+#mk-auth-gate .mk-logo-main{font-family:'Fredoka One',cursive;font-size:38px;color:var(--blue);line-height:1}
+#mk-auth-gate .mk-logo-main span{color:#FFD54F;text-shadow:1px 1px 0 var(--blue-dk)}
+#mk-auth-gate .mk-logo-sub{font-size:13px;color:var(--txt2);font-weight:800;margin-top:6px}
+#mk-auth-gate .mk-step-tag{display:inline-block;background:var(--blue);color:#fff;font-size:11px;font-weight:900;padding:5px 10px;border-radius:99px;margin-bottom:12px}
+#mk-auth-gate h2{font-size:20px;font-weight:900;margin-bottom:6px}
+#mk-auth-gate .mk-hint{font-size:13px;color:var(--txt2);line-height:1.45;margin-bottom:14px}
+#mk-auth-gate .mk-op-list{display:grid;gap:8px;margin-bottom:14px;max-height:240px;overflow:auto}
+#mk-auth-gate .mk-op-item{display:flex;align-items:center;gap:10px;border:2px solid var(--border);border-radius:12px;padding:12px 14px;cursor:pointer;font-weight:800;background:#f8fbff}
+#mk-auth-gate .mk-op-item.sel{border-color:var(--blue);background:var(--blue-lt)}
+#mk-auth-gate .mk-op-item input{accent-color:var(--blue);width:18px;height:18px}
+#mk-auth-gate .mk-op-meta{font-size:11px;color:var(--txt3);font-weight:700;margin-left:auto}
+#mk-auth-gate .mk-op-meta.mk-warn{color:var(--amber)}
+#mk-auth-gate .mk-pin-row{display:flex;gap:10px;justify-content:center;margin:14px 0}
+#mk-auth-gate .mk-pin-box{width:52px;height:58px;border:2px solid var(--border);border-radius:12px;font-size:26px;font-weight:900;text-align:center;outline:none}
+#mk-auth-gate .mk-pin-box:focus{border-color:var(--blue)}
+#mk-auth-gate .mk-btn{width:100%;height:52px;border:0;border-radius:12px;background:var(--blue);color:#fff;font-size:16px;font-weight:900;cursor:pointer;margin-top:8px}
+#mk-auth-gate .mk-btn:disabled{opacity:.45;cursor:not-allowed}
+#mk-auth-gate .mk-btn.sec{background:#fff;color:var(--blue);border:2px solid var(--blue)}
+#mk-auth-gate .mk-row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+#mk-auth-gate .mk-err{background:var(--red-lt);color:var(--red);border-radius:10px;padding:10px 12px;font-size:13px;font-weight:800;margin-top:10px;display:none}
+#mk-auth-gate .mk-admin-link{text-align:center;margin-top:14px;font-size:13px}
+#mk-auth-gate .mk-admin-link button{background:none;border:0;color:var(--blue-dk);font-weight:900;cursor:pointer;text-decoration:underline}
+#mk-auth-gate .hidden{display:none!important}
+.mk-admin-op-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);font-weight:700}
+.avulso-warn{background:var(--amber-lt);border:1px solid #ffb74d;border-radius:12px;padding:12px;font-size:13px;line-height:1.45;margin-bottom:12px}
 
 /* ── APP SHELL ────────────────────────────────────────────── */
 #app{display:flex;flex-direction:column;height:100dvh;max-width:430px;margin:0 auto;
@@ -1329,13 +1364,76 @@ nav button .nav-badge{
   <p>Carregando sistema...</p>
 </div>
 
+<!-- Login operadores (gate) -->
+<div id="mk-auth-gate" style="display:none">
+  <div class="mk-auth-inner">
+    <section id="mk-step-select" class="mk-auth-step">
+      <div class="mk-logo">
+        <div class="mk-logo-main">🚗 Movi <span>Kids</span></div>
+        <div class="mk-logo-sub">Golden Shopping Calhau · Acesso operacional</div>
+      </div>
+      <span class="mk-step-tag">Passo 1 de 2</span>
+      <h2>Quem está no balcão?</h2>
+      <p class="mk-hint">Selecione seu nome. Todas as ações do turno ficam registradas com o operador logado.</p>
+      <div class="mk-op-list" id="mk-op-list"></div>
+      <div class="mk-err" id="mk-login-err"></div>
+      <button type="button" class="mk-btn" id="mk-btn-proceed" disabled>Prosseguir</button>
+      <div class="mk-admin-link">
+        <button type="button" id="mk-btn-admin-entry">Entrar como administrador</button>
+      </div>
+    </section>
+    <section id="mk-step-create-pin" class="mk-auth-step hidden">
+      <div class="mk-logo"><div class="mk-logo-main">🚗 Movi <span>Kids</span></div></div>
+      <span class="mk-step-tag">Primeiro acesso</span>
+      <h2>Crie seu PIN</h2>
+      <p class="mk-hint">Olá, <b id="mk-create-name"></b>. PIN de 4 números (só seu).</p>
+      <label class="form-label">Digite o PIN</label>
+      <div class="mk-pin-row" id="mk-create-pin-1"></div>
+      <label class="form-label">Confirme o PIN</label>
+      <div class="mk-pin-row" id="mk-create-pin-2"></div>
+      <div class="mk-err" id="mk-create-err"></div>
+      <div class="mk-row2">
+        <button type="button" class="mk-btn sec" id="mk-btn-back-create">Voltar</button>
+        <button type="button" class="mk-btn" id="mk-btn-save-pin">Salvar e entrar</button>
+      </div>
+    </section>
+    <section id="mk-step-login-pin" class="mk-auth-step hidden">
+      <div class="mk-logo"><div class="mk-logo-main">🚗 Movi <span>Kids</span></div></div>
+      <span class="mk-step-tag">Login</span>
+      <h2>Digite seu PIN</h2>
+      <p class="mk-hint">Operador: <b id="mk-login-name"></b></p>
+      <div class="mk-pin-row" id="mk-login-pin"></div>
+      <div class="mk-err" id="mk-login-err"></div>
+      <div class="mk-row2">
+        <button type="button" class="mk-btn sec" id="mk-btn-back-login">Trocar operador</button>
+        <button type="button" class="mk-btn" id="mk-btn-do-login">Entrar</button>
+      </div>
+    </section>
+    <section id="mk-step-admin" class="mk-auth-step hidden">
+      <div class="mk-logo">
+        <div class="mk-logo-main">🚗 Movi <span>Kids</span></div>
+        <div class="mk-logo-sub">Área administrativa</div>
+      </div>
+      <span class="mk-step-tag">Administrador</span>
+      <h2>PIN do administrador</h2>
+      <p class="mk-hint">Gestão: operadores, configurações e relatórios.</p>
+      <div class="mk-pin-row" id="mk-admin-pin"></div>
+      <div class="mk-err" id="mk-admin-err"></div>
+      <div class="mk-row2">
+        <button type="button" class="mk-btn sec" id="mk-btn-back-admin">Voltar</button>
+        <button type="button" class="mk-btn" id="mk-btn-admin-login">Entrar</button>
+      </div>
+    </section>
+  </div>
+</div>
+
 <!-- App -->
-<div id="app">
+<div id="app" style="display:none">
 
   <!-- ══ SIDEBAR (desktop only) ══ -->
   <aside id="sidebar">
     <div class="sb-logo">🚗 Movi <span>Kids</span>
-      <div class="sb-status"><span id="sb-dot" class="dot-online"></span><span id="sb-txt">Online</span><span id="sb-version" style="font-size:10px;opacity:.85;margin-left:5px;color:rgba(255,255,255,.7);font-family:monospace">v1.6.71</span></div>
+      <div class="sb-status"><span id="sb-dot" class="dot-online"></span><span id="sb-txt">Online</span><span id="sb-version" style="font-size:10px;opacity:.85;margin-left:5px;color:rgba(255,255,255,.7);font-family:monospace">v1.6.72</span></div>
     </div>
     <div class="sb-nav" id="sb-nav">
       <button class="sb-btn active" id="sbn-home" onclick="showPage('home')"><span class="sb-icon">🏠</span>Home</button>
@@ -1343,6 +1441,7 @@ nav button .nav-badge{
       <button class="sb-btn" id="sbn-relacionamento" onclick="showPage('relacionamento')"><span class="sb-icon">👥</span>Relacionamento</button>
       <button class="sb-btn" id="sbn-painel" onclick="showPage('painel')"><span class="sb-icon">📺</span>Painel Operação</button>
       <button class="sb-btn" id="sbn-custos" onclick="showPage('custos')"><span class="sb-icon">💰</span>Registrar Custo</button>
+      <button class="sb-btn" id="sbn-avulso" onclick="showPage('lancamento')"><span class="sb-icon">⚡</span>Lanç. Avulso</button>
     </div>
     <div class="sb-admin-section" id="sb-admin-section">
       <div class="sb-divider">Administração</div>
@@ -1356,7 +1455,7 @@ nav button .nav-badge{
     <div class="sb-footer">
       <div class="sb-operator-bar" id="sb-operator-bar">
         <span>Operador: <span class="sb-operator-name" id="sb-operator-name">Nao definido</span></span>
-        <button class="sb-operator-btn" onclick="trocarOperador()">Trocar</button>
+        <button class="sb-operator-btn" onclick="trocarOperador()">Sair</button>
       </div>
       <div class="sb-wa-bar" id="sb-wa-bar">
         <span>SMS: <span class="sb-wa-mode" id="sb-wa-mode">Gateway</span></span>
@@ -1380,7 +1479,7 @@ nav button .nav-badge{
       <div class="hd-status">
         <div id="status-dot" class="dot-online"></div>
         <span id="status-txt">Online</span>
-        <span id="app-version" style="font-size:10px;opacity:.85;margin-left:4px;font-family:monospace">v1.6.71</span>
+        <span id="app-version" style="font-size:10px;opacity:.85;margin-left:4px;font-family:monospace">v1.6.72</span>
       </div>
     </div>
   </header>
@@ -1402,7 +1501,10 @@ nav button .nav-badge{
     <button onclick="showPage('custos')">
       <div class="nav-icon">💰</div>Custos
     </button>
-    <button id="nav-admin" onclick="abrirAdmin()">
+    <button onclick="showPage('lancamento')">
+      <div class="nav-icon">⚡</div>Avulso
+    </button>
+    <button id="nav-admin" onclick="abrirAdmin()" style="display:none">
       <div class="nav-icon">🔐</div>Admin
     </button>
   </nav>
@@ -1611,6 +1713,50 @@ nav button .nav-badge{
     </div>
   </div>
 
+  <!-- ──────── PAGE: LANÇAMENTO AVULSO ──────── -->
+  <div id="page-lancamento" class="page">
+    <div class="avulso-warn">
+      <b>Exceção operacional</b> — use apenas quando o cliente tem pressa e não cabe no fluxo normal de Nova Locação.
+      Justificativa obrigatória (mín. 10 caracteres). Tudo fica na auditoria com seu nome.
+    </div>
+    <div class="form-group">
+      <label class="form-label">Justificativa *</label>
+      <textarea id="avulso-motivo" class="form-input" rows="3" placeholder="Ex: Cliente com pressa, fila grande, cadastro simplificado autorizado pelo gestor"></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Responsável *</label>
+      <input id="avulso-resp" class="form-input" type="text" placeholder="Nome do responsável">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Criança *</label>
+      <input id="avulso-crianca" class="form-input" type="text" placeholder="Nome da criança">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Telefone</label>
+      <input id="avulso-tel" class="form-input" type="tel" placeholder="(00) 00000-0000">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Tipo *</label>
+      <div class="tipo-grid" id="avulso-tipo-grid">
+        <div class="tipo-btn" onclick="selAvulsoTipo(this,'Carro')">🚗 Carro</div>
+        <div class="tipo-btn" onclick="selAvulsoTipo(this,'Triciclo')">🛺 Triciclo</div>
+        <div class="tipo-btn" onclick="selAvulsoTipo(this,'Pelúcia')">🧸 Pelúcia</div>
+      </div>
+    </div>
+    <div class="form-group" id="avulso-plano-wrap" style="display:none">
+      <label class="form-label">Plano *</label>
+      <div class="plano-grid" id="avulso-plano-grid"></div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Veículo</label>
+      <input id="avulso-veiculo" class="form-input" type="text" placeholder="Ex: Carro 01 (opcional)">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Pagamento</label>
+      <input id="avulso-pag" class="form-input" type="text" placeholder="Pix, Crédito, Dinheiro...">
+    </div>
+    <button class="btn btn-primary" onclick="salvarLancamentoAvulso()" id="btn-avulso">⚡ Registrar lançamento avulso</button>
+  </div>
 
   <!-- ──────── PAGE: ADMIN ──────── -->
   <div id="page-admin" class="page">
@@ -1654,6 +1800,16 @@ nav button .nav-badge{
       <div class="diag-row"><div class="diag-dot ok" id="diag-dot-sess"></div><span>Sessões ativas agora</span><span class="diag-val" id="diag-sess">—</span></div>
       <div class="diag-row"><div class="diag-dot ok" id="diag-dot-extra"></div><span>Sessões em tempo extra</span><span class="diag-val" id="diag-extra">—</span></div>
       <div class="diag-alert" id="diag-alert-over" style="display:none"></div>
+    </div>
+
+    <div class="sec-title">Operadores do sistema</div>
+    <div class="fecha-card" style="margin-bottom:16px">
+      <p style="font-size:13px;color:var(--txt2);margin-bottom:10px">Somente administrador cadastra novos operadores. PIN individual de 4 dígitos na primeira entrada.</p>
+      <div id="mk-admin-ops-list"></div>
+      <div class="form-group" style="margin-top:12px">
+        <input id="mk-new-op-nome" class="form-input" type="text" placeholder="Nome do novo operador">
+      </div>
+      <button class="btn btn-primary" onclick="cadastrarOperadorAdmin_(document.getElementById('mk-new-op-nome').value); document.getElementById('mk-new-op-nome').value=''">➕ Cadastrar operador</button>
     </div>
 
     <div class="sec-title">Gestão</div>
@@ -2292,7 +2448,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = '1.6.71';
+const APP_VERSION = '1.6.72';
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec';
 const PORTAL_RESPONSAVEL_URL = 'https://ribocg-a11y.github.io/movikids/acompanhar.html';
 
@@ -2321,7 +2477,7 @@ let novaState   = { tipo: null, plano: null, veiculo: null, pagamento: null, obs
 let novaPrefillResponsavel = null;
 const NOVA_DRAFT_KEY = 'mk_nova_locacao_draft_v1';
 const WA_EVENT_LOG_KEY = 'mk_wa_event_log_v1';
-const OPERADOR_KEY = 'mk_operador_atual_v1';
+/* operador/sessao: mk-auth.js */
 const WA_MODE_KEY = 'mk_whatsapp_mode_v1';
 const SMS_CHECK_DELAYS = [15000, 60000, 180000, 300000];
 const SMS_UNCONFIRMED_MS = 5 * 60 * 1000;
@@ -2332,32 +2488,10 @@ let statsHoje   = { fat: 0, n: 0 };
 let relacionamentoCache = [];
 let relEditCurrent = null;
 
-function operadorAtual_() {
-  try { return String(localStorage.getItem(OPERADOR_KEY) || '').trim(); }
-  catch(e) { return ''; }
-}
-
-function operadorApiParams_() {
-  const operador = operadorAtual_();
-  return operador ? { operador } : {};
-}
-
 function atualizarOperadorUI_() {
   const el = document.getElementById('sb-operator-name');
-  if (el) el.textContent = operadorAtual_() || 'Nao definido';
-}
-
-function trocarOperador() {
-  const atual = operadorAtual_();
-  const nome = prompt('Nome do operador deste dispositivo:', atual);
-  if (nome === null) return;
-  const limpo = String(nome || '').trim().slice(0, 40);
-  try {
-    if (limpo) localStorage.setItem(OPERADOR_KEY, limpo);
-    else localStorage.removeItem(OPERADOR_KEY);
-  } catch(e) {}
-  atualizarOperadorUI_();
-  toast(limpo ? 'Operador definido: ' + limpo : 'Operador removido.', limpo ? 'success' : 'warning');
+  const nome = typeof operadorAtual_ === 'function' ? operadorAtual_() : '';
+  if (el) el.textContent = nome || 'Nao definido';
 }
 
 function whatsappModeAtual_() {
@@ -3813,7 +3947,7 @@ async function confirmarEncerrar() {
     updateStats();
     atualizarVeiculoGrid();
 
-    // SMS automático de agradecimento (v1.6.71) — fire-and-forget
+    // SMS automático de agradecimento (v1.6.72) — fire-and-forget
     try {
       const encDados = {
         rowIndex:    encSession.rowIndex,
@@ -4360,7 +4494,7 @@ async function iniciarContagem(rowIndex) {
     return;
   }
 
-  // 3. SMS automático de boas-vindas (v1.6.71) — disparo sem clique do operador
+  // 3. SMS automático de boas-vindas (v1.6.72) — disparo sem clique do operador
   // Não bloqueia a UI: fire-and-forget com toast discreto
   try {
     const sAtual = sessions.find(x => x.rowIndex === rowIndex);
@@ -4813,12 +4947,16 @@ let adminCountdown  = 60;
 let kpiData         = null;
 let chartsRendered  = false;
 let chartDiario=null,chartTipo=null,chartPlano=null,chartHoras=null;
-const ADMIN_PIN     = '1321';
+const ADMIN_PIN     = '1416';
 let pinBuffer       = '';
 
 // ── PIN ──────────────────────────────────────────────────────
 function abrirAdmin() {
   if (isAdmin) { showPage('admin'); return; }
+  if (typeof mkAuthIsAdmin === 'function' && mkAuthIsAdmin()) {
+    adminLogin();
+    return;
+  }
   pinBuffer = '';
   atualizarDots();
   document.getElementById('pin-modal').classList.add('show');
@@ -4873,6 +5011,7 @@ function adminLogin() {
   showPage('admin'); // BUG1-FIX: showPage já chama carregarKPIs se !kpiData — sem race condition
   carregarHistRelatorios();
   carregarConfig(); // Fase 6: carrega templates WA
+  if (typeof refreshOperadoresAdmin_ === 'function') refreshOperadoresAdmin_();
 }
 
 function adminLogout() {
@@ -5472,9 +5611,10 @@ function showPage(name, opts = {}) {
   document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
   const pg = document.getElementById('page-'+name);
   if(pg) pg.classList.add('active');
-  const navIdx = ['home','nova','relacionamento','painel','custos'].indexOf(name);
+  const navIdx = ['home','nova','relacionamento','painel','custos','lancamento'].indexOf(name);
   if (navIdx >= 0) document.querySelectorAll('nav button')[navIdx]?.classList.add('active');
   syncSidebar(name);
+  if (name === 'lancamento') resetAvulsoForm_();
   if (name==='nova') {
     if (opts.freshNova) {
       limparNovaDraft_();
@@ -5510,7 +5650,7 @@ function showPage(name, opts = {}) {
 function syncSidebar(page) {
   document.querySelectorAll('.sb-btn').forEach(b => b.classList.remove('active'));
   const map = {
-    'home':'sbn-home','nova':'sbn-nova','relacionamento':'sbn-relacionamento','custos':'sbn-custos','painel':'sbn-painel',
+    'home':'sbn-home','nova':'sbn-nova','relacionamento':'sbn-relacionamento','custos':'sbn-custos','painel':'sbn-painel','lancamento':'sbn-avulso',
     'admin':'sbn-adm','dashboard':'sbn-dash','relatorio':'sbn-rel','historico':'sbn-hist','caixa':'sbn-caixa'
   };
   if (map[page]) { const el=document.getElementById(map[page]); if(el) el.classList.add('active'); }
@@ -6227,7 +6367,85 @@ function renderAnalyticsCards(stats) {
   }
 }
 
-document.addEventListener('DOMContentLoaded', init);
+// ── LANÇAMENTO AVULSO v1.6.72 ───────────────────────────────
+let avulsoState = { tipo: null, plano: null };
+
+function resetAvulsoForm_() {
+  avulsoState = { tipo: null, plano: null };
+  ['avulso-motivo','avulso-resp','avulso-crianca','avulso-tel','avulso-veiculo','avulso-pag'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  document.querySelectorAll('#avulso-tipo-grid .tipo-btn').forEach(b => b.classList.remove('sel'));
+  const pw = document.getElementById('avulso-plano-wrap');
+  if (pw) pw.style.display = 'none';
+  const pg = document.getElementById('avulso-plano-grid');
+  if (pg) pg.innerHTML = '';
+}
+
+function selAvulsoTipo(el, tipo) {
+  avulsoState.tipo = tipo;
+  avulsoState.plano = null;
+  document.querySelectorAll('#avulso-tipo-grid .tipo-btn').forEach(b => b.classList.remove('sel'));
+  el.classList.add('sel');
+  const precos = PRECOS[tipo];
+  const grid = document.getElementById('avulso-plano-grid');
+  const wrap = document.getElementById('avulso-plano-wrap');
+  if (!precos || !grid || !wrap) return;
+  wrap.style.display = '';
+  grid.innerHTML = Object.keys(precos).map(pl =>
+    `<div class="plano-btn" onclick="selAvulsoPlano(this,'${pl}')">${PLANO_LABELS[pl] || pl}</div>`
+  ).join('');
+}
+
+function selAvulsoPlano(el, plano) {
+  avulsoState.plano = plano;
+  document.querySelectorAll('#avulso-plano-grid .plano-btn').forEach(b => b.classList.remove('sel'));
+  el.classList.add('sel');
+}
+
+async function salvarLancamentoAvulso() {
+  const motivo = String(document.getElementById('avulso-motivo')?.value || '').trim();
+  const responsavel = String(document.getElementById('avulso-resp')?.value || '').trim();
+  const crianca = String(document.getElementById('avulso-crianca')?.value || '').trim();
+  const telefone = String(document.getElementById('avulso-tel')?.value || '').trim();
+  const veiculo = String(document.getElementById('avulso-veiculo')?.value || '').trim();
+  const pagamento = String(document.getElementById('avulso-pag')?.value || '').trim();
+  if (motivo.length < 10) { toast('Justificativa obrigatoria (min. 10 caracteres)', 'warning'); return; }
+  if (!responsavel || !crianca) { toast('Responsavel e crianca obrigatorios', 'warning'); return; }
+  if (!avulsoState.tipo || !avulsoState.plano) { toast('Selecione tipo e plano', 'warning'); return; }
+  const btn = document.getElementById('btn-avulso');
+  if (btn) { btn.disabled = true; btn.textContent = 'Salvando...'; }
+  try {
+    const d = await api({
+      action: 'salvarLancamentoAvulso',
+      motivo,
+      tipo: avulsoState.tipo,
+      plano: avulsoState.plano,
+      responsavel,
+      crianca,
+      telefone,
+      veiculo,
+      pagamento,
+      ...operadorApiParams_()
+    });
+    if (d.ok) {
+      toast('Lancamento avulso #' + d.id + ' registrado', 'success');
+      resetAvulsoForm_();
+      broadcastInvalidate && broadcastInvalidate();
+      syncController(true, 0);
+      showPage('home');
+    } else toast(d.erro || 'Erro', 'error');
+  } catch (e) { toast('Erro de conexao', 'error'); }
+  finally {
+    if (btn) { btn.disabled = false; btn.textContent = '⚡ Registrar lançamento avulso'; }
+  }
+}
+
+</script>
+<script src="mk-auth.js?v=1.6.72"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => { if (typeof mkAuthBoot === 'function') mkAuthBoot(); else init(); });
 
 // ── SERVICE WORKER (PWA) ──────────────────────────────────────
 if ('serviceWorker' in navigator) {
