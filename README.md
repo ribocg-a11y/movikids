@@ -4,7 +4,7 @@ Sistema operacional para controle de locacoes da MOVI KIDS.
 
 ## Versao preparada
 
-- Frontend: `v1.6.33-sync-safe`
+- Frontend: `v1.6.71` (ver `ESTADO_ATUAL.md`)
 - Apps Script: `v1.5.13_SAFE`
 - Objetivo desta versao: corrigir divergencia entre multiplas telas sem tirar o sistema do ar.
 

@@ -1,13 +1,14 @@
 # MOVI KIDS - Proximas fases operacionais
 
-Estado atual em 01/06/2026:
+Estado atual em 04/06/2026:
 
-- Apps Script em producao: `v1.5.25`
-- Frontend em producao: `v1.6.60`
-- Service Worker em producao: `v1.6.60`
-- Ultima mudanca publicada: `Hotfix WhatsApp tablet/PWA`
-- Backend validado: `v1.5.25`, baseado em `v1.5.24`
-- Proximo candidato backend: `v1.5.26`, operador nas auditorias operacionais
+- Apps Script em producao: `v1.5.31` (espelho local: `MOVIKIDS_Code_v1.5.31_PRODUCAO.gs`)
+- Frontend em producao: `v1.6.71`
+- Service Worker em producao: `v1.6.71`
+- Portal responsavel: `acompanhar.html` (auto-refresh 30s, `extendedMins`)
+- Ultima mudanca publicada: SMS automatico + reidratacao `smsStatus` cross-device
+- Backend validado: `v1.5.31` (portal, SMS gateway, operador, relacionamento)
+- Arquivo historico `v1.5.27`: nao implantar — ver `arquivo-historico/README.md`
 - Regra obrigatoria de publicacao: `REGRAS_DE_PUBLICACAO_SEGURA.md`
 
 ## Fase 1 - Status canonico e timer
