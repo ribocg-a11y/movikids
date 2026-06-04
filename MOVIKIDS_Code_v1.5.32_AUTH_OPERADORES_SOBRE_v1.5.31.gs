@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.33
+// MOVI KIDS — Google Apps Script v1.5.34
+// v1.5.34: PIN trim hash/salt; reset PIN libera sessao; admin authRole
 // v1.5.33: trava sessao unica de operador (PropertiesService); ADM ignora trava
 // v1.5.32: autenticacao operadores (PIN 4 digitos), admin PIN 1416, lancamento avulso auditado
 // v1.5.32b: SMS dedup por locacao/tipo, status na linha de envio, campanha bloqueia Failed recente
@@ -251,9 +252,9 @@ function ping_() {
   const agora = new Date();
   return resp_({
     status:  'online',
-    versao:  'v1.5.33',
+    versao:  'v1.5.34',
     timestamp: fmtData_(agora) + ' ' + fmtHoraLocal_(agora),
-    sistema: 'MOVI KIDS v1.5.33'
+    sistema: 'MOVI KIDS v1.5.34'
   });
 }
 
@@ -2985,7 +2986,7 @@ function listarOperadoresLogin_() {
   }
   operadores.sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'));
   const todosComPin = operadores.length > 0 && operadores.every(o => o.hasPin);
-  return resp_({ operadores, todosComPin, sessaoAtiva: sessaoOperadorPayload_(), versao: 'v1.5.33' });
+  return resp_({ operadores, todosComPin, sessaoAtiva: sessaoOperadorPayload_(), versao: 'v1.5.34' });
 }
 
 function verificarOperadorLogin_(p) {
@@ -3026,12 +3027,13 @@ function loginOperador_(p) {
   if (!op.ativo) return err_('Operador inativo', 403);
   const bloqueio = assertPodeLoginOperador_(op.id);
   if (bloqueio) return bloqueio;
-  const hash = String(found.data[3] || '').trim();
-  const salt = String(found.data[4] || '').trim();
+  const hash = String(found.data[3] || '').trim().replace(/\s/g, '');
+  const salt = String(found.data[4] || '').trim().replace(/\s/g, '');
   if (!hash || !salt) return err_('PIN ainda nao definido', 403);
   const pin = pinDigits_(p.pin);
   if (!validPinFormat_(pin)) return err_('PIN invalido', 400);
-  if (hashPin_(pin, salt) !== hash) return err_('PIN incorreto', 401);
+  const computed = hashPin_(pin, salt);
+  if (!computed || computed !== hash) return err_('PIN incorreto', 401);
   const sh = operadoresSheet_();
   sh.getRange(found.row, 7).setValue(fmtData_(new Date()) + ' ' + fmtHoraLocal_(new Date()));
   registrarSessaoOperadorAtiva_(op);
@@ -3132,9 +3134,12 @@ function excluirOperadorSistema_(p) {
 }
 
 function resetarPinOperadorAdmin_(p) {
-  if (!adminPinOk_(p)) return err_('Acesso negado', 403);
+  if (!adminPinOk_(p)) return err_('Acesso negado — use PIN administrativo 1416', 403);
   const found = operadorRowById_(p.operadorId || p.id);
   if (!found) return err_('Operador nao encontrado', 404);
+  const opId = Number(found.data[0]);
+  const ativa = getSessaoOperadorAtiva_();
+  if (ativa && Number(ativa.operadorId) === opId) liberarSessaoOperadorAtiva_(true);
   const sh = operadoresSheet_();
   sh.getRange(found.row, 4, 1, 2).setValues([['', '']]);
   const op = operadorObjFromRow_(sh.getRange(found.row, 1, 1, 7).getValues()[0]);
