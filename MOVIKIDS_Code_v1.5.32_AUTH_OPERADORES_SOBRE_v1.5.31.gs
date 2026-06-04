@@ -1,5 +1,7 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.34
+// MOVI KIDS — Google Apps Script v1.5.36
+// v1.5.36: corrigirFinanceiroLocacaoAdmin (ADM ajusta encerrada — caixa/historico)
+// v1.5.35: mesmo operador pode relogar; ADM libera sessao com adminPin em liberarSessaoOperador
 // v1.5.34: PIN trim hash/salt; reset PIN libera sessao; admin authRole
 // v1.5.33: trava sessao unica de operador (PropertiesService); ADM ignora trava
 // v1.5.32: autenticacao operadores (PIN 4 digitos), admin PIN 1416, lancamento avulso auditado
@@ -235,6 +237,7 @@ function doGet(e) {
       case 'editarOperadorSistema': return editarOperadorSistema_(p);
       case 'excluirOperadorSistema': return excluirOperadorSistema_(p);
       case 'resetarPinOperadorAdmin': return resetarPinOperadorAdmin_(p);
+      case 'corrigirFinanceiroLocacaoAdmin': return corrigirFinanceiroLocacaoAdmin_(p);
       case 'liberarSessaoOperador': return liberarSessaoOperador_(p);
       case 'liberarSessaoOperadorAdmin': return liberarSessaoOperadorAdmin_(p);
       case 'verificarSmsDisparo': return verificarSmsDisparo_(p);
@@ -252,9 +255,9 @@ function ping_() {
   const agora = new Date();
   return resp_({
     status:  'online',
-    versao:  'v1.5.34',
+    versao:  'v1.5.36',
     timestamp: fmtData_(agora) + ' ' + fmtHoraLocal_(agora),
-    sistema: 'MOVI KIDS v1.5.34'
+    sistema: 'MOVI KIDS v1.5.36'
   });
 }
 
@@ -2986,7 +2989,7 @@ function listarOperadoresLogin_() {
   }
   operadores.sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'));
   const todosComPin = operadores.length > 0 && operadores.every(o => o.hasPin);
-  return resp_({ operadores, todosComPin, sessaoAtiva: sessaoOperadorPayload_(), versao: 'v1.5.34' });
+  return resp_({ operadores, todosComPin, sessaoAtiva: sessaoOperadorPayload_(), versao: 'v1.5.36' });
 }
 
 function verificarOperadorLogin_(p) {
@@ -3027,6 +3030,10 @@ function loginOperador_(p) {
   if (!op.ativo) return err_('Operador inativo', 403);
   const bloqueio = assertPodeLoginOperador_(op.id);
   if (bloqueio) return bloqueio;
+  const ativa = getSessaoOperadorAtiva_();
+  if (ativa && Number(ativa.operadorId) === Number(op.id)) {
+    liberarSessaoOperadorAtiva_(true);
+  }
   const hash = String(found.data[3] || '').trim().replace(/\s/g, '');
   const salt = String(found.data[4] || '').trim().replace(/\s/g, '');
   if (!hash || !salt) return err_('PIN ainda nao definido', 403);
@@ -3042,20 +3049,24 @@ function loginOperador_(p) {
 
 function liberarSessaoOperador_(p) {
   const id = Number(p.operadorId || p.id || 0);
-  if (!id) return err_('operadorId obrigatorio', 400);
   const ativa = getSessaoOperadorAtiva_();
-  if (!ativa) return resp_({ mensagem: 'Nenhuma sessao de operador ativa' });
-  if (Number(ativa.operadorId) !== id && !adminPinOk_(p)) {
+  if (!ativa) return resp_({ mensagem: 'Nenhuma sessao de operador ativa', sessaoAtiva: null });
+  if (adminPinOk_(p)) {
+    liberarSessaoOperadorAtiva_(true);
+    return resp_({ mensagem: 'Sessao liberada pelo administrador', sessaoAtiva: null });
+  }
+  if (!id) return err_('operadorId obrigatorio', 400);
+  if (Number(ativa.operadorId) !== id) {
     return errOperadorJaLogado_(ativa);
   }
   liberarSessaoOperadorAtiva_(true);
-  return resp_({ mensagem: 'Sessao de operador encerrada' });
+  return resp_({ mensagem: 'Sessao de operador encerrada', sessaoAtiva: null });
 }
 
 function liberarSessaoOperadorAdmin_(p) {
-  if (!adminPinOk_(p)) return err_('Acesso negado', 403);
+  if (!adminPinOk_(p)) return err_('Acesso negado — PIN admin 1416', 403);
   liberarSessaoOperadorAtiva_(true);
-  return resp_({ mensagem: 'Sessao de operador liberada pelo administrador' });
+  return resp_({ mensagem: 'Sessao do balcao liberada. Qualquer operador pode entrar.', sessaoAtiva: null });
 }
 
 function loginAdmin_(p) {
@@ -3144,6 +3155,66 @@ function resetarPinOperadorAdmin_(p) {
   sh.getRange(found.row, 4, 1, 2).setValues([['', '']]);
   const op = operadorObjFromRow_(sh.getRange(found.row, 1, 1, 7).getValues()[0]);
   return resp_({ operador: op, mensagem: 'PIN resetado. Operador criara novo PIN no proximo login.' });
+}
+
+function corrigirFinanceiroLocacaoAdmin_(p) {
+  if (!adminPinOk_(p)) return err_('Acesso negado — PIN admin 1416', 403);
+  const rowIndex = parseInt(p.rowIndex || '0', 10);
+  const motivo = String(p.motivo || '').trim();
+  if (!rowIndex || rowIndex < DATA_ROW) return err_('rowIndex invalido', 400);
+  if (motivo.length < 10) return err_('Motivo obrigatorio (min 10 caracteres)', 400);
+  const lock = LockService.getScriptLock();
+  try { lock.waitLock(6000); } catch (ex) { return err_('Sistema ocupado', 503); }
+  try {
+    const sheet = sh_(SH_LOC);
+    if (rowIndex > sheet.getLastRow()) return err_('Locacao nao encontrada', 404);
+    const row = sheet.getRange(rowIndex, 1, 1, 28).getValues()[0];
+    if (!row[0]) return err_('Locacao nao encontrada', 404);
+    const status = String(row[14] || '').trim();
+    if (status !== 'Encerrada') return err_('Somente locacoes Encerrada podem ser corrigidas por esta acao', 409);
+    const antes = locacaoObj_(row, rowIndex);
+    const minContratados = Number(row[6] || 0);
+    const valorPlano = Number(row[7] || 0);
+    if (p.horaFim !== undefined) {
+      const hf = String(p.horaFim || '').trim();
+      if (!/^\d{1,2}:\d{2}$/.test(hf)) return err_('horaFim invalida (use HH:mm)', 400);
+      sheet.getRange(rowIndex, 4).setValue(hf);
+    }
+    let minAdic = p.minAdicionais !== undefined ? Number(p.minAdicionais) : Number(row[8] || 0);
+    let valAdic = p.valorAdicional !== undefined ? Number(p.valorAdicional) : Number(row[9] || 0);
+    let valTotal = p.valorTotal !== undefined ? Number(p.valorTotal) : Number(row[10] || 0);
+    if (isNaN(minAdic) || minAdic < 0) return err_('minAdicionais invalido', 400);
+    if (isNaN(valAdic) || valAdic < 0) return err_('valorAdicional invalido', 400);
+    if (isNaN(valTotal) || valTotal < 0) return err_('valorTotal invalido', 400);
+    if (p.zerarExtra === '1' || p.zerarExtra === true || String(p.zerarExtra || '').toLowerCase() === 'true') {
+      minAdic = 0;
+      valAdic = 0;
+      valTotal = Math.round(valorPlano * 100) / 100;
+      if (p.horaFim === undefined && minContratados > 0) {
+        const hi = cellToStr_(row[2]);
+        const parts = hi.split(':');
+        if (parts.length >= 2) {
+          const d = parseDataStr_(cellToStr_(row[1])) || new Date();
+          d.setHours(Number(parts[0]), Number(parts[1]), 0, 0);
+          d.setMinutes(d.getMinutes() + minContratados);
+          sheet.getRange(rowIndex, 4).setValue(fmtHoraLocal_(d));
+        }
+      }
+    }
+    sheet.getRange(rowIndex, 9).setValue(minAdic);
+    sheet.getRange(rowIndex, 10).setValue(valAdic);
+    sheet.getRange(rowIndex, 11).setValue(valTotal);
+    const obs = String(row[17] || '').trim();
+    const tag = '[CORRECAO ADM] ' + motivo;
+    if (obs.indexOf(tag) < 0) {
+      sheet.getRange(rowIndex, 18).setValue(obs ? obs + ' | ' + tag : tag);
+    }
+    try { CacheService.getScriptCache().remove('carregarInicio_v2'); } catch (e) {}
+    const rowAfter = sheet.getRange(rowIndex, 1, 1, 28).getValues()[0];
+    const depois = locacaoObj_(rowAfter, rowIndex);
+    registrarAuditoriaLocacao_(rowIndex, 'corrigirFinanceiroLocacaoAdmin', antes, depois, motivo, operadorAudit_(p));
+    return resp_({ locacao: depois, mensagem: 'Locacao corrigida. Caixa e historico usam estes valores.' });
+  } finally { lock.releaseLock(); }
 }
 
 function salvarLancamentoAvulso_(p) {

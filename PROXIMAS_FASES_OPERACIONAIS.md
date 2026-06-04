@@ -1,5 +1,7 @@
 # MOVI KIDS - Proximas fases operacionais
 
+> **Prioridades e UX reorganizados:** `PLANO_MESTRE_REORGANIZADO_2026-06.md`
+
 Estado atual em 04/06/2026:
 
 - Apps Script em producao: `v1.5.31` (espelho local: `MOVIKIDS_Code_v1.5.31_PRODUCAO.gs`)
@@ -229,7 +231,7 @@ Ponto de atencao:
 
 ## Fase 9 - Login por operador e seguranca ADM
 
-Status: planejado, ainda nao publicado.
+Status: **primeira entrega publicada** (v1.6.72–v1.6.78, GAS v1.5.32–v1.5.33). Pendente: supervisor, POST, auditoria plena, esconder financeiro do operador.
 
 Objetivo:
 

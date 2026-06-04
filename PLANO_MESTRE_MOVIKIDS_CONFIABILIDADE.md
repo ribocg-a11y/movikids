@@ -2,7 +2,10 @@
 
 Data: 01/06/2026
 
-Este e o plano-mestre atual do projeto. Ele substitui desvios pontuais e reorganiza o trabalho para transformar o MOVI KIDS de um app operacional que funciona em um sistema confiavel, auditavel e seguro para operacao diaria.
+> **Roadmap atualizado (produto + UX + prioridades):** use `PLANO_MESTRE_REORGANIZADO_2026-06.md` (04/06/2026).  
+> Este arquivo permanece como referencia de **regras tecnicas de confiabilidade** (cache, sync, auditoria, WhatsApp).
+
+Este e o plano-mestre tecnico original do projeto. Ele substitui desvios pontuais e reorganiza o trabalho para transformar o MOVI KIDS de um app operacional que funciona em um sistema confiavel, auditavel e seguro para operacao diaria.
 
 ## Leitura Geral
 

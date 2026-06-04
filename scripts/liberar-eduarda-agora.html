@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Movi Kids — Liberar Eduarda agora</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 520px; margin: 40px auto; padding: 0 16px; }
+    button { font-size: 16px; padding: 12px 20px; margin: 8px 0; width: 100%; cursor: pointer; }
+    .ok { color: #0a7; } .err { color: #c00; }
+    pre { background: #f4f4f4; padding: 12px; overflow: auto; font-size: 13px; }
+  </style>
+</head>
+<body>
+  <h1>Liberar Eduarda (emergência)</h1>
+  <p>Clique uma vez. Isso chama o servidor Movi Kids para:</p>
+  <ol>
+    <li>Liberar sessão do balcão</li>
+    <li>Resetar PIN da Eduarda (id 1)</li>
+  </ol>
+  <button type="button" id="btn">Executar agora</button>
+  <p id="status"></p>
+  <pre id="log"></pre>
+  <script>
+    const GAS = 'https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec';
+    const PIN = '1416';
+    const log = (t) => { document.getElementById('log').textContent += t + '\n'; };
+    async function api(action, extra) {
+      const q = new URLSearchParams({ action, adminPin: PIN, ...extra });
+      const r = await fetch(GAS + '?' + q);
+      return r.json();
+    }
+    document.getElementById('btn').onclick = async () => {
+      const st = document.getElementById('status');
+      st.textContent = 'Executando...';
+      st.className = '';
+      document.getElementById('log').textContent = '';
+      try {
+        const a = await api('liberarSessaoOperadorAdmin');
+        log('Liberar: ' + JSON.stringify(a, null, 2));
+        const b = await api('resetarPinOperadorAdmin', { operadorId: '1' });
+        log('Reset PIN: ' + JSON.stringify(b, null, 2));
+        const c = await api('listarOperadoresLogin');
+        log('Lista: ' + JSON.stringify(c, null, 2));
+        const edu = (c.operadores || []).find(o => o.id === 1 || o.nome === 'Eduarda');
+        if (c.ok && edu && !edu.hasPin) {
+          st.textContent = 'Pronto! Eduarda sem PIN — no app: login → Eduarda → criar PIN novo.';
+          st.className = 'ok';
+        } else if (c.ok && edu && edu.hasPin) {
+          st.textContent = 'Servidor ainda mostra PIN. Apague colunas D e E na aba OPERADORES_SISTEMA (planilha).';
+          st.className = 'err';
+        } else {
+          st.textContent = 'Verifique o log abaixo.';
+          st.className = 'err';
+        }
+      } catch (e) {
+        st.textContent = 'Erro: ' + e.message;
+        st.className = 'err';
+      }
+    };
+  </script>
+</body>
+</html>
