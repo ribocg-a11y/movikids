@@ -7,11 +7,11 @@
 | **Planilha MOVIKIDS** | https://docs.google.com/spreadsheets/d/1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618/edit |
 | **Editor Apps Script** | Na planilha: menu **Extensões → Apps Script** (ou aba do Chrome *MoviKids - Editor do projeto*) |
 | **Testar se o GAS está no ar** | https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec?action=ping |
-| **App (GitHub Pages)** | https://ribocg-a11y.github.io/movikids/?force=1.6.81 |
+| **App (GitHub Pages)** | https://ribocg-a11y.github.io/movikids/?force=1.7.1 |
 
 No editor Apps Script: **Implantar → Gerenciar implantações → Editar** a implantação Web existente (ID `AKfycbzc...`) → **Nova versão** → Implantar. **Não** crie um deploy novo (mantém a mesma URL).
 
-Após implantar, o `ping` deve mostrar `versao` **v1.5.36** (mínimo **v1.5.35** para auth; **1.5.36** para correção financeira ADM).
+Após implantar, o `ping` deve mostrar `versao` **v1.5.37** (extras por dia, histórico em cache, mês de contrato por aniversário). Mínimo **v1.5.36** para correção financeira ADM.
 
 **Pós-incidente 04/06/2026:** leia `INCIDENTE_AUTH_OPERADORES_2026-06-04.md`.
 

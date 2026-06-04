@@ -8,8 +8,8 @@ Referencia unica para alinhamento local x producao.
 
 | Camada | Versao alvo | URL / ID |
 |--------|-------------|----------|
-| Apps Script | **v1.5.36** | Deploy `AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw` |
-| Frontend | **v1.7.0** | https://ribocg-a11y.github.io/movikids/?force=1.7.0 |
+| Apps Script | **v1.5.37** | Deploy `AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw` |
+| Frontend | **v1.7.1** | https://ribocg-a11y.github.io/movikids/?force=1.7.1 |
 | Planilha | MOVIKIDS_Planilha_Base | https://docs.google.com/spreadsheets/d/1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618/edit |
 | Apps Script editor | Planilha → Extensões → Apps Script | ver `DEPLOY_GAS_v1.5.32_AUTH.md` |
 
@@ -18,7 +18,7 @@ https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAW
 
 ## Arquivos canonicos
 
-- **GAS:** `MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs` (header v1.5.36)
+- **GAS:** `MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs` (header v1.5.37 — extras/dia, histórico cache, mês contrato)
 - **Login:** `mk-auth.js` + gate em `index.html`
 - **Deploy / links:** `DEPLOY_GAS_v1.5.32_AUTH.md`
 - **Emergencia:** `scripts/liberar-eduarda-agora.html`, `scripts/corrigir-locacao-206.html`

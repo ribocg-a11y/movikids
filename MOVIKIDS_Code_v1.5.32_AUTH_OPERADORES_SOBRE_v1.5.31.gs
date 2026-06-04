@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.36
+// MOVI KIDS — Google Apps Script v1.5.37
+// v1.5.37: extPorDia (KPIs + histórico), cache listarHistorico, mesContrato por aniversário (contrato)
 // v1.5.36: corrigirFinanceiroLocacaoAdmin (ADM ajusta encerrada — caixa/historico)
 // v1.5.35: mesmo operador pode relogar; ADM libera sessao com adminPin em liberarSessaoOperador
 // v1.5.34: PIN trim hash/salt; reset PIN libera sessao; admin authRole
@@ -173,11 +174,13 @@ function nextId_(sheet) {
   return max + 1;
 }
 
+// Mês de locação = aniversário da data de assinatura (contrato Golden Calhau)
 function mesContrato_() {
-  const hoje  = new Date();
-  const anos  = hoje.getFullYear() - CONTRATO_INICIO.getFullYear();
-  const meses = hoje.getMonth()    - CONTRATO_INICIO.getMonth();
-  return anos * 12 + meses + 1;
+  const hoje = new Date();
+  let meses = (hoje.getFullYear() - CONTRATO_INICIO.getFullYear()) * 12;
+  meses += hoje.getMonth() - CONTRATO_INICIO.getMonth();
+  if (hoje.getDate() < CONTRATO_INICIO.getDate()) meses--;
+  return Math.max(1, meses + 1);
 }
 
 function ctoMinimo_(mes) {
@@ -255,7 +258,7 @@ function ping_() {
   const agora = new Date();
   return resp_({
     status:  'online',
-    versao:  'v1.5.36',
+    versao:  'v1.5.37',
     timestamp: fmtData_(agora) + ' ' + fmtHoraLocal_(agora),
     sistema: 'MOVI KIDS v1.5.36'
   });
@@ -703,21 +706,63 @@ function dateToCmp_(s) {
   return p[2] + p[1].padStart(2,'0') + p[0].padStart(2,'0');
 }
 
+function historicoInRange_(dcmp, filtroData, sCmp, eCmp) {
+  if (filtroData) return dcmp === sCmp;
+  if (sCmp && eCmp) return dcmp >= sCmp && dcmp <= eCmp;
+  return true;
+}
+
+function buildExtPorDiaArr_(byDay) {
+  return Object.keys(byDay).sort().map(k => ({
+    dia: parseInt(k.slice(6, 8), 10),
+    label: k.slice(6, 8) + '/' + k.slice(4, 6),
+    cmp: k,
+    valor: Math.round(byDay[k] * 100) / 100
+  }));
+}
+
 function listarHistorico_(p) {
   const filtroData = (p.data      || '').trim();
   const startDate  = (p.startDate || '').trim();
   const endDate    = (p.endDate   || '').trim();
+  const statsOnly  = String(p.statsOnly || '') === '1' || p.statsOnly === true;
+  const bustCache  = String(p.bustCache || '') === '1';
+
+  const sCmp = filtroData ? dateToCmp_(filtroData) : (startDate ? dateToCmp_(startDate) : '');
+  const eCmp = filtroData ? sCmp : (endDate ? dateToCmp_(endDate) : '');
+  const cacheKey = 'hist_v37_' + (filtroData || (startDate + '_' + endDate)) + (statsOnly ? '_s' : '_f');
+  const cache = CacheService.getScriptCache();
+  if (!bustCache) {
+    const hit = cache.get(cacheKey);
+    if (hit) {
+      try { return resp_(JSON.parse(hit)); } catch (e) { /* recalcula */ }
+    }
+  }
+
   const sheet = sh_(SH_LOC);
   const last  = sheet.getLastRow();
-  if (last < DATA_ROW) return resp_({ locacoes: [] });
+  if (last < DATA_ROW) {
+    const empty = { locacoes: [], total: 0, stats: { n: 0, totalFat: 0, totalExt: 0, ticketMedio: 0, porTipo: {}, porPlano: {}, porVeiculo: {}, extPorDia: [] } };
+    return resp_(empty);
+  }
 
-  const dados = sheet.getRange(DATA_ROW, 1, last - DATA_ROW + 1, 18).getValues();
-  let lista = dados
-    .filter(r => r[0] !== '' && r[0] !== 0)
-    .map((r, idx) => ({
-      rowIndex:      DATA_ROW + idx,
+  const dados = sheet.getRange(DATA_ROW, 1, last - DATA_ROW + 1, 17).getValues();
+  const lista = [];
+  const enc = [];
+  const extPorDiaMap = {};
+
+  for (let i = dados.length - 1; i >= 0; i--) {
+    const r = dados[i];
+    if (!r[0] || r[0] === 0) continue;
+    const data = cellToStr_(r[1]);
+    const dcmp = dateToCmp_(data);
+    if (!historicoInRange_(dcmp, filtroData, sCmp, eCmp)) continue;
+
+    const status = String(r[14]);
+    const item = {
+      rowIndex:      DATA_ROW + i,
       id:            r[0],
-      data:          cellToStr_(r[1]),
+      data:          data,
       horaInicio:    cellToStr_(r[2]),
       horaFim:       cellToStr_(r[3]),
       tipo:          String(r[4]),
@@ -730,23 +775,22 @@ function listarHistorico_(p) {
       responsavel:   String(r[11]),
       crianca:       String(r[12]),
       telefone:      String(r[13]),
-      status:        String(r[14]),
+      status:        status,
       veiculo:       String(r[15] || ''),
       pagamento:     String(r[16] || '')
-    }));
+    };
 
-  if (filtroData) {
-    lista = lista.filter(r => String(r.data) === filtroData);
-  } else if (startDate && endDate) {
-    const s = dateToCmp_(startDate), e = dateToCmp_(endDate);
-    lista = lista.filter(r => { const d = dateToCmp_(String(r.data)); return d >= s && d <= e; });
+    if (status === 'Encerrada') {
+      enc.push(item);
+      const ext = Number(r[9]) || 0;
+      if (ext > 0 && dcmp) extPorDiaMap[dcmp] = (extPorDiaMap[dcmp] || 0) + ext;
+    }
+    if (!statsOnly && lista.length < 100) lista.push(item);
   }
 
-  lista = lista.reverse().slice(0, 100);
-
-  const enc = lista.filter(r => r.status === 'Encerrada');
   const totalFat = enc.reduce((s, r) => s + Number(r.valorTotal), 0);
   const totalExt = enc.reduce((s, r) => s + Number(r.valorAdicional), 0);
+  const nComExtra = enc.filter(r => Number(r.valorAdicional) > 0).length;
   const porTipo = {}, porPlano = {}, porVeiculo = {};
   enc.forEach(r => {
     const t = String(r.tipo), pl = String(r.plano), v = String(r.veiculo || r.tipo);
@@ -758,7 +802,7 @@ function listarHistorico_(p) {
     porVeiculo[v].n++; porVeiculo[v].fat += Number(r.valorTotal);
   });
 
-  return resp_({
+  const payload = {
     locacoes: lista,
     total:    lista.length,
     stats: {
@@ -766,11 +810,16 @@ function listarHistorico_(p) {
       totalFat:    Math.round(totalFat * 100) / 100,
       totalExt:    Math.round(totalExt * 100) / 100,
       ticketMedio: enc.length > 0 ? Math.round(totalFat / enc.length * 100) / 100 : 0,
+      pctExt:      totalFat > 0 ? Math.round(totalExt / totalFat * 1000) / 10 : 0,
+      nComExtra:   nComExtra,
       porTipo,
       porPlano,
-      porVeiculo
+      porVeiculo,
+      extPorDia:   buildExtPorDiaArr_(extPorDiaMap)
     }
-  });
+  };
+  try { cache.put(cacheKey, JSON.stringify(payload), 180); } catch (e) { /* ok */ }
+  return resp_(payload);
 }
 
 // ── SALVAR CUSTO ──────────────────────────────────────────────
@@ -849,10 +898,12 @@ function buscarKPIsAdmin_(p) {
   const mmyyPrev = String(mesPrev).padStart(2,'0') + '/' + anoPrev;
 
   let fatHoje = 0, nHoje = 0, fatMes = 0, nMes = 0;
+  let extMes = 0, nComExtra = 0;
   let fatSemana = 0, nSemana = 0, fatSemanaAnt = 0, nSemanaAnt = 0;
   let fatMesAnt = 0, nMesAnt = 0;
   const diasComMov = new Set();
   const fatPorDia = {};
+  const extPorDia = {};
   const fatPorTipo = {'Carro':0,'Triciclo':0,'Pelúcia':0}; // v1.5.3: Triciclo
   const fatPorPlano = {};
   const fatPorVeiculo   = {};
@@ -869,6 +920,7 @@ function buscarKPIsAdmin_(p) {
       if (pts.length < 3) return;
       const mmyyR  = pts[1].padStart(2,'0') + '/' + pts[2];
       const vt     = Number(r[10]);
+      const ext    = Number(r[9]) || 0;
       const tipo   = String(r[4]);
       const plano  = String(r[5]);
       const veiculo= String(r[15] || tipo);
@@ -879,8 +931,11 @@ function buscarKPIsAdmin_(p) {
 
       if (mmyyR === mmyy) {
         fatMes += vt; nMes++;
+        extMes += ext;
+        if (ext > 0) nComExtra++;
         const dk = pts[0].padStart(2,'0');
         diasComMov.add(dk); // v1.5.4: rastreia dias com movimento
+        if (ext > 0) extPorDia[dk] = (extPorDia[dk] || 0) + ext;
         // v1.5.4: comparativo semanal
         const dParsed = parseDataStr_(dataR);
         if (dParsed) {
@@ -916,7 +971,8 @@ function buscarKPIsAdmin_(p) {
   }
 
   const mesCto   = mesContrato_();
-  const ctoPagar = Math.max(ctoMinimo_(mesCto), fatMes * 0.10);
+  const ctoMin   = ctoMinimo_(mesCto);
+  const ctoPagar = Math.max(ctoMin, fatMes * 0.10);
   const resultado= fatMes - cusMes - ctoPagar;
   const margem   = fatMes > 0 ? Math.round(resultado / fatMes * 1000) / 10 : 0;
   // v1.5.4: projeção e média diária
@@ -926,8 +982,11 @@ function buscarKPIsAdmin_(p) {
   const projecaoRes   = Math.round((projecaoFat - cusMes - Math.max(ctoMinimo_(mesCto), projecaoFat * 0.10)) * 100) / 100;
 
   const fatDiaArr = [];
+  const extDiaArr = [];
   for (let d = 1; d <= diasMes; d++) {
-    fatDiaArr.push({ dia: d, valor: fatPorDia[String(d).padStart(2,'0')] || 0 });
+    const dk = String(d).padStart(2,'0');
+    fatDiaArr.push({ dia: d, valor: fatPorDia[dk] || 0 });
+    extDiaArr.push({ dia: d, valor: Math.round((extPorDia[dk] || 0) * 100) / 100 });
   }
 
   return resp_({
@@ -951,7 +1010,13 @@ function buscarKPIsAdmin_(p) {
     ctoPagar:    Math.round(ctoPagar * 100) / 100,
     resultado:   Math.round(resultado* 100) / 100,
     margem,
+    extMes:      Math.round(extMes * 100) / 100,
+    nComExtra,
+    pctExtMes:   fatMes > 0 ? Math.round(extMes / fatMes * 1000) / 10 : 0,
+    mesContrato: mesCto,
+    ctoMinimo:   ctoMin,
     fatPorDia:   fatDiaArr,
+    extPorDia:   extDiaArr,
     fatPorTipo,
     fatPorPlano,
     fatPorVeiculo,

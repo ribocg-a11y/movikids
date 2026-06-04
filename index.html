@@ -1975,7 +1975,9 @@ nav button .nav-badge{
         <div class="mk-stat-pill gold"><div class="mk-stat-pill-val" id="cx-din">...</div><div class="mk-stat-pill-lbl">Dinheiro</div></div>
         <div class="mk-stat-pill red"><div class="mk-stat-pill-val" id="cx-cus">...</div><div class="mk-stat-pill-lbl">Custos</div></div>
         <div class="mk-stat-pill neutral"><div class="mk-stat-pill-val" id="cx-nloc">...</div><div class="mk-stat-pill-lbl">Locações</div></div>
+        <div class="mk-stat-pill" style="background:#F3E5F5"><div class="mk-stat-pill-val" id="cx-ext" style="color:#6A1B9A">...</div><div class="mk-stat-pill-lbl">Extras</div></div>
       </div>
+      <div class="db-insight" id="cx-ext-insight" style="display:none;margin-top:8px;font-size:12px"></div>
     </div>
 
     <!-- Conferência -->
@@ -2161,6 +2163,18 @@ nav button .nav-badge{
       <div style="position:relative;height:300px">
         <canvas id="chart-diario" role="img" aria-label="Faturamento diário do mês">Faturamento diário.</canvas>
       </div>
+    </div>
+
+    <!-- Extras por dia (mês) -->
+    <div class="new-chart-card" style="margin-bottom:14px">
+      <div class="new-chart-title">
+        Minutos extras — receita por dia
+        <span class="nct-note" id="nk-ext-label">—</span>
+      </div>
+      <div style="position:relative;height:220px">
+        <canvas id="chart-extras-dia" role="img" aria-label="Receita de minutos extras por dia">Extras por dia.</canvas>
+      </div>
+      <div class="db-insight" id="nk-ext-insight" style="display:none;margin-top:8px"></div>
     </div>
 
     <!-- Por tipo + Pico -->
@@ -2351,6 +2365,14 @@ nav button .nav-badge{
       <div class="analytics-card purple"><div class="ac-val" id="ac-extras">R$0</div><div class="ac-lbl">Extras cobrados</div></div>
     </div>
 
+    <div class="new-chart-card" id="hist-ext-chart-wrap" style="display:none;margin-bottom:14px">
+      <div class="new-chart-title">Extras por dia <span class="nct-note" id="hist-ext-sub">no período</span></div>
+      <div style="position:relative;height:200px">
+        <canvas id="chart-hist-ext" role="img" aria-label="Extras por dia no período"></canvas>
+      </div>
+      <div class="rank-insight" id="hist-ext-insight" style="display:none;margin-top:8px"></div>
+    </div>
+
     <!-- Ranking por tipo -->
     <div class="ranking-card" id="ranking-card" style="display:none">
       <div class="chart-title">Ranking por tipo de veículo</div>
@@ -2530,7 +2552,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = '1.7.0';
+const APP_VERSION = '1.7.1';
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec';
 const PORTAL_RESPONSAVEL_URL = 'https://ribocg-a11y.github.io/movikids/acompanhar.html';
 
@@ -4629,47 +4651,98 @@ function showNotification(title, body) {
 // ═══════════════════════════════════════════════════════════
 // HISTÓRICO
 // ═══════════════════════════════════════════════════════════
+function histCacheKey_(dates) {
+  return 'mk_hist_v71_' + dates.s + '_' + dates.e;
+}
+
+function histItemHtml_(l) {
+  const icon = tipoIcon(l.tipo);
+  const vT = Number(l.valorTotal).toFixed(2).replace('.', ',');
+  const vE = Number(l.valorAdicional);
+  const sc = l.status === 'Ativa' ? 'ativa' : 'encerrada';
+  return `<div class="hist-item">
+    <div class="hi-left">
+      <div class="hi-tipo">${icon} ${l.tipo}</div>
+      <div class="hi-names">${escHtml(l.crianca)}</div>
+      <div class="hi-det">👤 ${escHtml(l.responsavel)} · ${l.plano}</div>
+      <div class="hi-det">⏰ ${l.horaInicio}${l.horaFim ? ' → ' + l.horaFim : ''} · ${l.data}</div>
+    </div>
+    <div class="hi-right">
+      <div class="hi-valor">R$ ${vT}</div>
+      ${vE > 0 ? `<div class="hi-extra">+${l.minAdicionais}min extra</div>` : ''}
+      <span class="hi-status ${sc}">${l.status}</span>
+    </div>
+  </div>`;
+}
+
+function renderHistListLazy_(locacoes, container) {
+  if (!locacoes.length) {
+    container.innerHTML = `<div class="empty"><div class="empty-icon">📋</div><h3>Sem locações neste período</h3></div>`;
+    return;
+  }
+  container.innerHTML = '';
+  let i = 0;
+  const CHUNK = 12;
+  function paint() {
+    const slice = locacoes.slice(i, i + CHUNK);
+    container.insertAdjacentHTML('beforeend', slice.map(histItemHtml_).join(''));
+    i += CHUNK;
+    if (i < locacoes.length) requestAnimationFrame(paint);
+  }
+  requestAnimationFrame(paint);
+}
+
+function aplicarHistorico_(res) {
+  const container = document.getElementById('hist-container');
+  if (!container) return;
+  histLocacoesAll = res.locacoes || [];
+  renderAnalyticsCards(res.stats);
+  renderHistExtChart_(res.stats);
+  const vf = document.getElementById('hist-veiculo-filter')?.value || '';
+  const locs = vf ? histLocacoesAll.filter(l => l.veiculo === vf) : histLocacoesAll;
+  renderVrankSection(locs);
+  renderHistListLazy_(locs, container);
+}
+
 async function buscarHistorico() {
   const dates = getDates();
-  if (!dates) { toast('Selecione as datas','error'); return; }
+  if (!dates) { toast('Selecione as datas', 'error'); return; }
   const container = document.getElementById('hist-container');
-  if(!container) return;
+  if (!container) return;
+
+  const cacheKey = histCacheKey_(dates);
+  try {
+    const raw = sessionStorage.getItem(cacheKey);
+    if (raw) {
+      const cached = JSON.parse(raw);
+      if (cached.ts && Date.now() - cached.ts < HIST_CACHE_TTL_MS && cached.res) {
+        aplicarHistorico_(cached.res);
+        return;
+      }
+    }
+  } catch (e) { /* ignora */ }
+
   container.innerHTML = '<div class="skeleton"></div><div class="skeleton"></div>';
+  const cards = document.getElementById('analytics-cards');
+  if (cards) cards.style.display = 'none';
 
   try {
-    const res = await api({ action:'listarHistorico', startDate:dates.s, endDate:dates.e });
-    if (!res.ok) { container.innerHTML='<div class="empty"><p>Erro.</p></div>'; return; }
-
-    histLocacoesAll = res.locacoes || []; // salva para filtro por veículo
-
-    renderAnalyticsCards(res.stats);
-    renderVrankSection(histLocacoesAll);  // ranking por veículo (Fase 4)
-
-    if (!res.locacoes.length) {
-      container.innerHTML=`<div class="empty"><div class="empty-icon">📋</div><h3>Sem locações neste período</h3></div>`;
-      return;
+    const resStats = await api({ action: 'listarHistorico', startDate: dates.s, endDate: dates.e, statsOnly: '1' });
+    if (resStats.ok && resStats.stats) {
+      renderAnalyticsCards(resStats.stats);
+      renderHistExtChart_(resStats.stats);
     }
-    container.innerHTML = res.locacoes.map(l=>{
-      const icon=tipoIcon(l.tipo);
-      const vT=Number(l.valorTotal).toFixed(2).replace('.',',');
-      const vE=Number(l.valorAdicional);
-      const sc=l.status==='Ativa'?'ativa':'encerrada';
-      return `<div class="hist-item">
-        <div class="hi-left">
-          <div class="hi-tipo">${icon} ${l.tipo}</div>
-          <div class="hi-names">${escHtml(l.crianca)}</div>
-          <div class="hi-det">👤 ${escHtml(l.responsavel)} · ${l.plano}</div>
-          <div class="hi-det">⏰ ${l.horaInicio}${l.horaFim?' → '+l.horaFim:''} · ${l.data}</div>
-        </div>
-        <div class="hi-right">
-          <div class="hi-valor">R$ ${vT}</div>
-          ${vE>0?`<div class="hi-extra">+${l.minAdicionais}min extra</div>`:''}
-          <span class="hi-status ${sc}">${l.status}</span>
-        </div>
-      </div>`;
-    }).join('');
+
+    const res = await api({ action: 'listarHistorico', startDate: dates.s, endDate: dates.e });
+    if (!res.ok) { container.innerHTML = '<div class="empty"><p>Erro.</p></div>'; return; }
+
+    try {
+      sessionStorage.setItem(cacheKey, JSON.stringify({ ts: Date.now(), res }));
+    } catch (e) { /* quota */ }
+
+    aplicarHistorico_(res);
   } catch {
-    container.innerHTML='<div class="empty"><p>Erro de conexão.</p></div>';
+    container.innerHTML = '<div class="empty"><p>Erro de conexão.</p></div>';
   }
 }
 
@@ -4899,30 +4972,8 @@ function filtrarPorVeiculo() {
     ? histLocacoesAll.filter(l => l.veiculo === filtro)
     : histLocacoesAll;
 
-  if (!lista.length) {
-    container.innerHTML = `<div class="empty"><div class="empty-icon">🔍</div><h3>Sem locações para ${filtro || 'este período'}</h3></div>`;
-    return;
-  }
-
-  container.innerHTML = lista.map(l => {
-    const icon = tipoIcon(l.tipo);
-    const vT   = Number(l.valorTotal).toFixed(2).replace('.', ',');
-    const vE   = Number(l.valorAdicional);
-    const sc   = l.status === 'Ativa' ? 'ativa' : 'encerrada';
-    return `<div class="hist-item">
-      <div class="hi-left">
-        <div class="hi-tipo">${icon} ${l.tipo}${l.veiculo ? ' · ' + l.veiculo : ''}</div>
-        <div class="hi-names">${escHtml(l.crianca)}</div>
-        <div class="hi-det">👤 ${escHtml(l.responsavel)} · ${l.plano}</div>
-        <div class="hi-det">⏰ ${l.horaInicio}${l.horaFim ? ' → ' + l.horaFim : ''} · ${l.data}</div>
-      </div>
-      <div class="hi-right">
-        <div class="hi-valor">R$ ${vT}</div>
-        ${vE > 0 ? `<div class="hi-extra">+${l.minAdicionais}min extra</div>` : ''}
-        <span class="hi-status ${sc}">${l.status}</span>
-      </div>
-    </div>`;
-  }).join('');
+  renderVrankSection(lista);
+  renderHistListLazy_(lista, container);
 }
 
 // ── Ranking por veículo no Histórico ───────────────────────
@@ -5027,7 +5078,8 @@ let adminTimerInt   = null;
 let adminCountdown  = 60;
 let kpiData         = null;
 let chartsRendered  = false;
-let chartDiario=null,chartTipo=null,chartPlano=null,chartHoras=null;
+let chartDiario=null,chartExtrasDia=null,chartHistExt=null,chartTipo=null,chartPlano=null,chartHoras=null;
+const HIST_CACHE_TTL_MS = 120000;
 const ADMIN_PIN     = '1416';
 let pinBuffer       = '';
 
@@ -5210,7 +5262,7 @@ async function carregarKPIsComMes(mes, ano) {
 
 function renderCharts(d) {
   if (!window.Chart) return;
-  [chartDiario,chartTipo,chartPlano,chartHoras].forEach(c => c && c.destroy());
+  [chartDiario, chartExtrasDia, chartTipo, chartPlano, chartHoras].forEach(c => c && c.destroy());
   if (window.chartVeiculo) window.chartVeiculo.destroy();
   if (window.chartPagamento) window.chartPagamento.destroy();
 
@@ -5244,17 +5296,18 @@ function renderCharts(d) {
   const ctoPct = d.fatMes > 0 ? Math.round(d.ctoPagar / d.fatMes * 100) : 0;
   const ctoBar = document.getElementById('nk-cto-bar');
   if (ctoBar) ctoBar.style.width = Math.min(ctoPct, 100) + '%';
-  setText2('nk-cto-note', 'CTO = ' + ctoPct + '% do faturamento');
   const nm = d.mesAtual < 12 ? d.mesAtual + 1 : 1;
   const ny = d.mesAtual < 12 ? d.anoAtual : d.anoAtual + 1;
   setText2('nk-cto-title', R2(d.ctoPagar) + ' — vence 05/' + String(nm).padStart(2,'0') + '/' + ny);
   const mesPill = document.getElementById('nk-cto-mes');
-  if (mesPill && d.mesAtual) {
-    const start = new Date(2026,3,29);
-    const cur   = new Date(d.anoAtual, d.mesAtual-1, 1);
-    const diff  = Math.max(1, Math.round((cur - start) / (1000*60*60*24*30)) + 1);
-    mesPill.textContent = diff + 'º mês de contrato';
+  if (mesPill) {
+    const mc = d.mesContrato || 1;
+    const cmin = d.ctoMinimo != null ? R2(d.ctoMinimo) : '';
+    mesPill.textContent = mc + 'º mês · mín. ' + cmin;
   }
+  setText2('nk-cto-note', (d.ctoMinimo != null
+    ? 'CTO = maior entre ' + R2(d.ctoMinimo) + ' e 10% do faturamento (' + ctoPct + '% aplicado)'
+    : 'CTO = ' + ctoPct + '% do faturamento'));
 
   // Faturamento diário — todos os dias do mês até hoje (zeros inclusive)
   // Os zeros mostram a linha do tempo completa e quando o negócio arrancou
@@ -5298,6 +5351,67 @@ function renderCharts(d) {
           x:{grid:{display:false}, ticks:{font:{size:9}, color:'#888', maxTicksLimit:10, maxRotation:0}},
           y:{grid:{color:GRID}, ticks:{font:{size:9}, color:'#888', callback:v=>'R$'+v}, min:0, suggestedMax: Math.max(...valsR, 1) * 1.2}
         }}
+    });
+  }
+
+  // Extras por dia (mês)
+  const extDia = d.extPorDia || [];
+  const hojeDExt = d.mesAtual === new Date().getMonth() + 1 ? new Date().getDate() : 31;
+  const diasExt = extDia.filter(x => x.dia <= hojeDExt);
+  const totalExtMes = Number(d.extMes) || 0;
+  const pctExt = d.pctExtMes != null ? d.pctExtMes : (d.fatMes > 0 ? Math.round(totalExtMes / d.fatMes * 1000) / 10 : 0);
+  setText2('nk-ext-label', totalExtMes > 0
+    ? R2(totalExtMes) + ' no mês · ' + pctExt + '% do faturamento · ' + (d.nComExtra || 0) + ' loc. com extra'
+    : 'sem extras cobrados neste mês');
+  const extIns = document.getElementById('nk-ext-insight');
+  if (extIns) {
+    if (totalExtMes <= 0) {
+      extIns.style.display = 'none';
+    } else {
+      const comExt = diasExt.filter(x => x.valor > 0);
+      const best = comExt.reduce((a, b) => (b.valor > (a.valor || 0) ? b : a), { dia: 0, valor: 0 });
+      const msgs = [];
+      if (pctExt >= 18) msgs.push('Extras representam ' + pctExt + '% do faturamento — revise aviso de tempo no balcão.');
+      else if (pctExt >= 10) msgs.push('Extras em ' + pctExt + '% do faturamento — margem saudável se o plano base estiver correto.');
+      else msgs.push('Extras em ' + pctExt + '% do faturamento — operação focada em planos.');
+      if (best.valor > 0) msgs.push('Melhor dia: ' + best.dia + '/' + String(d.mesAtual || '').padStart(2, '0') + ' com ' + R2(best.valor) + ' em extras.');
+      extIns.style.display = 'block';
+      extIns.textContent = msgs.join(' ');
+    }
+  }
+  const extCv = document.getElementById('chart-extras-dia');
+  if (extCv && window.Chart) {
+    if (chartExtrasDia) chartExtrasDia.destroy();
+    const valsE = diasExt.map(x => Math.round(x.valor));
+    const mesStrE = String(d.mesAtual || new Date().getMonth() + 1).padStart(2, '0');
+    chartExtrasDia = new Chart(extCv, {
+      type: 'bar',
+      data: {
+        labels: diasExt.map(x => x.dia + '/' + mesStrE),
+        datasets: [{
+          label: 'Extras',
+          data: valsE,
+          backgroundColor: valsE.map(v => v > 0 ? '#CE93D8' : '#F0F0F0'),
+          borderRadius: 3,
+          minBarLength: 3
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: ctx => ctx.parsed.y > 0 ? 'Extras: R$ ' + Math.round(ctx.parsed.y) : 'Sem extra'
+            }
+          }
+        },
+        scales: {
+          x: { grid: { display: false }, ticks: { font: { size: 9 }, maxTicksLimit: 10 } },
+          y: { grid: { color: GRID }, ticks: { callback: v => 'R$' + v }, min: 0 }
+        }
+      }
     });
   }
 
@@ -5437,7 +5551,7 @@ async function carregarCaixa() {
   const dataFmt = `${d}/${m}/${y}`;
 
   // Atualiza KPIs com loading
-  ['cx-total','cx-maq','cx-din','cx-cus','cx-res','cx-nloc'].forEach(id => {
+  ['cx-total','cx-maq','cx-din','cx-cus','cx-res','cx-nloc','cx-ext'].forEach(id => {
     const el = document.getElementById(id); if(el) el.textContent = '...';
   });
 
@@ -5467,6 +5581,8 @@ async function carregarCaixa() {
     const totalMaq = (totPag['PIX']||0) + (totPag['Crédito']||0) + (totPag['Débito']||0);
     const totalDin  = totPag['Dinheiro'] || 0;
     const totalCus  = custos.reduce((s,c) => s + Number(c.valor), 0);
+    const totalExt  = locacoes.reduce((s,l) => s + Number(l.valorAdicional || 0), 0);
+    const nExt      = locacoes.filter(l => Number(l.valorAdicional) > 0).length;
     const cusDin    = custos.filter(c => (c.categoria||'').toLowerCase().includes('dinheiro') || (c.obs||'').toLowerCase().includes('dinheiro')).reduce((s,c) => s+Number(c.valor), 0);
     const saldoDin  = totalDin - cusDin;
     const resultado = totalEnt - totalCus;
@@ -5491,7 +5607,18 @@ async function carregarCaixa() {
     setKpi('cx-din',   totalDin, '#854F0B');
     setKpi('cx-cus',   totalCus, '#A32D2D');
     setHero('cx-res', resultado, null);
+    setKpi('cx-ext', totalExt, '#6A1B9A');
     const nloc = document.getElementById('cx-nloc'); if(nloc) nloc.textContent = locacoes.length;
+    const cxExtIns = document.getElementById('cx-ext-insight');
+    if (cxExtIns) {
+      if (totalExt > 0) {
+        const pct = totalEnt > 0 ? Math.round(totalExt / totalEnt * 1000) / 10 : 0;
+        cxExtIns.style.display = 'block';
+        cxExtIns.textContent = 'Extras do dia: ' + fmtR(totalExt) + ' (' + nExt + ' locações) — ' + pct + '% do faturamento do dia.';
+      } else {
+        cxExtIns.style.display = 'none';
+      }
+    }
     document.getElementById('cx-total-ent').textContent = fmtR(totalEnt);
     document.getElementById('cx-total-sai').textContent = fmtR(totalCus);
     document.getElementById('cx-resultado-final').textContent = fmtR(resultado);
@@ -6400,13 +6527,62 @@ function getDates() {
   }
 }
 
+function renderHistExtChart_(stats) {
+  const wrap = document.getElementById('hist-ext-chart-wrap');
+  const canvas = document.getElementById('chart-hist-ext');
+  const ins = document.getElementById('hist-ext-insight');
+  if (!wrap || !canvas || !window.Chart) return;
+  const arr = (stats && stats.extPorDia) || [];
+  const show = arr.some(x => x.valor > 0) || (stats && stats.totalExt > 0);
+  if (!show || !stats || !stats.n) {
+    wrap.style.display = 'none';
+    if (chartHistExt) { chartHistExt.destroy(); chartHistExt = null; }
+    return;
+  }
+  wrap.style.display = 'block';
+  if (chartHistExt) chartHistExt.destroy();
+  chartHistExt = new Chart(canvas, {
+    type: 'bar',
+    data: {
+      labels: arr.map(x => x.label || String(x.dia)),
+      datasets: [{
+        data: arr.map(x => Math.round(x.valor)),
+        backgroundColor: '#CE93D8',
+        borderRadius: 4
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { display: false }, ticks: { font: { size: 9 }, maxTicksLimit: 12 } },
+        y: { ticks: { callback: v => 'R$' + v }, min: 0 }
+      }
+    }
+  });
+  if (ins) {
+    const pct = stats.pctExt != null ? stats.pctExt : (stats.totalFat > 0 ? Math.round(stats.totalExt / stats.totalFat * 1000) / 10 : 0);
+    const best = arr.reduce((a, b) => (b.valor > (a.valor || 0) ? b : a), { valor: 0, label: '—' });
+    ins.style.display = 'block';
+    ins.textContent = 'Extras = ' + pct + '% do faturamento do período'
+      + (best.valor > 0 ? ' · pico em ' + best.label + ' (' + ('R$ ' + Number(best.valor).toFixed(2).replace('.', ',')) + ')' : '')
+      + (stats.nComExtra ? ' · ' + stats.nComExtra + ' locações com minuto extra.' : '.');
+  }
+}
+
 function renderAnalyticsCards(stats) {
   const cards = document.getElementById('analytics-cards');
   const ranking = document.getElementById('ranking-card');
   const rankRows = document.getElementById('ranking-rows');
   const rankInsight = document.getElementById('rank-insight');
   if(!cards) return;
-  if(!stats||!stats.n) { cards.style.display='none'; if(ranking) ranking.style.display='none'; return; }
+  if(!stats||!stats.n) {
+    cards.style.display='none';
+    if(ranking) ranking.style.display='none';
+    renderHistExtChart_(null);
+    return;
+  }
 
   cards.style.display='grid';
   const R = v=>'R$ '+Number(v).toFixed(2).replace('.',',');
@@ -6415,6 +6591,12 @@ function renderAnalyticsCards(stats) {
   set('ac-n', stats.n);
   set('ac-ticket', R(stats.ticketMedio));
   set('ac-extras', R(stats.totalExt));
+  if (stats.pctExt != null && rankInsight) {
+    const extraLine = stats.pctExt >= 15
+      ? '💡 Extras em ' + stats.pctExt + '% do faturamento — alto; alinhe aviso de tempo com operadores.'
+      : '💡 Extras em ' + stats.pctExt + '% do faturamento do período.';
+    rankInsight.dataset.extraInsight = extraLine;
+  }
 
   // Ranking
   if(!ranking||!rankRows) return;
@@ -6440,12 +6622,13 @@ function renderAnalyticsCards(stats) {
     'Triciclo': '🛺 Triciclos lideram — ótima adesão ao novo veículo!',
     'Pelúcia':  '🧸 Pelúcias lideram — invista em mais pelúcias elétricas.'
   };
-  if(rankInsight) rankInsight.textContent = insights[lider[0]] || '';
+  const extraIns = rankInsight && rankInsight.dataset.extraInsight ? rankInsight.dataset.extraInsight + '<br>' : '';
+  if(rankInsight) rankInsight.innerHTML = extraIns + (insights[lider[0]] || '');
 
   // Planos mais vendidos
   const pp = stats.porPlano||{};
   const topPlanos = Object.entries(pp).sort((a,b)=>b[1].n-a[1].n).slice(0,3);
-  if(topPlanos.length) {
+  if(topPlanos.length && rankInsight) {
     rankInsight.innerHTML += '<br>📊 Top planos: '+topPlanos.map(([pl,d],i)=>
       `${i+1}° ${pl} (${d.n}×)`).join(' · ');
   }
