@@ -3228,7 +3228,8 @@ function loginAdmin_(p) {
   if (!adminPinOk_(p)) return err_('PIN administrativo incorreto', 401);
   return resp_({
     operador: { id: 'ADMIN', nome: 'Administrador', hasPin: true, ativo: true },
-    role: 'admin'
+    role: 'admin',
+    sessaoAtiva: sessaoOperadorPayload_()
   });
 }
 

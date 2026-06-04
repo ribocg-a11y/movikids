@@ -526,6 +526,9 @@
 
     if (isAdminRole && typeof adminLogin === 'function') {
       adminLogin();
+      if (typeof mkAuthRefreshSessaoTurno_ === 'function') {
+        try { await mkAuthRefreshSessaoTurno_(); } catch (e) { /* offline */ }
+      }
     } else {
       showApp();
       if (typeof showPage === 'function') showPage('home');
