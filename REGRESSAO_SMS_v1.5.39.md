@@ -31,11 +31,14 @@ Documento interno `ANALISE_SMS_DELIVERY_MILENA_2026-06-03.md` **pediu** os campo
 3. Ping → `versao:v1.5.39`
 4. Teste um SMS
 
-## v1.5.40 — deviceId Cloud
+## v1.5.40–41 — deviceId Cloud + troca DJVJRL
 
-Script Property opcional: `SMS_GATEWAY_DEVICE_ID` = `nFxvrvSt_v5il_v_T1-ZW` (igual tela Cloud do app).
+Producao (04/06 noite): conta **DJVJRL**, device **`wihWegHr4wXaVJQ1R-GZR`** (validado Delivered via GAS).
 
-Teste API direta (04/06 18:31) com esse deviceId para **98981972432** ainda retornou `GENERIC_FAILURE` no **Samsung a04e** — falha no chip/aparelho para esse destino, nao credencial errada.
+- `wlhWegHr...` (L na tela do app) → API `record not found`
+- Property `auto` ou v1.5.41: omite deviceId e usa `deviceActiveWithin=12`
+
+Samsung **EJQQD0** / `nFxvrvSt...` retirado — ver `TROCA_SMS_GATEWAY_DJVJRL_2026-06-04.md`.
 
 ## Nao desfeito (correto manter)
 
