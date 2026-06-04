@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.32
+// MOVI KIDS — Google Apps Script v1.5.33
+// v1.5.33: trava sessao unica de operador (PropertiesService); ADM ignora trava
 // v1.5.32: autenticacao operadores (PIN 4 digitos), admin PIN 1416, lancamento avulso auditado
 // v1.5.32b: SMS dedup por locacao/tipo, status na linha de envio, campanha bloqueia Failed recente
 // v1.5.0: pagamento (col Q) + observacao (col R)
@@ -233,6 +234,8 @@ function doGet(e) {
       case 'editarOperadorSistema': return editarOperadorSistema_(p);
       case 'excluirOperadorSistema': return excluirOperadorSistema_(p);
       case 'resetarPinOperadorAdmin': return resetarPinOperadorAdmin_(p);
+      case 'liberarSessaoOperador': return liberarSessaoOperador_(p);
+      case 'liberarSessaoOperadorAdmin': return liberarSessaoOperadorAdmin_(p);
       case 'verificarSmsDisparo': return verificarSmsDisparo_(p);
       case 'salvarLancamentoAvulso': return salvarLancamentoAvulso_(p);
       default:
@@ -248,9 +251,9 @@ function ping_() {
   const agora = new Date();
   return resp_({
     status:  'online',
-    versao:  'v1.5.32',
+    versao:  'v1.5.33',
     timestamp: fmtData_(agora) + ' ' + fmtHoraLocal_(agora),
-    sistema: 'MOVI KIDS v1.5.32'
+    sistema: 'MOVI KIDS v1.5.33'
   });
 }
 
@@ -2797,7 +2800,10 @@ function fbDadosSessao_(row, status, rowIndex) {
   };
 }
 
-// ── OPERADORES / AUTH v1.5.32 ─────────────────────────────────
+// ── OPERADORES / AUTH v1.5.33 ─────────────────────────────────
+const MK_SESSAO_OPERADOR_KEY = 'MK_SESSAO_OPERADOR_ATIVA';
+const MK_SESSAO_OPERADOR_TTL_MS = 18 * 60 * 60 * 1000;
+
 const OPERADORES_PADRAO_ = ['Eduarda', 'Milena Nunes'];
 const OPERADORES_RENOMEAR_LEGADO_ = {
   'Operador Balcao 1': 'Eduarda',
@@ -2898,6 +2904,74 @@ function operadorObjFromRow_(data) {
   };
 }
 
+function getSessaoOperadorAtiva_() {
+  const raw = PropertiesService.getScriptProperties().getProperty(MK_SESSAO_OPERADOR_KEY);
+  if (!raw) return null;
+  try {
+    const s = JSON.parse(raw);
+    if (!s || !s.operadorId) return null;
+    if (s.expiresAt && Date.now() > Number(s.expiresAt)) {
+      PropertiesService.getScriptProperties().deleteProperty(MK_SESSAO_OPERADOR_KEY);
+      return null;
+    }
+    return s;
+  } catch (e) {
+    return null;
+  }
+}
+
+function sessaoOperadorPayload_(ativa) {
+  const s = ativa || getSessaoOperadorAtiva_();
+  if (!s) return null;
+  return {
+    operadorId: Number(s.operadorId),
+    nome: String(s.nome || '').trim(),
+    loggedAt: Number(s.loggedAt || 0)
+  };
+}
+
+function liberarSessaoOperadorAtiva_(force) {
+  if (force) {
+    PropertiesService.getScriptProperties().deleteProperty(MK_SESSAO_OPERADOR_KEY);
+    return true;
+  }
+  return false;
+}
+
+function ocupadoPorOutroOperador_(operadorId) {
+  const ativa = getSessaoOperadorAtiva_();
+  if (!ativa) return null;
+  if (Number(ativa.operadorId) === Number(operadorId)) return null;
+  return ativa;
+}
+
+function errOperadorJaLogado_(ativa) {
+  const nome = String(ativa.nome || 'outro operador').trim();
+  return ContentService.createTextOutput(JSON.stringify({
+    ok: false,
+    erro: 'O operador ' + nome + ' ja esta logado no sistema. So o administrador pode entrar enquanto isso.',
+    code: 409,
+    sessaoAtiva: sessaoOperadorPayload_(ativa)
+  })).setMimeType(ContentService.MimeType.JSON);
+}
+
+function registrarSessaoOperadorAtiva_(op) {
+  const s = {
+    operadorId: Number(op.id),
+    nome: String(op.nome || '').trim(),
+    loggedAt: Date.now(),
+    expiresAt: Date.now() + MK_SESSAO_OPERADOR_TTL_MS
+  };
+  PropertiesService.getScriptProperties().setProperty(MK_SESSAO_OPERADOR_KEY, JSON.stringify(s));
+  return s;
+}
+
+function assertPodeLoginOperador_(operadorId) {
+  const outro = ocupadoPorOutroOperador_(operadorId);
+  if (outro) return errOperadorJaLogado_(outro);
+  return null;
+}
+
 function listarOperadoresLogin_() {
   const sh = operadoresSheet_();
   const last = sh.getLastRow();
@@ -2911,7 +2985,7 @@ function listarOperadoresLogin_() {
   }
   operadores.sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'));
   const todosComPin = operadores.length > 0 && operadores.every(o => o.hasPin);
-  return resp_({ operadores, todosComPin, versao: 'v1.5.32' });
+  return resp_({ operadores, todosComPin, sessaoAtiva: sessaoOperadorPayload_(), versao: 'v1.5.33' });
 }
 
 function verificarOperadorLogin_(p) {
@@ -2919,12 +2993,17 @@ function verificarOperadorLogin_(p) {
   if (!found) return err_('Operador nao encontrado', 404);
   const op = operadorObjFromRow_(found.data);
   if (!op.ativo) return err_('Operador inativo', 403);
-  return resp_({ operador: op });
+  const bloqueio = assertPodeLoginOperador_(op.id);
+  if (bloqueio) return bloqueio;
+  return resp_({ operador: op, sessaoAtiva: sessaoOperadorPayload_() });
 }
 
 function definirPinOperador_(p) {
   const found = operadorRowById_(p.operadorId || p.id);
   if (!found) return err_('Operador nao encontrado', 404);
+  const opCheck = operadorObjFromRow_(found.data);
+  const bloqueio = assertPodeLoginOperador_(opCheck.id);
+  if (bloqueio) return bloqueio;
   const pin = pinDigits_(p.pin);
   const pin2 = pinDigits_(p.pinConfirmar || p.pinConfirm);
   if (!validPinFormat_(pin)) return err_('PIN deve ter 4 digitos numericos', 400);
@@ -2936,7 +3015,8 @@ function definirPinOperador_(p) {
   sh.getRange(found.row, 4, 1, 2).setValues([[hash, salt]]);
   sh.getRange(found.row, 7).setValue(fmtData_(new Date()) + ' ' + fmtHoraLocal_(new Date()));
   const op = operadorObjFromRow_(sh.getRange(found.row, 1, 1, 7).getValues()[0]);
-  return resp_({ operador: op, role: 'operador' });
+  registrarSessaoOperadorAtiva_(op);
+  return resp_({ operador: op, role: 'operador', sessaoAtiva: sessaoOperadorPayload_() });
 }
 
 function loginOperador_(p) {
@@ -2944,6 +3024,8 @@ function loginOperador_(p) {
   if (!found) return err_('Operador nao encontrado', 404);
   const op = operadorObjFromRow_(found.data);
   if (!op.ativo) return err_('Operador inativo', 403);
+  const bloqueio = assertPodeLoginOperador_(op.id);
+  if (bloqueio) return bloqueio;
   const hash = String(found.data[3] || '').trim();
   const salt = String(found.data[4] || '').trim();
   if (!hash || !salt) return err_('PIN ainda nao definido', 403);
@@ -2952,7 +3034,26 @@ function loginOperador_(p) {
   if (hashPin_(pin, salt) !== hash) return err_('PIN incorreto', 401);
   const sh = operadoresSheet_();
   sh.getRange(found.row, 7).setValue(fmtData_(new Date()) + ' ' + fmtHoraLocal_(new Date()));
-  return resp_({ operador: op, role: 'operador' });
+  registrarSessaoOperadorAtiva_(op);
+  return resp_({ operador: op, role: 'operador', sessaoAtiva: sessaoOperadorPayload_() });
+}
+
+function liberarSessaoOperador_(p) {
+  const id = Number(p.operadorId || p.id || 0);
+  if (!id) return err_('operadorId obrigatorio', 400);
+  const ativa = getSessaoOperadorAtiva_();
+  if (!ativa) return resp_({ mensagem: 'Nenhuma sessao de operador ativa' });
+  if (Number(ativa.operadorId) !== id && !adminPinOk_(p)) {
+    return errOperadorJaLogado_(ativa);
+  }
+  liberarSessaoOperadorAtiva_(true);
+  return resp_({ mensagem: 'Sessao de operador encerrada' });
+}
+
+function liberarSessaoOperadorAdmin_(p) {
+  if (!adminPinOk_(p)) return err_('Acesso negado', 403);
+  liberarSessaoOperadorAtiva_(true);
+  return resp_({ mensagem: 'Sessao de operador liberada pelo administrador' });
 }
 
 function loginAdmin_(p) {

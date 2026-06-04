@@ -1,10 +1,20 @@
-/* MOVI KIDS — Login operadores v1.6.75 */
+/* MOVI KIDS — Login operadores v1.6.78 */
 (function () {
   const SESSION_KEY = 'mk_auth_session_v1';
   const LEGACY_OPERADOR_KEY = 'mk_operador_atual_v1';
 
   let selectedOp = null;
   let operadoresCache = [];
+  let sessaoAtivaRemota = null;
+  let _loadingOps = false;
+
+  function apiCall(params, timeoutMs) {
+    const fn = typeof window !== 'undefined' && window.api;
+    if (typeof fn !== 'function') {
+      throw new Error('Sistema ainda carregando. Atualize a pagina (Ctrl+F5).');
+    }
+    return fn(params, timeoutMs);
+  }
 
   function getSession() {
     try {
@@ -50,12 +60,62 @@
     return out;
   };
 
-  window.trocarOperador = function trocarOperador() {
+  function isSessaoBloqueadaPara_(operadorId) {
+    if (!sessaoAtivaRemota || !operadorId) return false;
+    return Number(sessaoAtivaRemota.operadorId) !== Number(operadorId);
+  }
+
+  function msgOperadorJaLogado_(nome) {
+    const n = String(nome || 'outro operador').trim();
+    return 'O operador ' + n + ' ja esta logado no sistema. So o administrador pode entrar enquanto isso.';
+  }
+
+  function handleSessaoOcupada_(d, errId) {
+    if (d && d.sessaoAtiva) sessaoAtivaRemota = d.sessaoAtiva;
+    const nome = (d && d.sessaoAtiva && d.sessaoAtiva.nome) ||
+      (d && d.erro && d.erro.replace(/.*operador\s+/i, '').split(' ja')[0]) || 'outro operador';
+    const msg = msgOperadorJaLogado_(nome);
+    showErr(errId || 'mk-login-err', msg);
+    updateSessaoLockUI_();
+    if (typeof alert === 'function') alert(msg);
+  }
+
+  function updateSessaoLockUI_() {
+    const el = document.getElementById('mk-sessao-lock');
+    const btn = document.getElementById('mk-btn-proceed');
+    if (!sessaoAtivaRemota) {
+      if (el) { el.style.display = 'none'; el.textContent = ''; }
+      return;
+    }
+    const msg = msgOperadorJaLogado_(sessaoAtivaRemota.nome);
+    if (el) {
+      el.style.display = 'block';
+      el.textContent = msg;
+    }
+    const bloqueia = !selectedOp || isSessaoBloqueadaPara_(selectedOp.id);
+    if (btn && bloqueia) btn.disabled = true;
+  }
+
+  function applySessaoAtivaFromApi_(d) {
+    sessaoAtivaRemota = (d && d.sessaoAtiva) ? d.sessaoAtiva : null;
+    updateSessaoLockUI_();
+  }
+
+  window.trocarOperador = async function trocarOperador() {
+    const s = getSession();
+    if (s && s.role !== 'admin' && s.id && s.id !== 'ADMIN') {
+      try {
+        await apiCall({ action: 'liberarSessaoOperador', operadorId: s.id });
+      } catch (e) { /* offline */ }
+      sessaoAtivaRemota = null;
+    }
     if (typeof adminLogout === 'function' && window.isAdmin) adminLogout();
     clearSession();
     selectedOp = null;
-    showGate();
+    showGate(true);
     hideApp();
+    showStep('mk-step-select');
+    try { await loadOperadores(); } catch (e) { /* ignore */ }
     toast('Sessao encerrada. Faca login novamente.', 'warning');
   };
 
@@ -144,11 +204,21 @@
     if (inputs[0]) inputs[0].focus();
   }
 
-  function renderOpList() {
+  function renderOpList(loading) {
     const sel = document.getElementById('mk-op-select');
     const btn = document.getElementById('mk-btn-proceed');
     const hint = document.getElementById('mk-op-pin-hint');
-    if (!sel) return;
+    if (!sel) {
+      console.warn('[mk-auth] #mk-op-select ausente — atualize o cache (Ctrl+F5).');
+      return;
+    }
+    if (loading) {
+      sel.innerHTML = '<option value="">Carregando operadores...</option>';
+      sel.disabled = true;
+      if (btn) btn.disabled = true;
+      return;
+    }
+    sel.disabled = false;
     const prev = selectedOp ? String(selectedOp.id) : '';
     sel.innerHTML = '<option value="">Selecione o operador</option>' +
       operadoresCache.map(op =>
@@ -166,7 +236,8 @@
       sel.addEventListener('change', () => {
         const id = sel.value;
         selectedOp = operadoresCache.find(o => String(o.id) === id) || null;
-        if (btn) btn.disabled = !selectedOp;
+        if (btn) btn.disabled = !selectedOp || isSessaoBloqueadaPara_(selectedOp.id);
+        updateSessaoLockUI_();
         if (hint) {
           if (!selectedOp) {
             hint.style.display = 'none';
@@ -182,7 +253,8 @@
       });
     }
     sel.dispatchEvent(new Event('change'));
-    if (btn) btn.disabled = !selectedOp;
+    if (btn) btn.disabled = !selectedOp || (selectedOp && isSessaoBloqueadaPara_(selectedOp.id));
+    updateSessaoLockUI_();
   }
 
   function escapeHtml_(s) {
@@ -190,23 +262,58 @@
   }
 
   async function loadOperadores() {
-    const d = await api({ action: 'listarOperadoresLogin' });
-    if (!d.ok) throw new Error(d.erro || 'Falha ao carregar operadores');
-    operadoresCache = d.operadores || [];
-    renderOpList();
-    return d;
+    if (_loadingOps) return;
+    _loadingOps = true;
+    renderOpList(true);
+    showErr('mk-login-err', '');
+    try {
+      let d = null;
+      const pre = typeof window !== 'undefined' && window.__mkLoginOpsPromise;
+      if (pre && typeof pre.then === 'function') {
+        try { d = await pre; } catch (e) { /* retry below */ }
+      }
+      const tries = d && d.ok ? 0 : 3;
+      for (let i = 0; i < tries; i++) {
+        try {
+          d = await apiCall({ action: 'listarOperadoresLogin' }, 30000);
+          if (d && d.ok) break;
+        } catch (e) {
+          if (i === tries - 1) throw e;
+          await new Promise(r => setTimeout(r, 800 * (i + 1)));
+        }
+      }
+      if (!d || !d.ok) throw new Error((d && d.erro) || 'Falha ao carregar operadores');
+      operadoresCache = Array.isArray(d.operadores) ? d.operadores : [];
+      applySessaoAtivaFromApi_(d);
+      renderOpList(false);
+      if (!operadoresCache.length) {
+        showErr('mk-login-err', 'Nenhum operador ativo. Cadastre em Administracao > Operadores.');
+      }
+      return d;
+    } finally {
+      _loadingOps = false;
+    }
   }
 
   async function onProceed() {
     if (!selectedOp) return;
+    if (isSessaoBloqueadaPara_(selectedOp.id)) {
+      handleSessaoOcupada_({ sessaoAtiva: sessaoAtivaRemota }, 'mk-login-err');
+      return;
+    }
     showErr('mk-login-err', '');
     showErr('mk-create-err', '');
     try {
-      const d = await api({ action: 'verificarOperadorLogin', operadorId: selectedOp.id });
+      const d = await apiCall({ action: 'verificarOperadorLogin', operadorId: selectedOp.id });
       if (!d.ok) {
+        if (d.code === 409 || (d.erro && d.erro.indexOf('ja esta logado') >= 0)) {
+          handleSessaoOcupada_(d, 'mk-login-err');
+          return;
+        }
         showErr('mk-login-err', d.erro || 'Erro');
         return;
       }
+      applySessaoAtivaFromApi_(d);
       const op = d.operador || selectedOp;
       selectedOp = op;
       if (op.hasPin) {
@@ -232,18 +339,25 @@
       return;
     }
     try {
-      const d = await api({
+      const d = await apiCall({
         action: 'definirPinOperador',
         operadorId: selectedOp.id,
         pin,
         pinConfirmar: pin2
       });
       if (!d.ok) {
+        if (d.code === 409 || (d.erro && d.erro.indexOf('ja esta logado') >= 0)) {
+          handleSessaoOcupada_(d, 'mk-create-err');
+          clearPins(createPins1);
+          clearPins(createPins2);
+          return;
+        }
         showErr('mk-create-err', d.erro || 'Erro');
         clearPins(createPins1);
         clearPins(createPins2);
         return;
       }
+      applySessaoAtivaFromApi_(d);
       finishLogin_(d.operador, d.role || 'operador');
     } catch (e) {
       showErr('mk-create-err', e.message || 'Sem conexao');
@@ -257,12 +371,18 @@
       return;
     }
     try {
-      const d = await api({ action: 'loginOperador', operadorId: selectedOp.id, pin });
+      const d = await apiCall({ action: 'loginOperador', operadorId: selectedOp.id, pin });
       if (!d.ok) {
+        if (d.code === 409 || (d.erro && d.erro.indexOf('ja esta logado') >= 0)) {
+          handleSessaoOcupada_(d, 'mk-login-err');
+          clearPins(loginPins);
+          return;
+        }
         showErr('mk-login-err', d.erro || 'PIN incorreto');
         clearPins(loginPins);
         return;
       }
+      applySessaoAtivaFromApi_(d);
       finishLogin_(d.operador, d.role || 'operador');
     } catch (e) {
       showErr('mk-login-err', e.message || 'Sem conexao');
@@ -276,7 +396,7 @@
       return;
     }
     try {
-      const d = await api({ action: 'loginAdmin', adminPin: pin });
+      const d = await apiCall({ action: 'loginAdmin', adminPin: pin });
       if (!d.ok) {
         showErr('mk-admin-err', d.erro || 'PIN incorreto');
         clearPins(adminPins);
@@ -364,16 +484,30 @@
     showStep('mk-step-select');
     try {
       await loadOperadores();
-      if (!operadoresCache.length) {
-        showErr('mk-login-err', 'Nenhum operador cadastrado. Admin deve cadastrar na area administrativa.');
-      }
     } catch (e) {
-      showErr('mk-login-err', (e.message || 'Erro') + ' — publique GAS v1.5.32 no mesmo deploy.');
+      renderOpList(false);
+      showErr('mk-login-err', (e.message || 'Erro') + ' — confira conexao e GAS v1.5.32 no mesmo deploy.');
     }
   };
 
   window.mkAuthAdminPinParams_ = function () {
     return { adminPin: '1416' };
+  };
+
+  window.mkAuthLiberarSessaoOperadorAdmin_ = async function () {
+    try {
+      const d = await apiCall({ action: 'liberarSessaoOperadorAdmin', ...mkAuthAdminPinParams_() });
+      if (!d.ok) {
+        toast(d.erro || 'Erro', 'error');
+        return;
+      }
+      sessaoAtivaRemota = null;
+      updateSessaoLockUI_();
+      toast(d.mensagem || 'Sessao liberada', 'success');
+      await loadOperadores();
+    } catch (e) {
+      toast('Erro de conexao', 'error');
+    }
   };
 
   window.cadastrarOperadorAdmin_ = async function cadastrarOperadorAdmin_(nome) {
@@ -383,7 +517,7 @@
       return;
     }
     try {
-      const d = await api({
+      const d = await apiCall({
         action: 'cadastrarOperadorSistema',
         nome: n,
         ...mkAuthAdminPinParams_()
@@ -415,7 +549,7 @@
   document.addEventListener('click', () => fecharMenusOperador_());
 
   async function opAdminApi_(action, extra) {
-    return api({ action, ...mkAuthAdminPinParams_(), ...extra });
+    return apiCall({ action, ...mkAuthAdminPinParams_(), ...extra });
   }
 
   window.mkOpEditar = async function mkOpEditar(id, nomeAtual) {
@@ -476,7 +610,7 @@
     const el = document.getElementById('mk-admin-ops-list');
     if (!el) return;
     try {
-      const d = await api({ action: 'listarOperadoresAdmin', ...mkAuthAdminPinParams_() });
+      const d = await apiCall({ action: 'listarOperadoresAdmin', ...mkAuthAdminPinParams_() });
       if (!d.ok) {
         el.innerHTML = '<p style="color:var(--txt3)">' + escapeHtml_(d.erro || 'Erro') + '</p>';
         return;

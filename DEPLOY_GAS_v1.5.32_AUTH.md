@@ -29,7 +29,17 @@ Colar no projeto Apps Script (mesmo projeto, **mesmo Deploy ID**):
 | `editarOperadorSistema` | Renomear operador (ADM + `adminPin`) |
 | `excluirOperadorSistema` | Desativa operador (ADM) |
 | `resetarPinOperadorAdmin` | Limpa PIN para recriar no login (ADM) |
+| `liberarSessaoOperador` | Operador encerra sessão global ao usar Sair (`operadorId`) |
+| `liberarSessaoOperadorAdmin` | ADM força liberação da trava de balcão (`adminPin` 1416) |
 | `verificarSmsDisparo` | Consulta se tipo ja foi enviado na janela de dedup |
+
+## v1.5.33 — Sessão única de operador
+
+- Trava global em `PropertiesService` (TTL 18h).
+- `loginOperador` / `definirPinOperador` registram sessão; outro operador recebe HTTP 409.
+- `loginAdmin` **não** usa a trava (ADM entra com outro operador logado).
+- `listarOperadoresLogin` retorna `sessaoAtiva: { operadorId, nome }` para o alerta no frontend.
+- Confirmar `ping` retorna `versao: v1.5.33` após implantar.
 
 ## SMS v1.5.32b (mesmo arquivo GAS)
 
