@@ -22,7 +22,7 @@
 <script>
 // ── CACHE BUSTER — alinhado a mk-version.js / APP_VERSION ──
 (function(){
-  const CURRENT = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.11';
+  const CURRENT = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.13';
   const KEY = 'mk_loaded_version';
   try {
     const stored = localStorage.getItem(KEY);
@@ -592,51 +592,24 @@ nav button .nav-badge{
   text-transform:uppercase;letter-spacing:.08em;padding:14px 13px 5px}
 .sb-admin-section{display:none}
 .sb-admin-section.visible{display:block}
-.sb-footer{padding:12px 10px;border-top:1px solid rgba(255,255,255,.1)}
-.sb-admin-bar{display:flex;justify-content:space-between;align-items:center;
-  padding:8px 13px;background:rgba(255,255,255,.1);border-radius:8px;
-  color:rgba(255,255,255,.8);font-size:12px;font-weight:700;margin-bottom:6px}
-.sb-operator-bar{display:flex;justify-content:space-between;align-items:center;
-  padding:8px 13px;background:rgba(255,255,255,.08);border-radius:8px;
-  color:rgba(255,255,255,.78);font-size:12px;font-weight:700;margin-bottom:6px}
-.sb-operator-name{max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.mk-turno-strip{
-  display:flex;align-items:center;flex-wrap:wrap;gap:8px 12px;
-  padding:8px 14px;margin:0 0 10px;
-  background:linear-gradient(90deg,var(--blue-lt),#fff);
-  border:2px solid var(--blue);border-radius:12px;
-  font-size:13px;font-weight:800;color:var(--blue-dk);
-  box-shadow:0 2px 8px rgba(21,101,192,.12);
+.sb-footer{padding:10px;border-top:1px solid rgba(255,255,255,.1)}
+.sb-sessao-card{
+  background:rgba(0,0,0,.22);border:1px solid rgba(255,255,255,.12);
+  border-radius:10px;padding:10px 11px;margin-bottom:8px;
 }
-.mk-turno-strip[hidden]{display:none!important}
-.mk-turno-strip-sb{
-  margin:0 10px 10px;flex-direction:column;align-items:flex-start;
-  background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.35);color:#fff;
+.sb-sessao-card[hidden]{display:none!important}
+.sb-sessao-row{display:grid;grid-template-columns:auto 1fr;gap:2px 8px;align-items:baseline;margin-bottom:8px}
+.sb-sessao-row:last-of-type{margin-bottom:10px}
+.sb-sessao-lbl{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:rgba(255,255,255,.45);grid-column:1}
+.sb-sessao-val{grid-column:2;font-size:13px;font-weight:900;color:#FFD54F;line-height:1.2}
+.sb-sessao-meta{grid-column:2;font-size:10px;font-weight:700;color:rgba(255,255,255,.55)}
+.sb-sessao-sair{
+  width:100%;border:1px solid rgba(255,255,255,.28);background:rgba(255,255,255,.08);
+  color:#fff;border-radius:8px;padding:8px;font-size:12px;font-weight:800;cursor:pointer;
 }
-.mk-turno-strip-sb .mk-turno-name{color:#FFD54F}
-.mk-turno-strip-sb .mk-turno-sub{color:rgba(255,255,255,.85)}
-.mk-turno-strip-sb .mk-turno-sb-lbl{font-size:11px;opacity:.9}
-.mk-turno-strip-sb .mk-turno-sb-body{width:100%}
-@media(min-width:768px){
-  #mk-turno-strip{display:none!important}
-  #mk-turno-strip-sb:not([hidden]){display:flex!important}
-}
-@media(max-width:767px){
-  #mk-turno-strip-sb{display:none!important}
-}
-.mk-turno-strip .mk-turno-name{font-size:15px;font-weight:900;color:var(--blue)}
-.mk-turno-role{
-  font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.04em;
-  padding:3px 8px;border-radius:99px;background:var(--blue);color:#fff;
-}
-.mk-turno-role.admin{background:#5c3d8f}
-.mk-turno-sub{width:100%;font-size:11px;font-weight:700;color:var(--txt2);line-height:1.35}
-.hd-operator-chip{
-  font-size:11px;font-weight:900;color:var(--blue-dk);
-  background:var(--blue-lt);border:1px solid var(--blue);
-  padding:4px 10px;border-radius:99px;max-width:42vw;
-  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
-}
+.sb-sessao-sair:hover{background:rgba(255,255,255,.16)}
+.sb-sessao-empty{font-size:11px;color:rgba(255,255,255,.5);font-weight:700;padding:4px 0 8px}
+.hd-turno-mini{font-size:10px;font-weight:800;color:var(--blue-dk);max-width:38vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .sb-operator-btn{border:1.5px solid rgba(255,255,255,.35);background:transparent;
   color:#fff;font-family:'Nunito',sans-serif;font-weight:700;font-size:11px;
   border-radius:6px;padding:3px 9px;cursor:pointer}
@@ -1544,15 +1517,7 @@ nav button .nav-badge{
   <!-- ══ SIDEBAR (desktop only) ══ -->
   <aside id="sidebar">
     <div class="sb-logo">🚗 Movi <span>Kids</span>
-      <div class="sb-status"><span id="sb-dot" class="dot-online"></span><span id="sb-txt">Online</span><span id="sb-version" style="font-size:10px;opacity:.85;margin-left:5px;color:rgba(255,255,255,.7);font-family:monospace">v1.7.12</span></div>
-    </div>
-    <div id="mk-turno-strip-sb" class="mk-turno-strip mk-turno-strip-sb" role="status" aria-live="polite" hidden>
-      <span class="mk-turno-sb-icon" id="mk-turno-icon-sb" aria-hidden="true">👤</span>
-      <div class="mk-turno-sb-body">
-        <div><span class="mk-turno-sb-lbl">Turno:</span> <strong class="mk-turno-name" id="mk-turno-name-sb">—</strong></div>
-        <span class="mk-turno-role" id="mk-turno-role-sb">Operador</span>
-        <div class="mk-turno-sub" id="mk-turno-sub-sb"></div>
-      </div>
+      <div class="sb-status"><span id="sb-dot" class="dot-online"></span><span id="sb-txt">Online</span><span id="sb-version" style="font-size:10px;opacity:.85;margin-left:5px;color:rgba(255,255,255,.7);font-family:monospace">v1.7.13</span></div>
     </div>
     <div class="sb-nav" id="sb-nav">
       <button class="sb-btn active" id="sbn-home" onclick="showPage('home')"><span class="sb-icon">🏠</span>Home</button>
@@ -1577,13 +1542,19 @@ nav button .nav-badge{
       <button class="sb-btn" id="sbn-sys" onclick="irAdmin('sistema')"><span class="sb-icon">🔧</span>Sistema</button>
     </div>
     <div class="sb-footer">
-      <div class="sb-operator-bar" id="sb-operator-bar">
-        <span>Operador: <span class="sb-operator-name" id="sb-operator-name">Nao definido</span></span>
-        <button class="sb-operator-btn" onclick="trocarOperador()">Sair</button>
-      </div>
-      <div class="sb-admin-bar" id="sb-admin-bar" style="display:none">
-        <span>🔐 Administrador</span>
-        <button class="sb-sair" onclick="adminLogout()">Sair admin</button>
+      <div id="sb-sessao-card" class="sb-sessao-card" role="status" aria-live="polite" hidden>
+        <div class="sb-sessao-row" id="sb-row-balcao" hidden>
+          <span class="sb-sessao-lbl">Balcao</span>
+          <span class="sb-sessao-val" id="sb-balcao-nome">—</span>
+          <span class="sb-sessao-meta" id="sb-balcao-horas">—</span>
+        </div>
+        <div class="sb-sessao-row" id="sb-row-tablet" hidden>
+          <span class="sb-sessao-lbl">Tablet</span>
+          <span class="sb-sessao-val" id="sb-tablet-nome">—</span>
+          <span class="sb-sessao-meta" id="sb-tablet-horas">—</span>
+        </div>
+        <p class="sb-sessao-empty" id="sb-sessao-empty" hidden>Nenhum turno no balcao</p>
+        <button type="button" class="sb-sessao-sair" id="sb-sessao-sair-btn" onclick="sbSairSessaoClick_()">Sair</button>
       </div>
       <button class="sb-btn sb-gerenciar" id="sb-gerenciar-btn" onclick="abrirAdmin()"><span class="sb-icon">🔐</span>Gerenciar</button>
     </div>
@@ -1597,21 +1568,13 @@ nav button .nav-badge{
     <div class="hd-row">
       <div class="logo">🚗 Movi <span>Kids</span></div>
       <div class="hd-status">
-        <span id="hd-operator-chip" class="hd-operator-chip" hidden title="Operador logado">—</span>
+        <span id="hd-turno-mini" class="hd-turno-mini" hidden title="Sessao">—</span>
         <div id="status-dot" class="dot-online"></div>
         <span id="status-txt">Online</span>
-        <span id="app-version" style="font-size:10px;opacity:.85;margin-left:4px;font-family:monospace">v1.7.12</span>
+        <span id="app-version" style="font-size:10px;opacity:.85;margin-left:4px;font-family:monospace">v1.7.13</span>
       </div>
     </div>
   </header>
-
-  <div id="mk-turno-strip" class="mk-turno-strip" role="status" aria-live="polite" hidden>
-    <span id="mk-turno-icon" aria-hidden="true">👤</span>
-    <span>Turno:</span>
-    <strong class="mk-turno-name" id="mk-turno-name">—</strong>
-    <span class="mk-turno-role" id="mk-turno-role">Operador</span>
-    <span class="mk-turno-sub" id="mk-turno-sub"></span>
-  </div>
 
   <!-- Nav -->
   <nav>
@@ -2673,7 +2636,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.11';
+const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.13';
 const WEBAPP_URL = (typeof window !== 'undefined' && window.MK_GAS_EXEC_URL) ? window.MK_GAS_EXEC_URL
   : 'https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec';
 const WEBAPP_URL_DEAD_PREFIX = 'AKfycbzc';
@@ -2736,65 +2699,81 @@ let statsHoje   = { fat: 0, n: 0 };
 let relacionamentoCache = [];
 let relEditCurrent = null;
 
+function fmtHoraTurno_(ms) {
+  const n = Number(ms || 0);
+  if (!n) return '';
+  try {
+    return new Date(n).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  } catch (e) {
+    return '';
+  }
+}
+
+function sbSairSessaoClick_() {
+  const isAdm = (typeof mkAuthIsAdmin === 'function' && mkAuthIsAdmin()) || !!window.isAdmin;
+  if (isAdm && typeof adminLogout === 'function') {
+    adminLogout();
+    return;
+  }
+  if (typeof trocarOperador === 'function') trocarOperador();
+}
+
 function atualizarOperadorUI_(sessaoServidor) {
   const getSess = typeof mkAuthGetSession === 'function' ? mkAuthGetSession : null;
   const s = getSess ? getSess() : null;
-  const nomeLocal = typeof operadorAtual_ === 'function' ? operadorAtual_() : '';
   const isAdm = (typeof mkAuthIsAdmin === 'function' && mkAuthIsAdmin()) || !!window.isAdmin;
-  const role = (s && s.role) || (isAdm ? 'admin' : 'operador');
-  const nome = nomeLocal || (isAdm ? 'Administrador' : '');
-  const logado = !!(s && s.nome) || isAdm;
-
+  const logadoTablet = !!(s && s.nome);
   const srv = sessaoServidor ||
     (typeof mkAuthGetSessaoServidor_ === 'function' ? mkAuthGetSessaoServidor_() : null);
 
-  const setText = (id, text) => {
+  const card = document.getElementById('sb-sessao-card');
+  const rowBalcao = document.getElementById('sb-row-balcao');
+  const rowTablet = document.getElementById('sb-row-tablet');
+  const empty = document.getElementById('sb-sessao-empty');
+  const sairBtn = document.getElementById('sb-sessao-sair-btn');
+  const hdMini = document.getElementById('hd-turno-mini');
+
+  const set = (id, text) => {
     const el = document.getElementById(id);
     if (el) el.textContent = text;
   };
 
-  setText('sb-operator-name', nome || 'Nao definido');
-  ['mk-turno-name', 'mk-turno-name-sb'].forEach(id => setText(id, nome || '—'));
+  const temBalcao = !!(srv && srv.nome);
+  const temTablet = logadoTablet;
 
-  let sub = '';
-  if (srv && srv.nome) {
-    const mesmo = nome && String(srv.nome).trim() === String(nome).trim();
-    if (mesmo) sub = 'Sessao registrada no servidor (este turno).';
-    else sub = 'Sessao no servidor: ' + srv.nome + (nome ? ' — voce: ' + nome : '') + '.';
-  } else if (logado && !isAdm) {
-    sub = 'Acoes deste tablet sao auditadas com este operador.';
-  } else if (isAdm) {
-    sub = 'Modo administrador — PIN 1416.';
+  if (card) card.hidden = !temBalcao && !temTablet;
+  if (rowBalcao) rowBalcao.hidden = !temBalcao;
+  if (empty) empty.hidden = temBalcao || !logadoTablet;
+
+  if (temBalcao) {
+    set('sb-balcao-nome', srv.nome);
+    const ent = fmtHoraTurno_(srv.loggedAt);
+    set('sb-balcao-horas', ent ? ('Entrou ' + ent + (srv.loggedOutAt ? ' · Saiu ' + fmtHoraTurno_(srv.loggedOutAt) : '')) : '');
   }
 
-  ['mk-turno-role', 'mk-turno-role-sb'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) {
-      el.textContent = isAdm ? 'Administrador' : 'Operador';
-      el.classList.toggle('admin', isAdm);
-    }
-  });
-  ['mk-turno-icon', 'mk-turno-icon-sb'].forEach(id => setText(id, isAdm ? '🔐' : '👤'));
-  ['mk-turno-sub', 'mk-turno-sub-sb'].forEach(id => setText(id, sub));
+  if (temTablet) {
+    const showTabletRow = isAdm || !temBalcao ||
+      String(s.nome).trim() !== String(srv && srv.nome ? srv.nome : '').trim();
+    if (rowTablet) rowTablet.hidden = !showTabletRow;
+    set('sb-tablet-nome', isAdm ? 'Administrador' : s.nome);
+    const entT = fmtHoraTurno_(s.loggedAt);
+    set('sb-tablet-horas', entT ? ('Entrou ' + entT + ' neste aparelho') : 'Neste aparelho');
+    if (sairBtn) sairBtn.textContent = isAdm ? 'Sair do admin' : 'Encerrar turno';
+  } else if (rowTablet) {
+    rowTablet.hidden = true;
+  }
 
-  const chip = document.getElementById('hd-operator-chip');
-  if (chip) {
-    if (logado && nome) {
-      chip.hidden = false;
-      chip.textContent = (isAdm ? 'ADM: ' : '') + nome;
+  if (hdMini) {
+    if (temBalcao) {
+      hdMini.hidden = false;
+      hdMini.textContent = 'Balcao: ' + srv.nome;
+    } else if (temTablet && isAdm) {
+      hdMini.hidden = false;
+      hdMini.textContent = 'Admin';
     } else {
-      chip.hidden = true;
-      chip.textContent = '';
+      hdMini.hidden = true;
     }
   }
-
-  const strip = document.getElementById('mk-turno-strip');
-  const stripSb = document.getElementById('mk-turno-strip-sb');
-  if (strip) strip.hidden = !logado;
-  if (stripSb) stripSb.hidden = !logado;
-
-  const opBar = document.getElementById('sb-operator-bar');
-  if (opBar) opBar.style.display = logado ? 'flex' : 'none';
 }
 window.atualizarOperadorUI_ = atualizarOperadorUI_;
 
@@ -6354,20 +6333,16 @@ function syncSidebarStatus(online) {
 // ════════════════════════════════════════════════════════════
 function showAdminSidebar() {
   const sec = document.getElementById('sb-admin-section');
-  const bar = document.getElementById('sb-admin-bar');
   const btn = document.getElementById('sb-gerenciar-btn');
-  if(sec) sec.classList.add('visible');
-  if(bar) bar.style.display='flex';
-  if(btn) btn.style.display='none';
+  if (sec) sec.classList.add('visible');
+  if (btn) btn.style.display = 'none';
 }
 
 function hideAdminSidebar() {
   const sec = document.getElementById('sb-admin-section');
-  const bar = document.getElementById('sb-admin-bar');
   const btn = document.getElementById('sb-gerenciar-btn');
-  if(sec) sec.classList.remove('visible');
-  if(bar) bar.style.display='none';
-  if(btn) btn.style.display='';
+  if (sec) sec.classList.remove('visible');
+  if (btn) btn.style.display = '';
 }
 
 // ═══════════════════════════════════════════════════════════

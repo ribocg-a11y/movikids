@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.41
+// MOVI KIDS — Google Apps Script v1.5.42
+// v1.5.42: auditoria AUD_TURNO login/logout operador balcao
 // v1.5.41: gateway producao DJVJRL + deviceId wihWegHr...; property "auto" omite deviceId
 // v1.5.40: deviceId explicito no Cloud + deviceActiveWithin=12 na URL
 // v1.5.39: SMS gateway payload minimo (como v1.5.28 que entregava) — sem ttl/priority/withDeliveryReport global
@@ -265,9 +266,9 @@ function ping_() {
   const agora = new Date();
   return resp_({
     status:  'online',
-    versao:  'v1.5.41',
+    versao:  'v1.5.42',
     timestamp: fmtData_(agora) + ' ' + fmtHoraLocal_(agora),
-    sistema: 'MOVI KIDS v1.5.41'
+    sistema: 'MOVI KIDS v1.5.42'
   });
 }
 
@@ -3060,8 +3061,35 @@ function sessaoOperadorPayload_(ativa) {
   };
 }
 
-function liberarSessaoOperadorAtiva_(force) {
+function registrarAuditoriaTurno_(acao, sessao, detalhe) {
+  try {
+    const sh = sh_getOrCreate_('AUD_TURNO');
+    if (sh.getLastRow() < 1) {
+      sh.getRange(1, 1, 1, 7).setValues([['DataHora', 'Acao', 'OperadorId', 'Nome', 'Entrada', 'Saida', 'Detalhe']]);
+      sh.getRange(1, 1, 1, 7).setFontWeight('bold');
+    }
+    const agora = new Date();
+    const dh = fmtData_(agora) + ' ' + fmtHoraLocal_(agora);
+    const entrada = sessao && sessao.loggedAt ? fmtData_(new Date(Number(sessao.loggedAt))) + ' ' + fmtHoraLocal_(new Date(Number(sessao.loggedAt))) : '';
+    const saida = (acao === 'logout' || acao === 'logout_admin') ? dh : '';
+    sh.appendRow([
+      dh,
+      String(acao || ''),
+      sessao ? Number(sessao.operadorId) : '',
+      sessao ? String(sessao.nome || '') : '',
+      entrada,
+      saida,
+      String(detalhe || '')
+    ]);
+  } catch (e) {
+    Logger.log('registrarAuditoriaTurno_: ' + e.message);
+  }
+}
+
+function liberarSessaoOperadorAtiva_(force, detalhe) {
   if (force) {
+    const ativa = getSessaoOperadorAtiva_();
+    if (ativa) registrarAuditoriaTurno_(detalhe || 'logout', ativa, detalhe || '');
     PropertiesService.getScriptProperties().deleteProperty(MK_SESSAO_OPERADOR_KEY);
     return true;
   }
@@ -3093,6 +3121,7 @@ function registrarSessaoOperadorAtiva_(op) {
     expiresAt: Date.now() + MK_SESSAO_OPERADOR_TTL_MS
   };
   PropertiesService.getScriptProperties().setProperty(MK_SESSAO_OPERADOR_KEY, JSON.stringify(s));
+  registrarAuditoriaTurno_('login', s, 'Login balcao');
   return s;
 }
 
@@ -3178,20 +3207,20 @@ function liberarSessaoOperador_(p) {
   const ativa = getSessaoOperadorAtiva_();
   if (!ativa) return resp_({ mensagem: 'Nenhuma sessao de operador ativa', sessaoAtiva: null });
   if (adminPinOk_(p)) {
-    liberarSessaoOperadorAtiva_(true);
+    liberarSessaoOperadorAtiva_(true, 'logout_admin');
     return resp_({ mensagem: 'Sessao liberada pelo administrador', sessaoAtiva: null });
   }
   if (!id) return err_('operadorId obrigatorio', 400);
   if (Number(ativa.operadorId) !== id) {
     return errOperadorJaLogado_(ativa);
   }
-  liberarSessaoOperadorAtiva_(true);
+  liberarSessaoOperadorAtiva_(true, 'logout');
   return resp_({ mensagem: 'Sessao de operador encerrada', sessaoAtiva: null });
 }
 
 function liberarSessaoOperadorAdmin_(p) {
   if (!adminPinOk_(p)) return err_('Acesso negado — PIN admin 1416', 403);
-  liberarSessaoOperadorAtiva_(true);
+  liberarSessaoOperadorAtiva_(true, 'logout_admin');
   return resp_({ mensagem: 'Sessao do balcao liberada. Qualquer operador pode entrar.', sessaoAtiva: null });
 }
 

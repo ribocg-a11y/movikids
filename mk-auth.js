@@ -1,4 +1,4 @@
-/* MOVI KIDS — Login operadores v1.7.12 */
+/* MOVI KIDS — Login operadores v1.7.13 */
 (function () {
   const SESSION_KEY = 'mk_auth_session_v1';
   const LEGACY_OPERADOR_KEY = 'mk_operador_atual_v1';
@@ -432,7 +432,7 @@
         return;
       }
       applySessaoAtivaFromApi_(d);
-      await finishLogin_(d.operador, d.role || 'operador');
+      await finishLogin_(d.operador, d.role || 'operador', d);
     } catch (e) {
       showErr('mk-create-err', e.message || 'Sem conexao');
     }
@@ -465,7 +465,7 @@
         return;
       }
       applySessaoAtivaFromApi_(d);
-      await finishLogin_(d.operador, d.role || 'operador');
+      await finishLogin_(d.operador, d.role || 'operador', d);
     } catch (e) {
       showErr('mk-login-pin-err', e.message || 'Sem conexao');
       clearPins(loginPins);
@@ -492,7 +492,8 @@
         clearPins(adminPins);
         return;
       }
-      await finishLogin_(d.operador, 'admin');
+      applySessaoAtivaFromApi_(d);
+      await finishLogin_(d.operador, 'admin', d);
     } catch (e) {
       showErr('mk-admin-err', e.message || 'Sem conexao com o servidor');
       clearPins(adminPins);
@@ -502,13 +503,15 @@
     }
   }
 
-  async function finishLogin_(operador, role) {
+  async function finishLogin_(operador, role, sessaoExtra) {
     const isAdminRole = role === 'admin';
+    const srvAt = sessaoExtra && sessaoExtra.sessaoAtiva ? sessaoExtra.sessaoAtiva : null;
+    const loggedAt = (isAdminRole ? Date.now() : (srvAt && srvAt.loggedAt) || Date.now());
     setSession({
       id: operador.id,
       nome: operador.nome,
       role: role || 'operador',
-      loggedAt: Date.now()
+      loggedAt: loggedAt
     });
     const splash = document.getElementById('splash');
     if (splash) {
