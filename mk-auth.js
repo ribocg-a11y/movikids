@@ -1,4 +1,4 @@
-/* MOVI KIDS — Login operadores v1.7.4 */
+/* MOVI KIDS — Login operadores v1.7.5 */
 (function () {
   const SESSION_KEY = 'mk_auth_session_v1';
   const LEGACY_OPERADOR_KEY = 'mk_operador_atual_v1';
@@ -45,6 +45,16 @@
   window.mkAuthIsAdmin = () => {
     const s = getSession();
     return !!(s && s.role === 'admin');
+  };
+  /** ADM pode encerrar/fechar alerta sem SMS de extra (emergencia operacional). */
+  window.mkAdminIgnoraSmsObrigatorio_ = () => {
+    if (mkAuthIsAdmin()) return true;
+    try {
+      const leg = sessionStorage.getItem('mk_auth_session');
+      const s = leg ? JSON.parse(leg) : null;
+      if (s && s.role === 'admin') return true;
+    } catch (e) {}
+    return !!(typeof window !== 'undefined' && window.isAdmin);
   };
   window.mkAuthIsLoggedIn = () => !!getSession();
 

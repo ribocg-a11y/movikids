@@ -77,7 +77,7 @@ Antes de considerar fechado:
 - Celular: botao abre WhatsApp/WhatsApp Business ou permite envio.
 - Tablet: botao abre WhatsApp/WhatsApp Business ou deixa mensagem copiada com instrucao clara.
 - PWA/app instalado: nao pode perder a tela operacional sem fallback.
-- Mensagem obrigatoria de tempo extra: nao pode ser pulada quando o tempo estiver esgotado.
+- Mensagem obrigatoria de tempo extra: nao pode ser pulada quando o tempo estiver esgotado (**exceto administrador**, v1.7.5+).
 
 ## Regra 4 - Cache E Atualizacao Automatica
 
@@ -146,3 +146,11 @@ Toda resposta depois de publicar deve conter:
 - proximo passo.
 
 Se algum desses itens faltar, a entrega nao esta completa.
+
+## Regra 8 - GAS: proibido `clasp deploy`
+
+Em 04/06/2026 o comando **`clasp deploy`** (feito pelo agente Cursor) quebrou a URL Web antiga e gerou **404 / Failed to fetch** + cobrança de “tempo extra” fantasma no caixa.
+
+- **Nunca** usar `clasp deploy` na implantacao Web.
+- **Sempre:** `.\scripts\deploy-gas.ps1` (apenas `clasp push`) + **Implantar → Gerenciar implantacoes → Editar Web `AKfycbwakQ...` → Nova versao**.
+- Correcao financeira de locacao encerrada: `corrigirFinanceiroLocacaoAdmin` (ver `INCIDENTE_DEPLOY_E_EXTRAS_2026-06-04.md`).

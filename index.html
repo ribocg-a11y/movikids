@@ -22,7 +22,7 @@
 <script>
 // ── CACHE BUSTER — alinhado a mk-version.js / APP_VERSION ──
 (function(){
-  const CURRENT = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.4';
+  const CURRENT = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.5';
   const KEY = 'mk_loaded_version';
   try {
     if (localStorage.getItem(KEY) !== CURRENT) {
@@ -2571,7 +2571,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.4';
+const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.5';
 const WEBAPP_URL = (typeof window !== 'undefined' && window.MK_GAS_EXEC_URL) ? window.MK_GAS_EXEC_URL
   : 'https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec';
 const WEBAPP_URL_DEAD_PREFIX = 'AKfycbzc';
@@ -3993,7 +3993,8 @@ function pedirEncerrar(rowIndex) {
   if (!encSession) return;
 
   const rem           = calcRemaining(encSession);
-  if (rem <= 0 && !extraWaFoiEnviado_(encSession)) {
+  const admIgnoraSms  = typeof mkAdminIgnoraSmsObrigatorio_ === 'function' && mkAdminIgnoraSmsObrigatorio_();
+  if (rem <= 0 && !extraWaFoiEnviado_(encSession) && !admIgnoraSms) {
     alertSession = encSession;
     showAlertModal(encSession, true);
     toast('Envie o aviso de minutos extras antes de encerrar.', 'error');
@@ -4034,9 +4035,11 @@ async function confirmarEncerrar() {
   btn.textContent = '⏳ Encerrando...'; btn.disabled = true;
 
   try {
+    const admEnc = typeof mkAdminIgnoraSmsObrigatorio_ === 'function' && mkAdminIgnoraSmsObrigatorio_();
     const d = await api({
       action:    'encerrarLocacao',
       ...operadorApiParams_(),
+      ...(admEnc ? { ignorarSmsObrigatorio: true } : {}),
       rowIndex:  encSession.rowIndex,
       minUsados: encSession._minUsados
     });
@@ -4126,13 +4129,17 @@ function triggerAlertExpired(s) {
 
 function showAlertModal(s, expired) {
   const modal = document.getElementById('alert-modal');
-  modal.className = 'modal-overlay alert-modal' + (expired ? ' danger show' : ' show');
-  modal.dataset.extraWaSent = expired && extraWaFoiEnviado_(s) ? '1' : '0';
+  const admIgnoraSms = typeof mkAdminIgnoraSmsObrigatorio_ === 'function' && mkAdminIgnoraSmsObrigatorio_();
+  const smsExtraObrigatorio = expired && !admIgnoraSms;
+  modal.className = 'modal-overlay alert-modal' + (smsExtraObrigatorio ? ' danger show' : ' show');
+  modal.dataset.extraWaSent = (expired && extraWaFoiEnviado_(s)) || admIgnoraSms ? '1' : '0';
 
   document.getElementById('alert-icon').textContent  = expired ? '🔴' : '⏰';
   document.getElementById('alert-title').textContent = expired ? 'Tempo esgotado!' : 'Faltam 5 minutos!';
   document.getElementById('alert-sub').textContent   = expired
-    ? 'Envie a mensagem ao responsável informando que minutos extras serão cobrados.'
+    ? (admIgnoraSms
+      ? 'Administrador: voce pode encerrar sem enviar SMS (use em falha de rede ou emergencia).'
+      : 'Envie a mensagem ao responsável informando que minutos extras serão cobrados.')
     : 'Avise ' + s.responsavel + ' que o tempo de ' + s.crianca + ' está acabando.';
 
   const vPlano = PRECOS[s.tipo]?.[s.plano]?.v || s.valorPlano;
@@ -4143,26 +4150,43 @@ function showAlertModal(s, expired) {
     '<div class="modal-info-row"><span>Responsável</span><span>' + s.responsavel + '</span></div>' +
     '<div class="modal-info-row"><span>Extra/min</span><span>R$ ' + s.adicionalPorMin + '</span></div>';
 
-  document.getElementById('btn-enc-alert').className = 'btn btn-encerrar' + (expired ? ' danger' : '');
+  const btnEncAlert = document.getElementById('btn-enc-alert');
+  if (btnEncAlert) {
+    btnEncAlert.className = 'btn btn-encerrar' + (smsExtraObrigatorio ? ' danger' : '');
+    btnEncAlert.textContent = admIgnoraSms && expired ? '✓ Encerrar sem SMS (ADM)' : '✓ Encerrar locação';
+  }
 
-  // SMS de extra obrigatorio: esconde botao pular
   const btnPular = document.getElementById('btn-pular-alerta');
   const btnWa    = document.getElementById('btn-wa');
   if (expired) {
-    if (btnPular) btnPular.style.display = 'none';
+    if (btnPular) {
+      btnPular.style.display = admIgnoraSms ? '' : 'none';
+      btnPular.textContent = admIgnoraSms
+        ? 'Continuar sem SMS (ADM)'
+        : 'Pular mensagem e continuar monitorando';
+    }
     if (btnWa) {
-      btnWa.textContent = 'Enviar SMS de cobranca (obrigatorio)';
+      btnWa.textContent = admIgnoraSms
+        ? 'Enviar SMS de cobranca (opcional)'
+        : 'Enviar SMS de cobranca (obrigatorio)';
       btnWa.onclick = async function() {
-        if (await waTempoEsgotado(s) === false) return;
+        if (await waTempoEsgotado(s) === false) {
+          if (!admIgnoraSms) return;
+          toast('SMS indisponivel; voce ainda pode encerrar como ADM.', 'warning');
+          return;
+        }
         marcarExtraWaEnviado_(s);
         modal.dataset.extraWaSent = '1';
         modal.classList.remove('danger');
-        fecharAlerta();
+        if (!admIgnoraSms) fecharAlerta();
         toast('Aviso de minutos extras acionado.', 'success');
       };
     }
   } else {
-    if (btnPular) btnPular.style.display = '';
+    if (btnPular) {
+      btnPular.style.display = '';
+      btnPular.textContent = 'Pular mensagem e continuar monitorando';
+    }
     if (btnWa) {
       btnWa.textContent = 'Enviar SMS ao responsável';
       btnWa.onclick = function() { abrirWhatsApp(); };
@@ -4171,9 +4195,9 @@ function showAlertModal(s, expired) {
 }
 
 function fecharAlerta() {
-  // Bloqueia fechar se expirado — operador deve enviar SMS de extra primeiro
   const modal = document.getElementById('alert-modal');
-  if (modal.classList.contains('danger') && modal.dataset.extraWaSent !== '1') {
+  const admIgnoraSms = typeof mkAdminIgnoraSmsObrigatorio_ === 'function' && mkAdminIgnoraSmsObrigatorio_();
+  if (!admIgnoraSms && modal.classList.contains('danger') && modal.dataset.extraWaSent !== '1') {
     toast('Envie o SMS de cobranca antes de fechar!', 'error');
     return;
   }
@@ -4563,7 +4587,17 @@ async function abrirWaMsg(s) {
 }
 
 function encerrarDireto() {
-  if (alertSession) pedirEncerrar(alertSession.rowIndex);
+  if (!alertSession) return;
+  const rowIndex = alertSession.rowIndex;
+  const admIgnoraSms = typeof mkAdminIgnoraSmsObrigatorio_ === 'function' && mkAdminIgnoraSmsObrigatorio_();
+  if (admIgnoraSms) {
+    const modal = document.getElementById('alert-modal');
+    if (modal) {
+      modal.classList.remove('danger');
+      modal.dataset.extraWaSent = '1';
+    }
+  }
+  pedirEncerrar(rowIndex);
   fecharAlerta();
 }
 
@@ -5178,10 +5212,11 @@ function verificarPin() {
 function adminLogin() {
   isAdmin = true;
   window.isAdmin = true;
+  const admSess = { id: 'ADMIN', nome: 'Administrador', role: 'admin', hasPin: true, ativo: true };
   try {
-    sessionStorage.setItem('mk_auth_session', JSON.stringify({
-      id: 'ADMIN', nome: 'Administrador', role: 'admin', hasPin: true, ativo: true
-    }));
+    sessionStorage.setItem('mk_auth_session_v1', JSON.stringify(admSess));
+    sessionStorage.setItem('mk_auth_session', JSON.stringify(admSess));
+    if (typeof window.mkPersistAuthSession === 'function') window.mkPersistAuthSession();
   } catch (e) { /* ignore */ }
   const app = document.getElementById('app');
   if (app) app.style.display = 'flex';

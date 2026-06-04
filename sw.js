@@ -1,6 +1,6 @@
-// MOVI KIDS - Service Worker 1.7.4
+// MOVI KIDS - Service Worker 1.7.5
 
-const SW_VERSION = '1.7.4';
+const SW_VERSION = '1.7.5';
 
 const NETWORK_FIRST = [
   'script.google.com',

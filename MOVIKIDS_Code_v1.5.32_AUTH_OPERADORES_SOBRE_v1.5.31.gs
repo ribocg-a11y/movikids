@@ -675,7 +675,9 @@ function encerrarLocacao_(p) {
   // Firebase: notificar todos os dispositivos que sessão encerrou
   try {
     const rowDataE = sheet.getRange(rowIndex, 1, 1, 28).getValues()[0];
-    registrarAuditoriaLocacao_(rowIndex, 'encerrarLocacao', antesEncerrar, locacaoObj_(rowDataE, rowIndex), 'Encerramento operacional; minUsados=' + minUsados, operadorAudit_(p));
+    const detEnc = 'Encerramento operacional; minUsados=' + minUsados +
+      (String(p.ignorarSmsObrigatorio || '') === 'true' || p.ignorarSmsObrigatorio === true ? '; ADM sem SMS obrigatorio' : '');
+    registrarAuditoriaLocacao_(rowIndex, 'encerrarLocacao', antesEncerrar, locacaoObj_(rowDataE, rowIndex), detEnc, operadorAudit_(p));
     firebaseSyncSessao_(rowIndex, fbDadosSessao_(rowDataE, 'Encerrada', rowIndex));
   } catch(eFb) { console.warn('Firebase encerrar:', eFb.message); }
   lockE.releaseLock();
