@@ -1,4 +1,4 @@
-/* MOVI KIDS — Login operadores v1.7.0 */
+/* MOVI KIDS — Login operadores v1.7.4 */
 (function () {
   const SESSION_KEY = 'mk_auth_session_v1';
   const LEGACY_OPERADOR_KEY = 'mk_operador_atual_v1';
@@ -537,6 +537,9 @@
   }
 
   window.mkAuthBoot = async function mkAuthBoot() {
+    if (!window.__mkLoginOpsPromise && typeof window.api === 'function') {
+      window.__mkLoginOpsPromise = apiCall({ action: 'listarOperadoresLogin' }, 30000);
+    }
     if (typeof window.mkRestoreAuthSession === 'function') window.mkRestoreAuthSession();
     loginPins = buildPinRow('mk-login-pin', 4, () => onLoginPin());
     createPins1 = buildPinRow('mk-create-pin-1', 4);

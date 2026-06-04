@@ -16,13 +16,13 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="mk-design.css?v=1.7.0">
+<script src="mk-version.js"></script>
+<link rel="stylesheet" href="mk-design.css">
 
 <script>
-// ── CACHE BUSTER v1.3.0 ─────────────────────────────────
-// Força limpeza do SW antigo e recarga com versão nova
+// ── CACHE BUSTER — alinhado a mk-version.js / APP_VERSION ──
 (function(){
-  const CURRENT = '1.7.0';
+  const CURRENT = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.4';
   const KEY = 'mk_loaded_version';
   try {
     if (localStorage.getItem(KEY) !== CURRENT) {
@@ -2571,8 +2571,31 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = '1.7.3';
-const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec';
+const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.4';
+const WEBAPP_URL = (typeof window !== 'undefined' && window.MK_GAS_EXEC_URL) ? window.MK_GAS_EXEC_URL
+  : 'https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec';
+const WEBAPP_URL_DEAD_PREFIX = 'AKfycbzc';
+let _gasUrlResolved = null;
+
+function mkAppBasePath_() {
+  const p = location.pathname || '/movikids/';
+  const i = p.lastIndexOf('/');
+  return i >= 0 ? p.slice(0, i + 1) : '/movikids/';
+}
+
+async function resolveGasUrl_() {
+  if (_gasUrlResolved) return _gasUrlResolved;
+  let url = WEBAPP_URL;
+  try {
+    const r = await fetch(location.origin + mkAppBasePath_() + 'gas-endpoint.json?_=' + Date.now(), { cache: 'no-store' });
+    if (r.ok) {
+      const j = await r.json();
+      if (j && j.url && String(j.url).indexOf(WEBAPP_URL_DEAD_PREFIX) < 0) url = j.url;
+    }
+  } catch (e) { /* fallback WEBAPP_URL */ }
+  _gasUrlResolved = url;
+  return url;
+}
 const PORTAL_RESPONSAVEL_URL = 'https://ribocg-a11y.github.io/movikids/acompanhar.html';
 
 const PRECOS = {
@@ -2646,8 +2669,9 @@ async function api(params, timeoutMs = 25000) {
   // AbortController + Service Worker causa conflito — o SW cria uma fetch
   // interna sem o signal, então o abort dispara na página mas o GAS
   // continua sem responder, acumulando falhas mesmo que o GAS esteja online.
+  const gasUrl = await resolveGasUrl_();
   const qs = new URLSearchParams(params).toString();
-  const fetchP = fetch(`${WEBAPP_URL}?${qs}`)
+  const fetchP = fetch(`${gasUrl}?${qs}`)
     .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); });
   const timer = new Promise((_, rej) =>
     setTimeout(() => rej(new Error('timeout-' + timeoutMs + 'ms')), timeoutMs));
@@ -6738,10 +6762,9 @@ async function salvarLancamentoAvulso() {
   }
 }
 
-window.__mkLoginOpsPromise = api({ action: 'listarOperadoresLogin' });
 </script>
-<script src="mk-update.js?v=1.7.0"></script>
-<script src="mk-auth.js?v=1.7.0"></script>
+<script src="mk-update.js"></script>
+<script src="mk-auth.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
   if (typeof mkAuthBoot === 'function') {

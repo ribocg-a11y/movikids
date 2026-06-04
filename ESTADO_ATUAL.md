@@ -9,7 +9,7 @@ Referencia unica para alinhamento local x producao.
 | Camada | Versao alvo | URL / ID |
 |--------|-------------|----------|
 | Apps Script | **v1.5.37** (impl. **v78**) | Deploy `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y` |
-| Frontend | **v1.7.3** | https://ribocg-a11y.github.io/movikids/?force=1.7.3 |
+| Frontend | **v1.7.4** | https://ribocg-a11y.github.io/movikids/?force=1.7.4 |
 | Planilha | MOVIKIDS_Planilha_Base | https://docs.google.com/spreadsheets/d/1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618/edit |
 | Apps Script editor | Planilha → Extensões → Apps Script | ver `DEPLOY_GAS_v1.5.32_AUTH.md` |
 

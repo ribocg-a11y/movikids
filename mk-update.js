@@ -63,7 +63,8 @@
     const url = (location.origin + (location.pathname || '/movikids/')) + '?nocache=' + Date.now();
     const r = await fetch(url, { cache: 'no-store' });
     const html = await r.text();
-    const m = html.match(/APP_VERSION\s*=\s*'([^']+)'/);
+    const m = html.match(/MK_VERSION\s*=\s*'([^']+)'/)
+      || html.match(/APP_VERSION\s*=\s*'([^']+)'/);
     return m ? m[1] : null;
   }
 
