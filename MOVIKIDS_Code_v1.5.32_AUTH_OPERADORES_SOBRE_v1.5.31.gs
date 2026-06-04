@@ -1,6 +1,7 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.40
-// v1.5.40: deviceId explicito no Cloud (nFxvrvSt...) + deviceActiveWithin=12 na URL
+// MOVI KIDS — Google Apps Script v1.5.41
+// v1.5.41: gateway producao DJVJRL + deviceId wihWegHr...; property "auto" omite deviceId
+// v1.5.40: deviceId explicito no Cloud + deviceActiveWithin=12 na URL
 // v1.5.39: SMS gateway payload minimo (como v1.5.28 que entregava) — sem ttl/priority/withDeliveryReport global
 // v1.5.38: Pacote SMS P0 unificado — textos curtos GSM, withDeliveryReport off, throttle, simNumber, rowIndex salvar
 // v1.5.37: extPorDia (KPIs + histórico), cache listarHistorico, mesContrato por aniversário (contrato)
@@ -54,8 +55,8 @@ const OP_DATA_ROW = 2;
 const DATA_ROW = 11;
 const PORTAL_RESPONSAVEL_URL = 'https://ribocg-a11y.github.io/movikids/acompanhar.html';
 const SMS_GATEWAY_URL = 'https://api.sms-gate.app/3rdparty/v1/messages';
-/** Device Cloud padrao (samsung a04e) — sobrescreva com Script Property SMS_GATEWAY_DEVICE_ID */
-const SMS_GATEWAY_DEVICE_ID_DEFAULT = 'nFxvrvSt_v5il_v_T1-ZW';
+/** Device Cloud producao (aparelho remoto DJVJRL) — copiar da API se falhar; app pode confundir l/I */
+const SMS_GATEWAY_DEVICE_ID_DEFAULT = 'wihWegHr4wXaVJQ1R-GZR';
 const SMS_OPT_OUT_CAMPANHA_ = ' Para sair, responda SAIR.';
 
 const EMAIL_RELATORIO = 'financeiro@goldenshoppingcalhau.com.br';
@@ -264,9 +265,9 @@ function ping_() {
   const agora = new Date();
   return resp_({
     status:  'online',
-    versao:  'v1.5.39',
+    versao:  'v1.5.41',
     timestamp: fmtData_(agora) + ' ' + fmtHoraLocal_(agora),
-    sistema: 'MOVI KIDS v1.5.39'
+    sistema: 'MOVI KIDS v1.5.41'
   });
 }
 
@@ -2060,7 +2061,14 @@ function smsConfigGateway_() {
   const simRaw = parseInt(props.getProperty('SMS_SIM_NUMBER') || '0', 10);
   const simNumber = (simRaw === 1 || simRaw === 2) ? simRaw : null;
   const minGap = Math.max(0, parseInt(props.getProperty('SMS_MIN_INTERVAL_MS') || '0', 10) || 0);
-  return { withDeliveryReport: withDr, simNumber: simNumber, minGapMs: minGap };
+  const rawDev = props.getProperty('SMS_GATEWAY_DEVICE_ID');
+  let deviceId = '';
+  if (rawDev != null) {
+    const t = String(rawDev).trim();
+    if (t && t.toLowerCase() !== 'auto') deviceId = t;
+  }
+  if (!deviceId) deviceId = SMS_GATEWAY_DEVICE_ID_DEFAULT;
+  return { withDeliveryReport: withDr, simNumber: simNumber, minGapMs: minGap, deviceId: deviceId };
 }
 
 function smsThrottleEsperar_() {
@@ -2125,7 +2133,9 @@ function enviarSmsGateway_(telefone, texto) {
   };
   if (cfg.withDeliveryReport) payload.withDeliveryReport = true;
   if (cfg.simNumber) payload.simNumber = cfg.simNumber;
-  const res = UrlFetchApp.fetch(SMS_GATEWAY_URL, {
+  if (cfg.deviceId) payload.deviceId = cfg.deviceId;
+  const url = SMS_GATEWAY_URL + '?deviceActiveWithin=12';
+  const res = UrlFetchApp.fetch(url, {
     method: 'post',
     contentType: 'application/json',
     payload: JSON.stringify(payload),
