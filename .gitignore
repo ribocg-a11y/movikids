@@ -1,4 +1,6 @@
 node_modules/
+gas/Code.gs
+.clasprc.json
 package-lock.json
 portal_server.out.log
 portal_server.err.log
