@@ -600,6 +600,28 @@ nav button .nav-badge{
   padding:8px 13px;background:rgba(255,255,255,.08);border-radius:8px;
   color:rgba(255,255,255,.78);font-size:12px;font-weight:700;margin-bottom:6px}
 .sb-operator-name{max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mk-turno-strip{
+  display:flex;align-items:center;flex-wrap:wrap;gap:8px 12px;
+  padding:8px 14px;margin:0 0 10px;
+  background:linear-gradient(90deg,var(--blue-lt),#fff);
+  border:2px solid var(--blue);border-radius:12px;
+  font-size:13px;font-weight:800;color:var(--blue-dk);
+  box-shadow:0 2px 8px rgba(21,101,192,.12);
+}
+.mk-turno-strip[hidden]{display:none!important}
+.mk-turno-strip .mk-turno-name{font-size:15px;font-weight:900;color:var(--blue)}
+.mk-turno-role{
+  font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.04em;
+  padding:3px 8px;border-radius:99px;background:var(--blue);color:#fff;
+}
+.mk-turno-role.admin{background:#5c3d8f}
+.mk-turno-sub{width:100%;font-size:11px;font-weight:700;color:var(--txt2);line-height:1.35}
+.hd-operator-chip{
+  font-size:11px;font-weight:900;color:var(--blue-dk);
+  background:var(--blue-lt);border:1px solid var(--blue);
+  padding:4px 10px;border-radius:99px;max-width:42vw;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
 .sb-operator-btn{border:1.5px solid rgba(255,255,255,.35);background:transparent;
   color:#fff;font-family:'Nunito',sans-serif;font-weight:700;font-size:11px;
   border-radius:6px;padding:3px 9px;cursor:pointer}
@@ -1507,7 +1529,7 @@ nav button .nav-badge{
   <!-- ══ SIDEBAR (desktop only) ══ -->
   <aside id="sidebar">
     <div class="sb-logo">🚗 Movi <span>Kids</span>
-      <div class="sb-status"><span id="sb-dot" class="dot-online"></span><span id="sb-txt">Online</span><span id="sb-version" style="font-size:10px;opacity:.85;margin-left:5px;color:rgba(255,255,255,.7);font-family:monospace">v1.7.11</span></div>
+      <div class="sb-status"><span id="sb-dot" class="dot-online"></span><span id="sb-txt">Online</span><span id="sb-version" style="font-size:10px;opacity:.85;margin-left:5px;color:rgba(255,255,255,.7);font-family:monospace">v1.7.12</span></div>
     </div>
     <div class="sb-nav" id="sb-nav">
       <button class="sb-btn active" id="sbn-home" onclick="showPage('home')"><span class="sb-icon">🏠</span>Home</button>
@@ -1552,12 +1574,21 @@ nav button .nav-badge{
     <div class="hd-row">
       <div class="logo">🚗 Movi <span>Kids</span></div>
       <div class="hd-status">
+        <span id="hd-operator-chip" class="hd-operator-chip" hidden title="Operador logado">—</span>
         <div id="status-dot" class="dot-online"></div>
         <span id="status-txt">Online</span>
-        <span id="app-version" style="font-size:10px;opacity:.85;margin-left:4px;font-family:monospace">v1.7.11</span>
+        <span id="app-version" style="font-size:10px;opacity:.85;margin-left:4px;font-family:monospace">v1.7.12</span>
       </div>
     </div>
   </header>
+
+  <div id="mk-turno-strip" class="mk-turno-strip" role="status" aria-live="polite" hidden>
+    <span id="mk-turno-icon" aria-hidden="true">👤</span>
+    <span>Turno:</span>
+    <strong class="mk-turno-name" id="mk-turno-name">—</strong>
+    <span class="mk-turno-role" id="mk-turno-role">Operador</span>
+    <span class="mk-turno-sub" id="mk-turno-sub"></span>
+  </div>
 
   <!-- Nav -->
   <nav>
@@ -2682,11 +2713,65 @@ let statsHoje   = { fat: 0, n: 0 };
 let relacionamentoCache = [];
 let relEditCurrent = null;
 
-function atualizarOperadorUI_() {
-  const el = document.getElementById('sb-operator-name');
-  const nome = typeof operadorAtual_ === 'function' ? operadorAtual_() : '';
-  if (el) el.textContent = nome || 'Nao definido';
+function atualizarOperadorUI_(sessaoServidor) {
+  const getSess = typeof mkAuthGetSession === 'function' ? mkAuthGetSession : null;
+  const s = getSess ? getSess() : null;
+  const nomeLocal = typeof operadorAtual_ === 'function' ? operadorAtual_() : '';
+  const isAdm = (typeof mkAuthIsAdmin === 'function' && mkAuthIsAdmin()) || !!window.isAdmin;
+  const role = (s && s.role) || (isAdm ? 'admin' : 'operador');
+  const nome = nomeLocal || (isAdm ? 'Administrador' : '');
+  const logado = !!(s && s.nome) || isAdm;
+
+  const srv = sessaoServidor ||
+    (typeof mkAuthGetSessaoServidor_ === 'function' ? mkAuthGetSessaoServidor_() : null);
+
+  const setText = (id, text) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = text;
+  };
+
+  setText('sb-operator-name', nome || 'Nao definido');
+  setText('mk-turno-name', nome || '—');
+  const chip = document.getElementById('hd-operator-chip');
+  if (chip) {
+    if (logado && nome) {
+      chip.hidden = false;
+      chip.textContent = (isAdm ? 'ADM: ' : '') + nome;
+    } else {
+      chip.hidden = true;
+      chip.textContent = '';
+    }
+  }
+
+  const strip = document.getElementById('mk-turno-strip');
+  const roleEl = document.getElementById('mk-turno-role');
+  const iconEl = document.getElementById('mk-turno-icon');
+  const subEl = document.getElementById('mk-turno-sub');
+  if (strip) strip.hidden = !logado;
+  if (roleEl) {
+    roleEl.textContent = isAdm ? 'Administrador' : 'Operador';
+    roleEl.classList.toggle('admin', isAdm);
+  }
+  if (iconEl) iconEl.textContent = isAdm ? '🔐' : '👤';
+
+  if (subEl) {
+    let sub = '';
+    if (srv && srv.nome) {
+      const mesmo = nome && String(srv.nome).trim() === String(nome).trim();
+      if (mesmo) sub = 'Sessao registrada no servidor (este turno).';
+      else sub = 'Sessao no servidor: ' + srv.nome + (nome ? ' — voce: ' + nome : '') + '.';
+    } else if (logado && !isAdm) {
+      sub = 'Acoes deste tablet sao auditadas com este operador.';
+    } else if (isAdm) {
+      sub = 'Modo administrador — PIN 1416.';
+    }
+    subEl.textContent = sub;
+  }
+
+  const opBar = document.getElementById('sb-operator-bar');
+  if (opBar) opBar.style.display = logado && !isAdm ? 'flex' : (logado && isAdm ? 'flex' : '');
 }
+window.atualizarOperadorUI_ = atualizarOperadorUI_;
 
 function whatsappModeAtual_() {
   try {
@@ -2757,6 +2842,7 @@ async function init() {
     if (el) el.textContent = APP_VERSION;
   });
   atualizarOperadorUI_();
+  if (typeof mkAuthRefreshSessaoTurno_ === 'function') mkAuthRefreshSessaoTurno_();
   atualizarWhatsAppUI_();
 
   requestNotificationPermission();
@@ -5502,6 +5588,8 @@ function adminLogin() {
   carregarHistRelatorios();
   carregarConfig(); // Fase 6: carrega templates WA
   if (typeof refreshOperadoresAdmin_ === 'function') refreshOperadoresAdmin_();
+  if (typeof atualizarOperadorUI_ === 'function') atualizarOperadorUI_();
+  if (typeof mkAuthRefreshSessaoTurno_ === 'function') mkAuthRefreshSessaoTurno_();
 }
 
 function adminLogout() {
@@ -5514,6 +5602,8 @@ function adminLogout() {
   const kpiEl = document.getElementById('admin-home-kpis');
   if(kpiEl) kpiEl.style.display = 'none';
   showPage('home');
+  if (typeof atualizarOperadorUI_ === 'function') atualizarOperadorUI_();
+  if (typeof mkAuthRefreshSessaoTurno_ === 'function') mkAuthRefreshSessaoTurno_();
   toast('Sessão administrativa encerrada', 'warning');
 }
 

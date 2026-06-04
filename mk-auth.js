@@ -1,4 +1,4 @@
-/* MOVI KIDS — Login operadores v1.7.11 */
+/* MOVI KIDS — Login operadores v1.7.12 */
 (function () {
   const SESSION_KEY = 'mk_auth_session_v1';
   const LEGACY_OPERADOR_KEY = 'mk_operador_atual_v1';
@@ -139,7 +139,25 @@
     sessaoAtivaRemota = (d && d.sessaoAtiva) ? d.sessaoAtiva : null;
     updateSessaoLockUI_();
     updateOperadoresSessaoBanner_(sessaoAtivaRemota);
+    if (typeof atualizarOperadorUI_ === 'function') {
+      atualizarOperadorUI_(sessaoAtivaRemota);
+    }
   }
+
+  window.mkAuthGetSessaoServidor_ = function mkAuthGetSessaoServidor_() {
+    return sessaoAtivaRemota;
+  };
+
+  let _turnoPollBusy = false;
+  window.mkAuthRefreshSessaoTurno_ = async function mkAuthRefreshSessaoTurno_() {
+    if (!mkAuthIsLoggedIn() || _turnoPollBusy) return;
+    _turnoPollBusy = true;
+    try {
+      const d = await apiCall({ action: 'listarOperadoresLogin' }, 20000);
+      if (d && d.ok) applySessaoAtivaFromApi_(d);
+    } catch (e) { /* offline */ }
+    finally { _turnoPollBusy = false; }
+  };
 
   window.trocarOperador = async function trocarOperador() {
     const s = getSession();
@@ -166,12 +184,22 @@
     if (gate) gate.style.display = 'flex';
   }
 
+  let _turnoPollInterval = null;
+  function startTurnoPoll_() {
+    if (_turnoPollInterval) return;
+    _turnoPollInterval = setInterval(() => {
+      if (mkAuthIsLoggedIn()) mkAuthRefreshSessaoTurno_();
+    }, 60000);
+  }
+
   function showApp() {
     const app = document.getElementById('app');
     const gate = document.getElementById('mk-auth-gate');
     if (gate) gate.style.display = 'none';
     if (app) app.style.display = '';
     if (typeof atualizarOperadorUI_ === 'function') atualizarOperadorUI_();
+    mkAuthRefreshSessaoTurno_();
+    startTurnoPoll_();
     applyRoleNav_();
   }
 
