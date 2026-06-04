@@ -21,7 +21,7 @@
 // ── CACHE BUSTER v1.3.0 ─────────────────────────────────
 // Força limpeza do SW antigo e recarga com versão nova
 (function(){
-  const CURRENT = '1.6.73';
+  const CURRENT = '1.6.74';
   const KEY = 'mk_loaded_version';
   try {
     if (localStorage.getItem(KEY) !== CURRENT) {
@@ -70,7 +70,7 @@ html,body{height:100%;background:var(--bg);color:var(--txt);overflow:hidden}
 #splash.hide{opacity:0;pointer-events:none}
 #splash.gone{display:none}
 
-/* ── LOGIN OPERADORES v1.6.73 ─────────────────────────────── */
+/* ── LOGIN OPERADORES v1.6.74 ─────────────────────────────── */
 #mk-auth-gate{
   position:fixed;inset:0;z-index:998;
   background:var(--bg);
@@ -1443,7 +1443,7 @@ nav button .nav-badge{
   <!-- ══ SIDEBAR (desktop only) ══ -->
   <aside id="sidebar">
     <div class="sb-logo">🚗 Movi <span>Kids</span>
-      <div class="sb-status"><span id="sb-dot" class="dot-online"></span><span id="sb-txt">Online</span><span id="sb-version" style="font-size:10px;opacity:.85;margin-left:5px;color:rgba(255,255,255,.7);font-family:monospace">v1.6.73</span></div>
+      <div class="sb-status"><span id="sb-dot" class="dot-online"></span><span id="sb-txt">Online</span><span id="sb-version" style="font-size:10px;opacity:.85;margin-left:5px;color:rgba(255,255,255,.7);font-family:monospace">v1.6.74</span></div>
     </div>
     <div class="sb-nav" id="sb-nav">
       <button class="sb-btn active" id="sbn-home" onclick="showPage('home')"><span class="sb-icon">🏠</span>Home</button>
@@ -1455,25 +1455,22 @@ nav button .nav-badge{
     </div>
     <div class="sb-admin-section" id="sb-admin-section">
       <div class="sb-divider">Administração</div>
-      <button class="sb-btn" id="sbn-adm" onclick="irAdmin('admin')"><span class="sb-icon">📊</span>Painel Admin</button>
+      <button class="sb-btn" id="sbn-adm" onclick="irAdmin('admin')"><span class="sb-icon">📊</span>Visão geral</button>
+      <button class="sb-btn" id="sbn-ops" onclick="irAdmin('operadores')"><span class="sb-icon">👤</span>Operadores</button>
+      <button class="sb-btn" id="sbn-caixa" onclick="irAdmin('caixa')"><span class="sb-icon">💰</span>Caixa do dia</button>
       <button class="sb-btn" id="sbn-dash" onclick="irAdmin('dashboard')"><span class="sb-icon">📈</span>Dashboard</button>
-      <button class="sb-btn" id="sbn-rel" onclick="irAdmin('relatorio')"><span class="sb-icon">📋</span>Relatório</button>
-      <button class="sb-btn" id="sbn-cfg" onclick="irAdmin('config')"><span class="sb-icon">⚙️</span>Configurações</button>
       <button class="sb-btn" id="sbn-hist" onclick="irAdmin('historico')"><span class="sb-icon">🗂️</span>Histórico</button>
-<button class="sb-btn" id="sbn-caixa" onclick="irAdmin('caixa')"><span class="sb-icon">💰</span>Caixa</button>
+      <button class="sb-btn" id="sbn-rel" onclick="irAdmin('relatorio')"><span class="sb-icon">📋</span>Relatório mensal</button>
+      <button class="sb-btn" id="sbn-cfg" onclick="irAdmin('config')"><span class="sb-icon">⚙️</span>Configurações SMS</button>
     </div>
     <div class="sb-footer">
       <div class="sb-operator-bar" id="sb-operator-bar">
         <span>Operador: <span class="sb-operator-name" id="sb-operator-name">Nao definido</span></span>
         <button class="sb-operator-btn" onclick="trocarOperador()">Sair</button>
       </div>
-      <div class="sb-wa-bar" id="sb-wa-bar">
-        <span>SMS: <span class="sb-wa-mode" id="sb-wa-mode">Gateway</span></span>
-        <button class="sb-operator-btn" onclick="trocarModoWhatsApp()">Info</button>
-      </div>
       <div class="sb-admin-bar" id="sb-admin-bar" style="display:none">
-        <span>🔐 Admin <span id="sb-timer">1:00</span></span>
-        <button class="sb-sair" onclick="adminLogout()">Sair</button>
+        <span>🔐 Administrador</span>
+        <button class="sb-sair" onclick="adminLogout()">Sair admin</button>
       </div>
       <button class="sb-btn sb-gerenciar" id="sb-gerenciar-btn" onclick="abrirAdmin()"><span class="sb-icon">🔐</span>Gerenciar</button>
     </div>
@@ -1489,7 +1486,7 @@ nav button .nav-badge{
       <div class="hd-status">
         <div id="status-dot" class="dot-online"></div>
         <span id="status-txt">Online</span>
-        <span id="app-version" style="font-size:10px;opacity:.85;margin-left:4px;font-family:monospace">v1.6.73</span>
+        <span id="app-version" style="font-size:10px;opacity:.85;margin-left:4px;font-family:monospace">v1.6.74</span>
       </div>
     </div>
   </header>
@@ -1773,7 +1770,7 @@ nav button .nav-badge{
     <div class="admin-badge">
       <div class="admin-badge-left">🔐 <span>Modo Administrador</span></div>
       <div style="display:flex;align-items:center;gap:10px">
-        <span class="admin-timer" id="admin-timer-display">1:00</span>
+        <span class="admin-timer">1:00</span>
         <button class="btn-sair" onclick="adminLogout()">Sair</button>
       </div>
     </div>
@@ -1812,18 +1809,16 @@ nav button .nav-badge{
       <div class="diag-alert" id="diag-alert-over" style="display:none"></div>
     </div>
 
-    <div class="sec-title">Operadores do sistema</div>
-    <div class="fecha-card" style="margin-bottom:16px">
-      <p style="font-size:13px;color:var(--txt2);margin-bottom:10px">Somente administrador cadastra novos operadores. PIN individual de 4 dígitos na primeira entrada.</p>
-      <div id="mk-admin-ops-list"></div>
-      <div class="form-group" style="margin-top:12px">
-        <input id="mk-new-op-nome" class="form-input" type="text" placeholder="Nome do novo operador">
-      </div>
-      <button class="btn btn-primary" onclick="cadastrarOperadorAdmin_(document.getElementById('mk-new-op-nome').value); document.getElementById('mk-new-op-nome').value=''">➕ Cadastrar operador</button>
-    </div>
-
     <div class="sec-title">Gestão</div>
     <div class="admin-cards">
+      <div class="admin-action-card" onclick="irAdmin('operadores')">
+        <div class="aac-icon">👤</div>
+        <div class="aac-body">
+          <div class="aac-title">Operadores</div>
+          <div class="aac-sub">Cadastrar balcão e consultar PIN</div>
+        </div>
+        <div class="aac-arrow">›</div>
+      </div>
       <div class="admin-action-card" onclick="irAdmin('dashboard')">
         <div class="aac-icon">📊</div>
         <div class="aac-body">
@@ -1857,6 +1852,34 @@ nav button .nav-badge{
         <div class="aac-arrow">›</div>
       </div>
     </div>
+  </div>
+
+  <!-- ──────── PAGE: OPERADORES (ADM) ──────── -->
+  <div id="page-operadores" class="page">
+    <div class="admin-badge">
+      <div class="admin-badge-left">👤 <span>Operadores do sistema</span></div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span class="admin-timer">1:00</span>
+        <button class="btn-sair" onclick="adminLogout()">Sair</button>
+      </div>
+    </div>
+    <p style="font-size:13px;color:var(--txt2);margin-bottom:14px;line-height:1.5">
+      Cadastre quem opera o balcão. Cada operador cria o PIN de 4 dígitos no primeiro login.
+      Padrão atual: Eduarda e Milena Nunes.
+    </p>
+    <div class="sec-title">Cadastrados</div>
+    <div class="fecha-card" style="margin-bottom:16px">
+      <div id="mk-admin-ops-list"></div>
+    </div>
+    <div class="sec-title">Novo operador</div>
+    <div class="fecha-card">
+      <div class="form-group">
+        <label class="form-label">Nome completo</label>
+        <input id="mk-new-op-nome" class="form-input" type="text" placeholder="Ex: Maria Silva" maxlength="40">
+      </div>
+      <button class="btn btn-primary" style="width:100%" onclick="cadastrarOperadorAdmin_(document.getElementById('mk-new-op-nome').value); document.getElementById('mk-new-op-nome').value=''">➕ Cadastrar operador</button>
+    </div>
+    <button class="btn btn-secondary" style="margin-top:12px" onclick="irAdmin('admin')">← Voltar à visão geral</button>
   </div>
 
   <!-- ──────── PAGE: CAIXA ──────── -->
@@ -2458,7 +2481,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = '1.6.73';
+const APP_VERSION = '1.6.74';
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec';
 const PORTAL_RESPONSAVEL_URL = 'https://ribocg-a11y.github.io/movikids/acompanhar.html';
 
@@ -3957,7 +3980,7 @@ async function confirmarEncerrar() {
     updateStats();
     atualizarVeiculoGrid();
 
-    // SMS automático de agradecimento (v1.6.73) — fire-and-forget
+    // SMS automático de agradecimento (v1.6.74) — fire-and-forget
     try {
       const encDados = {
         rowIndex:    encSession.rowIndex,
@@ -4504,7 +4527,7 @@ async function iniciarContagem(rowIndex) {
     return;
   }
 
-  // 3. SMS automático de boas-vindas (v1.6.73) — disparo sem clique do operador
+  // 3. SMS automático de boas-vindas (v1.6.74) — disparo sem clique do operador
   // Não bloqueia a UI: fire-and-forget com toast discreto
   try {
     const sAtual = sessions.find(x => x.rowIndex === rowIndex);
@@ -5043,9 +5066,8 @@ function resetAdminTimer() {
 function tickAdmin() {
   if (!isAdmin) return;
   adminCountdown--;
-  const el = document.getElementById('admin-timer-display');
-  if (el) el.textContent = '0:' + String(adminCountdown).padStart(2,'0');
-  updateAdminTimer(adminCountdown);
+  const t = '0:' + String(adminCountdown).padStart(2,'0');
+  document.querySelectorAll('.admin-timer').forEach(el => { el.textContent = t; });
   if (adminCountdown <= 0) adminLogout();
 }
 
@@ -5062,6 +5084,7 @@ function irAdmin(page) {
   }
   if (page === 'config') { irParaConfig(); }
   if (page === 'caixa') inicializarCaixa();
+  if (page === 'operadores' && typeof refreshOperadoresAdmin_ === 'function') refreshOperadoresAdmin_();
   if (page === 'admin') {
     setTimeout(atualizarDiagnostico, 100);
     // Se já há dados em memória, preenche imediatamente sem esperar novo fetch
@@ -5613,7 +5636,7 @@ async function carregarHistRelatorios() {
 
 // ── OVERRIDE showPage for admin pages ────────────────────────
 function showPage(name, opts = {}) {
-  const adminPages = ['admin','dashboard','relatorio','historico','caixa'];
+  const adminPages = ['admin','operadores','dashboard','relatorio','historico','caixa','config'];
   if (adminPages.includes(name) && !isAdmin) { abrirAdmin(); return; }
   const wasNovaActive = !!document.getElementById('page-nova')?.classList.contains('active');
   if (wasNovaActive && name !== 'nova') salvarNovaDraft_();
@@ -5647,6 +5670,7 @@ function showPage(name, opts = {}) {
   if (name==='custos') loadCustosHoje();
   if (name==='historico') buscarHistorico(); // FIX BUG-007: if(!currentPeriod) sempre false pois currentPeriod='hoje' na declaração
   if (name==='admin' && isAdmin) { resetAdminTimer(); if(!kpiData) carregarKPIs(); }
+  if (name==='operadores' && isAdmin && typeof refreshOperadoresAdmin_ === 'function') refreshOperadoresAdmin_();
   if (name==='dashboard') {
     if (kpiData) renderCharts(kpiData);
     else carregarKPIs().then(() => { if (kpiData) renderCharts(kpiData); }); // BUG3-FIX: carrega KPIs se ainda não carregou
@@ -5661,7 +5685,7 @@ function syncSidebar(page) {
   document.querySelectorAll('.sb-btn').forEach(b => b.classList.remove('active'));
   const map = {
     'home':'sbn-home','nova':'sbn-nova','relacionamento':'sbn-relacionamento','custos':'sbn-custos','painel':'sbn-painel','lancamento':'sbn-avulso',
-    'admin':'sbn-adm','dashboard':'sbn-dash','relatorio':'sbn-rel','historico':'sbn-hist','caixa':'sbn-caixa'
+    'admin':'sbn-adm','operadores':'sbn-ops','dashboard':'sbn-dash','relatorio':'sbn-rel','historico':'sbn-hist','caixa':'sbn-caixa','config':'sbn-cfg'
   };
   if (map[page]) { const el=document.getElementById(map[page]); if(el) el.classList.add('active'); }
 }
@@ -5695,12 +5719,6 @@ function hideAdminSidebar() {
   if(bar) bar.style.display='none';
   if(btn) btn.style.display='';
 }
-
-function updateAdminTimer(s) {
-  const el = document.getElementById('sb-timer');
-  if(el) el.textContent = '0:'+String(s).padStart(2,'0');
-}
-
 
 // ═══════════════════════════════════════════════════════════
 // FASE 3 — PAINEL DE OPERAÇÃO AO VIVO (v1.6.0)
@@ -6377,7 +6395,7 @@ function renderAnalyticsCards(stats) {
   }
 }
 
-// ── LANÇAMENTO AVULSO v1.6.73 ───────────────────────────────
+// ── LANÇAMENTO AVULSO v1.6.74 ───────────────────────────────
 let avulsoState = { tipo: null, plano: null };
 
 function resetAvulsoForm_() {
@@ -6453,7 +6471,7 @@ async function salvarLancamentoAvulso() {
 }
 
 </script>
-<script src="mk-auth.js?v=1.6.73"></script>
+<script src="mk-auth.js?v=1.6.74"></script>
 <script>
 document.addEventListener('DOMContentLoaded', () => { if (typeof mkAuthBoot === 'function') mkAuthBoot(); else init(); });
 
