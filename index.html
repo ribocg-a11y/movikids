@@ -16,15 +16,23 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="mk-design.css?v=1.7.0">
 
 <script>
 // ── CACHE BUSTER v1.3.0 ─────────────────────────────────
 // Força limpeza do SW antigo e recarga com versão nova
 (function(){
-  const CURRENT = '1.6.80';
+  const CURRENT = '1.7.0';
   const KEY = 'mk_loaded_version';
   try {
     if (localStorage.getItem(KEY) !== CURRENT) {
+      try {
+        var _s = sessionStorage.getItem('mk_auth_session_v1');
+        if (_s) {
+          localStorage.setItem('mk_auth_session_persist_v1', _s);
+          localStorage.setItem('mk_auth_session_persist_at', String(Date.now()));
+        }
+      } catch(e) {}
       localStorage.setItem(KEY, CURRENT);
       if (window.caches) caches.keys().then(keys => keys.forEach(k => caches.delete(k)));
       if ('serviceWorker' in navigator) navigator.serviceWorker.getRegistrations().then(regs => regs.forEach(r => r.unregister()));
@@ -70,7 +78,7 @@ html,body{height:100%;background:var(--bg);color:var(--txt);overflow:hidden}
 #splash.hide{opacity:0;pointer-events:none}
 #splash.gone{display:none}
 
-/* ── LOGIN OPERADORES v1.6.80 ─────────────────────────────── */
+/* ── LOGIN OPERADORES v1.7.0 ─────────────────────────────── */
 #mk-auth-gate{
   position:fixed;inset:0;z-index:998;
   background:var(--bg);
@@ -1474,7 +1482,7 @@ nav button .nav-badge{
   <!-- ══ SIDEBAR (desktop only) ══ -->
   <aside id="sidebar">
     <div class="sb-logo">🚗 Movi <span>Kids</span>
-      <div class="sb-status"><span id="sb-dot" class="dot-online"></span><span id="sb-txt">Online</span><span id="sb-version" style="font-size:10px;opacity:.85;margin-left:5px;color:rgba(255,255,255,.7);font-family:monospace">v1.6.80</span></div>
+      <div class="sb-status"><span id="sb-dot" class="dot-online"></span><span id="sb-txt">Online</span><span id="sb-version" style="font-size:10px;opacity:.85;margin-left:5px;color:rgba(255,255,255,.7);font-family:monospace">v1.7.0</span></div>
     </div>
     <div class="sb-nav" id="sb-nav">
       <button class="sb-btn active" id="sbn-home" onclick="showPage('home')"><span class="sb-icon">🏠</span>Home</button>
@@ -1517,7 +1525,7 @@ nav button .nav-badge{
       <div class="hd-status">
         <div id="status-dot" class="dot-online"></div>
         <span id="status-txt">Online</span>
-        <span id="app-version" style="font-size:10px;opacity:.85;margin-left:4px;font-family:monospace">v1.6.80</span>
+        <span id="app-version" style="font-size:10px;opacity:.85;margin-left:4px;font-family:monospace">v1.7.0</span>
       </div>
     </div>
   </header>
@@ -1549,11 +1557,15 @@ nav button .nav-badge{
 
   <!-- ──────── PAGE: HOME ──────── -->
   <div id="page-home" class="page active">
-    <div class="stats-bar">
-      <div class="stat-card"><div class="stat-val" id="stat-ativas">0</div><div class="stat-lbl">Ativas agora</div></div>
-      <div class="stat-card"><div class="stat-val" id="stat-nloc">0</div><div class="stat-lbl">Encerradas hoje</div></div>
+    <div class="mk-stat-row stats-bar">
+      <div class="mk-stat-tile stat-card"><div class="stat-val mk-stat-val" id="stat-ativas">0</div><div class="stat-lbl mk-stat-lbl">Ativas agora</div></div>
+      <div class="mk-stat-tile stat-card"><div class="stat-val mk-stat-val" id="stat-nloc">0</div><div class="stat-lbl mk-stat-lbl">Encerradas hoje</div></div>
     </div>
-    <div id="admin-home-kpis" class="admin-kpis-hidden">
+    <div id="admin-home-chip" class="mk-admin-chip" hidden>
+      <span>Hoje: <strong id="admin-chip-fat">—</strong></span>
+      <button type="button" class="mk-admin-chip-btn" onclick="if(typeof irAdmin==='function')irAdmin('caixa');else{showPage('caixa');if(typeof carregarCaixa==='function')carregarCaixa();}">Abrir caixa</button>
+    </div>
+    <div id="admin-home-kpis" class="admin-kpis-hidden" hidden aria-hidden="true">
       <div class="kpi-grid" style="margin-bottom:10px">
         <div class="kpi-card blue"><div class="kpi-val" id="h-fathoje">R$0</div><div class="kpi-lbl">Fat. hoje</div></div>
         <div class="kpi-card red"><div class="kpi-val" id="h-cushoje">R$0</div><div class="kpi-lbl">Custos hoje</div></div>
@@ -1898,7 +1910,8 @@ nav button .nav-badge{
       Cadastre quem opera o balcão. Cada operador cria o PIN de 4 dígitos no primeiro login.
       Padrão atual: Eduarda e Milena Nunes. Apenas um operador pode estar logado por vez.
     </p>
-    <button type="button" class="btn btn-secondary" style="width:100%;margin-bottom:14px" onclick="mkAuthLiberarSessaoOperadorAdmin_()">🔓 Liberar sessão do balcão (se operador esqueceu Sair)</button>
+    <div id="mk-ops-sessao-banner" class="mk-sessao-lock" style="display:none;margin-bottom:12px"></div>
+    <button type="button" class="btn btn-secondary" id="mk-btn-liberar-sessao" style="width:100%;margin-bottom:14px">🔓 Liberar sessão do balcão (operador esqueceu Sair)</button>
     <div class="sec-title">Cadastrados</div>
     <div class="fecha-card" style="margin-bottom:16px">
       <div id="mk-admin-ops-list"></div>
@@ -1951,14 +1964,18 @@ nav button .nav-badge{
       </button>
     </div>
 
-    <!-- KPIs -->
-    <div class="kpi-grid" id="caixa-kpis" style="margin-bottom:16px">
-      <div class="kpi-card blue"><div class="kpi-val" id="cx-total">...</div><div class="kpi-lbl">Total do dia</div></div>
-      <div class="kpi-card" style="background:var(--blue-lt);border:1px solid var(--blue)"><div class="kpi-val" style="color:var(--blue)" id="cx-maq">...</div><div class="kpi-lbl">Maquininha</div></div>
-      <div class="kpi-card" style="background:#FFF8E1;border:1px solid #FFB300"><div class="kpi-val" style="color:#854F0B" id="cx-din">...</div><div class="kpi-lbl">Dinheiro</div></div>
-      <div class="kpi-card red"><div class="kpi-val" id="cx-cus">...</div><div class="kpi-lbl">Custos</div></div>
-      <div class="kpi-card green"><div class="kpi-val" id="cx-res">...</div><div class="kpi-lbl">Resultado</div></div>
-      <div class="kpi-card"><div class="kpi-val" id="cx-nloc">...</div><div class="kpi-lbl">Locações</div></div>
+    <div class="mk-caixa-resumo" id="caixa-kpis">
+      <div class="mk-stat-hero">
+        <div class="mk-stat-hero-val" id="cx-res">...</div>
+        <div class="mk-stat-hero-lbl">Resultado do dia</div>
+      </div>
+      <div class="mk-stat-pills">
+        <div class="mk-stat-pill blue"><div class="mk-stat-pill-val" id="cx-total">...</div><div class="mk-stat-pill-lbl">Faturamento</div></div>
+        <div class="mk-stat-pill blue"><div class="mk-stat-pill-val" id="cx-maq">...</div><div class="mk-stat-pill-lbl">Maquininha</div></div>
+        <div class="mk-stat-pill gold"><div class="mk-stat-pill-val" id="cx-din">...</div><div class="mk-stat-pill-lbl">Dinheiro</div></div>
+        <div class="mk-stat-pill red"><div class="mk-stat-pill-val" id="cx-cus">...</div><div class="mk-stat-pill-lbl">Custos</div></div>
+        <div class="mk-stat-pill neutral"><div class="mk-stat-pill-val" id="cx-nloc">...</div><div class="mk-stat-pill-lbl">Locações</div></div>
+      </div>
     </div>
 
     <!-- Conferência -->
@@ -2472,8 +2489,8 @@ nav button .nav-badge{
 
 <!-- Toast container -->
 <div id="update-banner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:9999;background:#1565C0;color:#fff;padding:10px 16px;align-items:center;justify-content:space-between;font-size:13px;font-weight:600;gap:12px">
-  <span>🔄 Nova versão disponível — atualizando em <span id="update-countdown">10</span>s</span>
-  <button onclick="location.reload(true)" style="background:#fff;color:#1565C0;border:none;border-radius:6px;padding:6px 14px;font-weight:700;cursor:pointer">Atualizar agora</button>
+  <span>🔄 Nova versão — atualizando em <span id="update-countdown">5</span>s (login mantido)</span>
+  <button type="button" onclick="if(window.mkApplyAppUpdate&amp;&amp;typeof APP_VERSION!=='undefined')mkApplyAppUpdate(APP_VERSION)" style="background:#fff;color:#1565C0;border:none;border-radius:6px;padding:6px 14px;font-weight:700;cursor:pointer">Agora</button>
 </div>
 
 <div class="toast-container" id="toast-container"></div>
@@ -2513,7 +2530,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = '1.6.80';
+const APP_VERSION = '1.7.0';
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec';
 const PORTAL_RESPONSAVEL_URL = 'https://ribocg-a11y.github.io/movikids/acompanhar.html';
 
@@ -2988,28 +3005,7 @@ function calcStartTimestamp(data, horaInicio) {
   return new Date(yyyy, mm-1, dd, hh, mi, 0).getTime();
 }
 
-async function verificarNovaVersao() {
-  try {
-    const url = location.origin + location.pathname + '?nocache=' + Date.now();
-    const r = await fetch(url, { cache: 'no-store' });
-    const html = await r.text();
-    const m = html.match(/APP_VERSION = '([^']+)'/);
-    if (m && m[1] !== APP_VERSION) {
-      const banner = document.getElementById('update-banner');
-      if (banner && banner.style.display === 'none') {
-        banner.style.display = 'flex';
-        // Countdown de 10s e recarrega automaticamente
-        let secs = 10;
-        const cd = document.getElementById('update-countdown');
-        const iv = setInterval(() => {
-          secs--;
-          if (cd) cd.textContent = secs;
-          if (secs <= 0) { clearInterval(iv); location.reload(true); }
-        }, 1000);
-      }
-    }
-  } catch(e) { /* silencioso */ }
-}
+/* verificarNovaVersao — implementado em mk-update.js (auto-update + sessao) */
 
 function saveSessions() {
   localStorage.setItem('mk_sessions', JSON.stringify(sessions));
@@ -4018,7 +4014,7 @@ async function confirmarEncerrar() {
     updateStats();
     atualizarVeiculoGrid();
 
-    // SMS automático de agradecimento (v1.6.80) — fire-and-forget
+    // SMS automático de agradecimento (v1.7.0) — fire-and-forget
     try {
       const encDados = {
         rowIndex:    encSession.rowIndex,
@@ -5089,6 +5085,11 @@ function verificarPin() {
 function adminLogin() {
   isAdmin = true;
   window.isAdmin = true;
+  try {
+    sessionStorage.setItem('mk_auth_session', JSON.stringify({
+      id: 'ADMIN', nome: 'Administrador', role: 'admin', hasPin: true, ativo: true
+    }));
+  } catch (e) { /* ignore */ }
   const app = document.getElementById('app');
   if (app) app.style.display = 'flex';
   const gate = document.getElementById('mk-auth-gate');
@@ -5471,12 +5472,25 @@ async function carregarCaixa() {
     const resultado = totalEnt - totalCus;
 
     // KPIs
-    const setKpi = (id, val, cor) => { const el=document.getElementById(id); if(el){el.textContent=fmtR(val); if(cor)el.style.color=cor;} };
+    const setKpi = (id, val, cor) => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.textContent = fmtR(val);
+        if (cor) el.style.color = cor;
+      }
+    };
+    const setHero = (id, val, cor) => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.textContent = fmtR(val);
+        if (cor) el.style.color = cor;
+      }
+    };
     setKpi('cx-total', totalEnt, '#3B6D11');
     setKpi('cx-maq',   totalMaq, '#185FA5');
     setKpi('cx-din',   totalDin, '#854F0B');
     setKpi('cx-cus',   totalCus, '#A32D2D');
-    setKpi('cx-res',   resultado, resultado >= 0 ? '#3B6D11' : '#A32D2D');
+    setHero('cx-res', resultado, null);
     const nloc = document.getElementById('cx-nloc'); if(nloc) nloc.textContent = locacoes.length;
     document.getElementById('cx-total-ent').textContent = fmtR(totalEnt);
     document.getElementById('cx-total-sai').textContent = fmtR(totalCus);
@@ -6327,36 +6341,20 @@ setInterval(() => {
 
 function showAdminHomeKpis(d) {
   const el = document.getElementById('admin-home-kpis');
-  if (!el) return;
-  el.style.display = 'block';
-  const R = v=>'R$ '+Number(v).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,'.');
-  const set = (id,v) => { const e=document.getElementById(id); if(e) e.textContent=v; };
-  set('h-fathoje', R(d.fatHoje));
-  set('h-cushoje', R(d.cusHoje));
-  set('h-fatmes',  R(d.fatMes));
-  set('h-nmes',    d.nMes+' locações');
-  set('h-resultado', R(d.resultado));
-  set('h-margem',  'margem '+d.margem+'%');
+  if (el) { el.style.display = 'none'; el.hidden = true; }
+  const chip = document.getElementById('admin-home-chip');
+  const isAdmin = (typeof mkAuthIsAdmin === 'function' && mkAuthIsAdmin()) || window.isAdmin;
+  const R = v => 'R$ ' + Number(v).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  const set = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
+  if (chip) {
+    if (!isAdmin) chip.hidden = true;
+    else {
+      chip.hidden = false;
+      set('admin-chip-fat', R(d.fatHoje));
+    }
+  }
 
-  // Fase 7: Fechamento sempre atualiza, independente de ter dados de tipo
   if (typeof atualizarFechamento === 'function') atualizarFechamento(d);
-
-  // Ranking carro vs pelúcia
-  const ranking = document.getElementById('h-ranking');
-  const rows    = document.getElementById('h-rank-rows');
-  if (!ranking||!rows) return;
-  const pt = d.fatPorTipo||{};
-  const total = (pt['Carro']||0)+(pt['Triciclo']||0)+(pt['Pelúcia']||0);
-  if (!total) return;
-  ranking.style.display='block';
-  const pct = v => total>0 ? Math.round(v/total*100) : 0;
-  rows.innerHTML = [['🚗 Carros','Carro','#1565C0'],['🛺 Triciclos','Triciclo','#2E7D32'],['🧸 Pelúcias','Pelúcia','#C2185B']].map(([label,key,color])=>{
-    const n = pt[key]||0, p = pct(n);
-    return `<div class="rank-row">
-      <div class="rank-label"><span>${label}</span><span>${p}% — R$ ${n.toFixed(0)}</span></div>
-      <div class="rank-bar-bg"><div class="rank-bar" style="width:${p}%;background:${color}"></div></div>
-    </div>`;
-  }).join('');
 }
 
 // ════════════════════════════════════════════════════════════
@@ -6453,7 +6451,7 @@ function renderAnalyticsCards(stats) {
   }
 }
 
-// ── LANÇAMENTO AVULSO v1.6.80 ───────────────────────────────
+// ── LANÇAMENTO AVULSO v1.7.0 ───────────────────────────────
 let avulsoState = { tipo: null, plano: null };
 
 function resetAvulsoForm_() {
@@ -6530,7 +6528,8 @@ async function salvarLancamentoAvulso() {
 
 window.__mkLoginOpsPromise = api({ action: 'listarOperadoresLogin' });
 </script>
-<script src="mk-auth.js?v=1.6.80"></script>
+<script src="mk-update.js?v=1.7.0"></script>
+<script src="mk-auth.js?v=1.7.0"></script>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
   if (typeof mkAuthBoot === 'function') {
@@ -6547,7 +6546,9 @@ if ('serviceWorker' in navigator) {
   navigator.serviceWorker.addEventListener('message', event => {
     if (event.data && event.data.type === 'MK_UPDATE_READY') {
       const swVersion = event.data.version || '';
-      if (swVersion && swVersion !== APP_VERSION) location.reload();
+      if (swVersion && swVersion !== APP_VERSION && typeof mkApplyAppUpdate === 'function') {
+        mkApplyAppUpdate(swVersion);
+      }
     }
   });
   window.addEventListener('load', () => {

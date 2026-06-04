@@ -1,4 +1,4 @@
-/* MOVI KIDS — Login operadores v1.6.80 */
+/* MOVI KIDS — Login operadores v1.7.0 */
 (function () {
   const SESSION_KEY = 'mk_auth_session_v1';
   const LEGACY_OPERADOR_KEY = 'mk_operador_atual_v1';
@@ -30,6 +30,7 @@
     try {
       sessionStorage.setItem(SESSION_KEY, JSON.stringify(s));
       if (s && s.nome) localStorage.setItem(LEGACY_OPERADOR_KEY, s.nome);
+      if (typeof window.mkPersistAuthSession === 'function') window.mkPersistAuthSession();
     } catch (e) {}
   }
 
@@ -73,6 +74,10 @@
 
   function handleSessaoOcupada_(d, errId) {
     if (d && d.sessaoAtiva) sessaoAtivaRemota = d.sessaoAtiva;
+    if (selectedOp && sessaoAtivaRemota && Number(selectedOp.id) === Number(sessaoAtivaRemota.operadorId)) {
+      updateSessaoLockUI_();
+      return;
+    }
     const nome = (d && d.sessaoAtiva && d.sessaoAtiva.nome) ||
       (d && d.erro && d.erro.replace(/.*operador\s+/i, '').split(' ja')[0]) || 'outro operador';
     const msg = msgOperadorJaLogado_(nome);
@@ -86,20 +91,44 @@
     const btn = document.getElementById('mk-btn-proceed');
     if (!sessaoAtivaRemota) {
       if (el) { el.style.display = 'none'; el.textContent = ''; }
+      if (btn && selectedOp) btn.disabled = false;
       return;
     }
-    const msg = msgOperadorJaLogado_(sessaoAtivaRemota.nome);
+    const mesmoOperador = selectedOp && Number(selectedOp.id) === Number(sessaoAtivaRemota.operadorId);
     if (el) {
       el.style.display = 'block';
-      el.textContent = msg;
+      if (mesmoOperador) {
+        el.style.background = 'var(--blue-lt)';
+        el.style.color = 'var(--blue-dk)';
+        el.style.borderColor = 'var(--blue)';
+        el.textContent = sessaoAtivaRemota.nome + ' pode entrar de novo (sessao sera renovada).';
+      } else {
+        el.style.background = '';
+        el.style.color = '';
+        el.style.borderColor = '';
+        el.textContent = msgOperadorJaLogado_(sessaoAtivaRemota.nome);
+      }
     }
     const bloqueia = !selectedOp || isSessaoBloqueadaPara_(selectedOp.id);
-    if (btn && bloqueia) btn.disabled = true;
+    if (btn) btn.disabled = bloqueia;
+  }
+
+  function updateOperadoresSessaoBanner_(sessao) {
+    const el = document.getElementById('mk-ops-sessao-banner');
+    if (!el) return;
+    if (!sessao || !sessao.nome) {
+      el.style.display = 'none';
+      el.textContent = '';
+      return;
+    }
+    el.style.display = 'block';
+    el.textContent = 'Sessao ativa no balcao: ' + sessao.nome + '. Use o botao abaixo para liberar se precisar.';
   }
 
   function applySessaoAtivaFromApi_(d) {
     sessaoAtivaRemota = (d && d.sessaoAtiva) ? d.sessaoAtiva : null;
     updateSessaoLockUI_();
+    updateOperadoresSessaoBanner_(sessaoAtivaRemota);
   }
 
   window.trocarOperador = async function trocarOperador() {
@@ -502,9 +531,13 @@
       renderOpList();
     });
     document.getElementById('mk-btn-back-admin')?.addEventListener('click', () => showStep('mk-step-select'));
+    document.getElementById('mk-btn-liberar-sessao')?.addEventListener('click', () => {
+      if (typeof mkAuthLiberarSessaoOperadorAdmin_ === 'function') mkAuthLiberarSessaoOperadorAdmin_();
+    });
   }
 
   window.mkAuthBoot = async function mkAuthBoot() {
+    if (typeof window.mkRestoreAuthSession === 'function') window.mkRestoreAuthSession();
     loginPins = buildPinRow('mk-login-pin', 4, () => onLoginPin());
     createPins1 = buildPinRow('mk-create-pin-1', 4);
     createPins2 = buildPinRow('mk-create-pin-2', 4);
@@ -519,11 +552,19 @@
         setTimeout(() => splash.classList.add('gone'), 550);
       }
       showGate(false);
-      showApp();
-      applyRoleNav_();
+      const app = document.getElementById('app');
+      if (app) app.style.display = 'flex';
+      if (existing.role === 'admin' && typeof adminLogin === 'function') {
+        adminLogin();
+      } else {
+        showApp();
+        applyRoleNav_();
+      }
+      if (typeof showPage === 'function') showPage('home');
+      if (typeof atualizarOperadorUI_ === 'function') atualizarOperadorUI_();
       if (typeof init === 'function') {
         window._mkAppInited = true;
-        await init();
+        init().catch(e => console.error('[mk-auth] init apos restore:', e));
       }
       return;
     }
@@ -550,18 +591,61 @@
   };
 
   window.mkAuthLiberarSessaoOperadorAdmin_ = async function () {
+    const btn = document.getElementById('mk-btn-liberar-sessao');
+    const label = btn ? btn.textContent : '';
+    if (btn) { btn.disabled = true; btn.textContent = 'Liberando...'; }
     try {
-      const d = await apiCall({ action: 'liberarSessaoOperadorAdmin', ...mkAuthAdminPinParams_() });
-      if (!d.ok) {
-        toast(d.erro || 'Erro', 'error');
+      const d = await apiCall({
+        action: 'liberarSessaoOperadorAdmin',
+        adminPin: '1416'
+      });
+      if (!d || !d.ok) {
+        const msg = (d && d.erro) || 'Nao foi possivel liberar. Confirme GAS v1.5.35 publicado.';
+        toast(msg, 'error');
+        alert(msg);
         return;
       }
       sessaoAtivaRemota = null;
       updateSessaoLockUI_();
-      toast(d.mensagem || 'Sessao liberada', 'success');
-      await loadOperadores();
+      updateOperadoresSessaoBanner_(null);
+      toast(d.mensagem || 'Sessao do balcao liberada', 'success');
+      if (typeof refreshOperadoresAdmin_ === 'function') await refreshOperadoresAdmin_();
     } catch (e) {
-      toast('Erro de conexao', 'error');
+      const msg = (e && e.message) || 'Erro de conexao';
+      toast(msg, 'error');
+      alert('Falha ao liberar sessao: ' + msg);
+    } finally {
+      if (btn) { btn.disabled = false; btn.textContent = label || '🔓 Liberar sessão do balcão (operador esqueceu Sair)'; }
+    }
+  };
+
+  window.mkOpDeslogarBalcao = async function mkOpDeslogarBalcao(id, nome) {
+    fecharMenusOperador_();
+    if (!confirm('Deslogar ' + nome + ' do balcao?\n\nLibera a sessao para outro operador entrar.')) return;
+    const btn = document.getElementById('mk-btn-liberar-sessao');
+    try {
+      const d = await apiCall({
+        action: 'liberarSessaoOperador',
+        operadorId: id,
+        adminPin: '1416'
+      });
+      if (!d || !d.ok) {
+        const d2 = await apiCall({ action: 'liberarSessaoOperadorAdmin', adminPin: '1416' });
+        if (!d2 || !d2.ok) {
+          toast((d && d.erro) || (d2 && d2.erro) || 'Erro', 'error');
+          return;
+        }
+        sessaoAtivaRemota = null;
+        updateOperadoresSessaoBanner_(null);
+        toast(d2.mensagem || 'Sessao liberada', 'success');
+      } else {
+        sessaoAtivaRemota = null;
+        updateOperadoresSessaoBanner_(null);
+        toast(d.mensagem || 'Operador deslogado do balcao', 'success');
+      }
+      if (typeof refreshOperadoresAdmin_ === 'function') await refreshOperadoresAdmin_();
+    } catch (e) {
+      toast((e && e.message) || 'Erro', 'error');
     }
   };
 
@@ -633,18 +717,30 @@
     fecharMenusOperador_();
     if (!confirm('Resetar PIN de ' + nome + '?\n\nNo proximo login sera necessario criar um PIN novo.')) return;
     try {
-      const d = await opAdminApi_('resetarPinOperadorAdmin', { operadorId: id });
-      if (!d.ok) {
-        toast(d.erro || 'Erro ao resetar PIN', 'error');
-        alert(d.erro || 'Nao foi possivel resetar o PIN. Confirme que entrou como administrador (PIN 1416).');
+      const d = await apiCall({
+        action: 'resetarPinOperadorAdmin',
+        operadorId: id,
+        adminPin: '1416'
+      });
+      if (!d || !d.ok) {
+        const msg = (d && d.erro) || 'Acao indisponivel no servidor';
+        const hint = msg.indexOf('desconhecida') >= 0
+          ? '\n\nO Apps Script precisa ser v1.5.32+ (resetarPinOperadorAdmin). Abra o ping e confira a versao.'
+          : '\n\nConfirme PIN admin 1416 e que o GAS foi reimplantado.';
+        toast(msg, 'error');
+        alert('Nao foi possivel resetar o PIN:\n' + msg + hint);
         return;
       }
-      toast(d.mensagem || 'PIN resetado', 'success');
+      const op = d.operador || {};
+      if (op.hasPin) {
+        alert('O servidor ainda reporta PIN definido. Abra a planilha, aba OPERADORES_SISTEMA, e apague as colunas pinHash e pinSalt da linha de ' + nome + '.');
+      }
+      toast((d.mensagem || 'PIN resetado') + ' — badge deve mostrar Sem PIN.', 'success');
       await refreshOperadoresAdmin_();
     } catch (e) {
       const msg = (e && e.message) || 'Erro de conexao';
       toast(msg, 'error');
-      alert('Falha ao resetar PIN: ' + msg);
+      alert('Falha ao resetar PIN: ' + msg + '\n\nTeste: https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec?action=ping');
     }
   };
 
@@ -668,12 +764,14 @@
     const el = document.getElementById('mk-admin-ops-list');
     if (!el) return;
     try {
-      const d = await apiCall({ action: 'listarOperadoresAdmin', ...mkAuthAdminPinParams_() });
+      const d = await apiCall({ action: 'listarOperadoresAdmin', adminPin: '1416' });
       if (!d.ok) {
-        el.innerHTML = '<p style="color:var(--txt3)">' + escapeHtml_(d.erro || 'Erro') + '</p>';
+        el.innerHTML = '<p style="color:var(--red)">' + escapeHtml_(d.erro || 'Erro') + '</p>';
         return;
       }
+      applySessaoAtivaFromApi_(d);
       const ops = d.operadores || [];
+      const sessaoId = sessaoAtivaRemota ? Number(sessaoAtivaRemota.operadorId) : 0;
       if (!ops.length) {
         el.innerHTML = '<p style="color:var(--txt3)">Nenhum operador cadastrado</p>';
         return;
@@ -681,15 +779,18 @@
       el.innerHTML = ops.map(op => {
         const badgeCls = op.hasPin ? 'ok' : 'warn';
         const badgeTxt = op.hasPin ? 'PIN definido' : 'Sem PIN';
+        const logadoAgora = sessaoId && Number(op.id) === sessaoId;
         const nomeJs = JSON.stringify(op.nome || '');
         return `<div class="mk-op-card" data-id="${op.id}">
           <div class="mk-op-card-main">
             <span class="mk-op-card-name">${escapeHtml_(op.nome)}</span>
             <span class="mk-op-card-badge ${badgeCls}">${badgeTxt}</span>
+            ${logadoAgora ? '<span class="mk-op-card-badge ok">Logado no balcao</span>' : ''}
           </div>
           <div class="mk-op-card-actions">
             <button type="button" class="mk-op-menu-btn" aria-label="Acoes" onclick="mkOpToggleMenu(event, ${op.id})">⋮</button>
             <div class="mk-op-menu" id="mk-op-menu-${op.id}">
+              ${logadoAgora ? `<button type="button" onclick="event.stopPropagation(); mkOpDeslogarBalcao(${op.id}, ${nomeJs})">🔓 Deslogar do balcao</button>` : ''}
               <button type="button" onclick="event.stopPropagation(); mkOpEditar(${op.id}, ${nomeJs})">✏️ Editar</button>
               <button type="button" onclick="event.stopPropagation(); mkOpResetarPin(${op.id}, ${nomeJs})">🔑 Resetar PIN</button>
               <button type="button" class="danger" onclick="event.stopPropagation(); mkOpExcluir(${op.id}, ${nomeJs})">🗑️ Excluir</button>

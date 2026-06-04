@@ -1,0 +1,134 @@
+/* MOVI KIDS — Design system v1 (Pacote A) — aditivo, não remove legado */
+
+:root {
+  --mk-radius: 12px;
+  --mk-shadow-1: 0 2px 8px rgba(13, 71, 161, 0.08);
+  --mk-space: 16px;
+}
+
+/* ── MKStat (Home + Caixa) ─────────────────────────────── */
+.mk-stat-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.mk-stat-tile {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--mk-radius);
+  padding: 14px var(--mk-space);
+  box-shadow: var(--mk-shadow-1);
+  text-align: center;
+}
+.mk-stat-tile .stat-val,
+.mk-stat-tile .mk-stat-val {
+  font-size: 28px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: var(--blue);
+  line-height: 1.1;
+}
+.mk-stat-tile .stat-lbl,
+.mk-stat-tile .mk-stat-lbl {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--txt3);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-top: 4px;
+}
+
+.mk-caixa-resumo { margin-bottom: 16px; }
+.mk-stat-hero {
+  background: linear-gradient(135deg, var(--blue-dk), var(--blue));
+  color: #fff;
+  border-radius: var(--mk-radius);
+  padding: 18px var(--mk-space);
+  margin-bottom: 10px;
+  box-shadow: var(--mk-shadow-1);
+}
+.mk-stat-hero-val {
+  font-size: 32px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+.mk-stat-hero-lbl {
+  font-size: 12px;
+  font-weight: 600;
+  opacity: 0.9;
+  margin-top: 4px;
+}
+.mk-stat-pills {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+@media (max-width: 520px) {
+  .mk-stat-pills { grid-template-columns: repeat(2, 1fr); }
+}
+.mk-stat-pill {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 8px;
+  text-align: center;
+}
+.mk-stat-pill-val {
+  font-size: 15px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+.mk-stat-pill-lbl {
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--txt3);
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+.mk-stat-pill.blue .mk-stat-pill-val { color: var(--blue); }
+.mk-stat-pill.gold .mk-stat-pill-val { color: #854f0b; }
+.mk-stat-pill.red .mk-stat-pill-val { color: var(--red); }
+.mk-stat-pill.green .mk-stat-pill-val { color: var(--green); }
+.mk-stat-pill.neutral .mk-stat-pill-val { color: var(--txt); }
+
+/* Admin: chip em vez de 4 KPIs na Home */
+.mk-admin-chip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 10px 14px;
+  margin-bottom: 12px;
+  background: var(--blue-lt);
+  border: 1px solid var(--blue);
+  border-radius: var(--mk-radius);
+  font-size: 13px;
+  color: var(--blue-dk);
+}
+.mk-admin-chip[hidden] { display: none !important; }
+.mk-admin-chip-btn {
+  background: var(--blue);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* Session card — menos ruído (Home) */
+.page-home .session-card.danger {
+  animation: none;
+}
+.page-home .session-card .sc-timer-big {
+  font-size: 34px;
+  font-variant-numeric: tabular-nums;
+}
+.page-home .session-card .sc-valor:last-child {
+  display: none;
+}

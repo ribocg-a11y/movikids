@@ -1,31 +1,47 @@
 # MOVI KIDS — Estado atual (04/06/2026)
 
-Referencia unica para alinhamento local x producao.
+Referencia unica para alinhamento local x producao.  
+**Incidente auth 04/06:** `INCIDENTE_AUTH_OPERADORES_2026-06-04.md`  
+**Roadmap mestre:** `PLANO_MESTRE_REORGANIZADO_2026-06.md`
 
-## Producao
+## Producao (verificar apos cada deploy)
 
-| Camada | Versao | URL / ID |
-|--------|--------|----------|
-| Apps Script | v1.5.31 prod / **v1.5.32 pronto** | Deploy `AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw` |
-| Frontend | **v1.6.72** (repo) / v1.6.71 Pages até push | https://ribocg-a11y.github.io/movikids/ |
-| Portal | publicado | https://ribocg-a11y.github.io/movikids/acompanhar.html |
-| Planilha | MOVIKIDS_Planilha_Base | `1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618` |
+| Camada | Versao alvo | URL / ID |
+|--------|-------------|----------|
+| Apps Script | **v1.5.36** | Deploy `AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw` |
+| Frontend | **v1.7.0** | https://ribocg-a11y.github.io/movikids/?force=1.7.0 |
+| Planilha | MOVIKIDS_Planilha_Base | https://docs.google.com/spreadsheets/d/1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618/edit |
+| Apps Script editor | Planilha → Extensões → Apps Script | ver `DEPLOY_GAS_v1.5.32_AUTH.md` |
 
-## Arquivo canonico no repositorio
+Teste rapido GAS:  
+https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec?action=ping
 
-- **GAS producao:** `MOVIKIDS_Code_v1.5.31_PRODUCAO.gs`
-- **GAS proximo deploy:** `MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs` — ver `DEPLOY_GAS_v1.5.32_AUTH.md`
-- **Login operadores:** `mk-auth.js` + gate em `index.html`
-- **Nao implantar:** `arquivo-historico/` e versoes antigas `MOVIKIDS_Code_v1.5.2x` salvo deploy documentado
+## Arquivos canonicos
 
-## Validacao (04/06/2026)
+- **GAS:** `MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs` (header v1.5.36)
+- **Login:** `mk-auth.js` + gate em `index.html`
+- **Deploy / links:** `DEPLOY_GAS_v1.5.32_AUTH.md`
+- **Emergencia:** `scripts/liberar-eduarda-agora.html`, `scripts/corrigir-locacao-206.html`
 
-- `ping`, `validarSchema`, `diagnosticoConfigOperacional`: OK
-- `TESTE_RELACIONAMENTO_MOVIKIDS_READONLY.ps1`: OK
-- Portal: 0 locacoes Pendente/Ativa no momento (teste API OK; retorno vazio esperado)
-- `TESTE_REGRESSAO_MOVIKIDS_PROD_SAFE.ps1 -RunWriteTests`: OK em 04/06/2026 (id teste 191 cancelado)
+## Auth operadores — capacidades ADM (GAS 1.5.35+)
 
-## QR Code portal
+| Acao | API |
+|------|-----|
+| Resetar PIN qualquer operador | `resetarPinOperadorAdmin` + `adminPin=1416` |
+| Liberar balcao (qualquer um logado) | `liberarSessaoOperadorAdmin` |
+| Deslogar operador especifico | `liberarSessaoOperador` + `operadorId` + `adminPin` |
+| Corrigir locacao encerrada (caixa) | `corrigirFinanceiroLocacaoAdmin` (v1.5.36) |
 
-- PNG: `assets/qr-portal-acompanhar.png`
-- SVG: `assets/qr-portal-acompanhar.svg`
+UI: Administracao → Operadores (app v1.6.81).
+
+## Pendencias pos-incidente 04/06
+
+- [ ] Implantar GAS **v1.5.36** no Apps Script (Nova versao)
+- [ ] Publicar / cache bust frontend **v1.6.81** em todos os dispositivos
+- [ ] Corrigir planilha **linha 206** (tempo extra indevido) — ver incidente doc
+- [ ] Checklist 2 dispositivos (login, 409, liberar, reset PIN)
+
+## Validacao
+
+- `listarOperadoresLogin`: Eduarda `hasPin: false`, `sessaoAtiva: null` (apos reset)
+- Regressao prod safe: OK (04/06) — estender com cenarios do incidente doc
