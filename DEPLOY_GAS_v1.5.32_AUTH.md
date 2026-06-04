@@ -29,6 +29,13 @@ Colar no projeto Apps Script (mesmo projeto, **mesmo Deploy ID**):
 | `editarOperadorSistema` | Renomear operador (ADM + `adminPin`) |
 | `excluirOperadorSistema` | Desativa operador (ADM) |
 | `resetarPinOperadorAdmin` | Limpa PIN para recriar no login (ADM) |
+| `verificarSmsDisparo` | Consulta se tipo ja foi enviado na janela de dedup |
+
+## SMS v1.5.32b (mesmo arquivo GAS)
+
+- Dedup por locacao/tipo e campanha por telefone.
+- Status de entrega atualiza linha de envio na aba `AUD_SMS`.
+- Ver `AUDITORIA_SMS_MELHORIAS_v1.6.76.md`.
 
 ## Planilha
 

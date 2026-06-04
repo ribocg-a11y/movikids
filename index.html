@@ -21,7 +21,7 @@
 // ── CACHE BUSTER v1.3.0 ─────────────────────────────────
 // Força limpeza do SW antigo e recarga com versão nova
 (function(){
-  const CURRENT = '1.6.75';
+  const CURRENT = '1.6.76';
   const KEY = 'mk_loaded_version';
   try {
     if (localStorage.getItem(KEY) !== CURRENT) {
@@ -70,7 +70,7 @@ html,body{height:100%;background:var(--bg);color:var(--txt);overflow:hidden}
 #splash.hide{opacity:0;pointer-events:none}
 #splash.gone{display:none}
 
-/* ── LOGIN OPERADORES v1.6.75 ─────────────────────────────── */
+/* ── LOGIN OPERADORES v1.6.76 ─────────────────────────────── */
 #mk-auth-gate{
   position:fixed;inset:0;z-index:998;
   background:var(--bg);
@@ -268,6 +268,7 @@ nav button .nav-badge{
 .sc-timer-extra-cost{font-size:13px;font-weight:700;color:var(--red)}
 .sc-valor{font-size:13px;color:var(--txt2);font-weight:600;margin-top:4px}
 .sms-status{display:inline-flex;align-items:center;margin-top:7px;padding:4px 8px;border-radius:999px;font-size:11px;font-weight:900;border:1px solid transparent}
+.sms-fail-hint{font-size:11px;color:var(--red);font-weight:700;margin-top:6px;line-height:1.35}
 .sms-ok{background:#E8F5E9;color:#1B5E20;border-color:#A5D6A7}
 .sms-err{background:#FFEBEE;color:#B71C1C;border-color:#EF9A9A}
 .sms-sent{background:#E3F2FD;color:#0D47A1;border-color:#90CAF9}
@@ -1471,7 +1472,7 @@ nav button .nav-badge{
   <!-- ══ SIDEBAR (desktop only) ══ -->
   <aside id="sidebar">
     <div class="sb-logo">🚗 Movi <span>Kids</span>
-      <div class="sb-status"><span id="sb-dot" class="dot-online"></span><span id="sb-txt">Online</span><span id="sb-version" style="font-size:10px;opacity:.85;margin-left:5px;color:rgba(255,255,255,.7);font-family:monospace">v1.6.75</span></div>
+      <div class="sb-status"><span id="sb-dot" class="dot-online"></span><span id="sb-txt">Online</span><span id="sb-version" style="font-size:10px;opacity:.85;margin-left:5px;color:rgba(255,255,255,.7);font-family:monospace">v1.6.76</span></div>
     </div>
     <div class="sb-nav" id="sb-nav">
       <button class="sb-btn active" id="sbn-home" onclick="showPage('home')"><span class="sb-icon">🏠</span>Home</button>
@@ -1514,7 +1515,7 @@ nav button .nav-badge{
       <div class="hd-status">
         <div id="status-dot" class="dot-online"></div>
         <span id="status-txt">Online</span>
-        <span id="app-version" style="font-size:10px;opacity:.85;margin-left:4px;font-family:monospace">v1.6.75</span>
+        <span id="app-version" style="font-size:10px;opacity:.85;margin-left:4px;font-family:monospace">v1.6.76</span>
       </div>
     </div>
   </header>
@@ -2509,7 +2510,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = '1.6.75';
+const APP_VERSION = '1.6.76';
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec';
 const PORTAL_RESPONSAVEL_URL = 'https://ribocg-a11y.github.io/movikids/acompanhar.html';
 
@@ -2540,7 +2541,7 @@ const NOVA_DRAFT_KEY = 'mk_nova_locacao_draft_v1';
 const WA_EVENT_LOG_KEY = 'mk_wa_event_log_v1';
 /* operador/sessao: mk-auth.js */
 const WA_MODE_KEY = 'mk_whatsapp_mode_v1';
-const SMS_CHECK_DELAYS = [15000, 60000, 180000, 300000];
+const SMS_CHECK_DELAYS = [15000, 60000, 180000];
 const SMS_UNCONFIRMED_MS = 5 * 60 * 1000;
 let _restoringNovaDraft = false;
 let catSel      = 'Energia';
@@ -2885,10 +2886,12 @@ function mergeSessaoCanonica(serverSession, localSession = {}) {
     started: isAtiva && startTimestamp > 0,
 
     // Somente flags locais de UX podem sobreviver ao estado canonico.
-    alertFired5: Boolean(localSession.alertFired5),
-    alertFiredExp: Boolean(localSession.alertFiredExp),
-    extraWaSentAt: localSession.extraWaSentAt || localStorage.getItem(extraWaKey_(serverSession)) || null,
-    smsStatus: serverSession.smsStatus || localSession.smsStatus || null
+    alertFired5: Boolean(localSession.alertFired5) || Boolean(serverSession.smsFlags && serverSession.smsFlags.alerta),
+    alertFiredExp: Boolean(localSession.alertFiredExp) || Boolean(serverSession.smsFlags && serverSession.smsFlags.esgotado),
+    extraWaSentAt: localSession.extraWaSentAt || localStorage.getItem(extraWaKey_(serverSession)) ||
+      (serverSession.smsFlags && serverSession.smsFlags.esgotado ? Date.now() : null),
+    smsStatus: serverSession.smsStatus || localSession.smsStatus || null,
+    smsFlags: serverSession.smsFlags || localSession.smsFlags || null
   };
 }
 
@@ -3014,6 +3017,7 @@ function extraWaKey_(s) {
 
 function extraWaFoiEnviado_(s) {
   if (!s) return false;
+  if (s.smsFlags && s.smsFlags.esgotado) return true;
   return Boolean(s.extraWaSentAt || localStorage.getItem(extraWaKey_(s)));
 }
 
@@ -3045,8 +3049,10 @@ function smsStatusHtml_(s) {
     : sms.state;
   const label = smsStatusLabel_(state);
   const title = sms.error ? ' title="' + escHtml(sms.error) + '"' : '';
-  const fallback = String(state || '').toLowerCase() === 'failed'
-    ? '<button class="btn btn-wa" onclick="abrirWhatsAppFallback(' + Number(s.rowIndex || 0) + ')" title="Abrir WhatsApp como alternativa">WhatsApp fallback</button>'
+  const failed = String(state || '').toLowerCase() === 'failed';
+  const fallback = failed
+    ? '<div class="sms-fail-hint">Confirme o telefone ou mostre o QR do portal no balcao.</div>' +
+      '<button class="btn btn-wa" onclick="abrirWhatsAppFallback(' + Number(s.rowIndex || 0) + ')" title="Abrir WhatsApp como alternativa">WhatsApp fallback</button>'
     : '';
   return '<div class="sms-status sms-' + label.cls + '"' + title + '>' + label.txt + '</div>' + fallback;
 }
@@ -3090,7 +3096,7 @@ function reconsultarSmsPendentes_() {
 }
 
 async function consultarSmsStatusSessao_(rowIndex, gatewayId) {
-  if (!gatewayId) return null;
+  if (!gatewayId || gatewayId.length < 8) return null;
   const atual = sessions.find(x => Number(x.rowIndex) === Number(rowIndex));
   if (atual && atual.smsStatus && smsStatusFinal_(atual.smsStatus.state)) return atual.smsStatus;
   try {
@@ -4008,7 +4014,7 @@ async function confirmarEncerrar() {
     updateStats();
     atualizarVeiculoGrid();
 
-    // SMS automático de agradecimento (v1.6.75) — fire-and-forget
+    // SMS automático de agradecimento (v1.6.76) — fire-and-forget
     try {
       const encDados = {
         rowIndex:    encSession.rowIndex,
@@ -4131,6 +4137,20 @@ function tipoSmsPorSessao_(s) {
   return 'portal';
 }
 
+function aplicarSmsResposta_(s, sms, smsTipo) {
+  if (!sms || !sms.gatewayId) return;
+  atualizarSmsStatusLocal_(s.rowIndex, {
+    gatewayId: sms.gatewayId,
+    state: sms.state || (sms.duplicado ? (sms.state || 'Sent') : 'Accepted'),
+    error: '',
+    telefone: sms.telefone || '',
+    tipo: smsTipo,
+    sentAt: Date.now(),
+    checks: 0
+  });
+  if (!sms.duplicado) agendarConsultaSms_(s.rowIndex, sms.gatewayId);
+}
+
 async function enviarSmsResponsavel_(s, tipo) {
   if (!s || !s.telefone) { toast('Telefone nao cadastrado', 'error'); return false; }
   const smsTipo = tipo || tipoSmsPorSessao_(s);
@@ -4145,18 +4165,12 @@ async function enviarSmsResponsavel_(s, tipo) {
     }, 30000);
     if (!d.ok) throw new Error(d.erro || 'Falha ao enviar SMS');
     const sms = d.sms || {};
-    if (sms.gatewayId) {
-      atualizarSmsStatusLocal_(s.rowIndex, {
-        gatewayId: sms.gatewayId,
-        state: 'Accepted',
-        error: '',
-        telefone: sms.telefone || '',
-        tipo: smsTipo,
-        sentAt: Date.now(),
-        checks: 0
-      });
-      agendarConsultaSms_(s.rowIndex, sms.gatewayId);
+    if (sms.duplicado) {
+      aplicarSmsResposta_(s, sms, smsTipo);
+      toast('SMS ja enviado recentemente para esta locacao.', 'warning');
+      return true;
     }
+    if (sms.gatewayId) aplicarSmsResposta_(s, sms, smsTipo);
     toast('SMS enviado para a fila.', 'success');
     return true;
   } catch(e) {
@@ -4511,7 +4525,7 @@ async function enviarBvEIniciar() {
   const s = sessions.find(x => x.rowIndex === bvRowIndex);
   if (s && await waBoasVindas(s) === false) return;
   document.getElementById('wa-bv-modal').classList.remove('show');
-  iniciarContagem(bvRowIndex);
+  iniciarContagem(bvRowIndex, { skipAutoPortal: true });
   bvRowIndex = null;
 }
 
@@ -4521,7 +4535,8 @@ function pularBvEIniciar() {
   bvRowIndex = null;
 }
 
-async function iniciarContagem(rowIndex) {
+async function iniciarContagem(rowIndex, opts) {
+  opts = opts || {};
   const ts = Date.now(); // Momento exato do clique
 
   // 1. Atualiza estado local IMEDIATAMENTE (sem esperar servidor)
@@ -4555,16 +4570,21 @@ async function iniciarContagem(rowIndex) {
     return;
   }
 
-  // 3. SMS automático de boas-vindas (v1.6.75) — disparo sem clique do operador
-  // Não bloqueia a UI: fire-and-forget com toast discreto
-  try {
-    const sAtual = sessions.find(x => x.rowIndex === rowIndex);
-    if (sAtual && sAtual.telefone) {
-      enviarSmsResponsavel_(sAtual, 'portal').then(ok => {
-        if (ok) toast('📱 SMS de boas-vindas enviado automaticamente.', 'info');
-      }).catch(() => {});
-    }
-  } catch(eSms) {}
+  // 3. SMS portal automatico ao iniciar (1x) — pular se modal ja enviou boas-vindas
+  if (!opts.skipAutoPortal) {
+    try {
+      const sAtual = sessions.find(x => x.rowIndex === rowIndex);
+      const jaPortal = sAtual && (
+        (sAtual.smsStatus && sAtual.smsStatus.tipo === 'portal') ||
+        (sAtual.smsFlags && sAtual.smsFlags.portal)
+      );
+      if (sAtual && sAtual.telefone && !jaPortal) {
+        enviarSmsResponsavel_(sAtual, 'portal').then(ok => {
+          if (ok) toast('SMS de boas-vindas enviado.', 'info');
+        }).catch(() => {});
+      }
+    } catch(eSms) {}
+  }
 
   // 4. Sync via controller (deduplicado, force=true pois sessão mudou)
   broadcastInvalidate(); syncController(true, 500);
@@ -6423,7 +6443,7 @@ function renderAnalyticsCards(stats) {
   }
 }
 
-// ── LANÇAMENTO AVULSO v1.6.75 ───────────────────────────────
+// ── LANÇAMENTO AVULSO v1.6.76 ───────────────────────────────
 let avulsoState = { tipo: null, plano: null };
 
 function resetAvulsoForm_() {
@@ -6499,7 +6519,7 @@ async function salvarLancamentoAvulso() {
 }
 
 </script>
-<script src="mk-auth.js?v=1.6.75"></script>
+<script src="mk-auth.js?v=1.6.76"></script>
 <script>
 document.addEventListener('DOMContentLoaded', () => { if (typeof mkAuthBoot === 'function') mkAuthBoot(); else init(); });
 

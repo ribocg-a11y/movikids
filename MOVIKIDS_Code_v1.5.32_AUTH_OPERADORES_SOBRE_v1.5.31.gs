@@ -1,6 +1,7 @@
 // ═══════════════════════════════════════════════════════════
 // MOVI KIDS — Google Apps Script v1.5.32
 // v1.5.32: autenticacao operadores (PIN 4 digitos), admin PIN 1416, lancamento avulso auditado
+// v1.5.32b: SMS dedup por locacao/tipo, status na linha de envio, campanha bloqueia Failed recente
 // v1.5.0: pagamento (col Q) + observacao (col R)
 // v1.5.2: CacheService 20s em carregarInicio_
 // v1.5.3: Triciclo Elétrico — novo tipo de veículo
@@ -232,6 +233,7 @@ function doGet(e) {
       case 'editarOperadorSistema': return editarOperadorSistema_(p);
       case 'excluirOperadorSistema': return excluirOperadorSistema_(p);
       case 'resetarPinOperadorAdmin': return resetarPinOperadorAdmin_(p);
+      case 'verificarSmsDisparo': return verificarSmsDisparo_(p);
       case 'salvarLancamentoAvulso': return salvarLancamentoAvulso_(p);
       default:
         return err_('Ação desconhecida: ' + action, 400);
@@ -481,25 +483,25 @@ function listarAtivas_() {
       const shSms = ss_().getSheetByName(SH_AUD_SMS);
       if (shSms && shSms.getLastRow() >= 2) {
         const smsRows = shSms.getRange(2, 1, shSms.getLastRow() - 1, 13).getValues();
-        // Mapear por rowIndex: guardar o registro mais recente de tipo != 'status' (envio real)
         const smsMap = {};
         smsRows.forEach(r => {
           const tipo = String(r[2] || '').trim();
-          const status = String(r[3] || '').trim();
+          const statusCol = String(r[3] || '').trim();
           const ri = String(r[4] || '').trim();
           const gatewayId = String(r[11] || '').trim();
-          if (!ri || !gatewayId) return;
-          // r[1] = DataHora string "dd/MM/yyyy HH:mm"
-          if (!smsMap[ri] || r[1] > smsMap[ri].dataHora) {
-            smsMap[ri] = { gatewayId, state: tipo === 'status' ? status : 'Sent', dataHora: r[1], tipo };
+          if (!ri || !gatewayId || tipo === 'status') return;
+          const entrega = statusCol === 'enviado' ? 'Sent' : statusCol;
+          const rowNum = Number(r[0] || 0);
+          if (!smsMap[ri] || rowNum >= smsMap[ri].rowNum) {
+            smsMap[ri] = { gatewayId, state: entrega, dataHora: r[1], tipo, rowNum };
           }
         });
-        // Injetar em cada ativa
         ativas.forEach(a => {
           const entry = smsMap[String(a.rowIndex)];
           if (entry) {
-            a.smsStatus = { gatewayId: entry.gatewayId, state: entry.state, sentAt: null, updatedAt: Date.now() };
+            a.smsStatus = { gatewayId: entry.gatewayId, state: entry.state, tipo: entry.tipo, sentAt: null, updatedAt: Date.now() };
           }
+          a.smsFlags = smsFlagsPorRowIndex_(a.rowIndex);
         });
       }
     } catch(eSms) {
@@ -2048,6 +2050,165 @@ function consultarSmsGateway_(gatewayId) {
   };
 }
 
+const SMS_DEDUP_MIN_ = {
+  portal: 30,
+  alerta: 20,
+  esgotado: 60,
+  agradecimento: 720,
+  extensao: 15
+};
+const SMS_CAMPANHA_FALHA_DIAS_ = 7;
+const SMS_AUD_SCAN_MAX_ = 600;
+
+function parseDataHoraAud_(str) {
+  const parts = String(str || '').trim().split(' ');
+  if (parts.length < 2) return null;
+  const dp = parts[0].split('/');
+  const hp = parts[1].split(':');
+  if (dp.length < 3 || hp.length < 2) return null;
+  return new Date(
+    parseInt(dp[2], 10),
+    parseInt(dp[1], 10) - 1,
+    parseInt(dp[0], 10),
+    parseInt(hp[0], 10),
+    parseInt(hp[1], 10) || 0
+  );
+}
+
+function lerAudSmsRecentes_() {
+  const sh = ss_().getSheetByName(SH_AUD_SMS);
+  if (!sh || sh.getLastRow() < 2) return [];
+  const last = sh.getLastRow();
+  const start = Math.max(2, last - SMS_AUD_SCAN_MAX_ + 1);
+  return sh.getRange(start, 1, last - start + 1, 13).getValues();
+}
+
+function buscarSmsEnvioRecente_(rowIndex, tipo, minutos, telefoneDigits) {
+  const limiteMs = (minutos || 30) * 60 * 1000;
+  const agora = new Date();
+  const rows = lerAudSmsRecentes_();
+  for (let i = rows.length - 1; i >= 0; i--) {
+    const r = rows[i];
+    const rTipo = String(r[2] || '').trim();
+    const rStatus = String(r[3] || '').trim();
+    if (rTipo === 'status' || rStatus === 'erro') continue;
+    if (tipo && rTipo !== tipo) continue;
+    if (rowIndex && String(r[4]) !== String(rowIndex)) continue;
+    if (telefoneDigits) {
+      const tel = normalizarTelefoneSms_(String(r[8] || ''));
+      if (!tel.ok || tel.phone.replace(/\D/g, '') !== String(telefoneDigits).replace(/\D/g, '')) continue;
+    }
+    const dh = parseDataHoraAud_(r[1]);
+    if (!dh || (agora.getTime() - dh.getTime()) > limiteMs) continue;
+    const gatewayId = String(r[11] || '').trim();
+    if (!gatewayId) continue;
+    return {
+      gatewayId,
+      telefone: String(r[8] || ''),
+      estadoEntrega: rStatus === 'enviado' ? 'Sent' : rStatus,
+      dataHora: r[1],
+      tipo: rTipo,
+      rowAudit: Number(r[0] || 0)
+    };
+  }
+  return null;
+}
+
+function smsFlagsPorRowIndex_(rowIndex) {
+  const flags = {};
+  Object.keys(SMS_DEDUP_MIN_).forEach(tipo => {
+    flags[tipo] = !!buscarSmsEnvioRecente_(rowIndex, tipo, SMS_DEDUP_MIN_[tipo], '');
+  });
+  return flags;
+}
+
+function verificarSmsDisparo_(p) {
+  const rowIndex = parseInt(p.rowIndex || '0', 10);
+  const tipo = String(p.tipo || 'portal').trim() || 'portal';
+  const minutos = parseInt(p.minutos || SMS_DEDUP_MIN_[tipo] || 30, 10);
+  if (!rowIndex || rowIndex < DATA_ROW) return err_('rowIndex invalido', 400);
+  const recent = buscarSmsEnvioRecente_(rowIndex, tipo, minutos, '');
+  return resp_({
+    disparado: !!recent,
+    tipo,
+    minutos,
+    gatewayId: recent ? recent.gatewayId : '',
+    estadoEntrega: recent ? recent.estadoEntrega : '',
+    dataHora: recent ? recent.dataHora : ''
+  });
+}
+
+function encontrarLinhaAudPorGateway_(gatewayId, preferTipoEnvio) {
+  const gid = String(gatewayId || '').trim();
+  if (!gid) return 0;
+  const rows = lerAudSmsRecentes_();
+  let foundStatus = 0;
+  let foundEnvio = 0;
+  for (let i = rows.length - 1; i >= 0; i--) {
+    const r = rows[i];
+    if (String(r[11] || '').trim() !== gid) continue;
+    const rowNum = Number(r[0] || 0);
+    const tipo = String(r[2] || '').trim();
+    if (tipo === 'status' && !foundStatus) foundStatus = rowNum;
+    if (tipo !== 'status' && !foundEnvio) foundEnvio = rowNum;
+  }
+  if (preferTipoEnvio) return foundEnvio || foundStatus;
+  return foundStatus || foundEnvio;
+}
+
+function auditarSmsEntrega_(gatewayId, deliveryState, payloadExtra, meta) {
+  const state = String(deliveryState || '').trim();
+  if (!state) return;
+  const rowNum = encontrarLinhaAudPorGateway_(gatewayId, true);
+  if (!rowNum) {
+    auditarSms_({
+      tipo: 'status',
+      status: state,
+      rowIndex: meta.rowIndex || '',
+      origem: meta.origem || '',
+      versaoFrontend: meta.versaoFrontend || '',
+      gatewayId,
+      payload: payloadExtra || {}
+    });
+    return;
+  }
+  try {
+    const sh = sh_getOrCreate_(SH_AUD_SMS);
+    const atual = String(sh.getRange(rowNum, 4).getValue() || '').trim();
+    if (atual.toLowerCase() === state.toLowerCase()) return;
+    sh.getRange(rowNum, 4).setValue(state);
+    let payload = {};
+    try {
+      payload = JSON.parse(String(sh.getRange(rowNum, 13).getValue() || '{}'));
+    } catch(e) { payload = {}; }
+    payload.entrega = payloadExtra || {};
+    payload.entregaAt = fmtData_(new Date()) + ' ' + fmtHoraLocal_(new Date());
+    sh.getRange(rowNum, 13).setValue(JSON.stringify(payload));
+  } catch(e) {
+    Logger.log('auditarSmsEntrega_: ' + e.message);
+  }
+}
+
+function telefoneTeveFalhaCampanhaRecente_(telefone) {
+  const tel = normalizarTelefoneSms_(telefone);
+  if (!tel.ok) return false;
+  const alvo = tel.phone.replace(/\D/g, '');
+  const limiteMs = SMS_CAMPANHA_FALHA_DIAS_ * 24 * 60 * 60 * 1000;
+  const agora = new Date();
+  const rows = lerAudSmsRecentes_();
+  for (let i = rows.length - 1; i >= 0; i--) {
+    const r = rows[i];
+    const rTel = normalizarTelefoneSms_(String(r[8] || ''));
+    if (!rTel.ok || rTel.phone.replace(/\D/g, '') !== alvo) continue;
+    const dh = parseDataHoraAud_(r[1]);
+    if (!dh || (agora.getTime() - dh.getTime()) > limiteMs) continue;
+    const st = String(r[3] || '').trim().toLowerCase();
+    if (st === 'failed') return true;
+    if (String(r[2] || '').trim() === 'status' && st === 'failed') return true;
+  }
+  return false;
+}
+
 function auditarSms_(dados) {
   try {
     const sh = sh_getOrCreate_(SH_AUD_SMS);
@@ -2088,6 +2249,21 @@ function enviarSmsResponsavel_(p) {
 
     const loc = locacaoObj_(row, rowIndex);
     const tipo = String(p.tipo || 'portal').trim() || 'portal';
+    const minDedup = SMS_DEDUP_MIN_[tipo] || 30;
+    const recent = buscarSmsEnvioRecente_(rowIndex, tipo, minDedup, '');
+    if (recent && recent.gatewayId) {
+      return resp_({
+        sms: {
+          enviado: true,
+          duplicado: true,
+          gatewayId: recent.gatewayId,
+          telefone: recent.telefone,
+          state: recent.estadoEntrega,
+          minutosAtras: minDedup
+        }
+      });
+    }
+
     const texto = smsTextoPortal_(tipo, loc);
     const envio = enviarSmsGateway_(loc.telefone, texto);
     const gatewayId = envio.body && envio.body.id ? envio.body.id : '';
@@ -2106,7 +2282,7 @@ function enviarSmsResponsavel_(p) {
       payload: { texto, gateway: envio.body, ajustado: envio.ajustado }
     });
 
-    return resp_({ sms: { enviado: true, gatewayId, telefone: envio.phone, code: envio.code } });
+    return resp_({ sms: { enviado: true, duplicado: false, gatewayId, telefone: envio.phone, code: envio.code } });
   } catch(ex) {
     try {
       auditarSms_({
@@ -2153,6 +2329,21 @@ function enviarSmsAvulso_(p) {
     const tipo = String(p.tipo || 'agradecimento').trim() || 'agradecimento';
     const telefone = String(p.telefone || p.tel || '').trim();
     if (!telefone) return err_('telefone obrigatorio para SMS', 400);
+    const ri = parseInt(p.rowIndex || '0', 10);
+    const minDedup = tipo === 'retorno' ? 24 * 60 : (SMS_DEDUP_MIN_.agradecimento || 720);
+    const recent = ri >= DATA_ROW
+      ? buscarSmsEnvioRecente_(ri, tipo, minDedup, '')
+      : null;
+    const telNorm = normalizarTelefoneSms_(telefone);
+    const recentTel = (!recent && telNorm.ok)
+      ? buscarSmsEnvioRecente_(0, tipo, minDedup, telNorm.phone.replace(/\D/g, ''))
+      : null;
+    const dup = recent || recentTel;
+    if (dup && dup.gatewayId) {
+      return resp_({
+        sms: { enviado: true, duplicado: true, gatewayId: dup.gatewayId, telefone: dup.telefone, state: dup.estadoEntrega }
+      });
+    }
     const nome = String(p.responsavel || p.nome || '').trim();
     const crianca = String(p.crianca || '').trim();
     const texto = smsTextoAvulso_(tipo, nome, crianca);
@@ -2191,6 +2382,24 @@ function enviarSmsCampanha_(p) {
   try {
     const telefone = String(p.telefone || p.tel || '').trim();
     if (!telefone) return err_('telefone obrigatorio para SMS campanha', 400);
+    if (telefoneTeveFalhaCampanhaRecente_(telefone)) {
+      return err_('SMS com falha de entrega recente neste telefone. Revise o numero antes de reenviar.', 409);
+    }
+    const telNorm = normalizarTelefoneSms_(telefone);
+    const recent = telNorm.ok
+      ? buscarSmsEnvioRecente_(0, 'campanha', 24 * 60, telNorm.phone.replace(/\D/g, ''))
+      : null;
+    if (recent && recent.gatewayId) {
+      return resp_({
+        sms: {
+          enviado: true,
+          duplicado: true,
+          gatewayId: recent.gatewayId,
+          telefone: recent.telefone,
+          state: recent.estadoEntrega
+        }
+      });
+    }
     const nome = String(p.responsavel || p.nome || '').trim();
     const crianca = String(p.crianca || '').trim();
     const texto = smsTextoCampanha_(p);
@@ -2231,18 +2440,14 @@ function consultarSmsStatus_(p) {
     if (!gatewayId) return err_('gatewayId obrigatorio', 400);
     const status = consultarSmsGateway_(gatewayId);
 
-    auditarSms_({
-      tipo: 'status',
-      status: status.state || '',
+    auditarSmsEntrega_(gatewayId, status.state || '', {
+      state: status.state,
+      error: status.error,
+      telefoneHash: status.telefoneHash
+    }, {
       rowIndex: p.rowIndex || '',
       origem: String(p.origem || 'frontend'),
-      versaoFrontend: String(p.versao || ''),
-      gatewayId,
-      payload: {
-        state: status.state,
-        error: status.error,
-        telefoneHash: status.telefoneHash
-      }
+      versaoFrontend: String(p.versao || '')
     });
 
     return resp_({

@@ -1,5 +1,5 @@
-// MOVI KIDS - Service Worker 1.6.75
-const SW_VERSION = '1.6.75';
+// MOVI KIDS - Service Worker 1.6.76
+const SW_VERSION = '1.6.76';
 
 self.addEventListener('install', event => {
   self.skipWaiting();
