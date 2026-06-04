@@ -4,6 +4,18 @@ $root = Split-Path -Parent (Split-Path -Parent $MyInvocation.MyCommand.Path)
 Set-Location $root
 
 & "$root\scripts\sync-gas-to-clasp.ps1"
+
+$canonical = Join-Path $root "MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs"
+$gasCode = Join-Path $root "gas\Code.gs"
+$canonId = (Select-String -Path $canonical -Pattern "const DEPLOY_ID\s*=\s*'([^']+)'" | Select-Object -First 1).Matches.Groups[1].Value
+$gasId = (Select-String -Path $gasCode -Pattern "const DEPLOY_ID\s*=\s*'([^']+)'" | Select-Object -First 1).Matches.Groups[1].Value
+if (-not $canonId -or $canonId -ne $gasId) {
+  Write-Error "gas/Code.gs DEPLOY_ID ($gasId) diferente do canonico ($canonId). Rode sync-gas-to-clasp.ps1."
+}
+if ($gasId -like 'AKfycbzc*') {
+  Write-Error "gas/Code.gs ainda usa URL morta AKfycbzc. Abortando clasp push."
+}
+
 clasp push --force
 
 Write-Host ""

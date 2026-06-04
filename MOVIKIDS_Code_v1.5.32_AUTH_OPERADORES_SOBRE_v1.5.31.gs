@@ -645,6 +645,8 @@ function encerrarLocacao_(p) {
   const minContratados  = Number(row[6]);
   const valorPlano      = Number(row[7]);
   const adicionalPorMin = cfg.adicional || 0;
+  const somentePlano = String(p.somentePlano || '') === 'true' || p.somentePlano === true;
+  if (somentePlano) minUsados = minContratados;
   const maxMinUsados    = Math.max(minContratados + 720, 900); // limite operacional: ate 12h extras
 
   if (minUsados > maxMinUsados) {
@@ -676,6 +678,7 @@ function encerrarLocacao_(p) {
   try {
     const rowDataE = sheet.getRange(rowIndex, 1, 1, 28).getValues()[0];
     const detEnc = 'Encerramento operacional; minUsados=' + minUsados +
+      (somentePlano ? '; somente plano (GAS instavel/offline)' : '') +
       (String(p.ignorarSmsObrigatorio || '') === 'true' || p.ignorarSmsObrigatorio === true ? '; ADM sem SMS obrigatorio' : '');
     registrarAuditoriaLocacao_(rowIndex, 'encerrarLocacao', antesEncerrar, locacaoObj_(rowDataE, rowIndex), detEnc, operadorAudit_(p));
     firebaseSyncSessao_(rowIndex, fbDadosSessao_(rowDataE, 'Encerrada', rowIndex));

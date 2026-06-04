@@ -22,7 +22,7 @@
 <script>
 // ── CACHE BUSTER — alinhado a mk-version.js / APP_VERSION ──
 (function(){
-  const CURRENT = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.5';
+  const CURRENT = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.6';
   const KEY = 'mk_loaded_version';
   try {
     if (localStorage.getItem(KEY) !== CURRENT) {
@@ -1482,7 +1482,7 @@ nav button .nav-badge{
   <!-- ══ SIDEBAR (desktop only) ══ -->
   <aside id="sidebar">
     <div class="sb-logo">🚗 Movi <span>Kids</span>
-      <div class="sb-status"><span id="sb-dot" class="dot-online"></span><span id="sb-txt">Online</span><span id="sb-version" style="font-size:10px;opacity:.85;margin-left:5px;color:rgba(255,255,255,.7);font-family:monospace">v1.7.0</span></div>
+      <div class="sb-status"><span id="sb-dot" class="dot-online"></span><span id="sb-txt">Online</span><span id="sb-version" style="font-size:10px;opacity:.85;margin-left:5px;color:rgba(255,255,255,.7);font-family:monospace">v1.7.6</span></div>
     </div>
     <div class="sb-nav" id="sb-nav">
       <button class="sb-btn active" id="sbn-home" onclick="showPage('home')"><span class="sb-icon">🏠</span>Home</button>
@@ -1529,7 +1529,7 @@ nav button .nav-badge{
       <div class="hd-status">
         <div id="status-dot" class="dot-online"></div>
         <span id="status-txt">Online</span>
-        <span id="app-version" style="font-size:10px;opacity:.85;margin-left:4px;font-family:monospace">v1.7.0</span>
+        <span id="app-version" style="font-size:10px;opacity:.85;margin-left:4px;font-family:monospace">v1.7.6</span>
       </div>
     </div>
   </header>
@@ -2467,6 +2467,11 @@ nav button .nav-badge{
     <div class="modal-icon">✅</div>
     <div class="modal-title">Encerrar locação</div>
     <div class="modal-info" id="enc-info"></div>
+    <div id="enc-offline-warn" class="op-policy danger" style="display:none;margin:0 0 12px"></div>
+    <label id="enc-adm-extra-wrap" style="display:none;align-items:flex-start;gap:8px;font-size:13px;font-weight:700;margin:0 0 12px;cursor:pointer">
+      <input type="checkbox" id="enc-adm-extra-local" style="margin-top:3px">
+      <span>Incluir minutos extras do cronometro local (somente ADM, com GAS instavel)</span>
+    </label>
     <div class="modal-btns">
       <button class="btn btn-primary" onclick="confirmarEncerrar()" id="btn-enc-confirm">
         ✓ Confirmar encerramento
@@ -2571,7 +2576,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.5';
+const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.6';
 const WEBAPP_URL = (typeof window !== 'undefined' && window.MK_GAS_EXEC_URL) ? window.MK_GAS_EXEC_URL
   : 'https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec';
 const WEBAPP_URL_DEAD_PREFIX = 'AKfycbzc';
@@ -3988,6 +3993,81 @@ async function confirmarLocacao() {
 // ═══════════════════════════════════════════════════════════
 // ENCERRAR
 // ═══════════════════════════════════════════════════════════
+function mkGasConsideradoOffline_() {
+  return typeof _syncFailCount !== 'undefined' && _syncFailCount >= _FAIL_THRESH;
+}
+
+function calcMinExtraLocal_(session) {
+  const elapsedSec = Math.floor((Date.now() - session.startTimestamp) / 1000);
+  const contratSec = session.mins * 60;
+  return Math.max(0, Math.floor((elapsedSec - contratSec) / 60));
+}
+
+/** Evita extras fantasmas quando GAS esta offline (incidente 04/06). */
+function resolverMinUsadosEncerrar_(session, incluirExtraLocalAdm) {
+  const minExtraTimer = calcMinExtraLocal_(session);
+  const offline = mkGasConsideradoOffline_();
+  const adm = typeof mkAdminIgnoraSmsObrigatorio_ === 'function' && mkAdminIgnoraSmsObrigatorio_();
+  let minUsados = session.mins + minExtraTimer;
+  let somentePlano = false;
+  if (offline && minExtraTimer > 0 && !(adm && incluirExtraLocalAdm)) {
+    minUsados = session.mins;
+    somentePlano = true;
+  }
+  const minExtraCobrados = Math.max(0, minUsados - session.mins);
+  const vBase = PRECOS[session.tipo]?.[session.plano]?.v || session.valorPlano;
+  const vExtra = minExtraCobrados * session.adicionalPorMin;
+  const vTotal = vBase + vExtra;
+  return { minUsados, minExtraTimer, minExtraCobrados, vBase, vExtra, vTotal, somentePlano, offline, adm };
+}
+
+function renderEncerrarModal_(session, fin) {
+  const icon = tipoIcon(session.tipo);
+  const vExtraStr = fin.vExtra.toFixed(2).replace('.', ',');
+  const vTotalStr = fin.vTotal.toFixed(2).replace('.', ',');
+  document.getElementById('enc-info').innerHTML =
+    '<div class="modal-info-row"><span>' + icon + ' Tipo</span><span>' + escHtml(session.tipo) + '</span></div>' +
+    '<div class="modal-info-row"><span>Plano</span><span>' + escHtml(session.plano) + '</span></div>' +
+    '<div class="modal-info-row"><span>Criança</span><span>' + escHtml(session.crianca) + '</span></div>' +
+    '<div class="modal-info-row"><span>Responsável</span><span>' + escHtml(session.responsavel) + '</span></div>' +
+    '<div class="modal-info-row"><span>Tempo utilizado</span><span>' + fin.minUsados + ' min</span></div>' +
+    (fin.minExtraCobrados > 0
+      ? '<div class="modal-info-row"><span>Min. adicionais</span><span>' + fin.minExtraCobrados + ' min</span></div>' +
+        '<div class="modal-info-row"><span>Valor adicional</span><span>R$ ' + vExtraStr + '</span></div>'
+      : (fin.minExtraTimer > 0 && fin.somentePlano
+        ? '<div class="modal-info-row"><span>Cronometro local</span><span>' + fin.minExtraTimer + ' min extra (nao cobrados)</span></div>'
+        : '')) +
+    '<div class="modal-info-row total"><span>TOTAL A COBRAR</span><span>R$ ' + vTotalStr + '</span></div>';
+
+  const warn = document.getElementById('enc-offline-warn');
+  const admWrap = document.getElementById('enc-adm-extra-wrap');
+  const admChk = document.getElementById('enc-adm-extra-local');
+  if (warn) {
+    if (fin.somentePlano) {
+      warn.style.display = 'block';
+      warn.textContent = 'Servidor offline ou instavel: encerramento apenas pelo valor do plano, sem extras do cronometro. Ajuste depois em Administracao se necessario.';
+    } else {
+      warn.style.display = 'none';
+      warn.textContent = '';
+    }
+  }
+  if (admWrap && admChk) {
+    if (fin.offline && fin.adm && fin.minExtraTimer > 0) {
+      admWrap.style.display = 'flex';
+      admChk.checked = !!incluirExtraLocalAdm;
+      admChk.onchange = function() {
+        const f2 = resolverMinUsadosEncerrar_(session, admChk.checked);
+        session._minUsados = f2.minUsados;
+        session._somentePlanoEnc = f2.somentePlano;
+        renderEncerrarModal_(session, f2);
+      };
+    } else {
+      admWrap.style.display = 'none';
+      admChk.checked = false;
+    }
+  }
+}
+
 function pedirEncerrar(rowIndex) {
   encSession = sessions.find(s => s.rowIndex === rowIndex);
   if (!encSession) return;
@@ -4000,32 +4080,22 @@ function pedirEncerrar(rowIndex) {
     toast('Envie o aviso de minutos extras antes de encerrar.', 'error');
     return;
   }
-  const elapsedSec    = Math.floor((Date.now() - encSession.startTimestamp) / 1000);
-  const contratSec    = encSession.mins * 60;
-  // Cobra minuto adicional apenas após completar cada minuto extra (Math.floor)
-  const minExtra      = Math.max(0, Math.floor((elapsedSec - contratSec) / 60));
-  const minUsadosReal = encSession.mins + minExtra;
-  const vExtra        = (minExtra * encSession.adicionalPorMin).toFixed(2).replace('.',',');
-  const vBase         = PRECOS[encSession.tipo]?.[encSession.plano]?.v || encSession.valorPlano;
-  const vTotal        = (vBase + minExtra * encSession.adicionalPorMin).toFixed(2).replace('.',',');
-  const icon     = tipoIcon(encSession.tipo);
 
-  document.getElementById('enc-info').innerHTML = `
-    <div class="modal-info-row"><span>${icon} Tipo</span><span>${encSession.tipo}</span></div>
-    <div class="modal-info-row"><span>Plano</span><span>${encSession.plano}</span></div>
-    <div class="modal-info-row"><span>Criança</span><span>${encSession.crianca}</span></div>
-    <div class="modal-info-row"><span>Responsável</span><span>${encSession.responsavel}</span></div>
-    <div class="modal-info-row"><span>Tempo utilizado</span><span>${minUsadosReal} min</span></div>
-    ${minExtra > 0 ? `<div class="modal-info-row"><span>Min. adicionais</span><span>${minExtra} min</span></div>
-    <div class="modal-info-row"><span>Valor adicional</span><span>R$ ${vExtra}</span></div>` : ''}
-    <div class="modal-info-row total"><span>TOTAL A COBRAR</span><span>R$ ${vTotal}</span></div>`;
-
+  const fin = resolverMinUsadosEncerrar_(encSession, false);
+  encSession._minUsados = fin.minUsados;
+  encSession._somentePlanoEnc = fin.somentePlano;
+  renderEncerrarModal_(encSession, fin);
   document.getElementById('enc-modal').classList.add('show');
-  encSession._minUsados = minUsadosReal;
 }
 
 function fecharEncModal() {
   document.getElementById('enc-modal').classList.remove('show');
+  const w = document.getElementById('enc-offline-warn');
+  const wrap = document.getElementById('enc-adm-extra-wrap');
+  const chk = document.getElementById('enc-adm-extra-local');
+  if (w) { w.style.display = 'none'; w.textContent = ''; }
+  if (wrap) wrap.style.display = 'none';
+  if (chk) chk.checked = false;
   encSession = null;
 }
 
@@ -4035,11 +4105,31 @@ async function confirmarEncerrar() {
   btn.textContent = '⏳ Encerrando...'; btn.disabled = true;
 
   try {
+    const admChk = document.getElementById('enc-adm-extra-local');
+    const incluirExtraAdm = !!(admChk && admChk.checked);
+    const fin = resolverMinUsadosEncerrar_(encSession, incluirExtraAdm);
+    encSession._minUsados = fin.minUsados;
+    encSession._somentePlanoEnc = fin.somentePlano;
+
+    if (mkGasConsideradoOffline_()) {
+      try {
+        await api({ action: 'ping' }, 8000);
+        _syncFailCount = 0;
+        setStatus(true);
+      } catch (ePing) {
+        if (!fin.somentePlano && fin.minExtraTimer > 0) {
+          toast('Servidor offline. Encerre apenas pelo plano ou restaure o GAS.', 'error');
+          return;
+        }
+      }
+    }
+
     const admEnc = typeof mkAdminIgnoraSmsObrigatorio_ === 'function' && mkAdminIgnoraSmsObrigatorio_();
     const d = await api({
       action:    'encerrarLocacao',
       ...operadorApiParams_(),
       ...(admEnc ? { ignorarSmsObrigatorio: true } : {}),
+      ...(fin.somentePlano ? { somentePlano: true } : {}),
       rowIndex:  encSession.rowIndex,
       minUsados: encSession._minUsados
     });

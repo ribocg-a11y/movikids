@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Corrigir extras indevidos — lote 04/06/2026</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 720px; margin: 24px auto; padding: 0 16px; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 16px 0; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+    button { font-size: 15px; padding: 12px 18px; cursor: pointer; margin: 8px 4px 8px 0; }
+    pre { background: #f4f4f4; padding: 12px; font-size: 11px; max-height: 320px; overflow: auto; }
+    .ok { color: #0a7; } .err { color: #c00; }
+  </style>
+</head>
+<body>
+  <h1>Corrigir extras indevidos (incidente 04/06)</h1>
+  <p>Zera minutos/valor extra e deixa <strong>total = valor do plano</strong>. Requer GAS <strong>v1.5.36+</strong> (produção atual: v1.5.37).</p>
+  <table>
+    <thead><tr><th>Linha</th><th>id</th><th>Criança</th><th>Antes</th><th>Plano</th></tr></thead>
+    <tbody id="tbl"></tbody>
+  </table>
+  <button type="button" id="btnAll">Corrigir as 5 agora</button>
+  <p id="status"></p>
+  <pre id="log"></pre>
+  <script>
+    const GAS = 'https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec';
+    const MOTIVO = 'Tempo extra indevido: falha GAS/cache 04-06-2026 — correcao ADM lote';
+    const ROWS = [
+      { rowIndex: 218, id: 208, crianca: 'Livia', antes: 29.4, plano: 15 },
+      { rowIndex: 217, id: 207, crianca: 'Helena', antes: 27, plano: 12 },
+      { rowIndex: 216, id: 206, crianca: 'Livia E Malu', antes: 36.6, plano: 15 },
+      { rowIndex: 215, id: 205, crianca: 'Inae', antes: 35, plano: 22 },
+      { rowIndex: 213, id: 203, crianca: 'Duda', antes: 24.6, plano: 15 }
+    ];
+    const tbl = document.getElementById('tbl');
+    tbl.innerHTML = ROWS.map(r =>
+      `<tr><td>${r.rowIndex}</td><td>${r.id}</td><td>${r.crianca}</td><td>R$ ${r.antes}</td><td>R$ ${r.plano}</td></tr>`
+    ).join('');
+
+    async function corrigir(rowIndex) {
+      const q = new URLSearchParams({
+        action: 'corrigirFinanceiroLocacaoAdmin',
+        adminPin: '1416',
+        rowIndex: String(rowIndex),
+        zerarExtra: 'true',
+        motivo: MOTIVO
+      });
+      const r = await fetch(GAS + '?' + q);
+      return r.json();
+    }
+
+    document.getElementById('btnAll').onclick = async () => {
+      const st = document.getElementById('status');
+      const log = document.getElementById('log');
+      const lines = [];
+      st.textContent = 'Corrigindo...';
+      for (const row of ROWS) {
+        try {
+          const d = await corrigir(row.rowIndex);
+          lines.push({ row: row.rowIndex, d });
+          if (!d.ok) {
+            st.textContent = 'Erro na linha ' + row.rowIndex + ': ' + (d.erro || '?');
+            st.className = 'err';
+            log.textContent = JSON.stringify(lines, null, 2);
+            return;
+          }
+        } catch (e) {
+          st.textContent = e.message;
+          st.className = 'err';
+          return;
+        }
+      }
+      st.textContent = '5 locações corrigidas. Abra Caixa do dia e confira totais.';
+      st.className = 'ok';
+      log.textContent = JSON.stringify(lines, null, 2);
+    };
+  </script>
+</body>
+</html>
