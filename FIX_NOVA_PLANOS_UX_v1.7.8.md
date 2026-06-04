@@ -17,3 +17,9 @@ Abrir (ou deixar o app redirecionar):
 https://ribocg-a11y.github.io/movikids/?force=1.7.8
 
 Sidebar deve mostrar **Online 1.7.8**. Fluxo: carro → plano aparece em destaque → toque no plano → passo **Quem**.
+
+---
+
+## Atualização v1.7.9
+
+Bug: `migrateDraftStep_` dentro de `aplicarStepNova_` convertia passo **1 → 0**, então ao escolher o plano o wizard **não avançava**. Corrigido: migração só ao restaurar rascunho antigo.
