@@ -22,7 +22,7 @@
 <script>
 // ── CACHE BUSTER — alinhado a mk-version.js / APP_VERSION ──
 (function(){
-  const CURRENT = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.10';
+  const CURRENT = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.11';
   const KEY = 'mk_loaded_version';
   try {
     const stored = localStorage.getItem(KEY);
@@ -1507,7 +1507,7 @@ nav button .nav-badge{
   <!-- ══ SIDEBAR (desktop only) ══ -->
   <aside id="sidebar">
     <div class="sb-logo">🚗 Movi <span>Kids</span>
-      <div class="sb-status"><span id="sb-dot" class="dot-online"></span><span id="sb-txt">Online</span><span id="sb-version" style="font-size:10px;opacity:.85;margin-left:5px;color:rgba(255,255,255,.7);font-family:monospace">v1.7.10</span></div>
+      <div class="sb-status"><span id="sb-dot" class="dot-online"></span><span id="sb-txt">Online</span><span id="sb-version" style="font-size:10px;opacity:.85;margin-left:5px;color:rgba(255,255,255,.7);font-family:monospace">v1.7.11</span></div>
     </div>
     <div class="sb-nav" id="sb-nav">
       <button class="sb-btn active" id="sbn-home" onclick="showPage('home')"><span class="sb-icon">🏠</span>Home</button>
@@ -1554,7 +1554,7 @@ nav button .nav-badge{
       <div class="hd-status">
         <div id="status-dot" class="dot-online"></div>
         <span id="status-txt">Online</span>
-        <span id="app-version" style="font-size:10px;opacity:.85;margin-left:4px;font-family:monospace">v1.7.10</span>
+        <span id="app-version" style="font-size:10px;opacity:.85;margin-left:4px;font-family:monospace">v1.7.11</span>
       </div>
     </div>
   </header>
@@ -2619,7 +2619,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.10';
+const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.11';
 const WEBAPP_URL = (typeof window !== 'undefined' && window.MK_GAS_EXEC_URL) ? window.MK_GAS_EXEC_URL
   : 'https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec';
 const WEBAPP_URL_DEAD_PREFIX = 'AKfycbzc';
@@ -2673,7 +2673,7 @@ const NOVA_DRAFT_KEY = 'mk_nova_locacao_draft_v1';
 const WA_EVENT_LOG_KEY = 'mk_wa_event_log_v1';
 /* operador/sessao: mk-auth.js */
 const WA_MODE_KEY = 'mk_whatsapp_mode_v1';
-const SMS_CHECK_DELAYS = [15000, 60000, 180000];
+const SMS_CHECK_DELAYS = [15000, 60000, 180000, 300000];
 const SMS_UNCONFIRMED_MS = 5 * 60 * 1000;
 let _restoringNovaDraft = false;
 let catSel      = 'Energia';
