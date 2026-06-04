@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.38
+// MOVI KIDS — Google Apps Script v1.5.39
+// v1.5.39: SMS gateway payload minimo (como v1.5.28 que entregava) — sem ttl/priority/withDeliveryReport global
 // v1.5.38: Pacote SMS P0 unificado — textos curtos GSM, withDeliveryReport off, throttle, simNumber, rowIndex salvar
 // v1.5.37: extPorDia (KPIs + histórico), cache listarHistorico, mesContrato por aniversário (contrato)
 // v1.5.36: corrigirFinanceiroLocacaoAdmin (ADM ajusta encerrada — caixa/historico)
@@ -51,10 +52,8 @@ const ADMIN_PIN_PLAIN = '1416';
 const OP_DATA_ROW = 2;
 const DATA_ROW = 11;
 const PORTAL_RESPONSAVEL_URL = 'https://ribocg-a11y.github.io/movikids/acompanhar.html';
-/** URL curta nos SMS (1 segmento GSM) — portal completo no app */
-const PORTAL_SMS_URL_SHORT = 'https://ribocg-a11y.github.io/movikids/';
 const SMS_GATEWAY_URL = 'https://api.sms-gate.app/3rdparty/v1/messages';
-const SMS_OPT_OUT_ = ' SAIR=SAIR';
+const SMS_OPT_OUT_CAMPANHA_ = ' Para sair, responda SAIR.';
 
 const EMAIL_RELATORIO = 'financeiro@goldenshoppingcalhau.com.br';
 const EMAIL_CC        = 'antonio.luis.vieira.nj@gmail.com';
@@ -262,9 +261,9 @@ function ping_() {
   const agora = new Date();
   return resp_({
     status:  'online',
-    versao:  'v1.5.38',
+    versao:  'v1.5.39',
     timestamp: fmtData_(agora) + ' ' + fmtHoraLocal_(agora),
-    sistema: 'MOVI KIDS v1.5.38'
+    sistema: 'MOVI KIDS v1.5.39'
   });
 }
 
@@ -2057,7 +2056,7 @@ function smsConfigGateway_() {
   const withDr = String(props.getProperty('SMS_WITH_DELIVERY_REPORT') || 'false').toLowerCase() === 'true';
   const simRaw = parseInt(props.getProperty('SMS_SIM_NUMBER') || '0', 10);
   const simNumber = (simRaw === 1 || simRaw === 2) ? simRaw : null;
-  const minGap = Math.max(2000, parseInt(props.getProperty('SMS_MIN_INTERVAL_MS') || '4500', 10) || 4500);
+  const minGap = Math.max(0, parseInt(props.getProperty('SMS_MIN_INTERVAL_MS') || '0', 10) || 0);
   return { withDeliveryReport: withDr, simNumber: simNumber, minGapMs: minGap };
 }
 
@@ -2083,47 +2082,45 @@ function smsTextoGsmSafe_(texto) {
   return t;
 }
 
-function smsGarantirOptOut_(texto) {
-  const t = String(texto || '').trim();
-  if (!t) return SMS_OPT_OUT_.trim();
-  if (/sair/i.test(t)) return t;
-  return t + SMS_OPT_OUT_;
-}
-
 function smsTextoPortal_(tipo, loc) {
   const nome = String(loc.responsavel || 'responsavel').trim() || 'responsavel';
   const crianca = String(loc.crianca || 'crianca').trim() || 'crianca';
-  const portal = PORTAL_SMS_URL_SHORT;
-  let texto = '';
+  const veiculo = String(loc.veiculo || loc.tipo || 'veiculo').trim() || 'veiculo';
+  const status = String(loc.status || '').trim();
+  const portal = PORTAL_RESPONSAVEL_URL;
 
   if (tipo === 'alerta') {
-    texto = 'MOVI KIDS: faltam 5 min p/ ' + crianca + '. Portal: ' + portal;
-  } else if (tipo === 'esgotado') {
-    texto = 'MOVI KIDS: tempo de ' + crianca + ' esgotou. Va ao balcao. ' + portal;
-  } else if (tipo === 'extensao') {
-    texto = 'MOVI KIDS: tempo de ' + crianca + ' atualizado. ' + portal;
-  } else if (tipo === 'agradecimento') {
-    texto = 'MOVI KIDS: obrigado, ' + nome + '! Ate a proxima com ' + crianca + '.';
-  } else {
-    texto = 'MOVI KIDS: acompanhe ' + crianca + ' no portal: ' + portal;
+    return 'MOVI KIDS: faltam cerca de 5 minutos para o tempo de ' + crianca + ' acabar. Acompanhe pelo portal: ' + portal;
   }
-  return smsTextoGsmSafe_(smsGarantirOptOut_(texto));
+  if (tipo === 'esgotado') {
+    return 'MOVI KIDS: o tempo de ' + crianca + ' encerrou e minutos extras estao contando. Procure o operador. Portal: ' + portal;
+  }
+  if (tipo === 'extensao') {
+    return 'MOVI KIDS: o tempo de ' + crianca + ' foi atualizado. Acompanhe o novo tempo pelo portal: ' + portal;
+  }
+  if (tipo === 'agradecimento') {
+    return 'MOVI KIDS: obrigado pela visita, ' + nome + '! Esperamos ' + crianca + ' na proxima aventura.';
+  }
+  return 'MOVI KIDS: acompanhe a locacao de ' + crianca + ' (' + veiculo + ', ' + status + ') pelo portal: ' + portal;
 }
 
+/**
+ * Payload minimo = v1.5.28 (quando SMS chegava na planilha/AUD_SMS).
+ * v1.5.29+ adicionou withDeliveryReport/ttl/priority e piorou fila no Android.
+ * Opcional via Script Properties: SMS_WITH_DELIVERY_REPORT, SMS_SIM_NUMBER, SMS_MIN_INTERVAL_MS
+ */
 function enviarSmsGateway_(telefone, texto) {
   const tel = normalizarTelefoneSms_(telefone);
   if (!tel.ok) throw new Error(tel.erro);
-  smsThrottleEsperar_();
-  const creds = smsGatewayCreds_();
   const cfg = smsConfigGateway_();
-  const msg = smsTextoGsmSafe_(smsGarantirOptOut_(texto));
+  if (cfg.minGapMs > 0) smsThrottleEsperar_();
+  const creds = smsGatewayCreds_();
+  const msg = String(texto || '').trim();
   const payload = {
     phoneNumbers: [tel.phone],
-    textMessage: { text: msg },
-    withDeliveryReport: cfg.withDeliveryReport,
-    ttl: 600,
-    priority: 100
+    textMessage: { text: msg }
   };
+  if (cfg.withDeliveryReport) payload.withDeliveryReport = true;
   if (cfg.simNumber) payload.simNumber = cfg.simNumber;
   const res = UrlFetchApp.fetch(SMS_GATEWAY_URL, {
     method: 'post',
@@ -2443,7 +2440,8 @@ function smsTextoCampanha_(p) {
   } else {
     texto = 'MOVI KIDS: oi, ' + nome + '! Venha acelerar sua alegria aqui na Movi Kids. Temos oportunidades para ' + crianca + ' hoje.';
   }
-  return smsTextoGsmSafe_(smsGarantirOptOut_(texto));
+  if (!/sair/i.test(texto)) texto += SMS_OPT_OUT_CAMPANHA_;
+  return texto;
 }
 
 function enviarSmsAvulso_(p) {
