@@ -22,10 +22,14 @@
 <script>
 // ── CACHE BUSTER — alinhado a mk-version.js / APP_VERSION ──
 (function(){
-  const CURRENT = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.7';
+  const CURRENT = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.8';
   const KEY = 'mk_loaded_version';
   try {
-    if (localStorage.getItem(KEY) !== CURRENT) {
+    const stored = localStorage.getItem(KEY);
+    const m = location.search.match(/force[=:\-]+([0-9]+\.[0-9]+)/i);
+    const urlVer = m ? m[1] : '';
+    const precisaAtualizar = stored !== CURRENT || (urlVer && urlVer !== CURRENT);
+    if (precisaAtualizar) {
       try {
         var _s = sessionStorage.getItem('mk_auth_session_v1');
         if (_s) {
@@ -36,7 +40,9 @@
       localStorage.setItem(KEY, CURRENT);
       if (window.caches) caches.keys().then(keys => keys.forEach(k => caches.delete(k)));
       if ('serviceWorker' in navigator) navigator.serviceWorker.getRegistrations().then(regs => regs.forEach(r => r.unregister()));
-      if (!location.search.includes('force=' + CURRENT)) location.replace(location.pathname + '?force=' + CURRENT + '&t=' + Date.now());
+      if (!location.search.includes('force=' + CURRENT)) {
+        location.replace(location.pathname + '?force=' + CURRENT + '&t=' + Date.now());
+      }
     }
   } catch(e) {}
 })();
@@ -317,8 +323,13 @@ nav button .nav-badge{
 .nova-summary-bar b{color:var(--txt)}
 .nova-step-hints{display:flex;justify-content:center;gap:12px;margin:-12px 0 16px;font-size:11px;font-weight:800;color:var(--txt3);text-transform:uppercase;letter-spacing:.04em}
 .nova-step-hints span.active{color:var(--blue)}
-.nova-plano-section{display:none;margin-top:4px}
+.nova-plano-section{display:none;margin-top:12px;padding:12px 0 4px;border-top:2px dashed var(--blue);background:var(--blue-lt);border-radius:var(--radius-sm)}
 .nova-plano-section.visible{display:block}
+.nova-plano-hint{font-size:13px;font-weight:800;color:var(--blue-dk);margin-bottom:10px}
+#page-nova.step-0-veiculo .vc-section-label.nova-vc-outro{opacity:.45}
+#page-nova.step-0-veiculo .veiculo-grid-carros,
+#page-nova.step-0-veiculo .veiculo-grid-triciclos,
+#page-nova.step-0-veiculo .veiculo-grid-pelucias{transition:opacity .2s}
 .nova-rel-quick{display:flex;gap:8px;margin-bottom:10px;align-items:stretch}
 .nova-rel-quick .form-input{margin:0;flex:1}
 .nova-rel-results{margin-bottom:12px;max-height:160px;overflow-y:auto}
@@ -1494,7 +1505,7 @@ nav button .nav-badge{
   <!-- ══ SIDEBAR (desktop only) ══ -->
   <aside id="sidebar">
     <div class="sb-logo">🚗 Movi <span>Kids</span>
-      <div class="sb-status"><span id="sb-dot" class="dot-online"></span><span id="sb-txt">Online</span><span id="sb-version" style="font-size:10px;opacity:.85;margin-left:5px;color:rgba(255,255,255,.7);font-family:monospace">v1.7.7</span></div>
+      <div class="sb-status"><span id="sb-dot" class="dot-online"></span><span id="sb-txt">Online</span><span id="sb-version" style="font-size:10px;opacity:.85;margin-left:5px;color:rgba(255,255,255,.7);font-family:monospace">v1.7.8</span></div>
     </div>
     <div class="sb-nav" id="sb-nav">
       <button class="sb-btn active" id="sbn-home" onclick="showPage('home')"><span class="sb-icon">🏠</span>Home</button>
@@ -1541,7 +1552,7 @@ nav button .nav-badge{
       <div class="hd-status">
         <div id="status-dot" class="dot-online"></div>
         <span id="status-txt">Online</span>
-        <span id="app-version" style="font-size:10px;opacity:.85;margin-left:4px;font-family:monospace">v1.7.7</span>
+        <span id="app-version" style="font-size:10px;opacity:.85;margin-left:4px;font-family:monospace">v1.7.8</span>
       </div>
     </div>
   </header>
@@ -1669,7 +1680,8 @@ nav button .nav-badge{
         </div>
       </div>
       <div id="nova-plano-section" class="nova-plano-section">
-        <div class="sec-title" style="margin-top:8px">Escolha o plano</div>
+        <div class="nova-plano-hint" id="nova-plano-hint">↓ Escolha o plano para continuar</div>
+        <div class="sec-title" style="margin-top:0">Plano</div>
         <div class="plano-list" id="plano-list"></div>
       </div>
     </div>
@@ -2600,7 +2612,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.7';
+const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.8';
 const WEBAPP_URL = (typeof window !== 'undefined' && window.MK_GAS_EXEC_URL) ? window.MK_GAS_EXEC_URL
   : 'https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec';
 const WEBAPP_URL_DEAD_PREFIX = 'AKfycbzc';
@@ -3834,6 +3846,30 @@ function atualizarVeiculoGrid() {
   });
 }
 
+function destacarSecaoVeiculoNova_(tipo) {
+  const page = document.getElementById('page-nova');
+  const map = { Carro: 'vc-grid-carros', Triciclo: 'vc-grid-triciclos', 'Pelúcia': 'vc-grid-pelucias' };
+  const activeId = map[tipo] || '';
+  if (page) page.classList.add('step-0-veiculo');
+  document.querySelectorAll('#page-nova .vc-section-label').forEach(lab => {
+    const next = lab.nextElementSibling;
+    const isActive = next && next.id === activeId;
+    lab.classList.toggle('nova-vc-outro', !!tipo && !isActive);
+    if (next && next.classList && (next.classList.contains('veiculo-grid-carros') || next.classList.contains('veiculo-grid-triciclos') || next.classList.contains('veiculo-grid-pelucias'))) {
+      next.style.display = (!tipo || isActive) ? '' : 'none';
+      if (isActive) lab.style.display = '';
+      else if (tipo) lab.style.display = 'none';
+    }
+  });
+}
+
+function scrollParaPlanosNova_() {
+  const sec = document.getElementById('nova-plano-section');
+  if (sec && sec.classList.contains('visible')) {
+    setTimeout(() => { try { sec.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e) { sec.scrollIntoView(true); } }, 80);
+  }
+}
+
 function selectVeiculo(el, veiculo, tipo) {
   if (el.classList.contains('vc-busy') || el.classList.contains('vc-busy-pink')) return;
   document.querySelectorAll('.vc-card').forEach(function(c) { c.classList.remove('vc-sel','vc-sel-pink'); });
@@ -3845,9 +3881,12 @@ function selectVeiculo(el, veiculo, tipo) {
   renderPlanosNova_(tipo);
   const sec = document.getElementById('nova-plano-section');
   if (sec) sec.classList.add('visible');
+  destacarSecaoVeiculoNova_(tipo);
   aplicarEstiloInputsNova_(tipo);
   atualizarNovaSummaryBar_();
   salvarNovaDraft_();
+  toast(veiculo + ' selecionado — escolha o plano abaixo.', 'success');
+  scrollParaPlanosNova_();
 }
 
 function selectTipo(tipo, el) {
@@ -3915,6 +3954,13 @@ function capitalizarNome(el) {
 
 function resetNova(opts = {}) {
   novaState = { tipo: null, plano: null, veiculo: null, pagamento: null, observacao: '', step: 0 };
+  const pageNova = document.getElementById('page-nova');
+  if (pageNova) pageNova.classList.remove('step-0-veiculo');
+  document.querySelectorAll('#page-nova .vc-section-label').forEach(l => { l.style.display = ''; l.classList.remove('nova-vc-outro'); });
+  ['vc-grid-carros','vc-grid-triciclos','vc-grid-pelucias'].forEach(id => {
+    const g = document.getElementById(id);
+    if (g) g.style.display = '';
+  });
   document.querySelectorAll('.tipo-btn').forEach(b => b.classList.remove('sel'));
   document.querySelectorAll('.plano-btn').forEach(b => b.classList.remove('sel'));
   document.querySelectorAll('.vc-card').forEach(c => c.classList.remove('vc-sel','vc-sel-pink'));

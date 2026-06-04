@@ -1,4 +1,4 @@
-/* MOVI KIDS — Login operadores v1.7.7 */
+/* MOVI KIDS — Login operadores v1.7.8 */
 (function () {
   const SESSION_KEY = 'mk_auth_session_v1';
   const LEGACY_OPERADOR_KEY = 'mk_operador_atual_v1';
