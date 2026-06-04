@@ -31,8 +31,10 @@ Colar no projeto Apps Script (mesmo projeto, **mesmo Deploy ID**):
 
 Cria automaticamente a aba `OPERADORES_SISTEMA` com seeds:
 
-- Operador Balcao 1
-- Operador Balcao 2
+- Eduarda
+- Milena Nunes
+
+(Nomes legados `Operador Balcao 1/2` são renomeados automaticamente na primeira listagem.)
 
 ## Frontend
 

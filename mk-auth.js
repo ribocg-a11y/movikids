@@ -1,4 +1,4 @@
-/* MOVI KIDS — Login operadores v1.6.72 */
+/* MOVI KIDS — Login operadores v1.6.73 */
 (function () {
   const SESSION_KEY = 'mk_auth_session_v1';
   const LEGACY_OPERADOR_KEY = 'mk_operador_atual_v1';
@@ -145,30 +145,43 @@
   }
 
   function renderOpList() {
-    const list = document.getElementById('mk-op-list');
+    const sel = document.getElementById('mk-op-select');
     const btn = document.getElementById('mk-btn-proceed');
-    if (!list) return;
-    list.innerHTML = operadoresCache.map(op => {
-      const badge = op.hasPin
-        ? '<span class="mk-op-meta">PIN definido</span>'
-        : '<span class="mk-op-meta mk-warn">Criar PIN no primeiro acesso</span>';
-      return `<label class="mk-op-item${selectedOp && selectedOp.id === op.id ? ' sel' : ''}">
-        <input type="radio" name="mk-op" value="${op.id}" ${selectedOp && selectedOp.id === op.id ? 'checked' : ''}>
-        <span>${escapeHtml_(op.nome)}</span>${badge}
-      </label>`;
-    }).join('');
-    list.querySelectorAll('.mk-op-item').forEach(label => {
-      label.addEventListener('click', () => {
-        const inp = label.querySelector('input');
-        if (inp) {
-          inp.checked = true;
-          selectedOp = operadoresCache.find(o => String(o.id) === inp.value) || null;
-          list.querySelectorAll('.mk-op-item').forEach(l => l.classList.remove('sel'));
-          label.classList.add('sel');
-          if (btn) btn.disabled = !selectedOp;
+    const hint = document.getElementById('mk-op-pin-hint');
+    if (!sel) return;
+    const prev = selectedOp ? String(selectedOp.id) : '';
+    sel.innerHTML = '<option value="">Selecione o operador</option>' +
+      operadoresCache.map(op =>
+        `<option value="${op.id}">${escapeHtml_(op.nome)}</option>`
+      ).join('');
+    if (prev && operadoresCache.some(o => String(o.id) === prev)) {
+      sel.value = prev;
+      selectedOp = operadoresCache.find(o => String(o.id) === prev) || null;
+    } else {
+      sel.value = '';
+      selectedOp = null;
+    }
+    if (!sel._mkWired) {
+      sel._mkWired = true;
+      sel.addEventListener('change', () => {
+        const id = sel.value;
+        selectedOp = operadoresCache.find(o => String(o.id) === id) || null;
+        if (btn) btn.disabled = !selectedOp;
+        if (hint) {
+          if (!selectedOp) {
+            hint.style.display = 'none';
+            hint.textContent = '';
+          } else if (!selectedOp.hasPin) {
+            hint.style.display = 'block';
+            hint.textContent = 'Primeiro acesso: voce criara um PIN de 4 digitos na proxima etapa.';
+          } else {
+            hint.style.display = 'block';
+            hint.textContent = 'Digite seu PIN na proxima etapa.';
+          }
         }
       });
-    });
+    }
+    sel.dispatchEvent(new Event('change'));
     if (btn) btn.disabled = !selectedOp;
   }
 

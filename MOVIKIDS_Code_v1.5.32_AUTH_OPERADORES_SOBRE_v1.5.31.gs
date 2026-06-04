@@ -2590,17 +2590,49 @@ function fbDadosSessao_(row, status, rowIndex) {
 }
 
 // ── OPERADORES / AUTH v1.5.32 ─────────────────────────────────
+const OPERADORES_PADRAO_ = ['Eduarda', 'Milena Nunes'];
+const OPERADORES_RENOMEAR_LEGADO_ = {
+  'Operador Balcao 1': 'Eduarda',
+  'Operador Balcao 2': 'Milena Nunes'
+};
+
+function sincronizarOperadoresPadrao_(sh) {
+  const last = sh.getLastRow();
+  const agora = new Date();
+  const ts = fmtData_(agora) + ' ' + fmtHoraLocal_(agora);
+  if (last < OP_DATA_ROW) {
+    OPERADORES_PADRAO_.forEach(nome => {
+      sh.appendRow([nextIdOperador_(sh), ts, nome, '', '', 'SIM', '']);
+    });
+    return;
+  }
+  const rows = sh.getRange(OP_DATA_ROW, 1, last - OP_DATA_ROW + 1, 7).getValues();
+  const nomesNorm = [];
+  rows.forEach((r, i) => {
+    const nome = String(r[2] || '').trim();
+    const legado = OPERADORES_RENOMEAR_LEGADO_[nome];
+    if (legado) {
+      sh.getRange(OP_DATA_ROW + i, 3).setValue(legado);
+      nomesNorm.push(legado.toLowerCase());
+    } else if (nome) {
+      nomesNorm.push(nome.toLowerCase());
+    }
+  });
+  OPERADORES_PADRAO_.forEach(nome => {
+    if (!nomesNorm.includes(nome.toLowerCase())) {
+      sh.appendRow([nextIdOperador_(sh), ts, nome, '', '', 'SIM', '']);
+      nomesNorm.push(nome.toLowerCase());
+    }
+  });
+}
+
 function operadoresSheet_() {
   const sh = sh_getOrCreate_(SH_OPS);
   if (sh.getLastRow() < 1) {
     sh.getRange(1, 1, 1, 7).setValues([['id', 'criadoEm', 'nome', 'pinHash', 'pinSalt', 'ativo', 'ultimoLogin']]);
     sh.getRange(1, 1, 1, 7).setFontWeight('bold');
-    const seeds = ['Operador Balcao 1', 'Operador Balcao 2'];
-    const agora = new Date();
-    seeds.forEach(nome => {
-      sh.appendRow([nextIdOperador_(sh), fmtData_(agora) + ' ' + fmtHoraLocal_(agora), nome, '', '', 'SIM', '']);
-    });
   }
+  sincronizarOperadoresPadrao_(sh);
   return sh;
 }
 
