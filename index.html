@@ -22,7 +22,7 @@
 <script>
 // ── CACHE BUSTER — alinhado a mk-version.js / APP_VERSION ──
 (function(){
-  const CURRENT = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.6';
+  const CURRENT = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.7';
   const KEY = 'mk_loaded_version';
   try {
     if (localStorage.getItem(KEY) !== CURRENT) {
@@ -312,6 +312,18 @@ nav button .nav-badge{
 
 .step-page{display:none}
 .step-page.active{display:block}
+.nova-summary-bar{display:none;margin-bottom:14px;padding:12px 14px;background:var(--bg2);border-radius:var(--radius-sm);border:1px solid var(--border);font-size:13px;line-height:1.45}
+.nova-summary-bar.visible{display:block}
+.nova-summary-bar b{color:var(--txt)}
+.nova-step-hints{display:flex;justify-content:center;gap:12px;margin:-12px 0 16px;font-size:11px;font-weight:800;color:var(--txt3);text-transform:uppercase;letter-spacing:.04em}
+.nova-step-hints span.active{color:var(--blue)}
+.nova-plano-section{display:none;margin-top:4px}
+.nova-plano-section.visible{display:block}
+.nova-rel-quick{display:flex;gap:8px;margin-bottom:10px;align-items:stretch}
+.nova-rel-quick .form-input{margin:0;flex:1}
+.nova-rel-results{margin-bottom:12px;max-height:160px;overflow-y:auto}
+.nova-rel-item{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:6px;background:var(--card);cursor:pointer;font-size:13px}
+.nova-rel-item:hover{border-color:var(--blue);background:var(--blue-lt)}
 
 .tipo-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
 .veiculo-grid-carros{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}
@@ -1482,7 +1494,7 @@ nav button .nav-badge{
   <!-- ══ SIDEBAR (desktop only) ══ -->
   <aside id="sidebar">
     <div class="sb-logo">🚗 Movi <span>Kids</span>
-      <div class="sb-status"><span id="sb-dot" class="dot-online"></span><span id="sb-txt">Online</span><span id="sb-version" style="font-size:10px;opacity:.85;margin-left:5px;color:rgba(255,255,255,.7);font-family:monospace">v1.7.6</span></div>
+      <div class="sb-status"><span id="sb-dot" class="dot-online"></span><span id="sb-txt">Online</span><span id="sb-version" style="font-size:10px;opacity:.85;margin-left:5px;color:rgba(255,255,255,.7);font-family:monospace">v1.7.7</span></div>
     </div>
     <div class="sb-nav" id="sb-nav">
       <button class="sb-btn active" id="sbn-home" onclick="showPage('home')"><span class="sb-icon">🏠</span>Home</button>
@@ -1529,7 +1541,7 @@ nav button .nav-badge{
       <div class="hd-status">
         <div id="status-dot" class="dot-online"></div>
         <span id="status-txt">Online</span>
-        <span id="app-version" style="font-size:10px;opacity:.85;margin-left:4px;font-family:monospace">v1.7.6</span>
+        <span id="app-version" style="font-size:10px;opacity:.85;margin-left:4px;font-family:monospace">v1.7.7</span>
       </div>
     </div>
   </header>
@@ -1583,19 +1595,25 @@ nav button .nav-badge{
     <div id="enc-hoje-section" style="display:none"><div class="sec-title">Encerradas hoje</div><div id="enc-hoje-list"></div></div>
   </div>
 
-  <!-- ──────── PAGE: NOVA ──────── -->
+  <!-- ──────── PAGE: NOVA (Pacote C — 3 passos) ──────── -->
   <div id="page-nova" class="page">
 
+    <div id="nova-summary-bar" class="nova-summary-bar" aria-live="polite"></div>
+
     <div class="steps">
-      <div class="step-dot active" id="dot-0"></div>
-      <div class="step-dot" id="dot-1"></div>
-      <div class="step-dot" id="dot-2"></div>
-      <div class="step-dot" id="dot-3"></div>
+      <div class="step-dot active" id="dot-0" title="O quê"></div>
+      <div class="step-dot" id="dot-1" title="Quem"></div>
+      <div class="step-dot" id="dot-2" title="Fechar"></div>
+    </div>
+    <div class="nova-step-hints">
+      <span id="nova-hint-0" class="active">1. O quê</span>
+      <span id="nova-hint-1">2. Quem</span>
+      <span id="nova-hint-2">3. Fechar</span>
     </div>
 
-    <!-- Step 1: Tipo -->
+    <!-- Passo 1: veículo + plano -->
     <div id="step-0" class="step-page active">
-      <div class="sec-title">Escolha o veículo</div>
+      <div class="sec-title">O quê — veículo e plano</div>
       <div class="vc-section-label">Carros elétricos</div>
       <div class="veiculo-grid-carros" id="vc-grid-carros">
         <div class="vc-card" id="vc-Carro 01" onclick="selectVeiculo(this,'Carro 01','Carro')">
@@ -1650,17 +1668,20 @@ nav button .nav-badge{
           <div class="vc-status livre" id="vc-st-Pelúcia 04">✓ Livre</div>
         </div>
       </div>
+      <div id="nova-plano-section" class="nova-plano-section">
+        <div class="sec-title" style="margin-top:8px">Escolha o plano</div>
+        <div class="plano-list" id="plano-list"></div>
+      </div>
     </div>
 
-    <!-- Step 2: Plano -->
+    <!-- Passo 2: Quem -->
     <div id="step-1" class="step-page">
-      <div class="sec-title">Escolha o plano</div>
-      <div class="plano-list" id="plano-list"></div>
-    </div>
-
-    <!-- Step 3: Dados -->
-    <div id="step-2" class="step-page">
-      <div id="review-card-wrap"></div>
+      <div class="sec-title">Quem — responsável e criança</div>
+      <div class="nova-rel-quick">
+        <input id="nova-rel-q" class="form-input" type="search" placeholder="Buscar responsável cadastrado (nome ou telefone)" autocomplete="off">
+        <button type="button" class="btn btn-secondary btn-sm" onclick="novaBuscarRelacionamento_()">Buscar</button>
+      </div>
+      <div id="nova-rel-results" class="nova-rel-results"></div>
       <div class="form-group">
         <label class="form-label">Nome do Responsável *</label>
         <input id="inp-resp" class="form-input" type="text" placeholder="Ex: João Silva" autocomplete="off" autocapitalize="words" oninput="capitalizarNome(this)">
@@ -1677,17 +1698,17 @@ nav button .nav-badge{
         <label class="form-label" style="color:var(--txt2)">Observação <span style="font-size:11px;font-style:italic;color:var(--txt3)">(opcional)</span></label>
         <textarea id="inp-obs" class="form-input" rows="2" placeholder="Ex: capacete rosa, cadeirinha especial..." style="resize:none;font-family:var(--font-sans)"></textarea>
       </div>
-      <button class="btn btn-primary" onclick="irParaPagamento()" id="btn-continuar">
-        Continuar →
+      <button class="btn btn-primary" onclick="avancarParaFechar_()" id="btn-continuar">
+        Continuar para pagamento →
       </button>
       <button class="btn btn-secondary" onclick="backStep()" style="margin-top:8px">
         ← Voltar
       </button>
     </div>
 
-    <!-- Step 4: Pagamento -->
-    <div id="step-3" class="step-page">
-      <div id="pag-review-wrap"></div>
+    <!-- Passo 3: Fechar -->
+    <div id="step-2" class="step-page">
+      <div class="sec-title">Fechar — pagamento</div>
       <div class="sec-title">Forma de pagamento *</div>
       <div class="pag-grid">
         <div class="pag-btn" id="pag-PIX" onclick="selPagamento(this,'PIX')">
@@ -1712,7 +1733,10 @@ nav button .nav-badge{
         </div>
       </div>
       <button class="btn btn-primary" onclick="confirmarLocacao()" id="btn-confirmar" style="display:none">
-        🚀 Iniciar Locação
+        ✓ Confirmar cadastro
+      </button>
+      <button class="btn btn-secondary" onclick="confirmarLocacaoEIniciar_()" id="btn-confirmar-iniciar" style="display:none;margin-top:8px">
+        Confirmar e enviar SMS / iniciar
       </button>
       <button class="btn btn-secondary" onclick="backStep()" style="margin-top:8px">
         ← Voltar
@@ -2576,7 +2600,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.6';
+const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.7';
 const WEBAPP_URL = (typeof window !== 'undefined' && window.MK_GAS_EXEC_URL) ? window.MK_GAS_EXEC_URL
   : 'https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec';
 const WEBAPP_URL_DEAD_PREFIX = 'AKfycbzc';
@@ -3540,16 +3564,62 @@ function limparNovaDraft_() {
   try { localStorage.removeItem(NOVA_DRAFT_KEY); } catch(e) {}
 }
 
+const NOVA_MAX_STEP = 2;
+
+function migrateDraftStep_(step) {
+  const s = Number(step) || 0;
+  if (s >= 3) return 2;
+  if (s === 2) return 1;
+  if (s === 1) return 0;
+  return s;
+}
+
 function aplicarStepNova_(step) {
-  const safeStep = Math.max(0, Math.min(Number(step) || 0, 3));
-  document.querySelectorAll('.step-page').forEach(s => s.classList.remove('active'));
-  document.querySelectorAll('.step-dot').forEach(d => d.classList.remove('active'));
+  const safeStep = Math.max(0, Math.min(migrateDraftStep_(step), NOVA_MAX_STEP));
+  document.querySelectorAll('#page-nova .step-page').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('#page-nova .step-dot').forEach(d => d.classList.remove('active'));
+  document.querySelectorAll('.nova-step-hints span').forEach(h => h.classList.remove('active'));
   const pg = document.getElementById('step-' + safeStep);
   const dot = document.getElementById('dot-' + safeStep);
+  const hint = document.getElementById('nova-hint-' + safeStep);
   if (pg) pg.classList.add('active');
   if (dot) dot.classList.add('active');
+  if (hint) hint.classList.add('active');
   novaState.step = safeStep;
-  if (safeStep === 2) aplicarPrefillResponsavel_();
+  const planoSec = document.getElementById('nova-plano-section');
+  if (planoSec) planoSec.classList.toggle('visible', !!(novaState.veiculo && novaState.tipo));
+  if (safeStep === 1) aplicarPrefillResponsavel_();
+  if (safeStep === 2) toggleBotoesConfirmarNova_();
+  atualizarNovaSummaryBar_();
+}
+
+function atualizarNovaSummaryBar_() {
+  const bar = document.getElementById('nova-summary-bar');
+  if (!bar) return;
+  const { tipo, plano, veiculo } = novaState;
+  if (!tipo || !plano || !PRECOS[tipo] || !PRECOS[tipo][plano]) {
+    bar.classList.remove('visible');
+    bar.innerHTML = '';
+    return;
+  }
+  const cfg = PRECOS[tipo][plano];
+  const c = novaDraftCampos_();
+  const parts = [
+    tipoIcon(tipo) + ' ' + (veiculo || tipo),
+    PLANO_LABELS[plano] || plano,
+    'R$ ' + cfg.v
+  ];
+  if (c.responsavel) parts.push(c.responsavel + ' / ' + (c.crianca || '—'));
+  bar.innerHTML = '<b>Resumo:</b> ' + escHtml(parts.join(' · '));
+  bar.classList.add('visible');
+}
+
+function toggleBotoesConfirmarNova_() {
+  const ok = !!novaState.pagamento;
+  const b1 = document.getElementById('btn-confirmar');
+  const b2 = document.getElementById('btn-confirmar-iniciar');
+  if (b1) b1.style.display = ok ? 'block' : 'none';
+  if (b2) b2.style.display = ok ? 'block' : 'none';
 }
 
 function aplicarPrefillResponsavel_() {
@@ -3562,6 +3632,7 @@ function aplicarPrefillResponsavel_() {
   setIfEmpty('inp-resp', novaPrefillResponsavel.responsavel || '');
   setIfEmpty('inp-tel', novaPrefillResponsavel.telefone || '');
   setIfEmpty('inp-cri', criancas[0] || '');
+  atualizarNovaSummaryBar_();
   salvarNovaDraft_();
 }
 
@@ -3569,56 +3640,59 @@ function renderPlanosNova_(tipo) {
   const container = document.getElementById('plano-list');
   if (!container || !tipo || !PRECOS[tipo]) return;
   container.innerHTML = Object.entries(PRECOS[tipo]).map(([k,v]) => {
-    const badgeCls = tipo === 'PelÃºcia' ? 'pelucia' : '';
+    const badgeCls = tipo === 'Pelúcia' ? 'pelucia' : '';
     const adicFmt  = 'R$ ' + String(v.a).replace('.',',') + '/min extra';
     return `<div class="plano-btn ${badgeCls}" onclick="selectPlano('${k}',this)">
       <div>
         <div class="pb-nome">${PLANO_LABELS[k]}</div>
-        <div class="pb-det">${v.m} min Â· ${adicFmt}</div>
+        <div class="pb-det">${v.m} min · ${adicFmt}</div>
       </div>
       <div class="pb-val">R$ ${v.v}</div>
     </div>`;
   }).join('');
 }
 
-function renderReviewNova_(plano) {
-  const tipo = novaState.tipo;
-  if (!tipo || !plano || !PRECOS[tipo] || !PRECOS[tipo][plano]) return;
-  const cfg = PRECOS[tipo][plano];
-  const cls = tipo === 'PelÃºcia' ? 'pelucia' : '';
-  const wrap = document.getElementById('review-card-wrap');
-  if (wrap) {
-    wrap.innerHTML = `
-      <div class="review-card ${cls}">
-        <div class="rc-tipo">${tipoIcon(tipo)} ${tipo}</div>
-        <div class="rc-plano">${PLANO_LABELS[plano]}</div>
-        <div class="rc-valor">R$ ${cfg.v} Â· adicional R$ ${cfg.a}/min</div>
-      </div>`;
-  }
-  const cls2 = tipo === 'PelÃºcia' ? 'pink' : '';
+function aplicarEstiloInputsNova_(tipo) {
+  const cls2 = tipo === 'Pelúcia' ? 'pink' : '';
   ['inp-resp','inp-cri','inp-tel'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.className = 'form-input ' + cls2;
   });
 }
 
-function renderPagamentoResumo_() {
-  const resp = document.getElementById('inp-resp')?.value.trim() || '';
-  const cri  = document.getElementById('inp-cri')?.value.trim() || '';
-  const obs  = document.getElementById('inp-obs')?.value.trim() || '';
-  const tipo = novaState.tipo, plano = novaState.plano, veiculo = novaState.veiculo;
-  const cfg  = PRECOS[tipo] && PRECOS[tipo][plano] ? PRECOS[tipo][plano] : {};
-  const wrap = document.getElementById('pag-review-wrap');
-  if (!wrap) return;
-  const icon = tipoIcon(tipo);
-  wrap.innerHTML = '<div class="pag-resumo">' +
-    '<div class="pag-resumo-row"><span>VeÃ­culo</span><span>' + icon + ' ' + escHtml(veiculo||tipo) + '</span></div>' +
-    '<div class="pag-resumo-row"><span>Plano</span><span>' + escHtml(PLANO_LABELS[plano]||plano) + '</span></div>' +
-    '<div class="pag-resumo-row"><span>ResponsÃ¡vel</span><span>' + escHtml(resp) + '</span></div>' +
-    '<div class="pag-resumo-row"><span>CrianÃ§a</span><span>' + escHtml(cri) + '</span></div>' +
-    (obs ? '<div class="pag-resumo-row"><span>Obs</span><span style="font-style:italic">' + escHtml(obs) + '</span></div>' : '') +
-    '<div class="pag-resumo-row total"><span>Total</span><span>R$ ' + (cfg.v||0) + '</span></div>' +
-  '</div>';
+async function novaBuscarRelacionamento_() {
+  const q = document.getElementById('nova-rel-q')?.value.trim() || '';
+  const box = document.getElementById('nova-rel-results');
+  if (!box) return;
+  if (!q) { toast('Digite nome ou telefone para buscar.', 'warning'); return; }
+  box.innerHTML = '<div class="skeleton"></div>';
+  try {
+    const res = await api({ action: 'listarResponsaveis', q, limite: 12 }, 20000);
+    if (!res.ok || !(res.responsaveis || []).length) {
+      box.innerHTML = '<div style="font-size:12px;color:var(--txt3);padding:8px">Nenhum cadastro encontrado.</div>';
+      return;
+    }
+    box.innerHTML = res.responsaveis.map((r, idx) => {
+      const kids = (r.criancas || []).join(', ') || '—';
+      return '<div class="nova-rel-item" onclick="novaAplicarRelacionamento_(' + idx + ')">' +
+        '<span><b>' + escHtml(r.responsavel || '') + '</b><br><span style="font-size:11px;color:var(--txt3)">' +
+        escHtml(kids) + '</span></span>' +
+        '<span style="font-size:11px;color:var(--txt3)">' + escHtml(relPhone_(r.telefone)) + '</span></div>';
+    }).join('');
+    relacionamentoCache = res.responsaveis;
+  } catch (e) {
+    box.innerHTML = '<div style="font-size:12px;color:var(--red);padding:8px">Falha na busca. Tente de novo.</div>';
+  }
+}
+
+function novaAplicarRelacionamento_(idx) {
+  const r = relacionamentoCache && relacionamentoCache[idx];
+  if (!r) return;
+  novaPrefillResponsavel = r;
+  aplicarPrefillResponsavel_();
+  const box = document.getElementById('nova-rel-results');
+  if (box) box.innerHTML = '';
+  toast('Dados preenchidos. Confira nome e telefone.', 'success');
 }
 
 function restaurarNovaDraft_() {
@@ -3633,7 +3707,7 @@ function restaurarNovaDraft_() {
     if (novaState.veiculo) {
       const card = document.getElementById('vc-' + novaState.veiculo);
       if (card && !card.classList.contains('vc-busy') && !card.classList.contains('vc-busy-pink')) {
-        card.classList.add(novaState.tipo === 'PelÃºcia' ? 'vc-sel-pink' : 'vc-sel');
+        card.classList.add(novaState.tipo === 'Pelúcia' ? 'vc-sel-pink' : 'vc-sel');
       }
     }
     if (novaState.plano) {
@@ -3641,7 +3715,7 @@ function restaurarNovaDraft_() {
         const onclick = b.getAttribute('onclick') || '';
         if (onclick.includes("'" + novaState.plano + "'")) b.classList.add('sel');
       });
-      renderReviewNova_(novaState.plano);
+      if (novaState.tipo) aplicarEstiloInputsNova_(novaState.tipo);
     }
     const c = draft.campos || {};
     const set = (id, value) => { const el = document.getElementById(id); if (el) el.value = value || ''; };
@@ -3650,12 +3724,9 @@ function restaurarNovaDraft_() {
     set('inp-tel', c.telefone);
     set('inp-obs', c.observacao || novaState.observacao);
     novaState.observacao = c.observacao || novaState.observacao || '';
-    renderPagamentoResumo_();
     document.querySelectorAll('.pag-btn').forEach(b => {
       b.classList.toggle('sel', !!(novaState.pagamento && b.textContent.includes(novaState.pagamento)));
     });
-    const btn = document.getElementById('btn-confirmar');
-    if (btn && novaState.pagamento) btn.style.display = 'block';
     aplicarStepNova_(novaState.step || 0);
   } finally {
     _restoringNovaDraft = false;
@@ -3666,7 +3737,10 @@ function restaurarNovaDraft_() {
 function inicializarDraftNova_() {
   ['inp-resp','inp-cri','inp-tel','inp-obs'].forEach(id => {
     const el = document.getElementById(id);
-    if (el) ['input','change'].forEach(ev => el.addEventListener(ev, salvarNovaDraft_));
+    if (el) ['input','change'].forEach(ev => el.addEventListener(ev, function() {
+      salvarNovaDraft_();
+      atualizarNovaSummaryBar_();
+    }));
   });
   window.addEventListener('beforeunload', salvarNovaDraft_);
 }
@@ -3766,8 +3840,13 @@ function selectVeiculo(el, veiculo, tipo) {
   el.classList.add(tipo === 'Pelúcia' ? 'vc-sel-pink' : 'vc-sel');
   novaState.veiculo = veiculo;
   novaState.tipo    = tipo;
-  // Reutiliza selectTipo para construir planos (código testado e funcional)
-  selectTipo(tipo, null);
+  novaState.plano   = null;
+  document.querySelectorAll('.plano-btn').forEach(b => b.classList.remove('sel'));
+  renderPlanosNova_(tipo);
+  const sec = document.getElementById('nova-plano-section');
+  if (sec) sec.classList.add('visible');
+  aplicarEstiloInputsNova_(tipo);
+  atualizarNovaSummaryBar_();
   salvarNovaDraft_();
 }
 
@@ -3775,104 +3854,55 @@ function selectTipo(tipo, el) {
   document.querySelectorAll('.tipo-btn').forEach(b => b.classList.remove('sel'));
   if (el) el.classList.add('sel');
   novaState.tipo = tipo;
-
-  // Build plano list
-  const container = document.getElementById('plano-list');
-  container.innerHTML = Object.entries(PRECOS[tipo]).map(([k,v]) => {
-    const badgeCls = tipo === 'Pelúcia' ? 'pelucia' : '';
-    const adicFmt  = 'R$ ' + String(v.a).replace('.',',') + '/min extra';
-    return `<div class="plano-btn ${badgeCls}" onclick="selectPlano('${k}',this)">
-      <div>
-        <div class="pb-nome">${PLANO_LABELS[k]}</div>
-        <div class="pb-det">${v.m} min · ${adicFmt}</div>
-      </div>
-      <div class="pb-val">R$ ${v.v}</div>
-    </div>`;
-  }).join('');
-
-  nextStep();
+  renderPlanosNova_(tipo);
+  const sec = document.getElementById('nova-plano-section');
+  if (sec) sec.classList.add('visible');
 }
 
 function selectPlano(plano, el) {
+  if (!novaState.tipo) { toast('Selecione o veículo primeiro.', 'error'); return; }
   document.querySelectorAll('.plano-btn').forEach(b => b.classList.remove('sel'));
   el.classList.add('sel');
   novaState.plano = plano;
-
-  // Build review card
-  const tipo  = novaState.tipo;
-  const cfg   = PRECOS[tipo][plano];
-  const cls   = tipo === 'Pelúcia' ? 'pelucia' : '';
-  document.getElementById('review-card-wrap').innerHTML = `
-    <div class="review-card ${cls}">
-      <div class="rc-tipo">${tipoIcon(tipo)} ${tipo}</div>
-      <div class="rc-plano">${PLANO_LABELS[plano]}</div>
-      <div class="rc-valor">R$ ${cfg.v} · adicional R$ ${cfg.a}/min</div>
-    </div>`;
-
-  // Preserva dados ja digitados ao trocar ou revisar o plano.
-
-  // Set input class by tipo
-  const cls2 = tipo === 'Pelúcia' ? 'pink' : '';
-  ['inp-resp','inp-cri','inp-tel'].forEach(id => {
-    const el2 = document.getElementById(id);
-    el2.className = 'form-input ' + cls2;
-  });
-
-  nextStep();
+  aplicarEstiloInputsNova_(novaState.tipo);
+  atualizarNovaSummaryBar_();
+  if (novaState.step === 0) nextStep();
+  salvarNovaDraft_();
 }
 
 function nextStep() {
-  const cur = novaState.step;
-  document.getElementById(`step-${cur}`).classList.remove('active');
-  document.getElementById(`dot-${cur}`).classList.remove('active');
-  novaState.step++;
-  document.getElementById(`step-${novaState.step}`).classList.add('active');
-  document.getElementById(`dot-${novaState.step}`).classList.add('active');
-  if (novaState.step === 2) aplicarPrefillResponsavel_();
+  if (novaState.step >= NOVA_MAX_STEP) return;
+  if (novaState.step === 0 && !novaState.plano) {
+    toast('Escolha o plano antes de continuar.', 'error');
+    return;
+  }
+  aplicarStepNova_(novaState.step + 1);
   salvarNovaDraft_();
 }
 
 function backStep() {
-  const cur = novaState.step;
-  document.getElementById(`step-${cur}`).classList.remove('active');
-  document.getElementById(`dot-${cur}`).classList.remove('active');
-  novaState.step--;
-  document.getElementById(`step-${novaState.step}`).classList.add('active');
-  document.getElementById(`dot-${novaState.step}`).classList.add('active');
+  if (novaState.step <= 0) return;
+  aplicarStepNova_(novaState.step - 1);
   salvarNovaDraft_();
 }
 
-function irParaPagamento() {
+function avancarParaFechar_() {
   const resp = document.getElementById('inp-resp').value.trim();
   const cri  = document.getElementById('inp-cri').value.trim();
   const tel  = document.getElementById('inp-tel').value.trim().replace(/\D/g,'');
-  if (!resp || !cri || !tel) { toast('Preencha todos os campos!', 'error'); return; }
-  // Monta resumo no step-3
-  const tipo = novaState.tipo, plano = novaState.plano, veiculo = novaState.veiculo;
-  const cfg  = PRECOS[tipo] && PRECOS[tipo][plano] ? PRECOS[tipo][plano] : {};
-  const obs  = (document.getElementById('inp-obs') ? document.getElementById('inp-obs').value.trim() : '');
-  novaState.observacao = obs;
-  const wrap = document.getElementById('pag-review-wrap');
-  if (wrap) {
-    const icon = tipoIcon(tipo);
-    wrap.innerHTML = '<div class="pag-resumo">' +
-      '<div class="pag-resumo-row"><span>Veículo</span><span>' + icon + ' ' + (veiculo||tipo) + '</span></div>' +
-      '<div class="pag-resumo-row"><span>Plano</span><span>' + (PLANO_LABELS[plano]||plano) + '</span></div>' +
-      '<div class="pag-resumo-row"><span>Responsável</span><span>' + resp + '</span></div>' +
-      '<div class="pag-resumo-row"><span>Criança</span><span>' + cri + '</span></div>' +
-      (obs ? '<div class="pag-resumo-row"><span>Obs</span><span style="font-style:italic">' + obs + '</span></div>' : '') +
-      '<div class="pag-resumo-row total"><span>Total</span><span>R$ ' + (cfg.v||0) + '</span></div>' +
-    '</div>';
-  }
-  nextStep();
+  if (!novaState.plano) { toast('Escolha o plano.', 'error'); return; }
+  if (!resp || !cri || !tel) { toast('Preencha responsável, criança e telefone.', 'error'); return; }
+  novaState.observacao = (document.getElementById('inp-obs')?.value.trim() || '');
+  atualizarNovaSummaryBar_();
+  aplicarStepNova_(2);
+  salvarNovaDraft_();
 }
 
 function selPagamento(el, forma) {
   document.querySelectorAll('.pag-btn').forEach(b => b.classList.remove('sel'));
   el.classList.add('sel');
   novaState.pagamento = forma;
-  const btn = document.getElementById('btn-confirmar');
-  if (btn) btn.style.display = 'block';
+  toggleBotoesConfirmarNova_();
   salvarNovaDraft_();
 }
 
@@ -3884,18 +3914,18 @@ function capitalizarNome(el) {
 }
 
 function resetNova(opts = {}) {
-  document.querySelectorAll('.step-page').forEach(s => s.classList.remove('active'));
-  document.querySelectorAll('.step-dot').forEach(d => d.classList.remove('active'));
-  document.getElementById('step-0').classList.add('active');
-  document.getElementById('dot-0').classList.add('active');
+  novaState = { tipo: null, plano: null, veiculo: null, pagamento: null, observacao: '', step: 0 };
   document.querySelectorAll('.tipo-btn').forEach(b => b.classList.remove('sel'));
   document.querySelectorAll('.plano-btn').forEach(b => b.classList.remove('sel'));
   document.querySelectorAll('.vc-card').forEach(c => c.classList.remove('vc-sel','vc-sel-pink'));
-  novaState = { tipo: null, plano: null, veiculo: null, pagamento: null, observacao: '', step: 0 };
   ['inp-resp','inp-cri','inp-tel'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
-  const obsEl = document.getElementById('inp-obs'); if(obsEl) obsEl.value = '';
+  const obsEl = document.getElementById('inp-obs'); if (obsEl) obsEl.value = '';
+  const relQ = document.getElementById('nova-rel-q'); if (relQ) relQ.value = '';
+  const relBox = document.getElementById('nova-rel-results'); if (relBox) relBox.innerHTML = '';
   document.querySelectorAll('.pag-btn').forEach(b => b.classList.remove('sel'));
-  const bc = document.getElementById('btn-confirmar'); if(bc) bc.style.display='none';
+  const sec = document.getElementById('nova-plano-section'); if (sec) sec.classList.remove('visible');
+  aplicarStepNova_(0);
+  toggleBotoesConfirmarNova_();
   if (!opts.preserveDraft) limparNovaDraft_();
 }
 
@@ -3986,7 +4016,88 @@ async function confirmarLocacao() {
   } catch(e) {
     toast('Erro de conexão. Tente novamente.', 'error');
   } finally {
-    btn.textContent = '🚀 Iniciar Locação'; btn.disabled = false;
+    btn.textContent = '✓ Confirmar cadastro'; btn.disabled = false;
+    const b2 = document.getElementById('btn-confirmar-iniciar');
+    if (b2) { b2.disabled = false; b2.textContent = 'Confirmar e enviar SMS / iniciar'; }
+  }
+}
+
+async function confirmarLocacaoEIniciar_() {
+  if (!novaState.veiculo || !novaState.pagamento) {
+    toast('Complete veículo, plano e pagamento.', 'error');
+    return;
+  }
+  const resp = document.getElementById('inp-resp').value.trim();
+  const cri  = document.getElementById('inp-cri').value.trim();
+  const tel  = document.getElementById('inp-tel').value.trim().replace(/\D/g,'');
+  if (!resp || !cri || !tel) { toast('Preencha responsável, criança e telefone.', 'error'); return; }
+
+  const cfgLocal = (PRECOS[novaState.tipo] && PRECOS[novaState.tipo][novaState.plano]) || {};
+  const btn = document.getElementById('btn-confirmar-iniciar');
+  if (btn) { btn.textContent = '⏳ Salvando...'; btn.disabled = true; }
+  const btnMain = document.getElementById('btn-confirmar');
+  if (btnMain) btnMain.disabled = true;
+
+  try {
+    const d = await api({
+      action: 'salvarLocacao',
+      ...operadorApiParams_(),
+      tipo: novaState.tipo,
+      plano: novaState.plano,
+      veiculo: novaState.veiculo,
+      pagamento: novaState.pagamento,
+      observacao: novaState.observacao || '',
+      responsavel: resp,
+      crianca: cri,
+      telefone: tel,
+      valorPlano: cfgLocal.v || 0,
+      mins: cfgLocal.m || 0,
+      adicionalPorMin: cfgLocal.a || 1.00
+    });
+    if (!d.ok) { toast('Erro: ' + d.erro, 'error'); return; }
+
+    const approxRow = 10 + Number(d.id);
+    sessions.push({
+      rowIndex: approxRow,
+      id: d.id,
+      tipo: novaState.tipo,
+      plano: novaState.plano,
+      veiculo: novaState.veiculo,
+      pagamento: novaState.pagamento,
+      observacao: novaState.observacao || '',
+      mins: d.mins || cfgLocal.m,
+      valorPlano: d.valorPlano || cfgLocal.v,
+      adicionalPorMin: d.adicionalPorMin || cfgLocal.a,
+      responsavel: resp,
+      crianca: cri,
+      telefone: tel,
+      horaInicio: d.horaInicio,
+      data: d.data,
+      startTimestamp: 0,
+      started: false,
+      alertFired5: false,
+      alertFiredExp: false,
+      status: d.status || 'Pendente'
+    });
+    saveSessions();
+    limparNovaDraft_();
+    resetNova();
+    try { localStorage.removeItem('mk_inicio_cache'); } catch (e) {}
+    broadcastInvalidate();
+    syncController(true, 800);
+    showPage('home');
+    renderCards();
+    atualizarVeiculoGrid();
+    setTimeout(() => {
+      const s = sessions.find(x => Number(x.id) === Number(d.id)) || sessions.find(x => x.rowIndex === approxRow);
+      if (s) abrirModalBv(s.rowIndex);
+      else toast('Cadastro salvo. Use ▶ Iniciar na Home.', 'success');
+    }, 400);
+  } catch (e) {
+    toast('Erro de conexão.', 'error');
+  } finally {
+    if (btn) { btn.textContent = 'Confirmar e enviar SMS / iniciar'; btn.disabled = false; }
+    if (btnMain) btnMain.disabled = false;
   }
 }
 

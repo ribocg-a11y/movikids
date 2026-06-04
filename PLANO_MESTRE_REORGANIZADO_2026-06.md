@@ -2,8 +2,8 @@
 
 **Data:** 04/06/2026  
 **Substitui como referência única de roadmap:** `PLANO_MESTRE_MOVIKIDS_CONFIABILIDADE.md` + trechos desatualizados de `PROXIMAS_FASES_OPERACIONAIS.md`  
-**Produção de referência:** GAS **v1.5.37** · Frontend **v1.7.2** · Portal `acompanhar.html`  
-**Atualizado:** 04/06/2026 — Pacotes A, financeiro (1.7.1) e B (1.7.2) em andamento/publicados.
+**Produção de referência:** GAS **v1.5.37** (impl. Web **v79**) · Frontend **v1.7.7** · Portal `acompanhar.html`  
+**Atualizado:** 04/06/2026 — Pacotes A/B/C + incidente publicados; **próximo: Pacote D** (drawer sessão).
 
 ---
 
@@ -221,6 +221,23 @@ Prioridade **P0** — baixo risco, alto impacto percebido.
 | I5 | Estender regressão: `listarOperadoresLogin`, trava 409, `liberarSessaoOperador` | `.ps1` + GAS | 4 h |
 | I6 | Colar GAS v1.5.33 se ainda não em algum ambiente | Apps Script | 15 min |
 
+**Status 04/06 tarde:** I1 parcial (`ESTADO_ATUAL` ok); I4/I6 feitos em produção (GAS v79, ping ok); incidente documentado. I2/I3/I5 permanecem no backlog se ainda houver KPI duplicado na Home.
+
+---
+
+## 6b. Pacote Incidente — confiabilidade (04/06) — **CONCLUÍDO**
+
+Interrupção entre Pacote B e Pacote C; não substitui o roadmap de UX.
+
+| Versão | Entrega |
+|--------|---------|
+| **1.7.4** | Cache/URL GAS (`mk-version.js`, `gas-endpoint.json`) |
+| **1.7.5** | ADM encerra sem SMS obrigatório de extra |
+| **1.7.6** | `track.html` URL nova; encerrar `somentePlano` offline; `deploy-gas.ps1` valida DEPLOY_ID |
+| **GAS v79** | `somentePlano`, auditoria ADM; correção financeira já em v1.5.36+ |
+
+Docs: `INCIDENTE_DEPLOY_E_EXTRAS_2026-06-04.md`, `FIX_OFFLINE_ENCERRAR_v1.7.6.md`, `REGRAS_DE_PUBLICACAO_SEGURA.md` Regra 8.
+
 ---
 
 ## 7. Ações planejadas (pacotes por entrega)
@@ -244,15 +261,26 @@ Prioridade **P0** — baixo risco, alto impacto percebido.
 - Sidebar admin agrupada: Financeiro | Pessoas | Sistema.
 - Sem KPI/fechamento duplicado na visão geral.
 
-### Pacote C — Wizard Nova locação — **PRÓXIMO**
+### Pacote C — Wizard Nova locação — **CONCLUÍDO v1.7.7**
 
 - 3 passos, barra resumo fixa, busca relacionamento no passo 2.
-- Versão alvo: **v1.7.3**.
+- Ver `PACOTE_C_NOVA_3_PASSOS_v1.7.7.md`.
+
+**Escopo técnico sugerido:**
+
+1. Fundir passos 0+1 (veículo + plano) em **“O quê”** com tiles `MKTile`.
+2. Passo **“Quem”**: responsável/criança/tel + busca relacionamento inline (sem review card duplicado).
+3. Passo **“Fechar”**: pagamento + CTA único “Salvar pendente” / “Iniciar agora”.
+4. Barra resumo fixa no topo durante todo o wizard.
+5. Atalhos: repetir última locação; pré-preenchimento do Relacionamento (já parcial — formalizar).
+
+**Critério de pronto:** ≤ 3 telas; cadastro médio mais rápido; regressão nova locação + SMS boas-vindas.
 
 ### Pacote D — Drawer operação sessão
 
-- Unificar modais encerrar/editar/estender.
-- Versão alvo: **v1.7.4**.
+- Unificar modais encerrar/editar/estender/cancelar em drawer ou sheet único.
+- Versão alvo: **v1.7.8**.
+- Reaproveitar lógica de encerrar offline/SMS ADM já em 1.7.5–1.7.6.
 
 ### Pacote E — Backend endurecimento
 
@@ -361,11 +389,13 @@ flowchart LR
 
 ---
 
-## 14. Próxima sprint (decisão)
+## 14. Próxima sprint (decisão) — **ativa**
 
-**Recomendado agora:** **Pacote C** — Nova locação em 3 passos (impacto direto no balcão).  
-**Depois:** Pacote D (drawer encerrar/editar) · Pacote E (POST/auditoria GAS).
+**Agora:** **Pacote D** (drawer encerrar/editar/estender) → alvo **v1.7.8**.  
+**Depois:** Pacote E (POST GAS) → Pacote F (KPIs avançados).
+
+Pacote C entregue em **v1.7.7** — publicar com `git push` e `?force=1.7.7` nos tablets.
 
 ---
 
-*Arquivo gerado a partir do estado real do código (`index.html` ~6.5k linhas), produção GAS v1.5.33 / FE v1.6.78 e histórico do projeto MOVI KIDS.*
+*Arquivo alinhado em 04/06/2026: GAS impl. v79 / FE v1.7.6 / plano mestre seção 6b incidente.*
