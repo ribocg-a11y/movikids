@@ -6,8 +6,8 @@
 |--------|------|
 | **Planilha MOVIKIDS** | https://docs.google.com/spreadsheets/d/1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618/edit |
 | **Editor Apps Script** | Na planilha: menu **Extensões → Apps Script** (ou aba do Chrome *MoviKids - Editor do projeto*) |
-| **Testar se o GAS está no ar** | https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec?action=ping |
-| **App (GitHub Pages)** | https://ribocg-a11y.github.io/movikids/?force=1.7.1 |
+| **Testar se o GAS está no ar** | https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec?action=ping |
+| **App (GitHub Pages)** | https://ribocg-a11y.github.io/movikids/?force=1.7.3 |
 
 No editor Apps Script: **Implantar → Gerenciar implantações → Editar** a implantação Web existente (ID `AKfycbzc...`) → **Nova versão** → Implantar. **Não** crie um deploy novo (mantém a mesma URL).
 

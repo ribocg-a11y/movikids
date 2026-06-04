@@ -1,5 +1,5 @@
 const BASE =
-  "https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec";
+  "https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec";
 
 async function api(params) {
   const url = `${BASE}?${new URLSearchParams({ ...params, t: String(Date.now()) })}`;

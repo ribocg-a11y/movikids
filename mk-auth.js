@@ -740,7 +740,7 @@
     } catch (e) {
       const msg = (e && e.message) || 'Erro de conexao';
       toast(msg, 'error');
-      alert('Falha ao resetar PIN: ' + msg + '\n\nTeste: https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec?action=ping');
+      alert('Falha ao resetar PIN: ' + msg + '\n\nTeste: https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec?action=ping');
     }
   };
 

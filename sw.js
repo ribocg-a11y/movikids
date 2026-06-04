@@ -1,6 +1,6 @@
-// MOVI KIDS - Service Worker 1.7.2
+// MOVI KIDS - Service Worker 1.7.3
 
-const SW_VERSION = '1.7.2';
+const SW_VERSION = '1.7.3';
 
 
 
