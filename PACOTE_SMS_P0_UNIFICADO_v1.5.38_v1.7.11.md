@@ -1,6 +1,7 @@
 # Pacote SMS P0 unificado — v1.5.38 + v1.7.11
 
-Data: 04/06/2026 — fecha o ponto SMS (nao reabrir).
+Data: 04/06/2026 — fecha o ponto SMS (nao reabrir).  
+**Troca gateway:** `TROCA_SMS_GATEWAY_DJVJRL_2026-06-04.md` (Samsung EJQQD0 → DJVJRL remoto, Delivered validado).
 
 ## Pesquisa (SMS Gateway Cloud / sms-gate.app)
 
