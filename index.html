@@ -21,7 +21,7 @@
 // ── CACHE BUSTER v1.3.0 ─────────────────────────────────
 // Força limpeza do SW antigo e recarga com versão nova
 (function(){
-  const CURRENT = '1.6.79';
+  const CURRENT = '1.6.80';
   const KEY = 'mk_loaded_version';
   try {
     if (localStorage.getItem(KEY) !== CURRENT) {
@@ -70,7 +70,7 @@ html,body{height:100%;background:var(--bg);color:var(--txt);overflow:hidden}
 #splash.hide{opacity:0;pointer-events:none}
 #splash.gone{display:none}
 
-/* ── LOGIN OPERADORES v1.6.79 ─────────────────────────────── */
+/* ── LOGIN OPERADORES v1.6.80 ─────────────────────────────── */
 #mk-auth-gate{
   position:fixed;inset:0;z-index:998;
   background:var(--bg);
@@ -1474,7 +1474,7 @@ nav button .nav-badge{
   <!-- ══ SIDEBAR (desktop only) ══ -->
   <aside id="sidebar">
     <div class="sb-logo">🚗 Movi <span>Kids</span>
-      <div class="sb-status"><span id="sb-dot" class="dot-online"></span><span id="sb-txt">Online</span><span id="sb-version" style="font-size:10px;opacity:.85;margin-left:5px;color:rgba(255,255,255,.7);font-family:monospace">v1.6.79</span></div>
+      <div class="sb-status"><span id="sb-dot" class="dot-online"></span><span id="sb-txt">Online</span><span id="sb-version" style="font-size:10px;opacity:.85;margin-left:5px;color:rgba(255,255,255,.7);font-family:monospace">v1.6.80</span></div>
     </div>
     <div class="sb-nav" id="sb-nav">
       <button class="sb-btn active" id="sbn-home" onclick="showPage('home')"><span class="sb-icon">🏠</span>Home</button>
@@ -1517,7 +1517,7 @@ nav button .nav-badge{
       <div class="hd-status">
         <div id="status-dot" class="dot-online"></div>
         <span id="status-txt">Online</span>
-        <span id="app-version" style="font-size:10px;opacity:.85;margin-left:4px;font-family:monospace">v1.6.79</span>
+        <span id="app-version" style="font-size:10px;opacity:.85;margin-left:4px;font-family:monospace">v1.6.80</span>
       </div>
     </div>
   </header>
@@ -2513,7 +2513,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = '1.6.79';
+const APP_VERSION = '1.6.80';
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec';
 const PORTAL_RESPONSAVEL_URL = 'https://ribocg-a11y.github.io/movikids/acompanhar.html';
 
@@ -4018,7 +4018,7 @@ async function confirmarEncerrar() {
     updateStats();
     atualizarVeiculoGrid();
 
-    // SMS automático de agradecimento (v1.6.79) — fire-and-forget
+    // SMS automático de agradecimento (v1.6.80) — fire-and-forget
     try {
       const encDados = {
         rowIndex:    encSession.rowIndex,
@@ -5089,6 +5089,10 @@ function verificarPin() {
 function adminLogin() {
   isAdmin = true;
   window.isAdmin = true;
+  const app = document.getElementById('app');
+  if (app) app.style.display = 'flex';
+  const gate = document.getElementById('mk-auth-gate');
+  if (gate) gate.style.display = 'none';
   adminCountdown = 60;
   document.addEventListener('click',    resetAdminTimer);
   document.addEventListener('touchstart', resetAdminTimer);
@@ -6449,7 +6453,7 @@ function renderAnalyticsCards(stats) {
   }
 }
 
-// ── LANÇAMENTO AVULSO v1.6.79 ───────────────────────────────
+// ── LANÇAMENTO AVULSO v1.6.80 ───────────────────────────────
 let avulsoState = { tipo: null, plano: null };
 
 function resetAvulsoForm_() {
@@ -6526,7 +6530,7 @@ async function salvarLancamentoAvulso() {
 
 window.__mkLoginOpsPromise = api({ action: 'listarOperadoresLogin' });
 </script>
-<script src="mk-auth.js?v=1.6.79"></script>
+<script src="mk-auth.js?v=1.6.80"></script>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
   if (typeof mkAuthBoot === 'function') {

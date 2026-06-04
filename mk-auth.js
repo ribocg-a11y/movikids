@@ -1,4 +1,4 @@
-/* MOVI KIDS — Login operadores v1.6.79 */
+/* MOVI KIDS — Login operadores v1.6.80 */
 (function () {
   const SESSION_KEY = 'mk_auth_session_v1';
   const LEGACY_OPERADOR_KEY = 'mk_operador_atual_v1';
@@ -7,6 +7,7 @@
   let operadoresCache = [];
   let sessaoAtivaRemota = null;
   let _loadingOps = false;
+  let _authBusy = false;
 
   function apiCall(params, timeoutMs) {
     const fn = typeof window !== 'undefined' && window.api;
@@ -143,7 +144,6 @@
     if (navAdmin) navAdmin.style.display = admin ? '' : 'none';
     if (sbGer) sbGer.style.display = admin ? 'none' : '';
     if (sbAdminSec && !admin && typeof hideAdminSidebar === 'function') hideAdminSidebar();
-    if (admin && typeof adminLogin === 'function' && !(typeof isAdmin !== 'undefined' && isAdmin)) adminLogin();
   }
 
   function showStep(id) {
@@ -181,7 +181,8 @@
         inp.value = inp.value.replace(/\D/g, '').slice(0, 1);
         if (inp.value && idx < count - 1) inputs[idx + 1].focus();
         if (onComplete && inputs.every(x => x.value.length === 1)) {
-          setTimeout(() => onComplete(), 80);
+          clearTimeout(c._mkPinTimer);
+          c._mkPinTimer = setTimeout(() => onComplete(), 150);
         }
       });
       inp.addEventListener('keydown', e => {
@@ -407,55 +408,70 @@
   }
 
   async function onAdminLogin() {
+    if (_authBusy) return;
     const pin = readPins(adminPins);
     if (pin.length !== 4) {
-      showErr('mk-admin-err', 'Digite o PIN de 4 digitos');
+      showErr('mk-admin-err', 'Digite os 4 numeros do PIN administrativo (1416).');
       return;
     }
+    const btn = document.getElementById('mk-btn-admin-login');
+    if (btn) { btn.disabled = true; btn.textContent = 'Entrando...'; }
+    showErr('mk-admin-err', '');
+    _authBusy = true;
     try {
       const d = await apiCall({ action: 'loginAdmin', adminPin: pin });
       if (!d.ok) {
-        showErr('mk-admin-err', d.erro || 'PIN incorreto');
+        showErr('mk-admin-err', d.erro || 'PIN administrativo incorreto');
         clearPins(adminPins);
         return;
       }
       await finishLogin_(d.operador, 'admin');
     } catch (e) {
-      showErr('mk-admin-err', e.message || 'Sem conexao');
+      showErr('mk-admin-err', e.message || 'Sem conexao com o servidor');
+      clearPins(adminPins);
+    } finally {
+      _authBusy = false;
+      if (btn) { btn.disabled = false; btn.textContent = 'Entrar'; }
     }
   }
 
   async function finishLogin_(operador, role) {
+    const isAdminRole = role === 'admin';
     setSession({
       id: operador.id,
       nome: operador.nome,
       role: role || 'operador',
       loggedAt: Date.now()
     });
-    showGate(false);
-    showApp();
     const splash = document.getElementById('splash');
     if (splash) {
       splash.classList.add('hide');
       splash.classList.add('gone');
     }
-    try {
-      if (typeof init === 'function' && !window._mkAppInited) {
-        window._mkAppInited = true;
-        await init();
-      } else if (typeof syncController === 'function') {
-        await syncController(true, 0);
-      }
-    } catch (e) {
-      console.error('[mk-auth] init apos login:', e);
-      toast('Login ok, mas falhou carregar dados. Puxe para atualizar.', 'warning');
-    }
-    if (typeof atualizarOperadorUI_ === 'function') atualizarOperadorUI_();
-    if (role === 'admin' && typeof adminLogin === 'function') {
+    showGate(false);
+    const app = document.getElementById('app');
+    if (app) app.style.display = 'flex';
+    const gate = document.getElementById('mk-auth-gate');
+    if (gate) gate.style.display = 'none';
+
+    if (isAdminRole && typeof adminLogin === 'function') {
       adminLogin();
-    } else if (typeof showPage === 'function') {
-      showPage('home');
+    } else {
+      showApp();
+      if (typeof showPage === 'function') showPage('home');
+      if (typeof atualizarOperadorUI_ === 'function') atualizarOperadorUI_();
     }
+
+    if (!window._mkAppInited && typeof init === 'function') {
+      window._mkAppInited = true;
+      init().catch(e => {
+        console.error('[mk-auth] init apos login:', e);
+        toast('Login ok. Sincronizando em segundo plano...', 'warning');
+      });
+    } else if (typeof syncController === 'function') {
+      syncController(true, 0).catch(() => {});
+    }
+
     toast('Bem-vindo, ' + operador.nome, 'success');
   }
 
@@ -473,9 +489,11 @@
     document.getElementById('mk-btn-do-login')?.addEventListener('click', onLoginPin);
     document.getElementById('mk-btn-admin-login')?.addEventListener('click', onAdminLogin);
     document.getElementById('mk-btn-admin-entry')?.addEventListener('click', () => {
-      clearPins(adminPins);
       showErr('mk-admin-err', '');
       showStep('mk-step-admin');
+      adminPins = buildPinRow('mk-admin-pin', 4, () => onAdminLogin());
+      clearPins(adminPins);
+      if (adminPins[0]) adminPins[0].focus();
     });
     document.getElementById('mk-btn-back-create')?.addEventListener('click', () => showStep('mk-step-select'));
     document.getElementById('mk-btn-back-login')?.addEventListener('click', () => {
