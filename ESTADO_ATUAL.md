@@ -8,8 +8,9 @@ Referencia unica para alinhamento local x producao.
 
 | Camada | Versao alvo | URL / ID |
 |--------|-------------|----------|
-| Apps Script | **v1.5.37** (impl. Web **v79**, 04/06 16:13) | Deploy `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y` |
-| Frontend | **v1.7.7** | https://ribocg-a11y.github.io/movikids/?force=1.7.7 |
+| Apps Script | **v1.5.38** (colar + Nova versao Web) | Deploy `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y` |
+| Frontend | **v1.7.11** | https://ribocg-a11y.github.io/movikids/?force=1.7.11 |
+| Pacote SMS P0 | **FECHADO** | `PACOTE_SMS_P0_UNIFICADO_v1.5.38_v1.7.11.md` |
 | Planilha | MOVIKIDS_Planilha_Base | https://docs.google.com/spreadsheets/d/1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618/edit |
 | Portal responsavel | acompanhar.html | mesma base GitHub Pages |
 | Cronometro curto | track.html | URL GAS alinhada (v1.7.6) |
@@ -50,8 +51,9 @@ URL morta (nao usar): `AKfycbzc...` → 404
 - [x] Financeiro extras + historico — v1.7.1 + GAS v1.5.37
 - [x] Pacote B — Hub admin — v1.7.2
 - [x] Pacote Incidente — cache, ADM SMS, offline encerrar — v1.7.4–1.7.6 + GAS v79
-- [x] Pacote C — Nova locacao 3 passos — **v1.7.7** (`PACOTE_C_NOVA_3_PASSOS_v1.7.7.md`)
-- [ ] Pacote D — Drawer sessao — v1.7.8 (pendente)
+- [x] Pacote C — Nova locacao 3 passos — **v1.7.7+**
+- [x] Pacote SMS P0 unificado — **v1.5.38 + v1.7.11**
+- [ ] Pacote D — Drawer sessao — proximo
 
 ## Validacao rapida
 
