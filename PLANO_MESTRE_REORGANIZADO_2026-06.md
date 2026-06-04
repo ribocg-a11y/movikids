@@ -2,7 +2,8 @@
 
 **Data:** 04/06/2026  
 **Substitui como referência única de roadmap:** `PLANO_MESTRE_MOVIKIDS_CONFIABILIDADE.md` + trechos desatualizados de `PROXIMAS_FASES_OPERACIONAIS.md`  
-**Produção de referência:** GAS **v1.5.33** · Frontend **v1.6.78** · Portal `acompanhar.html`
+**Produção de referência:** GAS **v1.5.37** · Frontend **v1.7.2** · Portal `acompanhar.html`  
+**Atualizado:** 04/06/2026 — Pacotes A, financeiro (1.7.1) e B (1.7.2) em andamento/publicados.
 
 ---
 
@@ -224,29 +225,34 @@ Prioridade **P0** — baixo risco, alto impacto percebido.
 
 ## 7. Ações planejadas (pacotes por entrega)
 
-### Pacote A — Design system v1 (frontend only) — **EM PRODUÇÃO v1.7.0**
+### Pacote A — Design system v1 (frontend only) — **CONCLUÍDO v1.7.0**
 
 - `mk-design.css` + `mk-update.js` (auto-update com sessão preservada).
 - Home: `MKStat` + chip admin (sem 4 KPIs na Home).
 - Caixa: hero resultado + pills.
-- Versão: **v1.7.0** (publicar GitHub Pages).
 
-### Pacote B — Reorganização admin
+### Pacote A+ — Financeiro / extras / histórico — **CONCLUÍDO v1.7.1**
+
+- Gráfico extras por dia (Dashboard + Histórico).
+- Histórico mais rápido (cache + stats primeiro).
+- CTO mês de contrato por aniversário (GAS v1.5.37).
+
+### Pacote B — Reorganização admin — **CONCLUÍDO v1.7.2**
 
 - Visão geral = hub 3 portas (Dia / Mês / Sistema).
-- Diagnóstico → página Sistema.
-- Sidebar admin agrupada: Financeiro | Pessoas | Dados.
-- Versão: **v1.7.1**.
+- Diagnóstico → página **Sistema**.
+- Sidebar admin agrupada: Financeiro | Pessoas | Sistema.
+- Sem KPI/fechamento duplicado na visão geral.
 
-### Pacote C — Wizard Nova locação
+### Pacote C — Wizard Nova locação — **PRÓXIMO**
 
 - 3 passos, barra resumo fixa, busca relacionamento no passo 2.
-- Versão: **v1.7.2**.
+- Versão alvo: **v1.7.3**.
 
 ### Pacote D — Drawer operação sessão
 
 - Unificar modais encerrar/editar/estender.
-- Versão: **v1.7.3**.
+- Versão alvo: **v1.7.4**.
 
 ### Pacote E — Backend endurecimento
 
@@ -355,15 +361,10 @@ flowchart LR
 
 ---
 
-## 14. Próxima decisão sua (1 escolha)
+## 14. Próxima sprint (decisão)
 
-Para começar o trabalho visual sem paralisar operação:
-
-1. **Pacote A** — Design system + Home/Caixa (recomendado: impacto imediato no ruído).  
-2. **Pacote B** — Hub Admin (reorganiza navegação).  
-3. **Pacote C** — Nova locação 3 passos (impacto no operador do balcão).
-
-Qual pacote autoriza como **primeira sprint de UX**?
+**Recomendado agora:** **Pacote C** — Nova locação em 3 passos (impacto direto no balcão).  
+**Depois:** Pacote D (drawer encerrar/editar) · Pacote E (POST/auditoria GAS).
 
 ---
 

@@ -132,3 +132,88 @@
 .page-home .session-card .sc-valor:last-child {
   display: none;
 }
+
+/* Pacote B — Hub admin */
+.sb-group-lbl {
+  font-size: 9px;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.35);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 10px 14px 4px;
+}
+.mk-hub-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 12px 14px;
+  margin-bottom: 16px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--mk-radius);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--txt2);
+  cursor: pointer;
+  text-align: left;
+}
+.mk-hub-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ffb74d;
+  flex-shrink: 0;
+}
+.mk-hub-status-arrow {
+  margin-left: auto;
+  color: var(--txt3);
+  font-size: 18px;
+}
+.mk-hub-doors {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+@media (min-width: 520px) {
+  .mk-hub-doors { grid-template-columns: repeat(3, 1fr); }
+}
+.mk-hub-door {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 16px 14px;
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  border-radius: var(--mk-radius);
+  box-shadow: var(--mk-shadow-1);
+  cursor: pointer;
+  text-align: left;
+  transition: transform 0.12s ease;
+}
+.mk-hub-door:active { transform: scale(0.98); }
+.mk-hub-door--dia { border-color: #90caf9; background: linear-gradient(180deg, #f5faff, var(--card)); }
+.mk-hub-door--mes { border-color: #a5d6a7; background: linear-gradient(180deg, #f6fff6, var(--card)); }
+.mk-hub-door--sys { border-color: #e0e0e0; }
+.mk-hub-door-icon { font-size: 28px; line-height: 1; }
+.mk-hub-door-title {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--txt);
+}
+.mk-hub-door-sub {
+  font-size: 11px;
+  color: var(--txt3);
+  line-height: 1.35;
+}
+.mk-hub-groups { display: flex; flex-direction: column; gap: 14px; }
+.mk-hub-group-lbl {
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--txt3);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 6px;
+}

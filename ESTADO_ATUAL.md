@@ -9,7 +9,7 @@ Referencia unica para alinhamento local x producao.
 | Camada | Versao alvo | URL / ID |
 |--------|-------------|----------|
 | Apps Script | **v1.5.37** | Deploy `AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw` |
-| Frontend | **v1.7.1** | https://ribocg-a11y.github.io/movikids/?force=1.7.1 |
+| Frontend | **v1.7.2** | https://ribocg-a11y.github.io/movikids/?force=1.7.2 |
 | Planilha | MOVIKIDS_Planilha_Base | https://docs.google.com/spreadsheets/d/1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618/edit |
 | Apps Script editor | Planilha → Extensões → Apps Script | ver `DEPLOY_GAS_v1.5.32_AUTH.md` |
 
@@ -34,12 +34,13 @@ https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAW
 
 UI: Administracao → Operadores (app v1.6.81).
 
-## Pendencias pos-incidente 04/06
+## Roadmap UX (plano mestre)
 
-- [ ] Implantar GAS **v1.5.36** no Apps Script (Nova versao)
-- [ ] Publicar / cache bust frontend **v1.6.81** em todos os dispositivos
-- [ ] Corrigir planilha **linha 206** (tempo extra indevido) — ver incidente doc
-- [ ] Checklist 2 dispositivos (login, 409, liberar, reset PIN)
+- [x] Pacote A — design system v1.7.0
+- [x] Financeiro extras + histórico — v1.7.1 + GAS v1.5.37
+- [x] Pacote B — Hub admin — v1.7.2 (publicar `git push` + `?force=1.7.2`)
+- [ ] Pacote C — Nova locação 3 passos — v1.7.3
+- [ ] Pacote D — Drawer sessão
 
 ## Validacao
 

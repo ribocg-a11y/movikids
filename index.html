@@ -1495,12 +1495,16 @@ nav button .nav-badge{
     <div class="sb-admin-section" id="sb-admin-section">
       <div class="sb-divider">Administração</div>
       <button class="sb-btn" id="sbn-adm" onclick="irAdmin('admin')"><span class="sb-icon">📊</span>Visão geral</button>
-      <button class="sb-btn" id="sbn-ops" onclick="irAdmin('operadores')"><span class="sb-icon">👤</span>Operadores</button>
+      <div class="sb-group-lbl">Financeiro</div>
       <button class="sb-btn" id="sbn-caixa" onclick="irAdmin('caixa')"><span class="sb-icon">💰</span>Caixa do dia</button>
       <button class="sb-btn" id="sbn-dash" onclick="irAdmin('dashboard')"><span class="sb-icon">📈</span>Dashboard</button>
       <button class="sb-btn" id="sbn-hist" onclick="irAdmin('historico')"><span class="sb-icon">🗂️</span>Histórico</button>
       <button class="sb-btn" id="sbn-rel" onclick="irAdmin('relatorio')"><span class="sb-icon">📋</span>Relatório mensal</button>
+      <div class="sb-group-lbl">Pessoas</div>
+      <button class="sb-btn" id="sbn-ops" onclick="irAdmin('operadores')"><span class="sb-icon">👤</span>Operadores</button>
+      <div class="sb-group-lbl">Sistema</div>
       <button class="sb-btn" id="sbn-cfg" onclick="irAdmin('config')"><span class="sb-icon">⚙️</span>Configurações SMS</button>
+      <button class="sb-btn" id="sbn-sys" onclick="irAdmin('sistema')"><span class="sb-icon">🔧</span>Sistema</button>
     </div>
     <div class="sb-footer">
       <div class="sb-operator-bar" id="sb-operator-bar">
@@ -1818,31 +1822,86 @@ nav button .nav-badge{
       </div>
     </div>
 
-    <div class="sec-title">Visão geral</div>
-    <div class="kpi-grid" id="admin-kpi-grid">
-      <div class="kpi-card blue"><div class="kpi-val" id="k-fathoje">...</div><div class="kpi-lbl">Faturamento hoje</div></div>
-      <div class="kpi-card red"><div class="kpi-val" id="k-cushoje">...</div><div class="kpi-lbl">Custos hoje</div></div>
-      <div class="kpi-card green"><div class="kpi-val" id="k-fatmes">...</div><div class="kpi-lbl">Faturamento mês</div><div class="kpi-sub" id="k-nmes" style="color:var(--green)"></div></div>
-      <div class="kpi-card purple"><div class="kpi-val" id="k-resultado">...</div><div class="kpi-lbl">Resultado mês</div><div class="kpi-sub" id="k-margem" style="color:var(--purple)"></div></div>
+    <div class="sec-title">Centro de gestão</div>
+    <p style="font-size:13px;color:var(--txt2);margin:-4px 0 14px;line-height:1.45">
+      Escolha o que precisa: conferência do dia, análise do mês ou status técnico. Números detalhados ficam em Caixa e Dashboard.
+    </p>
+
+    <button type="button" class="mk-hub-status" id="hub-status-chip" onclick="irAdmin('sistema')">
+      <span class="mk-hub-status-dot" id="hub-dot"></span>
+      <span id="hub-status-txt">Verificando sistema…</span>
+      <span class="mk-hub-status-arrow">›</span>
+    </button>
+
+    <div class="mk-hub-doors">
+      <button type="button" class="mk-hub-door mk-hub-door--dia" onclick="irAdmin('caixa')">
+        <span class="mk-hub-door-icon">💰</span>
+        <span class="mk-hub-door-title">Operação do dia</span>
+        <span class="mk-hub-door-sub" id="hub-dia-sub">Caixa e conferência física</span>
+      </button>
+      <button type="button" class="mk-hub-door mk-hub-door--mes" onclick="irAdmin('dashboard')">
+        <span class="mk-hub-door-icon">📈</span>
+        <span class="mk-hub-door-title">Gestão do mês</span>
+        <span class="mk-hub-door-sub" id="hub-mes-sub">Dashboard, CTO e extras</span>
+      </button>
+      <button type="button" class="mk-hub-door mk-hub-door--sys" onclick="irAdmin('sistema')">
+        <span class="mk-hub-door-icon">🔧</span>
+        <span class="mk-hub-door-title">Sistema</span>
+        <span class="mk-hub-door-sub" id="hub-sys-sub">Versão, sync e diagnóstico</span>
+      </button>
     </div>
 
-    <!-- ── FECHAMENTO DO DIA (Fase 7) ── -->
-    <div class="sec-title">Fechamento do dia</div>
-    <div class="fecha-card">
-      <div class="fecha-row"><span class="lbl">📋 Locações realizadas</span><span class="val" id="fch-nloc">—</span></div>
-      <div class="fecha-row"><span class="lbl">💰 Faturamento</span><span class="val blue" id="fch-fat">—</span></div>
-      <div class="fecha-row"><span class="lbl">🧾 Custos registrados</span><span class="val" id="fch-cus">—</span></div>
-      <div class="fecha-row"><span class="lbl">🏢 CTO estimado (mín)</span><span class="val amber" id="fch-cto">—</span></div>
-      <div class="fecha-total">
-        <span>Resultado do dia</span>
-        <span class="val" id="fch-res">—</span>
+    <div class="sec-title" style="margin-top:8px">Atalhos</div>
+    <div class="mk-hub-groups">
+      <div class="mk-hub-group">
+        <div class="mk-hub-group-lbl">Financeiro</div>
+        <div class="admin-cards" style="margin:0">
+          <div class="admin-action-card" onclick="irAdmin('historico')">
+            <div class="aac-icon">🗂️</div>
+            <div class="aac-body"><div class="aac-title">Histórico</div><div class="aac-sub">Período e analytics</div></div>
+            <div class="aac-arrow">›</div>
+          </div>
+          <div class="admin-action-card" onclick="irAdmin('relatorio')">
+            <div class="aac-icon">📋</div>
+            <div class="aac-body"><div class="aac-title">Relatório PDF</div><div class="aac-sub">Mensal no Drive</div></div>
+            <div class="aac-arrow">›</div>
+          </div>
+        </div>
       </div>
-      <div class="fecha-alert" id="fch-alerta" style="display:none"></div>
-      <button class="fecha-copy-btn" onclick="copiarFechamentoDia()">Copiar fechamento do dia</button>
+      <div class="mk-hub-group">
+        <div class="mk-hub-group-lbl">Pessoas</div>
+        <div class="admin-cards" style="margin:0">
+          <div class="admin-action-card" onclick="irAdmin('operadores')">
+            <div class="aac-icon">👤</div>
+            <div class="aac-body"><div class="aac-title">Operadores</div><div class="aac-sub">PIN, sessão e cadastro</div></div>
+            <div class="aac-arrow">›</div>
+          </div>
+        </div>
+      </div>
+      <div class="mk-hub-group">
+        <div class="mk-hub-group-lbl">Mensagens</div>
+        <div class="admin-cards" style="margin:0">
+          <div class="admin-action-card" onclick="irAdmin('config')">
+            <div class="aac-icon">⚙️</div>
+            <div class="aac-body"><div class="aac-title">SMS / WhatsApp</div><div class="aac-sub">Templates e link avaliação</div></div>
+            <div class="aac-arrow">›</div>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
 
-    <!-- ── DIAGNÓSTICO DO SISTEMA (Fase 7) ── -->
-    <div class="sec-title">🔧 Diagnóstico do sistema</div>
+  <!-- ──────── PAGE: SISTEMA (admin) ──────── -->
+  <div id="page-sistema" class="page">
+    <div class="admin-badge">
+      <div class="admin-badge-left">🔧 <span>Sistema</span></div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span class="admin-timer">1:00</span>
+        <button class="btn-sair" onclick="adminLogout()">Sair</button>
+      </div>
+    </div>
+    <div class="dash-back" onclick="irAdmin('admin')">← Voltar ao hub</div>
+    <div class="sec-title">Diagnóstico</div>
     <div class="diag-card" id="diag-card">
       <div class="diag-row"><div class="diag-dot ok" id="diag-dot-gas"></div><span>GAS / Servidor</span><span class="diag-val" id="diag-gas">—</span></div>
       <div class="diag-row"><div class="diag-dot ok" id="diag-dot-sync"></div><span>Última sincronização</span><span class="diag-val" id="diag-sync">—</span></div>
@@ -1851,50 +1910,10 @@ nav button .nav-badge{
       <div class="diag-row"><div class="diag-dot ok" id="diag-dot-extra"></div><span>Sessões em tempo extra</span><span class="diag-val" id="diag-extra">—</span></div>
       <div class="diag-alert" id="diag-alert-over" style="display:none"></div>
     </div>
-
-    <div class="sec-title">Gestão</div>
-    <div class="admin-cards">
-      <div class="admin-action-card" onclick="irAdmin('operadores')">
-        <div class="aac-icon">👤</div>
-        <div class="aac-body">
-          <div class="aac-title">Operadores</div>
-          <div class="aac-sub">Cadastrar balcão e consultar PIN</div>
-        </div>
-        <div class="aac-arrow">›</div>
-      </div>
-      <div class="admin-action-card" onclick="irAdmin('dashboard')">
-        <div class="aac-icon">📊</div>
-        <div class="aac-body">
-          <div class="aac-title">Dashboard</div>
-          <div class="aac-sub">Gráficos por dia, tipo e plano</div>
-        </div>
-        <div class="aac-arrow">›</div>
-      </div>
-      <div class="admin-action-card" onclick="irAdmin('relatorio')">
-        <div class="aac-icon">📋</div>
-        <div class="aac-body">
-          <div class="aac-title">Relatório Mensal</div>
-          <div class="aac-sub">Enviar e salvar PDF no Drive</div>
-        </div>
-        <div class="aac-arrow">›</div>
-      </div>
-      <div class="admin-action-card" onclick="irAdmin('historico')">
-        <div class="aac-icon">📈</div>
-        <div class="aac-body">
-          <div class="aac-title">Histórico de Locações</div>
-          <div class="aac-sub">Buscar por data</div>
-        </div>
-        <div class="aac-arrow">›</div>
-      </div>
-      <div class="admin-action-card" onclick="irAdmin('caixa')">
-        <div class="aac-icon">💰</div>
-        <div class="aac-body">
-          <div class="aac-title">Caixa do Dia</div>
-          <div class="aac-sub">Fechamento, conferência e resultado</div>
-        </div>
-        <div class="aac-arrow">›</div>
-      </div>
-    </div>
+    <div class="sec-title">Operação</div>
+    <button type="button" class="btn btn-secondary" style="width:100%;margin-bottom:10px" onclick="irAdmin('operadores')">👤 Operadores e liberar sessão</button>
+    <button type="button" class="btn btn-secondary" style="width:100%;margin-bottom:10px" onclick="copiarFechamentoDia()">📋 Copiar resumo do dia (WhatsApp)</button>
+    <p style="font-size:12px;color:var(--txt3);line-height:1.4">Fechamento completo com maquininha e dinheiro: use <strong>Caixa do dia</strong>.</p>
   </div>
 
   <!-- ──────── PAGE: OPERADORES (ADM) ──────── -->
@@ -2552,7 +2571,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = '1.7.1';
+const APP_VERSION = '1.7.2';
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzcAfu7c3ESVE4sQT_CA5XL3W1bqDZESZX3nTSAWH0Wzqedm2JTVPJwSfYwEOrxkgnw/exec';
 const PORTAL_RESPONSAVEL_URL = 'https://ribocg-a11y.github.io/movikids/acompanhar.html';
 
@@ -4929,8 +4948,6 @@ function renderCustos() {
       </div>
     </div>`;
   }).join('');
-  // Fase 7: Fechamento do Dia
-  if (typeof atualizarFechamento === 'function') atualizarFechamento(d);
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -5197,11 +5214,12 @@ function irAdmin(page) {
   if (page === 'caixa') inicializarCaixa();
   if (page === 'operadores' && typeof refreshOperadoresAdmin_ === 'function') refreshOperadoresAdmin_();
   if (page === 'admin') {
+    if (!kpiData) carregarKPIs();
+    else atualizarHubAdmin_();
+  }
+  if (page === 'sistema') {
     setTimeout(atualizarDiagnostico, 100);
-    // Se já há dados em memória, preenche imediatamente sem esperar novo fetch
-    if (kpiData && kpiData.ok && typeof atualizarFechamento === 'function') {
-      atualizarFechamento(kpiData);
-    }
+    if (!kpiData) carregarKPIs();
   }
 }
 
@@ -5216,15 +5234,8 @@ async function carregarKPIs() {
     // Re-renderiza gráficos com dados frescos (fix: gráficos ficavam com dados velhos)
     const dashPage = document.getElementById('page-dashboard');
     if (dashPage && dashPage.classList.contains('active')) renderCharts(d);
-    setText2('k-fathoje', R2(d.fatHoje));
-    setText2('k-cushoje', R2(d.cusHoje));
-    setText2('k-fatmes',  R2(d.fatMes));
-    setText2('k-nmes',    d.nMes + ' locações');
-    setText2('k-resultado', R2(d.resultado));
-    setText2('k-margem',  'margem ' + d.margem + '%');
     showAdminHomeKpis(d);
-    // Fase 7: garantir fechamento mesmo se showAdminHomeKpis falhar
-    if (typeof atualizarFechamento === 'function') atualizarFechamento(d);
+    if (typeof atualizarHubAdmin_ === 'function') atualizarHubAdmin_();
   } catch(e) { console.error('carregarKPIs:', e); }
   finally { window._kpiInFlight = false; }
 }
@@ -5249,14 +5260,8 @@ async function carregarKPIsComMes(mes, ano) {
     if (!d.ok) return;
     kpiData = d;
     renderCharts(d);
-    setText2('k-fathoje', R2(d.fatHoje));
-    setText2('k-cushoje', R2(d.cusHoje));
-    setText2('k-fatmes',  R2(d.fatMes));
-    setText2('k-nmes',    d.nMes + ' locações');
-    setText2('k-resultado', R2(d.resultado));
-    setText2('k-margem',  'margem ' + d.margem + '%');
     if (typeof showAdminHomeKpis === 'function') showAdminHomeKpis(d);
-    if (typeof atualizarFechamento === 'function') atualizarFechamento(d);
+    if (typeof atualizarHubAdmin_ === 'function') atualizarHubAdmin_();
   } catch(e) { console.error('carregarKPIsComMes:', e); }
 }
 
@@ -5835,7 +5840,7 @@ async function carregarHistRelatorios() {
 
 // ── OVERRIDE showPage for admin pages ────────────────────────
 function showPage(name, opts = {}) {
-  const adminPages = ['admin','operadores','dashboard','relatorio','historico','caixa','config'];
+  const adminPages = ['admin','sistema','operadores','dashboard','relatorio','historico','caixa','config'];
   if (adminPages.includes(name) && !isAdmin) { abrirAdmin(); return; }
   const wasNovaActive = !!document.getElementById('page-nova')?.classList.contains('active');
   if (wasNovaActive && name !== 'nova') salvarNovaDraft_();
@@ -5868,7 +5873,8 @@ function showPage(name, opts = {}) {
   if (name==='dashboard') { if (kpiData && kpiData.ok) renderCharts(kpiData); carregarKPIs(); }
   if (name==='custos') loadCustosHoje();
   if (name==='historico') buscarHistorico(); // FIX BUG-007: if(!currentPeriod) sempre false pois currentPeriod='hoje' na declaração
-  if (name==='admin' && isAdmin) { resetAdminTimer(); if(!kpiData) carregarKPIs(); }
+  if (name==='admin' && isAdmin) { resetAdminTimer(); if(!kpiData) carregarKPIs(); else atualizarHubAdmin_(); }
+  if (name==='sistema' && isAdmin) { resetAdminTimer(); setTimeout(atualizarDiagnostico, 80); }
   if (name==='operadores' && isAdmin && typeof refreshOperadoresAdmin_ === 'function') refreshOperadoresAdmin_();
   if (name==='dashboard') {
     if (kpiData) renderCharts(kpiData);
@@ -5884,7 +5890,7 @@ function syncSidebar(page) {
   document.querySelectorAll('.sb-btn').forEach(b => b.classList.remove('active'));
   const map = {
     'home':'sbn-home','nova':'sbn-nova','relacionamento':'sbn-relacionamento','custos':'sbn-custos','painel':'sbn-painel','lancamento':'sbn-avulso',
-    'admin':'sbn-adm','operadores':'sbn-ops','dashboard':'sbn-dash','relatorio':'sbn-rel','historico':'sbn-hist','caixa':'sbn-caixa','config':'sbn-cfg'
+    'admin':'sbn-adm','sistema':'sbn-sys','operadores':'sbn-ops','dashboard':'sbn-dash','relatorio':'sbn-rel','historico':'sbn-hist','caixa':'sbn-caixa','config':'sbn-cfg'
   };
   if (map[page]) { const el=document.getElementById(map[page]); if(el) el.classList.add('active'); }
 }
@@ -6340,6 +6346,7 @@ function atualizarFechamento(d) {
 
   _lastSyncMs = Date.now();
   atualizarDiagnostico();
+  if (typeof atualizarHubAdmin_ === 'function') atualizarHubAdmin_();
 }
 
 function atualizarDiagnostico() {
@@ -6451,9 +6458,31 @@ function copiarFallback(texto) {
 
 // FIX 10: diagnóstico atualiza a cada 5s — só recalcula diff, sem GAS call
 // Frequência 5s: "Última sync: 3s atrás" → "8s atrás" → etc. em tempo real
+function atualizarHubAdmin_() {
+  const d = kpiData;
+  const dia = document.getElementById('hub-dia-sub');
+  const mes = document.getElementById('hub-mes-sub');
+  if (d && d.ok) {
+    if (dia) dia.textContent = 'Hoje ' + R2(d.fatHoje) + ' · ' + (d.nHoje || 0) + ' loc.';
+    if (mes) mes.textContent = 'Mês ' + R2(d.fatMes) + ' · margem ' + (d.margem || 0) + '%';
+  }
+  const gasOnline = typeof _syncFailCount !== 'undefined' && _syncFailCount === 0;
+  const chip = document.getElementById('hub-status-txt');
+  const dot = document.getElementById('hub-dot');
+  const ver = typeof APP_VERSION !== 'undefined' ? APP_VERSION : '—';
+  if (chip) chip.textContent = (gasOnline ? 'Online' : 'Atenção sync') + ' · app ' + ver;
+  if (dot) dot.style.background = gasOnline ? '#2E7D32' : '#E65100';
+}
+
 setInterval(() => {
   const adminPage = document.getElementById('page-admin');
-  if (!adminPage || !adminPage.classList.contains('active')) return;
+  const sysPage = document.getElementById('page-sistema');
+  const hubAtivo = (adminPage && adminPage.classList.contains('active')) ||
+    (sysPage && sysPage.classList.contains('active'));
+  if (!hubAtivo) return;
+  if (adminPage && adminPage.classList.contains('active') && typeof atualizarHubAdmin_ === 'function') {
+    atualizarHubAdmin_();
+  }
   // Só atualiza o campo de "última sync" em tempo real (sem recalcular tudo)
   const diffSec = _lastSyncAt > 0 ? Math.round((Date.now() - _lastSyncAt) / 1000) : null;
   const syncTxt = diffSec === null ? 'Nunca' :
@@ -6481,7 +6510,7 @@ function showAdminHomeKpis(d) {
     }
   }
 
-  if (typeof atualizarFechamento === 'function') atualizarFechamento(d);
+  if (typeof atualizarHubAdmin_ === 'function') atualizarHubAdmin_();
 }
 
 // ════════════════════════════════════════════════════════════
