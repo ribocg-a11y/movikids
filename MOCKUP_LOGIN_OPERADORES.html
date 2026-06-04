@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MOVI KIDS — Mockup Login Operadores</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --blue:#1565C0;--blue-dk:#0D47A1;--yellow:#FFD54F;
+  --bg:#eef4fb;--card:#fff;--muted:#65758d;--line:#dbe6f3;
+  --ok:#2e7d32;--warn:#e65100;
+}
+body{min-height:100vh;background:var(--bg);font-family:Nunito,sans-serif;color:#07122b}
+.wrap{max-width:1100px;margin:0 auto;padding:20px}
+.top-note{background:#fff8e1;border:1px solid #ffe082;border-radius:10px;padding:12px 14px;font-size:13px;margin-bottom:16px;line-height:1.5}
+.top-note b{color:#e65100}
+.layout{display:grid;grid-template-columns:1fr 340px;gap:18px;align-items:start}
+@media(max-width:900px){.layout{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px}
+.login-shell{max-width:420px;margin:0 auto}
+.logo{text-align:center;margin-bottom:18px}
+.logo-main{font-family:'Fredoka One',cursive;font-size:42px;color:var(--blue);line-height:1}
+.logo-main span{color:var(--yellow);text-shadow:1px 1px 0 #0d47a1}
+.logo-sub{font-size:13px;color:var(--muted);font-weight:800;margin-top:6px}
+.step-tag{display:inline-block;background:var(--blue);color:#fff;font-size:11px;font-weight:900;padding:5px 10px;border-radius:999px;margin-bottom:12px}
+h2{font-size:20px;font-weight:900;margin-bottom:6px}
+.hint{font-size:13px;color:var(--muted);line-height:1.45;margin-bottom:14px}
+label{display:block;font-size:12px;font-weight:900;color:#33445f;margin-bottom:8px}
+.op-list{display:grid;gap:8px;margin-bottom:14px;max-height:220px;overflow:auto}
+.op-item{display:flex;align-items:center;gap:10px;border:2px solid var(--line);border-radius:12px;padding:12px 14px;cursor:pointer;font-weight:800;background:#f8fbff}
+.op-item:hover{border-color:#90caf9}
+.op-item.sel{border-color:var(--blue);background:#e3f2fd}
+.op-item input{accent-color:var(--blue);width:18px;height:18px}
+.op-meta{font-size:11px;color:var(--muted);font-weight:700}
+.pin-row{display:flex;gap:10px;justify-content:center;margin:14px 0}
+.pin-box{width:56px;height:64px;border:2px solid var(--line);border-radius:12px;font-size:28px;font-weight:900;text-align:center;outline:none;background:#fff}
+.pin-box:focus{border-color:var(--blue)}
+.btn{width:100%;height:52px;border:0;border-radius:12px;background:var(--blue);color:#fff;font-size:16px;font-weight:900;cursor:pointer;margin-top:8px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.sec{background:#fff;color:var(--blue);border:2px solid var(--blue)}
+.btn.warn{background:#fff3e0;color:#e65100;border:2px solid #ffb74d}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.admin-link{text-align:center;margin-top:14px;font-size:13px}
+.admin-link button{background:none;border:0;color:var(--blue-dk);font-weight:900;cursor:pointer;text-decoration:underline}
+.err{background:#ffebee;color:#b71c1c;border-radius:10px;padding:10px 12px;font-size:13px;font-weight:800;margin-top:10px;display:none}
+.side h3{font-size:15px;font-weight:900;margin-bottom:10px}
+.flow{font-size:13px;line-height:1.55;color:#33445f}
+.flow li{margin-bottom:8px}
+.badge{display:inline-block;padding:4px 8px;border-radius:999px;font-size:11px;font-weight:900}
+.badge.ok{background:#e8f5e9;color:var(--ok)}
+.badge.pend{background:#fff3e0;color:var(--warn)}
+.preview{display:none;margin-top:14px;border:2px dashed var(--line);border-radius:12px;padding:12px;background:#f8fbff}
+.preview.on{display:block}
+.mock-app{display:grid;grid-template-columns:220px 1fr;min-height:280px;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.mock-side{background:linear-gradient(180deg,#0d47a1,#1565C0);color:#fff;padding:14px}
+.mock-side .sb-logo{font-family:'Fredoka One',cursive;font-size:20px}
+.mock-side .sb-logo span{color:var(--yellow)}
+.mock-op{margin-top:14px;background:rgba(255,255,255,.12);border-radius:10px;padding:10px;font-size:12px;font-weight:800}
+.mock-op b{display:block;font-size:11px;opacity:.75;margin-bottom:4px}
+.mock-nav{margin-top:12px;font-size:12px;font-weight:800;line-height:2}
+.mock-nav .new{color:#FFD54F}
+.mock-main{padding:14px;background:#fff}
+.mock-main h4{font-size:14px;font-weight:900;margin-bottom:8px}
+.pill{display:inline-block;background:#e3f2fd;color:var(--blue);font-size:11px;font-weight:900;padding:4px 8px;border-radius:999px;margin:2px}
+.demo-bar{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.demo-bar button{border:1px solid var(--line);background:#fff;border-radius:8px;padding:8px 10px;font-size:12px;font-weight:800;cursor:pointer}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top-note">
+    <b>Mockup de validação</b> — não é o sistema em produção. Use os botões “Simular” à direita para ver cada fluxo:
+    operador sem senha, operador com senha, administrador (PIN 1416) e tela após login.
+  </div>
+
+  <div class="layout">
+    <div class="card login-shell">
+      <!-- ETAPA 1: escolher operador -->
+      <section id="step-select">
+        <div class="logo">
+          <div class="logo-main">🚗 Movi <span>Kids</span></div>
+          <div class="logo-sub">Golden Shopping Calhau · Acesso operacional</div>
+        </div>
+        <span class="step-tag">Passo 1 de 2</span>
+        <h2>Quem está no balcão?</h2>
+        <p class="hint">Selecione seu nome na lista. Todas as ações do turno ficarão registradas com o operador logado.</p>
+        <label>Operadores cadastrados</label>
+        <div class="op-list" id="op-list"></div>
+        <button class="btn" id="btn-proceed" disabled>Prosseguir</button>
+        <div class="admin-link">
+          <button type="button" id="btn-admin-entry">Entrar como administrador</button>
+        </div>
+      </section>
+
+      <!-- ETAPA 2A: criar PIN (primeira vez) -->
+      <section id="step-create-pin" class="hidden">
+        <div class="logo">
+          <div class="logo-main">🚗 Movi <span>Kids</span></div>
+        </div>
+        <span class="step-tag">Primeiro acesso</span>
+        <h2>Crie seu PIN</h2>
+        <p class="hint">Olá, <b id="create-name"></b>. Este PIN é só seu (4 números). Na próxima vez você só digita o PIN para entrar.</p>
+        <label>Digite o PIN</label>
+        <div class="pin-row" id="create-pin-1"></div>
+        <label>Confirme o PIN</label>
+        <div class="pin-row" id="create-pin-2"></div>
+        <div class="err" id="create-err"></div>
+        <div class="row2">
+          <button class="btn sec" type="button" id="btn-back-create">Voltar</button>
+          <button class="btn" type="button" id="btn-save-pin">Salvar e entrar</button>
+        </div>
+      </section>
+
+      <!-- ETAPA 2B: login PIN -->
+      <section id="step-login-pin" class="hidden">
+        <div class="logo">
+          <div class="logo-main">🚗 Movi <span>Kids</span></div>
+        </div>
+        <span class="step-tag">Login</span>
+        <h2>Digite seu PIN</h2>
+        <p class="hint">Operador: <b id="login-name"></b></p>
+        <div class="pin-row" id="login-pin"></div>
+        <div class="err" id="login-err"></div>
+        <div class="row2">
+          <button class="btn sec" type="button" id="btn-back-login">Trocar operador</button>
+          <button class="btn" type="button" id="btn-do-login">Entrar</button>
+        </div>
+      </section>
+
+      <!-- ADMIN login -->
+      <section id="step-admin" class="hidden">
+        <div class="logo">
+          <div class="logo-main">🚗 Movi <span>Kids</span></div>
+          <div class="logo-sub">Área administrativa</div>
+        </div>
+        <span class="step-tag">Administrador</span>
+        <h2>PIN do administrador</h2>
+        <p class="hint">Somente gestão: cadastro de operadores, configurações e relatórios sensíveis.</p>
+        <div class="pin-row" id="admin-pin"></div>
+        <div class="err" id="admin-err"></div>
+        <div class="row2">
+          <button class="btn sec" type="button" id="btn-back-admin">Voltar</button>
+          <button class="btn" type="button" id="btn-admin-login">Entrar</button>
+        </div>
+      </section>
+
+      <div class="preview" id="preview-logged">
+        <div class="mock-app">
+          <div class="mock-side">
+            <div class="sb-logo">🚗 Movi <span>Kids</span></div>
+            <div class="mock-op">
+              <b>Operando agora</b>
+              <span id="preview-operator">—</span>
+            </div>
+            <div class="mock-nav" id="preview-nav"></div>
+          </div>
+          <div class="mock-main">
+            <h4 id="preview-title">Painel de operação</h4>
+            <p style="font-size:13px;color:#65758d;line-height:1.5" id="preview-desc"></p>
+            <div style="margin-top:10px" id="preview-pills"></div>
+          </div>
+        </div>
+        <button class="btn sec" type="button" id="btn-logout" style="margin-top:12px">Sair (mockup)</button>
+      </div>
+    </div>
+
+    <div class="side">
+      <div class="card" style="margin-bottom:14px">
+        <h3>Regras do fluxo (proposta)</h3>
+        <ul class="flow">
+          <li>Lista pré-cadastrada de operadores (somente ADM cadastra novos).</li>
+          <li>PIN numérico de <b>4 dígitos</b> por operador.</li>
+          <li>Sem PIN definido → tela de <b>criar PIN</b> (uma vez).</li>
+          <li>Com PIN → tela de <b>login</b> direto.</li>
+          <li>ADM fixo: PIN <b>1416</b> (mockup já valida).</li>
+          <li>Todas as ações enviam <code>operador</code> para auditoria e fechamento de caixa por turno.</li>
+        </ul>
+      </div>
+      <div class="card" style="margin-bottom:14px">
+        <h3>Operadores (demo)</h3>
+        <div id="status-list" style="font-size:13px;line-height:1.8"></div>
+      </div>
+      <div class="card">
+        <h3>Simular cenário</h3>
+        <div class="demo-bar">
+          <button type="button" data-demo="select">Escolher operador</button>
+          <button type="button" data-demo="create">Sem PIN (criar)</button>
+          <button type="button" data-demo="login">Com PIN</button>
+          <button type="button" data-demo="admin">ADM 1416</button>
+          <button type="button" data-demo="logged-op">Logado operador</button>
+          <button type="button" data-demo="logged-adm">Logado ADM</button>
+        </div>
+      </div>
+      <div class="card" style="margin-top:14px">
+        <h3>Menu produção (operador)</h3>
+        <p class="flow" style="margin-top:8px">
+          Home · Nova locação · Relacionamento · Painel de operação · Registrar custo ·
+          <b style="color:#1565C0">Lançamento avulso</b> (exceção com justificativa)
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const OPERATORS = [
+  { id: 'henrique', name: 'Henrique', role: 'operador', hasPin: false },
+  { id: 'maria', name: 'Maria', role: 'operador', hasPin: true, pin: '2580' },
+  { id: 'joao', name: 'João', role: 'operador', hasPin: true, pin: '1234' },
+  { id: 'ana', name: 'Ana', role: 'operador', hasPin: true, pin: '0000' }
+];
+const ADMIN_PIN = '1416';
+
+const PROD_NAV = [
+  'Home', 'Nova locação', 'Relacionamento', 'Painel de operação', 'Registrar custo', 'Lançamento avulso'
+];
+const ADM_EXTRA = ['Cadastro de operadores', 'Configurações', 'Relatórios / KPIs', 'Auditoria'];
+
+let selectedId = null;
+let session = null;
+
+function $(id){ return document.getElementById(id); }
+function show(id){
+  ['step-select','step-create-pin','step-login-pin','step-admin'].forEach(s => $(s).classList.add('hidden'));
+  $(id).classList.remove('hidden');
+  $('preview-logged').classList.remove('on');
+}
+function showLogged(user, isAdmin){
+  ['step-select','step-create-pin','step-login-pin','step-admin'].forEach(s => s.classList.add('hidden'));
+  $('preview-logged').classList.add('on');
+  $('preview-operator').textContent = user.name + (isAdmin ? ' (Administrador)' : '');
+  const nav = isAdmin ? [...PROD_NAV, ...ADM_EXTRA] : PROD_NAV;
+  $('preview-nav').innerHTML = nav.map(n => {
+    const cls = n.includes('Lançamento') ? ' class="new"' : (n.includes('Cadastro') ? ' style="color:#FFD54F"' : '');
+    return '<div'+cls+'>' + n + '</div>';
+  }).join('');
+  $('preview-title').textContent = isAdmin ? 'Área administrativa' : 'Painel de operação';
+  $('preview-desc').textContent = isAdmin
+    ? 'Aqui o ADM cadastra novos operadores, redefine PINs e acessa relatórios. Operadores comuns não veem estes itens.'
+    : 'Cards de locação, timers e alertas. Toda ação grava operador + horário para fechamento de caixa do turno.';
+  $('preview-pills').innerHTML = isAdmin
+    ? '<span class="pill">Cadastrar operador</span><span class="pill">Ver auditoria</span>'
+    : '<span class="pill">Rastreio por turno</span><span class="pill">Fechamento de caixa</span><span class="pill">Lançamento = exceção</span>';
+}
+
+function renderOpList(){
+  const box = $('op-list');
+  box.innerHTML = OPERATORS.map(op => `
+    <label class="op-item ${selectedId===op.id?'sel':''}" data-id="${op.id}">
+      <input type="radio" name="op" ${selectedId===op.id?'checked':''}>
+      <div>
+        <div>${op.name}</div>
+        <div class="op-meta">${op.hasPin ? 'PIN já definido' : 'Primeiro acesso — criar PIN'}</div>
+      </div>
+    </label>
+  `).join('');
+  box.querySelectorAll('.op-item').forEach(el => {
+    el.addEventListener('click', () => {
+      selectedId = el.dataset.id;
+      $('btn-proceed').disabled = false;
+      renderOpList();
+      renderStatus();
+    });
+  });
+}
+
+function renderStatus(){
+  $('status-list').innerHTML = OPERATORS.map(op =>
+    `<div>${op.name} ${op.hasPin ? '<span class="badge ok">PIN ok</span>' : '<span class="badge pend">criar PIN</span>'}</div>`
+  ).join('') + '<div style="margin-top:8px">ADM: PIN <b>1416</b> (pré-cadastrado)</div>';
+}
+
+function makePinRow(containerId, len){
+  const box = $(containerId);
+  box.innerHTML = '';
+  for (let i=0;i<len;i++){
+    const inp = document.createElement('input');
+    inp.className = 'pin-box';
+    inp.maxLength = 1;
+    inp.inputMode = 'numeric';
+    inp.pattern = '[0-9]*';
+    inp.addEventListener('input', () => {
+      inp.value = inp.value.replace(/\D/g,'').slice(0,1);
+      if (inp.value && inp.nextElementSibling) inp.nextElementSibling.focus();
+    });
+    inp.addEventListener('keydown', e => {
+      if (e.key === 'Backspace' && !inp.value && inp.previousElementSibling) inp.previousElementSibling.focus();
+    });
+    box.appendChild(inp);
+  }
+}
+function readPin(containerId){
+  return Array.from($(containerId).querySelectorAll('.pin-box')).map(i => i.value).join('');
+}
+function clearPin(containerId){
+  $(containerId).querySelectorAll('.pin-box').forEach(i => i.value = '');
+}
+
+$('btn-proceed').addEventListener('click', () => {
+  const op = OPERATORS.find(o => o.id === selectedId);
+  if (!op) return;
+  if (!op.hasPin) {
+    $('create-name').textContent = op.name;
+    clearPin('create-pin-1'); clearPin('create-pin-2');
+    $('create-err').style.display = 'none';
+    show('step-create-pin');
+    $('create-pin-1').querySelector('.pin-box')?.focus();
+  } else {
+    $('login-name').textContent = op.name;
+    clearPin('login-pin');
+    $('login-err').style.display = 'none';
+    show('step-login-pin');
+    $('login-pin').querySelector('.pin-box')?.focus();
+  }
+});
+
+$('btn-save-pin').addEventListener('click', () => {
+  const p1 = readPin('create-pin-1'), p2 = readPin('create-pin-2');
+  const err = $('create-err');
+  if (p1.length !== 4 || p2.length !== 4) {
+    err.textContent = 'O PIN deve ter 4 números.';
+    err.style.display = 'block'; return;
+  }
+  if (p1 !== p2) {
+    err.textContent = 'Os PINs não conferem. Digite novamente.';
+    err.style.display = 'block'; return;
+  }
+  const op = OPERATORS.find(o => o.id === selectedId);
+  op.hasPin = true; op.pin = p1;
+  session = { type: 'operador', user: op };
+  renderStatus(); renderOpList();
+  showLogged(op, false);
+});
+
+$('btn-do-login').addEventListener('click', () => {
+  const op = OPERATORS.find(o => o.id === selectedId);
+  const pin = readPin('login-pin');
+  const err = $('login-err');
+  if (pin.length !== 4) { err.textContent = 'Digite os 4 números.'; err.style.display = 'block'; return; }
+  if (pin !== op.pin) { err.textContent = 'PIN incorreto.'; err.style.display = 'block'; return; }
+  session = { type: 'operador', user: op };
+  showLogged(op, false);
+});
+
+$('btn-admin-entry').addEventListener('click', () => {
+  clearPin('admin-pin');
+  $('admin-err').style.display = 'none';
+  show('step-admin');
+  $('admin-pin').querySelector('.pin-box')?.focus();
+});
+
+$('btn-admin-login').addEventListener('click', () => {
+  const pin = readPin('admin-pin');
+  const err = $('admin-err');
+  if (pin !== ADMIN_PIN) { err.textContent = 'PIN administrativo incorreto.'; err.style.display = 'block'; return; }
+  session = { type: 'admin', user: { name: 'Administrador' } };
+  showLogged(session.user, true);
+});
+
+['btn-back-create','btn-back-login','btn-back-admin'].forEach(id => {
+  $(id).addEventListener('click', () => { show('step-select'); });
+});
+$('btn-logout').addEventListener('click', () => {
+  session = null; selectedId = null; $('btn-proceed').disabled = true;
+  show('step-select'); renderOpList();
+});
+
+document.querySelectorAll('[data-demo]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const d = btn.dataset.demo;
+    if (d === 'select') { show('step-select'); return; }
+    if (d === 'create') { selectedId = 'henrique'; show('step-create-pin'); $('create-name').textContent = 'Henrique'; return; }
+    if (d === 'login') { selectedId = 'maria'; show('step-login-pin'); $('login-name').textContent = 'Maria'; return; }
+    if (d === 'admin') { show('step-admin'); return; }
+    if (d === 'logged-op') { showLogged({ name: 'Maria' }, false); return; }
+    if (d === 'logged-adm') { showLogged({ name: 'Administrador' }, true); return; }
+  });
+});
+
+makePinRow('create-pin-1', 4);
+makePinRow('create-pin-2', 4);
+makePinRow('login-pin', 4);
+makePinRow('admin-pin', 4);
+renderOpList();
+renderStatus();
+</script>
+</body>
+</html>
