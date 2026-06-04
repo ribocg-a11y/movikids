@@ -22,7 +22,7 @@
 <script>
 // ── CACHE BUSTER — alinhado a mk-version.js / APP_VERSION ──
 (function(){
-  const CURRENT = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.9';
+  const CURRENT = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.10';
   const KEY = 'mk_loaded_version';
   try {
     const stored = localStorage.getItem(KEY);
@@ -408,6 +408,8 @@ nav button .nav-badge{
 }
 .form-input:focus{border-color:var(--blue)}
 .form-input.pink:focus{border-color:var(--pink)}
+.form-hint{font-size:11px;color:var(--txt3);margin-top:5px;line-height:1.35}
+.nova-fechar-hint{font-size:12px;color:var(--txt2);margin:0 0 10px;line-height:1.4}
 
 /* Review card */
 .review-card{background:linear-gradient(135deg,var(--blue),var(--blue-dk));
@@ -1505,7 +1507,7 @@ nav button .nav-badge{
   <!-- ══ SIDEBAR (desktop only) ══ -->
   <aside id="sidebar">
     <div class="sb-logo">🚗 Movi <span>Kids</span>
-      <div class="sb-status"><span id="sb-dot" class="dot-online"></span><span id="sb-txt">Online</span><span id="sb-version" style="font-size:10px;opacity:.85;margin-left:5px;color:rgba(255,255,255,.7);font-family:monospace">v1.7.9</span></div>
+      <div class="sb-status"><span id="sb-dot" class="dot-online"></span><span id="sb-txt">Online</span><span id="sb-version" style="font-size:10px;opacity:.85;margin-left:5px;color:rgba(255,255,255,.7);font-family:monospace">v1.7.10</span></div>
     </div>
     <div class="sb-nav" id="sb-nav">
       <button class="sb-btn active" id="sbn-home" onclick="showPage('home')"><span class="sb-icon">🏠</span>Home</button>
@@ -1552,7 +1554,7 @@ nav button .nav-badge{
       <div class="hd-status">
         <div id="status-dot" class="dot-online"></div>
         <span id="status-txt">Online</span>
-        <span id="app-version" style="font-size:10px;opacity:.85;margin-left:4px;font-family:monospace">v1.7.9</span>
+        <span id="app-version" style="font-size:10px;opacity:.85;margin-left:4px;font-family:monospace">v1.7.10</span>
       </div>
     </div>
   </header>
@@ -1707,7 +1709,8 @@ nav button .nav-badge{
       </div>
       <div class="form-group">
         <label class="form-label">Telefone do Responsável *</label>
-        <input id="inp-tel" class="form-input" type="tel" placeholder="(98) 9 9999-9999" autocomplete="off">
+        <input id="inp-tel" class="form-input" type="tel" placeholder="(98) 9 9999-9999" autocomplete="off" inputmode="tel">
+        <div class="form-hint">SMS: DDD + 9 dígitos (ex: 98981972432). O gateway envia para +55…</div>
       </div>
       <div class="form-group">
         <label class="form-label" style="color:var(--txt2)">Observação <span style="font-size:11px;font-style:italic;color:var(--txt3)">(opcional)</span></label>
@@ -1747,11 +1750,12 @@ nav button .nav-badge{
           <div class="pag-sub">Troco necessário</div>
         </div>
       </div>
-      <button class="btn btn-primary" onclick="confirmarLocacao()" id="btn-confirmar" style="display:none">
-        ✓ Confirmar cadastro
+      <p class="nova-fechar-hint" id="nova-fechar-hint" style="display:none">Recomendado: enviar SMS do portal e iniciar a contagem. “Só salvar” deixa na Home sem SMS — use ▶ Iniciar depois.</p>
+      <button class="btn btn-primary" onclick="confirmarLocacaoEIniciar_()" id="btn-confirmar-iniciar" style="display:none">
+        ✓ Enviar SMS e iniciar locação
       </button>
-      <button class="btn btn-secondary" onclick="confirmarLocacaoEIniciar_()" id="btn-confirmar-iniciar" style="display:none;margin-top:8px">
-        Confirmar e enviar SMS / iniciar
+      <button class="btn btn-secondary" onclick="confirmarLocacao()" id="btn-confirmar" style="display:none;margin-top:8px">
+        Só salvar cadastro (sem SMS agora)
       </button>
       <button class="btn btn-secondary" onclick="backStep()" style="margin-top:8px">
         ← Voltar
@@ -2615,7 +2619,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.9';
+const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.10';
 const WEBAPP_URL = (typeof window !== 'undefined' && window.MK_GAS_EXEC_URL) ? window.MK_GAS_EXEC_URL
   : 'https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec';
 const WEBAPP_URL_DEAD_PREFIX = 'AKfycbzc';
@@ -3159,8 +3163,9 @@ function smsStatusHtml_(s) {
   const label = smsStatusLabel_(state);
   const title = sms.error ? ' title="' + escHtml(sms.error) + '"' : '';
   const failed = String(state || '').toLowerCase() === 'failed';
+  const errTxt = sms.error ? (' Detalhe: ' + escHtml(String(sms.error).slice(0, 120))) : '';
   const fallback = failed
-    ? '<div class="sms-fail-hint">Confirme o telefone ou mostre o QR do portal no balcao.</div>' +
+    ? '<div class="sms-fail-hint">Confirme o telefone (DDD+9) ou mostre o QR do portal no balcao.' + errTxt + '</div>' +
       '<button class="btn btn-wa" onclick="abrirWhatsAppFallback(' + Number(s.rowIndex || 0) + ')" title="Abrir WhatsApp como alternativa">WhatsApp fallback</button>'
     : '';
   return '<div class="sms-status sms-' + label.cls + '"' + title + '>' + label.txt + '</div>' + fallback;
@@ -3636,8 +3641,16 @@ function toggleBotoesConfirmarNova_() {
   const ok = !!novaState.pagamento;
   const b1 = document.getElementById('btn-confirmar');
   const b2 = document.getElementById('btn-confirmar-iniciar');
+  const hint = document.getElementById('nova-fechar-hint');
   if (b1) b1.style.display = ok ? 'block' : 'none';
   if (b2) b2.style.display = ok ? 'block' : 'none';
+  if (hint) hint.style.display = ok ? 'block' : 'none';
+}
+
+function rowIndexFromSalvar_(d) {
+  const ri = Number(d && d.rowIndex);
+  if (ri >= 11) return ri;
+  return 11 + Number(d && d.id || 0);
 }
 
 function aplicarPrefillResponsavel_() {
@@ -4033,9 +4046,9 @@ async function confirmarLocacao() {
     if (!d.ok) { toast('Erro: ' + d.erro, 'error'); return; }
 
     // Adiciona IMEDIATAMENTE com started=false (aguardando botão Iniciar)
-    const approxRow = 10 + Number(d.id);
+    const rowIdx = rowIndexFromSalvar_(d);
     sessions.push({
-      rowIndex:        approxRow,
+      rowIndex:        rowIdx,
       id:              d.id,
       tipo:            novaState.tipo,
       plano:           novaState.plano,
@@ -4073,9 +4086,9 @@ async function confirmarLocacao() {
   } catch(e) {
     toast('Erro de conexão. Tente novamente.', 'error');
   } finally {
-    btn.textContent = '✓ Confirmar cadastro'; btn.disabled = false;
+    btn.textContent = 'Só salvar cadastro (sem SMS agora)'; btn.disabled = false;
     const b2 = document.getElementById('btn-confirmar-iniciar');
-    if (b2) { b2.disabled = false; b2.textContent = 'Confirmar e enviar SMS / iniciar'; }
+    if (b2) { b2.disabled = false; b2.textContent = '✓ Enviar SMS e iniciar locação'; }
   }
 }
 
@@ -4113,9 +4126,9 @@ async function confirmarLocacaoEIniciar_() {
     });
     if (!d.ok) { toast('Erro: ' + d.erro, 'error'); return; }
 
-    const approxRow = 10 + Number(d.id);
+    const rowIdx = rowIndexFromSalvar_(d);
     sessions.push({
-      rowIndex: approxRow,
+      rowIndex: rowIdx,
       id: d.id,
       tipo: novaState.tipo,
       plano: novaState.plano,
@@ -4146,14 +4159,14 @@ async function confirmarLocacaoEIniciar_() {
     renderCards();
     atualizarVeiculoGrid();
     setTimeout(() => {
-      const s = sessions.find(x => Number(x.id) === Number(d.id)) || sessions.find(x => x.rowIndex === approxRow);
+      const s = sessions.find(x => Number(x.rowIndex) === Number(rowIdx)) || sessions.find(x => Number(x.id) === Number(d.id));
       if (s) abrirModalBv(s.rowIndex);
       else toast('Cadastro salvo. Use ▶ Iniciar na Home.', 'success');
     }, 400);
   } catch (e) {
     toast('Erro de conexão.', 'error');
   } finally {
-    if (btn) { btn.textContent = 'Confirmar e enviar SMS / iniciar'; btn.disabled = false; }
+    if (btn) { btn.textContent = '✓ Enviar SMS e iniciar locação'; btn.disabled = false; }
     if (btnMain) btnMain.disabled = false;
   }
 }

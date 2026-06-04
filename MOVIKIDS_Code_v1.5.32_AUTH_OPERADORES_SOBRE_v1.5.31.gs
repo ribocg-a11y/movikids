@@ -429,6 +429,7 @@ function salvarLocacao_(p) {
 
   return resp_({
     id,
+    rowIndex:        newRow,
     tipo,
     plano,
     veiculo,
