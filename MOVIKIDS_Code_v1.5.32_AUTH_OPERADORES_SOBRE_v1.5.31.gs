@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.39
+// MOVI KIDS — Google Apps Script v1.5.40
+// v1.5.40: deviceId explicito no Cloud (nFxvrvSt...) + deviceActiveWithin=12 na URL
 // v1.5.39: SMS gateway payload minimo (como v1.5.28 que entregava) — sem ttl/priority/withDeliveryReport global
 // v1.5.38: Pacote SMS P0 unificado — textos curtos GSM, withDeliveryReport off, throttle, simNumber, rowIndex salvar
 // v1.5.37: extPorDia (KPIs + histórico), cache listarHistorico, mesContrato por aniversário (contrato)
@@ -53,6 +54,8 @@ const OP_DATA_ROW = 2;
 const DATA_ROW = 11;
 const PORTAL_RESPONSAVEL_URL = 'https://ribocg-a11y.github.io/movikids/acompanhar.html';
 const SMS_GATEWAY_URL = 'https://api.sms-gate.app/3rdparty/v1/messages';
+/** Device Cloud padrao (samsung a04e) — sobrescreva com Script Property SMS_GATEWAY_DEVICE_ID */
+const SMS_GATEWAY_DEVICE_ID_DEFAULT = 'nFxvrvSt_v5il_v_T1-ZW';
 const SMS_OPT_OUT_CAMPANHA_ = ' Para sair, responda SAIR.';
 
 const EMAIL_RELATORIO = 'financeiro@goldenshoppingcalhau.com.br';
