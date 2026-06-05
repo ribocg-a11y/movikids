@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.48
+// MOVI KIDS — Google Apps Script v1.5.49
+// v1.5.49: fix kpiAvancadosMes_ — leitura de data AUDITORIA via cellToStr_ (porOperador/cancelamentos por motivo)
 // v1.5.48: Pacote F — relatorio/PDF mensal inclui gestao avancada (operador, cancelamentos, frota, custos, recorrencia)
 // v1.5.47: Pacote F — custos por categoria + recorrencia de clientes em buscarKPIsAdmin
 // v1.5.46: Pacote F — KPIs avancados em buscarKPIsAdmin (operador, cancelamentos, ocupacao frota)
@@ -317,9 +318,9 @@ function ping_() {
   const agora = new Date();
   return resp_({
     status:  'online',
-    versao:  'v1.5.48',
+    versao:  'v1.5.49',
     timestamp: fmtData_(agora) + ' ' + fmtHoraLocal_(agora),
-    sistema: 'MOVI KIDS v1.5.48',
+    sistema: 'MOVI KIDS v1.5.49',
     postWriteActions: WRITE_ACTIONS_CRITICAS_
   });
 }
@@ -971,11 +972,12 @@ function kpiAvancadosMes_(mmyy, nMes, nCancelMes, diasOperando, nPorVeiculo, min
     if (shAud && shAud.getLastRow() >= 2) {
       const dadosAud = shAud.getRange(2, 1, shAud.getLastRow() - 1, 8).getValues();
       dadosAud.forEach(r => {
-        const ts = String(r[0] || '');
+        const ts = cellToStr_(r[0]);
         const acao = String(r[1] || '').trim();
         const motivo = String(r[4] || '').trim();
         const operador = String(r[7] || '').trim() || 'operador';
-        const pts = ts.split(' ')[0].split('/');
+        const dataAudit = ts.indexOf(' ') >= 0 ? ts.split(' ')[0] : ts;
+        const pts = dataAudit.split('/');
         if (pts.length < 3) return;
         const mmyyR = pts[1].padStart(2, '0') + '/' + pts[2];
         if (mmyyR !== mmyy) return;
@@ -1877,7 +1879,7 @@ ${_htmlSecaoPacoteF_(mes, ano)}
 <div style="text-align:center"><div style="color:rgba(255,255,255,.7);font-size:11px">Faturamento</div><div style="color:#fff;font-weight:bold">${f(fatTotal)}</div></div>
 <div style="text-align:center"><div style="color:rgba(255,255,255,.7);font-size:11px">Custos+CTO</div><div style="color:#EF9A9A;font-weight:bold">−${f(totalCustos+ctoPagar)}</div></div>
 <div style="text-align:center"><div style="color:rgba(255,255,255,.7);font-size:11px">Resultado</div><div style="color:${lucro>=0?'#A5D6A7':'#EF9A9A'};font-weight:bold">${f(lucro)}</div></div></div></div>
-<div style="padding:16px 28px;background:#f9f9f9;text-align:center;font-size:11px;color:#aaa;border-top:1px solid #eee">Gerado em ${fmtData_(new Date())} às ${fmtHoraLocal_(new Date())} · Movi Kids GAS v1.5.48 · Pacote F</div>
+<div style="padding:16px 28px;background:#f9f9f9;text-align:center;font-size:11px;color:#aaa;border-top:1px solid #eee">Gerado em ${fmtData_(new Date())} às ${fmtHoraLocal_(new Date())} · Movi Kids GAS v1.5.49 · Pacote F</div>
 </div></body></html>`;
 }
 
