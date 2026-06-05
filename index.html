@@ -22,7 +22,7 @@
 <script>
 // ── CACHE BUSTER — alinhado a mk-version.js / APP_VERSION ──
 (function(){
-  const CURRENT = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.17';
+  const CURRENT = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.18';
   const KEY = 'mk_loaded_version';
   try {
     const stored = localStorage.getItem(KEY);
@@ -1560,7 +1560,7 @@ nav button .nav-badge{
   <!-- ══ SIDEBAR (desktop fixo / celular = menu suspenso) ══ -->
   <aside id="sidebar">
     <div class="sb-logo">🚗 Movi <span>Kids</span>
-      <div class="sb-status"><span id="sb-dot" class="dot-online"></span><span id="sb-txt">Online</span><span id="sb-version" style="font-size:10px;opacity:.85;margin-left:5px;color:rgba(255,255,255,.7);font-family:monospace">v1.7.17</span></div>
+      <div class="sb-status"><span id="sb-dot" class="dot-online"></span><span id="sb-txt">Online</span><span id="sb-version" style="font-size:10px;opacity:.85;margin-left:5px;color:rgba(255,255,255,.7);font-family:monospace">v1.7.18</span></div>
     </div>
     <div class="sb-nav" id="sb-nav">
       <button class="sb-btn active" id="sbn-home" onclick="showPage('home')"><span class="sb-icon">🏠</span>Home</button>
@@ -1619,7 +1619,7 @@ nav button .nav-badge{
         <span id="hd-turno-mini" class="hd-turno-mini" hidden title="Sessao">—</span>
         <div id="status-dot" class="dot-online"></div>
         <span id="status-txt">Online</span>
-        <span id="app-version" style="font-size:10px;opacity:.85;margin-left:4px;font-family:monospace">v1.7.17</span>
+        <span id="app-version" style="font-size:10px;opacity:.85;margin-left:4px;font-family:monospace">v1.7.18</span>
       </div>
       <button type="button" class="hd-menu-btn" id="hd-menu-btn" aria-label="Abrir menu" onclick="mobMenuToggle_()">☰</button>
     </div>
@@ -2676,7 +2676,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.17';
+const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.18';
 const WEBAPP_URL = (typeof window !== 'undefined' && window.MK_GAS_EXEC_URL) ? window.MK_GAS_EXEC_URL
   : 'https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec';
 const WEBAPP_URL_DEAD_PREFIX = 'AKfycbzc';
@@ -2736,6 +2736,22 @@ let _restoringNovaDraft = false;
 let catSel      = 'Energia';
 let custosHoje  = [];
 let statsHoje   = { fat: 0, n: 0 };
+/** Operador: sem R$, totais ou KPIs de gestao; ADM ve tudo. */
+function mkExibirFinanceiro_() {
+  return (typeof mkAuthIsAdmin === 'function' && mkAuthIsAdmin()) || !!window.isAdmin;
+}
+function apiParamsComAuth_() {
+  const out = typeof operadorApiParams_ === 'function' ? operadorApiParams_() : {};
+  if (mkExibirFinanceiro_()) {
+    if (typeof mkAuthAdminPinParams_ === 'function') Object.assign(out, mkAuthAdminPinParams_());
+    else { out.adminPin = '1416'; out.authRole = 'admin'; }
+  }
+  return out;
+}
+function adicionalPorMinSessao_(s) {
+  if (s.adicionalPorMin != null && s.adicionalPorMin !== '') return Number(s.adicionalPorMin) || 0;
+  return Number(PRECOS[s.tipo]?.[s.plano]?.a) || 0;
+}
 let relacionamentoCache = [];
 let relEditCurrent = null;
 
@@ -3120,7 +3136,7 @@ async function sincronizarServidor(force = false) {
     // Só mostra "Verificando..." se estava Offline (evita piscar)
     if (_syncFailCount > 0) setStatus(null);
 
-    const d = await api({ action: 'carregarInicio' });
+    const d = await api({ action: 'carregarInicio', ...apiParamsComAuth_() });
 
     if (!d.ok) {
       _syncFailCount++;
@@ -3197,9 +3213,31 @@ function mergeSessaoCanonica(serverSession, localSession = {}) {
   };
 }
 
+function sanitizarDadosInicioOperador_(d) {
+  if (!d || mkExibirFinanceiro_()) return d;
+  if (d.statsHoje) d.statsHoje = { n: d.statsHoje.n };
+  if (Array.isArray(d.encHoje)) {
+    d.encHoje = d.encHoje.map(e => {
+      const o = Object.assign({}, e);
+      delete o.valorTotal;
+      return o;
+    });
+  }
+  if (Array.isArray(d.ativos)) {
+    d.ativos = d.ativos.map(s => {
+      const o = Object.assign({}, s);
+      delete o.valorPlano;
+      delete o.adicionalPorMin;
+      return o;
+    });
+  }
+  return d;
+}
+
 function aplicarDadosInicio(d) {
   try {
     if (!d || !Array.isArray(d.ativos)) return;
+    d = sanitizarDadosInicioOperador_(d);
     window._lastSyncSource = d.fonte || 'gas';
     window._lastCanonicalRows = d.ativos.length;
     if (d.fonte === 'firebase') window._fbLastUpdate = Date.now();
@@ -3221,8 +3259,9 @@ function aplicarDadosInicio(d) {
 
     // Atualiza stats
     if (d.statsHoje) {
-      statsHoje.fat = d.statsHoje.fat;
-      statsHoje.n   = d.statsHoje.n;
+      statsHoje.n = d.statsHoje.n;
+      if (mkExibirFinanceiro_()) statsHoje.fat = Number(d.statsHoje.fat) || 0;
+      else statsHoje.fat = 0;
     }
 
     renderCards();
@@ -3571,13 +3610,16 @@ function buildCard(s) {
 
   // Countdown display
   let timerDisplay, timerLabel, extraCost = '';
+  const fin = mkExibirFinanceiro_();
+  const adicMin = adicionalPorMinSessao_(s);
   if (isOver) {
     const extraSec = Math.abs(rem);
     const extraMin = Math.floor(extraSec / 60); // FIX #4: consistente com pedirEncerrar
-    const custo    = (extraMin * s.adicionalPorMin).toFixed(2).replace('.',',');
     timerDisplay   = '+' + fmtTime(extraSec);
     timerLabel     = 'TEMPO EXTRA';
-    extraCost      = `<div class="sc-timer-extra-cost">+${extraMin}min = R$ ${custo}</div>`;
+    extraCost      = fin
+      ? `<div class="sc-timer-extra-cost">+${extraMin}min = R$ ${(extraMin * adicMin).toFixed(2).replace('.',',')}</div>`
+      : `<div class="sc-timer-extra-cost">+${extraMin}min extra</div>`;
   } else {
     timerDisplay = fmtTime(rem);
     timerLabel   = 'RESTANTE';
@@ -3591,6 +3633,7 @@ function buildCard(s) {
 
   const vPlano= PRECOS[s.tipo]?.[s.plano]?.v || 0;
   const vFmt  = 'R$ ' + String(vPlano).replace('.',',') + ',00';
+  const planoLinha = fin ? `${s.plano} · ${vFmt}` : String(s.plano);
 
   return `<div class="${cardCls}" id="card-${s.rowIndex}">
     <div class="sc-top">
@@ -3626,7 +3669,7 @@ function buildCard(s) {
         <div class="sc-timer-label">${timerLabel}</div>
         <div class="sc-timer-big" style="color:${ringColor}">${timerDisplay}</div>
         ${extraCost}
-        <div class="sc-valor">${s.plano} · ${vFmt}</div>
+        <div class="sc-valor">${planoLinha}</div>
         <div class="sc-valor" style="font-size:11px;color:var(--txt3)">Início: ${s.horaInicio}</div>
         ${smsStatusHtml_(s)}
       </div>
@@ -3797,9 +3840,9 @@ function atualizarNovaSummaryBar_() {
   const c = novaDraftCampos_();
   const parts = [
     tipoIcon(tipo) + ' ' + (veiculo || tipo),
-    PLANO_LABELS[plano] || plano,
-    'R$ ' + cfg.v
+    PLANO_LABELS[plano] || plano
   ];
+  if (mkExibirFinanceiro_()) parts.push('R$ ' + cfg.v);
   if (c.responsavel) parts.push(c.responsavel + ' / ' + (c.crianca || '—'));
   bar.innerHTML = '<b>Resumo:</b> ' + escHtml(parts.join(' · '));
   bar.classList.add('visible');
@@ -3838,15 +3881,17 @@ function aplicarPrefillResponsavel_() {
 function renderPlanosNova_(tipo) {
   const container = document.getElementById('plano-list');
   if (!container || !tipo || !PRECOS[tipo]) return;
+  const fin = mkExibirFinanceiro_();
   container.innerHTML = Object.entries(PRECOS[tipo]).map(([k,v]) => {
     const badgeCls = tipo === 'Pelúcia' ? 'pelucia' : '';
-    const adicFmt  = 'R$ ' + String(v.a).replace('.',',') + '/min extra';
+    const detExtra = fin ? (' · R$ ' + String(v.a).replace('.',',') + '/min extra') : '';
+    const valCol = fin ? `<div class="pb-val">R$ ${v.v}</div>` : '';
     return `<div class="plano-btn ${badgeCls}" onclick="selectPlano('${k}',this)">
       <div>
         <div class="pb-nome">${PLANO_LABELS[k]}</div>
-        <div class="pb-det">${v.m} min · ${adicFmt}</div>
+        <div class="pb-det">${v.m} min${detExtra}</div>
       </div>
-      <div class="pb-val">R$ ${v.v}</div>
+      ${valCol}
     </div>`;
   }).join('');
 }
@@ -3994,7 +4039,7 @@ async function loadCustosHoje() {
     const hoje  = new Date();
     const mm    = String(hoje.getMonth()+1).padStart(2,'0');
     const yyyy  = hoje.getFullYear();
-    const dc    = await api({ action: 'listarCustos', mes: mm, ano: yyyy });
+    const dc    = await api({ action: 'listarCustos', mes: mm, ano: yyyy, ...apiParamsComAuth_() });
     if (dc.ok) {
       const dataHoje = String(hoje.getDate()).padStart(2,'0') + '/' + mm + '/' + yyyy;
       custosHoje = dc.custos.filter(c => String(c.data) === dataHoje);
@@ -4044,8 +4089,10 @@ function atualizarVeiculoGrid() {
       if (isOver) {
         const extraSec = Math.abs(rem);
         const extraMin = Math.floor(extraSec / 60);
-        const custo    = (extraMin * (s.adicionalPorMin || 1)).toFixed(2).replace('.',',');
-        timerDiv.innerHTML = `<div class="vc-timer-time extra">+${fmtTime(extraSec)}</div><div class="vc-timer-extra">R$ ${custo} extra</div>`;
+        const extraLbl = mkExibirFinanceiro_()
+          ? `<div class="vc-timer-extra">R$ ${(extraMin * adicionalPorMinSessao_(s)).toFixed(2).replace('.',',')} extra</div>`
+          : `<div class="vc-timer-extra">+${extraMin}min extra</div>`;
+        timerDiv.innerHTML = `<div class="vc-timer-time extra">+${fmtTime(extraSec)}</div>${extraLbl}`;
       } else {
         const isWarn = rem <= 120;
         timerDiv.innerHTML = `<div class="vc-timer-time${isWarn?' warn':''}">${fmtTime(rem)}</div>`;
@@ -4392,28 +4439,32 @@ function resolverMinUsadosEncerrar_(session, incluirExtraLocalAdm) {
   }
   const minExtraCobrados = Math.max(0, minUsados - session.mins);
   const vBase = PRECOS[session.tipo]?.[session.plano]?.v || session.valorPlano;
-  const vExtra = minExtraCobrados * session.adicionalPorMin;
+  const vExtra = minExtraCobrados * adicionalPorMinSessao_(session);
   const vTotal = vBase + vExtra;
   return { minUsados, minExtraTimer, minExtraCobrados, vBase, vExtra, vTotal, somentePlano, offline, adm };
 }
 
 function renderEncerrarModal_(session, fin) {
   const icon = tipoIcon(session.tipo);
+  const exibirFin = mkExibirFinanceiro_();
   const vExtraStr = fin.vExtra.toFixed(2).replace('.', ',');
   const vTotalStr = fin.vTotal.toFixed(2).replace('.', ',');
-  document.getElementById('enc-info').innerHTML =
+  let html =
     '<div class="modal-info-row"><span>' + icon + ' Tipo</span><span>' + escHtml(session.tipo) + '</span></div>' +
     '<div class="modal-info-row"><span>Plano</span><span>' + escHtml(session.plano) + '</span></div>' +
     '<div class="modal-info-row"><span>Criança</span><span>' + escHtml(session.crianca) + '</span></div>' +
     '<div class="modal-info-row"><span>Responsável</span><span>' + escHtml(session.responsavel) + '</span></div>' +
-    '<div class="modal-info-row"><span>Tempo utilizado</span><span>' + fin.minUsados + ' min</span></div>' +
-    (fin.minExtraCobrados > 0
-      ? '<div class="modal-info-row"><span>Min. adicionais</span><span>' + fin.minExtraCobrados + ' min</span></div>' +
-        '<div class="modal-info-row"><span>Valor adicional</span><span>R$ ' + vExtraStr + '</span></div>'
-      : (fin.minExtraTimer > 0 && fin.somentePlano
-        ? '<div class="modal-info-row"><span>Cronometro local</span><span>' + fin.minExtraTimer + ' min extra (nao cobrados)</span></div>'
-        : '')) +
-    '<div class="modal-info-row total"><span>TOTAL A COBRAR</span><span>R$ ' + vTotalStr + '</span></div>';
+    '<div class="modal-info-row"><span>Tempo utilizado</span><span>' + fin.minUsados + ' min</span></div>';
+  if (fin.minExtraCobrados > 0) {
+    html += '<div class="modal-info-row"><span>Min. adicionais</span><span>' + fin.minExtraCobrados + ' min</span></div>';
+    if (exibirFin) html += '<div class="modal-info-row"><span>Valor adicional</span><span>R$ ' + vExtraStr + '</span></div>';
+  } else if (fin.minExtraTimer > 0 && fin.somentePlano) {
+    html += '<div class="modal-info-row"><span>Cronometro local</span><span>' + fin.minExtraTimer + ' min extra (nao cobrados)</span></div>';
+  }
+  if (exibirFin) {
+    html += '<div class="modal-info-row total"><span>TOTAL A COBRAR</span><span>R$ ' + vTotalStr + '</span></div>';
+  }
+  document.getElementById('enc-info').innerHTML = html;
 
   const warn = document.getElementById('enc-offline-warn');
   const admWrap = document.getElementById('enc-adm-extra-wrap');
@@ -4516,11 +4567,14 @@ async function confirmarEncerrar() {
     sessions = sessions.filter(s => s.rowIndex !== encSession.rowIndex);
     saveSessions();
 
-    const vT = Number(d.valorTotal).toFixed(2).replace('.',',');
-    toast(`✅ Encerrado! Total: R$ ${vT}`, 'success');
+    if (mkExibirFinanceiro_() && d.valorTotal != null) {
+      const vT = Number(d.valorTotal).toFixed(2).replace('.',',');
+      toast(`✅ Encerrado! Total: R$ ${vT}`, 'success');
+      statsHoje.fat += Number(d.valorTotal);
+    } else {
+      toast('✅ Locação encerrada!', 'success');
+    }
 
-    // Update today stats
-    statsHoje.fat += Number(d.valorTotal);
     statsHoje.n++;
 
     fecharEncModal();
@@ -4608,13 +4662,15 @@ function showAlertModal(s, expired) {
       : 'Envie a mensagem ao responsável informando que minutos extras serão cobrados.')
     : 'Avise ' + s.responsavel + ' que o tempo de ' + s.crianca + ' está acabando.';
 
-  const vPlano = PRECOS[s.tipo]?.[s.plano]?.v || s.valorPlano;
   const icon   = tipoIcon(s.tipo);
-  document.getElementById('alert-info').innerHTML =
+  let alertHtml =
     '<div class="modal-info-row"><span>' + icon + ' ' + (s.veiculo||s.tipo) + '</span><span>' + s.plano + '</span></div>' +
     '<div class="modal-info-row"><span>Criança</span><span>' + s.crianca + '</span></div>' +
-    '<div class="modal-info-row"><span>Responsável</span><span>' + s.responsavel + '</span></div>' +
-    '<div class="modal-info-row"><span>Extra/min</span><span>R$ ' + s.adicionalPorMin + '</span></div>';
+    '<div class="modal-info-row"><span>Responsável</span><span>' + s.responsavel + '</span></div>';
+  if (mkExibirFinanceiro_()) {
+    alertHtml += '<div class="modal-info-row"><span>Extra/min</span><span>R$ ' + adicionalPorMinSessao_(s) + '</span></div>';
+  }
+  document.getElementById('alert-info').innerHTML = alertHtml;
 
   const btnEncAlert = document.getElementById('btn-enc-alert');
   if (btnEncAlert) {
@@ -5270,13 +5326,13 @@ async function buscarHistorico() {
   if (cards) cards.style.display = 'none';
 
   try {
-    const resStats = await api({ action: 'listarHistorico', startDate: dates.s, endDate: dates.e, statsOnly: '1' });
+    const resStats = await api({ action: 'listarHistorico', startDate: dates.s, endDate: dates.e, statsOnly: '1', ...apiParamsComAuth_() });
     if (resStats.ok && resStats.stats) {
       renderAnalyticsCards(resStats.stats);
       renderHistExtChart_(resStats.stats);
     }
 
-    const res = await api({ action: 'listarHistorico', startDate: dates.s, endDate: dates.e });
+    const res = await api({ action: 'listarHistorico', startDate: dates.s, endDate: dates.e, ...apiParamsComAuth_() });
     if (!res.ok) { container.innerHTML = '<div class="empty"><p>Erro.</p></div>'; return; }
 
     try {
@@ -5695,6 +5751,8 @@ function adminLogin() {
   showAdminSidebar();
   showPage('home');
   if (!kpiData) carregarKPIs();
+  try { localStorage.removeItem('mk_inicio_cache'); } catch(e) {}
+  if (typeof syncController === 'function') syncController(true, 0);
   carregarHistRelatorios();
   carregarConfig(); // Fase 6: carrega templates WA
   if (typeof refreshOperadoresAdmin_ === 'function') refreshOperadoresAdmin_();
@@ -5709,8 +5767,12 @@ function adminLogout() {
   document.removeEventListener('click',    resetAdminTimer);
   document.removeEventListener('touchstart', resetAdminTimer);
   hideAdminSidebar();
+  statsHoje.fat = 0;
   const kpiEl = document.getElementById('admin-home-kpis');
   if(kpiEl) kpiEl.style.display = 'none';
+  if (typeof showAdminHomeKpis === 'function') showAdminHomeKpis(null);
+  try { localStorage.removeItem('mk_inicio_cache'); } catch(e) {}
+  if (typeof syncController === 'function') syncController(true, 0);
   showPage('home');
   if (typeof atualizarOperadorUI_ === 'function') atualizarOperadorUI_();
   if (typeof mkAuthRefreshSessaoTurno_ === 'function') mkAuthRefreshSessaoTurno_();
@@ -5760,7 +5822,7 @@ async function carregarKPIs() {
   if (window._kpiInFlight) return;  // evita calls GAS simultâneos
   window._kpiInFlight = true;
   try {
-    const d = await api({ action: 'buscarKPIsAdmin' });
+    const d = await api({ action: 'buscarKPIsAdmin', ...apiParamsComAuth_() });
     if (!d.ok) return;
     kpiData = d;
     // Re-renderiza gráficos com dados frescos (fix: gráficos ficavam com dados velhos)
@@ -5785,7 +5847,7 @@ function mudarMesDash() {
 
 async function carregarKPIsComMes(mes, ano) {
   try {
-    const p = { action: 'buscarKPIsAdmin' };
+    const p = { action: 'buscarKPIsAdmin', ...apiParamsComAuth_() };
     if (mes) p.mes = mes;
     if (ano) p.ano = ano;
     const d = await api(p);
@@ -6094,9 +6156,10 @@ async function carregarCaixa() {
 
   try {
     // Buscar locações e custos em paralelo
+    const authP = apiParamsComAuth_();
     const [rLoc, rCus] = await Promise.all([
-      api({ action:'listarHistorico', data: dataFmt }),
-      api({ action:'listarCustos' })
+      api({ action:'listarHistorico', data: dataFmt, ...authP }),
+      api({ action:'listarCustos', ...authP })
     ]);
 
     const locacoes = (rLoc.locacoes||[]).filter(l => l.status === 'Encerrada');
@@ -6567,11 +6630,14 @@ function buildPainelCard(nome, tipo, s) {
   if (isOver) {
     const extraSec = Math.abs(rem);
     const extraMin = Math.floor(extraSec / 60);
-    const custo    = (extraMin * s.adicionalPorMin).toFixed(2).replace('.',',');
+    const finPainel = mkExibirFinanceiro_();
+    const adicP = adicionalPorMinSessao_(s);
     cardCls   = 'pcard extra';
     timerTxt  = '+' + fmtTime(extraSec);
     timerCls  = 'pcard-timer extra-time';
-    subLbl    = `+${extraMin}min · R$ ${custo}`;
+    subLbl    = finPainel
+      ? `+${extraMin}min · R$ ${(extraMin * adicP).toFixed(2).replace('.',',')}`
+      : `+${extraMin}min extra`;
     progressPct = 0;
     barColor  = '#E53935';
   } else if (isWarn) {
@@ -6646,17 +6712,19 @@ function abrirEstender(rowIndex) {
   // v1.6.27: opções são planos com preço real (novo contrato, não adicional/min)
   const tipo = estSession.tipo || estSession.veiculo?.split(' ')[0] || 'Carro';
   const tipoKey = Object.keys(PRECOS).find(k => tipo.includes(k)) || 'Carro';
+  const finEst = mkExibirFinanceiro_();
   const planosDisp = Object.entries(PRECOS[tipoKey]).filter(([k,v]) => k !== '3h');
+  const precoLbl = (v) => finEst ? `<div style="font-size:11px;opacity:.75">R$ ${v},00</div>` : '';
   document.getElementById('est-opts').innerHTML = planosDisp.map(([plano, cfg]) =>
     `<button class="est-opt-btn" onclick="selecionarEstender('${plano}',${cfg.m},${cfg.v})" id="est-opt-${plano}">
        <div style="font-size:13px;font-weight:700">+${cfg.m} min</div>
-       <div style="font-size:11px;opacity:.75">R$ ${cfg.v},00</div>
+       ${precoLbl(cfg.v)}
      </button>`
   ).join('');
   document.getElementById('est-opts').innerHTML +=
     `<button class="est-opt-btn" onclick="selecionarEstender('3h',180,${PRECOS[tipoKey]['3h'].v})" id="est-opt-3h">
        <div style="font-size:13px;font-weight:700">+3h</div>
-       <div style="font-size:11px;opacity:.75">R$ ${PRECOS[tipoKey]['3h'].v},00</div>
+       ${precoLbl(PRECOS[tipoKey]['3h'].v)}
      </button>`;
 
   document.getElementById('est-modal').classList.add('show');

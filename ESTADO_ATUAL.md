@@ -20,11 +20,11 @@ Referencia unica para alinhamento local x producao.
 
 |--------|-------------|----------|
 
-| Apps Script | **v1.5.42** (colar + Nova versao Web) | Deploy `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y` |
+| Apps Script | **v1.5.43** (colar + Nova versao Web) | Deploy `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y` |
 
 | SMS Gateway Cloud | **DJVJRL** / device `wihWegHr4wXaVJQ1R-GZR` | Aparelho remoto ONLINE |
 
-| Frontend | **v1.7.17** | https://ribocg-a11y.github.io/movikids/?force=1.7.17 |
+| Frontend | **v1.7.18** | https://ribocg-a11y.github.io/movikids/?force=1.7.18 |
 
 | Pacote SMS P0 | **FECHADO** | `PACOTE_SMS_P0_UNIFICADO_v1.5.38_v1.7.11.md` |
 

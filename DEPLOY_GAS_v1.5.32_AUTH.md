@@ -8,11 +8,11 @@
 | **Web app em produção (exec)** | https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec |
 | **Testar se o GAS está no ar (ping)** | https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec?action=ping |
 | **Planilha MOVIKIDS** | https://docs.google.com/spreadsheets/d/1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618/edit |
-| **App (GitHub Pages)** | https://ribocg-a11y.github.io/movikids/?force=1.7.17 |
+| **App (GitHub Pages)** | https://ribocg-a11y.github.io/movikids/?force=1.7.18 |
 
 No **editor GAS** (link acima): **Implantar → Gerenciar implantações → Editar** a implantação Web (**ID `AKfycbwakQ...`**) → **Nova versão** → Implantar. **Não** crie um deploy novo. **Nunca** use `clasp deploy`.
 
-Após implantar, o `ping` deve mostrar `versao` **v1.5.42** (auditoria `AUD_TURNO` login/logout). SMS: **v1.5.41** — ver `TROCA_SMS_GATEWAY_DJVJRL_2026-06-04.md`.
+Após implantar, o `ping` deve mostrar `versao` **v1.5.43** (dados financeiros/gestão só ADM). SMS: **v1.5.41** — ver `TROCA_SMS_GATEWAY_DJVJRL_2026-06-04.md`.
 
 ### Propriedades do script (SMS — producao)
 
@@ -35,7 +35,7 @@ O script: copia o `.gs` canônico → `gas/Code.gs` → valida `DEPLOY_ID` → `
 
 ## Arquivo canônico
 
-`MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs` (header **v1.5.42**)
+`MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs` (header **v1.5.43**)
 
 `const DEPLOY_ID` no arquivo deve ser **`AKfycbwakQ...`** (não `AKfycbzc...`).
 
@@ -50,6 +50,6 @@ O script: copia o `.gs` canônico → `gas/Code.gs` → valida `DEPLOY_ID` → `
 
 ## Frontend
 
-Publicar **v1.7.17** no GitHub (`git push`). Tablets: `?force=1.7.17`.
+Publicar **v1.7.18** no GitHub (`git push`). Tablets: `?force=1.7.18`.
 
 Ver também: `ESTADO_ATUAL.md`, `REGRAS_DE_PUBLICACAO_SEGURA.md`.

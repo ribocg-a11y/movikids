@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.42
+// MOVI KIDS — Google Apps Script v1.5.43
+// v1.5.43: dados financeiros/gestao so ADM — carregarInicio, listarCustos, buscarKPIsAdmin, encerrarLocacao filtrados
 // v1.5.42: auditoria AUD_TURNO login/logout operador balcao
 // v1.5.41: gateway producao DJVJRL + deviceId wihWegHr...; property "auto" omite deviceId
 // v1.5.40: deviceId explicito no Cloud + deviceActiveWithin=12 na URL
@@ -220,7 +221,7 @@ function doGet(e) {
       case 'listarRelatorios':    return listarRelatorios_();
       case 'verificarSessao':     return verificarSessao_(p);
       case 'iniciarTimer':        return iniciarTimer_(p);
-      case 'carregarInicio':      return carregarInicio_();
+      case 'carregarInicio':      return carregarInicio_(p);
       case 'gerarRelatorio':      return gerarRelatorio_();
       case 'criarAnalise':        return criarAnalise_(p);
       case 'buscarPreviewRelatorio': return buscarPreviewRelatorio_(p);
@@ -266,9 +267,9 @@ function ping_() {
   const agora = new Date();
   return resp_({
     status:  'online',
-    versao:  'v1.5.42',
+    versao:  'v1.5.43',
     timestamp: fmtData_(agora) + ' ' + fmtHoraLocal_(agora),
-    sistema: 'MOVI KIDS v1.5.42'
+    sistema: 'MOVI KIDS v1.5.43'
   });
 }
 
@@ -693,7 +694,7 @@ function encerrarLocacao_(p) {
     firebaseSyncSessao_(rowIndex, fbDadosSessao_(rowDataE, 'Encerrada', rowIndex));
   } catch(eFb) { console.warn('Firebase encerrar:', eFb.message); }
   lockE.releaseLock();
-  return resp_({
+  const encResp = {
     id:            row[0],
     tipo,
     plano,
@@ -710,7 +711,14 @@ function encerrarLocacao_(p) {
     valorTotal,
     adicionalPorMin,
     status: 'Encerrada'
-  });
+  };
+  if (!isAdminRequest_(p)) {
+    delete encResp.valorPlano;
+    delete encResp.valorAdicional;
+    delete encResp.valorTotal;
+    delete encResp.adicionalPorMin;
+  }
+  return resp_(encResp);
 }
 
 // ── LISTAR HISTÓRICO ──────────────────────────────────────────
@@ -736,6 +744,7 @@ function buildExtPorDiaArr_(byDay) {
 }
 
 function listarHistorico_(p) {
+  if (!isAdminRequest_(p)) return err_('Acesso negado — historico so para administrador', 403);
   const filtroData = (p.data      || '').trim();
   const startDate  = (p.startDate || '').trim();
   const endDate    = (p.endDate   || '').trim();
@@ -861,11 +870,14 @@ function salvarCusto_(p) {
 
 // ── LISTAR CUSTOS ─────────────────────────────────────────────
 function listarCustos_(p) {
+  const adm = isAdminRequest_(p || {});
   const mes = p.mes ? parseInt(p.mes) : null;
   const ano = p.ano ? parseInt(p.ano) : null;
   const sheet = sh_(SH_CUS);
   const last  = sheet.getLastRow();
-  if (last < DATA_ROW) return resp_({ custos: [], total: 0, soma: 0 });
+  if (last < DATA_ROW) {
+    return adm ? resp_({ custos: [], total: 0, soma: 0 }) : resp_({ custos: [] });
+  }
 
   const dados = sheet.getRange(DATA_ROW, 1, last - DATA_ROW + 1, 6).getValues();
   let lista = dados.filter(r => r[0] !== '' && r[0] !== 0).map(r => ({
@@ -876,6 +888,12 @@ function listarCustos_(p) {
     categoria: r[4],
     valor:     Number(r[5])
   }));
+
+  if (!adm) {
+    const dataHoje = fmtData_(new Date());
+    lista = lista.filter(r => String(r.data) === dataHoje);
+    return resp_({ custos: lista });
+  }
 
   if (mes || ano) {
     lista = lista.filter(r => {
@@ -891,6 +909,7 @@ function listarCustos_(p) {
 
 // ── KPIs ADMIN — v1.5.3: fatPorTipo inclui Triciclo ──────────
 function buscarKPIsAdmin_(p) {
+  if (!isAdminRequest_(p)) return err_('Acesso negado — KPIs so para administrador', 403);
   const hoje     = new Date();
   const dataHoje = fmtData_(hoje);
   const mesAtual = p && p.mes ? parseInt(p.mes) : hoje.getMonth() + 1;
@@ -1042,10 +1061,11 @@ function buscarKPIsAdmin_(p) {
 }
 
 // ── CARREGAR INÍCIO ───────────────────────────────────────────
-function carregarInicio_() {
+function carregarInicio_(p) {
   // HOTFIX: sem CacheService aqui. Cache antigo podia retornar objeto puro em vez de TextOutput
   // e quebrar o WebApp com "tipo de valor retornado nao e compativel".
 
+  const adm      = isAdminRequest_(p || {});
   const hoje     = new Date();
   const dataHoje = fmtData_(hoje);
   const shLoc    = sh_(SH_LOC);
@@ -1069,7 +1089,7 @@ function carregarInicio_() {
         const plano = String(r[5]);
         const cfg   = (PRECOS[tipo] && PRECOS[tipo][plano]) ? PRECOS[tipo][plano] : {};
         const ts    = status === 'Ativa' ? timestampCanonico_(r[1], r[2], r[24]) : 0;
-        ativas.push({
+        const ativaObj = {
           rowIndex:        DATA_ROW + idx,
           id:              r[0],
           data:            dataR,
@@ -1081,13 +1101,16 @@ function carregarInicio_() {
           veiculo,
           pagamento,
           mins:            Number(r[6]),
-          valorPlano:      Number(r[7]),
-          adicionalPorMin: cfg.adicional || 0,
           responsavel:     String(r[11]),
           crianca:         String(r[12]),
           telefone:        String(r[13]),
           status
-        });
+        };
+        if (adm) {
+          ativaObj.valorPlano = Number(r[7]);
+          ativaObj.adicionalPorMin = cfg.adicional || 0;
+        }
+        ativas.push(ativaObj);
       }
 
       if (status === 'Encerrada' && dataR === dataHoje) {
@@ -1117,7 +1140,7 @@ function carregarInicio_() {
     dados2.forEach(r => {
       if (!r[0] || String(r[14]).trim() !== 'Encerrada') return;
       if (cellToStr_(r[1]) !== dataHoje) return;
-      encHoje.push({
+      const encObj = {
         id:          r[0],
         horaInicio:  cellToStr_(r[2]),
         horaFim:     cellToStr_(r[3]),
@@ -1127,18 +1150,24 @@ function carregarInicio_() {
         pagamento:   String(r[16] || ''),
         crianca:     String(r[12]),
         responsavel: String(r[11]),
-        telefone:    String(r[13] || ''), // v1.5.5: para msg pós-locação
-        valorTotal:  Number(r[10])
-      });
+        telefone:    String(r[13] || '')
+      };
+      if (adm) encObj.valorTotal = Number(r[10]);
+      encHoje.push(encObj);
     });
   }
 
+  const statsHoje = adm ? { fat: fatHoje, n: nHoje } : { n: nHoje };
+  const custosPayload = adm ? custosHoje : custosHoje.map(c => ({
+    id: c.id, data: c.data, hora: c.hora, descricao: c.descricao, categoria: c.categoria, valor: c.valor
+  }));
+
   const resultado = resp_({
-    sistema:    'MOVI KIDS v1.5.31',
+    sistema:    'MOVI KIDS v1.5.43',
     timestamp:  dataHoje + ' ' + fmtHoraLocal_(hoje),
     ativos:     ativas,
-    statsHoje:  { fat: fatHoje, n: nHoje },
-    custosHoje,
+    statsHoje,
+    custosHoje: custosPayload,
     encHoje
   });
   return resultado;
@@ -1371,6 +1400,7 @@ function registrarRelatorio_(mes, ano, nomeMes, link, tipo) {
 
 // ── CRIAR ANÁLISE — v1.5.3: Triciclo incluído ────────────────
 function criarAnalise_(p) {
+  if (!isAdminRequest_(p)) return err_('Acesso negado — analises so para administrador', 403);
   const mes    = parseInt(p.mes || (new Date().getMonth() + 1));
   const ano    = parseInt(p.ano || new Date().getFullYear());
   const mmyy   = String(mes).padStart(2,'0') + '/' + ano;
@@ -3012,6 +3042,13 @@ function hashPin_(pin, salt) {
 
 function adminPinOk_(p) {
   return pinDigits_(p && p.adminPin) === ADMIN_PIN_PLAIN;
+}
+
+/** Sessao admin (authRole) ou PIN 1416 na requisicao. */
+function isAdminRequest_(p) {
+  if (!p) return false;
+  if (String(p.authRole || '').trim().toLowerCase() === 'admin') return true;
+  return adminPinOk_(p);
 }
 
 function operadorRowById_(id) {
