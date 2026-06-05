@@ -3,6 +3,7 @@
 Referência única para alinhamento local × produção.
 
 **Roadmap mestre:** `PLANO_MESTRE_REORGANIZADO_2026-06.md`  
+**Pausa maturidade (ativo):** `PLANO_PAUSA_MATURIDADE_2026-06.md`  
 **Handoff:** `HANDOFF_NOVO_CHAT_2026-06-05.md`  
 **Incidentes:** `INCIDENTE_AUTH_OPERADORES_2026-06-04.md`, `INCIDENTE_DEPLOY_E_EXTRAS_2026-06-04.md`, **`INCIDENTE_POST_BROWSER_LANCAMENTO_2026-06-05.md` (P0)**  
 **SMS gateway:** `TROCA_SMS_GATEWAY_DJVJRL_2026-06-04.md`  
@@ -13,7 +14,7 @@ Referência única para alinhamento local × produção.
 ## ALERTA P0 (05/06/2026)
 
 **Nunca POST no `api()` do browser** — ver `INCIDENTE_POST_BROWSER_LANCAMENTO_2026-06-05.md`.  
-FE mínimo em operação: **v1.7.35** (recomendado **v1.7.38** — Pacote F + auto-update). Teste tablet obrigatório após mudança em `api()`.
+FE mínimo em operação: **v1.7.35** (recomendado **v1.7.39+**). Teste tablet obrigatório após mudança em `api()`.
 
 ---
 
@@ -21,8 +22,8 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.38** — Pacote F + au
 
 | Camada | Versão alvo | URL / ID |
 |--------|-------------|----------|
-| **Frontend** | **v1.7.38** | https://ribocg-a11y.github.io/movikids/?force=1.7.38 |
-| **Apps Script** | **v1.5.52** | Deploy `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y` |
+| **Frontend** | **v1.7.39** | https://ribocg-a11y.github.io/movikids/?force=1.7.39 |
+| **Apps Script** | **v1.5.53** | Deploy `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y` |
 | SMS Gateway Cloud | **DJVJRL** / device `wihWegHr4wXaVJQ1R-GZR` | Aparelho remoto ONLINE |
 | Pacote SMS P0 | **FECHADO** | `PACOTE_SMS_P0_UNIFICADO_v1.5.38_v1.7.11.md` |
 | Planilha | MOVIKIDS_Planilha_Base | https://docs.google.com/spreadsheets/d/1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618/edit |
@@ -110,19 +111,26 @@ Commits de referência: `3d9d106` (v1.7.25), `e1a56db` (Pacote E), `1454bc8` (fi
 - [x] **Pacote E — POST + auditoria plena** — **v1.7.26** + GAS **v1.5.44**
 - [x] **Limpeza testes** — planilha + auto-cleanup nos scripts
 - [x] **Pacote F — KPIs avançados** — **v1.7.38** + GAS **v1.5.48–1.5.52** (Dashboard 5 blocos + PDF Gestão Avançada)
-- [ ] Fase 4 WhatsApp, Fase 8 config dinâmica
-- [~] **Fase 9 supervisor — PAUSADA** (operadores mantêm editar/cancelar/plano; perfil supervisor não restringe balcão)
+- [ ] **Pacote I — Sanitização gestão** ← **próximo** (ver `PLANO_PAUSA_MATURIDADE_2026-06.md`)
+- [ ] Pacote G — Portal responsável
+- [ ] Pacote H — Config amigável
+- [ ] Pacote J — Travas CI
+- [ ] Fase 4 WhatsApp (após I+G)
+- [~] **Fase 9 supervisor — PAUSADA**
+- [~] Fase 8 config — após Pacote H
 
 ---
 
-## Ordem de retomada do planejamento (ativa)
+## Ordem de retomada do planejamento (pausa maturidade — ativa)
 
-| # | Frente | Status | Alvo |
+| # | Pacote | Status | Alvo |
 |---|--------|--------|------|
-| 1 | Publicar GAS v1.5.46 | **feito** | ping v1.5.46 em 05/06 16:00 |
-| 2 | Pacote F — KPIs avançados | **feito** | v1.7.38 + GAS v1.5.52 |
-| 3 | Validação tablet drawer 4 abas | opcional | checklist `TESTE_VALIDACAO_TABLET_PACOTE_F.ps1` |
-| 4 | Fases abertas | pendente | config frota (F8), WhatsApp (F4); **F9 supervisor pausada** |
+| 1 | **I — Sanitização gestão** | **próximo** | FE v1.7.40 — uma métrica, um lugar |
+| 2 | G — Portal responsável | pendente | `acompanhar.html` + QR |
+| 3 | H — Config amigável | pendente | frota/preços sem JSON |
+| 4 | J — Travas CI | pendente | pre-push + guard POST |
+| 5 | F4 WhatsApp | pendente | após I e G |
+| ⏸ | F9 supervisor | pausado | — |
 
 ### Pacote F — escopo entregue (v1.7.27)
 
