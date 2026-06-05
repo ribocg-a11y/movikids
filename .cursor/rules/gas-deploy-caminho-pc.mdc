@@ -1,0 +1,22 @@
+---
+description: Regra de ouro — sempre informar caminho local do .gs após alteração GAS
+globs: MOVIKIDS_Code*.gs,**/gas/**/*.gs,DEPLOY_GAS*.md
+alwaysApply: true
+---
+
+# Regra de ouro — deploy GAS MOVI KIDS
+
+Sempre que **você** alterar o código Google Apps Script deste projeto (arquivo canônico ou cópia em `gas/`), **obrigatoriamente** informar ao usuário o caminho completo no PC, neste formato exato:
+
+```
+v{VERSÃO} no seu PC:
+
+C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github\MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs
+```
+
+- `{VERSÃO}` = versão lida do header do arquivo (ex.: `v1.5.43`), nunca inventada.
+- **Não** substituir por link GitHub/raw, salvo se o usuário pedir explicitamente.
+- **Não** omitir esse bloco no fim da resposta quando houver mudança no `.gs`.
+- Lembrete curto opcional: colar no **Código.gs** do Apps Script → **Implantar → Nova versão** (só se o `.gs` mudou; mudança só em `index.html`/frontend **não** exige reimplantar o script).
+
+Arquivo canônico único: `MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs` (o nome do arquivo no disco não muda; só o header de versão).
