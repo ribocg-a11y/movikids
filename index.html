@@ -22,7 +22,7 @@
 <script>
 // ── CACHE BUSTER — alinhado a mk-version.js / APP_VERSION ──
 (function(){
-  const CURRENT = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.20';
+  const CURRENT = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.21';
   const KEY = 'mk_loaded_version';
   try {
     const stored = localStorage.getItem(KEY);
@@ -572,12 +572,6 @@ nav button .nav-badge{
 /* ══ SIDEBAR ════════════════════════════════════════════════ */
 #mob-nav-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:190}
 #mob-nav-backdrop.show{display:block}
-.hd-menu-btn{
-  display:none;align-items:center;justify-content:center;
-  width:40px;height:40px;margin-left:8px;border:1.5px solid rgba(255,255,255,.35);
-  background:rgba(255,255,255,.1);color:#fff;border-radius:10px;
-  font-size:20px;line-height:1;cursor:pointer;flex-shrink:0;
-}
 #sidebar{
   display:none;width:230px;flex-shrink:0;
   background:linear-gradient(180deg,#060d1f 0%,#0a1e4a 40%,#0d2a5c 100%);
@@ -587,7 +581,6 @@ nav button .nav-badge{
   overflow-y:auto;-webkit-overflow-scrolling:touch;
 }
 @media(max-width:1023px){
-  .hd-menu-btn{display:flex}
   #sidebar{
     display:flex;position:fixed;left:0;top:0;bottom:0;width:min(280px,88vw);
     z-index:200;transform:translateX(-105%);transition:transform .22s ease;
@@ -617,7 +610,6 @@ nav button .nav-badge{
 .sb-icon{font-size:17px;line-height:1;flex-shrink:0}
 .sb-divider{font-size:10px;font-weight:700;color:rgba(255,255,255,.3);
   text-transform:uppercase;letter-spacing:.08em;padding:14px 13px 5px}
-.sb-oper-section{padding:0 10px 6px;flex:0 0 auto}
 .sb-admin-section{display:none;padding:0 10px 6px;flex:0 0 auto}
 .sb-admin-section.visible{display:block}
 .sb-admin-toggle{
@@ -651,7 +643,6 @@ nav button .nav-badge{
 }
 .sb-sessao-sair:hover{background:rgba(255,255,255,.16)}
 .sb-sessao-empty{font-size:11px;color:rgba(255,255,255,.5);font-weight:700;padding:4px 0 8px}
-.hd-turno-mini{font-size:10px;font-weight:800;color:var(--blue-dk);max-width:38vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .sb-operator-btn{border:1.5px solid rgba(255,255,255,.35);background:transparent;
   color:#fff;font-family:'Nunito',sans-serif;font-weight:700;font-size:11px;
   border-radius:6px;padding:3px 9px;cursor:pointer}
@@ -681,7 +672,6 @@ nav button .nav-badge{
   }
   header{display:none}
   #main-content nav{display:none!important}
-  .hd-menu-btn{display:none!important}
   .stats-bar{grid-template-columns:repeat(4,1fr)}
   .kpi-grid{grid-template-columns:repeat(4,1fr)!important}
   .charts-row{grid-template-columns:1fr 1fr}
@@ -1561,22 +1551,16 @@ nav button .nav-badge{
   <!-- ══ SIDEBAR (desktop fixo / celular = menu suspenso) ══ -->
   <aside id="sidebar">
     <div class="sb-logo">🚗 Movi <span>Kids</span>
-      <div class="sb-status"><span id="sb-dot" class="dot-online"></span><span id="sb-txt">Online</span><span id="sb-version" style="font-size:10px;opacity:.85;margin-left:5px;color:rgba(255,255,255,.7);font-family:monospace">v1.7.20</span></div>
+      <div class="sb-status"><span id="sb-dot" class="dot-online"></span><span id="sb-txt">Online</span><span id="sb-version" style="font-size:10px;opacity:.85;margin-left:5px;color:rgba(255,255,255,.7);font-family:monospace">v1.7.21</span></div>
     </div>
-    <div class="sb-oper-section" id="sb-oper-section">
-      <button type="button" class="sb-admin-toggle" id="sb-oper-toggle" aria-expanded="true" aria-controls="sb-oper-panel" onclick="sbToggleOperNav_()">
-        <span>Home</span>
-        <span class="sb-admin-chevron" aria-hidden="true">▸</span>
-      </button>
-      <div class="sb-admin-panel" id="sb-oper-panel">
-        <button class="sb-btn active" id="sbn-home" onclick="showPage('home')"><span class="sb-icon">🏠</span>Início</button>
-        <button class="sb-btn" id="sbn-nova" onclick="abrirNovaLocacao()"><span class="sb-icon">➕</span>Nova Locação</button>
-        <button class="sb-btn" id="sbn-relacionamento" onclick="showPage('relacionamento')"><span class="sb-icon">👥</span>Relacionamento</button>
-        <button class="sb-btn" id="sbn-painel" onclick="showPage('painel')"><span class="sb-icon">📺</span>Painel Operação</button>
-        <button class="sb-btn" id="sbn-custos" onclick="showPage('custos')"><span class="sb-icon">💰</span>Registrar Custo</button>
-        <button class="sb-btn" id="sbn-avulso" onclick="showPage('lancamento')"><span class="sb-icon">⚡</span>Lanç. Avulso</button>
-      </div>
-    </div>
+    <nav class="sb-nav" id="sb-nav" aria-label="Operação">
+      <button class="sb-btn active" id="sbn-home" onclick="showPage('home')"><span class="sb-icon">🏠</span>Home</button>
+      <button class="sb-btn" id="sbn-nova" onclick="abrirNovaLocacao()"><span class="sb-icon">➕</span>Nova Locação</button>
+      <button class="sb-btn" id="sbn-relacionamento" onclick="showPage('relacionamento')"><span class="sb-icon">👥</span>Relacionamento</button>
+      <button class="sb-btn" id="sbn-painel" onclick="showPage('painel')"><span class="sb-icon">📺</span>Painel Operação</button>
+      <button class="sb-btn" id="sbn-custos" onclick="showPage('custos')"><span class="sb-icon">💰</span>Registrar Custo</button>
+      <button class="sb-btn" id="sbn-avulso" onclick="showPage('lancamento')"><span class="sb-icon">⚡</span>Lanç. Avulso</button>
+    </nav>
     <div class="sb-admin-section" id="sb-admin-section">
       <button type="button" class="sb-admin-toggle" id="sb-admin-toggle" aria-expanded="false" aria-controls="sb-admin-panel" onclick="sbToggleAdminNav_()">
         <span>Administração</span>
@@ -1623,12 +1607,10 @@ nav button .nav-badge{
     <div class="hd-row">
       <div class="logo">🚗 Movi <span>Kids</span></div>
       <div class="hd-status">
-        <span id="hd-turno-mini" class="hd-turno-mini" hidden title="Sessão">—</span>
         <div id="status-dot" class="dot-online"></div>
         <span id="status-txt">Online</span>
-        <span id="app-version" style="font-size:10px;opacity:.85;margin-left:4px;font-family:monospace">v1.7.20</span>
+        <span id="app-version" style="font-size:10px;opacity:.85;margin-left:4px;font-family:monospace">v1.7.21</span>
       </div>
-      <button type="button" class="hd-menu-btn" id="hd-menu-btn" aria-label="Abrir menu" onclick="mobMenuToggle_()">☰</button>
     </div>
   </header>
 
@@ -2683,7 +2665,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.20';
+const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.21';
 const WEBAPP_URL = (typeof window !== 'undefined' && window.MK_GAS_EXEC_URL) ? window.MK_GAS_EXEC_URL
   : 'https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec';
 const WEBAPP_URL_DEAD_PREFIX = 'AKfycbzc';
@@ -2772,28 +2754,6 @@ function fmtHoraTurno_(ms) {
   }
 }
 
-function sbSetOperNavOpen_(open, persist) {
-  const panel = document.getElementById('sb-oper-panel');
-  const toggle = document.getElementById('sb-oper-toggle');
-  if (!panel || !toggle) return;
-  panel.hidden = !open;
-  toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
-  if (persist !== false) {
-    try { localStorage.setItem('mk_sb_oper_open', open ? '1' : '0'); } catch (e) {}
-  }
-}
-
-function sbToggleOperNav_() {
-  const panel = document.getElementById('sb-oper-panel');
-  sbSetOperNavOpen_(panel && panel.hidden, true);
-}
-
-function sbInitOperNav_() {
-  let open = true;
-  try { open = localStorage.getItem('mk_sb_oper_open') !== '0'; } catch (e) {}
-  sbSetOperNavOpen_(open, false);
-}
-
 function sbSetAdminNavOpen_(open, persist) {
   const panel = document.getElementById('sb-admin-panel');
   const toggle = document.getElementById('sb-admin-toggle');
@@ -2826,12 +2786,6 @@ function mobMenuClose_() {
   document.body.style.overflow = '';
 }
 
-function mobMenuToggle_() {
-  const sb = document.getElementById('sidebar');
-  if (sb && sb.classList.contains('mob-open')) mobMenuClose_();
-  else mobMenuOpen_();
-}
-
 function sbSairSessaoClick_() {
   const isAdm = (typeof mkAuthIsAdmin === 'function' && mkAuthIsAdmin()) || !!window.isAdmin;
   if (isAdm) {
@@ -2854,7 +2808,6 @@ function atualizarOperadorUI_(sessaoServidor) {
   const rowTablet = document.getElementById('sb-row-tablet');
   const empty = document.getElementById('sb-sessao-empty');
   const sairBtn = document.getElementById('sb-sessao-sair-btn');
-  const hdMini = document.getElementById('hd-turno-mini');
 
   const set = (id, text) => {
     const el = document.getElementById(id);
@@ -2890,18 +2843,6 @@ function atualizarOperadorUI_(sessaoServidor) {
   if (sairBtn && (temBalcao || temTablet)) {
     sairBtn.hidden = false;
     sairBtn.textContent = isAdm ? 'Sair do admin' : 'Encerrar turno';
-  }
-
-  if (hdMini) {
-    if (temBalcao) {
-      hdMini.hidden = false;
-      hdMini.textContent = 'Balcão: ' + srv.nome;
-    } else if (temTablet && isAdm) {
-      hdMini.hidden = false;
-      hdMini.textContent = 'Admin';
-    } else {
-      hdMini.hidden = true;
-    }
   }
 }
 window.atualizarOperadorUI_ = atualizarOperadorUI_;
@@ -2975,7 +2916,6 @@ async function init() {
     if (el) el.textContent = APP_VERSION;
   });
   atualizarOperadorUI_();
-  sbInitOperNav_();
   if (typeof mkAuthRefreshSessaoTurno_ === 'function') mkAuthRefreshSessaoTurno_();
   atualizarWhatsAppUI_();
 
@@ -6496,8 +6436,6 @@ function showPage(name, opts = {}) {
   const navId = navMap[name];
   if (navId) document.getElementById(navId)?.classList.add('active');
   syncSidebar(name);
-  const operPages = ['home', 'nova', 'relacionamento', 'painel', 'custos', 'lancamento'];
-  if (operPages.includes(name)) sbSetOperNavOpen_(true, false);
   if (name === 'lancamento') resetAvulsoForm_();
   if (name==='nova') {
     if (opts.freshNova) {
