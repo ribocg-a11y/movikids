@@ -22,7 +22,7 @@
 <script>
 // ── CACHE BUSTER — alinhado a mk-version.js / APP_VERSION ──
 (function(){
-  const CURRENT = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.25';
+  const CURRENT = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.26';
   const KEY = 'mk_loaded_version';
   try {
     const stored = localStorage.getItem(KEY);
@@ -1607,7 +1607,7 @@ header{
   <!-- ══ SIDEBAR (desktop fixo / celular = menu suspenso) ══ -->
   <aside id="sidebar">
     <div class="sb-logo">🚗 Movi <span>Kids</span>
-      <div class="sb-status"><span id="sb-dot" class="dot-online"></span><span id="sb-txt">Online</span><span id="sb-version" style="font-size:10px;opacity:.85;margin-left:5px;color:rgba(255,255,255,.7);font-family:monospace">v1.7.25</span></div>
+      <div class="sb-status"><span id="sb-dot" class="dot-online"></span><span id="sb-txt">Online</span><span id="sb-version" style="font-size:10px;opacity:.85;margin-left:5px;color:rgba(255,255,255,.7);font-family:monospace">v1.7.26</span></div>
     </div>
     <div class="sb-nav" id="sb-nav" role="navigation" aria-label="Operação">
       <button class="sb-btn active" id="sbn-home" onclick="showPage('home')"><span class="sb-icon">🏠</span>Home</button>
@@ -1665,7 +1665,7 @@ header{
       <div class="hd-status">
         <div id="status-dot" class="dot-online"></div>
         <span id="status-txt">Online</span>
-        <span id="app-version" style="font-size:10px;opacity:.85;margin-left:4px;font-family:monospace">v1.7.25</span>
+        <span id="app-version" style="font-size:10px;opacity:.85;margin-left:4px;font-family:monospace">v1.7.26</span>
       </div>
     </div>
   </header>
@@ -2719,7 +2719,7 @@ header{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.25';
+const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.26';
 const WEBAPP_URL = (typeof window !== 'undefined' && window.MK_GAS_EXEC_URL) ? window.MK_GAS_EXEC_URL
   : 'https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec';
 const WEBAPP_URL_DEAD_PREFIX = 'AKfycbzc';
@@ -2926,20 +2926,56 @@ function trocarModoWhatsApp() {
 }
 
 // ═══════════════════════════════════════════════════════════
-// API
+// API (Pacote E: escritas criticas via POST + operador obrigatorio no GAS)
 // ═══════════════════════════════════════════════════════════
-async function api(params, timeoutMs = 25000) {
-  // Usa Promise.race ao invés de AbortController:
-  // AbortController + Service Worker causa conflito — o SW cria uma fetch
-  // interna sem o signal, então o abort dispara na página mas o GAS
-  // continua sem responder, acumulando falhas mesmo que o GAS esteja online.
-  const gasUrl = await resolveGasUrl_();
-  const qs = new URLSearchParams(params).toString();
-  const fetchP = fetch(`${gasUrl}?${qs}`)
-    .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); });
+const MK_WRITE_ACTIONS_POST = new Set([
+  'salvarLocacao', 'editarLocacao', 'cancelarLocacao', 'encerrarLocacao', 'estenderLocacao'
+]);
+
+function mkApiFetchJson_(url, init, timeoutMs) {
+  const fetchP = fetch(url, init)
+    .then(async r => {
+      const text = await r.text();
+      let data;
+      try { data = JSON.parse(text); } catch (e) {
+        throw new Error('Resposta invalida do GAS (nao-JSON). Publique Nova versao da Web App.');
+      }
+      if (!r.ok && !data.erro) throw new Error('HTTP ' + r.status);
+      return data;
+    });
   const timer = new Promise((_, rej) =>
     setTimeout(() => rej(new Error('timeout-' + timeoutMs + 'ms')), timeoutMs));
   return Promise.race([fetchP, timer]);
+}
+
+async function mkGasPostReady_() {
+  if (window._mkGasPostReady != null) return window._mkGasPostReady;
+  try {
+    const gasUrl = await resolveGasUrl_();
+    const d = await mkApiFetchJson_(`${gasUrl}?action=ping`, { method: 'GET', redirect: 'follow' }, 8000);
+    window._mkGasPostReady = !!(d && d.ok && d.postWriteActions);
+  } catch (e) {
+    window._mkGasPostReady = false;
+  }
+  return window._mkGasPostReady;
+}
+
+async function api(params, timeoutMs = 25000) {
+  const gasUrl = await resolveGasUrl_();
+  const action = String((params && params.action) || '');
+  const payload = Object.assign({}, params);
+  const wantsPost = MK_WRITE_ACTIONS_POST.has(action);
+  if (wantsPost && typeof operadorApiParams_ === 'function') Object.assign(payload, operadorApiParams_());
+  if (wantsPost && await mkGasPostReady_()) {
+    return mkApiFetchJson_(gasUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      redirect: 'follow'
+    }, timeoutMs);
+  }
+  const qs = new URLSearchParams(payload).toString();
+  return mkApiFetchJson_(`${gasUrl}?${qs}`, { method: 'GET', redirect: 'follow' }, timeoutMs);
 }
 window.api = api;
 

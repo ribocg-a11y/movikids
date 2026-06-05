@@ -5,8 +5,36 @@ param(
 
 $ErrorActionPreference = "Stop"
 
+$WriteActions = @("salvarLocacao","editarLocacao","cancelarLocacao")
+$script:GasPostReady = $null
+
+function Test-GasPostReady {
+  if ($null -ne $script:GasPostReady) { return $script:GasPostReady }
+  try {
+    $ping = Invoke-RestMethod -Uri "$BaseUrl`?action=ping" -Method Get -TimeoutSec 15
+    $script:GasPostReady = [bool]($ping.postWriteActions)
+  } catch {
+    $script:GasPostReady = $false
+  }
+  return $script:GasPostReady
+}
+
 function Invoke-MoviApi {
-  param([hashtable]$Params)
+  param([hashtable]$Params, [string]$Method = "AUTO")
+  $action = [string]$Params.action
+  if ($Method -eq "AUTO") {
+    $Method = if (($WriteActions -contains $action) -and (Test-GasPostReady)) { "POST" } else { "GET" }
+  }
+  if ($Method -eq "POST") {
+    $body = $Params | ConvertTo-Json -Compress
+    try {
+      return Invoke-RestMethod -Uri $BaseUrl -Method Post -Body $body -ContentType "application/json" -TimeoutSec 25
+    } catch {
+      $raw = & curl.exe -L -s -X POST -H "Content-Type: application/json" -d $body $BaseUrl
+      if (-not $raw) { throw "Resposta vazia POST: $action" }
+      try { return $raw | ConvertFrom-Json } catch { throw "JSON invalido POST em ${action}: $raw" }
+    }
+  }
   $query = ($Params.GetEnumerator() | ForEach-Object {
     "{0}={1}" -f [uri]::EscapeDataString([string]$_.Key), [uri]::EscapeDataString([string]$_.Value)
   }) -join "&"
@@ -15,8 +43,8 @@ function Invoke-MoviApi {
     return Invoke-RestMethod -Uri $url -Method Get -TimeoutSec 20
   } catch {
     $raw = & curl.exe -L -s $url
-    if (-not $raw) { throw "Resposta vazia: $($Params.action)" }
-    try { return $raw | ConvertFrom-Json } catch { throw "JSON invalido em $($Params.action): $raw" }
+    if (-not $raw) { throw "Resposta vazia: $action" }
+    try { return $raw | ConvertFrom-Json } catch { throw "JSON invalido em ${action}: $raw" }
   }
 }
 
@@ -67,6 +95,7 @@ try {
       crianca = $nomeTeste
       telefone = "98999999999"
       observacao = "Teste regressao safe v1.5.18"
+      operador = "TESTE_CODEX"
     }
     Assert-Ok $salvar "salvarLocacao"
     if ($salvar.status -ne "Pendente") { throw "salvarLocacao deveria retornar Pendente; retornou $($salvar.status)" }
@@ -89,6 +118,7 @@ try {
       responsavel = "TESTE_CODEX_EDITADO"
       pagamento = "Dinheiro"
       observacao = "Teste regressao editado antes de iniciar"
+      operador = "TESTE_CODEX"
     }
     Assert-Ok $editar "editarLocacao"
     Add-Check "editarLocacao pendente" "ok" "pagamento=Dinheiro"
@@ -97,6 +127,7 @@ try {
       action = "cancelarLocacao"
       rowIndex = $loc.rowIndex
       motivo = "Teste regressao Codex sem iniciar timer"
+      operador = "TESTE_CODEX"
     }
     Assert-Ok $cancelar "cancelarLocacao"
     if ($cancelar.locacao.status -ne "Cancelada") { throw "Cancelamento retornou status $($cancelar.locacao.status)" }

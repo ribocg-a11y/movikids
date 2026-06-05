@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.43
+// MOVI KIDS — Google Apps Script v1.5.44
+// v1.5.44: Pacote E — doPost JSON; operador obrigatorio nas 5 escritas criticas; GET write deprecado
 // v1.5.43: dados financeiros/gestao so ADM — carregarInicio, listarCustos, buscarKPIsAdmin, encerrarLocacao filtrados
 // v1.5.42: auditoria AUD_TURNO login/logout operador balcao
 // v1.5.41: gateway producao DJVJRL + deviceId wihWegHr...; property "auto" omite deviceId
@@ -199,12 +200,43 @@ function ctoMinimo_(mes) {
   return 3000;
 }
 
-// ── ROTEADOR ──────────────────────────────────────────────────
-function doGet(e) {
-  try {
-    const p = e.parameter || {};
-    const action = p.action || '';
-    switch (action) {
+// ── ROTEADOR (Pacote E: POST + operador em escritas criticas) ──
+const WRITE_ACTIONS_CRITICAS_ = [
+  'salvarLocacao', 'editarLocacao', 'cancelarLocacao', 'encerrarLocacao', 'estenderLocacao'
+];
+
+function parseRequestParams_(e) {
+  const p = {};
+  if (e && e.postData && e.postData.contents) {
+    try {
+      const ct = String(e.postData.type || '');
+      if (ct.indexOf('application/json') >= 0) {
+        const parsed = JSON.parse(e.postData.contents);
+        if (parsed && typeof parsed === 'object') Object.assign(p, parsed);
+      }
+    } catch (ex) {
+      Logger.log('parseRequestParams_ JSON: ' + ex.message);
+    }
+  }
+  if (e && e.parameter) Object.assign(p, e.parameter);
+  return p;
+}
+
+function assertOperadorEscrita_(p, action) {
+  const op = String((p && (p.operador || p.operadorNome)) || '').trim();
+  if (!op) return err_('Operador obrigatorio para ' + action + '. Faca login no balcao.', 401);
+  return null;
+}
+
+function dispatchMoviAction_(p, method) {
+  const action = String((p && p.action) || '').trim();
+  if (!action) return err_('action obrigatoria', 400);
+  if (WRITE_ACTIONS_CRITICAS_.indexOf(action) >= 0) {
+    const opErr = assertOperadorEscrita_(p, action);
+    if (opErr) return opErr;
+    if (method === 'GET') Logger.log('DEPRECATION: ' + action + ' via GET — migrar para POST');
+  }
+  switch (action) {
       case 'ping':                return ping_();
       case 'diagnosticoSistema':  return diagnosticoSistema_();
       case 'validarSchema':       return validarSchema_();
@@ -257,6 +289,19 @@ function doGet(e) {
       default:
         return err_('Ação desconhecida: ' + action, 400);
     }
+}
+
+function doGet(e) {
+  try {
+    return dispatchMoviAction_(parseRequestParams_(e), 'GET');
+  } catch (ex) {
+    return err_(ex.message, 500);
+  }
+}
+
+function doPost(e) {
+  try {
+    return dispatchMoviAction_(parseRequestParams_(e), 'POST');
   } catch (ex) {
     return err_(ex.message, 500);
   }
@@ -267,9 +312,10 @@ function ping_() {
   const agora = new Date();
   return resp_({
     status:  'online',
-    versao:  'v1.5.43',
+    versao:  'v1.5.44',
     timestamp: fmtData_(agora) + ' ' + fmtHoraLocal_(agora),
-    sistema: 'MOVI KIDS v1.5.43'
+    sistema: 'MOVI KIDS v1.5.44',
+    postWriteActions: WRITE_ACTIONS_CRITICAS_
   });
 }
 
