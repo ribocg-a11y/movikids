@@ -22,7 +22,7 @@
 <script>
 // ── CACHE BUSTER — alinhado a mk-version.js / APP_VERSION ──
 (function(){
-  const CURRENT = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.22';
+  const CURRENT = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.23';
   const KEY = 'mk_loaded_version';
   try {
     const stored = localStorage.getItem(KEY);
@@ -1555,7 +1555,7 @@ header{
   <!-- ══ SIDEBAR (desktop fixo / celular = menu suspenso) ══ -->
   <aside id="sidebar">
     <div class="sb-logo">🚗 Movi <span>Kids</span>
-      <div class="sb-status"><span id="sb-dot" class="dot-online"></span><span id="sb-txt">Online</span><span id="sb-version" style="font-size:10px;opacity:.85;margin-left:5px;color:rgba(255,255,255,.7);font-family:monospace">v1.7.22</span></div>
+      <div class="sb-status"><span id="sb-dot" class="dot-online"></span><span id="sb-txt">Online</span><span id="sb-version" style="font-size:10px;opacity:.85;margin-left:5px;color:rgba(255,255,255,.7);font-family:monospace">v1.7.23</span></div>
     </div>
     <div class="sb-nav" id="sb-nav" role="navigation" aria-label="Operação">
       <button class="sb-btn active" id="sbn-home" onclick="showPage('home')"><span class="sb-icon">🏠</span>Home</button>
@@ -1613,7 +1613,7 @@ header{
       <div class="hd-status">
         <div id="status-dot" class="dot-online"></div>
         <span id="status-txt">Online</span>
-        <span id="app-version" style="font-size:10px;opacity:.85;margin-left:4px;font-family:monospace">v1.7.22</span>
+        <span id="app-version" style="font-size:10px;opacity:.85;margin-left:4px;font-family:monospace">v1.7.23</span>
       </div>
     </div>
   </header>
@@ -1910,7 +1910,7 @@ header{
     <div class="admin-badge">
       <div class="admin-badge-left">🔐 <span>Modo Administrador</span></div>
       <div style="display:flex;align-items:center;gap:10px">
-        <span class="admin-timer">1:00</span>
+        <span class="admin-timer">60:00</span>
         <button class="btn-sair" onclick="adminLogout()">Sair</button>
       </div>
     </div>
@@ -1989,7 +1989,7 @@ header{
     <div class="admin-badge">
       <div class="admin-badge-left">🔧 <span>Sistema</span></div>
       <div style="display:flex;align-items:center;gap:10px">
-        <span class="admin-timer">1:00</span>
+        <span class="admin-timer">60:00</span>
         <button class="btn-sair" onclick="adminLogout()">Sair</button>
       </div>
     </div>
@@ -2014,7 +2014,7 @@ header{
     <div class="admin-badge">
       <div class="admin-badge-left">👤 <span>Operadores do sistema</span></div>
       <div style="display:flex;align-items:center;gap:10px">
-        <span class="admin-timer">1:00</span>
+        <span class="admin-timer">60:00</span>
         <button class="btn-sair" onclick="adminLogout()">Sair</button>
       </div>
     </div>
@@ -2669,7 +2669,7 @@ header{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.22';
+const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.23';
 const WEBAPP_URL = (typeof window !== 'undefined' && window.MK_GAS_EXEC_URL) ? window.MK_GAS_EXEC_URL
   : 'https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec';
 const WEBAPP_URL_DEAD_PREFIX = 'AKfycbzc';
@@ -5652,7 +5652,8 @@ function renderDashVehRank(fatPorVeiculo) {
 // ═══════════════════════════════════════════════════════════
 let isAdmin         = false;
 let adminTimerInt   = null;
-let adminCountdown  = 60;
+const ADMIN_IDLE_SEC = 60 * 60; // 1 hora sem atividade (alinha com mk-auth)
+let adminCountdown  = ADMIN_IDLE_SEC;
 let kpiData         = null;
 let chartsRendered  = false;
 let chartDiario=null,chartExtrasDia=null,chartHistExt=null,chartTipo=null,chartPlano=null,chartHoras=null;
@@ -5724,9 +5725,11 @@ function adminLogin() {
   if (app) app.style.display = 'flex';
   const gate = document.getElementById('mk-auth-gate');
   if (gate) gate.style.display = 'none';
-  adminCountdown = 60;
-  document.addEventListener('click',    resetAdminTimer);
-  document.addEventListener('touchstart', resetAdminTimer);
+  adminCountdown = ADMIN_IDLE_SEC;
+  if (typeof mkAuthTouchActivity_ === 'function') mkAuthTouchActivity_();
+  ['click', 'keydown', 'touchstart', 'scroll', 'mousemove'].forEach(ev => {
+    document.addEventListener(ev, resetAdminTimer, { passive: true });
+  });
   adminTimerInt = setInterval(tickAdmin, 1000);
   showAdminSidebar();
   showPage('home');
@@ -5751,8 +5754,9 @@ function adminLogout() {
   isAdmin = false;
   window.isAdmin = false;
   clearInterval(adminTimerInt);
-  document.removeEventListener('click',    resetAdminTimer);
-  document.removeEventListener('touchstart', resetAdminTimer);
+  ['click', 'keydown', 'touchstart', 'scroll', 'mousemove'].forEach(ev => {
+    document.removeEventListener(ev, resetAdminTimer);
+  });
   hideAdminSidebar();
   statsHoje.fat = 0;
   const kpiEl = document.getElementById('admin-home-kpis');
@@ -5771,16 +5775,27 @@ function adminLogout() {
   }
 }
 
+function fmtAdminTimer_(sec) {
+  const m = Math.floor(sec / 60);
+  const s = sec % 60;
+  return String(m) + ':' + String(s).padStart(2, '0');
+}
+
 function resetAdminTimer() {
-  adminCountdown = 60;
+  if (!isAdmin) return;
+  adminCountdown = ADMIN_IDLE_SEC;
+  if (typeof mkAuthTouchActivity_ === 'function') mkAuthTouchActivity_();
 }
 
 function tickAdmin() {
   if (!isAdmin) return;
   adminCountdown--;
-  const t = '0:' + String(adminCountdown).padStart(2,'0');
+  const t = fmtAdminTimer_(adminCountdown);
   document.querySelectorAll('.admin-timer').forEach(el => { el.textContent = t; });
-  if (adminCountdown <= 0) adminLogout();
+  if (adminCountdown <= 0) {
+    if (typeof trocarOperador === 'function') trocarOperador('inatividade');
+    else adminLogout();
+  }
 }
 
 function irAdmin(page) {

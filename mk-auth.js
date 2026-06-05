@@ -1,4 +1,4 @@
-/* MOVI KIDS — Login operadores v1.7.22 */
+/* MOVI KIDS — Login operadores v1.7.23 */
 (function () {
   const SESSION_KEY = 'mk_auth_session_v1';
   const LEGACY_OPERADOR_KEY = 'mk_operador_atual_v1';
@@ -31,6 +31,8 @@
   function touchAuthActivity_() {
     try { localStorage.setItem(AUTH_ACTIVITY_KEY, String(Date.now())); } catch (e) {}
   }
+  window.mkAuthTouchActivity_ = touchAuthActivity_;
+  window.MK_AUTH_IDLE_MS = AUTH_IDLE_MS;
 
   function isAuthIdleExpired_() {
     try {
@@ -226,7 +228,6 @@
       if (document.visibilityState === 'visible') checkAuthIdle_();
     });
     setInterval(checkAuthIdle_, 60000);
-    checkAuthIdle_();
   }
 
   function hideApp() {
