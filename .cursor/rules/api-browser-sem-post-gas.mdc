@@ -1,0 +1,21 @@
+---
+description: P0 — Nunca POST JSON no browser para GAS Web App (incidente 05/06/2026)
+globs: index.html,mk-auth.js,**/TESTE_*.ps1
+alwaysApply: true
+---
+
+# ALERTA P0 — api() no browser MOVI KIDS
+
+Incidente **05/06/2026** (`INCIDENTE_POST_BROWSER_LANCAMENTO_2026-06-05.md`): Pacote E usou POST no `fetch` quando `ping.postWriteActions` existia. **Quebrou lançamento no tablet** (*Erro de conexão*).
+
+## Regras obrigatórias
+
+1. Em `index.html`, função `api()`: escritas críticas (`salvarLocacao`, `editarLocacao`, `cancelarLocacao`, `encerrarLocacao`, `estenderLocacao`) = **somente GET** com query string.
+2. **Nunca** reintroduzir `method: 'POST'` + `JSON.stringify` no browser para a URL `script.google.com/macros/s/.../exec`.
+3. `postWriteActions` no GAS é para backend/scripts — **não** autoriza POST no frontend.
+4. Antes de publicar mudança em `api()`: rodar `TESTE_PARIDADE_HTTP_BROWSER_GAS.ps1` e validar **Nova locação no tablet** (não só PowerShell).
+5. `Invoke-RestMethod -Method Post` nos `.ps1` **não prova** o tablet.
+
+## Versão mínima operação
+
+FE **v1.7.35+** (anti-stale + GET). Tablets em v1.7.31–v1.7.33 estão quebrados para lançamento.

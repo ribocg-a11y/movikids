@@ -4,9 +4,16 @@ Referência única para alinhamento local × produção.
 
 **Roadmap mestre:** `PLANO_MESTRE_REORGANIZADO_2026-06.md`  
 **Handoff:** `HANDOFF_NOVO_CHAT_2026-06-05.md`  
-**Incidentes:** `INCIDENTE_AUTH_OPERADORES_2026-06-04.md`, `INCIDENTE_DEPLOY_E_EXTRAS_2026-06-04.md`  
+**Incidentes:** `INCIDENTE_AUTH_OPERADORES_2026-06-04.md`, `INCIDENTE_DEPLOY_E_EXTRAS_2026-06-04.md`, **`INCIDENTE_POST_BROWSER_LANCAMENTO_2026-06-05.md` (P0)**  
 **SMS gateway:** `TROCA_SMS_GATEWAY_DJVJRL_2026-06-04.md`  
 **Deploy GAS:** `DEPLOY_GAS_v1.5.32_AUTH.md`
+
+---
+
+## ALERTA P0 (05/06/2026)
+
+**Nunca POST no `api()` do browser** — ver `INCIDENTE_POST_BROWSER_LANCAMENTO_2026-06-05.md`.  
+FE mínimo em operação: **v1.7.35**. Teste tablet obrigatório após mudança em `api()`.
 
 ---
 
@@ -14,8 +21,8 @@ Referência única para alinhamento local × produção.
 
 | Camada | Versão alvo | URL / ID |
 |--------|-------------|----------|
-| **Frontend** | **v1.7.28** (local) / **v1.7.27** (Pages) | https://ribocg-a11y.github.io/movikids/?force=1.7.28 |
-| **Apps Script** | **v1.5.47** (local; produção **v1.5.46** até Nova versão) | Deploy `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y` |
+| **Frontend** | **v1.7.35** | https://ribocg-a11y.github.io/movikids/?force=1.7.35 |
+| **Apps Script** | **v1.5.51** | Deploy `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y` |
 | SMS Gateway Cloud | **DJVJRL** / device `wihWegHr4wXaVJQ1R-GZR` | Aparelho remoto ONLINE |
 | Pacote SMS P0 | **FECHADO** | `PACOTE_SMS_P0_UNIFICADO_v1.5.38_v1.7.11.md` |
 | Planilha | MOVIKIDS_Planilha_Base | https://docs.google.com/spreadsheets/d/1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618/edit |
@@ -26,7 +33,7 @@ Referência única para alinhamento local × produção.
 
 **Teste rápido GAS (ping):**  
 https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec?action=ping  
-→ deve retornar `versao: v1.5.46` e `postWriteActions` com as 5 escritas críticas
+→ deve retornar `versao: v1.5.51` e `postWriteActions` (POST só no GAS; FE usa GET — incidente I15)
 
 **URL morta (não usar):** `AKfycbzc...` → 404
 
@@ -41,7 +48,8 @@ https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPe
 | Login | `mk-auth.js` + gate em `index.html` |
 | Versão FE | `mk-version.js`, `sw.js` |
 | Deploy | `DEPLOY_GAS_v1.5.32_AUTH.md`, `scripts/deploy-gas.ps1` |
-| Limpeza testes | `LIMPAR_TESTES_MOVIKIDS.ps1`, action `limparLocacoesTesteAdmin` |
+| Limpeza testes | `LIMPAR_TESTES_MOVIKIDS.ps1`, `LIMPAR_SESSOES_TESTE_AGORA.ps1`, `limparLocacoesTesteAdmin` |
+| Paridade HTTP tablet | `TESTE_PARIDADE_HTTP_BROWSER_GAS.ps1` (obrigatório se mexer em `api()`) |
 | Emergência | `scripts/corrigir-locacao-206.html`, `scripts/corrigir-locacoes-extras-lote.html` |
 
 ---

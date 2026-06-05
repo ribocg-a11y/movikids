@@ -42,6 +42,11 @@ Após implantar, o `ping` deve mostrar `versao` **v1.5.48** e `postWriteActions`
 
 **Pós-incidente 04/06/2026:** `INCIDENTE_DEPLOY_E_EXTRAS_2026-06-04.md`, `INCIDENTE_AUTH_OPERADORES_2026-06-04.md`.
 
+### ALERTA P0 — 05/06/2026 (frontend, não GAS)
+
+`postWriteActions` no ping **não** significa que o **tablet** pode usar POST. Isso quebrou o lançamento (Pacote E v1.7.26–v1.7.33).  
+**Frontend v1.7.35+** usa GET no browser. Ver `INCIDENTE_POST_BROWSER_LANCAMENTO_2026-06-05.md` e Regra 6 em `REGRAS_DE_PUBLICACAO_SEGURA.md`.
+
 ## Deploy seguro (PC)
 
 ```powershell

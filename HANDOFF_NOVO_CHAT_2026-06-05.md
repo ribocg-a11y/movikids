@@ -136,6 +136,7 @@ C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\m
 | Doc | O quê |
 |-----|--------|
 | `INCIDENTE_DEPLOY_E_EXTRAS_2026-06-04.md` | `clasp deploy` quebrou URL; extras fantasmas com GAS offline |
+| **`INCIDENTE_POST_BROWSER_LANCAMENTO_2026-06-05.md`** | **P0** POST no browser quebrou lançamento; GET obrigatório no FE |
 | `INCIDENTE_AUTH_OPERADORES_2026-06-04.md` | Sessão travada; PIN invisível; timer sem operador → extra indevido |
 | `EMERGENCIA_SMS_404.md` | URL morta AKfycbzc; só Nova versão na mesma implantação resolve |
 | `TROCA_SMS_GATEWAY_DJVJRL_2026-06-04.md` | Gateway produção DJVJRL |
@@ -158,7 +159,7 @@ C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\m
 | I12 | URL GAS morta em script teste | `TESTE_RELACIONAMENTO` falhava | URL `AKfycbwakQ...` | commit 1454bc8 |
 | I13 | `listarAtivas` antes de encerrar | Falso negativo por concorrência | Verificar row Ativa antes de encerrar | TESTE_DRAWER_E |
 | I14 | Ping desatualizado no `.gs` | Produção mostra versão antiga após push | Atualizar `ping_()` + Nova versão Web | v1.5.46 |
-| I15 | Pacote E POST no FE (`v1.7.26`–`v1.7.33`) | Lançamento/encerrar/editar quebram no tablet (`Failed to fetch`) | FE v1.7.34: escritas via GET no browser; `TESTE_PARIDADE_HTTP_BROWSER_GAS.ps1` | v1.7.34 |
+| I15 | **P0** Pacote E POST no FE (`v1.7.26`–`v1.7.33`) + cache `?force=1.7.31` | **Balcão parado:** Nova locação *"Erro de conexão"*; testes PS passavam | FE **v1.7.35**: GET no browser + anti-stale; Regra 6; paridade HTTP | v1.7.35 — ver `INCIDENTE_POST_BROWSER_LANCAMENTO_2026-06-05.md` |
 
 ### Aprendizados operacionais (não repetir)
 
@@ -170,7 +171,8 @@ C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\m
 - **Testes em produção:** telefone `98999999999`, prefixo `DRAWER_E_` / `TESTE_CODEX`; limpar no `finally` ou via `LIMPAR_TESTES_MOVIKIDS.ps1`.
 - **ADM PIN:** `1416` — reset PIN, liberar sessão, corrigir financeiro, limpar testes.
 - **Dados financeiros:** só admin vê (`carregarInicio`, KPIs filtrados GAS v1.5.43+).
-- **Escritas críticas POST:** salvar, editar, cancelar, encerrar, estender — exigem operador logado (GAS v1.5.44+).
+- **Escritas críticas:** exigem operador logado (GAS v1.5.44+). No **browser** = **GET** apenas (incidente I15 — **nunca POST** no FE).
+- **ALERTA P0:** `INCIDENTE_POST_BROWSER_LANCAMENTO_2026-06-05.md` — regressão PowerShell POST ≠ tablet.
 
 ---
 
@@ -224,6 +226,8 @@ cd "C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-moviki
 
 .\LIMPAR_TESTES_MOVIKIDS.ps1              # limpeza manual
 .\LIMPAR_TESTES_MOVIKIDS.ps1 -DryRun      # só lista
+.\LIMPAR_SESSOES_TESTE_AGORA.ps1          # cancela pendentes teste (9899999*, Teste*)
+.\TESTE_PARIDADE_HTTP_BROWSER_GAS.ps1       # obrigatorio antes de publicar mudanca em api()
 ```
 
 Limpeza via planilha (OAuth): `C:\Users\riboc\Projects\google-drive-sheets-auth\scripts\limpar-testes-movikids.js`

@@ -1,8 +1,23 @@
 # MOVI KIDS - Regras de Publicacao Segura
 
-Data: 02/06/2026
+Data: 02/06/2026 (alerta P0 atualizado 05/06/2026)
 
 Este documento e uma trava operacional. Nenhuma mudanca futura deve ser publicada sem passar por estas regras, principalmente porque o sistema roda em operacao real e pequenos ajustes de frontend, cache ou WhatsApp podem derrubar o balcao.
+
+---
+
+## ALERTA P0 — Incidente 05/06/2026 (lancamento quebrado)
+
+**O que aconteceu:** Pacote E (FE v1.7.26–v1.7.33) usou **POST JSON** no `api()` do browser. No tablet isso **nao funciona** com a Web App GAS (redirect 302 + CORS). Resultado: *"Erro de conexao"* em **Nova locacao**, encerrar, editar, cancelar, estender.
+
+**Regra absoluta (nao negociavel):**
+
+1. No **browser/tablet**, escritas criticas ao GAS = **GET** com query string (FE **v1.7.34+**).
+2. **Nunca** reativar POST no `index.html` porque `ping.postWriteActions` existe.
+3. **Nunca** declarar testes OK so com `Invoke-RestMethod POST` — rodar `TESTE_PARIDADE_HTTP_BROWSER_GAS.ps1` e validar **lancamento no tablet**.
+4. Tablets devem mostrar **Online v1.7.35+** — `?force=1.7.31` ou anterior = versao quebrada.
+
+**Documentacao completa:** `INCIDENTE_POST_BROWSER_LANCAMENTO_2026-06-05.md`
 
 ## Regra 1 - Declarar Escopo Antes de Mexer
 
@@ -21,6 +36,7 @@ Se o pacote nao precisa mexer em `track.html`, Apps Script, Firebase ou planilha
 
 Antes de commit/push:
 
+- se mexeu em `api()` / lancamento: `TESTE_PARIDADE_HTTP_BROWSER_GAS.ps1` ok + checklist tablet (Regra 6 / incidente I15);
 - `index.html` passou por checagem de versao;
 - `sw.js` passou por checagem de versao;
 - `CURRENT`, `APP_VERSION` e `SW_VERSION` estao alinhados;
@@ -140,7 +156,8 @@ Erros cometidos neste projeto que nao devem se repetir:
 - deixar documento antigo contradizer hotfix novo;
 - entregar mudanca sem regra de rollback curta;
 - fazer verificacao parcial e chamar de validacao completa;
-- validar POST ao GAS so com PowerShell e declarar tablet OK (incidente 05/06/2026, Pacote E).
+- validar POST ao GAS so com PowerShell e declarar tablet OK (incidente 05/06/2026, Pacote E — ver `INCIDENTE_POST_BROWSER_LANCAMENTO_2026-06-05.md`);
+- reintroduzir POST no `api()` do browser sem validacao tablet (incidente I15).
 
 Toda regressao deve gerar:
 
