@@ -4,7 +4,7 @@
 **Motivo da pausa:** Pacotes A–F entregues; priorizar **confiabilidade, consistência e experiência** antes de novas fases (F9 supervisor, F4 WhatsApp completo).  
 **Referências:** `ESTADO_ATUAL.md`, `PLANO_MESTRE_REORGANIZADO_2026-06.md` (seção 3 redundâncias), `REGRAS_DE_PUBLICACAO_SEGURA.md`
 
-**Produção alvo:** FE **v1.7.39** · GAS **v1.5.53**
+**Produção alvo:** FE **v1.7.40** · GAS **v1.5.53**
 
 ---
 
@@ -98,31 +98,31 @@ Admin e operação veem os mesmos números em **Home, hub admin, Dashboard e Cai
 
 #### I.1 — Home operacional limpa
 
-- [ ] Operador: **zero** bloco financeiro (auditar `sanitizarDadosInicioOperador_` + cards).
-- [ ] Admin: remover `#admin-home-kpis` e `#h-ranking` da Home.
-- [ ] Admin: manter **uma linha** opcional “Hoje: R$ X” com link → Caixa (colapsável ou discreta).
-- [ ] Stats-bar: só **ativas agora** e **encerradas hoje** (contagem), sem fat.
+- [x] Operador: **zero** bloco financeiro (auditar `sanitizarDadosInicioOperador_` + cards).
+- [x] Admin: remover `#admin-home-kpis` e `#h-ranking` da Home.
+- [x] Admin: manter **uma linha** opcional “Hoje: R$ X” com link → Caixa (colapsável ou discreta).
+- [x] Stats-bar: só **ativas agora** e **encerradas hoje** (contagem), sem fat.
 
 #### I.2 — Hub admin (Centro de gestão) enxuto
 
-- [ ] Remover duplicação de KPIs mensais que já existem no Dashboard.
-- [ ] Manter portas: Caixa, Dashboard, Histórico, Relatório, Operadores, Sistema.
-- [ ] Chip “Online · vX” no hub (versão), sem bloco diagnóstico completo.
+- [x] Remover duplicação de KPIs mensais que já existem no Dashboard.
+- [x] Manter portas: Caixa, Dashboard, Histórico, Relatório, Operadores, Sistema.
+- [x] Chip “Online · vX” no hub (versão), sem bloco diagnóstico completo.
 
 #### I.3 — Dashboard como “Gestão do mês”
 
-- [ ] Confirmar `new-kpi-row` + CTO strip **somente** no Dashboard.
-- [ ] Tile “Caixa de hoje” continua linkando para Caixa (já feito no F).
-- [ ] Remover canvas/tabelas legadas `display:none` se não forem usadas (código morto).
+- [x] Confirmar `new-kpi-row` + CTO strip **somente** no Dashboard.
+- [x] Tile “Caixa de hoje” continua linkando para Caixa (já feito no F).
+- [x] Remover canvas/tabelas legadas `display:none` se não forem usadas (código morto).
 
 #### I.4 — Caixa como “Resumo do dia”
 
-- [ ] Caixa = único lugar com fechamento detalhado do dia.
-- [ ] Garantir que “Copiar resumo” / conferência maquininha ficam aqui, não no Sistema.
+- [x] Caixa = único lugar com fechamento detalhado do dia.
+- [x] Garantir que “Copiar resumo” / conferência maquininha ficam aqui, não no Sistema.
 
 #### I.5 — Documentação e teste
 
-- [ ] Atualizar `ESTADO_ATUAL.md` com mapa canônico.
+- [x] Atualizar `ESTADO_ATUAL.md` com mapa canônico.
 - [ ] Checklist manual tablet: operador Home sem R$; admin Dashboard vs Caixa coerentes.
 
 ### Fora do escopo (Pacote I)
@@ -186,12 +186,11 @@ Admin e operação veem os mesmos números em **Home, hub admin, Dashboard e Cai
 
 ## 9. Próximo passo imediato
 
-**Iniciar Pacote I** — branch/commit FE v1.7.40:
+**Pacote I concluído** (FE v1.7.40). **Iniciar Pacote G** — portal responsável:
 
-1. Remover KPIs e ranking da Home admin.
-2. Enxugar hub admin.
-3. Validar operador sem R$ em todas as rotas.
-4. Publicar + checklist tablet.
+1. Redesign `acompanhar.html` com marca Movi Kids.
+2. QR deep link + mobile.
+3. Checklist tablet Pacote I (operador Home sem R$).
 
 ---
 

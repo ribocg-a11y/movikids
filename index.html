@@ -69,13 +69,13 @@
   } catch(e) {}
 })();
 </script>
-<script src="mk-version.js?v=1.7.39"></script>
+<script src="mk-version.js?v=1.7.40"></script>
 <link rel="stylesheet" href="mk-design.css">
 
 <script>
 // ── CACHE BUSTER — alinhado a mk-version.js / APP_VERSION ──
 (function(){
-  const CURRENT = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.39';
+  const CURRENT = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.40';
   const KEY = 'mk_loaded_version';
   function mkVerParts_(v) {
     return String(v || '0.0').split('.').map(function(n) { return parseInt(n, 10) || 0; });
@@ -761,9 +761,6 @@ header{
   .analytics-grid{grid-template-columns:repeat(4,1fr)!important}
 }
 
-/* ══ ADMIN HOME KPI (hidden until admin) ════════════════════ */
-#admin-home-kpis{display:none}
-#admin-home-kpis.visible{display:block}
 /* ══ ENCERRADAS HOJE ════════════════════════════════════════ */
 .enc-item{
   background:var(--card);border-radius:var(--radius-sm);
@@ -1011,7 +1008,6 @@ header{
   display:flex;justify-content:space-between;align-items:center}
 .rel-hist-link{color:var(--blue);font-weight:700;font-size:11px;cursor:pointer}
 
-.admin-kpis-hidden{display:none}
 /* Loading skeleton */
 .skeleton{background:linear-gradient(90deg,var(--border) 25%,#F0F6FF 50%,var(--border) 75%);
   background-size:200% 100%;animation:shimmer 1.2s infinite;border-radius:8px;height:80px;margin-bottom:8px}
@@ -1302,22 +1298,6 @@ header{
   font-size:12px;color:var(--txt3);line-height:1.5;
 }
 .vrank-insight strong{color:var(--txt)}
-
-/* Dashboard: ranking table below chart */
-.veh-rank-table{width:100%;border-collapse:collapse;margin-top:10px}
-.veh-rank-table th{
-  font-size:10px;font-weight:800;color:var(--txt3);text-transform:uppercase;
-  letter-spacing:.05em;border-bottom:1.5px solid var(--border);padding-bottom:6px;text-align:left;
-}
-.veh-rank-table td{
-  padding:7px 0;font-size:12px;border-bottom:1px solid var(--border);
-  vertical-align:middle;
-}
-.veh-rank-table tr:last-child td{border-bottom:none}
-.veh-bar-wrap{display:flex;align-items:center;gap:6px}
-.veh-bar-bg{flex:1;height:6px;border-radius:99px;background:var(--border);min-width:30px}
-.veh-bar-fill{height:6px;border-radius:99px;transition:width .6s}
-.veh-pct{font-size:10px;font-weight:700;color:var(--txt3);min-width:28px;text-align:right}
 
 /* Section title inside a chart card */
 .chart-card .chart-sub-title{
@@ -1791,16 +1771,7 @@ header{
     </div>
     <div id="admin-home-chip" class="mk-admin-chip" hidden>
       <span>Hoje: <strong id="admin-chip-fat">—</strong></span>
-      <button type="button" class="mk-admin-chip-btn" onclick="if(typeof irAdmin==='function')irAdmin('caixa');else{showPage('caixa');if(typeof carregarCaixa==='function')carregarCaixa();}">Abrir caixa</button>
-    </div>
-    <div id="admin-home-kpis" class="admin-kpis-hidden" hidden aria-hidden="true">
-      <div class="kpi-grid" style="margin-bottom:10px">
-        <div class="kpi-card blue"><div class="kpi-val" id="h-fathoje">R$0</div><div class="kpi-lbl">Fat. hoje</div></div>
-        <div class="kpi-card red"><div class="kpi-val" id="h-cushoje">R$0</div><div class="kpi-lbl">Custos hoje</div></div>
-        <div class="kpi-card green"><div class="kpi-val" id="h-fatmes">R$0</div><div class="kpi-lbl">Fat. mês</div><div class="kpi-sub" id="h-nmes"></div></div>
-        <div class="kpi-card purple"><div class="kpi-val" id="h-resultado">R$0</div><div class="kpi-lbl">Resultado mês</div><div class="kpi-sub" id="h-margem"></div></div>
-      </div>
-      <div class="ranking-card" id="h-ranking" style="margin-bottom:10px;display:none"><div class="chart-title">Ranking — mês atual</div><div id="h-rank-rows"></div></div>
+      <button type="button" class="mk-admin-chip-btn" onclick="if(typeof irAdmin==='function')irAdmin('caixa');else{showPage('caixa');if(typeof carregarCaixa==='function')carregarCaixa();}">→ Caixa</button>
     </div>
     <div class="sec-title">Sessões ativas</div>
     <div id="sessions-container"><div class="skeleton"></div><div class="skeleton"></div></div>
@@ -2177,8 +2148,8 @@ header{
     <button type="button" class="btn btn-secondary" id="mk-btn-toggle-opcfg" style="width:100%;margin-bottom:14px" onclick="toggleEditorOperacaoConfig_()">✏️ Editar frota e preços</button>
     <div class="sec-title">Operação</div>
     <button type="button" class="btn btn-secondary" style="width:100%;margin-bottom:10px" onclick="irAdmin('operadores')">👤 Operadores e liberar sessão</button>
-    <button type="button" class="btn btn-secondary" style="width:100%;margin-bottom:10px" onclick="copiarFechamentoDia()">📋 Copiar resumo do dia (WhatsApp)</button>
-    <p style="font-size:12px;color:var(--txt3);line-height:1.4">Fechamento completo com maquininha e dinheiro: use <strong>Caixa do dia</strong>.</p>
+    <p style="font-size:12px;color:var(--txt3);line-height:1.4;margin-bottom:10px">Fechamento do dia, conferência de maquininha e copiar resumo: use <strong>Caixa do dia</strong> no hub de gestão.</p>
+    <button type="button" class="btn btn-secondary" style="width:100%;margin-bottom:10px" onclick="irAdmin('caixa')">💰 Abrir Caixa do dia</button>
   </div>
 
   <!-- ──────── PAGE: OPERADORES (ADM) ──────── -->
@@ -2541,12 +2512,6 @@ header{
       </div>
     </div>
 
-    <!-- hidden canvases for compat -->
-    <canvas id="chart-tipo" style="display:none"></canvas>
-    <canvas id="chart-plano" style="display:none"></canvas>
-    <canvas id="chart-veiculo" style="display:none"></canvas>
-    <canvas id="chart-pagamento" style="display:none"></canvas>
-    <table style="display:none"><tbody id="dash-veh-rank-body"></tbody></table>
   </div>
 
   <!-- ──────── PAGE: RELATÓRIO ──────── -->
@@ -2885,7 +2850,7 @@ header{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.39';
+const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.40';
 const WEBAPP_URL = (typeof window !== 'undefined' && window.MK_GAS_EXEC_URL) ? window.MK_GAS_EXEC_URL
   : 'https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec';
 const WEBAPP_URL_DEAD_PREFIX = 'AKfycbzc';
@@ -6129,43 +6094,6 @@ function renderVrankSection(locacoes) {
   section.style.display = 'block';
 }
 
-// ── Ranking na tabela do Dashboard ─────────────────────────
-function renderDashVehRank(fatPorVeiculo) {
-  const tbody = document.getElementById('dash-veh-rank-body');
-  if (!tbody || !fatPorVeiculo) return;
-
-  const veiculos = Object.keys(fatPorVeiculo).sort();
-  if (!veiculos.length) {
-    tbody.innerHTML = '<tr><td colspan="4" style="color:var(--txt3);font-size:12px;padding:8px 0">Sem dados este mês</td></tr>';
-    return;
-  }
-
-  const total = veiculos.reduce((acc, v) => acc + fatPorVeiculo[v], 0);
-  // Ordena por faturamento
-  veiculos.sort((a, b) => fatPorVeiculo[b] - fatPorVeiculo[a]);
-
-  tbody.innerHTML = veiculos.map((v, i) => {
-    const fat    = fatPorVeiculo[v] || 0;
-    const pct    = total > 0 ? (fat / total * 100) : 0;
-    const tipoV  = v.startsWith('Carro') ? 'Carro' : v.startsWith('Triciclo') ? 'Triciclo' : 'Pelúcia';
-    const clr    = tipoCor(tipoV);
-    return `<tr>
-      <td style="font-weight:800;color:var(--txt3);width:20px">${i + 1}</td>
-      <td style="font-weight:700">${tipoIcon(tipoV)} ${v}</td>
-      <td style="font-weight:700">R$${fat.toFixed(0)}</td>
-      <td>
-        <div class="veh-bar-wrap">
-          <div class="veh-bar-bg">
-            <div class="veh-bar-fill" style="width:${pct.toFixed(0)}%;background:${clr}"></div>
-          </div>
-          <span class="veh-pct">${pct.toFixed(0)}%</span>
-        </div>
-      </td>
-    </tr>`;
-  }).join('');
-}
-
-
 // ADMIN — Estado, PIN, Timeout
 // ═══════════════════════════════════════════════════════════
 let isAdmin         = false;
@@ -6174,7 +6102,7 @@ const ADMIN_IDLE_SEC = 60 * 60; // 1 hora sem atividade (alinha com mk-auth)
 let adminCountdown  = ADMIN_IDLE_SEC;
 let kpiData         = null;
 let chartsRendered  = false;
-let chartDiario=null,chartExtrasDia=null,chartHistExt=null,chartTipo=null,chartPlano=null,chartHoras=null;
+let chartDiario=null,chartExtrasDia=null,chartHistExt=null,chartHoras=null;
 const HIST_CACHE_TTL_MS = 120000;
 const ADMIN_PIN     = '1416';
 let pinBuffer       = '';
@@ -6282,9 +6210,7 @@ function adminLogout() {
   });
   hideAdminSidebar();
   statsHoje.fat = 0;
-  const kpiEl = document.getElementById('admin-home-kpis');
   const chipEl = document.getElementById('admin-home-chip');
-  if (kpiEl) { kpiEl.style.display = 'none'; kpiEl.hidden = true; }
   if (chipEl) chipEl.hidden = true;
   if (typeof showAdminHomeKpis === 'function') showAdminHomeKpis(null);
   try { localStorage.removeItem('mk_inicio_cache'); } catch(e) {}
@@ -6561,9 +6487,7 @@ function atualizarSemanaDetalhe_(sem, d) {
 function renderCharts(d) {
   if (typeof renderSemanasChart_ === 'function') renderSemanasChart_(d);
   if (!window.Chart) return;
-  [chartDiario, chartExtrasDia, chartTipo, chartPlano, chartHoras].forEach(c => c && c.destroy());
-  if (window.chartVeiculo) window.chartVeiculo.destroy();
-  if (window.chartPagamento) window.chartPagamento.destroy();
+  [chartDiario, chartExtrasDia, chartHoras].forEach(c => c && c.destroy());
 
   const BLUE='#185FA5',PINK='#C2185B',GREEN='#3B6D11',AMBER='#BA7517',GRID='rgba(0,0,0,.06)';
   const PLAN_LABELS = {'10min':'10 min','20min':'20 min','30min':'30 min','40min':'40 min','60min':'1 hora','3h':'3 horas'};
@@ -6786,8 +6710,6 @@ function renderCharts(d) {
   const topPl = plOrder.filter(k=>pl[k]>0).reduce((a,b)=>(pl[b]||0)>(pl[a]||0)?b:a,'10min');
   const plInsEl = document.getElementById('nk-plano-insight');
   if (plInsEl && pl[topPl]) { plInsEl.style.display='block'; plInsEl.textContent = (PLAN_LABELS[topPl]||topPl)+' é o plano mais popular: '+pct2(pl[topPl],totPl)+'% do faturamento.'; }
-
-  chartTipo=null; chartPlano=null;
 
   // Pacote F — operador, cancelamentos, ocupação frota
   const ops = d.porOperador || [];
@@ -7726,9 +7648,12 @@ function renderEncHoje(list) {
   if (!section||!container) return;
   if (!encHojeData.length) { section.style.display='none'; return; }
   section.style.display='block';
+  const fin = mkExibirFinanceiro_();
+  const admSms = (typeof mkAuthIsAdmin === 'function' && mkAuthIsAdmin()) || window.isAdmin;
   container.innerHTML = encHojeData.map(e=>{
     const icon = tipoIcon(e.tipo);
-    const v = isAdmin ? `<div class="enc-valor">R$ ${Number(e.valorTotal).toFixed(2).replace('.',',')}</div>` : '';
+    const v = fin && e.valorTotal != null
+      ? `<div class="enc-valor">R$ ${Number(e.valorTotal).toFixed(2).replace('.',',')}</div>` : '';
     return `<div class="enc-item">
       <div class="enc-left">
         <div class="enc-crianca">${icon} ${escHtml(e.crianca)}</div>
@@ -7737,54 +7662,14 @@ function renderEncHoje(list) {
       <div class="enc-right">
         ${v}
         <div class="enc-horario">${e.horaInicio} → ${e.horaFim||'--:--'}</div>
-        ${isAdmin && e.telefone ? '<button class="enc-wa-btn" onclick=\'waAgradecimento(' + JSON.stringify(e).replace(/\'/g,"\\\'")+')\'>SMS agradecer</button>' : ''}
+        ${admSms && e.telefone ? '<button class="enc-wa-btn" onclick=\'waAgradecimento(' + JSON.stringify(e).replace(/\'/g,"\\\'")+')\'>SMS agradecer</button>' : ''}
       </div>
     </div>`;
   }).join('');
 }
 
 
-// ── FASE 7: Fechamento do Dia + Diagnóstico ───────────────────
-let _lastSyncMs = 0;  // timestamp da última sync bem-sucedida
-
-function atualizarFechamento(d) {
-  const R   = v => 'R$ ' + Math.round(Number(v)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-  const set = (id, v, cls) => {
-    const e = document.getElementById(id);
-    if (!e) return;
-    e.textContent = v;
-    if (cls) e.className = 'val ' + cls;
-  };
-  // KPIs do dia a partir dos dados do mês
-  const nHoje   = d.nHoje   || 0;
-  const fatHoje = d.fatHoje || 0;
-  const cusHoje = d.cusHoje || 0;
-  // CTO proporcional: CTO do mês ÷ dias operando × 1 dia
-  const diasOp  = d.diasOperando || 1;
-  const ctoHoje = diasOp > 0 ? Math.round((d.ctoPagar || 0) / Math.max(diasOp, 1)) : 0;
-  const resHoje = fatHoje - cusHoje - ctoHoje;
-
-  set('fch-nloc', nHoje + (nHoje === 1 ? ' locação' : ' locações'));
-  set('fch-fat',  R(fatHoje), 'blue');
-  set('fch-cus',  R(cusHoje));
-  set('fch-cto',  R(ctoHoje), 'amber');
-  const resEl = document.getElementById('fch-res');
-  if (resEl) {
-    resEl.textContent = R(resHoje);
-    resEl.className = 'val ' + (resHoje >= 0 ? 'green' : 'red');
-  }
-  // Alerta se faturamento hoje < média
-  const alertEl = document.getElementById('fch-alerta');
-  if (alertEl && (d.mediaDiaria || 0) > 0 && fatHoje < d.mediaDiaria * 0.7) {
-    alertEl.style.display = 'block';
-    alertEl.textContent = '⚠️ Faturamento hoje (' + R(fatHoje) + ') abaixo de 70% da média (' + R(d.mediaDiaria) + '/dia)';
-  } else if (alertEl) alertEl.style.display = 'none';
-
-  _lastSyncMs = Date.now();
-  atualizarDiagnostico();
-  if (typeof atualizarHubAdmin_ === 'function') atualizarHubAdmin_();
-}
-
+// ── Diagnóstico (Sistema) ─────────────────────────────────────
 function atualizarDiagnostico() {
   const sessions = (typeof _sessoes !== 'undefined' ? _sessoes : null) ||
                    (window.kpiData ? [] : []);
@@ -7845,53 +7730,6 @@ function atualizarDiagnostico() {
   }
 }
 
-function copiarFechamentoDia() {
-  const d = kpiData || {};
-  const R = v => 'R$ ' + Math.round(Number(v)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-  const diasOp  = d.diasOperando || 1;
-  const ctoHoje = Math.round((d.ctoPagar || 0) / Math.max(diasOp, 1));
-  const fatHoje = d.fatHoje || 0;
-  const cusHoje = d.cusHoje || 0;
-  const resHoje = fatHoje - cusHoje - ctoHoje;
-  const MESES   = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
-  const hoje    = new Date();
-  const data    = hoje.getDate() + '/' + MESES[hoje.getMonth()] + '/' + hoje.getFullYear();
-
-  const texto = [
-    '🚗 *Movi Kids — Fechamento do dia*',
-    '📅 ' + data,
-    '',
-    '📋 Locações: ' + (d.nHoje || 0),
-    '💰 Faturamento: ' + R(fatHoje),
-    '🧾 Custos: ' + R(cusHoje),
-    '🏢 CTO (est.): ' + R(ctoHoje),
-    '━━━━━━━━━━━━━━━',
-    (resHoje >= 0 ? '✅' : '⚠️') + ' Resultado: *' + R(resHoje) + '*',
-    '',
-    '📊 Acumulado mês: ' + R(d.fatMes || 0) + ' (' + (d.nMes || 0) + ' loc)',
-    '📈 Projeção mês: ' + R(d.projecaoFat || 0),
-    '',
-    '_Enviado pelo sistema Movi Kids_'
-  ].join('\n');
-
-  if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(texto).then(() => {
-      toast('Fechamento copiado.', 'success');
-    }).catch(() => copiarFallback(texto));
-  } else {
-    copiarFallback(texto);
-  }
-}
-
-function copiarFallback(texto) {
-  const ta = document.createElement('textarea');
-  ta.value = texto; ta.style.position = 'fixed'; ta.style.opacity = '0';
-  document.body.appendChild(ta); ta.focus(); ta.select();
-  try { document.execCommand('copy'); toast('Fechamento copiado!', 'success'); }
-  catch { toast('Não foi possível copiar — copie manualmente', 'error'); }
-  document.body.removeChild(ta);
-}
-
 // FIX 10: diagnóstico atualiza a cada 5s — só recalcula diff, sem GAS call
 // Frequência 5s: "Última sync: 3s atrás" → "8s atrás" → etc. em tempo real
 function atualizarHubAdmin_() {
@@ -7899,8 +7737,9 @@ function atualizarHubAdmin_() {
   const dia = document.getElementById('hub-dia-sub');
   const mes = document.getElementById('hub-mes-sub');
   if (d && d.ok) {
-    if (dia) dia.textContent = 'Hoje ' + R2(d.fatHoje) + ' · ' + (d.nHoje || 0) + ' loc.';
-    if (mes) mes.textContent = 'Mês ' + R2(d.fatMes) + ' · margem ' + (d.margem || 0) + '%';
+    const nHoje = d.nHoje || 0;
+    if (dia) dia.textContent = nHoje + (nHoje === 1 ? ' locação hoje' : ' locações hoje') + ' · conferência no caixa';
+    if (mes) mes.textContent = 'KPIs do mês, CTO e gestão avançada';
   }
   const gasOnline = typeof _syncFailCount !== 'undefined' && _syncFailCount === 0;
   const chip = document.getElementById('hub-status-txt');
@@ -7931,37 +7770,20 @@ setInterval(() => {
   if (typeof atualizarDiagnostico === 'function') atualizarDiagnostico();
 }, 5000);
 
+/** Pacote I — Home admin: só chip “Hoje → Caixa”; KPIs mensais ficam no Dashboard. */
 function showAdminHomeKpis(d) {
-  const el = document.getElementById('admin-home-kpis');
   const chip = document.getElementById('admin-home-chip');
-  const isAdmin = (typeof mkAuthIsAdmin === 'function' && mkAuthIsAdmin()) || window.isAdmin;
+  const isAdminView = (typeof mkAuthIsAdmin === 'function' && mkAuthIsAdmin()) || window.isAdmin;
   const homeOn = !!document.getElementById('page-home')?.classList.contains('active');
   const R = v => 'R$ ' + Number(v).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
   const set = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
-  if (!isAdmin || !d) {
-    if (el) { el.style.display = 'none'; el.hidden = true; el.classList.remove('visible'); }
+  if (!isAdminView || !d || !d.ok) {
     if (chip) chip.hidden = true;
     return;
   }
   if (chip) {
     chip.hidden = !homeOn;
-    if (homeOn) set('admin-chip-fat', R(d.fatHoje));
-  }
-  if (el && homeOn) {
-    el.style.display = '';
-    el.hidden = false;
-    el.classList.add('visible');
-    set('h-fathoje', R(d.fatHoje));
-    set('h-cushoje', R(d.cusHoje));
-    set('h-fatmes', R(d.fatMes));
-    set('h-nmes', (d.nMes || 0) + ' loc. no mês');
-    const res = (d.fatMes || 0) - (d.cusMes || d.cusHoje || 0);
-    set('h-resultado', R(res));
-    set('h-margem', 'margem ' + (d.margem || 0) + '%');
-  } else if (el) {
-    el.style.display = 'none';
-    el.hidden = true;
-    el.classList.remove('visible');
+    if (homeOn) set('admin-chip-fat', R(d.fatHoje || 0));
   }
   if (typeof atualizarHubAdmin_ === 'function') atualizarHubAdmin_();
 }
@@ -8192,7 +8014,7 @@ async function salvarLancamentoAvulso() {
 }
 
 </script>
-<script src="mk-update.js?v=1.7.39"></script>
+<script src="mk-update.js?v=1.7.40"></script>
 <script src="mk-auth.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', () => {

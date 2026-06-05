@@ -14,7 +14,7 @@ Referência única para alinhamento local × produção.
 ## ALERTA P0 (05/06/2026)
 
 **Nunca POST no `api()` do browser** — ver `INCIDENTE_POST_BROWSER_LANCAMENTO_2026-06-05.md`.  
-FE mínimo em operação: **v1.7.35** (recomendado **v1.7.39+**). Teste tablet obrigatório após mudança em `api()`.
+FE mínimo em operação: **v1.7.35** (recomendado **v1.7.40+**). Teste tablet obrigatório após mudança em `api()`.
 
 ---
 
@@ -22,7 +22,7 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.39+**). Teste tablet o
 
 | Camada | Versão alvo | URL / ID |
 |--------|-------------|----------|
-| **Frontend** | **v1.7.39** | https://ribocg-a11y.github.io/movikids/?force=1.7.39 |
+| **Frontend** | **v1.7.40** | https://ribocg-a11y.github.io/movikids/?force=1.7.40 |
 | **Apps Script** | **v1.5.53** | Deploy `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y` |
 | SMS Gateway Cloud | **DJVJRL** / device `wihWegHr4wXaVJQ1R-GZR` | Aparelho remoto ONLINE |
 | Pacote SMS P0 | **FECHADO** | `PACOTE_SMS_P0_UNIFICADO_v1.5.38_v1.7.11.md` |
@@ -111,8 +111,8 @@ Commits de referência: `3d9d106` (v1.7.25), `e1a56db` (Pacote E), `1454bc8` (fi
 - [x] **Pacote E — POST + auditoria plena** — **v1.7.26** + GAS **v1.5.44**
 - [x] **Limpeza testes** — planilha + auto-cleanup nos scripts
 - [x] **Pacote F — KPIs avançados** — **v1.7.38** + GAS **v1.5.48–1.5.52** (Dashboard 5 blocos + PDF Gestão Avançada)
-- [ ] **Pacote I — Sanitização gestão** ← **próximo** (ver `PLANO_PAUSA_MATURIDADE_2026-06.md`)
-- [ ] Pacote G — Portal responsável
+- [x] **Pacote I — Sanitização gestão** — **v1.7.40** (Home enxuta, hub sem KPIs duplicados)
+- [ ] **Pacote G — Portal responsável** ← **próximo**
 - [ ] Pacote H — Config amigável
 - [ ] Pacote J — Travas CI
 - [ ] Fase 4 WhatsApp (após I+G)
@@ -125,8 +125,8 @@ Commits de referência: `3d9d106` (v1.7.25), `e1a56db` (Pacote E), `1454bc8` (fi
 
 | # | Pacote | Status | Alvo |
 |---|--------|--------|------|
-| 1 | **I — Sanitização gestão** | **próximo** | FE v1.7.40 — uma métrica, um lugar |
-| 2 | G — Portal responsável | pendente | `acompanhar.html` + QR |
+| 1 | **I — Sanitização gestão** | **concluído** | FE v1.7.40 — uma métrica, um lugar |
+| 2 | **G — Portal responsável** | **próximo** | `acompanhar.html` + QR |
 | 3 | H — Config amigável | pendente | frota/preços sem JSON |
 | 4 | J — Travas CI | pendente | pre-push + guard POST |
 | 5 | F4 WhatsApp | pendente | após I e G |
@@ -153,16 +153,34 @@ Commits de referência: `3d9d106` (v1.7.25), `e1a56db` (Pacote E), `1454bc8` (fi
 - Tile Caixa de hoje → página Caixa
 - Operador na Home **sem** KPIs financeiros; editar/cancelar/plano liberados (F9 pausada)
 
+### Pacote I — sanitização gestão (v1.7.40)
+
+- Home admin: removidos grid KPI mensal e ranking; só chip **Hoje: R$ X → Caixa**
+- Hub admin: subtítulos sem R$ duplicado; chip **Online · app vX**
+- Sistema: fechamento/copiar resumo removidos → atalho para **Caixa do dia**
+- Dashboard: único lugar de KPIs do mês + gestão avançada; código legado removido
+- Caixa: fechamento detalhado + copiar resumo (canônico)
+
+### Mapa canônico de métricas (Pacote I)
+
+| Métrica | Onde |
+|---------|------|
+| Faturamento **hoje** (detalhe) | **Caixa** |
+| Chip “Hoje” na Home admin | Atalho → Caixa |
+| Faturamento **mês**, CTO, gestão avançada | **Dashboard** |
+| Ativas / encerradas hoje (contagem) | **Home** stats-bar |
+| Diagnóstico técnico | **Sistema** |
+
 ---
 
 ## Validação rápida (pós-deploy)
 
-1. Ping GAS → `ok:true`, `versao:v1.5.52`
-2. Tablet → `?force=1.7.38`, rodapé **Online v1.7.38**
-3. Login operador → Home **sem** KPIs financeiros; drawer **Editar/Cancelar** visível
-4. Login admin → Dashboard → **Gestão avançada do mês** (5 blocos)
-5. `buscarKPIsAdmin` retorna `porOperador`, `cancelamentos`, `ocupacaoFrota`, `cusPorCategoria`, `recorrenciaClientes`
-6. Relatório → Ver → preview com **Gestão Avançada**
+1. Ping GAS → `ok:true`, `versao:v1.5.53`
+2. Tablet → `?force=1.7.40`, rodapé **Online v1.7.40**
+3. Login operador → Home **sem** valores em R$; drawer **Editar/Cancelar** visível
+4. Login admin → Home só chip “Hoje → Caixa”; Dashboard com KPIs do mês
+5. Caixa → fechamento completo + **Copiar fechamento**
+6. `buscarKPIsAdmin` retorna campos Pacote F (readonly)
 
 Scripts: `TESTE_PACOTE_F_KPI_READONLY.ps1`, `TESTE_REGRESSAO_MOVIKIDS_PROD_SAFE.ps1`, `TESTE_DRAWER_E_PACOTE_E.ps1`
 
