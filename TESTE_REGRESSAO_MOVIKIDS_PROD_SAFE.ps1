@@ -96,6 +96,23 @@ try {
   Assert-Ok $ativas "listarAtivas"
   Add-Check "listarAtivas" "ok" ("total={0}" -f $ativas.total)
 
+  try {
+    $parityScript = Join-Path $PSScriptRoot "TESTE_PARIDADE_HTTP_BROWSER_GAS.ps1"
+    if (Test-Path $parityScript) {
+      $parityJson = & powershell -NoProfile -File $parityScript -BaseUrl $BaseUrl | Out-String
+      $parity = $parityJson | ConvertFrom-Json
+      if ($parity.status -eq "ok") {
+        Add-Check "paridade HTTP browser" "ok" "curl POST != JSON; GET ok"
+      } else {
+        Add-Check "paridade HTTP browser" "warn" ($parity.error)
+      }
+    } else {
+      Add-Check "paridade HTTP browser" "skipped" "script ausente"
+    }
+  } catch {
+    Add-Check "paridade HTTP browser" "warn" $_.Exception.Message
+  }
+
   if ($RunWriteTests) {
     $script:RunCleanupAfter = $true
     $stamp = Get-Date -Format "HHmmss"

@@ -52,7 +52,8 @@ https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPe
 |--------|---------|
 | **v1.7.24** | Pacote D — drawer unificado Encerrar / Estender / Editar / Cancelar |
 | **v1.7.25** | Fix busca cliente passo Quem + checkbox ADM offline encerrar |
-| **v1.7.26** | Pacote E — escritas críticas via POST JSON + operador obrigatório no GAS |
+| **v1.7.26** | Pacote E — tentativa POST JSON no FE (revertido v1.7.34 — POST quebra no tablet) |
+| **v1.7.34** | Fix I15 — `api()` usa GET no browser para as 5 escritas críticas |
 | **GAS v1.5.44** | `doPost` JSON; operador obrigatório nas 5 escritas |
 | **GAS v1.5.45** | `limparLocacoesTesteAdmin` — anula locações de teste |
 | **v1.7.27** + **GAS v1.5.46** | **Pacote F (início)** — KPIs operador, cancelamentos, ocupação frota no Dashboard |
@@ -69,6 +70,8 @@ Commits de referência: `3d9d106` (v1.7.25), `e1a56db` (Pacote E), `1454bc8` (fi
 | Sem extras fantasmas com GAS offline | frontend v1.7.6 + `somentePlano` no GAS |
 | Nunca `clasp deploy` | `REGRAS_DE_PUBLICACAO_SEGURA.md` Regra 8 |
 | Cache / URL GAS | `mk-version.js`, `gas-endpoint.json` |
+| Escritas no tablet = GET | `api()` v1.7.34+; ver Regra 6 em `REGRAS_DE_PUBLICACAO_SEGURA.md` |
+| Paridade HTTP nos testes | `TESTE_PARIDADE_HTTP_BROWSER_GAS.ps1` (readonly) |
 | Dados financeiros só ADM | GAS v1.5.43 + frontend v1.7.18+ |
 | Testes não poluem caixa | `limparLocacoesTesteAdmin` + cleanup scripts |
 

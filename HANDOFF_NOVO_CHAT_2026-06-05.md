@@ -158,6 +158,7 @@ C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\m
 | I12 | URL GAS morta em script teste | `TESTE_RELACIONAMENTO` falhava | URL `AKfycbwakQ...` | commit 1454bc8 |
 | I13 | `listarAtivas` antes de encerrar | Falso negativo por concorrência | Verificar row Ativa antes de encerrar | TESTE_DRAWER_E |
 | I14 | Ping desatualizado no `.gs` | Produção mostra versão antiga após push | Atualizar `ping_()` + Nova versão Web | v1.5.46 |
+| I15 | Pacote E POST no FE (`v1.7.26`–`v1.7.33`) | Lançamento/encerrar/editar quebram no tablet (`Failed to fetch`) | FE v1.7.34: escritas via GET no browser; `TESTE_PARIDADE_HTTP_BROWSER_GAS.ps1` | v1.7.34 |
 
 ### Aprendizados operacionais (não repetir)
 

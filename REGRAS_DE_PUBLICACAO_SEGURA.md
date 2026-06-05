@@ -109,7 +109,26 @@ Quando o pacote for Apps Script:
 - validar `ping` apos reimplantacao;
 - evitar escrita de teste em operacao, salvo janela aprovada.
 
-## Regra 6 - Auditoria Dos Meus Proprios Erros
+## Regra 6 - Paridade HTTP Browser vs Scripts (GAS Web App)
+
+O Apps Script Web App publicado em `script.google.com/macros/s/.../exec` responde **302** em requisicoes **POST**. No **tablet/navegador** (`fetch` com `redirect: follow`):
+
+- o corpo JSON do POST se perde ou a preflight CORS falha (`Failed to fetch`);
+- **GET** com query string continua funcionando.
+
+### Regras obrigatorias da camada `api()` no frontend
+
+- Escritas criticas no balcao (`salvarLocacao`, `editarLocacao`, `cancelarLocacao`, `encerrarLocacao`, `estenderLocacao`) devem usar **GET** no browser ate existir endpoint POST compativel com CORS sem redirect 302.
+- Nunca ativar POST no FE apenas porque `ping.postWriteActions` existe no GAS (Pacote E backend).
+- `Invoke-RestMethod -Method Post` nos scripts `.ps1` **nao prova** o tablet — cliente HTTP diferente.
+
+### Matriz minima antes de publicar mudanca em `api()`
+
+- Rodar `TESTE_PARIDADE_HTTP_BROWSER_GAS.ps1` (readonly).
+- Se alterou lancamento/encerrar: validar no tablet real ou emulador **Nova locacao → salvar** (nao so regressao PowerShell).
+- Mensagem de erro no balcao deve distinguir: sem operador logado vs falha de rede vs resposta nao-JSON.
+
+## Regra 7 - Auditoria Dos Meus Proprios Erros
 
 Erros cometidos neste projeto que nao devem se repetir:
 
@@ -120,7 +139,8 @@ Erros cometidos neste projeto que nao devem se repetir:
 - mexer em cache/versionamento sem validar efeito em tela ja aberta;
 - deixar documento antigo contradizer hotfix novo;
 - entregar mudanca sem regra de rollback curta;
-- fazer verificacao parcial e chamar de validacao completa.
+- fazer verificacao parcial e chamar de validacao completa;
+- validar POST ao GAS so com PowerShell e declarar tablet OK (incidente 05/06/2026, Pacote E).
 
 Toda regressao deve gerar:
 
@@ -131,7 +151,7 @@ Toda regressao deve gerar:
 - como validar;
 - como voltar atras.
 
-## Regra 7 - Resumo Obrigatorio Depois De Cada Pacote
+## Regra 8 - Resumo Obrigatorio Depois De Cada Pacote
 
 Toda resposta depois de publicar deve conter:
 
@@ -147,7 +167,7 @@ Toda resposta depois de publicar deve conter:
 
 Se algum desses itens faltar, a entrega nao esta completa.
 
-## Regra 8 - GAS: proibido `clasp deploy`
+## Regra 9 - GAS: proibido `clasp deploy`
 
 Em 04/06/2026 o comando **`clasp deploy`** (feito pelo agente Cursor) quebrou a URL Web antiga e gerou **404 / Failed to fetch** + cobrança de “tempo extra” fantasma no caixa.
 
