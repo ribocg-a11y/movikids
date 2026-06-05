@@ -1,5 +1,6 @@
 param(
   [string]$BaseUrl = "https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec",
+  [string]$AdminPin = "1416",
   [switch]$RunWriteTests
 )
 
@@ -145,23 +146,23 @@ try {
     }
     Add-Check "listarAtivas pendente" "ok" ("rowIndex={0}" -f $loc.rowIndex)
 
-    $editar = Invoke-MoviApi @{
+    $adminOp = Get-MoviAdminSupervisorParams -AdminPin $AdminPin
+    $editar = Invoke-MoviApi (@{
       action = "editarLocacao"
       rowIndex = $loc.rowIndex
       responsavel = "TESTE_CODEX_EDITADO"
       pagamento = "Dinheiro"
       observacao = "Teste regressao editado antes de iniciar"
-      operador = "TESTE_CODEX"
-    }
+      motivo = "Teste regressao editar pendente"
+    } + $adminOp)
     Assert-Ok $editar "editarLocacao"
-    Add-Check "editarLocacao pendente" "ok" "pagamento=Dinheiro"
+    Add-Check "editarLocacao pendente" "ok" "pagamento=Dinheiro (admin)"
 
-    $cancelar = Invoke-MoviApi @{
+    $cancelar = Invoke-MoviApi (@{
       action = "cancelarLocacao"
       rowIndex = $loc.rowIndex
       motivo = "Teste regressao Codex sem iniciar timer"
-      operador = "TESTE_CODEX"
-    }
+    } + $adminOp)
     Assert-Ok $cancelar "cancelarLocacao"
     if ($cancelar.locacao.status -ne "Cancelada") { throw "Cancelamento retornou status $($cancelar.locacao.status)" }
     Add-Check "cancelarLocacao" "ok" ("id={0}" -f $cancelar.locacao.id)

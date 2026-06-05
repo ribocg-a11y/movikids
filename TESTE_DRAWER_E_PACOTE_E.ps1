@@ -1,6 +1,7 @@
 param(
   [string]$BaseUrl = "https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec",
   [string]$Operador = "TESTE_CODEX",
+  [string]$AdminPin = "1416",
   [switch]$UseGetFallback
 )
 
@@ -86,7 +87,8 @@ try {
 
   $stamp = Get-Date -Format "HHmmss"
   $nomeTeste = "DRAWER_E_$stamp"
-  $op = @{ operador = $Operador }
+  $op = Get-MoviOperadorParams -Operador $Operador
+  $adminOp = Get-MoviAdminSupervisorParams -AdminPin $AdminPin
 
   # Pendente — drawer: Editar/Cancelar ok; Encerrar/Estender desabilitados (UI)
   $salvar = Invoke-MoviApi (@{
@@ -99,7 +101,7 @@ try {
 
   $editar = Invoke-MoviApi (@{
     action = "editarLocacao"; rowIndex = $salvar.rowIndex; responsavel = "TESTE_EDIT"; motivo = "Teste drawer editar"
-  } + $op) (Write-Method "editarLocacao")
+  } + $adminOp) (Write-Method "editarLocacao")
   Assert-Ok $editar "editarLocacao pendente"
   Add-Check "editar pendente" "ok" $editar.locacao.responsavel
 
@@ -138,7 +140,7 @@ try {
 
   $cancelar = Invoke-MoviApi (@{
     action = "cancelarLocacao"; rowIndex = $salvar2.rowIndex; motivo = "Teste drawer cancelar Pacote E"
-  } + $op) (Write-Method "cancelarLocacao")
+  } + $adminOp) (Write-Method "cancelarLocacao")
   Assert-Ok $cancelar "cancelarLocacao"
   if ($cancelar.locacao.status -ne "Cancelada") { throw "Cancelamento nao retornou Cancelada" }
   Add-Check "cancelar pendente" "ok" $cancelar.locacao.status

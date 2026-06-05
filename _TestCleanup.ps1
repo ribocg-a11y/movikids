@@ -1,6 +1,24 @@
 # Limpeza pos-teste: remove locacoes de teste do caixa (Encerrada -> Cancelada + valores zerados).
 # Tenta GAS limparLocacoesTesteAdmin (v1.5.45+); senao usa script Node na planilha.
 
+function Get-MoviOperadorParams {
+  param([string]$Operador = "TESTE_CODEX")
+  return @{ operador = $Operador }
+}
+
+# Fase 9: editar/cancelar exigem supervisor ou admin no GAS.
+function Get-MoviAdminSupervisorParams {
+  param(
+    [string]$AdminPin = "1416",
+    [string]$Operador = "Administrador"
+  )
+  return @{
+    operador = $Operador
+    authRole = "admin"
+    adminPin = $AdminPin
+  }
+}
+
 function Invoke-MoviTestCleanup {
   param(
     [string]$BaseUrl = "https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec",
