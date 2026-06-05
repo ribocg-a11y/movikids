@@ -3902,9 +3902,14 @@ function isLocacaoTeste_(crianca, responsavel, telefone, observacao) {
   if (/^TESTE_CODEX/i.test(c)) return true;
   if (/^TESTE_CODEX/i.test(r)) return true;
   if (r === 'TESTE_EDIT' || r === 'TESTE') return true;
+  if (/^Teste/i.test(r)) return true;
   if (r === 'X' && c === 'Y') return true;
+  if (/^9899999/.test(t)) return true;
   if (t === '98999999999' || t === '98999999998') return true;
+  if (/^(BT|BrowserTest|DebugTest|ParityTest|OperadorTeste|TestOp)$/i.test(r)) return true;
+  if (/^(C|P)$/i.test(c) && /^9899999/.test(t)) return true;
   if (o.indexOf('[TESTE]') >= 0 || o.indexOf('TESTE_CODEX') >= 0) return true;
+  if (o.indexOf('[ANULADO TESTE ADM]') >= 0) return false;
   return false;
 }
 
