@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.52
+// MOVI KIDS — Google Apps Script v1.5.53
+// v1.5.53: SMS — GENERIC_FAILURE do Android nao marca Failed definitivo; recheck + downgrade se passou Sent
 // v1.5.52: Fase 9 em pausa — operador logado volta a editar/cancelar locacao (supervisor nao restringe balcao)
 // v1.5.51: KPI porSemana — comparativo interativo com melhor dia e insights por semana
 // v1.5.50: Fase 8 — validacao frota/preços via operacaoConfig_; salvarOperacaoConfigAdmin
@@ -324,9 +325,9 @@ function ping_() {
   const agora = new Date();
   return resp_({
     status:  'online',
-    versao:  'v1.5.52',
+    versao:  'v1.5.53',
     timestamp: fmtData_(agora) + ' ' + fmtHoraLocal_(agora),
-    sistema: 'MOVI KIDS v1.5.52',
+    sistema: 'MOVI KIDS v1.5.53',
     postWriteActions: WRITE_ACTIONS_CRITICAS_
   });
 }
@@ -1481,7 +1482,7 @@ function carregarInicio_(p) {
 
   const opCfg = operacaoConfig_();
   const resultado = resp_({
-    sistema:    'MOVI KIDS v1.5.52',
+    sistema:    'MOVI KIDS v1.5.53',
     timestamp:  dataHoje + ' ' + fmtHoraLocal_(hoje),
     ativos:     ativas,
     statsHoje,
@@ -2711,7 +2712,7 @@ function consultarSmsGateway_(gatewayId) {
     throw new Error('SMS Gateway status HTTP ' + code + ': ' + body);
   }
   const rec = parsed.recipients && parsed.recipients.length ? parsed.recipients[0] : {};
-  return {
+  const base = {
     code,
     gatewayId: parsed.id || id,
     state: parsed.state || rec.state || '',
@@ -2719,6 +2720,41 @@ function consultarSmsGateway_(gatewayId) {
     telefoneHash: rec.phoneNumber || '',
     raw: parsed
   };
+  const norm = normalizarEstadoSmsGateway_(base);
+  base.state = norm.state;
+  base.error = norm.error;
+  if (norm.suspectFail) base.suspectFail = true;
+  return base;
+}
+
+/** Android SmsManager pode retornar GENERIC_FAILURE mesmo com SMS entregue (falso positivo). */
+function smsErroFalsoPositivoGateway_(error) {
+  const e = String(error || '').toLowerCase();
+  return e.indexOf('generic_failure') >= 0 || e.indexOf('generic failure') >= 0 ||
+         e.indexOf('result_error_generic') >= 0;
+}
+
+function smsEstadosHistoricoGateway_(raw) {
+  const out = [];
+  if (!raw || typeof raw !== 'object') return out;
+  if (Array.isArray(raw.states)) raw.states.forEach(function(s) { out.push(String(s)); });
+  const rec = raw.recipients && raw.recipients[0];
+  if (rec && Array.isArray(rec.states)) rec.states.forEach(function(s) { out.push(String(s)); });
+  return out;
+}
+
+function normalizarEstadoSmsGateway_(status) {
+  const state = String(status.state || '').trim();
+  const error = String(status.error || '').trim();
+  if (state.toLowerCase() !== 'failed' || !smsErroFalsoPositivoGateway_(error)) {
+    return { state: state, error: error };
+  }
+  const hist = smsEstadosHistoricoGateway_(status.raw);
+  const passouSent = hist.some(function(s) { return s.toLowerCase() === 'sent'; });
+  if (passouSent) {
+    return { state: 'Delivered', error: '', suspectFail: true };
+  }
+  return { state: 'Sent', error: '', suspectFail: true };
 }
 
 const SMS_DEDUP_MIN_ = {
@@ -3127,7 +3163,8 @@ function consultarSmsStatus_(p) {
         state: status.state,
         error: status.error,
         telefoneHash: status.telefoneHash,
-        code: status.code
+        code: status.code,
+        suspectFail: !!status.suspectFail
       }
     });
   } catch(ex) {

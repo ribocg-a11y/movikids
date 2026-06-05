@@ -69,13 +69,13 @@
   } catch(e) {}
 })();
 </script>
-<script src="mk-version.js?v=1.7.38"></script>
+<script src="mk-version.js?v=1.7.39"></script>
 <link rel="stylesheet" href="mk-design.css">
 
 <script>
 // ── CACHE BUSTER — alinhado a mk-version.js / APP_VERSION ──
 (function(){
-  const CURRENT = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.38';
+  const CURRENT = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.39';
   const KEY = 'mk_loaded_version';
   function mkVerParts_(v) {
     return String(v || '0.0').split('.').map(function(n) { return parseInt(n, 10) || 0; });
@@ -2885,7 +2885,7 @@ header{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.38';
+const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.39';
 const WEBAPP_URL = (typeof window !== 'undefined' && window.MK_GAS_EXEC_URL) ? window.MK_GAS_EXEC_URL
   : 'https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec';
 const WEBAPP_URL_DEAD_PREFIX = 'AKfycbzc';
@@ -2942,8 +2942,11 @@ const NOVA_DRAFT_KEY = 'mk_nova_locacao_draft_v1';
 const WA_EVENT_LOG_KEY = 'mk_wa_event_log_v1';
 /* operador/sessao: mk-auth.js */
 const WA_MODE_KEY = 'mk_whatsapp_mode_v1';
-const SMS_CHECK_DELAYS = [15000, 60000, 180000, 300000];
+const SMS_CHECK_DELAYS = [15000, 60000, 180000, 300000, 420000, 600000];
+const SMS_RECHECK_EXTRA_MS = [120000, 300000, 600000];
 const SMS_UNCONFIRMED_MS = 5 * 60 * 1000;
+const SMS_FAIL_CONFIRM_CHECKS = 6;
+const SMS_GENERIC_FAIL_RE = /generic.failure|generic_failure|result_error_generic/i;
 let _restoringNovaDraft = false;
 let catSel      = 'Energia';
 let custosHoje  = [];
@@ -3470,7 +3473,7 @@ function mergeSessaoCanonica(serverSession, localSession = {}) {
     alertFiredExp: Boolean(localSession.alertFiredExp) || Boolean(serverSession.smsFlags && serverSession.smsFlags.esgotado),
     extraWaSentAt: localSession.extraWaSentAt || localStorage.getItem(extraWaKey_(serverSession)) ||
       (serverSession.smsFlags && serverSession.smsFlags.esgotado ? Date.now() : null),
-    smsStatus: serverSession.smsStatus || localSession.smsStatus || null,
+    smsStatus: higienizarSmsStatusSessao_(serverSession.smsStatus || localSession.smsStatus || null),
     smsFlags: serverSession.smsFlags || localSession.smsFlags || null
   };
 }
@@ -3612,9 +3615,45 @@ function marcarExtraWaEnviado_(s) {
   saveSessions();
 }
 
+function smsErroFalsoPositivo_(error) {
+  return SMS_GENERIC_FAIL_RE.test(String(error || ''));
+}
+
+function higienizarSmsStatusSessao_(sms) {
+  if (!sms || !sms.gatewayId || sms.manualOk) return sms;
+  const st = String(sms.state || '').toLowerCase();
+  if (st === 'failed' && (smsErroFalsoPositivo_(sms.error) || !sms.error)) {
+    const checks = Number(sms.checks || 0);
+    if (checks >= SMS_FAIL_CONFIRM_CHECKS) {
+      return Object.assign({}, sms, { state: 'Sent', error: '', suspectFail: true });
+    }
+    return Object.assign({}, sms, { state: 'Verifying', suspectFail: true });
+  }
+  return sms;
+}
+
+/** Estado exibido — recheck antes de mostrar Falha SMS (GENERIC_FAILURE costuma ser falso positivo). */
+function smsStatusEfetivo_(sms) {
+  if (!sms) return '';
+  const raw = String(sms.state || '');
+  const st = raw.toLowerCase();
+  if (st === 'failed' && smsErroFalsoPositivo_(sms.error)) {
+    const checks = Number(sms.checks || 0);
+    const sentAt = Number(sms.sentAt || sms.updatedAt || 0);
+    const age = sentAt ? Date.now() - sentAt : 0;
+    if (checks < SMS_FAIL_CONFIRM_CHECKS && age < 900000) return 'Verifying';
+    return 'Sent';
+  }
+  if (st === 'failed' && sms.suspectFail) return 'Sent';
+  const sentAt = Number(sms.sentAt || sms.updatedAt || 0);
+  if (sentAt && !smsStatusFinal_(raw) && (Date.now() - sentAt > SMS_UNCONFIRMED_MS)) return 'Unconfirmed';
+  return raw;
+}
+
 function smsStatusLabel_(state) {
   const st = String(state || '').toLowerCase();
   if (st === 'delivered') return { cls:'ok', txt:'Entregue SMS' };
+  if (st === 'verifying') return { cls:'wait', txt:'Confirmando SMS...' };
   if (st === 'failed') return { cls:'err', txt:'Falha SMS' };
   if (st === 'unconfirmed') return { cls:'sent', txt:'SMS sem confirmacao' };
   if (st === 'sent') return { cls:'sent', txt:'SMS enviado' };
@@ -3623,22 +3662,30 @@ function smsStatusLabel_(state) {
   return { cls:'wait', txt:'SMS pendente' };
 }
 
+function smsFalhaReal_(sms) {
+  const eff = smsStatusEfetivo_(sms);
+  return String(eff).toLowerCase() === 'failed';
+}
+
 function smsStatusHtml_(s) {
   const sms = s && s.smsStatus;
   if (!sms || !sms.gatewayId) return '';
-  const sentAt = Number(sms.sentAt || sms.updatedAt || 0);
-  const state = sentAt && !smsStatusFinal_(sms.state) && (Date.now() - sentAt > SMS_UNCONFIRMED_MS)
-    ? 'Unconfirmed'
-    : sms.state;
+  const state = smsStatusEfetivo_(sms);
   const label = smsStatusLabel_(state);
   const title = sms.error ? ' title="' + escHtml(sms.error) + '"' : '';
-  const failed = String(state || '').toLowerCase() === 'failed';
-  const errTxt = sms.error ? (' Detalhe: ' + escHtml(String(sms.error).slice(0, 120))) : '';
+  const failed = smsFalhaReal_(sms);
+  const errTxt = failed && sms.error ? (' Detalhe: ' + escHtml(String(sms.error).slice(0, 120))) : '';
   const fallback = failed
     ? '<div class="sms-fail-hint">Confirme o telefone (DDD+9) ou mostre o QR do portal no balcão.' + errTxt + '</div>' +
-      '<button class="btn btn-wa" onclick="abrirWhatsAppFallback(' + Number(s.rowIndex || 0) + ')" title="Abrir WhatsApp como alternativa">WhatsApp fallback</button>'
+      '<button class="btn btn-wa" onclick="abrirWhatsAppFallback(' + Number(s.rowIndex || 0) + ')" title="Abrir WhatsApp como alternativa">WhatsApp fallback</button>' +
+      '<button class="btn btn-secondary" style="margin-top:6px;font-size:11px" onclick="confirmarSmsRecebido_(' + Number(s.rowIndex || 0) + ')" title="Operador confirmou que o SMS chegou">SMS chegou — limpar aviso</button>'
     : '';
   return '<div class="sms-status sms-' + label.cls + '"' + title + '>' + label.txt + '</div>' + fallback;
+}
+
+function confirmarSmsRecebido_(rowIndex) {
+  atualizarSmsStatusLocal_(rowIndex, { state: 'Delivered', error: '', suspectFail: false, manualOk: true });
+  toast('SMS confirmado pelo balcão.', 'success');
 }
 
 function atualizarSmsStatusLocal_(rowIndex, patch) {
@@ -3658,7 +3705,20 @@ function agendarConsultaSms_(rowIndex, gatewayId, delays) {
 
 function smsStatusFinal_(state) {
   const st = String(state || '').toLowerCase();
-  return st === 'delivered' || st === 'failed';
+  return st === 'delivered' || st === 'failed' || st === 'sent';
+}
+
+function smsPrecisaRecheck_(sms) {
+  if (!sms || !sms.gatewayId || sms.manualOk) return false;
+  const rawSt = String(sms.state || '').toLowerCase();
+  if (rawSt === 'failed') {
+    if (!sms.error || smsErroFalsoPositivo_(sms.error)) return true;
+    return Number(sms.checks || 0) < SMS_FAIL_CONFIRM_CHECKS;
+  }
+  const eff = smsStatusEfetivo_(sms);
+  const effSt = String(eff).toLowerCase();
+  if (effSt === 'verifying') return true;
+  return !smsStatusFinal_(eff);
 }
 
 function reconsultarSmsPendentes_() {
@@ -3667,12 +3727,16 @@ function reconsultarSmsPendentes_() {
   _smsStatusSweepAt = now;
   sessions.forEach(s => {
     const sms = s && s.smsStatus;
-    if (!sms || !sms.gatewayId || smsStatusFinal_(sms.state)) return;
+    if (!smsPrecisaRecheck_(sms)) return;
     const last = Number(sms.updatedAt || sms.sentAt || 0);
     const sentAt = Number(sms.sentAt || last || now);
     const checks = Number(sms.checks || 0);
-    if (checks >= 8) {
-      if (now - sentAt > SMS_UNCONFIRMED_MS) atualizarSmsStatusLocal_(s.rowIndex, { state:'Unconfirmed' });
+    if (checks >= 12) {
+      if (String(sms.state || '').toLowerCase() === 'failed' && smsErroFalsoPositivo_(sms.error)) {
+        atualizarSmsStatusLocal_(s.rowIndex, { state: 'Sent', error: '', suspectFail: true });
+      } else if (now - sentAt > SMS_UNCONFIRMED_MS) {
+        atualizarSmsStatusLocal_(s.rowIndex, { state: 'Unconfirmed' });
+      }
       return;
     }
     if (!last || now - last >= 45000) consultarSmsStatusSessao_(s.rowIndex, sms.gatewayId);
@@ -3682,7 +3746,9 @@ function reconsultarSmsPendentes_() {
 async function consultarSmsStatusSessao_(rowIndex, gatewayId) {
   if (!gatewayId || gatewayId.length < 8) return null;
   const atual = sessions.find(x => Number(x.rowIndex) === Number(rowIndex));
-  if (atual && atual.smsStatus && smsStatusFinal_(atual.smsStatus.state)) return atual.smsStatus;
+  if (atual && atual.smsStatus && atual.smsStatus.manualOk) return atual.smsStatus;
+  if (atual && atual.smsStatus && smsStatusFinal_(smsStatusEfetivo_(atual.smsStatus)) &&
+      !smsErroFalsoPositivo_(atual.smsStatus.error)) return atual.smsStatus;
   try {
     const d = await api({
       action: 'consultarSmsStatus',
@@ -3696,15 +3762,33 @@ async function consultarSmsStatusSessao_(rowIndex, gatewayId) {
     const sms = d.sms || {};
     const anterior = sessions.find(x => Number(x.rowIndex) === Number(rowIndex));
     const checks = Number((anterior && anterior.smsStatus && anterior.smsStatus.checks) || 0) + 1;
-    const s = atualizarSmsStatusLocal_(rowIndex, {
+    let state = sms.state || 'Pending';
+    let error = sms.error || '';
+    let suspectFail = !!sms.suspectFail;
+    if (String(state).toLowerCase() === 'failed' && smsErroFalsoPositivo_(error)) {
+      if (checks < SMS_FAIL_CONFIRM_CHECKS) {
+        state = 'Verifying';
+      } else {
+        state = 'Sent';
+        error = '';
+        suspectFail = true;
+      }
+    }
+    const patch = {
       gatewayId,
-      state: sms.state || 'Pending',
-      error: sms.error || '',
+      state,
+      error,
       telefoneHash: sms.telefoneHash || '',
-      checks
-    });
-    if (s && String(s.smsStatus.state).toLowerCase() === 'failed') {
+      checks,
+      suspectFail
+    };
+    const s = atualizarSmsStatusLocal_(rowIndex, patch);
+    if (s && smsFalhaReal_(s.smsStatus)) {
       toast('Falha SMS: confirme telefone ou use alternativa.', 'error');
+    }
+    if (String(state).toLowerCase() === 'verifying' && checks <= SMS_FAIL_CONFIRM_CHECKS) {
+      const extra = SMS_RECHECK_EXTRA_MS[Math.min(checks - 1, SMS_RECHECK_EXTRA_MS.length - 1)] || 120000;
+      setTimeout(() => consultarSmsStatusSessao_(rowIndex, gatewayId), extra);
     }
     return sms;
   } catch(e) {
@@ -8108,7 +8192,7 @@ async function salvarLancamentoAvulso() {
 }
 
 </script>
-<script src="mk-update.js?v=1.7.38"></script>
+<script src="mk-update.js?v=1.7.39"></script>
 <script src="mk-auth.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
