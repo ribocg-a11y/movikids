@@ -16,13 +16,66 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<script src="mk-version.js?v=1.7.34"></script>
+<script>
+// ── ANTI-STALE (sync): busca versao remota antes de qualquer cache local ──
+(function(){
+  var KEY = 'mk_loaded_version';
+  function verParts(v) {
+    return String(v || '0.0').split('.').map(function(n) { return parseInt(n, 10) || 0; });
+  }
+  function verNewer(a, b) {
+    var pa = verParts(a), pb = verParts(b);
+    for (var i = 0; i < 3; i++) {
+      if (pa[i] > pb[i]) return true;
+      if (pa[i] < pb[i]) return false;
+    }
+    return false;
+  }
+  function precisaIrPara(remote) {
+    if (!remote) return false;
+    var stored = '';
+    try { stored = localStorage.getItem(KEY) || ''; } catch(e) {}
+    var urlM = location.search.match(/force[=:\-]+([0-9]+\.[0-9]+)/i);
+    var urlVer = urlM ? urlM[1] : '';
+    return !stored || stored !== remote || verNewer(remote, stored) || verNewer(remote, urlVer) || (urlVer && urlVer !== remote);
+  }
+  function aplicarAtualizacao(remote) {
+    try {
+      var _s = sessionStorage.getItem('mk_auth_session_v1');
+      if (_s) {
+        localStorage.setItem('mk_auth_session_persist_v1', _s);
+        localStorage.setItem('mk_auth_session_persist_at', String(Date.now()));
+      }
+    } catch(e) {}
+    try { localStorage.setItem(KEY, remote); } catch(e) {}
+    try {
+      if (window.caches) caches.keys().then(function(keys) { keys.forEach(function(k) { caches.delete(k); }); });
+      if ('serviceWorker' in navigator) navigator.serviceWorker.getRegistrations().then(function(regs) { regs.forEach(function(r) { r.unregister(); }); });
+    } catch(e) {}
+    if (!location.search.includes('force=' + remote)) {
+      location.replace(location.pathname + '?force=' + remote + '&t=' + Date.now());
+    }
+  }
+  try {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', 'mk-version.js?nocache=' + Date.now(), false);
+    try { xhr.setRequestHeader('Cache-Control', 'no-cache'); } catch(e) {}
+    xhr.send(null);
+    if (xhr.status >= 200 && xhr.status < 300) {
+      var m = xhr.responseText.match(/MK_VERSION\s*=\s*'([^']+)'/);
+      var REMOTE = m ? m[1] : '';
+      if (REMOTE && precisaIrPara(REMOTE)) aplicarAtualizacao(REMOTE);
+    }
+  } catch(e) {}
+})();
+</script>
+<script src="mk-version.js?v=1.7.35"></script>
 <link rel="stylesheet" href="mk-design.css">
 
 <script>
 // ── CACHE BUSTER — alinhado a mk-version.js / APP_VERSION ──
 (function(){
-  const CURRENT = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.34';
+  const CURRENT = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.35';
   const KEY = 'mk_loaded_version';
   function mkVerParts_(v) {
     return String(v || '0.0').split('.').map(function(n) { return parseInt(n, 10) || 0; });
@@ -2839,7 +2892,7 @@ header{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.34';
+const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.35';
 const WEBAPP_URL = (typeof window !== 'undefined' && window.MK_GAS_EXEC_URL) ? window.MK_GAS_EXEC_URL
   : 'https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec';
 const WEBAPP_URL_DEAD_PREFIX = 'AKfycbzc';
