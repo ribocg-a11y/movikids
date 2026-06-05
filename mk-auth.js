@@ -1,4 +1,4 @@
-/* MOVI KIDS — Login operadores v1.7.18 */
+/* MOVI KIDS — Login operadores v1.7.19 */
 (function () {
   const SESSION_KEY = 'mk_auth_session_v1';
   const LEGACY_OPERADOR_KEY = 'mk_operador_atual_v1';
@@ -256,13 +256,32 @@
   }
 
   function applyRoleNav_() {
-    const admin = mkAuthIsAdmin();
+    const admin = mkAuthIsAdmin() || !!(typeof window !== 'undefined' && window.isAdmin);
     const sbGer = document.getElementById('sb-gerenciar-btn');
     const sbAdminSec = document.getElementById('sb-admin-section');
     if (sbGer) sbGer.style.display = admin ? 'none' : '';
     if (admin && typeof showAdminSidebar === 'function') showAdminSidebar();
     else if (sbAdminSec && typeof hideAdminSidebar === 'function') hideAdminSidebar();
   }
+
+  /** Sai do modo administrador: perfil ADM volta ao login; operador+PIN admin so fecha o painel ADM. */
+  window.mkAuthExitAdmin_ = function mkAuthExitAdmin_() {
+    const s = getSession();
+    if (s && s.role === 'admin') {
+      clearSession();
+      selectedOp = null;
+      sessaoAtivaRemota = null;
+      showGate(true);
+      hideApp();
+      showStep('mk-step-select');
+      loadOperadores().catch(() => renderOpList(false));
+      if (typeof toast === 'function') {
+        toast('Sessao administrativa encerrada. Escolha operador ou admin.', 'warning');
+      }
+    }
+    applyRoleNav_();
+  };
+  window.applyRoleNav_ = applyRoleNav_;
 
   function showStep(id) {
     document.querySelectorAll('#mk-auth-gate .mk-auth-step').forEach(el => {

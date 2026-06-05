@@ -22,7 +22,7 @@
 <script>
 // ── CACHE BUSTER — alinhado a mk-version.js / APP_VERSION ──
 (function(){
-  const CURRENT = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.18';
+  const CURRENT = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.19';
   const KEY = 'mk_loaded_version';
   try {
     const stored = localStorage.getItem(KEY);
@@ -1560,7 +1560,7 @@ nav button .nav-badge{
   <!-- ══ SIDEBAR (desktop fixo / celular = menu suspenso) ══ -->
   <aside id="sidebar">
     <div class="sb-logo">🚗 Movi <span>Kids</span>
-      <div class="sb-status"><span id="sb-dot" class="dot-online"></span><span id="sb-txt">Online</span><span id="sb-version" style="font-size:10px;opacity:.85;margin-left:5px;color:rgba(255,255,255,.7);font-family:monospace">v1.7.18</span></div>
+      <div class="sb-status"><span id="sb-dot" class="dot-online"></span><span id="sb-txt">Online</span><span id="sb-version" style="font-size:10px;opacity:.85;margin-left:5px;color:rgba(255,255,255,.7);font-family:monospace">v1.7.19</span></div>
     </div>
     <div class="sb-nav" id="sb-nav">
       <button class="sb-btn active" id="sbn-home" onclick="showPage('home')"><span class="sb-icon">🏠</span>Home</button>
@@ -1619,7 +1619,7 @@ nav button .nav-badge{
         <span id="hd-turno-mini" class="hd-turno-mini" hidden title="Sessao">—</span>
         <div id="status-dot" class="dot-online"></div>
         <span id="status-txt">Online</span>
-        <span id="app-version" style="font-size:10px;opacity:.85;margin-left:4px;font-family:monospace">v1.7.18</span>
+        <span id="app-version" style="font-size:10px;opacity:.85;margin-left:4px;font-family:monospace">v1.7.19</span>
       </div>
       <button type="button" class="hd-menu-btn" id="hd-menu-btn" aria-label="Abrir menu" onclick="mobMenuToggle_()">☰</button>
     </div>
@@ -2676,7 +2676,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.18';
+const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.19';
 const WEBAPP_URL = (typeof window !== 'undefined' && window.MK_GAS_EXEC_URL) ? window.MK_GAS_EXEC_URL
   : 'https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec';
 const WEBAPP_URL_DEAD_PREFIX = 'AKfycbzc';
@@ -2805,8 +2805,8 @@ function mobMenuToggle_() {
 
 function sbSairSessaoClick_() {
   const isAdm = (typeof mkAuthIsAdmin === 'function' && mkAuthIsAdmin()) || !!window.isAdmin;
-  if (isAdm && typeof adminLogout === 'function') {
-    adminLogout();
+  if (isAdm) {
+    if (typeof adminLogout === 'function') adminLogout();
     return;
   }
   if (typeof trocarOperador === 'function') trocarOperador();
@@ -2852,9 +2852,15 @@ function atualizarOperadorUI_(sessaoServidor) {
     set('sb-tablet-nome', isAdm ? 'Administrador' : s.nome);
     const entT = fmtHoraTurno_(s.loggedAt);
     set('sb-tablet-horas', entT ? ('Entrou ' + entT + ' neste aparelho') : 'Neste aparelho');
-    if (sairBtn) sairBtn.textContent = isAdm ? 'Sair do admin' : 'Encerrar turno';
   } else if (rowTablet) {
     rowTablet.hidden = true;
+  }
+
+  const gerBtn = document.getElementById('sb-gerenciar-btn');
+  if (gerBtn) gerBtn.style.display = isAdm ? 'none' : '';
+  if (sairBtn && (temBalcao || temTablet)) {
+    sairBtn.hidden = false;
+    sairBtn.textContent = isAdm ? 'Sair do admin' : 'Encerrar turno';
   }
 
   if (hdMini) {
@@ -5758,9 +5764,16 @@ function adminLogin() {
   if (typeof refreshOperadoresAdmin_ === 'function') refreshOperadoresAdmin_();
   if (typeof atualizarOperadorUI_ === 'function') atualizarOperadorUI_();
   if (typeof mkAuthRefreshSessaoTurno_ === 'function') mkAuthRefreshSessaoTurno_();
+  if (typeof applyRoleNav_ === 'function') applyRoleNav_();
+  else {
+    const gerBtn = document.getElementById('sb-gerenciar-btn');
+    if (gerBtn) gerBtn.style.display = 'none';
+  }
 }
 
 function adminLogout() {
+  const sessaoAdmin = typeof mkAuthGetSession === 'function' && mkAuthGetSession() &&
+    mkAuthGetSession().role === 'admin';
   isAdmin = false;
   window.isAdmin = false;
   clearInterval(adminTimerInt);
@@ -5769,14 +5782,19 @@ function adminLogout() {
   hideAdminSidebar();
   statsHoje.fat = 0;
   const kpiEl = document.getElementById('admin-home-kpis');
-  if(kpiEl) kpiEl.style.display = 'none';
+  const chipEl = document.getElementById('admin-home-chip');
+  if (kpiEl) { kpiEl.style.display = 'none'; kpiEl.hidden = true; }
+  if (chipEl) chipEl.hidden = true;
   if (typeof showAdminHomeKpis === 'function') showAdminHomeKpis(null);
   try { localStorage.removeItem('mk_inicio_cache'); } catch(e) {}
-  if (typeof syncController === 'function') syncController(true, 0);
-  showPage('home');
-  if (typeof atualizarOperadorUI_ === 'function') atualizarOperadorUI_();
-  if (typeof mkAuthRefreshSessaoTurno_ === 'function') mkAuthRefreshSessaoTurno_();
-  toast('Sessão administrativa encerrada', 'warning');
+  if (typeof mkAuthExitAdmin_ === 'function') mkAuthExitAdmin_();
+  if (!sessaoAdmin) {
+    if (typeof syncController === 'function') syncController(true, 0);
+    showPage('home');
+    if (typeof atualizarOperadorUI_ === 'function') atualizarOperadorUI_();
+    if (typeof mkAuthRefreshSessaoTurno_ === 'function') mkAuthRefreshSessaoTurno_();
+    toast('Modo administrativo encerrado', 'warning');
+  }
 }
 
 function resetAdminTimer() {
