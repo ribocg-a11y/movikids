@@ -1481,7 +1481,7 @@ function carregarInicio_(p) {
 
   const opCfg = operacaoConfig_();
   const resultado = resp_({
-    sistema:    'MOVI KIDS v1.5.50',
+    sistema:    'MOVI KIDS v1.5.52',
     timestamp:  dataHoje + ' ' + fmtHoraLocal_(hoje),
     ativos:     ativas,
     statsHoje,

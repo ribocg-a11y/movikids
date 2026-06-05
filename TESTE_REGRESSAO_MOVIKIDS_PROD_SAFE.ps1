@@ -146,7 +146,7 @@ try {
     }
     Add-Check "listarAtivas pendente" "ok" ("rowIndex={0}" -f $loc.rowIndex)
 
-    $adminOp = Get-MoviAdminSupervisorParams -AdminPin $AdminPin
+    $opWrite = Get-MoviOperadorParams -Operador "TESTE_CODEX"
     $editar = Invoke-MoviApi (@{
       action = "editarLocacao"
       rowIndex = $loc.rowIndex
@@ -154,15 +154,15 @@ try {
       pagamento = "Dinheiro"
       observacao = "Teste regressao editado antes de iniciar"
       motivo = "Teste regressao editar pendente"
-    } + $adminOp)
+    } + $opWrite)
     Assert-Ok $editar "editarLocacao"
-    Add-Check "editarLocacao pendente" "ok" "pagamento=Dinheiro (admin)"
+    Add-Check "editarLocacao pendente operador" "ok" "pagamento=Dinheiro"
 
     $cancelar = Invoke-MoviApi (@{
       action = "cancelarLocacao"
       rowIndex = $loc.rowIndex
       motivo = "Teste regressao Codex sem iniciar timer"
-    } + $adminOp)
+    } + $opWrite)
     Assert-Ok $cancelar "cancelarLocacao"
     if ($cancelar.locacao.status -ne "Cancelada") { throw "Cancelamento retornou status $($cancelar.locacao.status)" }
     Add-Check "cancelarLocacao" "ok" ("id={0}" -f $cancelar.locacao.id)

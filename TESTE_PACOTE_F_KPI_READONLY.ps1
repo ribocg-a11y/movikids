@@ -57,6 +57,41 @@ try {
     Add-FCheck "pdf pacote-f" "ok" "secao Gestao Avancada no HTML"
   }
 
+  $inicioOp = Invoke-MoviApiF @{ action = "carregarInicio"; operador = "TESTE_PACOTE_F" }
+  if (-not $inicioOp.ok) { throw "carregarInicio operador falhou" }
+  if ($null -ne $inicioOp.statsHoje.fat) {
+    Add-FCheck "operador sem fat home" "warn" "statsHoje.fat exposto ao operador"
+  } else {
+    Add-FCheck "operador sem fat home" "ok" "statsHoje so contagem"
+  }
+
+  $stamp = Get-Date -Format "HHmmss"
+  $salvar = Invoke-MoviApiF @{
+    action = "salvarLocacao"; tipo = "Carro"; plano = "10min"; veiculo = "Carro 01"
+    pagamento = "PIX"; responsavel = "TESTE_PACOTE_F"; crianca = "PF_EDIT_$stamp"
+    telefone = "98999999999"; observacao = "[TESTE] Pacote F operador edit"
+    operador = "TESTE_PACOTE_F"
+  }
+  if (-not $salvar.ok) { throw "salvarLocacao teste Pacote F falhou" }
+  $editOp = Invoke-MoviApiF @{
+    action = "editarLocacao"; rowIndex = $salvar.rowIndex; pagamento = "Dinheiro"
+    motivo = "Teste Pacote F operador editar"; operador = "TESTE_PACOTE_F"
+  }
+  if (-not $editOp.ok) {
+    Add-FCheck "operador editar" "warn" ("falhou: " + $editOp.erro + "; publique GAS v1.5.52+")
+  } else {
+    Add-FCheck "operador editar" "ok" $editOp.locacao.pagamento
+  }
+  $cancelOp = Invoke-MoviApiF @{
+    action = "cancelarLocacao"; rowIndex = $salvar.rowIndex
+    motivo = "Teste Pacote F operador cancelar"; operador = "TESTE_PACOTE_F"
+  }
+  if (-not $cancelOp.ok) {
+    Add-FCheck "operador cancelar" "warn" ("falhou: " + $cancelOp.erro + "; publique GAS v1.5.52+")
+  } else {
+    Add-FCheck "operador cancelar" "ok" $cancelOp.locacao.status
+  }
+
   $result.status = "ok"
 } catch {
   $result.status = "failed"

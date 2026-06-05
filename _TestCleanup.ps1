@@ -6,7 +6,7 @@ function Get-MoviOperadorParams {
   return @{ operador = $Operador }
 }
 
-# Fase 9: editar/cancelar exigem supervisor ou admin no GAS.
+# Fase 9 em pausa: editar/cancelar aceitam operador logado (authRole admin so em testes legados).
 function Get-MoviAdminSupervisorParams {
   param(
     [string]$AdminPin = "1416",

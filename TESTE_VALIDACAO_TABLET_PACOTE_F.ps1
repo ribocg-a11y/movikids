@@ -1,9 +1,9 @@
 param(
-  [string]$AppUrl = "https://ribocg-a11y.github.io/movikids/?force=1.7.29"
+  [string]$AppUrl = "https://ribocg-a11y.github.io/movikids/?force=1.7.38"
 )
 
 $checks = @(
-  @{ id = "T1"; area = "Versao"; passo = "Rodape mostra Online v1.7.29+ apos ?force=" },
+  @{ id = "T1"; area = "Versao"; passo = "Rodape mostra Online v1.7.38+ apos ?force=" },
   @{ id = "T2"; area = "Operador"; passo = "Login operador: Home SEM KPIs financeiros" },
   @{ id = "T3"; area = "Admin"; passo = "Login admin PIN 1416: Dashboard abre sem erro" },
   @{ id = "T4"; area = "Pacote F"; passo = "Dashboard: secao Gestao avancada com 5 blocos visiveis" },

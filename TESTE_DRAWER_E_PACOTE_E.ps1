@@ -101,9 +101,9 @@ try {
 
   $editar = Invoke-MoviApi (@{
     action = "editarLocacao"; rowIndex = $salvar.rowIndex; responsavel = "TESTE_EDIT"; motivo = "Teste drawer editar"
-  } + $adminOp) (Write-Method "editarLocacao")
+  } + $op) (Write-Method "editarLocacao")
   Assert-Ok $editar "editarLocacao pendente"
-  Add-Check "editar pendente" "ok" $editar.locacao.responsavel
+  Add-Check "editar pendente operador" "ok" $editar.locacao.responsavel
 
   $iniciar = Invoke-MoviApi @{
     action = "iniciarTimer"; rowIndex = $salvar.rowIndex; timestamp = [int64]([DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds())
@@ -140,10 +140,10 @@ try {
 
   $cancelar = Invoke-MoviApi (@{
     action = "cancelarLocacao"; rowIndex = $salvar2.rowIndex; motivo = "Teste drawer cancelar Pacote E"
-  } + $adminOp) (Write-Method "cancelarLocacao")
+  } + $op) (Write-Method "cancelarLocacao")
   Assert-Ok $cancelar "cancelarLocacao"
   if ($cancelar.locacao.status -ne "Cancelada") { throw "Cancelamento nao retornou Cancelada" }
-  Add-Check "cancelar pendente" "ok" $cancelar.locacao.status
+  Add-Check "cancelar pendente operador" "ok" $cancelar.locacao.status
 
   $result.finishedAt = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
   $result.status = "ok"
