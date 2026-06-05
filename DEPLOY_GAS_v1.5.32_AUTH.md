@@ -8,7 +8,7 @@
 | **Web app em produção (exec)** | https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec |
 | **Testar se o GAS está no ar (ping)** | https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec?action=ping |
 | **Planilha MOVIKIDS** | https://docs.google.com/spreadsheets/d/1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618/edit |
-| **App (GitHub Pages)** | https://ribocg-a11y.github.io/movikids/?force=1.7.15 |
+| **App (GitHub Pages)** | https://ribocg-a11y.github.io/movikids/?force=1.7.16 |
 
 No **editor GAS** (link acima): **Implantar → Gerenciar implantações → Editar** a implantação Web (**ID `AKfycbwakQ...`**) → **Nova versão** → Implantar. **Não** crie um deploy novo. **Nunca** use `clasp deploy`.
 
@@ -50,6 +50,6 @@ O script: copia o `.gs` canônico → `gas/Code.gs` → valida `DEPLOY_ID` → `
 
 ## Frontend
 
-Publicar **v1.7.15** no GitHub (`git push`). Tablets: `?force=1.7.15`.
+Publicar **v1.7.16** no GitHub (`git push`). Tablets: `?force=1.7.16`.
 
 Ver também: `ESTADO_ATUAL.md`, `REGRAS_DE_PUBLICACAO_SEGURA.md`.

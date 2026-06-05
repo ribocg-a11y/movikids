@@ -22,7 +22,7 @@
 <script>
 // ── CACHE BUSTER — alinhado a mk-version.js / APP_VERSION ──
 (function(){
-  const CURRENT = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.15';
+  const CURRENT = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.16';
   const KEY = 'mk_loaded_version';
   try {
     const stored = localStorage.getItem(KEY);
@@ -578,7 +578,7 @@ nav button .nav-badge{
 .sb-logo span{color:#FFD54F}
 .sb-status{display:flex;align-items:center;gap:5px;margin-top:5px;
   font-size:11px;color:rgba(255,255,255,.5);font-family:'Nunito',sans-serif;font-weight:600}
-.sb-nav{flex:1;padding:12px 10px;display:flex;flex-direction:column;gap:3px;overflow-y:auto}
+.sb-nav{flex:0 0 auto;padding:12px 10px;display:flex;flex-direction:column;gap:3px}
 .sb-btn{
   display:flex;align-items:center;gap:11px;padding:11px 13px;border:none;
   background:transparent;color:rgba(255,255,255,.6);
@@ -590,11 +590,11 @@ nav button .nav-badge{
 .sb-icon{font-size:17px;line-height:1;flex-shrink:0}
 .sb-divider{font-size:10px;font-weight:700;color:rgba(255,255,255,.3);
   text-transform:uppercase;letter-spacing:.08em;padding:14px 13px 5px}
-.sb-admin-section{display:none;padding:0 10px 6px}
+.sb-admin-section{display:none;padding:0 10px 6px;flex:0 0 auto}
 .sb-admin-section.visible{display:block}
 .sb-admin-toggle{
   display:flex;align-items:center;justify-content:space-between;width:100%;
-  padding:10px 13px;margin-top:6px;border:1px solid rgba(255,255,255,.14);
+  padding:10px 13px;margin-top:0;border:1px solid rgba(255,255,255,.14);
   background:rgba(255,255,255,.06);color:rgba(255,255,255,.75);
   font-family:'Nunito',sans-serif;font-size:11px;font-weight:800;
   text-transform:uppercase;letter-spacing:.06em;border-radius:10px;cursor:pointer;
@@ -606,7 +606,7 @@ nav button .nav-badge{
 .sb-admin-panel{padding:4px 0 2px}
 .sb-admin-panel[hidden]{display:none!important}
 .sb-admin-panel .sb-group-lbl{padding-top:8px}
-.sb-footer{padding:10px;border-top:1px solid rgba(255,255,255,.1)}
+.sb-footer{padding:10px;border-top:1px solid rgba(255,255,255,.1);margin-top:auto;flex:0 0 auto}
 .sb-sessao-card{
   background:rgba(0,0,0,.22);border:1px solid rgba(255,255,255,.12);
   border-radius:10px;padding:10px 11px;margin-bottom:8px;
@@ -664,11 +664,6 @@ nav button .nav-badge{
 /* ══ ADMIN HOME KPI (hidden until admin) ════════════════════ */
 #admin-home-kpis{display:none}
 #admin-home-kpis.visible{display:block}
-.mk-home-quick{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:4px}
-.mk-home-quick-btn{flex:1;min-width:120px;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:#fff;font-size:14px;font-weight:600;color:var(--txt);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px}
-.mk-home-quick-btn--primary{background:var(--blue);color:#fff;border-color:var(--blue)}
-.mk-home-quick-btn--primary:active{filter:brightness(.92)}
-
 /* ══ ENCERRADAS HOJE ════════════════════════════════════════ */
 .enc-item{
   background:var(--card);border-radius:var(--radius-sm);
@@ -1535,7 +1530,7 @@ nav button .nav-badge{
   <!-- ══ SIDEBAR (desktop only) ══ -->
   <aside id="sidebar">
     <div class="sb-logo">🚗 Movi <span>Kids</span>
-      <div class="sb-status"><span id="sb-dot" class="dot-online"></span><span id="sb-txt">Online</span><span id="sb-version" style="font-size:10px;opacity:.85;margin-left:5px;color:rgba(255,255,255,.7);font-family:monospace">v1.7.15</span></div>
+      <div class="sb-status"><span id="sb-dot" class="dot-online"></span><span id="sb-txt">Online</span><span id="sb-version" style="font-size:10px;opacity:.85;margin-left:5px;color:rgba(255,255,255,.7);font-family:monospace">v1.7.16</span></div>
     </div>
     <div class="sb-nav" id="sb-nav">
       <button class="sb-btn active" id="sbn-home" onclick="showPage('home')"><span class="sb-icon">🏠</span>Home</button>
@@ -1594,7 +1589,7 @@ nav button .nav-badge{
         <span id="hd-turno-mini" class="hd-turno-mini" hidden title="Sessao">—</span>
         <div id="status-dot" class="dot-online"></div>
         <span id="status-txt">Online</span>
-        <span id="app-version" style="font-size:10px;opacity:.85;margin-left:4px;font-family:monospace">v1.7.15</span>
+        <span id="app-version" style="font-size:10px;opacity:.85;margin-left:4px;font-family:monospace">v1.7.16</span>
       </div>
     </div>
   </header>
@@ -1626,11 +1621,6 @@ nav button .nav-badge{
 
   <!-- ──────── PAGE: HOME ──────── -->
   <div id="page-home" class="page active">
-    <div id="mk-home-quick" class="mk-home-quick" hidden>
-      <button type="button" class="mk-home-quick-btn mk-home-quick-btn--primary" onclick="abrirNovaLocacao()"><span>➕</span> Nova locacao</button>
-      <button type="button" class="mk-home-quick-btn" onclick="showPage('painel')"><span>📺</span> Painel</button>
-      <button type="button" class="mk-home-quick-btn" onclick="irAdmin('caixa')"><span>💰</span> Caixa</button>
-    </div>
     <div class="mk-stat-row stats-bar">
       <div class="mk-stat-tile stat-card"><div class="stat-val mk-stat-val" id="stat-ativas">0</div><div class="stat-lbl mk-stat-lbl">Ativas agora</div></div>
       <div class="mk-stat-tile stat-card"><div class="stat-val mk-stat-val" id="stat-nloc">0</div><div class="stat-lbl mk-stat-lbl">Encerradas hoje</div></div>
@@ -2664,7 +2654,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.15';
+const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.16';
 const WEBAPP_URL = (typeof window !== 'undefined' && window.MK_GAS_EXEC_URL) ? window.MK_GAS_EXEC_URL
   : 'https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec';
 const WEBAPP_URL_DEAD_PREFIX = 'AKfycbzc';
@@ -6969,12 +6959,10 @@ setInterval(() => {
 function showAdminHomeKpis(d) {
   const el = document.getElementById('admin-home-kpis');
   const chip = document.getElementById('admin-home-chip');
-  const quick = document.getElementById('mk-home-quick');
   const isAdmin = (typeof mkAuthIsAdmin === 'function' && mkAuthIsAdmin()) || window.isAdmin;
   const homeOn = !!document.getElementById('page-home')?.classList.contains('active');
   const R = v => 'R$ ' + Number(v).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
   const set = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
-  if (quick) quick.hidden = !isAdmin;
   if (!isAdmin || !d) {
     if (el) { el.style.display = 'none'; el.hidden = true; el.classList.remove('visible'); }
     if (chip) chip.hidden = true;
