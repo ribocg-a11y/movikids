@@ -22,7 +22,7 @@
 <script>
 // ── CACHE BUSTER — alinhado a mk-version.js / APP_VERSION ──
 (function(){
-  const CURRENT = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.26';
+  const CURRENT = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.27';
   const KEY = 'mk_loaded_version';
   try {
     const stored = localStorage.getItem(KEY);
@@ -2258,10 +2258,10 @@ header{
         <div class="nkv green" id="nk-resultado">...</div>
         <div class="nks" id="nk-margem">margem —</div>
       </div>
-      <div class="new-kpi">
-        <label>Faturamento hoje</label>
+      <div class="new-kpi" role="button" tabindex="0" onclick="irAdmin('caixa')" onkeydown="if(event.key==='Enter')irAdmin('caixa')" title="Conferência do dia — abre Caixa">
+        <label>Caixa de hoje</label>
         <div class="nkv blue" id="nk-fathoje">...</div>
-        <div class="nks" id="nk-cushoje">custos hoje: —</div>
+        <div class="nks" id="nk-cushoje">toque para conferir →</div>
       </div>
     </div>
 
@@ -2374,6 +2374,26 @@ header{
         <div id="nk-plano-rows"></div>
         <div class="db-insight" id="nk-plano-insight" style="display:none"></div>
       </div>
+    </div>
+
+    <!-- Pacote F — gestão avançada do mês -->
+    <div class="sec-title" style="margin:16px 0 8px;padding:0 2px">Gestão avançada do mês</div>
+    <div class="new-row">
+      <div class="new-chart-card">
+        <div class="new-chart-title">Desempenho por operador</div>
+        <div id="nk-operador-rows"><div class="nks" style="padding:8px 0">Carregando...</div></div>
+        <div class="db-insight" id="nk-operador-insight" style="display:none"></div>
+      </div>
+      <div class="new-chart-card">
+        <div class="new-chart-title">Cancelamentos</div>
+        <div id="nk-cancel-summary" class="nks" style="padding:4px 0 10px">—</div>
+        <div id="nk-cancel-rows"><div class="nks" style="padding:8px 0">Carregando...</div></div>
+      </div>
+    </div>
+    <div class="new-chart-card" style="margin-bottom:14px">
+      <div class="new-chart-title">Ocupação da frota <span class="nct-note">minutos usados / capacidade estimada (12h·dia)</span></div>
+      <div class="vrank-grid" id="nk-ocupacao-grid"></div>
+      <div class="db-insight" id="nk-ocupacao-insight" style="display:none"></div>
     </div>
 
     <!-- hidden canvases for compat -->
@@ -2719,7 +2739,7 @@ header{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.26';
+const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.27';
 const WEBAPP_URL = (typeof window !== 'undefined' && window.MK_GAS_EXEC_URL) ? window.MK_GAS_EXEC_URL
   : 'https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec';
 const WEBAPP_URL_DEAD_PREFIX = 'AKfycbzc';
@@ -6119,7 +6139,7 @@ function renderCharts(d) {
   if (resEl) { resEl.textContent = R2(d.resultado); resEl.className = 'nkv ' + ((d.resultado||0) >= 0 ? 'green' : 'red'); }
   setText2('nk-margem',  'margem ' + (d.margem||0) + '%');
   setText2('nk-fathoje', R2(d.fatHoje));
-  setText2('nk-cushoje', 'custos hoje: ' + R2(d.cusHoje));
+  setText2('nk-cushoje', (d.fatHoje > 0 ? R2(d.fatHoje) + ' hoje · ' : '') + 'toque para conferir →');
 
   // CTO
   setText2('nk-cto-fat',  R2(d.fatMes));
@@ -6322,6 +6342,72 @@ function renderCharts(d) {
   if (plInsEl && pl[topPl]) { plInsEl.style.display='block'; plInsEl.textContent = (PLAN_LABELS[topPl]||topPl)+' é o plano mais popular: '+pct2(pl[topPl],totPl)+'% do faturamento.'; }
 
   chartTipo=null; chartPlano=null;
+
+  // Pacote F — operador, cancelamentos, ocupação frota
+  const ops = d.porOperador || [];
+  const opEl = document.getElementById('nk-operador-rows');
+  const opIns = document.getElementById('nk-operador-insight');
+  if (opEl) {
+    if (!ops.length) {
+      opEl.innerHTML = '<div class="nks">Sem encerramentos auditados neste mês</div>';
+      if (opIns) opIns.style.display = 'none';
+    } else {
+      const maxOp = Math.max(...ops.map(o => o.nLoc || 0), 1);
+      opEl.innerHTML = ops.map((o, i) => {
+        const bw = Math.round((o.nLoc || 0) / maxOp * 100);
+        return `<div class="nb-row"><div class="nb-n">${i + 1}</div><div class="nb-name">${o.nome}</div><div class="nb-bar-bg"><div class="nb-bar-fill" style="width:${bw}%;background:var(--blue)"></div></div><div class="nb-val">${o.nLoc} loc</div><div class="nb-pct">${R2(o.fat || 0)}</div></div>`;
+      }).join('');
+      if (opIns) {
+        opIns.style.display = 'block';
+        opIns.textContent = ops[0].nome + ' lidera com ' + ops[0].nLoc + ' encerramentos (' + (ops[0].pct || 0) + '% do mês).';
+      }
+    }
+  }
+
+  const canc = d.cancelamentos || { total: 0, porMotivo: [], taxaPct: 0 };
+  const cancSum = document.getElementById('nk-cancel-summary');
+  const cancEl = document.getElementById('nk-cancel-rows');
+  if (cancSum) {
+    cancSum.innerHTML = canc.total > 0
+      ? '<strong style="color:#C62828;font-size:18px">' + canc.total + '</strong> cancelamento(s) · taxa ' + (canc.taxaPct || 0) + '% sobre locações do mês'
+      : 'Nenhum cancelamento neste mês';
+  }
+  if (cancEl) {
+    const motivos = canc.porMotivo || [];
+    if (!motivos.length) {
+      cancEl.innerHTML = '<div class="nks">' + (canc.total > 0 ? 'Motivos não detalhados na auditoria' : 'Operação sem cancelamentos') + '</div>';
+    } else {
+      const maxC = Math.max(...motivos.map(m => m.count), 1);
+      cancEl.innerHTML = motivos.map(m => {
+        const bw = Math.round(m.count / maxC * 100);
+        return `<div class="nb-row"><div class="nb-name">${m.motivo}</div><div class="nb-bar-bg"><div class="nb-bar-fill" style="width:${bw}%;background:#EF9A9A"></div></div><div class="nb-val">${m.count}</div></div>`;
+      }).join('');
+    }
+  }
+
+  const ocup = d.ocupacaoFrota || [];
+  const ocupGrid = document.getElementById('nk-ocupacao-grid');
+  const ocupIns = document.getElementById('nk-ocupacao-insight');
+  if (ocupGrid) {
+    const comUso = ocup.filter(v => v.nLoc > 0);
+    if (!comUso.length) {
+      ocupGrid.innerHTML = '<div class="nks" style="grid-column:1/-1;padding:12px 0">Sem locações encerradas neste mês</div>';
+      if (ocupIns) ocupIns.style.display = 'none';
+    } else {
+      const topO = comUso[0];
+      ocupGrid.innerHTML = comUso.map((v, i) => {
+        const tipo = v.veiculo.startsWith('Carro') ? 'Carro' : v.veiculo.startsWith('Triciclo') ? 'Triciclo' : 'Pelúcia';
+        const icon = tipoIcon(tipo);
+        const cls = i === 0 ? 'vrank-card top1' : 'vrank-card';
+        const barClr = tipo === 'Carro' ? 'var(--blue)' : tipo === 'Triciclo' ? '#2E7D32' : 'var(--pink)';
+        return `<div class="${cls}"><span class="vr-rank">#${i + 1}</span><div class="vr-icon">${icon}</div><div class="vr-nome">${v.veiculo}</div><div class="vr-count">${v.pctOcupacao || 0}%</div><div class="vr-sub">${v.nLoc} loc · ${v.pctFrota || 0}% frota</div><div class="vr-bar-wrap"><div class="vr-bar" style="width:${Math.min(100, v.pctOcupacao || 0)}%;background:${barClr}"></div></div></div>`;
+      }).join('');
+      if (ocupIns) {
+        ocupIns.style.display = 'block';
+        ocupIns.innerHTML = '<strong>' + topO.veiculo + '</strong> com maior uso: <strong>' + (topO.pctOcupacao || 0) + '%</strong> da capacidade estimada (' + topO.nLoc + ' locações).';
+      }
+    }
+  }
 
   // ── FASE 5: Comparativo + Projeção + Alerta ──────────────────
   // Alerta de faturamento baixo

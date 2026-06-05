@@ -5,6 +5,7 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+. "$PSScriptRoot\_TestCleanup.ps1"
 
 function Invoke-MoviApi {
   param([hashtable]$Params, [string]$Method = "GET")
@@ -91,6 +92,7 @@ try {
   $salvar = Invoke-MoviApi (@{
     action = "salvarLocacao"; tipo = "Carro"; plano = "10min"; veiculo = "Carro 01"
     pagamento = "PIX"; responsavel = "TESTE"; crianca = $nomeTeste; telefone = "98999999999"
+    observacao = "[TESTE] Pacote E drawer encerrar"
   } + $op) (Write-Method "salvarLocacao")
   Assert-Ok $salvar "salvarLocacao pendente"
   Add-Check "salvar pendente POST" "ok" ("id={0}; row={1}" -f $salvar.id, $salvar.rowIndex)
@@ -130,6 +132,7 @@ try {
   $salvar2 = Invoke-MoviApi (@{
     action = "salvarLocacao"; tipo = "Triciclo"; plano = "10min"; veiculo = "Triciclo 01"
     pagamento = "Dinheiro"; responsavel = "TESTE"; crianca = ($nomeTeste + "_C"); telefone = "98999999998"
+    observacao = "[TESTE] Pacote E drawer cancelar"
   } + $op) (Write-Method "salvarLocacao")
   Assert-Ok $salvar2 "salvar2 pendente"
 
@@ -142,12 +145,13 @@ try {
 
   $result.finishedAt = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
   $result.status = "ok"
-  $result | ConvertTo-Json -Depth 6
-  exit 0
 } catch {
   $result.finishedAt = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
   $result.status = "failed"
   $result.error = $_.Exception.Message
+} finally {
+  $cleanup = Invoke-MoviTestCleanup -BaseUrl $BaseUrl -SoHoje -Quiet
+  Add-Check "limpeza pos-teste" $(if ($cleanup.ok) { "ok" } else { "warn" }) $cleanup.detail
   $result | ConvertTo-Json -Depth 6
-  exit 1
+  if ($result.status -eq "ok") { exit 0 } else { exit 1 }
 }

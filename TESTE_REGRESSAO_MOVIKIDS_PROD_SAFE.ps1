@@ -4,8 +4,10 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+. "$PSScriptRoot\_TestCleanup.ps1"
 
 $WriteActions = @("salvarLocacao","editarLocacao","cancelarLocacao")
+$script:RunCleanupAfter = $false
 $script:GasPostReady = $null
 
 function Test-GasPostReady {
@@ -82,6 +84,7 @@ try {
   Add-Check "listarAtivas" "ok" ("total={0}" -f $ativas.total)
 
   if ($RunWriteTests) {
+    $script:RunCleanupAfter = $true
     $stamp = Get-Date -Format "HHmmss"
     $nomeTeste = "TESTE_CODEX_$stamp"
 
@@ -94,7 +97,7 @@ try {
       responsavel = "TESTE_CODEX"
       crianca = $nomeTeste
       telefone = "98999999999"
-      observacao = "Teste regressao safe v1.5.18"
+      observacao = "[TESTE] Regressao safe Codex v1.5.18"
       operador = "TESTE_CODEX"
     }
     Assert-Ok $salvar "salvarLocacao"
@@ -144,12 +147,15 @@ try {
 
   $result.finishedAt = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
   $result.status = "ok"
-  $result | ConvertTo-Json -Depth 6
-  exit 0
 } catch {
   $result.finishedAt = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
   $result.status = "failed"
   $result.error = $_.Exception.Message
+} finally {
+  if ($script:RunCleanupAfter) {
+    $cleanup = Invoke-MoviTestCleanup -BaseUrl $BaseUrl -SoHoje -Quiet
+    Add-Check "limpeza pos-teste" $(if ($cleanup.ok) { "ok" } else { "warn" }) $cleanup.detail
+  }
   $result | ConvertTo-Json -Depth 6
-  exit 1
+  if ($result.status -eq "ok") { exit 0 } else { exit 1 }
 }

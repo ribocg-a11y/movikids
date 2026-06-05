@@ -1,5 +1,7 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.44
+// MOVI KIDS — Google Apps Script v1.5.46
+// v1.5.46: Pacote F — KPIs avancados em buscarKPIsAdmin (operador, cancelamentos, ocupacao frota)
+// v1.5.45: limparLocacoesTesteAdmin — anula locacoes de teste (Encerrada/Pendente/Ativa) sem contar no caixa
 // v1.5.44: Pacote E — doPost JSON; operador obrigatorio nas 5 escritas criticas; GET write deprecado
 // v1.5.43: dados financeiros/gestao so ADM — carregarInicio, listarCustos, buscarKPIsAdmin, encerrarLocacao filtrados
 // v1.5.42: auditoria AUD_TURNO login/logout operador balcao
@@ -282,6 +284,7 @@ function dispatchMoviAction_(p, method) {
       case 'excluirOperadorSistema': return excluirOperadorSistema_(p);
       case 'resetarPinOperadorAdmin': return resetarPinOperadorAdmin_(p);
       case 'corrigirFinanceiroLocacaoAdmin': return corrigirFinanceiroLocacaoAdmin_(p);
+      case 'limparLocacoesTesteAdmin': return limparLocacoesTesteAdmin_(p);
       case 'liberarSessaoOperador': return liberarSessaoOperador_(p);
       case 'liberarSessaoOperadorAdmin': return liberarSessaoOperadorAdmin_(p);
       case 'verificarSmsDisparo': return verificarSmsDisparo_(p);
@@ -312,9 +315,9 @@ function ping_() {
   const agora = new Date();
   return resp_({
     status:  'online',
-    versao:  'v1.5.44',
+    versao:  'v1.5.46',
     timestamp: fmtData_(agora) + ' ' + fmtHoraLocal_(agora),
-    sistema: 'MOVI KIDS v1.5.44',
+    sistema: 'MOVI KIDS v1.5.46',
     postWriteActions: WRITE_ACTIONS_CRITICAS_
   });
 }
@@ -953,6 +956,80 @@ function listarCustos_(p) {
   return resp_({ custos: lista, total: lista.length, soma: Math.round(soma * 100) / 100 });
 }
 
+// ── Pacote F: operador / cancelamentos / ocupacao (AUDITORIA + frota) ──
+const KPI_HORAS_OPERACAO_DIA_ = 12;
+
+function kpiAvancadosMes_(mmyy, nMes, nCancelMes, diasOperando, nPorVeiculo, minPorVeiculo) {
+  const porOperador = {};
+  const cancelPorMotivo = {};
+  let nCancelAud = 0;
+
+  try {
+    const shAud = ss_().getSheetByName('AUDITORIA');
+    if (shAud && shAud.getLastRow() >= 2) {
+      const dadosAud = shAud.getRange(2, 1, shAud.getLastRow() - 1, 8).getValues();
+      dadosAud.forEach(r => {
+        const ts = String(r[0] || '');
+        const acao = String(r[1] || '').trim();
+        const motivo = String(r[4] || '').trim();
+        const operador = String(r[7] || '').trim() || 'operador';
+        const pts = ts.split(' ')[0].split('/');
+        if (pts.length < 3) return;
+        const mmyyR = pts[1].padStart(2, '0') + '/' + pts[2];
+        if (mmyyR !== mmyy) return;
+
+        if (acao === 'encerrarLocacao') {
+          let fat = 0;
+          try {
+            const dep = JSON.parse(String(r[6] || '{}'));
+            fat = Number(dep.valorTotal) || 0;
+          } catch (e) {}
+          if (!porOperador[operador]) porOperador[operador] = { n: 0, fat: 0 };
+          porOperador[operador].n++;
+          porOperador[operador].fat += fat;
+        }
+        if (acao === 'cancelarLocacao') {
+          nCancelAud++;
+          const tipo = motivo.indexOf(':') >= 0 ? motivo.split(':')[0].trim() : (motivo.slice(0, 48) || 'Sem motivo');
+          cancelPorMotivo[tipo] = (cancelPorMotivo[tipo] || 0) + 1;
+        }
+      });
+    }
+  } catch (e) { Logger.log('kpiAvancadosMes_ AUDITORIA: ' + e.message); }
+
+  const nCancel = Math.max(nCancelMes, nCancelAud);
+  const porOperadorArr = Object.keys(porOperador).map(k => ({
+    nome: k,
+    nLoc: porOperador[k].n,
+    fat: Math.round(porOperador[k].fat * 100) / 100,
+    pct: nMes > 0 ? Math.round(porOperador[k].n / nMes * 1000) / 10 : 0
+  })).sort((a, b) => b.nLoc - a.nLoc);
+
+  const cancelArr = Object.keys(cancelPorMotivo).map(k => ({ motivo: k, count: cancelPorMotivo[k] }))
+    .sort((a, b) => b.count - a.count);
+  const taxaCancel = (nMes + nCancel) > 0 ? Math.round(nCancel / (nMes + nCancel) * 1000) / 10 : 0;
+
+  const capMinVeic = diasOperando > 0 ? diasOperando * KPI_HORAS_OPERACAO_DIA_ * 60 : 0;
+  const ocupacaoFrota = VEICULOS_VALIDOS.map(v => {
+    const n = nPorVeiculo[v] || 0;
+    const mins = minPorVeiculo[v] || 0;
+    const pctOcup = capMinVeic > 0 ? Math.min(100, Math.round(mins / capMinVeic * 1000) / 10) : 0;
+    return {
+      veiculo: v,
+      nLoc: n,
+      minutos: mins,
+      pctOcupacao: pctOcup,
+      pctFrota: nMes > 0 ? Math.round(n / nMes * 1000) / 10 : 0
+    };
+  }).sort((a, b) => b.nLoc - a.nLoc);
+
+  return {
+    porOperador: porOperadorArr,
+    cancelamentos: { total: nCancel, porMotivo: cancelArr, taxaPct: taxaCancel },
+    ocupacaoFrota: ocupacaoFrota
+  };
+}
+
 // ── KPIs ADMIN — v1.5.3: fatPorTipo inclui Triciclo ──────────
 function buscarKPIsAdmin_(p) {
   if (!isAdminRequest_(p)) return err_('Acesso negado — KPIs so para administrador', 403);
@@ -988,16 +1065,27 @@ function buscarKPIsAdmin_(p) {
   const fatPorVeiculo   = {};
   const fatPorPagamento = {};
   const horasPico = Array(14).fill(0);
+  let nCancelMes = 0;
+  const nPorVeiculo = {};
+  const minPorVeiculo = {};
 
   const lastLoc = shLoc.getLastRow();
   if (lastLoc >= DATA_ROW) {
-    const dados = shLoc.getRange(DATA_ROW, 1, lastLoc - DATA_ROW + 1, 18).getValues();
+    const dados = shLoc.getRange(DATA_ROW, 1, lastLoc - DATA_ROW + 1, 27).getValues();
     dados.forEach(r => {
-      if (!r[0] || String(r[14]) !== 'Encerrada') return;
+      if (!r[0]) return;
+      const status = String(r[14] || '').trim();
       const dataR = cellToStr_(r[1]);
       const pts   = dataR.split('/');
       if (pts.length < 3) return;
       const mmyyR  = pts[1].padStart(2,'0') + '/' + pts[2];
+
+      if (status === 'Cancelada' && mmyyR === mmyy) {
+        nCancelMes++;
+        return;
+      }
+      if (status !== 'Encerrada') return;
+
       const vt     = Number(r[10]);
       const ext    = Number(r[9]) || 0;
       const tipo   = String(r[4]);
@@ -1028,6 +1116,9 @@ function buscarKPIsAdmin_(p) {
         const pag = String(r[16] || 'Não informado');
         fatPorPagamento[pag]     = (fatPorPagamento[pag]     || 0) + vt;
         horasPico[Math.min(Math.max(hora - 9, 0), 13)] += vt;
+        nPorVeiculo[veiculo] = (nPorVeiculo[veiculo] || 0) + 1;
+        const minsTot = (Number(r[6]) || 0) + (Number(r[8]) || 0) + (Number(r[25]) || 0);
+        minPorVeiculo[veiculo] = (minPorVeiculo[veiculo] || 0) + minsTot;
       }
       if (dataR === dataHoje) { fatHoje += vt; nHoje++; }
     });
@@ -1068,6 +1159,9 @@ function buscarKPIsAdmin_(p) {
     extDiaArr.push({ dia: d, valor: Math.round((extPorDia[dk] || 0) * 100) / 100 });
   }
 
+  const diasOperandoCalc = diasComMov.size;
+  const kpiAv = kpiAvancadosMes_(mmyy, nMes, nCancelMes, diasOperandoCalc, nPorVeiculo, minPorVeiculo);
+
   return resp_({
     // v1.5.4: comparativo + projeção
     fatSemana:   Math.round(fatSemana    * 100) / 100,
@@ -1102,7 +1196,10 @@ function buscarKPIsAdmin_(p) {
     fatPorPagamento,
     horasPico,
     mesAtual,
-    anoAtual
+    anoAtual,
+    porOperador: kpiAv.porOperador,
+    cancelamentos: kpiAv.cancelamentos,
+    ocupacaoFrota: kpiAv.ocupacaoFrota
   });
 }
 
@@ -3394,6 +3491,86 @@ function resetarPinOperadorAdmin_(p) {
   sh.getRange(found.row, 4, 1, 2).setValues([['', '']]);
   const op = operadorObjFromRow_(sh.getRange(found.row, 1, 1, 7).getValues()[0]);
   return resp_({ operador: op, mensagem: 'PIN resetado. Operador criara novo PIN no proximo login.' });
+}
+
+function isLocacaoTeste_(crianca, responsavel, telefone, observacao) {
+  const c = String(crianca || '').trim();
+  const r = String(responsavel || '').trim();
+  const t = String(telefone || '').replace(/\D/g, '');
+  const o = String(observacao || '').trim().toUpperCase();
+  if (/^DRAWER_E_/i.test(c)) return true;
+  if (/^TESTE_CODEX/i.test(c)) return true;
+  if (/^TESTE_CODEX/i.test(r)) return true;
+  if (r === 'TESTE_EDIT' || r === 'TESTE') return true;
+  if (r === 'X' && c === 'Y') return true;
+  if (t === '98999999999' || t === '98999999998') return true;
+  if (o.indexOf('[TESTE]') >= 0 || o.indexOf('TESTE_CODEX') >= 0) return true;
+  return false;
+}
+
+function anularLinhaTesteAdmin_(sheet, rowIndex, motivo) {
+  const row = sheet.getRange(rowIndex, 1, 1, 28).getValues()[0];
+  if (!row[0]) return { anulada: false, motivo: 'nao_encontrada' };
+  const status = String(row[14] || '').trim();
+  const valTotal = Number(row[10] || 0);
+  if (status === 'Cancelada' && valTotal === 0) {
+    return { anulada: false, motivo: 'ja_anulada', id: row[0], crianca: String(row[12] || '') };
+  }
+  const antes = locacaoObj_(row, rowIndex);
+  sheet.getRange(rowIndex, 9, 1, 3).setValues([[0, 0, 0]]);
+  sheet.getRange(rowIndex, 15).setValue('Cancelada');
+  const obs = String(row[17] || '').trim();
+  const tag = '[ANULADO TESTE ADM] ' + motivo;
+  if (obs.indexOf(tag) < 0) {
+    sheet.getRange(rowIndex, 18).setValue(obs ? obs + ' | ' + tag : tag);
+  }
+  const rowAfter = sheet.getRange(rowIndex, 1, 1, 28).getValues()[0];
+  const depois = locacaoObj_(rowAfter, rowIndex);
+  registrarAuditoriaLocacao_(rowIndex, 'limparLocacaoTesteAdmin', antes, depois, motivo, 'admin');
+  return {
+    anulada: true,
+    rowIndex: rowIndex,
+    id: row[0],
+    crianca: String(row[12] || ''),
+    responsavel: String(row[11] || ''),
+    statusAntes: status
+  };
+}
+
+function limparLocacoesTesteAdmin_(p) {
+  if (!adminPinOk_(p)) return err_('Acesso negado — PIN admin 1416', 403);
+  const motivo = String(p.motivo || 'Limpeza locacoes de teste automatica Codex').trim();
+  if (motivo.length < 10) return err_('Motivo obrigatorio (min 10 caracteres)', 400);
+  const soHoje = String(p.soHoje || '') === '1' || p.soHoje === true;
+  const dataHoje = fmtData_(new Date());
+  const lock = LockService.getScriptLock();
+  try { lock.waitLock(10000); } catch (ex) { return err_('Sistema ocupado', 503); }
+  try {
+    const sheet = sh_(SH_LOC);
+    const last = sheet.getLastRow();
+    if (last < DATA_ROW) return resp_({ anuladas: [], ignoradas: [], total: 0, mensagem: 'Nenhuma locacao' });
+    const dados = sheet.getRange(DATA_ROW, 1, last - DATA_ROW + 1, 18).getValues();
+    const anuladas = [];
+    const ignoradas = [];
+    for (let i = 0; i < dados.length; i++) {
+      const r = dados[i];
+      if (!r[0]) continue;
+      const dataR = cellToStr_(r[1]);
+      if (soHoje && dataR !== dataHoje) continue;
+      if (!isLocacaoTeste_(String(r[12] || ''), String(r[11] || ''), String(r[13] || ''), String(r[17] || ''))) continue;
+      const rowIndex = DATA_ROW + i;
+      const out = anularLinhaTesteAdmin_(sheet, rowIndex, motivo);
+      if (out.anulada) anuladas.push(out);
+      else ignoradas.push(out);
+    }
+    try { CacheService.getScriptCache().remove('carregarInicio_v2'); } catch (e) {}
+    return resp_({
+      anuladas: anuladas,
+      ignoradas: ignoradas,
+      total: anuladas.length,
+      mensagem: anuladas.length + ' locacao(oes) de teste anulada(s)'
+    });
+  } finally { lock.releaseLock(); }
 }
 
 function corrigirFinanceiroLocacaoAdmin_(p) {

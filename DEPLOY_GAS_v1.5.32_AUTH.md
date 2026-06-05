@@ -4,13 +4,13 @@
 
 Toda vez que o assistente alterar o `.gs`, deve informar este caminho (versão atual no header do arquivo):
 
-**v1.5.44 no seu PC:**
+**v1.5.46 no seu PC:**
 
 `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github\MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs`
 
 ## Código GAS no PC (copiar daqui → colar no script)
 
-**Arquivo canônico v1.5.44 (Pacote E — doPost + operador obrigatório):**
+**Arquivo canônico v1.5.46 (Pacote F KPIs + v1.5.45 limparLocacoesTesteAdmin):**
 
 `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github\MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs`
 
@@ -24,11 +24,11 @@ Abrir no Explorer: cole o caminho na barra de endereço → Enter → duplo cliq
 | **Web app em produção (exec)** | https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec |
 | **Testar se o GAS está no ar (ping)** | https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec?action=ping |
 | **Planilha MOVIKIDS** | https://docs.google.com/spreadsheets/d/1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618/edit |
-| **App (GitHub Pages)** | https://ribocg-a11y.github.io/movikids/?force=1.7.26 |
+| **App (GitHub Pages)** | https://ribocg-a11y.github.io/movikids/?force=1.7.27 |
 
 No **editor GAS** (link acima): **Implantar → Gerenciar implantações → Editar** a implantação Web (**ID `AKfycbwakQ...`**) → **Nova versão** → Implantar. **Não** crie um deploy novo. **Nunca** use `clasp deploy`.
 
-Após implantar, o `ping` deve mostrar `versao` **v1.5.44** e `postWriteActions` (Pacote E). SMS: **v1.5.41** — ver `TROCA_SMS_GATEWAY_DJVJRL_2026-06-04.md`.
+Após implantar, o `ping` deve mostrar `versao` **v1.5.46** e `postWriteActions` (Pacote E). `buscarKPIsAdmin` inclui `porOperador`, `cancelamentos`, `ocupacaoFrota` (Pacote F). SMS: **v1.5.41** — ver `TROCA_SMS_GATEWAY_DJVJRL_2026-06-04.md`.
 
 ### Propriedades do script (SMS — producao)
 
@@ -51,7 +51,7 @@ O script: copia o `.gs` canônico → `gas/Code.gs` → valida `DEPLOY_ID` → `
 
 ## Arquivo canônico
 
-`MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs` (header **v1.5.44**)
+`MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs` (header **v1.5.46**)
 
 `const DEPLOY_ID` no arquivo deve ser **`AKfycbwakQ...`** (não `AKfycbzc...`).
 
@@ -61,11 +61,12 @@ O script: copia o `.gs` canônico → `gas/Code.gs` → valida `DEPLOY_ID` → `
 |--------|-----|
 | `loginOperador` / `loginAdmin` | Auth balcão (ADM PIN **1416**) |
 | `corrigirFinanceiroLocacaoAdmin` | Ajuste locação encerrada + `zerarExtra` |
+| `limparLocacoesTesteAdmin` | Anula locações de teste (`adminPin=1416`, `motivo` ≥10 chars; opcional `soHoje=1`) |
 | `liberarSessaoOperadorAdmin` | ADM libera trava de sessão |
 | `encerrarLocacao` | Aceita `somentePlano=true` (sem extras — GAS instável) |
 
 ## Frontend
 
-Publicar **v1.7.26** no GitHub (`git push`). Tablets: `?force=1.7.26`. Escritas críticas usam **POST** — exige GAS **v1.5.44** implantado antes do FE em produção.
+Publicar **v1.7.27** no GitHub (`git push`). Tablets: `?force=1.7.27`. Escritas críticas usam **POST** — exige GAS **v1.5.44+** implantado. Pacote F Dashboard exige GAS **v1.5.46**.
 
 Ver também: `ESTADO_ATUAL.md`, `REGRAS_DE_PUBLICACAO_SEGURA.md`.
