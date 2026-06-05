@@ -24,7 +24,7 @@ Referencia unica para alinhamento local x producao.
 
 | SMS Gateway Cloud | **DJVJRL** / device `wihWegHr4wXaVJQ1R-GZR` | Aparelho remoto ONLINE |
 
-| Frontend | **v1.7.15** | https://ribocg-a11y.github.io/movikids/?force=1.7.15 |
+| Frontend | **v1.7.17** | https://ribocg-a11y.github.io/movikids/?force=1.7.17 |
 
 | Pacote SMS P0 | **FECHADO** | `PACOTE_SMS_P0_UNIFICADO_v1.5.38_v1.7.11.md` |
 

@@ -1,7 +1,9 @@
-/* MOVI KIDS — Login operadores v1.7.16 */
+/* MOVI KIDS — Login operadores v1.7.17 */
 (function () {
   const SESSION_KEY = 'mk_auth_session_v1';
   const LEGACY_OPERADOR_KEY = 'mk_operador_atual_v1';
+  const AUTH_ACTIVITY_KEY = 'mk_auth_last_activity';
+  const AUTH_IDLE_MS = 60 * 60 * 1000;
 
   let selectedOp = null;
   let operadoresCache = [];
@@ -26,10 +28,25 @@
     }
   }
 
+  function touchAuthActivity_() {
+    try { localStorage.setItem(AUTH_ACTIVITY_KEY, String(Date.now())); } catch (e) {}
+  }
+
+  function isAuthIdleExpired_() {
+    try {
+      const last = Number(localStorage.getItem(AUTH_ACTIVITY_KEY) || 0);
+      if (!last) return false;
+      return Date.now() - last >= AUTH_IDLE_MS;
+    } catch (e) {
+      return false;
+    }
+  }
+
   function setSession(s) {
     try {
       sessionStorage.setItem(SESSION_KEY, JSON.stringify(s));
       if (s && s.nome) localStorage.setItem(LEGACY_OPERADOR_KEY, s.nome);
+      touchAuthActivity_();
       if (typeof window.mkPersistAuthSession === 'function') window.mkPersistAuthSession();
     } catch (e) {}
   }
@@ -38,6 +55,10 @@
     try {
       sessionStorage.removeItem(SESSION_KEY);
       localStorage.removeItem(LEGACY_OPERADOR_KEY);
+      localStorage.removeItem(AUTH_ACTIVITY_KEY);
+      localStorage.removeItem('mk_auth_session_persist_v1');
+      localStorage.removeItem('mk_auth_session_persist_at');
+      localStorage.removeItem('mk_admin_ui_persist');
     } catch (e) {}
   }
 
@@ -159,7 +180,7 @@
     finally { _turnoPollBusy = false; }
   };
 
-  window.trocarOperador = async function trocarOperador() {
+  window.trocarOperador = async function trocarOperador(motivo) {
     const s = getSession();
     if (s && s.role !== 'admin' && s.id && s.id !== 'ADMIN') {
       try {
@@ -170,12 +191,43 @@
     if (typeof adminLogout === 'function' && window.isAdmin) adminLogout();
     clearSession();
     selectedOp = null;
+    if (typeof mobMenuClose_ === 'function') mobMenuClose_();
     showGate(true);
     hideApp();
     showStep('mk-step-select');
     try { await loadOperadores(); } catch (e) { /* ignore */ }
-    toast('Sessao encerrada. Faca login novamente.', 'warning');
+    const msg = motivo === 'inatividade'
+      ? 'Sessao encerrada: 1 hora sem atividade. Faca login novamente.'
+      : 'Sessao encerrada. Faca login novamente.';
+    toast(msg, 'warning');
   };
+
+  let _authIdleBusy = false;
+  async function checkAuthIdle_() {
+    if (!mkAuthIsLoggedIn() || _authIdleBusy) return;
+    if (!isAuthIdleExpired_()) return;
+    _authIdleBusy = true;
+    try {
+      await trocarOperador('inatividade');
+    } finally {
+      _authIdleBusy = false;
+    }
+  }
+
+  function initAuthIdleWatch_() {
+    if (window._mkAuthIdleWired) return;
+    window._mkAuthIdleWired = true;
+    ['click', 'keydown', 'touchstart', 'scroll', 'mousemove'].forEach(ev => {
+      document.addEventListener(ev, () => {
+        if (mkAuthIsLoggedIn()) touchAuthActivity_();
+      }, { passive: true });
+    });
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') checkAuthIdle_();
+    });
+    setInterval(checkAuthIdle_, 60000);
+    checkAuthIdle_();
+  }
 
   function hideApp() {
     const app = document.getElementById('app');
@@ -205,12 +257,11 @@
 
   function applyRoleNav_() {
     const admin = mkAuthIsAdmin();
-    const navAdmin = document.getElementById('nav-admin');
     const sbGer = document.getElementById('sb-gerenciar-btn');
     const sbAdminSec = document.getElementById('sb-admin-section');
-    if (navAdmin) navAdmin.style.display = admin ? '' : 'none';
     if (sbGer) sbGer.style.display = admin ? 'none' : '';
-    if (sbAdminSec && !admin && typeof hideAdminSidebar === 'function') hideAdminSidebar();
+    if (admin && typeof showAdminSidebar === 'function') showAdminSidebar();
+    else if (sbAdminSec && typeof hideAdminSidebar === 'function') hideAdminSidebar();
   }
 
   function showStep(id) {
@@ -592,8 +643,20 @@
     wireEvents();
 
     const splash = document.getElementById('splash');
+    initAuthIdleWatch_();
+
     const existing = getSession();
     if (existing && existing.nome) {
+      if (isAuthIdleExpired_()) {
+        clearSession();
+        hideApp();
+        showGate(true);
+        showStep('mk-step-select');
+        try { await loadOperadores(); } catch (e) { renderOpList(false); }
+        toast('Sessao expirada (1h sem uso). Faca login novamente.', 'warning');
+        return;
+      }
+      touchAuthActivity_();
       if (splash) {
         splash.classList.add('hide');
         setTimeout(() => splash.classList.add('gone'), 550);

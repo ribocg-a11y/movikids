@@ -22,7 +22,7 @@
 <script>
 // ── CACHE BUSTER — alinhado a mk-version.js / APP_VERSION ──
 (function(){
-  const CURRENT = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.16';
+  const CURRENT = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.17';
   const KEY = 'mk_loaded_version';
   try {
     const stored = localStorage.getItem(KEY);
@@ -173,7 +173,7 @@ header{
 /* ── NAV ──────────────────────────────────────────────────── */
 nav{
   flex-shrink:0;
-  display:grid;grid-template-columns:repeat(6,1fr);
+  display:grid;grid-template-columns:repeat(4,1fr);
   background:#fff;border-bottom:1px solid var(--border);
   box-shadow:var(--shadow-sm);
 }
@@ -332,9 +332,16 @@ nav button .nav-badge{
 #page-nova.step-0-veiculo .veiculo-grid-pelucias{transition:opacity .2s}
 .nova-rel-quick{display:flex;gap:8px;margin-bottom:10px;align-items:stretch}
 .nova-rel-quick .form-input{margin:0;flex:1}
-.nova-rel-results{margin-bottom:12px;max-height:160px;overflow-y:auto}
-.nova-rel-item{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:6px;background:var(--card);cursor:pointer;font-size:13px}
-.nova-rel-item:hover{border-color:var(--blue);background:var(--blue-lt)}
+.nova-rel-results{margin-bottom:12px;max-height:0;overflow:hidden;transition:max-height .2s}
+.nova-rel-results.has-items{max-height:200px;overflow-y:auto}
+.nova-rel-hint{font-size:11px;color:var(--txt3);margin-bottom:8px;font-weight:700}
+.nova-rel-item{
+  display:flex;justify-content:space-between;align-items:center;gap:8px;width:100%;
+  padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);
+  margin-bottom:6px;background:var(--card);cursor:pointer;font-size:13px;
+  text-align:left;font-family:inherit;
+}
+.nova-rel-item:hover,.nova-rel-item:focus{border-color:var(--blue);background:var(--blue-lt);outline:none}
 
 .tipo-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
 .veiculo-grid-carros{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}
@@ -563,12 +570,32 @@ nav button .nav-badge{
 
 
 /* ══ SIDEBAR ════════════════════════════════════════════════ */
+#mob-nav-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:190}
+#mob-nav-backdrop.show{display:block}
+.hd-menu-btn{
+  display:none;align-items:center;justify-content:center;
+  width:40px;height:40px;margin-left:8px;border:1.5px solid rgba(255,255,255,.35);
+  background:rgba(255,255,255,.1);color:#fff;border-radius:10px;
+  font-size:20px;line-height:1;cursor:pointer;flex-shrink:0;
+}
 #sidebar{
   display:none;width:230px;flex-shrink:0;
   background:linear-gradient(180deg,#060d1f 0%,#0a1e4a 40%,#0d2a5c 100%);
   flex-direction:column;height:100dvh;position:sticky;top:0;
   border-right:1px solid rgba(255,255,255,.08);
   box-shadow:4px 0 24px rgba(0,0,0,.4);z-index:20;
+  overflow-y:auto;-webkit-overflow-scrolling:touch;
+}
+@media(max-width:1023px){
+  .hd-menu-btn{display:flex}
+  #sidebar{
+    display:flex;position:fixed;left:0;top:0;bottom:0;width:min(280px,88vw);
+    z-index:200;transform:translateX(-105%);transition:transform .22s ease;
+    height:100dvh;max-height:100dvh;
+  }
+  #sidebar.mob-open{transform:translateX(0)}
+  nav{grid-template-columns:repeat(4,1fr)!important}
+  .nav-icon-menu{font-size:18px;line-height:1}
 }
 .sb-logo{
   padding:22px 18px 16px;
@@ -642,16 +669,18 @@ nav button .nav-badge{
 #main-content{flex:1;min-width:0;display:flex;flex-direction:column;overflow:hidden}
 
 /* ══ RESPONSIVE BREAKPOINTS ════════════════════════════════ */
-@media(min-width:768px){
-  #sidebar{display:flex}
+@media(min-width:1024px){
+  #sidebar{display:flex;position:sticky;transform:none!important}
+  #mob-nav-backdrop{display:none!important}
   #app{
     flex-direction:row!important;
     width:min(1400px,100vw)!important;
     max-width:min(1400px,100vw)!important;
     height:100dvh;
   }
-  header{display:none} /* sidebar handles branding */
-  #main-content nav{display:none!important} /* hide bottom nav only */
+  header{display:none}
+  #main-content nav{display:none!important}
+  .hd-menu-btn{display:none!important}
   .stats-bar{grid-template-columns:repeat(4,1fr)}
   .kpi-grid{grid-template-columns:repeat(4,1fr)!important}
   .charts-row{grid-template-columns:1fr 1fr}
@@ -936,8 +965,8 @@ nav button .nav-badge{
   }
 }
 
-/* ── DESKTOP (768px+): app ocupa 100% com sidebar lateral ─────────────── */
-@media(min-width:768px){
+/* ── DESKTOP (1024px+): app ocupa 100% com sidebar lateral ─────────────── */
+@media(min-width:1024px){
   #app{
     width:100vw!important;
     max-width:100vw!important;
@@ -1526,11 +1555,12 @@ nav button .nav-badge{
 
 <!-- App -->
 <div id="app" style="display:none">
+  <div id="mob-nav-backdrop" onclick="mobMenuClose_()" aria-hidden="true"></div>
 
-  <!-- ══ SIDEBAR (desktop only) ══ -->
+  <!-- ══ SIDEBAR (desktop fixo / celular = menu suspenso) ══ -->
   <aside id="sidebar">
     <div class="sb-logo">🚗 Movi <span>Kids</span>
-      <div class="sb-status"><span id="sb-dot" class="dot-online"></span><span id="sb-txt">Online</span><span id="sb-version" style="font-size:10px;opacity:.85;margin-left:5px;color:rgba(255,255,255,.7);font-family:monospace">v1.7.16</span></div>
+      <div class="sb-status"><span id="sb-dot" class="dot-online"></span><span id="sb-txt">Online</span><span id="sb-version" style="font-size:10px;opacity:.85;margin-left:5px;color:rgba(255,255,255,.7);font-family:monospace">v1.7.17</span></div>
     </div>
     <div class="sb-nav" id="sb-nav">
       <button class="sb-btn active" id="sbn-home" onclick="showPage('home')"><span class="sb-icon">🏠</span>Home</button>
@@ -1589,33 +1619,25 @@ nav button .nav-badge{
         <span id="hd-turno-mini" class="hd-turno-mini" hidden title="Sessao">—</span>
         <div id="status-dot" class="dot-online"></div>
         <span id="status-txt">Online</span>
-        <span id="app-version" style="font-size:10px;opacity:.85;margin-left:4px;font-family:monospace">v1.7.16</span>
+        <span id="app-version" style="font-size:10px;opacity:.85;margin-left:4px;font-family:monospace">v1.7.17</span>
       </div>
+      <button type="button" class="hd-menu-btn" id="hd-menu-btn" aria-label="Abrir menu" onclick="mobMenuToggle_()">☰</button>
     </div>
   </header>
 
-  <!-- Nav -->
+  <!-- Nav mobile: atalhos + menu completo na sidebar -->
   <nav>
-    <button class="active" onclick="showPage('home')">
+    <button class="active" id="nav-home" onclick="showPage('home')">
       <div class="nav-icon">🏠</div>Home
     </button>
-    <button onclick="abrirNovaLocacao()">
+    <button id="nav-nova" onclick="abrirNovaLocacao()">
       <div class="nav-icon nav-badge">➕<span id="badge-nova" class="badge" style="display:none">!</span></div>Nova
-    </button>
-    <button onclick="showPage('relacionamento')">
-      <div class="nav-icon">👥</div>Resp.
     </button>
     <button id="nav-painel" onclick="showPage('painel')">
       <div class="nav-icon">📺</div>Operação
     </button>
-    <button onclick="showPage('custos')">
-      <div class="nav-icon">💰</div>Custos
-    </button>
-    <button onclick="showPage('lancamento')">
-      <div class="nav-icon">⚡</div>Avulso
-    </button>
-    <button id="nav-admin" onclick="abrirAdmin()" style="display:none">
-      <div class="nav-icon">🔐</div>Admin
+    <button id="nav-menu" onclick="mobMenuOpen_()">
+      <div class="nav-icon nav-icon-menu">☰</div>Menu
     </button>
   </nav>
 
@@ -1730,7 +1752,7 @@ nav button .nav-badge{
     <div id="step-1" class="step-page">
       <div class="sec-title">Quem — responsável e criança</div>
       <div class="nova-rel-quick">
-        <input id="nova-rel-q" class="form-input" type="search" placeholder="Buscar responsável cadastrado (nome ou telefone)" autocomplete="off">
+        <input id="nova-rel-q" class="form-input" type="search" placeholder="Buscar responsável cadastrado (nome ou telefone)" autocomplete="off" onkeydown="if(event.key==='Enter'){event.preventDefault();novaBuscarRelacionamento_();}">
         <button type="button" class="btn btn-secondary btn-sm" onclick="novaBuscarRelacionamento_()">Buscar</button>
       </div>
       <div id="nova-rel-results" class="nova-rel-results"></div>
@@ -2654,7 +2676,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.16';
+const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.17';
 const WEBAPP_URL = (typeof window !== 'undefined' && window.MK_GAS_EXEC_URL) ? window.MK_GAS_EXEC_URL
   : 'https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec';
 const WEBAPP_URL_DEAD_PREFIX = 'AKfycbzc';
@@ -2741,6 +2763,28 @@ function sbSetAdminNavOpen_(open, persist) {
 function sbToggleAdminNav_() {
   const panel = document.getElementById('sb-admin-panel');
   sbSetAdminNavOpen_(panel && panel.hidden, true);
+}
+
+function mobMenuOpen_() {
+  const sb = document.getElementById('sidebar');
+  const bd = document.getElementById('mob-nav-backdrop');
+  if (sb) sb.classList.add('mob-open');
+  if (bd) bd.classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+
+function mobMenuClose_() {
+  const sb = document.getElementById('sidebar');
+  const bd = document.getElementById('mob-nav-backdrop');
+  if (sb) sb.classList.remove('mob-open');
+  if (bd) bd.classList.remove('show');
+  document.body.style.overflow = '';
+}
+
+function mobMenuToggle_() {
+  const sb = document.getElementById('sidebar');
+  if (sb && sb.classList.contains('mob-open')) mobMenuClose_();
+  else mobMenuOpen_();
 }
 
 function sbSairSessaoClick_() {
@@ -3820,34 +3864,60 @@ async function novaBuscarRelacionamento_() {
   const box = document.getElementById('nova-rel-results');
   if (!box) return;
   if (!q) { toast('Digite nome ou telefone para buscar.', 'warning'); return; }
+  box.classList.remove('has-items');
   box.innerHTML = '<div class="skeleton"></div>';
   try {
     const res = await api({ action: 'listarResponsaveis', q, limite: 12 }, 20000);
     if (!res.ok || !(res.responsaveis || []).length) {
       box.innerHTML = '<div style="font-size:12px;color:var(--txt3);padding:8px">Nenhum cadastro encontrado.</div>';
+      box.classList.add('has-items');
       return;
     }
-    box.innerHTML = res.responsaveis.map((r, idx) => {
+    relacionamentoCache = res.responsaveis;
+    if (res.responsaveis.length === 1) {
+      novaAplicarRelacionamento_(0);
+      return;
+    }
+    box.innerHTML = '<div class="nova-rel-hint">Toque no cadastro para preencher o formulario abaixo:</div>';
+    res.responsaveis.forEach((r, idx) => {
       const kids = (r.criancas || []).join(', ') || '—';
-      return '<div class="nova-rel-item" onclick="novaAplicarRelacionamento_(' + idx + ')">' +
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'nova-rel-item';
+      btn.innerHTML =
         '<span><b>' + escHtml(r.responsavel || '') + '</b><br><span style="font-size:11px;color:var(--txt3)">' +
         escHtml(kids) + '</span></span>' +
-        '<span style="font-size:11px;color:var(--txt3)">' + escHtml(relPhone_(r.telefone)) + '</span></div>';
-    }).join('');
-    relacionamentoCache = res.responsaveis;
+        '<span style="font-size:11px;color:var(--txt3)">' + escHtml(relPhone_(r.telefone)) + '</span>';
+      btn.addEventListener('click', () => novaAplicarRelacionamento_(idx));
+      box.appendChild(btn);
+    });
+    box.classList.add('has-items');
   } catch (e) {
     box.innerHTML = '<div style="font-size:12px;color:var(--red);padding:8px">Falha na busca. Tente de novo.</div>';
+    box.classList.add('has-items');
   }
 }
 
 function novaAplicarRelacionamento_(idx) {
   const r = relacionamentoCache && relacionamentoCache[idx];
   if (!r) return;
-  novaPrefillResponsavel = r;
-  aplicarPrefillResponsavel_();
+  const set = (id, value) => {
+    const el = document.getElementById(id);
+    if (el) el.value = value || '';
+  };
+  const criancas = Array.isArray(r.criancas) ? r.criancas : [];
+  set('inp-resp', r.responsavel || '');
+  set('inp-tel', r.telefone || '');
+  set('inp-cri', criancas[0] || '');
+  novaPrefillResponsavel = null;
   const box = document.getElementById('nova-rel-results');
-  if (box) box.innerHTML = '';
-  toast('Dados preenchidos. Confira nome e telefone.', 'success');
+  if (box) { box.innerHTML = ''; box.classList.remove('has-items'); }
+  const q = document.getElementById('nova-rel-q');
+  if (q) q.value = '';
+  atualizarNovaSummaryBar_();
+  salvarNovaDraft_();
+  toast('Cadastro preenchido. Confira os dados.', 'success');
+  document.getElementById('inp-resp')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
 function restaurarNovaDraft_() {
@@ -3902,6 +3972,7 @@ function inicializarDraftNova_() {
 }
 
 function abrirNovaLocacao() {
+  if (window.innerWidth < 1024) mobMenuClose_();
   novaPrefillResponsavel = null;
   limparNovaDraft_();
   resetNova({ preserveDraft: true });
@@ -5661,6 +5732,7 @@ function tickAdmin() {
 function irAdmin(page) {
   resetAdminTimer();
   if (typeof sbSetAdminNavOpen_ === 'function') sbSetAdminNavOpen_(true, true);
+  if (window.innerWidth < 1024 && typeof mobMenuClose_ === 'function') mobMenuClose_();
   showPage(page);
   if (page === 'dashboard') {
     // Busca dados frescos do servidor — re-renderiza gráficos ao terminar (fix race condition)
@@ -6300,6 +6372,7 @@ async function carregarHistRelatorios() {
 
 // ── OVERRIDE showPage for admin pages ────────────────────────
 function showPage(name, opts = {}) {
+  if (window.innerWidth < 1024) mobMenuClose_();
   const adminPages = ['admin','sistema','operadores','dashboard','relatorio','historico','caixa','config'];
   if (adminPages.includes(name) && !isAdmin) { abrirAdmin(); return; }
   const wasNovaActive = !!document.getElementById('page-nova')?.classList.contains('active');
@@ -6308,8 +6381,9 @@ function showPage(name, opts = {}) {
   document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
   const pg = document.getElementById('page-'+name);
   if(pg) pg.classList.add('active');
-  const navIdx = ['home','nova','relacionamento','painel','custos','lancamento'].indexOf(name);
-  if (navIdx >= 0) document.querySelectorAll('nav button')[navIdx]?.classList.add('active');
+  const navMap = { home: 'nav-home', nova: 'nav-nova', painel: 'nav-painel', relacionamento: 'nav-menu', custos: 'nav-menu', lancamento: 'nav-menu' };
+  const navId = navMap[name];
+  if (navId) document.getElementById(navId)?.classList.add('active');
   syncSidebar(name);
   if (name === 'lancamento') resetAvulsoForm_();
   if (name==='nova') {
