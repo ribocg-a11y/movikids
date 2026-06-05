@@ -69,13 +69,13 @@
   } catch(e) {}
 })();
 </script>
-<script src="mk-version.js?v=1.7.35"></script>
+<script src="mk-version.js?v=1.7.36"></script>
 <link rel="stylesheet" href="mk-design.css">
 
 <script>
 // ── CACHE BUSTER — alinhado a mk-version.js / APP_VERSION ──
 (function(){
-  const CURRENT = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.35';
+  const CURRENT = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.36';
   const KEY = 'mk_loaded_version';
   function mkVerParts_(v) {
     return String(v || '0.0').split('.').map(function(n) { return parseInt(n, 10) || 0; });
@@ -280,18 +280,12 @@ header{
   padding:16px;box-shadow:var(--shadow);
   border:2px solid transparent;
   transition:border-color .3s,background .3s;
-  position:relative;overflow:visible;
+  position:relative;overflow:hidden;
 }
-.session-card::before{
-  content:'';position:absolute;top:0;left:0;right:0;height:4px;
-  background:linear-gradient(90deg,var(--blue),var(--pink));
-}
-.session-card.carro::before{background:var(--blue)}
-.session-card.pelucia::before{background:var(--pink)}
+.session-card.carro{border-left:4px solid var(--blue)}
+.session-card.pelucia{border-left:4px solid var(--pink)}
 .session-card.warning{border-color:var(--amber);background:var(--amber-lt)}
-.session-card.warning::before{background:var(--amber)}
 .session-card.danger{border-color:var(--red);background:var(--red-lt);animation:shake .5s ease-in-out}
-.session-card.danger::before{background:var(--red)}
 @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
 
 .sc-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}
@@ -823,8 +817,7 @@ header{
 .rank-insight{font-size:12px;color:var(--txt3);font-style:italic;margin-top:8px;padding-top:8px;border-top:1px solid var(--border)}
 
 /* ── PENDING CARD (aguardando início) ─────────────────────────────────── */
-.session-card.pending{border-color:var(--border);background:var(--card)}
-.session-card.pending::before{background:var(--txt3)}
+.session-card.pending{border:2px solid var(--border);border-left:4px solid var(--txt3);background:var(--card)}
 .frozen-timer{text-align:center;padding:16px 0 20px}
 .frozen-time{font-size:44px;font-weight:900;color:var(--txt3);font-variant-numeric:tabular-nums;line-height:1}
 .frozen-label{font-size:12px;color:var(--txt3);margin-top:6px;font-weight:600}
@@ -2851,8 +2844,8 @@ header{
 
 <!-- Toast container -->
 <div id="update-banner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:9999;background:#1565C0;color:#fff;padding:10px 16px;align-items:center;justify-content:space-between;font-size:13px;font-weight:600;gap:12px">
-  <span>🔄 Nova versão — atualizando em <span id="update-countdown">5</span>s (login mantido)</span>
-  <button type="button" onclick="if(window.mkApplyAppUpdate&amp;&amp;typeof APP_VERSION!=='undefined')mkApplyAppUpdate(APP_VERSION)" style="background:#fff;color:#1565C0;border:none;border-radius:6px;padding:6px 14px;font-weight:700;cursor:pointer">Agora</button>
+  <span>🔄 Nova versão <strong id="update-remote-ver"></strong> — atualizando em <span id="update-countdown">5</span>s (login mantido)</span>
+  <button type="button" onclick="if(window.mkApplyAppUpdate)mkApplyAppUpdate(window.mkPendingUpdateVersion||APP_VERSION)" style="background:#fff;color:#1565C0;border:none;border-radius:6px;padding:6px 14px;font-weight:700;cursor:pointer">Agora</button>
 </div>
 
 <div class="toast-container" id="toast-container"></div>
@@ -2892,7 +2885,7 @@ header{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.35';
+const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.36';
 const WEBAPP_URL = (typeof window !== 'undefined' && window.MK_GAS_EXEC_URL) ? window.MK_GAS_EXEC_URL
   : 'https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec';
 const WEBAPP_URL_DEAD_PREFIX = 'AKfycbzc';
@@ -3299,8 +3292,7 @@ async function init() {
     syncController(true, 0);
   }, 30000);
 
-  setTimeout(() => verificarNovaVersao(), 15000);
-  setInterval(() => verificarNovaVersao(), 60000);
+  /* verificarNovaVersao: polling em mk-update.js (45s + ao voltar à aba) */
 
   // DIAGNÓSTICO ADMIN — a cada 60s (era 30s; -50% recalculos)
   setInterval(() => {
@@ -8115,7 +8107,7 @@ async function salvarLancamentoAvulso() {
 }
 
 </script>
-<script src="mk-update.js"></script>
+<script src="mk-update.js?v=1.7.36"></script>
 <script src="mk-auth.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', () => {

@@ -13,7 +13,7 @@ Referência única para alinhamento local × produção.
 ## ALERTA P0 (05/06/2026)
 
 **Nunca POST no `api()` do browser** — ver `INCIDENTE_POST_BROWSER_LANCAMENTO_2026-06-05.md`.  
-FE mínimo em operação: **v1.7.35**. Teste tablet obrigatório após mudança em `api()`.
+FE mínimo em operação: **v1.7.35** (recomendado **v1.7.36+** com auto-update). Teste tablet obrigatório após mudança em `api()`.
 
 ---
 
@@ -21,7 +21,7 @@ FE mínimo em operação: **v1.7.35**. Teste tablet obrigatório após mudança 
 
 | Camada | Versão alvo | URL / ID |
 |--------|-------------|----------|
-| **Frontend** | **v1.7.35** | https://ribocg-a11y.github.io/movikids/?force=1.7.35 |
+| **Frontend** | **v1.7.36** | https://ribocg-a11y.github.io/movikids/?force=1.7.36 |
 | **Apps Script** | **v1.5.51** | Deploy `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y` |
 | SMS Gateway Cloud | **DJVJRL** / device `wihWegHr4wXaVJQ1R-GZR` | Aparelho remoto ONLINE |
 | Pacote SMS P0 | **FECHADO** | `PACOTE_SMS_P0_UNIFICADO_v1.5.38_v1.7.11.md` |

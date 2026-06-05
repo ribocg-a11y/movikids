@@ -4,7 +4,10 @@
   const PERSIST_AT = 'mk_auth_session_persist_at';
   const PERSIST_TTL_MS = 24 * 60 * 60 * 1000;
   const CHECK_MS = 45000;
+  const ACTIVE_TIMER_DELAY_MS = 30000;
+  const IDLE_DELAY_MS = 5000;
   let _updateBusy = false;
+  let _updateScheduled = false;
 
   function persistAuthSession_() {
     try {
@@ -43,6 +46,31 @@
     }
   }
 
+  function verParts_(v) {
+    return String(v || '0.0').split('.').map(n => parseInt(n, 10) || 0);
+  }
+
+  function verNewer_(a, b) {
+    const pa = verParts_(a);
+    const pb = verParts_(b);
+    for (let i = 0; i < 3; i++) {
+      if (pa[i] > pb[i]) return true;
+      if (pa[i] < pb[i]) return false;
+    }
+    return false;
+  }
+
+  function clearCachesAndSw_() {
+    try {
+      if (window.caches) {
+        caches.keys().then(keys => keys.forEach(k => caches.delete(k)));
+      }
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(regs => regs.forEach(r => r.unregister()));
+      }
+    } catch (e) { /* ignore */ }
+  }
+
   window.mkPersistAuthSession = persistAuthSession_;
   window.mkRestoreAuthSession = restoreAuthSession_;
 
@@ -50,6 +78,7 @@
     if (_updateBusy) return;
     _updateBusy = true;
     persistAuthSession_();
+    clearCachesAndSw_();
     try {
       localStorage.setItem('mk_loaded_version', newVersion || '');
     } catch (e) { /* ignore */ }
@@ -60,46 +89,50 @@
   };
 
   async function fetchRemoteVersion_() {
-    const url = (location.origin + (location.pathname || '/movikids/')) + '?nocache=' + Date.now();
+    const path = location.pathname || '/movikids/';
+    const base = path.endsWith('/') ? path : path.replace(/[^/]+$/, '');
+    const url = location.origin + base + 'mk-version.js?nocache=' + Date.now();
     const r = await fetch(url, { cache: 'no-store' });
-    const html = await r.text();
-    const m = html.match(/MK_VERSION\s*=\s*'([^']+)'/)
-      || html.match(/APP_VERSION\s*=\s*'([^']+)'/);
+    const text = await r.text();
+    const m = text.match(/MK_VERSION\s*=\s*'([^']+)'/);
     return m ? m[1] : null;
   }
 
+  function scheduleUpdate_(remote, delayMs) {
+    if (_updateBusy || _updateScheduled) return;
+    _updateScheduled = true;
+    window.mkPendingUpdateVersion = remote;
+    const banner = document.getElementById('update-banner');
+    const cd = document.getElementById('update-countdown');
+    const verEl = document.getElementById('update-remote-ver');
+    if (banner) banner.style.display = 'flex';
+    if (verEl) verEl.textContent = remote;
+    let secs = Math.ceil(delayMs / 1000);
+    if (cd) cd.textContent = secs;
+    const iv = setInterval(() => {
+      secs--;
+      if (cd) cd.textContent = Math.max(0, secs);
+      if (secs <= 0) clearInterval(iv);
+    }, 1000);
+    setTimeout(() => {
+      _updateScheduled = false;
+      if (!_updateBusy) window.mkApplyAppUpdate(remote);
+    }, delayMs);
+  }
+
   window.verificarNovaVersao = async function verificarNovaVersao() {
-    if (_updateBusy || document.visibilityState === 'hidden') return;
-    const localVer = typeof APP_VERSION !== 'undefined' ? APP_VERSION : '';
+    if (_updateBusy || _updateScheduled || document.visibilityState === 'hidden') return;
+    const localVer = (typeof APP_VERSION !== 'undefined' && APP_VERSION)
+      || (typeof window.MK_VERSION !== 'undefined' && window.MK_VERSION)
+      || '';
     try {
       const remote = await fetchRemoteVersion_();
-      if (!remote || remote === localVer) return;
-      if (hasActiveTimerSession_()) {
-        if (typeof toast === 'function') {
-          toast('Nova versao ' + remote + ' — atualiza ao encerrar timers ou em 2 min', 'warning');
-        }
-        setTimeout(() => {
-          if (!_updateBusy) window.mkApplyAppUpdate(remote);
-        }, 120000);
-        return;
+      if (!remote || !verNewer_(remote, localVer)) return;
+      const delay = hasActiveTimerSession_() ? ACTIVE_TIMER_DELAY_MS : IDLE_DELAY_MS;
+      if (hasActiveTimerSession_() && typeof toast === 'function') {
+        toast('Nova versão ' + remote + ' — atualiza em ' + (delay / 1000) + 's', 'warning');
       }
-      const banner = document.getElementById('update-banner');
-      if (banner) {
-        banner.style.display = 'flex';
-        const cd = document.getElementById('update-countdown');
-        let secs = 5;
-        if (cd) cd.textContent = secs;
-        const iv = setInterval(() => {
-          secs--;
-          if (cd) cd.textContent = Math.max(0, secs);
-          if (secs <= 0) {
-            clearInterval(iv);
-            window.mkApplyAppUpdate(remote);
-          }
-        }, 1000);
-        return;
-      }
-      window.mkApplyAppUpdate(remote);
+      scheduleUpdate_(remote, delay);
     } catch (e) { /* silencioso */ }
   };
 
@@ -108,6 +141,11 @@
   setInterval(persistAuthSession_, 15000);
   window.addEventListener('pagehide', persistAuthSession_);
   document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible') persistAuthSession_();
+    if (document.visibilityState === 'visible') {
+      persistAuthSession_();
+      verificarNovaVersao();
+    }
   });
+  setTimeout(verificarNovaVersao, 8000);
+  setInterval(verificarNovaVersao, CHECK_MS);
 })();
