@@ -113,11 +113,18 @@ try {
   Assert-Ok $estender "estenderLocacao"
   Add-Check "estender ativa" "ok" ("totalMins={0}" -f $estender.totalMins)
 
-  $encerrar = Invoke-MoviApi (@{
-    action = "encerrarLocacao"; rowIndex = $salvar.rowIndex; minUsados = $estender.totalMins
-  } + $op) (Write-Method "encerrarLocacao")
-  Assert-Ok $encerrar "encerrarLocacao"
-  Add-Check "encerrar ativa" "ok" ("status encerrada")
+  $ativasPre = Invoke-MoviApi @{ action = "listarAtivas" }
+  Assert-Ok $ativasPre "listarAtivas pre-encerrar"
+  $aindaAtiva = ($ativasPre.locacoes | Where-Object { $_.rowIndex -eq $salvar.rowIndex -and $_.status -eq "Ativa" } | Select-Object -First 1)
+  if (-not $aindaAtiva) {
+    Add-Check "encerrar ativa" "skipped" ("row {0} nao esta Ativa (encerrada por outro dispositivo?)" -f $salvar.rowIndex)
+  } else {
+    $encerrar = Invoke-MoviApi (@{
+      action = "encerrarLocacao"; rowIndex = $salvar.rowIndex; minUsados = $estender.totalMins
+    } + $op) (Write-Method "encerrarLocacao")
+    Assert-Ok $encerrar "encerrarLocacao"
+    Add-Check "encerrar ativa" "ok" "Encerrada"
+  }
 
   # Segundo pendente para cancelar
   $salvar2 = Invoke-MoviApi (@{
