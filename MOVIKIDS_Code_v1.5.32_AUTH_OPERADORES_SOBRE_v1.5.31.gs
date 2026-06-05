@@ -1,8 +1,9 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.51
+// MOVI KIDS — Google Apps Script v1.5.52
+// v1.5.52: Fase 9 em pausa — operador logado volta a editar/cancelar locacao (supervisor nao restringe balcao)
 // v1.5.51: KPI porSemana — comparativo interativo com melhor dia e insights por semana
 // v1.5.50: Fase 8 — validacao frota/preços via operacaoConfig_; salvarOperacaoConfigAdmin
-// v1.5.50: Fase 9 — perfil supervisor em OPERADORES_SISTEMA; editar/cancelar/corrigir financeiro exigem supervisor+
+// v1.5.50: Fase 9 (adiada) — perfil supervisor em OPERADORES_SISTEMA; restricoes revertidas em v1.5.52
 // v1.5.49: fix kpiAvancadosMes_ — leitura de data AUDITORIA via cellToStr_ (porOperador/cancelamentos por motivo)
 // v1.5.48: Pacote F — relatorio/PDF mensal inclui gestao avancada (operador, cancelamentos, frota, custos, recorrencia)
 // v1.5.47: Pacote F — custos por categoria + recorrencia de clientes em buscarKPIsAdmin
@@ -323,9 +324,9 @@ function ping_() {
   const agora = new Date();
   return resp_({
     status:  'online',
-    versao:  'v1.5.51',
+    versao:  'v1.5.52',
     timestamp: fmtData_(agora) + ' ' + fmtHoraLocal_(agora),
-    sistema: 'MOVI KIDS v1.5.51',
+    sistema: 'MOVI KIDS v1.5.52',
     postWriteActions: WRITE_ACTIONS_CRITICAS_
   });
 }
@@ -623,7 +624,6 @@ function locacaoObj_(row, rowIndex) {
 }
 
 function editarLocacao_(p) {
-  if (!isSupervisorOrAdminRequest_(p)) return err_('Acesso negado — perfil supervisor ou admin necessario', 403);
   const lock = LockService.getScriptLock();
   try { lock.waitLock(6000); } catch(ex) { return err_('Sistema ocupado', 503); }
   try {
@@ -663,7 +663,6 @@ function editarLocacao_(p) {
 }
 
 function cancelarLocacao_(p) {
-  if (!isSupervisorOrAdminRequest_(p)) return err_('Acesso negado — perfil supervisor ou admin necessario', 403);
   const lock = LockService.getScriptLock();
   try { lock.waitLock(6000); } catch(ex) { return err_('Sistema ocupado', 503); }
   try {
@@ -3979,7 +3978,7 @@ function limparLocacoesTesteAdmin_(p) {
 }
 
 function corrigirFinanceiroLocacaoAdmin_(p) {
-  if (!isSupervisorOrAdminRequest_(p)) return err_('Acesso negado — perfil supervisor ou admin necessario', 403);
+  if (!isAdminRequest_(p)) return err_('Acesso negado — admin necessario', 403);
   const rowIndex = parseInt(p.rowIndex || '0', 10);
   const motivo = String(p.motivo || '').trim();
   if (!rowIndex || rowIndex < DATA_ROW) return err_('rowIndex invalido', 400);

@@ -13,7 +13,7 @@ Referência única para alinhamento local × produção.
 ## ALERTA P0 (05/06/2026)
 
 **Nunca POST no `api()` do browser** — ver `INCIDENTE_POST_BROWSER_LANCAMENTO_2026-06-05.md`.  
-FE mínimo em operação: **v1.7.35** (recomendado **v1.7.36+** com auto-update). Teste tablet obrigatório após mudança em `api()`.
+FE mínimo em operação: **v1.7.35** (recomendado **v1.7.37+** — operador edita/cancela + auto-update). Teste tablet obrigatório após mudança em `api()`.
 
 ---
 
@@ -21,8 +21,8 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.36+** com auto-update)
 
 | Camada | Versão alvo | URL / ID |
 |--------|-------------|----------|
-| **Frontend** | **v1.7.36** | https://ribocg-a11y.github.io/movikids/?force=1.7.36 |
-| **Apps Script** | **v1.5.51** | Deploy `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y` |
+| **Frontend** | **v1.7.37** | https://ribocg-a11y.github.io/movikids/?force=1.7.37 |
+| **Apps Script** | **v1.5.52** (após Nova versão Web) | Deploy `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y` |
 | SMS Gateway Cloud | **DJVJRL** / device `wihWegHr4wXaVJQ1R-GZR` | Aparelho remoto ONLINE |
 | Pacote SMS P0 | **FECHADO** | `PACOTE_SMS_P0_UNIFICADO_v1.5.38_v1.7.11.md` |
 | Planilha | MOVIKIDS_Planilha_Base | https://docs.google.com/spreadsheets/d/1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618/edit |
@@ -110,7 +110,8 @@ Commits de referência: `3d9d106` (v1.7.25), `e1a56db` (Pacote E), `1454bc8` (fi
 - [x] **Pacote E — POST + auditoria plena** — **v1.7.26** + GAS **v1.5.44**
 - [x] **Limpeza testes** — planilha + auto-cleanup nos scripts
 - [x] **Pacote F — KPIs avançados (início)** — **v1.7.27** + GAS **v1.5.46**
-- [ ] Fase 4 WhatsApp, Fase 8 config dinâmica, Fase 9 supervisor
+- [ ] Fase 4 WhatsApp, Fase 8 config dinâmica
+- [~] **Fase 9 supervisor — PAUSADA** (operadores mantêm editar/cancelar/plano; perfil supervisor não restringe balcão)
 
 ---
 
@@ -121,7 +122,7 @@ Commits de referência: `3d9d106` (v1.7.25), `e1a56db` (Pacote E), `1454bc8` (fi
 | 1 | Publicar GAS v1.5.46 | **feito** | ping v1.5.46 em 05/06 16:00 |
 | 2 | Pacote F — KPIs avançados | **em andamento** | v1.7.28 + v1.5.47 (custos cat. + recorrência) |
 | 3 | Validação tablet drawer 4 abas | pendente | admin logado pode bloquear |
-| 4 | Fases abertas | pendente | supervisor (F9), config frota (F8), WhatsApp (F4) |
+| 4 | Fases abertas | pendente | config frota (F8), WhatsApp (F4); **F9 supervisor pausada** |
 
 ### Pacote F — escopo entregue (v1.7.27)
 

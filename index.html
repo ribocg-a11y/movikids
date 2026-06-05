@@ -69,13 +69,13 @@
   } catch(e) {}
 })();
 </script>
-<script src="mk-version.js?v=1.7.36"></script>
+<script src="mk-version.js?v=1.7.37"></script>
 <link rel="stylesheet" href="mk-design.css">
 
 <script>
 // ── CACHE BUSTER — alinhado a mk-version.js / APP_VERSION ──
 (function(){
-  const CURRENT = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.36';
+  const CURRENT = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.37';
   const KEY = 'mk_loaded_version';
   function mkVerParts_(v) {
     return String(v || '0.0').split('.').map(function(n) { return parseInt(n, 10) || 0; });
@@ -2192,7 +2192,7 @@ header{
     </div>
     <p style="font-size:13px;color:var(--txt2);margin-bottom:14px;line-height:1.5">
       Cadastre quem opera o balcão. Cada operador cria o PIN de 4 dígitos no primeiro login.
-      Padrão atual: Eduarda e Milena Nunes. Perfil <strong>supervisor</strong> permite editar/cancelar e ver caixa/histórico.
+      Padrão atual: Eduarda e Milena Nunes. Perfil <strong>supervisor</strong> (planejamento em pausa) — hoje todos os operadores editam/cancelam no balcão.
       Apenas um operador pode estar logado por vez.
     </p>
     <div id="mk-ops-sessao-banner" class="mk-sessao-lock" style="display:none;margin-bottom:12px"></div>
@@ -2885,7 +2885,7 @@ header{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.36';
+const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.37';
 const WEBAPP_URL = (typeof window !== 'undefined' && window.MK_GAS_EXEC_URL) ? window.MK_GAS_EXEC_URL
   : 'https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec';
 const WEBAPP_URL_DEAD_PREFIX = 'AKfycbzc';
@@ -2953,8 +2953,9 @@ function mkExibirFinanceiro_() {
   if (typeof mkAuthIsSupervisorOrAdmin_ === 'function' && mkAuthIsSupervisorOrAdmin_()) return true;
   return (typeof mkAuthIsAdmin === 'function' && mkAuthIsAdmin()) || !!window.isAdmin;
 }
+/** Fase 9 supervisor em pausa — todo operador logado edita/cancela/muda plano no balcão. */
 function mkAuthCanEditarLocacao_() {
-  if (typeof mkAuthIsSupervisorOrAdmin_ === 'function' && mkAuthIsSupervisorOrAdmin_()) return true;
+  if (typeof mkAuthGetSession === 'function' && mkAuthGetSession()) return true;
   return (typeof mkAuthIsAdmin === 'function' && mkAuthIsAdmin()) || !!window.isAdmin;
 }
 function aplicarOperacaoConfig_(cfg) {
@@ -8107,7 +8108,7 @@ async function salvarLancamentoAvulso() {
 }
 
 </script>
-<script src="mk-update.js?v=1.7.36"></script>
+<script src="mk-update.js?v=1.7.37"></script>
 <script src="mk-auth.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
