@@ -1,5 +1,8 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.49
+// MOVI KIDS — Google Apps Script v1.5.51
+// v1.5.51: KPI porSemana — comparativo interativo com melhor dia e insights por semana
+// v1.5.50: Fase 8 — validacao frota/preços via operacaoConfig_; salvarOperacaoConfigAdmin
+// v1.5.50: Fase 9 — perfil supervisor em OPERADORES_SISTEMA; editar/cancelar/corrigir financeiro exigem supervisor+
 // v1.5.49: fix kpiAvancadosMes_ — leitura de data AUDITORIA via cellToStr_ (porOperador/cancelamentos por motivo)
 // v1.5.48: Pacote F — relatorio/PDF mensal inclui gestao avancada (operador, cancelamentos, frota, custos, recorrencia)
 // v1.5.47: Pacote F — custos por categoria + recorrencia de clientes em buscarKPIsAdmin
@@ -266,6 +269,8 @@ function dispatchMoviAction_(p, method) {
       case 'salvarConfig':         return salvarConfig_(p);
       case 'carregarOperacaoConfig': return carregarOperacaoConfig_();
       case 'diagnosticoConfigOperacional': return diagnosticoConfigOperacional_();
+      case 'salvarOperacaoConfigAdmin': return salvarOperacaoConfigAdmin_(p);
+      case 'definirPerfilOperadorAdmin': return definirPerfilOperadorAdmin_(p);
       case 'listarResponsaveis': return listarResponsaveis_(p);
       case 'salvarResponsavel': return salvarResponsavel_(p);
       case 'registrarWhatsAppEvento': return registrarWhatsAppEvento_(p);
@@ -318,9 +323,9 @@ function ping_() {
   const agora = new Date();
   return resp_({
     status:  'online',
-    versao:  'v1.5.49',
+    versao:  'v1.5.51',
     timestamp: fmtData_(agora) + ' ' + fmtHoraLocal_(agora),
-    sistema: 'MOVI KIDS v1.5.49',
+    sistema: 'MOVI KIDS v1.5.51',
     postWriteActions: WRITE_ACTIONS_CRITICAS_
   });
 }
@@ -443,14 +448,16 @@ function salvarLocacao_(p) {
   if (!tipo || !plano || !responsavel || !crianca) {
     return err_('Campos obrigatórios: tipo, plano, responsavel, crianca', 400);
   }
-  if (!PRECOS[tipo])        return err_('Tipo inválido: ' + tipo, 400);
-  if (!PRECOS[tipo][plano]) return err_('Plano inválido: ' + plano, 400);
+  const precosOp = precosOp_();
+  const veiculosOp = veiculosOp_();
+  if (!precosOp[tipo])        return err_('Tipo inválido: ' + tipo, 400);
+  if (!precosOp[tipo][plano]) return err_('Plano inválido: ' + plano, 400);
 
-  if (veiculo && !VEICULOS_VALIDOS.includes(veiculo)) {
+  if (veiculo && veiculosOp.indexOf(veiculo) < 0) {
     return err_('Veículo inválido: ' + veiculo, 400);
   }
 
-  const config = PRECOS[tipo][plano];
+  const config = precosOp[tipo][plano];
   const agora  = new Date();
   const sheet  = sh_(SH_LOC);
   const id     = nextId_(sheet);
@@ -524,7 +531,7 @@ function listarAtivas_() {
     if (status === 'Ativa' || status === 'Pendente') {
       const tipo    = String(r[4]);
       const plano   = String(r[5]);
-      const cfg     = (PRECOS[tipo] && PRECOS[tipo][plano]) ? PRECOS[tipo][plano] : {};
+      const cfg     = planoCfgOp_(tipo, plano) || {};
       const ts      = status === 'Ativa' ? timestampCanonico_(r[1], r[2], r[24]) : 0;
       const veiculo   = String(r[15] || '');
       const pagamento = String(r[16] || '');
@@ -616,6 +623,7 @@ function locacaoObj_(row, rowIndex) {
 }
 
 function editarLocacao_(p) {
+  if (!isSupervisorOrAdminRequest_(p)) return err_('Acesso negado — perfil supervisor ou admin necessario', 403);
   const lock = LockService.getScriptLock();
   try { lock.waitLock(6000); } catch(ex) { return err_('Sistema ocupado', 503); }
   try {
@@ -638,8 +646,8 @@ function editarLocacao_(p) {
     if (p.plano !== undefined) {
       if (started) return err_('Plano so pode ser alterado antes de iniciar. Use extensao.', 409);
       const tipo = String(row[4] || ''), plano = String(p.plano || '').trim();
-      if (!PRECOS[tipo] || !PRECOS[tipo][plano]) return err_('Plano invalido', 400);
-      const cfg = PRECOS[tipo][plano];
+      const cfg = planoCfgOp_(tipo, plano);
+      if (!cfg) return err_('Plano invalido', 400);
       sheet.getRange(rowIndex, 6).setValue(plano);
       sheet.getRange(rowIndex, 7).setValue(cfg.mins);
       sheet.getRange(rowIndex, 8).setValue(cfg.valor);
@@ -655,6 +663,7 @@ function editarLocacao_(p) {
 }
 
 function cancelarLocacao_(p) {
+  if (!isSupervisorOrAdminRequest_(p)) return err_('Acesso negado — perfil supervisor ou admin necessario', 403);
   const lock = LockService.getScriptLock();
   try { lock.waitLock(6000); } catch(ex) { return err_('Sistema ocupado', 503); }
   try {
@@ -703,7 +712,7 @@ function encerrarLocacao_(p) {
   const tipo    = String(row[4]);
   const plano   = String(row[5]);
   const veiculo = String(row[15] || '');
-  const cfg     = PRECOS[tipo] && PRECOS[tipo][plano] ? PRECOS[tipo][plano] : {};
+  const cfg     = planoCfgOp_(tipo, plano) || {};
   const minContratados  = Number(row[6]);
   const valorPlano      = Number(row[7]);
   const adicionalPorMin = cfg.adicional || 0;
@@ -922,7 +931,7 @@ function salvarCusto_(p) {
 
 // ── LISTAR CUSTOS ─────────────────────────────────────────────
 function listarCustos_(p) {
-  const adm = isAdminRequest_(p || {});
+  const adm = isSupervisorOrAdminRequest_(p || {});
   const mes = p.mes ? parseInt(p.mes) : null;
   const ano = p.ano ? parseInt(p.ano) : null;
   const sheet = sh_(SH_CUS);
@@ -1014,7 +1023,7 @@ function kpiAvancadosMes_(mmyy, nMes, nCancelMes, diasOperando, nPorVeiculo, min
   const taxaCancel = (nMes + nCancel) > 0 ? Math.round(nCancel / (nMes + nCancel) * 1000) / 10 : 0;
 
   const capMinVeic = diasOperando > 0 ? diasOperando * KPI_HORAS_OPERACAO_DIA_ * 60 : 0;
-  const ocupacaoFrota = VEICULOS_VALIDOS.map(v => {
+  const ocupacaoFrota = veiculosOp_().map(v => {
     const n = nPorVeiculo[v] || 0;
     const mins = minPorVeiculo[v] || 0;
     const pctOcup = capMinVeic > 0 ? Math.min(100, Math.round(mins / capMinVeic * 1000) / 10) : 0;
@@ -1035,6 +1044,135 @@ function kpiAvancadosMes_(mmyy, nMes, nCancelMes, diasOperando, nPorVeiculo, min
 }
 
 // ── KPIs ADMIN — v1.5.3: fatPorTipo inclui Triciclo ──────────
+const DIA_NOME_PT_ = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
+
+function buildPorSemanaMes_(fatMap, nMap, extMap, diasMes, mesAtual, anoAtual, mediaDiariaMes) {
+  const nSemanas = Math.ceil(diasMes / 7);
+  const semanas = [];
+  let maxFat = 0;
+  let maxN = 0;
+
+  for (let s = 0; s < nSemanas; s++) {
+    const diaIni = s * 7 + 1;
+    const diaFim = Math.min((s + 1) * 7, diasMes);
+    let fat = 0;
+    let n = 0;
+    let ext = 0;
+    const porDia = [];
+    let melhorDia = null;
+
+    for (let d = diaIni; d <= diaFim; d++) {
+      const dk = String(d).padStart(2, '0');
+      const f = Math.round((fatMap[dk] || 0) * 100) / 100;
+      const nn = nMap[dk] || 0;
+      const e = Math.round((extMap[dk] || 0) * 100) / 100;
+      fat += f;
+      n += nn;
+      ext += e;
+      const dt = new Date(anoAtual, mesAtual - 1, d);
+      const diaSem = DIA_NOME_PT_[dt.getDay()];
+      const diaObj = { dia: d, fat: f, n: nn, ext: e, diaSemana: diaSem };
+      porDia.push(diaObj);
+      if (f > 0 && (!melhorDia || f > melhorDia.fat || (f === melhorDia.fat && nn > melhorDia.n))) {
+        melhorDia = {
+          dia: d,
+          fat: f,
+          n: nn,
+          ext: e,
+          diaSemana: diaSem,
+          label: dk + '/' + String(mesAtual).padStart(2, '0')
+        };
+      }
+    }
+
+    fat = Math.round(fat * 100) / 100;
+    ext = Math.round(ext * 100) / 100;
+    const ticket = n > 0 ? Math.round(fat / n * 100) / 100 : 0;
+    const diasComMov = porDia.filter(x => x.fat > 0).length;
+    const mediaDiaSem = diasComMov > 0 ? Math.round(fat / diasComMov * 100) / 100 : 0;
+
+    if (melhorDia && melhorDia.fat > 0) {
+      const motivos = [];
+      const pctSem = fat > 0 ? Math.round(melhorDia.fat / fat * 1000) / 10 : 0;
+      motivos.push(melhorDia.diaSemana + ' (' + melhorDia.label + ') concentrou ' + pctSem + '% da receita da semana.');
+      if (mediaDiaSem > 0 && melhorDia.fat > mediaDiaSem) {
+        const acima = Math.round((melhorDia.fat / mediaDiaSem - 1) * 100);
+        if (acima > 0) motivos.push('Faturamento ' + acima + '% acima da media diaria desta semana (R$ ' + mediaDiaSem + ').');
+      }
+      if (melhorDia.n > 0 && n > 0) {
+        const pctN = Math.round(melhorDia.n / n * 1000) / 10;
+        motivos.push(melhorDia.n + ' atendimentos (' + pctN + '% do volume semanal).');
+      }
+      if (melhorDia.ext > 0) motivos.push('Inclui R$ ' + melhorDia.ext + ' em minutos extras.');
+      if (mediaDiariaMes > 0 && melhorDia.fat >= mediaDiariaMes * 1.15) {
+        motivos.push('Superou a media diaria do mes (R$ ' + mediaDiariaMes + ').');
+      }
+      melhorDia.motivos = motivos;
+      melhorDia.porque = motivos.join(' ');
+    }
+
+    const insights = [];
+    if (fat <= 0) {
+      insights.push('Sem receita registrada nesta semana.');
+    } else {
+      if (melhorDia && melhorDia.porque) insights.push('Melhor dia: ' + melhorDia.porque);
+      if (ext > 0) {
+        const pctExt = Math.round(ext / fat * 1000) / 10;
+        insights.push('Extras representam ' + pctExt + '% do faturamento semanal (R$ ' + ext + ').');
+      }
+      if (ticket > 0) insights.push('Ticket medio da semana: R$ ' + ticket + '.');
+    }
+
+    semanas.push({
+      semana: s + 1,
+      label: 'Sem ' + String(s + 1).padStart(2, '0'),
+      diaIni: diaIni,
+      diaFim: diaFim,
+      periodo: String(diaIni).padStart(2, '0') + '-' + String(diaFim).padStart(2, '0'),
+      fat: fat,
+      n: n,
+      ext: ext,
+      ticketMedio: ticket,
+      porDia: porDia,
+      melhorDia: melhorDia || null,
+      insights: insights
+    });
+    if (fat > maxFat) maxFat = fat;
+    if (n > maxN) maxN = n;
+  }
+
+  semanas.forEach(sem => {
+    sem.pctFat = maxFat > 0 ? Math.round(sem.fat / maxFat * 1000) / 10 : 0;
+    sem.pctN = maxN > 0 ? Math.round(sem.n / maxN * 1000) / 10 : 0;
+  });
+
+  for (let i = 1; i < semanas.length; i++) {
+    const ant = semanas[i - 1];
+    const cur = semanas[i];
+    if (cur.fat > 0 && ant.fat > 0) {
+      const diff = Math.round((cur.fat - ant.fat) / ant.fat * 100);
+      cur.insights.unshift((diff >= 0 ? 'Crescimento de ' : 'Queda de ') + Math.abs(diff) + '% vs ' + ant.label + '.');
+    }
+  }
+
+  let melhorSemanaIdx = 0;
+  let melhorFat = -1;
+  semanas.forEach((sem, idx) => {
+    if (sem.fat > melhorFat) {
+      melhorFat = sem.fat;
+      melhorSemanaIdx = idx;
+    }
+  });
+  const melhorSemana = semanas[melhorSemanaIdx] || null;
+
+  return {
+    semanas: semanas,
+    melhorSemanaIdx: melhorSemanaIdx,
+    melhorSemanaLabel: melhorSemana ? melhorSemana.label : '',
+    melhorSemanaFat: melhorSemana ? melhorSemana.fat : 0
+  };
+}
+
 function buscarKPIsAdmin_(p) {
   if (!isAdminRequest_(p)) return err_('Acesso negado — KPIs so para administrador', 403);
   const hoje     = new Date();
@@ -1063,6 +1201,7 @@ function buscarKPIsAdmin_(p) {
   let fatMesAnt = 0, nMesAnt = 0;
   const diasComMov = new Set();
   const fatPorDia = {};
+  const nPorDia = {};
   const extPorDia = {};
   const fatPorTipo = {'Carro':0,'Triciclo':0,'Pelúcia':0}; // v1.5.3: Triciclo
   const fatPorPlano = {};
@@ -1115,6 +1254,7 @@ function buscarKPIsAdmin_(p) {
           else if (dParsed >= mondayPrev) { fatSemanaAnt += vt; nSemanaAnt++; }
         }
         fatPorDia[dk]      = (fatPorDia[dk]      || 0) + vt;
+        nPorDia[dk]        = (nPorDia[dk]        || 0) + 1;
         fatPorTipo[tipo]   = (fatPorTipo[tipo]    || 0) + vt;
         fatPorPlano[plano] = (fatPorPlano[plano]  || 0) + vt;
         fatPorVeiculo[veiculo]   = (fatPorVeiculo[veiculo]   || 0) + vt;
@@ -1184,6 +1324,7 @@ function buscarKPIsAdmin_(p) {
 
   const diasOperandoCalc = diasComMov.size;
   const kpiAv = kpiAvancadosMes_(mmyy, nMes, nCancelMes, diasOperandoCalc, nPorVeiculo, minPorVeiculo);
+  const porSemanaPack = buildPorSemanaMes_(fatPorDia, nPorDia, extPorDia, diasMes, mesAtual, anoAtual, mediaDiaria);
 
   return resp_({
     // v1.5.4: comparativo + projeção
@@ -1228,7 +1369,11 @@ function buscarKPIsAdmin_(p) {
       nUnicos: nClientesUnicos,
       nRecorrentes: nClientesRecorrentes,
       pctRecorrencia: pctRecorrencia
-    }
+    },
+    porSemana: porSemanaPack.semanas,
+    melhorSemanaIdx: porSemanaPack.melhorSemanaIdx,
+    melhorSemanaLabel: porSemanaPack.melhorSemanaLabel,
+    melhorSemanaFat: porSemanaPack.melhorSemanaFat
   });
 }
 
@@ -1238,6 +1383,7 @@ function carregarInicio_(p) {
   // e quebrar o WebApp com "tipo de valor retornado nao e compativel".
 
   const adm      = isAdminRequest_(p || {});
+  const gestao   = isSupervisorOrAdminRequest_(p || {});
   const hoje     = new Date();
   const dataHoje = fmtData_(hoje);
   const shLoc    = sh_(SH_LOC);
@@ -1259,7 +1405,7 @@ function carregarInicio_(p) {
       if (status === 'Ativa' || status === 'Pendente') {
         const tipo  = String(r[4]);
         const plano = String(r[5]);
-        const cfg   = (PRECOS[tipo] && PRECOS[tipo][plano]) ? PRECOS[tipo][plano] : {};
+        const cfg   = planoCfgOp_(tipo, plano) || {};
         const ts    = status === 'Ativa' ? timestampCanonico_(r[1], r[2], r[24]) : 0;
         const ativaObj = {
           rowIndex:        DATA_ROW + idx,
@@ -1278,7 +1424,7 @@ function carregarInicio_(p) {
           telefone:        String(r[13]),
           status
         };
-        if (adm) {
+        if (gestao) {
           ativaObj.valorPlano = Number(r[7]);
           ativaObj.adicionalPorMin = cfg.adicional || 0;
         }
@@ -1324,23 +1470,25 @@ function carregarInicio_(p) {
         responsavel: String(r[11]),
         telefone:    String(r[13] || '')
       };
-      if (adm) encObj.valorTotal = Number(r[10]);
+      if (gestao) encObj.valorTotal = Number(r[10]);
       encHoje.push(encObj);
     });
   }
 
-  const statsHoje = adm ? { fat: fatHoje, n: nHoje } : { n: nHoje };
-  const custosPayload = adm ? custosHoje : custosHoje.map(c => ({
-    id: c.id, data: c.data, hora: c.hora, descricao: c.descricao, categoria: c.categoria, valor: c.valor
+  const statsHoje = gestao ? { fat: fatHoje, n: nHoje } : { n: nHoje };
+  const custosPayload = gestao ? custosHoje : custosHoje.map(c => ({
+    id: c.id, data: c.data, hora: c.hora, descricao: c.descricao, categoria: c.categoria
   }));
 
+  const opCfg = operacaoConfig_();
   const resultado = resp_({
-    sistema:    'MOVI KIDS v1.5.43',
+    sistema:    'MOVI KIDS v1.5.50',
     timestamp:  dataHoje + ' ' + fmtHoraLocal_(hoje),
     ativos:     ativas,
     statsHoje,
     custosHoje: custosPayload,
-    encHoje
+    encHoje,
+    operacaoConfig: payloadOperacaoConfigFe_(opCfg)
   });
   return resultado;
 }
@@ -1377,7 +1525,7 @@ function verificarSessao_(p) {
   const planoVS = String(row[5]);
   const tipoKey = tipoVS.includes('Pel') ? 'Pelúcia'
     : tipoVS.includes('Triciclo') ? 'Triciclo' : 'Carro';
-  const precoPl  = PRECOS[tipoKey] && PRECOS[tipoKey][planoVS] ? PRECOS[tipoKey][planoVS] : null;
+  const precoPl  = planoCfgOp_(tipoKey, planoVS);
   const valorPlano = precoPl ? precoPl.valor : 0;
   const adicVS = precoPl ? precoPl.adicional : 0;
 
@@ -2007,9 +2155,122 @@ function operacaoConfig_() {
   };
 }
 
+function precosOp_() {
+  return operacaoConfig_().precos;
+}
+
+function veiculosOp_() {
+  return operacaoConfig_().veiculos_validos;
+}
+
+function planoCfgOp_(tipo, plano) {
+  const p = precosOp_();
+  return (p[tipo] && p[tipo][plano]) ? p[tipo][plano] : null;
+}
+
+function precosFeFromOp_(precos) {
+  const out = {};
+  Object.keys(precos || {}).forEach(tipo => {
+    out[tipo] = {};
+    Object.keys(precos[tipo] || {}).forEach(plano => {
+      const c = precos[tipo][plano] || {};
+      out[tipo][plano] = {
+        v: Number(c.valor != null ? c.valor : c.v),
+        m: Number(c.mins != null ? c.mins : c.m),
+        a: Number(c.adicional != null ? c.adicional : c.a)
+      };
+    });
+  });
+  return out;
+}
+
+function veiculosDefFromList_(veiculos) {
+  return (veiculos || []).map(nome => {
+    const n = String(nome);
+    let tipo = 'Carro';
+    if (n.indexOf('Triciclo') >= 0) tipo = 'Triciclo';
+    else if (n.indexOf('Pel') >= 0) tipo = 'Pelúcia';
+    return { nome: n, tipo: tipo };
+  });
+}
+
+function payloadOperacaoConfigFe_(cfg) {
+  const c = cfg || operacaoConfig_();
+  return {
+    veiculos_validos: c.veiculos_validos,
+    veiculosDef: veiculosDefFromList_(c.veiculos_validos),
+    precosFe: precosFeFromOp_(c.precos),
+    formas_pagamento: c.formas_pagamento,
+    regras: c.regras,
+    fonte: c.fonte,
+    problemas: c.problemas || []
+  };
+}
+
+function cfgSetValue_(key, value) {
+  const sheet = sh_getOrCreate_(SH_CFG);
+  if (sheet.getLastRow() < 1) {
+    sheet.getRange(1, 1, 1, 2).setValues([['Chave', 'Valor']]);
+    sheet.getRange(1, 1, 1, 2).setFontWeight('bold');
+  }
+  const last = sheet.getLastRow();
+  let found = false;
+  if (last >= 2) {
+    const keys = sheet.getRange(2, 1, last - 1, 1).getValues();
+    for (let i = 0; i < keys.length; i++) {
+      if (String(keys[i][0]).trim() === key) {
+        sheet.getRange(2 + i, 2).setValue(value);
+        found = true;
+        break;
+      }
+    }
+  }
+  if (!found) sheet.appendRow([key, value]);
+}
+
+function salvarOperacaoConfigAdmin_(p) {
+  if (!isAdminRequest_(p)) return err_('Acesso negado — somente admin', 403);
+  let veiculos = null;
+  let precos = null;
+  if (p.veiculos_validos_json !== undefined) {
+    try {
+      veiculos = typeof p.veiculos_validos_json === 'string'
+        ? JSON.parse(p.veiculos_validos_json)
+        : p.veiculos_validos_json;
+    } catch (e) {
+      return err_('veiculos_validos_json invalido', 400);
+    }
+  }
+  if (p.precos_json !== undefined) {
+    try {
+      precos = typeof p.precos_json === 'string' ? JSON.parse(p.precos_json) : p.precos_json;
+    } catch (e) {
+      return err_('precos_json invalido', 400);
+    }
+  }
+  if (veiculos !== null) {
+    if (!Array.isArray(veiculos) || !veiculos.length) return err_('Lista de veiculos vazia', 400);
+    const limpos = veiculos.map(v => String(v || '').trim()).filter(Boolean);
+    if (!limpos.length) return err_('Nenhum veiculo valido', 400);
+    cfgSetValue_('veiculos_validos_json', JSON.stringify(limpos));
+  }
+  if (precos !== null) {
+    if (!precos || typeof precos !== 'object' || Array.isArray(precos)) return err_('precos_json deve ser objeto', 400);
+    cfgSetValue_('precos_json', JSON.stringify(precos));
+  }
+  if (veiculos === null && precos === null) return err_('Informe veiculos_validos_json e/ou precos_json', 400);
+  try { CacheService.getScriptCache().remove('carregarInicio_v2'); } catch (e) {}
+  const cfg = operacaoConfig_();
+  return resp_({
+    mensagem: 'Configuracao operacional salva',
+    config: payloadOperacaoConfigFe_(cfg)
+  });
+}
+
 function carregarOperacaoConfig_() {
   try {
-    return resp_({ versao: 'v1.5.31', config: operacaoConfig_() });
+    const cfg = operacaoConfig_();
+    return resp_({ versao: 'v1.5.50', config: payloadOperacaoConfigFe_(cfg) });
   } catch(ex) {
     return err_('Erro ao carregar configuracao operacional: ' + ex.message, 500);
   }
@@ -2020,7 +2281,7 @@ function diagnosticoConfigOperacional_() {
     const cfg = operacaoConfig_();
     const tipos = Object.keys(cfg.precos || {});
     return resp_({
-      versao: 'v1.5.31',
+      versao: 'v1.5.50',
       okConfig: cfg.problemas.length === 0,
       fonte: cfg.fonte,
       problemas: cfg.problemas,
@@ -2079,7 +2340,7 @@ function buscarPortalResponsavel_(p) {
       if (!telKeys.some(k => keySet[k])) return;
       const tipo = String(r[4] || '');
       const plano = String(r[5] || '');
-      const cfg = PRECOS[tipo] && PRECOS[tipo][plano] ? PRECOS[tipo][plano] : {};
+      const cfg = planoCfgOp_(tipo, plano) || {};
       locacoes.push({
         rowIndex: DATA_ROW + idx,
         id: r[0],
@@ -3179,7 +3440,7 @@ function fbDadosSessao_(row, status, rowIndex) {
   const planoFb = String(row[5] || '');
   const tipoKeyFb = tipoFb.includes('Pel') ? 'Pelúcia'
     : tipoFb.includes('Triciclo') ? 'Triciclo' : 'Carro';
-  const precoFb = PRECOS[tipoKeyFb] && PRECOS[tipoKeyFb][planoFb] ? PRECOS[tipoKeyFb][planoFb] : null;
+  const precoFb = planoCfgOp_(tipoKeyFb, planoFb);
   const statusFb = String(status || '').trim();
   const tsFb = statusFb === 'Ativa'
     ? timestampCanonico_(row[1], row[2], row[24])
@@ -3224,11 +3485,11 @@ function sincronizarOperadoresPadrao_(sh) {
   const ts = fmtData_(agora) + ' ' + fmtHoraLocal_(agora);
   if (last < OP_DATA_ROW) {
     OPERADORES_PADRAO_.forEach(nome => {
-      sh.appendRow([nextIdOperador_(sh), ts, nome, '', '', 'SIM', '']);
+      sh.appendRow([nextIdOperador_(sh), ts, nome, '', '', 'SIM', '', 'operador']);
     });
     return;
   }
-  const rows = sh.getRange(OP_DATA_ROW, 1, last - OP_DATA_ROW + 1, 7).getValues();
+  const rows = sh.getRange(OP_DATA_ROW, 1, last - OP_DATA_ROW + 1, 8).getValues();
   const nomesNorm = [];
   rows.forEach((r, i) => {
     const nome = String(r[2] || '').trim();
@@ -3242,7 +3503,7 @@ function sincronizarOperadoresPadrao_(sh) {
   });
   OPERADORES_PADRAO_.forEach(nome => {
     if (!nomesNorm.includes(nome.toLowerCase())) {
-      sh.appendRow([nextIdOperador_(sh), ts, nome, '', '', 'SIM', '']);
+      sh.appendRow([nextIdOperador_(sh), ts, nome, '', '', 'SIM', '', 'operador']);
       nomesNorm.push(nome.toLowerCase());
     }
   });
@@ -3251,8 +3512,11 @@ function sincronizarOperadoresPadrao_(sh) {
 function operadoresSheet_() {
   const sh = sh_getOrCreate_(SH_OPS);
   if (sh.getLastRow() < 1) {
-    sh.getRange(1, 1, 1, 7).setValues([['id', 'criadoEm', 'nome', 'pinHash', 'pinSalt', 'ativo', 'ultimoLogin']]);
-    sh.getRange(1, 1, 1, 7).setFontWeight('bold');
+    sh.getRange(1, 1, 1, 8).setValues([['id', 'criadoEm', 'nome', 'pinHash', 'pinSalt', 'ativo', 'ultimoLogin', 'perfil']]);
+    sh.getRange(1, 1, 1, 8).setFontWeight('bold');
+  } else {
+    const hdr = String(sh.getRange(1, 8).getValue() || '').trim().toLowerCase();
+    if (!hdr) sh.getRange(1, 8).setValue('perfil');
   }
   sincronizarOperadoresPadrao_(sh);
   return sh;
@@ -3298,12 +3562,29 @@ function isAdminRequest_(p) {
   return adminPinOk_(p);
 }
 
+/** Supervisor (authRole) ou admin. */
+function isSupervisorOrAdminRequest_(p) {
+  if (!p) return false;
+  if (isAdminRequest_(p)) return true;
+  return String(p.authRole || '').trim().toLowerCase() === 'supervisor';
+}
+
+function perfilNorm_(v) {
+  const p = String(v || '').trim().toLowerCase();
+  if (p === 'supervisor') return 'supervisor';
+  return 'operador';
+}
+
+function roleFromPerfil_(perfil) {
+  return perfilNorm_(perfil) === 'supervisor' ? 'supervisor' : 'operador';
+}
+
 function operadorRowById_(id) {
   const sh = operadoresSheet_();
   const last = sh.getLastRow();
   if (last < OP_DATA_ROW) return null;
   const target = Number(id);
-  const rows = sh.getRange(OP_DATA_ROW, 1, last - OP_DATA_ROW + 1, 7).getValues();
+  const rows = sh.getRange(OP_DATA_ROW, 1, last - OP_DATA_ROW + 1, 8).getValues();
   for (let i = 0; i < rows.length; i++) {
     if (Number(rows[i][0]) === target) return { row: OP_DATA_ROW + i, data: rows[i] };
   }
@@ -3315,7 +3596,8 @@ function operadorObjFromRow_(data) {
     id: Number(data[0]),
     nome: String(data[2] || '').trim(),
     hasPin: !!String(data[3] || '').trim(),
-    ativo: String(data[5] || 'SIM').toUpperCase() !== 'NAO'
+    ativo: String(data[5] || 'SIM').toUpperCase() !== 'NAO',
+    perfil: perfilNorm_(data[7])
   };
 }
 
@@ -3420,7 +3702,7 @@ function listarOperadoresLogin_() {
   const last = sh.getLastRow();
   const operadores = [];
   if (last >= OP_DATA_ROW) {
-    const rows = sh.getRange(OP_DATA_ROW, 1, last - OP_DATA_ROW + 1, 7).getValues();
+    const rows = sh.getRange(OP_DATA_ROW, 1, last - OP_DATA_ROW + 1, 8).getValues();
     rows.forEach(r => {
       const op = operadorObjFromRow_(r);
       if (op.nome && op.ativo) operadores.push(op);
@@ -3428,7 +3710,7 @@ function listarOperadoresLogin_() {
   }
   operadores.sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'));
   const todosComPin = operadores.length > 0 && operadores.every(o => o.hasPin);
-  return resp_({ operadores, todosComPin, sessaoAtiva: sessaoOperadorPayload_(), versao: 'v1.5.36' });
+  return resp_({ operadores, todosComPin, sessaoAtiva: sessaoOperadorPayload_(), versao: 'v1.5.50' });
 }
 
 function verificarOperadorLogin_(p) {
@@ -3457,9 +3739,9 @@ function definirPinOperador_(p) {
   const sh = operadoresSheet_();
   sh.getRange(found.row, 4, 1, 2).setValues([[hash, salt]]);
   sh.getRange(found.row, 7).setValue(fmtData_(new Date()) + ' ' + fmtHoraLocal_(new Date()));
-  const op = operadorObjFromRow_(sh.getRange(found.row, 1, 1, 7).getValues()[0]);
+  const op = operadorObjFromRow_(sh.getRange(found.row, 1, 1, 8).getValues()[0]);
   registrarSessaoOperadorAtiva_(op);
-  return resp_({ operador: op, role: 'operador', sessaoAtiva: sessaoOperadorPayload_() });
+  return resp_({ operador: op, role: roleFromPerfil_(op.perfil), sessaoAtiva: sessaoOperadorPayload_() });
 }
 
 function loginOperador_(p) {
@@ -3483,7 +3765,7 @@ function loginOperador_(p) {
   const sh = operadoresSheet_();
   sh.getRange(found.row, 7).setValue(fmtData_(new Date()) + ' ' + fmtHoraLocal_(new Date()));
   registrarSessaoOperadorAtiva_(op);
-  return resp_({ operador: op, role: 'operador', sessaoAtiva: sessaoOperadorPayload_() });
+  return resp_({ operador: op, role: roleFromPerfil_(op.perfil), sessaoAtiva: sessaoOperadorPayload_() });
 }
 
 function liberarSessaoOperador_(p) {
@@ -3535,14 +3817,14 @@ function cadastrarOperadorSistema_(p) {
   }
   const agora = new Date();
   const id = nextIdOperador_(sh);
-  sh.appendRow([id, fmtData_(agora) + ' ' + fmtHoraLocal_(agora), nome, '', '', 'SIM', '']);
-  return resp_({ operador: { id, nome, hasPin: false, ativo: true } });
+  sh.appendRow([id, fmtData_(agora) + ' ' + fmtHoraLocal_(agora), nome, '', '', 'SIM', '', 'operador']);
+  return resp_({ operador: { id, nome, hasPin: false, ativo: true, perfil: 'operador' } });
 }
 
 function operadorNomeDuplicado_(sh, nome, ignorarId) {
   const last = sh.getLastRow();
   if (last < OP_DATA_ROW) return false;
-  const rows = sh.getRange(OP_DATA_ROW, 1, last - OP_DATA_ROW + 1, 7).getValues();
+  const rows = sh.getRange(OP_DATA_ROW, 1, last - OP_DATA_ROW + 1, 8).getValues();
   const alvo = nome.toLowerCase();
   return rows.some(r => {
     const id = Number(r[0]);
@@ -3561,8 +3843,22 @@ function editarOperadorSistema_(p) {
   const sh = operadoresSheet_();
   if (operadorNomeDuplicado_(sh, nome, found.data[0])) return err_('Ja existe operador com este nome', 409);
   sh.getRange(found.row, 3).setValue(nome);
-  const op = operadorObjFromRow_(sh.getRange(found.row, 1, 1, 7).getValues()[0]);
+  const op = operadorObjFromRow_(sh.getRange(found.row, 1, 1, 8).getValues()[0]);
   return resp_({ operador: op });
+}
+
+function definirPerfilOperadorAdmin_(p) {
+  if (!adminPinOk_(p)) return err_('Acesso negado', 403);
+  const found = operadorRowById_(p.operadorId || p.id);
+  if (!found) return err_('Operador nao encontrado', 404);
+  const perfil = perfilNorm_(p.perfil);
+  if (perfil !== 'operador' && perfil !== 'supervisor') {
+    return err_('Perfil invalido — use operador ou supervisor', 400);
+  }
+  const sh = operadoresSheet_();
+  sh.getRange(found.row, 8).setValue(perfil);
+  const op = operadorObjFromRow_(sh.getRange(found.row, 1, 1, 8).getValues()[0]);
+  return resp_({ operador: op, mensagem: 'Perfil atualizado para ' + perfil });
 }
 
 function excluirOperadorSistema_(p) {
@@ -3573,7 +3869,7 @@ function excluirOperadorSistema_(p) {
   const last = sh.getLastRow();
   let ativos = 0;
   if (last >= OP_DATA_ROW) {
-    const rows = sh.getRange(OP_DATA_ROW, 1, last - OP_DATA_ROW + 1, 7).getValues();
+    const rows = sh.getRange(OP_DATA_ROW, 1, last - OP_DATA_ROW + 1, 8).getValues();
     rows.forEach(r => {
       if (String(r[5] || 'SIM').toUpperCase() !== 'NAO' && String(r[2] || '').trim()) ativos++;
     });
@@ -3593,7 +3889,7 @@ function resetarPinOperadorAdmin_(p) {
   if (ativa && Number(ativa.operadorId) === opId) liberarSessaoOperadorAtiva_(true);
   const sh = operadoresSheet_();
   sh.getRange(found.row, 4, 1, 2).setValues([['', '']]);
-  const op = operadorObjFromRow_(sh.getRange(found.row, 1, 1, 7).getValues()[0]);
+  const op = operadorObjFromRow_(sh.getRange(found.row, 1, 1, 8).getValues()[0]);
   return resp_({ operador: op, mensagem: 'PIN resetado. Operador criara novo PIN no proximo login.' });
 }
 
@@ -3678,7 +3974,7 @@ function limparLocacoesTesteAdmin_(p) {
 }
 
 function corrigirFinanceiroLocacaoAdmin_(p) {
-  if (!adminPinOk_(p)) return err_('Acesso negado — PIN admin 1416', 403);
+  if (!isSupervisorOrAdminRequest_(p)) return err_('Acesso negado — perfil supervisor ou admin necessario', 403);
   const rowIndex = parseInt(p.rowIndex || '0', 10);
   const motivo = String(p.motivo || '').trim();
   if (!rowIndex || rowIndex < DATA_ROW) return err_('rowIndex invalido', 400);

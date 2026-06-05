@@ -16,19 +16,30 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<script src="mk-version.js"></script>
+<script src="mk-version.js?v=1.7.33"></script>
 <link rel="stylesheet" href="mk-design.css">
 
 <script>
 // ── CACHE BUSTER — alinhado a mk-version.js / APP_VERSION ──
 (function(){
-  const CURRENT = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.29';
+  const CURRENT = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.33';
   const KEY = 'mk_loaded_version';
+  function mkVerParts_(v) {
+    return String(v || '0.0').split('.').map(function(n) { return parseInt(n, 10) || 0; });
+  }
+  function mkVerNewer_(a, b) {
+    const pa = mkVerParts_(a), pb = mkVerParts_(b);
+    for (let i = 0; i < 3; i++) {
+      if (pa[i] > pb[i]) return true;
+      if (pa[i] < pb[i]) return false;
+    }
+    return false;
+  }
   try {
-    const stored = localStorage.getItem(KEY);
+    const stored = localStorage.getItem(KEY) || '';
     const m = location.search.match(/force[=:\-]+([0-9]+\.[0-9]+)/i);
     const urlVer = m ? m[1] : '';
-    const precisaAtualizar = stored !== CURRENT || (urlVer && urlVer !== CURRENT);
+    const precisaAtualizar = !stored || mkVerNewer_(CURRENT, stored) || stored !== CURRENT || (urlVer && urlVer !== CURRENT);
     if (precisaAtualizar) {
       try {
         var _s = sessionStorage.getItem('mk_auth_session_v1');
@@ -1369,38 +1380,45 @@ header{
 .f5-badge.up{background:#E8F5E9;color:#2E7D32}.f5-badge.dn{background:#FFEBEE;color:#C62828}
 .f5-badge.eq{background:#F5F5F5;color:#888}
 
-/* Comparativo semanal interativo (KPI) */
-.mk-semana-panel{background:linear-gradient(160deg,#1a1f2e 0%,#12151c 100%);border-radius:14px;padding:16px 14px 14px;margin-bottom:14px;border:1px solid #2a3142}
-.mk-semana-title{font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#7eb8ff;margin-bottom:12px}
+/* Comparativo semanal interativo (KPI) — tema Movi Kids */
+.mk-semana-panel{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);
+  padding:16px;margin-bottom:14px;box-shadow:var(--shadow-sm)}
+.mk-semana-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;
+  color:var(--txt3);margin-bottom:12px}
 .mk-semana-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-bottom:12px}
 @media(max-width:900px){.mk-semana-grid{display:flex;overflow-x:auto;gap:8px;padding-bottom:4px;scroll-snap-type:x mandatory}.mk-semana-card{min-width:132px;scroll-snap-align:start;flex-shrink:0}}
-.mk-semana-card{background:#232833;border:1.5px solid #343b4a;border-radius:10px;padding:10px 10px 8px;cursor:pointer;transition:border-color .15s,box-shadow .15s}
-.mk-semana-card:hover{border-color:#4a90c4}
-.mk-semana-card.active{border-color:#00d4ff;box-shadow:0 0 0 1px rgba(0,212,255,.35),0 0 18px rgba(0,212,255,.18)}
+.mk-semana-card{background:var(--bg);border:1.5px solid var(--border);border-radius:var(--radius-sm);
+  padding:10px 10px 8px;cursor:pointer;transition:border-color .15s,background .15s,box-shadow .15s;
+  font-family:'Nunito',sans-serif;text-align:left}
+.mk-semana-card:hover{border-color:var(--blue);background:var(--blue-lt)}
+.mk-semana-card.active{border-color:var(--blue);background:var(--blue-lt);
+  box-shadow:0 0 0 2px rgba(21,101,192,.12)}
 .mk-sem-hdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px}
-.mk-sem-lbl{font-size:11px;font-weight:800;color:#e8ecf4}
-.mk-sem-per{font-size:9px;color:#8b95a8}
-.mk-sem-fat{font-size:15px;font-weight:800;color:#00d4ff;line-height:1.2;margin-bottom:2px}
-.mk-sem-n{font-size:10px;color:#9aa3b5;margin-bottom:8px}
+.mk-sem-lbl{font-size:11px;font-weight:800;color:var(--txt)}
+.mk-sem-per{font-size:9px;color:var(--txt3);font-weight:600}
+.mk-sem-fat{font-size:15px;font-weight:800;color:var(--blue);line-height:1.2;margin-bottom:2px}
+.mk-sem-n{font-size:10px;color:var(--txt2);font-weight:600;margin-bottom:8px}
 .mk-sem-bar-row{display:flex;align-items:center;gap:6px;margin-top:4px}
-.mk-sem-bar-lbl{font-size:8px;color:#6d7689;width:18px;flex-shrink:0}
-.mk-sem-bar-bg{flex:1;height:5px;background:#2f3644;border-radius:3px;overflow:hidden}
-.mk-sem-bar-fill{height:100%;border-radius:3px;transition:width .3s}
-.mk-sem-bar-fill.fat{background:linear-gradient(90deg,#1565c0,#00d4ff)}
-.mk-sem-bar-fill.n{background:linear-gradient(90deg,#2e7d32,#69f0ae)}
-.mk-semana-detail{background:#1e2430;border:1px solid #343b4a;border-radius:10px;padding:12px 14px;display:grid;grid-template-columns:1fr auto;gap:12px;align-items:start}
+.mk-sem-bar-lbl{font-size:8px;font-weight:700;color:var(--txt3);width:18px;flex-shrink:0}
+.mk-sem-bar-bg{flex:1;height:5px;background:var(--border);border-radius:99px;overflow:hidden}
+.mk-sem-bar-fill{height:100%;border-radius:99px;transition:width .3s}
+.mk-sem-bar-fill.fat{background:var(--blue)}
+.mk-sem-bar-fill.n{background:var(--green)}
+.mk-semana-detail{background:var(--bg);border:1.5px solid var(--border);border-radius:var(--radius-sm);
+  padding:12px 14px;display:grid;grid-template-columns:1fr auto;gap:12px;align-items:start}
 @media(max-width:700px){.mk-semana-detail{grid-template-columns:1fr}}
 .mk-sem-detail-left{min-width:0}
-.mk-sem-detail-hdr{font-size:12px;font-weight:700;color:#e8ecf4;margin-bottom:6px}
-.mk-sem-insights{font-size:11px;color:#a8b0c0;line-height:1.55}
+.mk-sem-detail-hdr{font-size:12px;font-weight:700;color:var(--txt);margin-bottom:6px}
+.mk-sem-insights{font-size:11px;color:var(--txt2);line-height:1.55}
 .mk-sem-insights li{margin:0 0 4px 14px}
-.mk-sem-destaque{background:#0d2137;border:1px solid #1e4a6e;border-radius:8px;padding:8px 10px;margin-bottom:8px;font-size:11px;color:#b8d4f0;line-height:1.45}
-.mk-sem-destaque strong{color:#00d4ff}
+.mk-sem-destaque{background:var(--blue-lt);border:1.5px solid var(--border);border-left:3px solid var(--blue);
+  border-radius:var(--radius-sm);padding:8px 10px;margin-bottom:8px;font-size:11px;color:var(--txt2);line-height:1.45}
+.mk-sem-destaque strong{color:var(--blue-dk)}
 .mk-sem-kpis{display:flex;gap:16px;flex-wrap:wrap}
 .mk-sem-kpi{text-align:right;min-width:72px}
-.mk-sem-kpi-val{font-size:16px;font-weight:800;color:#00d4ff}
-.mk-sem-kpi-lbl{font-size:8px;text-transform:uppercase;letter-spacing:.05em;color:#7a8499;margin-top:2px}
-.mk-semana-foot{font-size:10px;color:#6d7689;margin-top:10px;text-align:center}
+.mk-sem-kpi-val{font-size:16px;font-weight:800;color:var(--blue)}
+.mk-sem-kpi-lbl{font-size:8px;text-transform:uppercase;letter-spacing:.05em;color:var(--txt3);margin-top:2px;font-weight:700}
+.mk-semana-foot{font-size:10px;color:var(--txt3);margin-top:10px;text-align:center;font-weight:600}
 
 /* Relatório preview */
 .rel-iframe-wrap{border:1.5px solid var(--border);border-radius:var(--radius);
@@ -2821,7 +2839,7 @@ header{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.29';
+const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.33';
 const WEBAPP_URL = (typeof window !== 'undefined' && window.MK_GAS_EXEC_URL) ? window.MK_GAS_EXEC_URL
   : 'https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec';
 const WEBAPP_URL_DEAD_PREFIX = 'AKfycbzc';
@@ -6351,7 +6369,7 @@ function renderSemanasChart_(d) {
   if (!grid) return;
   const semanas = d.porSemana || [];
   if (!semanas.length) {
-    grid.innerHTML = '<p style="color:#8b95a8;font-size:12px;grid-column:1/-1">Sem dados de semanas neste mês.</p>';
+    grid.innerHTML = '<p style="color:var(--txt3);font-size:12px;grid-column:1/-1">Sem dados de semanas neste mês.</p>';
     return;
   }
   if (_semanaSelIdx == null || _semanaSelIdx >= semanas.length) {
