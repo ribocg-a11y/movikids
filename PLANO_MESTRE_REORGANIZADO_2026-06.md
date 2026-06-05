@@ -2,8 +2,8 @@
 
 **Data:** 04/06/2026  
 **Substitui como referência única de roadmap:** `PLANO_MESTRE_MOVIKIDS_CONFIABILIDADE.md` + trechos desatualizados de `PROXIMAS_FASES_OPERACIONAIS.md`  
-**Produção de referência:** GAS **v1.5.37** (impl. Web **v79**) · Frontend **v1.7.7** · Portal `acompanhar.html`  
-**Atualizado:** 04/06/2026 — Pacotes A/B/C + incidente publicados; **próximo: Pacote D** (drawer sessão).
+**Produção de referência:** GAS **v1.5.43** · Frontend **v1.7.23** · Portal `acompanhar.html`  
+**Atualizado:** 03/06/2026 — Pacotes A/B/C + incidente + UX auth (v1.7.18–23) publicados; **próximo: Pacote D** (drawer sessão). Ver `ESTADO_ATUAL.md`.
 
 ---
 
@@ -391,11 +391,16 @@ flowchart LR
 
 ## 14. Próxima sprint (decisão) — **ativa**
 
-**Agora:** **Pacote D** (drawer encerrar/editar/estender) → alvo **v1.7.8**.  
-**Depois:** Pacote E (POST GAS) → Pacote F (KPIs avançados).
+Ordem de retomada (03/06/2026):
 
-Pacote C entregue em **v1.7.7** — publicar com `git push` e `?force=1.7.7` nos tablets.
+1. [x] `ESTADO_ATUAL.md` — v1.7.23 + GAS v1.5.43
+2. [ ] **Pacote D** — drawer sessão → alvo **v1.7.24+**
+3. [ ] Pacote E — POST + auditoria plena (GAS v1.5.34+)
+4. [ ] Pacote F — KPIs avançados (Fase 10)
+5. [ ] Fases abertas — supervisor (F9), config frota (F8), WhatsApp (F4)
+
+Pacote C entregue em **v1.7.7**. UX pós-C (auth, menu, inatividade 1h) em **v1.7.18–1.7.23**.
 
 ---
 
-*Arquivo alinhado em 04/06/2026: GAS impl. v79 / FE v1.7.6 / plano mestre seção 6b incidente.*
+*Arquivo alinhado em 03/06/2026: GAS v1.5.43 / FE v1.7.23 — retomada Pacote D.*
