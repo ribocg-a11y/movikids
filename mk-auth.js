@@ -1,4 +1,4 @@
-/* MOVI KIDS — Login operadores v1.7.19 */
+/* MOVI KIDS — Login operadores v1.7.20 */
 (function () {
   const SESSION_KEY = 'mk_auth_session_v1';
   const LEGACY_OPERADOR_KEY = 'mk_operador_atual_v1';
@@ -153,7 +153,7 @@
       return;
     }
     el.style.display = 'block';
-    el.textContent = 'Sessao ativa no balcao: ' + sessao.nome + '. Use o botao abaixo para liberar se precisar.';
+    el.textContent = 'Sessão ativa no balcão: ' + sessao.nome + '. Use o botão abaixo para liberar se precisar.';
   }
 
   function applySessaoAtivaFromApi_(d) {
@@ -197,8 +197,8 @@
     showStep('mk-step-select');
     try { await loadOperadores(); } catch (e) { /* ignore */ }
     const msg = motivo === 'inatividade'
-      ? 'Sessao encerrada: 1 hora sem atividade. Faca login novamente.'
-      : 'Sessao encerrada. Faca login novamente.';
+      ? 'Sessão encerrada: 1 hora sem atividade. Faça login novamente.'
+      : 'Sessão encerrada. Faça login novamente.';
     toast(msg, 'warning');
   };
 
@@ -276,7 +276,7 @@
       showStep('mk-step-select');
       loadOperadores().catch(() => renderOpList(false));
       if (typeof toast === 'function') {
-        toast('Sessao administrativa encerrada. Escolha operador ou admin.', 'warning');
+        toast('Sessão administrativa encerrada. Escolha operador ou admin.', 'warning');
       }
     }
     applyRoleNav_();
@@ -429,7 +429,7 @@
       applySessaoAtivaFromApi_(d);
       renderOpList(false);
       if (!operadoresCache.length) {
-        showErr('mk-login-err', 'Nenhum operador ativo. Cadastre em Administracao > Operadores.');
+        showErr('mk-login-err', 'Nenhum operador ativo. Cadastre em Administração > Operadores.');
       }
       return d;
     } finally {
@@ -471,7 +471,7 @@
         showStep('mk-step-create-pin');
       }
     } catch (e) {
-      showErr('mk-login-err', e.message || 'Sem conexao');
+      showErr('mk-login-err', e.message || 'Sem conexão');
     }
   }
 
@@ -504,7 +504,7 @@
       applySessaoAtivaFromApi_(d);
       await finishLogin_(d.operador, d.role || 'operador', d);
     } catch (e) {
-      showErr('mk-create-err', e.message || 'Sem conexao');
+      showErr('mk-create-err', e.message || 'Sem conexão');
     }
   }
 
@@ -537,7 +537,7 @@
       applySessaoAtivaFromApi_(d);
       await finishLogin_(d.operador, d.role || 'operador', d);
     } catch (e) {
-      showErr('mk-login-pin-err', e.message || 'Sem conexao');
+      showErr('mk-login-pin-err', e.message || 'Sem conexão');
       clearPins(loginPins);
     } finally {
       if (btn) { btn.disabled = false; btn.textContent = 'Entrar'; }
@@ -565,7 +565,7 @@
       applySessaoAtivaFromApi_(d);
       await finishLogin_(d.operador, 'admin', d);
     } catch (e) {
-      showErr('mk-admin-err', e.message || 'Sem conexao com o servidor');
+      showErr('mk-admin-err', e.message || 'Sem conexão com o servidor');
       clearPins(adminPins);
     } finally {
       _authBusy = false;
@@ -672,7 +672,7 @@
         showGate(true);
         showStep('mk-step-select');
         try { await loadOperadores(); } catch (e) { renderOpList(false); }
-        toast('Sessao expirada (1h sem uso). Faca login novamente.', 'warning');
+        toast('Sessão expirada (1h sem uso). Faça login novamente.', 'warning');
         return;
       }
       touchAuthActivity_();
@@ -709,7 +709,7 @@
       await loadOperadores();
     } catch (e) {
       renderOpList(false);
-      showErr('mk-login-err', (e.message || 'Erro') + ' — confira conexao e GAS v1.5.32 no mesmo deploy.');
+      showErr('mk-login-err', (e.message || 'Erro') + ' — confira conexão e GAS v1.5.32 no mesmo deploy.');
     }
   };
 

@@ -22,7 +22,7 @@
 <script>
 // ── CACHE BUSTER — alinhado a mk-version.js / APP_VERSION ──
 (function(){
-  const CURRENT = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.19';
+  const CURRENT = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.20';
   const KEY = 'mk_loaded_version';
   try {
     const stored = localStorage.getItem(KEY);
@@ -617,6 +617,7 @@ nav button .nav-badge{
 .sb-icon{font-size:17px;line-height:1;flex-shrink:0}
 .sb-divider{font-size:10px;font-weight:700;color:rgba(255,255,255,.3);
   text-transform:uppercase;letter-spacing:.08em;padding:14px 13px 5px}
+.sb-oper-section{padding:0 10px 6px;flex:0 0 auto}
 .sb-admin-section{display:none;padding:0 10px 6px;flex:0 0 auto}
 .sb-admin-section.visible{display:block}
 .sb-admin-toggle{
@@ -1560,39 +1561,45 @@ nav button .nav-badge{
   <!-- ══ SIDEBAR (desktop fixo / celular = menu suspenso) ══ -->
   <aside id="sidebar">
     <div class="sb-logo">🚗 Movi <span>Kids</span>
-      <div class="sb-status"><span id="sb-dot" class="dot-online"></span><span id="sb-txt">Online</span><span id="sb-version" style="font-size:10px;opacity:.85;margin-left:5px;color:rgba(255,255,255,.7);font-family:monospace">v1.7.19</span></div>
+      <div class="sb-status"><span id="sb-dot" class="dot-online"></span><span id="sb-txt">Online</span><span id="sb-version" style="font-size:10px;opacity:.85;margin-left:5px;color:rgba(255,255,255,.7);font-family:monospace">v1.7.20</span></div>
     </div>
-    <div class="sb-nav" id="sb-nav">
-      <button class="sb-btn active" id="sbn-home" onclick="showPage('home')"><span class="sb-icon">🏠</span>Home</button>
-      <button class="sb-btn" id="sbn-nova" onclick="abrirNovaLocacao()"><span class="sb-icon">➕</span>Nova Locação</button>
-      <button class="sb-btn" id="sbn-relacionamento" onclick="showPage('relacionamento')"><span class="sb-icon">👥</span>Relacionamento</button>
-      <button class="sb-btn" id="sbn-painel" onclick="showPage('painel')"><span class="sb-icon">📺</span>Painel Operação</button>
-      <button class="sb-btn" id="sbn-custos" onclick="showPage('custos')"><span class="sb-icon">💰</span>Registrar Custo</button>
-      <button class="sb-btn" id="sbn-avulso" onclick="showPage('lancamento')"><span class="sb-icon">⚡</span>Lanç. Avulso</button>
+    <div class="sb-oper-section" id="sb-oper-section">
+      <button type="button" class="sb-admin-toggle" id="sb-oper-toggle" aria-expanded="true" aria-controls="sb-oper-panel" onclick="sbToggleOperNav_()">
+        <span>Home</span>
+        <span class="sb-admin-chevron" aria-hidden="true">▸</span>
+      </button>
+      <div class="sb-admin-panel" id="sb-oper-panel">
+        <button class="sb-btn active" id="sbn-home" onclick="showPage('home')"><span class="sb-icon">🏠</span>Início</button>
+        <button class="sb-btn" id="sbn-nova" onclick="abrirNovaLocacao()"><span class="sb-icon">➕</span>Nova Locação</button>
+        <button class="sb-btn" id="sbn-relacionamento" onclick="showPage('relacionamento')"><span class="sb-icon">👥</span>Relacionamento</button>
+        <button class="sb-btn" id="sbn-painel" onclick="showPage('painel')"><span class="sb-icon">📺</span>Painel Operação</button>
+        <button class="sb-btn" id="sbn-custos" onclick="showPage('custos')"><span class="sb-icon">💰</span>Registrar Custo</button>
+        <button class="sb-btn" id="sbn-avulso" onclick="showPage('lancamento')"><span class="sb-icon">⚡</span>Lanç. Avulso</button>
+      </div>
     </div>
     <div class="sb-admin-section" id="sb-admin-section">
       <button type="button" class="sb-admin-toggle" id="sb-admin-toggle" aria-expanded="false" aria-controls="sb-admin-panel" onclick="sbToggleAdminNav_()">
-        <span>Administracao</span>
+        <span>Administração</span>
         <span class="sb-admin-chevron" aria-hidden="true">▸</span>
       </button>
       <div class="sb-admin-panel" id="sb-admin-panel" hidden>
-        <button class="sb-btn" id="sbn-adm" onclick="irAdmin('admin')"><span class="sb-icon">📊</span>Centro de gestao</button>
+        <button class="sb-btn" id="sbn-adm" onclick="irAdmin('admin')"><span class="sb-icon">📊</span>Centro de gestão</button>
         <div class="sb-group-lbl">Financeiro</div>
         <button class="sb-btn" id="sbn-caixa" onclick="irAdmin('caixa')"><span class="sb-icon">💰</span>Caixa do dia</button>
         <button class="sb-btn" id="sbn-dash" onclick="irAdmin('dashboard')"><span class="sb-icon">📈</span>Dashboard</button>
-        <button class="sb-btn" id="sbn-hist" onclick="irAdmin('historico')"><span class="sb-icon">🗂️</span>Historico</button>
-        <button class="sb-btn" id="sbn-rel" onclick="irAdmin('relatorio')"><span class="sb-icon">📋</span>Relatorio mensal</button>
+        <button class="sb-btn" id="sbn-hist" onclick="irAdmin('historico')"><span class="sb-icon">🗂️</span>Histórico</button>
+        <button class="sb-btn" id="sbn-rel" onclick="irAdmin('relatorio')"><span class="sb-icon">📋</span>Relatório mensal</button>
         <div class="sb-group-lbl">Pessoas</div>
         <button class="sb-btn" id="sbn-ops" onclick="irAdmin('operadores')"><span class="sb-icon">👤</span>Operadores</button>
         <div class="sb-group-lbl">Sistema</div>
-        <button class="sb-btn" id="sbn-cfg" onclick="irAdmin('config')"><span class="sb-icon">⚙️</span>Configuracoes SMS</button>
+        <button class="sb-btn" id="sbn-cfg" onclick="irAdmin('config')"><span class="sb-icon">⚙️</span>Configurações SMS</button>
         <button class="sb-btn" id="sbn-sys" onclick="irAdmin('sistema')"><span class="sb-icon">🔧</span>Sistema</button>
       </div>
     </div>
     <div class="sb-footer">
       <div id="sb-sessao-card" class="sb-sessao-card" role="status" aria-live="polite" hidden>
         <div class="sb-sessao-row" id="sb-row-balcao" hidden>
-          <span class="sb-sessao-lbl">Balcao</span>
+          <span class="sb-sessao-lbl">Balcão</span>
           <span class="sb-sessao-val" id="sb-balcao-nome">—</span>
           <span class="sb-sessao-meta" id="sb-balcao-horas">—</span>
         </div>
@@ -1601,7 +1608,7 @@ nav button .nav-badge{
           <span class="sb-sessao-val" id="sb-tablet-nome">—</span>
           <span class="sb-sessao-meta" id="sb-tablet-horas">—</span>
         </div>
-        <p class="sb-sessao-empty" id="sb-sessao-empty" hidden>Nenhum turno no balcao</p>
+        <p class="sb-sessao-empty" id="sb-sessao-empty" hidden>Nenhum turno no balcão</p>
         <button type="button" class="sb-sessao-sair" id="sb-sessao-sair-btn" onclick="sbSairSessaoClick_()">Sair</button>
       </div>
       <button class="sb-btn sb-gerenciar" id="sb-gerenciar-btn" onclick="abrirAdmin()"><span class="sb-icon">🔐</span>Gerenciar</button>
@@ -1616,10 +1623,10 @@ nav button .nav-badge{
     <div class="hd-row">
       <div class="logo">🚗 Movi <span>Kids</span></div>
       <div class="hd-status">
-        <span id="hd-turno-mini" class="hd-turno-mini" hidden title="Sessao">—</span>
+        <span id="hd-turno-mini" class="hd-turno-mini" hidden title="Sessão">—</span>
         <div id="status-dot" class="dot-online"></div>
         <span id="status-txt">Online</span>
-        <span id="app-version" style="font-size:10px;opacity:.85;margin-left:4px;font-family:monospace">v1.7.19</span>
+        <span id="app-version" style="font-size:10px;opacity:.85;margin-left:4px;font-family:monospace">v1.7.20</span>
       </div>
       <button type="button" class="hd-menu-btn" id="hd-menu-btn" aria-label="Abrir menu" onclick="mobMenuToggle_()">☰</button>
     </div>
@@ -1823,13 +1830,13 @@ nav button .nav-badge{
 
   <!-- ──────── PAGE: RELACIONAMENTO ──────── -->
   <div id="page-relacionamento" class="page">
-    <div class="sec-title">Relacionamento / Responsaveis</div>
+    <div class="sec-title">Relacionamento / Responsáveis</div>
     <div class="rel-search">
-      <input id="rel-busca" type="search" placeholder="Buscar por responsavel, crianca ou telefone" onkeydown="if(event.key==='Enter') carregarRelacionamento()">
+      <input id="rel-busca" type="search" placeholder="Buscar por responsável, criança ou telefone" onkeydown="if(event.key==='Enter') carregarRelacionamento()">
       <button onclick="carregarRelacionamento()">Buscar</button>
     </div>
     <div id="rel-container" class="rel-grid">
-      <div class="empty"><div class="empty-icon">👥</div><h3>Busque um responsavel</h3><p>Use nome, crianca ou telefone.</p></div>
+      <div class="empty"><div class="empty-icon">👥</div><h3>Busque um responsável</h3><p>Use nome, criança ou telefone.</p></div>
     </div>
   </div>
 
@@ -2570,7 +2577,7 @@ nav button .nav-badge{
     <div id="enc-offline-warn" class="op-policy danger" style="display:none;margin:0 0 12px"></div>
     <label id="enc-adm-extra-wrap" style="display:none;align-items:flex-start;gap:8px;font-size:13px;font-weight:700;margin:0 0 12px;cursor:pointer">
       <input type="checkbox" id="enc-adm-extra-local" style="margin-top:3px">
-      <span>Incluir minutos extras do cronometro local (somente ADM, com GAS instavel)</span>
+      <span>Incluir minutos extras do cronômetro local (somente ADM, com GAS instável)</span>
     </label>
     <div class="modal-btns">
       <button class="btn btn-primary" onclick="confirmarEncerrar()" id="btn-enc-confirm">
@@ -2602,11 +2609,11 @@ nav button .nav-badge{
   <div class="modal-sheet">
     <div class="modal-handle"></div>
     <div class="modal-icon" id="op-icon">...</div>
-    <div class="modal-title" id="op-title">Editar locacao</div>
+    <div class="modal-title" id="op-title">Editar locação</div>
     <div class="modal-sub" id="op-sub">Corrija dados operacionais com auditoria.</div>
     <div id="op-body"></div>
     <div class="modal-btns">
-      <button class="btn btn-primary" id="op-save" onclick="salvarOperacaoLocacao()">Salvar alteracao</button>
+      <button class="btn btn-primary" id="op-save" onclick="salvarOperacaoLocacao()">Salvar alteração</button>
       <button class="btn btn-secondary" onclick="fecharOperacaoLocacao()">Cancelar</button>
     </div>
   </div>
@@ -2617,13 +2624,13 @@ nav button .nav-badge{
   <div class="modal-sheet">
     <div class="modal-handle"></div>
     <div class="modal-icon">👥</div>
-    <div class="modal-title">Cadastro do responsavel</div>
+    <div class="modal-title">Cadastro do responsável</div>
     <div class="modal-sub">Cadastro opcional para acelerar proximas locacoes.</div>
     <div class="op-form">
-      <div class="op-field"><label>Responsavel</label><input id="rel-edit-nome"></div>
+      <div class="op-field"><label>Responsável</label><input id="rel-edit-nome"></div>
       <div class="op-field"><label>Telefone</label><input id="rel-edit-tel"></div>
-      <div class="op-field"><label>Criancas</label><input id="rel-edit-criancas" placeholder="Separe por virgula"></div>
-      <div class="op-field"><label>Observacao</label><textarea id="rel-edit-obs" placeholder="Preferencias, restricoes ou observacoes"></textarea></div>
+      <div class="op-field"><label>Crianças</label><input id="rel-edit-criancas" placeholder="Separe por vírgula"></div>
+      <div class="op-field"><label>Observação</label><textarea id="rel-edit-obs" placeholder="Preferências, restrições ou observações"></textarea></div>
       <div class="op-field"><label>Motivo</label><textarea id="rel-edit-motivo">Atualizacao do cadastro de relacionamento.</textarea></div>
     </div>
     <div class="modal-btns">
@@ -2676,7 +2683,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.19';
+const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.20';
 const WEBAPP_URL = (typeof window !== 'undefined' && window.MK_GAS_EXEC_URL) ? window.MK_GAS_EXEC_URL
   : 'https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec';
 const WEBAPP_URL_DEAD_PREFIX = 'AKfycbzc';
@@ -2763,6 +2770,28 @@ function fmtHoraTurno_(ms) {
   } catch (e) {
     return '';
   }
+}
+
+function sbSetOperNavOpen_(open, persist) {
+  const panel = document.getElementById('sb-oper-panel');
+  const toggle = document.getElementById('sb-oper-toggle');
+  if (!panel || !toggle) return;
+  panel.hidden = !open;
+  toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+  if (persist !== false) {
+    try { localStorage.setItem('mk_sb_oper_open', open ? '1' : '0'); } catch (e) {}
+  }
+}
+
+function sbToggleOperNav_() {
+  const panel = document.getElementById('sb-oper-panel');
+  sbSetOperNavOpen_(panel && panel.hidden, true);
+}
+
+function sbInitOperNav_() {
+  let open = true;
+  try { open = localStorage.getItem('mk_sb_oper_open') !== '0'; } catch (e) {}
+  sbSetOperNavOpen_(open, false);
 }
 
 function sbSetAdminNavOpen_(open, persist) {
@@ -2866,7 +2895,7 @@ function atualizarOperadorUI_(sessaoServidor) {
   if (hdMini) {
     if (temBalcao) {
       hdMini.hidden = false;
-      hdMini.textContent = 'Balcao: ' + srv.nome;
+      hdMini.textContent = 'Balcão: ' + srv.nome;
     } else if (temTablet && isAdm) {
       hdMini.hidden = false;
       hdMini.textContent = 'Admin';
@@ -2946,6 +2975,7 @@ async function init() {
     if (el) el.textContent = APP_VERSION;
   });
   atualizarOperadorUI_();
+  sbInitOperNav_();
   if (typeof mkAuthRefreshSessaoTurno_ === 'function') mkAuthRefreshSessaoTurno_();
   atualizarWhatsAppUI_();
 
@@ -3378,7 +3408,7 @@ function smsStatusHtml_(s) {
   const failed = String(state || '').toLowerCase() === 'failed';
   const errTxt = sms.error ? (' Detalhe: ' + escHtml(String(sms.error).slice(0, 120))) : '';
   const fallback = failed
-    ? '<div class="sms-fail-hint">Confirme o telefone (DDD+9) ou mostre o QR do portal no balcao.' + errTxt + '</div>' +
+    ? '<div class="sms-fail-hint">Confirme o telefone (DDD+9) ou mostre o QR do portal no balcão.' + errTxt + '</div>' +
       '<button class="btn btn-wa" onclick="abrirWhatsAppFallback(' + Number(s.rowIndex || 0) + ')" title="Abrir WhatsApp como alternativa">WhatsApp fallback</button>'
     : '';
   return '<div class="sms-status sms-' + label.cls + '"' + title + '>' + label.txt + '</div>' + fallback;
@@ -3710,8 +3740,8 @@ function menuLocacaoHtml_(s, ativa) {
   const itensAtiva = `
     <button onclick="abrirOperacaoLocacao(${row},'editar')">Editar dados</button>
     <button onclick="abrirOperacaoLocacao(${row},'pagamento')">Trocar pagamento</button>
-    <button onclick="abrirOperacaoLocacao(${row},'veiculo')">Trocar veiculo</button>
-    <button onclick="abrirOperacaoLocacao(${row},'observacao')">Observacao</button>
+    <button onclick="abrirOperacaoLocacao(${row},'veiculo')">Trocar veículo</button>
+    <button onclick="abrirOperacaoLocacao(${row},'observacao')">Observação</button>
     <div class="sep"></div>
     <button onclick="abrirEstender(${row})">Estender tempo</button>
     <button class="danger" onclick="abrirOperacaoLocacao(${row},'cancelar')">Cancelar</button>`;
@@ -3719,10 +3749,10 @@ function menuLocacaoHtml_(s, ativa) {
     <button onclick="abrirOperacaoLocacao(${row},'editar')">Editar cadastro</button>
     <button onclick="abrirOperacaoLocacao(${row},'plano')">Trocar plano</button>
     <button onclick="abrirOperacaoLocacao(${row},'pagamento')">Trocar pagamento</button>
-    <button onclick="abrirOperacaoLocacao(${row},'veiculo')">Trocar veiculo</button>
+    <button onclick="abrirOperacaoLocacao(${row},'veiculo')">Trocar veículo</button>
     <div class="sep"></div>
     <button class="danger" onclick="abrirOperacaoLocacao(${row},'cancelar')">Cancelar cadastro</button>`;
-  return `<button class="sc-more" data-menu-key="${menuKey}" onclick="toggleMenuLocacao(event,this)" title="Mais opcoes">...</button><div class="sc-menu${showCls}" data-menu-key="${menuKey}" onclick="event.stopPropagation()">${ativa ? itensAtiva : itensPendente}</div>`;
+  return `<button class="sc-more" data-menu-key="${menuKey}" onclick="toggleMenuLocacao(event,this)" title="Mais opções">...</button><div class="sc-menu${showCls}" data-menu-key="${menuKey}" onclick="event.stopPropagation()">${ativa ? itensAtiva : itensPendente}</div>`;
 }
 
 function toggleMenuLocacao(ev, btn) {
@@ -4255,7 +4285,7 @@ function abrirNovaComResponsavel(resp, novaCrianca = false) {
   limparNovaDraft_();
   resetNova({ preserveDraft: true });
   showPage('nova', { freshNova: true });
-  toast(novaCrianca ? 'Responsavel selecionado. Cadastre a nova crianca apos escolher o plano.' : 'Responsavel selecionado. Escolha o veiculo e o plano.', '');
+  toast(novaCrianca ? 'Responsável selecionado. Cadastre a nova criança após escolher o plano.' : 'Responsável selecionado. Escolha o veículo e o plano.', '');
 }
 
 async function confirmarLocacao() {
@@ -4465,7 +4495,7 @@ function renderEncerrarModal_(session, fin) {
     html += '<div class="modal-info-row"><span>Min. adicionais</span><span>' + fin.minExtraCobrados + ' min</span></div>';
     if (exibirFin) html += '<div class="modal-info-row"><span>Valor adicional</span><span>R$ ' + vExtraStr + '</span></div>';
   } else if (fin.minExtraTimer > 0 && fin.somentePlano) {
-    html += '<div class="modal-info-row"><span>Cronometro local</span><span>' + fin.minExtraTimer + ' min extra (nao cobrados)</span></div>';
+    html += '<div class="modal-info-row"><span>Cronômetro local</span><span>' + fin.minExtraTimer + ' min extra (não cobrados)</span></div>';
   }
   if (exibirFin) {
     html += '<div class="modal-info-row total"><span>TOTAL A COBRAR</span><span>R$ ' + vTotalStr + '</span></div>';
@@ -4478,7 +4508,7 @@ function renderEncerrarModal_(session, fin) {
   if (warn) {
     if (fin.somentePlano) {
       warn.style.display = 'block';
-      warn.textContent = 'Servidor offline ou instavel: encerramento apenas pelo valor do plano, sem extras do cronometro. Ajuste depois em Administracao se necessario.';
+      warn.textContent = 'Servidor offline ou instável: encerramento apenas pelo valor do plano, sem extras do cronômetro. Ajuste depois em Administração se necessário.';
     } else {
       warn.style.display = 'none';
       warn.textContent = '';
@@ -4664,7 +4694,7 @@ function showAlertModal(s, expired) {
   document.getElementById('alert-title').textContent = expired ? 'Tempo esgotado!' : 'Faltam 5 minutos!';
   document.getElementById('alert-sub').textContent   = expired
     ? (admIgnoraSms
-      ? 'Administrador: voce pode encerrar sem enviar SMS (use em falha de rede ou emergencia).'
+      ? 'Administrador: você pode encerrar sem enviar SMS (use em falha de rede ou emergência).'
       : 'Envie a mensagem ao responsável informando que minutos extras serão cobrados.')
     : 'Avise ' + s.responsavel + ' que o tempo de ' + s.crianca + ' está acabando.';
 
@@ -4695,12 +4725,12 @@ function showAlertModal(s, expired) {
     }
     if (btnWa) {
       btnWa.textContent = admIgnoraSms
-        ? 'Enviar SMS de cobranca (opcional)'
-        : 'Enviar SMS de cobranca (obrigatorio)';
+        ? 'Enviar SMS de cobrança (opcional)'
+        : 'Enviar SMS de cobrança (obrigatório)';
       btnWa.onclick = async function() {
         if (await waTempoEsgotado(s) === false) {
           if (!admIgnoraSms) return;
-          toast('SMS indisponivel; voce ainda pode encerrar como ADM.', 'warning');
+          toast('SMS indisponível; você ainda pode encerrar como ADM.', 'warning');
           return;
         }
         marcarExtraWaEnviado_(s);
@@ -4726,7 +4756,7 @@ function fecharAlerta() {
   const modal = document.getElementById('alert-modal');
   const admIgnoraSms = typeof mkAdminIgnoraSmsObrigatorio_ === 'function' && mkAdminIgnoraSmsObrigatorio_();
   if (!admIgnoraSms && modal.classList.contains('danger') && modal.dataset.extraWaSent !== '1') {
-    toast('Envie o SMS de cobranca antes de fechar!', 'error');
+    toast('Envie o SMS de cobrança antes de fechar!', 'error');
     return;
   }
   modal.classList.remove('show');
@@ -4769,7 +4799,7 @@ function aplicarSmsResposta_(s, sms, smsTipo) {
 }
 
 async function enviarSmsResponsavel_(s, tipo) {
-  if (!s || !s.telefone) { toast('Telefone nao cadastrado', 'error'); return false; }
+  if (!s || !s.telefone) { toast('Telefone não cadastrado', 'error'); return false; }
   const smsTipo = tipo || tipoSmsPorSessao_(s);
   try {
     const d = await api({
@@ -4784,21 +4814,21 @@ async function enviarSmsResponsavel_(s, tipo) {
     const sms = d.sms || {};
     if (sms.duplicado) {
       aplicarSmsResposta_(s, sms, smsTipo);
-      toast('SMS ja enviado recentemente para esta locacao.', 'warning');
+      toast('SMS já enviado recentemente para esta locação.', 'warning');
       return true;
     }
     if (sms.gatewayId) aplicarSmsResposta_(s, sms, smsTipo);
     toast('SMS enviado para a fila.', 'success');
     return true;
   } catch(e) {
-    toast('SMS nao enviado: ' + (e.message || 'erro'), 'error');
+    toast('SMS não enviado: ' + (e.message || 'erro'), 'error');
     return false;
   }
 }
 
 async function enviarSmsAvulso_(dados, tipo) {
   const telefone = dados && (dados.telefone || dados.tel);
-  if (!telefone) { toast('Telefone nao cadastrado', 'error'); return false; }
+  if (!telefone) { toast('Telefone não cadastrado', 'error'); return false; }
   try {
     const d = await api({
       action: 'enviarSmsAvulso',
@@ -4815,7 +4845,7 @@ async function enviarSmsAvulso_(dados, tipo) {
     toast('SMS enviado.', 'success');
     return true;
   } catch(e) {
-    toast('SMS nao enviado: ' + (e.message || 'erro'), 'error');
+    toast('SMS não enviado: ' + (e.message || 'erro'), 'error');
     return false;
   }
 }
@@ -4827,7 +4857,7 @@ function normalizarTxt_(s) {
 function abrirOperacaoLocacao(rowIndex, tipo) {
   opSession = sessions.find(x => Number(x.rowIndex) === Number(rowIndex));
   opTipo = tipo;
-  if (!opSession) { toast('Locacao nao encontrada', 'error'); return; }
+  if (!opSession) { toast('Locação não encontrada', 'error'); return; }
   menuLocacaoAbertoKey = null;
   document.querySelectorAll('.sc-menu').forEach(m => m.classList.remove('show'));
   const modal = document.getElementById('op-modal');
@@ -4839,29 +4869,29 @@ function abrirOperacaoLocacao(rowIndex, tipo) {
   const ativa = !!opSession.started;
   icon.textContent = tipo === 'cancelar' ? '!' : tipo === 'pagamento' ? '$' : '...';
   save.className = 'btn btn-primary' + (tipo === 'cancelar' ? ' op-danger' : '');
-  save.textContent = tipo === 'cancelar' ? 'Confirmar cancelamento' : 'Salvar alteracao';
+  save.textContent = tipo === 'cancelar' ? 'Confirmar cancelamento' : 'Salvar alteração';
   if (tipo === 'pagamento') {
     title.textContent = 'Trocar pagamento';
-    sub.textContent = 'Atualiza caixa, card e relatorios com auditoria.';
-    body.innerHTML = `<div class="op-policy">Use quando o responsavel pagou em outra forma.</div><div class="op-form"><div class="op-grid"><div class="op-field"><label>Atual</label><input value="${escHtml(opSession.pagamento || 'Nao informado')}" disabled></div><div class="op-field"><label>Novo</label><select id="op-pagamento">${['PIX','Credito','Debito','Dinheiro'].map(p=>`<option ${normalizarTxt_(opSession.pagamento)===normalizarTxt_(p)?'selected':''}>${p}</option>`).join('')}</select></div></div><div class="op-field"><label>Motivo</label><textarea id="op-motivo">Responsavel alterou a forma de pagamento.</textarea></div></div>`;
+    sub.textContent = 'Atualiza caixa, card e relatórios com auditoria.';
+    body.innerHTML = `<div class="op-policy">Use quando o responsável pagou em outra forma.</div><div class="op-form"><div class="op-grid"><div class="op-field"><label>Atual</label><input value="${escHtml(opSession.pagamento || 'Não informado')}" disabled></div><div class="op-field"><label>Novo</label><select id="op-pagamento">${['PIX','Credito','Debito','Dinheiro'].map(p=>`<option ${normalizarTxt_(opSession.pagamento)===normalizarTxt_(p)?'selected':''}>${p}</option>`).join('')}</select></div></div><div class="op-field"><label>Motivo</label><textarea id="op-motivo">Responsável alterou a forma de pagamento.</textarea></div></div>`;
   } else if (tipo === 'veiculo') {
-    title.textContent = 'Trocar veiculo';
-    sub.textContent = ativa ? 'Mantem o tempo correndo e registra a troca.' : 'Permitido antes do inicio sem impacto financeiro.';
-    body.innerHTML = `<div class="op-policy">A troca nao reinicia timer nem altera valores automaticamente.</div><div class="op-form"><div class="op-grid"><div class="op-field"><label>Atual</label><input value="${escHtml(opSession.veiculo || opSession.tipo || '')}" disabled></div><div class="op-field"><label>Novo</label><select id="op-veiculo">${['Carro 01','Carro 02','Carro 03','Triciclo 01','Triciclo 02','Pelucia 01','Pelucia 02','Pelucia 03','Pelucia 04'].map(v=>`<option ${normalizarTxt_(opSession.veiculo)===normalizarTxt_(v)?'selected':''}>${v}</option>`).join('')}</select></div></div><div class="op-field"><label>Motivo</label><textarea id="op-motivo">Troca solicitada pelo responsavel ou por operacao.</textarea></div></div>`;
+    title.textContent = 'Trocar veículo';
+    sub.textContent = ativa ? 'Mantém o tempo correndo e registra a troca.' : 'Permitido antes do início sem impacto financeiro.';
+    body.innerHTML = `<div class="op-policy">A troca não reinicia o timer nem altera valores automaticamente.</div><div class="op-form"><div class="op-grid"><div class="op-field"><label>Atual</label><input value="${escHtml(opSession.veiculo || opSession.tipo || '')}" disabled></div><div class="op-field"><label>Novo</label><select id="op-veiculo">${['Carro 01','Carro 02','Carro 03','Triciclo 01','Triciclo 02','Pelucia 01','Pelucia 02','Pelucia 03','Pelucia 04'].map(v=>`<option ${normalizarTxt_(opSession.veiculo)===normalizarTxt_(v)?'selected':''}>${v}</option>`).join('')}</select></div></div><div class="op-field"><label>Motivo</label><textarea id="op-motivo">Troca solicitada pelo responsável ou por operação.</textarea></div></div>`;
   } else if (tipo === 'plano') {
-    if (ativa) { toast('Plano so pode ser trocado antes de iniciar. Use Estender tempo.', 'warning'); return; }
+    if (ativa) { toast('Plano só pode ser trocado antes de iniciar. Use Estender tempo.', 'warning'); return; }
     title.textContent = 'Trocar plano';
     sub.textContent = 'Permitido apenas antes da contagem iniciar.';
     const planos = Object.keys(PRECOS[opSession.tipo] || {});
-    body.innerHTML = `<div class="op-policy">Depois do inicio, use extensao para preservar faturamento.</div><div class="op-form"><div class="op-field"><label>Novo plano</label><select id="op-plano">${planos.map(p=>`<option ${p===opSession.plano?'selected':''}>${p}</option>`).join('')}</select></div><div class="op-field"><label>Motivo</label><textarea id="op-motivo">Cliente pediu alteracao antes de iniciar.</textarea></div></div>`;
+    body.innerHTML = `<div class="op-policy">Depois do início, use extensão para preservar faturamento.</div><div class="op-form"><div class="op-field"><label>Novo plano</label><select id="op-plano">${planos.map(p=>`<option ${p===opSession.plano?'selected':''}>${p}</option>`).join('')}</select></div><div class="op-field"><label>Motivo</label><textarea id="op-motivo">Cliente pediu alteração antes de iniciar.</textarea></div></div>`;
   } else if (tipo === 'cancelar') {
-    title.textContent = ativa ? 'Cancelar locacao em andamento' : 'Cancelar cadastro';
-    sub.textContent = 'Nao apaga a linha: marca como Cancelada e preserva auditoria.';
-    body.innerHTML = `<div class="op-policy danger">${ativa ? 'Informe o motivo para nao quebrar caixa e historico.' : 'Cadastro nao iniciado sera marcado como Cancelada.'}</div><div class="op-form"><div class="op-field"><label>Tipo</label><select id="op-motivo-tipo"><option>Erro de cadastro</option><option>Cliente desistiu</option><option>Manutencao do veiculo</option><option>Cortesia autorizada</option></select></div><div class="op-field"><label>Justificativa obrigatoria</label><textarea id="op-motivo">Descreva o motivo do cancelamento.</textarea></div></div>`;
+    title.textContent = ativa ? 'Cancelar locação em andamento' : 'Cancelar cadastro';
+    sub.textContent = 'Não apaga a linha: marca como Cancelada e preserva auditoria.';
+    body.innerHTML = `<div class="op-policy danger">${ativa ? 'Informe o motivo para não quebrar caixa e histórico.' : 'Cadastro não iniciado será marcado como Cancelada.'}</div><div class="op-form"><div class="op-field"><label>Tipo</label><select id="op-motivo-tipo"><option>Erro de cadastro</option><option>Cliente desistiu</option><option>Manutenção do veículo</option><option>Cortesia autorizada</option></select></div><div class="op-field"><label>Justificativa obrigatória</label><textarea id="op-motivo">Descreva o motivo do cancelamento.</textarea></div></div>`;
   } else {
-    title.textContent = tipo === 'observacao' ? 'Observacao da locacao' : 'Editar dados';
+    title.textContent = tipo === 'observacao' ? 'Observação da locação' : 'Editar dados';
     sub.textContent = ativa ? 'Corrige dados textuais sem alterar tempo/valor.' : 'Corrige dados principais do cadastro.';
-    body.innerHTML = `<div class="op-policy">Toda alteracao sera sincronizada e registrada.</div><div class="op-form"><div class="op-field"><label>Crianca</label><input id="op-crianca" value="${escHtml(opSession.crianca || '')}"></div><div class="op-field"><label>Responsavel</label><input id="op-responsavel" value="${escHtml(opSession.responsavel || '')}"></div><div class="op-field"><label>Telefone</label><input id="op-telefone" value="${escHtml(opSession.telefone || '')}"></div><div class="op-field"><label>Observacao</label><textarea id="op-observacao">${escHtml(opSession.observacao || '')}</textarea></div><div class="op-field"><label>Motivo</label><textarea id="op-motivo">Correcao operacional solicitada no atendimento.</textarea></div></div>`;
+    body.innerHTML = `<div class="op-policy">Toda alteração será sincronizada e registrada.</div><div class="op-form"><div class="op-field"><label>Criança</label><input id="op-crianca" value="${escHtml(opSession.crianca || '')}"></div><div class="op-field"><label>Responsável</label><input id="op-responsavel" value="${escHtml(opSession.responsavel || '')}"></div><div class="op-field"><label>Telefone</label><input id="op-telefone" value="${escHtml(opSession.telefone || '')}"></div><div class="op-field"><label>Observação</label><textarea id="op-observacao">${escHtml(opSession.observacao || '')}</textarea></div><div class="op-field"><label>Motivo</label><textarea id="op-motivo">Correção operacional solicitada no atendimento.</textarea></div></div>`;
   }
   modal.classList.add('show');
 }
@@ -4903,7 +4933,7 @@ async function salvarOperacaoLocacao() {
     toast(opTipo === 'cancelar' ? 'Locacao cancelada com auditoria.' : 'Alteracao salva e sincronizada.', 'success');
     broadcastInvalidate(); syncController(true, 400);
   } catch(e) {
-    toast('Erro de conexao ao salvar.', 'error');
+    toast('Erro de conexão ao salvar.', 'error');
   } finally {
     btn.disabled = false;
     btn.textContent = oldText;
@@ -5024,7 +5054,7 @@ function enviarWaTel(tel, msg) {
 
 function abrirWhatsAppFallback(rowIndex) {
   const s = sessions.find(x => Number(x.rowIndex) === Number(rowIndex));
-  if (!s || !s.telefone) { toast('Telefone nao cadastrado para fallback.', 'error'); return false; }
+  if (!s || !s.telefone) { toast('Telefone não cadastrado para fallback.', 'error'); return false; }
   const link = PORTAL_RESPONSAVEL_URL || 'https://ribocg-a11y.github.io/movikids/acompanhar.html';
   const msg = 'MOVI KIDS: acompanhe a locacao de ' + (s.crianca || 'sua crianca') +
     ' pelo portal: ' + link + '. Use o telefone com DDD informado no cadastro.';
@@ -5066,19 +5096,19 @@ function getMsgTemplate(key) {
 
 // ── MSG 1: Boas-vindas (logo após confirmar locação) ──────────────────────
 function waBoasVindas(s) {
-  if (!s || !s.telefone) { toast('Telefone nao cadastrado', 'error'); return false; }
+  if (!s || !s.telefone) { toast('Telefone não cadastrado', 'error'); return false; }
   return enviarSmsResponsavel_(s, 'portal');
 }
 
 // ── MSG 2: Alerta de tempo (faltam ~5 min) ────────────────────────────────
 function waAlertaTempo(s) {
-  if (!s || !s.telefone) { toast('Telefone nao cadastrado', 'error'); return false; }
+  if (!s || !s.telefone) { toast('Telefone não cadastrado', 'error'); return false; }
   return enviarSmsResponsavel_(s, 'alerta');
 }
 
 // ── MSG 3: Tempo esgotado com extra ──────────────────────────────────────
 function waTempoEsgotado(s) {
-  if (!s || !s.telefone) { toast('Telefone obrigatorio para aviso de extra.', 'error'); return false; }
+  if (!s || !s.telefone) { toast('Telefone obrigatório para aviso de extra.', 'error'); return false; }
   return enviarSmsResponsavel_(s, 'esgotado');
 }
 
@@ -5090,7 +5120,7 @@ function waExtensao(s, extMins, extValor, extPlano, extraAntes, debtAntes) {
 
 // -- MSG 4: Agradecimento pos-locacao (Fase 6) ------
 function waAgradecimento(e) {
-  if (!e || !e.telefone) { toast('Telefone nao cadastrado', 'error'); return; }
+  if (!e || !e.telefone) { toast('Telefone não cadastrado', 'error'); return; }
   if (e.rowIndex) return enviarSmsResponsavel_(e, 'agradecimento');
   return enviarSmsAvulso_(e, 'agradecimento');
 }
@@ -5185,14 +5215,14 @@ async function iniciarContagem(rowIndex, opts) {
   // 2. Confirma no servidor. Se falhar, nao mantem estado local divergente.
   try {
     const d = await api({ action: 'iniciarTimer', rowIndex, timestamp: ts, ...operadorApiParams_() });
-    if (!d.ok) throw new Error(d.erro || 'Servidor nao confirmou o inicio.');
+    if (!d.ok) throw new Error(d.erro || 'Servidor não confirmou o início.');
   } catch(e) {
     s.startTimestamp = 0;
     s.started        = false;
     s.status         = prevStatus;
     saveSessions();
     renderCards();
-    toast('Inicio nao confirmado no servidor. Tente iniciar novamente.', 'error');
+    toast('Início não confirmado no servidor. Tente iniciar novamente.', 'error');
     syncController(true, 0);
     return;
   }
@@ -5396,7 +5426,7 @@ async function salvarResponsavelRel() {
   const criancas = document.getElementById('rel-edit-criancas')?.value || '';
   const obs = document.getElementById('rel-edit-obs')?.value.trim() || '';
   const motivo = document.getElementById('rel-edit-motivo')?.value.trim() || 'Atualizacao do cadastro de relacionamento.';
-  if (!nome || !tel) { toast('Nome e telefone sao obrigatorios.', 'error'); return; }
+  if (!nome || !tel) { toast('Nome e telefone são obrigatórios.', 'error'); return; }
   if (btn) { btn.textContent = 'Salvando...'; btn.disabled = true; }
   try {
     const res = await api({
@@ -5465,9 +5495,9 @@ async function carregarRelacionamento() {
           <button class="rel-primary" onclick="abrirNovaComResponsavel(relacionamentoCache[${idx}])">Nova locação</button>
           <button class="rel-primary" onclick="abrirNovaComResponsavel(relacionamentoCache[${idx}], true)">Nova crianca</button>
           <button class="rel-secondary" onclick="abrirEditarResponsavel(${idx})">Editar</button>
-          <button class="rel-secondary" onclick="relToggleHist(${idx})">Historico</button>
+          <button class="rel-secondary" onclick="relToggleHist(${idx})">Histórico</button>
         </div>
-        <div class="rel-history" id="rel-hist-${idx}">${hist || '<div class="rel-hitem"><span>Sem historico detalhado</span></div>'}</div>
+        <div class="rel-history" id="rel-hist-${idx}">${hist || '<div class="rel-hitem"><span>Sem histórico detalhado</span></div>'}</div>
       </div>`;
     }).join('');
   } catch(e) {
@@ -6466,6 +6496,8 @@ function showPage(name, opts = {}) {
   const navId = navMap[name];
   if (navId) document.getElementById(navId)?.classList.add('active');
   syncSidebar(name);
+  const operPages = ['home', 'nova', 'relacionamento', 'painel', 'custos', 'lancamento'];
+  if (operPages.includes(name)) sbSetOperNavOpen_(true, false);
   if (name === 'lancamento') resetAvulsoForm_();
   if (name==='nova') {
     if (opts.freshNova) {
@@ -7139,7 +7171,7 @@ function showAdminHomeKpis(d) {
     set('h-fathoje', R(d.fatHoje));
     set('h-cushoje', R(d.cusHoje));
     set('h-fatmes', R(d.fatMes));
-    set('h-nmes', (d.nMes || 0) + ' loc. no mes');
+    set('h-nmes', (d.nMes || 0) + ' loc. no mês');
     const res = (d.fatMes || 0) - (d.cusMes || d.cusHoje || 0);
     set('h-resultado', R(res));
     set('h-margem', 'margem ' + (d.margem || 0) + '%');
@@ -7345,8 +7377,8 @@ async function salvarLancamentoAvulso() {
   const telefone = String(document.getElementById('avulso-tel')?.value || '').trim();
   const veiculo = String(document.getElementById('avulso-veiculo')?.value || '').trim();
   const pagamento = String(document.getElementById('avulso-pag')?.value || '').trim();
-  if (motivo.length < 10) { toast('Justificativa obrigatoria (min. 10 caracteres)', 'warning'); return; }
-  if (!responsavel || !crianca) { toast('Responsavel e crianca obrigatorios', 'warning'); return; }
+  if (motivo.length < 10) { toast('Justificativa obrigatória (mín. 10 caracteres)', 'warning'); return; }
+  if (!responsavel || !crianca) { toast('Responsável e criança são obrigatórios', 'warning'); return; }
   if (!avulsoState.tipo || !avulsoState.plano) { toast('Selecione tipo e plano', 'warning'); return; }
   const btn = document.getElementById('btn-avulso');
   if (btn) { btn.disabled = true; btn.textContent = 'Salvando...'; }
@@ -7370,7 +7402,7 @@ async function salvarLancamentoAvulso() {
       syncController(true, 0);
       showPage('home');
     } else toast(d.erro || 'Erro', 'error');
-  } catch (e) { toast('Erro de conexao', 'error'); }
+  } catch (e) { toast('Erro de conexão', 'error'); }
   finally {
     if (btn) { btn.disabled = false; btn.textContent = '⚡ Registrar lançamento avulso'; }
   }
