@@ -22,7 +22,7 @@
 <script>
 // ── CACHE BUSTER — alinhado a mk-version.js / APP_VERSION ──
 (function(){
-  const CURRENT = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.27';
+  const CURRENT = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.28';
   const KEY = 'mk_loaded_version';
   try {
     const stored = localStorage.getItem(KEY);
@@ -2395,6 +2395,18 @@ header{
       <div class="vrank-grid" id="nk-ocupacao-grid"></div>
       <div class="db-insight" id="nk-ocupacao-insight" style="display:none"></div>
     </div>
+    <div class="new-row">
+      <div class="new-chart-card">
+        <div class="new-chart-title">Custos por categoria</div>
+        <div id="nk-custo-cat-rows"><div class="nks" style="padding:8px 0">Carregando...</div></div>
+        <div class="db-insight" id="nk-custo-insight" style="display:none"></div>
+      </div>
+      <div class="new-chart-card">
+        <div class="new-chart-title">Recorrência de clientes</div>
+        <div id="nk-recorrencia-summary" class="nks" style="padding:4px 0 10px">—</div>
+        <div class="db-insight" id="nk-recorrencia-insight" style="display:none"></div>
+      </div>
+    </div>
 
     <!-- hidden canvases for compat -->
     <canvas id="chart-tipo" style="display:none"></canvas>
@@ -2739,7 +2751,7 @@ header{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.27';
+const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.28';
 const WEBAPP_URL = (typeof window !== 'undefined' && window.MK_GAS_EXEC_URL) ? window.MK_GAS_EXEC_URL
   : 'https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec';
 const WEBAPP_URL_DEAD_PREFIX = 'AKfycbzc';
@@ -6406,6 +6418,48 @@ function renderCharts(d) {
         ocupIns.style.display = 'block';
         ocupIns.innerHTML = '<strong>' + topO.veiculo + '</strong> com maior uso: <strong>' + (topO.pctOcupacao || 0) + '%</strong> da capacidade estimada (' + topO.nLoc + ' locações).';
       }
+    }
+  }
+
+  const cusCat = d.cusPorCategoria || [];
+  const cusCatEl = document.getElementById('nk-custo-cat-rows');
+  const cusIns = document.getElementById('nk-custo-insight');
+  if (cusCatEl) {
+    if (!cusCat.length) {
+      cusCatEl.innerHTML = '<div class="nks">Sem custos lançados neste mês</div>';
+      if (cusIns) cusIns.style.display = 'none';
+    } else {
+      const totC = cusCat.reduce((a, b) => a + (b.valor || 0), 0) || 1;
+      const maxC = Math.max(...cusCat.map(c => c.valor || 0), 1);
+      cusCatEl.innerHTML = cusCat.map(c => {
+        const bw = Math.round((c.valor || 0) / maxC * 100);
+        const pcc = pct2(c.valor || 0, totC);
+        return `<div class="nb-row"><div class="nb-name">${c.categoria}</div><div class="nb-bar-bg"><div class="nb-bar-fill" style="width:${bw}%;background:#E65100"></div></div><div class="nb-val">${R2(c.valor)}</div><div class="nb-pct">${pcc}%</div></div>`;
+      }).join('');
+      if (cusIns) {
+        cusIns.style.display = 'block';
+        cusIns.textContent = cusCat[0].categoria + ' concentra ' + pct2(cusCat[0].valor, totC) + '% dos custos do mês (' + R2(totC) + ' total).';
+      }
+    }
+  }
+
+  const rec = d.recorrenciaClientes || {};
+  const recSum = document.getElementById('nk-recorrencia-summary');
+  const recIns = document.getElementById('nk-recorrencia-insight');
+  if (recSum) {
+    const nU = rec.nUnicos || 0;
+    const nR = rec.nRecorrentes || 0;
+    const pctR = rec.pctRecorrencia || 0;
+    recSum.innerHTML = nU > 0
+      ? '<strong style="font-size:18px;color:var(--blue)">' + nR + '</strong> de <strong>' + nU + '</strong> clientes voltaram no mês (' + pctR + '% recorrência)'
+      : 'Sem telefones válidos nas locações encerradas deste mês';
+    if (recIns) {
+      if (nU > 0) {
+        recIns.style.display = 'block';
+        recIns.textContent = pctR >= 30
+          ? 'Boa recorrência — ' + pctR + '% dos clientes únicos retornaram no período.'
+          : 'Recorrência em ' + pctR + '% — oportunidade de campanha de retorno (Relacionamento / Config).';
+      } else recIns.style.display = 'none';
     }
   }
 

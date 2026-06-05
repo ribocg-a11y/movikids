@@ -14,8 +14,8 @@ Referência única para alinhamento local × produção.
 
 | Camada | Versão alvo | URL / ID |
 |--------|-------------|----------|
-| **Frontend** | **v1.7.27** | https://ribocg-a11y.github.io/movikids/?force=1.7.27 |
-| **Apps Script** | **v1.5.46** (clasp push + **Nova versão Web**) | Deploy `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y` |
+| **Frontend** | **v1.7.28** (local) / **v1.7.27** (Pages) | https://ribocg-a11y.github.io/movikids/?force=1.7.28 |
+| **Apps Script** | **v1.5.47** (local; produção **v1.5.46** até Nova versão) | Deploy `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y` |
 | SMS Gateway Cloud | **DJVJRL** / device `wihWegHr4wXaVJQ1R-GZR` | Aparelho remoto ONLINE |
 | Pacote SMS P0 | **FECHADO** | `PACOTE_SMS_P0_UNIFICADO_v1.5.38_v1.7.11.md` |
 | Planilha | MOVIKIDS_Planilha_Base | https://docs.google.com/spreadsheets/d/1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618/edit |
@@ -107,8 +107,8 @@ Commits de referência: `3d9d106` (v1.7.25), `e1a56db` (Pacote E), `1454bc8` (fi
 
 | # | Frente | Status | Alvo |
 |---|--------|--------|------|
-| 1 | Publicar GAS v1.5.45+ (Nova versão Web) | **pendente manual** | ping v1.5.46 |
-| 2 | Pacote F — KPIs avançados | **em andamento** | v1.7.27 + v1.5.46 |
+| 1 | Publicar GAS v1.5.46 | **feito** | ping v1.5.46 em 05/06 16:00 |
+| 2 | Pacote F — KPIs avançados | **em andamento** | v1.7.28 + v1.5.47 (custos cat. + recorrência) |
 | 3 | Validação tablet drawer 4 abas | pendente | admin logado pode bloquear |
 | 4 | Fases abertas | pendente | supervisor (F9), config frota (F8), WhatsApp (F4) |
 
@@ -120,11 +120,16 @@ Commits de referência: `3d9d106` (v1.7.25), `e1a56db` (Pacote E), `1454bc8` (fi
 - Tile “Caixa de hoje” linka para Caixa (sem duplicar conferência)
 - Horários de pico, ranking veículo, planos e pagamento — já existentes
 
+### Pacote F — entregue neste incremento (v1.7.28 local)
+
+- Custos por categoria (`cusPorCategoria`) no Dashboard
+- Recorrência de clientes (`recorrenciaClientes`) — telefones com 2+ locações no mês
+- Regressão: checagem ping ≥ v1.5.46 + gate admin em `buscarKPIsAdmin`
+
 ### Pacote F — próximo incremento
 
-- Recorrência de clientes; custos por categoria no Dashboard
 - Relatório PDF alinhado aos novos KPIs
-- Regressão automatizada dos campos `porOperador` / `cancelamentos` / `ocupacaoFrota`
+- Validação tablet Dashboard + drawer 4 abas
 
 ---
 

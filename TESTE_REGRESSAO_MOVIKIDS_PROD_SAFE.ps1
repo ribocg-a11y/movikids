@@ -74,6 +74,19 @@ try {
   $ping = Invoke-MoviApi @{ action = "ping" }
   Assert-Ok $ping "ping"
   Add-Check "ping" "ok" $ping.versao
+  if ($ping.versao -match 'v1\.5\.(4[6-9]|[5-9]\d)') {
+    Add-Check "pacote-f gas" "ok" "versao>=1.5.46"
+  } else {
+    Add-Check "pacote-f gas" "warn" ("versao $($ping.versao) - KPIs avancados exigem v1.5.46+")
+  }
+
+  try {
+    $kpiNegado = Invoke-MoviApi @{ action = "buscarKPIsAdmin" }
+    if ($kpiNegado.ok) { Add-Check "kpi admin gate" "warn" "buscarKPIsAdmin sem PIN retornou ok" }
+    else { Add-Check "kpi admin gate" "ok" "acesso negado sem admin" }
+  } catch {
+    Add-Check "kpi admin gate" "ok" "acesso negado sem admin"
+  }
 
   $inicio = Invoke-MoviApi @{ action = "carregarInicio" }
   Assert-Ok $inicio "carregarInicio"

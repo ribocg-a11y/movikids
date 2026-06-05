@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.46
+// MOVI KIDS — Google Apps Script v1.5.47
+// v1.5.47: Pacote F — custos por categoria + recorrencia de clientes em buscarKPIsAdmin
 // v1.5.46: Pacote F — KPIs avancados em buscarKPIsAdmin (operador, cancelamentos, ocupacao frota)
 // v1.5.45: limparLocacoesTesteAdmin — anula locacoes de teste (Encerrada/Pendente/Ativa) sem contar no caixa
 // v1.5.44: Pacote E — doPost JSON; operador obrigatorio nas 5 escritas criticas; GET write deprecado
@@ -315,9 +316,9 @@ function ping_() {
   const agora = new Date();
   return resp_({
     status:  'online',
-    versao:  'v1.5.46',
+    versao:  'v1.5.47',
     timestamp: fmtData_(agora) + ' ' + fmtHoraLocal_(agora),
-    sistema: 'MOVI KIDS v1.5.46',
+    sistema: 'MOVI KIDS v1.5.47',
     postWriteActions: WRITE_ACTIONS_CRITICAS_
   });
 }
@@ -1068,6 +1069,7 @@ function buscarKPIsAdmin_(p) {
   let nCancelMes = 0;
   const nPorVeiculo = {};
   const minPorVeiculo = {};
+  const telMesCounts = {};
 
   const lastLoc = shLoc.getLastRow();
   if (lastLoc >= DATA_ROW) {
@@ -1119,12 +1121,15 @@ function buscarKPIsAdmin_(p) {
         nPorVeiculo[veiculo] = (nPorVeiculo[veiculo] || 0) + 1;
         const minsTot = (Number(r[6]) || 0) + (Number(r[8]) || 0) + (Number(r[25]) || 0);
         minPorVeiculo[veiculo] = (minPorVeiculo[veiculo] || 0) + minsTot;
+        const tel = String(r[13] || '').replace(/\D/g, '');
+        if (tel.length >= 10) telMesCounts[tel] = (telMesCounts[tel] || 0) + 1;
       }
       if (dataR === dataHoje) { fatHoje += vt; nHoje++; }
     });
   }
 
   let cusHoje = 0, cusMes = 0;
+  const cusPorCategoria = {};
   const lastCus = shCus.getLastRow();
   if (lastCus >= DATA_ROW) {
     const dados = shCus.getRange(DATA_ROW, 1, lastCus - DATA_ROW + 1, 6).getValues();
@@ -1135,10 +1140,25 @@ function buscarKPIsAdmin_(p) {
       if (pts.length < 3) return;
       const mmyyR = pts[1].padStart(2,'0') + '/' + pts[2];
       const val   = Number(r[5]);
-      if (mmyyR === mmyy) cusMes += val;
+      const cat   = String(r[4] || 'Outros').trim() || 'Outros';
+      if (mmyyR === mmyy) {
+        cusMes += val;
+        cusPorCategoria[cat] = (cusPorCategoria[cat] || 0) + val;
+      }
       if (dataR === dataHoje) cusHoje += val;
     });
   }
+
+  const telKeys = Object.keys(telMesCounts);
+  const nClientesUnicos = telKeys.length;
+  const nClientesRecorrentes = telKeys.filter(k => telMesCounts[k] >= 2).length;
+  const pctRecorrencia = nClientesUnicos > 0
+    ? Math.round(nClientesRecorrentes / nClientesUnicos * 1000) / 10
+    : 0;
+  const cusCatArr = Object.keys(cusPorCategoria).map(k => ({
+    categoria: k,
+    valor: Math.round(cusPorCategoria[k] * 100) / 100
+  })).sort((a, b) => b.valor - a.valor);
 
   const mesCto   = mesContrato_();
   const ctoMin   = ctoMinimo_(mesCto);
@@ -1199,7 +1219,13 @@ function buscarKPIsAdmin_(p) {
     anoAtual,
     porOperador: kpiAv.porOperador,
     cancelamentos: kpiAv.cancelamentos,
-    ocupacaoFrota: kpiAv.ocupacaoFrota
+    ocupacaoFrota: kpiAv.ocupacaoFrota,
+    cusPorCategoria: cusCatArr,
+    recorrenciaClientes: {
+      nUnicos: nClientesUnicos,
+      nRecorrentes: nClientesRecorrentes,
+      pctRecorrencia: pctRecorrencia
+    }
   });
 }
 
