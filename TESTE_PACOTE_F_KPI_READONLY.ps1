@@ -36,6 +36,19 @@ try {
     Add-FCheck "kpi.$field" "ok" "presente"
   }
 
+  if ($null -eq $kpi.porSemana) {
+    Add-FCheck "kpi.porSemana" "warn" "ausente - publique GAS v1.5.51+ (Nova versao Web)"
+  } elseif ($kpi.porSemana.Count -lt 1) {
+    Add-FCheck "kpi.porSemana" "warn" "lista vazia"
+  } else {
+    $s0 = $kpi.porSemana[0]
+    $hasMelhor = ($null -ne $s0.melhorDia) -or ($kpi.porSemana | Where-Object { $_.fat -gt 0 } | Select-Object -First 1)
+    Add-FCheck "kpi.porSemana" "ok" ("semanas=" + $kpi.porSemana.Count + "; melhorSemana=" + $kpi.melhorSemanaLabel)
+    if ($s0.insights -and $s0.insights.Count -gt 0) {
+      Add-FCheck "kpi.porSemana.insights" "ok" "presente"
+    }
+  }
+
   $preview = Invoke-MoviApiF @{ action = "buscarPreviewRelatorio"; mes = (Get-Date).Month; ano = (Get-Date).Year }
   if (-not $preview.ok -or -not $preview.html) { throw "preview relatorio falhou" }
   if ($preview.html -notmatch "Gestao Avancada") {

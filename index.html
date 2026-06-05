@@ -1369,6 +1369,39 @@ header{
 .f5-badge.up{background:#E8F5E9;color:#2E7D32}.f5-badge.dn{background:#FFEBEE;color:#C62828}
 .f5-badge.eq{background:#F5F5F5;color:#888}
 
+/* Comparativo semanal interativo (KPI) */
+.mk-semana-panel{background:linear-gradient(160deg,#1a1f2e 0%,#12151c 100%);border-radius:14px;padding:16px 14px 14px;margin-bottom:14px;border:1px solid #2a3142}
+.mk-semana-title{font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#7eb8ff;margin-bottom:12px}
+.mk-semana-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-bottom:12px}
+@media(max-width:900px){.mk-semana-grid{display:flex;overflow-x:auto;gap:8px;padding-bottom:4px;scroll-snap-type:x mandatory}.mk-semana-card{min-width:132px;scroll-snap-align:start;flex-shrink:0}}
+.mk-semana-card{background:#232833;border:1.5px solid #343b4a;border-radius:10px;padding:10px 10px 8px;cursor:pointer;transition:border-color .15s,box-shadow .15s}
+.mk-semana-card:hover{border-color:#4a90c4}
+.mk-semana-card.active{border-color:#00d4ff;box-shadow:0 0 0 1px rgba(0,212,255,.35),0 0 18px rgba(0,212,255,.18)}
+.mk-sem-hdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px}
+.mk-sem-lbl{font-size:11px;font-weight:800;color:#e8ecf4}
+.mk-sem-per{font-size:9px;color:#8b95a8}
+.mk-sem-fat{font-size:15px;font-weight:800;color:#00d4ff;line-height:1.2;margin-bottom:2px}
+.mk-sem-n{font-size:10px;color:#9aa3b5;margin-bottom:8px}
+.mk-sem-bar-row{display:flex;align-items:center;gap:6px;margin-top:4px}
+.mk-sem-bar-lbl{font-size:8px;color:#6d7689;width:18px;flex-shrink:0}
+.mk-sem-bar-bg{flex:1;height:5px;background:#2f3644;border-radius:3px;overflow:hidden}
+.mk-sem-bar-fill{height:100%;border-radius:3px;transition:width .3s}
+.mk-sem-bar-fill.fat{background:linear-gradient(90deg,#1565c0,#00d4ff)}
+.mk-sem-bar-fill.n{background:linear-gradient(90deg,#2e7d32,#69f0ae)}
+.mk-semana-detail{background:#1e2430;border:1px solid #343b4a;border-radius:10px;padding:12px 14px;display:grid;grid-template-columns:1fr auto;gap:12px;align-items:start}
+@media(max-width:700px){.mk-semana-detail{grid-template-columns:1fr}}
+.mk-sem-detail-left{min-width:0}
+.mk-sem-detail-hdr{font-size:12px;font-weight:700;color:#e8ecf4;margin-bottom:6px}
+.mk-sem-insights{font-size:11px;color:#a8b0c0;line-height:1.55}
+.mk-sem-insights li{margin:0 0 4px 14px}
+.mk-sem-destaque{background:#0d2137;border:1px solid #1e4a6e;border-radius:8px;padding:8px 10px;margin-bottom:8px;font-size:11px;color:#b8d4f0;line-height:1.45}
+.mk-sem-destaque strong{color:#00d4ff}
+.mk-sem-kpis{display:flex;gap:16px;flex-wrap:wrap}
+.mk-sem-kpi{text-align:right;min-width:72px}
+.mk-sem-kpi-val{font-size:16px;font-weight:800;color:#00d4ff}
+.mk-sem-kpi-lbl{font-size:8px;text-transform:uppercase;letter-spacing:.05em;color:#7a8499;margin-top:2px}
+.mk-semana-foot{font-size:10px;color:#6d7689;margin-top:10px;text-align:center}
+
 /* Relatório preview */
 .rel-iframe-wrap{border:1.5px solid var(--border);border-radius:var(--radius);
   overflow:hidden;margin-bottom:14px}
@@ -2059,6 +2092,25 @@ header{
       <div class="diag-row"><div class="diag-dot ok" id="diag-dot-extra"></div><span>Sessões em tempo extra</span><span class="diag-val" id="diag-extra">—</span></div>
       <div class="diag-alert" id="diag-alert-over" style="display:none"></div>
     </div>
+    <div class="sec-title">Frota e preços (CONFIG)</div>
+    <div class="diag-card" id="mk-opcfg-card" style="margin-bottom:14px">
+      <div class="diag-row"><span>Fonte</span><span class="diag-val" id="mk-opcfg-fonte">—</span></div>
+      <div class="diag-row"><span>Veículos</span><span class="diag-val" id="mk-opcfg-veic">—</span></div>
+      <div class="diag-row"><span>Tipos de preço</span><span class="diag-val" id="mk-opcfg-tipos">—</span></div>
+      <div class="diag-alert" id="mk-opcfg-alert" style="display:none"></div>
+    </div>
+    <div id="mk-opcfg-editor" style="display:none;margin-bottom:14px">
+      <div class="form-group">
+        <label class="form-label">Veículos (um por linha)</label>
+        <textarea id="mk-opcfg-veiculos-ta" class="form-input" rows="6" style="font-family:monospace;font-size:12px"></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Preços (JSON — formato GAS: valor/mins/adicional)</label>
+        <textarea id="mk-opcfg-precos-ta" class="form-input" rows="10" style="font-family:monospace;font-size:11px"></textarea>
+      </div>
+      <button type="button" class="btn btn-primary" style="width:100%;margin-bottom:8px" onclick="salvarOperacaoConfigAdmin_()">💾 Salvar frota e preços</button>
+    </div>
+    <button type="button" class="btn btn-secondary" id="mk-btn-toggle-opcfg" style="width:100%;margin-bottom:14px" onclick="toggleEditorOperacaoConfig_()">✏️ Editar frota e preços</button>
     <div class="sec-title">Operação</div>
     <button type="button" class="btn btn-secondary" style="width:100%;margin-bottom:10px" onclick="irAdmin('operadores')">👤 Operadores e liberar sessão</button>
     <button type="button" class="btn btn-secondary" style="width:100%;margin-bottom:10px" onclick="copiarFechamentoDia()">📋 Copiar resumo do dia (WhatsApp)</button>
@@ -2076,7 +2128,8 @@ header{
     </div>
     <p style="font-size:13px;color:var(--txt2);margin-bottom:14px;line-height:1.5">
       Cadastre quem opera o balcão. Cada operador cria o PIN de 4 dígitos no primeiro login.
-      Padrão atual: Eduarda e Milena Nunes. Apenas um operador pode estar logado por vez.
+      Padrão atual: Eduarda e Milena Nunes. Perfil <strong>supervisor</strong> permite editar/cancelar e ver caixa/histórico.
+      Apenas um operador pode estar logado por vez.
     </p>
     <div id="mk-ops-sessao-banner" class="mk-sessao-lock" style="display:none;margin-bottom:12px"></div>
     <button type="button" class="btn btn-secondary" id="mk-btn-liberar-sessao" style="width:100%;margin-bottom:14px">🔓 Liberar sessão do balcão (operador esqueceu Sair)</button>
@@ -2284,23 +2337,27 @@ header{
       <div class="cto-note" id="nk-cto-note">CTO = 0% do faturamento</div>
     </div>
 
-    <!-- Comparativo semanal + Projeção (Fase 5) -->
-    <div class="f5-row">
-      <div class="f5-card">
-        <div class="f5-title">Comparativo semanal</div>
-        <div class="f5-line">
-          <span class="f5-lbl">Esta semana</span>
-          <span><span class="f5-val blue" id="nk-sem-atual">—</span><span class="f5-badge" id="nk-sem-badge"></span></span>
+    <!-- Receita e atendimentos por semana — interativo -->
+    <div class="mk-semana-panel" id="mk-semana-panel">
+      <div class="mk-semana-title">Receita e atendimentos por semana</div>
+      <div class="mk-semana-grid" id="mk-semana-grid" role="tablist" aria-label="Semanas do mês"></div>
+      <div class="mk-semana-detail" id="mk-semana-detail">
+        <div class="mk-sem-detail-left">
+          <div class="mk-sem-destaque" id="mk-sem-melhor-dia">Melhor dia da semana: —</div>
+          <div class="mk-sem-detail-hdr" id="mk-sem-detail-hdr">Selecione uma semana</div>
+          <ul class="mk-sem-insights" id="mk-sem-insights"><li>Toque em uma semana para ver a leitura financeira.</li></ul>
         </div>
-        <div class="f5-line">
-          <span class="f5-lbl">Semana anterior</span>
-          <span class="f5-val" id="nk-sem-ant">—</span>
-        </div>
-        <div class="f5-line">
-          <span class="f5-lbl">Mês anterior</span>
-          <span class="f5-val" id="nk-mes-ant">—</span>
+        <div class="mk-sem-kpis">
+          <div class="mk-sem-kpi"><div class="mk-sem-kpi-val" id="mk-sem-kpi-fat">—</div><div class="mk-sem-kpi-lbl">Receita</div></div>
+          <div class="mk-sem-kpi"><div class="mk-sem-kpi-val" id="mk-sem-kpi-n">—</div><div class="mk-sem-kpi-lbl">Atendimentos</div></div>
+          <div class="mk-sem-kpi"><div class="mk-sem-kpi-val" id="mk-sem-kpi-ticket">—</div><div class="mk-sem-kpi-lbl">Ticket médio</div></div>
         </div>
       </div>
+      <div class="mk-semana-foot" id="mk-semana-foot">Passe o mouse ou toque em uma semana para ver a leitura.</div>
+    </div>
+
+    <!-- Projeção (Fase 5) -->
+    <div class="f5-row" style="grid-template-columns:1fr">
       <div class="f5-card">
         <div class="f5-title">Projeção do mês</div>
         <div class="f5-line">
@@ -2318,6 +2375,18 @@ header{
         <div class="f5-line">
           <span class="f5-lbl">Resultado projetado</span>
           <span class="f5-val" id="nk-proj-res">—</span>
+        </div>
+        <div class="f5-line">
+          <span class="f5-lbl">Semana corrida (seg–hoje)</span>
+          <span><span class="f5-val blue" id="nk-sem-atual">—</span><span class="f5-badge" id="nk-sem-badge"></span></span>
+        </div>
+        <div class="f5-line">
+          <span class="f5-lbl">Semana anterior (corrida)</span>
+          <span class="f5-val" id="nk-sem-ant">—</span>
+        </div>
+        <div class="f5-line">
+          <span class="f5-lbl">Mês anterior</span>
+          <span class="f5-val" id="nk-mes-ant">—</span>
         </div>
       </div>
     </div>
@@ -2779,7 +2848,7 @@ async function resolveGasUrl_() {
 }
 const PORTAL_RESPONSAVEL_URL = 'https://ribocg-a11y.github.io/movikids/acompanhar.html';
 
-const PRECOS = {
+let PRECOS = {
   'Carro':   { '10min':{v:12,m:10,a:1.00},'20min':{v:22,m:20,a:1.00},'30min':{v:30,m:30,a:1.00},
                '40min':{v:40,m:40,a:1.00},'60min':{v:55,m:60,a:1.00},'3h':{v:130,m:180,a:1.00} },
   'Triciclo': { '10min':{v:12,m:10,a:1.00},'20min':{v:22,m:20,a:1.00},'30min':{v:30,m:30,a:1.00},
@@ -2815,13 +2884,51 @@ let _restoringNovaDraft = false;
 let catSel      = 'Energia';
 let custosHoje  = [];
 let statsHoje   = { fat: 0, n: 0 };
-/** Operador: sem R$, totais ou KPIs de gestao; ADM ve tudo. */
+/** Operador: sem R$; supervisor e ADM veem valores para reconciliacao/gestao. */
 function mkExibirFinanceiro_() {
+  if (typeof mkAuthIsSupervisorOrAdmin_ === 'function' && mkAuthIsSupervisorOrAdmin_()) return true;
   return (typeof mkAuthIsAdmin === 'function' && mkAuthIsAdmin()) || !!window.isAdmin;
+}
+function mkAuthCanEditarLocacao_() {
+  if (typeof mkAuthIsSupervisorOrAdmin_ === 'function' && mkAuthIsSupervisorOrAdmin_()) return true;
+  return (typeof mkAuthIsAdmin === 'function' && mkAuthIsAdmin()) || !!window.isAdmin;
+}
+function aplicarOperacaoConfig_(cfg) {
+  if (!cfg) return;
+  if (cfg.precosFe && typeof cfg.precosFe === 'object') {
+    Object.keys(cfg.precosFe).forEach(tipo => {
+      PRECOS[tipo] = Object.assign({}, cfg.precosFe[tipo]);
+    });
+  } else if (cfg.precos && typeof cfg.precos === 'object') {
+    Object.keys(cfg.precos).forEach(tipo => {
+      PRECOS[tipo] = {};
+      Object.entries(cfg.precos[tipo] || {}).forEach(([plano, c]) => {
+        PRECOS[tipo][plano] = {
+          v: Number(c.valor != null ? c.valor : c.v),
+          m: Number(c.mins != null ? c.mins : c.m),
+          a: Number(c.adicional != null ? c.adicional : c.a)
+        };
+      });
+    });
+  }
+  if (Array.isArray(cfg.veiculosDef) && cfg.veiculosDef.length) {
+    TODOS_VEICULOS_DEF.length = 0;
+    cfg.veiculosDef.forEach(v => TODOS_VEICULOS_DEF.push(v));
+  } else if (Array.isArray(cfg.veiculos_validos) && cfg.veiculos_validos.length) {
+    TODOS_VEICULOS_DEF.length = 0;
+    cfg.veiculos_validos.forEach(nome => {
+      const n = String(nome);
+      let tipo = 'Carro';
+      if (n.includes('Triciclo')) tipo = 'Triciclo';
+      else if (n.includes('Pel')) tipo = 'Pelúcia';
+      TODOS_VEICULOS_DEF.push({ nome: n, tipo });
+    });
+  }
 }
 function apiParamsComAuth_() {
   const out = typeof operadorApiParams_ === 'function' ? operadorApiParams_() : {};
-  if (mkExibirFinanceiro_()) {
+  const isAdm = (typeof mkAuthIsAdmin === 'function' && mkAuthIsAdmin()) || !!window.isAdmin;
+  if (isAdm) {
     if (typeof mkAuthAdminPinParams_ === 'function') Object.assign(out, mkAuthAdminPinParams_());
     else { out.adminPin = '1416'; out.authRole = 'admin'; }
   }
@@ -3339,6 +3446,7 @@ function sanitizarDadosInicioOperador_(d) {
 function aplicarDadosInicio(d) {
   try {
     if (!d || !Array.isArray(d.ativos)) return;
+    if (d.operacaoConfig) aplicarOperacaoConfig_(d.operacaoConfig);
     d = sanitizarDadosInicioOperador_(d);
     window._lastSyncSource = d.fonte || 'gas';
     window._lastCanonicalRows = d.ativos.length;
@@ -4562,8 +4670,15 @@ function renderSessDrawerHead_(s) {
 
 function renderSessDrawerTabs_(s) {
   const ativa = !!s.started;
+  const canEdit = typeof mkAuthCanEditarLocacao_ === 'function' && mkAuthCanEditarLocacao_();
   document.querySelectorAll('.sess-drawer-tab').forEach(btn => {
     const tab = btn.getAttribute('data-tab');
+    if ((tab === 'editar' || tab === 'cancelar') && !canEdit) {
+      btn.style.display = 'none';
+      btn.disabled = true;
+      return;
+    }
+    btn.style.display = '';
     const disabled = !ativa && (tab === 'encerrar' || tab === 'estender');
     btn.disabled = disabled;
   });
@@ -4572,7 +4687,11 @@ function renderSessDrawerTabs_(s) {
 function abrirSessaoDrawer(rowIndex, tab) {
   const s = sessions.find(x => Number(x.rowIndex) === Number(rowIndex));
   if (!s) return;
-  const wantTab = tab || (s.started ? 'encerrar' : 'editar');
+  let wantTab = tab || (s.started ? 'encerrar' : 'editar');
+  const canEdit = typeof mkAuthCanEditarLocacao_ === 'function' && mkAuthCanEditarLocacao_();
+  if (!canEdit && (wantTab === 'editar' || wantTab === 'cancelar')) {
+    wantTab = s.started ? 'encerrar' : 'encerrar';
+  }
   if (wantTab === 'encerrar' && s.started) {
     const rem = calcRemaining(s);
     const admIgnoraSms = typeof mkAdminIgnoraSmsObrigatorio_ === 'function' && mkAdminIgnoraSmsObrigatorio_();
@@ -5928,6 +6047,11 @@ function abrirAdmin() {
     adminLogin();
     return;
   }
+  if (typeof mkAuthIsSupervisor === 'function' && mkAuthIsSupervisor()) {
+    showSupervisorSidebar();
+    irAdmin('caixa');
+    return;
+  }
   pinBuffer = '';
   atualizarDots();
   document.getElementById('pin-modal').classList.add('show');
@@ -6080,7 +6204,99 @@ function irAdmin(page) {
   }
   if (page === 'sistema') {
     setTimeout(atualizarDiagnostico, 100);
+    setTimeout(carregarResumoOperacaoConfig_, 120);
     if (!kpiData) carregarKPIs();
+  }
+}
+
+async function carregarResumoOperacaoConfig_() {
+  const fonte = document.getElementById('mk-opcfg-fonte');
+  const veic = document.getElementById('mk-opcfg-veic');
+  const tipos = document.getElementById('mk-opcfg-tipos');
+  const alert = document.getElementById('mk-opcfg-alert');
+  const editor = document.getElementById('mk-opcfg-editor');
+  const btnToggle = document.getElementById('mk-btn-toggle-opcfg');
+  const isAdm = (typeof mkAuthIsAdmin === 'function' && mkAuthIsAdmin()) || !!window.isAdmin;
+  if (btnToggle) btnToggle.style.display = isAdm ? '' : 'none';
+  if (editor && !isAdm) editor.style.display = 'none';
+  try {
+    const d = await api({ action: 'diagnosticoConfigOperacional' });
+    if (!d || !d.ok) return;
+    if (fonte) fonte.textContent = (d.fonte || '—') + (d.okConfig ? ' ✓' : ' (fallback)');
+    if (veic) veic.textContent = String((d.resumo && d.resumo.veiculos) || '—');
+    if (tipos) tipos.textContent = ((d.resumo && d.resumo.tipos) || []).join(', ') || '—';
+    if (alert) {
+      const probs = d.problemas || [];
+      if (probs.length) {
+        alert.style.display = 'block';
+        alert.textContent = probs.join(' · ');
+      } else {
+        alert.style.display = 'none';
+        alert.textContent = '';
+      }
+    }
+    if (isAdm) {
+      const cfg = await api({ action: 'carregarOperacaoConfig' });
+      if (cfg && cfg.ok && cfg.config) {
+        const taV = document.getElementById('mk-opcfg-veiculos-ta');
+        const taP = document.getElementById('mk-opcfg-precos-ta');
+        if (taV && cfg.config.veiculos_validos) taV.value = cfg.config.veiculos_validos.join('\n');
+        if (taP && cfg.config.precosFe) {
+          const gasPrecos = {};
+          Object.keys(cfg.config.precosFe).forEach(tipo => {
+            gasPrecos[tipo] = {};
+            Object.entries(cfg.config.precosFe[tipo]).forEach(([plano, c]) => {
+              gasPrecos[tipo][plano] = { valor: c.v, mins: c.m, adicional: c.a };
+            });
+          });
+          taP.value = JSON.stringify(gasPrecos, null, 2);
+        }
+      }
+    }
+  } catch (e) { console.warn('carregarResumoOperacaoConfig_', e); }
+}
+
+function toggleEditorOperacaoConfig_() {
+  const el = document.getElementById('mk-opcfg-editor');
+  if (!el) return;
+  const open = el.style.display === 'none' || !el.style.display;
+  el.style.display = open ? 'block' : 'none';
+}
+
+async function salvarOperacaoConfigAdmin_() {
+  if (!(typeof mkAuthIsAdmin === 'function' && mkAuthIsAdmin()) && !window.isAdmin) {
+    toast('Somente administrador pode alterar frota e preços', 'error');
+    return;
+  }
+  const taV = document.getElementById('mk-opcfg-veiculos-ta');
+  const taP = document.getElementById('mk-opcfg-precos-ta');
+  const veiculos = (taV && taV.value ? taV.value.split('\n') : []).map(v => v.trim()).filter(Boolean);
+  let precos = null;
+  try {
+    if (taP && taP.value.trim()) precos = JSON.parse(taP.value);
+  } catch (e) {
+    toast('JSON de preços inválido', 'error');
+    return;
+  }
+  try {
+    const d = await api({
+      action: 'salvarOperacaoConfigAdmin',
+      veiculos_validos_json: JSON.stringify(veiculos),
+      precos_json: precos ? JSON.stringify(precos) : undefined,
+      ...apiParamsComAuth_()
+    });
+    if (!d || !d.ok) {
+      toast((d && d.erro) || 'Erro ao salvar', 'error');
+      return;
+    }
+    if (d.config) aplicarOperacaoConfig_(d.config);
+    toast(d.mensagem || 'Configuração salva', 'success');
+    atualizarVeiculoGrid();
+    renderPainel();
+    carregarResumoOperacaoConfig_();
+    syncController(true, 0);
+  } catch (e) {
+    toast('Erro de conexão', 'error');
   }
 }
 
@@ -6092,6 +6308,7 @@ async function carregarKPIs() {
     const d = await api({ action: 'buscarKPIsAdmin', ...apiParamsComAuth_() });
     if (!d.ok) return;
     kpiData = d;
+    if (typeof renderSemanasChart_ === 'function') renderSemanasChart_(d);
     // Re-renderiza gráficos com dados frescos (fix: gráficos ficavam com dados velhos)
     const dashPage = document.getElementById('page-dashboard');
     if (dashPage && dashPage.classList.contains('active')) renderCharts(d);
@@ -6109,6 +6326,7 @@ const setText2 = (id, txt) => { const e = document.getElementById(id); if (e) e.
 function mudarMesDash() {
   const sel = document.getElementById('dash-mes-sel');
   if (!sel || !kpiData) return;
+  _semanaSelIdx = null;
   carregarKPIsComMes(parseInt(sel.value), kpiData.anoAtual || new Date().getFullYear());
 }
 
@@ -6126,7 +6344,83 @@ async function carregarKPIsComMes(mes, ano) {
   } catch(e) { console.error('carregarKPIsComMes:', e); }
 }
 
+let _semanaSelIdx = null;
+
+function renderSemanasChart_(d) {
+  const grid = document.getElementById('mk-semana-grid');
+  if (!grid) return;
+  const semanas = d.porSemana || [];
+  if (!semanas.length) {
+    grid.innerHTML = '<p style="color:#8b95a8;font-size:12px;grid-column:1/-1">Sem dados de semanas neste mês.</p>';
+    return;
+  }
+  if (_semanaSelIdx == null || _semanaSelIdx >= semanas.length) {
+    _semanaSelIdx = typeof d.melhorSemanaIdx === 'number' ? d.melhorSemanaIdx : 0;
+  }
+  grid.innerHTML = semanas.map((sem, idx) => {
+    const active = idx === _semanaSelIdx ? ' active' : '';
+    const fatPct = sem.pctFat || 0;
+    const nPct = sem.pctN || 0;
+    return `<button type="button" class="mk-semana-card${active}" role="tab" aria-selected="${idx === _semanaSelIdx}"
+      onclick="selecionarSemanaKpi_(${idx})" onmouseenter="selecionarSemanaKpi_(${idx},true)">
+      <div class="mk-sem-hdr"><span class="mk-sem-lbl">${sem.label}</span><span class="mk-sem-per">${sem.periodo}</span></div>
+      <div class="mk-sem-fat">${R2(sem.fat || 0)}</div>
+      <div class="mk-sem-n">${sem.n || 0} atendimento(s)</div>
+      <div class="mk-sem-bar-row"><span class="mk-sem-bar-lbl">R$</span><div class="mk-sem-bar-bg"><div class="mk-sem-bar-fill fat" style="width:${fatPct}%"></div></div></div>
+      <div class="mk-sem-bar-row"><span class="mk-sem-bar-lbl">Atd</span><div class="mk-sem-bar-bg"><div class="mk-sem-bar-fill n" style="width:${nPct}%"></div></div></div>
+    </button>`;
+  }).join('');
+  atualizarSemanaDetalhe_(semanas[_semanaSelIdx], d);
+  const foot = document.getElementById('mk-semana-foot');
+  if (foot) {
+    const ml = d.melhorSemanaLabel || (semanas[d.melhorSemanaIdx] && semanas[d.melhorSemanaIdx].label) || '—';
+    foot.textContent = 'Passe o mouse ou toque em uma semana para ver a leitura. Melhor receita: ' + ml + '.';
+  }
+}
+
+window.selecionarSemanaKpi_ = function selecionarSemanaKpi_(idx, hoverOnly) {
+  if (!kpiData || !kpiData.porSemana) return;
+  _semanaSelIdx = idx;
+  document.querySelectorAll('.mk-semana-card').forEach((el, i) => {
+    el.classList.toggle('active', i === idx);
+    el.setAttribute('aria-selected', i === idx ? 'true' : 'false');
+  });
+  atualizarSemanaDetalhe_(kpiData.porSemana[idx], kpiData);
+};
+
+function atualizarSemanaDetalhe_(sem, d) {
+  if (!sem) return;
+  const hdr = document.getElementById('mk-sem-detail-hdr');
+  const ins = document.getElementById('mk-sem-insights');
+  const dest = document.getElementById('mk-sem-melhor-dia');
+  const kFat = document.getElementById('mk-sem-kpi-fat');
+  const kN = document.getElementById('mk-sem-kpi-n');
+  const kT = document.getElementById('mk-sem-kpi-ticket');
+  if (hdr) hdr.textContent = sem.label + ' · dias ' + sem.periodo;
+  if (kFat) kFat.textContent = R2(sem.fat || 0);
+  if (kN) kN.textContent = String(sem.n || 0);
+  if (kT) kT.textContent = sem.n > 0 ? R2(sem.ticketMedio || 0) : '—';
+  if (dest) {
+    const md = sem.melhorDia;
+    if (md && md.fat > 0) {
+      dest.innerHTML = '<strong>Melhor dia da semana:</strong> ' + md.diaSemana + ' ' + md.label +
+        ' — ' + R2(md.fat) + ' · ' + (md.n || 0) + ' atend.' +
+        (md.porque ? '<br><span style="opacity:.9">' + md.porque + '</span>' : '');
+      dest.style.display = 'block';
+    } else {
+      dest.innerHTML = '<strong>Melhor dia da semana:</strong> sem movimento registrado neste período.';
+      dest.style.display = 'block';
+    }
+  }
+  if (ins) {
+    const items = (sem.insights || []).slice();
+    if (!items.length) items.push('Sem insights para esta semana.');
+    ins.innerHTML = items.map(t => '<li>' + t + '</li>').join('');
+  }
+}
+
 function renderCharts(d) {
+  if (typeof renderSemanasChart_ === 'function') renderSemanasChart_(d);
   if (!window.Chart) return;
   [chartDiario, chartExtrasDia, chartTipo, chartPlano, chartHoras].forEach(c => c && c.destroy());
   if (window.chartVeiculo) window.chartVeiculo.destroy();
@@ -6485,7 +6779,7 @@ function renderCharts(d) {
     }
   }
 
-  // Comparativo semanal
+  // Comparativo semana corrida (seg–hoje)
   setText2('nk-sem-atual', R2(d.fatSemana || 0));
   setText2('nk-sem-ant',   R2(d.fatSemanaAnt || 0));
   setText2('nk-mes-ant',   R2(d.fatMesAnt || 0) + ' (' + (d.nMesAnt||0) + ' loc)');
@@ -6809,10 +7103,17 @@ async function carregarHistRelatorios() {
 }
 
 // ── OVERRIDE showPage for admin pages ────────────────────────
+function mkPaginaGestaoPermitida_(name) {
+  if (isAdmin || (typeof mkAuthIsAdmin === 'function' && mkAuthIsAdmin())) return true;
+  if (typeof mkAuthIsSupervisor === 'function' && mkAuthIsSupervisor()) {
+    return ['caixa', 'historico'].indexOf(name) >= 0;
+  }
+  return false;
+}
 function showPage(name, opts = {}) {
   if (window.innerWidth < 1024) mobMenuClose_();
   const adminPages = ['admin','sistema','operadores','dashboard','relatorio','historico','caixa','config'];
-  if (adminPages.includes(name) && !isAdmin) { abrirAdmin(); return; }
+  if (adminPages.includes(name) && !mkPaginaGestaoPermitida_(name)) { abrirAdmin(); return; }
   const wasNovaActive = !!document.getElementById('page-nova')?.classList.contains('active');
   if (wasNovaActive && name !== 'nova') salvarNovaDraft_();
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -6896,6 +7197,21 @@ function hideAdminSidebar() {
   if (sec) sec.classList.remove('visible');
   if (btn) btn.style.display = '';
   sbSetAdminNavOpen_(false, false);
+  ['sbn-adm','sbn-dash','sbn-rel','sbn-ops','sbn-cfg','sbn-sys','sbn-caixa','sbn-hist'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = '';
+  });
+}
+
+function showSupervisorSidebar() {
+  const sec = document.getElementById('sb-admin-section');
+  const btn = document.getElementById('sb-gerenciar-btn');
+  if (sec) sec.classList.add('visible');
+  if (btn) btn.style.display = 'none';
+  sbSetAdminNavOpen_(true, false);
+  const hideIds = ['sbn-adm','sbn-dash','sbn-rel','sbn-ops','sbn-cfg','sbn-sys'];
+  hideIds.forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
+  ['sbn-caixa','sbn-hist'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = ''; });
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -6919,7 +7235,7 @@ function tipoLabel(tipo) {
   return '🧸 Pelúcias';
 }
 
-const TODOS_VEICULOS_DEF = [
+let TODOS_VEICULOS_DEF = [
   {nome:'Carro 01',   tipo:'Carro'},
   {nome:'Carro 02',   tipo:'Carro'},
   {nome:'Carro 03',   tipo:'Carro'},

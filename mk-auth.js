@@ -1,4 +1,4 @@
-/* MOVI KIDS — Login operadores v1.7.26 */
+/* MOVI KIDS — Login operadores v1.7.30 (supervisor) */
 (function () {
   const SESSION_KEY = 'mk_auth_session_v1';
   const LEGACY_OPERADOR_KEY = 'mk_operador_atual_v1';
@@ -69,6 +69,11 @@
     const s = getSession();
     return !!(s && s.role === 'admin');
   };
+  window.mkAuthIsSupervisor = () => {
+    const s = getSession();
+    return !!(s && s.role === 'supervisor');
+  };
+  window.mkAuthIsSupervisorOrAdmin_ = () => mkAuthIsAdmin() || mkAuthIsSupervisor();
   /** ADM pode encerrar/fechar alerta sem SMS de extra (emergencia operacional). */
   window.mkAdminIgnoraSmsObrigatorio_ = () => {
     if (mkAuthIsAdmin()) return true;
@@ -258,11 +263,12 @@
 
   function applyRoleNav_() {
     const admin = mkAuthIsAdmin() || !!(typeof window !== 'undefined' && window.isAdmin);
+    const supervisor = mkAuthIsSupervisor();
     const sbGer = document.getElementById('sb-gerenciar-btn');
-    const sbAdminSec = document.getElementById('sb-admin-section');
-    if (sbGer) sbGer.style.display = admin ? 'none' : '';
+    if (sbGer) sbGer.style.display = (admin || supervisor) ? 'none' : '';
     if (admin && typeof showAdminSidebar === 'function') showAdminSidebar();
-    else if (sbAdminSec && typeof hideAdminSidebar === 'function') hideAdminSidebar();
+    else if (supervisor && typeof showSupervisorSidebar === 'function') showSupervisorSidebar();
+    else if (typeof hideAdminSidebar === 'function') hideAdminSidebar();
   }
 
   /** Sai do modo administrador: perfil ADM volta ao login; operador+PIN admin so fecha o painel ADM. */
@@ -821,6 +827,32 @@
     return apiCall({ action, ...mkAuthAdminPinParams_(), ...extra });
   }
 
+  window.mkOpSetPerfil = async function mkOpSetPerfil(id, nome, perfilAtual) {
+    fecharMenusOperador_();
+    const atual = perfilAtual === 'supervisor' ? 'supervisor' : 'operador';
+    const novo = prompt(
+      'Perfil de ' + nome + ':\n\noperador = balcao padrao\nsupervisor = editar/cancelar + caixa/historico\n\nDigite operador ou supervisor:',
+      atual
+    );
+    if (novo === null) return;
+    const limpo = String(novo).trim().toLowerCase();
+    if (limpo !== 'operador' && limpo !== 'supervisor') {
+      toast('Use operador ou supervisor', 'warning');
+      return;
+    }
+    try {
+      const d = await opAdminApi_('definirPerfilOperadorAdmin', { operadorId: id, perfil: limpo });
+      if (!d.ok) {
+        toast(d.erro || 'Erro', 'error');
+        return;
+      }
+      toast('Perfil de ' + nome + ': ' + limpo, 'success');
+      await refreshOperadoresAdmin_();
+    } catch (e) {
+      toast('Erro de conexao', 'error');
+    }
+  };
+
   window.mkOpEditar = async function mkOpEditar(id, nomeAtual) {
     fecharMenusOperador_();
     const nome = prompt('Novo nome do operador:', nomeAtual || '');
@@ -909,18 +941,21 @@
       el.innerHTML = ops.map(op => {
         const badgeCls = op.hasPin ? 'ok' : 'warn';
         const badgeTxt = op.hasPin ? 'PIN definido' : 'Sem PIN';
+        const perfil = (op.perfil === 'supervisor') ? 'Supervisor' : 'Operador';
         const logadoAgora = sessaoId && Number(op.id) === sessaoId;
         const nomeJs = JSON.stringify(op.nome || '');
         return `<div class="mk-op-card" data-id="${op.id}">
           <div class="mk-op-card-main">
             <span class="mk-op-card-name">${escapeHtml_(op.nome)}</span>
             <span class="mk-op-card-badge ${badgeCls}">${badgeTxt}</span>
+            <span class="mk-op-card-badge">${perfil}</span>
             ${logadoAgora ? '<span class="mk-op-card-badge ok">Logado no balcao</span>' : ''}
           </div>
           <div class="mk-op-card-actions">
             <button type="button" class="mk-op-menu-btn" aria-label="Acoes" onclick="mkOpToggleMenu(event, ${op.id})">⋮</button>
             <div class="mk-op-menu" id="mk-op-menu-${op.id}">
               ${logadoAgora ? `<button type="button" onclick="event.stopPropagation(); mkOpDeslogarBalcao(${op.id}, ${nomeJs})">🔓 Deslogar do balcao</button>` : ''}
+              <button type="button" onclick="event.stopPropagation(); mkOpSetPerfil(${op.id}, ${nomeJs}, ${JSON.stringify(op.perfil || 'operador')})">👤 Perfil</button>
               <button type="button" onclick="event.stopPropagation(); mkOpEditar(${op.id}, ${nomeJs})">✏️ Editar</button>
               <button type="button" onclick="event.stopPropagation(); mkOpResetarPin(${op.id}, ${nomeJs})">🔑 Resetar PIN</button>
               <button type="button" class="danger" onclick="event.stopPropagation(); mkOpExcluir(${op.id}, ${nomeJs})">🗑️ Excluir</button>
