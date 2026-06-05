@@ -22,7 +22,7 @@
 <script>
 // ── CACHE BUSTER — alinhado a mk-version.js / APP_VERSION ──
 (function(){
-  const CURRENT = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.24';
+  const CURRENT = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.25';
   const KEY = 'mk_loaded_version';
   try {
     const stored = localStorage.getItem(KEY);
@@ -330,10 +330,28 @@ header{
 #page-nova.step-0-veiculo .veiculo-grid-carros,
 #page-nova.step-0-veiculo .veiculo-grid-triciclos,
 #page-nova.step-0-veiculo .veiculo-grid-pelucias{transition:opacity .2s}
-.nova-rel-quick{display:flex;gap:8px;margin-bottom:10px;align-items:stretch}
-.nova-rel-quick .form-input{margin:0;flex:1}
-.nova-rel-results{margin-bottom:12px;max-height:0;overflow:hidden;transition:max-height .2s}
-.nova-rel-results.has-items{max-height:200px;overflow-y:auto}
+.nova-rel-block{
+  margin-bottom:16px;padding:12px 14px;background:var(--bg2);border:1px solid var(--border);
+  border-radius:var(--radius-sm);
+}
+.nova-rel-label{font-size:12px;font-weight:800;color:var(--txt);display:block;margin-bottom:4px}
+.nova-rel-desc{font-size:12px;color:var(--txt3);line-height:1.45;margin:0 0 10px}
+.nova-rel-search{display:flex;gap:8px;align-items:stretch}
+.nova-rel-search input{
+  flex:1;min-width:0;margin:0;padding:11px 12px;border:2px solid var(--border);
+  border-radius:var(--radius-sm);font-family:'Nunito',sans-serif;font-size:14px;
+  outline:none;background:var(--card);color:var(--txt);
+}
+.nova-rel-search input:focus{border-color:var(--blue)}
+.nova-rel-search-btn{
+  flex:0 0 auto;width:auto;min-width:92px;padding:10px 16px;background:var(--blue);color:#fff;
+  border:0;border-radius:var(--radius-sm);font-family:'Nunito',sans-serif;
+  font-size:13px;font-weight:800;cursor:pointer;white-space:nowrap;
+}
+.nova-rel-search-btn:disabled{opacity:.55;cursor:wait}
+.nova-rel-search-btn:not(:disabled):active{transform:scale(.98)}
+.nova-rel-results{margin-top:10px;max-height:0;overflow:hidden;transition:max-height .25s}
+.nova-rel-results.has-items{max-height:220px;overflow-y:auto}
 .nova-rel-hint{font-size:11px;color:var(--txt3);margin-bottom:8px;font-weight:700}
 .nova-rel-item{
   display:flex;justify-content:space-between;align-items:center;gap:8px;width:100%;
@@ -1589,7 +1607,7 @@ header{
   <!-- ══ SIDEBAR (desktop fixo / celular = menu suspenso) ══ -->
   <aside id="sidebar">
     <div class="sb-logo">🚗 Movi <span>Kids</span>
-      <div class="sb-status"><span id="sb-dot" class="dot-online"></span><span id="sb-txt">Online</span><span id="sb-version" style="font-size:10px;opacity:.85;margin-left:5px;color:rgba(255,255,255,.7);font-family:monospace">v1.7.24</span></div>
+      <div class="sb-status"><span id="sb-dot" class="dot-online"></span><span id="sb-txt">Online</span><span id="sb-version" style="font-size:10px;opacity:.85;margin-left:5px;color:rgba(255,255,255,.7);font-family:monospace">v1.7.25</span></div>
     </div>
     <div class="sb-nav" id="sb-nav" role="navigation" aria-label="Operação">
       <button class="sb-btn active" id="sbn-home" onclick="showPage('home')"><span class="sb-icon">🏠</span>Home</button>
@@ -1647,7 +1665,7 @@ header{
       <div class="hd-status">
         <div id="status-dot" class="dot-online"></div>
         <span id="status-txt">Online</span>
-        <span id="app-version" style="font-size:10px;opacity:.85;margin-left:4px;font-family:monospace">v1.7.24</span>
+        <span id="app-version" style="font-size:10px;opacity:.85;margin-left:4px;font-family:monospace">v1.7.25</span>
       </div>
     </div>
   </header>
@@ -1778,11 +1796,15 @@ header{
     <!-- Passo 2: Quem -->
     <div id="step-1" class="step-page">
       <div class="sec-title">Quem — responsável e criança</div>
-      <div class="nova-rel-quick">
-        <input id="nova-rel-q" class="form-input" type="search" placeholder="Buscar responsável cadastrado (nome ou telefone)" autocomplete="off" onkeydown="if(event.key==='Enter'){event.preventDefault();novaBuscarRelacionamento_();}">
-        <button type="button" class="btn btn-secondary btn-sm" onclick="novaBuscarRelacionamento_()">Buscar</button>
+      <div class="nova-rel-block">
+        <label class="nova-rel-label" for="nova-rel-q">Buscar cliente cadastrado</label>
+        <p class="nova-rel-desc">Digite nome do responsável, da criança ou telefone. Toque no resultado para preencher o formulário — mais rápido e sem erro no SMS.</p>
+        <div class="nova-rel-search">
+          <input id="nova-rel-q" type="search" placeholder="Ex: Maria, Ana ou 98981..." autocomplete="off" enterkeyhint="search" oninput="novaRelSearchInput_()" onkeydown="if(event.key==='Enter'){event.preventDefault();novaBuscarRelacionamento_();}">
+          <button type="button" id="nova-rel-btn" class="nova-rel-search-btn" onclick="novaBuscarRelacionamento_()">Buscar</button>
+        </div>
+        <div id="nova-rel-results" class="nova-rel-results" aria-live="polite"></div>
       </div>
-      <div id="nova-rel-results" class="nova-rel-results"></div>
       <div class="form-group">
         <label class="form-label">Nome do Responsável *</label>
         <input id="inp-resp" class="form-input" type="text" placeholder="Ex: João Silva" autocomplete="off" autocapitalize="words" oninput="capitalizarNome(this)">
@@ -2697,7 +2719,7 @@ header{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.24';
+const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.25';
 const WEBAPP_URL = (typeof window !== 'undefined' && window.MK_GAS_EXEC_URL) ? window.MK_GAS_EXEC_URL
   : 'https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec';
 const WEBAPP_URL_DEAD_PREFIX = 'AKfycbzc';
@@ -3815,7 +3837,10 @@ function aplicarStepNova_(step) {
   novaState.step = safeStep;
   const planoSec = document.getElementById('nova-plano-section');
   if (planoSec) planoSec.classList.toggle('visible', !!(novaState.veiculo && novaState.tipo));
-  if (safeStep === 1) aplicarPrefillResponsavel_();
+  if (safeStep === 1) {
+    aplicarPrefillResponsavel_();
+    setTimeout(() => document.getElementById('nova-rel-q')?.focus(), 80);
+  }
   if (safeStep === 2) toggleBotoesConfirmarNova_();
   const btnQuem = document.getElementById('btn-nova-continuar-quem');
   if (btnQuem) btnQuem.style.display = (safeStep === 0 && novaState.plano) ? 'block' : 'none';
@@ -3899,46 +3924,80 @@ function aplicarEstiloInputsNova_(tipo) {
   });
 }
 
-async function novaBuscarRelacionamento_() {
+let _novaRelSearchTimer = null;
+
+function novaRelSearchInput_() {
+  const q = document.getElementById('nova-rel-q')?.value.trim() || '';
+  if (_novaRelSearchTimer) clearTimeout(_novaRelSearchTimer);
+  if (q.length < 2) {
+    const box = document.getElementById('nova-rel-results');
+    if (box) { box.innerHTML = ''; box.classList.remove('has-items'); }
+    return;
+  }
+  _novaRelSearchTimer = setTimeout(() => novaBuscarRelacionamento_({ silentEmpty: true }), 450);
+}
+
+function novaRelPickList_(responsaveis) {
+  const picks = [];
+  (responsaveis || []).forEach((r, idx) => {
+    const kids = Array.isArray(r.criancas) && r.criancas.length ? r.criancas : [''];
+    kids.forEach((kid, kidIdx) => {
+      picks.push({ idx, kidIdx, kid: kid || '', r });
+    });
+  });
+  return picks;
+}
+
+async function novaBuscarRelacionamento_(opts) {
+  const silentEmpty = !!(opts && opts.silentEmpty);
   const q = document.getElementById('nova-rel-q')?.value.trim() || '';
   const box = document.getElementById('nova-rel-results');
+  const btn = document.getElementById('nova-rel-btn');
   if (!box) return;
-  if (!q) { toast('Digite nome ou telefone para buscar.', 'warning'); return; }
+  if (!q || q.length < 2) {
+    if (!silentEmpty) toast('Digite pelo menos 2 caracteres (nome ou telefone).', 'warning');
+    return;
+  }
+  if (_novaRelSearchTimer) { clearTimeout(_novaRelSearchTimer); _novaRelSearchTimer = null; }
   box.classList.remove('has-items');
   box.innerHTML = '<div class="skeleton"></div>';
+  if (btn) { btn.disabled = true; btn.textContent = '…'; }
   try {
     const res = await api({ action: 'listarResponsaveis', q, limite: 12 }, 20000);
     if (!res.ok || !(res.responsaveis || []).length) {
-      box.innerHTML = '<div style="font-size:12px;color:var(--txt3);padding:8px">Nenhum cadastro encontrado.</div>';
+      box.innerHTML = '<div style="font-size:12px;color:var(--txt3);padding:8px 2px">Nenhum cadastro encontrado. Preencha o formulário manualmente.</div>';
       box.classList.add('has-items');
       return;
     }
     relacionamentoCache = res.responsaveis;
-    if (res.responsaveis.length === 1) {
-      novaAplicarRelacionamento_(0);
+    const picks = novaRelPickList_(res.responsaveis);
+    if (picks.length === 1) {
+      novaAplicarRelacionamento_(picks[0].idx, picks[0].kidIdx);
       return;
     }
-    box.innerHTML = '<div class="nova-rel-hint">Toque no cadastro para preencher o formulario abaixo:</div>';
-    res.responsaveis.forEach((r, idx) => {
-      const kids = (r.criancas || []).join(', ') || '—';
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'nova-rel-item';
-      btn.innerHTML =
-        '<span><b>' + escHtml(r.responsavel || '') + '</b><br><span style="font-size:11px;color:var(--txt3)">' +
-        escHtml(kids) + '</span></span>' +
-        '<span style="font-size:11px;color:var(--txt3)">' + escHtml(relPhone_(r.telefone)) + '</span>';
-      btn.addEventListener('click', () => novaAplicarRelacionamento_(idx));
-      box.appendChild(btn);
+    box.innerHTML = '<div class="nova-rel-hint">Toque no cadastro para preencher o formulário abaixo:</div>';
+    picks.forEach(p => {
+      const btnPick = document.createElement('button');
+      btnPick.type = 'button';
+      btnPick.className = 'nova-rel-item';
+      const kidLabel = p.kid ? escHtml(p.kid) : '—';
+      btnPick.innerHTML =
+        '<span><b>' + escHtml(p.r.responsavel || '') + '</b><br><span style="font-size:11px;color:var(--txt3)">Criança: ' +
+        kidLabel + '</span></span>' +
+        '<span style="font-size:11px;color:var(--txt3);text-align:right">' + escHtml(relPhone_(p.r.telefone)) + '</span>';
+      btnPick.addEventListener('click', () => novaAplicarRelacionamento_(p.idx, p.kidIdx));
+      box.appendChild(btnPick);
     });
     box.classList.add('has-items');
   } catch (e) {
-    box.innerHTML = '<div style="font-size:12px;color:var(--red);padding:8px">Falha na busca. Tente de novo.</div>';
+    box.innerHTML = '<div style="font-size:12px;color:var(--red);padding:8px 2px">Falha na busca. Verifique a conexão e tente de novo.</div>';
     box.classList.add('has-items');
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = 'Buscar'; }
   }
 }
 
-function novaAplicarRelacionamento_(idx) {
+function novaAplicarRelacionamento_(idx, kidIdx) {
   const r = relacionamentoCache && relacionamentoCache[idx];
   if (!r) return;
   const set = (id, value) => {
@@ -3946,9 +4005,10 @@ function novaAplicarRelacionamento_(idx) {
     if (el) el.value = value || '';
   };
   const criancas = Array.isArray(r.criancas) ? r.criancas : [];
+  const ki = Number(kidIdx) || 0;
   set('inp-resp', r.responsavel || '');
   set('inp-tel', r.telefone || '');
-  set('inp-cri', criancas[0] || '');
+  set('inp-cri', criancas[ki] || criancas[0] || '');
   novaPrefillResponsavel = null;
   const box = document.getElementById('nova-rel-results');
   if (box) { box.innerHTML = ''; box.classList.remove('has-items'); }
@@ -3956,8 +4016,8 @@ function novaAplicarRelacionamento_(idx) {
   if (q) q.value = '';
   atualizarNovaSummaryBar_();
   salvarNovaDraft_();
-  toast('Cadastro preenchido. Confira os dados.', 'success');
-  document.getElementById('inp-resp')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  toast('Cadastro preenchido. Confira nome, criança e telefone.', 'success');
+  document.getElementById('inp-resp')?.focus();
 }
 
 function restaurarNovaDraft_() {
@@ -4228,7 +4288,9 @@ function resetNova(opts = {}) {
   ['inp-resp','inp-cri','inp-tel'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
   const obsEl = document.getElementById('inp-obs'); if (obsEl) obsEl.value = '';
   const relQ = document.getElementById('nova-rel-q'); if (relQ) relQ.value = '';
-  const relBox = document.getElementById('nova-rel-results'); if (relBox) relBox.innerHTML = '';
+  const relBox = document.getElementById('nova-rel-results');
+  if (relBox) { relBox.innerHTML = ''; relBox.classList.remove('has-items'); }
+  if (_novaRelSearchTimer) { clearTimeout(_novaRelSearchTimer); _novaRelSearchTimer = null; }
   document.querySelectorAll('.pag-btn').forEach(b => b.classList.remove('sel'));
   const sec = document.getElementById('nova-plano-section'); if (sec) sec.classList.remove('visible');
   aplicarStepNova_(0);
@@ -4613,8 +4675,9 @@ function renderEncerrarModal_(session, fin) {
   if (admWrap && admChk) {
     if (fin.offline && fin.adm && fin.minExtraTimer > 0) {
       admWrap.style.display = 'flex';
-      admChk.checked = !!incluirExtraLocalAdm;
+      admChk.checked = !!session._incluirExtraLocalAdm;
       admChk.onchange = function() {
+        session._incluirExtraLocalAdm = admChk.checked;
         const f2 = resolverMinUsadosEncerrar_(session, admChk.checked);
         session._minUsados = f2.minUsados;
         session._somentePlanoEnc = f2.somentePlano;
