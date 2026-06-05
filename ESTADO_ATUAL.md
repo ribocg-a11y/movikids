@@ -13,7 +13,7 @@ Referência única para alinhamento local × produção.
 
 | Camada | Versão alvo | URL / ID |
 |--------|-------------|----------|
-| **Frontend** | **v1.7.23** | https://ribocg-a11y.github.io/movikids/?force=1.7.23 |
+| **Frontend** | **v1.7.24** | https://ribocg-a11y.github.io/movikids/?force=1.7.24 |
 | **Apps Script** | **v1.5.43** (colar + Nova versão Web) | Deploy `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y` |
 | SMS Gateway Cloud | **DJVJRL** / device `wihWegHr4wXaVJQ1R-GZR` | Aparelho remoto ONLINE |
 | Pacote SMS P0 | **FECHADO** | `PACOTE_SMS_P0_UNIFICADO_v1.5.38_v1.7.11.md` |
@@ -53,6 +53,7 @@ https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPe
 | **v1.7.21** | Sidebar plana; menu mobile único; operador só na barra lateral |
 | **v1.7.22** | Fix sidebar esmagada (CSS `nav` mobile vs sidebar) |
 | **v1.7.23** | Inatividade **1 hora** para todos (admin saía em 60s); timer admin `60:00` |
+| **v1.7.24** | **Pacote D** — drawer unificado Encerrar / Estender / Editar / Cancelar |
 
 Commits de referência: `b4cf32d` … `361eab2` (branch `main`).
 
@@ -90,7 +91,7 @@ Commits de referência: `b4cf32d` … `361eab2` (branch `main`).
 - [x] Pacote C — Nova locação 3 passos — v1.7.7+
 - [x] Pacote SMS P0 + gateway DJVJRL — v1.5.41 + v1.7.11
 - [x] UX auth/menu (pós-C) — v1.7.18–1.7.23
-- [ ] **Pacote D — Drawer sessão** ← **próximo**
+- [x] **Pacote D — Drawer sessão** — **v1.7.24**
 - [ ] Pacote E — POST + auditoria plena (GAS v1.5.34+)
 - [ ] Pacote F — KPIs avançados (Fase 10)
 
@@ -101,8 +102,8 @@ Commits de referência: `b4cf32d` … `361eab2` (branch `main`).
 | # | Frente | Status | Alvo |
 |---|--------|--------|------|
 | 1 | Atualizar `ESTADO_ATUAL.md` | **feito** | v1.7.23 + v1.5.43 |
-| 2 | **Pacote D** — drawer encerrar/editar/estender/cancelar | **próximo** | v1.7.24+ |
-| 3 | Pacote E — segurança/auditoria backend | pendente | GAS v1.5.34+ |
+| 2 | **Pacote D** — drawer encerrar/editar/estender/cancelar | **feito** | v1.7.24 |
+| 3 | Pacote E — segurança/auditoria backend | **próximo** | GAS v1.5.34+ |
 | 4 | Pacote F — KPIs avançados | pendente | pós Pacote E |
 | 5 | Fases abertas | pendente | supervisor (F9), config frota (F8), WhatsApp (F4) |
 
@@ -137,13 +138,14 @@ Commits de referência: `b4cf32d` … `361eab2` (branch `main`).
 ## Validação rápida (pós-deploy)
 
 1. Ping GAS → `ok:true`, `versao:v1.5.43`
-2. Tablet → `?force=1.7.23`, rodapé **Online v1.7.23**
+2. Tablet → `?force=1.7.24`, rodapé **Online v1.7.24**
 3. Login operador → Home **sem** KPIs financeiros
 4. Login admin → KPIs visíveis; timer inatividade inicia em **60:00**
 5. Sidebar desktop → itens com texto (Home, Nova Locação…)
 6. Mobile → menu só na barra inferior; sem nome do operador no header
 7. Nova locação → 3 passos; SMS boas-vindas
 8. Sessão única → trava 409 + liberar balcão ADM
+9. Card ativo → **Encerrar** ou **⚙** abre drawer com 4 abas
 
 Scripts: `TESTE_REGRESSAO_MOVIKIDS_PROD_SAFE.ps1`, `TESTE_RELACIONAMENTO_MOVIKIDS_READONLY.ps1`
 

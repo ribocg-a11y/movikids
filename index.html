@@ -22,7 +22,7 @@
 <script>
 // ── CACHE BUSTER — alinhado a mk-version.js / APP_VERSION ──
 (function(){
-  const CURRENT = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.23';
+  const CURRENT = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.24';
   const KEY = 'mk_loaded_version';
   try {
     const stored = localStorage.getItem(KEY);
@@ -1142,6 +1142,40 @@ header{
 }
 .est-opt-btn.sel{background:var(--blue);color:#fff;border-color:var(--blue)}
 
+/* ── Pacote D — drawer sessão ─────────────────────────────── */
+.sess-drawer-overlay{align-items:flex-end}
+.sess-drawer-overlay.show{display:flex}
+.sess-drawer-sheet{
+  max-height:min(92dvh,720px);overflow-y:auto;-webkit-overflow-scrolling:touch;
+  width:100%;max-width:480px;padding-bottom:12px;
+}
+.sess-drawer-head{padding:0 2px 12px}
+.sess-drawer-head-title{font-size:18px;font-weight:900;color:var(--txt);line-height:1.2}
+.sess-drawer-head-meta{font-size:12px;color:var(--txt3);font-weight:700;margin-top:4px}
+.sess-drawer-tabs{display:flex;gap:4px;padding:0 0 12px;border-bottom:1px solid var(--border);margin-bottom:12px}
+.sess-drawer-tab{
+  flex:1;border:none;background:transparent;padding:10px 4px;font-size:11px;font-weight:800;
+  color:var(--txt3);cursor:pointer;border-radius:8px;font-family:'Nunito',sans-serif;
+}
+.sess-drawer-tab.active{background:var(--blue-lt);color:var(--blue)}
+.sess-drawer-tab:disabled{opacity:.35;cursor:not-allowed}
+.sess-drawer-panel[hidden]{display:none!important}
+.sess-drawer-edit-menu{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.sess-drawer-edit-chip{
+  border:1px solid var(--border);background:#fff;border-radius:8px;padding:8px 10px;
+  font-size:11px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;color:var(--txt);
+}
+.sess-drawer-edit-chip.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+.sess-drawer-close{margin-top:8px}
+@media(min-width:768px){
+  .sess-drawer-overlay{align-items:stretch;justify-content:flex-end;padding:0}
+  .sess-drawer-sheet{
+    max-width:400px;height:100dvh;max-height:100dvh;border-radius:16px 0 0 16px;
+    margin:0;animation:slideInRight .25s ease;
+  }
+  @keyframes slideInRight{from{transform:translateX(100%)}to{transform:translateX(0)}}
+}
+
 /* Section labels in painel */
 .painel-sec-label{
   grid-column:1/-1;font-size:11px;font-weight:800;color:var(--txt3);
@@ -1555,7 +1589,7 @@ header{
   <!-- ══ SIDEBAR (desktop fixo / celular = menu suspenso) ══ -->
   <aside id="sidebar">
     <div class="sb-logo">🚗 Movi <span>Kids</span>
-      <div class="sb-status"><span id="sb-dot" class="dot-online"></span><span id="sb-txt">Online</span><span id="sb-version" style="font-size:10px;opacity:.85;margin-left:5px;color:rgba(255,255,255,.7);font-family:monospace">v1.7.23</span></div>
+      <div class="sb-status"><span id="sb-dot" class="dot-online"></span><span id="sb-txt">Online</span><span id="sb-version" style="font-size:10px;opacity:.85;margin-left:5px;color:rgba(255,255,255,.7);font-family:monospace">v1.7.24</span></div>
     </div>
     <div class="sb-nav" id="sb-nav" role="navigation" aria-label="Operação">
       <button class="sb-btn active" id="sbn-home" onclick="showPage('home')"><span class="sb-icon">🏠</span>Home</button>
@@ -1613,7 +1647,7 @@ header{
       <div class="hd-status">
         <div id="status-dot" class="dot-online"></div>
         <span id="status-txt">Online</span>
-        <span id="app-version" style="font-size:10px;opacity:.85;margin-left:4px;font-family:monospace">v1.7.23</span>
+        <span id="app-version" style="font-size:10px;opacity:.85;margin-left:4px;font-family:monospace">v1.7.24</span>
       </div>
     </div>
   </header>
@@ -2553,55 +2587,49 @@ header{
   </div>
 </div>
 
-<!-- ──────── ENCERRAR MODAL ──────── -->
-<div id="enc-modal" class="modal-overlay">
-  <div class="modal-sheet">
+<!-- ──────── DRAWER SESSÃO (Pacote D) ──────── -->
+<div id="sess-drawer" class="modal-overlay sess-drawer-overlay" onclick="if(event.target===this)fecharSessaoDrawer()">
+  <div class="modal-sheet sess-drawer-sheet" onclick="event.stopPropagation()">
     <div class="modal-handle"></div>
-    <div class="modal-icon">✅</div>
-    <div class="modal-title">Encerrar locação</div>
-    <div class="modal-info" id="enc-info"></div>
-    <div id="enc-offline-warn" class="op-policy danger" style="display:none;margin:0 0 12px"></div>
-    <label id="enc-adm-extra-wrap" style="display:none;align-items:flex-start;gap:8px;font-size:13px;font-weight:700;margin:0 0 12px;cursor:pointer">
-      <input type="checkbox" id="enc-adm-extra-local" style="margin-top:3px">
-      <span>Incluir minutos extras do cronômetro local (somente ADM, com GAS instável)</span>
-    </label>
-    <div class="modal-btns">
-      <button class="btn btn-primary" onclick="confirmarEncerrar()" id="btn-enc-confirm">
-        ✓ Confirmar encerramento
-      </button>
-      <button class="btn btn-secondary" onclick="fecharEncModal()">Cancelar</button>
+    <div id="sess-drawer-head" class="sess-drawer-head"></div>
+    <div class="sess-drawer-tabs" id="sess-drawer-tabs">
+      <button type="button" class="sess-drawer-tab active" data-tab="encerrar" onclick="sessDrawerSetTab('encerrar')">Encerrar</button>
+      <button type="button" class="sess-drawer-tab" data-tab="estender" onclick="sessDrawerSetTab('estender')">Estender</button>
+      <button type="button" class="sess-drawer-tab" data-tab="editar" onclick="sessDrawerSetTab('editar')">Editar</button>
+      <button type="button" class="sess-drawer-tab" data-tab="cancelar" onclick="sessDrawerSetTab('cancelar')">Cancelar</button>
     </div>
-  </div>
-</div>
-
-
-<!-- ──────── ESTENDER MODAL ──────── -->
-<div id="est-modal" class="modal-overlay">
-  <div class="modal-sheet">
-    <div class="modal-handle"></div>
-    <div class="modal-icon">⏱</div>
-    <div class="modal-title">Estender tempo</div>
-    <div class="modal-info" id="est-info"></div>
-    <div class="est-opts" id="est-opts"></div>
-    <div class="modal-btns">
-      <button class="btn btn-primary" id="btn-est-confirm" onclick="confirmarEstender()">⏱ Confirmar extensão</button>
-      <button class="btn btn-secondary" onclick="fecharEstModal()">Cancelar</button>
+    <div id="sess-drawer-panel-encerrar" class="sess-drawer-panel">
+      <div class="modal-info" id="enc-info"></div>
+      <div id="enc-offline-warn" class="op-policy danger" style="display:none;margin:0 0 12px"></div>
+      <label id="enc-adm-extra-wrap" style="display:none;align-items:flex-start;gap:8px;font-size:13px;font-weight:700;margin:0 0 12px;cursor:pointer">
+        <input type="checkbox" id="enc-adm-extra-local" style="margin-top:3px">
+        <span>Incluir minutos extras do cronômetro local (somente ADM, com GAS instável)</span>
+      </label>
+      <div class="modal-btns">
+        <button class="btn btn-primary" onclick="confirmarEncerrar()" id="btn-enc-confirm">✓ Confirmar encerramento</button>
+      </div>
     </div>
-  </div>
-</div>
-
-<!-- OPERACOES DA LOCACAO -->
-<div id="op-modal" class="modal-overlay">
-  <div class="modal-sheet">
-    <div class="modal-handle"></div>
-    <div class="modal-icon" id="op-icon">...</div>
-    <div class="modal-title" id="op-title">Editar locação</div>
-    <div class="modal-sub" id="op-sub">Corrija dados operacionais com auditoria.</div>
-    <div id="op-body"></div>
-    <div class="modal-btns">
-      <button class="btn btn-primary" id="op-save" onclick="salvarOperacaoLocacao()">Salvar alteração</button>
-      <button class="btn btn-secondary" onclick="fecharOperacaoLocacao()">Cancelar</button>
+    <div id="sess-drawer-panel-estender" class="sess-drawer-panel" hidden>
+      <div class="modal-info" id="est-info"></div>
+      <div class="est-opts" id="est-opts"></div>
+      <div class="modal-btns">
+        <button class="btn btn-primary" id="btn-est-confirm" onclick="confirmarEstender()">⏱ Confirmar extensão</button>
+      </div>
     </div>
+    <div id="sess-drawer-panel-editar" class="sess-drawer-panel" hidden>
+      <div id="sess-drawer-edit-menu" class="sess-drawer-edit-menu"></div>
+      <div id="op-body"></div>
+      <div class="modal-btns">
+        <button class="btn btn-primary" id="op-save" onclick="salvarOperacaoLocacao()">Salvar alteração</button>
+      </div>
+    </div>
+    <div id="sess-drawer-panel-cancelar" class="sess-drawer-panel" hidden>
+      <div id="sess-drawer-cancel-body"></div>
+      <div class="modal-btns">
+        <button class="btn btn-primary op-danger" id="op-save-cancel" onclick="salvarOperacaoLocacao()">Confirmar cancelamento</button>
+      </div>
+    </div>
+    <button type="button" class="btn btn-secondary sess-drawer-close" onclick="fecharSessaoDrawer()">Fechar</button>
   </div>
 </div>
 
@@ -2669,7 +2697,7 @@ header{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.23';
+const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.24';
 const WEBAPP_URL = (typeof window !== 'undefined' && window.MK_GAS_EXEC_URL) ? window.MK_GAS_EXEC_URL
   : 'https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec';
 const WEBAPP_URL_DEAD_PREFIX = 'AKfycbzc';
@@ -2714,9 +2742,12 @@ const PLANO_LABELS = { '10min':'10 minutos','20min':'20 minutos','30min':'30 min
 let sessions    = [];   // active sessions with timer data
 let timerInterv = null;
 let alertSession= null; // session triggering alert modal
-let encSession  = null; // session in encerrar modal
-let opSession   = null; // session in edit/cancel modal
+let encSession  = null; // session in encerrar drawer
+let opSession   = null; // session in edit/cancel drawer
 let opTipo      = null;
+let sessDrawerRow = null;
+let sessDrawerTab = 'encerrar';
+let sessDrawerEditTipo = 'editar';
 let novaState   = { tipo: null, plano: null, veiculo: null, pagamento: null, observacao: '', step: 0 };
 let novaPrefillResponsavel = null;
 const NOVA_DRAFT_KEY = 'mk_nova_locacao_draft_v1';
@@ -3668,7 +3699,7 @@ function buildCard(s) {
                Enviar SMS
              </button>`
       }
-      <button class="btn btn-encerrar ${isOver?'danger':''}" onclick="pedirEncerrar(${s.rowIndex})">
+      <button class="btn btn-encerrar ${isOver?'danger':''}" onclick="abrirSessaoDrawer(${s.rowIndex},'encerrar')">
         ✓ Encerrar
       </button>
     </div>
@@ -3679,24 +3710,8 @@ let menuLocacaoAbertoKey = null;
 
 function menuLocacaoHtml_(s, ativa) {
   const row = Number(s.rowIndex);
-  const menuKey = `${row}:${ativa ? 'ativa' : 'pendente'}`;
-  const showCls = menuLocacaoAbertoKey === menuKey ? ' show' : '';
-  const itensAtiva = `
-    <button onclick="abrirOperacaoLocacao(${row},'editar')">Editar dados</button>
-    <button onclick="abrirOperacaoLocacao(${row},'pagamento')">Trocar pagamento</button>
-    <button onclick="abrirOperacaoLocacao(${row},'veiculo')">Trocar veículo</button>
-    <button onclick="abrirOperacaoLocacao(${row},'observacao')">Observação</button>
-    <div class="sep"></div>
-    <button onclick="abrirEstender(${row})">Estender tempo</button>
-    <button class="danger" onclick="abrirOperacaoLocacao(${row},'cancelar')">Cancelar</button>`;
-  const itensPendente = `
-    <button onclick="abrirOperacaoLocacao(${row},'editar')">Editar cadastro</button>
-    <button onclick="abrirOperacaoLocacao(${row},'plano')">Trocar plano</button>
-    <button onclick="abrirOperacaoLocacao(${row},'pagamento')">Trocar pagamento</button>
-    <button onclick="abrirOperacaoLocacao(${row},'veiculo')">Trocar veículo</button>
-    <div class="sep"></div>
-    <button class="danger" onclick="abrirOperacaoLocacao(${row},'cancelar')">Cancelar cadastro</button>`;
-  return `<button class="sc-more" data-menu-key="${menuKey}" onclick="toggleMenuLocacao(event,this)" title="Mais opções">...</button><div class="sc-menu${showCls}" data-menu-key="${menuKey}" onclick="event.stopPropagation()">${ativa ? itensAtiva : itensPendente}</div>`;
+  const tab = ativa ? 'editar' : 'editar';
+  return `<button type="button" class="sc-more" onclick="abrirSessaoDrawer(${row},'${tab}')" title="Gerenciar locação">⚙</button>`;
 }
 
 function toggleMenuLocacao(ev, btn) {
@@ -4394,6 +4409,143 @@ async function confirmarLocacaoEIniciar_() {
 }
 
 // ═══════════════════════════════════════════════════════════
+// DRAWER SESSÃO (Pacote D)
+// ═══════════════════════════════════════════════════════════
+function sessDrawerSession_() {
+  if (sessDrawerRow == null) return null;
+  return sessions.find(s => Number(s.rowIndex) === Number(sessDrawerRow)) || null;
+}
+
+function renderSessDrawerHead_(s) {
+  const head = document.getElementById('sess-drawer-head');
+  if (!head || !s) return;
+  const icon = tipoIcon(s.tipo);
+  const rem = s.started ? calcRemaining(s) : s.mins * 60;
+  const tempo = s.started
+    ? (rem <= 0 ? 'Extra ' + fmtTime(Math.abs(rem)) : fmtTime(rem) + ' restante')
+    : fmtTime(s.mins * 60) + ' · aguardando início';
+  head.innerHTML =
+    '<div class="sess-drawer-head-title">' + icon + ' ' + escHtml(s.crianca) + '</div>' +
+    '<div class="sess-drawer-head-meta">' + escHtml(s.veiculo || s.tipo) + ' · ' + escHtml(s.plano) + ' · ' + tempo + '</div>';
+}
+
+function renderSessDrawerTabs_(s) {
+  const ativa = !!s.started;
+  document.querySelectorAll('.sess-drawer-tab').forEach(btn => {
+    const tab = btn.getAttribute('data-tab');
+    const disabled = !ativa && (tab === 'encerrar' || tab === 'estender');
+    btn.disabled = disabled;
+  });
+}
+
+function abrirSessaoDrawer(rowIndex, tab) {
+  const s = sessions.find(x => Number(x.rowIndex) === Number(rowIndex));
+  if (!s) return;
+  const wantTab = tab || (s.started ? 'encerrar' : 'editar');
+  if (wantTab === 'encerrar' && s.started) {
+    const rem = calcRemaining(s);
+    const admIgnoraSms = typeof mkAdminIgnoraSmsObrigatorio_ === 'function' && mkAdminIgnoraSmsObrigatorio_();
+    if (rem <= 0 && !extraWaFoiEnviado_(s) && !admIgnoraSms) {
+      alertSession = s;
+      showAlertModal(s, true);
+      toast('Envie o aviso de minutos extras antes de encerrar.', 'error');
+      return;
+    }
+  }
+  sessDrawerRow = rowIndex;
+  menuLocacaoAbertoKey = null;
+  document.querySelectorAll('.sc-menu').forEach(m => m.classList.remove('show'));
+  renderSessDrawerHead_(s);
+  renderSessDrawerTabs_(s);
+  sessDrawerSetTab(wantTab);
+  const drawer = document.getElementById('sess-drawer');
+  if (drawer) drawer.classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+
+function fecharSessaoDrawer() {
+  const drawer = document.getElementById('sess-drawer');
+  if (drawer) drawer.classList.remove('show');
+  document.body.style.overflow = '';
+  fecharEncModal();
+  fecharEstModal();
+  fecharOperacaoLocacao();
+  sessDrawerRow = null;
+}
+
+function sessDrawerSetTab(tab) {
+  const s = sessDrawerSession_();
+  if (!s) return;
+  if (!s.started && (tab === 'encerrar' || tab === 'estender')) tab = 'editar';
+  sessDrawerTab = tab;
+  document.querySelectorAll('.sess-drawer-tab').forEach(btn => {
+    btn.classList.toggle('active', btn.getAttribute('data-tab') === tab);
+  });
+  ['encerrar', 'estender', 'editar', 'cancelar'].forEach(t => {
+    const panel = document.getElementById('sess-drawer-panel-' + t);
+    if (panel) panel.hidden = t !== tab;
+  });
+  if (tab === 'encerrar') initSessDrawerEncerrar_(s);
+  else if (tab === 'estender') initSessDrawerEstender_(s);
+  else if (tab === 'editar') initSessDrawerEditar_(s, sessDrawerEditTipo);
+  else if (tab === 'cancelar') initSessDrawerCancelar_(s);
+}
+
+function initSessDrawerEncerrar_(s) {
+  encSession = s;
+  const fin = resolverMinUsadosEncerrar_(s, false);
+  encSession._minUsados = fin.minUsados;
+  encSession._somentePlanoEnc = fin.somentePlano;
+  renderEncerrarModal_(s, fin);
+}
+
+function initSessDrawerEstender_(s) {
+  abrirEstender(s.rowIndex, true);
+}
+
+function initSessDrawerEditar_(s, subTipo) {
+  const ativa = !!s.started;
+  const menu = document.getElementById('sess-drawer-edit-menu');
+  if (!menu) return;
+  const chips = ativa
+    ? [
+        { id: 'editar', label: 'Dados' },
+        { id: 'pagamento', label: 'Pagamento' },
+        { id: 'veiculo', label: 'Veículo' },
+        { id: 'observacao', label: 'Observação' }
+      ]
+    : [
+        { id: 'editar', label: 'Cadastro' },
+        { id: 'plano', label: 'Plano' },
+        { id: 'pagamento', label: 'Pagamento' },
+        { id: 'veiculo', label: 'Veículo' }
+      ];
+  const tipo = subTipo || 'editar';
+  sessDrawerEditTipo = tipo;
+  menu.innerHTML = chips.map(c =>
+    '<button type="button" class="sess-drawer-edit-chip' + (c.id === tipo ? ' active' : '') +
+    '" onclick="sessDrawerPickEdit(\'' + c.id + '\')">' + c.label + '</button>'
+  ).join('');
+  renderOperacaoLocacaoForm_(s.rowIndex, tipo, 'op-body');
+  const save = document.getElementById('op-save');
+  if (save) {
+    save.className = 'btn btn-primary';
+    save.textContent = 'Salvar alteração';
+  }
+}
+
+function sessDrawerPickEdit(tipo) {
+  sessDrawerEditTipo = tipo;
+  const s = sessDrawerSession_();
+  if (!s) return;
+  initSessDrawerEditar_(s, tipo);
+}
+
+function initSessDrawerCancelar_(s) {
+  renderOperacaoLocacaoForm_(s.rowIndex, 'cancelar', 'sess-drawer-cancel-body');
+}
+
+// ═══════════════════════════════════════════════════════════
 // ENCERRAR
 // ═══════════════════════════════════════════════════════════
 function mkGasConsideradoOffline_() {
@@ -4476,27 +4628,10 @@ function renderEncerrarModal_(session, fin) {
 }
 
 function pedirEncerrar(rowIndex) {
-  encSession = sessions.find(s => s.rowIndex === rowIndex);
-  if (!encSession) return;
-
-  const rem           = calcRemaining(encSession);
-  const admIgnoraSms  = typeof mkAdminIgnoraSmsObrigatorio_ === 'function' && mkAdminIgnoraSmsObrigatorio_();
-  if (rem <= 0 && !extraWaFoiEnviado_(encSession) && !admIgnoraSms) {
-    alertSession = encSession;
-    showAlertModal(encSession, true);
-    toast('Envie o aviso de minutos extras antes de encerrar.', 'error');
-    return;
-  }
-
-  const fin = resolverMinUsadosEncerrar_(encSession, false);
-  encSession._minUsados = fin.minUsados;
-  encSession._somentePlanoEnc = fin.somentePlano;
-  renderEncerrarModal_(encSession, fin);
-  document.getElementById('enc-modal').classList.add('show');
+  abrirSessaoDrawer(rowIndex, 'encerrar');
 }
 
 function fecharEncModal() {
-  document.getElementById('enc-modal').classList.remove('show');
   const w = document.getElementById('enc-offline-warn');
   const wrap = document.getElementById('enc-adm-extra-wrap');
   const chk = document.getElementById('enc-adm-extra-local');
@@ -4557,7 +4692,7 @@ async function confirmarEncerrar() {
 
     statsHoje.n++;
 
-    fecharEncModal();
+    fecharSessaoDrawer();
     fecharAlerta();
     // Invalida cache para outros dispositivos verem encerramento imediatamente
     try { localStorage.removeItem('mk_inicio_cache'); } catch(e) {}
@@ -4798,57 +4933,50 @@ function normalizarTxt_(s) {
   return String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
 }
 
-function abrirOperacaoLocacao(rowIndex, tipo) {
+function renderOperacaoLocacaoForm_(rowIndex, tipo, bodyId) {
   opSession = sessions.find(x => Number(x.rowIndex) === Number(rowIndex));
   opTipo = tipo;
-  if (!opSession) { toast('Locação não encontrada', 'error'); return; }
-  menuLocacaoAbertoKey = null;
-  document.querySelectorAll('.sc-menu').forEach(m => m.classList.remove('show'));
-  const modal = document.getElementById('op-modal');
-  const title = document.getElementById('op-title');
-  const sub = document.getElementById('op-sub');
-  const body = document.getElementById('op-body');
-  const icon = document.getElementById('op-icon');
-  const save = document.getElementById('op-save');
+  if (!opSession) { toast('Locação não encontrada', 'error'); return false; }
+  const body = document.getElementById(bodyId || 'op-body');
+  if (!body) return false;
   const ativa = !!opSession.started;
-  icon.textContent = tipo === 'cancelar' ? '!' : tipo === 'pagamento' ? '$' : '...';
-  save.className = 'btn btn-primary' + (tipo === 'cancelar' ? ' op-danger' : '');
-  save.textContent = tipo === 'cancelar' ? 'Confirmar cancelamento' : 'Salvar alteração';
   if (tipo === 'pagamento') {
-    title.textContent = 'Trocar pagamento';
-    sub.textContent = 'Atualiza caixa, card e relatórios com auditoria.';
     body.innerHTML = `<div class="op-policy">Use quando o responsável pagou em outra forma.</div><div class="op-form"><div class="op-grid"><div class="op-field"><label>Atual</label><input value="${escHtml(opSession.pagamento || 'Não informado')}" disabled></div><div class="op-field"><label>Novo</label><select id="op-pagamento">${['PIX','Credito','Debito','Dinheiro'].map(p=>`<option ${normalizarTxt_(opSession.pagamento)===normalizarTxt_(p)?'selected':''}>${p}</option>`).join('')}</select></div></div><div class="op-field"><label>Motivo</label><textarea id="op-motivo">Responsável alterou a forma de pagamento.</textarea></div></div>`;
   } else if (tipo === 'veiculo') {
-    title.textContent = 'Trocar veículo';
-    sub.textContent = ativa ? 'Mantém o tempo correndo e registra a troca.' : 'Permitido antes do início sem impacto financeiro.';
     body.innerHTML = `<div class="op-policy">A troca não reinicia o timer nem altera valores automaticamente.</div><div class="op-form"><div class="op-grid"><div class="op-field"><label>Atual</label><input value="${escHtml(opSession.veiculo || opSession.tipo || '')}" disabled></div><div class="op-field"><label>Novo</label><select id="op-veiculo">${['Carro 01','Carro 02','Carro 03','Triciclo 01','Triciclo 02','Pelucia 01','Pelucia 02','Pelucia 03','Pelucia 04'].map(v=>`<option ${normalizarTxt_(opSession.veiculo)===normalizarTxt_(v)?'selected':''}>${v}</option>`).join('')}</select></div></div><div class="op-field"><label>Motivo</label><textarea id="op-motivo">Troca solicitada pelo responsável ou por operação.</textarea></div></div>`;
   } else if (tipo === 'plano') {
-    if (ativa) { toast('Plano só pode ser trocado antes de iniciar. Use Estender tempo.', 'warning'); return; }
-    title.textContent = 'Trocar plano';
-    sub.textContent = 'Permitido apenas antes da contagem iniciar.';
+    if (ativa) { toast('Plano só pode ser trocado antes de iniciar. Use Estender tempo.', 'warning'); return false; }
     const planos = Object.keys(PRECOS[opSession.tipo] || {});
     body.innerHTML = `<div class="op-policy">Depois do início, use extensão para preservar faturamento.</div><div class="op-form"><div class="op-field"><label>Novo plano</label><select id="op-plano">${planos.map(p=>`<option ${p===opSession.plano?'selected':''}>${p}</option>`).join('')}</select></div><div class="op-field"><label>Motivo</label><textarea id="op-motivo">Cliente pediu alteração antes de iniciar.</textarea></div></div>`;
   } else if (tipo === 'cancelar') {
-    title.textContent = ativa ? 'Cancelar locação em andamento' : 'Cancelar cadastro';
-    sub.textContent = 'Não apaga a linha: marca como Cancelada e preserva auditoria.';
     body.innerHTML = `<div class="op-policy danger">${ativa ? 'Informe o motivo para não quebrar caixa e histórico.' : 'Cadastro não iniciado será marcado como Cancelada.'}</div><div class="op-form"><div class="op-field"><label>Tipo</label><select id="op-motivo-tipo"><option>Erro de cadastro</option><option>Cliente desistiu</option><option>Manutenção do veículo</option><option>Cortesia autorizada</option></select></div><div class="op-field"><label>Justificativa obrigatória</label><textarea id="op-motivo">Descreva o motivo do cancelamento.</textarea></div></div>`;
   } else {
-    title.textContent = tipo === 'observacao' ? 'Observação da locação' : 'Editar dados';
-    sub.textContent = ativa ? 'Corrige dados textuais sem alterar tempo/valor.' : 'Corrige dados principais do cadastro.';
     body.innerHTML = `<div class="op-policy">Toda alteração será sincronizada e registrada.</div><div class="op-form"><div class="op-field"><label>Criança</label><input id="op-crianca" value="${escHtml(opSession.crianca || '')}"></div><div class="op-field"><label>Responsável</label><input id="op-responsavel" value="${escHtml(opSession.responsavel || '')}"></div><div class="op-field"><label>Telefone</label><input id="op-telefone" value="${escHtml(opSession.telefone || '')}"></div><div class="op-field"><label>Observação</label><textarea id="op-observacao">${escHtml(opSession.observacao || '')}</textarea></div><div class="op-field"><label>Motivo</label><textarea id="op-motivo">Correção operacional solicitada no atendimento.</textarea></div></div>`;
   }
-  modal.classList.add('show');
+  return true;
+}
+
+function abrirOperacaoLocacao(rowIndex, tipo) {
+  if (tipo === 'cancelar') {
+    abrirSessaoDrawer(rowIndex, 'cancelar');
+    return;
+  }
+  sessDrawerEditTipo = tipo;
+  abrirSessaoDrawer(rowIndex, 'editar');
 }
 
 function fecharOperacaoLocacao() {
-  document.getElementById('op-modal').classList.remove('show');
   opSession = null;
   opTipo = null;
+  const body = document.getElementById('op-body');
+  const cancelBody = document.getElementById('sess-drawer-cancel-body');
+  if (body) body.innerHTML = '';
+  if (cancelBody) cancelBody.innerHTML = '';
 }
 
 async function salvarOperacaoLocacao() {
   if (!opSession || !opTipo) return;
-  const btn = document.getElementById('op-save');
+  const btn = document.getElementById(sessDrawerTab === 'cancelar' ? 'op-save-cancel' : 'op-save');
   const oldText = btn.textContent;
   btn.disabled = true;
   btn.textContent = 'Salvando...';
@@ -4873,7 +5001,7 @@ async function salvarOperacaoLocacao() {
       if (idx >= 0) sessions[idx] = Object.assign({}, sessions[idx], d.locacao || {});
     }
     saveSessions(); renderCards(); updateStats(); atualizarVeiculoGrid();
-    fecharOperacaoLocacao();
+    fecharSessaoDrawer();
     toast(opTipo === 'cancelar' ? 'Locacao cancelada com auditoria.' : 'Alteracao salva e sincronizada.', 'success');
     broadcastInvalidate(); syncController(true, 400);
   } catch(e) {
@@ -6678,8 +6806,8 @@ function buildPainelCard(nome, tipo, s) {
     <div class="pcard-crianca">${escHtml(s.crianca)}</div>
     <div class="pcard-resp">👤 ${escHtml(s.responsavel)}</div>
     <div class="pcard-btns">
-      <button class="pcard-btn enc" onclick="pedirEncerrar(${s.rowIndex})">✓ Enc.</button>
-      <button class="pcard-btn est" onclick="abrirEstender(${s.rowIndex})">⏱ +Tempo</button>
+      <button class="pcard-btn enc" onclick="abrirSessaoDrawer(${s.rowIndex},'encerrar')">✓ Enc.</button>
+      <button class="pcard-btn est" onclick="abrirSessaoDrawer(${s.rowIndex},'estender')">⏱ +Tempo</button>
     </div>
   </div>`;
 }
@@ -6700,12 +6828,16 @@ function iniciarNovaPeloVeiculo(veiculo, tipo) {
 let estSession = null;
 let estMins    = 0;
 
-function abrirEstender(rowIndex) {
+function abrirEstender(rowIndex, fromDrawer) {
   estSession = sessions.find(s => s.rowIndex === rowIndex);
   if (!estSession) return;
   estMins = 0;
+  if (!fromDrawer) {
+    abrirSessaoDrawer(rowIndex, 'estender');
+    return;
+  }
 
-  const icon = estSession.tipoIcon(tipo);
+  const icon = tipoIcon(estSession.tipo);
   document.getElementById('est-info').innerHTML =
     '<div class="modal-info-row"><span>' + icon + ' ' + escHtml(estSession.veiculo || estSession.tipo) + '</span><span>' + estSession.plano + '</span></div>' +
     '<div class="modal-info-row"><span>Criança</span><span>' + escHtml(estSession.crianca) + '</span></div>' +
@@ -6734,7 +6866,6 @@ function abrirEstender(rowIndex) {
        ${precoLbl(PRECOS[tipoKey]['3h'].v)}
      </button>`;
 
-  document.getElementById('est-modal').classList.add('show');
 }
 
 let estPlano = '';   // plano selecionado para extensão ('10min', '20min'...)
@@ -6750,11 +6881,11 @@ function selecionarEstender(plano, mins, valor) {
 }
 
 function fecharEstModal() {
-  document.getElementById('est-modal').classList.remove('show');
   estSession = null;
   estMins    = 0;
   estPlano   = '';
   estValor   = 0;
+  document.querySelectorAll('.est-opt-btn').forEach(b => b.classList.remove('sel'));
 }
 
 async function confirmarEstender() {
@@ -6807,7 +6938,7 @@ async function confirmarEstender() {
     toast('Erro ao estender: ' + e.message, 'error');
   } finally {
     if (btn) { btn.disabled = false; btn.textContent = '⏱ Confirmar extensão'; }
-    fecharEstModal();
+    fecharSessaoDrawer();
     renderCards();
     const painelPage = document.getElementById('page-painel');
     if (painelPage && painelPage.classList.contains('active')) renderPainel();

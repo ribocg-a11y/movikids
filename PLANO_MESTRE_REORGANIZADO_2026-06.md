@@ -394,8 +394,8 @@ flowchart LR
 Ordem de retomada (03/06/2026):
 
 1. [x] `ESTADO_ATUAL.md` — v1.7.23 + GAS v1.5.43
-2. [ ] **Pacote D** — drawer sessão → alvo **v1.7.24+**
-3. [ ] Pacote E — POST + auditoria plena (GAS v1.5.34+)
+2. [x] **Pacote D** — drawer sessão → **v1.7.24**
+3. [ ] Pacote E — POST + auditoria plena (GAS v1.5.34+) ← **próximo**
 4. [ ] Pacote F — KPIs avançados (Fase 10)
 5. [ ] Fases abertas — supervisor (F9), config frota (F8), WhatsApp (F4)
 
