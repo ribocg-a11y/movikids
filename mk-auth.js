@@ -1,4 +1,4 @@
-/* MOVI KIDS — Login operadores v1.7.13 */
+/* MOVI KIDS — Login operadores v1.7.15 */
 (function () {
   const SESSION_KEY = 'mk_auth_session_v1';
   const LEGACY_OPERADOR_KEY = 'mk_operador_atual_v1';
@@ -606,8 +606,8 @@
       } else {
         showApp();
         applyRoleNav_();
+        if (typeof showPage === 'function') showPage('home');
       }
-      if (typeof showPage === 'function') showPage('home');
       if (typeof atualizarOperadorUI_ === 'function') atualizarOperadorUI_();
       if (typeof init === 'function') {
         window._mkAppInited = true;

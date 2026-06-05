@@ -20,11 +20,11 @@ Referencia unica para alinhamento local x producao.
 
 |--------|-------------|----------|
 
-| Apps Script | **v1.5.41** (colar + Nova versao Web) | Deploy `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y` |
+| Apps Script | **v1.5.42** (colar + Nova versao Web) | Deploy `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y` |
 
 | SMS Gateway Cloud | **DJVJRL** / device `wihWegHr4wXaVJQ1R-GZR` | Aparelho remoto ONLINE |
 
-| Frontend | **v1.7.12** | https://ribocg-a11y.github.io/movikids/?force=1.7.12 |
+| Frontend | **v1.7.15** | https://ribocg-a11y.github.io/movikids/?force=1.7.15 |
 
 | Pacote SMS P0 | **FECHADO** | `PACOTE_SMS_P0_UNIFICADO_v1.5.38_v1.7.11.md` |
 
@@ -70,7 +70,7 @@ URL morta (nao usar): `AKfycbzc...` → 404
 
 
 
-- **GAS:** `MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs` (v1.5.41)
+- **GAS:** `MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs` (v1.5.42)
 
 - **Clasp:** `gas/Code.gs` (gerado por `scripts/sync-gas-to-clasp.ps1` — nao editar a mao)
 

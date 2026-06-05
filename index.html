@@ -22,7 +22,7 @@
 <script>
 // ── CACHE BUSTER — alinhado a mk-version.js / APP_VERSION ──
 (function(){
-  const CURRENT = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.13';
+  const CURRENT = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.15';
   const KEY = 'mk_loaded_version';
   try {
     const stored = localStorage.getItem(KEY);
@@ -590,8 +590,22 @@ nav button .nav-badge{
 .sb-icon{font-size:17px;line-height:1;flex-shrink:0}
 .sb-divider{font-size:10px;font-weight:700;color:rgba(255,255,255,.3);
   text-transform:uppercase;letter-spacing:.08em;padding:14px 13px 5px}
-.sb-admin-section{display:none}
+.sb-admin-section{display:none;padding:0 10px 6px}
 .sb-admin-section.visible{display:block}
+.sb-admin-toggle{
+  display:flex;align-items:center;justify-content:space-between;width:100%;
+  padding:10px 13px;margin-top:6px;border:1px solid rgba(255,255,255,.14);
+  background:rgba(255,255,255,.06);color:rgba(255,255,255,.75);
+  font-family:'Nunito',sans-serif;font-size:11px;font-weight:800;
+  text-transform:uppercase;letter-spacing:.06em;border-radius:10px;cursor:pointer;
+}
+.sb-admin-toggle:hover{background:rgba(255,255,255,.12);color:#fff}
+.sb-admin-toggle[aria-expanded="true"]{background:rgba(255,255,255,.14);color:#fff;border-color:rgba(255,213,79,.35)}
+.sb-admin-chevron{font-size:12px;transition:transform .15s;line-height:1}
+.sb-admin-toggle[aria-expanded="true"] .sb-admin-chevron{transform:rotate(90deg)}
+.sb-admin-panel{padding:4px 0 2px}
+.sb-admin-panel[hidden]{display:none!important}
+.sb-admin-panel .sb-group-lbl{padding-top:8px}
 .sb-footer{padding:10px;border-top:1px solid rgba(255,255,255,.1)}
 .sb-sessao-card{
   background:rgba(0,0,0,.22);border:1px solid rgba(255,255,255,.12);
@@ -650,6 +664,10 @@ nav button .nav-badge{
 /* ══ ADMIN HOME KPI (hidden until admin) ════════════════════ */
 #admin-home-kpis{display:none}
 #admin-home-kpis.visible{display:block}
+.mk-home-quick{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:4px}
+.mk-home-quick-btn{flex:1;min-width:120px;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:#fff;font-size:14px;font-weight:600;color:var(--txt);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px}
+.mk-home-quick-btn--primary{background:var(--blue);color:#fff;border-color:var(--blue)}
+.mk-home-quick-btn--primary:active{filter:brightness(.92)}
 
 /* ══ ENCERRADAS HOJE ════════════════════════════════════════ */
 .enc-item{
@@ -1517,7 +1535,7 @@ nav button .nav-badge{
   <!-- ══ SIDEBAR (desktop only) ══ -->
   <aside id="sidebar">
     <div class="sb-logo">🚗 Movi <span>Kids</span>
-      <div class="sb-status"><span id="sb-dot" class="dot-online"></span><span id="sb-txt">Online</span><span id="sb-version" style="font-size:10px;opacity:.85;margin-left:5px;color:rgba(255,255,255,.7);font-family:monospace">v1.7.13</span></div>
+      <div class="sb-status"><span id="sb-dot" class="dot-online"></span><span id="sb-txt">Online</span><span id="sb-version" style="font-size:10px;opacity:.85;margin-left:5px;color:rgba(255,255,255,.7);font-family:monospace">v1.7.15</span></div>
     </div>
     <div class="sb-nav" id="sb-nav">
       <button class="sb-btn active" id="sbn-home" onclick="showPage('home')"><span class="sb-icon">🏠</span>Home</button>
@@ -1528,18 +1546,23 @@ nav button .nav-badge{
       <button class="sb-btn" id="sbn-avulso" onclick="showPage('lancamento')"><span class="sb-icon">⚡</span>Lanç. Avulso</button>
     </div>
     <div class="sb-admin-section" id="sb-admin-section">
-      <div class="sb-divider">Administração</div>
-      <button class="sb-btn" id="sbn-adm" onclick="irAdmin('admin')"><span class="sb-icon">📊</span>Visão geral</button>
-      <div class="sb-group-lbl">Financeiro</div>
-      <button class="sb-btn" id="sbn-caixa" onclick="irAdmin('caixa')"><span class="sb-icon">💰</span>Caixa do dia</button>
-      <button class="sb-btn" id="sbn-dash" onclick="irAdmin('dashboard')"><span class="sb-icon">📈</span>Dashboard</button>
-      <button class="sb-btn" id="sbn-hist" onclick="irAdmin('historico')"><span class="sb-icon">🗂️</span>Histórico</button>
-      <button class="sb-btn" id="sbn-rel" onclick="irAdmin('relatorio')"><span class="sb-icon">📋</span>Relatório mensal</button>
-      <div class="sb-group-lbl">Pessoas</div>
-      <button class="sb-btn" id="sbn-ops" onclick="irAdmin('operadores')"><span class="sb-icon">👤</span>Operadores</button>
-      <div class="sb-group-lbl">Sistema</div>
-      <button class="sb-btn" id="sbn-cfg" onclick="irAdmin('config')"><span class="sb-icon">⚙️</span>Configurações SMS</button>
-      <button class="sb-btn" id="sbn-sys" onclick="irAdmin('sistema')"><span class="sb-icon">🔧</span>Sistema</button>
+      <button type="button" class="sb-admin-toggle" id="sb-admin-toggle" aria-expanded="false" aria-controls="sb-admin-panel" onclick="sbToggleAdminNav_()">
+        <span>Administracao</span>
+        <span class="sb-admin-chevron" aria-hidden="true">▸</span>
+      </button>
+      <div class="sb-admin-panel" id="sb-admin-panel" hidden>
+        <button class="sb-btn" id="sbn-adm" onclick="irAdmin('admin')"><span class="sb-icon">📊</span>Centro de gestao</button>
+        <div class="sb-group-lbl">Financeiro</div>
+        <button class="sb-btn" id="sbn-caixa" onclick="irAdmin('caixa')"><span class="sb-icon">💰</span>Caixa do dia</button>
+        <button class="sb-btn" id="sbn-dash" onclick="irAdmin('dashboard')"><span class="sb-icon">📈</span>Dashboard</button>
+        <button class="sb-btn" id="sbn-hist" onclick="irAdmin('historico')"><span class="sb-icon">🗂️</span>Historico</button>
+        <button class="sb-btn" id="sbn-rel" onclick="irAdmin('relatorio')"><span class="sb-icon">📋</span>Relatorio mensal</button>
+        <div class="sb-group-lbl">Pessoas</div>
+        <button class="sb-btn" id="sbn-ops" onclick="irAdmin('operadores')"><span class="sb-icon">👤</span>Operadores</button>
+        <div class="sb-group-lbl">Sistema</div>
+        <button class="sb-btn" id="sbn-cfg" onclick="irAdmin('config')"><span class="sb-icon">⚙️</span>Configuracoes SMS</button>
+        <button class="sb-btn" id="sbn-sys" onclick="irAdmin('sistema')"><span class="sb-icon">🔧</span>Sistema</button>
+      </div>
     </div>
     <div class="sb-footer">
       <div id="sb-sessao-card" class="sb-sessao-card" role="status" aria-live="polite" hidden>
@@ -1571,7 +1594,7 @@ nav button .nav-badge{
         <span id="hd-turno-mini" class="hd-turno-mini" hidden title="Sessao">—</span>
         <div id="status-dot" class="dot-online"></div>
         <span id="status-txt">Online</span>
-        <span id="app-version" style="font-size:10px;opacity:.85;margin-left:4px;font-family:monospace">v1.7.13</span>
+        <span id="app-version" style="font-size:10px;opacity:.85;margin-left:4px;font-family:monospace">v1.7.15</span>
       </div>
     </div>
   </header>
@@ -1603,6 +1626,11 @@ nav button .nav-badge{
 
   <!-- ──────── PAGE: HOME ──────── -->
   <div id="page-home" class="page active">
+    <div id="mk-home-quick" class="mk-home-quick" hidden>
+      <button type="button" class="mk-home-quick-btn mk-home-quick-btn--primary" onclick="abrirNovaLocacao()"><span>➕</span> Nova locacao</button>
+      <button type="button" class="mk-home-quick-btn" onclick="showPage('painel')"><span>📺</span> Painel</button>
+      <button type="button" class="mk-home-quick-btn" onclick="irAdmin('caixa')"><span>💰</span> Caixa</button>
+    </div>
     <div class="mk-stat-row stats-bar">
       <div class="mk-stat-tile stat-card"><div class="stat-val mk-stat-val" id="stat-ativas">0</div><div class="stat-lbl mk-stat-lbl">Ativas agora</div></div>
       <div class="mk-stat-tile stat-card"><div class="stat-val mk-stat-val" id="stat-nloc">0</div><div class="stat-lbl mk-stat-lbl">Encerradas hoje</div></div>
@@ -2636,7 +2664,7 @@ nav button .nav-badge{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.13';
+const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.15';
 const WEBAPP_URL = (typeof window !== 'undefined' && window.MK_GAS_EXEC_URL) ? window.MK_GAS_EXEC_URL
   : 'https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec';
 const WEBAPP_URL_DEAD_PREFIX = 'AKfycbzc';
@@ -2707,6 +2735,22 @@ function fmtHoraTurno_(ms) {
   } catch (e) {
     return '';
   }
+}
+
+function sbSetAdminNavOpen_(open, persist) {
+  const panel = document.getElementById('sb-admin-panel');
+  const toggle = document.getElementById('sb-admin-toggle');
+  if (!panel || !toggle) return;
+  panel.hidden = !open;
+  toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+  if (persist !== false) {
+    try { localStorage.setItem('mk_sb_admin_open', open ? '1' : '0'); } catch (e) {}
+  }
+}
+
+function sbToggleAdminNav_() {
+  const panel = document.getElementById('sb-admin-panel');
+  sbSetAdminNavOpen_(panel && panel.hidden, true);
 }
 
 function sbSairSessaoClick_() {
@@ -5521,7 +5565,7 @@ let pinBuffer       = '';
 
 // ── PIN ──────────────────────────────────────────────────────
 function abrirAdmin() {
-  if (isAdmin) { showPage('admin'); return; }
+  if (isAdmin) { showPage('home'); return; }
   if (typeof mkAuthIsAdmin === 'function' && mkAuthIsAdmin()) {
     adminLogin();
     return;
@@ -5588,7 +5632,8 @@ function adminLogin() {
   document.addEventListener('touchstart', resetAdminTimer);
   adminTimerInt = setInterval(tickAdmin, 1000);
   showAdminSidebar();
-  showPage('admin'); // BUG1-FIX: showPage já chama carregarKPIs se !kpiData — sem race condition
+  showPage('home');
+  if (!kpiData) carregarKPIs();
   carregarHistRelatorios();
   carregarConfig(); // Fase 6: carrega templates WA
   if (typeof refreshOperadoresAdmin_ === 'function') refreshOperadoresAdmin_();
@@ -5625,6 +5670,7 @@ function tickAdmin() {
 
 function irAdmin(page) {
   resetAdminTimer();
+  if (typeof sbSetAdminNavOpen_ === 'function') sbSetAdminNavOpen_(true, true);
   showPage(page);
   if (page === 'dashboard') {
     // Busca dados frescos do servidor — re-renderiza gráficos ao terminar (fix race condition)
@@ -6300,6 +6346,7 @@ function showPage(name, opts = {}) {
   if (name==='admin' && isAdmin) { resetAdminTimer(); if(!kpiData) carregarKPIs(); else atualizarHubAdmin_(); }
   if (name==='sistema' && isAdmin) { resetAdminTimer(); setTimeout(atualizarDiagnostico, 80); }
   if (name==='operadores' && isAdmin && typeof refreshOperadoresAdmin_ === 'function') refreshOperadoresAdmin_();
+  if (kpiData && typeof showAdminHomeKpis === 'function') showAdminHomeKpis(kpiData);
   if (name==='dashboard') {
     if (kpiData) renderCharts(kpiData);
     else carregarKPIs().then(() => { if (kpiData) renderCharts(kpiData); }); // BUG3-FIX: carrega KPIs se ainda não carregou
@@ -6336,6 +6383,9 @@ function showAdminSidebar() {
   const btn = document.getElementById('sb-gerenciar-btn');
   if (sec) sec.classList.add('visible');
   if (btn) btn.style.display = 'none';
+  let open = false;
+  try { open = localStorage.getItem('mk_sb_admin_open') === '1'; } catch (e) {}
+  sbSetAdminNavOpen_(open, false);
 }
 
 function hideAdminSidebar() {
@@ -6343,6 +6393,7 @@ function hideAdminSidebar() {
   const btn = document.getElementById('sb-gerenciar-btn');
   if (sec) sec.classList.remove('visible');
   if (btn) btn.style.display = '';
+  sbSetAdminNavOpen_(false, false);
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -6917,19 +6968,38 @@ setInterval(() => {
 
 function showAdminHomeKpis(d) {
   const el = document.getElementById('admin-home-kpis');
-  if (el) { el.style.display = 'none'; el.hidden = true; }
   const chip = document.getElementById('admin-home-chip');
+  const quick = document.getElementById('mk-home-quick');
   const isAdmin = (typeof mkAuthIsAdmin === 'function' && mkAuthIsAdmin()) || window.isAdmin;
+  const homeOn = !!document.getElementById('page-home')?.classList.contains('active');
   const R = v => 'R$ ' + Number(v).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
   const set = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
-  if (chip) {
-    if (!isAdmin) chip.hidden = true;
-    else {
-      chip.hidden = false;
-      set('admin-chip-fat', R(d.fatHoje));
-    }
+  if (quick) quick.hidden = !isAdmin;
+  if (!isAdmin || !d) {
+    if (el) { el.style.display = 'none'; el.hidden = true; el.classList.remove('visible'); }
+    if (chip) chip.hidden = true;
+    return;
   }
-
+  if (chip) {
+    chip.hidden = !homeOn;
+    if (homeOn) set('admin-chip-fat', R(d.fatHoje));
+  }
+  if (el && homeOn) {
+    el.style.display = '';
+    el.hidden = false;
+    el.classList.add('visible');
+    set('h-fathoje', R(d.fatHoje));
+    set('h-cushoje', R(d.cusHoje));
+    set('h-fatmes', R(d.fatMes));
+    set('h-nmes', (d.nMes || 0) + ' loc. no mes');
+    const res = (d.fatMes || 0) - (d.cusMes || d.cusHoje || 0);
+    set('h-resultado', R(res));
+    set('h-margem', 'margem ' + (d.margem || 0) + '%');
+  } else if (el) {
+    el.style.display = 'none';
+    el.hidden = true;
+    el.classList.remove('visible');
+  }
   if (typeof atualizarHubAdmin_ === 'function') atualizarHubAdmin_();
 }
 

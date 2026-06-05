@@ -4,15 +4,15 @@
 
 | O quê | Link |
 |--------|------|
+| **Editor Apps Script (GAS)** | https://script.google.com/home/projects/19SIhkX9Tk7FiJA1JXu1OrUwssHdr3H5zc8q3rOjmBvqgWfXuHlk8xyf8/edit |
+| **Web app em produção (exec)** | https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec |
+| **Testar se o GAS está no ar (ping)** | https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec?action=ping |
 | **Planilha MOVIKIDS** | https://docs.google.com/spreadsheets/d/1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618/edit |
-| **Editor Apps Script** | Na planilha: menu **Extensões → Apps Script** |
-| **Testar se o GAS está no ar** | https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec?action=ping |
-| **App (GitHub Pages)** | https://ribocg-a11y.github.io/movikids/?force=1.7.11 |
-| **Editor Apps Script (direto)** | https://script.google.com/home/projects/19SIhkX9Tk7FiJA1JXu1OrUwssHdr3H5zc8q3rOjmBvqgWfXuHlk8xyf8/edit |
+| **App (GitHub Pages)** | https://ribocg-a11y.github.io/movikids/?force=1.7.15 |
 
-No editor Apps Script: **Implantar → Gerenciar implantações → Editar** a implantação Web (**ID `AKfycbwakQ...`**) → **Nova versão** → Implantar. **Não** crie um deploy novo. **Nunca** use `clasp deploy`.
+No **editor GAS** (link acima): **Implantar → Gerenciar implantações → Editar** a implantação Web (**ID `AKfycbwakQ...`**) → **Nova versão** → Implantar. **Não** crie um deploy novo. **Nunca** use `clasp deploy`.
 
-Após implantar, o `ping` deve mostrar `versao` **v1.5.41** (SMS gateway DJVJRL: ver `TROCA_SMS_GATEWAY_DJVJRL_2026-06-04.md`).
+Após implantar, o `ping` deve mostrar `versao` **v1.5.42** (auditoria `AUD_TURNO` login/logout). SMS: **v1.5.41** — ver `TROCA_SMS_GATEWAY_DJVJRL_2026-06-04.md`.
 
 ### Propriedades do script (SMS — producao)
 
@@ -35,7 +35,7 @@ O script: copia o `.gs` canônico → `gas/Code.gs` → valida `DEPLOY_ID` → `
 
 ## Arquivo canônico
 
-`MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs` (header **v1.5.41**)
+`MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs` (header **v1.5.42**)
 
 `const DEPLOY_ID` no arquivo deve ser **`AKfycbwakQ...`** (não `AKfycbzc...`).
 
@@ -50,6 +50,6 @@ O script: copia o `.gs` canônico → `gas/Code.gs` → valida `DEPLOY_ID` → `
 
 ## Frontend
 
-Publicar **v1.7.11** no GitHub (`git push`). Tablets: `?force=1.7.11`.
+Publicar **v1.7.15** no GitHub (`git push`). Tablets: `?force=1.7.15`.
 
 Ver também: `ESTADO_ATUAL.md`, `REGRAS_DE_PUBLICACAO_SEGURA.md`.
