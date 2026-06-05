@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.47
+// MOVI KIDS — Google Apps Script v1.5.48
+// v1.5.48: Pacote F — relatorio/PDF mensal inclui gestao avancada (operador, cancelamentos, frota, custos, recorrencia)
 // v1.5.47: Pacote F — custos por categoria + recorrencia de clientes em buscarKPIsAdmin
 // v1.5.46: Pacote F — KPIs avancados em buscarKPIsAdmin (operador, cancelamentos, ocupacao frota)
 // v1.5.45: limparLocacoesTesteAdmin — anula locacoes de teste (Encerrada/Pendente/Ativa) sem contar no caixa
@@ -316,9 +317,9 @@ function ping_() {
   const agora = new Date();
   return resp_({
     status:  'online',
-    versao:  'v1.5.47',
+    versao:  'v1.5.48',
     timestamp: fmtData_(agora) + ' ' + fmtHoraLocal_(agora),
-    sistema: 'MOVI KIDS v1.5.47',
+    sistema: 'MOVI KIDS v1.5.48',
     postWriteActions: WRITE_ACTIONS_CRITICAS_
   });
 }
@@ -1713,6 +1714,80 @@ function _calcFatMes_(refDate) {
   return fat;
 }
 
+/** Secao HTML Pacote F para relatorio/PDF — reutiliza buscarKPIsAdmin_ */
+function _htmlSecaoPacoteF_(mes, ano) {
+  try {
+    const out = buscarKPIsAdmin_({ mes: mes, ano: ano, authRole: 'admin' });
+    const k = JSON.parse(out.getContent());
+    if (!k.ok) return '';
+    const f = v => 'R$ ' + Number(v || 0).toFixed(2).replace('.', ',');
+
+    let linhasOp = '';
+    (k.porOperador || []).slice(0, 6).forEach((o, i) => {
+      linhasOp += '<tr><td style="padding:5px 8px;border-bottom:1px solid #eee;text-align:center">' + (i + 1)
+        + '</td><td style="padding:5px 8px;border-bottom:1px solid #eee">' + o.nome
+        + '</td><td style="padding:5px 8px;border-bottom:1px solid #eee;text-align:center">' + o.nLoc
+        + '</td><td style="padding:5px 8px;border-bottom:1px solid #eee;text-align:right">' + f(o.fat) + '</td></tr>';
+    });
+    if (!linhasOp) linhasOp = '<tr><td colspan="4" style="padding:8px;text-align:center;color:#aaa">Sem encerramentos auditados</td></tr>';
+
+    const canc = k.cancelamentos || { total: 0, taxaPct: 0, porMotivo: [] };
+    let linhasCanc = '';
+    (canc.porMotivo || []).slice(0, 5).forEach(m => {
+      linhasCanc += '<tr><td style="padding:5px 8px;border-bottom:1px solid #eee">' + m.motivo
+        + '</td><td style="padding:5px 8px;border-bottom:1px solid #eee;text-align:center">' + m.count + '</td></tr>';
+    });
+    if (!linhasCanc) linhasCanc = '<tr><td colspan="2" style="padding:8px;text-align:center;color:#aaa">Nenhum cancelamento</td></tr>';
+
+    let linhasOcup = '';
+    (k.ocupacaoFrota || []).filter(v => v.nLoc > 0).slice(0, 6).forEach(v => {
+      linhasOcup += '<tr><td style="padding:5px 8px;border-bottom:1px solid #eee">' + v.veiculo
+        + '</td><td style="padding:5px 8px;border-bottom:1px solid #eee;text-align:center">' + v.nLoc
+        + '</td><td style="padding:5px 8px;border-bottom:1px solid #eee;text-align:right">' + (v.pctOcupacao || 0) + '%</td></tr>';
+    });
+    if (!linhasOcup) linhasOcup = '<tr><td colspan="3" style="padding:8px;text-align:center;color:#aaa">Sem uso de frota</td></tr>';
+
+    let linhasCat = '';
+    (k.cusPorCategoria || []).slice(0, 6).forEach(c => {
+      linhasCat += '<tr><td style="padding:5px 8px;border-bottom:1px solid #eee">' + c.categoria
+        + '</td><td style="padding:5px 8px;border-bottom:1px solid #eee;text-align:right">' + f(c.valor) + '</td></tr>';
+    });
+    if (!linhasCat) linhasCat = '<tr><td colspan="2" style="padding:8px;text-align:center;color:#aaa">Sem custos por categoria</td></tr>';
+
+    const rec = k.recorrenciaClientes || { nUnicos: 0, nRecorrentes: 0, pctRecorrencia: 0 };
+    const pico = (k.horasPico || []).map((v, i) => ({ h: (9 + i) + 'h', v: Number(v) || 0 }));
+    const picoMax = pico.reduce((a, b) => (b.v > a.v ? b : a), { h: '-', v: 0 });
+
+    return '<div style="padding:0 28px 20px;border-top:2px solid #E3F2FD">'
+      + '<h3 style="margin:0 0 14px;font-size:13px;text-transform:uppercase;color:#1565C0">Gestao Avancada — Pacote F</h3>'
+      + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">'
+      + '<div style="background:#E8F5E9;border-radius:8px;padding:12px"><div style="font-size:11px;color:#555">Recorrencia</div>'
+      + '<div style="font-size:16px;font-weight:bold;color:#2E7D32">' + (rec.nRecorrentes || 0) + ' / ' + (rec.nUnicos || 0) + ' clientes</div>'
+      + '<div style="font-size:11px;color:#555">' + (rec.pctRecorrencia || 0) + '% voltaram no mes</div></div>'
+      + '<div style="background:#FFEBEE;border-radius:8px;padding:12px"><div style="font-size:11px;color:#555">Cancelamentos</div>'
+      + '<div style="font-size:16px;font-weight:bold;color:#C62828">' + (canc.total || 0) + '</div>'
+      + '<div style="font-size:11px;color:#555">taxa ' + (canc.taxaPct || 0) + '%</div></div>'
+      + '<div style="background:#F3E5F5;border-radius:8px;padding:12px"><div style="font-size:11px;color:#555">Horario de pico</div>'
+      + '<div style="font-size:16px;font-weight:bold;color:#6A1B9A">' + picoMax.h + '</div>'
+      + '<div style="font-size:11px;color:#555">' + f(picoMax.v) + ' no pico</div></div>'
+      + '<div style="background:#FFF8E1;border-radius:8px;padding:12px"><div style="font-size:11px;color:#555">Custos mes</div>'
+      + '<div style="font-size:16px;font-weight:bold;color:#E65100">' + f(k.cusMes) + '</div>'
+      + '<div style="font-size:11px;color:#555">' + (k.cusPorCategoria || []).length + ' categorias</div></div></div>'
+      + '<table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:12px"><caption style="text-align:left;font-weight:bold;padding:6px 0">Desempenho por operador</caption>'
+      + '<thead><tr style="background:#f8f8f8"><th>#</th><th>Operador</th><th>Loc.</th><th>Fat.</th></tr></thead><tbody>' + linhasOp + '</tbody></table>'
+      + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">'
+      + '<table style="width:100%;border-collapse:collapse;font-size:12px"><caption style="text-align:left;font-weight:bold;padding:6px 0">Ocupacao frota</caption>'
+      + '<thead><tr style="background:#f8f8f8"><th>Veiculo</th><th>Loc.</th><th>Uso est.</th></tr></thead><tbody>' + linhasOcup + '</tbody></table>'
+      + '<table style="width:100%;border-collapse:collapse;font-size:12px"><caption style="text-align:left;font-weight:bold;padding:6px 0">Custos por categoria</caption>'
+      + '<thead><tr style="background:#f8f8f8"><th>Categoria</th><th>Valor</th></tr></thead><tbody>' + linhasCat + '</tbody></table></div>'
+      + '<table style="width:100%;border-collapse:collapse;font-size:12px;margin-top:12px"><caption style="text-align:left;font-weight:bold;padding:6px 0">Cancelamentos por motivo</caption>'
+      + '<thead><tr style="background:#f8f8f8"><th>Motivo</th><th>Qtd</th></tr></thead><tbody>' + linhasCanc + '</tbody></table></div>';
+  } catch (e) {
+    Logger.log('_htmlSecaoPacoteF_: ' + e.message);
+    return '';
+  }
+}
+
 function _gerarHtmlRelatorio_(refDate) {
   const mes  = refDate.getMonth() + 1;
   const ano  = refDate.getFullYear();
@@ -1797,11 +1872,12 @@ ${fatExtra>0?`<div style="margin-top:12px;background:#FFF3E0;border-radius:8px;p
 <tr><td style="font-size:12px;color:#888">Vencimento:</td><td style="text-align:right;font-size:12px;color:#888">${vencCto}</td></tr></table></div>
 <div style="padding:0 28px 20px"><h3 style="margin:0 0 10px;font-size:13px;text-transform:uppercase;color:#555">Custos Operacionais</h3>
 <table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr style="background:#f8f8f8"><th style="padding:6px 10px;text-align:left">Data</th><th style="padding:6px 10px;text-align:left">Descrição</th><th style="padding:6px 10px;text-align:left">Categoria</th><th style="padding:6px 10px;text-align:right">Valor</th></tr></thead><tbody>${linhasCusto}</tbody></table></div>
+${_htmlSecaoPacoteF_(mes, ano)}
 <div style="margin:0 28px 28px;border-radius:8px;overflow:hidden"><div style="background:#1A237E;padding:16px 20px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
 <div style="text-align:center"><div style="color:rgba(255,255,255,.7);font-size:11px">Faturamento</div><div style="color:#fff;font-weight:bold">${f(fatTotal)}</div></div>
 <div style="text-align:center"><div style="color:rgba(255,255,255,.7);font-size:11px">Custos+CTO</div><div style="color:#EF9A9A;font-weight:bold">−${f(totalCustos+ctoPagar)}</div></div>
 <div style="text-align:center"><div style="color:rgba(255,255,255,.7);font-size:11px">Resultado</div><div style="color:${lucro>=0?'#A5D6A7':'#EF9A9A'};font-weight:bold">${f(lucro)}</div></div></div></div>
-<div style="padding:16px 28px;background:#f9f9f9;text-align:center;font-size:11px;color:#aaa;border-top:1px solid #eee">Gerado em ${fmtData_(new Date())} às ${fmtHoraLocal_(new Date())} · Movi Kids v1.5.3</div>
+<div style="padding:16px 28px;background:#f9f9f9;text-align:center;font-size:11px;color:#aaa;border-top:1px solid #eee">Gerado em ${fmtData_(new Date())} às ${fmtHoraLocal_(new Date())} · Movi Kids GAS v1.5.48 · Pacote F</div>
 </div></body></html>`;
 }
 
