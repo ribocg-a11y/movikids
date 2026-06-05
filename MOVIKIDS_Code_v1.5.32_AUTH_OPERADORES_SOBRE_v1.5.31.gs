@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.53
+// MOVI KIDS — Google Apps Script v1.5.54
+// v1.5.54: Pacote G — rate limit buscarPortalResponsavel (por telefone + global)
 // v1.5.53: SMS — GENERIC_FAILURE do Android nao marca Failed definitivo; recheck + downgrade se passou Sent
 // v1.5.52: Fase 9 em pausa — operador logado volta a editar/cancelar locacao (supervisor nao restringe balcao)
 // v1.5.51: KPI porSemana — comparativo interativo com melhor dia e insights por semana
@@ -2319,10 +2320,31 @@ function telPortalKeys_(v) {
   return Object.keys(keys);
 }
 
+/** Pacote G — limite consultas portal (anti-abuso / brute force telefone). */
+function portalRateLimitOk_(telKey) {
+  try {
+    const cache = CacheService.getScriptCache();
+    const norm = String(telKey || '').replace(/\D/g, '').slice(-11);
+    const telBucket = 'prl_t_' + (norm || 'x');
+    const telCount = parseInt(cache.get(telBucket) || '0', 10);
+    if (telCount >= 20) return false;
+    cache.put(telBucket, String(telCount + 1), 60);
+    const gCount = parseInt(cache.get('prl_global') || '0', 10);
+    if (gCount >= 150) return false;
+    cache.put('prl_global', String(gCount + 1), 60);
+    return true;
+  } catch (e) {
+    return true;
+  }
+}
+
 function buscarPortalResponsavel_(p) {
   try {
     const keys = telPortalKeys_(p.telefone || p.senha || '');
     if (!keys.length || keys[0].length < 10) return err_('Digite o telefone com DDD.', 400);
+    if (!portalRateLimitOk_(keys[0])) {
+      return err_('Muitas consultas em pouco tempo. Aguarde 1 minuto e tente novamente.', 429);
+    }
     const keySet = {};
     keys.forEach(k => keySet[k] = true);
 

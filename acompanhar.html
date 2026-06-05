@@ -2,127 +2,199 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#1565C0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Movi Kids">
 <meta name="robots" content="noindex,nofollow">
-<title>Movi Kids - Portal do Responsavel</title>
-<style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{min-height:100vh;background:#eef4fb;color:#07122b;font-family:Arial,sans-serif;padding:18px}
-.wrap{max-width:760px;margin:0 auto}
-.brand{font-size:26px;font-weight:900;color:#102b5c;margin:10px 0 4px}.brand span{color:#f6c400}
-.sub{color:#65758d;margin-bottom:18px;line-height:1.4}
-.card{background:#fff;border:1px solid #dbe6f3;border-radius:14px;box-shadow:0 10px 30px rgba(21,50,94,.08);padding:18px;margin-bottom:14px}
-label{display:block;font-weight:800;font-size:13px;margin-bottom:8px;color:#33445f}
-.row{display:flex;gap:10px}input{height:52px;border:2px solid #d8e4f2;border-radius:10px;padding:0 14px;font-size:18px;font-weight:800;flex:1;outline:none}
-button{height:52px;border:0;border-radius:10px;padding:0 18px;background:#1967c2;color:#fff;font-weight:900;font-size:15px;cursor:pointer}
-.hint{font-size:12px;color:#7b8ba5;margin-top:9px}.status{font-size:14px;color:#52637f;margin-top:12px}
-.loc{display:grid;grid-template-columns:118px 1fr;gap:15px;align-items:center}.ring{width:112px;height:112px;border:9px solid #1967c2;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-direction:column;background:#f8fbff}
-.ring small{font-size:10px;color:#7788a3;font-weight:900}.ring b{font-size:27px;color:#1967c2}
-.kid{font-size:25px;font-weight:900}.meta{color:#52637f;line-height:1.7;margin-top:4px}.pill{display:inline-block;background:#e8f2ff;color:#1967c2;border-radius:999px;padding:6px 10px;font-weight:900;font-size:12px;margin-top:8px}
-.warn{border-left:5px solid #e65300;background:#fff3e8;padding:11px;border-radius:10px;color:#8f3500;font-weight:800;margin-top:12px}
-.empty{text-align:center;color:#65758d;padding:26px 10px}.empty b{display:block;color:#102b5c;font-size:20px;margin-bottom:6px}
-.foot{font-size:12px;color:#7b8ba5;text-align:center;margin-top:18px;line-height:1.45}
-@media(max-width:560px){.row{display:block}button{width:100%;margin-top:8px}.loc{grid-template-columns:1fr}.ring{margin:auto}}
-</style>
+<meta name="description" content="Acompanhe em tempo real a locação do seu filho na Movi Kids.">
+<title>Movi Kids — Portal do Responsável</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="mk-design.css?v=1.7.41">
 </head>
-<body>
-<main class="wrap">
-  <div class="brand">Movi <span>Kids</span></div>
-  <div class="sub">Portal do responsavel. Digite o telefone com DDD usado no cadastro para acompanhar apenas suas locacoes ativas.</div>
+<body class="mk-portal-page">
+<header class="mk-portal-header">
+  <div class="mk-portal-brand">Movi <span>Kids</span></div>
+  <p class="mk-portal-tagline">Portal do responsável — acompanhe apenas as locações vinculadas ao seu telefone.</p>
+</header>
 
-  <section class="card">
-    <label for="telefone">Telefone com DDD</label>
-    <div class="row">
-      <input id="telefone" inputmode="tel" autocomplete="tel" placeholder="Ex.: 98 98206-8696">
-      <button id="btn" onclick="buscar()">Entrar</button>
+<main class="mk-portal-main">
+  <section class="mk-portal-card" id="sec-login">
+    <label class="mk-portal-label" for="telefone">Telefone com DDD</label>
+    <div class="mk-portal-row">
+      <input id="telefone" class="mk-portal-input" type="tel" inputmode="tel" autocomplete="tel"
+        placeholder="(98) 98206-8696" maxlength="16" aria-describedby="hint-tel">
+      <button type="button" class="mk-portal-btn" id="btn">Entrar</button>
     </div>
-    <div class="hint">O telefone funciona como senha simples. Nao compartilhe com terceiros.</div>
-    <div class="status" id="status"></div>
+    <p class="mk-portal-hint" id="hint-tel">Use o mesmo número informado no balcão. Funciona como senha simples — não compartilhe.</p>
+    <div class="mk-portal-status" id="status" role="status" aria-live="polite"></div>
   </section>
 
-  <section id="resultado"></section>
+  <section class="mk-portal-card mk-portal-qr-card" id="sec-qr">
+    <div class="mk-portal-qr-inner">
+      <img src="assets/qr-portal-acompanhar.png" width="128" height="128" alt="QR Code para abrir o portal Movi Kids" loading="lazy">
+      <div>
+        <div class="mk-portal-qr-title">Acesso rápido no balcão</div>
+        <p class="mk-portal-qr-text">Escaneie o QR ou salve este link. Você também pode abrir com <code>?tel=DDDnumero</code> após o cadastro.</p>
+      </div>
+    </div>
+  </section>
 
-  <div class="foot">
-    WhatsApp continua como canal alternativo. Se o WhatsApp estiver restrito, use este portal por QR Code.
-  </div>
+  <section id="resultado" class="mk-portal-results" aria-live="polite"></section>
+
+  <footer class="mk-portal-foot">
+    Golden Shopping Calhau · São Luís — WhatsApp continua como canal alternativo quando disponível.
+  </footer>
 </main>
 
 <script>
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec';
+const PORTAL_FALLBACK_GAS = 'https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec';
+const RING_C = 408;
+let GAS_URL = PORTAL_FALLBACK_GAS;
 let locacoes = [];
+let _telAtual = '';
+let _refreshTimer = null;
 
-function esc(v){return String(v == null ? '' : v).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
-function digits(v){return String(v||'').replace(/\D/g,'')}
-function fmt(sec){
+function esc(v) {
+  return String(v == null ? '' : v).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+}
+function digits(v) { return String(v || '').replace(/\D/g, ''); }
+function fmt(sec) {
   sec = Math.max(0, Math.floor(sec || 0));
-  const m = Math.floor(sec / 60), s = sec % 60;
-  return String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+  const m = Math.floor(sec / 60);
+  const s = sec % 60;
+  return String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
 }
-function inicioMs(l){
-  if (Number(l.startTimestamp || 0) > 0) return Number(l.startTimestamp);
-  return 0;
+function maskTelInput(raw) {
+  const d = digits(raw).slice(0, 11);
+  if (d.length <= 2) return d.length ? '(' + d : '';
+  if (d.length <= 7) return '(' + d.slice(0, 2) + ') ' + d.slice(2);
+  return '(' + d.slice(0, 2) + ') ' + d.slice(2, 7) + '-' + d.slice(7);
 }
-function totalMins(l){
-  // v1.1: extendedMins acumulado pelo operador (estensoes de plano)
-  const base = Number(l.mins || 0);
-  const ext  = Number(l.extendedMins || 0);
-  return base + ext;
+function tipoIcon(tipo) {
+  if (String(tipo).indexOf('Triciclo') >= 0) return '🛺';
+  if (String(tipo).indexOf('Pel') >= 0) return '🧸';
+  return '🚗';
 }
-function restante(l){
+function inicioMs(l) {
+  return Number(l.startTimestamp || 0) > 0 ? Number(l.startTimestamp) : 0;
+}
+function totalMins(l) {
+  return Number(l.mins || 0) + Number(l.extendedMins || 0);
+}
+function restante(l) {
   const total = totalMins(l);
   if (l.status === 'Pendente') return total * 60;
   const ini = inicioMs(l);
   if (!ini) return total * 60;
   return (total * 60) - Math.floor((Date.now() - ini) / 1000);
 }
-function render(){
+function ringOffset(rem, totalSec) {
+  if (totalSec <= 0) return RING_C;
+  const p = Math.max(0, Math.min(1, rem / totalSec));
+  return RING_C * (1 - p);
+}
+function portalErro_(d, err) {
+  if (d && Number(d.code) === 429) return 'Muitas consultas em pouco tempo. Aguarde 1 minuto e tente de novo.';
+  if (d && d.erro) return String(d.erro);
+  if (err && err.message) return err.message;
+  return 'Não foi possível conectar ao servidor. Verifique a internet ou fale com o operador.';
+}
+function setStatus(msg, kind) {
+  const el = document.getElementById('status');
+  if (!el) return;
+  el.textContent = msg || '';
+  el.className = 'mk-portal-status' + (kind ? ' is-' + kind : '');
+}
+
+async function loadGasUrl_() {
+  try {
+    const base = location.pathname.replace(/[^/]*$/, '');
+    const r = await fetch(base + 'gas-endpoint.json?_=' + Date.now(), { cache: 'no-store' });
+    const j = await r.json();
+    if (j && j.url) GAS_URL = j.url;
+  } catch (e) {}
+}
+
+function render() {
   const box = document.getElementById('resultado');
+  if (!box) return;
   if (!locacoes.length) {
-    box.innerHTML = '<div class="card empty"><b>Nenhuma locacao ativa encontrada</b><span>Confira se o telefone digitado e o mesmo informado ao operador.</span></div>';
+    box.innerHTML = '<div class="mk-portal-card mk-portal-empty"><b>Nenhuma locação ativa</b><span>Não encontramos sessões em andamento para este telefone. Confira o número ou pergunte ao operador.</span></div>';
     return;
   }
   box.innerHTML = locacoes.map((l, i) => {
     const rem = restante(l);
+    const totalSec = totalMins(l) * 60;
     const extra = rem < 0;
-    const titulo = extra ? 'TEMPO EXTRA' : (l.status === 'Pendente' ? 'AGUARDANDO' : 'RESTANTE');
-    return `<div class="card loc">
-      <div class="ring"><small>${titulo}</small><b id="tempo-${i}">${extra ? '+' + fmt(Math.abs(rem)) : fmt(rem)}</b></div>
-      <div>
-        <div class="kid">${esc(l.crianca)}</div>
-        <div class="meta">Responsavel: ${esc(l.responsavel)}<br>${esc(l.veiculo || l.tipo)} - ${esc(l.plano)}<br>Status: ${esc(l.status)}</div>
-        <span class="pill">${totalMins(l)} min${Number(l.extendedMins||0)>0?' (+'+l.extendedMins+' ext)':''}</span>
-        ${extra ? '<div class="warn">O tempo contratado encerrou. Minutos extras estao sendo contados.</div>' : ''}
+    const pend = l.status === 'Pendente';
+    const titulo = extra ? 'TEMPO EXTRA' : (pend ? 'AGUARDANDO' : 'RESTANTE');
+    const ringClass = extra ? 'extra' : (pend ? 'wait' : 'ok');
+    const timeTxt = extra ? '+' + fmt(Math.abs(rem)) : fmt(rem);
+    const off = ringOffset(extra ? 0 : rem, totalSec);
+    const extLbl = Number(l.extendedMins || 0) > 0 ? ' (+' + l.extendedMins + ' min ext.)' : '';
+    return `<article class="mk-portal-loc-card ${extra ? 'is-extra' : ''}">
+      <div class="mk-portal-ring-wrap">
+        <svg viewBox="0 0 150 150" aria-hidden="true">
+          <circle class="mk-portal-ring-bg" cx="75" cy="75" r="65"></circle>
+          <circle class="mk-portal-ring-prog ${ringClass}" cx="75" cy="75" r="65"
+            style="stroke-dashoffset:${off.toFixed(1)}"></circle>
+        </svg>
+        <div class="mk-portal-ring-center">
+          <span class="mk-portal-ring-lbl">${titulo}</span>
+          <b class="mk-portal-ring-time" id="tempo-${i}">${timeTxt}</b>
+        </div>
       </div>
-    </div>`;
+      <div class="mk-portal-loc-body">
+        <div class="mk-portal-kid">${tipoIcon(l.tipo)} ${esc(l.crianca)}</div>
+        <div class="mk-portal-meta">
+          Responsável: ${esc(l.responsavel)}<br>
+          ${esc(l.veiculo || l.tipo)} · ${esc(l.plano)}<br>
+          Status: <strong>${esc(l.status)}</strong>
+        </div>
+        <span class="mk-portal-pill">${totalMins(l)} min${extLbl}</span>
+        ${extra ? '<div class="mk-portal-warn">O tempo contratado terminou. Minutos extras estão sendo contados — dirija-se ao balcão.</div>' : ''}
+        ${pend ? '<div class="mk-portal-info">Aguardando início do cronômetro pelo operador.</div>' : ''}
+      </div>
+    </article>`;
   }).join('');
 }
-async function buscar(){
+
+async function buscar(silent) {
   const tel = digits(document.getElementById('telefone').value);
-  const status = document.getElementById('status');
-  if (tel.length < 10) { status.textContent = 'Digite o telefone com DDD.'; return; }
-  status.textContent = 'Buscando locacoes...';
-  document.getElementById('btn').disabled = true;
+  if (tel.length < 10) {
+    setStatus('Digite o telefone com DDD (10 ou 11 dígitos).', 'warn');
+    return;
+  }
+  if (!silent) setStatus('Buscando locações...', 'load');
+  const btn = document.getElementById('btn');
+  if (btn) btn.disabled = true;
   try {
     const url = GAS_URL + '?action=buscarPortalResponsavel&telefone=' + encodeURIComponent(tel) + '&t=' + Date.now();
-    const r = await fetch(url, { cache:'no-store' });
+    const r = await fetch(url, { cache: 'no-store' });
     const d = await r.json();
-    if (!d.ok) throw new Error(d.erro || 'Falha no portal');
+    if (!d.ok) {
+      const ex = new Error(d.erro || 'Falha no portal');
+      ex.data = d;
+      throw ex;
+    }
     locacoes = d.locacoes || [];
-    status.textContent = locacoes.length ? 'Locacao encontrada.' : '';
+    _telAtual = tel;
+    if (!silent) {
+      setStatus(locacoes.length ? 'Locação encontrada — atualizando a cada 30s.' : '', locacoes.length ? 'ok' : '');
+    }
     render();
     if (locacoes.length) iniciarAutoRefresh(tel);
-  } catch(e) {
-    status.textContent = 'Portal ainda nao esta disponivel. Verifique com o operador.';
+    else clearInterval(_refreshTimer);
+  } catch (e) {
+    if (!silent) setStatus(portalErro_(e.data, e), 'err');
   } finally {
-    document.getElementById('btn').disabled = false;
+    if (btn) btn.disabled = false;
   }
 }
-// Render a cada 1s (timer ao vivo)
-setInterval(() => { if (locacoes.length) render(); }, 1000);
 
-// Auto-refresh do servidor a cada 30s — detecta encerramento e extensões
-let _telAtual = '';
-let _refreshTimer = null;
 function iniciarAutoRefresh(tel) {
   _telAtual = tel;
   clearInterval(_refreshTimer);
@@ -130,23 +202,47 @@ function iniciarAutoRefresh(tel) {
     if (!_telAtual) return;
     try {
       const url = GAS_URL + '?action=buscarPortalResponsavel&telefone=' + encodeURIComponent(_telAtual) + '&t=' + Date.now();
-      const r = await fetch(url, { cache:'no-store' });
+      const r = await fetch(url, { cache: 'no-store' });
       const d = await r.json();
-      if (!d.ok) return;
+      if (!d.ok) {
+        if (Number(d.code) === 429) setStatus(portalErro_(d), 'warn');
+        return;
+      }
       const novas = d.locacoes || [];
-      // Se quantidade mudou ou status mudou, atualiza
       const mudou = novas.length !== locacoes.length ||
         novas.some((l, i) => !locacoes[i] || l.status !== locacoes[i].status ||
-          Number(l.extendedMins||0) !== Number((locacoes[i]||{}).extendedMins||0));
+          Number(l.extendedMins || 0) !== Number((locacoes[i] || {}).extendedMins || 0));
       if (mudou) {
         locacoes = novas;
-        const status = document.getElementById('status');
-        if (status) status.textContent = locacoes.length ? 'Atualizado.' : '';
+        setStatus(locacoes.length ? 'Atualizado agora.' : 'Nenhuma locação ativa no momento.', locacoes.length ? 'ok' : '');
         render();
       }
-    } catch(e) {}
+    } catch (e) {}
   }, 30000);
 }
+
+function applyDeepLink_() {
+  const p = new URLSearchParams(location.search);
+  const tel = digits(p.get('tel') || p.get('telefone') || '');
+  if (!tel) return;
+  const inp = document.getElementById('telefone');
+  if (inp) {
+    inp.value = maskTelInput(tel);
+    if (tel.length >= 10) setTimeout(() => buscar(false), 400);
+  }
+}
+
+document.getElementById('btn').addEventListener('click', () => buscar(false));
+document.getElementById('telefone').addEventListener('input', (e) => {
+  e.target.value = maskTelInput(e.target.value);
+});
+document.getElementById('telefone').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') buscar(false);
+});
+
+setInterval(() => { if (locacoes.length) render(); }, 1000);
+
+loadGasUrl_().then(() => applyDeepLink_());
 </script>
 </body>
 </html>

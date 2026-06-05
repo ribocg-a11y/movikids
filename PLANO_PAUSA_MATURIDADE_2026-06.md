@@ -4,7 +4,7 @@
 **Motivo da pausa:** Pacotes A–F entregues; priorizar **confiabilidade, consistência e experiência** antes de novas fases (F9 supervisor, F4 WhatsApp completo).  
 **Referências:** `ESTADO_ATUAL.md`, `PLANO_MESTRE_REORGANIZADO_2026-06.md` (seção 3 redundâncias), `REGRAS_DE_PUBLICACAO_SEGURA.md`
 
-**Produção alvo:** FE **v1.7.40** · GAS **v1.5.53**
+**Produção alvo:** FE **v1.7.41** · GAS **v1.5.54**
 
 ---
 
@@ -53,7 +53,7 @@
 | T2 | Script pré-push: versão FE/SW/mk-version alinhados | J |
 | T3 | CI/local: `TESTE_PARIDADE` + regressão readonly obrigatórios | J |
 | T4 | PIN admin só via GAS (remover hardcode FE) | J+ |
-| T5 | Rate limit `buscarPortalResponsavel` | G |
+| T5 | Rate limit `buscarPortalResponsavel` | G ✅ |
 | T6 | Schema validação ao salvar CONFIG frota/preços | H |
 
 ---
@@ -186,11 +186,11 @@ Admin e operação veem os mesmos números em **Home, hub admin, Dashboard e Cai
 
 ## 9. Próximo passo imediato
 
-**Pacote I concluído** (FE v1.7.40). **Iniciar Pacote G** — portal responsável:
+**Pacote G concluído** (FE v1.7.41, GAS v1.5.54). **Iniciar Pacote H** — config amigável:
 
-1. Redesign `acompanhar.html` com marca Movi Kids.
-2. QR deep link + mobile.
-3. Checklist tablet Pacote I (operador Home sem R$).
+1. Editor visual frota/preços (sem JSON).
+2. Preview antes de salvar.
+3. Publicar GAS v1.5.54 (Nova versão Web) se ping ainda mostrar v1.5.53.
 
 ---
 

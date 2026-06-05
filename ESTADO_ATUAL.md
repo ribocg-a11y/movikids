@@ -14,7 +14,7 @@ Referência única para alinhamento local × produção.
 ## ALERTA P0 (05/06/2026)
 
 **Nunca POST no `api()` do browser** — ver `INCIDENTE_POST_BROWSER_LANCAMENTO_2026-06-05.md`.  
-FE mínimo em operação: **v1.7.35** (recomendado **v1.7.40+**). Teste tablet obrigatório após mudança em `api()`.
+FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet obrigatório após mudança em `api()`.
 
 ---
 
@@ -22,8 +22,8 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.40+**). Teste tablet o
 
 | Camada | Versão alvo | URL / ID |
 |--------|-------------|----------|
-| **Frontend** | **v1.7.40** | https://ribocg-a11y.github.io/movikids/?force=1.7.40 |
-| **Apps Script** | **v1.5.53** | Deploy `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y` |
+| **Frontend** | **v1.7.41** | https://ribocg-a11y.github.io/movikids/?force=1.7.41 |
+| **Apps Script** | **v1.5.54** | Deploy `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y` |
 | SMS Gateway Cloud | **DJVJRL** / device `wihWegHr4wXaVJQ1R-GZR` | Aparelho remoto ONLINE |
 | Pacote SMS P0 | **FECHADO** | `PACOTE_SMS_P0_UNIFICADO_v1.5.38_v1.7.11.md` |
 | Planilha | MOVIKIDS_Planilha_Base | https://docs.google.com/spreadsheets/d/1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618/edit |
@@ -112,8 +112,8 @@ Commits de referência: `3d9d106` (v1.7.25), `e1a56db` (Pacote E), `1454bc8` (fi
 - [x] **Limpeza testes** — planilha + auto-cleanup nos scripts
 - [x] **Pacote F — KPIs avançados** — **v1.7.38** + GAS **v1.5.48–1.5.52** (Dashboard 5 blocos + PDF Gestão Avançada)
 - [x] **Pacote I — Sanitização gestão** — **v1.7.40** (Home enxuta, hub sem KPIs duplicados)
-- [ ] **Pacote G — Portal responsável** ← **próximo**
-- [ ] Pacote H — Config amigável
+- [x] **Pacote G — Portal responsável** — **v1.7.41** + GAS **v1.5.54** (rate limit portal)
+- [ ] **Pacote H — Config amigável** ← **próximo**
 - [ ] Pacote J — Travas CI
 - [ ] Fase 4 WhatsApp (após I+G)
 - [~] **Fase 9 supervisor — PAUSADA**
@@ -125,9 +125,9 @@ Commits de referência: `3d9d106` (v1.7.25), `e1a56db` (Pacote E), `1454bc8` (fi
 
 | # | Pacote | Status | Alvo |
 |---|--------|--------|------|
-| 1 | **I — Sanitização gestão** | **concluído** | FE v1.7.40 — uma métrica, um lugar |
-| 2 | **G — Portal responsável** | **próximo** | `acompanhar.html` + QR |
-| 3 | H — Config amigável | pendente | frota/preços sem JSON |
+| 1 | **I — Sanitização gestão** | **concluído** | FE v1.7.40 |
+| 2 | **G — Portal responsável** | **concluído** | FE v1.7.41 + GAS v1.5.54 |
+| 3 | **H — Config amigável** | **próximo** | frota/preços sem JSON |
 | 4 | J — Travas CI | pendente | pre-push + guard POST |
 | 5 | F4 WhatsApp | pendente | após I e G |
 | ⏸ | F9 supervisor | pausado | — |
@@ -160,6 +160,13 @@ Commits de referência: `3d9d106` (v1.7.25), `e1a56db` (Pacote E), `1454bc8` (fi
 - Sistema: fechamento/copiar resumo removidos → atalho para **Caixa do dia**
 - Dashboard: único lugar de KPIs do mês + gestão avançada; código legado removido
 - Caixa: fechamento detalhado + copiar resumo (canônico)
+
+### Pacote G — portal responsável (v1.7.41)
+
+- `acompanhar.html` redesenhado com `mk-design.css`, tema Movi Kids, `safe-area`, `theme-color`
+- Máscara de telefone BR, deep link `?tel=`, QR no balcão, timer com anel de progresso
+- GAS **v1.5.54**: rate limit `buscarPortalResponsavel` (20/min por telefone, 150/min global)
+- Teste: `TESTE_PORTAL_READONLY.ps1`
 
 ### Mapa canônico de métricas (Pacote I)
 
