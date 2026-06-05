@@ -16,13 +16,13 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<script src="mk-version.js?v=1.7.33"></script>
+<script src="mk-version.js?v=1.7.34"></script>
 <link rel="stylesheet" href="mk-design.css">
 
 <script>
 // ── CACHE BUSTER — alinhado a mk-version.js / APP_VERSION ──
 (function(){
-  const CURRENT = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.33';
+  const CURRENT = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.34';
   const KEY = 'mk_loaded_version';
   function mkVerParts_(v) {
     return String(v || '0.0').split('.').map(function(n) { return parseInt(n, 10) || 0; });
@@ -2839,7 +2839,7 @@ header{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.33';
+const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.34';
 const WEBAPP_URL = (typeof window !== 'undefined' && window.MK_GAS_EXEC_URL) ? window.MK_GAS_EXEC_URL
   : 'https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec';
 const WEBAPP_URL_DEAD_PREFIX = 'AKfycbzc';
@@ -3084,11 +3084,19 @@ function trocarModoWhatsApp() {
 }
 
 // ═══════════════════════════════════════════════════════════
-// API (Pacote E: escritas criticas via POST + operador obrigatorio no GAS)
+// API (Pacote E: escritas criticas via GET no browser + operador obrigatorio no GAS)
+// POST quebra no tablet/navegador (redirect 302 do GAS + CORS) — GET funciona em producao.
 // ═══════════════════════════════════════════════════════════
-const MK_WRITE_ACTIONS_POST = new Set([
+const MK_WRITE_ACTIONS = new Set([
   'salvarLocacao', 'editarLocacao', 'cancelarLocacao', 'encerrarLocacao', 'estenderLocacao'
 ]);
+
+function mkRequireOperadorEscrita_() {
+  const op = typeof operadorApiParams_ === 'function' ? operadorApiParams_() : {};
+  if (op.operador) return op;
+  toast('Faça login no balcão antes de lançar.', 'error');
+  return null;
+}
 
 function mkApiFetchJson_(url, init, timeoutMs) {
   const fetchP = fetch(url, init)
@@ -3106,31 +3114,12 @@ function mkApiFetchJson_(url, init, timeoutMs) {
   return Promise.race([fetchP, timer]);
 }
 
-async function mkGasPostReady_() {
-  if (window._mkGasPostReady != null) return window._mkGasPostReady;
-  try {
-    const gasUrl = await resolveGasUrl_();
-    const d = await mkApiFetchJson_(`${gasUrl}?action=ping`, { method: 'GET', redirect: 'follow' }, 8000);
-    window._mkGasPostReady = !!(d && d.ok && d.postWriteActions);
-  } catch (e) {
-    window._mkGasPostReady = false;
-  }
-  return window._mkGasPostReady;
-}
-
 async function api(params, timeoutMs = 25000) {
   const gasUrl = await resolveGasUrl_();
   const action = String((params && params.action) || '');
   const payload = Object.assign({}, params);
-  const wantsPost = MK_WRITE_ACTIONS_POST.has(action);
-  if (wantsPost && typeof operadorApiParams_ === 'function') Object.assign(payload, operadorApiParams_());
-  if (wantsPost && await mkGasPostReady_()) {
-    return mkApiFetchJson_(gasUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-      redirect: 'follow'
-    }, timeoutMs);
+  if (MK_WRITE_ACTIONS.has(action) && typeof operadorApiParams_ === 'function') {
+    Object.assign(payload, operadorApiParams_());
   }
   const qs = new URLSearchParams(payload).toString();
   return mkApiFetchJson_(`${gasUrl}?${qs}`, { method: 'GET', redirect: 'follow' }, timeoutMs);
@@ -4512,6 +4501,7 @@ async function confirmarLocacao() {
   if (!novaState.veiculo) { toast('Selecione um veículo!', 'error'); return; }
   if (!resp || !cri || !tel) { toast('Preencha todos os campos!', 'error'); return; }
   if (!novaState.pagamento) { toast('Selecione a forma de pagamento!', 'error'); return; }
+  if (!mkRequireOperadorEscrita_()) return;
 
   const btn = document.getElementById('btn-confirmar');
   btn.textContent = '⏳ Iniciando...'; btn.disabled = true;
@@ -4578,9 +4568,9 @@ async function confirmarLocacao() {
     broadcastInvalidate(); syncController(true, 800);
 
   } catch(e) {
-    toast('Erro de conexão. Tente novamente.', 'error');
+    toast((e && e.message) ? e.message : 'Erro de conexão. Tente novamente.', 'error');
   } finally {
-    btn.textContent = 'Só salvar cadastro (sem SMS agora)'; btn.disabled = false;
+    if (btn) { btn.textContent = 'Só salvar cadastro (sem SMS agora)'; btn.disabled = false; }
     const b2 = document.getElementById('btn-confirmar-iniciar');
     if (b2) { b2.disabled = false; b2.textContent = '✓ Enviar SMS e iniciar locação'; }
   }
@@ -4595,6 +4585,7 @@ async function confirmarLocacaoEIniciar_() {
   const cri  = document.getElementById('inp-cri').value.trim();
   const tel  = document.getElementById('inp-tel').value.trim().replace(/\D/g,'');
   if (!resp || !cri || !tel) { toast('Preencha responsável, criança e telefone.', 'error'); return; }
+  if (!mkRequireOperadorEscrita_()) return;
 
   const cfgLocal = (PRECOS[novaState.tipo] && PRECOS[novaState.tipo][novaState.plano]) || {};
   const btn = document.getElementById('btn-confirmar-iniciar');
@@ -4658,7 +4649,7 @@ async function confirmarLocacaoEIniciar_() {
       else toast('Cadastro salvo. Use ▶ Iniciar na Home.', 'success');
     }, 400);
   } catch (e) {
-    toast('Erro de conexão.', 'error');
+    toast((e && e.message) ? e.message : 'Erro de conexão.', 'error');
   } finally {
     if (btn) { btn.textContent = '✓ Enviar SMS e iniciar locação'; btn.disabled = false; }
     if (btnMain) btnMain.disabled = false;
