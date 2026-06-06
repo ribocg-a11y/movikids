@@ -25,7 +25,7 @@
 | Item | Valor |
 |------|-------|
 | **URL** | https://ribocg-a11y.github.io/movikids/acompanhar.html |
-| **Cartaz balcão (imprimir)** | `assets/qr-balcao-imprimir.html` — **abrir → Ctrl+P → A6** |
+| **Cartaz balcão (imprimir)** | `assets/qr-balcao-imprimir.html` — visual **portal carrossel** · **A5** + gráficos de fundo |
 | **Online (após push)** | https://ribocg-a11y.github.io/movikids/assets/qr-balcao-imprimir.html |
 | **QR só (SVG/PNG)** | `assets/qr-portal-acompanhar.svg` · `.png` |
 | **Regenerar QR** | `node scripts/generate-portal-qr.js` |

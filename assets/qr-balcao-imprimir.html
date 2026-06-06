@@ -3,17 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Movi Kids — QR Portal (imprimir balcão)</title>
+  <meta name="theme-color" content="#1565C0">
+  <title>Movi Kids — QR balcão (imprimir)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
   <style>
     :root {
       --blue: #29B6F6;
-      --blue-dk: #1565C0;
       --gold: #FFD54F;
-      --pink: #F06292;
-      --purple: #7E57C2;
-      --txt: #1a237e;
-      --muted: #5c6bc0;
+      --orange: #FF8A65;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -22,207 +21,325 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 20px;
-      padding: 24px;
-      background: #eceff1;
+      gap: 16px;
+      padding: 20px;
+      background: #263238;
       font-family: 'Nunito', sans-serif;
-      color: var(--txt);
+      -webkit-font-smoothing: antialiased;
     }
     .toolbar {
+      max-width: 520px;
+      text-align: center;
+      color: #cfd8dc;
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.45;
+    }
+    .toolbar-btns {
       display: flex;
-      gap: 10px;
+      gap: 8px;
       flex-wrap: wrap;
       justify-content: center;
+      margin-top: 10px;
     }
     .toolbar button {
-      font-family: 'Nunito', sans-serif;
+      font-family: inherit;
       font-weight: 900;
-      font-size: 14px;
-      padding: 12px 20px;
+      font-size: 13px;
+      padding: 10px 16px;
       border: 0;
       border-radius: 12px;
       cursor: pointer;
-      background: var(--blue-dk);
+      background: var(--gold);
+      color: #3e2723;
+    }
+    .toolbar button.sec {
+      background: transparent;
+      color: #fff;
+      border: 2px solid rgba(255,255,255,0.35);
+    }
+
+    /* === Mesmo DNA do portal (acompanhar.html v1.7.47+) === */
+    .mk-poster {
+      --poster-w: 105mm;
+      width: var(--poster-w);
+      min-height: 148mm;
+      position: relative;
+      overflow: hidden;
+      color: #fff;
+      text-align: center;
+      padding: 9mm 7mm 7mm;
+      background: linear-gradient(145deg, #0d47a1 0%, #5c6bc0 42%, #ab47bc 78%, #ec407a 100%);
+      border-radius: 18px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.35);
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    .mk-poster.a5 { --poster-w: 148mm; min-height: 210mm; padding: 12mm 10mm; }
+    .mk-poster-glow {
+      position: absolute;
+      inset: -25%;
+      background:
+        radial-gradient(circle at 18% 28%, rgba(255, 213, 79, 0.28), transparent 42%),
+        radial-gradient(circle at 82% 72%, rgba(41, 182, 246, 0.22), transparent 38%);
+      pointer-events: none;
+    }
+    .mk-poster-inner { position: relative; z-index: 1; }
+
+    .mk-portal-brand-lg {
+      font-family: 'Fredoka One', cursive;
+      font-size: 34px;
+      letter-spacing: 1px;
+      line-height: 1;
+      margin-bottom: 4px;
+      text-shadow: 0 2px 12px rgba(0,0,0,0.25);
+    }
+    .mk-poster.a5 .mk-portal-brand-lg { font-size: 44px; }
+    .mk-portal-brand-lg span { color: var(--gold); }
+
+    .mk-poster-venue {
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      opacity: 0.82;
+      margin-bottom: 10px;
+    }
+
+    .mk-portal-gate-title {
+      font-size: 17px;
+      font-weight: 800;
+      margin-bottom: 4px;
+      opacity: 0.96;
+    }
+    .mk-poster.a5 .mk-portal-gate-title { font-size: 22px; }
+
+    .mk-poster-scan {
+      font-size: 12px;
+      font-weight: 800;
+      opacity: 0.9;
+      margin-bottom: 10px;
+    }
+
+    .mk-poster-qr {
+      background: #fff;
+      border-radius: 18px;
+      padding: 5mm;
+      margin: 0 auto 10px;
+      width: fit-content;
+      box-shadow: 0 10px 32px rgba(0,0,0,0.22);
+    }
+    .mk-poster-qr img {
+      display: block;
+      width: 46mm;
+      height: 46mm;
+    }
+    .mk-poster.a5 .mk-poster-qr img { width: 62mm; height: 62mm; }
+
+    /* Prévia carrossel (como no mockup) */
+    .mk-poster-preview {
+      margin: 8px 0 10px;
+      padding: 10px 10px 12px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.22);
+      backdrop-filter: blur(6px);
+    }
+    .mk-poster-preview-lbl {
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      opacity: 0.72;
+      margin-bottom: 8px;
+    }
+    .mk-portal-tabs {
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 6px;
+    }
+    .mk-portal-tab {
+      font-size: 10px;
+      font-weight: 900;
+      padding: 5px 10px;
+      border-radius: 99px;
+      border: 1px solid rgba(255,255,255,0.25);
+      background: rgba(255,255,255,0.08);
       color: #fff;
     }
-    .toolbar button.sec { background: #fff; color: var(--blue-dk); border: 2px solid var(--blue-dk); }
-    .toolbar p { width: 100%; text-align: center; font-size: 13px; color: #546e7a; font-weight: 700; }
-
-    /* Cartão A6 (105 × 148 mm) — ideal mesa balcão */
-    .poster {
-      width: 105mm;
-      min-height: 148mm;
-      background: linear-gradient(145deg, #e3f2fd 0%, #f3e5f5 45%, #fce4ec 100%);
-      border-radius: 16px;
-      box-shadow: 0 12px 40px rgba(21, 101, 192, 0.18);
-      padding: 10mm 8mm 8mm;
+    .mk-portal-tab.is-active {
+      background: var(--blue);
+      border-color: rgba(255,255,255,0.35);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .mk-portal-counter {
+      font-size: 10px;
+      font-weight: 800;
+      opacity: 0.8;
+      margin-bottom: 8px;
+    }
+    .mk-poster-ring {
+      position: relative;
+      width: 72px;
+      height: 72px;
+      margin: 0 auto 4px;
+    }
+    .mk-poster.a5 .mk-poster-ring { width: 96px; height: 96px; }
+    .mk-poster-ring svg {
+      transform: rotate(-90deg);
+      width: 100%;
+      height: 100%;
+    }
+    .mk-poster-ring-bg { fill: none; stroke: rgba(255,255,255,0.15); stroke-width: 10; }
+    .mk-poster-ring-prog { fill: none; stroke: var(--blue); stroke-width: 10; stroke-linecap: round;
+      stroke-dasharray: 420 552; }
+    .mk-poster-ring-center {
+      position: absolute;
+      inset: 0;
       display: flex;
       flex-direction: column;
       align-items: center;
-      text-align: center;
-      position: relative;
-      overflow: hidden;
+      justify-content: center;
     }
-    .poster::before {
-      content: '';
-      position: absolute;
-      top: -30%;
-      right: -20%;
-      width: 70%;
-      height: 50%;
-      background: radial-gradient(circle, rgba(41, 182, 246, 0.25) 0%, transparent 70%);
-      pointer-events: none;
-    }
-    .brand {
+    .mk-poster-ring-lbl { font-size: 8px; font-weight: 800; opacity: 0.85; }
+    .mk-poster-ring-time {
       font-family: 'Fredoka One', cursive;
-      font-size: 28px;
-      line-height: 1.1;
-      color: var(--blue);
-      margin-bottom: 4px;
-      position: relative;
-      z-index: 1;
+      font-size: 18px;
+      letter-spacing: 0.5px;
     }
-    .brand span { color: var(--gold); text-shadow: 1px 1px 0 var(--blue-dk); }
-    .venue {
-      font-size: 11px;
+    .mk-poster.a5 .mk-poster-ring-time { font-size: 22px; }
+
+    .mk-poster-others {
+      display: flex;
+      gap: 6px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 6px;
+    }
+    .mk-poster-other {
+      font-size: 9px;
       font-weight: 900;
-      color: var(--muted);
-      letter-spacing: 0.02em;
-      margin-bottom: 8px;
-      z-index: 1;
+      padding: 4px 8px;
+      border-radius: 10px;
+      background: rgba(41,182,246,0.35);
+      border: 1px solid rgba(255,255,255,0.2);
     }
-    .headline {
-      font-family: 'Fredoka One', cursive;
-      font-size: 20px;
-      color: var(--blue-dk);
-      line-height: 1.2;
-      margin-bottom: 6px;
-      z-index: 1;
-    }
-    .sub {
-      font-size: 12px;
-      font-weight: 800;
-      color: var(--muted);
-      margin-bottom: 10px;
-      max-width: 85mm;
-      line-height: 1.35;
-      z-index: 1;
-    }
-    .qr-wrap {
-      background: #fff;
-      border-radius: 14px;
-      padding: 6mm;
-      box-shadow: 0 4px 20px rgba(21, 101, 192, 0.12);
-      border: 3px solid var(--blue);
-      margin-bottom: 10px;
-      z-index: 1;
-    }
-    .qr-wrap img, .qr-wrap svg {
-      display: block;
-      width: 52mm;
-      height: 52mm;
-    }
-    .steps {
-      width: 100%;
+    .mk-poster-other.warn { background: rgba(255,213,79,0.35); }
+
+    .mk-poster-steps {
       text-align: left;
-      font-size: 11px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.22);
+      font-size: 10px;
       font-weight: 800;
-      line-height: 1.45;
-      color: var(--txt);
-      z-index: 1;
+      line-height: 1.4;
     }
-    .steps li {
+    .mk-poster.a5 .mk-poster-steps { font-size: 11px; }
+    .mk-poster-steps li {
       list-style: none;
       display: flex;
       gap: 8px;
-      align-items: flex-start;
       margin-bottom: 6px;
     }
-    .steps .n {
+    .mk-poster-steps li:last-child { margin-bottom: 0; }
+    .mk-poster-steps .n {
       flex-shrink: 0;
-      width: 20px;
-      height: 20px;
+      width: 18px;
+      height: 18px;
       border-radius: 50%;
-      background: var(--blue);
-      color: #fff;
-      font-size: 11px;
+      background: var(--gold);
+      color: #3e2723;
+      font-size: 10px;
       font-weight: 900;
       display: flex;
       align-items: center;
       justify-content: center;
     }
-    .foot {
+    .mk-poster-foot {
       margin-top: 8px;
-      font-size: 9px;
-      font-weight: 800;
-      color: var(--muted);
-      z-index: 1;
-    }
-    .url-hint {
       font-size: 8px;
-      word-break: break-all;
-      color: #90a4ae;
-      margin-top: 4px;
-      z-index: 1;
+      font-weight: 800;
+      opacity: 0.65;
     }
-
-    .poster.a5 {
-      width: 148mm;
-      min-height: 210mm;
-      padding: 14mm 12mm;
-    }
-    .poster.a5 .brand { font-size: 36px; }
-    .poster.a5 .headline { font-size: 26px; }
-    .poster.a5 .qr-wrap img, .poster.a5 .qr-wrap svg { width: 70mm; height: 70mm; }
-    .poster.a5 .steps { font-size: 13px; }
 
     @media print {
       body { background: #fff; padding: 0; }
       .toolbar { display: none !important; }
-      .poster {
-        box-shadow: none;
+      .mk-poster {
         border-radius: 0;
+        box-shadow: none;
         margin: 0 auto;
         page-break-inside: avoid;
       }
-      @page { margin: 8mm; }
+      @page { margin: 6mm; size: auto; }
     }
   </style>
 </head>
 <body>
   <div class="toolbar">
-    <p>Abra no Chrome → <strong>Imprimir</strong> (Ctrl+P) → papel A6 ou A5 · margens mínimas · ativar gráficos de fundo.</p>
-    <button type="button" onclick="window.print()">🖨️ Imprimir agora</button>
-    <button type="button" class="sec" onclick="setSize('a6')">Tamanho A6 (mesa)</button>
-    <button type="button" class="sec" onclick="setSize('a5')">Tamanho A5 (maior)</button>
+    <p>Igual ao <strong>portal carrossel</strong> (mockup). Imprimir: <strong>Ctrl+P</strong> · papel <strong>A5</strong> recomendado · marcar <strong>Gráficos de fundo</strong>.</p>
+    <div class="toolbar-btns">
+      <button type="button" onclick="window.print()">Imprimir</button>
+      <button type="button" class="sec" onclick="setSize('a5')">A5 (recomendado)</button>
+      <button type="button" class="sec" onclick="setSize('a6')">A6 (mesa)</button>
+    </div>
   </div>
 
-  <article class="poster" id="poster">
-    <div class="brand">🚗 Movi <span>Kids</span></div>
-    <div class="venue">Golden Shopping Calhau</div>
-    <h1 class="headline">Escaneie para acompanhar</h1>
-    <p class="sub">Veja o tempo da brincadeira no seu celular — sem precisar de SMS ou WhatsApp.</p>
+  <article class="mk-poster a5" id="poster">
+    <div class="mk-poster-glow" aria-hidden="true"></div>
+    <div class="mk-poster-inner">
+      <div class="mk-portal-brand-lg">Movi <span>Kids</span></div>
+      <p class="mk-poster-venue">Golden Shopping Calhau</p>
+      <p class="mk-portal-gate-title">Quanto tempo falta? ⏱️</p>
+      <p class="mk-poster-scan">Escaneie o QR e veja no celular</p>
 
-    <div class="qr-wrap">
-      <img src="qr-portal-acompanhar.svg" width="512" height="512" alt="QR Code portal Movi Kids">
+      <div class="mk-poster-qr">
+        <img src="qr-portal-acompanhar.svg" width="512" height="512" alt="QR Code portal">
+      </div>
+
+      <div class="mk-poster-preview">
+        <p class="mk-poster-preview-lbl">No celular fica assim ↓</p>
+        <div class="mk-portal-tabs">
+          <span class="mk-portal-tab is-active">Matheus</span>
+          <span class="mk-portal-tab">Ana</span>
+          <span class="mk-portal-tab">João</span>
+        </div>
+        <p class="mk-portal-counter">Criança 1 de 3 · 3 brincando</p>
+        <div class="mk-poster-ring">
+          <svg viewBox="0 0 200 200" aria-hidden="true">
+            <circle class="mk-poster-ring-bg" cx="100" cy="100" r="88"></circle>
+            <circle class="mk-poster-ring-prog" cx="100" cy="100" r="88"></circle>
+          </svg>
+          <div class="mk-poster-ring-center">
+            <span class="mk-poster-ring-lbl">Falta</span>
+            <span class="mk-poster-ring-time">18:42</span>
+          </div>
+        </div>
+        <div class="mk-poster-others">
+          <span class="mk-poster-other warn">Ana 05:12</span>
+          <span class="mk-poster-other">João 42:30</span>
+        </div>
+      </div>
+
+      <ol class="mk-poster-steps">
+        <li><span class="n">1</span><span>Abra a <strong>câmera</strong> e escaneie o QR.</span></li>
+        <li><span class="n">2</span><span>Digite seu <strong>telefone com DDD</strong>.</span></li>
+        <li><span class="n">3</span><span>Toque <strong>Ver tempo</strong> — várias crianças? Use as abas.</span></li>
+      </ol>
+      <p class="mk-poster-foot">Sem SMS · Sem WhatsApp · Só o portal Movi Kids</p>
     </div>
-
-    <ol class="steps">
-      <li><span class="n">1</span><span>Abra a <strong>câmera</strong> do celular (ou leitor de QR).</span></li>
-      <li><span class="n">2</span><span>Aponte para o código acima.</span></li>
-      <li><span class="n">3</span><span>Digite seu <strong>telefone com DDD</strong> (ex.: 98 99999-1234).</span></li>
-      <li><span class="n">4</span><span>Acompanhe o timer em tempo real — várias crianças no mesmo telefone.</span></li>
-    </ol>
-
-    <p class="foot">Dúvidas? Peça ajuda ao atendente no balcão.</p>
-    <p class="url-hint">ribocg-a11y.github.io/movikids/acompanhar.html</p>
   </article>
 
   <script>
     function setSize(size) {
       const p = document.getElementById('poster');
-      p.classList.remove('a5');
+      p.classList.remove('a5', 'a6');
       if (size === 'a5') p.classList.add('a5');
+      else p.classList.remove('a5');
     }
   </script>
 </body>
