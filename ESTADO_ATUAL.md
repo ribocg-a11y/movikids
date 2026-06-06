@@ -126,7 +126,7 @@ Commits de referência: `3d9d106` (v1.7.25), `e1a56db` (Pacote E), `1454bc8` (fi
 - [x] **Pacote J — Travas CI** — `pre-push-check.ps1` + guards I16/I18
 - [x] **Fix cronômetro portal** — GAS v1.5.55 + portal `canonLoc_` (I16)
 - [x] **Fix auth sessão UI + idle** — v1.7.45–46 (I17, I18)
-- [ ] **Pacote K** — RESPONSAVEIS + relacionamento ← **próximo**
+- [~] **Pacote K** — K.1 import no repo (GAS v1.5.57); **deploy pendente** (fora pico)
 - [ ] Fase 4 WhatsApp (após Pacote K)
 - [ ] Pacote L — UX polish (tiles, sync header, Sistema)
 - [~] **Fase 9 supervisor — PAUSADA**
@@ -138,7 +138,7 @@ Commits de referência: `3d9d106` (v1.7.25), `e1a56db` (Pacote E), `1454bc8` (fi
 | Sprint | Foco | Status |
 |--------|------|--------|
 | **1** | Estabilizar: checklist I.5, ping, testes | **ativa** |
-| **2** | **Pacote K** — import RESPONSAVEIS, CRM | próxima |
+| **2** | **Pacote K** — K.1 código pronto; deploy GAS fora pico | **em andamento** |
 | **3** | F4 WhatsApp completo (tablet) | após K |
 | **4** | Pacote L — UX polish | após F4 |
 | ⏸ | F9 supervisor | pausada |

@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.56
+// MOVI KIDS — Google Apps Script v1.5.57
+// v1.5.57: Pacote K.1 — importarResponsaveisAdmin (LOCACOES -> RESPONSAVEIS, dryRun)
 // v1.5.56: Pacote H — validacao schema frota/preços em salvarOperacaoConfigAdmin
 // v1.5.55: Portal — timestampCanonico + totalMins alinhados ao balcão (carregarInicio + buscarPortalResponsavel)
 // v1.5.54: Pacote G — rate limit buscarPortalResponsavel (por telefone + global)
@@ -278,6 +279,7 @@ function dispatchMoviAction_(p, method) {
       case 'definirPerfilOperadorAdmin': return definirPerfilOperadorAdmin_(p);
       case 'listarResponsaveis': return listarResponsaveis_(p);
       case 'salvarResponsavel': return salvarResponsavel_(p);
+      case 'importarResponsaveisAdmin': return importarResponsaveisAdmin_(p);
       case 'registrarWhatsAppEvento': return registrarWhatsAppEvento_(p);
       case 'enviarSmsResponsavel': return enviarSmsResponsavel_(p);
       case 'enviarSmsAvulso': return enviarSmsAvulso_(p);
@@ -328,9 +330,9 @@ function ping_() {
   const agora = new Date();
   return resp_({
     status:  'online',
-    versao:  'v1.5.56',
+    versao:  'v1.5.57',
     timestamp: fmtData_(agora) + ' ' + fmtHoraLocal_(agora),
-    sistema: 'MOVI KIDS v1.5.56',
+    sistema: 'MOVI KIDS v1.5.57',
     postWriteActions: WRITE_ACTIONS_CRITICAS_
   });
 }
@@ -1489,7 +1491,7 @@ function carregarInicio_(p) {
 
   const opCfg = operacaoConfig_();
   const resultado = resp_({
-    sistema:    'MOVI KIDS v1.5.56',
+    sistema:    'MOVI KIDS v1.5.57',
     timestamp:  dataHoje + ' ' + fmtHoraLocal_(hoje),
     ativos:     ativas,
     statsHoje,
@@ -2651,6 +2653,159 @@ function salvarResponsavel_(p) {
     return err_('Erro salvarResponsavel: ' + ex.message, 500);
   } finally {
     lock.releaseLock();
+  }
+}
+
+/** Pacote K.1 — consolida LOCACOES por telefone (mesma chave que listarResponsaveis_). */
+function consolidarMapaResponsaveisImport_() {
+  const shLoc = sh_(SH_LOC);
+  const last = shLoc.getLastRow();
+  const dados = last >= DATA_ROW
+    ? shLoc.getRange(DATA_ROW, 1, last - DATA_ROW + 1, 18).getValues()
+    : [];
+  const mapa = {};
+  let totalLidas = 0;
+  let ignoradosSemTelefone = 0;
+
+  dados.forEach((r, idx) => {
+    if (!r[0]) return;
+    totalLidas++;
+    const status = String(r[14] || '').trim();
+    if (status === 'Cancelada') return;
+
+    const tel = normTel_(r[13]);
+    if (!tel || tel.length < 8) { ignoradosSemTelefone++; return; }
+
+    const rowIndex = DATA_ROW + idx;
+    const responsavel = String(r[11] || '').trim();
+    const crianca = String(r[12] || '').trim();
+    const valorTotal = Number(r[10] || 0);
+    const enc = status === 'Encerrada';
+
+    if (!mapa[tel]) {
+      mapa[tel] = {
+        telefone: tel,
+        responsavel: responsavel,
+        criancasMap: {},
+        totalLocacoes: 0,
+        faturamento: 0,
+        ultimoRowIndex: 0
+      };
+    }
+
+    const item = mapa[tel];
+    item.totalLocacoes++;
+    if (enc) {
+      item.faturamento = Math.round((item.faturamento + valorTotal) * 100) / 100;
+    }
+    if (responsavel && (!item.responsavel || rowIndex >= item.ultimoRowIndex)) {
+      item.responsavel = responsavel;
+    }
+    if (crianca) item.criancasMap[crianca] = (item.criancasMap[crianca] || 0) + 1;
+    if (rowIndex >= item.ultimoRowIndex) item.ultimoRowIndex = rowIndex;
+  });
+
+  return { mapa: mapa, totalLidas: totalLidas, ignoradosSemTelefone: ignoradosSemTelefone };
+}
+
+/** Pacote K.1 — import inicial para aba RESPONSAVEIS (admin; dryRun=1 sem escrita). */
+function importarResponsaveisAdmin_(p) {
+  if (!isAdminRequest_(p)) return err_('Acesso negado — admin obrigatorio', 403);
+
+  const dryRun = String(p.dryRun || '') === '1' || String(p.dryRun || '').toLowerCase() === 'true';
+  const soNovos = String(p.soNovos || '1') !== '0';
+  const limite = Math.min(Math.max(parseInt(p.limite || '500', 10) || 500, 1), 2000);
+  const motivo = String(p.motivo || 'Import inicial LOCACOES -> RESPONSAVEIS (K.1)').trim();
+
+  const lock = LockService.getScriptLock();
+  if (!dryRun) {
+    try { lock.waitLock(30000); } catch(ex) { return err_('Sistema ocupado', 503); }
+  }
+
+  try {
+    const cons = consolidarMapaResponsaveisImport_();
+    const mapa = cons.mapa;
+    const existentes = lerResponsaveisCanonicos_();
+    const tels = Object.keys(mapa).sort(function(a, b) {
+      return mapa[b].ultimoRowIndex - mapa[a].ultimoRowIndex;
+    });
+
+    let ignoradosJaExistem = 0;
+    const aInserir = [];
+
+    tels.forEach(function(tel) {
+      if (soNovos && existentes[tel]) { ignoradosJaExistem++; return; }
+      const item = mapa[tel];
+      const criancas = Object.keys(item.criancasMap)
+        .sort(function(a, b) {
+          return item.criancasMap[b] - item.criancasMap[a] || a.localeCompare(b);
+        })
+        .slice(0, 12);
+      const obs = 'Import K.1 — ' + item.totalLocacoes + ' loc(s), R$ ' +
+        item.faturamento.toFixed(2).replace('.', ',');
+      aInserir.push({
+        telefone: tel,
+        responsavel: item.responsavel || 'Sem nome',
+        criancas: criancas,
+        observacao: obs
+      });
+    });
+
+    const lote = aInserir.slice(0, limite);
+    const amostra = lote.slice(0, 5).map(function(x) {
+      return { telefone: x.telefone, responsavel: x.responsavel, criancas: x.criancas.length };
+    });
+
+    if (dryRun) {
+      return resp_({
+        dryRun: true,
+        totalLocacoesLidas: cons.totalLidas,
+        gruposTelefone: tels.length,
+        aInserir: aInserir.length,
+        inseridosNesteLote: lote.length,
+        ignoradosJaExistem: ignoradosJaExistem,
+        ignoradosSemTelefone: cons.ignoradosSemTelefone,
+        amostra: amostra
+      });
+    }
+
+    const sh = responsaveisSheet_();
+    const agora = fmtData_(new Date()) + ' ' + fmtHoraLocal_(new Date());
+    let inseridos = 0;
+
+    lote.forEach(function(x) {
+      const id = nextIdResponsavel_(sh);
+      const row = [
+        id, agora, agora, x.telefone, x.responsavel,
+        JSON.stringify(x.criancas), x.observacao, 'Import_LOCACOES', 'Ativo'
+      ];
+      sh.appendRow(row);
+      inseridos++;
+      responsaveisAuditoria_('importResponsavel', null, {
+        id: id,
+        telefone: x.telefone,
+        responsavel: x.responsavel,
+        criancas: x.criancas,
+        observacao: x.observacao,
+        origem: 'Import_LOCACOES',
+        statusCadastro: 'Ativo'
+      }, motivo);
+    });
+
+    return resp_({
+      dryRun: false,
+      inseridos: inseridos,
+      totalLocacoesLidas: cons.totalLidas,
+      gruposTelefone: tels.length,
+      aInserir: aInserir.length,
+      ignoradosJaExistem: ignoradosJaExistem,
+      ignoradosSemTelefone: cons.ignoradosSemTelefone,
+      amostra: amostra
+    });
+  } catch(ex) {
+    return err_('Erro importarResponsaveisAdmin: ' + ex.message, 500);
+  } finally {
+    if (!dryRun) lock.releaseLock();
   }
 }
 

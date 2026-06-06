@@ -90,6 +90,11 @@ try {
     } else {
       Add-Check "guard.gas.portal.canon" "ok" "timestampCanonico_ no portal GAS"
     }
+    if ($gasRaw -notmatch 'function importarResponsaveisAdmin_') {
+      Add-Check "guard.k1.import" "fail" "importarResponsaveisAdmin_ ausente (Pacote K.1)"
+    } else {
+      Add-Check "guard.k1.import" "ok" "import K.1 presente no GAS"
+    }
   } else {
     Add-Check "guard.gas.portal.canon" "warn" ".gs canonico nao encontrado"
   }
