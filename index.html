@@ -69,13 +69,13 @@
   } catch(e) {}
 })();
 </script>
-<script src="mk-version.js?v=1.7.62"></script>
+<script src="mk-version.js?v=1.7.63"></script>
 <link rel="stylesheet" href="mk-design.css">
 
 <script>
 // ── CACHE BUSTER — alinhado a mk-version.js / APP_VERSION ──
 (function(){
-  const CURRENT = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.62';
+  const CURRENT = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.63';
   const KEY = 'mk_loaded_version';
   function mkVerParts_(v) {
     return String(v || '0.0').split('.').map(function(n) { return parseInt(n, 10) || 0; });
@@ -1361,6 +1361,20 @@ header{
 .cto-bar-bg{height:6px;background:var(--border);border-radius:99px;overflow:hidden;margin-bottom:3px}
 .cto-bar-fill{height:6px;border-radius:99px;background:#E65100}
 .cto-note{font-size:10px;color:var(--txt3)}
+.payback-strip{background:var(--card);border:1.5px solid #7E57C2;border-radius:var(--radius);
+  padding:12px 14px;margin-bottom:14px}
+.payback-strip-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+.payback-strip-label{font-size:10px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.04em}
+.payback-strip-title{font-size:13px;font-weight:700;color:var(--txt);margin-top:3px}
+.payback-pill{font-size:10px;padding:2px 8px;border-radius:4px;background:#EDE7F6;color:#4527A0;font-weight:700}
+.payback-pill.is-done{background:#E8F5E9;color:#2E7D32}
+.payback-nums{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:8px}
+.payback-n{text-align:center}
+.payback-n-val{font-size:15px;font-weight:800;font-family:'Nunito',sans-serif}
+.payback-n-lbl{font-size:10px;color:var(--txt3);font-weight:600}
+.payback-bar-bg{height:8px;background:var(--border);border-radius:99px;overflow:hidden;margin-bottom:3px}
+.payback-bar-fill{height:8px;border-radius:99px;background:linear-gradient(90deg,#7E57C2,#5E35B1)}
+.payback-note{font-size:10px;color:var(--txt3);line-height:1.4}
 
 .mk-opcfg-section{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:12px}
 .mk-opcfg-head{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:var(--txt3);margin-bottom:10px}
@@ -2426,6 +2440,25 @@ header{
       <div class="cto-note" id="nk-cto-note">CTO = 0% do faturamento</div>
     </div>
 
+    <!-- Payback investimento -->
+    <div class="payback-strip" id="nk-payback-strip" style="display:none">
+      <div class="payback-strip-top">
+        <div>
+          <div class="payback-strip-label">Payback do investimento</div>
+          <div class="payback-strip-title" id="nk-pb-title">—</div>
+        </div>
+        <span class="payback-pill" id="nk-pb-pill">—</span>
+      </div>
+      <div class="payback-nums">
+        <div class="payback-n"><div class="payback-n-val" style="color:#5E35B1" id="nk-pb-inv">—</div><div class="payback-n-lbl">Investido</div></div>
+        <div class="payback-n"><div class="payback-n-val" style="color:#2E7D32" id="nk-pb-acum">—</div><div class="payback-n-lbl">Recuperado</div></div>
+        <div class="payback-n"><div class="payback-n-val" style="color:#E65100" id="nk-pb-falta">—</div><div class="payback-n-lbl">Falta</div></div>
+        <div class="payback-n"><div class="payback-n-val blue" id="nk-pb-meses">—</div><div class="payback-n-lbl">Meses est.</div></div>
+      </div>
+      <div class="payback-bar-bg"><div class="payback-bar-fill" id="nk-pb-bar" style="width:0%"></div></div>
+      <div class="payback-note" id="nk-pb-note">—</div>
+    </div>
+
     <!-- Receita e atendimentos por semana — interativo -->
     <div class="mk-semana-panel" id="mk-semana-panel">
       <div class="mk-semana-title">Receita e atendimentos por semana</div>
@@ -2904,7 +2937,7 @@ header{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.62';
+const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.63';
 const WEBAPP_URL = (typeof window !== 'undefined' && window.MK_GAS_EXEC_URL) ? window.MK_GAS_EXEC_URL
   : 'https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec';
 const WEBAPP_URL_DEAD_PREFIX = 'AKfycbzc';
@@ -6899,6 +6932,36 @@ function renderCharts(d) {
     ? 'CTO = maior entre ' + R2(d.ctoMinimo) + ' e 10% do faturamento (' + ctoPct + '% aplicado)'
     : 'CTO = ' + ctoPct + '% do faturamento'));
 
+  // Payback
+  const pbStrip = document.getElementById('nk-payback-strip');
+  const pb = d.payback;
+  if (pbStrip && pb && pb.ok && pb.investimentoTotal > 0) {
+    pbStrip.style.display = '';
+    const pctPb = pb.pctRecuperado || 0;
+    setText2('nk-pb-inv', R2(pb.investimentoTotal));
+    setText2('nk-pb-acum', R2(pb.resultadoAcumulado));
+    setText2('nk-pb-falta', R2(pb.faltaRecuperar));
+    const pbBar = document.getElementById('nk-pb-bar');
+    if (pbBar) pbBar.style.width = Math.min(pctPb, 100) + '%';
+    const pbPill = document.getElementById('nk-pb-pill');
+    if (pb.paybackAtingido) {
+      setText2('nk-pb-title', 'Investimento recuperado!');
+      if (pbPill) { pbPill.textContent = '✓ Payback'; pbPill.className = 'payback-pill is-done'; }
+      setText2('nk-pb-meses', '0');
+      setText2('nk-pb-note', 'Acumulado até ' + (pb.acumuladoAteLabel || '') + ' · média/mês ' + R2(pb.mediaResultadoMensal));
+    } else {
+      setText2('nk-pb-title', pctPb + '% recuperado · acumulado até ' + (pb.acumuladoAteLabel || ''));
+      if (pbPill) { pbPill.textContent = pctPb + '%'; pbPill.className = 'payback-pill'; }
+      setText2('nk-pb-meses', pb.mesesRestantesEstimados != null ? '~' + pb.mesesRestantesEstimados : '—');
+      const ritmo = pb.mediaResultadoMensal > 0
+        ? 'Ritmo médio ' + R2(pb.mediaResultadoMensal) + '/mês (' + (pb.mesesOperados || 0) + ' meses)'
+        : 'Sem ritmo mensal ainda';
+      setText2('nk-pb-note', ritmo + ' · início ' + (pb.mesInicioPayback || '') + ' · planilha INVESTIMENTO');
+    }
+  } else if (pbStrip) {
+    pbStrip.style.display = 'none';
+  }
+
   // Faturamento diário — todos os dias do mês até hoje (zeros inclusive)
   // Os zeros mostram a linha do tempo completa e quando o negócio arrancou
   const fatDia  = d.fatPorDia || [];
@@ -8381,8 +8444,8 @@ async function salvarLancamentoAvulso() {
 }
 
 </script>
-<script src="mk-update.js?v=1.7.62"></script>
-<script src="mk-auth.js?v=1.7.62"></script>
+<script src="mk-update.js?v=1.7.63"></script>
+<script src="mk-auth.js?v=1.7.63"></script>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
   if (typeof mkAuthBoot === 'function') {

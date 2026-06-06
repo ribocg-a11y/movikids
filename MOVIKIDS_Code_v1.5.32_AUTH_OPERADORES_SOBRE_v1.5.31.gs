@@ -1,5 +1,7 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.59
+// MOVI KIDS — Google Apps Script v1.5.61
+// v1.5.61: Payback — calcPaybackAcumulado_ + buscarKPIsAdmin.payback
+// v1.5.60: Aba INVESTIMENTO — lerInvestimento_ para payback (planilha)
 // v1.5.59: buscarKPIsAdmin — fatAno/nAno = faturamento acumulado do ano civil inteiro
 // v1.5.58: buscarKPIsAdmin — fatAno/nAno (primeira versão; recorte jan–mês — substituída)
 // v1.5.57: Pacote K.1 — importarResponsaveisAdmin (LOCACOES -> RESPONSAVEIS, dryRun)
@@ -61,6 +63,7 @@ const FB_URL     = 'https://movikids-fa3d7-default-rtdb.firebaseio.com';
 
 const SH_LOC   = 'LOCACOES';
 const SH_CUS   = 'CUSTOS';
+const SH_INV   = 'INVESTIMENTO';
 const SH_DASH  = 'DASHBOARD';
 const SH_CFG   = 'CONFIG';
 const SH_ANA   = 'Analise';
@@ -72,6 +75,7 @@ const SH_OPS = 'OPERADORES_SISTEMA';
 const ADMIN_PIN_PLAIN = '1416';
 const OP_DATA_ROW = 2;
 const DATA_ROW = 11;
+const INV_DATA_ROW = 11;
 const PORTAL_RESPONSAVEL_URL = 'https://ribocg-a11y.github.io/movikids/acompanhar.html';
 const SMS_GATEWAY_URL = 'https://api.sms-gate.app/3rdparty/v1/messages';
 /** Device Cloud producao (aparelho remoto DJVJRL) — copiar da API se falhar; app pode confundir l/I */
@@ -201,8 +205,8 @@ function nextId_(sheet) {
 }
 
 // Mês de locação = aniversário da data de assinatura (contrato Golden Calhau)
-function mesContrato_() {
-  const hoje = new Date();
+function mesContrato_(refDate) {
+  const hoje = refDate || new Date();
   let meses = (hoje.getFullYear() - CONTRATO_INICIO.getFullYear()) * 12;
   meses += hoje.getMonth() - CONTRATO_INICIO.getMonth();
   if (hoje.getDate() < CONTRATO_INICIO.getDate()) meses--;
@@ -332,7 +336,7 @@ function ping_() {
   const agora = new Date();
   return resp_({
     status:  'online',
-    versao:  'v1.5.59',
+    versao:  'v1.5.61',
     timestamp: fmtData_(agora) + ' ' + fmtHoraLocal_(agora),
     sistema: 'MOVI KIDS v1.5.59',
     postWriteActions: WRITE_ACTIONS_CRITICAS_
@@ -1180,6 +1184,121 @@ function buildPorSemanaMes_(fatMap, nMap, extMap, diasMes, mesAtual, anoAtual, m
   };
 }
 
+/** Lê aba INVESTIMENTO (payback) — linha 9 cabeçalho, dados desde linha 11. */
+function lerInvestimento_() {
+  const sh = ss_().getSheetByName(SH_INV);
+  if (!sh) {
+    return { ok: false, erro: 'Aba INVESTIMENTO ausente', investimentoTotal: 0, itens: [] };
+  }
+  const dataInauguracao = cellToStr_(sh.getRange('B3').getValue()).trim();
+  const mesInicioPayback = cellToStr_(sh.getRange('B4').getValue()).trim();
+  const last = sh.getLastRow();
+  const itens = [];
+  let total = 0;
+  if (last >= INV_DATA_ROW) {
+    const n = last - INV_DATA_ROW + 1;
+    const rows = sh.getRange(INV_DATA_ROW, 1, n, 6).getValues();
+    rows.forEach(function(r) {
+      const item = String(r[2] || '').trim();
+      if (!item || item.indexOf('Subtotal') === 0) return;
+      const entra = String(r[4] || 'S').trim().toUpperCase() !== 'N';
+      const val = Number(r[3]) || 0;
+      if (entra) total += val;
+      itens.push({
+        codigo: cellToStr_(r[0]),
+        categoria: cellToStr_(r[1]),
+        item: item,
+        valor: Math.round(val * 100) / 100,
+        entra: entra,
+        observacao: cellToStr_(r[5])
+      });
+    });
+  }
+  return {
+    ok: true,
+    dataInauguracao: dataInauguracao,
+    mesInicioPayback: mesInicioPayback,
+    investimentoTotal: Math.round(total * 100) / 100,
+    itens: itens
+  };
+}
+
+/** Payback: resultado líquido acumulado desde mes_inicio até fim do mês selecionado. */
+function calcPaybackAcumulado_(mesFim, anoFim, inv) {
+  const I = Number(inv && inv.investimentoTotal) || 0;
+  if (!I) {
+    return { ok: false, erro: 'Cadastre valores na aba INVESTIMENTO', investimentoTotal: 0 };
+  }
+  const iniParts = String(inv.mesInicioPayback || '05/2026').split('/');
+  let mesIni = parseInt(iniParts[0], 10) || 5;
+  let anoIni = parseInt(iniParts[1], 10) || 2026;
+
+  const fatBy = {};
+  const cusBy = {};
+  const shLoc = sh_(SH_LOC);
+  const lastLoc = shLoc.getLastRow();
+  if (lastLoc >= DATA_ROW) {
+    shLoc.getRange(DATA_ROW, 1, lastLoc - DATA_ROW + 1, 15).getValues().forEach(function(r) {
+      if (!r[0] || String(r[14] || '').trim() !== 'Encerrada') return;
+      const pts = cellToStr_(r[1]).split('/');
+      if (pts.length < 3) return;
+      const mmyy = pts[1].padStart(2, '0') + '/' + pts[2];
+      fatBy[mmyy] = (fatBy[mmyy] || 0) + Number(r[10]);
+    });
+  }
+  const shCus = sh_(SH_CUS);
+  const lastCus = shCus.getLastRow();
+  if (lastCus >= DATA_ROW) {
+    shCus.getRange(DATA_ROW, 1, lastCus - DATA_ROW + 1, 6).getValues().forEach(function(r) {
+      if (!r[0]) return;
+      const pts = cellToStr_(r[1]).split('/');
+      if (pts.length < 3) return;
+      const mmyy = pts[1].padStart(2, '0') + '/' + pts[2];
+      cusBy[mmyy] = (cusBy[mmyy] || 0) + Number(r[5]);
+    });
+  }
+
+  let acumulado = 0;
+  let mesesOperados = 0;
+  let m = mesIni;
+  let a = anoIni;
+  const limite = anoFim * 12 + mesFim;
+  while (a * 12 + m <= limite) {
+    const mmyy = String(m).padStart(2, '0') + '/' + a;
+    const fat = fatBy[mmyy] || 0;
+    const cus = cusBy[mmyy] || 0;
+    const refDate = new Date(a, m, 0);
+    const cto = Math.max(ctoMinimo_(mesContrato_(refDate)), fat * 0.10);
+    const res = fat - cus - cto;
+    acumulado += res;
+    if (fat > 0 || cus > 0) mesesOperados++;
+    m++;
+    if (m > 12) { m = 1; a++; }
+  }
+
+  const media = mesesOperados > 0 ? acumulado / mesesOperados : 0;
+  const pct = I > 0 ? Math.min(100, Math.round(acumulado / I * 1000) / 10) : 0;
+  const falta = Math.max(0, I - acumulado);
+  const atingido = acumulado >= I;
+  let mesesRest = null;
+  if (!atingido && media > 0) mesesRest = Math.ceil(falta / media);
+
+  return {
+    ok: true,
+    investimentoTotal: I,
+    resultadoAcumulado: Math.round(acumulado * 100) / 100,
+    pctRecuperado: pct,
+    faltaRecuperar: Math.round(falta * 100) / 100,
+    paybackAtingido: atingido,
+    mesesOperados: mesesOperados,
+    mediaResultadoMensal: Math.round(media * 100) / 100,
+    mesesRestantesEstimados: mesesRest,
+    acumuladoAteLabel: String(mesFim).padStart(2, '0') + '/' + anoFim,
+    mesInicioPayback: inv.mesInicioPayback,
+    dataInauguracao: inv.dataInauguracao
+  };
+}
+
 function buscarKPIsAdmin_(p) {
   if (!isAdminRequest_(p)) return err_('Acesso negado — KPIs so para administrador', 403);
   const hoje     = new Date();
@@ -1339,6 +1458,8 @@ function buscarKPIsAdmin_(p) {
   const diasOperandoCalc = diasComMov.size;
   const kpiAv = kpiAvancadosMes_(mmyy, nMes, nCancelMes, diasOperandoCalc, nPorVeiculo, minPorVeiculo);
   const porSemanaPack = buildPorSemanaMes_(fatPorDia, nPorDia, extPorDia, diasMes, mesAtual, anoAtual, mediaDiaria);
+  const investimento = lerInvestimento_();
+  const payback = calcPaybackAcumulado_(mesAtual, anoAtual, investimento);
 
   return resp_({
     // v1.5.4: comparativo + projeção
@@ -1389,7 +1510,9 @@ function buscarKPIsAdmin_(p) {
     porSemana: porSemanaPack.semanas,
     melhorSemanaIdx: porSemanaPack.melhorSemanaIdx,
     melhorSemanaLabel: porSemanaPack.melhorSemanaLabel,
-    melhorSemanaFat: porSemanaPack.melhorSemanaFat
+    melhorSemanaFat: porSemanaPack.melhorSemanaFat,
+    investimento: investimento,
+    payback: payback
   });
 }
 
