@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="mk-design.css?v=1.7.60">
+<link rel="stylesheet" href="mk-design.css?v=1.7.61">
 </head>
 <body class="mk-portal-page mk-frame-page" data-step="start">
 
@@ -475,10 +475,34 @@ document.getElementById('frame-switch').addEventListener('click', e => {
   if (btn) setKidIdx_(Number(btn.getAttribute('data-kid')));
 });
 
+async function renderExemploPreview_() {
+  const ph = document.createElement('canvas');
+  ph.width = 640;
+  ph.height = 640;
+  const pc = ph.getContext('2d');
+  const g = pc.createRadialGradient(320, 280, 30, 320, 320, 300);
+  g.addColorStop(0, '#81d4fa');
+  g.addColorStop(0.55, '#42a5f5');
+  g.addColorStop(1, '#3949ab');
+  pc.fillStyle = g;
+  pc.fillRect(0, 0, 640, 640);
+  pc.font = '200px sans-serif';
+  pc.textAlign = 'center';
+  pc.textBaseline = 'middle';
+  pc.fillText('😊', 320, 310);
+  try {
+    lastSource_ = ph;
+    lastBlob_ = await composite_(ph);
+    resultImg.src = URL.createObjectURL(lastBlob_);
+    setStep('done');
+  } catch (e) {}
+}
+
 (async function init_() {
   const p = new URLSearchParams(location.search);
   const tel = digits(p.get('tel') || p.get('telefone') || '');
   const nomeUrl = (p.get('nome') || '').trim();
+  const isExemplo = p.get('exemplo') === '1';
 
   if (tel) {
     document.getElementById('link-voltar').href = 'acompanhar.html?tel=' + encodeURIComponent(tel);
@@ -487,6 +511,7 @@ document.getElementById('frame-switch').addEventListener('click', e => {
   await loadGasUrl_();
   if (tel) await loadCriancas_(tel);
   if (!criancas_.length && nomeUrl) criancas_ = [nomeUrl];
+  if (isExemplo && !criancas_.length) criancas_ = ['Maria', 'João'];
   if (nomeUrl && criancas_.length) {
     const ni = criancas_.findIndex(n => n.toLowerCase() === nomeUrl.toLowerCase());
     kidIdx_ = ni >= 0 ? ni : 0;
@@ -494,6 +519,12 @@ document.getElementById('frame-switch').addEventListener('click', e => {
 
   updateNomeUI_();
   renderSwitcher_();
+
+  if (isExemplo) {
+    document.getElementById('frame-subtitle').textContent =
+      'Exemplo — ' + (nomeAtual_() ? 'Foto de ' + nomeAtual_() : 'moldura Movi Kids');
+    await renderExemploPreview_();
+  }
 })();
 </script>
 </body>
