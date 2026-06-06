@@ -69,13 +69,13 @@
   } catch(e) {}
 })();
 </script>
-<script src="mk-version.js?v=1.7.42"></script>
+<script src="mk-version.js?v=1.7.43"></script>
 <link rel="stylesheet" href="mk-design.css">
 
 <script>
 // ── CACHE BUSTER — alinhado a mk-version.js / APP_VERSION ──
 (function(){
-  const CURRENT = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.42';
+  const CURRENT = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.43';
   const KEY = 'mk_loaded_version';
   function mkVerParts_(v) {
     return String(v || '0.0').split('.').map(function(n) { return parseInt(n, 10) || 0; });
@@ -1349,6 +1349,20 @@ header{
 .cto-bar-fill{height:6px;border-radius:99px;background:#E65100}
 .cto-note{font-size:10px;color:var(--txt3)}
 
+.mk-opcfg-section{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:12px}
+.mk-opcfg-head{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:var(--txt3);margin-bottom:10px}
+.mk-opcfg-veic-row{display:grid;grid-template-columns:1fr 120px 36px;gap:8px;align-items:center;margin-bottom:8px}
+.mk-opcfg-tabs,.mk-opcfg-prev-tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.mk-opcfg-tab,.mk-opcfg-prev-tab{font-size:12px;font-weight:700;padding:6px 12px;border-radius:8px;border:1.5px solid var(--border);background:var(--bg);cursor:pointer}
+.mk-opcfg-tab.sel,.mk-opcfg-prev-tab.sel{border-color:var(--blue);background:var(--blue-lt);color:var(--blue-dk)}
+.mk-opcfg-precos-table{width:100%;border-collapse:collapse;font-size:12px}
+.mk-opcfg-precos-table th,.mk-opcfg-precos-table td{padding:6px 4px;border-bottom:1px solid var(--border);text-align:left}
+.mk-opcfg-precos-table input{width:100%;padding:6px 8px;border:1.5px solid var(--border);border-radius:6px;font-size:12px}
+.mk-opcfg-preview{display:grid;gap:8px}
+.mk-opcfg-preview .plano-btn{cursor:default}
+.mk-opcfg-actions{display:grid;gap:8px;margin-top:4px}
+.mk-opcfg-advanced summary{font-size:12px;font-weight:700;color:var(--txt2);cursor:pointer;margin-bottom:8px}
+
 .new-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
 .new-row.wide{grid-template-columns:3fr 2fr}
 .new-chart-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);padding:16px}
@@ -2135,15 +2149,36 @@ header{
       <div class="diag-alert" id="mk-opcfg-alert" style="display:none"></div>
     </div>
     <div id="mk-opcfg-editor" style="display:none;margin-bottom:14px">
-      <div class="form-group">
-        <label class="form-label">Veículos (um por linha)</label>
-        <textarea id="mk-opcfg-veiculos-ta" class="form-input" rows="6" style="font-family:monospace;font-size:12px"></textarea>
+      <div class="mk-opcfg-section">
+        <div class="mk-opcfg-head">Frota</div>
+        <div id="mk-opcfg-veic-list"></div>
+        <button type="button" class="btn btn-secondary" style="width:100%;margin-top:4px" onclick="opCfgAddVeiculo_()">+ Adicionar veículo</button>
       </div>
-      <div class="form-group">
-        <label class="form-label">Preços (JSON — formato GAS: valor/mins/adicional)</label>
-        <textarea id="mk-opcfg-precos-ta" class="form-input" rows="10" style="font-family:monospace;font-size:11px"></textarea>
+      <div class="mk-opcfg-section">
+        <div class="mk-opcfg-head">Preços por tipo</div>
+        <div class="mk-opcfg-tabs" id="mk-opcfg-precos-tabs"></div>
+        <div id="mk-opcfg-precos-panel"></div>
       </div>
-      <button type="button" class="btn btn-primary" style="width:100%;margin-bottom:8px" onclick="salvarOperacaoConfigAdmin_()">💾 Salvar frota e preços</button>
+      <div class="mk-opcfg-section">
+        <div class="mk-opcfg-head">Preview — Nova locação</div>
+        <div class="mk-opcfg-prev-tabs" id="mk-opcfg-prev-tabs"></div>
+        <div class="mk-opcfg-preview" id="mk-opcfg-preview"></div>
+      </div>
+      <div class="mk-opcfg-actions">
+        <button type="button" class="btn btn-secondary" onclick="opCfgAtualizarPreview_()">👁 Atualizar preview</button>
+        <button type="button" class="btn btn-primary" onclick="salvarOperacaoConfigAdmin_()">💾 Salvar frota e preços</button>
+      </div>
+      <details class="mk-opcfg-advanced" style="margin-top:10px">
+        <summary>Modo avançado (JSON)</summary>
+        <div class="form-group" style="margin-top:8px">
+          <label class="form-label">Veículos (um por linha)</label>
+          <textarea id="mk-opcfg-veiculos-ta" class="form-input" rows="4" style="font-family:monospace;font-size:12px"></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Preços (JSON)</label>
+          <textarea id="mk-opcfg-precos-ta" class="form-input" rows="6" style="font-family:monospace;font-size:11px"></textarea>
+        </div>
+      </details>
     </div>
     <button type="button" class="btn btn-secondary" id="mk-btn-toggle-opcfg" style="width:100%;margin-bottom:14px" onclick="toggleEditorOperacaoConfig_()">✏️ Editar frota e preços</button>
     <div class="sec-title">Operação</div>
@@ -2850,7 +2885,7 @@ header{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.42';
+const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.43';
 const WEBAPP_URL = (typeof window !== 'undefined' && window.MK_GAS_EXEC_URL) ? window.MK_GAS_EXEC_URL
   : 'https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec';
 const WEBAPP_URL_DEAD_PREFIX = 'AKfycbzc';
@@ -6298,6 +6333,261 @@ function irAdmin(page) {
   }
 }
 
+const OPCFG_TIPOS_ = ['Carro', 'Triciclo', 'Pelúcia'];
+const OPCFG_PLANOS_ = ['10min', '20min', '30min', '40min', '60min', '3h'];
+let opCfgEditorTab_ = 'Carro';
+let opCfgPreviewTab_ = 'Carro';
+let opCfgDraftPrecos_ = null;
+
+function opCfgInferTipo_(nome) {
+  const n = String(nome || '');
+  if (n.indexOf('Triciclo') >= 0) return 'Triciclo';
+  if (n.indexOf('Pel') >= 0) return 'Pelúcia';
+  return 'Carro';
+}
+
+function opCfgEmptyPrecos_() {
+  const out = {};
+  OPCFG_TIPOS_.forEach(tipo => {
+    out[tipo] = {};
+    OPCFG_PLANOS_.forEach(pl => { out[tipo][pl] = { valor: 0, mins: 0, adicional: 0 }; });
+  });
+  return out;
+}
+
+function opCfgNormalizePrecos_(src) {
+  const out = opCfgEmptyPrecos_();
+  if (!src || typeof src !== 'object') return out;
+  OPCFG_TIPOS_.forEach(tipo => {
+    const plans = src[tipo] || {};
+    OPCFG_PLANOS_.forEach(pl => {
+      const c = plans[pl];
+      if (!c) return;
+      out[tipo][pl] = {
+        valor: Number(c.valor != null ? c.valor : c.v),
+        mins: Number(c.mins != null ? c.mins : c.m),
+        adicional: Number(c.adicional != null ? c.adicional : c.a)
+      };
+    });
+  });
+  return out;
+}
+
+function opCfgDraftPrecosEnsure_() {
+  if (!opCfgDraftPrecos_) opCfgDraftPrecos_ = opCfgEmptyPrecos_();
+  return opCfgDraftPrecos_;
+}
+
+function opCfgSavePrecosPanelToDraft_() {
+  const precos = opCfgDraftPrecosEnsure_();
+  document.querySelectorAll('.mk-opcfg-p-val').forEach(inp => {
+    const tipo = inp.getAttribute('data-tipo');
+    const pl = inp.getAttribute('data-plano');
+    if (!tipo || !pl || !precos[tipo]) return;
+    precos[tipo][pl].valor = Number(inp.value || 0);
+  });
+  document.querySelectorAll('.mk-opcfg-p-mins').forEach(inp => {
+    const tipo = inp.getAttribute('data-tipo');
+    const pl = inp.getAttribute('data-plano');
+    if (!tipo || !pl || !precos[tipo]) return;
+    precos[tipo][pl].mins = Number(inp.value || 0);
+  });
+  document.querySelectorAll('.mk-opcfg-p-adic').forEach(inp => {
+    const tipo = inp.getAttribute('data-tipo');
+    const pl = inp.getAttribute('data-plano');
+    if (!tipo || !pl || !precos[tipo]) return;
+    precos[tipo][pl].adicional = Number(inp.value || 0);
+  });
+}
+
+function opCfgSyncTextareasFromVisual_() {
+  const taV = document.getElementById('mk-opcfg-veiculos-ta');
+  const taP = document.getElementById('mk-opcfg-precos-ta');
+  const data = opCfgCollectFromDom_(false);
+  if (taV) taV.value = data.veiculos.join('\n');
+  if (taP) taP.value = JSON.stringify(data.precos, null, 2);
+}
+
+function opCfgRenderVeiculos_(veiculosOverride) {
+  const box = document.getElementById('mk-opcfg-veic-list');
+  if (!box) return;
+  const list = veiculosOverride || opCfgCollectVeiculosFromDom_();
+  const rows = list.map((nome, i) => {
+    const tipo = opCfgInferTipo_(nome);
+    return `<div class="mk-opcfg-veic-row" data-idx="${i}">
+      <input type="text" class="form-input mk-opcfg-veic-nome" value="${escHtml(nome)}" placeholder="Ex: Carro 04" maxlength="40">
+      <select class="form-input mk-opcfg-veic-tipo">
+        ${OPCFG_TIPOS_.map(t => `<option value="${t}"${t === tipo ? ' selected' : ''}>${t}</option>`).join('')}
+      </select>
+      <button type="button" class="btn btn-secondary" style="padding:6px 8px" onclick="opCfgRemoveVeiculo_(${i})" title="Remover">✕</button>
+    </div>`;
+  }).join('');
+  box.innerHTML = rows || '<p style="font-size:12px;color:var(--txt3);margin:0">Nenhum veículo — adicione abaixo.</p>';
+}
+
+function opCfgRenderPrecosTabs_() {
+  const tabs = document.getElementById('mk-opcfg-precos-tabs');
+  if (!tabs) return;
+  tabs.innerHTML = OPCFG_TIPOS_.map(t =>
+    `<button type="button" class="mk-opcfg-tab${t === opCfgEditorTab_ ? ' sel' : ''}" onclick="opCfgSelectPrecosTab_('${t}')">${t}</button>`
+  ).join('');
+  opCfgRenderPrecosPanel_();
+}
+
+function opCfgCollectVeiculosFromDom_() {
+  const veiculos = [];
+  document.querySelectorAll('#mk-opcfg-veic-list .mk-opcfg-veic-row').forEach(row => {
+    const nomeInp = row.querySelector('.mk-opcfg-veic-nome');
+    const nome = nomeInp ? String(nomeInp.value || '').trim() : '';
+    if (nome) veiculos.push(nome);
+  });
+  return veiculos;
+}
+
+function opCfgRenderPrecosPanel_() {
+  const panel = document.getElementById('mk-opcfg-precos-panel');
+  if (!panel) return;
+  const precos = opCfgDraftPrecosEnsure_();
+  const tipo = opCfgEditorTab_;
+  const rows = OPCFG_PLANOS_.map(pl => {
+    const c = (precos[tipo] && precos[tipo][pl]) || { valor: 0, mins: 0, adicional: 0 };
+    return `<tr>
+      <td><strong>${PLANO_LABELS[pl] || pl}</strong></td>
+      <td><input type="number" min="0" step="0.01" class="mk-opcfg-p-val" data-tipo="${tipo}" data-plano="${pl}" value="${c.valor || ''}" placeholder="0"></td>
+      <td><input type="number" min="1" step="1" class="mk-opcfg-p-mins" data-tipo="${tipo}" data-plano="${pl}" value="${c.mins || ''}" placeholder="0"></td>
+      <td><input type="number" min="0" step="0.01" class="mk-opcfg-p-adic" data-tipo="${tipo}" data-plano="${pl}" value="${c.adicional || ''}" placeholder="0"></td>
+    </tr>`;
+  }).join('');
+  panel.innerHTML = `<table class="mk-opcfg-precos-table">
+    <thead><tr><th>Plano</th><th>Valor R$</th><th>Minutos</th><th>Extra/min R$</th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table>`;
+}
+
+function opCfgRenderPreviewTabs_() {
+  const tabs = document.getElementById('mk-opcfg-prev-tabs');
+  if (!tabs) return;
+  tabs.innerHTML = OPCFG_TIPOS_.map(t =>
+    `<button type="button" class="mk-opcfg-prev-tab${t === opCfgPreviewTab_ ? ' sel' : ''}" onclick="opCfgSelectPreviewTab_('${t}')">${t}</button>`
+  ).join('');
+}
+
+function opCfgAtualizarPreview_() {
+  opCfgRenderPreviewTabs_();
+  const box = document.getElementById('mk-opcfg-preview');
+  if (!box) return;
+  const precos = opCfgCollectFromDom_(false).precos;
+  const tipo = opCfgPreviewTab_;
+  const plans = precos[tipo] || {};
+  const badgeCls = tipo === 'Pelúcia' ? 'pelucia' : '';
+  box.innerHTML = OPCFG_PLANOS_.map(pl => {
+    const v = plans[pl] || {};
+    const val = Number(v.valor || 0);
+    const mins = Number(v.mins || 0);
+    const adic = Number(v.adicional || 0);
+    if (!(val > 0) || !(mins > 0)) {
+      return `<div class="plano-btn ${badgeCls}" style="opacity:.45">
+        <div><div class="pb-nome">${PLANO_LABELS[pl] || pl}</div><div class="pb-det">incompleto</div></div>
+      </div>`;
+    }
+    return `<div class="plano-btn ${badgeCls}">
+      <div>
+        <div class="pb-nome">${PLANO_LABELS[pl] || pl}</div>
+        <div class="pb-det">${mins} min · R$ ${String(adic).replace('.', ',')}/min extra</div>
+      </div>
+      <div class="pb-val">R$ ${val}</div>
+    </div>`;
+  }).join('');
+  opCfgSyncTextareasFromVisual_();
+}
+
+function opCfgRenderEditor_() {
+  opCfgRenderVeiculos_();
+  opCfgRenderPrecosTabs_();
+  opCfgAtualizarPreview_();
+}
+
+function opCfgSelectPrecosTab_(tipo) {
+  opCfgSavePrecosPanelToDraft_();
+  opCfgEditorTab_ = tipo;
+  opCfgRenderPrecosTabs_();
+}
+
+function opCfgSelectPreviewTab_(tipo) {
+  opCfgPreviewTab_ = tipo;
+  opCfgAtualizarPreview_();
+}
+
+function opCfgAddVeiculo_() {
+  opCfgSavePrecosPanelToDraft_();
+  const veiculos = opCfgCollectVeiculosFromDom_();
+  const n = veiculos.length + 1;
+  const tipo = opCfgEditorTab_ || 'Carro';
+  const prefix = tipo === 'Triciclo' ? 'Triciclo' : (tipo === 'Pelúcia' ? 'Pelúcia' : 'Carro');
+  veiculos.push(prefix + ' ' + String(n).padStart(2, '0'));
+  opCfgRenderVeiculos_(veiculos);
+  opCfgSyncTextareasFromVisual_();
+}
+
+function opCfgRemoveVeiculo_(idx) {
+  opCfgSavePrecosPanelToDraft_();
+  const veiculos = opCfgCollectVeiculosFromDom_();
+  veiculos.splice(idx, 1);
+  opCfgRenderVeiculos_(veiculos);
+  opCfgSyncTextareasFromVisual_();
+}
+
+function opCfgLoadIntoEditor_(cfg) {
+  const veiculos = Array.isArray(cfg.veiculos_validos) ? cfg.veiculos_validos.slice() : [];
+  let precos = null;
+  if (cfg.precosFe) {
+    const gasPrecos = {};
+    Object.keys(cfg.precosFe).forEach(tipo => {
+      gasPrecos[tipo] = {};
+      Object.entries(cfg.precosFe[tipo] || {}).forEach(([plano, c]) => {
+        gasPrecos[tipo][plano] = { valor: c.v, mins: c.m, adicional: c.a };
+      });
+    });
+    precos = gasPrecos;
+  } else if (cfg.precos) {
+    precos = cfg.precos;
+  }
+  const taV = document.getElementById('mk-opcfg-veiculos-ta');
+  const taP = document.getElementById('mk-opcfg-precos-ta');
+  opCfgDraftPrecos_ = opCfgNormalizePrecos_(precos);
+  if (taV) taV.value = veiculos.join('\n');
+  if (taP) taP.value = JSON.stringify(opCfgDraftPrecos_, null, 2);
+  opCfgRenderVeiculos_(veiculos);
+  opCfgRenderPrecosTabs_();
+  opCfgAtualizarPreview_();
+}
+
+function opCfgCollectFromDom_(validate) {
+  opCfgSavePrecosPanelToDraft_();
+  const veiculos = opCfgCollectVeiculosFromDom_();
+  const precos = JSON.parse(JSON.stringify(opCfgDraftPrecosEnsure_()));
+  if (validate) {
+    if (!veiculos.length) throw new Error('Adicione pelo menos um veículo.');
+    const seen = {};
+    veiculos.forEach(v => {
+      if (seen[v]) throw new Error('Veículo duplicado: ' + v);
+      seen[v] = true;
+    });
+    let temPlano = false;
+    OPCFG_TIPOS_.forEach(tipo => {
+      OPCFG_PLANOS_.forEach(pl => {
+        const c = precos[tipo][pl];
+        if (c.valor > 0 && c.mins > 0) temPlano = true;
+        if ((c.valor > 0 || c.mins > 0 || c.adicional > 0) && !(c.valor > 0 && c.mins > 0)) {
+          throw new Error('Plano incompleto: ' + tipo + ' · ' + (PLANO_LABELS[pl] || pl));
+        }
+      });
+    });
+    if (!temPlano) throw new Error('Informe valor e minutos em pelo menos um plano.');
+  }
+  return { veiculos, precos };
+}
+
 async function carregarResumoOperacaoConfig_() {
   const fonte = document.getElementById('mk-opcfg-fonte');
   const veic = document.getElementById('mk-opcfg-veic');
@@ -6326,21 +6616,7 @@ async function carregarResumoOperacaoConfig_() {
     }
     if (isAdm) {
       const cfg = await api({ action: 'carregarOperacaoConfig' });
-      if (cfg && cfg.ok && cfg.config) {
-        const taV = document.getElementById('mk-opcfg-veiculos-ta');
-        const taP = document.getElementById('mk-opcfg-precos-ta');
-        if (taV && cfg.config.veiculos_validos) taV.value = cfg.config.veiculos_validos.join('\n');
-        if (taP && cfg.config.precosFe) {
-          const gasPrecos = {};
-          Object.keys(cfg.config.precosFe).forEach(tipo => {
-            gasPrecos[tipo] = {};
-            Object.entries(cfg.config.precosFe[tipo]).forEach(([plano, c]) => {
-              gasPrecos[tipo][plano] = { valor: c.v, mins: c.m, adicional: c.a };
-            });
-          });
-          taP.value = JSON.stringify(gasPrecos, null, 2);
-        }
-      }
+      if (cfg && cfg.ok && cfg.config) opCfgLoadIntoEditor_(cfg.config);
     }
   } catch (e) { console.warn('carregarResumoOperacaoConfig_', e); }
 }
@@ -6350,6 +6626,7 @@ function toggleEditorOperacaoConfig_() {
   if (!el) return;
   const open = el.style.display === 'none' || !el.style.display;
   el.style.display = open ? 'block' : 'none';
+  if (open) opCfgRenderEditor_();
 }
 
 async function salvarOperacaoConfigAdmin_() {
@@ -6357,14 +6634,23 @@ async function salvarOperacaoConfigAdmin_() {
     toast('Somente administrador pode alterar frota e preços', 'error');
     return;
   }
-  const taV = document.getElementById('mk-opcfg-veiculos-ta');
-  const taP = document.getElementById('mk-opcfg-precos-ta');
-  const veiculos = (taV && taV.value ? taV.value.split('\n') : []).map(v => v.trim()).filter(Boolean);
+  let veiculos = [];
   let precos = null;
+  const editorOpen = document.getElementById('mk-opcfg-editor')?.style.display !== 'none';
   try {
-    if (taP && taP.value.trim()) precos = JSON.parse(taP.value);
+    if (editorOpen) {
+      const data = opCfgCollectFromDom_(true);
+      veiculos = data.veiculos;
+      precos = data.precos;
+      opCfgSyncTextareasFromVisual_();
+    } else {
+      const taV = document.getElementById('mk-opcfg-veiculos-ta');
+      const taP = document.getElementById('mk-opcfg-precos-ta');
+      veiculos = (taV && taV.value ? taV.value.split('\n') : []).map(v => v.trim()).filter(Boolean);
+      if (taP && taP.value.trim()) precos = JSON.parse(taP.value);
+    }
   } catch (e) {
-    toast('JSON de preços inválido', 'error');
+    toast(e.message || 'Dados inválidos', 'error');
     return;
   }
   try {
@@ -8038,7 +8324,7 @@ async function salvarLancamentoAvulso() {
 }
 
 </script>
-<script src="mk-update.js?v=1.7.42"></script>
+<script src="mk-update.js?v=1.7.43"></script>
 <script src="mk-auth.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', () => {

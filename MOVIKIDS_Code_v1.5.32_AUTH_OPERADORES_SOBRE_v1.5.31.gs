@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.55
+// MOVI KIDS — Google Apps Script v1.5.56
+// v1.5.56: Pacote H — validacao schema frota/preços em salvarOperacaoConfigAdmin
 // v1.5.55: Portal — timestampCanonico + totalMins alinhados ao balcão (carregarInicio + buscarPortalResponsavel)
 // v1.5.54: Pacote G — rate limit buscarPortalResponsavel (por telefone + global)
 // v1.5.53: SMS — GENERIC_FAILURE do Android nao marca Failed definitivo; recheck + downgrade se passou Sent
@@ -327,9 +328,9 @@ function ping_() {
   const agora = new Date();
   return resp_({
     status:  'online',
-    versao:  'v1.5.55',
+    versao:  'v1.5.56',
     timestamp: fmtData_(agora) + ' ' + fmtHoraLocal_(agora),
-    sistema: 'MOVI KIDS v1.5.55',
+    sistema: 'MOVI KIDS v1.5.56',
     postWriteActions: WRITE_ACTIONS_CRITICAS_
   });
 }
@@ -1488,7 +1489,7 @@ function carregarInicio_(p) {
 
   const opCfg = operacaoConfig_();
   const resultado = resp_({
-    sistema:    'MOVI KIDS v1.5.55',
+    sistema:    'MOVI KIDS v1.5.56',
     timestamp:  dataHoje + ' ' + fmtHoraLocal_(hoje),
     ativos:     ativas,
     statsHoje,
@@ -2213,6 +2214,62 @@ function payloadOperacaoConfigFe_(cfg) {
   };
 }
 
+const OPCFG_PLANOS_SCHEMA_ = ['10min', '20min', '30min', '40min', '60min', '3h'];
+const OPCFG_TIPOS_SCHEMA_ = ['Carro', 'Triciclo', 'Pelúcia'];
+
+function validarVeiculosConfig_(veiculos) {
+  const erros = [];
+  if (!Array.isArray(veiculos) || !veiculos.length) {
+    erros.push('Lista de veiculos vazia');
+    return erros;
+  }
+  const seen = {};
+  veiculos.forEach((v, i) => {
+    const nome = String(v || '').trim();
+    if (!nome) {
+      erros.push('Veiculo ' + (i + 1) + ': nome vazio');
+      return;
+    }
+    if (seen[nome]) erros.push('Veiculo duplicado: ' + nome);
+    seen[nome] = true;
+    const tipoOk = nome.indexOf('Carro') >= 0 || nome.indexOf('Triciclo') >= 0 || nome.indexOf('Pel') >= 0;
+    if (!tipoOk) erros.push(nome + ': nome deve indicar Carro, Triciclo ou Pelucia');
+  });
+  return erros;
+}
+
+function validarPrecosConfig_(precos) {
+  const erros = [];
+  if (!precos || typeof precos !== 'object' || Array.isArray(precos)) {
+    erros.push('precos_json deve ser objeto');
+    return erros;
+  }
+  let temPlanoValido = false;
+  OPCFG_TIPOS_SCHEMA_.forEach(tipo => {
+    const plans = precos[tipo];
+    if (!plans) return;
+    if (typeof plans !== 'object' || Array.isArray(plans)) {
+      erros.push(tipo + ': planos invalidos');
+      return;
+    }
+    OPCFG_PLANOS_SCHEMA_.forEach(pl => {
+      const c = plans[pl];
+      if (!c) return;
+      const valor = Number(c.valor != null ? c.valor : c.v);
+      const mins = Number(c.mins != null ? c.mins : c.m);
+      const adic = Number(c.adicional != null ? c.adicional : c.a);
+      const parcial = (valor > 0 || mins > 0 || adic > 0);
+      if (!parcial) return;
+      if (!(valor > 0)) erros.push(tipo + ' · ' + pl + ': valor invalido');
+      if (!(mins > 0)) erros.push(tipo + ' · ' + pl + ': minutos invalidos');
+      if (adic < 0 || isNaN(adic)) erros.push(tipo + ' · ' + pl + ': adicional invalido');
+      if (valor > 0 && mins > 0) temPlanoValido = true;
+    });
+  });
+  if (!temPlanoValido) erros.push('Informe valor e minutos em pelo menos um plano');
+  return erros;
+}
+
 function cfgSetValue_(key, value) {
   const sheet = sh_getOrCreate_(SH_CFG);
   if (sheet.getLastRow() < 1) {
@@ -2257,11 +2314,13 @@ function salvarOperacaoConfigAdmin_(p) {
   if (veiculos !== null) {
     if (!Array.isArray(veiculos) || !veiculos.length) return err_('Lista de veiculos vazia', 400);
     const limpos = veiculos.map(v => String(v || '').trim()).filter(Boolean);
-    if (!limpos.length) return err_('Nenhum veiculo valido', 400);
+    const errosV = validarVeiculosConfig_(limpos);
+    if (errosV.length) return err_(errosV.join(' · '), 400);
     cfgSetValue_('veiculos_validos_json', JSON.stringify(limpos));
   }
   if (precos !== null) {
-    if (!precos || typeof precos !== 'object' || Array.isArray(precos)) return err_('precos_json deve ser objeto', 400);
+    const errosP = validarPrecosConfig_(precos);
+    if (errosP.length) return err_(errosP.join(' · '), 400);
     cfgSetValue_('precos_json', JSON.stringify(precos));
   }
   if (veiculos === null && precos === null) return err_('Informe veiculos_validos_json e/ou precos_json', 400);
