@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.54
+// MOVI KIDS — Google Apps Script v1.5.55
+// v1.5.55: Portal — timestampCanonico + totalMins alinhados ao balcão (carregarInicio + buscarPortalResponsavel)
 // v1.5.54: Pacote G — rate limit buscarPortalResponsavel (por telefone + global)
 // v1.5.53: SMS — GENERIC_FAILURE do Android nao marca Failed definitivo; recheck + downgrade se passou Sent
 // v1.5.52: Fase 9 em pausa — operador logado volta a editar/cancelar locacao (supervisor nao restringe balcao)
@@ -326,9 +327,9 @@ function ping_() {
   const agora = new Date();
   return resp_({
     status:  'online',
-    versao:  'v1.5.53',
+    versao:  'v1.5.55',
     timestamp: fmtData_(agora) + ' ' + fmtHoraLocal_(agora),
-    sistema: 'MOVI KIDS v1.5.53',
+    sistema: 'MOVI KIDS v1.5.55',
     postWriteActions: WRITE_ACTIONS_CRITICAS_
   });
 }
@@ -1407,7 +1408,9 @@ function carregarInicio_(p) {
         const tipo  = String(r[4]);
         const plano = String(r[5]);
         const cfg   = planoCfgOp_(tipo, plano) || {};
-        const ts    = status === 'Ativa' ? timestampCanonico_(r[1], r[2], r[24]) : 0;
+        const minContrat = Number(r[6] || 0);
+        const extMins    = Number(r[25] || 0);
+        const ts         = status === 'Ativa' ? timestampCanonico_(r[1], r[2], r[24]) : 0;
         const ativaObj = {
           rowIndex:        DATA_ROW + idx,
           id:              r[0],
@@ -1419,7 +1422,9 @@ function carregarInicio_(p) {
           plano,
           veiculo,
           pagamento,
-          mins:            Number(r[6]),
+          mins:            minContrat + extMins,
+          originalMins:    minContrat,
+          extendedMins:    extMins,
           responsavel:     String(r[11]),
           crianca:         String(r[12]),
           telefone:        String(r[13]),
@@ -1483,7 +1488,7 @@ function carregarInicio_(p) {
 
   const opCfg = operacaoConfig_();
   const resultado = resp_({
-    sistema:    'MOVI KIDS v1.5.53',
+    sistema:    'MOVI KIDS v1.5.55',
     timestamp:  dataHoje + ' ' + fmtHoraLocal_(hoje),
     ativos:     ativas,
     statsHoje,
@@ -2363,6 +2368,9 @@ function buscarPortalResponsavel_(p) {
       const tipo = String(r[4] || '');
       const plano = String(r[5] || '');
       const cfg = planoCfgOp_(tipo, plano) || {};
+      const minContrat = Number(r[6] || 0);
+      const extendedMins = Number(r[25] || 0);
+      const ts = status === 'Ativa' ? timestampCanonico_(r[1], r[2], r[24]) : 0;
       locacoes.push({
         rowIndex: DATA_ROW + idx,
         id: r[0],
@@ -2371,7 +2379,8 @@ function buscarPortalResponsavel_(p) {
         horaFim: cellToStr_(r[3]),
         tipo,
         plano,
-        mins: Number(r[6] || 0),
+        mins: minContrat + extendedMins,
+        originalMins: minContrat,
         valorPlano: Number(r[7] || 0),
         adicionalPorMin: cfg.adicional || 0,
         valorTotal: Number(r[10] || 0),
@@ -2380,8 +2389,8 @@ function buscarPortalResponsavel_(p) {
         status,
         veiculo: String(r[15] || ''),
         pagamento: String(r[16] || ''),
-        startTimestamp: Number(r[24] || 0),
-        extendedMins: Number(r[25] || 0),
+        startTimestamp: ts,
+        extendedMins,
         extendedValor: Number(r[26] || 0)
       });
     });
