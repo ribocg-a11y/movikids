@@ -163,13 +163,18 @@
     el.textContent = 'Sessão ativa no balcão: ' + sessao.nome + '. Use o botão abaixo para liberar se precisar.';
   }
 
-  function applySessaoAtivaFromApi_(d) {
-    sessaoAtivaRemota = (d && d.sessaoAtiva) ? d.sessaoAtiva : null;
+  /** Atualiza banner, login lock e rodapé (sb-sessao) de uma vez. */
+  function mkAuthSyncSessaoBalcaoUI_(sessao) {
+    sessaoAtivaRemota = sessao && sessao.nome ? sessao : null;
     updateSessaoLockUI_();
     updateOperadoresSessaoBanner_(sessaoAtivaRemota);
     if (typeof atualizarOperadorUI_ === 'function') {
       atualizarOperadorUI_(sessaoAtivaRemota);
     }
+  }
+
+  function applySessaoAtivaFromApi_(d) {
+    mkAuthSyncSessaoBalcaoUI_((d && d.sessaoAtiva) ? d.sessaoAtiva : null);
   }
 
   window.mkAuthGetSessaoServidor_ = function mkAuthGetSessaoServidor_() {
@@ -741,9 +746,7 @@
         alert(msg);
         return;
       }
-      sessaoAtivaRemota = null;
-      updateSessaoLockUI_();
-      updateOperadoresSessaoBanner_(null);
+      mkAuthSyncSessaoBalcaoUI_(null);
       toast(d.mensagem || 'Sessao do balcao liberada', 'success');
       if (typeof refreshOperadoresAdmin_ === 'function') await refreshOperadoresAdmin_();
     } catch (e) {
@@ -771,12 +774,10 @@
           toast((d && d.erro) || (d2 && d2.erro) || 'Erro', 'error');
           return;
         }
-        sessaoAtivaRemota = null;
-        updateOperadoresSessaoBanner_(null);
+        mkAuthSyncSessaoBalcaoUI_(d2.sessaoAtiva || null);
         toast(d2.mensagem || 'Sessao liberada', 'success');
       } else {
-        sessaoAtivaRemota = null;
-        updateOperadoresSessaoBanner_(null);
+        mkAuthSyncSessaoBalcaoUI_(d.sessaoAtiva || null);
         toast(d.mensagem || 'Operador deslogado do balcao', 'success');
       }
       if (typeof refreshOperadoresAdmin_ === 'function') await refreshOperadoresAdmin_();
