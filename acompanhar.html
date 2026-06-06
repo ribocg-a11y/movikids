@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="mk-design.css?v=1.7.42">
+<link rel="stylesheet" href="mk-design.css?v=1.7.43">
 </head>
 <body class="mk-portal-page" data-view="gate">
 
@@ -62,6 +62,22 @@ function tipoIcon(tipo) {
   if (String(tipo).indexOf('Triciclo') >= 0) return '🛺';
   if (String(tipo).indexOf('Pel') >= 0) return '🧸';
   return '🚗';
+}
+const PLAN_LABELS = { '10min': '10 min', '20min': '20 min', '30min': '30 min', '40min': '40 min', '60min': '1 hora', '3h': '3 horas' };
+function planoLabel_(plano) {
+  return PLAN_LABELS[plano] || String(plano || '').replace('min', ' min');
+}
+function infoBasicaHtml_(l) {
+  const plano = planoLabel_(l.plano);
+  const ext = Number(l.extendedMins || 0);
+  const planoTxt = ext > 0 ? plano + ' +' + ext + ' min' : plano;
+  const veic = esc(l.veiculo || l.tipo || '—');
+  const st = esc(l.status || '—');
+  return `<div class="mk-portal-info">
+    <div class="mk-portal-info-row"><span>Plano contratado</span><strong>${planoTxt}</strong></div>
+    <div class="mk-portal-info-row"><span>Veículo</span><strong>${veic}</strong></div>
+    <div class="mk-portal-info-row"><span>Status</span><strong>${st}</strong></div>
+  </div>`;
 }
 function inicioMs(l) {
   return Number(l.startTimestamp || 0) > 0 ? Number(l.startTimestamp) : 0;
@@ -150,6 +166,7 @@ function render() {
           <b class="mk-portal-ring-time" id="tempo-${i}">${timeTxt}</b>
         </div>
       </div>
+      ${infoBasicaHtml_(l)}
       ${extra ? '<p class="mk-portal-play-msg">Hora de buscar no balcão 🏃</p>' : ''}
       ${pend ? '<p class="mk-portal-play-msg">Preparando o veículo…</p>' : ''}
     </article>`;
