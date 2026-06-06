@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="mk-design.css?v=1.7.44">
+<link rel="stylesheet" href="mk-design.css?v=1.7.45">
 </head>
 <body class="mk-portal-page" data-view="gate">
 
@@ -79,18 +79,48 @@ function infoBasicaHtml_(l) {
     <div class="mk-portal-info-row"><span>Status</span><strong>${st}</strong></div>
   </div>`;
 }
-function inicioMs(l) {
-  return Number(l.startTimestamp || 0) > 0 ? Number(l.startTimestamp) : 0;
+/** Mesma lógica do balcão (mergeSessaoCanonica + calcStartTimestamp). */
+function calcStartTimestamp_(data, horaInicio) {
+  if (!data || !horaInicio) return 0;
+  const dp = String(data).split('/');
+  const hp = String(horaInicio).split(':');
+  if (dp.length < 3 || hp.length < 2) return 0;
+  const d = new Date(
+    parseInt(dp[2], 10),
+    parseInt(dp[1], 10) - 1,
+    parseInt(dp[0], 10),
+    parseInt(hp[0], 10),
+    parseInt(hp[1], 10),
+    0
+  );
+  const out = d.getTime();
+  return isNaN(out) ? 0 : out;
+}
+function canonLoc_(l) {
+  const status = String(l.status || '').trim();
+  let startTimestamp = Number(l.startTimestamp || 0);
+  const nowTs = Date.now();
+  if (status === 'Pendente') {
+    startTimestamp = 0;
+  } else if (status === 'Ativa' && ((!startTimestamp || startTimestamp < 1e12) || startTimestamp > nowTs + 300000)) {
+    startTimestamp = calcStartTimestamp_(l.data, l.horaInicio);
+  }
+  const extendedMins = Number(l.extendedMins || 0);
+  const originalMins = l.originalMins != null ? Number(l.originalMins) : Math.max(0, Number(l.mins || 0) - extendedMins);
+  const totalMins = l.originalMins != null ? originalMins + extendedMins : Number(l.mins || 0);
+  return Object.assign({}, l, { status, startTimestamp, mins: totalMins, originalMins, extendedMins });
 }
 function totalMins(l) {
-  return Number(l.mins || 0) + Number(l.extendedMins || 0);
+  return canonLoc_(l).mins;
 }
 function restante(l) {
-  const total = totalMins(l);
-  if (l.status === 'Pendente') return total * 60;
-  const ini = inicioMs(l);
-  if (!ini) return total * 60;
-  return (total * 60) - Math.floor((Date.now() - ini) / 1000);
+  const c = canonLoc_(l);
+  if (c.status === 'Pendente') return c.mins * 60;
+  if (!c.startTimestamp || c.startTimestamp < 1e12 || c.startTimestamp > Date.now() + 300000) {
+    return c.mins * 60;
+  }
+  const elapsed = (Date.now() - c.startTimestamp) / 1000;
+  return Math.floor(c.mins * 60 - elapsed);
 }
 /** Arco visível no sentido horário a partir do topo (12h). */
 function ringDash_(rem, totalSec, extra) {
@@ -225,14 +255,17 @@ function iniciarAutoRefresh(tel) {
       if (!d.ok) return;
       const novas = d.locacoes || [];
       const mudou = novas.length !== locacoes.length ||
-        novas.some((l, i) => !locacoes[i] || l.status !== locacoes[i].status ||
-          Number(l.extendedMins || 0) !== Number((locacoes[i] || {}).extendedMins || 0));
-      if (mudou) {
-        locacoes = novas;
-        render();
-      }
+        novas.some((l, i) => {
+          const ant = locacoes[i] || {};
+          return l.status !== ant.status ||
+            Number(l.extendedMins || 0) !== Number(ant.extendedMins || 0) ||
+            Number(l.startTimestamp || 0) !== Number(ant.startTimestamp || 0) ||
+            Number(l.mins || 0) !== Number(ant.mins || 0);
+        });
+      locacoes = novas;
+      if (mudou) render();
     } catch (e) {}
-  }, 30000);
+  }, 15000);
 }
 
 function applyDeepLink_() {
