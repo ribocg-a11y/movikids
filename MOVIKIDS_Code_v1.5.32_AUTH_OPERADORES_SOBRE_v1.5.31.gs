@@ -1,6 +1,7 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.58
-// v1.5.58: buscarKPIsAdmin — fatAno/nAno (faturamento acumulado jan–mês do ano)
+// MOVI KIDS — Google Apps Script v1.5.59
+// v1.5.59: buscarKPIsAdmin — fatAno/nAno = faturamento acumulado do ano civil inteiro
+// v1.5.58: buscarKPIsAdmin — fatAno/nAno (primeira versão; recorte jan–mês — substituída)
 // v1.5.57: Pacote K.1 — importarResponsaveisAdmin (LOCACOES -> RESPONSAVEIS, dryRun)
 // v1.5.56: Pacote H — validacao schema frota/preços em salvarOperacaoConfigAdmin
 // v1.5.55: Portal — timestampCanonico + totalMins alinhados ao balcão (carregarInicio + buscarPortalResponsavel)
@@ -331,9 +332,9 @@ function ping_() {
   const agora = new Date();
   return resp_({
     status:  'online',
-    versao:  'v1.5.58',
+    versao:  'v1.5.59',
     timestamp: fmtData_(agora) + ' ' + fmtHoraLocal_(agora),
-    sistema: 'MOVI KIDS v1.5.58',
+    sistema: 'MOVI KIDS v1.5.59',
     postWriteActions: WRITE_ACTIONS_CRITICAS_
   });
 }
@@ -1248,7 +1249,7 @@ function buscarKPIsAdmin_(p) {
 
       const anoR = parseInt(pts[2], 10);
       const mesR = parseInt(pts[1], 10);
-      if (anoR === anoAtual && mesR >= 1 && mesR <= mesAtual) {
+      if (anoR === anoAtual) {
         fatAno += vt;
         nAno++;
       }
@@ -1501,7 +1502,7 @@ function carregarInicio_(p) {
 
   const opCfg = operacaoConfig_();
   const resultado = resp_({
-    sistema:    'MOVI KIDS v1.5.58',
+    sistema:    'MOVI KIDS v1.5.59',
     timestamp:  dataHoje + ' ' + fmtHoraLocal_(hoje),
     ativos:     ativas,
     statsHoje,

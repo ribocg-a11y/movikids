@@ -69,13 +69,13 @@
   } catch(e) {}
 })();
 </script>
-<script src="mk-version.js?v=1.7.53"></script>
+<script src="mk-version.js?v=1.7.54"></script>
 <link rel="stylesheet" href="mk-design.css">
 
 <script>
 // ── CACHE BUSTER — alinhado a mk-version.js / APP_VERSION ──
 (function(){
-  const CURRENT = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.53';
+  const CURRENT = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.54';
   const KEY = 'mk_loaded_version';
   function mkVerParts_(v) {
     return String(v || '0.0').split('.').map(function(n) { return parseInt(n, 10) || 0; });
@@ -2904,7 +2904,7 @@ header{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.53';
+const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.54';
 const WEBAPP_URL = (typeof window !== 'undefined' && window.MK_GAS_EXEC_URL) ? window.MK_GAS_EXEC_URL
   : 'https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec';
 const WEBAPP_URL_DEAD_PREFIX = 'AKfycbzc';
@@ -6861,10 +6861,9 @@ function renderCharts(d) {
 
   // KPIs
   const ticket = d.nMes > 0 ? d.fatMes / d.nMes : 0;
-  const mesNome = (d.mesAtual && MESES_DB[d.mesAtual - 1]) ? MESES_DB[d.mesAtual - 1].toLowerCase() : '';
   if (d.fatAno != null) {
     setText2('nk-fatano', R2(d.fatAno));
-    setText2('nk-fatano-sub', (d.nAno || 0) + ' locações · acum. jan–' + mesNome + '/' + (d.anoAtual || ''));
+    setText2('nk-fatano-sub', (d.nAno || 0) + ' locações em ' + (d.anoAtual || ''));
   } else {
     setText2('nk-fatano', '—');
     setText2('nk-fatano-sub', 'atualize o GAS para ver o acumulado');
@@ -8382,8 +8381,8 @@ async function salvarLancamentoAvulso() {
 }
 
 </script>
-<script src="mk-update.js?v=1.7.53"></script>
-<script src="mk-auth.js?v=1.7.53"></script>
+<script src="mk-update.js?v=1.7.54"></script>
+<script src="mk-auth.js?v=1.7.54"></script>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
   if (typeof mkAuthBoot === 'function') {
