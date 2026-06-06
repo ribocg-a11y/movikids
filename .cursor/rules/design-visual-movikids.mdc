@@ -39,6 +39,12 @@ O portal conquistou responsáveis: visual **profissional, agradável, amigável*
 - [ ] Hierarquia visual óbvia (teste “olho fechado”)?
 - [ ] Alinhado a `mk-design.css` e referência `acompanhar.html`?
 
+## PWA (ícone na tela) — sessão e atualização
+
+- App instalado **não é navegador**: persiste `localStorage` 24h (`mk_auth_session_persist_v1`) — pode gerar **acesso fantasma** se servidor liberou e tablet não soube.
+- Sempre reconciliar tablet × GAS (`mkAuthReconcileSessaoFantasma_`); chip **Turno** visível no header mobile.
+- PWA: `verificarNovaVersao` mais frequente; anti-stale no boot; SW `skipWaiting` + reload.
+
 ## Não fazer
 
 - Tabelas cruas onde um card/carrossel comunica melhor

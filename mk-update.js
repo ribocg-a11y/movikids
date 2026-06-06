@@ -3,9 +3,19 @@
   const PERSIST_KEY = 'mk_auth_session_persist_v1';
   const PERSIST_AT = 'mk_auth_session_persist_at';
   const PERSIST_TTL_MS = 24 * 60 * 60 * 1000;
-  const CHECK_MS = 45000;
-  const ACTIVE_TIMER_DELAY_MS = 30000;
-  const IDLE_DELAY_MS = 5000;
+  function isStandalonePwa_() {
+    try {
+      return window.matchMedia('(display-mode: standalone)').matches
+        || window.navigator.standalone === true
+        || (document.referrer && document.referrer.indexOf('android-app://') >= 0);
+    } catch (e) {
+      return false;
+    }
+  }
+  const IS_PWA = isStandalonePwa_();
+  const CHECK_MS = IS_PWA ? 25000 : 45000;
+  const ACTIVE_TIMER_DELAY_MS = IS_PWA ? 20000 : 30000;
+  const IDLE_DELAY_MS = IS_PWA ? 1500 : 5000;
   let _updateBusy = false;
   let _updateScheduled = false;
 
@@ -120,6 +130,8 @@
     }, delayMs);
   }
 
+  window.mkIsStandalonePwa_ = isStandalonePwa_;
+
   window.verificarNovaVersao = async function verificarNovaVersao() {
     if (_updateBusy || _updateScheduled || document.visibilityState === 'hidden') return;
     const localVer = (typeof APP_VERSION !== 'undefined' && APP_VERSION)
@@ -146,6 +158,11 @@
       verificarNovaVersao();
     }
   });
-  setTimeout(verificarNovaVersao, 8000);
+  setTimeout(verificarNovaVersao, IS_PWA ? 3000 : 8000);
   setInterval(verificarNovaVersao, CHECK_MS);
+  if (IS_PWA && typeof document !== 'undefined') {
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') verificarNovaVersao();
+    });
+  }
 })();

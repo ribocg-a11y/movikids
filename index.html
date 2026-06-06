@@ -69,13 +69,13 @@
   } catch(e) {}
 })();
 </script>
-<script src="mk-version.js?v=1.7.47"></script>
+<script src="mk-version.js?v=1.7.48"></script>
 <link rel="stylesheet" href="mk-design.css">
 
 <script>
 // ── CACHE BUSTER — alinhado a mk-version.js / APP_VERSION ──
 (function(){
-  const CURRENT = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.47';
+  const CURRENT = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.48';
   const KEY = 'mk_loaded_version';
   function mkVerParts_(v) {
     return String(v || '0.0').split('.').map(function(n) { return parseInt(n, 10) || 0; });
@@ -230,6 +230,15 @@ header{
 .logo{font-family:'Fredoka One',cursive;font-size:24px;color:#fff;letter-spacing:1px;line-height:1}
 .logo span{color:#FFD54F}
 .hd-status{display:flex;align-items:center;gap:6px;font-size:12px;color:rgba(255,255,255,.8)}
+.hd-turno-chip{
+  margin-top:8px;padding:7px 12px;border-radius:12px;
+  font-size:12px;font-weight:800;text-align:center;line-height:1.3;
+  border:1px solid rgba(255,255,255,.25);
+}
+.hd-turno-chip.is-ok{background:rgba(255,213,79,.22);color:#FFF8E1;border-color:rgba(255,213,79,.45)}
+.hd-turno-chip.is-admin{background:rgba(255,255,255,.14);color:#fff}
+.hd-turno-chip.is-ghost{background:rgba(255,138,101,.35);color:#fff;border-color:rgba(255,138,101,.55);animation:mk-ghost-pulse 1.4s ease-in-out infinite}
+@keyframes mk-ghost-pulse{0%,100%{opacity:1}50%{opacity:.82}}
 .dot-online{width:7px;height:7px;border-radius:50%;background:#69F0AE;animation:pulse-g 2s infinite}
 @keyframes pulse-g{0%,100%{opacity:1}50%{opacity:.4}}
 .dot-offline{background:#EF9A9A;animation:none}
@@ -1759,6 +1768,7 @@ header{
         <span id="app-version" style="font-size:10px;opacity:.85;margin-left:4px;font-family:monospace">v1.7.26</span>
       </div>
     </div>
+    <div id="hd-turno-chip" class="hd-turno-chip" hidden role="status" aria-live="polite"></div>
   </header>
 
   <!-- Nav mobile: atalhos + menu completo na sidebar -->
@@ -2885,7 +2895,7 @@ header{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.47';
+const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.48';
 const WEBAPP_URL = (typeof window !== 'undefined' && window.MK_GAS_EXEC_URL) ? window.MK_GAS_EXEC_URL
   : 'https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec';
 const WEBAPP_URL_DEAD_PREFIX = 'AKfycbzc';
@@ -3108,6 +3118,29 @@ function atualizarOperadorUI_(sessaoServidor) {
   if (sairBtn && (temBalcao || temTablet)) {
     sairBtn.hidden = false;
     sairBtn.textContent = isAdm ? 'Sair do admin' : 'Encerrar turno';
+  }
+
+  const chip = document.getElementById('hd-turno-chip');
+  if (chip) {
+    if (!logadoTablet) {
+      chip.hidden = true;
+      chip.textContent = '';
+    } else if (isAdm) {
+      chip.hidden = false;
+      chip.className = 'hd-turno-chip is-admin';
+      chip.textContent = temBalcao
+        ? ('Admin · balcão: ' + srv.nome)
+        : 'Admin neste aparelho · sem turno no balcão';
+    } else {
+      const localId = Number(s.id);
+      const srvId = srv && srv.operadorId ? Number(srv.operadorId) : 0;
+      const synced = srvId && srvId === localId;
+      chip.hidden = false;
+      chip.className = 'hd-turno-chip ' + (synced ? 'is-ok' : 'is-ghost');
+      chip.textContent = synced
+        ? ('Turno: ' + s.nome + (srv && fmtHoraTurno_(srv.loggedAt) ? ' · desde ' + fmtHoraTurno_(srv.loggedAt) : ''))
+        : ('Turno inválido — ' + s.nome + ' não está no servidor. Faça login de novo.');
+    }
   }
 }
 window.atualizarOperadorUI_ = atualizarOperadorUI_;
@@ -8330,8 +8363,8 @@ async function salvarLancamentoAvulso() {
 }
 
 </script>
-<script src="mk-update.js?v=1.7.47"></script>
-<script src="mk-auth.js?v=1.7.47"></script>
+<script src="mk-update.js?v=1.7.48"></script>
+<script src="mk-auth.js?v=1.7.48"></script>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
   if (typeof mkAuthBoot === 'function') {

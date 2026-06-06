@@ -102,6 +102,11 @@ try {
     } else {
       Add-Check "guard.idle.locacao" "ok" "idle bloqueado com locacao aberta"
     }
+    if ($authRaw -notmatch 'mkAuthReconcileSessaoFantasma_') {
+      Add-Check "guard.auth.fantasma" "fail" "mkAuthReconcileSessaoFantasma_ ausente (PWA sessao fantasma)"
+    } else {
+      Add-Check "guard.auth.fantasma" "ok" "reconcile sessao tablet x servidor"
+    }
   } else {
     Add-Check "guard.idle.locacao" "fail" "mk-auth.js ausente"
   }

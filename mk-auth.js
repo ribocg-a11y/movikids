@@ -205,12 +205,41 @@
   };
 
   let _turnoPollBusy = false;
+  let _reconcileBusy = false;
+
+  /** Operador local sem sessão correspondente no GAS = acesso fantasma (comum em PWA após liberar no servidor). */
+  async function mkAuthReconcileSessaoFantasma_(d) {
+    if (_reconcileBusy) return false;
+    const s = getSession();
+    if (!s || !s.nome) return false;
+    if (s.role === 'admin' || s.id === 'ADMIN' || mkAuthIsAdmin()) return false;
+    if (!d || !d.ok) return false;
+
+    const srv = d.sessaoAtiva;
+    const localId = Number(s.id);
+    const srvId = srv && srv.operadorId ? Number(srv.operadorId) : 0;
+    const fantasma = !srvId || srvId !== localId;
+    if (!fantasma) return false;
+
+    _reconcileBusy = true;
+    try {
+      await trocarOperador('fantasma');
+      return true;
+    } finally {
+      _reconcileBusy = false;
+    }
+  }
+  window.mkAuthReconcileSessaoFantasma_ = mkAuthReconcileSessaoFantasma_;
+
   window.mkAuthRefreshSessaoTurno_ = async function mkAuthRefreshSessaoTurno_() {
     if (!mkAuthIsLoggedIn() || _turnoPollBusy) return;
     _turnoPollBusy = true;
     try {
       const d = await apiCall({ action: 'listarOperadoresLogin' }, 20000);
-      if (d && d.ok) applySessaoAtivaFromApi_(d);
+      if (d && d.ok) {
+        const kicked = await mkAuthReconcileSessaoFantasma_(d);
+        if (!kicked) applySessaoAtivaFromApi_(d);
+      }
     } catch (e) { /* offline */ }
     finally { _turnoPollBusy = false; }
   };
@@ -233,7 +262,9 @@
     try { await loadOperadores(); } catch (e) { /* ignore */ }
     const msg = motivo === 'inatividade'
       ? 'Sessão encerrada: 1 hora sem atividade. Faça login novamente.'
-      : 'Sessão encerrada. Faça login novamente.';
+      : motivo === 'fantasma'
+        ? 'Turno neste aparelho não confere com o servidor. Faça login de novo.'
+        : 'Sessão encerrada. Faça login novamente.';
     toast(msg, 'warning');
   };
 
@@ -253,13 +284,17 @@
   function initAuthIdleWatch_() {
     if (window._mkAuthIdleWired) return;
     window._mkAuthIdleWired = true;
-    ['click', 'keydown', 'touchstart', 'scroll', 'mousemove'].forEach(ev => {
+    ['click', 'keydown', 'touchstart', 'scroll'].forEach(ev => {
       document.addEventListener(ev, () => {
         if (mkAuthIsLoggedIn()) touchAuthActivity_();
       }, { passive: true });
     });
     document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'visible') checkAuthIdle_();
+      if (document.visibilityState === 'visible') {
+        checkAuthIdle_();
+        mkAuthRefreshSessaoTurno_();
+        if (typeof verificarNovaVersao === 'function') verificarNovaVersao();
+      }
     });
     setInterval(checkAuthIdle_, 60000);
   }
@@ -711,6 +746,12 @@
         toast('Sessão expirada (1h sem uso). Faça login novamente.', 'warning');
         return;
       }
+      let bootOps = null;
+      try {
+        bootOps = await (window.__mkLoginOpsPromise || apiCall({ action: 'listarOperadoresLogin' }, 30000));
+      } catch (e) { /* offline */ }
+      if (bootOps && bootOps.ok && await mkAuthReconcileSessaoFantasma_(bootOps)) return;
+      if (bootOps && bootOps.ok) applySessaoAtivaFromApi_(bootOps);
       touchAuthActivity_();
       if (splash) {
         splash.classList.add('hide');
