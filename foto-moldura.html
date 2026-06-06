@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="mk-design.css?v=1.7.57">
+<link rel="stylesheet" href="mk-design.css?v=1.7.58">
 </head>
 <body class="mk-portal-page mk-frame-page" data-step="start">
 
@@ -20,9 +20,19 @@
   <p class="mk-frame-sub" id="frame-subtitle">Sua foto na moldura Movi Kids</p>
 
   <div class="mk-frame-card" id="frame-card">
+    <div class="mk-frame-deco" aria-hidden="true">
+      <span class="mk-frame-sticker s1">⭐</span>
+      <span class="mk-frame-sticker s2">✨</span>
+      <span class="mk-frame-sticker s3">🚗</span>
+      <span class="mk-frame-sticker s4">🧸</span>
+      <span class="mk-frame-sticker s5">🌟</span>
+      <span class="mk-frame-sticker s6">🎉</span>
+      <span class="mk-frame-sticker s7">⭐</span>
+      <span class="mk-frame-sticker s8">🛺</span>
+    </div>
     <div class="mk-frame-top">
-      <span class="mk-frame-top-title">Movi Kids</span>
-      <span class="mk-frame-top-sub">Diversão com segurança</span>
+      <span class="mk-frame-top-title">Movi <span>Kids</span></span>
+      <span class="mk-frame-top-ribbon">Diversão com segurança</span>
     </div>
     <div class="mk-frame-slot">
       <div class="mk-frame-placeholder" aria-hidden="true">📸</div>
@@ -30,7 +40,7 @@
       <img id="frame-result" alt="Sua foto na moldura Movi Kids">
     </div>
     <div class="mk-frame-bottom">
-      <span class="mk-frame-bottom-ig">@movikidsslz</span>
+      <span class="mk-frame-bottom-pill">📸 @movikidsslz</span>
       <span class="mk-frame-bottom-loc">Golden Shopping Calhau</span>
     </div>
   </div>
@@ -95,37 +105,95 @@ function roundRect_(c, x, y, w, h, r) {
   c.closePath();
 }
 
+function drawConfetti_(ctx) {
+  const dots = [
+    [70, 320, '#FFD54F', 14], [55, 520, '#4fc3f7', 10], [88, 720, '#ec407a', 12],
+    [1000, 380, '#66bb6a', 11], [1010, 580, '#FFD54F', 13], [985, 780, '#ab47bc', 10],
+    [200, 1120, '#4fc3f7', 9], [880, 1100, '#ff8a65', 11], [540, 1280, '#FFD54F', 8]
+  ];
+  dots.forEach(([x, y, c, r]) => {
+    ctx.fillStyle = c;
+    ctx.globalAlpha = 0.85;
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+    ctx.fill();
+  });
+  ctx.globalAlpha = 1;
+  const stickers = [
+    [95, 215, '⭐', 44], [990, 340, '🚗', 40], [78, 650, '🧸', 38],
+    [1005, 720, '✨', 36], [120, 1080, '🌟', 34], [960, 1050, '🎉', 40]
+  ];
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  stickers.forEach(([x, y, ch, sz]) => {
+    ctx.font = sz + 'px sans-serif';
+    ctx.fillText(ch, x, y);
+  });
+}
+
 function drawMoldura_(nome) {
   const g = ctx.createLinearGradient(0, 0, 0, OUT_H);
   g.addColorStop(0, '#1a237e');
-  g.addColorStop(0.5, '#3949ab');
+  g.addColorStop(0.45, '#5c6bc0');
   g.addColorStop(1, '#1565c0');
   ctx.fillStyle = g;
   ctx.fillRect(0, 0, OUT_W, 250);
   ctx.fillRect(0, 1070, OUT_W, 280);
   ctx.fillRect(0, 250, 130, 820);
   ctx.fillRect(950, 250, 130, 820);
+  drawConfetti_(ctx);
+  ctx.strokeStyle = '#ec407a';
+  ctx.lineWidth = 14;
+  roundRect_(ctx, 114, 234, 852, 852, 38);
+  ctx.stroke();
   ctx.strokeStyle = '#FFD54F';
-  ctx.lineWidth = 10;
+  ctx.lineWidth = 8;
   roundRect_(ctx, 122, 242, 836, 836, 34);
   ctx.stroke();
-  ctx.textAlign = 'center';
-  ctx.fillStyle = '#FFD54F';
-  ctx.font = 'bold 68px Fredoka One, Arial Rounded MT Bold, sans-serif';
-  ctx.fillText('Movi Kids', OUT_W / 2, 108);
-  ctx.fillStyle = '#e3f2fd';
-  ctx.font = 'bold 26px Nunito, sans-serif';
-  ctx.fillText('Diversão com segurança', OUT_W / 2, 165);
+  ctx.font = 'bold 72px Fredoka One, Arial Rounded MT Bold, sans-serif';
+  const partM = 'Movi ';
+  const partK = 'Kids';
+  const titleW = ctx.measureText(partM).width + ctx.measureText(partK).width;
+  let tx = (OUT_W - titleW) / 2;
+  ctx.textAlign = 'left';
   ctx.fillStyle = '#fff';
-  ctx.font = 'bold 30px Nunito, sans-serif';
-  ctx.fillText('@movikidsslz', OUT_W / 2, 1155);
+  ctx.fillText(partM, tx, 100);
+  ctx.fillStyle = '#FFD54F';
+  ctx.fillText(partK, tx + ctx.measureText(partM).width, 100);
+  ctx.textAlign = 'center';
+  ctx.font = 'bold 48px sans-serif';
+  ctx.fillText('✨', tx - 50, 98);
+  ctx.fillText('✨', tx + titleW + 20, 98);
+  const rw = 420;
+  const rh = 44;
+  const rx = (OUT_W - rw) / 2;
+  const ry = 128;
+  ctx.fillStyle = 'rgba(236, 64, 122, 0.92)';
+  roundRect_(ctx, rx, ry, rw, rh, 22);
+  ctx.fill();
+  ctx.fillStyle = '#fff';
+  ctx.font = 'bold 24px Nunito, sans-serif';
+  ctx.fillText('Diversão com segurança', OUT_W / 2, ry + 30);
+  const pw = 340;
+  const ph = 48;
+  const px = (OUT_W - pw) / 2;
+  const py = 1118;
+  ctx.fillStyle = 'rgba(41, 182, 246, 0.95)';
+  roundRect_(ctx, px, py, pw, ph, 24);
+  ctx.fill();
+  ctx.fillStyle = '#fff';
+  ctx.font = 'bold 28px Nunito, sans-serif';
+  ctx.fillText('📸 @movikidsslz', OUT_W / 2, py + 32);
   ctx.fillStyle = '#90caf9';
   ctx.font = 'bold 22px Nunito, sans-serif';
   ctx.fillText('Golden Shopping Calhau', OUT_W / 2, 1210);
   if (nome) {
     ctx.font = 'bold 34px Nunito, sans-serif';
-    ctx.fillStyle = 'rgba(255,255,255,0.95)';
-    ctx.fillText(String(nome).trim().slice(0, 28), OUT_W / 2, PHOTO.y + PHOTO.h - 40);
+    ctx.fillStyle = 'rgba(255,255,255,0.96)';
+    ctx.shadowColor = 'rgba(0,0,0,0.45)';
+    ctx.shadowBlur = 6;
+    ctx.fillText(String(nome).trim().slice(0, 28), OUT_W / 2, PHOTO.y + PHOTO.h - 44);
+    ctx.shadowBlur = 0;
   }
 }
 
