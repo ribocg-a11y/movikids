@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="mk-design.css?v=1.7.52">
+<link rel="stylesheet" href="mk-design.css?v=1.7.55">
 </head>
 <body class="mk-portal-page" data-view="gate">
 
@@ -269,9 +269,9 @@ function render() {
   const stats = locStats_(atual);
   const telFmt = maskTelInput(_telAtual);
 
-  const tabs = locacoes.map((l, i) =>
+  const tabs = n > 1 ? locacoes.map((l, i) =>
     `<button type="button" class="mk-portal-tab${i === _carouselIdx ? ' is-active' : ''}" data-carousel-tab="${i}" role="tab" aria-selected="${i === _carouselIdx}">${esc(l.crianca)}</button>`
-  ).join('');
+  ).join('') : '';
 
   const dots = n > 1 ? locacoes.map((_, i) =>
     `<button type="button" class="mk-portal-dot${i === _carouselIdx ? ' is-active' : ''}" data-carousel-tab="${i}" aria-label="Criança ${i + 1}"></button>`
@@ -299,12 +299,12 @@ function render() {
   box.innerHTML = `<div class="mk-portal-carousel">
     <div class="mk-portal-brand-lg mk-portal-brand-play">Movi <span>Kids</span></div>
     <p class="mk-portal-subtitle">📱 ${esc(telFmt)} · ${brincandoLabel_(n)}</p>
-    <div class="mk-portal-tabs" role="tablist">${tabs}</div>
-    <p class="mk-portal-counter">Criança ${_carouselIdx + 1} de ${n}</p>
+    ${tabs ? `<div class="mk-portal-tabs" role="tablist">${tabs}</div>` : ''}
+    ${n > 1 ? `<p class="mk-portal-counter">Criança ${_carouselIdx + 1} de ${n}</p>` : ''}
     <article class="${stats.cardCls}">
       <div class="mk-portal-play-hero">
         ${avatarHtml_(atual.crianca, 'lg')}
-        <div class="mk-portal-play-name">${esc(atual.crianca)}</div>
+        ${n === 1 ? `<div class="mk-portal-play-name">${esc(atual.crianca)}</div>` : ''}
       </div>
       ${ringBlockHtml_(stats)}
       ${infoBasicaHtml_(atual)}
