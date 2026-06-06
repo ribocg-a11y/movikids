@@ -1,8 +1,8 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.57
+// MOVI KIDS — Google Apps Script v1.5.58
+// v1.5.58: buscarKPIsAdmin — fatAno/nAno (faturamento acumulado jan–mês do ano)
 // v1.5.57: Pacote K.1 — importarResponsaveisAdmin (LOCACOES -> RESPONSAVEIS, dryRun)
 // v1.5.56: Pacote H — validacao schema frota/preços em salvarOperacaoConfigAdmin
-// v1.5.58: buscarKPIsAdmin — fatAno/nAno (faturamento acumulado jan–mês do ano selecionado)
 // v1.5.55: Portal — timestampCanonico + totalMins alinhados ao balcão (carregarInicio + buscarPortalResponsavel)
 // v1.5.54: Pacote G — rate limit buscarPortalResponsavel (por telefone + global)
 // v1.5.53: SMS — GENERIC_FAILURE do Android nao marca Failed definitivo; recheck + downgrade se passou Sent
@@ -331,9 +331,9 @@ function ping_() {
   const agora = new Date();
   return resp_({
     status:  'online',
-    versao:  'v1.5.57',
+    versao:  'v1.5.58',
     timestamp: fmtData_(agora) + ' ' + fmtHoraLocal_(agora),
-    sistema: 'MOVI KIDS v1.5.57',
+    sistema: 'MOVI KIDS v1.5.58',
     postWriteActions: WRITE_ACTIONS_CRITICAS_
   });
 }
@@ -1501,7 +1501,7 @@ function carregarInicio_(p) {
 
   const opCfg = operacaoConfig_();
   const resultado = resp_({
-    sistema:    'MOVI KIDS v1.5.57',
+    sistema:    'MOVI KIDS v1.5.58',
     timestamp:  dataHoje + ' ' + fmtHoraLocal_(hoje),
     ativos:     ativas,
     statsHoje,
