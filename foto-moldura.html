@@ -10,61 +10,58 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="mk-design.css?v=1.7.56">
+<link rel="stylesheet" href="mk-design.css?v=1.7.57">
 </head>
 <body class="mk-portal-page mk-frame-page" data-step="start">
 
 <div class="mk-portal-deco" aria-hidden="true"></div>
 
 <main class="mk-frame-wrap">
-  <div class="mk-portal-brand-lg mk-portal-brand-play">Movi <span>Kids</span></div>
-  <p class="mk-frame-sub" id="frame-subtitle">Monte sua foto na moldura e compartilhe</p>
+  <p class="mk-frame-sub" id="frame-subtitle">Sua foto na moldura Movi Kids</p>
 
-  <div class="mk-frame-stage" id="frame-stage">
-    <div class="mk-frame-preview" id="frame-live">
-      <video id="frame-video" playsinline muted autoplay hidden></video>
-      <img id="frame-result" alt="Sua foto na moldura Movi Kids" hidden>
-      <img class="mk-frame-overlay" src="assets/moldura-retrato.svg" alt="" aria-hidden="true">
-      <div class="mk-frame-placeholder" id="frame-placeholder">
-        <span>📸</span>
-        <p>Toque em <strong>Abrir câmera</strong><br>a foto entra certinha na moldura</p>
-      </div>
+  <div class="mk-frame-card" id="frame-card">
+    <div class="mk-frame-top">
+      <span class="mk-frame-top-title">Movi Kids</span>
+      <span class="mk-frame-top-sub">Diversão com segurança</span>
+    </div>
+    <div class="mk-frame-slot">
+      <div class="mk-frame-placeholder" aria-hidden="true">📸</div>
+      <video id="frame-video" playsinline muted autoplay></video>
+      <img id="frame-result" alt="Sua foto na moldura Movi Kids">
+    </div>
+    <div class="mk-frame-bottom">
+      <span class="mk-frame-bottom-ig">@movikidsslz</span>
+      <span class="mk-frame-bottom-loc">Golden Shopping Calhau</span>
     </div>
   </div>
 
   <p class="mk-frame-err" id="frame-err" role="status" aria-live="polite"></p>
 
-  <div class="mk-frame-actions" id="actions-camera">
-    <button type="button" class="mk-portal-btn" id="btn-camera">Abrir câmera</button>
-    <label class="mk-frame-file-btn">
-      Escolher da galeria
-      <input type="file" id="file-pick" accept="image/*" capture="environment" hidden>
-    </label>
+  <div class="mk-frame-toolbar mk-frame-toolbar--start">
+    <button type="button" class="mk-portal-btn" id="btn-camera">📸 Tirar foto</button>
+    <label class="mk-frame-link">ou escolher da galeria<input type="file" id="file-pick" accept="image/*" hidden></label>
   </div>
 
-  <div class="mk-frame-actions" id="actions-capture" hidden>
-    <button type="button" class="mk-portal-btn" id="btn-snap">📸 Capturar</button>
-    <button type="button" class="mk-frame-sec" id="btn-flip">Trocar câmera</button>
+  <div class="mk-frame-toolbar mk-frame-toolbar--live">
+    <button type="button" class="mk-portal-btn" id="btn-snap">Capturar</button>
+    <button type="button" class="mk-frame-flip" id="btn-flip">🔄 Trocar câmera</button>
   </div>
 
-  <div class="mk-frame-actions" id="actions-share" hidden>
+  <div class="mk-frame-toolbar mk-frame-toolbar--done">
     <button type="button" class="mk-portal-btn mk-frame-share" id="btn-share">Compartilhar no Instagram</button>
-    <button type="button" class="mk-frame-sec" id="btn-download">Baixar foto</button>
-    <button type="button" class="mk-frame-sec" id="btn-retry">Nova foto</button>
+    <div class="mk-frame-mini-row">
+      <button type="button" class="mk-frame-link" id="btn-download">Baixar</button>
+      <button type="button" class="mk-frame-link" id="btn-retry">Nova foto</button>
+    </div>
   </div>
 
-  <p class="mk-frame-hint" id="frame-hint">
-    No celular, <strong>Compartilhar</strong> abre o Instagram com a foto pronta.
-    Legenda sugerida: <em>@movikidsslz</em> #MoviKids
-  </p>
-
+  <p class="mk-frame-hint">Legenda sugerida: <em>@movikidsslz</em> #MoviKids</p>
   <a class="mk-frame-back" href="acompanhar.html" id="link-voltar">← Voltar ao cronômetro</a>
 </main>
 
 <canvas id="frame-canvas" width="1080" height="1350" hidden aria-hidden="true"></canvas>
 
 <script>
-const IG_USER = 'movikidsslz';
 const IG_PROFILE = 'https://www.instagram.com/movikidsslz';
 const IG_CAPTION = 'Diversão na @movikidsslz 🚗✨ #MoviKids #GoldenShoppingCalhau';
 const OUT_W = 1080;
@@ -73,64 +70,94 @@ const PHOTO = { x: 130, y: 250, w: 820, h: 820 };
 
 let stream_ = null;
 let facing_ = 'environment';
-let molduraImg_ = null;
 let lastBlob_ = null;
 
 const video = document.getElementById('frame-video');
 const resultImg = document.getElementById('frame-result');
-const placeholder = document.getElementById('frame-placeholder');
 const canvas = document.getElementById('frame-canvas');
 const ctx = canvas.getContext('2d');
 
 function setStep(step) {
   document.body.dataset.step = step;
-  document.getElementById('actions-camera').hidden = step !== 'start';
-  document.getElementById('actions-capture').hidden = step !== 'live';
-  document.getElementById('actions-share').hidden = step !== 'done';
-  placeholder.hidden = step === 'live' || step === 'done';
-  video.hidden = step !== 'live';
-  resultImg.hidden = step !== 'done';
 }
 
 function setErr(msg) {
   document.getElementById('frame-err').textContent = msg || '';
 }
 
-function loadMoldura_() {
-  return new Promise((resolve, reject) => {
-    if (molduraImg_ && molduraImg_.complete) return resolve(molduraImg_);
-    const img = new Image();
-    img.onload = () => { molduraImg_ = img; resolve(img); };
-    img.onerror = reject;
-    img.src = 'assets/moldura-retrato.svg';
-  });
+function roundRect_(c, x, y, w, h, r) {
+  c.beginPath();
+  c.moveTo(x + r, y);
+  c.arcTo(x + w, y, x + w, y + h, r);
+  c.arcTo(x + w, y + h, x, y + h, r);
+  c.arcTo(x, y + h, x, y, r);
+  c.arcTo(x, y, x + w, y, r);
+  c.closePath();
 }
 
-function drawPhotoCover_(source, dx, dy, dw, dh) {
+function drawMoldura_(nome) {
+  const g = ctx.createLinearGradient(0, 0, 0, OUT_H);
+  g.addColorStop(0, '#1a237e');
+  g.addColorStop(0.5, '#3949ab');
+  g.addColorStop(1, '#1565c0');
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, OUT_W, 250);
+  ctx.fillRect(0, 1070, OUT_W, 280);
+  ctx.fillRect(0, 250, 130, 820);
+  ctx.fillRect(950, 250, 130, 820);
+  ctx.strokeStyle = '#FFD54F';
+  ctx.lineWidth = 10;
+  roundRect_(ctx, 122, 242, 836, 836, 34);
+  ctx.stroke();
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#FFD54F';
+  ctx.font = 'bold 68px Fredoka One, Arial Rounded MT Bold, sans-serif';
+  ctx.fillText('Movi Kids', OUT_W / 2, 108);
+  ctx.fillStyle = '#e3f2fd';
+  ctx.font = 'bold 26px Nunito, sans-serif';
+  ctx.fillText('Diversão com segurança', OUT_W / 2, 165);
+  ctx.fillStyle = '#fff';
+  ctx.font = 'bold 30px Nunito, sans-serif';
+  ctx.fillText('@movikidsslz', OUT_W / 2, 1155);
+  ctx.fillStyle = '#90caf9';
+  ctx.font = 'bold 22px Nunito, sans-serif';
+  ctx.fillText('Golden Shopping Calhau', OUT_W / 2, 1210);
+  if (nome) {
+    ctx.font = 'bold 34px Nunito, sans-serif';
+    ctx.fillStyle = 'rgba(255,255,255,0.95)';
+    ctx.fillText(String(nome).trim().slice(0, 28), OUT_W / 2, PHOTO.y + PHOTO.h - 40);
+  }
+}
+
+function drawPhotoCover_(source) {
   const sw = source.videoWidth || source.naturalWidth || source.width;
   const sh = source.videoHeight || source.naturalHeight || source.height;
   if (!sw || !sh) return;
-  const scale = Math.max(dw / sw, dh / sh);
+  const { x, y, w, h } = PHOTO;
+  const scale = Math.max(w / sw, h / sh);
   const cw = sw * scale;
   const ch = sh * scale;
-  const cx = dx + (dw - cw) / 2;
-  const cy = dy + (dh - ch) / 2;
-  ctx.drawImage(source, cx, cy, cw, ch);
+  const cx = x + (w - cw) / 2;
+  const cy = y + (h - ch) / 2;
+  ctx.save();
+  roundRect_(ctx, x, y, w, h, 28);
+  ctx.clip();
+  if (source === video && facing_ === 'user') {
+    ctx.translate(x + w, 0);
+    ctx.scale(-1, 1);
+    ctx.drawImage(source, x + (w - cw) / 2, cy, cw, ch);
+  } else {
+    ctx.drawImage(source, cx, cy, cw, ch);
+  }
+  ctx.restore();
 }
 
 async function composite_(source) {
-  await loadMoldura_();
-  ctx.fillStyle = '#1a237e';
-  ctx.fillRect(0, 0, OUT_W, OUT_H);
-  drawPhotoCover_(source, PHOTO.x, PHOTO.y, PHOTO.w, PHOTO.h);
-  ctx.drawImage(molduraImg_, 0, 0, OUT_W, OUT_H);
+  ctx.fillStyle = '#263238';
+  ctx.fillRect(PHOTO.x, PHOTO.y, PHOTO.w, PHOTO.h);
+  drawPhotoCover_(source);
   const nome = new URLSearchParams(location.search).get('nome');
-  if (nome) {
-    ctx.font = 'bold 36px Nunito, sans-serif';
-    ctx.fillStyle = 'rgba(255,255,255,0.92)';
-    ctx.textAlign = 'center';
-    ctx.fillText(String(nome).trim().slice(0, 32), OUT_W / 2, PHOTO.y + PHOTO.h - 36);
-  }
+  drawMoldura_(nome);
   return new Promise(r => canvas.toBlob(r, 'image/jpeg', 0.92));
 }
 
@@ -145,6 +172,10 @@ function stopCamera_() {
 async function startCamera_() {
   setErr('');
   stopCamera_();
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    setErr('Use o celular ou escolha da galeria.');
+    return;
+  }
   try {
     stream_ = await navigator.mediaDevices.getUserMedia({
       video: { facingMode: facing_, width: { ideal: 1280 }, height: { ideal: 1280 } },
@@ -155,7 +186,7 @@ async function startCamera_() {
     await video.play();
     setStep('live');
   } catch (e) {
-    setErr('Não foi possível abrir a câmera. Use “Escolher da galeria” ou permita o acesso.');
+    setErr('Permita a câmera ou escolha da galeria.');
   }
 }
 
@@ -170,7 +201,7 @@ async function useFile_(file) {
       resultImg.src = URL.createObjectURL(lastBlob_);
       setStep('done');
     } catch (e) {
-      setErr('Erro ao montar a moldura.');
+      setErr('Erro ao montar a foto.');
     }
     URL.revokeObjectURL(url);
   };
@@ -186,7 +217,7 @@ async function snap_() {
     stopCamera_();
     setStep('done');
   } catch (e) {
-    setErr('Erro ao capturar. Tente de novo.');
+    setErr('Erro ao capturar.');
   }
 }
 
@@ -198,44 +229,22 @@ function download_() {
   a.click();
 }
 
-async function copyCaption_() {
-  try {
-    await navigator.clipboard.writeText(IG_CAPTION);
-    return true;
-  } catch (e) {
-    return false;
-  }
-}
-
 async function share_() {
   if (!lastBlob_) return;
   setErr('');
   const file = new File([lastBlob_], 'movikids-foto.jpg', { type: 'image/jpeg' });
-  const copied = await copyCaption_();
-
+  try { await navigator.clipboard.writeText(IG_CAPTION); } catch (e) {}
   if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
     try {
-      await navigator.share({
-        files: [file],
-        title: 'Movi Kids',
-        text: IG_CAPTION
-      });
-      setErr(copied ? 'Legenda copiada! Cole no Instagram se precisar.' : 'Escolha Instagram no menu.');
+      await navigator.share({ files: [file], title: 'Movi Kids', text: IG_CAPTION });
       return;
     } catch (e) {
       if (e.name === 'AbortError') return;
     }
   }
-
   download_();
-  if (copied) {
-    setErr('Foto baixada e legenda copiada. Abra o Instagram e publique marcando @movikidsslz');
-  } else {
-    setErr('Foto baixada. Abra o Instagram e marque @movikidsslz na legenda.');
-  }
-  setTimeout(() => {
-    window.open(IG_PROFILE, '_blank', 'noopener');
-  }, 600);
+  setErr('Foto salva. Abra o Instagram e marque @movikidsslz');
+  setTimeout(() => window.open(IG_PROFILE, '_blank', 'noopener'), 500);
 }
 
 function retry_() {
@@ -259,14 +268,13 @@ document.getElementById('btn-retry').addEventListener('click', retry_);
 (function init_() {
   const nome = new URLSearchParams(location.search).get('nome');
   if (nome) {
-    document.getElementById('frame-subtitle').textContent = 'Foto de ' + nome + ' na moldura Movi Kids';
+    document.getElementById('frame-subtitle').textContent = 'Foto de ' + nome;
   }
   const tel = new URLSearchParams(location.search).get('tel') || new URLSearchParams(location.search).get('telefone');
   if (tel) {
-    const a = document.getElementById('link-voltar');
-    a.href = 'acompanhar.html?tel=' + encodeURIComponent(tel.replace(/\D/g, ''));
+    document.getElementById('link-voltar').href =
+      'acompanhar.html?tel=' + encodeURIComponent(String(tel).replace(/\D/g, ''));
   }
-  loadMoldura_().catch(() => setErr('Moldura não carregou. Atualize a página.'));
 })();
 </script>
 </body>
