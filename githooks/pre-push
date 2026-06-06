@@ -1,0 +1,5 @@
+#!/bin/sh
+# Opcional: git config core.hooksPath githooks
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$ROOT/scripts/pre-push-check.ps1"
+exit $?

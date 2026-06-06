@@ -69,13 +69,13 @@
   } catch(e) {}
 })();
 </script>
-<script src="mk-version.js?v=1.7.41"></script>
+<script src="mk-version.js?v=1.7.42"></script>
 <link rel="stylesheet" href="mk-design.css">
 
 <script>
 // ── CACHE BUSTER — alinhado a mk-version.js / APP_VERSION ──
 (function(){
-  const CURRENT = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.41';
+  const CURRENT = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.42';
   const KEY = 'mk_loaded_version';
   function mkVerParts_(v) {
     return String(v || '0.0').split('.').map(function(n) { return parseInt(n, 10) || 0; });
@@ -2850,7 +2850,7 @@ header{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.41';
+const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.42';
 const WEBAPP_URL = (typeof window !== 'undefined' && window.MK_GAS_EXEC_URL) ? window.MK_GAS_EXEC_URL
   : 'https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec';
 const WEBAPP_URL_DEAD_PREFIX = 'AKfycbzc';
@@ -3106,6 +3106,26 @@ const MK_WRITE_ACTIONS = new Set([
   'salvarLocacao', 'editarLocacao', 'cancelarLocacao', 'encerrarLocacao', 'estenderLocacao'
 ]);
 
+/** Pacote J (T1): bloqueia POST no browser para escritas criticas — incidente P0 05/06/2026. */
+function mkGuardEscritaBrowser_(action, method) {
+  const act = String(action || '').trim();
+  const m = String(method || 'GET').toUpperCase();
+  if (!MK_WRITE_ACTIONS.has(act) || m === 'GET' || m === 'HEAD') return;
+  const msg = 'Escritas criticas bloqueadas via ' + m + ' no browser (use GET). Ver INCIDENTE_POST_BROWSER_LANCAMENTO_2026-06-05.md';
+  console.error('[MK_GUARD]', msg, { action: act, method: m });
+  throw new Error(msg);
+}
+
+function mkActionFromApiUrl_(url) {
+  try {
+    const u = new URL(String(url), typeof location !== 'undefined' ? location.href : 'https://local/');
+    return u.searchParams.get('action') || '';
+  } catch (e) {
+    const m = String(url).match(/[?&]action=([^&]+)/);
+    return m ? decodeURIComponent(m[1]) : '';
+  }
+}
+
 function mkRequireOperadorEscrita_() {
   const op = typeof operadorApiParams_ === 'function' ? operadorApiParams_() : {};
   if (op.operador) return op;
@@ -3114,6 +3134,8 @@ function mkRequireOperadorEscrita_() {
 }
 
 function mkApiFetchJson_(url, init, timeoutMs) {
+  const method = String((init && init.method) || 'GET').toUpperCase();
+  mkGuardEscritaBrowser_(mkActionFromApiUrl_(url), method);
   const fetchP = fetch(url, init)
     .then(async r => {
       const text = await r.text();
@@ -3129,15 +3151,17 @@ function mkApiFetchJson_(url, init, timeoutMs) {
   return Promise.race([fetchP, timer]);
 }
 
-async function api(params, timeoutMs = 25000) {
+async function api(params, timeoutMs = 25000, fetchInit) {
   const gasUrl = await resolveGasUrl_();
   const action = String((params && params.action) || '');
+  const init = Object.assign({ method: 'GET', redirect: 'follow' }, fetchInit || {});
+  mkGuardEscritaBrowser_(action, init.method);
   const payload = Object.assign({}, params);
   if (MK_WRITE_ACTIONS.has(action) && typeof operadorApiParams_ === 'function') {
     Object.assign(payload, operadorApiParams_());
   }
   const qs = new URLSearchParams(payload).toString();
-  return mkApiFetchJson_(`${gasUrl}?${qs}`, { method: 'GET', redirect: 'follow' }, timeoutMs);
+  return mkApiFetchJson_(`${gasUrl}?${qs}`, init, timeoutMs);
 }
 window.api = api;
 
@@ -8014,7 +8038,7 @@ async function salvarLancamentoAvulso() {
 }
 
 </script>
-<script src="mk-update.js?v=1.7.41"></script>
+<script src="mk-update.js?v=1.7.42"></script>
 <script src="mk-auth.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
