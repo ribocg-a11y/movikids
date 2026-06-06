@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.61
+// MOVI KIDS — Google Apps Script v1.5.62
+// v1.5.62: Payback — parseMesAnoPayback_ (B4 dd/MM/yyyy vs MM/yyyy) + % clamp 0–100
 // v1.5.61: Payback — calcPaybackAcumulado_ + buscarKPIsAdmin.payback
 // v1.5.60: Aba INVESTIMENTO — lerInvestimento_ para payback (planilha)
 // v1.5.59: buscarKPIsAdmin — fatAno/nAno = faturamento acumulado do ano civil inteiro
@@ -183,6 +184,33 @@ function parseDataStr_(s) {
   return new Date(parseInt(p[2]), parseInt(p[1])-1, parseInt(p[0]));
 }
 
+/** B4 INVESTIMENTO: aceita Date, dd/MM/yyyy ou MM/yyyy → { mes, ano, label }. */
+function parseMesAnoPayback_(val) {
+  if (val instanceof Date) {
+    const mes = val.getMonth() + 1;
+    const ano = val.getFullYear();
+    return { mes: mes, ano: ano, label: String(mes).padStart(2, '0') + '/' + ano };
+  }
+  const s = String(val || '').trim();
+  if (!s) return { mes: 5, ano: 2026, label: '05/2026' };
+  const parts = s.split('/').map(function(p) { return p.trim(); });
+  if (parts.length >= 3) {
+    const mes = parseInt(parts[1], 10);
+    const ano = parseInt(parts[2], 10);
+    if (mes >= 1 && mes <= 12 && ano >= 2020 && ano <= 2100) {
+      return { mes: mes, ano: ano, label: String(mes).padStart(2, '0') + '/' + ano };
+    }
+  }
+  if (parts.length >= 2) {
+    const mes = parseInt(parts[0], 10);
+    const ano = parseInt(parts[1], 10);
+    if (mes >= 1 && mes <= 12 && ano >= 2020 && ano <= 2100) {
+      return { mes: mes, ano: ano, label: String(mes).padStart(2, '0') + '/' + ano };
+    }
+  }
+  return { mes: 5, ano: 2026, label: '05/2026' };
+}
+
 function resp_(data) {
   return ContentService
     .createTextOutput(JSON.stringify({ ok: true, ...data }))
@@ -336,9 +364,9 @@ function ping_() {
   const agora = new Date();
   return resp_({
     status:  'online',
-    versao:  'v1.5.61',
+    versao:  'v1.5.62',
     timestamp: fmtData_(agora) + ' ' + fmtHoraLocal_(agora),
-    sistema: 'MOVI KIDS v1.5.59',
+    sistema: 'MOVI KIDS v1.5.62',
     postWriteActions: WRITE_ACTIONS_CRITICAS_
   });
 }
@@ -1191,7 +1219,8 @@ function lerInvestimento_() {
     return { ok: false, erro: 'Aba INVESTIMENTO ausente', investimentoTotal: 0, itens: [] };
   }
   const dataInauguracao = cellToStr_(sh.getRange('B3').getValue()).trim();
-  const mesInicioPayback = cellToStr_(sh.getRange('B4').getValue()).trim();
+  const mesInicioParsed = parseMesAnoPayback_(sh.getRange('B4').getValue());
+  const mesInicioPayback = mesInicioParsed.label;
   const last = sh.getLastRow();
   const itens = [];
   let total = 0;
@@ -1229,9 +1258,9 @@ function calcPaybackAcumulado_(mesFim, anoFim, inv) {
   if (!I) {
     return { ok: false, erro: 'Cadastre valores na aba INVESTIMENTO', investimentoTotal: 0 };
   }
-  const iniParts = String(inv.mesInicioPayback || '05/2026').split('/');
-  let mesIni = parseInt(iniParts[0], 10) || 5;
-  let anoIni = parseInt(iniParts[1], 10) || 2026;
+  const ini = parseMesAnoPayback_(inv.mesInicioPayback);
+  let mesIni = ini.mes;
+  let anoIni = ini.ano;
 
   const fatBy = {};
   const cusBy = {};
@@ -1277,8 +1306,8 @@ function calcPaybackAcumulado_(mesFim, anoFim, inv) {
   }
 
   const media = mesesOperados > 0 ? acumulado / mesesOperados : 0;
-  const pct = I > 0 ? Math.min(100, Math.round(acumulado / I * 1000) / 10) : 0;
-  const falta = Math.max(0, I - acumulado);
+  const pct = I > 0 ? Math.max(0, Math.min(100, Math.round(acumulado / I * 1000) / 10)) : 0;
+  const falta = acumulado >= I ? 0 : Math.max(0, I - acumulado);
   const atingido = acumulado >= I;
   let mesesRest = null;
   if (!atingido && media > 0) mesesRest = Math.ceil(falta / media);
@@ -1294,7 +1323,7 @@ function calcPaybackAcumulado_(mesFim, anoFim, inv) {
     mediaResultadoMensal: Math.round(media * 100) / 100,
     mesesRestantesEstimados: mesesRest,
     acumuladoAteLabel: String(mesFim).padStart(2, '0') + '/' + anoFim,
-    mesInicioPayback: inv.mesInicioPayback,
+    mesInicioPayback: ini.label,
     dataInauguracao: inv.dataInauguracao
   };
 }
@@ -1625,7 +1654,7 @@ function carregarInicio_(p) {
 
   const opCfg = operacaoConfig_();
   const resultado = resp_({
-    sistema:    'MOVI KIDS v1.5.59',
+    sistema:    'MOVI KIDS v1.5.62',
     timestamp:  dataHoje + ' ' + fmtHoraLocal_(hoje),
     ativos:     ativas,
     statsHoje,
