@@ -133,6 +133,8 @@ C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\m
 
 **Canônico (atualizado 06/06/2026 10:34):** `MAPA_ERROS_FALHAS_BUGS.md` — tabela I1–I18, travas e scripts de teste.
 
+**DNA visual (obrigatório em toda UI):** `DESIGN_DNA_MOVIKIDS.md` — portal carrossel `acompanhar.html` v1.7.47+ como referência; regra `.cursor/rules/design-visual-movikids.mdc`.
+
 ### Incidentes documentados
 
 | Doc | O quê |

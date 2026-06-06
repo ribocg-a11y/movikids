@@ -6,6 +6,7 @@ Referência única para alinhamento local × produção.
 **Planejamento ativo:** `PLANO_CONTINUIDADE_2026-06.md` · Pausa maturidade (encerrada): `PLANO_PAUSA_MATURIDADE_2026-06.md`  
 **Handoff:** `HANDOFF_NOVO_CHAT_2026-06-05.md`  
 **Mapa de erros/bugs:** **`MAPA_ERROS_FALHAS_BUGS.md`** (consulta em testes)  
+**DNA visual / produto:** **`DESIGN_DNA_MOVIKIDS.md`** (portal carrossel = norte criativo)  
 **Incidentes:** `INCIDENTE_AUTH_OPERADORES_2026-06-04.md`, `INCIDENTE_DEPLOY_E_EXTRAS_2026-06-04.md`, **`INCIDENTE_POST_BROWSER_LANCAMENTO_2026-06-05.md` (P0)**, **`INCIDENTE_CRONOMETRO_PORTAL_AUTH_2026-06-05_06.md` (I16–I18)**  
 **SMS gateway:** `TROCA_SMS_GATEWAY_DJVJRL_2026-06-04.md`  
 **Deploy GAS:** `DEPLOY_GAS_v1.5.32_AUTH.md`

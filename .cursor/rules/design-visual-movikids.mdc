@@ -1,0 +1,47 @@
+---
+description: DNA visual MOVI KIDS — portal carrossel como norte (profissional, amigável, vende o serviço)
+globs: acompanhar.html,mk-design.css,index.html,**/*.canvas.tsx
+alwaysApply: true
+---
+
+# Design visual MOVI KIDS — linha criativa obrigatória
+
+**Referência canônica:** `acompanhar.html` (portal carrossel v1.7.47+) + `DESIGN_DNA_MOVIKIDS.md`
+
+## Por quê
+
+O portal conquistou responsáveis: visual **profissional, agradável, amigável** — isso **vende o serviço** e gera confiança. Toda UI do sistema (balcão, admin, portal, SMS links, relatórios) deve seguir a **mesma sensação**, não só “funcionar”.
+
+## Princípios (sempre)
+
+1. **Uma coisa em destaque** — hero claro (timer, valor do dia, ação principal); o resto apoia, não compete.
+2. **Calor + seriedade** — infantil sem ser infantilizado; operação séria sem parecer planilha.
+3. **Tipografia** — Fredoka One (marca/títulos/relógio); Nunito 700–900 (dados e botões).
+4. **Cor com significado** — azul = ação/tempo ok; amarelo = marca e “quase lá”; laranja = extra/urgência; verde/vermelho só semântica operacional.
+5. **Ritmo e respiro** — poucos elementos por tela; bordas arredondadas (14–20px); gaps generosos; nada de parede de cards iguais.
+6. **Feedback emocional** — animação leve (pop, pulso no alerta); mensagens humanas (“Quase lá!”, “Já já começa”).
+7. **Mobile-first nos responsáveis** — portal e QR: legível no celular, uma mão, sem rolagem infinita (carrossel/abas > empilhar 3 heróis).
+8. **Consistência** — reutilizar classes `mk-portal-*` / tokens em `mk-design.css`; não inventar CSS paralelo por tela.
+
+## Padrões do portal (replicar onde couber)
+
+- Cabeçalho marca + contexto (`telefone · N brincando`)
+- Abas/pills por entidade (criança, operador, veículo)
+- Contador “X de N”
+- Faixa de alerta quando estado crítico
+- Lista compacta “outras” para troca rápida
+- Botão secundário fixo no rodapé (ex.: Trocar telefone / Sair)
+
+## Antes de entregar UI nova
+
+- [ ] Parece **produto**, não protótipo?
+- [ ] Responsável/operador entende em **3 segundos**?
+- [ ] Hierarquia visual óbvia (teste “olho fechado”)?
+- [ ] Alinhado a `mk-design.css` e referência `acompanhar.html`?
+
+## Não fazer
+
+- Tabelas cruas onde um card/carrossel comunica melhor
+- KPIs todos do mesmo tamanho sem hero
+- Emoji em cada linha (só marca, empty state ou ícone de tipo)
+- Quebrar paridade técnica (cronômetro I16) por estética — beleza **com** `canonLoc_` / `timestampCanonico_`

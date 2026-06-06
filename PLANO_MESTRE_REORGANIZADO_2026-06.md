@@ -132,6 +132,8 @@ Já resolvido: 1 operador logado. **Próximo:** banner discreto “Turno: Eduard
 
 ## 5. Nova roupagem — design system MOVI KIDS
 
+**DNA visual registrado (06/06/2026):** `DESIGN_DNA_MOVIKIDS.md` — portal carrossel `acompanhar.html` v1.7.47+ é a **referência canônica** de tom (profissional, amigável, vende o serviço). Regra agente: `.cursor/rules/design-visual-movikids.mdc`.
+
 ### 5.1 Princípios (compatível com marca infantil + operação séria)
 
 - **Fredoka / Nunito** mantidos; uso mais disciplinado (títulos vs dados).

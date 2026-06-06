@@ -7,6 +7,7 @@ Sistema operacional para controle de locacoes da MOVI KIDS.
 - Frontend: `v1.7.46` (ver `ESTADO_ATUAL.md`)
 - Apps Script: `v1.5.56` repo (confirmar ping; ver `DEPLOY_GAS_v1.5.32_AUTH.md`)
 - Mapa de erros/bugs: `MAPA_ERROS_FALHAS_BUGS.md`
+- DNA visual (portal = referência): `DESIGN_DNA_MOVIKIDS.md`
 - Incidentes recentes: `INCIDENTE_CRONOMETRO_PORTAL_AUTH_2026-06-05_06.md`, `INCIDENTE_POST_BROWSER_LANCAMENTO_2026-06-05.md`
 - Objetivo desta versao: corrigir divergencia entre multiplas telas sem tirar o sistema do ar.
 

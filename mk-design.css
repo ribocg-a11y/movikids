@@ -325,18 +325,78 @@
   line-height: 1.35;
 }
 
-/* Palco do cronômetro */
+/* Palco do cronômetro — carrossel (1 ou N crianças) */
 .mk-portal-stage {
   width: 100%;
   max-width: 380px;
-  display: flex;
-  flex-direction: column;
-  gap: 28px;
   z-index: 1;
+}
+.mk-portal-carousel {
+  width: 100%;
+  text-align: center;
+  animation: mk-portal-pop 0.45s cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+.mk-portal-brand-play {
+  font-size: 32px;
+  margin-bottom: 6px;
+}
+.mk-portal-subtitle {
+  font-size: 14px;
+  font-weight: 800;
+  opacity: 0.9;
+  margin: 0 0 14px;
+  letter-spacing: 0.02em;
+}
+.mk-portal-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.mk-portal-tab {
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 800;
+  padding: 8px 14px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+}
+.mk-portal-tab:active { transform: scale(0.97); }
+.mk-portal-tab.is-active {
+  background: var(--blue);
+  border-color: rgba(255, 255, 255, 0.45);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+}
+.mk-portal-counter {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  opacity: 0.8;
+  margin: 0 0 6px;
+}
+.mk-portal-alert {
+  margin: 0 0 12px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  background: rgba(255, 213, 79, 0.22);
+  border: 1px solid rgba(255, 213, 79, 0.45);
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.35;
+  text-align: left;
+}
+.mk-portal-alert.is-extra {
+  background: rgba(255, 138, 101, 0.22);
+  border-color: rgba(255, 138, 101, 0.5);
 }
 .mk-portal-play {
   text-align: center;
-  animation: mk-portal-pop 0.45s cubic-bezier(0.34, 1.4, 0.64, 1);
 }
 @keyframes mk-portal-pop {
   from { opacity: 0; transform: scale(0.92); }
@@ -344,9 +404,108 @@
 }
 .mk-portal-play-name {
   font-family: 'Fredoka One', cursive;
-  font-size: 28px;
-  margin-bottom: 16px;
+  font-size: clamp(24px, 7vw, 30px);
+  margin-bottom: 12px;
   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+.mk-portal-nav {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 14px;
+}
+.mk-portal-nav-btn {
+  flex: 1;
+  max-width: 140px;
+  height: 44px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+}
+.mk-portal-nav-btn:active { transform: scale(0.98); }
+.mk-portal-nav-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.mk-portal-others {
+  margin-top: 18px;
+  text-align: left;
+}
+.mk-portal-others-title {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  opacity: 0.75;
+  margin: 0 0 8px;
+}
+.mk-portal-other-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.mk-portal-other-row:active { transform: scale(0.99); }
+.mk-portal-other-name {
+  font-size: 15px;
+  font-weight: 800;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.mk-portal-other-pill {
+  flex-shrink: 0;
+  font-size: 14px;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+  padding: 5px 10px;
+  border-radius: 12px;
+  background: rgba(41, 182, 246, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+.mk-portal-other-pill.is-warn {
+  background: rgba(255, 213, 79, 0.35);
+  color: #fff8e1;
+}
+.mk-portal-other-pill.is-extra {
+  background: rgba(255, 138, 101, 0.4);
+}
+.mk-portal-dots {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 10px;
+}
+.mk-portal-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: none;
+  padding: 0;
+  background: rgba(255, 255, 255, 0.3);
+  cursor: pointer;
+}
+.mk-portal-dot.is-active {
+  background: var(--gold);
+  transform: scale(1.15);
 }
 .mk-portal-play-ring {
   position: relative;

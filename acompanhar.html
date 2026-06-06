@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="mk-design.css?v=1.7.46">
+<link rel="stylesheet" href="mk-design.css?v=1.7.47">
 </head>
 <body class="mk-portal-page" data-view="gate">
 
@@ -41,6 +41,8 @@ let GAS_URL = PORTAL_FALLBACK_GAS;
 let locacoes = [];
 let _telAtual = '';
 let _refreshTimer = null;
+let _carouselIdx = 0;
+let _touchStartX = null;
 
 function esc(v) {
   return String(v == null ? '' : v).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
@@ -74,10 +76,66 @@ function infoBasicaHtml_(l) {
   const veic = esc(l.veiculo || l.tipo || '—');
   const st = esc(l.status || '—');
   return `<div class="mk-portal-info">
-    <div class="mk-portal-info-row"><span>Plano contratado</span><strong>${planoTxt}</strong></div>
+    <div class="mk-portal-info-row"><span>Plano</span><strong>${planoTxt}</strong></div>
     <div class="mk-portal-info-row"><span>Veículo</span><strong>${veic}</strong></div>
     <div class="mk-portal-info-row"><span>Status</span><strong>${st}</strong></div>
   </div>`;
+}
+function brincandoLabel_(n) {
+  return n === 1 ? '1 brincando' : n + ' brincando';
+}
+function sortLocacoes_(list) {
+  return list.slice().sort((a, b) => String(a.crianca || '').localeCompare(String(b.crianca || ''), 'pt-BR'));
+}
+function locStats_(l) {
+  const rem = restante(l);
+  const totalSec = totalMins(l) * 60;
+  const extra = rem < 0;
+  const pend = l.status === 'Pendente';
+  const warn = !extra && !pend && rem > 0 && rem <= 300;
+  const ringClass = extra ? 'extra' : (pend ? 'wait' : (warn ? 'warn' : 'ok'));
+  const timeTxt = extra ? '+' + fmt(Math.abs(rem)) : fmt(rem);
+  const dash = ringDash_(extra ? 0 : Math.max(0, rem), totalSec, extra);
+  const lbl = extra ? 'Tempo extra' : (pend ? 'Já já começa' : (warn ? 'Quase lá!' : 'Falta'));
+  const cardCls = 'mk-portal-play' + (extra ? ' is-extra' : '') + (warn ? ' is-warn' : '') + (pend ? ' is-wait' : '');
+  return { rem, totalSec, extra, pend, warn, ringClass, timeTxt, dash, lbl, cardCls };
+}
+function ringBlockHtml_(stats) {
+  return `<div class="mk-portal-play-ring">
+    <svg viewBox="0 0 200 200" aria-hidden="true">
+      <circle class="mk-portal-ring-bg" cx="100" cy="100" r="88"></circle>
+      <circle class="mk-portal-ring-prog ${stats.ringClass}" cx="100" cy="100" r="88"
+        style="stroke-dasharray:${stats.dash.vis.toFixed(1)} ${stats.dash.circ.toFixed(1)};stroke-dashoffset:0"></circle>
+    </svg>
+    <div class="mk-portal-ring-center">
+      <span class="mk-portal-ring-lbl">${stats.lbl}</span>
+      <b class="mk-portal-ring-time">${stats.timeTxt}</b>
+    </div>
+  </div>`;
+}
+function alertasHtml_() {
+  const itens = locacoes.map((l) => {
+    const s = locStats_(l);
+    if (!s.warn && !s.extra) return null;
+    const nome = esc(l.crianca);
+    if (s.extra) return { cls: 'is-extra', txt: nome + ' — hora de buscar no balcão!' };
+    return { cls: '', txt: nome + ' em ' + fmt(s.rem) + ' — atenção!' };
+  }).filter(Boolean);
+  if (!itens.length) return '';
+  return itens.map((a) => `<div class="mk-portal-alert ${a.cls}">${a.txt}</div>`).join('');
+}
+function clampCarouselIdx_() {
+  if (!locacoes.length) {
+    _carouselIdx = 0;
+    return;
+  }
+  if (_carouselIdx < 0) _carouselIdx = 0;
+  if (_carouselIdx >= locacoes.length) _carouselIdx = locacoes.length - 1;
+}
+function setCarouselIdx_(i) {
+  if (!locacoes.length) return;
+  _carouselIdx = ((i % locacoes.length) + locacoes.length) % locacoes.length;
+  render();
 }
 /** MK_TIMER_CANON_GUARD I16 — espelha mergeSessaoCanonica + calcStartTimestamp (index.html). Ver MAPA_ERROS_FALHAS_BUGS.md */
 function calcStartTimestamp_(data, horaInicio) {
@@ -171,37 +229,59 @@ function render() {
 
   setView('play');
   setStatus('');
+  clampCarouselIdx_();
 
-  box.innerHTML = locacoes.map((l, i) => {
-    const rem = restante(l);
-    const totalSec = totalMins(l) * 60;
-    const extra = rem < 0;
-    const pend = l.status === 'Pendente';
-    const warn = !extra && !pend && rem > 0 && rem <= 300;
-    const ringClass = extra ? 'extra' : (pend ? 'wait' : (warn ? 'warn' : 'ok'));
-    const timeTxt = extra ? '+' + fmt(Math.abs(rem)) : fmt(rem);
-    const dash = ringDash_(extra ? 0 : Math.max(0, rem), totalSec, extra);
-    const lbl = extra ? 'Tempo extra' : (pend ? 'Já já começa' : (warn ? 'Quase lá!' : 'Falta'));
-    const cardCls = 'mk-portal-play' + (extra ? ' is-extra' : '') + (warn ? ' is-warn' : '') + (pend ? ' is-wait' : '');
+  const n = locacoes.length;
+  const atual = locacoes[_carouselIdx];
+  const stats = locStats_(atual);
+  const telFmt = maskTelInput(_telAtual);
 
-    return `<article class="${cardCls}">
-      <div class="mk-portal-play-name">${tipoIcon(l.tipo)} ${esc(l.crianca)}</div>
-      <div class="mk-portal-play-ring">
-        <svg viewBox="0 0 200 200" aria-hidden="true">
-          <circle class="mk-portal-ring-bg" cx="100" cy="100" r="88"></circle>
-          <circle class="mk-portal-ring-prog ${ringClass}" cx="100" cy="100" r="88"
-            style="stroke-dasharray:${dash.vis.toFixed(1)} ${dash.circ.toFixed(1)};stroke-dashoffset:0"></circle>
-        </svg>
-        <div class="mk-portal-ring-center">
-          <span class="mk-portal-ring-lbl">${lbl}</span>
-          <b class="mk-portal-ring-time" id="tempo-${i}">${timeTxt}</b>
-        </div>
-      </div>
-      ${infoBasicaHtml_(l)}
-      ${extra ? '<p class="mk-portal-play-msg">Hora de buscar no balcão 🏃</p>' : ''}
-      ${pend ? '<p class="mk-portal-play-msg">Preparando o veículo…</p>' : ''}
-    </article>`;
-  }).join('');
+  const tabs = locacoes.map((l, i) =>
+    `<button type="button" class="mk-portal-tab${i === _carouselIdx ? ' is-active' : ''}" data-carousel-tab="${i}" role="tab" aria-selected="${i === _carouselIdx}">${esc(l.crianca)}</button>`
+  ).join('');
+
+  const dots = n > 1 ? locacoes.map((_, i) =>
+    `<button type="button" class="mk-portal-dot${i === _carouselIdx ? ' is-active' : ''}" data-carousel-tab="${i}" aria-label="Criança ${i + 1}"></button>`
+  ).join('') : '';
+
+  const outros = locacoes
+    .map((l, i) => ({ l, i, s: locStats_(l) }))
+    .filter((x) => x.i !== _carouselIdx)
+    .map((x) => {
+      const pillCls = 'mk-portal-other-pill' + (x.s.extra ? ' is-extra' : (x.s.warn ? ' is-warn' : ''));
+      return `<button type="button" class="mk-portal-other-row" data-carousel-other="${x.i}">
+        <span class="mk-portal-other-name">${tipoIcon(x.l.tipo)} ${esc(x.l.crianca)}</span>
+        <span class="${pillCls}">${x.s.timeTxt}</span>
+      </button>`;
+    }).join('');
+
+  const nav = n > 1 ? `<div class="mk-portal-nav">
+    <button type="button" class="mk-portal-nav-btn" id="btn-carousel-prev">Anterior</button>
+    <button type="button" class="mk-portal-nav-btn" id="btn-carousel-next">Próxima</button>
+  </div>` : '';
+
+  const othersSec = n > 1 ? `<section class="mk-portal-others">
+    <p class="mk-portal-others-title">Outras no mesmo telefone</p>
+    ${outros}
+  </section>` : '';
+
+  box.innerHTML = `<div class="mk-portal-carousel">
+    <div class="mk-portal-brand-lg mk-portal-brand-play">Movi <span>Kids</span></div>
+    <p class="mk-portal-subtitle">${esc(telFmt)} · ${brincandoLabel_(n)}</p>
+    <div class="mk-portal-tabs" role="tablist">${tabs}</div>
+    <p class="mk-portal-counter">Criança ${_carouselIdx + 1} de ${n}</p>
+    ${alertasHtml_()}
+    <article class="${stats.cardCls}">
+      <div class="mk-portal-play-name">${tipoIcon(atual.tipo)} ${esc(atual.crianca)}</div>
+      ${ringBlockHtml_(stats)}
+      ${infoBasicaHtml_(atual)}
+      ${stats.extra ? '<p class="mk-portal-play-msg">Hora de buscar no balcão 🏃</p>' : ''}
+      ${stats.pend ? '<p class="mk-portal-play-msg">Preparando o veículo…</p>' : ''}
+    </article>
+    ${nav}
+    ${dots ? `<div class="mk-portal-dots">${dots}</div>` : ''}
+    ${othersSec}
+  </div>`;
 }
 
 async function buscar(silent) {
@@ -222,8 +302,9 @@ async function buscar(silent) {
       ex.data = d;
       throw ex;
     }
-    locacoes = d.locacoes || [];
+    locacoes = sortLocacoes_(d.locacoes || []);
     _telAtual = tel;
+    _carouselIdx = 0;
     render();
     if (locacoes.length) iniciarAutoRefresh(tel);
     else clearInterval(_refreshTimer);
@@ -237,6 +318,7 @@ async function buscar(silent) {
 function voltarGate_() {
   locacoes = [];
   _telAtual = '';
+  _carouselIdx = 0;
   clearInterval(_refreshTimer);
   setView('gate');
   setStatus('');
@@ -253,17 +335,15 @@ function iniciarAutoRefresh(tel) {
       const r = await fetch(url, { cache: 'no-store' });
       const d = await r.json();
       if (!d.ok) return;
-      const novas = d.locacoes || [];
-      const mudou = novas.length !== locacoes.length ||
-        novas.some((l, i) => {
-          const ant = locacoes[i] || {};
-          return l.status !== ant.status ||
-            Number(l.extendedMins || 0) !== Number(ant.extendedMins || 0) ||
-            Number(l.startTimestamp || 0) !== Number(ant.startTimestamp || 0) ||
-            Number(l.mins || 0) !== Number(ant.mins || 0);
-        });
-      locacoes = novas;
-      if (mudou) render();
+      const sorted = sortLocacoes_(d.locacoes || []);
+      const prevId = locacoes[_carouselIdx] && (locacoes[_carouselIdx].id || locacoes[_carouselIdx].rowIndex);
+      locacoes = sorted;
+      if (prevId != null) {
+        const ni = sorted.findIndex((l) => (l.id || l.rowIndex) === prevId);
+        if (ni >= 0) _carouselIdx = ni;
+      }
+      clampCarouselIdx_();
+      render();
     } catch (e) {}
   }, 15000);
 }
@@ -281,6 +361,35 @@ function applyDeepLink_() {
 
 document.getElementById('btn').addEventListener('click', () => buscar(false));
 document.getElementById('btn-voltar').addEventListener('click', voltarGate_);
+
+document.getElementById('resultado').addEventListener('click', (e) => {
+  const tab = e.target.closest('[data-carousel-tab]');
+  if (tab) {
+    setCarouselIdx_(Number(tab.getAttribute('data-carousel-tab')));
+    return;
+  }
+  const other = e.target.closest('[data-carousel-other]');
+  if (other) {
+    setCarouselIdx_(Number(other.getAttribute('data-carousel-other')));
+    return;
+  }
+  if (e.target.id === 'btn-carousel-prev') setCarouselIdx_(_carouselIdx - 1);
+  if (e.target.id === 'btn-carousel-next') setCarouselIdx_(_carouselIdx + 1);
+});
+
+const stageEl = document.getElementById('resultado');
+stageEl.addEventListener('touchstart', (e) => {
+  if (locacoes.length <= 1) return;
+  _touchStartX = e.changedTouches[0].clientX;
+}, { passive: true });
+stageEl.addEventListener('touchend', (e) => {
+  if (_touchStartX == null || locacoes.length <= 1) return;
+  const dx = e.changedTouches[0].clientX - _touchStartX;
+  _touchStartX = null;
+  if (Math.abs(dx) < 48) return;
+  if (dx < 0) setCarouselIdx_(_carouselIdx + 1);
+  else setCarouselIdx_(_carouselIdx - 1);
+}, { passive: true });
 document.getElementById('telefone').addEventListener('input', (e) => {
   e.target.value = maskTelInput(e.target.value);
 });
