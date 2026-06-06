@@ -26,3 +26,7 @@ console.log("QR gerado:");
 console.log(outPng);
 console.log(outSvg);
 console.log("URL:", PORTAL_URL);
+console.log("");
+console.log("Cartaz para imprimir no balcao:");
+console.log(path.join(outDir, "qr-balcao-imprimir.html"));
+console.log("  -> Abra no navegador e Ctrl+P (A6 recomendado)");

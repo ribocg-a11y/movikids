@@ -25,9 +25,10 @@
 | Item | Valor |
 |------|-------|
 | **URL** | https://ribocg-a11y.github.io/movikids/acompanhar.html |
-| **PNG para imprimir** | `assets/qr-portal-acompanhar.png` |
-| **SVG** | `assets/qr-portal-acompanhar.svg` |
-| **Regenerar** | `node scripts/generate-portal-qr.js` |
+| **Cartaz balcão (imprimir)** | `assets/qr-balcao-imprimir.html` — **abrir → Ctrl+P → A6** |
+| **Online (após push)** | https://ribocg-a11y.github.io/movikids/assets/qr-balcao-imprimir.html |
+| **QR só (SVG/PNG)** | `assets/qr-portal-acompanhar.svg` · `.png` |
+| **Regenerar QR** | `node scripts/generate-portal-qr.js` |
 
 **Fluxo:** operador mostra QR na mesa / tablet → responsável escaneia → digita **telefone com DDD** → vê timer das crianças (carrossel v1.7.47+).
 

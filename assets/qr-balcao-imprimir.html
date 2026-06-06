@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Movi Kids — QR Portal (imprimir balcão)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --blue: #29B6F6;
+      --blue-dk: #1565C0;
+      --gold: #FFD54F;
+      --pink: #F06292;
+      --purple: #7E57C2;
+      --txt: #1a237e;
+      --muted: #5c6bc0;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      padding: 24px;
+      background: #eceff1;
+      font-family: 'Nunito', sans-serif;
+      color: var(--txt);
+    }
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .toolbar button {
+      font-family: 'Nunito', sans-serif;
+      font-weight: 900;
+      font-size: 14px;
+      padding: 12px 20px;
+      border: 0;
+      border-radius: 12px;
+      cursor: pointer;
+      background: var(--blue-dk);
+      color: #fff;
+    }
+    .toolbar button.sec { background: #fff; color: var(--blue-dk); border: 2px solid var(--blue-dk); }
+    .toolbar p { width: 100%; text-align: center; font-size: 13px; color: #546e7a; font-weight: 700; }
+
+    /* Cartão A6 (105 × 148 mm) — ideal mesa balcão */
+    .poster {
+      width: 105mm;
+      min-height: 148mm;
+      background: linear-gradient(145deg, #e3f2fd 0%, #f3e5f5 45%, #fce4ec 100%);
+      border-radius: 16px;
+      box-shadow: 0 12px 40px rgba(21, 101, 192, 0.18);
+      padding: 10mm 8mm 8mm;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .poster::before {
+      content: '';
+      position: absolute;
+      top: -30%;
+      right: -20%;
+      width: 70%;
+      height: 50%;
+      background: radial-gradient(circle, rgba(41, 182, 246, 0.25) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .brand {
+      font-family: 'Fredoka One', cursive;
+      font-size: 28px;
+      line-height: 1.1;
+      color: var(--blue);
+      margin-bottom: 4px;
+      position: relative;
+      z-index: 1;
+    }
+    .brand span { color: var(--gold); text-shadow: 1px 1px 0 var(--blue-dk); }
+    .venue {
+      font-size: 11px;
+      font-weight: 900;
+      color: var(--muted);
+      letter-spacing: 0.02em;
+      margin-bottom: 8px;
+      z-index: 1;
+    }
+    .headline {
+      font-family: 'Fredoka One', cursive;
+      font-size: 20px;
+      color: var(--blue-dk);
+      line-height: 1.2;
+      margin-bottom: 6px;
+      z-index: 1;
+    }
+    .sub {
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--muted);
+      margin-bottom: 10px;
+      max-width: 85mm;
+      line-height: 1.35;
+      z-index: 1;
+    }
+    .qr-wrap {
+      background: #fff;
+      border-radius: 14px;
+      padding: 6mm;
+      box-shadow: 0 4px 20px rgba(21, 101, 192, 0.12);
+      border: 3px solid var(--blue);
+      margin-bottom: 10px;
+      z-index: 1;
+    }
+    .qr-wrap img, .qr-wrap svg {
+      display: block;
+      width: 52mm;
+      height: 52mm;
+    }
+    .steps {
+      width: 100%;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 800;
+      line-height: 1.45;
+      color: var(--txt);
+      z-index: 1;
+    }
+    .steps li {
+      list-style: none;
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+      margin-bottom: 6px;
+    }
+    .steps .n {
+      flex-shrink: 0;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--blue);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .foot {
+      margin-top: 8px;
+      font-size: 9px;
+      font-weight: 800;
+      color: var(--muted);
+      z-index: 1;
+    }
+    .url-hint {
+      font-size: 8px;
+      word-break: break-all;
+      color: #90a4ae;
+      margin-top: 4px;
+      z-index: 1;
+    }
+
+    .poster.a5 {
+      width: 148mm;
+      min-height: 210mm;
+      padding: 14mm 12mm;
+    }
+    .poster.a5 .brand { font-size: 36px; }
+    .poster.a5 .headline { font-size: 26px; }
+    .poster.a5 .qr-wrap img, .poster.a5 .qr-wrap svg { width: 70mm; height: 70mm; }
+    .poster.a5 .steps { font-size: 13px; }
+
+    @media print {
+      body { background: #fff; padding: 0; }
+      .toolbar { display: none !important; }
+      .poster {
+        box-shadow: none;
+        border-radius: 0;
+        margin: 0 auto;
+        page-break-inside: avoid;
+      }
+      @page { margin: 8mm; }
+    }
+  </style>
+</head>
+<body>
+  <div class="toolbar">
+    <p>Abra no Chrome → <strong>Imprimir</strong> (Ctrl+P) → papel A6 ou A5 · margens mínimas · ativar gráficos de fundo.</p>
+    <button type="button" onclick="window.print()">🖨️ Imprimir agora</button>
+    <button type="button" class="sec" onclick="setSize('a6')">Tamanho A6 (mesa)</button>
+    <button type="button" class="sec" onclick="setSize('a5')">Tamanho A5 (maior)</button>
+  </div>
+
+  <article class="poster" id="poster">
+    <div class="brand">🚗 Movi <span>Kids</span></div>
+    <div class="venue">Golden Shopping Calhau</div>
+    <h1 class="headline">Escaneie para acompanhar</h1>
+    <p class="sub">Veja o tempo da brincadeira no seu celular — sem precisar de SMS ou WhatsApp.</p>
+
+    <div class="qr-wrap">
+      <img src="qr-portal-acompanhar.svg" width="512" height="512" alt="QR Code portal Movi Kids">
+    </div>
+
+    <ol class="steps">
+      <li><span class="n">1</span><span>Abra a <strong>câmera</strong> do celular (ou leitor de QR).</span></li>
+      <li><span class="n">2</span><span>Aponte para o código acima.</span></li>
+      <li><span class="n">3</span><span>Digite seu <strong>telefone com DDD</strong> (ex.: 98 99999-1234).</span></li>
+      <li><span class="n">4</span><span>Acompanhe o timer em tempo real — várias crianças no mesmo telefone.</span></li>
+    </ol>
+
+    <p class="foot">Dúvidas? Peça ajuda ao atendente no balcão.</p>
+    <p class="url-hint">ribocg-a11y.github.io/movikids/acompanhar.html</p>
+  </article>
+
+  <script>
+    function setSize(size) {
+      const p = document.getElementById('poster');
+      p.classList.remove('a5');
+      if (size === 'a5') p.classList.add('a5');
+    }
+  </script>
+</body>
+</html>

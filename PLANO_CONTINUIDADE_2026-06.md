@@ -117,7 +117,7 @@ flowchart TD
 | L.3 | Indicador “Última sync · há Xs” no header | Backlog §8 |
 | L.4 | Dashboard: link “ver caixa hoje” sem duplicar número | §5 |
 | L.5 | Página Sistema: diagnóstico + liberar sessão | §9 recursos |
-| L.6 | QR portal visível no balcão (impresso ou tela fixa) | `DECISAO_COMUNICACAO_QR_CODE_2026-06.md` |
+| L.6 | QR portal no balcão — `assets/qr-balcao-imprimir.html` (A6) | `DECISAO_COMUNICACAO_QR_CODE_2026-06.md` |
 
 **Versão alvo:** FE **v1.7.50+** · GAS mínimo
 
