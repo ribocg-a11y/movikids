@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="mk-design.css?v=1.7.43">
+<link rel="stylesheet" href="mk-design.css?v=1.7.44">
 </head>
 <body class="mk-portal-page" data-view="gate">
 
@@ -92,10 +92,11 @@ function restante(l) {
   if (!ini) return total * 60;
   return (total * 60) - Math.floor((Date.now() - ini) / 1000);
 }
-function ringOffset(rem, totalSec) {
-  if (totalSec <= 0) return RING_C;
+/** Arco visível no sentido horário a partir do topo (12h). */
+function ringDash_(rem, totalSec, extra) {
+  if (extra || totalSec <= 0) return { vis: 0, circ: RING_C };
   const p = Math.max(0, Math.min(1, rem / totalSec));
-  return RING_C * (1 - p);
+  return { vis: RING_C * p, circ: RING_C };
 }
 function portalErro_(d, err) {
   if (d && Number(d.code) === 429) return 'Aguarde 1 minuto e tente de novo.';
@@ -149,7 +150,7 @@ function render() {
     const warn = !extra && !pend && rem > 0 && rem <= 300;
     const ringClass = extra ? 'extra' : (pend ? 'wait' : (warn ? 'warn' : 'ok'));
     const timeTxt = extra ? '+' + fmt(Math.abs(rem)) : fmt(rem);
-    const off = ringOffset(extra ? 0 : Math.max(0, rem), totalSec);
+    const dash = ringDash_(extra ? 0 : Math.max(0, rem), totalSec, extra);
     const lbl = extra ? 'Tempo extra' : (pend ? 'Já já começa' : (warn ? 'Quase lá!' : 'Falta'));
     const cardCls = 'mk-portal-play' + (extra ? ' is-extra' : '') + (warn ? ' is-warn' : '') + (pend ? ' is-wait' : '');
 
@@ -159,7 +160,7 @@ function render() {
         <svg viewBox="0 0 200 200" aria-hidden="true">
           <circle class="mk-portal-ring-bg" cx="100" cy="100" r="88"></circle>
           <circle class="mk-portal-ring-prog ${ringClass}" cx="100" cy="100" r="88"
-            style="stroke-dashoffset:${off.toFixed(1)}"></circle>
+            style="stroke-dasharray:${dash.vis.toFixed(1)} ${dash.circ.toFixed(1)};stroke-dashoffset:0"></circle>
         </svg>
         <div class="mk-portal-ring-center">
           <span class="mk-portal-ring-lbl">${lbl}</span>

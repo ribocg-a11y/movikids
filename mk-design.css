@@ -369,8 +369,7 @@
   fill: none;
   stroke-width: 14;
   stroke-linecap: round;
-  stroke-dasharray: 553;
-  transition: stroke-dashoffset 1s linear, stroke 0.4s;
+  transition: stroke-dasharray 1s linear, stroke 0.4s;
 }
 .mk-portal-ring-prog.ok { stroke: var(--blue); }
 .mk-portal-ring-prog.warn { stroke: var(--gold); }
