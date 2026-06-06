@@ -168,6 +168,7 @@ C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\m
 | I16 | Portal `startTimestamp` bruto vs balcão `timestampCanonico_` | Celular mostra minutos diferentes do tablet | GAS **v1.5.55** + `canonLoc_` em `acompanhar.html` | `TESTE_PARIDADE_CRONOMETRO_PORTAL_BALCAO.ps1` |
 | I17 | Liberar sessão + GET em cache | Banner operador preso após ADM liberar | v1.7.45 `mkAuthSyncSessaoBalcaoUI_` + `no-store` | tablet ADM liberar |
 | I18 | Idle 1h com locação Ativa/Pendente | Logout no meio da operação | v1.7.46 `mkHasLocacaoAbertaNoTablet_` | `pre-push-check` guard.idle.locacao |
+| I19 | PWA sessão fantasma + turno invisível (Milena 06/06) | App aberto sem turno no GAS; Home sem nome | v1.7.48 reconcile + chip Turno | `INCIDENTE_AUTH_SESSAO_FANTASMA_PWA_2026-06-06.md` |
 
 ### Aprendizados operacionais (não repetir)
 

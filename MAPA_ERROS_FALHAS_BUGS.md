@@ -1,6 +1,6 @@
 # MOVI KIDS — Mapa de erros, falhas e bugs
 
-**Atualizado:** 06/06/2026 10:34  
+**Atualizado:** 06/06/2026 — I19 sessão fantasma PWA / Milena  
 **Uso:** consultar **antes de publicar** e **ao montar checklist de teste**. Cada linha tem trava e script de verificação quando existir.
 
 **Índice de incidentes longos:** `INCIDENTE_*.md` (pós-mortems).  
@@ -47,6 +47,7 @@
 | **I16** | **Portal sem `timestampCanonico_`** | **Celular ≠ balcão (minutos)** | GAS v1.5.55 + `canonLoc_` portal | GAS+FE canon; pre-push estático | **`TESTE_PARIDADE_CRONOMETRO`** + tablet+celular |
 | **I17** | **Liberar sessão + cache GET** | **Banner operador preso** | v1.7.45 sync UI + `no-store` | `mkAuthSyncSessaoBalcaoUI_`; api cache | ADM liberar **tablet** |
 | **I18** | **Idle 1h com locação aberta** | **Logout no meio da locação** | v1.7.46 `mkHasLocacaoAbertaNoTablet_` | mk-auth + tickAdmin | mock idle + loc ativa |
+| **I19** | **PWA sessão fantasma + turno invisível** | Operador “dentro” do app; servidor sem turno; Home sem nome; AUD sem logout idle | v1.7.48 `mkAuthReconcileSessaoFantasma_` + chip `#hd-turno-chip` | pre-push `guard.auth.fantasma`; PWA `mk-update` | tablet ícone: chip Turno + liberar ADM |
 
 ---
 
@@ -58,6 +59,7 @@
 | `INCIDENTE_AUTH_OPERADORES_2026-06-04.md` | I4, I6, I7, timer sem operador |
 | `INCIDENTE_POST_BROWSER_LANCAMENTO_2026-06-05.md` | **I15** |
 | **`INCIDENTE_CRONOMETRO_PORTAL_AUTH_2026-06-05_06.md`** | **I16, I17, I18** |
+| **`INCIDENTE_AUTH_SESSAO_FANTASMA_PWA_2026-06-06.md`** | **I19** (Milena 06/06, login OK 13:05) |
 | `EMERGENCIA_SMS_404.md` | URL morta |
 | `TROCA_SMS_GATEWAY_DJVJRL_2026-06-04.md` | Gateway SMS |
 
@@ -74,6 +76,8 @@
 | `guard.portal.canon` | `canonLoc_`, `calcStartTimestamp_` em acompanhar | I16 |
 | `guard.gas.portal.canon` | `timestampCanonico_` em `buscarPortalResponsavel_` | I16 |
 | `guard.idle.locacao` | `mkHasLocacaoAbertaNoTablet_` em mk-auth | I18 |
+| `guard.auth.fantasma` | `mkAuthReconcileSessaoFantasma_` em mk-auth | I19 |
+| `guard.turno.chip` | `#hd-turno-chip` em index.html | I19 |
 | `teste.paridade` | `TESTE_PARIDADE_HTTP_BROWSER_GAS.ps1` | I15 |
 | `teste.portal` | `TESTE_PORTAL_READONLY.ps1` | portal |
 | `teste.cronometro` | `TESTE_PARIDADE_CRONOMETRO_PORTAL_BALCAO.ps1` | I16 |
@@ -87,6 +91,8 @@
 - [ ] Timer balcão = portal mesmo telefone ±2 s (I16)
 - [ ] ADM liberar sessão atualiza banner (I17)
 - [ ] Idle não desloga com locação Ativa (I18)
+- [ ] Chip **Turno: Nome** visível no header (I19) — PWA ícone
+- [ ] Liberar sessão ADM → tablet desloga ou chip laranja em ≤60s (I19)
 - [ ] Ctrl+F5 com `?force=VERSAO_ATUAL`
 
 ---
@@ -100,6 +106,8 @@
 5. **Sempre** `cache: 'no-store'` em leituras de sessão no tablet (I17).
 6. **Sempre** registrar novo bug neste mapa + incidente `.md` + trava em `pre-push-check` quando possível.
 7. **Sempre** bump `mk-version` + `sw` + cache bust juntos (I3).
+8. **Nunca** assumir tablet deslogado após `liberarSessaoOperadorAdmin` — PWA pode manter fantasma (I19).
+9. **Sempre** validar turno com chip header + `listarOperadoresLogin.sessaoAtiva` (I19).
 
 ---
 
@@ -107,7 +115,7 @@
 
 | Camada | Repo | Produção (verificar ping) |
 |--------|------|---------------------------|
-| Frontend | **v1.7.46** | `?force=1.7.46` |
+| Frontend | **v1.7.48** | `?force=1.7.48` |
 | GAS repo | **v1.5.56** (ping no `.gs`) | Nova versão Web se ping menor |
 
 Ver `ESTADO_ATUAL.md` para URLs e editor GAS.

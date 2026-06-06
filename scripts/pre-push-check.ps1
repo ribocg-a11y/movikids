@@ -109,6 +109,19 @@ try {
     }
   } else {
     Add-Check "guard.idle.locacao" "fail" "mk-auth.js ausente"
+    Add-Check "guard.auth.fantasma" "fail" "mk-auth.js ausente"
+  }
+
+  $indexAuth = Join-Path $root "index.html"
+  if (Test-Path $indexAuth) {
+    $indexAuthRaw = Get-Content -Path $indexAuth -Raw -Encoding UTF8
+    if ($indexAuthRaw -notmatch 'id="hd-turno-chip"') {
+      Add-Check "guard.turno.chip" "fail" "hd-turno-chip ausente (I19)"
+    } else {
+      Add-Check "guard.turno.chip" "ok" "chip turno no header mobile"
+    }
+  } else {
+    Add-Check "guard.turno.chip" "fail" "index.html ausente"
   }
 
   if (-not $SkipNetworkTests) {

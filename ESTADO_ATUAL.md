@@ -7,7 +7,7 @@ Referência única para alinhamento local × produção.
 **Handoff:** `HANDOFF_NOVO_CHAT_2026-06-05.md`  
 **Mapa de erros/bugs:** **`MAPA_ERROS_FALHAS_BUGS.md`** (consulta em testes)  
 **DNA visual / produto:** **`DESIGN_DNA_MOVIKIDS.md`** (portal carrossel = norte criativo)  
-**Incidentes:** `INCIDENTE_AUTH_OPERADORES_2026-06-04.md`, `INCIDENTE_DEPLOY_E_EXTRAS_2026-06-04.md`, **`INCIDENTE_POST_BROWSER_LANCAMENTO_2026-06-05.md` (P0)**, **`INCIDENTE_CRONOMETRO_PORTAL_AUTH_2026-06-05_06.md` (I16–I18)**  
+**Incidentes:** `INCIDENTE_AUTH_OPERADORES_2026-06-04.md`, `INCIDENTE_DEPLOY_E_EXTRAS_2026-06-04.md`, **`INCIDENTE_POST_BROWSER_LANCAMENTO_2026-06-05.md` (P0)**, **`INCIDENTE_CRONOMETRO_PORTAL_AUTH_2026-06-05_06.md` (I16–I18)**, **`INCIDENTE_AUTH_SESSAO_FANTASMA_PWA_2026-06-06.md` (I19)**  
 **SMS gateway:** `TROCA_SMS_GATEWAY_DJVJRL_2026-06-04.md`  
 **Deploy GAS:** `DEPLOY_GAS_v1.5.32_AUTH.md`
 
@@ -24,7 +24,7 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 | Camada | Versão alvo | URL / ID |
 |--------|-------------|----------|
-| **Frontend** | **v1.7.46** | https://ribocg-a11y.github.io/movikids/?force=1.7.46 |
+| **Frontend** | **v1.7.48** | https://ribocg-a11y.github.io/movikids/?force=1.7.48 |
 | **Apps Script** | **v1.5.56** (repo; confirmar ping) | Deploy `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y` |
 | SMS Gateway Cloud | **DJVJRL** / device `wihWegHr4wXaVJQ1R-GZR` | Aparelho remoto ONLINE |
 | Pacote SMS P0 | **FECHADO** | `PACOTE_SMS_P0_UNIFICADO_v1.5.38_v1.7.11.md` |
@@ -91,6 +91,7 @@ Commits de referência: `3d9d106` (v1.7.25), `e1a56db` (Pacote E), `1454bc8` (fi
 | Cronômetro portal = balcão | GAS `timestampCanonico_` v1.5.55+ + `canonLoc_` portal (I16) |
 | Liberar sessão atualiza UI | `mkAuthSyncSessaoBalcaoUI_` + `cache: no-store` (I17) |
 | Idle não desloga com locação | `mkHasLocacaoAbertaNoTablet_` v1.7.46 (I18) |
+| Anti sessão fantasma PWA | `mkAuthReconcileSessaoFantasma_` + chip Turno v1.7.48 (I19) |
 
 ---
 

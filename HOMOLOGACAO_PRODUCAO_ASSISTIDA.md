@@ -81,4 +81,109 @@ Status: PASS_WITH_KNOWN_RISKS
 
 Se qualquer item acima acontecer, executar `ROLLBACK_EMERGENCIA.md`.
 
+---
+
+## Checklist I.5 — Operação diária (Pacote I + I19)
+
+**Versão de referência:** FE **v1.7.48** · GAS **v1.5.56**  
+**Quando:** fora do pico ou com 1 operador de reserva no balcão  
+**Duração:** ~30 min  
+**Mapa:** `PLANO_PAUSA_MATURIDADE_2026-06.md` I.5 · `MAPA_ERROS_FALHAS_BUGS.md` I19
+
+### Regras de segurança (ler antes)
+
+- **Não** publicar FE/GAS durante este checklist se o balcão estiver atendendo.
+- **Não** usar “Liberar sessão” no admin **a menos que** seja o teste I19.4 — avise o operador antes.
+- **Não** pedir Ctrl+F5 no tablet do operador em horário de pico; use o ícone PWA.
+- ADM no computador pode validar Caixa/Dashboard em paralelo **sem** mexer no tablet.
+
+### Participantes
+
+| Papel | Onde | Responsável |
+|-------|------|-------------|
+| Operador | Tablet (ícone PWA) | Ex.: Milena |
+| Admin | PC — login PIN admin | Você |
+| Observador | Portal no celular (opcional) | — |
+
+### A — Versão e conectividade (só leitura)
+
+| # | Passo | Esperado | OK |
+|---|-------|----------|-----|
+| A.1 | Tablet: Menu ☰ → rodapé mostra versão | ≥ **v1.7.48** | [ ] |
+| A.2 | Header tablet: chip **Turno: Nome** | Verde com operador logado | [ ] |
+| A.3 | PC: `?action=ping` no GAS | ≥ v1.5.55 | [ ] |
+| A.4 | PC: `listarOperadoresLogin` | `sessaoAtiva` = operador do tablet | [ ] |
+
+### B — Home operador (sem R$)
+
+| # | Passo | Esperado | OK |
+|---|-------|----------|-----|
+| B.1 | Login **operador** (não admin) no tablet | Home abre | [ ] |
+| B.2 | Home central | **Zero** valores em R$, KPI financeiro | [ ] |
+| B.3 | Stats-bar | Só contagem ativas / encerradas hoje | [ ] |
+| B.4 | Sidebar rodapé | Nome operador visível | [ ] |
+
+### C — Admin: Caixa vs Dashboard (no PC)
+
+| # | Passo | Esperado | OK |
+|---|-------|----------|-----|
+| C.1 | Login admin no PC | Home sem grid KPI mensal | [ ] |
+| C.2 | Abrir **Caixa** | Faturamento do dia completo | [ ] |
+| C.3 | Abrir **Dashboard** | KPIs do mês (não duplica fechamento linha a linha) | [ ] |
+| C.4 | Comparar total “hoje” Caixa vs chip discreto Home admin | Mesmo valor (±R$ 0) | [ ] |
+
+### D — Portal responsável (±2 s)
+
+| # | Passo | Esperado | OK |
+|---|-------|----------|-----|
+| D.1 | Celular: `acompanhar.html` telefone de locação ativa | Lista crianças | [ ] |
+| D.2 | Iniciar timer no tablet | Portal atualiza em **≤ 2 s** | [ ] |
+| D.3 | Carrossel 1 ou N crianças | Layout carrossel (v1.7.47+) | [ ] |
+
+### E — Sincronização mínima (se houver locação de teste)
+
+Só se a loja autorizar locação de teste **sem cliente real**:
+
+| # | Passo | Esperado | OK |
+|---|-------|----------|-----|
+| E.1 | Criar pendente teste | Aparece no tablet | [ ] |
+| E.2 | Iniciar timer | Portal ±2s | [ ] |
+| E.3 | Encerrar | Sai de ativas; histórico OK | [ ] |
+
+### F — Auth I19 (cuidado: avisar operador)
+
+| # | Passo | Esperado | OK |
+|---|-------|----------|-----|
+| F.1 | Com operador logado: chip Turno | Nome correto | [ ] |
+| F.2 | PC: `sessaoAtiva` no GAS | Mesmo operador | [ ] |
+| F.3 | **Opcional** F.3: ADM “Liberar sessão” **com aviso** | Tablet: chip laranja ou logout em ≤60s | [ ] |
+| F.4 | Operador faz login de novo | Chip verde; locações normais | [ ] |
+
+### G — Regressão automatizada (PC, antes de qualquer push)
+
+```powershell
+.\pre-push-check.ps1
+.\TESTE_RELACIONAMENTO_MOVIKIDS_READONLY.ps1
+```
+
+| # | Script | Esperado | OK |
+|---|--------|----------|-----|
+| G.1 | `pre-push-check.ps1` | Verde | [ ] |
+| G.2 | `TESTE_RELACIONAMENTO_READONLY` | `ok:true` | [ ] |
+
+### Assinatura Sprint 1
+
+| Campo | Valor |
+|-------|-------|
+| Data | ___/06/2026 |
+| Versão FE tablet | v1.7.___ |
+| Operador testado | _________________ |
+| Admin | _________________ |
+| Incidentes abertos | Nenhum P1 [ ] |
+
+**Sprint 1 fechada quando:** A–G marcados + nenhum rollback.
+
+---
+
+*Checklist I.5 não substitui homologação de release (`RELEASE_CANDIDATE_*`); complementa operação diária pós-pausa maturidade.*
 

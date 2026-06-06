@@ -178,6 +178,15 @@ Erros cometidos neste projeto que nao devem se repetir:
 - Idle 1h: **nao** deslogar se `mk_sessions` tiver status **Ativa** ou **Pendente** (`mkHasLocacaoAbertaNoTablet_`).
 - Trava estatica: `scripts/pre-push-check.ps1` (`guard.idle.locacao`).
 
+## Regra 12 - PWA sessao fantasma e turno visivel (I19)
+
+- App **instalado (icone)** persiste login 24h em `localStorage` — **liberar sessao no GAS nao desloga o tablet**.
+- Obrigatorio: `mkAuthReconcileSessaoFantasma_` no boot, poll e ao voltar do segundo plano.
+- Obrigatorio: chip **Turno** (`#hd-turno-chip`) visivel no header mobile — Home sozinha **nao** prova operador logado.
+- Validar: `listarOperadoresLogin.sessaoAtiva` = chip do tablet; apos `liberarSessaoOperadorAdmin`, tablet desloga em <=60s.
+- Doc: `INCIDENTE_AUTH_SESSAO_FANTASMA_PWA_2026-06-06.md`; mapa I19.
+- PWA: `verificarNovaVersao` acelerado; tablet com `?force=VERSAO_ATUAL` ou reinstalar icone apos mudanca grande.
+
 Toda regressao deve gerar:
 
 - causa provavel;

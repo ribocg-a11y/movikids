@@ -1,7 +1,7 @@
 # MOVI KIDS — Plano de continuidade (pós-pausa maturidade)
 
-**Data:** 06/06/2026  
-**Produção:** FE **v1.7.46** · GAS **v1.5.56** (confirmar ping)  
+**Data:** 06/06/2026 (revisão tarde — pós I19 Milena)  
+**Produção:** FE **v1.7.48** · GAS **v1.5.56** (confirmar ping)  
 **Substitui como “próximo passo”:** seção 9 de `PLANO_PAUSA_MATURIDADE_2026-06.md` e seção 14 de `PLANO_MESTRE_REORGANIZADO_2026-06.md`  
 **Referências:** `ESTADO_ATUAL.md`, `MAPA_ERROS_FALHAS_BUGS.md`, `AUDITORIA_PLANILHA_BASE_2026-06-06.md`
 
@@ -19,6 +19,8 @@
 | J — Travas CI | ✅ | pre-push-check + guards I15–I18 |
 | Fixes pós-incidente | ✅ | I16 cronômetro, I17 sessão UI, I18 idle v1.7.46 |
 | Planilha base | ✅ | Auditoria + organização 06/06 |
+| Portal carrossel + DNA visual | ✅ | v1.7.47 `acompanhar.html` + `DESIGN_DNA_MOVIKIDS.md` |
+| Anti sessão fantasma PWA | ✅ | I19 v1.7.48 — chip Turno + reconcile tablet×GAS |
 
 O gargalo **deixou de ser confiabilidade básica**. O sistema opera; o foco passa a **dados, relacionamento e WhatsApp**.
 
@@ -65,15 +67,18 @@ flowchart TD
 
 **Objetivo:** fechar pendências da pausa e garantir produção alinhada antes de features novas.
 
-| # | Entrega | Tipo | Critério de pronto |
-|---|---------|------|-------------------|
-| S1.1 | Checklist tablet **I.5** | QA manual | Operador sem R$; Caixa vs Dashboard coerentes; portal ±2s |
-| S1.2 | Confirmar GAS **v1.5.56** no ping | Ops | `?action=ping` ≥ v1.5.55 |
-| S1.3 | Tablet **v1.7.46** em uso | Ops | `?force=1.7.46` no balcão |
-| S1.4 | `pre-push-check` + regressão readonly | CI | Verde antes de cada push |
-| S1.5 | Documentar checklist I.5 em `HOMOLOGACAO_PRODUCAO_ASSISTIDA.md` | Docs | 1 página atualizada |
+| # | Entrega | Tipo | Status | Critério de pronto |
+|---|---------|------|--------|-------------------|
+| S1.1 | Checklist tablet **I.5** | QA manual | 🟡 parcial | Operador sem R$; Caixa vs Dashboard; portal ±2s; **chip Turno** (I19) |
+| S1.2 | Confirmar GAS **v1.5.56** no ping | Ops | ✅ | `?action=ping` ≥ v1.5.55 |
+| S1.3 | Tablet **v1.7.48** no ícone PWA | Ops | 🟡 | `?force=1.7.48`; reinstalar ícone se cache 1.7.41 |
+| S1.4 | `pre-push-check` + regressão readonly | CI | ✅ | Guards I15–I19 |
+| S1.5 | Documentar checklist I.5 | Docs | 🟡 | `HOMOLOGACAO_PRODUCAO_ASSISTIDA.md` + I19 no mapa |
+| S1.6 | Auth turno visível + anti-fantasma | FE | ✅ | v1.7.48; Milena login 13:05 validado |
 
-**Fora desta sprint:** código novo de feature.
+**Incidente fechado na sprint:** I19 (`INCIDENTE_AUTH_SESSAO_FANTASMA_PWA_2026-06-06.md`).
+
+**Fora desta sprint:** código novo de feature (exceto hotfix P0/P1).
 
 ---
 
@@ -95,7 +100,7 @@ flowchart TD
 - Locação **nunca** bloqueia se RESPONSAVEIS falhar.
 - Auditoria em alterações de cadastro (opcional K.6).
 
-**Versão alvo:** FE **v1.7.47–48** · GAS **v1.5.57**
+**Versão alvo:** FE **v1.7.49+** · GAS **v1.5.57** (v1.7.48 já consumida por portal + I19)
 
 ---
 
@@ -157,19 +162,41 @@ flowchart TD
 
 ---
 
-## 10. Decisão imediata — começar agora
+## 10. Decisão imediata — junho 2026
 
-**Sprint 1** está ativa. Ordem de execução:
+**Sprint 1** quase fechada. Ordem **agora**:
 
-1. Rodar checklist tablet (I.5) — 30 min no balcão.
-2. Iniciar **Pacote K** (import RESPONSAVEIS) — maior valor após maturidade.
-3. Em paralelo: ampliar `TESTE_REGRESSAO` com cenários write documentados.
+| Prioridade | Ação | Quem | Tempo |
+|------------|------|------|-------|
+| **P0** | Tablet balcão em **v1.7.48** (ícone PWA atualizado) | Ops balcão | 10 min |
+| **P0** | Fechar checklist **I.5** formal (1 folha assinada) | Ops + dev | 30 min |
+| **P1** | **Pacote K.1** — script import LOCACOES → RESPONSAVEIS | Dev | 1–2 dias |
+| **P2** | `TESTE_REGRESSAO` write controlado (B7) | Dev | paralelo |
 
-**Não iniciar F4 WhatsApp antes de K.1** — evita duas zonas críticas ao mesmo tempo.
+**Não iniciar F4 WhatsApp antes de K.1 estável.**
+
+### Critério para encerrar Sprint 1 e abrir Sprint 2
+
+- [ ] Todos tablets **1.7.48** + chip Turno verde com operador logado  
+- [ ] Checklist I.5 marcado em `HOMOLOGACAO_PRODUCAO_ASSISTIDA.md`  
+- [ ] `pre-push-check` verde  
+- [ ] Nenhum incidente P1 auth aberto  
+
+→ Então: **merge mental Sprint 1 → início Pacote K**.
 
 ---
 
-## 11. Documentos a manter atualizados
+## 11. Visão por trimestre (resumo)
+
+| Mês | Entrega principal | Valor para a loja |
+|-----|-------------------|-------------------|
+| **Jun** | K — CRM / RESPONSAVEIS | Reconhecer cliente, repetir visita |
+| **Jul** | F4 WhatsApp | Cobrança extra e comunicação no tablet |
+| **Ago** | L — UX polish | Balcão mais rápido e bonito (DNA portal) |
+
+---
+
+## 12. Documentos a manter atualizados
 
 | Ao fechar sprint | Atualizar |
 |------------------|-----------|
@@ -180,4 +207,4 @@ flowchart TD
 
 ---
 
-*Próxima revisão do plano: ao fechar Sprint 1 (checklist I.5 concluído).*
+*Próxima revisão: ao iniciar Pacote K.1 (import RESPONSAVEIS) ou 13/06/2026.*
