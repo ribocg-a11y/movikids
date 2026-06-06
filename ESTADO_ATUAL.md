@@ -9,7 +9,7 @@ Referência única para alinhamento local × produção.
 **DNA visual / produto:** **`DESIGN_DNA_MOVIKIDS.md`** (portal carrossel = norte criativo)  
 **Incidentes:** `INCIDENTE_AUTH_OPERADORES_2026-06-04.md`, `INCIDENTE_DEPLOY_E_EXTRAS_2026-06-04.md`, **`INCIDENTE_POST_BROWSER_LANCAMENTO_2026-06-05.md` (P0)**, **`INCIDENTE_CRONOMETRO_PORTAL_AUTH_2026-06-05_06.md` (I16–I18)**, **`INCIDENTE_AUTH_SESSAO_FANTASMA_PWA_2026-06-06.md` (I19)**  
 **SMS gateway:** `TROCA_SMS_GATEWAY_DJVJRL_2026-06-04.md`  
-**Deploy GAS:** `DEPLOY_GAS_v1.5.32_AUTH.md`
+**Deploy GAS:** `DEPLOY_GAS_v1.5.32_AUTH.md` · **K.1:** `DEPLOY_v1.5.57_IMPORT_RESPONSAVEIS.md`
 
 ---
 
@@ -25,7 +25,7 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 | Camada | Versão alvo | URL / ID |
 |--------|-------------|----------|
 | **Frontend** | **v1.7.48** | https://ribocg-a11y.github.io/movikids/?force=1.7.48 |
-| **Apps Script** | **v1.5.56** (repo; confirmar ping) | Deploy `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y` |
+| **Apps Script** | **v1.5.57** (repo) · produção ping **v1.5.56** até Nova versão | Deploy `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y` |
 | SMS Gateway Cloud | **DJVJRL** / device `wihWegHr4wXaVJQ1R-GZR` | Aparelho remoto ONLINE |
 | Pacote SMS P0 | **FECHADO** | `PACOTE_SMS_P0_UNIFICADO_v1.5.38_v1.7.11.md` |
 | Planilha | MOVIKIDS_Planilha_Base | https://docs.google.com/spreadsheets/d/1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618/edit — auditoria `AUDITORIA_PLANILHA_BASE_2026-06-06.md` |
@@ -46,7 +46,7 @@ https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPe
 
 | Artefato | Arquivo |
 |----------|---------|
-| GAS | `MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs` (header **v1.5.56**; portal cronômetro **v1.5.55+**) |
+| GAS | `MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs` (header **v1.5.57**; produção ping **v1.5.56** até deploy) |
 | Clasp | `gas/Code.gs` (gerado por `scripts/sync-gas-to-clasp.ps1` — não editar à mão) |
 | Login | `mk-auth.js` + gate em `index.html` |
 | Versão FE | `mk-version.js`, `sw.js` |

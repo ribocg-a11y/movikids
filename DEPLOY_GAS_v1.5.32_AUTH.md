@@ -4,15 +4,17 @@
 
 Toda vez que o assistente alterar o `.gs`, deve informar este caminho (versão atual no header do arquivo):
 
-**v1.5.48 no seu PC (regra de ouro — copiar deste arquivo):**
+**v1.5.57 no seu PC (regra de ouro — copiar deste arquivo):**
 
 `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github\MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs`
+
+Pacote K.1 (import RESPONSAVEIS): `DEPLOY_v1.5.57_IMPORT_RESPONSAVEIS.md`
 
 **Como colar no Apps Script:** Explorer → cole o caminho acima na barra → Enter → duplo clique no `.gs` → Ctrl+A → Ctrl+C → colar em **Código.gs** no editor → **Implantar → Nova versão**.
 
 ## Código GAS no PC (copiar daqui → colar no script)
 
-**Arquivo canônico v1.5.48 (PDF Pacote F + KPIs + limparLocacoesTesteAdmin):**
+**Arquivo canônico v1.5.57 (Pacote K.1 import RESPONSAVEIS + histórico v1.5.32–56):**
 
 `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github\MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs`
 
@@ -30,7 +32,7 @@ Abrir no Explorer: cole o caminho na barra de endereço → Enter → duplo cliq
 
 No **editor GAS** (link acima): **Implantar → Gerenciar implantações → Editar** a implantação Web (**ID `AKfycbwakQ...`**) → **Nova versão** → Implantar. **Não** crie um deploy novo. **Nunca** use `clasp deploy`.
 
-Após implantar, o `ping` deve mostrar `versao` **v1.5.48** e `postWriteActions` (Pacote E). `buscarKPIsAdmin` + PDF mensal incluem Pacote F (`porOperador`, `cancelamentos`, `ocupacaoFrota`, `cusPorCategoria`, `recorrenciaClientes`). SMS: **v1.5.41** — ver `TROCA_SMS_GATEWAY_DJVJRL_2026-06-04.md`.
+Após implantar, o `ping` deve mostrar `versao` **v1.5.57** (ou a versão do header do `.gs`) e `postWriteActions` (Pacote E). `buscarKPIsAdmin` + PDF mensal incluem Pacote F (`porOperador`, `cancelamentos`, `ocupacaoFrota`, `cusPorCategoria`, `recorrenciaClientes`). SMS: **v1.5.41** — ver `TROCA_SMS_GATEWAY_DJVJRL_2026-06-04.md`.
 
 ### Propriedades do script (SMS — producao)
 
@@ -76,6 +78,7 @@ O script: copia o `.gs` canônico → `gas/Code.gs` → valida `DEPLOY_ID` → `
 | `corrigirFinanceiroLocacaoAdmin` | Ajuste locação encerrada + `zerarExtra` |
 | `limparLocacoesTesteAdmin` | Anula locações de teste (`adminPin=1416`, `motivo` ≥10 chars; opcional `soHoje=1`) |
 | `liberarSessaoOperadorAdmin` | ADM libera trava de sessão |
+| `importarResponsaveisAdmin` | K.1 — import LOCACOES→RESPONSAVEIS (`dryRun=1` primeiro) — ver `DEPLOY_v1.5.57_IMPORT_RESPONSAVEIS.md` |
 | `encerrarLocacao` | Aceita `somentePlano=true` (sem extras — GAS instável) |
 
 ## Frontend
