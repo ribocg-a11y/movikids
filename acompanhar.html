@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="mk-design.css?v=1.7.61">
+<link rel="stylesheet" href="mk-design.css?v=1.7.62">
 </head>
 <body class="mk-portal-page" data-view="gate">
 
@@ -32,8 +32,6 @@
 
 <!-- Timer: uma ou mais locações, só o relógio -->
 <main class="mk-portal-stage" id="resultado" hidden aria-live="polite"></main>
-
-<button type="button" class="mk-portal-back" id="btn-foto" hidden>📸 Foto para o Instagram</button>
 
 <script>
 const PORTAL_FALLBACK_GAS = 'https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec';
@@ -234,10 +232,14 @@ function setView(mode) {
   document.body.dataset.view = mode;
   const gate = document.getElementById('sec-gate');
   const stage = document.getElementById('resultado');
-  const fotoBtn = document.getElementById('btn-foto');
   if (gate) gate.hidden = mode === 'play';
   if (stage) stage.hidden = mode !== 'play';
-  if (fotoBtn) fotoBtn.hidden = mode !== 'play';
+}
+
+function goFotoMoldura_() {
+  if (!_telAtual || !locacoes.length) return;
+  const nome = locacoes[_carouselIdx]?.crianca || '';
+  location.href = 'foto-moldura.html?tel=' + encodeURIComponent(_telAtual) + '&nome=' + encodeURIComponent(nome);
 }
 
 async function loadGasUrl_() {
@@ -309,6 +311,7 @@ function render() {
       ${ringBlockHtml_(stats)}
       ${infoBasicaHtml_(atual)}
       ${stats.pend ? '<p class="mk-portal-play-msg">Preparando o veículo…</p>' : ''}
+      <button type="button" class="mk-portal-foto-btn" data-action="foto">📸 Tira uma foto</button>
     </article>
     ${dots ? `<div class="mk-portal-dots">${dots}</div>` : ''}
     ${swipeHint}
@@ -392,13 +395,11 @@ function applyDeepLink_() {
 }
 
 document.getElementById('btn').addEventListener('click', () => buscar(false));
-document.getElementById('btn-foto').addEventListener('click', () => {
-  if (!_telAtual || !locacoes.length) return;
-  const nome = locacoes[_carouselIdx]?.crianca || '';
-  location.href = 'foto-moldura.html?tel=' + encodeURIComponent(_telAtual) + '&nome=' + encodeURIComponent(nome);
-});
-
 document.getElementById('resultado').addEventListener('click', (e) => {
+  if (e.target.closest('[data-action="foto"]')) {
+    goFotoMoldura_();
+    return;
+  }
   if (e.target.id === 'btn-trocar-tel' || e.target.closest('#btn-trocar-tel')) {
     voltarGate_();
     return;

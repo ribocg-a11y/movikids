@@ -713,9 +713,22 @@
   text-decoration: underline;
   cursor: pointer;
 }
-.mk-portal-page[data-view="play"] {
-  padding-bottom: max(72px, calc(env(safe-area-inset-bottom) + 56px));
+.mk-portal-foto-btn {
+  display: block;
+  width: 100%;
+  margin-top: 16px;
+  height: 50px;
+  background: linear-gradient(180deg, #4fc3f7 0%, #29B6F6 45%, #039be5 100%);
+  border: none;
+  border-radius: 25px;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 900;
+  font-family: inherit;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.22);
 }
+.mk-portal-foto-btn:active { transform: scale(0.98); }
 
 /* ── Foto moldura redes sociais (foto-moldura.html) ── */
 .mk-frame-page {
