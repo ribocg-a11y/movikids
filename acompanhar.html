@@ -7,51 +7,36 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Movi Kids">
 <meta name="robots" content="noindex,nofollow">
-<meta name="description" content="Acompanhe em tempo real a locação do seu filho na Movi Kids.">
-<title>Movi Kids — Portal do Responsável</title>
+<title>Movi Kids — Acompanhar</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="mk-design.css?v=1.7.41">
+<link rel="stylesheet" href="mk-design.css?v=1.7.42">
 </head>
-<body class="mk-portal-page">
-<header class="mk-portal-header">
-  <div class="mk-portal-brand">Movi <span>Kids</span></div>
-  <p class="mk-portal-tagline">Portal do responsável — acompanhe apenas as locações vinculadas ao seu telefone.</p>
-</header>
+<body class="mk-portal-page" data-view="gate">
 
-<main class="mk-portal-main">
-  <section class="mk-portal-card" id="sec-login">
-    <label class="mk-portal-label" for="telefone">Telefone com DDD</label>
-    <div class="mk-portal-row">
-      <input id="telefone" class="mk-portal-input" type="tel" inputmode="tel" autocomplete="tel"
-        placeholder="(98) 98206-8696" maxlength="16" aria-describedby="hint-tel">
-      <button type="button" class="mk-portal-btn" id="btn">Entrar</button>
-    </div>
-    <p class="mk-portal-hint" id="hint-tel">Use o mesmo número informado no balcão. Funciona como senha simples — não compartilhe.</p>
-    <div class="mk-portal-status" id="status" role="status" aria-live="polite"></div>
-  </section>
+<div class="mk-portal-glow" aria-hidden="true"></div>
 
-  <section class="mk-portal-card mk-portal-qr-card" id="sec-qr">
-    <div class="mk-portal-qr-inner">
-      <img src="assets/qr-portal-acompanhar.png" width="128" height="128" alt="QR Code para abrir o portal Movi Kids" loading="lazy">
-      <div>
-        <div class="mk-portal-qr-title">Acesso rápido no balcão</div>
-        <p class="mk-portal-qr-text">Escaneie o QR ou salve este link. Você também pode abrir com <code>?tel=DDDnumero</code> após o cadastro.</p>
-      </div>
-    </div>
-  </section>
+<!-- Entrada: só telefone -->
+<section class="mk-portal-gate" id="sec-gate">
+  <div class="mk-portal-brand-lg">Movi <span>Kids</span></div>
+  <p class="mk-portal-gate-title">Quanto tempo falta? ⏱️</p>
+  <div class="mk-portal-gate-form">
+    <input id="telefone" class="mk-portal-input" type="tel" inputmode="tel" autocomplete="tel"
+      placeholder="Seu telefone com DDD" maxlength="16" aria-label="Telefone com DDD">
+    <button type="button" class="mk-portal-btn" id="btn">Ver tempo</button>
+  </div>
+  <p class="mk-portal-gate-err" id="status" role="status" aria-live="polite"></p>
+</section>
 
-  <section id="resultado" class="mk-portal-results" aria-live="polite"></section>
+<!-- Timer: uma ou mais locações, só o relógio -->
+<main class="mk-portal-stage" id="resultado" hidden aria-live="polite"></main>
 
-  <footer class="mk-portal-foot">
-    Golden Shopping Calhau · São Luís — WhatsApp continua como canal alternativo quando disponível.
-  </footer>
-</main>
+<button type="button" class="mk-portal-back" id="btn-voltar" hidden>Trocar telefone</button>
 
 <script>
 const PORTAL_FALLBACK_GAS = 'https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec';
-const RING_C = 408;
+const RING_C = 2 * Math.PI * 88;
 let GAS_URL = PORTAL_FALLBACK_GAS;
 let locacoes = [];
 let _telAtual = '';
@@ -97,16 +82,24 @@ function ringOffset(rem, totalSec) {
   return RING_C * (1 - p);
 }
 function portalErro_(d, err) {
-  if (d && Number(d.code) === 429) return 'Muitas consultas em pouco tempo. Aguarde 1 minuto e tente de novo.';
+  if (d && Number(d.code) === 429) return 'Aguarde 1 minuto e tente de novo.';
   if (d && d.erro) return String(d.erro);
   if (err && err.message) return err.message;
-  return 'Não foi possível conectar ao servidor. Verifique a internet ou fale com o operador.';
+  return 'Sem conexão. Tente outra vez.';
 }
-function setStatus(msg, kind) {
+function setStatus(msg) {
   const el = document.getElementById('status');
-  if (!el) return;
-  el.textContent = msg || '';
-  el.className = 'mk-portal-status' + (kind ? ' is-' + kind : '');
+  if (el) el.textContent = msg || '';
+}
+
+function setView(mode) {
+  document.body.dataset.view = mode;
+  const gate = document.getElementById('sec-gate');
+  const stage = document.getElementById('resultado');
+  const back = document.getElementById('btn-voltar');
+  if (gate) gate.hidden = mode === 'play';
+  if (stage) stage.hidden = mode !== 'play';
+  if (back) back.hidden = mode !== 'play';
 }
 
 async function loadGasUrl_() {
@@ -121,43 +114,44 @@ async function loadGasUrl_() {
 function render() {
   const box = document.getElementById('resultado');
   if (!box) return;
+
   if (!locacoes.length) {
-    box.innerHTML = '<div class="mk-portal-card mk-portal-empty"><b>Nenhuma locação ativa</b><span>Não encontramos sessões em andamento para este telefone. Confira o número ou pergunte ao operador.</span></div>';
+    setView('gate');
+    setStatus('Nenhuma brincadeira ativa agora. Confira o telefone ou fale com o operador.');
+    box.innerHTML = '';
     return;
   }
+
+  setView('play');
+  setStatus('');
+
   box.innerHTML = locacoes.map((l, i) => {
     const rem = restante(l);
     const totalSec = totalMins(l) * 60;
     const extra = rem < 0;
     const pend = l.status === 'Pendente';
-    const titulo = extra ? 'TEMPO EXTRA' : (pend ? 'AGUARDANDO' : 'RESTANTE');
-    const ringClass = extra ? 'extra' : (pend ? 'wait' : 'ok');
+    const warn = !extra && !pend && rem > 0 && rem <= 300;
+    const ringClass = extra ? 'extra' : (pend ? 'wait' : (warn ? 'warn' : 'ok'));
     const timeTxt = extra ? '+' + fmt(Math.abs(rem)) : fmt(rem);
-    const off = ringOffset(extra ? 0 : rem, totalSec);
-    const extLbl = Number(l.extendedMins || 0) > 0 ? ' (+' + l.extendedMins + ' min ext.)' : '';
-    return `<article class="mk-portal-loc-card ${extra ? 'is-extra' : ''}">
-      <div class="mk-portal-ring-wrap">
-        <svg viewBox="0 0 150 150" aria-hidden="true">
-          <circle class="mk-portal-ring-bg" cx="75" cy="75" r="65"></circle>
-          <circle class="mk-portal-ring-prog ${ringClass}" cx="75" cy="75" r="65"
+    const off = ringOffset(extra ? 0 : Math.max(0, rem), totalSec);
+    const lbl = extra ? 'Tempo extra' : (pend ? 'Já já começa' : (warn ? 'Quase lá!' : 'Falta'));
+    const cardCls = 'mk-portal-play' + (extra ? ' is-extra' : '') + (warn ? ' is-warn' : '') + (pend ? ' is-wait' : '');
+
+    return `<article class="${cardCls}">
+      <div class="mk-portal-play-name">${tipoIcon(l.tipo)} ${esc(l.crianca)}</div>
+      <div class="mk-portal-play-ring">
+        <svg viewBox="0 0 200 200" aria-hidden="true">
+          <circle class="mk-portal-ring-bg" cx="100" cy="100" r="88"></circle>
+          <circle class="mk-portal-ring-prog ${ringClass}" cx="100" cy="100" r="88"
             style="stroke-dashoffset:${off.toFixed(1)}"></circle>
         </svg>
         <div class="mk-portal-ring-center">
-          <span class="mk-portal-ring-lbl">${titulo}</span>
+          <span class="mk-portal-ring-lbl">${lbl}</span>
           <b class="mk-portal-ring-time" id="tempo-${i}">${timeTxt}</b>
         </div>
       </div>
-      <div class="mk-portal-loc-body">
-        <div class="mk-portal-kid">${tipoIcon(l.tipo)} ${esc(l.crianca)}</div>
-        <div class="mk-portal-meta">
-          Responsável: ${esc(l.responsavel)}<br>
-          ${esc(l.veiculo || l.tipo)} · ${esc(l.plano)}<br>
-          Status: <strong>${esc(l.status)}</strong>
-        </div>
-        <span class="mk-portal-pill">${totalMins(l)} min${extLbl}</span>
-        ${extra ? '<div class="mk-portal-warn">O tempo contratado terminou. Minutos extras estão sendo contados — dirija-se ao balcão.</div>' : ''}
-        ${pend ? '<div class="mk-portal-info">Aguardando início do cronômetro pelo operador.</div>' : ''}
-      </div>
+      ${extra ? '<p class="mk-portal-play-msg">Hora de buscar no balcão 🏃</p>' : ''}
+      ${pend ? '<p class="mk-portal-play-msg">Preparando o veículo…</p>' : ''}
     </article>`;
   }).join('');
 }
@@ -165,10 +159,10 @@ function render() {
 async function buscar(silent) {
   const tel = digits(document.getElementById('telefone').value);
   if (tel.length < 10) {
-    setStatus('Digite o telefone com DDD (10 ou 11 dígitos).', 'warn');
+    setStatus('Digite o telefone com DDD.');
     return;
   }
-  if (!silent) setStatus('Buscando locações...', 'load');
+  if (!silent) setStatus('Buscando…');
   const btn = document.getElementById('btn');
   if (btn) btn.disabled = true;
   try {
@@ -176,23 +170,29 @@ async function buscar(silent) {
     const r = await fetch(url, { cache: 'no-store' });
     const d = await r.json();
     if (!d.ok) {
-      const ex = new Error(d.erro || 'Falha no portal');
+      const ex = new Error(d.erro || 'Falha');
       ex.data = d;
       throw ex;
     }
     locacoes = d.locacoes || [];
     _telAtual = tel;
-    if (!silent) {
-      setStatus(locacoes.length ? 'Locação encontrada — atualizando a cada 30s.' : '', locacoes.length ? 'ok' : '');
-    }
     render();
     if (locacoes.length) iniciarAutoRefresh(tel);
     else clearInterval(_refreshTimer);
   } catch (e) {
-    if (!silent) setStatus(portalErro_(e.data, e), 'err');
+    if (!silent) setStatus(portalErro_(e.data, e));
   } finally {
     if (btn) btn.disabled = false;
   }
+}
+
+function voltarGate_() {
+  locacoes = [];
+  _telAtual = '';
+  clearInterval(_refreshTimer);
+  setView('gate');
+  setStatus('');
+  document.getElementById('resultado').innerHTML = '';
 }
 
 function iniciarAutoRefresh(tel) {
@@ -204,17 +204,13 @@ function iniciarAutoRefresh(tel) {
       const url = GAS_URL + '?action=buscarPortalResponsavel&telefone=' + encodeURIComponent(_telAtual) + '&t=' + Date.now();
       const r = await fetch(url, { cache: 'no-store' });
       const d = await r.json();
-      if (!d.ok) {
-        if (Number(d.code) === 429) setStatus(portalErro_(d), 'warn');
-        return;
-      }
+      if (!d.ok) return;
       const novas = d.locacoes || [];
       const mudou = novas.length !== locacoes.length ||
         novas.some((l, i) => !locacoes[i] || l.status !== locacoes[i].status ||
           Number(l.extendedMins || 0) !== Number((locacoes[i] || {}).extendedMins || 0));
       if (mudou) {
         locacoes = novas;
-        setStatus(locacoes.length ? 'Atualizado agora.' : 'Nenhuma locação ativa no momento.', locacoes.length ? 'ok' : '');
         render();
       }
     } catch (e) {}
@@ -233,6 +229,7 @@ function applyDeepLink_() {
 }
 
 document.getElementById('btn').addEventListener('click', () => buscar(false));
+document.getElementById('btn-voltar').addEventListener('click', voltarGate_);
 document.getElementById('telefone').addEventListener('input', (e) => {
   e.target.value = maskTelInput(e.target.value);
 });
