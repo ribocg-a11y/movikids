@@ -49,16 +49,16 @@ flowchart TD
     K[CRM + aba RESPONSAVEIS]
     I[Import LOCACOES → RESPONSAVEIS]
   end
-  subgraph s3 [Sprint 3 — F4 WhatsApp]
-    W[Regras tablet/PWA fechadas]
-    A[AUD_WHATSAPP + UX extra]
-  end
-  subgraph s4 [Sprint 4 — Pacote L UX]
+  subgraph s3 [Sprint 3 — Pacote L UX]
     L[Nova locação polish]
     U[Painel tiles unificados]
   end
-  s1 --> s2 --> s3 --> s4
-  F9[F9 Supervisor] -. pausado .- s4
+  subgraph pausado [Pausado]
+    F4[F4 WhatsApp / SMS auto]
+  end
+  s1 --> s2 --> s3
+  F4 -. conta bloqueada + SMS sem entrega .- pausado
+  F9[F9 Supervisor] -. pausado .- s3
 ```
 
 ---
@@ -104,28 +104,11 @@ flowchart TD
 
 ---
 
-## 6. Sprint 3 — F4 WhatsApp completo (2–3 semanas)
-
-**Objetivo:** fechar escopo da Fase 4 com regressão tablet — zona crítica (Regra 3).
-
-| # | Entrega | Detalhe |
-|---|---------|---------|
-| W.1 | Inventário fluxos WA (extra, encerramento, cobrança) | Mapa em doc |
-| W.2 | Clique real em link + fallback `api.whatsapp.com` | Tablet/PWA |
-| W.3 | Normalização BR + bloqueio tel inválido | v1.6.61+ manter |
-| W.4 | Copiar mensagem + `AUD_WHATSAPP` | GAS v1.5.25+ |
-| W.5 | Aviso minuto extra **não pulável** | Regra negócio |
-| W.6 | Checklist tablet WhatsApp Business | QA obrigatório |
-
-**Versão alvo:** FE **v1.7.49+** · GAS se novas actions
-
-**Risco:** alto — só publicar após teste físico no tablet.
-
----
-
-## 7. Sprint 4 — Pacote L: UX polish (2 semanas)
+## 6. Sprint 3 — Pacote L: UX polish (2 semanas) ← **próximo após K**
 
 **Objetivo:** reduzir ruído visual sem mudar regras de negócio.
+
+> **F4 WhatsApp / SMS automático — PAUSADO** (06/06/2026): conta bloqueada 4 dias; SMS sem entrega no número novo. **Canal oficial:** QR Code → `acompanhar.html`. Ver `DECISAO_COMUNICACAO_QR_CODE_2026-06.md`.
 
 | # | Entrega | Origem plano mestre |
 |---|---------|---------------------|
@@ -134,8 +117,15 @@ flowchart TD
 | L.3 | Indicador “Última sync · há Xs” no header | Backlog §8 |
 | L.4 | Dashboard: link “ver caixa hoje” sem duplicar número | §5 |
 | L.5 | Página Sistema: diagnóstico + liberar sessão | §9 recursos |
+| L.6 | QR portal visível no balcão (impresso ou tela fixa) | `DECISAO_COMUNICACAO_QR_CODE_2026-06.md` |
 
 **Versão alvo:** FE **v1.7.50+** · GAS mínimo
+
+---
+
+## 7. F4 WhatsApp — **PAUSADO** (não executar)
+
+Escopo original W.1–W.6 (inventário mensagens, aviso extra não pulável, checklist WA Business) **fora do roadmap** até nova decisão. Manter botões atuais como fallback **manual** apenas; **não** expandir automação.
 
 ---
 
@@ -157,7 +147,8 @@ flowchart TD
 
 | Item | Motivo | Reavaliar quando |
 |------|--------|------------------|
-| **F9 Supervisor** | Operadores precisam autonomia total no balcão | Após F4 + K estáveis 30 dias |
+| **F4 WhatsApp / SMS auto** | Conta bloqueada 4d; SMS sem entrega; usar **QR Code** | Reavaliar só com entrega manual comprovada |
+| **F9 Supervisor** | Operadores precisam autonomia total no balcão | Após K + L estáveis 30 dias |
 | Modularização `index.html` | Risco alto, pouco ganho imediato | Q3 se equipe crescer |
 
 ---
@@ -173,7 +164,7 @@ flowchart TD
 | **P1** | **Pacote K.1** — código no repo (`a4bf087`); **deploy GAS fora pico** | Dev | deploy ~15 min |
 | **P2** | `TESTE_REGRESSAO` write controlado (B7) | Dev | paralelo |
 
-**Não iniciar F4 WhatsApp antes de K.1 estável.**
+**Não iniciar F4** — pausado; comunicação = **QR portal** (`DECISAO_COMUNICACAO_QR_CODE_2026-06.md`).
 
 ### Critério para encerrar Sprint 1 e abrir Sprint 2
 
@@ -191,8 +182,9 @@ flowchart TD
 | Mês | Entrega principal | Valor para a loja |
 |-----|-------------------|-------------------|
 | **Jun** | K — CRM / RESPONSAVEIS | Reconhecer cliente, repetir visita |
-| **Jul** | F4 WhatsApp | Cobrança extra e comunicação no tablet |
-| **Ago** | L — UX polish | Balcão mais rápido e bonito (DNA portal) |
+| **Jul** | **L — UX polish** + QR no balcão | Balcão rápido; pais pelo portal |
+| **Ago** | Backlog B7/B1 | Regressão write + KPIs |
+| ~~F4 WhatsApp~~ | **Pausado** | QR + manual apenas |
 
 ---
 

@@ -7,6 +7,7 @@ Referência única para alinhamento local × produção.
 **Handoff:** `HANDOFF_NOVO_CHAT_2026-06-05.md`  
 **Mapa de erros/bugs:** **`MAPA_ERROS_FALHAS_BUGS.md`** (consulta em testes)  
 **DNA visual / produto:** **`DESIGN_DNA_MOVIKIDS.md`** (portal carrossel = norte criativo)  
+**Comunicação balcão:** **`DECISAO_COMUNICACAO_QR_CODE_2026-06.md`** (F4/SMS pausados; QR oficial)  
 **Incidentes:** `INCIDENTE_AUTH_OPERADORES_2026-06-04.md`, `INCIDENTE_DEPLOY_E_EXTRAS_2026-06-04.md`, **`INCIDENTE_POST_BROWSER_LANCAMENTO_2026-06-05.md` (P0)**, **`INCIDENTE_CRONOMETRO_PORTAL_AUTH_2026-06-05_06.md` (I16–I18)**, **`INCIDENTE_AUTH_SESSAO_FANTASMA_PWA_2026-06-06.md` (I19)**  
 **SMS gateway:** `TROCA_SMS_GATEWAY_DJVJRL_2026-06-04.md`  
 **Deploy GAS:** `DEPLOY_GAS_v1.5.32_AUTH.md` · **K.1:** `DEPLOY_v1.5.57_IMPORT_RESPONSAVEIS.md`
@@ -129,7 +130,7 @@ Commits de referência: `3d9d106` (v1.7.25), `e1a56db` (Pacote E), `1454bc8` (fi
 - [x] **Pacote K.1** — RESPONSAVEIS populado (240 cadastros, import 06/06)
 - [x] **Pacote K.2** — merge GAS canônico (v1.5.57)
 - [~] **Pacote K.3–K.4** — FE v1.7.49 badge Cadastro; checklist tablet `CHECKLIST_PACOTE_K.md`
-- [ ] Fase 4 WhatsApp (após Pacote K)
+- [~] **Fase 4 WhatsApp / SMS auto — PAUSADA** (QR Code oficial — `DECISAO_COMUNICACAO_QR_CODE_2026-06.md`)
 - [ ] Pacote L — UX polish (tiles, sync header, Sistema)
 - [~] **Fase 9 supervisor — PAUSADA**
 
@@ -141,8 +142,8 @@ Commits de referência: `3d9d106` (v1.7.25), `e1a56db` (Pacote E), `1454bc8` (fi
 |--------|------|--------|
 | **1** | Estabilizar: checklist I.5, ping, testes | **ativa** |
 | **2** | **Pacote K** — K.1 código pronto; deploy GAS fora pico | **em andamento** |
-| **3** | F4 WhatsApp completo (tablet) | após K |
-| **4** | Pacote L — UX polish | após F4 |
+| **3** | **Pacote L** — UX polish + QR balcão | **próximo** (F4 pausado) |
+| ⏸ | F4 WhatsApp / SMS automático | conta bloqueada; usar QR |
 | ⏸ | F9 supervisor | pausada |
 
 ### Pacote F — escopo entregue (v1.7.27)

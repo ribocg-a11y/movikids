@@ -1,7 +1,7 @@
 # Mapa de dependências — Pacote K (CRM) vs F4 (WhatsApp)
 
 **Data:** 06/06/2026  
-**Princípio:** não iniciar F4 completo antes de **K.1 estável** (`PLANO_CONTINUIDADE_2026-06.md`).
+**Princípio (atualizado 06/06/2026):** **F4 PAUSADO** — conta WA bloqueada 4 dias; SMS sem entrega. **Canal oficial: QR Code.** Ver `DECISAO_COMUNICACAO_QR_CODE_2026-06.md`.
 
 ---
 

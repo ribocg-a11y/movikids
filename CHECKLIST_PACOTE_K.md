@@ -60,7 +60,7 @@
 - [ ] Checklist I.5 (`HOMOLOGACAO_PRODUCAO_ASSISTIDA.md`) fechado
 - [ ] Tablet em **v1.7.49** (`?force=1.7.49` ou ícone PWA atualizado)
 
-→ Então: iniciar planejamento **F4 WhatsApp** (Sprint 3).
+→ Então: iniciar **Pacote L** (Sprint 3). **F4 WhatsApp pausado** — comunicação via **QR** (`DECISAO_COMUNICACAO_QR_CODE_2026-06.md`).
 
 ---
 
