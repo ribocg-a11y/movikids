@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="mk-design.css?v=1.7.51">
+<link rel="stylesheet" href="mk-design.css?v=1.7.52">
 </head>
 <body class="mk-portal-page" data-view="gate">
 
@@ -139,8 +139,8 @@ function locStats_(l) {
   const ringClass = extra ? 'extra' : (pend ? 'wait' : (warn ? 'warn' : 'ok'));
   const timeTxt = extra ? '+' + fmt(Math.abs(rem)) : fmt(rem);
   const dash = ringDash_(extra ? 0 : Math.max(0, rem), totalSec, extra);
-  const lbl = extra ? 'Tempo extra' : (pend ? 'Já já começa' : (warn ? 'Quase lá!' : 'Falta'));
-  const lblUpper = extra ? lbl : (warn ? 'QUASE LÁ!' : (pend ? lbl : 'FALTA'));
+  const lbl = extra ? 'Tempo extra' : (pend ? 'Já já começa' : 'Falta');
+  const lblUpper = extra ? 'TEMPO EXTRA' : (pend ? 'JÁ JÁ COMEÇA' : 'FALTA');
   const cardCls = 'mk-portal-play' + (extra ? ' is-extra' : '') + (warn ? ' is-warn' : '') + (pend ? ' is-wait' : '');
   return { rem, totalSec, extra, pend, warn, ringClass, timeTxt, dash, lbl, lblUpper, cardCls };
 }
@@ -156,17 +156,6 @@ function ringBlockHtml_(stats) {
       <b class="mk-portal-ring-time">${stats.timeTxt}</b>
     </div>
   </div>`;
-}
-function alertasHtml_() {
-  const itens = locacoes.map((l) => {
-    const s = locStats_(l);
-    if (!s.warn && !s.extra) return null;
-    const nome = esc(l.crianca);
-    if (s.extra) return { cls: 'is-extra', txt: nome + ' — hora de buscar no balcão!' };
-    return { cls: '', txt: nome + ' em ' + fmt(s.rem) + ' — atenção!' };
-  }).filter(Boolean);
-  if (!itens.length) return '';
-  return itens.map((a) => `<div class="mk-portal-alert ${a.cls}">${a.txt}</div>`).join('');
 }
 function clampCarouselIdx_() {
   if (!locacoes.length) {
@@ -312,7 +301,6 @@ function render() {
     <p class="mk-portal-subtitle">📱 ${esc(telFmt)} · ${brincandoLabel_(n)}</p>
     <div class="mk-portal-tabs" role="tablist">${tabs}</div>
     <p class="mk-portal-counter">Criança ${_carouselIdx + 1} de ${n}</p>
-    ${alertasHtml_()}
     <article class="${stats.cardCls}">
       <div class="mk-portal-play-hero">
         ${avatarHtml_(atual.crianca, 'lg')}
@@ -320,7 +308,6 @@ function render() {
       </div>
       ${ringBlockHtml_(stats)}
       ${infoBasicaHtml_(atual)}
-      ${stats.extra ? '<p class="mk-portal-play-msg">Hora de buscar no balcão 🏃</p>' : ''}
       ${stats.pend ? '<p class="mk-portal-play-msg">Preparando o veículo…</p>' : ''}
     </article>
     ${dots ? `<div class="mk-portal-dots">${dots}</div>` : ''}

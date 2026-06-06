@@ -612,8 +612,15 @@
   line-height: 1;
   letter-spacing: -1px;
 }
+.mk-portal-play.is-warn .mk-portal-ring-prog { stroke: #ffca28; }
+.mk-portal-play.is-warn .mk-portal-ring-lbl,
 .mk-portal-play.is-warn .mk-portal-ring-time {
+  color: #ffca28;
   animation: mk-portal-tick 1s ease-in-out infinite;
+}
+.mk-portal-play.is-extra .mk-portal-ring-lbl,
+.mk-portal-play.is-extra .mk-portal-ring-time {
+  color: var(--orange);
 }
 @keyframes mk-portal-tick {
   0%, 100% { transform: scale(1); }
