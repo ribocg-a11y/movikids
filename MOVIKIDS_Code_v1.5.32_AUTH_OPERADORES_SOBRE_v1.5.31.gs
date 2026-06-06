@@ -2,6 +2,7 @@
 // MOVI KIDS — Google Apps Script v1.5.57
 // v1.5.57: Pacote K.1 — importarResponsaveisAdmin (LOCACOES -> RESPONSAVEIS, dryRun)
 // v1.5.56: Pacote H — validacao schema frota/preços em salvarOperacaoConfigAdmin
+// v1.5.58: buscarKPIsAdmin — fatAno/nAno (faturamento acumulado jan–mês do ano selecionado)
 // v1.5.55: Portal — timestampCanonico + totalMins alinhados ao balcão (carregarInicio + buscarPortalResponsavel)
 // v1.5.54: Pacote G — rate limit buscarPortalResponsavel (por telefone + global)
 // v1.5.53: SMS — GENERIC_FAILURE do Android nao marca Failed definitivo; recheck + downgrade se passou Sent
@@ -1200,7 +1201,7 @@ function buscarKPIsAdmin_(p) {
   const anoPrev  = mesAtual === 1 ? anoAtual - 1 : anoAtual;
   const mmyyPrev = String(mesPrev).padStart(2,'0') + '/' + anoPrev;
 
-  let fatHoje = 0, nHoje = 0, fatMes = 0, nMes = 0;
+  let fatHoje = 0, nHoje = 0, fatMes = 0, nMes = 0, fatAno = 0, nAno = 0;
   let extMes = 0, nComExtra = 0;
   let fatSemana = 0, nSemana = 0, fatSemanaAnt = 0, nSemanaAnt = 0;
   let fatMesAnt = 0, nMesAnt = 0;
@@ -1244,6 +1245,13 @@ function buscarKPIsAdmin_(p) {
 
       // v1.5.4: mes anterior
       if (mmyyR === mmyyPrev) { fatMesAnt += vt; nMesAnt++; }
+
+      const anoR = parseInt(pts[2], 10);
+      const mesR = parseInt(pts[1], 10);
+      if (anoR === anoAtual && mesR >= 1 && mesR <= mesAtual) {
+        fatAno += vt;
+        nAno++;
+      }
 
       if (mmyyR === mmyy) {
         fatMes += vt; nMes++;
@@ -1345,6 +1353,8 @@ function buscarKPIsAdmin_(p) {
     projecaoRes,
     fatHoje:     Math.round(fatHoje  * 100) / 100,
     nHoje,
+    fatAno:      Math.round(fatAno   * 100) / 100,
+    nAno,
     fatMes:      Math.round(fatMes   * 100) / 100,
     nMes,
     cusHoje:     Math.round(cusHoje  * 100) / 100,

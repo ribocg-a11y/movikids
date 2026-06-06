@@ -69,13 +69,13 @@
   } catch(e) {}
 })();
 </script>
-<script src="mk-version.js?v=1.7.52"></script>
+<script src="mk-version.js?v=1.7.53"></script>
 <link rel="stylesheet" href="mk-design.css">
 
 <script>
 // ── CACHE BUSTER — alinhado a mk-version.js / APP_VERSION ──
 (function(){
-  const CURRENT = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.52';
+  const CURRENT = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.53';
   const KEY = 'mk_loaded_version';
   function mkVerParts_(v) {
     return String(v || '0.0').split('.').map(function(n) { return parseInt(n, 10) || 0; });
@@ -1334,7 +1334,9 @@ header{
 .db-mes-sel{font-size:12px;padding:5px 10px;border-radius:var(--radius-sm);border:1.5px solid var(--border);
   background:var(--surface);color:var(--txt);cursor:pointer;font-family:'Nunito',sans-serif}
 
-.new-kpi-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:14px}
+.new-kpi-row{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-bottom:14px}
+@media (max-width:960px){.new-kpi-row{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.new-kpi .nkv.purple{color:var(--purple)}
 .new-kpi{background:var(--surface);border-radius:var(--radius);border:1.5px solid var(--border);
   padding:12px 14px}
 .new-kpi label{display:block;font-size:10px;font-weight:700;color:var(--txt3);
@@ -2379,6 +2381,11 @@ header{
     <!-- KPIs -->
     <div class="new-kpi-row">
       <div class="new-kpi">
+        <label>Faturamento do ano</label>
+        <div class="nkv purple" id="nk-fatano">...</div>
+        <div class="nks" id="nk-fatano-sub">acumulado do ano</div>
+      </div>
+      <div class="new-kpi">
         <label>Faturamento do mês</label>
         <div class="nkv blue" id="nk-fatmes">...</div>
         <div class="nks" id="nk-nloc">— locações</div>
@@ -2897,7 +2904,7 @@ header{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.52';
+const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.53';
 const WEBAPP_URL = (typeof window !== 'undefined' && window.MK_GAS_EXEC_URL) ? window.MK_GAS_EXEC_URL
   : 'https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec';
 const WEBAPP_URL_DEAD_PREFIX = 'AKfycbzc';
@@ -6854,6 +6861,14 @@ function renderCharts(d) {
 
   // KPIs
   const ticket = d.nMes > 0 ? d.fatMes / d.nMes : 0;
+  const mesNome = (d.mesAtual && MESES_DB[d.mesAtual - 1]) ? MESES_DB[d.mesAtual - 1].toLowerCase() : '';
+  if (d.fatAno != null) {
+    setText2('nk-fatano', R2(d.fatAno));
+    setText2('nk-fatano-sub', (d.nAno || 0) + ' locações · acum. jan–' + mesNome + '/' + (d.anoAtual || ''));
+  } else {
+    setText2('nk-fatano', '—');
+    setText2('nk-fatano-sub', 'atualize o GAS para ver o acumulado');
+  }
   setText2('nk-fatmes',  R2(d.fatMes));
   setText2('nk-nloc',    d.nMes + ' locações no mês');
   setText2('nk-ticket',  R2(ticket));
@@ -8367,8 +8382,8 @@ async function salvarLancamentoAvulso() {
 }
 
 </script>
-<script src="mk-update.js?v=1.7.52"></script>
-<script src="mk-auth.js?v=1.7.52"></script>
+<script src="mk-update.js?v=1.7.53"></script>
+<script src="mk-auth.js?v=1.7.53"></script>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
   if (typeof mkAuthBoot === 'function') {
