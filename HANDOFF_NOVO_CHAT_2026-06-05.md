@@ -131,12 +131,15 @@ C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\m
 
 ## Mapa de erros, bugs, falhas e aprendizados
 
+**Canônico (atualizado 06/06/2026 10:34):** `MAPA_ERROS_FALHAS_BUGS.md` — tabela I1–I18, travas e scripts de teste.
+
 ### Incidentes documentados
 
 | Doc | O quê |
 |-----|--------|
 | `INCIDENTE_DEPLOY_E_EXTRAS_2026-06-04.md` | `clasp deploy` quebrou URL; extras fantasmas com GAS offline |
 | **`INCIDENTE_POST_BROWSER_LANCAMENTO_2026-06-05.md`** | **P0** POST no browser quebrou lançamento; GET obrigatório no FE |
+| **`INCIDENTE_CRONOMETRO_PORTAL_AUTH_2026-06-05_06.md`** | **I16** cronômetro portal≠balcão; **I17** liberar sessão UI; **I18** idle com locação |
 | `INCIDENTE_AUTH_OPERADORES_2026-06-04.md` | Sessão travada; PIN invisível; timer sem operador → extra indevido |
 | `EMERGENCIA_SMS_404.md` | URL morta AKfycbzc; só Nova versão na mesma implantação resolve |
 | `TROCA_SMS_GATEWAY_DJVJRL_2026-06-04.md` | Gateway produção DJVJRL |
@@ -160,6 +163,9 @@ C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\m
 | I13 | `listarAtivas` antes de encerrar | Falso negativo por concorrência | Verificar row Ativa antes de encerrar | TESTE_DRAWER_E |
 | I14 | Ping desatualizado no `.gs` | Produção mostra versão antiga após push | Atualizar `ping_()` + Nova versão Web | v1.5.46 |
 | I15 | **P0** Pacote E POST no FE (`v1.7.26`–`v1.7.33`) + cache `?force=1.7.31` | **Balcão parado:** Nova locação *"Erro de conexão"*; testes PS passavam | FE **v1.7.35**: GET no browser + anti-stale; Regra 6; paridade HTTP | v1.7.35 — ver `INCIDENTE_POST_BROWSER_LANCAMENTO_2026-06-05.md` |
+| I16 | Portal `startTimestamp` bruto vs balcão `timestampCanonico_` | Celular mostra minutos diferentes do tablet | GAS **v1.5.55** + `canonLoc_` em `acompanhar.html` | `TESTE_PARIDADE_CRONOMETRO_PORTAL_BALCAO.ps1` |
+| I17 | Liberar sessão + GET em cache | Banner operador preso após ADM liberar | v1.7.45 `mkAuthSyncSessaoBalcaoUI_` + `no-store` | tablet ADM liberar |
+| I18 | Idle 1h com locação Ativa/Pendente | Logout no meio da operação | v1.7.46 `mkHasLocacaoAbertaNoTablet_` | `pre-push-check` guard.idle.locacao |
 
 ### Aprendizados operacionais (não repetir)
 
@@ -173,6 +179,8 @@ C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\m
 - **Dados financeiros:** só admin vê (`carregarInicio`, KPIs filtrados GAS v1.5.43+).
 - **Escritas críticas:** exigem operador logado (GAS v1.5.44+). No **browser** = **GET** apenas (incidente I15 — **nunca POST** no FE).
 - **ALERTA P0:** `INCIDENTE_POST_BROWSER_LANCAMENTO_2026-06-05.md` — regressão PowerShell POST ≠ tablet.
+- **Cronômetro portal:** nunca sem `timestampCanonico_` (GAS) e `canonLoc_` (portal) — `REGRAS` Regra 10; teste `TESTE_PARIDADE_CRONOMETRO_PORTAL_BALCAO.ps1`.
+- **Idle + locação:** não deslogar com Ativa/Pendente — Regra 11; mapa `MAPA_ERROS_FALHAS_BUGS.md`.
 
 ---
 
@@ -214,6 +222,8 @@ C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\m
 
 ## Scripts de teste e limpeza
 
+**Gate antes de push:** `.\scripts\pre-push-check.ps1` (versões, guards I15–I18, paridade HTTP + portal + cronômetro).
+
 Rodar a partir do repo:
 
 ```powershell
@@ -228,6 +238,8 @@ cd "C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-moviki
 .\LIMPAR_TESTES_MOVIKIDS.ps1 -DryRun      # só lista
 .\LIMPAR_SESSOES_TESTE_AGORA.ps1          # cancela pendentes teste (9899999*, Teste*)
 .\TESTE_PARIDADE_HTTP_BROWSER_GAS.ps1       # obrigatorio antes de publicar mudanca em api()
+.\TESTE_PARIDADE_CRONOMETRO_PORTAL_BALCAO.ps1  # I16 — portal x balcao (GAS >= v1.5.55)
+.\scripts\pre-push-check.ps1                # Pacote J — gate completo
 ```
 
 Limpeza via planilha (OAuth): `C:\Users\riboc\Projects\google-drive-sheets-auth\scripts\limpar-testes-movikids.js`

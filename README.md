@@ -4,9 +4,10 @@ Sistema operacional para controle de locacoes da MOVI KIDS.
 
 ## Versao preparada
 
-- Frontend: `v1.6.81` (ver `ESTADO_ATUAL.md`)
-- Apps Script: `v1.5.36` (ver `DEPLOY_GAS_v1.5.32_AUTH.md`)
-- Incidente auth/sessao 04/06/2026: `INCIDENTE_AUTH_OPERADORES_2026-06-04.md`
+- Frontend: `v1.7.46` (ver `ESTADO_ATUAL.md`)
+- Apps Script: `v1.5.56` repo (confirmar ping; ver `DEPLOY_GAS_v1.5.32_AUTH.md`)
+- Mapa de erros/bugs: `MAPA_ERROS_FALHAS_BUGS.md`
+- Incidentes recentes: `INCIDENTE_CRONOMETRO_PORTAL_AUTH_2026-06-05_06.md`, `INCIDENTE_POST_BROWSER_LANCAMENTO_2026-06-05.md`
 - Objetivo desta versao: corrigir divergencia entre multiplas telas sem tirar o sistema do ar.
 
 ## Problema tratado

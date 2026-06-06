@@ -44,6 +44,26 @@
     }
   }
 
+  function mkHasLocacaoAbertaNoTablet_() {
+    function hasAberta(list) {
+      if (!Array.isArray(list)) return false;
+      return list.some(s => {
+        if (!s) return false;
+        const st = String(s.status);
+        return st === 'Ativa' || st === 'Pendente';
+      });
+    }
+    try {
+      if (typeof window !== 'undefined' && Array.isArray(window.sessions) && hasAberta(window.sessions)) return true;
+      const raw = localStorage.getItem('mk_sessions');
+      if (!raw) return false;
+      return hasAberta(JSON.parse(raw));
+    } catch (e) {
+      return false;
+    }
+  }
+  window.mkHasLocacaoAbertaNoTablet_ = mkHasLocacaoAbertaNoTablet_;
+
   function setSession(s) {
     try {
       sessionStorage.setItem(SESSION_KEY, JSON.stringify(s));
@@ -221,6 +241,7 @@
   async function checkAuthIdle_() {
     if (!mkAuthIsLoggedIn() || _authIdleBusy) return;
     if (!isAuthIdleExpired_()) return;
+    if (mkHasLocacaoAbertaNoTablet_()) return;
     _authIdleBusy = true;
     try {
       await trocarOperador('inatividade');
@@ -681,7 +702,7 @@
 
     const existing = getSession();
     if (existing && existing.nome) {
-      if (isAuthIdleExpired_()) {
+      if (isAuthIdleExpired_() && !mkHasLocacaoAbertaNoTablet_()) {
         clearSession();
         hideApp();
         showGate(true);

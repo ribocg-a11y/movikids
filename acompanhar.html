@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="mk-design.css?v=1.7.45">
+<link rel="stylesheet" href="mk-design.css?v=1.7.46">
 </head>
 <body class="mk-portal-page" data-view="gate">
 
@@ -79,7 +79,7 @@ function infoBasicaHtml_(l) {
     <div class="mk-portal-info-row"><span>Status</span><strong>${st}</strong></div>
   </div>`;
 }
-/** Mesma lógica do balcão (mergeSessaoCanonica + calcStartTimestamp). */
+/** MK_TIMER_CANON_GUARD I16 — espelha mergeSessaoCanonica + calcStartTimestamp (index.html). Ver MAPA_ERROS_FALHAS_BUGS.md */
 function calcStartTimestamp_(data, horaInicio) {
   if (!data || !horaInicio) return 0;
   const dp = String(data).split('/');

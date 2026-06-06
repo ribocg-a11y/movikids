@@ -47,6 +47,12 @@ Após implantar, o `ping` deve mostrar `versao` **v1.5.48** e `postWriteActions`
 `postWriteActions` no ping **não** significa que o **tablet** pode usar POST. Isso quebrou o lançamento (Pacote E v1.7.26–v1.7.33).  
 **Frontend v1.7.35+** usa GET no browser. Ver `INCIDENTE_POST_BROWSER_LANCAMENTO_2026-06-05.md` e Regra 6 em `REGRAS_DE_PUBLICACAO_SEGURA.md`.
 
+### Cronômetro portal (I16) — GAS mínimo v1.5.55
+
+Se o ping &lt; **v1.5.55**, o celular (`acompanhar.html`) pode mostrar tempo **diferente** do balcão.  
+Após Nova versão Web, rodar: `.\TESTE_PARIDADE_CRONOMETRO_PORTAL_BALCAO.ps1`  
+Doc: `INCIDENTE_CRONOMETRO_PORTAL_AUTH_2026-06-05_06.md`, mapa `MAPA_ERROS_FALHAS_BUGS.md`.
+
 ## Deploy seguro (PC)
 
 ```powershell

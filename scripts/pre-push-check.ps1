@@ -70,6 +70,42 @@ try {
     Add-Check "static.no-post-index" "ok" "sem POST explicito"
   }
 
+  $portalPath = Join-Path $root "acompanhar.html"
+  if (Test-Path $portalPath) {
+    $portalRaw = Get-Content -Path $portalPath -Raw -Encoding UTF8
+    if ($portalRaw -notmatch 'function canonLoc_' -or $portalRaw -notmatch 'function calcStartTimestamp_') {
+      Add-Check "guard.portal.canon" "fail" "acompanhar.html sem canonLoc_/calcStartTimestamp_ (I16)"
+    } else {
+      Add-Check "guard.portal.canon" "ok" "canonLoc_ presente"
+    }
+  } else {
+    Add-Check "guard.portal.canon" "fail" "acompanhar.html ausente"
+  }
+
+  $gasCanon = Join-Path $root "MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs"
+  if (Test-Path $gasCanon) {
+    $gasRaw = Get-Content -Path $gasCanon -Raw -Encoding UTF8
+    if ($gasRaw -notmatch 'function buscarPortalResponsavel_[\s\S]{0,1200}timestampCanonico_') {
+      Add-Check "guard.gas.portal.canon" "fail" "buscarPortalResponsavel_ sem timestampCanonico_ (I16)"
+    } else {
+      Add-Check "guard.gas.portal.canon" "ok" "timestampCanonico_ no portal GAS"
+    }
+  } else {
+    Add-Check "guard.gas.portal.canon" "warn" ".gs canonico nao encontrado"
+  }
+
+  $authPath = Join-Path $root "mk-auth.js"
+  if (Test-Path $authPath) {
+    $authRaw = Get-Content -Path $authPath -Raw -Encoding UTF8
+    if ($authRaw -notmatch 'mkHasLocacaoAbertaNoTablet_') {
+      Add-Check "guard.idle.locacao" "fail" "mkHasLocacaoAbertaNoTablet_ ausente (I18)"
+    } else {
+      Add-Check "guard.idle.locacao" "ok" "idle bloqueado com locacao aberta"
+    }
+  } else {
+    Add-Check "guard.idle.locacao" "fail" "mk-auth.js ausente"
+  }
+
   if (-not $SkipNetworkTests) {
     $paridade = Join-Path $root "TESTE_PARIDADE_HTTP_BROWSER_GAS.ps1"
     $portal = Join-Path $root "TESTE_PORTAL_READONLY.ps1"
@@ -83,9 +119,16 @@ try {
     $portOut = & $portal 2>&1 | Out-String
     if ($LASTEXITCODE -ne 0) { Add-Check "teste.portal" "fail" "exit $LASTEXITCODE" }
     else { Add-Check "teste.portal" "ok" "TESTE_PORTAL_READONLY" }
+
+    $cron = Join-Path $root "TESTE_PARIDADE_CRONOMETRO_PORTAL_BALCAO.ps1"
+    if (-not (Test-Path $cron)) { throw "TESTE_PARIDADE_CRONOMETRO_PORTAL_BALCAO.ps1 nao encontrado" }
+    $cronOut = & $cron 2>&1 | Out-String
+    if ($LASTEXITCODE -ne 0) { Add-Check "teste.cronometro" "fail" "exit $LASTEXITCODE" }
+    else { Add-Check "teste.cronometro" "ok" "TESTE_PARIDADE_CRONOMETRO_PORTAL_BALCAO" }
   } else {
     Add-Check "teste.paridade" "skip" "SkipNetworkTests"
     Add-Check "teste.portal" "skip" "SkipNetworkTests"
+    Add-Check "teste.cronometro" "skip" "SkipNetworkTests"
   }
 } catch {
   $result.status = "fail"

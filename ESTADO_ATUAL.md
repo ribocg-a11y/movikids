@@ -1,11 +1,12 @@
-# MOVI KIDS — Estado atual (05/06/2026)
+# MOVI KIDS — Estado atual (06/06/2026 10:34)
 
 Referência única para alinhamento local × produção.
 
 **Roadmap mestre:** `PLANO_MESTRE_REORGANIZADO_2026-06.md`  
 **Pausa maturidade (ativo):** `PLANO_PAUSA_MATURIDADE_2026-06.md`  
 **Handoff:** `HANDOFF_NOVO_CHAT_2026-06-05.md`  
-**Incidentes:** `INCIDENTE_AUTH_OPERADORES_2026-06-04.md`, `INCIDENTE_DEPLOY_E_EXTRAS_2026-06-04.md`, **`INCIDENTE_POST_BROWSER_LANCAMENTO_2026-06-05.md` (P0)**  
+**Mapa de erros/bugs:** **`MAPA_ERROS_FALHAS_BUGS.md`** (consulta em testes)  
+**Incidentes:** `INCIDENTE_AUTH_OPERADORES_2026-06-04.md`, `INCIDENTE_DEPLOY_E_EXTRAS_2026-06-04.md`, **`INCIDENTE_POST_BROWSER_LANCAMENTO_2026-06-05.md` (P0)**, **`INCIDENTE_CRONOMETRO_PORTAL_AUTH_2026-06-05_06.md` (I16–I18)**  
 **SMS gateway:** `TROCA_SMS_GATEWAY_DJVJRL_2026-06-04.md`  
 **Deploy GAS:** `DEPLOY_GAS_v1.5.32_AUTH.md`
 
@@ -22,8 +23,8 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 | Camada | Versão alvo | URL / ID |
 |--------|-------------|----------|
-| **Frontend** | **v1.7.41** | https://ribocg-a11y.github.io/movikids/?force=1.7.41 |
-| **Apps Script** | **v1.5.54** | Deploy `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y` |
+| **Frontend** | **v1.7.46** | https://ribocg-a11y.github.io/movikids/?force=1.7.46 |
+| **Apps Script** | **v1.5.56** (repo; confirmar ping) | Deploy `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y` |
 | SMS Gateway Cloud | **DJVJRL** / device `wihWegHr4wXaVJQ1R-GZR` | Aparelho remoto ONLINE |
 | Pacote SMS P0 | **FECHADO** | `PACOTE_SMS_P0_UNIFICADO_v1.5.38_v1.7.11.md` |
 | Planilha | MOVIKIDS_Planilha_Base | https://docs.google.com/spreadsheets/d/1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618/edit |
@@ -34,7 +35,7 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 **Teste rápido GAS (ping):**  
 https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec?action=ping  
-→ deve retornar `versao: v1.5.51` e `postWriteActions` (POST só no GAS; FE usa GET — incidente I15)
+→ deve retornar `versao: v1.5.55` **ou superior** (cronômetro portal I16) e `postWriteActions` (POST só no GAS; FE usa GET — I15)
 
 **URL morta (não usar):** `AKfycbzc...` → 404
 
@@ -44,13 +45,16 @@ https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPe
 
 | Artefato | Arquivo |
 |----------|---------|
-| GAS | `MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs` (header **v1.5.46**) |
+| GAS | `MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs` (header **v1.5.56**; portal cronômetro **v1.5.55+**) |
 | Clasp | `gas/Code.gs` (gerado por `scripts/sync-gas-to-clasp.ps1` — não editar à mão) |
 | Login | `mk-auth.js` + gate em `index.html` |
 | Versão FE | `mk-version.js`, `sw.js` |
 | Deploy | `DEPLOY_GAS_v1.5.32_AUTH.md`, `scripts/deploy-gas.ps1` |
 | Limpeza testes | `LIMPAR_TESTES_MOVIKIDS.ps1`, `LIMPAR_SESSOES_TESTE_AGORA.ps1`, `limparLocacoesTesteAdmin` |
 | Paridade HTTP tablet | `TESTE_PARIDADE_HTTP_BROWSER_GAS.ps1` (obrigatório se mexer em `api()`) |
+| Paridade cronômetro portal | `TESTE_PARIDADE_CRONOMETRO_PORTAL_BALCAO.ps1` (obrigatório se mexer em timer/portal — I16) |
+| Pre-push (Pacote J) | `scripts/pre-push-check.ps1` — versões, guards I15–I18 |
+| Mapa bugs | `MAPA_ERROS_FALHAS_BUGS.md` |
 | Emergência | `scripts/corrigir-locacao-206.html`, `scripts/corrigir-locacoes-extras-lote.html` |
 
 ---
@@ -83,6 +87,9 @@ Commits de referência: `3d9d106` (v1.7.25), `e1a56db` (Pacote E), `1454bc8` (fi
 | Paridade HTTP nos testes | `TESTE_PARIDADE_HTTP_BROWSER_GAS.ps1` (readonly) |
 | Dados financeiros só ADM | GAS v1.5.43 + frontend v1.7.18+ |
 | Testes não poluem caixa | `limparLocacoesTesteAdmin` + cleanup scripts |
+| Cronômetro portal = balcão | GAS `timestampCanonico_` v1.5.55+ + `canonLoc_` portal (I16) |
+| Liberar sessão atualiza UI | `mkAuthSyncSessaoBalcaoUI_` + `cache: no-store` (I17) |
+| Idle não desloga com locação | `mkHasLocacaoAbertaNoTablet_` v1.7.46 (I18) |
 
 ---
 
@@ -94,7 +101,7 @@ Commits de referência: `3d9d106` (v1.7.25), `e1a56db` (Pacote E), `1454bc8` (fi
 | Liberar balcão | `liberarSessaoOperadorAdmin` |
 | Corrigir locação encerrada | `corrigirFinanceiroLocacaoAdmin` + `zerarExtra` (v1.5.36+) |
 | Limpar locações de teste | `limparLocacoesTesteAdmin` + `motivo` ≥10 chars |
-| Logout por inatividade | 1h sem clique/toque/teclado/scroll (`mk-auth.js` + timer admin) |
+| Logout por inatividade | 1h sem atividade — **pausado** se locação Ativa/Pendente no tablet (v1.7.46, I18) |
 
 ---
 
@@ -113,8 +120,10 @@ Commits de referência: `3d9d106` (v1.7.25), `e1a56db` (Pacote E), `1454bc8` (fi
 - [x] **Pacote F — KPIs avançados** — **v1.7.38** + GAS **v1.5.48–1.5.52** (Dashboard 5 blocos + PDF Gestão Avançada)
 - [x] **Pacote I — Sanitização gestão** — **v1.7.40** (Home enxuta, hub sem KPIs duplicados)
 - [x] **Pacote G — Portal responsável** — **v1.7.41** + GAS **v1.5.54** (rate limit portal)
-- [ ] **Pacote H — Config amigável** ← **próximo**
-- [ ] Pacote J — Travas CI
+- [x] **Pacote H — Config amigável** — v1.7.43 + GAS v1.5.56 (validação config)
+- [x] **Pacote J — Travas CI** — `pre-push-check.ps1` + guards I16/I18
+- [x] **Fix cronômetro portal** — GAS v1.5.55 + portal `canonLoc_` (I16)
+- [x] **Fix auth sessão UI + idle** — v1.7.45–46 (I17, I18)
 - [ ] Fase 4 WhatsApp (após I+G)
 - [~] **Fase 9 supervisor — PAUSADA**
 - [~] Fase 8 config — após Pacote H
@@ -161,12 +170,14 @@ Commits de referência: `3d9d106` (v1.7.25), `e1a56db` (Pacote E), `1454bc8` (fi
 - Dashboard: único lugar de KPIs do mês + gestão avançada; código legado removido
 - Caixa: fechamento detalhado + copiar resumo (canônico)
 
-### Pacote G — portal responsável (v1.7.41)
+### Pacote G — portal responsável (v1.7.41+)
 
 - `acompanhar.html` redesenhado com `mk-design.css`, tema Movi Kids, `safe-area`, `theme-color`
 - Máscara de telefone BR, deep link `?tel=`, QR no balcão, timer com anel de progresso
 - GAS **v1.5.54**: rate limit `buscarPortalResponsavel` (20/min por telefone, 150/min global)
-- Teste: `TESTE_PORTAL_READONLY.ps1`
+- GAS **v1.5.55**: `timestampCanonico_` + `mins` alinhados ao balcão (**I16**)
+- Portal: `canonLoc_` / `calcStartTimestamp_` / refresh 15s — paridade com `mergeSessaoCanonica`
+- Testes: `TESTE_PORTAL_READONLY.ps1`, **`TESTE_PARIDADE_CRONOMETRO_PORTAL_BALCAO.ps1`**
 
 ### Mapa canônico de métricas (Pacote I)
 
@@ -182,14 +193,15 @@ Commits de referência: `3d9d106` (v1.7.25), `e1a56db` (Pacote E), `1454bc8` (fi
 
 ## Validação rápida (pós-deploy)
 
-1. Ping GAS → `ok:true`, `versao:v1.5.53`
-2. Tablet → `?force=1.7.40`, rodapé **Online v1.7.40**
-3. Login operador → Home **sem** valores em R$; drawer **Editar/Cancelar** visível
-4. Login admin → Home só chip “Hoje → Caixa”; Dashboard com KPIs do mês
-5. Caixa → fechamento completo + **Copiar fechamento**
-6. `buscarKPIsAdmin` retorna campos Pacote F (readonly)
+1. Ping GAS → `ok:true`, `versao` ≥ **v1.5.55** (I16 cronômetro)
+2. Tablet → `?force=1.7.46`, rodapé **Online v1.7.46**
+3. `.\scripts\pre-push-check.ps1` → status ok
+4. Balcão + celular mesma locação → timer ± **2 s** (I16)
+5. ADM liberar sessão → banner limpa sem Ctrl+F5 (I17)
+6. Locação ativa + idle expirado → operador **permanece** logado (I18)
+7. Nova locação salva no tablet (I15)
 
-Scripts: `TESTE_PACOTE_F_KPI_READONLY.ps1`, `TESTE_REGRESSAO_MOVIKIDS_PROD_SAFE.ps1`, `TESTE_DRAWER_E_PACOTE_E.ps1`
+Scripts: `TESTE_PARIDADE_CRONOMETRO_PORTAL_BALCAO.ps1`, `TESTE_PARIDADE_HTTP_BROWSER_GAS.ps1`, `TESTE_PACOTE_F_KPI_READONLY.ps1`, `TESTE_REGRESSAO_MOVIKIDS_PROD_SAFE.ps1`
 
 ---
 

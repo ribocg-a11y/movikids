@@ -157,7 +157,26 @@ Erros cometidos neste projeto que nao devem se repetir:
 - entregar mudanca sem regra de rollback curta;
 - fazer verificacao parcial e chamar de validacao completa;
 - validar POST ao GAS so com PowerShell e declarar tablet OK (incidente 05/06/2026, Pacote E — ver `INCIDENTE_POST_BROWSER_LANCAMENTO_2026-06-05.md`);
-- reintroduzir POST no `api()` do browser sem validacao tablet (incidente I15).
+- reintroduzir POST no `api()` do browser sem validacao tablet (incidente I15);
+- devolver `startTimestamp` bruto no portal sem `timestampCanonico_` (incidente I16 — ver `INCIDENTE_CRONOMETRO_PORTAL_AUTH_2026-06-05_06.md`);
+- calcular tempo do portal sem `canonLoc_` / paridade com `mergeSessaoCanonica` do balcao (I16);
+- liberar sessao operador sem `cache: 'no-store'` e sem atualizar UI do balcao (I17);
+- deslogar por inatividade com locacao Ativa/Pendente no tablet (I18).
+
+## Regra 10 - Cronometro portal x balcao (I16)
+
+- **GAS** `buscarPortalResponsavel` e `carregarInicio` (ativas) devem usar **`timestampCanonico_`** e `mins = originalMins + extendedMins`.
+- **Portal** (`acompanhar.html`) deve usar **`canonLoc_`** / **`calcStartTimestamp_`** — mesma regra que `mergeSessaoCanonica` + `calcStartTimestamp` em `index.html`.
+- Antes de push que mexa em timer/portal: rodar `TESTE_PARIDADE_CRONOMETRO_PORTAL_BALCAO.ps1`.
+- Checklist manual: balcao e celular na mesma locacao — diferenca maxima **2 segundos**, nao minutos.
+- Mapa completo: `MAPA_ERROS_FALHAS_BUGS.md`.
+
+## Regra 11 - Auth sessao e idle com locacao (I17, I18)
+
+- Leituras de sessao no tablet: **`cache: 'no-store'`** + bust `_t` em `api()`.
+- Apos liberar sessao: **`mkAuthSyncSessaoBalcaoUI_`** deve atualizar banner sem Ctrl+F5.
+- Idle 1h: **nao** deslogar se `mk_sessions` tiver status **Ativa** ou **Pendente** (`mkHasLocacaoAbertaNoTablet_`).
+- Trava estatica: `scripts/pre-push-check.ps1` (`guard.idle.locacao`).
 
 Toda regressao deve gerar:
 
