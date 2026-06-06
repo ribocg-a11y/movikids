@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1350" role="img" aria-label="Moldura Movi Kids">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1a237e"/>
+      <stop offset="50%" stop-color="#3949ab"/>
+      <stop offset="100%" stop-color="#1565c0"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FFD54F"/>
+      <stop offset="100%" stop-color="#ffb300"/>
+    </linearGradient>
+  </defs>
+  <!-- Bordas (janela da foto: x=130 y=250 w=820 h=820 — transparente no centro) -->
+  <rect width="1080" height="250" fill="url(#bg)"/>
+  <rect y="1070" width="1080" height="280" fill="url(#bg)"/>
+  <rect y="250" width="130" height="820" fill="url(#bg)"/>
+  <rect x="950" y="250" width="130" height="820" fill="url(#bg)"/>
+  <text x="540" y="108" text-anchor="middle" font-family="Fredoka One, Arial Rounded MT Bold, sans-serif" font-size="68" fill="#FFD54F">Movi Kids</text>
+  <text x="540" y="165" text-anchor="middle" font-family="Nunito, sans-serif" font-size="26" font-weight="800" fill="#e3f2fd">Diversão com segurança</text>
+  <rect x="122" y="242" width="836" height="836" rx="34" ry="34" fill="none" stroke="url(#gold)" stroke-width="10"/>
+  <circle cx="115" cy="1185" r="16" fill="#FFD54F"/>
+  <circle cx="965" cy="1185" r="16" fill="#4fc3f7"/>
+  <text x="540" y="1155" text-anchor="middle" font-family="Nunito, sans-serif" font-size="30" font-weight="900" fill="#fff">@movikidsslz</text>
+  <text x="540" y="1210" text-anchor="middle" font-family="Nunito, sans-serif" font-size="22" font-weight="700" fill="#90caf9">Golden Shopping Calhau</text>
+</svg>

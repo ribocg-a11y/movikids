@@ -1,11 +1,12 @@
 // MOVI KIDS - Service Worker 1.7.12
 
-const SW_VERSION = '1.7.55';
+const SW_VERSION = '1.7.56';
 
 const NETWORK_FIRST = [
   'script.google.com',
   'index.html',
   'acompanhar.html',
+  'foto-moldura.html',
   'mk-version.js',
   'gas-endpoint.json',
   'mk-auth.js',

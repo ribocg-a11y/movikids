@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="mk-design.css?v=1.7.55">
+<link rel="stylesheet" href="mk-design.css?v=1.7.56">
 </head>
 <body class="mk-portal-page" data-view="gate">
 
@@ -309,6 +309,7 @@ function render() {
       ${ringBlockHtml_(stats)}
       ${infoBasicaHtml_(atual)}
       ${stats.pend ? '<p class="mk-portal-play-msg">Preparando o veículo…</p>' : ''}
+      <a class="mk-portal-foto-link" href="foto-moldura.html?nome=${encodeURIComponent(atual.crianca || '')}&amp;tel=${encodeURIComponent(_telAtual)}">📸 Foto para o Instagram</a>
     </article>
     ${dots ? `<div class="mk-portal-dots">${dots}</div>` : ''}
     ${swipeHint}
