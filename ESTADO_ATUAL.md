@@ -3,7 +3,7 @@
 Referência única para alinhamento local × produção.
 
 **Roadmap mestre:** `PLANO_MESTRE_REORGANIZADO_2026-06.md`  
-**Pausa maturidade (ativo):** `PLANO_PAUSA_MATURIDADE_2026-06.md`  
+**Planejamento ativo:** `PLANO_CONTINUIDADE_2026-06.md` · Pausa maturidade (encerrada): `PLANO_PAUSA_MATURIDADE_2026-06.md`  
 **Handoff:** `HANDOFF_NOVO_CHAT_2026-06-05.md`  
 **Mapa de erros/bugs:** **`MAPA_ERROS_FALHAS_BUGS.md`** (consulta em testes)  
 **Incidentes:** `INCIDENTE_AUTH_OPERADORES_2026-06-04.md`, `INCIDENTE_DEPLOY_E_EXTRAS_2026-06-04.md`, **`INCIDENTE_POST_BROWSER_LANCAMENTO_2026-06-05.md` (P0)**, **`INCIDENTE_CRONOMETRO_PORTAL_AUTH_2026-06-05_06.md` (I16–I18)**  
@@ -124,22 +124,22 @@ Commits de referência: `3d9d106` (v1.7.25), `e1a56db` (Pacote E), `1454bc8` (fi
 - [x] **Pacote J — Travas CI** — `pre-push-check.ps1` + guards I16/I18
 - [x] **Fix cronômetro portal** — GAS v1.5.55 + portal `canonLoc_` (I16)
 - [x] **Fix auth sessão UI + idle** — v1.7.45–46 (I17, I18)
-- [ ] Fase 4 WhatsApp (após I+G)
+- [ ] **Pacote K** — RESPONSAVEIS + relacionamento ← **próximo**
+- [ ] Fase 4 WhatsApp (após Pacote K)
+- [ ] Pacote L — UX polish (tiles, sync header, Sistema)
 - [~] **Fase 9 supervisor — PAUSADA**
-- [~] Fase 8 config — após Pacote H
 
 ---
 
-## Ordem de retomada do planejamento (pausa maturidade — ativa)
+## Planejamento ativo (`PLANO_CONTINUIDADE_2026-06.md`)
 
-| # | Pacote | Status | Alvo |
-|---|--------|--------|------|
-| 1 | **I — Sanitização gestão** | **concluído** | FE v1.7.40 |
-| 2 | **G — Portal responsável** | **concluído** | FE v1.7.41 + GAS v1.5.54 |
-| 3 | **H — Config amigável** | **próximo** | frota/preços sem JSON |
-| 4 | J — Travas CI | pendente | pre-push + guard POST |
-| 5 | F4 WhatsApp | pendente | após I e G |
-| ⏸ | F9 supervisor | pausado | — |
+| Sprint | Foco | Status |
+|--------|------|--------|
+| **1** | Estabilizar: checklist I.5, ping, testes | **ativa** |
+| **2** | **Pacote K** — import RESPONSAVEIS, CRM | próxima |
+| **3** | F4 WhatsApp completo (tablet) | após K |
+| **4** | Pacote L — UX polish | após F4 |
+| ⏸ | F9 supervisor | pausada |
 
 ### Pacote F — escopo entregue (v1.7.27)
 

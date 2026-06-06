@@ -1,10 +1,11 @@
 # MOVI KIDS — Pausa do planejamento · Maturidade e saneamento
 
-**Data:** 05/06/2026  
+**Data:** 05/06/2026 · **Encerrada:** 06/06/2026  
 **Motivo da pausa:** Pacotes A–F entregues; priorizar **confiabilidade, consistência e experiência** antes de novas fases (F9 supervisor, F4 WhatsApp completo).  
-**Referências:** `ESTADO_ATUAL.md`, `PLANO_MESTRE_REORGANIZADO_2026-06.md` (seção 3 redundâncias), `REGRAS_DE_PUBLICACAO_SEGURA.md`
+**Referências:** `ESTADO_ATUAL.md`, `PLANO_MESTRE_REORGANIZADO_2026-06.md` (seção 3 redundâncias), `REGRAS_DE_PUBLICACAO_SEGURA.md`  
+**Continuidade:** **`PLANO_CONTINUIDADE_2026-06.md`** ← planejamento ativo a partir de 06/06
 
-**Produção alvo:** FE **v1.7.41** · GAS **v1.5.54**
+**Produção ao encerrar pausa:** FE **v1.7.46** · GAS **v1.5.56**
 
 ---
 
@@ -184,14 +185,20 @@ Admin e operação veem os mesmos números em **Home, hub admin, Dashboard e Cai
 
 ---
 
-## 9. Próximo passo imediato
+## 9. Encerramento da pausa (06/06/2026)
 
-**Pacote G concluído** (FE v1.7.41, GAS v1.5.54). **Iniciar Pacote H** — config amigável:
+| Pacote | Status final |
+|--------|----------------|
+| I | ✅ v1.7.40 |
+| G | ✅ v1.7.41 + GAS v1.5.55 |
+| H | ✅ v1.7.43 + GAS v1.5.56 |
+| J | ✅ pre-push-check + guards |
+| Extras | ✅ I16–I18, planilha organizada |
 
-1. Editor visual frota/preços (sem JSON).
-2. Preview antes de salvar.
-3. Publicar GAS v1.5.54 (Nova versão Web) se ping ainda mostrar v1.5.53.
+**Pendência única da pausa:** checklist manual tablet **I.5** → Sprint 1 em `PLANO_CONTINUIDADE_2026-06.md`.
+
+**Próximo pacote de produto:** **Pacote K** (RESPONSAVEIS + relacionamento).
 
 ---
 
-*Documento vivo — atualizar ao fechar cada pacote (I → G → H → J).*
+*Documento histórico — planejamento ativo em `PLANO_CONTINUIDADE_2026-06.md`.*
