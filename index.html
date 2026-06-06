@@ -69,13 +69,13 @@
   } catch(e) {}
 })();
 </script>
-<script src="mk-version.js?v=1.7.44"></script>
+<script src="mk-version.js?v=1.7.45"></script>
 <link rel="stylesheet" href="mk-design.css">
 
 <script>
 // ── CACHE BUSTER — alinhado a mk-version.js / APP_VERSION ──
 (function(){
-  const CURRENT = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.44';
+  const CURRENT = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.45';
   const KEY = 'mk_loaded_version';
   function mkVerParts_(v) {
     return String(v || '0.0').split('.').map(function(n) { return parseInt(n, 10) || 0; });
@@ -2885,7 +2885,7 @@ header{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.44';
+const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.45';
 const WEBAPP_URL = (typeof window !== 'undefined' && window.MK_GAS_EXEC_URL) ? window.MK_GAS_EXEC_URL
   : 'https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec';
 const WEBAPP_URL_DEAD_PREFIX = 'AKfycbzc';
@@ -3171,7 +3171,8 @@ function mkRequireOperadorEscrita_() {
 function mkApiFetchJson_(url, init, timeoutMs) {
   const method = String((init && init.method) || 'GET').toUpperCase();
   mkGuardEscritaBrowser_(mkActionFromApiUrl_(url), method);
-  const fetchP = fetch(url, init)
+  const fetchInit = Object.assign({ cache: 'no-store' }, init || {});
+  const fetchP = fetch(url, fetchInit)
     .then(async r => {
       const text = await r.text();
       let data;
@@ -3189,9 +3190,9 @@ function mkApiFetchJson_(url, init, timeoutMs) {
 async function api(params, timeoutMs = 25000, fetchInit) {
   const gasUrl = await resolveGasUrl_();
   const action = String((params && params.action) || '');
-  const init = Object.assign({ method: 'GET', redirect: 'follow' }, fetchInit || {});
+  const init = Object.assign({ method: 'GET', redirect: 'follow', cache: 'no-store' }, fetchInit || {});
   mkGuardEscritaBrowser_(action, init.method);
-  const payload = Object.assign({}, params);
+  const payload = Object.assign({ _t: Date.now() }, params);
   if (MK_WRITE_ACTIONS.has(action) && typeof operadorApiParams_ === 'function') {
     Object.assign(payload, operadorApiParams_());
   }
@@ -8324,8 +8325,8 @@ async function salvarLancamentoAvulso() {
 }
 
 </script>
-<script src="mk-update.js?v=1.7.44"></script>
-<script src="mk-auth.js?v=1.7.44"></script>
+<script src="mk-update.js?v=1.7.45"></script>
+<script src="mk-auth.js?v=1.7.45"></script>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
   if (typeof mkAuthBoot === 'function') {

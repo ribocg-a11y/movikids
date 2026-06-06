@@ -160,6 +160,9 @@
       return;
     }
     el.style.display = 'block';
+    el.style.background = '';
+    el.style.color = '';
+    el.style.borderColor = '';
     el.textContent = 'Sessão ativa no balcão: ' + sessao.nome + '. Use o botão abaixo para liberar se precisar.';
   }
 
@@ -731,26 +734,49 @@
     return p;
   };
 
+  function mkAuthShowLiberarStatus_(ok, msg) {
+    const el = document.getElementById('mk-ops-sessao-banner');
+    if (!el) return;
+    el.style.display = 'block';
+    el.style.background = ok ? '#E8F5E9' : '#FFEBEE';
+    el.style.color = ok ? '#1B5E20' : '#B71C1C';
+    el.style.borderColor = ok ? '#A5D6A7' : '#FFCDD2';
+    el.textContent = msg;
+  }
+
   window.mkAuthLiberarSessaoOperadorAdmin_ = async function () {
     const btn = document.getElementById('mk-btn-liberar-sessao');
     const label = btn ? btn.textContent : '';
     if (btn) { btn.disabled = true; btn.textContent = 'Liberando...'; }
     try {
-      const d = await apiCall({
+      const pinParams = typeof mkAuthAdminPinParams_ === 'function' ? mkAuthAdminPinParams_() : { adminPin: '1416' };
+      const d = await apiCall(Object.assign({
         action: 'liberarSessaoOperadorAdmin',
-        adminPin: '1416'
-      });
+        _t: Date.now()
+      }, pinParams), 30000);
       if (!d || !d.ok) {
-        const msg = (d && d.erro) || 'Nao foi possivel liberar. Confirme GAS v1.5.35 publicado.';
+        const msg = (d && d.erro) || 'Nao foi possivel liberar. Confirme conexao e GAS publicado.';
+        mkAuthShowLiberarStatus_(false, 'Falha: ' + msg);
         toast(msg, 'error');
         alert(msg);
         return;
       }
-      mkAuthSyncSessaoBalcaoUI_(null);
-      toast(d.mensagem || 'Sessao do balcao liberada', 'success');
+      const srvLivre = !d.sessaoAtiva;
+      mkAuthSyncSessaoBalcaoUI_(srvLivre ? null : d.sessaoAtiva);
       if (typeof refreshOperadoresAdmin_ === 'function') await refreshOperadoresAdmin_();
+      const ainda = sessaoAtivaRemota && sessaoAtivaRemota.nome;
+      if (ainda) {
+        const aviso = 'Servidor ainda mostra ' + ainda.nome + ' logado(a). Tente de novo ou peca para encerrar turno no tablet.';
+        mkAuthShowLiberarStatus_(false, aviso);
+        toast(aviso, 'error');
+        alert(aviso);
+        return;
+      }
+      mkAuthShowLiberarStatus_(true, d.mensagem || 'Balcao liberado. Nenhum operador logado agora.');
+      toast(d.mensagem || 'Sessao do balcao liberada', 'success');
     } catch (e) {
       const msg = (e && e.message) || 'Erro de conexao';
+      mkAuthShowLiberarStatus_(false, 'Falha: ' + msg);
       toast(msg, 'error');
       alert('Falha ao liberar sessao: ' + msg);
     } finally {
@@ -761,28 +787,40 @@
   window.mkOpDeslogarBalcao = async function mkOpDeslogarBalcao(id, nome) {
     fecharMenusOperador_();
     if (!confirm('Deslogar ' + nome + ' do balcao?\n\nLibera a sessao para outro operador entrar.')) return;
-    const btn = document.getElementById('mk-btn-liberar-sessao');
+    const pinParams = typeof mkAuthAdminPinParams_ === 'function' ? mkAuthAdminPinParams_() : { adminPin: '1416' };
     try {
-      const d = await apiCall({
+      let d = await apiCall(Object.assign({
         action: 'liberarSessaoOperador',
         operadorId: id,
-        adminPin: '1416'
-      });
+        _t: Date.now()
+      }, pinParams), 30000);
       if (!d || !d.ok) {
-        const d2 = await apiCall({ action: 'liberarSessaoOperadorAdmin', adminPin: '1416' });
-        if (!d2 || !d2.ok) {
-          toast((d && d.erro) || (d2 && d2.erro) || 'Erro', 'error');
+        d = await apiCall(Object.assign({
+          action: 'liberarSessaoOperadorAdmin',
+          _t: Date.now()
+        }, pinParams), 30000);
+        if (!d || !d.ok) {
+          const msg = (d && d.erro) || 'Erro ao deslogar';
+          mkAuthShowLiberarStatus_(false, 'Falha: ' + msg);
+          toast(msg, 'error');
+          alert(msg);
           return;
         }
-        mkAuthSyncSessaoBalcaoUI_(d2.sessaoAtiva || null);
-        toast(d2.mensagem || 'Sessao liberada', 'success');
-      } else {
-        mkAuthSyncSessaoBalcaoUI_(d.sessaoAtiva || null);
-        toast(d.mensagem || 'Operador deslogado do balcao', 'success');
       }
+      mkAuthSyncSessaoBalcaoUI_(d.sessaoAtiva || null);
       if (typeof refreshOperadoresAdmin_ === 'function') await refreshOperadoresAdmin_();
+      if (sessaoAtivaRemota && sessaoAtivaRemota.nome) {
+        const aviso = 'Servidor ainda mostra ' + sessaoAtivaRemota.nome + ' logado(a).';
+        mkAuthShowLiberarStatus_(false, aviso);
+        toast(aviso, 'error');
+        return;
+      }
+      mkAuthShowLiberarStatus_(true, (d.mensagem || nome + ' deslogado(a) do balcao.'));
+      toast(d.mensagem || 'Operador deslogado do balcao', 'success');
     } catch (e) {
-      toast((e && e.message) || 'Erro', 'error');
+      const msg = (e && e.message) || 'Erro';
+      mkAuthShowLiberarStatus_(false, 'Falha: ' + msg);
+      toast(msg, 'error');
     }
   };
 
@@ -927,7 +965,8 @@
     const el = document.getElementById('mk-admin-ops-list');
     if (!el) return;
     try {
-      const d = await apiCall({ action: 'listarOperadoresAdmin', adminPin: '1416' });
+      const pinParams = typeof mkAuthAdminPinParams_ === 'function' ? mkAuthAdminPinParams_() : { adminPin: '1416' };
+      const d = await apiCall(Object.assign({ action: 'listarOperadoresAdmin', _t: Date.now() }, pinParams), 30000);
       if (!d.ok) {
         el.innerHTML = '<p style="color:var(--red)">' + escapeHtml_(d.erro || 'Erro') + '</p>';
         return;
