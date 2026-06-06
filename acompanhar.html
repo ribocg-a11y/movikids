@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="mk-design.css?v=1.7.50">
+<link rel="stylesheet" href="mk-design.css?v=1.7.51">
 </head>
 <body class="mk-portal-page" data-view="gate">
 
@@ -70,13 +70,28 @@ const PLAN_LABELS = { '10min': '10 min', '20min': '20 min', '30min': '30 min', '
 function planoLabel_(plano) {
   return PLAN_LABELS[plano] || String(plano || '').replace('min', ' min');
 }
-function avatarHtml_(nome) {
-  const colors = ['#5c6bc0', '#ec407a', '#29B6F6', '#66bb6a', '#ffa726', '#ab47bc'];
-  const raw = String(nome || '?').trim();
-  const ch = raw ? raw.charAt(0).toUpperCase() : '?';
-  let h = 0;
-  for (let i = 0; i < raw.length; i++) h = (h + raw.charCodeAt(i)) % colors.length;
-  return `<span class="mk-portal-avatar" style="background:${colors[h]}">${esc(ch)}</span>`;
+const AVATAR_BOY_NAMES = new Set([
+  'joao','joão','matheus','pedro','lucas','gabriel','miguel','arthur','enzo','bernardo','heitor','davi',
+  'guilherme','samuel','rafael','henrique','theo','murilo','benjamin','lorenzo','isaac','daniel','nathan',
+  'caio','vinicius','bruno','eduardo','felipe','leonardo','gustavo','joaquim','antonio','antônio','carlos',
+  'jose','josé','luiz','paulo','marcos','andre','andré','nicolas','breno','otavio','otávio','yuri','ryan'
+]);
+function avatarGenero_(nome) {
+  const first = String(nome || '').trim().toLowerCase().split(/\s+/)[0].normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  const firstOrig = String(nome || '').trim().toLowerCase().split(/\s+/)[0];
+  if (AVATAR_BOY_NAMES.has(first) || AVATAR_BOY_NAMES.has(firstOrig)) return 'boy';
+  if (first.endsWith('o') && first.length > 3 && !first.endsWith('ao')) return 'boy';
+  if (first.endsWith('a') || first.endsWith('e')) return 'girl';
+  return 'boy';
+}
+function avatarAsset_(nome) {
+  return avatarGenero_(nome) === 'girl' ? 'assets/avatar-girl.svg' : 'assets/avatar-boy.svg';
+}
+function avatarHtml_(nome, size) {
+  const cls = 'mk-portal-face mk-portal-face--' + (size === 'lg' ? 'lg' : 'sm');
+  const src = avatarAsset_(nome);
+  const label = esc(String(nome || 'criança'));
+  return `<span class="${cls}"><img src="${src}" width="64" height="64" alt="Avatar ${label}"></span>`;
 }
 function statusClass_(st) {
   const s = String(st || '').trim().toLowerCase();
@@ -279,7 +294,7 @@ function render() {
     .map((x) => {
       const pillCls = 'mk-portal-other-pill' + (x.s.extra ? ' is-extra' : (x.s.warn ? ' is-warn' : ''));
       return `<button type="button" class="mk-portal-other-row" data-carousel-other="${x.i}">
-        ${avatarHtml_(x.l.crianca)}
+        ${avatarHtml_(x.l.crianca, 'sm')}
         <span class="mk-portal-other-name">${esc(x.l.crianca)}</span>
         <span class="${pillCls}">${x.s.timeTxt}</span>
       </button>`;
@@ -299,7 +314,10 @@ function render() {
     <p class="mk-portal-counter">Criança ${_carouselIdx + 1} de ${n}</p>
     ${alertasHtml_()}
     <article class="${stats.cardCls}">
-      <div class="mk-portal-play-name">${esc(atual.crianca)}</div>
+      <div class="mk-portal-play-hero">
+        ${avatarHtml_(atual.crianca, 'lg')}
+        <div class="mk-portal-play-name">${esc(atual.crianca)}</div>
+      </div>
       ${ringBlockHtml_(stats)}
       ${infoBasicaHtml_(atual)}
       ${stats.extra ? '<p class="mk-portal-play-msg">Hora de buscar no balcão 🏃</p>' : ''}
