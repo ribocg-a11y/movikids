@@ -3,45 +3,57 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#283593">
+<meta name="theme-color" content="#dc2743">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="robots" content="noindex,nofollow">
 <title>Movi Kids — Foto para redes</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="mk-design.css?v=1.7.58">
+<link rel="stylesheet" href="mk-design.css?v=1.7.59">
 </head>
 <body class="mk-portal-page mk-frame-page" data-step="start">
 
-<div class="mk-portal-deco" aria-hidden="true"></div>
+<div class="mk-frame-bg" aria-hidden="true"></div>
 
 <main class="mk-frame-wrap">
   <p class="mk-frame-sub" id="frame-subtitle">Sua foto na moldura Movi Kids</p>
 
-  <div class="mk-frame-card" id="frame-card">
-    <div class="mk-frame-deco" aria-hidden="true">
-      <span class="mk-frame-sticker s1">⭐</span>
-      <span class="mk-frame-sticker s2">✨</span>
-      <span class="mk-frame-sticker s3">🚗</span>
-      <span class="mk-frame-sticker s4">🧸</span>
-      <span class="mk-frame-sticker s5">🌟</span>
-      <span class="mk-frame-sticker s6">🎉</span>
-      <span class="mk-frame-sticker s7">⭐</span>
-      <span class="mk-frame-sticker s8">🛺</span>
+  <div class="mk-frame-switch" id="frame-switch" hidden></div>
+
+  <div class="mk-frame-card mk-frame-card--ig" id="frame-card">
+    <div class="mk-frame-ig-head">
+      <span class="mk-frame-ig-avatar" aria-hidden="true">MK</span>
+      <span class="mk-frame-ig-user">movikidsslz</span>
+      <span class="mk-frame-ig-dots" aria-hidden="true">⋯</span>
     </div>
-    <div class="mk-frame-top">
-      <span class="mk-frame-top-title">Movi <span>Kids</span></span>
-      <span class="mk-frame-top-ribbon">Diversão com segurança</span>
+    <div class="mk-frame-name-bar" id="frame-nome">⭐</div>
+    <div class="mk-frame-slot-wrap">
+      <div class="mk-frame-hearts" aria-hidden="true">
+        <span class="mk-frame-heart h1">❤️</span>
+        <span class="mk-frame-heart h2">💗</span>
+        <span class="mk-frame-heart h3">❤️</span>
+        <span class="mk-frame-heart h4">💖</span>
+        <span class="mk-frame-heart h5">❤️</span>
+        <span class="mk-frame-heart h6">💕</span>
+        <span class="mk-frame-heart h7">❤️</span>
+        <span class="mk-frame-heart h8">💗</span>
+      </div>
+      <div class="mk-frame-slot">
+        <div class="mk-frame-placeholder" aria-hidden="true">📸</div>
+        <video id="frame-video" playsinline muted autoplay></video>
+        <img id="frame-result" alt="Sua foto na moldura Movi Kids">
+      </div>
     </div>
-    <div class="mk-frame-slot">
-      <div class="mk-frame-placeholder" aria-hidden="true">📸</div>
-      <video id="frame-video" playsinline muted autoplay></video>
-      <img id="frame-result" alt="Sua foto na moldura Movi Kids">
+    <div class="mk-frame-ig-actions" aria-hidden="true">
+      <span class="mk-frame-ig-act">♡</span>
+      <span class="mk-frame-ig-act">💬</span>
+      <span class="mk-frame-ig-act">↗</span>
+      <span class="mk-frame-ig-save">🔖</span>
     </div>
-    <div class="mk-frame-bottom">
-      <span class="mk-frame-bottom-pill">📸 @movikidsslz</span>
-      <span class="mk-frame-bottom-loc">Golden Shopping Calhau</span>
+    <div class="mk-frame-ig-caption">
+      <strong>movikidsslz</strong> Diversão no Golden Shopping Calhau 🚗✨
+      <span class="mk-frame-ig-tag">#MoviKids</span>
     </div>
   </div>
 
@@ -65,27 +77,44 @@
     </div>
   </div>
 
-  <p class="mk-frame-hint">Legenda sugerida: <em>@movikidsslz</em> #MoviKids</p>
+  <p class="mk-frame-hint">Legenda sugerida: <em id="frame-caption-hint">@movikidsslz</em> #MoviKids</p>
   <a class="mk-frame-back" href="acompanhar.html" id="link-voltar">← Voltar ao cronômetro</a>
 </main>
 
 <canvas id="frame-canvas" width="1080" height="1350" hidden aria-hidden="true"></canvas>
 
 <script>
+const PORTAL_FALLBACK_GAS = 'https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec';
 const IG_PROFILE = 'https://www.instagram.com/movikidsslz';
-const IG_CAPTION = 'Diversão na @movikidsslz 🚗✨ #MoviKids #GoldenShoppingCalhau';
 const OUT_W = 1080;
 const OUT_H = 1350;
-const PHOTO = { x: 130, y: 250, w: 820, h: 820 };
+const CARD = { x: 70, y: 100, w: 940, h: 1150, r: 28 };
+const PHOTO = { x: 130, y: 300, w: 820, h: 820 };
 
+let GAS_URL = PORTAL_FALLBACK_GAS;
 let stream_ = null;
 let facing_ = 'environment';
 let lastBlob_ = null;
+let lastSource_ = null;
+let criancas_ = [];
+let kidIdx_ = 0;
 
 const video = document.getElementById('frame-video');
 const resultImg = document.getElementById('frame-result');
 const canvas = document.getElementById('frame-canvas');
 const ctx = canvas.getContext('2d');
+
+function esc(v) {
+  return String(v == null ? '' : v).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+}
+function digits(v) { return String(v || '').replace(/\D/g, ''); }
+function nomeAtual_() { return criancas_[kidIdx_] || ''; }
+function igCaption_() {
+  const n = nomeAtual_();
+  return n
+    ? `${n} se divertiu na @movikidsslz 🚗✨ #MoviKids #GoldenShoppingCalhau`
+    : 'Diversão na @movikidsslz 🚗✨ #MoviKids #GoldenShoppingCalhau';
+}
 
 function setStep(step) {
   document.body.dataset.step = step;
@@ -93,6 +122,38 @@ function setStep(step) {
 
 function setErr(msg) {
   document.getElementById('frame-err').textContent = msg || '';
+}
+
+function updateNomeUI_() {
+  const nome = nomeAtual_();
+  const nomeEl = document.getElementById('frame-nome');
+  if (nomeEl) nomeEl.textContent = nome || '⭐';
+  document.getElementById('frame-subtitle').textContent = nome ? 'Foto de ' + nome : 'Sua foto na moldura Movi Kids';
+  document.getElementById('frame-caption-hint').textContent = igCaption_();
+}
+
+function renderSwitcher_() {
+  const el = document.getElementById('frame-switch');
+  if (!el) return;
+  if (criancas_.length <= 1) {
+    el.hidden = true;
+    el.innerHTML = '';
+    return;
+  }
+  el.hidden = false;
+  el.innerHTML = criancas_.map((n, i) =>
+    `<button type="button" class="mk-frame-kid-pill${i === kidIdx_ ? ' is-active' : ''}" data-kid="${i}">${esc(n)}</button>`
+  ).join('');
+}
+
+function setKidIdx_(i) {
+  if (!criancas_.length) return;
+  kidIdx_ = Math.max(0, Math.min(criancas_.length - 1, i));
+  updateNomeUI_();
+  renderSwitcher_();
+  if (lastSource_ && document.body.dataset.step === 'done') {
+    refreshComposite_();
+  }
 }
 
 function roundRect_(c, x, y, w, h, r) {
@@ -105,96 +166,126 @@ function roundRect_(c, x, y, w, h, r) {
   c.closePath();
 }
 
-function drawConfetti_(ctx) {
-  const dots = [
-    [70, 320, '#FFD54F', 14], [55, 520, '#4fc3f7', 10], [88, 720, '#ec407a', 12],
-    [1000, 380, '#66bb6a', 11], [1010, 580, '#FFD54F', 13], [985, 780, '#ab47bc', 10],
-    [200, 1120, '#4fc3f7', 9], [880, 1100, '#ff8a65', 11], [540, 1280, '#FFD54F', 8]
+function drawIgGradientBg_(c) {
+  const g = c.createLinearGradient(0, 0, OUT_W, OUT_H);
+  g.addColorStop(0, '#f09433');
+  g.addColorStop(0.25, '#e6683c');
+  g.addColorStop(0.5, '#dc2743');
+  g.addColorStop(0.75, '#cc2366');
+  g.addColorStop(1, '#bc1888');
+  c.fillStyle = g;
+  c.fillRect(0, 0, OUT_W, OUT_H);
+}
+
+function drawHeart_(c, x, y, size, rot, alpha) {
+  c.save();
+  c.translate(x, y);
+  c.rotate(rot);
+  c.globalAlpha = alpha || 0.9;
+  c.font = size + 'px sans-serif';
+  c.textAlign = 'center';
+  c.textBaseline = 'middle';
+  c.fillText('❤️', 0, 0);
+  c.restore();
+  c.globalAlpha = 1;
+}
+
+function drawHearts_(c) {
+  const hearts = [
+    [95, 520, 52, -0.35, 0.85], [1005, 480, 46, 0.4, 0.8],
+    [78, 720, 40, 0.2, 0.75], [1010, 760, 44, -0.25, 0.82],
+    [140, 980, 36, 0.5, 0.7], [960, 1000, 38, -0.4, 0.72],
+    [200, 420, 30, 0.15, 0.65], [900, 620, 34, -0.2, 0.68],
+    [60, 880, 28, 0.3, 0.6], [1020, 900, 32, -0.35, 0.65]
   ];
-  dots.forEach(([x, y, c, r]) => {
-    ctx.fillStyle = c;
-    ctx.globalAlpha = 0.85;
-    ctx.beginPath();
-    ctx.arc(x, y, r, 0, Math.PI * 2);
-    ctx.fill();
-  });
-  ctx.globalAlpha = 1;
-  const stickers = [
-    [95, 215, '⭐', 44], [990, 340, '🚗', 40], [78, 650, '🧸', 38],
-    [1005, 720, '✨', 36], [120, 1080, '🌟', 34], [960, 1050, '🎉', 40]
-  ];
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  stickers.forEach(([x, y, ch, sz]) => {
-    ctx.font = sz + 'px sans-serif';
-    ctx.fillText(ch, x, y);
-  });
+  hearts.forEach(([x, y, sz, rot, a]) => drawHeart_(c, x, y, sz, rot, a));
 }
 
 function drawMoldura_(nome) {
-  const g = ctx.createLinearGradient(0, 0, 0, OUT_H);
-  g.addColorStop(0, '#1a237e');
-  g.addColorStop(0.45, '#5c6bc0');
-  g.addColorStop(1, '#1565c0');
-  ctx.fillStyle = g;
-  ctx.fillRect(0, 0, OUT_W, 250);
-  ctx.fillRect(0, 1070, OUT_W, 280);
-  ctx.fillRect(0, 250, 130, 820);
-  ctx.fillRect(950, 250, 130, 820);
-  drawConfetti_(ctx);
-  ctx.strokeStyle = '#ec407a';
-  ctx.lineWidth = 14;
-  roundRect_(ctx, 114, 234, 852, 852, 38);
-  ctx.stroke();
-  ctx.strokeStyle = '#FFD54F';
-  ctx.lineWidth = 8;
-  roundRect_(ctx, 122, 242, 836, 836, 34);
-  ctx.stroke();
-  ctx.font = 'bold 72px Fredoka One, Arial Rounded MT Bold, sans-serif';
-  const partM = 'Movi ';
-  const partK = 'Kids';
-  const titleW = ctx.measureText(partM).width + ctx.measureText(partK).width;
-  let tx = (OUT_W - titleW) / 2;
-  ctx.textAlign = 'left';
+  drawIgGradientBg_(ctx);
+  ctx.save();
+  ctx.shadowColor = 'rgba(0,0,0,0.35)';
+  ctx.shadowBlur = 40;
+  ctx.shadowOffsetY = 12;
   ctx.fillStyle = '#fff';
-  ctx.fillText(partM, tx, 100);
-  ctx.fillStyle = '#FFD54F';
-  ctx.fillText(partK, tx + ctx.measureText(partM).width, 100);
-  ctx.textAlign = 'center';
-  ctx.font = 'bold 48px sans-serif';
-  ctx.fillText('✨', tx - 50, 98);
-  ctx.fillText('✨', tx + titleW + 20, 98);
-  const rw = 420;
-  const rh = 44;
-  const rx = (OUT_W - rw) / 2;
-  const ry = 128;
-  ctx.fillStyle = 'rgba(236, 64, 122, 0.92)';
-  roundRect_(ctx, rx, ry, rw, rh, 22);
+  roundRect_(ctx, CARD.x, CARD.y, CARD.w, CARD.h, CARD.r);
   ctx.fill();
-  ctx.fillStyle = '#fff';
-  ctx.font = 'bold 24px Nunito, sans-serif';
-  ctx.fillText('Diversão com segurança', OUT_W / 2, ry + 30);
-  const pw = 340;
-  const ph = 48;
-  const px = (OUT_W - pw) / 2;
-  const py = 1118;
-  ctx.fillStyle = 'rgba(41, 182, 246, 0.95)';
-  roundRect_(ctx, px, py, pw, ph, 24);
+  ctx.restore();
+
+  const hx = CARD.x + 28;
+  const hy = CARD.y + 36;
+  ctx.fillStyle = 'linear-gradient';
+  const ag = ctx.createLinearGradient(hx, hy, hx + 56, hy + 56);
+  ag.addColorStop(0, '#5c6bc0');
+  ag.addColorStop(1, '#3949ab');
+  ctx.fillStyle = ag;
+  ctx.beginPath();
+  ctx.arc(hx + 28, hy + 28, 28, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = '#FFD54F';
+  ctx.font = 'bold 22px Fredoka One, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('MK', hx + 28, hy + 30);
+  ctx.fillStyle = '#262626';
+  ctx.font = 'bold 30px Nunito, sans-serif';
+  ctx.textAlign = 'left';
+  ctx.fillText('movikidsslz', hx + 68, hy + 30);
+  ctx.fillStyle = '#8e8e8e';
+  ctx.font = 'bold 36px sans-serif';
+  ctx.textAlign = 'right';
+  ctx.fillText('⋯', CARD.x + CARD.w - 28, hy + 30);
+
+  const nomeTxt = String(nome || '').trim() || '⭐';
+  ctx.textAlign = 'center';
+  const nw = Math.min(560, Math.max(200, ctx.measureText(nomeTxt).width + 80));
+  const nx = (OUT_W - nw) / 2;
+  const ny = CARD.y + 100;
+  const ng = ctx.createLinearGradient(nx, ny, nx + nw, ny);
+  ng.addColorStop(0, '#f06292');
+  ng.addColorStop(1, '#ec407a');
+  ctx.fillStyle = ng;
+  roundRect_(ctx, nx, ny, nw, 52, 26);
   ctx.fill();
   ctx.fillStyle = '#fff';
   ctx.font = 'bold 28px Nunito, sans-serif';
-  ctx.fillText('📸 @movikidsslz', OUT_W / 2, py + 32);
-  ctx.fillStyle = '#90caf9';
-  ctx.font = 'bold 22px Nunito, sans-serif';
-  ctx.fillText('Golden Shopping Calhau', OUT_W / 2, 1210);
-  if (nome) {
-    ctx.font = 'bold 34px Nunito, sans-serif';
-    ctx.fillStyle = 'rgba(255,255,255,0.96)';
-    ctx.shadowColor = 'rgba(0,0,0,0.45)';
-    ctx.shadowBlur = 6;
-    ctx.fillText(String(nome).trim().slice(0, 28), OUT_W / 2, PHOTO.y + PHOTO.h - 44);
-    ctx.shadowBlur = 0;
-  }
+  ctx.fillText(nomeTxt.slice(0, 24), OUT_W / 2, ny + 34);
+
+  ctx.fillStyle = '#efefef';
+  roundRect_(ctx, PHOTO.x, PHOTO.y, PHOTO.w, PHOTO.h, 12);
+  ctx.fill();
+  drawHearts_(ctx);
+
+  const ay = PHOTO.y + PHOTO.h + 36;
+  ctx.textAlign = 'left';
+  ctx.font = 'bold 42px sans-serif';
+  ctx.fillStyle = '#262626';
+  ctx.fillText('♡', CARD.x + 32, ay);
+  ctx.fillText('💬', CARD.x + 88, ay);
+  ctx.fillText('↗', CARD.x + 144, ay);
+  ctx.textAlign = 'right';
+  ctx.fillText('🔖', CARD.x + CARD.w - 32, ay);
+
+  const cy = ay + 52;
+  ctx.textAlign = 'left';
+  ctx.font = 'bold 26px Nunito, sans-serif';
+  ctx.fillStyle = '#262626';
+  ctx.fillText('movikidsslz', CARD.x + 32, cy);
+  const brandW = ctx.measureText('movikidsslz ').width;
+  ctx.font = '24px Nunito, sans-serif';
+  ctx.fillStyle = '#262626';
+  ctx.fillText('Diversão no Golden Shopping Calhau 🚗✨', CARD.x + 32 + brandW, cy);
+  ctx.fillStyle = '#00376b';
+  ctx.font = '22px Nunito, sans-serif';
+  ctx.fillText('#MoviKids', CARD.x + 32, cy + 36);
+
+  ctx.font = 'bold 56px Fredoka One, sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.92)';
+  ctx.textAlign = 'center';
+  ctx.shadowColor = 'rgba(0,0,0,0.25)';
+  ctx.shadowBlur = 8;
+  ctx.fillText('Movi Kids', OUT_W / 2, OUT_H - 48);
+  ctx.shadowBlur = 0;
 }
 
 function drawPhotoCover_(source) {
@@ -208,7 +299,7 @@ function drawPhotoCover_(source) {
   const cx = x + (w - cw) / 2;
   const cy = y + (h - ch) / 2;
   ctx.save();
-  roundRect_(ctx, x, y, w, h, 28);
+  roundRect_(ctx, x, y, w, h, 12);
   ctx.clip();
   if (source === video && facing_ === 'user') {
     ctx.translate(x + w, 0);
@@ -220,13 +311,29 @@ function drawPhotoCover_(source) {
   ctx.restore();
 }
 
+function drawPhotoBorder_() {
+  ctx.strokeStyle = '#dbdbdb';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(PHOTO.x - 2, PHOTO.y - 2, PHOTO.w + 4, PHOTO.h + 4);
+  ctx.strokeStyle = '#ec407a';
+  ctx.lineWidth = 6;
+  roundRect_(ctx, PHOTO.x - 8, PHOTO.y - 8, PHOTO.w + 16, PHOTO.h + 16, 20);
+  ctx.stroke();
+}
+
 async function composite_(source) {
-  ctx.fillStyle = '#263238';
-  ctx.fillRect(PHOTO.x, PHOTO.y, PHOTO.w, PHOTO.h);
+  drawMoldura_(nomeAtual_());
   drawPhotoCover_(source);
-  const nome = new URLSearchParams(location.search).get('nome');
-  drawMoldura_(nome);
+  drawPhotoBorder_();
   return new Promise(r => canvas.toBlob(r, 'image/jpeg', 0.92));
+}
+
+async function refreshComposite_() {
+  if (!lastSource_) return;
+  try {
+    lastBlob_ = await composite_(lastSource_);
+    resultImg.src = URL.createObjectURL(lastBlob_);
+  } catch (e) {}
 }
 
 function stopCamera_() {
@@ -265,6 +372,7 @@ async function useFile_(file) {
   const img = new Image();
   img.onload = async () => {
     try {
+      lastSource_ = img;
       lastBlob_ = await composite_(img);
       resultImg.src = URL.createObjectURL(lastBlob_);
       setStep('done');
@@ -280,6 +388,7 @@ async function useFile_(file) {
 async function snap_() {
   if (!video.videoWidth) return;
   try {
+    lastSource_ = video;
     lastBlob_ = await composite_(video);
     resultImg.src = URL.createObjectURL(lastBlob_);
     stopCamera_();
@@ -300,11 +409,12 @@ function download_() {
 async function share_() {
   if (!lastBlob_) return;
   setErr('');
+  const cap = igCaption_();
   const file = new File([lastBlob_], 'movikids-foto.jpg', { type: 'image/jpeg' });
-  try { await navigator.clipboard.writeText(IG_CAPTION); } catch (e) {}
+  try { await navigator.clipboard.writeText(cap); } catch (e) {}
   if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
     try {
-      await navigator.share({ files: [file], title: 'Movi Kids', text: IG_CAPTION });
+      await navigator.share({ files: [file], title: 'Movi Kids', text: cap });
       return;
     } catch (e) {
       if (e.name === 'AbortError') return;
@@ -317,9 +427,38 @@ async function share_() {
 
 function retry_() {
   lastBlob_ = null;
+  lastSource_ = null;
   resultImg.removeAttribute('src');
   setStep('start');
   setErr('');
+}
+
+async function loadGasUrl_() {
+  try {
+    const base = location.pathname.replace(/[^/]*$/, '');
+    const r = await fetch(base + 'gas-endpoint.json?_=' + Date.now(), { cache: 'no-store' });
+    const j = await r.json();
+    if (j && j.url) GAS_URL = j.url;
+  } catch (e) {}
+}
+
+async function loadCriancas_(tel) {
+  if (!tel || tel.length < 10) return;
+  try {
+    const url = GAS_URL + '?action=buscarPortalResponsavel&telefone=' + encodeURIComponent(tel) + '&t=' + Date.now();
+    const r = await fetch(url, { cache: 'no-store' });
+    const d = await r.json();
+    if (!d.ok || !d.locacoes || !d.locacoes.length) return;
+    const seen = new Set();
+    criancas_ = [];
+    d.locacoes.forEach(l => {
+      const n = String(l.crianca || '').trim();
+      if (n && !seen.has(n.toLowerCase())) {
+        seen.add(n.toLowerCase());
+        criancas_.push(n);
+      }
+    });
+  } catch (e) {}
 }
 
 document.getElementById('btn-camera').addEventListener('click', startCamera_);
@@ -333,16 +472,32 @@ document.getElementById('btn-share').addEventListener('click', share_);
 document.getElementById('btn-download').addEventListener('click', download_);
 document.getElementById('btn-retry').addEventListener('click', retry_);
 
-(function init_() {
-  const nome = new URLSearchParams(location.search).get('nome');
-  if (nome) {
-    document.getElementById('frame-subtitle').textContent = 'Foto de ' + nome;
-  }
-  const tel = new URLSearchParams(location.search).get('tel') || new URLSearchParams(location.search).get('telefone');
+document.getElementById('frame-switch').addEventListener('click', e => {
+  const btn = e.target.closest('[data-kid]');
+  if (btn) setKidIdx_(Number(btn.getAttribute('data-kid')));
+});
+
+(async function init_() {
+  const p = new URLSearchParams(location.search);
+  const tel = digits(p.get('tel') || p.get('telefone') || '');
+  const nomeUrl = (p.get('nome') || '').trim();
+
   if (tel) {
-    document.getElementById('link-voltar').href =
-      'acompanhar.html?tel=' + encodeURIComponent(String(tel).replace(/\D/g, ''));
+    document.getElementById('link-voltar').href = 'acompanhar.html?tel=' + encodeURIComponent(tel);
   }
+
+  await loadGasUrl_();
+  if (tel) await loadCriancas_(tel);
+
+  if (!criancas_.length && nomeUrl) criancas_ = [nomeUrl];
+
+  if (nomeUrl && criancas_.length) {
+    const ni = criancas_.findIndex(n => n.toLowerCase() === nomeUrl.toLowerCase());
+    kidIdx_ = ni >= 0 ? ni : 0;
+  }
+
+  updateNomeUI_();
+  renderSwitcher_();
 })();
 </script>
 </body>

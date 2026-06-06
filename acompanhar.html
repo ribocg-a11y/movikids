@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="mk-design.css?v=1.7.58">
+<link rel="stylesheet" href="mk-design.css?v=1.7.59">
 </head>
 <body class="mk-portal-page" data-view="gate">
 
@@ -33,7 +33,7 @@
 <!-- Timer: uma ou mais locações, só o relógio -->
 <main class="mk-portal-stage" id="resultado" hidden aria-live="polite"></main>
 
-<button type="button" class="mk-portal-back" id="btn-voltar" hidden>📱 Trocar telefone</button>
+<button type="button" class="mk-portal-back mk-portal-foto-btn" id="btn-foto" hidden>📸 Foto para o Instagram</button>
 
 <script>
 const PORTAL_FALLBACK_GAS = 'https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec';
@@ -234,10 +234,10 @@ function setView(mode) {
   document.body.dataset.view = mode;
   const gate = document.getElementById('sec-gate');
   const stage = document.getElementById('resultado');
-  const back = document.getElementById('btn-voltar');
+  const fotoBtn = document.getElementById('btn-foto');
   if (gate) gate.hidden = mode === 'play';
   if (stage) stage.hidden = mode !== 'play';
-  if (back) back.hidden = mode !== 'play';
+  if (fotoBtn) fotoBtn.hidden = mode !== 'play';
 }
 
 async function loadGasUrl_() {
@@ -298,7 +298,7 @@ function render() {
 
   box.innerHTML = `<div class="mk-portal-carousel">
     <div class="mk-portal-brand-lg mk-portal-brand-play">Movi <span>Kids</span></div>
-    <p class="mk-portal-subtitle">📱 ${esc(telFmt)} · ${brincandoLabel_(n)}</p>
+    <p class="mk-portal-subtitle">📱 ${esc(telFmt)} · ${brincandoLabel_(n)} · <button type="button" class="mk-portal-tel-link" id="btn-trocar-tel">Trocar telefone</button></p>
     ${tabs ? `<div class="mk-portal-tabs" role="tablist">${tabs}</div>` : ''}
     ${n > 1 ? `<p class="mk-portal-counter">Criança ${_carouselIdx + 1} de ${n}</p>` : ''}
     <article class="${stats.cardCls}">
@@ -309,7 +309,6 @@ function render() {
       ${ringBlockHtml_(stats)}
       ${infoBasicaHtml_(atual)}
       ${stats.pend ? '<p class="mk-portal-play-msg">Preparando o veículo…</p>' : ''}
-      <a class="mk-portal-foto-link" href="foto-moldura.html?nome=${encodeURIComponent(atual.crianca || '')}&amp;tel=${encodeURIComponent(_telAtual)}">📸 Foto para o Instagram</a>
     </article>
     ${dots ? `<div class="mk-portal-dots">${dots}</div>` : ''}
     ${swipeHint}
@@ -393,9 +392,17 @@ function applyDeepLink_() {
 }
 
 document.getElementById('btn').addEventListener('click', () => buscar(false));
-document.getElementById('btn-voltar').addEventListener('click', voltarGate_);
+document.getElementById('btn-foto').addEventListener('click', () => {
+  if (!_telAtual || !locacoes.length) return;
+  const nome = locacoes[_carouselIdx]?.crianca || '';
+  location.href = 'foto-moldura.html?tel=' + encodeURIComponent(_telAtual) + '&nome=' + encodeURIComponent(nome);
+});
 
 document.getElementById('resultado').addEventListener('click', (e) => {
+  if (e.target.id === 'btn-trocar-tel' || e.target.closest('#btn-trocar-tel')) {
+    voltarGate_();
+    return;
+  }
   const tab = e.target.closest('[data-carousel-tab]');
   if (tab) {
     setCarouselIdx_(Number(tab.getAttribute('data-carousel-tab')));
