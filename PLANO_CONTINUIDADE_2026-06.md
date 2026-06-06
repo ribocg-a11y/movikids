@@ -88,7 +88,7 @@ flowchart TD
 
 | # | Entrega | Camada | Detalhe |
 |---|---------|--------|---------|
-| K.1 | Import inicial LOCACOES → **RESPONSAVEIS** | GAS + script | Telefone canônico; dedup; read-only na falha |
+| K.1 | Import inicial LOCACOES → **RESPONSAVEIS** | GAS + script | ✅ repo v1.5.57; deploy pendente |
 | K.2 | `listarResponsaveis` lê aba quando existir | GAS | Fallback LOCACOES se aba vazia |
 | K.3 | Card relacionamento: última visita + total gasto | FE | Já parcial — validar com aba nova |
 | K.4 | Botões Nova locação / Nova criança | FE | Manter fluxo 3 passos |
@@ -170,7 +170,7 @@ flowchart TD
 |------------|------|------|-------|
 | **P0** | Tablet balcão em **v1.7.48** (ícone PWA atualizado) | Ops balcão | 10 min |
 | **P0** | Fechar checklist **I.5** formal (1 folha assinada) | Ops + dev | 30 min |
-| **P1** | **Pacote K.1** — script import LOCACOES → RESPONSAVEIS | Dev | 1–2 dias |
+| **P1** | **Pacote K.1** — código no repo (`a4bf087`); **deploy GAS fora pico** | Dev | deploy ~15 min |
 | **P2** | `TESTE_REGRESSAO` write controlado (B7) | Dev | paralelo |
 
 **Não iniciar F4 WhatsApp antes de K.1 estável.**
