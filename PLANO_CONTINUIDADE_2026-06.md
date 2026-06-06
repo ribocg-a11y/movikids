@@ -89,10 +89,10 @@ flowchart TD
 | # | Entrega | Camada | Detalhe |
 |---|---------|--------|---------|
 | K.1 | Import inicial LOCACOES → **RESPONSAVEIS** | GAS + script | ✅ **240 cadastros** (06/06/2026) |
-| K.2 | `listarResponsaveis` lê aba quando existir | GAS | Fallback LOCACOES se aba vazia |
-| K.3 | Card relacionamento: última visita + total gasto | FE | Já parcial — validar com aba nova |
-| K.4 | Botões Nova locação / Nova criança | FE | Manter fluxo 3 passos |
-| K.5 | `TESTE_RELACIONAMENTO` + import | Teste | Readonly + dry-run import |
+| K.2 | `listarResponsaveis` lê aba quando existir | GAS | ✅ merge canônico v1.5.57 |
+| K.3 | Card relacionamento + badge **Cadastro** | FE | ✅ v1.7.49 — validar tablet |
+| K.4 | Botões Nova locação / Nova criança | FE | código ok — checklist K.4 |
+| K.5 | `TESTE_RELACIONAMENTO` + import | Teste | ✅ readonly + `cadastroCanonico` |
 
 **Regras (não negociáveis):**
 

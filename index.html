@@ -69,13 +69,13 @@
   } catch(e) {}
 })();
 </script>
-<script src="mk-version.js?v=1.7.48"></script>
+<script src="mk-version.js?v=1.7.49"></script>
 <link rel="stylesheet" href="mk-design.css">
 
 <script>
 // ── CACHE BUSTER — alinhado a mk-version.js / APP_VERSION ──
 (function(){
-  const CURRENT = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.48';
+  const CURRENT = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.49';
   const KEY = 'mk_loaded_version';
   function mkVerParts_(v) {
     return String(v || '0.0').split('.').map(function(n) { return parseInt(n, 10) || 0; });
@@ -546,7 +546,9 @@ header{
 .rel-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);box-shadow:var(--shadow-sm);
   padding:14px;display:grid;gap:10px}
 .rel-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
-.rel-name{font-size:18px;font-weight:900;color:var(--txt);line-height:1.15}
+.rel-name{font-size:18px;font-weight:900;color:var(--txt);line-height:1.15;display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.rel-badge{font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.04em;
+  background:var(--green-lt,#e8f5e9);color:var(--green,#2e7d32);border-radius:99px;padding:3px 8px}
 .rel-phone{font-size:13px;color:var(--txt3);font-weight:700;margin-top:2px}
 .rel-metrics{text-align:right;font-size:12px;color:var(--txt3);font-weight:700;white-space:nowrap}
 .rel-kids{display:flex;flex-wrap:wrap;gap:6px}
@@ -2895,7 +2897,7 @@ header{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.48';
+const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.49';
 const WEBAPP_URL = (typeof window !== 'undefined' && window.MK_GAS_EXEC_URL) ? window.MK_GAS_EXEC_URL
   : 'https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec';
 const WEBAPP_URL_DEAD_PREFIX = 'AKfycbzc';
@@ -6000,14 +6002,16 @@ async function carregarRelacionamento() {
           <strong>${relMoney_(h.valorTotal)}</strong>
         </div>`).join('');
       const totalLoc = Number(r.totalLocacoes || 0);
+      const encerradas = Number(r.encerradas || 0);
       const locLabel = totalLoc === 1 ? 'locação' : 'locações';
+      const canonBadge = r.cadastroCanonico ? '<span class="rel-badge" title="Cadastro na aba RESPONSAVEIS">Cadastro</span>' : '';
       return `<div class="rel-card">
         <div class="rel-top">
           <div>
-            <div class="rel-name">${escHtml(r.responsavel || 'Responsavel sem nome')}</div>
+            <div class="rel-name">${escHtml(r.responsavel || 'Responsavel sem nome')}${canonBadge}</div>
             <div class="rel-phone">📱 ${relPhone_(r.telefone)}</div>
           </div>
-          <div class="rel-metrics">${totalLoc} ${locLabel}<br>${relMoney_(r.faturamento)}</div>
+          <div class="rel-metrics">${totalLoc} ${locLabel}${encerradas ? (' · ' + encerradas + ' enc.') : ''}<br>${relMoney_(r.faturamento)} total</div>
         </div>
         <div class="rel-kids">${kids}</div>
         <div class="rel-last">Ultima visita: ${escHtml(r.ultimaData || '-')} ${escHtml(r.ultimaHora || '')}<br>Ultimo: ${escHtml(r.ultimoVeiculo || '-')} · ${escHtml(r.ultimoPlano || '-')} · ${escHtml(r.ultimoPagamento || '-')}</div>
@@ -8363,8 +8367,8 @@ async function salvarLancamentoAvulso() {
 }
 
 </script>
-<script src="mk-update.js?v=1.7.48"></script>
-<script src="mk-auth.js?v=1.7.48"></script>
+<script src="mk-update.js?v=1.7.49"></script>
+<script src="mk-auth.js?v=1.7.49"></script>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
   if (typeof mkAuthBoot === 'function') {

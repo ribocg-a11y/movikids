@@ -24,7 +24,7 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 | Camada | Versão alvo | URL / ID |
 |--------|-------------|----------|
-| **Frontend** | **v1.7.48** | https://ribocg-a11y.github.io/movikids/?force=1.7.48 |
+| **Frontend** | **v1.7.49** | https://ribocg-a11y.github.io/movikids/?force=1.7.49 |
 | **Apps Script** | **v1.5.57** (produção + K.1 importado 06/06) | Deploy `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y` |
 | SMS Gateway Cloud | **DJVJRL** / device `wihWegHr4wXaVJQ1R-GZR` | Aparelho remoto ONLINE |
 | Pacote SMS P0 | **FECHADO** | `PACOTE_SMS_P0_UNIFICADO_v1.5.38_v1.7.11.md` |
@@ -127,7 +127,8 @@ Commits de referência: `3d9d106` (v1.7.25), `e1a56db` (Pacote E), `1454bc8` (fi
 - [x] **Fix cronômetro portal** — GAS v1.5.55 + portal `canonLoc_` (I16)
 - [x] **Fix auth sessão UI + idle** — v1.7.45–46 (I17, I18)
 - [x] **Pacote K.1** — RESPONSAVEIS populado (240 cadastros, import 06/06)
-- [ ] **Pacote K.2–K.4** — validar card CRM + salvarResponsavel em uso
+- [x] **Pacote K.2** — merge GAS canônico (v1.5.57)
+- [~] **Pacote K.3–K.4** — FE v1.7.49 badge Cadastro; checklist tablet `CHECKLIST_PACOTE_K.md`
 - [ ] Fase 4 WhatsApp (após Pacote K)
 - [ ] Pacote L — UX polish (tiles, sync header, Sistema)
 - [~] **Fase 9 supervisor — PAUSADA**

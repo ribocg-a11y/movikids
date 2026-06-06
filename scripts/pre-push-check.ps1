@@ -125,6 +125,11 @@ try {
     } else {
       Add-Check "guard.turno.chip" "ok" "chip turno no header mobile"
     }
+    if ($indexAuthRaw -notmatch 'rel-badge' -or $indexAuthRaw -notmatch 'cadastroCanonico') {
+      Add-Check "guard.k3.rel-badge" "fail" "badge Cadastro ausente em Relacionamento (K.3)"
+    } else {
+      Add-Check "guard.k3.rel-badge" "ok" "card CRM com cadastroCanonico"
+    }
   } else {
     Add-Check "guard.turno.chip" "fail" "index.html ausente"
   }

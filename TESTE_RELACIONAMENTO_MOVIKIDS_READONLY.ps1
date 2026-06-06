@@ -69,6 +69,17 @@ try {
       if ($tel.Length -lt 10) { throw "Telefone normalizado curto demais: $($r.telefone)" }
     }
     Add-Check "schema responsavel" "ok" ("responsavel={0}; telefone={1}" -f $r.responsavel, $r.telefone)
+    $canonCount = @($resp.responsaveis | Where-Object { $_.cadastroCanonico -eq $true }).Count
+    if ($canonCount -gt 0) {
+      Add-Check "k1.cadastroCanonico" "ok" ("amostra={0}/{1}" -f $canonCount, $resp.responsaveis.Count)
+    } else {
+      Add-Check "k1.cadastroCanonico" "warn" "Nenhum cadastroCanonico na amostra — conferir aba RESPONSAVEIS"
+    }
+    if ($resp.total -lt 100) {
+      Add-Check "k1.total" "warn" ("total={0} — esperado ~240 apos import K.1" -f $resp.total)
+    } else {
+      Add-Check "k1.total" "ok" ("total={0}" -f $resp.total)
+    }
   } else {
     Add-Check "schema responsavel" "skipped" "Nenhum responsavel retornado para validar campos"
   }
