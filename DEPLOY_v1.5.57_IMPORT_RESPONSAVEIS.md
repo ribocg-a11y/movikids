@@ -23,7 +23,9 @@ C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\m
 
 **URL morta (não usar):** `AKfycbzc...` → 404
 
-**Produção hoje:** ping ainda pode retornar **v1.5.56** até você aplicar Nova versão no painel.
+**Produção (06/06/2026):** v1.5.57 implantado · **240** cadastros importados em RESPONSAVEIS.
+
+**Dica:** import de 240+ linhas pode levar >3 min — se o browser/PS timeout, conferir com `dryRun=1` (`ignoradosJaExistem`) antes de repetir.
 
 ---
 

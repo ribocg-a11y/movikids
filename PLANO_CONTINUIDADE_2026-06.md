@@ -88,7 +88,7 @@ flowchart TD
 
 | # | Entrega | Camada | Detalhe |
 |---|---------|--------|---------|
-| K.1 | Import inicial LOCACOES → **RESPONSAVEIS** | GAS + script | ✅ repo v1.5.57; deploy pendente |
+| K.1 | Import inicial LOCACOES → **RESPONSAVEIS** | GAS + script | ✅ **240 cadastros** (06/06/2026) |
 | K.2 | `listarResponsaveis` lê aba quando existir | GAS | Fallback LOCACOES se aba vazia |
 | K.3 | Card relacionamento: última visita + total gasto | FE | Já parcial — validar com aba nova |
 | K.4 | Botões Nova locação / Nova criança | FE | Manter fluxo 3 passos |

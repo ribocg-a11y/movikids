@@ -1,7 +1,7 @@
 # Pacote K.1 — Desenho técnico: import LOCACOES → RESPONSAVEIS
 
 **Data:** 06/06/2026  
-**Status:** implementado no repo (GAS v1.5.57) — **deploy pendente** (fora pico)  
+**Status:** ✅ **concluído em produção** (06/06/2026) — 240 cadastros em RESPONSAVEIS  
 **Versão alvo:** GAS **v1.5.57** · FE sem mudança obrigatória  
 **Referências:** `MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs` (base), `AUDITORIA_PLANILHA_BASE_2026-06-06.md`
 
