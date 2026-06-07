@@ -1,4 +1,4 @@
-/* Controle Financeiro Geral — Movi Kids + ZapClin v8 */
+/* Controle Financeiro Geral — Movi Kids + ZapClin v9 */
 
 const BRL = (n) =>
   (n ?? 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -471,7 +471,16 @@ function renderAll() {
   try { renderCharts(DATA); } catch (e) { console.error("charts", e); }
 }
 
+function removerHistoricoDia() {
+  document.querySelectorAll(".table-dia, #tbl-dia-body").forEach((el) => {
+    const wrap = el.closest(".table-wrap");
+    if (wrap?.classList.contains("table-dia")) wrap.remove();
+    else el.remove();
+  });
+}
+
 async function init() {
+  removerHistoricoDia();
   const root = document.getElementById("app");
   try {
     DATA = await loadData();

@@ -192,9 +192,7 @@ header p {
 .dia-card.zap strong { color: var(--zap); }
 .dia-card.total strong { color: var(--text); }
 
-.table-dia { margin-top: 4px; }
-.table-dia table { font-size: 0.8rem; }
-tr.row-dia-selected td { background: rgba(62, 207, 142, 0.1); }
+.table-dia { display: none !important; }
 
 .faixa-titulo {
   font-size: 0.75rem;

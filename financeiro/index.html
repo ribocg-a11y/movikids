@@ -4,10 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Controle Financeiro Geral — Movi Kids + ZapClin</title>
-  <link rel="stylesheet" href="style.css?v=8">
+  <link rel="stylesheet" href="style.css?v=9">
   <meta http-equiv="Cache-Control" content="no-cache">
 </head>
 <body>
+  <script>document.querySelectorAll(".table-dia").forEach(function (el) { el.remove(); });</script>
   <div id="app" class="wrap loading">
     <header>
       <div>
@@ -158,10 +159,10 @@
     </div>
 
     <footer>
-      Dados das planilhas Google · Atualize com <code>.\scripts\SYNC_FINANCEIRO.ps1</code>
+      Dashboard v9 · Dados das planilhas Google · <code>.\scripts\SYNC_FINANCEIRO.ps1</code>
     </footer>
   </div>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-  <script src="app.js?v=8"></script>
+  <script src="app.js?v=9"></script>
 </body>
 </html>
