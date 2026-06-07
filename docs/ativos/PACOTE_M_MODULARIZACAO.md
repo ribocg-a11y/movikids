@@ -15,7 +15,8 @@
 | **M.4** | `mk-sync.js` (sync + Firebase merge) | FE **v1.7.68** | ✅ 07/06 |
 | **M.5** | `mk-sessao.js` (sessão, SMS, timer) | FE **v1.7.69** | ✅ 07/06 |
 | **M.6** | `mk-nova.js` (fluxo Nova locação) | FE **v1.7.70** | ✅ 07/06 |
-| M.7+ | `mk-admin`, drawer, … | — | ⬜ |
+| **M.7** | `mk-drawer.js` (drawer + encerrar) | FE **v1.7.71** | ✅ 07/06 |
+| M.8+ | `mk-operacao`, admin, … | — | ⬜ |
 
 ---
 
@@ -174,9 +175,26 @@ Tablet: `?force=1.7.69` — cards com timer, alertas 5min/expirado, badges SMS.
 
 Tablet: `?force=1.7.70` — **Nova locação completa** (zona P0 I15).
 
-### Próximo (M.7+)
+## M.7 — Drawer + encerrar (v1.7.71)
 
-Admin, drawer sessão, páginas gestão.
+### O que mudou
+
+| Antes | Depois |
+|-------|--------|
+| ~346 linhas drawer/encerrar inline | `mk-drawer.js` (~360 linhas) |
+| `index.html` ~5.070 linhas | **~4.735 linhas** |
+
+### Arquivos
+
+- `mk-drawer.js` — `abrirSessaoDrawer`, `confirmarEncerrar`, `resolverMinUsadosEncerrar_`
+
+### Validação
+
+Tablet: `?force=1.7.71` — drawer Encerrar + confirmar (zona P0 caixa).
+
+### Próximo (M.8)
+
+Alertas, iniciar contagem, editar/cancelar/estender → `mk-operacao.js`.
 
 ---
 
