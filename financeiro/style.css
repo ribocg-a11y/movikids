@@ -29,6 +29,15 @@ body {
   padding: 24px 20px 48px;
 }
 
+.wrap.loading .grid-kpi,
+.wrap.loading .grid-2,
+.wrap.loading .chart-box,
+.wrap.loading .table-wrap,
+.wrap.loading .narrativa {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
 header {
   display: flex;
   flex-wrap: wrap;

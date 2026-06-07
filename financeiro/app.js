@@ -1,4 +1,4 @@
-/* Controle Financeiro Geral — Movi Kids + ZapClin */
+/* Controle Financeiro Geral — Movi Kids + ZapClin v5 */
 
 const BRL = (n) =>
   (n ?? 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -72,9 +72,18 @@ function setSemaforo(el, sinal) {
 
 function setupFiltro(d) {
   const sel = document.getElementById("filtro-mes");
+  if (!sel) return;
   sel.innerHTML = "";
 
-  const ordem = [...d.mesesOrdem].reverse();
+  const ordem = [...(d.mesesOrdem || [])].reverse();
+  if (!ordem.length) {
+    const opt = document.createElement("option");
+    opt.value = "";
+    opt.textContent = "Sem dados";
+    sel.appendChild(opt);
+    mesSelecionado = null;
+    return;
+  }
   for (const k of ordem) {
     const opt = document.createElement("option");
     opt.value = k;
@@ -95,15 +104,19 @@ function setupFiltro(d) {
   mesSelecionado = d.consolidado.mesAtual || d.mesesOrdem.at(-1);
   sel.value = mesSelecionado;
 
-  sel.addEventListener("change", () => {
-    mesSelecionado = sel.value;
-    renderAll();
-  });
+  if (!sel.dataset.bound) {
+    sel.dataset.bound = "1";
+    sel.addEventListener("change", () => {
+      mesSelecionado = sel.value;
+      renderAll();
+    });
+  }
 }
 
 function renderFiltroInfo(d) {
   const lbl = document.getElementById("filtro-periodo-label");
   const hint = document.getElementById("filtro-hint");
+  if (!lbl || !hint) return;
   const isAcum = mesSelecionado === MODO_ACUMULADO;
 
   lbl.textContent = labelPeriodo(d);
@@ -114,6 +127,7 @@ function renderFiltroInfo(d) {
 
 function renderFaixaAcumulado(d) {
   const box = document.getElementById("faixa-acumulado");
+  if (!box || !mesSelecionado) return;
   const isAcum = mesSelecionado === MODO_ACUMULADO;
 
   if (isAcum) {
@@ -278,6 +292,7 @@ function renderRanking(d) {
 }
 
 function renderCharts(d) {
+  if (typeof Chart === "undefined") return;
   const labels = d.mesesOrdem.map((k) => d.mesesLabel[k]);
   const fat = d.mesesOrdem.map((k) => d.consolidado.meses[k].faturamento);
   const custos = d.mesesOrdem.map((k) => d.consolidado.meses[k].custosTotal);
@@ -369,15 +384,16 @@ function renderMeta(d) {
 }
 
 function renderAll() {
-  renderFiltroInfo(DATA);
-  renderFaixaAcumulado(DATA);
-  renderKPIs(DATA);
-  renderEmpresa("card-mk", DATA.empresas.movikids, DATA.sinais.movikids);
-  renderEmpresa("card-zap", DATA.empresas.zapclin, DATA.sinais.zapclin);
-  renderTabela(DATA);
-  renderNarrativa(DATA);
-  renderRanking(DATA);
-  renderCharts(DATA);
+  if (!DATA) return;
+  try { renderFiltroInfo(DATA); } catch (e) { console.error("filtro", e); }
+  try { renderFaixaAcumulado(DATA); } catch (e) { console.error("faixa", e); }
+  try { renderKPIs(DATA); } catch (e) { console.error("kpis", e); }
+  try { renderEmpresa("card-mk", DATA.empresas.movikids, DATA.sinais.movikids); } catch (e) { console.error("mk", e); }
+  try { renderEmpresa("card-zap", DATA.empresas.zapclin, DATA.sinais.zapclin); } catch (e) { console.error("zap", e); }
+  try { renderTabela(DATA); } catch (e) { console.error("tabela", e); }
+  try { renderNarrativa(DATA); } catch (e) { console.error("narrativa", e); }
+  try { renderRanking(DATA); } catch (e) { console.error("ranking", e); }
+  try { renderCharts(DATA); } catch (e) { console.error("charts", e); }
 }
 
 async function init() {
@@ -389,8 +405,16 @@ async function init() {
     setupFiltro(DATA);
     renderAll();
   } catch (e) {
-    root.innerHTML = `<div class="erro"><p>Erro ao carregar dashboard</p><p>${e.message}</p></div>`;
+    console.error(e);
+    const msg = document.createElement("div");
+    msg.className = "erro";
+    msg.innerHTML = `<p>Erro ao carregar dashboard</p><p>${e.message}</p><p>Recarregue com Ctrl+F5.</p>`;
+    root.prepend(msg);
   }
 }
 
-init();
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", init);
+} else {
+  init();
+}
