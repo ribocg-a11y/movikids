@@ -33,7 +33,7 @@ Continuo o MOVI KIDS. Repo: C:\Users\riboc\Documents\Codex\2026-05-30\files-ment
 
 - Ler: este arquivo → `PLANO_PRIORIDADES` → `ESTADO_ATUAL` → `REGRAS` → `ACESSOS_E_AUTORIZACOES` (§7 = agente vs você)
 - Ignorar handoff antigo em `docs/arquivo/planos/`
-- Informar: FE **v1.7.68**, GAS **v1.5.63**, próximo passo do checklist
+- Informar: FE **v1.7.69**, GAS **v1.5.63**, próximo passo do checklist
 - Deixar claro: **agente** código, testes e **planilha (OAuth)**; **você** Nova versão GAS Web e tablet
 
 ---
@@ -54,10 +54,10 @@ Continuo o MOVI KIDS. Repo: C:\Users\riboc\Documents\Codex\2026-05-30\files-ment
 
 | Camada | Versão | Verificação |
 |--------|--------|-------------|
-| **Frontend** | **v1.7.68** | `mk-version.js` → `window.MK_VERSION` |
-| **Service Worker** | **1.7.68** | `sw.js` → `SW_VERSION` |
+| **Frontend** | **v1.7.69** | `mk-version.js` → `window.MK_VERSION` |
+| **Service Worker** | **1.7.69** | `sw.js` → `SW_VERSION` |
 | **Apps Script** | **v1.5.63** | [ping](https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec?action=ping) → `versao` |
-| **App tablet** | v1.7.68 | https://ribocg-a11y.github.io/movikids/?force=1.7.68 |
+| **App tablet** | v1.7.69 | https://ribocg-a11y.github.io/movikids/?force=1.7.69 |
 
 **Deploy ID GAS (único — nunca criar outro):** `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y`
 
@@ -185,8 +185,8 @@ Guia completo: `DEPLOY_GAS_v1.5.32_AUTH.md`
 
 | Item | Status |
 |------|--------|
-| Pacote M.4 `mk-sync.js` v1.7.68 | ✅ código — **tablet sync** ⬜ |
-| Pacote M.5+ (sessão/nova/admin) | ⬜ próximo técnico |
+| Pacote M.5 `mk-sessao.js` v1.7.69 | ✅ código — **tablet timer/SMS** ⬜ |
+| Pacote M.6+ (nova/admin) | ⬜ próximo técnico |
 | FASE 1 homologação | ⬜ após validar M no tablet |
 | Payback negócio (§10 memorial) | ⬜ FASE 2 |
 | Pacote L UX polish | ⬜ FASE 3 |

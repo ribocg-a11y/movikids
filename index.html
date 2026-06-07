@@ -16,16 +16,16 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<script src="mk-stale-sync.js?v=1.7.68"></script>
-<script src="mk-version.js?v=1.7.68"></script>
-<script src="mk-api.js?v=1.7.68"></script>
+<script src="mk-stale-sync.js?v=1.7.69"></script>
+<script src="mk-version.js?v=1.7.69"></script>
+<script src="mk-api.js?v=1.7.69"></script>
 <link rel="stylesheet" href="mk-design.css">
 
-<script src="mk-cache-bust.js?v=1.7.68"></script>
+<script src="mk-cache-bust.js?v=1.7.69"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<link rel="stylesheet" href="mk-app.css?v=1.7.68">
+<link rel="stylesheet" href="mk-app.css?v=1.7.69">
 <!-- Firebase SDK — Realtime sync canonico para todos os dispositivos -->
-<script type="module" src="mk-firebase.js?v=1.7.68"></script>
+<script type="module" src="mk-firebase.js?v=1.7.69"></script>
 </head>
 
 <body>
@@ -1358,7 +1358,7 @@
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.68';
+const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.69';
 const PORTAL_RESPONSAVEL_URL = 'https://ribocg-a11y.github.io/movikids/acompanhar.html';
 
 let PRECOS = {
@@ -1388,14 +1388,8 @@ let sessDrawerEditTipo = 'editar';
 let novaState   = { tipo: null, plano: null, veiculo: null, pagamento: null, observacao: '', step: 0 };
 let novaPrefillResponsavel = null;
 const NOVA_DRAFT_KEY = 'mk_nova_locacao_draft_v1';
-const WA_EVENT_LOG_KEY = 'mk_wa_event_log_v1';
-/* operador/sessao: mk-auth.js */
+/* operador/sessao: mk-auth.js · sms/timer: mk-sessao.js */
 const WA_MODE_KEY = 'mk_whatsapp_mode_v1';
-const SMS_CHECK_DELAYS = [15000, 60000, 180000, 300000, 420000, 600000];
-const SMS_RECHECK_EXTRA_MS = [120000, 300000, 600000];
-const SMS_UNCONFIRMED_MS = 5 * 60 * 1000;
-const SMS_FAIL_CONFIRM_CHECKS = 6;
-const SMS_GENERIC_FAIL_RE = /generic.failure|generic_failure|result_error_generic/i;
 let _restoringNovaDraft = false;
 let catSel      = 'Energia';
 let custosHoje  = [];
@@ -1607,6 +1601,7 @@ function trocarModoWhatsApp() {
 
 /* api() + guards I15: mk-api.js (Pacote M.3) */
 /* syncController + merge: mk-sync.js (Pacote M.4) */
+/* sessao/sms/timer: mk-sessao.js (Pacote M.5) */
 
 // ═══════════════════════════════════════════════════════════
 // INIT
@@ -1669,318 +1664,6 @@ function setDefaultDate() {
   const e = document.getElementById('hist-end');
   if (s) s.value = iso;
   if (e) e.value = iso;
-}
-
-// ═══════════════════════════════════════════════════════════
-// SESSIONS
-// ═══════════════════════════════════════════════════════════
-async function loadAtivas() {
-  // Mantido para compatibilidade — usa sincronizarServidor
-  await sincronizarServidor();
-}
-
-function calcStartTimestamp(data, horaInicio) {
-  // data = "dd/MM/yyyy", horaInicio = "HH:mm"
-  if (!data || !horaInicio) return Date.now();
-  const [dd,mm,yyyy] = data.split('/').map(Number);
-  const [hh,mi] = horaInicio.split(':').map(Number);
-  return new Date(yyyy, mm-1, dd, hh, mi, 0).getTime();
-}
-
-/* verificarNovaVersao — implementado em mk-update.js (auto-update + sessao) */
-
-function saveSessions() {
-  localStorage.setItem('mk_sessions', JSON.stringify(sessions));
-}
-
-function extraWaKey_(s) {
-  return 'mk_extra_wa_sent_' + String((s && (s.rowIndex || s.id)) || '');
-}
-
-function extraWaFoiEnviado_(s) {
-  if (!s) return false;
-  if (s.smsFlags && s.smsFlags.esgotado) return true;
-  return Boolean(s.extraWaSentAt || localStorage.getItem(extraWaKey_(s)));
-}
-
-function marcarExtraWaEnviado_(s) {
-  if (!s) return;
-  const ts = Date.now();
-  s.extraWaSentAt = ts;
-  try { localStorage.setItem(extraWaKey_(s), String(ts)); } catch(e) {}
-  saveSessions();
-}
-
-function smsErroFalsoPositivo_(error) {
-  return SMS_GENERIC_FAIL_RE.test(String(error || ''));
-}
-
-function higienizarSmsStatusSessao_(sms) {
-  if (!sms || !sms.gatewayId || sms.manualOk) return sms;
-  const st = String(sms.state || '').toLowerCase();
-  if (st === 'failed' && (smsErroFalsoPositivo_(sms.error) || !sms.error)) {
-    const checks = Number(sms.checks || 0);
-    if (checks >= SMS_FAIL_CONFIRM_CHECKS) {
-      return Object.assign({}, sms, { state: 'Sent', error: '', suspectFail: true });
-    }
-    return Object.assign({}, sms, { state: 'Verifying', suspectFail: true });
-  }
-  return sms;
-}
-
-/** Estado exibido — recheck antes de mostrar Falha SMS (GENERIC_FAILURE costuma ser falso positivo). */
-function smsStatusEfetivo_(sms) {
-  if (!sms) return '';
-  const raw = String(sms.state || '');
-  const st = raw.toLowerCase();
-  if (st === 'failed' && smsErroFalsoPositivo_(sms.error)) {
-    const checks = Number(sms.checks || 0);
-    const sentAt = Number(sms.sentAt || sms.updatedAt || 0);
-    const age = sentAt ? Date.now() - sentAt : 0;
-    if (checks < SMS_FAIL_CONFIRM_CHECKS && age < 900000) return 'Verifying';
-    return 'Sent';
-  }
-  if (st === 'failed' && sms.suspectFail) return 'Sent';
-  const sentAt = Number(sms.sentAt || sms.updatedAt || 0);
-  if (sentAt && !smsStatusFinal_(raw) && (Date.now() - sentAt > SMS_UNCONFIRMED_MS)) return 'Unconfirmed';
-  return raw;
-}
-
-function smsStatusLabel_(state) {
-  const st = String(state || '').toLowerCase();
-  if (st === 'delivered') return { cls:'ok', txt:'Entregue SMS' };
-  if (st === 'verifying') return { cls:'wait', txt:'Confirmando SMS...' };
-  if (st === 'failed') return { cls:'err', txt:'Falha SMS' };
-  if (st === 'unconfirmed') return { cls:'sent', txt:'SMS sem confirmacao' };
-  if (st === 'sent') return { cls:'sent', txt:'SMS enviado' };
-  if (st === 'processed') return { cls:'wait', txt:'SMS processando' };
-  if (st === 'pending' || st === 'accepted') return { cls:'wait', txt:'SMS na fila' };
-  return { cls:'wait', txt:'SMS pendente' };
-}
-
-function smsFalhaReal_(sms) {
-  const eff = smsStatusEfetivo_(sms);
-  return String(eff).toLowerCase() === 'failed';
-}
-
-function smsStatusHtml_(s) {
-  const sms = s && s.smsStatus;
-  if (!sms || !sms.gatewayId) return '';
-  const state = smsStatusEfetivo_(sms);
-  const label = smsStatusLabel_(state);
-  const title = sms.error ? ' title="' + escHtml(sms.error) + '"' : '';
-  const failed = smsFalhaReal_(sms);
-  const errTxt = failed && sms.error ? (' Detalhe: ' + escHtml(String(sms.error).slice(0, 120))) : '';
-  const fallback = failed
-    ? '<div class="sms-fail-hint">Confirme o telefone (DDD+9) ou mostre o QR do portal no balcão.' + errTxt + '</div>' +
-      '<button class="btn btn-wa" onclick="abrirWhatsAppFallback(' + Number(s.rowIndex || 0) + ')" title="Abrir WhatsApp como alternativa">WhatsApp fallback</button>' +
-      '<button class="btn btn-secondary" style="margin-top:6px;font-size:11px" onclick="confirmarSmsRecebido_(' + Number(s.rowIndex || 0) + ')" title="Operador confirmou que o SMS chegou">SMS chegou — limpar aviso</button>'
-    : '';
-  return '<div class="sms-status sms-' + label.cls + '"' + title + '>' + label.txt + '</div>' + fallback;
-}
-
-function confirmarSmsRecebido_(rowIndex) {
-  atualizarSmsStatusLocal_(rowIndex, { state: 'Delivered', error: '', suspectFail: false, manualOk: true });
-  toast('SMS confirmado pelo balcão.', 'success');
-}
-
-function atualizarSmsStatusLocal_(rowIndex, patch) {
-  const s = sessions.find(x => Number(x.rowIndex) === Number(rowIndex));
-  if (!s) return null;
-  s.smsStatus = { ...(s.smsStatus || {}), ...patch, updatedAt: Date.now() };
-  saveSessions();
-  renderCards();
-  return s;
-}
-
-function agendarConsultaSms_(rowIndex, gatewayId, delays) {
-  (delays || SMS_CHECK_DELAYS).forEach(delay => {
-    setTimeout(() => consultarSmsStatusSessao_(rowIndex, gatewayId), delay);
-  });
-}
-
-function smsStatusFinal_(state) {
-  const st = String(state || '').toLowerCase();
-  return st === 'delivered' || st === 'failed' || st === 'sent';
-}
-
-function smsPrecisaRecheck_(sms) {
-  if (!sms || !sms.gatewayId || sms.manualOk) return false;
-  const rawSt = String(sms.state || '').toLowerCase();
-  if (rawSt === 'failed') {
-    if (!sms.error || smsErroFalsoPositivo_(sms.error)) return true;
-    return Number(sms.checks || 0) < SMS_FAIL_CONFIRM_CHECKS;
-  }
-  const eff = smsStatusEfetivo_(sms);
-  const effSt = String(eff).toLowerCase();
-  if (effSt === 'verifying') return true;
-  return !smsStatusFinal_(eff);
-}
-
-function reconsultarSmsPendentes_() {
-  const now = Date.now();
-  if (now - _smsStatusSweepAt < 30000) return;
-  _smsStatusSweepAt = now;
-  sessions.forEach(s => {
-    const sms = s && s.smsStatus;
-    if (!smsPrecisaRecheck_(sms)) return;
-    const last = Number(sms.updatedAt || sms.sentAt || 0);
-    const sentAt = Number(sms.sentAt || last || now);
-    const checks = Number(sms.checks || 0);
-    if (checks >= 12) {
-      if (String(sms.state || '').toLowerCase() === 'failed' && smsErroFalsoPositivo_(sms.error)) {
-        atualizarSmsStatusLocal_(s.rowIndex, { state: 'Sent', error: '', suspectFail: true });
-      } else if (now - sentAt > SMS_UNCONFIRMED_MS) {
-        atualizarSmsStatusLocal_(s.rowIndex, { state: 'Unconfirmed' });
-      }
-      return;
-    }
-    if (!last || now - last >= 45000) consultarSmsStatusSessao_(s.rowIndex, sms.gatewayId);
-  });
-}
-
-async function consultarSmsStatusSessao_(rowIndex, gatewayId) {
-  if (!gatewayId || gatewayId.length < 8) return null;
-  const atual = sessions.find(x => Number(x.rowIndex) === Number(rowIndex));
-  if (atual && atual.smsStatus && atual.smsStatus.manualOk) return atual.smsStatus;
-  if (atual && atual.smsStatus && smsStatusFinal_(smsStatusEfetivo_(atual.smsStatus)) &&
-      !smsErroFalsoPositivo_(atual.smsStatus.error)) return atual.smsStatus;
-  try {
-    const d = await api({
-      action: 'consultarSmsStatus',
-      gatewayId,
-      rowIndex,
-      origem: 'frontend',
-      versao: APP_VERSION,
-      ...operadorApiParams_()
-    }, 20000);
-    if (!d.ok) throw new Error(d.erro || 'Falha ao consultar SMS');
-    const sms = d.sms || {};
-    const anterior = sessions.find(x => Number(x.rowIndex) === Number(rowIndex));
-    const checks = Number((anterior && anterior.smsStatus && anterior.smsStatus.checks) || 0) + 1;
-    let state = sms.state || 'Pending';
-    let error = sms.error || '';
-    let suspectFail = !!sms.suspectFail;
-    if (String(state).toLowerCase() === 'failed' && smsErroFalsoPositivo_(error)) {
-      if (checks < SMS_FAIL_CONFIRM_CHECKS) {
-        state = 'Verifying';
-      } else {
-        state = 'Sent';
-        error = '';
-        suspectFail = true;
-      }
-    }
-    const patch = {
-      gatewayId,
-      state,
-      error,
-      telefoneHash: sms.telefoneHash || '',
-      checks,
-      suspectFail
-    };
-    const s = atualizarSmsStatusLocal_(rowIndex, patch);
-    if (s && smsFalhaReal_(s.smsStatus)) {
-      toast('Falha SMS: confirme telefone ou use alternativa.', 'error');
-    }
-    if (String(state).toLowerCase() === 'verifying' && checks <= SMS_FAIL_CONFIRM_CHECKS) {
-      const extra = SMS_RECHECK_EXTRA_MS[Math.min(checks - 1, SMS_RECHECK_EXTRA_MS.length - 1)] || 120000;
-      setTimeout(() => consultarSmsStatusSessao_(rowIndex, gatewayId), extra);
-    }
-    return sms;
-  } catch(e) {
-    atualizarSmsStatusLocal_(rowIndex, { gatewayId, state:'Pending', error: e.message || 'Erro consulta SMS' });
-    return null;
-  }
-}
-
-function registrarWaEvento_(tipo, s, status) {
-  try {
-    const evento = {
-      tipo,
-      status,
-      rowIndex: s && s.rowIndex,
-      id: s && s.id,
-      crianca: s && s.crianca,
-      responsavel: s && s.responsavel,
-      telefone: s && s.telefone,
-      at: Date.now(),
-      versao: APP_VERSION
-    };
-    const list = JSON.parse(localStorage.getItem(WA_EVENT_LOG_KEY) || '[]');
-    list.unshift(evento);
-    localStorage.setItem(WA_EVENT_LOG_KEY, JSON.stringify(list.slice(0, 200)));
-
-    api({
-      action: 'registrarWhatsAppEvento',
-      tipo: evento.tipo || '',
-      status: evento.status || '',
-      rowIndex: evento.rowIndex || '',
-      id: evento.id || '',
-      crianca: evento.crianca || '',
-      responsavel: evento.responsavel || '',
-      telefone: evento.telefone || '',
-      versao: evento.versao || '',
-      origem: 'frontend'
-    }, 8000).catch(() => {});
-  } catch(e) {}
-}
-
-// ═══════════════════════════════════════════════════════════
-// TIMER LOOP
-// ═══════════════════════════════════════════════════════════
-function startTimerLoop() {
-  if (timerInterv) clearInterval(timerInterv);
-  timerInterv = setInterval(() => {
-    sessions.forEach(s => checkTimer(s));
-    sessions.forEach(s => checkShake(s));
-    reconsultarSmsPendentes_();
-    renderCards();
-    updateStats();
-    // Painel ao vivo: atualiza se visível
-    const painelPage = document.getElementById('page-painel');
-    if (painelPage && painelPage.classList.contains('active')) renderPainel();
-  }, 1000);
-}
-
-function calcRemaining(s) {
-  if (!s || !s.startTimestamp || s.startTimestamp < 1000000000000 || s.startTimestamp > Date.now() + 300000) {
-    return Number(s && s.mins ? s.mins : 0) * 60;
-  }
-  const elapsed = (Date.now() - s.startTimestamp) / 1000; // seconds
-  const total   = s.mins * 60;
-  return Math.floor(total - elapsed); // can be negative
-}
-
-function checkShake(s) {
-  // Card treme após 40s aguardando início sem operador apertar o botão
-  if (s.started) return;
-  const criado = s.startTimestamp || s._criado || 0;
-  if (!criado) return;
-  const elapsed = (Date.now() - criado) / 1000;
-  const card = document.querySelector('[data-row="' + s.rowIndex + '"]');
-  if (!card) return;
-  if (elapsed > 40 && !card.classList.contains('card-shake')) {
-    card.classList.add('card-shake');
-  }
-}
-
-function checkTimer(s) {
-  if (!s.started) return; // Aguardando início
-  const rem = calcRemaining(s);
-
-  // 5 min warning
-  if (rem <= 300 && rem > 0 && !s.alertFired5) {
-    s.alertFired5 = true;
-    saveSessions();
-    triggerAlert5(s);
-  }
-
-  // Expired (0 min)
-  if (rem <= 0 && !s.alertFiredExp) {
-    s.alertFiredExp = true;
-    saveSessions();
-    triggerAlertExpired(s);
-  }
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -6457,9 +6140,10 @@ async function salvarLancamentoAvulso() {
 }
 
 </script>
-<script src="mk-sync.js?v=1.7.68"></script>
-<script src="mk-update.js?v=1.7.68"></script>
-<script src="mk-auth.js?v=1.7.68"></script>
+<script src="mk-sessao.js?v=1.7.69"></script>
+<script src="mk-sync.js?v=1.7.69"></script>
+<script src="mk-update.js?v=1.7.69"></script>
+<script src="mk-auth.js?v=1.7.69"></script>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
   if (typeof mkAuthBoot === 'function') {

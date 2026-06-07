@@ -1,6 +1,6 @@
 // MOVI KIDS - Service Worker 1.7.12
 
-const SW_VERSION = '1.7.68';
+const SW_VERSION = '1.7.69';
 
 const NETWORK_FIRST = [
   'script.google.com',
@@ -17,7 +17,8 @@ const NETWORK_FIRST = [
   'mk-cache-bust.js',
   'mk-firebase.js',
   'mk-api.js',
-  'mk-sync.js'
+  'mk-sync.js',
+  'mk-sessao.js'
 ];
 
 self.addEventListener('install', event => {
