@@ -47,15 +47,15 @@ https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPe
 
 | Artefato | Arquivo |
 |----------|---------|
-| GAS | `MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs` (header **v1.5.63**) |
+| GAS | `MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs` (único na raiz; legados em `arquivo-historico/`) |
 | Payback | `MEMORIAL_PAYBACK_INVESTIMENTO.md` · deploy `DEPLOY_v1.5.61_PAYBACK.md` (atualizar v1.5.63) |
 | Clasp | `gas/Code.gs` (gerado por `scripts/sync-gas-to-clasp.ps1` — não editar à mão) |
 | Login | `mk-auth.js` + gate em `index.html` |
 | Versão FE | `mk-version.js`, `sw.js` |
 | Deploy | `DEPLOY_GAS_v1.5.32_AUTH.md`, `scripts/deploy-gas.ps1` |
-| Limpeza testes | `LIMPAR_TESTES_MOVIKIDS.ps1`, `LIMPAR_SESSOES_TESTE_AGORA.ps1`, `limparLocacoesTesteAdmin` |
-| Paridade HTTP tablet | `TESTE_PARIDADE_HTTP_BROWSER_GAS.ps1` (obrigatório se mexer em `api()`) |
-| Paridade cronômetro portal | `TESTE_PARIDADE_CRONOMETRO_PORTAL_BALCAO.ps1` (obrigatório se mexer em timer/portal — I16) |
+| Limpeza testes | `scripts/testes/LIMPAR_TESTES_MOVIKIDS.ps1`, `scripts/testes/LIMPAR_SESSOES_TESTE_AGORA.ps1` |
+| Paridade HTTP tablet | `scripts/testes/TESTE_PARIDADE_HTTP_BROWSER_GAS.ps1` |
+| Paridade cronômetro portal | `scripts/testes/TESTE_PARIDADE_CRONOMETRO_PORTAL_BALCAO.ps1` |
 | Pre-push (Pacote J) | `scripts/pre-push-check.ps1` — versões, guards I15–I18 |
 | Mapa bugs | `MAPA_ERROS_FALHAS_BUGS.md` |
 | Emergência | `scripts/corrigir-locacao-206.html`, `scripts/corrigir-locacoes-extras-lote.html` |
@@ -210,7 +210,7 @@ Commits de referência: `3d9d106` (v1.7.25), `e1a56db` (Pacote E), `1454bc8` (fi
 6. Locação ativa + idle expirado → operador **permanece** logado (I18)
 7. Nova locação salva no tablet (I15)
 
-Scripts: `TESTE_PARIDADE_CRONOMETRO_PORTAL_BALCAO.ps1`, `TESTE_PARIDADE_HTTP_BROWSER_GAS.ps1`, `TESTE_PACOTE_F_KPI_READONLY.ps1`, `TESTE_REGRESSAO_MOVIKIDS_PROD_SAFE.ps1`
+Scripts: `scripts/testes/` — ver `scripts/testes/README.md`
 
 ---
 

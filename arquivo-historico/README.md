@@ -1,15 +1,15 @@
-# Arquivos historicos — nao implantar
+# Arquivos históricos — não implantar
 
-Estes arquivos existem apenas para referencia e rollback manual.
+Versões antigas do GAS e mockups. **Não colar no Apps Script.**
 
-## Producao atual (04/06/2026)
+## Produção (07/06/2026)
 
-- **Apps Script:** `MOVIKIDS_Code_v1.5.31_PRODUCAO.gs` (espelho do `Código.gs` em producao v1.5.31)
-- **Frontend:** `index.html` + `sw.js` v1.6.71
-- **Deploy ID:** nunca criar novo; sempre nova versao no mesmo deploy
+| Camada | Arquivo |
+|--------|---------|
+| **GAS canônico (único na raiz)** | `../MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs` |
+| **Clasp / deploy** | `../gas/Code.gs` (gerado por `scripts/sync-gas-to-clasp.ps1`) |
+| **Frontend** | `../index.html` + `../mk-version.js` (v1.7.64) |
 
-## v1.5.27 portal
+Todos os `MOVIKIDS_Code_v1.5.*.gs` **desta pasta** são legado. Muitos usam Deploy ID morto `AKfycbzc...`.
 
-O pacote `MOVIKIDS_Code_v1.5.27_PORTAL_RESPONSAVEL_SOBRE_v1.5.26.gs` foi absorvido em versoes posteriores (v1.5.28+). **Nao colar no Apps Script.**
-
-Referencia equivalente ja em producao: action `buscarPortalResponsavel` na v1.5.31.
+Ver também: `../docs/referencia/ARQUIVOS_GAS_LEGADOS.md`

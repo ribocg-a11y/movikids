@@ -14,7 +14,7 @@ Este documento e uma trava operacional. Nenhuma mudanca futura deve ser publicad
 
 1. No **browser/tablet**, escritas criticas ao GAS = **GET** com query string (FE **v1.7.34+**).
 2. **Nunca** reativar POST no `index.html` porque `ping.postWriteActions` existe.
-3. **Nunca** declarar testes OK so com `Invoke-RestMethod POST` — rodar `TESTE_PARIDADE_HTTP_BROWSER_GAS.ps1` e validar **lancamento no tablet**.
+3. **Nunca** declarar testes OK so com `Invoke-RestMethod POST` — rodar `scripts/testes/TESTE_PARIDADE_HTTP_BROWSER_GAS.ps1` e validar **lancamento no tablet**.
 4. Tablets devem mostrar **Online v1.7.35+** — `?force=1.7.31` ou anterior = versao quebrada.
 
 **Documentacao completa:** `../arquivo/incidentes/docs/arquivo/incidentes/INCIDENTE_POST_BROWSER_LANCAMENTO_2026-06-05.md`
@@ -36,7 +36,7 @@ Se o pacote nao precisa mexer em `track.html`, Apps Script, Firebase ou planilha
 
 Antes de commit/push:
 
-- se mexeu em `api()` / lancamento: `TESTE_PARIDADE_HTTP_BROWSER_GAS.ps1` ok + checklist tablet (Regra 6 / incidente I15);
+- se mexeu em `api()` / lancamento: `scripts/testes/TESTE_PARIDADE_HTTP_BROWSER_GAS.ps1` ok + checklist tablet (Regra 6 / incidente I15);
 - `index.html` passou por checagem de versao;
 - `sw.js` passou por checagem de versao;
 - `CURRENT`, `APP_VERSION` e `SW_VERSION` estao alinhados;
@@ -140,7 +140,7 @@ O Apps Script Web App publicado em `script.google.com/macros/s/.../exec` respond
 
 ### Matriz minima antes de publicar mudanca em `api()`
 
-- Rodar `TESTE_PARIDADE_HTTP_BROWSER_GAS.ps1` (readonly).
+- Rodar `scripts/testes/TESTE_PARIDADE_HTTP_BROWSER_GAS.ps1` (readonly).
 - Se alterou lancamento/encerrar: validar no tablet real ou emulador **Nova locacao → salvar** (nao so regressao PowerShell).
 - Mensagem de erro no balcao deve distinguir: sem operador logado vs falha de rede vs resposta nao-JSON.
 
@@ -167,7 +167,7 @@ Erros cometidos neste projeto que nao devem se repetir:
 
 - **GAS** `buscarPortalResponsavel` e `carregarInicio` (ativas) devem usar **`timestampCanonico_`** e `mins = originalMins + extendedMins`.
 - **Portal** (`acompanhar.html`) deve usar **`canonLoc_`** / **`calcStartTimestamp_`** — mesma regra que `mergeSessaoCanonica` + `calcStartTimestamp` em `index.html`.
-- Antes de push que mexa em timer/portal: rodar `TESTE_PARIDADE_CRONOMETRO_PORTAL_BALCAO.ps1`.
+- Antes de push que mexa em timer/portal: rodar `scripts/testes/TESTE_PARIDADE_CRONOMETRO_PORTAL_BALCAO.ps1`.
 - Checklist manual: balcao e celular na mesma locacao — diferenca maxima **2 segundos**, nao minutos.
 - Mapa completo: `MAPA_ERROS_FALHAS_BUGS.md`.
 

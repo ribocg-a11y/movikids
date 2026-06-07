@@ -163,7 +163,7 @@ Só se a loja autorizar locação de teste **sem cliente real**:
 
 ```powershell
 .\pre-push-check.ps1
-.\TESTE_RELACIONAMENTO_MOVIKIDS_READONLY.ps1
+.\scripts\testes\TESTE_RELACIONAMENTO_MOVIKIDS_READONLY.ps1
 ```
 
 | # | Script | Esperado | OK |

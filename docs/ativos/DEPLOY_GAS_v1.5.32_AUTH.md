@@ -52,7 +52,7 @@ Após implantar, o `ping` deve mostrar `versao` **v1.5.63** (ou header do `.gs`)
 ### Cronômetro portal (I16) — GAS mínimo v1.5.55
 
 Se o ping &lt; **v1.5.55**, o celular (`acompanhar.html`) pode mostrar tempo **diferente** do balcão.  
-Após Nova versão Web, rodar: `.\TESTE_PARIDADE_CRONOMETRO_PORTAL_BALCAO.ps1`  
+Após Nova versão Web, rodar: `.\scripts\testes\TESTE_PARIDADE_CRONOMETRO_PORTAL_BALCAO.ps1`  
 Doc: `../arquivo/incidentes/INCIDENTE_CRONOMETRO_PORTAL_AUTH_2026-06-05_06.md`, mapa `MAPA_ERROS_FALHAS_BUGS.md`.
 
 ## Deploy seguro (PC)

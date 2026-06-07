@@ -135,8 +135,9 @@ try {
   }
 
   if (-not $SkipNetworkTests) {
-    $paridade = Join-Path $root "TESTE_PARIDADE_HTTP_BROWSER_GAS.ps1"
-    $portal = Join-Path $root "TESTE_PORTAL_READONLY.ps1"
+    $testDir = Join-Path $root "scripts\testes"
+    $paridade = Join-Path $testDir "TESTE_PARIDADE_HTTP_BROWSER_GAS.ps1"
+    $portal = Join-Path $testDir "TESTE_PORTAL_READONLY.ps1"
     if (-not (Test-Path $paridade)) { throw "TESTE_PARIDADE_HTTP_BROWSER_GAS.ps1 nao encontrado" }
     if (-not (Test-Path $portal)) { throw "TESTE_PORTAL_READONLY.ps1 nao encontrado" }
 
@@ -148,7 +149,7 @@ try {
     if ($LASTEXITCODE -ne 0) { Add-Check "teste.portal" "fail" "exit $LASTEXITCODE" }
     else { Add-Check "teste.portal" "ok" "TESTE_PORTAL_READONLY" }
 
-    $cron = Join-Path $root "TESTE_PARIDADE_CRONOMETRO_PORTAL_BALCAO.ps1"
+    $cron = Join-Path $testDir "TESTE_PARIDADE_CRONOMETRO_PORTAL_BALCAO.ps1"
     if (-not (Test-Path $cron)) { throw "TESTE_PARIDADE_CRONOMETRO_PORTAL_BALCAO.ps1 nao encontrado" }
     $cronOut = & $cron 2>&1 | Out-String
     if ($LASTEXITCODE -ne 0) { Add-Check "teste.cronometro" "fail" "exit $LASTEXITCODE" }

@@ -15,10 +15,10 @@
 .\scripts\pre-push-check.ps1
 
 # Cronômetro portal × balcão (I16)
-.\TESTE_PARIDADE_CRONOMETRO_PORTAL_BALCAO.ps1
+.\scripts\testes\TESTE_PARIDADE_CRONOMETRO_PORTAL_BALCAO.ps1
 
 # HTTP tablet (I15)
-.\TESTE_PARIDADE_HTTP_BROWSER_GAS.ps1
+.\scripts\testes\TESTE_PARIDADE_HTTP_BROWSER_GAS.ps1
 ```
 
 **Tablet obrigatório** quando a linha marcar `tablet`: PowerShell sozinho **não** substitui (lição I15).
@@ -78,9 +78,9 @@
 | `guard.idle.locacao` | `mkHasLocacaoAbertaNoTablet_` em mk-auth | I18 |
 | `guard.auth.fantasma` | `mkAuthReconcileSessaoFantasma_` em mk-auth | I19 |
 | `guard.turno.chip` | `#hd-turno-chip` em index.html | I19 |
-| `teste.paridade` | `TESTE_PARIDADE_HTTP_BROWSER_GAS.ps1` | I15 |
-| `teste.portal` | `TESTE_PORTAL_READONLY.ps1` | portal |
-| `teste.cronometro` | `TESTE_PARIDADE_CRONOMETRO_PORTAL_BALCAO.ps1` | I16 |
+| `teste.paridade` | `scripts/testes/TESTE_PARIDADE_HTTP_BROWSER_GAS.ps1` | I15 |
+| `teste.portal` | `scripts/testes/TESTE_PORTAL_READONLY.ps1` | portal |
+| `teste.cronometro` | `scripts/testes/TESTE_PARIDADE_CRONOMETRO_PORTAL_BALCAO.ps1` | I16 |
 
 ---
 

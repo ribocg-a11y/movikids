@@ -43,4 +43,6 @@
 
 ## App (raiz do repo)
 
-Código publicado no GitHub Pages: `index.html`, `sw.js`, `mk-version.js`, `acompanhar.html`, `foto-moldura.html`, `MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs`.
+**Raiz (app + GAS canônico):** `index.html`, `sw.js`, `mk-version.js`, `acompanhar.html`, `foto-moldura.html`, `MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs` (único `.gs`).
+
+**Arquivo:** `arquivo-historico/` (GAS legados) · **Testes:** `scripts/testes/`

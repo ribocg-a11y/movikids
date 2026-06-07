@@ -10,7 +10,7 @@
 
 | # | Teste | Comando | Esperado |
 |---|-------|---------|----------|
-| K.A1 | Relacionamento readonly | `.\TESTE_RELACIONAMENTO_MOVIKIDS_READONLY.ps1` | `k1.total` ok, `cadastroCanonico` ok |
+| K.A1 | Relacionamento readonly | `.\scripts\testes\TESTE_RELACIONAMENTO_MOVIKIDS_READONLY.ps1` | `k1.total` ok, `cadastroCanonico` ok |
 | K.A2 | Import dry-run pós-K.1 | `.\scripts\import-responsaveis-dry-run.ps1` | `aInserir: 0`, `ignoradosJaExistem: 240` |
 | K.A3 | pre-push-check | `.\scripts\pre-push-check.ps1` | Verde |
 

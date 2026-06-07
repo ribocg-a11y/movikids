@@ -27,6 +27,7 @@
 | 0.5 | `PLANO_PRIORIDADES` + deploy docs | ✅ 07/06 |
 | 0.6 | `pre-push-check.ps1` verde | ✅ 07/06 |
 | 0.7 | Saneamento docs → `docs/` | ✅ 07/06 |
+| 0.8 | Saneamento código → `arquivo-historico/` + `scripts/testes/` | ✅ 07/06 |
 
 **Próximo passo imediato (Ops):** abrir tablet com `?force=1.7.64` → confirmar rodapé **v1.7.64** + chip Turno.
 

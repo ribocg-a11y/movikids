@@ -28,5 +28,7 @@ Toda a documentação está em **`docs/`**. Não use arquivos soltos na raiz (fo
 
 ## Código canônico
 
-- **GAS:** `MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs`
+- **GAS:** `MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs` (único `.gs` na raiz)
+- **GAS legado:** `arquivo-historico/` (não implantar)
+- **Testes:** `scripts/testes/`
 - **Versão FE:** `mk-version.js`
