@@ -1,4 +1,4 @@
-/* Controle Financeiro Geral — Movi Kids + ZapClin v7 */
+/* Controle Financeiro Geral — Movi Kids + ZapClin v8 */
 
 const BRL = (n) =>
   (n ?? 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -209,7 +209,7 @@ function renderDia(d) {
     ? `Faturamento de hoje — ${dia.dataBR}`
     : `Faturamento do dia — ${dia.dataBR}`;
   document.getElementById("dia-sub").textContent =
-    `Mês ${d.mesesLabel[mesSelecionado]} · selecione outro dia na lista ou na tabela`;
+    `Mês ${d.mesesLabel[mesSelecionado]} · troque o dia no seletor ao lado`;
 
   document.getElementById("dia-mk").textContent = BRL(dia.movikids.faturamento);
   document.getElementById("dia-mk-qtd").textContent =
@@ -223,31 +223,6 @@ function renderDia(d) {
   document.getElementById("dia-resultado").textContent = BRL(dia.resultadoEstimado);
   document.getElementById("dia-extra").textContent =
     `Golden est. ${BRL(dia.goldenEstimado)} · ticket ${BRL(dia.ticketMedio)}`;
-
-  const tbody = document.getElementById("tbl-dia-body");
-  if (!tbody) return;
-  tbody.innerHTML = "";
-  for (const k of [...mesData.ordem].reverse()) {
-    const row = mesData.dias[k];
-    const tr = document.createElement("tr");
-    if (k === diaSelecionado) tr.classList.add("row-dia-selected");
-    tr.style.cursor = "pointer";
-    tr.addEventListener("click", () => {
-      diaSelecionado = k;
-      const sel = document.getElementById("filtro-dia");
-      if (sel) sel.value = k;
-      renderDia(d);
-    });
-    tr.innerHTML = `
-      <td>${row.dataBR}</td>
-      <td>${BRL(row.movikids.faturamento)}</td>
-      <td>${BRL(row.zapclin.faturamento)}</td>
-      <td>${BRL(row.total)}</td>
-      <td>${row.atendimentos}</td>
-      <td>${BRL(row.ticketMedio)}</td>
-    `;
-    tbody.appendChild(tr);
-  }
 }
 
 function dadosVisao(d) {
