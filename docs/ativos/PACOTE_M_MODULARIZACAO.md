@@ -62,7 +62,7 @@ pie title JS inline restante por dominio (estimativa)
 | **M.13** | `mk-relacionamento.js` (CRM K.3) | v1.7.83 | ✅ |
 | **M.14** | `mk-custos.js` | v1.7.84 | ✅ |
 | **M.15** | `mk-avulso.js` (lançamento avulso) | v1.7.85 | ✅ |
-| **M.16** | `mk-core.js` (utils, toast, tipos, config apply) | v1.7.86 | ⬜ |
+| **M.16** | `mk-core.js` (utils, toast, tipos, config apply) | v1.7.86 | ✅ |
 | **M.17** | Enxugar inline → só globals + boot | v1.7.87 | ⬜ |
 
 **Meta final:** `index.html` **~900–1.100 linhas** (só HTML + bloco mínimo de estado global).
@@ -318,7 +318,7 @@ Tablet: Dashboard, Caixa, Config templates, Sistema/diagnóstico.
 
 ---
 
-### M.16 — `mk-core.js` · ~200 linhas · v1.7.86
+### M.16 — `mk-core.js` · ~200 linhas · v1.7.86 ✅
 
 **Extrair:**
 - `toast`, `fmtTime`, `escHtml`
@@ -540,5 +540,5 @@ flowchart TB
 - Handoff: `HANDOFF_NOVO_CHAT.md` (próximo técnico = M.16)
 - Auth admin PIN: `ACESSOS_E_AUTORIZACOES.md`
 
-*Próxima ação: **M.16 `mk-core.js`** + validação tablet (`?force=1.7.85`).*
+*Próxima ação: **M.17 enxugar inline** + validação tablet (`?force=1.7.86`).*
 
