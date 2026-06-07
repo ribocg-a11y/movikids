@@ -32,7 +32,8 @@ Leia **nesta ordem**:
 |---------------------|-------------------|---------|
 | Ler docs, editar código, `pre-push-check`, ping GAS, testes `.ps1` | `git commit`, `git push`, `clasp push` | Nova versão Web GAS no editor |
 | Validar versões no repo | Mudanças em `api()` / auth | Tablet balcão `?force=` |
-| Preparar deploy (sync + clasp push) | Limpar testes / corrigir prod | Planilha, Script Properties SMS |
+| **Planilha** via `google-drive-sheets-auth` (OAuth) | Escritas destrutivas na planilha | Script Properties SMS, re-auth OAuth |
+| Preparar deploy (sync + clasp push) | Limpar testes prod / corrigir financeiro GAS | — |
 
 **Nunca:** `clasp deploy`, POST no browser, commit de segredos.
 
