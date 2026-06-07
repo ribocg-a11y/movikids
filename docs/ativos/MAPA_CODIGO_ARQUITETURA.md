@@ -22,7 +22,7 @@
 | **Porta de entrada** | Quem pode entrar | `mk-auth.js` — operador PIN, admin 1416, chip Turno |
 | **Dedos finos** | Scripts pontuais, emergência, testes | `scripts/testes/`, `scripts/liberar-*.html`, `google-drive-sheets-auth` |
 
-**Monólito em redução (Pacote M):** `index.html` **~4.735 linhas** (v1.7.71). Extraídos: `mk-app.css`, bootstrap, `mk-api.js`, `mk-sync.js`, `mk-sessao.js`, `mk-nova.js`, `mk-drawer.js`, `mk-auth.js` — ver `PACOTE_M_MODULARIZACAO.md`.
+**Monólito em redução (Pacote M):** `index.html` **~4.419 linhas** (v1.7.72). Extraídos: `mk-app.css`, bootstrap, `mk-api.js`, `mk-sync.js`, `mk-sessao.js`, `mk-nova.js`, `mk-operacao.js`, `mk-drawer.js`, `mk-auth.js` — ver `PACOTE_M_MODULARIZACAO.md`.
 
 ---
 

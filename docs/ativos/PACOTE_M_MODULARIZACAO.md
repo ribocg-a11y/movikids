@@ -16,7 +16,8 @@
 | **M.5** | `mk-sessao.js` (sessão, SMS, timer) | FE **v1.7.69** | ✅ 07/06 |
 | **M.6** | `mk-nova.js` (fluxo Nova locação) | FE **v1.7.70** | ✅ 07/06 |
 | **M.7** | `mk-drawer.js` (drawer + encerrar) | FE **v1.7.71** | ✅ 07/06 |
-| M.8+ | `mk-operacao`, admin, … | — | ⬜ |
+| **M.8** | `mk-operacao.js` (alertas, SMS/WA, editar, iniciar, estender) | FE **v1.7.72** | ✅ 07/06 |
+| M.9+ | `mk-home`, admin, … | — | ⬜ |
 
 ---
 
@@ -192,9 +193,34 @@ Tablet: `?force=1.7.70` — **Nova locação completa** (zona P0 I15).
 
 Tablet: `?force=1.7.71` — drawer Encerrar + confirmar (zona P0 caixa).
 
-### Próximo (M.8)
+## M.8 — Operações balcão (v1.7.72)
 
-Alertas, iniciar contagem, editar/cancelar/estender → `mk-operacao.js`.
+### O que mudou
+
+| Antes | Depois |
+|-------|--------|
+| ~731 linhas alertas/SMS/operação/iniciar/estender inline | `mk-operacao.js` (~764 linhas) |
+| `index.html` ~4.735 linhas | **~4.419 linhas** |
+
+### Ordem de carga (após `mk-nova.js`)
+
+`mk-operacao.js` → `mk-drawer.js` (drawer depende de `renderOperacaoLocacaoForm_`, `abrirEstender`, `showAlertModal`)
+
+### Arquivos
+
+- `mk-operacao.js` — alertas, SMS/WA, `salvarOperacaoLocacao`, `iniciarContagem`, `confirmarEstender`, `carregarConfig`
+
+### Validação
+
+```powershell
+.\scripts\pre-push-check.ps1
+```
+
+Tablet: `?force=1.7.72` — editar/cancelar, ▶ iniciar, alertas, estender (zona P0 I15).
+
+### Próximo (M.9)
+
+`renderCards`, home, painel ao vivo → `mk-home.js`.
 
 ---
 

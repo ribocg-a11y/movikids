@@ -4,7 +4,7 @@
 let sessDrawerRow = null;
 let sessDrawerTab = 'encerrar';
 let sessDrawerEditTipo = 'editar';
-let encSession = null;
+var encSession = null;
 // ═══════════════════════════════════════════════════════════
 // DRAWER SESSÃO (Pacote D)
 // ═══════════════════════════════════════════════════════════
