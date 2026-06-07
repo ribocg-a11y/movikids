@@ -68,7 +68,16 @@ header p {
   min-width: 180px;
 }
 
-.meta strong { color: var(--text); display: block; margin-bottom: 8px; }
+.meta strong { color: var(--text); display: block; margin-bottom: 4px; }
+
+.meta-stale {
+  display: block;
+  font-size: 0.72rem;
+  color: var(--warn);
+  margin: 4px 0 8px;
+  max-width: 220px;
+  margin-left: auto;
+}
 
 .meta-filtro {
   display: flex;

@@ -1,6 +1,6 @@
 {
   "versao": 2,
-  "atualizadoEm": "2026-06-07T18:48:09.443Z",
+  "atualizadoEm": "2026-06-07T19:27:10.681Z",
   "titulo": "Controle Financeiro Geral",
   "empresas": {
     "movikids": {
@@ -11,12 +11,12 @@
       "investimento": 65410,
       "dataInauguracao": "27/05/2026",
       "mesInicioPayback": "05/2026",
-      "fatAcumulado": 7008.799999999999,
-      "locEncerradas": 344,
-      "ticketMedio": 20.37441860465116,
-      "fatMesAtual": 4028.5999999999995,
+      "fatAcumulado": 7020.799999999999,
+      "locEncerradas": 345,
+      "ticketMedio": 20.35014492753623,
+      "fatMesAtual": 4040.5999999999995,
       "fatMesAnterior": 2980.2000000000007,
-      "crescimentoMesPct": 35.178847057244425,
+      "crescimentoMesPct": 35.58150459700686,
       "meses": {
         "2026-05": {
           "faturamento": 2980.2000000000007,
@@ -28,21 +28,21 @@
           "custosPorCategoria": {}
         },
         "2026-06": {
-          "faturamento": 4028.5999999999995,
+          "faturamento": 4040.5999999999995,
           "custos": 0,
           "cto": 1000,
-          "resultado": 3028.5999999999995,
-          "margem": 75.17748101077298,
-          "qtd": 202,
+          "resultado": 3040.5999999999995,
+          "margem": 75.25120031678463,
+          "qtd": 203,
           "custosPorCategoria": {}
         }
       },
       "payback": {
         "investido": 65410,
-        "recuperado": 5008.8,
-        "percentual": 7.657544717933037,
+        "recuperado": 5020.8,
+        "percentual": 7.6758905366151975,
         "mesesProjetados": 25,
-        "mediaResultadoMensal": 2504.4
+        "mediaResultadoMensal": 2510.4
       },
       "ctoRegra": "max(CTO mínimo contrato, 10% faturamento) — Golden Shopping",
       "avisos": [
@@ -57,12 +57,12 @@
       "investimento": 93493,
       "dataInauguracao": "21/04/2026",
       "mesInicioPayback": "04/2026",
-      "fatAcumulado": 23874,
-      "qtdServicos": 790,
-      "ticketMedio": 30.22025316455696,
-      "fatMesAtual": 1993,
+      "fatAcumulado": 23904,
+      "qtdServicos": 791,
+      "ticketMedio": 30.219974715549938,
+      "fatMesAtual": 2023,
       "fatMesAnterior": 12830,
-      "crescimentoMesPct": -84.46609508963367,
+      "crescimentoMesPct": -84.23226812159002,
       "meses": {
         "2026-04": {
           "faturamento": 9051,
@@ -89,58 +89,58 @@
           }
         },
         "2026-06": {
-          "faturamento": 1993,
+          "faturamento": 2023,
           "custos": 0,
-          "cto": 199.3,
-          "resultado": 1793.7,
+          "cto": 202.3,
+          "resultado": 1820.7,
           "margem": 90,
-          "qtd": 66,
+          "qtd": 67,
           "custosPorCategoria": {}
         }
       },
       "rankingServicos": [
         {
           "nome": "Limpeza + Hig. Profunda",
-          "receita": 17356,
-          "pct": 72.69833291446763
+          "receita": 17386,
+          "pct": 72.73259705488621
         },
         {
           "nome": "Limpeza + Hig. Essencial",
           "receita": 2181,
-          "pct": 9.135461171148531
+          "pct": 9.123995983935743
         },
         {
           "nome": "Revitalização",
           "receita": 1680,
-          "pct": 7.036943955767781
+          "pct": 7.028112449799197
         },
         {
           "nome": "Limpeza + Hig. Rápida",
           "receita": 1315,
-          "pct": 5.5080841082349
+          "pct": 5.501171352074966
         },
         {
           "nome": "Higienização Essencial",
           "receita": 886,
-          "pct": 3.7111502052441985
+          "pct": 3.706492637215529
         },
         {
           "nome": "Higienização Profunda",
           "receita": 276,
-          "pct": 1.1560693641618496
+          "pct": 1.1546184738955823
         },
         {
           "nome": "Higienização Rápida",
           "receita": 180,
-          "pct": 0.7539582809751194
+          "pct": 0.7530120481927711
         }
       ],
       "payback": {
         "investido": 93493,
-        "recuperado": 10614.85,
-        "percentual": 11.353630753104511,
+        "recuperado": 10641.85,
+        "percentual": 11.382509920528811,
         "mesesProjetados": 24,
-        "mediaResultadoMensal": 3538.2833333333333
+        "mediaResultadoMensal": 3547.2833333333333
       },
       "ctoRegra": "10% do faturamento — Golden Shopping",
       "avisos": []
@@ -211,35 +211,35 @@
         }
       },
       "2026-06": {
-        "faturamento": 6021.599999999999,
+        "faturamento": 6063.599999999999,
         "custos": 0,
-        "cto": 1199.3,
+        "cto": 1202.3,
         "ctoMovikids": 1000,
-        "ctoZapclin": 199.3,
-        "custosTotal": 1199.3,
-        "resultado": 4822.299999999999,
-        "margem": 80.08336654709711,
+        "ctoZapclin": 202.3,
+        "custosTotal": 1202.3,
+        "resultado": 4861.299999999999,
+        "margem": 80.1718451085164,
         "movikids": {
-          "faturamento": 4028.5999999999995,
+          "faturamento": 4040.5999999999995,
           "custos": 0,
           "cto": 1000,
-          "resultado": 3028.5999999999995,
-          "margem": 75.17748101077298,
-          "qtd": 202,
+          "resultado": 3040.5999999999995,
+          "margem": 75.25120031678463,
+          "qtd": 203,
           "custosPorCategoria": {}
         },
         "zapclin": {
-          "faturamento": 1993,
+          "faturamento": 2023,
           "custos": 0,
-          "cto": 199.3,
-          "resultado": 1793.7,
+          "cto": 202.3,
+          "resultado": 1820.7,
           "margem": 90,
-          "qtd": 66,
+          "qtd": 67,
           "custosPorCategoria": {}
         }
       }
     },
-    "resultadoAcumulado": 15623.65,
+    "resultadoAcumulado": 15662.65,
     "mesAtual": "2026-06"
   },
   "sinais": {
@@ -261,8 +261,8 @@
   },
   "narrativa": [
     "Movi Kids: Custos operacionais ainda não lançados na aba CUSTOS.",
-    "ZapClin faturou R$ 1.993,00 no último mês; Golden Shopping (10%): R$ 199,30; margem 90%.",
-    "Consolidado: resultado acumulado R$ 15.623,65 em 3 meses.",
+    "ZapClin faturou R$ 2.023,00 no último mês; Golden Shopping (10%): R$ 202,30; margem 90%.",
+    "Consolidado: resultado acumulado R$ 15.662,65 em 3 meses.",
     "Dados parciais — lance custos fixos mensais para análise confiável."
   ],
   "mesesOrdem": [
@@ -893,18 +893,18 @@
         "2026-06-07": {
           "dataBR": "07/06/2026",
           "movikids": {
-            "faturamento": 288.4,
-            "qtd": 12
+            "faturamento": 300.4,
+            "qtd": 13
           },
           "zapclin": {
-            "faturamento": 63,
-            "qtd": 3
+            "faturamento": 93,
+            "qtd": 4
           },
-          "total": 351.4,
-          "atendimentos": 15,
-          "ticketMedio": 23.426666666666666,
-          "goldenEstimado": 35.14,
-          "resultadoEstimado": 316.26
+          "total": 393.4,
+          "atendimentos": 17,
+          "ticketMedio": 23.141176470588235,
+          "goldenEstimado": 39.34,
+          "resultadoEstimado": 354.05999999999995
         }
       },
       "ordem": [

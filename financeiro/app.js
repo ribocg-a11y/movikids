@@ -1,4 +1,4 @@
-/* Controle Financeiro Geral — Movi Kids + ZapClin v9 */
+/* Controle Financeiro Geral — Movi Kids + ZapClin v10 */
 
 const BRL = (n) =>
   (n ?? 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -149,7 +149,7 @@ function renderFaixaAcumulado(d) {
   document.getElementById("acum-resultado").textContent = BRL(t.resultado);
   document.getElementById("acum-margem").textContent = PCT(margem(t.faturamento, t.resultado));
   document.getElementById("acum-det").textContent =
-    `MK ${BRL(mk.resultado)} · ZC ${BRL(zap.resultado)}`;
+    `Resultado acum.: MK ${BRL(mk.resultado)} · ZC ${BRL(zap.resultado)}`;
 }
 
 function setupFiltroDia(d) {
@@ -453,7 +453,17 @@ function renderCharts(d) {
 }
 
 function renderMeta(d) {
-  document.getElementById("atualizado").textContent = new Date(d.atualizadoEm).toLocaleString("pt-BR");
+  const dt = new Date(d.atualizadoEm);
+  document.getElementById("atualizado").textContent = dt.toLocaleString("pt-BR");
+  const alerta = document.getElementById("sync-alerta");
+  if (!alerta) return;
+  const horas = (Date.now() - dt.getTime()) / 3600000;
+  if (horas > 2) {
+    alerta.hidden = false;
+    alerta.textContent = `⚠ Dados com ${Math.floor(horas)}h+ — rode SYNC_FINANCEIRO.ps1`;
+  } else {
+    alerta.hidden = true;
+  }
 }
 
 function renderAll() {
