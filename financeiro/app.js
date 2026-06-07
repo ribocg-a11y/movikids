@@ -5,13 +5,62 @@ const BRL = (n) =>
 
 const PCT = (n) => (n == null || Number.isNaN(n) ? "—" : `${n.toFixed(1)}%`);
 
+const MODO_ACUMULADO = "__acumulado__";
+
 let chartBar = null;
 let chartPie = null;
+let DATA = null;
+let mesSelecionado = null;
 
 async function loadData() {
   const res = await fetch("./data/finance-data.json?" + Date.now());
   if (!res.ok) throw new Error("Não foi possível carregar finance-data.json");
   return res.json();
+}
+
+function mesesAte(d, mes) {
+  if (mes === MODO_ACUMULADO) return d.mesesOrdem;
+  const idx = d.mesesOrdem.indexOf(mes);
+  return idx < 0 ? [] : d.mesesOrdem.slice(0, idx + 1);
+}
+
+function somaConsolidado(d, keys) {
+  return keys.reduce(
+    (acc, k) => {
+      const c = d.consolidado.meses[k] || {};
+      acc.faturamento += c.faturamento || 0;
+      acc.custos += c.custos || 0;
+      acc.golden += c.cto || 0;
+      acc.custosTotal += c.custosTotal || 0;
+      acc.resultado += c.resultado || 0;
+      return acc;
+    },
+    { faturamento: 0, custos: 0, golden: 0, custosTotal: 0, resultado: 0 }
+  );
+}
+
+function somaEmpresa(emp, keys) {
+  return keys.reduce(
+    (acc, k) => {
+      const m = emp.meses[k] || {};
+      acc.faturamento += m.faturamento || 0;
+      acc.custos += m.custos || 0;
+      acc.golden += m.cto || 0;
+      acc.resultado += m.resultado || 0;
+      acc.qtd += m.qtd || 0;
+      return acc;
+    },
+    { faturamento: 0, custos: 0, golden: 0, resultado: 0, qtd: 0 }
+  );
+}
+
+function margem(fat, resultado) {
+  return fat ? (resultado / fat) * 100 : 0;
+}
+
+function labelPeriodo(d) {
+  if (mesSelecionado === MODO_ACUMULADO) return "Todo o período";
+  return d.mesesLabel[mesSelecionado] || mesSelecionado;
 }
 
 function setSemaforo(el, sinal) {
@@ -21,47 +70,153 @@ function setSemaforo(el, sinal) {
   el.title = sinal.motivo;
 }
 
+function setupFiltro(d) {
+  const sel = document.getElementById("filtro-mes");
+  sel.innerHTML = "";
+
+  const ordem = [...d.mesesOrdem].reverse();
+  for (const k of ordem) {
+    const opt = document.createElement("option");
+    opt.value = k;
+    opt.textContent = d.mesesLabel[k];
+    sel.appendChild(opt);
+  }
+
+  const sep = document.createElement("option");
+  sep.disabled = true;
+  sep.textContent = "──────────";
+  sel.appendChild(sep);
+
+  const optAll = document.createElement("option");
+  optAll.value = MODO_ACUMULADO;
+  optAll.textContent = "Todo o período (acumulado)";
+  sel.appendChild(optAll);
+
+  mesSelecionado = d.consolidado.mesAtual || d.mesesOrdem.at(-1);
+  sel.value = mesSelecionado;
+
+  sel.addEventListener("change", () => {
+    mesSelecionado = sel.value;
+    renderAll();
+  });
+}
+
+function renderFiltroInfo(d) {
+  const lbl = document.getElementById("filtro-periodo-label");
+  const hint = document.getElementById("filtro-hint");
+  const isAcum = mesSelecionado === MODO_ACUMULADO;
+
+  lbl.textContent = labelPeriodo(d);
+  hint.textContent = isAcum
+    ? "Os cards principais mostram a soma de todos os meses."
+    : "Os cards principais mostram só este mês. A faixa abaixo traz o acumulado até aqui.";
+}
+
+function renderFaixaAcumulado(d) {
+  const box = document.getElementById("faixa-acumulado");
+  const isAcum = mesSelecionado === MODO_ACUMULADO;
+
+  if (isAcum) {
+    box.hidden = true;
+    return;
+  }
+
+  box.hidden = false;
+  const keys = mesesAte(d, mesSelecionado);
+  const t = somaConsolidado(d, keys);
+  const mk = somaEmpresa(d.empresas.movikids, keys);
+  const zap = somaEmpresa(d.empresas.zapclin, keys);
+
+  document.getElementById("acum-titulo").textContent =
+    `Acumulado até ${d.mesesLabel[mesSelecionado]}`;
+  document.getElementById("acum-fat").textContent = BRL(t.faturamento);
+  document.getElementById("acum-custos").textContent = BRL(t.custosTotal);
+  document.getElementById("acum-resultado").textContent = BRL(t.resultado);
+  document.getElementById("acum-margem").textContent = PCT(margem(t.faturamento, t.resultado));
+  document.getElementById("acum-det").textContent =
+    `MK ${BRL(mk.resultado)} · ZC ${BRL(zap.resultado)}`;
+}
+
+function dadosVisao(d) {
+  if (mesSelecionado === MODO_ACUMULADO) {
+    const keys = d.mesesOrdem;
+    const t = somaConsolidado(d, keys);
+    return {
+      modo: "acumulado",
+      consolidado: { ...t, margem: margem(t.faturamento, t.resultado) },
+      keys,
+    };
+  }
+  const c = d.consolidado.meses[mesSelecionado] || {};
+  return {
+    modo: "mensal",
+    consolidado: c,
+    keys: [mesSelecionado],
+  };
+}
+
 function renderKPIs(d) {
-  const mes = d.consolidado.mesAtual;
-  const m = d.consolidado.meses[mes] || {};
-  const mk = d.empresas.movikids;
-  const zap = d.empresas.zapclin;
+  const visao = dadosVisao(d);
+  const c = visao.consolidado;
+  const isAcum = visao.modo === "acumulado";
+  const mkKeys = mesesAte(d, mesSelecionado === MODO_ACUMULADO ? MODO_ACUMULADO : mesSelecionado);
+  const mk = somaEmpresa(d.empresas.movikids, mkKeys);
+  const zap = somaEmpresa(d.empresas.zapclin, mkKeys);
 
-  document.getElementById("kpi-fat").textContent = BRL(m.faturamento);
+  document.getElementById("kpi-fat-label").textContent = isAcum ? "Faturamento total" : "Faturamento do mês";
+  document.getElementById("kpi-fat").textContent = BRL(c.faturamento);
   document.getElementById("kpi-fat-sub").textContent =
-    `MK ${BRL(mk.fatMesAtual)} · ZC ${BRL(zap.fatMesAtual)}`;
+    `MK ${BRL(mk.faturamento)} · ZC ${BRL(zap.faturamento)}`;
 
-  document.getElementById("kpi-custos").textContent = BRL(m.custosTotal);
+  document.getElementById("kpi-custos-label").textContent = isAcum ? "Custos totais" : "Custos do mês";
+  document.getElementById("kpi-custos").textContent = BRL(c.custosTotal);
   document.getElementById("kpi-custos-sub").textContent =
-    `Operacional ${BRL(m.custos)} · Golden ${BRL(m.cto)} (MK ${BRL(m.ctoMovikids || 0)} + ZC ${BRL(m.ctoZapclin || 0)})`;
+    `Operacional ${BRL(c.custos)} · Golden ${BRL(c.golden ?? c.cto ?? 0)}`;
 
-  document.getElementById("kpi-resultado").textContent = BRL(m.resultado);
+  document.getElementById("kpi-resultado-label").textContent = isAcum ? "Resultado total" : "Resultado do mês";
+  document.getElementById("kpi-resultado").textContent = BRL(c.resultado);
   document.getElementById("kpi-resultado-sub").textContent =
-    `Acumulado ${BRL(d.consolidado.resultadoAcumulado)}`;
+    isAcum
+      ? `${d.mesesOrdem.length} meses no período`
+      : `Só em ${d.mesesLabel[mesSelecionado]} — veja acumulado abaixo`;
 
-  document.getElementById("kpi-margem").textContent = PCT(m.margem);
-  document.getElementById("kpi-margem-sub").textContent = d.mesesLabel[mes] || mes;
+  document.getElementById("kpi-margem-label").textContent = isAcum ? "Margem do período" : "Margem do mês";
+  document.getElementById("kpi-margem").textContent = PCT(c.margem);
+  document.getElementById("kpi-margem-sub").textContent = labelPeriodo(d);
 
   setSemaforo(document.getElementById("semaforo-geral"), d.sinais.geral);
 }
 
 function renderEmpresa(id, emp, sinal) {
   const el = document.getElementById(id);
-  const mes = Object.keys(emp.meses).sort().at(-1);
-  const m = emp.meses[mes] || {};
+  const keys = mesesAte(DATA, mesSelecionado === MODO_ACUMULADO ? MODO_ACUMULADO : mesSelecionado);
+  const acum = somaEmpresa(emp, keys);
+  const isAcum = mesSelecionado === MODO_ACUMULADO;
+  const m = isAcum
+    ? { ...acum, margem: margem(acum.faturamento, acum.resultado), cto: acum.golden }
+    : emp.meses[mesSelecionado] || {};
   const pb = emp.payback;
 
   el.querySelector(".emp-nome").textContent = `${emp.emoji} ${emp.nome}`;
   setSemaforo(el.querySelector(".emp-sinal"), sinal);
 
+  el.querySelector(".lbl-fat").textContent = isAcum ? "Fat. período" : "Fat. mês";
   el.querySelector(".m-fat").textContent = BRL(m.faturamento);
   el.querySelector(".m-golden").textContent = BRL(m.cto || 0);
+  el.querySelector(".lbl-resultado").textContent = isAcum ? "Resultado período" : "Resultado mês";
   el.querySelector(".m-resultado").textContent = BRL(m.resultado);
   el.querySelector(".m-margem").textContent = PCT(m.margem);
   const goldenLbl = el.querySelector(".m-golden-lbl");
-  if (goldenLbl && emp.ctoRegra) goldenLbl.textContent = emp.ctoRegra.includes("10%") ? "Golden (10%)" : "Golden / CTO";
-  el.querySelector(".m-ticket").textContent = BRL(emp.ticketMedio);
-  el.querySelector(".m-acum").textContent = BRL(emp.fatAcumulado);
+  if (goldenLbl && emp.ctoRegra) {
+    goldenLbl.textContent = emp.ctoRegra.includes("10%") ? "Golden (10%)" : "Golden / CTO";
+  }
+
+  const ticket = isAcum && acum.qtd ? acum.faturamento / acum.qtd : emp.ticketMedio;
+  el.querySelector(".m-ticket").textContent = BRL(ticket);
+  el.querySelector(".m-acum").textContent = BRL(acum.faturamento);
+  el.querySelector(".lbl-acum").textContent = isAcum
+    ? "Fat. período (= acima)"
+    : `Fat. acum. até ${DATA.mesesLabel[mesSelecionado]}`;
 
   const pct = Math.min(100, pb.percentual || 0);
   el.querySelector(".pb-pct").textContent = PCT(pct);
@@ -69,11 +224,10 @@ function renderEmpresa(id, emp, sinal) {
   el.querySelector(".pb-fill").style.background = emp.cor;
   el.querySelector(".pb-text").textContent =
     pb.investido > 0
-      ? `${BRL(pb.recuperado)} de ${BRL(pb.investido)} · ${pb.mesesProjetados ?? "—"} meses proj.`
+      ? `Payback (sempre total): ${BRL(pb.recuperado)} de ${BRL(pb.investido)}`
       : "Preencha aba INVESTIMENTO";
 
-  const avisos = el.querySelector(".avisos");
-  avisos.innerHTML = (emp.avisos || [])
+  el.querySelector(".avisos").innerHTML = (emp.avisos || [])
     .map((a) => `<div class="aviso">⚠ ${a}</div>`)
     .join("");
 }
@@ -81,9 +235,15 @@ function renderEmpresa(id, emp, sinal) {
 function renderTabela(d) {
   const tbody = document.getElementById("tbl-body");
   tbody.innerHTML = "";
+  let runFat = 0;
+  let runRes = 0;
+
   for (const k of d.mesesOrdem) {
     const c = d.consolidado.meses[k];
+    runFat += c.faturamento;
+    runRes += c.resultado;
     const tr = document.createElement("tr");
+    if (k === mesSelecionado) tr.classList.add("row-selected");
     tr.innerHTML = `
       <td>${d.mesesLabel[k]}</td>
       <td>${BRL(c.faturamento)}</td>
@@ -92,6 +252,8 @@ function renderTabela(d) {
       <td>${BRL(c.custosTotal)}</td>
       <td>${BRL(c.resultado)}</td>
       <td>${PCT(c.margem)}</td>
+      <td>${BRL(runFat)}</td>
+      <td>${BRL(runRes)}</td>
     `;
     tbody.appendChild(tr);
   }
@@ -99,14 +261,15 @@ function renderTabela(d) {
 
 function renderNarrativa(d) {
   const box = document.getElementById("narrativa");
-  box.innerHTML = `<h3>Análise para decisão</h3>` +
+  const periodo = labelPeriodo(d);
+  box.innerHTML =
+    `<h3>Análise para decisão — ${periodo}</h3>` +
     d.narrativa.map((p) => `<p>${p}</p>`).join("");
 }
 
 function renderRanking(d) {
   const ul = document.getElementById("ranking-zap");
-  const items = d.empresas.zapclin.rankingServicos || [];
-  ul.innerHTML = items
+  ul.innerHTML = (d.empresas.zapclin.rankingServicos || [])
     .map(
       (s) =>
         `<li><span>${s.nome}</span><span>${BRL(s.receita)} (${PCT(s.pct)})</span></li>`
@@ -119,6 +282,8 @@ function renderCharts(d) {
   const fat = d.mesesOrdem.map((k) => d.consolidado.meses[k].faturamento);
   const custos = d.mesesOrdem.map((k) => d.consolidado.meses[k].custosTotal);
   const resultado = d.mesesOrdem.map((k) => d.consolidado.meses[k].resultado);
+  const selIdx =
+    mesSelecionado === MODO_ACUMULADO ? -1 : d.mesesOrdem.indexOf(mesSelecionado);
 
   if (chartBar) chartBar.destroy();
   chartBar = new Chart(document.getElementById("chart-bar"), {
@@ -126,9 +291,29 @@ function renderCharts(d) {
     data: {
       labels,
       datasets: [
-        { label: "Faturamento", data: fat, backgroundColor: "rgba(74,158,255,0.7)" },
-        { label: "Custos+Golden", data: custos, backgroundColor: "rgba(255,92,92,0.6)" },
-        { label: "Resultado", data: resultado, backgroundColor: "rgba(62,207,142,0.8)", type: "line", borderColor: "#3ecf8e", tension: 0.3 },
+        {
+          label: "Faturamento",
+          data: fat,
+          backgroundColor: labels.map((_, i) =>
+            i === selIdx ? "rgba(74,158,255,1)" : "rgba(74,158,255,0.45)"
+          ),
+        },
+        {
+          label: "Custos+Golden",
+          data: custos,
+          backgroundColor: labels.map((_, i) =>
+            i === selIdx ? "rgba(255,92,92,0.85)" : "rgba(255,92,92,0.4)"
+          ),
+        },
+        {
+          label: "Resultado",
+          data: resultado,
+          type: "line",
+          borderColor: "#3ecf8e",
+          backgroundColor: "rgba(62,207,142,0.15)",
+          tension: 0.3,
+          pointRadius: labels.map((_, i) => (i === selIdx ? 6 : 3)),
+        },
       ],
     },
     options: {
@@ -137,20 +322,25 @@ function renderCharts(d) {
       plugins: { legend: { labels: { color: "#8b9cb3" } } },
       scales: {
         x: { ticks: { color: "#8b9cb3" }, grid: { color: "#2d3a4f" } },
-        y: { ticks: { color: "#8b9cb3", callback: (v) => "R$" + v }, grid: { color: "#2d3a4f" } },
+        y: {
+          ticks: { color: "#8b9cb3", callback: (v) => "R$" + v },
+          grid: { color: "#2d3a4f" },
+        },
       },
     },
   });
 
-  const mk = d.empresas.movikids.fatAcumulado;
-  const zap = d.empresas.zapclin.fatAcumulado;
+  const mkKeys = mesesAte(d, mesSelecionado === MODO_ACUMULADO ? MODO_ACUMULADO : mesSelecionado);
+  const mkFat = somaEmpresa(d.empresas.movikids, mkKeys).faturamento;
+  const zapFat = somaEmpresa(d.empresas.zapclin, mkKeys).faturamento;
+
   if (chartPie) chartPie.destroy();
   chartPie = new Chart(document.getElementById("chart-pie"), {
     type: "doughnut",
     data: {
       labels: ["Movi Kids", "ZapClin"],
       datasets: [{
-        data: [mk, zap],
+        data: [mkFat, zapFat],
         backgroundColor: ["#4a9eff", "#3ecf8e"],
         borderWidth: 0,
       }],
@@ -158,29 +348,46 @@ function renderCharts(d) {
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      plugins: { legend: { position: "bottom", labels: { color: "#8b9cb3" } } },
+      plugins: {
+        legend: { position: "bottom", labels: { color: "#8b9cb3" } },
+        title: {
+          display: true,
+          text:
+            mesSelecionado === MODO_ACUMULADO
+              ? "Faturamento — todo o período"
+              : `Faturamento acum. até ${d.mesesLabel[mesSelecionado]}`,
+          color: "#8b9cb3",
+          font: { size: 12 },
+        },
+      },
     },
   });
 }
 
 function renderMeta(d) {
-  const dt = new Date(d.atualizadoEm);
-  document.getElementById("atualizado").textContent = dt.toLocaleString("pt-BR");
+  document.getElementById("atualizado").textContent = new Date(d.atualizadoEm).toLocaleString("pt-BR");
+}
+
+function renderAll() {
+  renderFiltroInfo(DATA);
+  renderFaixaAcumulado(DATA);
+  renderKPIs(DATA);
+  renderEmpresa("card-mk", DATA.empresas.movikids, DATA.sinais.movikids);
+  renderEmpresa("card-zap", DATA.empresas.zapclin, DATA.sinais.zapclin);
+  renderTabela(DATA);
+  renderNarrativa(DATA);
+  renderRanking(DATA);
+  renderCharts(DATA);
 }
 
 async function init() {
   const root = document.getElementById("app");
   try {
-    const data = await loadData();
+    DATA = await loadData();
     root.classList.remove("loading");
-    renderMeta(data);
-    renderKPIs(data);
-    renderEmpresa("card-mk", data.empresas.movikids, data.sinais.movikids);
-    renderEmpresa("card-zap", data.empresas.zapclin, data.sinais.zapclin);
-    renderTabela(data);
-    renderNarrativa(data);
-    renderRanking(data);
-    renderCharts(data);
+    renderMeta(DATA);
+    setupFiltro(DATA);
+    renderAll();
   } catch (e) {
     root.innerHTML = `<div class="erro"><p>Erro ao carregar dashboard</p><p>${e.message}</p></div>`;
   }

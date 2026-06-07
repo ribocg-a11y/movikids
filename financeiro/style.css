@@ -60,6 +60,95 @@ header p {
 
 .meta strong { color: var(--text); display: block; }
 
+.filtro-bar {
+  margin-bottom: 16px;
+  padding: 16px 18px !important;
+}
+
+.filtro-main {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.filtro-main label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.filtro-main select {
+  background: var(--surface2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 0.95rem;
+  min-width: 200px;
+}
+
+.filtro-badge {
+  background: var(--accent);
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+
+.filtro-hint {
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin-top: 10px;
+}
+
+.faixa-acumulado {
+  background: linear-gradient(135deg, rgba(124,108,255,0.15), rgba(74,158,255,0.1));
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 18px;
+  margin-bottom: 20px;
+}
+
+.faixa-titulo {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.faixa-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+.faixa-grid div span {
+  display: block;
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+
+.faixa-grid div strong {
+  font-size: 1.1rem;
+}
+
+.faixa-det {
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin-top: 8px;
+}
+
+tr.row-selected td {
+  background: rgba(124, 108, 255, 0.12);
+  font-weight: 600;
+}
+
 .semaforo {
   display: inline-flex;
   align-items: center;

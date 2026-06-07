@@ -22,24 +22,44 @@
       </div>
     </header>
 
+    <section class="filtro-bar card">
+      <div class="filtro-main">
+        <label for="filtro-mes">Período de análise</label>
+        <select id="filtro-mes" aria-label="Selecionar mês"></select>
+        <span class="filtro-badge" id="filtro-periodo-label">—</span>
+      </div>
+      <p class="filtro-hint" id="filtro-hint"></p>
+    </section>
+
+    <section class="faixa-acumulado" id="faixa-acumulado">
+      <div class="faixa-titulo" id="acum-titulo">Acumulado até —</div>
+      <div class="faixa-grid">
+        <div><span>Faturamento</span><strong id="acum-fat">—</strong></div>
+        <div><span>Custos total</span><strong id="acum-custos">—</strong></div>
+        <div><span>Resultado</span><strong id="acum-resultado">—</strong></div>
+        <div><span>Margem</span><strong id="acum-margem">—</strong></div>
+      </div>
+      <p class="faixa-det" id="acum-det"></p>
+    </section>
+
     <section class="grid-kpi">
       <div class="card">
-        <div class="card-label">Faturamento do mês</div>
+        <div class="card-label" id="kpi-fat-label">Faturamento do mês</div>
         <div class="card-value" id="kpi-fat">—</div>
         <div class="card-sub" id="kpi-fat-sub"></div>
       </div>
       <div class="card">
-        <div class="card-label">Custos totais</div>
+        <div class="card-label" id="kpi-custos-label">Custos do mês</div>
         <div class="card-value" id="kpi-custos">—</div>
         <div class="card-sub" id="kpi-custos-sub"></div>
       </div>
       <div class="card">
-        <div class="card-label">Resultado líquido</div>
+        <div class="card-label" id="kpi-resultado-label">Resultado do mês</div>
         <div class="card-value" id="kpi-resultado">—</div>
         <div class="card-sub" id="kpi-resultado-sub"></div>
       </div>
       <div class="card">
-        <div class="card-label">Margem</div>
+        <div class="card-label" id="kpi-margem-label">Margem do mês</div>
         <div class="card-value" id="kpi-margem">—</div>
         <div class="card-sub" id="kpi-margem-sub"></div>
       </div>
@@ -53,12 +73,12 @@
           <div class="emp-sinal semaforo atencao"></div>
         </div>
         <div class="empresa-metrics">
-          <div class="metric"><span>Fat. mês</span><strong class="m-fat">—</strong></div>
+          <div class="metric"><span class="lbl-fat">Fat. mês</span><strong class="m-fat">—</strong></div>
           <div class="metric"><span class="m-golden-lbl">Golden</span><strong class="m-golden">—</strong></div>
-          <div class="metric"><span>Resultado</span><strong class="m-resultado">—</strong></div>
+          <div class="metric"><span class="lbl-resultado">Resultado mês</span><strong class="m-resultado">—</strong></div>
           <div class="metric"><span>Margem</span><strong class="m-margem">—</strong></div>
           <div class="metric"><span>Ticket médio</span><strong class="m-ticket">—</strong></div>
-          <div class="metric"><span>Fat. acumulado</span><strong class="m-acum">—</strong></div>
+          <div class="metric"><span class="lbl-acum">Fat. acumulado</span><strong class="m-acum">—</strong></div>
           <div class="metric"><span>Payback</span><strong class="pb-pct">—</strong></div>
         </div>
         <div class="payback-bar"><div class="pb-fill payback-fill" style="width:0"></div></div>
@@ -72,12 +92,12 @@
           <div class="emp-sinal semaforo atencao"></div>
         </div>
         <div class="empresa-metrics">
-          <div class="metric"><span>Fat. mês</span><strong class="m-fat">—</strong></div>
+          <div class="metric"><span class="lbl-fat">Fat. mês</span><strong class="m-fat">—</strong></div>
           <div class="metric"><span class="m-golden-lbl">Golden</span><strong class="m-golden">—</strong></div>
-          <div class="metric"><span>Resultado</span><strong class="m-resultado">—</strong></div>
+          <div class="metric"><span class="lbl-resultado">Resultado mês</span><strong class="m-resultado">—</strong></div>
           <div class="metric"><span>Margem</span><strong class="m-margem">—</strong></div>
           <div class="metric"><span>Ticket médio</span><strong class="m-ticket">—</strong></div>
-          <div class="metric"><span>Fat. acumulado</span><strong class="m-acum">—</strong></div>
+          <div class="metric"><span class="lbl-acum">Fat. acumulado</span><strong class="m-acum">—</strong></div>
           <div class="metric"><span>Payback</span><strong class="pb-pct">—</strong></div>
         </div>
         <div class="payback-bar"><div class="pb-fill payback-fill" style="width:0"></div></div>
@@ -102,6 +122,8 @@
             <th>Custos total</th>
             <th>Resultado</th>
             <th>Margem</th>
+            <th>Fat. acum.</th>
+            <th>Res. acum.</th>
           </tr>
         </thead>
         <tbody id="tbl-body"></tbody>
