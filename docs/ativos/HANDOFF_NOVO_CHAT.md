@@ -8,26 +8,44 @@
 
 ---
 
-## Cole isto no novo chat (primeira mensagem)
+## Como abrir um chat novo (você)
+
+### Opção A — mensagem mínima (recomendada)
+
+1. Abra o Cursor **nesta pasta** (`movikids-github`).
+2. Novo chat. Digite só:
 
 ```
-Continuo o projeto MOVI KIDS. Siga o handoff ativo.
-
-Repo: C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github
-
-Leia nesta ordem:
-1. docs/ativos/HANDOFF_NOVO_CHAT.md (este arquivo)
-2. docs/ativos/PLANO_PRIORIDADES_2026-06.md — checklist FASE 0 e próximo passo
-3. docs/ativos/ESTADO_ATUAL.md — versões e links de produção
-4. docs/ativos/REGRAS_DE_PUBLICACAO_SEGURA.md — antes de publicar
-
-Produção hoje: FE v1.7.64 · GAS v1.5.63 · Deploy AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y
-
-Próximo passo: FASE 0.1 — tablet balcão em ?force=1.7.64 (rodapé v1.7.64 + chip Turno).
-
-NÃO usar docs/arquivo/planos/HANDOFF_NOVO_CHAT_2026-06-05.md (defasado).
-NÃO implantar arquivos em arquivo-historico/.
+Vamos dar continuidade ao projeto Movi Kids, tem uma pasta no C da minha máquina.
 ```
+
+Isso basta. A regra `.cursor/rules/handoff-movikids.mdc` manda o agente ler este arquivo e o planejamento **sem pedir mais nada**.
+
+### Opção B — mensagem explícita (opcional)
+
+Se o chat não estiver na pasta do projeto, use:
+
+```
+Continuo o MOVI KIDS. Repo: C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github
+```
+
+### O que o agente faz sozinho (não precisa repetir)
+
+- Ler: este arquivo → `PLANO_PRIORIDADES` → `ESTADO_ATUAL` → `REGRAS_DE_PUBLICACAO_SEGURA`
+- Ignorar handoff antigo em `docs/arquivo/planos/`
+- Informar: FE **v1.7.64**, GAS **v1.5.63**, próximo passo do checklist
+
+---
+
+## Comportamento esperado do agente (checklist)
+
+| # | Ação |
+|---|------|
+| 1 | Reconhecer pedido de continuidade — **sem** pedir caminho se workspace = `movikids-github` |
+| 2 | Ler os 4 docs ativos (ordem na seção abaixo) |
+| 3 | Opcional: ping GAS + `pre-push-check.ps1` se for mexer em código |
+| 4 | Responder com: versões, fase ativa, **próximo passo** (de `PLANO_PRIORIDADES`) |
+| 5 | Ao encerrar sessão: atualizar este arquivo + checklist se algo mudou |
 
 ---
 

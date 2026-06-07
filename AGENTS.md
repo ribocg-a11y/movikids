@@ -2,6 +2,18 @@
 
 Sistema operacional de locações — balcão (tablet), portal do responsável, painel admin.
 
+**Repo neste PC:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`
+
+## Mensagem mínima do usuário
+
+Esta frase **basta** para retomar o projeto — não exija caminhos, anexos nem bloco longo:
+
+> Vamos dar continuidade ao projeto Movi Kids, tem uma pasta no C da minha máquina.
+
+**O agente deve:** ler os 4 docs abaixo → resumir produção + próximo passo → só então trabalhar. Não perguntar "qual pasta?" se `AGENTS.md` ou `README.md` estiverem no workspace.
+
+**Melhor experiência:** abrir o Cursor **nesta pasta** (`movikids-github`) antes do chat.
+
 ## Antes de qualquer trabalho
 
 Leia **nesta ordem**:

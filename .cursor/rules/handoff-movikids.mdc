@@ -1,9 +1,25 @@
 ---
-description: Handoff MOVI KIDS — ler documentação ativa antes de qualquer trabalho no repo
+description: Handoff MOVI KIDS — continuidade com mensagem mínima do usuário; ler docs ativos antes de qualquer trabalho
 alwaysApply: true
 ---
 
 # Continuidade MOVI KIDS
+
+## Mensagem mínima do usuário (suficiente)
+
+Se o usuário disser apenas algo como **"vamos dar continuidade ao projeto Movi Kids"**, **"continuar o Movi Kids"**, **"pasta no C da minha máquina"** ou equivalente — **não pedir** caminho, handoff, versão nem anexos.
+
+**Ação imediata (sem perguntas):**
+
+1. Confirmar que este workspace é o repo MOVI KIDS (`README.md` + `AGENTS.md` na raiz, ou pasta `movikids-github`).
+2. Se o workspace for outro: abrir/usar `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`.
+3. Ler os 4 documentos abaixo **antes** de propor ou executar qualquer tarefa.
+4. Resumir em 3 linhas: produção (FE/GAS), fase ativa, próximo passo do checklist.
+5. Perguntar só se o usuário quiser **desviar** do próximo passo — não por falta de contexto.
+
+**GitHub:** `ribocg-a11y/movikids` · branch `main`
+
+---
 
 Ao trabalhar neste repositório, **ler primeiro** (nesta ordem):
 
