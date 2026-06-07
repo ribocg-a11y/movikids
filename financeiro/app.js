@@ -1,4 +1,4 @@
-/* Controle Financeiro Geral — Movi Kids + ZapClin v11 */
+/* Controle Financeiro Geral — Movi Kids + ZapClin v12 (tempo real via GAS) */
 
 const BRL = (n) =>
   (n ?? 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -6,17 +6,61 @@ const BRL = (n) =>
 const PCT = (n) => (n == null || Number.isNaN(n) ? "—" : `${n.toFixed(1)}%`);
 
 const MODO_ACUMULADO = "__acumulado__";
+const GAS_FALLBACK =
+  "https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec";
+const REFRESH_MS = 30000;
 
 let chartBar = null;
 let chartPie = null;
 let DATA = null;
 let mesSelecionado = null;
 let diaSelecionado = null;
+let gasUrlResolved = null;
+let refreshTimer = null;
+let dataFonte = "static";
+
+async function resolveGasUrl() {
+  if (gasUrlResolved) return gasUrlResolved;
+  let url = GAS_FALLBACK;
+  try {
+    const r = await fetch("../gas-endpoint.json?_=" + Date.now(), { cache: "no-store" });
+    if (r.ok) {
+      const j = await r.json();
+      if (j?.url) url = j.url;
+    }
+  } catch (_) { /* fallback */ }
+  gasUrlResolved = url;
+  return url;
+}
+
+async function loadDataLive() {
+  const base = await resolveGasUrl();
+  const res = await fetch(
+    base + "?action=controleFinanceiro&_=" + Date.now(),
+    { cache: "no-store", redirect: "follow" }
+  );
+  if (!res.ok) throw new Error("GAS HTTP " + res.status);
+  const json = await res.json();
+  if (json.erro) throw new Error(json.erro);
+  if (!json.versao) throw new Error("Resposta GAS inválida");
+  dataFonte = "live";
+  return json;
+}
+
+async function loadDataStatic() {
+  const res = await fetch("./data/finance-data.json?" + Date.now(), { cache: "no-store" });
+  if (!res.ok) throw new Error("Não foi possível carregar finance-data.json");
+  dataFonte = "static";
+  return res.json();
+}
 
 async function loadData() {
-  const res = await fetch("./data/finance-data.json?" + Date.now());
-  if (!res.ok) throw new Error("Não foi possível carregar finance-data.json");
-  return res.json();
+  try {
+    return await loadDataLive();
+  } catch (e) {
+    console.warn("[financeiro] GAS indisponível, usando JSON estático:", e.message);
+    return loadDataStatic();
+  }
 }
 
 function mesesAte(d, mes) {
@@ -455,15 +499,28 @@ function renderCharts(d) {
 function renderMeta(d) {
   const dt = new Date(d.atualizadoEm);
   document.getElementById("atualizado").textContent = dt.toLocaleString("pt-BR");
+  const live = document.getElementById("live-badge");
+  if (live) {
+    live.className = "live-badge " + (dataFonte === "live" ? "on" : "off");
+    live.textContent =
+      dataFonte === "live"
+        ? "● Ao vivo — atualiza a cada 30s"
+        : "● Modo estático — deploy GAS v1.5.67 pendente";
+  }
   const alerta = document.getElementById("sync-alerta");
   if (!alerta) return;
   const minutos = (Date.now() - dt.getTime()) / 60000;
-  if (minutos > 15) {
+  const limite = dataFonte === "live" ? 2 : 15;
+  if (minutos > limite) {
     alerta.hidden = false;
-    const label = minutos >= 60
-      ? `${Math.floor(minutos / 60)}h+`
-      : `${Math.floor(minutos)} min+`;
-    alerta.textContent = `⚠ Dados com ${label} — verifique sync automático (10 min)`;
+    const label =
+      minutos >= 60
+        ? `${Math.floor(minutos / 60)}h+`
+        : `${Math.floor(minutos)} min+`;
+    alerta.textContent =
+      dataFonte === "live"
+        ? `⚠ Dados com ${label} — verifique planilhas ou GAS`
+        : `⚠ Dados com ${label} — publique GAS v1.5.67 (Nova versão Web)`;
   } else {
     alerta.hidden = true;
   }
@@ -492,6 +549,33 @@ function removerHistoricoDia() {
   });
 }
 
+async function refreshData(silent) {
+  const prevMes = mesSelecionado;
+  const prevDia = diaSelecionado;
+  const next = await loadData();
+  const changed = !DATA || next.atualizadoEm !== DATA.atualizadoEm;
+  DATA = next;
+  renderMeta(DATA);
+  if (!silent || changed) {
+    setupFiltro(DATA);
+    const sel = document.getElementById("filtro-mes");
+    if (prevMes && sel && [...sel.options].some((o) => o.value === prevMes)) {
+      mesSelecionado = prevMes;
+      sel.value = prevMes;
+    }
+    diaSelecionado = prevDia;
+    setupFiltroDia(DATA);
+    renderAll();
+  }
+}
+
+function startAutoRefresh() {
+  if (refreshTimer) clearInterval(refreshTimer);
+  refreshTimer = setInterval(() => {
+    refreshData(true).catch((e) => console.warn("[financeiro] refresh:", e.message));
+  }, REFRESH_MS);
+}
+
 async function init() {
   removerHistoricoDia();
   const root = document.getElementById("app");
@@ -502,6 +586,7 @@ async function init() {
     setupFiltro(DATA);
     setupFiltroDia(DATA);
     renderAll();
+    startAutoRefresh();
   } catch (e) {
     console.error(e);
     const msg = document.createElement("div");

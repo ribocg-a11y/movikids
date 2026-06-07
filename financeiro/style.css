@@ -70,6 +70,15 @@ header p {
 
 .meta strong { color: var(--text); display: block; margin-bottom: 4px; }
 
+.live-badge {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+.live-badge.on { color: var(--ok); }
+.live-badge.off { color: var(--warn); }
+
 .meta-stale {
   display: block;
   font-size: 0.72rem;

@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.66
+// MOVI KIDS — Google Apps Script v1.5.67
+// v1.5.67: controleFinanceiro — dashboard financeiro MK+ZapClin ao vivo (GET readonly)
 // v1.5.66: iniciarTimer grava clientTs (instante do clique) quando drift <= 2min — absorve latencia API
 // v1.5.65: iniciarTimer idempotente se ja Ativa com col Y valida (nao reinicia relogio)
 // v1.5.64: iniciarTimer grava serverTs na col Y; timestampCanonico sem fallback hora cadastro; horaInicio vazia no cadastro
@@ -327,6 +328,7 @@ function dispatchMoviAction_(p, method) {
       case 'liberarSessaoOperadorAdmin': return liberarSessaoOperadorAdmin_(p);
       case 'verificarSmsDisparo': return verificarSmsDisparo_(p);
       case 'salvarLancamentoAvulso': return salvarLancamentoAvulso_(p);
+      case 'controleFinanceiro':     return controleFinanceiro_();
       default:
         return err_('Ação desconhecida: ' + action, 400);
     }
@@ -353,9 +355,9 @@ function ping_() {
   const agora = new Date();
   return resp_({
     status:  'online',
-    versao:  'v1.5.66',
+    versao:  'v1.5.67',
     timestamp: fmtData_(agora) + ' ' + fmtHoraLocal_(agora),
-    sistema: 'MOVI KIDS v1.5.66',
+    sistema: 'MOVI KIDS v1.5.67',
     postWriteActions: WRITE_ACTIONS_CRITICAS_
   });
 }

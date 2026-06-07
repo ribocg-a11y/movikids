@@ -7,3 +7,9 @@ if (-not (Test-Path $src)) { Write-Error "Arquivo GAS nao encontrado: $src"; exi
 New-Item -ItemType Directory -Force -Path $dstDir | Out-Null
 Copy-Item -Force $src $dst
 Write-Host "OK: $dst"
+$finSrc = Join-Path $root "FinanceiroGeral.gs"
+$finDst = Join-Path $dstDir "FinanceiroGeral.gs"
+if (Test-Path $finSrc) {
+  Copy-Item -Force $finSrc $finDst
+  Write-Host "OK: $finDst"
+}

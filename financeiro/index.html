@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Controle Financeiro Geral — Movi Kids + ZapClin</title>
-  <link rel="stylesheet" href="style.css?v=11">
+  <link rel="stylesheet" href="style.css?v=12">
   <meta http-equiv="Cache-Control" content="no-cache">
 </head>
 <body>
@@ -17,6 +17,7 @@
         <div id="semaforo-geral" class="semaforo atencao"></div>
       </div>
       <div class="meta">
+        <span id="live-badge" class="live-badge off">● Carregando…</span>
         <span>Dados das planilhas em</span>
         <strong id="atualizado">—</strong>
         <span class="meta-stale" id="sync-alerta" hidden></span>
@@ -160,10 +161,10 @@
     </div>
 
     <footer>
-      Dashboard v11 · Sync automático a cada 10 min (se instalado) · Log: <code>financeiro/logs/sync-auto.log</code>
+      Dashboard v12 · Dados ao vivo via Google Apps Script (atualiza a cada 30s)
     </footer>
   </div>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-  <script src="app.js?v=11"></script>
+  <script src="app.js?v=12"></script>
 </body>
 </html>
