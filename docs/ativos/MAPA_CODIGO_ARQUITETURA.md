@@ -18,11 +18,11 @@
 | **Mãos (braços)** | Ações do operador no balcão | Nova locação, drawer, encerrar, SMS manual — `index.html` + 5 escritas GAS |
 | **Olhos (gestão)** | KPIs, payback, relatório | Dashboard, Caixa admin — `buscarKPIsAdmin` (GAS) + páginas admin no FE |
 | **Pernas (canais externos)** | Portal pais, foto, cronômetro curto | `acompanhar.html`, `foto-moldura.html`, `track.html` |
-| **Pele** | Visual único | `mk-design.css`, tokens em `index.html` + Pacote A DNA |
+| **Pele** | Visual único | `mk-app.css` (base) + `mk-design.css` (aditivo Pacote A) |
 | **Porta de entrada** | Quem pode entrar | `mk-auth.js` — operador PIN, admin 1416, chip Turno |
 | **Dedos finos** | Scripts pontuais, emergência, testes | `scripts/testes/`, `scripts/liberar-*.html`, `google-drive-sheets-auth` |
 
-**Monólito consciente:** o “corpo” principal (`index.html` ~8,5k linhas) concentra UI + lógica. Braços e pernas (`mk-auth.js`, portais) foram separados onde o risco era alto (auth, I15, I19).
+**Monólito em redução (Pacote M):** `index.html` **~7.050 linhas** (v1.7.65; CSS em `mk-app.css`). JS ainda inline — ver `PACOTE_M_MODULARIZACAO.md`.
 
 ---
 
@@ -43,7 +43,8 @@ movikids-github/
 │   ├── foto-moldura.html
 │   └── track.html          ← cronômetro curto
 ├── PELE
-│   └── mk-design.css
+│   ├── mk-app.css          ← base legado (ex-inline, Pacote M.1)
+│   └── mk-design.css       ← aditivo Pacote A
 ├── CONFIG deploy
 │   ├── gas-endpoint.json   ← override URL GAS (fallback)
 │   ├── manifest.json
@@ -135,7 +136,7 @@ flowchart TB
 | Bloco | Conteúdo |
 |-------|----------|
 | Head anti-stale | Força `mk-version.js` fresco antes do cache |
-| CSS inline | ~1.400 linhas — design embutido (Pacote A legado) |
+| CSS | `mk-app.css` + `mk-design.css` (extraído M.1) |
 | Firebase module | Listener `sessoes` |
 | `api()` + guards | **Zona P0** — I15 |
 | `syncController` | Poll + merge com Firebase |
@@ -145,7 +146,7 @@ flowchart TB
 
 **Extraídos (bem definidos):** `mk-auth.js`, `mk-version.js`, `mk-update.js`, `mk-design.css`.
 
-**Dívida consciente:** `index.html` monolítico — aceito até equipe crescer (ver `PLANO_PRIORIDADES` §6).
+**Dívida em redução:** JS ainda em `index.html` — Pacote M fases M.2+ (`PACOTE_M_MODULARIZACAO.md`).
 
 ---
 
@@ -227,12 +228,12 @@ Duplicar KPI em Home operador = **proibido** (Pacote I).
 | Processos publicar / handoff / acessos | ✅ Documentados |
 | Arquivos canônicos na raiz | ✅ Limpos (onda 2) |
 | Partições GAS | ✅ Seções lógicas no `.gs` |
-| Partições FE | 🟡 `mk-auth` separado; `index.html` ainda monolito |
+| Partições FE | 🟡 M.1 CSS ok; `index.html` JS ainda monolito (M.2+) |
 | Mapa conexões FE↔GAS↔planilha | ✅ **este arquivo** |
 | Chaves mestras + zonas sensíveis | ✅ §7 e §8 |
 | Diagrama único | ✅ §3 (mermaid) |
 
-**Honesto:** fluxo e diretrizes estão claros; anatomia agora está mapeada; a **dívida** é o monólito `index.html` — risco aceito, não é bagunça.
+**Honesto:** M.1 removeu CSS do monólito; JS (~5,5k linhas) é a próxima fatia (Pacote M).
 
 ---
 

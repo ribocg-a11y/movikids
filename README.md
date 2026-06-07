@@ -6,7 +6,7 @@ Sistema operacional para locações — balcão (tablet), portal do responsável
 
 | Camada | Versão |
 |--------|--------|
-| Frontend | **v1.7.64** — https://ribocg-a11y.github.io/movikids/?force=1.7.64 |
+| Frontend | **v1.7.65** — https://ribocg-a11y.github.io/movikids/?force=1.7.65 |
 | Apps Script | **v1.5.63** — ping `?action=ping` no deploy `AKfycbwakQ...` |
 
 ## Novo chat / agente Cursor
@@ -44,3 +44,4 @@ Toda a documentação está em **`docs/`**. Não use arquivos soltos na raiz (fo
 - **GAS legado:** `arquivo-historico/` (não implantar)
 - **Testes:** `scripts/testes/`
 - **Versão FE:** `mk-version.js`
+- **CSS app:** `mk-app.css` + `mk-design.css` (Pacote M.1)

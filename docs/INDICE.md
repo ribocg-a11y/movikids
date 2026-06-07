@@ -13,6 +13,7 @@
 | [PLANO_CONTINUIDADE_2026-06.md](ativos/PLANO_CONTINUIDADE_2026-06.md) | Sprints e roadmap 90 dias |
 | [ACESSOS_E_AUTORIZACOES.md](ativos/ACESSOS_E_AUTORIZACOES.md) | Papéis, PIN admin, agente vs humano, **planilha OAuth** §7.8 |
 | [MAPA_CODIGO_ARQUITETURA.md](ativos/MAPA_CODIGO_ARQUITETURA.md) | **Anatomia do código** — partes, conexões, chaves mestras |
+| [PACOTE_M_MODULARIZACAO.md](ativos/PACOTE_M_MODULARIZACAO.md) | Extração CSS/JS do `index.html` (M.1 ✅) |
 
 ## Operação e deploy
 
@@ -47,6 +48,6 @@
 
 ## App (raiz do repo)
 
-**Raiz (app + GAS canônico):** `index.html`, `sw.js`, `mk-version.js`, `acompanhar.html`, `foto-moldura.html`, `MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs` (único `.gs`).
+**Raiz (app + GAS canônico):** `index.html`, `mk-app.css`, `mk-design.css`, `sw.js`, `mk-version.js`, `acompanhar.html`, `foto-moldura.html`, `MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs` (único `.gs`).
 
 **Arquivo:** `arquivo-historico/` (GAS legados) · **Testes:** `scripts/testes/`

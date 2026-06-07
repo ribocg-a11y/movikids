@@ -42,8 +42,8 @@
 
 | Camada | Repo (GitHub) | Produção (verificado) | Alinhado? |
 |--------|---------------|------------------------|-----------|
-| **Frontend** | **v1.7.64** (`mk-version.js`) | GitHub Pages publicado | ✅ |
-| **Service Worker** | v1.7.64 (`sw.js`) | GitHub Pages | ✅ |
+| **Frontend** | **v1.7.65** (`mk-version.js`) | GitHub Pages após push | ✅ |
+| **Service Worker** | v1.7.65 (`sw.js`) | — | ✅ |
 | **GAS** | **v1.5.63** (header `.gs`) | Ping **v1.5.63** (07/06) | ✅ |
 | **Deploy ID** | `AKfycbwakQ...` | Mesmo ID | ✅ |
 
@@ -188,7 +188,7 @@ Objetivo: balcão mais rápido; menos ruído visual. **Próximo pacote de featur
 |------|------------------|
 | **F4** WhatsApp / SMS auto | Entrega manual comprovada + conta estável |
 | **F9** Supervisor | K + L estáveis 30 dias |
-| Modularização `index.html` | Q3 ou equipe maior |
+| Modularização `index.html` | **Pacote M** — M.1 ✅; M.2+ em `PACOTE_M_MODULARIZACAO.md` |
 
 ---
 
