@@ -60,7 +60,7 @@ pie title JS inline restante por dominio (estimativa)
 | **M.11** | `mk-admin.js` (PIN, KPIs, caixa, dashboard, config) | v1.7.80 | ✅ |
 | **M.12** | `mk-historico.js` (período, analytics, ranking) | v1.7.81 | ✅ |
 | **M.13** | `mk-relacionamento.js` (CRM K.3) | v1.7.83 | ✅ |
-| **M.14** | `mk-custos.js` | v1.7.83 | ⬜ |
+| **M.14** | `mk-custos.js` | v1.7.84 | ✅ |
 | **M.15** | `mk-avulso.js` (lançamento avulso) | v1.7.84 | ⬜ |
 | **M.16** | `mk-core.js` (utils, toast, tipos, config apply) | v1.7.85 | ⬜ |
 | **M.17** | Enxugar inline → só globals + boot | v1.7.86 | ⬜ |
@@ -540,5 +540,5 @@ flowchart TB
 - Handoff: `HANDOFF_NOVO_CHAT.md` (próximo técnico = M.11)
 - Auth admin PIN: `ACESSOS_E_AUTORIZACOES.md`
 
-*Próxima ação: **M.12 `mk-historico.js`** + validação tablet M.10+M.11 (`?force=1.7.80`).*
+*Próxima ação: **M.14 `mk-custos.js`** + validação tablet (`?force=1.7.83`).*
 

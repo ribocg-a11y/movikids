@@ -16,16 +16,16 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<script src="mk-stale-sync.js?v=1.7.83"></script>
-<script src="mk-version.js?v=1.7.83"></script>
-<script src="mk-api.js?v=1.7.83"></script>
+<script src="mk-stale-sync.js?v=1.7.84"></script>
+<script src="mk-version.js?v=1.7.84"></script>
+<script src="mk-api.js?v=1.7.84"></script>
 <link rel="stylesheet" href="mk-design.css">
 
-<script src="mk-cache-bust.js?v=1.7.83"></script>
+<script src="mk-cache-bust.js?v=1.7.84"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<link rel="stylesheet" href="mk-app.css?v=1.7.83">
+<link rel="stylesheet" href="mk-app.css?v=1.7.84">
 <!-- Firebase SDK — Realtime sync canonico para todos os dispositivos -->
-<script type="module" src="mk-firebase.js?v=1.7.83"></script>
+<script type="module" src="mk-firebase.js?v=1.7.84"></script>
 </head>
 
 <body>
@@ -1361,7 +1361,7 @@
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.83';
+const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.84';
 const PORTAL_RESPONSAVEL_URL = 'https://ribocg-a11y.github.io/movikids/acompanhar.html';
 
 let PRECOS = {
@@ -1385,8 +1385,6 @@ let timerInterv = null;
 /* drawer/encerrar: mk-drawer.js */
 /* operador/sessao: mk-auth.js · sms/timer: mk-sessao.js · nova: mk-nova.js */
 const WA_MODE_KEY = 'mk_whatsapp_mode_v1';
-let catSel      = 'Energia';
-let custosHoje  = [];
 let statsHoje   = { fat: 0, n: 0 };
 /** Operador: sem R$; supervisor e ADM veem valores para reconciliacao/gestao. */
 function mkExibirFinanceiro_() {
@@ -1647,82 +1645,6 @@ function updateStats() {
   // stat-nloc is updated by renderEncHoje
 }
 
-async function loadCustosHoje() {
-  // FIX #7: apenas busca custos (stats já vêm de carregarInicio/sincronizarServidor)
-  try {
-    const hoje  = new Date();
-    const mm    = String(hoje.getMonth()+1).padStart(2,'0');
-    const yyyy  = hoje.getFullYear();
-    const dc    = await api({ action: 'listarCustos', mes: mm, ano: yyyy, ...apiParamsComAuth_() });
-    if (dc.ok) {
-      const dataHoje = String(hoje.getDate()).padStart(2,'0') + '/' + mm + '/' + yyyy;
-      custosHoje = dc.custos.filter(c => String(c.data) === dataHoje);
-      renderCustos();
-    }
-  } catch(e) { console.error('loadCustosHoje:', e); } // BUG4-FIX
-}
-
-// ═══════════════════════════════════════════════════════════
-// CUSTOS
-// ═══════════════════════════════════════════════════════════
-function selCat(el, cat) {
-  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('sel'));
-  el.classList.add('sel');
-  catSel = cat;
-}
-
-async function salvarCusto() {
-  const desc = document.getElementById('custo-desc').value.trim();
-  const val  = parseFloat(document.getElementById('custo-val').value);
-
-  if (!desc)        { toast('Digite uma descrição', 'error'); return; }
-  if (!val || val <= 0) { toast('Valor inválido', 'error'); return; }
-
-  const btn = document.getElementById('btn-custo');
-  btn.textContent = '⏳ Salvando...'; btn.disabled = true;
-
-  try {
-    const d = await api({
-      action:    'salvarCusto',
-      descricao: desc,
-      categoria: catSel,
-      valor:     val
-    });
-
-    if (!d.ok) { toast('Erro: ' + d.erro, 'error'); return; }
-
-    document.getElementById('custo-desc').value = '';
-    document.getElementById('custo-val').value  = '';
-    toast('✅ Custo registrado!', 'success');
-    await loadCustosHoje();
-  } catch {
-    toast('Erro de conexão.', 'error');
-  } finally {
-    btn.textContent = '💾 Salvar Custo'; btn.disabled = false;
-  }
-}
-
-function renderCustos() {
-  const container = document.getElementById('custo-list');
-  if (!custosHoje || custosHoje.length === 0) {
-    container.innerHTML = `<div class="empty"><div class="empty-icon">💰</div><h3>Sem custos hoje</h3></div>`;
-    return;
-  }
-  container.innerHTML = custosHoje.slice().reverse().map(c => {
-    const v = Number(c.valor).toFixed(2).replace('.',',');
-    return `<div class="hist-item">
-      <div class="hi-left">
-        <div class="hi-tipo">${c.categoria}</div>
-        <div class="hi-names">${escHtml(c.descricao)}</div>
-        <div class="hi-det">📅 ${c.data} · ${c.hora}</div>
-      </div>
-      <div class="hi-right">
-        <div class="hi-valor" style="color:var(--red)">R$ ${v}</div>
-      </div>
-    </div>`;
-  }).join('');
-}
-
 // ═══════════════════════════════════════════════════════════
 // NAVIGATION
 // ═══════════════════════════════════════════════════════════
@@ -1847,18 +1769,19 @@ async function salvarLancamentoAvulso() {
 }
 
 </script>
-<script src="mk-nav.js?v=1.7.83"></script>
-<script src="mk-admin.js?v=1.7.83"></script>
-<script src="mk-historico.js?v=1.7.83"></script>
-<script src="mk-sessao.js?v=1.7.83"></script>
-<script src="mk-home.js?v=1.7.83"></script>
-<script src="mk-sync.js?v=1.7.83"></script>
-<script src="mk-nova.js?v=1.7.83"></script>
-<script src="mk-relacionamento.js?v=1.7.83"></script>
-<script src="mk-operacao.js?v=1.7.83"></script>
-<script src="mk-drawer.js?v=1.7.83"></script>
-<script src="mk-update.js?v=1.7.83"></script>
-<script src="mk-auth.js?v=1.7.83"></script>
+<script src="mk-nav.js?v=1.7.84"></script>
+<script src="mk-admin.js?v=1.7.84"></script>
+<script src="mk-historico.js?v=1.7.84"></script>
+<script src="mk-sessao.js?v=1.7.84"></script>
+<script src="mk-home.js?v=1.7.84"></script>
+<script src="mk-custos.js?v=1.7.84"></script>
+<script src="mk-sync.js?v=1.7.84"></script>
+<script src="mk-nova.js?v=1.7.84"></script>
+<script src="mk-relacionamento.js?v=1.7.84"></script>
+<script src="mk-operacao.js?v=1.7.84"></script>
+<script src="mk-drawer.js?v=1.7.84"></script>
+<script src="mk-update.js?v=1.7.84"></script>
+<script src="mk-auth.js?v=1.7.84"></script>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
   if (typeof mkAuthBoot === 'function') {

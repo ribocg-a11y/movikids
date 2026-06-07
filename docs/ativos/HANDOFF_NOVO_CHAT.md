@@ -33,7 +33,7 @@ Continuo o MOVI KIDS. Repo: C:\Users\riboc\Documents\Codex\2026-05-30\files-ment
 
 - Ler: este arquivo → `PLANO_PRIORIDADES` → `ESTADO_ATUAL` → `REGRAS` → `ACESSOS_E_AUTORIZACOES` (§7 = agente vs você)
 - Ignorar handoff antigo em `docs/arquivo/planos/`
-- Informar: FE **v1.7.83**, GAS **v1.5.66** — **I20 cronômetro RESOLVIDO**; **M.13 `mk-relacionamento.js` ✅**; próximo **M.14 `mk-custos.js`**
+- Informar: FE **v1.7.84**, GAS **v1.5.66** — **I20 cronômetro RESOLVIDO**; **M.14 `mk-custos.js` ✅**; próximo **M.15 `mk-avulso.js`**
 - Deixar claro: **agente** código, testes e **planilha (OAuth)**; **você** Nova versão GAS Web e tablet
 
 ---
@@ -55,10 +55,10 @@ Continuo o MOVI KIDS. Repo: C:\Users\riboc\Documents\Codex\2026-05-30\files-ment
 
 | Camada | Versão | Verificação |
 |--------|--------|-------------|
-| **Frontend** | **v1.7.83** | `mk-version.js` → `window.MK_VERSION` |
-| **Service Worker** | **1.7.83** | `sw.js` → `SW_VERSION` |
+| **Frontend** | **v1.7.84** | `mk-version.js` → `window.MK_VERSION` |
+| **Service Worker** | **1.7.84** | `sw.js` → `SW_VERSION` |
 | **Apps Script** | **v1.5.66** | [ping](https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec?action=ping) → `versao` |
-| **App tablet** | v1.7.83 | https://ribocg-a11y.github.io/movikids/?force=1.7.83 |
+| **App tablet** | v1.7.84 | https://ribocg-a11y.github.io/movikids/?force=1.7.84 |
 
 **Deploy ID GAS (único — nunca criar outro):** `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y`
 
@@ -95,7 +95,7 @@ Continuo o MOVI KIDS. Repo: C:\Users\riboc\Documents\Codex\2026-05-30\files-ment
 
 **I20 cronômetro:** **FECHADO** — GAS v1.5.66 + FE v1.7.78+; operador confirmou em tablet. Memorial: `INCIDENTE_I20_CRONOMETRO_RESOLUCAO_2026-06-07.md`.
 
-**Pacote M:** M.13 `mk-relacionamento.js` ✅ (v1.7.83; `index.html` ~1.890). **Próximo técnico:** M.14 `mk-custos.js` — ver `PACOTE_M_MODULARIZACAO.md`.
+**Pacote M:** M.14 `mk-custos.js` ✅ (v1.7.84; `index.html` ~1.810). **Próximo técnico:** M.15 `mk-avulso.js` — ver `PACOTE_M_MODULARIZACAO.md`.
 
 **Paralelo:** validar M.10–M.13 no tablet (`?force=1.7.83`) + **FASE 1 Homologação** (`HOMOLOGACAO_PRODUCAO_ASSISTIDA.md` I.5).
 
