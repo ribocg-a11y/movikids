@@ -15,7 +15,7 @@
 | **I16** | Cronômetro portal ≠ balcão | 05/06 | P1 | **Corrigido** FE + GAS repo | GAS **v1.5.55+** Nova versão Web se ping &lt; 55 |
 | **I17** | Liberar sessão operador — UI não atualiza | 05/06 | P1 | **Corrigido** v1.7.45 | FE v1.7.45+ no tablet |
 | **I18** | Logout 1h com locação ativa no tablet | 06/06 | P1 | **Corrigido** v1.7.46 | FE v1.7.46+ no tablet |
-| **I20** | Timer inicia sozinho / adiantado — hora do cadastro em col C | 05/06 | **P0** | **Corrigido** GAS v1.5.64 + FE v1.7.74 | GAS **v1.5.64** Nova versão Web; FE `?force=1.7.74` |
+| **I20** | Timer adiantado / ▶ lento — col C + latência `serverTs` | 05–07/06 | **P0** | **RESOLVIDO** GAS v1.5.66 + FE v1.7.78 | Ver **`INCIDENTE_I20_CRONOMETRO_RESOLUCAO_2026-06-07.md`** |
 
 Incidentes já documentados (mesma janela): **I15** POST browser (`INCIDENTE_POST_BROWSER_LANCAMENTO_2026-06-05.md`).
 
@@ -159,6 +159,14 @@ Compara, para cada locação ativa com telefone, campos `startTimestamp`, `mins`
 - **I20** = semântica das colunas C/Y — **quando** o relógio começa a contar.
 - Ambos precisam estar corretos; corrigir só I16 **não** resolve timer adiantado se C ainda for preenchida no cadastro.
 
+### I20 — Fase 2 (latência API) — ver documento mestre
+
+A fase 1 (col C/Y, v1.5.64) **não** eliminou o sintoma “ao ▶ começa em 09:33”. Causa: `iniciarTimer_` gravava `serverTs` no **fim** da requisição; FE só atualizava o card **após** a resposta.
+
+**Resolução definitiva (07/06):** GAS **v1.5.66** + FE **v1.7.78**. Memorial completo:
+
+→ **`../../ativos/INCIDENTE_I20_CRONOMETRO_RESOLUCAO_2026-06-07.md`**
+
 ---
 
 ## I17 — ADM libera sessão do operador mas UI não muda
@@ -265,3 +273,4 @@ Compara, para cada locação ativa com telefone, campos `startTimestamp`, `mins`
 | 05/06/2026 | I17 fix v1.7.44–45 |
 | 06/06/2026 10:34 | I18 fix v1.7.46; documentação + teste paridade cronômetro |
 | 05/06/2026 | I20 identificado; fix GAS v1.5.64 + FE v1.7.73–74; regra col C/Y documentada |
+| 07/06/2026 | I20 **definitivo** GAS v1.5.66 (`clientTs`) + FE v1.7.78 (otimista); tablet validado; doc `INCIDENTE_I20_CRONOMETRO_RESOLUCAO_2026-06-07.md` |

@@ -120,6 +120,39 @@ flowchart TB
 | **Firebase** | `sessoes` → atualiza cards/timer sem esperar poll |
 | **BroadcastChannel** | Abas do mesmo tablet sincronizadas |
 
+### Cronômetro — fluxo I20 (v1.5.66 + v1.7.78) — **zona P0**
+
+Doc mestre: `INCIDENTE_I20_CRONOMETRO_RESOLUCAO_2026-06-07.md`
+
+```mermaid
+sequenceDiagram
+  participant Op as Operador
+  participant OP as mk-operacao iniciarContagem
+  participant SE as mk-sessao calcRemaining
+  participant SY as mk-sync mergeSessaoCanonica
+  participant GAS as iniciarTimer_
+  participant Y as Planilha col Y
+
+  Op->>OP: ▶ click (T)
+  OP->>OP: clickTs=T, _localTimerStart=T, render imediato
+  OP->>GAS: iniciarTimer timestamp=T
+  GAS->>Y: col Y = T (clientTs)
+  GAS-->>OP: startTimestamp=T
+  SY->>SY: preserva _localTimerStart se server atrasado
+  SE->>SE: effectiveStartTs_ → RESTANTE correto
+```
+
+| Etapa | Arquivo | Função | Regra |
+|-------|---------|--------|-------|
+| Cadastro | GAS `salvarLocacao_` | — | Col C `''`, Y `0`, Pendente |
+| Clique ▶ | `mk-operacao.js` | `iniciarContagem` | Otimista em T; API em background |
+| Gravação | GAS `iniciarTimer_` | — | Y = `clientTs` se drift ≤ 2 min |
+| Merge | `mk-sync.js` | `mergeSessaoCanonica` | Não stomp `_localTimerStart` |
+| Display | `mk-sessao.js` | `effectiveStartTs_`, `calcRemaining` | Countdown desde T |
+| Portal | `acompanhar.html` | `canonLoc_`, `restante()` | Lê mesma col Y (I16) |
+
+**Nunca alterar** este fluxo sem: `TESTE_I20_COMPLETO_PROD.ps1` + teste tablet ▶→10:00.
+
 ---
 
 ## 4. Partições no GAS (`.gs`)

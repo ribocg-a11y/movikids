@@ -188,14 +188,17 @@ Erros cometidos neste projeto que nao devem se repetir:
 - Doc: `docs/arquivo/incidentes/INCIDENTE_AUTH_SESSAO_FANTASMA_PWA_2026-06-06.md`; mapa I19.
 - PWA: `verificarNovaVersao` acelerado; tablet com `?force=VERSAO_ATUAL` ou reinstalar icone apos mudanca grande.
 
-## Regra 13 - Coluna C (Hora Inicio) e col Y (startTimestamp) — I20
+## Regra 13 - Coluna C/Y + instante do clique + inicio otimista — I20
 
 - **Cadastro (`salvarLocacao_`):** col **C vazia**, col **Y = 0**, status **Pendente**. Nunca `fmtHoraLocal_` na col C no cadastro.
-- **Inicio (`iniciarTimer_`):** col **Y = serverTs** (ms servidor); col **C = HH:mm** do mesmo instante; status **Ativa**.
+- **Inicio (`iniciarTimer_`):** col **Y = `clientTs`** (instante do clique no tablet) quando `drift ≤ 2 min`; senão `serverTs`. Col **C = HH:mm** do mesmo instante canonico; status **Ativa**.
 - **`timestampCanonico_`:** so col Y valida (>= 1e12). **Sem fallback** por data + hora do cadastro.
-- **FE:** timer so com `sessaoTimerIniciado_` / col Y valida; `started=true` apos GAS confirmar.
-- GAS minimo **v1.5.64**; FE **v1.7.74+**. Teste tablet: Pendente 10:00 parado ate ▶.
-- Doc: `INCIDENTE_CRONOMETRO_PORTAL_AUTH_2026-06-05_06.md` § I20; mapa **I20**.
+- **FE (`iniciarContagem`):** inicio **otimista** no clique (`clickTs`, `_localTimerStart`); card ativo e RESTANTE 10:00 **antes** da resposta API; revert se GAS falhar.
+- **FE (`mergeSessaoCanonica`):** nao reverter Ativa→Pendente durante `_iniciandoTimer`; preservar `_localTimerStart` se servidor trouxer ts mais tardio (≤2 min).
+- **FE (`calcRemaining`):** usar `effectiveStartTs_` — nao perder segundos na latencia nem no sync.
+- GAS minimo **v1.5.66**; FE **v1.7.78+**. Teste tablet: ▶ responde na hora; ativo com 10:00 ±1 s.
+- Testes: `TESTE_I20_COMPLETO_PROD.ps1` + checklist tablet em `INCIDENTE_I20_CRONOMETRO_RESOLUCAO_2026-06-07.md`.
+- Doc mestre: **`INCIDENTE_I20_CRONOMETRO_RESOLUCAO_2026-06-07.md`**; mapa **I20**.
 
 Toda regressao deve gerar:
 

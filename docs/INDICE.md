@@ -33,6 +33,7 @@
 | [INVESTIMENTO_PAYBACK_TABELA.md](ativos/INVESTIMENTO_PAYBACK_TABELA.md) | Template planilha |
 | [DECISAO_COMUNICACAO_QR_CODE_2026-06.md](ativos/DECISAO_COMUNICACAO_QR_CODE_2026-06.md) | QR portal; F4 pausado |
 | [MAPA_ERROS_FALHAS_BUGS.md](ativos/MAPA_ERROS_FALHAS_BUGS.md) | Índice incidentes I1–I20 |
+| [**INCIDENTE_I20_CRONOMETRO_RESOLUCAO_2026-06-07.md**](ativos/INCIDENTE_I20_CRONOMETRO_RESOLUCAO_2026-06-07.md) | **I20 resolvido** — cronologia, causa raiz, travas |
 
 ## Referência técnica
 

@@ -27,8 +27,8 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 | Camada | Versão alvo | URL / ID |
 |--------|-------------|----------|
-| **Frontend** | **v1.7.72** | https://ribocg-a11y.github.io/movikids/?force=1.7.72 |
-| **Apps Script** | **v1.5.63** (payback projetado + parse INVESTIMENTO) | Deploy `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y` |
+| **Frontend** | **v1.7.78** | https://ribocg-a11y.github.io/movikids/?force=1.7.78 |
+| **Apps Script** | **v1.5.66** (I20 `clientTs` + idempotência iniciarTimer) | Deploy `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y` |
 | SMS Gateway Cloud | **DJVJRL** / device `wihWegHr4wXaVJQ1R-GZR` | Aparelho remoto ONLINE |
 | Pacote SMS P0 | **FECHADO** | `PACOTE_SMS_P0_UNIFICADO_v1.5.38_v1.7.11.md` |
 | Planilha | MOVIKIDS_Planilha_Base | https://docs.google.com/spreadsheets/d/1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618/edit — auditoria `AUDITORIA_PLANILHA_BASE_2026-06-06.md` |
@@ -39,7 +39,7 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 **Teste rápido GAS (ping):**  
 https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec?action=ping  
-→ deve retornar `versao: v1.5.63` (ou header do `.gs`) e `postWriteActions` (POST só no GAS; FE usa GET — I15)
+→ deve retornar `versao: v1.5.66` (ou header do `.gs`) e `postWriteActions` (POST só no GAS; FE usa GET — I15)
 
 **URL morta (não usar):** `AKfycbzc...` → 404
 
@@ -66,7 +66,9 @@ https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPe
 | Limpeza testes | `scripts/testes/LIMPAR_TESTES_MOVIKIDS.ps1`, `scripts/testes/LIMPAR_SESSOES_TESTE_AGORA.ps1` |
 | Paridade HTTP tablet | `scripts/testes/TESTE_PARIDADE_HTTP_BROWSER_GAS.ps1` |
 | Paridade cronômetro portal | `scripts/testes/TESTE_PARIDADE_CRONOMETRO_PORTAL_BALCAO.ps1` |
-| Pre-push (Pacote J) | `scripts/pre-push-check.ps1` — versões, guards I15–I18 |
+| Pre-push (Pacote J) | `scripts/pre-push-check.ps1` — versões, guards I15–I20 |
+| I20 cronômetro | `INCIDENTE_I20_CRONOMETRO_RESOLUCAO_2026-06-07.md` — causa raiz + travas |
+| Teste I20 | `scripts/testes/TESTE_I20_COMPLETO_PROD.ps1` |
 | Mapa bugs | `MAPA_ERROS_FALHAS_BUGS.md` |
 | Emergência | `scripts/corrigir-locacao-206.html`, `scripts/corrigir-locacoes-extras-lote.html` |
 
@@ -76,6 +78,10 @@ https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPe
 
 | Versão | Entrega |
 |--------|---------|
+| **v1.7.78** | **I20 definitivo** — início otimista no ▶, `_localTimerStart`, `effectiveStartTs_`, botão imediato; validado tablet |
+| **v1.5.66** | **I20 GAS** — `iniciarTimer_` grava `clientTs` (clique) na col Y quando drift ≤ 2 min |
+| **v1.7.76** | I20 fase 1 — SMS separado do ▶; `iniciarContagemDireto_`; card pendente compacto |
+| **v1.5.64–65** | I20 col C/Y — cadastro Pendente; idempotência `iniciarTimer` |
 | **v1.7.72** | Pacote M.8 — alertas/operação/iniciar/estender extraídos para `mk-operacao.js` |
 | **v1.7.71** | Pacote M.7 — drawer + encerrar extraídos para `mk-drawer.js` |
 | **v1.7.70** | Pacote M.6 — Nova locação extraída para `mk-nova.js` |

@@ -159,8 +159,8 @@ try {
 
   # --- FE producao ---
   $feVer = & curl.exe -L -s "https://ribocg-a11y.github.io/movikids/mk-version.js"
-  if ($feVer -match "MK_VERSION = '1\.7\.77'") { Add-C "fe.pages" "ok" "v1.7.77" }
-  elseif ($feVer -match "MK_VERSION = '([^']+)'") { Add-C "fe.pages" "warn" "v$($Matches[1]) - tablet precisa ?force=1.7.77" }
+  if ($feVer -match "MK_VERSION = '1\.7\.78'") { Add-C "fe.pages" "ok" "v1.7.78" }
+  elseif ($feVer -match "MK_VERSION = '([^']+)'") { Add-C "fe.pages" "warn" "v$($Matches[1]) - tablet precisa ?force=1.7.78" }
   else { Add-C "fe.pages" "fail" "mk-version.js ilegivel" }
 
   $feOp = & curl.exe -L -s "https://ribocg-a11y.github.io/movikids/mk-operacao.js"

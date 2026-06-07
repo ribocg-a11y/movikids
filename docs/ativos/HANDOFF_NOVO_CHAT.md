@@ -33,7 +33,7 @@ Continuo o MOVI KIDS. Repo: C:\Users\riboc\Documents\Codex\2026-05-30\files-ment
 
 - Ler: este arquivo → `PLANO_PRIORIDADES` → `ESTADO_ATUAL` → `REGRAS` → `ACESSOS_E_AUTORIZACOES` (§7 = agente vs você)
 - Ignorar handoff antigo em `docs/arquivo/planos/`
-- Informar: FE **v1.7.74**, GAS **v1.5.64** (deploy Web pendente — cronômetro só após ▶), próximo passo do checklist
+- Informar: FE **v1.7.78**, GAS **v1.5.66** — **I20 cronômetro RESOLVIDO** (tablet validado 07/06); doc `INCIDENTE_I20_CRONOMETRO_RESOLUCAO_2026-06-07.md`
 - Deixar claro: **agente** código, testes e **planilha (OAuth)**; **você** Nova versão GAS Web e tablet
 
 ---
@@ -54,10 +54,10 @@ Continuo o MOVI KIDS. Repo: C:\Users\riboc\Documents\Codex\2026-05-30\files-ment
 
 | Camada | Versão | Verificação |
 |--------|--------|-------------|
-| **Frontend** | **v1.7.74** | `mk-version.js` → `window.MK_VERSION` |
-| **Service Worker** | **1.7.74** | `sw.js` → `SW_VERSION` |
-| **Apps Script** | **v1.5.63** | [ping](https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec?action=ping) → `versao` |
-| **App tablet** | v1.7.74 | https://ribocg-a11y.github.io/movikids/?force=1.7.74 |
+| **Frontend** | **v1.7.78** | `mk-version.js` → `window.MK_VERSION` |
+| **Service Worker** | **1.7.78** | `sw.js` → `SW_VERSION` |
+| **Apps Script** | **v1.5.66** | [ping](https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec?action=ping) → `versao` |
+| **App tablet** | v1.7.78 | https://ribocg-a11y.github.io/movikids/?force=1.7.78 |
 
 **Deploy ID GAS (único — nunca criar outro):** `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y`
 
@@ -82,7 +82,7 @@ Continuo o MOVI KIDS. Repo: C:\Users\riboc\Documents\Codex\2026-05-30\files-ment
 | Tarefa | Ler |
 |--------|-----|
 | Deploy GAS | `DEPLOY_GAS_v1.5.32_AUTH.md` + deploy feature (ex. `DEPLOY_v1.5.63_PAYBACK.md`) |
-| Bug / incidente | `MAPA_ERROS_FALHAS_BUGS.md` → `docs/arquivo/incidentes/` |
+| Bug / incidente | `MAPA_ERROS_FALHAS_BUGS.md` → `INCIDENTE_I20_CRONOMETRO_RESOLUCAO_2026-06-07.md` (I20) → `docs/arquivo/incidentes/` |
 | QA tablet | `HOMOLOGACAO_PRODUCAO_ASSISTIDA.md`, `CHECKLIST_PACOTE_K.md` |
 | Payback | `MEMORIAL_PAYBACK_INVESTIMENTO.md` |
 | Roadmap 90 dias | `PLANO_CONTINUIDADE_2026-06.md` |
@@ -91,9 +91,11 @@ Continuo o MOVI KIDS. Repo: C:\Users\riboc\Documents\Codex\2026-05-30\files-ment
 
 ## Próximo passo (07/06/2026)
 
-**FASE 0 fechada** (tablet v1.7.64 validado 07/06).
+**I20 cronômetro:** **FECHADO** — GAS v1.5.66 + FE v1.7.78; operador confirmou em tablet. Memorial: `INCIDENTE_I20_CRONOMETRO_RESOLUCAO_2026-06-07.md`.
 
 **Próximo:** **FASE 1 Homologação** — `HOMOLOGACAO_PRODUCAO_ASSISTIDA.md` checklist I.5 + validar payback no Dashboard + K.3–K.4 tablet se aplicável.
+
+**Nunca regredir I20:** antes de push que toque `iniciarTimer_`, `iniciarContagem`, `mergeSessaoCanonica` ou `calcRemaining` → rodar `TESTE_I20_COMPLETO_PROD.ps1` + teste tablet ▶→10:00.
 
 Detalhe vivo: seção **Execução — status ao vivo** em `PLANO_PRIORIDADES_2026-06.md`.
 

@@ -4,7 +4,7 @@
 
 Toda vez que o assistente alterar o `.gs`, deve informar este caminho (versão atual no header do arquivo):
 
-**v1.5.64 no seu PC (regra de ouro — copiar deste arquivo):**
+**v1.5.66 no seu PC (regra de ouro — copiar deste arquivo):**
 
 `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github\MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs`
 
@@ -55,27 +55,31 @@ Se o ping &lt; **v1.5.55**, o celular (`acompanhar.html`) pode mostrar tempo **d
 Após Nova versão Web, rodar: `.\scripts\testes\TESTE_PARIDADE_CRONOMETRO_PORTAL_BALCAO.ps1`  
 Doc: `../arquivo/incidentes/INCIDENTE_CRONOMETRO_PORTAL_AUTH_2026-06-05_06.md`, mapa `MAPA_ERROS_FALHAS_BUGS.md`.
 
-### Colunas C e Y — regra do cronômetro (I20) — GAS mínimo v1.5.64
+### Colunas C e Y + clientTs — cronômetro (I20) — GAS mínimo v1.5.66
 
-> **Não inferir início pela hora do cadastro.**
+> **Não inferir início pela hora do cadastro.** > **Não gravar só `serverTs` no fim da API** — usar **`clientTs`** (clique) quando drift ≤ 2 min.
 
 | Coluna | Planilha LOCACOES | Quando gravar | Conteúdo |
 |--------|-------------------|---------------|----------|
-| **C** | Hora Início | **Somente** em `iniciarTimer_` (botão ▶) | `HH:mm` legível para relatório |
-| **Y (25)** | `startTimestamp` | **Somente** em `iniciarTimer_` | ms do servidor GAS — **fonte do countdown** |
+| **C** | Hora Início | **Somente** em `iniciarTimer_` (botão ▶) | `HH:mm` do **clique** |
+| **Y (25)** | `startTimestamp` | **Somente** em `iniciarTimer_` | **`clientTs`** (ms do clique) se drift ≤ 2 min; senão `serverTs` |
 | — | — | Em `salvarLocacao_` (cadastro) | Col C = **vazia**; col Y = `0`; status = `Pendente` |
 
-Se o ping &lt; **v1.5.64**, o tablet pode mostrar timer **sozinho e adiantado** (ex. 9:30 em plano 10 min) porque a col C ainda era preenchida no cadastro.
+| Ping | Problema se menor |
+|------|-------------------|
+| &lt; **v1.5.64** | Timer sozinho/adiantado (col C no cadastro) |
+| &lt; **v1.5.66** | Ao ▶ perde Δt da API (~3–27 s) — `serverTs` no fim da requisição |
 
-**`timestampCanonico_`** não usa fallback `data + horaInicio` — só col Y ≥ 1e12.
+**FE mínimo:** **v1.7.78** — início otimista + `_localTimerStart` + `effectiveStartTs_`.
 
 **Teste tablet obrigatório após deploy:**
 
-1. Nova locação → card **Pendente**, **10:00**, timer parado.
-2. Esperar 1–2 min sem ▶ → continua 10:00.
-3. Apertar ▶ → começa em 10:00.
+1. Nova locação → **Pendente**, **10:00**, parado.
+2. Esperar 30 s sem ▶ → continua 10:00.
+3. ▶ → botão responde na hora; ativo com **10:00** ±1 s (não 09:33).
+4. Portal ±2 s (I16).
 
-Mapa: `MAPA_ERROS_FALHAS_BUGS.md` **I20** · Incidente: `../arquivo/incidentes/INCIDENTE_CRONOMETRO_PORTAL_AUTH_2026-06-05_06.md` § I20.
+Mapa: `MAPA_ERROS_FALHAS_BUGS.md` **I20** · Doc mestre: **`INCIDENTE_I20_CRONOMETRO_RESOLUCAO_2026-06-07.md`**
 
 ## Deploy seguro (PC)
 

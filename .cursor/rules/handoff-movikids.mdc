@@ -43,6 +43,8 @@ Ao trabalhar neste repositório, **ler primeiro** (nesta ordem):
 
 **NUNCA:** `clasp deploy`, POST browser (I15), commit de segredos.
 
+**I20 cronômetro (RESOLVIDO 07/06):** GAS v1.5.66 + FE v1.7.78 — doc `docs/ativos/INCIDENTE_I20_CRONOMETRO_RESOLUCAO_2026-06-07.md`. Antes de mexer em `iniciarTimer_`, `iniciarContagem`, `mergeSessaoCanonica` ou `calcRemaining`: rodar `TESTE_I20_COMPLETO_PROD.ps1` + teste tablet ▶→10:00.
+
 **Matriz completa:** `docs/ativos/ACESSOS_E_AUTORIZACOES.md` §7.
 
 ## Não usar como fonte de verdade

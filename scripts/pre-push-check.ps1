@@ -109,10 +109,12 @@ try {
     } else {
       Add-Check "guard.gas.portal.canon" "ok" "timestampCanonico_ no portal GAS"
     }
-    if ($gasRaw -notmatch 'function iniciarTimer_[\s\S]{0,2500}serverTs') {
-      Add-Check "guard.gas.iniciar.serverTs" "fail" "iniciarTimer_ sem serverTs (I16 paridade)"
+    if ($gasRaw -notmatch 'function iniciarTimer_[\s\S]{0,3500}canonTs') {
+      Add-Check "guard.gas.iniciar.clientTs" "fail" "iniciarTimer_ sem canonTs/clientTs (I20 latencia API)"
+    } elseif ($gasRaw -notmatch 'function iniciarTimer_[\s\S]{0,3500}clientTs') {
+      Add-Check "guard.gas.iniciar.clientTs" "fail" "iniciarTimer_ nao usa clientTs no clique (I20)"
     } else {
-      Add-Check "guard.gas.iniciar.serverTs" "ok" "iniciarTimer usa relogio servidor"
+      Add-Check "guard.gas.iniciar.clientTs" "ok" "iniciarTimer grava instante do clique"
     }
     $novaRaw = Join-Path $root "mk-nova.js"
     if (Test-Path $novaRaw) {
@@ -135,6 +137,28 @@ try {
         Add-Check "guard.iniciar.direto" "fail" "mk-operacao sem iniciarContagemDireto_ (I20)"
       } else {
         Add-Check "guard.iniciar.direto" "ok" "▶ inicia sem modal SMS"
+      }
+      if ($opJs -notmatch '_localTimerStart' -or $opJs -notmatch 'const clickTs = Date\.now\(\)') {
+        Add-Check "guard.fe.iniciar.otimista" "fail" "mk-operacao sem inicio otimista clickTs/_localTimerStart (I20)"
+      } else {
+        Add-Check "guard.fe.iniciar.otimista" "ok" "inicio otimista no clique"
+      }
+    }
+    $syncPath = Join-Path $root "mk-sync.js"
+    if (Test-Path $syncPath) {
+      $syncRaw = Get-Content -Path $syncPath -Raw -Encoding UTF8
+      if ($syncRaw -notmatch '_localTimerStart' -or $syncRaw -notmatch '_iniciandoTimer') {
+        Add-Check "guard.sync.localTimer" "fail" "mergeSessaoCanonica sem preservar _localTimerStart (I20)"
+      } else {
+        Add-Check "guard.sync.localTimer" "ok" "merge preserva instante do clique"
+      }
+    }
+    if (Test-Path $sessaoPath) {
+      $sessaoRaw2 = Get-Content -Path $sessaoPath -Raw -Encoding UTF8
+      if ($sessaoRaw2 -notmatch 'function effectiveStartTs_') {
+        Add-Check "guard.sessao.effectiveStart" "fail" "mk-sessao.js sem effectiveStartTs_ (I20)"
+      } else {
+        Add-Check "guard.sessao.effectiveStart" "ok" "calcRemaining usa effectiveStartTs_"
       }
     }
     if ($gasRaw -notmatch 'function salvarLocacao_[\s\S]{0,3500}fmtData_\(agora\),\s*''') {

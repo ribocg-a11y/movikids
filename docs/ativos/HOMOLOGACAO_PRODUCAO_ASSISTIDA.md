@@ -140,6 +140,20 @@ Se qualquer item acima acontecer, executar `ROLLBACK_EMERGENCIA.md`.
 | D.2 | Iniciar timer no tablet | Portal atualiza em **≤ 2 s** | [ ] |
 | D.3 | Carrossel 1 ou N crianças | Layout carrossel (v1.7.47+) | [ ] |
 
+### H — Cronômetro I20 (obrigatório após mudança em timer)
+
+**Versão mínima:** FE **v1.7.78** · GAS **v1.5.66** · Doc: `INCIDENTE_I20_CRONOMETRO_RESOLUCAO_2026-06-07.md`
+
+| # | Passo | Esperado | OK |
+|---|-------|----------|-----|
+| H.1 | Nova locação 10 min | Card **Pendente**, display **10:00**, parado | [ ] |
+| H.2 | Esperar 30 s **sem** ▶ | Continua **10:00** (não conta sozinho) | [ ] |
+| H.3 | Clicar ▶ | Botão **“⏳ Iniciando…”** na hora; card ativo imediato | [ ] |
+| H.4 | No instante do ativo | **RESTANTE 10:00** (±1 s) — **não** 09:33 / 09:50 | [ ] |
+| H.5 | Após 10 s | ~**09:50** (±2 s) | [ ] |
+| H.6 | Portal mesmo telefone | ±2 s do balcão (I16) | [ ] |
+| H.7 | PC: `TESTE_I20_COMPLETO_PROD.ps1` | `status: ok` | [ ] |
+
 ### E — Sincronização mínima (se houver locação de teste)
 
 Só se a loja autorizar locação de teste **sem cliente real**:

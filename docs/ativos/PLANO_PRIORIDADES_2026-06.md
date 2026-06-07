@@ -23,7 +23,8 @@
 | 0.1 | Tablets **v1.7.64** | ✅ 07/06 Ops |
 | 0.2 | `sw.js` = 1.7.64 | ✅ 07/06 |
 | 0.3 | `ESTADO_ATUAL.md` atualizado | ✅ 07/06 |
-| 0.4 | Ping GAS v1.5.63 | ✅ 07/06 |
+| 0.4 | Ping GAS v1.5.66 | ✅ 07/06 |
+| 0.5 | **I20 cronômetro** — tablet ▶→10:00 | ✅ 07/06 |
 | 0.5 | `PLANO_PRIORIDADES` + deploy docs | ✅ 07/06 |
 | 0.6 | `pre-push-check.ps1` verde | ✅ 07/06 |
 | 0.7 | Saneamento docs → `docs/` | ✅ 07/06 |
@@ -42,13 +43,15 @@
 
 | Camada | Repo (GitHub) | Produção (verificado) | Alinhado? |
 |--------|---------------|------------------------|-----------|
-| **Frontend** | **v1.7.72** (`mk-version.js`) | GitHub Pages após push | ✅ |
-| **Service Worker** | v1.7.72 (`sw.js`) | — | ✅ |
-| **GAS** | **v1.5.63** (header `.gs`) | Ping **v1.5.63** (07/06) | ✅ |
+| **Frontend** | **v1.7.78** (`mk-version.js`) | GitHub Pages após push | ✅ |
+| **Service Worker** | v1.7.78 (`sw.js`) | — | ✅ |
+| **GAS** | **v1.5.66** (header `.gs`) | Ping **v1.5.66** (07/06) | ✅ |
 | **Deploy ID** | `AKfycbwakQ...` | Mesmo ID | ✅ |
 
 **Teste rápido:** https://ribocg-a11y.github.io/movikids/?force=1.7.64  
-**Ping GAS:** `?action=ping` → `versao: v1.5.63`
+**Ping GAS:** `?action=ping` → `versao: v1.5.66`
+
+**I20 cronômetro:** RESOLVIDO — `INCIDENTE_I20_CRONOMETRO_RESOLUCAO_2026-06-07.md`. Não regredir sem `TESTE_I20_COMPLETO_PROD.ps1` + tablet.
 
 ### 1.2 Maturidade por área
 
