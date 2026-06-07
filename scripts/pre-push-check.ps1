@@ -208,7 +208,10 @@ try {
     } else {
       Add-Check "guard.turno.chip" "ok" "chip turno no header mobile"
     }
-    if ($indexAuthRaw -notmatch 'rel-badge' -or $indexAuthRaw -notmatch 'cadastroCanonico') {
+    $relPath = Join-Path $root "mk-relacionamento.js"
+    $relRaw = if (Test-Path $relPath) { Get-Content -Path $relPath -Raw -Encoding UTF8 } else { "" }
+    $relK3Src = $indexAuthRaw + $relRaw
+    if ($relK3Src -notmatch 'rel-badge' -or $relK3Src -notmatch 'cadastroCanonico') {
       Add-Check "guard.k3.rel-badge" "fail" "badge Cadastro ausente em Relacionamento (K.3)"
     } else {
       Add-Check "guard.k3.rel-badge" "ok" "card CRM com cadastroCanonico"
