@@ -38,8 +38,11 @@ function canonSessao_(s) {
   const nowTs = Date.now();
   if (status === 'Pendente') {
     startTimestamp = 0;
-  } else if (status === 'Ativa' && ((!startTimestamp || startTimestamp < 1e12) || startTimestamp > nowTs + 300000)) {
-    startTimestamp = calcStartTimestamp(s.data, s.horaInicio);
+  } else if (status === 'Ativa') {
+    // Cronômetro só após iniciarTimer (col Y). Nunca inferir pela hora do cadastro.
+    if (!startTimestamp || startTimestamp < 1e12 || startTimestamp > nowTs + 300000) {
+      startTimestamp = 0;
+    }
   }
   const extendedMins = Number(s.extendedMins || 0);
   const originalMins = s.originalMins != null
@@ -47,6 +50,11 @@ function canonSessao_(s) {
     : Math.max(0, Number(s.mins || 0) - extendedMins);
   const totalMins = s.originalMins != null ? originalMins + extendedMins : Number(s.mins || 0);
   return Object.assign({}, s, { status, startTimestamp, mins: totalMins, originalMins, extendedMins });
+}
+
+function sessaoTimerIniciado_(s) {
+  const c = canonSessao_(s);
+  return c.status === 'Ativa' && c.startTimestamp >= 1e12;
 }
 
 function saveSessions() {
@@ -338,5 +346,6 @@ function checkTimer(s) {
 
 window.calcStartTimestamp = calcStartTimestamp;
 window.canonSessao_ = canonSessao_;
+window.sessaoTimerIniciado_ = sessaoTimerIniciado_;
 window.saveSessions = saveSessions;
 window.startTimerLoop = startTimerLoop;

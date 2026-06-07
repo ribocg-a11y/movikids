@@ -191,8 +191,10 @@ function canonLoc_(l) {
   const nowTs = Date.now();
   if (status === 'Pendente') {
     startTimestamp = 0;
-  } else if (status === 'Ativa' && ((!startTimestamp || startTimestamp < 1e12) || startTimestamp > nowTs + 300000)) {
-    startTimestamp = calcStartTimestamp_(l.data, l.horaInicio);
+  } else if (status === 'Ativa') {
+    if (!startTimestamp || startTimestamp < 1e12 || startTimestamp > nowTs + 300000) {
+      startTimestamp = 0;
+    }
   }
   const extendedMins = Number(l.extendedMins || 0);
   const originalMins = l.originalMins != null ? Number(l.originalMins) : Math.max(0, Number(l.mins || 0) - extendedMins);

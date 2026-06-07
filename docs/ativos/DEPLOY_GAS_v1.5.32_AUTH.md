@@ -4,7 +4,7 @@
 
 Toda vez que o assistente alterar o `.gs`, deve informar este caminho (versão atual no header do arquivo):
 
-**v1.5.63 no seu PC (regra de ouro — copiar deste arquivo):**
+**v1.5.64 no seu PC (regra de ouro — copiar deste arquivo):**
 
 `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github\MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs`
 

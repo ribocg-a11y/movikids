@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.63
+// MOVI KIDS — Google Apps Script v1.5.64
+// v1.5.64: iniciarTimer grava serverTs na col Y; timestampCanonico sem fallback hora cadastro; horaInicio vazia no cadastro
 // v1.5.63: Payback — previsão com projecaoRes (ritmo dos dias com movimento, não média parcial)
 // v1.5.62: Payback — parseMesAnoPayback_ (B4 dd/MM/yyyy vs MM/yyyy) + % clamp 0–100
 // v1.5.61: Payback — calcPaybackAcumulado_ + buscarKPIsAdmin.payback
@@ -149,23 +150,8 @@ function fmtHoraLocal_(h) {
 function timestampCanonico_(dataVal, horaVal, tsVal) {
   const ts = tsVal ? Number(tsVal) : 0;
   if (ts && ts >= 1e12) return ts;
-
-  const dataStr = cellToStr_(dataVal);
-  const horaStr = cellToStr_(horaVal);
-  const dp = dataStr ? dataStr.split('/') : [];
-  const hp = horaStr ? horaStr.split(':') : [];
-  if (dp.length < 3 || hp.length < 2) return 0;
-
-  const d = new Date(
-    parseInt(dp[2], 10),
-    parseInt(dp[1], 10) - 1,
-    parseInt(dp[0], 10),
-    parseInt(hp[0], 10),
-    parseInt(hp[1], 10),
-    0
-  );
-  const out = d.getTime();
-  return isNaN(out) ? 0 : out;
+  // v1.5.64: cronometro so apos iniciarTimer (col Y). Nao usar hora do cadastro.
+  return 0;
 }
 
 function cellToStr_(val) {
@@ -365,9 +351,9 @@ function ping_() {
   const agora = new Date();
   return resp_({
     status:  'online',
-    versao:  'v1.5.63',
+    versao:  'v1.5.64',
     timestamp: fmtData_(agora) + ' ' + fmtHoraLocal_(agora),
-    sistema: 'MOVI KIDS v1.5.63',
+    sistema: 'MOVI KIDS v1.5.64',
     postWriteActions: WRITE_ACTIONS_CRITICAS_
   });
 }
@@ -507,7 +493,7 @@ function salvarLocacao_(p) {
   const row = [
     id,
     fmtData_(agora),
-    fmtHoraLocal_(agora),
+    '',
     '',
     tipo,
     plano,
@@ -551,7 +537,7 @@ function salvarLocacao_(p) {
     responsavel,
     crianca,
     telefone,
-    horaInicio:      fmtHoraLocal_(agora),
+    horaInicio:      '',
     data:            fmtData_(agora),
     startTimestamp:  0,
     status:          'Pendente'
@@ -1712,7 +1698,7 @@ function carregarInicio_(p) {
 
   const opCfg = operacaoConfig_();
   const resultado = resp_({
-    sistema:    'MOVI KIDS v1.5.63',
+    sistema:    'MOVI KIDS v1.5.64',
     timestamp:  dataHoje + ' ' + fmtHoraLocal_(hoje),
     ativos:     ativas,
     statsHoje,

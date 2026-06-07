@@ -527,40 +527,30 @@ function pularBvEIniciar() {
 
 async function iniciarContagem(rowIndex, opts) {
   opts = opts || {};
-  const ts = Date.now(); // Momento exato do clique
-
-  // 1. Atualiza estado local IMEDIATAMENTE (sem esperar servidor)
   const s = sessions.find(x => x.rowIndex === rowIndex);
   if (!s) return;
-  const prevStatus = s.status || 'Pendente';
-  s.startTimestamp = ts;    // timestamp real do clique
-  s.started        = true;
-  s.status         = 'Ativa';
-  saveSessions();           // localStorage agora tem started=true + ts correto
-  renderCards();
+  if (typeof sessaoTimerIniciado_ === 'function' ? sessaoTimerIniciado_(s) : (s.started && s.status === 'Ativa')) {
+    return;
+  }
 
-  toast('⏱ Contagem iniciada!', 'success');
-
-  // Invalida cache + broadcast para outros dispositivos verem
+  const ts = Date.now();
   try { localStorage.removeItem('mk_inicio_cache'); } catch(e) {}
-  try { if(window._bc) window._bc.postMessage('sync'); } catch(e) {}
 
-  // 2. Confirma no servidor. Se falhar, nao mantem estado local divergente.
+  // Só inicia após GAS confirmar (col Y = relógio servidor) — evita contagem adiantada/sozinha
   try {
     const d = await api({ action: 'iniciarTimer', rowIndex, timestamp: ts, ...operadorApiParams_() });
     if (!d.ok) throw new Error(d.erro || 'Servidor não confirmou o início.');
-    // I16: alinhar ao timestamp canonico do GAS (servidor) — portal e balcao leem a mesma col Y
     const serverTs = Number(d.startTimestamp || 0);
-    if (serverTs >= 1e12) s.startTimestamp = serverTs;
+    if (serverTs < 1e12) throw new Error('Servidor não gravou o início da contagem.');
+    s.startTimestamp = serverTs;
     if (d.horaInicio) s.horaInicio = d.horaInicio;
+    s.started = true;
+    s.status = 'Ativa';
     saveSessions();
     renderCards();
+    toast('⏱ Contagem iniciada!', 'success');
+    try { if(window._bc) window._bc.postMessage('sync'); } catch(e) {}
   } catch(e) {
-    s.startTimestamp = 0;
-    s.started        = false;
-    s.status         = prevStatus;
-    saveSessions();
-    renderCards();
     toast('Início não confirmado no servidor. Tente iniciar novamente.', 'error');
     syncController(true, 0);
     return;

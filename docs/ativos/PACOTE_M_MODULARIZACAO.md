@@ -17,7 +17,8 @@
 | **M.6** | `mk-nova.js` (fluxo Nova locação) | FE **v1.7.70** | ✅ 07/06 |
 | **M.7** | `mk-drawer.js` (drawer + encerrar) | FE **v1.7.71** | ✅ 07/06 |
 | **M.8** | `mk-operacao.js` (alertas, SMS/WA, editar, iniciar, estender) | FE **v1.7.72** | ✅ 07/06 |
-| M.9+ | `mk-home`, admin, … | — | ⬜ |
+| **M.9** | `mk-home.js` (renderCards, painel, encHoje) | FE **v1.7.74** | ✅ 07/06 |
+| M.10+ | admin, gestão, … | — | ⬜ |
 
 ---
 

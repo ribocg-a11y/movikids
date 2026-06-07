@@ -7,7 +7,9 @@ let   _mainPollTimer = null;
 
 function agendarProximoPoll() {
   clearTimeout(_mainPollTimer);
-  const temAtivos = Array.isArray(sessions) && sessions.some(s => s.startTimestamp > 0);
+  const temAtivos = Array.isArray(sessions) && sessions.some(s =>
+    (typeof sessaoTimerIniciado_ === 'function' ? sessaoTimerIniciado_(s) : (s.started && s.status === 'Ativa'))
+  );
   const intervalo = temAtivos ? _POLL_ACTIVE : _POLL_IDLE;
   _mainPollTimer = setTimeout(() => {
     if (document.visibilityState !== 'hidden') syncController();
@@ -156,7 +158,7 @@ function mergeSessaoCanonica(serverSession, localSession = {}) {
     originalMins: canon.originalMins,
     extendedMins: canon.extendedMins,
     extendedValor,
-    started: isAtiva && startTimestamp > 0,
+    started: typeof sessaoTimerIniciado_ === 'function' ? sessaoTimerIniciado_(canon) : (isAtiva && startTimestamp >= 1e12),
     alertFired5: Boolean(localSession.alertFired5) || Boolean(serverSession.smsFlags && serverSession.smsFlags.alerta),
     alertFiredExp: Boolean(localSession.alertFiredExp) || Boolean(serverSession.smsFlags && serverSession.smsFlags.esgotado),
     extraWaSentAt: localSession.extraWaSentAt || localStorage.getItem(extraWaKey_(serverSession)) ||
