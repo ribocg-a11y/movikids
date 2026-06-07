@@ -535,7 +535,22 @@ function fecharBvSemIniciar_() {
 
 /** I20: ▶ na Home — sem modal SMS, sem SMS automático. */
 function iniciarContagemDireto_(rowIndex) {
-  iniciarContagem(rowIndex, { skipAutoPortal: true });
+  const card = document.getElementById('card-' + rowIndex);
+  const btn = card && card.querySelector('.btn-iniciar');
+  if (btn && btn.disabled) return;
+  if (btn) {
+    btn.disabled = true;
+    btn.style.opacity = '0.7';
+    btn.innerHTML = '⏳ Iniciando...';
+  }
+  iniciarContagem(rowIndex, { skipAutoPortal: true }).finally(() => {
+    const s = sessions.find(x => x.rowIndex === rowIndex);
+    if (s && !s.started && btn) {
+      btn.disabled = false;
+      btn.style.opacity = '';
+      btn.innerHTML = '▶ INICIAR CONTAGEM';
+    }
+  });
 }
 
 /** SMS opcional em Pendente — não inicia cronômetro. */
@@ -558,24 +573,46 @@ async function iniciarContagem(rowIndex, opts) {
     return;
   }
 
-  const ts = Date.now();
+  const clickTs = Date.now();
   try { localStorage.removeItem('mk_inicio_cache'); } catch(e) {}
 
-  // Só inicia após GAS confirmar (col Y = relógio servidor) — evita contagem adiantada/sozinha
+  // I20: início otimista no clique — cronômetro não perde segundos na latência da API
+  s._localTimerStart = clickTs;
+  s._iniciandoTimer = true;
+  s.startTimestamp = clickTs;
+  const _d0 = new Date(clickTs);
+  s.horaInicio = String(_d0.getHours()).padStart(2, '0') + ':' + String(_d0.getMinutes()).padStart(2, '0');
+  s.started = true;
+  s.status = 'Ativa';
+  saveSessions();
+  renderCards();
+
   try {
-    const d = await api({ action: 'iniciarTimer', rowIndex, timestamp: ts, ...operadorApiParams_() });
+    const d = await api({ action: 'iniciarTimer', rowIndex, timestamp: clickTs, ...operadorApiParams_() });
     if (!d.ok) throw new Error(d.erro || 'Servidor não confirmou o início.');
     const serverTs = Number(d.startTimestamp || 0);
     if (serverTs < 1e12) throw new Error('Servidor não gravou o início da contagem.');
-    s.startTimestamp = serverTs;
+    if (Math.abs(serverTs - clickTs) > 120000) {
+      s.startTimestamp = serverTs;
+      s._localTimerStart = serverTs;
+    } else {
+      s.startTimestamp = clickTs;
+    }
     if (d.horaInicio) s.horaInicio = d.horaInicio;
-    s.started = true;
-    s.status = 'Ativa';
+    delete s._iniciandoTimer;
     saveSessions();
     renderCards();
     toast('⏱ Contagem iniciada!', 'success');
     try { if(window._bc) window._bc.postMessage('sync'); } catch(e) {}
   } catch(e) {
+    delete s._localTimerStart;
+    delete s._iniciandoTimer;
+    s.started = false;
+    s.status = 'Pendente';
+    s.startTimestamp = 0;
+    s.horaInicio = '';
+    saveSessions();
+    renderCards();
     toast('Início não confirmado no servidor. Tente iniciar novamente.', 'error');
     syncController(true, 0);
     return;

@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.65
+// MOVI KIDS — Google Apps Script v1.5.66
+// v1.5.66: iniciarTimer grava clientTs (instante do clique) quando drift <= 2min — absorve latencia API
 // v1.5.65: iniciarTimer idempotente se ja Ativa com col Y valida (nao reinicia relogio)
 // v1.5.64: iniciarTimer grava serverTs na col Y; timestampCanonico sem fallback hora cadastro; horaInicio vazia no cadastro
 // v1.5.63: Payback — previsão com projecaoRes (ritmo dos dias com movimento, não média parcial)
@@ -352,9 +353,9 @@ function ping_() {
   const agora = new Date();
   return resp_({
     status:  'online',
-    versao:  'v1.5.64',
+    versao:  'v1.5.66',
     timestamp: fmtData_(agora) + ' ' + fmtHoraLocal_(agora),
-    sistema: 'MOVI KIDS v1.5.64',
+    sistema: 'MOVI KIDS v1.5.66',
     postWriteActions: WRITE_ACTIONS_CRITICAS_
   });
 }
@@ -1699,7 +1700,7 @@ function carregarInicio_(p) {
 
   const opCfg = operacaoConfig_();
   const resultado = resp_({
-    sistema:    'MOVI KIDS v1.5.64',
+    sistema:    'MOVI KIDS v1.5.66',
     timestamp:  dataHoje + ' ' + fmtHoraLocal_(hoje),
     ativos:     ativas,
     statsHoje,
@@ -1792,22 +1793,24 @@ function iniciarTimer_(p) {
   }
   const rowAntesTimer = sheet.getRange(rowIndex, 1, 1, 28).getValues()[0];
   const antesTimer = locacaoObj_(rowAntesTimer, rowIndex);
-  // v1.5.64 / I16: col Y = relogio do SERVIDOR GAS — portal (celular) e balcao leem o mesmo instante
-  const agora      = new Date();
-  const serverTs   = agora.getTime();
-  const horaInicio = fmtHoraLocal_(agora);
-  const driftMs    = Math.abs(clientTs - serverTs);
+  // v1.5.66 / I20: col Y = instante do CLIQUE (clientTs) quando drift <= 2min — portal e balcao iguais
+  const agora    = new Date();
+  const serverTs = agora.getTime();
+  const driftMs  = Math.abs(clientTs - serverTs);
   if (driftMs > 15 * 60 * 1000) {
     return err_('Relogio do tablet muito divergente do servidor. Ajuste data/hora do aparelho.', 409);
   }
-  sheet.getRange(rowIndex, 25).setValue(serverTs);
+  const clientOk = clientTs >= 1e12;
+  const canonTs  = (clientOk && driftMs <= 120 * 1000) ? clientTs : serverTs;
+  const horaInicio = fmtHoraLocal_(new Date(canonTs));
+  sheet.getRange(rowIndex, 25).setValue(canonTs);
   sheet.getRange(rowIndex, 3).setValue(horaInicio);
   sheet.getRange(rowIndex, 15).setValue('Ativa');
   try { CacheService.getScriptCache().remove('carregarInicio_v2'); } catch(e) {}
   const rowDataI = sheet.getRange(rowIndex, 1, 1, 28).getValues()[0];
   registrarAuditoriaLocacao_(rowIndex, 'iniciarTimer', antesTimer, locacaoObj_(rowDataI, rowIndex), 'Inicio de contagem', operadorAudit_(p));
   firebaseSyncSessao_(rowIndex, fbDadosSessao_(rowDataI, 'Ativa', rowIndex));
-  return resp_({ startTimestamp: serverTs, horaInicio: horaInicio });
+  return resp_({ startTimestamp: canonTs, horaInicio: horaInicio });
 }
 
 // ── GERAR RELATÓRIO ───────────────────────────────────────────

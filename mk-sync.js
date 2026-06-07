@@ -146,14 +146,31 @@ function mergeSessaoCanonica(serverSession, localSession = {}) {
       : Math.max(0, Number(serverSession.mins || 0) - extendedMins)
   });
   const canon = typeof canonSessao_ === 'function' ? canonSessao_(canonIn) : canonIn;
-  const status = canon.status;
-  const startTimestamp = canon.startTimestamp;
-  const isAtiva = status === 'Ativa';
+  let status = canon.status;
+  let startTimestamp = canon.startTimestamp;
+  let isAtiva = status === 'Ativa';
+
+  if (localSession._iniciandoTimer && localSession.started && localSession.status === 'Ativa') {
+    if (!isAtiva || !startTimestamp || startTimestamp < 1e12) {
+      status = 'Ativa';
+      isAtiva = true;
+      startTimestamp = Number(localSession._localTimerStart || localSession.startTimestamp || 0);
+    }
+  }
+
+  const localStart = Number(localSession._localTimerStart || 0);
+  if (localStart >= 1e12 && isAtiva && startTimestamp >= 1e12) {
+    if (startTimestamp > localStart && startTimestamp - localStart <= 120000) {
+      startTimestamp = localStart;
+    }
+  }
 
   return {
     ...serverSession,
     status,
     startTimestamp,
+    _localTimerStart: localStart >= 1e12 ? localStart : localSession._localTimerStart,
+    _iniciandoTimer: localSession._iniciandoTimer,
     mins: canon.mins,
     originalMins: canon.originalMins,
     extendedMins: canon.extendedMins,

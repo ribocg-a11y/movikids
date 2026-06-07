@@ -307,13 +307,26 @@ function startTimerLoop() {
   }, 1000);
 }
 
+/** I20: instante efetivo do clique — evita perder segundos se sync trouxer serverTs atrasado. */
+function effectiveStartTs_(s) {
+  const c = canonSessao_(s);
+  const local = Number(s && s._localTimerStart || 0);
+  const canonTs = Number(c.startTimestamp || 0);
+  if (local >= 1e12 && canonTs >= 1e12 && local < canonTs && canonTs - local <= 120000) {
+    return local;
+  }
+  if (local >= 1e12 && (!canonTs || canonTs < 1e12)) return local;
+  return canonTs;
+}
+
 function calcRemaining(s) {
   const c = canonSessao_(s);
   if (c.status === 'Pendente') return c.mins * 60;
-  if (!c.startTimestamp || c.startTimestamp < 1e12 || c.startTimestamp > Date.now() + 300000) {
+  const startTs = effectiveStartTs_(s);
+  if (!startTs || startTs < 1e12 || startTs > Date.now() + 300000) {
     return c.mins * 60;
   }
-  const elapsed = (Date.now() - c.startTimestamp) / 1000;
+  const elapsed = (Date.now() - startTs) / 1000;
   return Math.floor(c.mins * 60 - elapsed);
 }
 
@@ -345,6 +358,7 @@ function checkTimer(s) {
 }
 
 window.calcStartTimestamp = calcStartTimestamp;
+window.effectiveStartTs_ = effectiveStartTs_;
 window.canonSessao_ = canonSessao_;
 window.sessaoTimerIniciado_ = sessaoTimerIniciado_;
 window.saveSessions = saveSessions;

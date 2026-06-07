@@ -61,12 +61,12 @@ function buildCard(s) {
         <div class="frozen-time">${fmtTime(s.mins * 60)}</div>
         <div class="frozen-label">⏸ Cadastro salvo · aguardando início</div>
       </div>
-      <div class="sc-btns">
-        <button class="btn btn-wa" onclick="enviarSmsPendente_(${s.rowIndex})" title="SMS do portal — não inicia o cronômetro">
-          Enviar SMS
-        </button>
+      <div class="pending-actions">
         <button class="btn btn-iniciar" onclick="iniciarContagemDireto_(${s.rowIndex})">
           ▶ INICIAR CONTAGEM
+        </button>
+        <button class="btn btn-sms-link" onclick="enviarSmsPendente_(${s.rowIndex})" title="SMS do portal — não inicia o cronômetro">
+          Enviar SMS
         </button>
       </div>
     </div>`;

@@ -718,6 +718,13 @@ header{
 .frozen-timer{text-align:center;padding:16px 0 20px}
 .frozen-time{font-size:44px;font-weight:900;color:var(--txt3);font-variant-numeric:tabular-nums;line-height:1}
 .frozen-label{font-size:12px;color:var(--txt3);margin-top:6px;font-weight:600}
+.pending-actions{display:flex;flex-direction:column;gap:6px;padding:4px 2px 2px}
+.pending-actions .btn-iniciar{width:100%;padding:11px 14px;font-size:14px;border-radius:var(--radius-sm);margin:0}
+.pending-actions .btn-sms-link{
+  width:100%;padding:7px;font-size:12px;font-weight:700;border-radius:var(--radius-sm);
+  background:transparent;color:#1B5E20;border:1.5px solid #25D366;cursor:pointer;
+  font-family:'Nunito',sans-serif;
+}
 .btn-iniciar{background:linear-gradient(135deg,var(--green),#1B5E20);color:#fff;
   width:100%;padding:16px;font-size:15px;border-radius:var(--radius)}
 

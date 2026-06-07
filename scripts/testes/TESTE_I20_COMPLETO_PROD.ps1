@@ -49,6 +49,7 @@ try {
   Assert-Ok $ping "ping"
   Add-C "ping" "ok" $ping.versao
   $gasIdempotent = $ping.versao -match 'v1\.5\.(6[5-9]|[7-9]\d)'
+  $gasClientTs = $ping.versao -match 'v1\.5\.(6[6-9]|[7-9]\d)'
 
   # --- B2: So salvar + espera 5s + iniciar (reproduz modal antigo) ---
   $nomeB2 = "B2_SO_SALVAR_$stamp"
@@ -104,6 +105,13 @@ try {
   }
   if ($elapsedInicio -gt 120) { throw "B2 elapsed desde iniciar muito alto: ${elapsedInicio}s" }
   Add-C "B2.iniciar.fresco" "ok" "rem=${remPos}s elapsed=${elapsedInicio}s desde iniciar (nao desde cadastro)"
+  $driftTs = [math]::Abs($tsInicio - $tAntes)
+  if ($gasClientTs) {
+    if ($driftTs -gt 5000) { throw "B2 v1.5.66+: startTimestamp deveria ~= clientTs; drift=${driftTs}ms" }
+    Add-C "B2.clientTs" "ok" "col Y ~= timestamp enviado (drift ${driftTs}ms)"
+  } else {
+    Add-C "B2.clientTs" "warn" "GAS $($ping.versao) grava serverTs — deploy v1.5.66 para fix 09:33"
+  }
 
   # --- B1: Salvar + SMS sem iniciar ---
   $tel2 = "989" + (Get-Random -Minimum 10000000 -Maximum 99999999)
@@ -151,14 +159,16 @@ try {
 
   # --- FE producao ---
   $feVer = & curl.exe -L -s "https://ribocg-a11y.github.io/movikids/mk-version.js"
-  if ($feVer -match "MK_VERSION = '1\.7\.76'") { Add-C "fe.pages" "ok" "v1.7.76" }
-  elseif ($feVer -match "MK_VERSION = '([^']+)'") { Add-C "fe.pages" "warn" "v$($Matches[1]) - tablet precisa ?force=1.7.76" }
+  if ($feVer -match "MK_VERSION = '1\.7\.77'") { Add-C "fe.pages" "ok" "v1.7.77" }
+  elseif ($feVer -match "MK_VERSION = '([^']+)'") { Add-C "fe.pages" "warn" "v$($Matches[1]) - tablet precisa ?force=1.7.77" }
   else { Add-C "fe.pages" "fail" "mk-version.js ilegivel" }
 
   $feOp = & curl.exe -L -s "https://ribocg-a11y.github.io/movikids/mk-operacao.js"
-  if ($feOp -match 'iniciarContagemDireto_' -and $feOp -notmatch 'enviarBvEIniciar') {
-    Add-C "fe.iniciar.direto" "ok" "iniciarContagemDireto_ sem enviarBvEIniciar"
-  } else { Add-C "fe.iniciar.direto" "fail" "FE producao sem fix I20" }
+  if ($feOp -match 'const clickTs = Date\.now\(\)' -and $feOp -match 'iniciarContagemDireto_') {
+    Add-C "fe.iniciar.otimista" "ok" "inicio otimista no clique (I20 latencia)"
+  } elseif ($feOp -match 'iniciarContagemDireto_' -and $feOp -notmatch 'enviarBvEIniciar') {
+    Add-C "fe.iniciar.otimista" "warn" "FE sem inicio otimista - deploy v1.7.77"
+  } else { Add-C "fe.iniciar.otimista" "fail" "FE producao sem fix I20" }
 
   $result.status = "ok"
   $result.finishedAt = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
