@@ -62,6 +62,7 @@ Fonte de verdade: `mk-version.js`, header do `.gs`, ping GAS.
 - **GAS:** `MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs` (único `.gs` na raiz)
 - **Legado:** `arquivo-historico/` — não implantar
 - **Testes:** `scripts/testes/`
+- **Protocolo teste/diagnóstico:** `docs/ativos/PROTOCOLO_DIAGNOSTICO_E_TESTES.md` → `TESTE_PROTOCOLO_DIAGNOSTICO.ps1`
 - **CI:** `scripts/pre-push-check.ps1` — rodar antes de push
 
 ## Regras P0

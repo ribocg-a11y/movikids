@@ -3,6 +3,8 @@
 **Atualizado:** 07/06/2026 — **I20 RESOLVIDO** (GAS v1.5.66 + FE v1.7.78) — ver `INCIDENTE_I20_CRONOMETRO_RESOLUCAO_2026-06-07.md`  
 **Uso:** consultar **antes de publicar** e **ao montar checklist de teste**. Cada linha tem trava e script de verificação quando existir.
 
+**Protocolo de teste (obrigatório quando usuário pedir “rodar teste”):** `PROTOCOLO_DIAGNOSTICO_E_TESTES.md` → `scripts/testes/TESTE_PROTOCOLO_DIAGNOSTICO.ps1`
+
 **Índice de incidentes longos:** `INCIDENTE_*.md` (pós-mortems).  
 **Regras anti-repetição:** `REGRAS_DE_PUBLICACAO_SEGURA.md` Regra 6–7.
 

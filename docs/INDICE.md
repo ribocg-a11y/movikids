@@ -34,6 +34,7 @@
 | [DECISAO_COMUNICACAO_QR_CODE_2026-06.md](ativos/DECISAO_COMUNICACAO_QR_CODE_2026-06.md) | QR portal; F4 pausado |
 | [MAPA_ERROS_FALHAS_BUGS.md](ativos/MAPA_ERROS_FALHAS_BUGS.md) | Índice incidentes I1–I20 |
 | [**INCIDENTE_I20_CRONOMETRO_RESOLUCAO_2026-06-07.md**](ativos/INCIDENTE_I20_CRONOMETRO_RESOLUCAO_2026-06-07.md) | **I20 resolvido** — cronologia, causa raiz, travas |
+| [**PROTOCOLO_DIAGNOSTICO_E_TESTES.md**](ativos/PROTOCOLO_DIAGNOSTICO_E_TESTES.md) | **Protocolo mestre** — fluxos F0–F14, maturidade, como rodar testes |
 
 ## Referência técnica
 

@@ -44,7 +44,8 @@ Continuo o MOVI KIDS. Repo: C:\Users\riboc\Documents\Codex\2026-05-30\files-ment
 |---|------|
 | 1 | Reconhecer pedido de continuidade — **sem** pedir caminho se workspace = `movikids-github` |
 | 2 | Ler os 5 docs ativos (ordem na seção abaixo) |
-| 3 | Opcional: ping GAS + `pre-push-check.ps1` se for mexer em código |
+| 3 | Se pedir **teste/diagnóstico**: seguir **`PROTOCOLO_DIAGNOSTICO_E_TESTES.md`** + `TESTE_PROTOCOLO_DIAGNOSTICO.ps1` |
+| 3b | Opcional: ping GAS + `pre-push-check.ps1` se for mexer em código |
 | 4 | Responder com: versões, fase ativa, **próximo passo**, **quem faz o quê** (agente vs você — `ACESSOS` §7) |
 | 5 | Ao encerrar sessão: atualizar este arquivo + checklist se algo mudou |
 
@@ -83,7 +84,8 @@ Continuo o MOVI KIDS. Repo: C:\Users\riboc\Documents\Codex\2026-05-30\files-ment
 |--------|-----|
 | Deploy GAS | `DEPLOY_GAS_v1.5.32_AUTH.md` + deploy feature (ex. `DEPLOY_v1.5.63_PAYBACK.md`) |
 | Bug / incidente | `MAPA_ERROS_FALHAS_BUGS.md` → `INCIDENTE_I20_CRONOMETRO_RESOLUCAO_2026-06-07.md` (I20) → `docs/arquivo/incidentes/` |
-| QA tablet | `HOMOLOGACAO_PRODUCAO_ASSISTIDA.md`, `CHECKLIST_PACOTE_K.md` |
+| QA tablet | **`PROTOCOLO_DIAGNOSTICO_E_TESTES.md`** → `TESTE_PROTOCOLO_DIAGNOSTICO.ps1` |
+| Homologação | `HOMOLOGACAO_PRODUCAO_ASSISTIDA.md`, `CHECKLIST_PACOTE_K.md` |
 | Payback | `MEMORIAL_PAYBACK_INVESTIMENTO.md` |
 | Roadmap 90 dias | `PLANO_CONTINUIDADE_2026-06.md` |
 

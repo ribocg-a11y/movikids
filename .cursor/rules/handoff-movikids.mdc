@@ -43,7 +43,11 @@ Ao trabalhar neste repositório, **ler primeiro** (nesta ordem):
 
 **NUNCA:** `clasp deploy`, POST browser (I15), commit de segredos.
 
-**I20 cronômetro (RESOLVIDO 07/06):** GAS v1.5.66 + FE v1.7.78 — doc `docs/ativos/INCIDENTE_I20_CRONOMETRO_RESOLUCAO_2026-06-07.md`. Antes de mexer em `iniciarTimer_`, `iniciarContagem`, `mergeSessaoCanonica` ou `calcRemaining`: rodar `TESTE_I20_COMPLETO_PROD.ps1` + teste tablet ▶→10:00.
+**I20 cronômetro (RESOLVIDO 07/06):** GAS v1.5.66 + FE v1.7.78 — doc `docs/ativos/INCIDENTE_I20_CRONOMETRO_RESOLUCAO_2026-06-07.md`.
+
+**Teste / diagnóstico (OBRIGATÓRIO quando usuário pedir):** ler e seguir `docs/ativos/PROTOCOLO_DIAGNOSTICO_E_TESTES.md` → executar `scripts/testes/TESTE_PROTOCOLO_DIAGNOSTICO.ps1` (ou `-Foco` adequado). Nunca testar só um script isolado sem F0 e sem listar fluxos impactados (§4 do protocolo). Antes de mudar código: preencher matriz de impacto do protocolo.
+
+**I20 guards:** antes de mexer em `iniciarTimer_`, `iniciarContagem`, `mergeSessaoCanonica` ou `calcRemaining` → `-Foco cronometro` + tablet ▶→10:00.
 
 **Matriz completa:** `docs/ativos/ACESSOS_E_AUTORIZACOES.md` §7.
 

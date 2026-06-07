@@ -233,8 +233,17 @@ sequenceDiagram
 
 ---
 
+## Retrospectiva — por que demorou 4 iterações?
+
+Ver **`PROTOCOLO_DIAGNOSTICO_E_TESTES.md`** §1–3: maturidade 3→4, anti-padrões, checklist de 14 dimensões esquecidas, fluxos F0–F14.
+
+**Daqui em diante:** pedido de teste → `TESTE_PROTOCOLO_DIAGNOSTICO.ps1` (não só `TESTE_I20`).
+
+---
+
 ## Histórico deste documento
 
 | Data | Ação |
 |------|------|
 | 07/06/2026 | Criado após validação do operador (“ARRUMOU”); consolida fases A+B e travas |
+| 07/06/2026 | Protocolo mestre de diagnóstico derivado desta retrospectiva |
