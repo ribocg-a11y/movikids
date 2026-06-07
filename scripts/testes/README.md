@@ -1,22 +1,59 @@
 # Testes e limpeza — MOVI KIDS
 
-Scripts movidos da raiz em 07/06/2026 (onda 2 saneamento).
+Scripts em `scripts/testes/`. Documentação: `docs/ativos/PROTOCOLO_DIAGNOSTICO_E_TESTES.md`.
 
-## Uso (a partir da raiz do repo)
+## Orquestrador
 
 ```powershell
-.\scripts\testes\TESTE_PARIDADE_HTTP_BROWSER_GAS.ps1
-.\scripts\testes\TESTE_PARIDADE_CRONOMETRO_PORTAL_BALCAO.ps1
-.\scripts\testes\TESTE_PORTAL_READONLY.ps1
-.\scripts\testes\TESTE_RELACIONAMENTO_MOVIKIDS_READONLY.ps1
-.\scripts\testes\TESTE_REGRESSAO_MOVIKIDS_PROD_SAFE.ps1
+# Completo (inclui testes que GRAVAM locações de teste + cleanup)
+.\scripts\testes\TESTE_PROTOCOLO_DIAGNOSTICO.ps1
+
+# Sem rede (só pre-push + guards)
+.\scripts\testes\TESTE_PROTOCOLO_DIAGNOSTICO.ps1 -SkipNetworkTests
 ```
 
-Pre-push (`.\scripts\pre-push-check.ps1`) chama paridade, portal e cronômetro automaticamente.
+## Somente leitura (não cria locações)
 
-## Limpeza operacional
+Use quando a loja está operando ou não quer poluir a planilha:
+
+```powershell
+.\scripts\pre-push-check.ps1
+.\scripts\testes\TESTE_PARIDADE_HTTP_BROWSER_GAS.ps1
+.\scripts\testes\TESTE_PORTAL_READONLY.ps1
+.\scripts\testes\TESTE_PARIDADE_CRONOMETRO_PORTAL_BALCAO.ps1
+.\scripts\testes\TESTE_RELACIONAMENTO_MOVIKIDS_READONLY.ps1
+.\scripts\testes\TESTE_REGRESSAO_MOVIKIDS_PROD_SAFE.ps1
+# sem -RunWriteTests
+```
+
+Validação estática (repo):
+
+```powershell
+Get-ChildItem mk-*.js | ForEach-Object { node --check $_.FullName }
+```
+
+## Gravam dados de teste (exigem cleanup)
+
+| Script | O que grava |
+|--------|-------------|
+| `TESTE_I20_COMPLETO_PROD.ps1` | Locações `TESTE I20`, `B2_*`, etc. |
+| `TESTE_4_FLUXOS_CADASTRO_I20.ps1` | Locações cadastro I20 |
+| `TESTE_DRAWER_E_PACOTE_E.ps1` | Locações `DRAWER_E_*` |
+| `TESTE_PACOTE_F_KPI_READONLY.ps1` | Salvar/editar/cancelar `TESTE_PACOTE_F` (nome enganoso) |
+
+Limpeza após testes de escrita:
 
 ```powershell
 .\scripts\testes\LIMPAR_TESTES_MOVIKIDS.ps1
 .\scripts\testes\LIMPAR_SESSOES_TESTE_AGORA.ps1
 ```
+
+## Regra PowerShell (scripts `.ps1`)
+
+**Não usar em-dash Unicode `—` em strings** que ficam perto de `-f` ou operadores — o parser quebra (`ParserError`). Usar hífen ASCII `-` em mensagens de `Add-Check` / `throw`.
+
+Corrigido em 07/06/2026: `TESTE_RELACIONAMENTO_MOVIKIDS_READONLY.ps1`.
+
+## Pre-push
+
+`.\scripts\pre-push-check.ps1` chama paridade HTTP, portal e cronômetro quando rede disponível.

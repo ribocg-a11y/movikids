@@ -1,7 +1,8 @@
 # Checklist Pacote K — CRM / RESPONSAVEIS
 
-**Data:** 06/06/2026  
-**GAS:** v1.5.57 · **FE:** v1.7.49  
+**Data:** 07/06/2026  
+**GAS:** v1.5.66 · **FE:** v1.7.86  
+**Nota:** `TESTE_RELACIONAMENTO_MOVIKIDS_READONLY.ps1` corrigido (T1 em-dash) — rodar antes de marcar K.A1.  
 **Referência:** `PLANO_CONTINUIDADE_2026-06.md` Sprint 2
 
 ---

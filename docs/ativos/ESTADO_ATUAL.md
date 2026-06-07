@@ -94,6 +94,7 @@ https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPe
 | **v1.7.80** | **Pacote M.11** — admin extraído para `mk-admin.js` |
 | **v1.7.79** | **Pacote M.10** — `showPage` + sidebar extraídos para `mk-nav.js` |
 | **Pacote M** | M.1–M.16 ✅ · **próximo M.17 enxugar inline** — `PACOTE_M_MODULARIZACAO.md` |
+| **Testes** | Fix T1: `TESTE_RELACIONAMENTO_READONLY` (em-dash); modo read-only em `PROTOCOLO` §5.3.1 |
 | **v1.5.66** | **I20 GAS** — `iniciarTimer_` grava `clientTs` (clique) na col Y quando drift ≤ 2 min |
 | **v1.7.76** | I20 fase 1 — SMS separado do ▶; `iniciarContagemDireto_`; card pendente compacto |
 | **v1.5.64–65** | I20 col C/Y — cadastro Pendente; idempotência `iniciarTimer` |

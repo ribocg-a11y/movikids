@@ -97,7 +97,9 @@ Continuo o MOVI KIDS. Repo: C:\Users\riboc\Documents\Codex\2026-05-30\files-ment
 
 **Pacote M:** M.16 `mk-core.js` ✅ (v1.7.86; `index.html` ~1.440). **Próximo técnico:** M.17 enxugar inline — ver `PACOTE_M_MODULARIZACAO.md`.
 
-**Paralelo:** validar M.10–M.13 no tablet (`?force=1.7.83`) + **FASE 1 Homologação** (`HOMOLOGACAO_PRODUCAO_ASSISTIDA.md` I.5).
+**Paralelo:** tablet `?force=1.7.86` + **FASE 1 Homologação** (`HOMOLOGACAO_PRODUCAO_ASSISTIDA.md` I.5). Checklist: `CHECKLIST_TABLET_v1.7.85.md` (URLs `?force=1.7.86`).
+
+**Diagnóstico sem gravar planilha:** `PROTOCOLO_DIAGNOSTICO_E_TESTES.md` §5.3.1 + `scripts/testes/README.md`.
 
 **Nunca regredir I20:** antes de push que toque `iniciarTimer_`, `iniciarContagem`, `mergeSessaoCanonica` ou `calcRemaining` → rodar `TESTE_I20_COMPLETO_PROD.ps1` + teste tablet ▶→10:00.
 

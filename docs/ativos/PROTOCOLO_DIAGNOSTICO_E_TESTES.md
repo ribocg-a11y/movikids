@@ -196,6 +196,25 @@ F12–F13 Admin/CRM (se escopo incluir)
 .\scripts\testes\TESTE_PROTOCOLO_DIAGNOSTICO.ps1 -Foco iniciarTimer
 ```
 
+### 5.3.1 Modo read-only (loja aberta / sem poluir planilha)
+
+O orquestrador **completo** inclui scripts que **gravam** locações de teste. Quando o usuário pedir diagnóstico **sem criar dados reais**, rodar apenas:
+
+| Fase | Script |
+|------|--------|
+| F0 | `pre-push-check.ps1` + ping GAS + FE Pages vs `mk-version.js` |
+| F14 | `TESTE_PARIDADE_HTTP_BROWSER_GAS.ps1` |
+| F11 | `TESTE_PORTAL_READONLY.ps1` |
+| F6/F11 | `TESTE_PARIDADE_CRONOMETRO_PORTAL_BALCAO.ps1` |
+| F13 | `TESTE_RELACIONAMENTO_MOVIKIDS_READONLY.ps1` |
+| F0 | `TESTE_REGRESSAO_MOVIKIDS_PROD_SAFE.ps1` (sem `-RunWriteTests`) |
+
+**Pular:** `TESTE_I20_*`, `TESTE_4_FLUXOS_*`, `TESTE_DRAWER_E_*`, `TESTE_PACOTE_F_KPI_READONLY.ps1` (este último grava apesar do nome).
+
+**Estático:** `node --check` em cada `mk-*.js`; `grep "^function"` em `index.html` → 0; funções duplicadas entre `mk-*.js`.
+
+**Scripts `.ps1`:** não usar em-dash `—` em strings perto de `-f` (ver `scripts/testes/README.md`).
+
 ### 5.4 Template de relatório (agente devolve ao usuário)
 
 ```markdown
@@ -252,7 +271,7 @@ Detalhe em `HOMOLOGACAO_PRODUCAO_ASSISTIDA.md` seções A–H. Resumo mínimo:
 | `TESTE_DRAWER_E_PACOTE_E.ps1` | F9 | I13, Pacote E |
 | `TESTE_REGRESSAO_MOVIKIDS_PROD_SAFE.ps1` | F0, leituras | geral |
 | `TESTE_RELACIONAMENTO_*` | F13 | K.3 |
-| `TESTE_PACOTE_F_KPI_*` | F12 | Pacote F |
+| `TESTE_PACOTE_F_KPI_*` | F12 | Pacote F (⚠️ grava locação teste) |
 
 ---
 
@@ -284,3 +303,4 @@ Detalhe em `HOMOLOGACAO_PRODUCAO_ASSISTIDA.md` seções A–H. Resumo mínimo:
 | Data | Ação |
 |------|------|
 | 07/06/2026 | Criado após retrospectiva chat I20 — maturidade, fluxos F0–F14, protocolo e orquestrador |
+| 07/06/2026 | §5.3.1 modo read-only; fix `TESTE_RELACIONAMENTO` (em-dash quebrava ParserError) |
