@@ -74,7 +74,8 @@ Continuo o MOVI KIDS. Repo: C:\Users\riboc\Documents\Codex\2026-05-30\files-ment
 | 3 | `ESTADO_ATUAL.md` | Versões, pacotes entregues, validação pós-deploy |
 | 4 | `REGRAS_DE_PUBLICACAO_SEGURA.md` | Travas antes de commit/push/deploy |
 | 5 | `ACESSOS_E_AUTORIZACOES.md` | Quem pode o quê — app, infra, agente vs humano |
-| 6 | `../INDICE.md` | Mapa completo se precisar de doc específico |
+| 6 | `MAPA_CODIGO_ARQUITETURA.md` | Anatomia código — o que liga com o quê, zonas sensíveis |
+| 7 | `../INDICE.md` | Mapa completo se precisar de doc específico |
 
 ### Por tarefa (consulta rápida)
 
@@ -90,13 +91,9 @@ Continuo o MOVI KIDS. Repo: C:\Users\riboc\Documents\Codex\2026-05-30\files-ment
 
 ## Próximo passo (07/06/2026)
 
-**FASE 0 quase fechada** — falta só **0.1 Ops**:
+**FASE 0 fechada** (tablet v1.7.64 validado 07/06).
 
-1. Abrir tablet: `?force=1.7.64`
-2. Confirmar rodapé **Online v1.7.64**
-3. Confirmar chip **Turno** (operador logado)
-
-Depois → **FASE 1 Homologação** (`HOMOLOGACAO_PRODUCAO_ASSISTIDA.md` checklist I.5 + payback no Dashboard).
+**Próximo:** **FASE 1 Homologação** — `HOMOLOGACAO_PRODUCAO_ASSISTIDA.md` checklist I.5 + validar payback no Dashboard + K.3–K.4 tablet se aplicável.
 
 Detalhe vivo: seção **Execução — status ao vivo** em `PLANO_PRIORIDADES_2026-06.md`.
 

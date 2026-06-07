@@ -12,6 +12,7 @@
 | [ESTADO_ATUAL.md](ativos/ESTADO_ATUAL.md) | Versões em produção, links, pacotes |
 | [PLANO_CONTINUIDADE_2026-06.md](ativos/PLANO_CONTINUIDADE_2026-06.md) | Sprints e roadmap 90 dias |
 | [ACESSOS_E_AUTORIZACOES.md](ativos/ACESSOS_E_AUTORIZACOES.md) | Papéis, PIN admin, agente vs humano, **planilha OAuth** §7.8 |
+| [MAPA_CODIGO_ARQUITETURA.md](ativos/MAPA_CODIGO_ARQUITETURA.md) | **Anatomia do código** — partes, conexões, chaves mestras |
 
 ## Operação e deploy
 

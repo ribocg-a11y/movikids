@@ -11,8 +11,8 @@
 
 | Fase | Status | Início |
 |------|--------|--------|
-| **FASE 0** Alinhar base | 🟡 em andamento | 07/06/2026 |
-| FASE 1 Homologação | ⬜ aguardando F0 | — |
+| **FASE 0** Alinhar base | ✅ fechada | 07/06/2026 |
+| FASE 1 Homologação | 🟡 próxima | 07/06/2026 |
 | FASE 2 Payback negócio | ⬜ | — |
 | FASE 3 Pacote L | ⬜ | — |
 
@@ -20,7 +20,7 @@
 
 | # | Ação | Status |
 |---|------|--------|
-| 0.1 | Tablets **v1.7.64** | ⬜ **Ops balcão** |
+| 0.1 | Tablets **v1.7.64** | ✅ 07/06 Ops |
 | 0.2 | `sw.js` = 1.7.64 | ✅ 07/06 |
 | 0.3 | `ESTADO_ATUAL.md` atualizado | ✅ 07/06 |
 | 0.4 | Ping GAS v1.5.63 | ✅ 07/06 |
@@ -30,8 +30,9 @@
 | 0.8 | Saneamento código → `arquivo-historico/` + `scripts/testes/` | ✅ 07/06 |
 | 0.9 | Handoff ativo `HANDOFF_NOVO_CHAT.md` + `AGENTS.md` + regra Cursor | ✅ 07/06 |
 | 0.10 | `ACESSOS_E_AUTORIZACOES.md` + planilha OAuth (`google-drive-sheets-auth`) | ✅ 07/06 |
+| 0.11 | `MAPA_CODIGO_ARQUITETURA.md` — anatomia e chaves mestras | ✅ 07/06 |
 
-**Próximo passo imediato (Ops):** abrir tablet com `?force=1.7.64` → confirmar rodapé **v1.7.64** + chip Turno.
+**Próximo passo imediato:** **FASE 1** — homologação (`HOMOLOGACAO_PRODUCAO_ASSISTIDA.md` checklist I.5 + payback Dashboard).
 
 ---
 
