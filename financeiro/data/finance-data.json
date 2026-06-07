@@ -1,6 +1,6 @@
 {
-  "versao": 1,
-  "atualizadoEm": "2026-06-07T18:32:35.044Z",
+  "versao": 2,
+  "atualizadoEm": "2026-06-07T18:48:09.443Z",
   "titulo": "Controle Financeiro Geral",
   "empresas": {
     "movikids": {
@@ -11,12 +11,12 @@
       "investimento": 65410,
       "dataInauguracao": "27/05/2026",
       "mesInicioPayback": "05/2026",
-      "fatAcumulado": 6971.799999999999,
-      "locEncerradas": 342,
-      "ticketMedio": 20.385380116959062,
-      "fatMesAtual": 3991.5999999999995,
+      "fatAcumulado": 7008.799999999999,
+      "locEncerradas": 344,
+      "ticketMedio": 20.37441860465116,
+      "fatMesAtual": 4028.5999999999995,
       "fatMesAnterior": 2980.2000000000007,
-      "crescimentoMesPct": 33.93731964297693,
+      "crescimentoMesPct": 35.178847057244425,
       "meses": {
         "2026-05": {
           "faturamento": 2980.2000000000007,
@@ -28,21 +28,21 @@
           "custosPorCategoria": {}
         },
         "2026-06": {
-          "faturamento": 3991.5999999999995,
+          "faturamento": 4028.5999999999995,
           "custos": 0,
           "cto": 1000,
-          "resultado": 2991.5999999999995,
-          "margem": 74.94738951798777,
-          "qtd": 200,
+          "resultado": 3028.5999999999995,
+          "margem": 75.17748101077298,
+          "qtd": 202,
           "custosPorCategoria": {}
         }
       },
       "payback": {
         "investido": 65410,
-        "recuperado": 4971.8,
-        "percentual": 7.600978443663049,
+        "recuperado": 5008.8,
+        "percentual": 7.657544717933037,
         "mesesProjetados": 25,
-        "mediaResultadoMensal": 2485.9
+        "mediaResultadoMensal": 2504.4
       },
       "ctoRegra": "max(CTO mínimo contrato, 10% faturamento) — Golden Shopping",
       "avisos": [
@@ -211,21 +211,21 @@
         }
       },
       "2026-06": {
-        "faturamento": 5984.599999999999,
+        "faturamento": 6021.599999999999,
         "custos": 0,
         "cto": 1199.3,
         "ctoMovikids": 1000,
         "ctoZapclin": 199.3,
         "custosTotal": 1199.3,
-        "resultado": 4785.299999999999,
-        "margem": 79.9602312602346,
+        "resultado": 4822.299999999999,
+        "margem": 80.08336654709711,
         "movikids": {
-          "faturamento": 3991.5999999999995,
+          "faturamento": 4028.5999999999995,
           "custos": 0,
           "cto": 1000,
-          "resultado": 2991.5999999999995,
-          "margem": 74.94738951798777,
-          "qtd": 200,
+          "resultado": 3028.5999999999995,
+          "margem": 75.17748101077298,
+          "qtd": 202,
           "custosPorCategoria": {}
         },
         "zapclin": {
@@ -239,7 +239,7 @@
         }
       }
     },
-    "resultadoAcumulado": 15586.65,
+    "resultadoAcumulado": 15623.65,
     "mesAtual": "2026-06"
   },
   "sinais": {
@@ -262,7 +262,7 @@
   "narrativa": [
     "Movi Kids: Custos operacionais ainda não lançados na aba CUSTOS.",
     "ZapClin faturou R$ 1.993,00 no último mês; Golden Shopping (10%): R$ 199,30; margem 90%.",
-    "Consolidado: resultado acumulado R$ 15.586,65 em 3 meses.",
+    "Consolidado: resultado acumulado R$ 15.623,65 em 3 meses.",
     "Dados parciais — lance custos fixos mensais para análise confiável."
   ],
   "mesesOrdem": [
@@ -274,5 +274,1131 @@
     "2026-04": "Abr/26",
     "2026-05": "Mai/26",
     "2026-06": "Jun/26"
-  }
+  },
+  "diarioPorMes": {
+    "2026-05": {
+      "dias": {
+        "2026-05-27": {
+          "dataBR": "27/05/2026",
+          "movikids": {
+            "faturamento": 331.20000000000005,
+            "qtd": 14
+          },
+          "zapclin": {
+            "faturamento": 246,
+            "qtd": 9
+          },
+          "total": 577.2,
+          "atendimentos": 23,
+          "ticketMedio": 25.095652173913045,
+          "goldenEstimado": 57.720000000000006,
+          "resultadoEstimado": 519.48
+        },
+        "2026-05-28": {
+          "dataBR": "28/05/2026",
+          "movikids": {
+            "faturamento": 223.6,
+            "qtd": 12
+          },
+          "zapclin": {
+            "faturamento": 243,
+            "qtd": 7
+          },
+          "total": 466.6,
+          "atendimentos": 19,
+          "ticketMedio": 24.557894736842105,
+          "goldenEstimado": 46.66,
+          "resultadoEstimado": 419.94000000000005
+        },
+        "2026-05-29": {
+          "dataBR": "29/05/2026",
+          "movikids": {
+            "faturamento": 676.2000000000002,
+            "qtd": 30
+          },
+          "zapclin": {
+            "faturamento": 300,
+            "qtd": 13
+          },
+          "total": 976.2000000000002,
+          "atendimentos": 43,
+          "ticketMedio": 22.702325581395353,
+          "goldenEstimado": 97.62000000000002,
+          "resultadoEstimado": 878.5800000000002
+        },
+        "2026-05-30": {
+          "dataBR": "30/05/2026",
+          "movikids": {
+            "faturamento": 1151,
+            "qtd": 56
+          },
+          "zapclin": {
+            "faturamento": 219,
+            "qtd": 9
+          },
+          "total": 1370,
+          "atendimentos": 65,
+          "ticketMedio": 21.076923076923077,
+          "goldenEstimado": 137,
+          "resultadoEstimado": 1233
+        },
+        "2026-05-31": {
+          "dataBR": "31/05/2026",
+          "movikids": {
+            "faturamento": 598.1999999999999,
+            "qtd": 30
+          },
+          "zapclin": {
+            "faturamento": 279,
+            "qtd": 10
+          },
+          "total": 877.1999999999999,
+          "atendimentos": 40,
+          "ticketMedio": 21.93,
+          "goldenEstimado": 87.72,
+          "resultadoEstimado": 789.4799999999999
+        },
+        "2026-05-02": {
+          "dataBR": "02/05/2026",
+          "movikids": {
+            "faturamento": 0,
+            "qtd": 0
+          },
+          "zapclin": {
+            "faturamento": 501,
+            "qtd": 20
+          },
+          "total": 501,
+          "atendimentos": 20,
+          "ticketMedio": 25.05,
+          "goldenEstimado": 50.1,
+          "resultadoEstimado": 450.9
+        },
+        "2026-05-03": {
+          "dataBR": "03/05/2026",
+          "movikids": {
+            "faturamento": 0,
+            "qtd": 0
+          },
+          "zapclin": {
+            "faturamento": 231,
+            "qtd": 8
+          },
+          "total": 231,
+          "atendimentos": 8,
+          "ticketMedio": 28.875,
+          "goldenEstimado": 23.1,
+          "resultadoEstimado": 207.9
+        },
+        "2026-05-04": {
+          "dataBR": "04/05/2026",
+          "movikids": {
+            "faturamento": 0,
+            "qtd": 0
+          },
+          "zapclin": {
+            "faturamento": 454,
+            "qtd": 13
+          },
+          "total": 454,
+          "atendimentos": 13,
+          "ticketMedio": 34.92307692307692,
+          "goldenEstimado": 45.400000000000006,
+          "resultadoEstimado": 408.6
+        },
+        "2026-05-05": {
+          "dataBR": "05/05/2026",
+          "movikids": {
+            "faturamento": 0,
+            "qtd": 0
+          },
+          "zapclin": {
+            "faturamento": 334,
+            "qtd": 11
+          },
+          "total": 334,
+          "atendimentos": 11,
+          "ticketMedio": 30.363636363636363,
+          "goldenEstimado": 33.4,
+          "resultadoEstimado": 300.6
+        },
+        "2026-05-06": {
+          "dataBR": "06/05/2026",
+          "movikids": {
+            "faturamento": 0,
+            "qtd": 0
+          },
+          "zapclin": {
+            "faturamento": 366,
+            "qtd": 13
+          },
+          "total": 366,
+          "atendimentos": 13,
+          "ticketMedio": 28.153846153846153,
+          "goldenEstimado": 36.6,
+          "resultadoEstimado": 329.4
+        },
+        "2026-05-07": {
+          "dataBR": "07/05/2026",
+          "movikids": {
+            "faturamento": 0,
+            "qtd": 0
+          },
+          "zapclin": {
+            "faturamento": 474,
+            "qtd": 17
+          },
+          "total": 474,
+          "atendimentos": 17,
+          "ticketMedio": 27.88235294117647,
+          "goldenEstimado": 47.400000000000006,
+          "resultadoEstimado": 426.6
+        },
+        "2026-05-08": {
+          "dataBR": "08/05/2026",
+          "movikids": {
+            "faturamento": 0,
+            "qtd": 0
+          },
+          "zapclin": {
+            "faturamento": 571,
+            "qtd": 19
+          },
+          "total": 571,
+          "atendimentos": 19,
+          "ticketMedio": 30.05263157894737,
+          "goldenEstimado": 57.1,
+          "resultadoEstimado": 513.9
+        },
+        "2026-05-09": {
+          "dataBR": "09/05/2026",
+          "movikids": {
+            "faturamento": 0,
+            "qtd": 0
+          },
+          "zapclin": {
+            "faturamento": 746,
+            "qtd": 25
+          },
+          "total": 746,
+          "atendimentos": 25,
+          "ticketMedio": 29.84,
+          "goldenEstimado": 74.60000000000001,
+          "resultadoEstimado": 671.4
+        },
+        "2026-05-10": {
+          "dataBR": "10/05/2026",
+          "movikids": {
+            "faturamento": 0,
+            "qtd": 0
+          },
+          "zapclin": {
+            "faturamento": 153,
+            "qtd": 7
+          },
+          "total": 153,
+          "atendimentos": 7,
+          "ticketMedio": 21.857142857142858,
+          "goldenEstimado": 15.3,
+          "resultadoEstimado": 137.7
+        },
+        "2026-05-11": {
+          "dataBR": "11/05/2026",
+          "movikids": {
+            "faturamento": 0,
+            "qtd": 0
+          },
+          "zapclin": {
+            "faturamento": 474,
+            "qtd": 18
+          },
+          "total": 474,
+          "atendimentos": 18,
+          "ticketMedio": 26.333333333333332,
+          "goldenEstimado": 47.400000000000006,
+          "resultadoEstimado": 426.6
+        },
+        "2026-05-12": {
+          "dataBR": "12/05/2026",
+          "movikids": {
+            "faturamento": 0,
+            "qtd": 0
+          },
+          "zapclin": {
+            "faturamento": 535,
+            "qtd": 18
+          },
+          "total": 535,
+          "atendimentos": 18,
+          "ticketMedio": 29.72222222222222,
+          "goldenEstimado": 53.5,
+          "resultadoEstimado": 481.5
+        },
+        "2026-05-13": {
+          "dataBR": "13/05/2026",
+          "movikids": {
+            "faturamento": 0,
+            "qtd": 0
+          },
+          "zapclin": {
+            "faturamento": 476,
+            "qtd": 14
+          },
+          "total": 476,
+          "atendimentos": 14,
+          "ticketMedio": 34,
+          "goldenEstimado": 47.6,
+          "resultadoEstimado": 428.4
+        },
+        "2026-05-14": {
+          "dataBR": "14/05/2026",
+          "movikids": {
+            "faturamento": 0,
+            "qtd": 0
+          },
+          "zapclin": {
+            "faturamento": 642,
+            "qtd": 25
+          },
+          "total": 642,
+          "atendimentos": 25,
+          "ticketMedio": 25.68,
+          "goldenEstimado": 64.2,
+          "resultadoEstimado": 577.8
+        },
+        "2026-05-15": {
+          "dataBR": "15/05/2026",
+          "movikids": {
+            "faturamento": 0,
+            "qtd": 0
+          },
+          "zapclin": {
+            "faturamento": 800,
+            "qtd": 28
+          },
+          "total": 800,
+          "atendimentos": 28,
+          "ticketMedio": 28.571428571428573,
+          "goldenEstimado": 80,
+          "resultadoEstimado": 720
+        },
+        "2026-05-16": {
+          "dataBR": "16/05/2026",
+          "movikids": {
+            "faturamento": 0,
+            "qtd": 0
+          },
+          "zapclin": {
+            "faturamento": 759,
+            "qtd": 26
+          },
+          "total": 759,
+          "atendimentos": 26,
+          "ticketMedio": 29.192307692307693,
+          "goldenEstimado": 75.9,
+          "resultadoEstimado": 683.1
+        },
+        "2026-05-17": {
+          "dataBR": "17/05/2026",
+          "movikids": {
+            "faturamento": 0,
+            "qtd": 0
+          },
+          "zapclin": {
+            "faturamento": 426,
+            "qtd": 16
+          },
+          "total": 426,
+          "atendimentos": 16,
+          "ticketMedio": 26.625,
+          "goldenEstimado": 42.6,
+          "resultadoEstimado": 383.4
+        },
+        "2026-05-18": {
+          "dataBR": "18/05/2026",
+          "movikids": {
+            "faturamento": 0,
+            "qtd": 0
+          },
+          "zapclin": {
+            "faturamento": 603,
+            "qtd": 21
+          },
+          "total": 603,
+          "atendimentos": 21,
+          "ticketMedio": 28.714285714285715,
+          "goldenEstimado": 60.300000000000004,
+          "resultadoEstimado": 542.7
+        },
+        "2026-05-19": {
+          "dataBR": "19/05/2026",
+          "movikids": {
+            "faturamento": 0,
+            "qtd": 0
+          },
+          "zapclin": {
+            "faturamento": 578,
+            "qtd": 18
+          },
+          "total": 578,
+          "atendimentos": 18,
+          "ticketMedio": 32.111111111111114,
+          "goldenEstimado": 57.800000000000004,
+          "resultadoEstimado": 520.2
+        },
+        "2026-05-20": {
+          "dataBR": "20/05/2026",
+          "movikids": {
+            "faturamento": 0,
+            "qtd": 0
+          },
+          "zapclin": {
+            "faturamento": 382,
+            "qtd": 12
+          },
+          "total": 382,
+          "atendimentos": 12,
+          "ticketMedio": 31.833333333333332,
+          "goldenEstimado": 38.2,
+          "resultadoEstimado": 343.8
+        },
+        "2026-05-21": {
+          "dataBR": "21/05/2026",
+          "movikids": {
+            "faturamento": 0,
+            "qtd": 0
+          },
+          "zapclin": {
+            "faturamento": 177,
+            "qtd": 8
+          },
+          "total": 177,
+          "atendimentos": 8,
+          "ticketMedio": 22.125,
+          "goldenEstimado": 17.7,
+          "resultadoEstimado": 159.3
+        },
+        "2026-05-22": {
+          "dataBR": "22/05/2026",
+          "movikids": {
+            "faturamento": 0,
+            "qtd": 0
+          },
+          "zapclin": {
+            "faturamento": 459,
+            "qtd": 14
+          },
+          "total": 459,
+          "atendimentos": 14,
+          "ticketMedio": 32.785714285714285,
+          "goldenEstimado": 45.900000000000006,
+          "resultadoEstimado": 413.1
+        },
+        "2026-05-23": {
+          "dataBR": "23/05/2026",
+          "movikids": {
+            "faturamento": 0,
+            "qtd": 0
+          },
+          "zapclin": {
+            "faturamento": 609,
+            "qtd": 25
+          },
+          "total": 609,
+          "atendimentos": 25,
+          "ticketMedio": 24.36,
+          "goldenEstimado": 60.900000000000006,
+          "resultadoEstimado": 548.1
+        },
+        "2026-05-24": {
+          "dataBR": "24/05/2026",
+          "movikids": {
+            "faturamento": 0,
+            "qtd": 0
+          },
+          "zapclin": {
+            "faturamento": 21,
+            "qtd": 1
+          },
+          "total": 21,
+          "atendimentos": 1,
+          "ticketMedio": 21,
+          "goldenEstimado": 2.1,
+          "resultadoEstimado": 18.9
+        },
+        "2026-05-25": {
+          "dataBR": "25/05/2026",
+          "movikids": {
+            "faturamento": 0,
+            "qtd": 0
+          },
+          "zapclin": {
+            "faturamento": 381,
+            "qtd": 14
+          },
+          "total": 381,
+          "atendimentos": 14,
+          "ticketMedio": 27.214285714285715,
+          "goldenEstimado": 38.1,
+          "resultadoEstimado": 342.9
+        },
+        "2026-05-26": {
+          "dataBR": "26/05/2026",
+          "movikids": {
+            "faturamento": 0,
+            "qtd": 0
+          },
+          "zapclin": {
+            "faturamento": 391,
+            "qtd": 14
+          },
+          "total": 391,
+          "atendimentos": 14,
+          "ticketMedio": 27.928571428571427,
+          "goldenEstimado": 39.1,
+          "resultadoEstimado": 351.9
+        }
+      },
+      "ordem": [
+        "2026-05-02",
+        "2026-05-03",
+        "2026-05-04",
+        "2026-05-05",
+        "2026-05-06",
+        "2026-05-07",
+        "2026-05-08",
+        "2026-05-09",
+        "2026-05-10",
+        "2026-05-11",
+        "2026-05-12",
+        "2026-05-13",
+        "2026-05-14",
+        "2026-05-15",
+        "2026-05-16",
+        "2026-05-17",
+        "2026-05-18",
+        "2026-05-19",
+        "2026-05-20",
+        "2026-05-21",
+        "2026-05-22",
+        "2026-05-23",
+        "2026-05-24",
+        "2026-05-25",
+        "2026-05-26",
+        "2026-05-27",
+        "2026-05-28",
+        "2026-05-29",
+        "2026-05-30",
+        "2026-05-31"
+      ]
+    },
+    "2026-06": {
+      "dias": {
+        "2026-06-01": {
+          "dataBR": "01/06/2026",
+          "movikids": {
+            "faturamento": 228.4,
+            "qtd": 12
+          },
+          "zapclin": {
+            "faturamento": 135,
+            "qtd": 6
+          },
+          "total": 363.4,
+          "atendimentos": 18,
+          "ticketMedio": 20.188888888888886,
+          "goldenEstimado": 36.34,
+          "resultadoEstimado": 327.05999999999995
+        },
+        "2026-06-02": {
+          "dataBR": "02/06/2026",
+          "movikids": {
+            "faturamento": 319.2,
+            "qtd": 16
+          },
+          "zapclin": {
+            "faturamento": 360,
+            "qtd": 12
+          },
+          "total": 679.2,
+          "atendimentos": 28,
+          "ticketMedio": 24.25714285714286,
+          "goldenEstimado": 67.92,
+          "resultadoEstimado": 611.2800000000001
+        },
+        "2026-06-03": {
+          "dataBR": "03/06/2026",
+          "movikids": {
+            "faturamento": 298.2,
+            "qtd": 17
+          },
+          "zapclin": {
+            "faturamento": 321,
+            "qtd": 11
+          },
+          "total": 619.2,
+          "atendimentos": 28,
+          "ticketMedio": 22.114285714285717,
+          "goldenEstimado": 61.92,
+          "resultadoEstimado": 557.2800000000001
+        },
+        "2026-06-04": {
+          "dataBR": "04/06/2026",
+          "movikids": {
+            "faturamento": 1061.7999999999997,
+            "qtd": 60
+          },
+          "zapclin": {
+            "faturamento": 353,
+            "qtd": 10
+          },
+          "total": 1414.7999999999997,
+          "atendimentos": 70,
+          "ticketMedio": 20.211428571428566,
+          "goldenEstimado": 141.48,
+          "resultadoEstimado": 1273.3199999999997
+        },
+        "2026-06-05": {
+          "dataBR": "05/06/2026",
+          "movikids": {
+            "faturamento": 746.8000000000001,
+            "qtd": 37
+          },
+          "zapclin": {
+            "faturamento": 420,
+            "qtd": 15
+          },
+          "total": 1166.8000000000002,
+          "atendimentos": 52,
+          "ticketMedio": 22.438461538461542,
+          "goldenEstimado": 116.68,
+          "resultadoEstimado": 1050.1200000000001
+        },
+        "2026-06-06": {
+          "dataBR": "06/06/2026",
+          "movikids": {
+            "faturamento": 1085.8000000000002,
+            "qtd": 48
+          },
+          "zapclin": {
+            "faturamento": 341,
+            "qtd": 9
+          },
+          "total": 1426.8000000000002,
+          "atendimentos": 57,
+          "ticketMedio": 25.031578947368423,
+          "goldenEstimado": 142.68000000000004,
+          "resultadoEstimado": 1284.1200000000001
+        },
+        "2026-06-07": {
+          "dataBR": "07/06/2026",
+          "movikids": {
+            "faturamento": 288.4,
+            "qtd": 12
+          },
+          "zapclin": {
+            "faturamento": 63,
+            "qtd": 3
+          },
+          "total": 351.4,
+          "atendimentos": 15,
+          "ticketMedio": 23.426666666666666,
+          "goldenEstimado": 35.14,
+          "resultadoEstimado": 316.26
+        }
+      },
+      "ordem": [
+        "2026-06-01",
+        "2026-06-02",
+        "2026-06-03",
+        "2026-06-04",
+        "2026-06-05",
+        "2026-06-06",
+        "2026-06-07"
+      ]
+    },
+    "2026-04": {
+      "dias": {
+        "2026-04-02": {
+          "dataBR": "02/04/2026",
+          "movikids": {
+            "faturamento": 0,
+            "qtd": 0
+          },
+          "zapclin": {
+            "faturamento": 96,
+            "qtd": 3
+          },
+          "total": 96,
+          "atendimentos": 3,
+          "ticketMedio": 32,
+          "goldenEstimado": 9.600000000000001,
+          "resultadoEstimado": 86.4
+        },
+        "2026-04-04": {
+          "dataBR": "04/04/2026",
+          "movikids": {
+            "faturamento": 0,
+            "qtd": 0
+          },
+          "zapclin": {
+            "faturamento": 182,
+            "qtd": 4
+          },
+          "total": 182,
+          "atendimentos": 4,
+          "ticketMedio": 45.5,
+          "goldenEstimado": 18.2,
+          "resultadoEstimado": 163.8
+        },
+        "2026-04-05": {
+          "dataBR": "05/04/2026",
+          "movikids": {
+            "faturamento": 0,
+            "qtd": 0
+          },
+          "zapclin": {
+            "faturamento": 120,
+            "qtd": 3
+          },
+          "total": 120,
+          "atendimentos": 3,
+          "ticketMedio": 40,
+          "goldenEstimado": 12,
+          "resultadoEstimado": 108
+        },
+        "2026-04-06": {
+          "dataBR": "06/04/2026",
+          "movikids": {
+            "faturamento": 0,
+            "qtd": 0
+          },
+          "zapclin": {
+            "faturamento": 374,
+            "qtd": 7
+          },
+          "total": 374,
+          "atendimentos": 7,
+          "ticketMedio": 53.42857142857143,
+          "goldenEstimado": 37.4,
+          "resultadoEstimado": 336.6
+        },
+        "2026-04-07": {
+          "dataBR": "07/04/2026",
+          "movikids": {
+            "faturamento": 0,
+            "qtd": 0
+          },
+          "zapclin": {
+            "faturamento": 178,
+            "qtd": 8
+          },
+          "total": 178,
+          "atendimentos": 8,
+          "ticketMedio": 22.25,
+          "goldenEstimado": 17.8,
+          "resultadoEstimado": 160.2
+        },
+        "2026-04-08": {
+          "dataBR": "08/04/2026",
+          "movikids": {
+            "faturamento": 0,
+            "qtd": 0
+          },
+          "zapclin": {
+            "faturamento": 266,
+            "qtd": 8
+          },
+          "total": 266,
+          "atendimentos": 8,
+          "ticketMedio": 33.25,
+          "goldenEstimado": 26.6,
+          "resultadoEstimado": 239.4
+        },
+        "2026-04-09": {
+          "dataBR": "09/04/2026",
+          "movikids": {
+            "faturamento": 0,
+            "qtd": 0
+          },
+          "zapclin": {
+            "faturamento": 204,
+            "qtd": 6
+          },
+          "total": 204,
+          "atendimentos": 6,
+          "ticketMedio": 34,
+          "goldenEstimado": 20.400000000000002,
+          "resultadoEstimado": 183.6
+        },
+        "2026-04-10": {
+          "dataBR": "10/04/2026",
+          "movikids": {
+            "faturamento": 0,
+            "qtd": 0
+          },
+          "zapclin": {
+            "faturamento": 185,
+            "qtd": 6
+          },
+          "total": 185,
+          "atendimentos": 6,
+          "ticketMedio": 30.833333333333332,
+          "goldenEstimado": 18.5,
+          "resultadoEstimado": 166.5
+        },
+        "2026-04-11": {
+          "dataBR": "11/04/2026",
+          "movikids": {
+            "faturamento": 0,
+            "qtd": 0
+          },
+          "zapclin": {
+            "faturamento": 278,
+            "qtd": 10
+          },
+          "total": 278,
+          "atendimentos": 10,
+          "ticketMedio": 27.8,
+          "goldenEstimado": 27.8,
+          "resultadoEstimado": 250.2
+        },
+        "2026-04-12": {
+          "dataBR": "12/04/2026",
+          "movikids": {
+            "faturamento": 0,
+            "qtd": 0
+          },
+          "zapclin": {
+            "faturamento": 99,
+            "qtd": 3
+          },
+          "total": 99,
+          "atendimentos": 3,
+          "ticketMedio": 33,
+          "goldenEstimado": 9.9,
+          "resultadoEstimado": 89.1
+        },
+        "2026-04-13": {
+          "dataBR": "13/04/2026",
+          "movikids": {
+            "faturamento": 0,
+            "qtd": 0
+          },
+          "zapclin": {
+            "faturamento": 168,
+            "qtd": 5
+          },
+          "total": 168,
+          "atendimentos": 5,
+          "ticketMedio": 33.6,
+          "goldenEstimado": 16.8,
+          "resultadoEstimado": 151.2
+        },
+        "2026-04-14": {
+          "dataBR": "14/04/2026",
+          "movikids": {
+            "faturamento": 0,
+            "qtd": 0
+          },
+          "zapclin": {
+            "faturamento": 161,
+            "qtd": 3
+          },
+          "total": 161,
+          "atendimentos": 3,
+          "ticketMedio": 53.666666666666664,
+          "goldenEstimado": 16.1,
+          "resultadoEstimado": 144.9
+        },
+        "2026-04-15": {
+          "dataBR": "15/04/2026",
+          "movikids": {
+            "faturamento": 0,
+            "qtd": 0
+          },
+          "zapclin": {
+            "faturamento": 261,
+            "qtd": 11
+          },
+          "total": 261,
+          "atendimentos": 11,
+          "ticketMedio": 23.727272727272727,
+          "goldenEstimado": 26.1,
+          "resultadoEstimado": 234.9
+        },
+        "2026-04-16": {
+          "dataBR": "16/04/2026",
+          "movikids": {
+            "faturamento": 0,
+            "qtd": 0
+          },
+          "zapclin": {
+            "faturamento": 372,
+            "qtd": 12
+          },
+          "total": 372,
+          "atendimentos": 12,
+          "ticketMedio": 31,
+          "goldenEstimado": 37.2,
+          "resultadoEstimado": 334.8
+        },
+        "2026-04-17": {
+          "dataBR": "17/04/2026",
+          "movikids": {
+            "faturamento": 0,
+            "qtd": 0
+          },
+          "zapclin": {
+            "faturamento": 333,
+            "qtd": 12
+          },
+          "total": 333,
+          "atendimentos": 12,
+          "ticketMedio": 27.75,
+          "goldenEstimado": 33.300000000000004,
+          "resultadoEstimado": 299.7
+        },
+        "2026-04-18": {
+          "dataBR": "18/04/2026",
+          "movikids": {
+            "faturamento": 0,
+            "qtd": 0
+          },
+          "zapclin": {
+            "faturamento": 195,
+            "qtd": 7
+          },
+          "total": 195,
+          "atendimentos": 7,
+          "ticketMedio": 27.857142857142858,
+          "goldenEstimado": 19.5,
+          "resultadoEstimado": 175.5
+        },
+        "2026-04-19": {
+          "dataBR": "19/04/2026",
+          "movikids": {
+            "faturamento": 0,
+            "qtd": 0
+          },
+          "zapclin": {
+            "faturamento": 326,
+            "qtd": 11
+          },
+          "total": 326,
+          "atendimentos": 11,
+          "ticketMedio": 29.636363636363637,
+          "goldenEstimado": 32.6,
+          "resultadoEstimado": 293.4
+        },
+        "2026-04-20": {
+          "dataBR": "20/04/2026",
+          "movikids": {
+            "faturamento": 0,
+            "qtd": 0
+          },
+          "zapclin": {
+            "faturamento": 932,
+            "qtd": 25
+          },
+          "total": 932,
+          "atendimentos": 25,
+          "ticketMedio": 37.28,
+          "goldenEstimado": 93.2,
+          "resultadoEstimado": 838.8
+        },
+        "2026-04-21": {
+          "dataBR": "21/04/2026",
+          "movikids": {
+            "faturamento": 0,
+            "qtd": 0
+          },
+          "zapclin": {
+            "faturamento": 406,
+            "qtd": 10
+          },
+          "total": 406,
+          "atendimentos": 10,
+          "ticketMedio": 40.6,
+          "goldenEstimado": 40.6,
+          "resultadoEstimado": 365.4
+        },
+        "2026-04-22": {
+          "dataBR": "22/04/2026",
+          "movikids": {
+            "faturamento": 0,
+            "qtd": 0
+          },
+          "zapclin": {
+            "faturamento": 549,
+            "qtd": 16
+          },
+          "total": 549,
+          "atendimentos": 16,
+          "ticketMedio": 34.3125,
+          "goldenEstimado": 54.900000000000006,
+          "resultadoEstimado": 494.1
+        },
+        "2026-04-23": {
+          "dataBR": "23/04/2026",
+          "movikids": {
+            "faturamento": 0,
+            "qtd": 0
+          },
+          "zapclin": {
+            "faturamento": 456,
+            "qtd": 13
+          },
+          "total": 456,
+          "atendimentos": 13,
+          "ticketMedio": 35.07692307692308,
+          "goldenEstimado": 45.6,
+          "resultadoEstimado": 410.4
+        },
+        "2026-04-24": {
+          "dataBR": "24/04/2026",
+          "movikids": {
+            "faturamento": 0,
+            "qtd": 0
+          },
+          "zapclin": {
+            "faturamento": 386,
+            "qtd": 14
+          },
+          "total": 386,
+          "atendimentos": 14,
+          "ticketMedio": 27.571428571428573,
+          "goldenEstimado": 38.6,
+          "resultadoEstimado": 347.4
+        },
+        "2026-04-25": {
+          "dataBR": "25/04/2026",
+          "movikids": {
+            "faturamento": 0,
+            "qtd": 0
+          },
+          "zapclin": {
+            "faturamento": 271,
+            "qtd": 9
+          },
+          "total": 271,
+          "atendimentos": 9,
+          "ticketMedio": 30.11111111111111,
+          "goldenEstimado": 27.1,
+          "resultadoEstimado": 243.9
+        },
+        "2026-04-26": {
+          "dataBR": "26/04/2026",
+          "movikids": {
+            "faturamento": 0,
+            "qtd": 0
+          },
+          "zapclin": {
+            "faturamento": 567,
+            "qtd": 16
+          },
+          "total": 567,
+          "atendimentos": 16,
+          "ticketMedio": 35.4375,
+          "goldenEstimado": 56.7,
+          "resultadoEstimado": 510.3
+        },
+        "2026-04-27": {
+          "dataBR": "27/04/2026",
+          "movikids": {
+            "faturamento": 0,
+            "qtd": 0
+          },
+          "zapclin": {
+            "faturamento": 422,
+            "qtd": 13
+          },
+          "total": 422,
+          "atendimentos": 13,
+          "ticketMedio": 32.46153846153846,
+          "goldenEstimado": 42.2,
+          "resultadoEstimado": 379.8
+        },
+        "2026-04-28": {
+          "dataBR": "28/04/2026",
+          "movikids": {
+            "faturamento": 0,
+            "qtd": 0
+          },
+          "zapclin": {
+            "faturamento": 426,
+            "qtd": 12
+          },
+          "total": 426,
+          "atendimentos": 12,
+          "ticketMedio": 35.5,
+          "goldenEstimado": 42.6,
+          "resultadoEstimado": 383.4
+        },
+        "2026-04-29": {
+          "dataBR": "29/04/2026",
+          "movikids": {
+            "faturamento": 0,
+            "qtd": 0
+          },
+          "zapclin": {
+            "faturamento": 485,
+            "qtd": 12
+          },
+          "total": 485,
+          "atendimentos": 12,
+          "ticketMedio": 40.416666666666664,
+          "goldenEstimado": 48.5,
+          "resultadoEstimado": 436.5
+        },
+        "2026-04-30": {
+          "dataBR": "30/04/2026",
+          "movikids": {
+            "faturamento": 0,
+            "qtd": 0
+          },
+          "zapclin": {
+            "faturamento": 353,
+            "qtd": 12
+          },
+          "total": 353,
+          "atendimentos": 12,
+          "ticketMedio": 29.416666666666668,
+          "goldenEstimado": 35.300000000000004,
+          "resultadoEstimado": 317.7
+        }
+      },
+      "ordem": [
+        "2026-04-02",
+        "2026-04-04",
+        "2026-04-05",
+        "2026-04-06",
+        "2026-04-07",
+        "2026-04-08",
+        "2026-04-09",
+        "2026-04-10",
+        "2026-04-11",
+        "2026-04-12",
+        "2026-04-13",
+        "2026-04-14",
+        "2026-04-15",
+        "2026-04-16",
+        "2026-04-17",
+        "2026-04-18",
+        "2026-04-19",
+        "2026-04-20",
+        "2026-04-21",
+        "2026-04-22",
+        "2026-04-23",
+        "2026-04-24",
+        "2026-04-25",
+        "2026-04-26",
+        "2026-04-27",
+        "2026-04-28",
+        "2026-04-29",
+        "2026-04-30"
+      ]
+    }
+  },
+  "dataHoje": "2026-06-07"
 }

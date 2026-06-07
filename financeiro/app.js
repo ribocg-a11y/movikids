@@ -1,4 +1,4 @@
-/* Controle Financeiro Geral — Movi Kids + ZapClin v5 */
+/* Controle Financeiro Geral — Movi Kids + ZapClin v6 */
 
 const BRL = (n) =>
   (n ?? 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -11,6 +11,7 @@ let chartBar = null;
 let chartPie = null;
 let DATA = null;
 let mesSelecionado = null;
+let diaSelecionado = null;
 
 async function loadData() {
   const res = await fetch("./data/finance-data.json?" + Date.now());
@@ -22,6 +23,11 @@ function mesesAte(d, mes) {
   if (mes === MODO_ACUMULADO) return d.mesesOrdem;
   const idx = d.mesesOrdem.indexOf(mes);
   return idx < 0 ? [] : d.mesesOrdem.slice(0, idx + 1);
+}
+
+function keysPeriodo(d) {
+  if (mesSelecionado === MODO_ACUMULADO) return d.mesesOrdem;
+  return mesSelecionado ? [mesSelecionado] : [];
 }
 
 function somaConsolidado(d, keys) {
@@ -108,6 +114,8 @@ function setupFiltro(d) {
     sel.dataset.bound = "1";
     sel.addEventListener("change", () => {
       mesSelecionado = sel.value;
+      diaSelecionado = null;
+      setupFiltroDia(DATA);
       renderAll();
     });
   }
@@ -115,40 +123,106 @@ function setupFiltro(d) {
 
 function renderFiltroInfo(d) {
   const lbl = document.getElementById("filtro-periodo-label");
-  const hint = document.getElementById("filtro-hint");
-  if (!lbl || !hint) return;
-  const isAcum = mesSelecionado === MODO_ACUMULADO;
-
+  if (!lbl) return;
   lbl.textContent = labelPeriodo(d);
-  hint.textContent = isAcum
-    ? "Os cards principais mostram a soma de todos os meses."
-    : "Os cards principais mostram só este mês. A faixa abaixo traz o acumulado até aqui.";
 }
 
-function renderFaixaAcumulado(d) {
-  const box = document.getElementById("faixa-acumulado");
-  if (!box || !mesSelecionado) return;
-  const isAcum = mesSelecionado === MODO_ACUMULADO;
+function setupFiltroDia(d) {
+  const sel = document.getElementById("filtro-dia");
+  const box = document.getElementById("faixa-dia");
+  if (!sel || !box) return;
 
-  if (isAcum) {
+  if (mesSelecionado === MODO_ACUMULADO || !mesSelecionado) {
+    box.hidden = true;
+    return;
+  }
+
+  const mesData = d.diarioPorMes?.[mesSelecionado];
+  if (!mesData?.ordem?.length) {
     box.hidden = true;
     return;
   }
 
   box.hidden = false;
-  const keys = mesesAte(d, mesSelecionado);
-  const t = somaConsolidado(d, keys);
-  const mk = somaEmpresa(d.empresas.movikids, keys);
-  const zap = somaEmpresa(d.empresas.zapclin, keys);
+  sel.innerHTML = "";
+  for (const k of [...mesData.ordem].reverse()) {
+    const opt = document.createElement("option");
+    const dia = mesData.dias[k];
+    opt.value = k;
+    opt.textContent = dia.dataBR;
+    sel.appendChild(opt);
+  }
 
-  document.getElementById("acum-titulo").textContent =
-    `Acumulado até ${d.mesesLabel[mesSelecionado]}`;
-  document.getElementById("acum-fat").textContent = BRL(t.faturamento);
-  document.getElementById("acum-custos").textContent = BRL(t.custosTotal);
-  document.getElementById("acum-resultado").textContent = BRL(t.resultado);
-  document.getElementById("acum-margem").textContent = PCT(margem(t.faturamento, t.resultado));
-  document.getElementById("acum-det").textContent =
-    `MK ${BRL(mk.resultado)} · ZC ${BRL(zap.resultado)}`;
+  if (!diaSelecionado || !mesData.dias[diaSelecionado]) {
+    if (d.dataHoje?.startsWith(mesSelecionado) && mesData.dias[d.dataHoje]) {
+      diaSelecionado = d.dataHoje;
+    } else {
+      diaSelecionado = mesData.ordem.at(-1);
+    }
+  }
+  sel.value = diaSelecionado;
+
+  if (!sel.dataset.bound) {
+    sel.dataset.bound = "1";
+    sel.addEventListener("change", () => {
+      diaSelecionado = sel.value;
+      renderDia(DATA);
+    });
+  }
+}
+
+function renderDia(d) {
+  const box = document.getElementById("faixa-dia");
+  if (!box || box.hidden || !diaSelecionado) return;
+
+  const mesData = d.diarioPorMes?.[mesSelecionado];
+  const dia = mesData?.dias?.[diaSelecionado];
+  if (!dia) return;
+
+  const isHoje = diaSelecionado === d.dataHoje;
+  document.getElementById("dia-titulo").textContent = isHoje
+    ? `Faturamento de hoje — ${dia.dataBR}`
+    : `Faturamento do dia — ${dia.dataBR}`;
+  document.getElementById("dia-sub").textContent =
+    `Mês ${d.mesesLabel[mesSelecionado]} · selecione outro dia na lista ou na tabela`;
+
+  document.getElementById("dia-mk").textContent = BRL(dia.movikids.faturamento);
+  document.getElementById("dia-mk-qtd").textContent =
+    `${dia.movikids.qtd} locação(ões)`;
+  document.getElementById("dia-zap").textContent = BRL(dia.zapclin.faturamento);
+  document.getElementById("dia-zap-qtd").textContent =
+    `${dia.zapclin.qtd} serviço(s)`;
+  document.getElementById("dia-total").textContent = BRL(dia.total);
+  document.getElementById("dia-total-qtd").textContent =
+    `${dia.atendimentos} atendimentos no total`;
+  document.getElementById("dia-resultado").textContent = BRL(dia.resultadoEstimado);
+  document.getElementById("dia-extra").textContent =
+    `Golden est. ${BRL(dia.goldenEstimado)} · ticket ${BRL(dia.ticketMedio)}`;
+
+  const tbody = document.getElementById("tbl-dia-body");
+  if (!tbody) return;
+  tbody.innerHTML = "";
+  for (const k of [...mesData.ordem].reverse()) {
+    const row = mesData.dias[k];
+    const tr = document.createElement("tr");
+    if (k === diaSelecionado) tr.classList.add("row-dia-selected");
+    tr.style.cursor = "pointer";
+    tr.addEventListener("click", () => {
+      diaSelecionado = k;
+      const sel = document.getElementById("filtro-dia");
+      if (sel) sel.value = k;
+      renderDia(d);
+    });
+    tr.innerHTML = `
+      <td>${row.dataBR}</td>
+      <td>${BRL(row.movikids.faturamento)}</td>
+      <td>${BRL(row.zapclin.faturamento)}</td>
+      <td>${BRL(row.total)}</td>
+      <td>${row.atendimentos}</td>
+      <td>${BRL(row.ticketMedio)}</td>
+    `;
+    tbody.appendChild(tr);
+  }
 }
 
 function dadosVisao(d) {
@@ -173,9 +247,10 @@ function renderKPIs(d) {
   const visao = dadosVisao(d);
   const c = visao.consolidado;
   const isAcum = visao.modo === "acumulado";
-  const mkKeys = mesesAte(d, mesSelecionado === MODO_ACUMULADO ? MODO_ACUMULADO : mesSelecionado);
-  const mk = somaEmpresa(d.empresas.movikids, mkKeys);
-  const zap = somaEmpresa(d.empresas.zapclin, mkKeys);
+  const mk = somaEmpresa(d.empresas.movikids, visao.keys);
+  const zap = somaEmpresa(d.empresas.zapclin, visao.keys);
+  const acumKeys = mesSelecionado === MODO_ACUMULADO ? d.mesesOrdem : mesesAte(d, mesSelecionado);
+  const acum = somaConsolidado(d, acumKeys);
 
   document.getElementById("kpi-fat-label").textContent = isAcum ? "Faturamento total" : "Faturamento do mês";
   document.getElementById("kpi-fat").textContent = BRL(c.faturamento);
@@ -192,7 +267,7 @@ function renderKPIs(d) {
   document.getElementById("kpi-resultado-sub").textContent =
     isAcum
       ? `${d.mesesOrdem.length} meses no período`
-      : `Só em ${d.mesesLabel[mesSelecionado]} — veja acumulado abaixo`;
+      : `Acumulado até ${d.mesesLabel[mesSelecionado]}: ${BRL(acum.resultado)}`;
 
   document.getElementById("kpi-margem-label").textContent = isAcum ? "Margem do período" : "Margem do mês";
   document.getElementById("kpi-margem").textContent = PCT(c.margem);
@@ -203,9 +278,9 @@ function renderKPIs(d) {
 
 function renderEmpresa(id, emp, sinal) {
   const el = document.getElementById(id);
-  const keys = mesesAte(DATA, mesSelecionado === MODO_ACUMULADO ? MODO_ACUMULADO : mesSelecionado);
-  const acum = somaEmpresa(emp, keys);
   const isAcum = mesSelecionado === MODO_ACUMULADO;
+  const keysAcum = isAcum ? DATA.mesesOrdem : mesesAte(DATA, mesSelecionado);
+  const acum = somaEmpresa(emp, keysAcum);
   const m = isAcum
     ? { ...acum, margem: margem(acum.faturamento, acum.resultado), cto: acum.golden }
     : emp.meses[mesSelecionado] || {};
@@ -345,9 +420,9 @@ function renderCharts(d) {
     },
   });
 
-  const mkKeys = mesesAte(d, mesSelecionado === MODO_ACUMULADO ? MODO_ACUMULADO : mesSelecionado);
-  const mkFat = somaEmpresa(d.empresas.movikids, mkKeys).faturamento;
-  const zapFat = somaEmpresa(d.empresas.zapclin, mkKeys).faturamento;
+  const pieKeys = mesSelecionado === MODO_ACUMULADO ? d.mesesOrdem : mesesAte(d, mesSelecionado);
+  const mkFat = somaEmpresa(d.empresas.movikids, pieKeys).faturamento;
+  const zapFat = somaEmpresa(d.empresas.zapclin, pieKeys).faturamento;
 
   if (chartPie) chartPie.destroy();
   chartPie = new Chart(document.getElementById("chart-pie"), {
@@ -386,7 +461,8 @@ function renderMeta(d) {
 function renderAll() {
   if (!DATA) return;
   try { renderFiltroInfo(DATA); } catch (e) { console.error("filtro", e); }
-  try { renderFaixaAcumulado(DATA); } catch (e) { console.error("faixa", e); }
+  try { setupFiltroDia(DATA); } catch (e) { console.error("dia-setup", e); }
+  try { renderDia(DATA); } catch (e) { console.error("dia", e); }
   try { renderKPIs(DATA); } catch (e) { console.error("kpis", e); }
   try { renderEmpresa("card-mk", DATA.empresas.movikids, DATA.sinais.movikids); } catch (e) { console.error("mk", e); }
   try { renderEmpresa("card-zap", DATA.empresas.zapclin, DATA.sinais.zapclin); } catch (e) { console.error("zap", e); }
@@ -403,6 +479,7 @@ async function init() {
     root.classList.remove("loading");
     renderMeta(DATA);
     setupFiltro(DATA);
+    setupFiltroDia(DATA);
     renderAll();
   } catch (e) {
     console.error(e);
