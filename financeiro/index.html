@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Controle Financeiro Geral — Movi Kids + ZapClin</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <div id="app" class="wrap loading">
+    <header>
+      <div>
+        <h1>Controle Financeiro Geral</h1>
+        <p>Movi Kids + ZapClin — visão consolidada para decisão de investimento</p>
+        <div id="semaforo-geral" class="semaforo atencao"></div>
+      </div>
+      <div class="meta">
+        <span>Atualizado em</span>
+        <strong id="atualizado">—</strong>
+      </div>
+    </header>
+
+    <section class="grid-kpi">
+      <div class="card">
+        <div class="card-label">Faturamento do mês</div>
+        <div class="card-value" id="kpi-fat">—</div>
+        <div class="card-sub" id="kpi-fat-sub"></div>
+      </div>
+      <div class="card">
+        <div class="card-label">Custos totais</div>
+        <div class="card-value" id="kpi-custos">—</div>
+        <div class="card-sub" id="kpi-custos-sub"></div>
+      </div>
+      <div class="card">
+        <div class="card-label">Resultado líquido</div>
+        <div class="card-value" id="kpi-resultado">—</div>
+        <div class="card-sub" id="kpi-resultado-sub"></div>
+      </div>
+      <div class="card">
+        <div class="card-label">Margem</div>
+        <div class="card-value" id="kpi-margem">—</div>
+        <div class="card-sub" id="kpi-margem-sub"></div>
+      </div>
+    </section>
+
+    <h2 class="section-title">Por empresa</h2>
+    <div class="grid-2">
+      <div id="card-mk" class="card empresa-card mk">
+        <div class="empresa-header">
+          <h3 class="emp-nome">🚗 Movi Kids</h3>
+          <div class="emp-sinal semaforo atencao"></div>
+        </div>
+        <div class="empresa-metrics">
+          <div class="metric"><span>Fat. mês</span><strong class="m-fat">—</strong></div>
+          <div class="metric"><span>Resultado</span><strong class="m-resultado">—</strong></div>
+          <div class="metric"><span>Margem</span><strong class="m-margem">—</strong></div>
+          <div class="metric"><span>Ticket médio</span><strong class="m-ticket">—</strong></div>
+          <div class="metric"><span>Fat. acumulado</span><strong class="m-acum">—</strong></div>
+          <div class="metric"><span>Payback</span><strong class="pb-pct">—</strong></div>
+        </div>
+        <div class="payback-bar"><div class="pb-fill payback-fill" style="width:0"></div></div>
+        <div class="card-sub pb-text"></div>
+        <div class="avisos"></div>
+      </div>
+
+      <div id="card-zap" class="card empresa-card zap">
+        <div class="empresa-header">
+          <h3 class="emp-nome">⚡ ZapClin</h3>
+          <div class="emp-sinal semaforo atencao"></div>
+        </div>
+        <div class="empresa-metrics">
+          <div class="metric"><span>Fat. mês</span><strong class="m-fat">—</strong></div>
+          <div class="metric"><span>Resultado</span><strong class="m-resultado">—</strong></div>
+          <div class="metric"><span>Margem</span><strong class="m-margem">—</strong></div>
+          <div class="metric"><span>Ticket médio</span><strong class="m-ticket">—</strong></div>
+          <div class="metric"><span>Fat. acumulado</span><strong class="m-acum">—</strong></div>
+          <div class="metric"><span>Payback</span><strong class="pb-pct">—</strong></div>
+        </div>
+        <div class="payback-bar"><div class="pb-fill payback-fill" style="width:0"></div></div>
+        <div class="card-sub pb-text"></div>
+        <div class="avisos"></div>
+      </div>
+    </div>
+
+    <div id="narrativa" class="narrativa"></div>
+
+    <h2 class="section-title">P&amp;L consolidado mensal</h2>
+    <div class="chart-box"><canvas id="chart-bar"></canvas></div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Mês</th>
+            <th>Faturamento</th>
+            <th>Custos op.</th>
+            <th>CTO</th>
+            <th>Custos total</th>
+            <th>Resultado</th>
+            <th>Margem</th>
+          </tr>
+        </thead>
+        <tbody id="tbl-body"></tbody>
+      </table>
+    </div>
+
+    <div class="grid-2">
+      <div>
+        <h2 class="section-title">Receita acumulada por empresa</h2>
+        <div class="chart-box" style="height:240px"><canvas id="chart-pie"></canvas></div>
+      </div>
+      <div>
+        <h2 class="section-title">ZapClin — ranking de serviços</h2>
+        <div class="card">
+          <ul id="ranking-zap" class="ranking"></ul>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      Dados das planilhas Google · Atualize com <code>node scripts/sync-controle-financeiro.js</code> (OAuth)
+    </footer>
+  </div>
+</body>
+</html>

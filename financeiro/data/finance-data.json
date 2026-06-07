@@ -1,0 +1,272 @@
+{
+  "versao": 1,
+  "atualizadoEm": "2026-06-07T18:02:07.260Z",
+  "titulo": "Controle Financeiro Geral",
+  "empresas": {
+    "movikids": {
+      "id": "movikids",
+      "nome": "Movi Kids",
+      "emoji": "🚗",
+      "cor": "#1565C0",
+      "investimento": 65410,
+      "dataInauguracao": "27/05/2026",
+      "mesInicioPayback": "05/2026",
+      "fatAcumulado": 6899.5999999999985,
+      "locEncerradas": 339,
+      "ticketMedio": 20.352802359882002,
+      "fatMesAtual": 3919.3999999999996,
+      "fatMesAnterior": 2980.2000000000007,
+      "crescimentoMesPct": 31.514663445406306,
+      "meses": {
+        "2026-05": {
+          "faturamento": 2980.2000000000007,
+          "custos": 0,
+          "cto": 1000,
+          "resultado": 1980.2000000000007,
+          "margem": 66.44520501979734,
+          "qtd": 142,
+          "custosPorCategoria": {}
+        },
+        "2026-06": {
+          "faturamento": 3919.3999999999996,
+          "custos": 0,
+          "cto": 1000,
+          "resultado": 2919.3999999999996,
+          "margem": 74.48589069755575,
+          "qtd": 197,
+          "custosPorCategoria": {}
+        }
+      },
+      "payback": {
+        "investido": 65410,
+        "recuperado": 4899.6,
+        "percentual": 7.490597767925395,
+        "mesesProjetados": 25,
+        "mediaResultadoMensal": 2449.8
+      },
+      "avisos": [
+        "Custos operacionais ainda não lançados na aba CUSTOS"
+      ]
+    },
+    "zapclin": {
+      "id": "zapclin",
+      "nome": "ZapClin",
+      "emoji": "⚡",
+      "cor": "#1B8A5A",
+      "investimento": 0,
+      "dataInauguracao": "01/04/2026",
+      "mesInicioPayback": "04/2026",
+      "fatAcumulado": 23874,
+      "qtdServicos": 790,
+      "ticketMedio": 30.22025316455696,
+      "fatMesAtual": 1993,
+      "fatMesAnterior": 12830,
+      "crescimentoMesPct": -84.46609508963367,
+      "meses": {
+        "2026-04": {
+          "faturamento": 9051,
+          "custos": 0,
+          "cto": 0,
+          "resultado": 9051,
+          "margem": 100,
+          "qtd": 271,
+          "custosPorCategoria": {}
+        },
+        "2026-05": {
+          "faturamento": 12830,
+          "custos": 10871.75,
+          "cto": 0,
+          "resultado": 1958.25,
+          "margem": 15.263055339049103,
+          "qtd": 453,
+          "custosPorCategoria": {
+            "Outros": 7570.65,
+            "Utilidades": 653,
+            "Salários": 760,
+            "Transporte": 551.2,
+            "Taxas e Boletos": 1336.9
+          }
+        },
+        "2026-06": {
+          "faturamento": 1993,
+          "custos": 0,
+          "cto": 0,
+          "resultado": 1993,
+          "margem": 100,
+          "qtd": 66,
+          "custosPorCategoria": {}
+        }
+      },
+      "rankingServicos": [
+        {
+          "nome": "Limpeza + Hig. Profunda",
+          "receita": 17356,
+          "pct": 72.69833291446763
+        },
+        {
+          "nome": "Limpeza + Hig. Essencial",
+          "receita": 2181,
+          "pct": 9.135461171148531
+        },
+        {
+          "nome": "Revitalização",
+          "receita": 1680,
+          "pct": 7.036943955767781
+        },
+        {
+          "nome": "Limpeza + Hig. Rápida",
+          "receita": 1315,
+          "pct": 5.5080841082349
+        },
+        {
+          "nome": "Higienização Essencial",
+          "receita": 886,
+          "pct": 3.7111502052441985
+        },
+        {
+          "nome": "Higienização Profunda",
+          "receita": 276,
+          "pct": 1.1560693641618496
+        },
+        {
+          "nome": "Higienização Rápida",
+          "receita": 180,
+          "pct": 0.7539582809751194
+        }
+      ],
+      "payback": {
+        "investido": 0,
+        "recuperado": 13002.25,
+        "percentual": 0,
+        "mesesProjetados": null,
+        "mediaResultadoMensal": 4334.083333333333
+      },
+      "avisos": [
+        "Preencha a aba INVESTIMENTO com os valores de abertura"
+      ]
+    }
+  },
+  "consolidado": {
+    "meses": {
+      "2026-04": {
+        "faturamento": 9051,
+        "custos": 0,
+        "cto": 0,
+        "custosTotal": 0,
+        "resultado": 9051,
+        "margem": 100,
+        "movikids": {
+          "faturamento": 0,
+          "custos": 0,
+          "cto": 0,
+          "resultado": 0,
+          "margem": 0,
+          "qtd": 0,
+          "custosPorCategoria": {}
+        },
+        "zapclin": {
+          "faturamento": 9051,
+          "custos": 0,
+          "cto": 0,
+          "resultado": 9051,
+          "margem": 100,
+          "qtd": 271,
+          "custosPorCategoria": {}
+        }
+      },
+      "2026-05": {
+        "faturamento": 15810.2,
+        "custos": 10871.75,
+        "cto": 1000,
+        "custosTotal": 11871.75,
+        "resultado": 3938.4500000000007,
+        "margem": 24.91081706746278,
+        "movikids": {
+          "faturamento": 2980.2000000000007,
+          "custos": 0,
+          "cto": 1000,
+          "resultado": 1980.2000000000007,
+          "margem": 66.44520501979734,
+          "qtd": 142,
+          "custosPorCategoria": {}
+        },
+        "zapclin": {
+          "faturamento": 12830,
+          "custos": 10871.75,
+          "cto": 0,
+          "resultado": 1958.25,
+          "margem": 15.263055339049103,
+          "qtd": 453,
+          "custosPorCategoria": {
+            "Outros": 7570.65,
+            "Utilidades": 653,
+            "Salários": 760,
+            "Transporte": 551.2,
+            "Taxas e Boletos": 1336.9
+          }
+        }
+      },
+      "2026-06": {
+        "faturamento": 5912.4,
+        "custos": 0,
+        "cto": 1000,
+        "custosTotal": 1000,
+        "resultado": 4912.4,
+        "margem": 83.08639469589338,
+        "movikids": {
+          "faturamento": 3919.3999999999996,
+          "custos": 0,
+          "cto": 1000,
+          "resultado": 2919.3999999999996,
+          "margem": 74.48589069755575,
+          "qtd": 197,
+          "custosPorCategoria": {}
+        },
+        "zapclin": {
+          "faturamento": 1993,
+          "custos": 0,
+          "cto": 0,
+          "resultado": 1993,
+          "margem": 100,
+          "qtd": 66,
+          "custosPorCategoria": {}
+        }
+      }
+    },
+    "resultadoAcumulado": 17901.85,
+    "mesAtual": "2026-06"
+  },
+  "sinais": {
+    "movikids": {
+      "nivel": "atencao",
+      "label": "Atenção",
+      "motivo": "Custos operacionais ainda não lançados na aba CUSTOS"
+    },
+    "zapclin": {
+      "nivel": "atencao",
+      "label": "Atenção",
+      "motivo": "Preencha a aba INVESTIMENTO com os valores de abertura"
+    },
+    "geral": {
+      "nivel": "atencao",
+      "label": "Atenção",
+      "motivo": "Custos operacionais ainda não lançados na aba CUSTOS"
+    }
+  },
+  "narrativa": [
+    "Movi Kids: Custos operacionais ainda não lançados na aba CUSTOS.",
+    "ZapClin: Preencha a aba INVESTIMENTO com os valores de abertura.",
+    "Consolidado: resultado acumulado R$ 17.901,85 em 3 meses.",
+    "Dados parciais — lance custos fixos mensais para análise confiável."
+  ],
+  "mesesOrdem": [
+    "2026-04",
+    "2026-05",
+    "2026-06"
+  ],
+  "mesesLabel": {
+    "2026-04": "Abr/26",
+    "2026-05": "Mai/26",
+    "2026-06": "Jun/26"
+  }
+}
