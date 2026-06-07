@@ -3,6 +3,7 @@
 Referência única para alinhamento local × produção.
 
 **Handoff (novo chat):** **`HANDOFF_NOVO_CHAT.md`** ← ler primeiro  
+**Acessos:** **`ACESSOS_E_AUTORIZACOES.md`** — papéis, PIN admin, agente vs humano  
 **Índice:** `../INDICE.md` · **Prioridades:** **`PLANO_PRIORIDADES_2026-06.md`**  
 **Planejamento ativo:** `PLANO_CONTINUIDADE_2026-06.md`  
 **Mapa de erros/bugs:** **`MAPA_ERROS_FALHAS_BUGS.md`**  

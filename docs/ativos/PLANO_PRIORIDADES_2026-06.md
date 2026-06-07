@@ -72,7 +72,8 @@
 | **2** | **Este arquivo** | Fases, checklist vivo, prioridades |
 | **3** | `ESTADO_ATUAL.md` | Versões, pacotes, links, validação |
 | **4** | `mk-version.js` + header `.gs` + ping GAS | Versão em código e produção |
-| **5** | `DEPLOY_GAS_v1.5.32_AUTH.md` | Deploy GAS mestre (v1.5.63) |
+| **5** | `ACESSOS_E_AUTORIZACOES.md` | Papéis, PIN admin, agente vs humano |
+| **6** | `DEPLOY_GAS_v1.5.32_AUTH.md` | Deploy GAS mestre (v1.5.63) |
 
 **Não usar para versão atual:** `docs/arquivo/obsoleto/`, `docs/arquivo/planos/HANDOFF_NOVO_CHAT_2026-06-05.md`, `docs/arquivo/deploy/` (histórico), `arquivo-historico/*.gs`.
 
@@ -216,6 +217,7 @@ Todos em `docs/ativos/` salvo indicação. Índice completo: `docs/INDICE.md`.
 | Tarefa | Ler primeiro |
 |--------|--------------|
 | **Novo chat** | `HANDOFF_NOVO_CHAT.md` → este arquivo |
+| Acessos / quem faz o quê | `ACESSOS_E_AUTORIZACOES.md` |
 | Deploy GAS | `DEPLOY_GAS_v1.5.32_AUTH.md` + deploy específico |
 | Publicar FE | `REGRAS_DE_PUBLICACAO_SEGURA.md` + `pre-push-check.ps1` |
 | Incidente / bug | `MAPA_ERROS_FALHAS_BUGS.md` → `docs/arquivo/incidentes/` |

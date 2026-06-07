@@ -31,7 +31,7 @@ Continuo o MOVI KIDS. Repo: C:\Users\riboc\Documents\Codex\2026-05-30\files-ment
 
 ### O que o agente faz sozinho (não precisa repetir)
 
-- Ler: este arquivo → `PLANO_PRIORIDADES` → `ESTADO_ATUAL` → `REGRAS_DE_PUBLICACAO_SEGURA`
+- Ler: este arquivo → `PLANO_PRIORIDADES` → `ESTADO_ATUAL` → `REGRAS` → `ACESSOS_E_AUTORIZACOES`
 - Ignorar handoff antigo em `docs/arquivo/planos/`
 - Informar: FE **v1.7.64**, GAS **v1.5.63**, próximo passo do checklist
 
@@ -42,7 +42,7 @@ Continuo o MOVI KIDS. Repo: C:\Users\riboc\Documents\Codex\2026-05-30\files-ment
 | # | Ação |
 |---|------|
 | 1 | Reconhecer pedido de continuidade — **sem** pedir caminho se workspace = `movikids-github` |
-| 2 | Ler os 4 docs ativos (ordem na seção abaixo) |
+| 2 | Ler os 5 docs ativos (ordem na seção abaixo) |
 | 3 | Opcional: ping GAS + `pre-push-check.ps1` se for mexer em código |
 | 4 | Responder com: versões, fase ativa, **próximo passo** (de `PLANO_PRIORIDADES`) |
 | 5 | Ao encerrar sessão: atualizar este arquivo + checklist se algo mudou |
@@ -72,7 +72,8 @@ Continuo o MOVI KIDS. Repo: C:\Users\riboc\Documents\Codex\2026-05-30\files-ment
 | 2 | `PLANO_PRIORIDADES_2026-06.md` | **O que fazer agora** (fases P0–P4, checklist vivo) |
 | 3 | `ESTADO_ATUAL.md` | Versões, pacotes entregues, validação pós-deploy |
 | 4 | `REGRAS_DE_PUBLICACAO_SEGURA.md` | Travas antes de commit/push/deploy |
-| 5 | `../INDICE.md` | Mapa completo se precisar de doc específico |
+| 5 | `ACESSOS_E_AUTORIZACOES.md` | Quem pode o quê — app, infra, agente vs humano |
+| 6 | `../INDICE.md` | Mapa completo se precisar de doc específico |
 
 ### Por tarefa (consulta rápida)
 

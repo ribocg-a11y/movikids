@@ -22,8 +22,19 @@ Leia **nesta ordem**:
 2. [`docs/ativos/PLANO_PRIORIDADES_2026-06.md`](docs/ativos/PLANO_PRIORIDADES_2026-06.md) — o que fazer agora
 3. [`docs/ativos/ESTADO_ATUAL.md`](docs/ativos/ESTADO_ATUAL.md) — versões e links
 4. [`docs/ativos/REGRAS_DE_PUBLICACAO_SEGURA.md`](docs/ativos/REGRAS_DE_PUBLICACAO_SEGURA.md) — antes de publicar
+5. [`docs/ativos/ACESSOS_E_AUTORIZACOES.md`](docs/ativos/ACESSOS_E_AUTORIZACOES.md) — papéis, PIN admin, o que agente vs humano faz
 
 Índice completo: [`docs/INDICE.md`](docs/INDICE.md)
+
+## Acessos (resumo)
+
+| Papel app | Entrada | Gestão financeira |
+|-----------|---------|-------------------|
+| Operador | Nome + PIN | Não (Home sem KPIs) |
+| Admin | PIN **1416** | Sim (Dashboard, APIs admin) |
+| Portal | Telefone | Só suas locações |
+
+**GAS Nova versão** = só humano no editor Google. **Agente:** código + `git push` + `clasp push` (nunca `clasp deploy`).
 
 ## Produção atual
 
