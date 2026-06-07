@@ -161,7 +161,8 @@ Erros cometidos neste projeto que nao devem se repetir:
 - devolver `startTimestamp` bruto no portal sem `timestampCanonico_` (incidente I16 — ver `docs/arquivo/incidentes/INCIDENTE_CRONOMETRO_PORTAL_AUTH_2026-06-05_06.md`);
 - calcular tempo do portal sem `canonLoc_` / paridade com `mergeSessaoCanonica` do balcao (I16);
 - liberar sessao operador sem `cache: 'no-store'` e sem atualizar UI do balcao (I17);
-- deslogar por inatividade com locacao Ativa/Pendente no tablet (I18).
+- deslogar por inatividade com locacao Ativa/Pendente no tablet (I18);
+- gravar Hora Inicio (col C) no cadastro ou inferir startTimestamp por data+hora sem col Y (I20).
 
 ## Regra 10 - Cronometro portal x balcao (I16)
 
@@ -186,6 +187,15 @@ Erros cometidos neste projeto que nao devem se repetir:
 - Validar: `listarOperadoresLogin.sessaoAtiva` = chip do tablet; apos `liberarSessaoOperadorAdmin`, tablet desloga em <=60s.
 - Doc: `docs/arquivo/incidentes/INCIDENTE_AUTH_SESSAO_FANTASMA_PWA_2026-06-06.md`; mapa I19.
 - PWA: `verificarNovaVersao` acelerado; tablet com `?force=VERSAO_ATUAL` ou reinstalar icone apos mudanca grande.
+
+## Regra 13 - Coluna C (Hora Inicio) e col Y (startTimestamp) — I20
+
+- **Cadastro (`salvarLocacao_`):** col **C vazia**, col **Y = 0**, status **Pendente**. Nunca `fmtHoraLocal_` na col C no cadastro.
+- **Inicio (`iniciarTimer_`):** col **Y = serverTs** (ms servidor); col **C = HH:mm** do mesmo instante; status **Ativa**.
+- **`timestampCanonico_`:** so col Y valida (>= 1e12). **Sem fallback** por data + hora do cadastro.
+- **FE:** timer so com `sessaoTimerIniciado_` / col Y valida; `started=true` apos GAS confirmar.
+- GAS minimo **v1.5.64**; FE **v1.7.74+**. Teste tablet: Pendente 10:00 parado ate ▶.
+- Doc: `INCIDENTE_CRONOMETRO_PORTAL_AUTH_2026-06-05_06.md` § I20; mapa **I20**.
 
 Toda regressao deve gerar:
 

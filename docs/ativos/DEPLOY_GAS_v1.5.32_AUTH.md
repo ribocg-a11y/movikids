@@ -55,6 +55,28 @@ Se o ping &lt; **v1.5.55**, o celular (`acompanhar.html`) pode mostrar tempo **d
 Após Nova versão Web, rodar: `.\scripts\testes\TESTE_PARIDADE_CRONOMETRO_PORTAL_BALCAO.ps1`  
 Doc: `../arquivo/incidentes/INCIDENTE_CRONOMETRO_PORTAL_AUTH_2026-06-05_06.md`, mapa `MAPA_ERROS_FALHAS_BUGS.md`.
 
+### Colunas C e Y — regra do cronômetro (I20) — GAS mínimo v1.5.64
+
+> **Não inferir início pela hora do cadastro.**
+
+| Coluna | Planilha LOCACOES | Quando gravar | Conteúdo |
+|--------|-------------------|---------------|----------|
+| **C** | Hora Início | **Somente** em `iniciarTimer_` (botão ▶) | `HH:mm` legível para relatório |
+| **Y (25)** | `startTimestamp` | **Somente** em `iniciarTimer_` | ms do servidor GAS — **fonte do countdown** |
+| — | — | Em `salvarLocacao_` (cadastro) | Col C = **vazia**; col Y = `0`; status = `Pendente` |
+
+Se o ping &lt; **v1.5.64**, o tablet pode mostrar timer **sozinho e adiantado** (ex. 9:30 em plano 10 min) porque a col C ainda era preenchida no cadastro.
+
+**`timestampCanonico_`** não usa fallback `data + horaInicio` — só col Y ≥ 1e12.
+
+**Teste tablet obrigatório após deploy:**
+
+1. Nova locação → card **Pendente**, **10:00**, timer parado.
+2. Esperar 1–2 min sem ▶ → continua 10:00.
+3. Apertar ▶ → começa em 10:00.
+
+Mapa: `MAPA_ERROS_FALHAS_BUGS.md` **I20** · Incidente: `../arquivo/incidentes/INCIDENTE_CRONOMETRO_PORTAL_AUTH_2026-06-05_06.md` § I20.
+
 ## Deploy seguro (PC)
 
 ```powershell

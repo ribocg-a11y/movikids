@@ -114,6 +114,18 @@ try {
     } else {
       Add-Check "guard.gas.iniciar.serverTs" "ok" "iniciarTimer usa relogio servidor"
     }
+    if ($gasRaw -notmatch 'function salvarLocacao_[\s\S]{0,1200}fmtData_\(agora\),\s*''') {
+      Add-Check "guard.gas.salvar.horaVazia" "fail" "salvarLocacao_ grava hora na col C (I20)"
+    } else {
+      Add-Check "guard.gas.salvar.horaVazia" "ok" "col C vazia no cadastro"
+    }
+    if ($gasRaw -notmatch 'function timestampCanonico_[\s\S]{0,400}return 0') {
+      Add-Check "guard.gas.timestamp.noFallback" "fail" "timestampCanonico_ sem return 0 / fallback I20"
+    } elseif ($gasRaw -match 'function timestampCanonico_[\s\S]{0,800}(parseData|calcStart|horaVal.*dataVal)') {
+      Add-Check "guard.gas.timestamp.noFallback" "fail" "timestampCanonico_ ainda infere por data/hora (I20)"
+    } else {
+      Add-Check "guard.gas.timestamp.noFallback" "ok" "timestampCanonico so col Y"
+    }
     if ($gasRaw -notmatch 'function importarResponsaveisAdmin_') {
       Add-Check "guard.k1.import" "fail" "importarResponsaveisAdmin_ ausente (Pacote K.1)"
     } else {
