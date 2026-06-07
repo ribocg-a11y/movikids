@@ -10,7 +10,7 @@
 | Fase | Entrega | Versão | Status |
 |------|---------|--------|--------|
 | **M.1** | CSS legado → `mk-app.css` | FE **v1.7.65** | ✅ 07/06 |
-| M.2 | `mk-stale-sync.js`, `mk-cache-bust.js`, `mk-firebase.js` | v1.7.66+ | ⬜ |
+| **M.2** | `mk-stale-sync.js`, `mk-cache-bust.js`, `mk-firebase.js` | FE **v1.7.66** | ✅ 07/06 |
 | M.3 | `mk-api.js` (api + guards I15) | — | ⬜ |
 | M.4 | `mk-sync.js` (sync + Firebase merge) | — | ⬜ |
 | M.5+ | `mk-sessao`, `mk-nova`, `mk-admin`, … | — | ⬜ |
@@ -46,9 +46,33 @@
 
 Tablet: `?force=1.7.65` — Home, Nova locação, Dashboard (visual igual).
 
-### Próximo (M.2)
+## M.2 — Bootstrap + Firebase (v1.7.66)
 
-Extrair anti-stale e cache bust para JS externos (ordem de carga crítica).
+### O que mudou
+
+| Antes | Depois |
+|-------|--------|
+| ~140 linhas inline no `<head>` | 3 arquivos JS |
+| `index.html` ~7.054 linhas | **~6.915 linhas** |
+
+### Ordem de carregamento (crítica)
+
+1. `mk-stale-sync.js` — XHR síncrono (antes de tudo)
+2. `mk-version.js`
+3. `mk-design.css`
+4. `mk-cache-bust.js`
+5. Chart.js CDN
+6. `mk-app.css`
+7. `mk-firebase.js` (`type="module"`)
+
+### Arquivos
+
+- `mk-stale-sync.js`, `mk-cache-bust.js`, `mk-firebase.js` (novos)
+- `sw.js` — NETWORK_FIRST nos 3 arquivos
+
+### Próximo (M.3)
+
+Extrair `api()` + guards I15 → `mk-api.js`.
 
 ---
 
