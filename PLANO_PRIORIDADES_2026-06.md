@@ -24,7 +24,7 @@
 | 0.3 | `ESTADO_ATUAL.md` atualizado | ✅ 07/06 |
 | 0.4 | Ping GAS v1.5.63 | ✅ 07/06 |
 | 0.5 | `PLANO_PRIORIDADES` + deploy docs | ✅ 07/06 |
-| 0.6 | `pre-push-check.ps1` verde | 🟡 rodar após commit |
+| 0.6 | `pre-push-check.ps1` verde | ✅ 07/06 |
 
 **Próximo passo imediato (Ops):** abrir tablet com `?force=1.7.64` → confirmar rodapé **v1.7.64** + chip Turno.
 
