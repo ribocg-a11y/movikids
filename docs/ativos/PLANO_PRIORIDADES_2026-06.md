@@ -29,6 +29,7 @@
 | 0.7 | Saneamento docs → `docs/` | ✅ 07/06 |
 | 0.8 | Saneamento código → `arquivo-historico/` + `scripts/testes/` | ✅ 07/06 |
 | 0.9 | Handoff ativo `HANDOFF_NOVO_CHAT.md` + `AGENTS.md` + regra Cursor | ✅ 07/06 |
+| 0.10 | `ACESSOS_E_AUTORIZACOES.md` + planilha OAuth (`google-drive-sheets-auth`) | ✅ 07/06 |
 
 **Próximo passo imediato (Ops):** abrir tablet com `?force=1.7.64` → confirmar rodapé **v1.7.64** + chip Turno.
 

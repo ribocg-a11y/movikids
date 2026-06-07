@@ -114,7 +114,7 @@ Esta seção responde: **o que o agente faz sozinho, o que valida, o que publica
 | **Terminal (PowerShell)** | Cursor integrado | `git`, `.\scripts\pre-push-check.ps1`, testes `scripts/testes/`, ping GAS |
 | **Regras Cursor** | `.cursor/rules/*.mdc` | Handoff, GAS caminho PC, proibir POST browser, design DNA |
 | **Git local + remote** | `.git` → `ribocg-a11y/movikids` | `status`, `diff`, `commit`, `push` (push pode pedir sua aprovação no Cursor) |
-| **Clasp** | `.clasp.json` → projeto `19SIhkX9...` | `clasp push` via `scripts/deploy-gas.ps1` — **se** `clasp login` já estiver feito no PC |
+| **Clasp** | `.clasp.json` → projeto `19SIhkX9...` · `~/.clasprc.json` no PC | `clasp push` via `scripts/deploy-gas.ps1` (login clasp ativo) |
 | **GitHub CLI (`gh`)** | Instalado no PC (se configurado) | PRs, issues, checks — quando você pedir tarefa GitHub |
 | **HTTP público GAS** | URL `exec?action=...` | Ping, APIs admin (`adminPin=1416`), testes nos `.ps1` |
 | **Google Sheets OAuth** | `C:\Users\riboc\Projects\google-drive-sheets-auth` | Ler/escrever **MOVIKIDS_Planilha_Base** via API — token em `~/.config/google-api/` |

@@ -45,7 +45,7 @@ Continuo o MOVI KIDS. Repo: C:\Users\riboc\Documents\Codex\2026-05-30\files-ment
 | 1 | Reconhecer pedido de continuidade — **sem** pedir caminho se workspace = `movikids-github` |
 | 2 | Ler os 5 docs ativos (ordem na seção abaixo) |
 | 3 | Opcional: ping GAS + `pre-push-check.ps1` se for mexer em código |
-| 4 | Responder com: versões, fase ativa, **próximo passo** (de `PLANO_PRIORIDADES`) |
+| 4 | Responder com: versões, fase ativa, **próximo passo**, **quem faz o quê** (agente vs você — `ACESSOS` §7) |
 | 5 | Ao encerrar sessão: atualizar este arquivo + checklist se algo mudou |
 
 ---
