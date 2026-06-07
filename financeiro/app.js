@@ -1,4 +1,4 @@
-/* Controle Financeiro Geral — Movi Kids + ZapClin v10 */
+/* Controle Financeiro Geral — Movi Kids + ZapClin v11 */
 
 const BRL = (n) =>
   (n ?? 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -457,10 +457,13 @@ function renderMeta(d) {
   document.getElementById("atualizado").textContent = dt.toLocaleString("pt-BR");
   const alerta = document.getElementById("sync-alerta");
   if (!alerta) return;
-  const horas = (Date.now() - dt.getTime()) / 3600000;
-  if (horas > 2) {
+  const minutos = (Date.now() - dt.getTime()) / 60000;
+  if (minutos > 15) {
     alerta.hidden = false;
-    alerta.textContent = `⚠ Dados com ${Math.floor(horas)}h+ — rode SYNC_FINANCEIRO.ps1`;
+    const label = minutos >= 60
+      ? `${Math.floor(minutos / 60)}h+`
+      : `${Math.floor(minutos)} min+`;
+    alerta.textContent = `⚠ Dados com ${label} — verifique sync automático (10 min)`;
   } else {
     alerta.hidden = true;
   }
