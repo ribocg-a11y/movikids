@@ -4,17 +4,17 @@
 
 Toda vez que o assistente alterar o `.gs`, deve informar este caminho (versão atual no header do arquivo):
 
-**v1.5.61 no seu PC (regra de ouro — copiar deste arquivo):**
+**v1.5.63 no seu PC (regra de ouro — copiar deste arquivo):**
 
 `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github\MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs`
 
-Payback Dashboard: `DEPLOY_v1.5.61_PAYBACK.md` · KPI faturamento do ano: `DEPLOY_v1.5.58_FAT_ANO_KPI.md` (v1.5.59) · Pacote K.1: `DEPLOY_v1.5.57_IMPORT_RESPONSAVEIS.md`
+Payback: `DEPLOY_v1.5.63_PAYBACK.md` · KPI fatAno: `DEPLOY_v1.5.58_FAT_ANO_KPI.md` (v1.5.59) · K.1: `DEPLOY_v1.5.57_IMPORT_RESPONSAVEIS.md` · Prioridades: `PLANO_PRIORIDADES_2026-06.md`
 
 **Como colar no Apps Script:** Explorer → cole o caminho acima na barra → Enter → duplo clique no `.gs` → Ctrl+A → Ctrl+C → colar em **Código.gs** no editor → **Implantar → Nova versão**.
 
 ## Código GAS no PC (copiar daqui → colar no script)
 
-**Arquivo canônico v1.5.61 (Payback + INVESTIMENTO + histórico v1.5.32–60):**
+**Arquivo canônico v1.5.63 (Payback projetado + INVESTIMENTO + histórico v1.5.32–62):**
 
 `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github\MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs`
 
@@ -28,11 +28,11 @@ Abrir no Explorer: cole o caminho na barra de endereço → Enter → duplo cliq
 | **Web app em produção (exec)** | https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec |
 | **Testar se o GAS está no ar (ping)** | https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec?action=ping |
 | **Planilha MOVIKIDS** | https://docs.google.com/spreadsheets/d/1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618/edit |
-| **App (GitHub Pages)** | https://ribocg-a11y.github.io/movikids/?force=1.7.63 |
+| **App (GitHub Pages)** | https://ribocg-a11y.github.io/movikids/?force=1.7.64 |
 
 No **editor GAS** (link acima): **Implantar → Gerenciar implantações → Editar** a implantação Web (**ID `AKfycbwakQ...`**) → **Nova versão** → Implantar. **Não** crie um deploy novo. **Nunca** use `clasp deploy`.
 
-Após implantar, o `ping` deve mostrar `versao` **v1.5.61** (ou a versão do header do `.gs`) e `postWriteActions` (Pacote E). `buscarKPIsAdmin` inclui **`payback`** + **`investimento`** (v1.5.61, aba INVESTIMENTO), **`fatAno`/`nAno`** (v1.5.59) + Pacote F. SMS: **v1.5.41** — ver `TROCA_SMS_GATEWAY_DJVJRL_2026-06-04.md`. Payback: **`DEPLOY_v1.5.61_PAYBACK.md`**.
+Após implantar, o `ping` deve mostrar `versao` **v1.5.63** (ou header do `.gs`) e `postWriteActions` (Pacote E). `buscarKPIsAdmin` inclui **`payback`** projetado (v1.5.63) + **`investimento`**, **`fatAno`/`nAno`** (v1.5.59) + Pacote F. SMS: **v1.5.41** — ver `TROCA_SMS_GATEWAY_DJVJRL_2026-06-04.md`. Payback: **`DEPLOY_v1.5.63_PAYBACK.md`**.
 
 ### Propriedades do script (SMS — producao)
 

@@ -1,9 +1,10 @@
 # MOVI KIDS — Plano de continuidade (pós-pausa maturidade)
 
-**Data:** 06/06/2026 (revisão tarde — pós I19 Milena)  
-**Produção:** FE **v1.7.48** · GAS **v1.5.56** (confirmar ping)  
+**Data:** 07/06/2026 (revisão — payback M + prioridades)  
+**Produção:** FE **v1.7.64** · GAS **v1.5.63** (ping confirmado 07/06)  
+**Ordem de execução:** **`PLANO_PRIORIDADES_2026-06.md`** (prioridades por fase)  
 **Substitui como “próximo passo”:** seção 9 de `PLANO_PAUSA_MATURIDADE_2026-06.md` e seção 14 de `PLANO_MESTRE_REORGANIZADO_2026-06.md`  
-**Referências:** `ESTADO_ATUAL.md`, `MAPA_ERROS_FALHAS_BUGS.md`, `AUDITORIA_PLANILHA_BASE_2026-06-06.md`
+**Referências:** `ESTADO_ATUAL.md`, `MAPA_ERROS_FALHAS_BUGS.md`, `MEMORIAL_PAYBACK_INVESTIMENTO.md`
 
 ---
 
@@ -22,7 +23,7 @@
 | Portal carrossel + DNA visual | ✅ | v1.7.47 `acompanhar.html` + `DESIGN_DNA_MOVIKIDS.md` |
 | Anti sessão fantasma PWA | ✅ | I19 v1.7.48 — chip Turno + reconcile tablet×GAS |
 
-O gargalo **deixou de ser confiabilidade básica**. O sistema opera; o foco passa a **dados, relacionamento e WhatsApp**.
+O gargalo **deixou de ser confiabilidade básica**. O sistema opera; o foco passa a **homologação tablet, payback estratégico e UX (Pacote L)**. WhatsApp automático permanece **pausado** (QR portal).
 
 ---
 
@@ -159,9 +160,10 @@ Escopo original W.1–W.6 (inventário mensagens, aviso extra não pulável, che
 
 | Prioridade | Ação | Quem | Tempo |
 |------------|------|------|-------|
-| **P0** | Tablet balcão em **v1.7.48** (ícone PWA atualizado) | Ops balcão | 10 min |
-| **P0** | Fechar checklist **I.5** formal (1 folha assinada) | Ops + dev | 30 min |
-| **P1** | **Pacote K.1** — código no repo (`a4bf087`); **deploy GAS fora pico** | Dev | deploy ~15 min |
+| **P0** | Tablet balcão em **v1.7.64** (ícone PWA atualizado) | Ops balcão | 10 min |
+| **P0** | Fechar checklist **I.5** + **K.3–K.4** tablet | Ops + dev | 30–60 min |
+| **P1** | Fechar regras payback (memorial §10) + validar painel Dashboard | Sócio + dev | 1 sessão |
+| **P1** | Iniciar **Pacote L** (UX polish + QR balcão) | Dev | sprint 3 |
 | **P2** | `TESTE_REGRESSAO` write controlado (B7) | Dev | paralelo |
 
 **Não iniciar F4** — pausado; comunicação = **QR portal** (`DECISAO_COMUNICACAO_QR_CODE_2026-06.md`).

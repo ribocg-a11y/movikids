@@ -1,7 +1,8 @@
-# MOVI KIDS — Estado atual (06/06/2026 10:34)
+# MOVI KIDS — Estado atual (07/06/2026)
 
 Referência única para alinhamento local × produção.
 
+**Prioridades (ordem de execução):** **`PLANO_PRIORIDADES_2026-06.md`** ← ler primeiro  
 **Roadmap mestre:** `PLANO_MESTRE_REORGANIZADO_2026-06.md`  
 **Planejamento ativo:** `PLANO_CONTINUIDADE_2026-06.md` · Pausa maturidade (encerrada): `PLANO_PAUSA_MATURIDADE_2026-06.md`  
 **Handoff:** `HANDOFF_NOVO_CHAT_2026-06-05.md`  
@@ -25,8 +26,8 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 | Camada | Versão alvo | URL / ID |
 |--------|-------------|----------|
-| **Frontend** | **v1.7.49** | https://ribocg-a11y.github.io/movikids/?force=1.7.49 |
-| **Apps Script** | **v1.5.57** (produção + K.1 importado 06/06) | Deploy `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y` |
+| **Frontend** | **v1.7.64** | https://ribocg-a11y.github.io/movikids/?force=1.7.64 |
+| **Apps Script** | **v1.5.63** (payback projetado + parse INVESTIMENTO) | Deploy `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y` |
 | SMS Gateway Cloud | **DJVJRL** / device `wihWegHr4wXaVJQ1R-GZR` | Aparelho remoto ONLINE |
 | Pacote SMS P0 | **FECHADO** | `PACOTE_SMS_P0_UNIFICADO_v1.5.38_v1.7.11.md` |
 | Planilha | MOVIKIDS_Planilha_Base | https://docs.google.com/spreadsheets/d/1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618/edit — auditoria `AUDITORIA_PLANILHA_BASE_2026-06-06.md` |
@@ -37,7 +38,7 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 **Teste rápido GAS (ping):**  
 https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec?action=ping  
-→ deve retornar `versao: v1.5.55` **ou superior** (cronômetro portal I16) e `postWriteActions` (POST só no GAS; FE usa GET — I15)
+→ deve retornar `versao: v1.5.63` (ou header do `.gs`) e `postWriteActions` (POST só no GAS; FE usa GET — I15)
 
 **URL morta (não usar):** `AKfycbzc...` → 404
 
@@ -47,7 +48,8 @@ https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPe
 
 | Artefato | Arquivo |
 |----------|---------|
-| GAS | `MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs` (header **v1.5.57**; produção ping **v1.5.56** até deploy) |
+| GAS | `MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs` (header **v1.5.63**) |
+| Payback | `MEMORIAL_PAYBACK_INVESTIMENTO.md` · deploy `DEPLOY_v1.5.61_PAYBACK.md` (atualizar v1.5.63) |
 | Clasp | `gas/Code.gs` (gerado por `scripts/sync-gas-to-clasp.ps1` — não editar à mão) |
 | Login | `mk-auth.js` + gate em `index.html` |
 | Versão FE | `mk-version.js`, `sw.js` |
@@ -129,9 +131,11 @@ Commits de referência: `3d9d106` (v1.7.25), `e1a56db` (Pacote E), `1454bc8` (fi
 - [x] **Fix auth sessão UI + idle** — v1.7.45–46 (I17, I18)
 - [x] **Pacote K.1** — RESPONSAVEIS populado (240 cadastros, import 06/06)
 - [x] **Pacote K.2** — merge GAS canônico (v1.5.57)
-- [~] **Pacote K.3–K.4** — FE v1.7.49 badge Cadastro; checklist tablet `CHECKLIST_PACOTE_K.md`
+- [~] **Pacote K.3–K.4** — FE v1.7.49+ badge Cadastro; checklist tablet `CHECKLIST_PACOTE_K.md`
+- [x] **Pacote M — Payback investimento** — GAS v1.5.60–63 + FE v1.7.63–64 (painel Dashboard)
+- [x] **Portal foto moldura** — `foto-moldura.html` + botão no portal (v1.7.62+)
 - [~] **Fase 4 WhatsApp / SMS auto — PAUSADA** (QR Code oficial — `DECISAO_COMUNICACAO_QR_CODE_2026-06.md`)
-- [ ] Pacote L — UX polish (tiles, sync header, Sistema)
+- [ ] **Pacote L** — UX polish (tiles, sync header, Sistema, QR balcão) ← **próximo pacote feature**
 - [~] **Fase 9 supervisor — PAUSADA**
 
 ---
@@ -140,8 +144,9 @@ Commits de referência: `3d9d106` (v1.7.25), `e1a56db` (Pacote E), `1454bc8` (fi
 
 | Sprint | Foco | Status |
 |--------|------|--------|
-| **1** | Estabilizar: checklist I.5, ping, testes | **ativa** |
-| **2** | **Pacote K** — K.1 código pronto; deploy GAS fora pico | **em andamento** |
+| **1** | Estabilizar: checklist I.5, tablets v1.7.64, testes | **ativa** |
+| **2** | **Pacote K** — K.1–K.2 feitos; **K.3–K.4 QA tablet** | **quase fechado** |
+| **2b** | **Pacote M Payback** — código em prod; fechar regras §10 memorial | **em andamento** |
 | **3** | **Pacote L** — UX polish + QR balcão | **próximo** (F4 pausado) |
 | ⏸ | F4 WhatsApp / SMS automático | conta bloqueada; usar QR |
 | ⏸ | F9 supervisor | pausada |
@@ -199,7 +204,7 @@ Commits de referência: `3d9d106` (v1.7.25), `e1a56db` (Pacote E), `1454bc8` (fi
 ## Validação rápida (pós-deploy)
 
 1. Ping GAS → `ok:true`, `versao` ≥ **v1.5.55** (I16 cronômetro)
-2. Tablet → `?force=1.7.46`, rodapé **Online v1.7.46**
+2. Tablet → `?force=1.7.64`, rodapé **Online v1.7.64**
 3. `.\scripts\pre-push-check.ps1` → status ok
 4. Balcão + celular mesma locação → timer ± **2 s** (I16)
 5. ADM liberar sessão → banner limpa sem Ctrl+F5 (I17)
