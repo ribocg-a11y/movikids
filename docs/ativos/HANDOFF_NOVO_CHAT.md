@@ -193,7 +193,9 @@ Guia completo: `DEPLOY_GAS_v1.5.32_AUTH.md`
 | Pacote M.8 `mk-operacao.js` v1.7.72 | ✅ código — **tablet operação** ⬜ |
 | Pacote M.9 `mk-home.js` v1.7.74 | ✅ código — **tablet home/painel** ⬜ |
 | GAS v1.5.64 cronômetro | ⬜ **Nova versão Web** (só você) |
-| Pacote M.10 `mk-admin.js` | ⬜ próximo técnico |
+| Pacote M.10 `mk-nav.js` (navegação) | ⬜ **próximo técnico** — ver `PACOTE_M_MODULARIZACAO.md` |
+| Pacote M.11 `mk-admin.js` (KPIs, caixa, config) | ⬜ após M.10 |
+| Pacote M.12–M.17 | ⬜ histórico, CRM, custos, avulso, core, enxugar inline |
 | FASE 1 homologação | ⬜ após validar M no tablet |
 | Payback negócio (§10 memorial) | ⬜ FASE 2 |
 | Pacote L UX polish | ⬜ FASE 3 |

@@ -80,6 +80,7 @@ https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPe
 | Versão | Entrega |
 |--------|---------|
 | **v1.7.78** | **I20 definitivo** — início otimista no ▶, `_localTimerStart`, `effectiveStartTs_`, botão imediato; validado tablet |
+| **Pacote M** | M.1–M.9 ✅ · `index.html` ~3.756 linhas · **M.10 `mk-nav.js` planejado** — `PACOTE_M_MODULARIZACAO.md` |
 | **v1.5.66** | **I20 GAS** — `iniciarTimer_` grava `clientTs` (clique) na col Y quando drift ≤ 2 min |
 | **v1.7.76** | I20 fase 1 — SMS separado do ▶; `iniciarContagemDireto_`; card pendente compacto |
 | **v1.5.64–65** | I20 col C/Y — cadastro Pendente; idempotência `iniciarTimer` |

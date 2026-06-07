@@ -22,7 +22,7 @@
 | **Porta de entrada** | Quem pode entrar | `mk-auth.js` — operador PIN, admin 1416, chip Turno |
 | **Dedos finos** | Scripts pontuais, emergência, testes | `scripts/testes/`, `scripts/liberar-*.html`, `google-drive-sheets-auth` |
 
-**Monólito em redução (Pacote M):** `index.html` **~4.419 linhas** (v1.7.72). Extraídos: `mk-app.css`, bootstrap, `mk-api.js`, `mk-sync.js`, `mk-sessao.js`, `mk-nova.js`, `mk-operacao.js`, `mk-drawer.js`, `mk-auth.js` — ver `PACOTE_M_MODULARIZACAO.md`.
+**Monólito em redução (Pacote M):** `index.html` **~3.756 linhas** (v1.7.78) — JS inline **~2.400** (admin/histórico/nav). Extraídos: M.1–M.9 (`mk-app.css` … `mk-home.js`). **Próximo:** M.10 `mk-nav.js`. Plano completo: `PACOTE_M_MODULARIZACAO.md`.
 
 ---
 
@@ -187,7 +187,7 @@ sequenceDiagram
 
 **Extraídos (bem definidos):** `mk-auth.js`, `mk-version.js`, `mk-update.js`, `mk-design.css`.
 
-**Dívida em redução:** JS ainda em `index.html` — Pacote M fases M.2+ (`PACOTE_M_MODULARIZACAO.md`).
+**Dívida em redução:** JS admin/gestão ainda em `index.html` — Pacote M fases **M.10–M.17** (`PACOTE_M_MODULARIZACAO.md`). Meta: index &lt; 1.100 linhas.
 
 ---
 

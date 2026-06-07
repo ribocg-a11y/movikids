@@ -191,7 +191,7 @@ Objetivo: balcão mais rápido; menos ruído visual. **Próximo pacote de featur
 |------|------------------|
 | **F4** WhatsApp / SMS auto | Entrega manual comprovada + conta estável |
 | **F9** Supervisor | K + L estáveis 30 dias |
-| Modularização `index.html` | **Pacote M** — M.1 ✅; M.2+ em `PACOTE_M_MODULARIZACAO.md` |
+| Modularização `index.html` | **Pacote M** — M.1–M.9 ✅ (~3.756 linhas); **M.10 `mk-nav.js` próximo** — plano M.10–M.17 em `PACOTE_M_MODULARIZACAO.md` |
 
 ---
 
