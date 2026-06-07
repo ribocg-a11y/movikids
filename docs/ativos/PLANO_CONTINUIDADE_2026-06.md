@@ -2,6 +2,7 @@
 
 **Data:** 07/06/2026 (revisão — payback M + prioridades)  
 **Produção:** FE **v1.7.64** · GAS **v1.5.63** (ping confirmado 07/06)  
+**Handoff novo chat:** **`HANDOFF_NOVO_CHAT.md`**  
 **Ordem de execução:** **`PLANO_PRIORIDADES_2026-06.md`** (prioridades por fase)  
 **Substitui como “próximo passo”:** seção 9 de `PLANO_PAUSA_MATURIDADE_2026-06.md` e seção 14 de `PLANO_MESTRE_REORGANIZADO_2026-06.md`  
 **Referências:** `ESTADO_ATUAL.md`, `MAPA_ERROS_FALHAS_BUGS.md`, `MEMORIAL_PAYBACK_INVESTIMENTO.md`

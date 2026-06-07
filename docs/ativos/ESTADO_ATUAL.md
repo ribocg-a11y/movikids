@@ -2,7 +2,8 @@
 
 Referência única para alinhamento local × produção.
 
-**Índice:** `../INDICE.md` · **Prioridades:** **`PLANO_PRIORIDADES_2026-06.md`** ← ler primeiro  
+**Handoff (novo chat):** **`HANDOFF_NOVO_CHAT.md`** ← ler primeiro  
+**Índice:** `../INDICE.md` · **Prioridades:** **`PLANO_PRIORIDADES_2026-06.md`**  
 **Planejamento ativo:** `PLANO_CONTINUIDADE_2026-06.md`  
 **Mapa de erros/bugs:** **`MAPA_ERROS_FALHAS_BUGS.md`**  
 **DNA visual:** `../referencia/DESIGN_DNA_MOVIKIDS.md`  
@@ -16,7 +17,7 @@ Referência única para alinhamento local × produção.
 
 ## ALERTA P0 (05/06/2026)
 
-**Nunca POST no `api()` do browser** — ver `INCIDENTE_POST_BROWSER_LANCAMENTO_2026-06-05.md`.  
+**Nunca POST no `api()` do browser** — ver `../arquivo/incidentes/INCIDENTE_POST_BROWSER_LANCAMENTO_2026-06-05.md`.  
 FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet obrigatório após mudança em `api()`.
 
 ---

@@ -3,7 +3,7 @@
 **Data:** 07/06/2026  
 **Função:** documento único de **o que fazer agora**, por ordem de prioridade.  
 **Local:** `docs/ativos/` · **Índice:** `../INDICE.md`  
-**Complementa:** `ESTADO_ATUAL.md`, `PLANO_CONTINUIDADE_2026-06.md`, `REGRAS_DE_PUBLICACAO_SEGURA.md`.
+**Handoff:** `HANDOFF_NOVO_CHAT.md` · **Complementa:** `ESTADO_ATUAL.md`, `PLANO_CONTINUIDADE_2026-06.md`, `REGRAS_DE_PUBLICACAO_SEGURA.md`.
 
 ---
 
@@ -28,6 +28,7 @@
 | 0.6 | `pre-push-check.ps1` verde | ✅ 07/06 |
 | 0.7 | Saneamento docs → `docs/` | ✅ 07/06 |
 | 0.8 | Saneamento código → `arquivo-historico/` + `scripts/testes/` | ✅ 07/06 |
+| 0.9 | Handoff ativo `HANDOFF_NOVO_CHAT.md` + `AGENTS.md` + regra Cursor | ✅ 07/06 |
 
 **Próximo passo imediato (Ops):** abrir tablet com `?force=1.7.64` → confirmar rodapé **v1.7.64** + chip Turno.
 
@@ -40,7 +41,7 @@
 | Camada | Repo (GitHub) | Produção (verificado) | Alinhado? |
 |--------|---------------|------------------------|-----------|
 | **Frontend** | **v1.7.64** (`mk-version.js`) | GitHub Pages publicado | ✅ |
-| **Service Worker** | v1.7.63 (`sw.js`) | — | ⚠️ corrigir → 1.7.64 |
+| **Service Worker** | v1.7.64 (`sw.js`) | GitHub Pages | ✅ |
 | **GAS** | **v1.5.63** (header `.gs`) | Ping **v1.5.63** (07/06) | ✅ |
 | **Deploy ID** | `AKfycbwakQ...` | Mesmo ID | ✅ |
 
@@ -61,17 +62,19 @@
 | **SMS gateway** | ✅ Produção manual | DJVJRL; **auto/F4 pausado** |
 | **Config frota/preços** | 🟡 Fallback GAS | Aba CONFIG sem JSON na planilha — usa constantes no `.gs` |
 | **CI local** | ✅ | `pre-push-check.ps1`; sem GitHub Actions |
-| **Documentação** | 🔴 Fragmentada | Vários docs defasados (ver §1.3) |
+| **Documentação** | ✅ Estruturada | Handoff ativo + `docs/ativos/` (ver §1.3) |
 
-### 1.3 Dívida documental (não confiar para versões)
+### 1.3 Fontes de verdade (usar nesta ordem)
 
-| Documento | Problema |
-|-----------|----------|
-| `ESTADO_ATUAL.md` | Cita FE v1.7.49 / GAS v1.5.57 — **atualizar** |
-| `PLANO_CONTINUIDADE_2026-06.md` | Cita v1.7.48 / v1.5.56 — **atualizar** |
-| `DEPLOY_GAS_v1.5.32_AUTH.md` | Cita v1.5.61 / v1.7.63 — falta v1.5.62–63 |
-| `docs/arquivo/obsoleto/` | CHANGELOG, ROLLBACK — **não usar** |
-| `DEPLOY_CLASP.md` (arquivo) | Trechos obsoletos — ver `DEPLOY_GAS` ativo |
+| Prioridade | Documento | Conteúdo |
+|------------|-----------|----------|
+| **1** | `HANDOFF_NOVO_CHAT.md` | Entrada para novo chat; produção; próximo passo |
+| **2** | **Este arquivo** | Fases, checklist vivo, prioridades |
+| **3** | `ESTADO_ATUAL.md` | Versões, pacotes, links, validação |
+| **4** | `mk-version.js` + header `.gs` + ping GAS | Versão em código e produção |
+| **5** | `DEPLOY_GAS_v1.5.32_AUTH.md` | Deploy GAS mestre (v1.5.63) |
+
+**Não usar para versão atual:** `docs/arquivo/obsoleto/`, `docs/arquivo/planos/HANDOFF_NOVO_CHAT_2026-06-05.md`, `docs/arquivo/deploy/` (histórico), `arquivo-historico/*.gs`.
 
 ### 1.4 Pacotes entregues (fechados)
 
@@ -212,6 +215,7 @@ Todos em `docs/ativos/` salvo indicação. Índice completo: `docs/INDICE.md`.
 
 | Tarefa | Ler primeiro |
 |--------|--------------|
+| **Novo chat** | `HANDOFF_NOVO_CHAT.md` → este arquivo |
 | Deploy GAS | `DEPLOY_GAS_v1.5.32_AUTH.md` + deploy específico |
 | Publicar FE | `REGRAS_DE_PUBLICACAO_SEGURA.md` + `pre-push-check.ps1` |
 | Incidente / bug | `MAPA_ERROS_FALHAS_BUGS.md` → `docs/arquivo/incidentes/` |

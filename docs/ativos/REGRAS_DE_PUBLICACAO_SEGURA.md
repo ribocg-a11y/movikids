@@ -17,7 +17,7 @@ Este documento e uma trava operacional. Nenhuma mudanca futura deve ser publicad
 3. **Nunca** declarar testes OK so com `Invoke-RestMethod POST` — rodar `scripts/testes/TESTE_PARIDADE_HTTP_BROWSER_GAS.ps1` e validar **lancamento no tablet**.
 4. Tablets devem mostrar **Online v1.7.35+** — `?force=1.7.31` ou anterior = versao quebrada.
 
-**Documentacao completa:** `../arquivo/incidentes/docs/arquivo/incidentes/INCIDENTE_POST_BROWSER_LANCAMENTO_2026-06-05.md`
+**Documentacao completa:** `../arquivo/incidentes/INCIDENTE_POST_BROWSER_LANCAMENTO_2026-06-05.md`
 
 ## Regra 1 - Declarar Escopo Antes de Mexer
 

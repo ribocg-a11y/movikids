@@ -1,0 +1,25 @@
+---
+description: Handoff MOVI KIDS — ler documentação ativa antes de qualquer trabalho no repo
+alwaysApply: true
+---
+
+# Continuidade MOVI KIDS
+
+Ao trabalhar neste repositório, **ler primeiro** (nesta ordem):
+
+1. `docs/ativos/HANDOFF_NOVO_CHAT.md` — produção, próximo passo, armadilhas
+2. `docs/ativos/PLANO_PRIORIDADES_2026-06.md` — checklist da fase ativa
+3. `docs/ativos/ESTADO_ATUAL.md` — versões e links canônicos
+4. `docs/ativos/REGRAS_DE_PUBLICACAO_SEGURA.md` — antes de commit/push/deploy
+
+Índice: `docs/INDICE.md` · Entrada raiz: `AGENTS.md` · `README.md`
+
+## Não usar como fonte de verdade
+
+- `docs/arquivo/planos/HANDOFF_NOVO_CHAT_2026-06-05.md` (defasado)
+- `docs/arquivo/obsoleto/`
+- `arquivo-historico/*.gs` (GAS legado)
+
+## Ao mudar versão ou fase
+
+Atualizar `HANDOFF_NOVO_CHAT.md` + checklist em `PLANO_PRIORIDADES` + `ESTADO_ATUAL.md` se aplicável.

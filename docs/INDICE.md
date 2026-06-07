@@ -6,6 +6,8 @@
 
 | Documento | Para quê |
 |-----------|----------|
+| [**HANDOFF_NOVO_CHAT.md**](ativos/HANDOFF_NOVO_CHAT.md) | **Novo chat Cursor** — contexto, próximo passo, bloco para colar |
+| [AGENTS.md](../AGENTS.md) | Instruções resumidas para agentes (raiz do repo) |
 | [PLANO_PRIORIDADES_2026-06.md](ativos/PLANO_PRIORIDADES_2026-06.md) | **O que fazer agora** (fases P0–P4) |
 | [ESTADO_ATUAL.md](ativos/ESTADO_ATUAL.md) | Versões em produção, links, pacotes |
 | [PLANO_CONTINUIDADE_2026-06.md](ativos/PLANO_CONTINUIDADE_2026-06.md) | Sprints e roadmap 90 dias |

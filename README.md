@@ -9,12 +9,18 @@ Sistema operacional para locações — balcão (tablet), portal do responsável
 | Frontend | **v1.7.64** — https://ribocg-a11y.github.io/movikids/?force=1.7.64 |
 | Apps Script | **v1.5.63** — ping `?action=ping` no deploy `AKfycbwakQ...` |
 
+## Novo chat / agente Cursor
+
+**Comece aqui:** [docs/ativos/HANDOFF_NOVO_CHAT.md](docs/ativos/HANDOFF_NOVO_CHAT.md) (bloco “Cole isto no novo chat”)  
+**Instruções agente:** [AGENTS.md](AGENTS.md)
+
 ## Documentação
 
 Toda a documentação está em **`docs/`**. Não use arquivos soltos na raiz (foram movidos em 07/06/2026).
 
 | Comece por | Caminho |
 |------------|---------|
+| **Handoff (novo chat)** | [docs/ativos/HANDOFF_NOVO_CHAT.md](docs/ativos/HANDOFF_NOVO_CHAT.md) |
 | **Prioridades e fases** | [docs/ativos/PLANO_PRIORIDADES_2026-06.md](docs/ativos/PLANO_PRIORIDADES_2026-06.md) |
 | **Estado e versões** | [docs/ativos/ESTADO_ATUAL.md](docs/ativos/ESTADO_ATUAL.md) |
 | **Índice completo** | [docs/INDICE.md](docs/INDICE.md) |
