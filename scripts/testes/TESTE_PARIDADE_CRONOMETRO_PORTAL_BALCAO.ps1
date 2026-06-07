@@ -6,6 +6,7 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+$RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
 
 function Invoke-MkApi {
   param([hashtable]$Params)
@@ -62,7 +63,7 @@ try {
   $ativos = @($ci.ativos)
   Add-CCheck "balcao.ativos" "ok" ("count=" + $ativos.Count)
 
-  $portalHtml = Join-Path $PSScriptRoot "acompanhar.html"
+  $portalHtml = Join-Path $RepoRoot "acompanhar.html"
   if (-not (Test-Path $portalHtml)) { throw "acompanhar.html ausente" }
   $src = Get-Content -Path $portalHtml -Raw -Encoding UTF8
   foreach ($needle in @('function canonLoc_', 'function calcStartTimestamp_', 'function restante(')) {
@@ -70,7 +71,7 @@ try {
   }
   Add-CCheck "fe.portal.canon" "ok" "canonLoc_ + calcStartTimestamp_ + restante"
 
-  $gasFile = Join-Path $PSScriptRoot "MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs"
+  $gasFile = Join-Path $RepoRoot "MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs"
   if (Test-Path $gasFile) {
     $gs = Get-Content -Path $gasFile -Raw -Encoding UTF8
     if ($gs -notmatch 'function buscarPortalResponsavel_[\s\S]{0,1200}timestampCanonico_') {

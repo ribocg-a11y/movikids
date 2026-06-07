@@ -3,6 +3,7 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+$RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
 
 function Invoke-PortalApi {
   param([hashtable]$Params)
@@ -52,7 +53,7 @@ try {
     Add-PCheck "portal.locacoes_array" "ok" "presente"
   }
 
-  $localHtml = Join-Path $PSScriptRoot "acompanhar.html"
+  $localHtml = Join-Path $RepoRoot "acompanhar.html"
   if (-not (Test-Path $localHtml)) { throw "acompanhar.html nao encontrado no repo" }
   $src = Get-Content -Path $localHtml -Raw -Encoding UTF8
   if ($src -notmatch 'mk-portal-page') { throw "acompanhar.html sem classe mk-portal-page" }
