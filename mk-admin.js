@@ -9,7 +9,6 @@ let adminCountdown  = ADMIN_IDLE_SEC;
 var kpiData         = null;
 let chartsRendered  = false;
 var chartDiario=null,chartExtrasDia=null,chartHistExt=null,chartHoras=null;
-const HIST_CACHE_TTL_MS = 120000;
 const ADMIN_PIN     = '1416';
 let pinBuffer       = '';
 
