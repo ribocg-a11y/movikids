@@ -1,6 +1,6 @@
 /* MOVI KIDS — cache buster pós mk-version.js (Pacote M.2) */
 (function () {
-  const CURRENT = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.67';
+  const CURRENT = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.68';
   const KEY = 'mk_loaded_version';
   function mkVerParts_(v) {
     return String(v || '0.0').split('.').map(function (n) { return parseInt(n, 10) || 0; });

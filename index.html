@@ -16,16 +16,16 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<script src="mk-stale-sync.js?v=1.7.67"></script>
-<script src="mk-version.js?v=1.7.67"></script>
-<script src="mk-api.js?v=1.7.67"></script>
+<script src="mk-stale-sync.js?v=1.7.68"></script>
+<script src="mk-version.js?v=1.7.68"></script>
+<script src="mk-api.js?v=1.7.68"></script>
 <link rel="stylesheet" href="mk-design.css">
 
-<script src="mk-cache-bust.js?v=1.7.67"></script>
+<script src="mk-cache-bust.js?v=1.7.68"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<link rel="stylesheet" href="mk-app.css?v=1.7.67">
+<link rel="stylesheet" href="mk-app.css?v=1.7.68">
 <!-- Firebase SDK — Realtime sync canonico para todos os dispositivos -->
-<script type="module" src="mk-firebase.js?v=1.7.67"></script>
+<script type="module" src="mk-firebase.js?v=1.7.68"></script>
 </head>
 
 <body>
@@ -1358,7 +1358,7 @@
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.67';
+const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.68';
 const PORTAL_RESPONSAVEL_URL = 'https://ribocg-a11y.github.io/movikids/acompanhar.html';
 
 let PRECOS = {
@@ -1606,26 +1606,7 @@ function trocarModoWhatsApp() {
 }
 
 /* api() + guards I15: mk-api.js (Pacote M.3) */
-
-// ═══════════════════════════════════════════════════════════
-// POLLING ADAPTATIVO GLOBAL (v1.6.30)
-// Definido no escopo global para ser acessível de qualquer lugar
-// 5s com sessões ativas → lag máximo entre dispositivos = 5s
-// 15s sem sessões → mantém GAS aquecido, reduz consumo de quota
-// ═══════════════════════════════════════════════════════════
-const _POLL_ACTIVE = 5000;   // 5s com sessões em andamento
-const _POLL_IDLE   = 15000;  // 15s sem sessões ativas
-let   _mainPollTimer = null;
-
-function agendarProximoPoll() {
-  clearTimeout(_mainPollTimer);
-  const temAtivos = Array.isArray(sessions) && sessions.some(s => s.startTimestamp > 0);
-  const intervalo = temAtivos ? _POLL_ACTIVE : _POLL_IDLE;
-  _mainPollTimer = setTimeout(() => {
-    if (document.visibilityState !== 'hidden') syncController();
-    agendarProximoPoll();
-  }, intervalo);
-}
+/* syncController + merge: mk-sync.js (Pacote M.4) */
 
 // ═══════════════════════════════════════════════════════════
 // INIT
@@ -1665,67 +1646,8 @@ async function init() {
   // Padrão: stale-while-revalidate + request deduplication + exponential backoff
   // Ref: como Notion, Figma e sistemas de alta disponibilidade funcionam
 
-  // Polling adaptativo iniciado — função global definida acima do init()
   agendarProximoPoll();
-
-  // BroadcastChannel — sync instantâneo entre abas no mesmo dispositivo
-  try {
-    const bc = new BroadcastChannel('movikids_sync');
-    bc.onmessage = (e) => {
-      if (e.data === 'invalidate' || e.data === 'sync') syncController(true, 0);
-    };
-    window._bc = bc;
-  } catch(e) {}
-  // FIX 4: helper para emitir invalidate após qualquer write
-  window.broadcastInvalidate = () => { try { window._bc?.postMessage('invalidate'); } catch(e) {} };
-
-  // VISIBILIDADE — só força sync se tab ficou oculta > 30s
-  document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'hidden') {
-      _wasHiddenAt = Date.now();
-    } else {
-      const hiddenMs = _wasHiddenAt ? Date.now() - _wasHiddenAt : 0;
-      _wasHiddenAt = null;
-      if (hiddenMs > 30000) syncController(true, 0);   // forçado se ausente > 30s
-      else syncController(false, 500);                  // suave se pouco tempo
-    }
-  });
-
-  // FOCO — debounce de 2s e só se último sync foi há > 20s
-  window.addEventListener('focus', () => {
-    const sinceLastSync = Date.now() - (_lastSyncAt || 0);
-    if (sinceLastSync > 20000) syncController(false, 2000);
-  });
-
-  // DASHBOARD auto-refresh — usa dados do syncController, sem call extra ao GAS
-  // (removido o carregarKPIs() separado — era uma call a mais por minuto)
-  setInterval(() => {
-    const dashPage = document.getElementById('page-dashboard');
-    if (dashPage && dashPage.classList.contains('active') &&
-        document.visibilityState === 'visible') {
-      syncController(false, 0);    // reutiliza dados em memória + busca fresco se stale
-    }
-  }, 60000);
-
-  // WATCHER OCIOSIDADE — só se idle > 5 min
-  setInterval(() => {
-    if (document.visibilityState !== 'visible') return;
-    const idleMs = Date.now() - _lastActivity;
-    if (idleMs > _IDLE_MS) {
-      _lastActivity = Date.now();
-      // FIX 9: idle watcher respeita backoff — não sobrescreve tentativa de recuperação
-      if (_syncBackoffMs === 0) syncController(true, 0);
-      else syncController(false, 0); // suave se em backoff
-    }
-  }, 60000);
-
-  // VERIFICAR VERSAO — a cada 1 min durante estabilizacao operacional.
-  // LIVE HEAL v1.6.37: telas abertas se corrigem sozinhas.
-  // Bypass do cache local para reduzir divergencia entre dispositivos em operacao.
-  setInterval(() => {
-    if (document.visibilityState !== 'visible') return;
-    syncController(true, 0);
-  }, 30000);
+  if (typeof mkSyncWireEvents_ === 'function') mkSyncWireEvents_();
 
   /* verificarNovaVersao: polling em mk-update.js (45s + ao voltar à aba) */
 
@@ -1735,263 +1657,6 @@ async function init() {
     if (adminPage && adminPage.classList.contains('active')) atualizarDiagnostico();
   }, 60000);
 } // fim inicializarApp
-
-// ── SYNC CONTROLLER STATE v1.6.25 (overhaul) ──────────────────────────────
-let _syncFailCount  = 0;
-let _syncInFlight   = false;
-let _syncPending    = false;
-let _syncDebounce   = null;
-let _syncBackoffMs  = 0;
-let _lastSyncAt     = 0;
-let _lastActivity   = Date.now();
-let _wasHiddenAt    = null;
-let _smsStatusSweepAt = 0;
-const _FAIL_THRESH  = 3;
-const _BACKOFF_MAX  = 60000;
-let _lastFailAt     = 0;
-// FIX 3: safety timeout — libera lock se api() travar além de 35s
-let _syncSafetyTimer = null;
-
-// SYNC CONTROLLER: ponto único de entrada para todas as sincronizações
-// Substitui chamadas diretas a sincronizarServidor() de múltiplos lugares
-function syncController(force = false, delayMs = 0) {
-  if (delayMs > 0) {
-    // Debounce: cancela o timer anterior, programa novo
-    clearTimeout(_syncDebounce);
-    _syncDebounce = setTimeout(() => syncController(force, 0), delayMs);
-    return;
-  }
-  if (_syncInFlight) {
-    // Request deduplication: já há uma call em andamento
-    if (force) _syncPending = true;  // no máximo 1 na fila
-    return;
-  }
-  sincronizarServidor(force);
-}
-const _IDLE_MS      = 5 * 60 * 1000; // 5 minutos
-
-// Rastreia atividade do operador
-['click','keydown','touchstart','scroll','mousemove'].forEach(ev =>
-  document.addEventListener(ev, () => { _lastActivity = Date.now(); }, { passive: true })
-);
-
-async function sincronizarServidor(force = false) {
-  // ── GUARD 1: nunca duas chamadas GAS simultâneas ─────────────────────
-  if (_syncInFlight) {
-    if (force) _syncPending = true;
-    return;
-  }
-  _syncInFlight = true;
-  // FIX 3: safety timeout — se api() travar, libera o lock após 35s
-  clearTimeout(_syncSafetyTimer);
-  _syncSafetyTimer = setTimeout(() => {
-    if (_syncInFlight) {
-      console.warn('[Sync] safety timeout — liberando lock travado');
-      _syncInFlight = false;
-      _syncFailCount++;
-      _lastFailAt = Date.now();
-      _syncBackoffMs = Math.min(_syncBackoffMs ? _syncBackoffMs * 2 : 5000, _BACKOFF_MAX);
-    }
-  }, 35000);
-
-  try {
-    const CACHE_KEY = 'mk_inicio_cache';
-    // v1.6.37: TTL curto para nao mascarar alteracoes feitas em outro dispositivo.
-    const CACHE_TTL = 5000;
-
-    // ── STALE-WHILE-REVALIDATE ─────────────────────────────────────────
-    if (!force) {
-      const raw = localStorage.getItem(CACHE_KEY);
-      if (raw) {
-        try {
-          const { data, ts } = JSON.parse(raw);
-          const age = Date.now() - ts;
-          // FIX 2: _lastSyncAt atualizado mesmo em cache hit
-          _lastSyncAt = Math.max(_lastSyncAt, ts);
-          if (age < CACHE_TTL) {
-            aplicarDadosInicio(data);
-            setStatus(true);
-            _syncInFlight = false; // libera antes de retornar
-            return;
-          }
-          // Cache stale: serve imediatamente e vai buscar fresco
-          aplicarDadosInicio(data);
-          setStatus(true);
-        } catch(e) {}
-      }
-    } else {
-      try { localStorage.removeItem('mk_inicio_cache'); } catch(e) {}
-    }
-
-    // ── VERIFICA BACKOFF (não sobrecarregar GAS após falhas) ───────────
-    if (_syncBackoffMs > 0) {
-      const sinceLastFail = Date.now() - (_lastFailAt || 0);
-      if (sinceLastFail < _syncBackoffMs) return; // ainda em backoff
-    }
-
-    // Só mostra "Verificando..." se estava Offline (evita piscar)
-    if (_syncFailCount > 0) setStatus(null);
-
-    const d = await api({ action: 'carregarInicio', ...apiParamsComAuth_() });
-
-    if (!d.ok) {
-      _syncFailCount++;
-      _lastFailAt   = Date.now();
-      _syncBackoffMs = Math.min(_syncBackoffMs ? _syncBackoffMs * 2 : 5000, _BACKOFF_MAX);
-      if (_syncFailCount >= _FAIL_THRESH) setStatus(false);
-      return;
-    }
-
-    // ── SUCESSO ────────────────────────────────────────────────────────
-    _syncFailCount = 0;
-    _syncBackoffMs = 0;
-    _lastSyncAt    = Date.now();
-    // FIX 5: reescalonar poll imediatamente após sync (adapta à presença de ativos)
-    if (typeof agendarProximoPoll === 'function') agendarProximoPoll();
-    try { localStorage.setItem(CACHE_KEY, JSON.stringify({ data: d, ts: Date.now() })); } catch(e) {}
-    setStatus(true);
-    aplicarDadosInicio(d);
-
-  } catch(e) {
-    _syncFailCount++;
-    _lastFailAt   = Date.now();
-    _syncBackoffMs = Math.min(_syncBackoffMs ? _syncBackoffMs * 2 : 5000, _BACKOFF_MAX);
-    console.error('[Sync]', e.message || e);
-    if (_syncFailCount >= _FAIL_THRESH) setStatus(false);
-
-  } finally {
-    clearTimeout(_syncSafetyTimer); // FIX 3: cancela safety se call terminou normal
-    _syncInFlight = false;
-    if (_syncPending) {
-      _syncPending = false;
-      setTimeout(() => sincronizarServidor(true), 300);
-    }
-  }
-}
-
-function mergeSessaoCanonica(serverSession, localSession = {}) {
-  const status = String(serverSession.status || '').trim();
-  let startTimestamp = Number(serverSession.startTimestamp || 0);
-  const nowTs = Date.now();
-  const isAtiva = status === 'Ativa';
-  const isPendente = status === 'Pendente';
-  if (isPendente) {
-    startTimestamp = 0;
-  } else if ((isAtiva && (!startTimestamp || startTimestamp < 1000000000000)) ||
-      (startTimestamp > 0 && startTimestamp > nowTs + 300000)) {
-    startTimestamp = calcStartTimestamp(serverSession.data, serverSession.horaInicio);
-  }
-  const serverMins = Number(serverSession.mins || 0);
-  const hasServerExtMins = Object.prototype.hasOwnProperty.call(serverSession, 'extendedMins');
-  const hasServerExtValor = Object.prototype.hasOwnProperty.call(serverSession, 'extendedValor');
-  const extendedMins = Number(hasServerExtMins ? serverSession.extendedMins || 0 : localSession.extendedMins || 0);
-  const extendedValor = Number(hasServerExtValor ? serverSession.extendedValor || 0 : localSession.extendedValor || 0);
-  const originalMins = Number(serverSession.originalMins || serverMins);
-  const totalMins = Number(serverSession.totalMins || (originalMins + extendedMins));
-
-  return {
-    ...serverSession,
-    status,
-    startTimestamp,
-    mins: totalMins,
-    originalMins,
-    extendedMins,
-    extendedValor,
-    started: isAtiva && startTimestamp > 0,
-
-    // Somente flags locais de UX podem sobreviver ao estado canonico.
-    alertFired5: Boolean(localSession.alertFired5) || Boolean(serverSession.smsFlags && serverSession.smsFlags.alerta),
-    alertFiredExp: Boolean(localSession.alertFiredExp) || Boolean(serverSession.smsFlags && serverSession.smsFlags.esgotado),
-    extraWaSentAt: localSession.extraWaSentAt || localStorage.getItem(extraWaKey_(serverSession)) ||
-      (serverSession.smsFlags && serverSession.smsFlags.esgotado ? Date.now() : null),
-    smsStatus: higienizarSmsStatusSessao_(serverSession.smsStatus || localSession.smsStatus || null),
-    smsFlags: serverSession.smsFlags || localSession.smsFlags || null
-  };
-}
-
-function sanitizarDadosInicioOperador_(d) {
-  if (!d || mkExibirFinanceiro_()) return d;
-  if (d.statsHoje) d.statsHoje = { n: d.statsHoje.n };
-  if (Array.isArray(d.encHoje)) {
-    d.encHoje = d.encHoje.map(e => {
-      const o = Object.assign({}, e);
-      delete o.valorTotal;
-      return o;
-    });
-  }
-  if (Array.isArray(d.ativos)) {
-    d.ativos = d.ativos.map(s => {
-      const o = Object.assign({}, s);
-      delete o.valorPlano;
-      delete o.adicionalPorMin;
-      return o;
-    });
-  }
-  return d;
-}
-
-function aplicarDadosInicio(d) {
-  try {
-    if (!d || !Array.isArray(d.ativos)) return;
-    if (d.operacaoConfig) aplicarOperacaoConfig_(d.operacaoConfig);
-    d = sanitizarDadosInicioOperador_(d);
-    window._lastSyncSource = d.fonte || 'gas';
-    window._lastCanonicalRows = d.ativos.length;
-    if (d.fonte === 'firebase') window._fbLastUpdate = Date.now();
-
-    // Atualiza sessões ativas
-    const stored = JSON.parse(localStorage.getItem('mk_sessions') || '[]');
-    const storedMap = {};
-    stored.forEach(s => storedMap[s.rowIndex] = s);
-
-    // FIX 6: limpar entradas obsoletas — sessões que o servidor não retornou mais
-    const serverRows = new Set(d.ativos.map(s => s.rowIndex));
-    const cleanedStored = stored.filter(s => serverRows.has(s.rowIndex));
-    if (cleanedStored.length !== stored.length) {
-      try { localStorage.setItem('mk_sessions', JSON.stringify(cleanedStored)); } catch(e) {}
-    }
-
-    sessions = d.ativos.map(s => mergeSessaoCanonica(s, storedMap[s.rowIndex] || {}));
-    saveSessions();
-
-    // Atualiza stats
-    if (d.statsHoje) {
-      statsHoje.n = d.statsHoje.n;
-      if (mkExibirFinanceiro_()) statsHoje.fat = Number(d.statsHoje.fat) || 0;
-      else statsHoje.fat = 0;
-    }
-
-    renderCards();
-    updateStats();
-
-    // Encerradas hoje e KPIs do dia devem vir do GAS/planilha.
-    // O Firebase e um canal vivo parcial; se ele vier vazio, nao pode apagar o total do dia.
-    if (d.encHoje && d.fonte !== 'firebase') renderEncHoje(d.encHoje);
-    atualizarVeiculoGrid(); // Atualiza disponibilidade após sync com servidor
-
-    // Custos do dia
-    if (d.custosHoje) { custosHoje = d.custosHoje; renderCustos(); }
-    else loadCustosHoje();
-  // Reagendar polling com intervalo correto (ativo=5s / idle=15s)
-  agendarProximoPoll();
-  } catch(e) {
-    console.error('aplicarDadosInicio:', e);
-    setStatus(false);
-  }
-}
-
-function setStatus(online) {
-  const dot = document.getElementById('status-dot');
-  const txt = document.getElementById('status-txt');
-  // v1.6.5: só mostra Offline após _FAIL_THRESH falhas — evita falso-offline em soluço de rede
-  const efectivo = (online === false && _syncFailCount < _FAIL_THRESH) ? null : online;
-  if (dot && txt) {
-    if (efectivo===null) { dot.className='dot-online';dot.style.background='#FFB74D';txt.textContent='Verificando...'; }
-    else if (efectivo)   { dot.className='dot-online';dot.style.background='';txt.textContent='Online'; }
-    else                 { dot.className='dot-offline';dot.style.background='';txt.textContent='Offline'; }
-  }
-  syncSidebarStatus(efectivo);
-}
 
 function setDefaultDate() {
   const hoje = new Date();
@@ -6792,8 +6457,9 @@ async function salvarLancamentoAvulso() {
 }
 
 </script>
-<script src="mk-update.js?v=1.7.67"></script>
-<script src="mk-auth.js?v=1.7.67"></script>
+<script src="mk-sync.js?v=1.7.68"></script>
+<script src="mk-update.js?v=1.7.68"></script>
+<script src="mk-auth.js?v=1.7.68"></script>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
   if (typeof mkAuthBoot === 'function') {

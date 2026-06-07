@@ -12,7 +12,7 @@
 | **M.1** | CSS legado → `mk-app.css` | FE **v1.7.65** | ✅ 07/06 |
 | **M.2** | `mk-stale-sync.js`, `mk-cache-bust.js`, `mk-firebase.js` | FE **v1.7.66** | ✅ 07/06 |
 | **M.3** | `mk-api.js` (api + guards I15) | FE **v1.7.67** | ✅ 07/06 |
-| M.4 | `mk-sync.js` (sync + Firebase merge) | — | ⬜ |
+| **M.4** | `mk-sync.js` (sync + Firebase merge) | FE **v1.7.68** | ✅ 07/06 |
 | M.5+ | `mk-sessao`, `mk-nova`, `mk-admin`, … | — | ⬜ |
 
 ---
@@ -100,9 +100,33 @@ Tablet: `?force=1.7.65` — Home, Nova locação, Dashboard (visual igual).
 
 Tablet: `?force=1.7.67` — **Nova locação** (zona P0 I15).
 
-### Próximo (M.4)
+## M.4 — Sync + merge Firebase (v1.7.68)
 
-Extrair `syncController` + merge Firebase → `mk-sync.js`.
+### O que mudou
+
+| Antes | Depois |
+|-------|--------|
+| ~380 linhas sync inline | `mk-sync.js` (~290 linhas) |
+| `index.html` ~6.268 linhas | **~5.968 linhas** |
+
+### Ordem de carregamento
+
+1. Script inline principal (sessions, UI, páginas)
+2. **`mk-sync.js`** — após inline, antes de `mk-update` / `mk-auth`
+3. `mk-firebase.js` (module, head) chama `aplicarDadosInicio` em runtime
+
+### Arquivos
+
+- `mk-sync.js` (novo) — `syncController`, `sincronizarServidor`, `aplicarDadosInicio`, `mergeSessaoCanonica`, `mkSyncWireEvents_`
+- `sw.js` — NETWORK_FIRST em `mk-sync.js`
+
+### Validação
+
+Tablet: `?force=1.7.68` — cards sync multi-dispositivo + status Online/Offline.
+
+### Próximo (M.5+)
+
+Extrair sessão, nova locação, admin em fatias menores.
 
 ---
 

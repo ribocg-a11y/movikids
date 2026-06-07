@@ -11,7 +11,7 @@
 | Parte | O que é no MOVI KIDS | Arquivos / camada |
 |-------|----------------------|-------------------|
 | **Cérebro** | Regras de negócio, dados, financeiro, auth servidor | `MOVIKIDS_Code_...gs` (GAS) + planilha `MOVIKIDS_Planilha_Base` |
-| **Coração** | Pulso operacional — sync balcão, timer, locações ativas | `carregarInicio` (GAS) + `syncController` (index.html) + Firebase `sessoes` |
+| **Coração** | Pulso operacional — sync balcão, timer, locações ativas | `carregarInicio` (GAS) + `syncController` (`mk-sync.js`) + Firebase `sessoes` |
 | **Sistema nervoso** | Comunicação FE ↔ GAS | `api()` em `mk-api.js` + `doGet`/`dispatchMoviAction_` (GAS) |
 | **Rosto / identidade** | Versão, URL GAS, cache | `mk-version.js`, `sw.js`, bloco anti-stale no `index.html` |
 | **Imunológico** | Travas P0, CI, incidentes | `pre-push-check.ps1`, `.cursor/rules/`, `REGRAS_DE_PUBLICACAO_SEGURA.md` |
@@ -22,7 +22,7 @@
 | **Porta de entrada** | Quem pode entrar | `mk-auth.js` — operador PIN, admin 1416, chip Turno |
 | **Dedos finos** | Scripts pontuais, emergência, testes | `scripts/testes/`, `scripts/liberar-*.html`, `google-drive-sheets-auth` |
 
-**Monólito em redução (Pacote M):** `index.html` **~6.268 linhas** (v1.7.67). Extraídos: `mk-app.css`, `mk-stale-sync.js`, `mk-cache-bust.js`, `mk-firebase.js`, `mk-api.js`, `mk-auth.js` — ver `PACOTE_M_MODULARIZACAO.md`.
+**Monólito em redução (Pacote M):** `index.html` **~5.968 linhas** (v1.7.68). Extraídos: `mk-app.css`, `mk-stale-sync.js`, `mk-cache-bust.js`, `mk-firebase.js`, `mk-api.js`, `mk-sync.js`, `mk-auth.js` — ver `PACOTE_M_MODULARIZACAO.md`.
 
 ---
 
@@ -33,7 +33,7 @@ movikids-github/
 ├── CÉREBRO + NERVOSO
 │   └── MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs   ← único GAS canônico
 ├── CORAÇÃO + MÃOS (balcão)
-│   ├── index.html          ← app principal (UI + sync + páginas)
+│   ├── index.html          ← app principal (UI + páginas)
 │   ├── mk-auth.js          ← auth operadores/admin (extraído v1.7.48+)
 │   ├── mk-update.js        ← reload seguro pós-update
 │   ├── mk-version.js       ← versão FE + URL GAS
@@ -41,6 +41,7 @@ movikids-github/
 │   ├── mk-cache-bust.js    ← cache bust pós versão (M.2)
 │   ├── mk-firebase.js      ← RTDB sessoes (M.2)
 │   ├── mk-api.js           ← api() + guards I15 (M.3)
+│   ├── mk-sync.js          ← syncController + merge (M.4)
 │   └── sw.js               ← PWA cache
 ├── PERNAS (outros canais)
 │   ├── acompanhar.html     ← portal responsável

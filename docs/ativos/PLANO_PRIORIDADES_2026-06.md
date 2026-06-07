@@ -42,8 +42,8 @@
 
 | Camada | Repo (GitHub) | Produção (verificado) | Alinhado? |
 |--------|---------------|------------------------|-----------|
-| **Frontend** | **v1.7.67** (`mk-version.js`) | GitHub Pages após push | ✅ |
-| **Service Worker** | v1.7.67 (`sw.js`) | — | ✅ |
+| **Frontend** | **v1.7.68** (`mk-version.js`) | GitHub Pages após push | ✅ |
+| **Service Worker** | v1.7.68 (`sw.js`) | — | ✅ |
 | **GAS** | **v1.5.63** (header `.gs`) | Ping **v1.5.63** (07/06) | ✅ |
 | **Deploy ID** | `AKfycbwakQ...` | Mesmo ID | ✅ |
 
