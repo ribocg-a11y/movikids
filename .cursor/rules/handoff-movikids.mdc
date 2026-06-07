@@ -31,14 +31,19 @@ Ao trabalhar neste repositório, **ler primeiro** (nesta ordem):
 
 Índice: `docs/INDICE.md` · Entrada raiz: `AGENTS.md` · `README.md`
 
-## Acessos (memória rápida)
+## Agente vs usuário (memória rápida)
 
-- **Operador:** PIN próprio · sem KPIs financeiros
-- **Admin:** PIN **1416** · Dashboard, liberar sessão, reset PIN
-- **Agente pode:** código, testes, `git push` (se pedido), `clasp push`
-- **Só humano:** Nova versão Web GAS no editor Google · tablet no balcão
-- **Nunca:** `clasp deploy`, POST no browser (I15), commit de segredos
-- **Pausado:** F4 WhatsApp auto, F9 supervisor
+**Agente SOZINHO:** ler docs, editar repo, `pre-push-check`, ping GAS, testes `scripts/testes/`, validar versões no código.
+
+**Agente SE USUÁRIO PEDIR:** `git commit`, `git push`, `clasp push`, mudanças em `api()`/auth.
+
+**SÓ O USUÁRIO:** Nova versão Web GAS (editor Google), tablet balcão, planilha, Script Properties, aprovar push na main.
+
+**Agente NÃO TEM:** login Google, editor Apps Script, tablet físico.
+
+**NUNCA:** `clasp deploy`, POST browser (I15), commit de segredos.
+
+**Matriz completa:** `docs/ativos/ACESSOS_E_AUTORIZACOES.md` §7.
 
 ## Não usar como fonte de verdade
 

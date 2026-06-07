@@ -31,9 +31,10 @@ Continuo o MOVI KIDS. Repo: C:\Users\riboc\Documents\Codex\2026-05-30\files-ment
 
 ### O que o agente faz sozinho (não precisa repetir)
 
-- Ler: este arquivo → `PLANO_PRIORIDADES` → `ESTADO_ATUAL` → `REGRAS` → `ACESSOS_E_AUTORIZACOES`
+- Ler: este arquivo → `PLANO_PRIORIDADES` → `ESTADO_ATUAL` → `REGRAS` → `ACESSOS_E_AUTORIZACOES` (§7 = agente vs você)
 - Ignorar handoff antigo em `docs/arquivo/planos/`
 - Informar: FE **v1.7.64**, GAS **v1.5.63**, próximo passo do checklist
+- Deixar claro: **agente** prepara código/testes; **você** publica GAS (Nova versão) e valida tablet
 
 ---
 

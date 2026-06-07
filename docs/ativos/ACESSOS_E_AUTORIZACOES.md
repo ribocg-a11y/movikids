@@ -101,42 +101,130 @@ Operador nas 5 escritas críticas: deve enviar `operador` / `operadorId` (GET no
 
 ---
 
-## 7. O que o agente Cursor deve assumir
+## 7. Agente Cursor vs você — matriz completa
 
-**Pode fazer sem pedir autorização extra:**
+Esta seção responde: **o que o agente faz sozinho, o que valida, o que publica e o que só você faz.**
 
-- Ler docs em `docs/ativos/`
-- Editar código, rodar testes locais, `pre-push-check`
-- `git commit` / `git push` **se o usuário pedir**
-- `clasp push` (nunca deploy)
+### 7.1 O que configuramos para o agente (acessos no seu PC)
 
-**Deve pedir confirmação explícita do usuário:**
+| Acesso / ferramenta | Onde está | Para quê |
+|---------------------|-----------|----------|
+| **Pasta do repo** | `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github` | Ler e editar todo o código e docs |
+| **Terminal (PowerShell)** | Cursor integrado | `git`, `.\scripts\pre-push-check.ps1`, testes `scripts/testes/`, ping GAS |
+| **Regras Cursor** | `.cursor/rules/*.mdc` | Handoff, GAS caminho PC, proibir POST browser, design DNA |
+| **Git local + remote** | `.git` → `ribocg-a11y/movikids` | `status`, `diff`, `commit`, `push` (push pode pedir sua aprovação no Cursor) |
+| **Clasp** | `.clasp.json` → projeto `19SIhkX9...` | `clasp push` via `scripts/deploy-gas.ps1` — **se** `clasp login` já estiver feito no PC |
+| **GitHub CLI (`gh`)** | Instalado no PC (se configurado) | PRs, issues, checks — quando você pedir tarefa GitHub |
+| **HTTP público GAS** | URL `exec?action=...` | Ping, testes readonly nos `.ps1` — **sem login Google** |
+| **Browser MCP** | Cursor | Abrir GitHub Pages, URLs públicas — **não** loga na sua conta Google |
+| **AGENTS.md + HANDOFF** | Raiz e `docs/ativos/` | Entrada automática em todo chat novo na pasta |
 
-- Deploy GAS (**Nova versão** — lembrar que é passo manual no editor)
-- Mudanças em auth, PIN, perfis, `api()`
-- Reativar F4 (WhatsApp auto) ou F9 (supervisor)
-- Operações destrutivas na planilha ou limpeza em produção
-- `git push` para `main` se o usuário não pediu
-
-**Nunca fazer:**
-
-- `clasp deploy` ou novo Deploy ID GAS
-- POST JSON no `api()` do browser (I15)
-- Commitar senhas, PINs novos ou credenciais
-- Inventar versão ou caminho do `.gs`
+**O agente NÃO tem:** login Google, editor Apps Script, planilha Sheets, tablet do balcão, conta WhatsApp/SMS.
 
 ---
 
-## 8. Checklist rápido para novo chat
+### 7.2 EU (agente) — faço sozinho
 
-Quando o usuário pedir continuidade, o agente deve saber:
+Sem precisar que você cole caminhos, versões ou docs:
+
+| Ação | Como |
+|------|------|
+| Ler handoff, prioridades, estado, regras, este arquivo | Abrir `docs/ativos/` |
+| Explorar e editar código | `index.html`, `.gs`, `mk-*.js`, `sw.js`, docs |
+| Rodar validação local | `.\scripts\pre-push-check.ps1` |
+| Rodar testes HTTP readonly | `scripts/testes/TESTE_*.ps1` |
+| Validar versão no código | `mk-version.js`, header `.gs`, `sw.js` |
+| Validar GAS no ar (leitura) | `Invoke-RestMethod` no `?action=ping` |
+| Preparar deploy GAS | `.\scripts\deploy-gas.ps1` → `clasp push` (código no Google, **não** publica Web) |
+| Informar caminho do `.gs` no PC | Regra `gas-deploy-caminho-pc.mdc` |
+| Criar branch, `git add`, `git commit` | Quando você pedir commit |
+| Abrir app público no browser MCP | `ribocg-a11y.github.io/movikids/?force=...` |
+
+---
+
+### 7.3 EU (agente) — faço só se você pedir explicitamente
+
+| Ação | Por quê pedir |
+|------|----------------|
+| `git push` para `main` | Publica FE no GitHub Pages — impacto produção |
+| `git commit` | Sua regra: commit só quando você pede |
+| `clasp push` | Envia código ao Google — você confirma que quer |
+| Mudar `api()`, auth, PIN, perfis | Zona crítica (I15, I17–I19) |
+| Limpar locações / corrigir financeiro em prod | APIs com `adminPin=1416` — impacto real |
+| Criar PR (`gh pr create`) | Publicação no GitHub |
+| Reativar F4 ou F9 | Explicitamente pausados |
+
+O Cursor pode **pedir sua aprovação** num card antes de `push` na `main` — isso é normal.
+
+---
+
+### 7.4 EU (agente) — valido vs não valido
+
+| Posso validar sozinho | Não substitui você |
+|----------------------|-------------------|
+| Ping GAS (`versao`, `ok`) | **Nova versão Web** no editor — ping só muda depois disso |
+| `pre-push-check.ps1` verde | Tablet físico no balcão |
+| Testes `.ps1` (HTTP servidor) | Nova locação real no tablet (I15) |
+| Versões alinhadas no repo | Cache PWA / ícone instalado no tablet |
+| App no browser MCP (desktop) | Chip Turno, operador logado no tablet |
+| Sintaxe / lints nos arquivos editados | Planilha INVESTIMENTO / CONFIG preenchida corretamente |
+
+**Regra:** teste PowerShell POST/GET **não prova** o tablet — checklist manual continua obrigatório.
+
+---
+
+### 7.5 EU (agente) — publico vs preparo
+
+| Etapa | Quem publica de fato |
+|-------|----------------------|
+| **Frontend** (GitHub Pages) | Agente faz `git push` **se você pediu** → Pages atualiza sozinho |
+| **GAS código** no projeto Google | Agente pode `clasp push` **se você pediu** |
+| **GAS Web App em produção** | **Só você** — Editor → Implantar → Nova versão → mesmo Deploy ID |
+| **Tablet na versão nova** | **Só você / Ops** — `?force=versão` ou reinstalar PWA |
+
+Fluxo típico: **agente prepara** → **você publica GAS** (1 clique Nova versão) → **você confirma tablet**.
+
+---
+
+### 7.6 VOCÊ — sempre seu (agente não substitui)
+
+| Ação | Onde |
+|------|------|
+| **Nova versão Web GAS** | [Editor Apps Script](https://script.google.com/home/projects/19SIhkX9Tk7FiJA1JXu1OrUwssHdr3H5zc8q3rOjmBvqgWfXuHlk8xyf8/edit) → Implantar → `AKfycbwakQ...` |
+| **Colar `.gs` manualmente** | Alternativa ao clasp — Ctrl+A no arquivo do PC → Código.gs |
+| **Tablet balcão** | Abrir `?force=1.7.64`, chip Turno, teste lançamento |
+| **Planilha** | MOVIKIDS_Planilha_Base — INVESTIMENTO, OPERADORES, CONFIG |
+| **Script Properties SMS** | Projeto GAS → Configurações → Propriedades |
+| **Aprovar push / comandos sensíveis** | Card de aprovação do Cursor quando aparecer |
+| **`clasp login`** (se expirar) | Terminal no seu PC — uma vez |
+
+---
+
+### 7.7 NUNCA (nem agente nem você)
+
+| Proibido | Motivo |
+|----------|--------|
+| `clasp deploy` | I1 — quebrou URL / caixa |
+| Novo Deploy ID GAS | Regra 8 — usar só `AKfycbwakQ...` |
+| POST JSON no `api()` do browser | I15 — quebra tablet |
+| Commitar senhas / tokens novos | Segurança |
+
+---
+
+## 8. Resumo em uma frase (novo chat)
+
+**Agente:** código, docs, testes, ping, preparar push/clasp — **você:** Nova versão GAS, tablet, planilha, OK de publicação.
+
+---
+
+## 9. Checklist rápido para novo chat
 
 1. **Operação balcão** = operador + PIN; **gestão** = admin 1416.
-2. **Publicar FE** = agente; **publicar GAS** = humano no editor.
-3. **Tablet** = Ops; agente só documenta `?force=versão`.
+2. **Publicar FE** = agente com seu pedido; **publicar GAS Web** = você no editor.
+3. **Tablet** = você/Ops; agente documenta e valida ping/repo.
 4. **Supervisor e WhatsApp auto** = pausados.
-5. Detalhe de incidentes auth → `INCIDENTE_AUTH_OPERADORES_2026-06-04.md`.
+5. **Matriz completa** = seção 7 deste arquivo.
 
 ---
 
-*Revisar ao mudar auth, deploy ou papéis de operador.*
+*Revisar ao mudar auth, deploy, clasp ou ferramentas do Cursor.*

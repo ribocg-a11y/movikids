@@ -26,15 +26,25 @@ Leia **nesta ordem**:
 
 Índice completo: [`docs/INDICE.md`](docs/INDICE.md)
 
-## Acessos (resumo)
+## Agente vs você (resumo)
 
-| Papel app | Entrada | Gestão financeira |
-|-----------|---------|-------------------|
-| Operador | Nome + PIN | Não (Home sem KPIs) |
-| Admin | PIN **1416** | Sim (Dashboard, APIs admin) |
-| Portal | Telefone | Só suas locações |
+| Eu (agente) sozinho | Só com seu pedido | Só você |
+|---------------------|-------------------|---------|
+| Ler docs, editar código, `pre-push-check`, ping GAS, testes `.ps1` | `git commit`, `git push`, `clasp push` | Nova versão Web GAS no editor |
+| Validar versões no repo | Mudanças em `api()` / auth | Tablet balcão `?force=` |
+| Preparar deploy (sync + clasp push) | Limpar testes / corrigir prod | Planilha, Script Properties SMS |
 
-**GAS Nova versão** = só humano no editor Google. **Agente:** código + `git push` + `clasp push` (nunca `clasp deploy`).
+**Nunca:** `clasp deploy`, POST no browser, commit de segredos.
+
+Detalhe completo: [`ACESSOS_E_AUTORIZACOES.md`](docs/ativos/ACESSOS_E_AUTORIZACOES.md) §7.
+
+## Papéis no app (resumo)
+
+| Papel | Entrada |
+|-------|---------|
+| Operador | Nome + PIN |
+| Admin | PIN **1416** |
+| Portal | Telefone |
 
 ## Produção atual
 
