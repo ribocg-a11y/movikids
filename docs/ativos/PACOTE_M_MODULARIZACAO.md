@@ -6,11 +6,12 @@
 
 ---
 
-## Panorama atual (v1.7.79)
+## Panorama atual (v1.7.80)
 
 | Artefato | Linhas | Papel |
 |----------|--------|-------|
-| `index.html` (total) | **~3.556** | HTML ~1.360 + JS inline **~2.196** |
+| `index.html` (total) | **~2.342** | HTML ~1.360 + JS inline **~780** |
+| `mk-admin.js` | 1.563 | Admin PIN, KPIs, caixa, config (M.11) |
 | `mk-nav.js` | 148 | Navegação + sidebar (M.10) |
 | `mk-operacao.js` | 736 | Operação balcão (M.8) |
 | `mk-nova.js` | 634 | Nova locação (M.6) |
@@ -56,7 +57,7 @@ pie title JS inline restante por dominio (estimativa)
 | **M.8** | `mk-operacao.js` | v1.7.72 | ✅ |
 | **M.9** | `mk-home.js` (cards, painel, encHoje) | v1.7.74 | ✅ |
 | **M.10** | `mk-nav.js` (navegação + sidebar) | v1.7.79 | ✅ |
-| **M.11** | `mk-admin.js` (PIN, KPIs, caixa, dashboard, config) | v1.7.80 | ⬜ **próximo** |
+| **M.11** | `mk-admin.js` (PIN, KPIs, caixa, dashboard, config) | v1.7.80 | ✅ |
 | **M.12** | `mk-historico.js` (período, analytics, ranking) | v1.7.81 | ⬜ |
 | **M.13** | `mk-relacionamento.js` (CRM K.3) | v1.7.82 | ⬜ |
 | **M.14** | `mk-custos.js` | v1.7.83 | ⬜ |
@@ -539,5 +540,5 @@ flowchart TB
 - Handoff: `HANDOFF_NOVO_CHAT.md` (próximo técnico = M.11)
 - Auth admin PIN: `ACESSOS_E_AUTORIZACOES.md`
 
-*Próxima ação: **M.11 `mk-admin.js`** + validação tablet M.10 (`?force=1.7.79`).*
+*Próxima ação: **M.12 `mk-historico.js`** + validação tablet M.10+M.11 (`?force=1.7.80`).*
 

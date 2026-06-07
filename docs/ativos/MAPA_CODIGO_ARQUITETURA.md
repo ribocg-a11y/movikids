@@ -22,7 +22,7 @@
 | **Porta de entrada** | Quem pode entrar | `mk-auth.js` — operador PIN, admin 1416, chip Turno |
 | **Dedos finos** | Scripts pontuais, emergência, testes | `scripts/testes/`, `scripts/liberar-*.html`, `google-drive-sheets-auth` |
 
-**Monólito em redução (Pacote M):** `index.html` **~3.556 linhas** (v1.7.79) — JS inline **~2.200** (admin/histórico). Extraídos: M.1–M.10 (`mk-app.css` … `mk-nav.js`). **Próximo:** M.11 `mk-admin.js`. Plano: `PACOTE_M_MODULARIZACAO.md`.
+**Monólito em redução (Pacote M):** `index.html` **~2.342 linhas** (v1.7.80) — JS inline **~780** (histórico/avulso/core). Extraídos: M.1–M.11 (`mk-app.css` … `mk-admin.js`). **Próximo:** M.12 `mk-historico.js`. Plano: `PACOTE_M_MODULARIZACAO.md`.
 
 ---
 
@@ -47,6 +47,7 @@ movikids-github/
 │   ├── mk-drawer.js        ← Drawer + encerrar (M.7)
 │   ├── mk-home.js          ← Cards + painel (M.9)
 │   ├── mk-nav.js           ← showPage + sidebar (M.10)
+│   ├── mk-admin.js         ← PIN, KPIs, caixa, config (M.11)
 │   └── sw.js               ← PWA cache
 ├── PERNAS (outros canais)
 │   ├── acompanhar.html     ← portal responsável

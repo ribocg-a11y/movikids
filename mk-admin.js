@@ -1,0 +1,1563 @@
+﻿/* MOVI KIDS - admin gestao: PIN, KPIs, caixa, config, sistema (Pacote M.11) */
+
+// ADMIN — Estado, PIN, Timeout
+// ═══════════════════════════════════════════════════════════
+var isAdmin         = false;
+let adminTimerInt   = null;
+const ADMIN_IDLE_SEC = 60 * 60; // 1 hora sem atividade (alinha com mk-auth)
+let adminCountdown  = ADMIN_IDLE_SEC;
+var kpiData         = null;
+let chartsRendered  = false;
+var chartDiario=null,chartExtrasDia=null,chartHistExt=null,chartHoras=null;
+const HIST_CACHE_TTL_MS = 120000;
+const ADMIN_PIN     = '1416';
+let pinBuffer       = '';
+
+// ── PIN ──────────────────────────────────────────────────────
+function abrirAdmin() {
+  if (isAdmin) { showPage('home'); return; }
+  if (typeof mkAuthIsAdmin === 'function' && mkAuthIsAdmin()) {
+    adminLogin();
+    return;
+  }
+  if (typeof mkAuthIsSupervisor === 'function' && mkAuthIsSupervisor()) {
+    showSupervisorSidebar();
+    irAdmin('caixa');
+    return;
+  }
+  pinBuffer = '';
+  atualizarDots();
+  document.getElementById('pin-modal').classList.add('show');
+}
+
+function fecharPin() {
+  document.getElementById('pin-modal').classList.remove('show');
+  pinBuffer = '';
+  atualizarDots();
+}
+
+function pinKey(d) {
+  if (pinBuffer.length >= 4) return;
+  pinBuffer += d;
+  atualizarDots();
+  if (pinBuffer.length === 4) setTimeout(verificarPin, 150);
+}
+
+function pinDel() {
+  pinBuffer = pinBuffer.slice(0, -1);
+  atualizarDots();
+}
+
+function atualizarDots(erro) {
+  for (let i=0;i<4;i++) {
+    const el = document.getElementById('pd'+i);
+    el.className = 'pin-dot';
+    if (erro) el.classList.add('error');
+    else if (i < pinBuffer.length) el.classList.add('filled');
+  }
+}
+
+function verificarPin() {
+  if (pinBuffer === ADMIN_PIN) {
+    fecharPin();
+    adminLogin();
+  } else {
+    atualizarDots(true);
+    navigator.vibrate && navigator.vibrate([80,40,80]);
+    setTimeout(() => { pinBuffer=''; atualizarDots(); }, 800);
+  }
+}
+
+// ── LOGIN/LOGOUT ─────────────────────────────────────────────
+function adminLogin() {
+  isAdmin = true;
+  window.isAdmin = true;
+  const admSess = { id: 'ADMIN', nome: 'Administrador', role: 'admin', hasPin: true, ativo: true };
+  try {
+    sessionStorage.setItem('mk_auth_session_v1', JSON.stringify(admSess));
+    sessionStorage.setItem('mk_auth_session', JSON.stringify(admSess));
+    if (typeof window.mkPersistAuthSession === 'function') window.mkPersistAuthSession();
+  } catch (e) { /* ignore */ }
+  const app = document.getElementById('app');
+  if (app) app.style.display = 'flex';
+  const gate = document.getElementById('mk-auth-gate');
+  if (gate) gate.style.display = 'none';
+  adminCountdown = ADMIN_IDLE_SEC;
+  if (typeof mkAuthTouchActivity_ === 'function') mkAuthTouchActivity_();
+  ['click', 'keydown', 'touchstart', 'scroll', 'mousemove'].forEach(ev => {
+    document.addEventListener(ev, resetAdminTimer, { passive: true });
+  });
+  adminTimerInt = setInterval(tickAdmin, 1000);
+  showAdminSidebar();
+  showPage('home');
+  if (!kpiData) carregarKPIs();
+  try { localStorage.removeItem('mk_inicio_cache'); } catch(e) {}
+  if (typeof syncController === 'function') syncController(true, 0);
+  carregarHistRelatorios();
+  carregarConfig(); // Fase 6: carrega templates WA
+  if (typeof refreshOperadoresAdmin_ === 'function') refreshOperadoresAdmin_();
+  if (typeof atualizarOperadorUI_ === 'function') atualizarOperadorUI_();
+  if (typeof mkAuthRefreshSessaoTurno_ === 'function') mkAuthRefreshSessaoTurno_();
+  if (typeof applyRoleNav_ === 'function') applyRoleNav_();
+  else {
+    const gerBtn = document.getElementById('sb-gerenciar-btn');
+    if (gerBtn) gerBtn.style.display = 'none';
+  }
+}
+
+function adminLogout() {
+  const sessaoAdmin = typeof mkAuthGetSession === 'function' && mkAuthGetSession() &&
+    mkAuthGetSession().role === 'admin';
+  isAdmin = false;
+  window.isAdmin = false;
+  clearInterval(adminTimerInt);
+  ['click', 'keydown', 'touchstart', 'scroll', 'mousemove'].forEach(ev => {
+    document.removeEventListener(ev, resetAdminTimer);
+  });
+  hideAdminSidebar();
+  statsHoje.fat = 0;
+  const chipEl = document.getElementById('admin-home-chip');
+  if (chipEl) chipEl.hidden = true;
+  if (typeof showAdminHomeKpis === 'function') showAdminHomeKpis(null);
+  try { localStorage.removeItem('mk_inicio_cache'); } catch(e) {}
+  if (typeof mkAuthExitAdmin_ === 'function') mkAuthExitAdmin_();
+  if (!sessaoAdmin) {
+    if (typeof syncController === 'function') syncController(true, 0);
+    showPage('home');
+    if (typeof atualizarOperadorUI_ === 'function') atualizarOperadorUI_();
+    if (typeof mkAuthRefreshSessaoTurno_ === 'function') mkAuthRefreshSessaoTurno_();
+    toast('Modo administrativo encerrado', 'warning');
+  }
+}
+
+function fmtAdminTimer_(sec) {
+  const m = Math.floor(sec / 60);
+  const s = sec % 60;
+  return String(m) + ':' + String(s).padStart(2, '0');
+}
+
+function resetAdminTimer() {
+  if (!isAdmin) return;
+  adminCountdown = ADMIN_IDLE_SEC;
+  if (typeof mkAuthTouchActivity_ === 'function') mkAuthTouchActivity_();
+}
+
+function tickAdmin() {
+  if (!isAdmin) return;
+  if (typeof mkHasLocacaoAbertaNoTablet_ === 'function' && mkHasLocacaoAbertaNoTablet_()) {
+    const t = fmtAdminTimer_(adminCountdown);
+    document.querySelectorAll('.admin-timer').forEach(el => { el.textContent = t; });
+    return;
+  }
+  adminCountdown--;
+  const t = fmtAdminTimer_(adminCountdown);
+  document.querySelectorAll('.admin-timer').forEach(el => { el.textContent = t; });
+  if (adminCountdown <= 0) {
+    if (typeof trocarOperador === 'function') trocarOperador('inatividade');
+    else adminLogout();
+  }
+}
+
+function irAdmin(page) {
+  resetAdminTimer();
+  if (typeof sbSetAdminNavOpen_ === 'function') sbSetAdminNavOpen_(true, true);
+  if (window.innerWidth < 1024 && typeof mobMenuClose_ === 'function') mobMenuClose_();
+  showPage(page);
+  if (page === 'dashboard') {
+    // Busca dados frescos do servidor — re-renderiza gráficos ao terminar (fix race condition)
+    carregarKPIs();
+  }
+  if (page === 'relatorio') {
+    initRelMesSel();
+    carregarHistRelatorios();
+  }
+  if (page === 'config') { irParaConfig(); }
+  if (page === 'caixa') inicializarCaixa();
+  if (page === 'operadores' && typeof refreshOperadoresAdmin_ === 'function') refreshOperadoresAdmin_();
+  if (page === 'admin') {
+    if (!kpiData) carregarKPIs();
+    else atualizarHubAdmin_();
+  }
+  if (page === 'sistema') {
+    setTimeout(atualizarDiagnostico, 100);
+    setTimeout(carregarResumoOperacaoConfig_, 120);
+    if (!kpiData) carregarKPIs();
+  }
+}
+
+const OPCFG_TIPOS_ = ['Carro', 'Triciclo', 'Pelúcia'];
+const OPCFG_PLANOS_ = ['10min', '20min', '30min', '40min', '60min', '3h'];
+let opCfgEditorTab_ = 'Carro';
+let opCfgPreviewTab_ = 'Carro';
+let opCfgDraftPrecos_ = null;
+
+function opCfgInferTipo_(nome) {
+  const n = String(nome || '');
+  if (n.indexOf('Triciclo') >= 0) return 'Triciclo';
+  if (n.indexOf('Pel') >= 0) return 'Pelúcia';
+  return 'Carro';
+}
+
+function opCfgEmptyPrecos_() {
+  const out = {};
+  OPCFG_TIPOS_.forEach(tipo => {
+    out[tipo] = {};
+    OPCFG_PLANOS_.forEach(pl => { out[tipo][pl] = { valor: 0, mins: 0, adicional: 0 }; });
+  });
+  return out;
+}
+
+function opCfgNormalizePrecos_(src) {
+  const out = opCfgEmptyPrecos_();
+  if (!src || typeof src !== 'object') return out;
+  OPCFG_TIPOS_.forEach(tipo => {
+    const plans = src[tipo] || {};
+    OPCFG_PLANOS_.forEach(pl => {
+      const c = plans[pl];
+      if (!c) return;
+      out[tipo][pl] = {
+        valor: Number(c.valor != null ? c.valor : c.v),
+        mins: Number(c.mins != null ? c.mins : c.m),
+        adicional: Number(c.adicional != null ? c.adicional : c.a)
+      };
+    });
+  });
+  return out;
+}
+
+function opCfgDraftPrecosEnsure_() {
+  if (!opCfgDraftPrecos_) opCfgDraftPrecos_ = opCfgEmptyPrecos_();
+  return opCfgDraftPrecos_;
+}
+
+function opCfgSavePrecosPanelToDraft_() {
+  const precos = opCfgDraftPrecosEnsure_();
+  document.querySelectorAll('.mk-opcfg-p-val').forEach(inp => {
+    const tipo = inp.getAttribute('data-tipo');
+    const pl = inp.getAttribute('data-plano');
+    if (!tipo || !pl || !precos[tipo]) return;
+    precos[tipo][pl].valor = Number(inp.value || 0);
+  });
+  document.querySelectorAll('.mk-opcfg-p-mins').forEach(inp => {
+    const tipo = inp.getAttribute('data-tipo');
+    const pl = inp.getAttribute('data-plano');
+    if (!tipo || !pl || !precos[tipo]) return;
+    precos[tipo][pl].mins = Number(inp.value || 0);
+  });
+  document.querySelectorAll('.mk-opcfg-p-adic').forEach(inp => {
+    const tipo = inp.getAttribute('data-tipo');
+    const pl = inp.getAttribute('data-plano');
+    if (!tipo || !pl || !precos[tipo]) return;
+    precos[tipo][pl].adicional = Number(inp.value || 0);
+  });
+}
+
+function opCfgSyncTextareasFromVisual_() {
+  const taV = document.getElementById('mk-opcfg-veiculos-ta');
+  const taP = document.getElementById('mk-opcfg-precos-ta');
+  const data = opCfgCollectFromDom_(false);
+  if (taV) taV.value = data.veiculos.join('\n');
+  if (taP) taP.value = JSON.stringify(data.precos, null, 2);
+}
+
+function opCfgRenderVeiculos_(veiculosOverride) {
+  const box = document.getElementById('mk-opcfg-veic-list');
+  if (!box) return;
+  const list = veiculosOverride || opCfgCollectVeiculosFromDom_();
+  const rows = list.map((nome, i) => {
+    const tipo = opCfgInferTipo_(nome);
+    return `<div class="mk-opcfg-veic-row" data-idx="${i}">
+      <input type="text" class="form-input mk-opcfg-veic-nome" value="${escHtml(nome)}" placeholder="Ex: Carro 04" maxlength="40">
+      <select class="form-input mk-opcfg-veic-tipo">
+        ${OPCFG_TIPOS_.map(t => `<option value="${t}"${t === tipo ? ' selected' : ''}>${t}</option>`).join('')}
+      </select>
+      <button type="button" class="btn btn-secondary" style="padding:6px 8px" onclick="opCfgRemoveVeiculo_(${i})" title="Remover">✕</button>
+    </div>`;
+  }).join('');
+  box.innerHTML = rows || '<p style="font-size:12px;color:var(--txt3);margin:0">Nenhum veículo — adicione abaixo.</p>';
+}
+
+function opCfgRenderPrecosTabs_() {
+  const tabs = document.getElementById('mk-opcfg-precos-tabs');
+  if (!tabs) return;
+  tabs.innerHTML = OPCFG_TIPOS_.map(t =>
+    `<button type="button" class="mk-opcfg-tab${t === opCfgEditorTab_ ? ' sel' : ''}" onclick="opCfgSelectPrecosTab_('${t}')">${t}</button>`
+  ).join('');
+  opCfgRenderPrecosPanel_();
+}
+
+function opCfgCollectVeiculosFromDom_() {
+  const veiculos = [];
+  document.querySelectorAll('#mk-opcfg-veic-list .mk-opcfg-veic-row').forEach(row => {
+    const nomeInp = row.querySelector('.mk-opcfg-veic-nome');
+    const nome = nomeInp ? String(nomeInp.value || '').trim() : '';
+    if (nome) veiculos.push(nome);
+  });
+  return veiculos;
+}
+
+function opCfgRenderPrecosPanel_() {
+  const panel = document.getElementById('mk-opcfg-precos-panel');
+  if (!panel) return;
+  const precos = opCfgDraftPrecosEnsure_();
+  const tipo = opCfgEditorTab_;
+  const rows = OPCFG_PLANOS_.map(pl => {
+    const c = (precos[tipo] && precos[tipo][pl]) || { valor: 0, mins: 0, adicional: 0 };
+    return `<tr>
+      <td><strong>${PLANO_LABELS[pl] || pl}</strong></td>
+      <td><input type="number" min="0" step="0.01" class="mk-opcfg-p-val" data-tipo="${tipo}" data-plano="${pl}" value="${c.valor || ''}" placeholder="0"></td>
+      <td><input type="number" min="1" step="1" class="mk-opcfg-p-mins" data-tipo="${tipo}" data-plano="${pl}" value="${c.mins || ''}" placeholder="0"></td>
+      <td><input type="number" min="0" step="0.01" class="mk-opcfg-p-adic" data-tipo="${tipo}" data-plano="${pl}" value="${c.adicional || ''}" placeholder="0"></td>
+    </tr>`;
+  }).join('');
+  panel.innerHTML = `<table class="mk-opcfg-precos-table">
+    <thead><tr><th>Plano</th><th>Valor R$</th><th>Minutos</th><th>Extra/min R$</th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table>`;
+}
+
+function opCfgRenderPreviewTabs_() {
+  const tabs = document.getElementById('mk-opcfg-prev-tabs');
+  if (!tabs) return;
+  tabs.innerHTML = OPCFG_TIPOS_.map(t =>
+    `<button type="button" class="mk-opcfg-prev-tab${t === opCfgPreviewTab_ ? ' sel' : ''}" onclick="opCfgSelectPreviewTab_('${t}')">${t}</button>`
+  ).join('');
+}
+
+function opCfgAtualizarPreview_() {
+  opCfgRenderPreviewTabs_();
+  const box = document.getElementById('mk-opcfg-preview');
+  if (!box) return;
+  const precos = opCfgCollectFromDom_(false).precos;
+  const tipo = opCfgPreviewTab_;
+  const plans = precos[tipo] || {};
+  const badgeCls = tipo === 'Pelúcia' ? 'pelucia' : '';
+  box.innerHTML = OPCFG_PLANOS_.map(pl => {
+    const v = plans[pl] || {};
+    const val = Number(v.valor || 0);
+    const mins = Number(v.mins || 0);
+    const adic = Number(v.adicional || 0);
+    if (!(val > 0) || !(mins > 0)) {
+      return `<div class="plano-btn ${badgeCls}" style="opacity:.45">
+        <div><div class="pb-nome">${PLANO_LABELS[pl] || pl}</div><div class="pb-det">incompleto</div></div>
+      </div>`;
+    }
+    return `<div class="plano-btn ${badgeCls}">
+      <div>
+        <div class="pb-nome">${PLANO_LABELS[pl] || pl}</div>
+        <div class="pb-det">${mins} min · R$ ${String(adic).replace('.', ',')}/min extra</div>
+      </div>
+      <div class="pb-val">R$ ${val}</div>
+    </div>`;
+  }).join('');
+  opCfgSyncTextareasFromVisual_();
+}
+
+function opCfgRenderEditor_() {
+  opCfgRenderVeiculos_();
+  opCfgRenderPrecosTabs_();
+  opCfgAtualizarPreview_();
+}
+
+function opCfgSelectPrecosTab_(tipo) {
+  opCfgSavePrecosPanelToDraft_();
+  opCfgEditorTab_ = tipo;
+  opCfgRenderPrecosTabs_();
+}
+
+function opCfgSelectPreviewTab_(tipo) {
+  opCfgPreviewTab_ = tipo;
+  opCfgAtualizarPreview_();
+}
+
+function opCfgAddVeiculo_() {
+  opCfgSavePrecosPanelToDraft_();
+  const veiculos = opCfgCollectVeiculosFromDom_();
+  const n = veiculos.length + 1;
+  const tipo = opCfgEditorTab_ || 'Carro';
+  const prefix = tipo === 'Triciclo' ? 'Triciclo' : (tipo === 'Pelúcia' ? 'Pelúcia' : 'Carro');
+  veiculos.push(prefix + ' ' + String(n).padStart(2, '0'));
+  opCfgRenderVeiculos_(veiculos);
+  opCfgSyncTextareasFromVisual_();
+}
+
+function opCfgRemoveVeiculo_(idx) {
+  opCfgSavePrecosPanelToDraft_();
+  const veiculos = opCfgCollectVeiculosFromDom_();
+  veiculos.splice(idx, 1);
+  opCfgRenderVeiculos_(veiculos);
+  opCfgSyncTextareasFromVisual_();
+}
+
+function opCfgLoadIntoEditor_(cfg) {
+  const veiculos = Array.isArray(cfg.veiculos_validos) ? cfg.veiculos_validos.slice() : [];
+  let precos = null;
+  if (cfg.precosFe) {
+    const gasPrecos = {};
+    Object.keys(cfg.precosFe).forEach(tipo => {
+      gasPrecos[tipo] = {};
+      Object.entries(cfg.precosFe[tipo] || {}).forEach(([plano, c]) => {
+        gasPrecos[tipo][plano] = { valor: c.v, mins: c.m, adicional: c.a };
+      });
+    });
+    precos = gasPrecos;
+  } else if (cfg.precos) {
+    precos = cfg.precos;
+  }
+  const taV = document.getElementById('mk-opcfg-veiculos-ta');
+  const taP = document.getElementById('mk-opcfg-precos-ta');
+  opCfgDraftPrecos_ = opCfgNormalizePrecos_(precos);
+  if (taV) taV.value = veiculos.join('\n');
+  if (taP) taP.value = JSON.stringify(opCfgDraftPrecos_, null, 2);
+  opCfgRenderVeiculos_(veiculos);
+  opCfgRenderPrecosTabs_();
+  opCfgAtualizarPreview_();
+}
+
+function opCfgCollectFromDom_(validate) {
+  opCfgSavePrecosPanelToDraft_();
+  const veiculos = opCfgCollectVeiculosFromDom_();
+  const precos = JSON.parse(JSON.stringify(opCfgDraftPrecosEnsure_()));
+  if (validate) {
+    if (!veiculos.length) throw new Error('Adicione pelo menos um veículo.');
+    const seen = {};
+    veiculos.forEach(v => {
+      if (seen[v]) throw new Error('Veículo duplicado: ' + v);
+      seen[v] = true;
+    });
+    let temPlano = false;
+    OPCFG_TIPOS_.forEach(tipo => {
+      OPCFG_PLANOS_.forEach(pl => {
+        const c = precos[tipo][pl];
+        if (c.valor > 0 && c.mins > 0) temPlano = true;
+        if ((c.valor > 0 || c.mins > 0 || c.adicional > 0) && !(c.valor > 0 && c.mins > 0)) {
+          throw new Error('Plano incompleto: ' + tipo + ' · ' + (PLANO_LABELS[pl] || pl));
+        }
+      });
+    });
+    if (!temPlano) throw new Error('Informe valor e minutos em pelo menos um plano.');
+  }
+  return { veiculos, precos };
+}
+
+async function carregarResumoOperacaoConfig_() {
+  const fonte = document.getElementById('mk-opcfg-fonte');
+  const veic = document.getElementById('mk-opcfg-veic');
+  const tipos = document.getElementById('mk-opcfg-tipos');
+  const alert = document.getElementById('mk-opcfg-alert');
+  const editor = document.getElementById('mk-opcfg-editor');
+  const btnToggle = document.getElementById('mk-btn-toggle-opcfg');
+  const isAdm = (typeof mkAuthIsAdmin === 'function' && mkAuthIsAdmin()) || !!window.isAdmin;
+  if (btnToggle) btnToggle.style.display = isAdm ? '' : 'none';
+  if (editor && !isAdm) editor.style.display = 'none';
+  try {
+    const d = await api({ action: 'diagnosticoConfigOperacional' });
+    if (!d || !d.ok) return;
+    if (fonte) fonte.textContent = (d.fonte || '—') + (d.okConfig ? ' ✓' : ' (fallback)');
+    if (veic) veic.textContent = String((d.resumo && d.resumo.veiculos) || '—');
+    if (tipos) tipos.textContent = ((d.resumo && d.resumo.tipos) || []).join(', ') || '—';
+    if (alert) {
+      const probs = d.problemas || [];
+      if (probs.length) {
+        alert.style.display = 'block';
+        alert.textContent = probs.join(' · ');
+      } else {
+        alert.style.display = 'none';
+        alert.textContent = '';
+      }
+    }
+    if (isAdm) {
+      const cfg = await api({ action: 'carregarOperacaoConfig' });
+      if (cfg && cfg.ok && cfg.config) opCfgLoadIntoEditor_(cfg.config);
+    }
+  } catch (e) { console.warn('carregarResumoOperacaoConfig_', e); }
+}
+
+function toggleEditorOperacaoConfig_() {
+  const el = document.getElementById('mk-opcfg-editor');
+  if (!el) return;
+  const open = el.style.display === 'none' || !el.style.display;
+  el.style.display = open ? 'block' : 'none';
+  if (open) opCfgRenderEditor_();
+}
+
+async function salvarOperacaoConfigAdmin_() {
+  if (!(typeof mkAuthIsAdmin === 'function' && mkAuthIsAdmin()) && !window.isAdmin) {
+    toast('Somente administrador pode alterar frota e preços', 'error');
+    return;
+  }
+  let veiculos = [];
+  let precos = null;
+  const editorOpen = document.getElementById('mk-opcfg-editor')?.style.display !== 'none';
+  try {
+    if (editorOpen) {
+      const data = opCfgCollectFromDom_(true);
+      veiculos = data.veiculos;
+      precos = data.precos;
+      opCfgSyncTextareasFromVisual_();
+    } else {
+      const taV = document.getElementById('mk-opcfg-veiculos-ta');
+      const taP = document.getElementById('mk-opcfg-precos-ta');
+      veiculos = (taV && taV.value ? taV.value.split('\n') : []).map(v => v.trim()).filter(Boolean);
+      if (taP && taP.value.trim()) precos = JSON.parse(taP.value);
+    }
+  } catch (e) {
+    toast(e.message || 'Dados inválidos', 'error');
+    return;
+  }
+  try {
+    const d = await api({
+      action: 'salvarOperacaoConfigAdmin',
+      veiculos_validos_json: JSON.stringify(veiculos),
+      precos_json: precos ? JSON.stringify(precos) : undefined,
+      ...apiParamsComAuth_()
+    });
+    if (!d || !d.ok) {
+      toast((d && d.erro) || 'Erro ao salvar', 'error');
+      return;
+    }
+    if (d.config) aplicarOperacaoConfig_(d.config);
+    toast(d.mensagem || 'Configuração salva', 'success');
+    atualizarVeiculoGrid();
+    renderPainel();
+    carregarResumoOperacaoConfig_();
+    syncController(true, 0);
+  } catch (e) {
+    toast('Erro de conexão', 'error');
+  }
+}
+
+// ── KPIs ─────────────────────────────────────────────────────
+async function carregarKPIs() {
+  if (window._kpiInFlight) return;  // evita calls GAS simultâneos
+  window._kpiInFlight = true;
+  try {
+    const d = await api({ action: 'buscarKPIsAdmin', ...apiParamsComAuth_() });
+    if (!d.ok) return;
+    kpiData = d;
+    if (typeof renderSemanasChart_ === 'function') renderSemanasChart_(d);
+    // Re-renderiza gráficos com dados frescos (fix: gráficos ficavam com dados velhos)
+    const dashPage = document.getElementById('page-dashboard');
+    if (dashPage && dashPage.classList.contains('active')) renderCharts(d);
+    showAdminHomeKpis(d);
+    if (typeof atualizarHubAdmin_ === 'function') atualizarHubAdmin_();
+  } catch(e) { console.error('carregarKPIs:', e); }
+  finally { window._kpiInFlight = false; }
+}
+// ── NOVO DASHBOARD v1.6.9 ────────────────────────────────────
+const MESES_DB = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+const R2 = v => 'R$ ' + Math.round(Number(v)).toString().replace(/\B(?=(\d{3})+(?!\d))/g,'.');
+const pct2 = (v, tot) => tot > 0 ? Math.round(v / tot * 100) : 0;
+const setText2 = (id, txt) => { const e = document.getElementById(id); if (e) e.textContent = txt; };
+
+function mudarMesDash() {
+  const sel = document.getElementById('dash-mes-sel');
+  if (!sel || !kpiData) return;
+  _semanaSelIdx = null;
+  carregarKPIsComMes(parseInt(sel.value), kpiData.anoAtual || new Date().getFullYear());
+}
+
+async function carregarKPIsComMes(mes, ano) {
+  try {
+    const p = { action: 'buscarKPIsAdmin', ...apiParamsComAuth_() };
+    if (mes) p.mes = mes;
+    if (ano) p.ano = ano;
+    const d = await api(p);
+    if (!d.ok) return;
+    kpiData = d;
+    renderCharts(d);
+    if (typeof showAdminHomeKpis === 'function') showAdminHomeKpis(d);
+    if (typeof atualizarHubAdmin_ === 'function') atualizarHubAdmin_();
+  } catch(e) { console.error('carregarKPIsComMes:', e); }
+}
+
+let _semanaSelIdx = null;
+
+function renderSemanasChart_(d) {
+  const grid = document.getElementById('mk-semana-grid');
+  if (!grid) return;
+  const semanas = d.porSemana || [];
+  if (!semanas.length) {
+    grid.innerHTML = '<p style="color:var(--txt3);font-size:12px;grid-column:1/-1">Sem dados de semanas neste mês.</p>';
+    return;
+  }
+  if (_semanaSelIdx == null || _semanaSelIdx >= semanas.length) {
+    _semanaSelIdx = typeof d.melhorSemanaIdx === 'number' ? d.melhorSemanaIdx : 0;
+  }
+  grid.innerHTML = semanas.map((sem, idx) => {
+    const active = idx === _semanaSelIdx ? ' active' : '';
+    const fatPct = sem.pctFat || 0;
+    const nPct = sem.pctN || 0;
+    return `<button type="button" class="mk-semana-card${active}" role="tab" aria-selected="${idx === _semanaSelIdx}"
+      onclick="selecionarSemanaKpi_(${idx})" onmouseenter="selecionarSemanaKpi_(${idx},true)">
+      <div class="mk-sem-hdr"><span class="mk-sem-lbl">${sem.label}</span><span class="mk-sem-per">${sem.periodo}</span></div>
+      <div class="mk-sem-fat">${R2(sem.fat || 0)}</div>
+      <div class="mk-sem-n">${sem.n || 0} atendimento(s)</div>
+      <div class="mk-sem-bar-row"><span class="mk-sem-bar-lbl">R$</span><div class="mk-sem-bar-bg"><div class="mk-sem-bar-fill fat" style="width:${fatPct}%"></div></div></div>
+      <div class="mk-sem-bar-row"><span class="mk-sem-bar-lbl">Atd</span><div class="mk-sem-bar-bg"><div class="mk-sem-bar-fill n" style="width:${nPct}%"></div></div></div>
+    </button>`;
+  }).join('');
+  atualizarSemanaDetalhe_(semanas[_semanaSelIdx], d);
+  const foot = document.getElementById('mk-semana-foot');
+  if (foot) {
+    const ml = d.melhorSemanaLabel || (semanas[d.melhorSemanaIdx] && semanas[d.melhorSemanaIdx].label) || '—';
+    foot.textContent = 'Passe o mouse ou toque em uma semana para ver a leitura. Melhor receita: ' + ml + '.';
+  }
+}
+
+window.selecionarSemanaKpi_ = function selecionarSemanaKpi_(idx, hoverOnly) {
+  if (!kpiData || !kpiData.porSemana) return;
+  _semanaSelIdx = idx;
+  document.querySelectorAll('.mk-semana-card').forEach((el, i) => {
+    el.classList.toggle('active', i === idx);
+    el.setAttribute('aria-selected', i === idx ? 'true' : 'false');
+  });
+  atualizarSemanaDetalhe_(kpiData.porSemana[idx], kpiData);
+};
+
+function atualizarSemanaDetalhe_(sem, d) {
+  if (!sem) return;
+  const hdr = document.getElementById('mk-sem-detail-hdr');
+  const ins = document.getElementById('mk-sem-insights');
+  const dest = document.getElementById('mk-sem-melhor-dia');
+  const kFat = document.getElementById('mk-sem-kpi-fat');
+  const kN = document.getElementById('mk-sem-kpi-n');
+  const kT = document.getElementById('mk-sem-kpi-ticket');
+  if (hdr) hdr.textContent = sem.label + ' · dias ' + sem.periodo;
+  if (kFat) kFat.textContent = R2(sem.fat || 0);
+  if (kN) kN.textContent = String(sem.n || 0);
+  if (kT) kT.textContent = sem.n > 0 ? R2(sem.ticketMedio || 0) : '—';
+  if (dest) {
+    const md = sem.melhorDia;
+    if (md && md.fat > 0) {
+      dest.innerHTML = '<strong>Melhor dia da semana:</strong> ' + md.diaSemana + ' ' + md.label +
+        ' — ' + R2(md.fat) + ' · ' + (md.n || 0) + ' atend.' +
+        (md.porque ? '<br><span style="opacity:.9">' + md.porque + '</span>' : '');
+      dest.style.display = 'block';
+    } else {
+      dest.innerHTML = '<strong>Melhor dia da semana:</strong> sem movimento registrado neste período.';
+      dest.style.display = 'block';
+    }
+  }
+  if (ins) {
+    const items = (sem.insights || []).slice();
+    if (!items.length) items.push('Sem insights para esta semana.');
+    ins.innerHTML = items.map(t => '<li>' + t + '</li>').join('');
+  }
+}
+
+function renderCharts(d) {
+  if (typeof renderSemanasChart_ === 'function') renderSemanasChart_(d);
+  if (!window.Chart) return;
+  [chartDiario, chartExtrasDia, chartHoras].forEach(c => c && c.destroy());
+
+  const BLUE='#185FA5',PINK='#C2185B',GREEN='#3B6D11',AMBER='#BA7517',GRID='rgba(0,0,0,.06)';
+  const PLAN_LABELS = {'10min':'10 min','20min':'20 min','30min':'30 min','40min':'40 min','60min':'1 hora','3h':'3 horas'};
+
+  // título
+  if (d.mesAtual && d.anoAtual) {
+    setText2('dash-title', 'Análise financeira — ' + MESES_DB[d.mesAtual-1] + '/' + d.anoAtual);
+    const sel = document.getElementById('dash-mes-sel');
+    if (sel) sel.value = String(d.mesAtual);
+  }
+
+  // KPIs
+  const ticket = d.nMes > 0 ? d.fatMes / d.nMes : 0;
+  if (d.fatAno != null) {
+    setText2('nk-fatano', R2(d.fatAno));
+    setText2('nk-fatano-sub', (d.nAno || 0) + ' locações em ' + (d.anoAtual || ''));
+  } else {
+    setText2('nk-fatano', '—');
+    setText2('nk-fatano-sub', 'atualize o GAS para ver o acumulado');
+  }
+  setText2('nk-fatmes',  R2(d.fatMes));
+  setText2('nk-nloc',    d.nMes + ' locações no mês');
+  setText2('nk-ticket',  R2(ticket));
+  setText2('nk-cusmes',  'custos: ' + R2(d.cusMes));
+  const resEl = document.getElementById('nk-resultado');
+  if (resEl) { resEl.textContent = R2(d.resultado); resEl.className = 'nkv ' + ((d.resultado||0) >= 0 ? 'green' : 'red'); }
+  setText2('nk-margem',  'margem ' + (d.margem||0) + '%');
+  setText2('nk-fathoje', R2(d.fatHoje));
+  setText2('nk-cushoje', (d.fatHoje > 0 ? R2(d.fatHoje) + ' hoje · ' : '') + 'toque para conferir →');
+
+  // CTO
+  setText2('nk-cto-fat',  R2(d.fatMes));
+  setText2('nk-cto-val',  R2(d.ctoPagar));
+  setText2('nk-cto-cus',  R2(d.cusMes));
+  setText2('nk-cto-disp', R2(d.resultado));
+  const ctoPct = d.fatMes > 0 ? Math.round(d.ctoPagar / d.fatMes * 100) : 0;
+  const ctoBar = document.getElementById('nk-cto-bar');
+  if (ctoBar) ctoBar.style.width = Math.min(ctoPct, 100) + '%';
+  const nm = d.mesAtual < 12 ? d.mesAtual + 1 : 1;
+  const ny = d.mesAtual < 12 ? d.anoAtual : d.anoAtual + 1;
+  setText2('nk-cto-title', R2(d.ctoPagar) + ' — vence 05/' + String(nm).padStart(2,'0') + '/' + ny);
+  const mesPill = document.getElementById('nk-cto-mes');
+  if (mesPill) {
+    const mc = d.mesContrato || 1;
+    const cmin = d.ctoMinimo != null ? R2(d.ctoMinimo) : '';
+    mesPill.textContent = mc + 'º mês · mín. ' + cmin;
+  }
+  setText2('nk-cto-note', (d.ctoMinimo != null
+    ? 'CTO = maior entre ' + R2(d.ctoMinimo) + ' e 10% do faturamento (' + ctoPct + '% aplicado)'
+    : 'CTO = ' + ctoPct + '% do faturamento'));
+
+  // Payback
+  const pbStrip = document.getElementById('nk-payback-strip');
+  const pb = d.payback;
+  if (pbStrip && pb && pb.ok && pb.investimentoTotal > 0) {
+    pbStrip.style.display = '';
+    const pctPb = pb.pctRecuperado || 0;
+    setText2('nk-pb-inv', R2(pb.investimentoTotal));
+    setText2('nk-pb-acum', R2(pb.resultadoAcumulado));
+    setText2('nk-pb-falta', R2(pb.faltaRecuperar));
+    const pbBar = document.getElementById('nk-pb-bar');
+    if (pbBar) pbBar.style.width = Math.min(pctPb, 100) + '%';
+    const pbPill = document.getElementById('nk-pb-pill');
+    if (pb.paybackAtingido) {
+      setText2('nk-pb-title', 'Investimento recuperado!');
+      if (pbPill) { pbPill.textContent = '✓ Payback'; pbPill.className = 'payback-pill is-done'; }
+      setText2('nk-pb-meses', '0');
+      setText2('nk-pb-note', 'Acumulado até ' + (pb.acumuladoAteLabel || '') + ' · média/mês ' + R2(pb.mediaResultadoMensal));
+    } else {
+      setText2('nk-pb-title', pctPb + '% recuperado · acumulado até ' + (pb.acumuladoAteLabel || ''));
+      if (pbPill) { pbPill.textContent = pctPb + '%'; pbPill.className = 'payback-pill'; }
+      let pbMesTxt = '—';
+      if (pb.mesesRestantesEstimados != null) {
+        pbMesTxt = '~' + pb.mesesRestantesEstimados;
+        if (pb.previsaoPaybackLabel) pbMesTxt += ' · ' + pb.previsaoPaybackLabel;
+      }
+      setText2('nk-pb-meses', pbMesTxt);
+      const ritmoEst = pb.ritmoMensalEstimado || pb.mediaResultadoMensal || 0;
+      const usaProj = pb.ritmoFonte === 'projecao' && pb.projecaoResMes > 0;
+      let nota = '';
+      if (pb.lucroOperacionalAtivo && pb.resultadoMesAtual != null) {
+        nota += 'Lucro operacional deste mês (até hoje): ' + R2(pb.resultadoMesAtual) + '. ';
+      }
+      if (usaProj && pb.diasOperando > 0) {
+        nota += 'Projeção payback: ' + R2(pb.projecaoResMes) + '/mês (' + pb.diasOperando + ' dias com movimento → mês cheio). ';
+      } else if (ritmoEst > 0) {
+        nota += 'Ritmo estimado: ' + R2(ritmoEst) + '/mês. ';
+      }
+      nota += 'Payback = recuperar os ' + R2(pb.investimentoTotal) + ' investidos (não é quando começa o lucro).';
+      if (pb.mesesRestantesHistorico != null && pb.mesesRestantesHistorico !== pb.mesesRestantesEstimados) {
+        nota += ' Conservador (média parcial): ~' + pb.mesesRestantesHistorico + ' meses.';
+      }
+      setText2('nk-pb-note', nota);
+    }
+  } else if (pbStrip) {
+    pbStrip.style.display = 'none';
+  }
+
+  // Faturamento diário — todos os dias do mês até hoje (zeros inclusive)
+  // Os zeros mostram a linha do tempo completa e quando o negócio arrancou
+  const fatDia  = d.fatPorDia || [];
+  const hojeD   = d.mesAtual === new Date().getMonth()+1 ? new Date().getDate() : 31;
+  const dias    = fatDia.filter(x => x.dia <= hojeD); // TODOS os dias, com ou sem receita
+  const comMov  = dias.filter(x => x.valor > 0);
+  const total   = comMov.reduce((a,b) => a + b.valor, 0);
+  const avgDia  = comMov.length > 0 ? Math.round(total / comMov.length) : 0;
+  const mesStr  = String(d.mesAtual || new Date().getMonth()+1).padStart(2,'0');
+
+  setText2('nk-avg-label',
+    comMov.length > 0
+      ? comMov.length + ' dias com movimento — média R$' + avgDia + '/dia'
+      : 'sem dados ainda neste mês');
+
+  if (dias.length === 0) {
+    const cvEl = document.getElementById('chart-diario');
+    const wEl  = cvEl ? cvEl.parentElement : null;
+    if (wEl) wEl.innerHTML = '<p style="text-align:center;color:var(--txt3);padding:40px 0;font-size:13px">Sem dados neste mês</p>';
+  } else {
+    const valsR = dias.map(x => Math.round(x.valor));
+    // Colore de cinza os dias sem movimento, azul os dias com receita
+    const colors = valsR.map(v => v > 0 ? '#B5D4F4' : '#E8E8E8');
+    chartDiario = new Chart(document.getElementById('chart-diario'), {
+      type:'bar',
+      data:{ labels: dias.map(x => x.dia + '/' + mesStr),
+        datasets:[
+          {label:'Faturamento', data:valsR, backgroundColor:colors, borderRadius:3, minBarLength:4, order:2},
+          ...(avgDia > 0 ? [{label:'Média', data:dias.map(()=>avgDia), type:'line',
+            borderColor:BLUE, borderWidth:1.5, pointRadius:0, tension:0, borderDash:[4,3], order:1}] : [])
+        ]},
+      options:{responsive:true, maintainAspectRatio:false,
+        plugins:{legend:{display:false},
+          tooltip:{mode:'index', intersect:false,
+            callbacks:{label:ctx => {
+              if (ctx.dataset.label === 'Média') return 'Média: R$ ' + Math.round(ctx.parsed.y);
+              return ctx.parsed.y > 0 ? 'Faturamento: R$ ' + Math.round(ctx.parsed.y) : 'Sem movimento';
+            }}}},
+        scales:{
+          x:{grid:{display:false}, ticks:{font:{size:9}, color:'#888', maxTicksLimit:10, maxRotation:0}},
+          y:{grid:{color:GRID}, ticks:{font:{size:9}, color:'#888', callback:v=>'R$'+v}, min:0, suggestedMax: Math.max(...valsR, 1) * 1.2}
+        }}
+    });
+  }
+
+  // Extras por dia (mês)
+  const extDia = d.extPorDia || [];
+  const hojeDExt = d.mesAtual === new Date().getMonth() + 1 ? new Date().getDate() : 31;
+  const diasExt = extDia.filter(x => x.dia <= hojeDExt);
+  const totalExtMes = Number(d.extMes) || 0;
+  const pctExt = d.pctExtMes != null ? d.pctExtMes : (d.fatMes > 0 ? Math.round(totalExtMes / d.fatMes * 1000) / 10 : 0);
+  setText2('nk-ext-label', totalExtMes > 0
+    ? R2(totalExtMes) + ' no mês · ' + pctExt + '% do faturamento · ' + (d.nComExtra || 0) + ' loc. com extra'
+    : 'sem extras cobrados neste mês');
+  const extIns = document.getElementById('nk-ext-insight');
+  if (extIns) {
+    if (totalExtMes <= 0) {
+      extIns.style.display = 'none';
+    } else {
+      const comExt = diasExt.filter(x => x.valor > 0);
+      const best = comExt.reduce((a, b) => (b.valor > (a.valor || 0) ? b : a), { dia: 0, valor: 0 });
+      const msgs = [];
+      if (pctExt >= 18) msgs.push('Extras representam ' + pctExt + '% do faturamento — revise aviso de tempo no balcão.');
+      else if (pctExt >= 10) msgs.push('Extras em ' + pctExt + '% do faturamento — margem saudável se o plano base estiver correto.');
+      else msgs.push('Extras em ' + pctExt + '% do faturamento — operação focada em planos.');
+      if (best.valor > 0) msgs.push('Melhor dia: ' + best.dia + '/' + String(d.mesAtual || '').padStart(2, '0') + ' com ' + R2(best.valor) + ' em extras.');
+      extIns.style.display = 'block';
+      extIns.textContent = msgs.join(' ');
+    }
+  }
+  const extCv = document.getElementById('chart-extras-dia');
+  if (extCv && window.Chart) {
+    if (chartExtrasDia) chartExtrasDia.destroy();
+    const valsE = diasExt.map(x => Math.round(x.valor));
+    const mesStrE = String(d.mesAtual || new Date().getMonth() + 1).padStart(2, '0');
+    chartExtrasDia = new Chart(extCv, {
+      type: 'bar',
+      data: {
+        labels: diasExt.map(x => x.dia + '/' + mesStrE),
+        datasets: [{
+          label: 'Extras',
+          data: valsE,
+          backgroundColor: valsE.map(v => v > 0 ? '#CE93D8' : '#F0F0F0'),
+          borderRadius: 3,
+          minBarLength: 3
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: ctx => ctx.parsed.y > 0 ? 'Extras: R$ ' + Math.round(ctx.parsed.y) : 'Sem extra'
+            }
+          }
+        },
+        scales: {
+          x: { grid: { display: false }, ticks: { font: { size: 9 }, maxTicksLimit: 10 } },
+          y: { grid: { color: GRID }, ticks: { callback: v => 'R$' + v }, min: 0 }
+        }
+      }
+    });
+  }
+
+  // Horários de pico
+  const horasDat = (d.horasPico||[]).map((v,i)=>({h:(9+i)+'h',v:Number(v)||0}));
+  const totalPico = horasDat.reduce((a,b)=>a+b.v,0);
+  const maxH = Math.max(...horasDat.map(x=>x.v),1);
+  const picoEl = document.getElementById('nk-pico-insight');
+  if (picoEl) picoEl.style.display = 'none'; // insight now in chart title
+  const picoTitleEl = document.getElementById('nk-pico-title-note');
+  if (totalPico === 0) {
+    // GAS ainda nao tem dados de horario (bug de leitura de hora serial — deploy v1.5.3d resolve)
+    const cv = document.getElementById('chart-horas');
+    if (cv) { const ctx=cv.getContext('2d'); ctx.clearRect(0,0,cv.width,cv.height); ctx.fillStyle='#888'; ctx.font='11px system-ui'; ctx.textAlign='center'; ctx.fillText('Disponível após deploy GAS v1.5.3d', cv.width/2, 60); }
+    if (picoEl) { picoEl.style.display='block'; picoEl.textContent='Dados de horário indisponíveis. Aplique o deploy GAS v1.5.3d para corrigir.'; }
+  } else {
+    chartHoras = new Chart(document.getElementById('chart-horas'), {
+      type:'bar',
+      data:{labels:horasDat.map(x=>x.h),
+        datasets:[{
+          label:'R$',
+          data:horasDat.map(x=>x.v),
+          backgroundColor:horasDat.map(x=>x.v>=maxH*0.65?BLUE:x.v>=maxH*0.3?'#85B7EB':'#D3E8F8'),
+          borderRadius:3,
+          minBarLength:3  // garante que barras com valor > 0 sempre aparecem
+        }]},
+      options:{responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{display:false},
+          tooltip:{callbacks:{label:c=>c.parsed.y>0?'R$ '+Math.round(c.parsed.y):'Sem movimento'}}},
+        scales:{
+          x:{grid:{display:false},ticks:{font:{size:9},color:'#888',maxRotation:0}},
+          y:{display:false}
+        }}
+    });
+    const picoMax = horasDat.reduce((a,b)=>b.v>a.v?b:a,{h:'—',v:0});
+    if (picoTitleEl && picoMax.v > 0) picoTitleEl.textContent = picoMax.h + ' · R$ ' + Math.round(picoMax.v);
+  }
+
+  // Por tipo
+  const tp = d.fatPorTipo || {};
+  const totTipo = (tp['Carro']||0)+(tp['Triciclo']||0)+(tp['Pelúcia']||0) || 1;
+  const maxTipo = Math.max(tp['Carro']||0, tp['Triciclo']||0, tp['Pelúcia']||0, 1);
+  const tiposArr = [{n:'Carros',k:'Carro',cor:BLUE},{n:'Triciclos',k:'Triciclo',cor:GREEN},{n:'Pelúcias',k:'Pelúcia',cor:PINK}].filter(t=>(tp[t.k]||0)>0);
+  const tipoEl = document.getElementById('nk-tipo-rows');
+  if (tipoEl) tipoEl.innerHTML = tiposArr.map(t=>{const v=tp[t.k]||0,p=pct2(v,totTipo),bw=Math.round(v/maxTipo*100);return `<div class="nb-row"><div class="nb-dot" style="background:${t.cor}"></div><div class="nb-name">${t.n}</div><div class="nb-bar-bg"><div class="nb-bar-fill" style="width:${bw}%;background:${t.cor}"></div></div><div class="nb-val">${R2(v)}</div><div class="nb-pct">${p}%</div></div>`;}).join('')||'<div class="nks">Sem dados</div>';
+  const tipInsEl = document.getElementById('nk-tipo-insight');
+  if (tipInsEl && tiposArr.length>0) { const top=tiposArr.reduce((a,b)=>(tp[b.k]||0)>(tp[a.k]||0)?b:a,tiposArr[0]); tipInsEl.style.display='block'; tipInsEl.textContent=top.n+' lideram com '+pct2(tp[top.k]||0,totTipo)+'% do faturamento.'; }
+
+  // Ranking veículos
+  const fv = d.fatPorVeiculo || {};
+  const totV = Object.values(fv).reduce((a,b)=>a+b,0) || 1;
+  const maxV = Math.max(...Object.values(fv),1);
+  const veics = Object.keys(fv).sort((a,b)=>fv[b]-fv[a]);
+  const veicEl = document.getElementById('nk-veiculo-rank');
+  if (veicEl) veicEl.innerHTML = veics.map((v,i)=>{const val=fv[v]||0,cor=v.startsWith('Carro')?BLUE:v.startsWith('Triciclo')?GREEN:PINK,bw=Math.round(val/maxV*100),p=pct2(val,totV);return `<div class="nb-row"><div class="nb-n">${i+1}</div><div class="nb-name">${v}</div><div class="nb-bar-bg"><div class="nb-bar-fill" style="width:${bw}%;background:${cor}"></div></div><div class="nb-val">${R2(val)}</div><div class="nb-pct">${p}%</div></div>`;}).join('')||'<div class="nks">Sem dados</div>';
+
+  // Pagamento
+  const fp = d.fatPorPagamento || {};
+  const totP = Object.values(fp).reduce((a,b)=>a+b,0) || 1;
+  const maxP = Math.max(...Object.values(fp),1);
+  const pagCorsD = {'Pix':BLUE,'Cartão':'#534AB7','Dinheiro':GREEN,'Crédito':'#534AB7','Débito':AMBER};
+  const pags = Object.keys(fp).sort((a,b)=>fp[b]-fp[a]);
+  const pagEl = document.getElementById('nk-pag-rows');
+  if (pagEl) pagEl.innerHTML = pags.map(p=>{const val=fp[p]||0,cor=pagCorsD[p]||AMBER,bw=Math.round(val/maxP*100),pcc=pct2(val,totP);return `<div class="nb-row"><div class="nb-dot" style="background:${cor}"></div><div class="nb-name">${p}</div><div class="nb-bar-bg"><div class="nb-bar-fill" style="width:${bw}%;background:${cor}"></div></div><div class="nb-val">${R2(val)}</div><div class="nb-pct">${pcc}%</div></div>`;}).join('')||'<div class="nks">Sem dados</div>';
+
+  // Por plano
+  const pl = d.fatPorPlano || {};
+  const plOrder = ['10min','20min','30min','40min','60min','3h'];
+  const totPl = plOrder.reduce((a,k)=>a+(pl[k]||0),0) || 1;
+  const maxPl = Math.max(...plOrder.map(k=>pl[k]||0),1);
+  const plEl = document.getElementById('nk-plano-rows');
+  if (plEl) plEl.innerHTML = plOrder.filter(k=>(pl[k]||0)>0).map(k=>{const val=pl[k]||0,bw=Math.round(val/maxPl*100),pcc=pct2(val,totPl);return `<div class="nb-row"><div class="nb-name">${PLAN_LABELS[k]||k}</div><div class="nb-bar-bg"><div class="nb-bar-fill" style="width:${bw}%;background:${AMBER}"></div></div><div class="nb-val">R$${Math.round(val)}</div><div class="nb-pct">${pcc}%</div></div>`;}).join('')||'<div class="nks">Sem dados</div>';
+  const topPl = plOrder.filter(k=>pl[k]>0).reduce((a,b)=>(pl[b]||0)>(pl[a]||0)?b:a,'10min');
+  const plInsEl = document.getElementById('nk-plano-insight');
+  if (plInsEl && pl[topPl]) { plInsEl.style.display='block'; plInsEl.textContent = (PLAN_LABELS[topPl]||topPl)+' é o plano mais popular: '+pct2(pl[topPl],totPl)+'% do faturamento.'; }
+
+  // Pacote F — operador, cancelamentos, ocupação frota
+  const ops = d.porOperador || [];
+  const opEl = document.getElementById('nk-operador-rows');
+  const opIns = document.getElementById('nk-operador-insight');
+  if (opEl) {
+    if (!ops.length) {
+      opEl.innerHTML = '<div class="nks">Sem encerramentos auditados neste mês</div>';
+      if (opIns) opIns.style.display = 'none';
+    } else {
+      const maxOp = Math.max(...ops.map(o => o.nLoc || 0), 1);
+      opEl.innerHTML = ops.map((o, i) => {
+        const bw = Math.round((o.nLoc || 0) / maxOp * 100);
+        return `<div class="nb-row"><div class="nb-n">${i + 1}</div><div class="nb-name">${o.nome}</div><div class="nb-bar-bg"><div class="nb-bar-fill" style="width:${bw}%;background:var(--blue)"></div></div><div class="nb-val">${o.nLoc} loc</div><div class="nb-pct">${R2(o.fat || 0)}</div></div>`;
+      }).join('');
+      if (opIns) {
+        opIns.style.display = 'block';
+        opIns.textContent = ops[0].nome + ' lidera com ' + ops[0].nLoc + ' encerramentos (' + (ops[0].pct || 0) + '% do mês).';
+      }
+    }
+  }
+
+  const canc = d.cancelamentos || { total: 0, porMotivo: [], taxaPct: 0 };
+  const cancSum = document.getElementById('nk-cancel-summary');
+  const cancEl = document.getElementById('nk-cancel-rows');
+  if (cancSum) {
+    cancSum.innerHTML = canc.total > 0
+      ? '<strong style="color:#C62828;font-size:18px">' + canc.total + '</strong> cancelamento(s) · taxa ' + (canc.taxaPct || 0) + '% sobre locações do mês'
+      : 'Nenhum cancelamento neste mês';
+  }
+  if (cancEl) {
+    const motivos = canc.porMotivo || [];
+    if (!motivos.length) {
+      cancEl.innerHTML = '<div class="nks">' + (canc.total > 0 ? 'Motivos não detalhados na auditoria' : 'Operação sem cancelamentos') + '</div>';
+    } else {
+      const maxC = Math.max(...motivos.map(m => m.count), 1);
+      cancEl.innerHTML = motivos.map(m => {
+        const bw = Math.round(m.count / maxC * 100);
+        return `<div class="nb-row"><div class="nb-name">${m.motivo}</div><div class="nb-bar-bg"><div class="nb-bar-fill" style="width:${bw}%;background:#EF9A9A"></div></div><div class="nb-val">${m.count}</div></div>`;
+      }).join('');
+    }
+  }
+
+  const ocup = d.ocupacaoFrota || [];
+  const ocupGrid = document.getElementById('nk-ocupacao-grid');
+  const ocupIns = document.getElementById('nk-ocupacao-insight');
+  if (ocupGrid) {
+    const comUso = ocup.filter(v => v.nLoc > 0);
+    if (!comUso.length) {
+      ocupGrid.innerHTML = '<div class="nks" style="grid-column:1/-1;padding:12px 0">Sem locações encerradas neste mês</div>';
+      if (ocupIns) ocupIns.style.display = 'none';
+    } else {
+      const topO = comUso[0];
+      ocupGrid.innerHTML = comUso.map((v, i) => {
+        const tipo = v.veiculo.startsWith('Carro') ? 'Carro' : v.veiculo.startsWith('Triciclo') ? 'Triciclo' : 'Pelúcia';
+        const icon = tipoIcon(tipo);
+        const cls = i === 0 ? 'vrank-card top1' : 'vrank-card';
+        const barClr = tipo === 'Carro' ? 'var(--blue)' : tipo === 'Triciclo' ? '#2E7D32' : 'var(--pink)';
+        return `<div class="${cls}"><span class="vr-rank">#${i + 1}</span><div class="vr-icon">${icon}</div><div class="vr-nome">${v.veiculo}</div><div class="vr-count">${v.pctOcupacao || 0}%</div><div class="vr-sub">${v.nLoc} loc · ${v.pctFrota || 0}% frota</div><div class="vr-bar-wrap"><div class="vr-bar" style="width:${Math.min(100, v.pctOcupacao || 0)}%;background:${barClr}"></div></div></div>`;
+      }).join('');
+      if (ocupIns) {
+        ocupIns.style.display = 'block';
+        ocupIns.innerHTML = '<strong>' + topO.veiculo + '</strong> com maior uso: <strong>' + (topO.pctOcupacao || 0) + '%</strong> da capacidade estimada (' + topO.nLoc + ' locações).';
+      }
+    }
+  }
+
+  const cusCat = d.cusPorCategoria || [];
+  const cusCatEl = document.getElementById('nk-custo-cat-rows');
+  const cusIns = document.getElementById('nk-custo-insight');
+  if (cusCatEl) {
+    if (!cusCat.length) {
+      cusCatEl.innerHTML = '<div class="nks">Sem custos lançados neste mês</div>';
+      if (cusIns) cusIns.style.display = 'none';
+    } else {
+      const totC = cusCat.reduce((a, b) => a + (b.valor || 0), 0) || 1;
+      const maxC = Math.max(...cusCat.map(c => c.valor || 0), 1);
+      cusCatEl.innerHTML = cusCat.map(c => {
+        const bw = Math.round((c.valor || 0) / maxC * 100);
+        const pcc = pct2(c.valor || 0, totC);
+        return `<div class="nb-row"><div class="nb-name">${c.categoria}</div><div class="nb-bar-bg"><div class="nb-bar-fill" style="width:${bw}%;background:#E65100"></div></div><div class="nb-val">${R2(c.valor)}</div><div class="nb-pct">${pcc}%</div></div>`;
+      }).join('');
+      if (cusIns) {
+        cusIns.style.display = 'block';
+        cusIns.textContent = cusCat[0].categoria + ' concentra ' + pct2(cusCat[0].valor, totC) + '% dos custos do mês (' + R2(totC) + ' total).';
+      }
+    }
+  }
+
+  const rec = d.recorrenciaClientes || {};
+  const recSum = document.getElementById('nk-recorrencia-summary');
+  const recIns = document.getElementById('nk-recorrencia-insight');
+  if (recSum) {
+    const nU = rec.nUnicos || 0;
+    const nR = rec.nRecorrentes || 0;
+    const pctR = rec.pctRecorrencia || 0;
+    recSum.innerHTML = nU > 0
+      ? '<strong style="font-size:18px;color:var(--blue)">' + nR + '</strong> de <strong>' + nU + '</strong> clientes voltaram no mês (' + pctR + '% recorrência)'
+      : 'Sem telefones válidos nas locações encerradas deste mês';
+    if (recIns) {
+      if (nU > 0) {
+        recIns.style.display = 'block';
+        recIns.textContent = pctR >= 30
+          ? 'Boa recorrência — ' + pctR + '% dos clientes únicos retornaram no período.'
+          : 'Recorrência em ' + pctR + '% — oportunidade de campanha de retorno (Relacionamento / Config).';
+      } else recIns.style.display = 'none';
+    }
+  }
+
+  // ── FASE 5: Comparativo + Projeção + Alerta ──────────────────
+  // Alerta de faturamento baixo
+  const alertEl  = document.getElementById('nk-alerta');
+  const alertMsg = document.getElementById('nk-alerta-msg');
+  if (alertEl && d.mediaDiaria > 0) {
+    const threshold = d.mediaDiaria * 0.7;
+    if (d.fatHoje < threshold && d.fatHoje >= 0) {
+      alertEl.style.display = 'flex';
+      alertEl.className = 'alerta-banner warn';
+      alertMsg.textContent = 'Hoje: R$' + Math.round(d.fatHoje)
+        + ' — abaixo de 70% da média diária (R$' + Math.round(d.mediaDiaria) + '/dia)';
+    } else if (d.fatHoje >= d.mediaDiaria) {
+      alertEl.style.display = 'flex';
+      alertEl.className = 'alerta-banner good';
+      alertMsg.textContent = 'Hoje: R$' + Math.round(d.fatHoje)
+        + ' — acima da média diária (' + Math.round(d.fatHoje / d.mediaDiaria * 100) + '% da meta)';
+    } else {
+      alertEl.style.display = 'none';
+    }
+  }
+
+  // Comparativo semana corrida (seg–hoje)
+  setText2('nk-sem-atual', R2(d.fatSemana || 0));
+  setText2('nk-sem-ant',   R2(d.fatSemanaAnt || 0));
+  setText2('nk-mes-ant',   R2(d.fatMesAnt || 0) + ' (' + (d.nMesAnt||0) + ' loc)');
+  const badgeEl = document.getElementById('nk-sem-badge');
+  if (badgeEl && (d.fatSemanaAnt || 0) > 0) {
+    const diff = Math.round(((d.fatSemana||0) - d.fatSemanaAnt) / d.fatSemanaAnt * 100);
+    badgeEl.textContent = (diff >= 0 ? '+' : '') + diff + '%';
+    badgeEl.className = 'f5-badge ' + (diff > 0 ? 'up' : diff < 0 ? 'dn' : 'eq');
+  } else if (badgeEl) badgeEl.textContent = '';
+
+  // Projeção do mês
+  setText2('nk-dias-op',  (d.diasOperando || 0) + ' dias');
+  setText2('nk-med-dia',  R2(d.mediaDiaria || 0) + '/dia');
+  setText2('nk-proj-fat', R2(d.projecaoFat || 0));
+  const projResEl = document.getElementById('nk-proj-res');
+  if (projResEl) {
+    projResEl.textContent = R2(d.projecaoRes || 0);
+    projResEl.className = 'f5-val ' + ((d.projecaoRes||0) >= 0 ? 'green' : 'red');
+  }
+}
+// ── CAIXA DO DIA ─────────────────────────────────────────────────────────
+const fmtR = v => 'R$ ' + Number(v).toFixed(2).replace('.',',').replace(/\B(?=(\d{3})+(?!\d))/g,'.');
+const pagCor = {'PIX':'background:#E6F1FB;color:#0C447C','Crédito':'background:#EEEDFE;color:#3C3489','Débito':'background:#EAF3DE;color:#27500A','Dinheiro':'background:#FAEEDA;color:#633806'};
+const pagPill = p => `<span style="font-size:11px;padding:2px 8px;border-radius:20px;font-weight:500;${pagCor[p]||'background:var(--bg2);color:var(--txt)'}">${p||'—'}</span>`;
+
+function inicializarCaixa() {
+  const hoje = new Date();
+  const pad = n => String(n).padStart(2,'0');
+  document.getElementById('caixa-data').value = `${hoje.getFullYear()}-${pad(hoje.getMonth()+1)}-${pad(hoje.getDate())}`;
+  carregarCaixa();
+}
+
+async function carregarCaixa() {
+  const dataEl = document.getElementById('caixa-data');
+  if (!dataEl) return;
+  const [y,m,d] = dataEl.value.split('-');
+  const dataFmt = `${d}/${m}/${y}`;
+
+  // Atualiza KPIs com loading
+  ['cx-total','cx-maq','cx-din','cx-cus','cx-res','cx-nloc','cx-ext'].forEach(id => {
+    const el = document.getElementById(id); if(el) el.textContent = '...';
+  });
+
+  try {
+    // Buscar locações e custos em paralelo
+    const authP = apiParamsComAuth_();
+    const [rLoc, rCus] = await Promise.all([
+      api({ action:'listarHistorico', data: dataFmt, ...authP }),
+      api({ action:'listarCustos', ...authP })
+    ]);
+
+    const locacoes = (rLoc.locacoes||[]).filter(l => l.status === 'Encerrada');
+    const mes = parseInt(m), ano = parseInt(y);
+    const custos = (rCus.custos||[]).filter(c => {
+      const [cd,cm,cy] = String(c.data).split('/');
+      return parseInt(cd) === parseInt(d) && parseInt(cm) === mes && parseInt(cy) === ano;
+    });
+
+    // Calcular totais por pagamento
+    const totPag = {};
+    let totalEnt = 0;
+    locacoes.forEach(l => {
+      const p = l.pagamento || 'Não informado';
+      totPag[p] = (totPag[p]||0) + Number(l.valorTotal);
+      totalEnt += Number(l.valorTotal);
+    });
+
+    const totalMaq = (totPag['PIX']||0) + (totPag['Crédito']||0) + (totPag['Débito']||0);
+    const totalDin  = totPag['Dinheiro'] || 0;
+    const totalCus  = custos.reduce((s,c) => s + Number(c.valor), 0);
+    const totalExt  = locacoes.reduce((s,l) => s + Number(l.valorAdicional || 0), 0);
+    const nExt      = locacoes.filter(l => Number(l.valorAdicional) > 0).length;
+    const cusDin    = custos.filter(c => (c.categoria||'').toLowerCase().includes('dinheiro') || (c.obs||'').toLowerCase().includes('dinheiro')).reduce((s,c) => s+Number(c.valor), 0);
+    const saldoDin  = totalDin - cusDin;
+    const resultado = totalEnt - totalCus;
+
+    // KPIs
+    const setKpi = (id, val, cor) => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.textContent = fmtR(val);
+        if (cor) el.style.color = cor;
+      }
+    };
+    const setHero = (id, val, cor) => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.textContent = fmtR(val);
+        if (cor) el.style.color = cor;
+      }
+    };
+    setKpi('cx-total', totalEnt, '#3B6D11');
+    setKpi('cx-maq',   totalMaq, '#185FA5');
+    setKpi('cx-din',   totalDin, '#854F0B');
+    setKpi('cx-cus',   totalCus, '#A32D2D');
+    setHero('cx-res', resultado, null);
+    setKpi('cx-ext', totalExt, '#6A1B9A');
+    const nloc = document.getElementById('cx-nloc'); if(nloc) nloc.textContent = locacoes.length;
+    const cxExtIns = document.getElementById('cx-ext-insight');
+    if (cxExtIns) {
+      if (totalExt > 0) {
+        const pct = totalEnt > 0 ? Math.round(totalExt / totalEnt * 1000) / 10 : 0;
+        cxExtIns.style.display = 'block';
+        cxExtIns.textContent = 'Extras do dia: ' + fmtR(totalExt) + ' (' + nExt + ' locações) — ' + pct + '% do faturamento do dia.';
+      } else {
+        cxExtIns.style.display = 'none';
+      }
+    }
+    document.getElementById('cx-total-ent').textContent = fmtR(totalEnt);
+    document.getElementById('cx-total-sai').textContent = fmtR(totalCus);
+    document.getElementById('cx-resultado-final').textContent = fmtR(resultado);
+    document.getElementById('cx-resultado-final').style.color = resultado >= 0 ? '#3B6D11' : '#A32D2D';
+    document.getElementById('cx-resultado-calc').textContent = `${fmtR(totalEnt)} − ${fmtR(totalCus)}`;
+
+    // Conferência maquininha
+    const maqEl = document.getElementById('cx-conf-maq');
+    if(maqEl) {
+      const formasMaq = ['PIX','Crédito','Débito'];
+      maqEl.innerHTML = formasMaq.map(f =>
+        `<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:0.5px solid var(--border);font-size:13px">
+          <span style="color:var(--txt2)">${pagPill(f)} ${f}</span>
+          <span style="font-weight:500">${fmtR(totPag[f]||0)}</span>
+        </div>`
+      ).join('') +
+      `<div style="display:flex;justify-content:space-between;padding:8px 0 4px;font-size:14px;font-weight:500;border-top:1px solid var(--border);margin-top:4px">
+        <span>Total maquininha</span><span style="color:#185FA5">${fmtR(totalMaq)}</span>
+      </div>`;
+    }
+
+    // Conferência dinheiro
+    const dinEl = document.getElementById('cx-conf-din');
+    if(dinEl) {
+      dinEl.innerHTML =
+        `<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:0.5px solid var(--border);font-size:13px">
+          <span style="color:var(--txt2)">Entradas em dinheiro</span>
+          <span style="font-weight:500">${fmtR(totalDin)}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:0.5px solid var(--border);font-size:13px">
+          <span style="color:var(--txt2)">Custos em dinheiro</span>
+          <span style="font-weight:500;color:#A32D2D">− ${fmtR(cusDin)}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:8px 0 4px;font-size:14px;font-weight:500;border-top:1px solid var(--border);margin-top:4px">
+          <span>Saldo em espécie</span><span style="color:#854F0B">${fmtR(saldoDin)}</span>
+        </div>`;
+    }
+
+    // Tabela entradas
+    const tbody = document.getElementById('cx-body-ent');
+    if(tbody) {
+      if(!locacoes.length) {
+        tbody.innerHTML = '<tr><td colspan="6" style="padding:20px;text-align:center;color:var(--txt3)">Nenhuma locação encerrada neste dia</td></tr>';
+      } else {
+        tbody.innerHTML = [...locacoes].sort((a,b)=>a.horaInicio.localeCompare(b.horaInicio)).map(l => {
+          const temExtra = Number(l.minAdicionais) > 0;
+          const planoStr = (PLANO_LABELS[l.plano]||l.plano) + (temExtra ? ` +${l.minAdicionais}min extra` : '');
+          return `<tr>
+            <td>${l.horaInicio||'—'}</td>
+            <td>${l.veiculo||l.tipo}</td>
+            <td>${planoStr}</td>
+            <td>${l.responsavel||'—'}</td>
+            <td>${pagPill(l.pagamento)}</td>
+            <td>${fmtR(l.valorTotal)}</td>
+          </tr>`;
+        }).join('');
+      }
+    }
+
+    // Tabela saídas
+    const tbodySai = document.getElementById('cx-body-sai');
+    if(tbodySai) {
+      if(!custos.length) {
+        tbodySai.innerHTML = '<tr><td colspan="4" style="padding:20px;text-align:center;color:var(--txt3)">Nenhum custo registrado neste dia</td></tr>';
+      } else {
+        tbodySai.innerHTML = custos.map(c =>
+          `<tr>
+            <td>${c.hora||'—'}</td>
+            <td>${c.descricao||'—'}</td>
+            <td>${c.categoria||'—'}</td>
+            <td style="color:#A32D2D">${fmtR(c.valor)}</td>
+          </tr>`
+        ).join('');
+      }
+    }
+
+    // Guardar dados para copiar
+    window._caixaData = { dataFmt, totalEnt, totalMaq, totalDin, totalCus, saldoDin, resultado, totPag, locacoes, custos };
+
+  } catch(e) {
+    console.error('carregarCaixa:', e);
+    toast('Erro ao carregar caixa', 'error');
+  }
+}
+
+function copiarFechamentoCaixa() {
+  const d = window._caixaData;
+  if (!d) { toast('Carregue o caixa primeiro', 'error'); return; }
+  const txt = [
+    `FECHAMENTO DE CAIXA — ${d.dataFmt}`,
+    `${'─'.repeat(35)}`,
+    `FATURAMENTO`,
+    `  PIX:        ${fmtR(d.totPag['PIX']||0)}`,
+    `  Crédito:    ${fmtR(d.totPag['Crédito']||0)}`,
+    `  Débito:     ${fmtR(d.totPag['Débito']||0)}`,
+    `  Dinheiro:   ${fmtR(d.totPag['Dinheiro']||0)}`,
+    `  TOTAL:      ${fmtR(d.totalEnt)}`,
+    ``,
+    `CONFERÊNCIA MAQUININHA`,
+    `  PIX + Crédito + Débito = ${fmtR(d.totalMaq)}`,
+    ``,
+    `DINHEIRO EM ESPÉCIE`,
+    `  Entradas:   ${fmtR(d.totalDin)}`,
+    `  Saldo:      ${fmtR(d.saldoDin)}`,
+    ``,
+    `CUSTOS DO DIA: ${fmtR(d.totalCus)}`,
+    `${'─'.repeat(35)}`,
+    `RESULTADO: ${fmtR(d.resultado)}`,
+    `Locações: ${d.locacoes.length}`,
+  ].join('\n');
+
+  navigator.clipboard.writeText(txt).then(() => toast('Fechamento copiado!', 'success'))
+    .catch(() => toast('Não foi possível copiar', 'error'));
+}
+
+// ── RELATÓRIO ────────────────────────────────────────────────
+function initRelMesSel() {
+  const hoje = new Date();
+  document.getElementById('rel-mes').value = hoje.getMonth()+1;
+  const anoSel = document.getElementById('rel-ano');
+  if (!anoSel.options.length) {
+    for (let a=hoje.getFullYear();a>=2026;a--) {
+      anoSel.add(new Option(a,a,a===hoje.getFullYear()));
+    }
+  }
+}
+
+async function carregarPreviewRelatorio() {
+  const mes  = document.getElementById('rel-mes').value;
+  const ano  = document.getElementById('rel-ano').value;
+  const prev = document.getElementById('rel-preview');
+  const btnEnv = document.getElementById('btn-rel-email');
+  const btnDrv = document.getElementById('btn-rel-drive');
+  prev.innerHTML = '<div style="text-align:center;padding:40px;color:var(--txt3);font-size:13px">⏳ Gerando preview do relatório...</div>';
+  if (btnEnv) btnEnv.disabled = true;
+  if (btnDrv) btnDrv.disabled = true;
+  try {
+    // v1.6.20: preview com HTML real do email (Fase 5)
+    const d = await api({ action:'buscarPreviewRelatorio', mes, ano }, 30000);
+    if (!d.ok || !d.html) {
+      prev.innerHTML = '<div style="color:var(--red);padding:20px;text-align:center">Erro ao gerar preview</div>';
+      return;
+    }
+    // Renderiza o HTML completo do email num iframe via Blob
+    const blob = new Blob([d.html], { type:'text/html;charset=utf-8' });
+    const url  = URL.createObjectURL(blob);
+    prev.innerHTML = '<div class="rel-iframe-wrap"><iframe id="preview-iframe" title="Preview do relatório"></iframe></div>';
+    document.getElementById('preview-iframe').src = url;
+    setTimeout(() => URL.revokeObjectURL(url), 120000);
+    if (btnEnv) { btnEnv.disabled = false; btnEnv.style.display = ''; }
+    if (btnDrv) { btnDrv.disabled = false; }
+    _relPreviewMes = mes; _relPreviewAno = ano;
+  } catch(e) {
+    prev.innerHTML = '<div style="color:var(--red);padding:20px;text-align:center">Erro de conexão: '+e.message+'</div>';
+    if (btnEnv) btnEnv.disabled = false;
+    if (btnDrv) btnDrv.disabled = false;
+  }
+}
+let _relPreviewMes = null, _relPreviewAno = null;
+
+async function enviarRelatorioEmail() {
+  // v1.6.20: confirmação antes de enviar (Fase 5)
+  const mes = document.getElementById('rel-mes').value;
+  const ano = document.getElementById('rel-ano').value;
+  const meses = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho',
+                 'Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  const nomeMes = meses[parseInt(mes)-1] + '/' + ano;
+  if (!confirm('Enviar relatório de ' + nomeMes + ' para financeiro@goldenshoppingcalhau.com.br?')) return;
+  const btn = document.getElementById('btn-rel-email');
+  btn.textContent = '⏳ Enviando...'; btn.disabled = true;
+  try {
+    const d = await api({ action:'gerarRelatorio' }, 30000);
+    if (d.ok) { toast('✅ Relatório ' + nomeMes + ' enviado!','success'); carregarHistRelatorios(); }
+    else toast('Erro: '+d.erro,'error');
+  } catch { toast('Erro de conexão','error'); }
+  finally { btn.textContent='📧 Enviar Email'; btn.disabled=false; }
+}
+
+async function salvarRelatorioDrive() {
+  const mes = document.getElementById('rel-mes').value;
+  const ano = document.getElementById('rel-ano').value;
+  const btn = document.getElementById('btn-rel-drive');
+  btn.textContent = '⏳ Salvando...'; btn.disabled = true;
+  try {
+    const d = await api({ action:'salvarRelatorioDrive', mes, ano });
+    if (d.ok) {
+      toast('✅ PDF salvo no Drive!','success');
+      carregarHistRelatorios();
+      window.open(d.link,'_blank');
+    } else toast('Erro: '+d.erro,'error');
+  } catch { toast('Erro de conexão','error'); }
+  finally { btn.textContent='💾 Salvar PDF'; btn.disabled=false; }
+}
+
+async function carregarHistRelatorios() {
+  const container = document.getElementById('rel-hist-container');
+  if (!container) return;
+  try {
+    const d = await api({ action:'listarRelatorios' });
+    if (!d.ok || !d.relatorios.length) {
+      container.innerHTML='<div class="empty"><div class="empty-icon">📋</div><h3>Nenhum relatório enviado</h3></div>';
+      return;
+    }
+    container.innerHTML = d.relatorios.map(r=>`
+      <div class="rel-hist-item">
+        <div>
+          <div style="font-weight:700;color:var(--txt)">${r.mesAno}</div>
+          <div style="color:var(--txt3)">${r.dataEnvio} · ${r.tipo}</div>
+        </div>
+        ${r.link&&r.link!=='(email)'?`<span class="rel-hist-link" onclick="window.open('${r.link}','_blank')">📄 PDF</span>`:'📧'}
+      </div>`).join('');
+  } catch(e) { console.error('carregarHistRelatorios:', e); if(container) container.innerHTML='<div class="empty"><div class="empty-icon">⚠️</div><h3>Erro ao carregar relatórios</h3><p>Verifique a conexão</p></div>'; }
+}
+
+// ═══════════════════════════════════════════════════════════
+// FASE 3 — PAINEL DE OPERAÇÃO AO VIVO (v1.6.0)
+// ═══════════════════════════════════════════════════════════
+
+
+async function restaurarPadrao(key) {
+  const val = MSG_DEF[key];
+  if (!val) return;
+  // 1. Atualiza UI e memória IMEDIATAMENTE — não depende do GAS
+  const elId = 'cfg-' + key.replace(/_/g, '-');
+  const el = document.getElementById(elId);
+  const valDisplay = val.replace(/\n/g, '\n'); // \n literal → newline real para textarea
+  if (el) el.value = valDisplay;
+  appConfig[key] = val;
+  toast('Padrão restaurado ✓', 'success');
+  // 2. Salva no GAS em background (best-effort)
+  const valSend = val.replace(/\n/g, '\\n'); // newlines → \n literal para URL segura
+  api({ action: 'salvarConfig', key, val: valSend })
+    .then(d => { if (!d.ok) console.warn('restaurar: GAS retornou ok=false'); })
+    .catch(e => console.warn('restaurar: GAS indisponível —', e.message));
+}
+
+async function irParaConfig() {
+  irAdmin('config');
+  await carregarConfig();
+  // Fill textareas
+  const fields = ['msg_boasvindas','msg_alerta','msg_esgotado','msg_agradecimento','msg_extensao'];
+  fields.forEach(k => {
+    const el = document.getElementById('cfg-' + k.replace(/_/g,'-'));
+    if (el) {
+      const tpl = getMsgTemplate(k);
+      // Converter \n literal → newline real para exibir corretamente na textarea
+      el.value = tpl.replace(/\\n/g, '\n').replace(/\n/g, '\n');
+    }
+  });
+  const linkEl = document.getElementById('cfg-link-avaliacao');
+  if (linkEl) linkEl.value = appConfig.link_avaliacao || '';
+  // Load retorno
+  carregarRetorno();
+}
+
+async function salvarCfgField(key) {
+  const elId = 'cfg-' + key.replace(/_/g, '-');
+  const el = document.getElementById(elId);
+  if (!el) return;
+  const val = el.value; // valor com newlines reais (da textarea)
+  // Codifica newlines como \n literal para URL segura (GAS decodifica de volta)
+  const valSend = val.replace(/\n/g, '\\n');
+  try {
+    const d = await api({ action: 'salvarConfig', key, val: valSend });
+    if (d.ok) { appConfig[key] = val; toast('Salvo!', 'success'); }
+    else toast('Erro ao salvar — ' + (d.erro || 'verifique a planilha'), 'error');
+  } catch(e) { toast('Erro de conexão: ' + (e.message||''), 'error'); }
+}
+
+async function carregarRetorno() {
+  const cont = document.getElementById('retorno-container');
+  if (!cont) return;
+  cont.innerHTML = '<div style="text-align:center;padding:20px;color:var(--txt3)">Carregando...</div>';
+  try {
+    const d = await api({ action: 'listarRetorno' });
+    if (!d.ok || !d.clientes || !d.clientes.length) {
+      cont.innerHTML = '<div class="empty"><div class="empty-icon">😊</div><h3>Nenhum cliente para retorno</h3><p>Clientes de 7-14 dias atrás aparecerão aqui</p></div>';
+      return;
+    }
+    cont.innerHTML = d.clientes.map(c => `
+      <div class="retorno-item">
+        <div style="flex:1">
+          <div class="retorno-nome">${escHtml(c.nome)}</div>
+          <div class="retorno-det">👶 ${escHtml(c.crianca)} · ${c.n} locação(ões) · R$ ${Number(c.fat).toFixed(2).replace('.',',')} · Última: ${c.data}</div>
+        </div>
+        <button class="retorno-btn" onclick='waMensagemRetorno(${JSON.stringify(c)})'>Enviar SMS</button>
+      </div>`).join('');
+  } catch(e) { cont.innerHTML = '<div style="color:var(--red)">Erro ao carregar</div>'; }
+}
+
+
+
+// ── Diagnóstico (Sistema) ─────────────────────────────────────
+function atualizarDiagnostico() {
+  const sessions = (typeof _sessoes !== 'undefined' ? _sessoes : null) ||
+                   (window.kpiData ? [] : []);
+  const ativos   = (typeof dadosLocais !== 'undefined' && dadosLocais.ativos) || [];
+  const agora    = Date.now();
+
+  // Status GAS
+  const gasStatus = document.querySelector('.status-badge-global')?.textContent || '';
+  const gasOnline = document.getElementById('status-dot')?.classList.contains('online') ||
+                   (typeof _syncFailCount !== 'undefined' && _syncFailCount === 0);
+  const dotGas = document.getElementById('diag-dot-gas');
+  const valGas = document.getElementById('diag-gas');
+  if (dotGas) dotGas.className = 'diag-dot ' + (gasOnline ? 'ok' : 'err');
+  if (valGas) valGas.textContent = gasOnline ? 'Online ✓' : 'Offline ✗';
+
+  // FIX 7: usar _lastSyncAt do syncController (não _lastSyncMs que nunca é atualizado)
+  const diffSec = _lastSyncAt > 0 ? Math.round((agora - _lastSyncAt) / 1000) : null;
+  const syncTxt = diffSec === null ? 'Nunca' :
+    diffSec < 60 ? diffSec + 's atrás' :
+    Math.floor(diffSec / 60) + 'min atrás';
+  const dotSync = document.getElementById('diag-dot-sync');
+  if (dotSync) dotSync.className = 'diag-dot ' + (diffSec !== null && diffSec < 120 ? 'ok' : 'warn');
+  const vSync = document.getElementById('diag-sync');
+  if (vSync) vSync.textContent = syncTxt;
+
+  // Versão
+  const verEl = document.getElementById('diag-ver');
+  if (verEl) verEl.textContent = (typeof APP_VERSION !== 'undefined' ? APP_VERSION : '—');
+
+  // Sessões ativas
+  const nAtivos = ativos.filter(s => s.startTimestamp > 0).length;
+  const nPend   = ativos.filter(s => !s.startTimestamp || s.startTimestamp === 0).length;
+  const vSess = document.getElementById('diag-sess');
+  if (vSess) vSess.textContent = nAtivos + ' em curso' + (nPend > 0 ? ' + ' + nPend + ' aguardando' : '');
+  const dotSess = document.getElementById('diag-dot-sess');
+  if (dotSess) dotSess.className = 'diag-dot ' + (nAtivos > 0 ? 'warn' : 'ok');
+
+  // Sessões em extra
+  const agora2 = Date.now();
+  const emExtra = ativos.filter(s => {
+    if (!s.startTimestamp || s.startTimestamp <= 0) return false;
+    const elapsed = (agora2 - s.startTimestamp) / 1000;
+    const planSec = (s.mins || 10) * 60;
+    return elapsed > planSec;
+  });
+  const vExtra = document.getElementById('diag-extra');
+  const dotExtra = document.getElementById('diag-dot-extra');
+  const alertOver = document.getElementById('diag-alert-over');
+  if (vExtra) vExtra.textContent = emExtra.length > 0 ? emExtra.length + ' em extra ⚠️' : '0 (nenhuma)';
+  if (dotExtra) dotExtra.className = 'diag-dot ' + (emExtra.length > 0 ? 'warn' : 'ok');
+  if (alertOver) {
+    if (emExtra.length > 0) {
+      alertOver.style.display = 'block';
+      alertOver.textContent = '⚠️ Em extra: ' + emExtra.map(s => (s.crianca || s.veiculo || '?')).join(', ');
+    } else {
+      alertOver.style.display = 'none';
+    }
+  }
+}
+
+// FIX 10: diagnóstico atualiza a cada 5s — só recalcula diff, sem GAS call
+// Frequência 5s: "Última sync: 3s atrás" → "8s atrás" → etc. em tempo real
+function atualizarHubAdmin_() {
+  const d = kpiData;
+  const dia = document.getElementById('hub-dia-sub');
+  const mes = document.getElementById('hub-mes-sub');
+  if (d && d.ok) {
+    const nHoje = d.nHoje || 0;
+    if (dia) dia.textContent = nHoje + (nHoje === 1 ? ' locação hoje' : ' locações hoje') + ' · conferência no caixa';
+    if (mes) mes.textContent = 'KPIs do mês, CTO e gestão avançada';
+  }
+  const gasOnline = typeof _syncFailCount !== 'undefined' && _syncFailCount === 0;
+  const chip = document.getElementById('hub-status-txt');
+  const dot = document.getElementById('hub-dot');
+  const ver = typeof APP_VERSION !== 'undefined' ? APP_VERSION : '—';
+  if (chip) chip.textContent = (gasOnline ? 'Online' : 'Atenção sync') + ' · app ' + ver;
+  if (dot) dot.style.background = gasOnline ? '#2E7D32' : '#E65100';
+}
+
+setInterval(() => {
+  const adminPage = document.getElementById('page-admin');
+  const sysPage = document.getElementById('page-sistema');
+  const hubAtivo = (adminPage && adminPage.classList.contains('active')) ||
+    (sysPage && sysPage.classList.contains('active'));
+  if (!hubAtivo) return;
+  if (adminPage && adminPage.classList.contains('active') && typeof atualizarHubAdmin_ === 'function') {
+    atualizarHubAdmin_();
+  }
+  // Só atualiza o campo de "última sync" em tempo real (sem recalcular tudo)
+  const diffSec = _lastSyncAt > 0 ? Math.round((Date.now() - _lastSyncAt) / 1000) : null;
+  const syncTxt = diffSec === null ? 'Nunca' :
+    diffSec < 60 ? diffSec + 's atrás' : Math.floor(diffSec / 60) + 'min atrás';
+  const el = document.getElementById('diag-sync');
+  if (el) el.textContent = syncTxt;
+  const dot = document.getElementById('diag-dot-sync');
+  if (dot) dot.className = 'diag-dot ' + (diffSec !== null && diffSec < 60 ? 'ok' : 'warn');
+  // Sessões em extra — recalcula a cada 5s (timer local, sem GAS)
+  if (typeof atualizarDiagnostico === 'function') atualizarDiagnostico();
+}, 5000);
+
+/** Pacote I — Home admin: só chip “Hoje → Caixa”; KPIs mensais ficam no Dashboard. */
+
+// ════════════════════════════════════════════════════════════

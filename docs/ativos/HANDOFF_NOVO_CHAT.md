@@ -33,7 +33,7 @@ Continuo o MOVI KIDS. Repo: C:\Users\riboc\Documents\Codex\2026-05-30\files-ment
 
 - Ler: este arquivo → `PLANO_PRIORIDADES` → `ESTADO_ATUAL` → `REGRAS` → `ACESSOS_E_AUTORIZACOES` (§7 = agente vs você)
 - Ignorar handoff antigo em `docs/arquivo/planos/`
-- Informar: FE **v1.7.78**, GAS **v1.5.66** — **I20 cronômetro RESOLVIDO** (tablet validado 07/06); doc `INCIDENTE_I20_CRONOMETRO_RESOLUCAO_2026-06-07.md`
+- Informar: FE **v1.7.80**, GAS **v1.5.66** — **I20 cronômetro RESOLVIDO** (tablet validado 07/06); **M.11 `mk-admin.js` ✅**; próximo **M.12 `mk-historico.js`**
 - Deixar claro: **agente** código, testes e **planilha (OAuth)**; **você** Nova versão GAS Web e tablet
 
 ---
@@ -55,10 +55,10 @@ Continuo o MOVI KIDS. Repo: C:\Users\riboc\Documents\Codex\2026-05-30\files-ment
 
 | Camada | Versão | Verificação |
 |--------|--------|-------------|
-| **Frontend** | **v1.7.79** | `mk-version.js` → `window.MK_VERSION` |
-| **Service Worker** | **1.7.79** | `sw.js` → `SW_VERSION` |
+| **Frontend** | **v1.7.80** | `mk-version.js` → `window.MK_VERSION` |
+| **Service Worker** | **1.7.80** | `sw.js` → `SW_VERSION` |
 | **Apps Script** | **v1.5.66** | [ping](https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec?action=ping) → `versao` |
-| **App tablet** | v1.7.79 | https://ribocg-a11y.github.io/movikids/?force=1.7.79 |
+| **App tablet** | v1.7.80 | https://ribocg-a11y.github.io/movikids/?force=1.7.80 |
 
 **Deploy ID GAS (único — nunca criar outro):** `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y`
 
@@ -93,9 +93,11 @@ Continuo o MOVI KIDS. Repo: C:\Users\riboc\Documents\Codex\2026-05-30\files-ment
 
 ## Próximo passo (07/06/2026)
 
-**I20 cronômetro:** **FECHADO** — GAS v1.5.66 + FE v1.7.78; operador confirmou em tablet. Memorial: `INCIDENTE_I20_CRONOMETRO_RESOLUCAO_2026-06-07.md`.
+**I20 cronômetro:** **FECHADO** — GAS v1.5.66 + FE v1.7.78+; operador confirmou em tablet. Memorial: `INCIDENTE_I20_CRONOMETRO_RESOLUCAO_2026-06-07.md`.
 
-**Próximo:** **FASE 1 Homologação** — `HOMOLOGACAO_PRODUCAO_ASSISTIDA.md` checklist I.5 + validar payback no Dashboard + K.3–K.4 tablet se aplicável.
+**Pacote M:** M.11 `mk-admin.js` ✅ (v1.7.80, ~1.563 linhas; `index.html` ~2.342). **Próximo técnico:** M.12 `mk-historico.js` — ver `PACOTE_M_MODULARIZACAO.md`.
+
+**Paralelo:** validar M.10+M.11 no tablet (`?force=1.7.80`) + **FASE 1 Homologação** (`HOMOLOGACAO_PRODUCAO_ASSISTIDA.md` I.5).
 
 **Nunca regredir I20:** antes de push que toque `iniciarTimer_`, `iniciarContagem`, `mergeSessaoCanonica` ou `calcRemaining` → rodar `TESTE_I20_COMPLETO_PROD.ps1` + teste tablet ▶→10:00.
 
@@ -194,7 +196,8 @@ Guia completo: `DEPLOY_GAS_v1.5.32_AUTH.md`
 | Pacote M.9 `mk-home.js` v1.7.74 | ✅ código — **tablet home/painel** ⬜ |
 | GAS v1.5.64 cronômetro | ⬜ **Nova versão Web** (só você) |
 | Pacote M.10 `mk-nav.js` v1.7.79 | ✅ código — **tablet navegação** ⬜ |
-| Pacote M.11 `mk-admin.js` (KPIs, caixa, config) | ⬜ **próximo técnico** — 2 PRs (M.11-A sessão/PIN, M.11-B KPIs/caixa) |
+| Pacote M.11 `mk-admin.js` v1.7.80 | ✅ código — **tablet admin** ⬜ |
+| Pacote M.12 `mk-historico.js` | ⬜ **próximo técnico** |
 | Pacote M.12–M.17 | ⬜ histórico, CRM, custos, avulso, core, enxugar inline — projeção ~900 linhas no doc M |
 | FASE 1 homologação | ⬜ após validar M no tablet |
 | Payback negócio (§10 memorial) | ⬜ FASE 2 |
