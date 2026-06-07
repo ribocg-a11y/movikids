@@ -1,16 +1,17 @@
 # Pacote M — Modularização do frontend
 
 **Início:** 07/06/2026  
-**Atualizado:** 07/06/2026 (planejamento M.10+)  
+**Atualizado:** 07/06/2026 (planejamento detalhado M.10–M.17)  
 **Objetivo:** reduzir monólito `index.html` sem mudar comportamento — extrair JS em fatias com validação por fluxo (`PROTOCOLO_DIAGNOSTICO_E_TESTES.md`).
 
 ---
 
-## Panorama atual (v1.7.78)
+## Panorama atual (v1.7.79)
 
 | Artefato | Linhas | Papel |
 |----------|--------|-------|
-| `index.html` (total) | **~3.756** | HTML ~1.360 + JS inline **~2.396** |
+| `index.html` (total) | **~3.556** | HTML ~1.360 + JS inline **~2.196** |
+| `mk-nav.js` | 148 | Navegação + sidebar (M.10) |
 | `mk-operacao.js` | 736 | Operação balcão (M.8) |
 | `mk-nova.js` | 634 | Nova locação (M.6) |
 | `mk-auth.js` | 1.005 | Auth operadores (extraído antes do M) |
@@ -22,14 +23,16 @@
 | `mk-app.css` | ~1.450 | CSS legado (M.1) |
 
 **Progresso:** CSS e **zona operacional balcão** (nova → drawer → operação → home cards) já estão fora do monólito.  
-**Dívida:** ~**2.400 linhas JS** no inline — concentradas em **admin/gestão**, **histórico/analytics**, **navegação** e **páginas secundárias**.
+**Dívida:** ~**2.400 linhas JS** no inline — **~100 `function`** restantes — concentradas em **admin/gestão**, **histórico/analytics**, **navegação** e **páginas secundárias**.
+
+**Carga atual (v1.7.78):** bloco inline **antes** dos `mk-*.js` no final do `<body>`. Cada extração remove do inline e insere `<script src="mk-*.js">` **imediatamente após** o `</script>` do inline (transição até M.17). Ordem alvo final na seção [Ordem de carga alvo](#ordem-de-carga-alvo-após-m17).
 
 ```mermaid
 pie title JS inline restante por dominio (estimativa)
     "Admin KPIs Caixa Dashboard" : 1420
     "Historico Analytics" : 280
-    "Nav showPage Sidebar" : 180
-    "Shell init operador UI" : 200
+    "Nav showPage Sidebar sb mob" : 200
+    "Shell init operador WA UI" : 200
     "Relacionamento" : 130
     "Config retorno templates" : 120
     "Custos" : 80
@@ -52,8 +55,8 @@ pie title JS inline restante por dominio (estimativa)
 | **M.7** | `mk-drawer.js` | v1.7.71 | ✅ |
 | **M.8** | `mk-operacao.js` | v1.7.72 | ✅ |
 | **M.9** | `mk-home.js` (cards, painel, encHoje) | v1.7.74 | ✅ |
-| **M.10** | `mk-nav.js` (navegação + sidebar) | v1.7.79 | ⬜ **próximo** |
-| **M.11** | `mk-admin.js` (PIN, KPIs, caixa, dashboard, config) | v1.7.80 | ⬜ |
+| **M.10** | `mk-nav.js` (navegação + sidebar) | v1.7.79 | ✅ |
+| **M.11** | `mk-admin.js` (PIN, KPIs, caixa, dashboard, config) | v1.7.80 | ⬜ **próximo** |
 | **M.12** | `mk-historico.js` (período, analytics, ranking) | v1.7.81 | ⬜ |
 | **M.13** | `mk-relacionamento.js` (CRM K.3) | v1.7.82 | ⬜ |
 | **M.14** | `mk-custos.js` | v1.7.83 | ⬜ |
@@ -124,8 +127,9 @@ BOOT
 
 | Bloco | Linhas ~ | Funções-chave | Fase |
 |-------|----------|---------------|------|
-| Globals + config apply | 1361–1460 | `PRECOS`, `aplicarOperacaoConfig_`, `apiParamsComAuth_` | M.16 |
-| Shell operador / WA mode | 1460–1600 | `atualizarOperadorUI_`, `trocarModoWhatsApp` | M.16 |
+| Globals + config apply | 1361–1457 | `PRECOS`, `aplicarOperacaoConfig_`, `apiParamsComAuth_` | M.16 |
+| **Sidebar shell (nav)** | **1458–1497** | `sbSetAdminNavOpen_`, `mobMenuOpen_`, `sbSairSessaoClick_` | **M.10** |
+| Shell operador / WA mode | 1499–1600 | `atualizarOperadorUI_`, `trocarModoWhatsApp` | M.16 |
 | `init`, datas | 1600–1665 | `init()`, `setDefaultDate()` | M.16 |
 | Utils | 1665–1685 | `fmtTime`, `escHtml` | M.16 |
 | Stats home | 1685–1710 | `updateStats`, `loadCustosHoje` | M.16 / mk-home |
@@ -135,7 +139,7 @@ BOOT
 | Toast | 2000–2015 | `toast()` | M.16 |
 | Ranking veículo hist | 2020–2095 | `filtrarPorVeiculo`, `renderVrankSection` | M.12 |
 | **Admin monólito** | 2095–3530 | PIN, KPIs, charts, caixa, opCfg, relatório | **M.11** |
-| Navegação | 3483–3590 | `showPage`, `syncSidebar`, sidebars admin | **M.10** |
+| Navegação core | 3476–3585 | `mkPaginaGestaoPermitida_`, `showPage`, `syncSidebar*`, `show*Sidebar` | **M.10** |
 | tipoIcon (dup) | 3590–3610 | `tipoIcon`, `tipoCor`, `tipoLabel` | M.16 |
 | Config / retorno / diag | 3610–3790 | `irParaConfig`, `atualizarDiagnostico`, hub admin | M.11 |
 | Analytics período | 3790–3940 | `setPeriod`, `renderAnalyticsCards`, charts hist | M.12 |
@@ -145,29 +149,101 @@ BOOT
 
 ## Fases M.10–M.17 (especificação)
 
-### M.10 — `mk-nav.js` (próximo) · ~180 linhas · v1.7.79
+### M.10 — `mk-nav.js` · ~148 linhas · v1.7.79 ✅
 
-**Extrair:**
-- `showPage`, `mkPaginaGestaoPermitida_`
-- `syncSidebar`, `syncSidebarStatus`
-- `sbSetAdminNavOpen_`, `sbToggleAdminNav_`, `mobMenuOpen_`, `mobMenuClose_`, `sbSairSessaoClick_`
-- `showAdminSidebar`, `hideAdminSidebar`, `showSupervisorSidebar`
+**Extrair (11 funções — inventário exato):**
 
-**Dependências:** inline globals; `mk-auth` (roles) em runtime.
+| Função | Linha ~ | Notas |
+|--------|---------|-------|
+| `sbSetAdminNavOpen_` | 1458 | localStorage `mk_sb_admin_open` |
+| `sbToggleAdminNav_` | 1469 | accordion admin na sidebar |
+| `mobMenuOpen_` | 1474 | overlay mobile `<1024px` |
+| `mobMenuClose_` | 1482 | chamado no início de `showPage` |
+| `sbSairSessaoClick_` | 1490 | admin → `adminLogout`; operador → `trocarOperador` |
+| `mkPaginaGestaoPermitida_` | 3476 | supervisor: só `caixa` + `historico` |
+| `showPage` | 3483 | **hub** — ver mapa de side-effects abaixo |
+| `syncSidebar` | 3533 | `.sb-btn.active` |
+| `syncSidebarStatus` | 3542 | dot online/offline |
+| `showAdminSidebar` | 3554 | revela secção admin |
+| `hideAdminSidebar` | 3564 | esconde + reset display botões |
+| `showSupervisorSidebar` | 3576 | esconde dash/ops/config/sys |
+
+**Não extrair nesta fase (ficam no inline até M.11):** `abrirAdmin`, `irAdmin`, `adminLogin` — chamam `showPage` mas pertencem ao domínio admin.
+
+**Posição no HTML (transição):**
+```html
+</script>          <!-- fim inline (~2.200 linhas após M.10) -->
+<script src="mk-nav.js?v=1.7.79"></script>   <!-- NOVO: antes de mk-sessao -->
+<script src="mk-sessao.js?v=1.7.79"></script>
+...
+```
+`sw.js` → adicionar `'mk-nav.js'` em `NETWORK_FIRST`.
+
+**Dependências (runtime, não import):** `isAdmin`, `kpiData`; funções ainda no inline: `carregarKPIs`, `renderCharts`, `buscarHistorico`, `salvarNovaDraft_`, `resetNova`, etc.; `mk-auth`: `mkAuthIsAdmin`, `mkAuthIsSupervisor`.
 
 **Fluxos protocolo:** F1 (navegação), F12 (páginas admin).
 
-**Risco:** médio — `showPage` dispara `carregarKPIs`, `inicializarCaixa`, etc. via `irAdmin`; manter ordem: extrair nav **sem** mudar side-effects de `showPage`.
+**Risco:** médio — `showPage` é hub de side-effects; **copiar literal**, zero refactor.
+
+#### Mapa de side-effects de `showPage` (não alterar na M.10)
+
+| `name` | Side-effects obrigatórios |
+|--------|---------------------------|
+| *(qualquer)* | `mobMenuClose_` se `<1024px`; toggle `.page.active` + nav bottom |
+| admin pages sem permissão | `abrirAdmin()` + return |
+| sair de `nova` | `salvarNovaDraft_()` |
+| `lancamento` | `resetAvulsoForm_()` |
+| `nova` | draft / `resetNova` / `atualizarVeiculoGrid` (4 ramos) |
+| `painel` | `renderPainel()` |
+| `relacionamento` | `carregarRelacionamento()` |
+| `dashboard` | `carregarKPIs` + `renderCharts` (duplo — manter como está) |
+| `custos` | `loadCustosHoje()` |
+| `historico` | `buscarHistorico()` |
+| `admin` | `resetAdminTimer`, KPIs/hub |
+| `sistema` | `resetAdminTimer`, `atualizarDiagnostico` |
+| `operadores` | `refreshOperadoresAdmin_()` |
+| *(se kpiData)* | `showAdminHomeKpis(kpiData)` |
+
+#### Receita de implementação M.10 (passo a passo)
+
+1. **Matriz §4** do protocolo: marcar F1 + F12.
+2. Criar `mk-nav.js` — copiar blocos 1458–1497 e 3475–3585 **sem editar lógica**.
+3. Remover esses blocos do `index.html`.
+4. Inserir `<script src="mk-nav.js?v=1.7.79">` após `</script>` do inline.
+5. Bump: `mk-version.js`, `sw.js` (`SW_VERSION` + `NETWORK_FIRST`), todos `?v=` no `index.html`.
+6. `pre-push-check.ps1` — adicionar guard se desejado: `mk-nav.js` existe e `showPage` não está no inline.
+7. Testes:
+   ```powershell
+   .\scripts\pre-push-check.ps1
+   .\scripts\testes\TESTE_PROTOCOLO_DIAGNOSTICO.ps1 -Foco infra
+   ```
+8. **Tablet** (checklist manual):
+   - [ ] Home → Nova → Painel → voltar (draft preservado)
+   - [ ] Menu mobile abre/fecha; troca de página fecha overlay
+   - [ ] Operador: Gerenciar → PIN → admin sidebar expande
+   - [ ] Supervisor: só Caixa + Histórico na sidebar
+   - [ ] Admin: Dashboard, Caixa, Config, Sistema abrem sem erro console
+9. Atualizar `MAPA_CODIGO_ARQUITETURA.md` §2, `ESTADO_ATUAL.md`, este doc (M.10 ✅).
 
 **DoD:**
-- [ ] Todas as páginas abrem (home, nova, painel, dashboard, caixa, histórico, config, sistema)
-- [ ] Sidebar active state correto
-- [ ] Supervisor vê só caixa/histórico
-- [ ] `pre-push-check` verde
+- [x] `index.html` −~200 linhas (~3.556)
+- [x] `grep "function showPage" index.html` → 0
+- [ ] Todas as páginas abrem; sidebar active correto (tablet)
+- [ ] Supervisor vê só caixa/histórico (tablet)
+- [x] `pre-push-check` verde
 
 ---
 
 ### M.11 — `mk-admin.js` · ~1.420 linhas · v1.7.80
+
+**Entrega recomendada em 2 PRs** (um bump v1.7.80 só no PR final):
+
+| PR | Conteúdo | Linhas ~ | Revisão |
+|----|----------|----------|---------|
+| **M.11-A** | Estado admin (`isAdmin`, `kpiData`, charts refs) + PIN + `adminLogin/Logout` + `tickAdmin` + `irAdmin` | 2096–2279 | Sessão, idle I18, supervisor→caixa |
+| **M.11-B** | `opCfg*` + KPIs/charts + caixa + relatório + config + sistema/diag | 2281–3474 + 3615–3795 | Dashboard payback, caixa copiar |
+
+PR-A pode mergear em branch `feat/m11-admin` sem bump; PR-B extrai o resto + `mk-admin.js` + v1.7.80.
 
 **Extrair (maior fatia):**
 - PIN admin: `abrirAdmin` … `verificarPin`
@@ -191,6 +267,11 @@ BOOT
 Tablet: Dashboard, Caixa, Config templates, Sistema/diagnóstico.
 
 **Risco:** alto — muitas chamadas GAS; não misturar com refatoração de KPI.
+
+**Variáveis que migram com M.11** (hoje no inline ~2098–2107):
+`isAdmin`, `adminTimerInt`, `ADMIN_IDLE_SEC`, `adminCountdown`, `kpiData`, `chartsRendered`, `chartDiario|chartExtrasDia|chartHistExt|chartHoras`, `HIST_CACHE_TTL_MS`, `ADMIN_PIN`, `pinBuffer`, `opCfgEditorTab_`, `opCfgPreviewTab_`, `opCfgDraftPrecos_`, `OPCFG_TIPOS_`, `OPCFG_PLANOS_`.
+
+**Posição de carga:** após `mk-nav.js`, antes de `mk-historico.js` (quando existir) ou após `mk-avulso.js` na ordem alvo.
 
 **DoD:**
 - [ ] Dashboard gráficos renderizam
@@ -350,11 +431,113 @@ const APP_VERSION = window.MK_VERSION;
 
 ---
 
+## Grafo de dependências (pós M.17)
+
+```mermaid
+flowchart TB
+  subgraph inline["index.html inline (~80 linhas)"]
+    G[sessions statsHoje PRECOS appConfig]
+  end
+
+  subgraph core["mk-core.js"]
+    toast[toast fmtTime escHtml tipoIcon]
+    cfg[aplicarOperacaoConfig_]
+  end
+
+  subgraph nav["mk-nav.js"]
+    SP[showPage syncSidebar]
+  end
+
+  subgraph ops["zona balcão — entregue"]
+    sess[mk-sessao]
+    home[mk-home]
+    sync[mk-sync]
+    nova[mk-nova]
+    op[mk-operacao]
+    dr[mk-drawer]
+  end
+
+  subgraph pages["páginas gestão — M.11–M.15"]
+    adm[mk-admin]
+    hist[mk-historico]
+    rel[mk-relacionamento]
+    cus[mk-custos]
+    av[mk-avulso]
+  end
+
+  auth[mk-auth.js]
+
+  G --> core
+  core --> sess
+  core --> ops
+  nav --> adm
+  nav --> pages
+  SP --> adm
+  SP --> hist
+  SP --> rel
+  SP --> nova
+  SP --> home
+  adm --> ChartJS[Chart.js CDN]
+  auth --> SP
+  auth --> adm
+  ops --> G
+  adm --> G
+```
+
+**Regra:** `mk-nav` não importa `mk-admin` — só chama funções globais por nome (padrão atual do projeto).
+
+---
+
+## Estado global — quem fica onde
+
+| Variável / const | Dono final | Motivo |
+|------------------|------------|--------|
+| `sessions`, `statsHoje`, `encHojeData` | inline | contrato sync + home + operação |
+| `PRECOS`, `PLANO_LABELS`, `appConfig` | inline → futuro `operacaoConfig` | lido por 8+ módulos |
+| `isAdmin`, `kpiData`, `pinBuffer` | `mk-admin.js` | só gestão |
+| `catSel`, `custosHoje` | `mk-custos.js` | página custos |
+| `currentPeriod`, caches hist | `mk-historico.js` | analytics |
+| `avulsoState` | `mk-avulso.js` | lançamento avulso |
+| `WA_MODE_KEY` + modo WA UI | `mk-core.js` | transversal auth/nova |
+| `timerInterv` | inline ou `mk-sessao` | já referenciado em sessão |
+
+**Não mover `isAdmin` antes de M.11** — `mk-nav.showPage` e `mk-auth` leem `window.isAdmin` / `isAdmin` hoje.
+
+---
+
+## Armadilhas conhecidas (evitar regressão)
+
+| # | Armadilha | Mitigação |
+|---|-----------|-----------|
+| 1 | Extrair `showPage` e esquecer `sb*` (linhas 1458) | Inventário M.10 lista 12 funções |
+| 2 | `showPage('dashboard')` chama KPI **duas vezes** | Comportamento legado — não “otimizar” na extração |
+| 3 | `irAdmin` fora de `mk-nav` mas chama `showPage` | OK — `mk-nav` carrega antes de qualquer clique |
+| 4 | `tipoIcon` duplicado (`index` + usado em `mk-home`) | Só consolidar na M.16 |
+| 5 | Ordem script: inline define, módulos estendem | Novo `mk-*.js` sempre **após** `</script>` inline até M.17 |
+| 6 | Bump versão esquecido em um `?v=` | `pre-push-check` valida alinhamento |
+| 7 | M.11 + refactor KPI payback junto | Proibido — só mover código |
+| 8 | Supervisor vê botões admin após nav | Testar `showSupervisorSidebar` + `mkPaginaGestaoPermitida_` |
+
+---
+
+## Projeção de linhas pós-fases
+
+| Marco | `index.html` total | JS inline | Δ acumulado vs hoje |
+|-------|-------------------|-----------|---------------------|
+| Hoje v1.7.79 (M.10 ✅) | ~3.556 | ~2.196 | −200 |
+| M.11 admin | ~2.130 | ~776 | −1.620 |
+| M.12–M.15 | ~1.240 | ~336 | −2.060 |
+| M.16 core | ~1.040 | ~136 | −2.260 |
+| M.17 enxugar | **~900–1.100** | **~80** | **−2.316 (~71%)** |
+
+---
+
 ## Referências
 
 - Arquitetura: `MAPA_CODIGO_ARQUITETURA.md` §2–5
 - Testes: `PROTOCOLO_DIAGNOSTICO_E_TESTES.md`
-- Handoff: `HANDOFF_NOVO_CHAT.md` (próximo técnico = M.10)
+- Handoff: `HANDOFF_NOVO_CHAT.md` (próximo técnico = M.11)
 - Auth admin PIN: `ACESSOS_E_AUTORIZACOES.md`
 
-*Próxima ação recomendada: implementar **M.10 `mk-nav.js`** (menor risco, desbloqueia M.11).*
+*Próxima ação: **M.11 `mk-admin.js`** + validação tablet M.10 (`?force=1.7.79`).*
+

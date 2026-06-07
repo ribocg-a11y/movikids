@@ -55,10 +55,10 @@ Continuo o MOVI KIDS. Repo: C:\Users\riboc\Documents\Codex\2026-05-30\files-ment
 
 | Camada | Versão | Verificação |
 |--------|--------|-------------|
-| **Frontend** | **v1.7.78** | `mk-version.js` → `window.MK_VERSION` |
-| **Service Worker** | **1.7.78** | `sw.js` → `SW_VERSION` |
+| **Frontend** | **v1.7.79** | `mk-version.js` → `window.MK_VERSION` |
+| **Service Worker** | **1.7.79** | `sw.js` → `SW_VERSION` |
 | **Apps Script** | **v1.5.66** | [ping](https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec?action=ping) → `versao` |
-| **App tablet** | v1.7.78 | https://ribocg-a11y.github.io/movikids/?force=1.7.78 |
+| **App tablet** | v1.7.79 | https://ribocg-a11y.github.io/movikids/?force=1.7.79 |
 
 **Deploy ID GAS (único — nunca criar outro):** `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y`
 
@@ -193,9 +193,9 @@ Guia completo: `DEPLOY_GAS_v1.5.32_AUTH.md`
 | Pacote M.8 `mk-operacao.js` v1.7.72 | ✅ código — **tablet operação** ⬜ |
 | Pacote M.9 `mk-home.js` v1.7.74 | ✅ código — **tablet home/painel** ⬜ |
 | GAS v1.5.64 cronômetro | ⬜ **Nova versão Web** (só você) |
-| Pacote M.10 `mk-nav.js` (navegação) | ⬜ **próximo técnico** — ver `PACOTE_M_MODULARIZACAO.md` |
-| Pacote M.11 `mk-admin.js` (KPIs, caixa, config) | ⬜ após M.10 |
-| Pacote M.12–M.17 | ⬜ histórico, CRM, custos, avulso, core, enxugar inline |
+| Pacote M.10 `mk-nav.js` v1.7.79 | ✅ código — **tablet navegação** ⬜ |
+| Pacote M.11 `mk-admin.js` (KPIs, caixa, config) | ⬜ **próximo técnico** — 2 PRs (M.11-A sessão/PIN, M.11-B KPIs/caixa) |
+| Pacote M.12–M.17 | ⬜ histórico, CRM, custos, avulso, core, enxugar inline — projeção ~900 linhas no doc M |
 | FASE 1 homologação | ⬜ após validar M no tablet |
 | Payback negócio (§10 memorial) | ⬜ FASE 2 |
 | Pacote L UX polish | ⬜ FASE 3 |
