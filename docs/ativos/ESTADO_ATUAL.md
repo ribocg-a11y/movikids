@@ -2,16 +2,15 @@
 
 Referência única para alinhamento local × produção.
 
-**Prioridades (ordem de execução):** **`PLANO_PRIORIDADES_2026-06.md`** ← ler primeiro  
-**Roadmap mestre:** `PLANO_MESTRE_REORGANIZADO_2026-06.md`  
-**Planejamento ativo:** `PLANO_CONTINUIDADE_2026-06.md` · Pausa maturidade (encerrada): `PLANO_PAUSA_MATURIDADE_2026-06.md`  
-**Handoff:** `HANDOFF_NOVO_CHAT_2026-06-05.md`  
-**Mapa de erros/bugs:** **`MAPA_ERROS_FALHAS_BUGS.md`** (consulta em testes)  
-**DNA visual / produto:** **`DESIGN_DNA_MOVIKIDS.md`** (portal carrossel = norte criativo)  
-**Comunicação balcão:** **`DECISAO_COMUNICACAO_QR_CODE_2026-06.md`** (F4/SMS pausados; QR oficial)  
-**Incidentes:** `INCIDENTE_AUTH_OPERADORES_2026-06-04.md`, `INCIDENTE_DEPLOY_E_EXTRAS_2026-06-04.md`, **`INCIDENTE_POST_BROWSER_LANCAMENTO_2026-06-05.md` (P0)**, **`INCIDENTE_CRONOMETRO_PORTAL_AUTH_2026-06-05_06.md` (I16–I18)**, **`INCIDENTE_AUTH_SESSAO_FANTASMA_PWA_2026-06-06.md` (I19)**  
-**SMS gateway:** `TROCA_SMS_GATEWAY_DJVJRL_2026-06-04.md`  
-**Deploy GAS:** `DEPLOY_GAS_v1.5.32_AUTH.md` · **K.1:** `DEPLOY_v1.5.57_IMPORT_RESPONSAVEIS.md`
+**Índice:** `../INDICE.md` · **Prioridades:** **`PLANO_PRIORIDADES_2026-06.md`** ← ler primeiro  
+**Planejamento ativo:** `PLANO_CONTINUIDADE_2026-06.md`  
+**Mapa de erros/bugs:** **`MAPA_ERROS_FALHAS_BUGS.md`**  
+**DNA visual:** `../referencia/DESIGN_DNA_MOVIKIDS.md`  
+**Comunicação balcão:** **`DECISAO_COMUNICACAO_QR_CODE_2026-06.md`**  
+**Incidentes (arquivo):** `../arquivo/incidentes/`  
+**SMS gateway:** `../referencia/TROCA_SMS_GATEWAY_DJVJRL_2026-06-04.md`  
+**Deploy GAS:** `DEPLOY_GAS_v1.5.32_AUTH.md` · **K.1:** `DEPLOY_v1.5.57_IMPORT_RESPONSAVEIS.md` · **Payback:** `DEPLOY_v1.5.63_PAYBACK.md`  
+**Planos históricos:** `../arquivo/planos/`
 
 ---
 

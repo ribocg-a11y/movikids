@@ -2,7 +2,8 @@
 
 **Data:** 07/06/2026  
 **Função:** documento único de **o que fazer agora**, por ordem de prioridade.  
-**Complementa (não substitui):** `ESTADO_ATUAL.md` (estado), `PLANO_CONTINUIDADE_2026-06.md` (sprints), `REGRAS_DE_PUBLICACAO_SEGURA.md` (regras).
+**Local:** `docs/ativos/` · **Índice:** `../INDICE.md`  
+**Complementa:** `ESTADO_ATUAL.md`, `PLANO_CONTINUIDADE_2026-06.md`, `REGRAS_DE_PUBLICACAO_SEGURA.md`.
 
 ---
 
@@ -25,6 +26,7 @@
 | 0.4 | Ping GAS v1.5.63 | ✅ 07/06 |
 | 0.5 | `PLANO_PRIORIDADES` + deploy docs | ✅ 07/06 |
 | 0.6 | `pre-push-check.ps1` verde | ✅ 07/06 |
+| 0.7 | Saneamento docs → `docs/` | ✅ 07/06 |
 
 **Próximo passo imediato (Ops):** abrir tablet com `?force=1.7.64` → confirmar rodapé **v1.7.64** + chip Turno.
 
@@ -67,10 +69,8 @@
 | `ESTADO_ATUAL.md` | Cita FE v1.7.49 / GAS v1.5.57 — **atualizar** |
 | `PLANO_CONTINUIDADE_2026-06.md` | Cita v1.7.48 / v1.5.56 — **atualizar** |
 | `DEPLOY_GAS_v1.5.32_AUTH.md` | Cita v1.5.61 / v1.7.63 — falta v1.5.62–63 |
-| `CHANGELOG.md` | Parado em 30/05/2026 |
-| `README.md` | Versões antigas |
-| `ROLLBACK_EMERGENCIA.md` / `DEPLOY_SEGURO_*` | Referenciam pastas inexistentes no repo |
-| `DEPLOY_CLASP.md` | Ainda menciona deploy ID morto em trechos |
+| `docs/arquivo/obsoleto/` | CHANGELOG, ROLLBACK — **não usar** |
+| `DEPLOY_CLASP.md` (arquivo) | Trechos obsoletos — ver `DEPLOY_GAS` ativo |
 
 ### 1.4 Pacotes entregues (fechados)
 
@@ -207,11 +207,13 @@ FASE 5  Backlog B7, B1, B2                 [contínuo]
 
 ## 4. Mapa de documentos — o que ler para cada tarefa
 
+Todos em `docs/ativos/` salvo indicação. Índice completo: `docs/INDICE.md`.
+
 | Tarefa | Ler primeiro |
 |--------|--------------|
-| Deploy GAS | `DEPLOY_GAS_v1.5.32_AUTH.md` + deploy específico (payback, K, etc.) |
+| Deploy GAS | `DEPLOY_GAS_v1.5.32_AUTH.md` + deploy específico |
 | Publicar FE | `REGRAS_DE_PUBLICACAO_SEGURA.md` + `pre-push-check.ps1` |
-| Incidente / bug | `MAPA_ERROS_FALHAS_BUGS.md` |
+| Incidente / bug | `MAPA_ERROS_FALHAS_BUGS.md` → `docs/arquivo/incidentes/` |
 | Payback fórmulas | `MEMORIAL_PAYBACK_INVESTIMENTO.md` |
 | Portal / QR | `DECISAO_COMUNICACAO_QR_CODE_2026-06.md` |
 | Tablet QA | `HOMOLOGACAO_PRODUCAO_ASSISTIDA.md`, `CHECKLIST_PACOTE_K.md` |

@@ -1,50 +1,32 @@
 ﻿# MOVI KIDS
 
-Sistema operacional para controle de locacoes da MOVI KIDS.
+Sistema operacional para locações — balcão (tablet), portal do responsável e painel admin.
 
-## Versao preparada
+## Produção (07/06/2026)
 
-- Frontend: `v1.7.46` (ver `ESTADO_ATUAL.md`)
-- Apps Script: `v1.5.56` repo (confirmar ping; ver `DEPLOY_GAS_v1.5.32_AUTH.md`)
-- Mapa de erros/bugs: `MAPA_ERROS_FALHAS_BUGS.md`
-- DNA visual (portal = referência): `DESIGN_DNA_MOVIKIDS.md`
-- Incidentes recentes: `INCIDENTE_CRONOMETRO_PORTAL_AUTH_2026-06-05_06.md`, `INCIDENTE_POST_BROWSER_LANCAMENTO_2026-06-05.md`
-- Objetivo desta versao: corrigir divergencia entre multiplas telas sem tirar o sistema do ar.
+| Camada | Versão |
+|--------|--------|
+| Frontend | **v1.7.64** — https://ribocg-a11y.github.io/movikids/?force=1.7.64 |
+| Apps Script | **v1.5.63** — ping `?action=ping` no deploy `AKfycbwakQ...` |
 
-## Problema tratado
+## Documentação
 
-Antes, cada tela podia manter estado local antigo e mostrar informacoes diferentes sobre a mesma locacao.
+Toda a documentação está em **`docs/`**. Não use arquivos soltos na raiz (foram movidos em 07/06/2026).
 
-Esta versao usa reconciliacao canonica:
+| Comece por | Caminho |
+|------------|---------|
+| **Prioridades e fases** | [docs/ativos/PLANO_PRIORIDADES_2026-06.md](docs/ativos/PLANO_PRIORIDADES_2026-06.md) |
+| **Estado e versões** | [docs/ativos/ESTADO_ATUAL.md](docs/ativos/ESTADO_ATUAL.md) |
+| **Índice completo** | [docs/INDICE.md](docs/INDICE.md) |
 
-- Firebase/GAS vencem para status, timer, extensao, minutos e valores.
-- Estado local da tela preserva somente flags visuais.
+## Publicar com segurança
 
-## Publicacao segura
+1. Ler [docs/ativos/REGRAS_DE_PUBLICACAO_SEGURA.md](docs/ativos/REGRAS_DE_PUBLICACAO_SEGURA.md)
+2. Rodar `.\scripts\pre-push-check.ps1`
+3. `git push` (GitHub Pages)
+4. GAS: colar `.gs` canônico → **Nova versão** no mesmo Deploy ID ([docs/ativos/DEPLOY_GAS_v1.5.32_AUTH.md](docs/ativos/DEPLOY_GAS_v1.5.32_AUTH.md))
 
-Leia antes de trocar:
+## Código canônico
 
-- `HOMOLOGACAO_PRODUCAO_ASSISTIDA.md`
-- `ROLLBACK_EMERGENCIA.md`
-- `COMPARATIVO_ANTIGO_NOVO.md`
-- `DEPLOY_SEGURO_PUBLICAVEL.md`
-
-## Status dos testes
-
-Resultado local:
-
-```text
-PASS_WITH_KNOWN_RISKS
-```
-
-Nao ha bloqueador novo encontrado no pacote de sincronizacao.
-
-Riscos herdados continuam e devem ser tratados na proxima fase:
-
-- Escrita via GET no Apps Script.
-- Webapp anonimo.
-- Uso alto de innerHTML.
-- Muitos onclick inline.
-- Frontend monolitico.
-
-
+- **GAS:** `MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs`
+- **Versão FE:** `mk-version.js`

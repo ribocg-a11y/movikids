@@ -6,7 +6,7 @@ alwaysApply: true
 
 # ALERTA P0 — api() no browser MOVI KIDS
 
-Incidente **05/06/2026** (`INCIDENTE_POST_BROWSER_LANCAMENTO_2026-06-05.md`): Pacote E usou POST no `fetch` quando `ping.postWriteActions` existia. **Quebrou lançamento no tablet** (*Erro de conexão*).
+Incidente **05/06/2026** (`docs/arquivo/incidentes/INCIDENTE_POST_BROWSER_LANCAMENTO_2026-06-05.md`): Pacote E usou POST no `fetch` quando `ping.postWriteActions` existia. **Quebrou lançamento no tablet** (*Erro de conexão*).
 
 ## Regras obrigatórias
 

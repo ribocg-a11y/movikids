@@ -3221,7 +3221,7 @@ function mkGuardEscritaBrowser_(action, method) {
   const act = String(action || '').trim();
   const m = String(method || 'GET').toUpperCase();
   if (!MK_WRITE_ACTIONS.has(act) || m === 'GET' || m === 'HEAD') return;
-  const msg = 'Escritas criticas bloqueadas via ' + m + ' no browser (use GET). Ver INCIDENTE_POST_BROWSER_LANCAMENTO_2026-06-05.md';
+  const msg = 'Escritas criticas bloqueadas via ' + m + ' no browser (use GET). Ver docs/arquivo/incidentes/INCIDENTE_POST_BROWSER_LANCAMENTO_2026-06-05.md';
   console.error('[MK_GUARD]', msg, { action: act, method: m });
   throw new Error(msg);
 }

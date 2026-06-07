@@ -77,7 +77,7 @@ flowchart TD
 | S1.5 | Documentar checklist I.5 | Docs | 🟡 | `HOMOLOGACAO_PRODUCAO_ASSISTIDA.md` + I19 no mapa |
 | S1.6 | Auth turno visível + anti-fantasma | FE | ✅ | v1.7.48; Milena login 13:05 validado |
 
-**Incidente fechado na sprint:** I19 (`INCIDENTE_AUTH_SESSAO_FANTASMA_PWA_2026-06-06.md`).
+**Incidente fechado na sprint:** I19 (`../arquivo/incidentes/INCIDENTE_AUTH_SESSAO_FANTASMA_PWA_2026-06-06.md`).
 
 **Fora desta sprint:** código novo de feature (exceto hotfix P0/P1).
 

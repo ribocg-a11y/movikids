@@ -19,7 +19,7 @@ C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\m
 | **Planilha INVESTIMENTO** | https://docs.google.com/spreadsheets/d/1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618/edit |
 | **App FE v1.7.64+** | https://ribocg-a11y.github.io/movikids/?force=1.7.64 |
 
-Histórico payback base: `DEPLOY_v1.5.61_PAYBACK.md` · Memorial: `MEMORIAL_PAYBACK_INVESTIMENTO.md`
+Histórico payback base: `../arquivo/deploy/DEPLOY_v1.5.61_PAYBACK.md` · Memorial: `MEMORIAL_PAYBACK_INVESTIMENTO.md`
 
 ---
 

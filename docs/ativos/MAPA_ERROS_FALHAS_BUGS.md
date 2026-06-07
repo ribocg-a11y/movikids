@@ -55,11 +55,11 @@
 
 | Doc | IDs |
 |-----|-----|
-| `INCIDENTE_DEPLOY_E_EXTRAS_2026-06-04.md` | I1, I2 |
-| `INCIDENTE_AUTH_OPERADORES_2026-06-04.md` | I4, I6, I7, timer sem operador |
-| `INCIDENTE_POST_BROWSER_LANCAMENTO_2026-06-05.md` | **I15** |
-| **`INCIDENTE_CRONOMETRO_PORTAL_AUTH_2026-06-05_06.md`** | **I16, I17, I18** |
-| **`INCIDENTE_AUTH_SESSAO_FANTASMA_PWA_2026-06-06.md`** | **I19** (Milena 06/06, login OK 13:05) |
+| `../arquivo/incidentes/INCIDENTE_DEPLOY_E_EXTRAS_2026-06-04.md` | I1, I2 |
+| `../arquivo/incidentes/INCIDENTE_AUTH_OPERADORES_2026-06-04.md` | I4, I6, I7, timer sem operador |
+| `../arquivo/incidentes/INCIDENTE_POST_BROWSER_LANCAMENTO_2026-06-05.md` | **I15** |
+| `../arquivo/incidentes/INCIDENTE_CRONOMETRO_PORTAL_AUTH_2026-06-05_06.md` | **I16, I17, I18** |
+| `../arquivo/incidentes/INCIDENTE_AUTH_SESSAO_FANTASMA_PWA_2026-06-06.md` | **I19** (Milena 06/06, login OK 13:05) |
 | `EMERGENCIA_SMS_404.md` | URL morta |
 | `TROCA_SMS_GATEWAY_DJVJRL_2026-06-04.md` | Gateway SMS |
 

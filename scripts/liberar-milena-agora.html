@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Movi Kids — Liberar Milena agora</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 520px; margin: 40px auto; padding: 0 16px; }
+    button { font-size: 16px; padding: 12px 20px; margin: 8px 0; width: 100%; cursor: pointer; }
+    .ok { color: #0a7; } .err { color: #c00; }
+    pre { background: #f4f4f4; padding: 12px; overflow: auto; font-size: 13px; }
+  </style>
+</head>
+<body>
+  <h1>Liberar Milena (emergência)</h1>
+  <p>Operador: <strong>Milena Nunes</strong> (id 2). Clique uma vez:</p>
+  <ol>
+    <li>Liberar sessão do balcão (se houver)</li>
+    <li>Resetar PIN da Milena</li>
+  </ol>
+  <button type="button" id="btn">Executar agora</button>
+  <p id="status"></p>
+  <pre id="log"></pre>
+  <script>
+    const GAS = 'https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec';
+    const PIN = '1416';
+    const log = (t) => { document.getElementById('log').textContent += t + '\n'; };
+    async function api(action, extra) {
+      const q = new URLSearchParams({ action, adminPin: PIN, ...extra });
+      const r = await fetch(GAS + '?' + q, { cache: 'no-store' });
+      return r.json();
+    }
+    document.getElementById('btn').onclick = async () => {
+      const st = document.getElementById('status');
+      st.textContent = 'Executando...';
+      st.className = '';
+      document.getElementById('log').textContent = '';
+      try {
+        const a = await api('liberarSessaoOperadorAdmin');
+        log('Liberar sessão: ' + JSON.stringify(a, null, 2));
+        const b = await api('resetarPinOperadorAdmin', { operadorId: '2' });
+        log('Reset PIN: ' + JSON.stringify(b, null, 2));
+        const c = await api('listarOperadoresLogin');
+        log('Lista: ' + JSON.stringify(c, null, 2));
+        const op = (c.operadores || []).find(o => o.id === 2 || String(o.nome).indexOf('Milena') >= 0);
+        if (c.ok && op && !op.hasPin) {
+          st.textContent = 'Pronto! Milena sem PIN — no tablet: login → Milena Nunes → criar PIN novo (4 dígitos).';
+          st.className = 'ok';
+        } else if (c.ok && op && op.hasPin) {
+          st.textContent = 'Servidor ainda mostra PIN. Apague colunas D e E (pinHash/pinSalt) na linha da Milena em OPERADORES_SISTEMA.';
+          st.className = 'err';
+        } else {
+          st.textContent = 'Verifique o log abaixo.';
+          st.className = 'err';
+        }
+      } catch (e) {
+        st.textContent = 'Erro: ' + e.message;
+        st.className = 'err';
+      }
+    };
+  </script>
+</body>
+</html>

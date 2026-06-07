@@ -1,6 +1,6 @@
 ---
 description: Regra de ouro — sempre informar caminho local do .gs após alteração GAS
-globs: MOVIKIDS_Code*.gs,**/gas/**/*.gs,DEPLOY_GAS*.md
+globs: MOVIKIDS_Code*.gs,**/gas/**/*.gs,docs/ativos/DEPLOY_GAS*.md,DEPLOY_GAS*.md
 alwaysApply: true
 ---
 

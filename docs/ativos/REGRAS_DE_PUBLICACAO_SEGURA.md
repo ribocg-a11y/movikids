@@ -17,7 +17,7 @@ Este documento e uma trava operacional. Nenhuma mudanca futura deve ser publicad
 3. **Nunca** declarar testes OK so com `Invoke-RestMethod POST` — rodar `TESTE_PARIDADE_HTTP_BROWSER_GAS.ps1` e validar **lancamento no tablet**.
 4. Tablets devem mostrar **Online v1.7.35+** — `?force=1.7.31` ou anterior = versao quebrada.
 
-**Documentacao completa:** `INCIDENTE_POST_BROWSER_LANCAMENTO_2026-06-05.md`
+**Documentacao completa:** `../arquivo/incidentes/docs/arquivo/incidentes/INCIDENTE_POST_BROWSER_LANCAMENTO_2026-06-05.md`
 
 ## Regra 1 - Declarar Escopo Antes de Mexer
 
@@ -156,9 +156,9 @@ Erros cometidos neste projeto que nao devem se repetir:
 - deixar documento antigo contradizer hotfix novo;
 - entregar mudanca sem regra de rollback curta;
 - fazer verificacao parcial e chamar de validacao completa;
-- validar POST ao GAS so com PowerShell e declarar tablet OK (incidente 05/06/2026, Pacote E — ver `INCIDENTE_POST_BROWSER_LANCAMENTO_2026-06-05.md`);
+- validar POST ao GAS so com PowerShell e declarar tablet OK (incidente 05/06/2026, Pacote E — ver `docs/arquivo/incidentes/INCIDENTE_POST_BROWSER_LANCAMENTO_2026-06-05.md`);
 - reintroduzir POST no `api()` do browser sem validacao tablet (incidente I15);
-- devolver `startTimestamp` bruto no portal sem `timestampCanonico_` (incidente I16 — ver `INCIDENTE_CRONOMETRO_PORTAL_AUTH_2026-06-05_06.md`);
+- devolver `startTimestamp` bruto no portal sem `timestampCanonico_` (incidente I16 — ver `docs/arquivo/incidentes/INCIDENTE_CRONOMETRO_PORTAL_AUTH_2026-06-05_06.md`);
 - calcular tempo do portal sem `canonLoc_` / paridade com `mergeSessaoCanonica` do balcao (I16);
 - liberar sessao operador sem `cache: 'no-store'` e sem atualizar UI do balcao (I17);
 - deslogar por inatividade com locacao Ativa/Pendente no tablet (I18).
@@ -184,7 +184,7 @@ Erros cometidos neste projeto que nao devem se repetir:
 - Obrigatorio: `mkAuthReconcileSessaoFantasma_` no boot, poll e ao voltar do segundo plano.
 - Obrigatorio: chip **Turno** (`#hd-turno-chip`) visivel no header mobile — Home sozinha **nao** prova operador logado.
 - Validar: `listarOperadoresLogin.sessaoAtiva` = chip do tablet; apos `liberarSessaoOperadorAdmin`, tablet desloga em <=60s.
-- Doc: `INCIDENTE_AUTH_SESSAO_FANTASMA_PWA_2026-06-06.md`; mapa I19.
+- Doc: `docs/arquivo/incidentes/INCIDENTE_AUTH_SESSAO_FANTASMA_PWA_2026-06-06.md`; mapa I19.
 - PWA: `verificarNovaVersao` acelerado; tablet com `?force=VERSAO_ATUAL` ou reinstalar icone apos mudanca grande.
 
 Toda regressao deve gerar:
@@ -218,4 +218,4 @@ Em 04/06/2026 o comando **`clasp deploy`** (feito pelo agente Cursor) quebrou a 
 
 - **Nunca** usar `clasp deploy` na implantacao Web.
 - **Sempre:** `.\scripts\deploy-gas.ps1` (apenas `clasp push`) + **Implantar → Gerenciar implantacoes → Editar Web `AKfycbwakQ...` → Nova versao**.
-- Correcao financeira de locacao encerrada: `corrigirFinanceiroLocacaoAdmin` (ver `INCIDENTE_DEPLOY_E_EXTRAS_2026-06-04.md`).
+- Correcao financeira de locacao encerrada: `corrigirFinanceiroLocacaoAdmin` (ver `docs/arquivo/incidentes/INCIDENTE_DEPLOY_E_EXTRAS_2026-06-04.md`).
