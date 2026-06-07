@@ -1800,19 +1800,22 @@ function iniciarTimer_(p) {
   }
   const rowAntesTimer = sheet.getRange(rowIndex, 1, 1, 28).getValues()[0];
   const antesTimer = locacaoObj_(rowAntesTimer, rowIndex);
-  // v1.5.3b: horaInicio usa o servidor (GAS) — o cliente pode ter relógio adiantado
-  // clientTs é preservado na col Y para o countdown do frontend (delta de tempo)
-  const agora      = new Date();           // servidor GAS — horário correto
-  const horaInicio = fmtHoraLocal_(agora); // America/Sao_Paulo
-  sheet.getRange(rowIndex, 25).setValue(clientTs); // timestamp do cliente (para countdown)
-  sheet.getRange(rowIndex, 3).setValue(horaInicio); // hora de início = servidor
-  sheet.getRange(rowIndex, 15).setValue('Ativa'); // status canonico: Ativa somente apos iniciar timer
+  // v1.5.64 / I16: col Y = relogio do SERVIDOR GAS — portal (celular) e balcao leem o mesmo instante
+  const agora      = new Date();
+  const serverTs   = agora.getTime();
+  const horaInicio = fmtHoraLocal_(agora);
+  const driftMs    = Math.abs(clientTs - serverTs);
+  if (driftMs > 15 * 60 * 1000) {
+    return err_('Relogio do tablet muito divergente do servidor. Ajuste data/hora do aparelho.', 409);
+  }
+  sheet.getRange(rowIndex, 25).setValue(serverTs);
+  sheet.getRange(rowIndex, 3).setValue(horaInicio);
+  sheet.getRange(rowIndex, 15).setValue('Ativa');
   try { CacheService.getScriptCache().remove('carregarInicio_v2'); } catch(e) {}
-  // Firebase: atualizar startTimestamp e status para Ativa
   const rowDataI = sheet.getRange(rowIndex, 1, 1, 28).getValues()[0];
   registrarAuditoriaLocacao_(rowIndex, 'iniciarTimer', antesTimer, locacaoObj_(rowDataI, rowIndex), 'Inicio de contagem', operadorAudit_(p));
   firebaseSyncSessao_(rowIndex, fbDadosSessao_(rowDataI, 'Ativa', rowIndex));
-  return resp_({ startTimestamp: clientTs, horaInicio: horaInicio });
+  return resp_({ startTimestamp: serverTs, horaInicio: horaInicio });
 }
 
 // ── GERAR RELATÓRIO ───────────────────────────────────────────

@@ -89,6 +89,18 @@ try {
     Add-Check "guard.portal.canon" "fail" "acompanhar.html ausente"
   }
 
+  $sessaoPath = Join-Path $root "mk-sessao.js"
+  if (Test-Path $sessaoPath) {
+    $sessaoRaw = Get-Content -Path $sessaoPath -Raw -Encoding UTF8
+    if ($sessaoRaw -notmatch 'function canonSessao_' -or $sessaoRaw -notmatch 'canonSessao_\(s\)') {
+      Add-Check "guard.balcao.canon" "fail" "mk-sessao.js sem canonSessao_/calcRemaining canon (I16)"
+    } else {
+      Add-Check "guard.balcao.canon" "ok" "canonSessao_ no balcao"
+    }
+  } else {
+    Add-Check "guard.balcao.canon" "fail" "mk-sessao.js ausente"
+  }
+
   $gasCanon = Join-Path $root "MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs"
   if (Test-Path $gasCanon) {
     $gasRaw = Get-Content -Path $gasCanon -Raw -Encoding UTF8
@@ -96,6 +108,11 @@ try {
       Add-Check "guard.gas.portal.canon" "fail" "buscarPortalResponsavel_ sem timestampCanonico_ (I16)"
     } else {
       Add-Check "guard.gas.portal.canon" "ok" "timestampCanonico_ no portal GAS"
+    }
+    if ($gasRaw -notmatch 'function iniciarTimer_[\s\S]{0,2500}serverTs') {
+      Add-Check "guard.gas.iniciar.serverTs" "fail" "iniciarTimer_ sem serverTs (I16 paridade)"
+    } else {
+      Add-Check "guard.gas.iniciar.serverTs" "ok" "iniciarTimer usa relogio servidor"
     }
     if ($gasRaw -notmatch 'function importarResponsaveisAdmin_') {
       Add-Check "guard.k1.import" "fail" "importarResponsaveisAdmin_ ausente (Pacote K.1)"

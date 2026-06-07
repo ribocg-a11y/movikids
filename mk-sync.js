@@ -132,32 +132,29 @@ async function sincronizarServidor(force = false) {
 }
 
 function mergeSessaoCanonica(serverSession, localSession = {}) {
-  const status = String(serverSession.status || '').trim();
-  let startTimestamp = Number(serverSession.startTimestamp || 0);
-  const nowTs = Date.now();
-  const isAtiva = status === 'Ativa';
-  const isPendente = status === 'Pendente';
-  if (isPendente) {
-    startTimestamp = 0;
-  } else if ((isAtiva && (!startTimestamp || startTimestamp < 1000000000000)) ||
-      (startTimestamp > 0 && startTimestamp > nowTs + 300000)) {
-    startTimestamp = calcStartTimestamp(serverSession.data, serverSession.horaInicio);
-  }
-  const serverMins = Number(serverSession.mins || 0);
   const hasServerExtMins = Object.prototype.hasOwnProperty.call(serverSession, 'extendedMins');
   const hasServerExtValor = Object.prototype.hasOwnProperty.call(serverSession, 'extendedValor');
   const extendedMins = Number(hasServerExtMins ? serverSession.extendedMins || 0 : localSession.extendedMins || 0);
   const extendedValor = Number(hasServerExtValor ? serverSession.extendedValor || 0 : localSession.extendedValor || 0);
-  const originalMins = Number(serverSession.originalMins || serverMins);
-  const totalMins = Number(serverSession.totalMins || (originalMins + extendedMins));
+  const canonIn = Object.assign({}, serverSession, {
+    extendedMins,
+    extendedValor,
+    originalMins: serverSession.originalMins != null
+      ? serverSession.originalMins
+      : Math.max(0, Number(serverSession.mins || 0) - extendedMins)
+  });
+  const canon = typeof canonSessao_ === 'function' ? canonSessao_(canonIn) : canonIn;
+  const status = canon.status;
+  const startTimestamp = canon.startTimestamp;
+  const isAtiva = status === 'Ativa';
 
   return {
     ...serverSession,
     status,
     startTimestamp,
-    mins: totalMins,
-    originalMins,
-    extendedMins,
+    mins: canon.mins,
+    originalMins: canon.originalMins,
+    extendedMins: canon.extendedMins,
     extendedValor,
     started: isAtiva && startTimestamp > 0,
     alertFired5: Boolean(localSession.alertFired5) || Boolean(serverSession.smsFlags && serverSession.smsFlags.alerta),

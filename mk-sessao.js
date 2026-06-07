@@ -12,11 +12,41 @@ async function loadAtivas() {
   await sincronizarServidor();
 }
 
+/** MK_TIMER_CANON_GUARD I16 — espelha calcStartTimestamp_ (acompanhar.html) e timestampCanonico_ (GAS). */
 function calcStartTimestamp(data, horaInicio) {
-  if (!data || !horaInicio) return Date.now();
-  const [dd,mm,yyyy] = data.split('/').map(Number);
-  const [hh,mi] = horaInicio.split(':').map(Number);
-  return new Date(yyyy, mm-1, dd, hh, mi, 0).getTime();
+  if (!data || !horaInicio) return 0;
+  const dp = String(data).split('/');
+  const hp = String(horaInicio).split(':');
+  if (dp.length < 3 || hp.length < 2) return 0;
+  const d = new Date(
+    parseInt(dp[2], 10),
+    parseInt(dp[1], 10) - 1,
+    parseInt(dp[0], 10),
+    parseInt(hp[0], 10),
+    parseInt(hp[1], 10),
+    0
+  );
+  const out = d.getTime();
+  return isNaN(out) ? 0 : out;
+}
+
+/** Canoniza sessão/locação — mesma regra que canonLoc_ no portal (I16). */
+function canonSessao_(s) {
+  if (!s) return { startTimestamp: 0, mins: 0, originalMins: 0, extendedMins: 0, status: '' };
+  const status = String(s.status || '').trim();
+  let startTimestamp = Number(s.startTimestamp || 0);
+  const nowTs = Date.now();
+  if (status === 'Pendente') {
+    startTimestamp = 0;
+  } else if (status === 'Ativa' && ((!startTimestamp || startTimestamp < 1e12) || startTimestamp > nowTs + 300000)) {
+    startTimestamp = calcStartTimestamp(s.data, s.horaInicio);
+  }
+  const extendedMins = Number(s.extendedMins || 0);
+  const originalMins = s.originalMins != null
+    ? Number(s.originalMins)
+    : Math.max(0, Number(s.mins || 0) - extendedMins);
+  const totalMins = s.originalMins != null ? originalMins + extendedMins : Number(s.mins || 0);
+  return Object.assign({}, s, { status, startTimestamp, mins: totalMins, originalMins, extendedMins });
 }
 
 function saveSessions() {
@@ -270,12 +300,13 @@ function startTimerLoop() {
 }
 
 function calcRemaining(s) {
-  if (!s || !s.startTimestamp || s.startTimestamp < 1000000000000 || s.startTimestamp > Date.now() + 300000) {
-    return Number(s && s.mins ? s.mins : 0) * 60;
+  const c = canonSessao_(s);
+  if (c.status === 'Pendente') return c.mins * 60;
+  if (!c.startTimestamp || c.startTimestamp < 1e12 || c.startTimestamp > Date.now() + 300000) {
+    return c.mins * 60;
   }
-  const elapsed = (Date.now() - s.startTimestamp) / 1000;
-  const total   = s.mins * 60;
-  return Math.floor(total - elapsed);
+  const elapsed = (Date.now() - c.startTimestamp) / 1000;
+  return Math.floor(c.mins * 60 - elapsed);
 }
 
 function checkShake(s) {
@@ -306,5 +337,6 @@ function checkTimer(s) {
 }
 
 window.calcStartTimestamp = calcStartTimestamp;
+window.canonSessao_ = canonSessao_;
 window.saveSessions = saveSessions;
 window.startTimerLoop = startTimerLoop;

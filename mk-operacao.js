@@ -549,6 +549,12 @@ async function iniciarContagem(rowIndex, opts) {
   try {
     const d = await api({ action: 'iniciarTimer', rowIndex, timestamp: ts, ...operadorApiParams_() });
     if (!d.ok) throw new Error(d.erro || 'Servidor não confirmou o início.');
+    // I16: alinhar ao timestamp canonico do GAS (servidor) — portal e balcao leem a mesma col Y
+    const serverTs = Number(d.startTimestamp || 0);
+    if (serverTs >= 1e12) s.startTimestamp = serverTs;
+    if (d.horaInicio) s.horaInicio = d.horaInicio;
+    saveSessions();
+    renderCards();
   } catch(e) {
     s.startTimestamp = 0;
     s.started        = false;

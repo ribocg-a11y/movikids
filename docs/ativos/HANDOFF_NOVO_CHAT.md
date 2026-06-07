@@ -33,7 +33,7 @@ Continuo o MOVI KIDS. Repo: C:\Users\riboc\Documents\Codex\2026-05-30\files-ment
 
 - Ler: este arquivo → `PLANO_PRIORIDADES` → `ESTADO_ATUAL` → `REGRAS` → `ACESSOS_E_AUTORIZACOES` (§7 = agente vs você)
 - Ignorar handoff antigo em `docs/arquivo/planos/`
-- Informar: FE **v1.7.72**, GAS **v1.5.63**, próximo passo do checklist
+- Informar: FE **v1.7.73**, GAS **v1.5.64** (deploy Web pendente — `iniciarTimer` serverTs), próximo passo do checklist
 - Deixar claro: **agente** código, testes e **planilha (OAuth)**; **você** Nova versão GAS Web e tablet
 
 ---
@@ -54,10 +54,10 @@ Continuo o MOVI KIDS. Repo: C:\Users\riboc\Documents\Codex\2026-05-30\files-ment
 
 | Camada | Versão | Verificação |
 |--------|--------|-------------|
-| **Frontend** | **v1.7.72** | `mk-version.js` → `window.MK_VERSION` |
-| **Service Worker** | **1.7.72** | `sw.js` → `SW_VERSION` |
+| **Frontend** | **v1.7.73** | `mk-version.js` → `window.MK_VERSION` |
+| **Service Worker** | **1.7.73** | `sw.js` → `SW_VERSION` |
 | **Apps Script** | **v1.5.63** | [ping](https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec?action=ping) → `versao` |
-| **App tablet** | v1.7.72 | https://ribocg-a11y.github.io/movikids/?force=1.7.72 |
+| **App tablet** | v1.7.73 | https://ribocg-a11y.github.io/movikids/?force=1.7.73 |
 
 **Deploy ID GAS (único — nunca criar outro):** `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y`
 
