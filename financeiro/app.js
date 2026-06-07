@@ -33,7 +33,7 @@ function renderKPIs(d) {
 
   document.getElementById("kpi-custos").textContent = BRL(m.custosTotal);
   document.getElementById("kpi-custos-sub").textContent =
-    `Operacional ${BRL(m.custos)} · CTO ${BRL(m.cto)}`;
+    `Operacional ${BRL(m.custos)} · Golden ${BRL(m.cto)} (MK ${BRL(m.ctoMovikids || 0)} + ZC ${BRL(m.ctoZapclin || 0)})`;
 
   document.getElementById("kpi-resultado").textContent = BRL(m.resultado);
   document.getElementById("kpi-resultado-sub").textContent =
@@ -55,8 +55,11 @@ function renderEmpresa(id, emp, sinal) {
   setSemaforo(el.querySelector(".emp-sinal"), sinal);
 
   el.querySelector(".m-fat").textContent = BRL(m.faturamento);
+  el.querySelector(".m-golden").textContent = BRL(m.cto || 0);
   el.querySelector(".m-resultado").textContent = BRL(m.resultado);
   el.querySelector(".m-margem").textContent = PCT(m.margem);
+  const goldenLbl = el.querySelector(".m-golden-lbl");
+  if (goldenLbl && emp.ctoRegra) goldenLbl.textContent = emp.ctoRegra.includes("10%") ? "Golden (10%)" : "Golden / CTO";
   el.querySelector(".m-ticket").textContent = BRL(emp.ticketMedio);
   el.querySelector(".m-acum").textContent = BRL(emp.fatAcumulado);
 
@@ -124,7 +127,7 @@ function renderCharts(d) {
       labels,
       datasets: [
         { label: "Faturamento", data: fat, backgroundColor: "rgba(74,158,255,0.7)" },
-        { label: "Custos+CTO", data: custos, backgroundColor: "rgba(255,92,92,0.6)" },
+        { label: "Custos+Golden", data: custos, backgroundColor: "rgba(255,92,92,0.6)" },
         { label: "Resultado", data: resultado, backgroundColor: "rgba(62,207,142,0.8)", type: "line", borderColor: "#3ecf8e", tension: 0.3 },
       ],
     },

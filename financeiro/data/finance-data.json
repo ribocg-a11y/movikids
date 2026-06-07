@@ -1,6 +1,6 @@
 {
   "versao": 1,
-  "atualizadoEm": "2026-06-07T18:02:07.260Z",
+  "atualizadoEm": "2026-06-07T18:32:35.044Z",
   "titulo": "Controle Financeiro Geral",
   "empresas": {
     "movikids": {
@@ -11,12 +11,12 @@
       "investimento": 65410,
       "dataInauguracao": "27/05/2026",
       "mesInicioPayback": "05/2026",
-      "fatAcumulado": 6899.5999999999985,
-      "locEncerradas": 339,
-      "ticketMedio": 20.352802359882002,
-      "fatMesAtual": 3919.3999999999996,
+      "fatAcumulado": 6971.799999999999,
+      "locEncerradas": 342,
+      "ticketMedio": 20.385380116959062,
+      "fatMesAtual": 3991.5999999999995,
       "fatMesAnterior": 2980.2000000000007,
-      "crescimentoMesPct": 31.514663445406306,
+      "crescimentoMesPct": 33.93731964297693,
       "meses": {
         "2026-05": {
           "faturamento": 2980.2000000000007,
@@ -28,22 +28,23 @@
           "custosPorCategoria": {}
         },
         "2026-06": {
-          "faturamento": 3919.3999999999996,
+          "faturamento": 3991.5999999999995,
           "custos": 0,
           "cto": 1000,
-          "resultado": 2919.3999999999996,
-          "margem": 74.48589069755575,
-          "qtd": 197,
+          "resultado": 2991.5999999999995,
+          "margem": 74.94738951798777,
+          "qtd": 200,
           "custosPorCategoria": {}
         }
       },
       "payback": {
         "investido": 65410,
-        "recuperado": 4899.6,
-        "percentual": 7.490597767925395,
+        "recuperado": 4971.8,
+        "percentual": 7.600978443663049,
         "mesesProjetados": 25,
-        "mediaResultadoMensal": 2449.8
+        "mediaResultadoMensal": 2485.9
       },
+      "ctoRegra": "max(CTO mínimo contrato, 10% faturamento) — Golden Shopping",
       "avisos": [
         "Custos operacionais ainda não lançados na aba CUSTOS"
       ]
@@ -53,8 +54,8 @@
       "nome": "ZapClin",
       "emoji": "⚡",
       "cor": "#1B8A5A",
-      "investimento": 0,
-      "dataInauguracao": "01/04/2026",
+      "investimento": 93493,
+      "dataInauguracao": "21/04/2026",
       "mesInicioPayback": "04/2026",
       "fatAcumulado": 23874,
       "qtdServicos": 790,
@@ -66,18 +67,18 @@
         "2026-04": {
           "faturamento": 9051,
           "custos": 0,
-          "cto": 0,
-          "resultado": 9051,
-          "margem": 100,
+          "cto": 905.1,
+          "resultado": 8145.9,
+          "margem": 89.99999999999999,
           "qtd": 271,
           "custosPorCategoria": {}
         },
         "2026-05": {
           "faturamento": 12830,
           "custos": 10871.75,
-          "cto": 0,
-          "resultado": 1958.25,
-          "margem": 15.263055339049103,
+          "cto": 1283,
+          "resultado": 675.25,
+          "margem": 5.263055339049104,
           "qtd": 453,
           "custosPorCategoria": {
             "Outros": 7570.65,
@@ -90,9 +91,9 @@
         "2026-06": {
           "faturamento": 1993,
           "custos": 0,
-          "cto": 0,
-          "resultado": 1993,
-          "margem": 100,
+          "cto": 199.3,
+          "resultado": 1793.7,
+          "margem": 90,
           "qtd": 66,
           "custosPorCategoria": {}
         }
@@ -135,15 +136,14 @@
         }
       ],
       "payback": {
-        "investido": 0,
-        "recuperado": 13002.25,
-        "percentual": 0,
-        "mesesProjetados": null,
-        "mediaResultadoMensal": 4334.083333333333
+        "investido": 93493,
+        "recuperado": 10614.85,
+        "percentual": 11.353630753104511,
+        "mesesProjetados": 24,
+        "mediaResultadoMensal": 3538.2833333333333
       },
-      "avisos": [
-        "Preencha a aba INVESTIMENTO com os valores de abertura"
-      ]
+      "ctoRegra": "10% do faturamento — Golden Shopping",
+      "avisos": []
     }
   },
   "consolidado": {
@@ -151,10 +151,12 @@
       "2026-04": {
         "faturamento": 9051,
         "custos": 0,
-        "cto": 0,
-        "custosTotal": 0,
-        "resultado": 9051,
-        "margem": 100,
+        "cto": 905.1,
+        "ctoMovikids": 0,
+        "ctoZapclin": 905.1,
+        "custosTotal": 905.1,
+        "resultado": 8145.9,
+        "margem": 89.99999999999999,
         "movikids": {
           "faturamento": 0,
           "custos": 0,
@@ -167,9 +169,9 @@
         "zapclin": {
           "faturamento": 9051,
           "custos": 0,
-          "cto": 0,
-          "resultado": 9051,
-          "margem": 100,
+          "cto": 905.1,
+          "resultado": 8145.9,
+          "margem": 89.99999999999999,
           "qtd": 271,
           "custosPorCategoria": {}
         }
@@ -177,10 +179,12 @@
       "2026-05": {
         "faturamento": 15810.2,
         "custos": 10871.75,
-        "cto": 1000,
-        "custosTotal": 11871.75,
-        "resultado": 3938.4500000000007,
-        "margem": 24.91081706746278,
+        "cto": 2283,
+        "ctoMovikids": 1000,
+        "ctoZapclin": 1283,
+        "custosTotal": 13154.75,
+        "resultado": 2655.4500000000007,
+        "margem": 16.795802709643144,
         "movikids": {
           "faturamento": 2980.2000000000007,
           "custos": 0,
@@ -193,9 +197,9 @@
         "zapclin": {
           "faturamento": 12830,
           "custos": 10871.75,
-          "cto": 0,
-          "resultado": 1958.25,
-          "margem": 15.263055339049103,
+          "cto": 1283,
+          "resultado": 675.25,
+          "margem": 5.263055339049104,
           "qtd": 453,
           "custosPorCategoria": {
             "Outros": 7570.65,
@@ -207,33 +211,35 @@
         }
       },
       "2026-06": {
-        "faturamento": 5912.4,
+        "faturamento": 5984.599999999999,
         "custos": 0,
-        "cto": 1000,
-        "custosTotal": 1000,
-        "resultado": 4912.4,
-        "margem": 83.08639469589338,
+        "cto": 1199.3,
+        "ctoMovikids": 1000,
+        "ctoZapclin": 199.3,
+        "custosTotal": 1199.3,
+        "resultado": 4785.299999999999,
+        "margem": 79.9602312602346,
         "movikids": {
-          "faturamento": 3919.3999999999996,
+          "faturamento": 3991.5999999999995,
           "custos": 0,
           "cto": 1000,
-          "resultado": 2919.3999999999996,
-          "margem": 74.48589069755575,
-          "qtd": 197,
+          "resultado": 2991.5999999999995,
+          "margem": 74.94738951798777,
+          "qtd": 200,
           "custosPorCategoria": {}
         },
         "zapclin": {
           "faturamento": 1993,
           "custos": 0,
-          "cto": 0,
-          "resultado": 1993,
-          "margem": 100,
+          "cto": 199.3,
+          "resultado": 1793.7,
+          "margem": 90,
           "qtd": 66,
           "custosPorCategoria": {}
         }
       }
     },
-    "resultadoAcumulado": 17901.85,
+    "resultadoAcumulado": 15586.65,
     "mesAtual": "2026-06"
   },
   "sinais": {
@@ -243,9 +249,9 @@
       "motivo": "Custos operacionais ainda não lançados na aba CUSTOS"
     },
     "zapclin": {
-      "nivel": "atencao",
-      "label": "Atenção",
-      "motivo": "Preencha a aba INVESTIMENTO com os valores de abertura"
+      "nivel": "ok",
+      "label": "Sustentável",
+      "motivo": "Resultado positivo com margem saudável"
     },
     "geral": {
       "nivel": "atencao",
@@ -255,8 +261,8 @@
   },
   "narrativa": [
     "Movi Kids: Custos operacionais ainda não lançados na aba CUSTOS.",
-    "ZapClin: Preencha a aba INVESTIMENTO com os valores de abertura.",
-    "Consolidado: resultado acumulado R$ 17.901,85 em 3 meses.",
+    "ZapClin faturou R$ 1.993,00 no último mês; Golden Shopping (10%): R$ 199,30; margem 90%.",
+    "Consolidado: resultado acumulado R$ 15.586,65 em 3 meses.",
     "Dados parciais — lance custos fixos mensais para análise confiável."
   ],
   "mesesOrdem": [
