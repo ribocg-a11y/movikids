@@ -27,7 +27,7 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 | Camada | Versão alvo | URL / ID |
 |--------|-------------|----------|
-| **Frontend** | **v1.7.83** | https://ribocg-a11y.github.io/movikids/?force=1.7.83 |
+| **Frontend** | **v1.7.85** | https://ribocg-a11y.github.io/movikids/?force=1.7.85 |
 | **Apps Script** | **v1.5.66** (I20 `clientTs` + idempotência iniciarTimer) | Deploy `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y` |
 | SMS Gateway Cloud | **DJVJRL** / device `wihWegHr4wXaVJQ1R-GZR` | Aparelho remoto ONLINE |
 | Pacote SMS P0 | **FECHADO** | `PACOTE_SMS_P0_UNIFICADO_v1.5.38_v1.7.11.md` |
@@ -85,12 +85,14 @@ https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPe
 | Versão | Entrega |
 |--------|---------|
 | **v1.7.78** | **I20 definitivo** — início otimista no ▶, `_localTimerStart`, `effectiveStartTs_`, botão imediato; validado tablet |
+| **v1.7.85** | **Pacote M.15** — lançamento avulso extraído para `mk-avulso.js`; `index.html` ~1.730 linhas |
+| **v1.7.84** | **Pacote M.14** — custos extraídos para `mk-custos.js`; `index.html` ~1.810 linhas |
 | **v1.7.83** | **Pacote M.13** — CRM extraído para `mk-relacionamento.js`; `index.html` ~1.890 linhas |
 | **v1.7.82** | Fix M.12 — `HIST_CACHE_TTL_MS` duplicado |
 | **v1.7.81** | **Pacote M.12** — `mk-historico.js` |
 | **v1.7.80** | **Pacote M.11** — admin extraído para `mk-admin.js` |
 | **v1.7.79** | **Pacote M.10** — `showPage` + sidebar extraídos para `mk-nav.js` |
-| **Pacote M** | M.1–M.13 ✅ · **próximo M.14 `mk-custos.js`** — `PACOTE_M_MODULARIZACAO.md` |
+| **Pacote M** | M.1–M.15 ✅ · **próximo M.16 `mk-core.js`** — `PACOTE_M_MODULARIZACAO.md` |
 | **v1.5.66** | **I20 GAS** — `iniciarTimer_` grava `clientTs` (clique) na col Y quando drift ≤ 2 min |
 | **v1.7.76** | I20 fase 1 — SMS separado do ▶; `iniciarContagemDireto_`; card pendente compacto |
 | **v1.5.64–65** | I20 col C/Y — cadastro Pendente; idempotência `iniciarTimer` |

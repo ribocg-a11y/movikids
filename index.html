@@ -16,16 +16,16 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<script src="mk-stale-sync.js?v=1.7.84"></script>
-<script src="mk-version.js?v=1.7.84"></script>
-<script src="mk-api.js?v=1.7.84"></script>
+<script src="mk-stale-sync.js?v=1.7.85"></script>
+<script src="mk-version.js?v=1.7.85"></script>
+<script src="mk-api.js?v=1.7.85"></script>
 <link rel="stylesheet" href="mk-design.css">
 
-<script src="mk-cache-bust.js?v=1.7.84"></script>
+<script src="mk-cache-bust.js?v=1.7.85"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<link rel="stylesheet" href="mk-app.css?v=1.7.84">
+<link rel="stylesheet" href="mk-app.css?v=1.7.85">
 <!-- Firebase SDK — Realtime sync canonico para todos os dispositivos -->
-<script type="module" src="mk-firebase.js?v=1.7.84"></script>
+<script type="module" src="mk-firebase.js?v=1.7.85"></script>
 </head>
 
 <body>
@@ -1361,7 +1361,7 @@
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.84';
+const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.85';
 const PORTAL_RESPONSAVEL_URL = 'https://ribocg-a11y.github.io/movikids/acompanhar.html';
 
 let PRECOS = {
@@ -1693,95 +1693,21 @@ function tipoLabel(tipo) {
 // HOME — encerradas hoje + admin KPIs
 // ════════════════════════════════════════════════════════════
 
-// ── LANÇAMENTO AVULSO v1.7.0 ───────────────────────────────
-let avulsoState = { tipo: null, plano: null };
-
-function resetAvulsoForm_() {
-  avulsoState = { tipo: null, plano: null };
-  ['avulso-motivo','avulso-resp','avulso-crianca','avulso-tel','avulso-veiculo','avulso-pag'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.value = '';
-  });
-  document.querySelectorAll('#avulso-tipo-grid .tipo-btn').forEach(b => b.classList.remove('sel'));
-  const pw = document.getElementById('avulso-plano-wrap');
-  if (pw) pw.style.display = 'none';
-  const pg = document.getElementById('avulso-plano-grid');
-  if (pg) pg.innerHTML = '';
-}
-
-function selAvulsoTipo(el, tipo) {
-  avulsoState.tipo = tipo;
-  avulsoState.plano = null;
-  document.querySelectorAll('#avulso-tipo-grid .tipo-btn').forEach(b => b.classList.remove('sel'));
-  el.classList.add('sel');
-  const precos = PRECOS[tipo];
-  const grid = document.getElementById('avulso-plano-grid');
-  const wrap = document.getElementById('avulso-plano-wrap');
-  if (!precos || !grid || !wrap) return;
-  wrap.style.display = '';
-  grid.innerHTML = Object.keys(precos).map(pl =>
-    `<div class="plano-btn" onclick="selAvulsoPlano(this,'${pl}')">${PLANO_LABELS[pl] || pl}</div>`
-  ).join('');
-}
-
-function selAvulsoPlano(el, plano) {
-  avulsoState.plano = plano;
-  document.querySelectorAll('#avulso-plano-grid .plano-btn').forEach(b => b.classList.remove('sel'));
-  el.classList.add('sel');
-}
-
-async function salvarLancamentoAvulso() {
-  const motivo = String(document.getElementById('avulso-motivo')?.value || '').trim();
-  const responsavel = String(document.getElementById('avulso-resp')?.value || '').trim();
-  const crianca = String(document.getElementById('avulso-crianca')?.value || '').trim();
-  const telefone = String(document.getElementById('avulso-tel')?.value || '').trim();
-  const veiculo = String(document.getElementById('avulso-veiculo')?.value || '').trim();
-  const pagamento = String(document.getElementById('avulso-pag')?.value || '').trim();
-  if (motivo.length < 10) { toast('Justificativa obrigatória (mín. 10 caracteres)', 'warning'); return; }
-  if (!responsavel || !crianca) { toast('Responsável e criança são obrigatórios', 'warning'); return; }
-  if (!avulsoState.tipo || !avulsoState.plano) { toast('Selecione tipo e plano', 'warning'); return; }
-  const btn = document.getElementById('btn-avulso');
-  if (btn) { btn.disabled = true; btn.textContent = 'Salvando...'; }
-  try {
-    const d = await api({
-      action: 'salvarLancamentoAvulso',
-      motivo,
-      tipo: avulsoState.tipo,
-      plano: avulsoState.plano,
-      responsavel,
-      crianca,
-      telefone,
-      veiculo,
-      pagamento,
-      ...operadorApiParams_()
-    });
-    if (d.ok) {
-      toast('Lancamento avulso #' + d.id + ' registrado', 'success');
-      resetAvulsoForm_();
-      broadcastInvalidate && broadcastInvalidate();
-      syncController(true, 0);
-      showPage('home');
-    } else toast(d.erro || 'Erro', 'error');
-  } catch (e) { toast('Erro de conexão', 'error'); }
-  finally {
-    if (btn) { btn.disabled = false; btn.textContent = '⚡ Registrar lançamento avulso'; }
-  }
-}
-
 </script>
-<script src="mk-nav.js?v=1.7.84"></script>
-<script src="mk-admin.js?v=1.7.84"></script>
-<script src="mk-historico.js?v=1.7.84"></script>
-<script src="mk-sessao.js?v=1.7.84"></script>
-<script src="mk-home.js?v=1.7.84"></script>
-<script src="mk-custos.js?v=1.7.84"></script>
-<script src="mk-sync.js?v=1.7.84"></script>
-<script src="mk-nova.js?v=1.7.84"></script>
-<script src="mk-relacionamento.js?v=1.7.84"></script>
-<script src="mk-operacao.js?v=1.7.84"></script>
-<script src="mk-drawer.js?v=1.7.84"></script>
-<script src="mk-update.js?v=1.7.84"></script>
-<script src="mk-auth.js?v=1.7.84"></script>
+<script src="mk-nav.js?v=1.7.85"></script>
+<script src="mk-admin.js?v=1.7.85"></script>
+<script src="mk-historico.js?v=1.7.85"></script>
+<script src="mk-sessao.js?v=1.7.85"></script>
+<script src="mk-home.js?v=1.7.85"></script>
+<script src="mk-custos.js?v=1.7.85"></script>
+<script src="mk-avulso.js?v=1.7.85"></script>
+<script src="mk-sync.js?v=1.7.85"></script>
+<script src="mk-nova.js?v=1.7.85"></script>
+<script src="mk-relacionamento.js?v=1.7.85"></script>
+<script src="mk-operacao.js?v=1.7.85"></script>
+<script src="mk-drawer.js?v=1.7.85"></script>
+<script src="mk-update.js?v=1.7.85"></script>
+<script src="mk-auth.js?v=1.7.85"></script>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
   if (typeof mkAuthBoot === 'function') {
