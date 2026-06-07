@@ -27,7 +27,7 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 | Camada | Versão alvo | URL / ID |
 |--------|-------------|----------|
-| **Frontend** | **v1.7.69** | https://ribocg-a11y.github.io/movikids/?force=1.7.69 |
+| **Frontend** | **v1.7.70** | https://ribocg-a11y.github.io/movikids/?force=1.7.70 |
 | **Apps Script** | **v1.5.63** (payback projetado + parse INVESTIMENTO) | Deploy `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y` |
 | SMS Gateway Cloud | **DJVJRL** / device `wihWegHr4wXaVJQ1R-GZR` | Aparelho remoto ONLINE |
 | Pacote SMS P0 | **FECHADO** | `PACOTE_SMS_P0_UNIFICADO_v1.5.38_v1.7.11.md` |
@@ -59,6 +59,7 @@ https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPe
 | API FE | `mk-api.js` — `api()` + guards I15 (Pacote M.3) |
 | Sync FE | `mk-sync.js` — `syncController` + merge Firebase (Pacote M.4) |
 | Sessão FE | `mk-sessao.js` — SMS, timer, `saveSessions` (Pacote M.5) |
+| Nova FE | `mk-nova.js` — fluxo Nova locação + `atualizarVeiculoGrid` (Pacote M.6) |
 | Deploy | `DEPLOY_GAS_v1.5.32_AUTH.md`, `scripts/deploy-gas.ps1` |
 | Limpeza testes | `scripts/testes/LIMPAR_TESTES_MOVIKIDS.ps1`, `scripts/testes/LIMPAR_SESSOES_TESTE_AGORA.ps1` |
 | Paridade HTTP tablet | `scripts/testes/TESTE_PARIDADE_HTTP_BROWSER_GAS.ps1` |
@@ -73,6 +74,7 @@ https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPe
 
 | Versão | Entrega |
 |--------|---------|
+| **v1.7.70** | Pacote M.6 — Nova locação extraída para `mk-nova.js` |
 | **v1.7.69** | Pacote M.5 — sessão/SMS/timer extraídos para `mk-sessao.js` |
 | **v1.7.68** | Pacote M.4 — `syncController` + merge extraídos para `mk-sync.js` |
 | **v1.7.67** | Pacote M.3 — `api()` + guards I15 extraídos para `mk-api.js` |

@@ -14,7 +14,8 @@
 | **M.3** | `mk-api.js` (api + guards I15) | FE **v1.7.67** | ✅ 07/06 |
 | **M.4** | `mk-sync.js` (sync + Firebase merge) | FE **v1.7.68** | ✅ 07/06 |
 | **M.5** | `mk-sessao.js` (sessão, SMS, timer) | FE **v1.7.69** | ✅ 07/06 |
-| M.6+ | `mk-nova`, `mk-admin`, … | — | ⬜ |
+| **M.6** | `mk-nova.js` (fluxo Nova locação) | FE **v1.7.70** | ✅ 07/06 |
+| M.7+ | `mk-admin`, drawer, … | — | ⬜ |
 
 ---
 
@@ -148,9 +149,34 @@ Tablet: `?force=1.7.68` — cards sync multi-dispositivo + status Online/Offline
 
 Tablet: `?force=1.7.69` — cards com timer, alertas 5min/expirado, badges SMS.
 
-### Próximo (M.6+)
+## M.6 — Nova locação (v1.7.70)
 
-`mk-nova.js` (fluxo Nova locação), depois admin.
+### O que mudou
+
+| Antes | Depois |
+|-------|--------|
+| ~670 linhas Nova inline | `mk-nova.js` (~685 linhas) |
+| `index.html` ~5.680 linhas | **~5.053 linhas** |
+
+### Ordem de carregamento
+
+1. Script inline → `mk-sessao.js` → `mk-sync.js` → **`mk-nova.js`** → `mk-update` → `mk-auth`
+
+### Arquivos
+
+- `mk-nova.js` — draft, steps, `confirmarLocacao`, `atualizarVeiculoGrid`, busca CRM
+
+### Validação
+
+```powershell
+.\scripts\pre-push-check.ps1
+```
+
+Tablet: `?force=1.7.70` — **Nova locação completa** (zona P0 I15).
+
+### Próximo (M.7+)
+
+Admin, drawer sessão, páginas gestão.
 
 ---
 
