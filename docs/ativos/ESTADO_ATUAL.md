@@ -27,7 +27,7 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 | Camada | Versão alvo | URL / ID |
 |--------|-------------|----------|
-| **Frontend** | **v1.7.80** | https://ribocg-a11y.github.io/movikids/?force=1.7.80 |
+| **Frontend** | **v1.7.81** | https://ribocg-a11y.github.io/movikids/?force=1.7.81 |
 | **Apps Script** | **v1.5.66** (I20 `clientTs` + idempotência iniciarTimer) | Deploy `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y` |
 | SMS Gateway Cloud | **DJVJRL** / device `wihWegHr4wXaVJQ1R-GZR` | Aparelho remoto ONLINE |
 | Pacote SMS P0 | **FECHADO** | `PACOTE_SMS_P0_UNIFICADO_v1.5.38_v1.7.11.md` |
@@ -65,6 +65,7 @@ https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPe
 | Home FE | `mk-home.js` — cards, painel, encHoje (Pacote M.9) |
 | Nav FE | `mk-nav.js` — showPage, sidebar, roles gestão (Pacote M.10) |
 | Admin FE | `mk-admin.js` — PIN, KPIs, caixa, config, sistema (Pacote M.11) |
+| Histórico FE | `mk-historico.js` — período, analytics, ranking veículo (Pacote M.12) |
 | Deploy | `DEPLOY_GAS_v1.5.32_AUTH.md`, `scripts/deploy-gas.ps1` |
 | Limpeza testes | `scripts/testes/LIMPAR_TESTES_MOVIKIDS.ps1`, `scripts/testes/LIMPAR_SESSOES_TESTE_AGORA.ps1` |
 | Paridade HTTP tablet | `scripts/testes/TESTE_PARIDADE_HTTP_BROWSER_GAS.ps1` |
@@ -83,9 +84,10 @@ https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPe
 | Versão | Entrega |
 |--------|---------|
 | **v1.7.78** | **I20 definitivo** — início otimista no ▶, `_localTimerStart`, `effectiveStartTs_`, botão imediato; validado tablet |
-| **v1.7.80** | **Pacote M.11** — admin (PIN, KPIs, caixa, config, sistema) extraído para `mk-admin.js`; `index.html` ~2.342 linhas |
+| **v1.7.81** | **Pacote M.12** — histórico/analytics extraídos para `mk-historico.js`; `index.html` ~2.018 linhas |
+| **v1.7.80** | **Pacote M.11** — admin extraído para `mk-admin.js` |
 | **v1.7.79** | **Pacote M.10** — `showPage` + sidebar extraídos para `mk-nav.js` |
-| **Pacote M** | M.1–M.11 ✅ · **próximo M.12 `mk-historico.js`** — `PACOTE_M_MODULARIZACAO.md` |
+| **Pacote M** | M.1–M.12 ✅ · **próximo M.13 `mk-relacionamento.js`** — `PACOTE_M_MODULARIZACAO.md` |
 | **v1.5.66** | **I20 GAS** — `iniciarTimer_` grava `clientTs` (clique) na col Y quando drift ≤ 2 min |
 | **v1.7.76** | I20 fase 1 — SMS separado do ▶; `iniciarContagemDireto_`; card pendente compacto |
 | **v1.5.64–65** | I20 col C/Y — cadastro Pendente; idempotência `iniciarTimer` |
