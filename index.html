@@ -69,13 +69,13 @@
   } catch(e) {}
 })();
 </script>
-<script src="mk-version.js?v=1.7.63"></script>
+<script src="mk-version.js?v=1.7.64"></script>
 <link rel="stylesheet" href="mk-design.css">
 
 <script>
 // ── CACHE BUSTER — alinhado a mk-version.js / APP_VERSION ──
 (function(){
-  const CURRENT = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.63';
+  const CURRENT = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.64';
   const KEY = 'mk_loaded_version';
   function mkVerParts_(v) {
     return String(v || '0.0').split('.').map(function(n) { return parseInt(n, 10) || 0; });
@@ -2453,7 +2453,7 @@ header{
         <div class="payback-n"><div class="payback-n-val" style="color:#5E35B1" id="nk-pb-inv">—</div><div class="payback-n-lbl">Investido</div></div>
         <div class="payback-n"><div class="payback-n-val" style="color:#2E7D32" id="nk-pb-acum">—</div><div class="payback-n-lbl">Recuperado</div></div>
         <div class="payback-n"><div class="payback-n-val" style="color:#E65100" id="nk-pb-falta">—</div><div class="payback-n-lbl">Falta</div></div>
-        <div class="payback-n"><div class="payback-n-val blue" id="nk-pb-meses">—</div><div class="payback-n-lbl">Meses est.</div></div>
+        <div class="payback-n"><div class="payback-n-val blue" id="nk-pb-meses">—</div><div class="payback-n-lbl">Payback prev.</div></div>
       </div>
       <div class="payback-bar-bg"><div class="payback-bar-fill" id="nk-pb-bar" style="width:0%"></div></div>
       <div class="payback-note" id="nk-pb-note">—</div>
@@ -2937,7 +2937,7 @@ header{
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.63';
+const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.64';
 const WEBAPP_URL = (typeof window !== 'undefined' && window.MK_GAS_EXEC_URL) ? window.MK_GAS_EXEC_URL
   : 'https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec';
 const WEBAPP_URL_DEAD_PREFIX = 'AKfycbzc';
@@ -6952,11 +6952,28 @@ function renderCharts(d) {
     } else {
       setText2('nk-pb-title', pctPb + '% recuperado · acumulado até ' + (pb.acumuladoAteLabel || ''));
       if (pbPill) { pbPill.textContent = pctPb + '%'; pbPill.className = 'payback-pill'; }
-      setText2('nk-pb-meses', pb.mesesRestantesEstimados != null ? '~' + pb.mesesRestantesEstimados : '—');
-      const ritmo = pb.mediaResultadoMensal > 0
-        ? 'Ritmo médio ' + R2(pb.mediaResultadoMensal) + '/mês (' + (pb.mesesOperados || 0) + ' meses)'
-        : 'Sem ritmo mensal ainda';
-      setText2('nk-pb-note', ritmo + ' · início ' + (pb.mesInicioPayback || '') + ' · planilha INVESTIMENTO');
+      let pbMesTxt = '—';
+      if (pb.mesesRestantesEstimados != null) {
+        pbMesTxt = '~' + pb.mesesRestantesEstimados;
+        if (pb.previsaoPaybackLabel) pbMesTxt += ' · ' + pb.previsaoPaybackLabel;
+      }
+      setText2('nk-pb-meses', pbMesTxt);
+      const ritmoEst = pb.ritmoMensalEstimado || pb.mediaResultadoMensal || 0;
+      const usaProj = pb.ritmoFonte === 'projecao' && pb.projecaoResMes > 0;
+      let nota = '';
+      if (pb.lucroOperacionalAtivo && pb.resultadoMesAtual != null) {
+        nota += 'Lucro operacional deste mês (até hoje): ' + R2(pb.resultadoMesAtual) + '. ';
+      }
+      if (usaProj && pb.diasOperando > 0) {
+        nota += 'Projeção payback: ' + R2(pb.projecaoResMes) + '/mês (' + pb.diasOperando + ' dias com movimento → mês cheio). ';
+      } else if (ritmoEst > 0) {
+        nota += 'Ritmo estimado: ' + R2(ritmoEst) + '/mês. ';
+      }
+      nota += 'Payback = recuperar os ' + R2(pb.investimentoTotal) + ' investidos (não é quando começa o lucro).';
+      if (pb.mesesRestantesHistorico != null && pb.mesesRestantesHistorico !== pb.mesesRestantesEstimados) {
+        nota += ' Conservador (média parcial): ~' + pb.mesesRestantesHistorico + ' meses.';
+      }
+      setText2('nk-pb-note', nota);
     }
   } else if (pbStrip) {
     pbStrip.style.display = 'none';
@@ -8444,8 +8461,8 @@ async function salvarLancamentoAvulso() {
 }
 
 </script>
-<script src="mk-update.js?v=1.7.63"></script>
-<script src="mk-auth.js?v=1.7.63"></script>
+<script src="mk-update.js?v=1.7.64"></script>
+<script src="mk-auth.js?v=1.7.64"></script>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
   if (typeof mkAuthBoot === 'function') {

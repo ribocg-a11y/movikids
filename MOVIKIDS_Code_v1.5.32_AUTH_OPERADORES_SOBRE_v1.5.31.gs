@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.62
+// MOVI KIDS — Google Apps Script v1.5.63
+// v1.5.63: Payback — previsão com projecaoRes (ritmo dos dias com movimento, não média parcial)
 // v1.5.62: Payback — parseMesAnoPayback_ (B4 dd/MM/yyyy vs MM/yyyy) + % clamp 0–100
 // v1.5.61: Payback — calcPaybackAcumulado_ + buscarKPIsAdmin.payback
 // v1.5.60: Aba INVESTIMENTO — lerInvestimento_ para payback (planilha)
@@ -364,9 +365,9 @@ function ping_() {
   const agora = new Date();
   return resp_({
     status:  'online',
-    versao:  'v1.5.62',
+    versao:  'v1.5.63',
     timestamp: fmtData_(agora) + ' ' + fmtHoraLocal_(agora),
-    sistema: 'MOVI KIDS v1.5.62',
+    sistema: 'MOVI KIDS v1.5.63',
     postWriteActions: WRITE_ACTIONS_CRITICAS_
   });
 }
@@ -1328,6 +1329,54 @@ function calcPaybackAcumulado_(mesFim, anoFim, inv) {
   };
 }
 
+function addMesesCalendario_(mes, ano, n) {
+  let m = mes;
+  let a = ano;
+  for (let i = 0; i < n; i++) {
+    m++;
+    if (m > 12) { m = 1; a++; }
+  }
+  return { mes: m, ano: a, label: String(m).padStart(2, '0') + '/' + a };
+}
+
+/** Enriquece payback com projeção do mês (§5.6 memorial) — ritmo real dos dias com movimento. */
+function enrichPaybackProjecao_(pb, ctx) {
+  if (!pb || !pb.ok) return pb;
+  const mesesHist = pb.mesesRestantesEstimados;
+  const mediaHist = pb.mediaResultadoMensal;
+  pb.mesesRestantesHistorico = mesesHist;
+  pb.mediaHistorica = mediaHist;
+  if (pb.paybackAtingido) {
+    pb.ritmoMensalEstimado = mediaHist;
+    pb.ritmoFonte = 'historico';
+    pb.lucroOperacionalAtivo = (ctx.resultado || 0) > 0;
+    return pb;
+  }
+  const isCorrente = ctx.mesFim === ctx.mesHoje && ctx.anoFim === ctx.anoHoje;
+  const mesParcial = isCorrente && ctx.diasOperando > 0 && ctx.diasOperando < ctx.diasMes;
+  let ritmo = mediaHist;
+  let fonte = 'historico';
+  if (ctx.projecaoRes > 0 && (mesParcial || isCorrente)) {
+    ritmo = ctx.projecaoRes;
+    fonte = 'projecao';
+  }
+  pb.ritmoMensalEstimado = Math.round(ritmo * 100) / 100;
+  pb.ritmoFonte = fonte;
+  pb.projecaoResMes = Math.round((ctx.projecaoRes || 0) * 100) / 100;
+  pb.resultadoMesAtual = Math.round((ctx.resultado || 0) * 100) / 100;
+  pb.diasOperando = ctx.diasOperando || 0;
+  pb.diasMes = ctx.diasMes || 0;
+  pb.lucroOperacionalAtivo = (ctx.resultado || 0) > 0;
+  if (ritmo > 0 && pb.faltaRecuperar > 0) {
+    pb.mesesRestantesEstimados = Math.ceil(pb.faltaRecuperar / ritmo);
+    pb.previsaoPaybackLabel = addMesesCalendario_(ctx.mesFim, ctx.anoFim, pb.mesesRestantesEstimados).label;
+  } else {
+    pb.mesesRestantesEstimados = null;
+    pb.previsaoPaybackLabel = null;
+  }
+  return pb;
+}
+
 function buscarKPIsAdmin_(p) {
   if (!isAdminRequest_(p)) return err_('Acesso negado — KPIs so para administrador', 403);
   const hoje     = new Date();
@@ -1488,7 +1537,16 @@ function buscarKPIsAdmin_(p) {
   const kpiAv = kpiAvancadosMes_(mmyy, nMes, nCancelMes, diasOperandoCalc, nPorVeiculo, minPorVeiculo);
   const porSemanaPack = buildPorSemanaMes_(fatPorDia, nPorDia, extPorDia, diasMes, mesAtual, anoAtual, mediaDiaria);
   const investimento = lerInvestimento_();
-  const payback = calcPaybackAcumulado_(mesAtual, anoAtual, investimento);
+  const payback = enrichPaybackProjecao_(calcPaybackAcumulado_(mesAtual, anoAtual, investimento), {
+    mesFim: mesAtual,
+    anoFim: anoAtual,
+    mesHoje: hoje.getMonth() + 1,
+    anoHoje: hoje.getFullYear(),
+    projecaoRes: projecaoRes,
+    resultado: resultado,
+    diasOperando: diasOperando,
+    diasMes: diasMes
+  });
 
   return resp_({
     // v1.5.4: comparativo + projeção
@@ -1654,7 +1712,7 @@ function carregarInicio_(p) {
 
   const opCfg = operacaoConfig_();
   const resultado = resp_({
-    sistema:    'MOVI KIDS v1.5.62',
+    sistema:    'MOVI KIDS v1.5.63',
     timestamp:  dataHoje + ' ' + fmtHoraLocal_(hoje),
     ativos:     ativas,
     statsHoje,
