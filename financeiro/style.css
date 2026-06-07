@@ -112,7 +112,48 @@ header p {
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 16px 18px;
+  margin-bottom: 14px;
+}
+
+.faixa-acumulado {
+  background: linear-gradient(135deg, rgba(124,108,255,0.15), rgba(74,158,255,0.1));
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 18px;
   margin-bottom: 20px;
+}
+
+.faixa-acumulado[hidden] { display: none; }
+
+.faixa-titulo {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.faixa-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+.faixa-grid div span {
+  display: block;
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+
+.faixa-grid div strong {
+  font-size: 1.1rem;
+}
+
+.faixa-det {
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin-top: 8px;
 }
 
 .faixa-dia[hidden] { display: none; }

@@ -1,4 +1,4 @@
-/* Controle Financeiro Geral — Movi Kids + ZapClin v6 */
+/* Controle Financeiro Geral — Movi Kids + ZapClin v7 */
 
 const BRL = (n) =>
   (n ?? 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -127,6 +127,31 @@ function renderFiltroInfo(d) {
   lbl.textContent = labelPeriodo(d);
 }
 
+function renderFaixaAcumulado(d) {
+  const box = document.getElementById("faixa-acumulado");
+  if (!box || !mesSelecionado) return;
+
+  if (mesSelecionado === MODO_ACUMULADO) {
+    box.hidden = true;
+    return;
+  }
+
+  box.hidden = false;
+  const keys = mesesAte(d, mesSelecionado);
+  const t = somaConsolidado(d, keys);
+  const mk = somaEmpresa(d.empresas.movikids, keys);
+  const zap = somaEmpresa(d.empresas.zapclin, keys);
+
+  document.getElementById("acum-titulo").textContent =
+    `Acumulado até ${d.mesesLabel[mesSelecionado]}`;
+  document.getElementById("acum-fat").textContent = BRL(t.faturamento);
+  document.getElementById("acum-custos").textContent = BRL(t.custosTotal);
+  document.getElementById("acum-resultado").textContent = BRL(t.resultado);
+  document.getElementById("acum-margem").textContent = PCT(margem(t.faturamento, t.resultado));
+  document.getElementById("acum-det").textContent =
+    `MK ${BRL(mk.resultado)} · ZC ${BRL(zap.resultado)}`;
+}
+
 function setupFiltroDia(d) {
   const sel = document.getElementById("filtro-dia");
   const box = document.getElementById("faixa-dia");
@@ -249,8 +274,6 @@ function renderKPIs(d) {
   const isAcum = visao.modo === "acumulado";
   const mk = somaEmpresa(d.empresas.movikids, visao.keys);
   const zap = somaEmpresa(d.empresas.zapclin, visao.keys);
-  const acumKeys = mesSelecionado === MODO_ACUMULADO ? d.mesesOrdem : mesesAte(d, mesSelecionado);
-  const acum = somaConsolidado(d, acumKeys);
 
   document.getElementById("kpi-fat-label").textContent = isAcum ? "Faturamento total" : "Faturamento do mês";
   document.getElementById("kpi-fat").textContent = BRL(c.faturamento);
@@ -267,7 +290,7 @@ function renderKPIs(d) {
   document.getElementById("kpi-resultado-sub").textContent =
     isAcum
       ? `${d.mesesOrdem.length} meses no período`
-      : `Acumulado até ${d.mesesLabel[mesSelecionado]}: ${BRL(acum.resultado)}`;
+      : `Veja faixa acumulada abaixo · mês: ${d.mesesLabel[mesSelecionado]}`;
 
   document.getElementById("kpi-margem-label").textContent = isAcum ? "Margem do período" : "Margem do mês";
   document.getElementById("kpi-margem").textContent = PCT(c.margem);
@@ -463,6 +486,7 @@ function renderAll() {
   try { renderFiltroInfo(DATA); } catch (e) { console.error("filtro", e); }
   try { setupFiltroDia(DATA); } catch (e) { console.error("dia-setup", e); }
   try { renderDia(DATA); } catch (e) { console.error("dia", e); }
+  try { renderFaixaAcumulado(DATA); } catch (e) { console.error("acumulado", e); }
   try { renderKPIs(DATA); } catch (e) { console.error("kpis", e); }
   try { renderEmpresa("card-mk", DATA.empresas.movikids, DATA.sinais.movikids); } catch (e) { console.error("mk", e); }
   try { renderEmpresa("card-zap", DATA.empresas.zapclin, DATA.sinais.zapclin); } catch (e) { console.error("zap", e); }
