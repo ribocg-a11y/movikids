@@ -511,18 +511,42 @@ function abrirModalBv(rowIndex) {
   document.getElementById('wa-bv-modal').classList.add('show');
 }
 
-async function enviarBvEIniciar() {
+/** I20: SMS do portal sem iniciar cronômetro. */
+async function enviarBvSomenteSms_() {
   const s = sessions.find(x => x.rowIndex === bvRowIndex);
   if (s && await waBoasVindas(s) === false) return;
   document.getElementById('wa-bv-modal').classList.remove('show');
-  iniciarContagem(bvRowIndex, { skipAutoPortal: true });
+  bvRowIndex = null;
+  toast('SMS na fila. Aperte ▶ Iniciar quando estiver pronto.', 'info');
+}
+
+/** I20: início explícito — separado do envio de SMS. */
+function iniciarContagemFromBv_() {
+  const ri = bvRowIndex;
+  document.getElementById('wa-bv-modal').classList.remove('show');
+  bvRowIndex = null;
+  if (ri != null) iniciarContagem(ri, { skipAutoPortal: true });
+}
+
+function fecharBvSemIniciar_() {
+  document.getElementById('wa-bv-modal').classList.remove('show');
   bvRowIndex = null;
 }
 
-function pularBvEIniciar() {
-  document.getElementById('wa-bv-modal').classList.remove('show');
-  iniciarContagem(bvRowIndex);
-  bvRowIndex = null;
+/** I20: ▶ na Home — sem modal SMS, sem SMS automático. */
+function iniciarContagemDireto_(rowIndex) {
+  iniciarContagem(rowIndex, { skipAutoPortal: true });
+}
+
+/** SMS opcional em Pendente — não inicia cronômetro. */
+async function enviarSmsPendente_(rowIndex) {
+  const s = sessions.find(x => x.rowIndex === rowIndex);
+  if (!s) return;
+  if (typeof sessaoTimerIniciado_ === 'function' ? sessaoTimerIniciado_(s) : (s.started && s.status === 'Ativa')) {
+    toast('Locação já iniciada — use Enviar SMS no card ativo.', 'warning');
+    return;
+  }
+  await enviarSmsResponsavel_(s, 'portal');
 }
 
 async function iniciarContagem(rowIndex, opts) {
@@ -530,6 +554,7 @@ async function iniciarContagem(rowIndex, opts) {
   const s = sessions.find(x => x.rowIndex === rowIndex);
   if (!s) return;
   if (typeof sessaoTimerIniciado_ === 'function' ? sessaoTimerIniciado_(s) : (s.started && s.status === 'Ativa')) {
+    toast('Contagem já iniciada.', 'info');
     return;
   }
 
@@ -556,23 +581,15 @@ async function iniciarContagem(rowIndex, opts) {
     return;
   }
 
-  // 3. SMS portal automatico ao iniciar (1x) — pular se modal ja enviou boas-vindas
-  if (!opts.skipAutoPortal) {
+  if (opts.sendPortalSms) {
     try {
       const sAtual = sessions.find(x => x.rowIndex === rowIndex);
-      const jaPortal = sAtual && (
-        (sAtual.smsStatus && sAtual.smsStatus.tipo === 'portal') ||
-        (sAtual.smsFlags && sAtual.smsFlags.portal)
-      );
-      if (sAtual && sAtual.telefone && !jaPortal) {
-        enviarSmsResponsavel_(sAtual, 'portal').then(ok => {
-          if (ok) toast('SMS de boas-vindas enviado.', 'info');
-        }).catch(() => {});
+      if (sAtual && sAtual.telefone) {
+        enviarSmsResponsavel_(sAtual, 'portal').catch(() => {});
       }
-    } catch(eSms) {}
+    } catch (eSms) {}
   }
 
-  // 4. Sync via controller (deduplicado, force=true pois sessão mudou)
   broadcastInvalidate(); syncController(true, 500);
 }
 
@@ -748,9 +765,12 @@ window.carregarConfig = carregarConfig;
 window.getMsgTemplate = getMsgTemplate;
 window.encerrarDireto = encerrarDireto;
 window.abrirModalBv = abrirModalBv;
-window.enviarBvEIniciar = enviarBvEIniciar;
-window.pularBvEIniciar = pularBvEIniciar;
+window.enviarBvSomenteSms_ = enviarBvSomenteSms_;
+window.iniciarContagemFromBv_ = iniciarContagemFromBv_;
+window.fecharBvSemIniciar_ = fecharBvSemIniciar_;
 window.iniciarContagem = iniciarContagem;
+window.iniciarContagemDireto_ = iniciarContagemDireto_;
+window.enviarSmsPendente_ = enviarSmsPendente_;
 window.requestNotificationPermission = requestNotificationPermission;
 window.abrirEstender = abrirEstender;
 window.selecionarEstender = selecionarEstender;

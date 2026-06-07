@@ -16,16 +16,16 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<script src="mk-stale-sync.js?v=1.7.74"></script>
-<script src="mk-version.js?v=1.7.74"></script>
-<script src="mk-api.js?v=1.7.74"></script>
+<script src="mk-stale-sync.js?v=1.7.76"></script>
+<script src="mk-version.js?v=1.7.76"></script>
+<script src="mk-api.js?v=1.7.76"></script>
 <link rel="stylesheet" href="mk-design.css">
 
-<script src="mk-cache-bust.js?v=1.7.74"></script>
+<script src="mk-cache-bust.js?v=1.7.76"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<link rel="stylesheet" href="mk-app.css?v=1.7.74">
+<link rel="stylesheet" href="mk-app.css?v=1.7.76">
 <!-- Firebase SDK — Realtime sync canonico para todos os dispositivos -->
-<script type="module" src="mk-firebase.js?v=1.7.74"></script>
+<script type="module" src="mk-firebase.js?v=1.7.76"></script>
 </head>
 
 <body>
@@ -387,9 +387,9 @@
           <div class="pag-sub">Troco necessário</div>
         </div>
       </div>
-      <p class="nova-fechar-hint" id="nova-fechar-hint" style="display:none">Recomendado: enviar SMS do portal e iniciar a contagem. “Só salvar” deixa na Home sem SMS — use ▶ Iniciar depois.</p>
-      <button class="btn btn-primary" onclick="confirmarLocacaoEIniciar_()" id="btn-confirmar-iniciar" style="display:none">
-        ✓ Enviar SMS e iniciar locação
+      <p class="nova-fechar-hint" id="nova-fechar-hint" style="display:none">O cronômetro só começa após ▶ Iniciar na Home. “Salvar e enviar SMS” não inicia a contagem.</p>
+      <button class="btn btn-primary" onclick="confirmarLocacaoEEnviarSms_()" id="btn-confirmar-iniciar" style="display:none">
+        ✓ Salvar e enviar SMS do portal
       </button>
       <button class="btn btn-secondary" onclick="confirmarLocacao()" id="btn-confirmar" style="display:none;margin-top:8px">
         Só salvar cadastro (sem SMS agora)
@@ -1235,14 +1235,17 @@
     <div class="modal-handle"></div>
     <div class="modal-icon">SMS</div>
     <div class="modal-title">Enviar boas-vindas</div>
-    <div class="modal-sub">Revise a mensagem e envie ao responsável antes de iniciar a contagem.</div>
+    <div class="modal-sub">Envie o SMS se quiser. O cronômetro só começa ao tocar ▶ Iniciar contagem.</div>
     <div class="wa-preview" id="wa-bv-preview"></div>
     <div class="modal-btns">
-      <button class="btn btn-wa" id="btn-wa-bv-send" onclick="enviarBvEIniciar()">
-        Enviar SMS e Iniciar
+      <button class="btn btn-wa" id="btn-wa-bv-send" onclick="enviarBvSomenteSms_()">
+        Enviar SMS
       </button>
-      <button class="btn btn-secondary btn-sm" onclick="pularBvEIniciar()">
-        Pular mensagem e iniciar
+      <button class="btn btn-primary btn-sm" onclick="iniciarContagemFromBv_()">
+        ▶ Iniciar contagem
+      </button>
+      <button class="btn btn-secondary btn-sm" onclick="fecharBvSemIniciar_()">
+        Agora não
       </button>
     </div>
   </div>
@@ -1358,7 +1361,7 @@
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.74';
+const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.76';
 const PORTAL_RESPONSAVEL_URL = 'https://ribocg-a11y.github.io/movikids/acompanhar.html';
 
 let PRECOS = {
@@ -4011,14 +4014,14 @@ async function salvarLancamentoAvulso() {
 }
 
 </script>
-<script src="mk-sessao.js?v=1.7.74"></script>
-<script src="mk-home.js?v=1.7.74"></script>
-<script src="mk-sync.js?v=1.7.74"></script>
-<script src="mk-nova.js?v=1.7.74"></script>
-<script src="mk-operacao.js?v=1.7.74"></script>
-<script src="mk-drawer.js?v=1.7.74"></script>
-<script src="mk-update.js?v=1.7.74"></script>
-<script src="mk-auth.js?v=1.7.74"></script>
+<script src="mk-sessao.js?v=1.7.76"></script>
+<script src="mk-home.js?v=1.7.76"></script>
+<script src="mk-sync.js?v=1.7.76"></script>
+<script src="mk-nova.js?v=1.7.76"></script>
+<script src="mk-operacao.js?v=1.7.76"></script>
+<script src="mk-drawer.js?v=1.7.76"></script>
+<script src="mk-update.js?v=1.7.76"></script>
+<script src="mk-auth.js?v=1.7.76"></script>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
   if (typeof mkAuthBoot === 'function') {

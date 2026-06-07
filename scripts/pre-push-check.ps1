@@ -114,14 +114,37 @@ try {
     } else {
       Add-Check "guard.gas.iniciar.serverTs" "ok" "iniciarTimer usa relogio servidor"
     }
-    if ($gasRaw -notmatch 'function salvarLocacao_[\s\S]{0,1200}fmtData_\(agora\),\s*''') {
+    $novaRaw = Join-Path $root "mk-nova.js"
+    if (Test-Path $novaRaw) {
+      $novaJs = Get-Content -Path $novaRaw -Raw -Encoding UTF8
+      if ($novaJs -match 'confirmarLocacaoEIniciar_' -or $novaJs -notmatch 'confirmarLocacaoEEnviarSms_') {
+        Add-Check "guard.nova.sms.sem.autoStart" "fail" "mk-nova.js: cadastro nao pode auto-iniciar timer (I20)"
+      } else {
+        Add-Check "guard.nova.sms.sem.autoStart" "ok" "SMS cadastro separado do iniciarTimer"
+      }
+    }
+    $opRaw = Join-Path $root "mk-operacao.js"
+    if (Test-Path $opRaw) {
+      $opJs = Get-Content -Path $opRaw -Raw -Encoding UTF8
+      if ($opJs -match 'enviarBvEIniciar|pularBvEIniciar') {
+        Add-Check "guard.modal.bv.sem.autoStart" "fail" "modal BV ainda acopla SMS+iniciar (I20)"
+      } else {
+        Add-Check "guard.modal.bv.sem.autoStart" "ok" "modal BV: SMS e iniciar separados"
+      }
+      if ($opJs -notmatch 'iniciarContagemDireto_') {
+        Add-Check "guard.iniciar.direto" "fail" "mk-operacao sem iniciarContagemDireto_ (I20)"
+      } else {
+        Add-Check "guard.iniciar.direto" "ok" "▶ inicia sem modal SMS"
+      }
+    }
+    if ($gasRaw -notmatch 'function salvarLocacao_[\s\S]{0,3500}fmtData_\(agora\),\s*''') {
       Add-Check "guard.gas.salvar.horaVazia" "fail" "salvarLocacao_ grava hora na col C (I20)"
     } else {
       Add-Check "guard.gas.salvar.horaVazia" "ok" "col C vazia no cadastro"
     }
-    if ($gasRaw -notmatch 'function timestampCanonico_[\s\S]{0,400}return 0') {
+    if ($gasRaw -notmatch 'function timestampCanonico_[\s\S]{0,500}return 0') {
       Add-Check "guard.gas.timestamp.noFallback" "fail" "timestampCanonico_ sem return 0 / fallback I20"
-    } elseif ($gasRaw -match 'function timestampCanonico_[\s\S]{0,800}(parseData|calcStart|horaVal.*dataVal)') {
+    } elseif ($gasRaw -match 'function timestampCanonico_[\s\S]{0,500}(parseDataStr_|calcStartTimestamp_)') {
       Add-Check "guard.gas.timestamp.noFallback" "fail" "timestampCanonico_ ainda infere por data/hora (I20)"
     } else {
       Add-Check "guard.gas.timestamp.noFallback" "ok" "timestampCanonico so col Y"

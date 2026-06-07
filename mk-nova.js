@@ -525,7 +525,7 @@ async function confirmarLocacao() {
   if (!mkRequireOperadorEscrita_()) return;
 
   const btn = document.getElementById('btn-confirmar');
-  btn.textContent = '⏳ Iniciando...'; btn.disabled = true;
+  btn.textContent = '⏳ Salvando cadastro...'; btn.disabled = true;
 
   try {
     // Preço local como fallback caso GAS não conheça o tipo (ex: Triciclo em GAS antigo)
@@ -597,7 +597,8 @@ async function confirmarLocacao() {
   }
 }
 
-async function confirmarLocacaoEIniciar_() {
+/** I20: salva Pendente + SMS portal — cronômetro só no ▶ Iniciar da Home. */
+async function confirmarLocacaoEEnviarSms_() {
   if (!novaState.veiculo || !novaState.pagamento) {
     toast('Complete veículo, plano e pagamento.', 'error');
     return;
@@ -664,20 +665,24 @@ async function confirmarLocacaoEIniciar_() {
     showPage('home');
     renderCards();
     atualizarVeiculoGrid();
-    setTimeout(() => {
-      const s = sessions.find(x => Number(x.rowIndex) === Number(rowIdx)) || sessions.find(x => Number(x.id) === Number(d.id));
-      if (s) abrirModalBv(s.rowIndex);
-      else toast('Cadastro salvo. Use ▶ Iniciar na Home.', 'success');
-    }, 400);
+
+    const s = sessions.find(x => Number(x.rowIndex) === Number(rowIdx)) ||
+              sessions.find(x => Number(x.id) === Number(d.id));
+    if (s && typeof enviarSmsResponsavel_ === 'function') {
+      await enviarSmsResponsavel_(s, 'portal');
+      toast('Cadastro salvo. SMS na fila. Aperte ▶ Iniciar quando estiver pronto.', 'success');
+    } else {
+      toast('Cadastro salvo. Aperte ▶ Iniciar na Home.', 'success');
+    }
   } catch (e) {
     toast((e && e.message) ? e.message : 'Erro de conexão.', 'error');
   } finally {
-    if (btn) { btn.textContent = '✓ Enviar SMS e iniciar locação'; btn.disabled = false; }
+    if (btn) { btn.textContent = '✓ Salvar e enviar SMS do portal'; btn.disabled = false; }
     if (btnMain) btnMain.disabled = false;
   }
 }
 
 window.atualizarVeiculoGrid = atualizarVeiculoGrid;
 window.confirmarLocacao = confirmarLocacao;
-window.confirmarLocacaoEIniciar_ = confirmarLocacaoEIniciar_;
+window.confirmarLocacaoEEnviarSms_ = confirmarLocacaoEEnviarSms_;
 

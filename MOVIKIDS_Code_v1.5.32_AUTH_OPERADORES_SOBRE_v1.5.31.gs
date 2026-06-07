@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.64
+// MOVI KIDS — Google Apps Script v1.5.65
+// v1.5.65: iniciarTimer idempotente se ja Ativa com col Y valida (nao reinicia relogio)
 // v1.5.64: iniciarTimer grava serverTs na col Y; timestampCanonico sem fallback hora cadastro; horaInicio vazia no cadastro
 // v1.5.63: Payback — previsão com projecaoRes (ritmo dos dias com movimento, não média parcial)
 // v1.5.62: Payback — parseMesAnoPayback_ (B4 dd/MM/yyyy vs MM/yyyy) + % clamp 0–100
@@ -1783,6 +1784,11 @@ function iniciarTimer_(p) {
   }
   if (statusAtual && statusAtual !== 'Pendente' && statusAtual !== 'Ativa') {
     return err_('Status invalido para iniciar: ' + statusAtual, 409);
+  }
+  const tsExistente = Number(sheet.getRange(rowIndex, 25).getValue() || 0);
+  if (statusAtual === 'Ativa' && tsExistente >= 1e12) {
+    const horaExistente = cellToStr_(sheet.getRange(rowIndex, 3).getValue());
+    return resp_({ startTimestamp: tsExistente, horaInicio: horaExistente, jaIniciada: true });
   }
   const rowAntesTimer = sheet.getRange(rowIndex, 1, 1, 28).getValues()[0];
   const antesTimer = locacaoObj_(rowAntesTimer, rowIndex);

@@ -61,9 +61,14 @@ function buildCard(s) {
         <div class="frozen-time">${fmtTime(s.mins * 60)}</div>
         <div class="frozen-label">⏸ Cadastro salvo · aguardando início</div>
       </div>
-      <button class="btn btn-iniciar" onclick="abrirModalBv(${s.rowIndex})">
-        ▶ INICIAR CONTAGEM
-      </button>
+      <div class="sc-btns">
+        <button class="btn btn-wa" onclick="enviarSmsPendente_(${s.rowIndex})" title="SMS do portal — não inicia o cronômetro">
+          Enviar SMS
+        </button>
+        <button class="btn btn-iniciar" onclick="iniciarContagemDireto_(${s.rowIndex})">
+          ▶ INICIAR CONTAGEM
+        </button>
+      </div>
     </div>`;
   }
 
@@ -254,7 +259,8 @@ function buildPainelCard(nome, tipo, s) {
       <div class="pcard-status">⏸ Aguardando</div>
       <div class="pcard-frozen">${fmtTime(s.mins * 60)}</div>
       <div class="pcard-crianca">${escHtml(s.crianca)}</div>
-      <button class="pcard-btn iniciar" onclick="abrirModalBv(${s.rowIndex})">▶ Iniciar</button>
+      <button class="pcard-btn" style="margin-bottom:6px" onclick="enviarSmsPendente_(${s.rowIndex})">SMS</button>
+      <button class="pcard-btn iniciar" onclick="iniciarContagemDireto_(${s.rowIndex})">▶ Iniciar</button>
     </div>`;
   }
 
