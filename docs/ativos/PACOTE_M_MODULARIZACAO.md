@@ -11,7 +11,7 @@
 |------|---------|--------|--------|
 | **M.1** | CSS legado → `mk-app.css` | FE **v1.7.65** | ✅ 07/06 |
 | **M.2** | `mk-stale-sync.js`, `mk-cache-bust.js`, `mk-firebase.js` | FE **v1.7.66** | ✅ 07/06 |
-| M.3 | `mk-api.js` (api + guards I15) | — | ⬜ |
+| **M.3** | `mk-api.js` (api + guards I15) | FE **v1.7.67** | ✅ 07/06 |
 | M.4 | `mk-sync.js` (sync + Firebase merge) | — | ⬜ |
 | M.5+ | `mk-sessao`, `mk-nova`, `mk-admin`, … | — | ⬜ |
 
@@ -70,9 +70,39 @@ Tablet: `?force=1.7.65` — Home, Nova locação, Dashboard (visual igual).
 - `mk-stale-sync.js`, `mk-cache-bust.js`, `mk-firebase.js` (novos)
 - `sw.js` — NETWORK_FIRST nos 3 arquivos
 
-### Próximo (M.3)
+## M.3 — API + guards I15 (v1.7.67)
 
-Extrair `api()` + guards I15 → `mk-api.js`.
+### O que mudou
+
+| Antes | Depois |
+|-------|--------|
+| ~130 linhas `api()` inline | `mk-api.js` (~95 linhas) |
+| `index.html` ~6.398 linhas | **~6.268 linhas** |
+
+### Ordem de carregamento
+
+1. `mk-stale-sync.js`
+2. `mk-version.js`
+3. **`mk-api.js`** ← após versão/URL GAS
+4. `mk-design.css` … (resto inalterado)
+
+### Arquivos
+
+- `mk-api.js` (novo) — `api()`, `resolveGasUrl_`, `mkGuardEscritaBrowser_`, `mkRequireOperadorEscrita_`
+- `sw.js` — NETWORK_FIRST em `mk-api.js`
+- `pre-push-check.ps1` — guard I15 em `mk-api.js`
+
+### Validação
+
+```powershell
+.\scripts\pre-push-check.ps1
+```
+
+Tablet: `?force=1.7.67` — **Nova locação** (zona P0 I15).
+
+### Próximo (M.4)
+
+Extrair `syncController` + merge Firebase → `mk-sync.js`.
 
 ---
 

@@ -1,6 +1,6 @@
 ---
 description: P0 — Nunca POST JSON no browser para GAS Web App (incidente 05/06/2026)
-globs: index.html,mk-auth.js,**/TESTE_*.ps1
+globs: index.html,mk-api.js,mk-auth.js,**/TESTE_*.ps1
 alwaysApply: true
 ---
 
@@ -10,7 +10,7 @@ Incidente **05/06/2026** (`docs/arquivo/incidentes/INCIDENTE_POST_BROWSER_LANCAM
 
 ## Regras obrigatórias
 
-1. Em `index.html`, função `api()`: escritas críticas (`salvarLocacao`, `editarLocacao`, `cancelarLocacao`, `encerrarLocacao`, `estenderLocacao`) = **somente GET** com query string.
+1. Em `mk-api.js`, função `api()`: escritas críticas (`salvarLocacao`, `editarLocacao`, `cancelarLocacao`, `encerrarLocacao`, `estenderLocacao`) = **somente GET** com query string.
 2. **Nunca** reintroduzir `method: 'POST'` + `JSON.stringify` no browser para a URL `script.google.com/macros/s/.../exec`.
 3. `postWriteActions` no GAS é para backend/scripts — **não** autoriza POST no frontend.
 4. Antes de publicar mudança em `api()`: rodar `scripts/testes/TESTE_PARIDADE_HTTP_BROWSER_GAS.ps1` e validar **Nova locação no tablet** (não só PowerShell).

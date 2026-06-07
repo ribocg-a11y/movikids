@@ -27,7 +27,7 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 | Camada | Versão alvo | URL / ID |
 |--------|-------------|----------|
-| **Frontend** | **v1.7.66** | https://ribocg-a11y.github.io/movikids/?force=1.7.66 |
+| **Frontend** | **v1.7.67** | https://ribocg-a11y.github.io/movikids/?force=1.7.67 |
 | **Apps Script** | **v1.5.63** (payback projetado + parse INVESTIMENTO) | Deploy `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y` |
 | SMS Gateway Cloud | **DJVJRL** / device `wihWegHr4wXaVJQ1R-GZR` | Aparelho remoto ONLINE |
 | Pacote SMS P0 | **FECHADO** | `PACOTE_SMS_P0_UNIFICADO_v1.5.38_v1.7.11.md` |
@@ -56,6 +56,7 @@ https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPe
 | Versão FE | `mk-version.js`, `sw.js` |
 | CSS FE | `mk-design.css`, `mk-app.css` (Pacote M.1) |
 | Bootstrap FE | `mk-stale-sync.js`, `mk-cache-bust.js`, `mk-firebase.js` (Pacote M.2) |
+| API FE | `mk-api.js` — `api()` + guards I15 (Pacote M.3) |
 | Deploy | `DEPLOY_GAS_v1.5.32_AUTH.md`, `scripts/deploy-gas.ps1` |
 | Limpeza testes | `scripts/testes/LIMPAR_TESTES_MOVIKIDS.ps1`, `scripts/testes/LIMPAR_SESSOES_TESTE_AGORA.ps1` |
 | Paridade HTTP tablet | `scripts/testes/TESTE_PARIDADE_HTTP_BROWSER_GAS.ps1` |
@@ -70,6 +71,9 @@ https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPe
 
 | Versão | Entrega |
 |--------|---------|
+| **v1.7.67** | Pacote M.3 — `api()` + guards I15 extraídos para `mk-api.js` |
+| **v1.7.66** | Pacote M.2 — bootstrap + Firebase extraídos |
+| **v1.7.65** | Pacote M.1 — CSS legado → `mk-app.css` |
 | **v1.7.24** | Pacote D — drawer unificado Encerrar / Estender / Editar / Cancelar |
 | **v1.7.25** | Fix busca cliente passo Quem + checkbox ADM offline encerrar |
 | **v1.7.26** | Pacote E — tentativa POST JSON no FE (revertido v1.7.34 — POST quebra no tablet) |

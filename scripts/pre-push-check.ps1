@@ -58,10 +58,17 @@ try {
     Add-Check "versao.index-cache-bust" "ok" ("?v=" + $mkVer)
   }
 
-  if ($indexRaw -notmatch 'mkGuardEscritaBrowser_') {
-    Add-Check "guard.post.escritas" "fail" "mkGuardEscritaBrowser_ ausente em index.html"
+  $apiPath = Join-Path $root "mk-api.js"
+  $apiRaw = if (Test-Path $apiPath) { Get-Content -Path $apiPath -Raw -Encoding UTF8 } else { "" }
+  if ($indexRaw -notmatch 'mkGuardEscritaBrowser_' -and $apiRaw -notmatch 'mkGuardEscritaBrowser_') {
+    Add-Check "guard.post.escritas" "fail" "mkGuardEscritaBrowser_ ausente (index.html ou mk-api.js)"
   } else {
     Add-Check "guard.post.escritas" "ok" "presente"
+  }
+  if ($apiRaw -match 'method:\s*[''"]POST[''"]') {
+    Add-Check "static.no-post-api" "fail" "mk-api.js contem method POST"
+  } elseif (Test-Path $apiPath) {
+    Add-Check "static.no-post-api" "ok" "sem POST explicito"
   }
 
   if ($indexRaw -match 'method:\s*[''"]POST[''"]') {

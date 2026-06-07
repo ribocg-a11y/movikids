@@ -12,7 +12,7 @@
 |-------|----------------------|-------------------|
 | **Cérebro** | Regras de negócio, dados, financeiro, auth servidor | `MOVIKIDS_Code_...gs` (GAS) + planilha `MOVIKIDS_Planilha_Base` |
 | **Coração** | Pulso operacional — sync balcão, timer, locações ativas | `carregarInicio` (GAS) + `syncController` (index.html) + Firebase `sessoes` |
-| **Sistema nervoso** | Comunicação FE ↔ GAS | `api()` em `index.html` + `doGet`/`dispatchMoviAction_` (GAS) |
+| **Sistema nervoso** | Comunicação FE ↔ GAS | `api()` em `mk-api.js` + `doGet`/`dispatchMoviAction_` (GAS) |
 | **Rosto / identidade** | Versão, URL GAS, cache | `mk-version.js`, `sw.js`, bloco anti-stale no `index.html` |
 | **Imunológico** | Travas P0, CI, incidentes | `pre-push-check.ps1`, `.cursor/rules/`, `REGRAS_DE_PUBLICACAO_SEGURA.md` |
 | **Mãos (braços)** | Ações do operador no balcão | Nova locação, drawer, encerrar, SMS manual — `index.html` + 5 escritas GAS |
@@ -22,7 +22,7 @@
 | **Porta de entrada** | Quem pode entrar | `mk-auth.js` — operador PIN, admin 1416, chip Turno |
 | **Dedos finos** | Scripts pontuais, emergência, testes | `scripts/testes/`, `scripts/liberar-*.html`, `google-drive-sheets-auth` |
 
-**Monólito em redução (Pacote M):** `index.html` **~6.915 linhas** (v1.7.66). Extraídos: `mk-app.css`, `mk-stale-sync.js`, `mk-cache-bust.js`, `mk-firebase.js`, `mk-auth.js` — ver `PACOTE_M_MODULARIZACAO.md`.
+**Monólito em redução (Pacote M):** `index.html` **~6.268 linhas** (v1.7.67). Extraídos: `mk-app.css`, `mk-stale-sync.js`, `mk-cache-bust.js`, `mk-firebase.js`, `mk-api.js`, `mk-auth.js` — ver `PACOTE_M_MODULARIZACAO.md`.
 
 ---
 
@@ -33,13 +33,14 @@ movikids-github/
 ├── CÉREBRO + NERVOSO
 │   └── MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs   ← único GAS canônico
 ├── CORAÇÃO + MÃOS (balcão)
-│   ├── index.html          ← app principal (UI + api + páginas + sync)
+│   ├── index.html          ← app principal (UI + sync + páginas)
 │   ├── mk-auth.js          ← auth operadores/admin (extraído v1.7.48+)
 │   ├── mk-update.js        ← reload seguro pós-update
 │   ├── mk-version.js       ← versão FE + URL GAS
 │   ├── mk-stale-sync.js    ← anti-stale (M.2)
 │   ├── mk-cache-bust.js    ← cache bust pós versão (M.2)
 │   ├── mk-firebase.js      ← RTDB sessoes (M.2)
+│   ├── mk-api.js           ← api() + guards I15 (M.3)
 │   └── sw.js               ← PWA cache
 ├── PERNAS (outros canais)
 │   ├── acompanhar.html     ← portal responsável
@@ -176,7 +177,7 @@ flowchart TB
 
 | # | Zona | Arquivo | Efeito se errar |
 |---|------|---------|-----------------|
-| **K1** | `api()` + GET guard | `index.html` | Tablet: *Erro de conexão* em lançamento (I15) |
+| **K1** | `api()` + GET guard | `mk-api.js` | Tablet: *Erro de conexão* em lançamento (I15) |
 | **K2** | `MK_GAS_EXEC_URL` / `DEPLOY_ID` | `mk-version.js`, `.gs` | 404, caixa morto (I1) |
 | **K3** | `SHEET_ID` | `.gs` L61 | Dados errados ou vazios |
 | **K4** | `ADMIN_PIN` 1416 | `.gs`, `mk-auth.js` | Admin e financeiro bloqueados |
