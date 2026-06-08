@@ -1,6 +1,6 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 08/06/2026  
+**Atualizado:** 08/06/2026 (pós M.17 + testes tablet F5–F11)  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **Repo local:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`  
@@ -84,7 +84,7 @@ Continuo o MOVI KIDS. Repo: C:\Users\riboc\Documents\Codex\2026-05-30\files-ment
 |--------|-----|
 | Deploy GAS | `DEPLOY_GAS_v1.5.32_AUTH.md` + deploy feature (ex. `DEPLOY_v1.5.63_PAYBACK.md`) |
 | Bug / incidente | `MAPA_ERROS_FALHAS_BUGS.md` → `INCIDENTE_I20_CRONOMETRO_RESOLUCAO_2026-06-07.md` (I20) → `docs/arquivo/incidentes/` |
-| QA tablet | **`PROTOCOLO_DIAGNOSTICO_E_TESTES.md`** → `TESTE_PROTOCOLO_DIAGNOSTICO.ps1` |
+| QA tablet | **`PROTOCOLO_DIAGNOSTICO_E_TESTES.md`** → `TESTE_PROTOCOLO_DIAGNOSTICO.ps1` · homologação F5–F11: `TESTE_TABLET_F5_F7_F10_F11.ps1` |
 | Homologação | `HOMOLOGACAO_PRODUCAO_ASSISTIDA.md`, `CHECKLIST_PACOTE_K.md` |
 | Payback | `MEMORIAL_PAYBACK_INVESTIMENTO.md` |
 | Roadmap 90 dias | `PLANO_CONTINUIDADE_2026-06.md` |
@@ -93,15 +93,19 @@ Continuo o MOVI KIDS. Repo: C:\Users\riboc\Documents\Codex\2026-05-30\files-ment
 
 ## Próximo passo (08/06/2026)
 
-**I20 cronômetro:** **FECHADO** — GAS v1.5.66+ + FE v1.7.78+; operador confirmou em tablet. Memorial: `INCIDENTE_I20_CRONOMETRO_RESOLUCAO_2026-06-07.md`.
+**I20 cronômetro:** **FECHADO** — GAS v1.5.66+ + FE v1.7.78+; validado tablet e automatizado. Memorial: `INCIDENTE_I20_CRONOMETRO_RESOLUCAO_2026-06-07.md`.
 
 **Pacote M:** **FECHADO** M.1–M.17 ✅ (v1.7.87; `mk-globals.js` + `mk-boot.js`; zero JS inline). Ver `PACOTE_M_MODULARIZACAO.md`.
 
-**Próximo:** homologação tablet `?force=1.7.87` + **FASE 1** (`HOMOLOGACAO_PRODUCAO_ASSISTIDA.md` I.5). Checklist: `CHECKLIST_TABLET_v1.7.85.md` (URLs `?force=1.7.87`).
+**Homologação tablet (08/06):** F5/F7/F11 **OK** (browser + GAS); F10 cache/reload **OK**; **pendente no tablet físico:** F10 com 2 abas PWA (seção D do checklist). Scripts: `TESTE_TABLET_F5_F7_F10_F11.ps1` + `TESTE_TABLET_F5_F7_F10_F11_BROWSER.js`.
 
-**Diagnóstico sem gravar planilha:** `PROTOCOLO_DIAGNOSTICO_E_TESTES.md` §5.3.1 + `scripts/testes/README.md`.
+**FASE 1:** assinar checklist `CHECKLIST_TABLET_v1.7.85.md` (A–F) no tablet `?force=1.7.87` + `HOMOLOGACAO_PRODUCAO_ASSISTIDA.md` I.5.
 
-**Nunca regredir I20:** antes de push que toque `iniciarTimer_`, `iniciarContagem`, `mergeSessaoCanonica` ou `calcRemaining` → rodar `TESTE_I20_COMPLETO_PROD.ps1` + teste tablet ▶→10:00.
+**Diagnóstico:** completo `TESTE_PROTOCOLO_DIAGNOSTICO.ps1` (WARN transitório Pages); read-only §5.3.1 quando loja aberta.
+
+**Nunca regredir I20:** antes de push em timer → `TESTE_I20_COMPLETO_PROD.ps1` + tablet ▶→10:00.
+
+**Últimos commits:** `e95a8f0` M.17 · `20431a9` fix I20 teste · `0d43fc2` testes tablet F5–F11.
 
 Detalhe vivo: seção **Execução — status ao vivo** em `PLANO_PRIORIDADES_2026-06.md`.
 
@@ -116,7 +120,7 @@ Detalhe vivo: seção **Execução — status ao vivo** em `PLANO_PRIORIDADES_20
 | Clasp (gerado, não editar) | `gas/Code.gs` via `scripts/sync-gas-to-clasp.ps1` |
 | Versão FE | `mk-version.js` + `sw.js` |
 | CSS balcão | `mk-design.css` + `mk-app.css` (Pacote M.1) |
-| App principal | `index.html`, `mk-auth.js`, `mk-design.css` |
+| App principal | `index.html` (só HTML), `mk-globals.js`, `mk-core.js` … `mk-boot.js`, `mk-auth.js` |
 | Portal | `acompanhar.html`, `foto-moldura.html` |
 | Testes | `scripts/testes/` — ver `scripts/testes/README.md` |
 | Pre-push CI | `scripts/pre-push-check.ps1` |
@@ -155,7 +159,7 @@ Invoke-RestMethod "https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5
 .\scripts\pre-push-check.ps1
 ```
 
-Esperado: ping `versao: v1.5.63`, pre-push verde.
+Esperado: ping `versao: v1.5.66+` (08/06: v1.5.67), pre-push verde, FE `1.7.87`.
 
 ---
 
@@ -187,25 +191,17 @@ Guia completo: `DEPLOY_GAS_v1.5.32_AUTH.md`
 
 ## Pacotes fechados vs em andamento
 
-**Fechados:** A, B, C, D, E, F, G, H, I, J, SMS P0, K.1, K.2, fixes I16–I19, Payback M (código v1.5.60–63 + FE v1.7.63–64).
+**Fechados:** A–J, SMS P0, K.1–K.2, fixes I16–I20, Payback (código), **Pacote M modularização M.1–M.17** (FE v1.7.87).
 
 **Em andamento / próximo:**
 
 | Item | Status |
 |------|--------|
-| Pacote M.7 `mk-drawer.js` v1.7.71 | ✅ código — **tablet encerrar** ⬜ |
-| Pacote M.8 `mk-operacao.js` v1.7.72 | ✅ código — **tablet operação** ⬜ |
-| Pacote M.9 `mk-home.js` v1.7.74 | ✅ código — **tablet home/painel** ⬜ |
-| GAS v1.5.64 cronômetro | ⬜ **Nova versão Web** (só você) |
-| Pacote M.10 `mk-nav.js` v1.7.79 | ✅ código — **tablet navegação** ⬜ |
-| Pacote M.11 `mk-admin.js` v1.7.80 | ✅ código — **tablet admin** ⬜ |
-| Pacote M.12 `mk-historico.js` v1.7.81 | ✅ código — **tablet histórico** ⬜ |
-| Pacote M.13 `mk-relacionamento.js` | ⬜ **próximo técnico** |
-| Pacote M.12–M.17 | ⬜ histórico, CRM, custos, avulso, core, enxugar inline — projeção ~900 linhas no doc M |
-| FASE 1 homologação | ⬜ após validar M no tablet |
+| **FASE 1 homologação** | 🟡 F5–F7 automatizado OK; tablet A–F + F10 2 abas ⬜ |
+| K.3–K.4 QA tablet | ⬜ `CHECKLIST_PACOTE_K.md` |
 | Payback negócio (§10 memorial) | ⬜ FASE 2 |
-| Pacote L UX polish | ⬜ FASE 3 |
-| K.3–K.4 QA tablet | ⬜ checklist não assinado |
+| **Pacote L** UX polish + QR balcão | ⬜ FASE 3 |
+| GAS ping produção | v1.5.67 (08/06) — repo header pode ser v1.5.66; **não criar novo Deploy** |
 
 ---
 

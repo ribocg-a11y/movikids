@@ -1,6 +1,6 @@
 # MOVI KIDS — Plano de prioridades (análise de sistemas)
 
-**Data:** 07/06/2026  
+**Data:** 08/06/2026  
 **Função:** documento único de **o que fazer agora**, por ordem de prioridade.  
 **Local:** `docs/ativos/` · **Índice:** `../INDICE.md`  
 **Handoff:** `HANDOFF_NOVO_CHAT.md` · **Complementa:** `ESTADO_ATUAL.md`, `PLANO_CONTINUIDADE_2026-06.md`, `REGRAS_DE_PUBLICACAO_SEGURA.md`.
@@ -12,7 +12,7 @@
 | Fase | Status | Início |
 |------|--------|--------|
 | **FASE 0** Alinhar base | ✅ fechada | 07/06/2026 |
-| FASE 1 Homologação | 🟡 próxima | 07/06/2026 |
+| FASE 1 Homologação | 🟡 em andamento | 07/06/2026 |
 | FASE 2 Payback negócio | ⬜ | — |
 | FASE 3 Pacote L | ⬜ | — |
 
@@ -20,8 +20,8 @@
 
 | # | Ação | Status |
 |---|------|--------|
-| 0.1 | Tablets **v1.7.64** | ✅ 07/06 Ops |
-| 0.2 | `sw.js` = 1.7.64 | ✅ 07/06 |
+| 0.1 | Tablets **v1.7.64** → evoluído **v1.7.87** (M.17) | ✅ 08/06 |
+| 0.2 | `sw.js` alinhado `mk-version.js` | ✅ 08/06 (1.7.87) |
 | 0.3 | `ESTADO_ATUAL.md` atualizado | ✅ 07/06 |
 | 0.4 | Ping GAS v1.5.66 | ✅ 07/06 |
 | 0.5 | **I20 cronômetro** — tablet ▶→10:00 | ✅ 07/06 |
@@ -33,7 +33,7 @@
 | 0.10 | `ACESSOS_E_AUTORIZACOES.md` + planilha OAuth (`google-drive-sheets-auth`) | ✅ 07/06 |
 | 0.11 | `MAPA_CODIGO_ARQUITETURA.md` — anatomia e chaves mestras | ✅ 07/06 |
 
-**Próximo passo imediato:** **FASE 1** — homologação (`HOMOLOGACAO_PRODUCAO_ASSISTIDA.md` checklist I.5 + payback Dashboard).
+**Próximo passo imediato:** **FASE 1** — assinar checklist tablet A–F (`CHECKLIST_TABLET_v1.7.85.md` com `?force=1.7.87`) + `HOMOLOGACAO_PRODUCAO_ASSISTIDA.md` I.5. F5/F7/F11 automatizados ✅ 08/06; F10 2 abas PWA pendente no tablet físico.
 
 ---
 
@@ -43,13 +43,13 @@
 
 | Camada | Repo (GitHub) | Produção (verificado) | Alinhado? |
 |--------|---------------|------------------------|-----------|
-| **Frontend** | **v1.7.78** (`mk-version.js`) | GitHub Pages após push | ✅ |
-| **Service Worker** | v1.7.78 (`sw.js`) | — | ✅ |
-| **GAS** | **v1.5.66** (header `.gs`) | Ping **v1.5.66** (07/06) | ✅ |
+| **Frontend** | **v1.7.87** (`mk-version.js`) | GitHub Pages após push | ✅ |
+| **Service Worker** | v1.7.87 (`sw.js`) | — | ✅ |
+| **GAS** | **v1.5.66** (header `.gs`) | Ping **v1.5.67** (08/06) | ✅ |
 | **Deploy ID** | `AKfycbwakQ...` | Mesmo ID | ✅ |
 
-**Teste rápido:** https://ribocg-a11y.github.io/movikids/?force=1.7.64  
-**Ping GAS:** `?action=ping` → `versao: v1.5.66`
+**Teste rápido:** https://ribocg-a11y.github.io/movikids/?force=1.7.87  
+**Ping GAS:** `?action=ping` → `versao: v1.5.66+` (08/06: v1.5.67)
 
 **I20 cronômetro:** RESOLVIDO — `INCIDENTE_I20_CRONOMETRO_RESOLUCAO_2026-06-07.md`. Não regredir sem `TESTE_I20_COMPLETO_PROD.ps1` + tablet.
 
@@ -57,12 +57,12 @@
 
 | Área | Status | Notas |
 |------|--------|-------|
-| **Balcão (tablet)** | 🟡 Estável com ressalvas | I15 GET, I18 idle, I19 sessão fantasma corrigidos; **tablets precisam `?force=1.7.64`** |
+| **Balcão (tablet)** | 🟡 Estável com ressalvas | I15 GET, I18 idle, I19 sessão fantasma corrigidos; **tablets precisam `?force=1.7.87`** |
 | **Auth operadores** | ✅ Produção | PIN, sessão única, liberar sessão ADM, chip Turno |
 | **Portal responsável** | ✅ Produção | `acompanhar.html`, cronômetro I16, rate limit GAS |
 | **Foto moldura** | ✅ Produção | `foto-moldura.html`, botão no portal |
 | **Dashboard / KPIs** | ✅ Produção | Pacote F completo, fatAno v1.5.59, comparativo semanal |
-| **Payback investimento** | 🟡 Código ok, negócio aberto | GAS v1.5.63 + FE v1.7.64; planilha INVESTIMENTO preenchida (~R$ 65.410); perguntas §10 memorial |
+| **Payback investimento** | 🟡 Código ok, negócio aberto | GAS v1.5.63 + FE v1.7.87; planilha INVESTIMENTO preenchida (~R$ 65.410); perguntas §10 memorial |
 | **CRM / RESPONSAVEIS** | 🟡 K.1–K.2 ok, QA pendente | 240 importados; checklist tablet K.3–K.4 não assinado |
 | **SMS gateway** | ✅ Produção manual | DJVJRL; **auto/F4 pausado** |
 | **Config frota/preços** | 🟡 Fallback GAS | Aba CONFIG sem JSON na planilha — usa constantes no `.gs` |
@@ -84,7 +84,7 @@
 
 ### 1.4 Pacotes entregues (fechados)
 
-A, B, C, D, E, F, G, H, I, J, SMS P0, K.1, K.2, fixes I16–I19, **Payback M** (código v1.5.60–63 + FE v1.7.63–64).
+A, B, C, D, E, F, G, H, I, J, SMS P0, K.1, K.2, fixes I16–I20, **Payback M** (código v1.5.60–63 + FE v1.7.63–64), **Pacote M modularização M.1–M.17** (FE v1.7.87).
 
 ### 1.5 Explicitamente pausado (não executar)
 
@@ -107,8 +107,8 @@ Objetivo: uma única verdade entre código, produção, tablets e documentação
 
 | # | Ação | Responsável | Critério de pronto |
 |---|------|-------------|-------------------|
-| 0.1 | Tablets balcão em **v1.7.64** (`?force=1.7.64` ou reinstalar PWA) | Ops | Rodapé mostra v1.7.64; chip Turno verde |
-| 0.2 | Corrigir **sw.js** → 1.7.64 (alinhar com `mk-version.js`) | Dev | `pre-push-check` verde |
+| 0.1 | Tablets balcão em **v1.7.87** (`?force=1.7.87` ou reinstalar PWA) | Ops | Rodapé mostra v1.7.87; chip Turno verde |
+| 0.2 | **sw.js** alinhado com `mk-version.js` (1.7.87) | Dev | `pre-push-check` verde |
 | 0.3 | Atualizar **`ESTADO_ATUAL.md`** com versões e entregas payback/foto | Dev | Tabela produção = ping + mk-version |
 | 0.4 | Confirmar ping GAS **v1.5.63** após cada deploy | Ops | `?action=ping` |
 | 0.5 | Rodar **`pre-push-check.ps1`** antes de cada push | Dev | Sem falhas |
@@ -126,6 +126,8 @@ Objetivo: fechar Sprint 1 do `PLANO_CONTINUIDADE` com evidência, não só códi
 | 1.3 | Paridade cronômetro balcão × portal (I16) | `TESTE_PARIDADE_CRONOMETRO_PORTAL_BALCAO.ps1` ok |
 | 1.4 | Paridade HTTP tablet (I15) | `TESTE_PARIDADE_HTTP_BROWSER_GAS.ps1` ok |
 | 1.5 | Teste payback no Dashboard admin | Painel roxo com % e previsão projetada coerente |
+| 1.6 | **Tablet A–F** — `CHECKLIST_TABLET_v1.7.85.md` | M.14/M.15 + cronômetro + portal; F10 2 abas PWA |
+| 1.7 | **F5/F7/F10/F11** automatizado | `TESTE_TABLET_F5_F7_F10_F11.ps1` + browser — ✅ 08/06 (F10 2 abas físico pendente) |
 
 **Saída:** Sprint 1 e Sprint 2 (K) declarados **fechados** para operação.
 
@@ -191,14 +193,14 @@ Objetivo: balcão mais rápido; menos ruído visual. **Próximo pacote de featur
 |------|------------------|
 | **F4** WhatsApp / SMS auto | Entrega manual comprovada + conta estável |
 | **F9** Supervisor | K + L estáveis 30 dias |
-| Modularização `index.html` | **Pacote M** — M.1–M.9 ✅ (~3.756 linhas); **M.10 `mk-nav.js` próximo** — plano M.10–M.17 em `PACOTE_M_MODULARIZACAO.md` |
+| Modularização `index.html` | **Pacote M FECHADO** — M.1–M.17 ✅ (v1.7.87; zero JS inline) — `PACOTE_M_MODULARIZACAO.md` |
 
 ---
 
 ## 3. Ordem de execução recomendada (resumo executivo)
 
 ```
-FASE 0  Alinhar versões + docs base          [agora — 1 dia]
+FASE 0  Alinhar versões + docs base          [✅ fechada 07/06]
    ↓
 FASE 1  Homologação tablet + K.3/K.4 + I.5 [2–3 dias]
    ↓
@@ -238,7 +240,7 @@ Todos em `docs/ativos/` salvo indicação. Índice completo: `docs/INDICE.md`.
 
 | Risco | Mitigação |
 |-------|-----------|
-| Tablet em versão antiga (cache PWA) | `?force=1.7.64`, reinstalar ícone |
+| Tablet em versão antiga (cache PWA) | `?force=1.7.87`, reinstalar ícone |
 | Doc defasado → deploy errado | FASE 0.3; confiar em `mk-version.js` + ping |
 | Payback mal interpretado pelo sócio | Nota no painel (v1.7.64); memorial §10 |
 | POST no browser (I15) | Nunca reintroduzir; `pre-push-check` guard |
@@ -254,7 +256,7 @@ Todos em `docs/ativos/` salvo indicação. Índice completo: `docs/INDICE.md`.
 3. **Dados:** CONFIG na planilha; APIs `resumoDia` / `kpiMes` reduzindo duplicação.
 4. **Relacionamento:** Pacote K em uso diário (cadastro canônico, recorrência).
 5. **Comunicação:** reavaliar F4 só com evidência de entrega; até lá QR + manual.
-6. **Arquitetura:** modularização só se equipe crescer; monólito `index.html` é risco aceito hoje.
+6. **Arquitetura:** Pacote M fechado (v1.7.87) — `index.html` só HTML; próximo: Pacote L UX polish.
 
 ---
 

@@ -1,7 +1,7 @@
 # MOVI KIDS — Plano de continuidade (pós-pausa maturidade)
 
-**Data:** 07/06/2026 (revisão — payback M + prioridades)  
-**Produção:** FE **v1.7.64** · GAS **v1.5.63** (ping confirmado 07/06)  
+**Data:** 08/06/2026 (revisão — Pacote M fechado + homologação FASE 1)  
+**Produção:** FE **v1.7.87** · GAS **v1.5.66+** (ping 08/06: v1.5.67)  
 **Handoff novo chat:** **`HANDOFF_NOVO_CHAT.md`**  
 **Ordem de execução:** **`PLANO_PRIORIDADES_2026-06.md`** (prioridades por fase)  
 **Substitui como “próximo passo”:** seção 9 de `PLANO_PAUSA_MATURIDADE_2026-06.md` e seção 14 de `PLANO_MESTRE_REORGANIZADO_2026-06.md`  
@@ -24,7 +24,7 @@
 | Portal carrossel + DNA visual | ✅ | v1.7.47 `acompanhar.html` + `DESIGN_DNA_MOVIKIDS.md` |
 | Anti sessão fantasma PWA | ✅ | I19 v1.7.48 — chip Turno + reconcile tablet×GAS |
 
-O gargalo **deixou de ser confiabilidade básica**. O sistema opera; o foco passa a **homologação tablet, payback estratégico e UX (Pacote L)**. WhatsApp automático permanece **pausado** (QR portal).
+O gargalo **deixou de ser confiabilidade básica**. **Pacote M modularização fechado** (v1.7.87). Foco atual: **homologação tablet FASE 1**, payback estratégico e **Pacote L** UX. WhatsApp automático permanece **pausado** (QR portal).
 
 ---
 
@@ -72,8 +72,8 @@ flowchart TD
 | # | Entrega | Tipo | Status | Critério de pronto |
 |---|---------|------|--------|-------------------|
 | S1.1 | Checklist tablet **I.5** | QA manual | 🟡 parcial | Operador sem R$; Caixa vs Dashboard; portal ±2s; **chip Turno** (I19) |
-| S1.2 | Confirmar GAS **v1.5.56** no ping | Ops | ✅ | `?action=ping` ≥ v1.5.55 |
-| S1.3 | Tablet **v1.7.48** no ícone PWA | Ops | 🟡 | `?force=1.7.48`; reinstalar ícone se cache 1.7.41 |
+| S1.2 | Confirmar GAS **v1.5.66+** no ping | Ops | ✅ | `?action=ping` ≥ v1.5.66 (08/06: v1.5.67) |
+| S1.3 | Tablet **v1.7.87** no ícone PWA | Ops | 🟡 | `?force=1.7.87`; reinstalar ícone se cache antigo |
 | S1.4 | `pre-push-check` + regressão readonly | CI | ✅ | Guards I15–I19 |
 | S1.5 | Documentar checklist I.5 | Docs | 🟡 | `HOMOLOGACAO_PRODUCAO_ASSISTIDA.md` + I19 no mapa |
 | S1.6 | Auth turno visível + anti-fantasma | FE | ✅ | v1.7.48; Milena login 13:05 validado |
@@ -151,7 +151,7 @@ Escopo original W.1–W.6 (inventário mensagens, aviso extra não pulável, che
 |------|--------|------------------|
 | **F4 WhatsApp / SMS auto** | Conta bloqueada 4d; SMS sem entrega; usar **QR Code** | Reavaliar só com entrega manual comprovada |
 | **F9 Supervisor** | Operadores precisam autonomia total no balcão | Após K + L estáveis 30 dias |
-| Modularização `index.html` | Risco alto, pouco ganho imediato | Q3 se equipe crescer |
+| Modularização `index.html` | **FECHADO** — Pacote M M.1–M.17 (v1.7.87) | `PACOTE_M_MODULARIZACAO.md` |
 
 ---
 
@@ -161,7 +161,7 @@ Escopo original W.1–W.6 (inventário mensagens, aviso extra não pulável, che
 
 | Prioridade | Ação | Quem | Tempo |
 |------------|------|------|-------|
-| **P0** | Tablet balcão em **v1.7.64** (ícone PWA atualizado) | Ops balcão | 10 min |
+| **P0** | Tablet balcão em **v1.7.87** (`CHECKLIST_TABLET_v1.7.85.md` A–F) | Ops balcão | 15 min |
 | **P0** | Fechar checklist **I.5** + **K.3–K.4** tablet | Ops + dev | 30–60 min |
 | **P1** | Fechar regras payback (memorial §10) + validar painel Dashboard | Sócio + dev | 1 sessão |
 | **P1** | Iniciar **Pacote L** (UX polish + QR balcão) | Dev | sprint 3 |
@@ -171,7 +171,7 @@ Escopo original W.1–W.6 (inventário mensagens, aviso extra não pulável, che
 
 ### Critério para encerrar Sprint 1 e abrir Sprint 2
 
-- [ ] Todos tablets **1.7.48** + chip Turno verde com operador logado  
+- [ ] Todos tablets **v1.7.87** + chip Turno verde com operador logado  
 - [ ] Checklist I.5 marcado em `HOMOLOGACAO_PRODUCAO_ASSISTIDA.md`  
 - [ ] `pre-push-check` verde  
 - [ ] Nenhum incidente P1 auth aberto  

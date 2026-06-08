@@ -51,8 +51,8 @@ Detalhe completo: [`ACESSOS_E_AUTORIZACOES.md`](docs/ativos/ACESSOS_E_AUTORIZACO
 
 | Camada | Versão |
 |--------|--------|
-| Frontend | **v1.7.78** |
-| GAS | **v1.5.66** |
+| Frontend | **v1.7.87** |
+| GAS | **v1.5.66+** (ping pode retornar v1.5.67) |
 | Deploy ID | `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y` |
 
 Fonte de verdade: `mk-version.js`, header do `.gs`, ping GAS.
@@ -77,6 +77,12 @@ Fonte de verdade: `mk-version.js`, header do `.gs`, ping GAS.
 - `docs/arquivo/planos/HANDOFF_NOVO_CHAT_2026-06-05.md` — defasado
 - `docs/arquivo/obsoleto/` — rollback/changelog antigos
 - Arquivos em `arquivo-historico/` para deploy
+
+## Estado do projeto (08/06/2026)
+
+- **Pacote M:** fechado M.1–M.17 (v1.7.87; zero JS inline)
+- **I20 cronômetro:** resolvido — não regredir sem `TESTE_I20_COMPLETO_PROD.ps1` + tablet
+- **Próximo:** FASE 1 homologação tablet (`CHECKLIST_TABLET_v1.7.85.md` A–F)
 
 ## Ao encerrar sessão
 

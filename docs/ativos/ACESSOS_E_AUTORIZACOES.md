@@ -1,6 +1,6 @@
 # MOVI KIDS — Acessos e autorizações
 
-**Atualizado:** 07/06/2026  
+**Atualizado:** 08/06/2026  
 **Função:** mapa único de **quem pode o quê** — app, infraestrutura e agente Cursor.  
 **Complementa:** `ESTADO_ATUAL.md`, `REGRAS_DE_PUBLICACAO_SEGURA.md`, `DEPLOY_GAS_v1.5.32_AUTH.md`
 
@@ -200,7 +200,7 @@ Fluxo típico: **agente prepara** → **você publica GAS** (1 clique Nova vers�
 |------|------|
 | **Nova versão Web GAS** | [Editor Apps Script](https://script.google.com/home/projects/19SIhkX9Tk7FiJA1JXu1OrUwssHdr3H5zc8q3rOjmBvqgWfXuHlk8xyf8/edit) → Implantar → `AKfycbwakQ...` |
 | **Colar `.gs` manualmente** | Alternativa ao clasp — Ctrl+A no arquivo do PC → Código.gs |
-| **Tablet balcão** | Abrir `?force=1.7.64`, chip Turno, teste lançamento |
+| **Tablet balcão** | Abrir `?force=1.7.87`, chip Turno, checklist `CHECKLIST_TABLET_v1.7.85.md` |
 | **Script Properties SMS** | Projeto GAS → Configurações → Propriedades (fora da planilha) |
 | **Re-auth OAuth** (se token expirar) | `cd google-drive-sheets-auth` → `npm run auth` — abre browser uma vez |
 | **Aprovar push / comandos sensíveis** | Card de aprovação do Cursor quando aparecer |

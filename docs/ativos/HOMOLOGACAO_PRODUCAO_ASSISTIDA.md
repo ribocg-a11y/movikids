@@ -142,7 +142,8 @@ Se qualquer item acima acontecer, executar `ROLLBACK_EMERGENCIA.md`.
 
 ### H — Cronômetro I20 (obrigatório após mudança em timer)
 
-**Versão mínima:** FE **v1.7.78** · GAS **v1.5.66** · Doc: `INCIDENTE_I20_CRONOMETRO_RESOLUCAO_2026-06-07.md`
+**Versão mínima I20:** FE **v1.7.78+** · GAS **v1.5.66+** · Doc: `INCIDENTE_I20_CRONOMETRO_RESOLUCAO_2026-06-07.md`  
+**Versão atual operação (08/06):** FE **v1.7.87** — https://ribocg-a11y.github.io/movikids/?force=1.7.87
 
 | # | Passo | Esperado | OK |
 |---|-------|----------|-----|

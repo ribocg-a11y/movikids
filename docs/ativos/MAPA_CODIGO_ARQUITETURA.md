@@ -1,6 +1,6 @@
 # MOVI KIDS — Mapa do código e arquitetura
 
-**Atualizado:** 07/06/2026  
+**Atualizado:** 08/06/2026  
 **Função:** anatomia do sistema — o que é cada parte, o que liga com o quê, o que é zona sensível.  
 **Complementa:** `ESTADO_ATUAL.md`, `ACESSOS_E_AUTORIZACOES.md`, `REGRAS_DE_PUBLICACAO_SEGURA.md`, `MAPA_ERROS_FALHAS_BUGS.md`, **`PROTOCOLO_DIAGNOSTICO_E_TESTES.md`**
 
@@ -130,7 +130,7 @@ flowchart TB
 | **Firebase** | `sessoes` → atualiza cards/timer sem esperar poll |
 | **BroadcastChannel** | Abas do mesmo tablet sincronizadas |
 
-### Cronômetro — fluxo I20 (v1.5.66 + v1.7.78) — **zona P0**
+### Cronômetro — fluxo I20 (v1.5.66+ + FE v1.7.78+; atual v1.7.87) — **zona P0**
 
 Doc mestre: `INCIDENTE_I20_CRONOMETRO_RESOLUCAO_2026-06-07.md`
 

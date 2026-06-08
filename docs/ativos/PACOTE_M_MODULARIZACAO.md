@@ -1,16 +1,19 @@
 # Pacote M — Modularização do frontend
 
 **Início:** 07/06/2026  
-**Atualizado:** 07/06/2026 (planejamento detalhado M.10–M.17)  
+**Atualizado:** 08/06/2026 (M.17 fechado — Pacote M completo)  
 **Objetivo:** reduzir monólito `index.html` sem mudar comportamento — extrair JS em fatias com validação por fluxo (`PROTOCOLO_DIAGNOSTICO_E_TESTES.md`).
 
 ---
 
-## Panorama atual (v1.7.80)
+## Panorama atual (v1.7.87 — **fechado**)
 
 | Artefato | Linhas | Papel |
 |----------|--------|-------|
-| `index.html` (total) | **~2.342** | HTML ~1.360 + JS inline **~780** |
+| `index.html` (total) | **~1.378** | **Só HTML** + `<script src>` — zero JS inline |
+| `mk-globals.js` | ~120 | PRECOS, sessions, statsHoje (M.17) |
+| `mk-boot.js` | ~30 | DOMContentLoaded + SW (M.17) |
+| `mk-core.js` | ~200 | Utils, toast, config apply (M.16) |
 | `mk-admin.js` | 1.563 | Admin PIN, KPIs, caixa, config (M.11) |
 | `mk-nav.js` | 148 | Navegação + sidebar (M.10) |
 | `mk-operacao.js` | 736 | Operação balcão (M.8) |
@@ -23,23 +26,11 @@
 | Outros `mk-*.js` | ~350 | api, bootstrap, update, version |
 | `mk-app.css` | ~1.450 | CSS legado (M.1) |
 
-**Progresso:** CSS e **zona operacional balcão** (nova → drawer → operação → home cards) já estão fora do monólito.  
-**Dívida:** ~**2.400 linhas JS** no inline — **~100 `function`** restantes — concentradas em **admin/gestão**, **histórico/analytics**, **navegação** e **páginas secundárias**.
+**Progresso:** **100%** — M.1–M.17 entregues. `index.html` contém apenas HTML e tags `<script src="mk-*.js">`.
 
-**Carga atual (v1.7.78):** bloco inline **antes** dos `mk-*.js` no final do `<body>`. Cada extração remove do inline e insere `<script src="mk-*.js">` **imediatamente após** o `</script>` do inline (transição até M.17). Ordem alvo final na seção [Ordem de carga alvo](#ordem-de-carga-alvo-após-m17).
+**Carga atual (v1.7.87):** ordem no `<body>`: `mk-globals.js` → `mk-core.js` → módulos de domínio → `mk-auth.js` → `mk-boot.js`. Ver seção [Ordem de carga alvo](#ordem-de-carga-alvo-após-m17).
 
-```mermaid
-pie title JS inline restante por dominio (estimativa)
-    "Admin KPIs Caixa Dashboard" : 1420
-    "Historico Analytics" : 280
-    "Nav showPage Sidebar sb mob" : 200
-    "Shell init operador WA UI" : 200
-    "Relacionamento" : 130
-    "Config retorno templates" : 120
-    "Custos" : 80
-    "Lancamento avulso" : 80
-    "Globals utils toast" : 120
-```
+**Commit de fechamento:** `e95a8f0` (M.17).
 
 ---
 
@@ -65,7 +56,7 @@ pie title JS inline restante por dominio (estimativa)
 | **M.16** | `mk-core.js` (utils, toast, tipos, config apply) | v1.7.86 | ✅ |
 | **M.17** | `mk-globals.js` + `mk-boot.js` (zero JS inline) | v1.7.87 | ✅ |
 
-**Meta final:** `index.html` **~900–1.100 linhas** (só HTML + bloco mínimo de estado global).
+**Meta final:** `index.html` **~900–1.100 linhas** (só HTML) — **atingida** (~1.378 linhas com markup completo).
 
 ---
 

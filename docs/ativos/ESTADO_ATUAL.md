@@ -1,4 +1,4 @@
-# MOVI KIDS — Estado atual (07/06/2026)
+# MOVI KIDS — Estado atual (08/06/2026)
 
 Referência única para alinhamento local × produção.
 
@@ -27,8 +27,8 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 | Camada | Versão alvo | URL / ID |
 |--------|-------------|----------|
-| **Frontend** | **v1.7.86** | https://ribocg-a11y.github.io/movikids/?force=1.7.86 |
-| **Apps Script** | **v1.5.66** (I20 `clientTs` + idempotência iniciarTimer) | Deploy `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y` |
+| **Frontend** | **v1.7.87** | https://ribocg-a11y.github.io/movikids/?force=1.7.87 |
+| **Apps Script** | **v1.5.66+** (ping 08/06: **v1.5.67**; I20 `clientTs`) | Deploy `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y` |
 | SMS Gateway Cloud | **DJVJRL** / device `wihWegHr4wXaVJQ1R-GZR` | Aparelho remoto ONLINE |
 | Pacote SMS P0 | **FECHADO** | `PACOTE_SMS_P0_UNIFICADO_v1.5.38_v1.7.11.md` |
 | Planilha | MOVIKIDS_Planilha_Base | https://docs.google.com/spreadsheets/d/1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618/edit — auditoria `AUDITORIA_PLANILHA_BASE_2026-06-06.md` |
@@ -39,7 +39,7 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 **Teste rápido GAS (ping):**  
 https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec?action=ping  
-→ deve retornar `versao: v1.5.66` (ou header do `.gs`) e `postWriteActions` (POST só no GAS; FE usa GET — I15)
+→ deve retornar `versao: v1.5.66+` (08/06: v1.5.67) e `postWriteActions` (POST só no GAS; FE usa GET — I15)
 
 **URL morta (não usar):** `AKfycbzc...` → 404
 
@@ -67,6 +67,11 @@ https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPe
 | Admin FE | `mk-admin.js` — PIN, KPIs, caixa, config, sistema (Pacote M.11) |
 | Histórico FE | `mk-historico.js` — período, analytics, ranking veículo (Pacote M.12) |
 | Relacionamento FE | `mk-relacionamento.js` — CRM responsáveis K.3 (Pacote M.13) |
+| Custos FE | `mk-custos.js` (M.14) |
+| Avulso FE | `mk-avulso.js` (M.15) |
+| Globals FE | `mk-globals.js` — PRECOS, sessions (M.17) |
+| Boot FE | `mk-boot.js` — DOMContentLoaded + SW (M.17) |
+| Core FE | `mk-core.js` — toast, init, config (M.16) |
 | Deploy | `DEPLOY_GAS_v1.5.32_AUTH.md`, `scripts/deploy-gas.ps1` |
 | Limpeza testes | `scripts/testes/LIMPAR_TESTES_MOVIKIDS.ps1`, `scripts/testes/LIMPAR_SESSOES_TESTE_AGORA.ps1` |
 | Paridade HTTP tablet | `scripts/testes/TESTE_PARIDADE_HTTP_BROWSER_GAS.ps1` |
@@ -75,6 +80,7 @@ https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPe
 | I20 cronômetro | `INCIDENTE_I20_CRONOMETRO_RESOLUCAO_2026-06-07.md` — causa raiz + travas |
 | Teste I20 | `scripts/testes/TESTE_I20_COMPLETO_PROD.ps1` |
 | **Protocolo testes** | **`PROTOCOLO_DIAGNOSTICO_E_TESTES.md`** + `TESTE_PROTOCOLO_DIAGNOSTICO.ps1` |
+| **Homologação tablet F5–F11** | `TESTE_TABLET_F5_F7_F10_F11.ps1` + `TESTE_TABLET_F5_F7_F10_F11_BROWSER.js` |
 | Mapa bugs | `MAPA_ERROS_FALHAS_BUGS.md` |
 | Emergência | `scripts/corrigir-locacao-206.html`, `scripts/corrigir-locacoes-extras-lote.html` |
 
@@ -95,7 +101,7 @@ https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPe
 | **v1.7.80** | **Pacote M.11** — admin extraído para `mk-admin.js` |
 | **v1.7.79** | **Pacote M.10** — `showPage` + sidebar extraídos para `mk-nav.js` |
 | **Pacote M** | M.1–M.17 ✅ **fechado** — `PACOTE_M_MODULARIZACAO.md` |
-| **Testes** | Fix T1: `TESTE_RELACIONAMENTO_READONLY` (em-dash); modo read-only em `PROTOCOLO` §5.3.1 |
+| **Testes** | T1 em-dash (`RELACIONAMENTO`, `I20`); tablet F5–F11 automatizado 08/06; protocolo completo WARN Pages |
 | **v1.5.66** | **I20 GAS** — `iniciarTimer_` grava `clientTs` (clique) na col Y quando drift ≤ 2 min |
 | **v1.7.76** | I20 fase 1 — SMS separado do ▶; `iniciarContagemDireto_`; card pendente compacto |
 | **v1.5.64–65** | I20 col C/Y — cadastro Pendente; idempotência `iniciarTimer` |
@@ -175,6 +181,7 @@ Commits de referência: `3d9d106` (v1.7.25), `e1a56db` (Pacote E), `1454bc8` (fi
 - [x] **Pacote M — Payback investimento** — GAS v1.5.60–63 + FE v1.7.63–64 (painel Dashboard)
 - [x] **Portal foto moldura** — `foto-moldura.html` + botão no portal (v1.7.62+)
 - [~] **Fase 4 WhatsApp / SMS auto — PAUSADA** (QR Code oficial — `DECISAO_COMUNICACAO_QR_CODE_2026-06.md`)
+- [x] **Pacote M — Modularização FE** — M.1–M.17 ✅ (v1.7.87; zero JS inline)
 - [ ] **Pacote L** — UX polish (tiles, sync header, Sistema, QR balcão) ← **próximo pacote feature**
 - [~] **Fase 9 supervisor — PAUSADA**
 
@@ -184,7 +191,7 @@ Commits de referência: `3d9d106` (v1.7.25), `e1a56db` (Pacote E), `1454bc8` (fi
 
 | Sprint | Foco | Status |
 |--------|------|--------|
-| **1** | Estabilizar: checklist I.5, tablets v1.7.64, testes | **ativa** |
+| **1** | Estabilizar: checklist I.5, tablets v1.7.87, testes | **ativa** |
 | **2** | **Pacote K** — K.1–K.2 feitos; **K.3–K.4 QA tablet** | **quase fechado** |
 | **2b** | **Pacote M Payback** — código em prod; fechar regras §10 memorial | **em andamento** |
 | **3** | **Pacote L** — UX polish + QR balcão | **próximo** (F4 pausado) |
@@ -244,7 +251,7 @@ Commits de referência: `3d9d106` (v1.7.25), `e1a56db` (Pacote E), `1454bc8` (fi
 ## Validação rápida (pós-deploy)
 
 1. Ping GAS → `ok:true`, `versao` ≥ **v1.5.55** (I16 cronômetro)
-2. Tablet → `?force=1.7.65`, rodapé **Online v1.7.65**
+2. Tablet → `?force=1.7.87`, rodapé **Online v1.7.87**
 3. `.\scripts\pre-push-check.ps1` → status ok
 4. Balcão + celular mesma locação → timer ± **2 s** (I16)
 5. ADM liberar sessão → banner limpa sem Ctrl+F5 (I17)

@@ -2,12 +2,12 @@
 
 Sistema operacional para locações — balcão (tablet), portal do responsável e painel admin.
 
-## Produção (07/06/2026)
+## Produção (08/06/2026)
 
 | Camada | Versão |
 |--------|--------|
-| Frontend | **v1.7.78** — https://ribocg-a11y.github.io/movikids/?force=1.7.78 |
-| Apps Script | **v1.5.66** — ping `?action=ping` no deploy `AKfycbwakQ...` |
+| Frontend | **v1.7.87** — https://ribocg-a11y.github.io/movikids/?force=1.7.87 |
+| Apps Script | **v1.5.66+** — ping `?action=ping` no deploy `AKfycbwakQ...` (08/06: v1.5.67) |
 
 ## Novo chat / agente Cursor
 
@@ -43,5 +43,7 @@ Toda a documentação está em **`docs/`**. Não use arquivos soltos na raiz (fo
 - **GAS:** `MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs` (único `.gs` na raiz)
 - **GAS legado:** `arquivo-historico/` (não implantar)
 - **Testes:** `scripts/testes/`
-- **Versão FE:** `mk-version.js`
+- **Versão FE:** `mk-version.js` + `sw.js`
+- **Módulos FE:** `mk-globals.js`, `mk-core.js`, `mk-api.js` … `mk-boot.js` (Pacote M fechado)
 - **CSS app:** `mk-app.css` + `mk-design.css` (Pacote M.1)
+- **Testes tablet:** `scripts/testes/TESTE_TABLET_F5_F7_F10_F11.ps1`

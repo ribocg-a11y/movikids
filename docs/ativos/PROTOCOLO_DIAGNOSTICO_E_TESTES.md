@@ -1,6 +1,6 @@
 # MOVI KIDS — Protocolo de diagnóstico, testes e maturidade de aprendizado
 
-**Criado:** 07/06/2026  
+**Criado:** 07/06/2026 · **Atualizado:** 08/06/2026  
 **Função:** quando o usuário pedir *“rodar teste”*, *“diagnosticar”* ou *“validar deploy”*, o agente **segue este documento** — não improvisa escopo.  
 **Complementa:** `MAPA_ERROS_FALHAS_BUGS.md`, `INCIDENTE_I20_CRONOMETRO_RESOLUCAO_2026-06-07.md`, `MAPA_CODIGO_ARQUITETURA.md`, `HOMOLOGACAO_PRODUCAO_ASSISTIDA.md`
 
@@ -17,7 +17,7 @@
 | 1 | **Reativo** | Fix no sintoma que o operador viu | — |
 | 2 | **Documentado** | Incidentes I1–I20, MAPA, memorial I20 | Cobertura por fluxo |
 | 3 | **Travas pontuais** | `pre-push-check.ps1`, guards estáticos | Testes E2E por fluxo |
-| **→ 4** | **Protocolo por fluxo** | **Este documento** + orquestrador | Tablet automatizado |
+| **→ 4** | **Protocolo por fluxo** | **Este documento** + orquestrador + `TESTE_TABLET_F5_F7_F10_F11` | F10 2 abas físico |
 | 5 | **Contínuo** | CI bloqueia merge; homologação diária | Não alcançado |
 
 **Posição hoje:** entre **3 e 4** (subindo para 4 com este protocolo).
@@ -66,10 +66,10 @@ Cada fluxo tem: **arquivos**, **incidentes**, **teste automático**, **tablet ob
 | **F4** | Pendente — **Enviar SMS** | SMS portal; continua Pendente | `mk-operacao.js` `enviarSmsPendente_` | I20 | `TESTE_I20` B1 | opcional |
 | **F5** | Pendente — **▶ Iniciar** | Clique imediato; 10:00; col Y=clientTs | `mk-operacao.js`, GAS `iniciarTimer_`, `mk-sync.js`, `mk-sessao.js` | **I16, I20** | `TESTE_I20` B2 | **✅ obrigatório** |
 | **F6** | Timer ativo — countdown | `calcRemaining`, anel, stats | `mk-sessao.js`, `mk-home.js` | I16, I20 | paridade cronômetro | ✅ |
-| **F7** | Alertas timer — 5 min / expirado | `checkTimer` → `triggerAlert5` / `triggerAlertExpired` | `mk-sessao.js`, `mk-operacao.js` | — | **manual tablet** | ✅ |
+| **F7** | Alertas timer — 5 min / expirado | `checkTimer` → `triggerAlert5` / `triggerAlertExpired` | `mk-sessao.js`, `mk-operacao.js` | — | `TESTE_TABLET_F5_F7_F10_F11` | ✅ |
 | **F8** | SMS operacional | portal, alerta, esgotado, extensão | `mk-operacao.js`, GAS SMS | SMS P0 | regressão readonly | opcional |
 | **F9** | Encerrar / cancelar | drawer → GAS → some do ativo | `mk-drawer.js`, GAS encerrar | I2, I11, I13 | `TESTE_DRAWER_E` | ✅ |
-| **F10** | Sync multi-canal | poll + Firebase + merge + BC | `mk-sync.js`, `mk-firebase.js` | I17, I20 | `carregarInicio` após mutação | ✅ 2 abas |
+| **F10** | Sync multi-canal | poll + Firebase + merge + BC | `mk-sync.js`, `mk-firebase.js` | I17, I20 | `TESTE_TABLET_F5_F7_F10_F11` (reload OK; 2 abas físico pendente) | ✅ 2 abas |
 | **F11** | Portal responsável | `acompanhar.html` ±2s do balcão | portal + GAS `buscarPortalResponsavel_` | **I16** | `TESTE_PARIDADE_CRONOMETRO` | ✅ celular |
 | **F12** | Admin — KPIs / payback / caixa | Dashboard, Caixa, payback | GAS `buscarKPIsAdmin` | payback M | `TESTE_PACOTE_F_KPI` | PC |
 | **F13** | CRM relacionamento | busca responsável, badge cadastro | `index.html` rel, GAS | K.3 | `TESTE_RELACIONAMENTO` | opcional |
@@ -120,7 +120,7 @@ Use esta tabela **antes de fechar qualquer bug** no fluxo F5 (e analogamente par
 | 10 | Versão FE Pages vs repo | **Sim** | F0 `mk-version.js` produção |
 | 11 | Versão GAS ping vs repo | Parcial | F0 ping |
 | 12 | Poluição testes na UI | Sim | F0 cleanup + `limparLocacoesTesteAdmin` |
-| 13 | Firebase / segunda aba | Não testado | F10 manual |
+| 13 | Firebase / segunda aba | Parcial | F10 `TESTE_TABLET_*` + 2 abas PWA físico |
 | 14 | Auth / operador na escrita | Assumido | F1 + params `operador` |
 
 ---
@@ -272,6 +272,9 @@ Detalhe em `HOMOLOGACAO_PRODUCAO_ASSISTIDA.md` seções A–H. Resumo mínimo:
 | `TESTE_REGRESSAO_MOVIKIDS_PROD_SAFE.ps1` | F0, leituras | geral |
 | `TESTE_RELACIONAMENTO_*` | F13 | K.3 |
 | `TESTE_PACOTE_F_KPI_*` | F12 | Pacote F (⚠️ grava locação teste) |
+| `TESTE_TABLET_F5_F7_F10_F11.ps1` | F5, F7, F10, F11 | I20, I16 |
+| `TESTE_TABLET_F5_F7_F10_F11_BROWSER.js` | F5, F7, F10, F11 | via `RUN_TABLET_BROWSER_TEST.ps1` |
+| `RUN_TABLET_BROWSER_TEST.ps1` | Orquestra browser CDP | — |
 
 ---
 
@@ -279,8 +282,8 @@ Detalhe em `HOMOLOGACAO_PRODUCAO_ASSISTIDA.md` seções A–H. Resumo mínimo:
 
 | Lacuna | Risco | Mitigação atual |
 |--------|-------|-----------------|
-| F7 alertas sem teste auto | Regressão silenciosa | Checklist tablet §6 |
-| F10 Firebase sem script | Dessync RTDB | Teste manual 2 abas |
+| F10 **2 abas PWA** no tablet físico | Dessync multi-aba | `TESTE_TABLET_*` cobre reload; checklist §D manual |
+| F7 alertas — drift GAS >2min via API | Teste API falha por design I20 | Browser ajusta timestamp FE; validar modal no tablet |
 | F8 SMS entrega real | Gateway externo | `TESTE_PORTAL_READONLY` + monitor |
 | Tablet não roda em CI | Bugs só em produção | Usuário valida; protocolo exige reportar “tablet pendente” |
 | Matriz impacto manual | Agente pode esquecer fluxo | Regra `.cursor/rules` + este doc |
@@ -304,3 +307,5 @@ Detalhe em `HOMOLOGACAO_PRODUCAO_ASSISTIDA.md` seções A–H. Resumo mínimo:
 |------|------|
 | 07/06/2026 | Criado após retrospectiva chat I20 — maturidade, fluxos F0–F14, protocolo e orquestrador |
 | 07/06/2026 | §5.3.1 modo read-only; fix `TESTE_RELACIONAMENTO` (em-dash quebrava ParserError) |
+| 08/06/2026 | Scripts tablet `TESTE_TABLET_F5_F7_F10_F11` + browser; F7/F10 na matriz F0–F14; §8 lacunas atualizadas |
+| 08/06/2026 | Fix T1 em-dash `TESTE_I20_COMPLETO_PROD.ps1`; protocolo completo WARN transitório Pages |

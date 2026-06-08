@@ -1,11 +1,11 @@
 # Checklist tablet — v1.7.87 (Pacote M fechado + FASE 1)
 
-**Data:** 07/06/2026  
+**Data:** 08/06/2026  
 **Duração:** ~10–15 min (núcleo M.14/M.15 ~5 min)  
 **Versão alvo:** FE **v1.7.87** · GAS **v1.5.66+** (sem deploy GAS)  
 *(Arquivo nomeado na M.15; URLs usam v1.7.87 pós-M.17.)*  
 **Quando:** fora do pico ou com operador de reserva  
-**Automatizado já OK (07/06):** `TESTE_PROTOCOLO_DIAGNOSTICO.ps1 -Foco completo` — I20, portal, KPI, CRM, drawer, HTTP.
+**Automatizado já OK (07–08/06):** `TESTE_PROTOCOLO_DIAGNOSTICO.ps1` completo (WARN Pages transitório); `TESTE_TABLET_F5_F7_F10_F11.ps1` + browser — F5/F7/F11 OK; F10 reload OK.
 
 ---
 
@@ -56,7 +56,8 @@
 
 ## C — Cronômetro rápido (protocolo F5/F6) · ~3 min
 
-*Só se puder criar locação de teste sem cliente real.*
+*Só se puder criar locação de teste sem cliente real.*  
+**Automatizado 08/06:** `TESTE_TABLET_F5_F7_F10_F11.ps1` — C.1–C.3 validados (GAS + browser). Assinatura física abaixo ainda necessária para FASE 1.
 
 | # | Passo | Esperado | OK |
 |---|-------|----------|-----|
@@ -70,6 +71,8 @@ Ref. completa: `HOMOLOGACAO_PRODUCAO_ASSISTIDA.md` seção **H**.
 ---
 
 ## D — Portal + sync (F10/F11) · ~2 min · opcional
+
+**Automatizado 08/06:** F11 drift ≤2s (GAS); F10 reload drift=0 (browser). **Pendente:** D.3 com **2 abas PWA** no tablet físico.
 
 | # | Passo | Esperado | OK |
 |---|-------|----------|-----|

@@ -2,7 +2,8 @@
 
 **Registrado em:** 07/06/2026  
 **Status:** **RESOLVIDO** em produção (tablet validado pelo operador)  
-**Versões finais:** GAS **v1.5.66** · FE **v1.7.78**  
+**Versões finais (fix I20):** GAS **v1.5.66** · FE **v1.7.78**  
+**Produção atual (08/06):** FE **v1.7.87** (Pacote M fechado) — mínimo I20 permanece v1.7.78+  
 **Mapa vivo:** `MAPA_ERROS_FALHAS_BUGS.md` (linha I20)  
 **Incidente relacionado:** `../arquivo/incidentes/INCIDENTE_CRONOMETRO_PORTAL_AUTH_2026-06-05_06.md` (I16 + I20 fase 1)
 
@@ -212,7 +213,7 @@ sequenceDiagram
 |-------|----------------|
 | Editor GAS | https://script.google.com/home/projects/19SIhkX9Tk7FiJA1JXu1OrUwssHdr3H5zc8q3rOjmBvqgWfXuHlk8xyf8/edit |
 | Ping (≥ v1.5.66) | https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec?action=ping |
-| FE tablet | https://ribocg-a11y.github.io/movikids/?force=1.7.78 |
+| FE tablet | https://ribocg-a11y.github.io/movikids/?force=1.7.87 (mínimo I20: v1.7.78) |
 | `.gs` canônico PC | `MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs` |
 | Deploy doc | `DEPLOY_GAS_v1.5.32_AUTH.md` |
 

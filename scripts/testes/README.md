@@ -52,7 +52,20 @@ Limpeza após testes de escrita:
 
 **Não usar em-dash Unicode `—` em strings** que ficam perto de `-f` ou operadores — o parser quebra (`ParserError`). Usar hífen ASCII `-` em mensagens de `Add-Check` / `throw`.
 
-Corrigido em 07/06/2026: `TESTE_RELACIONAMENTO_MOVIKIDS_READONLY.ps1`.
+Corrigido em 07/06/2026: `TESTE_RELACIONAMENTO_MOVIKIDS_READONLY.ps1`.  
+Corrigido em 08/06/2026: `TESTE_I20_COMPLETO_PROD.ps1` (mesmo bug T1).
+
+## Homologação tablet (F5/F7/F10/F11)
+
+```powershell
+# GAS + API (F5, F7, F11)
+.\scripts\testes\TESTE_TABLET_F5_F7_F10_F11.ps1
+
+# Browser CDP (modais F7, reload F10)
+.\scripts\testes\RUN_TABLET_BROWSER_TEST.ps1
+```
+
+Resultado 08/06: F5/F7/F10 reload/F11 **OK**; F10 com **2 abas PWA** no tablet físico ainda manual (`CHECKLIST_TABLET_v1.7.85.md` §D).
 
 ## Pre-push
 

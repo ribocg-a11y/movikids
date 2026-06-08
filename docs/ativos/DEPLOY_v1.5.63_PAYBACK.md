@@ -17,7 +17,7 @@ C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\m
 | **Editor GAS** | https://script.google.com/home/projects/19SIhkX9Tk7FiJA1JXu1OrUwssHdr3H5zc8q3rOjmBvqgWfXuHlk8xyf8/edit |
 | **Ping (v1.5.63)** | https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec?action=ping |
 | **Planilha INVESTIMENTO** | https://docs.google.com/spreadsheets/d/1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618/edit |
-| **App FE v1.7.64+** | https://ribocg-a11y.github.io/movikids/?force=1.7.64 |
+| **App FE v1.7.64+** (atual: v1.7.87) | https://ribocg-a11y.github.io/movikids/?force=1.7.87 |
 
 Histórico payback base: `../arquivo/deploy/DEPLOY_v1.5.61_PAYBACK.md` · Memorial: `MEMORIAL_PAYBACK_INVESTIMENTO.md`
 

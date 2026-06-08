@@ -1,6 +1,6 @@
 # MOVI KIDS — Mapa de erros, falhas e bugs
 
-**Atualizado:** 07/06/2026 — **I20 RESOLVIDO** (GAS v1.5.66 + FE v1.7.78) — ver `INCIDENTE_I20_CRONOMETRO_RESOLUCAO_2026-06-07.md`  
+**Atualizado:** 08/06/2026 — **I20 RESOLVIDO** (GAS v1.5.66+ + FE v1.7.78+) — ver `INCIDENTE_I20_CRONOMETRO_RESOLUCAO_2026-06-07.md`  
 **Uso:** consultar **antes de publicar** e **ao montar checklist de teste**. Cada linha tem trava e script de verificação quando existir.
 
 **Protocolo de teste (obrigatório quando usuário pedir “rodar teste”):** `PROTOCOLO_DIAGNOSTICO_E_TESTES.md` → `scripts/testes/TESTE_PROTOCOLO_DIAGNOSTICO.ps1`
@@ -51,7 +51,7 @@
 | **I17** | **Liberar sessão + cache GET** | **Banner operador preso** | v1.7.45 sync UI + `no-store` | `mkAuthSyncSessaoBalcaoUI_`; api cache | ADM liberar **tablet** |
 | **I18** | **Idle 1h com locação aberta** | **Logout no meio da locação** | v1.7.46 `mkHasLocacaoAbertaNoTablet_` | mk-auth + tickAdmin | mock idle + loc ativa |
 | **I19** | **PWA sessão fantasma + turno invisível** | Operador “dentro” do app; servidor sem turno; Home sem nome; AUD sem logout idle | v1.7.48 `mkAuthReconcileSessaoFantasma_` + chip `#hd-turno-chip` | pre-push `guard.auth.fantasma`; PWA `mk-update` | tablet ícone: chip Turno + liberar ADM |
-| T1 | Em-dash `—` em string `.ps1` perto de `-f` | `TESTE_RELACIONAMENTO` ParserError; F13 falha falso | Hífen ASCII `-` em mensagens | `scripts/testes/README.md` | `TESTE_RELACIONAMENTO_MOVIKIDS_READONLY.ps1` |
+| T1 | Em-dash `—` em string `.ps1` perto de `-f` | ParserError em `TESTE_RELACIONAMENTO`, `TESTE_I20` | Hífen ASCII `-` em mensagens | `scripts/testes/README.md` | `TESTE_RELACIONAMENTO_*`, `TESTE_I20_COMPLETO_PROD.ps1` |
 
 ---
 
@@ -129,11 +129,11 @@
 
 ---
 
-## Versões de referência (07/06/2026)
+## Versões de referência (08/06/2026)
 
 | Camada | Repo / produção | Mínimo I20 |
 |--------|-----------------|------------|
-| Frontend | **v1.7.78** | `?force=1.7.78` |
-| GAS | **v1.5.66** (ping) | Nova versão Web se ping &lt; 1.5.66 |
+| Frontend | **v1.7.87** | `?force=1.7.87` (mínimo I20: v1.7.78+) |
+| GAS | **v1.5.66+** (ping 08/06: v1.5.67) | Nova versão Web se ping &lt; 1.5.66 |
 
 Ver `ESTADO_ATUAL.md` para URLs e editor GAS.

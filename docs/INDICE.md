@@ -1,6 +1,6 @@
 # MOVI KIDS — Índice de documentação
 
-**Atualizado:** 07/06/2026 (saneamento)
+**Atualizado:** 08/06/2026 (pós M.17 + testes tablet F5–F11)
 
 ## Comece aqui
 
@@ -13,7 +13,8 @@
 | [PLANO_CONTINUIDADE_2026-06.md](ativos/PLANO_CONTINUIDADE_2026-06.md) | Sprints e roadmap 90 dias |
 | [ACESSOS_E_AUTORIZACOES.md](ativos/ACESSOS_E_AUTORIZACOES.md) | Papéis, PIN admin, agente vs humano, **planilha OAuth** §7.8 |
 | [MAPA_CODIGO_ARQUITETURA.md](ativos/MAPA_CODIGO_ARQUITETURA.md) | **Anatomia do código** — partes, conexões, chaves mestras |
-| [PACOTE_M_MODULARIZACAO.md](ativos/PACOTE_M_MODULARIZACAO.md) | Extração CSS/JS do `index.html` (M.1 ✅) |
+| [PACOTE_M_MODULARIZACAO.md](ativos/PACOTE_M_MODULARIZACAO.md) | Modularização FE — **M.1–M.17 ✅ fechado** (v1.7.87) |
+| [CHECKLIST_TABLET_v1.7.85.md](ativos/CHECKLIST_TABLET_v1.7.85.md) | Homologação tablet FASE 1 (A–F) |
 
 ## Operação e deploy
 
@@ -50,6 +51,6 @@
 
 ## App (raiz do repo)
 
-**Raiz (app + GAS canônico):** `index.html`, `mk-app.css`, `mk-design.css`, `sw.js`, `mk-version.js`, `acompanhar.html`, `foto-moldura.html`, `MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs` (único `.gs`).
+**Raiz (app + GAS canônico):** `index.html` (só HTML), `mk-globals.js`, `mk-core.js` … `mk-boot.js`, `mk-auth.js`, `mk-app.css`, `mk-design.css`, `sw.js`, `mk-version.js`, `acompanhar.html`, `foto-moldura.html`, `MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs` (único `.gs`).
 
 **Arquivo:** `arquivo-historico/` (GAS legados) · **Testes:** `scripts/testes/`
