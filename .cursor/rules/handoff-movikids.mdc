@@ -43,11 +43,11 @@ Ao trabalhar neste repositório, **ler primeiro** (nesta ordem):
 
 **NUNCA:** `clasp deploy`, POST browser (I15), commit de segredos.
 
-**Produção (08/06):** FE **v1.7.91** · GAS **v1.5.69** · **Pacote M fechado** M.1–M.17 · **Pacote L** entregue.
+**Produção (08/06):** FE **v1.7.92** · GAS **v1.5.70** (Nova versão Web) · B1 `resumoDia`.
 
 **I20 cronômetro (RESOLVIDO):** GAS v1.5.66+ + FE v1.7.78+ — doc `docs/ativos/INCIDENTE_I20_CRONOMETRO_RESOLUCAO_2026-06-07.md`. Não regredir sem `TESTE_I20_COMPLETO_PROD.ps1` + tablet.
 
-**FASE 1–2:** ✅ fechadas 08/06/2026. **FASE 4 CONFIG:** 🟡 ativa — `FASE_4_CONFIG_PLANILHA.md` · `TESTE_OPERACAO_CONFIG_READONLY.ps1`. Homologar Pacote L: `CHECKLIST_PACOTE_L.md`.
+**FASE 5:** B7 ok · B1 código entregue — `DEPLOY_v1.5.70_RESUMO_DIA.md` · próximo B2 `kpiMes`.
 
 **Teste / diagnóstico (OBRIGATÓRIO quando usuário pedir):** ler e seguir `docs/ativos/PROTOCOLO_DIAGNOSTICO_E_TESTES.md` → executar `scripts/testes/TESTE_PROTOCOLO_DIAGNOSTICO.ps1` (ou `-Foco` adequado). Nunca testar só um script isolado sem F0 e sem listar fluxos impactados (§4 do protocolo). Antes de mudar código: preencher matriz de impacto do protocolo.
 

@@ -1,6 +1,6 @@
 /* MOVI KIDS - estado global compartilhado (Pacote M.17) */
 
-const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.91';
+const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.92';
 const PORTAL_RESPONSAVEL_URL = 'https://ribocg-a11y.github.io/movikids/acompanhar.html';
 
 let PRECOS = {

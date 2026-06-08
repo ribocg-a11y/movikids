@@ -1,6 +1,6 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 08/06/2026 (FASE 4 CONFIG **ativa**)  
+**Atualizado:** 08/06/2026 (FASE 5 **ativa** — B7 ok)  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **Repo local:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`  
@@ -33,7 +33,7 @@ Continuo o MOVI KIDS. Repo: C:\Users\riboc\Documents\Codex\2026-05-30\files-ment
 
 - Ler: este arquivo → `PLANO_PRIORIDADES` → `ESTADO_ATUAL` → `REGRAS` → `ACESSOS_E_AUTORIZACOES` (§7 = agente vs você)
 - Ignorar handoff antigo em `docs/arquivo/planos/`
-- Informar: FE **v1.7.91**, GAS **v1.5.69** — **FASE 2 fechada**; **FASE 4 CONFIG ativa**; Pacote L homologar tablet
+- Informar: FE **v1.7.91**, GAS **v1.5.69** — **FASE 1–4 fechadas**; **FASE 5 ativa** (B7 ok, próximo B1 resumoDia)
 - Deixar claro: **agente** código, testes e **planilha (OAuth)**; **você** Nova versão GAS Web e tablet
 
 ---
@@ -55,10 +55,10 @@ Continuo o MOVI KIDS. Repo: C:\Users\riboc\Documents\Codex\2026-05-30\files-ment
 
 | Camada | Versão | Verificação |
 |--------|--------|-------------|
-| **Frontend** | **v1.7.91** | `mk-version.js` → `window.MK_VERSION` |
-| **Service Worker** | **1.7.91** | `sw.js` → `SW_VERSION` |
-| **Apps Script** | **v1.5.69** | [ping](https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec?action=ping) → `versao` |
-| **App tablet** | v1.7.91 | https://ribocg-a11y.github.io/movikids/?force=1.7.91 |
+| **Frontend** | **v1.7.92** | `mk-version.js` → `window.MK_VERSION` |
+| **Service Worker** | **1.7.92** | `sw.js` → `SW_VERSION` |
+| **Apps Script** | **v1.5.70** | [ping](https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec?action=ping) → `versao` |
+| **App tablet** | v1.7.92 | https://ribocg-a11y.github.io/movikids/?force=1.7.92 |
 
 **Deploy ID GAS (único — nunca criar outro):** `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y`
 
@@ -97,9 +97,9 @@ Continuo o MOVI KIDS. Repo: C:\Users\riboc\Documents\Codex\2026-05-30\files-ment
 
 **FASE 2:** ✅ fechada 08/06 — INVESTIMENTO + payback + GAS **v1.5.69**.
 
-**FASE 3:** **Pacote L** FE **v1.7.91** entregue — homologar tablet (`CHECKLIST_PACOTE_L.md`); imprimir QR A5 no balcão.
+**FASE 3–4:** ✅ fechadas 08/06 — Pacote L v1.7.91 + CONFIG planilha validados.
 
-**FASE 4 (ativa):** CONFIG na planilha — `FASE_4_CONFIG_PLANILHA.md` · template `CONFIG_OPERACIONAL_TEMPLATE.md` · teste `TESTE_OPERACAO_CONFIG_READONLY.ps1` (baseline 08/06: **ok**, 9 veículos, 3h 130/150).
+**FASE 5 (ativa):** **B7** ok · **B1 resumoDia** código v1.7.92 + GAS v1.5.70 — `DEPLOY_v1.5.70_RESUMO_DIA.md` · você publica **Nova versão Web** · próximo **B2** `kpiMes`.
 
 **I20 / Pacote M:** continuam fechados — não regredir timer sem `TESTE_I20_COMPLETO_PROD.ps1` + tablet.
 
@@ -157,7 +157,7 @@ Invoke-RestMethod "https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5
 .\scripts\pre-push-check.ps1
 ```
 
-Esperado: ping `versao: v1.5.69`, pre-push verde, FE `1.7.91`, CONFIG `TESTE_OPERACAO_CONFIG_READONLY.ps1` ok.
+Esperado: ping `versao: v1.5.70`, pre-push verde, FE `1.7.92`, `TESTE_RESUMO_DIA_READONLY.ps1` ok após Nova versão GAS.
 
 ---
 

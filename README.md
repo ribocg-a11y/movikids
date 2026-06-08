@@ -4,14 +4,14 @@ Sistema operacional para locações — balcão (tablet), portal do responsável
 
 ## Planejamento (08/06/2026)
 
-**FASE 1–2** ✅ fechadas · **FASE 3** Pacote L entregue (homologar tablet) · **FASE 4** CONFIG 🟡 ativa · [PLANO_PRIORIDADES](docs/ativos/PLANO_PRIORIDADES_2026-06.md)
+**FASE 1–4** ✅ fechadas · **FASE 5** Confiabilidade/APIs 🟡 ativa · [PLANO_PRIORIDADES](docs/ativos/PLANO_PRIORIDADES_2026-06.md)
 
 ## Produção (08/06/2026)
 
 | Camada | Versão |
 |--------|--------|
-| Frontend | **v1.7.91** (Pacote L) — https://ribocg-a11y.github.io/movikids/?force=1.7.91 |
-| Apps Script | **v1.5.69** — ping `?action=ping` no deploy `AKfycbwakQ...` (08/06) |
+| Frontend | **v1.7.92** (B1 resumoDia) — https://ribocg-a11y.github.io/movikids/?force=1.7.92 |
+| Apps Script | **v1.5.70** — Nova versão Web GAS (`DEPLOY_v1.5.70_RESUMO_DIA.md`) |
 
 ## Novo chat / agente Cursor
 
@@ -31,7 +31,7 @@ Toda a documentação está em **`docs/`**. Não use arquivos soltos na raiz (fo
 | **Estado e versões** | [docs/ativos/ESTADO_ATUAL.md](docs/ativos/ESTADO_ATUAL.md) |
 | **Acessos (agente vs você)** | [docs/ativos/ACESSOS_E_AUTORIZACOES.md](docs/ativos/ACESSOS_E_AUTORIZACOES.md) |
 | **Mapa do código** | [docs/ativos/MAPA_CODIGO_ARQUITETURA.md](docs/ativos/MAPA_CODIGO_ARQUITETURA.md) |
-| **FASE 4 CONFIG** | [docs/ativos/FASE_4_CONFIG_PLANILHA.md](docs/ativos/FASE_4_CONFIG_PLANILHA.md) · [template JSON](docs/ativos/CONFIG_OPERACIONAL_TEMPLATE.md) |
+| **FASE 5** | [docs/ativos/FASE_5_CONFIABILIDADE_APIS.md](docs/ativos/FASE_5_CONFIABILIDADE_APIS.md) · B7 `TESTE_B7_REGRESSAO_WRITE.ps1` |
 | **Índice completo** | [docs/INDICE.md](docs/INDICE.md) |
 
 **Planilha Google (OAuth):** `C:\Users\riboc\Projects\google-drive-sheets-auth` — token em `~/.config/google-api/`

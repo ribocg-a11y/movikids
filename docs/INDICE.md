@@ -1,6 +1,6 @@
 # MOVI KIDS — Índice de documentação
 
-**Atualizado:** 08/06/2026 (FASE 4 — CONFIG planilha ativa)
+**Atualizado:** 08/06/2026 (FASE 5 — B7 regressão write ativa)
 
 ## Comece aqui
 
@@ -16,8 +16,10 @@
 | [PACOTE_M_MODULARIZACAO.md](ativos/PACOTE_M_MODULARIZACAO.md) | Modularização FE — **M.1–M.17 ✅ fechado** (v1.7.87) |
 | [PACOTE_L_UX_POLISH.md](ativos/PACOTE_L_UX_POLISH.md) | **FASE 3** Pacote L (v1.7.91) |
 | [CHECKLIST_PACOTE_L.md](ativos/CHECKLIST_PACOTE_L.md) | Homologação tablet Pacote L |
-| [FASE_4_CONFIG_PLANILHA.md](ativos/FASE_4_CONFIG_PLANILHA.md) | **FASE 4 ativa** — CONFIG JSON |
+| [FASE_4_CONFIG_PLANILHA.md](ativos/FASE_4_CONFIG_PLANILHA.md) | FASE 4 ✅ CONFIG JSON |
 | [CONFIG_OPERACIONAL_TEMPLATE.md](ativos/CONFIG_OPERACIONAL_TEMPLATE.md) | Template JSON frota/preços |
+| [FASE_5_CONFIABILIDADE_APIS.md](ativos/FASE_5_CONFIABILIDADE_APIS.md) | **FASE 5 ativa** — B7, B1, B2 |
+| [DEPLOY_v1.5.70_RESUMO_DIA.md](ativos/DEPLOY_v1.5.70_RESUMO_DIA.md) | Deploy B1 resumoDia |
 | [CHECKLIST_TABLET_v1.7.85.md](ativos/CHECKLIST_TABLET_v1.7.85.md) | Homologação tablet FASE 1 (A–F) |
 
 ## Operação e deploy

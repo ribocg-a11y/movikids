@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.69
+// MOVI KIDS — Google Apps Script v1.5.70
+// v1.5.70: B1 resumoDia — fonte unica Caixa + chip admin (calcResumoDiaCore_)
 // v1.5.69: Relatorio Golden — remove frase "custos internos do lojista" do banner
 // v1.5.68: Relatorio Golden — sem custos operacionais, lucro, Pacote F (so movimentacao + CTO contratual)
 // v1.5.67: controleFinanceiro — dashboard financeiro MK+ZapClin ao vivo (GET readonly)
@@ -286,6 +287,7 @@ function dispatchMoviAction_(p, method) {
       case 'listarAtivas':        return listarAtivas_();
       case 'encerrarLocacao':     return encerrarLocacao_(p);
       case 'listarHistorico':     return listarHistorico_(p);
+      case 'resumoDia':           return resumoDia_(p);
       case 'salvarCusto':         return salvarCusto_(p);
       case 'listarCustos':        return listarCustos_(p);
       case 'buscarKPIsAdmin':     return buscarKPIsAdmin_(p);
@@ -357,9 +359,9 @@ function ping_() {
   const agora = new Date();
   return resp_({
     status:  'online',
-    versao:  'v1.5.69',
+    versao:  'v1.5.70',
     timestamp: fmtData_(agora) + ' ' + fmtHoraLocal_(agora),
-    sistema: 'MOVI KIDS v1.5.69',
+    sistema: 'MOVI KIDS v1.5.70',
     postWriteActions: WRITE_ACTIONS_CRITICAS_
   });
 }
@@ -1000,6 +1002,134 @@ function listarCustos_(p) {
   return resp_({ custos: lista, total: lista.length, soma: Math.round(soma * 100) / 100 });
 }
 
+// ── B1 FASE 5: resumo do dia (Caixa + chip admin) ─────────────
+function calcResumoDiaCore_(dataFmt) {
+  const dataAlvo = String(dataFmt || '').trim();
+  const empty = {
+    data: dataAlvo,
+    n: 0,
+    fat: 0,
+    totalExt: 0,
+    nExt: 0,
+    porPagamento: {},
+    totalMaq: 0,
+    totalDin: 0,
+    totalCus: 0,
+    cusDin: 0,
+    saldoDin: 0,
+    resultado: 0,
+    locacoes: [],
+    custos: []
+  };
+  if (!dataAlvo) return empty;
+
+  const enc = [];
+  const shLoc = sh_(SH_LOC);
+  const lastLoc = shLoc.getLastRow();
+  if (lastLoc >= DATA_ROW) {
+    const dados = shLoc.getRange(DATA_ROW, 1, lastLoc - DATA_ROW + 1, 17).getValues();
+    for (let i = 0; i < dados.length; i++) {
+      const r = dados[i];
+      if (!r[0]) continue;
+      const data = cellToStr_(r[1]);
+      if (data !== dataAlvo) continue;
+      const status = String(r[14]).trim();
+      if (status !== 'Encerrada') continue;
+      enc.push({
+        rowIndex:      DATA_ROW + i,
+        id:            r[0],
+        data:          data,
+        horaInicio:    cellToStr_(r[2]),
+        horaFim:       cellToStr_(r[3]),
+        tipo:          String(r[4]),
+        plano:         String(r[5]),
+        mins:          Number(r[6]),
+        valorPlano:    Number(r[7]),
+        minAdicionais: Number(r[8]),
+        valorAdicional:Number(r[9]),
+        valorTotal:    Number(r[10]),
+        responsavel:   String(r[11]),
+        crianca:       String(r[12]),
+        telefone:      String(r[13]),
+        status:        status,
+        veiculo:       String(r[15] || ''),
+        pagamento:     String(r[16] || '')
+      });
+    }
+  }
+
+  const porPagamento = {};
+  let fat = 0, totalExt = 0;
+  enc.forEach(function(l) {
+    const p = l.pagamento || 'Não informado';
+    porPagamento[p] = (porPagamento[p] || 0) + Number(l.valorTotal);
+    fat += Number(l.valorTotal);
+    totalExt += Number(l.valorAdicional) || 0;
+  });
+  const nExt = enc.filter(function(l) { return Number(l.valorAdicional) > 0; }).length;
+  const cred = (porPagamento['Crédito'] || porPagamento['Credito'] || 0);
+  const deb = (porPagamento['Débito'] || porPagamento['Debito'] || 0);
+  const totalMaq = (porPagamento['PIX'] || 0) + cred + deb;
+  const totalDin = porPagamento['Dinheiro'] || 0;
+
+  const custos = [];
+  const shCus = sh_(SH_CUS);
+  const lastCus = shCus.getLastRow();
+  if (lastCus >= DATA_ROW) {
+    const dadosC = shCus.getRange(DATA_ROW, 1, lastCus - DATA_ROW + 1, 6).getValues();
+    dadosC.forEach(function(r) {
+      if (!r[0]) return;
+      if (cellToStr_(r[1]) !== dataAlvo) return;
+      custos.push({
+        id: r[0],
+        data: cellToStr_(r[1]),
+        hora: cellToStr_(r[2]),
+        descricao: String(r[3]),
+        categoria: String(r[4]),
+        valor: Number(r[5])
+      });
+    });
+  }
+
+  let totalCus = 0, cusDin = 0;
+  custos.forEach(function(c) {
+    const val = Number(c.valor) || 0;
+    totalCus += val;
+    const cat = String(c.categoria || '').toLowerCase();
+    const desc = String(c.descricao || '').toLowerCase();
+    if (cat.indexOf('dinheiro') >= 0 || desc.indexOf('dinheiro') >= 0) cusDin += val;
+  });
+
+  enc.sort(function(a, b) {
+    return String(a.horaInicio).localeCompare(String(b.horaInicio));
+  });
+
+  return {
+    data: dataAlvo,
+    n: enc.length,
+    fat: Math.round(fat * 100) / 100,
+    totalExt: Math.round(totalExt * 100) / 100,
+    nExt: nExt,
+    porPagamento: porPagamento,
+    totalMaq: Math.round(totalMaq * 100) / 100,
+    totalDin: Math.round(totalDin * 100) / 100,
+    totalCus: Math.round(totalCus * 100) / 100,
+    cusDin: Math.round(cusDin * 100) / 100,
+    saldoDin: Math.round((totalDin - cusDin) * 100) / 100,
+    resultado: Math.round((fat - totalCus) * 100) / 100,
+    locacoes: enc,
+    custos: custos
+  };
+}
+
+function resumoDia_(p) {
+  if (!isAdminRequest_(p)) return err_('Acesso negado — resumoDia so para administrador', 403);
+  const dataIn = (p.data || '').trim();
+  const dataAlvo = dataIn || fmtData_(new Date());
+  if (!parseDataStr_(dataAlvo)) return err_('data invalida — use dd/MM/yyyy', 400);
+  return resp_(calcResumoDiaCore_(dataAlvo));
+}
+
 // ── Pacote F: operador / cancelamentos / ocupacao (AUDITORIA + frota) ──
 const KPI_HORAS_OPERACAO_DIA_ = 12;
 
@@ -1391,7 +1521,7 @@ function buscarKPIsAdmin_(p) {
   const anoPrev  = mesAtual === 1 ? anoAtual - 1 : anoAtual;
   const mmyyPrev = String(mesPrev).padStart(2,'0') + '/' + anoPrev;
 
-  let fatHoje = 0, nHoje = 0, fatMes = 0, nMes = 0, fatAno = 0, nAno = 0;
+  let fatMes = 0, nMes = 0, fatAno = 0, nAno = 0;
   let extMes = 0, nComExtra = 0;
   let fatSemana = 0, nSemana = 0, fatSemanaAnt = 0, nSemanaAnt = 0;
   let fatMesAnt = 0, nMesAnt = 0;
@@ -1470,11 +1600,14 @@ function buscarKPIsAdmin_(p) {
         const tel = String(r[13] || '').replace(/\D/g, '');
         if (tel.length >= 10) telMesCounts[tel] = (telMesCounts[tel] || 0) + 1;
       }
-      if (dataR === dataHoje) { fatHoje += vt; nHoje++; }
     });
   }
 
-  let cusHoje = 0, cusMes = 0;
+  const resumoHoje = calcResumoDiaCore_(dataHoje);
+  const fatHoje = resumoHoje.fat;
+  const nHoje = resumoHoje.n;
+
+  let cusMes = 0;
   const cusPorCategoria = {};
   const lastCus = shCus.getLastRow();
   if (lastCus >= DATA_ROW) {
@@ -1491,9 +1624,9 @@ function buscarKPIsAdmin_(p) {
         cusMes += val;
         cusPorCategoria[cat] = (cusPorCategoria[cat] || 0) + val;
       }
-      if (dataR === dataHoje) cusHoje += val;
     });
   }
+  const cusHoje = resumoHoje.totalCus;
 
   const telKeys = Object.keys(telMesCounts);
   const nClientesUnicos = telKeys.length;

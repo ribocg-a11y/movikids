@@ -53,4 +53,4 @@
 
 ## Fechar Pacote L
 
-Quando **L.T1–L.A7** e **L.O1** assinados → marcar FASE 3 fechada em `PLANO_PRIORIDADES_2026-06.md`. **FASE 4** já iniciada em paralelo (`FASE_4_CONFIG_PLANILHA.md`).
+**FASE 3:** ✅ fechada 08/06/2026. **FASE 5** ativa — `FASE_5_CONFIABILIDADE_APIS.md`.

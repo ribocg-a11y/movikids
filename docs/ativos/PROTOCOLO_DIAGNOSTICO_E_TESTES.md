@@ -208,6 +208,8 @@ O orquestrador **completo** inclui scripts que **gravam** locações de teste. Q
 | F6/F11 | `TESTE_PARIDADE_CRONOMETRO_PORTAL_BALCAO.ps1` |
 | F13 | `TESTE_RELACIONAMENTO_MOVIKIDS_READONLY.ps1` |
 | CONFIG | `TESTE_OPERACAO_CONFIG_READONLY.ps1` |
+| B7 write | `TESTE_B7_REGRESSAO_WRITE.ps1` (grava + cleanup) |
+| B1 resumoDia | `TESTE_RESUMO_DIA_READONLY.ps1` |
 | F0 | `TESTE_REGRESSAO_MOVIKIDS_PROD_SAFE.ps1` (sem `-RunWriteTests`) |
 
 **Pular:** `TESTE_I20_*`, `TESTE_4_FLUXOS_*`, `TESTE_DRAWER_E_*`, `TESTE_PACOTE_F_KPI_READONLY.ps1` (este último grava apesar do nome).
@@ -273,6 +275,7 @@ Detalhe em `HOMOLOGACAO_PRODUCAO_ASSISTIDA.md` seções A–H. Resumo mínimo:
 | `TESTE_REGRESSAO_MOVIKIDS_PROD_SAFE.ps1` | F0, leituras | geral |
 | `TESTE_RELACIONAMENTO_*` | F13 | K.3 |
 | `TESTE_OPERACAO_CONFIG_READONLY.ps1` | CONFIG frota/preços | FASE 4 |
+| `TESTE_B7_REGRESSAO_WRITE.ps1` | F5 iniciar/estender/encerrar | B7 |
 | `TESTE_PACOTE_F_KPI_*` | F12 | Pacote F (⚠️ grava locação teste) |
 | `TESTE_TABLET_F5_F7_F10_F11.ps1` | F5, F7, F10, F11 | I20, I16 |
 | `TESTE_TABLET_F5_F7_F10_F11_BROWSER.js` | F5, F7, F10, F11 | via `RUN_TABLET_BROWSER_TEST.ps1` |

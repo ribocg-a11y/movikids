@@ -1,6 +1,6 @@
 # MOVI KIDS — Plano de continuidade (pós-pausa maturidade)
 
-**Data:** 08/06/2026 (revisão — FASE 4 CONFIG ativa)  
+**Data:** 08/06/2026 (revisão — FASE 5 ativa)  
 **Produção:** FE **v1.7.91** · GAS **v1.5.69**  
 **Handoff novo chat:** **`HANDOFF_NOVO_CHAT.md`**  
 **Ordem de execução:** **`PLANO_PRIORIDADES_2026-06.md`** (prioridades por fase)  
@@ -24,7 +24,7 @@
 | Portal carrossel + DNA visual | ✅ | v1.7.47 `acompanhar.html` + `DESIGN_DNA_MOVIKIDS.md` |
 | Anti sessão fantasma PWA | ✅ | I19 v1.7.48 — chip Turno + reconcile tablet×GAS |
 
-O gargalo **deixou de ser confiabilidade básica**. **FASE 1–2 fechadas**; **Pacote L** entregue (v1.7.91). Foco atual: **FASE 4 CONFIG** na planilha + homologar Pacote L no tablet. WhatsApp automático permanece **pausado** (QR portal).
+O gargalo **deixou de ser confiabilidade básica**. **FASE 1–4 fechadas**. Foco atual: **FASE 5** — B7 regressão write (baseline ok) e APIs **B1** `resumoDia` / **B2** `kpiMes`. WhatsApp automático permanece **pausado** (QR portal).
 
 ---
 
@@ -161,9 +161,9 @@ Escopo original W.1–W.6 (inventário mensagens, aviso extra não pulável, che
 
 | Prioridade | Ação | Quem | Tempo |
 |------------|------|------|-------|
-| **P1** | **FASE 4** — CONFIG frota/preços na planilha | Sócio + agente OAuth | ~1 semana |
-| **P1** | Homologar **Pacote L** tablet + QR A5 | Ops | 1 sessão |
-| **P2** | `TESTE_REGRESSAO` write controlado (B7) | Dev | paralelo |
+| **P1** | **FASE 5 B1** — API `resumoDia` (Caixa + chip) | Dev + GAS Nova versão | sprint |
+| **P1** | **B7** — manter regressão write verde | Agente | contínuo |
+| **P2** | **B2** `kpiMes` Dashboard | Dev | após B1 |
 
 **Não iniciar F4 WhatsApp** — pausado; comunicação = **QR portal** (`DECISAO_COMUNICACAO_QR_CODE_2026-06.md`).
 
@@ -174,7 +174,7 @@ Escopo original W.1–W.6 (inventário mensagens, aviso extra não pulável, che
 - [x] `pre-push-check` verde  
 - [x] Nenhum incidente P1 auth aberto  
 
-→ **Sprint 1–3 fechadas.** Próximo: **FASE 4 CONFIG** (`FASE_4_CONFIG_PLANILHA.md`).
+→ **Sprint 1–4 fechadas.** Próximo: **FASE 5** B1 `resumoDia` (`FASE_5_CONFIABILIDADE_APIS.md`).
 
 ---
 

@@ -27,8 +27,8 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 | Camada | Versão alvo | URL / ID |
 |--------|-------------|----------|
-| **Frontend** | **v1.7.91** (Pacote L) | https://ribocg-a11y.github.io/movikids/?force=1.7.91 |
-| **Apps Script** | **v1.5.69** (ping 08/06; relatório Golden) | Deploy `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y` |
+| **Frontend** | **v1.7.92** (B1 resumoDia) | https://ribocg-a11y.github.io/movikids/?force=1.7.92 |
+| **Apps Script** | **v1.5.70** (B1; publicar Nova versão Web) | Deploy `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y` |
 | SMS Gateway Cloud | **DJVJRL** / device `wihWegHr4wXaVJQ1R-GZR` | Aparelho remoto ONLINE |
 | Pacote SMS P0 | **FECHADO** | `PACOTE_SMS_P0_UNIFICADO_v1.5.38_v1.7.11.md` |
 | Planilha | MOVIKIDS_Planilha_Base | https://docs.google.com/spreadsheets/d/1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618/edit — auditoria `AUDITORIA_PLANILHA_BASE_2026-06-06.md` |
@@ -39,7 +39,7 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 **Teste rápido GAS (ping):**  
 https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec?action=ping  
-→ deve retornar `versao: v1.5.69` e `postWriteActions` (POST só no GAS; FE usa GET — I15)
+→ deve retornar `versao: v1.5.70` e `postWriteActions` (POST só no GAS; FE usa GET — I15)
 
 **URL morta (não usar):** `AKfycbzc...` → 404
 
@@ -84,6 +84,7 @@ https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPe
 | Mapa bugs | `MAPA_ERROS_FALHAS_BUGS.md` |
 | Emergência | `scripts/ops/liberar-*.html`, `scripts/corrigir-locacao-206.html` |
 | CONFIG FASE 4 | `CONFIG_OPERACIONAL_TEMPLATE.md` · `TESTE_OPERACAO_CONFIG_READONLY.ps1` |
+| FASE 5 B7 | `FASE_5_CONFIABILIDADE_APIS.md` · `TESTE_B7_REGRESSAO_WRITE.ps1` |
 
 ---
 
@@ -183,8 +184,9 @@ Commits de referência: `3d9d106` (v1.7.25), `e1a56db` (Pacote E), `1454bc8` (fi
 - [x] **Portal foto moldura** — `foto-moldura.html` + botão no portal (v1.7.62+)
 - [~] **Fase 4 WhatsApp / SMS auto — PAUSADA** (QR Code oficial — `DECISAO_COMUNICACAO_QR_CODE_2026-06.md`)
 - [x] **Pacote M — Modularização FE** — M.1–M.17 ✅ (v1.7.87; zero JS inline)
-- [x] **Pacote L** — UX polish v1.7.91 (tiles, sync header, Sistema, QR balcão) — homologar tablet
-- [~] **FASE 4 CONFIG** — baseline API ok 08/06; conferir planilha + sócio (`FASE_4_CONFIG_PLANILHA.md`)
+- [x] **Pacote L** — UX polish v1.7.91 (FASE 3 fechada)
+- [x] **FASE 4 CONFIG** — planilha + tablet validados
+- [~] **FASE 5** — B7 ok; B1 `resumoDia` código entregue — publicar GAS v1.5.70 (`DEPLOY_v1.5.70_RESUMO_DIA.md`)
 - [~] **Fase 9 supervisor — PAUSADA**
 
 ---
@@ -196,8 +198,9 @@ Commits de referência: `3d9d106` (v1.7.25), `e1a56db` (Pacote E), `1454bc8` (fi
 | **1** | Estabilizar: checklist I.5, tablets v1.7.87, testes | ✅ **fechada** 08/06 |
 | **2** | **Pacote K** — K.1–K.4 homologado tablet | ✅ **fechada** 08/06 |
 | **2b** | **Payback negócio** — FASE 2 | ✅ fechada 08/06 |
-| **3** | **Pacote L** — UX polish + QR balcão v1.7.91 | homologar tablet |
-| **4** | **CONFIG planilha** — frota/preços sem redeploy GAS | **ativa** 08/06 |
+| **3** | **Pacote L** — UX polish + QR balcão v1.7.91 | ✅ fechada |
+| **4** | **CONFIG planilha** — frota/preços sem redeploy GAS | ✅ fechada |
+| **5** | **B7 write + APIs B1/B2** | **ativa** 08/06 |
 | ⏸ | F4 WhatsApp / SMS automático | conta bloqueada; usar QR |
 | ⏸ | F9 supervisor | pausada |
 
@@ -256,7 +259,7 @@ Commits de referência: `3d9d106` (v1.7.25), `e1a56db` (Pacote E), `1454bc8` (fi
 1. Ping GAS → `ok:true`, `versao` **v1.5.69**
 2. Tablet → `?force=1.7.91`, rodapé **Online v1.7.91**
 3. `.\scripts\pre-push-check.ps1` → status ok
-4. CONFIG → `.\scripts\testes\TESTE_OPERACAO_CONFIG_READONLY.ps1` → status ok
+4. B7 write → `.\scripts\testes\TESTE_B7_REGRESSAO_WRITE.ps1` → status ok (grava + cleanup)
 5. Balcão + celular mesma locação → timer ± **2 s** (I16)
 6. ADM liberar sessão → banner limpa sem Ctrl+F5 (I17)
 7. Locação ativa + idle expirado → operador **permanece** logado (I18)

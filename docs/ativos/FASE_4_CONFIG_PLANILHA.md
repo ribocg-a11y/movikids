@@ -1,6 +1,6 @@
 # FASE 4 — CONFIG na planilha
 
-**Status:** 🟡 **ativa** (08/06/2026)  
+**Status:** ✅ **fechada** (08/06/2026 — validado sócio/tablet)  
 **GAS:** v1.5.69+ (lê CONFIG via `operacaoConfig_` / `cfgReadMap_`)  
 **Template:** `CONFIG_OPERACIONAL_TEMPLATE.md` · **Teste:** `scripts/testes/TESTE_OPERACAO_CONFIG_READONLY.ps1`  
 **Referência:** `AUDITORIA_PLANILHA_BASE_2026-06-06.md` · `PLANO_PRIORIDADES_2026-06.md` § FASE 4
@@ -17,11 +17,11 @@ Admin altera **frota e preços** na aba CONFIG sem redeploy GAS. Hoje o fallback
 
 | # | Ação | Quem | OK |
 |---|------|------|-----|
-| 4.1 | Validar chaves JSON na aba **CONFIG** | Sócio + agente OAuth | [ ] |
-| 4.2 | Conferir frota (carros, triciclos, pelúcias) = operação real | Sócio | [ ] |
-| 4.3 | Conferir preços 3h Carro/Pelúcia **130/150** e triciclo | Sócio | [ ] |
-| 4.4 | Salvar no app: **Sistema → Editar frota e preços** (espelho CONFIG) | Admin tablet | [ ] |
-| 4.5 | Reauditar KPIs DASHBOARD pós-CONFIG | Agente | [~] KPI frota ok 08/06; reauditar após edição |
+| 4.1 | Validar chaves JSON na aba **CONFIG** | Sócio + agente OAuth | [x] |
+| 4.2 | Conferir frota (carros, triciclos, pelúcias) = operação real | Sócio | [x] |
+| 4.3 | Conferir preços 3h Carro/Pelúcia **130/150** e triciclo | Sócio | [x] |
+| 4.4 | Salvar no app: **Sistema → Editar frota e preços** (espelho CONFIG) | Admin tablet | [x] |
+| 4.5 | Reauditar KPIs DASHBOARD pós-CONFIG | Agente | [x] |
 | 4.6 | Mover `scripts/liberar-*-agora.html` → `scripts/ops/` (decisão 4.3 plano) | Dev | [x] 08/06 |
 
 ### Chaves CONFIG (Pacote H)

@@ -26,9 +26,9 @@
 
 ---
 
-## Fechar Pacote L (você)
+## Fechar Pacote L
 
-- [ ] Checklist tablet `CHECKLIST_PACOTE_L.md`  
-- [ ] Cartaz A5 impresso no balcão  
+- [x] Checklist tablet `CHECKLIST_PACOTE_L.md` (validado 08/06)  
+- [x] Cartaz A5 / QR balcão operacional  
 
-**Em paralelo:** **FASE 4** CONFIG ativa — `FASE_4_CONFIG_PLANILHA.md` · `CONFIG_OPERACIONAL_TEMPLATE.md`
+**FASE 3:** ✅ fechada · **FASE 5** ativa — `FASE_5_CONFIABILIDADE_APIS.md`

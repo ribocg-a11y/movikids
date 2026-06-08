@@ -23,6 +23,7 @@ Use quando a loja está operando ou não quer poluir a planilha:
 .\scripts\testes\TESTE_PARIDADE_CRONOMETRO_PORTAL_BALCAO.ps1
 .\scripts\testes\TESTE_RELACIONAMENTO_MOVIKIDS_READONLY.ps1
 .\scripts\testes\TESTE_OPERACAO_CONFIG_READONLY.ps1
+.\scripts\testes\TESTE_RESUMO_DIA_READONLY.ps1
 .\scripts\testes\TESTE_REGRESSAO_MOVIKIDS_PROD_SAFE.ps1
 # sem -RunWriteTests
 ```
@@ -41,6 +42,7 @@ Get-ChildItem mk-*.js | ForEach-Object { node --check $_.FullName }
 | `TESTE_4_FLUXOS_CADASTRO_I20.ps1` | Locações cadastro I20 |
 | `TESTE_DRAWER_E_PACOTE_E.ps1` | Locações `DRAWER_E_*` |
 | `TESTE_PACOTE_F_KPI_READONLY.ps1` | Salvar/editar/cancelar `TESTE_PACOTE_F` (nome enganoso) |
+| `TESTE_B7_REGRESSAO_WRITE.ps1` | B7 FASE 5: iniciar/estender/encerrar + cleanup |
 
 Limpeza após testes de escrita:
 

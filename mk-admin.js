@@ -7,6 +7,7 @@ let adminTimerInt   = null;
 const ADMIN_IDLE_SEC = 60 * 60; // 1 hora sem atividade (alinha com mk-auth)
 let adminCountdown  = ADMIN_IDLE_SEC;
 var kpiData         = null;
+var resumoDiaHoje   = null;
 let chartsRendered  = false;
 var chartDiario=null,chartExtrasDia=null,chartHistExt=null,chartHoras=null;
 const ADMIN_PIN     = '1416';
@@ -527,13 +528,31 @@ async function salvarOperacaoConfigAdmin_() {
 }
 
 // ── KPIs ─────────────────────────────────────────────────────
+function fmtDataBrHoje_() {
+  const hoje = new Date();
+  const pad = n => String(n).padStart(2, '0');
+  return pad(hoje.getDate()) + '/' + pad(hoje.getMonth() + 1) + '/' + hoje.getFullYear();
+}
+
+function nHojeCanonica_() {
+  if (resumoDiaHoje && resumoDiaHoje.n != null) return resumoDiaHoje.n;
+  if (kpiData && kpiData.nHoje != null) return kpiData.nHoje;
+  return 0;
+}
+
 async function carregarKPIs() {
   if (window._kpiInFlight) return;  // evita calls GAS simultâneos
   window._kpiInFlight = true;
   try {
-    const d = await api({ action: 'buscarKPIsAdmin', ...apiParamsComAuth_() });
+    const authP = apiParamsComAuth_();
+    const hojeFmt = fmtDataBrHoje_();
+    const [d, resumo] = await Promise.all([
+      api({ action: 'buscarKPIsAdmin', ...authP }),
+      api({ action: 'resumoDia', data: hojeFmt, ...authP })
+    ]);
     if (!d.ok) return;
     kpiData = d;
+    if (resumo && resumo.ok) resumoDiaHoje = resumo;
     if (typeof renderSemanasChart_ === 'function') renderSemanasChart_(d);
     // Re-renderiza gráficos com dados frescos (fix: gráficos ficavam com dados velhos)
     const dashPage = document.getElementById('page-dashboard');
@@ -677,7 +696,7 @@ function renderCharts(d) {
   if (resEl) { resEl.textContent = R2(d.resultado); resEl.className = 'nkv ' + ((d.resultado||0) >= 0 ? 'green' : 'red'); }
   setText2('nk-margem',  'margem ' + (d.margem||0) + '%');
   setText2('nk-fathoje', 'Conferir →');
-  const nHoje = d.nHoje != null ? d.nHoje : 0;
+  const nHoje = nHojeCanonica_();
   setText2('nk-cushoje', nHoje + (nHoje === 1 ? ' locação hoje' : ' locações hoje') + ' · abre Caixa');
 
   // CTO
@@ -1089,49 +1108,19 @@ function inicializarCaixa() {
   carregarCaixa();
 }
 
-async function carregarCaixa() {
-  const dataEl = document.getElementById('caixa-data');
-  if (!dataEl) return;
-  const [y,m,d] = dataEl.value.split('-');
-  const dataFmt = `${d}/${m}/${y}`;
-
-  // Atualiza KPIs com loading
-  ['cx-total','cx-maq','cx-din','cx-cus','cx-res','cx-nloc','cx-ext'].forEach(id => {
-    const el = document.getElementById(id); if(el) el.textContent = '...';
-  });
-
-  try {
-    // Buscar locações e custos em paralelo
-    const authP = apiParamsComAuth_();
-    const [rLoc, rCus] = await Promise.all([
-      api({ action:'listarHistorico', data: dataFmt, ...authP }),
-      api({ action:'listarCustos', ...authP })
-    ]);
-
-    const locacoes = (rLoc.locacoes||[]).filter(l => l.status === 'Encerrada');
-    const mes = parseInt(m), ano = parseInt(y);
-    const custos = (rCus.custos||[]).filter(c => {
-      const [cd,cm,cy] = String(c.data).split('/');
-      return parseInt(cd) === parseInt(d) && parseInt(cm) === mes && parseInt(cy) === ano;
-    });
-
-    // Calcular totais por pagamento
-    const totPag = {};
-    let totalEnt = 0;
-    locacoes.forEach(l => {
-      const p = l.pagamento || 'Não informado';
-      totPag[p] = (totPag[p]||0) + Number(l.valorTotal);
-      totalEnt += Number(l.valorTotal);
-    });
-
-    const totalMaq = (totPag['PIX']||0) + (totPag['Crédito']||0) + (totPag['Débito']||0);
-    const totalDin  = totPag['Dinheiro'] || 0;
-    const totalCus  = custos.reduce((s,c) => s + Number(c.valor), 0);
-    const totalExt  = locacoes.reduce((s,l) => s + Number(l.valorAdicional || 0), 0);
-    const nExt      = locacoes.filter(l => Number(l.valorAdicional) > 0).length;
-    const cusDin    = custos.filter(c => (c.categoria||'').toLowerCase().includes('dinheiro') || (c.obs||'').toLowerCase().includes('dinheiro')).reduce((s,c) => s+Number(c.valor), 0);
-    const saldoDin  = totalDin - cusDin;
-    const resultado = totalEnt - totalCus;
+function renderCaixaFromResumo_(dataFmt, r) {
+    const locacoes = r.locacoes || [];
+    const custos = r.custos || [];
+    const totPag = r.porPagamento || {};
+    const totalEnt = Number(r.fat) || 0;
+    const totalMaq = Number(r.totalMaq) || 0;
+    const totalDin = Number(r.totalDin) || 0;
+    const totalCus = Number(r.totalCus) || 0;
+    const totalExt = Number(r.totalExt) || 0;
+    const nExt = Number(r.nExt) || 0;
+    const cusDin = Number(r.cusDin) || 0;
+    const saldoDin = Number(r.saldoDin) || 0;
+    const resultado = Number(r.resultado) || 0;
 
     // KPIs
     const setKpi = (id, val, cor) => {
@@ -1243,7 +1232,28 @@ async function carregarCaixa() {
 
     // Guardar dados para copiar
     window._caixaData = { dataFmt, totalEnt, totalMaq, totalDin, totalCus, saldoDin, resultado, totPag, locacoes, custos };
+}
 
+async function carregarCaixa() {
+  const dataEl = document.getElementById('caixa-data');
+  if (!dataEl) return;
+  const [y,m,d] = dataEl.value.split('-');
+  const dataFmt = `${d}/${m}/${y}`;
+
+  ['cx-total','cx-maq','cx-din','cx-cus','cx-res','cx-nloc','cx-ext'].forEach(id => {
+    const el = document.getElementById(id); if(el) el.textContent = '...';
+  });
+
+  try {
+    const authP = apiParamsComAuth_();
+    const r = await api({ action: 'resumoDia', data: dataFmt, ...authP });
+    if (!r.ok) {
+      toast(r.erro || 'Erro ao carregar caixa', 'error');
+      return;
+    }
+    if (dataFmt === fmtDataBrHoje_()) resumoDiaHoje = r;
+    renderCaixaFromResumo_(dataFmt, r);
+    if (typeof atualizarHubAdmin_ === 'function') atualizarHubAdmin_();
   } catch(e) {
     console.error('carregarCaixa:', e);
     toast('Erro ao carregar caixa', 'error');
@@ -1525,7 +1535,7 @@ function atualizarHubAdmin_() {
   const dia = document.getElementById('hub-dia-sub');
   const mes = document.getElementById('hub-mes-sub');
   if (d && d.ok) {
-    const nHoje = d.nHoje || 0;
+    const nHoje = nHojeCanonica_();
     if (dia) dia.textContent = nHoje + (nHoje === 1 ? ' locação hoje' : ' locações hoje') + ' · conferência no caixa';
     if (mes) mes.textContent = 'KPIs do mês, CTO e gestão avançada';
   }
