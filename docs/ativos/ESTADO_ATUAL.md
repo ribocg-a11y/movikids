@@ -82,7 +82,8 @@ https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPe
 | **Protocolo testes** | **`PROTOCOLO_DIAGNOSTICO_E_TESTES.md`** + `TESTE_PROTOCOLO_DIAGNOSTICO.ps1` |
 | **Homologação tablet F5–F11** | `TESTE_TABLET_F5_F7_F10_F11.ps1` + `TESTE_TABLET_F5_F7_F10_F11_BROWSER.js` |
 | Mapa bugs | `MAPA_ERROS_FALHAS_BUGS.md` |
-| Emergência | `scripts/corrigir-locacao-206.html`, `scripts/corrigir-locacoes-extras-lote.html` |
+| Emergência | `scripts/ops/liberar-*.html`, `scripts/corrigir-locacao-206.html` |
+| CONFIG FASE 4 | `CONFIG_OPERACIONAL_TEMPLATE.md` · `TESTE_OPERACAO_CONFIG_READONLY.ps1` |
 
 ---
 
@@ -182,7 +183,8 @@ Commits de referência: `3d9d106` (v1.7.25), `e1a56db` (Pacote E), `1454bc8` (fi
 - [x] **Portal foto moldura** — `foto-moldura.html` + botão no portal (v1.7.62+)
 - [~] **Fase 4 WhatsApp / SMS auto — PAUSADA** (QR Code oficial — `DECISAO_COMUNICACAO_QR_CODE_2026-06.md`)
 - [x] **Pacote M — Modularização FE** — M.1–M.17 ✅ (v1.7.87; zero JS inline)
-- [ ] **Pacote L** — UX polish (tiles, sync header, Sistema, QR balcão) ← **próximo pacote feature**
+- [x] **Pacote L** — UX polish v1.7.91 (tiles, sync header, Sistema, QR balcão) — homologar tablet
+- [~] **FASE 4 CONFIG** — baseline API ok 08/06; conferir planilha + sócio (`FASE_4_CONFIG_PLANILHA.md`)
 - [~] **Fase 9 supervisor — PAUSADA**
 
 ---
@@ -193,8 +195,9 @@ Commits de referência: `3d9d106` (v1.7.25), `e1a56db` (Pacote E), `1454bc8` (fi
 |--------|------|--------|
 | **1** | Estabilizar: checklist I.5, tablets v1.7.87, testes | ✅ **fechada** 08/06 |
 | **2** | **Pacote K** — K.1–K.4 homologado tablet | ✅ **fechada** 08/06 |
-| **2b** | **Payback negócio** — FASE 2; memorial §10 | **ativa** |
-| **3** | **Pacote L** — UX polish + QR balcão | **próximo** (F4 pausado) |
+| **2b** | **Payback negócio** — FASE 2 | ✅ fechada 08/06 |
+| **3** | **Pacote L** — UX polish + QR balcão v1.7.91 | homologar tablet |
+| **4** | **CONFIG planilha** — frota/preços sem redeploy GAS | **ativa** 08/06 |
 | ⏸ | F4 WhatsApp / SMS automático | conta bloqueada; usar QR |
 | ⏸ | F9 supervisor | pausada |
 
@@ -250,13 +253,14 @@ Commits de referência: `3d9d106` (v1.7.25), `e1a56db` (Pacote E), `1454bc8` (fi
 
 ## Validação rápida (pós-deploy)
 
-1. Ping GAS → `ok:true`, `versao` ≥ **v1.5.55** (I16 cronômetro)
-2. Tablet → `?force=1.7.87`, rodapé **Online v1.7.87**
+1. Ping GAS → `ok:true`, `versao` **v1.5.69**
+2. Tablet → `?force=1.7.91`, rodapé **Online v1.7.91**
 3. `.\scripts\pre-push-check.ps1` → status ok
-4. Balcão + celular mesma locação → timer ± **2 s** (I16)
-5. ADM liberar sessão → banner limpa sem Ctrl+F5 (I17)
-6. Locação ativa + idle expirado → operador **permanece** logado (I18)
-7. Nova locação salva no tablet (I15)
+4. CONFIG → `.\scripts\testes\TESTE_OPERACAO_CONFIG_READONLY.ps1` → status ok
+5. Balcão + celular mesma locação → timer ± **2 s** (I16)
+6. ADM liberar sessão → banner limpa sem Ctrl+F5 (I17)
+7. Locação ativa + idle expirado → operador **permanece** logado (I18)
+8. Nova locação salva no tablet (I15)
 
 Scripts: `scripts/testes/` — ver `scripts/testes/README.md`
 

@@ -4,7 +4,7 @@ Sistema operacional para locações — balcão (tablet), portal do responsável
 
 ## Planejamento (08/06/2026)
 
-**FASE 1–2** ✅ fechadas · **FASE 3** Pacote L 🟡 ativa · detalhes: [PLANO_PRIORIDADES](docs/ativos/PLANO_PRIORIDADES_2026-06.md)
+**FASE 1–2** ✅ fechadas · **FASE 3** Pacote L entregue (homologar tablet) · **FASE 4** CONFIG 🟡 ativa · [PLANO_PRIORIDADES](docs/ativos/PLANO_PRIORIDADES_2026-06.md)
 
 ## Produção (08/06/2026)
 
@@ -31,6 +31,7 @@ Toda a documentação está em **`docs/`**. Não use arquivos soltos na raiz (fo
 | **Estado e versões** | [docs/ativos/ESTADO_ATUAL.md](docs/ativos/ESTADO_ATUAL.md) |
 | **Acessos (agente vs você)** | [docs/ativos/ACESSOS_E_AUTORIZACOES.md](docs/ativos/ACESSOS_E_AUTORIZACOES.md) |
 | **Mapa do código** | [docs/ativos/MAPA_CODIGO_ARQUITETURA.md](docs/ativos/MAPA_CODIGO_ARQUITETURA.md) |
+| **FASE 4 CONFIG** | [docs/ativos/FASE_4_CONFIG_PLANILHA.md](docs/ativos/FASE_4_CONFIG_PLANILHA.md) · [template JSON](docs/ativos/CONFIG_OPERACIONAL_TEMPLATE.md) |
 | **Índice completo** | [docs/INDICE.md](docs/INDICE.md) |
 
 **Planilha Google (OAuth):** `C:\Users\riboc\Projects\google-drive-sheets-auth` — token em `~/.config/google-api/`

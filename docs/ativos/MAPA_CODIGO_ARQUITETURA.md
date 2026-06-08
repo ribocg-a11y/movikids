@@ -20,7 +20,7 @@
 | **Pernas (canais externos)** | Portal pais, foto, cronômetro curto | `acompanhar.html`, `foto-moldura.html`, `track.html` |
 | **Pele** | Visual único | `mk-app.css` (base) + `mk-design.css` (aditivo Pacote A) |
 | **Porta de entrada** | Quem pode entrar | `mk-auth.js` — operador PIN, admin 1416, chip Turno |
-| **Dedos finos** | Scripts pontuais, emergência, testes | `scripts/testes/`, `scripts/liberar-*.html`, `google-drive-sheets-auth` |
+| **Dedos finos** | Scripts pontuais, emergência, testes | `scripts/testes/`, `scripts/ops/`, `google-drive-sheets-auth` |
 
 **Monólito modularizado (Pacote M fechado):** `index.html` **~1.378 linhas** (v1.7.87) — **zero JS inline** (só HTML + `<script src>`). Módulos: M.1–M.17 (`mk-globals.js`, `mk-core.js` … `mk-boot.js`). Plano: `PACOTE_M_MODULARIZACAO.md`.
 

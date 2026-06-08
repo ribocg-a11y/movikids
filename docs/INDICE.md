@@ -1,6 +1,6 @@
 # MOVI KIDS — Índice de documentação
 
-**Atualizado:** 08/06/2026 (FASE 3 — Pacote L v1.7.88)
+**Atualizado:** 08/06/2026 (FASE 4 — CONFIG planilha ativa)
 
 ## Comece aqui
 
@@ -16,7 +16,8 @@
 | [PACOTE_M_MODULARIZACAO.md](ativos/PACOTE_M_MODULARIZACAO.md) | Modularização FE — **M.1–M.17 ✅ fechado** (v1.7.87) |
 | [PACOTE_L_UX_POLISH.md](ativos/PACOTE_L_UX_POLISH.md) | **FASE 3** Pacote L (v1.7.91) |
 | [CHECKLIST_PACOTE_L.md](ativos/CHECKLIST_PACOTE_L.md) | Homologação tablet Pacote L |
-| [FASE_4_CONFIG_PLANILHA.md](ativos/FASE_4_CONFIG_PLANILHA.md) | Próxima fase — CONFIG JSON |
+| [FASE_4_CONFIG_PLANILHA.md](ativos/FASE_4_CONFIG_PLANILHA.md) | **FASE 4 ativa** — CONFIG JSON |
+| [CONFIG_OPERACIONAL_TEMPLATE.md](ativos/CONFIG_OPERACIONAL_TEMPLATE.md) | Template JSON frota/preços |
 | [CHECKLIST_TABLET_v1.7.85.md](ativos/CHECKLIST_TABLET_v1.7.85.md) | Homologação tablet FASE 1 (A–F) |
 
 ## Operação e deploy

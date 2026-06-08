@@ -51,7 +51,7 @@ Operador nas 5 escritas críticas: deve enviar `operador` / `operadorId` (GET no
 
 **No app:** menu Administrador (PIN 1416) → Operadores → reset / liberar sessão.
 
-**Emergência (browser local):** `scripts/liberar-eduarda-agora.html`, `scripts/liberar-milena-agora.html` — adaptar `operadorId`.
+**Emergência (browser local):** `scripts/ops/liberar-eduarda-agora.html`, `scripts/ops/liberar-milena-agora.html` — adaptar `operadorId`.
 
 **Incidente completo:** `docs/arquivo/incidentes/INCIDENTE_AUTH_OPERADORES_2026-06-04.md`
 

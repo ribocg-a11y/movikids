@@ -1,7 +1,7 @@
 # MOVI KIDS — Plano de continuidade (pós-pausa maturidade)
 
-**Data:** 08/06/2026 (revisão — Pacote M fechado + homologação FASE 1)  
-**Produção:** FE **v1.7.87** · GAS **v1.5.66+** (ping 08/06: v1.5.67)  
+**Data:** 08/06/2026 (revisão — FASE 4 CONFIG ativa)  
+**Produção:** FE **v1.7.91** · GAS **v1.5.69**  
 **Handoff novo chat:** **`HANDOFF_NOVO_CHAT.md`**  
 **Ordem de execução:** **`PLANO_PRIORIDADES_2026-06.md`** (prioridades por fase)  
 **Substitui como “próximo passo”:** seção 9 de `PLANO_PAUSA_MATURIDADE_2026-06.md` e seção 14 de `PLANO_MESTRE_REORGANIZADO_2026-06.md`  
@@ -24,7 +24,7 @@
 | Portal carrossel + DNA visual | ✅ | v1.7.47 `acompanhar.html` + `DESIGN_DNA_MOVIKIDS.md` |
 | Anti sessão fantasma PWA | ✅ | I19 v1.7.48 — chip Turno + reconcile tablet×GAS |
 
-O gargalo **deixou de ser confiabilidade básica**. **Pacote M modularização fechado** (v1.7.87). Foco atual: **homologação tablet FASE 1**, payback estratégico e **Pacote L** UX. WhatsApp automático permanece **pausado** (QR portal).
+O gargalo **deixou de ser confiabilidade básica**. **FASE 1–2 fechadas**; **Pacote L** entregue (v1.7.91). Foco atual: **FASE 4 CONFIG** na planilha + homologar Pacote L no tablet. WhatsApp automático permanece **pausado** (QR portal).
 
 ---
 
@@ -157,15 +157,15 @@ Escopo original W.1–W.6 (inventário mensagens, aviso extra não pulável, che
 
 ## 10. Decisão imediata — junho 2026
 
-**Sprint 1 + Sprint 2 fechadas** (08/06/2026). Ordem **agora**:
+**Sprint 1–3 entregues** (08/06/2026). Ordem **agora**:
 
 | Prioridade | Ação | Quem | Tempo |
 |------------|------|------|-------|
-| **P1** | **FASE 2** — regras payback (memorial §10) + aba INVESTIMENTO | Sócio + dev | 1 sessão |
-| **P1** | Iniciar **Pacote L** (UX polish + QR balcão) | Dev | sprint 3 |
+| **P1** | **FASE 4** — CONFIG frota/preços na planilha | Sócio + agente OAuth | ~1 semana |
+| **P1** | Homologar **Pacote L** tablet + QR A5 | Ops | 1 sessão |
 | **P2** | `TESTE_REGRESSAO` write controlado (B7) | Dev | paralelo |
 
-**Não iniciar F4** — pausado; comunicação = **QR portal** (`DECISAO_COMUNICACAO_QR_CODE_2026-06.md`).
+**Não iniciar F4 WhatsApp** — pausado; comunicação = **QR portal** (`DECISAO_COMUNICACAO_QR_CODE_2026-06.md`).
 
 ### Critério para encerrar Sprint 1 e abrir Sprint 2
 
@@ -174,7 +174,7 @@ Escopo original W.1–W.6 (inventário mensagens, aviso extra não pulável, che
 - [x] `pre-push-check` verde  
 - [x] Nenhum incidente P1 auth aberto  
 
-→ **Sprint 1 + Sprint 2 fechadas.** Próximo: **FASE 2 payback** → **Pacote L**.
+→ **Sprint 1–3 fechadas.** Próximo: **FASE 4 CONFIG** (`FASE_4_CONFIG_PLANILHA.md`).
 
 ---
 

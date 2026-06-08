@@ -14,7 +14,8 @@
 | **FASE 0** Alinhar base | ✅ fechada | 07/06/2026 |
 | **FASE 1** Homologação | ✅ fechada | 08/06/2026 (assinada) |
 | **FASE 2** Payback negócio | ✅ fechada | 08/06/2026 (INVESTIMENTO + GAS v1.5.69) |
-| **FASE 3** Pacote L | 🟡 **ativa** | 08/06/2026 (FE **v1.7.91** — homologar `CHECKLIST_PACOTE_L.md`) |
+| **FASE 3** Pacote L | 🟡 código entregue | 08/06/2026 (FE **v1.7.91** — homologar `CHECKLIST_PACOTE_L.md`) |
+| **FASE 4** CONFIG planilha | 🟡 **ativa** | 08/06/2026 (`FASE_4_CONFIG_PLANILHA.md`) |
 
 ### FASE 0 — checklist
 
@@ -33,7 +34,7 @@
 | 0.10 | `ACESSOS_E_AUTORIZACOES.md` + planilha OAuth (`google-drive-sheets-auth`) | ✅ 07/06 |
 | 0.11 | `MAPA_CODIGO_ARQUITETURA.md` — anatomia e chaves mestras | ✅ 07/06 |
 
-**Próximo passo imediato:** **FASE 3** — homologar tablet **v1.7.91** (`CHECKLIST_PACOTE_L.md`) + imprimir QR A5. Depois **FASE 4** (`FASE_4_CONFIG_PLANILHA.md`).
+**Próximo passo imediato:** **FASE 4** — validar CONFIG na planilha + sócio (`CONFIG_OPERACIONAL_TEMPLATE.md`, `TESTE_OPERACAO_CONFIG_READONLY.ps1`). Em paralelo: homologar Pacote L tablet (`CHECKLIST_PACOTE_L.md`).
 
 **FASE 1 fechada 08/06/2026:** I.5 assinado · K.3–K.4 tablet · checklist A–F · payback Dashboard · tablet v1.7.87. Sprint 1 + Sprint 2 (K) declarados fechados.
 
@@ -45,13 +46,14 @@
 
 | Camada | Repo (GitHub) | Produção (verificado) | Alinhado? |
 |--------|---------------|------------------------|-----------|
-| **Frontend** | **v1.7.87** (`mk-version.js`) | GitHub Pages após push | ✅ |
-| **Service Worker** | v1.7.87 (`sw.js`) | — | ✅ |
-| **GAS** | **v1.5.66** (header `.gs`) | Ping **v1.5.67** (08/06) | ✅ |
+| **Frontend** | **v1.7.91** (`mk-version.js`) | GitHub Pages após push | ✅ |
+| **Service Worker** | v1.7.91 (`sw.js`) | — | ✅ |
+| **GAS** | **v1.5.69** (header `.gs`) | Ping **v1.5.69** (08/06) | ✅ |
 | **Deploy ID** | `AKfycbwakQ...` | Mesmo ID | ✅ |
 
-**Teste rápido:** https://ribocg-a11y.github.io/movikids/?force=1.7.87  
-**Ping GAS:** `?action=ping` → `versao: v1.5.66+` (08/06: v1.5.67)
+**Teste rápido:** https://ribocg-a11y.github.io/movikids/?force=1.7.91  
+**Ping GAS:** `?action=ping` → `versao: v1.5.69`  
+**CONFIG:** `TESTE_OPERACAO_CONFIG_READONLY.ps1` → baseline ok 08/06
 
 **I20 cronômetro:** RESOLVIDO — `INCIDENTE_I20_CRONOMETRO_RESOLUCAO_2026-06-07.md`. Não regredir sem `TESTE_I20_COMPLETO_PROD.ps1` + tablet.
 
@@ -64,10 +66,10 @@
 | **Portal responsável** | ✅ Produção | `acompanhar.html`, cronômetro I16, rate limit GAS |
 | **Foto moldura** | ✅ Produção | `foto-moldura.html`, botão no portal |
 | **Dashboard / KPIs** | ✅ Produção | Pacote F completo, fatAno v1.5.59, comparativo semanal |
-| **Payback investimento** | 🟡 Código ok, negócio aberto | GAS v1.5.63 + FE v1.7.87; planilha INVESTIMENTO preenchida (~R$ 65.410); perguntas §10 memorial |
+| **Payback investimento** | ✅ FASE 2 fechada | GAS v1.5.69 + INVESTIMENTO; `DECISAO_PAYBACK_FASE2_2026-06.md` |
 | **CRM / RESPONSAVEIS** | ✅ K.1–K.4 homologado | 240 importados; K.3–K.4 assinado tablet 08/06 |
 | **SMS gateway** | ✅ Produção manual | DJVJRL; **auto/F4 pausado** |
-| **Config frota/preços** | 🟡 Fallback GAS | Aba CONFIG sem JSON na planilha — usa constantes no `.gs` |
+| **Config frota/preços** | 🟡 FASE 4 ativa | `okConfig: true`, fonte `config_ou_default`; conferir planilha + sócio |
 | **CI local** | ✅ | `pre-push-check.ps1`; sem GitHub Actions |
 | **Documentação** | ✅ Estruturada | Handoff ativo + `docs/ativos/` (ver §1.3) |
 
@@ -172,7 +174,7 @@ Objetivo: balcão mais rápido; menos ruído visual. **Próximo pacote de featur
 |---|------|-------|
 | 4.1 | Preencher **CONFIG JSON** na planilha (frota/preços) | Admin edita sem redeploy GAS |
 | 4.2 | Reauditar planilha pós-mudanças | `AUDITORIA_PLANILHA_BASE_*.md` |
-| 4.3 | Decidir destino `scripts/liberar-milena-agora.html` | Commit ops ou mover para `scripts/ops/` |
+| 4.3 | Decidir destino `scripts/liberar-milena-agora.html` | ✅ `scripts/ops/` (08/06) |
 
 ---
 
@@ -208,9 +210,9 @@ FASE 1  Homologação tablet + K.3/K.4 + I.5 [✅ fechada 08/06]
    ↓
 FASE 2  Payback negócio + deploy docs      [✅ fechada 08/06]
    ↓
-FASE 3  Pacote L UX + QR balcão            [🟡 ativa — v1.7.88]
+FASE 3  Pacote L UX + QR balcão            [🟡 homologar tablet — v1.7.91]
    ↓
-FASE 4  CONFIG planilha + auditoria        [1 semana]
+FASE 4  CONFIG planilha + auditoria        [🟡 ativa — 08/06]
    ↓
 FASE 5  Backlog B7, B1, B2                 [contínuo]
 ```
@@ -247,7 +249,7 @@ Todos em `docs/ativos/` salvo indicação. Índice completo: `docs/INDICE.md`.
 | Payback mal interpretado pelo sócio | Nota no painel (v1.7.64); memorial §10 |
 | POST no browser (I15) | Nunca reintroduzir; `pre-push-check` guard |
 | Novo Deploy ID GAS | Proibido — Regra 8 |
-| CONFIG vazio | Constantes no GAS até FASE 4 |
+| CONFIG planilha | FASE 4 ativa — `TESTE_OPERACAO_CONFIG_READONLY.ps1` baseline ok |
 
 ---
 
@@ -258,8 +260,8 @@ Todos em `docs/ativos/` salvo indicação. Índice completo: `docs/INDICE.md`.
 3. **Dados:** CONFIG na planilha; APIs `resumoDia` / `kpiMes` reduzindo duplicação.
 4. **Relacionamento:** Pacote K em uso diário (cadastro canônico, recorrência).
 5. **Comunicação:** reavaliar F4 só com evidência de entrega; até lá QR + manual.
-6. **Arquitetura:** Pacote M fechado (v1.7.87) — `index.html` só HTML; próximo: Pacote L UX polish.
+6. **Arquitetura:** Pacote M fechado — Pacote L v1.7.91 entregue; CONFIG na planilha (FASE 4).
 
 ---
 
-*Próxima revisão: ao fechar FASE 2 ou 13/06/2026.*
+*Próxima revisão: ao fechar FASE 4 ou 13/06/2026.*

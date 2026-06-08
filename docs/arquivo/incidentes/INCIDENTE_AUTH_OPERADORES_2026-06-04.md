@@ -2,7 +2,7 @@
 
 Documento oficial de pós-incidente: o que aconteceu, o que foi corrigido, como operar daqui pra frente e como evitar repetição.
 
-**Relacionados:** `DEPLOY_GAS_v1.5.32_AUTH.md`, `ESTADO_ATUAL.md`, `scripts/liberar-eduarda-agora.html`
+**Relacionados:** `DEPLOY_GAS_v1.5.32_AUTH.md`, `ESTADO_ATUAL.md`, `scripts/ops/liberar-eduarda-agora.html`
 
 ---
 
@@ -92,7 +92,7 @@ Após reset emergencial:
 3. Card do operador → **⋮ → Resetar PIN** → confirmar.
 4. Card deve mostrar **Sem PIN** (laranja). Operador cria PIN de 4 dígitos no próximo login.
 
-**Se falhar:** abrir `scripts/liberar-eduarda-agora.html` (adaptar `operadorId`) ou planilha `OPERADORES_SISTEMA` — apagar colunas **pinHash** e **pinSalt** da linha.
+**Se falhar:** abrir `scripts/ops/liberar-eduarda-agora.html` (adaptar `operadorId`) ou planilha `OPERADORES_SISTEMA` — apagar colunas **pinHash** e **pinSalt** da linha.
 
 ### 5.2 Remover operador “logado” no balcão
 
@@ -100,7 +100,7 @@ Após reset emergencial:
 |----------|------|
 | Não sabe quem está logado | **Liberar sessão do balcão** (botão na página Operadores) |
 | Sabe quem está (badge “Logado no balcão”) | **⋮ → Deslogar do balcão** |
-| Emergência | `scripts/liberar-eduarda-agora.html` |
+| Emergência | `scripts/ops/liberar-eduarda-agora.html` |
 
 ### 5.3 Operador esqueceu “Sair” mas é o **mesmo** operador
 

@@ -31,4 +31,4 @@
 - [ ] Checklist tablet `CHECKLIST_PACOTE_L.md`  
 - [ ] Cartaz A5 impresso no balcão  
 
-**Depois:** `FASE_4_CONFIG_PLANILHA.md`
+**Em paralelo:** **FASE 4** CONFIG ativa — `FASE_4_CONFIG_PLANILHA.md` · `CONFIG_OPERACIONAL_TEMPLATE.md`

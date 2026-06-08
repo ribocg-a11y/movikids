@@ -133,7 +133,7 @@
 
 | Camada | Repo / produção | Mínimo I20 |
 |--------|-----------------|------------|
-| Frontend | **v1.7.87** | `?force=1.7.87` (mínimo I20: v1.7.78+) |
-| GAS | **v1.5.66+** (ping 08/06: v1.5.67) | Nova versão Web se ping &lt; 1.5.66 |
+| Frontend | **v1.7.91** | `?force=1.7.91` (mínimo I20: v1.7.78+) |
+| GAS | **v1.5.69** | Nova versão Web se ping &lt; esperado |
 
 Ver `ESTADO_ATUAL.md` para URLs e editor GAS.

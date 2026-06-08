@@ -53,4 +53,4 @@
 
 ## Fechar Pacote L
 
-Quando **L.T1–L.A7** e **L.O1** assinados → marcar FASE 3 fechada em `PLANO_PRIORIDADES_2026-06.md` e abrir **FASE 4** (CONFIG planilha).
+Quando **L.T1–L.A7** e **L.O1** assinados → marcar FASE 3 fechada em `PLANO_PRIORIDADES_2026-06.md`. **FASE 4** já iniciada em paralelo (`FASE_4_CONFIG_PLANILHA.md`).
