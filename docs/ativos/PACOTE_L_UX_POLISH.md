@@ -1,7 +1,7 @@
 # Pacote L — UX polish + QR balcão (FASE 3)
 
 **Início:** 08/06/2026  
-**Versão alvo:** FE **v1.7.88** · GAS **v1.5.69** (sem mudança GAS)  
+**Versão alvo:** FE **v1.7.89** · GAS **v1.5.69** (sem mudança GAS)  
 **Referência:** `PLANO_PRIORIDADES_2026-06.md` FASE 3 · `DECISAO_COMUNICACAO_QR_CODE_2026-06.md`
 
 ---
@@ -16,19 +16,21 @@ Balcão mais rápido e menos ruído visual — **sem** mudar regras de negócio 
 
 | # | Item | Status | Notas |
 |---|------|--------|-------|
-| L.1 | Tiles veículo unificados (Home / Painel / Nova) | 🟡 | CSS `MKTile` + classe `mk-tile` em `vc-card` e `pcard` (v1.7.88) |
+| L.1 | Tiles veículo unificados (Home / Painel / Nova) | ✅ | `mk-tile` + radius/sombra/ícone unificados (v1.7.88–89) |
 | L.2 | Barra resumo fixa na Nova locação | ✅ | Sticky + resumo desde veículo (v1.7.88) |
-| L.3 | Header “Última sync · há Xs” | ✅ | `mk-sync.js` + sidebar (v1.7.88) |
-| L.4 | Dashboard: atalho Caixa sem duplicar R$ | ✅ | “Conferir →” + contagem locações (v1.7.88) |
+| L.3 | Header “Última sync · há Xs” | ✅ | Header + sidebar + hub admin (v1.7.88–89) |
+| L.4 | Dashboard: atalho Caixa sem duplicar R$ | ✅ | Dashboard + chip admin Home só locações (v1.7.88–89) |
 | L.5 | Sistema: diagnóstico + liberar sessão | ✅ | Botão inline em Sistema + Operadores (v1.7.88) |
-| L.6 | QR portal no balcão | 🟡 | Link Sistema → `assets/qr-balcao-imprimir.html`; **imprimir no balcão** = ops |
+| L.6 | QR portal no balcão | 🟡 | Strip Home + Sistema + cartaz A5; **imprimir físico** = ops |
 
 ---
 
-## FASE 2 — fechada
+## v1.7.89 (continuação)
 
-- INVESTIMENTO validado (B3=`27/05/2026`, B4=`05/2026`, capital giro Entra=S) — 08/06/2026  
-- Relatório Golden GAS **v1.5.69** em prod  
+- **Home:** strip “Portal dos pais” com link QR (dismissível)
+- **Admin chip Home:** “Caixa hoje: N locações” (sem R$)
+- **Hub gestão:** chip status com idade do sync
+- **L.1:** `session-card` + `pcard` alinhados ao `--mk-radius`
 
 ---
 
@@ -36,17 +38,19 @@ Balcão mais rápido e menos ruído visual — **sem** mudar regras de negócio 
 
 | # | Teste | Quem |
 |---|-------|------|
-| 1 | Header mobile/sidebar: `Online · sync há Xs` atualiza a cada 5s | Tablet |
-| 2 | Dashboard: tile Caixa sem R$; abre Caixa com valor correto | Admin |
-| 3 | Nova locação: barra resumo sticky desde passo 1 | Tablet |
-| 4 | Sistema: liberar sessão funciona (mesmo fluxo Operadores) | Admin + tablet |
-| 5 | Sistema → QR abre cartaz A5 | Qualquer |
-| 6 | Painel/Nova tiles visualmente alinhados (mk-tile) | Olho |
+| 1 | Header: `Online · sync há Xs` | Tablet |
+| 2 | Dashboard + chip admin: sem R$ duplicado | Admin |
+| 3 | Nova: barra resumo sticky | Tablet |
+| 4 | Sistema: liberar sessão | Admin |
+| 5 | Home → Abrir QR + Sistema → cartaz | Tablet |
+| 6 | Painel/Nova tiles alinhados | Olho |
+| 7 | Imprimir cartaz A5 no balcão | Ops |
 
 ---
 
-## Próximo após L
+## Fechar Pacote L
 
-- Fechar L.1 (refino visual Painel/Nova)  
-- FASE 4 — CONFIG JSON planilha  
-- Imprimir QR no balcão (checklist `DECISAO_COMUNICACAO_QR_CODE_2026-06.md`)
+- [ ] Homologação tablet v1.7.89 (checklist acima)
+- [ ] Cartaz QR impresso no balcão (`DECISAO_COMUNICACAO_QR_CODE_2026-06.md` § checklist)
+
+**Depois:** FASE 4 — CONFIG JSON planilha

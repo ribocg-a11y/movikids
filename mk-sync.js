@@ -357,3 +357,5 @@ window.syncController = syncController;
 window.agendarProximoPoll = agendarProximoPoll;
 window.sincronizarServidor = sincronizarServidor;
 window.setStatus = setStatus;
+window.mkSyncAgeSuffix_ = mkSyncAgeSuffix_;
+window.mkSyncRefreshAgeLabels_ = mkSyncRefreshAgeLabels_;

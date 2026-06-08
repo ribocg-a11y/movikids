@@ -80,7 +80,7 @@ flowchart LR
 
 | # | Ação | OK |
 |---|------|-----|
-| 1 | QR impresso ou em tablet fixo no balcão | [ ] |
+| 1 | QR impresso ou em tablet fixo no balcão | [ ] (strip Home v1.7.89 + link Sistema) |
 | 2 | Operador treinado: “escaneie e coloque seu telefone” | [ ] |
 | 3 | **Não** clicar SMS em sequência para vários clientes | [ ] |
 | 4 | Portal testado: timer ±2s após iniciar locação | [ ] |

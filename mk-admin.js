@@ -1533,7 +1533,8 @@ function atualizarHubAdmin_() {
   const chip = document.getElementById('hub-status-txt');
   const dot = document.getElementById('hub-dot');
   const ver = typeof APP_VERSION !== 'undefined' ? APP_VERSION : '—';
-  if (chip) chip.textContent = (gasOnline ? 'Online' : 'Atenção sync') + ' · app ' + ver;
+  const syncSuffix = (typeof mkSyncAgeSuffix_ === 'function') ? mkSyncAgeSuffix_() : '';
+  if (chip) chip.textContent = (gasOnline ? 'Online' : 'Atenção sync') + syncSuffix + ' · app ' + ver;
   if (dot) dot.style.background = gasOnline ? '#2E7D32' : '#E65100';
 }
 

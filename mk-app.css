@@ -1012,11 +1012,12 @@ header{
 @media(min-width:768px){.painel-grid{grid-template-columns:repeat(4,1fr);padding-bottom:20px}}
 
 .pcard{
-  border-radius:16px;padding:14px 12px 12px;
-  box-shadow:var(--shadow);display:flex;flex-direction:column;gap:8px;
+  border-radius:var(--mk-radius,12px);padding:14px 12px 12px;
+  box-shadow:var(--mk-shadow-1,var(--shadow));display:flex;flex-direction:column;gap:8px;
   border:2px solid transparent;transition:border-color .3s,background .3s;
   position:relative;overflow:hidden;
 }
+.pcard.mk-tile{box-shadow:var(--mk-shadow-1)}
 .pcard-label{
   font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;
   opacity:.75;margin-bottom:2px;

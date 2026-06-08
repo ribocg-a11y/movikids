@@ -190,6 +190,8 @@ async function init() {
   splash.classList.add('hide');
   setTimeout(() => splash.classList.add('gone'), 550);
 
+  if (typeof mkInitQrBalcaoStrip_ === 'function') mkInitQrBalcaoStrip_();
+
   syncController();
 
   agendarProximoPoll();

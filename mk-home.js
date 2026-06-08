@@ -363,11 +363,26 @@ function renderEncHoje(list) {
   }).join('');
 }
 
+function mkDismissQrStrip_() {
+  const el = document.getElementById('mk-qr-balcao-strip');
+  if (el) el.hidden = true;
+  try { localStorage.setItem('mk_qr_strip_off', '1'); } catch (e) {}
+}
+window.mkDismissQrStrip_ = mkDismissQrStrip_;
+
+function mkInitQrBalcaoStrip_() {
+  const el = document.getElementById('mk-qr-balcao-strip');
+  if (!el) return;
+  try {
+    if (localStorage.getItem('mk_qr_strip_off') === '1') el.hidden = true;
+  } catch (e) {}
+}
+window.mkInitQrBalcaoStrip_ = mkInitQrBalcaoStrip_;
+
 function showAdminHomeKpis(d) {
   const chip = document.getElementById('admin-home-chip');
   const isAdminView = (typeof mkAuthIsAdmin === 'function' && mkAuthIsAdmin()) || window.isAdmin;
   const homeOn = !!document.getElementById('page-home')?.classList.contains('active');
-  const R = v => 'R$ ' + Number(v).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
   const set = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
   if (!isAdminView || !d || !d.ok) {
     if (chip) chip.hidden = true;
@@ -375,7 +390,10 @@ function showAdminHomeKpis(d) {
   }
   if (chip) {
     chip.hidden = !homeOn;
-    if (homeOn) set('admin-chip-fat', R(d.fatHoje || 0));
+    if (homeOn) {
+      const n = d.nHoje != null ? d.nHoje : 0;
+      set('admin-chip-fat', n + (n === 1 ? ' locação' : ' locações'));
+    }
   }
   if (typeof atualizarHubAdmin_ === 'function') atualizarHubAdmin_();
 }
