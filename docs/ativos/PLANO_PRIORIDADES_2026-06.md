@@ -14,7 +14,7 @@
 | **FASE 0** Alinhar base | ✅ fechada | 07/06/2026 |
 | **FASE 1** Homologação | ✅ fechada | 08/06/2026 (assinada) |
 | **FASE 2** Payback negócio | ✅ fechada | 08/06/2026 (INVESTIMENTO + GAS v1.5.69) |
-| **FASE 3** Pacote L | 🟡 **ativa** | 08/06/2026 (FE v1.7.88 L.2–L.6) |
+| **FASE 3** Pacote L | 🟡 **ativa** | 08/06/2026 (FE **v1.7.91** — homologar `CHECKLIST_PACOTE_L.md`) |
 
 ### FASE 0 — checklist
 
@@ -33,7 +33,7 @@
 | 0.10 | `ACESSOS_E_AUTORIZACOES.md` + planilha OAuth (`google-drive-sheets-auth`) | ✅ 07/06 |
 | 0.11 | `MAPA_CODIGO_ARQUITETURA.md` — anatomia e chaves mestras | ✅ 07/06 |
 
-**Próximo passo imediato:** **FASE 3 Pacote L** — homologar tablet v1.7.88 (`PACOTE_L_UX_POLISH.md`). Imprimir QR balcão.
+**Próximo passo imediato:** **FASE 3** — homologar tablet **v1.7.91** (`CHECKLIST_PACOTE_L.md`) + imprimir QR A5. Depois **FASE 4** (`FASE_4_CONFIG_PLANILHA.md`).
 
 **FASE 1 fechada 08/06/2026:** I.5 assinado · K.3–K.4 tablet · checklist A–F · payback Dashboard · tablet v1.7.87. Sprint 1 + Sprint 2 (K) declarados fechados.
 

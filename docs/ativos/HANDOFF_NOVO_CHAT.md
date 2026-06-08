@@ -97,7 +97,7 @@ Continuo o MOVI KIDS. Repo: C:\Users\riboc\Documents\Codex\2026-05-30\files-ment
 
 **FASE 2:** ✅ fechada 08/06 — INVESTIMENTO + payback + GAS **v1.5.69**.
 
-**FASE 3 (ativa):** **Pacote L** FE **v1.7.89** — homologar tablet (`PACOTE_L_UX_POLISH.md`); falta imprimir QR físico.
+**FASE 3 (ativa):** **Pacote L** FE **v1.7.91** — homologar tablet (`CHECKLIST_PACOTE_L.md`); imprimir QR A5 no balcão.
 
 **I20 / Pacote M:** continuam fechados — não regredir timer sem `TESTE_I20_COMPLETO_PROD.ps1` + tablet.
 

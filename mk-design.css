@@ -85,6 +85,12 @@
   color: var(--txt3, #78909C);
   line-height: 1.35;
 }
+.mk-qr-balcao-actions {
+  display: flex;
+  flex-shrink: 0;
+  gap: 8px;
+  flex-wrap: wrap;
+}
 .mk-qr-balcao-btn {
   flex-shrink: 0;
   background: var(--blue, #1565C0);
@@ -99,6 +105,12 @@
   cursor: pointer;
   box-shadow: 0 1px 3px rgba(21, 101, 192, 0.25);
   transition: opacity .15s, transform .1s;
+}
+.mk-qr-balcao-btn--sec {
+  background: var(--card, #fff);
+  color: var(--blue, #1565C0);
+  border: 1.5px solid var(--blue, #1565C0);
+  box-shadow: none;
 }
 .mk-qr-balcao-btn:hover { opacity: .92; }
 .mk-qr-balcao-btn:active { transform: scale(.98); }
@@ -118,7 +130,8 @@
 .mk-qr-balcao-close:hover { opacity: 1; color: var(--txt, #1a1a2e); }
 @media (max-width: 420px) {
   .mk-qr-balcao-card { padding-right: 28px; }
-  .mk-qr-balcao-btn { width: 100%; text-align: center; }
+  .mk-qr-balcao-actions { width: 100%; }
+  .mk-qr-balcao-btn { flex: 1; text-align: center; min-width: 0; }
 }
 
 /* ── MKStat (Home + Caixa) ─────────────────────────────── */

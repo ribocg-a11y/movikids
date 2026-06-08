@@ -82,7 +82,7 @@ Fonte de verdade: `mk-version.js`, header do `.gs`, ping GAS.
 
 - **FASE 1:** ✅ fechada 08/06
 - **FASE 2:** ✅ fechada 08/06 (INVESTIMENTO + GAS v1.5.69)
-- **FASE 3:** Pacote L **v1.7.89** — homologar tablet (`PACOTE_L_UX_POLISH.md`)
+- **FASE 3:** Pacote L **v1.7.91** — `CHECKLIST_PACOTE_L.md` · depois FASE 4 CONFIG
 
 ## Ao encerrar sessão
 
