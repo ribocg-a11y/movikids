@@ -63,7 +63,7 @@ pie title JS inline restante por dominio (estimativa)
 | **M.14** | `mk-custos.js` | v1.7.84 | ✅ |
 | **M.15** | `mk-avulso.js` (lançamento avulso) | v1.7.85 | ✅ |
 | **M.16** | `mk-core.js` (utils, toast, tipos, config apply) | v1.7.86 | ✅ |
-| **M.17** | Enxugar inline → só globals + boot | v1.7.87 | ⬜ |
+| **M.17** | `mk-globals.js` + `mk-boot.js` (zero JS inline) | v1.7.87 | ✅ |
 
 **Meta final:** `index.html` **~900–1.100 linhas** (só HTML + bloco mínimo de estado global).
 
@@ -336,23 +336,19 @@ Tablet: Dashboard, Caixa, Config templates, Sistema/diagnóstico.
 
 ---
 
-### M.17 — Enxugar inline · v1.7.86
+### M.17 — `mk-globals.js` + `mk-boot.js` · v1.7.87 ✅
 
-**Deixar só no inline (~80 linhas):**
-```javascript
-// Estado global compartilhado (intencional até pacote ES modules)
-let sessions = [], statsHoje = { n: 0, fat: 0 }, encHojeData = [];
-let PRECOS = { ... };  // ou carregar de operacaoConfig
-let appConfig = {}, kpiData = null, isAdmin = false;
-const APP_VERSION = window.MK_VERSION;
-```
-
-**Remover:** todo o resto já extraído.
+**Extrair:**
+- `mk-globals.js` — `APP_VERSION`, `PRECOS`, `PLANO_LABELS`, `sessions`, `statsHoje`, `PORTAL_RESPONSAVEL_URL`
+- `mk-boot.js` — `DOMContentLoaded` → `mkAuthBoot`, registro SW
+- `WA_MODE_KEY` → `mk-core.js` (já usado lá)
+- `timerInterv` → `mk-sessao.js`
 
 **DoD:**
-- [ ] `index.html` < 1.100 linhas
-- [ ] Nenhuma `function` longa no inline (só const/let)
-- [ ] `grep "^function" index.html` → 0 resultados
+- [x] Zero JS inline no `index.html` (só `<script src>`)
+- [x] `grep "^function" index.html` → 0
+- [x] `sw.js` NETWORK_FIRST: `mk-globals.js`, `mk-boot.js`
+- [~] `index.html` total ~1.378 linhas (HTML SPA; meta 1.100 era projeção — HTML das páginas permanece)
 
 ---
 
@@ -540,5 +536,5 @@ flowchart TB
 - Handoff: `HANDOFF_NOVO_CHAT.md` (próximo técnico = M.16)
 - Auth admin PIN: `ACESSOS_E_AUTORIZACOES.md`
 
-*Próxima ação: **M.17 enxugar inline** + validação tablet (`?force=1.7.86`).*
+*Pacote M **fechado** (M.1–M.17 ✅). Próximo: homologação tablet `?force=1.7.87` + FASE 1 I.5.*
 

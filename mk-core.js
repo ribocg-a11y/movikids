@@ -1,5 +1,7 @@
 /* MOVI KIDS - core utils, init, config (Pacote M.16) */
 
+const WA_MODE_KEY = 'mk_whatsapp_mode_v1';
+
 function mkExibirFinanceiro_() {
   if (typeof mkAuthIsSupervisorOrAdmin_ === 'function' && mkAuthIsSupervisorOrAdmin_()) return true;
   return (typeof mkAuthIsAdmin === 'function' && mkAuthIsAdmin()) || !!window.isAdmin;

@@ -1,9 +1,9 @@
-# Checklist tablet — v1.7.86 (M.14–M.16 + FASE 1)
+# Checklist tablet — v1.7.87 (Pacote M fechado + FASE 1)
 
 **Data:** 07/06/2026  
 **Duração:** ~10–15 min (núcleo M.14/M.15 ~5 min)  
-**Versão alvo:** FE **v1.7.86** · GAS **v1.5.66** (sem deploy GAS)  
-*(Arquivo nomeado na M.15; URLs usam v1.7.86 pós-M.16.)*  
+**Versão alvo:** FE **v1.7.87** · GAS **v1.5.66+** (sem deploy GAS)  
+*(Arquivo nomeado na M.15; URLs usam v1.7.87 pós-M.17.)*  
 **Quando:** fora do pico ou com operador de reserva  
 **Automatizado já OK (07/06):** `TESTE_PROTOCOLO_DIAGNOSTICO.ps1 -Foco completo` — I20, portal, KPI, CRM, drawer, HTTP.
 
@@ -13,8 +13,8 @@
 
 | # | Ação | OK |
 |---|------|-----|
-| 0.1 | Tablet: abrir **https://ribocg-a11y.github.io/movikids/?force=1.7.86** | [ ] |
-| 0.2 | Menu ☰ → rodapé: versão **v1.7.86** | [ ] |
+| 0.1 | Tablet: abrir **https://ribocg-a11y.github.io/movikids/?force=1.7.87** | [ ] |
+| 0.2 | Menu ☰ → rodapé: versão **v1.7.87** | [ ] |
 | 0.3 | Header: chip **Turno: Nome** (operador logado) | [ ] |
 | 0.4 | Se versão antiga: fechar aba PWA → reabrir pelo link `?force=` (não Ctrl+F5 no pico) | [ ] |
 
@@ -108,8 +108,8 @@ No **PC** com PIN admin (não no tablet operador):
 | **M.14 fechado** | A.1–A.6 ✅ |
 | **M.15 fechado** | B.1–B.8 ✅ |
 | **FASE 1 parcial** | C + D + E + F conforme aplicável |
-| **M.16 fechado** | M.14 + M.15 + M.16 ✅ + diagnóstico read-only verde (07/06) |
-| **Próximo** | M.17 enxugar inline |
+| **Pacote M fechado** | M.1–M.17 ✅ (v1.7.87; `mk-globals` + `mk-boot`) |
+| **Próximo** | Homologação FASE 1 I.5 |
 
 ---
 
@@ -117,7 +117,7 @@ No **PC** com PIN admin (não no tablet operador):
 
 | Sintoma | Provável causa | Ação |
 |---------|----------------|------|
-| Página em branco / função undefined | Cache PWA / SW antigo | `?force=1.7.86`, reinstalar ícone |
+| Página em branco / função undefined | Cache PWA / SW antigo | `?force=1.7.87`, reinstalar ícone |
 | Cronômetro 09:33 | FE velho no tablet | Mesmo `?force=` |
 | Erro ao salvar custo/avulso | GAS / auth | Ver chip Turno; ping v1.5.66 |
 | Regressão grave | — | `ROLLBACK_EMERGENCIA.md` |

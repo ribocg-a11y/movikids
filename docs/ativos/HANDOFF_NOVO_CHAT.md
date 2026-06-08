@@ -1,6 +1,6 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 07/06/2026  
+**Atualizado:** 08/06/2026  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **Repo local:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`  
@@ -33,7 +33,7 @@ Continuo o MOVI KIDS. Repo: C:\Users\riboc\Documents\Codex\2026-05-30\files-ment
 
 - Ler: este arquivo → `PLANO_PRIORIDADES` → `ESTADO_ATUAL` → `REGRAS` → `ACESSOS_E_AUTORIZACOES` (§7 = agente vs você)
 - Ignorar handoff antigo em `docs/arquivo/planos/`
-- Informar: FE **v1.7.86**, GAS **v1.5.66** — **I20 cronômetro RESOLVIDO**; **M.16 `mk-core.js` ✅**; próximo **M.17 enxugar inline**
+- Informar: FE **v1.7.87**, GAS **v1.5.66+** — **I20 cronômetro RESOLVIDO**; **Pacote M fechado (M.17)**; próximo **homologação tablet + FASE 1**
 - Deixar claro: **agente** código, testes e **planilha (OAuth)**; **você** Nova versão GAS Web e tablet
 
 ---
@@ -55,10 +55,10 @@ Continuo o MOVI KIDS. Repo: C:\Users\riboc\Documents\Codex\2026-05-30\files-ment
 
 | Camada | Versão | Verificação |
 |--------|--------|-------------|
-| **Frontend** | **v1.7.86** | `mk-version.js` → `window.MK_VERSION` |
-| **Service Worker** | **1.7.86** | `sw.js` → `SW_VERSION` |
-| **Apps Script** | **v1.5.66** | [ping](https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec?action=ping) → `versao` |
-| **App tablet** | v1.7.86 | https://ribocg-a11y.github.io/movikids/?force=1.7.86 |
+| **Frontend** | **v1.7.87** | `mk-version.js` → `window.MK_VERSION` |
+| **Service Worker** | **1.7.87** | `sw.js` → `SW_VERSION` |
+| **Apps Script** | **v1.5.66+** | [ping](https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec?action=ping) → `versao` |
+| **App tablet** | v1.7.87 | https://ribocg-a11y.github.io/movikids/?force=1.7.87 |
 
 **Deploy ID GAS (único — nunca criar outro):** `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y`
 
@@ -91,13 +91,13 @@ Continuo o MOVI KIDS. Repo: C:\Users\riboc\Documents\Codex\2026-05-30\files-ment
 
 ---
 
-## Próximo passo (07/06/2026)
+## Próximo passo (08/06/2026)
 
-**I20 cronômetro:** **FECHADO** — GAS v1.5.66 + FE v1.7.78+; operador confirmou em tablet. Memorial: `INCIDENTE_I20_CRONOMETRO_RESOLUCAO_2026-06-07.md`.
+**I20 cronômetro:** **FECHADO** — GAS v1.5.66+ + FE v1.7.78+; operador confirmou em tablet. Memorial: `INCIDENTE_I20_CRONOMETRO_RESOLUCAO_2026-06-07.md`.
 
-**Pacote M:** M.16 `mk-core.js` ✅ (v1.7.86; `index.html` ~1.440). **Próximo técnico:** M.17 enxugar inline — ver `PACOTE_M_MODULARIZACAO.md`.
+**Pacote M:** **FECHADO** M.1–M.17 ✅ (v1.7.87; `mk-globals.js` + `mk-boot.js`; zero JS inline). Ver `PACOTE_M_MODULARIZACAO.md`.
 
-**Paralelo:** tablet `?force=1.7.86` + **FASE 1 Homologação** (`HOMOLOGACAO_PRODUCAO_ASSISTIDA.md` I.5). Checklist: `CHECKLIST_TABLET_v1.7.85.md` (URLs `?force=1.7.86`).
+**Próximo:** homologação tablet `?force=1.7.87` + **FASE 1** (`HOMOLOGACAO_PRODUCAO_ASSISTIDA.md` I.5). Checklist: `CHECKLIST_TABLET_v1.7.85.md` (URLs `?force=1.7.87`).
 
 **Diagnóstico sem gravar planilha:** `PROTOCOLO_DIAGNOSTICO_E_TESTES.md` §5.3.1 + `scripts/testes/README.md`.
 

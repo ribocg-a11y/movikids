@@ -85,6 +85,7 @@ https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPe
 | Versão | Entrega |
 |--------|---------|
 | **v1.7.78** | **I20 definitivo** — início otimista no ▶, `_localTimerStart`, `effectiveStartTs_`, botão imediato; validado tablet |
+| **v1.7.87** | **Pacote M.17** — `mk-globals.js` + `mk-boot.js`; **zero JS inline**; Pacote M **fechado** |
 | **v1.7.86** | **Pacote M.16** — core extraído para `mk-core.js`; `index.html` ~1.440 linhas (só globals) |
 | **v1.7.85** | **Pacote M.15** — lançamento avulso extraído para `mk-avulso.js`; `index.html` ~1.730 linhas |
 | **v1.7.84** | **Pacote M.14** — custos extraídos para `mk-custos.js`; `index.html` ~1.810 linhas |
@@ -93,7 +94,7 @@ https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPe
 | **v1.7.81** | **Pacote M.12** — `mk-historico.js` |
 | **v1.7.80** | **Pacote M.11** — admin extraído para `mk-admin.js` |
 | **v1.7.79** | **Pacote M.10** — `showPage` + sidebar extraídos para `mk-nav.js` |
-| **Pacote M** | M.1–M.16 ✅ · **próximo M.17 enxugar inline** — `PACOTE_M_MODULARIZACAO.md` |
+| **Pacote M** | M.1–M.17 ✅ **fechado** — `PACOTE_M_MODULARIZACAO.md` |
 | **Testes** | Fix T1: `TESTE_RELACIONAMENTO_READONLY` (em-dash); modo read-only em `PROTOCOLO` §5.3.1 |
 | **v1.5.66** | **I20 GAS** — `iniciarTimer_` grava `clientTs` (clique) na col Y quando drift ≤ 2 min |
 | **v1.7.76** | I20 fase 1 — SMS separado do ▶; `iniciarContagemDireto_`; card pendente compacto |

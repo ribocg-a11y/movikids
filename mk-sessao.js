@@ -1,6 +1,7 @@
 /* MOVI KIDS — sessão ativa, SMS status, timer loop (Pacote M.5)
- * Carregar após script inline (sessions, renderCards); antes de mk-sync.js.
+ * Carregar após mk-globals.js (sessions); antes de mk-sync.js.
  */
+var timerInterv = null;
 const WA_EVENT_LOG_KEY = 'mk_wa_event_log_v1';
 const SMS_CHECK_DELAYS = [15000, 60000, 180000, 300000, 420000, 600000];
 const SMS_RECHECK_EXTRA_MS = [120000, 300000, 600000];

@@ -16,16 +16,16 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<script src="mk-stale-sync.js?v=1.7.86"></script>
-<script src="mk-version.js?v=1.7.86"></script>
-<script src="mk-api.js?v=1.7.86"></script>
+<script src="mk-stale-sync.js?v=1.7.87"></script>
+<script src="mk-version.js?v=1.7.87"></script>
+<script src="mk-api.js?v=1.7.87"></script>
 <link rel="stylesheet" href="mk-design.css">
 
-<script src="mk-cache-bust.js?v=1.7.86"></script>
+<script src="mk-cache-bust.js?v=1.7.87"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<link rel="stylesheet" href="mk-app.css?v=1.7.86">
+<link rel="stylesheet" href="mk-app.css?v=1.7.87">
 <!-- Firebase SDK — Realtime sync canonico para todos os dispositivos -->
-<script type="module" src="mk-firebase.js?v=1.7.86"></script>
+<script type="module" src="mk-firebase.js?v=1.7.87"></script>
 </head>
 
 <body>
@@ -1357,82 +1357,22 @@
   </div>
 </div>
 
-<script>
-// ═══════════════════════════════════════════════════════════
-// CONFIG
-// ═══════════════════════════════════════════════════════════
-const APP_VERSION = (typeof window !== 'undefined' && window.MK_VERSION) ? window.MK_VERSION : '1.7.86';
-const PORTAL_RESPONSAVEL_URL = 'https://ribocg-a11y.github.io/movikids/acompanhar.html';
-
-let PRECOS = {
-  'Carro':   { '10min':{v:12,m:10,a:1.00},'20min':{v:22,m:20,a:1.00},'30min':{v:30,m:30,a:1.00},
-               '40min':{v:40,m:40,a:1.00},'60min':{v:55,m:60,a:1.00},'3h':{v:130,m:180,a:1.00} },
-  'Triciclo': { '10min':{v:12,m:10,a:1.00},'20min':{v:22,m:20,a:1.00},'30min':{v:30,m:30,a:1.00},
-               '40min':{v:40,m:40,a:1.00},'60min':{v:55,m:60,a:1.00},'3h':{v:130,m:180,a:1.00} },
-  'Pelúcia': { '10min':{v:15,m:10,a:1.20},'20min':{v:25,m:20,a:1.20},'30min':{v:35,m:30,a:1.20},
-               '40min':{v:45,m:40,a:1.20},'60min':{v:65,m:60,a:1.20},'3h':{v:150,m:180,a:1.20} }
-};
-
-const PLANO_LABELS = { '10min':'10 minutos','20min':'20 minutos','30min':'30 minutos',
-                        '40min':'40 minutos','60min':'1 hora','3h':'3 horas' };
-
-// ═══════════════════════════════════════════════════════════
-// STATE
-// ═══════════════════════════════════════════════════════════
-let sessions    = [];   // active sessions with timer data
-let timerInterv = null;
-/* alertas/operação/iniciar/estender: mk-operacao.js */
-/* drawer/encerrar: mk-drawer.js */
-/* operador/sessao: mk-auth.js · sms/timer: mk-sessao.js · nova: mk-nova.js */
-const WA_MODE_KEY = 'mk_whatsapp_mode_v1';
-let statsHoje   = { fat: 0, n: 0 };
-
-/* core utils, init, toast, config: mk-core.js (Pacote M.16) */
-/* api() + guards I15: mk-api.js · sync: mk-sync.js · sessao: mk-sessao.js */
-
-</script>
-<script src="mk-core.js?v=1.7.86"></script>
-<script src="mk-nav.js?v=1.7.86"></script>
-<script src="mk-admin.js?v=1.7.86"></script>
-<script src="mk-historico.js?v=1.7.86"></script>
-<script src="mk-sessao.js?v=1.7.86"></script>
-<script src="mk-home.js?v=1.7.86"></script>
-<script src="mk-custos.js?v=1.7.86"></script>
-<script src="mk-avulso.js?v=1.7.86"></script>
-<script src="mk-sync.js?v=1.7.86"></script>
-<script src="mk-nova.js?v=1.7.86"></script>
-<script src="mk-relacionamento.js?v=1.7.86"></script>
-<script src="mk-operacao.js?v=1.7.86"></script>
-<script src="mk-drawer.js?v=1.7.86"></script>
-<script src="mk-update.js?v=1.7.86"></script>
-<script src="mk-auth.js?v=1.7.86"></script>
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  if (typeof mkAuthBoot === 'function') {
-    mkAuthBoot().catch(e => {
-      console.error('[mk-auth]', e);
-      const el = document.getElementById('mk-login-err');
-      if (el) { el.textContent = (e && e.message) || 'Erro ao iniciar login'; el.style.display = 'block'; }
-    });
-  } else init();
-});
-
-// ── SERVICE WORKER (PWA) ──────────────────────────────────────
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.addEventListener('message', event => {
-    if (event.data && event.data.type === 'MK_UPDATE_READY') {
-      const swVersion = event.data.version || '';
-      if (swVersion && swVersion !== APP_VERSION && typeof mkApplyAppUpdate === 'function') {
-        mkApplyAppUpdate(swVersion);
-      }
-    }
-  });
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/movikids/sw.js?v=' + APP_VERSION)
-      .then(reg => console.log('SW registrado:', reg.scope))
-      .catch(err => console.warn('SW erro:', err));
-  });
-}
-</script>
+<script src="mk-globals.js?v=1.7.87"></script>
+<script src="mk-core.js?v=1.7.87"></script>
+<script src="mk-nav.js?v=1.7.87"></script>
+<script src="mk-admin.js?v=1.7.87"></script>
+<script src="mk-historico.js?v=1.7.87"></script>
+<script src="mk-sessao.js?v=1.7.87"></script>
+<script src="mk-home.js?v=1.7.87"></script>
+<script src="mk-custos.js?v=1.7.87"></script>
+<script src="mk-avulso.js?v=1.7.87"></script>
+<script src="mk-sync.js?v=1.7.87"></script>
+<script src="mk-nova.js?v=1.7.87"></script>
+<script src="mk-relacionamento.js?v=1.7.87"></script>
+<script src="mk-operacao.js?v=1.7.87"></script>
+<script src="mk-drawer.js?v=1.7.87"></script>
+<script src="mk-update.js?v=1.7.87"></script>
+<script src="mk-auth.js?v=1.7.87"></script>
+<script src="mk-boot.js?v=1.7.87"></script>
 </body>
 </html>
