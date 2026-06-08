@@ -13,8 +13,8 @@
 |------|--------|--------|
 | **FASE 0** Alinhar base | ✅ fechada | 07/06/2026 |
 | **FASE 1** Homologação | ✅ fechada | 08/06/2026 (assinada) |
-| **FASE 2** Payback negócio | 🟡 **ativa** | 08/06/2026 (§10 respondido; GAS **v1.5.69** relatório Golden em prod) |
-| FASE 3 Pacote L | ⬜ | — |
+| **FASE 2** Payback negócio | ✅ fechada | 08/06/2026 (INVESTIMENTO + GAS v1.5.69) |
+| **FASE 3** Pacote L | 🟡 **ativa** | 08/06/2026 (FE v1.7.88 L.2–L.6) |
 
 ### FASE 0 — checklist
 
@@ -33,7 +33,7 @@
 | 0.10 | `ACESSOS_E_AUTORIZACOES.md` + planilha OAuth (`google-drive-sheets-auth`) | ✅ 07/06 |
 | 0.11 | `MAPA_CODIGO_ARQUITETURA.md` — anatomia e chaves mestras | ✅ 07/06 |
 
-**Próximo passo imediato:** **FASE 2** — validar aba INVESTIMENTO (B3=`27/05/2026`, B4=`05/2026`) + **deploy GAS v1.5.69** (relatório Golden). Ver `DECISAO_PAYBACK_FASE2_2026-06.md`.
+**Próximo passo imediato:** **FASE 3 Pacote L** — homologar tablet v1.7.88 (`PACOTE_L_UX_POLISH.md`). Imprimir QR balcão.
 
 **FASE 1 fechada 08/06/2026:** I.5 assinado · K.3–K.4 tablet · checklist A–F · payback Dashboard · tablet v1.7.87. Sprint 1 + Sprint 2 (K) declarados fechados.
 
@@ -141,7 +141,7 @@ Objetivo: painel estratégico confiável para o sócio; fechar regras de negóci
 
 | # | Ação | Critério de pronto |
 |---|------|-------------------|
-| 2.1 | Validar aba **INVESTIMENTO** (B3=`27/05/2026`, B4=`05/2026`; capital giro Entra=S) | ⬜ conferir planilha |
+| 2.1 | Validar aba **INVESTIMENTO** (B3=`27/05/2026`, B4=`05/2026`; capital giro Entra=S) | ✅ 08/06/2026 |
 | 2.2 | Perguntas memorial **§10** | ✅ `DECISAO_PAYBACK_FASE2_2026-06.md` |
 | 2.3 | Relatório Golden sem dados ADM | ✅ GAS **v1.5.68**–**v1.5.69** |
 | 2.4 | Deploy GAS v1.5.69 no editor | ✅ 08/06 — ping **v1.5.69** |
@@ -206,9 +206,9 @@ FASE 0  Alinhar versões + docs base          [✅ fechada 07/06]
    ↓
 FASE 1  Homologação tablet + K.3/K.4 + I.5 [✅ fechada 08/06]
    ↓
-FASE 2  Payback negócio + deploy docs      [🟡 ativa — 1 semana]
+FASE 2  Payback negócio + deploy docs      [✅ fechada 08/06]
    ↓
-FASE 3  Pacote L UX + QR balcão            [2 semanas]
+FASE 3  Pacote L UX + QR balcão            [🟡 ativa — v1.7.88]
    ↓
 FASE 4  CONFIG planilha + auditoria        [1 semana]
    ↓

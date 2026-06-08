@@ -95,9 +95,9 @@ Continuo o MOVI KIDS. Repo: C:\Users\riboc\Documents\Codex\2026-05-30\files-ment
 
 **FASE 1 homologação:** ✅ **FECHADA** 08/06/2026 — I.5 assinado · K.3–K.4 tablet · checklist A–F · payback Dashboard · tablet **v1.7.87**.
 
-**FASE 2 (ativa):** §10 payback **respondido** (`DECISAO_PAYBACK_FASE2_2026-06.md`) · INVESTIMENTO B3=`27/05/2026` B4=`05/2026` · GAS **v1.5.69** em prod (relatório Golden sem custos ADM).
+**FASE 2:** ✅ fechada 08/06 — INVESTIMENTO + payback + GAS **v1.5.69**.
 
-**FASE 3 (próxima feature):** **Pacote L** — UX polish + QR balcão (`DECISAO_COMUNICACAO_QR_CODE_2026-06.md`).
+**FASE 3 (ativa):** **Pacote L** FE **v1.7.88** — sync header, Caixa link, Nova sticky, Sistema+QR (`PACOTE_L_UX_POLISH.md`).
 
 **I20 / Pacote M:** continuam fechados — não regredir timer sem `TESTE_I20_COMPLETO_PROD.ps1` + tablet.
 
@@ -195,8 +195,8 @@ Guia completo: `DEPLOY_GAS_v1.5.32_AUTH.md`
 |------|--------|
 | **FASE 1 homologação** | ✅ fechada 08/06/2026 |
 | **K.3–K.4** CRM tablet | ✅ homologado 08/06 |
-| **FASE 2** payback negócio (§10 memorial) | 🟡 **ativa** |
-| **Pacote L** UX polish + QR balcão | ⬜ FASE 3 (após 2) |
+| **FASE 2** payback negócio | ✅ fechada 08/06 |
+| **Pacote L** UX polish + QR balcão | 🟡 **ativa** v1.7.88 |
 | GAS ping produção | v1.5.67 — **não criar novo Deploy** |
 
 ---

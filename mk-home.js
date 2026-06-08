@@ -242,7 +242,7 @@ function buildPainelCard(nome, tipo, s) {
 
   // ── LIVRE ───────────────────────────────────────────────
   if (!s) {
-    return `<div class="pcard livre">
+    return `<div class="pcard livre mk-tile">
       <div class="pcard-icon">${icon}</div>
       <div class="pcard-name">${nome}</div>
       <div class="pcard-status">✓ Livre</div>
@@ -252,7 +252,7 @@ function buildPainelCard(nome, tipo, s) {
 
   // ── PENDENTE (cadastrado, aguardando iniciar) ───────────
   if (!s.started) {
-    return `<div class="pcard pendente" style="position:relative;overflow:visible">
+    return `<div class="pcard pendente mk-tile" style="position:relative;overflow:visible">
       <div style="position:absolute;right:6px;top:6px">${menuLocacaoHtml_(s, false)}</div>
       <div class="pcard-icon">${icon}</div>
       <div class="pcard-name">${nome}</div>
@@ -306,7 +306,7 @@ function buildPainelCard(nome, tipo, s) {
       <div class="pcard-bar" style="width:${progressPct.toFixed(1)}%;background:${barColor}"></div>
     </div>`;
 
-  return `<div class="${cardCls}" style="position:relative;overflow:visible">
+  return `<div class="${cardCls} mk-tile" style="position:relative;overflow:visible">
     <div style="position:absolute;right:6px;top:6px">${menuLocacaoHtml_(s, true)}</div>
     <div class="pcard-icon">${icon}</div>
     <div class="pcard-name">${nome}</div>

@@ -275,7 +275,7 @@ header{
 .step-page{display:none}
 .step-page.active{display:block}
 .nova-summary-bar{display:none;margin-bottom:14px;padding:12px 14px;background:var(--bg2);border-radius:var(--radius-sm);border:1px solid var(--border);font-size:13px;line-height:1.45}
-.nova-summary-bar.visible{display:block}
+.nova-summary-bar.visible{display:block;position:sticky;top:0;z-index:12;box-shadow:0 2px 10px rgba(13,71,161,.08)}
 .nova-summary-bar b{color:var(--txt)}
 .nova-step-hints{display:flex;justify-content:center;gap:12px;margin:-12px 0 16px;font-size:11px;font-weight:800;color:var(--txt3);text-transform:uppercase;letter-spacing:.04em}
 .nova-step-hints span.active{color:var(--blue)}
@@ -321,7 +321,8 @@ header{
 .veiculo-grid-carros{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}
 .veiculo-grid-triciclos{display:grid;grid-template-columns:1fr;gap:8px;margin-bottom:10px}
 .veiculo-grid-pelucias{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px}
-.vc-card{border:1.5px solid var(--border);border-radius:12px;padding:10px 6px 8px;text-align:center;cursor:pointer;transition:border-color .15s,background .15s;background:var(--card);position:relative}
+.vc-card.mk-tile,
+.vc-card{border:1.5px solid var(--border);padding:10px 6px 8px;text-align:center;cursor:pointer;background:var(--card);position:relative}
 .vc-card:hover:not(.vc-busy):not(.vc-busy-pink){border-color:var(--blue);background:var(--blue-lt)}
 .vc-card.vc-busy{background:var(--bg2);cursor:not-allowed;border-color:var(--border)}
 .vc-card.vc-busy-pink{background:#FFF0F6;cursor:not-allowed;border-color:#F4C0D1}

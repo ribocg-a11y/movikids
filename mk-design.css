@@ -6,6 +6,21 @@
   --mk-space: 16px;
 }
 
+/* ── MKTile (Pacote L — Nova vc-card + Painel pcard) ───── */
+.vc-card,
+.mk-tile {
+  border-radius: var(--mk-radius);
+  box-shadow: var(--mk-shadow-1);
+  transition: border-color .15s, background .15s, box-shadow .15s;
+}
+.vc-card {
+  border-width: 1.5px;
+}
+.mk-tile .vc-icon,
+.mk-tile .pcard-icon {
+  line-height: 1;
+}
+
 /* ── MKStat (Home + Caixa) ─────────────────────────────── */
 .mk-stat-row {
   display: grid;

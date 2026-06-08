@@ -250,14 +250,50 @@ function aplicarDadosInicio(d) {
 }
 window.aplicarDadosInicio = aplicarDadosInicio;
 
+function formatSyncAge_(diffMs) {
+  if (diffMs == null || diffMs < 0) return '';
+  const sec = Math.round(diffMs / 1000);
+  if (sec < 5) return 'agora';
+  if (sec < 60) return 'há ' + sec + 's';
+  const min = Math.floor(sec / 60);
+  if (min < 60) return 'há ' + min + 'min';
+  return 'há ' + Math.floor(min / 60) + 'h';
+}
+
+function mkSyncAgeSuffix_() {
+  if (!_lastSyncAt) return '';
+  return ' · sync ' + formatSyncAge_(Date.now() - _lastSyncAt);
+}
+
+function mkSyncRefreshAgeLabels_() {
+  const dot = document.getElementById('status-dot');
+  const txt = document.getElementById('status-txt');
+  if (dot && txt) {
+    const suffix = mkSyncAgeSuffix_();
+    if (dot.classList.contains('dot-offline')) {
+      txt.textContent = 'Offline' + (suffix || ' · sem sync');
+    } else if (dot.style.background === 'rgb(255, 183, 77)' || dot.style.background === '#FFB74D') {
+      txt.textContent = 'Verificando...';
+    } else {
+      txt.textContent = 'Online' + suffix;
+    }
+  }
+  if (typeof syncSidebarStatus === 'function') {
+    const efectivo = document.getElementById('status-dot')?.classList.contains('dot-offline') ? false
+      : (document.getElementById('status-dot')?.style.background === 'rgb(255, 183, 77)' || document.getElementById('status-dot')?.style.background === '#FFB74D') ? null
+      : true;
+    syncSidebarStatus(efectivo);
+  }
+}
+
 function setStatus(online) {
   const dot = document.getElementById('status-dot');
   const txt = document.getElementById('status-txt');
   const efectivo = (online === false && _syncFailCount < _FAIL_THRESH) ? null : online;
   if (dot && txt) {
     if (efectivo===null) { dot.className='dot-online';dot.style.background='#FFB74D';txt.textContent='Verificando...'; }
-    else if (efectivo)   { dot.className='dot-online';dot.style.background='';txt.textContent='Online'; }
-    else                 { dot.className='dot-offline';dot.style.background='';txt.textContent='Offline'; }
+    else if (efectivo)   { dot.className='dot-online';dot.style.background='';txt.textContent='Online' + mkSyncAgeSuffix_(); }
+    else                 { dot.className='dot-offline';dot.style.background='';txt.textContent='Offline' + (_lastSyncAt ? mkSyncAgeSuffix_() : ' · sem sync'); }
   }
   if (typeof syncSidebarStatus === 'function') syncSidebarStatus(efectivo);
 }
@@ -310,6 +346,11 @@ function mkSyncWireEvents_() {
     if (document.visibilityState !== 'visible') return;
     syncController(true, 0);
   }, 30000);
+
+  setInterval(() => {
+    if (document.visibilityState !== 'visible') return;
+    if (typeof mkSyncRefreshAgeLabels_ === 'function') mkSyncRefreshAgeLabels_();
+  }, 5000);
 }
 
 window.syncController = syncController;

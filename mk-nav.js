@@ -108,9 +108,10 @@ function syncSidebarStatus(online) {
   const dot=document.getElementById('sb-dot');
   const txt=document.getElementById('sb-txt');
   if (!dot||!txt) return;
+  const suffix = (typeof mkSyncAgeSuffix_ === 'function') ? mkSyncAgeSuffix_() : '';
   if (online===null) { dot.className='dot-online'; dot.style.background='#FFB74D'; txt.textContent='Verificando...'; }
-  else if (online)   { dot.className='dot-online'; dot.style.background=''; txt.textContent='Online'; }
-  else               { dot.className='dot-offline'; dot.style.background=''; txt.textContent='Offline'; }
+  else if (online)   { dot.className='dot-online'; dot.style.background=''; txt.textContent='Online' + suffix; }
+  else               { dot.className='dot-offline'; dot.style.background=''; txt.textContent='Offline' + (suffix || ' · sem sync'); }
 }
 
 function showAdminSidebar() {

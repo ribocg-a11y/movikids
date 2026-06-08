@@ -172,18 +172,18 @@
   }
 
   function updateOperadoresSessaoBanner_(sessao) {
-    const el = document.getElementById('mk-ops-sessao-banner');
-    if (!el) return;
-    if (!sessao || !sessao.nome) {
-      el.style.display = 'none';
-      el.textContent = '';
-      return;
-    }
-    el.style.display = 'block';
-    el.style.background = '';
-    el.style.color = '';
-    el.style.borderColor = '';
-    el.textContent = 'Sessão ativa no balcão: ' + sessao.nome + '. Use o botão abaixo para liberar se precisar.';
+    document.querySelectorAll('.mk-ops-sessao-banner').forEach(el => {
+      if (!sessao || !sessao.nome) {
+        el.style.display = 'none';
+        el.textContent = '';
+        return;
+      }
+      el.style.display = 'block';
+      el.style.background = '';
+      el.style.color = '';
+      el.style.borderColor = '';
+      el.textContent = 'Sessão ativa no balcão: ' + sessao.nome + '. Use o botão abaixo para liberar se precisar.';
+    });
   }
 
   /** Atualiza banner, login lock e rodapé (sb-sessao) de uma vez. */
@@ -716,8 +716,10 @@
       renderOpList();
     });
     document.getElementById('mk-btn-back-admin')?.addEventListener('click', () => showStep('mk-step-select'));
-    document.getElementById('mk-btn-liberar-sessao')?.addEventListener('click', () => {
-      if (typeof mkAuthLiberarSessaoOperadorAdmin_ === 'function') mkAuthLiberarSessaoOperadorAdmin_();
+    document.querySelectorAll('.mk-liberar-sessao-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (typeof mkAuthLiberarSessaoOperadorAdmin_ === 'function') mkAuthLiberarSessaoOperadorAdmin_();
+      });
     });
   }
 
@@ -797,19 +799,23 @@
   };
 
   function mkAuthShowLiberarStatus_(ok, msg) {
-    const el = document.getElementById('mk-ops-sessao-banner');
-    if (!el) return;
-    el.style.display = 'block';
-    el.style.background = ok ? '#E8F5E9' : '#FFEBEE';
-    el.style.color = ok ? '#1B5E20' : '#B71C1C';
-    el.style.borderColor = ok ? '#A5D6A7' : '#FFCDD2';
-    el.textContent = msg;
+    document.querySelectorAll('.mk-ops-sessao-banner').forEach(el => {
+      el.style.display = 'block';
+      el.style.background = ok ? '#E8F5E9' : '#FFEBEE';
+      el.style.color = ok ? '#1B5E20' : '#B71C1C';
+      el.style.borderColor = ok ? '#A5D6A7' : '#FFCDD2';
+      el.textContent = msg;
+    });
   }
 
   window.mkAuthLiberarSessaoOperadorAdmin_ = async function () {
-    const btn = document.getElementById('mk-btn-liberar-sessao');
-    const label = btn ? btn.textContent : '';
-    if (btn) { btn.disabled = true; btn.textContent = 'Liberando...'; }
+    const btns = document.querySelectorAll('.mk-liberar-sessao-btn');
+    const labels = [];
+    btns.forEach(btn => {
+      labels.push(btn.textContent);
+      btn.disabled = true;
+      btn.textContent = 'Liberando...';
+    });
     try {
       const pinParams = typeof mkAuthAdminPinParams_ === 'function' ? mkAuthAdminPinParams_() : { adminPin: '1416' };
       const d = await apiCall(Object.assign({
@@ -842,7 +848,10 @@
       toast(msg, 'error');
       alert('Falha ao liberar sessao: ' + msg);
     } finally {
-      if (btn) { btn.disabled = false; btn.textContent = label || '🔓 Liberar sessão do balcão (operador esqueceu Sair)'; }
+      btns.forEach((btn, i) => {
+        btn.disabled = false;
+        btn.textContent = labels[i] || '🔓 Liberar sessão do balcão (operador esqueceu Sair)';
+      });
     }
   };
 

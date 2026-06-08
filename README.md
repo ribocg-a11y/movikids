@@ -4,13 +4,13 @@ Sistema operacional para locações — balcão (tablet), portal do responsável
 
 ## Planejamento (08/06/2026)
 
-**FASE 1** homologação ✅ fechada · **FASE 2** payback 🟡 ativa · detalhes: [PLANO_PRIORIDADES](docs/ativos/PLANO_PRIORIDADES_2026-06.md)
+**FASE 1–2** ✅ fechadas · **FASE 3** Pacote L 🟡 ativa · detalhes: [PLANO_PRIORIDADES](docs/ativos/PLANO_PRIORIDADES_2026-06.md)
 
 ## Produção (08/06/2026)
 
 | Camada | Versão |
 |--------|--------|
-| Frontend | **v1.7.87** — https://ribocg-a11y.github.io/movikids/?force=1.7.87 |
+| Frontend | **v1.7.88** (Pacote L) — https://ribocg-a11y.github.io/movikids/?force=1.7.88 |
 | Apps Script | **v1.5.69** — ping `?action=ping` no deploy `AKfycbwakQ...` (08/06) |
 
 ## Novo chat / agente Cursor

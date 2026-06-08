@@ -676,8 +676,9 @@ function renderCharts(d) {
   const resEl = document.getElementById('nk-resultado');
   if (resEl) { resEl.textContent = R2(d.resultado); resEl.className = 'nkv ' + ((d.resultado||0) >= 0 ? 'green' : 'red'); }
   setText2('nk-margem',  'margem ' + (d.margem||0) + '%');
-  setText2('nk-fathoje', R2(d.fatHoje));
-  setText2('nk-cushoje', (d.fatHoje > 0 ? R2(d.fatHoje) + ' hoje · ' : '') + 'toque para conferir →');
+  setText2('nk-fathoje', 'Conferir →');
+  const nHoje = d.nHoje != null ? d.nHoje : 0;
+  setText2('nk-cushoje', nHoje + (nHoje === 1 ? ' locação hoje' : ' locações hoje') + ' · abre Caixa');
 
   // CTO
   setText2('nk-cto-fat',  R2(d.fatMes));

@@ -81,8 +81,8 @@ Fonte de verdade: `mk-version.js`, header do `.gs`, ping GAS.
 ## Estado do projeto (08/06/2026)
 
 - **FASE 1:** ✅ fechada 08/06
-- **FASE 2:** payback §10 respondido; relatório Golden **v1.5.69** em prod (08/06)
-- **Próximo:** validar INVESTIMENTO planilha → **Pacote L**
+- **FASE 2:** ✅ fechada 08/06 (INVESTIMENTO + GAS v1.5.69)
+- **FASE 3:** Pacote L **v1.7.88** ativo (`PACOTE_L_UX_POLISH.md`)
 
 ## Ao encerrar sessão
 

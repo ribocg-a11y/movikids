@@ -1,6 +1,6 @@
 # MOVI KIDS — Índice de documentação
 
-**Atualizado:** 08/06/2026 (FASE 2 — GAS v1.5.69 relatório Golden)
+**Atualizado:** 08/06/2026 (FASE 3 — Pacote L v1.7.88)
 
 ## Comece aqui
 
@@ -14,6 +14,7 @@
 | [ACESSOS_E_AUTORIZACOES.md](ativos/ACESSOS_E_AUTORIZACOES.md) | Papéis, PIN admin, agente vs humano, **planilha OAuth** §7.8 |
 | [MAPA_CODIGO_ARQUITETURA.md](ativos/MAPA_CODIGO_ARQUITETURA.md) | **Anatomia do código** — partes, conexões, chaves mestras |
 | [PACOTE_M_MODULARIZACAO.md](ativos/PACOTE_M_MODULARIZACAO.md) | Modularização FE — **M.1–M.17 ✅ fechado** (v1.7.87) |
+| [PACOTE_L_UX_POLISH.md](ativos/PACOTE_L_UX_POLISH.md) | **FASE 3** UX polish + QR — **v1.7.88 ativo** |
 | [CHECKLIST_TABLET_v1.7.85.md](ativos/CHECKLIST_TABLET_v1.7.85.md) | Homologação tablet FASE 1 (A–F) |
 
 ## Operação e deploy

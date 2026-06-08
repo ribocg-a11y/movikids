@@ -86,19 +86,21 @@ function atualizarNovaSummaryBar_() {
   const bar = document.getElementById('nova-summary-bar');
   if (!bar) return;
   const { tipo, plano, veiculo } = novaState;
-  if (!tipo || !plano || !PRECOS[tipo] || !PRECOS[tipo][plano]) {
+  const parts = [];
+  if (veiculo || tipo) parts.push(tipoIcon(tipo || '') + ' ' + (veiculo || tipo || '—'));
+  if (plano && tipo && PRECOS[tipo] && PRECOS[tipo][plano]) {
+    parts.push(PLANO_LABELS[plano] || plano);
+    if (mkExibirFinanceiro_()) parts.push('R$ ' + PRECOS[tipo][plano].v);
+  } else if (veiculo && tipo) {
+    parts.push('escolha o plano');
+  }
+  const c = novaDraftCampos_();
+  if (c.responsavel) parts.push(c.responsavel + ' / ' + (c.crianca || '—'));
+  if (!parts.length) {
     bar.classList.remove('visible');
     bar.innerHTML = '';
     return;
   }
-  const cfg = PRECOS[tipo][plano];
-  const c = novaDraftCampos_();
-  const parts = [
-    tipoIcon(tipo) + ' ' + (veiculo || tipo),
-    PLANO_LABELS[plano] || plano
-  ];
-  if (mkExibirFinanceiro_()) parts.push('R$ ' + cfg.v);
-  if (c.responsavel) parts.push(c.responsavel + ' / ' + (c.crianca || '—'));
   bar.innerHTML = '<b>Resumo:</b> ' + escHtml(parts.join(' · '));
   bar.classList.add('visible');
 }
