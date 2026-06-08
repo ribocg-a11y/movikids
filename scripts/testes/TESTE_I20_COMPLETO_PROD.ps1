@@ -110,7 +110,7 @@ try {
     if ($driftTs -gt 5000) { throw "B2 v1.5.66+: startTimestamp deveria ~= clientTs; drift=${driftTs}ms" }
     Add-C "B2.clientTs" "ok" "col Y ~= timestamp enviado (drift ${driftTs}ms)"
   } else {
-    Add-C "B2.clientTs" "warn" "GAS $($ping.versao) grava serverTs — deploy v1.5.66 para fix 09:33"
+    Add-C "B2.clientTs" "warn" "GAS $($ping.versao) grava serverTs - deploy v1.5.66 para fix 09:33"
   }
 
   # --- B1: Salvar + SMS sem iniciar ---
@@ -159,9 +159,11 @@ try {
 
   # --- FE producao ---
   $feVer = & curl.exe -L -s "https://ribocg-a11y.github.io/movikids/mk-version.js"
-  if ($feVer -match "MK_VERSION = '1\.7\.78'") { Add-C "fe.pages" "ok" "v1.7.78" }
-  elseif ($feVer -match "MK_VERSION = '([^']+)'") { Add-C "fe.pages" "warn" "v$($Matches[1]) - tablet precisa ?force=1.7.78" }
-  else { Add-C "fe.pages" "fail" "mk-version.js ilegivel" }
+  if ($feVer -match "MK_VERSION = '([^']+)'") {
+    $fePagesVer = $Matches[1]
+    if ($fePagesVer -match '^1\.7\.(7[89]|[89]\d)$') { Add-C "fe.pages" "ok" "v$fePagesVer" }
+    else { Add-C "fe.pages" "warn" "v$fePagesVer - tablet precisa ?force=1.7.87" }
+  } else { Add-C "fe.pages" "fail" "mk-version.js ilegivel" }
 
   $feOp = & curl.exe -L -s "https://ribocg-a11y.github.io/movikids/mk-operacao.js"
   if ($feOp -match 'const clickTs = Date\.now\(\)' -and $feOp -match 'iniciarContagemDireto_') {
