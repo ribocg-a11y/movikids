@@ -85,10 +85,12 @@ Se qualquer item acima acontecer, executar `ROLLBACK_EMERGENCIA.md`.
 
 ## Checklist I.5 — Operação diária (Pacote I + I19)
 
-**Versão de referência:** FE **v1.7.48** · GAS **v1.5.56**  
+> **✅ ASSINADO — 08/06/2026** · FASE 1 homologação fechada · FE tablet **v1.7.87** · Sprint 1 fechada.
+
+**Versão de referência:** FE **v1.7.87** · GAS **v1.5.66+** (ping v1.5.67)  
 **Quando:** fora do pico ou com 1 operador de reserva no balcão  
 **Duração:** ~30 min  
-**Mapa:** `PLANO_PAUSA_MATURIDADE_2026-06.md` I.5 · `MAPA_ERROS_FALHAS_BUGS.md` I19
+**Mapa:** `PLANO_PRIORIDADES_2026-06.md` FASE 1 · `MAPA_ERROS_FALHAS_BUGS.md` I19
 
 ### Regras de segurança (ler antes)
 
@@ -190,13 +192,13 @@ Só se a loja autorizar locação de teste **sem cliente real**:
 
 | Campo | Valor |
 |-------|-------|
-| Data | ___/06/2026 |
-| Versão FE tablet | v1.7.___ |
-| Operador testado | _________________ |
-| Admin | _________________ |
-| Incidentes abertos | Nenhum P1 [ ] |
+| Data | **08/06/2026** |
+| Versão FE tablet | **v1.7.87** |
+| Operador testado | Homologação FASE 1 (balcão) |
+| Admin | Homologação FASE 1 (PC) |
+| Incidentes abertos | Nenhum P1 ✅ |
 
-**Sprint 1 fechada quando:** A–G marcados + nenhum rollback.
+**Sprint 1 fechada:** ✅ 08/06/2026 — A–G validados + FASE 1 assinada.
 
 ---
 

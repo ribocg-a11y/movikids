@@ -71,11 +71,11 @@ flowchart TD
 
 | # | Entrega | Tipo | Status | Critério de pronto |
 |---|---------|------|--------|-------------------|
-| S1.1 | Checklist tablet **I.5** | QA manual | 🟡 parcial | Operador sem R$; Caixa vs Dashboard; portal ±2s; **chip Turno** (I19) |
+| S1.1 | Checklist tablet **I.5** | QA manual | ✅ | Assinado 08/06/2026 — FASE 1 |
 | S1.2 | Confirmar GAS **v1.5.66+** no ping | Ops | ✅ | `?action=ping` ≥ v1.5.66 (08/06: v1.5.67) |
-| S1.3 | Tablet **v1.7.87** no ícone PWA | Ops | 🟡 | `?force=1.7.87`; reinstalar ícone se cache antigo |
+| S1.3 | Tablet **v1.7.87** no ícone PWA | Ops | ✅ | Homologado 08/06/2026 |
 | S1.4 | `pre-push-check` + regressão readonly | CI | ✅ | Guards I15–I19 |
-| S1.5 | Documentar checklist I.5 | Docs | 🟡 | `HOMOLOGACAO_PRODUCAO_ASSISTIDA.md` + I19 no mapa |
+| S1.5 | Documentar checklist I.5 | Docs | ✅ | Assinado 08/06/2026 |
 | S1.6 | Auth turno visível + anti-fantasma | FE | ✅ | v1.7.48; Milena login 13:05 validado |
 
 **Incidente fechado na sprint:** I19 (`../arquivo/incidentes/INCIDENTE_AUTH_SESSAO_FANTASMA_PWA_2026-06-06.md`).
@@ -92,8 +92,8 @@ flowchart TD
 |---|---------|--------|---------|
 | K.1 | Import inicial LOCACOES → **RESPONSAVEIS** | GAS + script | ✅ **240 cadastros** (06/06/2026) |
 | K.2 | `listarResponsaveis` lê aba quando existir | GAS | ✅ merge canônico v1.5.57 |
-| K.3 | Card relacionamento + badge **Cadastro** | FE | ✅ v1.7.49 — validar tablet |
-| K.4 | Botões Nova locação / Nova criança | FE | código ok — checklist K.4 |
+| K.3 | Card relacionamento + badge **Cadastro** | FE | ✅ homologado tablet 08/06 |
+| K.4 | Botões Nova locação / Nova criança | FE | ✅ homologado tablet 08/06 |
 | K.5 | `TESTE_RELACIONAMENTO` + import | Teste | ✅ readonly + `cadastroCanonico` |
 
 **Regras (não negociáveis):**
@@ -106,7 +106,7 @@ flowchart TD
 
 ---
 
-## 6. Sprint 3 — Pacote L: UX polish (2 semanas) ← **próximo após K**
+## 6. Sprint 3 — Pacote L: UX polish (2 semanas) ← **próximo após FASE 2 payback**
 
 **Objetivo:** reduzir ruído visual sem mudar regras de negócio.
 
@@ -157,13 +157,11 @@ Escopo original W.1–W.6 (inventário mensagens, aviso extra não pulável, che
 
 ## 10. Decisão imediata — junho 2026
 
-**Sprint 1** quase fechada. Ordem **agora**:
+**Sprint 1 + Sprint 2 fechadas** (08/06/2026). Ordem **agora**:
 
 | Prioridade | Ação | Quem | Tempo |
 |------------|------|------|-------|
-| **P0** | Tablet balcão em **v1.7.87** (`CHECKLIST_TABLET_v1.7.85.md` A–F) | Ops balcão | 15 min |
-| **P0** | Fechar checklist **I.5** + **K.3–K.4** tablet | Ops + dev | 30–60 min |
-| **P1** | Fechar regras payback (memorial §10) + validar painel Dashboard | Sócio + dev | 1 sessão |
+| **P1** | **FASE 2** — regras payback (memorial §10) + aba INVESTIMENTO | Sócio + dev | 1 sessão |
 | **P1** | Iniciar **Pacote L** (UX polish + QR balcão) | Dev | sprint 3 |
 | **P2** | `TESTE_REGRESSAO` write controlado (B7) | Dev | paralelo |
 
@@ -171,12 +169,12 @@ Escopo original W.1–W.6 (inventário mensagens, aviso extra não pulável, che
 
 ### Critério para encerrar Sprint 1 e abrir Sprint 2
 
-- [ ] Todos tablets **v1.7.87** + chip Turno verde com operador logado  
-- [ ] Checklist I.5 marcado em `HOMOLOGACAO_PRODUCAO_ASSISTIDA.md`  
-- [ ] `pre-push-check` verde  
-- [ ] Nenhum incidente P1 auth aberto  
+- [x] Todos tablets **v1.7.87** + chip Turno verde — **08/06/2026**  
+- [x] Checklist I.5 em `HOMOLOGACAO_PRODUCAO_ASSISTIDA.md`  
+- [x] `pre-push-check` verde  
+- [x] Nenhum incidente P1 auth aberto  
 
-→ Então: **merge mental Sprint 1 → início Pacote K**.
+→ **Sprint 1 + Sprint 2 fechadas.** Próximo: **FASE 2 payback** → **Pacote L**.
 
 ---
 

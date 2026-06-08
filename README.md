@@ -2,6 +2,10 @@
 
 Sistema operacional para locações — balcão (tablet), portal do responsável e painel admin.
 
+## Planejamento (08/06/2026)
+
+**FASE 1** homologação ✅ fechada · **FASE 2** payback 🟡 ativa · detalhes: [PLANO_PRIORIDADES](docs/ativos/PLANO_PRIORIDADES_2026-06.md)
+
 ## Produção (08/06/2026)
 
 | Camada | Versão |

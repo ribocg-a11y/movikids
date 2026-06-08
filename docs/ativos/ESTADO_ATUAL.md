@@ -177,7 +177,7 @@ Commits de referência: `3d9d106` (v1.7.25), `e1a56db` (Pacote E), `1454bc8` (fi
 - [x] **Fix auth sessão UI + idle** — v1.7.45–46 (I17, I18)
 - [x] **Pacote K.1** — RESPONSAVEIS populado (240 cadastros, import 06/06)
 - [x] **Pacote K.2** — merge GAS canônico (v1.5.57)
-- [~] **Pacote K.3–K.4** — FE v1.7.49+ badge Cadastro; checklist tablet `CHECKLIST_PACOTE_K.md`
+- [x] **Pacote K.3–K.4** — homologado tablet 08/06/2026 (`CHECKLIST_PACOTE_K.md`)
 - [x] **Pacote M — Payback investimento** — GAS v1.5.60–63 + FE v1.7.63–64 (painel Dashboard)
 - [x] **Portal foto moldura** — `foto-moldura.html` + botão no portal (v1.7.62+)
 - [~] **Fase 4 WhatsApp / SMS auto — PAUSADA** (QR Code oficial — `DECISAO_COMUNICACAO_QR_CODE_2026-06.md`)
@@ -191,9 +191,9 @@ Commits de referência: `3d9d106` (v1.7.25), `e1a56db` (Pacote E), `1454bc8` (fi
 
 | Sprint | Foco | Status |
 |--------|------|--------|
-| **1** | Estabilizar: checklist I.5, tablets v1.7.87, testes | **ativa** |
-| **2** | **Pacote K** — K.1–K.2 feitos; **K.3–K.4 QA tablet** | **quase fechado** |
-| **2b** | **Pacote M Payback** — código em prod; fechar regras §10 memorial | **em andamento** |
+| **1** | Estabilizar: checklist I.5, tablets v1.7.87, testes | ✅ **fechada** 08/06 |
+| **2** | **Pacote K** — K.1–K.4 homologado tablet | ✅ **fechada** 08/06 |
+| **2b** | **Payback negócio** — FASE 2; memorial §10 | **ativa** |
 | **3** | **Pacote L** — UX polish + QR balcão | **próximo** (F4 pausado) |
 | ⏸ | F4 WhatsApp / SMS automático | conta bloqueada; usar QR |
 | ⏸ | F9 supervisor | pausada |

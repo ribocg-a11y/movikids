@@ -1,6 +1,6 @@
 # Checklist Pacote K — CRM / RESPONSAVEIS
 
-**Data:** 08/06/2026  
+**Data:** 08/06/2026 · **Homologação assinada:** 08/06/2026  
 **GAS:** v1.5.66+ · **FE:** v1.7.87  
 **Nota:** `TESTE_RELACIONAMENTO_MOVIKIDS_READONLY.ps1` corrigido (T1 em-dash) — rodar antes de marcar K.A1.  
 **Referência:** `PLANO_CONTINUIDADE_2026-06.md` Sprint 2
@@ -57,11 +57,11 @@
 
 ## Critério Sprint 2 fechada
 
-- [ ] K.3 + K.4 marcados no tablet (operador)
-- [ ] Checklist I.5 (`HOMOLOGACAO_PRODUCAO_ASSISTIDA.md`) fechado
-- [ ] Tablet em **v1.7.49** (`?force=1.7.49` ou ícone PWA atualizado)
+- [x] K.3 + K.4 marcados no tablet (operador) — **08/06/2026**
+- [x] Checklist I.5 (`HOMOLOGACAO_PRODUCAO_ASSISTIDA.md`) fechado — **08/06/2026**
+- [x] Tablet em **v1.7.87** (`?force=1.7.87`)
 
-→ Então: iniciar **Pacote L** (Sprint 3). **F4 WhatsApp pausado** — comunicação via **QR** (`DECISAO_COMUNICACAO_QR_CODE_2026-06.md`).
+**Sprint 2 fechada 08/06/2026.** Próximo: **FASE 2 payback** → depois **Pacote L** (Sprint 3). **F4 WhatsApp pausado** — QR (`DECISAO_COMUNICACAO_QR_CODE_2026-06.md`).
 
 ---
 

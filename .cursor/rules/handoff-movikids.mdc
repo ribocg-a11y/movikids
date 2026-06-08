@@ -47,7 +47,7 @@ Ao trabalhar neste repositório, **ler primeiro** (nesta ordem):
 
 **I20 cronômetro (RESOLVIDO):** GAS v1.5.66+ + FE v1.7.78+ — doc `docs/ativos/INCIDENTE_I20_CRONOMETRO_RESOLUCAO_2026-06-07.md`. Não regredir sem `TESTE_I20_COMPLETO_PROD.ps1` + tablet.
 
-**Próximo passo:** FASE 1 homologação tablet (`CHECKLIST_TABLET_v1.7.85.md` A–F); F5/F7/F11 automatizados ✅ 08/06.
+**FASE 1:** ✅ fechada 08/06/2026. **Próximo:** FASE 2 payback (`MEMORIAL_PAYBACK_INVESTIMENTO.md` §10) → Pacote L.
 
 **Teste / diagnóstico (OBRIGATÓRIO quando usuário pedir):** ler e seguir `docs/ativos/PROTOCOLO_DIAGNOSTICO_E_TESTES.md` → executar `scripts/testes/TESTE_PROTOCOLO_DIAGNOSTICO.ps1` (ou `-Foco` adequado). Nunca testar só um script isolado sem F0 e sem listar fluxos impactados (§4 do protocolo). Antes de mudar código: preencher matriz de impacto do protocolo.
 

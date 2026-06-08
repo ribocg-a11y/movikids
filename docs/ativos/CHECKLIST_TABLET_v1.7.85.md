@@ -1,6 +1,6 @@
 # Checklist tablet — v1.7.87 (Pacote M fechado + FASE 1)
 
-**Data:** 08/06/2026  
+**Data:** 08/06/2026 · **Assinado:** 08/06/2026 (FASE 1 fechada)  
 **Duração:** ~10–15 min (núcleo M.14/M.15 ~5 min)  
 **Versão alvo:** FE **v1.7.87** · GAS **v1.5.66+** (sem deploy GAS)  
 *(Arquivo nomeado na M.15; URLs usam v1.7.87 pós-M.17.)*  
@@ -110,9 +110,9 @@ No **PC** com PIN admin (não no tablet operador):
 |-------|----------|
 | **M.14 fechado** | A.1–A.6 ✅ |
 | **M.15 fechado** | B.1–B.8 ✅ |
-| **FASE 1 parcial** | C + D + E + F conforme aplicável |
+| **FASE 1** | A–F ✅ assinado 08/06/2026 |
 | **Pacote M fechado** | M.1–M.17 ✅ (v1.7.87; `mk-globals` + `mk-boot`) |
-| **Próximo** | Homologação FASE 1 I.5 |
+| **Próximo** | **FASE 2** payback negócio → **Pacote L** |
 
 ---
 

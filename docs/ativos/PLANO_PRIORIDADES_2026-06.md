@@ -12,8 +12,8 @@
 | Fase | Status | Início |
 |------|--------|--------|
 | **FASE 0** Alinhar base | ✅ fechada | 07/06/2026 |
-| FASE 1 Homologação | 🟡 em andamento | 07/06/2026 |
-| FASE 2 Payback negócio | ⬜ | — |
+| **FASE 1** Homologação | ✅ fechada | 07/06/2026 → **08/06/2026** |
+| **FASE 2** Payback negócio | 🟡 **ativa** | 08/06/2026 |
 | FASE 3 Pacote L | ⬜ | — |
 
 ### FASE 0 — checklist
@@ -33,7 +33,9 @@
 | 0.10 | `ACESSOS_E_AUTORIZACOES.md` + planilha OAuth (`google-drive-sheets-auth`) | ✅ 07/06 |
 | 0.11 | `MAPA_CODIGO_ARQUITETURA.md` — anatomia e chaves mestras | ✅ 07/06 |
 
-**Próximo passo imediato:** **FASE 1** — assinar checklist tablet A–F (`CHECKLIST_TABLET_v1.7.85.md` com `?force=1.7.87`) + `HOMOLOGACAO_PRODUCAO_ASSISTIDA.md` I.5. F5/F7/F11 automatizados ✅ 08/06; F10 2 abas PWA pendente no tablet físico.
+**Próximo passo imediato:** **FASE 2** — payback negócio (`MEMORIAL_PAYBACK_INVESTIMENTO.md` §10 + validar aba INVESTIMENTO). Paralelo permitido: preparar escopo **Pacote L** (FASE 3).
+
+**FASE 1 fechada 08/06/2026:** I.5 assinado · K.3–K.4 tablet · checklist A–F · payback Dashboard · tablet v1.7.87. Sprint 1 + Sprint 2 (K) declarados fechados.
 
 ---
 
@@ -57,13 +59,13 @@
 
 | Área | Status | Notas |
 |------|--------|-------|
-| **Balcão (tablet)** | 🟡 Estável com ressalvas | I15 GET, I18 idle, I19 sessão fantasma corrigidos; **tablets precisam `?force=1.7.87`** |
+| **Balcão (tablet)** | ✅ Homologado FASE 1 | v1.7.87 assinado 08/06; I.5 + checklist A–F |
 | **Auth operadores** | ✅ Produção | PIN, sessão única, liberar sessão ADM, chip Turno |
 | **Portal responsável** | ✅ Produção | `acompanhar.html`, cronômetro I16, rate limit GAS |
 | **Foto moldura** | ✅ Produção | `foto-moldura.html`, botão no portal |
 | **Dashboard / KPIs** | ✅ Produção | Pacote F completo, fatAno v1.5.59, comparativo semanal |
 | **Payback investimento** | 🟡 Código ok, negócio aberto | GAS v1.5.63 + FE v1.7.87; planilha INVESTIMENTO preenchida (~R$ 65.410); perguntas §10 memorial |
-| **CRM / RESPONSAVEIS** | 🟡 K.1–K.2 ok, QA pendente | 240 importados; checklist tablet K.3–K.4 não assinado |
+| **CRM / RESPONSAVEIS** | ✅ K.1–K.4 homologado | 240 importados; K.3–K.4 assinado tablet 08/06 |
 | **SMS gateway** | ✅ Produção manual | DJVJRL; **auto/F4 pausado** |
 | **Config frota/preços** | 🟡 Fallback GAS | Aba CONFIG sem JSON na planilha — usa constantes no `.gs` |
 | **CI local** | ✅ | `pre-push-check.ps1`; sem GitHub Actions |
@@ -84,7 +86,7 @@
 
 ### 1.4 Pacotes entregues (fechados)
 
-A, B, C, D, E, F, G, H, I, J, SMS P0, K.1, K.2, fixes I16–I20, **Payback M** (código v1.5.60–63 + FE v1.7.63–64), **Pacote M modularização M.1–M.17** (FE v1.7.87).
+A, B, C, D, E, F, G, H, I, J, SMS P0, **K.1–K.4** (homologado 08/06), fixes I16–I20, **Payback M** (código), **Pacote M** M.1–M.17 (v1.7.87), **FASE 1 homologação**.
 
 ### 1.5 Explicitamente pausado (não executar)
 
@@ -119,17 +121,17 @@ Objetivo: uma única verdade entre código, produção, tablets e documentação
 
 Objetivo: fechar Sprint 1 do `PLANO_CONTINUIDADE` com evidência, não só código.
 
-| # | Ação | Critério de pronto |
-|---|------|-------------------|
-| 1.1 | Checklist **I.5** em `HOMOLOGACAO_PRODUCAO_ASSISTIDA.md` | Todos itens `[x]` com data |
-| 1.2 | **Pacote K.3–K.4** — `CHECKLIST_PACOTE_K.md` no tablet | Badge Cadastro, Nova locação, Nova criança validados |
-| 1.3 | Paridade cronômetro balcão × portal (I16) | `TESTE_PARIDADE_CRONOMETRO_PORTAL_BALCAO.ps1` ok |
-| 1.4 | Paridade HTTP tablet (I15) | `TESTE_PARIDADE_HTTP_BROWSER_GAS.ps1` ok |
-| 1.5 | Teste payback no Dashboard admin | Painel roxo com % e previsão projetada coerente |
-| 1.6 | **Tablet A–F** — `CHECKLIST_TABLET_v1.7.85.md` | M.14/M.15 + cronômetro + portal; F10 2 abas PWA |
-| 1.7 | **F5/F7/F10/F11** automatizado | `TESTE_TABLET_F5_F7_F10_F11.ps1` + browser — ✅ 08/06 (F10 2 abas físico pendente) |
+| # | Ação | Critério de pronto | Status |
+|---|------|-------------------|--------|
+| 1.1 | Checklist **I.5** em `HOMOLOGACAO_PRODUCAO_ASSISTIDA.md` | Todos itens assinados com data | ✅ **08/06/2026** |
+| 1.2 | **Pacote K.3–K.4** — `CHECKLIST_PACOTE_K.md` no tablet | Badge Cadastro, Nova locação, Nova criança | ✅ **08/06/2026** |
+| 1.3 | Paridade cronômetro balcão × portal (I16) | `TESTE_PARIDADE_CRONOMETRO_PORTAL_BALCAO.ps1` ok | ✅ 08/06 |
+| 1.4 | Paridade HTTP tablet (I15) | `TESTE_PARIDADE_HTTP_BROWSER_GAS.ps1` ok | ✅ 08/06 |
+| 1.5 | Teste payback no Dashboard admin | Painel roxo com % e previsão coerente | ✅ **08/06/2026** |
+| 1.6 | **Tablet A–F** — `CHECKLIST_TABLET_v1.7.85.md` | M.14/M.15 + cronômetro + portal + F10 2 abas | ✅ **08/06/2026** |
+| 1.7 | **F5/F7/F10/F11** automatizado + I20 | Scripts + tablet manual | ✅ I20 + homologação manual |
 
-**Saída:** Sprint 1 e Sprint 2 (K) declarados **fechados** para operação.
+**Saída:** Sprint 1 e Sprint 2 (K) **fechados** para operação (08/06/2026).
 
 ---
 
@@ -202,9 +204,9 @@ Objetivo: balcão mais rápido; menos ruído visual. **Próximo pacote de featur
 ```
 FASE 0  Alinhar versões + docs base          [✅ fechada 07/06]
    ↓
-FASE 1  Homologação tablet + K.3/K.4 + I.5 [2–3 dias]
+FASE 1  Homologação tablet + K.3/K.4 + I.5 [✅ fechada 08/06]
    ↓
-FASE 2  Payback negócio + deploy docs      [1 semana, paralelo possível]
+FASE 2  Payback negócio + deploy docs      [🟡 ativa — 1 semana]
    ↓
 FASE 3  Pacote L UX + QR balcão            [2 semanas]
    ↓
@@ -260,4 +262,4 @@ Todos em `docs/ativos/` salvo indicação. Índice completo: `docs/INDICE.md`.
 
 ---
 
-*Próxima revisão: ao fechar FASE 1 ou 13/06/2026.*
+*Próxima revisão: ao fechar FASE 2 ou 13/06/2026.*
