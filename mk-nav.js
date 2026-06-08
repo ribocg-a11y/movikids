@@ -82,17 +82,16 @@ function showPage(name, opts = {}) {
   }
   if (name==='painel') renderPainel();
   if (name==='relacionamento') carregarRelacionamento();
-  if (name==='dashboard') { if (kpiData && kpiData.ok) renderCharts(kpiData); carregarKPIs(); }
+  if (name==='dashboard') {
+    if (kpiData && kpiData.ok) renderCharts(kpiData);
+    if (typeof carregarKPIsDashboard === 'function') carregarKPIsDashboard();
+  }
   if (name==='custos') loadCustosHoje();
   if (name==='historico') buscarHistorico();
-  if (name==='admin' && isAdmin) { resetAdminTimer(); if(!kpiData) carregarKPIs(); else atualizarHubAdmin_(); }
-  if (name==='sistema' && isAdmin) { resetAdminTimer(); setTimeout(atualizarDiagnostico, 80); }
+  if (name==='admin' && isAdmin) { resetAdminTimer(); carregarKPIs(); }
+  if (name==='sistema' && isAdmin) { resetAdminTimer(); setTimeout(atualizarDiagnostico, 80); carregarKPIs(); }
   if (name==='operadores' && isAdmin && typeof refreshOperadoresAdmin_ === 'function') refreshOperadoresAdmin_();
-  if (kpiData && typeof showAdminHomeKpis === 'function') showAdminHomeKpis(kpiData);
-  if (name==='dashboard') {
-    if (kpiData) renderCharts(kpiData);
-    else carregarKPIs().then(() => { if (kpiData) renderCharts(kpiData); });
-  }
+  if (typeof showAdminHomeKpis === 'function') showAdminHomeKpis(typeof kpiHubStub_ === 'function' ? kpiHubStub_() : kpiData);
 }
 
 function syncSidebar(page) {

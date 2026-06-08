@@ -10,8 +10,8 @@ Sistema operacional para locações — balcão (tablet), portal do responsável
 
 | Camada | Versão |
 |--------|--------|
-| Frontend | **v1.7.92** (B1 resumoDia) — https://ribocg-a11y.github.io/movikids/?force=1.7.92 |
-| Apps Script | **v1.5.70** — Nova versão Web GAS (`DEPLOY_v1.5.70_RESUMO_DIA.md`) |
+| Frontend | **v1.7.93** (B1+B2) — https://ribocg-a11y.github.io/movikids/?force=1.7.93 |
+| Apps Script | **v1.5.71** — Nova versão Web GAS (`DEPLOY_v1.5.71_KPI_MES.md`) |
 
 ## Novo chat / agente Cursor
 

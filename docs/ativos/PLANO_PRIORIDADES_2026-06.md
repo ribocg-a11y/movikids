@@ -35,7 +35,7 @@
 | 0.10 | `ACESSOS_E_AUTORIZACOES.md` + planilha OAuth (`google-drive-sheets-auth`) | ✅ 07/06 |
 | 0.11 | `MAPA_CODIGO_ARQUITETURA.md` — anatomia e chaves mestras | ✅ 07/06 |
 
-**Próximo passo imediato:** **Nova versão Web GAS v1.5.70** (`DEPLOY_v1.5.70_RESUMO_DIA.md`) + tablet `?force=1.7.92` · depois **B2** `kpiMes`.
+**Próximo passo imediato:** **Nova versão Web GAS v1.5.71** (`DEPLOY_v1.5.71_KPI_MES.md`) + tablet `?force=1.7.93` · fechar FASE 5 após testes B1/B2.
 
 **FASE 1 fechada 08/06/2026:** I.5 assinado · K.3–K.4 tablet · checklist A–F · payback Dashboard · tablet v1.7.87. Sprint 1 + Sprint 2 (K) declarados fechados.
 
@@ -47,9 +47,9 @@
 
 | Camada | Repo (GitHub) | Produção (verificado) | Alinhado? |
 |--------|---------------|------------------------|-----------|
-| **Frontend** | **v1.7.92** (`mk-version.js`) | GitHub Pages após push | ✅ |
-| **Service Worker** | v1.7.92 (`sw.js`) | — | ✅ |
-| **GAS** | **v1.5.70** (header `.gs`) | Ping **v1.5.70** após Nova versão Web | 🟡 |
+| **Frontend** | **v1.7.93** (`mk-version.js`) | GitHub Pages após push | ✅ |
+| **Service Worker** | v1.7.93 (`sw.js`) | — | ✅ |
+| **GAS** | **v1.5.71** (header `.gs`) | Ping **v1.5.71** após Nova versão Web | 🟡 |
 | **Deploy ID** | `AKfycbwakQ...` | Mesmo ID | ✅ |
 
 **Teste rápido:** https://ribocg-a11y.github.io/movikids/?force=1.7.91  

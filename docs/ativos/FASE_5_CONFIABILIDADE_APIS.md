@@ -18,7 +18,7 @@ Reduzir divergência entre app e planilha, e garantir que o ciclo **iniciar → 
 |----|------|------------|--------|
 | **B7** | Regressão write controlada | Alta | 🟡 baseline ok 08/06 |
 | **B1** | API `resumoDia(data)` única (Caixa + chip) | Média | 🟡 código FE+GAS; **Nova versão Web** |
-| **B2** | API `kpiMes` — Dashboard só visualiza | Média | ⬜ |
+| **B2** | API `kpiMes` — Dashboard só visualiza | Média | 🟡 código FE+GAS; **Nova versão Web** |
 | **B6** | PIN admin só via GAS (T4) | Média | ⬜ |
 | **B3** | Auditoria UI por operador | Baixa | ⬜ |
 | **B5** | PDF resumo executivo | Baixa | ⬜ |
@@ -70,9 +70,16 @@ Reduzir divergência entre app e planilha, e garantir que o ciclo **iniciar → 
 
 ---
 
-## B2 — Depois de B1
+## B2 — `kpiMes` (entregue no código 08/06)
 
-Dashboard hoje chama `buscarKPIsAdmin` (pesado). **Meta:** `kpiMes` read-only para visualização mensal.
+| Artefato | Detalhe |
+|----------|---------|
+| GAS | `buildKpiMesPayload_` + `kpiMes` v1.5.71 |
+| FE | Hub/Sistema: só `resumoDia` · Dashboard: `kpiMes` v1.7.93 |
+| Teste | `TESTE_KPI_MES_READONLY.ps1` |
+| Deploy | `DEPLOY_v1.5.71_KPI_MES.md` |
+
+**Você:** Nova versão Web GAS v1.5.71 (mesmo `.gs` que v1.5.70 se ainda não publicou).
 
 ---
 
@@ -80,4 +87,4 @@ Dashboard hoje chama `buscarKPIsAdmin` (pesado). **Meta:** `kpiMes` read-only pa
 
 - [ ] B7 baseline **ok** em produção (3 execuções sem falha)  
 - [ ] B1 `resumoDia` em produção + Caixa/chip alinhados  
-- [ ] B2 `kpiMes` ou decisão explícita de adiar
+- [ ] B2 `kpiMes` em produção + Dashboard v1.7.93

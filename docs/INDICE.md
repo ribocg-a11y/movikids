@@ -20,6 +20,7 @@
 | [CONFIG_OPERACIONAL_TEMPLATE.md](ativos/CONFIG_OPERACIONAL_TEMPLATE.md) | Template JSON frota/preços |
 | [FASE_5_CONFIABILIDADE_APIS.md](ativos/FASE_5_CONFIABILIDADE_APIS.md) | **FASE 5 ativa** — B7, B1, B2 |
 | [DEPLOY_v1.5.70_RESUMO_DIA.md](ativos/DEPLOY_v1.5.70_RESUMO_DIA.md) | Deploy B1 resumoDia |
+| [DEPLOY_v1.5.71_KPI_MES.md](ativos/DEPLOY_v1.5.71_KPI_MES.md) | Deploy B2 kpiMes |
 | [CHECKLIST_TABLET_v1.7.85.md](ativos/CHECKLIST_TABLET_v1.7.85.md) | Homologação tablet FASE 1 (A–F) |
 
 ## Operação e deploy

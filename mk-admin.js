@@ -164,8 +164,7 @@ function irAdmin(page) {
   if (window.innerWidth < 1024 && typeof mobMenuClose_ === 'function') mobMenuClose_();
   showPage(page);
   if (page === 'dashboard') {
-    // Busca dados frescos do servidor — re-renderiza gráficos ao terminar (fix race condition)
-    carregarKPIs();
+    carregarKPIsDashboard();
   }
   if (page === 'relatorio') {
     initRelMesSel();
@@ -540,26 +539,50 @@ function nHojeCanonica_() {
   return 0;
 }
 
+function kpiHubStub_() {
+  return { ok: true, nHoje: nHojeCanonica_() };
+}
+
+async function carregarResumoHojeAdmin_() {
+  const authP = apiParamsComAuth_();
+  const resumo = await api({ action: 'resumoDia', data: fmtDataBrHoje_(), ...authP });
+  if (resumo && resumo.ok) resumoDiaHoje = resumo;
+}
+
+/** Hub/Sistema: só resumoDia (leve). Dashboard usa carregarKPIsDashboard → kpiMes. */
 async function carregarKPIs() {
-  if (window._kpiInFlight) return;  // evita calls GAS simultâneos
+  if (window._kpiInFlight) return;
+  window._kpiInFlight = true;
+  try {
+    await carregarResumoHojeAdmin_();
+    if (typeof atualizarHubAdmin_ === 'function') atualizarHubAdmin_();
+    if (typeof showAdminHomeKpis === 'function') showAdminHomeKpis(kpiHubStub_());
+  } catch (e) { console.error('carregarKPIs:', e); }
+  finally { window._kpiInFlight = false; }
+}
+
+/** B2: Dashboard — kpiMes (visualização mensal). */
+async function carregarKPIsDashboard(mes, ano) {
+  if (window._kpiInFlight) return;
   window._kpiInFlight = true;
   try {
     const authP = apiParamsComAuth_();
-    const hojeFmt = fmtDataBrHoje_();
+    const p = { action: 'kpiMes', ...authP };
+    if (mes) p.mes = mes;
+    if (ano) p.ano = ano;
     const [d, resumo] = await Promise.all([
-      api({ action: 'buscarKPIsAdmin', ...authP }),
-      api({ action: 'resumoDia', data: hojeFmt, ...authP })
+      api(p),
+      api({ action: 'resumoDia', data: fmtDataBrHoje_(), ...authP })
     ]);
     if (!d.ok) return;
     kpiData = d;
     if (resumo && resumo.ok) resumoDiaHoje = resumo;
     if (typeof renderSemanasChart_ === 'function') renderSemanasChart_(d);
-    // Re-renderiza gráficos com dados frescos (fix: gráficos ficavam com dados velhos)
     const dashPage = document.getElementById('page-dashboard');
     if (dashPage && dashPage.classList.contains('active')) renderCharts(d);
-    showAdminHomeKpis(d);
+    if (typeof showAdminHomeKpis === 'function') showAdminHomeKpis(kpiHubStub_());
     if (typeof atualizarHubAdmin_ === 'function') atualizarHubAdmin_();
-  } catch(e) { console.error('carregarKPIs:', e); }
+  } catch (e) { console.error('carregarKPIsDashboard:', e); }
   finally { window._kpiInFlight = false; }
 }
 // ── NOVO DASHBOARD v1.6.9 ────────────────────────────────────
@@ -572,21 +595,7 @@ function mudarMesDash() {
   const sel = document.getElementById('dash-mes-sel');
   if (!sel || !kpiData) return;
   _semanaSelIdx = null;
-  carregarKPIsComMes(parseInt(sel.value), kpiData.anoAtual || new Date().getFullYear());
-}
-
-async function carregarKPIsComMes(mes, ano) {
-  try {
-    const p = { action: 'buscarKPIsAdmin', ...apiParamsComAuth_() };
-    if (mes) p.mes = mes;
-    if (ano) p.ano = ano;
-    const d = await api(p);
-    if (!d.ok) return;
-    kpiData = d;
-    renderCharts(d);
-    if (typeof showAdminHomeKpis === 'function') showAdminHomeKpis(d);
-    if (typeof atualizarHubAdmin_ === 'function') atualizarHubAdmin_();
-  } catch(e) { console.error('carregarKPIsComMes:', e); }
+  carregarKPIsDashboard(parseInt(sel.value), kpiData.anoAtual || new Date().getFullYear());
 }
 
 let _semanaSelIdx = null;

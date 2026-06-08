@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.70
+// MOVI KIDS — Google Apps Script v1.5.71
+// v1.5.71: B2 kpiMes — Dashboard via buildKpiMesPayload_ (alias buscarKPIsAdmin)
 // v1.5.70: B1 resumoDia — fonte unica Caixa + chip admin (calcResumoDiaCore_)
 // v1.5.69: Relatorio Golden — remove frase "custos internos do lojista" do banner
 // v1.5.68: Relatorio Golden — sem custos operacionais, lucro, Pacote F (so movimentacao + CTO contratual)
@@ -291,6 +292,7 @@ function dispatchMoviAction_(p, method) {
       case 'salvarCusto':         return salvarCusto_(p);
       case 'listarCustos':        return listarCustos_(p);
       case 'buscarKPIsAdmin':     return buscarKPIsAdmin_(p);
+      case 'kpiMes':              return kpiMes_(p);
       case 'salvarRelatorioDrive':return salvarRelatorioDrive_(p);
       case 'listarRelatorios':    return listarRelatorios_();
       case 'verificarSessao':     return verificarSessao_(p);
@@ -359,9 +361,9 @@ function ping_() {
   const agora = new Date();
   return resp_({
     status:  'online',
-    versao:  'v1.5.70',
+    versao:  'v1.5.71',
     timestamp: fmtData_(agora) + ' ' + fmtHoraLocal_(agora),
-    sistema: 'MOVI KIDS v1.5.70',
+    sistema: 'MOVI KIDS v1.5.71',
     postWriteActions: WRITE_ACTIONS_CRITICAS_
   });
 }
@@ -1499,8 +1501,7 @@ function enrichPaybackProjecao_(pb, ctx) {
   return pb;
 }
 
-function buscarKPIsAdmin_(p) {
-  if (!isAdminRequest_(p)) return err_('Acesso negado — KPIs so para administrador', 403);
+function buildKpiMesPayload_(p) {
   const hoje     = new Date();
   const dataHoje = fmtData_(hoje);
   const mesAtual = p && p.mes ? parseInt(p.mes) : hoje.getMonth() + 1;
@@ -1673,7 +1674,7 @@ function buscarKPIsAdmin_(p) {
     diasMes: diasMes
   });
 
-  return resp_({
+  return {
     // v1.5.4: comparativo + projeção
     fatSemana:   Math.round(fatSemana    * 100) / 100,
     nSemana,
@@ -1725,7 +1726,16 @@ function buscarKPIsAdmin_(p) {
     melhorSemanaFat: porSemanaPack.melhorSemanaFat,
     investimento: investimento,
     payback: payback
-  });
+  };
+}
+
+function kpiMes_(p) {
+  if (!isAdminRequest_(p)) return err_('Acesso negado — kpiMes so para administrador', 403);
+  return resp_(buildKpiMesPayload_(p));
+}
+
+function buscarKPIsAdmin_(p) {
+  return kpiMes_(p);
 }
 
 // ── CARREGAR INÍCIO ───────────────────────────────────────────
