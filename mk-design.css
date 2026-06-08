@@ -37,44 +37,88 @@
   font-weight: 700;
 }
 
-/* QR balcão — strip Home (operador) */
-.mk-qr-balcao-strip {
+/* QR balcão — card Home (mesma família visual que stat-card / admin-chip) */
+.mk-qr-balcao-card {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   flex-wrap: wrap;
-  padding: 10px 12px;
+  padding: 12px 14px;
   margin-bottom: 12px;
-  background: linear-gradient(135deg, #E8EAF6, #E3F2FD);
-  border: 1px solid #90CAF9;
+  background: var(--card, #fff);
+  border: 1px solid var(--border, #E0E8F4);
+  border-left: 4px solid var(--pink, #C2185B);
   border-radius: var(--mk-radius);
-  font-size: 12px;
-  color: #1565C0;
+  box-shadow: var(--shadow-sm, 0 1px 4px rgba(13, 71, 161, 0.06));
+  font-family: 'Nunito', sans-serif;
+  position: relative;
+}
+.mk-qr-balcao-card[hidden] { display: none !important; }
+.mk-qr-balcao-ico {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  background: var(--pink-lt, #FCE4EC);
+  border-radius: 10px;
+  line-height: 1;
+}
+.mk-qr-balcao-copy {
+  flex: 1;
+  min-width: 140px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.mk-qr-balcao-title {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--txt, #1a1a2e);
+  line-height: 1.25;
+}
+.mk-qr-balcao-sub {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--txt3, #78909C);
   line-height: 1.35;
 }
-.mk-qr-balcao-strip[hidden] { display: none !important; }
-.mk-qr-balcao-strip strong { font-weight: 800; }
 .mk-qr-balcao-btn {
   flex-shrink: 0;
-  background: #1565C0;
+  background: var(--blue, #1565C0);
   color: #fff;
   border: none;
   border-radius: 8px;
-  padding: 7px 12px;
+  padding: 8px 14px;
   font-size: 12px;
   font-weight: 800;
   text-decoration: none;
   font-family: 'Nunito', sans-serif;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(21, 101, 192, 0.25);
+  transition: opacity .15s, transform .1s;
 }
-.mk-qr-balcao-dismiss {
-  margin-left: auto;
+.mk-qr-balcao-btn:hover { opacity: .92; }
+.mk-qr-balcao-btn:active { transform: scale(.98); }
+.mk-qr-balcao-close {
+  position: absolute;
+  top: 6px;
+  right: 8px;
   background: transparent;
   border: none;
-  color: #546E7A;
-  font-size: 16px;
-  cursor: pointer;
-  padding: 4px 6px;
+  color: var(--txt3, #78909C);
+  font-size: 14px;
   line-height: 1;
+  cursor: pointer;
+  padding: 4px;
+  opacity: .65;
+}
+.mk-qr-balcao-close:hover { opacity: 1; color: var(--txt, #1a1a2e); }
+@media (max-width: 420px) {
+  .mk-qr-balcao-card { padding-right: 28px; }
+  .mk-qr-balcao-btn { width: 100%; text-align: center; }
 }
 
 /* ── MKStat (Home + Caixa) ─────────────────────────────── */
