@@ -66,6 +66,40 @@
       color: #fff;
       border: 2px solid rgba(255,255,255,0.35);
     }
+    .toolbar-portal {
+      margin-top: 12px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.18);
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.5;
+      color: #b0bec5;
+    }
+    .toolbar-portal strong {
+      display: block;
+      color: #eceff1;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .toolbar-portal a {
+      color: var(--gold);
+      font-weight: 900;
+      text-decoration: none;
+      word-break: break-all;
+    }
+    .toolbar-portal a:hover { text-decoration: underline; }
+    .toolbar-portal-hint {
+      display: block;
+      margin-top: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      opacity: 0.85;
+    }
 
     /* Cartaz — tela e impressão compartilham o mesmo DNA do portal */
     .mk-poster {
@@ -309,7 +343,8 @@
         background: var(--bg-mid) !important;
         display: block;
       }
-      .toolbar { display: none !important; }
+      .toolbar,
+      .toolbar-portal { display: none !important; }
       .mk-poster-preview { display: none !important; }
       .mk-poster-hint-print { display: block !important; }
 
@@ -363,6 +398,11 @@
       <button type="button" onclick="printPoster()">Imprimir / PDF</button>
       <button type="button" class="sec" onclick="setPage('a5')">A5 (recomendado)</button>
       <button type="button" class="sec" onclick="setPage('a4')">A4</button>
+    </div>
+    <div class="toolbar-portal">
+      <strong>Portal de acompanhamento</strong>
+      <a href="../acompanhar.html" target="_blank" rel="noopener" id="portal-link">https://ribocg-a11y.github.io/movikids/acompanhar.html</a>
+      <span class="toolbar-portal-hint">Abra no navegador para testar ou enviar o link ao responsável (sem escanear o QR).</span>
     </div>
   </div>
 
