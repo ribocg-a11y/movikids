@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.68
+// MOVI KIDS — Google Apps Script v1.5.69
+// v1.5.69: Relatorio Golden — remove frase "custos internos do lojista" do banner
 // v1.5.68: Relatorio Golden — sem custos operacionais, lucro, Pacote F (so movimentacao + CTO contratual)
 // v1.5.67: controleFinanceiro — dashboard financeiro MK+ZapClin ao vivo (GET readonly)
 // v1.5.66: iniciarTimer grava clientTs (instante do clique) quando drift <= 2min — absorve latencia API
@@ -356,9 +357,9 @@ function ping_() {
   const agora = new Date();
   return resp_({
     status:  'online',
-    versao:  'v1.5.68',
+    versao:  'v1.5.69',
     timestamp: fmtData_(agora) + ' ' + fmtHoraLocal_(agora),
-    sistema: 'MOVI KIDS v1.5.67',
+    sistema: 'MOVI KIDS v1.5.69',
     postWriteActions: WRITE_ACTIONS_CRITICAS_
   });
 }
@@ -2253,7 +2254,7 @@ function _gerarHtmlRelatorio_(refDate, audience) {
       + '<div style="background:linear-gradient(135deg,#1565C0,#E91E8C);padding:32px 28px;text-align:center"><h1 style="margin:0;color:#fff;font-size:26px">🚗 MOVI KIDS</h1>'
       + '<p style="margin:8px 0 0;color:rgba(255,255,255,.85);font-size:14px">Relatório Mensal — ' + nomeMes + ' de ' + ano + '</p>'
       + '<p style="margin:6px 0 0;color:rgba(255,255,255,.7);font-size:11px">Golden Shopping Calhau · movimentação e condições contratuais</p></div>'
-      + '<div style="padding:14px 28px;background:#E3F2FD;font-size:12px;color:#1565C0;line-height:1.5">Apresenta o <strong>fluxo de atendimento</strong> (locações e faturamento) e o <strong>CTO</strong> conforme contrato de locação. Não inclui custos internos do lojista.</div>'
+      + '<div style="padding:14px 28px;background:#E3F2FD;font-size:12px;color:#1565C0;line-height:1.5">Apresenta o <strong>fluxo de atendimento</strong> (locações e faturamento) e o <strong>CTO</strong> conforme contrato de locação.</div>'
       + '<div style="display:grid;grid-template-columns:repeat(3,1fr);border-bottom:1px solid #eee">'
       + '<div style="padding:20px;text-align:center;border-right:1px solid #eee"><div style="font-size:22px;font-weight:bold;color:#2E7D32">' + f(fatTotal) + '</div><div style="font-size:11px;color:#888;margin-top:4px">Faturamento bruto</div></div>'
       + '<div style="padding:20px;text-align:center;border-right:1px solid #eee"><div style="font-size:22px;font-weight:bold;color:#1565C0">' + nLoc + '</div><div style="font-size:11px;color:#888;margin-top:4px">Locações encerradas</div></div>'
@@ -2278,7 +2279,7 @@ function _gerarHtmlRelatorio_(refDate, audience) {
       + '<tr><td style="padding:4px 0;color:#555">10% do faturamento bruto:</td><td style="text-align:right">' + f(cto10pct) + '</td></tr>'
       + '<tr style="border-top:2px solid #FFE082"><td style="padding:8px 0 4px;font-weight:bold;color:#B71C1C">CTO a pagar neste mês:</td><td style="text-align:right;font-weight:bold;color:#B71C1C;font-size:16px">' + f(ctoPagar) + '</td></tr>'
       + '<tr><td style="font-size:12px;color:#888">Vencimento referência:</td><td style="text-align:right;font-size:12px;color:#888">' + vencCto + '</td></tr></table></div>'
-      + '<div style="padding:16px 28px 24px;background:#f9f9f9;text-align:center;font-size:11px;color:#aaa;border-top:1px solid #eee">Gerado em ' + fmtData_(new Date()) + ' às ' + fmtHoraLocal_(new Date()) + ' · Movi Kids GAS v1.5.68</div>'
+      + '<div style="padding:16px 28px 24px;background:#f9f9f9;text-align:center;font-size:11px;color:#aaa;border-top:1px solid #eee">Gerado em ' + fmtData_(new Date()) + ' às ' + fmtHoraLocal_(new Date()) + ' · Movi Kids GAS v1.5.69</div>'
       + '</div></body></html>';
   }
 

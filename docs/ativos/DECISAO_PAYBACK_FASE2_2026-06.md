@@ -11,7 +11,7 @@
 |---|----------|---------|
 | 1 | Valor total de **I** e lista de itens | **Fonte canônica:** aba **INVESTIMENTO** na planilha (itens linha 11+; total ~R$ 65.410). Detalhar/ajustar itens na planilha, não no código. |
 | 2 | Capital de giro entra no investimento? | **Sim** — marcar linhas com coluna **Entra = S** na aba INVESTIMENTO. |
-| 3 | Payback desde maio/2026 ou abertura abr/2026? | **Abertura do contrato** — `B4` INVESTIMENTO = **04/2026** (aniversário contrato 29/04/2026; ver `CONTRATO_CTO_REFERENCIA.md`). |
+| 3 | Payback desde maio/2026 ou abertura abr/2026? | **Datas da planilha** (aditivo alterou inauguração): **B3** = `27/05/2026` · **B4** = `05/2026`. CTO continua pelo aniversário contratual (`CONTRATO_CTO_REFERENCIA.md`). |
 | 4 | Confete ou badge discreto ao atingir payback? | **Badge discreto** — já implementado (`payback-pill is-done` no Dashboard; sem confete). |
 | 5 | PDF mensal com seção Payback? | **Não** — payback só no Dashboard admin interno. |
 
@@ -42,6 +42,19 @@
 
 ---
 
-## Deploy
+## Deploy (regra de ouro)
 
-Após push do `.gs`: colar no editor GAS → **Nova versão** (mesmo Deploy ID) → ping `v1.5.68`.
+**v1.5.69 no seu PC:**
+
+```
+C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github\MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs
+```
+
+| O quê | Link |
+|--------|------|
+| **Editor GAS** | https://script.google.com/home/projects/19SIhkX9Tk7FiJA1JXu1OrUwssHdr3H5zc8q3rOjmBvqgWfXuHlk8xyf8/edit |
+| **Ping (v1.5.69)** | https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec?action=ping |
+
+**Status 08/06/2026:** ✅ deploy concluído — ping `v1.5.69`.
+
+Guia: `DEPLOY_v1.5.69_GOLDEN_RELATORIO.md`

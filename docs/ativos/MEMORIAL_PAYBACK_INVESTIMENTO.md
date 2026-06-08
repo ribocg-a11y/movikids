@@ -58,8 +58,8 @@ I = Σ valor dos itens cadastrados em investimento_json
 
 | Campo | Valor sugerido | Uso |
 |-------|----------------|-----|
-| `data_inauguracao` | 09/05/2026 | Referência comercial |
-| `mes_inicio_payback` | 05/2026 (maio/2026) | Primeiro mês com receita real para acumular R_m |
+| `data_inauguracao` (B3) | **27/05/2026** | Planilha INVESTIMENTO — aditivo (não data do contrato original) |
+| `mes_inicio_payback` (B4) | **05/2026** | Primeiro mês com receita real para acumular R_m |
 
 Regra: o acumulado **só soma meses ≥ mes_inicio_payback** com pelo menos 1 locação Encerrada (ou, alternativa conservadora, meses com `R_m` calculado, mesmo negativo).
 
@@ -254,7 +254,7 @@ Ver decisões completas: **`DECISAO_PAYBACK_FASE2_2026-06.md`**
 
 1. **Valor total de I** e lista de itens → **Aba INVESTIMENTO** (planilha); total e itens linha 11+.  
 2. **Capital de giro** → **Sim**, entra (coluna Entra = S).  
-3. Início payback → **Abertura contrato** (**04/2026** em B4), não maio/2026.  
+3. Início payback → **Planilha** — B3 `27/05/2026`, B4 `05/2026` (aditivo; não usar data do contrato original).  
 4. Payback atingido → **Badge discreto** (sem confete).  
 5. PDF mensal Golden → **Não** incluir Payback (só Dashboard admin).
 

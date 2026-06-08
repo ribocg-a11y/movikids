@@ -95,7 +95,7 @@ Continuo o MOVI KIDS. Repo: C:\Users\riboc\Documents\Codex\2026-05-30\files-ment
 
 **FASE 1 homologação:** ✅ **FECHADA** 08/06/2026 — I.5 assinado · K.3–K.4 tablet · checklist A–F · payback Dashboard · tablet **v1.7.87**.
 
-**FASE 2 (ativa):** §10 payback **respondido** (`DECISAO_PAYBACK_FASE2_2026-06.md`) · validar aba INVESTIMENTO (B4=04/2026) · **deploy GAS v1.5.68** (relatório Golden sem custos ADM).
+**FASE 2 (ativa):** §10 payback **respondido** (`DECISAO_PAYBACK_FASE2_2026-06.md`) · INVESTIMENTO B3=`27/05/2026` B4=`05/2026` · GAS **v1.5.69** em prod (relatório Golden sem custos ADM).
 
 **FASE 3 (próxima feature):** **Pacote L** — UX polish + QR balcão (`DECISAO_COMUNICACAO_QR_CODE_2026-06.md`).
 

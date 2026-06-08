@@ -1,6 +1,6 @@
 # MOVI KIDS — Índice de documentação
 
-**Atualizado:** 08/06/2026 (pós M.17 + testes tablet F5–F11)
+**Atualizado:** 08/06/2026 (FASE 2 — GAS v1.5.69 relatório Golden)
 
 ## Comece aqui
 
@@ -22,7 +22,8 @@
 |-----------|----------|
 | [REGRAS_DE_PUBLICACAO_SEGURA.md](ativos/REGRAS_DE_PUBLICACAO_SEGURA.md) | Regras de publicação (P0) |
 | [DEPLOY_GAS_v1.5.32_AUTH.md](ativos/DEPLOY_GAS_v1.5.32_AUTH.md) | Deploy GAS mestre |
-| [DEPLOY_v1.5.63_PAYBACK.md](ativos/DEPLOY_v1.5.63_PAYBACK.md) | Payback (último feature deploy) |
+| [DEPLOY_v1.5.69_GOLDEN_RELATORIO.md](ativos/DEPLOY_v1.5.69_GOLDEN_RELATORIO.md) | Relatório Golden v1.5.69 (em prod) |
+| [DEPLOY_v1.5.63_PAYBACK.md](ativos/DEPLOY_v1.5.63_PAYBACK.md) | Payback |
 | [HOMOLOGACAO_PRODUCAO_ASSISTIDA.md](ativos/HOMOLOGACAO_PRODUCAO_ASSISTIDA.md) | Checklist operação |
 | [CHECKLIST_PACOTE_K.md](ativos/CHECKLIST_PACOTE_K.md) | QA tablet Pacote K |
 
