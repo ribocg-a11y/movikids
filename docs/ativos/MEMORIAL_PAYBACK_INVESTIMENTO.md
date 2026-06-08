@@ -248,13 +248,15 @@ Função auxiliar sugerida: `calcPaybackAcumulado_(mesFim, anoFim)`.
 
 ---
 
-## 10. Perguntas para fechar com o sócio
+## 10. Perguntas para fechar com o sócio — **RESPONDIDAS 08/06/2026**
 
-1. **Valor total de I** e lista de itens (frota, loja, sistema, …)?  
-2. **Capital de giro** entra no investimento ou fica fora?  
-3. Payback conta desde **maio/2026** (primeira receita) ou **abertura contrato** (abr/2026)?  
-4. Em payback atingido, mostrar **confete** ou só badge discreto?  
-5. Relatório PDF mensal deve incluir seção Payback? (sim — espelhar CTO no PDF)
+Ver decisões completas: **`DECISAO_PAYBACK_FASE2_2026-06.md`**
+
+1. **Valor total de I** e lista de itens → **Aba INVESTIMENTO** (planilha); total e itens linha 11+.  
+2. **Capital de giro** → **Sim**, entra (coluna Entra = S).  
+3. Início payback → **Abertura contrato** (**04/2026** em B4), não maio/2026.  
+4. Payback atingido → **Badge discreto** (sem confete).  
+5. PDF mensal Golden → **Não** incluir Payback (só Dashboard admin).
 
 ---
 

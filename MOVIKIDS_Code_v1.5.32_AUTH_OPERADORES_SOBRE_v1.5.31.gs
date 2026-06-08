@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.67
+// MOVI KIDS — Google Apps Script v1.5.68
+// v1.5.68: Relatorio Golden — sem custos operacionais, lucro, Pacote F (so movimentacao + CTO contratual)
 // v1.5.67: controleFinanceiro — dashboard financeiro MK+ZapClin ao vivo (GET readonly)
 // v1.5.66: iniciarTimer grava clientTs (instante do clique) quando drift <= 2min — absorve latencia API
 // v1.5.65: iniciarTimer idempotente se ja Ativa com col Y valida (nao reinicia relogio)
@@ -355,7 +356,7 @@ function ping_() {
   const agora = new Date();
   return resp_({
     status:  'online',
-    versao:  'v1.5.67',
+    versao:  'v1.5.68',
     timestamp: fmtData_(agora) + ' ' + fmtHoraLocal_(agora),
     sistema: 'MOVI KIDS v1.5.67',
     postWriteActions: WRITE_ACTIONS_CRITICAS_
@@ -2168,7 +2169,9 @@ function _htmlSecaoPacoteF_(mes, ano) {
   }
 }
 
-function _gerarHtmlRelatorio_(refDate) {
+/** audience: 'golden' (email/PDF shopping) ou 'admin' (gestao interna — legado). */
+function _gerarHtmlRelatorio_(refDate, audience) {
+  const forGolden = (audience || 'golden') !== 'admin';
   const mes  = refDate.getMonth() + 1;
   const ano  = refDate.getFullYear();
   const mmyy = String(mes).padStart(2,'0') + '/' + ano;
@@ -2179,6 +2182,7 @@ function _gerarHtmlRelatorio_(refDate) {
   const lastLoc = shLoc.getLastRow(), lastCus = shCus.getLastRow();
   let fatTotal = 0, nLoc = 0, fatCarros = 0, fatTricilos = 0, fatPelucias = 0, fatExtra = 0;
   const porPlano = {};
+  const porHora = Array(14).fill(0);
   if (lastLoc >= DATA_ROW) {
     const dados = shLoc.getRange(DATA_ROW, 1, lastLoc - DATA_ROW + 1, 15).getValues();
     dados.forEach(r => {
@@ -2191,13 +2195,17 @@ function _gerarHtmlRelatorio_(refDate) {
       if (tipo === 'Triciclo') fatTricilos += vt; // v1.5.3
       if (tipo === 'Pelúcia')  fatPelucias += vt;
       fatExtra += Number(r[9]);
+      const horaStr2 = cellToStr_(r[2]);
+      const hora = parseInt(String(horaStr2).split(':')[0] || '9', 10);
+      const hIdx = Math.min(Math.max(hora - 9, 0), 13);
+      porHora[hIdx] += vt;
       const k = tipo + ' — ' + plano;
       if (!porPlano[k]) porPlano[k] = { qty:0, valor:0 };
       porPlano[k].qty++; porPlano[k].valor += vt;
     });
   }
   let totalCustos = 0; const custosList = [];
-  if (lastCus >= DATA_ROW) {
+  if (!forGolden && lastCus >= DATA_ROW) {
     const dados = shCus.getRange(DATA_ROW, 1, lastCus - DATA_ROW + 1, 6).getValues();
     dados.forEach(r => {
       if (!r[0]) return;
@@ -2224,7 +2232,57 @@ function _gerarHtmlRelatorio_(refDate) {
   });
   if (!linhasCusto) linhasCusto = '<tr><td colspan="4" style="padding:8px;text-align:center;color:#aaa">Nenhum custo registrado</td></tr>';
 
-  // v1.5.3: bloco Triciclo condicional no HTML do relatório
+  const picoList = [];
+  for (let i = 0; i < 14; i++) {
+    if (porHora[i] > 0) picoList.push({ h: (9 + i) + 'h', v: porHora[i] });
+  }
+  picoList.sort(function(a, b) { return b.v - a.v; });
+  let linhasPico = '';
+  picoList.slice(0, 5).forEach(function(p) {
+    linhasPico += '<tr><td style="padding:6px 10px;border-bottom:1px solid #eee">' + p.h
+      + '</td><td style="padding:6px 10px;text-align:right;border-bottom:1px solid #eee">' + f(p.v) + '</td></tr>';
+  });
+  if (!linhasPico) linhasPico = '<tr><td colspan="2" style="padding:8px;text-align:center;color:#aaa">Sem movimento no periodo</td></tr>';
+
+  // v1.5.68: relatorio enviado ao Golden — sem custos, lucro ou gestao interna
+  if (forGolden) {
+    const blocoTricilosG = fatTricilos > 0
+      ? '<div style="background:#E8F5E9;border-radius:8px;padding:16px;border-left:4px solid #2E7D32"><div style="font-size:18px;font-weight:bold;color:#2E7D32">' + f(fatTricilos) + '</div><div style="font-size:11px;color:#555;margin-top:4px">🛺 Triciclos — ' + pct(fatTricilos) + '</div></div>'
+      : '';
+    return '<!DOCTYPE html><html><body style="margin:0;padding:0;background:#f5f5f5;font-family:Arial,sans-serif"><div style="max-width:640px;margin:20px auto;background:#fff;border-radius:12px;overflow:hidden">'
+      + '<div style="background:linear-gradient(135deg,#1565C0,#E91E8C);padding:32px 28px;text-align:center"><h1 style="margin:0;color:#fff;font-size:26px">🚗 MOVI KIDS</h1>'
+      + '<p style="margin:8px 0 0;color:rgba(255,255,255,.85);font-size:14px">Relatório Mensal — ' + nomeMes + ' de ' + ano + '</p>'
+      + '<p style="margin:6px 0 0;color:rgba(255,255,255,.7);font-size:11px">Golden Shopping Calhau · movimentação e condições contratuais</p></div>'
+      + '<div style="padding:14px 28px;background:#E3F2FD;font-size:12px;color:#1565C0;line-height:1.5">Apresenta o <strong>fluxo de atendimento</strong> (locações e faturamento) e o <strong>CTO</strong> conforme contrato de locação. Não inclui custos internos do lojista.</div>'
+      + '<div style="display:grid;grid-template-columns:repeat(3,1fr);border-bottom:1px solid #eee">'
+      + '<div style="padding:20px;text-align:center;border-right:1px solid #eee"><div style="font-size:22px;font-weight:bold;color:#2E7D32">' + f(fatTotal) + '</div><div style="font-size:11px;color:#888;margin-top:4px">Faturamento bruto</div></div>'
+      + '<div style="padding:20px;text-align:center;border-right:1px solid #eee"><div style="font-size:22px;font-weight:bold;color:#1565C0">' + nLoc + '</div><div style="font-size:11px;color:#888;margin-top:4px">Locações encerradas</div></div>'
+      + '<div style="padding:20px;text-align:center"><div style="font-size:22px;font-weight:bold;color:#6A1B9A">' + (nLoc > 0 ? f(fatTotal / nLoc) : 'R$ 0,00') + '</div><div style="font-size:11px;color:#888;margin-top:4px">Ticket médio</div></div></div>'
+      + '<div style="padding:20px 28px"><h3 style="margin:0 0 14px;font-size:13px;text-transform:uppercase;color:#555">Movimentação por tipo de veículo</h3>'
+      + '<div style="display:grid;grid-template-columns:' + (fatTricilos > 0 ? '1fr 1fr 1fr' : '1fr 1fr') + ';gap:12px">'
+      + '<div style="background:#E3F2FD;border-radius:8px;padding:16px;border-left:4px solid #1565C0"><div style="font-size:18px;font-weight:bold;color:#1565C0">' + f(fatCarros) + '</div><div style="font-size:11px;color:#555;margin-top:4px">🚗 Carros — ' + pct(fatCarros) + '</div></div>'
+      + blocoTricilosG
+      + '<div style="background:#FCE4EC;border-radius:8px;padding:16px;border-left:4px solid #C2185B"><div style="font-size:18px;font-weight:bold;color:#C2185B">' + f(fatPelucias) + '</div><div style="font-size:11px;color:#555;margin-top:4px">🧸 Pelúcias — ' + pct(fatPelucias) + '</div></div></div>'
+      + (fatExtra > 0 ? '<div style="margin-top:12px;background:#FFF3E0;border-radius:8px;padding:14px;border-left:4px solid #E65100"><span style="font-weight:bold;color:#E65100">⏱ Extensões de tempo (receita adicional): ' + f(fatExtra) + '</span></div>' : '')
+      + '</div>'
+      + '<div style="padding:0 28px 20px"><h3 style="margin:0 0 10px;font-size:13px;text-transform:uppercase;color:#555">Detalhamento por plano</h3>'
+      + '<table style="width:100%;border-collapse:collapse;font-size:13px"><thead><tr style="background:#f8f8f8"><th style="padding:8px 10px;text-align:left">Plano</th><th style="padding:8px 10px;text-align:center">Qtd</th><th style="padding:8px 10px;text-align:right">Faturamento</th></tr></thead><tbody>'
+      + (linhasPlano || '<tr><td colspan="3" style="padding:8px;text-align:center;color:#aaa">Sem locações</td></tr>') + '</tbody></table></div>'
+      + '<div style="padding:0 28px 20px"><h3 style="margin:0 0 10px;font-size:13px;text-transform:uppercase;color:#555">Horários de maior movimento</h3>'
+      + '<table style="width:100%;border-collapse:collapse;font-size:13px"><thead><tr style="background:#f8f8f8"><th style="padding:8px 10px;text-align:left">Faixa</th><th style="padding:8px 10px;text-align:right">Faturamento</th></tr></thead><tbody>' + linhasPico + '</tbody></table></div>'
+      + '<div style="margin:0 28px 20px;background:#FFF8E1;border-radius:8px;padding:18px;border:1px solid #FFE082"><h3 style="margin:0 0 12px;font-size:13px;text-transform:uppercase;color:#E65100">🏬 CTO — Condições contratuais Golden Shopping</h3>'
+      + '<p style="margin:0 0 10px;font-size:12px;color:#555;line-height:1.5">Contrato assinado em 29/04/2026 · prazo 12 meses · paga-se o <strong>maior</strong> entre o mínimo do mês de locação e <strong>10%</strong> do faturamento bruto do mês.</p>'
+      + '<table style="width:100%;font-size:13px;border-collapse:collapse">'
+      + '<tr><td style="padding:4px 0;color:#555">Mês de locação (aniversário contrato):</td><td style="text-align:right;font-weight:bold">' + mesContrato_(refDate) + 'º mês</td></tr>'
+      + '<tr><td style="padding:4px 0;color:#555">CTO mínimo do mês:</td><td style="text-align:right">' + f(ctoMin) + '</td></tr>'
+      + '<tr><td style="padding:4px 0;color:#555">10% do faturamento bruto:</td><td style="text-align:right">' + f(cto10pct) + '</td></tr>'
+      + '<tr style="border-top:2px solid #FFE082"><td style="padding:8px 0 4px;font-weight:bold;color:#B71C1C">CTO a pagar neste mês:</td><td style="text-align:right;font-weight:bold;color:#B71C1C;font-size:16px">' + f(ctoPagar) + '</td></tr>'
+      + '<tr><td style="font-size:12px;color:#888">Vencimento referência:</td><td style="text-align:right;font-size:12px;color:#888">' + vencCto + '</td></tr></table></div>'
+      + '<div style="padding:16px 28px 24px;background:#f9f9f9;text-align:center;font-size:11px;color:#aaa;border-top:1px solid #eee">Gerado em ' + fmtData_(new Date()) + ' às ' + fmtHoraLocal_(new Date()) + ' · Movi Kids GAS v1.5.68</div>'
+      + '</div></body></html>';
+  }
+
+  // v1.5.3: bloco Triciclo condicional no HTML do relatório (admin legado)
   const blocoTricilos = fatTricilos > 0
     ? `<div style="background:#E8F5E9;border-radius:8px;padding:16px;border-left:4px solid #2E7D32"><div style="font-size:18px;font-weight:bold;color:#2E7D32">${f(fatTricilos)}</div><div style="font-size:11px;color:#555;margin-top:4px">🛺 Triciclos — ${pct(fatTricilos)}</div></div>`
     : '';

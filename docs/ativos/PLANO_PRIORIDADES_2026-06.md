@@ -12,8 +12,8 @@
 | Fase | Status | Início |
 |------|--------|--------|
 | **FASE 0** Alinhar base | ✅ fechada | 07/06/2026 |
-| **FASE 1** Homologação | ✅ fechada | 07/06/2026 → **08/06/2026** |
-| **FASE 2** Payback negócio | 🟡 **ativa** | 08/06/2026 |
+| **FASE 1** Homologação | ✅ fechada | 08/06/2026 (assinada) |
+| **FASE 2** Payback negócio | 🟡 **ativa** | 08/06/2026 (§10 respondido; GAS v1.5.68 relatório Golden) |
 | FASE 3 Pacote L | ⬜ | — |
 
 ### FASE 0 — checklist
@@ -33,7 +33,7 @@
 | 0.10 | `ACESSOS_E_AUTORIZACOES.md` + planilha OAuth (`google-drive-sheets-auth`) | ✅ 07/06 |
 | 0.11 | `MAPA_CODIGO_ARQUITETURA.md` — anatomia e chaves mestras | ✅ 07/06 |
 
-**Próximo passo imediato:** **FASE 2** — payback negócio (`MEMORIAL_PAYBACK_INVESTIMENTO.md` §10 + validar aba INVESTIMENTO). Paralelo permitido: preparar escopo **Pacote L** (FASE 3).
+**Próximo passo imediato:** **FASE 2** — validar aba INVESTIMENTO (B4=04/2026) + **deploy GAS v1.5.68** (relatório Golden). Ver `DECISAO_PAYBACK_FASE2_2026-06.md`.
 
 **FASE 1 fechada 08/06/2026:** I.5 assinado · K.3–K.4 tablet · checklist A–F · payback Dashboard · tablet v1.7.87. Sprint 1 + Sprint 2 (K) declarados fechados.
 
@@ -123,13 +123,13 @@ Objetivo: fechar Sprint 1 do `PLANO_CONTINUIDADE` com evidência, não só códi
 
 | # | Ação | Critério de pronto | Status |
 |---|------|-------------------|--------|
-| 1.1 | Checklist **I.5** em `HOMOLOGACAO_PRODUCAO_ASSISTIDA.md` | Todos itens assinados com data | ✅ **08/06/2026** |
-| 1.2 | **Pacote K.3–K.4** — `CHECKLIST_PACOTE_K.md` no tablet | Badge Cadastro, Nova locação, Nova criança | ✅ **08/06/2026** |
-| 1.3 | Paridade cronômetro balcão × portal (I16) | `TESTE_PARIDADE_CRONOMETRO_PORTAL_BALCAO.ps1` ok | ✅ 08/06 |
-| 1.4 | Paridade HTTP tablet (I15) | `TESTE_PARIDADE_HTTP_BROWSER_GAS.ps1` ok | ✅ 08/06 |
-| 1.5 | Teste payback no Dashboard admin | Painel roxo com % e previsão coerente | ✅ **08/06/2026** |
-| 1.6 | **Tablet A–F** — `CHECKLIST_TABLET_v1.7.85.md` | M.14/M.15 + cronômetro + portal + F10 2 abas | ✅ **08/06/2026** |
-| 1.7 | **F5/F7/F10/F11** automatizado + I20 | Scripts + tablet manual | ✅ I20 + homologação manual |
+| 1.1 | Checklist **I.5** | Assinado | ✅ 08/06/2026 |
+| 1.2 | **K.3–K.4** tablet | Assinado | ✅ 08/06/2026 |
+| 1.3 | Paridade cronômetro (I16) | Script ok | ✅ 08/06 |
+| 1.4 | Paridade HTTP (I15) | Script ok | ✅ 08/06 |
+| 1.5 | Payback Dashboard admin | Assinado | ✅ 08/06/2026 |
+| 1.6 | Tablet **A–F** | Assinado | ✅ 08/06/2026 |
+| 1.7 | F5/F7/F10/F11 + I20 | Homologado | ✅ 08/06/2026 |
 
 **Saída:** Sprint 1 e Sprint 2 (K) **fechados** para operação (08/06/2026).
 
@@ -141,11 +141,11 @@ Objetivo: painel estratégico confiável para o sócio; fechar regras de negóci
 
 | # | Ação | Critério de pronto |
 |---|------|-------------------|
-| 2.1 | Validar aba **INVESTIMENTO** na planilha (B3 inauguração, B4 início payback, B6 total) | Valores batem com realidade (~R$ 65.410) |
-| 2.2 | Responder perguntas **`MEMORIAL_PAYBACK_INVESTIMENTO.md` §10** | Capital de giro, data início, PDF payback |
-| 2.3 | Criar **`DEPLOY_v1.5.63_PAYBACK.md`** (v1.5.62 parse data + v1.5.63 projeção) | Deploy documentado |
-| 2.4 | Atualizar **`DEPLOY_GAS_v1.5.32_AUTH.md`** | Versões e links corretos |
-| 2.5 | (Opcional) Seção Payback no **PDF mensal** | Espelha CTO |
+| 2.1 | Validar aba **INVESTIMENTO** (B4 = **04/2026**; capital giro Entra=S) | ⬜ conferir planilha |
+| 2.2 | Perguntas memorial **§10** | ✅ `DECISAO_PAYBACK_FASE2_2026-06.md` |
+| 2.3 | Relatório Golden sem dados ADM | ✅ GAS **v1.5.68** |
+| 2.4 | Deploy GAS v1.5.68 no editor | ⬜ **você** — Nova versão Web |
+| 2.5 | Payback no PDF Golden | ✅ **não** (decisão sócio) |
 
 ---
 

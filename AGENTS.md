@@ -80,9 +80,9 @@ Fonte de verdade: `mk-version.js`, header do `.gs`, ping GAS.
 
 ## Estado do projeto (08/06/2026)
 
-- **FASE 1:** ✅ fechada (homologação tablet + I.5 + K.3–K.4)
-- **Pacote M:** fechado M.1–M.17 (v1.7.87)
-- **Próximo:** **FASE 2** payback (`MEMORIAL_PAYBACK_INVESTIMENTO.md` §10) → **Pacote L**
+- **FASE 1:** ✅ fechada 08/06
+- **FASE 2:** payback §10 respondido; relatório Golden v1.5.68 (deploy GAS pendente)
+- **Próximo:** validar INVESTIMENTO planilha → **Pacote L**
 
 ## Ao encerrar sessão
 

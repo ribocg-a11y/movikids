@@ -31,6 +31,7 @@
 | Documento | Para quê |
 |-----------|----------|
 | [MEMORIAL_PAYBACK_INVESTIMENTO.md](ativos/MEMORIAL_PAYBACK_INVESTIMENTO.md) | Fórmulas payback |
+| [DECISAO_PAYBACK_FASE2_2026-06.md](ativos/DECISAO_PAYBACK_FASE2_2026-06.md) | Decisões §10 + relatório Golden |
 | [INVESTIMENTO_PAYBACK_TABELA.md](ativos/INVESTIMENTO_PAYBACK_TABELA.md) | Template planilha |
 | [DECISAO_COMUNICACAO_QR_CODE_2026-06.md](ativos/DECISAO_COMUNICACAO_QR_CODE_2026-06.md) | QR portal; F4 pausado |
 | [MAPA_ERROS_FALHAS_BUGS.md](ativos/MAPA_ERROS_FALHAS_BUGS.md) | Índice incidentes I1–I20 |
