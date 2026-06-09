@@ -86,7 +86,7 @@ Fonte de verdade: `mk-version.js`, header do `.gs`, ping GAS.
 
 - **FASE 1–4:** ✅ fechadas
 - **FASE 5:** 🟡 ativa — B1+B2+B8 ✅ · B7 tablet pendente (5.B7.4)
-- **Produção:** FE **v1.7.95** · GAS **v1.5.72** · `main` @ `0e9e47c`
+- **Produção:** FE **v1.7.95** · GAS **v1.5.72** · `main` @ `5a62726`
 - **Próximo:** tablet balcão `?force=1.7.95` + 3× B7 write
 
 ## Ao encerrar sessão

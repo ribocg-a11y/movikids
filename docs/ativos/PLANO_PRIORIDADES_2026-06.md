@@ -51,7 +51,7 @@
 | **Service Worker** | v1.7.95 (`sw.js`) | — | ✅ |
 | **GAS** | **v1.5.72** (header `.gs`) | Ping **v1.5.72** | ✅ |
 | **Deploy ID** | `AKfycbwakQ...` | Mesmo ID | ✅ |
-| **Git main** | `0e9e47c` | `origin/main` alinhado | ✅ |
+| **Git main** | `5a62726` | `origin/main` alinhado | ✅ |
 
 **Teste rápido:** https://ribocg-a11y.github.io/movikids/?force=1.7.95  
 **Ping GAS:** `?action=ping` → `versao: v1.5.72`  
