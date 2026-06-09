@@ -1,6 +1,6 @@
 # FASE 5 — Confiabilidade e APIs
 
-**Status:** 🟡 **ativa** (08/06/2026)  
+**Status:** ✅ **fechada** (09/06/2026 — tablet 5.B7.4 assinado Milena; I21 mock opcional)  
 **Prioridade:** B7 → B1 → B2  
 **Referência:** `PLANO_PRIORIDADES_2026-06.md` § FASE 5
 
@@ -33,7 +33,7 @@ Reduzir divergência entre app e planilha, e garantir que o ciclo **iniciar → 
 | 5.B7.1 | Script `TESTE_B7_REGRESSAO_WRITE.ps1` | Dev | [x] 08/06 |
 | 5.B7.2 | Rodar em produção (janela controlada + cleanup) | Agente | [x] 08/06 |
 | 5.B7.3 | Incluir no protocolo readonly vs write (doc) | Dev | [x] 08/06 |
-| 5.B7.4 | Homologar tablet após mudança em write GAS/FE | Ops | [ ] |
+| 5.B7.4 | Homologar tablet após mudança em write GAS/FE | Ops | [x] **09/06** — Milena; ver `CHECKLIST_FASE5_TABLET.md` |
 
 ### Fluxo coberto (B7)
 
@@ -99,10 +99,21 @@ Reduzir divergência entre app e planilha, e garantir que o ciclo **iniciar → 
 
 ---
 
+### 3× regressão write (09/06/2026)
+
+| Run | Status | GAS | Cleanup |
+|-----|--------|-----|---------|
+| 1/3 | ok | v1.5.72 | 2 anuladas |
+| 2/3 | ok | v1.5.72 | 2 anuladas |
+| 3/3 | ok | v1.5.72 | 2 anuladas |
+
+---
+
 ## Critério para fechar FASE 5
 
-- [ ] B7 baseline **ok** em produção (3 execuções sem falha)  
+- [x] B7 baseline **ok** em produção (3 execuções sem falha) — **09/06/2026**  
 - [x] B1 `resumoDia` em produção + teste readonly ok (08/06)  
 - [x] B2 `kpiMes` em produção + teste readonly ok (08/06)  
 - [x] **B8** idle FE+GAS + teste readonly ok (09/06)  
-- [ ] Tablet balcão `?force=1.7.95` — portal sem ✕ + Hub + Dashboard + mock idle I21 (5.B7.4)
+- [x] Tablet balcão `?force=1.7.95` — portal sem ✕ + smoke write B7 — **09/06 Milena**  
+- [~] Mock idle I21 no tablet — **opcional** (`assets/mock-idle-homolog.html` após push)

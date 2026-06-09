@@ -51,7 +51,7 @@ Continuo o MOVI KIDS. Repo: C:\Users\riboc\Documents\Codex\2026-05-30\files-ment
 
 - Ler: este arquivo → `PLANO_PRIORIDADES` → `ESTADO_ATUAL` → `REGRAS` → `ACESSOS_E_AUTORIZACOES` (§7 = agente vs você)
 - Ignorar handoff antigo em `docs/arquivo/planos/`
-- Informar: FE **v1.7.95**, GAS **v1.5.72** (ping ok) — **FASE 1–4 fechadas**; **FASE 5 ativa** (B1+B2+B8 ✅; pendente tablet 5.B7.4 + 3× B7)
+- Informar: FE **v1.7.95**, GAS **v1.5.72** (ping ok) — **FASE 1–4 fechadas**; **FASE 5 ativa** (B1+B2+B8 ✅; B7 3× write ✅; pendente tablet **5.B7.4** — `CHECKLIST_FASE5_TABLET.md`)
 - Deixar claro: **agente** no **PC** (código, testes, planilha); **você** Nova versão GAS Web; **tablet no balcão** = validação operação (não confundir com seu computador)
 
 ---
@@ -130,7 +130,9 @@ Regra Cursor: `.cursor/rules/handoff-movikids.mdc` § Modo de operação.
 
 **FASE 3–4:** ✅ fechadas 08/06 — Pacote L v1.7.91 + CONFIG planilha validados.
 
-**FASE 5 (ativa):** B7 baseline ok · B1+B2+B8 ✅ (09/06) · FE **v1.7.95** + GAS **v1.5.72** publicados · pendente: tablet **5.B7.4** + 3× `TESTE_B7_REGRESSAO_WRITE` sem falha.
+**FASE 5:** ✅ **FECHADA** 09/06/2026 — B1+B2+B8+B7 · tablet **5.B7.4** assinado (Milena) · I21 mock tablet opcional.
+
+**Próximo passo:** push `assets/mock-idle-homolog.html` (retry idle no tablet) · escolher próxima fase/backlog (B6/B3/B5 ou operação).
 
 **v1.7.95 (09/06):** card **Portal dos pais** fixo na Home — sem botão ✕; modo agente máximo potencial em regras/docs.
 

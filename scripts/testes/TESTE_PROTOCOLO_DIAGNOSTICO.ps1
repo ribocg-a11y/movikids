@@ -89,10 +89,13 @@ try {
 
       try {
         $feRaw = & curl.exe -L -s "https://ribocg-a11y.github.io/movikids/mk-version.js"
+        if ($feRaw.Length -lt 20) {
+          $feRaw = (Invoke-WebRequest -Uri "https://ribocg-a11y.github.io/movikids/mk-version.js" -UseBasicParsing -TimeoutSec 20).Content
+        }
         $repoRaw = Get-Content (Join-Path $root "mk-version.js") -Raw
-        $verPat = 'window\.MK_VERSION\s*=\s*''([^'']+)'''
-        if ($feRaw -match $verPat) { $fePages = $Matches[1] } else { $fePages = "?" }
-        if ($repoRaw -match $verPat) { $feRepo = $Matches[1] } else { $feRepo = "?" }
+        $verPat = "MK_VERSION\s*=\s*'([\d.]+)'"
+        $fePages = if ($feRaw -match $verPat) { $Matches[1] } else { "?" }
+        $feRepo = if ($repoRaw -match $verPat) { $Matches[1] } else { "?" }
         $aligned = ($fePages -eq $feRepo)
         Add-Fase "F0" "FE Pages vs repo" $(if ($aligned) { "ok" } else { "warn" }) "pages=$fePages repo=$feRepo"
       } catch {

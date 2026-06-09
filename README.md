@@ -4,7 +4,7 @@ Sistema operacional para locações — balcão (tablet), portal do responsável
 
 ## Planejamento (09/06/2026)
 
-**FASE 1–4** ✅ fechadas · **FASE 5** Confiabilidade/APIs 🟡 ativa (B1+B2+B8 ✅; tablet 5.B7.4 pendente) · [PLANO_PRIORIDADES](docs/ativos/PLANO_PRIORIDADES_2026-06.md)
+**FASE 1–5** ✅ fechadas · Operação **v1.7.95** / GAS **v1.5.72** · [PLANO_PRIORIDADES](docs/ativos/PLANO_PRIORIDADES_2026-06.md)
 
 ## Produção (09/06/2026 — verificado)
 

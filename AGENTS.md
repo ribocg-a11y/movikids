@@ -85,9 +85,9 @@ Fonte de verdade: `mk-version.js`, header do `.gs`, ping GAS.
 ## Estado do projeto (09/06/2026)
 
 - **FASE 1–4:** ✅ fechadas
-- **FASE 5:** 🟡 ativa — B1+B2+B8 ✅ · B7 tablet pendente (5.B7.4)
-- **Produção:** FE **v1.7.95** · GAS **v1.5.72** · `main` @ `5a62726`
-- **Próximo:** tablet balcão `?force=1.7.95` + 3× B7 write
+- **FASE 5:** ✅ fechada 09/06 — tablet Milena · I21 mock opcional
+- **Produção:** FE **v1.7.95** · GAS **v1.5.72**
+- **Próximo:** push mock-idle Pages · backlog B6/B3/B5 sob demanda
 
 ## Ao encerrar sessão
 

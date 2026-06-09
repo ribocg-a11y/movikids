@@ -16,6 +16,7 @@
 | [PACOTE_M_MODULARIZACAO.md](ativos/PACOTE_M_MODULARIZACAO.md) | Modularização FE — **M.1–M.17 ✅ fechado** (v1.7.87) |
 | [PACOTE_L_UX_POLISH.md](ativos/PACOTE_L_UX_POLISH.md) | **FASE 3** Pacote L (v1.7.91) |
 | [CHECKLIST_PACOTE_L.md](ativos/CHECKLIST_PACOTE_L.md) | Homologação tablet Pacote L |
+| [CHECKLIST_FASE5_TABLET.md](ativos/CHECKLIST_FASE5_TABLET.md) | Homologação tablet FASE 5 (5.B7.4 + idle I21) |
 | [FASE_4_CONFIG_PLANILHA.md](ativos/FASE_4_CONFIG_PLANILHA.md) | FASE 4 ✅ CONFIG JSON |
 | [CONFIG_OPERACIONAL_TEMPLATE.md](ativos/CONFIG_OPERACIONAL_TEMPLATE.md) | Template JSON frota/preços |
 | [FASE_5_CONFIABILIDADE_APIS.md](ativos/FASE_5_CONFIABILIDADE_APIS.md) | **FASE 5 ativa** — B7, B1, B2, **B8** |

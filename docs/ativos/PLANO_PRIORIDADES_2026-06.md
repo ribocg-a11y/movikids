@@ -16,7 +16,7 @@
 | **FASE 2** Payback negócio | ✅ fechada | 08/06/2026 (INVESTIMENTO + GAS v1.5.69) |
 | **FASE 3** Pacote L | ✅ fechada | 08/06/2026 (FE **v1.7.91** validado) |
 | **FASE 4** CONFIG planilha | ✅ fechada | 08/06/2026 (`FASE_4_CONFIG_PLANILHA.md`) |
-| **FASE 5** Confiabilidade/APIs | 🟡 **ativa** | 08/06/2026 (`FASE_5_CONFIABILIDADE_APIS.md`) |
+| **FASE 5** Confiabilidade/APIs | ✅ **fechada** | 09/06/2026 (`CHECKLIST_FASE5_TABLET.md` Milena) |
 
 ### FASE 0 — checklist
 
@@ -35,7 +35,7 @@
 | 0.10 | `ACESSOS_E_AUTORIZACOES.md` + planilha OAuth (`google-drive-sheets-auth`) | ✅ 07/06 |
 | 0.11 | `MAPA_CODIGO_ARQUITETURA.md` — anatomia e chaves mestras | ✅ 07/06 |
 
-**Próximo passo imediato:** tablet balcão `?force=1.7.95` (portal sem ✕ + 5.B7.4 + mock idle I21) + 3× `TESTE_B7_REGRESSAO_WRITE` sem falha · fechar FASE 5.
+**Próximo passo imediato:** operação estável v1.7.95 · retry idle I21 opcional via `assets/mock-idle-homolog.html` (após push) · backlog FASE 5+ (B6/B3/B5) só com pedido explícito.
 
 **FASE 1 fechada 08/06/2026:** I.5 assinado · K.3–K.4 tablet · checklist A–F · payback Dashboard · tablet v1.7.87. Sprint 1 + Sprint 2 (K) declarados fechados.
 
