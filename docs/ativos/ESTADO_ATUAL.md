@@ -27,8 +27,8 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 | Camada | Versão alvo | URL / ID |
 |--------|-------------|----------|
-| **Frontend** | **v1.7.97** | https://ribocg-a11y.github.io/movikids/?force=1.7.97 |
-| **Apps Script** | **v1.5.73** | Deploy `DEPLOY_v1.5.73_P3_BACKLOG.md` · Deploy ID `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y` |
+| **Frontend** | **v1.7.98** | https://ribocg-a11y.github.io/movikids/?force=1.7.98 |
+| **Apps Script** | **v1.5.74** | `DEPLOY_v1.5.74_B6_PIN_ADMIN.md` · Deploy ID `AKfycbwakQ...` |
 | SMS Gateway Cloud | **DJVJRL** / device `wihWegHr4wXaVJQ1R-GZR` | Aparelho remoto ONLINE |
 | Pacote SMS P0 | **FECHADO** | `PACOTE_SMS_P0_UNIFICADO_v1.5.38_v1.7.11.md` |
 | Planilha | MOVIKIDS_Planilha_Base | https://docs.google.com/spreadsheets/d/1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618/edit — auditoria `AUDITORIA_PLANILHA_BASE_2026-06-06.md` |

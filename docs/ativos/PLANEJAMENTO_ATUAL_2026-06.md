@@ -1,7 +1,7 @@
 # MOVI KIDS — Planejamento atual (pós-FASE 5)
 
 **Atualizado:** 09/06/2026  
-**Produção:** FE **v1.7.97** · GAS **v1.5.73** · Git `main` @ `9efa30a`  
+**Produção:** FE **v1.7.98** · GAS **v1.5.74** · Git `main` (P2 pendente push)  
 **Documentos irmãos:** `PLANO_PRIORIDADES_2026-06.md` · `PLANO_CONTINUIDADE_2026-06.md` · `HANDOFF_NOVO_CHAT.md`
 
 ---
@@ -25,6 +25,7 @@ Ciclo **FASE 0–5 concluído** (07–09/06/2026). Sistema em **operação madur
 | **4** CONFIG | 08/06 | Frota/preços na planilha sem redeploy | `FASE_4_CONFIG_PLANILHA.md` |
 | **5** Confiabilidade | 09/06 | B7+B1+B2+B8, tablet Milena, I21 v1.7.96 | `CHECKLIST_FASE5_TABLET.md` |
 | **P3** Backlog produto | 09/06 | B3+B4+B5+N2, CRM recorrente | `DEPLOY_v1.5.73_P3_BACKLOG.md` |
+| **P2** Backlog técnico | 09/06 | B6 PIN GAS, CI, F10, schema | `DEPLOY_v1.5.74_B6_PIN_ADMIN.md` · `.github/workflows/ci.yml` |
 
 ### Pacotes históricos fechados (pré-fases)
 
@@ -54,14 +55,14 @@ Legenda: **P0** bloqueia operação · **P1** valor imediato · **P2** próximo 
 | **O3** | Ping GAS após qualquer deploy `.gs` | 1 min |
 | **O4** | QR portal fixo na mesa (decisão QR) | Ops |
 
-### P2 — Backlog técnico (FASE 5 remanescente + qualidade)
+### P2 — Backlog técnico — ✅ fechado 09/06/2026
 
-| ID | Item | Valor | Esforço |
-|----|------|-------|---------|
-| **B6** | PIN admin só via GAS (T4) | Segurança | médio |
-| **Q1** | GitHub Actions (CI remoto espelhando pre-push) | Confiança deploy | médio |
-| **Q2** | Teste F10 duas abas físicas (sync multi-canal) | Cobertura protocolo | baixo |
-| **Q3** | Reauditoria planilha trimestral | Dados limpos | baixo |
+| ID | Item | Status |
+|----|------|--------|
+| **B6** | PIN admin só via GAS (T4) | ✅ v1.5.74 + FE v1.7.98 |
+| **Q1** | GitHub Actions CI | ✅ `.github/workflows/ci.yml` |
+| **Q2** | Teste F10 duas leituras sync | ✅ `TESTE_F10_DUAS_ABAS.ps1` |
+| **Q3** | Reauditoria planilha readonly | ✅ `TESTE_REAUDITORIA_PLANILHA.ps1` |
 
 ### P3 — Backlog produto — ✅ fechado 09/06/2026
 

@@ -86,10 +86,10 @@ Regra Cursor: `.cursor/rules/handoff-movikids.mdc` § Modo de operação.
 
 | Camada | Versão | Verificação |
 |--------|--------|-------------|
-| **Frontend** | **v1.7.97** | `mk-version.js` → `window.MK_VERSION` |
-| **Service Worker** | **1.7.97** | `sw.js` → `SW_VERSION` |
-| **Apps Script** | **v1.5.73** | [ping](https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec?action=ping) → `versao` |
-| **App tablet balcão** | v1.7.97 | https://ribocg-a11y.github.io/movikids/?force=1.7.97 (**na loja**, não só no PC) |
+| **Frontend** | **v1.7.98** | `mk-version.js` → `window.MK_VERSION` |
+| **Service Worker** | **1.7.98** | `sw.js` → `SW_VERSION` |
+| **Apps Script** | **v1.5.74** | [ping](https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec?action=ping) → `versao` |
+| **App tablet balcão** | v1.7.98 | https://ribocg-a11y.github.io/movikids/?force=1.7.98 (**na loja**, não só no PC) |
 
 **Deploy ID GAS (único — nunca criar outro):** `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y`
 
@@ -136,7 +136,7 @@ Regra Cursor: `.cursor/rules/handoff-movikids.mdc` § Modo de operação.
 
 **v1.7.97 (09/06):** auditoria por operador, PDF executivo, export caixa WA/email, badge CRM recorrente.
 
-**Próximo passo:** operação estável v1.7.97 · B7 semanal · backlog **P2** (B6, Q1…) — **`PLANEJAMENTO_ATUAL_2026-06.md`**.
+**Próximo passo:** operação estável v1.7.98 · B7 semanal · **P2 fechado** — aguarda Nova versão GAS v1.5.74
 
 **Últimos commits (main = origin):**
 
@@ -242,7 +242,7 @@ Guia completo: `DEPLOY_GAS_v1.5.32_AUTH.md`
 | **P3** Backlog produto | ✅ **fechado** | 09/06 — v1.7.97 / v1.5.73 |
 | **Tablet balcão** | v1.7.97 | `?force=1.7.97` |
 | GAS ping produção | **v1.5.73** — **não criar novo Deploy** |
-| **B6 / Q1** | Backlog **P2** (próximo ciclo técnico) |
+| **B6 / Q1** | ✅ P2 fechado 09/06 — CI + PIN via GAS |
 
 ---
 

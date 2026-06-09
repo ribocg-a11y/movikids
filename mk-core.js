@@ -50,7 +50,10 @@ function apiParamsComAuth_() {
   const isAdm = (typeof mkAuthIsAdmin === 'function' && mkAuthIsAdmin()) || !!window.isAdmin;
   if (isAdm) {
     if (typeof mkAuthAdminPinParams_ === 'function') Object.assign(out, mkAuthAdminPinParams_());
-    else { out.adminPin = '1416'; out.authRole = 'admin'; }
+    else {
+      const pin = typeof mkAuthGetAdminPin_ === 'function' ? mkAuthGetAdminPin_() : '';
+      if (pin) { out.adminPin = pin; out.authRole = 'admin'; }
+    }
   }
   return out;
 }

@@ -10,8 +10,8 @@ Sistema operacional para locações — balcão (tablet), portal do responsável
 
 | Camada | Versão |
 |--------|--------|
-| Frontend | **v1.7.97** — https://ribocg-a11y.github.io/movikids/?force=1.7.97 |
-| Apps Script | **v1.5.73** — ping ok (`DEPLOY_v1.5.73_P3_BACKLOG.md`) |
+| Frontend | **v1.7.98** — https://ribocg-a11y.github.io/movikids/?force=1.7.98 |
+| Apps Script | **v1.5.74** — ping ok (`DEPLOY_v1.5.74_B6_PIN_ADMIN.md`) |
 | Git `main` | `9efa30a` — alinhado com `origin/main` |
 
 ## Novo chat / agente Cursor

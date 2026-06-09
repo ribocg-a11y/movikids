@@ -188,7 +188,7 @@ Objetivo: balcão mais rápido; menos ruído visual. **Próximo pacote de featur
 | B1 | `resumoDia` | ✅ |
 | B2 | `kpiMes` | ✅ |
 | B8 | Idle I21 + v1.7.96 splash | ✅ |
-| B6 | PIN admin só GAS | ⬜ backlog P2 |
+| B6 | PIN admin só GAS | ✅ 09/06 P2 |
 | B3 | Auditoria UI operador | ✅ 09/06 P3 |
 | B5 | PDF executivo | ✅ 09/06 P3 |
 | B4 | Export caixa WA/email | ✅ 09/06 P3 |

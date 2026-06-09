@@ -230,6 +230,31 @@ try {
     Add-Check "guard.turno.chip" "fail" "index.html ausente"
   }
 
+  $b6Fail = $false
+  $b6Detail = @()
+  foreach ($f in @('mk-admin.js', 'mk-auth.js', 'mk-core.js')) {
+    $fp = Join-Path $root $f
+    if (-not (Test-Path $fp)) { continue }
+    $rawB6 = Get-Content -Path $fp -Raw -Encoding UTF8
+    if ($rawB6 -match "ADMIN_PIN\s*=\s*['\`"]1416['\`"]" -or $rawB6 -match "adminPin:\s*['\`"]1416['\`"]") {
+      $b6Fail = $true
+      $b6Detail += $f
+    }
+  }
+  $authB6 = Join-Path $root 'mk-auth.js'
+  if (Test-Path $authB6) {
+    $authB6Raw = Get-Content -Path $authB6 -Raw -Encoding UTF8
+    if ($authB6Raw -notmatch 'mkAuthStoreAdminPin_') {
+      $b6Fail = $true
+      $b6Detail += 'mkAuthStoreAdminPin_ ausente'
+    }
+  }
+  if ($b6Fail) {
+    Add-Check "guard.b6.pin-gas" "fail" ($b6Detail -join ', ')
+  } else {
+    Add-Check "guard.b6.pin-gas" "ok" "sem PIN 1416 hardcoded no FE"
+  }
+
   if (-not $SkipNetworkTests) {
     $testDir = Join-Path $root "scripts\testes"
     $paridade = Join-Path $testDir "TESTE_PARIDADE_HTTP_BROWSER_GAS.ps1"

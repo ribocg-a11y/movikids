@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.73
+// MOVI KIDS — Google Apps Script v1.5.74
+// v1.5.74: B6 — adminPinOk_ via Script Property ADMIN_PIN; isAdminRequest_ exige PIN valido
 // v1.5.73: P3 — listarAuditoriaAdmin; PDF executivo (Golden+payback); recorrente no CRM
 // v1.5.72: sessão operador — idle 1h (lastActivityAt) + touchSessaoOperador; auto logout_inatividade
 // v1.5.71: B2 kpiMes — Dashboard via buildKpiMesPayload_ (alias buscarKPIsAdmin)
@@ -367,9 +368,9 @@ function ping_() {
   const agora = new Date();
   return resp_({
     status:  'online',
-    versao:  'v1.5.73',
+    versao:  'v1.5.74',
     timestamp: fmtData_(agora) + ' ' + fmtHoraLocal_(agora),
-    sistema: 'MOVI KIDS v1.5.73',
+    sistema: 'MOVI KIDS v1.5.74',
     postWriteActions: WRITE_ACTIONS_CRITICAS_
   });
 }
@@ -4409,14 +4410,21 @@ function hashPin_(pin, salt) {
   return Utilities.base64Encode(digest);
 }
 
-function adminPinOk_(p) {
-  return pinDigits_(p && p.adminPin) === ADMIN_PIN_PLAIN;
+function adminPinPlain_() {
+  try {
+    const prop = PropertiesService.getScriptProperties().getProperty('ADMIN_PIN');
+    if (prop && String(prop).trim()) return pinDigits_(prop);
+  } catch (e) { Logger.log('adminPinPlain_: ' + e.message); }
+  return ADMIN_PIN_PLAIN;
 }
 
-/** Sessao admin (authRole) ou PIN 1416 na requisicao. */
+function adminPinOk_(p) {
+  return pinDigits_(p && p.adminPin) === adminPinPlain_();
+}
+
+/** Sessao admin — PIN validado no servidor (B6). authRole sozinho nao basta. */
 function isAdminRequest_(p) {
   if (!p) return false;
-  if (String(p.authRole || '').trim().toLowerCase() === 'admin') return true;
   return adminPinOk_(p);
 }
 

@@ -1,0 +1,36 @@
+# Q1 — CI remoto espelhando pre-push-check + testes readonly
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  pre-push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Pre-push check (guards + versao)
+        shell: pwsh
+        run: ./scripts/pre-push-check.ps1 -SkipNetworkTests
+
+      - name: B6 login admin readonly
+        shell: pwsh
+        env:
+          MK_ADMIN_PIN: ${{ secrets.MK_ADMIN_PIN }}
+        run: ./scripts/testes/TESTE_B6_LOGIN_ADMIN_READONLY.ps1
+
+      - name: P3 readonly
+        shell: pwsh
+        run: ./scripts/testes/TESTE_P3_READONLY.ps1
+
+      - name: F10 duas leituras (sync)
+        shell: pwsh
+        run: ./scripts/testes/TESTE_F10_DUAS_ABAS.ps1
+
+      - name: Reauditoria planilha (schema)
+        shell: pwsh
+        run: ./scripts/testes/TESTE_REAUDITORIA_PLANILHA.ps1

@@ -5,6 +5,7 @@
   const AUTH_ACTIVITY_KEY = 'mk_auth_last_activity';
   const AUTH_IDLE_MS = 60 * 60 * 1000;
   const AUTH_TOUCH_GAS_MS = 3 * 60 * 1000;
+  const ADMIN_PIN_SESS_KEY = 'mk_admin_pin_sess_v1';
 
   let selectedOp = null;
   let _lastGasTouchAt = 0;
@@ -104,10 +105,29 @@
   }
   window.mkHasLocacaoAbertaNoTablet_ = mkHasLocacaoAbertaNoTablet_;
 
+  window.mkAuthStoreAdminPin_ = function (pin) {
+    try {
+      const d = pinDigits_(pin);
+      if (d.length === 4) sessionStorage.setItem(ADMIN_PIN_SESS_KEY, d);
+    } catch (e) { /* ignore */ }
+  };
+
+  window.mkAuthClearAdminPin_ = function () {
+    try { sessionStorage.removeItem(ADMIN_PIN_SESS_KEY); } catch (e) { /* ignore */ }
+  };
+
+  window.mkAuthGetAdminPin_ = function () {
+    try { return sessionStorage.getItem(ADMIN_PIN_SESS_KEY) || ''; } catch (e) { return ''; }
+  };
+
+  function pinDigits_(v) {
+    return String(v || '').replace(/\D/g, '').slice(0, 4);
+  }
+
   window.mkAuthReleaseBalcaoServer_ = async function mkAuthReleaseBalcaoServer_(opts) {
     opts = opts || {};
     const s = getSession();
-    const pinParams = typeof mkAuthAdminPinParams_ === 'function' ? mkAuthAdminPinParams_() : { adminPin: '1416' };
+    const pinParams = typeof mkAuthAdminPinParams_ === 'function' ? mkAuthAdminPinParams_() : {};
     const srv = sessaoAtivaRemota;
     const preferAdmin = !!(opts.preferAdmin || opts.inatividade || window.isAdmin ||
       (s && s.role === 'admin') || (srv && srv.nome));
@@ -432,6 +452,7 @@
   window.mkAuthExitAdmin_ = function mkAuthExitAdmin_() {
     const s = getSession();
     if (s && s.role === 'admin') {
+      if (typeof mkAuthClearAdminPin_ === 'function') mkAuthClearAdminPin_();
       clearSession();
       selectedOp = null;
       sessaoAtivaRemota = null;
@@ -713,7 +734,7 @@
     if (_authBusy) return;
     const pin = readPins(adminPins);
     if (pin.length !== 4) {
-      showErr('mk-admin-err', 'Digite os 4 numeros do PIN administrativo (1416).');
+      showErr('mk-admin-err', 'Digite os 4 digitos do PIN administrativo.');
       return;
     }
     const btn = document.getElementById('mk-btn-admin-login');
@@ -727,6 +748,7 @@
         clearPins(adminPins);
         return;
       }
+      if (typeof mkAuthStoreAdminPin_ === 'function') mkAuthStoreAdminPin_(pin);
       applySessaoAtivaFromApi_(d);
       await finishLogin_(d.operador, 'admin', d);
     } catch (e) {
@@ -898,7 +920,9 @@
   };
 
   window.mkAuthAdminPinParams_ = function () {
-    const p = { adminPin: '1416' };
+    const pin = typeof mkAuthGetAdminPin_ === 'function' ? mkAuthGetAdminPin_() : '';
+    const p = {};
+    if (pin) p.adminPin = pin;
     if (mkAuthIsAdmin()) p.authRole = 'admin';
     return p;
   };
@@ -922,7 +946,7 @@
       btn.textContent = 'Liberando...';
     });
     try {
-      const pinParams = typeof mkAuthAdminPinParams_ === 'function' ? mkAuthAdminPinParams_() : { adminPin: '1416' };
+      const pinParams = typeof mkAuthAdminPinParams_ === 'function' ? mkAuthAdminPinParams_() : {};
       const d = await apiCall(Object.assign({
         action: 'liberarSessaoOperadorAdmin',
         _t: Date.now()
@@ -963,7 +987,7 @@
   window.mkOpDeslogarBalcao = async function mkOpDeslogarBalcao(id, nome) {
     fecharMenusOperador_();
     if (!confirm('Deslogar ' + nome + ' do balcao?\n\nLibera a sessao para outro operador entrar.')) return;
-    const pinParams = typeof mkAuthAdminPinParams_ === 'function' ? mkAuthAdminPinParams_() : { adminPin: '1416' };
+    const pinParams = typeof mkAuthAdminPinParams_ === 'function' ? mkAuthAdminPinParams_() : {};
     try {
       let d = await apiCall(Object.assign({
         action: 'liberarSessaoOperador',
@@ -1094,16 +1118,12 @@
     fecharMenusOperador_();
     if (!confirm('Resetar PIN de ' + nome + '?\n\nNo proximo login sera necessario criar um PIN novo.')) return;
     try {
-      const d = await apiCall({
-        action: 'resetarPinOperadorAdmin',
-        operadorId: id,
-        adminPin: '1416'
-      });
+      const d = await opAdminApi_('resetarPinOperadorAdmin', { operadorId: id });
       if (!d || !d.ok) {
         const msg = (d && d.erro) || 'Acao indisponivel no servidor';
         const hint = msg.indexOf('desconhecida') >= 0
           ? '\n\nO Apps Script precisa ser v1.5.32+ (resetarPinOperadorAdmin). Abra o ping e confira a versao.'
-          : '\n\nConfirme PIN admin 1416 e que o GAS foi reimplantado.';
+          : '\n\nFaca login admin de novo (PIN validado no servidor).';
         toast(msg, 'error');
         alert('Nao foi possivel resetar o PIN:\n' + msg + hint);
         return;
@@ -1141,7 +1161,7 @@
     const el = document.getElementById('mk-admin-ops-list');
     if (!el) return;
     try {
-      const pinParams = typeof mkAuthAdminPinParams_ === 'function' ? mkAuthAdminPinParams_() : { adminPin: '1416' };
+      const pinParams = typeof mkAuthAdminPinParams_ === 'function' ? mkAuthAdminPinParams_() : {};
       const d = await apiCall(Object.assign({ action: 'listarOperadoresAdmin', _t: Date.now() }, pinParams), 30000);
       if (!d.ok) {
         el.innerHTML = '<p style="color:var(--red)">' + escapeHtml_(d.erro || 'Erro') + '</p>';

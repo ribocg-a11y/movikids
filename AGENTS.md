@@ -55,8 +55,8 @@ Detalhe completo: [`ACESSOS_E_AUTORIZACOES.md`](docs/ativos/ACESSOS_E_AUTORIZACO
 
 | Camada | Versão |
 |--------|--------|
-| Frontend | **v1.7.97** |
-| GAS | **v1.5.73** |
+| Frontend | **v1.7.98** |
+| GAS | **v1.5.74** |
 | Deploy ID | `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y` |
 
 Fonte de verdade: `mk-version.js`, header do `.gs`, ping GAS.

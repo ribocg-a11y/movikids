@@ -10,7 +10,6 @@ var kpiData         = null;
 var resumoDiaHoje   = null;
 let chartsRendered  = false;
 var chartDiario=null,chartExtrasDia=null,chartHistExt=null,chartHoras=null;
-const ADMIN_PIN     = '1416';
 let pinBuffer       = '';
 
 // ── PIN ──────────────────────────────────────────────────────
@@ -58,14 +57,29 @@ function atualizarDots(erro) {
 }
 
 function verificarPin() {
-  if (pinBuffer === ADMIN_PIN) {
-    fecharPin();
-    adminLogin();
-  } else {
-    atualizarDots(true);
-    navigator.vibrate && navigator.vibrate([80,40,80]);
-    setTimeout(() => { pinBuffer=''; atualizarDots(); }, 800);
-  }
+  const pin = pinBuffer;
+  if (pin.length !== 4) return;
+  pinBuffer = '';
+  atualizarDots();
+  (async function () {
+    try {
+      const d = await api({ action: 'loginAdmin', adminPin: pin }, 20000);
+      if (d.ok) {
+        if (typeof mkAuthStoreAdminPin_ === 'function') mkAuthStoreAdminPin_(pin);
+        fecharPin();
+        adminLogin();
+      } else {
+        atualizarDots(true);
+        navigator.vibrate && navigator.vibrate([80, 40, 80]);
+        setTimeout(() => { pinBuffer = ''; atualizarDots(); }, 800);
+        toast(d.erro || 'PIN administrativo incorreto', 'error');
+      }
+    } catch (e) {
+      atualizarDots(true);
+      setTimeout(() => { pinBuffer = ''; atualizarDots(); }, 800);
+      toast(e.message || 'Sem conexão', 'error');
+    }
+  })();
 }
 
 function wireAdminIdleListeners_() {

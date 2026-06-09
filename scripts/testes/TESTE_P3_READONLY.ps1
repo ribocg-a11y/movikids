@@ -6,7 +6,7 @@ $pin = '1416'
 Write-Host '=== ping ===' -ForegroundColor Cyan
 $p = Invoke-RestMethod -Uri "$base`?action=ping" -Method Get -TimeoutSec 20
 Write-Host "versao=$($p.versao) ok=$($p.ok)"
-if ($p.versao -ne 'v1.5.73') { Write-Warning 'Esperado v1.5.73 — publique Nova versao Web se necessario' }
+if ($p.versao -notmatch 'v1\.5\.7[34]') { Write-Warning "Esperado v1.5.74+ — publique Nova versao Web se necessario" }
 
 Write-Host '=== listarAuditoriaAdmin ===' -ForegroundColor Cyan
 $a = Invoke-RestMethod -Uri "$base`?action=listarAuditoriaAdmin&adminPin=$pin&limite=5" -Method Get -TimeoutSec 30
