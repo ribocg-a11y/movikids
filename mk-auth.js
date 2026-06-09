@@ -341,6 +341,7 @@
     clearSession();
     selectedOp = null;
     if (typeof mobMenuClose_ === 'function') mobMenuClose_();
+    hideSplash_();
     showGate(true);
     hideApp();
     showStep('mk-step-select');
@@ -382,6 +383,13 @@
       }
     });
     setInterval(checkAuthIdle_, 60000);
+  }
+
+  function hideSplash_() {
+    const splash = document.getElementById('splash');
+    if (!splash) return;
+    splash.classList.add('hide');
+    splash.classList.add('gone');
   }
 
   function hideApp() {
@@ -427,6 +435,7 @@
       clearSession();
       selectedOp = null;
       sessaoAtivaRemota = null;
+      hideSplash_();
       showGate(true);
       hideApp();
       showStep('mk-step-select');
@@ -742,7 +751,7 @@
     const splash = document.getElementById('splash');
     if (splash) {
       splash.classList.add('hide');
-      splash.classList.add('gone');
+      setTimeout(() => splash.classList.add('gone'), 550);
     }
     showGate(false);
     const app = document.getElementById('app');
@@ -832,6 +841,7 @@
         } catch (e) { /* offline */ }
         clearSession();
         hideApp();
+        hideSplash_();
         showGate(true);
         showStep('mk-step-select');
         try { await loadOperadores(); } catch (e) { renderOpList(false); }
