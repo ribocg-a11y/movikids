@@ -140,6 +140,7 @@ Regra Cursor: `.cursor/rules/handoff-movikids.mdc` § Modo de operação.
 
 | Hash | Entrega |
 |------|---------|
+| `a56c3ed` | Docs handoff — hash main alinhado |
 | `5a62726` | Docs handoff pronto para novo chat |
 | `0e9e47c` | v1.7.95 — portal fixo + modo agente |
 | `097aea6` | Docs modelo operacional PC vs tablet |
@@ -261,7 +262,7 @@ Não criar novo handoff datado — manter **só este** em `docs/ativos/`.
 
 | Check | Resultado |
 |-------|-----------|
-| `git status` | `main` = `origin/main` @ `5a62726` |
+| `git status` | `main` = `origin/main` @ `a56c3ed` |
 | Ping GAS | **v1.5.72** ok |
 | GitHub Pages | **v1.7.95** ok (`mk-version.js`) |
 | `pre-push-check.ps1` | ok (27 checks) |
