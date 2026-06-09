@@ -1,7 +1,7 @@
 # MOVI KIDS — Planejamento atual (pós-FASE 5)
 
 **Atualizado:** 09/06/2026  
-**Produção:** FE **v1.7.96** · GAS **v1.5.72** · Git `main` @ `91cc08f`  
+**Produção:** FE **v1.7.97** · GAS **v1.5.73** · Git `main` @ `9efa30a`  
 **Documentos irmãos:** `PLANO_PRIORIDADES_2026-06.md` · `PLANO_CONTINUIDADE_2026-06.md` · `HANDOFF_NOVO_CHAT.md`
 
 ---
@@ -24,6 +24,7 @@ Ciclo **FASE 0–5 concluído** (07–09/06/2026). Sistema em **operação madur
 | **3** Pacote L | 08/06 | UX polish + QR balcão v1.7.91 | `CHECKLIST_PACOTE_L.md` |
 | **4** CONFIG | 08/06 | Frota/preços na planilha sem redeploy | `FASE_4_CONFIG_PLANILHA.md` |
 | **5** Confiabilidade | 09/06 | B7+B1+B2+B8, tablet Milena, I21 v1.7.96 | `CHECKLIST_FASE5_TABLET.md` |
+| **P3** Backlog produto | 09/06 | B3+B4+B5+N2, CRM recorrente | `DEPLOY_v1.5.73_P3_BACKLOG.md` |
 
 ### Pacotes históricos fechados (pré-fases)
 
@@ -39,7 +40,7 @@ Legenda: **P0** bloqueia operação · **P1** valor imediato · **P2** próximo 
 
 | Item | Ação | Responsável |
 |------|------|-------------|
-| Tablet em versão antiga | Manter `?force=1.7.96` no PWA balcão | Ops |
+| Tablet em versão antiga | Manter `?force=1.7.97` no PWA balcão | Ops |
 | POST no browser (I15) | Nunca reintroduzir | Dev |
 | Deploy ID GAS | Só Nova versão Web — nunca `clasp deploy` | Dev/Ops |
 | Regressão I20 cronômetro | Antes de mexer em timer: `TESTE_I20_COMPLETO_PROD.ps1` | Dev |
@@ -62,15 +63,15 @@ Legenda: **P0** bloqueia operação · **P1** valor imediato · **P2** próximo 
 | **Q2** | Teste F10 duas abas físicas (sync multi-canal) | Cobertura protocolo | baixo |
 | **Q3** | Reauditoria planilha trimestral | Dados limpos | baixo |
 
-### P3 — Backlog produto (negócio)
+### P3 — Backlog produto — ✅ fechado 09/06/2026
 
-| ID | Item | Valor | Esforço |
-|----|------|-------|---------|
-| **B3** | Auditoria UI filtrada por operador | Gestão | médio |
-| **B5** | PDF resumo executivo mensal (Pacote I-b) | Shopping/sócio | médio |
-| **B4** | Export fechamento WhatsApp/e-mail | Comunicação | opcional |
-| **N1** | Recorrência CRM em uso diário (treino operadores) | Retenção | ops |
-| **N2** | Relatório Golden + payback num único PDF | Gestão | médio |
+| ID | Item | Status |
+|----|------|--------|
+| **B3** | Auditoria UI filtrada por operador | ✅ v1.5.73 + Sistema admin |
+| **B5** | PDF resumo executivo mensal | ✅ Golden + payback (`executivo`) |
+| **B4** | Export fechamento WhatsApp/e-mail | ✅ Caixa do dia |
+| **N2** | Relatório Golden + payback num PDF | ✅ (mesmo que B5) |
+| **N1** | Recorrência CRM — treino operadores | 🟡 badge **Recorrente** no app; treino ops pendente |
 
 ### P4 — Pausado (não iniciar)
 
@@ -85,16 +86,16 @@ Legenda: **P0** bloqueia operação · **P1** valor imediato · **P2** próximo 
 
 ### Curto prazo (jun–jul 2026)
 
-1. **Manter tablet em v1.7.96** — fix splash idle; homologação assinada.
+1. **Manter tablet em v1.7.97** — P3 admin no PC; balcão operacional v1.7.96+ ok.
 2. **Rotina B7 semanal** — detectar regressão write antes do operador.
 3. **Cartaz QR** — impresso e treinamento “escaneie + DDD” (`DECISAO_COMUNICACAO_QR_CODE_2026-06.md`).
 4. **B6 PIN admin via GAS** — reduzir PIN 1416 hardcoded no FE.
 
 ### Médio prazo (ago–set 2026)
 
-5. **PDF executivo** (B5) — Dashboard + payback + Golden para o shopping.
+5. ~~**PDF executivo** (B5)~~ — ✅ 09/06 v1.5.73.
 6. **CI GitHub Actions** — bloquear merge se pre-push falhar.
-7. **Auditoria por operador** (B3) — transparência cancelamentos/edições.
+7. ~~**Auditoria por operador** (B3)~~ — ✅ 09/06.
 8. **Reavaliar F4** — só se SMS manual comprovado estável 30 dias.
 
 ### Longo prazo (out–dez 2026)
@@ -112,7 +113,7 @@ Legenda: **P0** bloqueia operação · **P1** valor imediato · **P2** próximo 
 | Novo chat Cursor | `HANDOFF_NOVO_CHAT.md` | Mensagem mínima |
 | Publicar FE | `REGRAS_DE_PUBLICACAO_SEGURA.md` | `pre-push-check` → push |
 | Publicar GAS | `DEPLOY_GAS_v1.5.32_AUTH.md` | Nova versão Web |
-| Testar deploy | `PROTOCOLO_DIAGNOSTICO_E_TESTES.md` | `TESTE_PROTOCOLO_DIAGNOSTICO.ps1` |
+| Testar deploy | `PROTOCOLO_DIAGNOSTICO_E_TESTES.md` | `TESTE_PROTOCOLO_DIAGNOSTICO.ps1` · P3: `TESTE_P3_READONLY.ps1` |
 | Homologação tablet | `HOMOLOGACAO_PRODUCAO_ASSISTIDA.md` | Checklists K/L/FASE5 |
 | Mock idle homolog | `assets/mock-idle-homolog.html` | HTTPS mesmo domínio |
 | Incidente novo | `MAPA_ERROS_FALHAS_BUGS.md` | + `docs/arquivo/incidentes/` |
@@ -124,6 +125,7 @@ Legenda: **P0** bloqueia operação · **P1** valor imediato · **P2** próximo 
 
 | Hash | Data | Entrega |
 |------|------|---------|
+| `9efa30a` | 09/06 | **P3** — GAS v1.5.73 + FE v1.7.97 (auditoria, PDF executivo, caixa WA/email, CRM) |
 | `91cc08f` | 09/06 | **v1.7.96** — fix splash idle boot (I21) |
 | `8173d10` | 09/06 | FASE 5 docs + mock-idle Pages |
 | `0e9e47c` | 09/06 | v1.7.95 — portal fixo Home |

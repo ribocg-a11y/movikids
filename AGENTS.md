@@ -55,8 +55,8 @@ Detalhe completo: [`ACESSOS_E_AUTORIZACOES.md`](docs/ativos/ACESSOS_E_AUTORIZACO
 
 | Camada | Versão |
 |--------|--------|
-| Frontend | **v1.7.96** |
-| GAS | **v1.5.72** (publicar Nova versão Web) |
+| Frontend | **v1.7.97** |
+| GAS | **v1.5.73** |
 | Deploy ID | `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y` |
 
 Fonte de verdade: `mk-version.js`, header do `.gs`, ping GAS.
@@ -86,7 +86,8 @@ Fonte de verdade: `mk-version.js`, header do `.gs`, ping GAS.
 
 - **FASE 1–4:** ✅ fechadas
 - **FASE 5:** ✅ fechada 09/06 — Milena + I21 v1.7.96
-- **Produção:** FE **v1.7.96** · GAS **v1.5.72** · `main` @ `91cc08f`
+- **P3:** ✅ fechado 09/06 — auditoria, PDF executivo, caixa WA/email, CRM
+- **Produção:** FE **v1.7.97** · GAS **v1.5.73** · `main` @ `9efa30a`
 - **Próximo:** operação · backlog B6/B3/B5 sob demanda
 
 ## Ao encerrar sessão

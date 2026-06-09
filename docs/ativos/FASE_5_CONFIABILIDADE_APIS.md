@@ -21,8 +21,8 @@ Reduzir divergência entre app e planilha, e garantir que o ciclo **iniciar → 
 | **B2** | API `kpiMes` — Dashboard só visualiza | Média | ✅ GAS v1.5.71 + teste readonly 08/06 |
 | **B8** | Idle sessão 1h — FE+GAS alinhados (v1.7.94/v1.5.72) | Alta | ✅ 09/06 — GAS v1.5.72 + protocolo + `TESTE_SESSAO_IDLE_READONLY` |
 | **B6** | PIN admin só via GAS (T4) | Média | ⬜ |
-| **B3** | Auditoria UI por operador | Baixa | ⬜ |
-| **B5** | PDF resumo executivo | Baixa | ⬜ |
+| **B3** | Auditoria UI por operador | Baixa | ✅ 09/06 P3 |
+| **B5** | PDF resumo executivo | Baixa | ✅ 09/06 P3 |
 
 ---
 
