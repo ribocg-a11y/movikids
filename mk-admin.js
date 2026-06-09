@@ -206,6 +206,7 @@ function irAdmin(page) {
   if (page === 'sistema') {
     setTimeout(atualizarDiagnostico, 100);
     setTimeout(carregarResumoOperacaoConfig_, 120);
+    setTimeout(carregarAuditoriaAdmin_, 150);
     if (!kpiData) carregarKPIs();
   }
 }
@@ -1295,10 +1296,10 @@ async function carregarCaixa() {
   }
 }
 
-function copiarFechamentoCaixa() {
+function buildFechamentoTexto_() {
   const d = window._caixaData;
-  if (!d) { toast('Carregue o caixa primeiro', 'error'); return; }
-  const txt = [
+  if (!d) return '';
+  return [
     `FECHAMENTO DE CAIXA — ${d.dataFmt}`,
     `${'─'.repeat(35)}`,
     `FATURAMENTO`,
@@ -1320,9 +1321,28 @@ function copiarFechamentoCaixa() {
     `RESULTADO: ${fmtR(d.resultado)}`,
     `Locações: ${d.locacoes.length}`,
   ].join('\n');
+}
 
+function copiarFechamentoCaixa() {
+  const txt = buildFechamentoTexto_();
+  if (!txt) { toast('Carregue o caixa primeiro', 'error'); return; }
   navigator.clipboard.writeText(txt).then(() => toast('Fechamento copiado!', 'success'))
     .catch(() => toast('Não foi possível copiar', 'error'));
+}
+
+function compartilharFechamentoWhatsApp() {
+  const txt = buildFechamentoTexto_();
+  if (!txt) { toast('Carregue o caixa primeiro', 'error'); return; }
+  window.open('https://wa.me/?text=' + encodeURIComponent(txt), '_blank', 'noopener');
+}
+
+function enviarFechamentoEmail() {
+  const d = window._caixaData;
+  const txt = buildFechamentoTexto_();
+  if (!txt || !d) { toast('Carregue o caixa primeiro', 'error'); return; }
+  const subject = encodeURIComponent('Fechamento Movi Kids — ' + d.dataFmt);
+  const body = encodeURIComponent(txt);
+  window.location.href = 'mailto:?subject=' + subject + '&body=' + body;
 }
 
 // ── RELATÓRIO ────────────────────────────────────────────────
@@ -1402,6 +1422,50 @@ async function salvarRelatorioDrive() {
     } else toast('Erro: '+d.erro,'error');
   } catch { toast('Erro de conexão','error'); }
   finally { btn.textContent='💾 Salvar PDF'; btn.disabled=false; }
+}
+
+async function carregarPreviewRelatorioExecutivo() {
+  const mes = document.getElementById('rel-mes').value;
+  const ano = document.getElementById('rel-ano').value;
+  const prev = document.getElementById('rel-preview-exec');
+  const btn = document.getElementById('btn-rel-exec-drive');
+  if (!prev) return;
+  prev.innerHTML = '<div style="text-align:center;padding:40px;color:var(--txt3);font-size:13px">⏳ Gerando PDF executivo...</div>';
+  if (btn) btn.disabled = true;
+  try {
+    const d = await api({ action: 'buscarPreviewRelatorioExecutivo', mes, ano, ...apiParamsComAuth_() }, 30000);
+    if (!d.ok || !d.html) {
+      prev.innerHTML = '<div style="color:var(--red);padding:20px;text-align:center">' + escHtml(d.erro || 'Erro ao gerar preview') + '</div>';
+      return;
+    }
+    const blob = new Blob([d.html], { type: 'text/html;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    prev.innerHTML = '<div class="rel-iframe-wrap"><iframe title="Preview PDF executivo"></iframe></div>';
+    prev.querySelector('iframe').src = url;
+    setTimeout(() => URL.revokeObjectURL(url), 120000);
+    if (btn) btn.disabled = false;
+  } catch (e) {
+    prev.innerHTML = '<div style="color:var(--red);padding:20px;text-align:center">Erro: ' + escHtml(e.message) + '</div>';
+    if (btn) btn.disabled = false;
+  }
+}
+
+async function salvarRelatorioExecutivoDrive() {
+  const mes = document.getElementById('rel-mes').value;
+  const ano = document.getElementById('rel-ano').value;
+  const btn = document.getElementById('btn-rel-exec-drive');
+  if (btn) { btn.textContent = '⏳ Salvando...'; btn.disabled = true; }
+  try {
+    const d = await api({ action: 'salvarRelatorioExecutivoDrive', mes, ano, ...apiParamsComAuth_() }, 30000);
+    if (d.ok) {
+      toast('✅ PDF executivo salvo!', 'success');
+      carregarHistRelatorios();
+      if (d.link) window.open(d.link, '_blank');
+    } else toast('Erro: ' + (d.erro || 'falha'), 'error');
+  } catch { toast('Erro de conexão', 'error'); }
+  finally {
+    if (btn) { btn.textContent = '📊 Salvar PDF Executivo'; btn.disabled = false; }
+  }
 }
 
 async function carregarHistRelatorios() {
@@ -1503,6 +1567,61 @@ async function carregarRetorno() {
 
 
 // ── Diagnóstico (Sistema) ─────────────────────────────────────
+const AUD_ACAO_LABEL_ = {
+  salvarLocacao: 'Nova locação',
+  editarLocacao: 'Editar locação',
+  cancelarLocacao: 'Cancelar',
+  encerrarLocacao: 'Encerrar',
+  iniciarTimer: 'Iniciar timer',
+  estenderLocacao: 'Estender',
+  login: 'Login balcão',
+  logout: 'Logout',
+  logout_admin: 'Logout admin',
+  logout_inatividade: 'Idle 1h'
+};
+
+async function carregarAuditoriaAdmin_() {
+  const list = document.getElementById('mk-audit-list');
+  if (!list) return;
+  const sel = document.getElementById('mk-audit-operador');
+  const op = sel ? sel.value : '';
+  list.innerHTML = '<div style="text-align:center;padding:16px;color:var(--txt3);font-size:13px">Carregando auditoria...</div>';
+  try {
+    const d = await api({ action: 'listarAuditoriaAdmin', operador: op, limite: 60, ...apiParamsComAuth_() });
+    if (!d.ok) {
+      list.innerHTML = '<div style="color:var(--red);padding:12px;font-size:13px">' + escHtml(d.erro || 'Erro') + '</div>';
+      return;
+    }
+    if (sel && sel.options.length <= 1 && (d.operadores || []).length) {
+      d.operadores.forEach(nome => {
+        const o = document.createElement('option');
+        o.value = nome;
+        o.textContent = nome;
+        sel.appendChild(o);
+      });
+    }
+    const evts = d.eventos || [];
+    if (!evts.length) {
+      list.innerHTML = '<div style="text-align:center;padding:16px;color:var(--txt3);font-size:13px">Nenhum evento para este filtro.</div>';
+      return;
+    }
+    list.innerHTML = evts.map(e => {
+      const acao = AUD_ACAO_LABEL_[e.acao] || e.acao || '—';
+      const det = e.fonte === 'turno'
+        ? (e.entrada ? 'Entrada ' + escHtml(e.entrada) : '') + (e.saida ? ' · Saída ' + escHtml(e.saida) : '') + (e.motivo ? ' · ' + escHtml(e.motivo) : '')
+        : (e.id ? 'ID ' + escHtml(String(e.id)) : '') + (e.motivo ? ' · ' + escHtml(e.motivo) : '');
+      return '<div class="mk-audit-row">'
+        + '<div class="mk-audit-ts">' + escHtml(e.timestamp || '—') + '</div>'
+        + '<div class="mk-audit-body"><strong>' + escHtml(acao) + '</strong>'
+        + ' <span class="mk-audit-op">' + escHtml(e.usuario || '—') + '</span>'
+        + (det ? '<div class="mk-audit-det">' + det + '</div>' : '')
+        + '</div></div>';
+    }).join('');
+  } catch (e) {
+    list.innerHTML = '<div style="color:var(--red);padding:12px;font-size:13px">Falha: ' + escHtml(e.message) + '</div>';
+  }
+}
+
 function atualizarDiagnostico() {
   const sessions = (typeof _sessoes !== 'undefined' ? _sessoes : null) ||
                    (window.kpiData ? [] : []);

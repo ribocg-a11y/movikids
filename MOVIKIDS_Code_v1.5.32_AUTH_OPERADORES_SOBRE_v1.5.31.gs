@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.72
+// MOVI KIDS — Google Apps Script v1.5.73
+// v1.5.73: P3 — listarAuditoriaAdmin; PDF executivo (Golden+payback); recorrente no CRM
 // v1.5.72: sessão operador — idle 1h (lastActivityAt) + touchSessaoOperador; auto logout_inatividade
 // v1.5.71: B2 kpiMes — Dashboard via buildKpiMesPayload_ (alias buscarKPIsAdmin)
 // v1.5.70: B1 resumoDia — fonte unica Caixa + chip admin (calcResumoDiaCore_)
@@ -302,6 +303,9 @@ function dispatchMoviAction_(p, method) {
       case 'gerarRelatorio':      return gerarRelatorio_();
       case 'criarAnalise':        return criarAnalise_(p);
       case 'buscarPreviewRelatorio': return buscarPreviewRelatorio_(p);
+      case 'buscarPreviewRelatorioExecutivo': return buscarPreviewRelatorioExecutivo_(p);
+      case 'salvarRelatorioExecutivoDrive': return salvarRelatorioExecutivoDrive_(p);
+      case 'listarAuditoriaAdmin': return listarAuditoriaAdmin_(p);
       case 'carregarConfig':       return carregarConfig_();
       case 'salvarConfig':         return salvarConfig_(p);
       case 'carregarOperacaoConfig': return carregarOperacaoConfig_();
@@ -363,9 +367,9 @@ function ping_() {
   const agora = new Date();
   return resp_({
     status:  'online',
-    versao:  'v1.5.72',
+    versao:  'v1.5.73',
     timestamp: fmtData_(agora) + ' ' + fmtHoraLocal_(agora),
-    sistema: 'MOVI KIDS v1.5.72',
+    sistema: 'MOVI KIDS v1.5.73',
     postWriteActions: WRITE_ACTIONS_CRITICAS_
   });
 }
@@ -645,6 +649,68 @@ function registrarAuditoriaLocacao_(rowIndex, acao, antes, depois, motivo, opera
     }
     sh.appendRow([fmtData_(new Date()) + ' ' + fmtHoraLocal_(new Date()), acao, rowIndex, antes && antes.id ? antes.id : '', motivo || '', JSON.stringify(antes || {}), JSON.stringify(depois || {}), operador || Session.getActiveUser().getEmail() || 'operador']);
   } catch(e) { Logger.log('registrarAuditoriaLocacao_: ' + e.message); }
+}
+
+/** B3 — auditoria locações + turnos, filtro por operador (admin). */
+function listarAuditoriaAdmin_(p) {
+  if (!isAdminRequest_(p)) return err_('Acesso negado — auditoria so para administrador', 403);
+  try {
+    const opFiltro = normBusca_(String((p && p.operador) || '').trim());
+    const limite = Math.min(Math.max(parseInt((p && p.limite) || '80', 10) || 80, 1), 200);
+    const eventos = [];
+    const opsMap = {};
+
+    const shAud = ss_().getSheetByName('AUDITORIA');
+    if (shAud && shAud.getLastRow() >= 2) {
+      const dados = shAud.getRange(2, 1, shAud.getLastRow() - 1, 8).getValues();
+      for (let i = dados.length - 1; i >= 0; i--) {
+        const r = dados[i];
+        const usuario = String(r[7] || '').trim();
+        if (usuario) opsMap[usuario] = true;
+        if (opFiltro && normBusca_(usuario).indexOf(opFiltro) < 0) continue;
+        eventos.push({
+          fonte: 'locacao',
+          timestamp: cellToStr_(r[0]),
+          acao: String(r[1] || ''),
+          rowIndex: Number(r[2]) || 0,
+          id: String(r[3] || ''),
+          motivo: String(r[4] || ''),
+          usuario: usuario
+        });
+      }
+    }
+
+    const shTurno = ss_().getSheetByName('AUD_TURNO');
+    if (shTurno && shTurno.getLastRow() >= 2) {
+      const dadosT = shTurno.getRange(2, 1, shTurno.getLastRow() - 1, 7).getValues();
+      for (let i = dadosT.length - 1; i >= 0; i--) {
+        const r = dadosT[i];
+        const nome = String(r[3] || '').trim();
+        const usuario = nome || String(r[2] || '').trim();
+        if (usuario) opsMap[usuario] = true;
+        if (opFiltro && normBusca_(usuario).indexOf(opFiltro) < 0) continue;
+        eventos.push({
+          fonte: 'turno',
+          timestamp: cellToStr_(r[0]),
+          acao: String(r[1] || ''),
+          operadorId: Number(r[2]) || 0,
+          usuario: usuario,
+          entrada: cellToStr_(r[4]),
+          saida: cellToStr_(r[5]),
+          motivo: String(r[6] || '')
+        });
+      }
+    }
+
+    eventos.sort(function(a, b) {
+      return String(b.timestamp || '').localeCompare(String(a.timestamp || ''), 'pt-BR');
+    });
+
+    const operadores = Object.keys(opsMap).sort(function(a, b) { return a.localeCompare(b, 'pt-BR'); });
+    return resp_({ eventos: eventos.slice(0, limite), operadores: operadores, total: eventos.length });
+  } catch (ex) {
+    return err_('Erro ao listar auditoria: ' + ex.message, 500);
+  }
 }
 
 function locacaoObj_(row, rowIndex) {
@@ -2057,6 +2123,37 @@ function salvarRelatorioDrive_(p) {
   return resp_({ mensagem: 'PDF salvo com sucesso', link, nome: nomeArq });
 }
 
+// ── PDF EXECUTIVO (Golden + payback — B5/N2) ───────────────────
+function salvarRelatorioExecutivoDrive_(p) {
+  if (!isAdminRequest_(p)) return err_('Acesso negado — PDF executivo so para administrador', 403);
+  const mes = parseInt(p.mes || (new Date().getMonth() + 1));
+  const ano = parseInt(p.ano || new Date().getFullYear());
+  const MESES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho',
+                 'Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  const nomeMes = MESES[mes-1];
+  const refDate = new Date(ano, mes-1, 15);
+  const htmlStr = _gerarHtmlRelatorio_(refDate, 'executivo');
+
+  const nomePasta = 'Movi Kids — Relatórios';
+  let pasta;
+  const pastas = DriveApp.getFoldersByName(nomePasta);
+  pasta = pastas.hasNext() ? pastas.next() : DriveApp.createFolder(nomePasta);
+
+  const nomeArq = `Relatorio_Executivo_MoviKids_${nomeMes}_${ano}.pdf`;
+  const existentes = pasta.getFilesByName(nomeArq);
+  while (existentes.hasNext()) existentes.next().setTrashed(true);
+
+  const blob = Utilities.newBlob(htmlStr, 'text/html', 'r.html');
+  const pdf  = blob.getAs('application/pdf');
+  pdf.setName(nomeArq);
+  const arq = pasta.createFile(pdf);
+  arq.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+  const link = arq.getUrl();
+
+  registrarRelatorio_(mes, ano, nomeMes, link, 'PDF Executivo');
+  return resp_({ mensagem: 'PDF executivo salvo com sucesso', link, nome: nomeArq });
+}
+
 // ── LISTAR RELATÓRIOS ─────────────────────────────────────────
 function listarRelatorios_() {
   const ss = ss_();
@@ -2242,6 +2339,43 @@ function _calcFatMes_(refDate) {
 }
 
 /** Secao HTML Pacote F para relatorio/PDF — reutiliza buscarKPIsAdmin_ */
+function _htmlSecaoPayback_(mes, ano, fmtMoeda) {
+  const f = fmtMoeda || function(v) { return 'R$ ' + v.toFixed(2).replace('.', ','); };
+  try {
+    const inv = lerInvestimento_();
+    const pb = calcPaybackAcumulado_(mes, ano, inv);
+    if (!pb.ok) {
+      return '<div style="margin:0 28px 20px;background:#FFEBEE;border-radius:8px;padding:16px;border:1px solid #EF9A9A">'
+        + '<h3 style="margin:0 0 8px;font-size:13px;text-transform:uppercase;color:#C62828">Payback do investimento</h3>'
+        + '<p style="margin:0;font-size:12px;color:#555">' + (pb.erro || 'Dados indisponiveis') + '</p></div>';
+    }
+    const barW = Math.min(100, Math.max(0, pb.pctRecuperado || 0));
+    const corBar = pb.paybackAtingido ? '#2E7D32' : '#1565C0';
+    const prevMes = pb.mesesRestantesEstimados != null
+      ? ' · previsao ~' + pb.mesesRestantesEstimados + ' mes(es)'
+      : '';
+    return '<div style="margin:0 28px 20px;background:#E8EAF6;border-radius:8px;padding:18px;border:1px solid #9FA8DA">'
+      + '<h3 style="margin:0 0 6px;font-size:13px;text-transform:uppercase;color:#283593">Payback — uso interno (socio)</h3>'
+      + '<p style="margin:0 0 12px;font-size:11px;color:#555">Acumulado desde ' + (pb.mesInicioPayback || '—')
+      + ' ate ' + (pb.acumuladoAteLabel || '—') + ' · inauguracao ' + (pb.dataInauguracao || '—') + '</p>'
+      + '<div style="background:#fff;border-radius:6px;height:10px;overflow:hidden;margin-bottom:10px">'
+      + '<div style="width:' + barW + '%;height:100%;background:' + corBar + '"></div></div>'
+      + '<table style="width:100%;font-size:13px;border-collapse:collapse">'
+      + '<tr><td style="padding:4px 0;color:#555">Investimento total</td><td style="text-align:right;font-weight:bold">' + f(pb.investimentoTotal) + '</td></tr>'
+      + '<tr><td style="padding:4px 0;color:#555">Resultado liquido acumulado</td><td style="text-align:right;font-weight:bold;color:'
+      + (pb.resultadoAcumulado >= 0 ? '#2E7D32' : '#C62828') + '">' + f(pb.resultadoAcumulado) + '</td></tr>'
+      + '<tr><td style="padding:4px 0;color:#555">Recuperado</td><td style="text-align:right;font-weight:bold">'
+      + (pb.pctRecuperado || 0) + '%' + (pb.paybackAtingido ? ' OK' : '') + '</td></tr>'
+      + (!pb.paybackAtingido
+        ? '<tr><td style="padding:4px 0;color:#555">Falta recuperar</td><td style="text-align:right">' + f(pb.faltaRecuperar) + prevMes + '</td></tr>'
+        : '')
+      + '</table></div>';
+  } catch (e) {
+    Logger.log('_htmlSecaoPayback_: ' + e.message);
+    return '';
+  }
+}
+
 function _htmlSecaoPacoteF_(mes, ano) {
   try {
     const out = buscarKPIsAdmin_({ mes: mes, ano: ano, authRole: 'admin' });
@@ -2315,9 +2449,11 @@ function _htmlSecaoPacoteF_(mes, ano) {
   }
 }
 
-/** audience: 'golden' (email/PDF shopping) ou 'admin' (gestao interna — legado). */
+/** audience: 'golden' | 'executivo' (golden+payback) | 'admin' (gestao interna — legado). */
 function _gerarHtmlRelatorio_(refDate, audience) {
-  const forGolden = (audience || 'golden') !== 'admin';
+  const aud = String(audience || 'golden').toLowerCase();
+  const forGolden = aud !== 'admin';
+  const forExecutivo = aud === 'executivo';
   const mes  = refDate.getMonth() + 1;
   const ano  = refDate.getFullYear();
   const mmyy = String(mes).padStart(2,'0') + '/' + ano;
@@ -2424,7 +2560,8 @@ function _gerarHtmlRelatorio_(refDate, audience) {
       + '<tr><td style="padding:4px 0;color:#555">10% do faturamento bruto:</td><td style="text-align:right">' + f(cto10pct) + '</td></tr>'
       + '<tr style="border-top:2px solid #FFE082"><td style="padding:8px 0 4px;font-weight:bold;color:#B71C1C">CTO a pagar neste mês:</td><td style="text-align:right;font-weight:bold;color:#B71C1C;font-size:16px">' + f(ctoPagar) + '</td></tr>'
       + '<tr><td style="font-size:12px;color:#888">Vencimento referência:</td><td style="text-align:right;font-size:12px;color:#888">' + vencCto + '</td></tr></table></div>'
-      + '<div style="padding:16px 28px 24px;background:#f9f9f9;text-align:center;font-size:11px;color:#aaa;border-top:1px solid #eee">Gerado em ' + fmtData_(new Date()) + ' às ' + fmtHoraLocal_(new Date()) + ' · Movi Kids GAS v1.5.69</div>'
+      + (forExecutivo ? _htmlSecaoPayback_(mes, ano, f) : '')
+      + '<div style="padding:16px 28px 24px;background:#f9f9f9;text-align:center;font-size:11px;color:#aaa;border-top:1px solid #eee">Gerado em ' + fmtData_(new Date()) + ' às ' + fmtHoraLocal_(new Date()) + ' · Movi Kids GAS v1.5.73' + (forExecutivo ? ' · PDF Executivo' : '') + '</div>'
       + '</div></body></html>';
   }
 
@@ -2475,6 +2612,19 @@ function buscarPreviewRelatorio_(p) {
     return resp_({ html });
   } catch(ex) {
     return err_('Erro ao gerar preview: ' + ex.message, 500);
+  }
+}
+
+function buscarPreviewRelatorioExecutivo_(p) {
+  if (!isAdminRequest_(p)) return err_('Acesso negado — preview executivo so para administrador', 403);
+  try {
+    const mes = p && p.mes ? parseInt(p.mes) : new Date().getMonth() + 1;
+    const ano = p && p.ano ? parseInt(p.ano) : new Date().getFullYear();
+    const refDate = new Date(ano, mes - 1, 1);
+    const html = _gerarHtmlRelatorio_(refDate, 'executivo');
+    return resp_({ html });
+  } catch(ex) {
+    return err_('Erro ao gerar preview executivo: ' + ex.message, 500);
   }
 }
 
@@ -3981,6 +4131,7 @@ function listarResponsaveis_(p) {
       item.historico = item.historico
         .sort((a, b) => b.rowIndex - a.rowIndex)
         .slice(0, 6);
+      item.recorrente = item.encerradas >= 2;
       delete item.criancasMap;
       return item;
     });

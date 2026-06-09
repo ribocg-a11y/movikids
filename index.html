@@ -16,16 +16,16 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<script src="mk-stale-sync.js?v=1.7.96"></script>
-<script src="mk-version.js?v=1.7.96"></script>
-<script src="mk-api.js?v=1.7.96"></script>
-<link rel="stylesheet" href="mk-design.css?v=1.7.96">
+<script src="mk-stale-sync.js?v=1.7.97"></script>
+<script src="mk-version.js?v=1.7.97"></script>
+<script src="mk-api.js?v=1.7.97"></script>
+<link rel="stylesheet" href="mk-design.css?v=1.7.97">
 
-<script src="mk-cache-bust.js?v=1.7.96"></script>
+<script src="mk-cache-bust.js?v=1.7.97"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<link rel="stylesheet" href="mk-app.css?v=1.7.96">
+<link rel="stylesheet" href="mk-app.css?v=1.7.97">
 <!-- Firebase SDK — Realtime sync canonico para todos os dispositivos -->
-<script type="module" src="mk-firebase.js?v=1.7.96"></script>
+<script type="module" src="mk-firebase.js?v=1.7.97"></script>
 </head>
 
 <body>
@@ -601,6 +601,17 @@
       <div class="diag-row"><div class="diag-dot ok" id="diag-dot-extra"></div><span>Sessões em tempo extra</span><span class="diag-val" id="diag-extra">—</span></div>
       <div class="diag-alert" id="diag-alert-over" style="display:none"></div>
     </div>
+    <div class="sec-title">Auditoria por operador</div>
+    <p style="font-size:12px;color:var(--txt3);line-height:1.4;margin:-6px 0 10px">Edições, cancelamentos, turnos de login/logout — filtro por operador do balcão.</p>
+    <div class="diag-card" style="margin-bottom:14px">
+      <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+        <select id="mk-audit-operador" class="form-input" style="flex:1;min-width:140px" onchange="carregarAuditoriaAdmin_()">
+          <option value="">Todos os operadores</option>
+        </select>
+        <button type="button" class="btn btn-secondary" style="white-space:nowrap" onclick="carregarAuditoriaAdmin_()">Atualizar</button>
+      </div>
+      <div id="mk-audit-list" style="max-height:320px;overflow-y:auto"></div>
+    </div>
     <div class="sec-title">Frota e preços (CONFIG)</div>
     <div class="diag-card" id="mk-opcfg-card" style="margin-bottom:14px">
       <div class="diag-row"><span>Fonte</span><span class="diag-val" id="mk-opcfg-fonte">—</span></div>
@@ -797,10 +808,18 @@
       </div>
     </div>
 
-    <!-- Botão copiar fechamento -->
-    <button class="btn btn-secondary" style="width:100%;padding:11px;font-size:13px" onclick="copiarFechamentoCaixa()">
-      📋 Copiar fechamento
-    </button>
+    <!-- Export fechamento -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:4px">
+      <button class="btn btn-secondary" style="padding:11px;font-size:12px" onclick="copiarFechamentoCaixa()">
+        📋 Copiar
+      </button>
+      <button class="btn btn-secondary" style="padding:11px;font-size:12px" onclick="compartilharFechamentoWhatsApp()">
+        💬 WhatsApp
+      </button>
+      <button class="btn btn-secondary" style="padding:11px;font-size:12px" onclick="enviarFechamentoEmail()">
+        📧 E-mail
+      </button>
+    </div>
   </div>
 
   <!-- ──────── PAGE: DASHBOARD ──────── -->
@@ -1061,7 +1080,17 @@
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
       <button class="btn btn-primary" onclick="enviarRelatorioEmail()" id="btn-rel-email" style="font-size:13px;display:none">📧 Confirmar e Enviar</button>
-      <button class="btn" onclick="salvarRelatorioDrive()" id="btn-rel-drive" style="font-size:13px;background:var(--green);color:#fff;border-radius:var(--radius-sm);padding:14px;font-weight:800;border:none;cursor:pointer;">💾 Salvar PDF</button>
+      <button class="btn" onclick="salvarRelatorioDrive()" id="btn-rel-drive" style="font-size:13px;background:var(--green);color:#fff;border-radius:var(--radius-sm);padding:14px;font-weight:800;border:none;cursor:pointer;">💾 Salvar PDF Golden</button>
+    </div>
+
+    <div class="sec-title">PDF Executivo (Golden + payback)</div>
+    <p style="font-size:12px;color:var(--txt3);margin:-6px 0 12px">Uso interno/sócio: movimentação Golden + CTO + payback do investimento num único PDF.</p>
+    <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+      <button class="btn btn-secondary" onclick="carregarPreviewRelatorioExecutivo()" style="font-size:13px">👁 Ver preview executivo</button>
+      <button class="btn btn-primary" onclick="salvarRelatorioExecutivoDrive()" id="btn-rel-exec-drive" style="font-size:13px">📊 Salvar PDF Executivo</button>
+    </div>
+    <div class="rel-preview" id="rel-preview-exec" style="margin-bottom:16px;min-height:40px">
+      <div style="text-align:center;color:var(--txt3);font-size:13px;">Clique em Ver preview executivo</div>
     </div>
 
     <div class="sec-title">Histórico de relatórios</div>
@@ -1371,22 +1400,22 @@
   </div>
 </div>
 
-<script src="mk-globals.js?v=1.7.96"></script>
-<script src="mk-core.js?v=1.7.96"></script>
-<script src="mk-nav.js?v=1.7.96"></script>
-<script src="mk-admin.js?v=1.7.96"></script>
-<script src="mk-historico.js?v=1.7.96"></script>
-<script src="mk-sessao.js?v=1.7.96"></script>
-<script src="mk-home.js?v=1.7.96"></script>
-<script src="mk-custos.js?v=1.7.96"></script>
-<script src="mk-avulso.js?v=1.7.96"></script>
-<script src="mk-sync.js?v=1.7.96"></script>
-<script src="mk-nova.js?v=1.7.96"></script>
-<script src="mk-relacionamento.js?v=1.7.96"></script>
-<script src="mk-operacao.js?v=1.7.96"></script>
-<script src="mk-drawer.js?v=1.7.96"></script>
-<script src="mk-update.js?v=1.7.96"></script>
-<script src="mk-auth.js?v=1.7.96"></script>
-<script src="mk-boot.js?v=1.7.96"></script>
+<script src="mk-globals.js?v=1.7.97"></script>
+<script src="mk-core.js?v=1.7.97"></script>
+<script src="mk-nav.js?v=1.7.97"></script>
+<script src="mk-admin.js?v=1.7.97"></script>
+<script src="mk-historico.js?v=1.7.97"></script>
+<script src="mk-sessao.js?v=1.7.97"></script>
+<script src="mk-home.js?v=1.7.97"></script>
+<script src="mk-custos.js?v=1.7.97"></script>
+<script src="mk-avulso.js?v=1.7.97"></script>
+<script src="mk-sync.js?v=1.7.97"></script>
+<script src="mk-nova.js?v=1.7.97"></script>
+<script src="mk-relacionamento.js?v=1.7.97"></script>
+<script src="mk-operacao.js?v=1.7.97"></script>
+<script src="mk-drawer.js?v=1.7.97"></script>
+<script src="mk-update.js?v=1.7.97"></script>
+<script src="mk-auth.js?v=1.7.97"></script>
+<script src="mk-boot.js?v=1.7.97"></script>
 </body>
 </html>

@@ -103,10 +103,11 @@ async function carregarRelacionamento() {
       const encerradas = Number(r.encerradas || 0);
       const locLabel = totalLoc === 1 ? 'locação' : 'locações';
       const canonBadge = r.cadastroCanonico ? '<span class="rel-badge" title="Cadastro na aba RESPONSAVEIS">Cadastro</span>' : '';
+      const recBadge = r.recorrente ? '<span class="rel-badge rel-badge-rec" title="2 ou mais locacoes encerradas">Recorrente</span>' : '';
       return `<div class="rel-card">
         <div class="rel-top">
           <div>
-            <div class="rel-name">${escHtml(r.responsavel || 'Responsavel sem nome')}${canonBadge}</div>
+            <div class="rel-name">${escHtml(r.responsavel || 'Responsavel sem nome')}${canonBadge}${recBadge}</div>
             <div class="rel-phone">📱 ${relPhone_(r.telefone)}</div>
           </div>
           <div class="rel-metrics">${totalLoc} ${locLabel}${encerradas ? (' · ' + encerradas + ' enc.') : ''}<br>${relMoney_(r.faturamento)} total</div>
