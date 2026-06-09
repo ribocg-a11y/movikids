@@ -1,5 +1,7 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.74
+// MOVI KIDS — Google Apps Script v1.5.76
+// v1.5.76: FASE 7 — leadingFinanceiro (ticket, R$/h, break-even, sensibilidade) + resumoDia.leadingDia
+// v1.5.75: FASE 6 — narrativaExecutiva + cockpit (ocupacaoMediaFrota) em kpiMes
 // v1.5.74: B6 — adminPinOk_ via Script Property ADMIN_PIN; isAdminRequest_ exige PIN valido
 // v1.5.73: P3 — listarAuditoriaAdmin; PDF executivo (Golden+payback); recorrente no CRM
 // v1.5.72: sessão operador — idle 1h (lastActivityAt) + touchSessaoOperador; auto logout_inatividade
@@ -1198,7 +1200,8 @@ function resumoDia_(p) {
   const dataIn = (p.data || '').trim();
   const dataAlvo = dataIn || fmtData_(new Date());
   if (!parseDataStr_(dataAlvo)) return err_('data invalida — use dd/MM/yyyy', 400);
-  return resp_(calcResumoDiaCore_(dataAlvo));
+  const core = calcResumoDiaCore_(dataAlvo);
+  return resp_(enrichResumoDiaLeading_(core, dataAlvo));
 }
 
 // ── Pacote F: operador / cancelamentos / ocupacao (AUDITORIA + frota) ──
@@ -1570,6 +1573,182 @@ function enrichPaybackProjecao_(pb, ctx) {
   return pb;
 }
 
+const MESES_NOME_PT_ = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+  'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+
+function calcOcupacaoMediaFrota_(ocupacaoFrota) {
+  const arr = ocupacaoFrota || [];
+  if (!arr.length) return 0;
+  const sum = arr.reduce(function (a, v) { return a + (Number(v.pctOcupacao) || 0); }, 0);
+  return Math.round(sum / arr.length * 10) / 10;
+}
+
+function pctVar_(atual, anterior) {
+  const a = Number(atual) || 0;
+  const b = Number(anterior) || 0;
+  if (b <= 0) return a > 0 ? null : 0;
+  return Math.round((a - b) / b * 1000) / 10;
+}
+
+/** FASE 6 — paragrafo executivo para Dashboard e PDF executivo. */
+function buildNarrativaExecutiva_(ctx) {
+  const mes = ctx.mesAtual || 1;
+  const ano = ctx.anoAtual || new Date().getFullYear();
+  const nomeMes = MESES_NOME_PT_[mes - 1] || ('Mês ' + mes);
+  const parts = [];
+
+  parts.push(nomeMes + '/' + ano + ': faturamento de R$ ' + fmtMoedaBr_(ctx.fatMes || 0)
+    + ' em ' + (ctx.nMes || 0) + ' locações.');
+
+  const dFat = pctVar_(ctx.fatMes, ctx.fatMesAnt);
+  if (dFat === null) {
+    parts.push('Primeiro mês com movimento registrado nesta base comparativa.');
+  } else if (dFat > 0) {
+    parts.push('Receita ' + dFat + '% acima do mês anterior.');
+  } else if (dFat < 0) {
+    parts.push('Receita ' + Math.abs(dFat) + '% abaixo do mês anterior — atenção ao volume.');
+  } else {
+    parts.push('Receita estável em relação ao mês anterior.');
+  }
+
+  const margem = Number(ctx.margem) || 0;
+  if (margem >= 20) {
+    parts.push('Margem operacional de ' + margem + '%, saudável após custos e CTO.');
+  } else if (margem >= 10) {
+    parts.push('Margem operacional de ' + margem + '%, dentro da faixa de atenção.');
+  } else if (margem > 0) {
+    parts.push('Margem operacional de ' + margem + '%, pressionada — revisar custos ou mix.');
+  } else {
+    parts.push('Resultado operacional negativo neste mês (margem ' + margem + '%).');
+  }
+
+  const pb = ctx.payback;
+  if (pb && pb.ok && pb.investimentoTotal > 0) {
+    if (pb.paybackAtingido) {
+      parts.push('Investimento inicial já recuperado.');
+    } else {
+      parts.push('Payback em ' + (pb.pctRecuperado || 0) + '% do capital investido.');
+    }
+  }
+
+  const occ = Number(ctx.ocupacaoMediaFrota) || 0;
+  if (occ >= 40) {
+    parts.push('Frota com ocupação média de ' + occ + '%, boa utilização dos ativos.');
+  } else if (occ >= 25) {
+    parts.push('Ocupação média da frota em ' + occ + '% — há espaço para ganho de volume.');
+  } else if (occ > 0) {
+    parts.push('Ocupação média baixa (' + occ + '%) — priorize horários e conversão no balcão.');
+  }
+
+  if (ctx.ctoMinimo != null && ctx.ctoPagar != null && ctx.fatMes > 0) {
+    const ctoMin = Number(ctx.ctoMinimo) || 0;
+    const ctoPag = Number(ctx.ctoPagar) || 0;
+    if (Math.abs(ctoPag - ctoMin) < 0.02) {
+      parts.push('CTO limitado pelo mínimo contratual do shopping (volume ainda não dilui o percentual).');
+    }
+  }
+
+  const canc = ctx.cancelamentos;
+  if (canc && canc.total > 0 && (canc.taxaPct || 0) >= 8) {
+    parts.push('Taxa de cancelamento em ' + canc.taxaPct + '% — revisar operação no balcão.');
+  }
+
+  return parts.join(' ');
+}
+
+function fmtMoedaBr_(v) {
+  return Number(v || 0).toFixed(2).replace('.', ',');
+}
+
+function buildCockpitMeta_(ctx) {
+  const pb = ctx.payback || {};
+  return {
+    deltaFatMesPct: pctVar_(ctx.fatMes, ctx.fatMesAnt),
+    deltaNLocPct: pctVar_(ctx.nMes, ctx.nMesAnt),
+    paybackPct: pb.ok ? (pb.pctRecuperado || 0) : null,
+    paybackAtingido: !!(pb.ok && pb.paybackAtingido),
+    ocupacaoMediaFrota: ctx.ocupacaoMediaFrota || 0
+  };
+}
+
+/** FASE 7 — KPIs leading financeiros derivados do mes. */
+function buildLeadingFinanceiros_(ctx) {
+  const fat = Number(ctx.fatMes) || 0;
+  const n = Number(ctx.nMes) || 0;
+  const cus = Number(ctx.cusMes) || 0;
+  const cto = Number(ctx.ctoPagar) || 0;
+  const ctoMin = Number(ctx.ctoMinimo) || 0;
+  const diasMes = Number(ctx.diasMes) || 30;
+  const diasOp = Number(ctx.diasOperando) || 0;
+  const ticket = n > 0 ? Math.round(fat / n * 100) / 100 : 0;
+  const horasMes = diasOp * KPI_HORAS_OPERACAO_DIA_;
+  const recHora = horasMes > 0 ? Math.round(fat / horasMes * 100) / 100 : 0;
+  const custoLoc = n > 0 ? Math.round(cus / n * 100) / 100 : 0;
+  const custoDiaMedio = diasMes > 0 ? Math.round((cus + cto) / diasMes * 100) / 100 : 0;
+  const breakEven = ticket > 0 ? Math.ceil(custoDiaMedio / ticket) : null;
+  const resultado = fat - cus - cto;
+  const margem = fat > 0 ? Math.round(resultado / fat * 1000) / 10 : 0;
+  const fatP10 = fat * 1.1;
+  const ctoP10 = Math.max(ctoMin, fatP10 * 0.1);
+  const resFat10 = Math.round((fatP10 - cus - ctoP10) * 100) / 100;
+  const margFat10 = fatP10 > 0 ? Math.round(resFat10 / fatP10 * 1000) / 10 : 0;
+  const cusP10 = cus * 1.1;
+  const resCus10 = Math.round((fat - cusP10 - cto) * 100) / 100;
+  const margCus10 = fat > 0 ? Math.round(resCus10 / fat * 1000) / 10 : 0;
+  const occ = Number(ctx.ocupacaoMediaFrota) || 0;
+  let impactoOcupacao5pp = null;
+  if (occ > 0 && fat > 0) {
+    const fatEst = Math.round(fat * (1 + 5 / Math.max(occ, 1)) * 100) / 100;
+    const ctoEst = Math.max(ctoMin, fatEst * 0.1);
+    impactoOcupacao5pp = Math.round((fatEst - cus - ctoEst - resultado) * 100) / 100;
+  }
+  return {
+    ticketMedio: ticket,
+    receitaPorHoraOperada: recHora,
+    custoPorLocacao: custoLoc,
+    breakEvenLocacoesDia: breakEven,
+    custoDiaMedio: custoDiaMedio,
+    margemOperacional: margem,
+    sensibilidade: {
+      fatMais10Pct: {
+        resultado: resFat10,
+        margem: margFat10,
+        deltaResultado: Math.round((resFat10 - resultado) * 100) / 100
+      },
+      custosMais10Pct: {
+        resultado: resCus10,
+        margem: margCus10,
+        deltaResultado: Math.round((resCus10 - resultado) * 100) / 100
+      }
+    },
+    impactoOcupacao5pp: impactoOcupacao5pp
+  };
+}
+
+function enrichResumoDiaLeading_(core, dataAlvo) {
+  try {
+    const pts = String(dataAlvo || '').split('/');
+    if (pts.length < 3) return core;
+    const mes = parseInt(pts[1], 10);
+    const ano = parseInt(pts[2], 10);
+    if (!mes || !ano) return core;
+    const kpi = buildKpiMesPayload_({ mes: mes, ano: ano });
+    const lf = kpi.leadingFinanceiro || {};
+    const be = lf.breakEvenLocacoesDia;
+    const nHoje = Number(core.n) || 0;
+    return Object.assign({}, core, {
+      leadingDia: {
+        breakEvenLocacoesDia: be,
+        ticketMedioMes: lf.ticketMedio,
+        faltamBreakEven: be != null ? Math.max(0, be - nHoje) : null
+      }
+    });
+  } catch (e) {
+    Logger.log('enrichResumoDiaLeading_: ' + e.message);
+    return core;
+  }
+}
+
 function buildKpiMesPayload_(p) {
   const hoje     = new Date();
   const dataHoje = fmtData_(hoje);
@@ -1743,6 +1922,29 @@ function buildKpiMesPayload_(p) {
     diasMes: diasMes
   });
 
+  const ocupacaoMediaFrota = calcOcupacaoMediaFrota_(kpiAv.ocupacaoFrota);
+  const narrativaCtx = {
+    mesAtual: mesAtual,
+    anoAtual: anoAtual,
+    fatMes: Math.round(fatMes * 100) / 100,
+    nMes: nMes,
+    fatMesAnt: Math.round(fatMesAnt * 100) / 100,
+    margem: margem,
+    ctoMinimo: ctoMin,
+    ctoPagar: Math.round(ctoPagar * 100) / 100,
+    payback: payback,
+    ocupacaoMediaFrota: ocupacaoMediaFrota,
+    cancelamentos: kpiAv.cancelamentos
+  };
+  const narrativaExecutiva = buildNarrativaExecutiva_(narrativaCtx);
+  const cockpit = buildCockpitMeta_(Object.assign({}, narrativaCtx, { payback: payback }));
+  const leadingFinanceiro = buildLeadingFinanceiros_(Object.assign({}, narrativaCtx, {
+    payback: payback,
+    diasOperando: diasOperando,
+    diasMes: diasMes,
+    ctoMinimo: ctoMin
+  }));
+
   return {
     // v1.5.4: comparativo + projeção
     fatSemana:   Math.round(fatSemana    * 100) / 100,
@@ -1794,7 +1996,11 @@ function buildKpiMesPayload_(p) {
     melhorSemanaLabel: porSemanaPack.melhorSemanaLabel,
     melhorSemanaFat: porSemanaPack.melhorSemanaFat,
     investimento: investimento,
-    payback: payback
+    payback: payback,
+    ocupacaoMediaFrota: ocupacaoMediaFrota,
+    narrativaExecutiva: narrativaExecutiva,
+    cockpit: cockpit,
+    leadingFinanceiro: leadingFinanceiro
   };
 }
 
@@ -2339,6 +2545,21 @@ function _calcFatMes_(refDate) {
   return fat;
 }
 
+/** FASE 6 — resumo executivo para PDF executivo. */
+function _htmlSecaoNarrativaExecutiva_(mes, ano) {
+  try {
+    const kpi = buildKpiMesPayload_({ mes: mes, ano: ano });
+    const txt = String(kpi.narrativaExecutiva || '').trim();
+    if (!txt) return '';
+    return '<div style="margin:0 28px 20px;background:#EDE7F6;border-radius:8px;padding:18px;border:1px solid #B39DDB">'
+      + '<h3 style="margin:0 0 10px;font-size:13px;text-transform:uppercase;color:#4527A0">Leitura executiva do mes</h3>'
+      + '<p style="margin:0;font-size:13px;color:#333;line-height:1.55">' + txt + '</p></div>';
+  } catch (e) {
+    Logger.log('_htmlSecaoNarrativaExecutiva_: ' + e.message);
+    return '';
+  }
+}
+
 /** Secao HTML Pacote F para relatorio/PDF — reutiliza buscarKPIsAdmin_ */
 function _htmlSecaoPayback_(mes, ano, fmtMoeda) {
   const f = fmtMoeda || function(v) { return 'R$ ' + v.toFixed(2).replace('.', ','); };
@@ -2561,6 +2782,7 @@ function _gerarHtmlRelatorio_(refDate, audience) {
       + '<tr><td style="padding:4px 0;color:#555">10% do faturamento bruto:</td><td style="text-align:right">' + f(cto10pct) + '</td></tr>'
       + '<tr style="border-top:2px solid #FFE082"><td style="padding:8px 0 4px;font-weight:bold;color:#B71C1C">CTO a pagar neste mês:</td><td style="text-align:right;font-weight:bold;color:#B71C1C;font-size:16px">' + f(ctoPagar) + '</td></tr>'
       + '<tr><td style="font-size:12px;color:#888">Vencimento referência:</td><td style="text-align:right;font-size:12px;color:#888">' + vencCto + '</td></tr></table></div>'
+      + (forExecutivo ? _htmlSecaoNarrativaExecutiva_(mes, ano) : '')
       + (forExecutivo ? _htmlSecaoPayback_(mes, ano, f) : '')
       + '<div style="padding:16px 28px 24px;background:#f9f9f9;text-align:center;font-size:11px;color:#aaa;border-top:1px solid #eee">Gerado em ' + fmtData_(new Date()) + ' às ' + fmtHoraLocal_(new Date()) + ' · Movi Kids GAS v1.5.73' + (forExecutivo ? ' · PDF Executivo' : '') + '</div>'
       + '</div></body></html>';

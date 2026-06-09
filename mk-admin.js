@@ -714,13 +714,134 @@ function atualizarSemanaDetalhe_(sem, d) {
   }
 }
 
-function renderCharts(d) {
-  if (typeof renderSemanasChart_ === 'function') renderSemanasChart_(d);
-  if (!window.Chart) return;
-  [chartDiario, chartExtrasDia, chartHoras].forEach(c => c && c.destroy());
+function fmtDeltaCockpit_(delta, suffix) {
+  suffix = suffix || 'vs mês ant.';
+  if (delta === null || delta === undefined) return '—';
+  if (delta === 0) return '→ estável ' + suffix;
+  if (delta > 0) return '↑ ' + delta + '% ' + suffix;
+  return '↓ ' + Math.abs(delta) + '% ' + suffix;
+}
 
-  const BLUE='#185FA5',PINK='#C2185B',GREEN='#3B6D11',AMBER='#BA7517',GRID='rgba(0,0,0,.06)';
-  const PLAN_LABELS = {'10min':'10 min','20min':'20 min','30min':'30 min','40min':'40 min','60min':'1 hora','3h':'3 horas'};
+function setDeltaEl_(id, delta, suffix) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = fmtDeltaCockpit_(delta, suffix);
+  el.className = 'mk-exec-kpi-delta' + (delta > 0 ? ' up' : delta < 0 ? ' down' : '');
+}
+
+/** FASE 6 — faixa executiva (5 KPIs + narrativa GAS). */
+function renderExecCockpit_(d) {
+  const box = document.getElementById('mk-exec-cockpit');
+  if (!box || !d) return;
+  box.style.display = '';
+
+  if (d.mesAtual && d.anoAtual) {
+    setText2('mk-exec-periodo', MESES_DB[d.mesAtual - 1] + ' / ' + d.anoAtual);
+  }
+
+  setText2('mk-exec-fat', R2(d.fatMes || 0));
+  const ck = d.cockpit || {};
+  setDeltaEl_('mk-exec-fat-d', ck.deltaFatMesPct);
+
+  const margem = Number(d.margem) || 0;
+  const margEl = document.getElementById('mk-exec-margem');
+  if (margEl) {
+    margEl.textContent = margem + '%';
+    margEl.className = 'mk-exec-kpi-val ' + (margem >= 18 ? 'green' : margem >= 10 ? 'amber' : 'red');
+  }
+  const margD = document.getElementById('mk-exec-margem-d');
+  if (margD) {
+    if (margem >= 20) { margD.textContent = 'Margem saudável'; margD.className = 'mk-exec-kpi-delta up'; }
+    else if (margem >= 10) { margD.textContent = 'Faixa de atenção'; margD.className = 'mk-exec-kpi-delta'; }
+    else if (margem > 0) { margD.textContent = 'Margem pressionada'; margD.className = 'mk-exec-kpi-delta down'; }
+    else { margD.textContent = 'Resultado negativo'; margD.className = 'mk-exec-kpi-delta down'; }
+  }
+
+  const resEl = document.getElementById('mk-exec-resultado');
+  const resultado = Number(d.resultado) || 0;
+  if (resEl) {
+    resEl.textContent = R2(resultado);
+    resEl.className = 'mk-exec-kpi-val ' + (resultado >= 0 ? 'green' : 'red');
+  }
+  setText2('mk-exec-res-d', (d.nMes || 0) + ' loc · custos ' + R2(d.cusMes || 0));
+
+  const pb = d.payback;
+  const pbEl = document.getElementById('mk-exec-payback');
+  const pbD = document.getElementById('mk-exec-pb-d');
+  if (pb && pb.ok && pb.investimentoTotal > 0) {
+    if (pbEl) {
+      pbEl.textContent = pb.paybackAtingido ? '100%' : ((pb.pctRecuperado || 0) + '%');
+      pbEl.className = 'mk-exec-kpi-val ' + (pb.paybackAtingido ? 'green' : 'purple');
+    }
+    if (pbD) {
+      pbD.textContent = pb.paybackAtingido ? 'Investimento recuperado' : ('Faltam ' + R2(pb.faltaRecuperar || 0));
+      pbD.className = 'mk-exec-kpi-delta' + (pb.paybackAtingido ? ' up' : '');
+    }
+  } else {
+    if (pbEl) { pbEl.textContent = '—'; pbEl.className = 'mk-exec-kpi-val purple'; }
+    if (pbD) pbD.textContent = 'Cadastre aba INVESTIMENTO';
+  }
+
+  const occ = d.ocupacaoMediaFrota != null ? d.ocupacaoMediaFrota : ck.ocupacaoMediaFrota;
+  setText2('mk-exec-ocup', occ != null ? (occ + '%') : '—');
+  const occD = document.getElementById('mk-exec-ocup-d');
+  if (occD) {
+    const o = Number(occ) || 0;
+    if (o >= 40) { occD.textContent = 'Boa utilização'; occD.className = 'mk-exec-kpi-delta up'; }
+    else if (o >= 25) { occD.textContent = 'Espaço para crescer'; occD.className = 'mk-exec-kpi-delta'; }
+    else if (o > 0) { occD.textContent = 'Ocupação baixa'; occD.className = 'mk-exec-kpi-delta down'; }
+    else { occD.textContent = 'Sem locações no mês'; occD.className = 'mk-exec-kpi-delta'; }
+  }
+
+  const nar = document.getElementById('mk-exec-narrativa');
+  if (nar) {
+    nar.textContent = d.narrativaExecutiva || 'Leitura executiva indisponível — publique GAS v1.5.75+.';
+  }
+
+  const badge = document.getElementById('mk-exec-badge');
+  if (badge) {
+    badge.textContent = resultado >= 0 && margem >= 10 ? 'Sustentável' : (resultado >= 0 ? 'Atenção' : 'Crítico');
+    badge.style.background = resultado >= 0 && margem >= 10 ? 'rgba(46,125,50,.12)' : (resultado >= 0 ? 'rgba(230,81,0,.12)' : 'rgba(198,40,40,.12)');
+    badge.style.color = resultado >= 0 && margem >= 10 ? '#2E7D32' : (resultado >= 0 ? '#E65100' : '#C62828');
+  }
+}
+
+function renderLeadingFinanceiro_(d) {
+  const lf = d.leadingFinanceiro;
+  const row = document.getElementById('mk-leading-row');
+  const sens = document.getElementById('mk-leading-sens');
+  if (!row || !lf) {
+    if (row) row.style.display = 'none';
+    if (sens) sens.style.display = 'none';
+    return;
+  }
+  row.style.display = '';
+  setText2('mk-lead-ticket', R2(lf.ticketMedio || 0));
+  setText2('mk-lead-ticket-sub', (d.nMes || 0) + ' loc no mês');
+  setText2('mk-lead-rhora', R2(lf.receitaPorHoraOperada || 0));
+  setText2('mk-lead-rhora-sub', (d.diasOperando || 0) + ' dias × ' + (lf.receitaPorHoraOperada > 0 ? '12h/dia' : '—'));
+  setText2('mk-lead-custoloc', R2(lf.custoPorLocacao || 0));
+  setText2('mk-lead-custoloc-sub', 'OPEX ' + R2(d.cusMes || 0));
+  const be = lf.breakEvenLocacoesDia;
+  setText2('mk-lead-be', be != null ? (be + ' loc') : '—');
+  setText2('mk-lead-be-sub', lf.custoDiaMedio != null ? ('custo dia ~' + R2(lf.custoDiaMedio)) : '—');
+  if (sens && lf.sensibilidade) {
+    const s = lf.sensibilidade;
+    const parts = [];
+    if (s.fatMais10Pct) parts.push('Fat +10% → resultado ' + R2(s.fatMais10Pct.resultado) + ' (' + (s.fatMais10Pct.deltaResultado >= 0 ? '+' : '') + R2(s.fatMais10Pct.deltaResultado) + ')');
+    if (s.custosMais10Pct) parts.push('Custos +10% → ' + R2(s.custosMais10Pct.resultado) + ' (Δ ' + R2(s.custosMais10Pct.deltaResultado) + ')');
+    if (lf.impactoOcupacao5pp != null) parts.push('+5 pp ocupação ≈ ' + R2(lf.impactoOcupacao5pp) + ' no resultado/mês');
+    if (parts.length) {
+      sens.style.display = 'block';
+      sens.textContent = parts.join(' · ');
+    } else sens.style.display = 'none';
+  }
+}
+
+function renderDashboardCore_(d) {
+  if (!d) return;
+  renderExecCockpit_(d);
+  renderLeadingFinanceiro_(d);
 
   // título
   if (d.mesAtual && d.anoAtual) {
@@ -729,8 +850,10 @@ function renderCharts(d) {
     if (sel) sel.value = String(d.mesAtual);
   }
 
-  // KPIs
-  const ticket = d.nMes > 0 ? d.fatMes / d.nMes : 0;
+  // KPIs (detalhe — linha abaixo do cockpit)
+  const ticket = (d.leadingFinanceiro && d.leadingFinanceiro.ticketMedio != null)
+    ? d.leadingFinanceiro.ticketMedio
+    : (d.nMes > 0 ? d.fatMes / d.nMes : 0);
   if (d.fatAno != null) {
     setText2('nk-fatano', R2(d.fatAno));
     setText2('nk-fatano-sub', (d.nAno || 0) + ' locações em ' + (d.anoAtual || ''));
@@ -770,7 +893,7 @@ function renderCharts(d) {
     ? 'CTO = maior entre ' + R2(d.ctoMinimo) + ' e 10% do faturamento (' + ctoPct + '% aplicado)'
     : 'CTO = ' + ctoPct + '% do faturamento'));
 
-  // Payback
+  // Payback strip
   const pbStrip = document.getElementById('nk-payback-strip');
   const pb = d.payback;
   if (pbStrip && pb && pb.ok && pb.investimentoTotal > 0) {
@@ -816,6 +939,16 @@ function renderCharts(d) {
   } else if (pbStrip) {
     pbStrip.style.display = 'none';
   }
+}
+
+function renderCharts(d) {
+  if (typeof renderSemanasChart_ === 'function') renderSemanasChart_(d);
+  renderDashboardCore_(d);
+  if (!window.Chart) return;
+  [chartDiario, chartExtrasDia, chartHoras].forEach(c => c && c.destroy());
+
+  const BLUE='#185FA5',PINK='#C2185B',GREEN='#3B6D11',AMBER='#BA7517',GRID='rgba(0,0,0,.06)';
+  const PLAN_LABELS = {'10min':'10 min','20min':'20 min','30min':'30 min','40min':'40 min','60min':'1 hora','3h':'3 horas'};
 
   // Faturamento diário — todos os dias do mês até hoje (zeros inclusive)
   // Os zeros mostram a linha do tempo completa e quando o negócio arrancou
@@ -1057,7 +1190,10 @@ function renderCharts(d) {
       }).join('');
       if (ocupIns) {
         ocupIns.style.display = 'block';
-        ocupIns.innerHTML = '<strong>' + topO.veiculo + '</strong> com maior uso: <strong>' + (topO.pctOcupacao || 0) + '%</strong> da capacidade estimada (' + topO.nLoc + ' locações).';
+        let txt = '<strong>' + topO.veiculo + '</strong> com maior uso: <strong>' + (topO.pctOcupacao || 0) + '%</strong> da capacidade estimada (' + topO.nLoc + ' locações).';
+        const imp = d.leadingFinanceiro && d.leadingFinanceiro.impactoOcupacao5pp;
+        if (imp != null && imp !== 0) txt += ' +5 pp ocupação ≈ ' + R2(imp) + '/mês no resultado.';
+        ocupIns.innerHTML = txt;
       }
     }
   }
@@ -1203,6 +1339,19 @@ function renderCaixaFromResumo_(dataFmt, r) {
       } else {
         cxExtIns.style.display = 'none';
       }
+    }
+    const cxBe = document.getElementById('cx-breakeven');
+    const ld = r.leadingDia;
+    if (cxBe && ld && ld.breakEvenLocacoesDia != null) {
+      cxBe.style.display = 'block';
+      const nLoc = locacoes.length;
+      const falta = ld.faltamBreakEven != null ? ld.faltamBreakEven : Math.max(0, ld.breakEvenLocacoesDia - nLoc);
+      cxBe.textContent = falta > 0
+        ? ('Meta break-even do mês: ' + ld.breakEvenLocacoesDia + ' loc/dia · faltam ' + falta + ' hoje (' + nLoc + ' feitas)')
+        : ('Meta break-even do mês atingida hoje (' + ld.breakEvenLocacoesDia + ' loc/dia · ' + nLoc + ' feitas)');
+      cxBe.style.color = falta > 0 ? '#E65100' : '#2E7D32';
+    } else if (cxBe) {
+      cxBe.style.display = 'none';
     }
     document.getElementById('cx-total-ent').textContent = fmtR(totalEnt);
     document.getElementById('cx-total-sai').textContent = fmtR(totalCus);

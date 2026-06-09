@@ -17,6 +17,11 @@
 | **FASE 3** Pacote L | ✅ fechada | 08/06/2026 (FE **v1.7.91** validado) |
 | **FASE 4** CONFIG planilha | ✅ fechada | 08/06/2026 (`FASE_4_CONFIG_PLANILHA.md`) |
 | **FASE 5** Confiabilidade/APIs | ✅ **fechada** | 09/06/2026 (`CHECKLIST_FASE5_TABLET.md` Milena) |
+| **P3** Backlog produto | ✅ fechada | 09/06/2026 |
+| **P2** Backlog técnico | ✅ fechada | 09/06/2026 |
+| **FASE 6** Cockpit executivo | ✅ repo | FE v1.8.0 / GAS v1.5.75 |
+| **FASE 7** Leading financeiros | ✅ repo | FE v1.8.1 / GAS v1.5.76 |
+| **FASE 8** Alertas proativos | 🟡 **próxima** | — |
 
 ### FASE 0 — checklist
 
@@ -35,7 +40,7 @@
 | 0.10 | `ACESSOS_E_AUTORIZACOES.md` + planilha OAuth (`google-drive-sheets-auth`) | ✅ 07/06 |
 | 0.11 | `MAPA_CODIGO_ARQUITETURA.md` — anatomia e chaves mestras | ✅ 07/06 |
 
-**Próximo passo imediato:** operação estável **v1.7.96** · manutenção P1 (B7 semanal) · backlog P2+ só com pedido — ver **`PLANEJAMENTO_ATUAL_2026-06.md`**.
+**Próximo passo imediato:** **Nova versão Web GAS v1.5.76** + validar **FE v1.8.1** · **FASE 8** alertas · ver **`PLANO_FASES_6_15_COCKPIT_EXECUTIVO_2026-06.md`**
 
 **FASE 1 fechada 08/06/2026:** I.5 assinado · K.3–K.4 tablet · checklist A–F · payback Dashboard · tablet v1.7.87. Sprint 1 + Sprint 2 (K) declarados fechados.
 
@@ -196,7 +201,26 @@ Objetivo: balcão mais rápido; menos ruído visual. **Próximo pacote de featur
 
 ---
 
-### FASE 6 — Pausado / trimestre (P4)
+### FASE 6–15 — Cockpit executivo, UX gestão e inteligência financeira · 🟡 ativo
+
+**Documento mestre:** **`PLANO_FASES_6_15_COCKPIT_EXECUTIVO_2026-06.md`** (benchmark jun/2026 → 10 fases + FASE 16 backlog + Anexo A futuro)
+
+| Fase | Nome | P | FE | GAS | Impacto visual |
+|------|------|---|-----|-----|----------------|
+| **6** | Cockpit 5 KPIs + narrativa | P1 | v1.8.0 | v1.5.75 | Dashboard topo |
+| **7** | Leading financeiros | P1 | v1.8.1 | v1.5.76 | Dashboard + Caixa |
+| **8** | Alertas / semáforos | P1 | v1.8.2 | v1.5.77 | Dashboard + sidebar |
+| **9** | DNA visual admin | P1 | v1.8.5 | — | Dashboard, Caixa, CRM, Sistema |
+| **10** | CRM LTV / cohort | P2 | v1.8.6 | v1.5.78 | Relacionamento |
+| **11** | Holding Movi+ZapClin | P2 | v1.8.7 | v1.5.79 | Página Holding |
+| **12** | Drill-down + simulação | P2 | v1.8.8 | v1.5.80 | Dashboard gráficos |
+| **13** | Live BI Firebase | P2 | v1.8.9 | v1.5.81 | Widget frota live |
+| **14** | Plano contas + mini-DRE | P2 | v1.8.10 | v1.5.82 | Cascata margens |
+| **15** | Portal metrics + CONFIG UI | P3 | v1.8.11 | v1.5.83 | Sistema + Dashboard |
+
+---
+
+### FASE 6 legado — Pausado / trimestre (P4)
 
 | Item | Reavaliar quando |
 |------|------------------|
@@ -221,10 +245,22 @@ FASE 4  CONFIG planilha + auditoria        [✅ fechada — 08/06]
    ↓
 FASE 5  B7 + B1/B2/B8 + tablet Milena     [✅ fechada 09/06 — v1.7.96]
    ↓
-OPERAÇÃO  Manutenção + backlog P2/P3      [🟢 ativa — ver PLANEJAMENTO_ATUAL]
+P2/P3   B6 + CI + backlog produto          [✅ fechada 09/06]
+   ↓
+FASE 6  Cockpit executivo (5 KPIs)         [🟡 PRÓXIMA — v1.8.0]
+   ↓
+FASE 7–8 Leading + alertas               [⏳ P1]
+   ↓
+FASE 9  DNA visual admin                   [⏳ P1]
+   ↓
+FASE 10–15 CRM, holding, drill, live, DRE [⏳ P2/P3]
+   ↓
+Anexo A ROIC/ERP/multi-loja                [⏸ só decisão sócio]
 ```
 
-**Não iniciar:** F4, F9 (pausados).
+**Plano completo:** `PLANO_FASES_6_15_COCKPIT_EXECUTIVO_2026-06.md`
+
+**Não iniciar:** F4, F9 (pausados — Anexo A plano 6–15).
 
 ---
 
@@ -240,6 +276,7 @@ Todos em `docs/ativos/` salvo indicação. Índice completo: `docs/INDICE.md`.
 | Publicar FE | `REGRAS_DE_PUBLICACAO_SEGURA.md` + `pre-push-check.ps1` |
 | Incidente / bug | `MAPA_ERROS_FALHAS_BUGS.md` → `docs/arquivo/incidentes/` |
 | Payback fórmulas | `MEMORIAL_PAYBACK_INVESTIMENTO.md` |
+| **Ciclo FASE 6–15 (cockpit/UX/financeiro)** | **`PLANO_FASES_6_15_COCKPIT_EXECUTIVO_2026-06.md`** |
 | Portal / QR | `DECISAO_COMUNICACAO_QR_CODE_2026-06.md` |
 | Tablet QA | `HOMOLOGACAO_PRODUCAO_ASSISTIDA.md`, `CHECKLIST_PACOTE_K.md` |
 | Roadmap sprints | `PLANO_CONTINUIDADE_2026-06.md` |
@@ -273,7 +310,8 @@ Todos em `docs/ativos/` salvo indicação. Índice completo: `docs/INDICE.md`.
 
 ## 7. Planejamento pós-FASE 5
 
-**Documento mestre:** **`PLANEJAMENTO_ATUAL_2026-06.md`** — fases abertas, backlog P0–P4, sugestões.
+**Documento mestre ciclo ativo:** **`PLANO_FASES_6_15_COCKPIT_EXECUTIVO_2026-06.md`**  
+**Resumo operação:** **`PLANEJAMENTO_ATUAL_2026-06.md`** — fases 6–15, B7, treino N1.
 
 ---
 

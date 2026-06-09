@@ -743,6 +743,7 @@
         <div class="mk-stat-pill" style="background:#F3E5F5"><div class="mk-stat-pill-val" id="cx-ext" style="color:#6A1B9A">...</div><div class="mk-stat-pill-lbl">Extras</div></div>
       </div>
       <div class="db-insight" id="cx-ext-insight" style="display:none;margin-top:8px;font-size:12px"></div>
+      <div class="db-insight" id="cx-breakeven" style="display:none;margin-top:8px;font-size:12px;font-weight:600"></div>
     </div>
 
     <!-- Conferência -->
@@ -839,6 +840,72 @@
         <option value="11">Novembro</option><option value="12">Dezembro</option>
       </select>
     </div>
+
+    <!-- FASE 6 — Cockpit executivo -->
+    <div id="mk-exec-cockpit" class="mk-exec-cockpit" style="display:none" aria-live="polite">
+      <div class="mk-exec-head">
+        <div>
+          <div class="mk-exec-label">Cockpit executivo</div>
+          <div class="mk-exec-periodo" id="mk-exec-periodo">—</div>
+        </div>
+        <span class="mk-exec-badge" id="mk-exec-badge">Gestão</span>
+      </div>
+      <div class="mk-exec-kpis">
+        <div class="mk-exec-kpi">
+          <div class="mk-exec-kpi-lbl">Faturamento do mês</div>
+          <div class="mk-exec-kpi-val blue" id="mk-exec-fat">—</div>
+          <div class="mk-exec-kpi-delta" id="mk-exec-fat-d">—</div>
+        </div>
+        <div class="mk-exec-kpi">
+          <div class="mk-exec-kpi-lbl">Margem operacional</div>
+          <div class="mk-exec-kpi-val amber" id="mk-exec-margem">—</div>
+          <div class="mk-exec-kpi-delta" id="mk-exec-margem-d">—</div>
+        </div>
+        <div class="mk-exec-kpi">
+          <div class="mk-exec-kpi-lbl">Resultado líquido</div>
+          <div class="mk-exec-kpi-val green" id="mk-exec-resultado">—</div>
+          <div class="mk-exec-kpi-delta" id="mk-exec-res-d">—</div>
+        </div>
+        <div class="mk-exec-kpi">
+          <div class="mk-exec-kpi-lbl">Payback investimento</div>
+          <div class="mk-exec-kpi-val purple" id="mk-exec-payback">—</div>
+          <div class="mk-exec-kpi-delta" id="mk-exec-pb-d">—</div>
+        </div>
+        <div class="mk-exec-kpi">
+          <div class="mk-exec-kpi-lbl">Ocupação média frota</div>
+          <div class="mk-exec-kpi-val blue" id="mk-exec-ocup">—</div>
+          <div class="mk-exec-kpi-delta" id="mk-exec-ocup-d">—</div>
+        </div>
+      </div>
+      <p class="mk-exec-narrativa" id="mk-exec-narrativa">Carregando leitura do mês…</p>
+    </div>
+
+    </div>
+
+    <!-- FASE 7 — Leading financeiros -->
+    <div id="mk-leading-row" class="mk-leading-row" style="display:none">
+      <div class="mk-leading-kpi">
+        <div class="mk-leading-lbl">Ticket médio</div>
+        <div class="mk-leading-val" id="mk-lead-ticket">—</div>
+        <div class="mk-leading-sub" id="mk-lead-ticket-sub">—</div>
+      </div>
+      <div class="mk-leading-kpi">
+        <div class="mk-leading-lbl">Receita / hora</div>
+        <div class="mk-leading-val" id="mk-lead-rhora">—</div>
+        <div class="mk-leading-sub" id="mk-lead-rhora-sub">—</div>
+      </div>
+      <div class="mk-leading-kpi">
+        <div class="mk-leading-lbl">Custo / locação</div>
+        <div class="mk-leading-val" id="mk-lead-custoloc">—</div>
+        <div class="mk-leading-sub" id="mk-lead-custoloc-sub">—</div>
+      </div>
+      <div class="mk-leading-kpi">
+        <div class="mk-leading-lbl">Break-even dia</div>
+        <div class="mk-leading-val" id="mk-lead-be">—</div>
+        <div class="mk-leading-sub" id="mk-lead-be-sub">—</div>
+      </div>
+    </div>
+    <div class="mk-leading-sens" id="mk-leading-sens" style="display:none"></div>
 
     <!-- Alerta diário (Fase 5) -->
     <div id="nk-alerta" class="alerta-banner warn" style="display:none">

@@ -1,14 +1,15 @@
 # MOVI KIDS — Índice de documentação
 
-**Atualizado:** 09/06/2026 (FE **v1.7.96** + GAS **v1.5.72** · **FASE 0–5 fechadas**)
+**Atualizado:** 09/06/2026 (FE **v1.7.98** + GAS **v1.5.74** · **FASE 6** próxima)
 
 ## Comece aqui
 
 | Documento | Para quê |
 |-----------|----------|
 | [**HANDOFF_NOVO_CHAT.md**](ativos/HANDOFF_NOVO_CHAT.md) | **Novo chat Cursor** — contexto, produção, armadilhas |
-| [**PLANEJAMENTO_ATUAL_2026-06.md**](ativos/PLANEJAMENTO_ATUAL_2026-06.md) | **Planejamento pós-FASE 5** — backlog P0–P4, sugestões |
-| [PLANO_PRIORIDADES_2026-06.md](ativos/PLANO_PRIORIDADES_2026-06.md) | Fases 0–5 + execução |
+| [**PLANO_FASES_6_15_COCKPIT_EXECUTIVO_2026-06.md**](ativos/PLANO_FASES_6_15_COCKPIT_EXECUTIVO_2026-06.md) | **Ciclo ativo FASE 6–15** — benchmark, entregas, impacto visual por página |
+| [**PLANEJAMENTO_ATUAL_2026-06.md**](ativos/PLANEJAMENTO_ATUAL_2026-06.md) | Resumo operação + tabela fases 6–15 |
+| [PLANO_PRIORIDADES_2026-06.md](ativos/PLANO_PRIORIDADES_2026-06.md) | Fases 0–15 + execução |
 | [ESTADO_ATUAL.md](ativos/ESTADO_ATUAL.md) | Versões em produção, links, pacotes |
 | [PLANO_CONTINUIDADE_2026-06.md](ativos/PLANO_CONTINUIDADE_2026-06.md) | Roadmap 90 dias + sprints |
 | [AGENTS.md](../AGENTS.md) | Instruções resumidas para agentes (raiz) |
@@ -17,6 +18,7 @@
 
 | Documento | Para quê |
 |-----------|----------|
+| [**PLANO_FASES_6_15_COCKPIT_EXECUTIVO_2026-06.md**](ativos/PLANO_FASES_6_15_COCKPIT_EXECUTIVO_2026-06.md) | 🟡 **FASE 6–15** — cockpit, UX admin, financeiro |
 | [CHECKLIST_FASE5_TABLET.md](ativos/CHECKLIST_FASE5_TABLET.md) | ✅ FASE 5 — Milena + I21 v1.7.96 |
 | [FASE_5_CONFIABILIDADE_APIS.md](ativos/FASE_5_CONFIABILIDADE_APIS.md) | B7, B1, B2, B8 — fechada |
 | [CHECKLIST_PACOTE_L.md](ativos/CHECKLIST_PACOTE_L.md) | ✅ Pacote L v1.7.91 |

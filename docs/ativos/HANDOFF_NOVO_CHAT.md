@@ -1,6 +1,6 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 09/06/2026 (FASE 5 **fechada** — FE **v1.7.96** + GAS **v1.5.72**)  
+**Atualizado:** 09/06/2026 (FASE 5 + P2/P3 **fechadas** — ciclo **FASE 6** ativo)  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **Repo local:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`  
@@ -51,7 +51,7 @@ Continuo o MOVI KIDS. Repo: C:\Users\riboc\Documents\Codex\2026-05-30\files-ment
 
 - Ler: este arquivo → `PLANO_PRIORIDADES` → `ESTADO_ATUAL` → `REGRAS` → `ACESSOS_E_AUTORIZACOES` (§7 = agente vs você)
 - Ignorar handoff antigo em `docs/arquivo/planos/`
-- Informar: FE **v1.7.96**, GAS **v1.5.72** — **FASE 0–5 fechadas** · operação estável · ver **`PLANEJAMENTO_ATUAL_2026-06.md`**
+- Informar: FE **v1.7.98**, GAS **v1.5.74** — **FASE 6 próxima** · plano **`PLANO_FASES_6_15_COCKPIT_EXECUTIVO_2026-06.md`**
 - Deixar claro: **agente** no **PC** (código, testes, planilha); **você** Nova versão GAS Web; **tablet no balcão** = validação operação (não confundir com seu computador)
 
 ---
@@ -86,10 +86,10 @@ Regra Cursor: `.cursor/rules/handoff-movikids.mdc` § Modo de operação.
 
 | Camada | Versão | Verificação |
 |--------|--------|-------------|
-| **Frontend** | **v1.7.98** | `mk-version.js` → `window.MK_VERSION` |
-| **Service Worker** | **1.7.98** | `sw.js` → `SW_VERSION` |
-| **Apps Script** | **v1.5.74** | [ping](https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec?action=ping) → `versao` |
-| **App tablet balcão** | v1.7.98 | https://ribocg-a11y.github.io/movikids/?force=1.7.98 (**na loja**, não só no PC) |
+| **Frontend** | **v1.8.1** (FASE 6–7) | `mk-version.js` |
+| **Service Worker** | **1.8.1** | `sw.js` |
+| **Apps Script (código)** | **v1.5.76** | Ping após **Nova versão Web** |
+| **App tablet balcão** | v1.7.98+ ok | Sem mudança obrigatória FASE 6–7 |
 
 **Deploy ID GAS (único — nunca criar outro):** `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y`
 
@@ -102,7 +102,8 @@ Regra Cursor: `.cursor/rules/handoff-movikids.mdc` § Modo de operação.
 | # | Documento | Para quê |
 |---|-----------|----------|
 | 1 | **Este arquivo** | Contexto, regras, próximo passo |
-| 2 | `PLANO_PRIORIDADES_2026-06.md` | **O que fazer agora** (fases P0–P4, checklist vivo) |
+| 2 | `PLANO_PRIORIDADES_2026-06.md` | Fases 0–15, checklist vivo |
+| 2b | **`PLANO_FASES_6_15_COCKPIT_EXECUTIVO_2026-06.md`** | **Ciclo ativo** — cockpit, UX admin, KPIs, impacto por página |
 | 3 | `ESTADO_ATUAL.md` | Versões, pacotes entregues, validação pós-deploy |
 | 4 | `REGRAS_DE_PUBLICACAO_SEGURA.md` | Travas antes de commit/push/deploy |
 | 5 | `ACESSOS_E_AUTORIZACOES.md` | Quem pode o quê — app, infra, agente vs humano |
@@ -118,7 +119,7 @@ Regra Cursor: `.cursor/rules/handoff-movikids.mdc` § Modo de operação.
 | QA tablet | **`PROTOCOLO_DIAGNOSTICO_E_TESTES.md`** → `TESTE_PROTOCOLO_DIAGNOSTICO.ps1` · homologação F5–F11: `TESTE_TABLET_F5_F7_F10_F11.ps1` |
 | Homologação | `HOMOLOGACAO_PRODUCAO_ASSISTIDA.md`, `CHECKLIST_PACOTE_K.md` |
 | Payback | `MEMORIAL_PAYBACK_INVESTIMENTO.md` |
-| Roadmap / planejamento | **`PLANEJAMENTO_ATUAL_2026-06.md`** · `PLANO_CONTINUIDADE_2026-06.md` |
+| Roadmap / planejamento | **`PLANO_FASES_6_15_COCKPIT_EXECUTIVO_2026-06.md`** · **`PLANEJAMENTO_ATUAL_2026-06.md`** · `PLANO_CONTINUIDADE_2026-06.md` |
 
 ---
 
@@ -132,11 +133,15 @@ Regra Cursor: `.cursor/rules/handoff-movikids.mdc` § Modo de operação.
 
 **FASE 5:** ✅ **FECHADA** 09/06/2026 — B1+B2+B8+B7 · tablet Milena · I21 mock **ok v1.7.96**.
 
-**P3 backlog produto:** ✅ **FECHADO** 09/06/2026 — B3+B4+B5+N2 · GAS **v1.5.73** · FE **v1.7.97** · `TESTE_P3_READONLY.ps1` ok.
+**P2 backlog técnico:** ✅ **FECHADO** 09/06/2026 — B6 PIN GAS · CI · F10 · schema · GAS **v1.5.74** · FE **v1.7.98**.
 
-**v1.7.97 (09/06):** auditoria por operador, PDF executivo, export caixa WA/email, badge CRM recorrente.
+**Ciclo FASE 6–15:** **FASE 6–7** entregues no repo · **FASE 8** próxima · alvo produção **FE v1.8.1** · **GAS v1.5.76**
 
-**Próximo passo:** operação estável v1.7.98 · B7 semanal · **P2 fechado** — aguarda Nova versão GAS v1.5.74
+**Deploy:** `DEPLOY_v1.5.75_FASE6_COCKPIT.md` · `DEPLOY_v1.5.76_FASE7_LEADING.md`
+
+**Sua ação após push Pages:** Nova versão Web GAS → ping **v1.5.76** → `?force=1.8.1` → Dashboard + Caixa
+
+**Paralelo ops:** B7 semanal · treino N1 badge Recorrente · tablet `?force=1.7.98`.
 
 **Últimos commits (main = origin):**
 

@@ -1,16 +1,17 @@
 # MOVI KIDS — Planejamento atual (pós-FASE 5)
 
 **Atualizado:** 09/06/2026  
-**Produção:** FE **v1.7.98** · GAS **v1.5.74** · Git `main` (P2 pendente push)  
-**Documentos irmãos:** `PLANO_PRIORIDADES_2026-06.md` · `PLANO_CONTINUIDADE_2026-06.md` · `HANDOFF_NOVO_CHAT.md`
+**Produção:** FE **v1.7.98** · GAS **v1.5.74** · Git `main`  
+**Documentos irmãos:** `PLANO_PRIORIDADES_2026-06.md` · `PLANO_CONTINUIDADE_2026-06.md` · `HANDOFF_NOVO_CHAT.md`  
+**Ciclo ativo:** **`PLANO_FASES_6_15_COCKPIT_EXECUTIVO_2026-06.md`** ← benchmark → fases 6–15
 
 ---
 
 ## 1. Resumo executivo
 
-Ciclo **FASE 0–5 concluído** (07–09/06/2026). Sistema em **operação madura** no balcão (tablet Milena homologado), portal QR, payback, CONFIG planilha e APIs unificadas (`resumoDia`, `kpiMes`, idle I21).
+Ciclo **FASE 0–5 + P2/P3 concluído** (07–09/06/2026). Balcão homologado, portal QR, payback, CONFIG e APIs unificadas.
 
-**Modo atual:** manutenção + melhorias sob demanda. **Não há fase ativa obrigatória** até nova decisão do sócio.
+**Modo atual:** **FASE 6** (Cockpit executivo) — próximo ciclo de evolução gestão/UX/financeiro. Plano completo: **`PLANO_FASES_6_15_COCKPIT_EXECUTIVO_2026-06.md`** (10 fases, jun–set 2026).
 
 ---
 
@@ -33,7 +34,28 @@ A–M (modularização FE), SMS P0, fixes I15–I21, Pacote K CRM, Pacote M M.1�
 
 ---
 
-## 3. Fases / itens em aberto (por prioridade)
+## 3. Ciclo FASES 6–15 (ativo)
+
+**Documento mestre:** [`PLANO_FASES_6_15_COCKPIT_EXECUTIVO_2026-06.md`](PLANO_FASES_6_15_COCKPIT_EXECUTIVO_2026-06.md)
+
+| Fase | Nome | Prioridade | Status | Impacto visual principal |
+|------|------|------------|--------|--------------------------|
+| **6** | Cockpit executivo | P1 | ✅ repo | Dashboard topo |
+| **7** | Leading financeiros + causalidade | P1 | ✅ repo | Dashboard + Caixa |
+| **8** | Alertas e semáforos | P1 | ⏳ próxima | Dashboard + sidebar |
+| **9** | DNA visual admin | P1 | ⏳ | Dashboard, Caixa, CRM, Sistema |
+| **10** | CRM LTV / cohort | P2 | ⏳ | Relacionamento + Dashboard |
+| **11** | Holding Movi + ZapClin | P2 | ⏳ | Nova página Holding |
+| **12** | Drill-down + simulação margem | P2 | ⏳ | Dashboard gráficos |
+| **13** | Live BI Firebase | P2 | ⏳ | Dashboard widget frota |
+| **14** | Plano contas + mini-DRE | P2 | ⏳ | Dashboard + Custos |
+| **15** | Portal metrics + CONFIG UI | P3 | ⏳ | Sistema + Dashboard |
+
+Detalhe entrega/melhoria/página: tabelas por fase no plano mestre · **FASE 16** (telemetria balcão) = backlog opcional · **Anexo A** = ROIC/ERP (fora do ciclo).
+
+---
+
+## 4. Fases / itens em aberto (operação + legado)
 
 Legenda: **P0** bloqueia operação · **P1** valor imediato · **P2** próximo ciclo · **P3** backlog · **P4** pausado
 
@@ -83,31 +105,29 @@ Legenda: **P0** bloqueia operação · **P1** valor imediato · **P2** próximo 
 
 ---
 
-## 4. Sugestões de melhoria (ordenadas)
+## 5. Sugestões absorvidas no plano FASES 6–15
 
-### Curto prazo (jun–jul 2026)
+| Sugestão antiga | Fase |
+|-----------------|------|
+| Cockpit sócio / KPIs síntese | **FASE 6** |
+| Leading + simulação margem | **FASE 7**, **12** |
+| DNA admin | **FASE 9** |
+| CRM LTV | **FASE 10** |
+| Financeiro consolidado | **FASE 11** |
+| Métricas portal | **FASE 15** |
+| CONFIG self-service | **FASE 15** |
 
-1. **Manter tablet em v1.7.97** — P3 admin no PC; balcão operacional v1.7.96+ ok.
-2. **Rotina B7 semanal** — detectar regressão write antes do operador.
-3. **Cartaz QR** — impresso e treinamento “escaneie + DDD” (`DECISAO_COMUNICACAO_QR_CODE_2026-06.md`).
-4. **B6 PIN admin via GAS** — reduzir PIN 1416 hardcoded no FE.
+### Operação contínua (paralelo às fases)
 
-### Médio prazo (ago–set 2026)
-
-5. ~~**PDF executivo** (B5)~~ — ✅ 09/06 v1.5.73.
-6. **CI GitHub Actions** — bloquear merge se pre-push falhar.
-7. ~~**Auditoria por operador** (B3)~~ — ✅ 09/06.
-8. **Reavaliar F4** — só se SMS manual comprovado estável 30 dias.
-
-### Longo prazo (out–dez 2026)
-
-9. **Portal como canal #1** — métricas de uso `acompanhar.html`.
-10. **CONFIG self-service** — operador admin edita frota sem dev.
-11. **Maturidade protocolo nível 4→5** — E2E tablet automatizado onde possível.
+1. **Tablet** — `?force=` versão atual após cada deploy FE admin.
+2. **Rotina B7 semanal** — `TESTE_B7_REGRESSAO_WRITE.ps1`.
+3. **Cartaz QR** — ops (`DECISAO_COMUNICACAO_QR_CODE_2026-06.md`).
+4. **Treino N1** — badge Recorrente (**FASE 10** reforça).
+5. **Reavaliar F4** — após 90d manual estável (Anexo A plano 6–15).
 
 ---
 
-## 5. Fluxos e processos (referência rápida)
+## 6. Fluxos e processos (referência rápida)
 
 | Processo | Documento | Comando / artefato |
 |----------|-----------|-------------------|
@@ -122,7 +142,7 @@ Legenda: **P0** bloqueia operação · **P1** valor imediato · **P2** próximo 
 
 ---
 
-## 6. Histórico recente (commits)
+## 7. Histórico recente (commits)
 
 | Hash | Data | Entrega |
 |------|------|---------|
@@ -134,8 +154,8 @@ Legenda: **P0** bloqueia operação · **P1** valor imediato · **P2** próximo 
 
 ---
 
-## 7. Próxima revisão
+## 8. Próxima revisão
 
-**13/06/2026** ou quando iniciar item P2+.
+**Ao fechar FASE 6** (cockpit) · meio ciclo **FASE 9** · fim **FASE 15**.
 
-Ao iniciar nova fase: atualizar `HANDOFF_NOVO_CHAT.md` + seção **Execução** em `PLANO_PRIORIDADES_2026-06.md`.
+Ao iniciar/fechar fase: `HANDOFF_NOVO_CHAT.md` + § Execução em `PLANO_PRIORIDADES_2026-06.md` + checklist fase no plano 6–15.

@@ -20,7 +20,7 @@ Write-Host "role=$($good.role) operador=$($good.operador.nome)"
 
 Write-Host '=== isAdminRequest sem PIN (authRole so) ===' -ForegroundColor Cyan
 if ($p.versao -ne 'v1.5.74') {
-  Write-Warning "GAS $($p.versao) — publique Nova versao Web v1.5.74 para validar B6 completo (skip authRole)"
+  Write-Warning "GAS $($p.versao) - publique Nova versao Web v1.5.74 para validar B6 completo (skip authRole)"
 } else {
   $noPin = Invoke-RestMethod -Uri "$base`?action=listarAuditoriaAdmin&authRole=admin&limite=1" -Method Get -TimeoutSec 20
   if ($noPin.ok) { throw 'listarAuditoriaAdmin nao deveria aceitar authRole sem adminPin (B6)' }
