@@ -1,6 +1,6 @@
 # MOVI KIDS — Mapa do código e arquitetura
 
-**Atualizado:** 09/06/2026 (B8 idle sessão — I21)  
+**Atualizado:** 09/06/2026 (v1.7.96 — I21 splash boot + FASE 5 fechada)  
 **Função:** anatomia do sistema — o que é cada parte, o que liga com o quê, o que é zona sensível.  
 **Complementa:** `ESTADO_ATUAL.md`, `ACESSOS_E_AUTORIZACOES.md`, `REGRAS_DE_PUBLICACAO_SEGURA.md`, `MAPA_ERROS_FALHAS_BUGS.md`, **`PROTOCOLO_DIAGNOSTICO_E_TESTES.md`**
 
@@ -19,7 +19,7 @@
 | **Olhos (gestão)** | KPIs, payback, relatório | Dashboard, Caixa admin — `buscarKPIsAdmin` (GAS) + páginas admin no FE |
 | **Pernas (canais externos)** | Portal pais, foto, cronômetro curto | `acompanhar.html`, `foto-moldura.html`, `track.html` |
 | **Pele** | Visual único | `mk-app.css` (base) + `mk-design.css` (aditivo Pacote A) |
-| **Porta de entrada** | Quem pode entrar + idle 1h | `mk-auth.js` + `mk-admin.js` — operador PIN, admin 1416 (overlay), `mkAuthReleaseBalcaoServer_` |
+| **Porta de entrada** | Quem pode entrar + idle 1h + splash boot | `mk-auth.js` — `mkAuthBoot`, `hideSplash_`, `mkAuthReleaseBalcaoServer_` |
 | **Dedos finos** | Scripts pontuais, emergência, testes | `scripts/testes/`, `scripts/ops/`, `google-drive-sheets-auth` |
 
 **Monólito modularizado (Pacote M fechado):** `index.html` **~1.378 linhas** (v1.7.87) — **zero JS inline** (só HTML + `<script src>`). Módulos: M.1–M.17 (`mk-globals.js`, `mk-core.js` … `mk-boot.js`). Plano: `PACOTE_M_MODULARIZACAO.md`.
@@ -69,8 +69,10 @@ movikids-github/
 │   └── gas/ + .clasp.json  ← clasp push (Code.gs gerado)
 ├── IMUNOLÓGICO
 │   └── scripts/pre-push-check.ps1
-├── DEDOS (testes / ops)
-│   └── scripts/testes/*.ps1
+├── DEDOS (testes / ops / homolog)
+│   ├── scripts/testes/*.ps1
+│   ├── scripts/ops/mock-idle-tablet.html
+│   └── assets/mock-idle-homolog.html   ← mock idle I21 (Pages HTTPS)
 ├── ARQUIVO (não implantar)
 │   └── arquivo-historico/*.gs
 └── DOCUMENTAÇÃO

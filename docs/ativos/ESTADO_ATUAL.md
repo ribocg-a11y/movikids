@@ -27,7 +27,7 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 | Camada | Versão alvo | URL / ID |
 |--------|-------------|----------|
-| **Frontend** | **v1.7.95** | https://ribocg-a11y.github.io/movikids/?force=1.7.95 |
+| **Frontend** | **v1.7.96** | https://ribocg-a11y.github.io/movikids/?force=1.7.96 |
 | **Apps Script** | **v1.5.72** | Publicar Nova versão Web · Deploy `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y` |
 | SMS Gateway Cloud | **DJVJRL** / device `wihWegHr4wXaVJQ1R-GZR` | Aparelho remoto ONLINE |
 | Pacote SMS P0 | **FECHADO** | `PACOTE_SMS_P0_UNIFICADO_v1.5.38_v1.7.11.md` |
@@ -92,7 +92,8 @@ https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPe
 
 | Versão | Entrega |
 |--------|---------|
-| **v1.7.95** | **Portal dos pais fixo** na Home — sem dismiss ✕; modo agente máximo potencial (docs/regras) |
+| **v1.7.96** | **Fix I21** — splash some após mock idle no boot; homologado tablet Milena |
+| **v1.7.95** | **Portal dos pais fixo** na Home — sem dismiss ✕ |
 | **v1.7.94** | **B8 idle I21** — wall clock FE+GAS; `mkAuthReleaseBalcaoServer_`; protocolo ok |
 | **v1.7.93** | **B2 kpiMes** — Dashboard só visualiza via `kpiMes` |
 | **v1.7.92** | **B1 resumoDia** — Caixa + chip admin unificados |
@@ -158,7 +159,7 @@ Commits de referência: `3d9d106` (v1.7.25), `e1a56db` (Pacote E), `1454bc8` (fi
 | Liberar balcão | `liberarSessaoOperadorAdmin` |
 | Corrigir locação encerrada | `corrigirFinanceiroLocacaoAdmin` + `zerarExtra` (v1.5.36+) |
 | Limpar locações de teste | `limparLocacoesTesteAdmin` + `motivo` ≥10 chars |
-| Logout por inatividade | 1h — relógio real FE v1.7.94+ (atual **v1.7.95**) + GAS v1.5.72 (`lastActivityAt`); pausado se locação Ativa/Pendente (I18); idle libera balcão no servidor |
+| Logout por inatividade | 1h — relógio real FE **v1.7.96** + GAS v1.5.72 |
 
 ---
 
@@ -190,7 +191,7 @@ Commits de referência: `3d9d106` (v1.7.25), `e1a56db` (Pacote E), `1454bc8` (fi
 - [x] **Pacote M — Modularização FE** — M.1–M.17 ✅ (v1.7.87; zero JS inline)
 - [x] **Pacote L** — UX polish v1.7.91 (FASE 3 fechada)
 - [x] **FASE 4 CONFIG** — planilha + tablet validados
-- [~] **FASE 5** — ✅ fechada 09/06 (tablet Milena; I21 mock opcional)
+- [x] **FASE 5** — ✅ fechada 09/06 (Milena + I21 v1.7.96)
 - [~] **Fase 9 supervisor — PAUSADA**
 
 ---
@@ -261,8 +262,8 @@ Commits de referência: `3d9d106` (v1.7.25), `e1a56db` (Pacote E), `1454bc8` (fi
 ## Validação rápida (pós-deploy)
 
 1. Ping GAS → `ok:true`, `versao` **v1.5.72**
-2. Pages → `mk-version.js` → **1.7.95**
-3. Tablet balcão → `?force=1.7.95`, rodapé **Online v1.7.95**; card Portal **sem** ✕
+2. Pages → `mk-version.js` → **1.7.96**
+3. Tablet balcão → `?force=1.7.96`, rodapé **Online v1.7.96**
 4. `.\scripts\pre-push-check.ps1` → status ok
 5. B7 write → `.\scripts\testes\TESTE_B7_REGRESSAO_WRITE.ps1` → status ok (grava + cleanup)
 6. Balcão + celular mesma locação → timer ± **2 s** (I16)

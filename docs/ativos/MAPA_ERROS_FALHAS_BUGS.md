@@ -1,6 +1,6 @@
 # MOVI KIDS — Mapa de erros, falhas e bugs
 
-**Atualizado:** 09/06/2026 — **I21** sessão idle dual (B8 v1.7.94/v1.5.72) — ver `../arquivo/incidentes/INCIDENTE_I21_SESSAO_IDLE_DUAL_2026-06-09.md`  
+**Atualizado:** 09/06/2026 — **I21 fechado** (B8 v1.7.94/v1.5.72 + splash v1.7.96) — ver `../arquivo/incidentes/INCIDENTE_I21_SESSAO_IDLE_DUAL_2026-06-09.md`  
 **Uso:** consultar **antes de publicar** e **ao montar checklist de teste**. Cada linha tem trava e script de verificação quando existir.
 
 **Protocolo de teste (obrigatório quando usuário pedir “rodar teste”):** `PROTOCOLO_DIAGNOSTICO_E_TESTES.md` → `scripts/testes/TESTE_PROTOCOLO_DIAGNOSTICO.ps1`
@@ -51,7 +51,7 @@
 | **I17** | **Liberar sessão + cache GET** | **Banner operador preso** | v1.7.45 sync UI + `no-store` | `mkAuthSyncSessaoBalcaoUI_`; api cache | ADM liberar **tablet** |
 | **I18** | **Idle 1h com locação aberta** | **Logout no meio da locação** | v1.7.46 `mkHasLocacaoAbertaNoTablet_` | mk-auth + tickAdmin | mock idle + loc ativa |
 | **I19** | **PWA sessão fantasma + turno invisível** | Operador “dentro” do app; servidor sem turno; Home sem nome; AUD sem logout idle | v1.7.48 `mkAuthReconcileSessaoFantasma_` + chip `#hd-turno-chip` | pre-push `guard.auth.fantasma`; PWA `mk-update` | tablet ícone: chip Turno + liberar ADM |
-| **I21** | **Idle 1h não deslogou — sessão dual admin/operador** | Milena no BALCÃO 14h+; TABLET Administrador; GAS TTL 18h; timer admin congelado | **B8** v1.7.94 + v1.5.72: wall clock, `mkAuthReleaseBalcaoServer_`, `lastActivityAt`, `touchSessaoOperador` | `guard.idle.wallclock`, `guard.idle.gas.release` | **`TESTE_SESSAO_IDLE_READONLY`** + mock idle tablet |
+| **I21** | **Idle 1h — sessão dual + splash boot** | Milena 14h+ logada; mock idle travava splash | **B8** v1.7.94/96 + v1.5.72: wall clock, release GAS, `hideSplash_` boot | `guard.idle.wallclock`, `guard.idle.gas.release` | **`TESTE_SESSAO_IDLE_READONLY`** + tablet mock ✅ |
 | T1 | Em-dash `—` em string `.ps1` perto de `-f` | ParserError em `TESTE_RELACIONAMENTO`, `TESTE_I20` | Hífen ASCII `-` em mensagens | `scripts/testes/README.md` | `TESTE_RELACIONAMENTO_*`, `TESTE_I20_COMPLETO_PROD.ps1` |
 
 ---
@@ -113,7 +113,7 @@
 - [ ] Idle não desloga com locação Ativa (I18)
 - [ ] Chip **Turno: Nome** visível no header (I19) — PWA ícone
 - [ ] Liberar sessão ADM → tablet desloga ou chip laranja em ≤60s (I19)
-- [ ] Mock idle 1h → gate login + balcão livre no GAS (I21)
+- [x] Mock idle 1h → gate login + balcão livre no GAS (I21) — **09/06 v1.7.96**
 - [ ] Admin timer mostra `MM:SS`; `⏸` com locação Ativa (I21/I18)
 - [ ] Ctrl+F5 com `?force=VERSAO_ATUAL`
 
@@ -141,7 +141,7 @@
 
 | Camada | Repo / produção | Mínimo I21 (B8) |
 |--------|-----------------|-----------------|
-| Frontend | **v1.7.95** | `?force=1.7.95` (mín. I21/B8: v1.7.94+) |
+| Frontend | **v1.7.96** | `?force=1.7.96` (mín. I21/B8: v1.7.94+) |
 | GAS | **v1.5.72** | Nova versão Web se ping &lt; esperado |
 
 Ver `ESTADO_ATUAL.md` para URLs e editor GAS.

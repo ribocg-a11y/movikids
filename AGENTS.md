@@ -55,7 +55,7 @@ Detalhe completo: [`ACESSOS_E_AUTORIZACOES.md`](docs/ativos/ACESSOS_E_AUTORIZACO
 
 | Camada | Versão |
 |--------|--------|
-| Frontend | **v1.7.95** |
+| Frontend | **v1.7.96** |
 | GAS | **v1.5.72** (publicar Nova versão Web) |
 | Deploy ID | `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y` |
 
@@ -85,9 +85,9 @@ Fonte de verdade: `mk-version.js`, header do `.gs`, ping GAS.
 ## Estado do projeto (09/06/2026)
 
 - **FASE 1–4:** ✅ fechadas
-- **FASE 5:** ✅ fechada 09/06 — tablet Milena · I21 mock opcional
-- **Produção:** FE **v1.7.95** · GAS **v1.5.72**
-- **Próximo:** push mock-idle Pages · backlog B6/B3/B5 sob demanda
+- **FASE 5:** ✅ fechada 09/06 — Milena + I21 v1.7.96
+- **Produção:** FE **v1.7.96** · GAS **v1.5.72** · `main` @ `91cc08f`
+- **Próximo:** operação · backlog B6/B3/B5 sob demanda
 
 ## Ao encerrar sessão
 

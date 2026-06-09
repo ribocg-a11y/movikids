@@ -3,7 +3,7 @@
 **Registrado em:** 09/06/2026  
 **Mapa:** `MAPA_ERROS_FALHAS_BUGS.md` → **I21**  
 **Pacote FASE 5:** **B8** — idle sessão FE+GAS alinhados  
-**Correção:** FE **v1.7.94** + GAS **v1.5.72**  
+**Correção:** FE **v1.7.94** + GAS **v1.5.72** + **v1.7.96** (splash boot)  
 **Operadora citada:** Milena Nunes (id 2)  
 **Deploy doc:** `DEPLOY_v1.5.72_SESSAO_IDLE.md`
 
@@ -158,7 +158,8 @@ sequenceDiagram
 |-------|-----------|
 | Ping GAS | **v1.5.72** |
 | `TESTE_SESSAO_IDLE_READONLY.ps1` | **ok** |
-| `TESTE_PROTOCOLO_DIAGNOSTICO.ps1` (completo) | **warn** (FE Pages regex corrigido); demais fases ok |
-| B8 FASE 5 | **Fechado** no repo |
+| Tablet mock idle (Milena) | **ok** — gate login |
+| **v1.7.96** splash boot | **ok** — `hideSplash_()` no idle expirado |
+| B8 + FASE 5 | **Fechado** |
 
-*Tablet mock idle (I21) — opcional; ver `DEPLOY_v1.5.72_SESSAO_IDLE.md`.*
+**Homologação tablet:** `assets/mock-idle-homolog.html` (HTTPS — não usar `file://`).

@@ -1,6 +1,6 @@
 # MOVI KIDS — Protocolo de diagnóstico, testes e maturidade de aprendizado
 
-**Criado:** 07/06/2026 · **Atualizado:** 08/06/2026  
+**Criado:** 07/06/2026 · **Atualizado:** 09/06/2026 (FASE 5 fechada · v1.7.96)  
 **Função:** quando o usuário pedir *“rodar teste”*, *“diagnosticar”* ou *“validar deploy”*, o agente **segue este documento** — não improvisa escopo.  
 **Complementa:** `MAPA_ERROS_FALHAS_BUGS.md`, `INCIDENTE_I20_CRONOMETRO_RESOLUCAO_2026-06-07.md`, `MAPA_CODIGO_ARQUITETURA.md`, `HOMOLOGACAO_PRODUCAO_ASSISTIDA.md`
 
@@ -211,7 +211,7 @@ O orquestrador **completo** inclui scripts que **gravam** locações de teste. Q
 | B7 write | `TESTE_B7_REGRESSAO_WRITE.ps1` (grava + cleanup) |
 | B1 resumoDia | `TESTE_RESUMO_DIA_READONLY.ps1` |
 | B2 kpiMes | `TESTE_KPI_MES_READONLY.ps1` |
-| B8 idle I21 | `TESTE_SESSAO_IDLE_READONLY.ps1` |
+| B8 idle I21 | `TESTE_SESSAO_IDLE_READONLY.ps1` · `assets/mock-idle-homolog.html` |
 | F0 | `TESTE_REGRESSAO_MOVIKIDS_PROD_SAFE.ps1` (sem `-RunWriteTests`) |
 
 **Pular:** `TESTE_I20_*`, `TESTE_4_FLUXOS_*`, `TESTE_DRAWER_E_*`, `TESTE_PACOTE_F_KPI_READONLY.ps1` (este último grava apesar do nome).

@@ -36,12 +36,11 @@
 | B7.2 | ▶ **Iniciar** | [x] | — |
 | B7.3 | **Estender** | [x] | — |
 | B7.4 | **Encerrar** | [x] | — |
-| I21.1 | Mock idle → gate login | [ ] | **não testado** — ver abaixo |
-| I21.2 | Re-login operador | [ ] | pendente I21.1 |
+| I21.1 | Mock idle → gate login | [x] | **09/06 v1.7.96** |
+| I21.2 | Re-login operador | [x] | Milena |
 
 **Assinatura ops:** Milena / balcão · **09/06/2026**  
-**5.B7.4:** ✅ **FECHADO**  
-**I21.1 tablet:** ⬜ opcional (B8 readonly ok; retry quando quiser)
+**5.B7.4 + I21:** ✅ **FECHADO** (v1.7.96)
 
 ---
 
@@ -74,4 +73,4 @@ O helper em arquivo local (`file://`) **não grava** no mesmo `localStorage` do 
 
 **Critério mínimo atingido:** F0 + P + B7 ✅ (09/06). I21.1 tablet = opcional pós-B8.
 
-FASE 5 declarada **fechada** em `HANDOFF_NOVO_CHAT.md` e `FASE_5_CONFIABILIDADE_APIS.md`.
+FASE 5 declarada **fechada** — ver `PLANEJAMENTO_ATUAL_2026-06.md`.

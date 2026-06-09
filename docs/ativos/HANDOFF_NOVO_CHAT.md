@@ -1,6 +1,6 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 09/06/2026 (FASE 5 **ativa** — FE **v1.7.95** + GAS **v1.5.72** publicados)  
+**Atualizado:** 09/06/2026 (FASE 5 **fechada** — FE **v1.7.96** + GAS **v1.5.72**)  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **Repo local:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`  
@@ -51,7 +51,7 @@ Continuo o MOVI KIDS. Repo: C:\Users\riboc\Documents\Codex\2026-05-30\files-ment
 
 - Ler: este arquivo → `PLANO_PRIORIDADES` → `ESTADO_ATUAL` → `REGRAS` → `ACESSOS_E_AUTORIZACOES` (§7 = agente vs você)
 - Ignorar handoff antigo em `docs/arquivo/planos/`
-- Informar: FE **v1.7.95**, GAS **v1.5.72** (ping ok) — **FASE 1–4 fechadas**; **FASE 5 ativa** (B1+B2+B8 ✅; B7 3× write ✅; pendente tablet **5.B7.4** — `CHECKLIST_FASE5_TABLET.md`)
+- Informar: FE **v1.7.96**, GAS **v1.5.72** — **FASE 0–5 fechadas** · operação estável · ver **`PLANEJAMENTO_ATUAL_2026-06.md`**
 - Deixar claro: **agente** no **PC** (código, testes, planilha); **você** Nova versão GAS Web; **tablet no balcão** = validação operação (não confundir com seu computador)
 
 ---
@@ -86,10 +86,10 @@ Regra Cursor: `.cursor/rules/handoff-movikids.mdc` § Modo de operação.
 
 | Camada | Versão | Verificação |
 |--------|--------|-------------|
-| **Frontend** | **v1.7.95** | `mk-version.js` → `window.MK_VERSION` |
-| **Service Worker** | **1.7.95** | `sw.js` → `SW_VERSION` |
+| **Frontend** | **v1.7.96** | `mk-version.js` → `window.MK_VERSION` |
+| **Service Worker** | **1.7.96** | `sw.js` → `SW_VERSION` |
 | **Apps Script** | **v1.5.72** | [ping](https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec?action=ping) → `versao` |
-| **App tablet balcão** | v1.7.95 | https://ribocg-a11y.github.io/movikids/?force=1.7.95 (**na loja**, não só no PC) |
+| **App tablet balcão** | v1.7.96 | https://ribocg-a11y.github.io/movikids/?force=1.7.96 (**na loja**, não só no PC) |
 
 **Deploy ID GAS (único — nunca criar outro):** `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y`
 
@@ -118,7 +118,7 @@ Regra Cursor: `.cursor/rules/handoff-movikids.mdc` § Modo de operação.
 | QA tablet | **`PROTOCOLO_DIAGNOSTICO_E_TESTES.md`** → `TESTE_PROTOCOLO_DIAGNOSTICO.ps1` · homologação F5–F11: `TESTE_TABLET_F5_F7_F10_F11.ps1` |
 | Homologação | `HOMOLOGACAO_PRODUCAO_ASSISTIDA.md`, `CHECKLIST_PACOTE_K.md` |
 | Payback | `MEMORIAL_PAYBACK_INVESTIMENTO.md` |
-| Roadmap 90 dias | `PLANO_CONTINUIDADE_2026-06.md` |
+| Roadmap / planejamento | **`PLANEJAMENTO_ATUAL_2026-06.md`** · `PLANO_CONTINUIDADE_2026-06.md` |
 
 ---
 
@@ -130,25 +130,20 @@ Regra Cursor: `.cursor/rules/handoff-movikids.mdc` § Modo de operação.
 
 **FASE 3–4:** ✅ fechadas 08/06 — Pacote L v1.7.91 + CONFIG planilha validados.
 
-**FASE 5:** ✅ **FECHADA** 09/06/2026 — B1+B2+B8+B7 · tablet **5.B7.4** assinado (Milena) · I21 mock tablet opcional.
+**FASE 5:** ✅ **FECHADA** 09/06/2026 — B1+B2+B8+B7 · tablet Milena · I21 mock **ok v1.7.96**.
 
-**Próximo passo:** push `assets/mock-idle-homolog.html` (retry idle no tablet) · escolher próxima fase/backlog (B6/B3/B5 ou operação).
+**v1.7.96 (09/06):** fix splash travada após mock idle no boot (I21).
 
-**v1.7.95 (09/06):** card **Portal dos pais** fixo na Home — sem botão ✕; modo agente máximo potencial em regras/docs.
-
-**I20 / Pacote M:** continuam fechados — não regredir timer sem `TESTE_I20_COMPLETO_PROD.ps1` + tablet.
+**Próximo passo:** operação estável v1.7.96 · B7 semanal · backlog P2+ — **`PLANEJAMENTO_ATUAL_2026-06.md`**.
 
 **Últimos commits (main = origin):**
 
 | Hash | Entrega |
 |------|---------|
-| `a56c3ed` | Docs handoff — hash main alinhado |
-| `5a62726` | Docs handoff pronto para novo chat |
-| `0e9e47c` | v1.7.95 — portal fixo + modo agente |
-| `097aea6` | Docs modelo operacional PC vs tablet |
-| `a72f0ad` | FASE 5 fecha B8 após protocolo |
-| `c3f92ac` | v1.7.94 + GAS v1.5.72 — B8 idle I21 |
-| `ef0ee3b` | v1.7.93 + GAS v1.5.71 — B2 kpiMes |
+| `91cc08f` | **v1.7.96** — fix splash idle boot (I21) |
+| `8173d10` | FASE 5 docs + mock-idle Pages |
+| `0e9e47c` | v1.7.95 — portal fixo Home |
+| `c3f92ac` | v1.7.94 + GAS v1.5.72 — B8 idle |
 
 Detalhe vivo: seção **Execução — status ao vivo** em `PLANO_PRIORIDADES_2026-06.md`.
 
@@ -202,7 +197,7 @@ Invoke-RestMethod "https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5
 .\scripts\pre-push-check.ps1
 ```
 
-Esperado: ping `versao: v1.5.72`, pre-push verde, FE `1.7.95` (Pages + `mk-version.js`).
+Esperado: ping `versao: v1.5.72`, pre-push verde, FE **1.7.96** (Pages + `mk-version.js`).
 
 ---
 
@@ -240,8 +235,8 @@ Guia completo: `DEPLOY_GAS_v1.5.32_AUTH.md`
 
 | Item | Status |
 |------|--------|
-| **FASE 5** Confiabilidade/APIs | 🟡 **ativa** — B1+B2+B8 ✅; B7 tablet pendente |
-| **Tablet balcão** | `?force=1.7.95` — portal sem ✕, mock idle I21, 5.B7.4 |
+| **FASE 5** Confiabilidade/APIs | ✅ **fechada** | 09/06 — Milena + I21 v1.7.96 |
+| **Tablet balcão** | v1.7.96 | `?force=1.7.96` |
 | GAS ping produção | **v1.5.72** — **não criar novo Deploy** |
 | **B6/B3/B5** | Backlog FASE 5 (não iniciar sem pedido) |
 
@@ -260,15 +255,14 @@ Não criar novo handoff datado — manter **só este** em `docs/ativos/`.
 
 ---
 
-## Verificação desta sessão (09/06/2026 — pronto para novo chat)
+## Verificação desta sessão (09/06/2026 — FASE 5 fechada)
 
 | Check | Resultado |
 |-------|-----------|
-| `git status` | `main` = `origin/main` @ `a56c3ed` |
+| `git status` | `main` = `origin/main` @ `91cc08f` |
 | Ping GAS | **v1.5.72** ok |
-| GitHub Pages | **v1.7.95** ok (`mk-version.js`) |
-| `pre-push-check.ps1` | ok (27 checks) |
-| Docs ativos | HANDOFF, PLANO, ESTADO, INDICE, AGENTS, README alinhados |
-| Untracked (ignorar) | `financeiro/logs/`, `scripts/testes/.tablet-cdp-payload.json` |
+| GitHub Pages | **v1.7.96** ok |
+| Tablet Milena | Homologação FASE 5 assinada |
+| I21 mock idle | ✅ v1.7.96 |
 
-*Revisão programada: ao fechar FASE 5 ou 13/06/2026.*
+*Próxima revisão: **13/06/2026** — ver `PLANEJAMENTO_ATUAL_2026-06.md`.*

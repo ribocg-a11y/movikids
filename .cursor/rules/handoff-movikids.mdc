@@ -14,7 +14,7 @@ Se o usuário disser apenas algo como **"vamos dar continuidade ao projeto Movi 
 1. Confirmar que este workspace é o repo MOVI KIDS (`README.md` + `AGENTS.md` na raiz, ou pasta `movikids-github`).
 2. Se o workspace for outro: abrir/usar `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`.
 3. Ler os 5 documentos abaixo **antes** de propor ou executar qualquer tarefa.
-4. Resumir em 3 linhas: produção (FE/GAS), fase ativa, próximo passo do checklist.
+4. Resumir em 3 linhas: produção (FE/GAS), **modo operação** (FASE 0–5 fechadas), próximo passo em `PLANEJAMENTO_ATUAL_2026-06.md`.
 5. Perguntar só se o usuário quiser **desviar** do próximo passo — não por falta de contexto.
 
 **GitHub:** `ribocg-a11y/movikids` · branch `main`
@@ -24,10 +24,11 @@ Se o usuário disser apenas algo como **"vamos dar continuidade ao projeto Movi 
 Ao trabalhar neste repositório, **ler primeiro** (nesta ordem):
 
 1. `docs/ativos/HANDOFF_NOVO_CHAT.md` — produção, próximo passo, armadilhas
-2. `docs/ativos/PLANO_PRIORIDADES_2026-06.md` — checklist da fase ativa
-3. `docs/ativos/ESTADO_ATUAL.md` — versões e links canônicos
-4. `docs/ativos/REGRAS_DE_PUBLICACAO_SEGURA.md` — antes de commit/push/deploy
-5. `docs/ativos/ACESSOS_E_AUTORIZACOES.md` — papéis, PIN admin, agente vs humano, o que nunca fazer
+2. `docs/ativos/PLANEJAMENTO_ATUAL_2026-06.md` — backlog P0–P4 pós-FASE 5
+3. `docs/ativos/PLANO_PRIORIDADES_2026-06.md` — fases concluídas
+4. `docs/ativos/ESTADO_ATUAL.md` — versões e links canônicos
+5. `docs/ativos/REGRAS_DE_PUBLICACAO_SEGURA.md` — antes de commit/push/deploy
+6. `docs/ativos/ACESSOS_E_AUTORIZACOES.md` — papéis, PIN admin, agente vs humano
 
 Índice: `docs/INDICE.md` · Entrada raiz: `AGENTS.md` · `README.md`
 
@@ -47,37 +48,19 @@ Ao trabalhar neste repositório, **ler primeiro** (nesta ordem):
 
 **I20 cronômetro (RESOLVIDO):** GAS v1.5.66+ + FE v1.7.78+ — doc `docs/ativos/INCIDENTE_I20_CRONOMETRO_RESOLUCAO_2026-06-07.md`. Não regredir sem `TESTE_I20_COMPLETO_PROD.ps1` + tablet.
 
-**FASE 5:** B7 ok · B1+B2+B8 ✅ · pendente tablet balcão 5.B7.4.
+**FASE 5:** ✅ fechada 09/06 — Milena + I21 v1.7.96 · ver `PLANEJAMENTO_ATUAL_2026-06.md`
 
-**Teste / diagnóstico (OBRIGATÓRIO quando usuário pedir):** ler e seguir `docs/ativos/PROTOCOLO_DIAGNOSTICO_E_TESTES.md` → executar `scripts/testes/TESTE_PROTOCOLO_DIAGNOSTICO.ps1` (ou `-Foco` adequado). Nunca testar só um script isolado sem F0 e sem listar fluxos impactados (§4 do protocolo). Antes de mudar código: preencher matriz de impacto do protocolo.
+**Produção (09/06):** FE **v1.7.96** · GAS **v1.5.72**.
 
-**I20 guards:** antes de mexer em `iniciarTimer_`, `iniciarContagem`, `mergeSessaoCanonica` ou `calcRemaining` → `-Foco cronometro` + tablet ▶→10:00.
+**Teste / diagnóstico:** `PROTOCOLO_DIAGNOSTICO_E_TESTES.md` → `TESTE_PROTOCOLO_DIAGNOSTICO.ps1`.
 
-**Matriz completa:** `docs/ativos/ACESSOS_E_AUTORIZACOES.md` §7.
+**I20 guards:** timer → `-Foco cronometro` + tablet ▶→10:00.
 
 ## Modo de operação — máximo potencial (obrigatório)
 
-Antes de **qualquer** alteração, percorrer mentalmente:
+1. Fluxo F0–F14 antes de codar · 2. PC ≠ tablet · 3. FE+GAS+planilha+PWA · 4. MAPA_ERROS I15/I18/I20/I21.
 
-1. **Fluxo impactado** (F0–F14 do `PROTOCOLO_DIAGNOSTICO_E_TESTES.md`) — não patch isolado.
-2. **Dois aparelhos:** mudança visível no balcão → checklist **tablet na loja**; seu trabalho no **PC** (código, testes HTTP, ping).
-3. **Camadas:** FE + GAS + planilha + PWA cache — listar o que precisa publicar e **quem** publica.
-4. **Incidentes:** consultar `MAPA_ERROS_FALHAS_BUGS.md` — regredir I15/I18/I20/I21 é P0.
-
-**Ao executar (sempre):**
-
-- UI operacional fixa (portal, turno, chip) → **sem** dismiss/localStorage que esconda sem decisão explícita do usuário.
-- Auth/idle/sessão/timer/`api()` → matriz de impacto + teste do fluxo, não só arquivo tocado.
-- Antes de commit/push: `pre-push-check.ps1` + resumo **Publicação:** FE versão · GAS (sim/não) · teste rodado · **tablet balcão:** o que validar lá.
-- Ao encerrar: atualizar HANDOFF + versões se mudou fase/FE.
-
-**Proatividade esperada (sem pedir):**
-
-- Sugerir teste do fluxo afetado e item de checklist tablet quando mexer em operação.
-- Registrar bugs novos no mapa de incidentes se a causa for sistêmica.
-- Não declarar "resolvido" sem F0 + fluxo + quem valida no tablet quando aplicável.
-
-**Produção (09/06):** FE **v1.7.95** · GAS **v1.5.72**.
+Antes de push: `pre-push-check.ps1` + resumo publicação. Ao encerrar: HANDOFF + PLANEJAMENTO se mudou fase.
 
 ## Não usar como fonte de verdade
 
