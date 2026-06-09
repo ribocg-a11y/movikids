@@ -1,4 +1,4 @@
-# MOVI KIDS — Estado atual (08/06/2026)
+# MOVI KIDS — Estado atual (09/06/2026)
 
 Referência única para alinhamento local × produção.
 
@@ -39,7 +39,7 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 **Teste rápido GAS (ping):**  
 https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec?action=ping  
-→ deve retornar `versao: v1.5.70` e `postWriteActions` (POST só no GAS; FE usa GET — I15)
+→ deve retornar `versao: v1.5.72` e `postWriteActions` (POST só no GAS; FE usa GET — I15)
 
 **URL morta (não usar):** `AKfycbzc...` → 404
 
@@ -92,6 +92,10 @@ https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPe
 
 | Versão | Entrega |
 |--------|---------|
+| **v1.7.95** | **Portal dos pais fixo** na Home — sem dismiss ✕; modo agente máximo potencial (docs/regras) |
+| **v1.7.94** | **B8 idle I21** — wall clock FE+GAS; `mkAuthReleaseBalcaoServer_`; protocolo ok |
+| **v1.7.93** | **B2 kpiMes** — Dashboard só visualiza via `kpiMes` |
+| **v1.7.92** | **B1 resumoDia** — Caixa + chip admin unificados |
 | **v1.7.78** | **I20 definitivo** — início otimista no ▶, `_localTimerStart`, `effectiveStartTs_`, botão imediato; validado tablet |
 | **v1.7.87** | **Pacote M.17** — `mk-globals.js` + `mk-boot.js`; **zero JS inline**; Pacote M **fechado** |
 | **v1.7.86** | **Pacote M.16** — core extraído para `mk-core.js`; `index.html` ~1.440 linhas (só globals) |
@@ -154,7 +158,7 @@ Commits de referência: `3d9d106` (v1.7.25), `e1a56db` (Pacote E), `1454bc8` (fi
 | Liberar balcão | `liberarSessaoOperadorAdmin` |
 | Corrigir locação encerrada | `corrigirFinanceiroLocacaoAdmin` + `zerarExtra` (v1.5.36+) |
 | Limpar locações de teste | `limparLocacoesTesteAdmin` + `motivo` ≥10 chars |
-| Logout por inatividade | 1h — relógio real FE v1.7.94 + GAS v1.5.72 (`lastActivityAt`); pausado se locação Ativa/Pendente (I18); idle libera balcão no servidor |
+| Logout por inatividade | 1h — relógio real FE v1.7.94+ (atual **v1.7.95**) + GAS v1.5.72 (`lastActivityAt`); pausado se locação Ativa/Pendente (I18); idle libera balcão no servidor |
 
 ---
 
@@ -256,14 +260,16 @@ Commits de referência: `3d9d106` (v1.7.25), `e1a56db` (Pacote E), `1454bc8` (fi
 
 ## Validação rápida (pós-deploy)
 
-1. Ping GAS → `ok:true`, `versao` **v1.5.69**
-2. Tablet → `?force=1.7.91`, rodapé **Online v1.7.91**
-3. `.\scripts\pre-push-check.ps1` → status ok
-4. B7 write → `.\scripts\testes\TESTE_B7_REGRESSAO_WRITE.ps1` → status ok (grava + cleanup)
-5. Balcão + celular mesma locação → timer ± **2 s** (I16)
-6. ADM liberar sessão → banner limpa sem Ctrl+F5 (I17)
-7. Locação ativa + idle expirado → operador **permanece** logado (I18)
-8. Nova locação salva no tablet (I15)
+1. Ping GAS → `ok:true`, `versao` **v1.5.72**
+2. Pages → `mk-version.js` → **1.7.95**
+3. Tablet balcão → `?force=1.7.95`, rodapé **Online v1.7.95**; card Portal **sem** ✕
+4. `.\scripts\pre-push-check.ps1` → status ok
+5. B7 write → `.\scripts\testes\TESTE_B7_REGRESSAO_WRITE.ps1` → status ok (grava + cleanup)
+6. Balcão + celular mesma locação → timer ± **2 s** (I16)
+7. ADM liberar sessão → banner limpa sem Ctrl+F5 (I17)
+8. Locação ativa + idle expirado → operador **permanece** logado (I18)
+9. Nova locação salva no tablet (I15)
+10. Idle I21 → `TESTE_SESSAO_IDLE_READONLY.ps1` ok; mock tablet opcional
 
 Scripts: `scripts/testes/` — ver `scripts/testes/README.md`
 

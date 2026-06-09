@@ -1,7 +1,7 @@
 # MOVI KIDS — Plano de continuidade (pós-pausa maturidade)
 
 **Data:** 08/06/2026 (revisão — FASE 5 ativa)  
-**Produção:** FE **v1.7.91** · GAS **v1.5.69**  
+**Produção:** FE **v1.7.95** · GAS **v1.5.72**  
 **Handoff novo chat:** **`HANDOFF_NOVO_CHAT.md`**  
 **Ordem de execução:** **`PLANO_PRIORIDADES_2026-06.md`** (prioridades por fase)  
 **Substitui como “próximo passo”:** seção 9 de `PLANO_PAUSA_MATURIDADE_2026-06.md` e seção 14 de `PLANO_MESTRE_REORGANIZADO_2026-06.md`  

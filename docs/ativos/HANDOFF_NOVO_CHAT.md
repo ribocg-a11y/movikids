@@ -1,6 +1,6 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 09/06/2026 (FASE 5 **ativa** — B8 idle I21 entregue no repo)  
+**Atualizado:** 09/06/2026 (FASE 5 **ativa** — FE **v1.7.95** + GAS **v1.5.72** publicados)  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **Repo local:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`  
@@ -51,7 +51,7 @@ Continuo o MOVI KIDS. Repo: C:\Users\riboc\Documents\Codex\2026-05-30\files-ment
 
 - Ler: este arquivo → `PLANO_PRIORIDADES` → `ESTADO_ATUAL` → `REGRAS` → `ACESSOS_E_AUTORIZACOES` (§7 = agente vs você)
 - Ignorar handoff antigo em `docs/arquivo/planos/`
-- Informar: FE **v1.7.95**, GAS **v1.5.72** — **FASE 1–4 fechadas**; **FASE 5 ativa** (B8 idle sessão — publicar GAS v1.5.72)
+- Informar: FE **v1.7.95**, GAS **v1.5.72** (ping ok) — **FASE 1–4 fechadas**; **FASE 5 ativa** (B1+B2+B8 ✅; pendente tablet 5.B7.4 + 3× B7)
 - Deixar claro: **agente** no **PC** (código, testes, planilha); **você** Nova versão GAS Web; **tablet no balcão** = validação operação (não confundir com seu computador)
 
 ---
@@ -130,11 +130,21 @@ Regra Cursor: `.cursor/rules/handoff-movikids.mdc` § Modo de operação.
 
 **FASE 3–4:** ✅ fechadas 08/06 — Pacote L v1.7.91 + CONFIG planilha validados.
 
-**FASE 5 (ativa):** B7 ok · B1+B2+B8 ✅ (09/06) · GAS **v1.5.72** + FE **v1.7.94** · pendente: tablet homologação 5.B7.4 + 3× B7.
+**FASE 5 (ativa):** B7 baseline ok · B1+B2+B8 ✅ (09/06) · FE **v1.7.95** + GAS **v1.5.72** publicados · pendente: tablet **5.B7.4** + 3× `TESTE_B7_REGRESSAO_WRITE` sem falha.
+
+**v1.7.95 (09/06):** card **Portal dos pais** fixo na Home — sem botão ✕; modo agente máximo potencial em regras/docs.
 
 **I20 / Pacote M:** continuam fechados — não regredir timer sem `TESTE_I20_COMPLETO_PROD.ps1` + tablet.
 
-**Últimos commits:** ver `git log -5` (docs FASE 1 + homologação).
+**Últimos commits (main = origin):**
+
+| Hash | Entrega |
+|------|---------|
+| `0e9e47c` | v1.7.95 — portal fixo + modo agente |
+| `097aea6` | Docs modelo operacional PC vs tablet |
+| `a72f0ad` | FASE 5 fecha B8 após protocolo |
+| `c3f92ac` | v1.7.94 + GAS v1.5.72 — B8 idle I21 |
+| `ef0ee3b` | v1.7.93 + GAS v1.5.71 — B2 kpiMes |
 
 Detalhe vivo: seção **Execução — status ao vivo** em `PLANO_PRIORIDADES_2026-06.md`.
 
@@ -188,7 +198,7 @@ Invoke-RestMethod "https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5
 .\scripts\pre-push-check.ps1
 ```
 
-Esperado: ping `versao: v1.5.72`, pre-push verde, FE `1.7.94`.
+Esperado: ping `versao: v1.5.72`, pre-push verde, FE `1.7.95` (Pages + `mk-version.js`).
 
 ---
 
@@ -220,17 +230,16 @@ Guia completo: `DEPLOY_GAS_v1.5.32_AUTH.md`
 
 ## Pacotes fechados vs em andamento
 
-**Fechados:** A–J, SMS P0, K.1–K.2, fixes I16–I20, Payback (código), **Pacote M modularização M.1–M.17** (FE v1.7.87).
+**Fechados:** A–J, SMS P0, K.1–K.4, fixes I16–I21 (B8), Payback (código), **Pacote M** M.1–M.17 (v1.7.87), **Pacote L** (v1.7.91), **FASE 1–4**.
 
 **Em andamento / próximo:**
 
 | Item | Status |
 |------|--------|
-| **FASE 1 homologação** | ✅ fechada 08/06/2026 |
-| **K.3–K.4** CRM tablet | ✅ homologado 08/06 |
-| **FASE 2** payback negócio | ✅ fechada 08/06 |
-| **Pacote L** UX polish + QR balcão | 🟡 **ativa** v1.7.88 |
-| GAS ping produção | v1.5.67 — **não criar novo Deploy** |
+| **FASE 5** Confiabilidade/APIs | 🟡 **ativa** — B1+B2+B8 ✅; B7 tablet pendente |
+| **Tablet balcão** | `?force=1.7.95` — portal sem ✕, mock idle I21, 5.B7.4 |
+| GAS ping produção | **v1.5.72** — **não criar novo Deploy** |
+| **B6/B3/B5** | Backlog FASE 5 (não iniciar sem pedido) |
 
 ---
 
@@ -247,4 +256,15 @@ Não criar novo handoff datado — manter **só este** em `docs/ativos/`.
 
 ---
 
-*Revisão programada: ao fechar FASE 2 ou 13/06/2026.*
+## Verificação desta sessão (09/06/2026 — pronto para novo chat)
+
+| Check | Resultado |
+|-------|-----------|
+| `git status` | `main` = `origin/main` @ `0e9e47c` |
+| Ping GAS | **v1.5.72** ok |
+| GitHub Pages | **v1.7.95** ok (`mk-version.js`) |
+| `pre-push-check.ps1` | ok (27 checks) |
+| Docs ativos | HANDOFF, PLANO, ESTADO, INDICE, AGENTS, README alinhados |
+| Untracked (ignorar) | `financeiro/logs/`, `scripts/testes/.tablet-cdp-payload.json` |
+
+*Revisão programada: ao fechar FASE 5 ou 13/06/2026.*

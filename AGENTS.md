@@ -82,12 +82,12 @@ Fonte de verdade: `mk-version.js`, header do `.gs`, ping GAS.
 - `docs/arquivo/obsoleto/` — rollback/changelog antigos
 - Arquivos em `arquivo-historico/` para deploy
 
-## Estado do projeto (08/06/2026)
+## Estado do projeto (09/06/2026)
 
-- **FASE 1:** ✅ fechada 08/06
-- **FASE 2:** ✅ fechada 08/06 (INVESTIMENTO + GAS v1.5.69)
-- **FASE 3–4:** ✅ fechadas 08/06 (Pacote L + CONFIG)
-- **FASE 5:** B7 ok · B1+B2 ✅ · **B8 idle sessão** v1.7.94/v1.5.72 — `DEPLOY_v1.5.72_SESSAO_IDLE.md`
+- **FASE 1–4:** ✅ fechadas
+- **FASE 5:** 🟡 ativa — B1+B2+B8 ✅ · B7 tablet pendente (5.B7.4)
+- **Produção:** FE **v1.7.95** · GAS **v1.5.72** · `main` @ `0e9e47c`
+- **Próximo:** tablet balcão `?force=1.7.95` + 3× B7 write
 
 ## Ao encerrar sessão
 

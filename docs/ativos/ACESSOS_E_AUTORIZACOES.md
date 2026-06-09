@@ -212,7 +212,7 @@ Fluxo típico: **agente prepara** → **você publica GAS** (1 clique Nova vers�
 |------|------|
 | **Nova versão Web GAS** | [Editor Apps Script](https://script.google.com/home/projects/19SIhkX9Tk7FiJA1JXu1OrUwssHdr3H5zc8q3rOjmBvqgWfXuHlk8xyf8/edit) → Implantar → `AKfycbwakQ...` |
 | **Colar `.gs` manualmente** | Alternativa ao clasp — Ctrl+A no arquivo do PC → Código.gs |
-| **Tablet balcão (na loja)** | Abrir `?force=1.7.94` **no aparelho da operação** — não confundir com o PC de gestão |
+| **Tablet balcão (na loja)** | Abrir `?force=1.7.95` **no aparelho da operação** — não confundir com o PC de gestão |
 | **Script Properties SMS** | Projeto GAS → Configurações → Propriedades (fora da planilha) |
 | **Re-auth OAuth** (se token expirar) | `cd google-drive-sheets-auth` → `npm run auth` — abre browser uma vez |
 | **Aprovar push / comandos sensíveis** | Card de aprovação do Cursor quando aparecer |

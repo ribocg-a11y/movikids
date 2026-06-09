@@ -141,7 +141,7 @@
 
 | Camada | Repo / produção | Mínimo I21 (B8) |
 |--------|-----------------|-----------------|
-| Frontend | **v1.7.94** | `?force=1.7.94` |
+| Frontend | **v1.7.95** | `?force=1.7.95` (mín. I21/B8: v1.7.94+) |
 | GAS | **v1.5.72** | Nova versão Web se ping &lt; esperado |
 
 Ver `ESTADO_ATUAL.md` para URLs e editor GAS.

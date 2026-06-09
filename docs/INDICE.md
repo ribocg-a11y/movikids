@@ -1,6 +1,6 @@
 # MOVI KIDS — Índice de documentação
 
-**Atualizado:** 09/06/2026 (FASE 5 — B8 idle sessão I21)
+**Atualizado:** 09/06/2026 (FE **v1.7.95** + GAS **v1.5.72** publicados · FASE 5 ativa)
 
 ## Comece aqui
 

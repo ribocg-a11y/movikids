@@ -105,4 +105,4 @@ Reduzir divergência entre app e planilha, e garantir que o ciclo **iniciar → 
 - [x] B1 `resumoDia` em produção + teste readonly ok (08/06)  
 - [x] B2 `kpiMes` em produção + teste readonly ok (08/06)  
 - [x] **B8** idle FE+GAS + teste readonly ok (09/06)  
-- [ ] Tablet `?force=1.7.94` — Hub + Dashboard + mock idle I21 (5.B7.4)
+- [ ] Tablet balcão `?force=1.7.95` — portal sem ✕ + Hub + Dashboard + mock idle I21 (5.B7.4)

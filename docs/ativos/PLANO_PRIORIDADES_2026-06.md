@@ -1,6 +1,6 @@
 # MOVI KIDS — Plano de prioridades (análise de sistemas)
 
-**Data:** 08/06/2026  
+**Data:** 09/06/2026  
 **Função:** documento único de **o que fazer agora**, por ordem de prioridade.  
 **Local:** `docs/ativos/` · **Índice:** `../INDICE.md`  
 **Handoff:** `HANDOFF_NOVO_CHAT.md` · **Complementa:** `ESTADO_ATUAL.md`, `PLANO_CONTINUIDADE_2026-06.md`, `REGRAS_DE_PUBLICACAO_SEGURA.md`.
@@ -35,7 +35,7 @@
 | 0.10 | `ACESSOS_E_AUTORIZACOES.md` + planilha OAuth (`google-drive-sheets-auth`) | ✅ 07/06 |
 | 0.11 | `MAPA_CODIGO_ARQUITETURA.md` — anatomia e chaves mestras | ✅ 07/06 |
 
-**Próximo passo imediato:** tablet `?force=1.7.94` (5.B7.4) + 3× `TESTE_B7_REGRESSAO_WRITE` sem falha · fechar FASE 5.
+**Próximo passo imediato:** tablet balcão `?force=1.7.95` (portal sem ✕ + 5.B7.4 + mock idle I21) + 3× `TESTE_B7_REGRESSAO_WRITE` sem falha · fechar FASE 5.
 
 **FASE 1 fechada 08/06/2026:** I.5 assinado · K.3–K.4 tablet · checklist A–F · payback Dashboard · tablet v1.7.87. Sprint 1 + Sprint 2 (K) declarados fechados.
 
@@ -47,12 +47,13 @@
 
 | Camada | Repo (GitHub) | Produção (verificado) | Alinhado? |
 |--------|---------------|------------------------|-----------|
-| **Frontend** | **v1.7.94** (`mk-version.js`) | GitHub Pages v1.7.94 | ✅ |
-| **Service Worker** | v1.7.94 (`sw.js`) | — | ✅ |
+| **Frontend** | **v1.7.95** (`mk-version.js`) | GitHub Pages v1.7.95 | ✅ |
+| **Service Worker** | v1.7.95 (`sw.js`) | — | ✅ |
 | **GAS** | **v1.5.72** (header `.gs`) | Ping **v1.5.72** | ✅ |
 | **Deploy ID** | `AKfycbwakQ...` | Mesmo ID | ✅ |
+| **Git main** | `0e9e47c` | `origin/main` alinhado | ✅ |
 
-**Teste rápido:** https://ribocg-a11y.github.io/movikids/?force=1.7.94  
+**Teste rápido:** https://ribocg-a11y.github.io/movikids/?force=1.7.95  
 **Ping GAS:** `?action=ping` → `versao: v1.5.72`  
 **CONFIG:** `TESTE_OPERACAO_CONFIG_READONLY.ps1` → baseline ok 08/06
 
@@ -246,7 +247,7 @@ Todos em `docs/ativos/` salvo indicação. Índice completo: `docs/INDICE.md`.
 
 | Risco | Mitigação |
 |-------|-----------|
-| Tablet em versão antiga (cache PWA) | `?force=1.7.87`, reinstalar ícone |
+| Tablet em versão antiga (cache PWA) | `?force=1.7.95`, reinstalar ícone |
 | Doc defasado → deploy errado | FASE 0.3; confiar em `mk-version.js` + ping |
 | Payback mal interpretado pelo sócio | Nota no painel (v1.7.64); memorial §10 |
 | POST no browser (I15) | Nunca reintroduzir; `pre-push-check` guard |
@@ -266,4 +267,4 @@ Todos em `docs/ativos/` salvo indicação. Índice completo: `docs/INDICE.md`.
 
 ---
 
-*Próxima revisão: ao fechar B1 (resumoDia) ou 13/06/2026.*
+*Próxima revisão: ao fechar FASE 5 ou 13/06/2026.*
