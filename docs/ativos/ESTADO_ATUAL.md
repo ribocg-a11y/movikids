@@ -27,7 +27,7 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 | Camada | Versão alvo | URL / ID |
 |--------|-------------|----------|
-| **Frontend** | **v1.8.1** | https://ribocg-a11y.github.io/movikids/?force=1.8.1 |
+| **Frontend** | **v1.8.2** | https://ribocg-a11y.github.io/movikids/?force=1.8.2 |
 | **Apps Script** | **v1.5.76** | `DEPLOY_v1.5.76_FASE7_LEADING.md` · FASE 6: `DEPLOY_v1.5.75_FASE6_COCKPIT.md` |
 | SMS Gateway Cloud | **DJVJRL** / device `wihWegHr4wXaVJQ1R-GZR` | Aparelho remoto ONLINE |
 | Pacote SMS P0 | **FECHADO** | `PACOTE_SMS_P0_UNIFICADO_v1.5.38_v1.7.11.md` |
@@ -150,6 +150,8 @@ Commits de referência: `3d9d106` (v1.7.25), `e1a56db` (Pacote E), `1454bc8` (fi
 | Liberar sessão atualiza UI | `mkAuthSyncSessaoBalcaoUI_` + `cache: no-store` (I17) |
 | Idle não desloga com locação | `mkHasLocacaoAbertaNoTablet_` v1.7.46 (I18) |
 | Anti sessão fantasma PWA | `mkAuthReconcileSessaoFantasma_` + chip Turno v1.7.48 (I19) |
+| Balanceamento HTML `#page-*` | `guard.html.page-balance` em pre-push (I22) |
+| Gate locações ativas antes push FE | `check-operacao-livre.ps1` + Regra 14 (I22) |
 
 ---
 

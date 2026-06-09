@@ -204,6 +204,20 @@ Erros cometidos neste projeto que nao devem se repetir:
 - Testes: `TESTE_I20_COMPLETO_PROD.ps1` + checklist tablet em `INCIDENTE_I20_CRONOMETRO_RESOLUCAO_2026-06-07.md`.
 - Doc mestre: **`INCIDENTE_I20_CRONOMETRO_RESOLUCAO_2026-06-07.md`**; mapa **I20**.
 
+## Regra 14 - Janela operacional — locacoes ativas (I22)
+
+**Incidente 09/06/2026:** FASE 6 alterou `index.html` com `</div>` extra; Home/balcao pararam **com locacoes Ativa/Pendente em andamento**.
+
+**Regra absoluta (nao negociavel em feature work):**
+
+1. **Antes** de commit/push que altere `index.html`, `mk-home.js`, `mk-sync.js`, `mk-sessao.js` ou `mk-core.js`: rodar `.\scripts\check-operacao-livre.ps1`.
+2. Se houver locacao **Ativa** ou **Pendente** em producao: **NAO publicar** feature, refactor ou pacote de fase — aguardar janela livre ou operacao encerrada.
+3. **Hotfix P0** (sistema fora do ar): so com **aprovacao explicita** do responsavel; repetir check com `-Force`; rollback e versao anterior prontos.
+4. `pre-push-check.ps1` inclui `guard.html.page-balance` (balanceamento `<div>` em `#page-home`, `#page-nova`, `#page-dashboard`) e `guard.operacao.livre` quando FE critico mudou.
+5. Apos push FE: smoke **F0 Home** + **F1 Nova locacao** no **tablet do balcao** — PowerShell nao substitui (I15).
+
+**Documentacao completa:** `../arquivo/incidentes/INCIDENTE_I22_HOME_FORA_DO_AR_FASE6_HTML_2026-06-09.md`
+
 Toda regressao deve gerar:
 
 - causa provavel;

@@ -188,6 +188,7 @@ C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\m
 | **Deploy GAS** | Mesmo Deploy ID → **Nova versão** no editor. **Nunca** `clasp deploy`. |
 | **Tablet obrigatório** | Mudança em `api()` ou auth → testar no tablet físico. |
 | **Pre-push** | Rodar `.\scripts\pre-push-check.ps1` antes de `git push`. |
+| **I22 — Janela operacional** | **Nunca** push FE crítico (`index.html`, Home, sync) com locações Ativa/Pendente — `check-operacao-livre.ps1` · doc I22. |
 | **Versões alinhadas** | `mk-version.js` = `sw.js` SW_VERSION após mudança FE. |
 | **F4 / F9 pausados** | WhatsApp auto e supervisor — não reativar sem decisão explícita. |
 

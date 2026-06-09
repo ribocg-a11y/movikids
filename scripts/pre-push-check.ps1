@@ -34,6 +34,22 @@ function Read-MkVersion {
   return $m.Matches.Groups[1].Value
 }
 
+function Test-PageDivBalance {
+  param([string]$Html, [string]$PageId)
+  $idNeedle = "id=`"$PageId`""
+  $start = $Html.IndexOf($idNeedle)
+  if ($start -lt 0) { return $null }
+  $divStart = $Html.LastIndexOf("<div", $start)
+  if ($divStart -lt 0) { return $null }
+  $tail = $Html.Substring($divStart)
+  $nextPage = [regex]::Match($tail, "<!--\s*────────\s*PAGE:")
+  $len = if ($nextPage.Success) { $nextPage.Index } else { $tail.Length }
+  $chunk = $tail.Substring(0, $len)
+  $opens = ([regex]::Matches($chunk, "<div[\s>]")).Count
+  $closes = ([regex]::Matches($chunk, "</div>")).Count
+  return [ordered]@{ page = $PageId; opens = $opens; closes = $closes; balanced = ($opens -eq $closes) }
+}
+
 Write-Host "MOVI KIDS pre-push-check (Pacote J)" -ForegroundColor Cyan
 
 try {
@@ -75,6 +91,34 @@ try {
     Add-Check "static.no-post-index" "fail" "index.html contem method POST"
   } else {
     Add-Check "static.no-post-index" "ok" "sem POST explicito"
+  }
+
+  $pageIds = @("page-home", "page-nova", "page-dashboard")
+  $htmlBalFail = $false
+  $htmlBalDetail = @()
+  foreach ($pageId in $pageIds) {
+    $bal = Test-PageDivBalance -Html $indexRaw -PageId $pageId
+    if ($null -eq $bal) {
+      $htmlBalFail = $true
+      $htmlBalDetail += "$pageId ausente"
+    } elseif (-not $bal.balanced) {
+      $htmlBalFail = $true
+      $htmlBalDetail += ("{0} div={1}/{2}" -f $pageId, $bal.opens, $bal.closes)
+    }
+  }
+  $dashIdx = $indexRaw.IndexOf('id="page-dashboard"')
+  $leadIdx = $indexRaw.IndexOf('id="mk-leading-row"')
+  $relIdx = $indexRaw.IndexOf('id="page-relatorio"')
+  if ($dashIdx -ge 0 -and $leadIdx -ge 0 -and $relIdx -ge 0) {
+    if ($leadIdx -lt $dashIdx -or $leadIdx -gt $relIdx) {
+      $htmlBalFail = $true
+      $htmlBalDetail += "mk-leading-row fora de page-dashboard"
+    }
+  }
+  if ($htmlBalFail) {
+    Add-Check "guard.html.page-balance" "fail" (($htmlBalDetail -join "; ") + " (I22)")
+  } else {
+    Add-Check "guard.html.page-balance" "ok" "page-home/nova/dashboard balanceados"
   }
 
   $portalPath = Join-Path $root "acompanhar.html"
@@ -253,6 +297,39 @@ try {
     Add-Check "guard.b6.pin-gas" "fail" ($b6Detail -join ', ')
   } else {
     Add-Check "guard.b6.pin-gas" "ok" "sem PIN 1416 hardcoded no FE"
+  }
+
+  $operCheck = Join-Path $root "scripts\check-operacao-livre.ps1"
+  $feCritico = @(
+    (Join-Path $root "index.html"),
+    (Join-Path $root "mk-home.js"),
+    (Join-Path $root "mk-sync.js"),
+    (Join-Path $root "mk-sessao.js"),
+    (Join-Path $root "mk-core.js")
+  )
+  $feAlterado = $false
+  try {
+    $diffNames = @(git -C $root diff --name-only HEAD 2>$null)
+    $stagedNames = @(git -C $root diff --name-only --cached HEAD 2>$null)
+    $allNames = @($diffNames + $stagedNames) | Select-Object -Unique
+    foreach ($p in $feCritico) {
+      $leaf = Split-Path -Leaf $p
+      if ($allNames -contains $leaf) { $feAlterado = $true; break }
+    }
+  } catch {
+    $feAlterado = $true
+  }
+  if ($feAlterado -and (Test-Path $operCheck) -and -not $SkipNetworkTests) {
+    & $operCheck 2>&1 | Out-Null
+    if ($LASTEXITCODE -ne 0) {
+      Add-Check "guard.operacao.livre" "fail" "locacoes Ativa/Pendente — Regra 14 (I22); use -Force no check so hotfix P0"
+    } else {
+      Add-Check "guard.operacao.livre" "ok" "sem locacoes abertas"
+    }
+  } elseif ($feAlterado) {
+    Add-Check "guard.operacao.livre" "skip" "SkipNetworkTests ou script ausente"
+  } else {
+    Add-Check "guard.operacao.livre" "ok" "FE critico nao alterado neste push"
   }
 
   if (-not $SkipNetworkTests) {

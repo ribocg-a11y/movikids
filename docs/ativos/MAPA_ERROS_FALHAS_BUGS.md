@@ -1,6 +1,7 @@
 # MOVI KIDS — Mapa de erros, falhas e bugs
 
-**Atualizado:** 09/06/2026 — **I21 fechado** (B8 v1.7.94/v1.5.72 + splash v1.7.96) — ver `../arquivo/incidentes/INCIDENTE_I21_SESSAO_IDLE_DUAL_2026-06-09.md`  
+**Atualizado:** 09/06/2026 — **I22 fechado** (hotfix FE v1.8.2) — ver `../arquivo/incidentes/INCIDENTE_I22_HOME_FORA_DO_AR_FASE6_HTML_2026-06-09.md`  
+**Uso anterior:** 09/06/2026 — **I21 fechado** (B8 v1.7.94/v1.5.72 + splash v1.7.96)  
 **Uso:** consultar **antes de publicar** e **ao montar checklist de teste**. Cada linha tem trava e script de verificação quando existir.
 
 **Protocolo de teste (obrigatório quando usuário pedir “rodar teste”):** `PROTOCOLO_DIAGNOSTICO_E_TESTES.md` → `scripts/testes/TESTE_PROTOCOLO_DIAGNOSTICO.ps1`
@@ -52,6 +53,7 @@
 | **I18** | **Idle 1h com locação aberta** | **Logout no meio da locação** | v1.7.46 `mkHasLocacaoAbertaNoTablet_` | mk-auth + tickAdmin | mock idle + loc ativa |
 | **I19** | **PWA sessão fantasma + turno invisível** | Operador “dentro” do app; servidor sem turno; Home sem nome; AUD sem logout idle | v1.7.48 `mkAuthReconcileSessaoFantasma_` + chip `#hd-turno-chip` | pre-push `guard.auth.fantasma`; PWA `mk-update` | tablet ícone: chip Turno + liberar ADM |
 | **I21** | **Idle 1h — sessão dual + splash boot** | Milena 14h+ logada; mock idle travava splash | **B8** v1.7.94/96 + v1.5.72: wall clock, release GAS, `hideSplash_` boot | `guard.idle.wallclock`, `guard.idle.gas.release` | **`TESTE_SESSAO_IDLE_READONLY`** + tablet mock ✅ |
+| **I22** | **`</div>` extra em `#page-dashboard` (FASE 6)** | **Home/balcão fora do ar** com locações ativas | FE **v1.8.2** — remover `</div>`; Regra 14 janela operacional | `guard.html.page-balance`, `guard.operacao.livre`, `check-operacao-livre.ps1` | **tablet F0 Home** após mudança em `index.html` |
 | T1 | Em-dash `—` em string `.ps1` perto de `-f` | ParserError em `TESTE_RELACIONAMENTO`, `TESTE_I20` | Hífen ASCII `-` em mensagens | `scripts/testes/README.md` | `TESTE_RELACIONAMENTO_*`, `TESTE_I20_COMPLETO_PROD.ps1` |
 
 ---
@@ -67,6 +69,7 @@
 | **`INCIDENTE_I20_CRONOMETRO_RESOLUCAO_2026-06-07.md`** | **I20 definitivo** — cronologia, causa raiz, travas |
 | `../arquivo/incidentes/INCIDENTE_AUTH_SESSAO_FANTASMA_PWA_2026-06-06.md` | **I19** (Milena 06/06, login OK 13:05) |
 | `../arquivo/incidentes/INCIDENTE_I21_SESSAO_IDLE_DUAL_2026-06-09.md` | **I21** — idle dual, B8 v1.7.94/v1.5.72 |
+| `../arquivo/incidentes/INCIDENTE_I22_HOME_FORA_DO_AR_FASE6_HTML_2026-06-09.md` | **I22** — `</div>` extra FASE 6; Home P0 |
 | `EMERGENCIA_SMS_404.md` | URL morta |
 | `TROCA_SMS_GATEWAY_DJVJRL_2026-06-04.md` | Gateway SMS |
 
@@ -95,6 +98,8 @@
 | `guard.idle.wallclock` | `mkAuthIdleRemainingMs_` em mk-auth | I21 |
 | `guard.idle.gas.release` | `mkAuthReleaseBalcaoServer_` em mk-auth | I21 |
 | `guard.turno.chip` | `#hd-turno-chip` em index.html | I19 |
+| `guard.html.page-balance` | balanceamento `<div>` page-home/nova/dashboard | I22 |
+| `guard.operacao.livre` | `check-operacao-livre.ps1` se FE crítico alterado | I22 |
 | `teste.paridade` | `scripts/testes/TESTE_PARIDADE_HTTP_BROWSER_GAS.ps1` | I15 |
 | `teste.portal` | `scripts/testes/TESTE_PORTAL_READONLY.ps1` | portal |
 | `teste.cronometro` | `scripts/testes/TESTE_PARIDADE_CRONOMETRO_PORTAL_BALCAO.ps1` | I16 |
@@ -134,6 +139,8 @@
 11. **Sempre** validar turno com chip header + `listarOperadoresLogin.sessaoAtiva` (I19).
 12. **Nunca** confiar só em TTL 18h no GAS para idle — usar `lastActivityAt` + FE wall clock (I21).
 13. **Nunca** `adminLogin()` sobrescrever sessão operador sem liberar balcão no servidor (I21).
+14. **Nunca** publicar mudança em `index.html` / Home / sync / sessão com locações **Ativa/Pendente** — Regra 14; hotfix P0 só com aprovação (I22).
+15. **Sempre** validar balanceamento HTML das páginas `#page-*` antes de push (I22).
 
 ---
 

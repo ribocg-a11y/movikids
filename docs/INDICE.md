@@ -35,7 +35,7 @@
 | [PROTOCOLO_DIAGNOSTICO_E_TESTES.md](ativos/PROTOCOLO_DIAGNOSTICO_E_TESTES.md) | Fluxos F0–F14, maturidade |
 | [REGRAS_DE_PUBLICACAO_SEGURA.md](ativos/REGRAS_DE_PUBLICACAO_SEGURA.md) | Regras P0 deploy |
 | [ACESSOS_E_AUTORIZACOES.md](ativos/ACESSOS_E_AUTORIZACOES.md) | Papéis, PIN, agente vs humano |
-| [MAPA_ERROS_FALHAS_BUGS.md](ativos/MAPA_ERROS_FALHAS_BUGS.md) | Índice I1–I21 |
+| [MAPA_ERROS_FALHAS_BUGS.md](ativos/MAPA_ERROS_FALHAS_BUGS.md) | Índice I1–I22 |
 
 ## Operação e deploy
 
@@ -56,7 +56,7 @@
 
 | Pasta | Conteúdo |
 |-------|----------|
-| [arquivo/incidentes/](arquivo/incidentes/) | Pós-mortems I1–I21 |
+| [arquivo/incidentes/](arquivo/incidentes/) | Pós-mortems I1–I22 |
 | [arquivo/deploy/](arquivo/deploy/) | Deploy notes históricos |
 | [arquivo/planos/](arquivo/planos/) | Planos antigos — **não usar para versão** |
 | [../arquivo-historico/](../arquivo-historico/) | GAS legados |
