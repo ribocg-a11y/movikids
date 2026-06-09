@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.71
+// MOVI KIDS — Google Apps Script v1.5.72
+// v1.5.72: sessão operador — idle 1h (lastActivityAt) + touchSessaoOperador; auto logout_inatividade
 // v1.5.71: B2 kpiMes — Dashboard via buildKpiMesPayload_ (alias buscarKPIsAdmin)
 // v1.5.70: B1 resumoDia — fonte unica Caixa + chip admin (calcResumoDiaCore_)
 // v1.5.69: Relatorio Golden — remove frase "custos internos do lojista" do banner
@@ -332,6 +333,7 @@ function dispatchMoviAction_(p, method) {
       case 'limparLocacoesTesteAdmin': return limparLocacoesTesteAdmin_(p);
       case 'liberarSessaoOperador': return liberarSessaoOperador_(p);
       case 'liberarSessaoOperadorAdmin': return liberarSessaoOperadorAdmin_(p);
+      case 'touchSessaoOperador': return touchSessaoOperador_(p);
       case 'verificarSmsDisparo': return verificarSmsDisparo_(p);
       case 'salvarLancamentoAvulso': return salvarLancamentoAvulso_(p);
       case 'controleFinanceiro':     return controleFinanceiro_();
@@ -361,9 +363,9 @@ function ping_() {
   const agora = new Date();
   return resp_({
     status:  'online',
-    versao:  'v1.5.71',
+    versao:  'v1.5.72',
     timestamp: fmtData_(agora) + ' ' + fmtHoraLocal_(agora),
-    sistema: 'MOVI KIDS v1.5.71',
+    sistema: 'MOVI KIDS v1.5.72',
     postWriteActions: WRITE_ACTIONS_CRITICAS_
   });
 }
@@ -4176,6 +4178,7 @@ function fbDadosSessao_(row, status, rowIndex) {
 // ── OPERADORES / AUTH v1.5.33 ─────────────────────────────────
 const MK_SESSAO_OPERADOR_KEY = 'MK_SESSAO_OPERADOR_ATIVA';
 const MK_SESSAO_OPERADOR_TTL_MS = 18 * 60 * 60 * 1000;
+const MK_SESSAO_OPERADOR_IDLE_MS = 60 * 60 * 1000;
 
 const OPERADORES_PADRAO_ = ['Eduarda', 'Milena Nunes'];
 const OPERADORES_RENOMEAR_LEGADO_ = {
@@ -4305,13 +4308,23 @@ function operadorObjFromRow_(data) {
   };
 }
 
+function sessaoOperadorIdleExpirada_(s) {
+  if (!s) return true;
+  const now = Date.now();
+  const last = Number(s.lastActivityAt || s.loggedAt || 0);
+  if (last && now - last > MK_SESSAO_OPERADOR_IDLE_MS) return true;
+  if (s.expiresAt && now > Number(s.expiresAt)) return true;
+  return false;
+}
+
 function getSessaoOperadorAtiva_() {
   const raw = PropertiesService.getScriptProperties().getProperty(MK_SESSAO_OPERADOR_KEY);
   if (!raw) return null;
   try {
     const s = JSON.parse(raw);
     if (!s || !s.operadorId) return null;
-    if (s.expiresAt && Date.now() > Number(s.expiresAt)) {
+    if (sessaoOperadorIdleExpirada_(s)) {
+      registrarAuditoriaTurno_('logout_inatividade', s, 'Sessao expirada por inatividade (1h)');
       PropertiesService.getScriptProperties().deleteProperty(MK_SESSAO_OPERADOR_KEY);
       return null;
     }
@@ -4384,15 +4397,29 @@ function errOperadorJaLogado_(ativa) {
 }
 
 function registrarSessaoOperadorAtiva_(op) {
+  const now = Date.now();
   const s = {
     operadorId: Number(op.id),
     nome: String(op.nome || '').trim(),
-    loggedAt: Date.now(),
-    expiresAt: Date.now() + MK_SESSAO_OPERADOR_TTL_MS
+    loggedAt: now,
+    lastActivityAt: now,
+    expiresAt: now + MK_SESSAO_OPERADOR_TTL_MS
   };
   PropertiesService.getScriptProperties().setProperty(MK_SESSAO_OPERADOR_KEY, JSON.stringify(s));
   registrarAuditoriaTurno_('login', s, 'Login balcao');
   return s;
+}
+
+function touchSessaoOperador_(p) {
+  const ativa = getSessaoOperadorAtiva_();
+  if (!ativa) return resp_({ mensagem: 'Nenhuma sessao de operador ativa', sessaoAtiva: null });
+  const id = Number(p.operadorId || p.id || 0);
+  if (!id || Number(ativa.operadorId) !== id) {
+    return err_('Operador nao confere com a sessao ativa do balcao', 409);
+  }
+  ativa.lastActivityAt = Date.now();
+  PropertiesService.getScriptProperties().setProperty(MK_SESSAO_OPERADOR_KEY, JSON.stringify(ativa));
+  return resp_({ mensagem: 'Atividade registrada', sessaoAtiva: sessaoOperadorPayload_(ativa) });
 }
 
 function assertPodeLoginOperador_(operadorId) {

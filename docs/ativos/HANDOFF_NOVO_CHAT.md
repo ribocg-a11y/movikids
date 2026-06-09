@@ -1,6 +1,6 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 08/06/2026 (FASE 5 **ativa** — B7 ok)  
+**Atualizado:** 09/06/2026 (FASE 5 **ativa** — B8 idle I21 entregue no repo)  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **Repo local:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`  
@@ -33,7 +33,7 @@ Continuo o MOVI KIDS. Repo: C:\Users\riboc\Documents\Codex\2026-05-30\files-ment
 
 - Ler: este arquivo → `PLANO_PRIORIDADES` → `ESTADO_ATUAL` → `REGRAS` → `ACESSOS_E_AUTORIZACOES` (§7 = agente vs você)
 - Ignorar handoff antigo em `docs/arquivo/planos/`
-- Informar: FE **v1.7.91**, GAS **v1.5.69** — **FASE 1–4 fechadas**; **FASE 5 ativa** (B7 ok, próximo B1 resumoDia)
+- Informar: FE **v1.7.94**, GAS **v1.5.72** — **FASE 1–4 fechadas**; **FASE 5 ativa** (B8 idle sessão — publicar GAS v1.5.72)
 - Deixar claro: **agente** código, testes e **planilha (OAuth)**; **você** Nova versão GAS Web e tablet
 
 ---
@@ -55,10 +55,10 @@ Continuo o MOVI KIDS. Repo: C:\Users\riboc\Documents\Codex\2026-05-30\files-ment
 
 | Camada | Versão | Verificação |
 |--------|--------|-------------|
-| **Frontend** | **v1.7.93** | `mk-version.js` → `window.MK_VERSION` |
-| **Service Worker** | **1.7.93** | `sw.js` → `SW_VERSION` |
-| **Apps Script** | **v1.5.71** | [ping](https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec?action=ping) → `versao` |
-| **App tablet** | v1.7.93 | https://ribocg-a11y.github.io/movikids/?force=1.7.93 |
+| **Frontend** | **v1.7.94** | `mk-version.js` → `window.MK_VERSION` |
+| **Service Worker** | **1.7.94** | `sw.js` → `SW_VERSION` |
+| **Apps Script** | **v1.5.72** | [ping](https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec?action=ping) → `versao` |
+| **App tablet** | v1.7.94 | https://ribocg-a11y.github.io/movikids/?force=1.7.94 |
 
 **Deploy ID GAS (único — nunca criar outro):** `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y`
 
@@ -83,7 +83,7 @@ Continuo o MOVI KIDS. Repo: C:\Users\riboc\Documents\Codex\2026-05-30\files-ment
 | Tarefa | Ler |
 |--------|-----|
 | Deploy GAS | `DEPLOY_GAS_v1.5.32_AUTH.md` + deploy feature (ex. `DEPLOY_v1.5.63_PAYBACK.md`) |
-| Bug / incidente | `MAPA_ERROS_FALHAS_BUGS.md` → `INCIDENTE_I20_CRONOMETRO_RESOLUCAO_2026-06-07.md` (I20) → `docs/arquivo/incidentes/` |
+| Bug / incidente | `MAPA_ERROS_FALHAS_BUGS.md` → I20/I21 → `docs/arquivo/incidentes/` (ex. `INCIDENTE_I21_SESSAO_IDLE_DUAL_2026-06-09.md`) |
 | QA tablet | **`PROTOCOLO_DIAGNOSTICO_E_TESTES.md`** → `TESTE_PROTOCOLO_DIAGNOSTICO.ps1` · homologação F5–F11: `TESTE_TABLET_F5_F7_F10_F11.ps1` |
 | Homologação | `HOMOLOGACAO_PRODUCAO_ASSISTIDA.md`, `CHECKLIST_PACOTE_K.md` |
 | Payback | `MEMORIAL_PAYBACK_INVESTIMENTO.md` |
@@ -91,7 +91,7 @@ Continuo o MOVI KIDS. Repo: C:\Users\riboc\Documents\Codex\2026-05-30\files-ment
 
 ---
 
-## Próximo passo (08/06/2026)
+## Próximo passo (09/06/2026)
 
 **FASE 1 homologação:** ✅ **FECHADA** 08/06/2026 — I.5 assinado · K.3–K.4 tablet · checklist A–F · payback Dashboard · tablet **v1.7.87**.
 
@@ -99,7 +99,7 @@ Continuo o MOVI KIDS. Repo: C:\Users\riboc\Documents\Codex\2026-05-30\files-ment
 
 **FASE 3–4:** ✅ fechadas 08/06 — Pacote L v1.7.91 + CONFIG planilha validados.
 
-**FASE 5 (ativa):** B7 ok · **B1+B2** código v1.7.93 + GAS **v1.5.71** — `DEPLOY_v1.5.71_KPI_MES.md` · você publica **Nova versão Web** (inclui resumoDia + kpiMes).
+**FASE 5 (ativa):** B7 ok · B1+B2 ✅ · **B8 idle sessão** v1.7.94 + GAS **v1.5.72** — `DEPLOY_v1.5.72_SESSAO_IDLE.md` · você: **Nova versão Web** + tablet `?force=1.7.94`.
 
 **I20 / Pacote M:** continuam fechados — não regredir timer sem `TESTE_I20_COMPLETO_PROD.ps1` + tablet.
 

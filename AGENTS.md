@@ -51,8 +51,8 @@ Detalhe completo: [`ACESSOS_E_AUTORIZACOES.md`](docs/ativos/ACESSOS_E_AUTORIZACO
 
 | Camada | Versão |
 |--------|--------|
-| Frontend | **v1.7.93** |
-| GAS | **v1.5.71** (publicar Nova versão Web) |
+| Frontend | **v1.7.94** |
+| GAS | **v1.5.72** (publicar Nova versão Web) |
 | Deploy ID | `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y` |
 
 Fonte de verdade: `mk-version.js`, header do `.gs`, ping GAS.
@@ -83,7 +83,7 @@ Fonte de verdade: `mk-version.js`, header do `.gs`, ping GAS.
 - **FASE 1:** ✅ fechada 08/06
 - **FASE 2:** ✅ fechada 08/06 (INVESTIMENTO + GAS v1.5.69)
 - **FASE 3–4:** ✅ fechadas 08/06 (Pacote L + CONFIG)
-- **FASE 5:** B7 ok · **B1+B2** v1.7.93/v1.5.71 — `DEPLOY_v1.5.71_KPI_MES.md`
+- **FASE 5:** B7 ok · B1+B2 ✅ · **B8 idle sessão** v1.7.94/v1.5.72 — `DEPLOY_v1.5.72_SESSAO_IDLE.md`
 
 ## Ao encerrar sessão
 

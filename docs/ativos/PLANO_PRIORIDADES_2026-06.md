@@ -35,7 +35,7 @@
 | 0.10 | `ACESSOS_E_AUTORIZACOES.md` + planilha OAuth (`google-drive-sheets-auth`) | ✅ 07/06 |
 | 0.11 | `MAPA_CODIGO_ARQUITETURA.md` — anatomia e chaves mestras | ✅ 07/06 |
 
-**Próximo passo imediato:** **Nova versão Web GAS v1.5.71** (`DEPLOY_v1.5.71_KPI_MES.md`) + tablet `?force=1.7.93` · fechar FASE 5 após testes B1/B2.
+**Próximo passo imediato:** **Nova versão Web GAS v1.5.72** (`DEPLOY_v1.5.72_SESSAO_IDLE.md`) + tablet `?force=1.7.94` · homologar B8 idle (mock 1h) · fechar FASE 5.
 
 **FASE 1 fechada 08/06/2026:** I.5 assinado · K.3–K.4 tablet · checklist A–F · payback Dashboard · tablet v1.7.87. Sprint 1 + Sprint 2 (K) declarados fechados.
 
@@ -47,13 +47,13 @@
 
 | Camada | Repo (GitHub) | Produção (verificado) | Alinhado? |
 |--------|---------------|------------------------|-----------|
-| **Frontend** | **v1.7.93** (`mk-version.js`) | GitHub Pages após push | ✅ |
-| **Service Worker** | v1.7.93 (`sw.js`) | — | ✅ |
-| **GAS** | **v1.5.71** (header `.gs`) | Ping **v1.5.71** após Nova versão Web | 🟡 |
+| **Frontend** | **v1.7.94** (`mk-version.js`) | GitHub Pages após push | 🟡 |
+| **Service Worker** | v1.7.94 (`sw.js`) | — | ✅ |
+| **GAS** | **v1.5.72** (header `.gs`) | Ping **v1.5.72** após Nova versão Web | 🟡 |
 | **Deploy ID** | `AKfycbwakQ...` | Mesmo ID | ✅ |
 
-**Teste rápido:** https://ribocg-a11y.github.io/movikids/?force=1.7.91  
-**Ping GAS:** `?action=ping` → `versao: v1.5.69`  
+**Teste rápido:** https://ribocg-a11y.github.io/movikids/?force=1.7.94  
+**Ping GAS:** `?action=ping` → `versao: v1.5.72`  
 **CONFIG:** `TESTE_OPERACAO_CONFIG_READONLY.ps1` → baseline ok 08/06
 
 **I20 cronômetro:** RESOLVIDO — `INCIDENTE_I20_CRONOMETRO_RESOLUCAO_2026-06-07.md`. Não regredir sem `TESTE_I20_COMPLETO_PROD.ps1` + tablet.
@@ -186,6 +186,7 @@ Objetivo: balcão mais rápido; menos ruído visual. **Próximo pacote de featur
 | B7 | Regressão write controlada (iniciar/estender/encerrar) | Alta |
 | B1 | API `resumoDia(data)` única (Caixa + chip) | Média |
 | B2 | API `kpiMes` — Dashboard só visualiza | Média |
+| **B8** | Idle sessão 1h FE+GAS (I21) | Alta |
 | B6 | PIN admin só via GAS (T4) | Média |
 | B3 | Auditoria UI por operador | Baixa |
 | B5 | PDF resumo executivo | Baixa |
@@ -215,7 +216,7 @@ FASE 3  Pacote L UX + QR balcão            [✅ fechada — v1.7.91]
    ↓
 FASE 4  CONFIG planilha + auditoria        [✅ fechada — 08/06]
    ↓
-FASE 5  B7 write + APIs B1/B2              [🟡 ativa — 08/06]
+FASE 5  B7 write + APIs B1/B2/B8           [🟡 ativa — B8 I21 09/06]
 ```
 
 **Não iniciar:** F4, F9 (pausados).

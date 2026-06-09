@@ -1,6 +1,6 @@
 # MOVI KIDS — Mapa de erros, falhas e bugs
 
-**Atualizado:** 08/06/2026 — **I20 RESOLVIDO** (GAS v1.5.66+ + FE v1.7.78+) — ver `INCIDENTE_I20_CRONOMETRO_RESOLUCAO_2026-06-07.md`  
+**Atualizado:** 09/06/2026 — **I21** sessão idle dual (B8 v1.7.94/v1.5.72) — ver `../arquivo/incidentes/INCIDENTE_I21_SESSAO_IDLE_DUAL_2026-06-09.md`  
 **Uso:** consultar **antes de publicar** e **ao montar checklist de teste**. Cada linha tem trava e script de verificação quando existir.
 
 **Protocolo de teste (obrigatório quando usuário pedir “rodar teste”):** `PROTOCOLO_DIAGNOSTICO_E_TESTES.md` → `scripts/testes/TESTE_PROTOCOLO_DIAGNOSTICO.ps1`
@@ -51,6 +51,7 @@
 | **I17** | **Liberar sessão + cache GET** | **Banner operador preso** | v1.7.45 sync UI + `no-store` | `mkAuthSyncSessaoBalcaoUI_`; api cache | ADM liberar **tablet** |
 | **I18** | **Idle 1h com locação aberta** | **Logout no meio da locação** | v1.7.46 `mkHasLocacaoAbertaNoTablet_` | mk-auth + tickAdmin | mock idle + loc ativa |
 | **I19** | **PWA sessão fantasma + turno invisível** | Operador “dentro” do app; servidor sem turno; Home sem nome; AUD sem logout idle | v1.7.48 `mkAuthReconcileSessaoFantasma_` + chip `#hd-turno-chip` | pre-push `guard.auth.fantasma`; PWA `mk-update` | tablet ícone: chip Turno + liberar ADM |
+| **I21** | **Idle 1h não deslogou — sessão dual admin/operador** | Milena no BALCÃO 14h+; TABLET Administrador; GAS TTL 18h; timer admin congelado | **B8** v1.7.94 + v1.5.72: wall clock, `mkAuthReleaseBalcaoServer_`, `lastActivityAt`, `touchSessaoOperador` | `guard.idle.wallclock`, `guard.idle.gas.release` | **`TESTE_SESSAO_IDLE_READONLY`** + mock idle tablet |
 | T1 | Em-dash `—` em string `.ps1` perto de `-f` | ParserError em `TESTE_RELACIONAMENTO`, `TESTE_I20` | Hífen ASCII `-` em mensagens | `scripts/testes/README.md` | `TESTE_RELACIONAMENTO_*`, `TESTE_I20_COMPLETO_PROD.ps1` |
 
 ---
@@ -65,6 +66,7 @@
 | `../arquivo/incidentes/INCIDENTE_CRONOMETRO_PORTAL_AUTH_2026-06-05_06.md` | **I16, I17, I18, I20 fase 1** |
 | **`INCIDENTE_I20_CRONOMETRO_RESOLUCAO_2026-06-07.md`** | **I20 definitivo** — cronologia, causa raiz, travas |
 | `../arquivo/incidentes/INCIDENTE_AUTH_SESSAO_FANTASMA_PWA_2026-06-06.md` | **I19** (Milena 06/06, login OK 13:05) |
+| `../arquivo/incidentes/INCIDENTE_I21_SESSAO_IDLE_DUAL_2026-06-09.md` | **I21** — idle dual, B8 v1.7.94/v1.5.72 |
 | `EMERGENCIA_SMS_404.md` | URL morta |
 | `TROCA_SMS_GATEWAY_DJVJRL_2026-06-04.md` | Gateway SMS |
 
@@ -90,6 +92,8 @@
 | `guard.iniciar.direto` | `iniciarContagemDireto_` sem modal BV | I20 |
 | `guard.idle.locacao` | `mkHasLocacaoAbertaNoTablet_` em mk-auth | I18 |
 | `guard.auth.fantasma` | `mkAuthReconcileSessaoFantasma_` em mk-auth | I19 |
+| `guard.idle.wallclock` | `mkAuthIdleRemainingMs_` em mk-auth | I21 |
+| `guard.idle.gas.release` | `mkAuthReleaseBalcaoServer_` em mk-auth | I21 |
 | `guard.turno.chip` | `#hd-turno-chip` em index.html | I19 |
 | `teste.paridade` | `scripts/testes/TESTE_PARIDADE_HTTP_BROWSER_GAS.ps1` | I15 |
 | `teste.portal` | `scripts/testes/TESTE_PORTAL_READONLY.ps1` | portal |
@@ -109,6 +113,8 @@
 - [ ] Idle não desloga com locação Ativa (I18)
 - [ ] Chip **Turno: Nome** visível no header (I19) — PWA ícone
 - [ ] Liberar sessão ADM → tablet desloga ou chip laranja em ≤60s (I19)
+- [ ] Mock idle 1h → gate login + balcão livre no GAS (I21)
+- [ ] Admin timer mostra `MM:SS`; `⏸` com locação Ativa (I21/I18)
 - [ ] Ctrl+F5 com `?force=VERSAO_ATUAL`
 
 ---
@@ -126,14 +132,16 @@
 9. **Sempre** bump `mk-version` + `sw` + cache bust juntos (I3).
 10. **Nunca** assumir tablet deslogado após `liberarSessaoOperadorAdmin` — PWA pode manter fantasma (I19).
 11. **Sempre** validar turno com chip header + `listarOperadoresLogin.sessaoAtiva` (I19).
+12. **Nunca** confiar só em TTL 18h no GAS para idle — usar `lastActivityAt` + FE wall clock (I21).
+13. **Nunca** `adminLogin()` sobrescrever sessão operador sem liberar balcão no servidor (I21).
 
 ---
 
-## Versões de referência (08/06/2026)
+## Versões de referência (09/06/2026)
 
-| Camada | Repo / produção | Mínimo I20 |
-|--------|-----------------|------------|
-| Frontend | **v1.7.92** | `?force=1.7.92` (mínimo I20: v1.7.78+) |
-| GAS | **v1.5.70** | Nova versão Web se ping &lt; esperado |
+| Camada | Repo / produção | Mínimo I21 (B8) |
+|--------|-----------------|-----------------|
+| Frontend | **v1.7.94** | `?force=1.7.94` |
+| GAS | **v1.5.72** | Nova versão Web se ping &lt; esperado |
 
 Ver `ESTADO_ATUAL.md` para URLs e editor GAS.

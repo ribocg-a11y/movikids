@@ -4,8 +4,8 @@
 // ═══════════════════════════════════════════════════════════
 var isAdmin         = false;
 let adminTimerInt   = null;
-const ADMIN_IDLE_SEC = 60 * 60; // 1 hora sem atividade (alinha com mk-auth)
-let adminCountdown  = ADMIN_IDLE_SEC;
+const ADMIN_IDLE_SEC = 60 * 60; // 1 hora — display; expiração via mk_auth_last_activity (relógio real)
+let _adminIdleWired = false;
 var kpiData         = null;
 var resumoDiaHoje   = null;
 let chartsRendered  = false;
@@ -68,26 +68,64 @@ function verificarPin() {
   }
 }
 
+function wireAdminIdleListeners_() {
+  if (_adminIdleWired) return;
+  _adminIdleWired = true;
+  ['click', 'keydown', 'touchstart', 'scroll', 'mousemove'].forEach(ev => {
+    document.addEventListener(ev, resetAdminTimer, { passive: true });
+  });
+}
+
+function adminTeardownUI_() {
+  isAdmin = false;
+  window.isAdmin = false;
+  if (adminTimerInt) {
+    clearInterval(adminTimerInt);
+    adminTimerInt = null;
+  }
+  hideAdminSidebar();
+  statsHoje.fat = 0;
+  const chipEl = document.getElementById('admin-home-chip');
+  if (chipEl) chipEl.hidden = true;
+  if (typeof showAdminHomeKpis === 'function') showAdminHomeKpis(null);
+  try { localStorage.removeItem('mk_inicio_cache'); } catch (e) {}
+  try { localStorage.removeItem('mk_admin_ui_persist'); } catch (e) {}
+}
+window.adminTeardownUI_ = adminTeardownUI_;
+
 // ── LOGIN/LOGOUT ─────────────────────────────────────────────
 function adminLogin() {
   isAdmin = true;
   window.isAdmin = true;
-  const admSess = { id: 'ADMIN', nome: 'Administrador', role: 'admin', hasPin: true, ativo: true };
-  try {
-    sessionStorage.setItem('mk_auth_session_v1', JSON.stringify(admSess));
-    sessionStorage.setItem('mk_auth_session', JSON.stringify(admSess));
-    if (typeof window.mkPersistAuthSession === 'function') window.mkPersistAuthSession();
-  } catch (e) { /* ignore */ }
+  const existing = typeof mkAuthGetSession === 'function' ? mkAuthGetSession() : null;
+  const keepOperador = !!(existing && existing.nome && existing.role !== 'admin' && existing.id !== 'ADMIN');
+  if (!keepOperador) {
+    const admSess = {
+      id: 'ADMIN',
+      nome: 'Administrador',
+      role: 'admin',
+      hasPin: true,
+      ativo: true,
+      loggedAt: Date.now()
+    };
+    try {
+      sessionStorage.setItem('mk_auth_session_v1', JSON.stringify(admSess));
+      sessionStorage.setItem('mk_auth_session', JSON.stringify(admSess));
+      if (typeof window.mkPersistAuthSession === 'function') window.mkPersistAuthSession();
+    } catch (e) { /* ignore */ }
+  } else {
+    try {
+      if (typeof window.mkPersistAuthSession === 'function') window.mkPersistAuthSession();
+      localStorage.setItem('mk_admin_ui_persist', '1');
+    } catch (e) { /* ignore */ }
+  }
   const app = document.getElementById('app');
   if (app) app.style.display = 'flex';
   const gate = document.getElementById('mk-auth-gate');
   if (gate) gate.style.display = 'none';
-  adminCountdown = ADMIN_IDLE_SEC;
   if (typeof mkAuthTouchActivity_ === 'function') mkAuthTouchActivity_();
-  ['click', 'keydown', 'touchstart', 'scroll', 'mousemove'].forEach(ev => {
-    document.addEventListener(ev, resetAdminTimer, { passive: true });
-  });
-  adminTimerInt = setInterval(tickAdmin, 1000);
+  wireAdminIdleListeners_();
+  if (!adminTimerInt) adminTimerInt = setInterval(tickAdmin, 1000);
   showAdminSidebar();
   showPage('home');
   if (!kpiData) carregarKPIs();
@@ -108,18 +146,7 @@ function adminLogin() {
 function adminLogout() {
   const sessaoAdmin = typeof mkAuthGetSession === 'function' && mkAuthGetSession() &&
     mkAuthGetSession().role === 'admin';
-  isAdmin = false;
-  window.isAdmin = false;
-  clearInterval(adminTimerInt);
-  ['click', 'keydown', 'touchstart', 'scroll', 'mousemove'].forEach(ev => {
-    document.removeEventListener(ev, resetAdminTimer);
-  });
-  hideAdminSidebar();
-  statsHoje.fat = 0;
-  const chipEl = document.getElementById('admin-home-chip');
-  if (chipEl) chipEl.hidden = true;
-  if (typeof showAdminHomeKpis === 'function') showAdminHomeKpis(null);
-  try { localStorage.removeItem('mk_inicio_cache'); } catch(e) {}
+  adminTeardownUI_();
   if (typeof mkAuthExitAdmin_ === 'function') mkAuthExitAdmin_();
   if (!sessaoAdmin) {
     if (typeof syncController === 'function') syncController(true, 0);
@@ -138,23 +165,22 @@ function fmtAdminTimer_(sec) {
 
 function resetAdminTimer() {
   if (!isAdmin) return;
-  adminCountdown = ADMIN_IDLE_SEC;
   if (typeof mkAuthTouchActivity_ === 'function') mkAuthTouchActivity_();
 }
 
 function tickAdmin() {
   if (!isAdmin) return;
-  if (typeof mkHasLocacaoAbertaNoTablet_ === 'function' && mkHasLocacaoAbertaNoTablet_()) {
-    const t = fmtAdminTimer_(adminCountdown);
-    document.querySelectorAll('.admin-timer').forEach(el => { el.textContent = t; });
-    return;
-  }
-  adminCountdown--;
-  const t = fmtAdminTimer_(adminCountdown);
+  const remMs = typeof mkAuthIdleRemainingMs_ === 'function'
+    ? mkAuthIdleRemainingMs_()
+    : ADMIN_IDLE_SEC * 1000;
+  const paused = typeof mkHasLocacaoAbertaNoTablet_ === 'function' && mkHasLocacaoAbertaNoTablet_();
+  const sec = Math.max(0, Math.ceil(remMs / 1000));
+  const t = fmtAdminTimer_(sec) + (paused ? ' ⏸' : '');
   document.querySelectorAll('.admin-timer').forEach(el => { el.textContent = t; });
-  if (adminCountdown <= 0) {
+  if (paused) return;
+  if (remMs <= 0) {
     if (typeof trocarOperador === 'function') trocarOperador('inatividade');
-    else adminLogout();
+    else adminTeardownUI_();
   }
 }
 

@@ -1,6 +1,6 @@
 # MOVI KIDS — Índice de documentação
 
-**Atualizado:** 08/06/2026 (FASE 5 — B7 regressão write ativa)
+**Atualizado:** 09/06/2026 (FASE 5 — B8 idle sessão I21)
 
 ## Comece aqui
 
@@ -18,9 +18,10 @@
 | [CHECKLIST_PACOTE_L.md](ativos/CHECKLIST_PACOTE_L.md) | Homologação tablet Pacote L |
 | [FASE_4_CONFIG_PLANILHA.md](ativos/FASE_4_CONFIG_PLANILHA.md) | FASE 4 ✅ CONFIG JSON |
 | [CONFIG_OPERACIONAL_TEMPLATE.md](ativos/CONFIG_OPERACIONAL_TEMPLATE.md) | Template JSON frota/preços |
-| [FASE_5_CONFIABILIDADE_APIS.md](ativos/FASE_5_CONFIABILIDADE_APIS.md) | **FASE 5 ativa** — B7, B1, B2 |
+| [FASE_5_CONFIABILIDADE_APIS.md](ativos/FASE_5_CONFIABILIDADE_APIS.md) | **FASE 5 ativa** — B7, B1, B2, **B8** |
 | [DEPLOY_v1.5.70_RESUMO_DIA.md](ativos/DEPLOY_v1.5.70_RESUMO_DIA.md) | Deploy B1 resumoDia |
 | [DEPLOY_v1.5.71_KPI_MES.md](ativos/DEPLOY_v1.5.71_KPI_MES.md) | Deploy B2 kpiMes |
+| [DEPLOY_v1.5.72_SESSAO_IDLE.md](ativos/DEPLOY_v1.5.72_SESSAO_IDLE.md) | Deploy B8 idle sessão (I21) |
 | [CHECKLIST_TABLET_v1.7.85.md](ativos/CHECKLIST_TABLET_v1.7.85.md) | Homologação tablet FASE 1 (A–F) |
 
 ## Operação e deploy
@@ -42,7 +43,7 @@
 | [DECISAO_PAYBACK_FASE2_2026-06.md](ativos/DECISAO_PAYBACK_FASE2_2026-06.md) | Decisões §10 + relatório Golden |
 | [INVESTIMENTO_PAYBACK_TABELA.md](ativos/INVESTIMENTO_PAYBACK_TABELA.md) | Template planilha |
 | [DECISAO_COMUNICACAO_QR_CODE_2026-06.md](ativos/DECISAO_COMUNICACAO_QR_CODE_2026-06.md) | QR portal; F4 pausado |
-| [MAPA_ERROS_FALHAS_BUGS.md](ativos/MAPA_ERROS_FALHAS_BUGS.md) | Índice incidentes I1–I20 |
+| [MAPA_ERROS_FALHAS_BUGS.md](ativos/MAPA_ERROS_FALHAS_BUGS.md) | Índice incidentes I1–I21 |
 | [**INCIDENTE_I20_CRONOMETRO_RESOLUCAO_2026-06-07.md**](ativos/INCIDENTE_I20_CRONOMETRO_RESOLUCAO_2026-06-07.md) | **I20 resolvido** — cronologia, causa raiz, travas |
 | [**PROTOCOLO_DIAGNOSTICO_E_TESTES.md**](ativos/PROTOCOLO_DIAGNOSTICO_E_TESTES.md) | **Protocolo mestre** — fluxos F0–F14, maturidade, como rodar testes |
 

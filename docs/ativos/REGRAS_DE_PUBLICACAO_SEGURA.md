@@ -172,12 +172,16 @@ Erros cometidos neste projeto que nao devem se repetir:
 - Checklist manual: balcao e celular na mesma locacao — diferenca maxima **2 segundos**, nao minutos.
 - Mapa completo: `MAPA_ERROS_FALHAS_BUGS.md`.
 
-## Regra 11 - Auth sessao e idle com locacao (I17, I18)
+## Regra 11 - Auth sessao e idle com locacao (I17, I18, I21)
 
 - Leituras de sessao no tablet: **`cache: 'no-store'`** + bust `_t` em `api()`.
 - Apos liberar sessao: **`mkAuthSyncSessaoBalcaoUI_`** deve atualizar banner sem Ctrl+F5.
-- Idle 1h: **nao** deslogar se `mk_sessions` tiver status **Ativa** ou **Pendente** (`mkHasLocacaoAbertaNoTablet_`).
-- Trava estatica: `scripts/pre-push-check.ps1` (`guard.idle.locacao`).
+- Idle 1h: **nao** deslogar se `window.sessions` tiver status **Ativa** ou **Pendente** (`mkHasLocacaoAbertaNoTablet_` — prioriza sync sobre cache).
+- Idle por **relógio real** (`mk_auth_last_activity`); **nunca** só `setInterval` countdown para segurança (I21).
+- Logout por inatividade: **`mkAuthReleaseBalcaoServer_`** deve liberar balcão no GAS (`liberarSessaoOperadorAdmin`).
+- PIN admin 1416: **overlay** (`isAdmin`) — não substitui sessão operador no servidor sem logout explícito.
+- Travas: `guard.idle.locacao`, `guard.idle.wallclock`, `guard.idle.gas.release` em `pre-push-check.ps1`.
+- Doc: `INCIDENTE_I21_SESSAO_IDLE_DUAL_2026-06-09.md`.
 
 ## Regra 12 - PWA sessao fantasma e turno visivel (I19)
 

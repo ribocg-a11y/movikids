@@ -25,6 +25,7 @@ Use quando a loja está operando ou não quer poluir a planilha:
 .\scripts\testes\TESTE_OPERACAO_CONFIG_READONLY.ps1
 .\scripts\testes\TESTE_RESUMO_DIA_READONLY.ps1
 .\scripts\testes\TESTE_KPI_MES_READONLY.ps1
+.\scripts\testes\TESTE_SESSAO_IDLE_READONLY.ps1
 .\scripts\testes\TESTE_REGRESSAO_MOVIKIDS_PROD_SAFE.ps1
 # sem -RunWriteTests
 ```

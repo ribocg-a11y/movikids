@@ -27,8 +27,8 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 | Camada | Versão alvo | URL / ID |
 |--------|-------------|----------|
-| **Frontend** | **v1.7.93** (B1+B2) | https://ribocg-a11y.github.io/movikids/?force=1.7.93 |
-| **Apps Script** | **v1.5.71** (publicar Nova versão Web) | Deploy `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y` |
+| **Frontend** | **v1.7.94** (B8 idle) | https://ribocg-a11y.github.io/movikids/?force=1.7.94 |
+| **Apps Script** | **v1.5.72** | Publicar Nova versão Web · Deploy `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y` |
 | SMS Gateway Cloud | **DJVJRL** / device `wihWegHr4wXaVJQ1R-GZR` | Aparelho remoto ONLINE |
 | Pacote SMS P0 | **FECHADO** | `PACOTE_SMS_P0_UNIFICADO_v1.5.38_v1.7.11.md` |
 | Planilha | MOVIKIDS_Planilha_Base | https://docs.google.com/spreadsheets/d/1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618/edit — auditoria `AUDITORIA_PLANILHA_BASE_2026-06-06.md` |
@@ -154,7 +154,7 @@ Commits de referência: `3d9d106` (v1.7.25), `e1a56db` (Pacote E), `1454bc8` (fi
 | Liberar balcão | `liberarSessaoOperadorAdmin` |
 | Corrigir locação encerrada | `corrigirFinanceiroLocacaoAdmin` + `zerarExtra` (v1.5.36+) |
 | Limpar locações de teste | `limparLocacoesTesteAdmin` + `motivo` ≥10 chars |
-| Logout por inatividade | 1h sem atividade — **pausado** se locação Ativa/Pendente no tablet (v1.7.46, I18) |
+| Logout por inatividade | 1h — relógio real FE v1.7.94 + GAS v1.5.72 (`lastActivityAt`); pausado se locação Ativa/Pendente (I18); idle libera balcão no servidor |
 
 ---
 
@@ -186,7 +186,7 @@ Commits de referência: `3d9d106` (v1.7.25), `e1a56db` (Pacote E), `1454bc8` (fi
 - [x] **Pacote M — Modularização FE** — M.1–M.17 ✅ (v1.7.87; zero JS inline)
 - [x] **Pacote L** — UX polish v1.7.91 (FASE 3 fechada)
 - [x] **FASE 4 CONFIG** — planilha + tablet validados
-- [~] **FASE 5** — B7 ok; B1 `resumoDia` código entregue — publicar GAS v1.5.70 (`DEPLOY_v1.5.70_RESUMO_DIA.md`)
+- [~] **FASE 5** — B7 ok; B1+B2 ✅; **B8** idle I21 v1.7.94/v1.5.72 no repo 09/06 — publicar GAS + tablet homologação
 - [~] **Fase 9 supervisor — PAUSADA**
 
 ---

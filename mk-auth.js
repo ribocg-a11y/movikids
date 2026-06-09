@@ -4,8 +4,10 @@
   const LEGACY_OPERADOR_KEY = 'mk_operador_atual_v1';
   const AUTH_ACTIVITY_KEY = 'mk_auth_last_activity';
   const AUTH_IDLE_MS = 60 * 60 * 1000;
+  const AUTH_TOUCH_GAS_MS = 3 * 60 * 1000;
 
   let selectedOp = null;
+  let _lastGasTouchAt = 0;
   let operadoresCache = [];
   let sessaoAtivaRemota = null;
   let _loadingOps = false;
@@ -28,20 +30,56 @@
     }
   }
 
+  function authActivityBaseline_() {
+    try {
+      const last = Number(localStorage.getItem(AUTH_ACTIVITY_KEY) || 0);
+      if (last) return last;
+      const s = getSession();
+      if (s && s.loggedAt) return Number(s.loggedAt);
+    } catch (e) { /* ignore */ }
+    return 0;
+  }
+
   function touchAuthActivity_() {
     try { localStorage.setItem(AUTH_ACTIVITY_KEY, String(Date.now())); } catch (e) {}
+    touchSessaoOperadorGasDebounced_();
   }
   window.mkAuthTouchActivity_ = touchAuthActivity_;
   window.MK_AUTH_IDLE_MS = AUTH_IDLE_MS;
 
   function isAuthIdleExpired_() {
+    if (!mkAuthIsLoggedIn()) return false;
     try {
-      const last = Number(localStorage.getItem(AUTH_ACTIVITY_KEY) || 0);
-      if (!last) return false;
-      return Date.now() - last >= AUTH_IDLE_MS;
+      const baseline = authActivityBaseline_();
+      if (!baseline) return true;
+      return Date.now() - baseline >= AUTH_IDLE_MS;
     } catch (e) {
       return false;
     }
+  }
+
+  function mkAuthIdleRemainingMs_() {
+    if (!mkAuthIsLoggedIn()) return AUTH_IDLE_MS;
+    const baseline = authActivityBaseline_();
+    if (!baseline) return 0;
+    return Math.max(0, AUTH_IDLE_MS - (Date.now() - baseline));
+  }
+  window.mkAuthIdleRemainingMs_ = mkAuthIdleRemainingMs_;
+  window.mkAuthIsIdleExpired_ = isAuthIdleExpired_;
+
+  async function touchSessaoOperadorGasDebounced_() {
+    const s = getSession();
+    let opId = (s && s.id && s.id !== 'ADMIN') ? Number(s.id) : 0;
+    if (!opId && sessaoAtivaRemota && sessaoAtivaRemota.operadorId) {
+      opId = Number(sessaoAtivaRemota.operadorId);
+    }
+    if (!opId) return;
+    const now = Date.now();
+    if (now - _lastGasTouchAt < AUTH_TOUCH_GAS_MS) return;
+    _lastGasTouchAt = now;
+    try {
+      await apiCall({ action: 'touchSessaoOperador', operadorId: opId }, 15000);
+    } catch (e) { /* offline */ }
   }
 
   function mkHasLocacaoAbertaNoTablet_() {
@@ -54,7 +92,9 @@
       });
     }
     try {
-      if (typeof window !== 'undefined' && Array.isArray(window.sessions) && hasAberta(window.sessions)) return true;
+      if (typeof window !== 'undefined' && Array.isArray(window.sessions)) {
+        return hasAberta(window.sessions);
+      }
       const raw = localStorage.getItem('mk_sessions');
       if (!raw) return false;
       return hasAberta(JSON.parse(raw));
@@ -63,6 +103,45 @@
     }
   }
   window.mkHasLocacaoAbertaNoTablet_ = mkHasLocacaoAbertaNoTablet_;
+
+  window.mkAuthReleaseBalcaoServer_ = async function mkAuthReleaseBalcaoServer_(opts) {
+    opts = opts || {};
+    const s = getSession();
+    const pinParams = typeof mkAuthAdminPinParams_ === 'function' ? mkAuthAdminPinParams_() : { adminPin: '1416' };
+    const srv = sessaoAtivaRemota;
+    const preferAdmin = !!(opts.preferAdmin || opts.inatividade || window.isAdmin ||
+      (s && s.role === 'admin') || (srv && srv.nome));
+
+    if (!preferAdmin && s && s.id && s.id !== 'ADMIN' && s.role !== 'admin') {
+      try {
+        const d = await apiCall(Object.assign({
+          action: 'liberarSessaoOperador',
+          operadorId: s.id,
+          _t: Date.now()
+        }, pinParams), 20000);
+        if (d && d.ok) {
+          sessaoAtivaRemota = d.sessaoAtiva || null;
+          mkAuthSyncSessaoBalcaoUI_(sessaoAtivaRemota);
+          return true;
+        }
+      } catch (e) { /* offline */ }
+    }
+
+    if (preferAdmin || (srv && srv.nome)) {
+      try {
+        const d = await apiCall(Object.assign({
+          action: 'liberarSessaoOperadorAdmin',
+          _t: Date.now()
+        }, pinParams), 20000);
+        if (d && d.ok) {
+          sessaoAtivaRemota = d.sessaoAtiva || null;
+          mkAuthSyncSessaoBalcaoUI_(sessaoAtivaRemota);
+          return true;
+        }
+      } catch (e) { /* offline */ }
+    }
+    return false;
+  };
 
   function setSession(s) {
     try {
@@ -245,14 +324,20 @@
   };
 
   window.trocarOperador = async function trocarOperador(motivo) {
+    const liberarInatividade = motivo === 'inatividade' || motivo === 'fantasma';
+    try {
+      await mkAuthReleaseBalcaoServer_({
+        inatividade: liberarInatividade,
+        preferAdmin: liberarInatividade || !!window.isAdmin
+      });
+    } catch (e) { /* offline */ }
+
+    if (window.isAdmin && typeof adminTeardownUI_ === 'function') adminTeardownUI_();
+    else if (window.isAdmin && typeof adminLogout === 'function') adminLogout();
+
     const s = getSession();
-    if (s && s.role !== 'admin' && s.id && s.id !== 'ADMIN') {
-      try {
-        await apiCall({ action: 'liberarSessaoOperador', operadorId: s.id });
-      } catch (e) { /* offline */ }
-      sessaoAtivaRemota = null;
-    }
-    if (typeof adminLogout === 'function' && window.isAdmin) adminLogout();
+    if (s && s.role === 'admin' && typeof mkAuthExitAdmin_ === 'function') mkAuthExitAdmin_();
+    sessaoAtivaRemota = null;
     clearSession();
     selectedOp = null;
     if (typeof mobMenuClose_ === 'function') mobMenuClose_();
@@ -739,7 +824,12 @@
 
     const existing = getSession();
     if (existing && existing.nome) {
-      if (isAuthIdleExpired_() && !mkHasLocacaoAbertaNoTablet_()) {
+      const idleExpired = isAuthIdleExpired_();
+      const locAberta = mkHasLocacaoAbertaNoTablet_();
+      if (idleExpired && !locAberta) {
+        try {
+          await mkAuthReleaseBalcaoServer_({ inatividade: true, preferAdmin: true });
+        } catch (e) { /* offline */ }
         clearSession();
         hideApp();
         showGate(true);
@@ -754,7 +844,7 @@
       } catch (e) { /* offline */ }
       if (bootOps && bootOps.ok && await mkAuthReconcileSessaoFantasma_(bootOps)) return;
       if (bootOps && bootOps.ok) applySessaoAtivaFromApi_(bootOps);
-      touchAuthActivity_();
+      if (!idleExpired) touchAuthActivity_();
       if (splash) {
         splash.classList.add('hide');
         setTimeout(() => splash.classList.add('gone'), 550);
@@ -768,6 +858,11 @@
         showApp();
         applyRoleNav_();
         if (typeof showPage === 'function') showPage('home');
+        try {
+          if (localStorage.getItem('mk_admin_ui_persist') === '1' && typeof adminLogin === 'function') {
+            adminLogin();
+          }
+        } catch (e) { /* ignore */ }
       }
       if (typeof atualizarOperadorUI_ === 'function') atualizarOperadorUI_();
       if (typeof init === 'function') {

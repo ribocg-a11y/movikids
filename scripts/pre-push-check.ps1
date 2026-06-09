@@ -195,6 +195,16 @@ try {
     } else {
       Add-Check "guard.auth.fantasma" "ok" "reconcile sessao tablet x servidor"
     }
+    if ($authRaw -notmatch 'mkAuthIdleRemainingMs_') {
+      Add-Check "guard.idle.wallclock" "fail" "mkAuthIdleRemainingMs_ ausente (idle relogio real)"
+    } else {
+      Add-Check "guard.idle.wallclock" "ok" "idle admin+operador por timestamp"
+    }
+    if ($authRaw -notmatch 'mkAuthReleaseBalcaoServer_') {
+      Add-Check "guard.idle.gas.release" "fail" "mkAuthReleaseBalcaoServer_ ausente"
+    } else {
+      Add-Check "guard.idle.gas.release" "ok" "logout libera balcao no GAS"
+    }
   } else {
     Add-Check "guard.idle.locacao" "fail" "mk-auth.js ausente"
     Add-Check "guard.auth.fantasma" "fail" "mk-auth.js ausente"

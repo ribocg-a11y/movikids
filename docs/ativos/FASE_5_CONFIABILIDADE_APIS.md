@@ -17,8 +17,9 @@ Reduzir divergência entre app e planilha, e garantir que o ciclo **iniciar → 
 | ID | Item | Prioridade | Status |
 |----|------|------------|--------|
 | **B7** | Regressão write controlada | Alta | 🟡 baseline ok 08/06 |
-| **B1** | API `resumoDia(data)` única (Caixa + chip) | Média | 🟡 código FE+GAS; **Nova versão Web** |
-| **B2** | API `kpiMes` — Dashboard só visualiza | Média | 🟡 código FE+GAS; **Nova versão Web** |
+| **B1** | API `resumoDia(data)` única (Caixa + chip) | Média | ✅ GAS v1.5.71 + teste readonly 08/06 |
+| **B2** | API `kpiMes` — Dashboard só visualiza | Média | ✅ GAS v1.5.71 + teste readonly 08/06 |
+| **B8** | Idle sessão 1h — FE+GAS alinhados (v1.7.94/v1.5.72) | Alta | 🟡 código repo; **Nova versão Web** + tablet I21 |
 | **B6** | PIN admin só via GAS (T4) | Média | ⬜ |
 | **B3** | Auditoria UI por operador | Baixa | ⬜ |
 | **B5** | PDF resumo executivo | Baixa | ⬜ |
@@ -66,7 +67,7 @@ Reduzir divergência entre app e planilha, e garantir que o ciclo **iniciar → 
 | Teste | `TESTE_RESUMO_DIA_READONLY.ps1` |
 | Deploy | `DEPLOY_v1.5.70_RESUMO_DIA.md` |
 
-**Você:** Nova versão Web GAS v1.5.70 → ping `v1.5.70` → rodar teste → tablet `?force=1.7.92`.
+**Produção 08/06:** GAS v1.5.71 · `TESTE_RESUMO_DIA_READONLY.ps1` → ok (nHoje=4, fatHoje=103.2).
 
 ---
 
@@ -79,12 +80,27 @@ Reduzir divergência entre app e planilha, e garantir que o ciclo **iniciar → 
 | Teste | `TESTE_KPI_MES_READONLY.ps1` |
 | Deploy | `DEPLOY_v1.5.71_KPI_MES.md` |
 
-**Você:** Nova versão Web GAS v1.5.71 (mesmo `.gs` que v1.5.70 se ainda não publicou).
+**Produção 08/06:** GAS v1.5.71 · `TESTE_KPI_MES_READONLY.ps1` → ok (paridade com `buscarKPIsAdmin`).
+
+---
+
+## B8 — Idle sessão 1h (entregue no código 09/06)
+
+| Artefato | Detalhe |
+|----------|---------|
+| GAS | `lastActivityAt` + idle 1h + `touchSessaoOperador` v1.5.72 |
+| FE | Relógio real (`mkAuthIdleRemainingMs_`); `mkAuthReleaseBalcaoServer_`; PIN admin preserva operador local v1.7.94 |
+| Teste | `TESTE_SESSAO_IDLE_READONLY.ps1` |
+| Deploy | `DEPLOY_v1.5.72_SESSAO_IDLE.md` |
+
+**Você:** Nova versão Web GAS v1.5.72 → ping `v1.5.72` → tablet `?force=1.7.94`.
 
 ---
 
 ## Critério para fechar FASE 5
 
 - [ ] B7 baseline **ok** em produção (3 execuções sem falha)  
-- [ ] B1 `resumoDia` em produção + Caixa/chip alinhados  
-- [ ] B2 `kpiMes` em produção + Dashboard v1.7.93
+- [x] B1 `resumoDia` em produção + teste readonly ok (08/06)  
+- [x] B2 `kpiMes` em produção + teste readonly ok (08/06)  
+- [ ] Tablet `?force=1.7.94` — Hub leve + Dashboard + Caixa/chip (5.B7.4)
+- [ ] B8 idle — mock 1h → gate + balcão livre GAS (I21)

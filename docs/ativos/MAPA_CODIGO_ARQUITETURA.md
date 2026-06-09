@@ -1,6 +1,6 @@
 # MOVI KIDS — Mapa do código e arquitetura
 
-**Atualizado:** 08/06/2026  
+**Atualizado:** 09/06/2026 (B8 idle sessão — I21)  
 **Função:** anatomia do sistema — o que é cada parte, o que liga com o quê, o que é zona sensível.  
 **Complementa:** `ESTADO_ATUAL.md`, `ACESSOS_E_AUTORIZACOES.md`, `REGRAS_DE_PUBLICACAO_SEGURA.md`, `MAPA_ERROS_FALHAS_BUGS.md`, **`PROTOCOLO_DIAGNOSTICO_E_TESTES.md`**
 
@@ -19,7 +19,7 @@
 | **Olhos (gestão)** | KPIs, payback, relatório | Dashboard, Caixa admin — `buscarKPIsAdmin` (GAS) + páginas admin no FE |
 | **Pernas (canais externos)** | Portal pais, foto, cronômetro curto | `acompanhar.html`, `foto-moldura.html`, `track.html` |
 | **Pele** | Visual único | `mk-app.css` (base) + `mk-design.css` (aditivo Pacote A) |
-| **Porta de entrada** | Quem pode entrar | `mk-auth.js` — operador PIN, admin 1416, chip Turno |
+| **Porta de entrada** | Quem pode entrar + idle 1h | `mk-auth.js` + `mk-admin.js` — operador PIN, admin 1416 (overlay), `mkAuthReleaseBalcaoServer_` |
 | **Dedos finos** | Scripts pontuais, emergência, testes | `scripts/testes/`, `scripts/ops/`, `google-drive-sheets-auth` |
 
 **Monólito modularizado (Pacote M fechado):** `index.html` **~1.378 linhas** (v1.7.87) — **zero JS inline** (só HTML + `<script src>`). Módulos: M.1–M.17 (`mk-globals.js`, `mk-core.js` … `mk-boot.js`). Plano: `PACOTE_M_MODULARIZACAO.md`.
@@ -90,7 +90,7 @@ flowchart TB
     SW[sw.js]
     PORT[acompanhar.html]
   end
-  subgraph GAS["Apps Script v1.5.63"]
+  subgraph GAS["Apps Script v1.5.72"]
     RT[dispatchMoviAction_]
     SH[(Planilha Sheets)]
     PS[PropertiesService sessão]
@@ -176,7 +176,7 @@ sequenceDiagram
 | Balcão sync | 1606–1817 | `carregarInicio`, timer |
 | CRM / Portal | 2589–3032 | Responsáveis, portal, import K.1 |
 | SMS | 3033–3660 | Gateway DJVJRL |
-| Auth operadores | 3974–4560 | PIN, sessão única, APIs admin |
+| Auth operadores | 4176–4520 | PIN, sessão única, idle 1h (`lastActivityAt`), `touchSessaoOperador`, APIs admin |
 
 **Regra:** nova `action` → registrar em `dispatchMoviAction_` + documentar se é escrita crítica.
 
@@ -228,7 +228,7 @@ sequenceDiagram
 | **K2** | `MK_GAS_EXEC_URL` / `DEPLOY_ID` | `mk-version.js`, `.gs` | 404, caixa morto (I1) |
 | **K3** | `SHEET_ID` | `.gs` L61 | Dados errados ou vazios |
 | **K4** | `ADMIN_PIN` 1416 | `.gs`, `mk-auth.js` | Admin e financeiro bloqueados |
-| **K5** | Sessão única balcão | `.gs` PropertiesService + `mk-auth.js` | 409, trava operador (I17, I19) |
+| **K5** | Sessão única balcão + idle 1h | `.gs` `MK_SESSAO_OPERADOR_ATIVA` + `mk-auth.js` / `mk-admin.js` | 409, trava operador; idle dual (I17, I19, **I21**) |
 | **K6** | `mk-version` = `sw.js` | `mk-version.js`, `sw.js` | Tablet em versão fantasma |
 | **K7** | `clasp deploy` | terminal | URL morta — **proibido** |
 | **K8** | SMS Script Properties | GAS (não no repo) | SMS para de enviar |
@@ -244,7 +244,8 @@ Antes de alterar, **declarar escopo** (Regra 1) e **pedir OK** do responsável:
 | Zona | Por quê | Validar com |
 |------|---------|-------------|
 | `api()`, `mkGuardEscritaBrowser_` | P0 operação balcão | `TESTE_PARIDADE_HTTP_BROWSER_GAS.ps1` + **tablet** |
-| `mk-auth.js` (sessão, idle, reconcile) | I17, I18, I19 | Tablet + chip Turno |
+| `mk-auth.js` (sessão, idle, reconcile, release GAS) | I17, I18, I19, **I21** | Tablet + `TESTE_SESSAO_IDLE_READONLY` |
+| `mk-admin.js` (`adminLogin` overlay, `tickAdmin` wall clock) | I18, **I21** | Timer `MM:SS` + `⏸` |
 | `DEPLOY_ID` / URLs GAS | Produção inteira | ping + Regra 9 |
 | `ADMIN_PIN` / APIs admin | Segurança financeira | Homologação admin |
 | `encerrarLocacao` / financeiro | Caixa real | Nunca só PowerShell |
@@ -258,7 +259,25 @@ Antes de alterar, **declarar escopo** (Regra 1) e **pedir OK** do responsável:
 
 ---
 
-## 9. Mapa de métricas (Pacote I — uma métrica, um lugar)
+## 9. Fluxo auth — idle 1h (B8 / I21)
+
+| Camada | Artefato | Comportamento |
+|--------|----------|---------------|
+| **FE relógio** | `mk_auth_last_activity` + `mkAuthIdleRemainingMs_` | Expiração por timestamp (não countdown) |
+| **FE guarda I18** | `mkHasLocacaoAbertaNoTablet_` | Pausa logout se `window.sessions` tem Ativa/Pendente |
+| **FE admin overlay** | `adminLogin()` sem sobrescrever operador | `isAdmin` + `mk_admin_ui_persist`; TABLET vs BALCÃO na sidebar |
+| **FE logout** | `mkAuthReleaseBalcaoServer_` → `trocarOperador` | Inatividade chama `liberarSessaoOperadorAdmin` no GAS |
+| **FE heartbeat** | `touchSessaoOperador` (debounce 3 min) | Renova `lastActivityAt` no servidor com atividade real |
+| **GAS sessão** | `MK_SESSAO_OPERADOR_ATIVA` | `lastActivityAt`; idle 1h → `logout_inatividade` em AUD_TURNO |
+| **GAS TTL** | `MK_SESSAO_OPERADOR_TTL_MS` (18h) | Teto absoluto; idle 1h é a regra operacional |
+
+**Design (timer admin):** `.admin-timer` em `index.html` — `MM:SS` derivado do wall clock; sufixo `⏸` quando I18 pausa (`mk-app.css` tabular-nums).
+
+**Incidente:** `docs/arquivo/incidentes/INCIDENTE_I21_SESSAO_IDLE_DUAL_2026-06-09.md`
+
+---
+
+## 10. Mapa de métricas (Pacote I — uma métrica, um lugar)
 
 | Métrica | Lugar canônico |
 |---------|----------------|
@@ -272,7 +291,7 @@ Duplicar KPI em Home operador = **proibido** (Pacote I).
 
 ---
 
-## 10. Resposta rápida: estamos 100% organizados no código?
+## 11. Resposta rápida: estamos 100% organizados no código?
 
 | Aspecto | Status |
 |---------|--------|
