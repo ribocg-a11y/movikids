@@ -28,7 +28,7 @@
 |---------|-----------|---------------|
 | **08/06 ~18:10** | Sidebar “BALCÃO: Milena Nunes · Entrou 18:10” | `registrarSessaoOperadorAtiva_` no GAS |
 | **08/06 noite** | Sem locações ativas (0 ativas / 0 encerradas hoje) | Sem guarda I18 — idle deveria correr |
-| **09/06 08:17** | Screenshot Windows Chrome — ainda logado, `?force=1.7.93` | ~14h desde login; idle 1h **não** efetivo |
+| **09/06 08:17** | Screenshot **computador** (Windows Chrome) — ainda logado, `?force=1.7.93` | ~14h desde login; idle 1h **não** efetivo — **não era o tablet do balcão** (gestão no PC com PIN admin) |
 | **09/06** | Usuário reporta inatividade >1h | Disparou auditoria de fluxo completo auth/idle |
 | **09/06** | Commit **v1.7.94** / **v1.5.72** (B8) | Correção entregue no repo |
 

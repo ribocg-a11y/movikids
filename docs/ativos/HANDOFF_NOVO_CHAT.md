@@ -8,6 +8,24 @@
 
 ---
 
+## Modelo operacional — dois aparelhos (ler sempre)
+
+| Papel | Aparelho | Quem | Uso típico |
+|-------|----------|------|------------|
+| **Gestão / dev** | **Computador** (Windows + Cursor) | **Você** (sócio/dev) | Código, GAS, deploy, testes `.ps1`, planilha OAuth, browser no PC |
+| **Operação balcão** | **Tablet** fixo no shopping | **Operadores** (Milena, Eduarda) | Locações, timer, PIN operador, PWA ícone na loja |
+
+**Regras para o agente:**
+
+1. **Você opera sempre do computador** — prints, chats e validações que você manda costumam ser do **PC**, não do tablet do balcão.
+2. O **tablet fica na operação** — homologação real (chip Turno, Nova locação, idle, PWA) exige **alguém no balcão** ou você indo até o tablet; o agente **não** substitui isso com browser no seu PC.
+3. **Sessão dual (I21):** no PC com PIN admin 1416 aparece **TABLET: Administrador**; no tablet dos operadores aparece **BALCÃO: Nome** — são camadas diferentes; idle e logout devem alinhar **GAS + aparelho do balcão**.
+4. Ao pedir “testar no tablet”, assumir: **você valida no físico do balcão**; agente roda protocolo HTTP + prepara `?force=versão` para você abrir lá.
+
+Detalhe: `ACESSOS_E_AUTORIZACOES.md` §7.0 · incidente I21.
+
+---
+
 ## Como abrir um chat novo (você)
 
 ### Opção A — mensagem mínima (recomendada)
@@ -34,7 +52,7 @@ Continuo o MOVI KIDS. Repo: C:\Users\riboc\Documents\Codex\2026-05-30\files-ment
 - Ler: este arquivo → `PLANO_PRIORIDADES` → `ESTADO_ATUAL` → `REGRAS` → `ACESSOS_E_AUTORIZACOES` (§7 = agente vs você)
 - Ignorar handoff antigo em `docs/arquivo/planos/`
 - Informar: FE **v1.7.94**, GAS **v1.5.72** — **FASE 1–4 fechadas**; **FASE 5 ativa** (B8 idle sessão — publicar GAS v1.5.72)
-- Deixar claro: **agente** código, testes e **planilha (OAuth)**; **você** Nova versão GAS Web e tablet
+- Deixar claro: **agente** no **PC** (código, testes, planilha); **você** Nova versão GAS Web; **tablet no balcão** = validação operação (não confundir com seu computador)
 
 ---
 
@@ -157,7 +175,7 @@ Invoke-RestMethod "https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5
 .\scripts\pre-push-check.ps1
 ```
 
-Esperado: ping `versao: v1.5.70`, pre-push verde, FE `1.7.92`, `TESTE_RESUMO_DIA_READONLY.ps1` ok após Nova versão GAS.
+Esperado: ping `versao: v1.5.72`, pre-push verde, FE `1.7.94`.
 
 ---
 

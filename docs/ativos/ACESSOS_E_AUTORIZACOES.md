@@ -1,6 +1,6 @@
 # MOVI KIDS — Acessos e autorizações
 
-**Atualizado:** 08/06/2026  
+**Atualizado:** 09/06/2026  
 **Função:** mapa único de **quem pode o quê** — app, infraestrutura e agente Cursor.  
 **Complementa:** `ESTADO_ATUAL.md`, `REGRAS_DE_PUBLICACAO_SEGURA.md`, `DEPLOY_GAS_v1.5.32_AUTH.md`
 
@@ -106,6 +106,18 @@ Operador nas 5 escritas críticas: deve enviar `operador` / `operadorId` (GET no
 
 Esta seção responde: **o que o agente faz sozinho, o que valida, o que publica e o que só você faz.**
 
+### 7.0 Modelo operacional — PC vs tablet balcão
+
+| | **Computador (você + Cursor)** | **Tablet (balcão na loja)** |
+|---|-------------------------------|----------------------------|
+| **Quem usa** | Sócio/dev — gestão, deploy, código | Operadores — locação do dia a dia |
+| **Onde fica** | Escritório / casa (Windows) | Fixo na operação (shopping) |
+| **Sessão típica** | PIN admin **1416** → sidebar “Administrador” | PIN operador → “BALCÃO: Milena/Eduarda” |
+| **O que o agente vê** | Repo, testes `.ps1`, browser MCP no **seu PC** | **Nada** — agente não tem o tablet físico |
+| **Homologação** | Ping, protocolo HTTP, `pre-push-check` | Chip Turno, ▶ timer, idle, PWA ícone — **só no tablet** |
+
+**Importante:** prints e relatos no chat vêm quase sempre do **computador**. Isso **não** substitui validação no tablet do balcão. Incidente I21 (idle) misturou sessão admin no PC com turno Milena no GAS — ver `INCIDENTE_I21_SESSAO_IDLE_DUAL_2026-06-09.md`.
+
 ### 7.1 O que configuramos para o agente (acessos no seu PC)
 
 | Acesso / ferramenta | Onde está | Para quê |
@@ -200,7 +212,7 @@ Fluxo típico: **agente prepara** → **você publica GAS** (1 clique Nova vers�
 |------|------|
 | **Nova versão Web GAS** | [Editor Apps Script](https://script.google.com/home/projects/19SIhkX9Tk7FiJA1JXu1OrUwssHdr3H5zc8q3rOjmBvqgWfXuHlk8xyf8/edit) → Implantar → `AKfycbwakQ...` |
 | **Colar `.gs` manualmente** | Alternativa ao clasp — Ctrl+A no arquivo do PC → Código.gs |
-| **Tablet balcão** | Abrir `?force=1.7.87`, chip Turno, checklist `CHECKLIST_TABLET_v1.7.85.md` |
+| **Tablet balcão (na loja)** | Abrir `?force=1.7.94` **no aparelho da operação** — não confundir com o PC de gestão |
 | **Script Properties SMS** | Projeto GAS → Configurações → Propriedades (fora da planilha) |
 | **Re-auth OAuth** (se token expirar) | `cd google-drive-sheets-auth` → `npm run auth` — abre browser uma vez |
 | **Aprovar push / comandos sensíveis** | Card de aprovação do Cursor quando aparecer |

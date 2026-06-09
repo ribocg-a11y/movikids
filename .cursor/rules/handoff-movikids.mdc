@@ -37,17 +37,19 @@ Ao trabalhar neste repositório, **ler primeiro** (nesta ordem):
 
 **Agente SE USUÁRIO PEDIR:** `git commit`, `git push`, `clasp push`, mudanças em `api()`/auth, escritas destrutivas na planilha.
 
-**SÓ O USUÁRIO:** Nova versão Web GAS (editor Google), tablet balcão, Script Properties SMS, re-auth OAuth (`npm run auth`), aprovar push na main.
+**SÓ O USUÁRIO:** Nova versão Web GAS (editor Google), tablet balcão **na loja** (não o PC de gestão), Script Properties SMS, re-auth OAuth (`npm run auth`), aprovar push na main.
+
+**DOIS APARELHOS:** usuário opera sempre do **computador**; tablet fixo na **operação** com operadores. Prints no chat = PC; homologação Turno/timer/idle = tablet físico do balcão. Ver HANDOFF § Modelo operacional.
 
 **Planilha:** ID `1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618` — scripts: `test-movikids.js`, `auditar-planilha-movikids.js`, `limpar-testes-movikids.js`, `criar-aba-investimento-movikids.js`. Ver `ACESSOS_E_AUTORIZACOES.md` §7.8.
 
 **NUNCA:** `clasp deploy`, POST browser (I15), commit de segredos.
 
-**Produção (08/06):** FE **v1.7.92** · GAS **v1.5.70** (Nova versão Web) · B1 `resumoDia`.
+**Produção (09/06):** FE **v1.7.94** · GAS **v1.5.72**.
 
 **I20 cronômetro (RESOLVIDO):** GAS v1.5.66+ + FE v1.7.78+ — doc `docs/ativos/INCIDENTE_I20_CRONOMETRO_RESOLUCAO_2026-06-07.md`. Não regredir sem `TESTE_I20_COMPLETO_PROD.ps1` + tablet.
 
-**FASE 5:** B7 ok · B1 código entregue — `DEPLOY_v1.5.70_RESUMO_DIA.md` · próximo B2 `kpiMes`.
+**FASE 5:** B7 ok · B1+B2+B8 ✅ · pendente tablet balcão 5.B7.4.
 
 **Teste / diagnóstico (OBRIGATÓRIO quando usuário pedir):** ler e seguir `docs/ativos/PROTOCOLO_DIAGNOSTICO_E_TESTES.md` → executar `scripts/testes/TESTE_PROTOCOLO_DIAGNOSTICO.ps1` (ou `-Foco` adequado). Nunca testar só um script isolado sem F0 e sem listar fluxos impactados (§4 do protocolo). Antes de mudar código: preencher matriz de impacto do protocolo.
 

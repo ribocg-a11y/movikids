@@ -1,6 +1,8 @@
 # MOVI KIDS — Instruções para agentes (Cursor / Codex)
 
-Sistema operacional de locações — balcão (tablet), portal do responsável, painel admin.
+Sistema operacional de locações — balcão (tablet na loja), portal do responsável, painel admin.
+
+**Modelo operacional:** o sócio/dev trabalha no **computador** (Cursor, deploy, testes). O **tablet fica no balcão** com os operadores — homologação real é lá, não no PC. Ver `HANDOFF_NOVO_CHAT.md` § Modelo operacional.
 
 **Repo neste PC:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`
 
