@@ -114,22 +114,7 @@
 }
 .mk-qr-balcao-btn:hover { opacity: .92; }
 .mk-qr-balcao-btn:active { transform: scale(.98); }
-.mk-qr-balcao-close {
-  position: absolute;
-  top: 6px;
-  right: 8px;
-  background: transparent;
-  border: none;
-  color: var(--txt3, #78909C);
-  font-size: 14px;
-  line-height: 1;
-  cursor: pointer;
-  padding: 4px;
-  opacity: .65;
-}
-.mk-qr-balcao-close:hover { opacity: 1; color: var(--txt, #1a1a2e); }
 @media (max-width: 420px) {
-  .mk-qr-balcao-card { padding-right: 28px; }
   .mk-qr-balcao-actions { width: 100%; }
   .mk-qr-balcao-btn { flex: 1; text-align: center; min-width: 0; }
 }

@@ -45,8 +45,6 @@ Ao trabalhar neste repositório, **ler primeiro** (nesta ordem):
 
 **NUNCA:** `clasp deploy`, POST browser (I15), commit de segredos.
 
-**Produção (09/06):** FE **v1.7.94** · GAS **v1.5.72**.
-
 **I20 cronômetro (RESOLVIDO):** GAS v1.5.66+ + FE v1.7.78+ — doc `docs/ativos/INCIDENTE_I20_CRONOMETRO_RESOLUCAO_2026-06-07.md`. Não regredir sem `TESTE_I20_COMPLETO_PROD.ps1` + tablet.
 
 **FASE 5:** B7 ok · B1+B2+B8 ✅ · pendente tablet balcão 5.B7.4.
@@ -56,6 +54,30 @@ Ao trabalhar neste repositório, **ler primeiro** (nesta ordem):
 **I20 guards:** antes de mexer em `iniciarTimer_`, `iniciarContagem`, `mergeSessaoCanonica` ou `calcRemaining` → `-Foco cronometro` + tablet ▶→10:00.
 
 **Matriz completa:** `docs/ativos/ACESSOS_E_AUTORIZACOES.md` §7.
+
+## Modo de operação — máximo potencial (obrigatório)
+
+Antes de **qualquer** alteração, percorrer mentalmente:
+
+1. **Fluxo impactado** (F0–F14 do `PROTOCOLO_DIAGNOSTICO_E_TESTES.md`) — não patch isolado.
+2. **Dois aparelhos:** mudança visível no balcão → checklist **tablet na loja**; seu trabalho no **PC** (código, testes HTTP, ping).
+3. **Camadas:** FE + GAS + planilha + PWA cache — listar o que precisa publicar e **quem** publica.
+4. **Incidentes:** consultar `MAPA_ERROS_FALHAS_BUGS.md` — regredir I15/I18/I20/I21 é P0.
+
+**Ao executar (sempre):**
+
+- UI operacional fixa (portal, turno, chip) → **sem** dismiss/localStorage que esconda sem decisão explícita do usuário.
+- Auth/idle/sessão/timer/`api()` → matriz de impacto + teste do fluxo, não só arquivo tocado.
+- Antes de commit/push: `pre-push-check.ps1` + resumo **Publicação:** FE versão · GAS (sim/não) · teste rodado · **tablet balcão:** o que validar lá.
+- Ao encerrar: atualizar HANDOFF + versões se mudou fase/FE.
+
+**Proatividade esperada (sem pedir):**
+
+- Sugerir teste do fluxo afetado e item de checklist tablet quando mexer em operação.
+- Registrar bugs novos no mapa de incidentes se a causa for sistêmica.
+- Não declarar "resolvido" sem F0 + fluxo + quem valida no tablet quando aplicável.
+
+**Produção (09/06):** FE **v1.7.95** · GAS **v1.5.72**.
 
 ## Não usar como fonte de verdade
 

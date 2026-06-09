@@ -363,19 +363,11 @@ function renderEncHoje(list) {
   }).join('');
 }
 
-function mkDismissQrStrip_() {
-  const el = document.getElementById('mk-qr-balcao-strip');
-  if (el) el.hidden = true;
-  try { localStorage.setItem('mk_qr_strip_off', '1'); } catch (e) {}
-}
-window.mkDismissQrStrip_ = mkDismissQrStrip_;
-
 function mkInitQrBalcaoStrip_() {
   const el = document.getElementById('mk-qr-balcao-strip');
   if (!el) return;
-  try {
-    if (localStorage.getItem('mk_qr_strip_off') === '1') el.hidden = true;
-  } catch (e) {}
+  el.hidden = false;
+  try { localStorage.removeItem('mk_qr_strip_off'); } catch (e) {}
 }
 window.mkInitQrBalcaoStrip_ = mkInitQrBalcaoStrip_;
 

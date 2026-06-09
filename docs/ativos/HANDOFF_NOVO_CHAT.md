@@ -51,7 +51,7 @@ Continuo o MOVI KIDS. Repo: C:\Users\riboc\Documents\Codex\2026-05-30\files-ment
 
 - Ler: este arquivo → `PLANO_PRIORIDADES` → `ESTADO_ATUAL` → `REGRAS` → `ACESSOS_E_AUTORIZACOES` (§7 = agente vs você)
 - Ignorar handoff antigo em `docs/arquivo/planos/`
-- Informar: FE **v1.7.94**, GAS **v1.5.72** — **FASE 1–4 fechadas**; **FASE 5 ativa** (B8 idle sessão — publicar GAS v1.5.72)
+- Informar: FE **v1.7.95**, GAS **v1.5.72** — **FASE 1–4 fechadas**; **FASE 5 ativa** (B8 idle sessão — publicar GAS v1.5.72)
 - Deixar claro: **agente** no **PC** (código, testes, planilha); **você** Nova versão GAS Web; **tablet no balcão** = validação operação (não confundir com seu computador)
 
 ---
@@ -66,6 +66,19 @@ Continuo o MOVI KIDS. Repo: C:\Users\riboc\Documents\Codex\2026-05-30\files-ment
 | 3b | Opcional: ping GAS + `pre-push-check.ps1` se for mexer em código |
 | 4 | Responder com: versões, fase ativa, **próximo passo**, **quem faz o quê** (agente vs você — `ACESSOS` §7) |
 | 5 | Ao encerrar sessão: atualizar este arquivo + checklist se algo mudou |
+| 6 | **Modo máximo potencial:** fluxo F0–F14 + dois aparelhos + resumo publicação antes de push (ver § Modo agente abaixo) |
+
+---
+
+## Modo de operação do agente (máximo potencial)
+
+1. **Nunca patch isolado** — mapear fluxo (`PROTOCOLO` §2) e incidentes (`MAPA_ERROS`) antes de codar.
+2. **PC ≠ tablet** — homologação operação = aparelho **na loja**; agente valida HTTP/ping no PC.
+3. **UI fixa no balcão** — portal dos pais, chip turno: sem ocultar sem pedido explícito.
+4. **Antes de push:** `pre-push-check` + bloco: FE · GAS? · testes · checklist tablet.
+5. **Proatividade:** propor teste + impacto; registrar I* se bug sistêmico; não fechar sem F0.
+
+Regra Cursor: `.cursor/rules/handoff-movikids.mdc` § Modo de operação.
 
 ---
 
@@ -73,10 +86,10 @@ Continuo o MOVI KIDS. Repo: C:\Users\riboc\Documents\Codex\2026-05-30\files-ment
 
 | Camada | Versão | Verificação |
 |--------|--------|-------------|
-| **Frontend** | **v1.7.94** | `mk-version.js` → `window.MK_VERSION` |
-| **Service Worker** | **1.7.94** | `sw.js` → `SW_VERSION` |
+| **Frontend** | **v1.7.95** | `mk-version.js` → `window.MK_VERSION` |
+| **Service Worker** | **1.7.95** | `sw.js` → `SW_VERSION` |
 | **Apps Script** | **v1.5.72** | [ping](https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec?action=ping) → `versao` |
-| **App tablet** | v1.7.94 | https://ribocg-a11y.github.io/movikids/?force=1.7.94 |
+| **App tablet balcão** | v1.7.95 | https://ribocg-a11y.github.io/movikids/?force=1.7.95 (**na loja**, não só no PC) |
 
 **Deploy ID GAS (único — nunca criar outro):** `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y`
 

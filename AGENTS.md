@@ -4,6 +4,8 @@ Sistema operacional de locações — balcão (tablet na loja), portal do respon
 
 **Modelo operacional:** o sócio/dev trabalha no **computador** (Cursor, deploy, testes). O **tablet fica no balcão** com os operadores — homologação real é lá, não no PC. Ver `HANDOFF_NOVO_CHAT.md` § Modelo operacional.
 
+**Modo agente (máximo potencial):** mapear fluxo F0–F14 antes de codar; `pre-push-check` + resumo publicação; checklist tablet na loja; sem UI operacional ocultável sem pedido. Ver HANDOFF § Modo de operação e `.cursor/rules/handoff-movikids.mdc`.
+
 **Repo neste PC:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`
 
 ## Mensagem mínima do usuário
@@ -53,7 +55,7 @@ Detalhe completo: [`ACESSOS_E_AUTORIZACOES.md`](docs/ativos/ACESSOS_E_AUTORIZACO
 
 | Camada | Versão |
 |--------|--------|
-| Frontend | **v1.7.94** |
+| Frontend | **v1.7.95** |
 | GAS | **v1.5.72** (publicar Nova versão Web) |
 | Deploy ID | `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y` |
 
