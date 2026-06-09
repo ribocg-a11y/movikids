@@ -60,7 +60,7 @@ Cada fluxo tem: **arquivos**, **incidentes**, **teste automático**, **tablet ob
 | ID | Fluxo | Caminho feliz | Arquivos principais | Incidentes | Teste auto | Tablet |
 |----|-------|---------------|---------------------|------------|------------|--------|
 | **F0** | Infra / versões / cleanup | ping OK, FE=GAS esperado, sem lixo teste | `mk-version.js`, `sw.js`, `.gs` ping | I3, I10, I12, I14 | `pre-push-check`, ping | `?force=` |
-| **F1** | Auth operador + admin | PIN → chip Turno → sessão GAS | `mk-auth.js`, GAS operadores | I4, I6, I17, I19 | guards pre-push | ✅ PWA |
+| **F1** | Auth operador + admin + idle 1h | PIN → chip Turno → sessão GAS; idle B8 | `mk-auth.js`, `mk-admin.js`, GAS | I4, I6, I17, I19, **I21** | `TESTE_SESSAO_IDLE_READONLY` | ✅ PWA + mock idle |
 | **F2** | Nova locação — **Salvar + SMS** | Salva Pendente + SMS, **sem** timer | `mk-nova.js` `confirmarLocacaoEEnviarSms_` | I20 | `TESTE_4_FLUXOS` T2 | ✅ |
 | **F3** | Nova locação — **Só salvar** | Pendente 10:00 parado | `mk-nova.js` `confirmarLocacao` | I20 | `TESTE_4_FLUXOS` T1 | ✅ |
 | **F4** | Pendente — **Enviar SMS** | SMS portal; continua Pendente | `mk-operacao.js` `enviarSmsPendente_` | I20 | `TESTE_I20` B1 | opcional |
@@ -211,6 +211,7 @@ O orquestrador **completo** inclui scripts que **gravam** locações de teste. Q
 | B7 write | `TESTE_B7_REGRESSAO_WRITE.ps1` (grava + cleanup) |
 | B1 resumoDia | `TESTE_RESUMO_DIA_READONLY.ps1` |
 | B2 kpiMes | `TESTE_KPI_MES_READONLY.ps1` |
+| B8 idle I21 | `TESTE_SESSAO_IDLE_READONLY.ps1` |
 | F0 | `TESTE_REGRESSAO_MOVIKIDS_PROD_SAFE.ps1` (sem `-RunWriteTests`) |
 
 **Pular:** `TESTE_I20_*`, `TESTE_4_FLUXOS_*`, `TESTE_DRAWER_E_*`, `TESTE_PACOTE_F_KPI_READONLY.ps1` (este último grava apesar do nome).
@@ -277,6 +278,9 @@ Detalhe em `HOMOLOGACAO_PRODUCAO_ASSISTIDA.md` seções A–H. Resumo mínimo:
 | `TESTE_RELACIONAMENTO_*` | F13 | K.3 |
 | `TESTE_OPERACAO_CONFIG_READONLY.ps1` | CONFIG frota/preços | FASE 4 |
 | `TESTE_B7_REGRESSAO_WRITE.ps1` | F5 iniciar/estender/encerrar | B7 |
+| `TESTE_SESSAO_IDLE_READONLY.ps1` | F1 idle B8 | **I21** |
+| `TESTE_RESUMO_DIA_READONLY.ps1` | F12/B1 | FASE 5 |
+| `TESTE_KPI_MES_READONLY.ps1` | F12/B2 | FASE 5 |
 | `TESTE_PACOTE_F_KPI_*` | F12 | Pacote F (⚠️ grava locação teste) |
 | `TESTE_TABLET_F5_F7_F10_F11.ps1` | F5, F7, F10, F11 | I20, I16 |
 | `TESTE_TABLET_F5_F7_F10_F11_BROWSER.js` | F5, F7, F10, F11 | via `RUN_TABLET_BROWSER_TEST.ps1` |

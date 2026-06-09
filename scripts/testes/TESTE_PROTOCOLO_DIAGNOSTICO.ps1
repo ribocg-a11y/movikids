@@ -81,7 +81,7 @@ try {
       try {
         $ping = Invoke-RestMethod -Uri $pingUrl -Method Get -TimeoutSec 20
         $gasVer = $ping.versao
-        $gasOk = $gasVer -match 'v1\.5\.(6[6-9]|[7-9]\d)'
+        $gasOk = $gasVer -match 'v1\.5\.(6[6-9]|[7-9]\d|\d{2,})'
         Add-Fase "F0" "Ping GAS" $(if ($gasOk) { "ok" } else { "warn" }) $gasVer
       } catch {
         Add-Fase "F0" "Ping GAS" "fail" $_.Exception.Message
@@ -90,7 +90,7 @@ try {
       try {
         $feRaw = & curl.exe -L -s "https://ribocg-a11y.github.io/movikids/mk-version.js"
         $repoRaw = Get-Content (Join-Path $root "mk-version.js") -Raw
-        $verPat = 'MK_VERSION\s*=\s*''([^'']+)'''
+        $verPat = 'window\.MK_VERSION\s*=\s*''([^'']+)'''
         if ($feRaw -match $verPat) { $fePages = $Matches[1] } else { $fePages = "?" }
         if ($repoRaw -match $verPat) { $feRepo = $Matches[1] } else { $feRepo = "?" }
         $aligned = ($fePages -eq $feRepo)
@@ -163,6 +163,25 @@ try {
       if (Test-Path $dr) {
         $r = Run-Script $dr "drawer"
         Add-Fase "F9" "Drawer encerrar Pacote E" $(if ($r.exit -eq 0) { "ok" } else { "warn" }) "exit=$($r.exit)"
+      }
+    }
+
+    # --- F1 B8 idle sessao (I21) ---
+    if ($Foco -eq "completo") {
+      $idle = Join-Path $testDir "TESTE_SESSAO_IDLE_READONLY.ps1"
+      if (Test-Path $idle) {
+        $r = Run-Script $idle "idle"
+        Add-Fase "F1" "B8 idle sessao readonly" $(if ($r.exit -eq 0) { "ok" } else { "fail" }) "exit=$($r.exit)" @("TESTE_SESSAO_IDLE_READONLY.ps1")
+      }
+      foreach ($b in @(
+        @{ f = "B1"; s = "TESTE_RESUMO_DIA_READONLY.ps1" },
+        @{ f = "B2"; s = "TESTE_KPI_MES_READONLY.ps1" }
+      )) {
+        $p = Join-Path $testDir $b.s
+        if (Test-Path $p) {
+          $r = Run-Script $p $b.f
+          Add-Fase $b.f "FASE5 $($b.f) readonly" $(if ($r.exit -eq 0) { "ok" } else { "warn" }) "exit=$($r.exit)" @($b.s)
+        }
       }
     }
   }

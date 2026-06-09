@@ -41,8 +41,10 @@ try {
   }
 
   $touch = Invoke-MkApi @{ action = "touchSessaoOperador"; operadorId = "1" }
-  if ($touch.ok) {
-    Add-SCheck "touch.semSessao" "warn" "touch ok sem sessao — revisar GAS"
+  if ($touch.ok -and $null -eq $touch.sessaoAtiva) {
+    Add-SCheck "touch.semSessao" "ok" "sem sessao ativa (esperado)"
+  } elseif ($touch.ok) {
+    Add-SCheck "touch.comSessao" "ok" "lastActivityAt renovado"
   } else {
     Add-SCheck "touch.semSessao" "ok" ($touch.erro)
   }

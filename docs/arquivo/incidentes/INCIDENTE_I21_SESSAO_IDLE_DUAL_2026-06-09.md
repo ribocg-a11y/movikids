@@ -152,4 +152,13 @@ sequenceDiagram
 
 ---
 
-*Próxima revisão: após homologação tablet v1.7.94 + ping v1.5.72.*
+## Validação 09/06/2026
+
+| Teste | Resultado |
+|-------|-----------|
+| Ping GAS | **v1.5.72** |
+| `TESTE_SESSAO_IDLE_READONLY.ps1` | **ok** |
+| `TESTE_PROTOCOLO_DIAGNOSTICO.ps1` (completo) | **warn** (FE Pages regex corrigido); demais fases ok |
+| B8 FASE 5 | **Fechado** no repo |
+
+*Tablet mock idle (I21) — opcional; ver `DEPLOY_v1.5.72_SESSAO_IDLE.md`.*

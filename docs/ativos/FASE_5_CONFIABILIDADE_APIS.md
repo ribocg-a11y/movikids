@@ -19,7 +19,7 @@ Reduzir divergência entre app e planilha, e garantir que o ciclo **iniciar → 
 | **B7** | Regressão write controlada | Alta | 🟡 baseline ok 08/06 |
 | **B1** | API `resumoDia(data)` única (Caixa + chip) | Média | ✅ GAS v1.5.71 + teste readonly 08/06 |
 | **B2** | API `kpiMes` — Dashboard só visualiza | Média | ✅ GAS v1.5.71 + teste readonly 08/06 |
-| **B8** | Idle sessão 1h — FE+GAS alinhados (v1.7.94/v1.5.72) | Alta | 🟡 código repo; **Nova versão Web** + tablet I21 |
+| **B8** | Idle sessão 1h — FE+GAS alinhados (v1.7.94/v1.5.72) | Alta | ✅ 09/06 — GAS v1.5.72 + protocolo + `TESTE_SESSAO_IDLE_READONLY` |
 | **B6** | PIN admin só via GAS (T4) | Média | ⬜ |
 | **B3** | Auditoria UI por operador | Baixa | ⬜ |
 | **B5** | PDF resumo executivo | Baixa | ⬜ |
@@ -93,7 +93,9 @@ Reduzir divergência entre app e planilha, e garantir que o ciclo **iniciar → 
 | Teste | `TESTE_SESSAO_IDLE_READONLY.ps1` |
 | Deploy | `DEPLOY_v1.5.72_SESSAO_IDLE.md` |
 
-**Você:** Nova versão Web GAS v1.5.72 → ping `v1.5.72` → tablet `?force=1.7.94`.
+**Produção 09/06:** ping **v1.5.72** · `TESTE_SESSAO_IDLE_READONLY.ps1` → ok · protocolo F0+F1 ok.
+
+**Tablet opcional (I21):** mock `mk_auth_last_activity` -61min + reload → gate login.
 
 ---
 
@@ -102,5 +104,5 @@ Reduzir divergência entre app e planilha, e garantir que o ciclo **iniciar → 
 - [ ] B7 baseline **ok** em produção (3 execuções sem falha)  
 - [x] B1 `resumoDia` em produção + teste readonly ok (08/06)  
 - [x] B2 `kpiMes` em produção + teste readonly ok (08/06)  
-- [ ] Tablet `?force=1.7.94` — Hub leve + Dashboard + Caixa/chip (5.B7.4)
-- [ ] B8 idle — mock 1h → gate + balcão livre GAS (I21)
+- [x] **B8** idle FE+GAS + teste readonly ok (09/06)  
+- [ ] Tablet `?force=1.7.94` — Hub + Dashboard + mock idle I21 (5.B7.4)

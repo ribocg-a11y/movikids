@@ -99,7 +99,7 @@ Continuo o MOVI KIDS. Repo: C:\Users\riboc\Documents\Codex\2026-05-30\files-ment
 
 **FASE 3–4:** ✅ fechadas 08/06 — Pacote L v1.7.91 + CONFIG planilha validados.
 
-**FASE 5 (ativa):** B7 ok · B1+B2 ✅ · **B8 idle sessão** v1.7.94 + GAS **v1.5.72** — `DEPLOY_v1.5.72_SESSAO_IDLE.md` · você: **Nova versão Web** + tablet `?force=1.7.94`.
+**FASE 5 (ativa):** B7 ok · B1+B2+B8 ✅ (09/06) · GAS **v1.5.72** + FE **v1.7.94** · pendente: tablet homologação 5.B7.4 + 3× B7.
 
 **I20 / Pacote M:** continuam fechados — não regredir timer sem `TESTE_I20_COMPLETO_PROD.ps1` + tablet.
 

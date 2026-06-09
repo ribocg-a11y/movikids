@@ -186,7 +186,7 @@ Commits de referência: `3d9d106` (v1.7.25), `e1a56db` (Pacote E), `1454bc8` (fi
 - [x] **Pacote M — Modularização FE** — M.1–M.17 ✅ (v1.7.87; zero JS inline)
 - [x] **Pacote L** — UX polish v1.7.91 (FASE 3 fechada)
 - [x] **FASE 4 CONFIG** — planilha + tablet validados
-- [~] **FASE 5** — B7 ok; B1+B2 ✅; **B8** idle I21 v1.7.94/v1.5.72 no repo 09/06 — publicar GAS + tablet homologação
+- [~] **FASE 5** — B7 ok; B1+B2+B8 ✅ 09/06 (GAS v1.5.72, protocolo ok); tablet 5.B7.4 pendente
 - [~] **Fase 9 supervisor — PAUSADA**
 
 ---
