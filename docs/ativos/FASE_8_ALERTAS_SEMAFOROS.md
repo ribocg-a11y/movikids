@@ -1,8 +1,8 @@
 # FASE 8 — Alertas proativos e semáforos
 
-**Status:** 🟡 **próxima** (planejamento ativo)  
+**Status:** 🟢 **repo pronto** — publicar GAS **v1.5.79** + FE **v1.8.9**  
 **Prioridade:** P1  
-**Versão alvo:** FE **v1.8.7** · GAS **v1.5.78**  
+**Versão alvo:** FE **v1.8.9** · GAS **v1.5.79**  
 **Plano mestre:** `PLANO_FASES_6_15_COCKPIT_EXECUTIVO_2026-06.md` § FASE 8  
 **Depende de:** FASE 6–7 publicadas · **v1.8.5+** / **v1.5.78** · hotfix **I22** · **Regra 14**
 
@@ -34,29 +34,29 @@ Antecipar problemas antes do P&L fechado: **semáforo verde/amarelo/vermelho** +
 
 | ID | Entrega | Status |
 |----|---------|--------|
-| 8.1 | `buildAlertasGestao_(payload)` — regras v1 (tabela abaixo) | ⏳ |
-| 8.2 | Port/adaptar `finSinalEmpresa_` → `movikidsSinalEmpresa_` | ⏳ |
-| 8.3 | Campo `alertas: [{ nivel, codigo, titulo, mensagem, acionavel }]` em `kpiMes` | ⏳ |
-| 8.4 | Campo `sinalEmpresa: { nivel, label, motivo }` em `kpiMes` | ⏳ |
-| 8.5 | Doc **`DEPLOY_v1.5.77_FASE8_ALERTAS.md`** (regra de ouro completa — copiar modelo de `DEPLOY_v1.5.76_FASE7_LEADING.md`) | ⏳ |
+| 8.1 | `buildAlertasGestao_(payload)` — regras v1 (tabela abaixo) | ✅ repo |
+| 8.2 | Port/adaptar `finSinalEmpresa_` → `movikidsSinalEmpresa_` | ✅ repo |
+| 8.3 | Campo `alertas: [{ nivel, codigo, titulo, mensagem, acionavel }]` em `kpiMes` | ✅ repo |
+| 8.4 | Campo `sinalEmpresa: { nivel, label, motivo }` em `kpiMes` | ✅ repo |
+| 8.5 | Doc **`DEPLOY_v1.5.79_FASE8_ALERTAS.md`** | ✅ |
 
 ### FE v1.8.3
 
 | ID | Entrega | Status |
 |----|---------|--------|
-| 8.6 | `#mk-alert-strip` sob cockpit (max 3 + “ver todos”) | ⏳ |
-| 8.7 | Modal **Alertas do mês** | ⏳ |
-| 8.8 | Semáforo payback strip + margem cockpit | ⏳ |
-| 8.9 | Badge sidebar Dashboard (alertas críticos) | ⏳ |
-| 8.10 | Dismiss sessionStorage (`mk_alert_dismiss_*`) | ⏳ |
-| 8.11 | Manter `#nk-alerta` FASE 5 (faturamento dia) — não conflitar | ⏳ |
-| 8.12 | Só admin vê alertas gestão | ⏳ |
+| 8.6 | `#mk-alert-strip` sob cockpit (max 3 + “ver todos”) | ✅ repo |
+| 8.7 | Modal **Alertas do mês** | ✅ repo |
+| 8.8 | Semáforo payback strip + margem cockpit | ✅ repo |
+| 8.9 | Badge sidebar Dashboard (alertas críticos) | ✅ repo |
+| 8.10 | Dismiss sessionStorage (`mk_alert_dismiss_*`) | ✅ repo |
+| 8.11 | Manter `#nk-alerta` FASE 5 (faturamento dia) — não conflitar | ✅ |
+| 8.12 | Só admin vê alertas gestão | ✅ repo |
 
 ### QA
 
 | ID | Entrega | Status |
 |----|---------|--------|
-| 8.13 | `TESTE_FASE8_ALERTAS_READONLY.ps1` | ⏳ |
+| 8.13 | `TESTE_FASE8_ALERTAS_READONLY.ps1` | ✅ repo |
 | 8.14 | `pre-push-check` verde + `guard.html.page-balance` | ⏳ |
 | 8.15 | PDF executivo — box “Pontos de atenção” (opcional nesta fase) | ⏳ |
 

@@ -797,6 +797,151 @@ function setDeltaEl_(id, delta, suffix) {
   el.className = 'mk-exec-kpi-delta' + (delta > 0 ? ' up' : delta < 0 ? ' down' : '');
 }
 
+function mkAlertPeriodKey_(d) {
+  return (d && d.mesAtual ? d.mesAtual : '') + '_' + (d && d.anoAtual ? d.anoAtual : '');
+}
+
+function mkAlertDismissKey_(codigo, d) {
+  return 'mk_alert_dismiss_' + codigo + '_' + mkAlertPeriodKey_(d);
+}
+
+function mkAlertDismiss_(codigo) {
+  if (!kpiData || !codigo) return;
+  try { sessionStorage.setItem(mkAlertDismissKey_(codigo, kpiData), '1'); } catch (e) {}
+  renderAlertStrip_(kpiData);
+}
+
+function mkAlertIcon_(nivel) {
+  if (nivel === 'vermelho') return '🔴';
+  if (nivel === 'amarelo') return '🟡';
+  return '🔵';
+}
+
+function mkAlertModalClose_() {
+  const m = document.getElementById('mk-alert-modal');
+  if (m) m.hidden = true;
+}
+
+function mkAlertModalOpen_() {
+  if (!kpiData || !kpiData.alertas) return;
+  const list = document.getElementById('mk-alert-modal-list');
+  const modal = document.getElementById('mk-alert-modal');
+  if (!list || !modal) return;
+  list.innerHTML = '';
+  kpiData.alertas.forEach(function(a) {
+    list.appendChild(mkAlertItemEl_(a, kpiData, true));
+  });
+  modal.hidden = false;
+}
+
+function mkAlertItemEl_(a, d, inModal) {
+  const row = document.createElement('div');
+  row.className = 'mk-alert-item ' + (a.nivel || 'info');
+  const dismissed = (function() {
+    try { return !!sessionStorage.getItem(mkAlertDismissKey_(a.codigo, d)); } catch (e) { return false; }
+  })();
+  if (dismissed && !inModal) return null;
+  row.innerHTML =
+    '<span class="mk-alert-item-icon">' + mkAlertIcon_(a.nivel) + '</span>' +
+    '<div class="mk-alert-item-body">' +
+      '<div class="mk-alert-item-title">' + (a.titulo || a.codigo || 'Alerta') + '</div>' +
+      '<div class="mk-alert-item-msg">' + (a.mensagem || '') + '</div>' +
+      (a.acionavel ? '<div class="mk-alert-item-act">' + a.acionavel + '</div>' : '') +
+    '</div>' +
+    (!inModal ? '<button type="button" class="mk-alert-item-dismiss" title="Dispensar nesta sessão">✕</button>' : '');
+  if (!inModal) {
+    const btn = row.querySelector('.mk-alert-item-dismiss');
+    if (btn) btn.addEventListener('click', function() { mkAlertDismiss_(a.codigo); });
+  }
+  return row;
+}
+
+function updateDashAlertBadge_(d) {
+  const badge = document.getElementById('sbn-dash-badge');
+  if (!badge) return;
+  const alertas = (d && d.alertas) || [];
+  const crit = alertas.filter(function(a) {
+    if (a.nivel !== 'vermelho') return false;
+    try { return !sessionStorage.getItem(mkAlertDismissKey_(a.codigo, d)); } catch (e) { return true; }
+  }).length;
+  if (crit > 0) {
+    badge.hidden = false;
+    badge.textContent = String(crit);
+    badge.setAttribute('aria-hidden', 'false');
+  } else {
+    badge.hidden = true;
+    badge.textContent = '';
+    badge.setAttribute('aria-hidden', 'true');
+  }
+}
+
+function renderAlertStrip_(d) {
+  const strip = document.getElementById('mk-alert-strip');
+  if (!strip) return;
+  const isAdm = (typeof mkAuthIsAdmin === 'function' && mkAuthIsAdmin()) || !!window.isAdmin;
+  if (!isAdm || !d || !d.ok || !d.alertas) {
+    strip.style.display = 'none';
+    updateDashAlertBadge_(null);
+    return;
+  }
+  strip.innerHTML = '';
+  const visible = [];
+  (d.alertas || []).forEach(function(a) {
+    const el = mkAlertItemEl_(a, d, false);
+    if (el) visible.push(el);
+  });
+  updateDashAlertBadge_(d);
+  if (!visible.length) {
+    strip.style.display = 'none';
+    return;
+  }
+  strip.style.display = '';
+  visible.slice(0, 3).forEach(function(el) { strip.appendChild(el); });
+  if (visible.length > 3 || (d.alertas && d.alertas.length > 3)) {
+    const foot = document.createElement('div');
+    foot.className = 'mk-alert-strip-foot';
+    const more = document.createElement('button');
+    more.type = 'button';
+    more.className = 'mk-alert-strip-more';
+    more.textContent = 'Ver todos (' + d.alertas.length + ')';
+    more.addEventListener('click', mkAlertModalOpen_);
+    foot.appendChild(more);
+    strip.appendChild(foot);
+  }
+}
+
+function applySinalEmpresa_(d) {
+  const box = document.getElementById('mk-exec-cockpit');
+  const s = d && d.sinalEmpresa;
+  if (box) {
+    box.classList.remove('mk-sinal-ok', 'mk-sinal-atencao', 'mk-sinal-perigo');
+    if (s && s.nivel) box.classList.add('mk-sinal-' + (s.nivel === 'ok' ? 'ok' : s.nivel === 'perigo' ? 'perigo' : 'atencao'));
+  }
+  const badge = document.getElementById('mk-exec-badge');
+  if (badge && s) {
+    badge.textContent = s.label || 'Gestão';
+    badge.title = s.motivo || '';
+    const colors = {
+      ok: { bg: 'rgba(46,125,50,.12)', fg: '#2E7D32' },
+      atencao: { bg: 'rgba(230,81,0,.12)', fg: '#E65100' },
+      perigo: { bg: 'rgba(198,40,40,.12)', fg: '#C62828' }
+    };
+    const c = colors[s.nivel] || colors.atencao;
+    badge.style.background = c.bg;
+    badge.style.color = c.fg;
+  }
+}
+
+function applyMargemSemaforo_(margem) {
+  const margEl = document.getElementById('mk-exec-margem');
+  const kpi = margEl ? margEl.closest('.mk-exec-kpi') : null;
+  if (!kpi) return;
+  kpi.classList.remove('mk-sem-verde', 'mk-sem-amarelo', 'mk-sem-vermelho');
+  if (margem >= 18) kpi.classList.add('mk-sem-verde');
+  else if (margem >= 10) kpi.classList.add('mk-sem-amarelo');
+  else if (margem > 0) kpi.classList.add('mk-sem-vermelho');
+}
+
 /** FASE 6 — faixa executiva (5 KPIs + narrativa GAS). */
 function renderExecCockpit_(d) {
   const box = document.getElementById('mk-exec-cockpit');
@@ -817,6 +962,7 @@ function renderExecCockpit_(d) {
     margEl.textContent = margem + '%';
     margEl.className = 'mk-exec-kpi-val ' + (margem >= 18 ? 'green' : margem >= 10 ? 'amber' : 'red');
   }
+  applyMargemSemaforo_(margem);
   const margD = document.getElementById('mk-exec-margem-d');
   if (margD) {
     if (margem >= 20) { margD.textContent = 'Margem saudável'; margD.className = 'mk-exec-kpi-delta up'; }
@@ -866,11 +1012,15 @@ function renderExecCockpit_(d) {
     nar.textContent = d.narrativaExecutiva || 'Leitura executiva indisponível — publique GAS v1.5.75+.';
   }
 
-  const badge = document.getElementById('mk-exec-badge');
-  if (badge) {
-    badge.textContent = resultado >= 0 && margem >= 10 ? 'Sustentável' : (resultado >= 0 ? 'Atenção' : 'Crítico');
-    badge.style.background = resultado >= 0 && margem >= 10 ? 'rgba(46,125,50,.12)' : (resultado >= 0 ? 'rgba(230,81,0,.12)' : 'rgba(198,40,40,.12)');
-    badge.style.color = resultado >= 0 && margem >= 10 ? '#2E7D32' : (resultado >= 0 ? '#E65100' : '#C62828');
+  if (d.sinalEmpresa) {
+    applySinalEmpresa_(d);
+  } else {
+    const badge = document.getElementById('mk-exec-badge');
+    if (badge) {
+      badge.textContent = resultado >= 0 && margem >= 10 ? 'Sustentável' : (resultado >= 0 ? 'Atenção' : 'Crítico');
+      badge.style.background = resultado >= 0 && margem >= 10 ? 'rgba(46,125,50,.12)' : (resultado >= 0 ? 'rgba(230,81,0,.12)' : 'rgba(198,40,40,.12)');
+      badge.style.color = resultado >= 0 && margem >= 10 ? '#2E7D32' : (resultado >= 0 ? '#E65100' : '#C62828');
+    }
   }
 }
 
@@ -909,6 +1059,7 @@ function renderLeadingFinanceiro_(d) {
 function renderDashboardCore_(d) {
   if (!d) return;
   renderExecCockpit_(d);
+  renderAlertStrip_(d);
   renderLeadingFinanceiro_(d);
 
   // título
@@ -967,6 +1118,7 @@ function renderDashboardCore_(d) {
   const pb = d.payback;
   if (pbStrip && pb && pb.ok && pb.investimentoTotal > 0) {
     pbStrip.style.display = '';
+    pbStrip.classList.toggle('mk-sem-atencao', !pb.paybackAtingido && pb.mesesRestantesEstimados != null && pb.mesesRestantesEstimados > 24);
     const pctPb = pb.pctRecuperado || 0;
     setText2('nk-pb-inv', R2(pb.investimentoTotal));
     setText2('nk-pb-acum', R2(pb.resultadoAcumulado));
@@ -1007,6 +1159,7 @@ function renderDashboardCore_(d) {
     }
   } else if (pbStrip) {
     pbStrip.style.display = 'none';
+    pbStrip.classList.remove('mk-sem-atencao');
   }
 }
 

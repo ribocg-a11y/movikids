@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.78
+// MOVI KIDS — Google Apps Script v1.5.79
+// v1.5.79: FASE 8 — kpiMes.alertas + sinalEmpresa (buildAlertasGestao_, movikidsSinalEmpresa_)
 // v1.5.78: kpiMes — leitura unica LOCAÇOES+CUSTOS (sem calcResumoDia/payback duplicados); lite=1 pula AUDITORIA
 // v1.5.77: FASE 7 perf — resumoDia.leadingDia via calcLeadingDiaPatch_ (sem buildKpiMesPayload_ duplicado)
 // v1.5.76: FASE 7 — leadingFinanceiro (ticket, R$/h, break-even, sensibilidade) + resumoDia.leadingDia
@@ -372,9 +373,9 @@ function ping_() {
   const agora = new Date();
   return resp_({
     status:  'online',
-    versao:  'v1.5.78',
+    versao:  'v1.5.79',
     timestamp: fmtData_(agora) + ' ' + fmtHoraLocal_(agora),
-    sistema: 'MOVI KIDS v1.5.78',
+    sistema: 'MOVI KIDS v1.5.79',
     postWriteActions: WRITE_ACTIONS_CRITICAS_
   });
 }
@@ -1735,6 +1736,135 @@ function buildLeadingFinanceiros_(ctx) {
   };
 }
 
+/** FASE 8 — últimos 3 meses (fat/cus/resultado) para semáforo empresa. */
+function buildMesesRecentesParaSinal_(mesAtual, anoAtual, fatByPayback, cusByPayback) {
+  const meses = [];
+  let m = parseInt(mesAtual, 10);
+  let y = parseInt(anoAtual, 10);
+  const ctoMinBase = ctoMinimo_(mesContrato_());
+  for (let i = 0; i < 3; i++) {
+    const key = String(m).padStart(2, '0') + '/' + y;
+    const fat = Math.round((fatByPayback[key] || 0) * 100) / 100;
+    const cus = Math.round((cusByPayback[key] || 0) * 100) / 100;
+    const cto = Math.max(ctoMinBase, fat * 0.10);
+    const resultado = Math.round((fat - cus - cto) * 100) / 100;
+    const margem = fat > 0 ? Math.round(resultado / fat * 1000) / 10 : 0;
+    meses.unshift({ fat: fat, custos: cus, resultado: resultado, margem: margem, mmyy: key });
+    m--;
+    if (m < 1) { m = 12; y--; }
+  }
+  return meses;
+}
+
+/** FASE 8 — semáforo ok/atencao/perigo (adaptado de finSinalEmpresa_). */
+function movikidsSinalEmpresa_(mesesRecentes, alertas) {
+  const recent = (mesesRecentes || []).filter(function(m) { return m && (m.fat > 0 || m.custos > 0); });
+  if (alertas && alertas.some(function(a) { return a.nivel === 'vermelho'; })) {
+    return { nivel: 'perigo', label: 'Crítico', motivo: 'Alertas vermelhos ativos no mês' };
+  }
+  if (recent.length < 2) {
+    return { nivel: 'atencao', label: 'Atenção', motivo: 'Poucos meses de histórico' };
+  }
+  const negativos = recent.filter(function(m) { return m.resultado < 0; }).length;
+  if (negativos >= 2) {
+    return { nivel: 'perigo', label: 'Repensar', motivo: '2+ meses com resultado negativo' };
+  }
+  const ult = recent[recent.length - 1];
+  if (ult.margem < 10 && ult.custos > 0) {
+    return { nivel: 'perigo', label: 'Repensar', motivo: 'Margem abaixo de 10%' };
+  }
+  if (alertas && alertas.some(function(a) { return a.nivel === 'amarelo'; })) {
+    const am = alertas.filter(function(a) { return a.nivel === 'amarelo'; })[0];
+    return { nivel: 'atencao', label: 'Atenção', motivo: (am && am.titulo) ? am.titulo : 'Monitorar indicadores' };
+  }
+  const positivos = recent.filter(function(m) { return m.resultado > 0; }).length;
+  if (positivos >= 2 && ult.margem >= 20) {
+    return { nivel: 'ok', label: 'Sustentável', motivo: 'Resultado positivo com margem saudável' };
+  }
+  return { nivel: 'atencao', label: 'Atenção', motivo: 'Monitorar custos e tendência' };
+}
+
+/** FASE 8 — alertas proativos de gestão (v1). */
+function buildAlertasGestao_(ctx) {
+  const alertas = [];
+  const margem = Number(ctx.margem) || 0;
+  const fat = Number(ctx.fatMes) || 0;
+  const occ = Number(ctx.ocupacaoMediaFrota) || 0;
+  const canc = ctx.cancelamentos || {};
+  const nMes = Number(ctx.nMes) || 0;
+  const taxaCanc = canc.taxaPct > 0 ? canc.taxaPct
+    : (nMes > 0 && canc.total ? Math.round(canc.total / nMes * 1000) / 10 : 0);
+  const pb = ctx.payback || {};
+  const diaMes = Number(ctx.diaCalendario) || 0;
+  const diasOp = Number(ctx.diasOperando) || 0;
+
+  if (fat > 0 && margem < 10) {
+    alertas.push({
+      nivel: 'vermelho', codigo: 'MARGEM_BAIXA',
+      titulo: 'Margem crítica',
+      mensagem: 'Margem operacional em ' + margem + '% — abaixo de 10%.',
+      acionavel: 'Sócio — revisar custos'
+    });
+  } else if (fat > 0 && margem < 18) {
+    alertas.push({
+      nivel: 'amarelo', codigo: 'MARGEM_ATENCAO',
+      titulo: 'Margem em atenção',
+      mensagem: 'Margem em ' + margem + '% — faixa 10–18%.',
+      acionavel: 'Sócio — monitorar'
+    });
+  }
+
+  if (occ > 0 && occ < 25) {
+    alertas.push({
+      nivel: 'amarelo', codigo: 'OCUPACAO_BAIXA',
+      titulo: 'Ocupação baixa',
+      mensagem: 'Ocupação média da frota em ' + occ + '% — abaixo de 25%.',
+      acionavel: 'Ops — horário e preço'
+    });
+  }
+
+  if (taxaCanc > 8) {
+    alertas.push({
+      nivel: 'amarelo', codigo: 'CANCEL_ALTO',
+      titulo: 'Cancelamentos altos',
+      mensagem: 'Taxa de cancelamento em ' + taxaCanc + '% — acima de 8%.',
+      acionavel: 'Ops — treino balcão'
+    });
+  }
+
+  if (pb.ok && pb.mesesRestantesEstimados != null && pb.mesesRestantesEstimados > 24) {
+    alertas.push({
+      nivel: 'amarelo', codigo: 'PAYBACK_ATRASO',
+      titulo: 'Payback estendido',
+      mensagem: 'Projeção de payback em ~' + pb.mesesRestantesEstimados + ' meses (>24).',
+      acionavel: 'Sócio — revisar ritmo'
+    });
+  }
+
+  if (fat > 0 && ctx.ctoMinimo != null && ctx.ctoPagar != null
+      && Math.abs(Number(ctx.ctoPagar) - Number(ctx.ctoMinimo)) < 0.02) {
+    alertas.push({
+      nivel: 'info', codigo: 'CTO_MINIMO',
+      titulo: 'CTO no mínimo',
+      mensagem: 'CTO limitado pelo mínimo contratual — volume ainda não dilui o percentual.',
+      acionavel: 'Sócio — volume'
+    });
+  }
+
+  if (diaMes > 10 && diasOp < 3) {
+    alertas.push({
+      nivel: 'vermelho', codigo: 'SEM_MOVIMENTO',
+      titulo: 'Pouco movimento',
+      mensagem: 'Apenas ' + diasOp + ' dias com locação após o dia ' + diaMes + ' do mês.',
+      acionavel: 'Ops — ação comercial'
+    });
+  }
+
+  const ord = { vermelho: 0, amarelo: 1, info: 2 };
+  alertas.sort(function(a, b) { return (ord[a.nivel] || 9) - (ord[b.nivel] || 9); });
+  return alertas;
+}
+
 /** FASE 7 lite — leading do dia sem payback/narrativa (evita buildKpiMesPayload_ em resumoDia). */
 function calcLeadingDiaPatch_(mes, ano) {
   const mesAtual = parseInt(mes, 10);
@@ -2016,8 +2146,23 @@ function buildKpiMesPayload_(p) {
     payback: payback,
     diasOperando: diasOperando,
     diasMes: diasMes,
-    ctoMinimo: ctoMin
+    ctoMinimo: ctoMin,
+    cusMes: Math.round(cusMes * 100) / 100,
+    ctoPagar: Math.round(ctoPagar * 100) / 100,
+    resultado: Math.round(resultado * 100) / 100
   }));
+
+  const mesesRecentes = buildMesesRecentesParaSinal_(mesAtual, anoAtual, fatByPayback, cusByPayback);
+  const alertaCtx = Object.assign({}, narrativaCtx, {
+    cusMes: Math.round(cusMes * 100) / 100,
+    ctoPagar: Math.round(ctoPagar * 100) / 100,
+    resultado: Math.round(resultado * 100) / 100,
+    diasOperando: diasOperando,
+    diaCalendario: hoje.getDate(),
+    nMes: nMes
+  });
+  const alertas = buildAlertasGestao_(alertaCtx);
+  const sinalEmpresa = movikidsSinalEmpresa_(mesesRecentes, alertas);
 
   return {
     // v1.5.4: comparativo + projeção
@@ -2075,6 +2220,8 @@ function buildKpiMesPayload_(p) {
     narrativaExecutiva: narrativaExecutiva,
     cockpit: cockpit,
     leadingFinanceiro: leadingFinanceiro,
+    alertas: alertas,
+    sinalEmpresa: sinalEmpresa,
     lite: skipAdvanced || false
   };
 }
@@ -2085,7 +2232,7 @@ function kpiMes_(p) {
   const mes = p && p.mes ? parseInt(p.mes) : hoje.getMonth() + 1;
   const ano = p && p.ano ? parseInt(p.ano) : hoje.getFullYear();
   const lite = (p && (String(p.lite || '') === '1' || String(p.lite || '').toLowerCase() === 'true')) ? '1' : '0';
-  const cacheKey = 'kpiMes78_' + mes + '_' + ano + '_L' + lite;
+  const cacheKey = 'kpiMes79_' + mes + '_' + ano + '_L' + lite;
   try {
     const cache = CacheService.getScriptCache();
     const hit = cache.get(cacheKey);
