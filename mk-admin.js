@@ -1049,12 +1049,14 @@ function renderDecisaoPanel_(d) {
 
   const be = lf && lf.breakEvenLocacoesDia;
   setText2('mk-dec-be-sem', be != null ? (be + ' loc/dia') : '—');
-  const mediaDia = Number(d.mediaDiaria) || (d.diasOperando > 0 ? Math.round(d.nMes / d.diasOperando * 10) / 10 : 0);
+  const mediaLocDia = (d.diasOperando > 0 && d.nMes > 0)
+    ? Math.round(d.nMes / d.diasOperando * 10) / 10
+    : 0;
   const beSemSub = document.getElementById('mk-dec-be-sem-sub');
   if (beSemSub) {
-    if (be != null && mediaDia > 0) {
-      const ok = mediaDia >= be;
-      beSemSub.textContent = 'Média atual: ' + mediaDia + ' loc/dia (' + (d.diasOperando || 0) + ' dias) · ' + (ok ? 'acima da meta ✓' : 'abaixo da meta');
+    if (be != null && mediaLocDia > 0) {
+      const ok = mediaLocDia >= be;
+      beSemSub.textContent = 'Média atual: ' + mediaLocDia + ' loc/dia (' + (d.diasOperando || 0) + ' dias) · ' + (ok ? 'acima da meta ✓' : 'abaixo da meta');
       beSemSub.style.color = ok ? '#2E7D32' : '#C62828';
     } else {
       beSemSub.textContent = (d.diasOperando || 0) + ' dias com movimento';
@@ -1084,9 +1086,9 @@ function renderDecisaoPanel_(d) {
   const beFolhaSub = document.getElementById('mk-dec-be-folha-sub');
   const folhaMes = (v && v.folhaMensal) || (lf && lf.folhaMensalSimulada) || 0;
   if (beFolhaSub) {
-    if (beFolha != null && mediaDia > 0) {
-      const ok = mediaDia >= beFolha;
-      beFolhaSub.textContent = 'Folha ' + R2(folhaMes) + '/mês · ' + (ok ? 'média atinge meta ✓' : 'faltam ~' + Math.max(0, Math.ceil(beFolha - mediaDia)) + ' loc/dia');
+    if (beFolha != null && mediaLocDia > 0) {
+      const ok = mediaLocDia >= beFolha;
+      beFolhaSub.textContent = 'Folha ' + R2(folhaMes) + '/mês · ' + (ok ? 'média atinge meta ✓' : 'faltam ~' + Math.max(0, Math.ceil(beFolha - mediaLocDia)) + ' loc/dia');
       beFolhaSub.style.color = ok ? '#2E7D32' : '#C62828';
     } else if (folhaMes > 0) {
       beFolhaSub.textContent = 'Folha simulada ' + R2(folhaMes) + '/mês (2 atendentes)';
