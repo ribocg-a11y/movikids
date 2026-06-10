@@ -1026,7 +1026,33 @@ function renderExecCockpit_(d) {
   }
 }
 
-/** Seção 2 — comparativo lucro e meta loc/dia (sem vs com folha). */
+/** Seção 2 — comparativo lucro e meta loc/dia (sem vs com folha, mesma base). */
+function setDecisaoCell_(id, val, margem, sub, forceColor) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const n = Number(val) || 0;
+  const color = forceColor || (n >= 0 ? '#2E7D32' : '#C62828');
+  var html = '<div class="mk-dec-val" style="color:' + color + '">' + R2(n) + '</div>';
+  if (margem != null && margem !== '') {
+    html += '<div class="mk-dec-marg">' + margem + '% margem</div>';
+  }
+  if (sub) html += '<div class="mk-dec-sub">' + sub + '</div>';
+  el.innerHTML = html;
+}
+
+function setDecisaoBeCell_(id, be, mediaLocDia, diasOp, projOk) {
+  const el = document.getElementById(id);
+  if (!el || be == null) return;
+  var sub = 'Ritmo: ' + mediaLocDia + ' loc/dia (' + diasOp + ' dias)';
+  if (mediaLocDia > 0) {
+    sub += ' · ' + (mediaLocDia >= be ? 'volume acima da meta ✓' : 'faltam ~' + Math.max(0, Math.ceil(be - mediaLocDia)) + ' loc/dia');
+  }
+  if (projOk != null) {
+    sub += ' · projeção mês ' + (projOk ? 'positiva ✓' : 'negativa');
+  }
+  el.innerHTML = '<div class="mk-dec-val blue">' + be + ' loc/dia</div><div class="mk-dec-sub">' + sub + '</div>';
+}
+
 function renderDecisaoPanel_(d) {
   const panel = document.getElementById('mk-dash-decisao');
   if (!panel || !d) return;
@@ -1038,62 +1064,56 @@ function renderDecisaoPanel_(d) {
   }
   panel.style.display = '';
 
-  const resultado = Number(d.resultado) || 0;
-  const resSem = document.getElementById('mk-dec-res-sem');
-  if (resSem) {
-    resSem.textContent = R2(resultado);
-    resSem.style.color = resultado >= 0 ? '#2E7D32' : '#C62828';
-  }
-  const margem = Number(d.margem) || 0;
-  setText2('mk-dec-res-sem-sub', margem + '% margem · ' + (d.nMes || 0) + ' locações no mês');
+  const diasOp = Number(d.diasOperando) || 0;
+  const diasMes = Number(d.diasMes) || 30;
+  setText2('mk-dec-dias-label', '(' + diasOp + ' de ' + diasMes + ' dias)');
 
-  const be = lf && lf.breakEvenLocacoesDia;
-  setText2('mk-dec-be-sem', be != null ? (be + ' loc/dia') : '—');
-  const mediaLocDia = (d.diasOperando > 0 && d.nMes > 0)
-    ? Math.round(d.nMes / d.diasOperando * 10) / 10
-    : 0;
-  const beSemSub = document.getElementById('mk-dec-be-sem-sub');
-  if (beSemSub) {
-    if (be != null && mediaLocDia > 0) {
-      const ok = mediaLocDia >= be;
-      beSemSub.textContent = 'Média atual: ' + mediaLocDia + ' loc/dia (' + (d.diasOperando || 0) + ' dias) · ' + (ok ? 'acima da meta ✓' : 'abaixo da meta');
-      beSemSub.style.color = ok ? '#2E7D32' : '#C62828';
-    } else {
-      beSemSub.textContent = (d.diasOperando || 0) + ' dias com movimento';
-      beSemSub.style.color = '';
-    }
-  }
+  const resultado = Number(d.resultado) || 0;
+  const margem = Number(d.margem) || 0;
+  const projRes = Number(d.projecaoRes) || 0;
+  const projFat = Number(d.projecaoFat) || 0;
+  const margemProjSem = projFat > 0 ? Math.round(projRes / projFat * 1000) / 10 : 0;
+
+  setDecisaoCell_('mk-dec-par-sem', resultado, margem, (d.nMes || 0) + ' locações no período');
 
   const folhaOk = v && v.ok;
-  const resFolhaVal = folhaOk ? (Number(v.resultadoComFolha) || 0) : null;
-  const resFolha = document.getElementById('mk-dec-res-folha');
-  if (resFolha) {
-    if (folhaOk) {
-      resFolha.textContent = R2(resFolhaVal) + ' (até hoje)';
-      resFolha.style.color = resFolhaVal >= 0 ? '#2E7D32' : '#C62828';
-    } else resFolha.textContent = '—';
-  }
-  const resFolhaSub = document.getElementById('mk-dec-res-folha-sub');
-  if (resFolhaSub) {
-    if (folhaOk && v.projecaoResComFolha != null) {
-      resFolhaSub.textContent = 'Projeção mês cheio: ' + R2(v.projecaoResComFolha) + ' (' + (v.margemProjComFolha || 0) + '% margem)';
-      resFolhaSub.style.color = v.projecaoResComFolha >= 0 ? '#2E7D32' : '#C62828';
-    } else resFolhaSub.textContent = 'Configure aba FOLHA + GAS v1.5.80';
+  if (folhaOk) {
+    const folhaPr = Number(v.folhaProRata) || 0;
+    setDecisaoCell_('mk-dec-par-folha', v.resultadoComFolha, v.margemComFolha,
+      'Folha proporcional ' + R2(folhaPr) + ' (de ' + R2(v.folhaMensal) + '/mês)');
+
+    const projSem = v.projecaoResSemFolha != null ? v.projecaoResSemFolha : projRes;
+    const margProjSem = v.margemProjSemFolha != null ? v.margemProjSemFolha : margemProjSem;
+    setDecisaoCell_('mk-dec-proj-sem', projSem, margProjSem,
+      'Fat. projetado ' + R2(v.projecaoFat || projFat));
+
+    setDecisaoCell_('mk-dec-proj-folha', v.projecaoResComFolha, v.margemProjComFolha,
+      'Folha integral ' + R2(v.folhaMensal) + '/mês');
+  } else {
+    ['mk-dec-par-folha', 'mk-dec-proj-folha'].forEach(function(id) {
+      const el = document.getElementById(id);
+      if (el) el.textContent = 'Configure aba FOLHA + GAS v1.5.81';
+    });
+    setDecisaoCell_('mk-dec-proj-sem', projRes, margemProjSem,
+      'Fat. projetado ' + R2(projFat));
   }
 
+  const mediaLocDia = (diasOp > 0 && d.nMes > 0)
+    ? Math.round(d.nMes / diasOp * 10) / 10
+    : 0;
+  const be = lf && lf.breakEvenLocacoesDia;
   const beFolha = lf && lf.breakEvenComFolha;
-  setText2('mk-dec-be-folha', beFolha != null ? (beFolha + ' loc/dia') : '—');
-  const beFolhaSub = document.getElementById('mk-dec-be-folha-sub');
-  const folhaMes = (v && v.folhaMensal) || (lf && lf.folhaMensalSimulada) || 0;
-  if (beFolhaSub) {
-    if (beFolha != null && mediaLocDia > 0) {
-      const ok = mediaLocDia >= beFolha;
-      beFolhaSub.textContent = 'Folha ' + R2(folhaMes) + '/mês · ' + (ok ? 'média atinge meta ✓' : 'faltam ~' + Math.max(0, Math.ceil(beFolha - mediaLocDia)) + ' loc/dia');
-      beFolhaSub.style.color = ok ? '#2E7D32' : '#C62828';
-    } else if (folhaMes > 0) {
-      beFolhaSub.textContent = 'Folha simulada ' + R2(folhaMes) + '/mês (2 atendentes)';
-      beFolhaSub.style.color = '';
-    } else beFolhaSub.textContent = 'Simulação 2 atendentes (aba FOLHA)';
+  const projOkSem = projRes >= 0;
+  const projOkFolha = folhaOk ? (Number(v.projecaoResComFolha) || 0) >= 0 : null;
+  setDecisaoBeCell_('mk-dec-be-sem', be, mediaLocDia, diasOp, projOkSem);
+  setDecisaoBeCell_('mk-dec-be-folha', beFolha, mediaLocDia, diasOp, projOkFolha);
+
+  const base = document.getElementById('mk-decisao-base');
+  if (base) {
+    base.textContent = 'Mesma base por linha: até hoje usa fat/custos/CTO reais'
+      + (folhaOk ? ' e folha proporcional (' + diasOp + '/' + diasMes + ' dias)' : '')
+      + '; projeção extrapola o ritmo dos dias com movimento'
+      + (folhaOk ? ' e desconta a folha mensal integral.' : '.');
   }
 
   const foot = document.getElementById('mk-decisao-foot');
@@ -1101,7 +1121,7 @@ function renderDecisaoPanel_(d) {
     if (folhaOk && v.label) {
       foot.textContent = 'Semáforo contratação: ' + v.label + ' — ' + (v.recomendacao || v.motivo || '');
     } else if (be != null && beFolha != null) {
-      foot.textContent = 'Para manter o negócio rentável: meta sem folha ' + be + ' loc/dia · com folha ' + beFolha + ' loc/dia.';
+      foot.textContent = 'Meta loc/dia referencia custos do mês inteiro. Com folha: ' + beFolha + ' loc/dia vs sem folha: ' + be + ' loc/dia.';
     } else foot.textContent = '';
   }
 }

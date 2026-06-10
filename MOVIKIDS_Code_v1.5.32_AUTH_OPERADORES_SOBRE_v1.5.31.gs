@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.80
+// MOVI KIDS — Google Apps Script v1.5.81
+// v1.5.81: viabilidadeContratacao — folha proporcional no parcial (mesma base sem vs com folha)
 // v1.5.80: FASE 9 — folha FOLHA B68 + viabilidadeContratacao + alertas CONTRATACAO_* em kpiMes
 // v1.5.79: FASE 8 — kpiMes.alertas + sinalEmpresa (buildAlertasGestao_, movikidsSinalEmpresa_)
 // v1.5.78: kpiMes — leitura unica LOCAÇOES+CUSTOS (sem calcResumoDia/payback duplicados); lite=1 pula AUDITORIA
@@ -1981,11 +1982,12 @@ function buildEstudoSustentabilidade_(ctx, folha, calc) {
     + ' · CTO: R$ ' + fmtMoedaBr_(cto) + ' · Resultado sem folha: R$ ' + fmtMoedaBr_(resultado)
     + ' (' + margem + '%).');
   linhas.push('Folha planejada (' + folha.nFuncionarios + ' func., aba FOLHA): R$ ' + fmtMoedaBr_(folhaVal)
-    + '/mês → resultado com folha (mês parcial): R$ ' + fmtMoedaBr_(calc.resultadoComFolha)
+    + '/mês (proporcional até hoje: R$ ' + fmtMoedaBr_(calc.folhaProRata) + ')'
+    + ' → resultado com folha (até hoje): R$ ' + fmtMoedaBr_(calc.resultadoComFolha)
     + ' (' + calc.margemComFolha + '%).');
-  linhas.push('Projeção mês cheio: fat. R$ ' + fmtMoedaBr_(projFat)
-    + ' → resultado com folha ~R$ ' + fmtMoedaBr_(calc.projecaoResComFolha)
-    + ' (margem ' + calc.margemProjComFolha + '%).');
+  linhas.push('Projeção mês cheio: sem folha R$ ' + fmtMoedaBr_(calc.projecaoResSemFolha)
+    + ' (' + calc.margemProjSemFolha + '%) · com folha R$ ' + fmtMoedaBr_(calc.projecaoResComFolha)
+    + ' (' + calc.margemProjComFolha + '%).');
   linhas.push('Faturamento mínimo sugerido (margem ' + CONTRAT_MARGEM_MIN_ + '% após folha+CTO): R$ '
     + fmtMoedaBr_(calc.fatMinMargem) + '.');
   if (calc.projecaoResComFolha >= CONTRAT_RESERVA_MIN_ && calc.margemProjComFolha >= CONTRAT_MARGEM_MIN_) {
@@ -2012,10 +2014,16 @@ function buildViabilidadeContratacao_(ctx, folha) {
   const projFat = Number(ctx.projecaoFat) || 0;
   const projRes = Number(ctx.projecaoRes) || 0;
   const diasOp = Number(ctx.diasOperando) || 0;
+  const diasMes = Number(ctx.diasMes) || 30;
   const ctoMin = Number(ctx.ctoMinimo) || 1000;
 
-  const resultadoComFolha = Math.round((resultado - folhaVal) * 100) / 100;
+  const folhaProRata = diasMes > 0 && diasOp > 0
+    ? Math.round(folhaVal * diasOp / diasMes * 100) / 100
+    : 0;
+  const resultadoComFolha = Math.round((resultado - folhaProRata) * 100) / 100;
   const margemComFolha = fat > 0 ? Math.round(resultadoComFolha / fat * 1000) / 10 : 0;
+  const projecaoResSemFolha = Math.round(projRes * 100) / 100;
+  const margemProjSemFolha = projFat > 0 ? Math.round(projRes / projFat * 1000) / 10 : 0;
   const projecaoResComFolha = Math.round((projRes - folhaVal) * 100) / 100;
   const margemProjComFolha = projFat > 0 ? Math.round(projecaoResComFolha / projFat * 1000) / 10 : 0;
   const fatMinMargem = Math.round((folhaVal + cus + ctoMin) / (0.9 - CONTRAT_MARGEM_MIN_ / 100) * 100) / 100;
@@ -2031,8 +2039,11 @@ function buildViabilidadeContratacao_(ctx, folha) {
   };
 
   const calcPack = {
+    folhaProRata: folhaProRata,
     resultadoComFolha: resultadoComFolha,
     margemComFolha: margemComFolha,
+    projecaoResSemFolha: projecaoResSemFolha,
+    margemProjSemFolha: margemProjSemFolha,
     projecaoResComFolha: projecaoResComFolha,
     margemProjComFolha: margemProjComFolha,
     fatMinMargem: fatMinMargem
@@ -2083,10 +2094,13 @@ function buildViabilidadeContratacao_(ctx, folha) {
     gatesOk: gatesOk,
     gatesTotal: Object.keys(gates).length,
     folhaMensal: folhaVal,
+    folhaProRata: folhaProRata,
     nFuncionarios: folha.nFuncionarios,
     resultadoComFolha: resultadoComFolha,
     margemComFolha: margemComFolha,
     projecaoFat: Math.round(projFat * 100) / 100,
+    projecaoResSemFolha: projecaoResSemFolha,
+    margemProjSemFolha: margemProjSemFolha,
     projecaoResComFolha: projecaoResComFolha,
     margemProjComFolha: margemProjComFolha,
     fatMinimoSugerido: fatMinMargem,
@@ -2491,7 +2505,7 @@ function kpiMes_(p) {
   const mes = p && p.mes ? parseInt(p.mes) : hoje.getMonth() + 1;
   const ano = p && p.ano ? parseInt(p.ano) : hoje.getFullYear();
   const lite = (p && (String(p.lite || '') === '1' || String(p.lite || '').toLowerCase() === 'true')) ? '1' : '0';
-  const cacheKey = 'kpiMes80_' + mes + '_' + ano + '_L' + lite;
+  const cacheKey = 'kpiMes81_' + mes + '_' + ano + '_L' + lite;
   try {
     const cache = CacheService.getScriptCache();
     const hit = cache.get(cacheKey);

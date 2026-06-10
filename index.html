@@ -16,16 +16,16 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<script src="mk-stale-sync.js?v=1.8.13"></script>
-<script src="mk-version.js?v=1.8.13"></script>
-<script src="mk-api.js?v=1.8.13"></script>
-<link rel="stylesheet" href="mk-design.css?v=1.8.13">
+<script src="mk-stale-sync.js?v=1.8.14"></script>
+<script src="mk-version.js?v=1.8.14"></script>
+<script src="mk-api.js?v=1.8.14"></script>
+<link rel="stylesheet" href="mk-design.css?v=1.8.14">
 
-<script src="mk-cache-bust.js?v=1.8.13"></script>
+<script src="mk-cache-bust.js?v=1.8.14"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<link rel="stylesheet" href="mk-app.css?v=1.8.13">
+<link rel="stylesheet" href="mk-app.css?v=1.8.14">
 <!-- Firebase SDK — Realtime sync canonico para todos os dispositivos -->
-<script type="module" src="mk-firebase.js?v=1.8.13"></script>
+<script type="module" src="mk-firebase.js?v=1.8.14"></script>
 </head>
 
 <body>
@@ -898,39 +898,32 @@
         <span class="mk-dash-step" aria-hidden="true">2</span>
         <div>
           <h2 class="mk-dash-chapter-title" id="mk-chapter-lucro-h">Lucro e meta de locações por dia</h2>
-          <p class="mk-dash-chapter-lead">Compare <strong>sem folha</strong> (situação atual) vs <strong>com folha simulada</strong> (2 atendentes · aba FOLHA). A meta é o break-even: locações/dia mínimas para cobrir custos.</p>
+          <p class="mk-dash-chapter-lead">Mesma base em cada linha: <strong>até hoje</strong> (fat/custos reais + folha proporcional) vs <strong>projeção mês cheio</strong> (ritmo atual + folha integral).</p>
         </div>
       </header>
 
       <div id="mk-dash-decisao" class="mk-decisao-panel" style="display:none">
-        <div class="mk-decisao-col">
-          <div class="mk-decisao-tag">Sem folha CLT</div>
-          <div class="mk-decisao-row">
-            <div class="mk-decisao-metric">
-              <div class="mk-decisao-metric-lbl">Lucro líquido (mês até hoje)</div>
-              <div class="mk-decisao-metric-val" id="mk-dec-res-sem">—</div>
-              <div class="mk-decisao-metric-sub" id="mk-dec-res-sem-sub">—</div>
-            </div>
-            <div class="mk-decisao-metric">
-              <div class="mk-decisao-metric-lbl">Meta locações/dia (break-even)</div>
-              <div class="mk-decisao-metric-val blue" id="mk-dec-be-sem">—</div>
-              <div class="mk-decisao-metric-sub" id="mk-dec-be-sem-sub">—</div>
-            </div>
+        <p class="mk-decisao-base" id="mk-decisao-base"></p>
+        <div class="mk-decisao-table" role="table" aria-label="Comparativo sem e com folha CLT">
+          <div class="mk-decisao-tr mk-decisao-tr-head" role="row">
+            <div class="mk-decisao-th mk-decisao-th-label" role="columnheader"></div>
+            <div class="mk-decisao-th" role="columnheader">Sem folha CLT</div>
+            <div class="mk-decisao-th mk-decisao-th-folha" role="columnheader">Com folha simulada</div>
           </div>
-        </div>
-        <div class="mk-decisao-col mk-decisao-col-folha">
-          <div class="mk-decisao-tag">Com folha simulada</div>
-          <div class="mk-decisao-row">
-            <div class="mk-decisao-metric">
-              <div class="mk-decisao-metric-lbl">Lucro líquido c/ folha</div>
-              <div class="mk-decisao-metric-val" id="mk-dec-res-folha">—</div>
-              <div class="mk-decisao-metric-sub" id="mk-dec-res-folha-sub">—</div>
-            </div>
-            <div class="mk-decisao-metric">
-              <div class="mk-decisao-metric-lbl">Meta locações/dia c/ folha</div>
-              <div class="mk-decisao-metric-val blue" id="mk-dec-be-folha">—</div>
-              <div class="mk-decisao-metric-sub" id="mk-dec-be-folha-sub">—</div>
-            </div>
+          <div class="mk-decisao-tr" role="row">
+            <div class="mk-decisao-row-lbl" role="rowheader">Até hoje <span id="mk-dec-dias-label" class="mk-decisao-dias">—</span></div>
+            <div class="mk-decisao-cell" id="mk-dec-par-sem" role="cell">—</div>
+            <div class="mk-decisao-cell mk-decisao-cell-folha" id="mk-dec-par-folha" role="cell">—</div>
+          </div>
+          <div class="mk-decisao-tr" role="row">
+            <div class="mk-decisao-row-lbl" role="rowheader">Projeção mês cheio</div>
+            <div class="mk-decisao-cell" id="mk-dec-proj-sem" role="cell">—</div>
+            <div class="mk-decisao-cell mk-decisao-cell-folha" id="mk-dec-proj-folha" role="cell">—</div>
+          </div>
+          <div class="mk-decisao-tr" role="row">
+            <div class="mk-decisao-row-lbl" role="rowheader">Meta loc/dia <span class="mk-decisao-hint">(break-even mês)</span></div>
+            <div class="mk-decisao-cell" id="mk-dec-be-sem" role="cell">—</div>
+            <div class="mk-decisao-cell mk-decisao-cell-folha" id="mk-dec-be-folha" role="cell">—</div>
           </div>
         </div>
         <p class="mk-decisao-foot" id="mk-decisao-foot"></p>
@@ -947,7 +940,7 @@
       </div>
       <div class="mk-contrat-nums">
         <div class="mk-contrat-n"><div class="mk-contrat-n-val" style="color:#5E35B1" id="mk-contrat-folha">—</div><div class="mk-contrat-n-lbl">Folha/mês (FOLHA B68)</div></div>
-        <div class="mk-contrat-n"><div class="mk-contrat-n-val" id="mk-contrat-res-atual">—</div><div class="mk-contrat-n-lbl">Resultado c/ folha (mês)</div></div>
+        <div class="mk-contrat-n"><div class="mk-contrat-n-val" id="mk-contrat-res-atual">—</div><div class="mk-contrat-n-lbl">Até hoje c/ folha (prop.)</div></div>
         <div class="mk-contrat-n"><div class="mk-contrat-n-val" id="mk-contrat-res-proj">—</div><div class="mk-contrat-n-lbl">Projeção c/ folha</div></div>
         <div class="mk-contrat-n"><div class="mk-contrat-n-val blue" id="mk-contrat-fat-min">—</div><div class="mk-contrat-n-lbl">Fat. mín. sugerido</div></div>
       </div>
@@ -1593,22 +1586,22 @@
   </div>
 </div>
 
-<script src="mk-globals.js?v=1.8.13"></script>
-<script src="mk-core.js?v=1.8.13"></script>
-<script src="mk-nav.js?v=1.8.13"></script>
-<script src="mk-admin.js?v=1.8.13"></script>
-<script src="mk-historico.js?v=1.8.13"></script>
-<script src="mk-sessao.js?v=1.8.13"></script>
-<script src="mk-home.js?v=1.8.13"></script>
-<script src="mk-custos.js?v=1.8.13"></script>
-<script src="mk-avulso.js?v=1.8.13"></script>
-<script src="mk-sync.js?v=1.8.13"></script>
-<script src="mk-nova.js?v=1.8.13"></script>
-<script src="mk-relacionamento.js?v=1.8.13"></script>
-<script src="mk-operacao.js?v=1.8.13"></script>
-<script src="mk-drawer.js?v=1.8.13"></script>
-<script src="mk-update.js?v=1.8.13"></script>
-<script src="mk-auth.js?v=1.8.13"></script>
-<script src="mk-boot.js?v=1.8.13"></script>
+<script src="mk-globals.js?v=1.8.14"></script>
+<script src="mk-core.js?v=1.8.14"></script>
+<script src="mk-nav.js?v=1.8.14"></script>
+<script src="mk-admin.js?v=1.8.14"></script>
+<script src="mk-historico.js?v=1.8.14"></script>
+<script src="mk-sessao.js?v=1.8.14"></script>
+<script src="mk-home.js?v=1.8.14"></script>
+<script src="mk-custos.js?v=1.8.14"></script>
+<script src="mk-avulso.js?v=1.8.14"></script>
+<script src="mk-sync.js?v=1.8.14"></script>
+<script src="mk-nova.js?v=1.8.14"></script>
+<script src="mk-relacionamento.js?v=1.8.14"></script>
+<script src="mk-operacao.js?v=1.8.14"></script>
+<script src="mk-drawer.js?v=1.8.14"></script>
+<script src="mk-update.js?v=1.8.14"></script>
+<script src="mk-auth.js?v=1.8.14"></script>
+<script src="mk-boot.js?v=1.8.14"></script>
 </body>
 </html>
