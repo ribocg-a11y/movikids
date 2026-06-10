@@ -1,7 +1,7 @@
 # MOVI KIDS — Mapa de erros, falhas e bugs
 
-**Atualizado:** 09/06/2026 — **I22 fechado** (hotfix FE v1.8.2) — ver `../arquivo/incidentes/INCIDENTE_I22_HOME_FORA_DO_AR_FASE6_HTML_2026-06-09.md`  
-**Uso anterior:** 09/06/2026 — **I21 fechado** (B8 v1.7.94/v1.5.72 + splash v1.7.96)  
+**Atualizado:** 09/06/2026 — **I23 fechado** (FE v1.8.4 + GAS v1.5.77) — ver `../arquivo/incidentes/INCIDENTE_I23_DASHBOARD_LENTO_TRAVADO_2026-06-09.md`  
+**Uso anterior:** 09/06/2026 — **I22 fechado** (hotfix FE v1.8.2)  
 **Uso:** consultar **antes de publicar** e **ao montar checklist de teste**. Cada linha tem trava e script de verificação quando existir.
 
 **Protocolo de teste (obrigatório quando usuário pedir “rodar teste”):** `PROTOCOLO_DIAGNOSTICO_E_TESTES.md` → `scripts/testes/TESTE_PROTOCOLO_DIAGNOSTICO.ps1`
@@ -54,6 +54,7 @@
 | **I19** | **PWA sessão fantasma + turno invisível** | Operador “dentro” do app; servidor sem turno; Home sem nome; AUD sem logout idle | v1.7.48 `mkAuthReconcileSessaoFantasma_` + chip `#hd-turno-chip` | pre-push `guard.auth.fantasma`; PWA `mk-update` | tablet ícone: chip Turno + liberar ADM |
 | **I21** | **Idle 1h — sessão dual + splash boot** | Milena 14h+ logada; mock idle travava splash | **B8** v1.7.94/96 + v1.5.72: wall clock, release GAS, `hideSplash_` boot | `guard.idle.wallclock`, `guard.idle.gas.release` | **`TESTE_SESSAO_IDLE_READONLY`** + tablet mock ✅ |
 | **I22** | **`</div>` extra em `#page-dashboard` (FASE 6)** | **Home/balcão fora do ar** com locações ativas | FE **v1.8.2** — remover `</div>`; Regra 14 janela operacional | `guard.html.page-balance`, `guard.operacao.livre`, `check-operacao-livre.ps1` | **tablet F0 Home** após mudança em `index.html` |
+| **I23** | **Mutex `_kpiInFlight` + `resumoDia` pesado (FASE 7)** | Dashboard KPIs `"Calculando..."` eterno; app pesado | FE **v1.8.4** locks hub/dash; GAS **v1.5.77** `calcLeadingDiaPatch_` | separar `_kpiHubInFlight` / `_kpiDashInFlight`; não `kpiMes`+`resumoDia` paralelo no Dash | **PC admin** Dashboard + `TESTE_KPI_MES_READONLY` |
 | T1 | Em-dash `—` em string `.ps1` perto de `-f` | ParserError em `TESTE_RELACIONAMENTO`, `TESTE_I20` | Hífen ASCII `-` em mensagens | `scripts/testes/README.md` | `TESTE_RELACIONAMENTO_*`, `TESTE_I20_COMPLETO_PROD.ps1` |
 
 ---
@@ -70,6 +71,7 @@
 | `../arquivo/incidentes/INCIDENTE_AUTH_SESSAO_FANTASMA_PWA_2026-06-06.md` | **I19** (Milena 06/06, login OK 13:05) |
 | `../arquivo/incidentes/INCIDENTE_I21_SESSAO_IDLE_DUAL_2026-06-09.md` | **I21** — idle dual, B8 v1.7.94/v1.5.72 |
 | `../arquivo/incidentes/INCIDENTE_I22_HOME_FORA_DO_AR_FASE6_HTML_2026-06-09.md` | **I22** — `</div>` extra FASE 6; Home P0 |
+| `../arquivo/incidentes/INCIDENTE_I23_DASHBOARD_LENTO_TRAVADO_2026-06-09.md` | **I23** — Dashboard lento; mutex KPI + GAS perf |
 | `EMERGENCIA_SMS_404.md` | URL morta |
 | `TROCA_SMS_GATEWAY_DJVJRL_2026-06-04.md` | Gateway SMS |
 
@@ -120,6 +122,7 @@
 - [ ] Liberar sessão ADM → tablet desloga ou chip laranja em ≤60s (I19)
 - [x] Mock idle 1h → gate login + balcão livre no GAS (I21) — **09/06 v1.7.96**
 - [ ] Admin timer mostra `MM:SS`; `⏸` com locação Ativa (I21/I18)
+- [ ] Dashboard admin carrega KPIs em &lt;15s — não fica em "Calculando..." (I23)
 - [ ] Ctrl+F5 com `?force=VERSAO_ATUAL`
 
 ---
@@ -141,14 +144,17 @@
 13. **Nunca** `adminLogin()` sobrescrever sessão operador sem liberar balcão no servidor (I21).
 14. **Nunca** publicar mudança em `index.html` / Home / sync / sessão com locações **Ativa/Pendente** — Regra 14; hotfix P0 só com aprovação (I22).
 15. **Sempre** validar balanceamento HTML das páginas `#page-*` antes de push (I22).
+16. **Nunca** compartilhar mutex entre `carregarKPIs` (hub) e `carregarKPIsDashboard` (I23).
+17. **Nunca** chamar `buildKpiMesPayload_` dentro de `resumoDia` — usar patch leve `calcLeadingDiaPatch_` (I23).
+18. **Sempre** pacote deploy completo (`DEPLOY_v*.md`) ao entregar fase GAS+FE (regra de ouro).
 
 ---
 
 ## Versões de referência (09/06/2026)
 
-| Camada | Repo / produção | Mínimo I21 (B8) |
-|--------|-----------------|-----------------|
-| Frontend | **v1.7.96** | `?force=1.7.96` (mín. I21/B8: v1.7.94+) |
-| GAS | **v1.5.72** | Nova versão Web se ping &lt; esperado |
+| Camada | Repo / produção alvo | Mínimo operação |
+|--------|----------------------|-----------------|
+| Frontend | **v1.8.4** | `?force=1.8.4` (mín. I22: v1.8.2+) |
+| GAS | **v1.5.77** | Nova versão Web se ping &lt; esperado |
 
 Ver `ESTADO_ATUAL.md` para URLs e editor GAS.

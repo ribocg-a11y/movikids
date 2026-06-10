@@ -1,9 +1,9 @@
 # MOVI KIDS — Planejamento atual (pós-FASE 5)
 
-**Atualizado:** 09/06/2026  
-**Produção:** FE **v1.7.98** · GAS **v1.5.74** · Git `main`  
+**Atualizado:** 09/06/2026 (pós-I23)  
+**Produção:** FE **v1.8.4** · GAS **v1.5.77** (repo) / ping prod **verificar** após Nova versão Web  
 **Documentos irmãos:** `PLANO_PRIORIDADES_2026-06.md` · `PLANO_CONTINUIDADE_2026-06.md` · `HANDOFF_NOVO_CHAT.md`  
-**Ciclo ativo:** **`PLANO_FASES_6_15_COCKPIT_EXECUTIVO_2026-06.md`** ← benchmark → fases 6–15
+**Ciclo ativo:** **`PLANO_FASES_6_15_COCKPIT_EXECUTIVO_2026-06.md`** · sprint FASE 8: **`FASE_8_ALERTAS_SEMAFOROS.md`**
 
 ---
 
@@ -11,7 +11,7 @@
 
 Ciclo **FASE 0–5 + P2/P3 concluído** (07–09/06/2026). Balcão homologado, portal QR, payback, CONFIG e APIs unificadas.
 
-**Modo atual:** **FASE 6** (Cockpit executivo) — próximo ciclo de evolução gestão/UX/financeiro. Plano completo: **`PLANO_FASES_6_15_COCKPIT_EXECUTIVO_2026-06.md`** (10 fases, jun–set 2026).
+**Modo atual:** **FASE 8** (Alertas e semáforos) — após estabilização I22/I23 e deploy GAS **v1.5.77**. Plano sprint: **`FASE_8_ALERTAS_SEMAFOROS.md`**.
 
 ---
 
@@ -40,9 +40,9 @@ A–M (modularização FE), SMS P0, fixes I15–I21, Pacote K CRM, Pacote M M.1�
 
 | Fase | Nome | Prioridade | Status | Impacto visual principal |
 |------|------|------------|--------|--------------------------|
-| **6** | Cockpit executivo | P1 | ✅ repo | Dashboard topo |
-| **7** | Leading financeiros + causalidade | P1 | ✅ repo | Dashboard + Caixa |
-| **8** | Alertas e semáforos | P1 | ⏳ próxima | Dashboard + sidebar |
+| **6** | Cockpit executivo | P1 | ✅ repo · I22 hotfix | Dashboard topo |
+| **7** | Leading financeiros + causalidade | P1 | ✅ repo · I23 perf | Dashboard + Caixa |
+| **8** | Alertas e semáforos | P1 | 🟡 **próxima** | Dashboard + sidebar |
 | **9** | DNA visual admin | P1 | ⏳ | Dashboard, Caixa, CRM, Sistema |
 | **10** | CRM LTV / cohort | P2 | ⏳ | Relacionamento + Dashboard |
 | **11** | Holding Movi + ZapClin | P2 | ⏳ | Nova página Holding |
@@ -63,10 +63,13 @@ Legenda: **P0** bloqueia operação · **P1** valor imediato · **P2** próximo 
 
 | Item | Ação | Responsável |
 |------|------|-------------|
-| Tablet em versão antiga | Manter `?force=1.7.97` no PWA balcão | Ops |
+| **I22 — janela operacional** | `check-operacao-livre.ps1` antes de push FE crítico | Dev |
+| **I23 — Dashboard perf** | Mutex KPI + GAS v1.5.77 antes de FASE 8 | Dev |
+| Tablet em versão antiga | Manter `?force=1.8.4` no PWA balcão | Ops |
 | POST no browser (I15) | Nunca reintroduzir | Dev |
 | Deploy ID GAS | Só Nova versão Web — nunca `clasp deploy` | Dev/Ops |
 | Regressão I20 cronômetro | Antes de mexer em timer: `TESTE_I20_COMPLETO_PROD.ps1` | Dev |
+| GAS FASE 6–7 + I23 | Publicar **v1.5.77** antes de homologar cockpit/leading/Dashboard | Usuário |
 
 ### P1 — Operação contínua (sem feature nova)
 
@@ -146,16 +149,23 @@ Legenda: **P0** bloqueia operação · **P1** valor imediato · **P2** próximo 
 
 | Hash | Data | Entrega |
 |------|------|---------|
-| `9efa30a` | 09/06 | **P3** — GAS v1.5.73 + FE v1.7.97 (auditoria, PDF executivo, caixa WA/email, CRM) |
-| `91cc08f` | 09/06 | **v1.7.96** — fix splash idle boot (I21) |
-| `8173d10` | 09/06 | FASE 5 docs + mock-idle Pages |
-| `0e9e47c` | 09/06 | v1.7.95 — portal fixo Home |
-| `c3f92ac` | 09/06 | v1.7.94 + GAS v1.5.72 — B8 idle |
+| `dbf5c49` | 09/06 | fix pre-push I22 ASCII |
+| `59e4ca4` | 09/06 | **I22** pós-mortem + Regra 14 + gates |
+| `f2574da` | 09/06 | **hotfix** Home — FE v1.8.2 |
+| `6e6f42e` | 09/06 | **FASE 6–7** cockpit + leading (repo) |
+| `9efa30a` | 09/06 | **P3** — GAS v1.5.73 + FE v1.7.97 |
 
 ---
 
 ## 8. Próxima revisão
 
-**Ao fechar FASE 6** (cockpit) · meio ciclo **FASE 9** · fim **FASE 15**.
+**Ao fechar FASE 8** · meio ciclo **FASE 9** · fim **FASE 15**.
+
+**Sequência imediata (09/06):**
+
+1. Confirmar Home tablet pós **v1.8.2** (I22)
+2. Nova versão Web GAS **v1.5.76** (FASE 6–7)
+3. Homologar cockpit + leading no PC admin
+4. Iniciar **FASE 8** só com `check-operacao-livre.ps1` ok — ver `FASE_8_ALERTAS_SEMAFOROS.md`
 
 Ao iniciar/fechar fase: `HANDOFF_NOVO_CHAT.md` + § Execução em `PLANO_PRIORIDADES_2026-06.md` + checklist fase no plano 6–15.

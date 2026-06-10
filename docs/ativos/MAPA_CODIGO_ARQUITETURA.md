@@ -1,6 +1,6 @@
 # MOVI KIDS — Mapa do código e arquitetura
 
-**Atualizado:** 09/06/2026 (v1.7.96 — I21 splash boot + FASE 5 fechada)  
+**Atualizado:** 09/06/2026 (FE **v1.8.4** · GAS **v1.5.77** · FASE 6–7 + I22/I23)  
 **Função:** anatomia do sistema — o que é cada parte, o que liga com o quê, o que é zona sensível.  
 **Complementa:** `ESTADO_ATUAL.md`, `ACESSOS_E_AUTORIZACOES.md`, `REGRAS_DE_PUBLICACAO_SEGURA.md`, `MAPA_ERROS_FALHAS_BUGS.md`, **`PROTOCOLO_DIAGNOSTICO_E_TESTES.md`**
 
@@ -16,7 +16,7 @@
 | **Rosto / identidade** | Versão, URL GAS, cache | `mk-version.js`, `sw.js`, bloco anti-stale no `index.html` |
 | **Imunológico** | Travas P0, CI, incidentes | `pre-push-check.ps1`, `.cursor/rules/`, `REGRAS_DE_PUBLICACAO_SEGURA.md` |
 | **Mãos (braços)** | Ações do operador no balcão | Nova locação, drawer, encerrar, SMS manual — `index.html` + 5 escritas GAS |
-| **Olhos (gestão)** | KPIs, payback, relatório | Dashboard, Caixa admin — `buscarKPIsAdmin` (GAS) + páginas admin no FE |
+| **Olhos (gestão)** | KPIs, payback, cockpit, leading | Dashboard, Caixa admin — `kpiMes` + `resumoDia` (GAS) + `mk-admin.js` |
 | **Pernas (canais externos)** | Portal pais, foto, cronômetro curto | `acompanhar.html`, `foto-moldura.html`, `track.html` |
 | **Pele** | Visual único | `mk-app.css` (base) + `mk-design.css` (aditivo Pacote A) |
 | **Porta de entrada** | Quem pode entrar + idle 1h + splash boot | `mk-auth.js` — `mkAuthBoot`, `hideSplash_`, `mkAuthReleaseBalcaoServer_` |
@@ -92,7 +92,7 @@ flowchart TB
     SW[sw.js]
     PORT[acompanhar.html]
   end
-  subgraph GAS["Apps Script v1.5.72"]
+  subgraph GAS["Apps Script v1.5.77"]
     RT[dispatchMoviAction_]
     SH[(Planilha Sheets)]
     PS[PropertiesService sessão]
@@ -121,7 +121,8 @@ flowchart TB
 | Versão GAS | header `.gs` + `ping` | Produção após Nova versão Web |
 | Escritas balcão | `api()` GET + 5 actions | `WRITE_ACTIONS_CRITICAS_` no GAS |
 | Operador nas escritas | `operadorApiParams_()` | GAS valida `operador`/`operadorId` |
-| Admin financeiro | `adminPin=1416` | `ADMIN_PIN_PLAIN`, `isAdminRequest_` |
+| KPIs admin | `action=kpiMes` | `buildKpiMesPayload_` → cockpit, leading, payback |
+| Resumo dia (leve) | `action=resumoDia` | `calcResumoDiaCore_` + `calcLeadingDiaPatch_` (v1.5.77) |
 | Dados mestres | `SHEET_ID` no `.gs` | Planilha `1ULMUx8AqZkZ75Ed0iRK...` |
 
 ### Sync em tempo real (3 canais)
@@ -174,7 +175,7 @@ sequenceDiagram
 | Constantes | 60–125 | `SHEET_ID`, `DEPLOY_ID`, preços, veículos, PIN admin |
 | Router | 252–361 | `doGet`, `doPost`, `dispatchMoviAction_` — **porta de tudo** |
 | Locações | 472–948 | CRUD locação + auditoria |
-| KPIs / Payback | 1011–1605 | Dashboard, investimento, Pacote F |
+| KPIs / Payback / Cockpit / Leading | 1011–1605 | `buildKpiMesPayload_`, `calcLeadingDiaPatch_` (v1.5.77), narrativaExecutiva |
 | Balcão sync | 1606–1817 | `carregarInicio`, timer |
 | CRM / Portal | 2589–3032 | Responsáveis, portal, import K.1 |
 | SMS | 3033–3660 | Gateway DJVJRL |
@@ -209,14 +210,17 @@ sequenceDiagram
 1. PLANO_PRIORIDADES     → o que fazer (fase ativa)
 2. Escopo + arquivos     → REGRAS Regra 1 (o que pode / não pode mexer)
 3. Código local          → agente ou você
-4. pre-push-check.ps1    → versões, guards I15–I19
-5. Testes .ps1           → conforme área (HTTP, portal, cronômetro)
-6. git push (se pedido)  → GitHub Pages (FE)
-7. clasp push (se pedido)→ código no projeto GAS
-8. Nova versão Web       → SÓ VOCÊ no editor Google
-9. Tablet ?force=        → SÓ VOCÊ / Ops
-10. Atualizar HANDOFF    → versões + checklist
+4. check-operacao-livre  → se FE crítico (Regra 14 / I22) — 0 Ativa/Pendente
+5. pre-push-check.ps1    → versões, guards I15–I22
+6. Testes .ps1           → conforme área (HTTP, portal, cronômetro, kpiMes)
+7. git push (se pedido)  → GitHub Pages (FE)
+8. clasp push (se pedido)→ código no projeto GAS
+9. Nova versão Web       → SÓ VOCÊ no editor Google
+10. Tablet ?force=       → SÓ VOCÊ / Ops
+11. Atualizar HANDOFF    → versões + checklist + MAPA_ERROS se incidente
 ```
+
+**Pacote deploy (regra de ouro):** toda entrega GAS+FE inclui doc `DEPLOY_v*.md` completo (caminho PC, clasp, ping, testes, checklist tablet) — ver `DEPLOY_v1.5.77_FASE7_PERF.md` como modelo pós-I23.
 
 **Diretrizes claras:** `REGRAS_DE_PUBLICACAO_SEGURA.md` (12 regras), `.cursor/rules/`, `ACESSOS_E_AUTORIZACOES.md`.
 
@@ -255,6 +259,8 @@ Antes de alterar, **declarar escopo** (Regra 1) e **pedir OK** do responsável:
 | `importarResponsaveisAdmin` | CRM 240 cadastros | `dryRun=1` primeiro |
 | SMS gateway / credenciais | Comunicação pais | Envio teste controlado |
 | Firebase config | Sync tempo real | Balcão + portal mesma locação |
+| `mk-admin.js` (`carregarKPIs*`, cockpit, mutex) | I23 — KPIs travados | `TESTE_KPI_MES_READONLY` + Dashboard PC |
+| `index.html` `#page-dashboard` | I22 — HTML quebra Home global | `guard.html.page-balance` + tablet F0 |
 | `OPERADORES_SISTEMA` na planilha | PIN hash | `resetarPinOperadorAdmin` preferível |
 
 **Pode evoluir com mais liberdade:** textos UI, cores (DNA), KPIs só leitura admin, docs, testes readonly.
@@ -306,6 +312,66 @@ Duplicar KPI em Home operador = **proibido** (Pacote I).
 | Diagrama único | ✅ §3 (mermaid) |
 
 **Honesto:** M.1 removeu CSS do monólito; JS (~5,5k linhas) é a próxima fatia (Pacote M).
+
+---
+
+## 12. Dashboard admin — kpiMes, cockpit e leading (FASE 6–7 / I23)
+
+### 12.1 Fluxo de dados
+
+```mermaid
+sequenceDiagram
+  participant D as Dashboard FE
+  participant H as Hub/Sistema FE
+  participant G as GAS
+  D->>G: action=kpiMes (único na abertura)
+  G->>G: buildKpiMesPayload_ (~5–8s)
+  G-->>D: cockpit + leading + payback + Pacote F
+  H->>G: action=resumoDia (leve)
+  G->>G: calcResumoDiaCore_ + calcLeadingDiaPatch_
+  G-->>H: chip Caixa / resumo dia
+```
+
+| Consumidor FE | Função | Action GAS | Payload |
+|---------------|--------|------------|---------|
+| **Dashboard** (`showPage dashboard`) | `carregarKPIsDashboard` | `kpiMes` | Completo — cockpit `#mk-exec-cockpit`, leading, payback |
+| **Hub / Sistema / Caixa chip** | `carregarKPIs` | `resumoDia` | Leve — totais do dia + `leadingDia` patch (v1.5.77+) |
+| **Troca mês Dashboard** | `carregarKPIsDashboard(m, a)` | `kpiMes` | Fila `_kpiDashPending` se load em andamento |
+
+### 12.2 Mutex FE (I23)
+
+| Lock | Escopo | Evita |
+|------|--------|-------|
+| `_kpiHubInFlight` | `carregarKPIs` | Hub bloquear hub |
+| `_kpiDashInFlight` | `carregarKPIsDashboard` | Dashboard abortar silenciosamente quando hub carregava |
+
+**Antes (I23):** `_kpiInFlight` único — segunda chamada retornava sem renderizar.
+
+**Depois (v1.8.4):** locks separados; Dashboard **não** chama `resumoDia` em paralelo com `kpiMes`.
+
+### 12.3 GAS — peso por action
+
+| Action | Função principal | Custo | Uso |
+|--------|------------------|-------|-----|
+| `kpiMes` | `buildKpiMesPayload_` | **Alto** (~6s prod) | Dashboard admin, PDF gestão |
+| `resumoDia` | `calcResumoDiaCore_` + `calcLeadingDiaPatch_` | **Baixo** | Caixa, chip admin, refresh leve |
+
+**Antes v1.5.77:** `enrichResumoDiaLeading_` chamava `buildKpiMesPayload_` inteiro em cada `resumoDia` (FASE 7 regressão).
+
+**Depois v1.5.77:** `calcLeadingDiaPatch_` — só métricas leading do dia, sem payback/auditoria completa.
+
+### 12.4 Abrangência ao alterar Dashboard/KPIs
+
+| Dimensão | Verificar |
+|----------|-----------|
+| HTML `#page-dashboard` | Balanceamento `<div>` (I22) |
+| Tipografia cockpit | `#mk-exec-cockpit` — Nunito 700, não Fredoka 900 (v1.8.3+) |
+| Mutex | Hub + Dashboard em paralelo (I23) |
+| GAS ping | `ping_()` = header versão |
+| Testes readonly | `TESTE_KPI_MES_READONLY.ps1`, `TESTE_RESUMO_DIA_READONLY.ps1` |
+| Tablet | Home F0 após `index.html`; Dashboard = **PC admin** |
+
+**Incidentes:** I22 (`INCIDENTE_I22_*`), I23 (`INCIDENTE_I23_DASHBOARD_LENTO_TRAVADO_2026-06-09.md`)
 
 ---
 

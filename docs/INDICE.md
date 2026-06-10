@@ -1,6 +1,6 @@
 # MOVI KIDS — Índice de documentação
 
-**Atualizado:** 09/06/2026 (FE **v1.7.98** + GAS **v1.5.74** · **FASE 6** próxima)
+**Atualizado:** 09/06/2026 (FE **v1.8.4** + GAS **v1.5.77** · FASE 6–7 + I23 · **FASE 8** próxima)
 
 ## Comece aqui
 
@@ -18,6 +18,7 @@
 
 | Documento | Para quê |
 |-----------|----------|
+| [**FASE_8_ALERTAS_SEMAFOROS.md**](ativos/FASE_8_ALERTAS_SEMAFOROS.md) | 🟡 **FASE 8** — sprint alertas + gates I22 |
 | [**PLANO_FASES_6_15_COCKPIT_EXECUTIVO_2026-06.md**](ativos/PLANO_FASES_6_15_COCKPIT_EXECUTIVO_2026-06.md) | 🟡 **FASE 6–15** — cockpit, UX admin, financeiro |
 | [CHECKLIST_FASE5_TABLET.md](ativos/CHECKLIST_FASE5_TABLET.md) | ✅ FASE 5 — Milena + I21 v1.7.96 |
 | [FASE_5_CONFIABILIDADE_APIS.md](ativos/FASE_5_CONFIABILIDADE_APIS.md) | B7, B1, B2, B8 — fechada |
@@ -35,14 +36,16 @@
 | [PROTOCOLO_DIAGNOSTICO_E_TESTES.md](ativos/PROTOCOLO_DIAGNOSTICO_E_TESTES.md) | Fluxos F0–F14, maturidade |
 | [REGRAS_DE_PUBLICACAO_SEGURA.md](ativos/REGRAS_DE_PUBLICACAO_SEGURA.md) | Regras P0 deploy |
 | [ACESSOS_E_AUTORIZACOES.md](ativos/ACESSOS_E_AUTORIZACOES.md) | Papéis, PIN, agente vs humano |
-| [MAPA_ERROS_FALHAS_BUGS.md](ativos/MAPA_ERROS_FALHAS_BUGS.md) | Índice I1–I22 |
+| [MAPA_ERROS_FALHAS_BUGS.md](ativos/MAPA_ERROS_FALHAS_BUGS.md) | Índice I1–I23 |
 
 ## Operação e deploy
 
 | Documento | Para quê |
 |-----------|----------|
 | [DEPLOY_GAS_v1.5.32_AUTH.md](ativos/DEPLOY_GAS_v1.5.32_AUTH.md) | Deploy GAS mestre |
-| [DEPLOY_v1.5.72_SESSAO_IDLE.md](ativos/DEPLOY_v1.5.72_SESSAO_IDLE.md) | B8 idle I21 |
+| [DEPLOY_v1.5.77_FASE7_PERF.md](ativos/DEPLOY_v1.5.77_FASE7_PERF.md) | **Deploy GAS v1.5.77** — perf resumoDia + FE v1.8.4 |
+| [DEPLOY_v1.5.76_FASE7_LEADING.md](ativos/DEPLOY_v1.5.76_FASE7_LEADING.md) | Deploy GAS FASE 6–7 — regra de ouro completa |
+| [DEPLOY_FE_v1.8.2_HOTFIX_I22.md](ativos/DEPLOY_FE_v1.8.2_HOTFIX_I22.md) | Hotfix FE I22 — só Pages |
 | [HOMOLOGACAO_PRODUCAO_ASSISTIDA.md](ativos/HOMOLOGACAO_PRODUCAO_ASSISTIDA.md) | Checklist operação |
 
 ## Negócio
@@ -56,7 +59,7 @@
 
 | Pasta | Conteúdo |
 |-------|----------|
-| [arquivo/incidentes/](arquivo/incidentes/) | Pós-mortems I1–I22 |
+| [arquivo/incidentes/](arquivo/incidentes/) | Pós-mortems I1–I23 |
 | [arquivo/deploy/](arquivo/deploy/) | Deploy notes históricos |
 | [arquivo/planos/](arquivo/planos/) | Planos antigos — **não usar para versão** |
 | [../arquivo-historico/](../arquivo-historico/) | GAS legados |

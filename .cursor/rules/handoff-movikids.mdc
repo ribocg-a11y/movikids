@@ -50,7 +50,7 @@ Ao trabalhar neste repositório, **ler primeiro** (nesta ordem):
 
 **FASE 5:** ✅ fechada 09/06 — Milena + I21 v1.7.96 · ver `PLANEJAMENTO_ATUAL_2026-06.md`
 
-**Produção (09/06):** FE **v1.7.96** · GAS **v1.5.72**.
+**Produção (09/06/2026 — pós-I23):** FE **v1.8.4** · GAS repo **v1.5.77** · FASE 8 próxima
 
 **Teste / diagnóstico:** `PROTOCOLO_DIAGNOSTICO_E_TESTES.md` → `TESTE_PROTOCOLO_DIAGNOSTICO.ps1`.
 
@@ -58,9 +58,11 @@ Ao trabalhar neste repositório, **ler primeiro** (nesta ordem):
 
 ## Modo de operação — máximo potencial (obrigatório)
 
-1. Fluxo F0–F14 antes de codar · 2. PC ≠ tablet · 3. FE+GAS+planilha+PWA · 4. MAPA_ERROS I15/I18/I20/I21/I22.
+1. Fluxo F0–F14 antes de codar · 2. PC ≠ tablet · 3. FE+GAS+planilha+PWA · 4. MAPA_ERROS I15/I18/I20/I21/I22/I23.
 
-**I22 (09/06):** nunca push FE crítico com locações Ativa/Pendente — `check-operacao-livre.ps1` · Regra 14 · doc `INCIDENTE_I22_HOME_FORA_DO_AR_FASE6_HTML_2026-06-09.md`.
+**I22 (09/06):** nunca push FE crítico com locações Ativa/Pendente — `check-operacao-livre.ps1` · Regra 14.
+
+**I23 (09/06):** mutex KPI hub/dash separado; GAS `resumoDia` leve — Regra 15 · doc `INCIDENTE_I23_DASHBOARD_LENTO_TRAVADO_2026-06-09.md`.
 
 Antes de push: `pre-push-check.ps1` + resumo publicação. Ao encerrar: HANDOFF + PLANEJAMENTO se mudou fase.
 

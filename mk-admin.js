@@ -592,39 +592,50 @@ async function carregarResumoHojeAdmin_() {
 
 /** Hub/Sistema: só resumoDia (leve). Dashboard usa carregarKPIsDashboard → kpiMes. */
 async function carregarKPIs() {
-  if (window._kpiInFlight) return;
-  window._kpiInFlight = true;
+  if (window._kpiHubInFlight) return;
+  window._kpiHubInFlight = true;
   try {
     await carregarResumoHojeAdmin_();
     if (typeof atualizarHubAdmin_ === 'function') atualizarHubAdmin_();
     if (typeof showAdminHomeKpis === 'function') showAdminHomeKpis(kpiHubStub_());
   } catch (e) { console.error('carregarKPIs:', e); }
-  finally { window._kpiInFlight = false; }
+  finally { window._kpiHubInFlight = false; }
 }
 
 /** B2: Dashboard — kpiMes (visualização mensal). */
 async function carregarKPIsDashboard(mes, ano) {
-  if (window._kpiInFlight) return;
-  window._kpiInFlight = true;
+  if (window._kpiDashInFlight) {
+    window._kpiDashPending = { mes: mes, ano: ano };
+    return;
+  }
+  window._kpiDashInFlight = true;
   try {
     const authP = apiParamsComAuth_();
     const p = { action: 'kpiMes', ...authP };
     if (mes) p.mes = mes;
     if (ano) p.ano = ano;
-    const [d, resumo] = await Promise.all([
-      api(p),
-      api({ action: 'resumoDia', data: fmtDataBrHoje_(), ...authP })
-    ]);
-    if (!d.ok) return;
+    const d = await api(p);
+    if (!d || !d.ok) {
+      console.error('kpiMes falhou', d);
+      if (typeof toast === 'function') toast('Dashboard: ' + ((d && d.erro) || 'erro ao carregar KPIs'), true);
+      return;
+    }
     kpiData = d;
-    if (resumo && resumo.ok) resumoDiaHoje = resumo;
+    carregarResumoHojeAdmin_().catch(function() {});
     if (typeof renderSemanasChart_ === 'function') renderSemanasChart_(d);
     const dashPage = document.getElementById('page-dashboard');
     if (dashPage && dashPage.classList.contains('active')) renderCharts(d);
     if (typeof showAdminHomeKpis === 'function') showAdminHomeKpis(kpiHubStub_());
     if (typeof atualizarHubAdmin_ === 'function') atualizarHubAdmin_();
-  } catch (e) { console.error('carregarKPIsDashboard:', e); }
-  finally { window._kpiInFlight = false; }
+  } catch (e) {
+    console.error('carregarKPIsDashboard:', e);
+    if (typeof toast === 'function') toast('Dashboard: erro de conexão', true);
+  } finally {
+    window._kpiDashInFlight = false;
+    const pending = window._kpiDashPending;
+    window._kpiDashPending = null;
+    if (pending) carregarKPIsDashboard(pending.mes, pending.ano);
+  }
 }
 // ── NOVO DASHBOARD v1.6.9 ────────────────────────────────────
 const MESES_DB = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];

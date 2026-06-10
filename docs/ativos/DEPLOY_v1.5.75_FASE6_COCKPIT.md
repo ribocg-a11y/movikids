@@ -32,8 +32,10 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 |------|-----|
 | **Editor GAS** | https://script.google.com/home/projects/19SIhkX9Tk7FiJA1JXu1OrUwssHdr3H5zc8q3rOjmBvqgWfXuHlk8xyf8/edit |
 | **Ping produção** | https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec?action=ping |
-| **App FE (após push Pages)** | https://ribocg-a11y.github.io/movikids/?force=1.8.0 |
+| **App FE (produção atual)** | https://ribocg-a11y.github.io/movikids/?force=1.8.2 |
 | **Planilha** | https://docs.google.com/spreadsheets/d/1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618/edit |
+
+> **Nota:** FE histórico desta fase era v1.8.0; produção atual **v1.8.2** (hotfix I22 + FASE 7) — ver `DEPLOY_FE_v1.8.2_HOTFIX_I22.md` e `DEPLOY_v1.5.76_FASE7_LEADING.md`.
 
 **Deploy ID único (não trocar):** `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y`
 

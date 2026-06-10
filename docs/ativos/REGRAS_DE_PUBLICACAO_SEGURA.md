@@ -218,6 +218,20 @@ Erros cometidos neste projeto que nao devem se repetir:
 
 **Documentacao completa:** `../arquivo/incidentes/INCIDENTE_I22_HOME_FORA_DO_AR_FASE6_HTML_2026-06-09.md`
 
+## Regra 15 - KPI Dashboard — mutex e peso GAS (I23)
+
+**Incidente 09/06/2026:** Dashboard admin ficou em `"Calculando..."` apos FASE 6–7.
+
+**Regras:**
+
+1. **Nunca** compartilhar flag `_kpiInFlight` entre `carregarKPIs` (hub/resumoDia) e `carregarKPIsDashboard` (kpiMes).
+2. **Dashboard** abre com **apenas** `action=kpiMes` — nao disparar `resumoDia` em paralelo na mesma tela.
+3. **GAS `resumoDia`:** usar `calcLeadingDiaPatch_` — **nunca** chamar `buildKpiMesPayload_` inteiro dentro de `resumoDia`.
+4. Ao entregar fase com KPIs: incluir `TESTE_KPI_MES_READONLY.ps1` + homolog **PC admin** Dashboard.
+5. Pacote deploy completo: `DEPLOY_v1.5.77_FASE7_PERF.md` (modelo pos-I23).
+
+**Documentacao:** `../arquivo/incidentes/INCIDENTE_I23_DASHBOARD_LENTO_TRAVADO_2026-06-09.md` · `MAPA_CODIGO_ARQUITETURA.md` §12
+
 Toda regressao deve gerar:
 
 - causa provavel;

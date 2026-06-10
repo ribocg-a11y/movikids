@@ -71,7 +71,7 @@ Cada fluxo tem: **arquivos**, **incidentes**, **teste automático**, **tablet ob
 | **F9** | Encerrar / cancelar | drawer → GAS → some do ativo | `mk-drawer.js`, GAS encerrar | I2, I11, I13 | `TESTE_DRAWER_E` | ✅ |
 | **F10** | Sync multi-canal | poll + Firebase + merge + BC | `mk-sync.js`, `mk-firebase.js` | I17, I20 | `TESTE_TABLET_F5_F7_F10_F11` (reload OK; 2 abas físico pendente) | ✅ 2 abas |
 | **F11** | Portal responsável | `acompanhar.html` ±2s do balcão | portal + GAS `buscarPortalResponsavel_` | **I16** | `TESTE_PARIDADE_CRONOMETRO` | ✅ celular |
-| **F12** | Admin — KPIs / payback / caixa | Dashboard, Caixa, payback | GAS `buscarKPIsAdmin` | payback M | `TESTE_PACOTE_F_KPI` | PC |
+| **F12** | Admin — KPIs / payback / caixa / cockpit | Dashboard (`kpiMes`), Caixa (`resumoDia`), payback | `mk-admin.js`, GAS `buildKpiMesPayload_`, `calcLeadingDiaPatch_` | I23, payback M | `TESTE_KPI_MES_READONLY`, `TESTE_RESUMO_DIA_READONLY` | PC admin |
 | **F13** | CRM relacionamento | busca responsável, badge cadastro | `index.html` rel, GAS | K.3 | `TESTE_RELACIONAMENTO` | opcional |
 | **F14** | HTTP / escrita browser | GET nas 5 actions críticas | `mk-api.js` | **I15** | `TESTE_PARIDADE_HTTP` | ✅ |
 
@@ -122,6 +122,8 @@ Use esta tabela **antes de fechar qualquer bug** no fluxo F5 (e analogamente par
 | 12 | Poluição testes na UI | Sim | F0 cleanup + `limparLocacoesTesteAdmin` |
 | 13 | Firebase / segunda aba | Parcial | F10 `TESTE_TABLET_*` + 2 abas PWA físico |
 | 14 | Auth / operador na escrita | Assumido | F1 + params `operador` |
+| 15 | Mutex KPI hub vs Dashboard (I23) | **Sim** | F12 — abrir Dashboard com Caixa em background |
+| 16 | Peso GAS `resumoDia` vs `kpiMes` | **Sim** | F12 — `TESTE_RESUMO_DIA_READONLY` rapido vs kpiMes ~6s |
 
 ---
 
@@ -142,6 +144,9 @@ Use esta tabela **antes de fechar qualquer bug** no fluxo F5 (e analogamente par
 | `api()` / `mk-api.js` | F14, **todas** escritas | `TESTE_PARIDADE_HTTP` | ✅ |
 | `acompanhar.html` | F11 | paridade cronômetro | celular |
 | `mk-version.js` / `sw.js` | F0, **todos** | pre-push versões | `?force=` |
+| `mk-admin.js` `carregarKPIs*` | F12 | `TESTE_KPI_MES_READONLY`, Dashboard PC | PC admin |
+| `buildKpiMesPayload_` / `calcLeadingDiaPatch_` | F12 | kpiMes + resumoDia readonly | PC admin |
+| `index.html` `#page-dashboard` | F0, F12, **I22** | `guard.html.page-balance`, tablet Home | ✅ |
 
 **Se não souber o impacto:** ler `MAPA_CODIGO_ARQUITETURA.md` §3 e §5–6 antes de codar.
 
@@ -319,3 +324,4 @@ Detalhe em `HOMOLOGACAO_PRODUCAO_ASSISTIDA.md` seções A–H. Resumo mínimo:
 | 07/06/2026 | §5.3.1 modo read-only; fix `TESTE_RELACIONAMENTO` (em-dash quebrava ParserError) |
 | 08/06/2026 | Scripts tablet `TESTE_TABLET_F5_F7_F10_F11` + browser; F7/F10 na matriz F0–F14; §8 lacunas atualizadas |
 | 08/06/2026 | Fix T1 em-dash `TESTE_I20_COMPLETO_PROD.ps1`; protocolo completo WARN transitório Pages |
+| 09/06/2026 | F12 atualizado FASE 6–7; I23 mutex + `calcLeadingDiaPatch_`; abrangência §3 linhas 15–16 |

@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.76
+// MOVI KIDS — Google Apps Script v1.5.77
+// v1.5.77: FASE 7 perf — resumoDia.leadingDia via calcLeadingDiaPatch_ (sem buildKpiMesPayload_ duplicado)
 // v1.5.76: FASE 7 — leadingFinanceiro (ticket, R$/h, break-even, sensibilidade) + resumoDia.leadingDia
 // v1.5.75: FASE 6 — narrativaExecutiva + cockpit (ocupacaoMediaFrota) em kpiMes
 // v1.5.74: B6 — adminPinOk_ via Script Property ADMIN_PIN; isAdminRequest_ exige PIN valido
@@ -370,9 +371,9 @@ function ping_() {
   const agora = new Date();
   return resp_({
     status:  'online',
-    versao:  'v1.5.74',
+    versao:  'v1.5.77',
     timestamp: fmtData_(agora) + ' ' + fmtHoraLocal_(agora),
-    sistema: 'MOVI KIDS v1.5.74',
+    sistema: 'MOVI KIDS v1.5.77',
     postWriteActions: WRITE_ACTIONS_CRITICAS_
   });
 }
@@ -1725,6 +1726,61 @@ function buildLeadingFinanceiros_(ctx) {
   };
 }
 
+/** FASE 7 lite — leading do dia sem payback/narrativa (evita buildKpiMesPayload_ em resumoDia). */
+function calcLeadingDiaPatch_(mes, ano) {
+  const mesAtual = parseInt(mes, 10);
+  const anoAtual = parseInt(ano, 10);
+  if (!mesAtual || !anoAtual) return null;
+  const mmyy = String(mesAtual).padStart(2, '0') + '/' + anoAtual;
+  const diasMes = new Date(anoAtual, mesAtual, 0).getDate();
+  let fatMes = 0, nMes = 0;
+  const diasComMov = {};
+  const shLoc = sh_(SH_LOC);
+  const lastLoc = shLoc.getLastRow();
+  if (lastLoc >= DATA_ROW) {
+    shLoc.getRange(DATA_ROW, 1, lastLoc - DATA_ROW + 1, 15).getValues().forEach(function(r) {
+      if (!r[0] || String(r[14] || '').trim() !== 'Encerrada') return;
+      const pts = cellToStr_(r[1]).split('/');
+      if (pts.length < 3) return;
+      const mmyyR = pts[1].padStart(2, '0') + '/' + pts[2];
+      if (mmyyR !== mmyy) return;
+      fatMes += Number(r[10]);
+      nMes++;
+      diasComMov[pts[0].padStart(2, '0')] = 1;
+    });
+  }
+  let cusMes = 0;
+  const shCus = sh_(SH_CUS);
+  const lastCus = shCus.getLastRow();
+  if (lastCus >= DATA_ROW) {
+    shCus.getRange(DATA_ROW, 1, lastCus - DATA_ROW + 1, 6).getValues().forEach(function(r) {
+      if (!r[0]) return;
+      const pts = cellToStr_(r[1]).split('/');
+      if (pts.length < 3) return;
+      if ((pts[1].padStart(2, '0') + '/' + pts[2]) !== mmyy) return;
+      cusMes += Number(r[5]);
+    });
+  }
+  const mesCto = mesContrato_();
+  const ctoMin = ctoMinimo_(mesCto);
+  const ctoPagar = Math.max(ctoMin, fatMes * 0.10);
+  const diasOp = Object.keys(diasComMov).length;
+  const lf = buildLeadingFinanceiros_({
+    fatMes: fatMes,
+    nMes: nMes,
+    cusMes: cusMes,
+    ctoPagar: ctoPagar,
+    ctoMinimo: ctoMin,
+    diasMes: diasMes,
+    diasOperando: diasOp,
+    ocupacaoMediaFrota: 0
+  });
+  return {
+    breakEvenLocacoesDia: lf.breakEvenLocacoesDia,
+    ticketMedioMes: lf.ticketMedio
+  };
+}
+
 function enrichResumoDiaLeading_(core, dataAlvo) {
   try {
     const pts = String(dataAlvo || '').split('/');
@@ -1732,15 +1788,14 @@ function enrichResumoDiaLeading_(core, dataAlvo) {
     const mes = parseInt(pts[1], 10);
     const ano = parseInt(pts[2], 10);
     if (!mes || !ano) return core;
-    const kpi = buildKpiMesPayload_({ mes: mes, ano: ano });
-    const lf = kpi.leadingFinanceiro || {};
-    const be = lf.breakEvenLocacoesDia;
+    const patch = calcLeadingDiaPatch_(mes, ano);
+    if (!patch) return core;
     const nHoje = Number(core.n) || 0;
     return Object.assign({}, core, {
       leadingDia: {
-        breakEvenLocacoesDia: be,
-        ticketMedioMes: lf.ticketMedio,
-        faltamBreakEven: be != null ? Math.max(0, be - nHoje) : null
+        breakEvenLocacoesDia: patch.breakEvenLocacoesDia,
+        ticketMedioMes: patch.ticketMedioMes,
+        faltamBreakEven: patch.breakEvenLocacoesDia != null ? Math.max(0, patch.breakEvenLocacoesDia - nHoje) : null
       }
     });
   } catch (e) {

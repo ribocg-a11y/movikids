@@ -32,7 +32,7 @@
 |------|------|------------|--------------|---------|----------|-------------|
 | **6** | Cockpit executivo — síntese e narrativa | **P1** | 5–7 dias | v1.8.0 | v1.5.75 | ✅ repo |
 | **7** | KPIs leading financeiros + causalidade | **P1** | 5–7 dias | v1.8.1 | v1.5.76 | ✅ repo |
-| **8** | Alertas proativos e semáforos | **P1** | 5–7 dias | v1.8.2 | v1.5.77 | PC admin |
+| **8** | Alertas proativos e semáforos | **P1** | 5–7 dias | v1.8.3 | v1.5.77 | PC admin |
 | **9** | DNA visual na gestão (hierarquia 3 níveis) | **P1** | 10–14 dias | v1.8.5 | — | PC + tablet sidebar |
 | **10** | CRM inteligente — LTV, cohort, segmentos | **P2** | 7–10 dias | v1.8.6 | v1.5.78 | PC admin + ops treino |
 | **11** | Holding unificada (Movi + ZapClin) | **P2** | 5–7 dias | v1.8.7 | v1.5.79 | PC sócio |
@@ -199,7 +199,7 @@ Nenhuma — usa `kpiMes` existente.
 | **Objetivo** | Antecipar problemas antes do P&L — **semáforo verde/amarelo/vermelho** + lista de alertas |
 | **Prioridade** | P1 |
 | **Esforço** | 5–7 dias |
-| **Versão** | FE **v1.8.2** · GAS **v1.5.77** |
+| **Versão** | FE **v1.8.3** · GAS **v1.5.77** |
 
 ### Entregas
 

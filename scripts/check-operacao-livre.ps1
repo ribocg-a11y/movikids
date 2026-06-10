@@ -1,4 +1,4 @@
-# MOVI KIDS — Gate operacional (I22)
+# MOVI KIDS - Gate operacional (I22)
 # Verifica se ha locacoes Ativa/Pendente em producao antes de push FE critico.
 #
 # Uso:
@@ -50,17 +50,17 @@ $detalhe = @($abertas | ForEach-Object {
 Write-Host ("Locacoes abertas (Ativa/Pendente): {0}" -f $abertas.Count)
 
 if ($abertas.Count -eq 0) {
-  Write-Host "Operacao LIVRE — pode publicar FE critico (Regra 12)." -ForegroundColor Green
+  Write-Host "Operacao LIVRE - pode publicar FE critico (Regra 14)." -ForegroundColor Green
   exit 0
 }
 
 Write-Host ""
-Write-Host "BLOQUEADO — operacao com locacoes ativas:" -ForegroundColor Red
+Write-Host "BLOQUEADO - operacao com locacoes ativas:" -ForegroundColor Red
 $detalhe | ForEach-Object { Write-Host ("  - {0}" -f $_) }
 
 if ($Force) {
   Write-Host ""
-  Write-Host "Force ativo — prosseguindo por hotfix P0 aprovado." -ForegroundColor Yellow
+  Write-Host "Force ativo - prosseguindo por hotfix P0 aprovado." -ForegroundColor Yellow
   exit 0
 }
 

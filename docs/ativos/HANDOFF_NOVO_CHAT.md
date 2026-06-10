@@ -1,6 +1,6 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 09/06/2026 (FASE 5 + P2/P3 **fechadas** — ciclo **FASE 6** ativo)  
+**Atualizado:** 09/06/2026 (FE **v1.8.4** + GAS **v1.5.77** · I23 fechado · **FASE 8** próxima)  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **Repo local:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`  
@@ -51,7 +51,7 @@ Continuo o MOVI KIDS. Repo: C:\Users\riboc\Documents\Codex\2026-05-30\files-ment
 
 - Ler: este arquivo → `PLANO_PRIORIDADES` → `ESTADO_ATUAL` → `REGRAS` → `ACESSOS_E_AUTORIZACOES` (§7 = agente vs você)
 - Ignorar handoff antigo em `docs/arquivo/planos/`
-- Informar: FE **v1.7.98**, GAS **v1.5.74** — **FASE 6 próxima** · plano **`PLANO_FASES_6_15_COCKPIT_EXECUTIVO_2026-06.md`**
+- Informar: FE **v1.8.4**, GAS **v1.5.77** — **FASE 6–7** entregues · **FASE 8** próxima · plano **`FASE_8_ALERTAS_SEMAFOROS.md`**
 - Deixar claro: **agente** no **PC** (código, testes, planilha); **você** Nova versão GAS Web; **tablet no balcão** = validação operação (não confundir com seu computador)
 
 ---
@@ -86,10 +86,10 @@ Regra Cursor: `.cursor/rules/handoff-movikids.mdc` § Modo de operação.
 
 | Camada | Versão | Verificação |
 |--------|--------|-------------|
-| **Frontend** | **v1.8.1** (FASE 6–7) | `mk-version.js` |
-| **Service Worker** | **1.8.1** | `sw.js` |
+| **Frontend** | **v1.8.2** (FASE 6–7 + hotfix I22) | `mk-version.js` · `?force=1.8.2` |
+| **Service Worker** | **1.8.2** | `sw.js` |
 | **Apps Script (código)** | **v1.5.76** | Ping após **Nova versão Web** |
-| **App tablet balcão** | v1.7.98+ ok | Sem mudança obrigatória FASE 6–7 |
+| **App tablet balcão** | **v1.8.2** obrigatório pós-I22 | Home + balcão — ver `DEPLOY_FE_v1.8.2_HOTFIX_I22.md` |
 
 **Deploy ID GAS (único — nunca criar outro):** `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y`
 
@@ -114,8 +114,9 @@ Regra Cursor: `.cursor/rules/handoff-movikids.mdc` § Modo de operação.
 
 | Tarefa | Ler |
 |--------|-----|
-| Deploy GAS | `DEPLOY_GAS_v1.5.32_AUTH.md` + deploy feature (ex. `DEPLOY_v1.5.73_P3_BACKLOG.md`) |
-| Bug / incidente | `MAPA_ERROS_FALHAS_BUGS.md` → I20/I21 → `docs/arquivo/incidentes/` (ex. `INCIDENTE_I21_SESSAO_IDLE_DUAL_2026-06-09.md`) |
+| Deploy GAS | `DEPLOY_GAS_v1.5.32_AUTH.md` + **`DEPLOY_v1.5.77_FASE7_PERF.md`** (perf I23) · **`DEPLOY_v1.5.76_FASE7_LEADING.md`** (FASE 6–7 completo) |
+| Deploy FE hotfix | **`DEPLOY_FE_v1.8.2_HOTFIX_I22.md`** |
+| Bug / incidente | `MAPA_ERROS_FALHAS_BUGS.md` → I20–I23 → `docs/arquivo/incidentes/` |
 | QA tablet | **`PROTOCOLO_DIAGNOSTICO_E_TESTES.md`** → `TESTE_PROTOCOLO_DIAGNOSTICO.ps1` · homologação F5–F11: `TESTE_TABLET_F5_F7_F10_F11.ps1` |
 | Homologação | `HOMOLOGACAO_PRODUCAO_ASSISTIDA.md`, `CHECKLIST_PACOTE_K.md` |
 | Payback | `MEMORIAL_PAYBACK_INVESTIMENTO.md` |
@@ -123,35 +124,49 @@ Regra Cursor: `.cursor/rules/handoff-movikids.mdc` § Modo de operação.
 
 ---
 
-## Próximo passo (09/06/2026)
+## Próximo passo (09/06/2026 — pós-I23)
 
-**FASE 1 homologação:** ✅ **FECHADA** 08/06/2026 — I.5 assinado · K.3–K.4 tablet · checklist A–F · payback Dashboard · tablet **v1.7.87**.
+**FASE 5–7 repo:** ✅ FASE 6 cockpit · ✅ FASE 7 leading · hotfix **I22** · perf **I23** FE **v1.8.4** + GAS **v1.5.77**
 
-**FASE 2:** ✅ fechada 08/06 — INVESTIMENTO + payback + GAS **v1.5.69**.
+**Incidentes recentes:**
+- **I22:** Home quebrada por `</div>` extra — corrigido v1.8.2 · Regra 14
+- **I23:** Dashboard `"Calculando..."` — mutex KPI + `calcLeadingDiaPatch_` · Regra 15
 
-**FASE 3–4:** ✅ fechadas 08/06 — Pacote L v1.7.91 + CONFIG planilha validados.
+**Ciclo FASE 6–15:** **FASE 8** próxima — alertas e semáforos · sprint **`FASE_8_ALERTAS_SEMAFOROS.md`**
 
-**FASE 5:** ✅ **FECHADA** 09/06/2026 — B1+B2+B8+B7 · tablet Milena · I21 mock **ok v1.7.96**.
+**Antes de FASE 8:**
 
-**P2 backlog técnico:** ✅ **FECHADO** 09/06/2026 — B6 PIN GAS · CI · F10 · schema · GAS **v1.5.74** · FE **v1.7.98**.
+| # | Ação |
+|---|------|
+| 1 | Tablet Home ok com `?force=1.8.4` |
+| 2 | Nova versão Web GAS **v1.5.77** → ping ok |
+| 3 | PC admin: Dashboard carrega em ~5–8s; cockpit + leading + Caixa break-even |
+| 4 | `check-operacao-livre.ps1` → 0 locações abertas |
 
-**Ciclo FASE 6–15:** **FASE 6–7** entregues no repo · **FASE 8** próxima · alvo produção **FE v1.8.1** · **GAS v1.5.76**
+**Deploy (regra de ouro — pacote completo):**
 
-**Deploy:** `DEPLOY_v1.5.75_FASE6_COCKPIT.md` · `DEPLOY_v1.5.76_FASE7_LEADING.md`
+| Doc | Conteúdo |
+|-----|----------|
+| **`DEPLOY_v1.5.77_FASE7_PERF.md`** | GAS v1.5.77 perf resumoDia + FE v1.8.4 mutex KPI |
+| **`DEPLOY_v1.5.76_FASE7_LEADING.md`** | GAS v1.5.76 + FE v1.8.x — FASE 6–7 base |
+| **`DEPLOY_FE_v1.8.2_HOTFIX_I22.md`** | Só FE hotfix Home |
 
-**Sua ação após push Pages:** Nova versão Web GAS → ping **v1.5.76** → `?force=1.8.1` → Dashboard + Caixa
+**v1.5.77 no seu PC:**
 
-**Paralelo ops:** B7 semanal · treino N1 badge Recorrente · tablet `?force=1.7.98`.
+```
+C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github\MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs
+```
+
+**Paralelo ops:** B7 semanal · treino N1 badge Recorrente · tablet `?force=1.8.4` · PC admin `?force=1.8.4`.
 
 **Últimos commits (main = origin):**
 
 | Hash | Entrega |
 |------|---------|
-| `9efa30a` | **P3** — GAS v1.5.73 + FE v1.7.97 |
-| `91cc08f` | **v1.7.96** — fix splash idle boot (I21) |
-| `8173d10` | FASE 5 docs + mock-idle Pages |
-| `0e9e47c` | v1.7.95 — portal fixo Home |
-| `c3f92ac` | v1.7.94 + GAS v1.5.72 — B8 idle |
+| `dbf5c49` | fix pre-push I22 |
+| `59e4ca4` | I22 pós-mortem + Regra 14 |
+| `f2574da` | hotfix Home v1.8.2 |
+| `6e6f42e` | FASE 6–7 cockpit + leading |
 
 Detalhe vivo: seção **Execução — status ao vivo** em `PLANO_PRIORIDADES_2026-06.md`.
 
@@ -188,7 +203,8 @@ C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\m
 | **Deploy GAS** | Mesmo Deploy ID → **Nova versão** no editor. **Nunca** `clasp deploy`. |
 | **Tablet obrigatório** | Mudança em `api()` ou auth → testar no tablet físico. |
 | **Pre-push** | Rodar `.\scripts\pre-push-check.ps1` antes de `git push`. |
-| **I22 — Janela operacional** | **Nunca** push FE crítico (`index.html`, Home, sync) com locações Ativa/Pendente — `check-operacao-livre.ps1` · doc I22. |
+| **I22 — Janela operacional** | **Nunca** push FE crítico com locações Ativa/Pendente — `check-operacao-livre.ps1` |
+| **I23 — KPI Dashboard** | Mutex hub/dash separado; `resumoDia` leve no GAS — Regra 15 |
 | **Versões alinhadas** | `mk-version.js` = `sw.js` SW_VERSION após mudança FE. |
 | **F4 / F9 pausados** | WhatsApp auto e supervisor — não reativar sem decisão explícita. |
 
@@ -206,7 +222,7 @@ Invoke-RestMethod "https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5
 .\scripts\pre-push-check.ps1
 ```
 
-Esperado: ping `versao: v1.5.72`, pre-push verde, FE **1.7.96** (Pages + `mk-version.js`).
+Esperado: ping alvo `versao: v1.5.77`, pre-push verde, FE **1.8.4** (Pages + `mk-version.js`).
 
 ---
 
