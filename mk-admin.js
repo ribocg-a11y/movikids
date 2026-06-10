@@ -831,7 +831,7 @@ function renderExecCockpit_(d) {
     resEl.textContent = R2(resultado);
     resEl.className = 'mk-exec-kpi-val ' + (resultado >= 0 ? 'green' : 'red');
   }
-  setText2('mk-exec-res-d', (d.nMes || 0) + ' loc · custos ' + R2(d.cusMes || 0));
+  setText2('mk-exec-res-d', (d.nMes || 0) + ' locações no mês');
 
   const pb = d.payback;
   const pbEl = document.getElementById('mk-exec-payback');
@@ -889,7 +889,7 @@ function renderLeadingFinanceiro_(d) {
   setText2('mk-lead-rhora', R2(lf.receitaPorHoraOperada || 0));
   setText2('mk-lead-rhora-sub', (d.diasOperando || 0) + ' dias × ' + (lf.receitaPorHoraOperada > 0 ? '12h/dia' : '—'));
   setText2('mk-lead-custoloc', R2(lf.custoPorLocacao || 0));
-  setText2('mk-lead-custoloc-sub', 'OPEX ' + R2(d.cusMes || 0));
+  setText2('mk-lead-custoloc-sub', '÷ ' + (d.nMes || 0) + ' loc · OPEX rateado');
   const be = lf.breakEvenLocacoesDia;
   setText2('mk-lead-be', be != null ? (be + ' loc') : '—');
   setText2('mk-lead-be-sub', lf.custoDiaMedio != null ? ('custo dia ~' + R2(lf.custoDiaMedio)) : '—');
@@ -928,9 +928,11 @@ function renderDashboardCore_(d) {
   }
   setText2('nk-nloc', String(d.nMes || 0));
   setText2('nk-nloc-sub', (d.diasOperando || 0) + ' dias · média ' + R2(d.mediaDiaria || 0) + '/dia');
-  setText2('nk-cusmes', R2(d.cusMes));
-  const cusPct = d.fatMes > 0 ? Math.round((d.cusMes || 0) / d.fatMes * 1000) / 10 : 0;
-  setText2('nk-cusmes-sub', cusPct > 0 ? cusPct + '% do faturamento' : 'sem custos lançados');
+  const canc = d.cancelamentos || { total: 0, taxaPct: 0 };
+  const nCanc = Number(canc.total) || 0;
+  const taxaCanc = canc.taxaPct > 0 ? canc.taxaPct : ((d.nMes || 0) > 0 ? Math.round(nCanc / d.nMes * 1000) / 10 : 0);
+  setText2('nk-canc', String(nCanc));
+  setText2('nk-canc-sub', nCanc > 0 ? (taxaCanc + '% das locações') : 'operação limpa no mês');
   const extVal = Number(d.extMes) || 0;
   const pctExt = d.pctExtMes != null ? d.pctExtMes : (d.fatMes > 0 ? Math.round(extVal / d.fatMes * 1000) / 10 : 0);
   setText2('nk-extmes', R2(extVal));

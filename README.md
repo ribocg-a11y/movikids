@@ -10,9 +10,9 @@ Sistema operacional para locações — balcão (tablet), portal do responsável
 
 | Camada | Versão repo | Produção alvo |
 |--------|-------------|---------------|
-| Frontend | **v1.8.7** | https://ribocg-a11y.github.io/movikids/?force=1.8.7 |
+| Frontend | **v1.8.8** | https://ribocg-a11y.github.io/movikids/?force=1.8.8 |
 | Apps Script | **v1.5.78** | ping ok · `DEPLOY_v1.5.78_FASE7_KPI_PERF.md` |
-| Git `main` | push v1.8.7 | Pacote I KPI dedup + docs |
+| Git `main` | push v1.8.8 | OPEX dedup Pacote I |
 
 ## Novo chat / agente Cursor
 

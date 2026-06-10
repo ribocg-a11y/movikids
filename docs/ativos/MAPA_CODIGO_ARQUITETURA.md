@@ -292,8 +292,11 @@ Antes de alterar, **declarar escopo** (Regra 1) e **pedir OK** do responsável:
 | Faturamento **hoje** (detalhe) | **Caixa** |
 | Chip “Hoje” na Home | Atalho → Caixa |
 | Faturamento **mês**, margem, resultado, payback, ocupação | **Cockpit** `#mk-exec-cockpit` |
+| OPEX total do mês (`cusMes`) | **CTO strip** `#nk-cto-strip` (waterfall resultado) |
+| Custo por locação (derivado) | **Leading** `#mk-leading-row` |
+| Custos por categoria (detalhe) | **Gestão avançada** (abaixo) |
 | Ticket médio, R$/h, break-even | **Leading** `#mk-leading-row` |
-| Ano, locações, custos, extras, caixa hoje | **Dashboard** linha `#new-kpi-row` |
+| Ano, locações, cancelamentos, extras, caixa hoje | **Dashboard** linha `#new-kpi-row` |
 | Contagem ativas/encerradas hoje | **Home** stats-bar |
 | Diagnóstico técnico | **Sistema** |
 

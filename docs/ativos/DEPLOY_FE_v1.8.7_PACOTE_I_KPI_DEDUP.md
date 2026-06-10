@@ -32,7 +32,7 @@ git push origin main
 |-------|----------|
 | **Cockpit** `#mk-exec-cockpit` | Fat mês, margem, resultado, payback, ocupação |
 | **Leading** `#mk-leading-row` | Ticket médio, R$/h, custo/loc, break-even |
-| **KPI row** `#new-kpi-row` | Ano · Locações · Custos · Extras · Caixa hoje |
+| **KPI row** `#new-kpi-row` | Ano · Locações · Cancelamentos · Extras · Caixa hoje |
 
 ---
 
