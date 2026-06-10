@@ -382,9 +382,9 @@ function ping_() {
   const agora = new Date();
   return resp_({
     status:  'online',
-    versao:  'v1.5.80',
+    versao:  'v1.5.81',
     timestamp: fmtData_(agora) + ' ' + fmtHoraLocal_(agora),
-    sistema: 'MOVI KIDS v1.5.80',
+    sistema: 'MOVI KIDS v1.5.81',
     postWriteActions: WRITE_ACTIONS_CRITICAS_
   });
 }
