@@ -42,7 +42,7 @@ function Test-PageDivBalance {
   $divStart = $Html.LastIndexOf("<div", $start)
   if ($divStart -lt 0) { return $null }
   $tail = $Html.Substring($divStart)
-  $nextPage = [regex]::Match($tail, "<!--\s*────────\s*PAGE:")
+  $nextPage = [regex]::Match($tail, '<!--[^>]*PAGE:')
   $len = if ($nextPage.Success) { $nextPage.Index } else { $tail.Length }
   $chunk = $tail.Substring(0, $len)
   $opens = ([regex]::Matches($chunk, "<div[\s>]")).Count
@@ -180,7 +180,7 @@ try {
       if ($opJs -notmatch 'iniciarContagemDireto_') {
         Add-Check "guard.iniciar.direto" "fail" "mk-operacao sem iniciarContagemDireto_ (I20)"
       } else {
-        Add-Check "guard.iniciar.direto" "ok" "▶ inicia sem modal SMS"
+        Add-Check "guard.iniciar.direto" "ok" "inicia sem modal SMS"
       }
       if ($opJs -notmatch '_localTimerStart' -or $opJs -notmatch 'const clickTs = Date\.now\(\)') {
         Add-Check "guard.fe.iniciar.otimista" "fail" "mk-operacao sem inicio otimista clickTs/_localTimerStart (I20)"
@@ -322,7 +322,7 @@ try {
   if ($feAlterado -and (Test-Path $operCheck) -and -not $SkipNetworkTests) {
     & $operCheck 2>&1 | Out-Null
     if ($LASTEXITCODE -ne 0) {
-      Add-Check "guard.operacao.livre" "fail" "locacoes Ativa/Pendente — Regra 14 (I22); use -Force no check so hotfix P0"
+      Add-Check "guard.operacao.livre" "fail" "locacoes Ativa/Pendente - Regra 14 (I22); use -Force no check so hotfix P0"
     } else {
       Add-Check "guard.operacao.livre" "ok" "sem locacoes abertas"
     }
