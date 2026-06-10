@@ -55,8 +55,8 @@ Detalhe completo: [`ACESSOS_E_AUTORIZACOES.md`](docs/ativos/ACESSOS_E_AUTORIZACO
 
 | Camada | Versão repo | Ping produção |
 |--------|-------------|---------------|
-| Frontend | **v1.8.10** | https://ribocg-a11y.github.io/movikids/?force=1.8.10 |
-| GAS | **v1.5.80** (Nova versão Web pendente) | **v1.5.79** até publicar |
+| Frontend | **v1.8.13** | https://ribocg-a11y.github.io/movikids/?force=1.8.13 |
+| GAS | **v1.5.80** | Nova versão Web publicada |
 | Deploy ID | `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y` | |
 
 **GAS canônico (sempre informar se alterou):**
@@ -89,8 +89,9 @@ Fonte de verdade: `mk-version.js`, header do `.gs`, ping GAS.
 ## Estado do projeto (10/06/2026)
 
 - **FASE 1–8:** ✅ repo (FASE 8 alertas v1.8.9/v1.5.79)
-- **FASE 9 Folha CLT:** ✅ repo v1.8.10/v1.5.80 — publicar pendente
-- **Próximo:** Nova versão Web GAS · homolog Dashboard painel CLT · DNA visual admin (fase plano 6–15)
+- **FASE 9 Folha CLT:** ✅ v1.8.10/v1.5.80
+- **Dashboard narrativo:** ✅ v1.8.13 — seções 1–5, lucro/meta sem vs com folha
+- **Próximo:** homolog v1.8.13 · DNA visual admin (fase plano 6–15)
 
 ## Ao encerrar sessão
 

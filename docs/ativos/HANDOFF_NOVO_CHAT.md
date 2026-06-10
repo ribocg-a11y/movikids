@@ -1,6 +1,6 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 10/06/2026 (FE **v1.8.10** + GAS **v1.5.80** · FASE 9 Folha CLT · FASE 8 alertas repo)  
+**Atualizado:** 10/06/2026 (FE **v1.8.13** + GAS **v1.5.80** · Dashboard narrativo · FASE 9 Folha CLT)  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **Repo local:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`  
@@ -51,7 +51,7 @@ Continuo o MOVI KIDS. Repo: C:\Users\riboc\Documents\Codex\2026-05-30\files-ment
 
 - Ler: este arquivo → `PLANO_PRIORIDADES` → `ESTADO_ATUAL` → `REGRAS` → `ACESSOS_E_AUTORIZACOES` (§7 = agente vs você)
 - Ignorar handoff antigo em `docs/arquivo/planos/`
-- Informar: FE **v1.8.10**, GAS **v1.5.80** (repo) · ping prod. **v1.5.79** até Nova versão Web
+- Informar: FE **v1.8.13**, GAS **v1.5.80** · ping prod. **v1.5.80**
 - **Toda resposta:** `Mudança no AppScript: sim|não` + link canônico `.gs` (Regra 16)
 - Deixar claro: **agente** no **PC** (código, testes, planilha); **você** Nova versão GAS Web; **tablet no balcão** = validação operação (não confundir com seu computador)
 
@@ -87,10 +87,10 @@ Regra Cursor: `.cursor/rules/handoff-movikids.mdc` § Modo de operação.
 
 | Camada | Versão | Verificação |
 |--------|--------|-------------|
-| **Frontend** | **v1.8.10** | `mk-version.js` · `?force=1.8.10` |
-| **Service Worker** | **1.8.10** | `sw.js` |
-| **Apps Script (código)** | **v1.5.80** | clasp push ✅ · **Nova versão Web** pendente |
-| **Apps Script (ping)** | **v1.5.79** | Até você publicar Nova versão |
+| **Frontend** | **v1.8.13** | `mk-version.js` · `?force=1.8.13` |
+| **Service Worker** | **1.8.13** | `sw.js` |
+| **Apps Script (código)** | **v1.5.80** | clasp push ✅ · Nova versão Web ✅ |
+| **Apps Script (ping)** | **v1.5.80** | Ping abaixo |
 
 **Deploy ID GAS (único — nunca criar outro):** `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y`
 
@@ -116,7 +116,7 @@ Regra Cursor: `.cursor/rules/handoff-movikids.mdc` § Modo de operação.
 | Tarefa | Ler |
 |--------|-----|
 | Deploy GAS | `DEPLOY_GAS_v1.5.32_AUTH.md` + **`DEPLOY_v1.5.80_FASE9_FOLHA_VIABILIDADE.md`** |
-| Deploy FE | **`DEPLOY_FE_v1.8.10_FASE9_FOLHA_VIABILIDADE.md`** · FASE 8: `DEPLOY_FE_v1.8.9_FASE8_ALERTAS.md` |
+| Deploy FE | **`DEPLOY_FE_v1.8.12_DASHBOARD_NARRATIVO.md`** · FASE 9: `DEPLOY_FE_v1.8.10_FASE9_FOLHA_VIABILIDADE.md` |
 | Folha / CLT | **`FASE_9_FOLHA_VIABILIDADE_CLT.md`** · `../referencia/FOLHA_PAGAMENTO_MEMORIAL_E_PLANILHA.md` |
 | Bug / incidente | `MAPA_ERROS_FALHAS_BUGS.md` → I20–I23 → `docs/arquivo/incidentes/` |
 | QA tablet | **`PROTOCOLO_DIAGNOSTICO_E_TESTES.md`** → `TESTE_PROTOCOLO_DIAGNOSTICO.ps1` · homologação F5–F11: `TESTE_TABLET_F5_F7_F10_F11.ps1` |
@@ -126,25 +126,23 @@ Regra Cursor: `.cursor/rules/handoff-movikids.mdc` § Modo de operação.
 
 ---
 
-## Próximo passo (10/06/2026 — pós FASE 9 repo)
+## Próximo passo (10/06/2026 — pós Dashboard narrativo v1.8.13)
 
-**FASE 8–9 repo:** ✅ alertas v1.8.9/v1.5.79 · folha CLT v1.8.10/v1.5.80
+**FASE 8–9 + Dashboard narrativo:** ✅ alertas · folha CLT · seções 1–5 · lucro/meta sem vs com folha
 
 | # | Ação | Quem |
 |---|------|------|
-| 1 | **Nova versão Web** GAS v1.5.80 — `DEPLOY_v1.5.80_FASE9_FOLHA_VIABILIDADE.md` | **Você** (editor) |
-| 2 | Ping → `v1.5.80` | Agente ou você |
-| 3 | Push FE v1.8.10 (se ainda não) + `?force=1.8.10` — painel **Sustentabilidade CLT** | Agente push · você homolog |
-| 4 | Tablet Home F0 smoke | Você (balcão) |
+| 1 | Homolog Dashboard `?force=1.8.13` — seções legíveis + seção 2 comparativo | **Você** (PC admin) |
+| 2 | Tablet Home F0 smoke | Você (balcão) |
+| 3 | FASE 10+ (DNA visual admin / mini-DRE) — ver `PLANO_FASES_6_15` | Backlog |
 
 **Deploy (regra de ouro — referência):**
 
 | Doc | Conteúdo |
 |-----|----------|
+| **`DEPLOY_FE_v1.8.12_DASHBOARD_NARRATIVO.md`** | **FE v1.8.11–1.8.13** — capítulos + legibilidade |
 | **`DEPLOY_v1.5.80_FASE9_FOLHA_VIABILIDADE.md`** | **GAS v1.5.80** — folha + viabilidade |
-| **`DEPLOY_FE_v1.8.10_FASE9_FOLHA_VIABILIDADE.md`** | **FE v1.8.10** — painel CLT |
-| **`DEPLOY_v1.5.79_FASE8_ALERTAS.md`** | FASE 8 alertas |
-| **`DEPLOY_GAS_v1.5.32_AUTH.md`** | Deploy mestre + link `.gs` |
+| **`DEPLOY_FE_v1.8.10_FASE9_FOLHA_VIABILIDADE.md`** | FASE 9 painel CLT (base) |
 
 **Regra 16:** toda resposta do agente termina com `Mudança no AppScript: sim|não` + link canônico.
 
@@ -152,10 +150,9 @@ Regra Cursor: `.cursor/rules/handoff-movikids.mdc` § Modo de operação.
 
 | Hash | Entrega |
 |------|---------|
-| (v1.8.7) | Pacote I KPI row — locações + extras |
-| `4d74a07` | v1.8.6 ticket médio dedup |
-| `1a7d0d3` | I23 fase 2 perf v1.8.5/v1.5.78 |
-| `dca694f` | I23 fase 1 v1.8.4/v1.5.77 |
+| `45c1f72` | v1.8.12 — legibilidade capítulos + média loc/dia |
+| `31b311f` | v1.8.11 — Dashboard narrativo seções 1–5 |
+| `e1e75bd` | v1.8.10/v1.5.80 — FASE 9 Folha CLT |
 
 Detalhe vivo: seção **Execução — status ao vivo** em `PLANO_PRIORIDADES_2026-06.md`.
 

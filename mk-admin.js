@@ -1010,7 +1010,7 @@ function renderExecCockpit_(d) {
   const nar = document.getElementById('mk-exec-narrativa');
   if (nar) {
     var text = d.narrativaExecutiva || 'Leitura executiva indisponível — publique GAS v1.5.75+.';
-    text = text.replace(/\s*CLT simulado[^.]*\.\s*/i, ' ');
+    text = text.replace(/\s*CLT simulado[\s\S]*?\/mês\.\s*/i, ' ');
     nar.textContent = text.trim();
   }
 

@@ -9,7 +9,7 @@ Referência única para alinhamento local × produção.
 **Mapa de erros/bugs:** **`MAPA_ERROS_FALHAS_BUGS.md`**  
 **FASE 9 Folha CLT:** **`FASE_9_FOLHA_VIABILIDADE_CLT.md`**  
 **Memorial folha:** `../referencia/FOLHA_PAGAMENTO_MEMORIAL_E_PLANILHA.md`  
-**Deploy GAS pacote:** **`DEPLOY_v1.5.80_FASE9_FOLHA_VIABILIDADE.md`** · FE **`DEPLOY_FE_v1.8.10_FASE9_FOLHA_VIABILIDADE.md`**
+**Deploy GAS pacote:** **`DEPLOY_v1.5.80_FASE9_FOLHA_VIABILIDADE.md`** · FE **`DEPLOY_FE_v1.8.12_DASHBOARD_NARRATIVO.md`**
 
 ---
 
@@ -24,9 +24,9 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 | Camada | Versão repo | URL / ID |
 |--------|-------------|----------|
-| **Frontend** | **v1.8.10** | https://ribocg-a11y.github.io/movikids/?force=1.8.10 |
-| **Apps Script (código)** | **v1.5.80** | clasp push ✅ · **Nova versão Web pendente** → `DEPLOY_v1.5.80_FASE9_FOLHA_VIABILIDADE.md` |
-| **Apps Script (ping prod.)** | **v1.5.79** até Nova versão | Ping abaixo |
+| **Frontend** | **v1.8.13** | https://ribocg-a11y.github.io/movikids/?force=1.8.13 |
+| **Apps Script (código)** | **v1.5.80** | clasp push ✅ · Nova versão Web |
+| **Apps Script (ping prod.)** | **v1.5.80** | Ping abaixo |
 | **Aba FOLHA** | memorial B68 | [gid=179040058](https://docs.google.com/spreadsheets/d/1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618/edit#gid=179040058) |
 
 **Editor Apps Script:** https://script.google.com/home/projects/19SIhkX9Tk7FiJA1JXu1OrUwssHdr3H5zc8q3rOjmBvqgWfXuHlk8xyf8/edit
