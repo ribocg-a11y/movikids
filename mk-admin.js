@@ -918,7 +918,7 @@ function renderDashboardCore_(d) {
     if (sel) sel.value = String(d.mesAtual);
   }
 
-  // KPIs (detalhe — linha abaixo do cockpit; ticket médio só em #mk-leading-row — Pacote I)
+  // KPIs complementares (cockpit = fat/margem/resultado/payback/ocupação — Pacote I)
   if (d.fatAno != null) {
     setText2('nk-fatano', R2(d.fatAno));
     setText2('nk-fatano-sub', (d.nAno || 0) + ' locações em ' + (d.anoAtual || ''));
@@ -926,14 +926,15 @@ function renderDashboardCore_(d) {
     setText2('nk-fatano', '—');
     setText2('nk-fatano-sub', 'atualize o GAS para ver o acumulado');
   }
-  setText2('nk-fatmes',  R2(d.fatMes));
-  setText2('nk-nloc',    d.nMes + ' locações no mês');
-  setText2('nk-cusmes',  R2(d.cusMes));
+  setText2('nk-nloc', String(d.nMes || 0));
+  setText2('nk-nloc-sub', (d.diasOperando || 0) + ' dias · média ' + R2(d.mediaDiaria || 0) + '/dia');
+  setText2('nk-cusmes', R2(d.cusMes));
   const cusPct = d.fatMes > 0 ? Math.round((d.cusMes || 0) / d.fatMes * 1000) / 10 : 0;
   setText2('nk-cusmes-sub', cusPct > 0 ? cusPct + '% do faturamento' : 'sem custos lançados');
-  const resEl = document.getElementById('nk-resultado');
-  if (resEl) { resEl.textContent = R2(d.resultado); resEl.className = 'nkv ' + ((d.resultado||0) >= 0 ? 'green' : 'red'); }
-  setText2('nk-margem',  'margem ' + (d.margem||0) + '%');
+  const extVal = Number(d.extMes) || 0;
+  const pctExt = d.pctExtMes != null ? d.pctExtMes : (d.fatMes > 0 ? Math.round(extVal / d.fatMes * 1000) / 10 : 0);
+  setText2('nk-extmes', R2(extVal));
+  setText2('nk-extmes-sub', (d.nComExtra || 0) + ' loc. com extra' + (pctExt > 0 ? ' · ' + pctExt + '% fat.' : ''));
   setText2('nk-fathoje', 'Conferir →');
   const nHoje = nHojeCanonica_();
   setText2('nk-cushoje', nHoje + (nHoje === 1 ? ' locação hoje' : ' locações hoje') + ' · abre Caixa');

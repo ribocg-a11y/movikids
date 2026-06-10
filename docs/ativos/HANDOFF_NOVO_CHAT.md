@@ -1,6 +1,6 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 09/06/2026 (FE **v1.8.4** + GAS **v1.5.77** · I23 fechado · **FASE 8** próxima)  
+**Atualizado:** 10/06/2026 (FE **v1.8.7** + GAS **v1.5.78** · Pacote I KPI dedup · **FASE 8** próxima)  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **Repo local:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`  
@@ -51,7 +51,7 @@ Continuo o MOVI KIDS. Repo: C:\Users\riboc\Documents\Codex\2026-05-30\files-ment
 
 - Ler: este arquivo → `PLANO_PRIORIDADES` → `ESTADO_ATUAL` → `REGRAS` → `ACESSOS_E_AUTORIZACOES` (§7 = agente vs você)
 - Ignorar handoff antigo em `docs/arquivo/planos/`
-- Informar: FE **v1.8.5** (repo), GAS **v1.5.78** (repo) — publicar antes de FASE 8
+- Informar: FE **v1.8.7** (repo/produção pós-push), GAS **v1.5.78** (produção)
 - Deixar claro: **agente** no **PC** (código, testes, planilha); **você** Nova versão GAS Web; **tablet no balcão** = validação operação (não confundir com seu computador)
 
 ---
@@ -86,10 +86,10 @@ Regra Cursor: `.cursor/rules/handoff-movikids.mdc` § Modo de operação.
 
 | Camada | Versão | Verificação |
 |--------|--------|-------------|
-| **Frontend** | **v1.8.2** (FASE 6–7 + hotfix I22) | `mk-version.js` · `?force=1.8.2` |
-| **Service Worker** | **1.8.2** | `sw.js` |
-| **Apps Script (código)** | **v1.5.76** | Ping após **Nova versão Web** |
-| **App tablet balcão** | **v1.8.2** obrigatório pós-I22 | Home + balcão — ver `DEPLOY_FE_v1.8.2_HOTFIX_I22.md` |
+| **Frontend** | **v1.8.7** (Pacote I KPI dedup) | `mk-version.js` · `?force=1.8.7` |
+| **Service Worker** | **1.8.7** | `sw.js` |
+| **Apps Script (código)** | **v1.5.78** | Ping após **Nova versão Web** |
+| **App tablet balcão** | **v1.8.7** recomendado pós-push | Home + balcão — ver `DEPLOY_FE_v1.8.7_PACOTE_I_KPI_DEDUP.md` |
 
 **Deploy ID GAS (único — nunca criar outro):** `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y`
 
@@ -114,7 +114,8 @@ Regra Cursor: `.cursor/rules/handoff-movikids.mdc` § Modo de operação.
 
 | Tarefa | Ler |
 |--------|-----|
-| Deploy GAS | `DEPLOY_GAS_v1.5.32_AUTH.md` + **`DEPLOY_v1.5.78_FASE7_KPI_PERF.md`** · **`DEPLOY_FE_v1.8.5_DASHBOARD_PERF.md`** |
+| Deploy GAS | `DEPLOY_GAS_v1.5.32_AUTH.md` + **`DEPLOY_v1.5.78_FASE7_KPI_PERF.md`** |
+| Deploy FE | **`DEPLOY_FE_v1.8.7_PACOTE_I_KPI_DEDUP.md`** · **`DEPLOY_FE_v1.8.5_DASHBOARD_PERF.md`** |
 | Deploy FE hotfix | **`DEPLOY_FE_v1.8.2_HOTFIX_I22.md`** |
 | Bug / incidente | `MAPA_ERROS_FALHAS_BUGS.md` → I20–I23 → `docs/arquivo/incidentes/` |
 | QA tablet | **`PROTOCOLO_DIAGNOSTICO_E_TESTES.md`** → `TESTE_PROTOCOLO_DIAGNOSTICO.ps1` · homologação F5–F11: `TESTE_TABLET_F5_F7_F10_F11.ps1` |
@@ -124,52 +125,41 @@ Regra Cursor: `.cursor/rules/handoff-movikids.mdc` § Modo de operação.
 
 ---
 
-## Próximo passo (09/06/2026 — pós-I23 complemento perf)
+## Próximo passo (10/06/2026 — pós Pacote I v1.8.7)
 
-**FASE 5–7 repo:** ✅ FASE 6–7 · I22 · I23 fase 1 (**v1.8.4** / **v1.5.77**) · **I23 fase 2 perf** repo **v1.8.5** / **v1.5.78** (pendente publicar)
+**FASE 5–7:** ✅ GAS **v1.5.78** em produção · FE **v1.8.7** (Pacote I KPI dedup) pushado
 
 **Incidentes recentes:**
 - **I22:** Home — v1.8.2 · Regra 14
-- **I23:** mutex + resumoDia leve (v1.8.4/v1.5.77) + **leitura única kpiMes + cache SWR** (v1.8.5/v1.5.78)
+- **I23:** mutex + resumoDia (v1.8.4/v1.5.77) + kpiMes perf + cache SWR (v1.8.5/v1.5.78) — **fechado**
 
-**Ciclo FASE 6–15:** **FASE 8** próxima — após **v1.5.78** + **v1.8.5** publicados
-
-**Antes de FASE 8:**
+**Ciclo FASE 6–15:** **FASE 8** — alertas/semáforos (`FASE_8_ALERTAS_SEMAFOROS.md`)
 
 | # | Ação |
 |---|------|
-| 1 | Publicar **GAS v1.5.78** + **FE v1.8.5** (pacote regra de ouro abaixo) |
-| 2 | PC admin: Dashboard KPIs &lt;5s; reabertura instantânea (cache) |
-| 3 | Tablet Home ok `?force=1.8.5` |
-| 4 | `check-operacao-livre.ps1` → 0 locações abertas |
+| 1 | PC admin: homologar Dashboard `?force=1.8.7` — cockpit + leading + KPI row sem duplicata |
+| 2 | Tablet Home F0 ok |
+| 3 | Implementar FASE 8 — GAS `buildAlertasGestao_` + FE `#mk-alert-strip` |
 
-**Deploy (regra de ouro — pacote completo):**
+**Deploy (regra de ouro — referência):**
 
 | Doc | Conteúdo |
 |-----|----------|
+| **`DEPLOY_FE_v1.8.7_PACOTE_I_KPI_DEDUP.md`** | **FE v1.8.6–7** — KPI row sem duplicata |
 | **`DEPLOY_v1.5.78_FASE7_KPI_PERF.md`** | **GAS v1.5.78** — leitura única + lite + cache |
 | **`DEPLOY_FE_v1.8.5_DASHBOARD_PERF.md`** | **FE v1.8.5** — cache SWR + lite→full |
-| **`DEPLOY_v1.5.77_FASE7_PERF.md`** | I23 fase 1 (mutex + resumoDia) |
-| **`DEPLOY_v1.5.76_FASE7_LEADING.md`** | FASE 6–7 base |
 | **`DEPLOY_FE_v1.8.2_HOTFIX_I22.md`** | Hotfix Home I22 |
 
-**v1.5.78 no seu PC:**
+**Paralelo ops:** B7 semanal · tablet/PC admin `?force=1.8.7`.
 
-```
-C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github\MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs
-```
-
-**Paralelo ops:** B7 semanal · tablet/PC admin `?force=1.8.5` após push.
-
-**Últimos commits (main = origin):**
+**Últimos commits (main = origin após push):**
 
 | Hash | Entrega |
 |------|---------|
-| `dca694f` | I23 perf + docs sweep v1.8.4/v1.5.77 |
-| `dbf5c49` | fix pre-push I22 |
-| `59e4ca4` | I22 pós-mortem + Regra 14 |
-| `f2574da` | hotfix Home v1.8.2 |
-| `6e6f42e` | FASE 6–7 cockpit + leading |
+| (v1.8.7) | Pacote I KPI row — locações + extras |
+| `4d74a07` | v1.8.6 ticket médio dedup |
+| `1a7d0d3` | I23 fase 2 perf v1.8.5/v1.5.78 |
+| `dca694f` | I23 fase 1 v1.8.4/v1.5.77 |
 
 Detalhe vivo: seção **Execução — status ao vivo** em `PLANO_PRIORIDADES_2026-06.md`.
 

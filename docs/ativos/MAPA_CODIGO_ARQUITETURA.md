@@ -291,7 +291,9 @@ Antes de alterar, **declarar escopo** (Regra 1) e **pedir OK** do responsável:
 |---------|----------------|
 | Faturamento **hoje** (detalhe) | **Caixa** |
 | Chip “Hoje” na Home | Atalho → Caixa |
-| Faturamento **mês**, CTO, payback, Pacote F | **Dashboard** |
+| Faturamento **mês**, margem, resultado, payback, ocupação | **Cockpit** `#mk-exec-cockpit` |
+| Ticket médio, R$/h, break-even | **Leading** `#mk-leading-row` |
+| Ano, locações, custos, extras, caixa hoje | **Dashboard** linha `#new-kpi-row` |
 | Contagem ativas/encerradas hoje | **Home** stats-bar |
 | Diagnóstico técnico | **Sistema** |
 

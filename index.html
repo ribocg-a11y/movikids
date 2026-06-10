@@ -16,16 +16,16 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<script src="mk-stale-sync.js?v=1.8.6"></script>
-<script src="mk-version.js?v=1.8.6"></script>
-<script src="mk-api.js?v=1.8.6"></script>
-<link rel="stylesheet" href="mk-design.css?v=1.8.6">
+<script src="mk-stale-sync.js?v=1.8.7"></script>
+<script src="mk-version.js?v=1.8.7"></script>
+<script src="mk-api.js?v=1.8.7"></script>
+<link rel="stylesheet" href="mk-design.css?v=1.8.7">
 
-<script src="mk-cache-bust.js?v=1.8.6"></script>
+<script src="mk-cache-bust.js?v=1.8.7"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<link rel="stylesheet" href="mk-app.css?v=1.8.6">
+<link rel="stylesheet" href="mk-app.css?v=1.8.7">
 <!-- Firebase SDK — Realtime sync canonico para todos os dispositivos -->
-<script type="module" src="mk-firebase.js?v=1.8.6"></script>
+<script type="module" src="mk-firebase.js?v=1.8.7"></script>
 </head>
 
 <body>
@@ -919,9 +919,9 @@
         <div class="nks" id="nk-fatano-sub">acumulado do ano</div>
       </div>
       <div class="new-kpi">
-        <label>Faturamento do mês</label>
-        <div class="nkv blue" id="nk-fatmes">...</div>
-        <div class="nks" id="nk-nloc">— locações</div>
+        <label>Locações no mês</label>
+        <div class="nkv blue" id="nk-nloc">...</div>
+        <div class="nks" id="nk-nloc-sub">dias com movimento</div>
       </div>
       <div class="new-kpi">
         <label>Custos do mês</label>
@@ -929,9 +929,9 @@
         <div class="nks" id="nk-cusmes-sub">OPEX operacional</div>
       </div>
       <div class="new-kpi">
-        <label>Resultado líquido</label>
-        <div class="nkv green" id="nk-resultado">...</div>
-        <div class="nks" id="nk-margem">margem —</div>
+        <label>Extras no mês</label>
+        <div class="nkv green" id="nk-extmes">...</div>
+        <div class="nks" id="nk-extmes-sub">minutos adicionais</div>
       </div>
       <div class="new-kpi" role="button" tabindex="0" onclick="irAdmin('caixa')" onkeydown="if(event.key==='Enter')irAdmin('caixa')" title="Conferência do dia — abre Caixa (valor só na Caixa)">
         <label>Caixa de hoje</label>
@@ -1465,22 +1465,22 @@
   </div>
 </div>
 
-<script src="mk-globals.js?v=1.8.6"></script>
-<script src="mk-core.js?v=1.8.6"></script>
-<script src="mk-nav.js?v=1.8.6"></script>
-<script src="mk-admin.js?v=1.8.6"></script>
-<script src="mk-historico.js?v=1.8.6"></script>
-<script src="mk-sessao.js?v=1.8.6"></script>
-<script src="mk-home.js?v=1.8.6"></script>
-<script src="mk-custos.js?v=1.8.6"></script>
-<script src="mk-avulso.js?v=1.8.6"></script>
-<script src="mk-sync.js?v=1.8.6"></script>
-<script src="mk-nova.js?v=1.8.6"></script>
-<script src="mk-relacionamento.js?v=1.8.6"></script>
-<script src="mk-operacao.js?v=1.8.6"></script>
-<script src="mk-drawer.js?v=1.8.6"></script>
-<script src="mk-update.js?v=1.8.6"></script>
-<script src="mk-auth.js?v=1.8.6"></script>
-<script src="mk-boot.js?v=1.8.6"></script>
+<script src="mk-globals.js?v=1.8.7"></script>
+<script src="mk-core.js?v=1.8.7"></script>
+<script src="mk-nav.js?v=1.8.7"></script>
+<script src="mk-admin.js?v=1.8.7"></script>
+<script src="mk-historico.js?v=1.8.7"></script>
+<script src="mk-sessao.js?v=1.8.7"></script>
+<script src="mk-home.js?v=1.8.7"></script>
+<script src="mk-custos.js?v=1.8.7"></script>
+<script src="mk-avulso.js?v=1.8.7"></script>
+<script src="mk-sync.js?v=1.8.7"></script>
+<script src="mk-nova.js?v=1.8.7"></script>
+<script src="mk-relacionamento.js?v=1.8.7"></script>
+<script src="mk-operacao.js?v=1.8.7"></script>
+<script src="mk-drawer.js?v=1.8.7"></script>
+<script src="mk-update.js?v=1.8.7"></script>
+<script src="mk-auth.js?v=1.8.7"></script>
+<script src="mk-boot.js?v=1.8.7"></script>
 </body>
 </html>

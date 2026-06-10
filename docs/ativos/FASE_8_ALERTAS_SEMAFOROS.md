@@ -2,9 +2,9 @@
 
 **Status:** 🟡 **próxima** (planejamento ativo)  
 **Prioridade:** P1  
-**Versão alvo:** FE **v1.8.3** · GAS **v1.5.77**  
+**Versão alvo:** FE **v1.8.7** · GAS **v1.5.78**  
 **Plano mestre:** `PLANO_FASES_6_15_COCKPIT_EXECUTIVO_2026-06.md` § FASE 8  
-**Depende de:** FASE 6–7 no repo · hotfix **I22** (FE v1.8.2) · **Regra 14** operacional
+**Depende de:** FASE 6–7 publicadas · **v1.8.5+** / **v1.5.78** · hotfix **I22** · **Regra 14**
 
 ---
 
@@ -14,8 +14,8 @@
 |---|------|-------------------|------|
 | P0.1 | Home estável pós-I22 | Tablet F0: sessões, sync, Nova locação | Ops |
 | P0.2 | Operacao livre | `.\scripts\check-operacao-livre.ps1` → 0 Ativa/Pendente | Dev |
-| P0.3 | GAS FASE 6–7 em produção | Ping `versao: v1.5.76` | Usuário (Nova versão Web) |
-| P0.4 | FE cockpit+leading validado | PC admin `?force=1.8.2` — cockpit + leading | Sócio |
+| P0.3 | GAS FASE 6–7 em produção | Ping `versao: v1.5.78` | ✅ |
+| P0.4 | FE cockpit+leading validado | PC admin `?force=1.8.7` — cockpit + leading + KPIs sem duplicata | Sócio |
 | P0.5 | Documentar escopo | Só `#page-dashboard` + GAS `kpiMes` — **não** tocar Home | Dev |
 
 **Nunca iniciar FASE 8 com locações ativas** (lição I22).

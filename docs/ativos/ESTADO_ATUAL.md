@@ -27,8 +27,8 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 | Camada | Versão alvo | URL / ID |
 |--------|-------------|----------|
-| **Frontend** | **v1.8.5** (repo) | https://ribocg-a11y.github.io/movikids/?force=1.8.5 |
-| **Apps Script** | **v1.5.78** (repo) | `DEPLOY_v1.5.78_FASE7_KPI_PERF.md` · FE: `DEPLOY_FE_v1.8.5_DASHBOARD_PERF.md` · I23 fase 1: `DEPLOY_v1.5.77_FASE7_PERF.md` |
+| **Frontend** | **v1.8.7** (repo) | https://ribocg-a11y.github.io/movikids/?force=1.8.7 |
+| **Apps Script** | **v1.5.78** (produção) | `DEPLOY_v1.5.78_FASE7_KPI_PERF.md` · FE: `DEPLOY_FE_v1.8.7_PACOTE_I_KPI_DEDUP.md` |
 | SMS Gateway Cloud | **DJVJRL** / device `wihWegHr4wXaVJQ1R-GZR` | Aparelho remoto ONLINE |
 | Pacote SMS P0 | **FECHADO** | `PACOTE_SMS_P0_UNIFICADO_v1.5.38_v1.7.11.md` |
 | Planilha | MOVIKIDS_Planilha_Base | https://docs.google.com/spreadsheets/d/1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618/edit — auditoria `AUDITORIA_PLANILHA_BASE_2026-06-06.md` |
@@ -92,6 +92,8 @@ https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPe
 
 | Versão | Entrega |
 |--------|---------|
+| **v1.8.7** | **Pacote I** — KPI row: Ano · Locações · Custos · Extras · Caixa (sem duplicar cockpit/leading) |
+| **v1.8.6** | **Pacote I** — ticket médio só em `#mk-leading-row` |
 | **v1.8.5** + **GAS v1.5.78** | **I23 fase 2** — kpiMes leitura única, lite, cache GAS+FE |
 | **v1.8.4** + **GAS v1.5.77** | **I23 fase 1** — mutex KPI + resumoDia leve |
 | **v1.8.2** | **I22 hotfix** — `</div>` extra Dashboard quebrava Home |
@@ -260,7 +262,9 @@ Commits de referência: `3d9d106` (v1.7.25), `e1a56db` (Pacote E), `1454bc8` (fi
 |---------|------|
 | Faturamento **hoje** (detalhe) | **Caixa** |
 | Chip “Hoje” na Home admin | Atalho → Caixa |
-| Faturamento **mês**, CTO, gestão avançada | **Dashboard** |
+| Faturamento **mês**, margem, resultado, payback, ocupação | **Cockpit** `#mk-exec-cockpit` |
+| Ticket médio, R$/h, break-even | **Leading** `#mk-leading-row` |
+| Ano, locações, custos, extras, caixa hoje | **Dashboard** linha `#new-kpi-row` |
 | Ativas / encerradas hoje (contagem) | **Home** stats-bar |
 | Diagnóstico técnico | **Sistema** |
 
