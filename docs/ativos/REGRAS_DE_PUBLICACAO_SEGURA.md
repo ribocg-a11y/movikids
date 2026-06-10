@@ -228,7 +228,7 @@ Erros cometidos neste projeto que nao devem se repetir:
 2. **Dashboard** abre com **apenas** `action=kpiMes` — nao disparar `resumoDia` em paralelo na mesma tela.
 3. **GAS `resumoDia`:** usar `calcLeadingDiaPatch_` — **nunca** chamar `buildKpiMesPayload_` inteiro dentro de `resumoDia`.
 4. Ao entregar fase com KPIs: incluir `TESTE_KPI_MES_READONLY.ps1` + homolog **PC admin** Dashboard.
-5. Pacote deploy completo: `DEPLOY_v1.5.77_FASE7_PERF.md` (modelo pos-I23).
+5. Pacote deploy completo: **`DEPLOY_v1.5.78_FASE7_KPI_PERF.md`** + **`DEPLOY_FE_v1.8.5_DASHBOARD_PERF.md`** (modelo `DEPLOY_v1.5.76`).
 
 **Documentacao:** `../arquivo/incidentes/INCIDENTE_I23_DASHBOARD_LENTO_TRAVADO_2026-06-09.md` · `MAPA_CODIGO_ARQUITETURA.md` §12
 

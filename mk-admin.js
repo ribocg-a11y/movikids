@@ -602,35 +602,92 @@ async function carregarKPIs() {
   finally { window._kpiHubInFlight = false; }
 }
 
-/** B2: Dashboard — kpiMes (visualização mensal). */
+/** B2: Dashboard — kpiMes (visualização mensal). v1.8.5: cache SWR + lite→full. */
+const KPI_DASH_CACHE_TTL_MS = 5 * 60 * 1000;
+
+function kpiDashCacheKey_(mes, ano) {
+  return 'mk_kpi_dash_' + mes + '_' + ano;
+}
+
+function kpiDashCacheGet_(mes, ano) {
+  try {
+    const raw = sessionStorage.getItem(kpiDashCacheKey_(mes, ano));
+    if (!raw) return null;
+    const o = JSON.parse(raw);
+    if (!o || !o.ts || !o.data || !o.data.ok) return null;
+    if (Date.now() - o.ts > KPI_DASH_CACHE_TTL_MS) return null;
+    return o.data;
+  } catch (e) { return null; }
+}
+
+function kpiDashCacheSet_(mes, ano, data) {
+  try {
+    if (!data || !data.ok) return;
+    sessionStorage.setItem(kpiDashCacheKey_(mes, ano), JSON.stringify({ ts: Date.now(), data: data }));
+  } catch (e) {}
+}
+
+function kpiDashSetLoading_(on) {
+  const el = document.getElementById('page-dashboard');
+  if (!el) return;
+  el.classList.toggle('mk-dash-loading', !!on);
+}
+
+function kpiDashApply_(d) {
+  if (!d || !d.ok) return;
+  kpiData = d;
+  const dashPage = document.getElementById('page-dashboard');
+  if (!dashPage || !dashPage.classList.contains('active')) return;
+  renderDashboardCore_(d);
+  if (typeof renderSemanasChart_ === 'function') renderSemanasChart_(d);
+  requestAnimationFrame(function() {
+    if (kpiData === d) renderChartsBody_(d);
+  });
+}
+
 async function carregarKPIsDashboard(mes, ano) {
   if (window._kpiDashInFlight) {
     window._kpiDashPending = { mes: mes, ano: ano };
     return;
   }
   window._kpiDashInFlight = true;
+  const mesEff = mes || new Date().getMonth() + 1;
+  const anoEff = ano || new Date().getFullYear();
+  const cached = kpiDashCacheGet_(mesEff, anoEff);
+  if (cached) kpiDashApply_(cached);
+
+  kpiDashSetLoading_(true);
   try {
     const authP = apiParamsComAuth_();
-    const p = { action: 'kpiMes', ...authP };
-    if (mes) p.mes = mes;
-    if (ano) p.ano = ano;
-    const d = await api(p);
-    if (!d || !d.ok) {
-      console.error('kpiMes falhou', d);
-      if (typeof toast === 'function') toast('Dashboard: ' + ((d && d.erro) || 'erro ao carregar KPIs'), true);
+    const base = { action: 'kpiMes', mes: mesEff, ano: anoEff, ...authP };
+
+    const dLite = await api(Object.assign({ lite: '1' }, base), 45000);
+    if (!dLite || !dLite.ok) {
+      if (!cached) {
+        console.error('kpiMes falhou', dLite);
+        if (typeof toast === 'function') toast('Dashboard: ' + ((dLite && dLite.erro) || 'erro ao carregar KPIs'), true);
+      }
       return;
     }
-    kpiData = d;
+    kpiDashApply_(dLite);
+    kpiDashCacheSet_(mesEff, anoEff, dLite);
+
+    if (dLite.lite) {
+      const dFull = await api(base, 45000);
+      if (dFull && dFull.ok) {
+        kpiDashApply_(dFull);
+        kpiDashCacheSet_(mesEff, anoEff, dFull);
+      }
+    }
+
     carregarResumoHojeAdmin_().catch(function() {});
-    if (typeof renderSemanasChart_ === 'function') renderSemanasChart_(d);
-    const dashPage = document.getElementById('page-dashboard');
-    if (dashPage && dashPage.classList.contains('active')) renderCharts(d);
     if (typeof showAdminHomeKpis === 'function') showAdminHomeKpis(kpiHubStub_());
     if (typeof atualizarHubAdmin_ === 'function') atualizarHubAdmin_();
   } catch (e) {
     console.error('carregarKPIsDashboard:', e);
-    if (typeof toast === 'function') toast('Dashboard: erro de conexão', true);
+    if (!cached && typeof toast === 'function') toast('Dashboard: erro de conexão', true);
   } finally {
+    kpiDashSetLoading_(false);
     window._kpiDashInFlight = false;
     const pending = window._kpiDashPending;
     window._kpiDashPending = null;
@@ -953,8 +1010,13 @@ function renderDashboardCore_(d) {
 }
 
 function renderCharts(d) {
-  if (typeof renderSemanasChart_ === 'function') renderSemanasChart_(d);
   renderDashboardCore_(d);
+  renderChartsBody_(d);
+}
+
+function renderChartsBody_(d) {
+  if (!d) return;
+  if (typeof renderSemanasChart_ === 'function') renderSemanasChart_(d);
   if (!window.Chart) return;
   [chartDiario, chartExtrasDia, chartHoras].forEach(c => c && c.destroy());
 

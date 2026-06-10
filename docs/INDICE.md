@@ -1,6 +1,6 @@
 # MOVI KIDS — Índice de documentação
 
-**Atualizado:** 09/06/2026 (FE **v1.8.4** + GAS **v1.5.77** · FASE 6–7 + I23 · **FASE 8** próxima)
+**Atualizado:** 09/06/2026 (FE **v1.8.5** repo + GAS **v1.5.78** repo · publicar pacote I23 fase 2)
 
 ## Comece aqui
 
@@ -43,7 +43,9 @@
 | Documento | Para quê |
 |-----------|----------|
 | [DEPLOY_GAS_v1.5.32_AUTH.md](ativos/DEPLOY_GAS_v1.5.32_AUTH.md) | Deploy GAS mestre |
-| [DEPLOY_v1.5.77_FASE7_PERF.md](ativos/DEPLOY_v1.5.77_FASE7_PERF.md) | **Deploy GAS v1.5.77** — perf resumoDia + FE v1.8.4 |
+| [DEPLOY_v1.5.78_FASE7_KPI_PERF.md](ativos/DEPLOY_v1.5.78_FASE7_KPI_PERF.md) | **Deploy GAS v1.5.78** — kpiMes perf (regra de ouro) |
+| [DEPLOY_FE_v1.8.5_DASHBOARD_PERF.md](ativos/DEPLOY_FE_v1.8.5_DASHBOARD_PERF.md) | **Deploy FE v1.8.5** — cache SWR Dashboard |
+| [DEPLOY_v1.5.77_FASE7_PERF.md](ativos/DEPLOY_v1.5.77_FASE7_PERF.md) | Deploy GAS v1.5.77 — I23 fase 1 |
 | [DEPLOY_v1.5.76_FASE7_LEADING.md](ativos/DEPLOY_v1.5.76_FASE7_LEADING.md) | Deploy GAS FASE 6–7 — regra de ouro completa |
 | [DEPLOY_FE_v1.8.2_HOTFIX_I22.md](ativos/DEPLOY_FE_v1.8.2_HOTFIX_I22.md) | Hotfix FE I22 — só Pages |
 | [HOMOLOGACAO_PRODUCAO_ASSISTIDA.md](ativos/HOMOLOGACAO_PRODUCAO_ASSISTIDA.md) | Checklist operação |

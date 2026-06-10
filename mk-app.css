@@ -1290,6 +1290,9 @@ header{
 .mk-exec-kpi-delta.up{color:#2E7D32}.mk-exec-kpi-delta.down{color:#C62828}
 .mk-exec-narrativa{margin:0;font-size:13px;line-height:1.55;color:var(--txt2);font-weight:500;
   background:rgba(255,255,255,.55);border-radius:8px;padding:10px 12px;border-left:3px solid #FFD54F}
+#page-dashboard.mk-dash-loading .db-top-title::after{
+  content:' · atualizando…';font-size:11px;font-weight:600;color:var(--txt3);margin-left:6px}
+#page-dashboard.mk-dash-loading .nkv:not([data-filled]){opacity:.55}
 /* FASE 7 — Leading financeiros */
 .mk-leading-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:10px}
 @media (max-width:960px){.mk-leading-row{grid-template-columns:repeat(2,minmax(0,1fr))}}

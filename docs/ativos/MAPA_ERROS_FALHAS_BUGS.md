@@ -146,7 +146,7 @@
 15. **Sempre** validar balanceamento HTML das páginas `#page-*` antes de push (I22).
 16. **Nunca** compartilhar mutex entre `carregarKPIs` (hub) e `carregarKPIsDashboard` (I23).
 17. **Nunca** chamar `buildKpiMesPayload_` dentro de `resumoDia` — usar patch leve `calcLeadingDiaPatch_` (I23).
-18. **Sempre** pacote deploy completo (`DEPLOY_v*.md`) ao entregar fase GAS+FE (regra de ouro).
+18. **Sempre** pacote deploy completo (`DEPLOY_v*.md` **modelo `DEPLOY_v1.5.76`**) ao entregar fase GAS+FE — caminho PC, clasp, links, testes, checklist tablet, critério de pronto (Regra 8).
 
 ---
 
@@ -154,7 +154,7 @@
 
 | Camada | Repo / produção alvo | Mínimo operação |
 |--------|----------------------|-----------------|
-| Frontend | **v1.8.4** | `?force=1.8.4` (mín. I22: v1.8.2+) |
-| GAS | **v1.5.77** | Nova versão Web se ping &lt; esperado |
+| Frontend | **v1.8.5** (repo) | `?force=1.8.5` (mín. I23 fase 1: v1.8.4+) |
+| GAS | **v1.5.78** (repo) | Nova versão Web se ping &lt; esperado |
 
 Ver `ESTADO_ATUAL.md` para URLs e editor GAS.

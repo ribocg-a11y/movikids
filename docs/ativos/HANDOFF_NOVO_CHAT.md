@@ -51,7 +51,7 @@ Continuo o MOVI KIDS. Repo: C:\Users\riboc\Documents\Codex\2026-05-30\files-ment
 
 - Ler: este arquivo → `PLANO_PRIORIDADES` → `ESTADO_ATUAL` → `REGRAS` → `ACESSOS_E_AUTORIZACOES` (§7 = agente vs você)
 - Ignorar handoff antigo em `docs/arquivo/planos/`
-- Informar: FE **v1.8.4**, GAS **v1.5.77** — **FASE 6–7** entregues · **FASE 8** próxima · plano **`FASE_8_ALERTAS_SEMAFOROS.md`**
+- Informar: FE **v1.8.5** (repo), GAS **v1.5.78** (repo) — publicar antes de FASE 8
 - Deixar claro: **agente** no **PC** (código, testes, planilha); **você** Nova versão GAS Web; **tablet no balcão** = validação operação (não confundir com seu computador)
 
 ---
@@ -114,7 +114,7 @@ Regra Cursor: `.cursor/rules/handoff-movikids.mdc` § Modo de operação.
 
 | Tarefa | Ler |
 |--------|-----|
-| Deploy GAS | `DEPLOY_GAS_v1.5.32_AUTH.md` + **`DEPLOY_v1.5.77_FASE7_PERF.md`** (perf I23) · **`DEPLOY_v1.5.76_FASE7_LEADING.md`** (FASE 6–7 completo) |
+| Deploy GAS | `DEPLOY_GAS_v1.5.32_AUTH.md` + **`DEPLOY_v1.5.78_FASE7_KPI_PERF.md`** · **`DEPLOY_FE_v1.8.5_DASHBOARD_PERF.md`** |
 | Deploy FE hotfix | **`DEPLOY_FE_v1.8.2_HOTFIX_I22.md`** |
 | Bug / incidente | `MAPA_ERROS_FALHAS_BUGS.md` → I20–I23 → `docs/arquivo/incidentes/` |
 | QA tablet | **`PROTOCOLO_DIAGNOSTICO_E_TESTES.md`** → `TESTE_PROTOCOLO_DIAGNOSTICO.ps1` · homologação F5–F11: `TESTE_TABLET_F5_F7_F10_F11.ps1` |
@@ -124,45 +124,48 @@ Regra Cursor: `.cursor/rules/handoff-movikids.mdc` § Modo de operação.
 
 ---
 
-## Próximo passo (09/06/2026 — pós-I23)
+## Próximo passo (09/06/2026 — pós-I23 complemento perf)
 
-**FASE 5–7 repo:** ✅ FASE 6 cockpit · ✅ FASE 7 leading · hotfix **I22** · perf **I23** FE **v1.8.4** + GAS **v1.5.77**
+**FASE 5–7 repo:** ✅ FASE 6–7 · I22 · I23 fase 1 (**v1.8.4** / **v1.5.77**) · **I23 fase 2 perf** repo **v1.8.5** / **v1.5.78** (pendente publicar)
 
 **Incidentes recentes:**
-- **I22:** Home quebrada por `</div>` extra — corrigido v1.8.2 · Regra 14
-- **I23:** Dashboard `"Calculando..."` — mutex KPI + `calcLeadingDiaPatch_` · Regra 15
+- **I22:** Home — v1.8.2 · Regra 14
+- **I23:** mutex + resumoDia leve (v1.8.4/v1.5.77) + **leitura única kpiMes + cache SWR** (v1.8.5/v1.5.78)
 
-**Ciclo FASE 6–15:** **FASE 8** próxima — alertas e semáforos · sprint **`FASE_8_ALERTAS_SEMAFOROS.md`**
+**Ciclo FASE 6–15:** **FASE 8** próxima — após **v1.5.78** + **v1.8.5** publicados
 
 **Antes de FASE 8:**
 
 | # | Ação |
 |---|------|
-| 1 | Tablet Home ok com `?force=1.8.4` |
-| 2 | Nova versão Web GAS **v1.5.77** → ping ok |
-| 3 | PC admin: Dashboard carrega em ~5–8s; cockpit + leading + Caixa break-even |
+| 1 | Publicar **GAS v1.5.78** + **FE v1.8.5** (pacote regra de ouro abaixo) |
+| 2 | PC admin: Dashboard KPIs &lt;5s; reabertura instantânea (cache) |
+| 3 | Tablet Home ok `?force=1.8.5` |
 | 4 | `check-operacao-livre.ps1` → 0 locações abertas |
 
 **Deploy (regra de ouro — pacote completo):**
 
 | Doc | Conteúdo |
 |-----|----------|
-| **`DEPLOY_v1.5.77_FASE7_PERF.md`** | GAS v1.5.77 perf resumoDia + FE v1.8.4 mutex KPI |
-| **`DEPLOY_v1.5.76_FASE7_LEADING.md`** | GAS v1.5.76 + FE v1.8.x — FASE 6–7 base |
-| **`DEPLOY_FE_v1.8.2_HOTFIX_I22.md`** | Só FE hotfix Home |
+| **`DEPLOY_v1.5.78_FASE7_KPI_PERF.md`** | **GAS v1.5.78** — leitura única + lite + cache |
+| **`DEPLOY_FE_v1.8.5_DASHBOARD_PERF.md`** | **FE v1.8.5** — cache SWR + lite→full |
+| **`DEPLOY_v1.5.77_FASE7_PERF.md`** | I23 fase 1 (mutex + resumoDia) |
+| **`DEPLOY_v1.5.76_FASE7_LEADING.md`** | FASE 6–7 base |
+| **`DEPLOY_FE_v1.8.2_HOTFIX_I22.md`** | Hotfix Home I22 |
 
-**v1.5.77 no seu PC:**
+**v1.5.78 no seu PC:**
 
 ```
 C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github\MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs
 ```
 
-**Paralelo ops:** B7 semanal · treino N1 badge Recorrente · tablet `?force=1.8.4` · PC admin `?force=1.8.4`.
+**Paralelo ops:** B7 semanal · tablet/PC admin `?force=1.8.5` após push.
 
 **Últimos commits (main = origin):**
 
 | Hash | Entrega |
 |------|---------|
+| `dca694f` | I23 perf + docs sweep v1.8.4/v1.5.77 |
 | `dbf5c49` | fix pre-push I22 |
 | `59e4ca4` | I22 pós-mortem + Regra 14 |
 | `f2574da` | hotfix Home v1.8.2 |
@@ -222,7 +225,7 @@ Invoke-RestMethod "https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5
 .\scripts\pre-push-check.ps1
 ```
 
-Esperado: ping alvo `versao: v1.5.77`, pre-push verde, FE **1.8.4** (Pages + `mk-version.js`).
+Esperado: ping alvo `versao: v1.5.78`, pre-push verde, FE **1.8.5** (Pages + `mk-version.js`).
 
 ---
 

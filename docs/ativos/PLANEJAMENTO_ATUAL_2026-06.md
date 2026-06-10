@@ -1,7 +1,7 @@
 # MOVI KIDS — Planejamento atual (pós-FASE 5)
 
 **Atualizado:** 09/06/2026 (pós-I23)  
-**Produção:** FE **v1.8.4** · GAS **v1.5.77** (repo) / ping prod **verificar** após Nova versão Web  
+**Produção:** FE **v1.8.5** (repo) · GAS **v1.5.78** (repo) — publicar pacote I23 fase 2  
 **Documentos irmãos:** `PLANO_PRIORIDADES_2026-06.md` · `PLANO_CONTINUIDADE_2026-06.md` · `HANDOFF_NOVO_CHAT.md`  
 **Ciclo ativo:** **`PLANO_FASES_6_15_COCKPIT_EXECUTIVO_2026-06.md`** · sprint FASE 8: **`FASE_8_ALERTAS_SEMAFOROS.md`**
 

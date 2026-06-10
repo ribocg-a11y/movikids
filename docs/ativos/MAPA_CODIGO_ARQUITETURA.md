@@ -220,7 +220,7 @@ sequenceDiagram
 11. Atualizar HANDOFF    → versões + checklist + MAPA_ERROS se incidente
 ```
 
-**Pacote deploy (regra de ouro):** toda entrega GAS+FE inclui doc `DEPLOY_v*.md` completo (caminho PC, clasp, ping, testes, checklist tablet) — ver `DEPLOY_v1.5.77_FASE7_PERF.md` como modelo pós-I23.
+**Pacote deploy (regra de ouro):** toda entrega GAS+FE inclui doc `DEPLOY_v*.md` **completo** (modelo `DEPLOY_v1.5.76`) + FE quando aplicável — ver `DEPLOY_v1.5.78_FASE7_KPI_PERF.md`.
 
 **Diretrizes claras:** `REGRAS_DE_PUBLICACAO_SEGURA.md` (12 regras), `.cursor/rules/`, `ACESSOS_E_AUTORIZACOES.md`.
 
@@ -371,7 +371,9 @@ sequenceDiagram
 | Testes readonly | `TESTE_KPI_MES_READONLY.ps1`, `TESTE_RESUMO_DIA_READONLY.ps1` |
 | Tablet | Home F0 após `index.html`; Dashboard = **PC admin** |
 
-**Incidentes:** I22 (`INCIDENTE_I22_*`), I23 (`INCIDENTE_I23_DASHBOARD_LENTO_TRAVADO_2026-06-09.md`)
+**Depois v1.5.78 (I23 fase 2):** `kpiMes&lite=1` → topo rápido; cache GAS 90s + FE sessionStorage 5 min.
+
+**Incidentes:** I22 · I23 (`INCIDENTE_I23_*`) · deploy **`DEPLOY_v1.5.78_FASE7_KPI_PERF.md`**
 
 ---
 

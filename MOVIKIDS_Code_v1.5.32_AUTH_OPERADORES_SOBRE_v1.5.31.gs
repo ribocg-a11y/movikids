@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.77
+// MOVI KIDS — Google Apps Script v1.5.78
+// v1.5.78: kpiMes — leitura unica LOCAÇOES+CUSTOS (sem calcResumoDia/payback duplicados); lite=1 pula AUDITORIA
 // v1.5.77: FASE 7 perf — resumoDia.leadingDia via calcLeadingDiaPatch_ (sem buildKpiMesPayload_ duplicado)
 // v1.5.76: FASE 7 — leadingFinanceiro (ticket, R$/h, break-even, sensibilidade) + resumoDia.leadingDia
 // v1.5.75: FASE 6 — narrativaExecutiva + cockpit (ocupacaoMediaFrota) em kpiMes
@@ -371,9 +372,9 @@ function ping_() {
   const agora = new Date();
   return resp_({
     status:  'online',
-    versao:  'v1.5.77',
+    versao:  'v1.5.78',
     timestamp: fmtData_(agora) + ' ' + fmtHoraLocal_(agora),
-    sistema: 'MOVI KIDS v1.5.77',
+    sistema: 'MOVI KIDS v1.5.78',
     postWriteActions: WRITE_ACTIONS_CRITICAS_
   });
 }
@@ -1208,6 +1209,22 @@ function resumoDia_(p) {
 // ── Pacote F: operador / cancelamentos / ocupacao (AUDITORIA + frota) ──
 const KPI_HORAS_OPERACAO_DIA_ = 12;
 
+function calcOcupacaoFrotaLite_(nPorVeiculo, minPorVeiculo, nMes, diasOperando) {
+  const capMinVeic = diasOperando > 0 ? diasOperando * KPI_HORAS_OPERACAO_DIA_ * 60 : 0;
+  return veiculosOp_().map(v => {
+    const n = nPorVeiculo[v] || 0;
+    const mins = minPorVeiculo[v] || 0;
+    const pctOcup = capMinVeic > 0 ? Math.min(100, Math.round(mins / capMinVeic * 1000) / 10) : 0;
+    return {
+      veiculo: v,
+      nLoc: n,
+      minutos: mins,
+      pctOcupacao: pctOcup,
+      pctFrota: nMes > 0 ? Math.round(n / nMes * 1000) / 10 : 0
+    };
+  }).sort((a, b) => b.nLoc - a.nLoc);
+}
+
 function kpiAvancadosMes_(mmyy, nMes, nCancelMes, diasOperando, nPorVeiculo, minPorVeiculo) {
   const porOperador = {};
   const cancelPorMotivo = {};
@@ -1259,19 +1276,7 @@ function kpiAvancadosMes_(mmyy, nMes, nCancelMes, diasOperando, nPorVeiculo, min
     .sort((a, b) => b.count - a.count);
   const taxaCancel = (nMes + nCancel) > 0 ? Math.round(nCancel / (nMes + nCancel) * 1000) / 10 : 0;
 
-  const capMinVeic = diasOperando > 0 ? diasOperando * KPI_HORAS_OPERACAO_DIA_ * 60 : 0;
-  const ocupacaoFrota = veiculosOp_().map(v => {
-    const n = nPorVeiculo[v] || 0;
-    const mins = minPorVeiculo[v] || 0;
-    const pctOcup = capMinVeic > 0 ? Math.min(100, Math.round(mins / capMinVeic * 1000) / 10) : 0;
-    return {
-      veiculo: v,
-      nLoc: n,
-      minutos: mins,
-      pctOcupacao: pctOcup,
-      pctFrota: nMes > 0 ? Math.round(n / nMes * 1000) / 10 : 0
-    };
-  }).sort((a, b) => b.nLoc - a.nLoc);
+  const ocupacaoFrota = calcOcupacaoFrotaLite_(nPorVeiculo, minPorVeiculo, nMes, diasOperando);
 
   return {
     porOperador: porOperadorArr,
@@ -1450,8 +1455,8 @@ function lerInvestimento_() {
   };
 }
 
-/** Payback: resultado líquido acumulado desde mes_inicio até fim do mês selecionado. */
-function calcPaybackAcumulado_(mesFim, anoFim, inv) {
+/** Payback acumulado — nucleo sem I/O (mapas pre-agregados). */
+function calcPaybackAcumuladoCore_(fatBy, cusBy, mesFim, anoFim, inv) {
   const I = Number(inv && inv.investimentoTotal) || 0;
   if (!I) {
     return { ok: false, erro: 'Cadastre valores na aba INVESTIMENTO', investimentoTotal: 0 };
@@ -1459,31 +1464,6 @@ function calcPaybackAcumulado_(mesFim, anoFim, inv) {
   const ini = parseMesAnoPayback_(inv.mesInicioPayback);
   let mesIni = ini.mes;
   let anoIni = ini.ano;
-
-  const fatBy = {};
-  const cusBy = {};
-  const shLoc = sh_(SH_LOC);
-  const lastLoc = shLoc.getLastRow();
-  if (lastLoc >= DATA_ROW) {
-    shLoc.getRange(DATA_ROW, 1, lastLoc - DATA_ROW + 1, 15).getValues().forEach(function(r) {
-      if (!r[0] || String(r[14] || '').trim() !== 'Encerrada') return;
-      const pts = cellToStr_(r[1]).split('/');
-      if (pts.length < 3) return;
-      const mmyy = pts[1].padStart(2, '0') + '/' + pts[2];
-      fatBy[mmyy] = (fatBy[mmyy] || 0) + Number(r[10]);
-    });
-  }
-  const shCus = sh_(SH_CUS);
-  const lastCus = shCus.getLastRow();
-  if (lastCus >= DATA_ROW) {
-    shCus.getRange(DATA_ROW, 1, lastCus - DATA_ROW + 1, 6).getValues().forEach(function(r) {
-      if (!r[0]) return;
-      const pts = cellToStr_(r[1]).split('/');
-      if (pts.length < 3) return;
-      const mmyy = pts[1].padStart(2, '0') + '/' + pts[2];
-      cusBy[mmyy] = (cusBy[mmyy] || 0) + Number(r[5]);
-    });
-  }
 
   let acumulado = 0;
   let mesesOperados = 0;
@@ -1524,6 +1504,35 @@ function calcPaybackAcumulado_(mesFim, anoFim, inv) {
     mesInicioPayback: ini.label,
     dataInauguracao: inv.dataInauguracao
   };
+}
+
+/** Payback: resultado líquido acumulado desde mes_inicio até fim do mês selecionado. */
+function calcPaybackAcumulado_(mesFim, anoFim, inv) {
+  const fatBy = {};
+  const cusBy = {};
+  const shLoc = sh_(SH_LOC);
+  const lastLoc = shLoc.getLastRow();
+  if (lastLoc >= DATA_ROW) {
+    shLoc.getRange(DATA_ROW, 1, lastLoc - DATA_ROW + 1, 15).getValues().forEach(function(r) {
+      if (!r[0] || String(r[14] || '').trim() !== 'Encerrada') return;
+      const pts = cellToStr_(r[1]).split('/');
+      if (pts.length < 3) return;
+      const mmyy = pts[1].padStart(2, '0') + '/' + pts[2];
+      fatBy[mmyy] = (fatBy[mmyy] || 0) + Number(r[10]);
+    });
+  }
+  const shCus = sh_(SH_CUS);
+  const lastCus = shCus.getLastRow();
+  if (lastCus >= DATA_ROW) {
+    shCus.getRange(DATA_ROW, 1, lastCus - DATA_ROW + 1, 6).getValues().forEach(function(r) {
+      if (!r[0]) return;
+      const pts = cellToStr_(r[1]).split('/');
+      if (pts.length < 3) return;
+      const mmyy = pts[1].padStart(2, '0') + '/' + pts[2];
+      cusBy[mmyy] = (cusBy[mmyy] || 0) + Number(r[5]);
+    });
+  }
+  return calcPaybackAcumuladoCore_(fatBy, cusBy, mesFim, anoFim, inv);
 }
 
 function addMesesCalendario_(mes, ano, n) {
@@ -1810,6 +1819,7 @@ function buildKpiMesPayload_(p) {
   const mesAtual = p && p.mes ? parseInt(p.mes) : hoje.getMonth() + 1;
   const anoAtual = p && p.ano ? parseInt(p.ano) : hoje.getFullYear();
   const mmyy     = String(mesAtual).padStart(2,'0') + '/' + anoAtual;
+  const skipAdvanced = p && (String(p.lite || '') === '1' || String(p.lite || '').toLowerCase() === 'true');
   const shLoc    = sh_(SH_LOC);
   const shCus    = sh_(SH_CUS);
   const diasMes  = new Date(anoAtual, mesAtual, 0).getDate();
@@ -1826,6 +1836,7 @@ function buildKpiMesPayload_(p) {
   const mmyyPrev = String(mesPrev).padStart(2,'0') + '/' + anoPrev;
 
   let fatMes = 0, nMes = 0, fatAno = 0, nAno = 0;
+  let fatHoje = 0, nHoje = 0;
   let extMes = 0, nComExtra = 0;
   let fatSemana = 0, nSemana = 0, fatSemanaAnt = 0, nSemanaAnt = 0;
   let fatMesAnt = 0, nMesAnt = 0;
@@ -1842,6 +1853,8 @@ function buildKpiMesPayload_(p) {
   const nPorVeiculo = {};
   const minPorVeiculo = {};
   const telMesCounts = {};
+  const fatByPayback = {};
+  const cusByPayback = {};
 
   const lastLoc = shLoc.getLastRow();
   if (lastLoc >= DATA_ROW) {
@@ -1861,17 +1874,19 @@ function buildKpiMesPayload_(p) {
       if (status !== 'Encerrada') return;
 
       const vt     = Number(r[10]);
-      const ext    = Number(r[9]) || 0;
+      fatByPayback[mmyyR] = (fatByPayback[mmyyR] || 0) + vt;
+      if (dataR === dataHoje) { fatHoje += vt; nHoje++; }
+
       const tipo   = String(r[4]);
       const plano  = String(r[5]);
       const veiculo= String(r[15] || tipo);
       const horaStr= cellToStr_(r[2]); const hora = parseInt(horaStr.split(':')[0]||'9');
+      const ext    = Number(r[9]) || 0;
 
       // v1.5.4: mes anterior
       if (mmyyR === mmyyPrev) { fatMesAnt += vt; nMesAnt++; }
 
       const anoR = parseInt(pts[2], 10);
-      const mesR = parseInt(pts[1], 10);
       if (anoR === anoAtual) {
         fatAno += vt;
         nAno++;
@@ -1907,11 +1922,8 @@ function buildKpiMesPayload_(p) {
     });
   }
 
-  const resumoHoje = calcResumoDiaCore_(dataHoje);
-  const fatHoje = resumoHoje.fat;
-  const nHoje = resumoHoje.n;
-
   let cusMes = 0;
+  let cusHoje = 0;
   const cusPorCategoria = {};
   const lastCus = shCus.getLastRow();
   if (lastCus >= DATA_ROW) {
@@ -1924,13 +1936,14 @@ function buildKpiMesPayload_(p) {
       const mmyyR = pts[1].padStart(2,'0') + '/' + pts[2];
       const val   = Number(r[5]);
       const cat   = String(r[4] || 'Outros').trim() || 'Outros';
+      cusByPayback[mmyyR] = (cusByPayback[mmyyR] || 0) + val;
+      if (dataR === dataHoje) cusHoje += val;
       if (mmyyR === mmyy) {
         cusMes += val;
         cusPorCategoria[cat] = (cusPorCategoria[cat] || 0) + val;
       }
     });
   }
-  const cusHoje = resumoHoje.totalCus;
 
   const telKeys = Object.keys(telMesCounts);
   const nClientesUnicos = telKeys.length;
@@ -1963,10 +1976,16 @@ function buildKpiMesPayload_(p) {
   }
 
   const diasOperandoCalc = diasComMov.size;
-  const kpiAv = kpiAvancadosMes_(mmyy, nMes, nCancelMes, diasOperandoCalc, nPorVeiculo, minPorVeiculo);
+  const kpiAv = skipAdvanced
+    ? {
+        porOperador: [],
+        cancelamentos: { total: nCancelMes, porMotivo: [], taxaPct: 0 },
+        ocupacaoFrota: calcOcupacaoFrotaLite_(nPorVeiculo, minPorVeiculo, nMes, diasOperandoCalc)
+      }
+    : kpiAvancadosMes_(mmyy, nMes, nCancelMes, diasOperandoCalc, nPorVeiculo, minPorVeiculo);
   const porSemanaPack = buildPorSemanaMes_(fatPorDia, nPorDia, extPorDia, diasMes, mesAtual, anoAtual, mediaDiaria);
   const investimento = lerInvestimento_();
-  const payback = enrichPaybackProjecao_(calcPaybackAcumulado_(mesAtual, anoAtual, investimento), {
+  const payback = enrichPaybackProjecao_(calcPaybackAcumuladoCore_(fatByPayback, cusByPayback, mesAtual, anoAtual, investimento), {
     mesFim: mesAtual,
     anoFim: anoAtual,
     mesHoje: hoje.getMonth() + 1,
@@ -2055,13 +2074,32 @@ function buildKpiMesPayload_(p) {
     ocupacaoMediaFrota: ocupacaoMediaFrota,
     narrativaExecutiva: narrativaExecutiva,
     cockpit: cockpit,
-    leadingFinanceiro: leadingFinanceiro
+    leadingFinanceiro: leadingFinanceiro,
+    lite: skipAdvanced || false
   };
 }
 
 function kpiMes_(p) {
   if (!isAdminRequest_(p)) return err_('Acesso negado — kpiMes so para administrador', 403);
-  return resp_(buildKpiMesPayload_(p));
+  const hoje = new Date();
+  const mes = p && p.mes ? parseInt(p.mes) : hoje.getMonth() + 1;
+  const ano = p && p.ano ? parseInt(p.ano) : hoje.getFullYear();
+  const lite = (p && (String(p.lite || '') === '1' || String(p.lite || '').toLowerCase() === 'true')) ? '1' : '0';
+  const cacheKey = 'kpiMes78_' + mes + '_' + ano + '_L' + lite;
+  try {
+    const cache = CacheService.getScriptCache();
+    const hit = cache.get(cacheKey);
+    if (hit) {
+      return ContentService.createTextOutput(hit).setMimeType(ContentService.MimeType.JSON);
+    }
+    const payload = buildKpiMesPayload_(p);
+    const out = JSON.stringify({ ok: true, ...payload });
+    if (out.length < 95000) cache.put(cacheKey, out, 90);
+    return ContentService.createTextOutput(out).setMimeType(ContentService.MimeType.JSON);
+  } catch (e) {
+    Logger.log('kpiMes_ cache: ' + e.message);
+    return resp_(buildKpiMesPayload_(p));
+  }
 }
 
 function buscarKPIsAdmin_(p) {
