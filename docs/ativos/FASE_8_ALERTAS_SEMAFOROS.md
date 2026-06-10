@@ -1,6 +1,6 @@
 # FASE 8 — Alertas proativos e semáforos
 
-**Status:** 🟢 **repo pronto** — publicar GAS **v1.5.79** + FE **v1.8.9**  
+**Status:** 🟢 **repo pronto** — publicar GAS **v1.5.79** + FE **v1.8.9** (ou já incluído no pacote v1.5.80)  
 **Prioridade:** P1  
 **Versão alvo:** FE **v1.8.9** · GAS **v1.5.79**  
 **Plano mestre:** `PLANO_FASES_6_15_COCKPIT_EXECUTIVO_2026-06.md` § FASE 8  

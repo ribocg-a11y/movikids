@@ -1,18 +1,15 @@
-# MOVI KIDS — Estado atual (09/06/2026)
+# MOVI KIDS — Estado atual (10/06/2026)
 
 Referência única para alinhamento local × produção.
 
 **Handoff (novo chat):** **`HANDOFF_NOVO_CHAT.md`** ← ler primeiro  
 **Acessos:** **`ACESSOS_E_AUTORIZACOES.md`** — papéis, PIN admin, agente vs humano  
 **Índice:** `../INDICE.md` · **Prioridades:** **`PLANO_PRIORIDADES_2026-06.md`**  
-**Planejamento ativo:** `PLANO_CONTINUIDADE_2026-06.md`  
+**Planejamento ativo:** `PLANEJAMENTO_ATUAL_2026-06.md`  
 **Mapa de erros/bugs:** **`MAPA_ERROS_FALHAS_BUGS.md`**  
-**DNA visual:** `../referencia/DESIGN_DNA_MOVIKIDS.md`  
-**Comunicação balcão:** **`DECISAO_COMUNICACAO_QR_CODE_2026-06.md`**  
-**Incidentes (arquivo):** `../arquivo/incidentes/`  
-**SMS gateway:** `../referencia/TROCA_SMS_GATEWAY_DJVJRL_2026-06-04.md`  
-**Deploy GAS:** `DEPLOY_GAS_v1.5.32_AUTH.md` · **K.1:** `DEPLOY_v1.5.57_IMPORT_RESPONSAVEIS.md` · **Payback:** `DEPLOY_v1.5.63_PAYBACK.md`  
-**Planos históricos:** `../arquivo/planos/`
+**FASE 9 Folha CLT:** **`FASE_9_FOLHA_VIABILIDADE_CLT.md`**  
+**Memorial folha:** `../referencia/FOLHA_PAGAMENTO_MEMORIAL_E_PLANILHA.md`  
+**Deploy GAS pacote:** **`DEPLOY_v1.5.80_FASE9_FOLHA_VIABILIDADE.md`** · FE **`DEPLOY_FE_v1.8.10_FASE9_FOLHA_VIABILIDADE.md`**
 
 ---
 
@@ -25,21 +22,18 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 ## Produção (verificar após cada deploy)
 
-| Camada | Versão alvo | URL / ID |
+| Camada | Versão repo | URL / ID |
 |--------|-------------|----------|
-| **Frontend** | **v1.8.7** (repo) | https://ribocg-a11y.github.io/movikids/?force=1.8.7 |
-| **Apps Script** | **v1.5.78** (produção) | `DEPLOY_v1.5.78_FASE7_KPI_PERF.md` · FE: `DEPLOY_FE_v1.8.7_PACOTE_I_KPI_DEDUP.md` |
-| SMS Gateway Cloud | **DJVJRL** / device `wihWegHr4wXaVJQ1R-GZR` | Aparelho remoto ONLINE |
-| Pacote SMS P0 | **FECHADO** | `PACOTE_SMS_P0_UNIFICADO_v1.5.38_v1.7.11.md` |
-| Planilha | MOVIKIDS_Planilha_Base | https://docs.google.com/spreadsheets/d/1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618/edit — auditoria `AUDITORIA_PLANILHA_BASE_2026-06-06.md` |
-| Portal responsável | acompanhar.html | mesma base GitHub Pages |
-| Cronômetro curto | track.html | URL GAS alinhada (v1.7.6+) |
+| **Frontend** | **v1.8.10** | https://ribocg-a11y.github.io/movikids/?force=1.8.10 |
+| **Apps Script (código)** | **v1.5.80** | clasp push ✅ · **Nova versão Web pendente** → `DEPLOY_v1.5.80_FASE9_FOLHA_VIABILIDADE.md` |
+| **Apps Script (ping prod.)** | **v1.5.79** até Nova versão | Ping abaixo |
+| **Aba FOLHA** | memorial B68 | [gid=179040058](https://docs.google.com/spreadsheets/d/1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618/edit#gid=179040058) |
 
 **Editor Apps Script:** https://script.google.com/home/projects/19SIhkX9Tk7FiJA1JXu1OrUwssHdr3H5zc8q3rOjmBvqgWfXuHlk8xyf8/edit
 
 **Teste rápido GAS (ping):**  
 https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec?action=ping  
-→ deve retornar `versao: v1.5.78` (após Nova versão Web) e `postWriteActions`
+→ alvo após Nova versão Web: `versao: v1.5.80` · produção hoje: `v1.5.79`
 
 **URL morta (não usar):** `AKfycbzc...` → 404
 
@@ -49,7 +43,7 @@ https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPe
 
 | Artefato | Arquivo |
 |----------|---------|
-| GAS | `MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs` (único na raiz; legados em `arquivo-historico/`) |
+| GAS | `MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs` | `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github\MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs` |
 | Payback | `MEMORIAL_PAYBACK_INVESTIMENTO.md` · deploy `DEPLOY_v1.5.61_PAYBACK.md` (atualizar v1.5.63) |
 | Clasp | `gas/Code.gs` (gerado por `scripts/sync-gas-to-clasp.ps1` — não editar à mão) |
 | Login | `mk-auth.js` + gate em `index.html` |
@@ -92,7 +86,9 @@ https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPe
 
 | Versão | Entrega |
 |--------|---------|
-| **v1.8.7** | **Pacote I** — KPI row: Ano · Locações · Custos · Extras · Caixa (sem duplicar cockpit/leading) |
+| **v1.8.10** + **GAS v1.5.80** | **FASE 9** — folha FOLHA B68 + `viabilidadeContratacao` + painel CLT + alertas `CONTRATACAO_*` |
+| **v1.8.9** + **GAS v1.5.79** | **FASE 8** — alertas gestão + semáforo empresa |
+| **v1.8.7** | **Pacote I** — KPI row: Ano · Locações · Cancel · Extras · Caixa |
 | **v1.8.6** | **Pacote I** — ticket médio só em `#mk-leading-row` |
 | **v1.8.5** + **GAS v1.5.78** | **I23 fase 2** — kpiMes leitura única, lite, cache GAS+FE |
 | **v1.8.4** + **GAS v1.5.77** | **I23 fase 1** — mutex KPI + resumoDia leve |

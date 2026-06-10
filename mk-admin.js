@@ -1049,10 +1049,79 @@ function renderLeadingFinanceiro_(d) {
     if (s.fatMais10Pct) parts.push('Fat +10% → resultado ' + R2(s.fatMais10Pct.resultado) + ' (' + (s.fatMais10Pct.deltaResultado >= 0 ? '+' : '') + R2(s.fatMais10Pct.deltaResultado) + ')');
     if (s.custosMais10Pct) parts.push('Custos +10% → ' + R2(s.custosMais10Pct.resultado) + ' (Δ ' + R2(s.custosMais10Pct.deltaResultado) + ')');
     if (lf.impactoOcupacao5pp != null) parts.push('+5 pp ocupação ≈ ' + R2(lf.impactoOcupacao5pp) + ' no resultado/mês');
+    if (lf.breakEvenComFolha != null && lf.folhaMensalSimulada > 0) {
+      parts.push('Break-even c/ folha: ' + lf.breakEvenComFolha + ' loc/dia (sem folha: ' + (be != null ? be : '—') + ')');
+    }
     if (parts.length) {
       sens.style.display = 'block';
       sens.textContent = parts.join(' · ');
     } else sens.style.display = 'none';
+  }
+}
+
+var MK_GATE_LABELS_ = {
+  negocioBasePositivo: 'Margem ≥10% sem folha CLT',
+  projecaoCobreFolha: 'Projeção do mês cobre a folha',
+  reservaAposFolha: 'Reserva ≥ R$ 2.500 após folha (projeção)',
+  margemProjOk: 'Margem projetada com folha ≥ 18%',
+  dadosSuficientes: '≥ 12 dias com locação no mês',
+  fatProjMinimo: 'Faturamento projetado no piso sugerido'
+};
+
+/** FASE 9 — painel viabilidade contratação (aba FOLHA + P&L). */
+function renderContratacaoPanel_(d) {
+  const panel = document.getElementById('mk-contratacao-panel');
+  const v = d && d.viabilidadeContratacao;
+  if (!panel || !v || !v.ok) {
+    if (panel) panel.style.display = 'none';
+    return;
+  }
+  panel.style.display = '';
+  panel.classList.remove('mk-contrat-verde', 'mk-contrat-amarelo', 'mk-contrat-vermelho');
+  const cls = v.nivel === 'verde' ? 'mk-contrat-verde' : v.nivel === 'amarelo' ? 'mk-contrat-amarelo' : 'mk-contrat-vermelho';
+  panel.classList.add(cls);
+
+  const nf = (d.folhaPlanejamento && d.folhaPlanejamento.nFuncionarios) || v.nFuncionarios || 2;
+  setText2('mk-contrat-title', nf + ' atendentes · ' + (v.label || 'Análise'));
+  const badge = document.getElementById('mk-contrat-badge');
+  if (badge) {
+    badge.textContent = v.label || '—';
+    badge.title = v.motivo || '';
+  }
+
+  setText2('mk-contrat-folha', R2(v.folhaMensal || 0));
+  const resAt = document.getElementById('mk-contrat-res-atual');
+  if (resAt) {
+    resAt.textContent = R2(v.resultadoComFolha || 0);
+    resAt.style.color = (v.resultadoComFolha || 0) >= 0 ? '#2E7D32' : '#C62828';
+  }
+  const resProj = document.getElementById('mk-contrat-res-proj');
+  if (resProj) {
+    resProj.textContent = R2(v.projecaoResComFolha || 0) + ' (' + (v.margemProjComFolha || 0) + '%)';
+    resProj.style.color = (v.projecaoResComFolha || 0) >= 0 ? '#2E7D32' : '#C62828';
+  }
+  setText2('mk-contrat-fat-min', R2(v.fatMinimoSugerido || 0));
+
+  const mot = document.getElementById('mk-contrat-motivo');
+  if (mot) mot.textContent = v.motivo || '';
+
+  const gatesEl = document.getElementById('mk-contrat-gates');
+  if (gatesEl && v.gates) {
+    gatesEl.innerHTML = '';
+    Object.keys(MK_GATE_LABELS_).forEach(function(key) {
+      const li = document.createElement('li');
+      const ok = !!v.gates[key];
+      li.className = ok ? 'ok' : 'fail';
+      li.textContent = (ok ? '✓ ' : '✗ ') + MK_GATE_LABELS_[key];
+      gatesEl.appendChild(li);
+    });
+  }
+
+  const rec = document.getElementById('mk-contrat-rec');
+  if (rec) rec.textContent = v.recomendacao || '';
+
+  if (v.estudo && v.estudo.length && mot) {
+    mot.textContent = v.estudo.join(' ');
   }
 }
 
@@ -1061,6 +1130,7 @@ function renderDashboardCore_(d) {
   renderExecCockpit_(d);
   renderAlertStrip_(d);
   renderLeadingFinanceiro_(d);
+  renderContratacaoPanel_(d);
 
   // título
   if (d.mesAtual && d.anoAtual) {

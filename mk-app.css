@@ -1303,6 +1303,31 @@ header{
 .mk-leading-sub{font-size:10px;color:var(--txt3);margin-top:4px;line-height:1.3}
 .mk-leading-sens{font-size:12px;color:var(--txt2);background:#FFFDE7;border:1px solid #FFF59D;border-radius:8px;
   padding:10px 12px;margin-bottom:14px;line-height:1.45}
+.mk-contratacao-panel{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);
+  padding:12px 14px;margin-bottom:14px}
+.mk-contratacao-panel.mk-contrat-verde{border-color:#2E7D32;background:linear-gradient(135deg,rgba(46,125,50,.06),var(--card))}
+.mk-contratacao-panel.mk-contrat-amarelo{border-color:#E65100;background:linear-gradient(135deg,rgba(230,81,0,.06),var(--card))}
+.mk-contratacao-panel.mk-contrat-vermelho{border-color:#C62828;background:linear-gradient(135deg,rgba(198,40,40,.06),var(--card))}
+.mk-contrat-head{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:10px}
+.mk-contrat-label{font-size:10px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.04em}
+.mk-contrat-title{font-size:14px;font-weight:700;color:var(--txt);margin-top:3px;line-height:1.3}
+.mk-contrat-badge{font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;white-space:nowrap}
+.mk-contrat-verde .mk-contrat-badge{background:rgba(46,125,50,.15);color:#2E7D32}
+.mk-contrat-amarelo .mk-contrat-badge{background:rgba(230,81,0,.15);color:#E65100}
+.mk-contrat-vermelho .mk-contrat-badge{background:rgba(198,40,40,.15);color:#C62828}
+.mk-contrat-nums{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:8px}
+@media (max-width:960px){.mk-contrat-nums{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.mk-contrat-n{text-align:center;padding:6px 4px}
+.mk-contrat-n-val{font-size:16px;font-weight:700;font-family:Nunito,sans-serif}
+.mk-contrat-n-lbl{font-size:9px;color:var(--txt3);margin-top:3px;line-height:1.25}
+.mk-contrat-motivo{font-size:12px;color:var(--txt2);line-height:1.45;margin:0 0 8px}
+.mk-contrat-gates{list-style:none;margin:0 0 8px;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px 12px}
+@media (max-width:720px){.mk-contrat-gates{grid-template-columns:1fr}}
+.mk-contrat-gates li{font-size:11px;line-height:1.35;padding:2px 0}
+.mk-contrat-gates li.ok{color:#2E7D32}
+.mk-contrat-gates li.fail{color:#C62828}
+.mk-contrat-rec{font-size:11px;font-weight:600;color:var(--txt);margin:0;padding:8px 10px;background:rgba(21,101,192,.06);
+  border-radius:6px;border-left:3px solid #1565C0;line-height:1.4}
 /* FASE 8 — Alertas gestão */
 .mk-alert-strip{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
 .mk-alert-item{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:10px;border:1.5px solid;

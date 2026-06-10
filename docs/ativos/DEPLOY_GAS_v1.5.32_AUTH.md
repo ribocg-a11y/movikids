@@ -4,11 +4,15 @@
 
 Toda vez que o assistente alterar o `.gs`, deve informar este caminho (versão atual no header do arquivo):
 
-**v1.5.66 no seu PC (regra de ouro — copiar deste arquivo):**
+**Copiar deste arquivo (header = versão atual, ex. v1.5.80):**
 
-`C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github\MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs`
+```
+C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github\MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs
+```
 
-Payback: `DEPLOY_v1.5.63_PAYBACK.md` · KPI fatAno: `DEPLOY_v1.5.58_FAT_ANO_KPI.md` (v1.5.59) · K.1: `DEPLOY_v1.5.57_IMPORT_RESPONSAVEIS.md` · Prioridades: `PLANO_PRIORIDADES_2026-06.md`
+**Toda resposta do agente** termina com: `Mudança no AppScript: sim | não` + link acima se sim (**Regra 16** · `.cursor/rules/gas-deploy-caminho-pc.mdc`).
+
+Pacote atual: **`DEPLOY_v1.5.80_FASE9_FOLHA_VIABILIDADE.md`** · FE **`DEPLOY_FE_v1.8.10_FASE9_FOLHA_VIABILIDADE.md`**
 
 **Como colar no Apps Script:** Explorer → cole o caminho acima na barra → Enter → duplo clique no `.gs` → Ctrl+A → Ctrl+C → colar em **Código.gs** no editor → **Implantar → Nova versão**.
 
@@ -28,7 +32,7 @@ Abrir no Explorer: cole o caminho na barra de endereço → Enter → duplo cliq
 | **Web app em produção (exec)** | https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec |
 | **Testar se o GAS está no ar (ping)** | https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec?action=ping |
 | **Planilha MOVIKIDS** | https://docs.google.com/spreadsheets/d/1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618/edit |
-| **App (GitHub Pages)** | https://ribocg-a11y.github.io/movikids/?force=1.7.87 |
+| **App (GitHub Pages)** | https://ribocg-a11y.github.io/movikids/?force=1.8.10 |
 
 No **editor GAS** (link acima): **Implantar → Gerenciar implantações → Editar** a implantação Web (**ID `AKfycbwakQ...`**) → **Nova versão** → Implantar. **Não** crie um deploy novo. **Nunca** use `clasp deploy`.
 

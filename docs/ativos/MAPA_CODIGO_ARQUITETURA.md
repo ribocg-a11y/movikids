@@ -1,6 +1,6 @@
 # MOVI KIDS — Mapa do código e arquitetura
 
-**Atualizado:** 09/06/2026 (FE **v1.8.4** · GAS **v1.5.77** · FASE 6–7 + I22/I23)  
+**Atualizado:** 10/06/2026 (FE **v1.8.10** · GAS **v1.5.80** · FASE 9 Folha)  
 **Função:** anatomia do sistema — o que é cada parte, o que liga com o quê, o que é zona sensível.  
 **Complementa:** `ESTADO_ATUAL.md`, `ACESSOS_E_AUTORIZACOES.md`, `REGRAS_DE_PUBLICACAO_SEGURA.md`, `MAPA_ERROS_FALHAS_BUGS.md`, **`PROTOCOLO_DIAGNOSTICO_E_TESTES.md`**
 
@@ -121,7 +121,7 @@ flowchart TB
 | Versão GAS | header `.gs` + `ping` | Produção após Nova versão Web |
 | Escritas balcão | `api()` GET + 5 actions | `WRITE_ACTIONS_CRITICAS_` no GAS |
 | Operador nas escritas | `operadorApiParams_()` | GAS valida `operador`/`operadorId` |
-| KPIs admin | `action=kpiMes` | `buildKpiMesPayload_` → cockpit, leading, payback |
+| KPIs admin | `action=kpiMes` | `buildKpiMesPayload_` → cockpit, leading, payback, **viabilidadeContratacao**, alertas |
 | Resumo dia (leve) | `action=resumoDia` | `calcResumoDiaCore_` + `calcLeadingDiaPatch_` (v1.5.77) |
 | Dados mestres | `SHEET_ID` no `.gs` | Planilha `1ULMUx8AqZkZ75Ed0iRK...` |
 
@@ -379,6 +379,21 @@ sequenceDiagram
 **Depois v1.5.78 (I23 fase 2):** `kpiMes&lite=1` → topo rápido; cache GAS 90s + FE sessionStorage 5 min.
 
 **Incidentes:** I22 · I23 (`INCIDENTE_I23_*`) · deploy **`DEPLOY_v1.5.78_FASE7_KPI_PERF.md`**
+
+---
+
+## 13. FASE 9 — Folha CLT + viabilidade contratação (v1.5.80 / v1.8.10)
+
+| Peça | Onde |
+|------|------|
+| Planilha | Aba **FOLHA** — B68 custo total · B5 nº func. |
+| GAS | `lerFolhaPlanejamento_`, `buildViabilidadeContratacao_` |
+| API | `kpiMes.folhaPlanejamento`, `kpiMes.viabilidadeContratacao` |
+| Alertas | `CONTRATACAO_VIAVEL`, `CONTRATACAO_AGUARDAR`, `CONTRATACAO_NAO_VIAVEL` |
+| FE | `#mk-contratacao-panel` · `renderContratacaoPanel_` (só admin Dashboard) |
+| Leading | `breakEvenComFolha`, `custoDiaComFolha` |
+
+Doc: **`FASE_9_FOLHA_VIABILIDADE_CLT.md`** · deploy **`DEPLOY_v1.5.80_FASE9_FOLHA_VIABILIDADE.md`**
 
 ---
 

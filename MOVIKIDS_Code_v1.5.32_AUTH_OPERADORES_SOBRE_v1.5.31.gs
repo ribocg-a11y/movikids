@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.79
+// MOVI KIDS — Google Apps Script v1.5.80
+// v1.5.80: FASE 9 — folha FOLHA B68 + viabilidadeContratacao + alertas CONTRATACAO_* em kpiMes
 // v1.5.79: FASE 8 — kpiMes.alertas + sinalEmpresa (buildAlertasGestao_, movikidsSinalEmpresa_)
 // v1.5.78: kpiMes — leitura unica LOCAÇOES+CUSTOS (sem calcResumoDia/payback duplicados); lite=1 pula AUDITORIA
 // v1.5.77: FASE 7 perf — resumoDia.leadingDia via calcLeadingDiaPatch_ (sem buildKpiMesPayload_ duplicado)
@@ -81,6 +82,7 @@ const FB_URL     = 'https://movikids-fa3d7-default-rtdb.firebaseio.com';
 
 const SH_LOC   = 'LOCACOES';
 const SH_CUS   = 'CUSTOS';
+const SH_FOLHA = 'FOLHA';
 const SH_INV   = 'INVESTIMENTO';
 const SH_DASH  = 'DASHBOARD';
 const SH_CFG   = 'CONFIG';
@@ -104,6 +106,12 @@ const EMAIL_RELATORIO = 'financeiro@goldenshoppingcalhau.com.br';
 const EMAIL_CC        = 'antonio.luis.vieira.nj@gmail.com';
 
 const CONTRATO_INICIO = new Date(2026, 3, 29);
+
+/** Gates objetivos para semáforo de contratação CLT (aba FOLHA). */
+const CONTRAT_RESERVA_MIN_ = 2500;
+const CONTRAT_MARGEM_MIN_ = 18;
+const CONTRAT_DIAS_MIN_ = 12;
+const CONTRAT_MARGEM_BASE_MIN_ = 10;
 
 // ── VEÍCULOS VÁLIDOS — v1.5.21: Triciclo 02 adicionado ───────
 const VEICULOS_VALIDOS = [
@@ -373,9 +381,9 @@ function ping_() {
   const agora = new Date();
   return resp_({
     status:  'online',
-    versao:  'v1.5.79',
+    versao:  'v1.5.80',
     timestamp: fmtData_(agora) + ' ' + fmtHoraLocal_(agora),
-    sistema: 'MOVI KIDS v1.5.79',
+    sistema: 'MOVI KIDS v1.5.80',
     postWriteActions: WRITE_ACTIONS_CRITICAS_
   });
 }
@@ -1664,6 +1672,13 @@ function buildNarrativaExecutiva_(ctx) {
     parts.push('Taxa de cancelamento em ' + canc.taxaPct + '% — revisar operação no balcão.');
   }
 
+  const viab = ctx.viabilidadeContratacao;
+  if (viab && viab.ok && viab.folhaMensal > 0) {
+    const nf = (ctx.folhaPlanejamento && ctx.folhaPlanejamento.nFuncionarios) || 2;
+    parts.push('CLT simulado (' + nf + ' func., R$ ' + fmtMoedaBr_(viab.folhaMensal) + '/mês): '
+      + viab.label.toLowerCase() + ' — projeção com folha ~R$ ' + fmtMoedaBr_(viab.projecaoResComFolha) + '/mês.');
+  }
+
   return parts.join(' ');
 }
 
@@ -1696,7 +1711,10 @@ function buildLeadingFinanceiros_(ctx) {
   const recHora = horasMes > 0 ? Math.round(fat / horasMes * 100) / 100 : 0;
   const custoLoc = n > 0 ? Math.round(cus / n * 100) / 100 : 0;
   const custoDiaMedio = diasMes > 0 ? Math.round((cus + cto) / diasMes * 100) / 100 : 0;
+  const folha = Number(ctx.folhaMensal) || 0;
+  const custoDiaComFolha = diasMes > 0 ? Math.round((cus + cto + folha) / diasMes * 100) / 100 : 0;
   const breakEven = ticket > 0 ? Math.ceil(custoDiaMedio / ticket) : null;
+  const breakEvenComFolha = ticket > 0 && folha > 0 ? Math.ceil(custoDiaComFolha / ticket) : null;
   const resultado = fat - cus - cto;
   const margem = fat > 0 ? Math.round(resultado / fat * 1000) / 10 : 0;
   const fatP10 = fat * 1.1;
@@ -1718,7 +1736,10 @@ function buildLeadingFinanceiros_(ctx) {
     receitaPorHoraOperada: recHora,
     custoPorLocacao: custoLoc,
     breakEvenLocacoesDia: breakEven,
+    breakEvenComFolha: breakEvenComFolha,
     custoDiaMedio: custoDiaMedio,
+    custoDiaComFolha: custoDiaComFolha,
+    folhaMensalSimulada: folha,
     margemOperacional: margem,
     sensibilidade: {
       fatMais10Pct: {
@@ -1860,9 +1881,224 @@ function buildAlertasGestao_(ctx) {
     });
   }
 
+  const viab = ctx.viabilidadeContratacao;
+  if (viab && viab.ok) {
+    if (viab.nivel === 'verde') {
+      alertas.push({
+        nivel: 'info', codigo: 'CONTRATACAO_VIAVEL',
+        titulo: 'Contratação: condições ideais',
+        mensagem: viab.motivo,
+        acionavel: 'Sócio — validar com contador'
+      });
+    } else if (viab.nivel === 'amarelo') {
+      alertas.push({
+        nivel: 'amarelo', codigo: 'CONTRATACAO_AGUARDAR',
+        titulo: 'Contratação: aguardar',
+        mensagem: viab.motivo,
+        acionavel: 'Sócio — não contratar por impulso'
+      });
+    } else {
+      alertas.push({
+        nivel: 'vermelho', codigo: 'CONTRATACAO_NAO_VIAVEL',
+        titulo: 'Contratação: não viável agora',
+        mensagem: viab.motivo,
+        acionavel: 'Sócio — priorizar volume'
+      });
+    }
+  }
+
   const ord = { vermelho: 0, amarelo: 1, info: 2 };
   alertas.sort(function(a, b) { return (ord[a.nivel] || 9) - (ord[b.nivel] || 9); });
   return alertas;
+}
+
+/** Parse moeda BR (R$ 1.234,56 ou número). */
+function parseMoedaBr_(val) {
+  if (typeof val === 'number' && !isNaN(val)) return val;
+  let s = String(val || '').replace(/R\$\s*/gi, '').trim();
+  if (!s) return 0;
+  if (s.indexOf(',') >= 0) s = s.replace(/\./g, '').replace(',', '.');
+  return Number(s) || 0;
+}
+
+/** Lê memorial folha (aba FOLHA) — planejamento, não folha oficial. */
+function lerFolhaPlanejamento_() {
+  const fallback = {
+    ok: false,
+    nFuncionarios: 2,
+    custoMensal: 5270,
+    salarioBase: 1621,
+    vtDia: 8.4,
+    vaMensal: 400,
+    fonte: 'default'
+  };
+  try {
+    const sh = sh_(SH_FOLHA);
+    if (!sh) return fallback;
+    const custoMensal = parseMoedaBr_(sh.getRange('B68').getValue());
+    if (custoMensal <= 0) return fallback;
+    return {
+      ok: true,
+      nFuncionarios: Math.max(1, parseInt(parseMoedaBr_(sh.getRange('B5').getValue()), 10) || 2),
+      custoMensal: Math.round(custoMensal * 100) / 100,
+      salarioBase: parseMoedaBr_(sh.getRange('B7').getValue()) || 1621,
+      vtDia: parseMoedaBr_(sh.getRange('B9').getValue()) || 8.4,
+      vaMensal: parseMoedaBr_(sh.getRange('B11').getValue()) || 400,
+      fonte: 'FOLHA'
+    };
+  } catch (e) {
+    Logger.log('lerFolhaPlanejamento_: ' + e.message);
+    return fallback;
+  }
+}
+
+function buildMotivoAguardarContrat_(gates, folhaVal, projResFolha, margProj, diasOp) {
+  const parts = [];
+  if (!gates.dadosSuficientes) {
+    parts.push('só ' + diasOp + ' dias com movimento (mín. ' + CONTRAT_DIAS_MIN_ + ')');
+  }
+  if (!gates.reservaAposFolha) {
+    parts.push('reserva após folha R$ ' + fmtMoedaBr_(projResFolha) + ' abaixo de R$ ' + fmtMoedaBr_(CONTRAT_RESERVA_MIN_));
+  }
+  if (!gates.margemProjOk) {
+    parts.push('margem projetada com folha em ' + margProj + '% (meta ' + CONTRAT_MARGEM_MIN_ + '%)');
+  }
+  if (!gates.fatProjMinimo) parts.push('faturamento projetado ainda abaixo do piso sugerido');
+  if (!parts.length) return 'Projeção positiva — aguardar confirmação de tendência.';
+  return parts.join('; ') + '.';
+}
+
+function buildEstudoSustentabilidade_(ctx, folha, calc) {
+  const fat = Number(ctx.fatMes) || 0;
+  const cus = Number(ctx.cusMes) || 0;
+  const cto = Number(ctx.ctoPagar) || 0;
+  const resultado = Number(ctx.resultado) || 0;
+  const margem = Number(ctx.margem) || 0;
+  const projFat = Number(ctx.projecaoFat) || 0;
+  const folhaVal = folha.custoMensal;
+  const linhas = [];
+  linhas.push('Receita mês (até hoje): R$ ' + fmtMoedaBr_(fat) + ' · Custos oper.: R$ ' + fmtMoedaBr_(cus)
+    + ' · CTO: R$ ' + fmtMoedaBr_(cto) + ' · Resultado sem folha: R$ ' + fmtMoedaBr_(resultado)
+    + ' (' + margem + '%).');
+  linhas.push('Folha planejada (' + folha.nFuncionarios + ' func., aba FOLHA): R$ ' + fmtMoedaBr_(folhaVal)
+    + '/mês → resultado com folha (mês parcial): R$ ' + fmtMoedaBr_(calc.resultadoComFolha)
+    + ' (' + calc.margemComFolha + '%).');
+  linhas.push('Projeção mês cheio: fat. R$ ' + fmtMoedaBr_(projFat)
+    + ' → resultado com folha ~R$ ' + fmtMoedaBr_(calc.projecaoResComFolha)
+    + ' (margem ' + calc.margemProjComFolha + '%).');
+  linhas.push('Faturamento mínimo sugerido (margem ' + CONTRAT_MARGEM_MIN_ + '% após folha+CTO): R$ '
+    + fmtMoedaBr_(calc.fatMinMargem) + '.');
+  if (calc.projecaoResComFolha >= CONTRAT_RESERVA_MIN_ && calc.margemProjComFolha >= CONTRAT_MARGEM_MIN_) {
+    linhas.push('Cenário projetado sustenta CLT com folha e reserva operacional.');
+  } else if (calc.projecaoResComFolha >= 0) {
+    linhas.push('Folha cabe na projeção, mas margem/reserva ainda apertadas — não contratar por impulso.');
+  } else {
+    linhas.push('Com folha CLT o negócio ficaria no vermelho na projeção atual — priorize volume antes de contratar.');
+  }
+  return linhas;
+}
+
+/** FASE 9 — viabilidade objetiva de contratação CLT (simula folha da aba FOLHA). */
+function buildViabilidadeContratacao_(ctx, folha) {
+  if (!folha || folha.custoMensal <= 0) {
+    return { ok: false, motivo: 'Configure a aba FOLHA (B68 custo total).' };
+  }
+  const folhaVal = folha.custoMensal;
+  const fat = Number(ctx.fatMes) || 0;
+  const cus = Number(ctx.cusMes) || 0;
+  const cto = Number(ctx.ctoPagar) || 0;
+  const resultado = Number(ctx.resultado) || 0;
+  const margem = Number(ctx.margem) || 0;
+  const projFat = Number(ctx.projecaoFat) || 0;
+  const projRes = Number(ctx.projecaoRes) || 0;
+  const diasOp = Number(ctx.diasOperando) || 0;
+  const ctoMin = Number(ctx.ctoMinimo) || 1000;
+
+  const resultadoComFolha = Math.round((resultado - folhaVal) * 100) / 100;
+  const margemComFolha = fat > 0 ? Math.round(resultadoComFolha / fat * 1000) / 10 : 0;
+  const projecaoResComFolha = Math.round((projRes - folhaVal) * 100) / 100;
+  const margemProjComFolha = projFat > 0 ? Math.round(projecaoResComFolha / projFat * 1000) / 10 : 0;
+  const fatMinMargem = Math.round((folhaVal + cus + ctoMin) / (0.9 - CONTRAT_MARGEM_MIN_ / 100) * 100) / 100;
+  const faltaFaturamento = Math.max(0, Math.round((fatMinMargem - projFat) * 100) / 100);
+
+  const gates = {
+    negocioBasePositivo: resultado > 0 && margem >= CONTRAT_MARGEM_BASE_MIN_,
+    projecaoCobreFolha: projecaoResComFolha >= 0,
+    reservaAposFolha: projecaoResComFolha >= CONTRAT_RESERVA_MIN_,
+    margemProjOk: margemProjComFolha >= CONTRAT_MARGEM_MIN_,
+    dadosSuficientes: diasOp >= CONTRAT_DIAS_MIN_,
+    fatProjMinimo: projFat <= 0 || projFat >= fatMinMargem * 0.92
+  };
+
+  const calcPack = {
+    resultadoComFolha: resultadoComFolha,
+    margemComFolha: margemComFolha,
+    projecaoResComFolha: projecaoResComFolha,
+    margemProjComFolha: margemProjComFolha,
+    fatMinMargem: fatMinMargem
+  };
+
+  let nivel = 'vermelho';
+  let label = 'Não contratar';
+  let motivo = '';
+  let recomendacao = '';
+
+  const allGreen = gates.negocioBasePositivo && gates.projecaoCobreFolha && gates.reservaAposFolha
+    && gates.margemProjOk && gates.dadosSuficientes && gates.fatProjMinimo;
+
+  if (allGreen) {
+    nivel = 'verde';
+    label = 'Condições ideais';
+    motivo = 'Projeção cobre folha R$ ' + fmtMoedaBr_(folhaVal) + ' com margem ' + margemProjComFolha
+      + '% e reserva R$ ' + fmtMoedaBr_(projecaoResComFolha) + '.';
+    recomendacao = 'Momento favorável para contratar — valide CCT/contador antes da admissão.';
+  } else if (gates.negocioBasePositivo && gates.projecaoCobreFolha) {
+    nivel = 'amarelo';
+    label = 'Aguardar confirmação';
+    motivo = buildMotivoAguardarContrat_(gates, folhaVal, projecaoResComFolha, margemProjComFolha, diasOp);
+    recomendacao = 'Não contrate só porque precisa de gente — espere gates verdes ou mais um mês consistente.';
+  } else {
+    nivel = 'vermelho';
+    label = 'Não contratar agora';
+    if (!gates.negocioBasePositivo) {
+      motivo = 'Sem folha, margem ' + margem + '% ou resultado insuficiente (mín. ' + CONTRAT_MARGEM_BASE_MIN_ + '%).';
+    } else if (!gates.projecaoCobreFolha) {
+      motivo = 'Projeção R$ ' + fmtMoedaBr_(projFat) + ' não cobre folha — déficit ~R$ '
+        + fmtMoedaBr_(Math.abs(projecaoResComFolha)) + '/mês.';
+    } else {
+      motivo = 'Indicadores não sustentam CLT neste ritmo.';
+    }
+    recomendacao = 'Priorize faturamento e payback. Meta fat. projetado: R$ ' + fmtMoedaBr_(fatMinMargem) + '.';
+  }
+
+  const gatesOk = Object.keys(gates).filter(function(k) { return gates[k]; }).length;
+
+  return {
+    ok: true,
+    nivel: nivel,
+    label: label,
+    motivo: motivo,
+    recomendacao: recomendacao,
+    gates: gates,
+    gatesOk: gatesOk,
+    gatesTotal: Object.keys(gates).length,
+    folhaMensal: folhaVal,
+    nFuncionarios: folha.nFuncionarios,
+    resultadoComFolha: resultadoComFolha,
+    margemComFolha: margemComFolha,
+    projecaoFat: Math.round(projFat * 100) / 100,
+    projecaoResComFolha: projecaoResComFolha,
+    margemProjComFolha: margemProjComFolha,
+    fatMinimoSugerido: fatMinMargem,
+    faltaFaturamento: faltaFaturamento,
+    criterios: {
+      reservaMin: CONTRAT_RESERVA_MIN_,
+      margemMin: CONTRAT_MARGEM_MIN_,
+      diasMin: CONTRAT_DIAS_MIN_,
+      margemBaseMin: CONTRAT_MARGEM_BASE_MIN_
+    },
+    estudo: buildEstudoSustentabilidade_(ctx, folha, calcPack)
+  };
 }
 
 /** FASE 7 lite — leading do dia sem payback/narrativa (evita buildKpiMesPayload_ em resumoDia). */
@@ -2127,6 +2363,21 @@ function buildKpiMesPayload_(p) {
   });
 
   const ocupacaoMediaFrota = calcOcupacaoMediaFrota_(kpiAv.ocupacaoFrota);
+  const folhaPlanejamento = lerFolhaPlanejamento_();
+  const viabCtx = {
+    fatMes: Math.round(fatMes * 100) / 100,
+    cusMes: Math.round(cusMes * 100) / 100,
+    ctoPagar: Math.round(ctoPagar * 100) / 100,
+    ctoMinimo: ctoMin,
+    resultado: Math.round(resultado * 100) / 100,
+    margem: margem,
+    projecaoFat: projecaoFat,
+    projecaoRes: projecaoRes,
+    diasOperando: diasOperando,
+    diasMes: diasMes
+  };
+  const viabilidadeContratacao = buildViabilidadeContratacao_(viabCtx, folhaPlanejamento);
+
   const narrativaCtx = {
     mesAtual: mesAtual,
     anoAtual: anoAtual,
@@ -2138,7 +2389,9 @@ function buildKpiMesPayload_(p) {
     ctoPagar: Math.round(ctoPagar * 100) / 100,
     payback: payback,
     ocupacaoMediaFrota: ocupacaoMediaFrota,
-    cancelamentos: kpiAv.cancelamentos
+    cancelamentos: kpiAv.cancelamentos,
+    folhaPlanejamento: folhaPlanejamento,
+    viabilidadeContratacao: viabilidadeContratacao
   };
   const narrativaExecutiva = buildNarrativaExecutiva_(narrativaCtx);
   const cockpit = buildCockpitMeta_(Object.assign({}, narrativaCtx, { payback: payback }));
@@ -2149,7 +2402,8 @@ function buildKpiMesPayload_(p) {
     ctoMinimo: ctoMin,
     cusMes: Math.round(cusMes * 100) / 100,
     ctoPagar: Math.round(ctoPagar * 100) / 100,
-    resultado: Math.round(resultado * 100) / 100
+    resultado: Math.round(resultado * 100) / 100,
+    folhaMensal: viabilidadeContratacao.ok ? viabilidadeContratacao.folhaMensal : 0
   }));
 
   const mesesRecentes = buildMesesRecentesParaSinal_(mesAtual, anoAtual, fatByPayback, cusByPayback);
@@ -2159,7 +2413,10 @@ function buildKpiMesPayload_(p) {
     resultado: Math.round(resultado * 100) / 100,
     diasOperando: diasOperando,
     diaCalendario: hoje.getDate(),
-    nMes: nMes
+    nMes: nMes,
+    projecaoFat: projecaoFat,
+    projecaoRes: projecaoRes,
+    viabilidadeContratacao: viabilidadeContratacao
   });
   const alertas = buildAlertasGestao_(alertaCtx);
   const sinalEmpresa = movikidsSinalEmpresa_(mesesRecentes, alertas);
@@ -2222,6 +2479,8 @@ function buildKpiMesPayload_(p) {
     leadingFinanceiro: leadingFinanceiro,
     alertas: alertas,
     sinalEmpresa: sinalEmpresa,
+    folhaPlanejamento: folhaPlanejamento,
+    viabilidadeContratacao: viabilidadeContratacao,
     lite: skipAdvanced || false
   };
 }
@@ -2232,7 +2491,7 @@ function kpiMes_(p) {
   const mes = p && p.mes ? parseInt(p.mes) : hoje.getMonth() + 1;
   const ano = p && p.ano ? parseInt(p.ano) : hoje.getFullYear();
   const lite = (p && (String(p.lite || '') === '1' || String(p.lite || '').toLowerCase() === 'true')) ? '1' : '0';
-  const cacheKey = 'kpiMes79_' + mes + '_' + ano + '_L' + lite;
+  const cacheKey = 'kpiMes80_' + mes + '_' + ano + '_L' + lite;
   try {
     const cache = CacheService.getScriptCache();
     const hit = cache.get(cacheKey);

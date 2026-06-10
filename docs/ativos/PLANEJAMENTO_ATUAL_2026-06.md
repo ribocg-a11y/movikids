@@ -1,9 +1,9 @@
 # MOVI KIDS — Planejamento atual (pós-FASE 5)
 
-**Atualizado:** 09/06/2026 (pós-I23)  
-**Produção:** FE **v1.8.5** (repo) · GAS **v1.5.78** (repo) — publicar pacote I23 fase 2  
+**Atualizado:** 10/06/2026 (pós FASE 9 Folha CLT)  
+**Produção:** FE **v1.8.10** (repo) · GAS **v1.5.80** (repo) · ping prod. **v1.5.79**  
 **Documentos irmãos:** `PLANO_PRIORIDADES_2026-06.md` · `PLANO_CONTINUIDADE_2026-06.md` · `HANDOFF_NOVO_CHAT.md`  
-**Ciclo ativo:** **`PLANO_FASES_6_15_COCKPIT_EXECUTIVO_2026-06.md`** · sprint FASE 8: **`FASE_8_ALERTAS_SEMAFOROS.md`**
+**Ciclo ativo:** **`PLANO_FASES_6_15_COCKPIT_EXECUTIVO_2026-06.md`** · FASE 9: **`FASE_9_FOLHA_VIABILIDADE_CLT.md`**
 
 ---
 
@@ -11,7 +11,7 @@
 
 Ciclo **FASE 0–5 + P2/P3 concluído** (07–09/06/2026). Balcão homologado, portal QR, payback, CONFIG e APIs unificadas.
 
-**Modo atual:** **FASE 8** (Alertas e semáforos) — após estabilização I22/I23 e deploy GAS **v1.5.77**. Plano sprint: **`FASE_8_ALERTAS_SEMAFOROS.md`**.
+**Modo atual:** **FASE 9 Folha CLT** publicada no repo — **Nova versão Web GAS v1.5.80** pendente. Sprint: **`FASE_9_FOLHA_VIABILIDADE_CLT.md`**.
 
 ---
 
@@ -42,8 +42,9 @@ A–M (modularização FE), SMS P0, fixes I15–I21, Pacote K CRM, Pacote M M.1�
 |------|------|------------|--------|--------------------------|
 | **6** | Cockpit executivo | P1 | ✅ repo · I22 hotfix | Dashboard topo |
 | **7** | Leading financeiros + causalidade | P1 | ✅ repo · I23 perf | Dashboard + Caixa |
-| **8** | Alertas e semáforos | P1 | 🟡 **próxima** | Dashboard + sidebar |
-| **9** | DNA visual admin | P1 | ⏳ | Dashboard, Caixa, CRM, Sistema |
+| **8** | Alertas e semáforos | P1 | ✅ repo | Dashboard + sidebar |
+| **9** | Folha CLT + viabilidade | P1 | ✅ repo | Dashboard `#mk-contratacao-panel` |
+| **9b** | DNA visual admin | P1 | ⏳ | Dashboard, Caixa, CRM, Sistema |
 | **10** | CRM LTV / cohort | P2 | ⏳ | Relacionamento + Dashboard |
 | **11** | Holding Movi + ZapClin | P2 | ⏳ | Nova página Holding |
 | **12** | Drill-down + simulação margem | P2 | ⏳ | Dashboard gráficos |

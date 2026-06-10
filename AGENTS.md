@@ -53,11 +53,15 @@ Detalhe completo: [`ACESSOS_E_AUTORIZACOES.md`](docs/ativos/ACESSOS_E_AUTORIZACO
 
 ## Produção atual
 
-| Camada | Versão |
-|--------|--------|
-| Frontend | **v1.7.98** |
-| GAS | **v1.5.74** |
-| Deploy ID | `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y` |
+| Camada | Versão repo | Ping produção |
+|--------|-------------|---------------|
+| Frontend | **v1.8.10** | https://ribocg-a11y.github.io/movikids/?force=1.8.10 |
+| GAS | **v1.5.80** (Nova versão Web pendente) | **v1.5.79** até publicar |
+| Deploy ID | `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y` | |
+
+**GAS canônico (sempre informar se alterou):**
+
+`C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github\MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs`
 
 Fonte de verdade: `mk-version.js`, header do `.gs`, ping GAS.
 
@@ -82,14 +86,12 @@ Fonte de verdade: `mk-version.js`, header do `.gs`, ping GAS.
 - `docs/arquivo/obsoleto/` — rollback/changelog antigos
 - Arquivos em `arquivo-historico/` para deploy
 
-## Estado do projeto (09/06/2026)
+## Estado do projeto (10/06/2026)
 
-- **FASE 1–4:** ✅ fechadas
-- **FASE 5:** ✅ fechada 09/06 — Milena + I21 v1.7.96
-- **P3:** ✅ fechado 09/06 — auditoria, PDF executivo, caixa WA/email, CRM
-- **Produção:** FE **v1.7.97** · GAS **v1.5.73** · `main` @ `9efa30a`
-- **Próximo:** operação · backlog B6/B3/B5 sob demanda
+- **FASE 1–8:** ✅ repo (FASE 8 alertas v1.8.9/v1.5.79)
+- **FASE 9 Folha CLT:** ✅ repo v1.8.10/v1.5.80 — publicar pendente
+- **Próximo:** Nova versão Web GAS · homolog Dashboard painel CLT · DNA visual admin (fase plano 6–15)
 
 ## Ao encerrar sessão
 
-Atualizar `HANDOFF_NOVO_CHAT.md`, checklist em `PLANO_PRIORIDADES`, e `ESTADO_ATUAL.md` se versões mudaram.
+Atualizar `HANDOFF_NOVO_CHAT.md`, checklist em `PLANO_PRIORIDADES`, e `ESTADO_ATUAL.md` se versões mudaram. **Sempre** terminar resposta com Regra 16 (AppScript sim/não + link).

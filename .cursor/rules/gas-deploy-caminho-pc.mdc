@@ -1,22 +1,50 @@
 ---
-description: Regra de ouro — sempre informar caminho local do .gs após alteração GAS
-globs: MOVIKIDS_Code*.gs,**/gas/**/*.gs,docs/ativos/DEPLOY_GAS*.md,DEPLOY_GAS*.md
+description: Regra de ouro — link canônico .gs + linha obrigatória "mudança no AppScript" em toda resposta
+globs: MOVIKIDS_Code*.gs,**/gas/**/*.gs,docs/ativos/DEPLOY*.md,docs/ativos/DEPLOY_GAS*.md
 alwaysApply: true
 ---
 
 # Regra de ouro — deploy GAS MOVI KIDS
 
-Sempre que **você** alterar o código Google Apps Script deste projeto (arquivo canônico ou cópia em `gas/`), **obrigatoriamente** informar ao usuário o caminho completo no PC, neste formato exato:
+## 1. Link canônico (obrigatório quando alterar Apps Script)
+
+Sempre que **você** alterar o código Google Apps Script deste projeto (arquivo canônico ou cópia em `gas/`), **obrigatoriamente**:
+
+1. Informar o caminho completo no PC, neste formato exato:
 
 ```
-v{VERSÃO} no seu PC:
-
 C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github\MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs
 ```
 
-- `{VERSÃO}` = versão lida do header do arquivo (ex.: `v1.5.43`), nunca inventada.
-- **Não** substituir por link GitHub/raw, salvo se o usuário pedir explicitamente.
-- **Não** omitir esse bloco no fim da resposta quando houver mudança no `.gs`.
-- Lembrete curto opcional: colar no **Código.gs** do Apps Script → **Implantar → Nova versão** (só se o `.gs` mudou; mudança só em `index.html`/frontend **não** exige reimplantar o script).
+2. Incluir a versão lida do **header** do arquivo (ex.: `v1.5.80`), nunca inventada.
 
-Arquivo canônico único: `MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs` (o nome do arquivo no disco não muda; só o header de versão).
+3. **Não** substituir por link GitHub/raw, salvo pedido explícito do usuário.
+
+4. Lembrete de publicação: `deploy-gas.ps1` (clasp push) + **Implantar → Gerenciar implantações → Nova versão** no Deploy ID `AKfycbwakQ...` — **nunca** `clasp deploy`.
+
+Arquivo canônico único: `MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs` (nome no disco não muda; só o header de versão).
+
+## 2. Linha obrigatória no fim de TODA resposta do agente
+
+**Sempre** encerrar toda resposta (com ou sem alteração de código) com este bloco:
+
+```
+---
+**Mudança no AppScript:** sim | não
+**Link canônico (.gs):** [caminho completo acima se sim · "—" se não]
+```
+
+- **sim** → colar o link canônico completo + versão do header + se aplicável lembrar Nova versão Web.
+- **não** → escrever `não` e link `—` (ou repetir link só se o usuário pediu referência).
+
+**Nunca omitir** este bloco. Faz parte da Regra 8 em `REGRAS_DE_PUBLICACAO_SEGURA.md` e Regra 16.
+
+## 3. Links canônicos de produção (referência rápida)
+
+| O quê | URL |
+|--------|-----|
+| Editor GAS | https://script.google.com/home/projects/19SIhkX9Tk7FiJA1JXu1OrUwssHdr3H5zc8q3rOjmBvqgWfXuHlk8xyf8/edit |
+| Ping | https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec?action=ping |
+| Planilha | https://docs.google.com/spreadsheets/d/1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618/edit |
+
+Doc deploy mestre: `docs/ativos/DEPLOY_GAS_v1.5.32_AUTH.md`

@@ -1,6 +1,6 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 10/06/2026 (FE **v1.8.7** + GAS **v1.5.78** · Pacote I KPI dedup · **FASE 8** próxima)  
+**Atualizado:** 10/06/2026 (FE **v1.8.10** + GAS **v1.5.80** · FASE 9 Folha CLT · FASE 8 alertas repo)  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **Repo local:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`  
@@ -51,7 +51,8 @@ Continuo o MOVI KIDS. Repo: C:\Users\riboc\Documents\Codex\2026-05-30\files-ment
 
 - Ler: este arquivo → `PLANO_PRIORIDADES` → `ESTADO_ATUAL` → `REGRAS` → `ACESSOS_E_AUTORIZACOES` (§7 = agente vs você)
 - Ignorar handoff antigo em `docs/arquivo/planos/`
-- Informar: FE **v1.8.7** (repo/produção pós-push), GAS **v1.5.78** (produção)
+- Informar: FE **v1.8.10**, GAS **v1.5.80** (repo) · ping prod. **v1.5.79** até Nova versão Web
+- **Toda resposta:** `Mudança no AppScript: sim|não` + link canônico `.gs` (Regra 16)
 - Deixar claro: **agente** no **PC** (código, testes, planilha); **você** Nova versão GAS Web; **tablet no balcão** = validação operação (não confundir com seu computador)
 
 ---
@@ -86,10 +87,10 @@ Regra Cursor: `.cursor/rules/handoff-movikids.mdc` § Modo de operação.
 
 | Camada | Versão | Verificação |
 |--------|--------|-------------|
-| **Frontend** | **v1.8.7** (Pacote I KPI dedup) | `mk-version.js` · `?force=1.8.7` |
-| **Service Worker** | **1.8.7** | `sw.js` |
-| **Apps Script (código)** | **v1.5.78** | Ping após **Nova versão Web** |
-| **App tablet balcão** | **v1.8.7** recomendado pós-push | Home + balcão — ver `DEPLOY_FE_v1.8.7_PACOTE_I_KPI_DEDUP.md` |
+| **Frontend** | **v1.8.10** | `mk-version.js` · `?force=1.8.10` |
+| **Service Worker** | **1.8.10** | `sw.js` |
+| **Apps Script (código)** | **v1.5.80** | clasp push ✅ · **Nova versão Web** pendente |
+| **Apps Script (ping)** | **v1.5.79** | Até você publicar Nova versão |
 
 **Deploy ID GAS (único — nunca criar outro):** `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y`
 
@@ -114,9 +115,9 @@ Regra Cursor: `.cursor/rules/handoff-movikids.mdc` § Modo de operação.
 
 | Tarefa | Ler |
 |--------|-----|
-| Deploy GAS | `DEPLOY_GAS_v1.5.32_AUTH.md` + **`DEPLOY_v1.5.78_FASE7_KPI_PERF.md`** |
-| Deploy FE | **`DEPLOY_FE_v1.8.7_PACOTE_I_KPI_DEDUP.md`** · **`DEPLOY_FE_v1.8.5_DASHBOARD_PERF.md`** |
-| Deploy FE hotfix | **`DEPLOY_FE_v1.8.2_HOTFIX_I22.md`** |
+| Deploy GAS | `DEPLOY_GAS_v1.5.32_AUTH.md` + **`DEPLOY_v1.5.80_FASE9_FOLHA_VIABILIDADE.md`** |
+| Deploy FE | **`DEPLOY_FE_v1.8.10_FASE9_FOLHA_VIABILIDADE.md`** · FASE 8: `DEPLOY_FE_v1.8.9_FASE8_ALERTAS.md` |
+| Folha / CLT | **`FASE_9_FOLHA_VIABILIDADE_CLT.md`** · `../referencia/FOLHA_PAGAMENTO_MEMORIAL_E_PLANILHA.md` |
 | Bug / incidente | `MAPA_ERROS_FALHAS_BUGS.md` → I20–I23 → `docs/arquivo/incidentes/` |
 | QA tablet | **`PROTOCOLO_DIAGNOSTICO_E_TESTES.md`** → `TESTE_PROTOCOLO_DIAGNOSTICO.ps1` · homologação F5–F11: `TESTE_TABLET_F5_F7_F10_F11.ps1` |
 | Homologação | `HOMOLOGACAO_PRODUCAO_ASSISTIDA.md`, `CHECKLIST_PACOTE_K.md` |
@@ -125,32 +126,27 @@ Regra Cursor: `.cursor/rules/handoff-movikids.mdc` § Modo de operação.
 
 ---
 
-## Próximo passo (10/06/2026 — pós Pacote I v1.8.7)
+## Próximo passo (10/06/2026 — pós FASE 9 repo)
 
-**FASE 5–7:** ✅ GAS **v1.5.78** em produção · FE **v1.8.7** (Pacote I KPI dedup) pushado
+**FASE 8–9 repo:** ✅ alertas v1.8.9/v1.5.79 · folha CLT v1.8.10/v1.5.80
 
-**Incidentes recentes:**
-- **I22:** Home — v1.8.2 · Regra 14
-- **I23:** mutex + resumoDia (v1.8.4/v1.5.77) + kpiMes perf + cache SWR (v1.8.5/v1.5.78) — **fechado**
-
-**Ciclo FASE 6–15:** **FASE 8** — alertas/semáforos (`FASE_8_ALERTAS_SEMAFOROS.md`)
-
-| # | Ação |
-|---|------|
-| 1 | PC admin: homologar Dashboard `?force=1.8.7` — cockpit + leading + KPI row sem duplicata |
-| 2 | Tablet Home F0 ok |
-| 3 | Implementar FASE 8 — GAS `buildAlertasGestao_` + FE `#mk-alert-strip` |
+| # | Ação | Quem |
+|---|------|------|
+| 1 | **Nova versão Web** GAS v1.5.80 — `DEPLOY_v1.5.80_FASE9_FOLHA_VIABILIDADE.md` | **Você** (editor) |
+| 2 | Ping → `v1.5.80` | Agente ou você |
+| 3 | Push FE v1.8.10 (se ainda não) + `?force=1.8.10` — painel **Sustentabilidade CLT** | Agente push · você homolog |
+| 4 | Tablet Home F0 smoke | Você (balcão) |
 
 **Deploy (regra de ouro — referência):**
 
 | Doc | Conteúdo |
 |-----|----------|
-| **`DEPLOY_FE_v1.8.7_PACOTE_I_KPI_DEDUP.md`** | **FE v1.8.6–7** — KPI row sem duplicata |
-| **`DEPLOY_v1.5.78_FASE7_KPI_PERF.md`** | **GAS v1.5.78** — leitura única + lite + cache |
-| **`DEPLOY_FE_v1.8.5_DASHBOARD_PERF.md`** | **FE v1.8.5** — cache SWR + lite→full |
-| **`DEPLOY_FE_v1.8.2_HOTFIX_I22.md`** | Hotfix Home I22 |
+| **`DEPLOY_v1.5.80_FASE9_FOLHA_VIABILIDADE.md`** | **GAS v1.5.80** — folha + viabilidade |
+| **`DEPLOY_FE_v1.8.10_FASE9_FOLHA_VIABILIDADE.md`** | **FE v1.8.10** — painel CLT |
+| **`DEPLOY_v1.5.79_FASE8_ALERTAS.md`** | FASE 8 alertas |
+| **`DEPLOY_GAS_v1.5.32_AUTH.md`** | Deploy mestre + link `.gs` |
 
-**Paralelo ops:** B7 semanal · tablet/PC admin `?force=1.8.7`.
+**Regra 16:** toda resposta do agente termina com `Mudança no AppScript: sim|não` + link canônico.
 
 **Últimos commits (main = origin após push):**
 
@@ -199,6 +195,7 @@ C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\m
 | **I22 — Janela operacional** | **Nunca** push FE crítico com locações Ativa/Pendente — `check-operacao-livre.ps1` |
 | **I23 — KPI Dashboard** | Mutex hub/dash separado; `resumoDia` leve no GAS — Regra 15 |
 | **Versões alinhadas** | `mk-version.js` = `sw.js` SW_VERSION após mudança FE. |
+| **Regra 16** | Toda resposta: `Mudança no AppScript: sim|não` + link `.gs` canônico |
 | **F4 / F9 pausados** | WhatsApp auto e supervisor — não reativar sem decisão explícita. |
 
 Regras Cursor automáticas: `.cursor/rules/` (GAS caminho PC, POST proibido, design DNA).
@@ -215,7 +212,7 @@ Invoke-RestMethod "https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5
 .\scripts\pre-push-check.ps1
 ```
 
-Esperado: ping alvo `versao: v1.5.78`, pre-push verde, FE **1.8.5** (Pages + `mk-version.js`).
+Esperado: ping alvo `versao: v1.5.80` (hoje prod. `v1.5.79`), pre-push verde, FE **1.8.10**.
 
 ---
 

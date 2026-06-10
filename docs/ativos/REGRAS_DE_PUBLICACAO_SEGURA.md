@@ -249,11 +249,13 @@ Toda resposta depois de publicar deve conter:
 - `sw.js`: sim/nao;
 - `track.html`: sim/nao;
 - Apps Script: sim/nao;
+- **Link canonico .gs** (se Apps Script = sim): caminho PC completo — ver **Regra 16**;
 - documentacao: sim/nao;
 - commit publicado;
 - versao publicada;
 - teste executado;
-- proximo passo.
+- proximo passo;
+- **`Mudança no AppScript: sim | não`** (obrigatorio toda resposta — Regra 16).
 
 Se algum desses itens faltar, a entrega nao esta completa.
 
@@ -264,3 +266,25 @@ Em 04/06/2026 o comando **`clasp deploy`** (feito pelo agente Cursor) quebrou a 
 - **Nunca** usar `clasp deploy` na implantacao Web.
 - **Sempre:** `.\scripts\deploy-gas.ps1` (apenas `clasp push`) + **Implantar → Gerenciar implantacoes → Editar Web `AKfycbwakQ...` → Nova versao**.
 - Correcao financeira de locacao encerrada: `corrigirFinanceiroLocacaoAdmin` (ver `docs/arquivo/incidentes/INCIDENTE_DEPLOY_E_EXTRAS_2026-06-04.md`).
+
+## Regra 16 - Link canonico Apps Script (obrigatorio)
+
+**Toda resposta do agente** deve terminar com:
+
+```
+**Mudança no AppScript:** sim | não
+**Link canônico (.gs):** [caminho ou —]
+```
+
+Quando **sim** (alterou ou entregou pacote GAS), incluir **sempre** este caminho completo:
+
+```
+C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github\MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs
+```
+
+- Versao = header do arquivo (ex. `v1.5.80`), nunca inventada.
+- **Nunca** omitir o bloco — mesmo em respostas so de documentacao ou diagnostico.
+- Regra Cursor: `.cursor/rules/gas-deploy-caminho-pc.mdc`
+- Doc deploy mestre: `DEPLOY_GAS_v1.5.32_AUTH.md` · pacote atual: `DEPLOY_v1.5.80_FASE9_FOLHA_VIABILIDADE.md`
+
+Complementa **Regra 8** (Apps Script: sim/nao no resumo de pacote).

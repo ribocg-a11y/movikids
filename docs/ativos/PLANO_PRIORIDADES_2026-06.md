@@ -21,7 +21,15 @@
 | **P2** Backlog técnico | ✅ fechada | 09/06/2026 |
 | **FASE 6** Cockpit executivo | ✅ repo + I22 hotfix | FE v1.8.2 → **v1.8.4** / GAS v1.5.75 |
 | **FASE 7** Leading financeiros | ✅ repo + I23 | FE v1.8.4 → **v1.8.5** / GAS v1.5.77 → **v1.5.78** |
-| **FASE 8** Alertas proativos | 🟡 **próxima** | sprint `FASE_8_ALERTAS_SEMAFOROS.md` |
+| **FASE 8** Alertas proativos | ✅ repo | FE v1.8.9 / GAS v1.5.79 |
+| **FASE 9** Folha CLT + viabilidade | ✅ repo | FE v1.8.10 / GAS v1.5.80 · `FASE_9_FOLHA_VIABILIDADE_CLT.md` |
+
+**Próximo passo imediato:**
+
+1. **Nova versão Web** GAS **v1.5.80** — `DEPLOY_v1.5.80_FASE9_FOLHA_VIABILIDADE.md` (regra de ouro)
+2. Push FE **v1.8.10** — `DEPLOY_FE_v1.8.10_FASE9_FOLHA_VIABILIDADE.md`
+3. Homolog Dashboard — painel **Sustentabilidade CLT** + alertas `CONTRATACAO_*`
+4. Tablet Home F0 smoke · `check-operacao-livre.ps1`
 
 ### FASE 0 — checklist
 
@@ -40,13 +48,6 @@
 | 0.10 | `ACESSOS_E_AUTORIZACOES.md` + planilha OAuth (`google-drive-sheets-auth`) | ✅ 07/06 |
 | 0.11 | `MAPA_CODIGO_ARQUITETURA.md` — anatomia e chaves mestras | ✅ 07/06 |
 
-**Próximo passo imediato:**
-
-1. Publicar **GAS v1.5.78** + **FE v1.8.5** — `DEPLOY_v1.5.78_FASE7_KPI_PERF.md`
-2. PC admin Dashboard KPIs &lt;5s; cache na reabertura
-3. Tablet Home ok **v1.8.5**
-4. `check-operacao-livre.ps1` → **FASE 8**
-
 **FASE 1 fechada 08/06/2026:** I.5 assinado · K.3–K.4 tablet · checklist A–F · payback Dashboard · tablet v1.7.87. Sprint 1 + Sprint 2 (K) declarados fechados.
 
 ---
@@ -57,14 +58,14 @@
 
 | Camada | Repo (GitHub) | Produção (verificado) | Alinhado? |
 |--------|---------------|------------------------|-----------|
-| **Frontend** | **v1.8.5** (`mk-version.js`) | após push | ⏸ |
-| **Service Worker** | v1.8.5 (`sw.js`) | — | ✅ |
-| **GAS** | **v1.5.78** (header `.gs`) | Ping **verificar** (alvo v1.5.78) | ⏸ |
+| **Frontend** | **v1.8.10** (`mk-version.js`) | após push | ⏸ |
+| **Service Worker** | v1.8.10 (`sw.js`) | — | ✅ |
+| **GAS** | **v1.5.80** (header `.gs`) | Ping prod. **v1.5.79** · alvo **v1.5.80** | ⏸ |
 | **Deploy ID** | `AKfycbwakQ...` | Mesmo ID | ✅ |
 | **Git main** | `dca694f` | `origin/main` alinhado | ✅ |
 
-**Teste rápido:** https://ribocg-a11y.github.io/movikids/?force=1.8.5  
-**Ping GAS:** `?action=ping` → alvo `versao: v1.5.78`  
+**Teste rápido:** https://ribocg-a11y.github.io/movikids/?force=1.8.10  
+**Ping GAS:** `?action=ping` → alvo `versao: v1.5.80`  
 **CONFIG:** `TESTE_OPERACAO_CONFIG_READONLY.ps1` → baseline ok 08/06
 
 **I20 cronômetro:** RESOLVIDO — `INCIDENTE_I20_CRONOMETRO_RESOLUCAO_2026-06-07.md`. Não regredir sem `TESTE_I20_COMPLETO_PROD.ps1` + tablet.

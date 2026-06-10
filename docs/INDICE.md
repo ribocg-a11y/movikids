@@ -1,6 +1,6 @@
 # MOVI KIDS — Índice de documentação
 
-**Atualizado:** 09/06/2026 (FE **v1.8.5** repo + GAS **v1.5.78** repo · publicar pacote I23 fase 2)
+**Atualizado:** 10/06/2026 (FE **v1.8.10** · GAS **v1.5.80** repo · FASE 9 Folha CLT)
 
 ## Comece aqui
 
@@ -18,7 +18,8 @@
 
 | Documento | Para quê |
 |-----------|----------|
-| [**FASE_8_ALERTAS_SEMAFOROS.md**](ativos/FASE_8_ALERTAS_SEMAFOROS.md) | 🟡 **FASE 8** — sprint alertas + gates I22 |
+| [**FASE_9_FOLHA_VIABILIDADE_CLT.md**](ativos/FASE_9_FOLHA_VIABILIDADE_CLT.md) | 🟢 **FASE 9** — folha B68 + semáforo contratação |
+| [**FASE_8_ALERTAS_SEMAFOROS.md**](ativos/FASE_8_ALERTAS_SEMAFOROS.md) | ✅ **FASE 8** — alertas + semáforos (repo) |
 | [**PLANO_FASES_6_15_COCKPIT_EXECUTIVO_2026-06.md**](ativos/PLANO_FASES_6_15_COCKPIT_EXECUTIVO_2026-06.md) | 🟡 **FASE 6–15** — cockpit, UX admin, financeiro |
 | [CHECKLIST_FASE5_TABLET.md](ativos/CHECKLIST_FASE5_TABLET.md) | ✅ FASE 5 — Milena + I21 v1.7.96 |
 | [FASE_5_CONFIABILIDADE_APIS.md](ativos/FASE_5_CONFIABILIDADE_APIS.md) | B7, B1, B2, B8 — fechada |
@@ -42,9 +43,11 @@
 
 | Documento | Para quê |
 |-----------|----------|
-| [DEPLOY_GAS_v1.5.32_AUTH.md](ativos/DEPLOY_GAS_v1.5.32_AUTH.md) | Deploy GAS mestre |
-| [DEPLOY_v1.5.78_FASE7_KPI_PERF.md](ativos/DEPLOY_v1.5.78_FASE7_KPI_PERF.md) | **Deploy GAS v1.5.78** — kpiMes perf (regra de ouro) |
-| [DEPLOY_FE_v1.8.5_DASHBOARD_PERF.md](ativos/DEPLOY_FE_v1.8.5_DASHBOARD_PERF.md) | **Deploy FE v1.8.5** — cache SWR Dashboard |
+| [DEPLOY_GAS_v1.5.32_AUTH.md](ativos/DEPLOY_GAS_v1.5.32_AUTH.md) | Deploy GAS mestre + link `.gs` |
+| [DEPLOY_v1.5.80_FASE9_FOLHA_VIABILIDADE.md](ativos/DEPLOY_v1.5.80_FASE9_FOLHA_VIABILIDADE.md) | **Deploy GAS v1.5.80** — folha CLT (regra de ouro) |
+| [DEPLOY_FE_v1.8.10_FASE9_FOLHA_VIABILIDADE.md](ativos/DEPLOY_FE_v1.8.10_FASE9_FOLHA_VIABILIDADE.md) | **Deploy FE v1.8.10** — painel viabilidade |
+| [DEPLOY_v1.5.79_FASE8_ALERTAS.md](ativos/DEPLOY_v1.5.79_FASE8_ALERTAS.md) | Deploy GAS v1.5.79 — FASE 8 |
+| [../referencia/FOLHA_PAGAMENTO_MEMORIAL_E_PLANILHA.md](../referencia/FOLHA_PAGAMENTO_MEMORIAL_E_PLANILHA.md) | Memorial aba FOLHA |
 | [DEPLOY_v1.5.77_FASE7_PERF.md](ativos/DEPLOY_v1.5.77_FASE7_PERF.md) | Deploy GAS v1.5.77 — I23 fase 1 |
 | [DEPLOY_v1.5.76_FASE7_LEADING.md](ativos/DEPLOY_v1.5.76_FASE7_LEADING.md) | Deploy GAS FASE 6–7 — regra de ouro completa |
 | [DEPLOY_FE_v1.8.2_HOTFIX_I22.md](ativos/DEPLOY_FE_v1.8.2_HOTFIX_I22.md) | Hotfix FE I22 — só Pages |

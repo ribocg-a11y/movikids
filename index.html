@@ -16,16 +16,16 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<script src="mk-stale-sync.js?v=1.8.9"></script>
-<script src="mk-version.js?v=1.8.9"></script>
-<script src="mk-api.js?v=1.8.9"></script>
-<link rel="stylesheet" href="mk-design.css?v=1.8.9">
+<script src="mk-stale-sync.js?v=1.8.10"></script>
+<script src="mk-version.js?v=1.8.10"></script>
+<script src="mk-api.js?v=1.8.10"></script>
+<link rel="stylesheet" href="mk-design.css?v=1.8.10">
 
-<script src="mk-cache-bust.js?v=1.8.9"></script>
+<script src="mk-cache-bust.js?v=1.8.10"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<link rel="stylesheet" href="mk-app.css?v=1.8.9">
+<link rel="stylesheet" href="mk-app.css?v=1.8.10">
 <!-- Firebase SDK — Realtime sync canonico para todos os dispositivos -->
-<script type="module" src="mk-firebase.js?v=1.8.9"></script>
+<script type="module" src="mk-firebase.js?v=1.8.10"></script>
 </head>
 
 <body>
@@ -908,6 +908,26 @@
     </div>
     <div class="mk-leading-sens" id="mk-leading-sens" style="display:none"></div>
 
+    <!-- FASE 9 — Viabilidade contratação CLT (aba FOLHA) -->
+    <div id="mk-contratacao-panel" class="mk-contratacao-panel" style="display:none" aria-live="polite">
+      <div class="mk-contrat-head">
+        <div>
+          <div class="mk-contrat-label">Sustentabilidade CLT · estudo com folha</div>
+          <div class="mk-contrat-title" id="mk-contrat-title">Analisando…</div>
+        </div>
+        <span class="mk-contrat-badge" id="mk-contrat-badge">—</span>
+      </div>
+      <div class="mk-contrat-nums">
+        <div class="mk-contrat-n"><div class="mk-contrat-n-val" style="color:#5E35B1" id="mk-contrat-folha">—</div><div class="mk-contrat-n-lbl">Folha/mês (FOLHA B68)</div></div>
+        <div class="mk-contrat-n"><div class="mk-contrat-n-val" id="mk-contrat-res-atual">—</div><div class="mk-contrat-n-lbl">Resultado c/ folha (mês)</div></div>
+        <div class="mk-contrat-n"><div class="mk-contrat-n-val" id="mk-contrat-res-proj">—</div><div class="mk-contrat-n-lbl">Projeção c/ folha</div></div>
+        <div class="mk-contrat-n"><div class="mk-contrat-n-val blue" id="mk-contrat-fat-min">—</div><div class="mk-contrat-n-lbl">Fat. mín. sugerido</div></div>
+      </div>
+      <p class="mk-contrat-motivo" id="mk-contrat-motivo"></p>
+      <ul class="mk-contrat-gates" id="mk-contrat-gates"></ul>
+      <p class="mk-contrat-rec" id="mk-contrat-rec"></p>
+    </div>
+
     <!-- Alerta diário (Fase 5) -->
     <div id="nk-alerta" class="alerta-banner warn" style="display:none">
       <span class="alerta-icon">⚠️</span>
@@ -1478,22 +1498,22 @@
   </div>
 </div>
 
-<script src="mk-globals.js?v=1.8.9"></script>
-<script src="mk-core.js?v=1.8.9"></script>
-<script src="mk-nav.js?v=1.8.9"></script>
-<script src="mk-admin.js?v=1.8.9"></script>
-<script src="mk-historico.js?v=1.8.9"></script>
-<script src="mk-sessao.js?v=1.8.9"></script>
-<script src="mk-home.js?v=1.8.9"></script>
-<script src="mk-custos.js?v=1.8.9"></script>
-<script src="mk-avulso.js?v=1.8.9"></script>
-<script src="mk-sync.js?v=1.8.9"></script>
-<script src="mk-nova.js?v=1.8.9"></script>
-<script src="mk-relacionamento.js?v=1.8.9"></script>
-<script src="mk-operacao.js?v=1.8.9"></script>
-<script src="mk-drawer.js?v=1.8.9"></script>
-<script src="mk-update.js?v=1.8.9"></script>
-<script src="mk-auth.js?v=1.8.9"></script>
-<script src="mk-boot.js?v=1.8.9"></script>
+<script src="mk-globals.js?v=1.8.10"></script>
+<script src="mk-core.js?v=1.8.10"></script>
+<script src="mk-nav.js?v=1.8.10"></script>
+<script src="mk-admin.js?v=1.8.10"></script>
+<script src="mk-historico.js?v=1.8.10"></script>
+<script src="mk-sessao.js?v=1.8.10"></script>
+<script src="mk-home.js?v=1.8.10"></script>
+<script src="mk-custos.js?v=1.8.10"></script>
+<script src="mk-avulso.js?v=1.8.10"></script>
+<script src="mk-sync.js?v=1.8.10"></script>
+<script src="mk-nova.js?v=1.8.10"></script>
+<script src="mk-relacionamento.js?v=1.8.10"></script>
+<script src="mk-operacao.js?v=1.8.10"></script>
+<script src="mk-drawer.js?v=1.8.10"></script>
+<script src="mk-update.js?v=1.8.10"></script>
+<script src="mk-auth.js?v=1.8.10"></script>
+<script src="mk-boot.js?v=1.8.10"></script>
 </body>
 </html>

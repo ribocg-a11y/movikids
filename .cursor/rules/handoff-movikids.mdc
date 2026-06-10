@@ -50,9 +50,11 @@ Ao trabalhar neste repositório, **ler primeiro** (nesta ordem):
 
 **FASE 5:** ✅ fechada 09/06 — Milena + I21 v1.7.96 · ver `PLANEJAMENTO_ATUAL_2026-06.md`
 
-**Produção (09/06/2026 — repo v1.8.5 / v1.5.78):** publicar pacote I23 fase 2 antes de FASE 8
+**Produção (10/06/2026 — repo):** publicar **GAS v1.5.80** Nova versão Web + **FE v1.8.10** push
 
 **Teste / diagnóstico:** `PROTOCOLO_DIAGNOSTICO_E_TESTES.md` → `TESTE_PROTOCOLO_DIAGNOSTICO.ps1`.
+
+**Regra 16:** toda resposta termina com `Mudança no AppScript: sim|não` + link `.gs` — `.cursor/rules/gas-deploy-caminho-pc.mdc`
 
 **I20 guards:** timer → `-Foco cronometro` + tablet ▶→10:00.
 

@@ -1,6 +1,6 @@
 # MOVI KIDS — Mapa de erros, falhas e bugs
 
-**Atualizado:** 09/06/2026 — **I23 fechado** (FE v1.8.4 + GAS v1.5.77) — ver `../arquivo/incidentes/INCIDENTE_I23_DASHBOARD_LENTO_TRAVADO_2026-06-09.md`  
+**Atualizado:** 10/06/2026 — **I23 fechado** · **FASE 9 Folha CLT** repo v1.8.10/v1.5.80  
 **Uso anterior:** 09/06/2026 — **I22 fechado** (hotfix FE v1.8.2)  
 **Uso:** consultar **antes de publicar** e **ao montar checklist de teste**. Cada linha tem trava e script de verificação quando existir.
 
