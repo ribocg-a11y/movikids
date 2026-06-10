@@ -918,10 +918,7 @@ function renderDashboardCore_(d) {
     if (sel) sel.value = String(d.mesAtual);
   }
 
-  // KPIs (detalhe — linha abaixo do cockpit)
-  const ticket = (d.leadingFinanceiro && d.leadingFinanceiro.ticketMedio != null)
-    ? d.leadingFinanceiro.ticketMedio
-    : (d.nMes > 0 ? d.fatMes / d.nMes : 0);
+  // KPIs (detalhe — linha abaixo do cockpit; ticket médio só em #mk-leading-row — Pacote I)
   if (d.fatAno != null) {
     setText2('nk-fatano', R2(d.fatAno));
     setText2('nk-fatano-sub', (d.nAno || 0) + ' locações em ' + (d.anoAtual || ''));
@@ -931,8 +928,9 @@ function renderDashboardCore_(d) {
   }
   setText2('nk-fatmes',  R2(d.fatMes));
   setText2('nk-nloc',    d.nMes + ' locações no mês');
-  setText2('nk-ticket',  R2(ticket));
-  setText2('nk-cusmes',  'custos: ' + R2(d.cusMes));
+  setText2('nk-cusmes',  R2(d.cusMes));
+  const cusPct = d.fatMes > 0 ? Math.round((d.cusMes || 0) / d.fatMes * 1000) / 10 : 0;
+  setText2('nk-cusmes-sub', cusPct > 0 ? cusPct + '% do faturamento' : 'sem custos lançados');
   const resEl = document.getElementById('nk-resultado');
   if (resEl) { resEl.textContent = R2(d.resultado); resEl.className = 'nkv ' + ((d.resultado||0) >= 0 ? 'green' : 'red'); }
   setText2('nk-margem',  'margem ' + (d.margem||0) + '%');
