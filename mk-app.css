@@ -1269,6 +1269,34 @@ header{
 .payback-strip{background:var(--card);border:1.5px solid #7E57C2;border-radius:var(--radius);
   padding:12px 14px;margin-bottom:14px}
 /* FASE 6 — Cockpit executivo */
+.mk-dash-chapter{margin-bottom:22px;padding-bottom:4px;border-bottom:1px solid var(--border)}
+.mk-dash-chapter:last-of-type{border-bottom:none}
+.mk-dash-chapter-compact{margin-bottom:14px}
+.mk-dash-chapter-head{display:flex;gap:12px;align-items:flex-start;margin-bottom:12px}
+.mk-dash-step{flex-shrink:0;width:28px;height:28px;border-radius:50%;background:#1565C0;color:#fff;
+  font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;font-family:Nunito,sans-serif}
+.mk-dash-chapter-title{margin:0;font-size:16px;font-weight:800;color:var(--txt);line-height:1.25}
+.mk-dash-chapter-lead{margin:4px 0 0;font-size:12px;color:var(--txt3);line-height:1.45;max-width:720px}
+.mk-dash-chapter-lead strong{color:var(--txt2);font-weight:700}
+.mk-decisao-panel{background:var(--card);border:2px solid rgba(21,101,192,.25);border-radius:14px;
+  padding:14px 16px;margin-bottom:14px;display:grid;gap:12px}
+.mk-decisao-col{background:rgba(255,255,255,.6);border:1px solid var(--border);border-radius:10px;padding:12px 14px}
+.mk-decisao-col-folha{border-color:rgba(94,53,177,.25);background:linear-gradient(135deg,rgba(94,53,177,.04),rgba(255,255,255,.6))}
+.mk-decisao-tag{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--txt3);margin-bottom:10px}
+.mk-decisao-col-folha .mk-decisao-tag{color:#5E35B1}
+.mk-decisao-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@media (max-width:640px){.mk-decisao-row{grid-template-columns:1fr}}
+.mk-decisao-metric-lbl{font-size:10px;font-weight:600;color:var(--txt3);text-transform:uppercase;letter-spacing:.03em;margin-bottom:4px}
+.mk-decisao-metric-val{font-size:22px;font-weight:800;font-family:Nunito,sans-serif;line-height:1.1;
+  font-variant-numeric:tabular-nums;color:var(--txt)}
+.mk-decisao-metric-val.blue{color:#1565C0}
+.mk-decisao-metric-sub{font-size:11px;color:var(--txt3);margin-top:5px;line-height:1.35}
+.mk-decisao-foot{margin:0;font-size:12px;color:var(--txt2);line-height:1.45;padding:8px 10px;background:rgba(21,101,192,.06);
+  border-radius:8px;border-left:3px solid #1565C0}
+@media (min-width:768px){
+  .mk-decisao-panel{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .mk-decisao-foot{grid-column:1/-1}
+}
 .mk-exec-cockpit{
   background:linear-gradient(135deg,rgba(21,101,192,.08),rgba(233,30,140,.06));
   border:1.5px solid rgba(21,101,192,.22);border-radius:14px;padding:14px 16px;margin-bottom:14px;
@@ -1294,7 +1322,8 @@ header{
   content:' · atualizando…';font-size:11px;font-weight:600;color:var(--txt3);margin-left:6px}
 #page-dashboard.mk-dash-loading .nkv:not([data-filled]){opacity:.55}
 /* FASE 7 — Leading financeiros */
-.mk-leading-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:10px}
+.mk-leading-row{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-bottom:10px}
+@media (max-width:1100px){.mk-leading-row{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media (max-width:960px){.mk-leading-row{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .mk-leading-kpi{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 12px}
 .mk-leading-lbl{font-size:10px;font-weight:600;color:var(--txt3);text-transform:uppercase;letter-spacing:.03em}

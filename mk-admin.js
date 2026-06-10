@@ -1009,7 +1009,9 @@ function renderExecCockpit_(d) {
 
   const nar = document.getElementById('mk-exec-narrativa');
   if (nar) {
-    nar.textContent = d.narrativaExecutiva || 'Leitura executiva indisponível — publique GAS v1.5.75+.';
+    var text = d.narrativaExecutiva || 'Leitura executiva indisponível — publique GAS v1.5.75+.';
+    text = text.replace(/\s*CLT simulado[^.]*\.\s*/i, ' ');
+    nar.textContent = text.trim();
   }
 
   if (d.sinalEmpresa) {
@@ -1021,6 +1023,84 @@ function renderExecCockpit_(d) {
       badge.style.background = resultado >= 0 && margem >= 10 ? 'rgba(46,125,50,.12)' : (resultado >= 0 ? 'rgba(230,81,0,.12)' : 'rgba(198,40,40,.12)');
       badge.style.color = resultado >= 0 && margem >= 10 ? '#2E7D32' : (resultado >= 0 ? '#E65100' : '#C62828');
     }
+  }
+}
+
+/** Seção 2 — comparativo lucro e meta loc/dia (sem vs com folha). */
+function renderDecisaoPanel_(d) {
+  const panel = document.getElementById('mk-dash-decisao');
+  if (!panel || !d) return;
+  const lf = d.leadingFinanceiro;
+  const v = d.viabilidadeContratacao;
+  if (!lf && d.resultado == null) {
+    panel.style.display = 'none';
+    return;
+  }
+  panel.style.display = '';
+
+  const resultado = Number(d.resultado) || 0;
+  const resSem = document.getElementById('mk-dec-res-sem');
+  if (resSem) {
+    resSem.textContent = R2(resultado);
+    resSem.style.color = resultado >= 0 ? '#2E7D32' : '#C62828';
+  }
+  const margem = Number(d.margem) || 0;
+  setText2('mk-dec-res-sem-sub', margem + '% margem · ' + (d.nMes || 0) + ' locações no mês');
+
+  const be = lf && lf.breakEvenLocacoesDia;
+  setText2('mk-dec-be-sem', be != null ? (be + ' loc/dia') : '—');
+  const mediaDia = Number(d.mediaDiaria) || (d.diasOperando > 0 ? Math.round(d.nMes / d.diasOperando * 10) / 10 : 0);
+  const beSemSub = document.getElementById('mk-dec-be-sem-sub');
+  if (beSemSub) {
+    if (be != null && mediaDia > 0) {
+      const ok = mediaDia >= be;
+      beSemSub.textContent = 'Média atual: ' + mediaDia + ' loc/dia (' + (d.diasOperando || 0) + ' dias) · ' + (ok ? 'acima da meta ✓' : 'abaixo da meta');
+      beSemSub.style.color = ok ? '#2E7D32' : '#C62828';
+    } else {
+      beSemSub.textContent = (d.diasOperando || 0) + ' dias com movimento';
+      beSemSub.style.color = '';
+    }
+  }
+
+  const folhaOk = v && v.ok;
+  const resFolhaVal = folhaOk ? (Number(v.resultadoComFolha) || 0) : null;
+  const resFolha = document.getElementById('mk-dec-res-folha');
+  if (resFolha) {
+    if (folhaOk) {
+      resFolha.textContent = R2(resFolhaVal) + ' (até hoje)';
+      resFolha.style.color = resFolhaVal >= 0 ? '#2E7D32' : '#C62828';
+    } else resFolha.textContent = '—';
+  }
+  const resFolhaSub = document.getElementById('mk-dec-res-folha-sub');
+  if (resFolhaSub) {
+    if (folhaOk && v.projecaoResComFolha != null) {
+      resFolhaSub.textContent = 'Projeção mês cheio: ' + R2(v.projecaoResComFolha) + ' (' + (v.margemProjComFolha || 0) + '% margem)';
+      resFolhaSub.style.color = v.projecaoResComFolha >= 0 ? '#2E7D32' : '#C62828';
+    } else resFolhaSub.textContent = 'Configure aba FOLHA + GAS v1.5.80';
+  }
+
+  const beFolha = lf && lf.breakEvenComFolha;
+  setText2('mk-dec-be-folha', beFolha != null ? (beFolha + ' loc/dia') : '—');
+  const beFolhaSub = document.getElementById('mk-dec-be-folha-sub');
+  const folhaMes = (v && v.folhaMensal) || (lf && lf.folhaMensalSimulada) || 0;
+  if (beFolhaSub) {
+    if (beFolha != null && mediaDia > 0) {
+      const ok = mediaDia >= beFolha;
+      beFolhaSub.textContent = 'Folha ' + R2(folhaMes) + '/mês · ' + (ok ? 'média atinge meta ✓' : 'faltam ~' + Math.max(0, Math.ceil(beFolha - mediaDia)) + ' loc/dia');
+      beFolhaSub.style.color = ok ? '#2E7D32' : '#C62828';
+    } else if (folhaMes > 0) {
+      beFolhaSub.textContent = 'Folha simulada ' + R2(folhaMes) + '/mês (2 atendentes)';
+      beFolhaSub.style.color = '';
+    } else beFolhaSub.textContent = 'Simulação 2 atendentes (aba FOLHA)';
+  }
+
+  const foot = document.getElementById('mk-decisao-foot');
+  if (foot) {
+    if (folhaOk && v.label) {
+      foot.textContent = 'Semáforo contratação: ' + v.label + ' — ' + (v.recomendacao || v.motivo || '');
+    } else if (be != null && beFolha != null) {
+      foot.textContent = 'Para manter o negócio rentável: meta sem folha ' + be + ' loc/dia · com folha ' + beFolha + ' loc/dia.';
+    } else foot.textContent = '';
   }
 }
 
@@ -1043,15 +1123,15 @@ function renderLeadingFinanceiro_(d) {
   const be = lf.breakEvenLocacoesDia;
   setText2('mk-lead-be', be != null ? (be + ' loc') : '—');
   setText2('mk-lead-be-sub', lf.custoDiaMedio != null ? ('custo dia ~' + R2(lf.custoDiaMedio)) : '—');
+  const beF = lf.breakEvenComFolha;
+  setText2('mk-lead-be-folha', beF != null ? (beF + ' loc') : '—');
+  setText2('mk-lead-be-folha-sub', lf.custoDiaComFolha != null ? ('custo dia c/ folha ~' + R2(lf.custoDiaComFolha)) : (lf.folhaMensalSimulada ? ('folha ' + R2(lf.folhaMensalSimulada)) : '—'));
   if (sens && lf.sensibilidade) {
     const s = lf.sensibilidade;
     const parts = [];
     if (s.fatMais10Pct) parts.push('Fat +10% → resultado ' + R2(s.fatMais10Pct.resultado) + ' (' + (s.fatMais10Pct.deltaResultado >= 0 ? '+' : '') + R2(s.fatMais10Pct.deltaResultado) + ')');
     if (s.custosMais10Pct) parts.push('Custos +10% → ' + R2(s.custosMais10Pct.resultado) + ' (Δ ' + R2(s.custosMais10Pct.deltaResultado) + ')');
     if (lf.impactoOcupacao5pp != null) parts.push('+5 pp ocupação ≈ ' + R2(lf.impactoOcupacao5pp) + ' no resultado/mês');
-    if (lf.breakEvenComFolha != null && lf.folhaMensalSimulada > 0) {
-      parts.push('Break-even c/ folha: ' + lf.breakEvenComFolha + ' loc/dia (sem folha: ' + (be != null ? be : '—') + ')');
-    }
     if (parts.length) {
       sens.style.display = 'block';
       sens.textContent = parts.join(' · ');
@@ -1128,9 +1208,10 @@ function renderContratacaoPanel_(d) {
 function renderDashboardCore_(d) {
   if (!d) return;
   renderExecCockpit_(d);
+  renderDecisaoPanel_(d);
+  renderContratacaoPanel_(d);
   renderAlertStrip_(d);
   renderLeadingFinanceiro_(d);
-  renderContratacaoPanel_(d);
 
   // título
   if (d.mesAtual && d.anoAtual) {

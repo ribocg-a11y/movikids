@@ -16,16 +16,16 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<script src="mk-stale-sync.js?v=1.8.10"></script>
-<script src="mk-version.js?v=1.8.10"></script>
-<script src="mk-api.js?v=1.8.10"></script>
-<link rel="stylesheet" href="mk-design.css?v=1.8.10">
+<script src="mk-stale-sync.js?v=1.8.11"></script>
+<script src="mk-version.js?v=1.8.11"></script>
+<script src="mk-api.js?v=1.8.11"></script>
+<link rel="stylesheet" href="mk-design.css?v=1.8.11">
 
-<script src="mk-cache-bust.js?v=1.8.10"></script>
+<script src="mk-cache-bust.js?v=1.8.11"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<link rel="stylesheet" href="mk-app.css?v=1.8.10">
+<link rel="stylesheet" href="mk-app.css?v=1.8.11">
 <!-- Firebase SDK — Realtime sync canonico para todos os dispositivos -->
-<script type="module" src="mk-firebase.js?v=1.8.10"></script>
+<script type="module" src="mk-firebase.js?v=1.8.11"></script>
 </head>
 
 <body>
@@ -841,7 +841,18 @@
       </select>
     </div>
 
-    <!-- FASE 6 — Cockpit executivo -->
+    <!-- Narrativa Dashboard — ordem de leitura 1→5 -->
+    <div id="mk-dash-narrative">
+
+    <!-- 1 · COMEÇO — panorama do mês -->
+    <section class="mk-dash-chapter" id="mk-chapter-inicio" aria-labelledby="mk-chapter-inicio-h">
+      <header class="mk-dash-chapter-head">
+        <span class="mk-dash-step" aria-hidden="true">1</span>
+        <div>
+          <h2 class="mk-dash-chapter-title" id="mk-chapter-inicio-h">Como está o negócio este mês?</h2>
+          <p class="mk-dash-chapter-lead">Comece aqui: faturamento, lucro <strong>sem folha</strong> e saúde geral (margem, payback, ocupação).</p>
+        </div>
+      </header>
     <div id="mk-exec-cockpit" class="mk-exec-cockpit" style="display:none" aria-live="polite">
       <div class="mk-exec-head">
         <div>
@@ -862,7 +873,7 @@
           <div class="mk-exec-kpi-delta" id="mk-exec-margem-d">—</div>
         </div>
         <div class="mk-exec-kpi">
-          <div class="mk-exec-kpi-lbl">Resultado líquido</div>
+          <div class="mk-exec-kpi-lbl">Lucro líquido · sem folha</div>
           <div class="mk-exec-kpi-val green" id="mk-exec-resultado">—</div>
           <div class="mk-exec-kpi-delta" id="mk-exec-res-d">—</div>
         </div>
@@ -879,11 +890,95 @@
       </div>
       <p class="mk-exec-narrativa" id="mk-exec-narrativa">Carregando leitura do mês…</p>
     </div>
+    </section>
 
-    <!-- FASE 8 — Alertas proativos (só admin) -->
+    <!-- 2 · MEIO — lucro e meta diária -->
+    <section class="mk-dash-chapter" id="mk-chapter-lucro" aria-labelledby="mk-chapter-lucro-h">
+      <header class="mk-dash-chapter-head">
+        <span class="mk-dash-step" aria-hidden="true">2</span>
+        <div>
+          <h2 class="mk-dash-chapter-title" id="mk-chapter-lucro-h">Lucro e meta de locações por dia</h2>
+          <p class="mk-dash-chapter-lead">Compare <strong>sem folha</strong> (situação atual) vs <strong>com folha simulada</strong> (2 atendentes · aba FOLHA). A meta é o break-even: locações/dia mínimas para cobrir custos.</p>
+        </div>
+      </header>
+
+      <div id="mk-dash-decisao" class="mk-decisao-panel" style="display:none">
+        <div class="mk-decisao-col">
+          <div class="mk-decisao-tag">Sem folha CLT</div>
+          <div class="mk-decisao-row">
+            <div class="mk-decisao-metric">
+              <div class="mk-decisao-metric-lbl">Lucro líquido (mês até hoje)</div>
+              <div class="mk-decisao-metric-val" id="mk-dec-res-sem">—</div>
+              <div class="mk-decisao-metric-sub" id="mk-dec-res-sem-sub">—</div>
+            </div>
+            <div class="mk-decisao-metric">
+              <div class="mk-decisao-metric-lbl">Meta locações/dia (break-even)</div>
+              <div class="mk-decisao-metric-val blue" id="mk-dec-be-sem">—</div>
+              <div class="mk-decisao-metric-sub" id="mk-dec-be-sem-sub">—</div>
+            </div>
+          </div>
+        </div>
+        <div class="mk-decisao-col mk-decisao-col-folha">
+          <div class="mk-decisao-tag">Com folha simulada</div>
+          <div class="mk-decisao-row">
+            <div class="mk-decisao-metric">
+              <div class="mk-decisao-metric-lbl">Lucro líquido c/ folha</div>
+              <div class="mk-decisao-metric-val" id="mk-dec-res-folha">—</div>
+              <div class="mk-decisao-metric-sub" id="mk-dec-res-folha-sub">—</div>
+            </div>
+            <div class="mk-decisao-metric">
+              <div class="mk-decisao-metric-lbl">Meta locações/dia c/ folha</div>
+              <div class="mk-decisao-metric-val blue" id="mk-dec-be-folha">—</div>
+              <div class="mk-decisao-metric-sub" id="mk-dec-be-folha-sub">—</div>
+            </div>
+          </div>
+        </div>
+        <p class="mk-decisao-foot" id="mk-decisao-foot"></p>
+      </div>
+
+    <!-- FASE 9 — Viabilidade contratação CLT (aba FOLHA) -->
+    <div id="mk-contratacao-panel" class="mk-contratacao-panel" style="display:none" aria-live="polite">
+      <div class="mk-contrat-head">
+        <div>
+          <div class="mk-contrat-label">Checklist — posso contratar CLT?</div>
+          <div class="mk-contrat-title" id="mk-contrat-title">Analisando…</div>
+        </div>
+        <span class="mk-contrat-badge" id="mk-contrat-badge">—</span>
+      </div>
+      <div class="mk-contrat-nums">
+        <div class="mk-contrat-n"><div class="mk-contrat-n-val" style="color:#5E35B1" id="mk-contrat-folha">—</div><div class="mk-contrat-n-lbl">Folha/mês (FOLHA B68)</div></div>
+        <div class="mk-contrat-n"><div class="mk-contrat-n-val" id="mk-contrat-res-atual">—</div><div class="mk-contrat-n-lbl">Resultado c/ folha (mês)</div></div>
+        <div class="mk-contrat-n"><div class="mk-contrat-n-val" id="mk-contrat-res-proj">—</div><div class="mk-contrat-n-lbl">Projeção c/ folha</div></div>
+        <div class="mk-contrat-n"><div class="mk-contrat-n-val blue" id="mk-contrat-fat-min">—</div><div class="mk-contrat-n-lbl">Fat. mín. sugerido</div></div>
+      </div>
+      <p class="mk-contrat-motivo" id="mk-contrat-motivo"></p>
+      <ul class="mk-contrat-gates" id="mk-contrat-gates"></ul>
+      <p class="mk-contrat-rec" id="mk-contrat-rec"></p>
+    </div>
+    </section>
+
+    <!-- 3 · ALERTAS — ação imediata -->
+    <section class="mk-dash-chapter mk-dash-chapter-compact" id="mk-chapter-alertas" aria-labelledby="mk-chapter-alertas-h">
+      <header class="mk-dash-chapter-head">
+        <span class="mk-dash-step" aria-hidden="true">3</span>
+        <div>
+          <h2 class="mk-dash-chapter-title" id="mk-chapter-alertas-h">O que exige atenção agora</h2>
+          <p class="mk-dash-chapter-lead">Alertas automáticos — resolva ou monitore antes de decidir contratar.</p>
+        </div>
+      </header>
     <div id="mk-alert-strip" class="mk-alert-strip" style="display:none" aria-live="polite"></div>
+    </section>
 
-    <!-- FASE 7 — Leading financeiros -->
+    <!-- 4 · DETALHE — composição -->
+    <section class="mk-dash-chapter" id="mk-chapter-detalhe" aria-labelledby="mk-chapter-detalhe-h">
+      <header class="mk-dash-chapter-head">
+        <span class="mk-dash-step" aria-hidden="true">4</span>
+        <div>
+          <h2 class="mk-dash-chapter-title" id="mk-chapter-detalhe-h">De onde vêm os números</h2>
+          <p class="mk-dash-chapter-lead">Ticket, custos, CTO Golden e indicadores complementares do mês.</p>
+        </div>
+      </header>
+
     <div id="mk-leading-row" class="mk-leading-row" style="display:none">
       <div class="mk-leading-kpi">
         <div class="mk-leading-lbl">Ticket médio</div>
@@ -901,32 +996,17 @@
         <div class="mk-leading-sub" id="mk-lead-custoloc-sub">—</div>
       </div>
       <div class="mk-leading-kpi">
-        <div class="mk-leading-lbl">Break-even dia</div>
+        <div class="mk-leading-lbl">Break-even · sem folha</div>
         <div class="mk-leading-val" id="mk-lead-be">—</div>
         <div class="mk-leading-sub" id="mk-lead-be-sub">—</div>
       </div>
+      <div class="mk-leading-kpi">
+        <div class="mk-leading-lbl">Break-even · com folha</div>
+        <div class="mk-leading-val" id="mk-lead-be-folha">—</div>
+        <div class="mk-leading-sub" id="mk-lead-be-folha-sub">—</div>
+      </div>
     </div>
     <div class="mk-leading-sens" id="mk-leading-sens" style="display:none"></div>
-
-    <!-- FASE 9 — Viabilidade contratação CLT (aba FOLHA) -->
-    <div id="mk-contratacao-panel" class="mk-contratacao-panel" style="display:none" aria-live="polite">
-      <div class="mk-contrat-head">
-        <div>
-          <div class="mk-contrat-label">Sustentabilidade CLT · estudo com folha</div>
-          <div class="mk-contrat-title" id="mk-contrat-title">Analisando…</div>
-        </div>
-        <span class="mk-contrat-badge" id="mk-contrat-badge">—</span>
-      </div>
-      <div class="mk-contrat-nums">
-        <div class="mk-contrat-n"><div class="mk-contrat-n-val" style="color:#5E35B1" id="mk-contrat-folha">—</div><div class="mk-contrat-n-lbl">Folha/mês (FOLHA B68)</div></div>
-        <div class="mk-contrat-n"><div class="mk-contrat-n-val" id="mk-contrat-res-atual">—</div><div class="mk-contrat-n-lbl">Resultado c/ folha (mês)</div></div>
-        <div class="mk-contrat-n"><div class="mk-contrat-n-val" id="mk-contrat-res-proj">—</div><div class="mk-contrat-n-lbl">Projeção c/ folha</div></div>
-        <div class="mk-contrat-n"><div class="mk-contrat-n-val blue" id="mk-contrat-fat-min">—</div><div class="mk-contrat-n-lbl">Fat. mín. sugerido</div></div>
-      </div>
-      <p class="mk-contrat-motivo" id="mk-contrat-motivo"></p>
-      <ul class="mk-contrat-gates" id="mk-contrat-gates"></ul>
-      <p class="mk-contrat-rec" id="mk-contrat-rec"></p>
-    </div>
 
     <!-- Alerta diário (Fase 5) -->
     <div id="nk-alerta" class="alerta-banner warn" style="display:none">
@@ -976,7 +1056,7 @@
         <div class="cto-n"><div class="cto-n-val blue" id="nk-cto-fat">—</div><div class="cto-n-lbl">Faturamento</div></div>
         <div class="cto-n"><div class="cto-n-val" style="color:#E65100" id="nk-cto-val">—</div><div class="cto-n-lbl">CTO a pagar</div></div>
         <div class="cto-n"><div class="cto-n-val" style="color:#c62828" id="nk-cto-cus">—</div><div class="cto-n-lbl">Custos operac.</div></div>
-        <div class="cto-n"><div class="cto-n-val" style="color:#2E7D32" id="nk-cto-disp">—</div><div class="cto-n-lbl">Resultado</div></div>
+        <div class="cto-n"><div class="cto-n-val" style="color:#2E7D32" id="nk-cto-disp">—</div><div class="cto-n-lbl">Lucro sem folha</div></div>
       </div>
       <div class="cto-bar-bg"><div class="cto-bar-fill" id="nk-cto-bar" style="width:0%"></div></div>
       <div class="cto-note" id="nk-cto-note">CTO = 0% do faturamento</div>
@@ -1000,6 +1080,17 @@
       <div class="payback-bar-bg"><div class="payback-bar-fill" id="nk-pb-bar" style="width:0%"></div></div>
       <div class="payback-note" id="nk-pb-note">—</div>
     </div>
+    </section>
+
+    <!-- 5 · FUNDO — tendência e gráficos -->
+    <section class="mk-dash-chapter" id="mk-chapter-tendencia" aria-labelledby="mk-chapter-tendencia-h">
+      <header class="mk-dash-chapter-head">
+        <span class="mk-dash-step" aria-hidden="true">5</span>
+        <div>
+          <h2 class="mk-dash-chapter-title" id="mk-chapter-tendencia-h">Tendência, projeção e detalhe</h2>
+          <p class="mk-dash-chapter-lead">Semanas, projeção do mês cheio e gráficos — use depois de entender o panorama (seções 1 e 2).</p>
+        </div>
+      </header>
 
     <!-- Receita e atendimentos por semana — interativo -->
     <div class="mk-semana-panel" id="mk-semana-panel">
@@ -1140,6 +1231,10 @@
         <div class="db-insight" id="nk-recorrencia-insight" style="display:none"></div>
       </div>
     </div>
+
+    </section>
+
+    </div><!-- /mk-dash-narrative -->
 
     <div id="mk-alert-modal" class="mk-alert-modal" hidden role="dialog" aria-modal="true" aria-labelledby="mk-alert-modal-title">
       <div class="mk-alert-modal-box">
@@ -1498,22 +1593,22 @@
   </div>
 </div>
 
-<script src="mk-globals.js?v=1.8.10"></script>
-<script src="mk-core.js?v=1.8.10"></script>
-<script src="mk-nav.js?v=1.8.10"></script>
-<script src="mk-admin.js?v=1.8.10"></script>
-<script src="mk-historico.js?v=1.8.10"></script>
-<script src="mk-sessao.js?v=1.8.10"></script>
-<script src="mk-home.js?v=1.8.10"></script>
-<script src="mk-custos.js?v=1.8.10"></script>
-<script src="mk-avulso.js?v=1.8.10"></script>
-<script src="mk-sync.js?v=1.8.10"></script>
-<script src="mk-nova.js?v=1.8.10"></script>
-<script src="mk-relacionamento.js?v=1.8.10"></script>
-<script src="mk-operacao.js?v=1.8.10"></script>
-<script src="mk-drawer.js?v=1.8.10"></script>
-<script src="mk-update.js?v=1.8.10"></script>
-<script src="mk-auth.js?v=1.8.10"></script>
-<script src="mk-boot.js?v=1.8.10"></script>
+<script src="mk-globals.js?v=1.8.11"></script>
+<script src="mk-core.js?v=1.8.11"></script>
+<script src="mk-nav.js?v=1.8.11"></script>
+<script src="mk-admin.js?v=1.8.11"></script>
+<script src="mk-historico.js?v=1.8.11"></script>
+<script src="mk-sessao.js?v=1.8.11"></script>
+<script src="mk-home.js?v=1.8.11"></script>
+<script src="mk-custos.js?v=1.8.11"></script>
+<script src="mk-avulso.js?v=1.8.11"></script>
+<script src="mk-sync.js?v=1.8.11"></script>
+<script src="mk-nova.js?v=1.8.11"></script>
+<script src="mk-relacionamento.js?v=1.8.11"></script>
+<script src="mk-operacao.js?v=1.8.11"></script>
+<script src="mk-drawer.js?v=1.8.11"></script>
+<script src="mk-update.js?v=1.8.11"></script>
+<script src="mk-auth.js?v=1.8.11"></script>
+<script src="mk-boot.js?v=1.8.11"></script>
 </body>
 </html>
