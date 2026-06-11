@@ -9,7 +9,7 @@ let _adminIdleWired = false;
 var kpiData         = null;
 var resumoDiaHoje   = null;
 let chartsRendered  = false;
-var chartDiario=null,chartExtrasDia=null,chartHistExt=null,chartHoras=null;
+var chartDiario=null,chartExtrasDia=null,chartHistExt=null,chartHoras=null,chartMetaDia=null;
 let pinBuffer       = '';
 
 // ── PIN ──────────────────────────────────────────────────────
@@ -1096,6 +1096,229 @@ function setDecisaoBeCell_(id, be, mediaLocDia, diasOp, projOk) {
   el.innerHTML = '<div class="mk-dec-val blue">' + be + ' loc/dia</div><div class="mk-dec-sub">' + sub + '</div>';
 }
 
+/** Mapa dia → n locações (porSemana ou locPorDia do GAS). */
+function extractLocPorDia_(d) {
+  const map = {};
+  if (d && d.locPorDia && d.locPorDia.length) {
+    d.locPorDia.forEach(function(x) { map[x.dia] = Number(x.n) || 0; });
+    return map;
+  }
+  (d.porSemana || []).forEach(function(sem) {
+    (sem.porDia || []).forEach(function(x) { map[x.dia] = Number(x.n) || 0; });
+  });
+  return map;
+}
+
+function mkMetaStatus_(n, meta) {
+  if (meta == null || meta <= 0) return { ok: null, faltam: null };
+  const nn = Number(n) || 0;
+  return { ok: nn >= meta, faltam: Math.max(0, meta - nn) };
+}
+
+function renderMetaHoje_(d) {
+  const box = document.getElementById('mk-meta-hoje');
+  if (!box || !d) return;
+  const lf = d.leadingFinanceiro;
+  const beSem = lf && lf.breakEvenLocacoesDia;
+  const beFolha = lf && lf.breakEvenComFolha;
+  const now = new Date();
+  const isMesAtual = d.mesAtual === now.getMonth() + 1 && d.anoAtual === now.getFullYear();
+  if (!isMesAtual || beSem == null) {
+    box.style.display = 'none';
+    return;
+  }
+  const locMap = extractLocPorDia_(d);
+  const nHoje = d.nHoje != null ? Number(d.nHoje) : (locMap[now.getDate()] || 0);
+  box.style.display = '';
+
+  const mesStr = String(d.mesAtual).padStart(2, '0');
+  setText2('mk-meta-hoje-data', now.getDate() + '/' + mesStr + '/' + (d.anoAtual || now.getFullYear()));
+
+  const stSem = mkMetaStatus_(nHoje, beSem);
+  const cardSem = document.getElementById('mk-meta-hoje-sem');
+  setText2('mk-meta-hoje-sem-val', nHoje + ' / ' + beSem + (stSem.ok ? ' ✓' : ' ✗'));
+  setText2('mk-meta-hoje-sem-sub', stSem.ok
+    ? ('Meta sem folha batida (+ ' + (nHoje - beSem) + ' loc)')
+    : ('Faltam ' + stSem.faltam + ' loc para o break-even do dia'));
+  if (cardSem) cardSem.classList.toggle('ok', !!stSem.ok);
+  if (cardSem) cardSem.classList.toggle('fail', stSem.ok === false);
+
+  const cardFolha = document.getElementById('mk-meta-hoje-folha');
+  if (beFolha == null) {
+    setText2('mk-meta-hoje-folha-val', '—');
+    setText2('mk-meta-hoje-folha-sub', 'Configure aba FOLHA para simular');
+    if (cardFolha) { cardFolha.classList.remove('ok', 'fail'); }
+  } else {
+    const stF = mkMetaStatus_(nHoje, beFolha);
+    setText2('mk-meta-hoje-folha-val', nHoje + ' / ' + beFolha + (stF.ok ? ' ✓' : ' ✗'));
+    setText2('mk-meta-hoje-folha-sub', stF.ok
+      ? ('Meta com folha batida (+ ' + (nHoje - beFolha) + ' loc)')
+      : ('Faltam ' + stF.faltam + ' loc com folha simulada'));
+    if (cardFolha) cardFolha.classList.toggle('ok', !!stF.ok);
+    if (cardFolha) cardFolha.classList.toggle('fail', stF.ok === false);
+  }
+}
+
+function renderMetaDiaChart_(d) {
+  const cv = document.getElementById('chart-meta-dia');
+  const ins = document.getElementById('nk-meta-dia-insight');
+  if (!cv || !window.Chart) return;
+  if (chartMetaDia) chartMetaDia.destroy();
+
+  const lf = d.leadingFinanceiro || {};
+  const beSem = lf.breakEvenLocacoesDia;
+  const beFolha = lf.breakEvenComFolha;
+  const locMap = extractLocPorDia_(d);
+  const hojeD = (d.mesAtual === new Date().getMonth() + 1 && d.anoAtual === new Date().getFullYear())
+    ? new Date().getDate()
+    : (d.fatPorDia || []).reduce(function(m, x) { return Math.max(m, x.dia || 0); }, 0);
+  const mesStr = String(d.mesAtual || new Date().getMonth() + 1).padStart(2, '0');
+
+  const dias = [];
+  for (let dd = 1; dd <= hojeD; dd++) dias.push(dd);
+
+  if (!dias.length || beSem == null) {
+    setText2('nk-meta-dia-label', beSem == null ? 'break-even indisponível' : 'sem dias no mês');
+    if (ins) ins.style.display = 'none';
+    return;
+  }
+
+  const locVals = dias.map(function(dd) { return locMap[dd] || 0; });
+  const ptBg = dias.map(function(dd) {
+    const n = locMap[dd] || 0;
+    if (n <= 0) return '#BDBDBD';
+    return n >= beSem ? '#2E7D32' : '#C62828';
+  });
+  const ptBorder = dias.map(function(dd) {
+    const n = locMap[dd] || 0;
+    if (n <= 0 || beFolha == null) return '#185FA5';
+    return n >= beFolha ? '#5E35B1' : '#FF8F00';
+  });
+
+  let hitSem = 0, hitFolha = 0, diasMov = 0;
+  dias.forEach(function(dd) {
+    const n = locMap[dd] || 0;
+    if (n <= 0) return;
+    diasMov++;
+    if (n >= beSem) hitSem++;
+    if (beFolha != null && n >= beFolha) hitFolha++;
+  });
+
+  setText2('nk-meta-dia-label',
+    diasMov > 0
+      ? ('sem folha ' + hitSem + '/' + diasMov + ' · com folha ' + (beFolha != null ? hitFolha + '/' + diasMov : '—'))
+      : 'nenhum dia com locação ainda');
+
+  const maxY = Math.max(beSem, beFolha || 0, Math.max.apply(null, locVals.concat([1]))) + 2;
+  const datasets = [
+    {
+      label: 'Locações',
+      data: locVals,
+      borderColor: '#185FA5',
+      backgroundColor: 'rgba(24,95,165,.12)',
+      borderWidth: 2.5,
+      pointRadius: dias.map(function(dd) { return (locMap[dd] || 0) > 0 ? 6 : 3; }),
+      pointHoverRadius: 8,
+      pointBackgroundColor: ptBg,
+      pointBorderColor: ptBorder,
+      pointBorderWidth: 2,
+      tension: 0.25,
+      fill: true,
+      order: 1
+    },
+    {
+      label: 'Meta sem folha',
+      data: dias.map(function() { return beSem; }),
+      borderColor: '#2E7D32',
+      borderWidth: 2,
+      borderDash: [6, 4],
+      pointRadius: 0,
+      tension: 0,
+      fill: false,
+      order: 0
+    }
+  ];
+  if (beFolha != null) {
+    datasets.push({
+      label: 'Meta com folha',
+      data: dias.map(function() { return beFolha; }),
+      borderColor: '#5E35B1',
+      borderWidth: 2,
+      borderDash: [6, 4],
+      pointRadius: 0,
+      tension: 0,
+      fill: false,
+      order: 0
+    });
+  }
+
+  chartMetaDia = new Chart(cv, {
+    type: 'line',
+    data: {
+      labels: dias.map(function(dd) { return dd + '/' + mesStr; }),
+      datasets: datasets
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: function(ctx) {
+              if (ctx.dataset.label !== 'Locações') {
+                return ctx.dataset.label + ': ' + Math.round(ctx.parsed.y) + ' loc/dia';
+              }
+              const n = Math.round(ctx.parsed.y);
+              const dd = dias[ctx.dataIndex];
+              if (n <= 0) return 'Sem movimento';
+              const parts = [n + ' locações'];
+              const stS = mkMetaStatus_(n, beSem);
+              parts.push(stS.ok ? '✓ sem folha' : '✗ sem folha (faltam ' + stS.faltam + ')');
+              if (beFolha != null) {
+                const stF = mkMetaStatus_(n, beFolha);
+                parts.push(stF.ok ? '✓ com folha' : '✗ com folha (faltam ' + stF.faltam + ')');
+              }
+              return parts.join(' · ');
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid: { display: false },
+          ticks: { font: { size: 9 }, color: '#888', maxTicksLimit: 12, maxRotation: 0 }
+        },
+        y: {
+          grid: { color: 'rgba(0,0,0,.06)' },
+          ticks: { font: { size: 9 }, color: '#888', stepSize: 1, precision: 0 },
+          min: 0,
+          suggestedMax: maxY
+        }
+      }
+    }
+  });
+
+  if (ins) {
+    if (diasMov <= 0) {
+      ins.style.display = 'none';
+    } else {
+      const pctSem = Math.round(hitSem / diasMov * 100);
+      const msgs = [
+        'Pontos verdes = bateu meta sem folha (' + beSem + ' loc); vermelhos = abaixo.',
+        hitSem + ' de ' + diasMov + ' dias com movimento na meta sem folha (' + pctSem + '%).'
+      ];
+      if (beFolha != null) {
+        const pctF = Math.round(hitFolha / diasMov * 100);
+        msgs.push('Com folha (' + beFolha + ' loc): ' + hitFolha + ' de ' + diasMov + ' dias (' + pctF + '%). Borda roxa = bateu; laranja = abaixo.');
+      }
+      ins.style.display = 'block';
+      ins.textContent = msgs.join(' ');
+    }
+  }
+}
+
 function renderDecisaoPanel_(d) {
   const panel = document.getElementById('mk-dash-decisao');
   if (!panel || !d) return;
@@ -1106,6 +1329,8 @@ function renderDecisaoPanel_(d) {
     return;
   }
   panel.style.display = '';
+
+  renderMetaHoje_(d);
 
   const diasOp = Number(d.diasOperando) || 0;
   const diasMes = Number(d.diasMes) || 30;
@@ -1388,7 +1613,7 @@ function renderChartsBody_(d) {
   if (!d) return;
   if (typeof renderSemanasChart_ === 'function') renderSemanasChart_(d);
   if (!window.Chart) return;
-  [chartDiario, chartExtrasDia, chartHoras].forEach(c => c && c.destroy());
+  [chartDiario, chartExtrasDia, chartHoras, chartMetaDia].forEach(c => c && c.destroy());
 
   const BLUE='#185FA5',PINK='#C2185B',GREEN='#3B6D11',AMBER='#BA7517',GRID='rgba(0,0,0,.06)';
   const PLAN_LABELS = {'10min':'10 min','20min':'20 min','30min':'30 min','40min':'40 min','60min':'1 hora','3h':'3 horas'};
@@ -1498,6 +1723,8 @@ function renderChartsBody_(d) {
       }
     });
   }
+
+  renderMetaDiaChart_(d);
 
   // Horários de pico
   const horasDat = (d.horasPico||[]).map((v,i)=>({h:(9+i)+'h',v:Number(v)||0}));

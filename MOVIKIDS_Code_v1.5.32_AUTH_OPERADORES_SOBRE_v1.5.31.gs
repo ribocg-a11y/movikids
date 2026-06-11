@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.82
+// MOVI KIDS — Google Apps Script v1.5.83
+// v1.5.83: kpiMes.locPorDia — locações por dia (meta loc/dia no Dashboard)
 // v1.5.82: FASE 14 — miniDre (margemBruta/cusCMV/cusOPEX) + lerPlanoContas_
 // v1.5.81: viabilidadeContratacao — folha proporcional no parcial (mesma base sem vs com folha)
 // v1.5.80: FASE 9 — folha FOLHA B68 + viabilidadeContratacao + alertas CONTRATACAO_* em kpiMes
@@ -2442,10 +2443,12 @@ function buildKpiMesPayload_(p) {
 
   const fatDiaArr = [];
   const extDiaArr = [];
+  const locDiaArr = [];
   for (let d = 1; d <= diasMes; d++) {
     const dk = String(d).padStart(2,'0');
     fatDiaArr.push({ dia: d, valor: fatPorDia[dk] || 0 });
     extDiaArr.push({ dia: d, valor: Math.round((extPorDia[dk] || 0) * 100) / 100 });
+    locDiaArr.push({ dia: d, n: nPorDia[dk] || 0 });
   }
 
   const diasOperandoCalc = diasComMov.size;
@@ -2563,6 +2566,7 @@ function buildKpiMesPayload_(p) {
     ctoMinimo:   ctoMin,
     fatPorDia:   fatDiaArr,
     extPorDia:   extDiaArr,
+    locPorDia:   locDiaArr,
     fatPorTipo,
     fatPorPlano,
     fatPorVeiculo,

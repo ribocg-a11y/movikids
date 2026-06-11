@@ -16,16 +16,16 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<script src="mk-stale-sync.js?v=1.8.17"></script>
-<script src="mk-version.js?v=1.8.17"></script>
-<script src="mk-api.js?v=1.8.17"></script>
-<link rel="stylesheet" href="mk-design.css?v=1.8.17">
+<script src="mk-stale-sync.js?v=1.8.18"></script>
+<script src="mk-version.js?v=1.8.18"></script>
+<script src="mk-api.js?v=1.8.18"></script>
+<link rel="stylesheet" href="mk-design.css?v=1.8.18">
 
-<script src="mk-cache-bust.js?v=1.8.17"></script>
+<script src="mk-cache-bust.js?v=1.8.18"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<link rel="stylesheet" href="mk-app.css?v=1.8.17">
+<link rel="stylesheet" href="mk-app.css?v=1.8.18">
 <!-- Firebase SDK — Realtime sync canonico para todos os dispositivos -->
-<script type="module" src="mk-firebase.js?v=1.8.17"></script>
+<script type="module" src="mk-firebase.js?v=1.8.18"></script>
 </head>
 
 <body>
@@ -930,6 +930,24 @@
       </header>
 
       <div id="mk-dash-decisao" class="mk-decisao-panel" style="display:none">
+        <div id="mk-meta-hoje" class="mk-meta-hoje" style="display:none" aria-live="polite">
+          <div class="mk-meta-hoje-head">
+            <span class="mk-meta-hoje-title">Meta de hoje</span>
+            <span class="mk-meta-hoje-date" id="mk-meta-hoje-data">—</span>
+          </div>
+          <div class="mk-meta-hoje-grid">
+            <div class="mk-meta-hoje-card" id="mk-meta-hoje-sem">
+              <span class="mk-meta-hoje-lbl">Sem folha CLT</span>
+              <span class="mk-meta-hoje-val" id="mk-meta-hoje-sem-val">—</span>
+              <span class="mk-meta-hoje-sub" id="mk-meta-hoje-sem-sub">—</span>
+            </div>
+            <div class="mk-meta-hoje-card mk-meta-hoje-card-folha" id="mk-meta-hoje-folha">
+              <span class="mk-meta-hoje-lbl">Com folha simulada</span>
+              <span class="mk-meta-hoje-val" id="mk-meta-hoje-folha-val">—</span>
+              <span class="mk-meta-hoje-sub" id="mk-meta-hoje-folha-sub">—</span>
+            </div>
+          </div>
+        </div>
         <p class="mk-decisao-base" id="mk-decisao-base"></p>
         <div class="mk-decisao-table" role="table" aria-label="Comparativo sem e com folha CLT">
           <div class="mk-decisao-tr mk-decisao-tr-head" role="row">
@@ -1187,6 +1205,25 @@
         <canvas id="chart-extras-dia" role="img" aria-label="Receita de minutos extras por dia">Extras por dia.</canvas>
       </div>
       <div class="db-insight" id="nk-ext-insight" style="display:none;margin-top:8px"></div>
+    </div>
+
+    <!-- Meta locações — dia a dia -->
+    <div class="new-chart-card mk-meta-chart-card" style="margin-bottom:14px">
+      <div class="new-chart-title">
+        Meta de locações — dia a dia
+        <span class="nct-note" id="nk-meta-dia-label">—</span>
+      </div>
+      <div class="mk-meta-chart-legend" id="nk-meta-dia-legend" aria-hidden="true">
+        <span class="mk-meta-leg mk-meta-leg-loc"><i></i> Locações do dia</span>
+        <span class="mk-meta-leg mk-meta-leg-sem"><i></i> Meta sem folha</span>
+        <span class="mk-meta-leg mk-meta-leg-folha"><i></i> Meta com folha</span>
+        <span class="mk-meta-leg mk-meta-leg-ok"><i></i> Bateu a meta</span>
+        <span class="mk-meta-leg mk-meta-leg-fail"><i></i> Abaixo da meta</span>
+      </div>
+      <div style="position:relative;height:280px">
+        <canvas id="chart-meta-dia" role="img" aria-label="Locações diárias versus meta sem e com folha">Meta de locações por dia.</canvas>
+      </div>
+      <div class="db-insight" id="nk-meta-dia-insight" style="display:none;margin-top:8px"></div>
     </div>
 
     <!-- Por tipo + Pico -->
@@ -1613,22 +1650,22 @@
   </div>
 </div>
 
-<script src="mk-globals.js?v=1.8.17"></script>
-<script src="mk-core.js?v=1.8.17"></script>
-<script src="mk-nav.js?v=1.8.17"></script>
-<script src="mk-admin.js?v=1.8.17"></script>
-<script src="mk-historico.js?v=1.8.17"></script>
-<script src="mk-sessao.js?v=1.8.17"></script>
-<script src="mk-home.js?v=1.8.17"></script>
-<script src="mk-custos.js?v=1.8.17"></script>
-<script src="mk-avulso.js?v=1.8.17"></script>
-<script src="mk-sync.js?v=1.8.17"></script>
-<script src="mk-nova.js?v=1.8.17"></script>
-<script src="mk-relacionamento.js?v=1.8.17"></script>
-<script src="mk-operacao.js?v=1.8.17"></script>
-<script src="mk-drawer.js?v=1.8.17"></script>
-<script src="mk-update.js?v=1.8.17"></script>
-<script src="mk-auth.js?v=1.8.17"></script>
-<script src="mk-boot.js?v=1.8.17"></script>
+<script src="mk-globals.js?v=1.8.18"></script>
+<script src="mk-core.js?v=1.8.18"></script>
+<script src="mk-nav.js?v=1.8.18"></script>
+<script src="mk-admin.js?v=1.8.18"></script>
+<script src="mk-historico.js?v=1.8.18"></script>
+<script src="mk-sessao.js?v=1.8.18"></script>
+<script src="mk-home.js?v=1.8.18"></script>
+<script src="mk-custos.js?v=1.8.18"></script>
+<script src="mk-avulso.js?v=1.8.18"></script>
+<script src="mk-sync.js?v=1.8.18"></script>
+<script src="mk-nova.js?v=1.8.18"></script>
+<script src="mk-relacionamento.js?v=1.8.18"></script>
+<script src="mk-operacao.js?v=1.8.18"></script>
+<script src="mk-drawer.js?v=1.8.18"></script>
+<script src="mk-update.js?v=1.8.18"></script>
+<script src="mk-auth.js?v=1.8.18"></script>
+<script src="mk-boot.js?v=1.8.18"></script>
 </body>
 </html>
