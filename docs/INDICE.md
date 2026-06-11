@@ -20,6 +20,7 @@
 |-----------|----------|
 | [**FASE_14_MINI_DRE.md**](ativos/FASE_14_MINI_DRE.md) | 🟡 **FASE 14** — plano contas + mini-DRE |
 | [**MEMORIAL_MINI_DRE.md**](referencia/MEMORIAL_MINI_DRE.md) | Fórmulas cascata margens |
+| [**FASE_9_FOLHA_VIABILIDADE_CLT.md**](ativos/FASE_9_FOLHA_VIABILIDADE_CLT.md) | 🟢 **FASE 9** — folha B68 + semáforo contratação |
 | [**FASE_8_ALERTAS_SEMAFOROS.md**](ativos/FASE_8_ALERTAS_SEMAFOROS.md) | ✅ **FASE 8** — alertas + semáforos (repo) |
 | [**PLANO_FASES_6_15_COCKPIT_EXECUTIVO_2026-06.md**](ativos/PLANO_FASES_6_15_COCKPIT_EXECUTIVO_2026-06.md) | 🟡 **FASE 6–15** — cockpit, UX admin, financeiro |
 | [CHECKLIST_FASE5_TABLET.md](ativos/CHECKLIST_FASE5_TABLET.md) | ✅ FASE 5 — Milena + I21 v1.7.96 |
