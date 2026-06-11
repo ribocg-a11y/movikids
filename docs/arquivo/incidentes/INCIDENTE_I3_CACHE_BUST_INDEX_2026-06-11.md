@@ -57,7 +57,9 @@
 
 1. Rodar `.\scripts\pre-push-check.ps1` antes de **todo** push FE
 2. Checklist agente: `mk-version.js` + `sw.js` + **`index.html ?v=`** na mesma sessão
-3. Após push: curl ou browser em `mk-version.js?v=VERSAO` e `index.html` na Pages
+3. Após push: `.\scripts\verify-publish-complete.ps1` (I24) ou curl `mk-version.js` na Pages
+
+Ver também **I24** — commit sem push: `INCIDENTE_I24_COMMIT_SEM_PUSH_2026-06-11.md`
 
 ---
 

@@ -36,6 +36,7 @@ Leia **nesta ordem**:
 |---------------------|-------------------|---------|
 | Ler docs, editar código, `pre-push-check`, ping GAS, testes `.ps1` | `clasp push` | Nova versão Web GAS no editor |
 | **`git commit` + `git push`** após mudanças FE/docs (automático) | Mudanças em `api()` / auth | Tablet balcão `?force=` |
+| **`verify-publish-complete.ps1`** após todo push FE (Regra 8 / I24) | — | — |
 | **Planilha** via `google-drive-sheets-auth` (OAuth) | Escritas destrutivas na planilha | Script Properties SMS, re-auth OAuth |
 | Preparar deploy (sync + clasp push) | Limpar testes prod / corrigir financeiro GAS | — |
 
@@ -71,7 +72,8 @@ Fonte de verdade: `mk-version.js`, header do `.gs`, ping GAS.
 - **Legado:** `arquivo-historico/` — não implantar
 - **Testes:** `scripts/testes/`
 - **Protocolo teste/diagnóstico:** `docs/ativos/PROTOCOLO_DIAGNOSTICO_E_TESTES.md` → `TESTE_PROTOCOLO_DIAGNOSTICO.ps1`
-- **CI:** `scripts/pre-push-check.ps1` — rodar antes de push
+- **CI:** `scripts/pre-push-check.ps1` — rodar **antes** do push
+- **Pos-push:** `scripts/verify-publish-complete.ps1` — obrigatório após `git push` FE (I24)
 
 ## Regras P0
 

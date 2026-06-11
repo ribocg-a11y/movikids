@@ -69,7 +69,7 @@ Continuo o MOVI KIDS. Repo: C:\Users\riboc\Documents\Codex\2026-05-30\files-ment
 | 4 | Responder com: versões, fase ativa, **próximo passo**, **quem faz o quê** (agente vs você — `ACESSOS` §7) |
 | 5 | Ao encerrar sessão: atualizar este arquivo + checklist se algo mudou |
 | 6 | **Modo máximo potencial:** fluxo F0–F14 + dois aparelhos + resumo publicação antes de push (ver § Modo agente abaixo) |
-| 7 | **Publicação FE:** `pre-push-check` → commit → push **sem pedir OK**; bump **mk-version + sw + index.html** juntos (I3) |
+| 7 | **Publicação FE:** `pre-push-check` → commit → push → **`verify-publish-complete`** (I24); bump **mk-version + sw + index.html** juntos (I3) |
 
 ---
 

@@ -3,6 +3,9 @@
 #   .\scripts\pre-push-check.ps1
 #   .\scripts\pre-push-check.ps1 -SkipNetworkTests   # offline / so versao
 #
+# Pos-push (obrigatorio apos git push FE — Regra 8 / I24):
+#   .\scripts\verify-publish-complete.ps1
+#
 # Hook opcional (uma vez no repo):
 #   git config core.hooksPath githooks
 
@@ -300,24 +303,18 @@ try {
   }
 
   $operCheck = Join-Path $root "scripts\check-operacao-livre.ps1"
-  $feCritico = @(
-    (Join-Path $root "index.html"),
-    (Join-Path $root "mk-home.js"),
-    (Join-Path $root "mk-sync.js"),
-    (Join-Path $root "mk-sessao.js"),
-    (Join-Path $root "mk-core.js")
-  )
+  $feCriticoNames = @("index.html", "mk-home.js", "mk-sync.js", "mk-sessao.js", "mk-core.js")
   $feAlterado = $false
   try {
-    $diffNames = @(git -C $root diff --name-only HEAD 2>$null)
-    $stagedNames = @(git -C $root diff --name-only --cached HEAD 2>$null)
-    $allNames = @($diffNames + $stagedNames) | Select-Object -Unique
-    foreach ($p in $feCritico) {
-      $leaf = Split-Path -Leaf $p
-      if ($allNames -contains $leaf) { $feAlterado = $true; break }
+    $prevEap = $ErrorActionPreference
+    $ErrorActionPreference = "Continue"
+    $porcelain = git -C $root status --porcelain -- @feCriticoNames 2>$null
+    $ErrorActionPreference = $prevEap
+    if ($porcelain -and ($porcelain.Trim().Length -gt 0)) {
+      $feAlterado = $true
     }
   } catch {
-    $feAlterado = $true
+    Add-Check "git.status-fe-critico" "fail" $_.Exception.Message
   }
   if ($feAlterado -and (Test-Path $operCheck) -and -not $SkipNetworkTests) {
     & $operCheck 2>&1 | Out-Null
@@ -374,4 +371,5 @@ if ($result.status -ne "ok") {
 
 Write-Host ""
 Write-Host "pre-push-check OK - pode publicar." -ForegroundColor Green
+Write-Host "Apos git push: .\scripts\verify-publish-complete.ps1  (Regra 8 / I24)" -ForegroundColor Yellow
 exit 0

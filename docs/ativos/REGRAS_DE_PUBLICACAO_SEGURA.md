@@ -253,6 +253,7 @@ Toda resposta depois de publicar deve conter:
 - documentacao: sim/nao;
 - commit publicado;
 - versao publicada;
+- **Pages confirma versao: sim/nao** (`.\scripts\verify-publish-complete.ps1` apos push — I24);
 - teste executado;
 - proximo passo;
 - **`Mudança no AppScript: sim | não`** (obrigatorio toda resposta — Regra 16).
