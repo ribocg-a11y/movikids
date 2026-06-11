@@ -36,3 +36,5 @@
 
 Dashboard → seção 1 → faixa **Mini-DRE · cascata de margens**  
 Resultado oper. = Lucro líquido sem folha (paridade)
+
+**Produção confirmada:** 11/06/2026 13:50 · ping **v1.5.82** · `TESTE_MINI_DRE_READONLY` ok

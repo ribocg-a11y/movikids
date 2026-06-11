@@ -1,18 +1,18 @@
 # FASE 14 — Plano de contas + mini-DRE
 
-**Status:** 🟡 **iniciada** (docs 11/06/2026) — implementação GAS/FE pendente revisão memorial  
+**Status:** 🟢 **FASE 14 core em prod** (11/06/2026) — mini-DRE GAS+FE · aba PLANO_CONTAS opcional  
 **Prioridade:** P2 · **Esforço:** 10–14 dias  
-**Versão alvo:** FE **v1.8.16** · GAS **v1.5.82** (clasp push ✅ · **Nova versão Web pendente**)  
+**Versão alvo:** FE **v1.8.16** · GAS **v1.5.82** ✅ prod. (11/06/2026 13:50)  
 **Mestre:** `PLANO_FASES_6_15_COCKPIT_EXECUTIVO_2026-06.md` § FASE 14
 
 ---
 
-## Produção base (não mudar até FASE 14 deploy)
+## Produção (11/06/2026)
 
 | Camada | Versão |
 |--------|--------|
-| GAS | **v1.5.81** |
-| FE | **v1.8.15** |
+| GAS | **v1.5.82** ✅ |
+| FE | **v1.8.16** ✅ |
 
 ---
 
@@ -45,16 +45,15 @@
 
 ---
 
-## Validação pós v1.8.15 (11/06/2026)
+## Validação prod (11/06/2026 13:50)
 
 | Teste | Resultado |
 |-------|-----------|
+| GAS ping | ✅ **v1.5.82** |
+| `TESTE_MINI_DRE_READONLY` | ✅ ok · paridade diff=0 |
+| `miniDre.planoFonte` | `default` (CMV=0 · OPEX=80 jun/2026) |
+| Pages `MK_VERSION` | ✅ **1.8.16** |
 | `check-operacao-livre` | ✅ 0 locações abertas |
-| `TESTE_KPI_MES_READONLY` | ✅ ok |
-| `TESTE_FASE9_FOLHA_READONLY` | ✅ ok (semáforo amarelo — 10 dias) |
-| `TESTE_FASE8_ALERTAS_READONLY` | ✅ ok |
-| Pages `MK_VERSION` | ✅ **1.8.15** |
-| GAS ping | ✅ **v1.5.81** |
 
 ---
 
@@ -62,9 +61,9 @@
 
 | # | Ação | Quem |
 |---|------|------|
-| 1 | Revisar **`MEMORIAL_MINI_DRE.md`** — OK mapeamento CMV/OPEX? | **Sócio** |
-| 2 | Homolog Dashboard v1.8.15 (semana corrente + rodapé) | **Sócio** (PC) |
-| 3 | Após OK memorial → aba PLANO_CONTAS + GAS 14.2–14.4 | **Agente** |
+| 1 | Homolog Dashboard **v1.8.16** — cascata mini-DRE | **Sócio** (PC) |
+| 2 | Opcional: `instalarAbaPlanoContas` na planilha | Sócio |
+| 3 | Tablet F0 smoke | Sócio (balcão) |
 
 ---
 

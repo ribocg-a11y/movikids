@@ -1,6 +1,6 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 11/06/2026 (FE **v1.8.15** + GAS **v1.5.81** prod. · semana atual no Dashboard)  
+**Atualizado:** 11/06/2026 (FE **v1.8.16** + GAS **v1.5.82** prod. · FASE 14 mini-DRE)  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **Repo local:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`  
@@ -51,7 +51,7 @@ Continuo o MOVI KIDS. Repo: C:\Users\riboc\Documents\Codex\2026-05-30\files-ment
 
 - Ler: este arquivo → `PLANO_PRIORIDADES` → `ESTADO_ATUAL` → `REGRAS` → `ACESSOS_E_AUTORIZACOES` (§7 = agente vs você)
 - Ignorar handoff antigo em `docs/arquivo/planos/`
-- Informar: FE **v1.8.15**, GAS **v1.5.81** · ping prod. **v1.5.81**
+- Informar: FE **v1.8.16**, GAS **v1.5.82** · ping prod. **v1.5.82**
 - **Commit + push automáticos** após mudanças FE/docs — não pedir autorização ao usuário
 - **Toda resposta:** `Mudança no AppScript: sim|não` + link canônico `.gs` (Regra 16)
 - Deixar claro: **agente** no **PC** (código, testes, planilha); **você** Nova versão GAS Web; **tablet no balcão** = validação operação (não confundir com seu computador)
@@ -89,9 +89,9 @@ Regra Cursor: `.cursor/rules/handoff-movikids.mdc` § Modo de operação.
 
 | Camada | Versão | Verificação |
 |--------|--------|-------------|
-| **Frontend** | **v1.8.15** | `mk-version.js` · `?force=1.8.15` · `index.html ?v=1.8.15` |
-| **Service Worker** | **1.8.15** | `sw.js` |
-| **Apps Script (código + ping)** | **v1.5.81** | clasp push ✅ · Nova versão Web ✅ |
+| **Frontend** | **v1.8.16** | `mk-version.js` · `?force=1.8.16` |
+| **Service Worker** | **1.8.16** | `sw.js` |
+| **Apps Script (código + ping)** | **v1.5.82** | clasp push ✅ · Nova versão Web ✅ |
 
 **Deploy ID GAS (único — nunca criar outro):** `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y`
 
@@ -128,25 +128,24 @@ Regra Cursor: `.cursor/rules/handoff-movikids.mdc` § Modo de operação.
 
 ---
 
-## Próximo passo (11/06/2026 — FASE 14 iniciada)
+## Próximo passo (11/06/2026 — FASE 14 em prod.)
 
-**Produção:** ✅ GAS **v1.5.81** · FE **v1.8.15** Pages · testes readonly **11/06 13:40** OK
+**Produção:** ✅ GAS **v1.5.82** · FE **v1.8.16** · `TESTE_MINI_DRE_READONLY` ok
 
 | # | Ação | Quem |
 |---|------|------|
-| 1 | Revisar **`MEMORIAL_MINI_DRE.md`** (mapeamento CMV/OPEX) | **Você** (sócio) |
-| 2 | Homolog Dashboard v1.8.15 — semana corrente + rodapé | **Você** (PC admin) |
-| 3 | Tablet Home F0 smoke | Você (balcão) |
-| 4 | Após OK memorial → PLANO_CONTAS + GAS v1.5.82 | **Agente** |
+| 1 | Homolog Dashboard `?force=1.8.16` — cascata mini-DRE seção 1 | **Você** (PC) |
+| 2 | Opcional: aba PLANO_CONTAS | Você |
+| 3 | Tablet F0 smoke | Você (balcão) |
 
 **Deploy (referência):**
 
 | Doc | Conteúdo |
 |-----|----------|
-| **`FASE_14_MINI_DRE.md`** | **FASE 14** — plano contas + mini-DRE (iniciada 11/06) |
+| **`DEPLOY_v1.5.82_FASE14_MINI_DRE.md`** | **GAS v1.5.82 + FE v1.8.16** — mini-DRE |
+| **`FASE_14_MINI_DRE.md`** | Checklist FASE 14 |
 | **`../referencia/MEMORIAL_MINI_DRE.md`** | Fórmulas cascata margens |
-| **`DEPLOY_FE_v1.8.15_SEMANA_ATUAL.md`** | **FE v1.8.15** — semana atual + fix I3 cache-bust |
-| **`DEPLOY_v1.5.81_FOLHA_PROPORCIONAL.md`** | **GAS v1.5.81** — folha proporcional + ping |
+| **`DEPLOY_FE_v1.8.15_SEMANA_ATUAL.md`** | FE v1.8.15 — semana atual |
 | **`DEPLOY_FE_v1.8.12_DASHBOARD_NARRATIVO.md`** | **FE v1.8.11–1.8.14** — Dashboard narrativo |
 | **`DEPLOY_v1.5.80_FASE9_FOLHA_VIABILIDADE.md`** | FASE 9 base folha CLT |
 | **`../arquivo/incidentes/INCIDENTE_I3_CACHE_BUST_INDEX_2026-06-11.md`** | I3 recorrência 11/06 |

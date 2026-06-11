@@ -25,8 +25,8 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 | Camada | Versão repo | URL / ID |
 |--------|-------------|----------|
-| **Frontend** | **v1.8.15** | https://ribocg-a11y.github.io/movikids/?force=1.8.15 |
-| **Apps Script (código + ping)** | **v1.5.81** | Nova versão Web ✅ |
+| **Frontend** | **v1.8.16** | https://ribocg-a11y.github.io/movikids/?force=1.8.16 |
+| **Apps Script (código + ping)** | **v1.5.82** | Nova versão Web ✅ |
 | **Aba FOLHA** | memorial B68 | [gid=179040058](https://docs.google.com/spreadsheets/d/1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618/edit#gid=179040058) |
 
 **Editor Apps Script:** https://script.google.com/home/projects/19SIhkX9Tk7FiJA1JXu1OrUwssHdr3H5zc8q3rOjmBvqgWfXuHlk8xyf8/edit
@@ -86,6 +86,7 @@ https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPe
 
 | Versão | Entrega |
 |--------|---------|
+| **v1.8.16** + **GAS v1.5.82** | FASE 14 mini-DRE — cascata margens Dashboard |
 | **v1.8.15** + **GAS v1.5.81** | Semana corrente Dashboard + fix I3 cache-bust |
 | **v1.8.14** + **GAS v1.5.81** | Dashboard narrativo + folha proporcional (mesma base sem/com folha) |
 | **v1.8.10** + **GAS v1.5.80** | **FASE 9** — folha FOLHA B68 + `viabilidadeContratacao` + painel CLT |
