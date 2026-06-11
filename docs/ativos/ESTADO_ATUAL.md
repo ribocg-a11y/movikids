@@ -9,7 +9,7 @@ Referência única para alinhamento local × produção.
 **Mapa de erros/bugs:** **`MAPA_ERROS_FALHAS_BUGS.md`**  
 **FASE 9 Folha CLT:** **`FASE_9_FOLHA_VIABILIDADE_CLT.md`**  
 **Memorial folha:** `../referencia/FOLHA_PAGAMENTO_MEMORIAL_E_PLANILHA.md`  
-**Deploy GAS pacote:** **`DEPLOY_v1.5.80_FASE9_FOLHA_VIABILIDADE.md`** · FE **`DEPLOY_FE_v1.8.12_DASHBOARD_NARRATIVO.md`**
+**Deploy GAS pacote:** **`DEPLOY_v1.5.81_FOLHA_PROPORCIONAL.md`** · FE **`DEPLOY_FE_v1.8.12_DASHBOARD_NARRATIVO.md`**
 
 ---
 
@@ -24,16 +24,15 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 | Camada | Versão repo | URL / ID |
 |--------|-------------|----------|
-| **Frontend** | **v1.8.13** | https://ribocg-a11y.github.io/movikids/?force=1.8.13 |
-| **Apps Script (código)** | **v1.5.80** | clasp push ✅ · Nova versão Web |
-| **Apps Script (ping prod.)** | **v1.5.80** | Ping abaixo |
+| **Frontend** | **v1.8.14** | https://ribocg-a11y.github.io/movikids/?force=1.8.14 |
+| **Apps Script (código + ping)** | **v1.5.81** | Nova versão Web ✅ |
 | **Aba FOLHA** | memorial B68 | [gid=179040058](https://docs.google.com/spreadsheets/d/1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618/edit#gid=179040058) |
 
 **Editor Apps Script:** https://script.google.com/home/projects/19SIhkX9Tk7FiJA1JXu1OrUwssHdr3H5zc8q3rOjmBvqgWfXuHlk8xyf8/edit
 
 **Teste rápido GAS (ping):**  
 https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec?action=ping  
-→ alvo após Nova versão Web: `versao: v1.5.80` · produção hoje: `v1.5.79`
+→ produção: `versao: v1.5.81` (confirmado 10/06/2026)
 
 **URL morta (não usar):** `AKfycbzc...` → 404
 
@@ -86,7 +85,8 @@ https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPe
 
 | Versão | Entrega |
 |--------|---------|
-| **v1.8.10** + **GAS v1.5.80** | **FASE 9** — folha FOLHA B68 + `viabilidadeContratacao` + painel CLT + alertas `CONTRATACAO_*` |
+| **v1.8.14** + **GAS v1.5.81** | Dashboard narrativo + folha proporcional (mesma base sem/com folha) |
+| **v1.8.10** + **GAS v1.5.80** | **FASE 9** — folha FOLHA B68 + `viabilidadeContratacao` + painel CLT |
 | **v1.8.9** + **GAS v1.5.79** | **FASE 8** — alertas gestão + semáforo empresa |
 | **v1.8.7** | **Pacote I** — KPI row: Ano · Locações · Cancel · Extras · Caixa |
 | **v1.8.6** | **Pacote I** — ticket médio só em `#mk-leading-row` |

@@ -1,6 +1,6 @@
 # MOVI KIDS — Índice de documentação
 
-**Atualizado:** 10/06/2026 (FE **v1.8.13** · GAS **v1.5.80** · Dashboard narrativo)
+**Atualizado:** 10/06/2026 (FE **v1.8.14** · GAS **v1.5.81** prod.)
 
 ## Comece aqui
 
@@ -44,7 +44,8 @@
 | Documento | Para quê |
 |-----------|----------|
 | [DEPLOY_GAS_v1.5.32_AUTH.md](ativos/DEPLOY_GAS_v1.5.32_AUTH.md) | Deploy GAS mestre + link `.gs` |
-| [DEPLOY_v1.5.80_FASE9_FOLHA_VIABILIDADE.md](ativos/DEPLOY_v1.5.80_FASE9_FOLHA_VIABILIDADE.md) | **Deploy GAS v1.5.80** — folha CLT (regra de ouro) |
+| [DEPLOY_v1.5.81_FOLHA_PROPORCIONAL.md](ativos/DEPLOY_v1.5.81_FOLHA_PROPORCIONAL.md) | **Deploy GAS v1.5.81** — folha proporcional + ping |
+| [DEPLOY_v1.5.80_FASE9_FOLHA_VIABILIDADE.md](ativos/DEPLOY_v1.5.80_FASE9_FOLHA_VIABILIDADE.md) | Deploy GAS v1.5.80 — FASE 9 folha CLT |
 | [DEPLOY_FE_v1.8.12_DASHBOARD_NARRATIVO.md](ativos/DEPLOY_FE_v1.8.12_DASHBOARD_NARRATIVO.md) | **Deploy FE v1.8.11–1.8.13** — Dashboard narrativo |
 | [DEPLOY_FE_v1.8.10_FASE9_FOLHA_VIABILIDADE.md](ativos/DEPLOY_FE_v1.8.10_FASE9_FOLHA_VIABILIDADE.md) | Deploy FE v1.8.10 — painel viabilidade |
 | [DEPLOY_v1.5.79_FASE8_ALERTAS.md](ativos/DEPLOY_v1.5.79_FASE8_ALERTAS.md) | Deploy GAS v1.5.79 — FASE 8 |

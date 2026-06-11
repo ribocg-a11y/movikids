@@ -1,6 +1,6 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 10/06/2026 (FE **v1.8.13** + GAS **v1.5.80** · Dashboard narrativo · FASE 9 Folha CLT)  
+**Atualizado:** 10/06/2026 (FE **v1.8.14** + GAS **v1.5.81** prod. · Dashboard narrativo · folha proporcional)  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **Repo local:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`  
@@ -51,7 +51,7 @@ Continuo o MOVI KIDS. Repo: C:\Users\riboc\Documents\Codex\2026-05-30\files-ment
 
 - Ler: este arquivo → `PLANO_PRIORIDADES` → `ESTADO_ATUAL` → `REGRAS` → `ACESSOS_E_AUTORIZACOES` (§7 = agente vs você)
 - Ignorar handoff antigo em `docs/arquivo/planos/`
-- Informar: FE **v1.8.13**, GAS **v1.5.80** · ping prod. **v1.5.80**
+- Informar: FE **v1.8.14**, GAS **v1.5.81** · ping prod. **v1.5.81**
 - **Toda resposta:** `Mudança no AppScript: sim|não` + link canônico `.gs` (Regra 16)
 - Deixar claro: **agente** no **PC** (código, testes, planilha); **você** Nova versão GAS Web; **tablet no balcão** = validação operação (não confundir com seu computador)
 
@@ -87,10 +87,9 @@ Regra Cursor: `.cursor/rules/handoff-movikids.mdc` § Modo de operação.
 
 | Camada | Versão | Verificação |
 |--------|--------|-------------|
-| **Frontend** | **v1.8.13** | `mk-version.js` · `?force=1.8.13` |
-| **Service Worker** | **1.8.13** | `sw.js` |
-| **Apps Script (código)** | **v1.5.80** | clasp push ✅ · Nova versão Web ✅ |
-| **Apps Script (ping)** | **v1.5.80** | Ping abaixo |
+| **Frontend** | **v1.8.14** | `mk-version.js` · `?force=1.8.14` |
+| **Service Worker** | **1.8.14** | `sw.js` |
+| **Apps Script (código + ping)** | **v1.5.81** | clasp push ✅ · Nova versão Web ✅ |
 
 **Deploy ID GAS (único — nunca criar outro):** `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y`
 
@@ -126,23 +125,23 @@ Regra Cursor: `.cursor/rules/handoff-movikids.mdc` § Modo de operação.
 
 ---
 
-## Próximo passo (10/06/2026 — pós Dashboard narrativo v1.8.13)
+## Próximo passo (10/06/2026 — pós GAS v1.5.81 + FE v1.8.14)
 
-**FASE 8–9 + Dashboard narrativo:** ✅ alertas · folha CLT · seções 1–5 · lucro/meta sem vs com folha
+**Produção:** ✅ GAS **v1.5.81** · FE **v1.8.14** no repo · planilha sem rastros de teste
 
 | # | Ação | Quem |
 |---|------|------|
-| 1 | Homolog Dashboard `?force=1.8.13` — seções legíveis + seção 2 comparativo | **Você** (PC admin) |
+| 1 | Homolog Dashboard `?force=1.8.14` — tabela comparativo sem/com folha | **Você** (PC admin) |
 | 2 | Tablet Home F0 smoke | Você (balcão) |
-| 3 | FASE 10+ (DNA visual admin / mini-DRE) — ver `PLANO_FASES_6_15` | Backlog |
+| 3 | FASE 10+ / mini-DRE (fase 14 plano) | Backlog |
 
-**Deploy (regra de ouro — referência):**
+**Deploy (referência):**
 
 | Doc | Conteúdo |
 |-----|----------|
-| **`DEPLOY_FE_v1.8.12_DASHBOARD_NARRATIVO.md`** | **FE v1.8.11–1.8.13** — capítulos + legibilidade |
-| **`DEPLOY_v1.5.80_FASE9_FOLHA_VIABILIDADE.md`** | **GAS v1.5.80** — folha + viabilidade |
-| **`DEPLOY_FE_v1.8.10_FASE9_FOLHA_VIABILIDADE.md`** | FASE 9 painel CLT (base) |
+| **`DEPLOY_v1.5.81_FOLHA_PROPORCIONAL.md`** | **GAS v1.5.81** — folha proporcional + ping |
+| **`DEPLOY_FE_v1.8.12_DASHBOARD_NARRATIVO.md`** | **FE v1.8.11–1.8.14** — Dashboard narrativo |
+| **`DEPLOY_v1.5.80_FASE9_FOLHA_VIABILIDADE.md`** | FASE 9 base folha CLT |
 
 **Regra 16:** toda resposta do agente termina com `Mudança no AppScript: sim|não` + link canônico.
 
@@ -150,9 +149,10 @@ Regra Cursor: `.cursor/rules/handoff-movikids.mdc` § Modo de operação.
 
 | Hash | Entrega |
 |------|---------|
-| `45c1f72` | v1.8.12 — legibilidade capítulos + média loc/dia |
-| `31b311f` | v1.8.11 — Dashboard narrativo seções 1–5 |
-| `e1e75bd` | v1.8.10/v1.5.80 — FASE 9 Folha CLT |
+| `3f5aeea` | GAS v1.5.81 — ping + folha proporcional |
+| `7e73fdf` | GAS v1.5.81 + FE v1.8.14 — comparativo mesma base |
+| `45c1f72` | FE v1.8.12 — legibilidade capítulos |
+| `31b311f` | FE v1.8.11 — Dashboard narrativo |
 
 Detalhe vivo: seção **Execução — status ao vivo** em `PLANO_PRIORIDADES_2026-06.md`.
 

@@ -5,9 +5,9 @@
 
 | Item | Valor |
 |------|-------|
-| Versão | **v1.8.13** (`mk-version.js` = `sw.js`) |
-| URL teste | https://ribocg-a11y.github.io/movikids/?force=1.8.13 |
-| GAS pareado | **v1.5.80** (sem mudança) |
+| Versão | **v1.8.14** (`mk-version.js` = `sw.js`) |
+| URL teste | https://ribocg-a11y.github.io/movikids/?force=1.8.14 |
+| GAS pareado | **v1.5.81** — `DEPLOY_v1.5.81_FOLHA_PROPORCIONAL.md` |
 | Cache bust | `index.html` — todos os `?v=1.8.12` |
 
 ---

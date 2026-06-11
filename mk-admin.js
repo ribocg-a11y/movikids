@@ -704,10 +704,24 @@ function mudarMesDash() {
   const sel = document.getElementById('dash-mes-sel');
   if (!sel || !kpiData) return;
   _semanaSelIdx = null;
+  _semanaMesKey = null;
   carregarKPIsDashboard(parseInt(sel.value), kpiData.anoAtual || new Date().getFullYear());
 }
 
 let _semanaSelIdx = null;
+let _semanaMesKey = null;
+
+function resolverSemanaDefaultIdx_(semanas, d) {
+  const hoje = new Date();
+  const mesVista = d.mesAtual;
+  const anoVista = d.anoAtual;
+  if (mesVista === hoje.getMonth() + 1 && anoVista === hoje.getFullYear()) {
+    const diaHoje = hoje.getDate();
+    const idx = semanas.findIndex(s => diaHoje >= (s.diaIni || 0) && diaHoje <= (s.diaFim || 0));
+    if (idx >= 0) return idx;
+  }
+  return typeof d.melhorSemanaIdx === 'number' ? d.melhorSemanaIdx : 0;
+}
 
 function renderSemanasChart_(d) {
   const grid = document.getElementById('mk-semana-grid');
@@ -717,8 +731,13 @@ function renderSemanasChart_(d) {
     grid.innerHTML = '<p style="color:var(--txt3);font-size:12px;grid-column:1/-1">Sem dados de semanas neste mês.</p>';
     return;
   }
+  const mesKey = (d.mesAtual || '') + '/' + (d.anoAtual || '');
+  if (_semanaMesKey !== mesKey) {
+    _semanaSelIdx = null;
+    _semanaMesKey = mesKey;
+  }
   if (_semanaSelIdx == null || _semanaSelIdx >= semanas.length) {
-    _semanaSelIdx = typeof d.melhorSemanaIdx === 'number' ? d.melhorSemanaIdx : 0;
+    _semanaSelIdx = resolverSemanaDefaultIdx_(semanas, d);
   }
   grid.innerHTML = semanas.map((sem, idx) => {
     const active = idx === _semanaSelIdx ? ' active' : '';
