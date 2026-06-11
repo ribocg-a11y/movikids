@@ -1250,6 +1250,8 @@ html,body{height:100%;background:var(--bg);color:var(--txt);overflow:hidden}
 .new-kpi .nkv.blue{color:var(--blue)}.new-kpi .nkv.green{color:#2E7D32}
 .new-kpi .nkv.amber{color:#E65100}.new-kpi .nkv.red{color:#C62828}
 .new-kpi .nks{font-size:10px;color:var(--txt3);margin-top:4px;font-weight:600}
+.new-kpi-link{cursor:pointer;transition:border-color .15s,box-shadow .15s}
+.new-kpi-link:hover,.new-kpi-link:focus-visible{border-color:rgba(21,101,192,.45);box-shadow:0 2px 8px rgba(21,101,192,.12);outline:none}
 .nk-badge-up{color:#2E7D32;background:#E8F5E9;padding:1px 6px;border-radius:4px;font-size:10px;font-weight:700}
 .nk-badge-dn{color:#C62828;background:#FFEBEE;padding:1px 6px;border-radius:4px;font-size:10px;font-weight:700}
 

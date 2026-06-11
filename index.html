@@ -16,16 +16,16 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<script src="mk-stale-sync.js?v=1.8.18"></script>
-<script src="mk-version.js?v=1.8.18"></script>
-<script src="mk-api.js?v=1.8.18"></script>
-<link rel="stylesheet" href="mk-design.css?v=1.8.18">
+<script src="mk-stale-sync.js?v=1.8.19"></script>
+<script src="mk-version.js?v=1.8.19"></script>
+<script src="mk-api.js?v=1.8.19"></script>
+<link rel="stylesheet" href="mk-design.css?v=1.8.19">
 
-<script src="mk-cache-bust.js?v=1.8.18"></script>
+<script src="mk-cache-bust.js?v=1.8.19"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<link rel="stylesheet" href="mk-app.css?v=1.8.18">
+<link rel="stylesheet" href="mk-app.css?v=1.8.19">
 <!-- Firebase SDK — Realtime sync canonico para todos os dispositivos -->
-<script type="module" src="mk-firebase.js?v=1.8.18"></script>
+<script type="module" src="mk-firebase.js?v=1.8.19"></script>
 </head>
 
 <body>
@@ -1074,10 +1074,10 @@
         <div class="nkv green" id="nk-extmes">...</div>
         <div class="nks" id="nk-extmes-sub">minutos adicionais</div>
       </div>
-      <div class="new-kpi" role="button" tabindex="0" onclick="irAdmin('caixa')" onkeydown="if(event.key==='Enter')irAdmin('caixa')" title="Conferência do dia — abre Caixa (valor só na Caixa)">
+      <div class="new-kpi new-kpi-link" role="button" tabindex="0" onclick="irAdmin('caixa')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();irAdmin('caixa')}" title="Abrir Caixa do dia — locações, pagamentos e conferência">
         <label>Caixa de hoje</label>
-        <div class="nkv blue" id="nk-fathoje" style="font-size:18px">Conferir →</div>
-        <div class="nks" id="nk-cushoje">locações hoje · abre Caixa</div>
+        <div class="nkv blue" id="nk-fathoje">—</div>
+        <div class="nks" id="nk-cushoje">locações hoje · ver detalhes</div>
       </div>
     </div>
 
@@ -1650,22 +1650,22 @@
   </div>
 </div>
 
-<script src="mk-globals.js?v=1.8.18"></script>
-<script src="mk-core.js?v=1.8.18"></script>
-<script src="mk-nav.js?v=1.8.18"></script>
-<script src="mk-admin.js?v=1.8.18"></script>
-<script src="mk-historico.js?v=1.8.18"></script>
-<script src="mk-sessao.js?v=1.8.18"></script>
-<script src="mk-home.js?v=1.8.18"></script>
-<script src="mk-custos.js?v=1.8.18"></script>
-<script src="mk-avulso.js?v=1.8.18"></script>
-<script src="mk-sync.js?v=1.8.18"></script>
-<script src="mk-nova.js?v=1.8.18"></script>
-<script src="mk-relacionamento.js?v=1.8.18"></script>
-<script src="mk-operacao.js?v=1.8.18"></script>
-<script src="mk-drawer.js?v=1.8.18"></script>
-<script src="mk-update.js?v=1.8.18"></script>
-<script src="mk-auth.js?v=1.8.18"></script>
-<script src="mk-boot.js?v=1.8.18"></script>
+<script src="mk-globals.js?v=1.8.19"></script>
+<script src="mk-core.js?v=1.8.19"></script>
+<script src="mk-nav.js?v=1.8.19"></script>
+<script src="mk-admin.js?v=1.8.19"></script>
+<script src="mk-historico.js?v=1.8.19"></script>
+<script src="mk-sessao.js?v=1.8.19"></script>
+<script src="mk-home.js?v=1.8.19"></script>
+<script src="mk-custos.js?v=1.8.19"></script>
+<script src="mk-avulso.js?v=1.8.19"></script>
+<script src="mk-sync.js?v=1.8.19"></script>
+<script src="mk-nova.js?v=1.8.19"></script>
+<script src="mk-relacionamento.js?v=1.8.19"></script>
+<script src="mk-operacao.js?v=1.8.19"></script>
+<script src="mk-drawer.js?v=1.8.19"></script>
+<script src="mk-update.js?v=1.8.19"></script>
+<script src="mk-auth.js?v=1.8.19"></script>
+<script src="mk-boot.js?v=1.8.19"></script>
 </body>
 </html>

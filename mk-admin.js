@@ -580,6 +580,13 @@ function nHojeCanonica_() {
   return 0;
 }
 
+function fatHojeCanonica_(d) {
+  if (resumoDiaHoje && resumoDiaHoje.fat != null) return Number(resumoDiaHoje.fat);
+  if (d && d.fatHoje != null) return Number(d.fatHoje);
+  if (kpiData && kpiData.fatHoje != null) return Number(kpiData.fatHoje);
+  return 0;
+}
+
 function kpiHubStub_() {
   return { ok: true, nHoje: nHojeCanonica_() };
 }
@@ -1529,9 +1536,10 @@ function renderDashboardCore_(d) {
   const pctExt = d.pctExtMes != null ? d.pctExtMes : (d.fatMes > 0 ? Math.round(extVal / d.fatMes * 1000) / 10 : 0);
   setText2('nk-extmes', R2(extVal));
   setText2('nk-extmes-sub', (d.nComExtra || 0) + ' loc. com extra' + (pctExt > 0 ? ' · ' + pctExt + '% fat.' : ''));
-  setText2('nk-fathoje', 'Conferir →');
+  const fatHoje = fatHojeCanonica_(d);
   const nHoje = nHojeCanonica_();
-  setText2('nk-cushoje', nHoje + (nHoje === 1 ? ' locação hoje' : ' locações hoje') + ' · abre Caixa');
+  setText2('nk-fathoje', R2(fatHoje));
+  setText2('nk-cushoje', nHoje + (nHoje === 1 ? ' locação hoje' : ' locações hoje') + ' · ver detalhes');
 
   // CTO
   setText2('nk-cto-fat',  R2(d.fatMes));
