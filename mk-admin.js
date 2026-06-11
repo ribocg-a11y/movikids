@@ -952,8 +952,7 @@ function applySinalEmpresa_(d) {
 }
 
 function applyMargemSemaforo_(margem) {
-  const margEl = document.getElementById('mk-exec-margem');
-  const kpi = margEl ? margEl.closest('.mk-exec-kpi') : null;
+  const kpi = document.getElementById('mk-exec-kpi-lucro');
   if (!kpi) return;
   kpi.classList.remove('mk-sem-verde', 'mk-sem-amarelo', 'mk-sem-vermelho');
   if (margem >= 18) kpi.classList.add('mk-sem-verde');
@@ -961,7 +960,7 @@ function applyMargemSemaforo_(margem) {
   else if (margem > 0) kpi.classList.add('mk-sem-vermelho');
 }
 
-/** FASE 14 — cascata mini-DRE (margem bruta → operacional). */
+/** FASE 14 — decomposição mini-DRE (tabela vertical). */
 function renderMiniDreCascade_(d) {
   const box = document.getElementById('mk-dre-cascata');
   if (!box) return;
@@ -974,19 +973,19 @@ function renderMiniDreCascade_(d) {
   setText2('mk-dre-fat', R2(md.fatMes || d.fatMes));
   setText2('mk-dre-cmv', '− ' + R2(md.cusCMV || 0));
   setText2('mk-dre-bruta', R2(md.margemBruta || 0));
-  setText2('mk-dre-bruta-pct', (md.margemBrutaPct != null ? md.margemBrutaPct : 0) + '%');
+  const bp = document.getElementById('mk-dre-bruta-pct');
+  if (bp) bp.textContent = '(' + (md.margemBrutaPct != null ? md.margemBrutaPct : 0) + '%)';
   setText2('mk-dre-opex', '− ' + R2(md.cusOPEX || 0));
   setText2('mk-dre-cto', '− ' + R2(md.ctoPagar || d.ctoPagar || 0));
   setText2('mk-dre-oper', R2(md.margemOperacional != null ? md.margemOperacional : d.resultado));
-  setText2('mk-dre-oper-pct', (md.margemOperacionalPct != null ? md.margemOperacionalPct : d.margem) + '%');
-  const foot = document.getElementById('mk-dre-foot');
-  if (foot) {
-    const par = Math.abs((md.margemOperacional || 0) - (Number(d.resultado) || 0)) < 0.02;
-    foot.textContent = md.planoOk
-      ? 'Plano de contas: aba PLANO_CONTAS'
-      : 'Plano de contas: mapeamento padrão (execute instalarAbaPlanoContas na planilha)';
-    if (md.cusSemPlano > 0) foot.textContent += ' · R$ ' + Math.round(md.cusSemPlano) + ' em categorias não mapeadas';
-    if (!par) foot.textContent += ' · Revisar classificação de custos';
+  const op = document.getElementById('mk-dre-oper-pct');
+  if (op) op.textContent = '(' + (md.margemOperacionalPct != null ? md.margemOperacionalPct : d.margem) + '%)';
+  const badge = document.getElementById('mk-dre-plano-badge');
+  if (badge) {
+    badge.textContent = md.planoOk ? 'Plano de contas' : 'Mapeamento padrão';
+    var tip = md.planoOk ? 'Categorias da aba PLANO_CONTAS' : 'Execute instalarAbaPlanoContas na planilha para categorias formais';
+    if (md.cusSemPlano > 0) tip += ' · R$ ' + Math.round(md.cusSemPlano) + ' não mapeados';
+    badge.title = tip;
   }
 }
 
@@ -1005,19 +1004,7 @@ function renderExecCockpit_(d) {
   setDeltaEl_('mk-exec-fat-d', ck.deltaFatMesPct);
 
   const margem = Number(d.margem) || 0;
-  const margEl = document.getElementById('mk-exec-margem');
-  if (margEl) {
-    margEl.textContent = margem + '%';
-    margEl.className = 'mk-exec-kpi-val ' + (margem >= 18 ? 'green' : margem >= 10 ? 'amber' : 'red');
-  }
   applyMargemSemaforo_(margem);
-  const margD = document.getElementById('mk-exec-margem-d');
-  if (margD) {
-    if (margem >= 20) { margD.textContent = 'Margem saudável'; margD.className = 'mk-exec-kpi-delta up'; }
-    else if (margem >= 10) { margD.textContent = 'Faixa de atenção'; margD.className = 'mk-exec-kpi-delta'; }
-    else if (margem > 0) { margD.textContent = 'Margem pressionada'; margD.className = 'mk-exec-kpi-delta down'; }
-    else { margD.textContent = 'Resultado negativo'; margD.className = 'mk-exec-kpi-delta down'; }
-  }
 
   const resEl = document.getElementById('mk-exec-resultado');
   const resultado = Number(d.resultado) || 0;
@@ -1025,7 +1012,14 @@ function renderExecCockpit_(d) {
     resEl.textContent = R2(resultado);
     resEl.className = 'mk-exec-kpi-val ' + (resultado >= 0 ? 'green' : 'red');
   }
-  setText2('mk-exec-res-d', (d.nMes || 0) + ' locações no mês');
+  const resD = document.getElementById('mk-exec-res-d');
+  if (resD) {
+    const nLoc = (d.nMes || 0) + ' locações · margem ' + margem + '%';
+    if (margem >= 20) { resD.textContent = nLoc; resD.className = 'mk-exec-kpi-delta up'; }
+    else if (margem >= 10) { resD.textContent = nLoc; resD.className = 'mk-exec-kpi-delta'; }
+    else if (margem > 0) { resD.textContent = nLoc; resD.className = 'mk-exec-kpi-delta down'; }
+    else { resD.textContent = nLoc; resD.className = 'mk-exec-kpi-delta down'; }
+  }
 
   const pb = d.payback;
   const pbEl = document.getElementById('mk-exec-payback');
