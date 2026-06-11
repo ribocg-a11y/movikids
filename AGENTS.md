@@ -91,7 +91,7 @@ Fonte de verdade: `mk-version.js`, header do `.gs`, ping GAS.
 - **FASE 1–8:** ✅ repo (FASE 8 alertas v1.8.9/v1.5.79)
 - **FASE 9 Folha CLT:** ✅ v1.8.10/v1.5.80
 - **Dashboard narrativo + folha prop. + semana atual:** ✅ v1.8.15/v1.5.81 prod.
-- **Próximo:** mini-DRE (fase 14 plano) · DNA visual admin
+- **FASE 14 mini-DRE:** 🟡 memorial + plano (aguarda revisão sócio)
 
 ## Ao encerrar sessão
 

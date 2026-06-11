@@ -9,6 +9,7 @@ Referência única para alinhamento local × produção.
 **Mapa de erros/bugs:** **`MAPA_ERROS_FALHAS_BUGS.md`**  
 **FASE 9 Folha CLT:** **`FASE_9_FOLHA_VIABILIDADE_CLT.md`**  
 **Memorial folha:** `../referencia/FOLHA_PAGAMENTO_MEMORIAL_E_PLANILHA.md`  
+**FASE 14 mini-DRE:** 🟡 memorial — `FASE_14_MINI_DRE.md` · `../referencia/MEMORIAL_MINI_DRE.md`  
 **Deploy GAS pacote:** **`DEPLOY_v1.5.81_FOLHA_PROPORCIONAL.md`** · FE **`DEPLOY_FE_v1.8.15_SEMANA_ATUAL.md`** (v1.8.11–1.8.14: `DEPLOY_FE_v1.8.12_DASHBOARD_NARRATIVO.md`)
 
 ---
@@ -85,7 +86,7 @@ https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPe
 
 | Versão | Entrega |
 |--------|---------|
-| **v1.8.15** + **GAS v1.5.81** | Semana corrente no Dashboard + fix cache-bust index (I3) |
+| **v1.8.15** + **GAS v1.5.81** | Semana corrente Dashboard + fix I3 cache-bust |
 | **v1.8.14** + **GAS v1.5.81** | Dashboard narrativo + folha proporcional (mesma base sem/com folha) |
 | **v1.8.10** + **GAS v1.5.80** | **FASE 9** — folha FOLHA B68 + `viabilidadeContratacao` + painel CLT |
 | **v1.8.9** + **GAS v1.5.79** | **FASE 8** — alertas gestão + semáforo empresa |

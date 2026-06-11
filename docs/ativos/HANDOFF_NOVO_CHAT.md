@@ -119,6 +119,7 @@ Regra Cursor: `.cursor/rules/handoff-movikids.mdc` § Modo de operação.
 | Deploy GAS | `DEPLOY_GAS_v1.5.32_AUTH.md` + **`DEPLOY_v1.5.80_FASE9_FOLHA_VIABILIDADE.md`** |
 | Deploy FE | **`DEPLOY_FE_v1.8.15_SEMANA_ATUAL.md`** · narrativa: `DEPLOY_FE_v1.8.12_DASHBOARD_NARRATIVO.md` · FASE 9: `DEPLOY_FE_v1.8.10_FASE9_FOLHA_VIABILIDADE.md` |
 | Folha / CLT | **`FASE_9_FOLHA_VIABILIDADE_CLT.md`** · `../referencia/FOLHA_PAGAMENTO_MEMORIAL_E_PLANILHA.md` |
+| Mini-DRE | **`FASE_14_MINI_DRE.md`** · **`../referencia/MEMORIAL_MINI_DRE.md`** |
 | Bug / incidente | `MAPA_ERROS_FALHAS_BUGS.md` → I20–I23 → `docs/arquivo/incidentes/` |
 | QA tablet | **`PROTOCOLO_DIAGNOSTICO_E_TESTES.md`** → `TESTE_PROTOCOLO_DIAGNOSTICO.ps1` · homologação F5–F11: `TESTE_TABLET_F5_F7_F10_F11.ps1` |
 | Homologação | `HOMOLOGACAO_PRODUCAO_ASSISTIDA.md`, `CHECKLIST_PACOTE_K.md` |
@@ -127,20 +128,23 @@ Regra Cursor: `.cursor/rules/handoff-movikids.mdc` § Modo de operação.
 
 ---
 
-## Próximo passo (11/06/2026 — pós FE v1.8.15)
+## Próximo passo (11/06/2026 — FASE 14 iniciada)
 
-**Produção:** ✅ GAS **v1.5.81** · FE **v1.8.15** Pages · semana atual Dashboard · cache-bust OK
+**Produção:** ✅ GAS **v1.5.81** · FE **v1.8.15** Pages · testes readonly **11/06 13:40** OK
 
 | # | Ação | Quem |
 |---|------|------|
-| 1 | Confirmar Dashboard — **Sem corrente** em destaque + rodapé **v1.8.15** | **Você** (PC admin) |
-| 2 | Tablet Home F0 smoke | Você (balcão) |
-| 3 | FASE 10+ / mini-DRE (fase 14 plano) | Backlog |
+| 1 | Revisar **`MEMORIAL_MINI_DRE.md`** (mapeamento CMV/OPEX) | **Você** (sócio) |
+| 2 | Homolog Dashboard v1.8.15 — semana corrente + rodapé | **Você** (PC admin) |
+| 3 | Tablet Home F0 smoke | Você (balcão) |
+| 4 | Após OK memorial → PLANO_CONTAS + GAS v1.5.82 | **Agente** |
 
 **Deploy (referência):**
 
 | Doc | Conteúdo |
 |-----|----------|
+| **`FASE_14_MINI_DRE.md`** | **FASE 14** — plano contas + mini-DRE (iniciada 11/06) |
+| **`../referencia/MEMORIAL_MINI_DRE.md`** | Fórmulas cascata margens |
 | **`DEPLOY_FE_v1.8.15_SEMANA_ATUAL.md`** | **FE v1.8.15** — semana atual + fix I3 cache-bust |
 | **`DEPLOY_v1.5.81_FOLHA_PROPORCIONAL.md`** | **GAS v1.5.81** — folha proporcional + ping |
 | **`DEPLOY_FE_v1.8.12_DASHBOARD_NARRATIVO.md`** | **FE v1.8.11–1.8.14** — Dashboard narrativo |
@@ -153,7 +157,7 @@ Regra Cursor: `.cursor/rules/handoff-movikids.mdc` § Modo de operação.
 
 | Hash | Entrega |
 |------|---------|
-| `68c47c0` | Fix index.html cache-bust v1.8.15 (I3) |
+| `393c8b7` | Docs v1.8.15 + incidente I3 |
 | `aeec240` | FE v1.8.15 — semana atual Dashboard |
 | `3f5aeea` | GAS v1.5.81 — ping + folha proporcional |
 | `7e73fdf` | GAS v1.5.81 + FE v1.8.14 — comparativo mesma base |

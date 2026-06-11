@@ -22,14 +22,15 @@
 | **FASE 6** Cockpit executivo | ✅ repo + I22 hotfix | FE v1.8.2 → **v1.8.4** / GAS v1.5.75 |
 | **FASE 7** Leading financeiros | ✅ repo + I23 | FE v1.8.4 → **v1.8.5** / GAS v1.5.77 → **v1.5.78** |
 | **FASE 8** Alertas proativos | ✅ repo | FE v1.8.9 / GAS v1.5.79 |
-| **FASE 9** Folha CLT + viabilidade | ✅ repo | FE v1.8.10 / GAS v1.5.80 · `FASE_9_FOLHA_VIABILIDADE_CLT.md` |
+| **FASE 9** Folha CLT + viabilidade | ✅ prod | FE v1.8.10–1.8.15 / GAS **v1.5.81** |
+| **Dashboard narrativo + folha prop.** | ✅ prod | FE v1.8.11–1.8.15 · `DEPLOY_FE_v1.8.15_SEMANA_ATUAL.md` |
+| **FASE 14** Mini-DRE | 🟡 iniciada | 11/06/2026 · `FASE_14_MINI_DRE.md` + memorial |
 
 **Próximo passo imediato:**
 
-1. **Nova versão Web** GAS **v1.5.80** — `DEPLOY_v1.5.80_FASE9_FOLHA_VIABILIDADE.md` (regra de ouro)
-2. Push FE **v1.8.10** — `DEPLOY_FE_v1.8.10_FASE9_FOLHA_VIABILIDADE.md`
-3. Homolog Dashboard — painel **Sustentabilidade CLT** + alertas `CONTRATACAO_*`
-4. Tablet Home F0 smoke · `check-operacao-livre.ps1`
+1. **Sócio** — revisar `MEMORIAL_MINI_DRE.md` + homolog Dashboard **v1.8.15**
+2. **Tablet** — F0 smoke balcão
+3. **Agente** — após OK memorial: aba PLANO_CONTAS + GAS v1.5.82
 
 ### FASE 0 — checklist
 
@@ -221,7 +222,7 @@ Objetivo: balcão mais rápido; menos ruído visual. **Próximo pacote de featur
 | **11** | Holding Movi+ZapClin | P2 | v1.8.7 | v1.5.79 | Página Holding |
 | **12** | Drill-down + simulação | P2 | v1.8.8 | v1.5.80 | Dashboard gráficos |
 | **13** | Live BI Firebase | P2 | v1.8.9 | v1.5.81 | Widget frota live |
-| **14** | Plano contas + mini-DRE | P2 | v1.8.10 | v1.5.82 | Cascata margens |
+| **14** | Plano contas + mini-DRE | P2 | v1.8.16 | v1.5.82 | Cascata margens · 🟡 docs 11/06 |
 | **15** | Portal metrics + CONFIG UI | P3 | v1.8.11 | v1.5.83 | Sistema + Dashboard |
 
 ---
