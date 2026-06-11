@@ -51,7 +51,8 @@ Continuo o MOVI KIDS. Repo: C:\Users\riboc\Documents\Codex\2026-05-30\files-ment
 
 - Ler: este arquivo → `PLANO_PRIORIDADES` → `ESTADO_ATUAL` → `REGRAS` → `ACESSOS_E_AUTORIZACOES` (§7 = agente vs você)
 - Ignorar handoff antigo em `docs/arquivo/planos/`
-- Informar: FE **v1.8.14**, GAS **v1.5.81** · ping prod. **v1.5.81**
+- Informar: FE **v1.8.15**, GAS **v1.5.81** · ping prod. **v1.5.81**
+- **Commit + push automáticos** após mudanças FE/docs — não pedir autorização ao usuário
 - **Toda resposta:** `Mudança no AppScript: sim|não` + link canônico `.gs` (Regra 16)
 - Deixar claro: **agente** no **PC** (código, testes, planilha); **você** Nova versão GAS Web; **tablet no balcão** = validação operação (não confundir com seu computador)
 
@@ -68,6 +69,7 @@ Continuo o MOVI KIDS. Repo: C:\Users\riboc\Documents\Codex\2026-05-30\files-ment
 | 4 | Responder com: versões, fase ativa, **próximo passo**, **quem faz o quê** (agente vs você — `ACESSOS` §7) |
 | 5 | Ao encerrar sessão: atualizar este arquivo + checklist se algo mudou |
 | 6 | **Modo máximo potencial:** fluxo F0–F14 + dois aparelhos + resumo publicação antes de push (ver § Modo agente abaixo) |
+| 7 | **Publicação FE:** `pre-push-check` → commit → push **sem pedir OK**; bump **mk-version + sw + index.html** juntos (I3) |
 
 ---
 
@@ -76,7 +78,7 @@ Continuo o MOVI KIDS. Repo: C:\Users\riboc\Documents\Codex\2026-05-30\files-ment
 1. **Nunca patch isolado** — mapear fluxo (`PROTOCOLO` §2) e incidentes (`MAPA_ERROS`) antes de codar.
 2. **PC ≠ tablet** — homologação operação = aparelho **na loja**; agente valida HTTP/ping no PC.
 3. **UI fixa no balcão** — portal dos pais, chip turno: sem ocultar sem pedido explícito.
-4. **Antes de push:** `pre-push-check` + bloco: FE · GAS? · testes · checklist tablet.
+4. **Antes de push:** `pre-push-check` + bloco: FE · GAS? · testes · checklist tablet · **`index.html ?v=`** alinhado.
 5. **Proatividade:** propor teste + impacto; registrar I* se bug sistêmico; não fechar sem F0.
 
 Regra Cursor: `.cursor/rules/handoff-movikids.mdc` § Modo de operação.
@@ -87,8 +89,8 @@ Regra Cursor: `.cursor/rules/handoff-movikids.mdc` § Modo de operação.
 
 | Camada | Versão | Verificação |
 |--------|--------|-------------|
-| **Frontend** | **v1.8.14** | `mk-version.js` · `?force=1.8.14` |
-| **Service Worker** | **1.8.14** | `sw.js` |
+| **Frontend** | **v1.8.15** | `mk-version.js` · `?force=1.8.15` · `index.html ?v=1.8.15` |
+| **Service Worker** | **1.8.15** | `sw.js` |
 | **Apps Script (código + ping)** | **v1.5.81** | clasp push ✅ · Nova versão Web ✅ |
 
 **Deploy ID GAS (único — nunca criar outro):** `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y`
@@ -115,7 +117,7 @@ Regra Cursor: `.cursor/rules/handoff-movikids.mdc` § Modo de operação.
 | Tarefa | Ler |
 |--------|-----|
 | Deploy GAS | `DEPLOY_GAS_v1.5.32_AUTH.md` + **`DEPLOY_v1.5.80_FASE9_FOLHA_VIABILIDADE.md`** |
-| Deploy FE | **`DEPLOY_FE_v1.8.12_DASHBOARD_NARRATIVO.md`** · FASE 9: `DEPLOY_FE_v1.8.10_FASE9_FOLHA_VIABILIDADE.md` |
+| Deploy FE | **`DEPLOY_FE_v1.8.15_SEMANA_ATUAL.md`** · narrativa: `DEPLOY_FE_v1.8.12_DASHBOARD_NARRATIVO.md` · FASE 9: `DEPLOY_FE_v1.8.10_FASE9_FOLHA_VIABILIDADE.md` |
 | Folha / CLT | **`FASE_9_FOLHA_VIABILIDADE_CLT.md`** · `../referencia/FOLHA_PAGAMENTO_MEMORIAL_E_PLANILHA.md` |
 | Bug / incidente | `MAPA_ERROS_FALHAS_BUGS.md` → I20–I23 → `docs/arquivo/incidentes/` |
 | QA tablet | **`PROTOCOLO_DIAGNOSTICO_E_TESTES.md`** → `TESTE_PROTOCOLO_DIAGNOSTICO.ps1` · homologação F5–F11: `TESTE_TABLET_F5_F7_F10_F11.ps1` |
@@ -125,13 +127,13 @@ Regra Cursor: `.cursor/rules/handoff-movikids.mdc` § Modo de operação.
 
 ---
 
-## Próximo passo (10/06/2026 — pós GAS v1.5.81 + FE v1.8.14)
+## Próximo passo (11/06/2026 — pós FE v1.8.15)
 
-**Produção:** ✅ GAS **v1.5.81** · FE **v1.8.14** no repo · planilha sem rastros de teste
+**Produção:** ✅ GAS **v1.5.81** · FE **v1.8.15** Pages · semana atual Dashboard · cache-bust OK
 
 | # | Ação | Quem |
 |---|------|------|
-| 1 | Homolog Dashboard `?force=1.8.14` — tabela comparativo sem/com folha | **Você** (PC admin) |
+| 1 | Confirmar Dashboard — **Sem corrente** em destaque + rodapé **v1.8.15** | **Você** (PC admin) |
 | 2 | Tablet Home F0 smoke | Você (balcão) |
 | 3 | FASE 10+ / mini-DRE (fase 14 plano) | Backlog |
 
@@ -139,9 +141,11 @@ Regra Cursor: `.cursor/rules/handoff-movikids.mdc` § Modo de operação.
 
 | Doc | Conteúdo |
 |-----|----------|
+| **`DEPLOY_FE_v1.8.15_SEMANA_ATUAL.md`** | **FE v1.8.15** — semana atual + fix I3 cache-bust |
 | **`DEPLOY_v1.5.81_FOLHA_PROPORCIONAL.md`** | **GAS v1.5.81** — folha proporcional + ping |
 | **`DEPLOY_FE_v1.8.12_DASHBOARD_NARRATIVO.md`** | **FE v1.8.11–1.8.14** — Dashboard narrativo |
 | **`DEPLOY_v1.5.80_FASE9_FOLHA_VIABILIDADE.md`** | FASE 9 base folha CLT |
+| **`../arquivo/incidentes/INCIDENTE_I3_CACHE_BUST_INDEX_2026-06-11.md`** | I3 recorrência 11/06 |
 
 **Regra 16:** toda resposta do agente termina com `Mudança no AppScript: sim|não` + link canônico.
 
@@ -149,10 +153,10 @@ Regra Cursor: `.cursor/rules/handoff-movikids.mdc` § Modo de operação.
 
 | Hash | Entrega |
 |------|---------|
+| `68c47c0` | Fix index.html cache-bust v1.8.15 (I3) |
+| `aeec240` | FE v1.8.15 — semana atual Dashboard |
 | `3f5aeea` | GAS v1.5.81 — ping + folha proporcional |
 | `7e73fdf` | GAS v1.5.81 + FE v1.8.14 — comparativo mesma base |
-| `45c1f72` | FE v1.8.12 — legibilidade capítulos |
-| `31b311f` | FE v1.8.11 — Dashboard narrativo |
 
 Detalhe vivo: seção **Execução — status ao vivo** em `PLANO_PRIORIDADES_2026-06.md`.
 

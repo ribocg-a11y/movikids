@@ -46,7 +46,8 @@
 | [DEPLOY_GAS_v1.5.32_AUTH.md](ativos/DEPLOY_GAS_v1.5.32_AUTH.md) | Deploy GAS mestre + link `.gs` |
 | [DEPLOY_v1.5.81_FOLHA_PROPORCIONAL.md](ativos/DEPLOY_v1.5.81_FOLHA_PROPORCIONAL.md) | **Deploy GAS v1.5.81** — folha proporcional + ping |
 | [DEPLOY_v1.5.80_FASE9_FOLHA_VIABILIDADE.md](ativos/DEPLOY_v1.5.80_FASE9_FOLHA_VIABILIDADE.md) | Deploy GAS v1.5.80 — FASE 9 folha CLT |
-| [DEPLOY_FE_v1.8.12_DASHBOARD_NARRATIVO.md](ativos/DEPLOY_FE_v1.8.12_DASHBOARD_NARRATIVO.md) | **Deploy FE v1.8.11–1.8.13** — Dashboard narrativo |
+| [DEPLOY_FE_v1.8.15_SEMANA_ATUAL.md](ativos/DEPLOY_FE_v1.8.15_SEMANA_ATUAL.md) | **Deploy FE v1.8.15** — semana atual + fix I3 cache-bust |
+| [DEPLOY_FE_v1.8.12_DASHBOARD_NARRATIVO.md](ativos/DEPLOY_FE_v1.8.12_DASHBOARD_NARRATIVO.md) | Deploy FE v1.8.11–1.8.14 — Dashboard narrativo |
 | [DEPLOY_FE_v1.8.10_FASE9_FOLHA_VIABILIDADE.md](ativos/DEPLOY_FE_v1.8.10_FASE9_FOLHA_VIABILIDADE.md) | Deploy FE v1.8.10 — painel viabilidade |
 | [DEPLOY_v1.5.79_FASE8_ALERTAS.md](ativos/DEPLOY_v1.5.79_FASE8_ALERTAS.md) | Deploy GAS v1.5.79 — FASE 8 |
 | [../referencia/FOLHA_PAGAMENTO_MEMORIAL_E_PLANILHA.md](../referencia/FOLHA_PAGAMENTO_MEMORIAL_E_PLANILHA.md) | Memorial aba FOLHA |

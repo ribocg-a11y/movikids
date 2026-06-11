@@ -34,8 +34,8 @@ Leia **nesta ordem**:
 
 | Eu (agente) sozinho | Só com seu pedido | Só você |
 |---------------------|-------------------|---------|
-| Ler docs, editar código, `pre-push-check`, ping GAS, testes `.ps1` | `git commit`, `git push`, `clasp push` | Nova versão Web GAS no editor |
-| Validar versões no repo | Mudanças em `api()` / auth | Tablet balcão `?force=` |
+| Ler docs, editar código, `pre-push-check`, ping GAS, testes `.ps1` | `clasp push` | Nova versão Web GAS no editor |
+| **`git commit` + `git push`** após mudanças FE/docs (automático) | Mudanças em `api()` / auth | Tablet balcão `?force=` |
 | **Planilha** via `google-drive-sheets-auth` (OAuth) | Escritas destrutivas na planilha | Script Properties SMS, re-auth OAuth |
 | Preparar deploy (sync + clasp push) | Limpar testes prod / corrigir financeiro GAS | — |
 
@@ -86,12 +86,12 @@ Fonte de verdade: `mk-version.js`, header do `.gs`, ping GAS.
 - `docs/arquivo/obsoleto/` — rollback/changelog antigos
 - Arquivos em `arquivo-historico/` para deploy
 
-## Estado do projeto (10/06/2026)
+## Estado do projeto (11/06/2026)
 
 - **FASE 1–8:** ✅ repo (FASE 8 alertas v1.8.9/v1.5.79)
 - **FASE 9 Folha CLT:** ✅ v1.8.10/v1.5.80
-- **Dashboard narrativo + folha prop.:** ✅ v1.8.15/v1.5.81 prod.
-- **Próximo:** homolog v1.8.13 · DNA visual admin (fase plano 6–15)
+- **Dashboard narrativo + folha prop. + semana atual:** ✅ v1.8.15/v1.5.81 prod.
+- **Próximo:** mini-DRE (fase 14 plano) · DNA visual admin
 
 ## Ao encerrar sessão
 

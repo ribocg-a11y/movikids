@@ -69,3 +69,9 @@
 |--------|-----------|
 | `31b311f` | v1.8.11 — capítulos narrativos |
 | `45c1f72` | v1.8.12 — legibilidade + média loc/dia |
+
+---
+
+## Continuação v1.8.14–1.8.15
+
+Ver **`DEPLOY_FE_v1.8.15_SEMANA_ATUAL.md`** — comparativo mesma base (v1.8.14), semana corrente (v1.8.15), fix I3 cache-bust.

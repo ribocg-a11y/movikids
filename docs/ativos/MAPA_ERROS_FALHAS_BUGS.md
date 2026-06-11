@@ -1,6 +1,6 @@
 # MOVI KIDS — Mapa de erros, falhas e bugs
 
-**Atualizado:** 10/06/2026 — **I23 fechado** · **FASE 9 Folha CLT** repo v1.8.10/v1.5.80  
+**Atualizado:** 11/06/2026 — **I3 recorrência** (cache-bust index v1.8.15) · **FE v1.8.15** prod.  
 **Uso anterior:** 09/06/2026 — **I22 fechado** (hotfix FE v1.8.2)  
 **Uso:** consultar **antes de publicar** e **ao montar checklist de teste**. Cada linha tem trava e script de verificação quando existir.
 
@@ -34,7 +34,7 @@
 |---|----------|--------|----------|-------|-------|
 | I1 | `clasp deploy` na Web App | 404; caixa quebrado | Só `clasp push` + Nova versão manual | Regra 8 / Regra 9 | ping |
 | I2 | GAS offline + timer local | Extra fantasma | ADM `somentePlano`; offline v1.7.6 | `FIX_OFFLINE_ENCERRAR` | tablet encerrar |
-| I3 | Cache `?force=` desatualizado | JS antigo no tablet | `mk-version` + `sw` + index alinhados | `pre-push-check` versões | `?force=VERSAO` |
+| I3 | Cache `?force=` / **`index.html ?v=` desatualizado** | JS antigo no tablet/admin | `mk-version` + `sw` + **index** alinhados | `pre-push-check` versões | `?force=VERSAO` · ver **11/06** |
 | I4 | `mk-login-err` duplicado | Erro PIN invisível | ID único `mk-login-pin-err` | review HTML ids | login PIN errado |
 | I5 | Liberar sessão sem refresh UI (v1) | ADM acha que botão falhou | `refreshOperadoresAdmin_` | — | ADM liberar |
 | I6 | Sessão única sem liberar | 409 operador | `liberarSessaoOperadorAdmin` | GAS sessão TTL | login 2º op |
@@ -71,6 +71,7 @@
 | `../arquivo/incidentes/INCIDENTE_AUTH_SESSAO_FANTASMA_PWA_2026-06-06.md` | **I19** (Milena 06/06, login OK 13:05) |
 | `../arquivo/incidentes/INCIDENTE_I21_SESSAO_IDLE_DUAL_2026-06-09.md` | **I21** — idle dual, B8 v1.7.94/v1.5.72 |
 | `../arquivo/incidentes/INCIDENTE_I22_HOME_FORA_DO_AR_FASE6_HTML_2026-06-09.md` | **I22** — `</div>` extra FASE 6; Home P0 |
+| `../arquivo/incidentes/INCIDENTE_I3_CACHE_BUST_INDEX_2026-06-11.md` | **I3 recorrência** — v1.8.15 não carregava (index.html) |
 | `../arquivo/incidentes/INCIDENTE_I23_DASHBOARD_LENTO_TRAVADO_2026-06-09.md` | **I23** — Dashboard lento; mutex KPI + GAS perf |
 | `EMERGENCIA_SMS_404.md` | URL morta |
 | `TROCA_SMS_GATEWAY_DJVJRL_2026-06-04.md` | Gateway SMS |
@@ -150,11 +151,11 @@
 
 ---
 
-## Versões de referência (09/06/2026)
+## Versões de referência (11/06/2026)
 
 | Camada | Repo / produção alvo | Mínimo operação |
 |--------|----------------------|-----------------|
-| Frontend | **v1.8.5** (repo) | `?force=1.8.5` (mín. I23 fase 1: v1.8.4+) |
-| GAS | **v1.5.78** (repo) | Nova versão Web se ping &lt; esperado |
+| Frontend | **v1.8.15** (repo + Pages) | `?force=1.8.15` |
+| GAS | **v1.5.81** (prod.) | Nova versão Web se ping &lt; esperado |
 
 Ver `ESTADO_ATUAL.md` para URLs e editor GAS.
