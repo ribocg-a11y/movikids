@@ -1,6 +1,6 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 10/06/2026 (FE **v1.8.14** + GAS **v1.5.81** prod. · Dashboard narrativo · folha proporcional)  
+**Atualizado:** 11/06/2026 (FE **v1.8.15** + GAS **v1.5.81** prod. · semana atual no Dashboard)  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **Repo local:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`  
@@ -279,3 +279,4 @@ Não criar novo handoff datado — manter **só este** em `docs/ativos/`.
 | I21 mock idle | ✅ v1.7.96 |
 
 *Próxima revisão: **13/06/2026** — ver `PLANEJAMENTO_ATUAL_2026-06.md`.*
+

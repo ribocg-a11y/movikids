@@ -24,7 +24,7 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 | Camada | Versão repo | URL / ID |
 |--------|-------------|----------|
-| **Frontend** | **v1.8.14** | https://ribocg-a11y.github.io/movikids/?force=1.8.14 |
+| **Frontend** | **v1.8.15** | https://ribocg-a11y.github.io/movikids/?force=1.8.15 |
 | **Apps Script (código + ping)** | **v1.5.81** | Nova versão Web ✅ |
 | **Aba FOLHA** | memorial B68 | [gid=179040058](https://docs.google.com/spreadsheets/d/1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618/edit#gid=179040058) |
 
@@ -85,7 +85,7 @@ https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPe
 
 | Versão | Entrega |
 |--------|---------|
-| **v1.8.14** + **GAS v1.5.81** | Dashboard narrativo + folha proporcional (mesma base sem/com folha) |
+| **v1.8.15** + **GAS v1.5.81** | Dashboard narrativo + semana atual + folha proporcional |
 | **v1.8.10** + **GAS v1.5.80** | **FASE 9** — folha FOLHA B68 + `viabilidadeContratacao` + painel CLT |
 | **v1.8.9** + **GAS v1.5.79** | **FASE 8** — alertas gestão + semáforo empresa |
 | **v1.8.7** | **Pacote I** — KPI row: Ano · Locações · Cancel · Extras · Caixa |

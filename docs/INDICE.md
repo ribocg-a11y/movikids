@@ -1,6 +1,6 @@
 # MOVI KIDS — Índice de documentação
 
-**Atualizado:** 10/06/2026 (FE **v1.8.14** · GAS **v1.5.81** prod.)
+**Atualizado:** 11/06/2026 (FE **v1.8.15** · GAS **v1.5.81** prod.)
 
 ## Comece aqui
 
