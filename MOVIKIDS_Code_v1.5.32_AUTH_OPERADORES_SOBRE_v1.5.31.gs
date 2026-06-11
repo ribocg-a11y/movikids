@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.81
+// MOVI KIDS — Google Apps Script v1.5.82
+// v1.5.82: FASE 14 — miniDre (margemBruta/cusCMV/cusOPEX) + lerPlanoContas_
 // v1.5.81: viabilidadeContratacao — folha proporcional no parcial (mesma base sem vs com folha)
 // v1.5.80: FASE 9 — folha FOLHA B68 + viabilidadeContratacao + alertas CONTRATACAO_* em kpiMes
 // v1.5.79: FASE 8 — kpiMes.alertas + sinalEmpresa (buildAlertasGestao_, movikidsSinalEmpresa_)
@@ -84,6 +85,7 @@ const FB_URL     = 'https://movikids-fa3d7-default-rtdb.firebaseio.com';
 const SH_LOC   = 'LOCACOES';
 const SH_CUS   = 'CUSTOS';
 const SH_FOLHA = 'FOLHA';
+const SH_PLANO_CONTAS = 'PLANO_CONTAS';
 const SH_INV   = 'INVESTIMENTO';
 const SH_DASH  = 'DASHBOARD';
 const SH_CFG   = 'CONFIG';
@@ -382,9 +384,9 @@ function ping_() {
   const agora = new Date();
   return resp_({
     status:  'online',
-    versao:  'v1.5.81',
+    versao:  'v1.5.82',
     timestamp: fmtData_(agora) + ' ' + fmtHoraLocal_(agora),
-    sistema: 'MOVI KIDS v1.5.81',
+    sistema: 'MOVI KIDS v1.5.82',
     postWriteActions: WRITE_ACTIONS_CRITICAS_
   });
 }
@@ -1953,6 +1955,95 @@ function lerFolhaPlanejamento_() {
   }
 }
 
+/** Mapeamento padrão CUSTOS → grupo DRE (FASE 14 — sem aba PLANO_CONTAS). */
+function defaultPlanoContasMap_() {
+  return {
+    'Manutenção': 'CMV',
+    'Manutencao': 'CMV',
+    'Material': 'CMV',
+    'Energia': 'OPEX_FIXO',
+    'Aluguel': 'OPEX_FIXO',
+    'Outros': 'OPEX_VAR'
+  };
+}
+
+/** Lê aba PLANO_CONTAS — col A codigo, B nome, C grupo, D categoriaLegacy, E entraCMV, F ativo. */
+function lerPlanoContas_() {
+  const fallback = { ok: false, map: defaultPlanoContasMap_(), fonte: 'default' };
+  try {
+    const sh = sh_(SH_PLANO_CONTAS);
+    if (!sh || sh.getLastRow() < 2) return fallback;
+    const n = sh.getLastRow() - 1;
+    const rows = sh.getRange(2, 1, n, 6).getValues();
+    const map = {};
+    rows.forEach(function(r) {
+      const leg = String(r[3] || '').trim();
+      let grupo = String(r[2] || '').trim().toUpperCase();
+      const ativo = String(r[5] || 'S').trim().toUpperCase() !== 'N';
+      if (!leg || !ativo) return;
+      if (!grupo) grupo = 'OPEX_VAR';
+      map[leg] = grupo;
+    });
+    if (!Object.keys(map).length) return fallback;
+    return { ok: true, map: map, fonte: 'PLANO_CONTAS' };
+  } catch (e) {
+    Logger.log('lerPlanoContas_: ' + e.message);
+    return Object.assign({}, fallback, { erro: e.message });
+  }
+}
+
+/** FASE 14 — mini-DRE: CMV + OPEX + margens (paridade margemOperacional = resultado). */
+function buildMiniDre_(fatMes, cusPorCategoriaObj, ctoPagar, planoPack) {
+  const map = (planoPack && planoPack.map) ? planoPack.map : defaultPlanoContasMap_();
+  let cusCMV = 0;
+  let cusOPEX = 0;
+  let cusInvest = 0;
+  let cusSemPlano = 0;
+  const grupos = { CMV: 0, OPEX_FIXO: 0, OPEX_VAR: 0, INVESTIMENTO: 0 };
+
+  Object.keys(cusPorCategoriaObj || {}).forEach(function(cat) {
+    const val = Number(cusPorCategoriaObj[cat]) || 0;
+    if (val <= 0) return;
+    let grupo = map[cat];
+    if (!grupo) {
+      grupo = 'OPEX_VAR';
+      cusSemPlano += val;
+    }
+    grupos[grupo] = (grupos[grupo] || 0) + val;
+    if (grupo === 'CMV') cusCMV += val;
+    else if (grupo === 'INVESTIMENTO') cusInvest += val;
+    else cusOPEX += val;
+  });
+
+  const fat = Math.round(fatMes * 100) / 100;
+  const cto = Math.round(ctoPagar * 100) / 100;
+  cusCMV = Math.round(cusCMV * 100) / 100;
+  cusOPEX = Math.round(cusOPEX * 100) / 100;
+  cusInvest = Math.round(cusInvest * 100) / 100;
+  const margemBruta = Math.round((fat - cusCMV) * 100) / 100;
+  const margemOperacional = Math.round((margemBruta - cusOPEX - cto) * 100) / 100;
+  const margemBrutaPct = fat > 0 ? Math.round(margemBruta / fat * 1000) / 10 : 0;
+  const margemOperacionalPct = fat > 0 ? Math.round(margemOperacional / fat * 1000) / 10 : 0;
+
+  return {
+    fatMes: fat,
+    cusCMV: cusCMV,
+    cusOPEX: cusOPEX,
+    cusInvestimento: cusInvest,
+    cusSemPlano: Math.round(cusSemPlano * 100) / 100,
+    ctoPagar: cto,
+    margemBruta: margemBruta,
+    margemBrutaPct: margemBrutaPct,
+    margemOperacional: margemOperacional,
+    margemOperacionalPct: margemOperacionalPct,
+    grupos: Object.keys(grupos).map(function(k) {
+      return { grupo: k, valor: Math.round((grupos[k] || 0) * 100) / 100 };
+    }).filter(function(g) { return g.valor > 0; }),
+    planoFonte: planoPack ? planoPack.fonte : 'default',
+    planoOk: !!(planoPack && planoPack.ok)
+  };
+}
+
 function buildMotivoAguardarContrat_(gates, folhaVal, projResFolha, margProj, diasOp) {
   const parts = [];
   if (!gates.dadosSuficientes) {
@@ -2341,6 +2432,8 @@ function buildKpiMesPayload_(p) {
   const ctoPagar = Math.max(ctoMin, fatMes * 0.10);
   const resultado= fatMes - cusMes - ctoPagar;
   const margem   = fatMes > 0 ? Math.round(resultado / fatMes * 1000) / 10 : 0;
+  const planoContas = lerPlanoContas_();
+  const miniDre = buildMiniDre_(fatMes, cusPorCategoria, ctoPagar, planoContas);
   // v1.5.4: projeção e média diária
   const diasOperando  = diasComMov.size;
   const mediaDiaria   = diasOperando > 0 ? Math.round(fatMes / diasOperando * 100) / 100 : 0;
@@ -2458,6 +2551,11 @@ function buildKpiMesPayload_(p) {
     ctoPagar:    Math.round(ctoPagar * 100) / 100,
     resultado:   Math.round(resultado* 100) / 100,
     margem,
+    margemBruta: miniDre.margemBruta,
+    margemBrutaPct: miniDre.margemBrutaPct,
+    margemOperacional: miniDre.margemOperacional,
+    margemOperacionalPct: miniDre.margemOperacionalPct,
+    miniDre: miniDre,
     extMes:      Math.round(extMes * 100) / 100,
     nComExtra,
     pctExtMes:   fatMes > 0 ? Math.round(extMes / fatMes * 1000) / 10 : 0,
@@ -2505,7 +2603,7 @@ function kpiMes_(p) {
   const mes = p && p.mes ? parseInt(p.mes) : hoje.getMonth() + 1;
   const ano = p && p.ano ? parseInt(p.ano) : hoje.getFullYear();
   const lite = (p && (String(p.lite || '') === '1' || String(p.lite || '').toLowerCase() === 'true')) ? '1' : '0';
-  const cacheKey = 'kpiMes81_' + mes + '_' + ano + '_L' + lite;
+  const cacheKey = 'kpiMes82_' + mes + '_' + ano + '_L' + lite;
   try {
     const cache = CacheService.getScriptCache();
     const hit = cache.get(cacheKey);

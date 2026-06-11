@@ -2,7 +2,7 @@
 
 **Status:** 🟡 **iniciada** (docs 11/06/2026) — implementação GAS/FE pendente revisão memorial  
 **Prioridade:** P2 · **Esforço:** 10–14 dias  
-**Versão alvo:** FE **v1.8.16+** · GAS **v1.5.82**  
+**Versão alvo:** FE **v1.8.16** · GAS **v1.5.82** (clasp push ✅ · **Nova versão Web pendente**)  
 **Mestre:** `PLANO_FASES_6_15_COCKPIT_EXECUTIVO_2026-06.md` § FASE 14
 
 ---
@@ -21,14 +21,14 @@
 | ID | Entrega | Camada | Status |
 |----|---------|--------|--------|
 | 14.0 | Memorial mini-DRE | Docs | ✅ `../referencia/MEMORIAL_MINI_DRE.md` |
-| 14.1 | Aba `PLANO_CONTAS` | Planilha | ⏳ |
-| 14.2 | Validar CUSTOS col cat → plano | GAS | ⏳ |
-| 14.3 | `margemBruta` / `cusCMV` | GAS | ⏳ |
-| 14.4 | `margemOperacional` explícito | GAS | ⏳ |
+| 14.1 | Aba `PLANO_CONTAS` | Planilha | ⏳ script `instalarAbaPlanoContas.gs` |
+| 14.2 | Validar CUSTOS col cat → plano | GAS | ✅ fallback default |
+| 14.3 | `margemBruta` / `cusCMV` | GAS | ✅ v1.5.82 repo |
+| 14.4 | `margemOperacional` explícito | GAS | ✅ v1.5.82 repo |
 | 14.5 | `depreciacaoMensal_` opcional | GAS | ⏳ backlog |
-| 14.6 | Cascata margens Dashboard | FE | ⏳ |
+| 14.6 | Cascata margens Dashboard | FE | ✅ v1.8.16 repo |
 | 14.7 | Memorial (este pacote) | Docs | ✅ |
-| 14.8 | `scripts/ops/migrar-plano-contas.ps1` | Ops | ⏳ |
+| 14.8 | `scripts/planilha/instalarAbaPlanoContas.gs` | Ops | ✅ |
 
 ---
 

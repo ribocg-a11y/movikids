@@ -961,6 +961,35 @@ function applyMargemSemaforo_(margem) {
   else if (margem > 0) kpi.classList.add('mk-sem-vermelho');
 }
 
+/** FASE 14 — cascata mini-DRE (margem bruta → operacional). */
+function renderMiniDreCascade_(d) {
+  const box = document.getElementById('mk-dre-cascata');
+  if (!box) return;
+  const md = d && d.miniDre;
+  if (!md || !(d.fatMes > 0)) {
+    box.style.display = 'none';
+    return;
+  }
+  box.style.display = '';
+  setText2('mk-dre-fat', R2(md.fatMes || d.fatMes));
+  setText2('mk-dre-cmv', '− ' + R2(md.cusCMV || 0));
+  setText2('mk-dre-bruta', R2(md.margemBruta || 0));
+  setText2('mk-dre-bruta-pct', (md.margemBrutaPct != null ? md.margemBrutaPct : 0) + '%');
+  setText2('mk-dre-opex', '− ' + R2(md.cusOPEX || 0));
+  setText2('mk-dre-cto', '− ' + R2(md.ctoPagar || d.ctoPagar || 0));
+  setText2('mk-dre-oper', R2(md.margemOperacional != null ? md.margemOperacional : d.resultado));
+  setText2('mk-dre-oper-pct', (md.margemOperacionalPct != null ? md.margemOperacionalPct : d.margem) + '%');
+  const foot = document.getElementById('mk-dre-foot');
+  if (foot) {
+    const par = Math.abs((md.margemOperacional || 0) - (Number(d.resultado) || 0)) < 0.02;
+    foot.textContent = md.planoOk
+      ? 'Plano de contas: aba PLANO_CONTAS'
+      : 'Plano de contas: mapeamento padrão (execute instalarAbaPlanoContas na planilha)';
+    if (md.cusSemPlano > 0) foot.textContent += ' · R$ ' + Math.round(md.cusSemPlano) + ' em categorias não mapeadas';
+    if (!par) foot.textContent += ' · Revisar classificação de custos';
+  }
+}
+
 /** FASE 6 — faixa executiva (5 KPIs + narrativa GAS). */
 function renderExecCockpit_(d) {
   const box = document.getElementById('mk-exec-cockpit');
@@ -1043,6 +1072,7 @@ function renderExecCockpit_(d) {
       badge.style.color = resultado >= 0 && margem >= 10 ? '#2E7D32' : (resultado >= 0 ? '#E65100' : '#C62828');
     }
   }
+  renderMiniDreCascade_(d);
 }
 
 /** Seção 2 — comparativo lucro e meta loc/dia (sem vs com folha, mesma base). */
