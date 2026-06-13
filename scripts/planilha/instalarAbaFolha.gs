@@ -49,7 +49,7 @@ function instalarAbaFolha() {
     ['Regime: 1=Simples (sem INSS 20% sep.) · 0=LP/LR', 1],
     ['Tarifa VT ida+volta/dia (R$)', 5],
     ['Dias VT no mês (padrão)', 24],
-    ['Vale-alimentação/dia PAT (R$)', 22],
+    ['Vale-alimentação PAT — teto mensal (R$)', 400],
     ['Dias trabalhados VA no mês', 26],
     ['INSS empregado % (SM ~7,5%)', 0.075],
     ['Piso CCT se houver (R$) — 0=usar salário padrão', 0],
@@ -85,23 +85,25 @@ function instalarAbaFolha() {
   F(23, 2, '=B21*0,06');
   L(24, 1, 'Custo VT/dia empresa (após 6%) ref.');
   F(24, 2, '=MÁXIMO(0;B' + R_TVT + '*B' + R_DVT + '-B23)');
-  L(25, 1, 'VA mensal ref. por funcionário (R$)');
-  F(25, 2, '=B' + R_VAD + '*B' + R_DVA);
-  L(26, 1, '% FGTS');
-  L(26, 2, 0.08);
-  L(27, 1, '% Prov. 13º');
-  L(27, 2, 0.0833);
-  L(28, 1, '% Prov. Férias+1/3');
-  L(28, 2, 0.1111);
-  L(29, 1, '% Prov. multa FGTS');
-  L(29, 2, 0.04);
-  L(30, 1, '% Total provisões+FGTS');
-  F(30, 2, '=B26+B27+B28+B29');
+  L(25, 1, 'VA/dia calculado (R$) — teto B11÷B12');
+  F(25, 2, '=SE(B' + R_DVA + '>0;ARRED(B' + R_VAD + '/B' + R_DVA + ';2);0)');
+  L(26, 1, 'VA mensal teto por funcionário (R$)');
+  F(26, 2, '=B' + R_VAD);
+  L(27, 1, '% FGTS');
+  L(27, 2, 0.08);
+  L(28, 1, '% Prov. 13º');
+  L(28, 2, 0.0833);
+  L(29, 1, '% Prov. Férias+1/3');
+  L(29, 2, 0.1111);
+  L(30, 1, '% Prov. multa FGTS');
+  L(30, 2, 0.04);
+  L(31, 1, '% Total provisões+FGTS');
+  F(31, 2, '=B27+B28+B29+B30');
 
   // ── BLOCO C: FUNCIONÁRIOS ────────────────────────────────
   fmtHdr(33, 33, 1, 8, '#E3F2FD');
   L(33, 1, 'C — CADASTRO FUNCIONÁRIOS (linhas ativas = parâmetro B5)');
-  var hdr = ['Ativo?', 'Nome', 'Salário R$', 'Dias VT', 'Tarifa VT R$', 'VA/dia R$', 'Admissão', 'Obs'];
+  var hdr = ['Ativo?', 'Nome', 'Salário R$', 'Dias VT', 'Tarifa VT R$', 'VA/dia calc. R$', 'Admissão', 'Obs'];
   for (var h = 0; h < hdr.length; h++) { L(34, h + 1, hdr[h]); }
 
   var firstEmp = 35;
@@ -115,7 +117,7 @@ function instalarAbaFolha() {
     F(r, 3, '=SE(A' + r + '="SIM";B$21;"")');
     F(r, 4, '=SE(A' + r + '="SIM";B$' + R_DVT + ';"")');
     F(r, 5, '=SE(A' + r + '="SIM";B$' + R_TVT + ';"")');
-    F(r, 6, '=SE(A' + r + '="SIM";B$' + R_VAD + ';"")');
+    F(r, 6, '=SE(A' + r + '="SIM";B$25;"")');
   }
   sh.getRange(firstEmp, 2, lastEmp, 7).setBackground('#FFFDE7');
 
@@ -134,9 +136,9 @@ function instalarAbaFolha() {
     F(mr, 3, '=SE(A' + er + '="SIM";-ARRED(C' + er + '*B$' + R_INSS + ';2);"")');
     F(mr, 4, '=SE(A' + er + '="SIM";-MÍNIMO(B$23;D' + er + '*E' + er + ');"")');
     F(mr, 5, '=SE(A' + er + '="SIM";B' + mr + '+C' + mr + '+D' + mr + ';" ")');
-    F(mr, 6, '=SE(A' + er + '="SIM";C' + er + '*B$26;"")');
-    F(mr, 7, '=SE(A' + er + '="SIM";C' + er + '*(B$27+B$28+B$29);"")');
-    F(mr, 8, '=SE(A' + er + '="SIM";C' + er + '+F' + mr + '+G' + mr + '+I' + mr + '+F' + er + '*B$' + R_DVA + ';"")');
+    F(mr, 6, '=SE(A' + er + '="SIM";C' + er + '*B$27;"")');
+    F(mr, 7, '=SE(A' + er + '="SIM";C' + er + '*(B$28+B$29+B$30);"")');
+    F(mr, 8, '=SE(A' + er + '="SIM";C' + er + '+F' + mr + '+G' + mr + '+B$' + R_VAD + '+I' + mr + ';" ")');
     F(mr, 9, '=SE(A' + er + '="SIM";MÁXIMO(0;D' + er + '*E' + er + '+D' + mr + ');"")');
   }
   sh.getRange(firstMem, 2, firstMem + 9, 8).setNumberFormat('#,##0.00');
@@ -152,8 +154,8 @@ function instalarAbaFolha() {
   F(64, 2, '=SOMA(G49:G58)');
   L(65, 1, 'VT (parte empresa)');
   F(65, 2, '=SOMA(I49:I58)');
-  L(66, 1, 'Vale-alimentação PAT');
-  F(66, 2, '=SOMA(ARRAYFORMULA(SE(A35:A44="SIM";F35:F44*B$' + R_DVA + ';0)))');
+  L(66, 1, 'Vale-alimentação PAT (teto mensal)');
+  F(66, 2, '=SOMA(ARRAYFORMULA(SE(A35:A44="SIM";B$' + R_VAD + ';0)))');
   L(67, 1, 'INSS patronal 20% (se LP/LR)');
   F(67, 2, '=SE(B' + R_SIMPLES + '=1;0;B62*0,2)');
   L(68, 1, 'CUSTO TOTAL FOLHA + ENCARGOS');
@@ -223,5 +225,66 @@ function onOpenFolhaMenu() {
   SpreadsheetApp.getUi()
     .createMenu('MOVI KIDS')
     .addItem('Instalar aba FOLHA', 'instalarAbaFolha')
+    .addItem('Patch VA mensal (B11 teto)', 'patchFolhaVaMensal400')
     .addToUi();
+}
+
+/**
+ * Atualiza aba FOLHA existente: B11 = teto mensal VA (R$ 400); VA/dia = B11/B12.
+ * Nao apaga dados — so rotulos e formulas. Executar 1x no editor da planilha.
+ */
+function patchFolhaVaMensal400() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sh = ss.getSheetByName('FOLHA');
+  if (!sh) {
+    SpreadsheetApp.getUi().alert('Aba FOLHA nao encontrada. Rode instalarAbaFolha primeiro.');
+    return;
+  }
+  var R_N = 5, R_SAL = 7, R_SIMPLES = 8, R_TVT = 9, R_DVT = 10, R_VAD = 11, R_DVA = 12, R_INSS = 13;
+  var firstEmp = 35, firstMem = 49;
+
+  sh.getRange(11, 1).setValue('Vale-alimentação PAT — teto mensal (R$)');
+  var vaAtual = sh.getRange(R_VAD, 2).getValue();
+  if (!vaAtual || Number(vaAtual) <= 0) sh.getRange(R_VAD, 2).setValue(400);
+
+  sh.getRange(25, 1).setValue('VA/dia calculado (R$) — teto B11÷B12');
+  sh.getRange(25, 2).setFormula('=SE(B' + R_DVA + '>0;ARRED(B' + R_VAD + '/B' + R_DVA + ';2);0)');
+  sh.getRange(26, 1).setValue('VA mensal teto por funcionário (R$)');
+  sh.getRange(26, 2).setFormula('=B' + R_VAD);
+
+  sh.getRange(27, 1).setValue('% FGTS');
+  sh.getRange(27, 2).setValue(0.08);
+  sh.getRange(28, 1).setValue('% Prov. 13º');
+  sh.getRange(28, 2).setValue(0.0833);
+  sh.getRange(29, 1).setValue('% Prov. Férias+1/3');
+  sh.getRange(29, 2).setValue(0.1111);
+  sh.getRange(30, 1).setValue('% Prov. multa FGTS');
+  sh.getRange(30, 2).setValue(0.04);
+  sh.getRange(31, 1).setValue('% Total provisões+FGTS');
+  sh.getRange(31, 2).setFormula('=B27+B28+B29+B30');
+
+  sh.getRange(34, 6).setValue('VA/dia calc. R$');
+  for (var r = firstEmp; r <= 44; r++) {
+    sh.getRange(r, 6).setFormula('=SE(A' + r + '="SIM";B$25;"")');
+  }
+
+  for (var mr = firstMem; mr < firstMem + 10; mr++) {
+    var er = firstEmp + (mr - firstMem);
+    sh.getRange(mr, 6).setFormula('=SE(A' + er + '="SIM";C' + er + '*B$27;"")');
+    sh.getRange(mr, 7).setFormula('=SE(A' + er + '="SIM";C' + er + '*(B$28+B$29+B$30);"")');
+    sh.getRange(mr, 8).setFormula('=SE(A' + er + '="SIM";C' + er + '+F' + mr + '+G' + mr + '+B$' + R_VAD + '+I' + mr + ';" ")');
+  }
+
+  sh.getRange(66, 1).setValue('Vale-alimentação PAT (teto mensal)');
+  sh.getRange(66, 2).setFormula('=SOMA(ARRAYFORMULA(SE(A35:A44="SIM";B$' + R_VAD + ';0)))');
+
+  var b68 = sh.getRange(68, 2).getValue();
+  var b25 = sh.getRange(25, 2).getValue();
+  SpreadsheetApp.getUi().alert(
+    'Patch VA mensal aplicado.\n\n'
+    + 'B11 teto mensal: R$ ' + sh.getRange(R_VAD, 2).getValue() + '\n'
+    + 'VA/dia (B25): R$ ' + b25 + '\n'
+    + 'Custo total (B68): R$ ' + b68 + '\n\n'
+    + 'Publique GAS v1.5.84 e Nova versao Web para o Dashboard ler vaDia.'
+  );
 }

@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.83
+// MOVI KIDS — Google Apps Script v1.5.84
+// v1.5.84: FOLHA — VA mensal teto B11 (400/mês); vaDia = B11/B12; patchFolhaVaMensal400_
 // v1.5.83: kpiMes.locPorDia — locações por dia (meta loc/dia no Dashboard)
 // v1.5.82: FASE 14 — miniDre (margemBruta/cusCMV/cusOPEX) + lerPlanoContas_
 // v1.5.81: viabilidadeContratacao — folha proporcional no parcial (mesma base sem vs com folha)
@@ -1930,10 +1931,12 @@ function lerFolhaPlanejamento_() {
   const fallback = {
     ok: false,
     nFuncionarios: 2,
-    custoMensal: 5270,
+    custoMensal: 4926,
     salarioBase: 1621,
-    vtDia: 8.4,
+    vtTarifa: 8.4,
     vaMensal: 400,
+    vaDia: 15.38,
+    diasVa: 26,
     fonte: 'default'
   };
   try {
@@ -1941,13 +1944,20 @@ function lerFolhaPlanejamento_() {
     if (!sh) return fallback;
     const custoMensal = parseMoedaBr_(sh.getRange('B68').getValue());
     if (custoMensal <= 0) return fallback;
+    const vaMensal = parseMoedaBr_(sh.getRange('B11').getValue()) || 400;
+    const diasVa = Math.max(1, parseInt(parseMoedaBr_(sh.getRange('B12').getValue()), 10) || 26);
+    const vaDiaCalc = Math.round(vaMensal / diasVa * 100) / 100;
+    const vaDiaCell = parseMoedaBr_(sh.getRange('B25').getValue());
     return {
       ok: true,
       nFuncionarios: Math.max(1, parseInt(parseMoedaBr_(sh.getRange('B5').getValue()), 10) || 2),
       custoMensal: Math.round(custoMensal * 100) / 100,
       salarioBase: parseMoedaBr_(sh.getRange('B7').getValue()) || 1621,
+      vtTarifa: parseMoedaBr_(sh.getRange('B9').getValue()) || 8.4,
       vtDia: parseMoedaBr_(sh.getRange('B9').getValue()) || 8.4,
-      vaMensal: parseMoedaBr_(sh.getRange('B11').getValue()) || 400,
+      vaMensal: vaMensal,
+      vaDia: vaDiaCell > 0 ? vaDiaCell : vaDiaCalc,
+      diasVa: diasVa,
       fonte: 'FOLHA'
     };
   } catch (e) {

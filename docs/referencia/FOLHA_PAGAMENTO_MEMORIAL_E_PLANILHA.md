@@ -47,7 +47,9 @@ No Simples, **INSS patronal (20%)**, SAT, Salário-Educação e Sistema S **não
 | Benefício | Custo empresa típico | Desconto empregado |
 |-----------|---------------------|-------------------|
 | Vale-transporte | Tarifa × dias úteis − desconto 6% | min(6% SM, custo VT) |
-| Vale-alimentação (PAT) | Valor/dia × dias trabalhados | **Sem desconto** (se política da empresa) |
+| Vale-alimentação (PAT) | Valor/mês **máx.** por funcionário | **Sem desconto** (se política da empresa) |
+
+**Regra VA na aba:** **B11** = teto mensal (ex. R$ 400) · **B12** = dias trabalhados · **B25** = VA/dia = `B11÷B12` (nunca ultrapassa B11 no mês).
 
 ### 2.2 Empresa **Lucro Presumido / Real** (se migrar)
 
@@ -149,7 +151,7 @@ A aba é dividida em **blocos verticais** (mesma aba, colunas A–H):
 |-------|--------|--------|
 | **A — ENTRADA (você preenche)** | 1–35 | Parâmetros que alimentam tudo — **não apagar fórmulas abaixo** |
 | **B — PARÂMETROS CALCULADOS** | 37–55 | Derivados (6% VT, hora, % provisões) |
-| **C — FUNCIONÁRIOS (1–10 linhas)** | 57–70 | Nome, salário, dias VT, tarifa, VA/dia — **quantidade ativa = parâmetro B4** |
+| **C — FUNCIONÁRIOS (1–10 linhas)** | 57–70 | Nome, salário, dias VT, tarifa, **VA/dia calc.** (B25) — **quantidade ativa = parâmetro B4** |
 | **D — MEMORIAL POR FUNCIONÁRIO** | 72–95 | Salário, descontos, líquido, custo empresa |
 | **E — TOTAIS EMPRESA** | 97–115 | Soma folha + encargos + benefícios + **custo total mensal** |
 | **F — PROVISÕES DETALHE** | 117–130 | FGTS, 13º, férias, multa |
@@ -176,7 +178,8 @@ Script canônico: `C:\Users\riboc\Projects\google-drive-sheets-auth\scripts\cria
 Hora = Salário_Base / 220
 Desconto_VT_empregado = MIN(Salário × 6%; Tarifa × Dias_VT)
 Custo_VT_empresa = MAX(0; Tarifa × Dias_VT − Desconto_VT_empregado)
-VA_mês = Valor_VA_dia × Dias_trabalhados
+VA_mês = MIN(B11; Valor_VA_dia × Dias_trabalhados)   → na aba: **B11** é o teto; custo = **B11** por funcionário ativo
+Valor_VA_dia = B11 / B12   (ex.: 400 / 26 ≈ 15,38)
 FGTS = Salário × 8%
 Provisão_13 = Salário × 8,33%
 Provisão_Férias = Salário × 11,11%
@@ -189,16 +192,16 @@ Custo_empresa_mês = Salário + FGTS + Provisões + VT_empresa + VA + (INSS_patr
 
 ## 8. Simulação rápida (2 × SM, jun/2026 — **exemplo**)
 
-Premissas: SM R$ 1.621 · VT R$ 5,00 × 24 dias = R$ 120 · desconto empregado R$ 97,26 · VA R$ 22/dia × 26 dias = R$ 572 · Simples (sem 20% patronal separado).
+Premissas: SM R$ 1.621 · VT R$ 8,40 × 24 dias · VA **R$ 400/mês** (≈ R$ 15,38/dia × 26) · Simples (sem 20% patronal separado).
 
 | Item | Por funcionário | 2 funcionários |
 |------|-----------------|--------------|
 | Salário bruto | 1.621,00 | 3.242,00 |
 | FGTS 8% | 129,68 | 259,36 |
 | Provisões 23,44% | 379,96 | 759,92 |
-| VT (empresa, após 6%) | ~22,74 | ~45,48 |
-| VA PAT | 572,00 | 1.144,00 |
-| **Custo empregador ~** | **~2.725** | **~5.450/mês** |
+| VT (empresa, após 6%) | ~104,34 | ~208,68 |
+| VA PAT (teto mensal) | **400,00** | **800,00** |
+| **Custo empregador ~** | **~2.635** | **~4.926/mês** |
 
 *Valores ilustrativos — a aba recalcula ao mudar tarifa, dias e nº funcionários.*
 
