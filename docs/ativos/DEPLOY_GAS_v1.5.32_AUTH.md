@@ -14,7 +14,15 @@ C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\m
 
 Pacote atual: **`DEPLOY_v1.5.91_FOLHA_REPAIR_USER_ENTERED.md`** · FE **`DEPLOY_FE_v1.8.16`** (mini-DRE) · FASE 9 **`DEPLOY_v1.5.80_FASE9_FOLHA_VIABILIDADE.md`**
 
-**Como colar no Apps Script:** Explorer → cole o caminho acima na barra → Enter → duplo clique no `.gs` → Ctrl+A → Ctrl+C → colar em **Código.gs** no editor → **Implantar → Nova versão**.
+**Publicar em produção (obrigatório — I26):**
+
+```powershell
+.\scripts\deploy-gas.ps1
+```
+
+Faz: sync → `clasp push` → **`clasp deploy -i AKfycbwakQ...`** → `verify-gas-deploy.ps1`. **Não basta** só push.
+
+Alternativa manual: colar no editor → **Implantar → Editar Web `AKfycbwakQ...` → Nova versão**.
 
 ## Código GAS no PC (copiar daqui → colar no script)
 
@@ -34,7 +42,7 @@ Abrir no Explorer: cole o caminho na barra de endereço → Enter → duplo cliq
 | **Planilha MOVIKIDS** | https://docs.google.com/spreadsheets/d/1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618/edit |
 | **App (GitHub Pages)** | https://ribocg-a11y.github.io/movikids/?force=1.8.10 |
 
-No **editor GAS** (link acima): **Implantar → Gerenciar implantações → Editar** a implantação Web (**ID `AKfycbwakQ...`**) → **Nova versão** → Implantar. **Não** crie um deploy novo. **Nunca** use `clasp deploy`.
+**Nunca** `clasp deploy` **sem `-i`** (I1). Republicar sempre com `deploy-gas.ps1` ou Nova versão no **mesmo** Deploy ID (I26).
 
 Após implantar, o `ping` deve mostrar `versao` **v1.5.63** (ou header do `.gs`) e `postWriteActions` (Pacote E). `buscarKPIsAdmin` inclui **`payback`** projetado (v1.5.63) + **`investimento`**, **`fatAno`/`nAno`** (v1.5.59) + Pacote F. SMS: **v1.5.41** — ver `TROCA_SMS_GATEWAY_DJVJRL_2026-06-04.md`. Payback: **`DEPLOY_v1.5.63_PAYBACK.md`**.
 
@@ -92,7 +100,7 @@ cd movikids-github
 .\scripts\deploy-gas.ps1
 ```
 
-O script: copia o `.gs` canônico → `gas/Code.gs` → valida `DEPLOY_ID` → `clasp push` → lembrete de **Nova versão** no painel.
+O script: sync → `clasp push` → **`clasp deploy -i AKfycbwakQ...`** → **`verify-gas-deploy.ps1`** (Regra 9 / I26).
 
 ## Arquivo canônico
 

@@ -20,7 +20,7 @@ C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\m
 
 3. **Não** substituir por link GitHub/raw, salvo pedido explícito do usuário.
 
-4. Lembrete de publicação: `deploy-gas.ps1` (clasp push) + **Implantar → Gerenciar implantações → Nova versão** no Deploy ID `AKfycbwakQ...` — **nunca** `clasp deploy`.
+4. Lembrete de publicacao: **SO SOCIO** — Editor → Implantar → **Editar** (lapis) `AKfycbwakQ...` → Nova versao. **Nunca** Nova implantacao. Agente: `prepare-gas-push.ps1` apenas (sem publicar Web). **Nunca** `clasp deploy` / `deploy-gas-SOCIO.ps1`.
 
 Arquivo canônico único: `MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs` (nome no disco não muda; só o header de versão).
 

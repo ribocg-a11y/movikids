@@ -32,15 +32,13 @@ Leia **nesta ordem**:
 
 ## Agente vs você (resumo)
 
-| Eu (agente) sozinho | Só com seu pedido | Só você |
+| Eu (agente) sozinho | So com seu pedido | So voce |
 |---------------------|-------------------|---------|
-| Ler docs, editar código, `pre-push-check`, ping GAS, testes `.ps1` | `clasp push` | Nova versão Web GAS no editor |
-| **`git commit` + `git push`** após mudanças FE/docs (automático) | Mudanças em `api()` / auth | Tablet balcão `?force=` |
-| **`verify-publish-complete.ps1`** após todo push FE (Regra 8 / I24) | — | — |
-| **Planilha** via `google-drive-sheets-auth` (OAuth) | Escritas destrutivas na planilha | Script Properties SMS, re-auth OAuth |
-| Preparar deploy (sync + clasp push) | Limpar testes prod / corrigir financeiro GAS | — |
+| Codigo, docs, testes, planilha OAuth | `git commit` + `git push` FE | **Implantar / Nova versao Web GAS** |
+| `prepare-gas-push.ps1` (sync+push codigo, **sem** publicar Web) | Mudancas em `api()` / auth | Arquivar implantacao errada @139 |
+| `verify-gas-deploy.ps1` (leitura) | Limpar testes prod | Tablet balcao `?force=` |
 
-**Nunca:** `clasp deploy`, POST no browser, commit de segredos.
+**Nunca (agente):** `deploy-gas.ps1`, `deploy-gas-SOCIO.ps1`, `clasp deploy`, nova implantacao GAS, POST no browser.
 
 Detalhe completo: [`ACESSOS_E_AUTORIZACOES.md`](docs/ativos/ACESSOS_E_AUTORIZACOES.md) §7.
 

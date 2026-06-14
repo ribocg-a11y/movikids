@@ -1,6 +1,6 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 14/06/2026 (GAS **v1.5.91** prod. · I25 fechado · testes FOLHA+FASE9 **ok** 08:23)  
+**Atualizado:** 14/06/2026 (GAS **v1.5.92** @143 · FE **v1.8.23** · I26/I27 · agente não publica GAS Web)  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **Repo local:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`  
@@ -51,10 +51,11 @@ Continuo o MOVI KIDS. Repo: C:\Users\riboc\Documents\Codex\2026-05-30\files-ment
 
 - Ler: este arquivo → `PLANO_PRIORIDADES` → `ESTADO_ATUAL` → `REGRAS` → `ACESSOS_E_AUTORIZACOES` (§7 = agente vs você)
 - Ignorar handoff antigo em `docs/arquivo/planos/`
-- Informar: FE **v1.8.20**, GAS **v1.5.91** · comunicação **QR only**
+- Informar: FE **v1.8.23**, GAS **v1.5.92** · comunicação **QR only**
+- **GAS:** agente **não** implanta Web App — só `prepare-gas-push.ps1` se pedido. Sócio: **Editar** `AKfycbwakQ...` no editor.
 - **Commit + push automáticos** após mudanças FE/docs — não pedir autorização ao usuário
 - **Toda resposta:** `Mudança no AppScript: sim|não` + link canônico `.gs` (Regra 16)
-- Deixar claro: **agente** no **PC** (código, testes, planilha); **você** Nova versão GAS Web; **tablet no balcão** = validação operação (não confundir com seu computador)
+- Deixar claro: **agente** no **PC** (código, testes, planilha); **GAS** via `deploy-gas.ps1`; **tablet no balcão** = validação operação
 
 ---
 
@@ -90,9 +91,9 @@ Regra Cursor: `.cursor/rules/handoff-movikids.mdc` § Modo de operação.
 
 | Camada | Versão | Verificação |
 |--------|--------|-------------|
-| **Frontend** | **v1.8.20** | `mk-version.js` · `?force=1.8.20` · **QR only** (sem SMS/WA) |
-| **Service Worker** | **1.8.16** | `sw.js` |
-| **Apps Script (código + ping)** | **v1.5.91** | clasp push ✅ · Nova versão Web ✅ (13/06) |
+| **Frontend** | **v1.8.23** | `mk-version.js` · `?force=1.8.23` · **QR only** (sem SMS/WA) |
+| **Service Worker** | **1.8.23** | `sw.js` |
+| **Apps Script (código + ping)** | **v1.5.92** | `deploy-gas.ps1` · @138 · ping confirmado 14/06 |
 | **Aba FOLHA** | **OK** (I25) | B68 ~5269,96 · `folhaPlanejamento.fonte: FOLHA` |
 
 **Deploy ID GAS (único — nunca criar outro):** `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y`
@@ -214,7 +215,7 @@ C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\m
 | Regra | Detalhe |
 |-------|---------|
 | **I15 — GET no browser** | Escritas críticas no `api()` = **GET** apenas. Nunca POST JSON no tablet. |
-| **Deploy GAS** | Mesmo Deploy ID → **Nova versão** no editor. **Nunca** `clasp deploy`. |
+| **Deploy GAS** | **Só sócio** — Editor → **Editar** `AKfycbwakQ...`. Agente: `prepare-gas-push.ps1` max. **Nunca** nova implantação (I1). |
 | **Tablet obrigatório** | Mudança em `api()` ou auth → testar no tablet físico. |
 | **Pre-push** | Rodar `.\scripts\pre-push-check.ps1` antes de `git push`. |
 | **I22 — Janela operacional** | **Nunca** push FE crítico com locações Ativa/Pendente — `check-operacao-livre.ps1` |
@@ -261,7 +262,7 @@ Histórico em `docs/arquivo/` é referência de incidentes e pacotes fechados, *
 1. Ler `REGRAS_DE_PUBLICACAO_SEGURA.md`
 2. `.\scripts\pre-push-check.ps1`
 3. `git push` → GitHub Pages (FE)
-4. Se `.gs` mudou: colar no editor → **Implantar → Nova versão** (mesmo Deploy ID)
+4. Se `.gs` mudou: agente `prepare-gas-push.ps1` → **você** Implantar → **Editar** `AKfycbwakQ...` → Nova versão
 5. Ping + tablet `?force={versão}`
 
 Guia completo: `DEPLOY_GAS_v1.5.32_AUTH.md`

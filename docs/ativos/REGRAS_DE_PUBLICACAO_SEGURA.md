@@ -260,13 +260,34 @@ Toda resposta depois de publicar deve conter:
 
 Se algum desses itens faltar, a entrega nao esta completa.
 
-## Regra 9 - GAS: proibido `clasp deploy`
+## Regra 9 - GAS: republicar Web App (mesmo Deploy ID)
 
-Em 04/06/2026 o comando **`clasp deploy`** (feito pelo agente Cursor) quebrou a URL Web antiga e gerou **404 / Failed to fetch** + cobrança de “tempo extra” fantasma no caixa.
+Em 04/06/2026 **`clasp deploy` sem `-i`** criou URL nova e quebrou produção (I1).
 
-- **Nunca** usar `clasp deploy` na implantacao Web.
-- **Sempre:** `.\scripts\deploy-gas.ps1` (apenas `clasp push`) + **Implantar → Gerenciar implantacoes → Editar Web `AKfycbwakQ...` → Nova versao**.
-- Correcao financeira de locacao encerrada: `corrigirFinanceiroLocacaoAdmin` (ver `docs/arquivo/incidentes/INCIDENTE_DEPLOY_E_EXTRAS_2026-06-04.md`).
+Em 14/06/2026 **`clasp push` sem republicar** deixou editor v1.5.92 e `/exec` em v1.5.91 (I26) — **3 vezes**.
+
+### Proibido
+
+- `clasp deploy` **sem** `-i` (cria implantação nova → URL morta)
+- Declarar deploy GAS OK só com `clasp push`
+- “Nova versão” manual no editor **sem** confirmar ping depois
+
+### Obrigatório (sócio — agente **não** publica)
+
+**Agente:** `prepare-gas-push.ps1` (sync + clasp push de código, **sem** Web App).
+
+**Sócio** no editor ou `deploy-gas-SOCIO.ps1` (pede digitar `SIM`):
+
+1. **Implantar → Gerenciar implantações → Editar** (lápis) **`AKfycbwakQ...`** — **nunca** "Nova implantação"
+2. Quem tem acesso = **Qualquer pessoa** (I27)
+3. Nova versão no **mesmo** Deploy ID
+
+Verificação: `verify-gas-deploy.ps1`
+
+- **Deploy ID fixo:** `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y`
+- Verificação avulsa: `.\scripts\verify-gas-deploy.ps1`
+- Incidente: `docs/arquivo/incidentes/INCIDENTE_I26_GAS_EDITOR_VS_EXEC_2026-06-14.md`
+- Acesso anônimo: `docs/arquivo/incidentes/INCIDENTE_I27_GAS_LOGIN_ANONIMO_2026-06-14.md`
 
 ## Regra 16 - Link canonico Apps Script (obrigatorio)
 

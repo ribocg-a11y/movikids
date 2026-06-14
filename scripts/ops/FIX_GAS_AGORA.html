@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <title>FIX GAS AGORA — Movi Kids</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 720px; margin: 2rem auto; padding: 0 1rem; line-height: 1.5; }
+    .err { background: #ffebee; border: 2px solid #c62828; padding: 1rem; border-radius: 8px; margin: 1rem 0; }
+    .ok { background: #e8f5e9; border: 2px solid #2e7d32; padding: 1rem; border-radius: 8px; }
+    .warn { background: #fff3e0; border: 2px solid #e65100; padding: 1rem; border-radius: 8px; }
+    code { background: #f5f5f5; padding: 2px 6px; word-break: break-all; }
+    h1 { color: #c62828; }
+    ol li { margin: 0.6rem 0; }
+    a { color: #1565c0; }
+  </style>
+</head>
+<body>
+  <h1>Corrigir login — 1 minuto</h1>
+
+  <div class="err">
+    <strong>Voce atualizou o ID ERRADO</strong> (Movi Kids.v134 / <code>AKfycbwkvWg...</code>).<br>
+    O tablet e o app usam <strong>outro</strong> ID: <code>AKfycbwakQ...</code> linha <strong>v1.5.92</strong>.
+  </div>
+
+  <div class="warn">
+    <strong>Lista esquerda em Gerenciar implantacoes:</strong><br>
+    ❌ Movi Kids.v134 — NAO e este<br>
+    ✅ <strong>v1.5.92</strong> — e ESTE (clique nele)
+  </div>
+
+  <ol>
+    <li>Abra o <a href="https://script.google.com/home/projects/19SIhkX9Tk7FiJA1JXu1OrUwssHdr3H5zc8q3rOjmBvqgWfXuHlk8xyf8/edit">Editor Apps Script</a></li>
+    <li><strong>Implantar → Gerenciar implantacoes</strong></li>
+    <li>Na coluna esquerda, clique em <strong>v1.5.92</strong> (nao Movi Kids.v134)</li>
+    <li><strong>Editar</strong> (lapis)</li>
+    <li><strong>Executar como:</strong> Eu</li>
+    <li><strong>Quem tem acesso:</strong> <strong>Qualquer pessoa</strong></li>
+    <li><strong>Implantar</strong></li>
+  </ol>
+
+  <div class="ok">
+    <strong>Teste (aba anonima):</strong><br>
+    <a href="https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec?action=ping" target="_blank">Ping producao</a><br>
+    Deve mostrar JSON <code>{"ok":true,...}</code> sem login Google.
+  </div>
+
+  <p>Depois: Ctrl+F5 em <a href="https://ribocg-a11y.github.io/movikids/?force=1.8.22">movikids ?force=1.8.22</a></p>
+
+  <p>Opcional: arquivar <strong>Movi Kids.v134</strong> (menu ⋮).</p>
+</body>
+</html>

@@ -132,6 +132,21 @@ html,body{height:100%;background:var(--bg);color:var(--txt);overflow:hidden}
 @keyframes pulse-g{0%,100%{opacity:1}50%{opacity:.4}}
 .dot-offline{background:#EF9A9A;animation:none}
 
+/* Banner nova versão (sempre visível no topo — tablet/celular) */
+#update-banner{
+  display:none;position:fixed;top:0;left:0;right:0;z-index:10050;
+  background:linear-gradient(90deg,#E65100,#F57C00);
+  color:#fff;padding:12px 16px;padding-top:max(12px,env(safe-area-inset-top));
+  align-items:center;justify-content:space-between;gap:12px;
+  font-size:14px;font-weight:800;line-height:1.35;
+  box-shadow:0 4px 20px rgba(0,0,0,.35);
+  border-bottom:3px solid #BF360C;
+}
+#update-banner button{
+  flex-shrink:0;background:#fff;color:#E65100;border:none;border-radius:8px;
+  padding:8px 16px;font-weight:900;cursor:pointer;font-size:13px;
+}
+
 /* ── NAV (barra inferior mobile — não afeta sidebar) ─────── */
 #main-content > nav{
   flex-shrink:0;
@@ -573,6 +588,24 @@ html,body{height:100%;background:var(--bg);color:var(--txt);overflow:hidden}
   #sidebar.mob-open{transform:translateX(0)}
   #main-content > nav{grid-template-columns:repeat(4,1fr)!important}
   .nav-icon-menu{font-size:18px;line-height:1}
+  /* Header balcão: contraste alto (sol / tablet na loja) */
+  #app > header{
+    background:linear-gradient(135deg,#0a2d6b 0%,#1565C0 50%,#0D47A1 100%);
+    padding:14px 16px 12px;
+    border-bottom:2px solid rgba(0,0,0,.15);
+  }
+  .logo{text-shadow:0 1px 3px rgba(0,0,0,.35)}
+  .hd-status{color:#fff;font-weight:800;font-size:13px;text-shadow:0 1px 2px rgba(0,0,0,.35)}
+  #app-version,#status-txt{opacity:1!important;color:#fff}
+  .hd-turno-chip{
+    margin-top:10px;padding:10px 12px;font-size:13px;font-weight:900;line-height:1.35;
+    box-shadow:0 2px 8px rgba(0,0,0,.18);
+  }
+  .hd-turno-chip.is-admin{background:#FFD54F;color:#1A2340;border:2px solid #F9A825}
+  .hd-turno-chip.is-ok{background:#FFE082;color:#1A2340;border:2px solid #FFC107}
+  .hd-turno-chip.is-ghost{background:#FF7043;color:#fff;border:2px solid #E64A19}
+  #main-content > nav button{color:var(--txt2);font-size:11px;font-weight:800}
+  #main-content > nav button.active{color:var(--blue-dk)}
 }
 .sb-logo{
   padding:22px 18px 16px;

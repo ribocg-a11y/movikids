@@ -26,15 +26,15 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 | Camada | Versão repo | URL / ID |
 |--------|-------------|----------|
-| **Frontend** | **v1.8.20** | https://ribocg-a11y.github.io/movikids/?force=1.8.20 |
-| **Apps Script (código + ping)** | **v1.5.91** | Nova versão Web ✅ (13/06) |
+| **Frontend** | **v1.8.23** | https://ribocg-a11y.github.io/movikids/?force=1.8.23 |
+| **Apps Script (código + ping)** | **v1.5.92** | @138 · `deploy-gas.ps1` · ping confirmado 14/06 |
 | **Aba FOLHA** | memorial B68 **OK** | [gid=179040058](https://docs.google.com/spreadsheets/d/1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618/edit#gid=179040058) · B68 ~5269,96 |
 
 **Editor Apps Script:** https://script.google.com/home/projects/19SIhkX9Tk7FiJA1JXu1OrUwssHdr3H5zc8q3rOjmBvqgWfXuHlk8xyf8/edit
 
 **Teste rápido GAS (ping):**  
 https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec?action=ping  
-→ produção: `versao: v1.5.91` (confirmado 13/06 repair · **re-validado 14/06** testes readonly)
+→ produção: `versao: v1.5.92` (confirmado 14/06 · incidente I26 resolvido @138)
 
 **URL morta (não usar):** `AKfycbzc...` → 404
 

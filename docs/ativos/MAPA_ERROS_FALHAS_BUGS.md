@@ -1,6 +1,6 @@
 # MOVI KIDS — Mapa de erros, falhas e bugs
 
-**Atualizado:** 14/06/2026 — **I25 fechado** (re-validado testes) · **I24** · **I3** · GAS **v1.5.91** prod.  
+**Atualizado:** 14/06/2026 — **I26** travas deploy GAS · **I25 fechado** · GAS **v1.5.92** prod.  
 **Uso anterior:** 09/06/2026 — **I22 fechado** (hotfix FE v1.8.2)  
 **Uso:** consultar **antes de publicar** e **ao montar checklist de teste**. Cada linha tem trava e script de verificação quando existir.
 
@@ -32,7 +32,9 @@
 
 | # | Problema | Efeito | Correção | Trava | Teste |
 |---|----------|--------|----------|-------|-------|
-| I1 | `clasp deploy` na Web App | 404; caixa quebrado | Só `clasp push` + Nova versão manual | Regra 8 / Regra 9 | ping |
+| I1 | `clasp deploy` **sem `-i`** na Web App | 404; caixa quebrado | `clasp deploy -i AKfycbwakQ...` via `deploy-gas.ps1` | Regra 9 | ping |
+| **I26** | **`clasp push` sem republicar Web App** | Editor v1.5.92 / `/exec` v1.5.91 (3×) | `deploy-gas.ps1` + `verify-gas-deploy.ps1` | Regra 9; clasp @138 desc | ping + verify |
+| **I27** | **Web App exige login Google (≠ Anyone)** | `fetch()` Failed to fetch no Pages/tablet | **Editar** `AKfycbwakQ...` → Quem tem acesso = **Qualquer pessoa** | `live.anonymous` verify | aba anonima ping JSON |
 | I2 | GAS offline + timer local | Extra fantasma | ADM `somentePlano`; offline v1.7.6 | `FIX_OFFLINE_ENCERRAR` | tablet encerrar |
 | I3 | Cache `?force=` / **`index.html ?v=` desatualizado** | JS antigo no tablet/admin | `mk-version` + `sw` + **index** alinhados | `pre-push-check` versões | `?force=VERSAO` · ver **11/06** |
 | **I25** | **FOLHA `#NAME?` — `setValue('=SE...')` no GAS** | Aba FOLHA quebrada; Dashboard usa fallback 4926 | GAS **v1.5.91** `folhaFlushFormulasUser_` (USER_ENTERED) + `repairFolhaAdmin` | Nunca `setValue`/`setFormula` PT para fórmulas FOLHA | `TESTE_FOLHA_FORMULAS_READONLY.ps1` · **fechado 14/06** |
@@ -77,7 +79,8 @@
 | `../arquivo/incidentes/INCIDENTE_I25_FOLHA_FORMULAS_NAME_2026-06-13.md` | **I25** — FOLHA USER_ENTERED |
 | `../arquivo/incidentes/INCIDENTE_I24_COMMIT_SEM_PUSH_2026-06-11.md` | **I24** — v1.8.18 commit sem push |
 | `../arquivo/incidentes/INCIDENTE_I23_DASHBOARD_LENTO_TRAVADO_2026-06-09.md` | **I23** — Dashboard lento; mutex KPI + GAS perf |
-| `EMERGENCIA_SMS_404.md` | URL morta |
+| `../arquivo/incidentes/INCIDENTE_I26_GAS_EDITOR_VS_EXEC_2026-06-14.md` | **I26** — push sem republicar |
+| `../arquivo/incidentes/INCIDENTE_I27_GAS_LOGIN_ANONIMO_2026-06-14.md` | **I27** — ServiceLogin / Failed to fetch |
 | `TROCA_SMS_GATEWAY_DJVJRL_2026-06-04.md` | Gateway SMS |
 
 ---
@@ -116,7 +119,7 @@
 | Check | Script | Incidente |
 |-------|--------|-----------|
 | `git.not-ahead-of-origin` | `verify-publish-complete.ps1` | I24 |
-| `pages.version-live` | `verify-pages-live.ps1` | I24, I3 |
+| `gas.deploy.verify` | `verify-gas-deploy.ps1` | I26, I27 |
 
 ---
 
@@ -141,7 +144,7 @@
 
 ## Aprendizados — nunca repetir
 
-1. **Nunca** `clasp deploy`.
+1. **Nunca** `clasp deploy` **sem `-i`** (I1). **Nunca** só `clasp push` sem `deploy-gas.ps1` (I26).
 2. **Nunca** POST no `api()` do browser (I15).
 3. **Nunca** timer do portal sem paridade com `carregarInicio` (I16).
 4. **Nunca** gravar **Hora Início (col C)** no cadastro nem inferir `startTimestamp` por data+hora do cadastro — só col **Y** após `iniciarTimer` (I20).
@@ -167,8 +170,8 @@
 
 | Camada | Repo / produção | Mínimo operação |
 |--------|-----------------|-----------------|
-| Frontend | **v1.8.16** | `?force=1.8.16` |
-| GAS | **v1.5.91** (prod.) | Nova versão Web se ping &lt; v1.5.91 |
+| Frontend | **v1.8.22** | `?force=1.8.22` |
+| GAS | **v1.5.92** (prod.) | `deploy-gas.ps1` se ping &lt; repo |
 | Aba FOLHA | B68 ~5269,96 · `fonte=FOLHA` | `repairFolhaAdmin` após deploy que toque FOLHA |
 
 Ver `ESTADO_ATUAL.md` para URLs e editor GAS.

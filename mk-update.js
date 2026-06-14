@@ -14,8 +14,10 @@
   }
   const IS_PWA = isStandalonePwa_();
   const CHECK_MS = IS_PWA ? 25000 : 45000;
-  const ACTIVE_TIMER_DELAY_MS = IS_PWA ? 20000 : 30000;
-  const IDLE_DELAY_MS = IS_PWA ? 1500 : 5000;
+  /** Tempo mínimo com banner visível antes do reload automático */
+  const BANNER_MIN_MS = 12000;
+  const ACTIVE_TIMER_DELAY_MS = Math.max(IS_PWA ? 20000 : 30000, BANNER_MIN_MS);
+  const IDLE_DELAY_MS = BANNER_MIN_MS;
   let _updateBusy = false;
   let _updateScheduled = false;
 
@@ -100,13 +102,37 @@
 
   async function fetchRemoteVersion_() {
     const path = location.pathname || '/movikids/';
-    const base = path.endsWith('/') ? path : path.replace(/[^/]+$/, '');
-    const url = location.origin + base + 'mk-version.js?nocache=' + Date.now();
-    const r = await fetch(url, { cache: 'no-store' });
-    const text = await r.text();
-    const m = text.match(/MK_VERSION\s*=\s*'([^']+)'/);
-    return m ? m[1] : null;
+    let base = path.endsWith('/') ? path : path.replace(/[^/]+$/, '');
+    if (!base.endsWith('/')) base += '/';
+    const bases = [base];
+    if (bases.indexOf('/movikids/') < 0) bases.push('/movikids/');
+    for (let i = 0; i < bases.length; i++) {
+      try {
+        const url = location.origin + bases[i] + 'mk-version.js?nocache=' + Date.now();
+        const r = await fetch(url, { cache: 'no-store' });
+        if (!r.ok) continue;
+        const text = await r.text();
+        const m = text.match(/MK_VERSION\s*=\s*['"]([^'"]+)['"]/);
+        if (m && m[1]) return m[1];
+      } catch (e) { /* tenta próximo base */ }
+    }
+    return null;
   }
+
+  function notifyRemoteVersion_(remote) {
+    const localVer = (typeof APP_VERSION !== 'undefined' && APP_VERSION)
+      || (typeof window.MK_VERSION !== 'undefined' && window.MK_VERSION)
+      || '';
+    if (!remote || !verNewer_(remote, localVer) || _updateBusy || _updateScheduled) return false;
+    const delay = hasActiveTimerSession_() ? ACTIVE_TIMER_DELAY_MS : IDLE_DELAY_MS;
+    if (typeof toast === 'function') {
+      toast('Nova versão ' + remote + ' disponível — atualiza em ' + Math.ceil(delay / 1000) + 's (login mantido)', 'warning');
+    }
+    scheduleUpdate_(remote, delay);
+    return true;
+  }
+
+  window.mkNotifyRemoteVersion_ = notifyRemoteVersion_;
 
   function scheduleUpdate_(remote, delayMs) {
     if (_updateBusy || _updateScheduled) return;
@@ -133,18 +159,11 @@
   window.mkIsStandalonePwa_ = isStandalonePwa_;
 
   window.verificarNovaVersao = async function verificarNovaVersao() {
-    if (_updateBusy || _updateScheduled || document.visibilityState === 'hidden') return;
-    const localVer = (typeof APP_VERSION !== 'undefined' && APP_VERSION)
-      || (typeof window.MK_VERSION !== 'undefined' && window.MK_VERSION)
-      || '';
+    if (_updateBusy || _updateScheduled) return;
+    if (document.visibilityState === 'hidden') return;
     try {
       const remote = await fetchRemoteVersion_();
-      if (!remote || !verNewer_(remote, localVer)) return;
-      const delay = hasActiveTimerSession_() ? ACTIVE_TIMER_DELAY_MS : IDLE_DELAY_MS;
-      if (hasActiveTimerSession_() && typeof toast === 'function') {
-        toast('Nova versão ' + remote + ' — atualiza em ' + (delay / 1000) + 's', 'warning');
-      }
-      scheduleUpdate_(remote, delay);
+      notifyRemoteVersion_(remote);
     } catch (e) { /* silencioso */ }
   };
 
@@ -158,11 +177,6 @@
       verificarNovaVersao();
     }
   });
-  setTimeout(verificarNovaVersao, IS_PWA ? 3000 : 8000);
+  setTimeout(verificarNovaVersao, IS_PWA ? 2000 : 3000);
   setInterval(verificarNovaVersao, CHECK_MS);
-  if (IS_PWA && typeof document !== 'undefined') {
-    document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'visible') verificarNovaVersao();
-    });
-  }
 })();

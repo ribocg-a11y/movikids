@@ -15,8 +15,12 @@ if ('serviceWorker' in navigator) {
   navigator.serviceWorker.addEventListener('message', event => {
     if (event.data && event.data.type === 'MK_UPDATE_READY') {
       const swVersion = event.data.version || '';
-      if (swVersion && swVersion !== APP_VERSION && typeof mkApplyAppUpdate === 'function') {
-        mkApplyAppUpdate(swVersion);
+      if (swVersion && swVersion !== APP_VERSION) {
+        if (typeof window.mkNotifyRemoteVersion_ === 'function') {
+          window.mkNotifyRemoteVersion_(swVersion);
+        } else if (typeof mkApplyAppUpdate === 'function') {
+          mkApplyAppUpdate(swVersion);
+        }
       }
     }
   });

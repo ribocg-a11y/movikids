@@ -1,32 +1,23 @@
-# Deploy GAS: copia codigo + push (NAO usa clasp deploy — quebra URL /exec)
+# BLOQUEADO para agente Cursor — publicacao Web GAS e SO DO SOCIO (Regra 9 / I1 / I27).
+# O agente NAO pode implantar nem reimplantar. Use prepare-gas-push.ps1 so para sync+push de codigo.
+#
+# Socio (humano) — republicar MESMA URL:
+#   .\scripts\deploy-gas-SOCIO.ps1
+#
+# Ou no editor: Implantar -> Gerenciar -> EDITAR (lapis) AKfycbwakQ... -> Nova versao
+# NUNCA "Nova implantacao" (cria URL nova — incidente I1).
+
 $ErrorActionPreference = 'Stop'
-$root = Split-Path -Parent (Split-Path -Parent $MyInvocation.MyCommand.Path)
-Set-Location $root
-
-& "$root\scripts\sync-gas-to-clasp.ps1"
-
-$canonical = Join-Path $root "MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs"
-$gasCode = Join-Path $root "gas\Code.gs"
-$canonId = (Select-String -Path $canonical -Pattern "const DEPLOY_ID\s*=\s*'([^']+)'" | Select-Object -First 1).Matches.Groups[1].Value
-$gasId = (Select-String -Path $gasCode -Pattern "const DEPLOY_ID\s*=\s*'([^']+)'" | Select-Object -First 1).Matches.Groups[1].Value
-if (-not $canonId -or $canonId -ne $gasId) {
-  Write-Error "gas/Code.gs DEPLOY_ID ($gasId) diferente do canonico ($canonId). Rode sync-gas-to-clasp.ps1."
-}
-if ($gasId -like 'AKfycbzc*') {
-  Write-Error "gas/Code.gs ainda usa URL morta AKfycbzc. Abortando clasp push."
-}
-
-clasp push --force
-
 Write-Host ""
-Write-Host "Codigo enviado ao Google." -ForegroundColor Green
+Write-Host "deploy-gas.ps1 BLOQUEADO — agente nao publica Web App GAS." -ForegroundColor Red
 Write-Host ""
-Write-Host "IMPORTANTE: abra Apps Script e publique a Web App manualmente:" -ForegroundColor Yellow
-Write-Host "  1) Extensoes > Apps Script (planilha MoviKids)"
-Write-Host "  2) Implantar > Gerenciar implantacoes"
-Write-Host "  3) Editar a implantacao Web (ID AKfycbwakQ...)"
-Write-Host "  4) Nova versao > Implantar"
+Write-Host "Producao (unica URL valida):" -ForegroundColor Cyan
+Write-Host "  AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y"
 Write-Host ""
-Write-Host "Teste no Chrome:" -ForegroundColor Cyan
-Write-Host "  https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec?action=ping"
-Write-Host "  Deve mostrar JSON com ok:true e versao v1.5.92"
+Write-Host "Implantacao errada @139 (NAO usar — arquivar no editor):" -ForegroundColor Yellow
+Write-Host "  AKfycbwkvWgfu2UvgzzxDXRI5_CcDdRE-b3UGzu86FjyuwiVTgQc0L9XGd4wgIZD1UWjOKA2"
+Write-Host ""
+Write-Host "Agente: .\scripts\prepare-gas-push.ps1  (so codigo no projeto, sem publicar Web)"
+Write-Host "Socio:  .\scripts\deploy-gas-SOCIO.ps1   (clasp deploy -i AKfycbwakQ...)"
+Write-Host ""
+exit 1
