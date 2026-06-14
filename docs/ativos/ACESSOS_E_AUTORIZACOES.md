@@ -61,7 +61,7 @@ Operador nas 5 escritas críticas: deve enviar `operador` / `operadorId` (GET no
 
 | Ação | Quem executa | Agente Cursor pode? | Notas |
 |------|--------------|---------------------|-------|
-| `git push` (FE → GitHub Pages) | Dev / agente | ✅ Sim | Após `pre-push-check.ps1` |
+| `git push` (FE → GitHub Pages) | Dev / agente | ✅ Sim (automático após FE — HANDOFF § checklist 7) | Após `pre-push-check.ps1` — **não pedir** ao sócio |
 | Editar código local | Dev / agente | ✅ Sim | `.gs` canônico na raiz |
 | `clasp push` | Dev / agente | ✅ Sim | Via `scripts/deploy-gas.ps1` |
 | **Nova versão Web GAS** | **`deploy-gas.ps1`** (clasp deploy **-i** mesmo ID) + **`verify-gas-deploy.ps1`** |
@@ -165,8 +165,8 @@ Sem precisar que você cole caminhos, versões ou docs:
 
 | Ação | Por quê pedir |
 |------|----------------|
-| `git push` para `main` | Publica FE no GitHub Pages — impacto produção |
-| `git commit` | Sua regra: commit só quando você pede |
+| `git push` para `main` | **Agente** (FE/docs) | Publica Pages — após `pre-push-check` · **sem pedir** (HANDOFF checklist 7) |
+| `git commit` | **Agente** (FE/docs) | Após mudanças aprovadas no chat ou pacote FE |
 | `clasp push` | Envia código ao Google — você confirma que quer |
 | Mudar `api()`, auth, PIN, perfis | Zona crítica (I15, I17–I19) |
 | Limpar locações / corrigir financeiro em prod | APIs com `adminPin=1416` — impacto real |
