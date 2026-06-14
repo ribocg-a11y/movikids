@@ -61,19 +61,23 @@ function showAlertModal(s, expired) {
 
   const btnPular = document.getElementById('btn-pular-alerta');
   const btnWa    = document.getElementById('btn-wa');
-  if (btnWa) btnWa.style.display = qrOnly ? 'none' : '';
+  if (btnWa) btnWa.style.display = '';
   if (expired) {
     if (btnPular) {
-      btnPular.style.display = admIgnoraSms ? '' : 'none';
+      btnPular.style.display = qrOnly ? 'none' : (admIgnoraSms ? '' : 'none');
       btnPular.textContent = admIgnoraSms
         ? 'Continuar sem SMS (ADM)'
         : 'Pular mensagem e continuar monitorando';
     }
     if (btnWa) {
-      btnWa.textContent = admIgnoraSms
-        ? 'Enviar SMS de cobrança (opcional)'
-        : 'Enviar SMS de cobrança (obrigatório)';
-      btnWa.onclick = async function() {
+      if (qrOnly) {
+        btnWa.textContent = 'Mostrar QR do portal';
+        btnWa.onclick = function() { mkOrientarQrPortal_('esgotado'); };
+      } else {
+        btnWa.textContent = admIgnoraSms
+          ? 'Enviar SMS de cobrança (opcional)'
+          : 'Enviar SMS de cobrança (obrigatório)';
+        btnWa.onclick = async function() {
         if (await waTempoEsgotado(s) === false) {
           if (!admIgnoraSms) return;
           toast('SMS indisponível; você ainda pode encerrar como ADM.', 'warning');
@@ -85,15 +89,21 @@ function showAlertModal(s, expired) {
         if (!admIgnoraSms) fecharAlerta();
         toast('Aviso de minutos extras acionado.', 'success');
       };
+      }
     }
   } else {
     if (btnPular) {
-      btnPular.style.display = '';
+      btnPular.style.display = qrOnly ? 'none' : '';
       btnPular.textContent = 'Pular mensagem e continuar monitorando';
     }
     if (btnWa) {
-      btnWa.textContent = 'Enviar SMS ao responsável';
-      btnWa.onclick = function() { abrirWhatsApp(); };
+      if (qrOnly) {
+        btnWa.textContent = 'Mostrar QR do portal';
+        btnWa.onclick = function() { mkOrientarQrPortal_('alerta5'); };
+      } else {
+        btnWa.textContent = 'Enviar SMS ao responsável';
+        btnWa.onclick = function() { abrirWhatsApp(); };
+      }
     }
   }
 }

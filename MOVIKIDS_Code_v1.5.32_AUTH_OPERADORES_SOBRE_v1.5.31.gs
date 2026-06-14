@@ -5893,6 +5893,10 @@ function isLocacaoTeste_(crianca, responsavel, telefone, observacao) {
   if (/^TESTE_CODEX/i.test(c)) return true;
   if (/^TESTE_CODEX/i.test(r)) return true;
   if (r === 'TESTE_EDIT' || r === 'TESTE') return true;
+  if (/^ALERT_/i.test(c)) return true;
+  if (/^F7_/i.test(c) || /^F5_/i.test(c) || /^F7_EXP_/i.test(c) || /^F7_5M_/i.test(c)) return true;
+  if (/^B7_WRITE/i.test(c) || /^TESTE_FLUXO/i.test(c) || /^TESTE_B7/i.test(c)) return true;
+  if (/^TESTE ALERTA/i.test(r) || /^TESTE TABLET/i.test(r)) return true;
   if (/^Teste/i.test(r)) return true;
   if (r === 'X' && c === 'Y') return true;
   if (/^9899999/.test(t)) return true;
