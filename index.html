@@ -16,16 +16,16 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<script src="mk-stale-sync.js?v=1.8.23"></script>
-<script src="mk-version.js?v=1.8.23"></script>
-<script src="mk-api.js?v=1.8.23"></script>
-<link rel="stylesheet" href="mk-design.css?v=1.8.23">
+<script src="mk-stale-sync.js?v=1.8.24"></script>
+<script src="mk-version.js?v=1.8.24"></script>
+<script src="mk-api.js?v=1.8.24"></script>
+<link rel="stylesheet" href="mk-design.css?v=1.8.24">
 
-<script src="mk-cache-bust.js?v=1.8.23"></script>
+<script src="mk-cache-bust.js?v=1.8.24"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<link rel="stylesheet" href="mk-app.css?v=1.8.23">
+<link rel="stylesheet" href="mk-app.css?v=1.8.24">
 <!-- Firebase SDK — Realtime sync canonico para todos os dispositivos -->
-<script type="module" src="mk-firebase.js?v=1.8.23"></script>
+<script type="module" src="mk-firebase.js?v=1.8.24"></script>
 </head>
 
 <body>
@@ -197,21 +197,21 @@
   <!-- ══ MAIN CONTENT ══ -->
   <div id="main-content">
 
-  <!-- Header (mobile only) -->
-  <header>
-    <div class="hd-row">
-      <div class="logo">🚗 Movi <span>Kids</span></div>
-      <div class="hd-status">
-        <div id="status-dot" class="dot-online"></div>
+  <!-- Header (mobile only) — mk-design.css .mk-mob-header -->
+  <header class="mk-mob-header">
+    <div class="mk-mob-header-top">
+      <div class="mk-mob-brand">🚗 Movi <span>Kids</span></div>
+      <div class="mk-mob-meta">
+        <span id="status-dot" class="dot-online"></span>
         <span id="status-txt">Online</span>
-        <span id="app-version" style="font-size:10px;opacity:.85;margin-left:4px;font-family:monospace">v1.7.26</span>
+        <span id="app-version" class="mk-mob-ver"></span>
       </div>
     </div>
-    <div id="hd-turno-chip" class="hd-turno-chip" hidden role="status" aria-live="polite"></div>
+    <div id="hd-turno-chip" class="mk-mob-turno" hidden role="status" aria-live="polite"></div>
   </header>
 
   <!-- Nav mobile: atalhos + menu completo na sidebar -->
-  <nav>
+  <nav class="mk-mob-nav">
     <button class="active" id="nav-home" onclick="showPage('home')">
       <div class="nav-icon">🏠</div>Home
     </button>
@@ -1650,22 +1650,22 @@
   </div>
 </div>
 
-<script src="mk-globals.js?v=1.8.23"></script>
-<script src="mk-core.js?v=1.8.23"></script>
-<script src="mk-nav.js?v=1.8.23"></script>
-<script src="mk-admin.js?v=1.8.23"></script>
-<script src="mk-historico.js?v=1.8.23"></script>
-<script src="mk-sessao.js?v=1.8.23"></script>
-<script src="mk-home.js?v=1.8.23"></script>
-<script src="mk-custos.js?v=1.8.23"></script>
-<script src="mk-avulso.js?v=1.8.23"></script>
-<script src="mk-sync.js?v=1.8.23"></script>
-<script src="mk-nova.js?v=1.8.23"></script>
-<script src="mk-relacionamento.js?v=1.8.23"></script>
-<script src="mk-operacao.js?v=1.8.23"></script>
-<script src="mk-drawer.js?v=1.8.23"></script>
-<script src="mk-update.js?v=1.8.23"></script>
-<script src="mk-auth.js?v=1.8.23"></script>
-<script src="mk-boot.js?v=1.8.23"></script>
+<script src="mk-globals.js?v=1.8.24"></script>
+<script src="mk-core.js?v=1.8.24"></script>
+<script src="mk-nav.js?v=1.8.24"></script>
+<script src="mk-admin.js?v=1.8.24"></script>
+<script src="mk-historico.js?v=1.8.24"></script>
+<script src="mk-sessao.js?v=1.8.24"></script>
+<script src="mk-home.js?v=1.8.24"></script>
+<script src="mk-custos.js?v=1.8.24"></script>
+<script src="mk-avulso.js?v=1.8.24"></script>
+<script src="mk-sync.js?v=1.8.24"></script>
+<script src="mk-nova.js?v=1.8.24"></script>
+<script src="mk-relacionamento.js?v=1.8.24"></script>
+<script src="mk-operacao.js?v=1.8.24"></script>
+<script src="mk-drawer.js?v=1.8.24"></script>
+<script src="mk-update.js?v=1.8.24"></script>
+<script src="mk-auth.js?v=1.8.24"></script>
+<script src="mk-boot.js?v=1.8.24"></script>
 </body>
 </html>

@@ -130,7 +130,7 @@ function atualizarOperadorUI_(sessaoServidor) {
       chip.textContent = '';
     } else if (isAdm) {
       chip.hidden = false;
-      chip.className = 'hd-turno-chip is-admin';
+      chip.className = 'mk-mob-turno is-admin';
       chip.textContent = temBalcao
         ? ('Admin · balcão: ' + srv.nome)
         : 'Admin neste aparelho · sem turno no balcão';
@@ -139,7 +139,7 @@ function atualizarOperadorUI_(sessaoServidor) {
       const srvId = srv && srv.operadorId ? Number(srv.operadorId) : 0;
       const synced = srvId && srvId === localId;
       chip.hidden = false;
-      chip.className = 'hd-turno-chip ' + (synced ? 'is-ok' : 'is-ghost');
+      chip.className = 'mk-mob-turno ' + (synced ? 'is-ok' : 'is-ghost');
       chip.textContent = synced
         ? ('Turno: ' + s.nome + (srv && fmtHoraTurno_(srv.loggedAt) ? ' · desde ' + fmtHoraTurno_(srv.loggedAt) : ''))
         : ('Turno inválido — ' + s.nome + ' não está no servidor. Faça login de novo.');
