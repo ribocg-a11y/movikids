@@ -24,7 +24,9 @@ function renderCards() {
   if (sessions.length === 0) {
     container.innerHTML = `
       <div class="empty">
-        <div class="empty-icon">${'🚗'}</div>
+        <div class="empty-logo" aria-hidden="true">
+          <img src="assets/logo-movi-kids.jpg" alt="" width="236" height="256" loading="lazy" decoding="async">
+        </div>
         <h3>Nenhuma locação ativa</h3>
         <p>Toque em <strong>Nova</strong> para iniciar uma locação</p>
       </div>`;

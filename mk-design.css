@@ -234,6 +234,19 @@
   cursor: pointer;
 }
 
+/* Home empty — logo oficial (assets/logo-movi-kids.jpg) */
+.empty-logo {
+  margin: 0 auto 14px;
+  max-width: min(200px, 72vw);
+}
+.empty-logo img {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: 0 auto;
+  filter: drop-shadow(0 4px 14px rgba(13, 71, 161, 0.12));
+}
+
 /* Mobile header balcão — família sidebar (DESIGN_DNA §2–3) */
 .mk-mob-header {
   flex-shrink: 0;
