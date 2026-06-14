@@ -234,17 +234,22 @@
   cursor: pointer;
 }
 
-/* Home empty — logo oficial (assets/logo-movi-kids.jpg) */
+/* Home empty — logo oficial (assets/logo-movi-kids.png) */
 .empty-logo {
+  display: inline-block;
   margin: 0 auto 14px;
-  max-width: min(200px, 72vw);
+  padding: 14px 18px;
+  max-width: min(240px, 78vw);
+  background: linear-gradient(180deg, #060d1f 0%, #0a1e4a 55%, #0d2a5c 100%);
+  border-radius: var(--mk-radius, 12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: var(--mk-shadow-1);
 }
 .empty-logo img {
   display: block;
   width: 100%;
   height: auto;
   margin: 0 auto;
-  filter: drop-shadow(0 4px 14px rgba(13, 71, 161, 0.12));
 }
 
 /* Mobile header balcão — família sidebar (DESIGN_DNA §2–3) */
