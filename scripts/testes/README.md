@@ -1,6 +1,8 @@
 # Testes e limpeza — MOVI KIDS
 
-Scripts em `scripts/testes/`. Documentação: `docs/ativos/PROTOCOLO_DIAGNOSTICO_E_TESTES.md`.
+Scripts em `scripts/testes/`. Documentação: `docs/ativos/PROTOCOLO_DIAGNOSTICO_E_TESTES.md` · **"atualize tudo":** `PROTOCOLO_ATUALIZAR_TUDO.md`
+
+**Repo:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github` — scripts `.ps1` exigem `cd` nesta pasta **ou** caminho absoluto.
 
 ## Orquestrador
 
@@ -25,6 +27,8 @@ Use quando a loja está operando ou não quer poluir a planilha:
 .\scripts\testes\TESTE_OPERACAO_CONFIG_READONLY.ps1
 .\scripts\testes\TESTE_RESUMO_DIA_READONLY.ps1
 .\scripts\testes\TESTE_KPI_MES_READONLY.ps1
+.\scripts\testes\TESTE_FOLHA_FORMULAS_READONLY.ps1
+.\scripts\testes\TESTE_FASE9_FOLHA_READONLY.ps1
 .\scripts\testes\TESTE_SESSAO_IDLE_READONLY.ps1
 .\scripts\testes\TESTE_REGRESSAO_MOVIKIDS_PROD_SAFE.ps1
 # sem -RunWriteTests
@@ -65,6 +69,8 @@ Corrigido em 08/06/2026: `TESTE_I20_COMPLETO_PROD.ps1` (mesmo bug T1).
 ```powershell
 # GAS + API (F5, F7, F11)
 .\scripts\testes\TESTE_TABLET_F5_F7_F10_F11.ps1
+.\scripts\testes\TESTE_ALERTAS_TABLET.ps1 -GasOnly   # GAS + instrucao browser
+.\scripts\testes\RUN_ALERTAS_TABLET_BROWSER.ps1        # Playwright: triggerAlert5 / triggerAlertExpired
 
 # Browser CDP (modais F7, reload F10)
 .\scripts\testes\RUN_TABLET_BROWSER_TEST.ps1

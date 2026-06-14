@@ -10,7 +10,7 @@
 
 | Papel | Como entra | O que pode | O que não pode |
 |-------|------------|------------|----------------|
-| **Operador** | Nome + PIN na tela de login | Nova locação, encerrar, estender, editar, cancelar, drawer, SMS manual | KPIs financeiros do mês, Dashboard admin, custos, config frota, import CRM |
+| **Operador** | Nome + PIN na tela de login | Nova locação, encerrar, estender, editar, cancelar, drawer · **comunicação: QR portal** (sem SMS/WA) | KPIs financeiros do mês, Dashboard admin, custos, config frota, import CRM |
 | **Administrador** | PIN **1416** (gate ou cadeado na sidebar) | Tudo do operador + Dashboard, Caixa detalhado, KPIs, payback, reset PIN, liberar sessão, corrigir financeiro, limpar testes, import RESPONSAVEIS | — |
 | **Supervisor** | Perfil em `OPERADORES_SISTEMA` col. `perfil` | Código existe (v1.5.50) | **F9 PAUSADA** — em produção operadores têm autonomia total (v1.5.52 reverteu restrições) |
 | **Portal responsável** | Telefone em `acompanhar.html` | Ver cronômetro, foto moldura | Sem PIN; sem dados de outros responsáveis |
@@ -69,7 +69,7 @@ Operador nas 5 escritas críticas: deve enviar `operador` / `operadorId` (GET no
 | Atualizar tablet `?force=` | **Ops balcão** | ❌ Não | Físico no shopping |
 | Editar planilha base | Agente (OAuth) ou GAS | ✅ Sim | `google-drive-sheets-auth` — ver §7.8 |
 | Script Properties SMS | Dono projeto GAS | ⚠️ Agente orienta | Valores em `ESTADO_ATUAL.md` § Script Properties |
-| Gateway SMS envio | Ops manual / GAS | Parcial | F4 auto **pausado** — QR portal é canal oficial |
+| Gateway SMS envio | ⏸ **Fora da operação** (`qr_only`) | Código GAS mantido para reativação futura |
 | Commit com segredos | — | ❌ Nunca | Sem `.env`, tokens, senhas novas no git |
 
 ---

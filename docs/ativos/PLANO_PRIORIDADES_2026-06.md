@@ -22,15 +22,15 @@
 | **FASE 6** Cockpit executivo | ✅ repo + I22 hotfix | FE v1.8.2 → **v1.8.4** / GAS v1.5.75 |
 | **FASE 7** Leading financeiros | ✅ repo + I23 | FE v1.8.4 → **v1.8.5** / GAS v1.5.77 → **v1.5.78** |
 | **FASE 8** Alertas proativos | ✅ repo | FE v1.8.9 / GAS v1.5.79 |
-| **FASE 9** Folha CLT + viabilidade | ✅ prod | FE v1.8.10–1.8.15 / GAS **v1.5.81** |
+| **FASE 9** Folha CLT + viabilidade | ✅ **prod fechado** | GAS **v1.5.91** · testes ok **14/06** · I25 fechado |
 | **Dashboard narrativo + folha prop.** | ✅ prod | FE v1.8.11–1.8.15 · `DEPLOY_FE_v1.8.15_SEMANA_ATUAL.md` |
 | **FASE 14** Mini-DRE | 🟡 iniciada | 11/06/2026 · `FASE_14_MINI_DRE.md` + memorial |
 
 **Próximo passo imediato:**
 
-1. **Sócio** — revisar `MEMORIAL_MINI_DRE.md` + homolog Dashboard **v1.8.15**
+1. **Sócio** — homolog Dashboard **v1.8.16** + painel CLT (viabilidade verde)
 2. **Tablet** — F0 smoke balcão
-3. **Agente** — após OK memorial: aba PLANO_CONTAS + GAS v1.5.82
+3. **Agente** — aba PLANO_CONTAS + GAS v1.5.82 mini-DRE se ainda não em prod
 
 ### FASE 0 — checklist
 
@@ -82,7 +82,7 @@
 | **Dashboard / KPIs** | ✅ Produção | Pacote F completo, fatAno v1.5.59, comparativo semanal |
 | **Payback investimento** | ✅ FASE 2 fechada | GAS v1.5.69 + INVESTIMENTO; `DECISAO_PAYBACK_FASE2_2026-06.md` |
 | **CRM / RESPONSAVEIS** | ✅ K.1–K.4 homologado | 240 importados; K.3–K.4 assinado tablet 08/06 |
-| **SMS gateway** | ✅ Produção manual | DJVJRL; **auto/F4 pausado** |
+| **SMS gateway** | ⏸ **Fora da operação** | QR portal oficial · reativar com serviço contratado |
 | **Config frota/preços** | ✅ FASE 4 fechada | `okConfig: true`, 9 veículos, 3h 130/150 |
 | **CI local** | ✅ | `pre-push-check.ps1`; sem GitHub Actions |
 | **Documentação** | ✅ Estruturada | Handoff ativo + `docs/ativos/` (ver §1.3) |
@@ -108,7 +108,7 @@ A, B, C, D, E, F, G, H, I, J, SMS P0, **K.1–K.4** (homologado 08/06), fixes I1
 
 | Item | Motivo | Doc |
 |------|--------|-----|
-| **F4** WhatsApp / SMS automático | Conta bloqueada; QR portal é canal oficial | `DECISAO_COMUNICACAO_QR_CODE_2026-06.md` |
+| **F4** WhatsApp / SMS (auto ou manual) | ⏸ **Zero envio na operação** | `OPERACAO_COMUNICACAO_QR_ONLY.md` |
 | **F9** Supervisor | Operadores precisam autonomia total no balcão | GAS v1.5.52 reverteu restrições |
 
 ---
@@ -322,4 +322,4 @@ Todos em `docs/ativos/` salvo indicação. Índice completo: `docs/INDICE.md`.
 
 ---
 
-*Próxima revisão: **13/06/2026**.*
+*Próxima revisão: **14/06/2026**.*

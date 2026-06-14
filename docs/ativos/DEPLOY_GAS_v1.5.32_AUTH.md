@@ -12,7 +12,7 @@ C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\m
 
 **Toda resposta do agente** termina com: `Mudança no AppScript: sim | não` + link acima se sim (**Regra 16** · `.cursor/rules/gas-deploy-caminho-pc.mdc`).
 
-Pacote atual: **`DEPLOY_v1.5.80_FASE9_FOLHA_VIABILIDADE.md`** · FE **`DEPLOY_FE_v1.8.10_FASE9_FOLHA_VIABILIDADE.md`**
+Pacote atual: **`DEPLOY_v1.5.91_FOLHA_REPAIR_USER_ENTERED.md`** · FE **`DEPLOY_FE_v1.8.16`** (mini-DRE) · FASE 9 **`DEPLOY_v1.5.80_FASE9_FOLHA_VIABILIDADE.md`**
 
 **Como colar no Apps Script:** Explorer → cole o caminho acima na barra → Enter → duplo clique no `.gs` → Ctrl+A → Ctrl+C → colar em **Código.gs** no editor → **Implantar → Nova versão**.
 

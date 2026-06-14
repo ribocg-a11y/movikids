@@ -1,5 +1,11 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.84
+// MOVI KIDS — Google Apps Script v1.5.92
+// v1.5.92: encerrarLocacao — mensagem distinta para Pendente vs Encerrada/Cancelada
+// v1.5.91: FOLHA — repair via Sheets API USER_ENTERED (fórmulas PT como digitar; corrige #NAME? do setValue)
+// v1.5.90: (quebrado) setValue + SE → barra mostra SE mas célula #NAME? — GAS não parseia fórmula locale
+// v1.5.89: (errado p/ pt_BR) setFormula EN → #ERROR! visível como IF(, ,)
+// v1.5.86: FOLHA — repairFolhaFormulasCore_ (corrige #NAME? memorial B63–B68); auto-repair em lerFolha
+// v1.5.85: FOLHA — patch VA mensal auto em lerFolhaPlanejamento_ (sem colar script na planilha); ping v1.5.85
 // v1.5.84: FOLHA — VA mensal teto B11 (400/mês); vaDia = B11/B12; patchFolhaVaMensal400_
 // v1.5.83: kpiMes.locPorDia — locações por dia (meta loc/dia no Dashboard)
 // v1.5.82: FASE 14 — miniDre (margemBruta/cusCMV/cusOPEX) + lerPlanoContas_
@@ -314,6 +320,7 @@ function dispatchMoviAction_(p, method) {
       case 'listarCustos':        return listarCustos_(p);
       case 'buscarKPIsAdmin':     return buscarKPIsAdmin_(p);
       case 'kpiMes':              return kpiMes_(p);
+      case 'repairFolhaAdmin':    return repairFolhaFormulasAdmin_(p);
       case 'salvarRelatorioDrive':return salvarRelatorioDrive_(p);
       case 'listarRelatorios':    return listarRelatorios_();
       case 'verificarSessao':     return verificarSessao_(p);
@@ -386,9 +393,9 @@ function ping_() {
   const agora = new Date();
   return resp_({
     status:  'online',
-    versao:  'v1.5.82',
+    versao:  'v1.5.92',
     timestamp: fmtData_(agora) + ' ' + fmtHoraLocal_(agora),
-    sistema: 'MOVI KIDS v1.5.82',
+    sistema: 'MOVI KIDS v1.5.92',
     postWriteActions: WRITE_ACTIONS_CRITICAS_
   });
 }
@@ -830,7 +837,17 @@ function encerrarLocacao_(p) {
   const row   = sheet.getRange(rowIndex, 1, 1, 28).getValues()[0];
   const antesEncerrar = locacaoObj_(row, rowIndex);
 
-  if (String(row[14]).trim() !== 'Ativa') { lockE.releaseLock(); return err_('Locação ja foi encerrada', 409); }
+  const statusEnc = String(row[14]).trim();
+  if (statusEnc !== 'Ativa') {
+    lockE.releaseLock();
+    if (statusEnc === 'Encerrada' || statusEnc === 'Cancelada') {
+      return err_('Locação ja foi encerrada', 409);
+    }
+    if (statusEnc === 'Pendente') {
+      return err_('Locação ainda pendente. Inicie o timer antes de encerrar.', 409);
+    }
+    return err_('Locação não está ativa', 409);
+  }
 
   const tipo    = String(row[4]);
   const plano   = String(row[5]);
@@ -1926,6 +1943,240 @@ function parseMoedaBr_(val) {
   return Number(s) || 0;
 }
 
+/** Célula com erro de planilha (#NAME?, #REF!, etc.). */
+function celulaComErro_(val) {
+  return typeof val === 'string' && String(val).trim().indexOf('#') === 0;
+}
+
+/** Detecta aba FOLHA com layout antigo (VA/dia = teto mensal em B25). */
+function folhaPrecisaPatchVaMensal_(sh) {
+  const a25 = String(sh.getRange(25, 1).getValue() || '').toLowerCase();
+  const f25 = String(sh.getRange(25, 2).getFormula() || '');
+  const vaMensal = parseMoedaBr_(sh.getRange('B11').getValue());
+  const vaDiaCell = parseMoedaBr_(sh.getRange('B25').getValue());
+  if (vaMensal > 0 && vaDiaCell >= vaMensal * 0.9) return true;
+  if (a25.indexOf('va/dia') >= 0 && (f25.indexOf('/B12') >= 0 || f25.indexOf('/b12') >= 0)) return false;
+  if (a25.indexOf('va/dia') < 0) return true;
+  return f25.indexOf('/B12') < 0 && f25.indexOf('/b12') < 0;
+}
+
+/** Detecta memorial/totais quebrados (#NAME? em B63–B68 ou % FGTS inválido). */
+function folhaPrecisaRepair_(sh) {
+  if (!sh) return false;
+  if (folhaPrecisaPatchVaMensal_(sh)) return true;
+  if (celulaComErro_(sh.getRange('B25').getValue())) return true;
+  if (celulaComErro_(sh.getRange('B68').getValue())) return true;
+  if (celulaComErro_(sh.getRange('B63').getValue())) return true;
+  if (celulaComErro_(sh.getRange('B66').getValue())) return true;
+  if (parseMoedaBr_(sh.getRange('B68').getValue()) <= 0) return true;
+  const b27 = sh.getRange('B27').getValue();
+  if (typeof b27 === 'string' && b27.indexOf('%') >= 0) return true;
+  const n27 = parseMoedaBr_(b27);
+  return !(n27 > 0 && n27 <= 1);
+}
+
+/**
+ * Prefixo A1 para batchUpdate na aba (nome com aspas se necessário).
+ */
+function folhaSheetRangePrefix_(sh) {
+  return "'" + String(sh.getName()).replace(/'/g, "''") + "'!";
+}
+
+/**
+ * Fallback: setFormula exige nomes EN e vírgulas (API GAS, não UI pt).
+ */
+function folhaToEnFormula_(formulaPt) {
+  var s = String(formulaPt || '');
+  if (s.charAt(0) !== '=') s = '=' + s;
+  s = s.replace(/MÁXIMO/g, 'MAX').replace(/MÍNIMO/g, 'MIN');
+  s = s.replace(/SOMA/g, 'SUM').replace(/ARRED/g, 'ROUND');
+  s = s.replace(/;/g, ',');
+  s = s.replace(/(^|[=(,+\-*\/\s])SE(\s*\()/g, '$1IF$2');
+  return s;
+}
+
+/**
+ * Grava fórmulas como entrada manual (Sheets API USER_ENTERED).
+ * setValue/setFormula PT via SpreadsheetApp → #NAME? / #ERROR! (bug locale GAS).
+ */
+function folhaFlushFormulasUser_(sh, entries) {
+  if (!entries || !entries.length) return;
+  var prefix = folhaSheetRangePrefix_(sh);
+  var ssId = sh.getParent().getId();
+  try {
+    Sheets.Spreadsheets.Values.batchUpdate({
+      valueInputOption: 'USER_ENTERED',
+      data: entries.map(function(e) {
+        return { range: prefix + e.a1, values: [[e.pt]] };
+      })
+    }, ssId);
+  } catch (ex) {
+    Logger.log('folhaFlushFormulasUser_: ' + ex.message);
+    entries.forEach(function(e) {
+      try {
+        sh.getRange(e.a1).setFormula(folhaToEnFormula_(e.pt));
+      } catch (ex2) {
+        Logger.log('folhaFlushFormulasUser_ fallback ' + e.a1 + ': ' + ex2.message);
+      }
+    });
+  }
+}
+
+/**
+ * Reescreve fórmulas da aba FOLHA (blocos B–F). Preserva entradas amarelas A4:B18.
+ * Sintaxe pt_BR: SE; SOMA; ARRED; MÁXIMO; MÍNIMO; separador ; ; decimal ,
+ */
+function repairFolhaFormulasCore_(sh) {
+  const R_N = 5;
+  const R_SAL = 7;
+  const R_SIMPLES = 8;
+  const R_TVT = 9;
+  const R_DVT = 10;
+  const R_VAD = 11;
+  const R_DVA = 12;
+  const R_INSS = 13;
+  const R_PISO = 14;
+  const firstEmp = 35;
+  const firstMem = 49;
+  const S = ';';
+  const pending = [];
+  function setFx(a1, pt) { pending.push({ a1: a1, pt: pt }); }
+
+  sh.getRange(11, 1).setValue('Vale-alimentação PAT — teto mensal (R$)');
+  const vaAtual = sh.getRange(R_VAD, 2).getValue();
+  if (!vaAtual || Number(vaAtual) <= 0) sh.getRange(R_VAD, 2).setValue(400);
+
+  sh.getRange(12, 1).setValue('Dias trabalhados VA no mês');
+  let diasVa = parseMoedaBr_(sh.getRange(R_DVA, 2).getValue());
+  if (!diasVa || diasVa < 15 || diasVa > 31) sh.getRange(R_DVA, 2).setValue(26);
+
+  sh.getRange(21, 1).setValue('Salário efetivo padrão (R$)');
+  setFx('B21', '=SE(B' + R_PISO + '>0' + S + 'B' + R_PISO + S + 'B' + R_SAL + ')');
+  sh.getRange(22, 1).setValue('Hora normal (R$)');
+  setFx('B22', '=B21/220');
+  sh.getRange(23, 1).setValue('Teto desconto VT 6% (R$)');
+  setFx('B23', '=B21*0,06');
+  sh.getRange(24, 1).setValue('Custo VT/dia empresa (após 6%) ref.');
+  setFx('B24', '=MÁXIMO(0' + S + 'B' + R_TVT + '*B' + R_DVT + '-B23)');
+  sh.getRange(25, 1).setValue('VA/dia calculado (R$) — teto B11÷B12');
+  setFx('B25', '=SE(B' + R_DVA + '>0' + S + 'ARRED(B' + R_VAD + '/B' + R_DVA + S + '2)' + S + '0)');
+  sh.getRange(26, 1).setValue('VA mensal teto por funcionário (R$)');
+  setFx('B26', '=B' + R_VAD);
+  sh.getRange(27, 1).setValue('% FGTS');
+  sh.getRange(27, 2).setValue(0.08);
+  sh.getRange(28, 1).setValue('% Prov. 13º');
+  sh.getRange(28, 2).setValue(0.0833);
+  sh.getRange(29, 1).setValue('% Prov. Férias+1/3');
+  sh.getRange(29, 2).setValue(0.1111);
+  sh.getRange(30, 1).setValue('% Prov. multa FGTS');
+  sh.getRange(30, 2).setValue(0.04);
+  sh.getRange(31, 1).setValue('% Total provisões+FGTS');
+  setFx('B31', '=B27+B28+B29+B30');
+
+  sh.getRange(34, 1, 1, 8).setValues([['Ativo?', 'Nome', 'Salário R$', 'Dias VT', 'Tarifa VT R$', 'VA/dia calc. R$', 'Admissão', 'Obs']]);
+  for (let r = firstEmp; r <= 44; r++) {
+    const idx = r - firstEmp + 1;
+    setFx('A' + r, '=SE(' + idx + '<=$B$' + R_N + S + '"SIM"' + S + '"-")');
+    setFx('C' + r, '=SE(A' + r + '="SIM"' + S + 'B$21' + S + '"")');
+    setFx('D' + r, '=SE(A' + r + '="SIM"' + S + 'B$' + R_DVT + S + '"")');
+    setFx('E' + r, '=SE(A' + r + '="SIM"' + S + 'B$' + R_TVT + S + '"")');
+    setFx('F' + r, '=SE(A' + r + '="SIM"' + S + 'B$25' + S + '"")');
+  }
+
+  sh.getRange(48, 1, 1, 9).setValues([['Nome', 'Bruto', 'INSS desc.', 'VT desc.', 'Líquido est.', 'FGTS 8%', 'Prov. total', 'Custo emp.', 'VT empresa']]);
+  for (let mr = firstMem; mr < firstMem + 10; mr++) {
+    const er = firstEmp + (mr - firstMem);
+    setFx('A' + mr, '=SE(A' + er + '="SIM"' + S + 'B' + er + S + '"")');
+    setFx('B' + mr, '=SE(A' + er + '="SIM"' + S + 'C' + er + S + '"")');
+    setFx('C' + mr, '=SE(A' + er + '="SIM"' + S + '-ARRED(C' + er + '*B$' + R_INSS + S + '2)' + S + '"")');
+    setFx('D' + mr, '=SE(A' + er + '="SIM"' + S + '-MÍNIMO(B$23' + S + 'D' + er + '*E' + er + ')' + S + '"")');
+    setFx('E' + mr, '=SE(A' + er + '="SIM"' + S + 'B' + mr + '+C' + mr + '+D' + mr + S + '" ")');
+    setFx('F' + mr, '=SE(A' + er + '="SIM"' + S + 'C' + er + '*B$27' + S + '"")');
+    setFx('G' + mr, '=SE(A' + er + '="SIM"' + S + 'C' + er + '*(B$28+B$29+B$30)' + S + '"")');
+    setFx('H' + mr, '=SE(A' + er + '="SIM"' + S + 'C' + er + '+F' + mr + '+G' + mr + '+B$' + R_VAD + '+I' + mr + S + '" ")');
+    setFx('I' + mr, '=SE(A' + er + '="SIM"' + S + 'MÁXIMO(0' + S + 'D' + er + '*E' + er + '+D' + mr + ')' + S + '"")');
+  }
+
+  setFx('B62', '=SOMA(B49:B58)');
+  setFx('B63', '=SOMA(F49:F58)');
+  setFx('B64', '=SOMA(G49:G58)');
+  setFx('B65', '=SOMA(I49:I58)');
+  sh.getRange(66, 1).setValue('Vale-alimentação PAT (teto mensal)');
+  setFx('B66', '=B$' + R_VAD + '*B$' + R_N);
+  setFx('B67', '=SE(B' + R_SIMPLES + '=1' + S + '0' + S + 'B62*0,2)');
+  setFx('B68', '=B62+B63+B64+B65+B66+B67');
+  setFx('B69', '=SE(B' + R_N + '>0' + S + 'B68/B' + R_N + S + '0)');
+
+  setFx('B73', '=B62*0,0833');
+  setFx('B74', '=B62*0,1111');
+  setFx('B75', '=B62*0,04');
+  setFx('B76', '=B63');
+  setFx('B77', '=B73+B74+B75+B76');
+
+  folhaFlushFormulasUser_(sh, pending);
+
+  sh.getRange(firstMem, 2, 10, 7).setNumberFormat('#,##0.00');
+  sh.getRange(62, 2, 8, 1).setNumberFormat('#,##0.00');
+  SpreadsheetApp.flush();
+}
+
+/** @deprecated — use repairFolhaFormulasCore_ */
+function patchFolhaVaMensal400Core_(sh) {
+  repairFolhaFormulasCore_(sh);
+}
+
+/** Aplica repair FOLHA quando memorial/totais estão quebrados. */
+function ensureFolhaRepair_(sh) {
+  if (!sh || !folhaPrecisaRepair_(sh)) return false;
+  try {
+    repairFolhaFormulasCore_(sh);
+    Logger.log('ensureFolhaRepair_: fórmulas FOLHA reparadas');
+    return true;
+  } catch (e) {
+    Logger.log('ensureFolhaRepair_: ' + e.message);
+    return false;
+  }
+}
+
+/** Executar via clasp run — repara aba FOLHA na planilha base. */
+function repairFolhaFormulasRemote() {
+  const sh = sh_(SH_FOLHA);
+  if (!sh) throw new Error('Aba FOLHA ausente');
+  const ss = sh.getParent();
+  repairFolhaFormulasCore_(sh);
+  const folha = lerFolhaPlanejamento_();
+  return {
+    ok: true,
+    locale: ss.getSpreadsheetLocale(),
+    b25: sh.getRange('B25').getValue(),
+    b25Formula: sh.getRange('B25').getFormula(),
+    b68: sh.getRange('B68').getValue(),
+    d36: sh.getRange('D36').getValue(),
+    d36Formula: sh.getRange('D36').getFormula(),
+    d36Display: sh.getRange('D36').getDisplayValue(),
+    folhaPlanejamento: folha
+  };
+}
+
+function repairFolhaFormulasAdmin_(p) {
+  if (!isAdminRequest_(p)) return err_('Acesso negado — repairFolhaAdmin so para administrador', 403);
+  const sh = sh_(SH_FOLHA);
+  if (!sh) return err_('Aba FOLHA ausente', 404);
+  const ss = sh.getParent();
+  repairFolhaFormulasCore_(sh);
+  return resp_({
+    ok: true,
+    locale: ss.getSpreadsheetLocale(),
+    b25: sh.getRange('B25').getValue(),
+    b25Formula: sh.getRange('B25').getFormula(),
+    b68: sh.getRange('B68').getValue(),
+    d36: sh.getRange('D36').getValue(),
+    d36Formula: sh.getRange('D36').getFormula(),
+    d36Display: sh.getRange('D36').getDisplayValue(),
+    folhaPlanejamento: lerFolhaPlanejamento_()
+  });
+}
+
 /** Lê memorial folha (aba FOLHA) — planejamento, não folha oficial. */
 function lerFolhaPlanejamento_() {
   const fallback = {
@@ -1942,12 +2193,15 @@ function lerFolhaPlanejamento_() {
   try {
     const sh = sh_(SH_FOLHA);
     if (!sh) return fallback;
+    ensureFolhaRepair_(sh);
     const custoMensal = parseMoedaBr_(sh.getRange('B68').getValue());
-    if (custoMensal <= 0) return fallback;
+    if (custoMensal <= 0 || celulaComErro_(sh.getRange('B68').getValue())) return fallback;
     const vaMensal = parseMoedaBr_(sh.getRange('B11').getValue()) || 400;
-    const diasVa = Math.max(1, parseInt(parseMoedaBr_(sh.getRange('B12').getValue()), 10) || 26);
+    let diasVa = Math.max(1, parseInt(parseMoedaBr_(sh.getRange('B12').getValue()), 10) || 26);
+    if (diasVa < 15 || diasVa > 31) diasVa = 26;
     const vaDiaCalc = Math.round(vaMensal / diasVa * 100) / 100;
-    const vaDiaCell = parseMoedaBr_(sh.getRange('B25').getValue());
+    let vaDiaCell = parseMoedaBr_(sh.getRange('B25').getValue());
+    if (vaDiaCell <= 0 || vaDiaCell >= vaMensal * 0.9) vaDiaCell = vaDiaCalc;
     return {
       ok: true,
       nFuncionarios: Math.max(1, parseInt(parseMoedaBr_(sh.getRange('B5').getValue()), 10) || 2),
@@ -1956,7 +2210,7 @@ function lerFolhaPlanejamento_() {
       vtTarifa: parseMoedaBr_(sh.getRange('B9').getValue()) || 8.4,
       vtDia: parseMoedaBr_(sh.getRange('B9').getValue()) || 8.4,
       vaMensal: vaMensal,
-      vaDia: vaDiaCell > 0 ? vaDiaCell : vaDiaCalc,
+      vaDia: vaDiaCell,
       diasVa: diasVa,
       fonte: 'FOLHA'
     };

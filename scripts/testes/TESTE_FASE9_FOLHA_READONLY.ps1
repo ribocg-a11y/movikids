@@ -26,8 +26,10 @@ function Add-F9Check([string]$Name, [string]$Status, [string]$Detail = "") {
 try {
   $ping = Invoke-F9Api @{ action = "ping" }
   Add-F9Check "ping" "ok" $ping.versao
-  if ($ping.versao -notmatch 'v1\.5\.81') {
-    Add-F9Check "gas.versao" "warn" "esperado v1.5.81"
+  if ($ping.versao -match 'v1\.5\.(8[1-9]|9[0-9])') {
+    Add-F9Check "gas.versao" "ok" $ping.versao
+  } else {
+    Add-F9Check "gas.versao" "warn" ("esperado v1.5.81+ (atual: $($ping.versao))")
   }
 
   $mes = (Get-Date).Month
@@ -37,14 +39,14 @@ try {
 
   $v = $kpi.viabilidadeContratacao
   if ($null -eq $v -or -not $v.ok) {
-    if ($ping.versao -match 'v1\.5\.81') { throw "viabilidadeContratacao ausente ou ok=false" }
-    Add-F9Check "viabilidadeContratacao" "warn" "publique GAS v1.5.81"
+    if ($ping.versao -match 'v1\.5\.(8[0-9]|9[0-9])') { throw "viabilidadeContratacao ausente ou ok=false" }
+    Add-F9Check "viabilidadeContratacao" "warn" "publique GAS v1.5.81+"
   } else {
     foreach ($f in @('nivel', 'label', 'motivo', 'recomendacao', 'folhaMensal', 'projecaoResComFolha', 'margemProjComFolha', 'gates')) {
       if ($null -eq $v.$f) { throw "viabilidadeContratacao.$f ausente" }
     }
     Add-F9Check "viabilidadeContratacao" "ok" ($v.nivel + " / " + $v.label)
-    if ($null -eq $v.folhaProRata) { throw "folhaProRata ausente (GAS v1.5.81)" }
+    if ($null -eq $v.folhaProRata) { throw "folhaProRata ausente (GAS v1.5.81+)" }
     Add-F9Check "folhaMensal" "ok" ("R$ " + $v.folhaMensal)
     Add-F9Check "folhaProRata" "ok" ("R$ " + $v.folhaProRata)
     Add-F9Check "resultadoComFolha" "ok" ("R$ " + $v.resultadoComFolha + " parcial")

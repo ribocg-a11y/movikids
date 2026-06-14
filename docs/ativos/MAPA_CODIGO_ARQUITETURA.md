@@ -15,7 +15,7 @@
 | **Sistema nervoso** | Comunicação FE ↔ GAS | `api()` em `mk-api.js` + `doGet`/`dispatchMoviAction_` (GAS) |
 | **Rosto / identidade** | Versão, URL GAS, cache | `mk-version.js`, `sw.js`, bloco anti-stale no `index.html` |
 | **Imunológico** | Travas P0, CI, incidentes | `pre-push-check.ps1`, `.cursor/rules/`, `REGRAS_DE_PUBLICACAO_SEGURA.md` |
-| **Mãos (braços)** | Ações do operador no balcão | Nova locação, drawer, encerrar, SMS manual — `index.html` + 5 escritas GAS |
+| **Mãos (braços)** | Ações do operador no balcão | Nova locação, drawer, encerrar — **comunicação: QR** (SMS/WA pausados) |
 | **Olhos (gestão)** | KPIs, payback, cockpit, leading | Dashboard, Caixa admin — `kpiMes` + `resumoDia` (GAS) + `mk-admin.js` |
 | **Pernas (canais externos)** | Portal pais, foto, cronômetro curto | `acompanhar.html`, `foto-moldura.html`, `track.html` |
 | **Pele** | Visual único | `mk-app.css` (base) + `mk-design.css` (aditivo Pacote A) |
@@ -382,18 +382,31 @@ sequenceDiagram
 
 ---
 
-## 13. FASE 9 — Folha CLT + viabilidade contratação (v1.5.80 / v1.8.10)
+## 13. FASE 9 — Folha CLT + viabilidade contratação (v1.5.91 / v1.8.10+)
 
 | Peça | Onde |
 |------|------|
-| Planilha | Aba **FOLHA** — B68 custo total · B5 nº func. |
+| Planilha | Aba **FOLHA** — B68 custo total · B5 nº func. · B25 VA/dia |
 | GAS | `lerFolhaPlanejamento_`, `buildViabilidadeContratacao_` |
+| Repair I25 | `repairFolhaFormulasCore_` → `folhaFlushFormulasUser_` (Sheets API USER_ENTERED) |
 | API | `kpiMes.folhaPlanejamento`, `kpiMes.viabilidadeContratacao` |
+| Admin | `repairFolhaAdmin`, `repairFolhaFormulasRemote` |
 | Alertas | `CONTRATACAO_VIAVEL`, `CONTRATACAO_AGUARDAR`, `CONTRATACAO_NAO_VIAVEL` |
 | FE | `#mk-contratacao-panel` · `renderContratacaoPanel_` (só admin Dashboard) |
 | Leading | `breakEvenComFolha`, `custoDiaComFolha` |
+| Testes | `TESTE_FOLHA_FORMULAS_READONLY.ps1`, `TESTE_FASE9_FOLHA_READONLY.ps1` |
 
-Doc: **`FASE_9_FOLHA_VIABILIDADE_CLT.md`** · deploy **`DEPLOY_v1.5.80_FASE9_FOLHA_VIABILIDADE.md`**
+```mermaid
+flowchart LR
+  FOLHA[FOLHA B68] --> ler[lerFolhaPlanejamento_]
+  repair[repairFolhaAdmin] --> flush[folhaFlushFormulasUser_]
+  flush --> FOLHA
+  ler --> kpi[kpiMes.folhaPlanejamento]
+  kpi --> via[buildViabilidadeContratacao_]
+  via --> FE[#mk-contratacao-panel]
+```
+
+Doc: **`FASE_9_FOLHA_VIABILIDADE_CLT.md`** · deploy **`DEPLOY_v1.5.91_FOLHA_REPAIR_USER_ENTERED.md`** · incidente **I25**
 
 ---
 

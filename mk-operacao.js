@@ -24,19 +24,24 @@ function triggerAlertExpired(s) {
 }
 
 function showAlertModal(s, expired) {
+  const qrOnly = typeof mkComunicacaoQrOnly_ === 'function' && mkComunicacaoQrOnly_();
   const modal = document.getElementById('alert-modal');
-  const admIgnoraSms = typeof mkAdminIgnoraSmsObrigatorio_ === 'function' && mkAdminIgnoraSmsObrigatorio_();
-  const smsExtraObrigatorio = expired && !admIgnoraSms;
+  const admIgnoraSms = qrOnly || (typeof mkAdminIgnoraSmsObrigatorio_ === 'function' && mkAdminIgnoraSmsObrigatorio_());
+  const smsExtraObrigatorio = !qrOnly && expired && !admIgnoraSms;
   modal.className = 'modal-overlay alert-modal' + (smsExtraObrigatorio ? ' danger show' : ' show');
   modal.dataset.extraWaSent = (expired && extraWaFoiEnviado_(s)) || admIgnoraSms ? '1' : '0';
 
   document.getElementById('alert-icon').textContent  = expired ? '🔴' : '⏰';
   document.getElementById('alert-title').textContent = expired ? 'Tempo esgotado!' : 'Faltam 5 minutos!';
   document.getElementById('alert-sub').textContent   = expired
-    ? (admIgnoraSms
-      ? 'Administrador: você pode encerrar sem enviar SMS (use em falha de rede ou emergência).'
-      : 'Envie a mensagem ao responsável informando que minutos extras serão cobrados.')
-    : 'Avise ' + s.responsavel + ' que o tempo de ' + s.crianca + ' está acabando.';
+    ? (qrOnly
+      ? 'Minutos extras em andamento. Oriente o responsável pelo QR do portal na mesa.'
+      : (admIgnoraSms
+        ? 'Administrador: você pode encerrar sem enviar SMS (use em falha de rede ou emergência).'
+        : 'Envie a mensagem ao responsável informando que minutos extras serão cobrados.'))
+    : (qrOnly
+      ? 'Avise ' + s.responsavel + ' verbalmente ou mostre o QR — ' + s.crianca + ' tem ~5 min restantes.'
+      : 'Avise ' + s.responsavel + ' que o tempo de ' + s.crianca + ' está acabando.');
 
   const icon   = tipoIcon(s.tipo);
   let alertHtml =
@@ -56,6 +61,7 @@ function showAlertModal(s, expired) {
 
   const btnPular = document.getElementById('btn-pular-alerta');
   const btnWa    = document.getElementById('btn-wa');
+  if (btnWa) btnWa.style.display = qrOnly ? 'none' : '';
   if (expired) {
     if (btnPular) {
       btnPular.style.display = admIgnoraSms ? '' : 'none';
@@ -94,8 +100,9 @@ function showAlertModal(s, expired) {
 
 function fecharAlerta() {
   const modal = document.getElementById('alert-modal');
-  const admIgnoraSms = typeof mkAdminIgnoraSmsObrigatorio_ === 'function' && mkAdminIgnoraSmsObrigatorio_();
-  if (!admIgnoraSms && modal.classList.contains('danger') && modal.dataset.extraWaSent !== '1') {
+  const qrOnly = typeof mkComunicacaoQrOnly_ === 'function' && mkComunicacaoQrOnly_();
+  const admIgnoraSms = qrOnly || (typeof mkAdminIgnoraSmsObrigatorio_ === 'function' && mkAdminIgnoraSmsObrigatorio_());
+  if (!qrOnly && !admIgnoraSms && modal.classList.contains('danger') && modal.dataset.extraWaSent !== '1') {
     toast('Envie o SMS de cobrança antes de fechar!', 'error');
     return;
   }
@@ -106,12 +113,20 @@ function fecharAlerta() {
 }
 
 function abrirWhatsApp() {
+  if (typeof mkComunicacaoQrOnly_ === 'function' && mkComunicacaoQrOnly_()) {
+    mkOrientarQrPortal_();
+    return;
+  }
   const s = alertSession;
   if (!s || !s.telefone) { toast('Telefone não cadastrado', 'error'); return; }
   abrirWaMsg(s);
 }
 
 function abrirWhatsAppCard(rowIndex) {
+  if (typeof mkComunicacaoQrOnly_ === 'function' && mkComunicacaoQrOnly_()) {
+    mkOrientarQrPortal_();
+    return;
+  }
   const s = sessions.find(x => x.rowIndex === rowIndex);
   if (!s) return;
   abrirWaMsg(s);
@@ -139,6 +154,10 @@ function aplicarSmsResposta_(s, sms, smsTipo) {
 }
 
 async function enviarSmsResponsavel_(s, tipo) {
+  if (typeof mkComunicacaoQrOnly_ === 'function' && mkComunicacaoQrOnly_()) {
+    mkOrientarQrPortal_();
+    return false;
+  }
   if (!s || !s.telefone) { toast('Telefone não cadastrado', 'error'); return false; }
   const smsTipo = tipo || tipoSmsPorSessao_(s);
   try {
@@ -167,6 +186,10 @@ async function enviarSmsResponsavel_(s, tipo) {
 }
 
 async function enviarSmsAvulso_(dados, tipo) {
+  if (typeof mkComunicacaoQrOnly_ === 'function' && mkComunicacaoQrOnly_()) {
+    mkOrientarQrPortal_();
+    return false;
+  }
   const telefone = dados && (dados.telefone || dados.tel);
   if (!telefone) { toast('Telefone não cadastrado', 'error'); return false; }
   try {
@@ -204,7 +227,7 @@ function renderOperacaoLocacaoForm_(rowIndex, tipo, bodyId) {
   if (tipo === 'pagamento') {
     body.innerHTML = `<div class="op-policy">Use quando o responsável pagou em outra forma.</div><div class="op-form"><div class="op-grid"><div class="op-field"><label>Atual</label><input value="${escHtml(opSession.pagamento || 'Não informado')}" disabled></div><div class="op-field"><label>Novo</label><select id="op-pagamento">${['PIX','Credito','Debito','Dinheiro'].map(p=>`<option ${normalizarTxt_(opSession.pagamento)===normalizarTxt_(p)?'selected':''}>${p}</option>`).join('')}</select></div></div><div class="op-field"><label>Motivo</label><textarea id="op-motivo">Responsável alterou a forma de pagamento.</textarea></div></div>`;
   } else if (tipo === 'veiculo') {
-    body.innerHTML = `<div class="op-policy">A troca não reinicia o timer nem altera valores automaticamente.</div><div class="op-form"><div class="op-grid"><div class="op-field"><label>Atual</label><input value="${escHtml(opSession.veiculo || opSession.tipo || '')}" disabled></div><div class="op-field"><label>Novo</label><select id="op-veiculo">${['Carro 01','Carro 02','Carro 03','Triciclo 01','Triciclo 02','Pelucia 01','Pelucia 02','Pelucia 03','Pelucia 04'].map(v=>`<option ${normalizarTxt_(opSession.veiculo)===normalizarTxt_(v)?'selected':''}>${v}</option>`).join('')}</select></div></div><div class="op-field"><label>Motivo</label><textarea id="op-motivo">Troca solicitada pelo responsável ou por operação.</textarea></div></div>`;
+    body.innerHTML = `<div class="op-policy">A troca não reinicia o timer nem altera valores automaticamente.</div><div class="op-form"><div class="op-grid"><div class="op-field"><label>Atual</label><input value="${escHtml(opSession.veiculo || opSession.tipo || '')}" disabled></div><div class="op-field"><label>Novo</label><select id="op-veiculo">${['Carro 01','Carro 02','Carro 03','Triciclo 01','Triciclo 02','Pelúcia 01','Pelúcia 02','Pelúcia 03','Pelúcia 04'].map(v=>`<option ${normalizarTxt_(opSession.veiculo)===normalizarTxt_(v)?'selected':''}>${v}</option>`).join('')}</select></div></div><div class="op-field"><label>Motivo</label><textarea id="op-motivo">Troca solicitada pelo responsável ou por operação.</textarea></div></div>`;
   } else if (tipo === 'plano') {
     if (ativa) { toast('Plano só pode ser trocado antes de iniciar. Use Estender tempo.', 'warning'); return false; }
     const planos = Object.keys(PRECOS[opSession.tipo] || {});
@@ -480,7 +503,8 @@ async function abrirWaMsg(s) {
 function encerrarDireto() {
   if (!alertSession) return;
   const rowIndex = alertSession.rowIndex;
-  const admIgnoraSms = typeof mkAdminIgnoraSmsObrigatorio_ === 'function' && mkAdminIgnoraSmsObrigatorio_();
+  const qrOnly = typeof mkComunicacaoQrOnly_ === 'function' && mkComunicacaoQrOnly_();
+  const admIgnoraSms = qrOnly || (typeof mkAdminIgnoraSmsObrigatorio_ === 'function' && mkAdminIgnoraSmsObrigatorio_());
   if (admIgnoraSms) {
     const modal = document.getElementById('alert-modal');
     if (modal) {
@@ -768,10 +792,12 @@ async function confirmarEstender() {
 
     saveSessions();
 
-    // Envia SMS com link do portal do responsavel
-    waExtensao(estSession, estMins, estValor, estPlano, extraAntes, debtAntes);
+    const qrOnly = typeof mkComunicacaoQrOnly_ === 'function' && mkComunicacaoQrOnly_();
+    if (!qrOnly) {
+      waExtensao(estSession, estMins, estValor, estPlano, extraAntes, debtAntes);
+    }
 
-    toast('+' + estMins + 'min adicionados! SMS solicitado.', 'success');
+    toast('+' + estMins + 'min adicionados!' + (qrOnly ? ' Mostre o QR se quiser.' : ' SMS solicitado.'), 'success');
 
     broadcastInvalidate();
     syncController(true, 500);

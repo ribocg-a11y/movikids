@@ -1,4 +1,4 @@
-# MOVI KIDS — Estado atual (11/06/2026)
+# MOVI KIDS — Estado atual (14/06/2026)
 
 Referência única para alinhamento local × produção.
 
@@ -10,7 +10,8 @@ Referência única para alinhamento local × produção.
 **FASE 9 Folha CLT:** **`FASE_9_FOLHA_VIABILIDADE_CLT.md`**  
 **Memorial folha:** `../referencia/FOLHA_PAGAMENTO_MEMORIAL_E_PLANILHA.md`  
 **FASE 14 mini-DRE:** 🟡 memorial — `FASE_14_MINI_DRE.md` · `../referencia/MEMORIAL_MINI_DRE.md`  
-**Deploy GAS pacote:** **`DEPLOY_v1.5.81_FOLHA_PROPORCIONAL.md`** · FE **`DEPLOY_FE_v1.8.15_SEMANA_ATUAL.md`** (v1.8.11–1.8.14: `DEPLOY_FE_v1.8.12_DASHBOARD_NARRATIVO.md`)
+**Deploy GAS pacote:** **`DEPLOY_v1.5.91_FOLHA_REPAIR_USER_ENTERED.md`** · FE **`DEPLOY_FE_v1.8.15_SEMANA_ATUAL.md`** (v1.8.11–1.8.14: `DEPLOY_FE_v1.8.12_DASHBOARD_NARRATIVO.md`)  
+**Incidente I25 (FOLHA #NAME?):** `../arquivo/incidentes/INCIDENTE_I25_FOLHA_FORMULAS_NAME_2026-06-13.md`
 
 ---
 
@@ -25,15 +26,15 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 | Camada | Versão repo | URL / ID |
 |--------|-------------|----------|
-| **Frontend** | **v1.8.16** | https://ribocg-a11y.github.io/movikids/?force=1.8.16 |
-| **Apps Script (código + ping)** | **v1.5.82** | Nova versão Web ✅ |
-| **Aba FOLHA** | memorial B68 | [gid=179040058](https://docs.google.com/spreadsheets/d/1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618/edit#gid=179040058) |
+| **Frontend** | **v1.8.20** | https://ribocg-a11y.github.io/movikids/?force=1.8.20 |
+| **Apps Script (código + ping)** | **v1.5.91** | Nova versão Web ✅ (13/06) |
+| **Aba FOLHA** | memorial B68 **OK** | [gid=179040058](https://docs.google.com/spreadsheets/d/1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618/edit#gid=179040058) · B68 ~5269,96 |
 
 **Editor Apps Script:** https://script.google.com/home/projects/19SIhkX9Tk7FiJA1JXu1OrUwssHdr3H5zc8q3rOjmBvqgWfXuHlk8xyf8/edit
 
 **Teste rápido GAS (ping):**  
 https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec?action=ping  
-→ produção: `versao: v1.5.81` (confirmado 10/06/2026)
+→ produção: `versao: v1.5.91` (confirmado 13/06 repair · **re-validado 14/06** testes readonly)
 
 **URL morta (não usar):** `AKfycbzc...` → 404
 
@@ -55,7 +56,7 @@ https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPe
 | Sessão FE | `mk-sessao.js` — SMS, timer, `saveSessions` (Pacote M.5) |
 | Nova FE | `mk-nova.js` — fluxo Nova locação + `atualizarVeiculoGrid` (Pacote M.6) |
 | Drawer FE | `mk-drawer.js` — drawer sessão + encerrar (Pacote M.7) |
-| Operação FE | `mk-operacao.js` — alertas, SMS/WA, editar, iniciar, estender (Pacote M.8) |
+| **Operação FE** | `mk-operacao.js` — alertas, editar, iniciar, estender (SMS/WA pausados — QR) |
 | Home FE | `mk-home.js` — cards, painel, encHoje (Pacote M.9) |
 | Nav FE | `mk-nav.js` — showPage, sidebar, roles gestão (Pacote M.10) |
 | Admin FE | `mk-admin.js` — PIN, KPIs, caixa, config, sistema (Pacote M.11) |
@@ -74,6 +75,10 @@ https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPe
 | I20 cronômetro | `INCIDENTE_I20_CRONOMETRO_RESOLUCAO_2026-06-07.md` — causa raiz + travas |
 | Teste I20 | `scripts/testes/TESTE_I20_COMPLETO_PROD.ps1` |
 | **Protocolo testes** | **`PROTOCOLO_DIAGNOSTICO_E_TESTES.md`** + `TESTE_PROTOCOLO_DIAGNOSTICO.ps1` |
+| **Protocolo "atualize tudo"** | **`PROTOCOLO_ATUALIZAR_TUDO.md`** |
+| **Comunicação balcão** | **`OPERACAO_COMUNICACAO_QR_ONLY.md`** · FE v1.8.20 · `MK_COMUNICACAO_MODO=qr_only` |
+| **Teste FOLHA fórmulas** | `TESTE_FOLHA_FORMULAS_READONLY.ps1` — gate pós-deploy I25 |
+| **Teste FASE 9 folha** | `TESTE_FASE9_FOLHA_READONLY.ps1` |
 | **Homologação tablet F5–F11** | `TESTE_TABLET_F5_F7_F10_F11.ps1` + `TESTE_TABLET_F5_F7_F10_F11_BROWSER.js` |
 | Mapa bugs | `MAPA_ERROS_FALHAS_BUGS.md` |
 | Emergência | `scripts/ops/liberar-*.html`, `scripts/corrigir-locacao-206.html` |
@@ -82,10 +87,21 @@ https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPe
 
 ---
 
+## Validação FOLHA + FASE 9 (14/06/2026 08:23)
+
+| Teste | Status | Destaque |
+|-------|--------|----------|
+| `TESTE_FOLHA_FORMULAS_READONLY` | **ok** | 12/12 · B25=15,38 · B68=5269,96 · `fonte=FOLHA` |
+| `TESTE_FASE9_FOLHA_READONLY` | **ok** | verde · 6/6 gates · `CONTRATACAO_VIAVEL` · margem proj. 41,8% |
+
+---
+
 ## Entregas recentes
 
 | Versão | Entrega |
 |--------|---------|
+| **v1.8.20** | Operação **QR only** — SMS/WA pausados; alertas mantidos; `MK_COMUNICACAO_MODO` |
+| **GAS v1.5.91** | **I25** — FOLHA repair USER_ENTERED |
 | **v1.8.16** + **GAS v1.5.82** | FASE 14 mini-DRE — cascata margens Dashboard |
 | **v1.8.15** + **GAS v1.5.81** | Semana corrente Dashboard + fix I3 cache-bust |
 | **v1.8.14** + **GAS v1.5.81** | Dashboard narrativo + folha proporcional (mesma base sem/com folha) |

@@ -1,6 +1,6 @@
 # MOVI KIDS — Índice de documentação
 
-**Atualizado:** 11/06/2026 (FE **v1.8.15** · GAS **v1.5.81** prod.)
+**Atualizado:** 14/06/2026 (FE **v1.8.16** · GAS **v1.5.91** prod. · I25 fechado)
 
 ## Comece aqui
 
@@ -37,16 +37,18 @@
 |-----------|----------|
 | [MAPA_CODIGO_ARQUITETURA.md](ativos/MAPA_CODIGO_ARQUITETURA.md) | Anatomia código — zonas sensíveis |
 | [PROTOCOLO_DIAGNOSTICO_E_TESTES.md](ativos/PROTOCOLO_DIAGNOSTICO_E_TESTES.md) | Fluxos F0–F14, maturidade |
+| [**PROTOCOLO_ATUALIZAR_TUDO.md**](ativos/PROTOCOLO_ATUALIZAR_TUDO.md) | **Comando "atualize tudo"** — checklist docs + planilha + pasta C |
 | [REGRAS_DE_PUBLICACAO_SEGURA.md](ativos/REGRAS_DE_PUBLICACAO_SEGURA.md) | Regras P0 deploy |
 | [ACESSOS_E_AUTORIZACOES.md](ativos/ACESSOS_E_AUTORIZACOES.md) | Papéis, PIN, agente vs humano |
-| [MAPA_ERROS_FALHAS_BUGS.md](ativos/MAPA_ERROS_FALHAS_BUGS.md) | Índice I1–I23 |
+| [MAPA_ERROS_FALHAS_BUGS.md](ativos/MAPA_ERROS_FALHAS_BUGS.md) | Índice I1–I25 |
 
 ## Operação e deploy
 
 | Documento | Para quê |
 |-----------|----------|
 | [DEPLOY_GAS_v1.5.32_AUTH.md](ativos/DEPLOY_GAS_v1.5.32_AUTH.md) | Deploy GAS mestre + link `.gs` |
-| [DEPLOY_v1.5.81_FOLHA_PROPORCIONAL.md](ativos/DEPLOY_v1.5.81_FOLHA_PROPORCIONAL.md) | **Deploy GAS v1.5.81** — folha proporcional + ping |
+| [DEPLOY_v1.5.91_FOLHA_REPAIR_USER_ENTERED.md](ativos/DEPLOY_v1.5.91_FOLHA_REPAIR_USER_ENTERED.md) | **Deploy GAS v1.5.91** — I25 FOLHA USER_ENTERED |
+| [DEPLOY_v1.5.81_FOLHA_PROPORCIONAL.md](ativos/DEPLOY_v1.5.81_FOLHA_PROPORCIONAL.md) | Deploy GAS v1.5.81 — folha proporcional + ping |
 | [DEPLOY_v1.5.80_FASE9_FOLHA_VIABILIDADE.md](ativos/DEPLOY_v1.5.80_FASE9_FOLHA_VIABILIDADE.md) | Deploy GAS v1.5.80 — FASE 9 folha CLT |
 | [DEPLOY_FE_v1.8.15_SEMANA_ATUAL.md](ativos/DEPLOY_FE_v1.8.15_SEMANA_ATUAL.md) | **Deploy FE v1.8.15** — semana atual + fix I3 cache-bust |
 | [DEPLOY_FE_v1.8.12_DASHBOARD_NARRATIVO.md](ativos/DEPLOY_FE_v1.8.12_DASHBOARD_NARRATIVO.md) | Deploy FE v1.8.11–1.8.14 — Dashboard narrativo |
@@ -63,13 +65,14 @@
 | Documento | Para quê |
 |-----------|----------|
 | [MEMORIAL_PAYBACK_INVESTIMENTO.md](ativos/MEMORIAL_PAYBACK_INVESTIMENTO.md) | Fórmulas payback |
-| [DECISAO_COMUNICACAO_QR_CODE_2026-06.md](ativos/DECISAO_COMUNICACAO_QR_CODE_2026-06.md) | QR portal; F4 pausado |
+| [DECISAO_COMUNICACAO_QR_CODE_2026-06.md](ativos/DECISAO_COMUNICACAO_QR_CODE_2026-06.md) | QR portal; SMS/WA pausados |
+| [**OPERACAO_COMUNICACAO_QR_ONLY.md**](ativos/OPERACAO_COMUNICACAO_QR_ONLY.md) | **Fluxo balcão** — só QR, alertas sem mensagem |
 
 ## Arquivo histórico
 
 | Pasta | Conteúdo |
 |-------|----------|
-| [arquivo/incidentes/](arquivo/incidentes/) | Pós-mortems I1–I23 |
+| [arquivo/incidentes/](arquivo/incidentes/) | Pós-mortems I1–I25 |
 | [arquivo/deploy/](arquivo/deploy/) | Deploy notes históricos |
 | [arquivo/planos/](arquivo/planos/) | Planos antigos — **não usar para versão** |
 | [../arquivo-historico/](../arquivo-historico/) | GAS legados |

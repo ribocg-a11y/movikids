@@ -132,6 +132,7 @@ function smsFalhaReal_(sms) {
 }
 
 function smsStatusHtml_(s) {
+  if (typeof mkComunicacaoQrOnly_ === 'function' && mkComunicacaoQrOnly_()) return '';
   const sms = s && s.smsStatus;
   if (!sms || !sms.gatewayId) return '';
   const state = smsStatusEfetivo_(sms);

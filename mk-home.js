@@ -65,9 +65,9 @@ function buildCard(s) {
         <button class="btn btn-iniciar" onclick="iniciarContagemDireto_(${s.rowIndex})">
           ▶ INICIAR CONTAGEM
         </button>
-        <button class="btn btn-sms-link" onclick="enviarSmsPendente_(${s.rowIndex})" title="SMS do portal — não inicia o cronômetro">
+        ${(typeof mkComunicacaoQrOnly_ === 'function' && mkComunicacaoQrOnly_()) ? '' : `<button class="btn btn-sms-link" onclick="enviarSmsPendente_(${s.rowIndex})" title="SMS do portal — não inicia o cronômetro">
           Enviar SMS
-        </button>
+        </button>`}
       </div>
     </div>`;
   }
@@ -150,7 +150,7 @@ function buildCard(s) {
     </div>
 
     <div class="sc-btns">
-      ${isOver
+      ${(typeof mkComunicacaoQrOnly_ === 'function' && mkComunicacaoQrOnly_()) ? '' : (isOver
         ? `<button class="btn btn-wa danger-wa" onclick="abrirWhatsAppCard(${s.rowIndex})" title="Enviar SMS sobre tempo extra">
              SMS extra
            </button>`
@@ -161,7 +161,7 @@ function buildCard(s) {
           : `<button class="btn btn-wa" onclick="abrirWhatsAppCard(${s.rowIndex})" title="Enviar SMS com o portal do responsável">
                Enviar SMS
              </button>`
-      }
+      )}
       <button class="btn btn-encerrar ${isOver?'danger':''}" onclick="abrirSessaoDrawer(${s.rowIndex},'encerrar')">
         ✓ Encerrar
       </button>
@@ -259,7 +259,6 @@ function buildPainelCard(nome, tipo, s) {
       <div class="pcard-status">⏸ Aguardando</div>
       <div class="pcard-frozen">${fmtTime(s.mins * 60)}</div>
       <div class="pcard-crianca">${escHtml(s.crianca)}</div>
-      <button class="pcard-btn" style="margin-bottom:6px" onclick="enviarSmsPendente_(${s.rowIndex})">SMS</button>
       <button class="pcard-btn iniciar" onclick="iniciarContagemDireto_(${s.rowIndex})">▶ Iniciar</button>
     </div>`;
   }
@@ -357,7 +356,7 @@ function renderEncHoje(list) {
       <div class="enc-right">
         ${v}
         <div class="enc-horario">${e.horaInicio} → ${e.horaFim||'--:--'}</div>
-        ${admSms && e.telefone ? '<button class="enc-wa-btn" onclick=\'waAgradecimento(' + JSON.stringify(e).replace(/\'/g,"\\\'")+')\'>SMS agradecer</button>' : ''}
+        ${admSms && e.telefone && !(typeof mkComunicacaoQrOnly_ === 'function' && mkComunicacaoQrOnly_()) ? '<button class="enc-wa-btn" onclick=\'waAgradecimento(' + JSON.stringify(e).replace(/\'/g,"\\\'")+')\'>SMS agradecer</button>' : ''}
       </div>
     </div>`;
   }).join('');

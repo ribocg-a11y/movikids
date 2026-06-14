@@ -110,7 +110,9 @@
       await syncWait();
       let s7 = findRow(salvar7.rowIndex);
       if (s7) {
-        s7.alertFired5 = false;
+        s7.startTimestamp = ts5;
+      s7.started = true;
+      s7.alertFired5 = false;
         s7.alertFiredExp = false;
         checkTimer(s7);
         const modal5 = document.getElementById('alert-modal');
@@ -136,6 +138,8 @@
       await syncWait();
       let s7b = findRow(salvar7b.rowIndex);
       if (s7b) {
+        s7b.startTimestamp = tsExp;
+        s7b.started = true;
         s7b.alertFired5 = true;
         s7b.alertFiredExp = false;
         checkTimer(s7b);

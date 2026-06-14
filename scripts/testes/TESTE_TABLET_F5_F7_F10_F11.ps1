@@ -147,7 +147,7 @@ try {
   if ($rem7b -gt 0) { Add-C "F7.janela.expirado" "fail" "rem=${rem7b}s (esperado <=0)" }
   else { Add-C "F7.janela.expirado" "ok" "rem=${rem7b}s dispara alerta expirado no FE" }
 
-  Add-C "F7.ui.modal" "warn" "modais validados no browser (checkTimer); GAS janela OK"
+  Add-C "F7.ui.modal" "warn" "modais FE: rode scripts/testes/TESTE_ALERTAS_TABLET_BROWSER.js no balcao logado"
 
   $result.status = if ($result.checks | Where-Object { $_.status -eq "fail" }) { "fail" } else { "ok" }
   $result.finishedAt = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")

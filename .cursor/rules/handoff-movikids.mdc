@@ -50,7 +50,9 @@ Ao trabalhar neste repositório, **ler primeiro** (nesta ordem):
 
 **FASE 5:** ✅ fechada 09/06 — Milena + I21 v1.7.96 · ver `PLANEJAMENTO_ATUAL_2026-06.md`
 
-**Produção (10/06/2026 — repo):** publicar **GAS v1.5.80** Nova versão Web + **FE v1.8.10** push
+**Produção (14/06/2026 — repo):** GAS **v1.5.91** prod. · FE **v1.8.16** · FOLHA OK (I25 fechado)
+
+**"Atualize tudo":** ver `.cursor/rules/atualize-tudo-movikids.mdc` + `docs/ativos/PROTOCOLO_ATUALIZAR_TUDO.md`
 
 **Teste / diagnóstico:** `PROTOCOLO_DIAGNOSTICO_E_TESTES.md` → `TESTE_PROTOCOLO_DIAGNOSTICO.ps1`.
 
@@ -77,3 +79,5 @@ Antes de push: `pre-push-check.ps1` + resumo publicação. Ao encerrar: HANDOFF 
 ## Ao mudar versão ou fase
 
 Atualizar `HANDOFF_NOVO_CHAT.md` + checklist em `PLANO_PRIORIDADES` + `ESTADO_ATUAL.md` se aplicável.
+
+**"Atualize tudo":** checklist completo em `PROTOCOLO_ATUALIZAR_TUDO.md` (handoff, mapa erros, protocolos, arquitetura, planilhas, histórico, pasta C).

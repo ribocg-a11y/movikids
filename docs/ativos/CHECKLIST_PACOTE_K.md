@@ -61,7 +61,7 @@
 - [x] Checklist I.5 (`HOMOLOGACAO_PRODUCAO_ASSISTIDA.md`) fechado — **08/06/2026**
 - [x] Tablet em **v1.7.87** (`?force=1.7.87`)
 
-**Sprint 2 fechada 08/06/2026.** Próximo: **FASE 2 payback** → depois **Pacote L** (Sprint 3). **F4 WhatsApp pausado** — QR (`DECISAO_COMUNICACAO_QR_CODE_2026-06.md`).
+**Sprint 2 fechada 08/06/2026.** Próximo: **FASE 2 payback** → depois **Pacote L** (Sprint 3). **Comunicação:** só **QR portal** — **não enviar SMS/WhatsApp** (`OPERACAO_COMUNICACAO_QR_ONLY.md`).
 
 ---
 

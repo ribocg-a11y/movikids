@@ -17,3 +17,39 @@ const PLANO_LABELS = { '10min':'10 minutos','20min':'20 minutos','30min':'30 min
 
 let sessions = [];
 let statsHoje = { fat: 0, n: 0 };
+
+/** Operação jun/2026: sem envio SMS/WhatsApp — só QR portal até serviço de mensagens contratado. */
+const MK_COMUNICACAO_MODO = 'qr_only';
+
+function mkComunicacaoQrOnly_() {
+  return MK_COMUNICACAO_MODO === 'qr_only';
+}
+
+function mkQrPortalUrl_() {
+  return typeof PORTAL_RESPONSAVEL_URL !== 'undefined' ? PORTAL_RESPONSAVEL_URL : 'acompanhar.html';
+}
+
+function mkOrientarQrPortal_(contexto) {
+  const ctx = contexto ? (' ' + contexto) : '';
+  if (typeof toast === 'function') {
+    toast('Mostre o QR do portal na mesa para o responsável acompanhar' + ctx + '.', 'info');
+  }
+}
+
+function mkApplyComunicacaoModoUi_() {
+  if (!mkComunicacaoQrOnly_()) return;
+  const btnSmsNova = document.getElementById('btn-confirmar-iniciar');
+  if (btnSmsNova) btnSmsNova.style.display = 'none';
+  const hintNova = document.getElementById('nova-fechar-hint');
+  if (hintNova) {
+    hintNova.textContent = 'O cronômetro só começa após ▶ Iniciar na Home. Comunicação com o responsável: QR do portal na mesa (SMS/WhatsApp pausados).';
+  }
+  const btnConfirm = document.getElementById('btn-confirmar');
+  if (btnConfirm && !btnConfirm.textContent.includes('QR')) {
+    btnConfirm.textContent = '✓ Salvar cadastro';
+  }
+  const btnWaAlert = document.getElementById('btn-wa');
+  if (btnWaAlert) btnWaAlert.style.display = 'none';
+  const btnWaBv = document.getElementById('btn-wa-bv-send');
+  if (btnWaBv) btnWaBv.style.display = 'none';
+}

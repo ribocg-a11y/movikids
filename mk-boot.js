@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (el) { el.textContent = (e && e.message) || 'Erro ao iniciar login'; el.style.display = 'block'; }
     });
   } else if (typeof init === 'function') init();
+  if (typeof mkApplyComunicacaoModoUi_ === 'function') mkApplyComunicacaoModoUi_();
 });
 
 if ('serviceWorker' in navigator) {

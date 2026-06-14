@@ -1,6 +1,6 @@
 # MOVI KIDS — Mapa de erros, falhas e bugs
 
-**Atualizado:** 11/06/2026 — **I24** (commit sem push v1.8.18) · **I3** cache-bust · **FE v1.8.18** prod.  
+**Atualizado:** 14/06/2026 — **I25 fechado** (re-validado testes) · **I24** · **I3** · GAS **v1.5.91** prod.  
 **Uso anterior:** 09/06/2026 — **I22 fechado** (hotfix FE v1.8.2)  
 **Uso:** consultar **antes de publicar** e **ao montar checklist de teste**. Cada linha tem trava e script de verificação quando existir.
 
@@ -35,6 +35,7 @@
 | I1 | `clasp deploy` na Web App | 404; caixa quebrado | Só `clasp push` + Nova versão manual | Regra 8 / Regra 9 | ping |
 | I2 | GAS offline + timer local | Extra fantasma | ADM `somentePlano`; offline v1.7.6 | `FIX_OFFLINE_ENCERRAR` | tablet encerrar |
 | I3 | Cache `?force=` / **`index.html ?v=` desatualizado** | JS antigo no tablet/admin | `mk-version` + `sw` + **index** alinhados | `pre-push-check` versões | `?force=VERSAO` · ver **11/06** |
+| **I25** | **FOLHA `#NAME?` — `setValue('=SE...')` no GAS** | Aba FOLHA quebrada; Dashboard usa fallback 4926 | GAS **v1.5.91** `folhaFlushFormulasUser_` (USER_ENTERED) + `repairFolhaAdmin` | Nunca `setValue`/`setFormula` PT para fórmulas FOLHA | `TESTE_FOLHA_FORMULAS_READONLY.ps1` · **fechado 14/06** |
 | **I24** | **Commit local sem `git push`** / Pages desatualizada | Mesmo sintoma I3; remoto em versão antiga | `git push` + **`verify-publish-complete.ps1`** | `git.not-ahead-of-origin`, `pages.version-live` | curl Pages `mk-version.js` · **11/06** |
 | I4 | `mk-login-err` duplicado | Erro PIN invisível | ID único `mk-login-pin-err` | review HTML ids | login PIN errado |
 | I5 | Liberar sessão sem refresh UI (v1) | ADM acha que botão falhou | `refreshOperadoresAdmin_` | — | ADM liberar |
@@ -73,6 +74,7 @@
 | `../arquivo/incidentes/INCIDENTE_I21_SESSAO_IDLE_DUAL_2026-06-09.md` | **I21** — idle dual, B8 v1.7.94/v1.5.72 |
 | `../arquivo/incidentes/INCIDENTE_I22_HOME_FORA_DO_AR_FASE6_HTML_2026-06-09.md` | **I22** — `</div>` extra FASE 6; Home P0 |
 | `../arquivo/incidentes/INCIDENTE_I3_CACHE_BUST_INDEX_2026-06-11.md` | **I3 recorrência** — v1.8.15 não carregava (index.html) |
+| `../arquivo/incidentes/INCIDENTE_I25_FOLHA_FORMULAS_NAME_2026-06-13.md` | **I25** — FOLHA USER_ENTERED |
 | `../arquivo/incidentes/INCIDENTE_I24_COMMIT_SEM_PUSH_2026-06-11.md` | **I24** — v1.8.18 commit sem push |
 | `../arquivo/incidentes/INCIDENTE_I23_DASHBOARD_LENTO_TRAVADO_2026-06-09.md` | **I23** — Dashboard lento; mutex KPI + GAS perf |
 | `EMERGENCIA_SMS_404.md` | URL morta |
@@ -157,14 +159,16 @@
 16. **Nunca** compartilhar mutex entre `carregarKPIs` (hub) e `carregarKPIsDashboard` (I23).
 17. **Nunca** chamar `buildKpiMesPayload_` dentro de `resumoDia` — usar patch leve `calcLeadingDiaPatch_` (I23).
 18. **Sempre** pacote deploy completo (`DEPLOY_v*.md` **modelo `DEPLOY_v1.5.76`**) ao entregar fase GAS+FE — caminho PC, clasp, links, testes, checklist tablet, critério de pronto (Regra 8).
+19. **Após deploy GAS que toque FOLHA:** rodar `repairFolhaAdmin` + `TESTE_FOLHA_FORMULAS_READONLY.ps1` (I25).
 
 ---
 
-## Versões de referência (11/06/2026)
+## Versões de referência (14/06/2026)
 
-| Camada | Repo / produção alvo | Mínimo operação |
-|--------|----------------------|-----------------|
-| Frontend | **v1.8.15** (repo + Pages) | `?force=1.8.15` |
-| GAS | **v1.5.81** (prod.) | Nova versão Web se ping &lt; esperado |
+| Camada | Repo / produção | Mínimo operação |
+|--------|-----------------|-----------------|
+| Frontend | **v1.8.16** | `?force=1.8.16` |
+| GAS | **v1.5.91** (prod.) | Nova versão Web se ping &lt; v1.5.91 |
+| Aba FOLHA | B68 ~5269,96 · `fonte=FOLHA` | `repairFolhaAdmin` após deploy que toque FOLHA |
 
 Ver `ESTADO_ATUAL.md` para URLs e editor GAS.

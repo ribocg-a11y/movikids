@@ -1,6 +1,6 @@
 # FASE 14 — Plano de contas + mini-DRE
 
-**Status:** 🟢 **FASE 14 core em prod** (11/06/2026) — mini-DRE GAS+FE · aba PLANO_CONTAS opcional  
+**Status:** 🟢 **FASE 14 core em prod** — mini-DRE GAS+FE · GAS ping prod. **v1.5.91** (14/06) · aba PLANO_CONTAS opcional  
 **Prioridade:** P2 · **Esforço:** 10–14 dias  
 **Versão alvo:** FE **v1.8.16** · GAS **v1.5.82** ✅ prod. (11/06/2026 13:50)  
 **Mestre:** `PLANO_FASES_6_15_COCKPIT_EXECUTIVO_2026-06.md` § FASE 14
@@ -73,4 +73,4 @@
 |-----|-----|
 | `../referencia/MEMORIAL_MINI_DRE.md` | Fórmulas e cascata |
 | `DEPLOY_FE_v1.8.15_SEMANA_ATUAL.md` | FE atual em prod |
-| `DEPLOY_v1.5.81_FOLHA_PROPORCIONAL.md` | GAS atual em prod |
+| `DEPLOY_v1.5.91_FOLHA_REPAIR_USER_ENTERED.md` | GAS atual em prod (ping v1.5.91) |

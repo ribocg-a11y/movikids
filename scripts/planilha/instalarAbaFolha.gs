@@ -1,10 +1,9 @@
 /**
  * MOVI KIDS — Instala/atualiza aba FOLHA na planilha base.
- * Executar 1× no editor Apps Script vinculado à planilha:
- * https://docs.google.com/spreadsheets/d/1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618/edit
  *
- * Menu: instalarAbaFolha() — cria aba FOLHA com memorial dinâmico.
- * Memorial: docs/referencia/FOLHA_PAGAMENTO_MEMORIAL_E_PLANILHA.md
+ * FÓRMULAS via setFormula(): usar nomes EN (IF, SUM, ROUND, MAX, MIN) e vírgulas.
+ * Planilha pt_BR exibe SE/SOMA na UI, mas Apps Script não aceita sintaxe PT (bug Google #36765372).
+ * Ref: https://stackoverflow.com/questions/79033170/
  */
 function instalarAbaFolha() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -18,7 +17,8 @@ function instalarAbaFolha() {
   sh.setTabColor('#5E35B1');
 
   var L = function (r, c, v) { sh.getRange(r, c).setValue(v); };
-  var F = function (r, c, f) { sh.getRange(r, c).setFormula(f); };
+  /** setValue (não setFormula) — fórmulas pt_BR como digitadas na planilha */
+  var F = function (r, c, f) { sh.getRange(r, c).setValue(f); };
   var fmtHdr = function (r1, r2, c1, c2, hex) {
     sh.getRange(r1, c1, r2, c2).setBackground(hex).setFontWeight('bold').setFontSize(10);
   };
@@ -110,7 +110,7 @@ function instalarAbaFolha() {
   var lastEmp = 44;
   for (var r = firstEmp; r <= lastEmp; r++) {
     var idx = r - firstEmp + 1;
-    F(r, 1, '=SE(' + idx + '<=$B$' + R_N + ';"SIM";"—")');
+    F(r, 1, '=SE(' + idx + '<=$B$' + R_N + ';"SIM";"-")');
     if (idx <= 2) {
       L(r, 2, idx === 1 ? 'Atendente 1 (preencher nome)' : 'Atendente 2 (preencher nome)');
     }
@@ -155,7 +155,7 @@ function instalarAbaFolha() {
   L(65, 1, 'VT (parte empresa)');
   F(65, 2, '=SOMA(I49:I58)');
   L(66, 1, 'Vale-alimentação PAT (teto mensal)');
-  F(66, 2, '=SOMA(ARRAYFORMULA(SE(A35:A44="SIM";B$' + R_VAD + ';0)))');
+  F(66, 2, '=B$' + R_VAD + '*B$' + R_N);
   L(67, 1, 'INSS patronal 20% (se LP/LR)');
   F(67, 2, '=SE(B' + R_SIMPLES + '=1;0;B62*0,2)');
   L(68, 1, 'CUSTO TOTAL FOLHA + ENCARGOS');
@@ -248,7 +248,7 @@ function patchFolhaVaMensal400() {
   if (!vaAtual || Number(vaAtual) <= 0) sh.getRange(R_VAD, 2).setValue(400);
 
   sh.getRange(25, 1).setValue('VA/dia calculado (R$) — teto B11÷B12');
-  sh.getRange(25, 2).setFormula('=SE(B' + R_DVA + '>0;ARRED(B' + R_VAD + '/B' + R_DVA + ';2);0)');
+  sh.getRange(25, 2).setValue('=SE(B' + R_DVA + '>0;ARRED(B' + R_VAD + '/B' + R_DVA + ';2);0)');
   sh.getRange(26, 1).setValue('VA mensal teto por funcionário (R$)');
   sh.getRange(26, 2).setFormula('=B' + R_VAD);
 
@@ -265,18 +265,18 @@ function patchFolhaVaMensal400() {
 
   sh.getRange(34, 6).setValue('VA/dia calc. R$');
   for (var r = firstEmp; r <= 44; r++) {
-    sh.getRange(r, 6).setFormula('=SE(A' + r + '="SIM";B$25;"")');
+    sh.getRange(r, 6).setValue('=SE(A' + r + '="SIM";B$25;"")');
   }
 
   for (var mr = firstMem; mr < firstMem + 10; mr++) {
     var er = firstEmp + (mr - firstMem);
-    sh.getRange(mr, 6).setFormula('=SE(A' + er + '="SIM";C' + er + '*B$27;"")');
-    sh.getRange(mr, 7).setFormula('=SE(A' + er + '="SIM";C' + er + '*(B$28+B$29+B$30);"")');
-    sh.getRange(mr, 8).setFormula('=SE(A' + er + '="SIM";C' + er + '+F' + mr + '+G' + mr + '+B$' + R_VAD + '+I' + mr + ';" ")');
+    sh.getRange(mr, 6).setValue('=SE(A' + er + '="SIM";C' + er + '*B$27;"")');
+    sh.getRange(mr, 7).setValue('=SE(A' + er + '="SIM";C' + er + '*(B$28+B$29+B$30);"")');
+    sh.getRange(mr, 8).setValue('=SE(A' + er + '="SIM";C' + er + '+F' + mr + '+G' + mr + '+B$' + R_VAD + '+I' + mr + ';" ")');
   }
 
   sh.getRange(66, 1).setValue('Vale-alimentação PAT (teto mensal)');
-  sh.getRange(66, 2).setFormula('=SOMA(ARRAYFORMULA(SE(A35:A44="SIM";B$' + R_VAD + ';0)))');
+  sh.getRange(66, 2).setFormula('=B$' + R_VAD + '*B$' + R_N);
 
   var b68 = sh.getRange(68, 2).getValue();
   var b25 = sh.getRange(25, 2).getValue();

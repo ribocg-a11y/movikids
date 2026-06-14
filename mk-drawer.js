@@ -52,7 +52,8 @@ function abrirSessaoDrawer(rowIndex, tab) {
   }
   if (wantTab === 'encerrar' && s.started) {
     const rem = calcRemaining(s);
-    const admIgnoraSms = typeof mkAdminIgnoraSmsObrigatorio_ === 'function' && mkAdminIgnoraSmsObrigatorio_();
+    const qrOnly = typeof mkComunicacaoQrOnly_ === 'function' && mkComunicacaoQrOnly_();
+    const admIgnoraSms = qrOnly || (typeof mkAdminIgnoraSmsObrigatorio_ === 'function' && mkAdminIgnoraSmsObrigatorio_());
     if (rem <= 0 && !extraWaFoiEnviado_(s) && !admIgnoraSms) {
       alertSession = s;
       showAlertModal(s, true);
@@ -275,7 +276,8 @@ async function confirmarEncerrar() {
       }
     }
 
-    const admEnc = typeof mkAdminIgnoraSmsObrigatorio_ === 'function' && mkAdminIgnoraSmsObrigatorio_();
+    const qrOnly = typeof mkComunicacaoQrOnly_ === 'function' && mkComunicacaoQrOnly_();
+    const admEnc = qrOnly || (typeof mkAdminIgnoraSmsObrigatorio_ === 'function' && mkAdminIgnoraSmsObrigatorio_());
     const d = await api({
       action:    'encerrarLocacao',
       ...operadorApiParams_(),

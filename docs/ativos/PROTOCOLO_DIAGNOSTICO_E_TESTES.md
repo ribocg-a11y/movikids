@@ -1,6 +1,6 @@
 # MOVI KIDS — Protocolo de diagnóstico, testes e maturidade de aprendizado
 
-**Criado:** 07/06/2026 · **Atualizado:** 09/06/2026 (FASE 5 fechada · v1.7.96)  
+**Criado:** 07/06/2026 · **Atualizado:** 14/06/2026 (I25 fechado · PROTOCOLO_ATUALIZAR_TUDO)  
 **Função:** quando o usuário pedir *“rodar teste”*, *“diagnosticar”* ou *“validar deploy”*, o agente **segue este documento** — não improvisa escopo.  
 **Complementa:** `MAPA_ERROS_FALHAS_BUGS.md`, `INCIDENTE_I20_CRONOMETRO_RESOLUCAO_2026-06-07.md`, `MAPA_CODIGO_ARQUITETURA.md`, `HOMOLOGACAO_PRODUCAO_ASSISTIDA.md`
 
@@ -15,7 +15,7 @@
 | Nível | Nome | O que temos | O que falta |
 |-------|------|-------------|-------------|
 | 1 | **Reativo** | Fix no sintoma que o operador viu | — |
-| 2 | **Documentado** | Incidentes I1–I20, MAPA, memorial I20 | Cobertura por fluxo |
+| 2 | **Documentado** | Incidentes I1–I25, MAPA, memorial I20/I25 | Cobertura por fluxo |
 | 3 | **Travas pontuais** | `pre-push-check.ps1`, guards estáticos | Testes E2E por fluxo |
 | **→ 4** | **Protocolo por fluxo** | **Este documento** + orquestrador + `TESTE_TABLET_F5_F7_F10_F11` | F10 2 abas físico |
 | 5 | **Contínuo** | CI bloqueia merge; homologação diária | Não alcançado |
@@ -61,17 +61,17 @@ Cada fluxo tem: **arquivos**, **incidentes**, **teste automático**, **tablet ob
 |----|-------|---------------|---------------------|------------|------------|--------|
 | **F0** | Infra / versões / cleanup | ping OK, FE=GAS esperado, sem lixo teste | `mk-version.js`, `sw.js`, `.gs` ping | I3, I10, I12, I14 | `pre-push-check`, ping | `?force=` |
 | **F1** | Auth operador + admin + idle 1h | PIN → chip Turno → sessão GAS; idle B8 | `mk-auth.js`, `mk-admin.js`, GAS | I4, I6, I17, I19, **I21** | `TESTE_SESSAO_IDLE_READONLY` | ✅ PWA + mock idle |
-| **F2** | Nova locação — **Salvar + SMS** | Salva Pendente + SMS, **sem** timer | `mk-nova.js` `confirmarLocacaoEEnviarSms_` | I20 | `TESTE_4_FLUXOS` T2 | ✅ |
+| **F2** | Nova locação — **Salvar cadastro** | Salva Pendente, **sem** timer · **sem SMS** (QR) | `mk-nova.js` `confirmarLocacao` | I20 | `TESTE_4_FLUXOS` T1/T2 | ✅ |
 | **F3** | Nova locação — **Só salvar** | Pendente 10:00 parado | `mk-nova.js` `confirmarLocacao` | I20 | `TESTE_4_FLUXOS` T1 | ✅ |
-| **F4** | Pendente — **Enviar SMS** | SMS portal; continua Pendente | `mk-operacao.js` `enviarSmsPendente_` | I20 | `TESTE_I20` B1 | opcional |
+| ~~**F4**~~ | ~~Pendente — Enviar SMS~~ | ⏸ **Suspenso** — usar QR portal | — | — | — | — |
 | **F5** | Pendente — **▶ Iniciar** | Clique imediato; 10:00; col Y=clientTs | `mk-operacao.js`, GAS `iniciarTimer_`, `mk-sync.js`, `mk-sessao.js` | **I16, I20** | `TESTE_I20` B2 | **✅ obrigatório** |
 | **F6** | Timer ativo — countdown | `calcRemaining`, anel, stats | `mk-sessao.js`, `mk-home.js` | I16, I20 | paridade cronômetro | ✅ |
-| **F7** | Alertas timer — 5 min / expirado | `checkTimer` → `triggerAlert5` / `triggerAlertExpired` | `mk-sessao.js`, `mk-operacao.js` | — | `TESTE_TABLET_F5_F7_F10_F11` | ✅ |
-| **F8** | SMS operacional | portal, alerta, esgotado, extensão | `mk-operacao.js`, GAS SMS | SMS P0 | regressão readonly | opcional |
+| **F7** | Alertas timer — 5 min / expirado | `checkTimer` → `triggerAlert5` / `triggerAlertExpired` (beep + modal, **sem SMS**) | `mk-sessao.js`, `mk-operacao.js` | — | `TESTE_TABLET_F5_F7_F10_F11` | ✅ |
+| ~~**F8**~~ | ~~SMS operacional~~ | ⏸ **Suspenso** — canal QR · alertas visuais OK | — | SMS P0 | — | — |
 | **F9** | Encerrar / cancelar | drawer → GAS → some do ativo | `mk-drawer.js`, GAS encerrar | I2, I11, I13 | `TESTE_DRAWER_E` | ✅ |
 | **F10** | Sync multi-canal | poll + Firebase + merge + BC | `mk-sync.js`, `mk-firebase.js` | I17, I20 | `TESTE_TABLET_F5_F7_F10_F11` (reload OK; 2 abas físico pendente) | ✅ 2 abas |
 | **F11** | Portal responsável | `acompanhar.html` ±2s do balcão | portal + GAS `buscarPortalResponsavel_` | **I16** | `TESTE_PARIDADE_CRONOMETRO` | ✅ celular |
-| **F12** | Admin — KPIs / payback / caixa / cockpit | Dashboard (`kpiMes`), Caixa (`resumoDia`), payback | `mk-admin.js`, GAS `buildKpiMesPayload_`, `calcLeadingDiaPatch_` | I23, payback M | `TESTE_KPI_MES_READONLY`, `TESTE_RESUMO_DIA_READONLY` | PC admin |
+| **F12** | Admin — KPIs / payback / caixa / cockpit / **folha CLT** | Dashboard (`kpiMes`), Caixa (`resumoDia`), payback, viabilidade | `mk-admin.js`, GAS `buildKpiMesPayload_`, `lerFolhaPlanejamento_`, `repairFolhaAdmin` | I23, **I25**, payback M | `TESTE_KPI_MES_READONLY`, `TESTE_FOLHA_FORMULAS_READONLY`, `TESTE_FASE9_FOLHA_READONLY` | PC admin |
 | **F13** | CRM relacionamento | busca responsável, badge cadastro | `index.html` rel, GAS | K.3 | `TESTE_RELACIONAMENTO` | opcional |
 | **F14** | HTTP / escrita browser | GET nas 5 actions críticas | `mk-api.js` | **I15** | `TESTE_PARIDADE_HTTP` | ✅ |
 
@@ -79,18 +79,16 @@ Cada fluxo tem: **arquivos**, **incidentes**, **teste automático**, **tablet ob
 
 ```mermaid
 flowchart LR
-  F2[F2 Salvar+SMS] --> F4[F4 SMS pendente]
-  F3[F3 Só salvar] --> F4
-  F3 --> F5[F5 ▶ Iniciar]
-  F4 --> F5
+  F2[F2 Salvar cadastro] --> F5[F5 Iniciar]
+  F3[F3 Só salvar] --> F5
   F5 --> F6[F6 Countdown]
-  F6 --> F7[F7 Alertas 5min/exp]
-  F5 --> F10[F10 Sync merge]
+  F6 --> F7[F7 Alertas beep/modal]
+  F7 --> QR[QR portal]
+  F5 --> F10[F10 Sync]
   F10 --> F6
   F6 --> F11[F11 Portal]
   F5 --> F11
   F6 --> F9[F9 Encerrar]
-  F7 --> F8[F8 SMS alerta]
   F0[F0 Versões] -.-> F5
   F1[F1 Auth] -.-> F2
   F14[F14 HTTP GET] -.-> F2
@@ -113,9 +111,9 @@ Use esta tabela **antes de fechar qualquer bug** no fluxo F5 (e analogamente par
 | 3 | Início otimista FE | Sim | F5 + guard `fe.iniciar.otimista` |
 | 4 | Sync stomp (`mergeSessaoCanonica`) | Sim | F10 + guard `sync.localTimer` |
 | 5 | Paridade portal (I16) | Parcial | F11 |
-| 6 | SMS **não** inicia timer | Parcial | F2, F4, `TESTE_4_FLUXOS` |
-| 7 | Alertas 5 min / expirado (F7) | **Sim** | Tablet — timer curto teste |
-| 8 | SMS status / reconsulta (F8) | **Sim** | Card badge SMS |
+| 6 | Timer **não** depende de SMS (I20) | Parcial | F5 `iniciarContagemDireto_` |
+| 7 | Alertas 5 min / expirado (F7) — **sem envio SMS** | **Sim** | Tablet — beep + modal + QR |
+| ~~8~~ | ~~SMS status (F8)~~ | ⏸ suspenso | — |
 | 9 | UX botões pendente | Sim | Tablet visual |
 | 10 | Versão FE Pages vs repo | **Sim** | F0 `mk-version.js` produção |
 | 11 | Versão GAS ping vs repo | Parcial | F0 ping |
@@ -138,8 +136,8 @@ Use esta tabela **antes de fechar qualquer bug** no fluxo F5 (e analogamente par
 | `iniciarContagem` / `mk-operacao.js` | F5, F6, F7, F10 | idem + guards otimista | ✅ |
 | `mergeSessaoCanonica` | F5, F6, F10, F11 | F5, F10, `TESTE_I20` | ✅ |
 | `calcRemaining` / `effectiveStartTs_` | F6, F7, F11 | paridade cronômetro | ✅ |
-| `enviarSmsResponsavel_` / GAS SMS | F2, F4, F7, F8 | `TESTE_I20` B1, F4 manual | opcional |
-| `checkTimer` / `triggerAlert*` | F7, F8 | timer teste 10min plano | ✅ |
+| `enviarSmsResponsavel_` / GAS SMS | ⏸ **fora da operação** (`qr_only`) | — | — |
+| `checkTimer` / `triggerAlert*` | F7 (alertas visuais/sonoros) | timer teste 10min plano | ✅ |
 | `mk-auth.js` | F1, F14, todas escritas | guards auth, F1 tablet | ✅ |
 | `api()` / `mk-api.js` | F14, **todas** escritas | `TESTE_PARIDADE_HTTP` | ✅ |
 | `acompanhar.html` | F11 | paridade cronômetro | celular |

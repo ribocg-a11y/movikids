@@ -56,8 +56,10 @@ Detalhe completo: [`ACESSOS_E_AUTORIZACOES.md`](docs/ativos/ACESSOS_E_AUTORIZACO
 
 | Camada | Versão repo | Ping produção |
 |--------|-------------|---------------|
-| Frontend | **v1.8.15** | https://ribocg-a11y.github.io/movikids/?force=1.8.15 |
-| GAS | **v1.5.81** | ping prod. **v1.5.81** ✅ |
+| Frontend | **v1.8.20** | https://ribocg-a11y.github.io/movikids/?force=1.8.20 |
+| Comunicação balcão | **QR only** | `OPERACAO_COMUNICACAO_QR_ONLY.md` |
+| GAS | **v1.5.91** | ping prod. **v1.5.91** ✅ |
+| Aba FOLHA | OK (I25) | B68 ~5269,96 · `folhaPlanejamento.fonte: FOLHA` |
 | Deploy ID | `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y` | |
 
 **GAS canônico (sempre informar se alterou):**
@@ -88,12 +90,15 @@ Fonte de verdade: `mk-version.js`, header do `.gs`, ping GAS.
 - `docs/arquivo/obsoleto/` — rollback/changelog antigos
 - Arquivos em `arquivo-historico/` para deploy
 
-## Estado do projeto (11/06/2026)
+## Estado do projeto (14/06/2026)
 
-- **FASE 1–8:** ✅ repo (FASE 8 alertas v1.8.9/v1.5.79)
-- **FASE 9 Folha CLT:** ✅ v1.8.10/v1.5.80
-- **Dashboard narrativo + folha prop. + semana atual:** ✅ v1.8.15/v1.5.81 prod.
-- **FASE 14 mini-DRE:** 🟡 memorial + plano (aguarda revisão sócio)
+- **FASE 1–8:** ✅ prod
+- **FASE 9 Folha CLT:** ✅ prod · testes readonly **ok** 14/06 · I25 **fechado**
+- **FASE 14 mini-DRE:** 🟡 FE v1.8.16 · homolog sócio pendente
+
+## "Atualize tudo"
+
+Quando pedir **atualize tudo** — seguir **`docs/ativos/PROTOCOLO_ATUALIZAR_TUDO.md`** (handoff, mapa erros, protocolos, arquitetura, diagramas, planilhas, histórico, pasta C).
 
 ## Ao encerrar sessão
 

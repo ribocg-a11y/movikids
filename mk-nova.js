@@ -107,12 +107,18 @@ function atualizarNovaSummaryBar_() {
 
 function toggleBotoesConfirmarNova_() {
   const ok = !!novaState.pagamento;
+  const qrOnly = typeof mkComunicacaoQrOnly_ === 'function' && mkComunicacaoQrOnly_();
   const b1 = document.getElementById('btn-confirmar');
   const b2 = document.getElementById('btn-confirmar-iniciar');
   const hint = document.getElementById('nova-fechar-hint');
   if (b1) b1.style.display = ok ? 'block' : 'none';
-  if (b2) b2.style.display = ok ? 'block' : 'none';
-  if (hint) hint.style.display = ok ? 'block' : 'none';
+  if (b2) b2.style.display = (ok && !qrOnly) ? 'block' : 'none';
+  if (hint) {
+    hint.style.display = ok ? 'block' : 'none';
+    if (ok && qrOnly) {
+      hint.textContent = 'O cronômetro só começa após ▶ Iniciar na Home. Comunicação: QR do portal na mesa.';
+    }
+  }
 }
 
 function rowIndexFromSalvar_(d) {
@@ -601,6 +607,9 @@ async function confirmarLocacao() {
 
 /** I20: salva Pendente + SMS portal — cronômetro só no ▶ Iniciar da Home. */
 async function confirmarLocacaoEEnviarSms_() {
+  if (typeof mkComunicacaoQrOnly_ === 'function' && mkComunicacaoQrOnly_()) {
+    return confirmarLocacao();
+  }
   if (!novaState.veiculo || !novaState.pagamento) {
     toast('Complete veículo, plano e pagamento.', 'error');
     return;

@@ -1,6 +1,6 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 11/06/2026 (FE **v1.8.16** + GAS **v1.5.82** prod. · FASE 14 mini-DRE)  
+**Atualizado:** 14/06/2026 (GAS **v1.5.91** prod. · I25 fechado · testes FOLHA+FASE9 **ok** 08:23)  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **Repo local:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`  
@@ -51,7 +51,7 @@ Continuo o MOVI KIDS. Repo: C:\Users\riboc\Documents\Codex\2026-05-30\files-ment
 
 - Ler: este arquivo → `PLANO_PRIORIDADES` → `ESTADO_ATUAL` → `REGRAS` → `ACESSOS_E_AUTORIZACOES` (§7 = agente vs você)
 - Ignorar handoff antigo em `docs/arquivo/planos/`
-- Informar: FE **v1.8.16**, GAS **v1.5.82** · ping prod. **v1.5.82**
+- Informar: FE **v1.8.20**, GAS **v1.5.91** · comunicação **QR only**
 - **Commit + push automáticos** após mudanças FE/docs — não pedir autorização ao usuário
 - **Toda resposta:** `Mudança no AppScript: sim|não` + link canônico `.gs` (Regra 16)
 - Deixar claro: **agente** no **PC** (código, testes, planilha); **você** Nova versão GAS Web; **tablet no balcão** = validação operação (não confundir com seu computador)
@@ -70,6 +70,7 @@ Continuo o MOVI KIDS. Repo: C:\Users\riboc\Documents\Codex\2026-05-30\files-ment
 | 5 | Ao encerrar sessão: atualizar este arquivo + checklist se algo mudou |
 | 6 | **Modo máximo potencial:** fluxo F0–F14 + dois aparelhos + resumo publicação antes de push (ver § Modo agente abaixo) |
 | 7 | **Publicação FE:** `pre-push-check` → commit → push → **`verify-publish-complete`** (I24); bump **mk-version + sw + index.html** juntos (I3) |
+| 8 | **"Atualize tudo":** seguir **`PROTOCOLO_ATUALIZAR_TUDO.md`** (handoff, mapa erros, protocolos, arquitetura, planilhas, histórico, pasta C) |
 
 ---
 
@@ -89,9 +90,10 @@ Regra Cursor: `.cursor/rules/handoff-movikids.mdc` § Modo de operação.
 
 | Camada | Versão | Verificação |
 |--------|--------|-------------|
-| **Frontend** | **v1.8.16** | `mk-version.js` · `?force=1.8.16` |
+| **Frontend** | **v1.8.20** | `mk-version.js` · `?force=1.8.20` · **QR only** (sem SMS/WA) |
 | **Service Worker** | **1.8.16** | `sw.js` |
-| **Apps Script (código + ping)** | **v1.5.82** | clasp push ✅ · Nova versão Web ✅ |
+| **Apps Script (código + ping)** | **v1.5.91** | clasp push ✅ · Nova versão Web ✅ (13/06) |
+| **Aba FOLHA** | **OK** (I25) | B68 ~5269,96 · `folhaPlanejamento.fonte: FOLHA` |
 
 **Deploy ID GAS (único — nunca criar outro):** `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y`
 
@@ -119,30 +121,49 @@ Regra Cursor: `.cursor/rules/handoff-movikids.mdc` § Modo de operação.
 | Deploy GAS | `DEPLOY_GAS_v1.5.32_AUTH.md` + **`DEPLOY_v1.5.80_FASE9_FOLHA_VIABILIDADE.md`** |
 | Deploy FE | **`DEPLOY_FE_v1.8.15_SEMANA_ATUAL.md`** · narrativa: `DEPLOY_FE_v1.8.12_DASHBOARD_NARRATIVO.md` · FASE 9: `DEPLOY_FE_v1.8.10_FASE9_FOLHA_VIABILIDADE.md` |
 | Folha / CLT | **`FASE_9_FOLHA_VIABILIDADE_CLT.md`** · `../referencia/FOLHA_PAGAMENTO_MEMORIAL_E_PLANILHA.md` |
+| Comunicação balcão | **`OPERACAO_COMUNICACAO_QR_ONLY.md`** · `DECISAO_COMUNICACAO_QR_CODE_2026-06.md` |
 | Mini-DRE | **`FASE_14_MINI_DRE.md`** · **`../referencia/MEMORIAL_MINI_DRE.md`** |
-| Bug / incidente | `MAPA_ERROS_FALHAS_BUGS.md` → I20–I23 → `docs/arquivo/incidentes/` |
-| QA tablet | **`PROTOCOLO_DIAGNOSTICO_E_TESTES.md`** → `TESTE_PROTOCOLO_DIAGNOSTICO.ps1` · homologação F5–F11: `TESTE_TABLET_F5_F7_F10_F11.ps1` |
+| Bug / incidente | `MAPA_ERROS_FALHAS_BUGS.md` → I20–I25 → `docs/arquivo/incidentes/` |
+| QA tablet | **`PROTOCOLO_DIAGNOSTICO_E_TESTES.md`** → `TESTE_PROTOCOLO_DIAGNOSTICO.ps1` · FOLHA: `TESTE_FOLHA_FORMULAS_READONLY.ps1` |
+| Atualizar tudo | **`PROTOCOLO_ATUALIZAR_TUDO.md`** |
 | Homologação | `HOMOLOGACAO_PRODUCAO_ASSISTIDA.md`, `CHECKLIST_PACOTE_K.md` |
 | Payback | `MEMORIAL_PAYBACK_INVESTIMENTO.md` |
 | Roadmap / planejamento | **`PLANO_FASES_6_15_COCKPIT_EXECUTIVO_2026-06.md`** · **`PLANEJAMENTO_ATUAL_2026-06.md`** · `PLANO_CONTINUIDADE_2026-06.md` |
 
 ---
 
-## Próximo passo (11/06/2026 — FASE 14 em prod.)
+## Próximo passo (14/06/2026 — I25 fechado · testes ok)
 
-**Produção:** ✅ GAS **v1.5.82** · FE **v1.8.16** · `TESTE_MINI_DRE_READONLY` ok
+**Produção:** ✅ GAS **v1.5.91** · FE **v1.8.16** · FOLHA **OK** · viabilidade CLT **verde 6/6** (validado 14/06 08:23)
 
 | # | Ação | Quem |
 |---|------|------|
-| 1 | Homolog Dashboard `?force=1.8.16` — cascata mini-DRE seção 1 | **Você** (PC) |
-| 2 | Opcional: aba PLANO_CONTAS | Você |
+| 1 | Homolog Dashboard `?force=1.8.16` — painel CLT + cascata mini-DRE | **Você** (PC) |
+| 2 | Opcional: aba PLANO_CONTAS | Você / Agente |
 | 3 | Tablet F0 smoke | Você (balcão) |
+
+**Validação 14/06/2026:**
+
+| Teste | Resultado |
+|-------|-----------|
+| `TESTE_FOLHA_FORMULAS_READONLY` | ok · 12/12 |
+| `TESTE_FASE9_FOLHA_READONLY` | ok · `CONTRATACAO_VIAVEL` · margem proj. 41,8% |
+
+**Comandos FOLHA (PowerShell — caminho absoluto ou `cd` no repo):**
+
+```powershell
+cd "C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github"
+powershell -ExecutionPolicy Bypass -File ".\scripts\testes\TESTE_FOLHA_FORMULAS_READONLY.ps1"
+powershell -ExecutionPolicy Bypass -File ".\scripts\testes\TESTE_FASE9_FOLHA_READONLY.ps1"
+```
 
 **Deploy (referência):**
 
 | Doc | Conteúdo |
 |-----|----------|
-| **`DEPLOY_v1.5.82_FASE14_MINI_DRE.md`** | **GAS v1.5.82 + FE v1.8.16** — mini-DRE |
+| **`DEPLOY_v1.5.91_FOLHA_REPAIR_USER_ENTERED.md`** | **GAS v1.5.91** — I25 USER_ENTERED |
+| **`../arquivo/incidentes/INCIDENTE_I25_FOLHA_FORMULAS_NAME_2026-06-13.md`** | Causa raiz + cronologia |
+| **`DEPLOY_v1.5.82_FASE14_MINI_DRE.md`** | GAS v1.5.82 + FE v1.8.16 — mini-DRE |
 | **`FASE_14_MINI_DRE.md`** | Checklist FASE 14 |
 | **`../referencia/MEMORIAL_MINI_DRE.md`** | Fórmulas cascata margens |
 | **`DEPLOY_FE_v1.8.15_SEMANA_ATUAL.md`** | FE v1.8.15 — semana atual |
@@ -201,6 +222,7 @@ C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\m
 | **Versões alinhadas** | `mk-version.js` = `sw.js` SW_VERSION após mudança FE. |
 | **Regra 16** | Toda resposta: `Mudança no AppScript: sim|não` + link `.gs` canônico |
 | **F4 / F9 pausados** | WhatsApp auto e supervisor — não reativar sem decisão explícita. |
+| **Comunicação balcão** | **Só QR portal** — SMS/WhatsApp **não enviar** (`OPERACAO_COMUNICACAO_QR_ONLY.md`, FE v1.8.20). |
 
 Regras Cursor automáticas: `.cursor/rules/` (GAS caminho PC, POST proibido, design DNA).
 
@@ -216,7 +238,7 @@ Invoke-RestMethod "https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5
 .\scripts\pre-push-check.ps1
 ```
 
-Esperado: ping alvo `versao: v1.5.80` (hoje prod. `v1.5.79`), pre-push verde, FE **1.8.10**.
+Esperado: ping `versao: v1.5.91`, pre-push verde, FE **1.8.16**.
 
 ---
 
@@ -285,5 +307,5 @@ Não criar novo handoff datado — manter **só este** em `docs/ativos/`.
 | Tablet Milena | Homologação FASE 5 assinada |
 | I21 mock idle | ✅ v1.7.96 |
 
-*Próxima revisão: **13/06/2026** — ver `PLANEJAMENTO_ATUAL_2026-06.md`.*
+*Próxima revisão: **14/06/2026** — ver `PROTOCOLO_ATUALIZAR_TUDO.md`.*
 

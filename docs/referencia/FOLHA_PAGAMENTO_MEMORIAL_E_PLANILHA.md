@@ -207,17 +207,52 @@ Premissas: SM R$ 1.621 · VT R$ 8,40 × 24 dias · VA **R$ 400/mês** (≈ R$ 15
 
 ---
 
-## 9. Próximos passos sugeridos
+## 9. Repair de fórmulas (I25 — GAS v1.5.91)
+
+Se células da aba FOLHA exibem `#NAME?` ou `#ERROR!`, o GAS **não** consegue gravar fórmulas PT via `setFormula`/`setValue`. Use o repair oficial:
+
+**PowerShell (Web App):**
+
+```powershell
+Invoke-RestMethod -Uri "https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec?action=repairFolhaAdmin&adminPin=1416"
+```
+
+**Validação:**
+
+```powershell
+.\scripts\testes\TESTE_FOLHA_FORMULAS_READONLY.ps1
+.\scripts\testes\TESTE_FASE9_FOLHA_READONLY.ps1
+```
+
+| Métrica | Valor esperado (2 func., jun/2026) |
+|---------|-------------------------------------|
+| B25 (VA/dia) | ~15,38 |
+| B68 (custo total) | ~5269,96 |
+| D36 (dias VT) | 24 |
+| `folhaPlanejamento.fonte` | FOLHA |
+
+**Implementação:** `folhaFlushFormulasUser_` — Sheets Advanced Service, `valueInputOption: USER_ENTERED`.  
+**Docs:** `DEPLOY_v1.5.91_FOLHA_REPAIR_USER_ENTERED.md` · `INCIDENTE_I25_FOLHA_FORMULAS_NAME_2026-06-13.md`
+
+**Regra:** após qualquer deploy GAS que altere fórmulas FOLHA, rodar repair + teste readonly.
+
+**Validação produção 14/06/2026:** `TESTE_FOLHA_FORMULAS_READONLY` ok · B68=5269,96 · incidente **I25 fechado**.
+
+---
+
+## 10. Próximos passos sugeridos
 
 1. Executar script e preencher **ENTRADA**  
 2. Enviar print dos totais ao **contador**  
 3. Solicitar **CCT MA** e atualizar linha “Piso CCT” na aba  
 4. Validar escala com **Golden Shopping** (normas de lojista)  
-5. ~~Integrar custo folha no **Dashboard**~~ → **FASE 9** GAS v1.5.80 + FE v1.8.10 (`viabilidadeContratacao`, painel `#mk-contratacao-panel`)
+5. ~~Integrar custo folha no **Dashboard**~~ → **FASE 9** ✅ prod (GAS v1.5.91 + FE v1.8.10+)
 
 ---
 
 **Arquivos relacionados**
 
 - Script instalação: `scripts/planilha/instalarAbaFolha.gs`  
+- Repair GAS: `repairFolhaAdmin` / `repairFolhaFormulasRemote`  
+- Teste: `scripts/testes/TESTE_FOLHA_FORMULAS_READONLY.ps1`  
 - Planilha: `1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618`

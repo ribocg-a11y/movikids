@@ -1,0 +1,44 @@
+---
+description: Comando "atualize tudo" — checklist obrigatório de documentação e estado MOVI KIDS
+alwaysApply: true
+---
+
+# "Atualize tudo" — MOVI KIDS
+
+Quando o usuário disser **"atualize tudo"**, **"registre tudo"**, **"atualize documentação"** ou equivalente — **executar este checklist completo**, sem pedir confirmação item a item.
+
+## Repo (pasta no C)
+
+**Caminho canônico:**
+
+`C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`
+
+**GAS canônico:**
+
+`C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github\MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs`
+
+## Checklist (ordem)
+
+1. **Handoff** — `docs/ativos/HANDOFF_NOVO_CHAT.md` (produção, próximo passo, comandos)
+2. **Estado** — `docs/ativos/ESTADO_ATUAL.md` (versões, entregas, validação)
+3. **Planejamento** — `PLANEJAMENTO_ATUAL_2026-06.md`, `PLANO_PRIORIDADES_2026-06.md`
+4. **Mapa de erros** — `MAPA_ERROS_FALHAS_BUGS.md` (I*, versões de referência)
+5. **Protocolos** — `PROTOCOLO_DIAGNOSTICO_E_TESTES.md`, `PROTOCOLO_ATUALIZAR_TUDO.md`
+6. **Arquitetura / fluxos / diagramas** — `MAPA_CODIGO_ARQUITETURA.md`, fases ativas (`FASE_*.md`)
+7. **Deploy / processos** — `DEPLOY_*.md` da versão atual, `DEPLOY_GAS_v1.5.32_AUTH.md`, `scripts/deploy-gas.ps1`
+8. **Histórico** — `docs/arquivo/incidentes/INCIDENTE_*.md` se houve incidente ou re-validação
+9. **Planilhas** — memorial e estado abas; **comunicação:** `OPERACAO_COMUNICACAO_QR_ONLY.md`
+10. **Índice e entrada** — `docs/INDICE.md`, `README.md`, `AGENTS.md`
+11. **Testes** — `scripts/testes/README.md`; alinhar versões esperadas nos `.ps1` se mudou GAS/FE
+
+## Evidência
+
+Se o usuário colou output de teste ou repair — registrar data, métricas (B68, ping, gates) nos docs ativos e no incidente se aplicável.
+
+## Não fazer sem pedido explícito
+
+- `git commit` / `git push` (regra do usuário)
+- Editar planilha Google diretamente (só documentar estado)
+- `clasp deploy`
+
+Doc mestre: `docs/ativos/PROTOCOLO_ATUALIZAR_TUDO.md`

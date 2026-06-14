@@ -1,78 +1,68 @@
 # Decisão operacional — Comunicação via QR Code (jun/2026)
 
-**Data:** 06/06/2026  
-**Decisão:** **Pular Sprint 3 (F4 WhatsApp)** e **não investir em SMS gateway** no curto prazo.  
-**Canal oficial no balcão:** **QR Code** → portal `acompanhar.html`.
+**Data:** 06/06/2026 · **Reforço:** 14/06/2026  
+**Decisão:** **Zero SMS/WhatsApp na operação** até serviço de mensagens contratado estar pronto.  
+**Canal oficial no balcão:** **QR Code** → portal `acompanhar.html`.  
+**Operação detalhada:** **`OPERACAO_COMUNICACAO_QR_ONLY.md`**
 
 ---
 
-## Motivo (problemas reais)
+## Modo operação (14/06/2026)
+
+| Item | Status |
+|------|--------|
+| Envio SMS pelo app | ⏸ **Desligado** (`MK_COMUNICACAO_MODO = 'qr_only'`, FE v1.8.20) |
+| WhatsApp (manual ou F4 auto) | ⏸ **Não usar** |
+| Alertas 5 min / esgotado (beep, modal) | ✅ **Ativos** — sem obrigação de mensagem |
+| QR portal | ✅ **Canal único** com responsável |
+
+**Motivo reforço:** serviço de mensagens contratado — integração **depois**; até lá nada de envio na loja.
+
+---
+
+## Motivo original (06/06/2026)
 
 | Problema | Impacto |
 |----------|---------|
 | Várias mensagens automáticas (WhatsApp/SMS) | Conta **bloqueada 4 dias** |
-| SMS no número novo | **Não entrega** — fica sem enviar |
-| Risco operacional | Pais sem aviso + loja sem canal confiável |
-
-**Conclusão:** automação de mensagens (F4 + campanhas SMS) **pausada até nova avaliação** — provavelmente meses, não semanas.
+| SMS no número novo | **Não entrega** |
+| Risco operacional | Pais sem aviso confiável |
 
 ---
 
 ## O que usar no balcão (agora)
 
-### 1. QR Code do portal (principal)
+### 1. QR Code do portal (único canal)
 
 | Item | Valor |
 |------|-------|
 | **URL** | https://ribocg-a11y.github.io/movikids/acompanhar.html |
-| **Cartaz balcão (imprimir)** | `assets/qr-balcao-imprimir.html` — visual **portal carrossel** · **A5** + gráficos de fundo |
-| **Online (após push)** | https://ribocg-a11y.github.io/movikids/assets/qr-balcao-imprimir.html |
-| **QR só (SVG/PNG)** | `assets/qr-portal-acompanhar.svg` · `.png` |
-| **Regenerar QR** | `node scripts/generate-portal-qr.js` |
+| **Cartaz balcão** | `assets/qr-balcao-imprimir.html` |
+| **Strip Home** | `#mk-qr-balcao-strip` (fixo, v1.7.89+) |
 
-**Fluxo:** operador mostra QR na mesa / tablet → responsável escaneia → digita **telefone com DDD** → vê timer das crianças (carrossel v1.7.47+).
+**Fluxo:** operador mostra QR → responsável escaneia → **telefone com DDD** → timer (±2s após ▶ Iniciar).
 
-### 2. WhatsApp manual (opcional, sem automação)
+### 2. ~~WhatsApp manual~~ — pausado na operação
 
-- Operador pode **copiar link** ou falar o portal — **não** disparar várias mensagens em sequência.
-- Botões `abrirWhatsApp` no app permanecem como **fallback manual** (1 conversa por vez); **não** expandir F4.
+Código permanece no repo para reativação futura. **Não usar no balcão.**
 
-### 3. SMS — não depender
+### 3. ~~SMS~~ — pausado na operação
 
-- Botões SMS no app **não são canal oficial** até gateway estável.
-- Se falhar: mensagem no app já sugere QR (`sms-fail-hint`).
+Gateway DJVJRL e GAS `enviarSmsResponsavel_` permanecem — **FE não chama** em `qr_only`. Reativar com `MK_COMUNICACAO_MODO = 'full'`.
 
 ---
 
-## O que fica pausado (não fazer)
+## O que fica pausado
 
 | Item | Status |
 |------|--------|
-| **Sprint 3 — F4 WhatsApp completo** | ⏸ **Cancelado do roadmap ativo** |
-| Inventário mensagens obrigatórias (W.1–W.6) | ⏸ |
-| Novas integrações SMS Gateway | ⏸ |
-| Campanhas / dedup / envio em massa | ⏸ |
-| Trocar gateway ou número só para “fazer SMS voltar” | ⏸ até política clara |
+| F4 WhatsApp/SMS automático | ⏸ |
+| Botões SMS nos cards / alertas | ⏸ ocultos (v1.8.20) |
+| SMS obrigatório ao esgotar tempo | ⏸ removido |
+| SMS ao estender / cadastro | ⏸ |
+| Campanhas / envio em sequência | ⏸ |
 
-**Reavaliar quando:** conta WA estável 30+ dias **e** teste manual de 1 SMS/dia com entrega comprovada — não antes.
-
----
-
-## Roadmap ajustado
-
-```mermaid
-flowchart LR
-  K[Pacote K CRM] --> L[Pacote L UX]
-  L --> B[Backlog B7 regressao]
-  F4[F4 WhatsApp] -. pausado .- X[sem prazo]
-```
-
-| Ordem | Sprint | Foco |
-|-------|--------|------|
-| **Atual** | K.3–K.4 tablet | Relacionamento + checklist |
-| **Próximo** | **L — UX polish** | Balcão mais rápido (DNA portal) |
-| **Depois** | B7, B1… | Confiabilidade / KPIs |
-| ~~Jul F4~~ | — | **Pausado** |
+**Reativar quando:** serviço contratado homologado + teste entrega + decisão explícita sócio.
 
 ---
 
@@ -80,20 +70,20 @@ flowchart LR
 
 | # | Ação | OK |
 |---|------|-----|
-| 1 | QR impresso ou em tablet fixo no balcão | [ ] (strip Home v1.7.89 + link Sistema) |
-| 2 | Operador treinado: “escaneie e coloque seu telefone” | [ ] |
-| 3 | **Não** clicar SMS em sequência para vários clientes | [ ] |
-| 4 | Portal testado: timer ±2s após iniciar locação | [ ] |
+| 1 | QR impresso ou strip Home visível | [ ] |
+| 2 | Operador: "escaneie e coloque DDD" | [ ] |
+| 3 | **Não** depender de SMS/WhatsApp | [ ] |
+| 4 | Alertas do app: avisar verbalmente + QR | [ ] |
+| 5 | Portal ±2s após ▶ Iniciar | [ ] |
 
 ---
 
 ## Documentos relacionados
 
-- `PLANO_CONTINUIDADE_2026-06.md` — roadmap atualizado
-- `PACOTE_K_vs_F4_WHATSAPP.md` — F4 marcado pausado
-- `ANALISE_SMS_DELIVERY_MILENA_2026-06-03.md` — histórico SMS
-- `REGRAS_DE_PUBLICACAO_SEGURA.md` Regra 3 — zona crítica WA (não expandir)
+- **`OPERACAO_COMUNICACAO_QR_ONLY.md`** — fluxo operacional
+- `PROTOCOLO_DIAGNOSTICO_E_TESTES.md` — F2/F7 (alertas sem F4/F8 SMS)
+- `PLANO_CONTINUIDADE_2026-06.md`
 
 ---
 
-*Decisão registrada por solicitação explícita da operação (06/06/2026).*
+*Decisão 06/06/2026 · reforço operação zero-mensagem 14/06/2026.*
