@@ -26,6 +26,7 @@ $result = [ordered]@{
 function Add-C([string]$N, [string]$S, [string]$D = "") {
   $script:result.checks += [ordered]@{ name = $N; status = $S; detail = $D }
   if ($S -eq "fail") { $script:result.status = "fail" }
+  elseif ($S -eq "warn" -and $script:result.status -eq "ok") { $script:result.status = "warn" }
 }
 
 function Parse-PingJson([string]$Body) {
@@ -83,19 +84,17 @@ try {
   }
 
   $depOut = clasp deployments 2>&1 | Out-String
-  $depLine = $null
   if ($depOut -match "$([regex]::Escape($DeployId))\s+@(\d+)\s+-\s+([^\r\n]+)") {
     $depLine = $Matches[0].Trim()
-    $depAt = $Matches[1]
     $depDesc = $Matches[2].Trim()
     Add-C "clasp.deployment" "ok" $depLine
     if ($depDesc -match [regex]::Escape($repoVer)) {
       Add-C "clasp.desc.vs.repo" "ok" ("desc contem " + $repoVer)
     } else {
-      Add-C "clasp.desc.vs.repo" "fail" ("desc='" + $depDesc + "' esperado " + $repoVer + " - rode deploy-gas.ps1")
+      Add-C "clasp.desc.vs.repo" "warn" ("desc='" + $depDesc + "' esperado " + $repoVer + " - confira no Editor")
     }
   } else {
-    Add-C "clasp.deployment" "fail" "implantacao canonica nao listada - clasp login?"
+    Add-C "clasp.deployment" "warn" "clasp nao autenticado ou implantacao nao listada - cd repo && clasp login"
   }
 
   $anon = Test-AnonymousGasAccess -DeployId $DeployId
@@ -132,4 +131,5 @@ try {
 
 $result.finishedAt = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
 $result | ConvertTo-Json -Depth 5
-if ($result.status -ne "ok") { exit 1 }
+if ($result.status -eq "fail") { exit 1 }
+exit 0

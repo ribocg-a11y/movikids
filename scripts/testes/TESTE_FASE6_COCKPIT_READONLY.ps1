@@ -57,7 +57,7 @@ try {
   }
 
   $result.status = "ok"
-  $result.summary = "FASE 6 cockpit OK — narrativa + ocupacaoMediaFrota + cockpit"
+  $result.summary = "FASE 6 cockpit OK - narrativa + ocupacaoMediaFrota + cockpit"
 }
 catch {
   $result.status = "fail"

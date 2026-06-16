@@ -4,3 +4,4 @@ gas/Code.gs
 package-lock.json
 portal_server.out.log
 portal_server.err.log
+financeiro/logs/

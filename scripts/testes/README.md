@@ -4,10 +4,16 @@ Scripts em `scripts/testes/`. Documentação: `docs/ativos/PROTOCOLO_DIAGNOSTICO
 
 **Repo:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github` — scripts `.ps1` exigem `cd` nesta pasta **ou** caminho absoluto.
 
-## Orquestrador
+| **Protocolo mestre (varredura completa)** | **`TESTE_PROTOCOLO_MESTRE.ps1`** ou **`.\protocolo-mestre.ps1`** na raiz do repo |
 
 ```powershell
-# Completo (inclui testes que GRAVAM locações de teste + cleanup)
+cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github
+.\protocolo-mestre.ps1
+.\verify-gas-deploy.ps1
+```
+
+```powershell
+# Orquestrador F0-F14 (subset)
 .\scripts\testes\TESTE_PROTOCOLO_DIAGNOSTICO.ps1
 
 # Sem rede (só pre-push + guards)
