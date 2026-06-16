@@ -6,12 +6,12 @@ Sistema operacional para locações — balcão (tablet), portal do responsável
 
 **Planejamento:** [PLANEJAMENTO_ATUAL_2026-06.md](docs/ativos/PLANEJAMENTO_ATUAL_2026-06.md) · [PLANO_PRIORIDADES](docs/ativos/PLANO_PRIORIDADES_2026-06.md)
 
-## Produção (14/06/2026 — GAS v1.5.91 + FE v1.8.20)
+## Produção (16/06/2026 — GAS v1.5.92 + FE v1.8.27)
 
 | Camada | Versão repo | Produção alvo |
 |--------|-------------|---------------|
-| Frontend | **v1.8.20** | https://ribocg-a11y.github.io/movikids/?force=1.8.20 |
-| Apps Script | **v1.5.91** | ping ✅ · `DEPLOY_v1.5.91_FOLHA_REPAIR_USER_ENTERED.md` |
+| Frontend | **v1.8.27** | https://ribocg-a11y.github.io/movikids/?force=1.8.27 |
+| Apps Script | **v1.5.92** | ping ✅ · @143 · `DEPLOY_v1.5.91_FOLHA_REPAIR_USER_ENTERED.md` (base) |
 | Aba FOLHA | memorial B68 | OK (I25) · B68 ~5269,96 |
 
 ## Novo chat / agente Cursor

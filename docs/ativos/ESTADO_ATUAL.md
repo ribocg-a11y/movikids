@@ -1,4 +1,4 @@
-# MOVI KIDS — Estado atual (14/06/2026)
+# MOVI KIDS — Estado atual (16/06/2026)
 
 Referência única para alinhamento local × produção.
 
@@ -26,15 +26,15 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 | Camada | Versão repo | URL / ID |
 |--------|-------------|----------|
-| **Frontend** | **v1.8.23** | https://ribocg-a11y.github.io/movikids/?force=1.8.23 |
-| **Apps Script (código + ping)** | **v1.5.92** | @138 · `deploy-gas.ps1` · ping confirmado 14/06 |
+| **Frontend** | **v1.8.27** | https://ribocg-a11y.github.io/movikids/?force=1.8.27 |
+| **Apps Script (código + ping)** | **v1.5.92** | @143 · ping confirmado 16/06 |
 | **Aba FOLHA** | memorial B68 **OK** | [gid=179040058](https://docs.google.com/spreadsheets/d/1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618/edit#gid=179040058) · B68 ~5269,96 |
 
 **Editor Apps Script:** https://script.google.com/home/projects/19SIhkX9Tk7FiJA1JXu1OrUwssHdr3H5zc8q3rOjmBvqgWfXuHlk8xyf8/edit
 
 **Teste rápido GAS (ping):**  
 https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec?action=ping  
-→ produção: `versao: v1.5.92` (confirmado 14/06 · incidente I26 resolvido @138)
+→ produção: `versao: v1.5.92` (confirmado 16/06 · @143 · rótulo clasp `v1.5.95` é só descricao)
 
 **URL morta (não usar):** `AKfycbzc...` → 404
 
@@ -75,6 +75,7 @@ https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPe
 | I20 cronômetro | `INCIDENTE_I20_CRONOMETRO_RESOLUCAO_2026-06-07.md` — causa raiz + travas |
 | Teste I20 | `scripts/testes/TESTE_I20_COMPLETO_PROD.ps1` |
 | **Protocolo testes** | **`PROTOCOLO_DIAGNOSTICO_E_TESTES.md`** + `TESTE_PROTOCOLO_DIAGNOSTICO.ps1` |
+| **Protocolo mestre** | **`TESTE_PROTOCOLO_MESTRE.ps1`** · atalho `protocolo-mestre.ps1` na raiz |
 | **Protocolo "atualize tudo"** | **`PROTOCOLO_ATUALIZAR_TUDO.md`** |
 | **Comunicação balcão** | **`OPERACAO_COMUNICACAO_QR_ONLY.md`** · FE v1.8.20 · `MK_COMUNICACAO_MODO=qr_only` |
 | **Teste FOLHA fórmulas** | `TESTE_FOLHA_FORMULAS_READONLY.ps1` — gate pós-deploy I25 |
@@ -100,7 +101,12 @@ https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPe
 
 | Versão | Entrega |
 |--------|---------|
-| **v1.8.20** | Operação **QR only** — SMS/WA pausados; alertas mantidos; `MK_COMUNICACAO_MODO` |
+| **v1.8.27** | Logo oficial PNG transparente empty state Home |
+| **v1.8.24–26** | Header mobile DNA (`mk-mob-header`) · banner auto-update 12s |
+| **v1.8.23** | Mobile header contraste + auto-update banner |
+| **GAS v1.5.92** | `encerrarLocacao` mensagem Pendente vs Encerrada |
+| **16/06** | **Protocolo Mestre** — varredura F0–F14 + cleanup · scripts FASE6/P3/tablet corrigidos |
+| **v1.8.20** | Operação **QR only** — SMS/WA pausados |
 | **GAS v1.5.91** | **I25** — FOLHA repair USER_ENTERED |
 | **v1.8.16** + **GAS v1.5.82** | FASE 14 mini-DRE — cascata margens Dashboard |
 | **v1.8.15** + **GAS v1.5.81** | Semana corrente Dashboard + fix I3 cache-bust |

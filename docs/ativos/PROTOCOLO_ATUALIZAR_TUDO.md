@@ -39,14 +39,14 @@ Sincronizar **documentação + estado operacional** do projeto com a realidade a
 
 ---
 
-## Produção atual (14/06/2026)
+## Produção atual (16/06/2026)
 
 | Camada | Versão | Evidência |
 |--------|--------|-----------|
-| GAS ping | **v1.5.91** | `TESTE_FOLHA_FORMULAS_READONLY` 14/06 08:23 |
-| FE | **v1.8.16** | repo · homolog sócio pendente |
+| GAS ping | **v1.5.92** | ping 16/06 · @143 |
+| FE | **v1.8.27** | Pages live · Protocolo Mestre 16/06 |
 | Aba FOLHA | **OK** (I25) | B25=15,38 · B68=5269,96 · D36=24 · `fonte=FOLHA` |
-| FASE 9 CLT | **verde 6/6** | `TESTE_FASE9_FOLHA_READONLY` · `CONTRATACAO_VIAVEL` · margem proj. 41,8% |
+| FASE 9 CLT | **verde 6/6** | `TESTE_FASE9_FOLHA_READONLY` · `CONTRATACAO_VIAVEL` |
 
 ---
 
@@ -61,8 +61,11 @@ Invoke-RestMethod -Uri "https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGL
 **Testes (caminho absoluto ou `cd` no repo):**
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File "C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github\scripts\testes\TESTE_FOLHA_FORMULAS_READONLY.ps1"
-powershell -ExecutionPolicy Bypass -File "C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github\scripts\testes\TESTE_FASE9_FOLHA_READONLY.ps1"
+cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github
+.\protocolo-mestre.ps1
+.\verify-gas-deploy.ps1
+powershell -ExecutionPolicy Bypass -File ".\scripts\testes\TESTE_FOLHA_FORMULAS_READONLY.ps1"
+powershell -ExecutionPolicy Bypass -File ".\scripts\testes\TESTE_FASE9_FOLHA_READONLY.ps1"
 ```
 
 ---

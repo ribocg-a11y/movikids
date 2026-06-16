@@ -1,7 +1,7 @@
 # MOVI KIDS — Planejamento atual (pós-FASE 5)
 
-**Atualizado:** 14/06/2026 (I25 fechado · testes FOLHA+FASE9 ok)  
-**Produção:** FE **v1.8.16** · GAS **v1.5.91** · ping prod. **v1.5.91**  
+**Atualizado:** 16/06/2026 (Protocolo Mestre · FE v1.8.27 · GAS v1.5.92)  
+**Produção:** FE **v1.8.27** · GAS **v1.5.92** · ping prod. **v1.5.92**  
 **Documentos irmãos:** `PLANO_PRIORIDADES_2026-06.md` · `PLANO_CONTINUIDADE_2026-06.md` · `HANDOFF_NOVO_CHAT.md`  
 **Ciclo ativo:** **`PLANO_FASES_6_15_COCKPIT_EXECUTIVO_2026-06.md`** · FASE 9: **`FASE_9_FOLHA_VIABILIDADE_CLT.md`** ✅ prod · I25: **`INCIDENTE_I25_FOLHA_FORMULAS_NAME_2026-06-13.md`**
 
@@ -11,7 +11,7 @@
 
 Ciclo **FASE 0–5 + P2/P3 concluído** (07–09/06/2026). Balcão homologado, portal QR, payback, CONFIG e APIs unificadas.
 
-**Modo atual:** **FASE 14 mini-DRE** + **FOLHA OK (I25)**. GAS **v1.5.91** em prod. Sprint: **`FASE_14_MINI_DRE.md`**.
+**Modo atual:** **FASE 14 mini-DRE** ✅ · **FOLHA OK (I25)** · FE **v1.8.27** (UX mobile). GAS **v1.5.92** em prod. Pendente: homolog tablet F5/F7/F11.
 
 ---
 

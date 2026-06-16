@@ -1,10 +1,10 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 14/06/2026 (GAS **v1.5.92** @143 · FE **v1.8.23** · I26/I27 · agente não publica GAS Web)  
+**Atualizado:** 16/06/2026 (GAS **v1.5.92** @143 · FE **v1.8.27** · Protocolo Mestre · logo PNG · header DNA)  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **Repo local:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`  
-**GitHub:** `ribocg-a11y/movikids` · branch `main`
+**GitHub:** `ribocg-a11y/movikids` · branch `main` · HEAD **`8cd49c3`**
 
 ---
 
@@ -12,17 +12,17 @@
 
 | Papel | Aparelho | Quem | Uso típico |
 |-------|----------|------|------------|
-| **Gestão / dev** | **Computador** (Windows + Cursor) | **Você** (sócio/dev) | Código, GAS, deploy, testes `.ps1`, planilha OAuth, browser no PC |
+| **Gestão / dev** | **Computador** (Windows + Cursor) | **Você** (sócio/dev) | Código, testes `.ps1`, planilha OAuth, browser no PC |
 | **Operação balcão** | **Tablet** fixo no shopping | **Operadores** (Milena, Eduarda) | Locações, timer, PIN operador, PWA ícone na loja |
 
 **Regras para o agente:**
 
-1. **Você opera sempre do computador** — prints, chats e validações que você manda costumam ser do **PC**, não do tablet do balcão.
-2. O **tablet fica na operação** — homologação real (chip Turno, Nova locação, idle, PWA) exige **alguém no balcão** ou você indo até o tablet; o agente **não** substitui isso com browser no seu PC.
-3. **Sessão dual (I21):** no PC com PIN admin 1416 aparece **TABLET: Administrador**; no tablet dos operadores aparece **BALCÃO: Nome** — são camadas diferentes; idle e logout devem alinhar **GAS + aparelho do balcão**.
-4. Ao pedir “testar no tablet”, assumir: **você valida no físico do balcão**; agente roda protocolo HTTP + prepara `?force=versão` para você abrir lá.
+1. **Você opera sempre do computador** — prints e chats costumam ser do **PC**, não do tablet do balcão.
+2. O **tablet fica na operação** — homologação real (chip Turno, Nova, idle, PWA, alertas F7) exige **aparelho na loja**; agente **não** substitui isso.
+3. **Sessão dual (I21):** PC com PIN admin 1416 = **TABLET: Administrador**; tablet operadores = **BALCÃO: Nome**.
+4. Ao pedir “testar no tablet”, assumir: **você valida no físico**; agente roda protocolo HTTP + `?force=versão`.
 
-Detalhe: `ACESSOS_E_AUTORIZACOES.md` §7.0 · incidente I21.
+Detalhe: `ACESSOS_E_AUTORIZACOES.md` §7 · incidente I21.
 
 ---
 
@@ -37,68 +37,46 @@ Detalhe: `ACESSOS_E_AUTORIZACOES.md` §7.0 · incidente I21.
 Vamos dar continuidade ao projeto Movi Kids, tem uma pasta no C da minha máquina.
 ```
 
-Isso basta. A regra `.cursor/rules/handoff-movikids.mdc` manda o agente ler este arquivo e o planejamento **sem pedir mais nada**.
+A regra `.cursor/rules/handoff-movikids.mdc` manda o agente ler este arquivo **sem pedir mais nada**.
 
-### Opção B — mensagem explícita (opcional)
-
-Se o chat não estiver na pasta do projeto, use:
+### Opção B — explícita
 
 ```
 Continuo o MOVI KIDS. Repo: C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github
 ```
 
-### O que o agente faz sozinho (não precisa repetir)
+### O que o agente faz sozinho (não pedir autorização)
 
-- Ler: este arquivo → `PLANO_PRIORIDADES` → `ESTADO_ATUAL` → `REGRAS` → `ACESSOS_E_AUTORIZACOES` (§7 = agente vs você)
-- Ignorar handoff antigo em `docs/arquivo/planos/`
-- Informar: FE **v1.8.23**, GAS **v1.5.92** · comunicação **QR only**
-- **GAS:** agente **não** implanta Web App — só `prepare-gas-push.ps1` se pedido. Sócio: **Editar** `AKfycbwakQ...` no editor.
-- **Commit + push automáticos** após mudanças FE/docs — não pedir autorização ao usuário
-- **Toda resposta:** `Mudança no AppScript: sim|não` + link canônico `.gs` (Regra 16)
-- Deixar claro: **agente** no **PC** (código, testes, planilha); **GAS** via `deploy-gas.ps1`; **tablet no balcão** = validação operação
+- Ler docs ativos (ordem abaixo)
+- Informar: FE **v1.8.27**, GAS **v1.5.92**, comunicação **QR only**
+- **FE:** `pre-push-check` → commit → push → `verify-publish-complete` (sem pedir)
+- **GAS Web App:** agente **NUNCA** implanta — só `prepare-gas-push.ps1` se pedido; **você** Editor → Editar `AKfycbwakQ...` → Nova versão
+- Toda resposta: `Mudança no AppScript: sim|não` + link `.gs` canônico (Regra 16)
 
 ---
 
-## Comportamento esperado do agente (checklist)
-
-| # | Ação |
-|---|------|
-| 1 | Reconhecer pedido de continuidade — **sem** pedir caminho se workspace = `movikids-github` |
-| 2 | Ler os 5 docs ativos (ordem na seção abaixo) |
-| 3 | Se pedir **teste/diagnóstico**: seguir **`PROTOCOLO_DIAGNOSTICO_E_TESTES.md`** + `TESTE_PROTOCOLO_DIAGNOSTICO.ps1` |
-| 3b | Opcional: ping GAS + `pre-push-check.ps1` se for mexer em código |
-| 4 | Responder com: versões, fase ativa, **próximo passo**, **quem faz o quê** (agente vs você — `ACESSOS` §7) |
-| 5 | Ao encerrar sessão: atualizar este arquivo + checklist se algo mudou |
-| 6 | **Modo máximo potencial:** fluxo F0–F14 + dois aparelhos + resumo publicação antes de push (ver § Modo agente abaixo) |
-| 7 | **Publicação FE:** `pre-push-check` → commit → push → **`verify-publish-complete`** (I24); bump **mk-version + sw + index.html** juntos (I3) |
-| 8 | **"Atualize tudo":** seguir **`PROTOCOLO_ATUALIZAR_TUDO.md`** (handoff, mapa erros, protocolos, arquitetura, planilhas, histórico, pasta C) |
-
----
-
-## Modo de operação do agente (máximo potencial)
-
-1. **Nunca patch isolado** — mapear fluxo (`PROTOCOLO` §2) e incidentes (`MAPA_ERROS`) antes de codar.
-2. **PC ≠ tablet** — homologação operação = aparelho **na loja**; agente valida HTTP/ping no PC.
-3. **UI fixa no balcão** — portal dos pais, chip turno: sem ocultar sem pedido explícito.
-4. **Antes de push:** `pre-push-check` + bloco: FE · GAS? · testes · checklist tablet · **`index.html ?v=`** alinhado.
-5. **Proatividade:** propor teste + impacto; registrar I* se bug sistêmico; não fechar sem F0.
-
-Regra Cursor: `.cursor/rules/handoff-movikids.mdc` § Modo de operação.
-
----
-
-## Produção (verificar sempre no início)
+## Produção (16/06/2026)
 
 | Camada | Versão | Verificação |
 |--------|--------|-------------|
-| **Frontend** | **v1.8.23** | `mk-version.js` · `?force=1.8.23` · **QR only** (sem SMS/WA) |
-| **Service Worker** | **1.8.23** | `sw.js` |
-| **Apps Script (código + ping)** | **v1.5.92** | `deploy-gas.ps1` · @138 · ping confirmado 14/06 |
+| **Frontend** | **v1.8.27** | https://ribocg-a11y.github.io/movikids/?force=1.8.27 |
+| **Service Worker** | **1.8.27** | `sw.js` |
+| **Apps Script (ping)** | **v1.5.92** | ping JSON 16/06 · `@143` clasp (rótulo desc. `v1.5.95` — só etiqueta, ping = v1.5.92) |
 | **Aba FOLHA** | **OK** (I25) | B68 ~5269,96 · `folhaPlanejamento.fonte: FOLHA` |
+| **Comunicação** | **QR only** | `OPERACAO_COMUNICACAO_QR_ONLY.md` |
 
-**Deploy ID GAS (único — nunca criar outro):** `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y`
+**Deploy ID GAS (único):** `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y`
 
 **Editor GAS:** https://script.google.com/home/projects/19SIhkX9Tk7FiJA1JXu1OrUwssHdr3H5zc8q3rOjmBvqgWfXuHlk8xyf8/edit
+
+**Atalhos teste (sempre `cd` no repo antes):**
+
+```powershell
+cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github
+.\verify-gas-deploy.ps1
+.\protocolo-mestre.ps1
+.\scripts\pre-push-check.ps1
+```
 
 ---
 
@@ -106,103 +84,68 @@ Regra Cursor: `.cursor/rules/handoff-movikids.mdc` § Modo de operação.
 
 | # | Documento | Para quê |
 |---|-----------|----------|
-| 1 | **Este arquivo** | Contexto, regras, próximo passo |
-| 2 | `PLANO_PRIORIDADES_2026-06.md` | Fases 0–15, checklist vivo |
-| 2b | **`PLANO_FASES_6_15_COCKPIT_EXECUTIVO_2026-06.md`** | **Ciclo ativo** — cockpit, UX admin, KPIs, impacto por página |
-| 3 | `ESTADO_ATUAL.md` | Versões, pacotes entregues, validação pós-deploy |
-| 4 | `REGRAS_DE_PUBLICACAO_SEGURA.md` | Travas antes de commit/push/deploy |
-| 5 | `ACESSOS_E_AUTORIZACOES.md` | Quem pode o quê — app, infra, agente vs humano |
-| 6 | `MAPA_CODIGO_ARQUITETURA.md` | Anatomia código — o que liga com o quê, zonas sensíveis |
-| 7 | `../INDICE.md` | Mapa completo se precisar de doc específico |
+| 1 | **Este arquivo** | Contexto, produção, próximo passo |
+| 2 | `PLANO_PRIORIDADES_2026-06.md` | Fases 0–15 |
+| 3 | `ESTADO_ATUAL.md` | Versões, entregas, testes |
+| 4 | `REGRAS_DE_PUBLICACAO_SEGURA.md` | Travas push/deploy |
+| 5 | `ACESSOS_E_AUTORIZACOES.md` | Agente vs você §7 |
+| 6 | `MAPA_CODIGO_ARQUITETURA.md` | Anatomia código |
+| 7 | `../INDICE.md` | Mapa docs |
 
-### Por tarefa (consulta rápida)
+### Por tarefa
 
-| Tarefa | Ler |
-|--------|-----|
-| Deploy GAS | `DEPLOY_GAS_v1.5.32_AUTH.md` + **`DEPLOY_v1.5.80_FASE9_FOLHA_VIABILIDADE.md`** |
-| Deploy FE | **`DEPLOY_FE_v1.8.15_SEMANA_ATUAL.md`** · narrativa: `DEPLOY_FE_v1.8.12_DASHBOARD_NARRATIVO.md` · FASE 9: `DEPLOY_FE_v1.8.10_FASE9_FOLHA_VIABILIDADE.md` |
-| Folha / CLT | **`FASE_9_FOLHA_VIABILIDADE_CLT.md`** · `../referencia/FOLHA_PAGAMENTO_MEMORIAL_E_PLANILHA.md` |
-| Comunicação balcão | **`OPERACAO_COMUNICACAO_QR_ONLY.md`** · `DECISAO_COMUNICACAO_QR_CODE_2026-06.md` |
-| Mini-DRE | **`FASE_14_MINI_DRE.md`** · **`../referencia/MEMORIAL_MINI_DRE.md`** |
-| Bug / incidente | `MAPA_ERROS_FALHAS_BUGS.md` → I20–I25 → `docs/arquivo/incidentes/` |
-| QA tablet | **`PROTOCOLO_DIAGNOSTICO_E_TESTES.md`** → `TESTE_PROTOCOLO_DIAGNOSTICO.ps1` · FOLHA: `TESTE_FOLHA_FORMULAS_READONLY.ps1` |
-| Atualizar tudo | **`PROTOCOLO_ATUALIZAR_TUDO.md`** |
-| Homologação | `HOMOLOGACAO_PRODUCAO_ASSISTIDA.md`, `CHECKLIST_PACOTE_K.md` |
-| Payback | `MEMORIAL_PAYBACK_INVESTIMENTO.md` |
-| Roadmap / planejamento | **`PLANO_FASES_6_15_COCKPIT_EXECUTIVO_2026-06.md`** · **`PLANEJAMENTO_ATUAL_2026-06.md`** · `PLANO_CONTINUIDADE_2026-06.md` |
+| Tarefa | Ler / rodar |
+|--------|-------------|
+| Teste completo | **`protocolo-mestre.ps1`** · `PROTOCOLO_DIAGNOSTICO_E_TESTES.md` |
+| Atualize tudo | **`PROTOCOLO_ATUALIZAR_TUDO.md`** |
+| Folha / CLT | `FASE_9_FOLHA_VIABILIDADE_CLT.md` · `TESTE_FASE9_FOLHA_READONLY.ps1` |
+| QA tablet | `CHECKLIST_TABLET_v1.7.85.md` · F5/F7/F10/F11 na loja |
+| Bug | `MAPA_ERROS_FALHAS_BUGS.md` |
 
 ---
 
-## Próximo passo (14/06/2026 — I25 fechado · testes ok)
+## Próximo passo (16/06/2026)
 
-**Produção:** ✅ GAS **v1.5.91** · FE **v1.8.16** · FOLHA **OK** · viabilidade CLT **verde 6/6** (validado 14/06 08:23)
+**Produção:** ✅ GAS v1.5.92 · FE v1.8.27 · FOLHA OK · Protocolo Mestre executado 16/06
 
 | # | Ação | Quem |
 |---|------|------|
-| 1 | Homolog Dashboard `?force=1.8.16` — painel CLT + cascata mini-DRE | **Você** (PC) |
-| 2 | Opcional: aba PLANO_CONTAS | Você / Agente |
-| 3 | Tablet F0 smoke | Você (balcão) |
+| 1 | **Tablet loja:** F5 ▶ 10:00 imediato · F7 alertas 5min/expirado · F11 portal ±2s · F10 2 abas PWA | **Você** |
+| 2 | Dashboard `?force=1.8.27` — header mobile + logo empty state + metas loc/dia | **Você** (PC ou tablet) |
+| 3 | Opcional: corrigir **rótulo** clasp @143 para `v1.5.92` (só organização) | **Você** (Editor, sem Nova versão obrigatória) |
 
-**Validação 14/06/2026:**
+**Protocolo Mestre 16/06:** 18+ suites OK · FASE6/P3/scripts corrigidos · cleanup 0 resíduos · log em `financeiro/logs/` (gitignored).
 
-| Teste | Resultado |
-|-------|-----------|
-| `TESTE_FOLHA_FORMULAS_READONLY` | ok · 12/12 |
-| `TESTE_FASE9_FOLHA_READONLY` | ok · `CONTRATACAO_VIAVEL` · margem proj. 41,8% |
+**Entregas FE recentes (v1.8.23–1.8.27):**
 
-**Comandos FOLHA (PowerShell — caminho absoluto ou `cd` no repo):**
+- Header mobile DNA (`mk-mob-header`, sidebar family)
+- Banner auto-update 12s
+- Logo oficial PNG transparente no empty state Home
+- Protocolo Mestre + atalhos raiz `verify-gas-deploy.ps1` / `protocolo-mestre.ps1`
 
-```powershell
-cd "C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github"
-powershell -ExecutionPolicy Bypass -File ".\scripts\testes\TESTE_FOLHA_FORMULAS_READONLY.ps1"
-powershell -ExecutionPolicy Bypass -File ".\scripts\testes\TESTE_FASE9_FOLHA_READONLY.ps1"
-```
-
-**Deploy (referência):**
-
-| Doc | Conteúdo |
-|-----|----------|
-| **`DEPLOY_v1.5.91_FOLHA_REPAIR_USER_ENTERED.md`** | **GAS v1.5.91** — I25 USER_ENTERED |
-| **`../arquivo/incidentes/INCIDENTE_I25_FOLHA_FORMULAS_NAME_2026-06-13.md`** | Causa raiz + cronologia |
-| **`DEPLOY_v1.5.82_FASE14_MINI_DRE.md`** | GAS v1.5.82 + FE v1.8.16 — mini-DRE |
-| **`FASE_14_MINI_DRE.md`** | Checklist FASE 14 |
-| **`../referencia/MEMORIAL_MINI_DRE.md`** | Fórmulas cascata margens |
-| **`DEPLOY_FE_v1.8.15_SEMANA_ATUAL.md`** | FE v1.8.15 — semana atual |
-| **`DEPLOY_FE_v1.8.12_DASHBOARD_NARRATIVO.md`** | **FE v1.8.11–1.8.14** — Dashboard narrativo |
-| **`DEPLOY_v1.5.80_FASE9_FOLHA_VIABILIDADE.md`** | FASE 9 base folha CLT |
-| **`../arquivo/incidentes/INCIDENTE_I3_CACHE_BUST_INDEX_2026-06-11.md`** | I3 recorrência 11/06 |
-
-**Regra 16:** toda resposta do agente termina com `Mudança no AppScript: sim|não` + link canônico.
-
-**Últimos commits (main = origin após push):**
+**Últimos commits:**
 
 | Hash | Entrega |
 |------|---------|
-| `393c8b7` | Docs v1.8.15 + incidente I3 |
-| `aeec240` | FE v1.8.15 — semana atual Dashboard |
-| `3f5aeea` | GAS v1.5.81 — ping + folha proporcional |
-| `7e73fdf` | GAS v1.5.81 + FE v1.8.14 — comparativo mesma base |
-
-Detalhe vivo: seção **Execução — status ao vivo** em `PLANO_PRIORIDADES_2026-06.md`.
+| `8cd49c3` | Protocolo Mestre + fix scripts teste + atalhos verify-gas |
+| `fff8632` | Logo PNG transparente empty state v1.8.27 |
+| `c4d902b` | Header mobile DNA v1.8.24 |
+| `fff8632` | … (ver `git log -10`) |
 
 ---
 
-## Arquivos canônicos (única fonte de código)
+## Arquivos canônicos
 
 | Artefato | Caminho |
 |----------|---------|
-| **GAS (único na raiz)** | `MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs` |
-| GAS legado (não implantar) | `arquivo-historico/*.gs` |
-| Clasp (gerado, não editar) | `gas/Code.gs` via `scripts/sync-gas-to-clasp.ps1` |
-| Versão FE | `mk-version.js` + `sw.js` |
-| CSS balcão | `mk-design.css` + `mk-app.css` (Pacote M.1) |
-| App principal | `index.html` (só HTML), `mk-globals.js`, `mk-core.js` … `mk-boot.js`, `mk-auth.js` |
-| Portal | `acompanhar.html`, `foto-moldura.html` |
-| Testes | `scripts/testes/` — ver `scripts/testes/README.md` |
-| Pre-push CI | `scripts/pre-push-check.ps1` |
-| Deploy GAS script | `scripts/deploy-gas.ps1` |
+| **GAS** | `MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs` |
+| Versão FE | `mk-version.js` + `sw.js` + **`index.html ?v=`** |
+| CSS | `mk-design.css` + `mk-app.css` |
+| Logo | `assets/logo-movi-kids.png` (PNG RGBA) |
+| Testes | `scripts/testes/` · **`TESTE_PROTOCOLO_MESTRE.ps1`** |
+| Pre-push | `scripts/pre-push-check.ps1` |
 
-**Caminho PC do .gs (regra de ouro após alteração GAS):**
+**GAS PC:**
 
 ```
 C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github\MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs
@@ -214,99 +157,40 @@ C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\m
 
 | Regra | Detalhe |
 |-------|---------|
-| **I15 — GET no browser** | Escritas críticas no `api()` = **GET** apenas. Nunca POST JSON no tablet. |
-| **Deploy GAS** | **Só sócio** — Editor → **Editar** `AKfycbwakQ...`. Agente: `prepare-gas-push.ps1` max. **Nunca** nova implantação (I1). |
-| **Tablet obrigatório** | Mudança em `api()` ou auth → testar no tablet físico. |
-| **Pre-push** | Rodar `.\scripts\pre-push-check.ps1` antes de `git push`. |
-| **I22 — Janela operacional** | **Nunca** push FE crítico com locações Ativa/Pendente — `check-operacao-livre.ps1` |
-| **I23 — KPI Dashboard** | Mutex hub/dash separado; `resumoDia` leve no GAS — Regra 15 |
-| **Versões alinhadas** | `mk-version.js` = `sw.js` SW_VERSION após mudança FE. |
-| **Regra 16** | Toda resposta: `Mudança no AppScript: sim|não` + link `.gs` canônico |
-| **F4 / F9 pausados** | WhatsApp auto e supervisor — não reativar sem decisão explícita. |
-| **Comunicação balcão** | **Só QR portal** — SMS/WhatsApp **não enviar** (`OPERACAO_COMUNICACAO_QR_ONLY.md`, FE v1.8.20). |
-
-Regras Cursor automáticas: `.cursor/rules/` (GAS caminho PC, POST proibido, design DNA).
+| **I15** | Escritas GAS no browser = **GET** |
+| **GAS Web** | **Só você** — Editar `AKfycbwakQ...` · agente **nunca** `deploy-gas-SOCIO.ps1` |
+| **FE push** | Agente: pre-push → commit → push **sem pedir** |
+| **I22** | `check-operacao-livre.ps1` antes push FE crítico |
+| **Versões** | `mk-version.js` = `sw.js` = `index.html ?v=` |
+| **QR only** | Sem SMS/WA operacional |
+| **Regra 16** | Resposta termina com Mudança AppScript + link `.gs` |
 
 ---
 
-## Validação rápida (rodar no início de cada sessão)
+## Validação rápida (início de sessão)
 
 ```powershell
-# Ping GAS
+cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github
 Invoke-RestMethod "https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec?action=ping"
-
-# CI local
 .\scripts\pre-push-check.ps1
 ```
 
-Esperado: ping `versao: v1.5.91`, pre-push verde, FE **1.8.16**.
+Esperado: ping **v1.5.92** · pre-push verde · Pages **1.8.27**.
 
 ---
 
-## O que NÃO usar (armadilhas)
+## O que NÃO usar
 
 | Caminho | Motivo |
 |---------|--------|
-| `docs/arquivo/planos/HANDOFF_NOVO_CHAT_2026-06-05.md` | Defasado (v1.7.27) — usar **este** arquivo |
-| `docs/arquivo/obsoleto/` | ROLLBACK, CHANGELOG antigos |
-| `arquivo-historico/*.gs` | GAS legado — não implantar |
-| Deploy ID `AKfycbzc...` | URL morta (404) |
-| `docs/arquivo/deploy/` | Histórico — versões antigas |
-
-Histórico em `docs/arquivo/` é referência de incidentes e pacotes fechados, **não** fonte de versão atual.
+| `docs/arquivo/planos/HANDOFF_NOVO_CHAT_2026-06-05.md` | Defasado |
+| `arquivo-historico/*.gs` | Legado |
+| Deploy `AKfycbzc...` | 404 |
 
 ---
 
-## Publicar com segurança (resumo)
+## Ao encerrar sessão
 
-1. Ler `REGRAS_DE_PUBLICACAO_SEGURA.md`
-2. `.\scripts\pre-push-check.ps1`
-3. `git push` → GitHub Pages (FE)
-4. Se `.gs` mudou: agente `prepare-gas-push.ps1` → **você** Implantar → **Editar** `AKfycbwakQ...` → Nova versão
-5. Ping + tablet `?force={versão}`
+Atualizar: **este arquivo** · `ESTADO_ATUAL.md` · `README.md` · `AGENTS.md` se versões mudarem.
 
-Guia completo: `DEPLOY_GAS_v1.5.32_AUTH.md`
-
----
-
-## Pacotes fechados vs em andamento
-
-**Fechados:** A–J, SMS P0, K.1–K.4, fixes I16–I21 (B8), Payback (código), **Pacote M** M.1–M.17 (v1.7.87), **Pacote L** (v1.7.91), **FASE 1–4**.
-
-**Em andamento / próximo:**
-
-| Item | Status |
-|------|--------|
-| **FASE 5** Confiabilidade/APIs | ✅ **fechada** | 09/06 — Milena + I21 v1.7.96 |
-| **P3** Backlog produto | ✅ **fechado** | 09/06 — v1.7.97 / v1.5.73 |
-| **Tablet balcão** | v1.7.97 | `?force=1.7.97` |
-| GAS ping produção | **v1.5.73** — **não criar novo Deploy** |
-| **B6 / Q1** | ✅ P2 fechado 09/06 — CI + PIN via GAS |
-
----
-
-## Ao encerrar uma sessão (manter 100% preparado)
-
-O assistente que **mudar versão, fase ou próximo passo** deve atualizar:
-
-1. **Este arquivo** — tabela Produção + seção Próximo passo
-2. **`PLANO_PRIORIDADES_2026-06.md`** — checklist FASE 0 (ou fase ativa)
-3. **`ESTADO_ATUAL.md`** — se versões ou entregas mudaram
-4. **`README.md`** — tabela Produção (se versão mudou)
-
-Não criar novo handoff datado — manter **só este** em `docs/ativos/`.
-
----
-
-## Verificação desta sessão (09/06/2026 — FASE 5 fechada)
-
-| Check | Resultado |
-|-------|-----------|
-| `git status` | `main` = `origin/main` @ `91cc08f` |
-| Ping GAS | **v1.5.72** ok |
-| GitHub Pages | **v1.7.96** ok |
-| Tablet Milena | Homologação FASE 5 assinada |
-| I21 mock idle | ✅ v1.7.96 |
-
-*Próxima revisão: **14/06/2026** — ver `PROTOCOLO_ATUALIZAR_TUDO.md`.*
-
+*Próxima revisão: após homologação tablet v1.8.27 ou deploy GAS.*

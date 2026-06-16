@@ -34,9 +34,9 @@ Leia **nesta ordem**:
 
 | Eu (agente) sozinho | So com seu pedido | So voce |
 |---------------------|-------------------|---------|
-| Codigo, docs, testes, planilha OAuth | `git commit` + `git push` FE | **Implantar / Nova versao Web GAS** |
-| `prepare-gas-push.ps1` (sync+push codigo, **sem** publicar Web) | Mudancas em `api()` / auth | Arquivar implantacao errada @139 |
-| `verify-gas-deploy.ps1` (leitura) | Limpar testes prod | Tablet balcao `?force=` |
+| Codigo, docs, testes, planilha OAuth | Mudancas em `api()` / auth | **Implantar / Nova versao Web GAS** |
+| `pre-push-check` + commit + push FE | `prepare-gas-push.ps1` (editor, nao Web) | Arquivar implantacao errada @139 |
+| `verify-gas-deploy.ps1`, `protocolo-mestre.ps1` | Tablet balcao `?force=` | clasp label cleanup @143 |
 
 **Nunca (agente):** `deploy-gas.ps1`, `deploy-gas-SOCIO.ps1`, `clasp deploy`, nova implantacao GAS, POST no browser.
 
@@ -54,8 +54,8 @@ Detalhe completo: [`ACESSOS_E_AUTORIZACOES.md`](docs/ativos/ACESSOS_E_AUTORIZACO
 
 | Camada | Versão repo | Ping produção |
 |--------|-------------|---------------|
-| Frontend | **v1.8.23** | https://ribocg-a11y.github.io/movikids/?force=1.8.23 |
-| GAS | **v1.5.91** | ping prod. **v1.5.91** ✅ |
+| Frontend | **v1.8.27** | https://ribocg-a11y.github.io/movikids/?force=1.8.27 |
+| GAS | **v1.5.92** | ping prod. **v1.5.92** ✅ · @143 |
 | Aba FOLHA | OK (I25) | B68 ~5269,96 · `folhaPlanejamento.fonte: FOLHA` |
 | Deploy ID | `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y` | |
 
@@ -71,6 +71,7 @@ Fonte de verdade: `mk-version.js`, header do `.gs`, ping GAS.
 - **Legado:** `arquivo-historico/` — não implantar
 - **Testes:** `scripts/testes/`
 - **Protocolo teste/diagnóstico:** `docs/ativos/PROTOCOLO_DIAGNOSTICO_E_TESTES.md` → `TESTE_PROTOCOLO_DIAGNOSTICO.ps1`
+- **Protocolo mestre (varredura completa):** `TESTE_PROTOCOLO_MESTRE.ps1` · atalho `protocolo-mestre.ps1`
 - **CI:** `scripts/pre-push-check.ps1` — rodar **antes** do push
 - **Pos-push:** `scripts/verify-publish-complete.ps1` — obrigatório após `git push` FE (I24)
 
@@ -87,11 +88,12 @@ Fonte de verdade: `mk-version.js`, header do `.gs`, ping GAS.
 - `docs/arquivo/obsoleto/` — rollback/changelog antigos
 - Arquivos em `arquivo-historico/` para deploy
 
-## Estado do projeto (14/06/2026)
+## Estado do projeto (16/06/2026)
 
-- **FASE 1–8:** ✅ prod
-- **FASE 9 Folha CLT:** ✅ prod · testes readonly **ok** 14/06 · I25 **fechado**
-- **FASE 14 mini-DRE:** 🟡 FE v1.8.16 · homolog sócio pendente
+- **FASE 1–9:** ✅ prod
+- **FASE 14 mini-DRE:** ✅ prod (FE v1.8.16+)
+- **FE v1.8.27:** header mobile DNA · logo PNG · Protocolo Mestre ok 16/06
+- **Pendente:** homolog tablet F5/F7/F10/F11 na loja
 
 ## "Atualize tudo"
 

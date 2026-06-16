@@ -24,13 +24,14 @@
 | **FASE 8** Alertas proativos | ✅ repo | FE v1.8.9 / GAS v1.5.79 |
 | **FASE 9** Folha CLT + viabilidade | ✅ **prod fechado** | GAS **v1.5.91** · testes ok **14/06** · I25 fechado |
 | **Dashboard narrativo + folha prop.** | ✅ prod | FE v1.8.11–1.8.15 · `DEPLOY_FE_v1.8.15_SEMANA_ATUAL.md` |
-| **FASE 14** Mini-DRE | 🟡 iniciada | 11/06/2026 · `FASE_14_MINI_DRE.md` + memorial |
+| **FASE 14** Mini-DRE | ✅ prod | FE v1.8.16+ · cascata Dashboard |
+| **FE UX mobile** | ✅ prod | v1.8.23–1.8.27 · header DNA · logo PNG · banner auto-update |
 
 **Próximo passo imediato:**
 
-1. **Sócio** — homolog Dashboard **v1.8.16** + painel CLT (viabilidade verde)
-2. **Tablet** — F0 smoke balcão
-3. **Agente** — aba PLANO_CONTAS + GAS v1.5.82 mini-DRE se ainda não em prod
+1. **Tablet loja** — F5 ▶ 10:00 · F7 alertas · F10 2 abas PWA · F11 portal ±2s
+2. **Sócio** — smoke Dashboard `?force=1.8.27` (header + logo + metas loc/dia)
+3. Opcional — rótulo clasp @143 → `v1.5.92` (cosmético)
 
 ### FASE 0 — checklist
 
