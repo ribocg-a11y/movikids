@@ -238,12 +238,13 @@ function aplicarDadosInicio(d) {
     updateStats();
 
     if (d.encHoje && d.fonte !== 'firebase') renderEncHoje(d.encHoje);
+    if (typeof mkMetaApplyFromInicio_ === 'function') mkMetaApplyFromInicio_(d);
+    else if (typeof mkMetaRefreshInstant_ === 'function') mkMetaRefreshInstant_();
     atualizarVeiculoGrid();
 
     if (d.custosHoje) { custosHoje = d.custosHoje; renderCustos(); }
     else loadCustosHoje();
     agendarProximoPoll();
-    if (typeof mkMetaRefresh_ === 'function') mkMetaRefresh_();
   } catch(e) {
     console.error('aplicarDadosInicio:', e);
     setStatus(false);

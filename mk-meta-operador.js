@@ -182,8 +182,7 @@ function mkMetaRenderKpi_(d) {
   _metaLastBonus = !!h.atingiu;
 }
 
-async function mkMetaRefresh_() {
-  if (_metaRefreshBusy) return;
+function mkMetaRefreshInstant_() {
   const tile = document.getElementById('stat-meta-tile');
   if (!tile) return;
   const opId = mkMetaResolveOperadorId_();
@@ -191,26 +190,55 @@ async function mkMetaRefresh_() {
     mkMetaShowTile_(tile, false);
     return;
   }
+  const local = mkMetaComputeLocal_(opId);
+  if (local) mkMetaRenderKpi_(local);
+  else mkMetaShowTile_(tile, false);
+}
+
+/** Usa metaTurno do carregarInicio (1 request) ou contagem local imediata. */
+function mkMetaApplyFromInicio_(d) {
+  const tile = document.getElementById('stat-meta-tile');
+  const opId = mkMetaResolveOperadorId_();
+  if (!opId || !mkMetaCfgAtiva_(opId)) {
+    mkMetaShowTile_(tile, false);
+    return;
+  }
+  if (d && d.metaTurno && d.metaTurno.configurado !== false) {
+    mkMetaRenderKpi_(Object.assign({ ok: true }, d.metaTurno));
+    return;
+  }
+  mkMetaRefreshInstant_();
+  mkMetaRefreshMesAsync_();
+}
+
+let _metaMesTimer = null;
+function mkMetaRefreshMesAsync_() {
+  if (_metaMesTimer) clearTimeout(_metaMesTimer);
+  _metaMesTimer = setTimeout(function() { mkMetaRefreshMesFromServer_(); }, 80);
+}
+
+async function mkMetaRefreshMesFromServer_() {
+  if (_metaRefreshBusy) return;
+  const opId = mkMetaResolveOperadorId_();
+  if (!opId || !mkMetaCfgAtiva_(opId)) return;
   _metaRefreshBusy = true;
-  let rendered = false;
   try {
     const params = Object.assign(
       { action: 'metaOperadorTurno', operadorId: opId, _t: Date.now() },
       typeof apiParamsComAuth_ === 'function' ? apiParamsComAuth_() : {}
     );
     const d = await api(params, 20000);
-    if (d && d.ok && d.configurado !== false) {
-      mkMetaRenderKpi_(d);
-      rendered = true;
-    }
-  } catch (e) { /* fallback local */ }
-  if (!rendered) {
-    const local = mkMetaComputeLocal_(opId);
-    if (local) mkMetaRenderKpi_(local);
-    else mkMetaShowTile_(tile, false);
-  }
+    if (d && d.ok && d.configurado !== false) mkMetaRenderKpi_(d);
+  } catch (e) { /* mantém valor local/inicio */ }
   _metaRefreshBusy = false;
 }
 
+function mkMetaRefresh_() {
+  mkMetaRefreshInstant_();
+  mkMetaRefreshMesAsync_();
+}
+
 window.mkMetaRefresh_ = mkMetaRefresh_;
+window.mkMetaRefreshInstant_ = mkMetaRefreshInstant_;
+window.mkMetaApplyFromInicio_ = mkMetaApplyFromInicio_;
 window.mkMetaRenderKpi_ = mkMetaRenderKpi_;

@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.96
+// MOVI KIDS — Google Apps Script v1.5.97
+// v1.5.97: metaTurno em carregarInicio (KPI meta junto com sync)
 // v1.5.96: bonus meta — R$100 so se loc > 20 (21+ no turno)
 // v1.5.95: meta só Raykelly id3 + reserva id4 (fora Eduarda/Milena)
 // v1.5.94: metaOperadorTurno — Raykelly id 3 (corrige id 1 Eduarda)
@@ -1404,15 +1405,28 @@ function metaOperadorShiftLabel_(shift) {
   return pad(shift[0]) + 'h–' + pad(shift[1]) + 'h';
 }
 
-function metaOperadorTurno_(p) {
-  const opId = Number((p && p.operadorId) || 0);
-  if (!opId) return err_('operadorId obrigatorio', 400);
+function metaOperadorIdFromRequest_(p) {
+  const tryId = function(id) {
+    id = Number(id);
+    if (!id) return 0;
+    const cfg = metaOperadorCfg_(id);
+    if (cfg && cfg.ativo !== false && cfg.inicio) return id;
+    return 0;
+  };
+  const fromP = tryId(p && p.operadorId);
+  if (fromP) return fromP;
+  const srv = getSessaoOperadorAtiva_();
+  if (srv && srv.operadorId) return tryId(srv.operadorId);
+  return 0;
+}
+
+function buildMetaOperadorPayload_(opId) {
   const found = operadorRowById_(opId);
-  if (!found) return err_('Operador nao encontrado', 404);
+  if (!found) return { ok: false, configurado: false, operadorId: opId };
   const op = operadorObjFromRow_(found.data);
   const cfg = metaOperadorCfg_(opId);
   if (!cfg || cfg.ativo === false || !cfg.inicio) {
-    return resp_({ ok: true, configurado: false, operador: op.nome, operadorId: opId });
+    return { ok: true, configurado: false, operador: op.nome, operadorId: opId };
   }
 
   const agora = new Date();
@@ -1443,7 +1457,7 @@ function metaOperadorTurno_(p) {
       });
     }
   } catch (e) {
-    Logger.log('metaOperadorTurno_ AUDITORIA: ' + e.message);
+    Logger.log('buildMetaOperadorPayload_ AUDITORIA: ' + e.message);
   }
 
   const nHoje = byDay[dataHoje] || 0;
@@ -1454,7 +1468,7 @@ function metaOperadorTurno_(p) {
     if (byDay[d] > cfg.meta) diasComBonus++;
   });
 
-  return resp_({
+  return {
     ok: true,
     configurado: true,
     operador: op.nome,
@@ -1475,7 +1489,15 @@ function metaOperadorTurno_(p) {
       diasTrabalhados: diasTrabalhados,
       bonusEstimado: diasComBonus * cfg.bonus
     }
-  });
+  };
+}
+
+function metaOperadorTurno_(p) {
+  const opId = Number((p && p.operadorId) || 0);
+  if (!opId) return err_('operadorId obrigatorio', 400);
+  const payload = buildMetaOperadorPayload_(opId);
+  if (payload.ok === false) return err_('Operador nao encontrado', 404);
+  return resp_(payload);
 }
 
 // ── KPIs ADMIN — v1.5.3: fatPorTipo inclui Triciclo ──────────
@@ -3162,6 +3184,15 @@ function carregarInicio_(p) {
   }));
 
   const opCfg = operacaoConfig_();
+  let metaTurno = null;
+  const metaOpId = metaOperadorIdFromRequest_(p || {});
+  if (metaOpId) {
+    try {
+      metaTurno = buildMetaOperadorPayload_(metaOpId);
+    } catch (e) {
+      Logger.log('carregarInicio_ metaTurno: ' + e.message);
+    }
+  }
   const resultado = resp_({
     sistema:    'MOVI KIDS v1.5.66',
     timestamp:  dataHoje + ' ' + fmtHoraLocal_(hoje),
@@ -3169,6 +3200,7 @@ function carregarInicio_(p) {
     statsHoje,
     custosHoje: custosPayload,
     encHoje,
+    metaTurno:  metaTurno,
     operacaoConfig: payloadOperacaoConfigFe_(opCfg)
   });
   return resultado;
