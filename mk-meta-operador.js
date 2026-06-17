@@ -3,9 +3,9 @@
 let _metaLastAtingiu = null;
 let _metaRefreshBusy = false;
 
-/** Espelha metaOperadorCfg_ no GAS v1.5.93+ (fallback FE se ping menor que 1.5.93). */
+/** id real na planilha OPERADORES_SISTEMA (Raykelly = 3, não 1). */
 const MK_META_CFG = {
-  1: {
+  3: {
     nome: 'Raykelly',
     meta: 20,
     bonus: 100,
@@ -22,12 +22,21 @@ const MK_META_CFG = {
   }
 };
 
+function mkMetaConfiguredIds_() {
+  return Object.keys(MK_META_CFG).map(Number).filter((id) => id > 0);
+}
+
 function mkMetaResolveOperadorId_() {
   const params = typeof operadorApiParams_ === 'function' ? operadorApiParams_() : {};
-  if (params.operadorId && Number(params.operadorId) > 0) return Number(params.operadorId);
+  const cfgIds = mkMetaConfiguredIds_();
+  if (params.operadorId && MK_META_CFG[Number(params.operadorId)]) {
+    return Number(params.operadorId);
+  }
   const srv = typeof mkAuthGetSessaoServidor_ === 'function' ? mkAuthGetSessaoServidor_() : null;
-  if (srv && srv.operadorId) return Number(srv.operadorId);
-  return 1;
+  if (srv && srv.operadorId && MK_META_CFG[Number(srv.operadorId)]) {
+    return Number(srv.operadorId);
+  }
+  return cfgIds[0] || 0;
 }
 
 function mkMetaShiftLabel_(shift) {
@@ -47,7 +56,6 @@ function mkMetaInShift_(mins, shift) {
   return mins >= shift[0] * 60 && mins < shift[1] * 60;
 }
 
-/** Conta encerradas hoje no horário do turno (até GAS v1.5.93 ir ao ar). */
 function mkMetaComputeLocal_(opId) {
   const cfg = MK_META_CFG[Number(opId)];
   if (!cfg) return null;
@@ -83,6 +91,12 @@ function mkMetaComputeLocal_(opId) {
   };
 }
 
+function mkMetaShowTile_(tile, show) {
+  if (!tile) return;
+  tile.hidden = !show;
+  if (show) tile.removeAttribute('hidden');
+}
+
 function mkMetaRenderKpi_(d) {
   const tile = document.getElementById('stat-meta-tile');
   const val = document.getElementById('stat-meta-val');
@@ -91,18 +105,19 @@ function mkMetaRenderKpi_(d) {
   if (!tile || !val) return;
 
   if (!d || !d.ok || d.configurado === false) {
-    tile.hidden = true;
+    mkMetaShowTile_(tile, false);
     return;
   }
 
-  tile.hidden = false;
+  mkMetaShowTile_(tile, true);
   tile.classList.remove('is-meta-ok', 'is-meta-warn', 'is-meta-idle');
 
   const h = d.hoje || {};
   const mes = d.mes || {};
   const meta = Number(d.meta) || 20;
   const n = Number(h.n) || 0;
-  const nome = String(d.operador || MK_META_CFG[d.operadorId]?.nome || 'Operador').split(' ')[0];
+  const opId = Number(d.operadorId) || mkMetaResolveOperadorId_();
+  const nome = String(d.operador || MK_META_CFG[opId]?.nome || 'Operador').split(' ')[0];
 
   if (lbl) lbl.textContent = 'Meta · ' + nome;
 
@@ -125,7 +140,6 @@ function mkMetaRenderKpi_(d) {
   let subTxt;
   if (d.fonte === 'local') {
     subTxt = 'Turno ' + (h.shiftLabel || '') + ' · hoje no balcão';
-    if (diasMeta === 0) subTxt += ' · histórico do mês após GAS v1.5.93';
   } else {
     subTxt = diasMeta + (diasMeta === 1 ? ' dia' : ' dias') + ' com meta no mês';
     if (bonus > 0) subTxt += ' · R$ ' + bonus.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
@@ -147,7 +161,7 @@ async function mkMetaRefresh_() {
   if (!tile) return;
   const opId = mkMetaResolveOperadorId_();
   if (!opId || !MK_META_CFG[opId]) {
-    tile.hidden = true;
+    mkMetaShowTile_(tile, false);
     return;
   }
   _metaRefreshBusy = true;
@@ -162,11 +176,11 @@ async function mkMetaRefresh_() {
       mkMetaRenderKpi_(d);
       rendered = true;
     }
-  } catch (e) { /* GAS antigo ou offline — fallback abaixo */ }
+  } catch (e) { /* fallback local */ }
   if (!rendered) {
     const local = mkMetaComputeLocal_(opId);
     if (local) mkMetaRenderKpi_(local);
-    else tile.hidden = true;
+    else mkMetaShowTile_(tile, false);
   }
   _metaRefreshBusy = false;
 }

@@ -193,6 +193,7 @@ function adminLogin() {
   if (typeof refreshOperadoresAdmin_ === 'function') refreshOperadoresAdmin_();
   if (typeof atualizarOperadorUI_ === 'function') atualizarOperadorUI_();
   if (typeof mkAuthRefreshSessaoTurno_ === 'function') mkAuthRefreshSessaoTurno_();
+  if (typeof mkMetaRefresh_ === 'function') mkMetaRefresh_();
   if (typeof applyRoleNav_ === 'function') applyRoleNav_();
   else {
     const gerBtn = document.getElementById('sb-gerenciar-btn');

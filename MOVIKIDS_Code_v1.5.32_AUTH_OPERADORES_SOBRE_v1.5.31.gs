@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.93
+// MOVI KIDS — Google Apps Script v1.5.94
+// v1.5.94: metaOperadorTurno — Raykelly id 3 (corrige id 1 Eduarda)
 // v1.5.93: metaOperadorTurno — meta 20 loc/turno + bonus R$100 (AUDITORIA + escala)
 // v1.5.92: encerrarLocacao — mensagem distinta para Pendente vs Encerrada/Cancelada
 // v1.5.91: FOLHA — repair via Sheets API USER_ENTERED (fórmulas PT como digitar; corrige #NAME? do setValue)
@@ -1318,13 +1319,13 @@ function kpiAvancadosMes_(mmyy, nMes, nCancelMes, diasOperando, nPorVeiculo, min
   };
 }
 
-/** Meta operacional — 20 locações/turno · bonus R$100 (Raykelly id 1 · escala anexo 06/2026). */
+/** Meta operacional — 20 locações/turno · bonus R$100 (Raykelly id 3 · escala 06/2026). */
 const META_LOC_TURNO_PADRAO_ = 20;
 const META_BONUS_DIA_REAIS_ = 100;
 
 function metaOperadorCfg_(opId) {
   const id = Number(opId);
-  if (id === 1) {
+  if (id === 3) {
     return {
       meta: META_LOC_TURNO_PADRAO_,
       bonus: META_BONUS_DIA_REAIS_,
