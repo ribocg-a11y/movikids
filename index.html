@@ -16,16 +16,16 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<script src="mk-stale-sync.js?v=1.8.30"></script>
-<script src="mk-version.js?v=1.8.30"></script>
-<script src="mk-api.js?v=1.8.30"></script>
-<link rel="stylesheet" href="mk-design.css?v=1.8.30">
+<script src="mk-stale-sync.js?v=1.8.31"></script>
+<script src="mk-version.js?v=1.8.31"></script>
+<script src="mk-api.js?v=1.8.31"></script>
+<link rel="stylesheet" href="mk-design.css?v=1.8.31">
 
-<script src="mk-cache-bust.js?v=1.8.30"></script>
+<script src="mk-cache-bust.js?v=1.8.31"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<link rel="stylesheet" href="mk-app.css?v=1.8.30">
+<link rel="stylesheet" href="mk-app.css?v=1.8.31">
 <!-- Firebase SDK — Realtime sync canonico para todos os dispositivos -->
-<script type="module" src="mk-firebase.js?v=1.8.30"></script>
+<script type="module" src="mk-firebase.js?v=1.8.31"></script>
 </head>
 
 <body>
@@ -236,6 +236,11 @@
     <div class="mk-stat-row stats-bar">
       <div class="mk-stat-tile stat-card"><div class="stat-val mk-stat-val" id="stat-ativas">0</div><div class="stat-lbl mk-stat-lbl">Ativas agora</div></div>
       <div class="mk-stat-tile stat-card"><div class="stat-val mk-stat-val" id="stat-nloc">0</div><div class="stat-lbl mk-stat-lbl">Encerradas hoje</div></div>
+      <div class="mk-stat-tile stat-card mk-stat-meta" id="stat-meta-tile" hidden>
+        <div class="stat-val mk-stat-val" id="stat-meta-val">—</div>
+        <div class="stat-lbl mk-stat-lbl" id="stat-meta-lbl">Meta do turno</div>
+        <div class="mk-stat-meta-sub" id="stat-meta-sub"></div>
+      </div>
     </div>
     <div class="mk-qr-balcao-card" id="mk-qr-balcao-strip" role="region" aria-label="Portal dos pais">
       <span class="mk-qr-balcao-ico" aria-hidden="true">📲</span>
@@ -1678,22 +1683,23 @@
   </div>
 </div>
 
-<script src="mk-globals.js?v=1.8.30"></script>
-<script src="mk-core.js?v=1.8.30"></script>
-<script src="mk-nav.js?v=1.8.30"></script>
-<script src="mk-admin.js?v=1.8.30"></script>
-<script src="mk-historico.js?v=1.8.30"></script>
-<script src="mk-sessao.js?v=1.8.30"></script>
-<script src="mk-home.js?v=1.8.30"></script>
-<script src="mk-custos.js?v=1.8.30"></script>
-<script src="mk-avulso.js?v=1.8.30"></script>
-<script src="mk-sync.js?v=1.8.30"></script>
-<script src="mk-nova.js?v=1.8.30"></script>
-<script src="mk-relacionamento.js?v=1.8.30"></script>
-<script src="mk-operacao.js?v=1.8.30"></script>
-<script src="mk-drawer.js?v=1.8.30"></script>
-<script src="mk-update.js?v=1.8.30"></script>
-<script src="mk-auth.js?v=1.8.30"></script>
-<script src="mk-boot.js?v=1.8.30"></script>
+<script src="mk-globals.js?v=1.8.31"></script>
+<script src="mk-core.js?v=1.8.31"></script>
+<script src="mk-nav.js?v=1.8.31"></script>
+<script src="mk-admin.js?v=1.8.31"></script>
+<script src="mk-historico.js?v=1.8.31"></script>
+<script src="mk-sessao.js?v=1.8.31"></script>
+<script src="mk-home.js?v=1.8.31"></script>
+<script src="mk-meta-operador.js?v=1.8.31"></script>
+<script src="mk-custos.js?v=1.8.31"></script>
+<script src="mk-avulso.js?v=1.8.31"></script>
+<script src="mk-sync.js?v=1.8.31"></script>
+<script src="mk-nova.js?v=1.8.31"></script>
+<script src="mk-relacionamento.js?v=1.8.31"></script>
+<script src="mk-operacao.js?v=1.8.31"></script>
+<script src="mk-drawer.js?v=1.8.31"></script>
+<script src="mk-update.js?v=1.8.31"></script>
+<script src="mk-auth.js?v=1.8.31"></script>
+<script src="mk-boot.js?v=1.8.31"></script>
 </body>
 </html>

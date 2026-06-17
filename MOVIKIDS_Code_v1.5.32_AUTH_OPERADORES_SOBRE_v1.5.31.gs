@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.92
+// MOVI KIDS — Google Apps Script v1.5.93
+// v1.5.93: metaOperadorTurno — meta 20 loc/turno + bonus R$100 (AUDITORIA + escala)
 // v1.5.92: encerrarLocacao — mensagem distinta para Pendente vs Encerrada/Cancelada
 // v1.5.91: FOLHA — repair via Sheets API USER_ENTERED (fórmulas PT como digitar; corrige #NAME? do setValue)
 // v1.5.90: (quebrado) setValue + SE → barra mostra SE mas célula #NAME? — GAS não parseia fórmula locale
@@ -364,6 +365,7 @@ function dispatchMoviAction_(p, method) {
       case 'liberarSessaoOperador': return liberarSessaoOperador_(p);
       case 'liberarSessaoOperadorAdmin': return liberarSessaoOperadorAdmin_(p);
       case 'touchSessaoOperador': return touchSessaoOperador_(p);
+      case 'metaOperadorTurno': return metaOperadorTurno_(p);
       case 'verificarSmsDisparo': return verificarSmsDisparo_(p);
       case 'salvarLancamentoAvulso': return salvarLancamentoAvulso_(p);
       case 'controleFinanceiro':     return controleFinanceiro_();
@@ -1314,6 +1316,144 @@ function kpiAvancadosMes_(mmyy, nMes, nCancelMes, diasOperando, nPorVeiculo, min
     cancelamentos: { total: nCancel, porMotivo: cancelArr, taxaPct: taxaCancel },
     ocupacaoFrota: ocupacaoFrota
   };
+}
+
+/** Meta operacional — 20 locações/turno · bonus R$100 (Kaykelly id 1 · escala anexo 06/2026). */
+const META_LOC_TURNO_PADRAO_ = 20;
+const META_BONUS_DIA_REAIS_ = 100;
+
+function metaOperadorCfg_(opId) {
+  const id = Number(opId);
+  if (id === 1) {
+    return {
+      meta: META_LOC_TURNO_PADRAO_,
+      bonus: META_BONUS_DIA_REAIS_,
+      inicio: '16/06/2026',
+      escala: {
+        '0': [13, 21],
+        '1': [14, 22],
+        '2': null,
+        '3': [14, 22],
+        '4': null,
+        '5': [14, 22],
+        '6': [10, 20]
+      }
+    };
+  }
+  return null;
+}
+
+function parseAuditTsMeta_(tsRaw) {
+  const s = String(tsRaw || '').trim();
+  const sp = s.indexOf(' ');
+  if (sp < 0) return { data: s, mins: 0 };
+  const data = s.slice(0, sp).trim();
+  const hm = s.slice(sp + 1).trim();
+  const pts = hm.split(':');
+  const h = parseInt(pts[0], 10) || 0;
+  const m = parseInt(pts[1], 10) || 0;
+  return { data: data, mins: h * 60 + m };
+}
+
+function weekdayFromDataStr_(dataStr) {
+  const d = parseDataStr_(dataStr);
+  if (!d) return -1;
+  return d.getDay();
+}
+
+function metaOperadorNomeMatch_(auditUser, opNome) {
+  const a = normBusca_(auditUser);
+  const b = normBusca_(opNome);
+  if (!a || !b) return false;
+  if (a === b) return true;
+  if (a.indexOf(b) >= 0 || b.indexOf(a) >= 0) return true;
+  return false;
+}
+
+function metaOperadorInShift_(mins, shift) {
+  if (!shift || shift.length < 2) return false;
+  const startM = Number(shift[0]) * 60;
+  const endM = Number(shift[1]) * 60;
+  return mins >= startM && mins < endM;
+}
+
+function metaOperadorShiftLabel_(shift) {
+  if (!shift) return 'folga';
+  const pad = function(n) { return String(n).padStart(2, '0'); };
+  return pad(shift[0]) + 'h–' + pad(shift[1]) + 'h';
+}
+
+function metaOperadorTurno_(p) {
+  const opId = Number((p && p.operadorId) || 0);
+  if (!opId) return err_('operadorId obrigatorio', 400);
+  const found = operadorRowById_(opId);
+  if (!found) return err_('Operador nao encontrado', 404);
+  const op = operadorObjFromRow_(found.data);
+  const cfg = metaOperadorCfg_(opId);
+  if (!cfg) {
+    return resp_({ ok: true, configurado: false, operador: op.nome, operadorId: opId });
+  }
+
+  const agora = new Date();
+  const dataHoje = fmtData_(agora);
+  const mesAtual = dataHoje.slice(3);
+  const inicioCmp = dateToCmp_(cfg.inicio);
+  const byDay = {};
+  const dowHoje = agora.getDay();
+  const shiftHoje = cfg.escala[String(dowHoje)];
+  const minsAgora = agora.getHours() * 60 + agora.getMinutes();
+  const emTurno = metaOperadorInShift_(minsAgora, shiftHoje);
+
+  try {
+    const shAud = ss_().getSheetByName('AUDITORIA');
+    if (shAud && shAud.getLastRow() >= 2) {
+      const dados = shAud.getRange(2, 1, shAud.getLastRow() - 1, 8).getValues();
+      dados.forEach(function(r) {
+        if (String(r[1] || '').trim() !== 'encerrarLocacao') return;
+        if (!metaOperadorNomeMatch_(String(r[7] || ''), op.nome)) return;
+        const ts = parseAuditTsMeta_(cellToStr_(r[0]));
+        if (!ts.data || ts.data.slice(3) !== mesAtual) return;
+        if (dateToCmp_(ts.data) < inicioCmp) return;
+        const dow = weekdayFromDataStr_(ts.data);
+        const shift = cfg.escala[String(dow)];
+        if (!shift) return;
+        if (!metaOperadorInShift_(ts.mins, shift)) return;
+        byDay[ts.data] = (byDay[ts.data] || 0) + 1;
+      });
+    }
+  } catch (e) {
+    Logger.log('metaOperadorTurno_ AUDITORIA: ' + e.message);
+  }
+
+  const nHoje = byDay[dataHoje] || 0;
+  let diasComMeta = 0;
+  let diasTrabalhados = 0;
+  Object.keys(byDay).forEach(function(d) {
+    diasTrabalhados++;
+    if (byDay[d] >= cfg.meta) diasComMeta++;
+  });
+
+  return resp_({
+    ok: true,
+    configurado: true,
+    operador: op.nome,
+    operadorId: opId,
+    meta: cfg.meta,
+    bonus: cfg.bonus,
+    hoje: {
+      n: nHoje,
+      meta: cfg.meta,
+      atingiu: nHoje >= cfg.meta,
+      emTurno: emTurno,
+      folga: !shiftHoje,
+      shiftLabel: metaOperadorShiftLabel_(shiftHoje)
+    },
+    mes: {
+      diasComMeta: diasComMeta,
+      diasTrabalhados: diasTrabalhados,
+      bonusEstimado: diasComMeta * cfg.bonus
+    }
+  });
 }
 
 // ── KPIs ADMIN — v1.5.3: fatPorTipo inclui Triciclo ──────────

@@ -324,6 +324,7 @@ async function confirmarEncerrar() {
       valorTotal:  d.valorTotal
     });
     renderEncHoje(encHojeData);
+    if (typeof mkMetaRefresh_ === 'function') mkMetaRefresh_();
     renderCards();
     updateStats();
     atualizarVeiculoGrid();

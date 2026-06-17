@@ -122,9 +122,13 @@
 /* ── MKStat (Home + Caixa) ─────────────────────────────── */
 .mk-stat-row {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, 1fr);
   gap: 10px;
   margin-bottom: 14px;
+}
+@media (max-width: 420px) {
+  .mk-stat-row.stats-bar { grid-template-columns: 1fr 1fr; }
+  .mk-stat-row.stats-bar .mk-stat-meta { grid-column: 1 / -1; }
 }
 .mk-stat-tile {
   background: var(--card);
@@ -151,6 +155,18 @@
   letter-spacing: 0.04em;
   margin-top: 4px;
 }
+.mk-stat-meta-sub {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--txt3);
+  margin-top: 6px;
+  line-height: 1.35;
+  text-transform: none;
+  letter-spacing: 0;
+}
+.mk-stat-tile.is-meta-ok .mk-stat-val { color: var(--green, #2E7D32); }
+.mk-stat-tile.is-meta-warn .mk-stat-val { color: var(--orange, #FB8C00); }
+.mk-stat-tile.is-meta-idle .mk-stat-val { color: var(--txt3); font-size: 20px !important; }
 
 .mk-caixa-resumo { margin-bottom: 16px; }
 .mk-stat-hero {

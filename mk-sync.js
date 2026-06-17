@@ -243,6 +243,7 @@ function aplicarDadosInicio(d) {
     if (d.custosHoje) { custosHoje = d.custosHoje; renderCustos(); }
     else loadCustosHoje();
     agendarProximoPoll();
+    if (typeof mkMetaRefresh_ === 'function') mkMetaRefresh_();
   } catch(e) {
     console.error('aplicarDadosInicio:', e);
     setStatus(false);
