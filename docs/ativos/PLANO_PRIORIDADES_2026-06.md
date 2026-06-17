@@ -31,7 +31,7 @@
 
 1. **Tablet loja** — F5 ▶ 10:00 · F7 alertas · F10 2 abas PWA · F11 portal ±2s
 2. **Sócio** — smoke Dashboard `?force=1.8.27` (header + logo + metas loc/dia)
-3. Opcional — rótulo clasp @143 → `v1.5.92` (cosmético)
+3. Opcional — rótulo clasp (feito 17/06: @144 `v1.5.92`)
 
 ### FASE 0 — checklist
 

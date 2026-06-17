@@ -16,7 +16,7 @@ Sistema operacional para locações — balcão (tablet), portal do responsável
 
 ## Novo chat / agente Cursor
 
-1. Abra o Cursor **nesta pasta** (`movikids-github`).
+1. Abra o Cursor **nesta pasta** — ver [`HANDOFF_NOVO_CHAT.md`](docs/ativos/HANDOFF_NOVO_CHAT.md) § *Como abrir o Cursor nesta pasta*
 2. Novo chat — digite só: *“Vamos dar continuidade ao projeto Movi Kids, tem uma pasta no C da minha máquina.”*
 
 Detalhes: [docs/ativos/HANDOFF_NOVO_CHAT.md](docs/ativos/HANDOFF_NOVO_CHAT.md) · [AGENTS.md](AGENTS.md)

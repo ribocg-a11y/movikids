@@ -55,7 +55,7 @@ Detalhe completo: [`ACESSOS_E_AUTORIZACOES.md`](docs/ativos/ACESSOS_E_AUTORIZACO
 | Camada | Versão repo | Ping produção |
 |--------|-------------|---------------|
 | Frontend | **v1.8.27** | https://ribocg-a11y.github.io/movikids/?force=1.8.27 |
-| GAS | **v1.5.92** | ping prod. **v1.5.92** ✅ · @143 |
+| GAS | **v1.5.92** | ping prod. **v1.5.92** ✅ · @144 |
 | Aba FOLHA | OK (I25) | B68 ~5269,96 · `folhaPlanejamento.fonte: FOLHA` |
 | Deploy ID | `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y` | |
 

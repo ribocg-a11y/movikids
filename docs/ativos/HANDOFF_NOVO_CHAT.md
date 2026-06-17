@@ -4,7 +4,7 @@
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **Repo local:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`  
-**GitHub:** `ribocg-a11y/movikids` · branch `main` · HEAD **`8cd49c3`**
+**GitHub:** `ribocg-a11y/movikids` · branch `main` · HEAD **`f9ead2a`**
 
 ---
 
@@ -26,24 +26,37 @@ Detalhe: `ACESSOS_E_AUTORIZACOES.md` §7 · incidente I21.
 
 ---
 
-## Como abrir um chat novo (você)
+## Como abrir o Cursor nesta pasta (novo chat)
 
-### Opção A — mensagem mínima (recomendada)
+### Método 1 — Explorador de Arquivos (mais fácil)
 
-1. Abra o Cursor **nesta pasta** (`movikids-github`).
-2. Novo chat. Digite só:
+1. Abra esta pasta no Windows:
+   `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`
+2. Clique na barra de endereço, digite `cursor .` e Enter  
+   *(ou botão direito na pasta → **Abrir com Cursor**, se aparecer)*
+
+### Método 2 — Terminal / PowerShell
+
+```powershell
+cursor "C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github"
+```
+
+### Método 3 — Dentro do Cursor
+
+**File → Open Folder…** → selecione `movikids-github`
+
+### Depois de abrir a pasta
+
+1. **Chat → New Chat** (Ctrl+L ou ícone de chat)
+2. Digite só:
 
 ```
 Vamos dar continuidade ao projeto Movi Kids, tem uma pasta no C da minha máquina.
 ```
 
-A regra `.cursor/rules/handoff-movikids.mdc` manda o agente ler este arquivo **sem pedir mais nada**.
+O agente lê `HANDOFF_NOVO_CHAT.md` automaticamente (regra `.cursor/rules/handoff-movikids.mdc`).
 
-### Opção B — explícita
-
-```
-Continuo o MOVI KIDS. Repo: C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github
-```
+---
 
 ### O que o agente faz sozinho (não pedir autorização)
 
@@ -61,7 +74,7 @@ Continuo o MOVI KIDS. Repo: C:\Users\riboc\Documents\Codex\2026-05-30\files-ment
 |--------|--------|-------------|
 | **Frontend** | **v1.8.27** | https://ribocg-a11y.github.io/movikids/?force=1.8.27 |
 | **Service Worker** | **1.8.27** | `sw.js` |
-| **Apps Script (ping)** | **v1.5.92** | ping JSON 16/06 · `@143` clasp (rótulo desc. `v1.5.95` — só etiqueta, ping = v1.5.92) |
+| **Apps Script (ping)** | **v1.5.92** | ping JSON · `@144` clasp · desc. `v1.5.92` |
 | **Aba FOLHA** | **OK** (I25) | B68 ~5269,96 · `folhaPlanejamento.fonte: FOLHA` |
 | **Comunicação** | **QR only** | `OPERACAO_COMUNICACAO_QR_ONLY.md` |
 
@@ -112,7 +125,8 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 |---|------|------|
 | 1 | **Tablet loja:** F5 ▶ 10:00 imediato · F7 alertas 5min/expirado · F11 portal ±2s · F10 2 abas PWA | **Você** |
 | 2 | Dashboard `?force=1.8.27` — header mobile + logo empty state + metas loc/dia | **Você** (PC ou tablet) |
-| 3 | Opcional: corrigir **rótulo** clasp @143 para `v1.5.92` (só organização) | **Você** (Editor, sem Nova versão obrigatória) |
+
+**Clasp @144** — rótulo `v1.5.92` alinhado (17/06) · mesmo Deploy ID · ping inalterado.
 
 **Protocolo Mestre 16/06:** 18+ suites OK · FASE6/P3/scripts corrigidos · cleanup 0 resíduos · log em `financeiro/logs/` (gitignored).
 
@@ -127,6 +141,7 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 
 | Hash | Entrega |
 |------|---------|
+| `f9ead2a` | docs: atualize tudo FE v1.8.27 + GAS v1.5.92 (handoff 16/06) |
 | `8cd49c3` | Protocolo Mestre + fix scripts teste + atalhos verify-gas |
 | `fff8632` | Logo PNG transparente empty state v1.8.27 |
 | `c4d902b` | Header mobile DNA v1.8.24 |
