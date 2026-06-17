@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.94
+// MOVI KIDS — Google Apps Script v1.5.95
+// v1.5.95: meta só Raykelly id3 + reserva id4 (fora Eduarda/Milena)
 // v1.5.94: metaOperadorTurno — Raykelly id 3 (corrige id 1 Eduarda)
 // v1.5.93: metaOperadorTurno — meta 20 loc/turno + bonus R$100 (AUDITORIA + escala)
 // v1.5.92: encerrarLocacao — mensagem distinta para Pendente vs Encerrada/Cancelada
@@ -1319,7 +1320,7 @@ function kpiAvancadosMes_(mmyy, nMes, nCancelMes, diasOperando, nPorVeiculo, min
   };
 }
 
-/** Meta operacional — 20 locações/turno · bonus R$100 (Raykelly id 3 · escala 06/2026). */
+/** Meta operacional — só Raykelly (id 3) + vaga id 4. Fora: Eduarda (1), Milena (2). */
 const META_LOC_TURNO_PADRAO_ = 20;
 const META_BONUS_DIA_REAIS_ = 100;
 
@@ -1327,6 +1328,7 @@ function metaOperadorCfg_(opId) {
   const id = Number(opId);
   if (id === 3) {
     return {
+      ativo: true,
       meta: META_LOC_TURNO_PADRAO_,
       bonus: META_BONUS_DIA_REAIS_,
       inicio: '16/06/2026',
@@ -1338,6 +1340,23 @@ function metaOperadorCfg_(opId) {
         '4': null,
         '5': [14, 22],
         '6': [10, 20]
+      }
+    };
+  }
+  if (id === 4) {
+    return {
+      ativo: false,
+      meta: META_LOC_TURNO_PADRAO_,
+      bonus: META_BONUS_DIA_REAIS_,
+      inicio: '',
+      escala: {
+        '0': [13, 21],
+        '1': null,
+        '2': [14, 22],
+        '3': null,
+        '4': [14, 22],
+        '5': [14, 22],
+        '6': [12, 22]
       }
     };
   }
@@ -1391,7 +1410,7 @@ function metaOperadorTurno_(p) {
   if (!found) return err_('Operador nao encontrado', 404);
   const op = operadorObjFromRow_(found.data);
   const cfg = metaOperadorCfg_(opId);
-  if (!cfg) {
+  if (!cfg || cfg.ativo === false || !cfg.inicio) {
     return resp_({ ok: true, configurado: false, operador: op.nome, operadorId: opId });
   }
 

@@ -3,10 +3,11 @@
 let _metaLastAtingiu = null;
 let _metaRefreshBusy = false;
 
-/** id real na planilha OPERADORES_SISTEMA (Raykelly = 3, não 1). */
+/** Meta 20 loc/turno · R$100 — só operadores do programa (não Eduarda id1, não Milena id2). */
 const MK_META_CFG = {
   3: {
     nome: 'Raykelly',
+    ativo: true,
     meta: 20,
     bonus: 100,
     inicio: '2026-06-16',
@@ -19,24 +20,42 @@ const MK_META_CFG = {
       5: [14, 22],
       6: [10, 20]
     }
+  },
+  4: {
+    nome: 'Atendente 2',
+    ativo: false,
+    meta: 20,
+    bonus: 100,
+    inicio: '',
+    escala: {
+      0: [13, 21],
+      1: null,
+      2: [14, 22],
+      3: null,
+      4: [14, 22],
+      5: [14, 22],
+      6: [12, 22]
+    }
   }
 };
 
-function mkMetaConfiguredIds_() {
-  return Object.keys(MK_META_CFG).map(Number).filter((id) => id > 0);
+function mkMetaCfgAtiva_(opId) {
+  const cfg = MK_META_CFG[Number(opId)];
+  if (!cfg || cfg.ativo === false) return null;
+  if (!cfg.inicio) return null;
+  return cfg;
 }
 
 function mkMetaResolveOperadorId_() {
   const params = typeof operadorApiParams_ === 'function' ? operadorApiParams_() : {};
-  const cfgIds = mkMetaConfiguredIds_();
-  if (params.operadorId && MK_META_CFG[Number(params.operadorId)]) {
-    return Number(params.operadorId);
-  }
   const srv = typeof mkAuthGetSessaoServidor_ === 'function' ? mkAuthGetSessaoServidor_() : null;
-  if (srv && srv.operadorId && MK_META_CFG[Number(srv.operadorId)]) {
+  if (srv && srv.operadorId && mkMetaCfgAtiva_(srv.operadorId)) {
     return Number(srv.operadorId);
   }
-  return cfgIds[0] || 0;
+  if (params.operadorId && mkMetaCfgAtiva_(params.operadorId)) {
+    return Number(params.operadorId);
+  }
+  return 0;
 }
 
 function mkMetaShiftLabel_(shift) {
@@ -57,7 +76,7 @@ function mkMetaInShift_(mins, shift) {
 }
 
 function mkMetaComputeLocal_(opId) {
-  const cfg = MK_META_CFG[Number(opId)];
+  const cfg = mkMetaCfgAtiva_(opId);
   if (!cfg) return null;
   const now = new Date();
   const dow = now.getDay();
@@ -160,7 +179,7 @@ async function mkMetaRefresh_() {
   const tile = document.getElementById('stat-meta-tile');
   if (!tile) return;
   const opId = mkMetaResolveOperadorId_();
-  if (!opId || !MK_META_CFG[opId]) {
+  if (!opId || !mkMetaCfgAtiva_(opId)) {
     mkMetaShowTile_(tile, false);
     return;
   }
