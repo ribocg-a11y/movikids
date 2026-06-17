@@ -1,6 +1,6 @@
 # MOVI KIDS — Mapa de erros, falhas e bugs
 
-**Atualizado:** 14/06/2026 — **I26** travas deploy GAS · **I25 fechado** · GAS **v1.5.92** prod.  
+**Atualizado:** 17/06/2026 — **I28** liberar sessão tablet · GAS **v1.5.92** prod. · FE **v1.8.30**  
 **Uso anterior:** 09/06/2026 — **I22 fechado** (hotfix FE v1.8.2)  
 **Uso:** consultar **antes de publicar** e **ao montar checklist de teste**. Cada linha tem trava e script de verificação quando existir.
 
@@ -35,6 +35,7 @@
 | I1 | `clasp deploy` **sem `-i`** na Web App | 404; caixa quebrado | `clasp deploy -i AKfycbwakQ...` via `deploy-gas.ps1` | Regra 9 | ping |
 | **I26** | **`clasp push` sem republicar Web App** | Editor v1.5.92 / `/exec` v1.5.91 (3×) | `deploy-gas.ps1` + `verify-gas-deploy.ps1` | Regra 9; clasp @138 desc | ping + verify |
 | **I27** | **Web App exige login Google (≠ Anyone)** | `fetch()` Failed to fetch no Pages/tablet | **Editar** `AKfycbwakQ...` → Quem tem acesso = **Qualquer pessoa** | `live.anonymous` verify | aba anonima ping JSON |
+| **I28** | **`prompt()` PIN admin + deslogar PIN-first no tablet** | Liberar/Deslogar balcão sem efeito; dual Milena+Admin | FE **v1.8.29** modal PIN + persist; **v1.8.30** banner dual + guards | `guard.auth.*` I28 | `TESTE_SESSAO_LIBERAR_READONLY.ps1` · tablet Liberar |
 | I2 | GAS offline + timer local | Extra fantasma | ADM `somentePlano`; offline v1.7.6 | `FIX_OFFLINE_ENCERRAR` | tablet encerrar |
 | I3 | Cache `?force=` / **`index.html ?v=` desatualizado** | JS antigo no tablet/admin | `mk-version` + `sw` + **index** alinhados | `pre-push-check` versões | `?force=VERSAO` · ver **11/06** |
 | **I25** | **FOLHA `#NAME?` — `setValue('=SE...')` no GAS** | Aba FOLHA quebrada; Dashboard usa fallback 4926 | GAS **v1.5.91** `folhaFlushFormulasUser_` (USER_ENTERED) + `repairFolhaAdmin` | Nunca `setValue`/`setFormula` PT para fórmulas FOLHA | `TESTE_FOLHA_FORMULAS_READONLY.ps1` · **fechado 14/06** |
@@ -81,6 +82,7 @@
 | `../arquivo/incidentes/INCIDENTE_I23_DASHBOARD_LENTO_TRAVADO_2026-06-09.md` | **I23** — Dashboard lento; mutex KPI + GAS perf |
 | `../arquivo/incidentes/INCIDENTE_I26_GAS_EDITOR_VS_EXEC_2026-06-14.md` | **I26** — push sem republicar |
 | `../arquivo/incidentes/INCIDENTE_I27_GAS_LOGIN_ANONIMO_2026-06-14.md` | **I27** — ServiceLogin / Failed to fetch |
+| `../arquivo/incidentes/INCIDENTE_I28_LIBERAR_SESSAO_TABLET_2026-06-17.md` | **I28** — prompt PIN / liberar balcão tablet |
 | `TROCA_SMS_GATEWAY_DJVJRL_2026-06-04.md` | Gateway SMS |
 
 ---
@@ -107,12 +109,18 @@
 | `guard.auth.fantasma` | `mkAuthReconcileSessaoFantasma_` em mk-auth | I19 |
 | `guard.idle.wallclock` | `mkAuthIdleRemainingMs_` em mk-auth | I21 |
 | `guard.idle.gas.release` | `mkAuthReleaseBalcaoServer_` em mk-auth | I21 |
+| `guard.auth.no-prompt-pin` | `mkAuthEnsureAdminPin_` sem `prompt()` | I28 |
+| `guard.auth.pin-modal` | `mkAdminPinModalAsk_` em mk-admin | I28 |
+| `guard.auth.pin-persist` | `mkAuthRestoreAdminPin_` + persist 24h | I28 |
+| `guard.auth.deslogar-api-first` | `mkOpDeslogarBalcao` API antes do PIN | I28 |
+| `guard.auth.dual-banner` | `mkAuthDualSessaoBanner_` + `#mk-dual-sessao-banner` | I28 |
 | `guard.turno.chip` | `#hd-turno-chip` em index.html | I19 |
 | `guard.html.page-balance` | balanceamento `<div>` page-home/nova/dashboard | I22 |
 | `guard.operacao.livre` | `check-operacao-livre.ps1` se FE crítico alterado | I22 |
 | `teste.paridade` | `scripts/testes/TESTE_PARIDADE_HTTP_BROWSER_GAS.ps1` | I15 |
 | `teste.portal` | `scripts/testes/TESTE_PORTAL_READONLY.ps1` | portal |
 | `teste.cronometro` | `scripts/testes/TESTE_PARIDADE_CRONOMETRO_PORTAL_BALCAO.ps1` | I16 |
+| `teste.sessao.liberar` | `scripts/testes/TESTE_SESSAO_LIBERAR_READONLY.ps1` | I28 |
 
 ## Travas pos-push (Pacote J — após `git push` FE)
 
@@ -137,6 +145,8 @@
 - [ ] Liberar sessão ADM → tablet desloga ou chip laranja em ≤60s (I19)
 - [x] Mock idle 1h → gate login + balcão livre no GAS (I21) — **09/06 v1.7.96**
 - [ ] Admin timer mostra `MM:SS`; `⏸` com locação Ativa (I21/I18)
+- [ ] **Dual admin + operador GAS:** faixa laranja Liberar + modal PIN (I28) — `?force=1.8.30`
+- [ ] Operadores → Deslogar balcão → teclado numérico, não `prompt()` nativo (I28)
 - [ ] Dashboard admin carrega KPIs em &lt;15s — não fica em "Calculando..." (I23)
 - [ ] Ctrl+F5 com `?force=VERSAO_ATUAL`
 
@@ -163,6 +173,9 @@
 17. **Nunca** chamar `buildKpiMesPayload_` dentro de `resumoDia` — usar patch leve `calcLeadingDiaPatch_` (I23).
 18. **Sempre** pacote deploy completo (`DEPLOY_v*.md` **modelo `DEPLOY_v1.5.76`**) ao entregar fase GAS+FE — caminho PC, clasp, links, testes, checklist tablet, critério de pronto (Regra 8).
 19. **Após deploy GAS que toque FOLHA:** rodar `repairFolhaAdmin` + `TESTE_FOLHA_FORMULAS_READONLY.ps1` (I25).
+20. **Nunca** usar `prompt()` para PIN admin no tablet — só `mkAdminPinModalAsk_` (I28).
+21. **Nunca** pedir PIN admin **antes** de tentar `liberarSessaoOperador` em `mkOpDeslogarBalcao` (I28).
+22. **Sempre** faixa `#mk-dual-sessao-banner` quando admin local + `sessaoAtiva` no GAS (I28).
 
 ---
 
@@ -170,7 +183,7 @@
 
 | Camada | Repo / produção | Mínimo operação |
 |--------|-----------------|-----------------|
-| Frontend | **v1.8.22** | `?force=1.8.22` |
+| Frontend | **v1.8.30** | `?force=1.8.30` |
 | GAS | **v1.5.92** (prod.) | `deploy-gas.ps1` se ping &lt; repo |
 | Aba FOLHA | B68 ~5269,96 · `fonte=FOLHA` | `repairFolhaAdmin` após deploy que toque FOLHA |
 

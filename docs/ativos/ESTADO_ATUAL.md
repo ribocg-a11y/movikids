@@ -1,4 +1,4 @@
-# MOVI KIDS — Estado atual (16/06/2026)
+# MOVI KIDS — Estado atual (17/06/2026)
 
 Referência única para alinhamento local × produção.
 
@@ -11,7 +11,7 @@ Referência única para alinhamento local × produção.
 **Memorial folha:** `../referencia/FOLHA_PAGAMENTO_MEMORIAL_E_PLANILHA.md`  
 **FASE 14 mini-DRE:** 🟡 memorial — `FASE_14_MINI_DRE.md` · `../referencia/MEMORIAL_MINI_DRE.md`  
 **Deploy GAS pacote:** **`DEPLOY_v1.5.91_FOLHA_REPAIR_USER_ENTERED.md`** · FE **`DEPLOY_FE_v1.8.15_SEMANA_ATUAL.md`** (v1.8.11–1.8.14: `DEPLOY_FE_v1.8.12_DASHBOARD_NARRATIVO.md`)  
-**Incidente I25 (FOLHA #NAME?):** `../arquivo/incidentes/INCIDENTE_I25_FOLHA_FORMULAS_NAME_2026-06-13.md`
+**Incidente I28 (liberar sessão tablet):** `../arquivo/incidentes/INCIDENTE_I28_LIBERAR_SESSAO_TABLET_2026-06-17.md`
 
 ---
 
@@ -26,7 +26,7 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 | Camada | Versão repo | URL / ID |
 |--------|-------------|----------|
-| **Frontend** | **v1.8.27** | https://ribocg-a11y.github.io/movikids/?force=1.8.27 |
+| **Frontend** | **v1.8.30** | https://ribocg-a11y.github.io/movikids/?force=1.8.30 |
 | **Apps Script (código + ping)** | **v1.5.92** | @144 · ping confirmado 16/06 |
 | **Aba FOLHA** | memorial B68 **OK** | [gid=179040058](https://docs.google.com/spreadsheets/d/1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618/edit#gid=179040058) · B68 ~5269,96 |
 
@@ -101,6 +101,9 @@ https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPe
 
 | Versão | Entrega |
 |--------|---------|
+| **v1.8.30** | **I28** — modal PIN + persist + banner dual + guards liberar sessão |
+| **v1.8.29** | I28 fix — `mkAdminPinModalAsk_`, API antes PIN em deslogar |
+| **v1.8.28** | FASE 9 DNA admin (glass, accordions, CRM cards) |
 | **v1.8.27** | Logo oficial PNG transparente empty state Home |
 | **v1.8.24–26** | Header mobile DNA (`mk-mob-header`) · banner auto-update 12s |
 | **v1.8.23** | Mobile header contraste + auto-update banner |

@@ -193,6 +193,11 @@ function adminLogin() {
   if (typeof refreshOperadoresAdmin_ === 'function') refreshOperadoresAdmin_();
   if (typeof atualizarOperadorUI_ === 'function') atualizarOperadorUI_();
   if (typeof mkAuthRefreshSessaoTurno_ === 'function') mkAuthRefreshSessaoTurno_();
+  const srvLogin = typeof mkAuthGetSessaoServidor_ === 'function' ? mkAuthGetSessaoServidor_() : null;
+  if (srvLogin && srvLogin.nome && typeof toast === 'function') {
+    toast(srvLogin.nome + ' ainda no balcão — use Liberar sessão se precisar trocar operador.', 'warning', 8000);
+  }
+  if (typeof mkAuthDualSessaoBanner_ === 'function') mkAuthDualSessaoBanner_();
   if (typeof applyRoleNav_ === 'function') applyRoleNav_();
   else {
     const gerBtn = document.getElementById('sb-gerenciar-btn');

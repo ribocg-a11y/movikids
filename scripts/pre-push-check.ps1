@@ -252,6 +252,32 @@ try {
     } else {
       Add-Check "guard.idle.gas.release" "ok" "logout libera balcao no GAS"
     }
+    if ($authRaw -match 'function mkAuthEnsureAdminPin_[\s\S]{0,800}prompt\s*\(') {
+      Add-Check "guard.auth.no-prompt-pin" "fail" "mkAuthEnsureAdminPin_ usa prompt() (I28 tablet/PWA)"
+    } elseif ($authRaw -notmatch 'mkAuthEnsureAdminPin_') {
+      Add-Check "guard.auth.no-prompt-pin" "fail" "mkAuthEnsureAdminPin_ ausente"
+    } else {
+      Add-Check "guard.auth.no-prompt-pin" "ok" "PIN admin sem prompt() no tablet"
+    }
+    if ($authRaw -notmatch 'mkAuthRestoreAdminPin_') {
+      Add-Check "guard.auth.pin-persist" "fail" "mkAuthRestoreAdminPin_ ausente (I28 PWA perde PIN)"
+    } elseif ($authRaw -notmatch 'ADMIN_PIN_PERSIST_KEY|mk_admin_pin_persist_v1') {
+      Add-Check "guard.auth.pin-persist" "fail" "PIN admin sem persist 24h (I28)"
+    } else {
+      Add-Check "guard.auth.pin-persist" "ok" "PIN admin restaura apos PWA"
+    }
+    if ($authRaw -notmatch 'function mkAuthDualSessaoBanner_') {
+      Add-Check "guard.auth.dual-banner" "fail" "mkAuthDualSessaoBanner_ ausente (I28 sessao dual)"
+    } else {
+      Add-Check "guard.auth.dual-banner" "ok" "faixa admin+balcao visivel"
+    }
+    if ($authRaw -notmatch 'mkOpDeslogarBalcao[\s\S]{0,1200}action:\s*''liberarSessaoOperador''') {
+      Add-Check "guard.auth.deslogar-api-first" "fail" "mkOpDeslogarBalcao nao tenta API antes do PIN (I28)"
+    } elseif ($authRaw -notmatch 'mkOpDeslogarBalcao[\s\S]{0,1200}liberarSessaoOperador[\s\S]{0,600}mkAuthEnsureAdminPin_') {
+      Add-Check "guard.auth.deslogar-api-first" "fail" "mkOpDeslogarBalcao ordem API/PIN errada (I28)"
+    } else {
+      Add-Check "guard.auth.deslogar-api-first" "ok" "deslogar tenta liberar antes do PIN"
+    }
   } else {
     Add-Check "guard.idle.locacao" "fail" "mk-auth.js ausente"
     Add-Check "guard.auth.fantasma" "fail" "mk-auth.js ausente"
@@ -264,6 +290,20 @@ try {
       Add-Check "guard.turno.chip" "fail" "hd-turno-chip ausente (I19)"
     } else {
       Add-Check "guard.turno.chip" "ok" "chip turno no header mobile"
+    }
+    if ($indexAuthRaw -notmatch 'id="mk-dual-sessao-banner"') {
+      Add-Check "guard.auth.dual-banner" "fail" "mk-dual-sessao-banner ausente em index.html (I28)"
+    }
+    $adminPath = Join-Path $root "mk-admin.js"
+    if (Test-Path $adminPath) {
+      $adminRaw = Get-Content -Path $adminPath -Raw -Encoding UTF8
+      if ($adminRaw -notmatch 'mkAdminPinModalAsk_') {
+        Add-Check "guard.auth.pin-modal" "fail" "mkAdminPinModalAsk_ ausente (I28 tablet)"
+      } else {
+        Add-Check "guard.auth.pin-modal" "ok" "PIN admin via modal numerico"
+      }
+    } else {
+      Add-Check "guard.auth.pin-modal" "fail" "mk-admin.js ausente"
     }
     $relPath = Join-Path $root "mk-relacionamento.js"
     $relRaw = if (Test-Path $relPath) { Get-Content -Path $relPath -Raw -Encoding UTF8 } else { "" }

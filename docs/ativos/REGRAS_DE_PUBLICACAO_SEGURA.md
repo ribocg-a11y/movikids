@@ -315,3 +315,27 @@ C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\m
 - Doc deploy mestre: `DEPLOY_GAS_v1.5.32_AUTH.md` · pacote atual: `DEPLOY_v1.5.80_FASE9_FOLHA_VIABILIDADE.md`
 
 Complementa **Regra 8** (Apps Script: sim/nao no resumo de pacote).
+
+## Regra 17 — PIN admin no tablet (I28)
+
+**Nunca** usar `prompt()` ou `window.prompt` em `mkAuthEnsureAdminPin_` ou fluxos de **Liberar sessão / Deslogar balcão**.
+
+- Usar **`mkAdminPinModalAsk_`** (teclado numérico `#pin-modal`).
+- Guard: `guard.auth.no-prompt-pin` + `guard.auth.pin-modal` em `pre-push-check.ps1`.
+- Incidente: `INCIDENTE_I28_LIBERAR_SESSAO_TABLET_2026-06-17.md`.
+
+## Regra 18 — Persistência PIN admin PWA (I28)
+
+PIN admin deve sobreviver restore PWA por **24h**:
+
+- `mkAuthRestoreAdminPin_` + chave `mk_admin_pin_persist_v1`.
+- Guard: `guard.auth.pin-persist`.
+- Tablet: fechar PWA → reabrir → Liberar ainda funciona sem redigitar PIN.
+
+## Regra 19 — Liberar balcão e sessão dual (I28)
+
+1. **`mkOpDeslogarBalcao`:** tentar `liberarSessaoOperador` **antes** de pedir PIN admin.
+2. **Admin + operador no GAS:** exibir `#mk-dual-sessao-banner` com botão Liberar (`mkAuthDualSessaoBanner_`).
+3. Guards: `guard.auth.deslogar-api-first`, `guard.auth.dual-banner`.
+4. Teste readonly: `scripts/testes/TESTE_SESSAO_LIBERAR_READONLY.ps1`.
+5. Homolog tablet obrigatória após mudança em `mk-auth.js` / `mk-admin.js` auth.

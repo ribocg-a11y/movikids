@@ -338,11 +338,31 @@
     });
   }
 
+  /** Faixa fixa quando admin local + operador ainda no GAS (I28). */
+  function mkAuthDualSessaoBanner_() {
+    const el = document.getElementById('mk-dual-sessao-banner');
+    const txt = document.getElementById('mk-dual-sessao-text');
+    if (!el) return;
+    const isAdm = (typeof mkAuthIsAdmin === 'function' && mkAuthIsAdmin()) || !!window.isAdmin;
+    const srv = sessaoAtivaRemota;
+    const dual = !!(isAdm && srv && srv.nome);
+    el.hidden = !dual;
+    if (!dual) {
+      if (txt) txt.textContent = '';
+      return;
+    }
+    if (txt) {
+      txt.textContent = srv.nome + ' ainda está no balcão (servidor). Libere antes de outro operador entrar.';
+    }
+  }
+  window.mkAuthDualSessaoBanner_ = mkAuthDualSessaoBanner_;
+
   /** Atualiza banner, login lock e rodapé (sb-sessao) de uma vez. */
   function mkAuthSyncSessaoBalcaoUI_(sessao) {
     sessaoAtivaRemota = sessao && sessao.nome ? sessao : null;
     updateSessaoLockUI_();
     updateOperadoresSessaoBanner_(sessaoAtivaRemota);
+    mkAuthDualSessaoBanner_();
     if (typeof atualizarOperadorUI_ === 'function') {
       atualizarOperadorUI_(sessaoAtivaRemota);
     }
