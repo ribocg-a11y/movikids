@@ -4,7 +4,7 @@
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **Repo local:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`  
-**GitHub:** `ribocg-a11y/movikids` · branch `main` · HEAD **`f9ead2a`**
+**GitHub:** `ribocg-a11y/movikids` · branch `main` · HEAD **`cb80d88`**
 
 ---
 
@@ -141,6 +141,7 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 
 | Hash | Entrega |
 |------|---------|
+| `cb80d88` | docs: @144 clasp v1.5.92 + instrucoes abrir Cursor na pasta |
 | `f9ead2a` | docs: atualize tudo FE v1.8.27 + GAS v1.5.92 (handoff 16/06) |
 | `8cd49c3` | Protocolo Mestre + fix scripts teste + atalhos verify-gas |
 | `fff8632` | Logo PNG transparente empty state v1.8.27 |
