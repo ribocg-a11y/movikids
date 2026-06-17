@@ -341,6 +341,7 @@ function renderEncHoje(list) {
   const container = document.getElementById('enc-hoje-list');
   const nLoc = document.getElementById('stat-nloc');
   if(nLoc) nLoc.textContent = encHojeData.length;
+  if (typeof mkMetaRefresh_ === 'function') mkMetaRefresh_();
   if (!section||!container) return;
   if (!encHojeData.length) { section.style.display='none'; return; }
   section.style.display='block';

@@ -1318,7 +1318,7 @@ function kpiAvancadosMes_(mmyy, nMes, nCancelMes, diasOperando, nPorVeiculo, min
   };
 }
 
-/** Meta operacional — 20 locações/turno · bonus R$100 (Kaykelly id 1 · escala anexo 06/2026). */
+/** Meta operacional — 20 locações/turno · bonus R$100 (Raykelly id 1 · escala anexo 06/2026). */
 const META_LOC_TURNO_PADRAO_ = 20;
 const META_BONUS_DIA_REAIS_ = 100;
 
