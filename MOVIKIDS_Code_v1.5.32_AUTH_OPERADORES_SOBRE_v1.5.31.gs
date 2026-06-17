@@ -1,6 +1,6 @@
 // ═══════════════════════════════════════════════════════════
 // MOVI KIDS — Google Apps Script v1.5.97
-// v1.5.97: metaTurno em carregarInicio (KPI meta junto com sync)
+// v1.5.97: metaTurno em carregarInicio (KPI meta junto com sync) · ping versao alinhada
 // v1.5.96: bonus meta — R$100 so se loc > 20 (21+ no turno)
 // v1.5.95: meta só Raykelly id3 + reserva id4 (fora Eduarda/Milena)
 // v1.5.94: metaOperadorTurno — Raykelly id 3 (corrige id 1 Eduarda)
@@ -399,9 +399,9 @@ function ping_() {
   const agora = new Date();
   return resp_({
     status:  'online',
-    versao:  'v1.5.92',
+    versao:  'v1.5.97',
     timestamp: fmtData_(agora) + ' ' + fmtHoraLocal_(agora),
-    sistema: 'MOVI KIDS v1.5.92',
+    sistema: 'MOVI KIDS v1.5.97',
     postWriteActions: WRITE_ACTIONS_CRITICAS_
   });
 }
