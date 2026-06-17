@@ -266,17 +266,15 @@ try {
     } else {
       Add-Check "guard.auth.pin-persist" "ok" "PIN admin restaura apos PWA"
     }
-    if ($authRaw -notmatch 'function mkAuthDualSessaoBanner_') {
-      Add-Check "guard.auth.dual-banner" "fail" "mkAuthDualSessaoBanner_ ausente (I28 sessao dual)"
-    } else {
-      Add-Check "guard.auth.dual-banner" "ok" "faixa admin+balcao visivel"
-    }
-    if ($authRaw -notmatch 'mkOpDeslogarBalcao[\s\S]{0,1200}action:\s*''liberarSessaoOperador''') {
-      Add-Check "guard.auth.deslogar-api-first" "fail" "mkOpDeslogarBalcao nao tenta API antes do PIN (I28)"
-    } elseif ($authRaw -notmatch 'mkOpDeslogarBalcao[\s\S]{0,1200}liberarSessaoOperador[\s\S]{0,600}mkAuthEnsureAdminPin_') {
+    if ($authRaw -notmatch 'mkOpDeslogarBalcao[\s\S]{0,1200}liberarSessaoOperador[\s\S]{0,600}mkAuthEnsureAdminPin_') {
       Add-Check "guard.auth.deslogar-api-first" "fail" "mkOpDeslogarBalcao ordem API/PIN errada (I28)"
     } else {
       Add-Check "guard.auth.deslogar-api-first" "ok" "deslogar tenta liberar antes do PIN"
+    }
+    if ($authRaw -notmatch 'mkAuthLiberarSessaoOperadorAdmin_') {
+      Add-Check "guard.auth.liberar-admin" "fail" "mkAuthLiberarSessaoOperadorAdmin_ ausente (I28)"
+    } else {
+      Add-Check "guard.auth.liberar-admin" "ok" "liberar sessao via pagina Operadores"
     }
   } else {
     Add-Check "guard.idle.locacao" "fail" "mk-auth.js ausente"
@@ -291,8 +289,10 @@ try {
     } else {
       Add-Check "guard.turno.chip" "ok" "chip turno no header mobile"
     }
-    if ($indexAuthRaw -notmatch 'id="mk-dual-sessao-banner"') {
-      Add-Check "guard.auth.dual-banner" "fail" "mk-dual-sessao-banner ausente em index.html (I28)"
+    if ($indexAuthRaw -notmatch 'id="mk-ops-sessao-banner"' -or $indexAuthRaw -notmatch 'mk-liberar-sessao-btn') {
+      Add-Check "guard.auth.liberar-admin" "fail" "pagina Operadores sem liberar sessao (I28)"
+    } else {
+      Add-Check "guard.auth.liberar-admin" "ok" "Operadores: banner + liberar sessao"
     }
     $adminPath = Join-Path $root "mk-admin.js"
     if (Test-Path $adminPath) {

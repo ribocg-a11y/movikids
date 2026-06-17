@@ -152,7 +152,6 @@ function atualizarOperadorUI_(sessaoServidor) {
         : ('Turno inválido — ' + s.nome + ' não está no servidor. Faça login de novo.');
     }
   }
-  if (typeof mkAuthDualSessaoBanner_ === 'function') mkAuthDualSessaoBanner_();
 }
 window.atualizarOperadorUI_ = atualizarOperadorUI_;
 
