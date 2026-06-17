@@ -844,6 +844,7 @@
       showApp();
       if (typeof showPage === 'function') showPage('home');
       if (typeof atualizarOperadorUI_ === 'function') atualizarOperadorUI_();
+      if (typeof mkMetaRefresh_ === 'function') mkMetaRefresh_();
     }
 
     if (!window._mkAppInited && typeof init === 'function') {
@@ -952,6 +953,7 @@
         } catch (e) { /* ignore */ }
       }
       if (typeof atualizarOperadorUI_ === 'function') atualizarOperadorUI_();
+      if (typeof mkMetaRefresh_ === 'function') mkMetaRefresh_();
       if (typeof init === 'function') {
         window._mkAppInited = true;
         init().catch(e => console.error('[mk-auth] init apos restore:', e));
