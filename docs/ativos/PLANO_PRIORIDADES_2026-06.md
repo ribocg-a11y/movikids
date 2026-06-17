@@ -25,13 +25,13 @@
 | **FASE 9** Folha CLT + viabilidade | ✅ **prod fechado** | GAS **v1.5.91** · testes ok **14/06** · I25 fechado |
 | **Dashboard narrativo + folha prop.** | ✅ prod | FE v1.8.11–1.8.15 · `DEPLOY_FE_v1.8.15_SEMANA_ATUAL.md` |
 | **FASE 14** Mini-DRE | ✅ prod | FE v1.8.16+ · cascata Dashboard |
-| **FE UX mobile** | ✅ prod | v1.8.23–1.8.27 · header DNA · logo PNG · banner auto-update |
+| **FE UX mobile + DNA admin** | ✅ repo | v1.8.23–1.8.28 · FASE 9 DNA · `CHECKLIST_FASE9_DNA_ADMIN.md` |
 
 **Próximo passo imediato:**
 
-1. **Tablet loja** — F5 ▶ 10:00 · F7 alertas · F10 2 abas PWA · F11 portal ±2s
-2. **Sócio** — smoke Dashboard `?force=1.8.27` (header + logo + metas loc/dia)
-3. Opcional — rótulo clasp (feito 17/06: @144 `v1.5.92`)
+1. Smoke PC `?force=1.8.28` — Dashboard accordions · Caixa hero · CRM cards · Sistema glass
+2. **Tablet loja** — F5/F7/F10/F11 (regressão balcão)
+3. **FASE 10** CRM LTV — próximo ciclo dev (GAS — pedir §7.3)
 
 ### FASE 0 — checklist
 

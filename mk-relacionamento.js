@@ -93,7 +93,9 @@ async function carregarRelacionamento() {
       return;
     }
     container.innerHTML = relacionamentoCache.map((r, idx) => {
-      const kids = (r.criancas || []).map(c => `<span class="rel-kid">${escHtml(c)}</span>`).join('') || '<span class="rel-kid">Sem crianca</span>';
+      const nome = String(r.responsavel || 'Responsavel sem nome').trim();
+      const initial = escHtml((nome.charAt(0) || '?').toUpperCase());
+      const kids = (r.criancas || []).map(c => `<span class="rel-kid mk-rel-tab">${escHtml(c)}</span>`).join('') || '<span class="rel-kid mk-rel-tab">Sem crianca</span>';
       const hist = (r.historico || []).map(h => `
         <div class="rel-hitem">
           <span>${escHtml(h.data || '')} ${escHtml(h.horaInicio || '')} · ${escHtml(h.crianca || '')} · ${escHtml(h.plano || '')}</span>
@@ -104,15 +106,16 @@ async function carregarRelacionamento() {
       const locLabel = totalLoc === 1 ? 'locação' : 'locações';
       const canonBadge = r.cadastroCanonico ? '<span class="rel-badge" title="Cadastro na aba RESPONSAVEIS">Cadastro</span>' : '';
       const recBadge = r.recorrente ? '<span class="rel-badge rel-badge-rec" title="2 ou mais locacoes encerradas">Recorrente</span>' : '';
-      return `<div class="rel-card">
-        <div class="rel-top">
-          <div>
-            <div class="rel-name">${escHtml(r.responsavel || 'Responsavel sem nome')}${canonBadge}${recBadge}</div>
-            <div class="rel-phone">📱 ${relPhone_(r.telefone)}</div>
+      return `<div class="rel-card mk-rel-portal-card mk-glass-card">
+        <div class="mk-rel-portal-head">
+          <div class="mk-rel-avatar" aria-hidden="true">${initial}</div>
+          <div class="mk-rel-portal-meta">
+            <div class="rel-name">${escHtml(nome)}${canonBadge}${recBadge}</div>
+            <div class="rel-phone">${relPhone_(r.telefone)}</div>
           </div>
-          <div class="rel-metrics">${totalLoc} ${locLabel}${encerradas ? (' · ' + encerradas + ' enc.') : ''}<br>${relMoney_(r.faturamento)} total</div>
+          <div class="rel-metrics mk-rel-portal-stats">${totalLoc} ${locLabel}${encerradas ? (' · ' + encerradas + ' enc.') : ''}<br><strong>${relMoney_(r.faturamento)}</strong></div>
         </div>
-        <div class="rel-kids">${kids}</div>
+        <div class="rel-kids mk-rel-tabs">${kids}</div>
         <div class="rel-last">Ultima visita: ${escHtml(r.ultimaData || '-')} ${escHtml(r.ultimaHora || '')}<br>Ultimo: ${escHtml(r.ultimoVeiculo || '-')} · ${escHtml(r.ultimoPlano || '-')} · ${escHtml(r.ultimoPagamento || '-')}</div>
         <div class="rel-actions">
           <button class="rel-primary" onclick="abrirNovaComResponsavel(relacionamentoCache[${idx}])">Nova locação</button>

@@ -1,6 +1,6 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 17/06/2026 (protocolo permissões §7.3 — lista fechada)  
+**Atualizado:** 17/06/2026 (FASE 9 DNA admin · FE v1.8.28 · protocolo permissões §7.3)  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **Repo local:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`  
@@ -61,7 +61,7 @@ O agente lê `HANDOFF_NOVO_CHAT.md` automaticamente (regra `.cursor/rules/handof
 ### O que o agente faz sozinho (não pedir autorização)
 
 - Ler docs ativos (ordem abaixo)
-- Informar: FE **v1.8.27**, GAS **v1.5.92**, comunicação **QR only**
+- Informar: FE **v1.8.28**, GAS **v1.5.92**, comunicação **QR only**
 - **FE:** editar código → `pre-push-check` → commit → push → `verify-publish-complete` (**sem pedir**)
 - Testes, ping GAS, planilha OAuth, docs, PRs, APIs admin quando necessário
 - **Lista fechada (só com pedido):** `ACESSOS_E_AUTORIZACOES.md` §7.3 — GAS/clasp, `api()`/auth, F4/F9
@@ -73,8 +73,8 @@ O agente lê `HANDOFF_NOVO_CHAT.md` automaticamente (regra `.cursor/rules/handof
 
 | Camada | Versão | Verificação |
 |--------|--------|-------------|
-| **Frontend** | **v1.8.27** | https://ribocg-a11y.github.io/movikids/?force=1.8.27 |
-| **Service Worker** | **1.8.27** | `sw.js` |
+| **Frontend** | **v1.8.28** | https://ribocg-a11y.github.io/movikids/?force=1.8.28 |
+| **Service Worker** | **1.8.28** | `sw.js` |
 | **Apps Script (ping)** | **v1.5.92** | ping JSON · `@144` clasp · desc. `v1.5.92` |
 | **Aba FOLHA** | **OK** (I25) | B68 ~5269,96 · `folhaPlanejamento.fonte: FOLHA` |
 | **Comunicação** | **QR only** | `OPERACAO_COMUNICACAO_QR_ONLY.md` |
@@ -118,14 +118,17 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 
 ---
 
-## Próximo passo (16/06/2026)
+## Próximo passo (17/06/2026)
 
-**Produção:** ✅ GAS v1.5.92 · FE v1.8.27 · FOLHA OK · Protocolo Mestre executado 16/06
+**Produção:** ✅ GAS v1.5.92 · FE **v1.8.28** (FASE 9 DNA admin) · FOLHA OK
 
 | # | Ação | Quem |
 |---|------|------|
-| 1 | **Tablet loja:** F5 ▶ 10:00 imediato · F7 alertas 5min/expirado · F11 portal ±2s · F10 2 abas PWA | **Você** |
-| 2 | Dashboard `?force=1.8.27` — header mobile + logo empty state + metas loc/dia | **Você** (PC ou tablet) |
+| 1 | Smoke PC: Dashboard + Caixa + CRM + Sistema `?force=1.8.28` | **Você** |
+| 2 | **Tablet loja:** F5/F7/F10/F11 — regressão balcão (Home/Nova inalterados) | **Você** |
+| 3 | Assinar `CHECKLIST_FASE9_DNA_ADMIN.md` | **Você** |
+
+**Próximo pacote dev:** **FASE 10** CRM LTV / cohort (GAS + FE — pedir antes de `.gs`).
 
 **Clasp @144** — rótulo `v1.5.92` alinhado (17/06) · mesmo Deploy ID · ping inalterado.
 
@@ -193,7 +196,7 @@ Invoke-RestMethod "https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5
 .\scripts\pre-push-check.ps1
 ```
 
-Esperado: ping **v1.5.92** · pre-push verde · Pages **1.8.27**.
+Esperado: ping **v1.5.92** · pre-push verde · Pages **1.8.28**.
 
 ---
 

@@ -1322,3 +1322,245 @@
   font-weight: 800;
   text-decoration: none;
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   FASE 9 — DNA visual admin (gestão) · FE v1.8.28+
+   Referência: DESIGN_DNA_MOVIKIDS.md · portal acompanhar.html
+   ═══════════════════════════════════════════════════════════════ */
+
+:root {
+  --mk-admin-blue: #29B6F6;
+  --mk-admin-blue-dk: #1565C0;
+  --mk-admin-gold: #FFD54F;
+  --mk-admin-pink: #F06292;
+  --mk-admin-orange: #FF8A65;
+  --mk-admin-glass: rgba(255, 255, 255, 0.72);
+  --mk-admin-glass-border: rgba(21, 101, 192, 0.12);
+  --mk-admin-radius: 16px;
+}
+
+/* Sidebar 9.10 — estado ativo portal-blue */
+#sidebar .sb-btn.active {
+  background: rgba(41, 182, 246, 0.2);
+  color: #fff;
+  box-shadow: inset 3px 0 0 var(--mk-admin-blue);
+}
+#sidebar .sb-admin-panel .sb-btn.active {
+  background: rgba(41, 182, 246, 0.24);
+  box-shadow: inset 3px 0 0 var(--mk-admin-gold);
+}
+
+/* Shell admin — gradiente suave (não afeta Home/Nova) */
+.page.mk-admin-page,
+.page.mk-admin-soft {
+  background: linear-gradient(165deg, #eef6ff 0%, #f5f0ff 42%, #fff5f8 100%);
+  padding: 14px 16px 24px;
+  overflow-y: auto;
+}
+@media (min-width: 1024px) {
+  .page.mk-admin-page,
+  .page.mk-admin-soft { padding: 18px 22px 28px; }
+}
+
+.mk-admin-page-head { margin-bottom: 12px; }
+.mk-admin-page-lead {
+  margin: -6px 0 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--txt2, #546e7a);
+  line-height: 1.45;
+  max-width: 640px;
+}
+
+/* Glass card — 9.1 */
+.mk-glass-card {
+  background: var(--mk-admin-glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--mk-admin-glass-border);
+  border-radius: var(--mk-admin-radius);
+  box-shadow: 0 8px 32px rgba(21, 101, 192, 0.08);
+}
+
+/* Accordion nível 3 — 9.4 */
+.mk-admin-acc {
+  margin: 14px 0;
+  border-radius: var(--mk-admin-radius);
+  border: 1px solid var(--mk-admin-glass-border);
+  background: rgba(255, 255, 255, 0.55);
+  overflow: hidden;
+}
+.mk-admin-acc-sum {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--mk-admin-blue-dk);
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+}
+.mk-admin-acc-sum::-webkit-details-marker { display: none; }
+.mk-admin-acc-sum::after {
+  content: '▾';
+  margin-left: auto;
+  font-size: 12px;
+  opacity: 0.55;
+  transition: transform 0.15s;
+}
+.mk-admin-acc[open] .mk-admin-acc-sum::after { transform: rotate(180deg); }
+.mk-admin-acc-ico { font-size: 18px; line-height: 1; }
+.mk-admin-acc-body { padding: 4px 14px 16px; }
+
+/* Dashboard — cockpit + strips glass */
+.mk-admin-page .mk-exec-cockpit,
+.mk-admin-page .mk-decisao-panel,
+.mk-admin-page .mk-contratacao-panel,
+.mk-admin-page .mk-leading-row,
+.mk-admin-page .new-kpi-row .new-kpi,
+.mk-admin-page .cto-strip,
+.mk-admin-page .payback-strip,
+.mk-admin-page .new-chart-card,
+.mk-admin-page .mk-semana-panel,
+.mk-admin-page .f5-card {
+  background: var(--mk-admin-glass);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--mk-admin-glass-border);
+  border-radius: var(--mk-admin-radius);
+  box-shadow: 0 6px 24px rgba(21, 101, 192, 0.06);
+}
+
+/* Payback 9.5 — pill Fredoka */
+.mk-admin-page .payback-strip {
+  border-color: rgba(94, 53, 177, 0.25);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.85) 0%, rgba(237, 231, 246, 0.9) 100%);
+}
+.mk-admin-page .payback-strip-title {
+  font-family: 'Fredoka One', cursive;
+  font-size: 15px;
+  letter-spacing: 0.02em;
+}
+.mk-admin-page .payback-pill {
+  border-radius: 999px;
+  font-family: 'Fredoka One', cursive;
+  font-size: 11px;
+  padding: 4px 12px;
+}
+.mk-admin-page .payback-bar-fill {
+  background: linear-gradient(90deg, var(--mk-admin-blue), #5E35B1, var(--mk-admin-pink));
+}
+
+.mk-admin-page .mk-exec-kpi-val {
+  font-family: 'Fredoka One', cursive;
+  letter-spacing: 0.02em;
+}
+.mk-admin-page .mk-stat-hero-val {
+  font-family: 'Fredoka One', cursive;
+  color: var(--mk-admin-blue-dk);
+}
+
+/* Caixa 9.6 */
+.mk-caixa-hero .mk-stat-hero-val {
+  font-size: clamp(28px, 6vw, 36px);
+  color: var(--mk-admin-blue-dk);
+}
+.mk-admin-page .cx-card {
+  background: var(--mk-admin-glass);
+  border: 1px solid var(--mk-admin-glass-border);
+  border-radius: var(--mk-admin-radius);
+}
+
+/* CRM portal 9.7 */
+.mk-rel-portal-card { padding: 14px 16px; }
+.mk-rel-portal-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.mk-rel-avatar {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Fredoka One', cursive;
+  font-size: 20px;
+  color: var(--mk-admin-blue-dk);
+  background: linear-gradient(145deg, rgba(41, 182, 246, 0.25), rgba(255, 213, 79, 0.35));
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 4px 12px rgba(21, 101, 192, 0.12);
+}
+.mk-rel-portal-meta { flex: 1; min-width: 0; }
+.mk-rel-portal-stats {
+  text-align: right;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--txt2, #546e7a);
+}
+.mk-rel-portal-stats strong {
+  font-family: 'Fredoka One', cursive;
+  font-size: 16px;
+  color: var(--mk-admin-blue-dk);
+}
+.mk-rel-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.mk-rel-tab {
+  border-radius: 999px !important;
+  padding: 5px 12px !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+  background: rgba(41, 182, 246, 0.12) !important;
+  border: 1px solid rgba(41, 182, 246, 0.25) !important;
+  color: var(--mk-admin-blue-dk) !important;
+}
+.rel-badge-rec {
+  background: rgba(255, 213, 79, 0.35) !important;
+  color: #E65100 !important;
+  border-radius: 999px;
+  font-weight: 800;
+}
+
+/* Custos 9.8 */
+#page-custos .custo-form.mk-glass-card {
+  padding: 16px;
+  margin-bottom: 16px;
+}
+#page-custos .form-label {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+}
+#page-custos .rel-card,
+#page-custos .empty {
+  border-radius: var(--mk-admin-radius);
+}
+
+/* Sistema 9.9 */
+.mk-admin-page .diag-card.mk-glass-card {
+  padding: 4px 0;
+}
+
+/* Busca relacionamento */
+.mk-admin-search input {
+  border-radius: 14px !important;
+  border: 2px solid rgba(41, 182, 246, 0.25) !important;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+}
+.mk-admin-search button {
+  border-radius: 14px !important;
+  font-family: 'Fredoka One', cursive;
+  letter-spacing: 0.03em;
+  background: linear-gradient(135deg, var(--mk-admin-blue), var(--mk-admin-blue-dk)) !important;
+}
+

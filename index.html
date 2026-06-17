@@ -16,16 +16,16 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<script src="mk-stale-sync.js?v=1.8.27"></script>
-<script src="mk-version.js?v=1.8.27"></script>
-<script src="mk-api.js?v=1.8.27"></script>
-<link rel="stylesheet" href="mk-design.css?v=1.8.27">
+<script src="mk-stale-sync.js?v=1.8.28"></script>
+<script src="mk-version.js?v=1.8.28"></script>
+<script src="mk-api.js?v=1.8.28"></script>
+<link rel="stylesheet" href="mk-design.css?v=1.8.28">
 
-<script src="mk-cache-bust.js?v=1.8.27"></script>
+<script src="mk-cache-bust.js?v=1.8.28"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<link rel="stylesheet" href="mk-app.css?v=1.8.27">
+<link rel="stylesheet" href="mk-app.css?v=1.8.28">
 <!-- Firebase SDK — Realtime sync canonico para todos os dispositivos -->
-<script type="module" src="mk-firebase.js?v=1.8.27"></script>
+<script type="module" src="mk-firebase.js?v=1.8.28"></script>
 </head>
 
 <body>
@@ -413,9 +413,12 @@
   </div>
 
   <!-- ──────── PAGE: RELACIONAMENTO ──────── -->
-  <div id="page-relacionamento" class="page">
-    <div class="sec-title">Relacionamento / Responsáveis</div>
-    <div class="rel-search">
+  <div id="page-relacionamento" class="page mk-admin-soft">
+    <div class="mk-admin-page-head">
+      <div class="sec-title">Relacionamento</div>
+      <p class="mk-admin-page-lead">Responsáveis e crianças — estilo portal, ação rápida para nova locação.</p>
+    </div>
+    <div class="rel-search mk-admin-search">
       <input id="rel-busca" type="search" placeholder="Buscar por responsável, criança ou telefone" onkeydown="if(event.key==='Enter') carregarRelacionamento()">
       <button onclick="carregarRelacionamento()">Buscar</button>
     </div>
@@ -425,8 +428,8 @@
   </div>
 
   <!-- ──────── PAGE: CUSTOS ──────── -->
-  <div id="page-custos" class="page">
-    <div class="custo-form">
+  <div id="page-custos" class="page mk-admin-soft">
+    <div class="custo-form mk-glass-card">
       <div class="sec-title">Registrar despesa</div>
       <div class="form-group">
         <label class="form-label">Descrição *</label>
@@ -504,7 +507,7 @@
   </div>
 
   <!-- ──────── PAGE: ADMIN ──────── -->
-  <div id="page-admin" class="page">
+  <div id="page-admin" class="page mk-admin-page">
     <div class="admin-badge">
       <div class="admin-badge-left">🔐 <span>Modo Administrador</span></div>
       <div style="display:flex;align-items:center;gap:10px">
@@ -583,7 +586,7 @@
   </div>
 
   <!-- ──────── PAGE: SISTEMA (admin) ──────── -->
-  <div id="page-sistema" class="page">
+  <div id="page-sistema" class="page mk-admin-page">
     <div class="admin-badge">
       <div class="admin-badge-left">🔧 <span>Sistema</span></div>
       <div style="display:flex;align-items:center;gap:10px">
@@ -593,7 +596,7 @@
     </div>
     <div class="dash-back" onclick="irAdmin('admin')">← Voltar ao hub</div>
     <div class="sec-title">Diagnóstico</div>
-    <div class="diag-card" id="diag-card">
+    <div class="diag-card mk-glass-card" id="diag-card">
       <div class="diag-row"><div class="diag-dot ok" id="diag-dot-gas"></div><span>GAS / Servidor</span><span class="diag-val" id="diag-gas">—</span></div>
       <div class="diag-row"><div class="diag-dot ok" id="diag-dot-sync"></div><span>Última sincronização</span><span class="diag-val" id="diag-sync">—</span></div>
       <div class="diag-row"><div class="diag-dot ok" id="diag-dot-ver"></div><span>Versão frontend</span><span class="diag-val" id="diag-ver">—</span></div>
@@ -603,7 +606,7 @@
     </div>
     <div class="sec-title">Auditoria por operador</div>
     <p style="font-size:12px;color:var(--txt3);line-height:1.4;margin:-6px 0 10px">Edições, cancelamentos, turnos de login/logout — filtro por operador do balcão.</p>
-    <div class="diag-card" style="margin-bottom:14px">
+    <div class="diag-card mk-glass-card" style="margin-bottom:14px">
       <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
         <select id="mk-audit-operador" class="form-input" style="flex:1;min-width:140px" onchange="carregarAuditoriaAdmin_()">
           <option value="">Todos os operadores</option>
@@ -613,7 +616,7 @@
       <div id="mk-audit-list" style="max-height:320px;overflow-y:auto"></div>
     </div>
     <div class="sec-title">Frota e preços (CONFIG)</div>
-    <div class="diag-card" id="mk-opcfg-card" style="margin-bottom:14px">
+    <div class="diag-card mk-glass-card" id="mk-opcfg-card" style="margin-bottom:14px">
       <div class="diag-row"><span>Fonte</span><span class="diag-val" id="mk-opcfg-fonte">—</span></div>
       <div class="diag-row"><span>Veículos</span><span class="diag-val" id="mk-opcfg-veic">—</span></div>
       <div class="diag-row"><span>Tipos de preço</span><span class="diag-val" id="mk-opcfg-tipos">—</span></div>
@@ -662,7 +665,7 @@
   </div>
 
   <!-- ──────── PAGE: OPERADORES (ADM) ──────── -->
-  <div id="page-operadores" class="page">
+  <div id="page-operadores" class="page mk-admin-page">
     <div class="admin-badge">
       <div class="admin-badge-left">👤 <span>Operadores do sistema</span></div>
       <div style="display:flex;align-items:center;gap:10px">
@@ -715,9 +718,12 @@
     </div>
   </div>
 
-  <div id="page-caixa" class="page">
+  <div id="page-caixa" class="page mk-admin-page">
     <div class="dash-back" onclick="irAdmin('admin')">← Voltar</div>
-    <div class="sec-title">Caixa do dia</div>
+    <div class="mk-admin-page-head">
+      <div class="sec-title">Caixa do dia</div>
+      <p class="mk-admin-page-lead">Hero do resultado — detalhes de conferência e tabelas ficam no bloco abaixo.</p>
+    </div>
 
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px">
       <div style="display:flex;align-items:center;gap:8px">
@@ -729,7 +735,7 @@
       </button>
     </div>
 
-    <div class="mk-caixa-resumo" id="caixa-kpis">
+    <div class="mk-caixa-resumo mk-glass-card mk-caixa-hero" id="caixa-kpis">
       <div class="mk-stat-hero">
         <div class="mk-stat-hero-val" id="cx-res">...</div>
         <div class="mk-stat-hero-lbl">Resultado do dia</div>
@@ -746,6 +752,9 @@
       <div class="db-insight" id="cx-breakeven" style="display:none;margin-top:8px;font-size:12px;font-weight:600"></div>
     </div>
 
+    <details class="mk-admin-acc">
+      <summary class="mk-admin-acc-sum"><span class="mk-admin-acc-ico">📋</span> Conferência, entradas, saídas e exportar</summary>
+      <div class="mk-admin-acc-body">
     <!-- Conferência -->
     <div class="cx-grid-conf" id="cx-conf-grid">
       <div class="cx-conf">
@@ -821,10 +830,12 @@
         📧 E-mail
       </button>
     </div>
+      </div>
+    </details>
   </div>
 
   <!-- ──────── PAGE: DASHBOARD ──────── -->
-  <div id="page-dashboard" class="page">
+  <div id="page-dashboard" class="page mk-admin-page">
     <!-- Header -->
     <div class="db-top">
       <div style="display:flex;align-items:center;gap:10px">
@@ -1052,6 +1063,10 @@
       <span id="nk-alerta-msg">Faturamento hoje abaixo da média</span>
     </div>
 
+    <details class="mk-admin-acc">
+      <summary class="mk-admin-acc-sum"><span class="mk-admin-acc-ico">📊</span> Indicadores complementares, CTO e payback</summary>
+      <div class="mk-admin-acc-body">
+
     <!-- KPIs -->
     <div class="new-kpi-row">
       <div class="new-kpi">
@@ -1118,6 +1133,9 @@
       <div class="payback-bar-bg"><div class="payback-bar-fill" id="nk-pb-bar" style="width:0%"></div></div>
       <div class="payback-note" id="nk-pb-note">—</div>
     </div>
+
+      </div>
+    </details>
     </section>
 
     <!-- 5 · FUNDO — tendência e gráficos -->
@@ -1258,7 +1276,9 @@
     </div>
 
     <!-- Pacote F — gestão avançada do mês -->
-    <div class="sec-title" style="margin:16px 0 8px;padding:0 2px">Gestão avançada do mês</div>
+    <details class="mk-admin-acc">
+      <summary class="mk-admin-acc-sum"><span class="mk-admin-acc-ico">🔬</span> Gestão avançada — Operador · Cancel · Ocupação · Custos · Recorrência</summary>
+      <div class="mk-admin-acc-body">
     <div class="new-row">
       <div class="new-chart-card">
         <div class="new-chart-title">Desempenho por operador</div>
@@ -1289,6 +1309,9 @@
       </div>
     </div>
 
+      </div>
+    </details>
+
     </section>
 
     </div><!-- /mk-dash-narrative -->
@@ -1306,7 +1329,7 @@
   </div>
 
   <!-- ──────── PAGE: RELATÓRIO ──────── -->
-  <div id="page-relatorio" class="page">
+  <div id="page-relatorio" class="page mk-admin-page">
     <div class="dash-back" onclick="irAdmin('admin')">← Voltar</div>
     <div class="sec-title">Relatório Mensal</div>
     <p style="font-size:12px;color:var(--txt3);margin:-6px 0 12px">Versão enviada ao Golden Shopping: movimentação (locações, planos, horários) + CTO contratual. Sem custos internos nem gestão ADM.</p>
@@ -1350,7 +1373,7 @@
   </div>
 
   <!-- ──────── PAGE: CONFIGURAÇÕES (Fase 6) ──────── -->
-  <div id="page-config" class="page">
+  <div id="page-config" class="page mk-admin-page">
     <div class="dash-back" onclick="irAdmin('admin')">← Voltar</div>
     <div class="sec-title">⚙️ Configurações de Mensagens</div>
 
@@ -1418,7 +1441,7 @@
   </div>
 
   <!-- ──────── PAGE: HISTÓRICO ANALYTICS (admin) ──────── -->
-  <div id="page-historico" class="page">
+  <div id="page-historico" class="page mk-admin-page">
     <div class="dash-back" onclick="irAdmin('admin')">← Voltar</div>
     <div class="sec-title">Histórico & Analytics</div>
 
@@ -1650,22 +1673,22 @@
   </div>
 </div>
 
-<script src="mk-globals.js?v=1.8.27"></script>
-<script src="mk-core.js?v=1.8.27"></script>
-<script src="mk-nav.js?v=1.8.27"></script>
-<script src="mk-admin.js?v=1.8.27"></script>
-<script src="mk-historico.js?v=1.8.27"></script>
-<script src="mk-sessao.js?v=1.8.27"></script>
-<script src="mk-home.js?v=1.8.27"></script>
-<script src="mk-custos.js?v=1.8.27"></script>
-<script src="mk-avulso.js?v=1.8.27"></script>
-<script src="mk-sync.js?v=1.8.27"></script>
-<script src="mk-nova.js?v=1.8.27"></script>
-<script src="mk-relacionamento.js?v=1.8.27"></script>
-<script src="mk-operacao.js?v=1.8.27"></script>
-<script src="mk-drawer.js?v=1.8.27"></script>
-<script src="mk-update.js?v=1.8.27"></script>
-<script src="mk-auth.js?v=1.8.27"></script>
-<script src="mk-boot.js?v=1.8.27"></script>
+<script src="mk-globals.js?v=1.8.28"></script>
+<script src="mk-core.js?v=1.8.28"></script>
+<script src="mk-nav.js?v=1.8.28"></script>
+<script src="mk-admin.js?v=1.8.28"></script>
+<script src="mk-historico.js?v=1.8.28"></script>
+<script src="mk-sessao.js?v=1.8.28"></script>
+<script src="mk-home.js?v=1.8.28"></script>
+<script src="mk-custos.js?v=1.8.28"></script>
+<script src="mk-avulso.js?v=1.8.28"></script>
+<script src="mk-sync.js?v=1.8.28"></script>
+<script src="mk-nova.js?v=1.8.28"></script>
+<script src="mk-relacionamento.js?v=1.8.28"></script>
+<script src="mk-operacao.js?v=1.8.28"></script>
+<script src="mk-drawer.js?v=1.8.28"></script>
+<script src="mk-update.js?v=1.8.28"></script>
+<script src="mk-auth.js?v=1.8.28"></script>
+<script src="mk-boot.js?v=1.8.28"></script>
 </body>
 </html>

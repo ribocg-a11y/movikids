@@ -1221,8 +1221,8 @@ function renderMetaDiaChart_(d) {
     {
       label: 'Locações',
       data: locVals,
-      borderColor: '#185FA5',
-      backgroundColor: 'rgba(24,95,165,.12)',
+      borderColor: '#29B6F6',
+      backgroundColor: 'rgba(41,182,246,.14)',
       borderWidth: 2.5,
       pointRadius: dias.map(function(dd) { return (locMap[dd] || 0) > 0 ? 6 : 3; }),
       pointHoverRadius: 8,
@@ -1623,7 +1623,7 @@ function renderChartsBody_(d) {
   if (!window.Chart) return;
   [chartDiario, chartExtrasDia, chartHoras, chartMetaDia].forEach(c => c && c.destroy());
 
-  const BLUE='#185FA5',PINK='#C2185B',GREEN='#3B6D11',AMBER='#BA7517',GRID='rgba(0,0,0,.06)';
+  const BLUE='#29B6F6',PINK='#F06292',GREEN='#2E7D32',AMBER='#FF8A65',GOLD='#FFD54F',GRID='rgba(21,101,192,.08)';
   const PLAN_LABELS = {'10min':'10 min','20min':'20 min','30min':'30 min','40min':'40 min','60min':'1 hora','3h':'3 horas'};
 
   // Faturamento diário — todos os dias do mês até hoje (zeros inclusive)

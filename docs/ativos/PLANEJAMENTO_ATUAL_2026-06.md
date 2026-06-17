@@ -11,7 +11,7 @@
 
 Ciclo **FASE 0–5 + P2/P3 concluído** (07–09/06/2026). Balcão homologado, portal QR, payback, CONFIG e APIs unificadas.
 
-**Modo atual:** **FASE 14 mini-DRE** ✅ · **FOLHA OK (I25)** · FE **v1.8.27** (UX mobile). GAS **v1.5.92** em prod. Pendente: homolog tablet F5/F7/F11.
+**Modo atual:** **FASE 9 DNA admin** ✅ repo · **FASE 14 mini-DRE** ✅ · FE **v1.8.28** · GAS **v1.5.92**. Pendente: smoke PC + tablet.
 
 ---
 
@@ -44,7 +44,7 @@ A–M (modularização FE), SMS P0, fixes I15–I21, Pacote K CRM, Pacote M M.1�
 | **7** | Leading financeiros + causalidade | P1 | ✅ repo · I23 perf | Dashboard + Caixa |
 | **8** | Alertas e semáforos | P1 | ✅ repo | Dashboard + sidebar |
 | **9** | Folha CLT + viabilidade | P1 | ✅ repo | Dashboard `#mk-contratacao-panel` |
-| **9b** | DNA visual admin | P1 | ⏳ | Dashboard, Caixa, CRM, Sistema |
+| **9b** | DNA visual admin | P1 | ✅ repo v1.8.28 | Dashboard, Caixa, CRM, Sistema |
 | **10** | CRM LTV / cohort | P2 | ⏳ | Relacionamento + Dashboard |
 | **11** | Holding Movi + ZapClin | P2 | ⏳ | Nova página Holding |
 | **12** | Drill-down + simulação margem | P2 | ⏳ | Dashboard gráficos |
