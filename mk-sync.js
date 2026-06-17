@@ -67,7 +67,7 @@ async function sincronizarServidor(force = false) {
   }, 35000);
 
   try {
-    const CACHE_KEY = 'mk_inicio_cache';
+    const CACHE_KEY = 'mk_inicio_cache_v2';
     const CACHE_TTL = 5000;
 
     if (!force) {
@@ -225,21 +225,32 @@ function aplicarDadosInicio(d) {
       try { localStorage.setItem('mk_sessions', JSON.stringify(cleanedStored)); } catch(e) {}
     }
 
-    sessions = d.ativos.map(s => mergeSessaoCanonica(s, storedMap[s.rowIndex] || {}));
-    saveSessions();
-
     if (d.statsHoje) {
       statsHoje.n = d.statsHoje.n;
       if (mkExibirFinanceiro_()) statsHoje.fat = Number(d.statsHoje.fat) || 0;
       else statsHoje.fat = 0;
     }
 
+    if (d.encHoje && d.fonte !== 'firebase') {
+      if (typeof mkUpdateEncHojeKpis_ === 'function') mkUpdateEncHojeKpis_(d.encHoje);
+      else {
+        encHojeData = d.encHoje;
+        const nLoc = document.getElementById('stat-nloc');
+        if (nLoc) nLoc.textContent = encHojeData.length;
+      }
+    }
+    if (typeof mkMetaApplyFromInicio_ === 'function') mkMetaApplyFromInicio_(d);
+
+    sessions = d.ativos.map(s => mergeSessaoCanonica(s, storedMap[s.rowIndex] || {}));
+    saveSessions();
+
     renderCards();
     updateStats();
 
-    if (d.encHoje && d.fonte !== 'firebase') renderEncHoje(d.encHoje);
-    if (typeof mkMetaApplyFromInicio_ === 'function') mkMetaApplyFromInicio_(d);
-    else if (typeof mkMetaRefreshInstant_ === 'function') mkMetaRefreshInstant_();
+    if (d.encHoje && d.fonte !== 'firebase') {
+      if (typeof renderEncHojeList_ === 'function') renderEncHojeList_(d.encHoje);
+      else if (typeof renderEncHoje === 'function') renderEncHoje(d.encHoje);
+    }
     atualizarVeiculoGrid();
 
     if (d.custosHoje) { custosHoje = d.custosHoje; renderCustos(); }

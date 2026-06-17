@@ -335,19 +335,23 @@ function iniciarNovaPeloVeiculo(veiculo, tipo) {
   }, 80);
 }
 
-function renderEncHoje(list) {
+function mkUpdateEncHojeKpis_(list) {
   encHojeData = list || [];
+  const nLoc = document.getElementById('stat-nloc');
+  if (nLoc) nLoc.textContent = encHojeData.length;
+}
+window.mkUpdateEncHojeKpis_ = mkUpdateEncHojeKpis_;
+
+function renderEncHojeList_(list) {
   const section = document.getElementById('enc-hoje-section');
   const container = document.getElementById('enc-hoje-list');
-  const nLoc = document.getElementById('stat-nloc');
-  if(nLoc) nLoc.textContent = encHojeData.length;
-  if (typeof mkMetaRefreshInstant_ === 'function') mkMetaRefreshInstant_();
-  if (!section||!container) return;
-  if (!encHojeData.length) { section.style.display='none'; return; }
-  section.style.display='block';
+  if (!section || !container) return;
+  const data = list || encHojeData || [];
+  if (!data.length) { section.style.display = 'none'; return; }
+  section.style.display = 'block';
   const fin = mkExibirFinanceiro_();
   const admSms = (typeof mkAuthIsAdmin === 'function' && mkAuthIsAdmin()) || window.isAdmin;
-  container.innerHTML = encHojeData.map(e=>{
+  container.innerHTML = data.map(e=>{
     const icon = tipoIcon(e.tipo);
     const v = fin && e.valorTotal != null
       ? `<div class="enc-valor">R$ ${Number(e.valorTotal).toFixed(2).replace('.',',')}</div>` : '';
@@ -363,6 +367,13 @@ function renderEncHoje(list) {
       </div>
     </div>`;
   }).join('');
+}
+window.renderEncHojeList_ = renderEncHojeList_;
+
+function renderEncHoje(list) {
+  mkUpdateEncHojeKpis_(list);
+  if (typeof mkMetaRefreshInstant_ === 'function') mkMetaRefreshInstant_();
+  renderEncHojeList_(list);
 }
 
 function mkInitQrBalcaoStrip_() {

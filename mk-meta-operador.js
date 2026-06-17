@@ -46,7 +46,10 @@ function mkMetaCfgAtiva_(opId) {
   return cfg;
 }
 
-function mkMetaResolveOperadorId_() {
+function mkMetaResolveOperadorId_(hint) {
+  if (hint && hint.operadorId && mkMetaCfgAtiva_(hint.operadorId)) {
+    return Number(hint.operadorId);
+  }
   const params = typeof operadorApiParams_ === 'function' ? operadorApiParams_() : {};
   const srv = typeof mkAuthGetSessaoServidor_ === 'function' ? mkAuthGetSessaoServidor_() : null;
   if (srv && srv.operadorId && mkMetaCfgAtiva_(srv.operadorId)) {
@@ -185,7 +188,7 @@ function mkMetaRenderKpi_(d) {
 function mkMetaRefreshInstant_() {
   const tile = document.getElementById('stat-meta-tile');
   if (!tile) return;
-  const opId = mkMetaResolveOperadorId_();
+  const opId = mkMetaResolveOperadorId_(window._mkLastMetaTurno);
   if (!opId || !mkMetaCfgAtiva_(opId)) {
     mkMetaShowTile_(tile, false);
     return;
@@ -198,13 +201,24 @@ function mkMetaRefreshInstant_() {
 /** Usa metaTurno do carregarInicio (1 request) ou contagem local imediata. */
 function mkMetaApplyFromInicio_(d) {
   const tile = document.getElementById('stat-meta-tile');
+  if (d && d.metaTurno && d.metaTurno.configurado !== false) {
+    window._mkLastMetaTurno = d.metaTurno;
+    mkMetaRenderKpi_(Object.assign({ ok: true }, d.metaTurno));
+    return;
+  }
+  window._mkLastMetaTurno = null;
   const opId = mkMetaResolveOperadorId_();
   if (!opId || !mkMetaCfgAtiva_(opId)) {
     mkMetaShowTile_(tile, false);
     return;
   }
-  if (d && d.metaTurno && d.metaTurno.configurado !== false) {
-    mkMetaRenderKpi_(Object.assign({ ok: true }, d.metaTurno));
+  mkMetaRefreshInstant_();
+  mkMetaRefreshMesAsync_();
+}
+
+function mkMetaRefresh_() {
+  if (window._mkLastMetaTurno && window._mkLastMetaTurno.configurado !== false) {
+    mkMetaRenderKpi_(Object.assign({ ok: true }, window._mkLastMetaTurno));
     return;
   }
   mkMetaRefreshInstant_();
@@ -219,7 +233,7 @@ function mkMetaRefreshMesAsync_() {
 
 async function mkMetaRefreshMesFromServer_() {
   if (_metaRefreshBusy) return;
-  const opId = mkMetaResolveOperadorId_();
+  const opId = mkMetaResolveOperadorId_(window._mkLastMetaTurno);
   if (!opId || !mkMetaCfgAtiva_(opId)) return;
   _metaRefreshBusy = true;
   try {
@@ -228,14 +242,12 @@ async function mkMetaRefreshMesFromServer_() {
       typeof apiParamsComAuth_ === 'function' ? apiParamsComAuth_() : {}
     );
     const d = await api(params, 20000);
-    if (d && d.ok && d.configurado !== false) mkMetaRenderKpi_(d);
+    if (d && d.ok && d.configurado !== false) {
+      window._mkLastMetaTurno = d;
+      mkMetaRenderKpi_(d);
+    }
   } catch (e) { /* mantém valor local/inicio */ }
   _metaRefreshBusy = false;
-}
-
-function mkMetaRefresh_() {
-  mkMetaRefreshInstant_();
-  mkMetaRefreshMesAsync_();
 }
 
 window.mkMetaRefresh_ = mkMetaRefresh_;
