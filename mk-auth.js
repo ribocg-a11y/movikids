@@ -6,6 +6,9 @@
   const AUTH_IDLE_MS = 60 * 60 * 1000;
   const AUTH_TOUCH_GAS_MS = 3 * 60 * 1000;
   const ADMIN_PIN_SESS_KEY = 'mk_admin_pin_sess_v1';
+  const ADMIN_PIN_PERSIST_KEY = 'mk_admin_pin_persist_v1';
+  const ADMIN_PIN_PERSIST_AT = 'mk_admin_pin_persist_at';
+  const ADMIN_PIN_PERSIST_TTL_MS = 24 * 60 * 60 * 1000;
 
   let selectedOp = null;
   let _lastGasTouchAt = 0;
@@ -108,12 +111,31 @@
   window.mkAuthStoreAdminPin_ = function (pin) {
     try {
       const d = pinDigits_(pin);
-      if (d.length === 4) sessionStorage.setItem(ADMIN_PIN_SESS_KEY, d);
+      if (d.length === 4) {
+        sessionStorage.setItem(ADMIN_PIN_SESS_KEY, d);
+        localStorage.setItem(ADMIN_PIN_PERSIST_KEY, d);
+        localStorage.setItem(ADMIN_PIN_PERSIST_AT, String(Date.now()));
+      }
     } catch (e) { /* ignore */ }
   };
 
   window.mkAuthClearAdminPin_ = function () {
-    try { sessionStorage.removeItem(ADMIN_PIN_SESS_KEY); } catch (e) { /* ignore */ }
+    try {
+      sessionStorage.removeItem(ADMIN_PIN_SESS_KEY);
+      localStorage.removeItem(ADMIN_PIN_PERSIST_KEY);
+      localStorage.removeItem(ADMIN_PIN_PERSIST_AT);
+    } catch (e) { /* ignore */ }
+  };
+
+  window.mkAuthRestoreAdminPin_ = function () {
+    try {
+      if (sessionStorage.getItem(ADMIN_PIN_SESS_KEY)) return true;
+      const d = localStorage.getItem(ADMIN_PIN_PERSIST_KEY);
+      const at = Number(localStorage.getItem(ADMIN_PIN_PERSIST_AT) || 0);
+      if (!d || d.length !== 4 || !at || Date.now() - at > ADMIN_PIN_PERSIST_TTL_MS) return false;
+      sessionStorage.setItem(ADMIN_PIN_SESS_KEY, d);
+      return true;
+    } catch (e) { return false; }
   };
 
   window.mkAuthGetAdminPin_ = function () {
@@ -124,42 +146,73 @@
     return String(v || '').replace(/\D/g, '').slice(0, 4);
   }
 
+  window.mkAuthEnsureAdminPin_ = async function mkAuthEnsureAdminPin_(motivo) {
+    const existing = mkAuthGetAdminPin_();
+    if (existing && existing.length === 4) return true;
+    if (typeof mkAuthRestoreAdminPin_ === 'function' && mkAuthRestoreAdminPin_()) return true;
+    if (typeof mkAdminPinModalAsk_ === 'function') {
+      const pin = await mkAdminPinModalAsk_(motivo || 'Digite o PIN administrativo (4 dígitos)');
+      const d = pinDigits_(pin);
+      if (d.length !== 4) {
+        if (typeof toast === 'function') toast('PIN admin necessário — use o teclado numérico.', 'warning', 5000);
+        return false;
+      }
+      mkAuthStoreAdminPin_(d);
+      return true;
+    }
+    if (typeof toast === 'function') toast('PIN admin necessário — abra Gerenciar e digite o PIN.', 'warning', 5000);
+    return false;
+  };
+
   window.mkAuthReleaseBalcaoServer_ = async function mkAuthReleaseBalcaoServer_(opts) {
     opts = opts || {};
     const s = getSession();
-    const pinParams = typeof mkAuthAdminPinParams_ === 'function' ? mkAuthAdminPinParams_() : {};
+    let pinParams = typeof mkAuthAdminPinParams_ === 'function' ? mkAuthAdminPinParams_() : {};
     const srv = sessaoAtivaRemota;
-    const preferAdmin = !!(opts.preferAdmin || opts.inatividade || window.isAdmin ||
-      (s && s.role === 'admin') || (srv && srv.nome));
+    const forceAdmin = !!(opts.preferAdmin || opts.inatividade || opts.fantasma);
 
-    if (!preferAdmin && s && s.id && s.id !== 'ADMIN' && s.role !== 'admin') {
-      try {
-        const d = await apiCall(Object.assign({
-          action: 'liberarSessaoOperador',
-          operadorId: s.id,
-          _t: Date.now()
-        }, pinParams), 20000);
-        if (d && d.ok) {
-          sessaoAtivaRemota = d.sessaoAtiva || null;
-          mkAuthSyncSessaoBalcaoUI_(sessaoAtivaRemota);
-          return true;
-        }
-      } catch (e) { /* offline */ }
+    // 1) Operador encerra proprio turno — prioridade (corrige dual admin+operador I21)
+    if (s && s.id && s.id !== 'ADMIN' && s.role !== 'admin') {
+      const opId = Number(s.id);
+      const srvId = srv && srv.operadorId ? Number(srv.operadorId) : 0;
+      if (!srvId || srvId === opId) {
+        try {
+          const d = await apiCall(Object.assign({
+            action: 'liberarSessaoOperador',
+            operadorId: opId,
+            _t: Date.now()
+          }, pinParams), 20000);
+          if (d && d.ok) {
+            sessaoAtivaRemota = d.sessaoAtiva || null;
+            mkAuthSyncSessaoBalcaoUI_(sessaoAtivaRemota);
+            if (!sessaoAtivaRemota) return true;
+          }
+        } catch (e) { /* tenta admin abaixo */ }
+      }
     }
 
-    if (preferAdmin || (srv && srv.nome)) {
-      try {
-        const d = await apiCall(Object.assign({
-          action: 'liberarSessaoOperadorAdmin',
-          _t: Date.now()
-        }, pinParams), 20000);
-        if (d && d.ok) {
-          sessaoAtivaRemota = d.sessaoAtiva || null;
-          mkAuthSyncSessaoBalcaoUI_(sessaoAtivaRemota);
-          return true;
-        }
-      } catch (e) { /* offline */ }
+    // 2) Admin libera qualquer sessao no GAS
+    const needAdmin = forceAdmin || !!(srv && srv.nome) ||
+      window.isAdmin || mkAuthIsAdmin() || (s && s.role === 'admin');
+    if (!needAdmin) return false;
+
+    if (!pinParams.adminPin && typeof mkAuthEnsureAdminPin_ === 'function') {
+      const ok = await mkAuthEnsureAdminPin_('Liberar sessao do balcao');
+      if (!ok) return false;
+      pinParams = mkAuthAdminPinParams_();
     }
+
+    try {
+      const d = await apiCall(Object.assign({
+        action: 'liberarSessaoOperadorAdmin',
+        _t: Date.now()
+      }, pinParams), 20000);
+      if (d && d.ok) {
+        sessaoAtivaRemota = d.sessaoAtiva || null;
+        mkAuthSyncSessaoBalcaoUI_(sessaoAtivaRemota);
+        return !sessaoAtivaRemota;
+      }
+    } catch (e) { /* offline */ }
     return false;
   };
 
@@ -348,7 +401,8 @@
     try {
       await mkAuthReleaseBalcaoServer_({
         inatividade: liberarInatividade,
-        preferAdmin: liberarInatividade || !!window.isAdmin
+        preferAdmin: liberarInatividade,
+        fantasma: motivo === 'fantasma'
       });
     } catch (e) { /* offline */ }
 
@@ -844,6 +898,7 @@
       window.__mkLoginOpsPromise = apiCall({ action: 'listarOperadoresLogin' }, 30000);
     }
     if (typeof window.mkRestoreAuthSession === 'function') window.mkRestoreAuthSession();
+    if (typeof mkAuthRestoreAdminPin_ === 'function') mkAuthRestoreAdminPin_();
     loginPins = buildPinRow('mk-login-pin', 4, () => onLoginPin());
     createPins1 = buildPinRow('mk-create-pin-1', 4);
     createPins2 = buildPinRow('mk-create-pin-2', 4);
@@ -946,6 +1001,13 @@
       btn.textContent = 'Liberando...';
     });
     try {
+      if (typeof mkAuthEnsureAdminPin_ === 'function') {
+        const okPin = await mkAuthEnsureAdminPin_('Liberar sessao do balcao');
+        if (!okPin) {
+          mkAuthShowLiberarStatus_(false, 'Cancelado — digite o PIN admin no teclado numérico.');
+          return;
+        }
+      }
       const pinParams = typeof mkAuthAdminPinParams_ === 'function' ? mkAuthAdminPinParams_() : {};
       const d = await apiCall(Object.assign({
         action: 'liberarSessaoOperadorAdmin',
@@ -995,10 +1057,17 @@
         _t: Date.now()
       }, pinParams), 30000);
       if (!d || !d.ok) {
+        if (typeof mkAuthEnsureAdminPin_ === 'function') {
+          const okPin = await mkAuthEnsureAdminPin_('Deslogar operador do balcao');
+          if (!okPin) {
+            mkAuthShowLiberarStatus_(false, 'Cancelado — PIN admin necessario.');
+            return;
+          }
+        }
         d = await apiCall(Object.assign({
           action: 'liberarSessaoOperadorAdmin',
           _t: Date.now()
-        }, pinParams), 30000);
+        }, typeof mkAuthAdminPinParams_ === 'function' ? mkAuthAdminPinParams_() : {}), 30000);
         if (!d || !d.ok) {
           const msg = (d && d.erro) || 'Erro ao deslogar';
           mkAuthShowLiberarStatus_(false, 'Falha: ' + msg);

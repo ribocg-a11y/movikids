@@ -33,8 +33,28 @@ function mobMenuClose_() {
 }
 
 function sbSairSessaoClick_() {
+  const s = typeof mkAuthGetSession === 'function' ? mkAuthGetSession() : null;
   const isAdm = (typeof mkAuthIsAdmin === 'function' && mkAuthIsAdmin()) || !!window.isAdmin;
+  const localOp = !!(s && s.nome && s.role !== 'admin' && s.id !== 'ADMIN');
+  const srv = typeof mkAuthGetSessaoServidor_ === 'function' ? mkAuthGetSessaoServidor_() : null;
+
+  // Turno local (operador) — encerra no GAS mesmo com painel admin aberto (I21)
+  if (localOp) {
+    if (typeof trocarOperador === 'function') trocarOperador('turno');
+    return;
+  }
   if (isAdm) {
+    if (srv && srv.nome) {
+      const msg = srv.nome + ' continua logada no balcao. Liberar o turno dela agora?';
+      if (typeof confirm === 'function' && confirm(msg)) {
+        if (typeof mkAuthLiberarSessaoOperadorAdmin_ === 'function') {
+          mkAuthLiberarSessaoOperadorAdmin_();
+          return;
+        }
+      } else if (typeof toast === 'function') {
+        toast('Turno de ' + srv.nome + ' continua no balcao — use Liberar sessao em Operadores.', 'warning', 6000);
+      }
+    }
     if (typeof adminLogout === 'function') adminLogout();
     return;
   }

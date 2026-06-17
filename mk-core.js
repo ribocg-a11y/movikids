@@ -120,7 +120,14 @@ function atualizarOperadorUI_(sessaoServidor) {
   if (gerBtn) gerBtn.style.display = isAdm ? 'none' : '';
   if (sairBtn && (temBalcao || temTablet)) {
     sairBtn.hidden = false;
-    sairBtn.textContent = isAdm ? 'Sair do admin' : 'Encerrar turno';
+    const localOp = !!(s && s.nome && s.role !== 'admin' && s.id !== 'ADMIN');
+    if (localOp) {
+      sairBtn.textContent = 'Encerrar turno';
+    } else if (isAdm) {
+      sairBtn.textContent = 'Sair do admin';
+    } else {
+      sairBtn.textContent = 'Encerrar turno';
+    }
   }
 
   const chip = document.getElementById('hd-turno-chip');

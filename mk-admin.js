@@ -11,6 +11,31 @@ var resumoDiaHoje   = null;
 let chartsRendered  = false;
 var chartDiario=null,chartExtrasDia=null,chartHistExt=null,chartHoras=null,chartMetaDia=null;
 let pinBuffer       = '';
+let _pinModalMode   = 'admin'; // 'admin' | 'ask'
+let _pinModalAskResolve = null;
+
+function pinModalSetCopy_(titulo, sub) {
+  const t = document.querySelector('#pin-modal .modal-title');
+  const s = document.querySelector('#pin-modal .modal-sub');
+  if (t && titulo) t.textContent = titulo;
+  if (s && sub) s.textContent = sub;
+}
+
+function pinModalResetCopy_() {
+  pinModalSetCopy_('Área Administrativa', 'Digite a senha de acesso');
+}
+
+/** PIN numérico no tablet (substitui prompt() — I21/I28). */
+window.mkAdminPinModalAsk_ = function mkAdminPinModalAsk_(motivo) {
+  return new Promise((resolve) => {
+    _pinModalAskResolve = resolve;
+    _pinModalMode = 'ask';
+    pinModalSetCopy_('Confirme o PIN', motivo || 'Digite o PIN administrativo (4 dígitos)');
+    pinBuffer = '';
+    atualizarDots();
+    document.getElementById('pin-modal').classList.add('show');
+  });
+};
 
 // ── PIN ──────────────────────────────────────────────────────
 function abrirAdmin() {
@@ -24,6 +49,8 @@ function abrirAdmin() {
     irAdmin('caixa');
     return;
   }
+  _pinModalMode = 'admin';
+  pinModalResetCopy_();
   pinBuffer = '';
   atualizarDots();
   document.getElementById('pin-modal').classList.add('show');
@@ -33,6 +60,13 @@ function fecharPin() {
   document.getElementById('pin-modal').classList.remove('show');
   pinBuffer = '';
   atualizarDots();
+  if (_pinModalMode === 'ask' && _pinModalAskResolve) {
+    const r = _pinModalAskResolve;
+    _pinModalAskResolve = null;
+    _pinModalMode = 'admin';
+    pinModalResetCopy_();
+    r(null);
+  }
 }
 
 function pinKey(d) {
@@ -66,6 +100,15 @@ function verificarPin() {
       const d = await api({ action: 'loginAdmin', adminPin: pin }, 20000);
       if (d.ok) {
         if (typeof mkAuthStoreAdminPin_ === 'function') mkAuthStoreAdminPin_(pin);
+        if (_pinModalMode === 'ask' && _pinModalAskResolve) {
+          const r = _pinModalAskResolve;
+          _pinModalAskResolve = null;
+          _pinModalMode = 'admin';
+          pinModalResetCopy_();
+          document.getElementById('pin-modal').classList.remove('show');
+          r(pin);
+          return;
+        }
         fecharPin();
         adminLogin();
       } else {

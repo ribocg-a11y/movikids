@@ -30,6 +30,13 @@
       }
       if (window.isAdmin) localStorage.setItem('mk_admin_ui_persist', '1');
       else localStorage.removeItem('mk_admin_ui_persist');
+      if (typeof mkAuthGetAdminPin_ === 'function') {
+        const pin = mkAuthGetAdminPin_();
+        if (pin && pin.length === 4) {
+          localStorage.setItem('mk_admin_pin_persist_v1', pin);
+          localStorage.setItem('mk_admin_pin_persist_at', String(Date.now()));
+        }
+      }
     } catch (e) { /* ignore */ }
   }
 
