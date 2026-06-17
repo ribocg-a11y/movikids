@@ -32,15 +32,16 @@ Leia **nesta ordem**:
 
 ## Agente vs você (resumo)
 
-| Eu (agente) sozinho | So com seu pedido | So voce |
-|---------------------|-------------------|---------|
-| Codigo, docs, testes, planilha OAuth | Mudancas em `api()` / auth | **Implantar / Nova versao Web GAS** |
-| `pre-push-check` + commit + push FE | `prepare-gas-push.ps1` (editor, nao Web) | Arquivar implantacao errada @139 |
-| `verify-gas-deploy.ps1`, `protocolo-mestre.ps1` | Tablet balcao `?force=` | clasp label cleanup @143 |
+| Eu (agente) sozinho | Só com seu pedido (lista fechada §7.3) | Só você (físico / conta) |
+|---------------------|--------------------------------------|---------------------------|
+| FE, docs, testes, planilha OAuth, commit + push FE | `clasp push` / `prepare-gas-push.ps1` | Tablet balcão na loja |
+| `pre-push-check`, `protocolo-mestre`, APIs admin | Mudar `api()`, auth, PIN, perfis | Script Properties SMS |
+| PRs, limpar testes planilha, atualizar docs | Editar `.gs` ou Nova versão Web GAS | Re-auth OAuth / `clasp login` |
+| | Reativar F4 (WhatsApp/SMS) ou F9 (supervisor) | Homologação real no tablet |
 
-**Nunca (agente):** `deploy-gas.ps1`, `deploy-gas-SOCIO.ps1`, `clasp deploy`, nova implantacao GAS, POST no browser.
+**Nunca (agente):** `clasp deploy` sem `-i`, nova implantação GAS, POST no browser, commit de segredos.
 
-Detalhe completo: [`ACESSOS_E_AUTORIZACOES.md`](docs/ativos/ACESSOS_E_AUTORIZACOES.md) §7.
+Detalhe completo: [`ACESSOS_E_AUTORIZACOES.md`](docs/ativos/ACESSOS_E_AUTORIZACOES.md) §7.3.
 
 ## Papéis no app (resumo)
 

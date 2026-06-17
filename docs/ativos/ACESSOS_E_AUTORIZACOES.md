@@ -1,6 +1,6 @@
 # MOVI KIDS — Acessos e autorizações
 
-**Atualizado:** 09/06/2026  
+**Atualizado:** 17/06/2026 (lista fechada §7.3 — permissão explícita)  
 **Função:** mapa único de **quem pode o quê** — app, infraestrutura e agente Cursor.  
 **Complementa:** `ESTADO_ATUAL.md`, `REGRAS_DE_PUBLICACAO_SEGURA.md`, `DEPLOY_GAS_v1.5.32_AUTH.md`
 
@@ -61,10 +61,11 @@ Operador nas 5 escritas críticas: deve enviar `operador` / `operadorId` (GET no
 
 | Ação | Quem executa | Agente Cursor pode? | Notas |
 |------|--------------|---------------------|-------|
-| `git push` (FE → GitHub Pages) | Dev / agente | ✅ Sim (automático após FE — HANDOFF § checklist 7) | Após `pre-push-check.ps1` — **não pedir** ao sócio |
-| Editar código local | Dev / agente | ✅ Sim | `.gs` canônico na raiz |
-| `clasp push` | Dev / agente | ✅ Sim | Via `scripts/deploy-gas.ps1` |
-| **Nova versão Web GAS** | **`deploy-gas.ps1`** (clasp deploy **-i** mesmo ID) + **`verify-gas-deploy.ps1`** |
+| `git commit` / `git push` (FE → GitHub Pages) | Dev / agente | ✅ Sim | Após `pre-push-check.ps1` — **sem pedir** (§7.3 lista fechada) |
+| Editar FE / docs local | Dev / agente | ✅ Sim | `mk-*.js`, `index.html`, docs — exceto `api()`/auth (§7.3) |
+| Editar `.gs` canônico | Dev / agente | ⚠️ Só com pedido | §7.3 item 4 |
+| `clasp push` / `prepare-gas-push.ps1` | Dev / agente | ⚠️ Só com pedido | §7.3 item 1 — não publica Web App |
+| **Nova versão Web GAS** | Sócio / agente **com pedido** | ⚠️ Só com pedido | Editor → Editar `AKfycbwakQ...` · §7.3 item 4 |
 | `clasp deploy` **sem `-i`** | **Proibido** | ❌ Nunca | I1 — URL morta |
 | Atualizar tablet `?force=` | **Ops balcão** | ❌ Não | Físico no shopping |
 | Editar planilha base | Agente (OAuth) ou GAS | ✅ Sim | `google-drive-sheets-auth` — ver §7.8 |
@@ -87,7 +88,7 @@ Operador nas 5 escritas críticas: deve enviar `operador` / `operadorId` (GET no
 | **URL morta** | `AKfycbzc...` — **não usar** (404) |
 
 **Planilha Google:** o agente **tem acesso** via OAuth configurado no PC (§7.8).  
-**Apps Script Web deploy:** **Só sócio** — Editor → **Editar** `AKfycbwakQ...` → Nova versão. Agente: `prepare-gas-push.ps1` (código no Google, **não** publica Web). **`deploy-gas.ps1` bloqueado.**
+**Apps Script Web deploy:** Nova versão só com **pedido explícito** (§7.3) — Editor → **Editar** `AKfycbwakQ...`. Agente **nunca** `clasp deploy` sem `-i` nem nova implantação.
 
 ---
 
@@ -137,43 +138,41 @@ Esta seção responde: **o que o agente faz sozinho, o que valida, o que publica
 
 ---
 
-### 7.2 EU (agente) — faço sozinho
+### 7.2 EU (agente) — faço sozinho (sem pedir permissão)
 
-Sem precisar que você cole caminhos, versões ou docs:
+**Regra (17/06/2026):** tudo abaixo pode ser feito **sem** sua autorização prévia. A **única** exceção é a lista fechada §7.3.
 
 | Ação | Como |
 |------|------|
 | Ler handoff, prioridades, estado, regras, este arquivo | Abrir `docs/ativos/` |
-| Explorar e editar código | `index.html`, `.gs`, `mk-*.js`, `sw.js`, docs |
-| Rodar validação local | `.\scripts\pre-push-check.ps1` |
-| Rodar testes HTTP readonly | `scripts/testes/TESTE_*.ps1` |
-| Validar versão no código | `mk-version.js`, header `.gs`, `sw.js` |
-| Validar GAS no ar (leitura) | `Invoke-RestMethod` no `?action=ping` |
-| Publicar GAS em produção | **Só sócio** — Editor → **Editar** `AKfycbwakQ...` ou `deploy-gas-SOCIO.ps1` |
+| Explorar e editar **frontend** e docs | `index.html`, `mk-*.js` (exceto `api()`/auth), `sw.js`, CSS, docs |
+| `git add`, `git commit`, `git push` | Após `pre-push-check.ps1` · `verify-publish-complete.ps1` pós-push FE |
+| Criar branch, PR (`gh pr create`) | Quando fizer sentido no pacote |
+| Rodar validação e testes | `pre-push-check`, `protocolo-mestre`, `scripts/testes/TESTE_*.ps1` |
+| Validar versão FE | `mk-version.js`, `sw.js`, `index.html ?v=` |
+| Validar GAS no ar (**leitura**) | `Invoke-RestMethod` no `?action=ping` · `verify-gas-deploy.ps1` |
 | Informar caminho do `.gs` no PC | Regra `gas-deploy-caminho-pc.mdc` |
-| Criar branch, `git add`, `git commit` | Quando você pedir commit |
 | Abrir app público no browser MCP | `ribocg-a11y.github.io/movikids/?force=...` |
-| **Ler e escrever planilha** | Scripts em `google-drive-sheets-auth` (OAuth já configurado no PC) |
-| Auditar / organizar planilha | `node scripts/auditar-planilha-movikids.js`, `organizar-planilha-movikids.js` |
-| Limpar testes na planilha | `node scripts/limpar-testes-movikids.js` ou `LIMPAR_TESTES_MOVIKIDS.ps1` |
-| Criar/atualizar aba INVESTIMENTO | `node scripts/criar-aba-investimento-movikids.js` |
-| Escritas via GAS (dados operacionais) | APIs `exec?action=...` com `adminPin=1416` quando aplicável |
+| **Ler e escrever planilha** | OAuth `google-drive-sheets-auth` · limpar testes · INVESTIMENTO · auditoria |
+| Escritas via GAS (dados operacionais) | APIs `exec?action=...` com `adminPin=1416` · limpar/corrigir quando necessário |
+| Atualizar documentação ativa | Handoff, estado, protocolos — inclusive comando **"atualize tudo"** |
+
+O Cursor pode mostrar **card de aprovação** antes de `git push` — isso é mecânica do IDE, não substitui §7.3.
 
 ---
 
-### 7.3 EU (agente) — faço só se você pedir explicitamente
+### 7.3 EU (agente) — lista fechada (só com seu pedido explícito)
 
-| Ação | Por quê pedir |
-|------|----------------|
-| `git push` para `main` | **Agente** (FE/docs) | Publica Pages — após `pre-push-check` · **sem pedir** (HANDOFF checklist 7) |
-| `git commit` | **Agente** (FE/docs) | Após mudanças aprovadas no chat ou pacote FE |
-| `clasp push` | Envia código ao Google — você confirma que quer |
-| Mudar `api()`, auth, PIN, perfis | Zona crítica (I15, I17–I19) |
-| Limpar locações / corrigir financeiro em prod | APIs com `adminPin=1416` — impacto real |
-| Criar PR (`gh pr create`) | Publicação no GitHub |
-| Reativar F4 ou F9 | Explicitamente pausados |
+**Decisão sócio 17/06/2026:** estas são as **únicas** ações que exigem sua permissão antes de executar. Nada fora desta lista pode ser bloqueado “por precaução”.
 
-O Cursor pode **pedir sua aprovação** num card antes de `push` na `main` — isso é normal.
+| # | Ação | Notas |
+|---|------|-------|
+| **1** | **`clasp push`** / **`prepare-gas-push.ps1`** | Envia código ao projeto Google; **não** publica a Web App sozinha |
+| **2** | **Mudar `api()`, auth, PIN, perfis** | Zona crítica (I15, I17–I19); após mudança, checklist **tablet** obrigatório |
+| **3** | **Reativar F4 (WhatsApp/SMS) ou F9 (supervisor)** | Pausados de propósito — QR only em produção |
+| **4** | **Mudar código Apps Script** (`.gs` canônico) **ou reimplantar Nova versão Web** | Editor → **Editar** `AKfycbwakQ...` → Nova versão · nunca nova implantação · ping pós-deploy |
+
+**Inclui no item 4:** editar `MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs`, incrementar header GAS, `deploy-gas-SOCIO.ps1`, colar manualmente no editor Google.
 
 ---
 
@@ -198,26 +197,27 @@ O Cursor pode **pedir sua aprovação** num card antes de `push` na `main` — i
 
 | Etapa | Quem publica de fato |
 |-------|----------------------|
-| **Frontend** (GitHub Pages) | Agente faz `git push` **se você pediu** → Pages atualiza sozinho |
-| **GAS código** no projeto Google | `deploy-gas.ps1` → `clasp push` **se você pediu** |
-| **GAS Web App em produção** | **Só sócio** — nunca agente |
-| **Tablet na versão nova** | **Só você / Ops** — `?force=versão` ou reinstalar PWA |
+| **Frontend** (GitHub Pages) | Agente: `pre-push-check` → commit → push **sem pedir** → Pages atualiza |
+| **GAS código** no projeto Google | Agente **só com pedido** — `clasp push` / `prepare-gas-push.ps1` (§7.3.1) |
+| **GAS Web App em produção** | Agente **só com pedido** — Nova versão Web mesmo Deploy ID (§7.3.4) |
+| **Tablet na versão nova** | **Só você / Ops** — `?force=versão` ou reinstalar PWA (agente não tem o aparelho) |
 
-Fluxo típico: **agente** `deploy-gas.ps1` → **verify** + ping no browser → **você confirma tablet**.
+Fluxo típico GAS: você autoriza §7.3 → agente prepara/push → **verify** + ping → você confirma tablet se mexeu em operação.
 
 ---
 
-### 7.6 VOCÊ — sempre seu (agente não substitui)
+### 7.6 VOCÊ — agente não substitui (limite físico / conta)
+
+Não são “pedidos de permissão” — são tarefas que o agente **não consegue** fazer no seu lugar:
 
 | Ação | Onde |
 |------|------|
-| **Republicar Web GAS** | `.\scripts\deploy-gas.ps1` (preferido) ou editor → Implantar → **Editar** `AKfycbwakQ...` → Nova versão |
-| **Colar `.gs` manualmente** | Alternativa ao clasp — Ctrl+A no arquivo do PC → Código.gs |
-| **Tablet balcão (na loja)** | Abrir `?force=1.7.95` **no aparelho da operação** — não confundir com o PC de gestão |
+| **Tablet balcão (na loja)** | Abrir `?force=` **no aparelho da operação** — homolog F5/F7/F10/F11 |
 | **Script Properties SMS** | Projeto GAS → Configurações → Propriedades (fora da planilha) |
 | **Re-auth OAuth** (se token expirar) | `cd google-drive-sheets-auth` → `npm run auth` — abre browser uma vez |
-| **Aprovar push / comandos sensíveis** | Card de aprovação do Cursor quando aparecer |
 | **`clasp login`** (se expirar) | Terminal no seu PC — uma vez |
+
+Republicar Web GAS: agente **pode** executar **se você pedir** (§7.3.4); no dia a dia costuma ser você no editor.
 
 ---
 
@@ -253,7 +253,7 @@ Fluxo típico: **agente** `deploy-gas.ps1` → **verify** + ping no browser → 
 
 **Alternativa (sem OAuth):** APIs GAS que gravam na planilha (`salvarLocacao`, `limparLocacoesTesteAdmin`, `importarResponsaveisAdmin`, etc.) — via URL `exec`.
 
-**Cuidado:** LOCACOES tem aviso “não editar manualmente” — preferir GAS ou scripts auditados; mudanças destrutivas pedir OK explícito.
+**Cuidado:** LOCACOES tem aviso “não editar manualmente” — preferir GAS ou scripts auditados. Escritas destrutivas **não** exigem pedido extra (fora da lista §7.3).
 
 **Se OAuth falhar:** `cd C:\Users\riboc\Projects\google-drive-sheets-auth` → `npm run auth` (você autoriza no browser uma vez).
 
@@ -261,18 +261,18 @@ Fluxo típico: **agente** `deploy-gas.ps1` → **verify** + ping no browser → 
 
 ## 8. Resumo em uma frase (novo chat)
 
-**Agente:** código, docs, testes, ping, **planilha (OAuth)**, preparar push/clasp — **você:** Nova versão GAS Web, tablet, OK de publicação, re-auth OAuth se expirar.
+**Agente sozinho:** FE, docs, git commit/push, testes, ping, planilha OAuth, APIs admin. **Só pedir antes:** §7.3 (GAS/clasp, `api()`/auth, F4/F9). **Só você fisicamente:** tablet loja, Script Properties SMS, re-auth OAuth.
 
 ---
 
 ## 9. Checklist rápido para novo chat
 
 1. **Operação balcão** = operador + PIN; **gestão** = admin 1416.
-2. **Publicar FE** = agente com seu pedido; **publicar GAS Web** = você no editor.
-3. **Planilha** = agente via `google-drive-sheets-auth` (OAuth no PC).
-4. **Tablet** = você/Ops; agente documenta e valida ping/repo.
-5. **Supervisor e WhatsApp auto** = pausados.
-6. **Planilha OAuth** = `google-drive-sheets-auth` — §7.8.
+2. **Publicar FE** = agente após `pre-push-check` (**sem pedir**).
+3. **GAS** = agente só com pedido explícito — lista fechada §7.3 (4 itens).
+4. **Planilha** = agente via `google-drive-sheets-auth` (OAuth no PC).
+5. **Tablet** = você/Ops na loja; agente valida ping/repo/HTTP.
+6. **Supervisor e WhatsApp auto** = pausados (reativar = §7.3.3).
 7. **Matriz completa** = seção 7 deste arquivo.
 
 ---

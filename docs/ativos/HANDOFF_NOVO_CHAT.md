@@ -1,6 +1,6 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 16/06/2026 (GAS **v1.5.92** @143 · FE **v1.8.27** · Protocolo Mestre · logo PNG · header DNA)  
+**Atualizado:** 17/06/2026 (protocolo permissões §7.3 — lista fechada)  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **Repo local:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`  
@@ -62,8 +62,9 @@ O agente lê `HANDOFF_NOVO_CHAT.md` automaticamente (regra `.cursor/rules/handof
 
 - Ler docs ativos (ordem abaixo)
 - Informar: FE **v1.8.27**, GAS **v1.5.92**, comunicação **QR only**
-- **FE:** `pre-push-check` → commit → push → `verify-publish-complete` (sem pedir)
-- **GAS Web App:** agente **NUNCA** implanta — só `prepare-gas-push.ps1` se pedido; **você** Editor → Editar `AKfycbwakQ...` → Nova versão
+- **FE:** editar código → `pre-push-check` → commit → push → `verify-publish-complete` (**sem pedir**)
+- Testes, ping GAS, planilha OAuth, docs, PRs, APIs admin quando necessário
+- **Lista fechada (só com pedido):** `ACESSOS_E_AUTORIZACOES.md` §7.3 — GAS/clasp, `api()`/auth, F4/F9
 - Toda resposta: `Mudança no AppScript: sim|não` + link `.gs` canônico (Regra 16)
 
 ---
@@ -174,8 +175,9 @@ C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\m
 | Regra | Detalhe |
 |-------|---------|
 | **I15** | Escritas GAS no browser = **GET** |
-| **GAS Web** | **Só você** — Editar `AKfycbwakQ...` · agente **nunca** `deploy-gas-SOCIO.ps1` |
+| **GAS Web / `.gs`** | §7.3 — só com pedido: clasp, editar `.gs`, Nova versão Web |
 | **FE push** | Agente: pre-push → commit → push **sem pedir** |
+| **`api()` / auth** | §7.3 — só com pedido explícito |
 | **I22** | `check-operacao-livre.ps1` antes push FE crítico |
 | **Versões** | `mk-version.js` = `sw.js` = `index.html ?v=` |
 | **QR only** | Sem SMS/WA operacional |

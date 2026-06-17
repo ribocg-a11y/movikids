@@ -311,6 +311,7 @@ Detalhe em `HOMOLOGACAO_PRODUCAO_ASSISTIDA.md` seções A–H. Resumo mínimo:
 4. **Nunca** testar só PowerShell e omitir versão Pages (lição I20).
 5. **Sempre** `finally` cleanup após testes de escrita em produção.
 6. Ao fechar incidente: atualizar MAPA + memorial + **esta matriz** se novo fluxo ou lacuna.
+7. **Permissão:** só pedir autorização para as 4 ações em `ACESSOS_E_AUTORIZACOES.md` §7.3 — nada além disso.
 
 ---
 

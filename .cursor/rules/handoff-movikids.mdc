@@ -34,11 +34,16 @@ Ao trabalhar neste repositório, **ler primeiro** (nesta ordem):
 
 ## Agente vs usuário (memória rápida)
 
-**Agente SOZINHO:** ler docs, editar repo, `pre-push-check`, ping GAS, testes `scripts/testes/`, validar versões, **planilha Google** via `C:\Users\riboc\Projects\google-drive-sheets-auth` (OAuth em `~/.config/google-api/token.json`).
+**Agente SOZINHO:** ler docs, editar FE/docs, `pre-push-check` → commit → push FE, ping GAS, testes `scripts/testes/`, validar versões FE, **planilha Google** (OAuth), PRs, APIs admin, limpar testes planilha.
 
-**Agente SE USUÁRIO PEDIR:** `git commit`, `git push`, `clasp push`, mudanças em `api()`/auth, escritas destrutivas na planilha.
+**Agente SÓ COM SEU PEDIDO (lista fechada §7.3 — única exceção):**
 
-**SÓ O USUÁRIO:** Nova versão Web GAS (editor Google), tablet balcão **na loja** (não o PC de gestão), Script Properties SMS, re-auth OAuth (`npm run auth`), aprovar push na main.
+1. `clasp push` / `prepare-gas-push.ps1`
+2. Mudar `api()`, auth, PIN, perfis
+3. Reativar F4 (WhatsApp/SMS) ou F9 (supervisor)
+4. Mudar código Apps Script (`.gs` canônico) ou reimplantar Nova versão Web GAS
+
+**SÓ O USUÁRIO (limite físico):** tablet balcão **na loja**, Script Properties SMS, re-auth OAuth (`npm run auth`), `clasp login` se expirar.
 
 **DOIS APARELHOS:** usuário opera sempre do **computador**; tablet fixo na **operação** com operadores. Prints no chat = PC; homologação Turno/timer/idle = tablet físico do balcão. Ver HANDOFF § Modelo operacional.
 

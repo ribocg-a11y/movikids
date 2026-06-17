@@ -272,11 +272,16 @@ Em 14/06/2026 **`clasp push` sem republicar** deixou editor v1.5.92 e `/exec` em
 - Declarar deploy GAS OK só com `clasp push`
 - “Nova versão” manual no editor **sem** confirmar ping depois
 
-### Obrigatório (sócio — agente **não** publica)
+### Obrigatório — agente só com pedido explícito (§7.3)
 
-**Agente:** `prepare-gas-push.ps1` (sync + clasp push de código, **sem** Web App).
+Lista fechada em `ACESSOS_E_AUTORIZACOES.md` §7.3 (17/06/2026):
 
-**Sócio** no editor ou `deploy-gas-SOCIO.ps1` (pede digitar `SIM`):
+1. `clasp push` / `prepare-gas-push.ps1`
+2. Mudar `api()`, auth, PIN, perfis
+3. Reativar F4 ou F9
+4. Editar `.gs` canônico ou **Nova versão Web** (Editar `AKfycbwakQ...` — nunca nova implantação)
+
+**Sócio** no editor ou `deploy-gas-SOCIO.ps1` (pede digitar `SIM`) quando autorizar item 4:
 
 1. **Implantar → Gerenciar implantações → Editar** (lápis) **`AKfycbwakQ...`** — **nunca** "Nova implantação"
 2. Quem tem acesso = **Qualquer pessoa** (I27)
