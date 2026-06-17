@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.95
+// MOVI KIDS — Google Apps Script v1.5.96
+// v1.5.96: bonus meta — R$100 so se loc > 20 (21+ no turno)
 // v1.5.95: meta só Raykelly id3 + reserva id4 (fora Eduarda/Milena)
 // v1.5.94: metaOperadorTurno — Raykelly id 3 (corrige id 1 Eduarda)
 // v1.5.93: metaOperadorTurno — meta 20 loc/turno + bonus R$100 (AUDITORIA + escala)
@@ -1446,11 +1447,11 @@ function metaOperadorTurno_(p) {
   }
 
   const nHoje = byDay[dataHoje] || 0;
-  let diasComMeta = 0;
+  let diasComBonus = 0;
   let diasTrabalhados = 0;
   Object.keys(byDay).forEach(function(d) {
     diasTrabalhados++;
-    if (byDay[d] >= cfg.meta) diasComMeta++;
+    if (byDay[d] > cfg.meta) diasComBonus++;
   });
 
   return resp_({
@@ -1463,15 +1464,16 @@ function metaOperadorTurno_(p) {
     hoje: {
       n: nHoje,
       meta: cfg.meta,
-      atingiu: nHoje >= cfg.meta,
+      metaOk: nHoje >= cfg.meta,
+      atingiu: nHoje > cfg.meta,
       emTurno: emTurno,
       folga: !shiftHoje,
       shiftLabel: metaOperadorShiftLabel_(shiftHoje)
     },
     mes: {
-      diasComMeta: diasComMeta,
+      diasComMeta: diasComBonus,
       diasTrabalhados: diasTrabalhados,
-      bonusEstimado: diasComMeta * cfg.bonus
+      bonusEstimado: diasComBonus * cfg.bonus
     }
   });
 }

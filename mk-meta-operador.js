@@ -1,9 +1,9 @@
 /* MOVI KIDS — Meta operadores (20 loc/turno · R$100/dia) */
 
-let _metaLastAtingiu = null;
+let _metaLastBonus = null;
 let _metaRefreshBusy = false;
 
-/** Meta 20 loc/turno · R$100 — só operadores do programa (não Eduarda id1, não Milena id2). */
+/** Meta 20 loc/turno · R$100 só se **21+** loc (acima da meta). */
 const MK_META_CFG = {
   3: {
     nome: 'Raykelly',
@@ -101,7 +101,8 @@ function mkMetaComputeLocal_(opId) {
     hoje: {
       n,
       meta: cfg.meta,
-      atingiu: n >= cfg.meta,
+      metaOk: n >= cfg.meta,
+      atingiu: n > cfg.meta,
       emTurno: mkMetaInShift_(minsNow, shift),
       folga: !shift,
       shiftLabel: mkMetaShiftLabel_(shift)
@@ -148,30 +149,37 @@ function mkMetaRenderKpi_(d) {
     val.textContent = n + '/' + meta + ' ✓';
     val.style.fontSize = '';
     tile.classList.add('is-meta-ok');
+  } else if (h.metaOk || (n >= meta && !h.atingiu)) {
+    val.textContent = n + '/' + meta;
+    val.style.fontSize = '';
+    tile.classList.add('is-meta-warn');
   } else {
     val.textContent = n + '/' + meta;
     val.style.fontSize = '';
     if (h.emTurno) tile.classList.add('is-meta-warn');
   }
 
-  const diasMeta = Number(mes.diasComMeta) || 0;
-  const bonus = Number(mes.bonusEstimado) || diasMeta * (Number(d.bonus) || 100);
+  const diasBonus = Number(mes.diasComMeta) || 0;
+  const bonus = Number(mes.bonusEstimado) || diasBonus * (Number(d.bonus) || 100);
   let subTxt;
   if (d.fonte === 'local') {
-    subTxt = 'Turno ' + (h.shiftLabel || '') + ' · hoje no balcão';
+    subTxt = 'Turno ' + (h.shiftLabel || '') + ' · bônus a partir da ' + (meta + 1) + 'ª loc';
   } else {
-    subTxt = diasMeta + (diasMeta === 1 ? ' dia' : ' dias') + ' com meta no mês';
+    subTxt = diasBonus + (diasBonus === 1 ? ' dia' : ' dias') + ' com bônus no mês';
     if (bonus > 0) subTxt += ' · R$ ' + bonus.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
     if (!h.folga && h.shiftLabel && h.shiftLabel !== 'folga') {
       subTxt = 'Turno ' + h.shiftLabel + ' · ' + subTxt;
     }
   }
+  if (!h.folga && n >= meta && !h.atingiu && sub) {
+    subTxt = 'Meta ok · falta ' + (meta + 1 - n) + ' loc p/ R$ ' + (Number(d.bonus) || 100);
+  }
   if (sub) sub.textContent = subTxt;
 
-  if (h.atingiu && _metaLastAtingiu === false && typeof toast === 'function') {
-    toast('Meta batida! +' + (Number(d.bonus) || 100) + ' reais no turno de hoje 🎉', 'success', 6000);
+  if (h.atingiu && _metaLastBonus === false && typeof toast === 'function') {
+    toast('Bônus! ' + n + ' locações — +R$ ' + (Number(d.bonus) || 100) + ' no turno 🎉', 'success', 6000);
   }
-  _metaLastAtingiu = !!h.atingiu;
+  _metaLastBonus = !!h.atingiu;
 }
 
 async function mkMetaRefresh_() {
