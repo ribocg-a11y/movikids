@@ -892,7 +892,7 @@
       showStep('mk-step-select');
       renderOpList();
     });
-    document.getElementById('mk-btn-back-admin')?.addEventListener('click', () => showStep('mk-step-select'));
+    document.getElementById('mk-btn-back-admin')?.addEventListener('click', () => mkAuthShowTabletHub_());
     document.getElementById('mk-btn-back-hub')?.addEventListener('click', () => mkAuthShowTabletHub_());
     document.getElementById('mk-hub-balcao')?.addEventListener('click', () => {
       hideApp();
@@ -901,7 +901,7 @@
       loadOperadores().catch(() => renderOpList(false));
     });
     document.getElementById('mk-hub-colab')?.addEventListener('click', () => {
-      const v = window.MK_VERSION || '1.8.43';
+      const v = window.MK_VERSION || '1.8.44';
       location.href = 'gestao-pessoas.html?v=' + encodeURIComponent(v) + '&_=' + Date.now();
     });
     document.getElementById('mk-hub-admin')?.addEventListener('click', () => {
