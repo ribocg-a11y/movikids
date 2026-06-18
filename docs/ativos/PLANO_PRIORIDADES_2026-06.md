@@ -25,13 +25,16 @@
 | **FASE 9** Folha CLT + viabilidade | ✅ **prod fechado** | GAS **v1.5.91** · testes ok **14/06** · I25 fechado |
 | **Dashboard narrativo + folha prop.** | ✅ prod | FE v1.8.11–1.8.15 · `DEPLOY_FE_v1.8.15_SEMANA_ATUAL.md` |
 | **FASE 14** Mini-DRE | ✅ prod | FE v1.8.16+ · cascata Dashboard |
-| **FE UX mobile + DNA admin** | ✅ repo | v1.8.23–1.8.28 · FASE 9 DNA · `CHECKLIST_FASE9_DNA_ADMIN.md` |
+| **FE UX mobile + DNA admin** | ✅ prod | v1.8.23–1.8.30 · I28 · `CHECKLIST_FASE9_DNA_ADMIN.md` |
+| **FASE 15** Gestão Pessoas | 🟡 repo | FE **v1.8.49** · GAS **v1.5.99** · I29/I30 · `FASE_15_GESTAO_PESSOAS.md` |
+| **Design System v1.0** | ✅ repo | `DESIGN_SYSTEM_MOVIKIDS.md` · regra Cursor obrigatória |
 
 **Próximo passo imediato:**
 
-1. Smoke PC `?force=1.8.28` — Dashboard accordions · Caixa hero · CRM cards · Sistema glass
-2. **Tablet loja** — F5/F7/F10/F11 (regressão balcão)
-3. **FASE 10** CRM LTV — próximo ciclo dev (GAS — pedir §7.3)
+1. PC: `gestao-pessoas.html?force=1.8.49` — validar I29 (auth DNA) · Design System §9
+2. **Nova versão Web GAS v1.5.99** — I30 abas RH (sócio)
+3. **Tablet loja** — F5/F7/F10/F11 (regressão balcão)
+4. **FASE 10** CRM LTV — próximo ciclo dev (GAS — pedir §7.3)
 
 ### FASE 0 — checklist
 
@@ -224,7 +227,7 @@ Objetivo: balcão mais rápido; menos ruído visual. **Próximo pacote de featur
 | **12** | Drill-down + simulação | P2 | v1.8.8 | v1.5.80 | Dashboard gráficos |
 | **13** | Live BI Firebase | P2 | v1.8.9 | v1.5.81 | Widget frota live |
 | **14** | Plano contas + mini-DRE | P2 | v1.8.16 | v1.5.82 | Cascata margens · 🟡 docs 11/06 |
-| **15** | Portal metrics + CONFIG UI | P3 | v1.8.11 | v1.5.83 | Sistema + Dashboard |
+| **15** | Gestão Pessoas / holerite | P1 | v1.8.49 | v1.5.99 | `gestao-pessoas.html` |
 
 ---
 
