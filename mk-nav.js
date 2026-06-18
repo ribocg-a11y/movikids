@@ -44,17 +44,6 @@ function sbSairSessaoClick_() {
     return;
   }
   if (isAdm) {
-    if (srv && srv.nome) {
-      const msg = srv.nome + ' continua logada no balcao. Liberar o turno dela agora?';
-      if (typeof confirm === 'function' && confirm(msg)) {
-        if (typeof mkAuthLiberarSessaoOperadorAdmin_ === 'function') {
-          mkAuthLiberarSessaoOperadorAdmin_();
-          return;
-        }
-      } else if (typeof toast === 'function') {
-        toast('Turno de ' + srv.nome + ' continua no balcao — use Liberar sessao em Operadores.', 'warning', 6000);
-      }
-    }
     if (typeof adminLogout === 'function') adminLogout();
     return;
   }
