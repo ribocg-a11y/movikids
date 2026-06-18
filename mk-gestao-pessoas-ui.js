@@ -179,6 +179,7 @@
 
     let balcaoPins = [];
     let adminPins = [];
+    let colabPins = [];
 
     function buildPinRow(containerId, onComplete) {
       const el = document.getElementById(containerId);
@@ -187,7 +188,7 @@
       const inputs = [];
       for (let i = 0; i < 4; i++) {
         const inp = document.createElement('input');
-        inp.type = 'tel';
+        inp.type = 'password';
         inp.inputMode = 'numeric';
         inp.pattern = '[0-9]*';
         inp.maxLength = 1;
@@ -268,8 +269,8 @@
       pickColab = null;
       sessionStorage.removeItem('mk-mock-colab-uid');
       document.getElementById('colab-pin-wrap').hidden = true;
-      const pinOne = document.getElementById('colab-pin-one');
-      if (pinOne) pinOne.value = '';
+      clearPinInputs(colabPins);
+      colabPins = [];
       if (MK_GP_PROD && window.MK_GestaoPessoas) {
         document.getElementById('colab-picks').innerHTML = '<div class="mock-note info">Carregando colaboradores…</div>';
         MK_GestaoPessoas.listarColaboradores().then(function (list) {
@@ -297,8 +298,7 @@
       err.hidden = false;
     }
     function readColabPin() {
-      const el = document.getElementById('colab-pin-one');
-      return el ? el.value.replace(/\D/g, '').slice(0, 4) : '';
+      return readPin(colabPins);
     }
     function colabPick(id) {
       pickColab = id;
@@ -312,21 +312,17 @@
       document.querySelectorAll('#colab-picks .mock-pick').forEach(btn => {
         btn.classList.toggle('sel', btn.dataset.uid === id);
       });
-      const pinEl = document.getElementById('colab-pin-one');
-      pinEl.value = '';
-      pinEl.focus();
-      pinEl.onkeydown = function (e) { if (e.key === 'Enter') colabEntrar(); };
-      pinEl.oninput = function () {
-        pinEl.value = pinEl.value.replace(/\D/g, '').slice(0, 4);
-        if (pinEl.value.length === 4) setTimeout(colabEntrar, 150);
-      };
+      clearPinInputs(colabPins);
+      colabPins = buildPinRow('colab-pin', colabEntrar);
+      colabPins[0]?.focus();
     }
     function colabCancelPin() {
       pickColab = null;
       sessionStorage.removeItem('mk-mock-colab-uid');
       delete document.getElementById('colab-pin-wrap').dataset.uid;
       document.getElementById('colab-pin-wrap').hidden = true;
-      document.getElementById('colab-pin-one').value = '';
+      clearPinInputs(colabPins);
+      colabPins = [];
       document.querySelectorAll('#colab-picks .mock-pick').forEach(btn => btn.classList.remove('sel'));
     }
     function colabEntrar() {
@@ -345,8 +341,7 @@
             go('s-colab-hub');
           }).catch(function (e) {
             showColabErr(e.message || 'PIN incorreto ou erro de conexão.');
-            document.getElementById('colab-pin-one').value = '';
-            document.getElementById('colab-pin-one').focus();
+            clearPinInputs(colabPins);
           });
           return;
         }
@@ -354,8 +349,7 @@
         if (!p) { showColabErr('Colaborador não encontrado.'); return; }
         if (pin !== String(p.pin)) {
           showColabErr('PIN incorreto para ' + p.label + '. Use: Raykelly 1111 · Clara 2222 · Milena 3333');
-          document.getElementById('colab-pin-one').value = '';
-          document.getElementById('colab-pin-one').focus();
+          clearPinInputs(colabPins);
           return;
         }
         document.getElementById('colab-err').hidden = true;

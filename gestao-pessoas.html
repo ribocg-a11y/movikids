@@ -6,16 +6,16 @@
   <meta name="theme-color" content="#1565C0">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <title>Movi Kids — Colaboradores</title>
-  <script src="mk-canonical-host.js?v=1.8.46"></script>
+  <script src="mk-canonical-host.js?v=1.8.47"></script>
   <script>window.MK_GP_PROD = true;</script>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="mk-design.css?v=1.8.46">
-  <link rel="stylesheet" href="mk-app.css?v=1.8.46">
-  <link rel="stylesheet" href="mk-gestao-pessoas.css?v=1.8.46">
-  <script src="mk-version.js?v=1.8.46"></script>
-  <script src="mk-globals.js?v=1.8.46"></script>
-  <script src="mk-api.js?v=1.8.46"></script>
-  <script src="mk-gestao-pessoas.js?v=1.8.46"></script>
+  <link rel="stylesheet" href="mk-design.css?v=1.8.47">
+  <link rel="stylesheet" href="mk-app.css?v=1.8.47">
+  <link rel="stylesheet" href="mk-gestao-pessoas.css?v=1.8.47">
+  <script src="mk-version.js?v=1.8.47"></script>
+  <script src="mk-globals.js?v=1.8.47"></script>
+  <script src="mk-api.js?v=1.8.47"></script>
+  <script src="mk-gestao-pessoas.js?v=1.8.47"></script>
 </head>
 <body class="gp-prod">
   <div class="gp-wrap">
@@ -32,11 +32,15 @@
         <p class="mk-hint">Selecione seu nome e digite seu PIN. Você verá <strong>somente seus dados</strong>.</p>
         <div id="colab-picks"></div>
         <div id="colab-pin-wrap" hidden>
-          <p class="mk-hint">PIN · <strong id="colab-pin-name"></strong></p>
-          <input type="tel" id="colab-pin-one" class="mock-pin-single" maxlength="4" inputmode="numeric" pattern="[0-9]*" autocomplete="off" placeholder="••••" aria-label="PIN 4 dígitos">
+          <span class="mk-step-tag">Passo 2 de 2</span>
+          <h2>Digite seu PIN</h2>
+          <p class="mk-hint">Colaborador: <strong id="colab-pin-name"></strong></p>
+          <div class="mk-pin-row" id="colab-pin"></div>
           <div class="mk-err" id="colab-err" hidden></div>
-          <button type="button" class="mk-btn" id="colab-btn-entrar">Entrar</button>
-          <button type="button" class="mk-btn sec" onclick="colabCancelPin()">Trocar pessoa</button>
+          <div class="mk-row2">
+            <button type="button" class="mk-btn sec" onclick="colabCancelPin()">Trocar pessoa</button>
+            <button type="button" class="mk-btn" id="colab-btn-entrar">Entrar</button>
+          </div>
         </div>
       </section>
 
@@ -145,6 +149,6 @@
     </div>
   </div>
 
-  <script src="mk-gestao-pessoas-ui.js?v=1.8.46"></script>
+  <script src="mk-gestao-pessoas-ui.js?v=1.8.47"></script>
 </body>
 </html>

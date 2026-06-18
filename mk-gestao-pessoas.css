@@ -166,21 +166,33 @@ html.gp-prod.gp-mode-app .gp-inner {
 .gp-prod .mock-pick:active { transform: scale(0.99); }
 .gp-prod .mock-pick.sel { border-color: var(--blue); background: #E8F2FF; }
 
-.gp-prod .mock-pin-single {
-  width: 100%;
-  max-width: 220px;
-  display: block;
-  margin: 0 auto 14px;
-  padding: 14px;
+.gp-prod .mk-pin-row {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin: 14px 0;
+}
+
+.gp-prod .mk-pin-box {
+  width: 52px;
+  height: 58px;
   border: 2px solid var(--border);
   border-radius: 12px;
   font-size: 26px;
   font-weight: 900;
   text-align: center;
-  letter-spacing: 10px;
-  font-family: inherit;
   outline: none;
+  font-family: inherit;
   background: #fff;
+}
+
+.gp-prod .mk-pin-box:focus { border-color: var(--blue); }
+
+.gp-prod .mk-row2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 8px;
 }
 
 .gp-prod .mk-err {
