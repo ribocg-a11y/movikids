@@ -5,18 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Expires" content="0">
-  <title>MOVI KIDS — Mockup v3.3 Hub Tablet</title>
+  <title>MOVI KIDS — Mockup v3.4</title>
   <script>
     (function () {
-      var CANON = 'https://ribocg-a11y.github.io/movikids/ponto-mockup.html?v=3.3';
+      var CANON = 'https://ribocg-a11y.github.io/movikids/ponto-mockup.html?v=3.4';
       var h = location.hostname;
-      if (h && h !== 'ribocg-a11y.github.io' && location.protocol !== 'file:') {
+      if (h && h.indexOf('ribocg-a11y') === -1 && h.indexOf('ribocg.a11y') !== -1 && location.protocol !== 'file:') {
         location.replace(CANON);
         return;
       }
-      if (!location.search.includes('v=3.3') && !sessionStorage.getItem('mk-mock-ponto-v33')) {
-        sessionStorage.setItem('mk-mock-ponto-v33', '1');
-        location.replace(location.pathname + '?v=3.3&_=' + Date.now());
+      if (!location.search.includes('v=3.4') && !sessionStorage.getItem('mk-mock-ponto-v34')) {
+        sessionStorage.setItem('mk-mock-ponto-v34', '1');
+        location.replace(location.pathname + '?v=3.4&_=' + Date.now());
       }
     })();
   </script>
@@ -97,7 +97,7 @@
   <div id="wrong-host-block">
     <h1 style="font-family:'Fredoka One',cursive;font-size:28px;margin-bottom:16px">URL errada</h1>
     <p style="font-size:16px;font-weight:700;line-height:1.6;margin-bottom:20px">Você está em <strong id="wrong-host-name"></strong>.<br>Use <strong>ribocg-a11y</strong> (com hífen -), não ribocg.a11y (com ponto).</p>
-    <p><a id="wrong-host-link" href="https://ribocg-a11y.github.io/movikids/ponto-mockup.html?v=3.3">Abrir mockup v3.3 correto →</a></p>
+    <p><a id="wrong-host-link" href="https://ribocg-a11y.github.io/movikids/ponto-mockup.html?v=3.4">Abrir mockup v3.4 correto →</a></p>
   </div>
   <script>
     (function () {
@@ -114,7 +114,7 @@
     URL errada — use <strong>ribocg-a11y</strong> (hífen).<br>
     <a href="https://ribocg-a11y.github.io/movikids/ponto-mockup.html">Abrir versão correta →</a>
   </div>
-  <div class="mock-banner">MOCKUP <strong>v3.3</strong> · PIN campo único · <span id="host-tag"></span></div>
+  <div class="mock-banner">MOCKUP <strong>v3.4</strong> · PIN campo único · funciona em ponto_mockup.html também</div>
 
   <div class="mock-shell">
 
@@ -173,7 +173,7 @@
         <p class="mock-lead">PIN · <strong id="colab-pin-name"></strong></p>
         <input type="tel" id="colab-pin-one" class="mock-pin-single" maxlength="4" inputmode="numeric" pattern="[0-9]*" autocomplete="off" placeholder="0000" aria-label="PIN 4 dígitos">
         <div class="mock-note err" id="colab-err" hidden></div>
-        <button type="button" class="mock-btn" id="colab-btn-entrar" onclick="colabEntrar()">Entrar</button>
+        <button type="button" class="mock-btn" id="colab-btn-entrar">Entrar</button>
         <button type="button" class="mock-btn sec" onclick="colabCancelPin()">Trocar pessoa</button>
       </div>
       <div class="mock-note info" style="margin-top:12px">PIN mock: Raykelly <strong>1111</strong> · Clara <strong>2222</strong> · Milena <strong>3333</strong></div>
@@ -500,7 +500,7 @@
       const pinOne = document.getElementById('colab-pin-one');
       if (pinOne) pinOne.value = '';
       document.getElementById('colab-picks').innerHTML = Object.values(PESSOAS).map(p =>
-        `<button type="button" class="mock-pick" data-uid="${p.id}" onclick="colabPick('${p.id}')">
+        `<button type="button" class="mock-pick" data-uid="${p.id}">
           <div class="mock-av${p.owner?' owner':''}">${p.letra}</div>
           <div><div style="font-weight:900">${p.label}</div><div style="font-size:12px;color:var(--txt3)">${p.funcao}</div></div>
         </button>`).join('');
@@ -542,21 +542,26 @@
       document.querySelectorAll('#colab-picks .mock-pick').forEach(btn => btn.classList.remove('sel'));
     }
     function colabEntrar() {
-      const uid = pickColab || document.getElementById('colab-pin-wrap').dataset.uid || sessionStorage.getItem('mk-mock-colab-uid');
-      if (!uid) { showColabErr('Selecione seu nome na lista acima.'); return; }
-      const pin = readColabPin();
-      if (pin.length < 4) { showColabErr('Digite os 4 números do PIN (ex.: 1111).'); return; }
-      const p = PESSOAS[uid];
-      if (!p) { showColabErr('Colaborador não encontrado.'); return; }
-      if (pin !== p.pin) {
-        showColabErr('PIN incorreto para ' + p.label + '. Use: Raykelly 1111 · Clara 2222 · Milena 3333');
-        document.getElementById('colab-pin-one').value = '';
-        document.getElementById('colab-pin-one').focus();
-        return;
+      try {
+        const uid = pickColab || document.getElementById('colab-pin-wrap').dataset.uid || sessionStorage.getItem('mk-mock-colab-uid');
+        if (!uid) { showColabErr('Selecione seu nome na lista acima.'); return; }
+        const pin = readColabPin();
+        if (pin.length < 4) { showColabErr('Digite os 4 números do PIN (ex.: 1111).'); return; }
+        const p = PESSOAS[uid];
+        if (!p) { showColabErr('Colaborador não encontrado.'); return; }
+        if (pin !== String(p.pin)) {
+          showColabErr('PIN incorreto para ' + p.label + '. Use: Raykelly 1111 · Clara 2222 · Milena 3333');
+          document.getElementById('colab-pin-one').value = '';
+          document.getElementById('colab-pin-one').focus();
+          return;
+        }
+        document.getElementById('colab-err').hidden = true;
+        colabLogado = uid;
+        pickColab = uid;
+        go('s-colab-hub');
+      } catch (e) {
+        showColabErr('Erro ao entrar: ' + e.message);
       }
-      document.getElementById('colab-err').hidden = true;
-      colabLogado = uid;
-      go('s-colab-hub');
     }
     function colabSair() { colabLogado=null; go('s-home'); }
 
@@ -714,18 +719,29 @@
     function fecharAlerta() { document.getElementById('mock-adm-alert').classList.remove('show'); }
 
     /* ── INIT ── */
-    adminPins = buildPinRow('adm-pin', admEntrar);
-
-    var ht = document.getElementById('host-tag');
-    if (ht) ht.textContent = location.hostname || 'local';
-    setInterval(() => {
-      const el = document.getElementById('ponto-clock');
-      if (el && document.getElementById('s-ponto').classList.contains('active')) el.textContent = fmtTime();
-    }, 1000);
-
-    if (location.hostname && location.hostname !== 'ribocg-a11y.github.io' && location.protocol !== 'file:') {
-      document.getElementById('url-warn').hidden = false;
+    function initMock() {
+      adminPins = buildPinRow('adm-pin', admEntrar);
+      document.getElementById('colab-btn-entrar').addEventListener('click', colabEntrar);
+      document.getElementById('colab-picks').addEventListener('click', function (e) {
+        const btn = e.target.closest('[data-uid]');
+        if (btn) colabPick(btn.dataset.uid);
+      });
+      window.go = go;
+      window.colabPick = colabPick;
+      window.colabEntrar = colabEntrar;
+      window.colabCancelPin = colabCancelPin;
+      setInterval(function () {
+        const el = document.getElementById('ponto-clock');
+        if (el && document.getElementById('s-ponto').classList.contains('active')) el.textContent = fmtTime();
+      }, 1000);
+      if (location.hostname && location.hostname.indexOf('ribocg-a11y') === -1 && location.protocol !== 'file:') {
+        var w = document.getElementById('wrong-host-block');
+        if (w) { w.style.display = 'block'; document.getElementById('wrong-host-name').textContent = location.hostname; }
+        document.getElementById('url-warn').hidden = false;
+      }
     }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initMock);
+    else initMock();
   </script>
 </body>
 </html>
