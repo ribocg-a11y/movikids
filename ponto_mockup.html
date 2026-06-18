@@ -366,14 +366,20 @@
       raykelly: {
         id:'raykelly', label:'Raykelly', letra:'R', owner:false, funcao:'Atendente 1', pin:'1111', pinBalcao:'1111',
         turno:'14h–22h', cadastro:{...VAZIO}, statusHoje:'fora', folha:[],
-        meta:{ alvo:20, atual:14, bonus:100, bonusMin:21 },
+        meta:{
+          alvo:20, atual:14, bonusValor:100, bonusMin:21,
+          diasMes:[
+            { data:'07/06', dia:'Sáb', loc:23, bonusOk:true },
+            { data:'15/06', dia:'Dom', loc:21, bonusOk:true }
+          ]
+        },
         escala:['14–22','OFF','14–22','OFF','14–22','10–20','13–21'],
-        bancoHoras:'-1h30', pagamento:{ base:SALARIO_MINIMO_BASE, bonus:0, total:SALARIO_MINIMO_BASE, obs:'Jun/2026 · base = salário mínimo' }
+        bancoHoras:'-1h30', pagamento:{ base:SALARIO_MINIMO_BASE, bonus:200, total:SALARIO_MINIMO_BASE+200, obs:'Jun/2026 · base SM + bônus metas' }
       },
       clara: {
         id:'clara', label:'Clara', letra:'C', owner:false, funcao:'Atendente 2', pin:'2222', pinBalcao:'2222',
         turno:'14h–22h', cadastro:{...VAZIO}, statusHoje:'fora', folha:[],
-        meta:{ alvo:20, atual:0, bonus:100, bonusMin:21 },
+        meta:{ alvo:20, atual:0, bonusValor:100, bonusMin:21, diasMes:[] },
         escala:['OFF','14–22','OFF','14–22','14–22','12–22','13–21'],
         bancoHoras:'0h00', pagamento:{ base:SALARIO_MINIMO_BASE, bonus:0, total:SALARIO_MINIMO_BASE, obs:'Jun/2026 · cadastro pendente · base SM' }
       }
@@ -664,16 +670,45 @@
     }
 
     /* ── MÓDULOS PESSOAIS ── */
+    function metaBonusTotal(m) {
+      return (m.diasMes || []).filter(d => d.bonusOk).reduce((s, d) => s + m.bonusValor, 0);
+    }
+    function metaDiasOk(m) { return (m.diasMes || []).filter(d => d.bonusOk); }
+
     function renderMetas() {
       const p = PESSOAS[colabLogado];
       let html;
       if (!p.meta) {
         html = '<div class="mock-note info">Milena (sócia) não tem meta de locações por turno.</div>';
       } else {
-        const pct = Math.min(100, Math.round(p.meta.atual/p.meta.alvo*100));
-        html = `<div class="mock-card"><div class="mock-kpi">${p.meta.atual}/${p.meta.alvo}</div><div class="mock-kpi-lbl">Locações hoje · turno ${p.turno}</div>
-          <div class="mock-prog" style="margin-top:12px"><div class="mock-prog-fill" style="width:${pct}%"></div></div>
-          <p style="font-size:13px;font-weight:700;margin-top:10px;color:var(--txt2)">Bônus R$ ${p.meta.bonus} com ${p.meta.bonusMin}+ locações no turno.</p></div>`;
+        const m = p.meta;
+        const pct = Math.min(100, Math.round(m.atual / m.alvo * 100));
+        const diasOk = metaDiasOk(m);
+        const totalBonus = metaBonusTotal(m);
+        const rows = diasOk.map(d =>
+          `<tr><td>${d.data}</td><td>${d.dia}</td><td><strong>${d.loc}</strong></td><td style="color:var(--green)">✓ R$ ${fmtBRL(m.bonusValor)}</td></tr>`
+        ).join('');
+        const tabela = diasOk.length
+          ? `<div class="mock-card" style="overflow-x:auto;margin-top:14px">
+              <div class="mock-kpi-lbl" style="margin-bottom:10px">Dias com meta atingida · jun/2026 · ${m.bonusMin}+ loc/turno</div>
+              <table class="mock-table">
+                <thead><tr><th>Data</th><th>Dia</th><th>Locações</th><th>Bônus do dia</th></tr></thead>
+                <tbody>${rows}</tbody>
+              </table>
+            </div>
+            <div class="mock-card" style="background:#E8F5E9;border-color:#A5D6A7">
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <div><div class="mock-kpi-lbl">Total bônus do mês</div><div style="font-size:13px;font-weight:700;color:var(--txt2)">${diasOk.length} dia(s) × R$ ${fmtBRL(m.bonusValor)}</div></div>
+                <div class="mock-kpi" style="color:var(--green);font-size:28px">R$ ${fmtBRL(totalBonus)}</div>
+              </div>
+            </div>`
+          : `<div class="mock-note info" style="margin-top:14px">Nenhum dia com meta atingida em jun/2026 ainda. Meta: ${m.bonusMin}+ locações no turno → R$ ${fmtBRL(m.bonusValor)} por dia.</div>`;
+        html = `<div class="mock-card">
+            <div class="mock-kpi">${m.atual}/${m.alvo}</div>
+            <div class="mock-kpi-lbl">Locações hoje · turno ${p.turno}</div>
+            <div class="mock-prog" style="margin-top:12px"><div class="mock-prog-fill" style="width:${pct}%"></div></div>
+            <p style="font-size:13px;font-weight:700;margin-top:10px;color:var(--txt2)">Bônus R$ ${fmtBRL(m.bonusValor)} ao fazer ${m.bonusMin}+ locações no turno.</p>
+          </div>${tabela}`;
       }
       document.getElementById('metas-body').innerHTML = html;
     }
