@@ -1,77 +1,234 @@
-/* MOVI KIDS — Gestão de Pessoas (produção colaborador) */
-html.gp-prod, html.gp-prod body {
+/* MOVI KIDS — Gestão de Pessoas (produção) · DNA mk-auth + mk-hub */
+html.gp-prod,
+html.gp-prod body {
   margin: 0;
   min-height: 100vh;
   font-family: Nunito, system-ui, sans-serif;
   color: var(--txt);
-  background: linear-gradient(165deg, #e3f2fd 0%, #fff 45%, #fff8e1 100%);
+  background: var(--bg);
 }
-.gp-topbar {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 12px 16px;
-  background: rgba(255, 255, 255, 0.92);
-  border-bottom: 1px solid var(--border);
-  backdrop-filter: blur(8px);
+
+.gp-wrap {
+  min-height: 100vh;
+  padding: 20px 16px 40px;
+  background: linear-gradient(165deg, #e3f2fd 0%, var(--bg) 42%, #fff8e1 100%);
 }
-.gp-topbar-back {
+
+.gp-inner {
+  width: 100%;
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+html.gp-prod.gp-mode-app .gp-inner {
+  max-width: 720px;
+}
+
+.gp-prod .mock-screen { display: none; animation: gpFade .25s ease; }
+.gp-prod .mock-screen.active { display: block; }
+@keyframes gpFade {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+
+.gp-prod .mk-hub-back {
   background: none;
   border: 0;
   color: var(--blue-dk);
-  font: inherit;
-  font-weight: 900;
   font-size: 13px;
+  font-weight: 900;
   cursor: pointer;
+  padding: 0 0 14px;
+  margin: 0;
+  display: block;
+  font-family: inherit;
+}
+
+.gp-prod h2 {
+  font-size: 20px;
+  font-weight: 900;
+  margin-bottom: 6px;
+  color: var(--txt);
+}
+
+.gp-prod .mock-h1 {
+  font-family: 'Fredoka One', cursive;
+  font-size: 22px;
+  color: var(--blue-dk);
+  margin-bottom: 6px;
+}
+
+.gp-prod .mock-lead {
+  font-size: 13px;
+  color: var(--txt2);
+  font-weight: 700;
+  line-height: 1.45;
+  margin-bottom: 14px;
+}
+
+.gp-prod .mock-back {
+  background: none;
+  border: none;
+  color: var(--blue);
+  font: inherit;
+  font-weight: 800;
+  font-size: 14px;
+  cursor: pointer;
+  margin-bottom: 12px;
   padding: 0;
 }
-.gp-topbar-brand {
-  font-family: 'Fredoka One', cursive;
-  font-size: 18px;
+
+.gp-prod .mock-user-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--mk-radius, 16px);
+  margin-bottom: 16px;
+  box-shadow: var(--mk-shadow-1);
+}
+
+.gp-prod .mock-av {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #E8F2FF;
   color: var(--blue);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.gp-prod .mock-tiles .mk-hub-doors {
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+@media (min-width: 560px) {
+  .gp-prod .mock-tiles .mk-hub-doors { grid-template-columns: repeat(3, 1fr); }
+}
+
+.gp-prod .mock-tiles .mk-hub-door {
+  min-height: 128px;
+  align-items: center;
   text-align: center;
-  flex: 1;
+  justify-content: center;
+  padding: 18px 12px;
+  width: 100%;
+  box-sizing: border-box;
+  font: inherit;
+  cursor: pointer;
 }
-.gp-topbar-brand span { color: #FFD54F; }
-.gp-topbar-meta {
-  font-size: 10px;
-  font-weight: 800;
-  color: var(--txt3);
-  min-width: 72px;
-  text-align: right;
-}
-.gp-shell { max-width: 720px; margin: 0 auto; padding: 16px 14px 32px; }
-.gp-prod .mock-screen { display: none; animation: gpFade .25s ease; }
-.gp-prod .mock-screen.active { display: block; }
-@keyframes gpFade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
-.gp-prod .mock-logo { font-family: 'Fredoka One', cursive; font-size: 32px; color: var(--blue); text-align: center; margin: 8px 0 4px; }
-.gp-prod .mock-logo span { color: #FFD54F; }
-.gp-prod .mock-sub { text-align: center; color: var(--txt2); font-size: 13px; font-weight: 700; margin-bottom: 18px; }
-.gp-prod .mock-back { background: none; border: none; color: var(--blue); font: inherit; font-weight: 800; font-size: 14px; cursor: pointer; margin-bottom: 12px; padding: 0; }
-.gp-prod .mock-h1 { font-family: 'Fredoka One', cursive; font-size: 22px; color: var(--blue-dk); margin-bottom: 6px; }
-.gp-prod .mock-lead { font-size: 14px; color: var(--txt2); font-weight: 700; margin-bottom: 16px; line-height: 1.5; }
-.gp-prod .mock-user-bar { display: flex; align-items: center; gap: 12px; padding: 14px; background: var(--card); border: 1px solid var(--border); border-radius: var(--mk-radius, 16px); margin-bottom: 16px; box-shadow: var(--mk-shadow-1); }
-.gp-prod .mock-av { width: 48px; height: 48px; border-radius: 50%; background: #E8F2FF; color: var(--blue); display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 18px; flex-shrink: 0; }
-.gp-prod .mock-tiles .mk-hub-doors { grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 18px; }
-@media (min-width: 560px) { .gp-prod .mock-tiles .mk-hub-doors { grid-template-columns: repeat(3, 1fr); } }
-.gp-prod .mock-tiles .mk-hub-door { min-height: 128px; align-items: center; text-align: center; justify-content: center; padding: 18px 12px; width: 100%; box-sizing: border-box; font: inherit; cursor: pointer; }
-.gp-prod .mock-tiles .mk-hub-door-icon { font-size: 36px; margin-bottom: 6px; }
+
+.gp-prod .mock-tiles .mk-hub-door-icon { font-size: 36px; margin-bottom: 6px; line-height: 1; }
 .gp-prod .mock-tiles-5 .mk-hub-doors { grid-template-columns: repeat(2, 1fr); }
-@media (min-width: 560px) { .gp-prod .mock-tiles-5 .mk-hub-doors { grid-template-columns: repeat(3, 1fr); } }
-.gp-prod .mock-note { font-size: 12px; font-weight: 700; padding: 12px; border-radius: 12px; line-height: 1.5; margin-bottom: 12px; }
+
+@media (min-width: 560px) {
+  .gp-prod .mock-tiles-5 .mk-hub-doors { grid-template-columns: repeat(3, 1fr); }
+}
+
+.gp-prod .mock-note {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 12px;
+  border-radius: 12px;
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+
 .gp-prod .mock-note.info { background: #E3F2FD; border: 1px solid #90CAF9; color: #1565C0; }
+.gp-prod .mock-note.ok { background: #E8F5E9; border: 1px solid #A5D6A7; color: var(--green); }
 .gp-prod .mock-note.err { background: var(--red-lt, #FFEBEE); border: 1px solid var(--red); color: var(--red); }
-.gp-prod .mock-pick { display: flex; gap: 12px; align-items: center; padding: 14px; border: 2px solid var(--border); border-radius: var(--mk-radius, 16px); margin-bottom: 10px; cursor: pointer; background: var(--card); width: 100%; text-align: left; font: inherit; box-shadow: var(--mk-shadow-1); }
+
+.gp-prod .mock-pick {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 14px;
+  border: 2px solid var(--border);
+  border-radius: var(--mk-radius, 16px);
+  margin-bottom: 10px;
+  cursor: pointer;
+  background: var(--card);
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  box-shadow: var(--mk-shadow-1);
+  transition: border-color .12s ease, background .12s ease;
+}
+
+.gp-prod .mock-pick:active { transform: scale(0.99); }
 .gp-prod .mock-pick.sel { border-color: var(--blue); background: #E8F2FF; }
-.gp-prod .mock-pin-single { width: 100%; max-width: 200px; display: block; margin: 0 auto 16px; padding: 16px; border: 2px solid var(--border); border-radius: 14px; font-size: 28px; font-weight: 900; text-align: center; letter-spacing: 8px; font-family: inherit; outline: none; }
-.gp-prod .mock-pin-single:focus { border-color: var(--blue); }
-.gp-prod .mock-btn { display: flex; align-items: center; justify-content: center; width: 100%; padding: 16px; border: none; border-radius: var(--mk-radius, 16px); font: inherit; font-weight: 900; font-size: 15px; cursor: pointer; margin-bottom: 10px; background: var(--blue); color: #fff; }
-.gp-prod .mock-btn.sec { background: var(--card); border: 2px solid var(--border); color: var(--txt); }
-.gp-prod .mock-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--mk-radius, 16px); padding: 14px; margin-bottom: 12px; box-shadow: var(--mk-shadow-1); }
+
+.gp-prod .mock-pin-single {
+  width: 100%;
+  max-width: 220px;
+  display: block;
+  margin: 0 auto 14px;
+  padding: 14px;
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  font-size: 26px;
+  font-weight: 900;
+  text-align: center;
+  letter-spacing: 10px;
+  font-family: inherit;
+  outline: none;
+  background: #fff;
+}
+
+.gp-prod .mk-err {
+  background: var(--red-lt, #FFEBEE);
+  color: var(--red);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 13px;
+  font-weight: 800;
+  margin: 10px 0;
+}
+
+.gp-prod .mk-btn { margin-top: 8px; }
+
+.gp-prod .mock-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 52px;
+  padding: 0 16px;
+  border: none;
+  border-radius: 12px;
+  font: inherit;
+  font-weight: 900;
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 8px;
+  margin-bottom: 8px;
+  background: var(--blue);
+  color: #fff;
+}
+
+.gp-prod .mock-btn.sec {
+  background: #fff;
+  border: 2px solid var(--blue);
+  color: var(--blue);
+}
+
+.gp-prod .mock-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--mk-radius, 16px);
+  padding: 14px;
+  margin-bottom: 12px;
+  box-shadow: var(--mk-shadow-1);
+}
+
 .gp-prod .mock-kpi { font-family: 'Fredoka One', cursive; font-size: 32px; color: var(--blue); }
 .gp-prod .mock-kpi-lbl { font-size: 10px; font-weight: 800; color: var(--txt3); text-transform: uppercase; }
 .gp-prod .mock-badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 10px; font-weight: 800; }
@@ -79,20 +236,70 @@ html.gp-prod, html.gp-prod body {
 .gp-prod .mock-badge.gray { background: #ECEFF1; color: var(--txt3); }
 .gp-prod .mock-clock { font-family: 'Fredoka One', cursive; font-size: 44px; color: var(--blue); text-align: center; }
 .gp-prod .mock-table { width: 100%; border-collapse: collapse; font-size: 12px; font-weight: 700; }
-.gp-prod .mock-table th, .gp-prod .mock-table td { padding: 8px 6px; border: 1px solid var(--border); text-align: center; }
+.gp-prod .mock-table th,
+.gp-prod .mock-table td { padding: 8px 6px; border: 1px solid var(--border); text-align: center; }
 .gp-prod .mock-table th { background: #F8FAFC; font-size: 10px; text-transform: uppercase; color: var(--txt3); }
 .gp-prod .mock-table tr.hoje { background: #E8F2FF; font-weight: 900; }
 .gp-prod .mock-prog { height: 8px; background: var(--border); border-radius: 999px; overflow: hidden; margin: 10px 0; }
 .gp-prod .mock-prog-fill { height: 100%; background: var(--blue); border-radius: 999px; }
-.gp-prod .mock-sec { font-size: 11px; font-weight: 900; color: var(--txt3); text-transform: uppercase; letter-spacing: .06em; margin: 20px 0 10px; padding-top: 8px; border-top: 2px solid var(--border); }
+.gp-prod .mock-sec {
+  font-size: 11px;
+  font-weight: 900;
+  color: var(--txt3);
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  margin: 20px 0 10px;
+  padding-top: 8px;
+  border-top: 2px solid var(--border);
+}
+
 .gp-prod .mock-field { margin-bottom: 10px; }
-.gp-prod .mock-field label { display: block; font-size: 11px; font-weight: 800; color: var(--txt3); text-transform: uppercase; margin-bottom: 4px; }
-.gp-prod .mock-field input { width: 100%; padding: 11px 12px; border: 1px solid var(--border); border-radius: 12px; font: inherit; font-weight: 700; box-sizing: border-box; }
+.gp-prod .mock-field label {
+  display: block;
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--txt3);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.gp-prod .mock-field input {
+  width: 100%;
+  padding: 11px 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  font: inherit;
+  font-weight: 700;
+  box-sizing: border-box;
+}
+
 .gp-prod .mock-checklist { list-style: none; margin: 0; padding: 0; }
-.gp-prod .mock-checklist li { font-size: 13px; font-weight: 700; padding: 8px 0; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; }
+.gp-prod .mock-checklist li {
+  font-size: 13px;
+  font-weight: 700;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+}
+
 /* Holerite */
-.gp-prod .mk-hol { background: var(--card); border: 1px solid var(--border); border-radius: var(--mk-radius, 16px); overflow: hidden; box-shadow: var(--mk-shadow-1); margin-bottom: 12px; font-size: 12px; }
-.gp-prod .mk-hol-head { background: linear-gradient(135deg, var(--blue-dk) 0%, var(--blue) 100%); color: #fff; padding: 14px 16px; }
+.gp-prod .mk-hol {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--mk-radius, 16px);
+  overflow: hidden;
+  box-shadow: var(--mk-shadow-1);
+  margin-bottom: 12px;
+  font-size: 12px;
+}
+
+.gp-prod .mk-hol-head {
+  background: linear-gradient(135deg, var(--blue-dk) 0%, var(--blue) 100%);
+  color: #fff;
+  padding: 14px 16px;
+}
+
 .gp-prod .mk-hol-head .mk-hol-brand { font-family: 'Fredoka One', cursive; font-size: 18px; }
 .gp-prod .mk-hol-head .mk-hol-sub { font-size: 10px; font-weight: 700; opacity: .92; margin-top: 4px; line-height: 1.45; }
 .gp-prod .mk-hol-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 16px; padding: 12px 16px; background: #F8FAFC; border-bottom: 1px solid var(--border); }

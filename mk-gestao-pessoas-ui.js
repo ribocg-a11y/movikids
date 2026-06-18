@@ -42,9 +42,7 @@
     let gpSessionPin = '';
 
     if (MK_GP_PROD) {
-      document.title = 'MOVI KIDS — Colaboradores';
-      var tb = document.getElementById('gp-topbar-title');
-      if (tb) tb.textContent = 'Colaboradores · v' + (global.MK_VERSION || '');
+      document.title = 'Movi Kids — Colaboradores';
     }
 
     const PESSOAS = {
@@ -100,6 +98,9 @@
       document.querySelectorAll('.mock-screen').forEach(s => s.classList.remove('active'));
       document.getElementById(id).classList.add('active');
       window.scrollTo(0, 0);
+      if (MK_GP_PROD) {
+        document.documentElement.classList.toggle('gp-mode-app', id !== 's-colab-login');
+      }
       if (id === 's-balcao') renderBalcao();
       if (id === 's-colab-login') renderColabLogin();
       if (id === 's-colab-hub') renderColabHub();
