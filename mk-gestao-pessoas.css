@@ -231,7 +231,8 @@ body {
 
 /* ── ADM Operadores · Gestão Pessoas (#page-operadores) ── */
 #page-operadores .gp-adm-lead { font-size: 13px; color: var(--txt2); font-weight: 700; line-height: 1.55; margin-bottom: 14px; }
-#page-operadores .gp-adm-err { font-size: 13px; font-weight: 700; color: var(--red); margin-bottom: 12px; }
+#page-operadores .gp-adm-err { font-size: 13px; font-weight: 700; color: #B71C1C; margin-bottom: 12px; line-height: 1.55; padding: 12px 14px; background: #FFEBEE; border: 1px solid #EF9A9A; border-radius: 12px; }
+#page-operadores .gp-adm-err code { font-size: 11px; background: rgba(0,0,0,.06); padding: 1px 4px; border-radius: 4px; }
 #page-operadores .gp-adm-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
 #page-operadores .gp-adm-tab {
   padding: 8px 14px; border-radius: 999px; border: 2px solid var(--border);
