@@ -5,9 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Expires" content="0">
-  <title>MOVI KIDS — Mockup v3.6</title>
+  <title>MOVI KIDS — Gestão de Pessoas</title>
   <script>
     (function () {
+      var PROD = location.pathname.indexOf('gestao-pessoas') >= 0 || location.search.indexOf('prod=1') >= 0;
+      if (PROD) { window.MK_GP_PROD = true; return; }
       var VER = '3.6';
       var CANON = 'https://ribocg-a11y.github.io/movikids/ponto_mockup.html?v=' + VER;
       var h = location.hostname || '';
@@ -23,8 +25,12 @@
     })();
   </script>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="mk-design.css?v=1.8.38">
-  <link rel="stylesheet" href="mk-app.css?v=1.8.38">
+  <link rel="stylesheet" href="mk-design.css?v=1.8.39">
+  <link rel="stylesheet" href="mk-app.css?v=1.8.39">
+  <script src="mk-version.js?v=1.8.39"></script>
+  <script src="mk-globals.js?v=1.8.39"></script>
+  <script src="mk-api.js?v=1.8.39"></script>
+  <script src="mk-gestao-pessoas.js?v=1.8.39"></script>
   <style>
     /* Mockup — só layout de telas; tokens e componentes vêm do mk-design / mk-app */
     body { background: var(--bg); margin: 0; font-family: Nunito, system-ui, sans-serif; color: var(--txt); min-height: 100vh; }
@@ -149,7 +155,7 @@
     URL errada — use <strong>ribocg-a11y</strong> (hífen).<br>
     <a href="https://ribocg-a11y.github.io/movikids/ponto-mockup.html">Abrir versão correta →</a>
   </div>
-  <div class="mock-banner">MOCKUP <strong>v3.6</strong> · holerite · INSS · IRRF · VT · VA · benefícios</div>
+  <div class="mock-banner" id="mock-banner">MOCKUP <strong>v3.6</strong> · holerite · INSS · IRRF · VT · VA · benefícios</div>
 
   <div class="mock-shell">
 
@@ -412,6 +418,15 @@
 
     const SALARIO_MINIMO_BASE = 1621; // SM nacional 2026 — base MOVI KIDS atendentes
 
+    const MK_GP_PROD = !!window.MK_GP_PROD;
+    let gpColabList = [];
+    let gpSessionPin = '';
+
+    if (MK_GP_PROD) {
+      document.getElementById('mock-banner').innerHTML = 'GESTÃO DE PESSOAS <strong>v1.8.39</strong> · produção · planilha + GAS v1.5.98';
+      document.title = 'MOVI KIDS — Gestão de Pessoas';
+    }
+
     const PESSOAS = {
       milena: {
         id:'milena', label:'Milena', letra:'M', owner:true, funcao:'Sócia', pin:'3333', pinBalcao:'3333',
@@ -634,6 +649,21 @@
       document.getElementById('colab-pin-wrap').hidden = true;
       const pinOne = document.getElementById('colab-pin-one');
       if (pinOne) pinOne.value = '';
+      if (MK_GP_PROD && window.MK_GestaoPessoas) {
+        document.getElementById('colab-picks').innerHTML = '<div class="mock-note info">Carregando colaboradores…</div>';
+        MK_GestaoPessoas.listarColaboradores().then(function (list) {
+          gpColabList = list || [];
+          document.getElementById('colab-picks').innerHTML = gpColabList.map(function (o) {
+            return `<button type="button" class="mock-pick" data-uid="${o.id}">
+              <div class="mock-av">${String(o.nome || '?').charAt(0)}</div>
+              <div><div style="font-weight:900">${o.nome}</div><div style="font-size:12px;color:var(--txt3)">${o.funcao || 'Colaborador'}</div></div>
+            </button>`;
+          }).join('') || '<div class="mock-note err">Nenhum colaborador — crie abas na planilha.</div>';
+        }).catch(function (e) {
+          document.getElementById('colab-picks').innerHTML = '<div class="mock-note err">' + e.message + '</div>';
+        });
+        return;
+      }
       document.getElementById('colab-picks').innerHTML = Object.values(PESSOAS).map(p =>
         `<button type="button" class="mock-pick" data-uid="${p.id}">
           <div class="mock-av${p.owner?' owner':''}">${p.letra}</div>
@@ -654,7 +684,9 @@
       sessionStorage.setItem('mk-mock-colab-uid', id);
       document.getElementById('colab-pin-wrap').dataset.uid = id;
       document.getElementById('colab-pin-wrap').hidden = false;
-      document.getElementById('colab-pin-name').textContent = PESSOAS[id].label;
+      document.getElementById('colab-pin-name').textContent = MK_GP_PROD
+        ? ((gpColabList.find(function (o) { return String(o.id) === String(id); }) || {}).nome || id)
+        : PESSOAS[id].label;
       document.getElementById('colab-err').hidden = true;
       document.querySelectorAll('#colab-picks .mock-pick').forEach(btn => {
         btn.classList.toggle('sel', btn.dataset.uid === id);
@@ -682,6 +714,21 @@
         if (!uid) { showColabErr('Selecione seu nome na lista acima.'); return; }
         const pin = readColabPin();
         if (pin.length < 4) { showColabErr('Digite os 4 números do PIN (ex.: 1111).'); return; }
+        if (MK_GP_PROD && window.MK_GestaoPessoas) {
+          MK_GestaoPessoas.loginPainel(uid, pin).then(function (mapped) {
+            PESSOAS[uid] = Object.assign({}, PESSOAS[uid] || {}, mapped, { pin: pin });
+            gpSessionPin = pin;
+            document.getElementById('colab-err').hidden = true;
+            colabLogado = uid;
+            pickColab = uid;
+            go('s-colab-hub');
+          }).catch(function (e) {
+            showColabErr(e.message || 'PIN incorreto ou erro de conexão.');
+            document.getElementById('colab-pin-one').value = '';
+            document.getElementById('colab-pin-one').focus();
+          });
+          return;
+        }
         const p = PESSOAS[uid];
         if (!p) { showColabErr('Colaborador não encontrado.'); return; }
         if (pin !== String(p.pin)) {
@@ -714,7 +761,7 @@
     function abrirModulo(mod) {
       if (mod==='ponto') {
         const p = PESSOAS[colabLogado];
-        if (!cadastroOk(p)) { showBloqueio(); return; }
+        if (!MK_GP_PROD && !cadastroOk(p)) { showBloqueio(); return; }
         go('s-ponto');
       } else if (mod==='metas') go('s-metas');
       else if (mod==='escala') go('s-escala');
@@ -782,9 +829,25 @@
     function confirmarPonto() {
       const p = PESSOAS[colabLogado];
       const t = fmtTime(), hoje = fmtDataHoje(), dia = diaSemanaHoje();
+      const flash = document.getElementById('ponto-flash');
+      if (MK_GP_PROD && window.MK_GestaoPessoas && gpSessionPin) {
+        const tipo = p.statusHoje !== 'dentro' ? 'entrada' : 'saida';
+        MK_GestaoPessoas.registrarPonto(colabLogado, gpSessionPin, tipo).then(function (r) {
+          p.statusHoje = r.status || (tipo === 'entrada' ? 'dentro' : 'fora');
+          flash.textContent = '✓ ' + (r.mensagem || 'Ponto registrado');
+          flash.hidden = false;
+          return MK_GestaoPessoas.loginPainel(colabLogado, gpSessionPin);
+        }).then(function (mapped) {
+          PESSOAS[colabLogado] = Object.assign({}, p, mapped, { pin: gpSessionPin });
+          renderPonto();
+        }).catch(function (e) {
+          flash.textContent = '✗ ' + (e.message || 'Erro ao registrar ponto');
+          flash.hidden = false;
+        });
+        return;
+      }
       let row = p.folha.find(r=>r.data===hoje);
       if (!row) { row={data:hoje,dia,entrada:'—',saida:'—',horas:'—',sit:'ABERTO'}; p.folha.unshift(row); }
-      const flash = document.getElementById('ponto-flash');
       if (p.statusHoje!=='dentro') {
         row.entrada=t; p.statusHoje='dentro';
         flash.textContent='✓ Entrada registrada às '+t; flash.hidden=false;
@@ -859,7 +922,7 @@
         document.getElementById('pag-body').innerHTML = `<div class="mock-note info">${pg.obs || 'Sem demonstrativo CLT.'}</div>`;
         return;
       }
-      const c = calcFolhaPagamento(pg);
+      const c = (pg.holerite && pg.holerite.bruto) ? Object.assign({ vaCopart: 0, faltas: pg.faltas || 0 }, pg.holerite) : calcFolhaPagamento(pg);
       const cpfMask = p.cadastro && p.cadastro.cpf ? p.cadastro.cpf : '***.***.***-**';
       const adm = p.admissao ? p.admissao.split('-').reverse().join('/') : (pg.obs || '—');
       const refSal = (pg.diasTrabalhados && pg.diasMes) ? pg.diasTrabalhados + '/' + pg.diasMes + ' dias' : '30/30';

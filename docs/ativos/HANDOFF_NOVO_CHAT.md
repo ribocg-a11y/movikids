@@ -1,6 +1,6 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 17/06/2026 (I28 liberar sessão · FE v1.8.30 · FASE 9 DNA admin)  
+**Atualizado:** 18/06/2026 (FASE 15 Gestão Pessoas · FE v1.8.39 · GAS v1.5.98 repo)  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **Repo local:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`  
@@ -69,13 +69,14 @@ O agente lê `HANDOFF_NOVO_CHAT.md` automaticamente (regra `.cursor/rules/handof
 
 ---
 
-## Produção (17/06/2026)
+## Produção (18/06/2026)
 
 | Camada | Versão | Verificação |
 |--------|--------|-------------|
-| **Frontend** | **v1.8.30** | https://ribocg-a11y.github.io/movikids/?force=1.8.30 |
-| **Service Worker** | **1.8.30** | `sw.js` |
-| **Apps Script (ping)** | **v1.5.92** | ping JSON · `@144` clasp · desc. `v1.5.92` |
+| **Frontend** | **v1.8.39** *(push pendente)* | https://ribocg-a11y.github.io/movikids/?force=1.8.39 |
+| **Gestão Pessoas** | **v1.8.39** | https://ribocg-a11y.github.io/movikids/gestao-pessoas.html |
+| **Service Worker** | **1.8.39** | `sw.js` |
+| **Apps Script (ping)** | **v1.5.92** · repo **v1.5.98** | Publicar Nova versão Web |
 | **Aba FOLHA** | **OK** (I25) | B68 ~5269,96 · `folhaPlanejamento.fonte: FOLHA` |
 | **Comunicação** | **QR only** | `OPERACAO_COMUNICACAO_QR_ONLY.md` |
 
@@ -118,23 +119,22 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 
 ---
 
-## Próximo passo (17/06/2026)
+## Próximo passo (18/06/2026)
 
-**Produção:** ✅ GAS v1.5.92 · FE **v1.8.30** (I28 + FASE 9 DNA) · FOLHA OK
+**FASE 15 Gestão Pessoas** — mockup aprovado → repo **FE v1.8.39** + **GAS v1.5.98** (clasp push OK)
 
 | # | Ação | Quem |
 |---|------|------|
-| 1 | Push FE v1.8.30 + `verify-publish-complete` | Agente (se ainda não push) |
-| 2 | **Tablet loja:** I28 — dual admin+operador → faixa laranja Liberar + modal PIN | **Você** |
-| 3 | Operadores → Deslogar balcão (teclado numérico, não prompt) | **Você** |
-| 4 | F5/F7/F10/F11 — regressão balcão após FASE 9 | **Você** |
-| 5 | Assinar `CHECKLIST_FASE9_DNA_ADMIN.md` | **Você** |
+| 1 | **Nova versão Web GAS v1.5.98** (Editor → Editar AKfycbwakQ... → Nova versão) | **Você** |
+| 2 | Criar abas planilha: `.\scripts\instalar-abas-gestao-pessoas-gas.ps1` (após passo 1) | Agente ou você |
+| 3 | Testar **gestao-pessoas.html** → Colaboradores → Raykelly PIN real | **Você** |
+| 4 | Tablet loja: homologação F5/F7/F10/F11 (regressão balcão) | **Você** |
 
-**Incidente I28:** `INCIDENTE_I28_LIBERAR_SESSAO_TABLET_2026-06-17.md` · guards Regra 17–19 · `TESTE_SESSAO_LIBERAR_READONLY.ps1`
+Doc: `docs/ativos/FASE_15_GESTAO_PESSOAS.md`
 
-**Próximo pacote dev:** **FASE 10** CRM LTV / cohort (GAS + FE — pedir antes de `.gs`).
+**OAuth planilha expirado** — alternativa: passo 2 via GAS admin (não precisa `npm run auth`).
 
-**Clasp @144** — rótulo `v1.5.92` alinhado (17/06) · mesmo Deploy ID · ping inalterado.
+**Produção anterior:** GAS ping **v1.5.92** · FE **v1.8.30** (I28)
 
 **Protocolo Mestre 16/06:** 18+ suites OK · FASE6/P3/scripts corrigidos · cleanup 0 resíduos · log em `financeiro/logs/` (gitignored).
 
