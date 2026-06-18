@@ -20,6 +20,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="mk-design.css?v=1.8.50">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;min-height:100dvh;
@@ -75,7 +76,7 @@ footer{margin-top:18px;font-size:11px;color:rgba(255,255,255,0.2);font-weight:60
 </head>
 <body>
 <div class="card" id="main-card">
-  <div class="brand">🚗 Movi <span>Kids</span></div>
+  <div class="track-brand"><img class="mk-brand-img mk-brand-img--track" src="assets/logo-movi-kids.png" alt="Movi Kids" width="1080" height="1080" loading="lazy" decoding="async"></div>
   <div class="tipo-badge" id="tipo-badge">Movi Kids</div>
   <div class="crianca-name" id="crianca-name" style="font-size:20px;color:rgba(255,255,255,0.4)" class="loading-text">Carregando...</div>
   <div class="resp-name" id="resp-name" style="display:none">👤 <span id="resp-span">—</span></div>
@@ -111,7 +112,7 @@ footer{margin-top:18px;font-size:11px;color:rgba(255,255,255,0.2);font-weight:60
   <div class="enc-total-lbl" id="enc-total-lbl" style="display:none">valor total da locação</div>
   <div class="enc-sub" id="enc-sub">Obrigado por escolher a Movi Kids!<br>Esperamos ver você em breve. 🧸</div>
 </div>
-<footer>🚗 Movi Kids · Golden Shopping Calhau · São Luís</footer>
+<footer class="track-foot-brand"><img class="mk-brand-img mk-brand-img--track-foot" src="assets/logo-movi-kids.png" alt="" width="1080" height="1080" loading="lazy" decoding="async" aria-hidden="true"><span>Movi Kids · Golden Shopping Calhau · São Luís</span></footer>
 <script>
 // v1.6.29: URL curta ?s=BASE36(rowIndex) — sem dados pessoais na URL
 const P        = new URLSearchParams(location.search);

@@ -25,7 +25,7 @@ function renderCards() {
     container.innerHTML = `
       <div class="empty">
         <div class="empty-logo" aria-hidden="true">
-          <img src="assets/logo-movi-kids.png" alt="" width="220" height="220" loading="lazy" decoding="async">
+          <img class="mk-brand-img mk-brand-img--lg" src="assets/logo-movi-kids.png" alt="Movi Kids" width="1080" height="1080" loading="lazy" decoding="async">
         </div>
         <h3>Nenhuma locação ativa</h3>
         <p>Toque em <strong>Nova</strong> para iniciar uma locação</p>

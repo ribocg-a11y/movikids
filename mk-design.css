@@ -250,11 +250,46 @@
   cursor: pointer;
 }
 
-/* Home empty — logo oficial transparente (assets/logo-movi-kids.png) */
+/* Marca oficial — PNG assets/logo-movi-kids.png · mestre assets/Logo-MOVI-KIDS.pdf */
+.mk-brand-img {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  object-fit: contain;
+  margin-left: auto;
+  margin-right: auto;
+}
+.mk-brand-img--xs { max-height: 32px; margin: 0; }           /* sidebar */
+.mk-brand-img--sm { max-height: 36px; margin: 0; }           /* header mobile */
+.mk-brand-img--md { max-width: min(168px, 52vw); }            /* auth, hub, colaboradores */
+.mk-brand-img--lg { max-width: min(220px, 72vw); }            /* empty home */
+.mk-brand-img--splash { max-width: min(200px, 58vw); margin-bottom: 12px; }
+.mk-brand-img--desktop { max-width: min(180px, 14vw); margin: 0 auto 8px; }
+.mk-brand-img--portal { max-width: min(200px, 58vw); filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.28)); }
+.mk-brand-img--portal-sm { max-width: min(140px, 42vw); filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.28)); }
+.mk-brand-img--track { max-height: 44px; margin: 0; }
+.mk-brand-img--track-foot { max-height: 24px; margin: 0; display: inline-block; vertical-align: middle; }
+.mk-brand-img--frame { max-height: clamp(40px, 11vw, 52px); margin: 0 auto; filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3)); }
+.mk-brand-img--inline { max-height: 22px; margin: 0; display: inline-block; vertical-align: middle; }
+.mk-brand-img--card { max-height: 28px; margin: 0; display: inline-block; vertical-align: middle; }
+.mk-brand-img--poster { max-width: min(280px, 72vw); filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.25)); }
+.mk-brand-img--on-dark { filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.35)); }
+.mk-portal-brand-wrap { text-align: center; margin-bottom: 8px; }
+.mk-portal-brand-wrap--play { margin-bottom: 8px; }
+.mk-mob-brand { display: flex; align-items: center; }
+.sb-logo .mk-brand-img { margin-bottom: 0; }
+.track-brand { display: flex; align-items: center; justify-content: center; margin-bottom: 12px; }
+.track-foot-brand { display: inline-flex; align-items: center; gap: 6px; justify-content: center; flex-wrap: wrap; }
+.dia-card-brand, .emp-nome-brand { display: inline-flex; align-items: center; gap: 6px; }
+.mk-frame-brand-wrap { display: flex; justify-content: center; margin: 0; }
+
+/* Home empty — logo oficial transparente */
 .empty-logo {
   margin: 0 auto 16px;
   max-width: min(220px, 72vw);
 }
+.empty-logo .mk-brand-img,
 .empty-logo img {
   display: block;
   width: 100%;

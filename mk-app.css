@@ -29,7 +29,7 @@ html,body{height:100%;background:var(--bg);color:var(--txt);overflow:hidden}
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;
   transition:opacity .5s;
 }
-#splash h1{font-family:'Fredoka One',cursive;font-size:42px;color:#fff;letter-spacing:2px}
+#splash .mk-brand-img--splash{margin:0 auto 12px}
 #splash p{color:rgba(255,255,255,.8);font-size:14px}
 .spinner{width:32px;height:32px;border:3px solid rgba(255,255,255,.3);
   border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite}
@@ -596,10 +596,8 @@ html,body{height:100%;background:var(--bg);color:var(--txt);overflow:hidden}
 }
 .sb-logo{
   padding:22px 18px 16px;
-  font-family:'Fredoka One',cursive;font-size:19px;color:#fff;letter-spacing:1px;
   border-bottom:1px solid rgba(255,255,255,.1);
 }
-.sb-logo span{color:#FFD54F}
 .sb-status{display:flex;align-items:center;gap:5px;margin-top:5px;
   font-size:11px;color:rgba(255,255,255,.5);font-family:'Nunito',sans-serif;font-weight:600}
 .sb-nav{flex:0 0 auto;padding:12px 10px;display:flex;flex-direction:column;gap:3px;background:transparent;border:none;box-shadow:none}
@@ -810,11 +808,7 @@ html,body{height:100%;background:var(--bg);color:var(--txt);overflow:hidden}
   .brand-left{left:0;right:calc(50% + 230px);text-align:center;padding:0 16px}
   .brand-right{left:calc(50% + 230px);right:0;text-align:center;padding:0 16px}
 
-  .brand-logo{
-    font-family:'Fredoka One',cursive;font-size:clamp(16px,2.2vw,28px);
-    color:#fff;letter-spacing:1px;margin-bottom:8px;
-  }
-  .brand-logo span{color:#FFD54F}
+  .brand-logo{margin-bottom:8px;text-align:center}
   .brand-sub{font-size:clamp(10px,1.2vw,13px);color:rgba(255,255,255,.65);font-weight:600;line-height:1.6}
   .feat{
     font-size:clamp(10px,1.1vw,13px);color:rgba(255,255,255,.7);

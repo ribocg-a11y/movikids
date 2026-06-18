@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="mk-design.css?v=1.7.62">
+<link rel="stylesheet" href="mk-design.css?v=1.8.50">
 </head>
 <body class="mk-portal-page mk-frame-page" data-step="start">
 
@@ -39,7 +39,7 @@
       <span class="st s8">⭐</span>
     </div>
     <header class="mk-frame-head">
-      <h2 class="mk-frame-brand">Movi <span>Kids</span></h2>
+      <div class="mk-frame-brand-wrap"><img class="mk-brand-img mk-brand-img--frame" src="assets/logo-movi-kids.png" alt="Movi Kids" width="1080" height="1080" loading="lazy" decoding="async"></div>
       <p class="mk-frame-name" id="frame-nome">⭐</p>
     </header>
     <div class="mk-frame-slot">
@@ -98,6 +98,36 @@ const video = document.getElementById('frame-video');
 const resultImg = document.getElementById('frame-result');
 const canvas = document.getElementById('frame-canvas');
 const ctx = canvas.getContext('2d');
+
+const logoImg_ = new Image();
+logoImg_.src = 'assets/logo-movi-kids.png';
+let logoReady_ = false;
+logoImg_.onload = () => { logoReady_ = true; };
+
+function drawMolduraLogo_(c) {
+  const h = 96;
+  const w = logoReady_ && logoImg_.naturalHeight
+    ? (logoImg_.naturalWidth / logoImg_.naturalHeight) * h
+    : h;
+  const x = (OUT_W - w) / 2;
+  const y = 32;
+  if (logoReady_ && logoImg_.complete && logoImg_.naturalWidth) {
+    c.drawImage(logoImg_, x, y, w, h);
+    return y + h + 8;
+  }
+  c.font = 'bold 72px Fredoka One, Arial Rounded MT Bold, sans-serif';
+  const partM = 'Movi ';
+  const partK = 'Kids';
+  const titleW = c.measureText(partM).width + c.measureText(partK).width;
+  let tx = (OUT_W - titleW) / 2;
+  c.textAlign = 'left';
+  c.textBaseline = 'alphabetic';
+  c.fillStyle = '#fff';
+  c.fillText(partM, tx, 100);
+  c.fillStyle = '#FFD54F';
+  c.fillText(partK, tx + c.measureText(partM).width, 100);
+  return 108;
+}
 
 function esc(v) {
   return String(v == null ? '' : v).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
@@ -226,26 +256,13 @@ function drawMoldura_(nome) {
   drawCornerBracket_(ctx, PHOTO.x - 18, PHOTO.y + PHOTO.h + 18, false, true);
   drawCornerBracket_(ctx, PHOTO.x + PHOTO.w + 18, PHOTO.y + PHOTO.h + 18, true, true);
 
-  ctx.font = 'bold 72px Fredoka One, Arial Rounded MT Bold, sans-serif';
-  const partM = 'Movi ';
-  const partK = 'Kids';
-  const titleW = ctx.measureText(partM).width + ctx.measureText(partK).width;
-  let tx = (OUT_W - titleW) / 2;
-  ctx.textAlign = 'left';
-  ctx.textBaseline = 'alphabetic';
-  ctx.fillStyle = '#fff';
-  ctx.fillText(partM, tx, 100);
-  ctx.fillStyle = '#FFD54F';
-  ctx.fillText(partK, tx + ctx.measureText(partM).width, 100);
-  ctx.font = 'bold 44px sans-serif';
-  ctx.fillText('✨', tx - 48, 98);
-  ctx.fillText('✨', tx + titleW + 12, 98);
+  const logoBottom = drawMolduraLogo_(ctx);
 
   const nomeTxt = String(nome || '').trim() || '⭐';
   ctx.font = 'bold 30px Nunito, sans-serif';
   const nw = Math.min(640, Math.max(220, ctx.measureText(nomeTxt).width + 72));
   const nx = (OUT_W - nw) / 2;
-  const ny = 128;
+  const ny = logoBottom + 12;
   const ng = ctx.createLinearGradient(nx, ny, nx + nw, ny + 48);
   ng.addColorStop(0, '#FFD54F');
   ng.addColorStop(1, '#ffb300');

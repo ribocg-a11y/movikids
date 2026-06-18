@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Movi Kids">
 <title>Movi Kids</title>
-<script src="mk-canonical-host.js?v=1.8.49"></script>
+<script src="mk-canonical-host.js?v=1.8.50"></script>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
@@ -17,16 +17,16 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<script src="mk-stale-sync.js?v=1.8.49"></script>
-<script src="mk-version.js?v=1.8.49"></script>
-<script src="mk-api.js?v=1.8.49"></script>
-<link rel="stylesheet" href="mk-design.css?v=1.8.49">
+<script src="mk-stale-sync.js?v=1.8.50"></script>
+<script src="mk-version.js?v=1.8.50"></script>
+<script src="mk-api.js?v=1.8.50"></script>
+<link rel="stylesheet" href="mk-design.css?v=1.8.50">
 
-<script src="mk-cache-bust.js?v=1.8.49"></script>
+<script src="mk-cache-bust.js?v=1.8.50"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<link rel="stylesheet" href="mk-app.css?v=1.8.49">
+<link rel="stylesheet" href="mk-app.css?v=1.8.50">
 <!-- Firebase SDK — Realtime sync canonico para todos os dispositivos -->
-<script type="module" src="mk-firebase.js?v=1.8.49"></script>
+<script type="module" src="mk-firebase.js?v=1.8.50"></script>
 </head>
 
 <body>
@@ -52,7 +52,7 @@
   <div class="deco" style="--x:85%;--y:50%;--s:0.8rem;--dur:12s;--del:4.5s">✦</div>
   <div class="deco" style="--x:92%;--y:30%;--s:1.1rem;--dur:9s;--del:1.5s">✦</div>
   <div class="brand-left">
-    <div class="brand-logo">🚗 Movi <span>Kids</span></div>
+    <div class="brand-logo"><img class="mk-brand-img mk-brand-img--desktop" src="assets/logo-movi-kids.png" alt="Movi Kids" width="1080" height="1080" loading="lazy" decoding="async"></div>
     <div class="brand-sub">Locação de Veículos Elétricos</div>
     <div class="brand-sub" style="opacity:.5;font-size:11px;margin-top:4px">Golden Shopping Calhau</div>
   </div>
@@ -65,7 +65,7 @@
 
 <!-- Splash -->
 <div id="splash">
-  <h1>🚗 Movi <span>Kids</span></h1>
+  <img class="mk-brand-img mk-brand-img--splash" src="assets/logo-movi-kids.png" alt="Movi Kids" width="1080" height="1080" decoding="async">
   <div class="spinner"></div>
   <p>Carregando sistema...</p>
 </div>
@@ -74,7 +74,7 @@
 <div id="mk-tablet-hub" style="display:none">
   <div class="mk-tablet-hub-inner">
     <div class="mk-logo">
-      <div class="mk-logo-main">🚗 Movi <span>Kids</span></div>
+      <img class="mk-brand-img mk-brand-img--md" src="assets/logo-movi-kids.png" alt="Movi Kids" width="1080" height="1080" loading="lazy" decoding="async">
       <div class="mk-logo-sub">Tablet na loja · Golden Shopping Calhau</div>
     </div>
     <div class="mk-hub-doors">
@@ -104,7 +104,7 @@
     <section id="mk-step-select" class="mk-auth-step">
       <button type="button" class="mk-hub-back" id="mk-btn-back-hub">← Voltar ao início</button>
       <div class="mk-logo">
-        <div class="mk-logo-main">🚗 Movi <span>Kids</span></div>
+        <img class="mk-brand-img mk-brand-img--md" src="assets/logo-movi-kids.png" alt="Movi Kids" width="1080" height="1080" loading="lazy" decoding="async">
         <div class="mk-logo-sub">Golden Shopping Calhau · Acesso operacional</div>
       </div>
       <span class="mk-step-tag">Passo 1 de 2</span>
@@ -122,7 +122,7 @@
       <button type="button" class="mk-btn" id="mk-btn-proceed" disabled>Prosseguir</button>
     </section>
     <section id="mk-step-create-pin" class="mk-auth-step hidden">
-      <div class="mk-logo"><div class="mk-logo-main">🚗 Movi <span>Kids</span></div></div>
+      <div class="mk-logo"><img class="mk-brand-img mk-brand-img--md" src="assets/logo-movi-kids.png" alt="Movi Kids" width="1080" height="1080" loading="lazy" decoding="async"></div>
       <span class="mk-step-tag">Primeiro acesso</span>
       <h2>Crie seu PIN</h2>
       <p class="mk-hint">Olá, <b id="mk-create-name"></b>. PIN de 4 números (só seu).</p>
@@ -137,7 +137,7 @@
       </div>
     </section>
     <section id="mk-step-login-pin" class="mk-auth-step hidden">
-      <div class="mk-logo"><div class="mk-logo-main">🚗 Movi <span>Kids</span></div></div>
+      <div class="mk-logo"><img class="mk-brand-img mk-brand-img--md" src="assets/logo-movi-kids.png" alt="Movi Kids" width="1080" height="1080" loading="lazy" decoding="async"></div>
       <span class="mk-step-tag">Login</span>
       <h2>Digite seu PIN</h2>
       <p class="mk-hint">Operador: <b id="mk-login-name"></b></p>
@@ -150,7 +150,7 @@
     </section>
     <section id="mk-step-admin" class="mk-auth-step hidden">
       <div class="mk-logo">
-        <div class="mk-logo-main">🚗 Movi <span>Kids</span></div>
+        <img class="mk-brand-img mk-brand-img--md" src="assets/logo-movi-kids.png" alt="Movi Kids" width="1080" height="1080" loading="lazy" decoding="async">
         <div class="mk-logo-sub">Área administrativa</div>
       </div>
       <span class="mk-step-tag">Administrador</span>
@@ -172,7 +172,7 @@
 
   <!-- ══ SIDEBAR (desktop fixo / celular = menu suspenso) ══ -->
   <aside id="sidebar">
-    <div class="sb-logo">🚗 Movi <span>Kids</span>
+    <div class="sb-logo"><img class="mk-brand-img mk-brand-img--xs mk-brand-img--on-dark" src="assets/logo-movi-kids.png" alt="Movi Kids" width="1080" height="1080" loading="lazy" decoding="async">
       <div class="sb-status"><span id="sb-dot" class="dot-online"></span><span id="sb-txt">Online</span><span id="sb-version" style="font-size:10px;opacity:.85;margin-left:5px;color:rgba(255,255,255,.7);font-family:monospace">v1.7.26</span></div>
     </div>
     <div class="sb-nav" id="sb-nav" role="navigation" aria-label="Operação">
@@ -227,7 +227,7 @@
   <!-- Header (mobile only) — mk-design.css .mk-mob-header -->
   <header class="mk-mob-header">
     <div class="mk-mob-header-top">
-      <div class="mk-mob-brand">🚗 Movi <span>Kids</span></div>
+      <div class="mk-mob-brand"><img class="mk-brand-img mk-brand-img--sm mk-brand-img--on-dark" src="assets/logo-movi-kids.png" alt="Movi Kids" width="1080" height="1080" loading="lazy" decoding="async"></div>
       <div class="mk-mob-meta">
         <span id="status-dot" class="dot-online"></span>
         <span id="status-txt">Online</span>
@@ -1705,23 +1705,23 @@
   </div>
 </div>
 
-<script src="mk-globals.js?v=1.8.49"></script>
-<script src="mk-core.js?v=1.8.49"></script>
-<script src="mk-nav.js?v=1.8.49"></script>
-<script src="mk-admin.js?v=1.8.49"></script>
-<script src="mk-historico.js?v=1.8.49"></script>
-<script src="mk-sessao.js?v=1.8.49"></script>
-<script src="mk-home.js?v=1.8.49"></script>
-<script src="mk-meta-operador.js?v=1.8.49"></script>
-<script src="mk-custos.js?v=1.8.49"></script>
-<script src="mk-avulso.js?v=1.8.49"></script>
-<script src="mk-sync.js?v=1.8.49"></script>
-<script src="mk-nova.js?v=1.8.49"></script>
-<script src="mk-relacionamento.js?v=1.8.49"></script>
-<script src="mk-operacao.js?v=1.8.49"></script>
-<script src="mk-drawer.js?v=1.8.49"></script>
-<script src="mk-update.js?v=1.8.49"></script>
-<script src="mk-auth.js?v=1.8.49"></script>
-<script src="mk-boot.js?v=1.8.49"></script>
+<script src="mk-globals.js?v=1.8.50"></script>
+<script src="mk-core.js?v=1.8.50"></script>
+<script src="mk-nav.js?v=1.8.50"></script>
+<script src="mk-admin.js?v=1.8.50"></script>
+<script src="mk-historico.js?v=1.8.50"></script>
+<script src="mk-sessao.js?v=1.8.50"></script>
+<script src="mk-home.js?v=1.8.50"></script>
+<script src="mk-meta-operador.js?v=1.8.50"></script>
+<script src="mk-custos.js?v=1.8.50"></script>
+<script src="mk-avulso.js?v=1.8.50"></script>
+<script src="mk-sync.js?v=1.8.50"></script>
+<script src="mk-nova.js?v=1.8.50"></script>
+<script src="mk-relacionamento.js?v=1.8.50"></script>
+<script src="mk-operacao.js?v=1.8.50"></script>
+<script src="mk-drawer.js?v=1.8.50"></script>
+<script src="mk-update.js?v=1.8.50"></script>
+<script src="mk-auth.js?v=1.8.50"></script>
+<script src="mk-boot.js?v=1.8.50"></script>
 </body>
 </html>
