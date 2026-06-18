@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MOVI KIDS — Gestão de Pessoas (visão gestor ADM)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --blue: #1E6FD9; --blue-dark: #0D4A9E; --yellow: #FFD54F; --orange: #FF9800;
+      --green: #2E7D32; --bg: #F4F6FA; --card: #fff; --border: #E2E8F0;
+      --txt: #1A2332; --txt2: #5A6578; --txt3: #8B95A5; --radius: 16px;
+      --shadow: 0 2px 12px rgba(26,35,50,.08);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Nunito, system-ui, sans-serif; background: var(--bg); color: var(--txt); }
+    .banner { background: #4A148C; color: #fff; text-align: center; padding: 8px 12px; font-size: 12px; font-weight: 800; }
+    .banner strong { color: var(--yellow); }
+    .layout { display: grid; grid-template-columns: 240px 1fr; min-height: calc(100vh - 36px); }
+    @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } .sidebar { display: none; } .mobile-nav { display: flex !important; } }
+    .sidebar { background: var(--blue-dark); color: #fff; padding: 18px 12px; }
+    .brand { font-family: 'Fredoka One', cursive; font-size: 20px; }
+    .brand-sub { font-size: 11px; opacity: .75; margin: 4px 0 16px; }
+    .nav-grp { font-size: 10px; font-weight: 800; opacity: .55; text-transform: uppercase; margin: 14px 0 6px 8px; }
+    .nav-btn { display: block; width: 100%; text-align: left; background: transparent; border: none; color: #fff; padding: 9px 10px; border-radius: 10px; font: inherit; font-weight: 700; font-size: 13px; cursor: pointer; margin-bottom: 2px; }
+    .nav-btn.active { background: rgba(255,255,255,.18); }
+    .main { padding: 18px 22px 60px; max-width: 960px; }
+    .screen { display: none; }
+    .screen.active { display: block; }
+    h1 { font-family: 'Fredoka One', cursive; font-size: 24px; color: var(--blue-dark); margin-bottom: 6px; }
+    .lead { color: var(--txt2); font-size: 14px; font-weight: 700; margin-bottom: 18px; max-width: 640px; line-height: 1.5; }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; margin-bottom: 12px; box-shadow: var(--shadow); }
+    .card h3 { font-size: 13px; font-weight: 900; margin-bottom: 8px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 14px; }
+    @media (max-width: 700px) { .grid-3 { grid-template-columns: 1fr; } }
+    .kpi-val { font-family: 'Fredoka One', cursive; font-size: 28px; color: var(--blue); }
+    .kpi-lbl { font-size: 10px; font-weight: 800; color: var(--txt3); text-transform: uppercase; }
+    .person-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+    .person-row:last-child { border-bottom: none; }
+    .av { width: 40px; height: 40px; border-radius: 50%; background: #E8F2FF; color: var(--blue); display: flex; align-items: center; justify-content: center; font-weight: 900; }
+    .av.owner { background: #FFF3E0; color: #E65100; }
+    .badge { font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 999px; }
+    .b-g { background: #E8F5E9; color: var(--green); }
+    .b-o { background: #FFF3E0; color: #E65100; }
+    .b-gr { background: #ECEFF1; color: var(--txt3); }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; font-weight: 700; }
+    th, td { padding: 7px 5px; text-align: center; border: 1px solid var(--border); }
+    th { background: #F8FAFC; font-size: 10px; text-transform: uppercase; color: var(--txt3); }
+    td.off { background: #F5F5F5; color: var(--txt3); }
+    td.on { background: #E8F5E9; color: var(--green); }
+    td.owner { background: #FFF8E1; color: #F57F17; }
+    .tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+    .tab { padding: 6px 14px; border-radius: 999px; border: 2px solid var(--border); background: var(--card); font: inherit; font-weight: 800; font-size: 12px; color: var(--txt2); }
+    .tab.active { border-color: var(--blue); background: #E8F2FF; color: var(--blue); }
+    .mobile-nav { display: none; gap: 6px; padding: 8px; overflow-x: auto; background: var(--card); border-bottom: 1px solid var(--border); }
+    .mobile-nav button { flex-shrink: 0; padding: 7px 12px; border-radius: 999px; border: 1px solid var(--border); background: var(--card); font: inherit; font-weight: 800; font-size: 11px; cursor: pointer; }
+    .mobile-nav button.active { background: var(--blue); color: #fff; }
+    .footer-link { position: fixed; bottom: 0; left: 0; right: 0; text-align: center; padding: 10px; background: rgba(244,246,250,.95); border-top: 1px solid var(--border); font-size: 11px; font-weight: 800; }
+    .footer-link a { color: var(--blue); text-decoration: none; }
+    .pin-note { background: #F3E5F5; border: 1px solid #CE93D8; border-radius: 12px; padding: 10px 14px; font-size: 12px; font-weight: 700; color: #6A1B9A; margin-bottom: 14px; }
+  </style>
+</head>
+<body>
+  <div class="banner">MOCKUP · <strong>Visão gestor (ADM)</strong> · PIN 1416 · Milena · não é produção</div>
+  <div class="mobile-nav" id="mob"></div>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="brand">Movi Kids</div>
+      <div class="brand-sub">Gestão de Pessoas · ADM</div>
+      <div class="nav-grp">Painel</div>
+      <button class="nav-btn active" data-s="hub">Visão geral</button>
+      <button class="nav-btn" data-s="escala">Escala semanal</button>
+      <button class="nav-btn" data-s="mes">Folha do mês</button>
+      <button class="nav-btn" data-s="ficha">Ficha colaborador</button>
+      <button class="nav-btn" data-s="ops">Operadores (atual+)</button>
+    </aside>
+    <main class="main">
+      <div class="pin-note">🔒 Área exclusiva do gestor — entra pelo menu Administração → Operadores / Gestão de Pessoas, com PIN administrativo.</div>
+
+      <section class="screen active" id="s-hub">
+        <h1>Gestão de Pessoas</h1>
+        <p class="lead">O que <strong>Milena (ADM)</strong> vê: equipe, presença, metas, bônus e folha. Evolução da página Operadores.</p>
+        <div class="tabs"><span class="tab active">Hoje</span><span class="tab">Presença</span><span class="tab">Metas</span><span class="tab">Folha</span></div>
+        <div class="grid-3">
+          <div class="card"><div class="kpi-val">3</div><div class="kpi-lbl">Colaboradores</div></div>
+          <div class="card"><div class="kpi-val" style="color:var(--green)">2/2</div><div class="kpi-lbl">Presença hoje</div></div>
+          <div class="card"><div class="kpi-val" style="color:var(--orange)">1</div><div class="kpi-lbl">Dias c/ bônus (mês)</div></div>
+        </div>
+        <div class="card">
+          <h3>Equipe — terça 17/06</h3>
+          <div class="person-row"><div class="av owner">M</div><div style="flex:1"><strong>Milena</strong> · 10–14h · ponto OK</div><span class="badge b-g">Presente</span></div>
+          <div class="person-row"><div class="av">R</div><div style="flex:1"><strong>Raykelly</strong> · folga ter</div><span class="badge b-gr">Folga</span></div>
+          <div class="person-row"><div class="av">C</div><div style="flex:1"><strong>Clara</strong> · cadastro pendente</div><span class="badge b-o">Pendente</span></div>
+        </div>
+      </section>
+
+      <section class="screen" id="s-escala">
+        <h1>Escala semanal</h1>
+        <p class="lead">Editável pelo gestor. Atendentes: meta 20 loc/turno, bônus R$100 com 21+.</p>
+        <div class="card" style="overflow-x:auto">
+          <table>
+            <tr><th>Dia</th><th>Milena</th><th>Raykelly</th><th>Clara</th></tr>
+            <tr><td>Seg</td><td class="owner">10–14</td><td class="on">14–22</td><td class="off">OFF</td></tr>
+            <tr><td>Ter</td><td class="owner">10–14</td><td class="off">OFF</td><td class="on">14–22</td></tr>
+            <tr><td>Qua</td><td class="owner">10–14</td><td class="on">14–22</td><td class="off">OFF</td></tr>
+            <tr><td>Qui</td><td class="owner">10–14</td><td class="off">OFF</td><td class="on">14–22</td></tr>
+            <tr><td>Sex</td><td class="owner">10–14</td><td class="on">14–22</td><td class="on">14–22</td></tr>
+            <tr><td>Sáb</td><td class="off">OFF</td><td class="on">10–20</td><td class="on">12–22</td></tr>
+            <tr><td>Dom</td><td class="off">OFF</td><td class="on">13–21</td><td class="on">13–21</td></tr>
+          </table>
+        </div>
+      </section>
+
+      <section class="screen" id="s-mes">
+        <h1>Folha — jun/2026</h1>
+        <p class="lead">Base + bônus meta − faltas. Export CSV para contador.</p>
+        <div class="card" style="overflow-x:auto">
+          <table>
+            <tr><th style="text-align:left">Nome</th><th>Loc</th><th>Bônus dias</th><th>Base</th><th>Bônus R$</th><th>Total</th></tr>
+            <tr><td style="text-align:left">Raykelly</td><td>87</td><td>1</td><td>1.800</td><td>100</td><td><strong>1.900</strong></td></tr>
+            <tr><td style="text-align:left">Clara</td><td>—</td><td>—</td><td>1.800</td><td>0</td><td><strong>1.800</strong></td></tr>
+          </table>
+        </div>
+      </section>
+
+      <section class="screen" id="s-ficha">
+        <h1>Ficha — Raykelly</h1>
+        <p class="lead">Drill-down: cadastro, ponto, vendas, meta, bônus, ações (PIN, deslogar, falta).</p>
+        <div class="card">
+          <h3>Performance jun/2026</h3>
+          <div class="grid-3">
+            <div><div class="kpi-val" style="font-size:22px">87</div><div class="kpi-lbl">Locações</div></div>
+            <div><div class="kpi-val" style="font-size:22px">1</div><div class="kpi-lbl">Dias bônus</div></div>
+            <div><div class="kpi-val" style="font-size:22px">0</div><div class="kpi-lbl">Faltas</div></div>
+          </div>
+        </div>
+        <div class="card" style="overflow-x:auto">
+          <table>
+            <tr><th>Data</th><th>Entrada</th><th>Saída</th><th>Loc turno</th><th>Meta</th></tr>
+            <tr><td>16/06</td><td>13:58</td><td>21:05</td><td>18</td><td>—</td></tr>
+            <tr><td>15/06</td><td>12:55</td><td>21:10</td><td>21</td><td style="color:var(--green)">+R$100</td></tr>
+          </table>
+        </div>
+      </section>
+
+      <section class="screen" id="s-ops">
+        <h1>Operadores (o que já existe +)</h1>
+        <p class="lead">Mantém cadastro, PIN, liberar sessão. Novo: link "Ver ficha completa" → Gestão de Pessoas.</p>
+        <div class="card">
+          <div class="person-row"><div class="av">E</div><div style="flex:1"><strong>Eduarda</strong> · PIN ok</div><span style="font-size:12px;color:var(--txt3)">⋮</span></div>
+          <div class="person-row"><div class="av owner">M</div><div style="flex:1"><strong>Milena</strong> · PIN ok</div><span style="font-size:12px;color:var(--txt3)">⋮</span></div>
+          <div class="person-row"><div class="av">R</div><div style="flex:1"><strong>Raykelly</strong> · PIN ok · meta ativa</div><span style="font-size:12px;color:var(--txt3)">⋮</span></div>
+          <div class="person-row"><div class="av">C</div><div style="flex:1"><strong>Clara</strong> · sem PIN · cadastrar</div><span style="font-size:12px;color:var(--txt3)">⋮</span></div>
+        </div>
+      </section>
+    </main>
+  </div>
+  <div class="footer-link"><a href="gestao-pessoas-mockup-colaborador.html">← Ver mockup do colaborador (tablet ponto)</a></div>
+  <script>
+    const screens = ['hub','escala','mes','ficha','ops'];
+    const labels = { hub:'Geral', escala:'Escala', mes:'Folha', ficha:'Ficha', ops:'Ops' };
+    function go(id) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById('s-' + id).classList.add('active');
+      document.querySelectorAll('.nav-btn, #mob button').forEach(b => {
+        b.classList.toggle('active', b.dataset.s === id);
+      });
+    }
+    document.querySelectorAll('.nav-btn').forEach(b => b.onclick = () => go(b.dataset.s));
+    const mob = document.getElementById('mob');
+    screens.forEach(id => {
+      const b = document.createElement('button');
+      b.textContent = labels[id];
+      b.dataset.s = id;
+      b.onclick = () => go(id);
+      if (id === 'hub') b.classList.add('active');
+      mob.appendChild(b);
+    });
+  </script>
+</body>
+</html>
