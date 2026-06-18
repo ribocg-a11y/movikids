@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Expires" content="0">
-  <title>MOVI KIDS — Mockup v3.5</title>
+  <title>MOVI KIDS — Mockup v3.6</title>
   <script>
     (function () {
-      var VER = '3.5';
+      var VER = '3.6';
       var CANON = 'https://ribocg-a11y.github.io/movikids/ponto_mockup.html?v=' + VER;
       var h = location.hostname || '';
       if (h && h.indexOf('ribocg-a11y') === -1 && location.protocol !== 'file:') {
@@ -93,13 +93,46 @@
     .mock-field input { width: 100%; padding: 11px 12px; border: 1px solid var(--border); border-radius: 12px; font: inherit; font-weight: 700; }
     .mock-sec { font-size: 11px; font-weight: 900; color: var(--txt3); text-transform: uppercase; letter-spacing: .06em; margin: 20px 0 10px; padding-top: 8px; border-top: 2px solid var(--border); }
     #mock-adm-alert { z-index: 9999; }
+    /* Holerite / contracheque */
+    .mk-hol { background: var(--card); border: 1px solid var(--border); border-radius: var(--mk-radius, 16px); overflow: hidden; box-shadow: var(--mk-shadow-1); margin-bottom: 12px; font-size: 12px; }
+    .mk-hol-head { background: linear-gradient(135deg, var(--blue-dk) 0%, var(--blue) 100%); color: #fff; padding: 14px 16px; }
+    .mk-hol-head .mk-hol-brand { font-family: 'Fredoka One', cursive; font-size: 18px; letter-spacing: .02em; }
+    .mk-hol-head .mk-hol-sub { font-size: 10px; font-weight: 700; opacity: .92; margin-top: 4px; line-height: 1.45; }
+    .mk-hol-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 16px; padding: 12px 16px; background: #F8FAFC; border-bottom: 1px solid var(--border); }
+    .mk-hol-meta div { font-weight: 700; line-height: 1.4; }
+    .mk-hol-meta span { display: block; font-size: 9px; font-weight: 800; color: var(--txt3); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 2px; }
+    .mk-hol-comp { padding: 10px 16px; border-bottom: 2px solid var(--blue); font-size: 11px; font-weight: 800; color: var(--blue-dk); text-transform: uppercase; letter-spacing: .05em; }
+    .mk-hol-tbl { width: 100%; border-collapse: collapse; font-size: 11px; font-weight: 700; }
+    .mk-hol-tbl th { background: #E8F2FF; color: var(--blue-dk); font-size: 9px; text-transform: uppercase; letter-spacing: .04em; padding: 8px 6px; border: 1px solid var(--border); text-align: center; }
+    .mk-hol-tbl td { padding: 7px 6px; border: 1px solid var(--border); vertical-align: middle; }
+    .mk-hol-tbl .c { text-align: center; color: var(--txt3); font-size: 10px; }
+    .mk-hol-tbl .n { text-align: right; white-space: nowrap; }
+    .mk-hol-tbl .n.v { color: var(--blue); }
+    .mk-hol-tbl .n.d { color: var(--red); }
+    .mk-hol-tbl tr.sec td { background: #F1F5F9; font-size: 9px; font-weight: 900; color: var(--txt3); text-transform: uppercase; letter-spacing: .06em; padding: 6px; }
+    .mk-hol-tot { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0; border-top: 2px solid var(--blue); }
+    .mk-hol-tot div { padding: 12px 10px; text-align: center; border-right: 1px solid var(--border); }
+    .mk-hol-tot div:last-child { border-right: none; background: #E8F2FF; }
+    .mk-hol-tot .lbl { font-size: 9px; font-weight: 800; color: var(--txt3); text-transform: uppercase; margin-bottom: 4px; }
+    .mk-hol-tot .val { font-family: 'Fredoka One', cursive; font-size: 16px; color: var(--blue); }
+    .mk-hol-tot div:last-child .val { font-size: 20px; color: var(--blue-dk); }
+    .mk-hol-bases { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px 12px; padding: 12px 16px; background: #FAFBFC; border-top: 1px solid var(--border); font-size: 10px; font-weight: 700; }
+    .mk-hol-bases span { color: var(--txt3); font-weight: 800; font-size: 9px; text-transform: uppercase; display: block; }
+    .mk-hol-ben { padding: 0 0 4px; }
+    .mk-hol-ben .mk-hol-tbl td.n { color: var(--green); }
+    .mk-hol-foot { padding: 10px 16px 14px; font-size: 10px; font-weight: 700; color: var(--txt3); line-height: 1.5; border-top: 1px dashed var(--border); }
+    @media (max-width: 480px) {
+      .mk-hol-meta { grid-template-columns: 1fr; }
+      .mk-hol-tbl { font-size: 10px; }
+      .mk-hol-tbl th:nth-child(1), .mk-hol-tbl td:nth-child(1) { display: none; }
+    }
   </style>
 </head>
 <body>
   <div id="wrong-host-block">
     <h1 style="font-family:'Fredoka One',cursive;font-size:28px;margin-bottom:16px">URL errada</h1>
     <p style="font-size:16px;font-weight:700;line-height:1.6;margin-bottom:20px">Você está em <strong id="wrong-host-name"></strong>.<br>Use <strong>ribocg-a11y</strong> (com hífen -), não ribocg.a11y (com ponto).</p>
-    <p><a id="wrong-host-link" href="https://ribocg-a11y.github.io/movikids/ponto_mockup.html?v=3.5">Abrir mockup v3.5 correto →</a></p>
+    <p><a id="wrong-host-link" href="https://ribocg-a11y.github.io/movikids/ponto_mockup.html?v=3.6">Abrir mockup v3.6 correto →</a></p>
   </div>
   <script>
     (function () {
@@ -116,7 +149,7 @@
     URL errada — use <strong>ribocg-a11y</strong> (hífen).<br>
     <a href="https://ribocg-a11y.github.io/movikids/ponto-mockup.html">Abrir versão correta →</a>
   </div>
-  <div class="mock-banner">MOCKUP <strong>v3.5</strong> · demonstrativo c/ INSS, VT, faltas e FGTS</div>
+  <div class="mock-banner">MOCKUP <strong>v3.6</strong> · holerite · INSS · IRRF · VT · VA · benefícios</div>
 
   <div class="mock-shell">
 
@@ -283,7 +316,7 @@
     </section>
     <section class="mock-screen" id="s-pagamento">
       <button class="mock-back" onclick="go('s-colab-hub')">← Meu painel</button>
-      <div class="mock-h1">Demonstrativo de pagamento</div>
+      <div class="mock-h1">Holerite · demonstrativo de pagamento</div>
       <div id="pag-body"></div>
     </section>
 
@@ -356,6 +389,27 @@
     ];
     const VAZIO = { nomeCompleto:'', cpf:'', nascimento:'', telefone:'', email:'', endereco:'', emergencia:'', admissao:'', pix:'' };
 
+    const EMPRESA = {
+      razao: 'MOVI KIDS Brincadeiras LTDA',
+      cnpj: '00.000.000/0001-00',
+      endereco: 'Golden Shopping Calhau · São Luís/MA'
+    };
+
+    const INSS_FAIXAS = [
+      { ate: 1518.00, ali: 0.075 },
+      { ate: 2793.88, ali: 0.09 },
+      { ate: 4190.83, ali: 0.12 },
+      { ate: 8157.41, ali: 0.14 }
+    ];
+    const IRRF_FAIXAS = [
+      { ate: 2259.20, ali: 0, ded: 0 },
+      { ate: 2826.65, ali: 0.075, ded: 169.44 },
+      { ate: 3751.05, ali: 0.15, ded: 381.44 },
+      { ate: 4666.68, ali: 0.225, ded: 662.77 },
+      { ate: Infinity, ali: 0.275, ded: 896.00 }
+    ];
+    const IRRF_DEDUCAO_DEPENDENTE = 189.59;
+
     const SALARIO_MINIMO_BASE = 1621; // SM nacional 2026 — base MOVI KIDS atendentes
 
     const PESSOAS = {
@@ -379,14 +433,24 @@
           ]
         },
         escala:['14–22','OFF','14–22','OFF','14–22','10–20','13–21'],
-        bancoHoras:'0h00', pagamento:{ base:SALARIO_MINIMO_BASE, bonus:100, faltas:0, obs:'Jun/2026 · admissão 15/06 · 1 dia c/ bônus' }
+        bancoHoras:'0h00', pagamento:{
+          base:SALARIO_MINIMO_BASE, bonus:100, faltas:0, dependentes:0,
+          competencia:'06/2026', pagamentoEm:'05/07/2026', diasTrabalhados:12, diasMes:30,
+          obs:'Jun/2026 · admissão 15/06 · 1 dia c/ bônus',
+          beneficios:{ vaDiario:20, vaDias:12, vtPasses:280.74, vaCoparticipacao:0 }
+        }
       },
       clara: {
         id:'clara', label:'Clara', letra:'C', owner:false, funcao:'Atendente 2', pin:'2222', pinBalcao:'2222',
         turno:'14h–22h', cadastro:{...VAZIO}, statusHoje:'fora', folha:[],
         meta:{ alvo:20, atual:0, bonusValor:100, bonusMin:21, diasMes:[] },
         escala:['OFF','14–22','OFF','14–22','14–22','12–22','13–21'],
-        bancoHoras:'0h00', pagamento:{ base:SALARIO_MINIMO_BASE, bonus:0, faltas:0, obs:'Jun/2026 · cadastro pendente · base SM' }
+        bancoHoras:'0h00', pagamento:{
+          base:SALARIO_MINIMO_BASE, bonus:0, faltas:0, dependentes:0,
+          competencia:'06/2026', pagamentoEm:'05/07/2026', diasTrabalhados:0, diasMes:30,
+          obs:'Jun/2026 · cadastro pendente · base SM',
+          beneficios:{ vaDiario:20, vaDias:0, vtPasses:0, vaCoparticipacao:0 }
+        }
       }
     };
 
@@ -417,18 +481,62 @@
     function fmtDataHoje() { const d=new Date(); return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0'); }
     function diaSemanaHoje() { return DIAS[(new Date().getDay()+6)%7]; }
     function fmtBRL(n) { return Number(n).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
-    function calcFolhaPagamento(base, bonus, faltas) {
-      bonus = bonus || 0;
-      faltas = faltas || 0;
-      const bruto = base + bonus;
-      const inss = Math.round(base * 0.075 * 100) / 100;
-      const vt = Math.round(base * 0.06 * 100) / 100;
-      const fgts = Math.round(base * 0.08 * 100) / 100;
-      const totalDescontos = inss + vt + faltas;
-      return { bruto, inss, vt, faltas, fgts, totalDescontos, liquido: bruto - totalDescontos };
+    function calcInssProgressivo(baseInss) {
+      let rest = baseInss, prev = 0, total = 0, aliEfetiva = 0;
+      for (const f of INSS_FAIXAS) {
+        const faixa = Math.min(rest, f.ate - prev);
+        if (faixa <= 0) break;
+        total += faixa * f.ali;
+        rest -= faixa;
+        prev = f.ate;
+        aliEfetiva = f.ali;
+      }
+      return { inss: Math.round(total * 100) / 100, aliEfetiva };
     }
-    function linhaPag(label, valor, cls) {
-      return `<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-weight:700${cls ? ';' + cls : ''}"><span>${label}</span><span>${valor}</span></div>`;
+    function calcIrrf(baseIrrf, dependentes) {
+      const dedDep = (dependentes || 0) * IRRF_DEDUCAO_DEPENDENTE;
+      const base = Math.max(0, baseIrrf - dedDep);
+      if (base <= IRRF_FAIXAS[0].ate) return { irrf: 0, base, ali: 0, isento: true };
+      for (const f of IRRF_FAIXAS) {
+        if (base <= f.ate) {
+          const v = Math.max(0, base * f.ali - f.ded);
+          return { irrf: Math.round(v * 100) / 100, base, ali: f.ali, isento: false };
+        }
+      }
+      return { irrf: 0, base, ali: 0, isento: true };
+    }
+    function calcFolhaPagamento(pg) {
+      const base = pg.base || 0;
+      const bonus = pg.bonus || 0;
+      const faltas = pg.faltas || 0;
+      const ben = pg.beneficios || {};
+      const vaDiario = ben.vaDiario || 0;
+      const vaDias = ben.vaDias || 0;
+      const vaTotal = Math.round(vaDiario * vaDias * 100) / 100;
+      const vaCopart = ben.vaCoparticipacao || 0;
+      const bruto = base + bonus;
+      const baseInss = bruto;
+      const inssCalc = calcInssProgressivo(baseInss);
+      const inss = inssCalc.inss;
+      const vt = Math.round(base * 0.06 * 100) / 100;
+      const irrfCalc = calcIrrf(bruto - inss, pg.dependentes);
+      const irrf = irrfCalc.irrf;
+      const fgts = Math.round(baseInss * 0.08 * 100) / 100;
+      const totalDescontos = inss + irrf + vt + faltas + vaCopart;
+      return {
+        bruto, inss, inssAli: inssCalc.aliEfetiva, irrf, irrfBase: irrfCalc.base, irrfAli: irrfCalc.ali, irrfIsento: irrfCalc.isento,
+        vt, faltas, vaTotal, vaCopart, vaDiario, vaDias, vtPasses: ben.vtPasses || 0,
+        fgts, baseInss, totalDescontos, liquido: bruto - totalDescontos
+      };
+    }
+    function holRow(cod, desc, ref, venc, descVal, sec) {
+      if (sec) return `<tr class="sec"><td colspan="5">${sec}</td></tr>`;
+      return `<tr><td class="c">${cod}</td><td>${desc}</td><td class="c">${ref || '—'}</td><td class="n v">${venc || ''}</td><td class="n d">${descVal || ''}</td></tr>`;
+    }
+    function holMoney(n, tipo) {
+      if (!n && n !== 0) return '';
+      const s = 'R$ ' + fmtBRL(n);
+      return tipo === 'd' ? '− ' + s : s;
     }
     function cadastroPct(p) { const r=CAMPOS.filter(f=>f.req); return Math.round(r.filter(f=>String(p.cadastro[f.key]||'').trim()).length/r.length*100); }
     function cadastroOk(p) { return cadastroPct(p)===100; }
@@ -751,27 +859,71 @@
         document.getElementById('pag-body').innerHTML = `<div class="mock-note info">${pg.obs || 'Sem demonstrativo CLT.'}</div>`;
         return;
       }
-      const c = calcFolhaPagamento(pg.base, pg.bonus, pg.faltas);
-      const faltasTxt = c.faltas > 0 ? '− R$ ' + fmtBRL(c.faltas) : 'R$ 0,00';
-      document.getElementById('pag-body').innerHTML = `<div class="mock-card">
-        <div style="font-size:12px;font-weight:800;color:var(--txt3);margin-bottom:12px">${pg.obs}</div>
-        <div class="mock-sec" style="margin-top:0;padding-top:0;border:none">Proventos</div>
-        ${linhaPag('Base (salário mínimo)', 'R$ ' + fmtBRL(pg.base))}
-        ${linhaPag('Bônus metas', 'R$ ' + fmtBRL(pg.bonus || 0))}
-        ${linhaPag('Total proventos', 'R$ ' + fmtBRL(c.bruto), 'color:var(--blue)')}
-        <div class="mock-sec">Descontos</div>
-        ${linhaPag('INSS (7,5% sobre base)', '− R$ ' + fmtBRL(c.inss), 'color:var(--red)')}
-        ${linhaPag('Vale-transporte (6% sobre base)', '− R$ ' + fmtBRL(c.vt), 'color:var(--red)')}
-        ${linhaPag('Faltas', faltasTxt, c.faltas > 0 ? 'color:var(--red)' : 'color:var(--txt3)')}
-        ${linhaPag('Total descontos', '− R$ ' + fmtBRL(c.totalDescontos), 'color:var(--red)')}
-        <div style="display:flex;justify-content:space-between;padding:14px 0 8px;font-weight:900;font-size:18px;color:var(--blue);border-top:2px solid var(--border);margin-top:8px">
-          <span>Líquido a receber</span><span>R$ ${fmtBRL(c.liquido)}</span>
-        </div>
-        <div class="mock-note info" style="margin-top:12px;margin-bottom:0;font-size:11px">
-          <strong>FGTS 8%</strong> sobre a base: R$ ${fmtBRL(c.fgts)} — recolhido pelo empregador (não desconta do seu salário).
-        </div>
-        <div style="font-size:10px;font-weight:800;color:var(--txt3);text-align:center;margin-top:10px">Demonstrativo v3.5 · INSS · VT 6% · faltas · líquido</div>
-      </div>`;
+      const c = calcFolhaPagamento(pg);
+      const cpfMask = p.cadastro && p.cadastro.cpf ? p.cadastro.cpf : '***.***.***-**';
+      const adm = p.admissao ? p.admissao.split('-').reverse().join('/') : (pg.obs || '—');
+      const refSal = (pg.diasTrabalhados && pg.diasMes) ? pg.diasTrabalhados + '/' + pg.diasMes + ' dias' : '30/30';
+      const irrfRef = c.irrfIsento ? 'Isento (tabela ' + new Date().getFullYear() + ')' : (c.irrfAli * 100).toFixed(1).replace('.', ',') + '%';
+      const inssRef = (c.inssAli * 100).toFixed(1).replace('.', ',') + '%';
+      const vaCopartRow = c.vaCopart > 0
+        ? holRow('405', 'VA — coparticipação PAT', '20%', '', holMoney(c.vaCopart, 'd'))
+        : '';
+      document.getElementById('pag-body').innerHTML = `
+        <div class="mk-hol">
+          <div class="mk-hol-head">
+            <div class="mk-hol-brand">MOVI <span style="color:var(--gold,#FFD54F)">KIDS</span></div>
+            <div class="mk-hol-sub">${EMPRESA.razao}<br>CNPJ ${EMPRESA.cnpj} · ${EMPRESA.endereco}</div>
+          </div>
+          <div class="mk-hol-meta">
+            <div><span>Colaborador</span>${p.label} · ${p.funcao}</div>
+            <div><span>CPF</span>${cpfMask}</div>
+            <div><span>Competência</span>${pg.competencia || '—'}</div>
+            <div><span>Data pagamento</span>${pg.pagamentoEm || '—'}</div>
+            <div><span>Admissão</span>${adm}</div>
+            <div><span>Matrícula</span>${String(p.id).toUpperCase().slice(0, 3)}-001</div>
+          </div>
+          <div class="mk-hol-comp">Demonstrativo de pagamento · ${pg.obs || ''}</div>
+          <table class="mk-hol-tbl">
+            <thead><tr><th>Cód</th><th>Descrição</th><th>Referência</th><th>Vencimentos</th><th>Descontos</th></tr></thead>
+            <tbody>
+              ${holRow('', '', '', '', '', 'Proventos')}
+              ${holRow('001', 'Salário base', refSal, holMoney(pg.base), '')}
+              ${pg.bonus ? holRow('105', 'Bônus metas (variável)', '1 dia meta', holMoney(pg.bonus), '') : ''}
+              ${holRow('', '', '', '', '', 'Descontos legais e autorizados')}
+              ${holRow('401', 'INSS — previdência', inssRef, '', holMoney(c.inss, 'd'))}
+              ${holRow('402', 'IRRF — imposto de renda', irrfRef, '', c.irrf > 0 ? holMoney(c.irrf, 'd') : 'R$ 0,00')}
+              ${holRow('403', 'Vale-transporte (6% base)', '6,0%', '', holMoney(c.vt, 'd'))}
+              ${holRow('404', 'Faltas / atrasos', c.faltas > 0 ? 'proporcional' : '0 dia', '', c.faltas > 0 ? holMoney(c.faltas, 'd') : 'R$ 0,00')}
+              ${vaCopartRow}
+            </tbody>
+          </table>
+          <div class="mk-hol-tot">
+            <div><div class="lbl">Total vencimentos</div><div class="val">${holMoney(c.bruto)}</div></div>
+            <div><div class="lbl">Total descontos</div><div class="val" style="color:var(--red)">${holMoney(c.totalDescontos, 'd')}</div></div>
+            <div><div class="lbl">Líquido a receber</div><div class="val">${holMoney(c.liquido)}</div></div>
+          </div>
+          <div class="mk-hol-comp" style="border-top:1px solid var(--border);border-bottom:none;background:#F0FDF4;color:#166534">Benefícios · não integram salário</div>
+          <div class="mk-hol-ben">
+            <table class="mk-hol-tbl">
+              <thead><tr><th>Cód</th><th>Benefício</th><th>Referência</th><th colspan="2">Valor concedido</th></tr></thead>
+              <tbody>
+                ${holRow('501', 'Vale-alimentação (VA)', c.vaDias ? c.vaDias + ' dias × R$ ' + fmtBRL(c.vaDiario) : '—', c.vaTotal ? holMoney(c.vaTotal) : 'R$ 0,00', '')}
+                ${holRow('502', 'Vale-transporte (passes)', 'mês ref.', c.vtPasses ? holMoney(c.vtPasses) : '—', '')}
+                ${holRow('503', 'FGTS 8% (empregador)', 'sobre base INSS', holMoney(c.fgts), '')}
+              </tbody>
+            </table>
+          </div>
+          <div class="mk-hol-bases">
+            <div><span>Salário contratual</span>R$ ${fmtBRL(pg.base)}</div>
+            <div><span>Base INSS</span>R$ ${fmtBRL(c.baseInss)}</div>
+            <div><span>Base IRRF</span>R$ ${fmtBRL(c.irrfBase)}</div>
+            <div><span>FGTS do mês</span>R$ ${fmtBRL(c.fgts)} (recolhido pela empresa)</div>
+          </div>
+          <div class="mk-hol-foot">
+            Documento informativo · mockup FASE 15. VA creditado em cartão benefício · VT desconto limitado a 6% do salário-base (Lei 7.418/85).
+            ${c.irrfIsento ? ' IR retido na fonte: isento nesta faixa salarial.' : ''}
+          </div>
+        </div>`;
     }
 
     /* ── ADM ── */
