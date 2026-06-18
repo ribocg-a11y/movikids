@@ -10,7 +10,8 @@
 #   git config core.hooksPath githooks
 
 param(
-  [switch]$SkipNetworkTests
+  [switch]$SkipNetworkTests,
+  [switch]$ForceOperacao
 )
 
 $ErrorActionPreference = "Stop"
@@ -357,7 +358,8 @@ try {
     Add-Check "git.status-fe-critico" "fail" $_.Exception.Message
   }
   if ($feAlterado -and (Test-Path $operCheck) -and -not $SkipNetworkTests) {
-    & $operCheck 2>&1 | Out-Null
+    if ($ForceOperacao) { & $operCheck -Force 2>&1 | Out-Null }
+    else { & $operCheck 2>&1 | Out-Null }
     if ($LASTEXITCODE -ne 0) {
       Add-Check "guard.operacao.livre" "fail" "locacoes Ativa/Pendente - Regra 14 (I22); use -Force no check so hotfix P0"
     } else {

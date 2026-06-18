@@ -5,6 +5,31 @@
   let gpAdmData_ = null;
   let gpAdmTab_ = 'hoje';
   let gpAdmSelId_ = null;
+  let gpAdmLoadPromise_ = null;
+
+  function gpAdmSetErr_(html) {
+    const errEl = document.getElementById('gp-adm-err');
+    if (!errEl) return;
+    if (html) {
+      errEl.hidden = false;
+      errEl.innerHTML = html;
+    } else {
+      errEl.innerHTML = '';
+      errEl.hidden = true;
+    }
+  }
+
+  function gpAdmShowLoading_() {
+    const sk = '<div class="gp-adm-kpi gp-adm-kpi--sk"><div class="gp-adm-kpi-val">…</div><div class="gp-adm-kpi-lbl">Carregando</div></div>';
+    const kpi = document.getElementById('gp-adm-kpis');
+    if (kpi) kpi.innerHTML = sk + sk + sk;
+    const team = document.getElementById('gp-adm-equipe');
+    if (team) team.innerHTML = '<p class="gp-adm-muted gp-adm-loading">Carregando equipe…</p>';
+    const alertEl = document.getElementById('gp-adm-alertas');
+    if (alertEl) alertEl.innerHTML = '';
+    const compEl = document.getElementById('gp-adm-comp');
+    if (compEl) compEl.textContent = '…';
+  }
 
   function esc(v) {
     if (typeof escapeHtml_ === 'function') return escapeHtml_(v);
@@ -23,15 +48,18 @@
 
   function gpAdmStatusBadge_(c) {
     if (c.logadoBalcao) return '<span class="gp-adm-badge ok">No balcão</span>';
+    if (c.escalaFolga) return '<span class="gp-adm-badge gray">Folga hoje</span>';
     if (c.ponto && c.ponto.status === 'dentro') return '<span class="gp-adm-badge ok">Presente</span>';
     if (c.ponto && c.ponto.entrada && c.ponto.saida) return '<span class="gp-adm-badge gray">Turno encerrado</span>';
-    if (c.ponto && !c.ponto.entrada && c.turno) return '<span class="gp-adm-badge warn">Sem ponto</span>';
+    if (c.ponto && !c.ponto.entrada && (c.turno || c.escalaHoje)) return '<span class="gp-adm-badge warn">Sem ponto</span>';
     return '<span class="gp-adm-badge gray">Fora</span>';
   }
 
   function gpAdmSubline_(c) {
     const parts = [];
-    if (c.turno) parts.push(c.turno);
+    if (c.escalaFolga) parts.push('Folga (escala)');
+    else if (c.escalaHoje && c.escalaHoje !== '—') parts.push('Hoje ' + c.escalaHoje);
+    else if (c.turno) parts.push(c.turno);
     if (c.ponto && c.ponto.entrada) parts.push('entrada ' + c.ponto.entrada);
     if (c.metas && c.metas.atual) parts.push(c.metas.atual + ' loc hoje');
     if (c.funcao) parts.push(c.funcao);
@@ -55,9 +83,88 @@
 
   window.mkGpAdmVerFicha = function (id) {
     gpAdmSelId_ = Number(id);
+    if (!gpAdmData_) {
+      if (typeof toast === 'function') toast('Carregando equipe…', 'warning');
+      window.mkGpAdmLoad_().then(function () { window.mkGpAdmVerFicha(id); });
+      return;
+    }
     gpAdmSetTab_('presenca');
     gpAdmRenderPresenca_();
+    const panel = document.getElementById('gp-adm-tab-presenca');
+    if (panel) {
+      try { panel.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e) { panel.scrollIntoView(true); }
+    }
   };
+
+  function gpAdmColabById_(id) {
+    return (gpAdmData_.colaboradores || []).find(function (x) { return Number(x.id) === Number(id); });
+  }
+
+  function gpAdmRenderFichaResumo_() {
+    const el = document.getElementById('gp-adm-ficha-resumo');
+    if (!el || !gpAdmData_) return;
+    const c = gpAdmColabById_(gpAdmSelId_);
+    if (!c) {
+      el.innerHTML = '';
+      return;
+    }
+    const m = c.metas || {};
+    el.innerHTML =
+      '<div class="gp-adm-ficha-hero">' +
+      '<div class="gp-adm-av' + (c.perfil === 'supervisor' ? ' owner' : '') + '">' + gpAdmInitial_(c.nome) + '</div>' +
+      '<div class="gp-adm-ficha-hero-body"><h3>' + esc(c.nome) + '</h3>' +
+      '<p>' + esc(c.funcao || 'Operador') + (c.admissao ? ' · admissão ' + esc(c.admissao) : '') + '</p></div>' +
+      gpAdmStatusBadge_(c) + '</div>' +
+      '<div class="gp-adm-ficha-grid">' +
+      '<div><span>Turno cadastro</span><strong>' + esc(c.turno || '—') + '</strong></div>' +
+      '<div><span>Escala hoje</span><strong>' + esc(c.escalaHoje || '—') + '</strong></div>' +
+      '<div><span>Meta / loc hoje</span><strong>' + (m.alvo || 20) + ' · ' + (m.atual || 0) + '</strong></div>' +
+      '<div><span>Loc no mês</span><strong>' + (m.locMes || 0) + '</strong></div>' +
+      '<div><span>Cadastro RH</span><strong>' + (c.cadastroPct || 0) + '%</strong></div>' +
+      '<div><span>Ponto hoje</span><strong>' + (c.ponto && c.ponto.entrada ? esc(c.ponto.entrada) + (c.ponto.saida ? ' → ' + esc(c.ponto.saida) : '') : 'Sem registro') + '</strong></div>' +
+      '</div>';
+  }
+
+  function gpAdmRenderPresenca_() {
+    const sel = document.getElementById('gp-adm-presenca-sel');
+    if (!gpAdmData_) return;
+    const cols = gpAdmData_.colaboradores || [];
+    if (sel) {
+      const cur = gpAdmSelId_ || (cols[0] && cols[0].id);
+      sel.innerHTML = cols.map(function (c) {
+        return '<option value="' + c.id + '"' + (Number(c.id) === Number(cur) ? ' selected' : '') + '>' + esc(c.nome) + '</option>';
+      }).join('');
+      sel.onchange = function () {
+        gpAdmSelId_ = Number(sel.value);
+        gpAdmRenderFichaResumo_();
+        gpAdmRenderPresencaTable_();
+      };
+      gpAdmSelId_ = Number(sel.value) || cur;
+    }
+    gpAdmRenderFichaResumo_();
+    gpAdmRenderPresencaTable_();
+  }
+
+  function gpAdmRenderPresencaTable_() {
+    const el = document.getElementById('gp-adm-presenca-table');
+    if (!el || !gpAdmData_) return;
+    const c = gpAdmColabById_(gpAdmSelId_);
+    if (!c) {
+      el.innerHTML = '<p class="gp-adm-muted">Selecione um colaborador.</p>';
+      return;
+    }
+    const rows = c.folhaPonto || [];
+    if (!rows.length) {
+      el.innerHTML = '<p class="gp-adm-muted">Sem registros de ponto nesta competência. Use a aba <strong>Escala</strong> para ver a grade da semana.</p>';
+      return;
+    }
+    el.innerHTML = '<table class="gp-adm-table"><tr><th>Data</th><th>Entrada</th><th>Saída</th><th>Horas</th><th>Loc turno</th><th>Meta</th></tr>' +
+      rows.slice().reverse().map(function (r) {
+        const metaOk = c.metas && c.metas.alvo && Number(c.metas.atual) >= c.metas.alvo + 1;
+        return '<tr><td>' + esc(r.data) + '</td><td>' + esc(r.entrada || '—') + '</td><td>' + esc(r.saida || '—') + '</td><td>' + esc(r.horas || '—') + '</td>' +
+          '<td>' + (c.metas ? c.metas.atual : '—') + '</td><td>' + (metaOk ? '<span style="color:var(--green)">+R$100</span>' : '—') + '</td></tr>';
+      }).join('') + '</table>';
+  }
 
   function gpAdmRenderKpis_() {
     const el = document.getElementById('gp-adm-kpis');
@@ -96,46 +203,6 @@
         gpAdmStatusBadge_(c) +
         '<button type="button" class="gp-adm-link" onclick="mkGpAdmVerFicha(' + c.id + ')">Ficha</button></div>';
     }).join('') || '<p class="gp-adm-muted">Nenhum colaborador.</p>';
-  }
-
-  function gpAdmRenderPresenca_() {
-    const el = document.getElementById('gp-adm-presenca');
-    const sel = document.getElementById('gp-adm-presenca-sel');
-    if (!el || !gpAdmData_) return;
-    const cols = gpAdmData_.colaboradores || [];
-    if (sel) {
-      const cur = gpAdmSelId_ || (cols[0] && cols[0].id);
-      sel.innerHTML = cols.map(function (c) {
-        return '<option value="' + c.id + '"' + (Number(c.id) === Number(cur) ? ' selected' : '') + '>' + esc(c.nome) + '</option>';
-      }).join('');
-      sel.onchange = function () {
-        gpAdmSelId_ = Number(sel.value);
-        gpAdmRenderPresencaTable_();
-      };
-      gpAdmSelId_ = Number(sel.value) || cur;
-    }
-    gpAdmRenderPresencaTable_();
-  }
-
-  function gpAdmRenderPresencaTable_() {
-    const el = document.getElementById('gp-adm-presenca-table');
-    if (!el || !gpAdmData_) return;
-    const c = (gpAdmData_.colaboradores || []).find(function (x) { return Number(x.id) === Number(gpAdmSelId_); });
-    if (!c) {
-      el.innerHTML = '<p class="gp-adm-muted">Selecione um colaborador.</p>';
-      return;
-    }
-    const rows = c.folhaPonto || [];
-    if (!rows.length) {
-      el.innerHTML = '<p class="gp-adm-muted">Sem registros de ponto nesta competência.</p>';
-      return;
-    }
-    el.innerHTML = '<table class="gp-adm-table"><tr><th>Data</th><th>Entrada</th><th>Saída</th><th>Horas</th><th>Loc turno</th><th>Meta</th></tr>' +
-      rows.slice().reverse().map(function (r) {
-        const metaOk = c.metas && c.metas.alvo && Number(c.metas.atual) >= c.metas.alvo + 1;
-        return '<tr><td>' + esc(r.data) + '</td><td>' + esc(r.entrada || '—') + '</td><td>' + esc(r.saida || '—') + '</td><td>' + esc(r.horas || '—') + '</td>' +
-          '<td>' + (c.metas ? c.metas.atual : '—') + '</td><td>' + (metaOk ? '<span style="color:var(--green)">+R$100</span>' : '—') + '</td></tr>';
-      }).join('') + '</table>';
   }
 
   function gpAdmRenderEscala_() {
@@ -263,43 +330,50 @@
   function gpAdmGasPendingHtml_() {
     return '<strong>GAS v1.5.100 ainda não publicado.</strong> O layout das abas está certo, mas o servidor está em <strong>v1.5.99</strong> — falta a action <code>painelGestaoPessoasAdmin</code>. ' +
       'No editor Apps Script: Implantar → Editar (lápis) → <strong>Nova versão</strong> (mesmo deploy). ' +
-      'Arquivo: <code>MOVIKIDS_Code_v1.5.32...</code> header <strong>v1.5.100</strong>. ' +
+      'Arquivo: <code>MOVIKIDS_Code_v1.5.32...</code> header <strong>v1.5.102</strong>. ' +
       'Enquanto isso, aba <em>Cadastro &amp; sessão</em> funciona; aba <em>Hoje</em> mostra só operadores (modo limitado).';
   }
 
-  window.mkGpAdmLoad_ = async function mkGpAdmLoad_() {
-    const errEl = document.getElementById('gp-adm-err');
-    if (errEl) errEl.innerHTML = '';
-    try {
-      const d = await api(Object.assign({ action: 'painelGestaoPessoasAdmin', _t: Date.now() }, gpAdmPinParams_()), 45000);
-      if (!d.ok) {
-        const msg = d.erro || 'Erro ao carregar gestão';
-        const gasPending = String(msg).indexOf('painelGestaoPessoasAdmin') >= 0 || String(msg).indexOf('desconhecida') >= 0;
-        if (gasPending) {
-          if (errEl) errEl.innerHTML = gpAdmGasPendingHtml_();
-          try { await gpAdmLoadFallback_(msg); } catch (e) { /* cadastro only */ }
+  window.mkGpAdmLoad_ = async function mkGpAdmLoad_(opts) {
+    if (gpAdmLoadPromise_ && !opts?.force) return gpAdmLoadPromise_;
+    gpAdmShowLoading_();
+    gpAdmSetErr_('');
+    gpAdmLoadPromise_ = (async function () {
+      try {
+        const d = await api(Object.assign({ action: 'painelGestaoPessoasAdmin', _t: Date.now() }, gpAdmPinParams_()), 45000);
+        if (!d.ok) {
+          const msg = d.erro || 'Erro ao carregar gestão';
+          const gasPending = String(msg).indexOf('painelGestaoPessoasAdmin') >= 0 || String(msg).indexOf('desconhecida') >= 0;
+          if (gasPending) {
+            gpAdmSetErr_(gpAdmGasPendingHtml_());
+            try { await gpAdmLoadFallback_(msg); } catch (e) { /* cadastro only */ }
+            if (typeof refreshOperadoresAdmin_ === 'function') await refreshOperadoresAdmin_();
+            return;
+          }
+          gpAdmSetErr_(esc(msg) + (String(msg).indexOf('ausentes') >= 0
+            ? ' <button type="button" class="gp-adm-link" onclick="mkGpAdmInstalarAbas_()">Instalar abas agora</button>'
+            : ''));
           if (typeof refreshOperadoresAdmin_ === 'function') await refreshOperadoresAdmin_();
           return;
         }
-        if (errEl) {
-          errEl.innerHTML = esc(msg) + (String(msg).indexOf('ausentes') >= 0
-            ? ' <button type="button" class="gp-adm-link" onclick="mkGpAdmInstalarAbas_()">Instalar abas agora</button>'
-            : '');
-        }
+        gpAdmData_ = d;
+        if (typeof applySessaoAtivaFromApi_ === 'function') applySessaoAtivaFromApi_(d);
+        gpAdmRender_();
+        gpAdmSetErr_('');
+        if (gpAdmTab_ === 'cadastro' && typeof refreshOperadoresAdmin_ === 'function') await refreshOperadoresAdmin_();
+      } catch (e) {
+        const msg = (e && e.message) || 'Erro de conexão';
+        if (String(msg).indexOf('timeout') >= 0) {
+          gpAdmSetErr_('Demorou demais para carregar — tente de novo ou publique GAS v1.5.102+ (leitura otimizada).');
+        } else if (String(msg).indexOf('painelGestaoPessoasAdmin') >= 0) {
+          gpAdmSetErr_(gpAdmGasPendingHtml_());
+          try { await gpAdmLoadFallback_(msg); } catch (e2) { /* ignore */ }
+        } else gpAdmSetErr_(esc(msg));
         if (typeof refreshOperadoresAdmin_ === 'function') await refreshOperadoresAdmin_();
-        return;
+      } finally {
+        gpAdmLoadPromise_ = null;
       }
-      gpAdmData_ = d;
-      if (typeof applySessaoAtivaFromApi_ === 'function') applySessaoAtivaFromApi_(d);
-      gpAdmRender_();
-      if (gpAdmTab_ === 'cadastro' && typeof refreshOperadoresAdmin_ === 'function') await refreshOperadoresAdmin_();
-    } catch (e) {
-      const msg = (e && e.message) || 'Erro de conexão';
-      if (String(msg).indexOf('painelGestaoPessoasAdmin') >= 0) {
-        if (errEl) errEl.innerHTML = gpAdmGasPendingHtml_();
-        try { await gpAdmLoadFallback_(msg); } catch (e2) { /* ignore */ }
-      } else if (errEl) errEl.textContent = msg;
-      if (typeof refreshOperadoresAdmin_ === 'function') await refreshOperadoresAdmin_();
-    }
+    })();
+    return gpAdmLoadPromise_;
   };
 })();

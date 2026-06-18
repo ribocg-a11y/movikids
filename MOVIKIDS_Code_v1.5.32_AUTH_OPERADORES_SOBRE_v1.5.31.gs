@@ -1,5 +1,8 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.100
+// MOVI KIDS — Google Apps Script v1.5.103
+// v1.5.103: alertas ponto respeitam escala do dia (OFF/folga não gera alerta)
+// v1.5.102: painelGestaoPessoasAdmin — cache único das abas RH (menos leituras planilha)
+// v1.5.101: gpNormCompetencia_ — escala/holerite lê MM/yyyy mesmo quando planilha grava Date
 // v1.5.100: painelGestaoPessoasAdmin — dashboard ADM Operadores (FASE 15)
 // v1.5.99: fix instalarAbasGestaoPessoas — getRange numRows (seeds)
 // v1.5.98: Gestão Pessoas FASE 15 — abas RH/ponto/holerite + APIs colaborador
@@ -409,9 +412,9 @@ function ping_() {
   const agora = new Date();
   return resp_({
     status:  'online',
-    versao:  'v1.5.99',
+    versao:  'v1.5.103',
     timestamp: fmtData_(agora) + ' ' + fmtHoraLocal_(agora),
-    sistema: 'MOVI KIDS v1.5.99',
+    sistema: 'MOVI KIDS v1.5.103',
     postWriteActions: WRITE_ACTIONS_CRITICAS_
   });
 }
@@ -6284,6 +6287,11 @@ function gpCompetenciaAtual_() {
   return String(d.getMonth() + 1).padStart(2, '0') + '/' + d.getFullYear();
 }
 
+/** Normaliza coluna competencia (texto, Date ou serial) → MM/yyyy. */
+function gpNormCompetencia_(val) {
+  return parseMesAnoPayback_(val).label;
+}
+
 function gpVerifyPinColaborador_(operadorId, pin) {
   const found = operadorRowById_(operadorId);
   if (!found) return { ok: false, err: err_('Operador nao encontrado', 404) };
@@ -6301,19 +6309,136 @@ function gpVerifyPinColaborador_(operadorId, pin) {
 function gpColabRhByOpId_(opId) {
   const rows = gpRows_(SH_COLAB_RH);
   for (let i = 0; i < rows.length; i++) {
-    if (Number(rows[i][0]) === Number(opId)) {
-      return {
-        operadorId: Number(rows[i][0]), nome: String(rows[i][1] || '').trim(), funcao: String(rows[i][2] || '').trim(),
-        cpf: String(rows[i][3] || '').trim(), nascimento: cellToStr_(rows[i][4]), telefone: String(rows[i][5] || '').trim(),
-        email: String(rows[i][6] || '').trim(), endereco: String(rows[i][7] || '').trim(), emergencia: String(rows[i][8] || '').trim(),
-        admissao: cellToStr_(rows[i][9]), pix: String(rows[i][10] || '').trim(), salarioBase: Number(rows[i][11]) || 1621,
-        vaDiario: Number(rows[i][12]) || 20, metaLocDia: Number(rows[i][13]) || 20, bonusMeta: Number(rows[i][14]) || 100,
-        turno: String(rows[i][15] || '').trim(), ativo: String(rows[i][16] || 'SIM').toUpperCase() !== 'NAO',
-        cadastroPct: Number(rows[i][17]) || 0, row: GP_DATA_ROW + i
-      };
-    }
+    if (Number(rows[i][0]) === Number(opId)) return gpColabRhObjFromRow_(rows[i], i);
   }
   return null;
+}
+
+function gpColabRhObjFromRow_(row, idx) {
+  return {
+    operadorId: Number(row[0]), nome: String(row[1] || '').trim(), funcao: String(row[2] || '').trim(),
+    cpf: String(row[3] || '').trim(), nascimento: cellToStr_(row[4]), telefone: String(row[5] || '').trim(),
+    email: String(row[6] || '').trim(), endereco: String(row[7] || '').trim(), emergencia: String(row[8] || '').trim(),
+    admissao: cellToStr_(row[9]), pix: String(row[10] || '').trim(), salarioBase: Number(row[11]) || 1621,
+    vaDiario: Number(row[12]) || 20, metaLocDia: Number(row[13]) || 20, bonusMeta: Number(row[14]) || 100,
+    turno: String(row[15] || '').trim(), ativo: String(row[16] || 'SIM').toUpperCase() !== 'NAO',
+    cadastroPct: Number(row[17]) || 0, row: GP_DATA_ROW + idx
+  };
+}
+
+function gpLoadContext_() {
+  return {
+    hoje: fmtData_(new Date()),
+    rhRows: gpRows_(SH_COLAB_RH),
+    folhaRows: gpRows_(SH_FOLHA_PONTO),
+    metasRows: gpRows_(SH_METAS_COLAB),
+    escalaRows: gpRows_(SH_ESCALA_COLAB)
+  };
+}
+
+function gpColabRhFromCtx_(opId, ctx) {
+  for (let i = 0; i < ctx.rhRows.length; i++) {
+    if (Number(ctx.rhRows[i][0]) === Number(opId)) return gpColabRhObjFromRow_(ctx.rhRows[i], i);
+  }
+  return null;
+}
+
+function gpStatusPontoFromCtx_(opId, ctx) {
+  const rows = ctx.folhaRows.filter(function (r) { return Number(r[1]) === Number(opId) && cellToStr_(r[2]) === ctx.hoje; });
+  if (!rows.length) return { status: 'fora', entrada: null, saida: null };
+  const r = rows[rows.length - 1];
+  const ent = cellToStr_(r[4]); const sai = cellToStr_(r[5]);
+  if (ent && !sai) return { status: 'dentro', entrada: ent, saida: null };
+  if (ent && sai) return { status: 'fora', entrada: ent, saida: sai };
+  return { status: 'fora', entrada: null, saida: null };
+}
+
+function gpMetasFromCtx_(opId, competencia, ctx) {
+  const mes = competencia.slice(0, 2);
+  const dias = ctx.metasRows.filter(function (r) {
+    return Number(r[1]) === Number(opId) && cellToStr_(r[2]).indexOf('/' + mes + '/') >= 0;
+  }).map(function (r) {
+    return { data: cellToStr_(r[2]), loc: Number(r[3]) || 0, meta: Number(r[4]) || 20, bonusOk: String(r[5] || '').toUpperCase() === 'SIM', bonusValor: Number(r[6]) || 0 };
+  });
+  const bonusTotal = dias.filter(function (d) { return d.bonusOk; }).reduce(function (s, d) { return s + d.bonusValor; }, 0);
+  const meta = dias.length ? dias[0].meta : 20;
+  const hoje = ctx.metasRows.filter(function (r) { return Number(r[1]) === Number(opId) && cellToStr_(r[2]) === ctx.hoje; });
+  const atual = hoje.length ? Number(hoje[0][3]) || 0 : 0;
+  return { alvo: meta, atual: atual, bonusValor: 100, bonusMin: meta + 1, diasMes: dias, bonusTotal: bonusTotal };
+}
+
+function gpFolhaPontoFromCtx_(opId, competencia, ctx) {
+  return ctx.folhaRows.filter(function (r) {
+    return Number(r[1]) === Number(opId) && String(r[2] || '').indexOf(competencia.slice(0, 2)) >= 0;
+  }).map(function (r) {
+    return { data: cellToStr_(r[2]), dia: String(r[3] || ''), entrada: cellToStr_(r[4]), saida: cellToStr_(r[5]), horas: String(r[6] || ''), sit: String(r[7] || 'OK') };
+  });
+}
+
+function gpDiaSemEscalaIdx_(d) {
+  const js = (d || new Date()).getDay();
+  return js === 0 ? 6 : js - 1;
+}
+
+function gpEscalaCelulaHojeFromCtx_(opId, ctx, competencia) {
+  const comp = gpNormCompetencia_(competencia || gpCompetenciaAtual_());
+  const idx = gpDiaSemEscalaIdx_();
+  const row = ctx.escalaRows.find(function (r) {
+    return Number(r[0]) === Number(opId) && gpNormCompetencia_(r[1]) === comp;
+  });
+  if (!row) return null;
+  return String(row[2 + idx] || '').trim();
+}
+
+function gpEscalaEhFolga_(cel) {
+  const s = String(cel || '').trim().toUpperCase();
+  if (!s || s === '—' || s === '-' || s === '–') return true;
+  if (s === 'OFF' || s === 'FOLGA' || s.indexOf('FOLGA') >= 0) return true;
+  return false;
+}
+
+function gpParseHoraInicioEscala_(cel) {
+  if (gpEscalaEhFolga_(cel)) return null;
+  const m = String(cel || '').match(/(\d{1,2})\s*(?:h|:)?/i);
+  if (!m) return null;
+  return { h: parseInt(m[1], 10), m: 0 };
+}
+
+function gpPassouToleranciaPonto_(agora, inicioH, inicioM, tolMin) {
+  tolMin = tolMin == null ? 20 : tolMin;
+  const limite = new Date(agora.getTime());
+  limite.setHours(inicioH, inicioM + tolMin, 0, 0);
+  return agora.getTime() >= limite.getTime();
+}
+
+function gpAlertasPontoFromCtx_(ctx) {
+  const agora = new Date();
+  const comp = gpCompetenciaAtual_();
+  const alertas = [];
+  ctx.rhRows.forEach(function (r) {
+    if (String(r[16] || 'SIM').toUpperCase() === 'NAO') return;
+    const opId = Number(r[0]);
+    const st = gpStatusPontoFromCtx_(opId, ctx);
+    if (st.status !== 'fora' || st.entrada) return;
+
+    const celEscala = gpEscalaCelulaHojeFromCtx_(opId, ctx, comp);
+    if (celEscala !== null && gpEscalaEhFolga_(celEscala)) return;
+
+    let inicio = gpParseHoraInicioEscala_(celEscala);
+    if (!inicio) {
+      const turno = String(r[15] || '');
+      const tm = turno.match(/(\d{1,2})\s*(?:h|:)?/i);
+      if (!tm) return;
+      inicio = { h: parseInt(tm[1], 10), m: 0 };
+    }
+    if (!gpPassouToleranciaPonto_(agora, inicio.h, inicio.m, 20)) return;
+
+    alertas.push({
+      operadorId: opId, nome: String(r[1] || ''), turno: celEscala || String(r[15] || ''),
+      mensagem: String(r[1] || '') + ' nao registrou entrada — tolerancia 20 min excedida'
+    });
+  });
+  return { alertas: alertas, total: alertas.length };
 }
 
 function gpCalcInss_(baseInss) {
@@ -6381,7 +6506,10 @@ function gpMetasColab_(opId, competencia) {
 }
 
 function gpEscalaColab_(opId, competencia) {
-  const row = gpRows_(SH_ESCALA_COLAB).find(function (r) { return Number(r[0]) === Number(opId) && String(r[1] || '') === competencia; });
+  const comp = gpNormCompetencia_(competencia);
+  const row = gpRows_(SH_ESCALA_COLAB).find(function (r) {
+    return Number(r[0]) === Number(opId) && gpNormCompetencia_(r[1]) === comp;
+  });
   if (!row) return ['—', '—', '—', '—', '—', '—', '—'];
   return [String(row[2] || ''), String(row[3] || ''), String(row[4] || ''), String(row[5] || ''), String(row[6] || ''), String(row[7] || ''), String(row[8] || '')];
 }
@@ -6503,77 +6631,68 @@ function alertasPontoGestaoAdmin_(p) {
 }
 
 function gpAlertasPontoCore_() {
-  const agora = new Date();
-  const alertas = [];
-  gpRows_(SH_COLAB_RH).forEach(function (r) {
-    if (String(r[16] || 'SIM').toUpperCase() === 'NAO') return;
-    const opId = Number(r[0]);
-    const st = gpStatusPontoHoje_(opId);
-    const turno = String(r[15] || '');
-    if (st.status === 'fora' && !st.entrada && turno.indexOf('14') >= 0 && agora.getHours() >= 14 && agora.getMinutes() >= 20) {
-      alertas.push({
-        operadorId: opId, nome: String(r[1] || ''), turno: turno,
-        mensagem: String(r[1] || '') + ' nao registrou entrada — tolerancia 20 min excedida'
-      });
-    }
-  });
-  return { alertas: alertas, total: alertas.length };
+  return gpAlertasPontoFromCtx_(gpLoadContext_());
 }
 
 function painelGestaoPessoasAdmin_(p) {
   if (!adminPinOk_(p)) return err_('Acesso negado — PIN admin 1416', 403);
   try {
     const comp = String(p.competencia || gpCompetenciaAtual_());
+    const ctx = gpLoadContext_();
     const opsResp = JSON.parse(listarOperadoresLogin_().getContent());
     const operadores = opsResp.operadores || [];
     const sessao = opsResp.sessaoAtiva || null;
     const sessaoId = sessao && sessao.operadorId ? Number(sessao.operadorId) : 0;
-    const alertasPack = gpAlertasPontoCore_();
+    const alertasPack = gpAlertasPontoFromCtx_(ctx);
     const colaboradores = [];
     const seen = {};
 
     operadores.forEach(function (op) {
       const id = Number(op.id);
       seen[id] = true;
-      const rh = gpColabRhByOpId_(id);
-      const ponto = gpStatusPontoHoje_(id);
-      const metas = gpMetasColab_(id, comp);
+      const rh = gpColabRhFromCtx_(id, ctx);
+      const ponto = gpStatusPontoFromCtx_(id, ctx);
+      const metas = gpMetasFromCtx_(id, comp, ctx);
       const locMes = (metas.diasMes || []).reduce(function (s, d) { return s + (Number(d.loc) || 0); }, 0);
       const bonusDias = (metas.diasMes || []).filter(function (d) { return d.bonusOk; }).length;
-      const folhaPonto = gpFolhaPontoColab_(id, comp);
+      const folhaPonto = gpFolhaPontoFromCtx_(id, comp, ctx);
+      const escalaHoje = gpEscalaCelulaHojeFromCtx_(id, ctx, comp);
       colaboradores.push({
         id: id, nome: op.nome, hasPin: op.hasPin, perfil: op.perfil || 'operador',
         funcao: rh ? rh.funcao : 'Operador', turno: rh ? rh.turno : '', admissao: rh ? rh.admissao : '',
         cadastroPct: rh ? rh.cadastroPct : 0, temRh: !!rh,
+        escalaHoje: escalaHoje, escalaFolga: escalaHoje !== null && gpEscalaEhFolga_(escalaHoje),
         ponto: ponto, logadoBalcao: sessaoId === id,
         metas: { alvo: metas.alvo, atual: metas.atual, locMes: locMes, bonusDias: bonusDias, bonusTotal: metas.bonusTotal || 0 },
         folhaPonto: folhaPonto
       });
     });
 
-    gpRows_(SH_COLAB_RH).forEach(function (r) {
+    ctx.rhRows.forEach(function (r) {
       if (String(r[16] || 'SIM').toUpperCase() === 'NAO') return;
       const id = Number(r[0]);
       if (seen[id]) return;
-      const rh = gpColabRhByOpId_(id);
-      const ponto = gpStatusPontoHoje_(id);
-      const metas = gpMetasColab_(id, comp);
+      const rh = gpColabRhFromCtx_(id, ctx);
+      const ponto = gpStatusPontoFromCtx_(id, ctx);
+      const metas = gpMetasFromCtx_(id, comp, ctx);
       const locMes = (metas.diasMes || []).reduce(function (s, d) { return s + (Number(d.loc) || 0); }, 0);
       const bonusDias = (metas.diasMes || []).filter(function (d) { return d.bonusOk; }).length;
+      const escalaHoje = gpEscalaCelulaHojeFromCtx_(id, ctx, comp);
       colaboradores.push({
         id: id, nome: rh ? rh.nome : String(r[1] || ''), hasPin: false, perfil: 'operador',
         funcao: rh ? rh.funcao : 'Colaborador', turno: rh ? rh.turno : '', admissao: rh ? rh.admissao : '',
         cadastroPct: rh ? rh.cadastroPct : 0, temRh: true,
+        escalaHoje: escalaHoje, escalaFolga: escalaHoje !== null && gpEscalaEhFolga_(escalaHoje),
         ponto: ponto, logadoBalcao: false,
         metas: { alvo: metas.alvo, atual: metas.atual, locMes: locMes, bonusDias: bonusDias, bonusTotal: metas.bonusTotal || 0 },
-        folhaPonto: gpFolhaPontoColab_(id, comp)
+        folhaPonto: gpFolhaPontoFromCtx_(id, comp, ctx)
       });
     });
 
     colaboradores.sort(function (a, b) { return String(a.nome).localeCompare(String(b.nome), 'pt-BR'); });
 
     const escalaNomes = colaboradores.filter(function (c) { return c.temRh; }).map(function (c) { return { id: c.id, nome: c.nome }; });
-    const escalaRows = gpRows_(SH_ESCALA_COLAB).filter(function (r) { return String(r[1] || '') === comp; });
+    const escalaRows = ctx.escalaRows.filter(function (r) { return gpNormCompetencia_(r[1]) === comp; });
     const escala = {
       competencia: comp,
       colunas: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'],
@@ -6587,7 +6706,7 @@ function painelGestaoPessoasAdmin_(p) {
     };
 
     const folha = colaboradores.filter(function (c) { return c.temRh; }).map(function (c) {
-      const rh = gpColabRhByOpId_(c.id);
+      const rh = gpColabRhFromCtx_(c.id, ctx);
       const bonus = c.metas.bonusTotal || 0;
       const diasTrab = (c.folhaPonto || []).length;
       const hol = gpCalcHollerite_(rh || { salarioBase: 1621, vaDiario: 20 }, bonus, 0, diasTrab || 0);
@@ -6608,7 +6727,7 @@ function painelGestaoPessoasAdmin_(p) {
       competencia: comp, colaboradores: colaboradores, escala: escala, folha: folha,
       alertas: alertasPack.alertas, alertasTotal: alertasPack.total,
       kpis: { total: colaboradores.length, presentes: presentes, comTurno: comTurno, alertas: alertasPack.total },
-      sessaoAtiva: sessao, versao: 'v1.5.100'
+      sessaoAtiva: sessao, versao: 'v1.5.103'
     });
   } catch (ex) {
     return err_('Abas Gestao Pessoas ausentes — rode instalar abas ou scripts/criar-abas-gestao-pessoas.ps1', 503);
@@ -6639,6 +6758,11 @@ function instalarAbasGestaoPessoasCore_() {
     [[1,3,'15/06/2026','Seg','13:58','21:05','7h07','OK','']]);
   ensure(SH_ESCALA_COLAB, '#9C27B0', ['operador_id','competencia','seg','ter','qua','qui','sex','sab','dom','obs'],
     [[3,'06/2026','14–22','OFF','14–22','OFF','14–22','10–20','13–21','Rodízio dom']]);
+  const shEsc = ss.getSheetByName(SH_ESCALA_COLAB);
+  if (shEsc) {
+    const escDataRows = shEsc.getLastRow() - 1;
+    if (escDataRows >= 1) shEsc.getRange(2, 2, escDataRows, 1).setNumberFormat('@');
+  }
   ensure(SH_FALTAS, '#F44336', ['id','operador_id','data','tipo','horas','valor_desconto','obs','registrado_em'], []);
   ensure(SH_HOLERITES, '#1976D2', ['id','operador_id','competencia','base','bonus','faltas','inss','irrf','vt','liquido','fgts','va_total','dias_trab','obs','gerado_em'], []);
   ensure(SH_METAS_COLAB, '#FFC107', ['id','operador_id','data','locacoes','meta','bonus_ok','bonus_valor'],

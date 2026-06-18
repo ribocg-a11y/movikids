@@ -232,6 +232,8 @@ body {
 /* ── ADM Operadores · Gestão Pessoas (#page-operadores) ── */
 #page-operadores .gp-adm-lead { font-size: 13px; color: var(--txt2); font-weight: 700; line-height: 1.55; margin-bottom: 14px; }
 #page-operadores .gp-adm-err { font-size: 13px; font-weight: 700; color: #B71C1C; margin-bottom: 12px; line-height: 1.55; padding: 12px 14px; background: #FFEBEE; border: 1px solid #EF9A9A; border-radius: 12px; }
+#page-operadores .gp-adm-err:empty,
+#page-operadores .gp-adm-err[hidden] { display: none !important; margin: 0; padding: 0; border: 0; }
 #page-operadores .gp-adm-err code { font-size: 11px; background: rgba(0,0,0,.06); padding: 1px 4px; border-radius: 4px; }
 #page-operadores .gp-adm-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
 #page-operadores .gp-adm-tab {
@@ -247,13 +249,28 @@ body {
   background: var(--card); border: 1px solid var(--border); border-radius: var(--mk-radius, 16px);
   padding: 14px; box-shadow: var(--mk-shadow-1);
 }
+#page-operadores .gp-adm-kpi--sk { opacity: 0.55; animation: gp-adm-pulse 1.2s ease-in-out infinite; }
 #page-operadores .gp-adm-kpi-val { font-family: 'Fredoka One', cursive; font-size: 28px; color: var(--blue); line-height: 1; }
+#page-operadores .gp-adm-loading { font-weight: 800; color: var(--blue); }
+@keyframes gp-adm-pulse { 0%, 100% { opacity: 0.45; } 50% { opacity: 0.85; } }
 #page-operadores .gp-adm-kpi-lbl { font-size: 10px; font-weight: 800; color: var(--txt3); text-transform: uppercase; margin-top: 4px; }
 #page-operadores .gp-adm-card {
   background: var(--card); border: 1px solid var(--border); border-radius: var(--mk-radius, 16px);
   padding: 14px; margin-bottom: 12px; box-shadow: var(--mk-shadow-1);
 }
-#page-operadores .gp-adm-card h3 { font-size: 13px; font-weight: 900; margin: 0 0 10px; }
+#page-operadores .gp-adm-ficha-hero {
+  display: flex; align-items: center; gap: 12px; margin-bottom: 14px; padding-bottom: 14px; border-bottom: 1px solid var(--border);
+}
+#page-operadores .gp-adm-ficha-hero-body { flex: 1; min-width: 0; }
+#page-operadores .gp-adm-ficha-hero-body h3 { margin: 0 0 4px; font-size: 18px; font-weight: 900; }
+#page-operadores .gp-adm-ficha-hero-body p { margin: 0; font-size: 12px; color: var(--txt3); font-weight: 700; }
+#page-operadores .gp-adm-ficha-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px;
+}
+@media (max-width: 640px) { #page-operadores .gp-adm-ficha-grid { grid-template-columns: 1fr 1fr; } }
+#page-operadores .gp-adm-ficha-grid div { background: #F8FAFC; border-radius: 10px; padding: 10px; border: 1px solid var(--border); }
+#page-operadores .gp-adm-ficha-grid span { display: block; font-size: 10px; font-weight: 800; color: var(--txt3); text-transform: uppercase; margin-bottom: 4px; }
+#page-operadores .gp-adm-ficha-grid strong { font-size: 13px; color: var(--txt); }
 #page-operadores .gp-adm-card--alert { border-color: #EF9A9A; background: #FFEBEE; }
 #page-operadores .gp-adm-card--alert h3 { color: #C62828; }
 #page-operadores .gp-adm-row {

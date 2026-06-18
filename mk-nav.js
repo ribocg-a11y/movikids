@@ -98,7 +98,7 @@ function showPage(name, opts = {}) {
   if (name==='historico') buscarHistorico();
   if (name==='admin' && isAdmin) { resetAdminTimer(); carregarKPIs(); }
   if (name==='sistema' && isAdmin) { resetAdminTimer(); setTimeout(atualizarDiagnostico, 80); carregarKPIs(); }
-  if (name==='operadores' && isAdmin && typeof refreshOperadoresAdmin_ === 'function') refreshOperadoresAdmin_();
+  if (name==='operadores' && isAdmin && typeof mkGpAdmLoad_ === 'function') mkGpAdmLoad_();
   if (typeof showAdminHomeKpis === 'function') showAdminHomeKpis(typeof kpiHubStub_ === 'function' ? kpiHubStub_() : kpiData);
 }
 
