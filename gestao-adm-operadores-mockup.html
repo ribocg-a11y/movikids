@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <title>MOVI KIDS — Mockup ADM · Operadores + Gestão de Pessoas</title>
+  <script src="mk-canonical-host.js?v=1.8.50"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="mk-design.css?v=1.8.50">
+  <link rel="stylesheet" href="mk-app.css?v=1.8.50">
+  <style>
+    /* Mockup — simula index.html logado como ADM na página Operadores */
+    body { margin: 0; background: var(--bg); font-family: Nunito, system-ui, sans-serif; color: var(--txt); }
+    .mock-top {
+      background: linear-gradient(90deg, #4A148C 0%, #6A1B9A 100%);
+      color: #fff; text-align: center; padding: 10px 14px;
+      font-size: 12px; font-weight: 800; line-height: 1.45;
+    }
+    .mock-top strong { color: #FFD54F; }
+    .mock-top a { color: #FFD54F; }
+    .mock-layout { display: flex; min-height: calc(100vh - 52px); }
+    .mock-sidebar {
+      width: 260px; flex-shrink: 0; background: linear-gradient(180deg, #060d1f 0%, #0a1e4a 40%, #0d2a5c 100%);
+      color: #fff; display: flex; flex-direction: column;
+    }
+    .mock-sb-logo { padding: 20px 16px 12px; border-bottom: 1px solid rgba(255,255,255,.1); }
+    .mock-sb-nav { padding: 10px; flex: 1; overflow-y: auto; }
+    .mock-sb-grp {
+      font-size: 10px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase;
+      color: rgba(255,255,255,.35); padding: 14px 10px 6px;
+    }
+    .mock-sb-btn {
+      display: flex; align-items: center; gap: 10px; width: 100%; padding: 10px 12px;
+      border: none; border-radius: 10px; background: transparent; color: rgba(255,255,255,.65);
+      font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; text-align: left;
+    }
+    .mock-sb-btn.active { background: rgba(255,255,255,.16); color: #fff; }
+    .mock-sb-btn .ico { font-size: 16px; }
+    .mock-main { flex: 1; min-width: 0; overflow-y: auto; padding: 0; }
+    .mock-admin-badge {
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      padding: 14px 18px; background: var(--card); border-bottom: 1px solid var(--border);
+    }
+    .mock-admin-badge span { font-weight: 900; font-size: 14px; }
+    .mock-content { padding: 16px 18px 80px; max-width: 920px; }
+    .mock-lead { font-size: 13px; color: var(--txt2); font-weight: 700; line-height: 1.55; margin-bottom: 16px; }
+    .mock-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+    .mock-tab {
+      padding: 8px 16px; border-radius: 999px; border: 2px solid var(--border);
+      background: var(--card); font: inherit; font-weight: 800; font-size: 12px;
+      color: var(--txt2); cursor: pointer;
+    }
+    .mock-tab.active { border-color: var(--blue); background: #E8F2FF; color: var(--blue); }
+    .mock-panel { display: none; animation: mockFade .22s ease; }
+    .mock-panel.active { display: block; }
+    @keyframes mockFade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+    .mock-kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; }
+    @media (max-width: 640px) { .mock-kpi-grid { grid-template-columns: 1fr; } .mock-sidebar { display: none; } }
+    .mock-kpi {
+      background: var(--card); border: 1px solid var(--border); border-radius: var(--mk-radius, 16px);
+      padding: 14px; box-shadow: var(--mk-shadow-1);
+    }
+    .mock-kpi-val { font-family: 'Fredoka One', cursive; font-size: 28px; color: var(--blue); line-height: 1; }
+    .mock-kpi-lbl { font-size: 10px; font-weight: 800; color: var(--txt3); text-transform: uppercase; margin-top: 4px; }
+    .mock-card {
+      background: var(--card); border: 1px solid var(--border); border-radius: var(--mk-radius, 16px);
+      padding: 14px; margin-bottom: 12px; box-shadow: var(--mk-shadow-1);
+    }
+    .mock-card h3 { font-size: 13px; font-weight: 900; margin: 0 0 10px; }
+    .mock-card.alert { border-color: #EF9A9A; background: #FFEBEE; }
+    .mock-card.alert h3 { color: #C62828; }
+    .mock-row {
+      display: flex; align-items: center; gap: 12px; padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .mock-row:last-child { border-bottom: none; }
+    .mock-av {
+      width: 42px; height: 42px; border-radius: 50%; background: #E8F2FF; color: var(--blue);
+      display: flex; align-items: center; justify-content: center; font-weight: 900; flex-shrink: 0;
+    }
+    .mock-av.owner { background: #FFF3E0; color: #E65100; }
+    .mock-row-body { flex: 1; min-width: 0; }
+    .mock-row-body strong { display: block; font-size: 14px; }
+    .mock-row-body small { font-size: 12px; color: var(--txt2); font-weight: 700; }
+    .mock-badge {
+      display: inline-block; padding: 3px 10px; border-radius: 999px;
+      font-size: 10px; font-weight: 800; flex-shrink: 0;
+    }
+    .mock-badge.ok { background: #E8F5E9; color: var(--green); }
+    .mock-badge.warn { background: #FFF3E0; color: #E65100; }
+    .mock-badge.gray { background: #ECEFF1; color: var(--txt3); }
+    .mock-table-wrap { overflow-x: auto; }
+    .mock-table { width: 100%; border-collapse: collapse; font-size: 12px; font-weight: 700; }
+    .mock-table th, .mock-table td { padding: 8px 6px; border: 1px solid var(--border); text-align: center; }
+    .mock-table th { background: #F8FAFC; font-size: 10px; text-transform: uppercase; color: var(--txt3); }
+    .mock-table td.off { background: #F5F5F5; color: var(--txt3); }
+    .mock-table td.on { background: #E8F5E9; color: var(--green); }
+    .mock-table td.owner { background: #FFF8E1; color: #F57F17; }
+    .mock-btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+      padding: 12px 16px; border: none; border-radius: var(--mk-radius, 14px);
+      font: inherit; font-weight: 900; font-size: 13px; cursor: pointer;
+      background: var(--blue); color: #fff; width: 100%; margin-top: 8px;
+    }
+    .mock-btn.sec { background: var(--card); border: 2px solid var(--border); color: var(--txt); }
+    .mock-btn.link { background: transparent; color: var(--blue); border: none; width: auto; padding: 4px 0; font-size: 12px; margin: 0; }
+    .mock-note {
+      background: #F3E5F5; border: 1px solid #CE93D8; border-radius: 12px;
+      padding: 12px 14px; font-size: 12px; font-weight: 700; color: #6A1B9A;
+      margin-bottom: 16px; line-height: 1.5;
+    }
+    .mock-compare {
+      background: #E3F2FD; border: 1px solid #90CAF9; border-radius: 12px;
+      padding: 12px 14px; font-size: 12px; font-weight: 700; color: #1565C0;
+      margin-bottom: 16px; line-height: 1.55;
+    }
+    .mock-footer {
+      position: fixed; bottom: 0; left: 0; right: 0; text-align: center;
+      padding: 10px; background: rgba(244,246,250,.97); border-top: 1px solid var(--border);
+      font-size: 11px; font-weight: 800; color: var(--txt3); z-index: 10;
+    }
+    .mock-footer a { color: var(--blue); }
+    .mock-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
+  </style>
+</head>
+<body>
+  <div class="mock-top">
+    <strong>MOCKUP v1.0 — APROVAR ANTES DE IMPLEMENTAR</strong><br>
+    Proposta: substituir / expandir a página <strong>Administração → Operadores</strong> do <code>index.html</code> (não a página separada <code>gestao-pessoas.html</code> do tablet).<br>
+    Colaborador continua em <a href="gestao-pessoas.html">gestao-pessoas.html</a> · mock gestor antigo: <a href="assets/gestao-pessoas-mockup-gestor.html">visão gestor v3</a>
+  </div>
+
+  <div class="mock-layout">
+    <aside class="mock-sidebar" aria-label="Menu admin (simulado)">
+      <div class="mock-sb-logo">
+        <img class="mk-brand-img mk-brand-img--xs mk-brand-img--on-dark" src="assets/logo-movi-kids.png" alt="Movi Kids" width="1080" height="1080">
+      </div>
+      <nav class="mock-sb-nav">
+        <div class="mock-sb-grp">Operação</div>
+        <button type="button" class="mock-sb-btn"><span class="ico">🏠</span>Home</button>
+        <button type="button" class="mock-sb-btn"><span class="ico">➕</span>Nova Locação</button>
+        <div class="mock-sb-grp">Administração</div>
+        <button type="button" class="mock-sb-btn"><span class="ico">📊</span>Dashboard</button>
+        <button type="button" class="mock-sb-btn"><span class="ico">💰</span>Caixa</button>
+        <div class="mock-sb-grp">Pessoas</div>
+        <button type="button" class="mock-sb-btn active"><span class="ico">👤</span>Operadores</button>
+        <button type="button" class="mock-sb-btn"><span class="ico">📋</span>Auditoria</button>
+      </nav>
+    </aside>
+
+    <main class="mock-main">
+      <div class="mock-admin-badge">
+        <span>👤 Operadores · Gestão de Pessoas</span>
+        <span style="font-size:12px;color:var(--txt3);font-weight:800">PIN ADM · 60:00</span>
+      </div>
+
+      <div class="mock-content">
+        <div class="mock-compare">
+          <strong>O que você vê hoje em produção:</strong> só lista + cadastro (Eduarda, Milena, Raykelly).<br>
+          <strong>O que este mockup propõe:</strong> mesma entrada no menu <em>Operadores</em>, com abas de gestão RH (presença, escala, metas, folha) + cadastro/PIN/sessão que já existe.
+        </div>
+
+        <div class="mock-note">
+          🔒 Mesmo fluxo de hoje: PIN admin 1416 → sidebar → Operadores. Aba <strong>Cadastro &amp; sessão</strong> = tela atual preservada.
+        </div>
+
+        <div class="mock-tabs" role="tablist">
+          <button type="button" class="mock-tab active" data-tab="hoje">Hoje</button>
+          <button type="button" class="mock-tab" data-tab="presenca">Presença</button>
+          <button type="button" class="mock-tab" data-tab="escala">Escala</button>
+          <button type="button" class="mock-tab" data-tab="metas">Metas &amp; bônus</button>
+          <button type="button" class="mock-tab" data-tab="folha">Folha do mês</button>
+          <button type="button" class="mock-tab" data-tab="cadastro">Cadastro &amp; sessão</button>
+        </div>
+
+        <!-- HOJE -->
+        <section class="mock-panel active" id="tab-hoje">
+          <p class="mock-lead">Visão do gestor (Milena ADM): equipe, alertas de ponto e quem está no balcão agora.</p>
+          <div class="mock-kpi-grid">
+            <div class="mock-kpi"><div class="mock-kpi-val">4</div><div class="mock-kpi-lbl">Colaboradores</div></div>
+            <div class="mock-kpi"><div class="mock-kpi-val" style="color:var(--green)">2/3</div><div class="mock-kpi-lbl">Presença hoje</div></div>
+            <div class="mock-kpi"><div class="mock-kpi-val" style="color:var(--orange)">1</div><div class="mock-kpi-lbl">Alertas ponto</div></div>
+          </div>
+          <div class="mock-card alert">
+            <h3>⚠ Alertas de ponto (tolerância 20 min)</h3>
+            <p style="font-size:13px;font-weight:700;color:var(--txt2);margin-bottom:8px">Esquecimento de entrada/saída → alerta fullscreen no tablet ADM (mesmo padrão dos minutos dos carrinhos).</p>
+            <div class="mock-row">
+              <div class="mock-av">R</div>
+              <div class="mock-row-body"><strong>Raykelly</strong><small>Entrada não registrada · turno 14h · +22 min</small></div>
+              <span class="mock-badge warn">Pendente</span>
+            </div>
+            <button type="button" class="mock-btn sec" onclick="alert('Produção: modal fullscreen danger (como alerta de locação)')">Simular alerta no tablet</button>
+          </div>
+          <div class="mock-card">
+            <h3>Equipe agora</h3>
+            <div class="mock-row">
+              <div class="mock-av owner">M</div>
+              <div class="mock-row-body"><strong>Milena Nunes</strong><small>10h–14h · ponto OK · ADM</small></div>
+              <span class="mock-badge ok">Presente</span>
+            </div>
+            <div class="mock-row">
+              <div class="mock-av">E</div>
+              <div class="mock-row-body"><strong>Eduarda</strong><small>Logada no balcão · turno operacional</small></div>
+              <span class="mock-badge ok">No balcão</span>
+            </div>
+            <div class="mock-row">
+              <div class="mock-av">R</div>
+              <div class="mock-row-body"><strong>Raykelly</strong><small>Turno 14–22h · 14 locações (quarta)</small></div>
+              <span class="mock-badge warn">Sem ponto</span>
+            </div>
+            <div class="mock-actions">
+              <button type="button" class="mock-btn link" onclick="goTab('presenca')">Ver presença detalhada →</button>
+              <button type="button" class="mock-btn link" onclick="goTab('cadastro')">Liberar sessão balcão →</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- PRESENÇA -->
+        <section class="mock-panel" id="tab-presenca">
+          <p class="mock-lead">Drill-down por colaborador: ponto do dia, locações no turno, meta do dia.</p>
+          <div class="mock-card">
+            <div class="mock-row">
+              <div class="mock-av">R</div>
+              <div class="mock-row-body"><strong>Raykelly</strong><small>Admissão 15/06/2026 · Atendente</small></div>
+              <button type="button" class="mock-btn link" onclick="goTab('presenca')">Ver ficha →</button>
+            </div>
+          </div>
+          <div class="mock-card mock-table-wrap">
+            <table class="mock-table">
+              <tr><th>Data</th><th>Entrada</th><th>Saída</th><th>Loc turno</th><th>Meta 20</th><th>Bônus</th></tr>
+              <tr><td>18/06 Qua</td><td>—</td><td>—</td><td>14</td><td style="color:var(--txt3)">Não</td><td>—</td></tr>
+              <tr><td>17/06 Ter</td><td>13:58</td><td>21:05</td><td>21</td><td style="color:var(--green)">Sim</td><td>+R$100</td></tr>
+            </table>
+          </div>
+        </section>
+
+        <!-- ESCALA -->
+        <section class="mock-panel" id="tab-escala">
+          <p class="mock-lead">Escala semanal editável pelo gestor (aba <code>ESCALA_COLABORADORES</code> na planilha).</p>
+          <div class="mock-card mock-table-wrap">
+            <table class="mock-table">
+              <tr><th>Dia</th><th>Milena</th><th>Eduarda</th><th>Raykelly</th></tr>
+              <tr><td>Seg</td><td class="owner">10–14</td><td class="on">14–22</td><td class="off">OFF</td></tr>
+              <tr><td>Ter</td><td class="owner">10–14</td><td class="off">OFF</td><td class="on">14–22</td></tr>
+              <tr><td>Qua</td><td class="owner">10–14</td><td class="on">14–22</td><td class="on">14–22</td></tr>
+              <tr><td>Qui</td><td class="owner">10–14</td><td class="off">OFF</td><td class="on">14–22</td></tr>
+              <tr><td>Sex</td><td class="owner">10–14</td><td class="on">14–22</td><td class="on">14–22</td></tr>
+              <tr><td>Sáb</td><td class="off">OFF</td><td class="on">10–20</td><td class="on">12–22</td></tr>
+              <tr><td>Dom</td><td class="off">OFF</td><td class="on">13–21</td><td class="on">13–21</td></tr>
+            </table>
+          </div>
+          <button type="button" class="mock-btn sec">✏️ Editar escala (GAS · próxima entrega)</button>
+        </section>
+
+        <!-- METAS -->
+        <section class="mock-panel" id="tab-metas">
+          <p class="mock-lead">Meta: 20 locações/turno · bônus R$ 100 com 21+ (config por colaborador).</p>
+          <div class="mock-kpi-grid">
+            <div class="mock-kpi"><div class="mock-kpi-val">20</div><div class="mock-kpi-lbl">Meta loc/turno</div></div>
+            <div class="mock-kpi"><div class="mock-kpi-val" style="color:var(--green)">R$100</div><div class="mock-kpi-lbl">Bônus/dia</div></div>
+            <div class="mock-kpi"><div class="mock-kpi-val">1</div><div class="mock-kpi-lbl">Dias c/ bônus (mês)</div></div>
+          </div>
+          <div class="mock-card">
+            <div class="mock-row">
+              <div class="mock-av">R</div>
+              <div class="mock-row-body"><strong>Raykelly</strong><small>17/06 · 21 loc · bônus creditado</small></div>
+              <span class="mock-badge ok">+R$100</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- FOLHA -->
+        <section class="mock-panel" id="tab-folha">
+          <p class="mock-lead">Folha mensal: salário base + bônus − faltas · export CSV · holerite (GAS v1.5.99+).</p>
+          <div class="mock-card mock-table-wrap">
+            <table class="mock-table">
+              <tr><th style="text-align:left">Nome</th><th>Loc mês</th><th>Bônus dias</th><th>Base</th><th>Bônus R$</th><th>Total</th><th></th></tr>
+              <tr><td style="text-align:left">Raykelly</td><td>35</td><td>1</td><td>1.621</td><td>100</td><td><strong>1.721</strong></td><td><button type="button" class="mock-btn link">Holerite</button></td></tr>
+              <tr><td style="text-align:left">Eduarda</td><td>28</td><td>0</td><td>1.621</td><td>0</td><td><strong>1.621</strong></td><td><button type="button" class="mock-btn link">Holerite</button></td></tr>
+              <tr><td style="text-align:left">Milena</td><td>—</td><td>—</td><td>—</td><td>—</td><td><strong>Sócia</strong></td><td>—</td></tr>
+            </table>
+          </div>
+          <button type="button" class="mock-btn sec">📥 Exportar CSV contador</button>
+        </section>
+
+        <!-- CADASTRO = tela atual -->
+        <section class="mock-panel" id="tab-cadastro">
+          <p class="mock-lead">Bloco que <strong>já existe hoje</strong> em produção — cadastro, PIN, liberar sessão. Permanece nesta aba.</p>
+          <button type="button" class="mock-btn sec" style="margin-bottom:14px">🔓 Liberar sessão do balcão (operador esqueceu Sair)</button>
+          <div class="mock-card">
+            <h3>Cadastrados</h3>
+            <div class="mock-row">
+              <div class="mock-av">E</div>
+              <div class="mock-row-body"><strong>Eduarda</strong><small>PIN definido · Operador</small></div>
+              <span class="mock-badge ok">Logado no balcão</span>
+            </div>
+            <div class="mock-row">
+              <div class="mock-av owner">M</div>
+              <div class="mock-row-body"><strong>Milena Nunes</strong><small>PIN definido · Operador / ADM</small></div>
+              <span class="mock-badge gray">⋮ menu</span>
+            </div>
+            <div class="mock-row">
+              <div class="mock-av">R</div>
+              <div class="mock-row-body"><strong>Raykelly</strong><small>PIN definido · Operador · meta ativa</small></div>
+              <span class="mock-badge gray">⋮ menu</span>
+            </div>
+          </div>
+          <div class="mock-card">
+            <h3>Novo operador</h3>
+            <label style="font-size:11px;font-weight:800;color:var(--txt3);text-transform:uppercase">Nome completo</label>
+            <input type="text" placeholder="Ex: Maria Silva" style="width:100%;padding:12px;border:1px solid var(--border);border-radius:12px;font:inherit;font-weight:700;margin:8px 0 12px">
+            <button type="button" class="mock-btn">➕ Cadastrar operador</button>
+          </div>
+          <p class="mock-lead" style="margin-top:16px">Cada linha ganha ação <strong>Ver ficha RH</strong> → abre presença/metas/holerite da pessoa.</p>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <div class="mock-footer">
+    Mockup ADM Operadores v1.0 · Aprovar layout → implementar em <code>index.html #page-operadores</code> ·
+    <a href="index.html">Voltar ao app</a>
+  </div>
+
+  <script>
+    function goTab(id) {
+      document.querySelectorAll('.mock-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === id));
+      document.querySelectorAll('.mock-panel').forEach(p => p.classList.toggle('active', p.id === 'tab-' + id));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    document.querySelectorAll('.mock-tab').forEach(btn => {
+      btn.addEventListener('click', () => goTab(btn.dataset.tab));
+    });
+  </script>
+</body>
+</html>
