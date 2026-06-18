@@ -365,16 +365,19 @@
       },
       raykelly: {
         id:'raykelly', label:'Raykelly', letra:'R', owner:false, funcao:'Atendente 1', pin:'1111', pinBalcao:'1111',
-        turno:'14h–22h', cadastro:{...VAZIO}, statusHoje:'fora', folha:[],
+        admissao:'2026-06-15',
+        turno:'14h–22h', cadastro:{ ...VAZIO, admissao:'2026-06-15' }, statusHoje:'fora',
+        folha:[
+          { data:'15/06', dia:'Seg', entrada:'13:58', saida:'21:05', horas:'7h07', sit:'OK' }
+        ],
         meta:{
-          alvo:20, atual:14, bonusValor:100, bonusMin:21,
+          alvo:20, atual:14, bonusValor:100, bonusMin:21, admissao:'15/06/2026',
           diasMes:[
-            { data:'07/06', dia:'Sáb', loc:23, bonusOk:true },
-            { data:'15/06', dia:'Dom', loc:21, bonusOk:true }
+            { data:'15/06', dia:'Seg', loc:21, bonusOk:true }
           ]
         },
         escala:['14–22','OFF','14–22','OFF','14–22','10–20','13–21'],
-        bancoHoras:'-1h30', pagamento:{ base:SALARIO_MINIMO_BASE, bonus:200, total:SALARIO_MINIMO_BASE+200, obs:'Jun/2026 · base SM + bônus metas' }
+        bancoHoras:'0h00', pagamento:{ base:SALARIO_MINIMO_BASE, bonus:100, total:SALARIO_MINIMO_BASE+100, obs:'Jun/2026 · admissão 15/06 · 1 dia c/ bônus' }
       },
       clara: {
         id:'clara', label:'Clara', letra:'C', owner:false, funcao:'Atendente 2', pin:'2222', pinBalcao:'2222',
@@ -708,6 +711,7 @@
             <div class="mock-kpi-lbl">Locações hoje · turno ${p.turno}</div>
             <div class="mock-prog" style="margin-top:12px"><div class="mock-prog-fill" style="width:${pct}%"></div></div>
             <p style="font-size:13px;font-weight:700;margin-top:10px;color:var(--txt2)">Bônus R$ ${fmtBRL(m.bonusValor)} ao fazer ${m.bonusMin}+ locações no turno.</p>
+            <p style="font-size:11px;font-weight:700;margin-top:8px;color:var(--txt3)">Admissão ${m.admissao || p.admissao || '—'} · histórico só a partir desta data</p>
           </div>${tabela}`;
       }
       document.getElementById('metas-body').innerHTML = html;
