@@ -406,6 +406,7 @@
     function fmtDataHoje() { const d=new Date(); return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0'); }
     function diaSemanaHoje() { return DIAS[(new Date().getDay()+6)%7]; }
     function fmtBRL(n) { return Number(n).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+    function cadastroPct(p) { const r=CAMPOS.filter(f=>f.req); return Math.round(r.filter(f=>String(p.cadastro[f.key]||'').trim()).length/r.length*100); }
     function cadastroOk(p) { return cadastroPct(p)===100; }
 
     let balcaoPins = [];
