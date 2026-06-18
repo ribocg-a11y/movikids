@@ -2,159 +2,308 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-  <meta http-equiv="Pragma" content="no-cache">
-  <meta http-equiv="Expires" content="0">
-  <title>MOVI KIDS — Ponto (visão colaborador)</title>
+  <title>MOVI KIDS — Gestão de Pessoas (mockup)</title>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="mk-design.css?v=1.8.38">
+  <link rel="stylesheet" href="mk-app.css?v=1.8.38">
   <style>
-    :root {
-      --blue: #1E6FD9; --blue-dark: #0D4A9E; --yellow: #FFD54F; --orange: #FF9800;
-      --green: #2E7D32; --red: #C62828; --bg: #F4F6FA; --card: #fff; --border: #E2E8F0;
-      --txt: #1A2332; --txt2: #5A6578; --txt3: #8B95A5; --radius: 16px;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: Nunito, system-ui, sans-serif; background: var(--bg); color: var(--txt); min-height: 100vh; }
-    .banner-warn { background: var(--red); color: #fff; text-align: center; padding: 10px 12px; font-size: 12px; font-weight: 800; line-height: 1.5; }
-    .banner-warn a { color: var(--yellow); }
-    .banner { background: var(--blue-dark); color: #fff; text-align: center; padding: 8px 12px; font-size: 12px; font-weight: 800; }
-    .banner strong { color: var(--yellow); }
-    .shell { max-width: 520px; margin: 0 auto; padding: 16px 14px 72px; }
-    .screen { display: none; animation: fade .25s ease; }
-    .screen.active { display: block; }
-    @keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
-    .logo { font-family: 'Fredoka One', cursive; font-size: 32px; color: var(--blue-dark); text-align: center; margin: 20px 0 6px; }
-    .sub { text-align: center; color: var(--txt2); font-size: 14px; font-weight: 700; margin-bottom: 24px; }
-    .btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 16px; border: none; border-radius: var(--radius); font: inherit; font-weight: 900; font-size: 15px; cursor: pointer; margin-bottom: 10px; }
-    .btn-primary { background: var(--blue); color: #fff; }
-    .btn-outline { background: var(--card); border: 2px solid var(--border); color: var(--txt); }
-    .btn-ghost { background: transparent; color: var(--txt3); font-size: 13px; padding: 8px; width: 100%; border: none; font: inherit; font-weight: 800; cursor: pointer; }
-    h1 { font-family: 'Fredoka One', cursive; font-size: 22px; color: var(--blue-dark); margin-bottom: 6px; }
-    .lead { font-size: 14px; color: var(--txt2); font-weight: 700; margin-bottom: 14px; line-height: 1.5; }
-    .card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(26,35,50,.05); }
-    .pick { display: flex; gap: 12px; align-items: center; padding: 14px; border: 2px solid var(--border); border-radius: var(--radius); margin-bottom: 10px; cursor: pointer; background: var(--card); width: 100%; text-align: left; font: inherit; }
-    .av { width: 48px; height: 48px; border-radius: 50%; background: #E8F2FF; color: var(--blue); display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 18px; flex-shrink: 0; }
-    .av.owner { background: #FFF3E0; color: #E65100; }
-    .pick-name { font-weight: 900; font-size: 16px; }
-    .pick-meta { font-size: 12px; color: var(--txt3); font-weight: 700; margin-top: 2px; }
-    .badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 10px; font-weight: 800; }
-    .b-ok { background: #E8F5E9; color: var(--green); }
-    .b-warn { background: #FFF3E0; color: #E65100; }
-    .b-gray { background: #ECEFF1; color: var(--txt3); }
-    .clock-big { font-family: 'Fredoka One', cursive; font-size: 44px; color: var(--blue); text-align: center; line-height: 1; }
-    .clock-sub { text-align: center; font-size: 13px; color: var(--txt3); font-weight: 800; margin-bottom: 12px; }
-    .back { background: none; border: none; color: var(--blue); font: inherit; font-weight: 800; font-size: 14px; cursor: pointer; margin-bottom: 12px; padding: 0; }
-    .note { font-size: 12px; color: var(--txt3); font-weight: 700; padding: 12px; background: #FFFDE7; border-radius: 12px; border: 1px solid #FFF59D; line-height: 1.5; }
-    .note.err { background: #FFEBEE; border-color: #FFCDD2; color: #B71C1C; }
-    .note.ok { background: #E8F5E9; border-color: #A5D6A7; color: var(--green); }
-    .field { margin-bottom: 10px; }
-    .field label { display: block; font-size: 11px; font-weight: 800; color: var(--txt3); text-transform: uppercase; margin-bottom: 4px; }
-    .field label .req { color: var(--red); }
-    .field input { width: 100%; padding: 11px 12px; border: 1px solid var(--border); border-radius: 12px; font: inherit; font-weight: 700; }
-    .field input.missing { border-color: var(--orange); background: #FFF8E1; }
-    .checklist { list-style: none; margin: 12px 0; }
-    .checklist li { font-size: 13px; font-weight: 700; padding: 8px 0; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; }
-    .prog { height: 8px; background: var(--border); border-radius: 999px; overflow: hidden; margin: 10px 0; }
-    .prog-fill { height: 100%; background: var(--blue); border-radius: 999px; }
-    .lanc-top { text-align: center; padding: 8px 0 16px; }
-    .lanc-hero { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
-    .sec-divider { font-size: 11px; font-weight: 900; color: var(--txt3); text-transform: uppercase; letter-spacing: .06em; margin: 20px 0 10px; padding-top: 8px; border-top: 2px solid var(--border); }
-    .espelho-head { border: 2px solid var(--txt); border-radius: 8px; padding: 10px; margin-bottom: 10px; background: #FAFAFA; }
-    .espelho-head h2 { font-size: 12px; font-weight: 900; text-transform: uppercase; text-align: center; margin-bottom: 8px; }
-    .espelho-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 10px; font-size: 11px; font-weight: 700; }
-    .espelho-meta span { color: var(--txt3); }
-    .espelho-wrap { overflow-x: auto; border: 1px solid var(--txt); border-radius: 4px; }
-    .espelho { width: 100%; border-collapse: collapse; font-size: 11px; font-weight: 700; min-width: 400px; }
-    .espelho th { background: #ECEFF1; border: 1px solid var(--txt); padding: 6px 4px; font-size: 10px; text-transform: uppercase; }
-    .espelho td { border: 1px solid var(--border); padding: 6px 4px; text-align: center; }
-    .espelho tr.hoje { background: #E8F2FF; font-weight: 900; }
-    .espelho tr.hoje td { border-color: var(--blue); }
-    .espelho .sit-ok { color: var(--green); }
-    .espelho .sit-ab { color: var(--orange); }
-    .espelho .sit-falta { color: var(--red); }
-    .espelho-foot { margin-top: 8px; font-size: 10px; font-weight: 700; color: var(--txt3); }
-    .flash { display: none; margin-bottom: 12px; }
-    .flash.show { display: block; }
-    .footer-link { position: fixed; bottom: 0; left: 0; right: 0; text-align: center; padding: 8px; background: rgba(244,246,250,.97); border-top: 1px solid var(--border); font-size: 11px; font-weight: 800; }
-    .footer-link a { color: var(--txt3); }
+    /* Mockup — só layout de telas; tokens e componentes vêm do mk-design / mk-app */
+    body { background: var(--bg); margin: 0; font-family: Nunito, system-ui, sans-serif; color: var(--txt); min-height: 100vh; }
+    .mock-banner { background: var(--blue-dk); color: #fff; text-align: center; padding: 8px 12px; font-size: 11px; font-weight: 800; }
+    .mock-banner strong { color: var(--gold, #FFD54F); }
+    .mock-banner-warn { background: var(--red); color: #fff; text-align: center; padding: 10px 12px; font-size: 12px; font-weight: 800; line-height: 1.5; }
+    .mock-banner-warn a { color: var(--gold, #FFD54F); }
+    .mock-shell { max-width: 720px; margin: 0 auto; padding: 16px 14px 80px; }
+    .mock-screen { display: none; animation: mockFade .25s ease; }
+    .mock-screen.active { display: block; }
+    @keyframes mockFade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+    .mock-logo { font-family: 'Fredoka One', cursive; font-size: 34px; color: var(--blue); text-align: center; margin: 16px 0 4px; line-height: 1.1; }
+    .mock-logo span { color: var(--gold, #FFD54F); }
+    .mock-sub { text-align: center; color: var(--txt2); font-size: 13px; font-weight: 700; margin-bottom: 20px; }
+    .mock-back { background: none; border: none; color: var(--blue); font: inherit; font-weight: 800; font-size: 14px; cursor: pointer; margin-bottom: 12px; padding: 0; }
+    .mock-h1 { font-family: 'Fredoka One', cursive; font-size: 22px; color: var(--blue-dk); margin-bottom: 6px; }
+    .mock-lead { font-size: 14px; color: var(--txt2); font-weight: 700; margin-bottom: 16px; line-height: 1.5; }
+    .mock-user-bar { display: flex; align-items: center; gap: 12px; padding: 14px; background: var(--card); border: 1px solid var(--border); border-radius: var(--mk-radius, 16px); margin-bottom: 16px; box-shadow: var(--mk-shadow-1); }
+    .mock-av { width: 48px; height: 48px; border-radius: 50%; background: #E8F2FF; color: var(--blue); display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 18px; flex-shrink: 0; }
+    .mock-av.owner { background: #FFF3E0; color: #E65100; }
+    .mock-tiles .mk-hub-doors { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    @media (min-width: 560px) { .mock-tiles .mk-hub-doors { grid-template-columns: repeat(3, 1fr); } }
+    .mock-tiles .mk-hub-door { min-height: 128px; align-items: center; text-align: center; justify-content: center; padding: 18px 12px; }
+    .mock-tiles .mk-hub-door-icon { font-size: 40px; margin-bottom: 6px; }
+    .mock-tiles .mk-hub-door-title { font-size: 14px; }
+    .mock-tiles .mk-hub-door-sub { font-size: 10px; }
+    .mock-tiles-5 .mk-hub-doors { grid-template-columns: repeat(2, 1fr); }
+    @media (min-width: 560px) { .mock-tiles-5 .mk-hub-doors { grid-template-columns: repeat(3, 1fr); } }
+    .mock-note { font-size: 12px; font-weight: 700; padding: 12px; border-radius: 12px; line-height: 1.5; margin-bottom: 12px; }
+    .mock-note.info { background: #E3F2FD; border: 1px solid #90CAF9; color: #1565C0; }
+    .mock-note.warn { background: var(--amber-lt, #FFF8E1); border: 1px solid var(--amber, #FFB300); color: #b45309; }
+    .mock-note.ok { background: #E8F5E9; border: 1px solid #A5D6A7; color: var(--green); }
+    .mock-note.err { background: var(--red-lt, #FFEBEE); border: 1px solid var(--red); color: var(--red); }
+    .mock-pick { display: flex; gap: 12px; align-items: center; padding: 14px; border: 2px solid var(--border); border-radius: var(--mk-radius, 16px); margin-bottom: 10px; cursor: pointer; background: var(--card); width: 100%; text-align: left; font: inherit; }
+    .mock-pick.sel { border-color: var(--blue); background: #E8F2FF; }
+    .mock-pin { display: flex; gap: 10px; justify-content: center; margin: 16px 0; }
+    .mock-pin input { width: 52px; height: 58px; border: 2px solid var(--border); border-radius: 12px; font-size: 26px; font-weight: 900; text-align: center; outline: none; font-family: inherit; }
+    .mock-pin input:focus { border-color: var(--blue); }
+    .mock-btn { display: flex; align-items: center; justify-content: center; width: 100%; padding: 16px; border: none; border-radius: var(--mk-radius, 16px); font: inherit; font-weight: 900; font-size: 15px; cursor: pointer; margin-bottom: 10px; background: var(--blue); color: #fff; }
+    .mock-btn.sec { background: var(--card); border: 2px solid var(--border); color: var(--txt); }
+    .mock-btn:disabled { opacity: .45; cursor: not-allowed; }
+    .mock-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--mk-radius, 16px); padding: 14px; margin-bottom: 12px; box-shadow: var(--mk-shadow-1); }
+    .mock-kpi { font-family: 'Fredoka One', cursive; font-size: 32px; color: var(--blue); }
+    .mock-kpi-lbl { font-size: 10px; font-weight: 800; color: var(--txt3); text-transform: uppercase; }
+    .mock-badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 10px; font-weight: 800; }
+    .mock-badge.ok { background: #E8F5E9; color: var(--green); }
+    .mock-badge.gray { background: #ECEFF1; color: var(--txt3); }
+    .mock-badge.warn { background: #FFF3E0; color: #E65100; }
+    .mock-clock { font-family: 'Fredoka One', cursive; font-size: 44px; color: var(--blue); text-align: center; }
+    .mock-table { width: 100%; border-collapse: collapse; font-size: 12px; font-weight: 700; }
+    .mock-table th, .mock-table td { padding: 8px 6px; border: 1px solid var(--border); text-align: center; }
+    .mock-table th { background: #F8FAFC; font-size: 10px; text-transform: uppercase; color: var(--txt3); }
+    .mock-table tr.hoje { background: #E8F2FF; font-weight: 900; }
+    .mock-footer { position: fixed; bottom: 0; left: 0; right: 0; text-align: center; padding: 8px; background: rgba(244,246,250,.97); border-top: 1px solid var(--border); font-size: 11px; font-weight: 800; color: var(--txt3); }
+    .mock-footer a { color: var(--blue); }
+    .mock-prog { height: 8px; background: var(--border); border-radius: 999px; overflow: hidden; margin: 10px 0; }
+    .mock-prog-fill { height: 100%; background: var(--blue); border-radius: 999px; }
+    .mock-checklist { list-style: none; margin: 0; padding: 0; }
+    .mock-checklist li { font-size: 13px; font-weight: 700; padding: 8px 0; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; }
+    .mock-field { margin-bottom: 10px; }
+    .mock-field label { display: block; font-size: 11px; font-weight: 800; color: var(--txt3); text-transform: uppercase; margin-bottom: 4px; }
+    .mock-field input { width: 100%; padding: 11px 12px; border: 1px solid var(--border); border-radius: 12px; font: inherit; font-weight: 700; }
+    .mock-sec { font-size: 11px; font-weight: 900; color: var(--txt3); text-transform: uppercase; letter-spacing: .06em; margin: 20px 0 10px; padding-top: 8px; border-top: 2px solid var(--border); }
+    #mock-adm-alert { z-index: 9999; }
   </style>
 </head>
 <body>
-  <div id="url-warn" class="banner-warn" hidden>
-    URL errada — use <strong>ribocg-a11y</strong> (hífen), não ribocg.a11y (ponto).<br>
+  <div id="url-warn" class="mock-banner-warn" hidden>
+    URL errada — use <strong>ribocg-a11y</strong> (hífen).<br>
     <a href="https://ribocg-a11y.github.io/movikids/ponto-mockup.html">Abrir versão correta →</a>
   </div>
-  <div class="banner">MOCKUP <strong>v2.2.1</strong> · cadastro zerado · 0% · build 404dddb</div>
-  <div class="shell">
+  <div class="mock-banner">MOCKUP <strong>v3.0</strong> · hub com ícones · login colaborador · dados isolados por PIN</div>
 
-    <section class="screen active" id="s-gate">
-      <div class="logo">Movi Kids</div>
-      <p class="sub">Tablet na loja — registrar ponto</p>
-      <button class="btn btn-primary" onclick="show('s-quem')">🕐 Registrar meu ponto</button>
-      <button class="btn btn-outline" onclick="alert('Fluxo existente: login operador + PIN → balcão')">🚗 Entrar no balcão</button>
-    </section>
+  <div class="mock-shell">
 
-    <section class="screen" id="s-quem">
-      <button class="back" onclick="show('s-gate')">← Voltar</button>
-      <h1>Quem é você?</h1>
-      <p class="lead">Toque no seu nome para abrir o lançamento de ponto.</p>
-      <div class="clock-big" id="liveClock">--:--</div>
-      <div class="clock-sub" id="liveDate"></div>
-      <div id="lista-quem"></div>
-    </section>
-
-    <section class="screen" id="s-bloqueio">
-      <button class="back" onclick="show('s-quem')">← Voltar</button>
-      <h1>Cadastro incompleto</h1>
-      <p class="lead" id="bloqueioNome"></p>
-      <div class="card">
-        <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:800;margin-bottom:4px">
-          <span style="color:var(--txt3)">PROGRESSO</span><span id="bloqueioPct" style="color:var(--blue)"></span>
+    <!-- ═══ TELA INICIAL — 3 portas (estilo XTOR, DNA mk-hub-door) ═══ -->
+    <section class="mock-screen active" id="s-home">
+      <div class="mock-logo">🚗 Movi <span>Kids</span></div>
+      <p class="mock-sub">Tablet na loja · Golden Shopping Calhau</p>
+      <div class="mock-tiles">
+        <div class="mk-hub-doors">
+          <button type="button" class="mk-hub-door mk-hub-door--dia" onclick="go('s-balcao')">
+            <span class="mk-hub-door-icon">🚗</span>
+            <span class="mk-hub-door-title">Entrar no sistema</span>
+            <span class="mk-hub-door-sub">Balcão · locações · 1 operador por vez</span>
+          </button>
+          <button type="button" class="mk-hub-door mk-hub-door--mes" onclick="go('s-colab-login')">
+            <span class="mk-hub-door-icon">👥</span>
+            <span class="mk-hub-door-title">Colaboradores</span>
+            <span class="mk-hub-door-sub">Ponto, metas, escala e pagamento</span>
+          </button>
+          <button type="button" class="mk-hub-door mk-hub-door--sys" onclick="go('s-adm-pin')">
+            <span class="mk-hub-door-icon">🔧</span>
+            <span class="mk-hub-door-title">Administração</span>
+            <span class="mk-hub-door-sub">Gestão total · PIN ADM 1416</span>
+          </button>
         </div>
-        <div class="prog"><div class="prog-fill" id="bloqueioBar"></div></div>
-        <ul class="checklist" id="bloqueioLista"></ul>
       </div>
-      <div class="note err">Preencha todos os campos obrigatórios (*) para liberar o ponto.</div>
-      <button class="btn btn-primary" onclick="showCadastro()">Completar cadastro</button>
+      <div class="mock-note info">Mockup FASE 15 — produção mantém regra atual: só <strong>um operador</strong> logado no balcão por vez.</div>
     </section>
 
-    <section class="screen" id="s-cadastro">
-      <button class="back" onclick="show('s-bloqueio')">← Voltar</button>
-      <h1 id="cadTitulo">Cadastro</h1>
-      <p class="lead">Todos os campos com * são obrigatórios.</p>
-      <div class="card" id="cadForm"></div>
-      <button class="btn btn-primary" onclick="salvarCadastro()">Salvar e ir para o ponto</button>
+    <!-- ═══ BALCÃO — fluxo existente ═══ -->
+    <section class="mock-screen" id="s-balcao">
+      <button class="mock-back" onclick="go('s-home')">← Voltar ao início</button>
+      <div class="mock-logo" style="font-size:28px">🚗 Movi <span>Kids</span></div>
+      <p class="mock-sub">Acesso operacional · Passo 1 de 2</p>
+      <div id="balcao-lock" class="mock-note warn" hidden></div>
+      <div class="mock-h1">Quem está no balcão?</div>
+      <p class="mock-lead">Escolha o operador e digite o PIN. Todas as ações ficam registradas com quem está logado.</p>
+      <div id="balcao-picks"></div>
+      <div id="balcao-pin-wrap" hidden>
+        <p class="mock-lead">PIN do operador: <strong id="balcao-pin-name"></strong></p>
+        <div class="mock-pin" id="balcao-pin"></div>
+        <div class="mock-note err" id="balcao-err" hidden></div>
+        <button class="mock-btn" onclick="balcaoEntrar()">Entrar no balcão</button>
+        <button class="mock-btn sec" onclick="balcaoCancelPin()">Trocar operador</button>
+      </div>
+      <div id="balcao-ok" class="mock-note ok" hidden></div>
     </section>
 
-    <!-- LANÇAMENTO: ponto + folha na mesma página -->
-    <section class="screen" id="s-lancamento">
-      <button class="back" onclick="show('s-quem')">← Trocar pessoa</button>
+    <!-- ═══ COLABORADOR — login nome + PIN ═══ -->
+    <section class="mock-screen" id="s-colab-login">
+      <button class="mock-back" onclick="go('s-home')">← Voltar ao início</button>
+      <div class="mock-h1">Área colaboradores</div>
+      <p class="mock-lead">Selecione seu nome e digite seu PIN. Você verá <strong>somente seus dados</strong>.</p>
+      <div id="colab-picks"></div>
+      <div id="colab-pin-wrap" hidden>
+        <p class="mock-lead">PIN · <strong id="colab-pin-name"></strong></p>
+        <div class="mock-pin" id="colab-pin"></div>
+        <div class="mock-note err" id="colab-err" hidden></div>
+        <button class="mock-btn" onclick="colabEntrar()">Entrar</button>
+        <button class="mock-btn sec" onclick="colabCancelPin()">Trocar pessoa</button>
+      </div>
+      <div class="mock-note info" style="margin-top:12px">PIN mock: Raykelly <strong>1111</strong> · Clara <strong>2222</strong> · Milena <strong>3333</strong></div>
+    </section>
 
-      <div id="flashOk" class="note ok flash"></div>
-
-      <div class="card lanc-hero">
-        <div class="av" id="lancAv">R</div>
+    <!-- ═══ COLABORADOR — hub pessoal (5 ícones) ═══ -->
+    <section class="mock-screen" id="s-colab-hub">
+      <button class="mock-back" onclick="colabSair()">← Sair</button>
+      <div class="mock-user-bar">
+        <div class="mock-av" id="hub-av">R</div>
         <div style="flex:1">
-          <div class="pick-name" id="lancNome">Raykelly</div>
-          <div class="pick-meta" id="lancMeta"></div>
+          <div style="font-weight:900;font-size:17px" id="hub-nome">Raykelly</div>
+          <div style="font-size:12px;color:var(--txt3);font-weight:700" id="hub-funcao">Atendente 1</div>
         </div>
-        <span class="badge b-gray" id="lancStatus">Fora</span>
+        <span class="mock-badge gray" id="hub-status">Fora</span>
       </div>
-
-      <div class="lanc-top">
-        <div class="clock-big" id="lancClock">--:--</div>
-        <div class="clock-sub" id="lancData"></div>
-        <button class="btn btn-primary" id="lancBtn" onclick="confirmarPonto()">Confirmar entrada</button>
-        <button class="btn btn-ghost" onclick="show('s-gate')">Voltar ao início</button>
+      <div class="mock-tiles mock-tiles-5">
+        <div class="mk-hub-doors">
+          <button type="button" class="mk-hub-door mk-hub-door--dia" onclick="abrirModulo('ponto')">
+            <span class="mk-hub-door-icon">🕐</span>
+            <span class="mk-hub-door-title">Meu ponto</span>
+            <span class="mk-hub-door-sub">Entrada e saída</span>
+          </button>
+          <button type="button" class="mk-hub-door mk-hub-door--mes" onclick="abrirModulo('metas')">
+            <span class="mk-hub-door-icon">🎯</span>
+            <span class="mk-hub-door-title">Minhas metas</span>
+            <span class="mk-hub-door-sub">Locações do turno</span>
+          </button>
+          <button type="button" class="mk-hub-door mk-hub-door--sys" onclick="abrirModulo('escala')">
+            <span class="mk-hub-door-icon">📅</span>
+            <span class="mk-hub-door-title">Minha escala</span>
+            <span class="mk-hub-door-sub">Dias e turnos</span>
+          </button>
+          <button type="button" class="mk-hub-door mk-hub-door--dia" onclick="abrirModulo('banco')">
+            <span class="mk-hub-door-icon">⏱</span>
+            <span class="mk-hub-door-title">Banco de horas</span>
+            <span class="mk-hub-door-sub">Saldo acumulado</span>
+          </button>
+          <button type="button" class="mk-hub-door mk-hub-door--mes" onclick="abrirModulo('pagamento')">
+            <span class="mk-hub-door-icon">💰</span>
+            <span class="mk-hub-door-title">Meu pagamento</span>
+            <span class="mk-hub-door-sub">Demonstrativo</span>
+          </button>
+        </div>
       </div>
+    </section>
 
-      <div class="sec-divider">Minha folha de ponto · jun/2026</div>
-      <div id="lancFolha"></div>
+    <!-- ═══ PONTO ═══ -->
+    <section class="mock-screen" id="s-ponto">
+      <button class="mock-back" onclick="go('s-colab-hub')">← Meu painel</button>
+      <div id="ponto-flash" class="mock-note ok" hidden></div>
+      <div class="mock-user-bar">
+        <div class="mock-av" id="ponto-av">R</div>
+        <div style="flex:1">
+          <div style="font-weight:900" id="ponto-nome"></div>
+          <div style="font-size:12px;color:var(--txt3);font-weight:700" id="ponto-meta"></div>
+        </div>
+        <span class="mock-badge gray" id="ponto-st">Fora</span>
+      </div>
+      <div class="mock-clock" id="ponto-clock">--:--</div>
+      <p style="text-align:center;font-size:13px;color:var(--txt3);font-weight:800;margin-bottom:12px" id="ponto-data"></p>
+      <button class="mock-btn" id="ponto-btn" onclick="confirmarPonto()">Confirmar entrada</button>
+      <div class="mock-sec">Minha folha de ponto · jun/2026</div>
+      <div id="ponto-folha"></div>
+    </section>
+
+    <!-- ═══ CADASTRO (bloqueio ponto) ═══ -->
+    <section class="mock-screen" id="s-cadastro-bloq">
+      <button class="mock-back" onclick="go('s-colab-hub')">← Meu painel</button>
+      <div class="mock-h1">Cadastro incompleto</div>
+      <p class="mock-lead" id="bloq-lead"></p>
+      <div class="mock-card">
+        <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:800;margin-bottom:4px">
+          <span style="color:var(--txt3)">PROGRESSO</span><span id="bloq-pct" style="color:var(--blue)"></span>
+        </div>
+        <div class="mock-prog"><div class="mock-prog-fill" id="bloq-bar"></div></div>
+        <ul class="mock-checklist" id="bloq-list"></ul>
+      </div>
+      <div class="mock-note err">Preencha todos os campos obrigatórios (*) para liberar o ponto.</div>
+      <button class="mock-btn" onclick="go('s-cadastro-form')">Completar cadastro</button>
+    </section>
+
+    <section class="mock-screen" id="s-cadastro-form">
+      <button class="mock-back" onclick="go('s-cadastro-bloq')">← Voltar</button>
+      <div class="mock-h1" id="cad-titulo">Cadastro</div>
+      <div class="mock-card" id="cad-form"></div>
+      <button class="mock-btn" onclick="salvarCadastro()">Salvar cadastro</button>
+    </section>
+
+    <!-- ═══ METAS / ESCALA / BANCO / PAGAMENTO ═══ -->
+    <section class="mock-screen" id="s-metas">
+      <button class="mock-back" onclick="go('s-colab-hub')">← Meu painel</button>
+      <div class="mock-h1">Minhas metas</div>
+      <div id="metas-body"></div>
+    </section>
+    <section class="mock-screen" id="s-escala">
+      <button class="mock-back" onclick="go('s-colab-hub')">← Meu painel</button>
+      <div class="mock-h1">Minha escala</div>
+      <div id="escala-body"></div>
+    </section>
+    <section class="mock-screen" id="s-banco">
+      <button class="mock-back" onclick="go('s-colab-hub')">← Meu painel</button>
+      <div class="mock-h1">Banco de horas</div>
+      <div id="banco-body"></div>
+    </section>
+    <section class="mock-screen" id="s-pagamento">
+      <button class="mock-back" onclick="go('s-colab-hub')">← Meu painel</button>
+      <div class="mock-h1">Demonstrativo de pagamento</div>
+      <div id="pag-body"></div>
+    </section>
+
+    <!-- ═══ ADM PIN ═══ -->
+    <section class="mock-screen" id="s-adm-pin">
+      <button class="mock-back" onclick="go('s-home')">← Voltar ao início</button>
+      <div class="mock-logo" style="font-size:28px">🔧 Administração</div>
+      <p class="mock-sub">PIN administrativo · produção: 1416</p>
+      <div class="mock-pin" id="adm-pin"></div>
+      <div class="mock-note err" id="adm-err" hidden></div>
+      <button class="mock-btn" onclick="admEntrar()">Entrar como ADM</button>
+    </section>
+
+    <section class="mock-screen" id="s-adm-hub">
+      <button class="mock-back" onclick="go('s-home')">← Voltar ao início</button>
+      <div class="mock-h1">Painel ADM</div>
+      <p class="mock-lead">Milena · gestão total do sistema e alertas de ponto.</p>
+      <div class="mock-tiles">
+        <div class="mk-hub-doors">
+          <a class="mk-hub-door mk-hub-door--mes" href="assets/gestao-pessoas-mockup-gestor.html" style="text-decoration:none;color:inherit">
+            <span class="mk-hub-door-icon">👥</span>
+            <span class="mk-hub-door-title">Gestão de Pessoas</span>
+            <span class="mk-hub-door-sub">Escala, folha, fichas</span>
+          </a>
+          <button type="button" class="mk-hub-door mk-hub-door--dia" onclick="go('s-home')">
+            <span class="mk-hub-door-icon">🚗</span>
+            <span class="mk-hub-door-title">Balcão (prod)</span>
+            <span class="mk-hub-door-sub">App principal</span>
+          </button>
+          <button type="button" class="mk-hub-door mk-hub-door--sys" onclick="demoAlertaPonto()">
+            <span class="mk-hub-door-icon">⚠️</span>
+            <span class="mk-hub-door-title">Alerta de ponto</span>
+            <span class="mk-hub-door-sub">Simular esquecimento · 20 min</span>
+          </button>
+        </div>
+      </div>
+      <div class="mock-note warn">Tolerância <strong>20 min</strong> na entrada e na saída. Depois disso, alerta em tela cheia (igual aviso de minutos dos carrinhos).</div>
     </section>
 
   </div>
-  <div class="footer-link">Visão colaborador · <a href="assets/gestao-pessoas-mockup-gestor.html">Mockup gestor →</a></div>
+
+  <!-- Alerta fullscreen — mesmo padrão alert-modal do balcão -->
+  <div id="mock-adm-alert" class="modal-overlay alert-modal danger">
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+      <div class="modal-icon">⚠️</div>
+      <div class="modal-title">Ponto não registrado!</div>
+      <div class="modal-sub" id="alert-sub">Raykelly não registrou a entrada — tolerância de 20 min excedida.</div>
+      <div class="modal-info">Turno previsto: 14h–22h · Hoje · Escala confirmada</div>
+      <div class="modal-btns">
+        <button class="btn btn-primary btn-sm" onclick="fecharAlerta()">Registrar manualmente (ADM)</button>
+        <button class="btn btn-secondary btn-sm" onclick="fecharAlerta()">Dispensar aviso</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="mock-footer">Mockup FASE 15 · <a href="assets/gestao-pessoas-mockup-gestor.html">Visão gestor →</a></div>
 
   <script>
     const CAMPOS = [
@@ -168,211 +317,313 @@
       { key: 'admissao', label: 'Data admissão', req: true, type: 'date' },
       { key: 'pix', label: 'Chave PIX', req: true }
     ];
+    const VAZIO = { nomeCompleto:'', cpf:'', nascimento:'', telefone:'', email:'', endereco:'', emergencia:'', admissao:'', pix:'' };
 
-    const CADASTRO_VAZIO = {
-      nomeCompleto: '', cpf: '', nascimento: '', telefone: '', email: '',
-      endereco: '', emergencia: '', admissao: '', pix: ''
-    };
-
-    const COLABS = {
+    const PESSOAS = {
       milena: {
-        id: 'milena', label: 'Milena', letra: 'M', owner: true, funcao: 'Sócia',
-        cadastro: { ...CADASTRO_VAZIO },
-        statusHoje: 'fora', turno: '10h–14h', folha: []
+        id:'milena', label:'Milena', letra:'M', owner:true, funcao:'Sócia', pin:'3333', pinBalcao:'3333',
+        turno:'10h–14h', cadastro:{...VAZIO}, statusHoje:'fora', folha:[],
+        meta:null, escala:['10–14','10–14','10–14','10–14','10–14','OFF','OFF'],
+        bancoHoras:'+2h15', pagamento:{ base:0, bonus:0, total:0, obs:'Pró-labore sócia' }
       },
       raykelly: {
-        id: 'raykelly', label: 'Raykelly', letra: 'R', owner: false, funcao: 'Atendente 1',
-        cadastro: { ...CADASTRO_VAZIO },
-        statusHoje: 'fora', turno: '14h–22h', folha: []
+        id:'raykelly', label:'Raykelly', letra:'R', owner:false, funcao:'Atendente 1', pin:'1111', pinBalcao:'1111',
+        turno:'14h–22h', cadastro:{...VAZIO}, statusHoje:'fora', folha:[],
+        meta:{ alvo:20, atual:14, bonus:100, bonusMin:21 },
+        escala:['14–22','OFF','14–22','OFF','14–22','10–20','13–21'],
+        bancoHoras:'-1h30', pagamento:{ base:1800, bonus:0, total:1800, obs:'Jun/2026' }
       },
       clara: {
-        id: 'clara', label: 'Clara', letra: 'C', owner: false, funcao: 'Atendente 2',
-        cadastro: { ...CADASTRO_VAZIO },
-        statusHoje: 'fora', turno: '14h–22h', folha: []
+        id:'clara', label:'Clara', letra:'C', owner:false, funcao:'Atendente 2', pin:'2222', pinBalcao:'2222',
+        turno:'14h–22h', cadastro:{...VAZIO}, statusHoje:'fora', folha:[],
+        meta:{ alvo:20, atual:0, bonus:100, bonusMin:21 },
+        escala:['OFF','14–22','OFF','14–22','14–22','12–22','13–21'],
+        bancoHoras:'0h00', pagamento:{ base:1800, bonus:0, total:1800, obs:'Jun/2026 · cadastro pendente' }
       }
     };
 
-    let currentId = null;
+    const DIAS = ['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'];
+    let sessao = null; // { tipo:'balcao'|'colab', id }
+    let balcaoAtivo = null; // id operador no balcão
+    let colabLogado = null;
+    let pickBalcao = null;
+    let pickColab = null;
 
-    function cadastroPct(c) {
-      const req = CAMPOS.filter(f => f.req);
-      const ok = req.filter(f => String(c.cadastro[f.key] || '').trim().length > 0);
-      return Math.round((ok.length / req.length) * 100);
-    }
-    function cadastroCompleto(c) { return cadastroPct(c) === 100; }
-    function fmtDate() { return new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric' }); }
-    function fmtTime() { return new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }); }
-    function fmtDataHoje() {
-      const d = new Date();
-      return String(d.getDate()).padStart(2,'0') + '/' + String(d.getMonth()+1).padStart(2,'0');
-    }
-    function diaSemanaHoje() { return ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'][new Date().getDay()]; }
-
-    function show(id) {
-      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    function go(id) {
+      document.querySelectorAll('.mock-screen').forEach(s => s.classList.remove('active'));
       document.getElementById(id).classList.add('active');
       window.scrollTo(0, 0);
-      if (id === 's-quem') renderListaQuem();
-      if (id === 's-lancamento') renderLancamento();
+      if (id === 's-balcao') renderBalcao();
+      if (id === 's-colab-login') renderColabLogin();
+      if (id === 's-colab-hub') renderColabHub();
+      if (id === 's-ponto') renderPonto();
+      if (id === 's-metas') renderMetas();
+      if (id === 's-escala') renderEscala();
+      if (id === 's-banco') renderBanco();
+      if (id === 's-pagamento') renderPagamento();
+      if (id === 's-cadastro-form') goCadastroForm();
     }
 
-    function renderListaQuem() {
-      document.getElementById('lista-quem').innerHTML = Object.values(COLABS).map(c => {
-        const comp = cadastroCompleto(c);
-        const st = c.statusHoje === 'dentro' ? '<span class="badge b-ok">Dentro</span>' : '<span class="badge b-gray">Fora</span>';
-        const cad = comp ? '' : ' <span class="badge b-warn">Cadastro pendente</span>';
-        return `<button class="pick" onclick="abrirLancamento('${c.id}')">
-          <div class="av${c.owner ? ' owner' : ''}">${c.letra}</div>
-          <div><div class="pick-name">${c.label} ${st}${cad}</div>
-          <div class="pick-meta">${c.funcao} · turno ${c.turno}</div></div></button>`;
+    function fmtTime() { return new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}); }
+    function fmtDate() { return new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'short',year:'numeric'}); }
+    function fmtDataHoje() { const d=new Date(); return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0'); }
+    function diaSemanaHoje() { return DIAS[(new Date().getDay()+6)%7]; }
+    function cadastroPct(p) { const r=CAMPOS.filter(f=>f.req); return Math.round(r.filter(f=>String(p.cadastro[f.key]||'').trim()).length/r.length*100); }
+    function cadastroOk(p) { return cadastroPct(p)===100; }
+
+    function mkPinRow(containerId, onDone) {
+      const el = document.getElementById(containerId);
+      el.innerHTML = '';
+      const inputs = [];
+      for (let i=0;i<4;i++) {
+        const inp = document.createElement('input');
+        inp.maxLength = 1; inp.inputMode = 'numeric'; inp.type = 'password';
+        inp.addEventListener('input', () => {
+          if (inp.value && i<3) inputs[i+1].focus();
+          if (inputs.every(x=>x.value)) onDone && onDone(readPin(inputs));
+        });
+        inp.addEventListener('keydown', e => { if (e.key==='Backspace' && !inp.value && i>0) inputs[i-1].focus(); });
+        el.appendChild(inp); inputs.push(inp);
+      }
+      return inputs;
+    }
+    function readPin(inputs) { return inputs.map(i=>i.value).join(''); }
+    function clearPin(containerId) { document.getElementById(containerId).querySelectorAll('input').forEach(i=>{i.value='';}); }
+
+    /* ── BALCÃO ── */
+    function renderBalcao() {
+      const lock = document.getElementById('balcao-lock');
+      const ok = document.getElementById('balcao-ok');
+      const pinWrap = document.getElementById('balcao-pin-wrap');
+      ok.hidden = true; pinWrap.hidden = true; pickBalcao = null;
+      if (balcaoAtivo) {
+        lock.hidden = false;
+        lock.textContent = '🔒 ' + PESSOAS[balcaoAtivo].label + ' já está no balcão. Só um operador por vez — peça para encerrar o turno antes de entrar.';
+      } else lock.hidden = true;
+      document.getElementById('balcao-picks').innerHTML = Object.values(PESSOAS).map(p =>
+        `<button class="mock-pick" onclick="balcaoPick('${p.id}')" ${balcaoAtivo && balcaoAtivo!==p.id?'disabled style="opacity:.45"':''}>
+          <div class="mock-av${p.owner?' owner':''}">${p.letra}</div>
+          <div><div style="font-weight:900">${p.label}</div><div style="font-size:12px;color:var(--txt3)">${p.funcao}</div></div>
+        </button>`).join('');
+    }
+    function balcaoPick(id) {
+      if (balcaoAtivo && balcaoAtivo!==id) return;
+      pickBalcao = id;
+      document.getElementById('balcao-pin-wrap').hidden = false;
+      document.getElementById('balcao-pin-name').textContent = PESSOAS[id].label;
+      document.getElementById('balcao-err').hidden = true;
+      clearPin('balcao-pin');
+      mkPinRow('balcao-pin');
+      document.getElementById('balcao-pin').querySelector('input')?.focus();
+    }
+    function balcaoCancelPin() { pickBalcao=null; document.getElementById('balcao-pin-wrap').hidden=true; }
+    function balcaoEntrar() {
+      const pin = readPin(document.getElementById('balcao-pin').querySelectorAll('input'));
+      const p = PESSOAS[pickBalcao];
+      if (pin !== p.pinBalcao) {
+        const err = document.getElementById('balcao-err');
+        err.textContent = 'PIN incorreto.'; err.hidden = false; return;
+      }
+      balcaoAtivo = pickBalcao;
+      document.getElementById('balcao-pin-wrap').hidden = true;
+      document.getElementById('balcao-picks').innerHTML = '';
+      const ok = document.getElementById('balcao-ok');
+      ok.hidden = false;
+      ok.innerHTML = '✓ <strong>'+p.label+'</strong> entrou no balcão. Fluxo real abriria o app de locações.<br><button class="mock-btn sec" style="margin-top:10px" onclick="balcaoSair()">Simular saída do turno</button>';
+      renderBalcao();
+    }
+    function balcaoSair() { balcaoAtivo=null; renderBalcao(); document.getElementById('balcao-ok').hidden=true; }
+
+    /* ── COLABORADOR LOGIN ── */
+    function renderColabLogin() {
+      pickColab = null;
+      document.getElementById('colab-pin-wrap').hidden = true;
+      document.getElementById('colab-picks').innerHTML = Object.values(PESSOAS).map(p =>
+        `<button class="mock-pick" onclick="colabPick('${p.id}')">
+          <div class="mock-av${p.owner?' owner':''}">${p.letra}</div>
+          <div><div style="font-weight:900">${p.label}</div><div style="font-size:12px;color:var(--txt3)">${p.funcao}</div></div>
+        </button>`).join('');
+    }
+    function colabPick(id) {
+      pickColab = id;
+      document.getElementById('colab-pin-wrap').hidden = false;
+      document.getElementById('colab-pin-name').textContent = PESSOAS[id].label;
+      document.getElementById('colab-err').hidden = true;
+      clearPin('colab-pin');
+      mkPinRow('colab-pin');
+    }
+    function colabCancelPin() { pickColab=null; document.getElementById('colab-pin-wrap').hidden=true; }
+    function colabEntrar() {
+      const pin = readPin(document.getElementById('colab-pin').querySelectorAll('input'));
+      const p = PESSOAS[pickColab];
+      if (pin !== p.pin) {
+        const err = document.getElementById('colab-err');
+        err.textContent = 'PIN incorreto.'; err.hidden = false; return;
+      }
+      colabLogado = pickColab;
+      go('s-colab-hub');
+    }
+    function colabSair() { colabLogado=null; go('s-home'); }
+
+    function renderColabHub() {
+      const p = PESSOAS[colabLogado];
+      document.getElementById('hub-av').textContent = p.letra;
+      document.getElementById('hub-av').className = 'mock-av'+(p.owner?' owner':'');
+      document.getElementById('hub-nome').textContent = p.label;
+      document.getElementById('hub-funcao').textContent = p.funcao+' · turno '+p.turno;
+      const st = document.getElementById('hub-status');
+      st.textContent = p.statusHoje==='dentro'?'Dentro':'Fora';
+      st.className = 'mock-badge '+(p.statusHoje==='dentro'?'ok':'gray');
+    }
+
+    function abrirModulo(mod) {
+      if (mod==='ponto') {
+        const p = PESSOAS[colabLogado];
+        if (!cadastroOk(p)) { showBloqueio(); return; }
+        go('s-ponto');
+      } else if (mod==='metas') go('s-metas');
+      else if (mod==='escala') go('s-escala');
+      else if (mod==='banco') go('s-banco');
+      else if (mod==='pagamento') go('s-pagamento');
+    }
+
+    function showBloqueio() {
+      const p = PESSOAS[colabLogado];
+      const pct = cadastroPct(p);
+      document.getElementById('bloq-lead').textContent = p.label+', complete o cadastro para registrar ponto.';
+      document.getElementById('bloq-pct').textContent = pct+'%';
+      document.getElementById('bloq-bar').style.width = pct+'%';
+      document.getElementById('bloq-list').innerHTML = CAMPOS.filter(f=>f.req).map(f => {
+        const ok = String(p.cadastro[f.key]||'').trim().length>0;
+        return `<li><span>${f.label}</span><span style="color:${ok?'var(--green)':'var(--orange)'}">${ok?'✓':'Pendente'}</span></li>`;
       }).join('');
+      go('s-cadastro-bloq');
     }
 
-    function abrirLancamento(id) {
-      currentId = id;
-      const c = COLABS[id];
-      if (!cadastroCompleto(c)) { showBloqueio(id); return; }
-      document.getElementById('flashOk').classList.remove('show');
-      show('s-lancamento');
-    }
-
-    function showBloqueio(id) {
-      currentId = id;
-      const c = COLABS[id];
-      const pct = cadastroPct(c);
-      document.getElementById('bloqueioNome').textContent = c.label + ', complete o cadastro para lançar ponto.';
-      document.getElementById('bloqueioPct').textContent = pct + '%';
-      document.getElementById('bloqueioBar').style.width = pct + '%';
-      document.getElementById('bloqueioLista').innerHTML = CAMPOS.filter(f => f.req).map(f => {
-        const ok = String(c.cadastro[f.key] || '').trim().length > 0;
-        return `<li><span>${f.label}</span><span style="color:${ok ? 'var(--green)' : 'var(--orange)'}">${ok ? '✓' : 'Pendente'}</span></li>`;
+    function goCadastroForm() {
+      const p = PESSOAS[colabLogado];
+      document.getElementById('cad-titulo').textContent = 'Cadastro — '+p.label;
+      document.getElementById('cad-form').innerHTML = CAMPOS.map(f => {
+        const v = p.cadastro[f.key]||'';
+        return `<div class="mock-field"><label>${f.label}${f.req?' *':''}</label><input type="${f.type||'text'}" id="cad-${f.key}" value="${v}"></div>`;
       }).join('');
-      show('s-bloqueio');
-    }
-
-    function showCadastro() {
-      const c = COLABS[currentId];
-      document.getElementById('cadTitulo').textContent = 'Cadastro — ' + c.label;
-      document.getElementById('cadForm').innerHTML = CAMPOS.map(f => {
-        const v = c.cadastro[f.key] || '';
-        return `<div class="field"><label>${f.label}${f.req ? ' <span class="req">*</span>' : ''}</label>
-          <input type="${f.type || 'text'}" id="cad-${f.key}" value="${v}" class="${f.req && !v ? 'missing' : ''}"></div>`;
-      }).join('');
-      show('s-cadastro');
     }
 
     function salvarCadastro() {
-      const c = COLABS[currentId];
-      CAMPOS.forEach(f => {
-        const el = document.getElementById('cad-' + f.key);
-        if (el) c.cadastro[f.key] = el.value.trim();
-      });
-      if (!cadastroCompleto(c)) {
-        alert('Preencha todos os campos obrigatórios (*).');
-        showCadastro();
-        return;
-      }
-      abrirLancamento(currentId);
+      const p = PESSOAS[colabLogado];
+      CAMPOS.forEach(f => { const el=document.getElementById('cad-'+f.key); if(el) p.cadastro[f.key]=el.value.trim(); });
+      if (!cadastroOk(p)) { alert('Preencha todos os campos obrigatórios (*).'); return; }
+      go('s-ponto');
     }
 
-    function renderEspelho(id) {
-      const c = COLABS[id];
+    /* ── PONTO ── */
+    function renderPonto() {
+      const p = PESSOAS[colabLogado];
+      document.getElementById('ponto-av').textContent = p.letra;
+      document.getElementById('ponto-av').className = 'mock-av'+(p.owner?' owner':'');
+      document.getElementById('ponto-nome').textContent = p.label;
+      document.getElementById('ponto-meta').textContent = p.funcao+' · turno '+p.turno;
+      const st = document.getElementById('ponto-st');
+      st.textContent = p.statusHoje==='dentro'?'Dentro':'Fora';
+      st.className = 'mock-badge '+(p.statusHoje==='dentro'?'ok':'gray');
+      document.getElementById('ponto-clock').textContent = fmtTime();
+      document.getElementById('ponto-data').textContent = fmtDate();
+      document.getElementById('ponto-btn').textContent = p.statusHoje!=='dentro'?'Confirmar entrada':'Confirmar saída';
+      document.getElementById('ponto-folha').innerHTML = renderFolha(p);
+      document.getElementById('ponto-flash').hidden = true;
+    }
+
+    function renderFolha(p) {
       const hoje = fmtDataHoje();
-      const rows = c.folha.map(r => {
-        const cls = r.data === hoje ? ' class="hoje"' : '';
-        const sitCls = r.sit === 'OK' ? 'sit-ok' : r.sit === 'FALTA' ? 'sit-falta' : 'sit-ab';
-        return `<tr${cls}><td>${r.data}</td><td>${r.dia}</td><td>${r.entrada}</td><td>${r.saida}</td><td>${r.horas}</td><td class="${sitCls}">${r.sit}</td></tr>`;
+      const rows = p.folha.map(r => {
+        const cls = r.data===hoje?' class="hoje"':'';
+        return `<tr${cls}><td>${r.data}</td><td>${r.dia}</td><td>${r.entrada}</td><td>${r.saida}</td><td>${r.horas}</td><td>${r.sit}</td></tr>`;
       }).join('');
-      return `
-        <div class="espelho-head">
-          <h2>Espelho de ponto eletrônico</h2>
-          <div class="espelho-meta">
-            <div><span>Empresa:</span> MOVI KIDS</div>
-            <div><span>Período:</span> Jun/2026</div>
-            <div><span>Colaborador:</span> ${c.cadastro.nomeCompleto || c.label}</div>
-            <div><span>CPF:</span> ${c.cadastro.cpf || '—'}</div>
-          </div>
-        </div>
-        <div class="espelho-wrap">
-          <table class="espelho">
-            <thead><tr><th>Data</th><th>Dia</th><th>Entrada</th><th>Saída</th><th>Total</th><th>Sit.</th></tr></thead>
-            <tbody>${rows || '<tr><td colspan="6">Nenhum registro ainda</td></tr>'}</tbody>
-          </table>
-        </div>
-        <div class="espelho-foot">Linha azul = hoje · atualiza ao confirmar entrada/saída</div>`;
-    }
-
-    function renderLancamento() {
-      const c = COLABS[currentId];
-      if (!c) return;
-      const isEntrada = c.statusHoje !== 'dentro';
-      document.getElementById('lancAv').textContent = c.letra;
-      document.getElementById('lancAv').className = 'av' + (c.owner ? ' owner' : '');
-      document.getElementById('lancNome').textContent = c.label;
-      document.getElementById('lancMeta').textContent = c.funcao + ' · turno ' + c.turno;
-      const stEl = document.getElementById('lancStatus');
-      stEl.textContent = c.statusHoje === 'dentro' ? 'Dentro' : 'Fora';
-      stEl.className = 'badge ' + (c.statusHoje === 'dentro' ? 'b-ok' : 'b-gray');
-      document.getElementById('lancClock').textContent = fmtTime();
-      document.getElementById('lancData').textContent = fmtDate();
-      document.getElementById('lancBtn').textContent = isEntrada ? 'Confirmar entrada' : 'Confirmar saída';
-      document.getElementById('lancFolha').innerHTML = renderEspelho(currentId);
+      return `<div class="mock-card" style="overflow-x:auto"><table class="mock-table">
+        <thead><tr><th>Data</th><th>Dia</th><th>Entrada</th><th>Saída</th><th>Total</th><th>Sit.</th></tr></thead>
+        <tbody>${rows||'<tr><td colspan="6">Nenhum registro ainda</td></tr>'}</tbody></table></div>`;
     }
 
     function confirmarPonto() {
-      const c = COLABS[currentId];
-      const t = fmtTime();
-      const hoje = fmtDataHoje();
-      const dia = diaSemanaHoje();
-      let row = c.folha.find(r => r.data === hoje);
-      if (!row) {
-        row = { data: hoje, dia, entrada: '—', saida: '—', horas: '—', sit: 'ABERTO' };
-        c.folha.unshift(row);
-      }
-      const isEntrada = c.statusHoje !== 'dentro';
-      let msg;
-      if (isEntrada) {
-        row.entrada = t;
-        c.statusHoje = 'dentro';
-        msg = 'Entrada registrada às ' + t + ' — veja na folha abaixo.';
+      const p = PESSOAS[colabLogado];
+      const t = fmtTime(), hoje = fmtDataHoje(), dia = diaSemanaHoje();
+      let row = p.folha.find(r=>r.data===hoje);
+      if (!row) { row={data:hoje,dia,entrada:'—',saida:'—',horas:'—',sit:'ABERTO'}; p.folha.unshift(row); }
+      const flash = document.getElementById('ponto-flash');
+      if (p.statusHoje!=='dentro') {
+        row.entrada=t; p.statusHoje='dentro';
+        flash.textContent='✓ Entrada registrada às '+t; flash.hidden=false;
       } else {
-        row.saida = t;
-        c.statusHoje = 'fora';
-        row.sit = 'OK';
-        if (row.entrada !== '—') {
-          const [eh, em] = row.entrada.split(':').map(Number);
-          const [sh, sm] = t.split(':').map(Number);
-          let mins = (sh * 60 + sm) - (eh * 60 + em);
-          if (mins < 0) mins += 1440;
-          row.horas = Math.floor(mins/60) + 'h' + String(mins%60).padStart(2,'0');
-        }
-        msg = 'Saída registrada às ' + t + ' — veja na folha abaixo.';
+        row.saida=t; p.statusHoje='fora'; row.sit='OK';
+        flash.textContent='✓ Saída registrada às '+t; flash.hidden=false;
       }
-      const flash = document.getElementById('flashOk');
-      flash.textContent = '✓ ' + msg;
-      flash.classList.add('show');
-      renderLancamento();
-      document.getElementById('lancFolha').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      renderPonto();
     }
 
-    function tick() {
-      const t = fmtTime();
-      const el = document.getElementById('liveClock');
-      if (el) el.textContent = t;
-      const el2 = document.getElementById('liveDate');
-      if (el2) el2.textContent = fmtDate();
-      const el3 = document.getElementById('lancClock');
-      if (el3) el3.textContent = t;
-    }
-    tick(); setInterval(tick, 1000);
-    renderListaQuem();
-
-    (function urlCheck() {
-      const h = location.hostname;
-      if (h && h !== 'ribocg-a11y.github.io' && location.protocol !== 'file:') {
-        document.getElementById('url-warn').hidden = false;
+    /* ── MÓDULOS PESSOAIS ── */
+    function renderMetas() {
+      const p = PESSOAS[colabLogado];
+      let html;
+      if (!p.meta) {
+        html = '<div class="mock-note info">Milena (sócia) não tem meta de locações por turno.</div>';
+      } else {
+        const pct = Math.min(100, Math.round(p.meta.atual/p.meta.alvo*100));
+        html = `<div class="mock-card"><div class="mock-kpi">${p.meta.atual}/${p.meta.alvo}</div><div class="mock-kpi-lbl">Locações hoje · turno ${p.turno}</div>
+          <div class="mock-prog" style="margin-top:12px"><div class="mock-prog-fill" style="width:${pct}%"></div></div>
+          <p style="font-size:13px;font-weight:700;margin-top:10px;color:var(--txt2)">Bônus R$ ${p.meta.bonus} com ${p.meta.bonusMin}+ locações no turno.</p></div>`;
       }
-    })();
+      document.getElementById('metas-body').innerHTML = html;
+    }
+
+    function renderEscala() {
+      const p = PESSOAS[colabLogado];
+      const rows = DIAS.map((d,i)=>`<tr><td>${d}</td><td>${p.escala[i]}</td></tr>`).join('');
+      document.getElementById('escala-body').innerHTML = `<div class="mock-card"><table class="mock-table"><thead><tr><th>Dia</th><th>Turno</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+    }
+
+    function renderBanco() {
+      const p = PESSOAS[colabLogado];
+      const cor = p.bancoHoras.startsWith('-')?'var(--red)':'var(--green)';
+      document.getElementById('banco-body').innerHTML = `<div class="mock-card"><div class="mock-kpi" style="color:${cor}">${p.bancoHoras}</div><div class="mock-kpi-lbl">Saldo acumulado · só ${p.label}</div></div>`;
+    }
+
+    function renderPagamento() {
+      const p = PESSOAS[colabLogado];
+      const pg = p.pagamento;
+      document.getElementById('pag-body').innerHTML = `<div class="mock-card">
+        <div style="font-size:12px;font-weight:800;color:var(--txt3);margin-bottom:8px">${pg.obs}</div>
+        <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-weight:700"><span>Base</span><span>R$ ${pg.base.toLocaleString('pt-BR')}</span></div>
+        <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-weight:700"><span>Bônus metas</span><span>R$ ${pg.bonus.toLocaleString('pt-BR')}</span></div>
+        <div style="display:flex;justify-content:space-between;padding:12px 0;font-weight:900;font-size:18px;color:var(--blue)"><span>Total</span><span>R$ ${pg.total.toLocaleString('pt-BR')}</span></div>
+      </div>`;
+    }
+
+    /* ── ADM ── */
+    function admEntrar() {
+      const pin = readPin(document.getElementById('adm-pin').querySelectorAll('input'));
+      if (pin !== '1416') {
+        const err = document.getElementById('adm-err');
+        err.textContent = 'PIN administrativo incorreto.'; err.hidden = false; return;
+      }
+      go('s-adm-hub');
+    }
+
+    function demoAlertaPonto() {
+      document.getElementById('alert-sub').textContent = 'Raykelly não registrou a entrada — tolerância de 20 min excedida (turno 14h–22h).';
+      document.getElementById('mock-adm-alert').classList.add('show');
+    }
+    function fecharAlerta() { document.getElementById('mock-adm-alert').classList.remove('show'); }
+
+    /* ── INIT ── */
+    mkPinRow('adm-pin');
+    setInterval(() => {
+      const el = document.getElementById('ponto-clock');
+      if (el && document.getElementById('s-ponto').classList.contains('active')) el.textContent = fmtTime();
+    }, 1000);
+
+    if (location.hostname && location.hostname !== 'ribocg-a11y.github.io' && location.protocol !== 'file:') {
+      document.getElementById('url-warn').hidden = false;
+    }
   </script>
 </body>
 </html>

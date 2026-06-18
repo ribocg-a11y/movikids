@@ -61,7 +61,7 @@
   </style>
 </head>
 <body>
-  <div class="banner">MOCKUP · <strong>Visão gestor (ADM)</strong> · PIN 1416 · Milena · não é produção</div>
+  <div class="banner">MOCKUP · <strong>Visão gestor (ADM)</strong> · PIN 1416 · alertas ponto 20 min · v3.0</div>
   <div class="mobile-nav" id="mob"></div>
   <div class="layout">
     <aside class="sidebar">
@@ -86,8 +86,13 @@
           <div class="card"><div class="kpi-val" style="color:var(--green)">2/2</div><div class="kpi-lbl">Presença hoje</div></div>
           <div class="card"><div class="kpi-val" style="color:var(--orange)">1</div><div class="kpi-lbl">Dias c/ bônus (mês)</div></div>
         </div>
+        <div class="card" style="border-color:#EF9A9A;background:#FFEBEE">
+          <h3 style="color:#C62828">⚠ Alertas de ponto (tolerância 20 min)</h3>
+          <p style="font-size:13px;font-weight:700;color:var(--txt2);margin-bottom:10px">Esquecimento de entrada/saída dispara alerta em tela cheia — mesmo padrão visual dos minutos dos carrinhos.</p>
+          <div class="person-row"><div class="av">R</div><div style="flex:1"><strong>Raykelly</strong> · entrada não registrada · turno 14h</div><span class="badge b-o">+22 min</span></div>
+          <button type="button" class="nav-btn" style="margin-top:10px;background:var(--blue);width:auto;display:inline-block" onclick="alert('Mockup: modal alert-modal danger fullscreen (ver ponto-mockup.html → ADM → Simular alerta)')">Ver como aparece no tablet ADM</button>
+        </div>
         <div class="card">
-          <h3>Equipe — terça 17/06</h3>
           <div class="person-row"><div class="av owner">M</div><div style="flex:1"><strong>Milena</strong> · 10–14h · ponto OK</div><span class="badge b-g">Presente</span></div>
           <div class="person-row"><div class="av">R</div><div style="flex:1"><strong>Raykelly</strong> · folga ter</div><span class="badge b-gr">Folga</span></div>
           <div class="person-row"><div class="av">C</div><div style="flex:1"><strong>Clara</strong> · cadastro pendente</div><span class="badge b-o">Pendente</span></div>
@@ -155,7 +160,7 @@
       </section>
     </main>
   </div>
-  <div class="footer-link"><a href="gestao-pessoas-mockup-colaborador.html">← Ver mockup do colaborador (tablet ponto)</a></div>
+  <div class="footer-link"><a href="../ponto-mockup.html">← Mockup hub tablet (v3.0)</a></div>
   <script>
     const screens = ['hub','escala','mes','ficha','ops'];
     const labels = { hub:'Geral', escala:'Escala', mes:'Folha', ficha:'Ficha', ops:'Ops' };
