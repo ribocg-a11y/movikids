@@ -908,7 +908,7 @@
       loadOperadores().catch(() => renderOpList(false));
     });
     document.getElementById('mk-hub-colab')?.addEventListener('click', () => {
-      const v = window.MK_VERSION || '1.8.40';
+      const v = window.MK_VERSION || '1.8.41';
       location.href = 'gestao-pessoas.html?v=' + encodeURIComponent(v) + '&_=' + Date.now();
     });
     document.getElementById('mk-hub-admin')?.addEventListener('click', () => {
