@@ -1,24 +1,27 @@
 <!DOCTYPE html>
-<html lang="pt-BR" class="gp-prod">
+<html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <meta name="theme-color" content="#1565C0">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <title>Movi Kids — Colaboradores</title>
-  <script src="mk-canonical-host.js?v=1.8.48"></script>
+  <script src="mk-canonical-host.js?v=1.8.49"></script>
   <script>window.MK_GP_PROD = true;</script>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="mk-design.css?v=1.8.48">
-  <link rel="stylesheet" href="mk-app.css?v=1.8.48">
-  <link rel="stylesheet" href="mk-gestao-pessoas.css?v=1.8.48">
-  <script src="mk-version.js?v=1.8.48"></script>
-  <script src="mk-globals.js?v=1.8.48"></script>
-  <script src="mk-api.js?v=1.8.48"></script>
-  <script src="mk-gestao-pessoas.js?v=1.8.48"></script>
+  <link rel="stylesheet" href="mk-design.css?v=1.8.49">
+  <link rel="stylesheet" href="mk-app.css?v=1.8.49">
+  <link rel="stylesheet" href="mk-gestao-pessoas.css?v=1.8.49">
+  <script src="mk-version.js?v=1.8.49"></script>
+  <script src="mk-globals.js?v=1.8.49"></script>
+  <script src="mk-api.js?v=1.8.49"></script>
+  <script src="mk-gestao-pessoas.js?v=1.8.49"></script>
 </head>
-<body class="gp-prod">
-  <!-- Login colaborador — mesmo DNA do mk-auth-gate (balcão/admin) -->
+<body>
+  <!--
+    AUTH: cópia literal do #mk-auth-gate (index.html · imagem 2).
+    Não customizar classes/fontes aqui — só mk-app.css #gp-auth-gate.
+  -->
   <div id="gp-auth-gate">
     <div class="mk-auth-inner">
       <section id="s-colab-login" class="mk-auth-step">
@@ -29,7 +32,7 @@
         </div>
         <span class="mk-step-tag">Passo 1 de 2</span>
         <h2>Quem está acessando?</h2>
-        <p class="mk-hint">Escolha seu nome. Na próxima etapa você digita seu PIN e verá <strong>somente seus dados</strong>.</p>
+        <p class="mk-hint">Escolha quem está acessando. Na próxima etapa você digita seu PIN.</p>
         <div class="mk-op-select-wrap">
           <label class="form-label" for="colab-select">Colaborador</label>
           <select id="colab-select" class="mk-op-select" aria-label="Selecionar colaborador">
@@ -42,8 +45,9 @@
       <section id="s-colab-pin" class="mk-auth-step hidden">
         <div class="mk-logo">
           <div class="mk-logo-main">🚗 Movi <span>Kids</span></div>
+          <div class="mk-logo-sub">Golden Shopping Calhau · Colaboradores</div>
         </div>
-        <span class="mk-step-tag">Passo 2 de 2</span>
+        <span class="mk-step-tag">Colaborador</span>
         <h2>Digite seu PIN</h2>
         <p class="mk-hint">Colaborador: <b id="colab-pin-name"></b></p>
         <div class="mk-pin-row" id="colab-pin"></div>
@@ -56,7 +60,7 @@
     </div>
   </div>
 
-  <!-- Painel colaborador (após login) -->
+  <!-- Painel pós-login — mock-shell aprovado + mk-design (imagem 3) -->
   <div id="gp-app" style="display:none">
     <div class="gp-app-shell">
       <section class="mock-screen" id="s-colab-hub">
@@ -163,6 +167,6 @@
     </div>
   </div>
 
-  <script src="mk-gestao-pessoas-ui.js?v=1.8.48"></script>
+  <script src="mk-gestao-pessoas-ui.js?v=1.8.49"></script>
 </body>
 </html>

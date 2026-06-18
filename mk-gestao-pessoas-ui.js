@@ -96,7 +96,9 @@
 
     function showAuthStep(stepId) {
       document.querySelectorAll('#gp-auth-gate .mk-auth-step').forEach(function (el) {
-        el.classList.toggle('hidden', el.id !== stepId);
+        var on = el.id === stepId;
+        el.classList.toggle('hidden', !on);
+        el.style.display = on ? '' : 'none';
       });
     }
 

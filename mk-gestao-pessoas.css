@@ -1,6 +1,9 @@
-/* MOVI KIDS — Gestão de Pessoas · painel pós-login (#gp-app) */
-html.gp-prod,
-html.gp-prod body {
+/*
+ * MOVI KIDS — Gestão de Pessoas · painel pós-login (#gp-app)
+ * AUTH (#gp-auth-gate): NÃO estilizar aqui — DNA em mk-app.css (igual #mk-auth-gate).
+ * Referência: index.html mk-step-login-pin + mock-shell aprovado FASE 15.
+ */
+body {
   margin: 0;
   min-height: 100vh;
   font-family: Nunito, system-ui, sans-serif;
@@ -10,15 +13,13 @@ html.gp-prod body {
 
 #gp-app {
   min-height: 100dvh;
-  background: linear-gradient(165deg, #e3f2fd 0%, var(--bg) 42%, #fff8e1 100%);
+  background: var(--bg);
 }
 
 #gp-app .gp-app-shell {
-  width: 100%;
-  max-width: min(720px, 100%);
+  max-width: 720px;
   margin: 0 auto;
-  min-height: 100dvh;
-  padding: 16px 16px 40px;
+  padding: 16px 14px 80px;
   box-sizing: border-box;
 }
 
@@ -30,22 +31,22 @@ html.gp-prod body {
   to { opacity: 1; transform: none; }
 }
 
-.gp-prod .mock-h1 {
+#gp-app .mock-h1 {
   font-family: 'Fredoka One', cursive;
   font-size: 22px;
   color: var(--blue-dk);
   margin-bottom: 6px;
 }
 
-.gp-prod .mock-lead {
-  font-size: 13px;
+#gp-app .mock-lead {
+  font-size: 14px;
   color: var(--txt2);
   font-weight: 700;
-  line-height: 1.45;
-  margin-bottom: 14px;
+  margin-bottom: 16px;
+  line-height: 1.5;
 }
 
-.gp-prod .mock-back {
+#gp-app .mock-back {
   background: none;
   border: none;
   color: var(--blue);
@@ -57,7 +58,7 @@ html.gp-prod body {
   padding: 0;
 }
 
-.gp-prod .mock-user-bar {
+#gp-app .mock-user-bar {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -69,11 +70,11 @@ html.gp-prod body {
   box-shadow: var(--mk-shadow-1);
 }
 
-.gp-prod .gp-user-meta { flex: 1; min-width: 0; }
-.gp-prod .gp-user-name { font-weight: 900; font-size: 17px; }
-.gp-prod .gp-user-sub { font-size: 12px; color: var(--txt3); font-weight: 700; }
+#gp-app .gp-user-meta { flex: 1; min-width: 0; }
+#gp-app .gp-user-name { font-weight: 900; font-size: 17px; }
+#gp-app .gp-user-sub { font-size: 12px; color: var(--txt3); font-weight: 700; }
 
-.gp-prod .mock-av {
+#gp-app .mock-av {
   width: 48px;
   height: 48px;
   border-radius: 50%;
@@ -87,36 +88,12 @@ html.gp-prod body {
   flex-shrink: 0;
 }
 
-.gp-prod .mock-tiles .mk-hub-doors {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 12px;
-  margin-bottom: 18px;
+#gp-app .mock-tiles-5 .mk-hub-doors { grid-template-columns: repeat(2, 1fr); }
+@media (min-width: 560px) {
+  #gp-app .mock-tiles-5 .mk-hub-doors { grid-template-columns: repeat(3, 1fr); }
 }
 
-@media (min-width: 480px) {
-  .gp-prod .mock-tiles .mk-hub-doors { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-}
-
-@media (min-width: 640px) {
-  .gp-prod .mock-tiles .mk-hub-doors { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-}
-
-.gp-prod .mock-tiles .mk-hub-door {
-  width: 100%;
-  min-height: 128px;
-  box-sizing: border-box;
-  align-items: center;
-  text-align: center;
-  justify-content: center;
-  padding: 18px 12px;
-  font: inherit;
-  cursor: pointer;
-}
-
-.gp-prod .mock-tiles .mk-hub-door-icon { font-size: 36px; margin-bottom: 6px; line-height: 1; }
-
-.gp-prod .mock-note {
+#gp-app .mock-note {
   font-size: 12px;
   font-weight: 700;
   padding: 12px;
@@ -125,53 +102,11 @@ html.gp-prod body {
   margin-bottom: 12px;
 }
 
-.gp-prod .mock-note.info { background: #E3F2FD; border: 1px solid #90CAF9; color: #1565C0; }
-.gp-prod .mock-note.ok { background: #E8F5E9; border: 1px solid #A5D6A7; color: var(--green); }
-.gp-prod .mock-note.err { background: var(--red-lt, #FFEBEE); border: 1px solid var(--red); color: var(--red); }
+#gp-app .mock-note.info { background: #E3F2FD; border: 1px solid #90CAF9; color: #1565C0; }
+#gp-app .mock-note.ok { background: #E8F5E9; border: 1px solid #A5D6A7; color: var(--green); }
+#gp-app .mock-note.err { background: var(--red-lt, #FFEBEE); border: 1px solid var(--red); color: var(--red); }
 
-.gp-prod .mk-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 52px;
-  border: none;
-  border-radius: 12px;
-  font: inherit;
-  font-weight: 900;
-  font-size: 16px;
-  cursor: pointer;
-  margin-top: 8px;
-  background: var(--blue);
-  color: #fff;
-}
-
-.gp-prod .mock-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 52px;
-  padding: 0 16px;
-  border: none;
-  border-radius: 12px;
-  font: inherit;
-  font-weight: 900;
-  font-size: 16px;
-  cursor: pointer;
-  margin-top: 8px;
-  margin-bottom: 8px;
-  background: var(--blue);
-  color: #fff;
-}
-
-.gp-prod .mock-btn.sec {
-  background: #fff;
-  border: 2px solid var(--blue);
-  color: var(--blue);
-}
-
-.gp-prod .mock-card {
+#gp-app .mock-card {
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: var(--mk-radius, 16px);
@@ -180,7 +115,7 @@ html.gp-prod body {
   box-shadow: var(--mk-shadow-1);
 }
 
-.gp-prod .gp-prog-head {
+#gp-app .gp-prog-head {
   display: flex;
   justify-content: space-between;
   font-size: 12px;
@@ -188,10 +123,10 @@ html.gp-prod body {
   margin-bottom: 4px;
 }
 
-.gp-prod .gp-prog-lbl { color: var(--txt3); }
-.gp-prod .gp-prog-val { color: var(--blue); }
+#gp-app .gp-prog-lbl { color: var(--txt3); }
+#gp-app .gp-prog-val { color: var(--blue); }
 
-.gp-prod .gp-ponto-data {
+#gp-app .gp-ponto-data {
   text-align: center;
   font-size: 13px;
   color: var(--txt3);
@@ -199,20 +134,20 @@ html.gp-prod body {
   margin-bottom: 12px;
 }
 
-.gp-prod .mock-kpi { font-family: 'Fredoka One', cursive; font-size: 32px; color: var(--blue); }
-.gp-prod .mock-kpi-lbl { font-size: 10px; font-weight: 800; color: var(--txt3); text-transform: uppercase; }
-.gp-prod .mock-badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 10px; font-weight: 800; }
-.gp-prod .mock-badge.ok { background: #E8F5E9; color: var(--green); }
-.gp-prod .mock-badge.gray { background: #ECEFF1; color: var(--txt3); }
-.gp-prod .mock-clock { font-family: 'Fredoka One', cursive; font-size: 44px; color: var(--blue); text-align: center; }
-.gp-prod .mock-table { width: 100%; border-collapse: collapse; font-size: 12px; font-weight: 700; }
-.gp-prod .mock-table th,
-.gp-prod .mock-table td { padding: 8px 6px; border: 1px solid var(--border); text-align: center; }
-.gp-prod .mock-table th { background: #F8FAFC; font-size: 10px; text-transform: uppercase; color: var(--txt3); }
-.gp-prod .mock-table tr.hoje { background: #E8F2FF; font-weight: 900; }
-.gp-prod .mock-prog { height: 8px; background: var(--border); border-radius: 999px; overflow: hidden; margin: 10px 0; }
-.gp-prod .mock-prog-fill { height: 100%; background: var(--blue); border-radius: 999px; }
-.gp-prod .mock-sec {
+#gp-app .mock-kpi { font-family: 'Fredoka One', cursive; font-size: 32px; color: var(--blue); }
+#gp-app .mock-kpi-lbl { font-size: 10px; font-weight: 800; color: var(--txt3); text-transform: uppercase; }
+#gp-app .mock-badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 10px; font-weight: 800; }
+#gp-app .mock-badge.ok { background: #E8F5E9; color: var(--green); }
+#gp-app .mock-badge.gray { background: #ECEFF1; color: var(--txt3); }
+#gp-app .mock-clock { font-family: 'Fredoka One', cursive; font-size: 44px; color: var(--blue); text-align: center; }
+#gp-app .mock-table { width: 100%; border-collapse: collapse; font-size: 12px; font-weight: 700; }
+#gp-app .mock-table th,
+#gp-app .mock-table td { padding: 8px 6px; border: 1px solid var(--border); text-align: center; }
+#gp-app .mock-table th { background: #F8FAFC; font-size: 10px; text-transform: uppercase; color: var(--txt3); }
+#gp-app .mock-table tr.hoje { background: #E8F2FF; font-weight: 900; }
+#gp-app .mock-prog { height: 8px; background: var(--border); border-radius: 999px; overflow: hidden; margin: 10px 0; }
+#gp-app .mock-prog-fill { height: 100%; background: var(--blue); border-radius: 999px; }
+#gp-app .mock-sec {
   font-size: 11px;
   font-weight: 900;
   color: var(--txt3);
@@ -223,8 +158,8 @@ html.gp-prod body {
   border-top: 2px solid var(--border);
 }
 
-.gp-prod .mock-field { margin-bottom: 10px; }
-.gp-prod .mock-field label {
+#gp-app .mock-field { margin-bottom: 10px; }
+#gp-app .mock-field label {
   display: block;
   font-size: 11px;
   font-weight: 800;
@@ -233,7 +168,7 @@ html.gp-prod body {
   margin-bottom: 4px;
 }
 
-.gp-prod .mock-field input {
+#gp-app .mock-field input {
   width: 100%;
   padding: 11px 12px;
   border: 1px solid var(--border);
@@ -243,8 +178,8 @@ html.gp-prod body {
   box-sizing: border-box;
 }
 
-.gp-prod .mock-checklist { list-style: none; margin: 0; padding: 0; }
-.gp-prod .mock-checklist li {
+#gp-app .mock-checklist { list-style: none; margin: 0; padding: 0; }
+#gp-app .mock-checklist li {
   font-size: 13px;
   font-weight: 700;
   padding: 8px 0;
@@ -254,7 +189,7 @@ html.gp-prod body {
 }
 
 /* Holerite */
-.gp-prod .mk-hol {
+#gp-app .mk-hol {
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: var(--mk-radius, 16px);
@@ -264,36 +199,32 @@ html.gp-prod body {
   font-size: 12px;
 }
 
-.gp-prod .mk-hol-head {
+#gp-app .mk-hol-head {
   background: linear-gradient(135deg, var(--blue-dk) 0%, var(--blue) 100%);
   color: #fff;
   padding: 14px 16px;
 }
 
-.gp-prod .mk-hol-head .mk-hol-brand { font-family: 'Fredoka One', cursive; font-size: 18px; }
-.gp-prod .mk-hol-head .mk-hol-sub { font-size: 10px; font-weight: 700; opacity: .92; margin-top: 4px; line-height: 1.45; }
-.gp-prod .mk-hol-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 16px; padding: 12px 16px; background: #F8FAFC; border-bottom: 1px solid var(--border); }
-.gp-prod .mk-hol-meta div { font-weight: 700; line-height: 1.4; }
-.gp-prod .mk-hol-meta span { display: block; font-size: 9px; font-weight: 800; color: var(--txt3); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 2px; }
-.gp-prod .mk-hol-comp { padding: 10px 16px; border-bottom: 2px solid var(--blue); font-size: 11px; font-weight: 800; color: var(--blue-dk); text-transform: uppercase; letter-spacing: .05em; }
-.gp-prod .mk-hol-tbl { width: 100%; border-collapse: collapse; font-size: 11px; font-weight: 700; }
-.gp-prod .mk-hol-tbl th { background: #E8F2FF; color: var(--blue-dk); font-size: 9px; text-transform: uppercase; padding: 8px 6px; border: 1px solid var(--border); text-align: center; }
-.gp-prod .mk-hol-tbl td { padding: 7px 6px; border: 1px solid var(--border); vertical-align: middle; }
-.gp-prod .mk-hol-tbl .c { text-align: center; color: var(--txt3); font-size: 10px; }
-.gp-prod .mk-hol-tbl .n { text-align: right; white-space: nowrap; }
-.gp-prod .mk-hol-tbl .n.v { color: var(--blue); }
-.gp-prod .mk-hol-tbl .n.d { color: var(--red); }
-.gp-prod .mk-hol-tbl tr.sec td { background: #F1F5F9; font-size: 9px; font-weight: 900; color: var(--txt3); text-transform: uppercase; padding: 6px; }
-.gp-prod .mk-hol-tot { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0; border-top: 2px solid var(--blue); }
-.gp-prod .mk-hol-tot div { padding: 12px 10px; text-align: center; border-right: 1px solid var(--border); }
-.gp-prod .mk-hol-tot div:last-child { border-right: none; background: #E8F2FF; }
-.gp-prod .mk-hol-tot .lbl { font-size: 9px; font-weight: 800; color: var(--txt3); text-transform: uppercase; margin-bottom: 4px; }
-.gp-prod .mk-hol-tot .val { font-family: 'Fredoka One', cursive; font-size: 16px; color: var(--blue); }
-.gp-prod .mk-hol-tot div:last-child .val { font-size: 20px; color: var(--blue-dk); }
-.gp-prod .mk-hol-bases { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px 12px; padding: 12px 16px; background: #FAFBFC; border-top: 1px solid var(--border); font-size: 10px; font-weight: 700; }
-.gp-prod .mk-hol-bases span { color: var(--txt3); font-weight: 800; font-size: 9px; text-transform: uppercase; display: block; }
-.gp-prod .mk-hol-foot { padding: 10px 16px 14px; font-size: 10px; font-weight: 700; color: var(--txt3); line-height: 1.5; border-top: 1px dashed var(--border); }
-
-@media (min-width: 900px) {
-  #gp-app .gp-app-shell { padding: 24px 24px 48px; }
-}
+#gp-app .mk-hol-head .mk-hol-brand { font-family: 'Fredoka One', cursive; font-size: 18px; }
+#gp-app .mk-hol-head .mk-hol-sub { font-size: 10px; font-weight: 700; opacity: .92; margin-top: 4px; line-height: 1.45; }
+#gp-app .mk-hol-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 16px; padding: 12px 16px; background: #F8FAFC; border-bottom: 1px solid var(--border); }
+#gp-app .mk-hol-meta div { font-weight: 700; line-height: 1.4; }
+#gp-app .mk-hol-meta span { display: block; font-size: 9px; font-weight: 800; color: var(--txt3); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 2px; }
+#gp-app .mk-hol-comp { padding: 10px 16px; border-bottom: 2px solid var(--blue); font-size: 11px; font-weight: 800; color: var(--blue-dk); text-transform: uppercase; letter-spacing: .05em; }
+#gp-app .mk-hol-tbl { width: 100%; border-collapse: collapse; font-size: 11px; font-weight: 700; }
+#gp-app .mk-hol-tbl th { background: #E8F2FF; color: var(--blue-dk); font-size: 9px; text-transform: uppercase; padding: 8px 6px; border: 1px solid var(--border); text-align: center; }
+#gp-app .mk-hol-tbl td { padding: 7px 6px; border: 1px solid var(--border); vertical-align: middle; }
+#gp-app .mk-hol-tbl .c { text-align: center; color: var(--txt3); font-size: 10px; }
+#gp-app .mk-hol-tbl .n { text-align: right; white-space: nowrap; }
+#gp-app .mk-hol-tbl .n.v { color: var(--blue); }
+#gp-app .mk-hol-tbl .n.d { color: var(--red); }
+#gp-app .mk-hol-tbl tr.sec td { background: #F1F5F9; font-size: 9px; font-weight: 900; color: var(--txt3); text-transform: uppercase; padding: 6px; }
+#gp-app .mk-hol-tot { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0; border-top: 2px solid var(--blue); }
+#gp-app .mk-hol-tot div { padding: 12px 10px; text-align: center; border-right: 1px solid var(--border); }
+#gp-app .mk-hol-tot div:last-child { border-right: none; background: #E8F2FF; }
+#gp-app .mk-hol-tot .lbl { font-size: 9px; font-weight: 800; color: var(--txt3); text-transform: uppercase; margin-bottom: 4px; }
+#gp-app .mk-hol-tot .val { font-family: 'Fredoka One', cursive; font-size: 16px; color: var(--blue); }
+#gp-app .mk-hol-tot div:last-child .val { font-size: 20px; color: var(--blue-dk); }
+#gp-app .mk-hol-bases { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px 12px; padding: 12px 16px; background: #FAFBFC; border-top: 1px solid var(--border); font-size: 10px; font-weight: 700; }
+#gp-app .mk-hol-bases span { color: var(--txt3); font-weight: 800; font-size: 9px; text-transform: uppercase; display: block; }
+#gp-app .mk-hol-foot { padding: 10px 16px 14px; font-size: 10px; font-weight: 700; color: var(--txt3); line-height: 1.5; border-top: 1px dashed var(--border); }
