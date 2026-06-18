@@ -13,7 +13,7 @@ const page = await browser.newPage();
 
 try {
   await page.goto(feUrl, { waitUntil: 'networkidle', timeout: 90000 });
-  await page.click('#mk-btn-admin-entry', { timeout: 20000 });
+  await page.click('#mk-hub-admin', { timeout: 20000 });
   await page.waitForSelector('#mk-step-admin:not(.hidden)', { timeout: 15000 });
   const pinInputs = page.locator('#mk-admin-pin input.mk-pin-box');
   for (let i = 0; i < adminPin.length; i++) {
