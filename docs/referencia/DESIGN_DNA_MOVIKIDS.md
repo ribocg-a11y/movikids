@@ -3,7 +3,10 @@
 **Registrado em:** 06/06/2026  
 **Gatilho:** Portal `acompanhar.html` carrossel (v1.7.47) — feedback: *“muito bonito, profissional, agradável, amigável; responsáveis se apaixonam; isso vende o serviço.”*
 
-**Regra Cursor (agente):** `.cursor/rules/design-visual-movikids.mdc`  
+> **Cartilha técnica completa (tokens, componentes, página a página, fluxo obrigatório):**  
+> **[`DESIGN_SYSTEM_MOVIKIDS.md`](DESIGN_SYSTEM_MOVIKIDS.md)** ← consultar **antes** de criar ou alterar UI.
+
+**Regra Cursor (agente):** `.cursor/rules/design-system-movikids.mdc` · `.cursor/rules/design-visual-movikids.mdc`  
 **Plano mestre (componentes):** `PLANO_MESTRE_REORGANIZADO_2026-06.md` §5
 
 ---

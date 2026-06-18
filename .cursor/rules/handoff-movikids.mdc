@@ -24,11 +24,12 @@ Se o usuário disser apenas algo como **"vamos dar continuidade ao projeto Movi 
 Ao trabalhar neste repositório, **ler primeiro** (nesta ordem):
 
 1. `docs/ativos/HANDOFF_NOVO_CHAT.md` — produção, próximo passo, armadilhas
-2. `docs/ativos/PLANEJAMENTO_ATUAL_2026-06.md` — backlog P0–P4 pós-FASE 5
-3. `docs/ativos/PLANO_PRIORIDADES_2026-06.md` — fases concluídas
-4. `docs/ativos/ESTADO_ATUAL.md` — versões e links canônicos
-5. `docs/ativos/REGRAS_DE_PUBLICACAO_SEGURA.md` — antes de commit/push/deploy
-6. `docs/ativos/ACESSOS_E_AUTORIZACOES.md` — papéis, PIN admin, agente vs humano
+2. **`docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md`** — cartilha UI (obrigatório antes de telas)
+3. `docs/ativos/PLANEJAMENTO_ATUAL_2026-06.md` — backlog P0–P4 pós-FASE 5
+4. `docs/ativos/PLANO_PRIORIDADES_2026-06.md` — fases concluídas
+5. `docs/ativos/ESTADO_ATUAL.md` — versões e links canônicos
+6. `docs/ativos/REGRAS_DE_PUBLICACAO_SEGURA.md` — antes de commit/push/deploy
+7. `docs/ativos/ACESSOS_E_AUTORIZACOES.md` — papéis, PIN admin, agente vs humano
 
 Índice: `docs/INDICE.md` · Entrada raiz: `AGENTS.md` · `README.md`
 

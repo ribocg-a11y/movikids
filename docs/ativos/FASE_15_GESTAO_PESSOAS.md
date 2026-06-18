@@ -1,13 +1,16 @@
 # FASE 15 — Gestão de Pessoas (produção)
 
-**Atualizado:** 18/06/2026 · GAS **v1.5.98** · FE **v1.8.39**
+**Atualizado:** 18/06/2026 · GAS **v1.5.99** · FE **v1.8.49** · Design System v1.0
 
 ## URLs
 
 | Página | URL |
 |--------|-----|
-| **Produção** | https://ribocg-a11y.github.io/movikids/gestao-pessoas.html |
-| Mockup | https://ribocg-a11y.github.io/movikids/ponto-mockup.html?v=3.6 |
+| **Produção colaboradores** | https://ribocg-a11y.github.io/movikids/gestao-pessoas.html?force=1.8.49 |
+| Hub tablet → Colaboradores | `index.html` `#mk-hub-colab` |
+| Mockup (só protótipo) | https://ribocg-a11y.github.io/movikids/ponto-mockup.html?v=3.6 |
+
+**Auth colaboradores:** cópia literal `#mk-auth-gate` → `#gp-auth-gate` (I29 · Design System §6.1)
 
 ## Abas planilha (7)
 
@@ -23,20 +26,11 @@
 
 ## Instalar abas
 
-**Opção A — GAS (após Nova versão Web v1.5.98):**
+**Após Nova versão Web GAS v1.5.99+** (corrige I30 getRange):
 ```powershell
+cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github
 .\scripts\instalar-abas-gestao-pessoas-gas.ps1
 ```
-
-**Opção B — OAuth planilha:**
-```powershell
-cd C:\Users\riboc\Projects\google-drive-sheets-auth
-npm run auth
-cd movikids-github
-.\scripts\criar-abas-gestao-pessoas.ps1
-```
-
-**Opção C — Editor planilha:** colar `scripts/planilha/instalarAbasGestaoPessoas.gs` e rodar `instalarAbasGestaoPessoas()`.
 
 ## APIs GAS
 
@@ -49,8 +43,15 @@ cd movikids-github
 | `alertasPontoGestaoAdmin` | ADM alertas |
 | `instalarAbasGestaoPessoasAdmin` | Criar abas (PIN 1416) |
 
-## Deploy
+## Deploy checklist
 
-1. `prepare-gas-push.ps1` → Editor GAS → **Nova versão Web**
+1. GAS **v1.5.99** → Nova versão Web (`AKfycbwakQ...`)
 2. `instalar-abas-gestao-pessoas-gas.ps1`
-3. FE já em Pages: `gestao-pessoas.html?prod=1`
+3. FE **v1.8.49** Pages (auth DNA)
+4. Homolog: dropdown + 4 PIN + hub 5 portas
+5. Tablet balcão: regressão F5/F7/F10/F11
+
+## Incidentes
+
+- **I29** — UI fora DNA → v1.8.49 + `DESIGN_SYSTEM_MOVIKIDS.md`
+- **I30** — abas parciais → v1.5.99 getRange fix

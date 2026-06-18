@@ -1,6 +1,7 @@
 # MOVI KIDS — Mapa de erros, falhas e bugs
 
-**Atualizado:** 17/06/2026 — **I28** liberar sessão tablet · GAS **v1.5.92** prod. · FE **v1.8.30**  
+**Atualizado:** 18/06/2026 — **I29** DNA Gestão Pessoas · **I30** abas RH getRange · GAS **v1.5.99** repo · FE **v1.8.49**  
+**Uso anterior:** 17/06/2026 — **I28** liberar sessão tablet · GAS **v1.5.92** prod. · FE **v1.8.30**  
 **Uso anterior:** 09/06/2026 — **I22 fechado** (hotfix FE v1.8.2)  
 **Uso:** consultar **antes de publicar** e **ao montar checklist de teste**. Cada linha tem trava e script de verificação quando existir.
 
@@ -36,6 +37,8 @@
 | **I26** | **`clasp push` sem republicar Web App** | Editor v1.5.92 / `/exec` v1.5.91 (3×) | `deploy-gas.ps1` + `verify-gas-deploy.ps1` | Regra 9; clasp @138 desc | ping + verify |
 | **I27** | **Web App exige login Google (≠ Anyone)** | `fetch()` Failed to fetch no Pages/tablet | **Editar** `AKfycbwakQ...` → Quem tem acesso = **Qualquer pessoa** | `live.anonymous` verify | aba anonima ping JSON |
 | **I28** | **`prompt()` PIN admin + deslogar PIN-first no tablet** | Liberar/Deslogar balcão sem efeito; dual Milena+Admin | FE **v1.8.29** modal PIN + persist; **v1.8.30** banner dual + guards | `guard.auth.*` I28 | `TESTE_SESSAO_LIBERAR_READONLY.ps1` · tablet Liberar |
+| **I29** | **Gestão Pessoas UI fora do DNA** (mock-pick, PIN único, CSS paralelo, passos juntos) | Colaboradores feio/não responsivo; perda padrão Movi Kids | FE **v1.8.48–1.8.49** `#gp-auth-gate` = `#mk-auth-gate`; **`DESIGN_SYSTEM_MOVIKIDS.md`** | `guard.ui.design-system`, `guard.ui.auth-gate` | `gestao-pessoas.html?force=1.8.49` · checklist §9 Design System |
+| **I30** | **`getRange` numRows errado em `instalarAbasGestaoPessoas`** | Abas RH parciais (1 linha seed) | GAS **v1.5.99** — `getRange(2,1,seeds.length,cols)` | `guard.gas.getRange.numRows` | `gestaoPessoasStatus` · reinstalar abas |
 | I2 | GAS offline + timer local | Extra fantasma | ADM `somentePlano`; offline v1.7.6 | `FIX_OFFLINE_ENCERRAR` | tablet encerrar |
 | I3 | Cache `?force=` / **`index.html ?v=` desatualizado** | JS antigo no tablet/admin | `mk-version` + `sw` + **index** alinhados | `pre-push-check` versões | `?force=VERSAO` · ver **11/06** |
 | **I25** | **FOLHA `#NAME?` — `setValue('=SE...')` no GAS** | Aba FOLHA quebrada; Dashboard usa fallback 4926 | GAS **v1.5.91** `folhaFlushFormulasUser_` (USER_ENTERED) + `repairFolhaAdmin` | Nunca `setValue`/`setFormula` PT para fórmulas FOLHA | `TESTE_FOLHA_FORMULAS_READONLY.ps1` · **fechado 14/06** |
@@ -83,6 +86,8 @@
 | `../arquivo/incidentes/INCIDENTE_I26_GAS_EDITOR_VS_EXEC_2026-06-14.md` | **I26** — push sem republicar |
 | `../arquivo/incidentes/INCIDENTE_I27_GAS_LOGIN_ANONIMO_2026-06-14.md` | **I27** — ServiceLogin / Failed to fetch |
 | `../arquivo/incidentes/INCIDENTE_I28_LIBERAR_SESSAO_TABLET_2026-06-17.md` | **I28** — prompt PIN / liberar balcão tablet |
+| `../arquivo/incidentes/INCIDENTE_I29_GESTAO_PESSOAS_DNA_UI_2026-06-18.md` | **I29** — UI colaboradores fora DNA; Design System |
+| `../arquivo/incidentes/INCIDENTE_I30_GAS_ABAS_GESTAO_RANGE_2026-06-18.md` | **I30** — abas RH getRange v1.5.99 |
 | `TROCA_SMS_GATEWAY_DJVJRL_2026-06-04.md` | Gateway SMS |
 
 ---
@@ -114,6 +119,12 @@
 | `guard.auth.pin-persist` | `mkAuthRestoreAdminPin_` + persist 24h | I28 |
 | `guard.auth.deslogar-api-first` | `mkOpDeslogarBalcao` API antes do PIN | I28 |
 | `guard.auth.dual-banner` | `mkAuthDualSessaoBanner_` + `#mk-dual-sessao-banner` | I28 |
+| `guard.ui.design-system` | Consultar `DESIGN_SYSTEM_MOVIKIDS.md` §0 antes de criar/alterar UI | I29 |
+| `guard.ui.auth-gate` | Auth colaboradores = `#gp-auth-gate` (classes `mk-auth-*` de `mk-app.css`) | I29 |
+| `guard.ui.no-mock-pick-prod` | Proibido `mock-pick` em login produção | I29 |
+| `guard.ui.pin-four-boxes` | PIN = 4× `.mk-pin-box`; nunca campo único largo | I29 |
+| `guard.host.canonical` | `mk-canonical-host.js` → host `ribocg-a11y` | I29 |
+| `guard.gas.getRange.numRows` | `getRange(row,col,numRows,numCols)` — seeds.length não 1+len | I30 |
 | `guard.turno.chip` | `#hd-turno-chip` em index.html | I19 |
 | `guard.html.page-balance` | balanceamento `<div>` page-home/nova/dashboard | I22 |
 | `guard.operacao.livre` | `check-operacao-livre.ps1` se FE crítico alterado | I22 |
@@ -176,15 +187,21 @@
 20. **Nunca** usar `prompt()` para PIN admin no tablet — só `mkAdminPinModalAsk_` (I28).
 21. **Nunca** pedir PIN admin **antes** de tentar `liberarSessaoOperador` em `mkOpDeslogarBalcao` (I28).
 22. **Sempre** faixa `#mk-dual-sessao-banner` quando admin local + `sessaoAtiva` no GAS (I28).
+23. **Sempre** consultar **`DESIGN_SYSTEM_MOVIKIDS.md`** antes de criar/alterar UI (I29).
+24. **Nunca** login produção com `mock-pick` ou PIN campo único — usar `#mk-auth-gate` / `#gp-auth-gate` (I29).
+25. **Nunca** CSS auth paralelo fora de `mk-app.css` `#mk-auth-gate,#gp-auth-gate` (I29).
+26. **Sempre** host **`ribocg-a11y`** (hífen) — nunca `ribocg.a11y` (I29).
+27. **Revisar** `getRange` numRows ao gravar seeds em abas GAS (I30).
 
 ---
 
-## Versões de referência (14/06/2026)
+## Versões de referência (18/06/2026)
 
 | Camada | Repo / produção | Mínimo operação |
 |--------|-----------------|-----------------|
-| Frontend | **v1.8.30** | `?force=1.8.30` |
-| GAS | **v1.5.92** (prod.) | `deploy-gas.ps1` se ping &lt; repo |
+| Frontend | **v1.8.49** | `?force=1.8.49` · Gestão Pessoas `gestao-pessoas.html` |
+| GAS | **v1.5.99** (repo) · ping confirmar | Nova versão Web após v1.5.98+ |
+| Design System | **`docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md`** | Obrigatório antes de UI |
 | Aba FOLHA | B68 ~5269,96 · `fonte=FOLHA` | `repairFolhaAdmin` após deploy que toque FOLHA |
 
 Ver `ESTADO_ATUAL.md` para URLs e editor GAS.

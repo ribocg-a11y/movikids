@@ -1,0 +1,44 @@
+---
+description: Design System MOVI KIDS — consulta obrigatória antes de criar ou alterar qualquer UI
+globs: "*.html,mk-design.css,mk-app.css,mk-gestao-pessoas.css,**/*.canvas.tsx"
+alwaysApply: true
+---
+
+# Design System MOVI KIDS — regra obrigatória
+
+## Fonte de verdade
+
+**Cartilha:** `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md`
+
+**Antes de criar ou alterar** qualquer página, seção, componente visual, CSS de UI ou mockup que vá para produção:
+
+1. **LER** `DESIGN_SYSTEM_MOVIKIDS.md` — §0 fluxo, §2 universo CSS, §6 componentes, §8 página alvo
+2. **SEGUIR** o fluxo §0 — checklist §9 antes de entregar
+3. **NÃO inventar** CSS paralelo, fonts, cores ou layout de auth fora do doc
+
+Documento filosófico (complementar): `docs/referencia/DESIGN_DNA_MOVIKIDS.md`
+
+## Referências vivas (código)
+
+| Padrão | Arquivo |
+|--------|---------|
+| Login / PIN / dropdown | `index.html` `#mk-auth-gate` + `mk-app.css` |
+| Hub 3 portas tablet | `index.html` `#mk-tablet-hub` |
+| Portal responsável | `acompanhar.html` + `mk-design.css` § Portal |
+| Admin glass FASE 9 | `mk-design.css` `--mk-admin-*` + `CHECKLIST_FASE9_DNA_ADMIN.md` |
+| Colaboradores auth | `gestao-pessoas.html` `#gp-auth-gate` (= mk-auth-gate) |
+
+## Proibido sem exceção
+
+- CSS auth custom (usar `#mk-auth-gate` / `#gp-auth-gate` classes)
+- PIN campo único largo (usar 4× `.mk-pin-box`)
+- Cards `mock-pick` em login produção (usar `.mk-op-select`)
+- Dois passos de login na mesma dobra
+- Fonte fora Fredoka + Nunito no MOVI KIDS
+- Copiar `ponto-mockup.html` direto para produção
+
+## Ao entregar UI nova
+
+Encerrar com confirmação: *"Design System §9 checklist aplicado — superfície §8.x"*
+
+Se nascer componente reutilizável novo → propor atualização de `DESIGN_SYSTEM_MOVIKIDS.md`.

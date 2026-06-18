@@ -1,12 +1,14 @@
 # MOVI KIDS — Índice de documentação
 
-**Atualizado:** 14/06/2026 (FE **v1.8.16** · GAS **v1.5.91** prod. · I25 fechado)
+**Atualizado:** 18/06/2026 (FE **v1.8.49** · GAS repo **v1.5.99** · I29/I30)
 
 ## Comece aqui
 
 | Documento | Para quê |
 |-----------|----------|
 | [**HANDOFF_NOVO_CHAT.md**](ativos/HANDOFF_NOVO_CHAT.md) | **Novo chat Cursor** — contexto, produção, armadilhas |
+| [**DESIGN_SYSTEM_MOVIKIDS.md**](referencia/DESIGN_SYSTEM_MOVIKIDS.md) | **Cartilha UI** — obrigatório antes de criar/alterar telas |
+| [**DESIGN_DNA_MOVIKIDS.md**](referencia/DESIGN_DNA_MOVIKIDS.md) | Princípios visuais e missão de produto |
 | [**PLANO_FASES_6_15_COCKPIT_EXECUTIVO_2026-06.md**](ativos/PLANO_FASES_6_15_COCKPIT_EXECUTIVO_2026-06.md) | **Ciclo ativo FASE 6–15** — benchmark, entregas, impacto visual por página |
 | [**PLANEJAMENTO_ATUAL_2026-06.md**](ativos/PLANEJAMENTO_ATUAL_2026-06.md) | Resumo operação + tabela fases 6–15 |
 | [PLANO_PRIORIDADES_2026-06.md](ativos/PLANO_PRIORIDADES_2026-06.md) | Fases 0–15 + execução |
@@ -22,6 +24,7 @@
 | [**MEMORIAL_MINI_DRE.md**](referencia/MEMORIAL_MINI_DRE.md) | Fórmulas cascata margens |
 | [**FASE_9_FOLHA_VIABILIDADE_CLT.md**](ativos/FASE_9_FOLHA_VIABILIDADE_CLT.md) | 🟢 **FASE 9** — folha B68 + semáforo contratação |
 | [**FASE_8_ALERTAS_SEMAFOROS.md**](ativos/FASE_8_ALERTAS_SEMAFOROS.md) | ✅ **FASE 8** — alertas + semáforos (repo) |
+| [**FASE_15_GESTAO_PESSOAS.md**](ativos/FASE_15_GESTAO_PESSOAS.md) | 🟡 **FASE 15** — colaboradores · I29/I30 |
 | [**PLANO_FASES_6_15_COCKPIT_EXECUTIVO_2026-06.md**](ativos/PLANO_FASES_6_15_COCKPIT_EXECUTIVO_2026-06.md) | 🟡 **FASE 6–15** — cockpit, UX admin, financeiro |
 | [CHECKLIST_FASE5_TABLET.md](ativos/CHECKLIST_FASE5_TABLET.md) | ✅ FASE 5 — Milena + I21 v1.7.96 |
 | [FASE_5_CONFIABILIDADE_APIS.md](ativos/FASE_5_CONFIABILIDADE_APIS.md) | B7, B1, B2, B8 — fechada |
@@ -30,6 +33,13 @@
 | [CHECKLIST_PACOTE_K.md](ativos/CHECKLIST_PACOTE_K.md) | ✅ Pacote K CRM |
 | [CHECKLIST_TABLET_v1.7.85.md](ativos/CHECKLIST_TABLET_v1.7.85.md) | ✅ FASE 1 homologação |
 | [assets/mock-idle-homolog.html](../assets/mock-idle-homolog.html) | Mock idle I21 (HTTPS) |
+
+## Referência visual
+
+| Documento | Para quê |
+|-----------|----------|
+| [**DESIGN_SYSTEM_MOVIKIDS.md**](referencia/DESIGN_SYSTEM_MOVIKIDS.md) | **Cartilha UI** — tokens, componentes, página a página, fluxo obrigatório |
+| [DESIGN_DNA_MOVIKIDS.md](referencia/DESIGN_DNA_MOVIKIDS.md) | Princípios de produto e missão visual |
 
 ## Arquitetura, processos, testes
 

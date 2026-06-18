@@ -6,7 +6,7 @@ alwaysApply: true
 
 # Design visual MOVI KIDS — linha criativa obrigatória
 
-**Referência canônica:** `acompanhar.html` (portal carrossel v1.7.47+) + `DESIGN_DNA_MOVIKIDS.md`
+**Referência canônica:** [`docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md`](docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md) (cartilha técnica) · `acompanhar.html` (portal) · `DESIGN_DNA_MOVIKIDS.md` (princípios)
 
 ## Por quê
 
@@ -21,7 +21,7 @@ O portal conquistou responsáveis: visual **profissional, agradável, amigável*
 5. **Ritmo e respiro** — poucos elementos por tela; bordas arredondadas (14–20px); gaps generosos; nada de parede de cards iguais.
 6. **Feedback emocional** — animação leve (pop, pulso no alerta); mensagens humanas (“Quase lá!”, “Já já começa”).
 7. **Mobile-first nos responsáveis** — portal e QR: legível no celular, uma mão, sem rolagem infinita (carrossel/abas > empilhar 3 heróis).
-8. **Consistência** — reutilizar classes `mk-portal-*` / tokens em `mk-design.css`; não inventar CSS paralelo por tela.
+8. **Consistência** — reutilizar classes `mk-portal-*` / tokens em `mk-design.css`; não inventar CSS paralelo por tela. **Consultar `DESIGN_SYSTEM_MOVIKIDS.md` §0 antes de qualquer UI.**
 
 ## Padrões do portal (replicar onde couber)
 

@@ -30,6 +30,8 @@ Leia **nesta ordem**:
 
 Índice completo: [`docs/INDICE.md`](docs/INDICE.md)
 
+**Design System (UI):** [`docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md`](docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md) — consultar antes de criar/alterar qualquer interface.
+
 ## Agente vs você (resumo)
 
 | Eu (agente) sozinho | Só com seu pedido (lista fechada §7.3) | Só você (físico / conta) |
@@ -55,8 +57,10 @@ Detalhe completo: [`ACESSOS_E_AUTORIZACOES.md`](docs/ativos/ACESSOS_E_AUTORIZACO
 
 | Camada | Versão repo | Ping produção |
 |--------|-------------|---------------|
-| Frontend | **v1.8.39** | https://ribocg-a11y.github.io/movikids/?force=1.8.39 · **Gestão Pessoas:** `gestao-pessoas.html` |
-| GAS | repo **v1.5.98** · ping prod. **v1.5.92** | clasp editor OK · **Nova versão Web pendente** |
+| Frontend | **v1.8.49** | https://ribocg-a11y.github.io/movikids/?force=1.8.49 |
+| Gestão Pessoas | **v1.8.49** | `gestao-pessoas.html?force=1.8.49` |
+| GAS | repo **v1.5.99** · ping confirmar | Nova versão Web se ping &lt; repo |
+| Design System | **v1.0** | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
 | Aba FOLHA | OK (I25) | B68 ~5269,96 · `folhaPlanejamento.fonte: FOLHA` |
 | Deploy ID | `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y` | |
 
@@ -93,7 +97,7 @@ Fonte de verdade: `mk-version.js`, header do `.gs`, ping GAS.
 
 - **FASE 1–9:** ✅ prod
 - **FASE 14 mini-DRE:** ✅ prod (FE v1.8.16+)
-- **FASE 15 Gestão Pessoas:** 🟡 repo FE v1.8.39 + GAS v1.5.98 · ping/Web + abas planilha pendentes
+- **FASE 15 Gestão Pessoas:** 🟡 FE v1.8.49 DNA (I29) · GAS v1.5.99 (I30) · homolog tablet pendente
 - **Pendente:** Nova versão Web GAS · abas planilha · homolog tablet F5/F7/F10/F11 na loja
 
 ## "Atualize tudo"

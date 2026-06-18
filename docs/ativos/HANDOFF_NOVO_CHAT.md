@@ -1,10 +1,10 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 18/06/2026 (FASE 15 Gestão Pessoas · FE v1.8.39 · GAS v1.5.98 repo)  
+**Atualizado:** 18/06/2026 (FASE 15 · FE **v1.8.49** · GAS repo **v1.5.99** · Design System v1.0)  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **Repo local:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`  
-**GitHub:** `ribocg-a11y/movikids` · branch `main` · HEAD **`cb80d88`**
+**GitHub:** `ribocg-a11y/movikids` · branch `main`
 
 ---
 
@@ -18,53 +18,32 @@
 **Regras para o agente:**
 
 1. **Você opera sempre do computador** — prints e chats costumam ser do **PC**, não do tablet do balcão.
-2. O **tablet fica na operação** — homologação real (chip Turno, Nova, idle, PWA, alertas F7) exige **aparelho na loja**; agente **não** substitui isso.
+2. O **tablet fica na operação** — homologação real exige **aparelho na loja**.
 3. **Sessão dual (I21):** PC com PIN admin 1416 = **TABLET: Administrador**; tablet operadores = **BALCÃO: Nome**.
-4. Ao pedir “testar no tablet”, assumir: **você valida no físico**; agente roda protocolo HTTP + `?force=versão`.
+4. **UI nova:** consultar **`docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md`** §0 **antes** de codar (I29).
 
-Detalhe: `ACESSOS_E_AUTORIZACOES.md` §7 · incidente I21.
+Detalhe: `ACESSOS_E_AUTORIZACOES.md` §7 · incidentes I21 · I29.
 
 ---
 
 ## Como abrir o Cursor nesta pasta (novo chat)
 
-### Método 1 — Explorador de Arquivos (mais fácil)
-
-1. Abra esta pasta no Windows:
-   `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`
-2. Clique na barra de endereço, digite `cursor .` e Enter  
-   *(ou botão direito na pasta → **Abrir com Cursor**, se aparecer)*
-
-### Método 2 — Terminal / PowerShell
+**Pasta:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`
 
 ```powershell
 cursor "C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github"
 ```
 
-### Método 3 — Dentro do Cursor
-
-**File → Open Folder…** → selecione `movikids-github`
-
-### Depois de abrir a pasta
-
-1. **Chat → New Chat** (Ctrl+L ou ícone de chat)
-2. Digite só:
-
-```
-Vamos dar continuidade ao projeto Movi Kids, tem uma pasta no C da minha máquina.
-```
-
-O agente lê `HANDOFF_NOVO_CHAT.md` automaticamente (regra `.cursor/rules/handoff-movikids.mdc`).
+Mensagem mínima: *"Vamos dar continuidade ao projeto Movi Kids, tem uma pasta no C da minha máquina."*
 
 ---
 
 ### O que o agente faz sozinho (não pedir autorização)
 
 - Ler docs ativos (ordem abaixo)
-- Informar: FE **v1.8.30**, GAS **v1.5.92**, comunicação **QR only**
-- **FE:** editar código → `pre-push-check` → commit → push → `verify-publish-complete` (**sem pedir**)
-- Testes, ping GAS, planilha OAuth, docs, PRs, APIs admin quando necessário
-- **Lista fechada (só com pedido):** `ACESSOS_E_AUTORIZACOES.md` §7.3 — GAS/clasp, `api()`/auth, F4/F9
+- **UI:** consultar `DESIGN_SYSTEM_MOVIKIDS.md` antes de alterar telas
+- **FE:** editar → `pre-push-check` → commit → push → `verify-publish-complete`
+- Testes, ping GAS, planilha OAuth, docs, incidentes no mapa I*
 - Toda resposta: `Mudança no AppScript: sim|não` + link `.gs` canônico (Regra 16)
 
 ---
@@ -73,23 +52,20 @@ O agente lê `HANDOFF_NOVO_CHAT.md` automaticamente (regra `.cursor/rules/handof
 
 | Camada | Versão | Verificação |
 |--------|--------|-------------|
-| **Frontend** | **v1.8.39** *(push pendente)* | https://ribocg-a11y.github.io/movikids/?force=1.8.39 |
-| **Gestão Pessoas** | **v1.8.39** | https://ribocg-a11y.github.io/movikids/gestao-pessoas.html |
-| **Service Worker** | **1.8.39** | `sw.js` |
-| **Apps Script (ping)** | **v1.5.92** · repo **v1.5.98** | Publicar Nova versão Web |
-| **Aba FOLHA** | **OK** (I25) | B68 ~5269,96 · `folhaPlanejamento.fonte: FOLHA` |
-| **Comunicação** | **QR only** | `OPERACAO_COMUNICACAO_QR_ONLY.md` |
+| **Frontend** | **v1.8.49** | https://ribocg-a11y.github.io/movikids/?force=1.8.49 |
+| **Gestão Pessoas** | **v1.8.49** | https://ribocg-a11y.github.io/movikids/gestao-pessoas.html?force=1.8.49 |
+| **Service Worker** | **1.8.49** | `sw.js` |
+| **Apps Script (ping)** | confirmar ping | repo **v1.5.99** — **Nova versão Web** se ping &lt; repo |
+| **Aba FOLHA** | **OK** (I25) | B68 ~5269,96 |
+| **Design System** | **v1.0** | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
 
-**Deploy ID GAS (único):** `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y`
+**Deploy ID GAS:** `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y`
 
-**Editor GAS:** https://script.google.com/home/projects/19SIhkX9Tk7FiJA1JXu1OrUwssHdr3H5zc8q3rOjmBvqgWfXuHlk8xyf8/edit
-
-**Atalhos teste (sempre `cd` no repo antes):**
+**Atalhos teste:**
 
 ```powershell
 cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github
 .\verify-gas-deploy.ps1
-.\protocolo-mestre.ps1
 .\scripts\pre-push-check.ps1
 ```
 
@@ -100,61 +76,43 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 | # | Documento | Para quê |
 |---|-----------|----------|
 | 1 | **Este arquivo** | Contexto, produção, próximo passo |
-| 2 | `PLANO_PRIORIDADES_2026-06.md` | Fases 0–15 |
-| 3 | `ESTADO_ATUAL.md` | Versões, entregas, testes |
-| 4 | `REGRAS_DE_PUBLICACAO_SEGURA.md` | Travas push/deploy |
-| 5 | `ACESSOS_E_AUTORIZACOES.md` | Agente vs você §7 |
-| 6 | `MAPA_CODIGO_ARQUITETURA.md` | Anatomia código |
+| 2 | **`DESIGN_SYSTEM_MOVIKIDS.md`** | Cartilha UI — **antes de qualquer tela** |
+| 3 | `PLANO_PRIORIDADES_2026-06.md` | Fases 0–15 |
+| 4 | `ESTADO_ATUAL.md` | Versões, entregas |
+| 5 | `MAPA_ERROS_FALHAS_BUGS.md` | I29/I30 + travas |
+| 6 | `REGRAS_DE_PUBLICACAO_SEGURA.md` | Push/deploy |
 | 7 | `../INDICE.md` | Mapa docs |
-
-### Por tarefa
-
-| Tarefa | Ler / rodar |
-|--------|-------------|
-| Teste completo | **`protocolo-mestre.ps1`** · `PROTOCOLO_DIAGNOSTICO_E_TESTES.md` |
-| Atualize tudo | **`PROTOCOLO_ATUALIZAR_TUDO.md`** |
-| Folha / CLT | `FASE_9_FOLHA_VIABILIDADE_CLT.md` · `TESTE_FASE9_FOLHA_READONLY.ps1` |
-| QA tablet | `CHECKLIST_TABLET_v1.7.85.md` · F5/F7/F10/F11 na loja |
-| Bug | `MAPA_ERROS_FALHAS_BUGS.md` |
 
 ---
 
 ## Próximo passo (18/06/2026)
 
-**FASE 15 Gestão Pessoas** — mockup aprovado → repo **FE v1.8.39** + **GAS v1.5.98** (clasp push OK)
+**FASE 15 Gestão Pessoas** — UI DNA corrigida (I29) · Design System publicado
 
 | # | Ação | Quem |
 |---|------|------|
-| 1 | **Nova versão Web GAS v1.5.98** (Editor → Editar AKfycbwakQ... → Nova versão) | **Você** |
-| 2 | Criar abas planilha: `.\scripts\instalar-abas-gestao-pessoas-gas.ps1` (após passo 1) | Agente ou você |
-| 3 | Testar **gestao-pessoas.html** → Colaboradores → Raykelly PIN real | **Você** |
+| 1 | **Nova versão Web GAS v1.5.99** (se ping &lt; v1.5.99) | **Você** |
+| 2 | Reinstalar abas se v1.5.98 parcial: `.\scripts\instalar-abas-gestao-pessoas-gas.ps1` | Agente/você |
+| 3 | Validar **gestao-pessoas.html?force=1.8.49** — auth = admin/balcão | **Você** |
 | 4 | Tablet loja: homologação F5/F7/F10/F11 (regressão balcão) | **Você** |
 
-Doc: `docs/ativos/FASE_15_GESTAO_PESSOAS.md`
+Doc: `FASE_15_GESTAO_PESSOAS.md` · incidentes `I29`, `I30`
 
-**OAuth planilha expirado** — alternativa: passo 2 via GAS admin (não precisa `npm run auth`).
+**Incidentes fechados nesta sessão (chat 18/06):**
 
-**Produção anterior:** GAS ping **v1.5.92** · FE **v1.8.30** (I28)
+| ID | Resumo | Fix |
+|----|--------|-----|
+| **I29** | Colaboradores fora DNA (mock-pick, PIN único, CSS paralelo) | FE v1.8.49 + Design System |
+| **I30** | Abas RH parciais getRange | GAS v1.5.99 |
 
-**Protocolo Mestre 16/06:** 18+ suites OK · FASE6/P3/scripts corrigidos · cleanup 0 resíduos · log em `financeiro/logs/` (gitignored).
+**Últimos commits FE (gestão pessoas + docs):**
 
-**Entregas FE recentes (v1.8.23–1.8.27):**
-
-- Header mobile DNA (`mk-mob-header`, sidebar family)
-- Banner auto-update 12s
-- Logo oficial PNG transparente no empty state Home
-- Protocolo Mestre + atalhos raiz `verify-gas-deploy.ps1` / `protocolo-mestre.ps1`
-
-**Últimos commits:**
-
-| Hash | Entrega |
-|------|---------|
-| `cb80d88` | docs: @144 clasp v1.5.92 + instrucoes abrir Cursor na pasta |
-| `f9ead2a` | docs: atualize tudo FE v1.8.27 + GAS v1.5.92 (handoff 16/06) |
-| `8cd49c3` | Protocolo Mestre + fix scripts teste + atalhos verify-gas |
-| `fff8632` | Logo PNG transparente empty state v1.8.27 |
-| `c4d902b` | Header mobile DNA v1.8.24 |
-| `fff8632` | … (ver `git log -10`) |
+| Entrega |
+|---------|
+| v1.8.49 Design System + `#gp-auth-gate` DNA fixo |
+| v1.8.48 auth dropdown + passos separados |
+| v1.8.45–47 iterações DNA colaboradores |
+| v1.8.44 hub 3 portas FASE 15 |
 
 ---
 
@@ -163,11 +121,10 @@ Doc: `docs/ativos/FASE_15_GESTAO_PESSOAS.md`
 | Artefato | Caminho |
 |----------|---------|
 | **GAS** | `MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs` |
+| **Design System** | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
 | Versão FE | `mk-version.js` + `sw.js` + **`index.html ?v=`** |
 | CSS | `mk-design.css` + `mk-app.css` |
-| Logo | `assets/logo-movi-kids.png` (PNG RGBA) |
-| Testes | `scripts/testes/` · **`TESTE_PROTOCOLO_MESTRE.ps1`** |
-| Pre-push | `scripts/pre-push-check.ps1` |
+| Colaboradores | `gestao-pessoas.html` + `mk-gestao-pessoas.css` (só pós-login) |
 
 **GAS PC:**
 
@@ -182,12 +139,10 @@ C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\m
 | Regra | Detalhe |
 |-------|---------|
 | **I15** | Escritas GAS no browser = **GET** |
-| **GAS Web / `.gs`** | §7.3 — só com pedido: clasp, editar `.gs`, Nova versão Web |
-| **FE push** | Agente: pre-push → commit → push **sem pedir** |
-| **`api()` / auth** | §7.3 — só com pedido explícito |
+| **I29** | **`DESIGN_SYSTEM_MOVIKIDS.md`** antes de UI |
 | **I22** | `check-operacao-livre.ps1` antes push FE crítico |
 | **Versões** | `mk-version.js` = `sw.js` = `index.html ?v=` |
-| **QR only** | Sem SMS/WA operacional |
+| **Host** | Sempre **`ribocg-a11y`** (I29) |
 | **Regra 16** | Resposta termina com Mudança AppScript + link `.gs` |
 
 ---
@@ -200,7 +155,7 @@ Invoke-RestMethod "https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5
 .\scripts\pre-push-check.ps1
 ```
 
-Esperado: ping **v1.5.92** · pre-push verde · Pages **1.8.28**.
+Esperado: ping alinhado ao header `.gs` · Pages **1.8.49** · pre-push verde.
 
 ---
 
@@ -208,14 +163,11 @@ Esperado: ping **v1.5.92** · pre-push verde · Pages **1.8.28**.
 
 | Caminho | Motivo |
 |---------|--------|
+| `ponto-mockup.html` em produção | Só protótipo v3.6 |
+| `mock-pick` / PIN único em auth | I29 — usar `#mk-auth-gate` |
 | `docs/arquivo/planos/HANDOFF_NOVO_CHAT_2026-06-05.md` | Defasado |
-| `arquivo-historico/*.gs` | Legado |
-| Deploy `AKfycbzc...` | 404 |
+| `ribocg.a11y.github.io` | Host errado (I29) |
 
 ---
 
-## Ao encerrar sessão
-
-Atualizar: **este arquivo** · `ESTADO_ATUAL.md` · `README.md` · `AGENTS.md` se versões mudarem.
-
-*Próxima revisão: após homologação tablet v1.8.27 ou deploy GAS.*
+*Próxima revisão: após homologação tablet FASE 15 + ping GAS v1.5.99.*
