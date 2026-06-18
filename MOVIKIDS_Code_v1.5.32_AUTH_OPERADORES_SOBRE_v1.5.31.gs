@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.99
+// MOVI KIDS — Google Apps Script v1.5.100
+// v1.5.100: painelGestaoPessoasAdmin — dashboard ADM Operadores (FASE 15)
 // v1.5.99: fix instalarAbasGestaoPessoas — getRange numRows (seeds)
 // v1.5.98: Gestão Pessoas FASE 15 — abas RH/ponto/holerite + APIs colaborador
 // v1.5.97: metaTurno em carregarInicio (KPI meta junto com sync) · ping versao alinhada
@@ -380,6 +381,7 @@ function dispatchMoviAction_(p, method) {
       case 'buscarPainelColaborador': return buscarPainelColaborador_(p);
       case 'registrarPontoColaborador': return registrarPontoColaborador_(p);
       case 'alertasPontoGestaoAdmin': return alertasPontoGestaoAdmin_(p);
+      case 'painelGestaoPessoasAdmin': return painelGestaoPessoasAdmin_(p);
       case 'instalarAbasGestaoPessoasAdmin': return instalarAbasGestaoPessoasAdmin_(p);
       default:
         return err_('Ação desconhecida: ' + action, 400);
@@ -6494,20 +6496,122 @@ function registrarPontoColaborador_(p) {
 function alertasPontoGestaoAdmin_(p) {
   if (!adminPinOk_(p)) return err_('Acesso negado — PIN admin 1416', 403);
   try {
-    const agora = new Date();
-    const alertas = [];
-    gpRows_(SH_COLAB_RH).forEach(function (r) {
-      if (String(r[16] || 'SIM').toUpperCase() === 'NAO') return;
-      const opId = Number(r[0]);
-      const st = gpStatusPontoHoje_(opId);
-      const turno = String(r[15] || '');
-      if (st.status === 'fora' && !st.entrada && turno.indexOf('14') >= 0 && agora.getHours() >= 14 && agora.getMinutes() >= 20) {
-        alertas.push({ operadorId: opId, nome: String(r[1] || ''), turno: turno, mensagem: String(r[1] || '') + ' nao registrou entrada — tolerancia 20 min excedida' });
-      }
-    });
-    return resp_({ alertas: alertas, total: alertas.length });
+    return resp_(gpAlertasPontoCore_());
   } catch (ex) {
     return err_('Abas Gestao Pessoas ausentes', 503);
+  }
+}
+
+function gpAlertasPontoCore_() {
+  const agora = new Date();
+  const alertas = [];
+  gpRows_(SH_COLAB_RH).forEach(function (r) {
+    if (String(r[16] || 'SIM').toUpperCase() === 'NAO') return;
+    const opId = Number(r[0]);
+    const st = gpStatusPontoHoje_(opId);
+    const turno = String(r[15] || '');
+    if (st.status === 'fora' && !st.entrada && turno.indexOf('14') >= 0 && agora.getHours() >= 14 && agora.getMinutes() >= 20) {
+      alertas.push({
+        operadorId: opId, nome: String(r[1] || ''), turno: turno,
+        mensagem: String(r[1] || '') + ' nao registrou entrada — tolerancia 20 min excedida'
+      });
+    }
+  });
+  return { alertas: alertas, total: alertas.length };
+}
+
+function painelGestaoPessoasAdmin_(p) {
+  if (!adminPinOk_(p)) return err_('Acesso negado — PIN admin 1416', 403);
+  try {
+    const comp = String(p.competencia || gpCompetenciaAtual_());
+    const opsResp = JSON.parse(listarOperadoresLogin_().getContent());
+    const operadores = opsResp.operadores || [];
+    const sessao = opsResp.sessaoAtiva || null;
+    const sessaoId = sessao && sessao.operadorId ? Number(sessao.operadorId) : 0;
+    const alertasPack = gpAlertasPontoCore_();
+    const colaboradores = [];
+    const seen = {};
+
+    operadores.forEach(function (op) {
+      const id = Number(op.id);
+      seen[id] = true;
+      const rh = gpColabRhByOpId_(id);
+      const ponto = gpStatusPontoHoje_(id);
+      const metas = gpMetasColab_(id, comp);
+      const locMes = (metas.diasMes || []).reduce(function (s, d) { return s + (Number(d.loc) || 0); }, 0);
+      const bonusDias = (metas.diasMes || []).filter(function (d) { return d.bonusOk; }).length;
+      const folhaPonto = gpFolhaPontoColab_(id, comp);
+      colaboradores.push({
+        id: id, nome: op.nome, hasPin: op.hasPin, perfil: op.perfil || 'operador',
+        funcao: rh ? rh.funcao : 'Operador', turno: rh ? rh.turno : '', admissao: rh ? rh.admissao : '',
+        cadastroPct: rh ? rh.cadastroPct : 0, temRh: !!rh,
+        ponto: ponto, logadoBalcao: sessaoId === id,
+        metas: { alvo: metas.alvo, atual: metas.atual, locMes: locMes, bonusDias: bonusDias, bonusTotal: metas.bonusTotal || 0 },
+        folhaPonto: folhaPonto
+      });
+    });
+
+    gpRows_(SH_COLAB_RH).forEach(function (r) {
+      if (String(r[16] || 'SIM').toUpperCase() === 'NAO') return;
+      const id = Number(r[0]);
+      if (seen[id]) return;
+      const rh = gpColabRhByOpId_(id);
+      const ponto = gpStatusPontoHoje_(id);
+      const metas = gpMetasColab_(id, comp);
+      const locMes = (metas.diasMes || []).reduce(function (s, d) { return s + (Number(d.loc) || 0); }, 0);
+      const bonusDias = (metas.diasMes || []).filter(function (d) { return d.bonusOk; }).length;
+      colaboradores.push({
+        id: id, nome: rh ? rh.nome : String(r[1] || ''), hasPin: false, perfil: 'operador',
+        funcao: rh ? rh.funcao : 'Colaborador', turno: rh ? rh.turno : '', admissao: rh ? rh.admissao : '',
+        cadastroPct: rh ? rh.cadastroPct : 0, temRh: true,
+        ponto: ponto, logadoBalcao: false,
+        metas: { alvo: metas.alvo, atual: metas.atual, locMes: locMes, bonusDias: bonusDias, bonusTotal: metas.bonusTotal || 0 },
+        folhaPonto: gpFolhaPontoColab_(id, comp)
+      });
+    });
+
+    colaboradores.sort(function (a, b) { return String(a.nome).localeCompare(String(b.nome), 'pt-BR'); });
+
+    const escalaNomes = colaboradores.filter(function (c) { return c.temRh; }).map(function (c) { return { id: c.id, nome: c.nome }; });
+    const escalaRows = gpRows_(SH_ESCALA_COLAB).filter(function (r) { return String(r[1] || '') === comp; });
+    const escala = {
+      competencia: comp,
+      colunas: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'],
+      linhas: escalaNomes.map(function (c) {
+        const row = escalaRows.find(function (r) { return Number(r[0]) === Number(c.id); });
+        return {
+          id: c.id, nome: c.nome,
+          dias: row ? [String(row[2] || ''), String(row[3] || ''), String(row[4] || ''), String(row[5] || ''), String(row[6] || ''), String(row[7] || ''), String(row[8] || '')] : ['—', '—', '—', '—', '—', '—', '—']
+        };
+      })
+    };
+
+    const folha = colaboradores.filter(function (c) { return c.temRh; }).map(function (c) {
+      const rh = gpColabRhByOpId_(c.id);
+      const bonus = c.metas.bonusTotal || 0;
+      const diasTrab = (c.folhaPonto || []).length;
+      const hol = gpCalcHollerite_(rh || { salarioBase: 1621, vaDiario: 20 }, bonus, 0, diasTrab || 0);
+      return {
+        id: c.id, nome: c.nome, locMes: c.metas.locMes, bonusDias: c.metas.bonusDias,
+        base: hol.base, bonus: bonus, total: Math.round((hol.liquido + bonus) * 100) / 100, holerite: hol
+      };
+    });
+
+    let presentes = 0;
+    let comTurno = 0;
+    colaboradores.forEach(function (c) {
+      if (c.ponto && c.ponto.status === 'dentro') presentes++;
+      if (c.turno) comTurno++;
+    });
+
+    return resp_({
+      competencia: comp, colaboradores: colaboradores, escala: escala, folha: folha,
+      alertas: alertasPack.alertas, alertasTotal: alertasPack.total,
+      kpis: { total: colaboradores.length, presentes: presentes, comTurno: comTurno, alertas: alertasPack.total },
+      sessaoAtiva: sessao, versao: 'v1.5.100'
+    });
+  } catch (ex) {
+    return err_('Abas Gestao Pessoas ausentes — rode instalar abas ou scripts/criar-abas-gestao-pessoas.ps1', 503);
   }
 }
 

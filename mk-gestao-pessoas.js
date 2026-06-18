@@ -70,6 +70,15 @@
     },
     statusAbas: function () {
       return gpApi('gestaoPessoasStatus');
+    },
+    painelAdmin: function (pinParams) {
+      return gpApi('painelGestaoPessoasAdmin', pinParams || {});
+    },
+    alertasAdmin: function (pinParams) {
+      return gpApi('alertasPontoGestaoAdmin', pinParams || {});
+    },
+    instalarAbasAdmin: function (pinParams) {
+      return gpApi('instalarAbasGestaoPessoasAdmin', pinParams || {});
     }
   };
 })(typeof window !== 'undefined' ? window : globalThis);

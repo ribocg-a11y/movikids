@@ -257,7 +257,8 @@ function irAdmin(page) {
   if (page === 'config') { irParaConfig(); }
   if (page === 'caixa') inicializarCaixa();
   if (page === 'operadores') {
-    if (typeof refreshOperadoresAdmin_ === 'function') refreshOperadoresAdmin_();
+    if (typeof mkGpAdmLoad_ === 'function') mkGpAdmLoad_();
+    else if (typeof refreshOperadoresAdmin_ === 'function') refreshOperadoresAdmin_();
     if (typeof mkAuthRefreshSessaoTurno_ === 'function') mkAuthRefreshSessaoTurno_();
   }
   if (page === 'admin') {

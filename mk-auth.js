@@ -1135,6 +1135,7 @@
       }
       toast('Operador cadastrado: ' + d.operador.nome, 'success');
       await refreshOperadoresAdmin_();
+      if (typeof mkGpAdmLoad_ === 'function') await mkGpAdmLoad_();
     } catch (e) {
       toast('Erro de conexao', 'error');
     }
@@ -1285,6 +1286,7 @@
             <div class="mk-op-menu" id="mk-op-menu-${op.id}">
               ${logadoAgora ? `<button type="button" onclick="event.stopPropagation(); mkOpDeslogarBalcao(${op.id}, ${nomeJs})">🔓 Deslogar do balcao</button>` : ''}
               <button type="button" onclick="event.stopPropagation(); mkOpSetPerfil(${op.id}, ${nomeJs}, ${JSON.stringify(op.perfil || 'operador')})">👤 Perfil</button>
+              ${typeof mkGpAdmVerFicha === 'function' ? `<button type="button" onclick="event.stopPropagation(); mkGpAdmVerFicha(${op.id})">📋 Ficha RH</button>` : ''}
               <button type="button" onclick="event.stopPropagation(); mkOpEditar(${op.id}, ${nomeJs})">✏️ Editar</button>
               <button type="button" onclick="event.stopPropagation(); mkOpResetarPin(${op.id}, ${nomeJs})">🔑 Resetar PIN</button>
               <button type="button" class="danger" onclick="event.stopPropagation(); mkOpExcluir(${op.id}, ${nomeJs})">🗑️ Excluir</button>
