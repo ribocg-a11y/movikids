@@ -4,7 +4,22 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-  <title>MOVI KIDS — Gestão de Pessoas (mockup)</title>
+  <meta http-equiv="Expires" content="0">
+  <title>MOVI KIDS — Mockup v3.1 Hub Tablet</title>
+  <script>
+    (function () {
+      var CANON = 'https://ribocg-a11y.github.io/movikids/ponto-mockup.html?v=3.1';
+      var h = location.hostname;
+      if (h && h !== 'ribocg-a11y.github.io' && location.protocol !== 'file:') {
+        location.replace(CANON);
+        return;
+      }
+      if (!location.search.includes('v=3.1') && !sessionStorage.getItem('mk-mock-ponto-v31')) {
+        sessionStorage.setItem('mk-mock-ponto-v31', '1');
+        location.replace(location.pathname + '?v=3.1&_=' + Date.now());
+      }
+    })();
+  </script>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="mk-design.css?v=1.8.38">
   <link rel="stylesheet" href="mk-app.css?v=1.8.38">
@@ -79,7 +94,7 @@
     URL errada — use <strong>ribocg-a11y</strong> (hífen).<br>
     <a href="https://ribocg-a11y.github.io/movikids/ponto-mockup.html">Abrir versão correta →</a>
   </div>
-  <div class="mock-banner">MOCKUP <strong>v3.0</strong> · hub com ícones · login colaborador · dados isolados por PIN</div>
+  <div class="mock-banner">MOCKUP <strong>v3.1</strong> · 3 portas com ícone · Colaboradores · ADM · build 77952b9</div>
 
   <div class="mock-shell">
 
