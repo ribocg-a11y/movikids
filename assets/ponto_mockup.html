@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <title>MOVI KIDS — Ponto (visão colaborador)</title>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
   <style>
@@ -14,6 +16,8 @@
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: Nunito, system-ui, sans-serif; background: var(--bg); color: var(--txt); min-height: 100vh; }
+    .banner-warn { background: var(--red); color: #fff; text-align: center; padding: 10px 12px; font-size: 12px; font-weight: 800; line-height: 1.5; }
+    .banner-warn a { color: var(--yellow); }
     .banner { background: var(--blue-dark); color: #fff; text-align: center; padding: 8px 12px; font-size: 12px; font-weight: 800; }
     .banner strong { color: var(--yellow); }
     .shell { max-width: 520px; margin: 0 auto; padding: 16px 14px 72px; }
@@ -77,7 +81,11 @@
   </style>
 </head>
 <body>
-  <div class="banner">MOCKUP <strong>v2.2</strong> · colaborador · cadastro <strong>zerado</strong> para todos (8 campos pendentes)</div>
+  <div id="url-warn" class="banner-warn" hidden>
+    URL errada — use <strong>ribocg-a11y</strong> (hífen), não ribocg.a11y (ponto).<br>
+    <a href="https://ribocg-a11y.github.io/movikids/ponto-mockup.html">Abrir versão correta →</a>
+  </div>
+  <div class="banner">MOCKUP <strong>v2.2.1</strong> · cadastro zerado · 0% · build 404dddb</div>
   <div class="shell">
 
     <section class="screen active" id="s-gate">
@@ -358,6 +366,13 @@
     }
     tick(); setInterval(tick, 1000);
     renderListaQuem();
+
+    (function urlCheck() {
+      const h = location.hostname;
+      if (h && h !== 'ribocg-a11y.github.io' && location.protocol !== 'file:') {
+        document.getElementById('url-warn').hidden = false;
+      }
+    })();
   </script>
 </body>
 </html>
