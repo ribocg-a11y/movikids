@@ -1,11 +1,146 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" class="gp-prod">
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="refresh" content="0;url=ponto-mockup.html?prod=1&v=1.8.40">
-  <script>window.MK_GP_PROD = true; location.replace('ponto-mockup.html?prod=1&v=1.8.40&_=' + Date.now());</script>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="theme-color" content="#1565C0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <title>MOVI KIDS — Colaboradores</title>
+  <script>window.MK_GP_PROD = true;</script>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="mk-design.css?v=1.8.43">
+  <link rel="stylesheet" href="mk-gestao-pessoas.css?v=1.8.43">
+  <script src="mk-version.js?v=1.8.43"></script>
+  <script src="mk-globals.js?v=1.8.43"></script>
+  <script src="mk-api.js?v=1.8.43"></script>
+  <script src="mk-gestao-pessoas.js?v=1.8.43"></script>
 </head>
-<body>
-  <p><a href="ponto-mockup.html?prod=1&v=1.8.40">Gestão de Pessoas MOVI KIDS</a></p>
+<body class="gp-prod">
+  <header class="gp-topbar">
+    <button type="button" class="gp-topbar-back gp-back-index">← Início</button>
+    <div class="gp-topbar-brand">🚗 Movi <span>Kids</span></div>
+    <div class="gp-topbar-meta" id="gp-topbar-title">Colaboradores</div>
+  </header>
+
+  <div class="gp-shell">
+    <section class="mock-screen active" id="s-colab-login">
+      <div class="mock-logo">👥 Área do <span>colaborador</span></div>
+      <p class="mock-sub">Golden Shopping Calhau · ponto, metas e holerite</p>
+      <div class="mock-h1">Quem está acessando?</div>
+      <p class="mock-lead">Selecione seu nome e digite seu PIN. Você verá <strong>somente seus dados</strong>.</p>
+      <div id="colab-picks"></div>
+      <div id="colab-pin-wrap" hidden>
+        <p class="mock-lead">PIN · <strong id="colab-pin-name"></strong></p>
+        <input type="tel" id="colab-pin-one" class="mock-pin-single" maxlength="4" inputmode="numeric" pattern="[0-9]*" autocomplete="off" placeholder="0000" aria-label="PIN 4 dígitos">
+        <div class="mock-note err" id="colab-err" hidden></div>
+        <button type="button" class="mock-btn" id="colab-btn-entrar">Entrar</button>
+        <button type="button" class="mock-btn sec" onclick="colabCancelPin()">Trocar pessoa</button>
+      </div>
+    </section>
+
+    <section class="mock-screen" id="s-colab-hub">
+      <button type="button" class="mock-back" onclick="colabSair()">← Sair</button>
+      <div class="mock-user-bar">
+        <div class="mock-av" id="hub-av">R</div>
+        <div style="flex:1">
+          <div style="font-weight:900;font-size:17px" id="hub-nome">—</div>
+          <div style="font-size:12px;color:var(--txt3);font-weight:700" id="hub-funcao">—</div>
+        </div>
+        <span class="mock-badge gray" id="hub-status">Fora</span>
+      </div>
+      <div class="mock-tiles mock-tiles-5">
+        <div class="mk-hub-doors">
+          <button type="button" class="mk-hub-door mk-hub-door--dia" onclick="abrirModulo('ponto')">
+            <span class="mk-hub-door-icon">🕐</span>
+            <span class="mk-hub-door-title">Meu ponto</span>
+            <span class="mk-hub-door-sub">Entrada e saída</span>
+          </button>
+          <button type="button" class="mk-hub-door mk-hub-door--mes" onclick="abrirModulo('metas')">
+            <span class="mk-hub-door-icon">🎯</span>
+            <span class="mk-hub-door-title">Minhas metas</span>
+            <span class="mk-hub-door-sub">Locações do turno</span>
+          </button>
+          <button type="button" class="mk-hub-door mk-hub-door--sys" onclick="abrirModulo('escala')">
+            <span class="mk-hub-door-icon">📅</span>
+            <span class="mk-hub-door-title">Minha escala</span>
+            <span class="mk-hub-door-sub">Dias e turnos</span>
+          </button>
+          <button type="button" class="mk-hub-door mk-hub-door--dia" onclick="abrirModulo('banco')">
+            <span class="mk-hub-door-icon">⏱</span>
+            <span class="mk-hub-door-title">Banco de horas</span>
+            <span class="mk-hub-door-sub">Saldo acumulado</span>
+          </button>
+          <button type="button" class="mk-hub-door mk-hub-door--mes" onclick="abrirModulo('pagamento')">
+            <span class="mk-hub-door-icon">💰</span>
+            <span class="mk-hub-door-title">Meu pagamento</span>
+            <span class="mk-hub-door-sub">Demonstrativo</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section class="mock-screen" id="s-ponto">
+      <button type="button" class="mock-back" onclick="go('s-colab-hub')">← Meu painel</button>
+      <div id="ponto-flash" class="mock-note ok" hidden></div>
+      <div class="mock-user-bar">
+        <div class="mock-av" id="ponto-av">R</div>
+        <div style="flex:1">
+          <div style="font-weight:900" id="ponto-nome"></div>
+          <div style="font-size:12px;color:var(--txt3);font-weight:700" id="ponto-meta"></div>
+        </div>
+        <span class="mock-badge gray" id="ponto-st">Fora</span>
+      </div>
+      <div class="mock-clock" id="ponto-clock">--:--</div>
+      <p style="text-align:center;font-size:13px;color:var(--txt3);font-weight:800;margin-bottom:12px" id="ponto-data"></p>
+      <button type="button" class="mock-btn" id="ponto-btn" onclick="confirmarPonto()">Confirmar entrada</button>
+      <div class="mock-sec">Minha folha de ponto</div>
+      <div id="ponto-folha"></div>
+    </section>
+
+    <section class="mock-screen" id="s-cadastro-bloq">
+      <button type="button" class="mock-back" onclick="go('s-colab-hub')">← Meu painel</button>
+      <div class="mock-h1">Cadastro incompleto</div>
+      <p class="mock-lead" id="bloq-lead"></p>
+      <div class="mock-card">
+        <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:800;margin-bottom:4px">
+          <span style="color:var(--txt3)">PROGRESSO</span><span id="bloq-pct" style="color:var(--blue)"></span>
+        </div>
+        <div class="mock-prog"><div class="mock-prog-fill" id="bloq-bar"></div></div>
+        <ul class="mock-checklist" id="bloq-list"></ul>
+      </div>
+      <div class="mock-note err">Preencha todos os campos obrigatórios (*) para liberar o ponto.</div>
+      <button type="button" class="mock-btn" onclick="go('s-cadastro-form')">Completar cadastro</button>
+    </section>
+
+    <section class="mock-screen" id="s-cadastro-form">
+      <button type="button" class="mock-back" onclick="go('s-cadastro-bloq')">← Voltar</button>
+      <div class="mock-h1" id="cad-titulo">Cadastro</div>
+      <div class="mock-card" id="cad-form"></div>
+      <button type="button" class="mock-btn" onclick="salvarCadastro()">Salvar cadastro</button>
+    </section>
+
+    <section class="mock-screen" id="s-metas">
+      <button type="button" class="mock-back" onclick="go('s-colab-hub')">← Meu painel</button>
+      <div class="mock-h1">Minhas metas</div>
+      <div id="metas-body"></div>
+    </section>
+    <section class="mock-screen" id="s-escala">
+      <button type="button" class="mock-back" onclick="go('s-colab-hub')">← Meu painel</button>
+      <div class="mock-h1">Minha escala</div>
+      <div id="escala-body"></div>
+    </section>
+    <section class="mock-screen" id="s-banco">
+      <button type="button" class="mock-back" onclick="go('s-colab-hub')">← Meu painel</button>
+      <div class="mock-h1">Banco de horas</div>
+      <div id="banco-body"></div>
+    </section>
+    <section class="mock-screen" id="s-pagamento">
+      <button type="button" class="mock-back" onclick="go('s-colab-hub')">← Meu painel</button>
+      <div class="mock-h1">Holerite · demonstrativo de pagamento</div>
+      <div id="pag-body"></div>
+    </section>
+  </div>
+
+  <script src="mk-gestao-pessoas-ui.js?v=1.8.43"></script>
 </body>
 </html>
