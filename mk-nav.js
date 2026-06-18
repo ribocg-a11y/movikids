@@ -36,9 +36,8 @@ function sbSairSessaoClick_() {
   const s = typeof mkAuthGetSession === 'function' ? mkAuthGetSession() : null;
   const isAdm = (typeof mkAuthIsAdmin === 'function' && mkAuthIsAdmin()) || !!window.isAdmin;
   const localOp = !!(s && s.nome && s.role !== 'admin' && s.id !== 'ADMIN');
-  const srv = typeof mkAuthGetSessaoServidor_ === 'function' ? mkAuthGetSessaoServidor_() : null;
 
-  // Turno local (operador) — encerra no GAS mesmo com painel admin aberto (I21)
+  // Turno local (operador)
   if (localOp) {
     if (typeof trocarOperador === 'function') trocarOperador('turno');
     return;
