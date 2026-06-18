@@ -5,18 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Expires" content="0">
-  <title>MOVI KIDS — Mockup v3.1 Hub Tablet</title>
+  <title>MOVI KIDS — Mockup v3.2 Hub Tablet</title>
   <script>
     (function () {
-      var CANON = 'https://ribocg-a11y.github.io/movikids/ponto-mockup.html?v=3.1';
+      var CANON = 'https://ribocg-a11y.github.io/movikids/ponto-mockup.html?v=3.2';
       var h = location.hostname;
       if (h && h !== 'ribocg-a11y.github.io' && location.protocol !== 'file:') {
         location.replace(CANON);
         return;
       }
-      if (!location.search.includes('v=3.1') && !sessionStorage.getItem('mk-mock-ponto-v31')) {
-        sessionStorage.setItem('mk-mock-ponto-v31', '1');
-        location.replace(location.pathname + '?v=3.1&_=' + Date.now());
+      if (!location.search.includes('v=3.2') && !sessionStorage.getItem('mk-mock-ponto-v32')) {
+        sessionStorage.setItem('mk-mock-ponto-v32', '1');
+        location.replace(location.pathname + '?v=3.2&_=' + Date.now());
       }
     })();
   </script>
@@ -58,9 +58,9 @@
     .mock-note.err { background: var(--red-lt, #FFEBEE); border: 1px solid var(--red); color: var(--red); }
     .mock-pick { display: flex; gap: 12px; align-items: center; padding: 14px; border: 2px solid var(--border); border-radius: var(--mk-radius, 16px); margin-bottom: 10px; cursor: pointer; background: var(--card); width: 100%; text-align: left; font: inherit; }
     .mock-pick.sel { border-color: var(--blue); background: #E8F2FF; }
-    .mock-pin { display: flex; gap: 10px; justify-content: center; margin: 16px 0; }
-    .mock-pin input { width: 52px; height: 58px; border: 2px solid var(--border); border-radius: 12px; font-size: 26px; font-weight: 900; text-align: center; outline: none; font-family: inherit; }
-    .mock-pin input:focus { border-color: var(--blue); }
+    .mock-pin-row { display: flex; gap: 10px; justify-content: center; margin: 16px 0; }
+    .mock-pin-row .mk-pin-box { width: 52px; height: 58px; border: 2px solid var(--border); border-radius: 12px; font-size: 26px; font-weight: 900; text-align: center; outline: none; font-family: inherit; -webkit-text-security: disc; }
+    .mock-pin-row .mk-pin-box:focus { border-color: var(--blue); }
     .mock-btn { display: flex; align-items: center; justify-content: center; width: 100%; padding: 16px; border: none; border-radius: var(--mk-radius, 16px); font: inherit; font-weight: 900; font-size: 15px; cursor: pointer; margin-bottom: 10px; background: var(--blue); color: #fff; }
     .mock-btn.sec { background: var(--card); border: 2px solid var(--border); color: var(--txt); }
     .mock-btn:disabled { opacity: .45; cursor: not-allowed; }
@@ -94,7 +94,7 @@
     URL errada — use <strong>ribocg-a11y</strong> (hífen).<br>
     <a href="https://ribocg-a11y.github.io/movikids/ponto-mockup.html">Abrir versão correta →</a>
   </div>
-  <div class="mock-banner">MOCKUP <strong>v3.1</strong> · 3 portas com ícone · Colaboradores · ADM · build 77952b9</div>
+  <div class="mock-banner">MOCKUP <strong>v3.2</strong> · login PIN corrigido · build 62127e1</div>
 
   <div class="mock-shell">
 
@@ -135,7 +135,7 @@
       <div id="balcao-picks"></div>
       <div id="balcao-pin-wrap" hidden>
         <p class="mock-lead">PIN do operador: <strong id="balcao-pin-name"></strong></p>
-        <div class="mock-pin" id="balcao-pin"></div>
+        <div class="mock-pin-row mk-pin-row" id="balcao-pin"></div>
         <div class="mock-note err" id="balcao-err" hidden></div>
         <button class="mock-btn" onclick="balcaoEntrar()">Entrar no balcão</button>
         <button class="mock-btn sec" onclick="balcaoCancelPin()">Trocar operador</button>
@@ -151,9 +151,9 @@
       <div id="colab-picks"></div>
       <div id="colab-pin-wrap" hidden>
         <p class="mock-lead">PIN · <strong id="colab-pin-name"></strong></p>
-        <div class="mock-pin" id="colab-pin"></div>
+        <div class="mock-pin-row mk-pin-row" id="colab-pin"></div>
         <div class="mock-note err" id="colab-err" hidden></div>
-        <button class="mock-btn" onclick="colabEntrar()">Entrar</button>
+        <button type="button" class="mock-btn" id="colab-btn-entrar" onclick="colabEntrar()">Entrar</button>
         <button class="mock-btn sec" onclick="colabCancelPin()">Trocar pessoa</button>
       </div>
       <div class="mock-note info" style="margin-top:12px">PIN mock: Raykelly <strong>1111</strong> · Clara <strong>2222</strong> · Milena <strong>3333</strong></div>
@@ -270,7 +270,7 @@
       <button class="mock-back" onclick="go('s-home')">← Voltar ao início</button>
       <div class="mock-logo" style="font-size:28px">🔧 Administração</div>
       <p class="mock-sub">PIN administrativo · produção: 1416</p>
-      <div class="mock-pin" id="adm-pin"></div>
+      <div class="mock-pin-row mk-pin-row" id="adm-pin"></div>
       <div class="mock-note err" id="adm-err" hidden></div>
       <button class="mock-btn" onclick="admEntrar()">Entrar como ADM</button>
     </section>
@@ -386,24 +386,43 @@
     function cadastroPct(p) { const r=CAMPOS.filter(f=>f.req); return Math.round(r.filter(f=>String(p.cadastro[f.key]||'').trim()).length/r.length*100); }
     function cadastroOk(p) { return cadastroPct(p)===100; }
 
-    function mkPinRow(containerId, onDone) {
+    let balcaoPins = [];
+    let colabPins = [];
+    let adminPins = [];
+
+    function buildPinRow(containerId, onComplete) {
       const el = document.getElementById(containerId);
+      if (!el) return [];
       el.innerHTML = '';
       const inputs = [];
-      for (let i=0;i<4;i++) {
+      for (let i = 0; i < 4; i++) {
         const inp = document.createElement('input');
-        inp.maxLength = 1; inp.inputMode = 'numeric'; inp.type = 'password';
+        inp.type = 'tel';
+        inp.inputMode = 'numeric';
+        inp.pattern = '[0-9]*';
+        inp.maxLength = 1;
+        inp.className = 'mk-pin-box';
+        inp.autocomplete = 'off';
+        const idx = i;
         inp.addEventListener('input', () => {
-          if (inp.value && i<3) inputs[i+1].focus();
-          if (inputs.every(x=>x.value)) onDone && onDone(readPin(inputs));
+          inp.value = inp.value.replace(/\D/g, '').slice(0, 1);
+          if (inp.value && idx < 3) inputs[idx + 1].focus();
+          if (inputs.every(x => x.value.length === 1) && onComplete) {
+            clearTimeout(el._pinTimer);
+            el._pinTimer = setTimeout(onComplete, 120);
+          }
         });
-        inp.addEventListener('keydown', e => { if (e.key==='Backspace' && !inp.value && i>0) inputs[i-1].focus(); });
-        el.appendChild(inp); inputs.push(inp);
+        inp.addEventListener('keydown', e => {
+          if (e.key === 'Backspace' && !inp.value && idx > 0) inputs[idx - 1].focus();
+          if (e.key === 'Enter' && onComplete) onComplete();
+        });
+        el.appendChild(inp);
+        inputs.push(inp);
       }
       return inputs;
     }
-    function readPin(inputs) { return inputs.map(i=>i.value).join(''); }
-    function clearPin(containerId) { document.getElementById(containerId).querySelectorAll('input').forEach(i=>{i.value='';}); }
+    function readPin(inputs) { return (inputs || []).map(i => i.value).join(''); }
+    function clearPinInputs(inputs) { (inputs || []).forEach(i => { i.value = ''; }); if (inputs[0]) inputs[0].focus(); }
 
     /* ── BALCÃO ── */
     function renderBalcao() {
@@ -427,14 +446,19 @@
       document.getElementById('balcao-pin-wrap').hidden = false;
       document.getElementById('balcao-pin-name').textContent = PESSOAS[id].label;
       document.getElementById('balcao-err').hidden = true;
-      clearPin('balcao-pin');
-      mkPinRow('balcao-pin');
-      document.getElementById('balcao-pin').querySelector('input')?.focus();
+      clearPinInputs(balcaoPins);
+      balcaoPins = buildPinRow('balcao-pin', balcaoEntrar);
+      balcaoPins[0]?.focus();
     }
     function balcaoCancelPin() { pickBalcao=null; document.getElementById('balcao-pin-wrap').hidden=true; }
     function balcaoEntrar() {
-      const pin = readPin(document.getElementById('balcao-pin').querySelectorAll('input'));
+      const pin = readPin(balcaoPins);
       const p = PESSOAS[pickBalcao];
+      if (!p) { return; }
+      if (pin.length < 4) {
+        const err = document.getElementById('balcao-err');
+        err.textContent = 'Digite os 4 números do PIN.'; err.hidden = false; return;
+      }
       if (pin !== p.pinBalcao) {
         const err = document.getElementById('balcao-err');
         err.textContent = 'PIN incorreto.'; err.hidden = false; return;
@@ -454,28 +478,48 @@
       pickColab = null;
       document.getElementById('colab-pin-wrap').hidden = true;
       document.getElementById('colab-picks').innerHTML = Object.values(PESSOAS).map(p =>
-        `<button class="mock-pick" onclick="colabPick('${p.id}')">
+        `<button type="button" class="mock-pick" data-uid="${p.id}" onclick="colabPick('${p.id}')">
           <div class="mock-av${p.owner?' owner':''}">${p.letra}</div>
           <div><div style="font-weight:900">${p.label}</div><div style="font-size:12px;color:var(--txt3)">${p.funcao}</div></div>
         </button>`).join('');
     }
+    function showColabErr(msg) {
+      const err = document.getElementById('colab-err');
+      err.textContent = msg;
+      err.hidden = false;
+    }
     function colabPick(id) {
       pickColab = id;
+      document.getElementById('colab-pin-wrap').dataset.uid = id;
       document.getElementById('colab-pin-wrap').hidden = false;
       document.getElementById('colab-pin-name').textContent = PESSOAS[id].label;
       document.getElementById('colab-err').hidden = true;
-      clearPin('colab-pin');
-      mkPinRow('colab-pin');
+      document.querySelectorAll('#colab-picks .mock-pick').forEach(btn => {
+        btn.classList.toggle('sel', btn.dataset.uid === id);
+      });
+      colabPins = buildPinRow('colab-pin', colabEntrar);
+      colabPins[0]?.focus();
     }
-    function colabCancelPin() { pickColab=null; document.getElementById('colab-pin-wrap').hidden=true; }
+    function colabCancelPin() {
+      pickColab = null;
+      delete document.getElementById('colab-pin-wrap').dataset.uid;
+      document.getElementById('colab-pin-wrap').hidden = true;
+      document.querySelectorAll('#colab-picks .mock-pick').forEach(btn => btn.classList.remove('sel'));
+    }
     function colabEntrar() {
-      const pin = readPin(document.getElementById('colab-pin').querySelectorAll('input'));
-      const p = PESSOAS[pickColab];
+      const uid = pickColab || document.getElementById('colab-pin-wrap').dataset.uid;
+      if (!uid) { showColabErr('Selecione seu nome na lista acima.'); return; }
+      const pin = readPin(colabPins);
+      if (pin.length < 4) { showColabErr('Digite os 4 números do PIN.'); return; }
+      const p = PESSOAS[uid];
+      if (!p) { showColabErr('Colaborador não encontrado.'); return; }
       if (pin !== p.pin) {
-        const err = document.getElementById('colab-err');
-        err.textContent = 'PIN incorreto.'; err.hidden = false; return;
+        showColabErr('PIN incorreto. Raykelly = 1111 · Clara = 2222 · Milena = 3333');
+        clearPinInputs(colabPins);
+        return;
       }
-      colabLogado = pickColab;
+      document.getElementById('colab-err').hidden = true;
+      colabLogado = uid;
       go('s-colab-hub');
     }
     function colabSair() { colabLogado=null; go('s-home'); }
@@ -615,7 +659,11 @@
 
     /* ── ADM ── */
     function admEntrar() {
-      const pin = readPin(document.getElementById('adm-pin').querySelectorAll('input'));
+      const pin = readPin(adminPins);
+      if (pin.length < 4) {
+        const err = document.getElementById('adm-err');
+        err.textContent = 'Digite os 4 números do PIN.'; err.hidden = false; return;
+      }
       if (pin !== '1416') {
         const err = document.getElementById('adm-err');
         err.textContent = 'PIN administrativo incorreto.'; err.hidden = false; return;
@@ -630,7 +678,7 @@
     function fecharAlerta() { document.getElementById('mock-adm-alert').classList.remove('show'); }
 
     /* ── INIT ── */
-    mkPinRow('adm-pin');
+    adminPins = buildPinRow('adm-pin', admEntrar);
     setInterval(() => {
       const el = document.getElementById('ponto-clock');
       if (el && document.getElementById('s-ponto').classList.contains('active')) el.textContent = fmtTime();
