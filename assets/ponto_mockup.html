@@ -2,8 +2,366 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="refresh" content="0;url=ponto-mockup.html">
-  <script>location.replace('ponto-mockup.html');</script>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <title>MOVI KIDS — Ponto (visão colaborador)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --blue: #1E6FD9; --blue-dark: #0D4A9E; --yellow: #FFD54F; --orange: #FF9800;
+      --green: #2E7D32; --red: #C62828; --bg: #F4F6FA; --card: #fff; --border: #E2E8F0;
+      --txt: #1A2332; --txt2: #5A6578; --txt3: #8B95A5; --radius: 16px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Nunito, system-ui, sans-serif; background: var(--bg); color: var(--txt); min-height: 100vh; }
+    .banner { background: var(--blue-dark); color: #fff; text-align: center; padding: 8px 12px; font-size: 12px; font-weight: 800; }
+    .banner strong { color: var(--yellow); }
+    .shell { max-width: 520px; margin: 0 auto; padding: 16px 14px 72px; }
+    .screen { display: none; animation: fade .25s ease; }
+    .screen.active { display: block; }
+    @keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+    .logo { font-family: 'Fredoka One', cursive; font-size: 32px; color: var(--blue-dark); text-align: center; margin: 20px 0 6px; }
+    .sub { text-align: center; color: var(--txt2); font-size: 14px; font-weight: 700; margin-bottom: 24px; }
+    .btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 16px; border: none; border-radius: var(--radius); font: inherit; font-weight: 900; font-size: 15px; cursor: pointer; margin-bottom: 10px; }
+    .btn-primary { background: var(--blue); color: #fff; }
+    .btn-outline { background: var(--card); border: 2px solid var(--border); color: var(--txt); }
+    .btn-ghost { background: transparent; color: var(--txt3); font-size: 13px; padding: 8px; width: 100%; border: none; font: inherit; font-weight: 800; cursor: pointer; }
+    h1 { font-family: 'Fredoka One', cursive; font-size: 22px; color: var(--blue-dark); margin-bottom: 6px; }
+    .lead { font-size: 14px; color: var(--txt2); font-weight: 700; margin-bottom: 14px; line-height: 1.5; }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(26,35,50,.05); }
+    .pick { display: flex; gap: 12px; align-items: center; padding: 14px; border: 2px solid var(--border); border-radius: var(--radius); margin-bottom: 10px; cursor: pointer; background: var(--card); width: 100%; text-align: left; font: inherit; }
+    .av { width: 48px; height: 48px; border-radius: 50%; background: #E8F2FF; color: var(--blue); display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 18px; flex-shrink: 0; }
+    .av.owner { background: #FFF3E0; color: #E65100; }
+    .pick-name { font-weight: 900; font-size: 16px; }
+    .pick-meta { font-size: 12px; color: var(--txt3); font-weight: 700; margin-top: 2px; }
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 10px; font-weight: 800; }
+    .b-ok { background: #E8F5E9; color: var(--green); }
+    .b-warn { background: #FFF3E0; color: #E65100; }
+    .b-gray { background: #ECEFF1; color: var(--txt3); }
+    .clock-big { font-family: 'Fredoka One', cursive; font-size: 44px; color: var(--blue); text-align: center; line-height: 1; }
+    .clock-sub { text-align: center; font-size: 13px; color: var(--txt3); font-weight: 800; margin-bottom: 12px; }
+    .back { background: none; border: none; color: var(--blue); font: inherit; font-weight: 800; font-size: 14px; cursor: pointer; margin-bottom: 12px; padding: 0; }
+    .note { font-size: 12px; color: var(--txt3); font-weight: 700; padding: 12px; background: #FFFDE7; border-radius: 12px; border: 1px solid #FFF59D; line-height: 1.5; }
+    .note.err { background: #FFEBEE; border-color: #FFCDD2; color: #B71C1C; }
+    .note.ok { background: #E8F5E9; border-color: #A5D6A7; color: var(--green); }
+    .field { margin-bottom: 10px; }
+    .field label { display: block; font-size: 11px; font-weight: 800; color: var(--txt3); text-transform: uppercase; margin-bottom: 4px; }
+    .field label .req { color: var(--red); }
+    .field input { width: 100%; padding: 11px 12px; border: 1px solid var(--border); border-radius: 12px; font: inherit; font-weight: 700; }
+    .field input.missing { border-color: var(--orange); background: #FFF8E1; }
+    .checklist { list-style: none; margin: 12px 0; }
+    .checklist li { font-size: 13px; font-weight: 700; padding: 8px 0; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; }
+    .prog { height: 8px; background: var(--border); border-radius: 999px; overflow: hidden; margin: 10px 0; }
+    .prog-fill { height: 100%; background: var(--blue); border-radius: 999px; }
+    .lanc-top { text-align: center; padding: 8px 0 16px; }
+    .lanc-hero { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+    .sec-divider { font-size: 11px; font-weight: 900; color: var(--txt3); text-transform: uppercase; letter-spacing: .06em; margin: 20px 0 10px; padding-top: 8px; border-top: 2px solid var(--border); }
+    .espelho-head { border: 2px solid var(--txt); border-radius: 8px; padding: 10px; margin-bottom: 10px; background: #FAFAFA; }
+    .espelho-head h2 { font-size: 12px; font-weight: 900; text-transform: uppercase; text-align: center; margin-bottom: 8px; }
+    .espelho-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 10px; font-size: 11px; font-weight: 700; }
+    .espelho-meta span { color: var(--txt3); }
+    .espelho-wrap { overflow-x: auto; border: 1px solid var(--txt); border-radius: 4px; }
+    .espelho { width: 100%; border-collapse: collapse; font-size: 11px; font-weight: 700; min-width: 400px; }
+    .espelho th { background: #ECEFF1; border: 1px solid var(--txt); padding: 6px 4px; font-size: 10px; text-transform: uppercase; }
+    .espelho td { border: 1px solid var(--border); padding: 6px 4px; text-align: center; }
+    .espelho tr.hoje { background: #E8F2FF; font-weight: 900; }
+    .espelho tr.hoje td { border-color: var(--blue); }
+    .espelho .sit-ok { color: var(--green); }
+    .espelho .sit-ab { color: var(--orange); }
+    .espelho .sit-falta { color: var(--red); }
+    .espelho-foot { margin-top: 8px; font-size: 10px; font-weight: 700; color: var(--txt3); }
+    .flash { display: none; margin-bottom: 12px; }
+    .flash.show { display: block; }
+    .footer-link { position: fixed; bottom: 0; left: 0; right: 0; text-align: center; padding: 8px; background: rgba(244,246,250,.97); border-top: 1px solid var(--border); font-size: 11px; font-weight: 800; }
+    .footer-link a { color: var(--txt3); }
+  </style>
 </head>
-<body><a href="ponto-mockup.html">Abrir mockup ponto</a></body>
+<body>
+  <div class="banner">MOCKUP <strong>v2.1</strong> · colaborador · folha <strong>dentro</strong> do lançamento (sem botão separado)</div>
+  <div class="shell">
+
+    <section class="screen active" id="s-gate">
+      <div class="logo">Movi Kids</div>
+      <p class="sub">Tablet na loja — registrar ponto</p>
+      <button class="btn btn-primary" onclick="show('s-quem')">🕐 Registrar meu ponto</button>
+      <button class="btn btn-outline" onclick="alert('Fluxo existente: login operador + PIN → balcão')">🚗 Entrar no balcão</button>
+    </section>
+
+    <section class="screen" id="s-quem">
+      <button class="back" onclick="show('s-gate')">← Voltar</button>
+      <h1>Quem é você?</h1>
+      <p class="lead">Toque no seu nome para abrir o lançamento de ponto.</p>
+      <div class="clock-big" id="liveClock">--:--</div>
+      <div class="clock-sub" id="liveDate"></div>
+      <div id="lista-quem"></div>
+    </section>
+
+    <section class="screen" id="s-bloqueio">
+      <button class="back" onclick="show('s-quem')">← Voltar</button>
+      <h1>Cadastro incompleto</h1>
+      <p class="lead" id="bloqueioNome"></p>
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:800;margin-bottom:4px">
+          <span style="color:var(--txt3)">PROGRESSO</span><span id="bloqueioPct" style="color:var(--blue)"></span>
+        </div>
+        <div class="prog"><div class="prog-fill" id="bloqueioBar"></div></div>
+        <ul class="checklist" id="bloqueioLista"></ul>
+      </div>
+      <div class="note err">Complete CPF, contato, endereço e PIX para liberar o ponto.</div>
+      <button class="btn btn-primary" onclick="showCadastro()">Completar cadastro</button>
+    </section>
+
+    <section class="screen" id="s-cadastro">
+      <button class="back" onclick="show('s-bloqueio')">← Voltar</button>
+      <h1 id="cadTitulo">Cadastro</h1>
+      <p class="lead">Todos os campos com * são obrigatórios.</p>
+      <div class="card" id="cadForm"></div>
+      <button class="btn btn-primary" onclick="salvarCadastro()">Salvar e ir para o ponto</button>
+    </section>
+
+    <!-- LANÇAMENTO: ponto + folha na mesma página -->
+    <section class="screen" id="s-lancamento">
+      <button class="back" onclick="show('s-quem')">← Trocar pessoa</button>
+
+      <div id="flashOk" class="note ok flash"></div>
+
+      <div class="card lanc-hero">
+        <div class="av" id="lancAv">R</div>
+        <div style="flex:1">
+          <div class="pick-name" id="lancNome">Raykelly</div>
+          <div class="pick-meta" id="lancMeta"></div>
+        </div>
+        <span class="badge b-gray" id="lancStatus">Fora</span>
+      </div>
+
+      <div class="lanc-top">
+        <div class="clock-big" id="lancClock">--:--</div>
+        <div class="clock-sub" id="lancData"></div>
+        <button class="btn btn-primary" id="lancBtn" onclick="confirmarPonto()">Confirmar entrada</button>
+        <button class="btn btn-ghost" onclick="show('s-gate')">Voltar ao início</button>
+      </div>
+
+      <div class="sec-divider">Minha folha de ponto · jun/2026</div>
+      <div id="lancFolha"></div>
+    </section>
+
+  </div>
+  <div class="footer-link">Visão colaborador · <a href="assets/gestao-pessoas-mockup-gestor.html">Mockup gestor →</a></div>
+
+  <script>
+    const CAMPOS = [
+      { key: 'nomeCompleto', label: 'Nome completo', req: true },
+      { key: 'cpf', label: 'CPF', req: true },
+      { key: 'nascimento', label: 'Data nascimento', req: true, type: 'date' },
+      { key: 'telefone', label: 'Telefone / WhatsApp', req: true },
+      { key: 'email', label: 'E-mail', req: false },
+      { key: 'endereco', label: 'Endereço completo', req: true },
+      { key: 'emergencia', label: 'Contato emergência', req: true },
+      { key: 'admissao', label: 'Data admissão', req: true, type: 'date' },
+      { key: 'pix', label: 'Chave PIX', req: true }
+    ];
+
+    const COLABS = {
+      milena: {
+        id: 'milena', label: 'Milena', letra: 'M', owner: true, funcao: 'Sócia',
+        cadastro: { nomeCompleto: 'Milena Nunes', cpf: '000.000.000-01', nascimento: '1990-01-15', telefone: '(11) 99999-0001', email: 'milena@movikids.com', endereco: 'Rua Exemplo, 100', emergencia: 'João 99999-0000', admissao: '2020-01-01', pix: 'milena@email.com' },
+        statusHoje: 'dentro', turno: '10h–14h',
+        folha: [
+          { data: '16/06', dia: 'Seg', entrada: '09:58', saida: '14:02', horas: '4h04', sit: 'OK' },
+          { data: '13/06', dia: 'Sex', entrada: '09:55', saida: '14:05', horas: '4h10', sit: 'OK' }
+        ]
+      },
+      raykelly: {
+        id: 'raykelly', label: 'Raykelly', letra: 'R', owner: false, funcao: 'Atendente 1',
+        cadastro: { nomeCompleto: 'Raykelly', telefone: '', cpf: '', nascimento: '', endereco: '', emergencia: '', admissao: '2026-06-16', pix: '', email: '' },
+        statusHoje: 'fora', turno: '14h–22h',
+        folha: [
+          { data: '16/06', dia: 'Seg', entrada: '13:58', saida: '21:05', horas: '7h07', sit: 'OK' },
+          { data: '15/06', dia: 'Dom', entrada: '12:55', saida: '21:10', horas: '8h15', sit: 'OK' },
+          { data: '14/06', dia: 'Sáb', entrada: '—', saida: '—', horas: '—', sit: 'FALTA' }
+        ]
+      },
+      clara: {
+        id: 'clara', label: 'Clara', letra: 'C', owner: false, funcao: 'Atendente 2',
+        cadastro: { nomeCompleto: 'Clara', telefone: '', cpf: '', nascimento: '', endereco: '', emergencia: '', admissao: '', pix: '', email: '' },
+        statusHoje: 'fora', turno: '14h–22h', folha: []
+      }
+    };
+
+    let currentId = null;
+
+    function cadastroPct(c) {
+      const req = CAMPOS.filter(f => f.req);
+      const ok = req.filter(f => String(c.cadastro[f.key] || '').trim().length > 0);
+      return Math.round((ok.length / req.length) * 100);
+    }
+    function cadastroCompleto(c) { return cadastroPct(c) === 100; }
+    function fmtDate() { return new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric' }); }
+    function fmtTime() { return new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }); }
+    function fmtDataHoje() {
+      const d = new Date();
+      return String(d.getDate()).padStart(2,'0') + '/' + String(d.getMonth()+1).padStart(2,'0');
+    }
+    function diaSemanaHoje() { return ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'][new Date().getDay()]; }
+
+    function show(id) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      window.scrollTo(0, 0);
+      if (id === 's-quem') renderListaQuem();
+      if (id === 's-lancamento') renderLancamento();
+    }
+
+    function renderListaQuem() {
+      document.getElementById('lista-quem').innerHTML = Object.values(COLABS).map(c => {
+        const comp = cadastroCompleto(c);
+        const st = c.statusHoje === 'dentro' ? '<span class="badge b-ok">Dentro</span>' : '<span class="badge b-gray">Fora</span>';
+        const cad = comp ? '' : ' <span class="badge b-warn">Cadastro pendente</span>';
+        return `<button class="pick" onclick="abrirLancamento('${c.id}')">
+          <div class="av${c.owner ? ' owner' : ''}">${c.letra}</div>
+          <div><div class="pick-name">${c.label} ${st}${cad}</div>
+          <div class="pick-meta">${c.funcao} · turno ${c.turno}</div></div></button>`;
+      }).join('');
+    }
+
+    function abrirLancamento(id) {
+      currentId = id;
+      const c = COLABS[id];
+      if (!cadastroCompleto(c)) { showBloqueio(id); return; }
+      document.getElementById('flashOk').classList.remove('show');
+      show('s-lancamento');
+    }
+
+    function showBloqueio(id) {
+      currentId = id;
+      const c = COLABS[id];
+      const pct = cadastroPct(c);
+      document.getElementById('bloqueioNome').textContent = c.label + ', complete o cadastro para lançar ponto.';
+      document.getElementById('bloqueioPct').textContent = pct + '%';
+      document.getElementById('bloqueioBar').style.width = pct + '%';
+      document.getElementById('bloqueioLista').innerHTML = CAMPOS.filter(f => f.req).map(f => {
+        const ok = String(c.cadastro[f.key] || '').trim().length > 0;
+        return `<li><span>${f.label}</span><span style="color:${ok ? 'var(--green)' : 'var(--orange)'}">${ok ? '✓' : 'Pendente'}</span></li>`;
+      }).join('');
+      show('s-bloqueio');
+    }
+
+    function showCadastro() {
+      const c = COLABS[currentId];
+      document.getElementById('cadTitulo').textContent = 'Cadastro — ' + c.label;
+      document.getElementById('cadForm').innerHTML = CAMPOS.map(f => {
+        const v = c.cadastro[f.key] || '';
+        return `<div class="field"><label>${f.label}${f.req ? ' <span class="req">*</span>' : ''}</label>
+          <input type="${f.type || 'text'}" id="cad-${f.key}" value="${v}" class="${f.req && !v ? 'missing' : ''}"></div>`;
+      }).join('');
+      show('s-cadastro');
+    }
+
+    function salvarCadastro() {
+      const c = COLABS[currentId];
+      CAMPOS.forEach(f => {
+        const el = document.getElementById('cad-' + f.key);
+        if (el) c.cadastro[f.key] = el.value.trim();
+      });
+      if (!cadastroCompleto(c)) {
+        alert('Preencha todos os campos obrigatórios (*).');
+        showCadastro();
+        return;
+      }
+      abrirLancamento(currentId);
+    }
+
+    function renderEspelho(id) {
+      const c = COLABS[id];
+      const hoje = fmtDataHoje();
+      const rows = c.folha.map(r => {
+        const cls = r.data === hoje ? ' class="hoje"' : '';
+        const sitCls = r.sit === 'OK' ? 'sit-ok' : r.sit === 'FALTA' ? 'sit-falta' : 'sit-ab';
+        return `<tr${cls}><td>${r.data}</td><td>${r.dia}</td><td>${r.entrada}</td><td>${r.saida}</td><td>${r.horas}</td><td class="${sitCls}">${r.sit}</td></tr>`;
+      }).join('');
+      return `
+        <div class="espelho-head">
+          <h2>Espelho de ponto eletrônico</h2>
+          <div class="espelho-meta">
+            <div><span>Empresa:</span> MOVI KIDS</div>
+            <div><span>Período:</span> Jun/2026</div>
+            <div><span>Colaborador:</span> ${c.cadastro.nomeCompleto || c.label}</div>
+            <div><span>CPF:</span> ${c.cadastro.cpf || '—'}</div>
+          </div>
+        </div>
+        <div class="espelho-wrap">
+          <table class="espelho">
+            <thead><tr><th>Data</th><th>Dia</th><th>Entrada</th><th>Saída</th><th>Total</th><th>Sit.</th></tr></thead>
+            <tbody>${rows || '<tr><td colspan="6">Nenhum registro ainda</td></tr>'}</tbody>
+          </table>
+        </div>
+        <div class="espelho-foot">Linha azul = hoje · atualiza ao confirmar entrada/saída</div>`;
+    }
+
+    function renderLancamento() {
+      const c = COLABS[currentId];
+      if (!c) return;
+      const isEntrada = c.statusHoje !== 'dentro';
+      document.getElementById('lancAv').textContent = c.letra;
+      document.getElementById('lancAv').className = 'av' + (c.owner ? ' owner' : '');
+      document.getElementById('lancNome').textContent = c.label;
+      document.getElementById('lancMeta').textContent = c.funcao + ' · turno ' + c.turno;
+      const stEl = document.getElementById('lancStatus');
+      stEl.textContent = c.statusHoje === 'dentro' ? 'Dentro' : 'Fora';
+      stEl.className = 'badge ' + (c.statusHoje === 'dentro' ? 'b-ok' : 'b-gray');
+      document.getElementById('lancClock').textContent = fmtTime();
+      document.getElementById('lancData').textContent = fmtDate();
+      document.getElementById('lancBtn').textContent = isEntrada ? 'Confirmar entrada' : 'Confirmar saída';
+      document.getElementById('lancFolha').innerHTML = renderEspelho(currentId);
+    }
+
+    function confirmarPonto() {
+      const c = COLABS[currentId];
+      const t = fmtTime();
+      const hoje = fmtDataHoje();
+      const dia = diaSemanaHoje();
+      let row = c.folha.find(r => r.data === hoje);
+      if (!row) {
+        row = { data: hoje, dia, entrada: '—', saida: '—', horas: '—', sit: 'ABERTO' };
+        c.folha.unshift(row);
+      }
+      const isEntrada = c.statusHoje !== 'dentro';
+      let msg;
+      if (isEntrada) {
+        row.entrada = t;
+        c.statusHoje = 'dentro';
+        msg = 'Entrada registrada às ' + t + ' — veja na folha abaixo.';
+      } else {
+        row.saida = t;
+        c.statusHoje = 'fora';
+        row.sit = 'OK';
+        if (row.entrada !== '—') {
+          const [eh, em] = row.entrada.split(':').map(Number);
+          const [sh, sm] = t.split(':').map(Number);
+          let mins = (sh * 60 + sm) - (eh * 60 + em);
+          if (mins < 0) mins += 1440;
+          row.horas = Math.floor(mins/60) + 'h' + String(mins%60).padStart(2,'0');
+        }
+        msg = 'Saída registrada às ' + t + ' — veja na folha abaixo.';
+      }
+      const flash = document.getElementById('flashOk');
+      flash.textContent = '✓ ' + msg;
+      flash.classList.add('show');
+      renderLancamento();
+      document.getElementById('lancFolha').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function tick() {
+      const t = fmtTime();
+      const el = document.getElementById('liveClock');
+      if (el) el.textContent = t;
+      const el2 = document.getElementById('liveDate');
+      if (el2) el2.textContent = fmtDate();
+      const el3 = document.getElementById('lancClock');
+      if (el3) el3.textContent = t;
+    }
+    tick(); setInterval(tick, 1000);
+    renderListaQuem();
+  </script>
+</body>
 </html>
