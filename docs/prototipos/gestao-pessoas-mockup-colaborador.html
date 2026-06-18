@@ -15,23 +15,20 @@
     body { font-family: Nunito, system-ui, sans-serif; background: var(--bg); color: var(--txt); min-height: 100vh; }
     .banner { background: var(--blue-dark); color: #fff; text-align: center; padding: 8px 12px; font-size: 12px; font-weight: 800; }
     .banner strong { color: var(--yellow); }
-    .shell { max-width: 480px; margin: 0 auto; padding: 16px 14px 88px; }
+    .shell { max-width: 520px; margin: 0 auto; padding: 16px 14px 72px; }
     .screen { display: none; animation: fade .25s ease; }
     .screen.active { display: block; }
     @keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
     .logo { font-family: 'Fredoka One', cursive; font-size: 32px; color: var(--blue-dark); text-align: center; margin: 20px 0 6px; }
-    .sub { text-align: center; color: var(--txt2); font-size: 14px; font-weight: 700; margin-bottom: 24px; line-height: 1.5; }
+    .sub { text-align: center; color: var(--txt2); font-size: 14px; font-weight: 700; margin-bottom: 24px; }
     .btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 16px; border: none; border-radius: var(--radius); font: inherit; font-weight: 900; font-size: 15px; cursor: pointer; margin-bottom: 10px; }
     .btn-primary { background: var(--blue); color: #fff; }
-    .btn-secondary { background: #E8F2FF; color: var(--blue); }
     .btn-outline { background: var(--card); border: 2px solid var(--border); color: var(--txt); }
     .btn-ghost { background: transparent; color: var(--txt3); font-size: 13px; padding: 8px; width: 100%; border: none; font: inherit; font-weight: 800; cursor: pointer; }
-    .btn:disabled { opacity: .45; cursor: not-allowed; }
     h1 { font-family: 'Fredoka One', cursive; font-size: 22px; color: var(--blue-dark); margin-bottom: 6px; }
-    .lead { font-size: 14px; color: var(--txt2); font-weight: 700; margin-bottom: 16px; line-height: 1.5; }
+    .lead { font-size: 14px; color: var(--txt2); font-weight: 700; margin-bottom: 14px; line-height: 1.5; }
     .card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(26,35,50,.05); }
     .pick { display: flex; gap: 12px; align-items: center; padding: 14px; border: 2px solid var(--border); border-radius: var(--radius); margin-bottom: 10px; cursor: pointer; background: var(--card); width: 100%; text-align: left; font: inherit; }
-    .pick:hover { border-color: var(--blue); }
     .av { width: 48px; height: 48px; border-radius: 50%; background: #E8F2FF; color: var(--blue); display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 18px; flex-shrink: 0; }
     .av.owner { background: #FFF3E0; color: #E65100; }
     .pick-name { font-weight: 900; font-size: 16px; }
@@ -40,131 +37,115 @@
     .b-ok { background: #E8F5E9; color: var(--green); }
     .b-warn { background: #FFF3E0; color: #E65100; }
     .b-gray { background: #ECEFF1; color: var(--txt3); }
-    .clock-big { font-family: 'Fredoka One', cursive; font-size: 40px; color: var(--blue); text-align: center; }
-    .clock-sub { text-align: center; font-size: 13px; color: var(--txt3); font-weight: 800; margin-bottom: 16px; }
+    .clock-big { font-family: 'Fredoka One', cursive; font-size: 44px; color: var(--blue); text-align: center; line-height: 1; }
+    .clock-sub { text-align: center; font-size: 13px; color: var(--txt3); font-weight: 800; margin-bottom: 12px; }
     .back { background: none; border: none; color: var(--blue); font: inherit; font-weight: 800; font-size: 14px; cursor: pointer; margin-bottom: 12px; padding: 0; }
     .note { font-size: 12px; color: var(--txt3); font-weight: 700; padding: 12px; background: #FFFDE7; border-radius: 12px; border: 1px solid #FFF59D; line-height: 1.5; }
     .note.err { background: #FFEBEE; border-color: #FFCDD2; color: #B71C1C; }
+    .note.ok { background: #E8F5E9; border-color: #A5D6A7; color: var(--green); }
     .field { margin-bottom: 10px; }
     .field label { display: block; font-size: 11px; font-weight: 800; color: var(--txt3); text-transform: uppercase; margin-bottom: 4px; }
     .field label .req { color: var(--red); }
     .field input { width: 100%; padding: 11px 12px; border: 1px solid var(--border); border-radius: 12px; font: inherit; font-weight: 700; }
     .field input.missing { border-color: var(--orange); background: #FFF8E1; }
-    .field input.ok { border-color: var(--green); }
     .checklist { list-style: none; margin: 12px 0; }
     .checklist li { font-size: 13px; font-weight: 700; padding: 8px 0; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; }
-    .checklist li:last-child { border-bottom: none; }
     .prog { height: 8px; background: var(--border); border-radius: 999px; overflow: hidden; margin: 10px 0; }
-    .prog-fill { height: 100%; background: var(--blue); border-radius: 999px; transition: width .3s; }
-    .success { text-align: center; padding: 24px 8px; }
-    .success h2 { font-family: 'Fredoka One', cursive; font-size: 26px; color: var(--green); margin: 8px 0; }
-    .success p { color: var(--txt2); font-weight: 700; font-size: 14px; }
-    /* Espelho de ponto — modelo REP / Portaria 671 */
-    .espelho-head { border: 2px solid var(--txt); border-radius: 8px; padding: 12px; margin-bottom: 12px; background: #FAFAFA; }
-    .espelho-head h2 { font-size: 13px; font-weight: 900; text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; text-align: center; }
-    .espelho-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 12px; font-size: 11px; font-weight: 700; }
+    .prog-fill { height: 100%; background: var(--blue); border-radius: 999px; }
+    .lanc-top { text-align: center; padding: 8px 0 16px; }
+    .lanc-hero { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+    .sec-divider { font-size: 11px; font-weight: 900; color: var(--txt3); text-transform: uppercase; letter-spacing: .06em; margin: 20px 0 10px; padding-top: 8px; border-top: 2px solid var(--border); }
+    .espelho-head { border: 2px solid var(--txt); border-radius: 8px; padding: 10px; margin-bottom: 10px; background: #FAFAFA; }
+    .espelho-head h2 { font-size: 12px; font-weight: 900; text-transform: uppercase; text-align: center; margin-bottom: 8px; }
+    .espelho-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 10px; font-size: 11px; font-weight: 700; }
     .espelho-meta span { color: var(--txt3); }
     .espelho-wrap { overflow-x: auto; border: 1px solid var(--txt); border-radius: 4px; }
-    .espelho { width: 100%; border-collapse: collapse; font-size: 11px; font-weight: 700; min-width: 420px; }
-    .espelho th { background: #ECEFF1; border: 1px solid var(--txt); padding: 6px 4px; text-align: center; font-size: 10px; text-transform: uppercase; }
+    .espelho { width: 100%; border-collapse: collapse; font-size: 11px; font-weight: 700; min-width: 400px; }
+    .espelho th { background: #ECEFF1; border: 1px solid var(--txt); padding: 6px 4px; font-size: 10px; text-transform: uppercase; }
     .espelho td { border: 1px solid var(--border); padding: 6px 4px; text-align: center; }
     .espelho tr.hoje { background: #E8F2FF; font-weight: 900; }
     .espelho tr.hoje td { border-color: var(--blue); }
     .espelho .sit-ok { color: var(--green); }
     .espelho .sit-ab { color: var(--orange); }
     .espelho .sit-falta { color: var(--red); }
-    .espelho-foot { margin-top: 10px; font-size: 11px; font-weight: 700; color: var(--txt2); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
-    .footer-link { position: fixed; bottom: 0; left: 0; right: 0; text-align: center; padding: 10px; background: rgba(244,246,250,.97); border-top: 1px solid var(--border); font-size: 11px; font-weight: 800; }
+    .espelho-foot { margin-top: 8px; font-size: 10px; font-weight: 700; color: var(--txt3); }
+    .flash { display: none; margin-bottom: 12px; }
+    .flash.show { display: block; }
+    .footer-link { position: fixed; bottom: 0; left: 0; right: 0; text-align: center; padding: 8px; background: rgba(244,246,250,.97); border-top: 1px solid var(--border); font-size: 11px; font-weight: 800; }
     .footer-link a { color: var(--txt3); }
   </style>
 </head>
 <body>
-  <div class="banner">MOCKUP · <strong>Visão colaborador</strong> · espelho de ponto (modelo REP) · não é produção</div>
+  <div class="banner">MOCKUP · <strong>Visão colaborador</strong> · lançamento + folha na mesma tela</div>
   <div class="shell">
 
     <section class="screen active" id="s-gate">
       <div class="logo">Movi Kids</div>
-      <p class="sub">Tablet na loja — registrar ponto ou ver sua folha</p>
+      <p class="sub">Tablet na loja — registrar ponto</p>
       <button class="btn btn-primary" onclick="show('s-quem')">🕐 Registrar meu ponto</button>
-      <button class="btn btn-secondary" onclick="show('s-quem-folha')">📋 Ver minha folha de ponto</button>
       <button class="btn btn-outline" onclick="alert('Fluxo existente: login operador + PIN → balcão')">🚗 Entrar no balcão</button>
     </section>
 
     <section class="screen" id="s-quem">
       <button class="back" onclick="show('s-gate')">← Voltar</button>
       <h1>Quem é você?</h1>
-      <p class="lead">Toque no seu nome. Se faltar cadastro, o sistema abre o formulário antes de liberar o ponto.</p>
+      <p class="lead">Toque no seu nome para abrir o lançamento de ponto.</p>
       <div class="clock-big" id="liveClock">--:--</div>
       <div class="clock-sub" id="liveDate"></div>
       <div id="lista-quem"></div>
     </section>
 
-    <section class="screen" id="s-quem-folha">
-      <button class="back" onclick="show('s-gate')">← Voltar</button>
-      <h1>Ver folha de ponto</h1>
-      <p class="lead">Escolha seu nome para ver o espelho completo do mês.</p>
-      <div id="lista-folha"></div>
-    </section>
-
     <section class="screen" id="s-bloqueio">
       <button class="back" onclick="show('s-quem')">← Voltar</button>
       <h1>Cadastro incompleto</h1>
-      <p class="lead" id="bloqueioNome">Raykelly, complete seus dados para bater ponto.</p>
+      <p class="lead" id="bloqueioNome"></p>
       <div class="card">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
-          <span style="font-size:12px;font-weight:800;color:var(--txt3)">PROGRESSO DO CADASTRO</span>
-          <span id="bloqueioPct" style="font-weight:900;color:var(--blue)">40%</span>
+        <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:800;margin-bottom:4px">
+          <span style="color:var(--txt3)">PROGRESSO</span><span id="bloqueioPct" style="color:var(--blue)"></span>
         </div>
-        <div class="prog"><div class="prog-fill" id="bloqueioBar" style="width:40%"></div></div>
+        <div class="prog"><div class="prog-fill" id="bloqueioBar"></div></div>
         <ul class="checklist" id="bloqueioLista"></ul>
       </div>
-      <div class="note err">Sem cadastro completo (CPF, contato, PIX etc.) o ponto fica <strong>bloqueado</strong> — exigência legal do espelho de ponto.</div>
-      <button class="btn btn-primary" id="btnIrCadastro" onclick="showCadastro()">Completar cadastro agora</button>
+      <div class="note err">Complete CPF, contato, endereço e PIX para liberar o ponto.</div>
+      <button class="btn btn-primary" onclick="showCadastro()">Completar cadastro</button>
     </section>
 
     <section class="screen" id="s-cadastro">
       <button class="back" onclick="show('s-bloqueio')">← Voltar</button>
-      <h1 id="cadTitulo">Cadastro — Raykelly</h1>
-      <p class="lead">Preencha os campos obrigatórios (*). Só libera ponto com 100%.</p>
+      <h1 id="cadTitulo">Cadastro</h1>
+      <p class="lead">Todos os campos com * são obrigatórios.</p>
       <div class="card" id="cadForm"></div>
-      <button class="btn btn-primary" onclick="salvarCadastro()">Salvar cadastro</button>
+      <button class="btn btn-primary" onclick="salvarCadastro()">Salvar e ir para o ponto</button>
     </section>
 
-    <section class="screen" id="s-confirm">
-      <button class="back" onclick="show('s-quem')">← Voltar</button>
-      <h1 id="confirmTitle">Registrar entrada</h1>
-      <p class="lead" id="confirmLead">Horário registrado pelo tablet (origem: loja).</p>
-      <div class="card" style="text-align:center;padding:20px">
-        <div class="av" id="confirmAv" style="margin:0 auto 10px;width:60px;height:60px;font-size:24px">R</div>
-        <div class="pick-name" id="confirmName" style="font-size:18px">Raykelly</div>
-        <div class="pick-meta" id="confirmMeta"></div>
-        <div class="clock-big" style="margin-top:12px;font-size:36px" id="confirmTime">--:--</div>
+    <!-- LANÇAMENTO: ponto + folha na mesma página -->
+    <section class="screen" id="s-lancamento">
+      <button class="back" onclick="show('s-quem')">← Trocar pessoa</button>
+
+      <div id="flashOk" class="note ok flash"></div>
+
+      <div class="card lanc-hero">
+        <div class="av" id="lancAv">R</div>
+        <div style="flex:1">
+          <div class="pick-name" id="lancNome">Raykelly</div>
+          <div class="pick-meta" id="lancMeta"></div>
+        </div>
+        <span class="badge b-gray" id="lancStatus">Fora</span>
       </div>
-      <button class="btn btn-primary" id="confirmBtn" onclick="confirmarPonto()">Confirmar entrada</button>
-      <button class="btn btn-ghost" onclick="show('s-quem')">Cancelar</button>
-    </section>
 
-    <section class="screen" id="s-ok">
-      <div class="success">
-        <div style="font-size:56px">✓</div>
-        <h2 id="okTitle">Entrada registrada!</h2>
-        <p id="okText"></p>
-        <p style="margin-top:10px;font-size:13px;color:var(--txt3)">Marcação incluída na sua folha de ponto abaixo.</p>
+      <div class="lanc-top">
+        <div class="clock-big" id="lancClock">--:--</div>
+        <div class="clock-sub" id="lancData"></div>
+        <button class="btn btn-primary" id="lancBtn" onclick="confirmarPonto()">Confirmar entrada</button>
+        <button class="btn btn-ghost" onclick="show('s-gate')">Voltar ao início</button>
       </div>
-      <div id="okFolhaMini"></div>
-      <button class="btn btn-primary" onclick="verFolha(currentId)">Ver folha completa do mês</button>
-      <button class="btn btn-secondary" onclick="show('s-gate')">Voltar ao início</button>
-    </section>
 
-    <section class="screen" id="s-folha">
-      <button class="back" onclick="show('s-gate')">← Voltar</button>
-      <h1>Espelho de ponto</h1>
-      <div id="folhaContent"></div>
-      <button class="btn btn-secondary" style="margin-top:12px" onclick="show('s-quem')">Registrar novo ponto</button>
+      <div class="sec-divider">Minha folha de ponto · jun/2026</div>
+      <div id="lancFolha"></div>
     </section>
 
   </div>
-  <div class="footer-link">Visão colaborador · <a href="assets/gestao-pessoas-mockup-gestor.html">Mockup gestor (ADM) →</a></div>
+  <div class="footer-link">Visão colaborador · <a href="assets/gestao-pessoas-mockup-gestor.html">Mockup gestor →</a></div>
 
   <script>
     const CAMPOS = [
@@ -176,7 +157,7 @@
       { key: 'endereco', label: 'Endereço completo', req: true },
       { key: 'emergencia', label: 'Contato emergência', req: true },
       { key: 'admissao', label: 'Data admissão', req: true, type: 'date' },
-      { key: 'pix', label: 'Chave PIX (pagamento)', req: true }
+      { key: 'pix', label: 'Chave PIX', req: true }
     ];
 
     const COLABS = {
@@ -186,8 +167,7 @@
         statusHoje: 'dentro', turno: '10h–14h',
         folha: [
           { data: '16/06', dia: 'Seg', entrada: '09:58', saida: '14:02', horas: '4h04', sit: 'OK' },
-          { data: '13/06', dia: 'Sex', entrada: '09:55', saida: '14:05', horas: '4h10', sit: 'OK' },
-          { data: '12/06', dia: 'Qui', entrada: '10:01', saida: '13:58', horas: '3h57', sit: 'OK' }
+          { data: '13/06', dia: 'Sex', entrada: '09:55', saida: '14:05', horas: '4h10', sit: 'OK' }
         ]
       },
       raykelly: {
@@ -203,81 +183,59 @@
       clara: {
         id: 'clara', label: 'Clara', letra: 'C', owner: false, funcao: 'Atendente 2',
         cadastro: { nomeCompleto: 'Clara', telefone: '', cpf: '', nascimento: '', endereco: '', emergencia: '', admissao: '', pix: '', email: '' },
-        statusHoje: 'fora', turno: '14h–22h',
-        folha: []
+        statusHoje: 'fora', turno: '14h–22h', folha: []
       }
     };
 
     let currentId = null;
-    let pendingTipo = 'entrada';
 
     function cadastroPct(c) {
       const req = CAMPOS.filter(f => f.req);
-      const ok = req.filter(f => String(c.cadastro[f.key] || '').trim()).length > 0);
+      const ok = req.filter(f => String(c.cadastro[f.key] || '').trim().length > 0);
       return Math.round((ok.length / req.length) * 100);
     }
     function cadastroCompleto(c) { return cadastroPct(c) === 100; }
-
-    function fmtDate() {
-      return new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric' });
-    }
-    function fmtTime() {
-      return new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-    }
+    function fmtDate() { return new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric' }); }
+    function fmtTime() { return new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }); }
     function fmtDataHoje() {
       const d = new Date();
       return String(d.getDate()).padStart(2,'0') + '/' + String(d.getMonth()+1).padStart(2,'0');
     }
-    function diaSemanaHoje() {
-      return ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'][new Date().getDay()];
-    }
+    function diaSemanaHoje() { return ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'][new Date().getDay()]; }
 
     function show(id) {
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
       document.getElementById(id).classList.add('active');
       window.scrollTo(0, 0);
       if (id === 's-quem') renderListaQuem();
-      if (id === 's-quem-folha') renderListaFolha();
+      if (id === 's-lancamento') renderLancamento();
     }
 
     function renderListaQuem() {
-      const el = document.getElementById('lista-quem');
-      el.innerHTML = Object.values(COLABS).map(c => {
+      document.getElementById('lista-quem').innerHTML = Object.values(COLABS).map(c => {
         const comp = cadastroCompleto(c);
         const st = c.statusHoje === 'dentro' ? '<span class="badge b-ok">Dentro</span>' : '<span class="badge b-gray">Fora</span>';
-        const cad = comp ? '' : ' · <span class="badge b-warn">Cadastro pendente</span>';
-        return `<button class="pick" onclick="iniciarPonto('${c.id}')">
+        const cad = comp ? '' : ' <span class="badge b-warn">Cadastro pendente</span>';
+        return `<button class="pick" onclick="abrirLancamento('${c.id}')">
           <div class="av${c.owner ? ' owner' : ''}">${c.letra}</div>
           <div><div class="pick-name">${c.label} ${st}${cad}</div>
           <div class="pick-meta">${c.funcao} · turno ${c.turno}</div></div></button>`;
       }).join('');
     }
 
-    function renderListaFolha() {
-      document.getElementById('lista-folha').innerHTML = Object.values(COLABS).map(c =>
-        `<button class="pick" onclick="verFolha('${c.id}')">
-          <div class="av${c.owner ? ' owner' : ''}">${c.letra}</div>
-          <div><div class="pick-name">${c.label}</div>
-          <div class="pick-meta">${c.folha.length} dias registrados · jun/2026</div></div></button>`
-      ).join('');
-    }
-
-    function iniciarPonto(id) {
+    function abrirLancamento(id) {
       currentId = id;
       const c = COLABS[id];
-      if (!cadastroCompleto(c)) {
-        showBloqueio(id);
-        return;
-      }
-      pendingTipo = c.statusHoje === 'dentro' ? 'saida' : 'entrada';
-      showConfirm(id, pendingTipo);
+      if (!cadastroCompleto(c)) { showBloqueio(id); return; }
+      document.getElementById('flashOk').classList.remove('show');
+      show('s-lancamento');
     }
 
     function showBloqueio(id) {
       currentId = id;
       const c = COLABS[id];
       const pct = cadastroPct(c);
-      document.getElementById('bloqueioNome').textContent = c.label + ', complete seus dados para bater ponto.';
+      document.getElementById('bloqueioNome').textContent = c.label + ', complete o cadastro para lançar ponto.';
       document.getElementById('bloqueioPct').textContent = pct + '%';
       document.getElementById('bloqueioBar').style.width = pct + '%';
       document.getElementById('bloqueioLista').innerHTML = CAMPOS.filter(f => f.req).map(f => {
@@ -292,10 +250,8 @@
       document.getElementById('cadTitulo').textContent = 'Cadastro — ' + c.label;
       document.getElementById('cadForm').innerHTML = CAMPOS.map(f => {
         const v = c.cadastro[f.key] || '';
-        const cls = f.req ? (v ? 'ok' : 'missing') : '';
-        const type = f.type || 'text';
         return `<div class="field"><label>${f.label}${f.req ? ' <span class="req">*</span>' : ''}</label>
-          <input type="${type}" id="cad-${f.key}" value="${v}" class="${cls}" placeholder="${f.req ? 'Obrigatório' : 'Opcional'}"></div>`;
+          <input type="${f.type || 'text'}" id="cad-${f.key}" value="${v}" class="${f.req && !v ? 'missing' : ''}"></div>`;
       }).join('');
       show('s-cadastro');
     }
@@ -307,28 +263,55 @@
         if (el) c.cadastro[f.key] = el.value.trim();
       });
       if (!cadastroCompleto(c)) {
-        alert('Ainda faltam campos obrigatórios. Preencha todos os itens com *.');
+        alert('Preencha todos os campos obrigatórios (*).');
         showCadastro();
         return;
       }
-      alert('Cadastro completo! Agora você pode bater ponto.');
-      iniciarPonto(currentId);
+      abrirLancamento(currentId);
     }
 
-    function showConfirm(id, tipo) {
-      currentId = id;
+    function renderEspelho(id) {
       const c = COLABS[id];
-      const isEntrada = tipo === 'entrada';
-      document.getElementById('confirmTitle').textContent = isEntrada ? 'Registrar entrada' : 'Registrar saída';
-      document.getElementById('confirmLead').textContent = isEntrada ? 'Confirme a chegada ao turno.' : 'Confirme a saída do turno.';
-      document.getElementById('confirmAv').textContent = c.letra;
-      document.getElementById('confirmAv').className = 'av' + (c.owner ? ' owner' : '');
-      document.getElementById('confirmName').textContent = c.label;
-      document.getElementById('confirmMeta').textContent = c.funcao + ' · turno ' + c.turno;
-      document.getElementById('confirmTime').textContent = fmtTime();
-      document.getElementById('confirmBtn').textContent = isEntrada ? 'Confirmar entrada' : 'Confirmar saída';
-      pendingTipo = tipo;
-      show('s-confirm');
+      const hoje = fmtDataHoje();
+      const rows = c.folha.map(r => {
+        const cls = r.data === hoje ? ' class="hoje"' : '';
+        const sitCls = r.sit === 'OK' ? 'sit-ok' : r.sit === 'FALTA' ? 'sit-falta' : 'sit-ab';
+        return `<tr${cls}><td>${r.data}</td><td>${r.dia}</td><td>${r.entrada}</td><td>${r.saida}</td><td>${r.horas}</td><td class="${sitCls}">${r.sit}</td></tr>`;
+      }).join('');
+      return `
+        <div class="espelho-head">
+          <h2>Espelho de ponto eletrônico</h2>
+          <div class="espelho-meta">
+            <div><span>Empresa:</span> MOVI KIDS</div>
+            <div><span>Período:</span> Jun/2026</div>
+            <div><span>Colaborador:</span> ${c.cadastro.nomeCompleto || c.label}</div>
+            <div><span>CPF:</span> ${c.cadastro.cpf || '—'}</div>
+          </div>
+        </div>
+        <div class="espelho-wrap">
+          <table class="espelho">
+            <thead><tr><th>Data</th><th>Dia</th><th>Entrada</th><th>Saída</th><th>Total</th><th>Sit.</th></tr></thead>
+            <tbody>${rows || '<tr><td colspan="6">Nenhum registro ainda</td></tr>'}</tbody>
+          </table>
+        </div>
+        <div class="espelho-foot">Linha azul = hoje · atualiza ao confirmar entrada/saída</div>`;
+    }
+
+    function renderLancamento() {
+      const c = COLABS[currentId];
+      if (!c) return;
+      const isEntrada = c.statusHoje !== 'dentro';
+      document.getElementById('lancAv').textContent = c.letra;
+      document.getElementById('lancAv').className = 'av' + (c.owner ? ' owner' : '');
+      document.getElementById('lancNome').textContent = c.label;
+      document.getElementById('lancMeta').textContent = c.funcao + ' · turno ' + c.turno;
+      const stEl = document.getElementById('lancStatus');
+      stEl.textContent = c.statusHoje === 'dentro' ? 'Dentro' : 'Fora';
+      stEl.className = 'badge ' + (c.statusHoje === 'dentro' ? 'b-ok' : 'b-gray');
+      document.getElementById('lancClock').textContent = fmtTime();
+      document.getElementById('lancData').textContent = fmtDate();
+      document.getElementById('lancBtn').textContent = isEntrada ? 'Confirmar entrada' : 'Confirmar saída';
+      document.getElementById('lancFolha').innerHTML = renderEspelho(currentId);
     }
 
     function confirmarPonto() {
@@ -341,10 +324,12 @@
         row = { data: hoje, dia, entrada: '—', saida: '—', horas: '—', sit: 'ABERTO' };
         c.folha.unshift(row);
       }
-      if (pendingTipo === 'entrada') {
+      const isEntrada = c.statusHoje !== 'dentro';
+      let msg;
+      if (isEntrada) {
         row.entrada = t;
         c.statusHoje = 'dentro';
-        document.getElementById('okTitle').textContent = 'Entrada registrada!';
+        msg = 'Entrada registrada às ' + t + ' — veja na folha abaixo.';
       } else {
         row.saida = t;
         c.statusHoje = 'fora';
@@ -353,62 +338,26 @@
           const [eh, em] = row.entrada.split(':').map(Number);
           const [sh, sm] = t.split(':').map(Number);
           let mins = (sh * 60 + sm) - (eh * 60 + em);
-          if (mins < 0) mins += 24 * 60;
+          if (mins < 0) mins += 1440;
           row.horas = Math.floor(mins/60) + 'h' + String(mins%60).padStart(2,'0');
         }
-        document.getElementById('okTitle').textContent = 'Saída registrada!';
+        msg = 'Saída registrada às ' + t + ' — veja na folha abaixo.';
       }
-      document.getElementById('okText').textContent = c.label + ' · ' + t + ' · ' + hoje + '/' + new Date().getFullYear();
-      document.getElementById('okFolhaMini').innerHTML = renderEspelho(currentId, true);
-      show('s-ok');
-    }
-
-    function renderEspelho(id, mini) {
-      const c = COLABS[id];
-      const hoje = fmtDataHoje();
-      const rows = c.folha.map(r => {
-        const cls = r.data === hoje ? ' class="hoje"' : '';
-        const sitCls = r.sit === 'OK' ? 'sit-ok' : r.sit === 'FALTA' ? 'sit-falta' : 'sit-ab';
-        return `<tr${cls}><td>${r.data}</td><td>${r.dia}</td><td>${r.entrada}</td><td>${r.saida}</td><td>${r.horas}</td><td class="${sitCls}">${r.sit}</td></tr>`;
-      }).join('');
-      const totalHoras = c.folha.filter(r => r.horas && r.horas !== '—').length + ' turnos';
-      if (mini) {
-        return `<div class="card" style="padding:8px"><div class="espelho-wrap"><table class="espelho"><thead><tr><th>Data</th><th>Dia</th><th>Entrada</th><th>Saída</th><th>Horas</th><th>Sit.</th></tr></thead><tbody>${rows.slice(0,4)}</tbody></table></div></div>`;
-      }
-      return `
-        <div class="espelho-head">
-          <h2>Espelho de ponto eletrônico</h2>
-          <div class="espelho-meta">
-            <div><span>Empresa:</span> MOVI KIDS</div>
-            <div><span>Período:</span> Jun/2026</div>
-            <div><span>Colaborador:</span> ${c.cadastro.nomeCompleto || c.label}</div>
-            <div><span>CPF:</span> ${c.cadastro.cpf || '—'}</div>
-            <div><span>Função:</span> ${c.funcao}</div>
-            <div><span>Admissão:</span> ${c.cadastro.admissao || '—'}</div>
-          </div>
-        </div>
-        <div class="espelho-wrap">
-          <table class="espelho">
-            <thead><tr><th>Data</th><th>Dia</th><th>Entrada</th><th>Saída</th><th>Total</th><th>Situação</th></tr></thead>
-            <tbody>${rows || '<tr><td colspan="6">Nenhum registro</td></tr>'}</tbody>
-          </table>
-        </div>
-        <div class="espelho-foot">
-          <span>Total no período: ${totalHoras}</span>
-          <span>Origem: tablet loja · REP simplificado</span>
-        </div>
-        <p class="note" style="margin-top:12px">Modelo baseado no espelho de ponto eletrônico (Portaria MTP 671/2021). Linha em azul = hoje, inclui marcação recém-feita.</p>`;
-    }
-
-    function verFolha(id) {
-      currentId = id;
-      document.getElementById('folhaContent').innerHTML = renderEspelho(id, false);
-      show('s-folha');
+      const flash = document.getElementById('flashOk');
+      flash.textContent = '✓ ' + msg;
+      flash.classList.add('show');
+      renderLancamento();
+      document.getElementById('lancFolha').scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
     function tick() {
-      document.getElementById('liveClock').textContent = fmtTime();
-      document.getElementById('liveDate').textContent = fmtDate();
+      const t = fmtTime();
+      const el = document.getElementById('liveClock');
+      if (el) el.textContent = t;
+      const el2 = document.getElementById('liveDate');
+      if (el2) el2.textContent = fmtDate();
+      const el3 = document.getElementById('lancClock');
+      if (el3) el3.textContent = t;
     }
     tick(); setInterval(tick, 1000);
     renderListaQuem();
