@@ -55,8 +55,8 @@ Detalhe completo: [`ACESSOS_E_AUTORIZACOES.md`](docs/ativos/ACESSOS_E_AUTORIZACO
 
 | Camada | Versão repo | Ping produção |
 |--------|-------------|---------------|
-| Frontend | **v1.8.28** | https://ribocg-a11y.github.io/movikids/?force=1.8.28 |
-| GAS | **v1.5.92** | ping prod. **v1.5.92** ✅ · @144 |
+| Frontend | **v1.8.39** | https://ribocg-a11y.github.io/movikids/?force=1.8.39 · **Gestão Pessoas:** `gestao-pessoas.html` |
+| GAS | repo **v1.5.98** · ping prod. **v1.5.92** | clasp editor OK · **Nova versão Web pendente** |
 | Aba FOLHA | OK (I25) | B68 ~5269,96 · `folhaPlanejamento.fonte: FOLHA` |
 | Deploy ID | `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y` | |
 
@@ -89,12 +89,12 @@ Fonte de verdade: `mk-version.js`, header do `.gs`, ping GAS.
 - `docs/arquivo/obsoleto/` — rollback/changelog antigos
 - Arquivos em `arquivo-historico/` para deploy
 
-## Estado do projeto (16/06/2026)
+## Estado do projeto (18/06/2026)
 
 - **FASE 1–9:** ✅ prod
 - **FASE 14 mini-DRE:** ✅ prod (FE v1.8.16+)
-- **FE v1.8.27:** header mobile DNA · logo PNG · Protocolo Mestre ok 16/06
-- **Pendente:** homolog tablet F5/F7/F10/F11 na loja
+- **FASE 15 Gestão Pessoas:** 🟡 repo FE v1.8.39 + GAS v1.5.98 · ping/Web + abas planilha pendentes
+- **Pendente:** Nova versão Web GAS · abas planilha · homolog tablet F5/F7/F10/F11 na loja
 
 ## "Atualize tudo"
 
