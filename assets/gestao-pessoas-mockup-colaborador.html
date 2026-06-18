@@ -5,18 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Expires" content="0">
-  <title>MOVI KIDS — Mockup v3.4</title>
+  <title>MOVI KIDS — Mockup v3.5</title>
   <script>
     (function () {
-      var CANON = 'https://ribocg-a11y.github.io/movikids/ponto-mockup.html?v=3.4';
-      var h = location.hostname;
-      if (h && h.indexOf('ribocg-a11y') === -1 && h.indexOf('ribocg.a11y') !== -1 && location.protocol !== 'file:') {
-        location.replace(CANON);
+      var VER = '3.5';
+      var CANON = 'https://ribocg-a11y.github.io/movikids/ponto_mockup.html?v=' + VER;
+      var h = location.hostname || '';
+      if (h && h.indexOf('ribocg-a11y') === -1 && location.protocol !== 'file:') {
+        location.replace(CANON + '&_=' + Date.now());
         return;
       }
-      if (!location.search.includes('v=3.4') && !sessionStorage.getItem('mk-mock-ponto-v34')) {
-        sessionStorage.setItem('mk-mock-ponto-v34', '1');
-        location.replace(location.pathname + '?v=3.4&_=' + Date.now());
+      var prev = sessionStorage.getItem('mk-mock-ponto-ver');
+      if (!location.search.includes('v=' + VER) || prev !== VER) {
+        sessionStorage.setItem('mk-mock-ponto-ver', VER);
+        location.replace(location.pathname + '?v=' + VER + '&_=' + Date.now());
       }
     })();
   </script>
@@ -97,7 +99,7 @@
   <div id="wrong-host-block">
     <h1 style="font-family:'Fredoka One',cursive;font-size:28px;margin-bottom:16px">URL errada</h1>
     <p style="font-size:16px;font-weight:700;line-height:1.6;margin-bottom:20px">Você está em <strong id="wrong-host-name"></strong>.<br>Use <strong>ribocg-a11y</strong> (com hífen -), não ribocg.a11y (com ponto).</p>
-    <p><a id="wrong-host-link" href="https://ribocg-a11y.github.io/movikids/ponto-mockup.html?v=3.4">Abrir mockup v3.4 correto →</a></p>
+    <p><a id="wrong-host-link" href="https://ribocg-a11y.github.io/movikids/ponto_mockup.html?v=3.5">Abrir mockup v3.5 correto →</a></p>
   </div>
   <script>
     (function () {
@@ -114,7 +116,7 @@
     URL errada — use <strong>ribocg-a11y</strong> (hífen).<br>
     <a href="https://ribocg-a11y.github.io/movikids/ponto-mockup.html">Abrir versão correta →</a>
   </div>
-  <div class="mock-banner">MOCKUP <strong>v3.4</strong> · PIN campo único · funciona em ponto_mockup.html também</div>
+  <div class="mock-banner">MOCKUP <strong>v3.5</strong> · demonstrativo c/ INSS, VT, faltas e FGTS</div>
 
   <div class="mock-shell">
 
@@ -768,6 +770,7 @@
         <div class="mock-note info" style="margin-top:12px;margin-bottom:0;font-size:11px">
           <strong>FGTS 8%</strong> sobre a base: R$ ${fmtBRL(c.fgts)} — recolhido pelo empregador (não desconta do seu salário).
         </div>
+        <div style="font-size:10px;font-weight:800;color:var(--txt3);text-align:center;margin-top:10px">Demonstrativo v3.5 · INSS · VT 6% · faltas · líquido</div>
       </div>`;
     }
 
