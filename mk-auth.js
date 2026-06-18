@@ -416,9 +416,7 @@
     selectedOp = null;
     if (typeof mobMenuClose_ === 'function') mobMenuClose_();
     hideSplash_();
-    showGate(true);
-    hideApp();
-    showStep('mk-step-select');
+    mkAuthShowTabletHub_();
     try { await loadOperadores(); } catch (e) { /* ignore */ }
     const msg = motivo === 'inatividade'
       ? 'Sessão encerrada: 1 hora sem atividade. Faça login novamente.'
@@ -468,10 +466,24 @@
 
   function hideApp() {
     const app = document.getElementById('app');
-    const gate = document.getElementById('mk-auth-gate');
     if (app) app.style.display = 'none';
-    if (gate) gate.style.display = 'flex';
   }
+
+  function showHub(show) {
+    const hub = document.getElementById('mk-tablet-hub');
+    if (!hub) return;
+    hub.style.display = show === false ? 'none' : 'flex';
+    if (show !== false) {
+      const gate = document.getElementById('mk-auth-gate');
+      if (gate) gate.style.display = 'none';
+    }
+  }
+
+  window.mkAuthShowTabletHub_ = function mkAuthShowTabletHub_() {
+    hideApp();
+    showGate(false);
+    showHub(true);
+  };
 
   let _turnoPollInterval = null;
   function startTurnoPoll_() {
@@ -484,6 +496,7 @@
   function showApp() {
     const app = document.getElementById('app');
     const gate = document.getElementById('mk-auth-gate');
+    showHub(false);
     if (gate) gate.style.display = 'none';
     if (app) app.style.display = '';
     if (typeof atualizarOperadorUI_ === 'function') atualizarOperadorUI_();
@@ -511,9 +524,7 @@
       selectedOp = null;
       sessaoAtivaRemota = null;
       hideSplash_();
-      showGate(true);
-      hideApp();
-      showStep('mk-step-select');
+      mkAuthShowTabletHub_();
       loadOperadores().catch(() => renderOpList(false));
       if (typeof toast === 'function') {
         toast('Sessão administrativa encerrada. Escolha operador ou admin.', 'warning');
@@ -829,6 +840,7 @@
       splash.classList.add('hide');
       setTimeout(() => splash.classList.add('gone'), 550);
     }
+    showHub(false);
     showGate(false);
     const app = document.getElementById('app');
     if (app) app.style.display = 'flex';
@@ -864,6 +876,7 @@
     const gate = document.getElementById('mk-auth-gate');
     if (!gate) return;
     gate.style.display = show === false ? 'none' : 'flex';
+    if (show !== false) showHub(false);
   }
 
   function wireEvents() {
@@ -887,6 +900,26 @@
       renderOpList();
     });
     document.getElementById('mk-btn-back-admin')?.addEventListener('click', () => showStep('mk-step-select'));
+    document.getElementById('mk-btn-back-hub')?.addEventListener('click', () => mkAuthShowTabletHub_());
+    document.getElementById('mk-hub-balcao')?.addEventListener('click', () => {
+      hideApp();
+      showGate(true);
+      showStep('mk-step-select');
+      loadOperadores().catch(() => renderOpList(false));
+    });
+    document.getElementById('mk-hub-colab')?.addEventListener('click', () => {
+      const v = window.MK_VERSION || '1.8.40';
+      location.href = 'gestao-pessoas.html?v=' + encodeURIComponent(v) + '&_=' + Date.now();
+    });
+    document.getElementById('mk-hub-admin')?.addEventListener('click', () => {
+      hideApp();
+      showGate(true);
+      showErr('mk-admin-err', '');
+      showStep('mk-step-admin');
+      adminPins = buildPinRow('mk-admin-pin', 4, () => onAdminLogin());
+      clearPins(adminPins);
+      if (adminPins[0]) adminPins[0].focus();
+    });
     document.querySelectorAll('.mk-liberar-sessao-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         if (typeof mkAuthLiberarSessaoOperadorAdmin_ === 'function') mkAuthLiberarSessaoOperadorAdmin_();
@@ -918,10 +951,8 @@
           await mkAuthReleaseBalcaoServer_({ inatividade: true, preferAdmin: true });
         } catch (e) { /* offline */ }
         clearSession();
-        hideApp();
         hideSplash_();
-        showGate(true);
-        showStep('mk-step-select');
+        mkAuthShowTabletHub_();
         try { await loadOperadores(); } catch (e) { renderOpList(false); }
         toast('Sessão expirada (1h sem uso). Faça login novamente.', 'warning');
         return;
@@ -962,17 +993,15 @@
     }
 
     hideApp();
-    showGate(true);
     if (splash) {
       splash.classList.add('hide');
       setTimeout(() => splash.classList.add('gone'), 550);
     }
-    showStep('mk-step-select');
+    mkAuthShowTabletHub_();
     try {
       await loadOperadores();
     } catch (e) {
       renderOpList(false);
-      showErr('mk-login-err', (e.message || 'Erro') + ' — confira conexão e GAS v1.5.32 no mesmo deploy.');
     }
   };
 

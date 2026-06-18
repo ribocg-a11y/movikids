@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.98
+// MOVI KIDS — Google Apps Script v1.5.99
+// v1.5.99: fix instalarAbasGestaoPessoas — getRange numRows (seeds)
 // v1.5.98: Gestão Pessoas FASE 15 — abas RH/ponto/holerite + APIs colaborador
 // v1.5.97: metaTurno em carregarInicio (KPI meta junto com sync) · ping versao alinhada
 // v1.5.96: bonus meta — R$100 so se loc > 20 (21+ no turno)
@@ -406,9 +407,9 @@ function ping_() {
   const agora = new Date();
   return resp_({
     status:  'online',
-    versao:  'v1.5.98',
+    versao:  'v1.5.99',
     timestamp: fmtData_(agora) + ' ' + fmtHoraLocal_(agora),
-    sistema: 'MOVI KIDS v1.5.98',
+    sistema: 'MOVI KIDS v1.5.99',
     postWriteActions: WRITE_ACTIONS_CRITICAS_
   });
 }
@@ -6514,7 +6515,7 @@ function gestaoPessoasStatus_() {
   const ss = ss_();
   const abas = [SH_COLAB_RH, SH_FOLHA_PONTO, SH_ESCALA_COLAB, SH_FALTAS, SH_HOLERITES, SH_METAS_COLAB, SH_BANCO_HORAS];
   const ok = abas.every(function (n) { return !!ss.getSheetByName(n); });
-  return resp_({ ok: ok, abas: abas.map(function (n) { return { nome: n, existe: !!ss.getSheetByName(n) }; }), versao: 'v1.5.98' });
+  return resp_({ ok: ok, abas: abas.map(function (n) { return { nome: n, existe: !!ss.getSheetByName(n) }; }), versao: 'v1.5.99' });
 }
 
 function instalarAbasGestaoPessoasCore_() {
@@ -6524,7 +6525,7 @@ function instalarAbasGestaoPessoasCore_() {
     if (!sh) sh = ss.insertSheet(name);
     sh.clear();
     sh.getRange(1, 1, 1, headers.length).setValues([headers]).setFontWeight('bold').setBackground('#E3F2FD');
-    if (seeds && seeds.length) sh.getRange(2, 1, 1 + seeds.length, headers.length).setValues(seeds);
+    if (seeds && seeds.length) sh.getRange(2, 1, seeds.length, headers.length).setValues(seeds);
     sh.setFrozenRows(1);
     if (color) sh.setTabColor(color);
   }
