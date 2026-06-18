@@ -354,6 +354,8 @@
     ];
     const VAZIO = { nomeCompleto:'', cpf:'', nascimento:'', telefone:'', email:'', endereco:'', emergencia:'', admissao:'', pix:'' };
 
+    const SALARIO_MINIMO_BASE = 1621; // SM nacional 2026 — base MOVI KIDS atendentes
+
     const PESSOAS = {
       milena: {
         id:'milena', label:'Milena', letra:'M', owner:true, funcao:'Sócia', pin:'3333', pinBalcao:'3333',
@@ -366,14 +368,14 @@
         turno:'14h–22h', cadastro:{...VAZIO}, statusHoje:'fora', folha:[],
         meta:{ alvo:20, atual:14, bonus:100, bonusMin:21 },
         escala:['14–22','OFF','14–22','OFF','14–22','10–20','13–21'],
-        bancoHoras:'-1h30', pagamento:{ base:1800, bonus:0, total:1800, obs:'Jun/2026' }
+        bancoHoras:'-1h30', pagamento:{ base:SALARIO_MINIMO_BASE, bonus:0, total:SALARIO_MINIMO_BASE, obs:'Jun/2026 · base = salário mínimo' }
       },
       clara: {
         id:'clara', label:'Clara', letra:'C', owner:false, funcao:'Atendente 2', pin:'2222', pinBalcao:'2222',
         turno:'14h–22h', cadastro:{...VAZIO}, statusHoje:'fora', folha:[],
         meta:{ alvo:20, atual:0, bonus:100, bonusMin:21 },
         escala:['OFF','14–22','OFF','14–22','14–22','12–22','13–21'],
-        bancoHoras:'0h00', pagamento:{ base:1800, bonus:0, total:1800, obs:'Jun/2026 · cadastro pendente' }
+        bancoHoras:'0h00', pagamento:{ base:SALARIO_MINIMO_BASE, bonus:0, total:SALARIO_MINIMO_BASE, obs:'Jun/2026 · cadastro pendente · base SM' }
       }
     };
 
@@ -403,7 +405,7 @@
     function fmtDate() { return new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'short',year:'numeric'}); }
     function fmtDataHoje() { const d=new Date(); return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0'); }
     function diaSemanaHoje() { return DIAS[(new Date().getDay()+6)%7]; }
-    function cadastroPct(p) { const r=CAMPOS.filter(f=>f.req); return Math.round(r.filter(f=>String(p.cadastro[f.key]||'').trim()).length/r.length*100); }
+    function fmtBRL(n) { return Number(n).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
     function cadastroOk(p) { return cadastroPct(p)===100; }
 
     let balcaoPins = [];
@@ -692,9 +694,9 @@
       const pg = p.pagamento;
       document.getElementById('pag-body').innerHTML = `<div class="mock-card">
         <div style="font-size:12px;font-weight:800;color:var(--txt3);margin-bottom:8px">${pg.obs}</div>
-        <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-weight:700"><span>Base</span><span>R$ ${pg.base.toLocaleString('pt-BR')}</span></div>
-        <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-weight:700"><span>Bônus metas</span><span>R$ ${pg.bonus.toLocaleString('pt-BR')}</span></div>
-        <div style="display:flex;justify-content:space-between;padding:12px 0;font-weight:900;font-size:18px;color:var(--blue)"><span>Total</span><span>R$ ${pg.total.toLocaleString('pt-BR')}</span></div>
+        <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-weight:700"><span>Base (salário mínimo)</span><span>R$ ${fmtBRL(pg.base)}</span></div>
+        <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-weight:700"><span>Bônus metas</span><span>R$ ${fmtBRL(pg.bonus)}</span></div>
+        <div style="display:flex;justify-content:space-between;padding:12px 0;font-weight:900;font-size:18px;color:var(--blue)"><span>Total</span><span>R$ ${fmtBRL(pg.total)}</span></div>
       </div>`;
     }
 
