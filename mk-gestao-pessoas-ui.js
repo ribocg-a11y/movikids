@@ -94,12 +94,48 @@
     let pickBalcao = null;
     let pickColab = null;
 
+    function showAuthStep(stepId) {
+      document.querySelectorAll('#gp-auth-gate .mk-auth-step').forEach(function (el) {
+        el.classList.toggle('hidden', el.id !== stepId);
+      });
+    }
+
+    function setGpView(mode) {
+      var gate = document.getElementById('gp-auth-gate');
+      var app = document.getElementById('gp-app');
+      if (!gate) return;
+      if (mode === 'app') {
+        gate.style.display = 'none';
+        if (app) app.style.display = '';
+        document.documentElement.classList.add('gp-mode-app');
+        return;
+      }
+      gate.style.display = '';
+      if (app) app.style.display = 'none';
+      document.documentElement.classList.remove('gp-mode-app');
+      showAuthStep(mode === 'auth-pin' ? 's-colab-pin' : 's-colab-login');
+    }
+
     function go(id) {
-      document.querySelectorAll('.mock-screen').forEach(s => s.classList.remove('active'));
-      document.getElementById(id).classList.add('active');
       window.scrollTo(0, 0);
       if (MK_GP_PROD) {
-        document.documentElement.classList.toggle('gp-mode-app', id !== 's-colab-login');
+        if (id === 's-colab-login') {
+          setGpView('auth-login');
+          renderColabLogin();
+          return;
+        }
+        if (id === 's-colab-pin') {
+          setGpView('auth-pin');
+          return;
+        }
+        setGpView('app');
+        document.querySelectorAll('#gp-app .mock-screen').forEach(function (s) { s.classList.remove('active'); });
+        var screen = document.getElementById(id);
+        if (screen) screen.classList.add('active');
+      } else {
+        document.querySelectorAll('.mock-screen').forEach(function (s) { s.classList.remove('active'); });
+        var legacy = document.getElementById(id);
+        if (legacy) legacy.classList.add('active');
       }
       if (id === 's-balcao') renderBalcao();
       if (id === 's-colab-login') renderColabLogin();
@@ -265,51 +301,145 @@
     function balcaoSair() { balcaoAtivo=null; renderBalcao(); document.getElementById('balcao-ok').hidden=true; }
 
     /* ── COLABORADOR LOGIN ── */
+    function escapeHtml_(s) {
+      return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+    function showGpErr(id, msg) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      if (msg) {
+        el.textContent = msg;
+        el.style.display = 'block';
+      } else {
+        el.textContent = '';
+        el.style.display = 'none';
+      }
+    }
+    function renderColabSelect(list, loading, errMsg) {
+      var sel = document.getElementById('colab-select');
+      var btn = document.getElementById('colab-btn-proceed');
+      if (!sel) return;
+      if (loading) {
+        sel.innerHTML = '<option value="">Carregando colaboradores…</option>';
+        sel.disabled = true;
+        if (btn) btn.disabled = true;
+        return;
+      }
+      sel.disabled = false;
+      if (errMsg) {
+        sel.innerHTML = '<option value="">Erro ao carregar</option>';
+        showColabSelectErr(errMsg);
+        if (btn) btn.disabled = true;
+        return;
+      }
+      var items = list || [];
+      sel.innerHTML = '<option value="">Selecione o colaborador</option>' +
+        items.map(function (o) {
+          return '<option value="' + escapeHtml_(o.id) + '">' + escapeHtml_(o.nome || o.label || o.id) + '</option>';
+        }).join('');
+      if (!items.length) {
+        showColabSelectErr('Nenhum colaborador cadastrado.');
+        if (btn) btn.disabled = true;
+      } else {
+        showColabSelectErr('');
+        if (btn) btn.disabled = !sel.value;
+      }
+    }
     function renderColabLogin() {
       pickColab = null;
       sessionStorage.removeItem('mk-mock-colab-uid');
-      document.getElementById('colab-pin-wrap').hidden = true;
       clearPinInputs(colabPins);
       colabPins = [];
+      showColabSelectErr('');
+      showColabErr('');
+      var sel = document.getElementById('colab-select');
+      if (sel) sel.value = '';
+      var pinWrap = document.getElementById('colab-pin-wrap');
+      if (pinWrap) pinWrap.hidden = true;
+
+      if (sel) {
+        if (MK_GP_PROD && window.MK_GestaoPessoas) {
+          renderColabSelect(null, true);
+          MK_GestaoPessoas.listarColaboradores().then(function (list) {
+            gpColabList = list || [];
+            renderColabSelect(gpColabList.map(function (o) {
+              return { id: o.id, nome: o.nome || o.id, funcao: o.funcao };
+            }));
+          }).catch(function (e) {
+            renderColabSelect(null, false, e.message);
+          });
+          return;
+        }
+        renderColabSelect(Object.values(PESSOAS).map(function (p) {
+          return { id: p.id, nome: p.label, funcao: p.funcao };
+        }));
+        return;
+      }
+
+      var picks = document.getElementById('colab-picks');
+      if (!picks) return;
       if (MK_GP_PROD && window.MK_GestaoPessoas) {
-        document.getElementById('colab-picks').innerHTML = '<div class="mock-note info">Carregando colaboradores…</div>';
+        picks.innerHTML = '<div class="mock-note info">Carregando colaboradores…</div>';
         MK_GestaoPessoas.listarColaboradores().then(function (list) {
           gpColabList = list || [];
-          document.getElementById('colab-picks').innerHTML = gpColabList.map(function (o) {
+          picks.innerHTML = gpColabList.map(function (o) {
             return `<button type="button" class="mock-pick" data-uid="${o.id}">
               <div class="mock-av">${String(o.nome || '?').charAt(0)}</div>
               <div><div style="font-weight:900">${o.nome}</div><div style="font-size:12px;color:var(--txt3)">${o.funcao || 'Colaborador'}</div></div>
             </button>`;
           }).join('') || '<div class="mock-note err">Nenhum colaborador — crie abas na planilha.</div>';
         }).catch(function (e) {
-          document.getElementById('colab-picks').innerHTML = '<div class="mock-note err">' + e.message + '</div>';
+          picks.innerHTML = '<div class="mock-note err">' + e.message + '</div>';
         });
         return;
       }
-      document.getElementById('colab-picks').innerHTML = Object.values(PESSOAS).map(p =>
-        `<button type="button" class="mock-pick" data-uid="${p.id}">
-          <div class="mock-av${p.owner?' owner':''}">${p.letra}</div>
+      picks.innerHTML = Object.values(PESSOAS).map(function (p) {
+        return `<button type="button" class="mock-pick" data-uid="${p.id}">
+          <div class="mock-av${p.owner ? ' owner' : ''}">${p.letra}</div>
           <div><div style="font-weight:900">${p.label}</div><div style="font-size:12px;color:var(--txt3)">${p.funcao}</div></div>
-        </button>`).join('');
+        </button>`;
+      }).join('');
     }
-    function showColabErr(msg) {
-      const err = document.getElementById('colab-err');
-      err.textContent = msg;
-      err.hidden = false;
-    }
+    function showColabErr(msg) { showGpErr('colab-err', msg); }
+    function showColabSelectErr(msg) { showGpErr('colab-select-err', msg); }
     function readColabPin() {
       return readPin(colabPins);
+    }
+    function colabPinLabelFor(id) {
+      if (MK_GP_PROD) {
+        var o = gpColabList.find(function (x) { return String(x.id) === String(id); });
+        return (o && o.nome) || id;
+      }
+      return (PESSOAS[id] || {}).label || id;
+    }
+    function colabProceed() {
+      var sel = document.getElementById('colab-select');
+      if (!sel || !sel.value) {
+        showColabSelectErr('Selecione seu nome na lista.');
+        return;
+      }
+      pickColab = sel.value;
+      sessionStorage.setItem('mk-mock-colab-uid', pickColab);
+      var nameEl = document.getElementById('colab-pin-name');
+      if (nameEl) nameEl.textContent = colabPinLabelFor(pickColab);
+      showColabErr('');
+      clearPinInputs(colabPins);
+      colabPins = buildPinRow('colab-pin', colabEntrar);
+      if (MK_GP_PROD) go('s-colab-pin');
+      colabPins[0]?.focus();
     }
     function colabPick(id) {
       pickColab = id;
       sessionStorage.setItem('mk-mock-colab-uid', id);
-      document.getElementById('colab-pin-wrap').dataset.uid = id;
-      document.getElementById('colab-pin-wrap').hidden = false;
-      document.getElementById('colab-pin-name').textContent = MK_GP_PROD
-        ? ((gpColabList.find(function (o) { return String(o.id) === String(id); }) || {}).nome || id)
-        : PESSOAS[id].label;
-      document.getElementById('colab-err').hidden = true;
-      document.querySelectorAll('#colab-picks .mock-pick').forEach(btn => {
+      var wrap = document.getElementById('colab-pin-wrap');
+      if (wrap) {
+        wrap.dataset.uid = id;
+        wrap.hidden = false;
+      }
+      var nameEl = document.getElementById('colab-pin-name');
+      if (nameEl) nameEl.textContent = colabPinLabelFor(id);
+      showColabErr('');
+      document.querySelectorAll('#colab-picks .mock-pick').forEach(function (btn) {
         btn.classList.toggle('sel', btn.dataset.uid === id);
       });
       clearPinInputs(colabPins);
@@ -319,23 +449,31 @@
     function colabCancelPin() {
       pickColab = null;
       sessionStorage.removeItem('mk-mock-colab-uid');
-      delete document.getElementById('colab-pin-wrap').dataset.uid;
-      document.getElementById('colab-pin-wrap').hidden = true;
+      var wrap = document.getElementById('colab-pin-wrap');
+      if (wrap) {
+        delete wrap.dataset.uid;
+        wrap.hidden = true;
+      }
       clearPinInputs(colabPins);
       colabPins = [];
-      document.querySelectorAll('#colab-picks .mock-pick').forEach(btn => btn.classList.remove('sel'));
+      showColabErr('');
+      if (MK_GP_PROD) {
+        go('s-colab-login');
+        return;
+      }
+      document.querySelectorAll('#colab-picks .mock-pick').forEach(function (btn) { btn.classList.remove('sel'); });
     }
     function colabEntrar() {
       try {
-        const uid = pickColab || document.getElementById('colab-pin-wrap').dataset.uid || sessionStorage.getItem('mk-mock-colab-uid');
-        if (!uid) { showColabErr('Selecione seu nome na lista acima.'); return; }
+        const uid = pickColab || sessionStorage.getItem('mk-mock-colab-uid');
+        if (!uid) { showColabErr('Selecione seu nome na lista.'); return; }
         const pin = readColabPin();
         if (pin.length < 4) { showColabErr('Digite os 4 números do PIN (ex.: 1111).'); return; }
         if (MK_GP_PROD && window.MK_GestaoPessoas) {
           MK_GestaoPessoas.loginPainel(uid, pin).then(function (mapped) {
             PESSOAS[uid] = Object.assign({}, PESSOAS[uid] || {}, mapped, { pin: pin });
             gpSessionPin = pin;
-            document.getElementById('colab-err').hidden = true;
+            showColabErr('');
             colabLogado = uid;
             pickColab = uid;
             go('s-colab-hub');
@@ -352,7 +490,7 @@
           clearPinInputs(colabPins);
           return;
         }
-        document.getElementById('colab-err').hidden = true;
+        showColabErr('');
         colabLogado = uid;
         pickColab = uid;
         go('s-colab-hub');
@@ -633,7 +771,10 @@ function gpVoltarInicio() {
 function colabSairProd() {
   colabLogado = null;
   gpSessionPin = '';
-  if (MK_GP_PROD) { gpVoltarInicio(); return; }
+  if (MK_GP_PROD) {
+    go('s-colab-login');
+    return;
+  }
   go('s-home');
 }
 function initGpUi() {
@@ -655,12 +796,29 @@ function initGpUi() {
   if (document.getElementById('adm-pin')) {
     adminPins = buildPinRow('adm-pin', typeof admEntrar === 'function' ? admEntrar : null);
   }
-  document.getElementById('colab-btn-entrar').addEventListener('click', colabEntrar);
-  document.getElementById('colab-picks').addEventListener('click', function (e) {
-    var btn = e.target.closest('[data-uid]');
-    if (btn) colabPick(btn.dataset.uid);
-  });
+  var btnEntrar = document.getElementById('colab-btn-entrar');
+  if (btnEntrar) btnEntrar.addEventListener('click', colabEntrar);
+  var btnProceed = document.getElementById('colab-btn-proceed');
+  if (btnProceed) btnProceed.addEventListener('click', colabProceed);
+  var btnTrocar = document.getElementById('colab-btn-trocar');
+  if (btnTrocar) btnTrocar.addEventListener('click', colabCancelPin);
+  var colabSel = document.getElementById('colab-select');
+  if (colabSel && !colabSel._gpWired) {
+    colabSel._gpWired = true;
+    colabSel.addEventListener('change', function () {
+      showColabSelectErr('');
+      if (btnProceed) btnProceed.disabled = !colabSel.value;
+    });
+  }
+  var colabPicks = document.getElementById('colab-picks');
+  if (colabPicks) {
+    colabPicks.addEventListener('click', function (e) {
+      var btn = e.target.closest('[data-uid]');
+      if (btn) colabPick(btn.dataset.uid);
+    });
+  }
   global.go = go;
+  global.colabProceed = colabProceed;
   global.colabPick = colabPick;
   global.colabEntrar = colabEntrar;
   global.colabCancelPin = colabCancelPin;
@@ -673,9 +831,7 @@ function initGpUi() {
     if (el && document.getElementById('s-ponto').classList.contains('active')) el.textContent = fmtTime();
   }, 1000);
   if (MK_GP_PROD) {
-    document.querySelectorAll('.mock-screen').forEach(function (s) { s.classList.remove('active'); });
-    var login = document.getElementById('s-colab-login');
-    if (login) login.classList.add('active');
+    setGpView('auth-login');
     renderColabLogin();
     return;
   }
