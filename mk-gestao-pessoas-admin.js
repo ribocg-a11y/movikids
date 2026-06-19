@@ -46,6 +46,10 @@
     return esc(String(nome || '?').trim().charAt(0).toUpperCase() || '?');
   }
 
+  function gpAdmIsOwner_(c) {
+    return c && (c.perfil === 'supervisor' || Number(c.id) === 2 || /sócia|socia|propriet/i.test(String(c.funcao || '')));
+  }
+
   function gpAdmStatusBadge_(c) {
     if (c.logadoBalcao) return '<span class="gp-adm-badge ok">No balcão</span>';
     if (c.escalaFolga) return '<span class="gp-adm-badge gray">Folga hoje</span>';
@@ -111,7 +115,7 @@
     const m = c.metas || {};
     el.innerHTML =
       '<div class="gp-adm-ficha-hero">' +
-      '<div class="gp-adm-av' + (c.perfil === 'supervisor' ? ' owner' : '') + '">' + gpAdmInitial_(c.nome) + '</div>' +
+      '<div class="gp-adm-av' + (gpAdmIsOwner_(c) ? ' owner' : '') + '">' + gpAdmInitial_(c.nome) + '</div>' +
       '<div class="gp-adm-ficha-hero-body"><h3>' + esc(c.nome) + '</h3>' +
       '<p>' + esc(c.funcao || 'Operador') + (c.admissao ? ' · admissão ' + esc(c.admissao) : '') + '</p></div>' +
       gpAdmStatusBadge_(c) + '</div>' +
@@ -198,7 +202,7 @@
     const cols = gpAdmData_.colaboradores || [];
     teamEl.innerHTML = cols.map(function (c) {
       return '<div class="gp-adm-row">' +
-        '<div class="gp-adm-av' + (c.perfil === 'supervisor' ? ' owner' : '') + '">' + gpAdmInitial_(c.nome) + '</div>' +
+        '<div class="gp-adm-av' + (gpAdmIsOwner_(c) ? ' owner' : '') + '">' + gpAdmInitial_(c.nome) + '</div>' +
         '<div class="gp-adm-row-body"><strong>' + esc(c.nome) + '</strong><small>' + gpAdmSubline_(c) + '</small></div>' +
         gpAdmStatusBadge_(c) +
         '<button type="button" class="gp-adm-link" onclick="mkGpAdmVerFicha(' + c.id + ')">Ficha</button></div>';

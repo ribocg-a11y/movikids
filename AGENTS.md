@@ -57,9 +57,9 @@ Detalhe completo: [`ACESSOS_E_AUTORIZACOES.md`](docs/ativos/ACESSOS_E_AUTORIZACO
 
 | Camada | Versão repo | Ping produção |
 |--------|-------------|---------------|
-| Frontend | **v1.8.49** | https://ribocg-a11y.github.io/movikids/?force=1.8.49 |
-| Gestão Pessoas | **v1.8.49** | `gestao-pessoas.html?force=1.8.49` |
-| GAS | repo **v1.5.99** · ping confirmar | Nova versão Web se ping &lt; repo |
+| Frontend | **v1.8.58** | https://ribocg-a11y.github.io/movikids/?force=1.8.58 |
+| Gestão Pessoas | **v1.8.58** | `gestao-pessoas.html?force=1.8.58` |
+| GAS | repo **v1.5.106** · ping **v1.5.105** | Nova versão Web no deploy `AKfycbwakQ...` |
 | Design System | **v1.0** | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
 | Aba FOLHA | OK (I25) | B68 ~5269,96 · `folhaPlanejamento.fonte: FOLHA` |
 | Deploy ID | `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y` | |

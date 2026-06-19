@@ -1,6 +1,6 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 18/06/2026 (FASE 15 · FE **v1.8.49** · GAS repo **v1.5.99** · Design System v1.0)  
+**Atualizado:** 19/06/2026 (Gestão Pessoas · FE **v1.8.58** · GAS repo **v1.5.106** · ping prod. **v1.5.105** — publicar Web)  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **Repo local:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`  
@@ -48,14 +48,14 @@ Mensagem mínima: *"Vamos dar continuidade ao projeto Movi Kids, tem uma pasta n
 
 ---
 
-## Produção (18/06/2026)
+## Produção (19/06/2026)
 
 | Camada | Versão | Verificação |
 |--------|--------|-------------|
-| **Frontend** | **v1.8.49** | https://ribocg-a11y.github.io/movikids/?force=1.8.49 |
-| **Gestão Pessoas** | **v1.8.49** | https://ribocg-a11y.github.io/movikids/gestao-pessoas.html?force=1.8.49 |
-| **Service Worker** | **1.8.49** | `sw.js` |
-| **Apps Script (ping)** | confirmar ping | repo **v1.5.99** — **Nova versão Web** se ping &lt; repo |
+| **Frontend** | **v1.8.58** | https://ribocg-a11y.github.io/movikids/?force=1.8.58 |
+| **Gestão Pessoas** | **v1.8.58** | https://ribocg-a11y.github.io/movikids/gestao-pessoas.html?force=1.8.58 |
+| **Service Worker** | **1.8.58** | `sw.js` |
+| **Apps Script (ping)** | repo **v1.5.106** · ping prod. **v1.5.105** | **Nova versão Web** no deploy `AKfycbwakQ...` |
 | **Aba FOLHA** | **OK** (I25) | B68 ~5269,96 |
 | **Design System** | **v1.0** | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
 

@@ -1,5 +1,8 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.103
+// MOVI KIDS — Google Apps Script v1.5.106
+// v1.5.106: loc Milena/RH — gpLocStatsFromAuditoria_ (sem filtro turno) + auditTsMeta_ preserva hora Date
+// v1.5.105: loc mês/hoje Gestão Pessoas — AUDITORIA (encerrarLocacao) + aba METAS
+// v1.5.104: Milena (id2) no RH/escala/metas — mesma regra salarial que equipe
 // v1.5.103: alertas ponto respeitam escala do dia (OFF/folga não gera alerta)
 // v1.5.102: painelGestaoPessoasAdmin — cache único das abas RH (menos leituras planilha)
 // v1.5.101: gpNormCompetencia_ — escala/holerite lê MM/yyyy mesmo quando planilha grava Date
@@ -412,9 +415,9 @@ function ping_() {
   const agora = new Date();
   return resp_({
     status:  'online',
-    versao:  'v1.5.103',
+    versao:  'v1.5.106',
     timestamp: fmtData_(agora) + ' ' + fmtHoraLocal_(agora),
-    sistema: 'MOVI KIDS v1.5.103',
+    sistema: 'MOVI KIDS v1.5.106',
     postWriteActions: WRITE_ACTIONS_CRITICAS_
   });
 }
@@ -1335,12 +1338,29 @@ function kpiAvancadosMes_(mmyy, nMes, nCancelMes, diasOperando, nPorVeiculo, min
   };
 }
 
-/** Meta operacional — só Raykelly (id 3) + vaga id 4. Fora: Eduarda (1), Milena (2). */
+/** Meta operacional — Milena (2) sócia + Raykelly (3) + reserva id 4. Fora: Eduarda (1). */
 const META_LOC_TURNO_PADRAO_ = 20;
 const META_BONUS_DIA_REAIS_ = 100;
 
 function metaOperadorCfg_(opId) {
   const id = Number(opId);
+  if (id === 2) {
+    return {
+      ativo: true,
+      meta: META_LOC_TURNO_PADRAO_,
+      bonus: META_BONUS_DIA_REAIS_,
+      inicio: '01/06/2026',
+      escala: {
+        '0': null,
+        '1': [10, 14],
+        '2': [10, 14],
+        '3': [10, 14],
+        '4': [10, 14],
+        '5': [10, 14],
+        '6': null
+      }
+    };
+  }
   if (id === 3) {
     return {
       ativo: true,
@@ -1459,13 +1479,13 @@ function buildMetaOperadorPayload_(opId) {
       dados.forEach(function(r) {
         if (String(r[1] || '').trim() !== 'encerrarLocacao') return;
         if (!metaOperadorNomeMatch_(String(r[7] || ''), op.nome)) return;
-        const ts = parseAuditTsMeta_(cellToStr_(r[0]));
+        const ts = auditTsMeta_(r[0]);
         if (!ts.data || ts.data.slice(3) !== mesAtual) return;
         if (dateToCmp_(ts.data) < inicioCmp) return;
         const dow = weekdayFromDataStr_(ts.data);
         const shift = cfg.escala[String(dow)];
         if (!shift) return;
-        if (!metaOperadorInShift_(ts.mins, shift)) return;
+        if (!metaOperadorInShift_(ts.mins, shift) && !ts.semHora) return;
         byDay[ts.data] = (byDay[ts.data] || 0) + 1;
       });
     }
@@ -1476,8 +1496,10 @@ function buildMetaOperadorPayload_(opId) {
   const nHoje = byDay[dataHoje] || 0;
   let diasComBonus = 0;
   let diasTrabalhados = 0;
-  Object.keys(byDay).forEach(function(d) {
+  let locMesTotal = 0;
+  Object.keys(byDay).forEach(function (d) {
     diasTrabalhados++;
+    locMesTotal += byDay[d];
     if (byDay[d] > cfg.meta) diasComBonus++;
   });
 
@@ -1498,6 +1520,7 @@ function buildMetaOperadorPayload_(opId) {
       shiftLabel: metaOperadorShiftLabel_(shiftHoje)
     },
     mes: {
+      locTotal: locMesTotal,
       diasComMeta: diasComBonus,
       diasTrabalhados: diasTrabalhados,
       bonusEstimado: diasComBonus * cfg.bonus
@@ -6353,6 +6376,76 @@ function gpStatusPontoFromCtx_(opId, ctx) {
   return { status: 'fora', entrada: null, saida: null };
 }
 
+function auditTsMeta_(val) {
+  if (val instanceof Date) {
+    const mins = val.getHours() * 60 + val.getMinutes();
+    return { data: fmtData_(val), mins: mins, semHora: mins === 0 };
+  }
+  const parsed = parseAuditTsMeta_(cellToStr_(val));
+  parsed.semHora = parsed.mins === 0;
+  return parsed;
+}
+
+function gpLocStatsFromAuditoria_(opId, competencia) {
+  const found = operadorRowById_(opId);
+  if (!found) return { locMes: 0, locHoje: 0 };
+  const op = operadorObjFromRow_(found.data);
+  const hoje = fmtData_(new Date());
+  let locMes = 0;
+  let locHoje = 0;
+  try {
+    const shAud = ss_().getSheetByName('AUDITORIA');
+    if (shAud && shAud.getLastRow() >= 2) {
+      const dados = shAud.getRange(2, 1, shAud.getLastRow(), 8).getValues();
+      dados.forEach(function (r) {
+        if (String(r[1] || '').trim() !== 'encerrarLocacao') return;
+        if (!metaOperadorNomeMatch_(String(r[7] || ''), op.nome)) return;
+        const ts = auditTsMeta_(r[0]);
+        if (!ts.data) return;
+        const pts = ts.data.split('/');
+        if (pts.length < 3) return;
+        const comp = pts[1].padStart(2, '0') + '/' + pts[2];
+        if (comp !== gpNormCompetencia_(competencia)) return;
+        locMes++;
+        if (ts.data === hoje) locHoje++;
+      });
+    }
+  } catch (e) {
+    Logger.log('gpLocStatsFromAuditoria_: ' + e.message);
+  }
+  return { locMes: locMes, locHoje: locHoje };
+}
+
+function gpMetasPainel_(opId, competencia, ctx) {
+  const sheet = gpMetasFromCtx_(opId, competencia, ctx);
+  const locMesSheet = (sheet.diasMes || []).reduce(function (s, d) { return s + (Number(d.loc) || 0); }, 0);
+  const bonusDiasSheet = (sheet.diasMes || []).filter(function (d) { return d.bonusOk; }).length;
+  const auditLoc = gpLocStatsFromAuditoria_(opId, competencia);
+  const live = buildMetaOperadorPayload_(opId);
+  if (!live.ok || !live.configurado) {
+    return {
+      alvo: sheet.alvo, atual: Math.max(sheet.atual || 0, auditLoc.locHoje),
+      locMes: Math.max(locMesSheet, auditLoc.locMes),
+      bonusDias: bonusDiasSheet, bonusTotal: sheet.bonusTotal || 0,
+      bonusValor: sheet.bonusValor, bonusMin: sheet.bonusMin, diasMes: sheet.diasMes
+    };
+  }
+  const locMesLive = live.mes && live.mes.locTotal ? live.mes.locTotal : 0;
+  const atualLive = live.hoje && live.hoje.n ? live.hoje.n : 0;
+  const bonusDiasLive = live.mes && live.mes.diasComMeta ? live.mes.diasComMeta : 0;
+  const bonusLive = live.mes && live.mes.bonusEstimado ? live.mes.bonusEstimado : 0;
+  return {
+    alvo: live.meta || sheet.alvo,
+    atual: Math.max(atualLive, auditLoc.locHoje, sheet.atual || 0),
+    locMes: Math.max(locMesLive, locMesSheet, auditLoc.locMes),
+    bonusDias: Math.max(bonusDiasLive, bonusDiasSheet),
+    bonusTotal: Math.max(bonusLive, sheet.bonusTotal || 0),
+    bonusValor: live.bonus || sheet.bonusValor,
+    bonusMin: (live.meta || sheet.alvo || 20) + 1,
+    diasMes: sheet.diasMes
+  };
+}
+
 function gpMetasFromCtx_(opId, competencia, ctx) {
   const mes = competencia.slice(0, 2);
   const dias = ctx.metasRows.filter(function (r) {
@@ -6492,17 +6585,7 @@ function gpFolhaPontoColab_(opId, competencia) {
 }
 
 function gpMetasColab_(opId, competencia) {
-  const mes = competencia.slice(0, 2);
-  const dias = gpRows_(SH_METAS_COLAB).filter(function (r) {
-    return Number(r[1]) === Number(opId) && cellToStr_(r[2]).indexOf('/' + mes + '/') >= 0;
-  }).map(function (r) {
-    return { data: cellToStr_(r[2]), loc: Number(r[3]) || 0, meta: Number(r[4]) || 20, bonusOk: String(r[5] || '').toUpperCase() === 'SIM', bonusValor: Number(r[6]) || 0 };
-  });
-  const bonusTotal = dias.filter(function (d) { return d.bonusOk; }).reduce(function (s, d) { return s + d.bonusValor; }, 0);
-  const meta = dias.length ? dias[0].meta : 20;
-  const hoje = gpRows_(SH_METAS_COLAB).filter(function (r) { return Number(r[1]) === Number(opId) && cellToStr_(r[2]) === fmtData_(new Date()); });
-  const atual = hoje.length ? Number(hoje[0][3]) || 0 : 0;
-  return { alvo: meta, atual: atual, bonusValor: 100, bonusMin: meta + 1, diasMes: dias, bonusTotal: bonusTotal };
+  return gpMetasPainel_(opId, competencia, gpLoadContext_());
 }
 
 function gpEscalaColab_(opId, competencia) {
@@ -6538,7 +6621,7 @@ function gpListarColaboradoresGestao_() {
     const rh = gpRows_(SH_COLAB_RH);
     const idsRh = rh.map(function (r) { return Number(r[0]); });
     parsed.colaboradores = (parsed.operadores || []).filter(function (o) {
-      return idsRh.indexOf(Number(o.id)) >= 0 || Number(o.id) === 3 || Number(o.id) === 4;
+      return idsRh.indexOf(Number(o.id)) >= 0;
     }).map(function (o) {
       const c = gpColabRhByOpId_(o.id);
       return { id: o.id, nome: o.nome, hasPin: o.hasPin, funcao: c ? c.funcao : 'Colaborador', cadastroPct: c ? c.cadastroPct : 0 };
@@ -6634,9 +6717,45 @@ function gpAlertasPontoCore_() {
   return gpAlertasPontoFromCtx_(gpLoadContext_());
 }
 
+function gpSyncRhColaboradoresPadrao_() {
+  try {
+    gpEnsureRowByOpId_(SH_COLAB_RH, 2, [2, 'Milena Nunes', 'Socia', '', '', '', '', '', '', '2020-01-01', '', 1621, 20, 20, 100, '10h–14h', 'SIM', 100, '']);
+    gpEnsureRowByOpId_(SH_COLAB_RH, 3, [3, 'Raykelly', 'Atendente 1', '', '', '', '', '', '', '2026-06-15', '', 1621, 20, 20, 100, '14h–22h', 'SIM', 100, '']);
+    const comp = gpCompetenciaAtual_();
+    gpEnsureEscalaRow_(2, comp, ['10–14', '10–14', '10–14', '10–14', '10–14', 'OFF', 'OFF'], 'Socia — turno manha');
+    gpEnsureEscalaRow_(3, comp, ['14–22', 'OFF', '14–22', 'OFF', '14–22', '10–20', '13–21'], 'Rodizio dom');
+    gpEnsureRowByOpId_(SH_BANCO_HORAS, 2, [2, '0h00', '']);
+    gpEnsureRowByOpId_(SH_BANCO_HORAS, 3, [3, '0h00', '']);
+  } catch (e) {
+    Logger.log('gpSyncRhColaboradoresPadrao_: ' + e.message);
+  }
+}
+
+function gpEnsureRowByOpId_(sheetName, opId, rowValues) {
+  const sh = gpSheet_(sheetName);
+  if (!sh) return false;
+  if (gpRows_(sheetName).some(function (r) { return Number(r[0]) === Number(opId); })) return false;
+  sh.appendRow(rowValues);
+  return true;
+}
+
+function gpEnsureEscalaRow_(opId, competencia, dias, obs) {
+  const sh = gpSheet_(SH_ESCALA_COLAB);
+  if (!sh) return false;
+  const comp = gpNormCompetencia_(competencia);
+  if (gpRows_(SH_ESCALA_COLAB).some(function (r) {
+    return Number(r[0]) === Number(opId) && gpNormCompetencia_(r[1]) === comp;
+  })) return false;
+  sh.appendRow([opId, competencia].concat(dias).concat([obs || '']));
+  const lr = sh.getLastRow();
+  if (lr >= 2) sh.getRange(lr, 2).setNumberFormat('@');
+  return true;
+}
+
 function painelGestaoPessoasAdmin_(p) {
   if (!adminPinOk_(p)) return err_('Acesso negado — PIN admin 1416', 403);
   try {
+    gpSyncRhColaboradoresPadrao_();
     const comp = String(p.competencia || gpCompetenciaAtual_());
     const ctx = gpLoadContext_();
     const opsResp = JSON.parse(listarOperadoresLogin_().getContent());
@@ -6652,9 +6771,9 @@ function painelGestaoPessoasAdmin_(p) {
       seen[id] = true;
       const rh = gpColabRhFromCtx_(id, ctx);
       const ponto = gpStatusPontoFromCtx_(id, ctx);
-      const metas = gpMetasFromCtx_(id, comp, ctx);
-      const locMes = (metas.diasMes || []).reduce(function (s, d) { return s + (Number(d.loc) || 0); }, 0);
-      const bonusDias = (metas.diasMes || []).filter(function (d) { return d.bonusOk; }).length;
+      const metas = gpMetasPainel_(id, comp, ctx);
+      const locMes = metas.locMes || 0;
+      const bonusDias = metas.bonusDias || 0;
       const folhaPonto = gpFolhaPontoFromCtx_(id, comp, ctx);
       const escalaHoje = gpEscalaCelulaHojeFromCtx_(id, ctx, comp);
       colaboradores.push({
@@ -6674,9 +6793,9 @@ function painelGestaoPessoasAdmin_(p) {
       if (seen[id]) return;
       const rh = gpColabRhFromCtx_(id, ctx);
       const ponto = gpStatusPontoFromCtx_(id, ctx);
-      const metas = gpMetasFromCtx_(id, comp, ctx);
-      const locMes = (metas.diasMes || []).reduce(function (s, d) { return s + (Number(d.loc) || 0); }, 0);
-      const bonusDias = (metas.diasMes || []).filter(function (d) { return d.bonusOk; }).length;
+      const metas = gpMetasPainel_(id, comp, ctx);
+      const locMes = metas.locMes || 0;
+      const bonusDias = metas.bonusDias || 0;
       const escalaHoje = gpEscalaCelulaHojeFromCtx_(id, ctx, comp);
       colaboradores.push({
         id: id, nome: rh ? rh.nome : String(r[1] || ''), hasPin: false, perfil: 'operador',
@@ -6727,7 +6846,7 @@ function painelGestaoPessoasAdmin_(p) {
       competencia: comp, colaboradores: colaboradores, escala: escala, folha: folha,
       alertas: alertasPack.alertas, alertasTotal: alertasPack.total,
       kpis: { total: colaboradores.length, presentes: presentes, comTurno: comTurno, alertas: alertasPack.total },
-      sessaoAtiva: sessao, versao: 'v1.5.103'
+      sessaoAtiva: sessao, versao: 'v1.5.106'
     });
   } catch (ex) {
     return err_('Abas Gestao Pessoas ausentes — rode instalar abas ou scripts/criar-abas-gestao-pessoas.ps1', 503);
@@ -6753,11 +6872,17 @@ function instalarAbasGestaoPessoasCore_() {
     if (color) sh.setTabColor(color);
   }
   ensure(SH_COLAB_RH, '#2196F3', ['operador_id','nome','funcao','cpf','nascimento','telefone','email','endereco','emergencia','admissao','pix','salario_base','va_diario','meta_loc_dia','bonus_meta_r$','turno','ativo','cadastro_pct','atualizado_em'],
-    [[3,'Raykelly','Atendente 1','','','','','','','2026-06-15','',1621,20,20,100,'14h–22h','SIM',100,'']]);
+    [
+      [2,'Milena Nunes','Socia','','','','','','','2020-01-01','',1621,20,20,100,'10h–14h','SIM',100,''],
+      [3,'Raykelly','Atendente 1','','','','','','','2026-06-15','',1621,20,20,100,'14h–22h','SIM',100,'']
+    ]);
   ensure(SH_FOLHA_PONTO, '#4CAF50', ['id','operador_id','data','dia_semana','entrada','saida','horas','situacao','registrado_em'],
     [[1,3,'15/06/2026','Seg','13:58','21:05','7h07','OK','']]);
   ensure(SH_ESCALA_COLAB, '#9C27B0', ['operador_id','competencia','seg','ter','qua','qui','sex','sab','dom','obs'],
-    [[3,'06/2026','14–22','OFF','14–22','OFF','14–22','10–20','13–21','Rodízio dom']]);
+    [
+      [2,'06/2026','10–14','10–14','10–14','10–14','10–14','OFF','OFF','Socia — turno manha'],
+      [3,'06/2026','14–22','OFF','14–22','OFF','14–22','10–20','13–21','Rodizio dom']
+    ]);
   const shEsc = ss.getSheetByName(SH_ESCALA_COLAB);
   if (shEsc) {
     const escDataRows = shEsc.getLastRow() - 1;
@@ -6767,7 +6892,7 @@ function instalarAbasGestaoPessoasCore_() {
   ensure(SH_HOLERITES, '#1976D2', ['id','operador_id','competencia','base','bonus','faltas','inss','irrf','vt','liquido','fgts','va_total','dias_trab','obs','gerado_em'], []);
   ensure(SH_METAS_COLAB, '#FFC107', ['id','operador_id','data','locacoes','meta','bonus_ok','bonus_valor'],
     [[1,3,'15/06/2026',21,20,'SIM',100]]);
-  ensure(SH_BANCO_HORAS, '#78909C', ['operador_id','saldo_hhmm','atualizado_em'], [[3,'0h00','']]);
+  ensure(SH_BANCO_HORAS, '#78909C', ['operador_id','saldo_hhmm','atualizado_em'], [[2,'0h00',''],[3,'0h00','']]);
 }
 
 function instalarAbasGestaoPessoasAdmin_(p) {
