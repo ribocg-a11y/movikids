@@ -303,47 +303,49 @@ body {
 #page-operadores .gp-adm-table td.on { background: #E8F5E9; color: var(--green); }
 #page-operadores .gp-adm-table td.owner { background: #FFF8E1; color: #F57F17; }
 
-/* Jornada — escala × ponto (ADM + colaborador) */
+/* Jornada — escala × ponto (ADM + colaborador) · tipografia leve */
 #page-operadores .gp-jorn-resumo,
 #gp-app .gp-jorn-resumo {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 8px;
-  margin-bottom: 4px;
+  gap: 6px;
+  margin-bottom: 8px;
 }
-@media (min-width: 640px) {
+@media (min-width: 720px) {
   #page-operadores .gp-jorn-resumo,
   #gp-app .gp-jorn-resumo { grid-template-columns: repeat(4, 1fr); }
 }
 #page-operadores .gp-jorn-resumo--compact,
-#gp-app .gp-jorn-resumo--compact { grid-template-columns: repeat(2, 1fr); }
+#gp-app .gp-jorn-resumo--compact { grid-template-columns: repeat(2, 1fr); gap: 6px; }
 @media (min-width: 480px) {
   #page-operadores .gp-jorn-resumo--compact,
   #gp-app .gp-jorn-resumo--compact { grid-template-columns: repeat(3, 1fr); }
 }
 #page-operadores .gp-jorn-kpi,
 #gp-app .gp-jorn-kpi {
-  background: #fff;
+  background: #FAFBFC;
   border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 10px 12px;
-  text-align: center;
+  border-radius: 10px;
+  padding: 8px 10px;
+  text-align: left;
 }
 #page-operadores .gp-jorn-kpi span,
 #gp-app .gp-jorn-kpi span {
   display: block;
-  font-size: 9px;
-  font-weight: 800;
+  font-size: 10px;
+  font-weight: 700;
   color: var(--txt3);
   text-transform: uppercase;
-  letter-spacing: .04em;
-  margin-bottom: 4px;
+  letter-spacing: .03em;
+  margin-bottom: 2px;
 }
 #page-operadores .gp-jorn-kpi strong,
 #gp-app .gp-jorn-kpi strong {
-  font-family: 'Fredoka One', cursive;
-  font-size: 16px;
-  color: var(--blue);
+  font-family: 'Nunito', sans-serif;
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--txt, #263238);
+  line-height: 1.2;
 }
 #page-operadores .gp-jorn-kpi--extra strong,
 #gp-app .gp-jorn-kpi--extra strong { color: var(--green); }
@@ -351,10 +353,15 @@ body {
 #gp-app .gp-jorn-kpi--atraso strong { color: var(--red); }
 #page-operadores .gp-jorn-kpi--banco strong,
 #gp-app .gp-jorn-kpi--banco strong { color: var(--blue-dk, #1565C0); }
+#page-operadores .gp-jorn-table { font-size: 11px; font-weight: 600; }
+#page-operadores .gp-jorn-table th { font-size: 9px; font-weight: 800; padding: 6px 4px; }
+#page-operadores .gp-jorn-table td { padding: 6px 4px; font-weight: 600; }
+#gp-app .gp-jorn-table { font-size: 11px; font-weight: 600; }
+#gp-app .gp-jorn-table th { font-size: 9px; font-weight: 800; }
 #page-operadores .gp-jorn-extra,
-#gp-app .gp-jorn-extra { color: var(--green); font-weight: 800; }
+#gp-app .gp-jorn-extra { color: var(--green); font-weight: 700; }
 #page-operadores .gp-jorn-atraso,
-#gp-app .gp-jorn-atraso { color: var(--red); font-weight: 800; }
+#gp-app .gp-jorn-atraso { color: var(--red); font-weight: 700; }
 #page-operadores .gp-jorn-row-folga td,
 #gp-app .mock-table tr.off td { background: #F5F5F5; color: var(--txt3); }
 #page-operadores .gp-jorn-sit,

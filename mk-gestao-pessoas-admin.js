@@ -171,7 +171,7 @@
     }
     const j = c.jornada;
     if (!j || !j.dias || !j.dias.length) {
-      el.innerHTML = '<p class="gp-adm-muted">Sem dias na competência (confira escala RH e admissão). Se o front já atualizou, publique o GAS <strong>v1.5.109</strong> (Nova versão Web).</p>';
+      el.innerHTML = '<p class="gp-adm-muted">Sem dias na competência (confira escala RH e admissão). Publique o GAS <strong>v1.5.110</strong> (Nova versão Web).</p>';
       return;
     }
     const t = j.totais || {};
