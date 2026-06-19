@@ -181,6 +181,10 @@ function adminLogin() {
   const gate = document.getElementById('mk-auth-gate');
   if (gate) gate.style.display = 'none';
   if (typeof mkAuthTouchActivity_ === 'function') mkAuthTouchActivity_();
+  document.querySelectorAll('.admin-timer').forEach(el => {
+    el.hidden = true;
+    el.setAttribute('aria-hidden', 'true');
+  });
   wireAdminIdleListeners_();
   if (!adminTimerInt) adminTimerInt = setInterval(tickAdmin, 1000);
   showAdminSidebar();
@@ -228,18 +232,11 @@ function resetAdminTimer() {
 
 function tickAdmin() {
   if (!isAdmin) return;
-  const remMs = typeof mkAuthIdleRemainingMs_ === 'function'
-    ? mkAuthIdleRemainingMs_()
-    : ADMIN_IDLE_SEC * 1000;
-  const paused = typeof mkHasLocacaoAbertaNoTablet_ === 'function' && mkHasLocacaoAbertaNoTablet_();
-  const sec = Math.max(0, Math.ceil(remMs / 1000));
-  const t = fmtAdminTimer_(sec) + (paused ? ' ⏸' : '');
-  document.querySelectorAll('.admin-timer').forEach(el => { el.textContent = t; });
-  if (paused) return;
-  if (remMs <= 0) {
-    if (typeof trocarOperador === 'function') trocarOperador('inatividade');
-    else adminTeardownUI_();
-  }
+  document.querySelectorAll('.admin-timer').forEach(el => {
+    el.hidden = true;
+    el.setAttribute('aria-hidden', 'true');
+  });
+  /* ADM no PC: sem logout por idle — regra só para operador no balcão (I21). */
 }
 
 function irAdmin(page) {

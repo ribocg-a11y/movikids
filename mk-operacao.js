@@ -8,6 +8,7 @@ var opTipo = null;
 // ALERTS
 // ═══════════════════════════════════════════════════════════
 function triggerAlert5(s) {
+  if (typeof mkOperadorRecebeAlertaTempo_ === 'function' && !mkOperadorRecebeAlertaTempo_()) return;
   salvarNovaDraft_();
   alertSession = s;
   playBeep();
@@ -16,6 +17,7 @@ function triggerAlert5(s) {
 }
 
 function triggerAlertExpired(s) {
+  if (typeof mkOperadorRecebeAlertaTempo_ === 'function' && !mkOperadorRecebeAlertaTempo_()) return;
   salvarNovaDraft_();
   alertSession = s;
   playBeep(3);
@@ -24,6 +26,7 @@ function triggerAlertExpired(s) {
 }
 
 function showAlertModal(s, expired) {
+  if (typeof mkOperadorRecebeAlertaTempo_ === 'function' && !mkOperadorRecebeAlertaTempo_()) return;
   const qrOnly = typeof mkComunicacaoQrOnly_ === 'function' && mkComunicacaoQrOnly_();
   const modal = document.getElementById('alert-modal');
   const admIgnoraSms = qrOnly || (typeof mkAdminIgnoraSmsObrigatorio_ === 'function' && mkAdminIgnoraSmsObrigatorio_());

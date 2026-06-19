@@ -256,6 +256,13 @@
     } catch (e) {}
     return !!(typeof window !== 'undefined' && window.isAdmin);
   };
+  /** Alertas de tempo de locação (5 min / esgotado) — só perfil operador no balcão. */
+  window.mkOperadorRecebeAlertaTempo_ = () => {
+    if (typeof mkAdminIgnoraSmsObrigatorio_ === 'function' && mkAdminIgnoraSmsObrigatorio_()) return false;
+    const s = getSession();
+    if (s && s.role === 'admin') return false;
+    return true;
+  };
   window.mkAuthIsLoggedIn = () => !!getSession();
 
   window.operadorAtual_ = function operadorAtual_() {
@@ -429,6 +436,7 @@
   let _authIdleBusy = false;
   async function checkAuthIdle_() {
     if (!mkAuthIsLoggedIn() || _authIdleBusy) return;
+    if (typeof mkAdminIgnoraSmsObrigatorio_ === 'function' && mkAdminIgnoraSmsObrigatorio_()) return;
     if (!isAuthIdleExpired_()) return;
     if (mkHasLocacaoAbertaNoTablet_()) return;
     _authIdleBusy = true;
@@ -948,7 +956,9 @@
     if (existing && existing.nome) {
       const idleExpired = isAuthIdleExpired_();
       const locAberta = mkHasLocacaoAbertaNoTablet_();
-      if (idleExpired && !locAberta) {
+      const perfilAdmin = existing.role === 'admin' ||
+        (typeof mkAdminIgnoraSmsObrigatorio_ === 'function' && mkAdminIgnoraSmsObrigatorio_());
+      if (idleExpired && !locAberta && !perfilAdmin) {
         try {
           await mkAuthReleaseBalcaoServer_({ inatividade: true, preferAdmin: true });
         } catch (e) { /* offline */ }
@@ -965,7 +975,7 @@
       } catch (e) { /* offline */ }
       if (bootOps && bootOps.ok && await mkAuthReconcileSessaoFantasma_(bootOps)) return;
       if (bootOps && bootOps.ok) applySessaoAtivaFromApi_(bootOps);
-      if (!idleExpired) touchAuthActivity_();
+      if (!idleExpired || perfilAdmin) touchAuthActivity_();
       if (splash) {
         splash.classList.add('hide');
         setTimeout(() => splash.classList.add('gone'), 550);
