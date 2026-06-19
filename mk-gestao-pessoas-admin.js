@@ -81,6 +81,7 @@
   }
 
   window.mkGpAdmSetTab = function (tab) {
+    if (tab !== 'folha' && typeof mkGpAdmFecharHolerite_ === 'function') mkGpAdmFecharHolerite_();
     gpAdmSetTab_(tab);
     if (tab === 'cadastro' && typeof refreshOperadoresAdmin_ === 'function') refreshOperadoresAdmin_();
   };
@@ -320,26 +321,28 @@
     if (!gpAdmData_) return;
     const f = (gpAdmData_.folha || []).find(function (x) { return Number(x.id) === Number(id); });
     const colab = gpAdmColabById_(id);
-    const modal = document.getElementById('gp-adm-holerite-modal');
+    const list = document.getElementById('gp-adm-folha-list');
+    const view = document.getElementById('gp-adm-holerite-view');
     const content = document.getElementById('gp-adm-holerite-content');
-    const title = document.getElementById('gp-adm-holerite-title');
-    if (!f || !modal || !content) {
+    if (!f || !view || !content) {
       if (typeof toast === 'function') toast('Holerite indisponível', 'warning');
       return;
     }
-    if (title) title.textContent = 'Holerite · ' + (f.nome || '');
     content.innerHTML = gpAdmBuildHoleriteHtml_(f, colab, gpAdmData_.competencia);
-    modal.hidden = false;
-    modal.setAttribute('aria-hidden', 'false');
-    document.body.style.overflow = 'hidden';
+    if (list) list.hidden = true;
+    view.hidden = false;
+    view.setAttribute('aria-hidden', 'false');
+    try { view.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e) { view.scrollIntoView(true); }
   };
 
   window.mkGpAdmFecharHolerite_ = function () {
-    const modal = document.getElementById('gp-adm-holerite-modal');
-    if (!modal) return;
-    modal.hidden = true;
-    modal.setAttribute('aria-hidden', 'true');
-    document.body.style.overflow = '';
+    const list = document.getElementById('gp-adm-folha-list');
+    const view = document.getElementById('gp-adm-holerite-view');
+    if (list) list.hidden = false;
+    if (view) {
+      view.hidden = true;
+      view.setAttribute('aria-hidden', 'true');
+    }
   };
 
   function gpAdmRenderFolha_() {
