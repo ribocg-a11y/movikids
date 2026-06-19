@@ -767,7 +767,7 @@
     
 
 function gpVoltarInicio() {
-  var v = global.MK_VERSION || '1.8.59';
+  var v = global.MK_VERSION || '1.8.60';
   global.location.href = 'index.html?force=' + encodeURIComponent(v);
 }
 function colabSairProd() {

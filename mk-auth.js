@@ -521,7 +521,7 @@
   /** Colaboradores — sempre exige PIN próprio (não reutiliza sessão do balcão). */
   window.mkAbrirColaboradores_ = function mkAbrirColaboradores_() {
     try { sessionStorage.removeItem('mk-mock-colab-uid'); } catch (e) { /* ignore */ }
-    const v = window.MK_VERSION || '1.8.59';
+    const v = window.MK_VERSION || '1.8.60';
     location.href = 'gestao-pessoas.html?force=' + encodeURIComponent(v) + '&from=index&_=' + Date.now();
   };
 

@@ -241,6 +241,107 @@
     }).join('') || '<p class="gp-adm-muted">Cadastre colaboradores na aba RH (planilha).</p>';
   }
 
+  function gpAdmFmtMoney_(v, tipo) {
+    const n = Math.abs(Number(v) || 0);
+    const s = n.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    return (tipo === 'd' && Number(v) > 0 ? '−' : '') + 'R$ ' + s;
+  }
+
+  function gpAdmHolRow_(cod, desc, ref, venc, desco, sec) {
+    if (sec) return '<tr class="sec"><td colspan="5">' + esc(sec) + '</td></tr>';
+    return '<tr><td class="c">' + esc(cod) + '</td><td>' + esc(desc) + '</td><td class="c">' + esc(ref) + '</td>' +
+      '<td class="n v">' + (venc || '') + '</td><td class="n d">' + (desco || '') + '</td></tr>';
+  }
+
+  function gpAdmBuildHoleriteHtml_(f, colab, comp) {
+    const hol = f.holerite || {};
+    const base = Number(f.base != null ? f.base : hol.base) || 0;
+    const bonus = Number(f.bonus != null ? f.bonus : hol.bonus) || 0;
+    if (base <= 0 && bonus <= 0 && !hol.bruto) {
+      return '<p class="gp-adm-muted">Sem demonstrativo CLT para esta competência.</p>';
+    }
+    const bruto = hol.bruto != null ? hol.bruto : base + bonus;
+    const inss = hol.inss || 0;
+    const irrf = hol.irrf || 0;
+    const vt = hol.vt || 0;
+    const faltas = hol.faltas || 0;
+    const liquido = hol.liquido != null ? hol.liquido : bruto - inss - irrf - vt - faltas;
+    const totalDescontos = hol.totalDescontos != null ? hol.totalDescontos : inss + irrf + vt + faltas;
+    const diasTrab = (colab && colab.folhaPonto && colab.folhaPonto.length) || hol.vaDias || 0;
+    const refSal = diasTrab ? diasTrab + '/30 dias' : '30/30';
+    const inssAli = hol.inssAli != null ? (Number(hol.inssAli) * 100).toFixed(1).replace('.', ',') + '%' : '—';
+    const irrfIsento = hol.irrfIsento === true || irrf === 0;
+    const irrfRef = irrfIsento ? 'Isento' : '—';
+    const nome = f.nome || (colab && colab.nome) || '—';
+    const funcao = (colab && colab.funcao) || 'Colaborador';
+    const adm = (colab && colab.admissao) || '—';
+    return '<div class="mk-hol">' +
+      '<div class="mk-hol-head"><div class="mk-hol-brand">MOVI <span style="color:var(--gold,#FFD54F)">KIDS</span></div>' +
+      '<div class="mk-hol-sub">MOVI KIDS Brincadeiras LTDA<br>Golden Shopping Calhau · São Luís/MA</div></div>' +
+      '<div class="mk-hol-meta">' +
+      '<div><span>Colaborador</span>' + esc(nome) + ' · ' + esc(funcao) + '</div>' +
+      '<div><span>Competência</span>' + esc(comp || '—') + '</div>' +
+      '<div><span>Admissão</span>' + esc(adm) + '</div>' +
+      '<div><span>Loc mês / bônus dias</span>' + (f.locMes || 0) + ' loc · ' + (f.bonusDias || 0) + ' dia(s)</div>' +
+      '</div>' +
+      '<div class="mk-hol-comp">Demonstrativo de pagamento · ' + esc(comp || '') + '</div>' +
+      '<table class="mk-hol-tbl"><thead><tr><th>Cód</th><th>Descrição</th><th>Referência</th><th>Vencimentos</th><th>Descontos</th></tr></thead><tbody>' +
+      gpAdmHolRow_('', '', '', '', '', 'Proventos') +
+      gpAdmHolRow_('001', 'Salário base', refSal, gpAdmFmtMoney_(base), '') +
+      (bonus > 0 ? gpAdmHolRow_('105', 'Bônus metas (variável)', (f.bonusDias || 0) + ' dia(s)', gpAdmFmtMoney_(bonus), '') : '') +
+      gpAdmHolRow_('', '', '', '', '', 'Descontos legais e autorizados') +
+      gpAdmHolRow_('401', 'INSS — previdência', inssAli, '', gpAdmFmtMoney_(inss, 'd')) +
+      gpAdmHolRow_('402', 'IRRF — imposto de renda', irrfRef, '', irrf > 0 ? gpAdmFmtMoney_(irrf, 'd') : 'R$ 0,00') +
+      gpAdmHolRow_('403', 'Vale-transporte (6% base)', '6,0%', '', gpAdmFmtMoney_(vt, 'd')) +
+      gpAdmHolRow_('404', 'Faltas / atrasos', faltas > 0 ? 'proporcional' : '0 dia', '', faltas > 0 ? gpAdmFmtMoney_(faltas, 'd') : 'R$ 0,00') +
+      '</tbody></table>' +
+      '<div class="mk-hol-tot">' +
+      '<div><div class="lbl">Total vencimentos</div><div class="val">' + gpAdmFmtMoney_(bruto) + '</div></div>' +
+      '<div><div class="lbl">Total descontos</div><div class="val" style="color:var(--red)">' + gpAdmFmtMoney_(totalDescontos, 'd') + '</div></div>' +
+      '<div><div class="lbl">Líquido a receber</div><div class="val">' + gpAdmFmtMoney_(liquido) + '</div></div>' +
+      '</div>' +
+      '<div class="mk-hol-comp" style="border-top:1px solid var(--border);border-bottom:none;background:#F0FDF4;color:#166534">Benefícios · não integram salário</div>' +
+      '<table class="mk-hol-tbl"><thead><tr><th>Cód</th><th>Benefício</th><th>Referência</th><th colspan="2">Valor concedido</th></tr></thead><tbody>' +
+      gpAdmHolRow_('501', 'Vale-alimentação (VA)', hol.vaDias ? hol.vaDias + ' dias × R$ ' + (hol.vaDiario || 20) : '—', hol.vaTotal ? gpAdmFmtMoney_(hol.vaTotal) : 'R$ 0,00', '') +
+      gpAdmHolRow_('502', 'Vale-transporte (passes)', 'mês ref.', hol.vtPasses ? gpAdmFmtMoney_(hol.vtPasses) : '—', '') +
+      gpAdmHolRow_('503', 'FGTS 8% (empregador)', 'sobre base INSS', hol.fgts ? gpAdmFmtMoney_(hol.fgts) : '—', '') +
+      '</tbody></table>' +
+      '<div class="mk-hol-bases">' +
+      '<div><span>Salário contratual</span>' + gpAdmFmtMoney_(base) + '</div>' +
+      '<div><span>Base INSS</span>' + gpAdmFmtMoney_(hol.baseInss || bruto) + '</div>' +
+      '<div><span>Base IRRF</span>' + gpAdmFmtMoney_(hol.irrfBase || (bruto - inss)) + '</div>' +
+      '<div><span>Total estimado c/ bônus</span>' + gpAdmFmtMoney_(f.total || liquido) + '</div>' +
+      '</div>' +
+      '<div class="mk-hol-foot">Documento informativo · MOVI KIDS. Simulação CLT para gestão interna — conferir com contador antes do pagamento.</div>' +
+      '</div>';
+  }
+
+  window.mkGpAdmVerHolerite_ = function (id) {
+    if (!gpAdmData_) return;
+    const f = (gpAdmData_.folha || []).find(function (x) { return Number(x.id) === Number(id); });
+    const colab = gpAdmColabById_(id);
+    const modal = document.getElementById('gp-adm-holerite-modal');
+    const content = document.getElementById('gp-adm-holerite-content');
+    const title = document.getElementById('gp-adm-holerite-title');
+    if (!f || !modal || !content) {
+      if (typeof toast === 'function') toast('Holerite indisponível', 'warning');
+      return;
+    }
+    if (title) title.textContent = 'Holerite · ' + (f.nome || '');
+    content.innerHTML = gpAdmBuildHoleriteHtml_(f, colab, gpAdmData_.competencia);
+    modal.hidden = false;
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+  };
+
+  window.mkGpAdmFecharHolerite_ = function () {
+    const modal = document.getElementById('gp-adm-holerite-modal');
+    if (!modal) return;
+    modal.hidden = true;
+    modal.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+  };
+
   function gpAdmRenderFolha_() {
     const el = document.getElementById('gp-adm-folha');
     if (!el || !gpAdmData_) return;
@@ -249,11 +350,12 @@
       el.innerHTML = '<p class="gp-adm-muted">Folha indisponível — instale abas RH ou cadastre colaboradores.</p>';
       return;
     }
-    el.innerHTML = '<table class="gp-adm-table"><tr><th style="text-align:left">Nome</th><th>Loc mês</th><th>Bônus dias</th><th>Base</th><th>Bônus R$</th><th>Total est.</th></tr>' +
+    el.innerHTML = '<table class="gp-adm-table"><tr><th style="text-align:left">Nome</th><th>Loc mês</th><th>Bônus dias</th><th>Base</th><th>Bônus R$</th><th>Total est.</th><th></th></tr>' +
       folha.map(function (f) {
-        return '<tr><td style="text-align:left">' + esc(f.nome) + '</td><td>' + (f.locMes || 0) + '</td><td>' + (f.bonusDias || 0) + '</td>' +
+        return '<tr><td style="text-align:left;font-weight:800">' + esc(f.nome) + '</td><td>' + (f.locMes || 0) + '</td><td>' + (f.bonusDias || 0) + '</td>' +
           '<td>' + Number(f.base || 0).toLocaleString('pt-BR') + '</td><td>' + Number(f.bonus || 0).toLocaleString('pt-BR') + '</td>' +
-          '<td><strong>' + Number(f.total || 0).toLocaleString('pt-BR') + '</strong></td></tr>';
+          '<td><strong>' + Number(f.total || 0).toLocaleString('pt-BR') + '</strong></td>' +
+          '<td><button type="button" class="gp-adm-link" onclick="mkGpAdmVerHolerite_(' + f.id + ')">Ver holerite</button></td></tr>';
       }).join('') + '</table>';
   }
 
