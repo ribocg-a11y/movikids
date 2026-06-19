@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.107
+// MOVI KIDS — Google Apps Script v1.5.108
+// v1.5.108: holerite quinzenal — 40% dia 15 · 60%+benefícios dia 30/31 · proporcional admissão · VA R$400
 // v1.5.107: painelGestaoPessoasAdmin — AUDITORIA lida 1x + índice loc/metas (fim timeout ~13s)
 // v1.5.106: loc Milena/RH — gpLocStatsFromAuditoria_ (sem filtro turno) + auditTsMeta_ preserva hora Date
 // v1.5.105: loc mês/hoje Gestão Pessoas — AUDITORIA (encerrarLocacao) + aba METAS
@@ -6344,7 +6345,8 @@ function gpColabRhObjFromRow_(row, idx) {
     cpf: String(row[3] || '').trim(), nascimento: cellToStr_(row[4]), telefone: String(row[5] || '').trim(),
     email: String(row[6] || '').trim(), endereco: String(row[7] || '').trim(), emergencia: String(row[8] || '').trim(),
     admissao: cellToStr_(row[9]), pix: String(row[10] || '').trim(), salarioBase: Number(row[11]) || 1621,
-    vaDiario: Number(row[12]) || 20, metaLocDia: Number(row[13]) || 20, bonusMeta: Number(row[14]) || 100,
+    vaDiario: Number(row[12]) || Math.round(GP_VA_MENSAL_PADRAO_ / 26 * 100) / 100,
+    vaMensal: GP_VA_MENSAL_PADRAO_, metaLocDia: Number(row[13]) || 20, bonusMeta: Number(row[14]) || 100,
     turno: String(row[15] || '').trim(), ativo: String(row[16] || 'SIM').toUpperCase() !== 'NAO',
     cadastroPct: Number(row[17]) || 0, row: GP_DATA_ROW + idx
   };
@@ -6642,6 +6644,68 @@ function gpAlertasPontoFromCtx_(ctx) {
   return { alertas: alertas, total: alertas.length };
 }
 
+const GP_VA_MENSAL_PADRAO_ = 400;
+const GP_PCT_QUINZENA_1_ = 0.40;
+const GP_PCT_QUINZENA_2_ = 0.60;
+
+function gpDiasNoMes_(mes, ano) {
+  return new Date(ano, mes, 0).getDate();
+}
+
+function gpDiasTrabalhadosNoMes_(admissaoStr, mes, ano) {
+  const diasMes = gpDiasNoMes_(mes, ano);
+  const adm = parseDataStr_(admissaoStr);
+  const iniMes = new Date(ano, mes - 1, 1);
+  const fimMes = new Date(ano, mes - 1, diasMes, 23, 59, 59);
+  let inicio = iniMes;
+  if (adm) {
+    const admD = new Date(adm.getFullYear(), adm.getMonth(), adm.getDate());
+    if (admD > fimMes) return 0;
+    if (admD > iniMes) inicio = admD;
+  }
+  if (inicio > fimMes) return 0;
+  return Math.floor((fimMes - inicio) / 86400000) + 1;
+}
+
+function gpDiasNaQuinzena_(admissaoStr, mes, ano, quinzena) {
+  const diasMes = gpDiasNoMes_(mes, ano);
+  const qIni = quinzena === 1 ? 1 : 15;
+  const qFim = quinzena === 1 ? Math.min(14, diasMes) : diasMes;
+  const adm = parseDataStr_(admissaoStr);
+  const iniQ = new Date(ano, mes - 1, qIni);
+  const fimQ = new Date(ano, mes - 1, qFim, 23, 59, 59);
+  let inicio = iniQ;
+  if (adm) {
+    const admD = new Date(adm.getFullYear(), adm.getMonth(), adm.getDate());
+    if (admD > fimQ) return 0;
+    if (admD > iniQ) inicio = admD;
+  }
+  if (inicio > fimQ) return 0;
+  return Math.floor((fimQ - inicio) / 86400000) + 1;
+}
+
+function gpQuinzenaAtual_(refDate, mes, ano) {
+  const d = refDate || new Date();
+  if (d.getFullYear() !== ano || d.getMonth() + 1 !== mes) {
+    return d < new Date(ano, mes - 1, 15) ? 1 : 2;
+  }
+  return d.getDate() <= 14 ? 1 : 2;
+}
+
+function gpDataPagamentoQuinzena_(quinzena, mes, ano) {
+  if (quinzena === 1) return '15/' + String(mes).padStart(2, '0') + '/' + ano;
+  return gpDiasNoMes_(mes, ano) + '/' + String(mes).padStart(2, '0') + '/' + ano;
+}
+
+function gpVaMensalColab_(colab) {
+  if (colab && colab.vaMensal && Number(colab.vaMensal) >= 100) return Number(colab.vaMensal);
+  try {
+    const fp = lerFolhaPlanejamento_();
+    if (fp.ok && fp.vaMensal >= 100) return fp.vaMensal;
+  } catch (e) { /* ignore */ }
+  return GP_VA_MENSAL_PADRAO_;
+}
+
 function gpCalcInss_(baseInss) {
   const faixas = [{ ate: 1518, ali: 0.075 }, { ate: 2793.88, ali: 0.09 }, { ate: 4190.83, ali: 0.12 }, { ate: 8157.41, ali: 0.14 }];
   let rest = baseInss, prev = 0, total = 0, aliEf = 0;
@@ -6665,22 +6729,80 @@ function gpCalcIrrf_(baseIrrf) {
   return { irrf: 0, isento: true };
 }
 
-function gpCalcHollerite_(colab, bonus, faltas, vaDias) {
-  const base = colab.salarioBase || 1621;
-  bonus = bonus || 0; faltas = faltas || 0; vaDias = vaDias || 0;
-  const bruto = base + bonus;
-  const inssCalc = gpCalcInss_(bruto);
-  const irrfCalc = gpCalcIrrf_(bruto - inssCalc.inss);
-  const vt = Math.round(base * 0.06 * 100) / 100;
-  const fgts = Math.round(bruto * 0.08 * 100) / 100;
-  const vaTotal = Math.round((colab.vaDiario || 20) * vaDias * 100) / 100;
-  const totalDescontos = inssCalc.inss + irrfCalc.irrf + vt + faltas;
+function gpCalcHollerite_(colab, bonus, faltas, competencia, refDate) {
+  colab = colab || {};
+  bonus = bonus || 0;
+  faltas = faltas || 0;
+  refDate = refDate || new Date();
+  const comp = parseMesAnoPayback_(competencia || gpCompetenciaAtual_());
+  const mes = comp.mes;
+  const ano = comp.ano;
+  const compLabel = comp.label;
+  const diasMes = gpDiasNoMes_(mes, ano);
+  const salarioContratual = Number(colab.salarioBase) || 1621;
+  const diasTrab = gpDiasTrabalhadosNoMes_(colab.admissao, mes, ano);
+  const fatorMes = diasMes > 0 ? diasTrab / diasMes : 0;
+  const salarioProp = Math.round(salarioContratual * fatorMes * 100) / 100;
+  const quinzena = gpQuinzenaAtual_(refDate, mes, ano);
+  const pctQuinz = quinzena === 1 ? GP_PCT_QUINZENA_1_ : GP_PCT_QUINZENA_2_;
+  const diasQuinz = gpDiasNaQuinzena_(colab.admissao, mes, ano, quinzena);
+  const temQuinzena = diasQuinz > 0;
+  const vaMensal = gpVaMensalColab_(colab);
+  const vaProp = Math.round(vaMensal * fatorMes * 100) / 100;
+  const vtPassesMes = Math.round((5 * 24 * 2.34) * 100) / 100;
+
+  let basePag = 0;
+  let bonusQuinz = 0;
+  let vaTotal = 0;
+  let vaDias = 0;
+  let vtPasses = 0;
+  let incluiBeneficios = false;
+
+  if (temQuinzena) {
+    basePag = Math.round(salarioProp * pctQuinz * 100) / 100;
+    if (quinzena === 2) {
+      bonusQuinz = bonus;
+      incluiBeneficios = true;
+      vaTotal = vaProp;
+      vaDias = diasTrab;
+      vtPasses = Math.round(vtPassesMes * fatorMes * 100) / 100;
+    }
+  }
+
+  const bruto = basePag + bonusQuinz;
+  let inss = 0, irrf = 0, vt = 0, inssAli = 0, irrfIsento = true, irrfBase = 0, fgts = 0;
+
+  if (quinzena === 2 && temQuinzena) {
+    const brutoMes = salarioProp + bonus;
+    const inssCalc = gpCalcInss_(brutoMes);
+    const irrfCalc = gpCalcIrrf_(brutoMes - inssCalc.inss);
+    inss = inssCalc.inss;
+    inssAli = inssCalc.aliEf;
+    irrf = irrfCalc.irrf;
+    irrfIsento = irrfCalc.isento;
+    irrfBase = Math.round((brutoMes - inss) * 100) / 100;
+    vt = Math.round(salarioProp * 0.06 * 100) / 100;
+    fgts = Math.round(brutoMes * 0.08 * 100) / 100;
+  }
+
+  const totalDescontos = Math.round((inss + irrf + vt + faltas) * 100) / 100;
+  const liquido = Math.round((bruto - totalDescontos) * 100) / 100;
+  const vaDiario = diasMes > 0 ? Math.round((vaMensal / diasMes) * 100) / 100 : 0;
+  const pagamentoEm = gpDataPagamentoQuinzena_(quinzena, mes, ano);
+  const quinzenaLabel = quinzena === 1 ? '1ª quinzena · 40% salário' : '2ª quinzena · 60% + benefícios';
+
   return {
-    base: base, bonus: bonus, faltas: faltas, bruto: bruto, inss: inssCalc.inss, inssAli: inssCalc.aliEf,
-    irrf: irrfCalc.irrf, irrfIsento: irrfCalc.isento, vt: vt, fgts: fgts, vaTotal: vaTotal, vaDias: vaDias,
-    vaDiario: colab.vaDiario || 20, vtPasses: Math.round((5 * 24 * 2.34) * 100) / 100,
-    totalDescontos: Math.round(totalDescontos * 100) / 100, liquido: Math.round((bruto - totalDescontos) * 100) / 100,
-    baseInss: bruto, irrfBase: Math.round((bruto - inssCalc.inss) * 100) / 100
+    base: basePag, salarioContratual: salarioContratual, salarioProporcional: salarioProp,
+    bonus: bonusQuinz, faltas: faltas, bruto: bruto,
+    inss: inss, inssAli: inssAli, irrf: irrf, irrfIsento: irrfIsento, vt: vt, fgts: fgts,
+    vaTotal: vaTotal, vaDias: vaDias, vaDiario: vaDiario, vaMensal: vaMensal, vtPasses: vtPasses,
+    totalDescontos: totalDescontos, liquido: liquido,
+    baseInss: quinzena === 2 ? salarioProp + bonus : bruto,
+    irrfBase: irrfBase, competencia: compLabel, quinzena: quinzena, quinzenaLabel: quinzenaLabel,
+    pctQuinzena: pctQuinz, pagamentoEm: pagamentoEm, diasTrabalhados: diasTrab, diasMes: diasMes,
+    diasQuinzena: diasQuinz, incluiBeneficios: incluiBeneficios, fatorMes: Math.round(fatorMes * 10000) / 10000,
+    obs: compLabel + ' · ' + quinzenaLabel + ' · pgto ' + pagamentoEm +
+      (diasTrab < diasMes ? ' · prop. ' + diasTrab + '/' + diasMes + ' dias' : '')
   };
 }
 
@@ -6754,7 +6876,7 @@ function buscarPainelColaborador_(p) {
     const metas = gpMetasColab_(opId, comp);
     const bonus = metas.bonusTotal || 0;
     const folhaLen = gpFolhaPontoColab_(opId, comp).length;
-    const hol = gpCalcHollerite_(colab, bonus, 0, folhaLen || 12);
+    const hol = gpCalcHollerite_(colab, bonus, 0, comp);
     const pontoHoje = gpStatusPontoHoje_(opId);
     return resp_({
       colaborador: {
@@ -6766,11 +6888,14 @@ function buscarPainelColaborador_(p) {
       ponto: { statusHoje: pontoHoje.status, folha: gpFolhaPontoColab_(opId, comp), hoje: pontoHoje },
       metas: metas, escala: gpEscalaColab_(opId, comp), bancoHoras: gpBancoHoras_(opId),
       pagamento: {
-        base: colab.salarioBase, bonus: bonus, faltas: 0, dependentes: 0, competencia: comp, pagamentoEm: '05/' + comp,
-        diasTrabalhados: folhaLen || 12, diasMes: 30, obs: comp + ' · admissão ' + (colab.admissao || '—'),
-        beneficios: { vaDiario: colab.vaDiario, vaDias: hol.vaDias, vtPasses: hol.vtPasses, vaCoparticipacao: 0 }, holerite: hol
+        base: hol.base, bonus: hol.bonus, faltas: 0, dependentes: 0, competencia: comp,
+        pagamentoEm: hol.pagamentoEm, quinzena: hol.quinzena, quinzenaLabel: hol.quinzenaLabel,
+        diasTrabalhados: hol.diasTrabalhados, diasMes: hol.diasMes, salarioContratual: hol.salarioContratual,
+        obs: hol.obs,
+        beneficios: { vaDiario: hol.vaDiario, vaDias: hol.vaDias, vaMensal: hol.vaMensal, vtPasses: hol.vtPasses, vaCoparticipacao: 0 },
+        holerite: hol
       },
-      versao: 'v1.5.98'
+      versao: 'v1.5.108'
     });
   } catch (ex) {
     return err_('Abas Gestao Pessoas ausentes — rode scripts/criar-abas-gestao-pessoas.ps1', 503);
@@ -6957,11 +7082,12 @@ function painelGestaoPessoasAdmin_(p) {
     const folha = colaboradores.filter(function (c) { return c.temRh; }).map(function (c) {
       const rh = gpColabRhFromCtx_(c.id, ctx);
       const bonus = c.metas.bonusTotal || 0;
-      const diasTrab = (c.folhaPonto || []).length;
-      const hol = gpCalcHollerite_(rh || { salarioBase: 1621, vaDiario: 20 }, bonus, 0, diasTrab || 0);
+      const hol = gpCalcHollerite_(rh || { salarioBase: 1621, admissao: c.admissao }, bonus, 0, comp);
       return {
         id: c.id, nome: c.nome, locMes: c.metas.locMes, bonusDias: c.metas.bonusDias,
-        base: hol.base, bonus: bonus, total: Math.round((hol.liquido + bonus) * 100) / 100, holerite: hol
+        base: hol.base, bonus: hol.bonus, total: hol.liquido,
+        quinzena: hol.quinzena, quinzenaLabel: hol.quinzenaLabel, pagamentoEm: hol.pagamentoEm,
+        holerite: hol
       };
     });
 
@@ -6976,7 +7102,7 @@ function painelGestaoPessoasAdmin_(p) {
       competencia: comp, colaboradores: colaboradores, escala: escala, folha: folha,
       alertas: alertasPack.alertas, alertasTotal: alertasPack.total,
       kpis: { total: colaboradores.length, presentes: presentes, comTurno: comTurno, alertas: alertasPack.total },
-      sessaoAtiva: sessao, versao: 'v1.5.107'
+      sessaoAtiva: sessao, versao: 'v1.5.108'
     });
   } catch (ex) {
     return err_('Abas Gestao Pessoas ausentes — rode instalar abas ou scripts/criar-abas-gestao-pessoas.ps1', 503);

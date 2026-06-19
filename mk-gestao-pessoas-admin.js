@@ -258,8 +258,8 @@
     const hol = f.holerite || {};
     const base = Number(f.base != null ? f.base : hol.base) || 0;
     const bonus = Number(f.bonus != null ? f.bonus : hol.bonus) || 0;
-    if (base <= 0 && bonus <= 0 && !hol.bruto) {
-      return '<p class="gp-adm-muted">Sem demonstrativo CLT para esta competência.</p>';
+    if (hol.diasQuinzena === 0 || (base <= 0 && bonus <= 0)) {
+      return '<p class="gp-adm-muted">Sem pagamento nesta quinzena — admissão posterior ou período não trabalhado.</p>';
     }
     const bruto = hol.bruto != null ? hol.bruto : base + bonus;
     const inss = hol.inss || 0;
@@ -268,52 +268,66 @@
     const faltas = hol.faltas || 0;
     const liquido = hol.liquido != null ? hol.liquido : bruto - inss - irrf - vt - faltas;
     const totalDescontos = hol.totalDescontos != null ? hol.totalDescontos : inss + irrf + vt + faltas;
-    const diasTrab = (colab && colab.folhaPonto && colab.folhaPonto.length) || hol.vaDias || 0;
-    const refSal = diasTrab ? diasTrab + '/30 dias' : '30/30';
+    const diasMes = hol.diasMes || 30;
+    const diasTrab = hol.diasTrabalhados != null ? hol.diasTrabalhados : 0;
+    const refSal = diasTrab + '/' + diasMes + ' dias · ' + (hol.quinzena === 1 ? '40%' : '60%');
     const inssAli = hol.inssAli != null ? (Number(hol.inssAli) * 100).toFixed(1).replace('.', ',') + '%' : '—';
     const irrfIsento = hol.irrfIsento === true || irrf === 0;
     const irrfRef = irrfIsento ? 'Isento' : '—';
     const nome = f.nome || (colab && colab.nome) || '—';
     const funcao = (colab && colab.funcao) || 'Colaborador';
     const adm = (colab && colab.admissao) || '—';
+    const qLabel = hol.quinzenaLabel || (hol.quinzena === 1 ? '1ª quinzena' : '2ª quinzena');
+    const pgto = hol.pagamentoEm || '—';
+    const salContr = hol.salarioContratual || hol.salarioProporcional || base;
+    const pctSal = hol.quinzena === 1 ? '40%' : '60%';
+    const descRows = hol.quinzena === 2
+      ? gpAdmHolRow_('', '', '', '', '', 'Descontos legais e autorizados') +
+        gpAdmHolRow_('401', 'INSS — previdência', inssAli, '', gpAdmFmtMoney_(inss, 'd')) +
+        gpAdmHolRow_('402', 'IRRF — imposto de renda', irrfRef, '', irrf > 0 ? gpAdmFmtMoney_(irrf, 'd') : 'R$ 0,00') +
+        gpAdmHolRow_('403', 'Vale-transporte (6% base)', '6,0%', '', gpAdmFmtMoney_(vt, 'd')) +
+        gpAdmHolRow_('404', 'Faltas / atrasos', faltas > 0 ? 'proporcional' : '0 dia', '', faltas > 0 ? gpAdmFmtMoney_(faltas, 'd') : 'R$ 0,00')
+      : gpAdmHolRow_('', '', '', '', '', 'Descontos') +
+        gpAdmHolRow_('—', 'Adiantamento quinzenal — descontos na 2ª quinzena', '—', '', 'R$ 0,00');
+    const benBlock = hol.incluiBeneficios
+      ? '<div class="mk-hol-comp" style="border-top:1px solid var(--border);border-bottom:none;background:#F0FDF4;color:#166534">Benefícios · pagos na 2ª quinzena · não integram salário</div>' +
+        '<table class="mk-hol-tbl"><thead><tr><th>Cód</th><th>Benefício</th><th>Referência</th><th colspan="2">Valor concedido</th></tr></thead><tbody>' +
+        gpAdmHolRow_('501', 'Vale-alimentação (VA)', 'R$ ' + (hol.vaMensal || 400) + '/mês prop. ' + diasTrab + '/' + diasMes, hol.vaTotal ? gpAdmFmtMoney_(hol.vaTotal) : 'R$ 0,00', '') +
+        gpAdmHolRow_('502', 'Vale-transporte (passes)', 'mês ref. prop.', hol.vtPasses ? gpAdmFmtMoney_(hol.vtPasses) : '—', '') +
+        gpAdmHolRow_('503', 'FGTS 8% (empregador)', 'sobre base INSS', hol.fgts ? gpAdmFmtMoney_(hol.fgts) : '—', '') +
+        '</tbody></table>'
+      : '<p class="gp-adm-muted" style="padding:12px 16px;margin:0">Benefícios (VA R$ 400/mês, VT) creditados na <strong>2ª quinzena</strong> (pagamento dia 30/31).</p>';
     return '<div class="mk-hol">' +
       '<div class="mk-hol-head"><div class="mk-hol-brand">MOVI <span style="color:var(--gold,#FFD54F)">KIDS</span></div>' +
       '<div class="mk-hol-sub">MOVI KIDS Brincadeiras LTDA<br>Golden Shopping Calhau · São Luís/MA</div></div>' +
       '<div class="mk-hol-meta">' +
       '<div><span>Colaborador</span>' + esc(nome) + ' · ' + esc(funcao) + '</div>' +
-      '<div><span>Competência</span>' + esc(comp || '—') + '</div>' +
+      '<div><span>Competência</span>' + esc(comp || hol.competencia || '—') + '</div>' +
+      '<div><span>Quinzena / pagamento</span>' + esc(qLabel) + ' · pgto ' + esc(pgto) + '</div>' +
       '<div><span>Admissão</span>' + esc(adm) + '</div>' +
-      '<div><span>Loc mês / bônus dias</span>' + (f.locMes || 0) + ' loc · ' + (f.bonusDias || 0) + ' dia(s)</div>' +
+      '<div><span>Salário contratual</span>' + gpAdmFmtMoney_(salContr) + '</div>' +
+      '<div><span>Proporcional mês</span>' + gpAdmFmtMoney_(hol.salarioProporcional || base) + ' (' + diasTrab + '/' + diasMes + ' dias)</div>' +
       '</div>' +
-      '<div class="mk-hol-comp">Demonstrativo de pagamento · ' + esc(comp || '') + '</div>' +
+      '<div class="mk-hol-comp">Demonstrativo · ' + esc(qLabel) + ' · pgto ' + esc(pgto) + '</div>' +
       '<table class="mk-hol-tbl"><thead><tr><th>Cód</th><th>Descrição</th><th>Referência</th><th>Vencimentos</th><th>Descontos</th></tr></thead><tbody>' +
       gpAdmHolRow_('', '', '', '', '', 'Proventos') +
-      gpAdmHolRow_('001', 'Salário base', refSal, gpAdmFmtMoney_(base), '') +
+      gpAdmHolRow_('001', 'Salário ' + pctSal + ' (proporcional)', refSal, gpAdmFmtMoney_(base), '') +
       (bonus > 0 ? gpAdmHolRow_('105', 'Bônus metas (variável)', (f.bonusDias || 0) + ' dia(s)', gpAdmFmtMoney_(bonus), '') : '') +
-      gpAdmHolRow_('', '', '', '', '', 'Descontos legais e autorizados') +
-      gpAdmHolRow_('401', 'INSS — previdência', inssAli, '', gpAdmFmtMoney_(inss, 'd')) +
-      gpAdmHolRow_('402', 'IRRF — imposto de renda', irrfRef, '', irrf > 0 ? gpAdmFmtMoney_(irrf, 'd') : 'R$ 0,00') +
-      gpAdmHolRow_('403', 'Vale-transporte (6% base)', '6,0%', '', gpAdmFmtMoney_(vt, 'd')) +
-      gpAdmHolRow_('404', 'Faltas / atrasos', faltas > 0 ? 'proporcional' : '0 dia', '', faltas > 0 ? gpAdmFmtMoney_(faltas, 'd') : 'R$ 0,00') +
+      descRows +
       '</tbody></table>' +
       '<div class="mk-hol-tot">' +
       '<div><div class="lbl">Total vencimentos</div><div class="val">' + gpAdmFmtMoney_(bruto) + '</div></div>' +
       '<div><div class="lbl">Total descontos</div><div class="val" style="color:var(--red)">' + gpAdmFmtMoney_(totalDescontos, 'd') + '</div></div>' +
       '<div><div class="lbl">Líquido a receber</div><div class="val">' + gpAdmFmtMoney_(liquido) + '</div></div>' +
       '</div>' +
-      '<div class="mk-hol-comp" style="border-top:1px solid var(--border);border-bottom:none;background:#F0FDF4;color:#166534">Benefícios · não integram salário</div>' +
-      '<table class="mk-hol-tbl"><thead><tr><th>Cód</th><th>Benefício</th><th>Referência</th><th colspan="2">Valor concedido</th></tr></thead><tbody>' +
-      gpAdmHolRow_('501', 'Vale-alimentação (VA)', hol.vaDias ? hol.vaDias + ' dias × R$ ' + (hol.vaDiario || 20) : '—', hol.vaTotal ? gpAdmFmtMoney_(hol.vaTotal) : 'R$ 0,00', '') +
-      gpAdmHolRow_('502', 'Vale-transporte (passes)', 'mês ref.', hol.vtPasses ? gpAdmFmtMoney_(hol.vtPasses) : '—', '') +
-      gpAdmHolRow_('503', 'FGTS 8% (empregador)', 'sobre base INSS', hol.fgts ? gpAdmFmtMoney_(hol.fgts) : '—', '') +
-      '</tbody></table>' +
+      benBlock +
       '<div class="mk-hol-bases">' +
-      '<div><span>Salário contratual</span>' + gpAdmFmtMoney_(base) + '</div>' +
-      '<div><span>Base INSS</span>' + gpAdmFmtMoney_(hol.baseInss || bruto) + '</div>' +
+      '<div><span>Salário contratual</span>' + gpAdmFmtMoney_(salContr) + '</div>' +
+      '<div><span>Base INSS (mês prop.)</span>' + gpAdmFmtMoney_(hol.baseInss || hol.salarioProporcional || bruto) + '</div>' +
       '<div><span>Base IRRF</span>' + gpAdmFmtMoney_(hol.irrfBase || (bruto - inss)) + '</div>' +
-      '<div><span>Total estimado c/ bônus</span>' + gpAdmFmtMoney_(f.total || liquido) + '</div>' +
+      '<div><span>Líquido desta quinzena</span>' + gpAdmFmtMoney_(liquido) + '</div>' +
       '</div>' +
-      '<div class="mk-hol-foot">Documento informativo · MOVI KIDS. Simulação CLT para gestão interna — conferir com contador antes do pagamento.</div>' +
+      '<div class="mk-hol-foot">Regra MOVI KIDS: 1ª quinzena 40% salário (dia 15) · 2ª quinzena 60% + benefícios (dia 30/31) · proporcional à admissão. Conferir com contador.</div>' +
       '</div>';
   }
 
@@ -353,11 +367,14 @@
       el.innerHTML = '<p class="gp-adm-muted">Folha indisponível — instale abas RH ou cadastre colaboradores.</p>';
       return;
     }
-    el.innerHTML = '<table class="gp-adm-table"><tr><th style="text-align:left">Nome</th><th>Loc mês</th><th>Bônus dias</th><th>Base</th><th>Bônus R$</th><th>Total est.</th><th></th></tr>' +
+    el.innerHTML = '<p class="gp-adm-muted" style="margin:0 0 10px">Pagamento quinzenal: <strong>40%</strong> dia 15 · <strong>60% + benefícios</strong> dia 30/31 · proporcional à admissão · VA R$ 400/mês.</p>' +
+      '<table class="gp-adm-table"><tr><th style="text-align:left">Nome</th><th>Quinzena</th><th>Pgto</th><th>Loc mês</th><th>Bônus</th><th>Líquido est.</th><th></th></tr>' +
       folha.map(function (f) {
-        return '<tr><td style="text-align:left;font-weight:800">' + esc(f.nome) + '</td><td>' + (f.locMes || 0) + '</td><td>' + (f.bonusDias || 0) + '</td>' +
-          '<td>' + Number(f.base || 0).toLocaleString('pt-BR') + '</td><td>' + Number(f.bonus || 0).toLocaleString('pt-BR') + '</td>' +
-          '<td><strong>' + Number(f.total || 0).toLocaleString('pt-BR') + '</strong></td>' +
+        const hol = f.holerite || {};
+        const q = f.quinzenaLabel || hol.quinzenaLabel || (f.quinzena === 1 ? '1ª' : '2ª');
+        const pg = f.pagamentoEm || hol.pagamentoEm || '—';
+        return '<tr><td style="text-align:left;font-weight:800">' + esc(f.nome) + '</td><td>' + esc(q) + '</td><td>' + esc(pg) + '</td><td>' + (f.locMes || 0) + '</td><td>' + Number(f.bonus || 0).toLocaleString('pt-BR') + '</td>' +
+          '<td><strong>' + Number(f.total || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) + '</strong></td>' +
           '<td><button type="button" class="gp-adm-link" onclick="mkGpAdmVerHolerite_(' + f.id + ')">Ver holerite</button></td></tr>';
       }).join('') + '</table>';
   }
