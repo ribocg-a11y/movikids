@@ -368,7 +368,7 @@
       } catch (e) {
         const msg = (e && e.message) || 'Erro de conexão';
         if (String(msg).indexOf('timeout') >= 0) {
-          gpAdmSetErr_('Demorou demais para carregar — tente de novo ou publique GAS v1.5.102+ (leitura otimizada).');
+          gpAdmSetErr_('Demorou demais — publique GAS v1.5.107+ (AUDITORIA lida uma vez).');
         } else if (String(msg).indexOf('painelGestaoPessoasAdmin') >= 0) {
           gpAdmSetErr_(gpAdmGasPendingHtml_());
           try { await gpAdmLoadFallback_(msg); } catch (e2) { /* ignore */ }

@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.106
+// MOVI KIDS — Google Apps Script v1.5.107
+// v1.5.107: painelGestaoPessoasAdmin — AUDITORIA lida 1x + índice loc/metas (fim timeout ~13s)
 // v1.5.106: loc Milena/RH — gpLocStatsFromAuditoria_ (sem filtro turno) + auditTsMeta_ preserva hora Date
 // v1.5.105: loc mês/hoje Gestão Pessoas — AUDITORIA (encerrarLocacao) + aba METAS
 // v1.5.104: Milena (id2) no RH/escala/metas — mesma regra salarial que equipe
@@ -415,9 +416,9 @@ function ping_() {
   const agora = new Date();
   return resp_({
     status:  'online',
-    versao:  'v1.5.106',
+    versao:  'v1.5.107',
     timestamp: fmtData_(agora) + ' ' + fmtHoraLocal_(agora),
-    sistema: 'MOVI KIDS v1.5.106',
+    sistema: 'MOVI KIDS v1.5.107',
     postWriteActions: WRITE_ACTIONS_CRITICAS_
   });
 }
@@ -6350,12 +6351,111 @@ function gpColabRhObjFromRow_(row, idx) {
 }
 
 function gpLoadContext_() {
+  let auditRows = [];
+  try {
+    const shAud = ss_().getSheetByName('AUDITORIA');
+    if (shAud && shAud.getLastRow() >= 2) {
+      auditRows = shAud.getRange(2, 1, shAud.getLastRow(), 8).getValues();
+    }
+  } catch (e) {
+    Logger.log('gpLoadContext_ AUDITORIA: ' + e.message);
+  }
   return {
     hoje: fmtData_(new Date()),
     rhRows: gpRows_(SH_COLAB_RH),
     folhaRows: gpRows_(SH_FOLHA_PONTO),
     metasRows: gpRows_(SH_METAS_COLAB),
-    escalaRows: gpRows_(SH_ESCALA_COLAB)
+    escalaRows: gpRows_(SH_ESCALA_COLAB),
+    auditRows: auditRows,
+    auditLocByOpId: null,
+    metaByDayByOpId: null
+  };
+}
+
+/** Uma passagem na AUDITORIA — loc mês/hoje + meta turno por operador (evita N leituras). */
+function gpEnrichContextAudit_(ctx, competencia, operadores) {
+  const compNorm = gpNormCompetencia_(competencia);
+  const hoje = ctx.hoje;
+  const mesAtual = hoje.slice(3);
+  const auditLocByOpId = {};
+  const metaByDayByOpId = {};
+  const opList = [];
+
+  (operadores || []).forEach(function (op) {
+    const id = Number(op.id);
+    if (!id) return;
+    opList.push({ id: id, nome: String(op.nome || ''), cfg: metaOperadorCfg_(id) });
+    auditLocByOpId[id] = { locMes: 0, locHoje: 0 };
+    metaByDayByOpId[id] = {};
+  });
+  ctx.rhRows.forEach(function (r) {
+    const id = Number(r[0]);
+    if (!id || auditLocByOpId[id]) return;
+    opList.push({ id: id, nome: String(r[1] || ''), cfg: metaOperadorCfg_(id) });
+    auditLocByOpId[id] = { locMes: 0, locHoje: 0 };
+    metaByDayByOpId[id] = {};
+  });
+
+  (ctx.auditRows || []).forEach(function (r) {
+    if (String(r[1] || '').trim() !== 'encerrarLocacao') return;
+    const usuario = String(r[7] || '');
+    const ts = auditTsMeta_(r[0]);
+    if (!ts.data) return;
+    const pts = ts.data.split('/');
+    const compRow = pts.length >= 3 ? pts[1].padStart(2, '0') + '/' + pts[2] : '';
+
+    for (let i = 0; i < opList.length; i++) {
+      const op = opList[i];
+      if (!metaOperadorNomeMatch_(usuario, op.nome)) continue;
+      if (compRow === compNorm) {
+        auditLocByOpId[op.id].locMes++;
+        if (ts.data === hoje) auditLocByOpId[op.id].locHoje++;
+      }
+      const cfg = op.cfg;
+      if (!cfg || cfg.ativo === false || !cfg.inicio) continue;
+      if (ts.data.slice(3) !== mesAtual) continue;
+      if (dateToCmp_(ts.data) < dateToCmp_(cfg.inicio)) continue;
+      const shift = cfg.escala[String(weekdayFromDataStr_(ts.data))];
+      if (!shift) continue;
+      if (!metaOperadorInShift_(ts.mins, shift) && !ts.semHora) continue;
+      const byDay = metaByDayByOpId[op.id];
+      byDay[ts.data] = (byDay[ts.data] || 0) + 1;
+    }
+  });
+
+  ctx.auditLocByOpId = auditLocByOpId;
+  ctx.metaByDayByOpId = metaByDayByOpId;
+}
+
+function gpMetaPayloadFromCtx_(opId, ctx) {
+  const cfg = metaOperadorCfg_(opId);
+  const byDay = (ctx.metaByDayByOpId && ctx.metaByDayByOpId[opId]) || {};
+  if (!cfg || cfg.ativo === false || !cfg.inicio) {
+    return { ok: true, configurado: false, operadorId: opId };
+  }
+  const agora = new Date();
+  const dataHoje = ctx.hoje || fmtData_(agora);
+  const dowHoje = agora.getDay();
+  const shiftHoje = cfg.escala[String(dowHoje)];
+  const minsAgora = agora.getHours() * 60 + agora.getMinutes();
+  const nHoje = byDay[dataHoje] || 0;
+  let diasComBonus = 0;
+  let locMesTotal = 0;
+  Object.keys(byDay).forEach(function (d) {
+    locMesTotal += byDay[d];
+    if (byDay[d] > cfg.meta) diasComBonus++;
+  });
+  return {
+    ok: true,
+    configurado: true,
+    operadorId: opId,
+    meta: cfg.meta,
+    bonus: cfg.bonus,
+    hoje: { n: nHoje, meta: cfg.meta, metaOk: nHoje >= cfg.meta, atingiu: nHoje > cfg.meta,
+      emTurno: metaOperadorInShift_(minsAgora, shiftHoje), folga: !shiftHoje,
+      shiftLabel: metaOperadorShiftLabel_(shiftHoje) },
+    mes: { locTotal: locMesTotal, diasComMeta: diasComBonus, diasTrabalhados: Object.keys(byDay).length,
+      bonusEstimado: diasComBonus * cfg.bonus }
   };
 }
 
@@ -6386,30 +6486,36 @@ function auditTsMeta_(val) {
   return parsed;
 }
 
-function gpLocStatsFromAuditoria_(opId, competencia) {
+function gpLocStatsFromAuditoria_(opId, competencia, ctx) {
+  if (ctx && ctx.auditLocByOpId && ctx.auditLocByOpId[opId]) {
+    return ctx.auditLocByOpId[opId];
+  }
   const found = operadorRowById_(opId);
   if (!found) return { locMes: 0, locHoje: 0 };
   const op = operadorObjFromRow_(found.data);
   const hoje = fmtData_(new Date());
   let locMes = 0;
   let locHoje = 0;
+  const rows = (ctx && ctx.auditRows) ? ctx.auditRows : null;
   try {
-    const shAud = ss_().getSheetByName('AUDITORIA');
-    if (shAud && shAud.getLastRow() >= 2) {
-      const dados = shAud.getRange(2, 1, shAud.getLastRow(), 8).getValues();
-      dados.forEach(function (r) {
-        if (String(r[1] || '').trim() !== 'encerrarLocacao') return;
-        if (!metaOperadorNomeMatch_(String(r[7] || ''), op.nome)) return;
-        const ts = auditTsMeta_(r[0]);
-        if (!ts.data) return;
-        const pts = ts.data.split('/');
-        if (pts.length < 3) return;
-        const comp = pts[1].padStart(2, '0') + '/' + pts[2];
-        if (comp !== gpNormCompetencia_(competencia)) return;
-        locMes++;
-        if (ts.data === hoje) locHoje++;
-      });
-    }
+    const dados = rows || (function () {
+      const shAud = ss_().getSheetByName('AUDITORIA');
+      if (!shAud || shAud.getLastRow() < 2) return [];
+      return shAud.getRange(2, 1, shAud.getLastRow(), 8).getValues();
+    })();
+    const compNorm = gpNormCompetencia_(competencia);
+    dados.forEach(function (r) {
+      if (String(r[1] || '').trim() !== 'encerrarLocacao') return;
+      if (!metaOperadorNomeMatch_(String(r[7] || ''), op.nome)) return;
+      const ts = auditTsMeta_(r[0]);
+      if (!ts.data) return;
+      const pts = ts.data.split('/');
+      if (pts.length < 3) return;
+      const comp = pts[1].padStart(2, '0') + '/' + pts[2];
+      if (comp !== compNorm) return;
+      locMes++;
+      if (ts.data === hoje) locHoje++;
+    });
   } catch (e) {
     Logger.log('gpLocStatsFromAuditoria_: ' + e.message);
   }
@@ -6420,8 +6526,10 @@ function gpMetasPainel_(opId, competencia, ctx) {
   const sheet = gpMetasFromCtx_(opId, competencia, ctx);
   const locMesSheet = (sheet.diasMes || []).reduce(function (s, d) { return s + (Number(d.loc) || 0); }, 0);
   const bonusDiasSheet = (sheet.diasMes || []).filter(function (d) { return d.bonusOk; }).length;
-  const auditLoc = gpLocStatsFromAuditoria_(opId, competencia);
-  const live = buildMetaOperadorPayload_(opId);
+  const auditLoc = gpLocStatsFromAuditoria_(opId, competencia, ctx);
+  const live = (ctx && ctx.metaByDayByOpId)
+    ? gpMetaPayloadFromCtx_(opId, ctx)
+    : buildMetaOperadorPayload_(opId);
   if (!live.ok || !live.configurado) {
     return {
       alvo: sheet.alvo, atual: Math.max(sheet.atual || 0, auditLoc.locHoje),
@@ -6717,35 +6825,56 @@ function gpAlertasPontoCore_() {
   return gpAlertasPontoFromCtx_(gpLoadContext_());
 }
 
-function gpSyncRhColaboradoresPadrao_() {
+function gpSyncRhColaboradoresPadrao_(ctx) {
   try {
-    gpEnsureRowByOpId_(SH_COLAB_RH, 2, [2, 'Milena Nunes', 'Socia', '', '', '', '', '', '', '2020-01-01', '', 1621, 20, 20, 100, '10h–14h', 'SIM', 100, '']);
-    gpEnsureRowByOpId_(SH_COLAB_RH, 3, [3, 'Raykelly', 'Atendente 1', '', '', '', '', '', '', '2026-06-15', '', 1621, 20, 20, 100, '14h–22h', 'SIM', 100, '']);
+    const hasRh = function (id) {
+      if (ctx && ctx.rhRows) return ctx.rhRows.some(function (r) { return Number(r[0]) === Number(id); });
+      return gpRows_(SH_COLAB_RH).some(function (r) { return Number(r[0]) === Number(id); });
+    };
+    const hasEscala = function (id, comp) {
+      const compNorm = gpNormCompetencia_(comp);
+      const rows = (ctx && ctx.escalaRows) ? ctx.escalaRows : gpRows_(SH_ESCALA_COLAB);
+      return rows.some(function (r) { return Number(r[0]) === Number(id) && gpNormCompetencia_(r[1]) === compNorm; });
+    };
     const comp = gpCompetenciaAtual_();
-    gpEnsureEscalaRow_(2, comp, ['10–14', '10–14', '10–14', '10–14', '10–14', 'OFF', 'OFF'], 'Socia — turno manha');
-    gpEnsureEscalaRow_(3, comp, ['14–22', 'OFF', '14–22', 'OFF', '14–22', '10–20', '13–21'], 'Rodizio dom');
-    gpEnsureRowByOpId_(SH_BANCO_HORAS, 2, [2, '0h00', '']);
-    gpEnsureRowByOpId_(SH_BANCO_HORAS, 3, [3, '0h00', '']);
+    if (!hasRh(2)) gpEnsureRowByOpId_(SH_COLAB_RH, 2, [2, 'Milena Nunes', 'Socia', '', '', '', '', '', '', '2020-01-01', '', 1621, 20, 20, 100, '10h–14h', 'SIM', 100, '']);
+    if (!hasRh(3)) gpEnsureRowByOpId_(SH_COLAB_RH, 3, [3, 'Raykelly', 'Atendente 1', '', '', '', '', '', '', '2026-06-15', '', 1621, 20, 20, 100, '14h–22h', 'SIM', 100, '']);
+    if (!hasEscala(2, comp)) gpEnsureEscalaRow_(2, comp, ['10–14', '10–14', '10–14', '10–14', '10–14', 'OFF', 'OFF'], 'Socia — turno manha');
+    if (!hasEscala(3, comp)) gpEnsureEscalaRow_(3, comp, ['14–22', 'OFF', '14–22', 'OFF', '14–22', '10–20', '13–21'], 'Rodizio dom');
+    if (!gpRowExistsByOpId_(SH_BANCO_HORAS, 2)) gpEnsureRowByOpId_(SH_BANCO_HORAS, 2, [2, '0h00', '']);
+    if (!gpRowExistsByOpId_(SH_BANCO_HORAS, 3)) gpEnsureRowByOpId_(SH_BANCO_HORAS, 3, [3, '0h00', '']);
   } catch (e) {
     Logger.log('gpSyncRhColaboradoresPadrao_: ' + e.message);
   }
 }
 
-function gpEnsureRowByOpId_(sheetName, opId, rowValues) {
+function gpRowExistsByOpId_(sheetName, opId) {
   const sh = gpSheet_(sheetName);
-  if (!sh) return false;
-  if (gpRows_(sheetName).some(function (r) { return Number(r[0]) === Number(opId); })) return false;
-  sh.appendRow(rowValues);
+  const last = sh.getLastRow();
+  if (last < GP_DATA_ROW) return false;
+  const ids = sh.getRange(GP_DATA_ROW, 1, last, 1).getValues();
+  for (let i = 0; i < ids.length; i++) {
+    if (Number(ids[i][0]) === Number(opId)) return true;
+  }
+  return false;
+}
+
+function gpEnsureRowByOpId_(sheetName, opId, rowValues) {
+  if (gpRowExistsByOpId_(sheetName, opId)) return false;
+  gpSheet_(sheetName).appendRow(rowValues);
   return true;
 }
 
 function gpEnsureEscalaRow_(opId, competencia, dias, obs) {
   const sh = gpSheet_(SH_ESCALA_COLAB);
-  if (!sh) return false;
   const comp = gpNormCompetencia_(competencia);
-  if (gpRows_(SH_ESCALA_COLAB).some(function (r) {
-    return Number(r[0]) === Number(opId) && gpNormCompetencia_(r[1]) === comp;
-  })) return false;
+  const last = sh.getLastRow();
+  if (last >= GP_DATA_ROW) {
+    const rows = sh.getRange(GP_DATA_ROW, 1, last, 2).getValues();
+    for (let i = 0; i < rows.length; i++) {
+      if (Number(rows[i][0]) === Number(opId) && gpNormCompetencia_(rows[i][1]) === comp) return false;
+    }
+  }
   sh.appendRow([opId, competencia].concat(dias).concat([obs || '']));
   const lr = sh.getLastRow();
   if (lr >= 2) sh.getRange(lr, 2).setNumberFormat('@');
@@ -6755,11 +6884,12 @@ function gpEnsureEscalaRow_(opId, competencia, dias, obs) {
 function painelGestaoPessoasAdmin_(p) {
   if (!adminPinOk_(p)) return err_('Acesso negado — PIN admin 1416', 403);
   try {
-    gpSyncRhColaboradoresPadrao_();
     const comp = String(p.competencia || gpCompetenciaAtual_());
     const ctx = gpLoadContext_();
+    gpSyncRhColaboradoresPadrao_(ctx);
     const opsResp = JSON.parse(listarOperadoresLogin_().getContent());
     const operadores = opsResp.operadores || [];
+    gpEnrichContextAudit_(ctx, comp, operadores);
     const sessao = opsResp.sessaoAtiva || null;
     const sessaoId = sessao && sessao.operadorId ? Number(sessao.operadorId) : 0;
     const alertasPack = gpAlertasPontoFromCtx_(ctx);
@@ -6846,7 +6976,7 @@ function painelGestaoPessoasAdmin_(p) {
       competencia: comp, colaboradores: colaboradores, escala: escala, folha: folha,
       alertas: alertasPack.alertas, alertasTotal: alertasPack.total,
       kpis: { total: colaboradores.length, presentes: presentes, comTurno: comTurno, alertas: alertasPack.total },
-      sessaoAtiva: sessao, versao: 'v1.5.106'
+      sessaoAtiva: sessao, versao: 'v1.5.107'
     });
   } catch (ex) {
     return err_('Abas Gestao Pessoas ausentes — rode instalar abas ou scripts/criar-abas-gestao-pessoas.ps1', 503);
