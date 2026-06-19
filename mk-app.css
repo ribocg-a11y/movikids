@@ -1282,7 +1282,7 @@ html,body{height:100%;background:var(--bg);color:var(--txt);overflow:hidden}
 .cto-bar-bg{height:6px;background:var(--border);border-radius:99px;overflow:hidden;margin-bottom:3px}
 .cto-bar-fill{height:6px;border-radius:99px;background:#E65100}
 .cto-note{font-size:10px;color:var(--txt3)}
-.payback-strip{background:var(--card);border:1.5px solid #7E57C2;border-radius:var(--radius);
+.payback-strip{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
   padding:12px 14px;margin-bottom:14px}
 /* FASE 6 — Cockpit executivo */
 .mk-dash-chapter{margin-bottom:22px;padding-bottom:4px;border-bottom:1px solid var(--border)}
@@ -1475,8 +1475,8 @@ html,body{height:100%;background:var(--bg);color:var(--txt);overflow:hidden}
 .payback-n{text-align:center}
 .payback-n-val{font-size:15px;font-weight:800;font-family:'Nunito',sans-serif}
 .payback-n-lbl{font-size:10px;color:var(--txt3);font-weight:600}
-.payback-bar-bg{height:8px;background:var(--border);border-radius:99px;overflow:hidden;margin-bottom:3px}
-.payback-bar-fill{height:8px;border-radius:99px;background:linear-gradient(90deg,#7E57C2,#5E35B1)}
+.payback-bar-bg{height:6px;background:rgba(21,101,192,.08);border-radius:99px;overflow:hidden;margin-bottom:3px}
+.payback-bar-fill{height:6px;border-radius:99px;background:linear-gradient(90deg,#29B6F6,#1565C0)}
 .payback-note{font-size:10px;color:var(--txt3);line-height:1.4}
 
 .mk-opcfg-section{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:12px}

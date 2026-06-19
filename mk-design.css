@@ -1470,8 +1470,8 @@
 .mk-admin-page .mk-exec-cockpit,
 .mk-admin-page .mk-decisao-panel,
 .mk-admin-page .mk-contratacao-panel,
-.mk-admin-page .mk-leading-row,
 .mk-admin-page .new-kpi-row .new-kpi,
+.mk-admin-page .mk-leading-kpi,
 .mk-admin-page .cto-strip,
 .mk-admin-page .payback-strip,
 .mk-admin-page .new-chart-card,
@@ -1485,11 +1485,16 @@
   box-shadow: 0 6px 24px rgba(21, 101, 192, 0.06);
 }
 
-/* Payback 9.5 — pill Fredoka */
-.mk-admin-page .payback-strip {
-  border-color: rgba(94, 53, 177, 0.25);
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.85) 0%, rgba(237, 231, 246, 0.9) 100%);
+/* Leading — glass por card; grid sem fundo (evita faixa atrás dos KPIs) */
+.mk-admin-page .mk-leading-row {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
+
+/* Payback 9.5 — pill Fredoka + trilho DNA azul */
 .mk-admin-page .payback-strip-title {
   font-family: 'Fredoka One', cursive;
   font-size: 15px;
@@ -1500,9 +1505,20 @@
   font-family: 'Fredoka One', cursive;
   font-size: 11px;
   padding: 4px 12px;
+  background: rgba(21, 101, 192, 0.12);
+  color: var(--mk-admin-blue-dk);
+}
+.mk-admin-page .payback-pill.is-done {
+  background: rgba(46, 125, 50, 0.12);
+  color: #2E7D32;
+}
+.mk-admin-page .payback-bar-bg {
+  height: 6px;
+  background: rgba(21, 101, 192, 0.1);
+  border-radius: 99px;
 }
 .mk-admin-page .payback-bar-fill {
-  background: linear-gradient(90deg, var(--mk-admin-blue), #5E35B1, var(--mk-admin-pink));
+  background: linear-gradient(90deg, var(--mk-admin-blue), var(--mk-admin-blue-dk));
 }
 
 .mk-admin-page .mk-exec-kpi-val {
