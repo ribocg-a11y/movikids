@@ -570,8 +570,39 @@
       document.getElementById('ponto-flash').hidden = true;
     }
 
+    function gpJornSitBadge(sit) {
+      const s = String(sit || '—');
+      let cls = 'gray';
+      if (s === 'OK') cls = 'ok';
+      else if (s === 'Extra') cls = 'extra';
+      else if (s === 'Atraso' || s === 'Falta' || s === 'Ponto em folga') cls = 'warn';
+      else if (s === 'Aberto') cls = 'open';
+      else if (s === 'Folga') cls = 'off';
+      return `<span class="gp-jorn-sit gp-jorn-sit--${cls}">${s}</span>`;
+    }
+
     function renderFolha(p) {
       const hoje = fmtDataHoje();
+      const j = p.jornada;
+      if (j && j.dias && j.dias.length) {
+        const t = j.totais || {};
+        const saldoCls = (t.saldoMesMin != null && t.saldoMesMin < 0) ? 'atraso' : 'extra';
+        const resumo = `<div class="gp-jorn-resumo gp-jorn-resumo--compact">
+          <div class="gp-jorn-kpi"><span>Previsto</span><strong>${t.previsto || '—'}</strong></div>
+          <div class="gp-jorn-kpi"><span>Trabalhado</span><strong>${t.trabalhado || '—'}</strong></div>
+          <div class="gp-jorn-kpi gp-jorn-kpi--extra"><span>Extras</span><strong>${t.extras || '—'}</strong></div>
+          <div class="gp-jorn-kpi gp-jorn-kpi--atraso"><span>Atraso</span><strong>${t.atraso || '—'}</strong></div>
+          <div class="gp-jorn-kpi gp-jorn-kpi--${saldoCls}"><span>Saldo mês</span><strong>${t.saldoMes || '—'}</strong></div>
+          <div class="gp-jorn-kpi gp-jorn-kpi--banco"><span>Banco</span><strong>${j.bancoProjetado || p.bancoHoras || '0h00'}</strong></div>
+        </div>`;
+        const rows = j.dias.map(r => {
+          const cls = r.folga ? ' class="off"' : (r.data === hoje ? ' class="hoje"' : '');
+          return `<tr${cls}><td>${r.data}</td><td>${r.dia || ''}</td><td>${r.escala || '—'}</td><td>${r.entrada || '—'}</td><td>${r.saida || '—'}</td><td>${r.previsto || '—'}</td><td>${r.trabalhado || '—'}</td><td class="gp-jorn-extra">${r.extras || '—'}</td><td class="gp-jorn-atraso">${r.atraso || '—'}</td><td>${gpJornSitBadge(r.sit)}</td></tr>`;
+        }).join('');
+        return resumo + `<div class="mock-card" style="overflow-x:auto;margin-top:12px"><table class="mock-table gp-jorn-table">
+          <thead><tr><th>Data</th><th>Dia</th><th>Escala</th><th>Entrada</th><th>Saída</th><th>Previsto</th><th>Trabalhado</th><th>Extras</th><th>Atraso</th><th>Sit.</th></tr></thead>
+          <tbody>${rows}</tbody></table></div>`;
+      }
       const rows = p.folha.map(r => {
         const cls = r.data===hoje?' class="hoje"':'';
         return `<tr${cls}><td>${r.data}</td><td>${r.dia}</td><td>${r.entrada}</td><td>${r.saida}</td><td>${r.horas}</td><td>${r.sit}</td></tr>`;
@@ -666,8 +697,17 @@
 
     function renderBanco() {
       const p = PESSOAS[colabLogado];
-      const cor = p.bancoHoras.startsWith('-')?'var(--red)':'var(--green)';
-      document.getElementById('banco-body').innerHTML = `<div class="mock-card"><div class="mock-kpi" style="color:${cor}">${p.bancoHoras}</div><div class="mock-kpi-lbl">Saldo acumulado · só ${p.label}</div></div>`;
+      const j = p.jornada;
+      const cad = (j && j.bancoSaldo) ? j.bancoSaldo : (p.bancoHoras || '0h00');
+      const proj = (j && j.bancoProjetado) ? j.bancoProjetado : cad;
+      const t = j && j.totais ? j.totais : {};
+      const corCad = cad.startsWith('-') ? 'var(--red)' : 'var(--green)';
+      const corProj = proj.startsWith('-') ? 'var(--red)' : 'var(--green)';
+      document.getElementById('banco-body').innerHTML = `
+        <div class="mock-card"><div class="mock-kpi" style="color:${corCad}">${cad}</div><div class="mock-kpi-lbl">Saldo cadastrado · ${p.label}</div></div>
+        <div class="mock-card" style="margin-top:12px"><div class="mock-kpi" style="color:${corProj}">${proj}</div><div class="mock-kpi-lbl">Saldo projetado (cadastro + saldo do mês)</div></div>
+        ${t.saldoMes ? `<div class="mock-note info" style="margin-top:12px">Este mês: extras <strong>${t.extras || '—'}</strong> · atrasos <strong>${t.atraso || '—'}</strong> · saldo <strong>${t.saldoMes || '—'}</strong></div>` : ''}
+        <div class="mock-note info" style="margin-top:12px">Horas extras entram no banco; atrasos e faltas são descontados. Detalhe dia a dia em <strong>Ponto</strong>.</div>`;
     }
 
     function renderPagamento() {

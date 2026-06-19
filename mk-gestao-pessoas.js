@@ -35,6 +35,7 @@
       },
       statusHoje: (data.ponto && data.ponto.statusHoje) || 'fora',
       folha: (data.ponto && data.ponto.folha) || [],
+      jornada: (data.ponto && data.ponto.jornada) || null,
       meta: m.alvo ? {
         alvo: m.alvo, atual: m.atual, bonusValor: m.bonusValor || 100, bonusMin: m.bonusMin || 21,
         admissao: c.admissao, diasMes: (m.diasMes || []).map(function (d) {

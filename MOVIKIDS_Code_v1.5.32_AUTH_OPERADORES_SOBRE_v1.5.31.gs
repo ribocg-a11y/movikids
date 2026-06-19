@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.108
+// MOVI KIDS — Google Apps Script v1.5.109
+// v1.5.109: jornada ponto × escala — extras/atraso dia a dia + banco de horas
 // v1.5.108: holerite quinzenal — 40% dia 15 · 60%+benefícios dia 30/31 · proporcional admissão · VA R$400
 // v1.5.107: painelGestaoPessoasAdmin — AUDITORIA lida 1x + índice loc/metas (fim timeout ~13s)
 // v1.5.106: loc Milena/RH — gpLocStatsFromAuditoria_ (sem filtro turno) + auditTsMeta_ preserva hora Date
@@ -6368,6 +6369,7 @@ function gpLoadContext_() {
     folhaRows: gpRows_(SH_FOLHA_PONTO),
     metasRows: gpRows_(SH_METAS_COLAB),
     escalaRows: gpRows_(SH_ESCALA_COLAB),
+    bancoRows: gpRows_(SH_BANCO_HORAS),
     auditRows: auditRows,
     auditLocByOpId: null,
     metaByDayByOpId: null
@@ -6612,6 +6614,173 @@ function gpPassouToleranciaPonto_(agora, inicioH, inicioM, tolMin) {
   const limite = new Date(agora.getTime());
   limite.setHours(inicioH, inicioM + tolMin, 0, 0);
   return agora.getTime() >= limite.getTime();
+}
+
+const GP_TOL_JORNADA_MIN_ = 5;
+
+function gpParseHoraMin_(s) {
+  if (!s || s === '—' || s === '-') return null;
+  const m = String(s).trim().match(/^(\d{1,2})(?::(\d{2}))?$/);
+  if (!m) return null;
+  return parseInt(m[1], 10) * 60 + parseInt(m[2] || '0', 10);
+}
+
+function gpFmtMinutosHhMm_(min, semSinal) {
+  if (min == null || isNaN(min)) return '—';
+  const abs = Math.abs(Math.round(min));
+  const h = Math.floor(abs / 60);
+  const mm = String(abs % 60).padStart(2, '0');
+  const base = h + 'h' + mm;
+  if (semSinal) return base;
+  if (min === 0) return '0h00';
+  return (min > 0 ? '+' : '-') + base;
+}
+
+function gpParseMinutosHhMm_(s) {
+  if (!s || s === '—') return 0;
+  const m = String(s).match(/([+\-]?)(\d+)h(\d{2})/i);
+  if (!m) return 0;
+  const sign = m[1] === '-' ? -1 : 1;
+  return sign * (parseInt(m[2], 10) * 60 + parseInt(m[3], 10));
+}
+
+function gpDiaSemLabel_(d) {
+  return ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'][(d || new Date()).getDay()];
+}
+
+function gpParseEscalaIntervalo_(cel, turnoFallback) {
+  if (gpEscalaEhFolga_(cel)) return null;
+  let s = String(cel || '').trim();
+  if (!s && turnoFallback) s = String(turnoFallback).trim();
+  if (!s) return null;
+  const m = s.match(/(\d{1,2})\s*(?:h|:)?\s*[–\-—a]\s*(\d{1,2})/i);
+  if (m) {
+    const iniMin = parseInt(m[1], 10) * 60;
+    let fimMin = parseInt(m[2], 10) * 60;
+    let previstoMin = fimMin - iniMin;
+    if (previstoMin <= 0) previstoMin += 24 * 60;
+    return { iniMin: iniMin, fimMin: fimMin, previstoMin: previstoMin, label: m[1] + '-' + m[2] };
+  }
+  const ini = gpParseHoraInicioEscala_(s);
+  if (!ini) return null;
+  return { iniMin: ini.h * 60 + ini.m, fimMin: null, previstoMin: 8 * 60, label: s };
+}
+
+function gpEscalaCelulaPorData_(opId, ctx, competencia, dateStr) {
+  const d = parseDataStr_(dateStr);
+  if (!d) return null;
+  const comp = gpNormCompetencia_(competencia);
+  const idx = gpDiaSemEscalaIdx_(d);
+  const row = ctx.escalaRows.find(function (r) {
+    return Number(r[0]) === Number(opId) && gpNormCompetencia_(r[1]) === comp;
+  });
+  if (!row) return null;
+  return String(row[2 + idx] || '').trim();
+}
+
+function gpBancoHorasFromCtx_(opId, ctx) {
+  const rows = ctx.bancoRows || gpRows_(SH_BANCO_HORAS);
+  const row = rows.find(function (r) { return Number(r[0]) === Number(opId); });
+  return row ? String(row[1] || '0h00') : '0h00';
+}
+
+function gpAnaliseJornadaColab_(opId, competencia, ctx, rh) {
+  const comp = parseMesAnoPayback_(competencia || gpCompetenciaAtual_());
+  const mes = comp.mes;
+  const ano = comp.ano;
+  const diasMes = gpDiasNoMes_(mes, ano);
+  const hojeStr = ctx.hoje || fmtData_(new Date());
+  const hojeD = parseDataStr_(hojeStr) || new Date();
+  const admD = rh && rh.admissao ? parseDataStr_(rh.admissao) : null;
+  const turnoFb = rh ? rh.turno : '';
+  const pontoMap = {};
+  gpFolhaPontoFromCtx_(opId, competencia, ctx).forEach(function (r) { pontoMap[r.data] = r; });
+
+  const dias = [];
+  let totPrev = 0, totTrab = 0, totExtra = 0, totAtraso = 0;
+
+  for (let dia = 1; dia <= diasMes; dia++) {
+    const dateStr = String(dia).padStart(2, '0') + '/' + String(mes).padStart(2, '0') + '/' + ano;
+    const d = parseDataStr_(dateStr);
+    if (!d) continue;
+    if (admD && d < admD) continue;
+    if (d > hojeD) continue;
+
+    const escalaCel = gpEscalaCelulaPorData_(opId, ctx, competencia, dateStr);
+    const folga = escalaCel !== null && gpEscalaEhFolga_(escalaCel);
+    const intervalo = folga ? null : gpParseEscalaIntervalo_(escalaCel, turnoFb);
+    const ponto = pontoMap[dateStr];
+    const prevMin = intervalo ? intervalo.previstoMin : null;
+
+    if (folga && !ponto) {
+      dias.push({ data: dateStr, dia: gpDiaSemLabel_(d), escala: escalaCel || 'OFF', folga: true, sit: 'Folga' });
+      continue;
+    }
+
+    const entrada = ponto ? ponto.entrada : null;
+    const saida = ponto ? ponto.saida : null;
+    const entMin = gpParseHoraMin_(entrada);
+    const saiMin = gpParseHoraMin_(saida);
+    let trabMin = null;
+    if (entMin != null && saiMin != null) {
+      trabMin = saiMin - entMin;
+      if (trabMin < 0) trabMin += 24 * 60;
+    }
+
+    let extraMin = 0, atrasoMin = 0, sit = '—';
+
+    if (folga && ponto) {
+      sit = 'Ponto em folga';
+    } else if (!ponto && prevMin != null) {
+      atrasoMin = prevMin;
+      sit = 'Falta';
+      totAtraso += atrasoMin;
+      totPrev += prevMin;
+    } else if (ponto && !saida) {
+      sit = 'Aberto';
+      if (prevMin != null) totPrev += prevMin;
+    } else if (trabMin != null && prevMin != null) {
+      const delta = trabMin - prevMin;
+      if (delta > GP_TOL_JORNADA_MIN_) { extraMin = delta; sit = 'Extra'; totExtra += extraMin; }
+      else if (delta < -GP_TOL_JORNADA_MIN_) { atrasoMin = -delta; sit = 'Atraso'; totAtraso += atrasoMin; }
+      else { sit = 'OK'; }
+      totPrev += prevMin;
+      totTrab += trabMin;
+    } else if (trabMin != null) {
+      totTrab += trabMin;
+      sit = (ponto && ponto.sit) ? ponto.sit : 'OK';
+    } else if (ponto && entrada && !saida) {
+      sit = 'Aberto';
+    }
+
+    dias.push({
+      data: dateStr, dia: gpDiaSemLabel_(d), escala: intervalo ? intervalo.label : (escalaCel || '—'),
+      entrada: entrada || '—', saida: saida || '—',
+      previsto: prevMin != null ? gpFmtMinutosHhMm_(prevMin, true) : '—',
+      trabalhado: trabMin != null ? gpFmtMinutosHhMm_(trabMin, true) : '—',
+      extras: extraMin > 0 ? gpFmtMinutosHhMm_(extraMin) : '—',
+      atraso: atrasoMin > 0 ? gpFmtMinutosHhMm_(atrasoMin) : '—',
+      sit: sit, folga: false
+    });
+  }
+
+  const saldoMesMin = totExtra - totAtraso;
+  const bancoCadastro = gpBancoHorasFromCtx_(opId, ctx);
+  const bancoCadastroMin = gpParseMinutosHhMm_(bancoCadastro);
+  return {
+    dias: dias.reverse(),
+    totais: {
+      previsto: gpFmtMinutosHhMm_(totPrev, true),
+      trabalhado: gpFmtMinutosHhMm_(totTrab, true),
+      extras: gpFmtMinutosHhMm_(totExtra),
+      atraso: gpFmtMinutosHhMm_(totAtraso),
+      saldoMes: gpFmtMinutosHhMm_(saldoMesMin),
+      saldoMesMin: saldoMesMin
+    },
+    bancoSaldo: bancoCadastro,
+    bancoSaldoMin: bancoCadastroMin,
+    bancoProjetado: gpFmtMinutosHhMm_(bancoCadastroMin + saldoMesMin)
+  };
 }
 
 function gpAlertasPontoFromCtx_(ctx) {
@@ -6878,6 +7047,8 @@ function buscarPainelColaborador_(p) {
     const folhaLen = gpFolhaPontoColab_(opId, comp).length;
     const hol = gpCalcHollerite_(colab, bonus, 0, comp);
     const pontoHoje = gpStatusPontoHoje_(opId);
+    const ctxJ = gpLoadContext_();
+    const jornada = gpAnaliseJornadaColab_(opId, comp, ctxJ, colab);
     return resp_({
       colaborador: {
         id: opId, label: colab.nome || auth.operador.nome, funcao: colab.funcao, turno: colab.turno,
@@ -6885,8 +7056,8 @@ function buscarPainelColaborador_(p) {
         cadastro: { nomeCompleto: colab.nome, cpf: colab.cpf, nascimento: colab.nascimento, telefone: colab.telefone, email: colab.email, endereco: colab.endereco, emergencia: colab.emergencia, admissao: colab.admissao, pix: colab.pix }
       },
       competencia: comp,
-      ponto: { statusHoje: pontoHoje.status, folha: gpFolhaPontoColab_(opId, comp), hoje: pontoHoje },
-      metas: metas, escala: gpEscalaColab_(opId, comp), bancoHoras: gpBancoHoras_(opId),
+      ponto: { statusHoje: pontoHoje.status, folha: gpFolhaPontoColab_(opId, comp), hoje: pontoHoje, jornada: jornada },
+      metas: metas, escala: gpEscalaColab_(opId, comp), bancoHoras: jornada.bancoProjetado || gpBancoHoras_(opId),
       pagamento: {
         base: hol.base, bonus: hol.bonus, faltas: 0, dependentes: 0, competencia: comp,
         pagamentoEm: hol.pagamentoEm, quinzena: hol.quinzena, quinzenaLabel: hol.quinzenaLabel,
@@ -6895,7 +7066,7 @@ function buscarPainelColaborador_(p) {
         beneficios: { vaDiario: hol.vaDiario, vaDias: hol.vaDias, vaMensal: hol.vaMensal, vtPasses: hol.vtPasses, vaCoparticipacao: 0 },
         holerite: hol
       },
-      versao: 'v1.5.108'
+      versao: 'v1.5.109'
     });
   } catch (ex) {
     return err_('Abas Gestao Pessoas ausentes — rode scripts/criar-abas-gestao-pessoas.ps1', 503);
@@ -6928,8 +7099,18 @@ function registrarPontoColaborador_(p) {
       return resp_({ mensagem: 'Entrada registrada ' + agora, status: 'dentro' });
     }
     if (!rowHoje) return err_('Nenhuma entrada hoje — registre entrada primeiro', 400);
+    const entVal = sh.getRange(rowHoje, 5).getValue();
+    const entStr = cellToStr_(entVal);
     sh.getRange(rowHoje, 6).setValue(agora);
-    sh.getRange(rowHoje, 7).setValue('—');
+    const entMin = gpParseHoraMin_(entStr);
+    const saiMin = gpParseHoraMin_(agora);
+    let horasStr = '—';
+    if (entMin != null && saiMin != null) {
+      let trabMin = saiMin - entMin;
+      if (trabMin < 0) trabMin += 24 * 60;
+      horasStr = gpFmtMinutosHhMm_(trabMin, true);
+    }
+    sh.getRange(rowHoje, 7).setValue(horasStr);
     sh.getRange(rowHoje, 9).setValue(fmtData_(new Date()) + ' ' + agora);
     return resp_({ mensagem: 'Saida registrada ' + agora, status: 'fora' });
   } catch (ex) {
@@ -7038,7 +7219,8 @@ function painelGestaoPessoasAdmin_(p) {
         escalaHoje: escalaHoje, escalaFolga: escalaHoje !== null && gpEscalaEhFolga_(escalaHoje),
         ponto: ponto, logadoBalcao: sessaoId === id,
         metas: { alvo: metas.alvo, atual: metas.atual, locMes: locMes, bonusDias: bonusDias, bonusTotal: metas.bonusTotal || 0 },
-        folhaPonto: folhaPonto
+        folhaPonto: folhaPonto,
+        jornada: gpAnaliseJornadaColab_(id, comp, ctx, rh)
       });
     });
 
@@ -7059,7 +7241,8 @@ function painelGestaoPessoasAdmin_(p) {
         escalaHoje: escalaHoje, escalaFolga: escalaHoje !== null && gpEscalaEhFolga_(escalaHoje),
         ponto: ponto, logadoBalcao: false,
         metas: { alvo: metas.alvo, atual: metas.atual, locMes: locMes, bonusDias: bonusDias, bonusTotal: metas.bonusTotal || 0 },
-        folhaPonto: gpFolhaPontoFromCtx_(id, comp, ctx)
+        folhaPonto: gpFolhaPontoFromCtx_(id, comp, ctx),
+        jornada: gpAnaliseJornadaColab_(id, comp, ctx, rh)
       });
     });
 
@@ -7102,7 +7285,7 @@ function painelGestaoPessoasAdmin_(p) {
       competencia: comp, colaboradores: colaboradores, escala: escala, folha: folha,
       alertas: alertasPack.alertas, alertasTotal: alertasPack.total,
       kpis: { total: colaboradores.length, presentes: presentes, comTurno: comTurno, alertas: alertasPack.total },
-      sessaoAtiva: sessao, versao: 'v1.5.108'
+      sessaoAtiva: sessao, versao: 'v1.5.109'
     });
   } catch (ex) {
     return err_('Abas Gestao Pessoas ausentes — rode instalar abas ou scripts/criar-abas-gestao-pessoas.ps1', 503);

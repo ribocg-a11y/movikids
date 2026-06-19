@@ -150,6 +150,17 @@
     gpAdmRenderPresencaTable_();
   }
 
+  function gpAdmJornSitBadge_(sit) {
+    const s = String(sit || '—');
+    let cls = 'gray';
+    if (s === 'OK') cls = 'ok';
+    else if (s === 'Extra') cls = 'extra';
+    else if (s === 'Atraso' || s === 'Falta' || s === 'Ponto em folga') cls = 'warn';
+    else if (s === 'Aberto') cls = 'open';
+    else if (s === 'Folga') cls = 'off';
+    return '<span class="gp-jorn-sit gp-jorn-sit--' + cls + '">' + esc(s) + '</span>';
+  }
+
   function gpAdmRenderPresencaTable_() {
     const el = document.getElementById('gp-adm-presenca-table');
     if (!el || !gpAdmData_) return;
@@ -158,17 +169,41 @@
       el.innerHTML = '<p class="gp-adm-muted">Selecione um colaborador.</p>';
       return;
     }
-    const rows = c.folhaPonto || [];
-    if (!rows.length) {
-      el.innerHTML = '<p class="gp-adm-muted">Sem registros de ponto nesta competência. Use a aba <strong>Escala</strong> para ver a grade da semana.</p>';
+    const j = c.jornada;
+    if (!j || !j.dias || !j.dias.length) {
+      el.innerHTML = '<p class="gp-adm-muted">Sem dias na competência (confira escala RH e admissão). Se o front já atualizou, publique o GAS <strong>v1.5.109</strong> (Nova versão Web).</p>';
       return;
     }
-    el.innerHTML = '<table class="gp-adm-table"><tr><th>Data</th><th>Entrada</th><th>Saída</th><th>Horas</th><th>Loc turno</th><th>Meta</th></tr>' +
-      rows.slice().reverse().map(function (r) {
-        const metaOk = c.metas && c.metas.alvo && Number(c.metas.atual) >= c.metas.alvo + 1;
-        return '<tr><td>' + esc(r.data) + '</td><td>' + esc(r.entrada || '—') + '</td><td>' + esc(r.saida || '—') + '</td><td>' + esc(r.horas || '—') + '</td>' +
-          '<td>' + (c.metas ? c.metas.atual : '—') + '</td><td>' + (metaOk ? '<span style="color:var(--green)">+R$100</span>' : '—') + '</td></tr>';
-      }).join('') + '</table>';
+    const t = j.totais || {};
+    const saldoCls = (t.saldoMesMin != null && t.saldoMesMin < 0) ? 'atraso' : 'extra';
+    const resumo = '<div class="gp-jorn-resumo">' +
+      '<div class="gp-jorn-kpi"><span>Previsto</span><strong>' + esc(t.previsto || '—') + '</strong></div>' +
+      '<div class="gp-jorn-kpi"><span>Trabalhado</span><strong>' + esc(t.trabalhado || '—') + '</strong></div>' +
+      '<div class="gp-jorn-kpi gp-jorn-kpi--extra"><span>Extras</span><strong>' + esc(t.extras || '—') + '</strong></div>' +
+      '<div class="gp-jorn-kpi gp-jorn-kpi--atraso"><span>Atraso / falta</span><strong>' + esc(t.atraso || '—') + '</strong></div>' +
+      '<div class="gp-jorn-kpi gp-jorn-kpi--' + saldoCls + '"><span>Saldo mês</span><strong>' + esc(t.saldoMes || '—') + '</strong></div>' +
+      '<div class="gp-jorn-kpi"><span>Banco cadastro</span><strong>' + esc(j.bancoSaldo || '0h00') + '</strong></div>' +
+      '<div class="gp-jorn-kpi gp-jorn-kpi--banco"><span>Banco projetado</span><strong>' + esc(j.bancoProjetado || '0h00') + '</strong></div>' +
+      '</div>' +
+      '<p class="gp-adm-muted" style="margin:8px 0 12px">Escala × batidas · extras creditam e atrasos/faltas debitam o banco de horas.</p>';
+    const rows = j.dias.map(function (r) {
+      const trCls = r.folga ? ' class="gp-jorn-row-folga"' : '';
+      return '<tr' + trCls + '>' +
+        '<td style="text-align:left">' + esc(r.data) + '</td>' +
+        '<td>' + esc(r.dia || '') + '</td>' +
+        '<td>' + esc(r.escala || '—') + '</td>' +
+        '<td>' + esc(r.entrada || '—') + '</td>' +
+        '<td>' + esc(r.saida || '—') + '</td>' +
+        '<td>' + esc(r.previsto || '—') + '</td>' +
+        '<td>' + esc(r.trabalhado || '—') + '</td>' +
+        '<td class="gp-jorn-extra">' + esc(r.extras || '—') + '</td>' +
+        '<td class="gp-jorn-atraso">' + esc(r.atraso || '—') + '</td>' +
+        '<td>' + gpAdmJornSitBadge_(r.sit) + '</td></tr>';
+    }).join('');
+    el.innerHTML = resumo +
+      '<div class="gp-adm-table-wrap"><table class="gp-adm-table gp-jorn-table">' +
+      '<thead><tr><th style="text-align:left">Data</th><th>Dia</th><th>Escala</th><th>Entrada</th><th>Saída</th><th>Previsto</th><th>Trabalhado</th><th>Extras</th><th>Atraso</th><th>Sit.</th></tr></thead>' +
+      '<tbody>' + rows + '</tbody></table></div>';
   }
 
   function gpAdmRenderKpis_() {
