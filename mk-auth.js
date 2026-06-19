@@ -510,10 +510,20 @@
     const supervisor = mkAuthIsSupervisor();
     const sbGer = document.getElementById('sb-gerenciar-btn');
     if (sbGer) sbGer.style.display = (admin || supervisor) ? 'none' : '';
+    const s = getSession();
+    const sbColab = document.getElementById('sbn-colab');
+    if (sbColab) sbColab.hidden = !(s && s.nome);
     if (admin && typeof showAdminSidebar === 'function') showAdminSidebar();
     else if (supervisor && typeof showSupervisorSidebar === 'function') showSupervisorSidebar();
     else if (typeof hideAdminSidebar === 'function') hideAdminSidebar();
   }
+
+  /** Colaboradores — sempre exige PIN próprio (não reutiliza sessão do balcão). */
+  window.mkAbrirColaboradores_ = function mkAbrirColaboradores_() {
+    try { sessionStorage.removeItem('mk-mock-colab-uid'); } catch (e) { /* ignore */ }
+    const v = window.MK_VERSION || '1.8.59';
+    location.href = 'gestao-pessoas.html?force=' + encodeURIComponent(v) + '&from=index&_=' + Date.now();
+  };
 
   /** Sai do modo administrador: perfil ADM volta ao login; operador+PIN admin so fecha o painel ADM. */
   window.mkAuthExitAdmin_ = function mkAuthExitAdmin_() {
@@ -901,8 +911,7 @@
       loadOperadores().catch(() => renderOpList(false));
     });
     document.getElementById('mk-hub-colab')?.addEventListener('click', () => {
-      const v = window.MK_VERSION || '1.8.50';
-      location.href = 'gestao-pessoas.html?v=' + encodeURIComponent(v) + '&_=' + Date.now();
+      if (typeof mkAbrirColaboradores_ === 'function') mkAbrirColaboradores_();
     });
     document.getElementById('mk-hub-admin')?.addEventListener('click', () => {
       hideApp();
