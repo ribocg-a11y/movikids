@@ -8,10 +8,11 @@
 <meta name="apple-mobile-web-app-title" content="Movi Kids">
 <meta name="robots" content="noindex,nofollow">
 <title>Movi Kids — Acompanhar</title>
+<script src="mk-canonical-host.js?v=1.8.75"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="mk-design.css?v=1.8.50">
+<link rel="stylesheet" href="mk-design.css?v=1.8.75">
 </head>
 <body class="mk-portal-page" data-view="gate">
 
@@ -20,9 +21,6 @@
 
 <!-- Entrada: só telefone -->
 <section class="mk-portal-gate" id="sec-gate">
-  <div class="mk-portal-brand-wrap">
-    <img class="mk-brand-img mk-brand-img--portal" src="assets/logo-movi-kids.png" alt="Movi Kids" width="1080" height="1080" loading="lazy" decoding="async">
-  </div>
   <p class="mk-portal-gate-title">Quanto tempo falta? ⏱️</p>
   <div class="mk-portal-gate-form">
     <input id="telefone" class="mk-portal-input" type="tel" inputmode="tel" autocomplete="tel"
@@ -303,7 +301,6 @@ function render() {
   </section>` : '';
 
   box.innerHTML = `<div class="mk-portal-carousel">
-    <div class="mk-portal-brand-wrap mk-portal-brand-wrap--play"><img class="mk-brand-img mk-brand-img--portal-sm" src="assets/logo-movi-kids.png" alt="Movi Kids" width="1080" height="1080" loading="lazy" decoding="async"></div>
     <p class="mk-portal-subtitle">📱 ${esc(telFmt)} · ${brincandoLabel_(n)} · <button type="button" class="mk-portal-tel-link" id="btn-trocar-tel">Trocar telefone</button></p>
     ${tabs ? `<div class="mk-portal-tabs" role="tablist">${tabs}</div>` : ''}
     ${n > 1 ? `<p class="mk-portal-counter">Criança ${_carouselIdx + 1} de ${n}</p>` : ''}
