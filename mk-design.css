@@ -1674,7 +1674,7 @@
 /* Caixa 9.6 */
 .mk-caixa-hero .mk-stat-hero-val {
   font-size: clamp(28px, 6vw, 36px);
-  color: var(--mk-admin-blue-dk);
+  color: #fff;
 }
 .mk-admin-page .cx-card {
   background: var(--mk-admin-glass);
