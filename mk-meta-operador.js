@@ -44,7 +44,7 @@ const MK_META_CFG = {
 };
 
 const MK_META_PHRASES_CHASE = [
-  '{nome}, reta final! Cada família conta — você consegue! 💪',
+  '{nome}, reta final! Cada criança conta — você consegue! 💪',
   'Quase lá! Mais {faltam} aventuras e a meta é sua ✨',
   'Você manda! Faltam só {faltam} — foco na reta final 🎯',
   'Cada sorriso na loja te aproxima da meta. Bora! 🚗💛',
