@@ -4,7 +4,7 @@
 
   var EMPRESA = {
     razao: 'MOVI KIDS Brincadeiras LTDA',
-    cnpj: '00.000.000/0001-00',
+    cnpj: '66.664.255/0001-67',
     endereco: 'Golden Shopping Calhau · São Luís/MA'
   };
 
