@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.112
+// MOVI KIDS — Google Apps Script v1.5.113
+// v1.5.113: historicoMeses — inclui meses vazios desde abr + proj. mês fechado no span real de operação
 // v1.5.112: kpiMes.historicoMeses — faturamento real vs projetado mês a mês (Dashboard)
 // v1.5.111: frota — Carro 04 em VEICULOS_VALIDOS (4 carros elétricos)
 // v1.5.110: jornada — filtro ponto por mês/ano (cellToStr_) + atraso sem sinal + ponto aberto hoje
@@ -2005,44 +2006,70 @@ function buildLeadingFinanceiros_(ctx) {
   };
 }
 
+/** Projeção de fechamento para histórico mensal (mês corrente → fim do mês; fechado → span calendário operado). */
+function calcFatProjetadoHistorico_(fat, diasOp, diasMes, diasMap, mes, ano, hoje) {
+  if (diasOp <= 0 || fat <= 0) return 0;
+  const hojeMes = hoje.getMonth() + 1;
+  const hojeAno = hoje.getFullYear();
+  const parcial = mes === hojeMes && ano === hojeAno;
+  if (parcial) {
+    return Math.round(fat / diasOp * diasMes * 100) / 100;
+  }
+  const diasKeys = Object.keys(diasMap || {}).map(function(d) { return parseInt(d, 10); }).filter(function(n) { return n > 0; })
+    .sort(function(a, b) { return a - b; });
+  if (!diasKeys.length) return Math.round(fat * 100) / 100;
+  const span = diasKeys[diasKeys.length - 1] - diasKeys[0] + 1;
+  return Math.round(fat / diasOp * span * 100) / 100;
+}
+
+/** Primeiro mês do histórico: abril do ano da 1ª receita (contrato) ou mês da 1ª receita. */
+function historicoMesInicio_(fatByPayback, anoRefInt) {
+  const keys = Object.keys(fatByPayback || {}).filter(function(k) {
+    return (Number(fatByPayback[k]) || 0) > 0;
+  }).sort(function(a, b) {
+    const pa = a.split('/'), pb = b.split('/');
+    return (parseInt(pa[1], 10) * 100 + parseInt(pa[0], 10)) - (parseInt(pb[1], 10) * 100 + parseInt(pb[0], 10));
+  });
+  if (!keys.length) return { mes: 4, ano: anoRefInt };
+  const p = keys[0].split('/');
+  const firstMes = parseInt(p[0], 10);
+  const firstAno = parseInt(p[1], 10);
+  if (firstMes > 4) return { mes: 4, ano: firstAno };
+  return { mes: firstMes, ano: firstAno };
+}
+
 /** Dashboard — histórico mês a mês: realizado vs projeção de fechamento (ritmo dias com movimento). */
 function buildHistoricoFatProjecao_(mesRef, anoRef, fatByPayback, diasOpByMonth, hoje) {
   const MESES = ['', 'Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
   const mesRefInt = parseInt(mesRef, 10);
   const anoRefInt = parseInt(anoRef, 10);
   const cutoff = anoRefInt * 100 + mesRefInt;
-  const hojeMes = hoje.getMonth() + 1;
-  const hojeAno = hoje.getFullYear();
-  const keys = Object.keys(fatByPayback || {}).filter(function(k) {
-    const p = k.split('/');
-    if (p.length !== 2) return false;
-    const mk = parseInt(p[1], 10) * 100 + parseInt(p[0], 10);
-    return mk <= cutoff && (Number(fatByPayback[k]) || 0) > 0;
-  }).sort(function(a, b) {
-    const pa = a.split('/'), pb = b.split('/');
-    return (parseInt(pa[1], 10) * 100 + parseInt(pa[0], 10)) - (parseInt(pb[1], 10) * 100 + parseInt(pb[0], 10));
-  });
-  return keys.map(function(k) {
-    const p = k.split('/');
-    const mes = parseInt(p[0], 10);
-    const ano = parseInt(p[1], 10);
-    const diasMes = new Date(ano, mes, 0).getDate();
-    const fat = Math.round((Number(fatByPayback[k]) || 0) * 100) / 100;
-    const diasMap = diasOpByMonth[k] || {};
+  const inicio = historicoMesInicio_(fatByPayback, anoRefInt);
+  const out = [];
+  let m = inicio.mes;
+  let y = inicio.ano;
+  while (y * 100 + m <= cutoff) {
+    const key = String(m).padStart(2, '0') + '/' + y;
+    const diasMes = new Date(y, m, 0).getDate();
+    const fat = Math.round((Number(fatByPayback[key]) || 0) * 100) / 100;
+    const diasMap = diasOpByMonth[key] || {};
     const diasOp = Object.keys(diasMap).length;
-    const fatProj = diasOp > 0 ? Math.round(fat / diasOp * diasMes * 100) / 100 : 0;
-    const parcial = mes === hojeMes && ano === hojeAno && mes === mesRefInt && ano === anoRefInt;
-    return {
-      mes: mes,
-      ano: ano,
-      label: MESES[mes] + '/' + String(ano).slice(-2),
+    const fatProj = calcFatProjetadoHistorico_(fat, diasOp, diasMes, diasMap, m, y, hoje);
+    const parcial = m === hoje.getMonth() + 1 && y === hoje.getFullYear() && m === mesRefInt && y === anoRefInt;
+    out.push({
+      mes: m,
+      ano: y,
+      label: MESES[m] + '/' + String(y).slice(-2),
       fatReal: fat,
       fatProjetado: fatProj,
       parcial: parcial,
       diasOperando: diasOp,
       diasMes: diasMes
-    };
-  });
+    });
+    m++;
+    if (m > 12) { m = 1; y++; }
+  }
+  return out;
 }
 
 /** FASE 8 — últimos 3 meses (fat/cus/resultado) para semáforo empresa. */

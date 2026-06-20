@@ -1528,40 +1528,71 @@ function mkHistoricoMesesRange_(mes, ano, maxBack) {
   return out;
 }
 
+/** Abr → mês selecionado no ano (inclui meses sem movimento). */
+function mkHistoricoMesesRangeOperacao_(mes, ano) {
+  const out = [];
+  let m = mes >= 4 ? 4 : 1;
+  let y = ano;
+  while (y < ano || (y === ano && m <= mes)) {
+    out.push({ mes: m, ano: y });
+    m++;
+    if (m > 12) { m = 1; y++; }
+  }
+  return out;
+}
+
+function calcFatProjetadoHistoricoFe_(fat, diasOp, diasMes, fatPorDia, mes, ano) {
+  if (diasOp <= 0 || fat <= 0) return 0;
+  const hojeMes = new Date().getMonth() + 1;
+  const hojeAno = new Date().getFullYear();
+  const parcial = mes === hojeMes && ano === hojeAno;
+  if (parcial) return Math.round(fat / diasOp * diasMes);
+  const diasComMov = (fatPorDia || []).filter(function(x) { return (Number(x.valor) || 0) > 0; })
+    .map(function(x) { return Number(x.dia) || 0; }).filter(function(n) { return n > 0; })
+    .sort(function(a, b) { return a - b; });
+  if (!diasComMov.length) return Math.round(fat);
+  const span = diasComMov[diasComMov.length - 1] - diasComMov[0] + 1;
+  return Math.round(fat / diasOp * span);
+}
+
+function mkHistoricoRowFromKpi_(item, r, parcial) {
+  const fat = Number(r.fatMes) || 0;
+  const diasOp = Number(r.diasOperando) || 0;
+  const diasMes = Number(r.diasMes) || new Date(item.ano, item.mes, 0).getDate();
+  const fatProj = parcial
+    ? (Number(r.projecaoFat) || calcFatProjetadoHistoricoFe_(fat, diasOp, diasMes, r.fatPorDia, item.mes, item.ano))
+    : calcFatProjetadoHistoricoFe_(fat, diasOp, diasMes, r.fatPorDia, item.mes, item.ano);
+  return {
+    mes: item.mes,
+    ano: item.ano,
+    label: mkMesLabel_(item.mes, item.ano),
+    fatReal: fat,
+    fatProjetado: fatProj,
+    parcial: !!parcial,
+    diasOperando: diasOp,
+    diasMes: diasMes
+  };
+}
+
 async function fetchHistoricoMesesFallback_(d) {
   const mes = d.mesAtual || new Date().getMonth() + 1;
   const ano = d.anoAtual || new Date().getFullYear();
   const hojeMes = new Date().getMonth() + 1;
   const hojeAno = new Date().getFullYear();
   const authP = apiParamsComAuth_();
-  const range = mkHistoricoMesesRange_(mes, ano, 12);
+  const range = mkHistoricoMesesRangeOperacao_(mes, ano);
   const rows = [];
   for (let i = 0; i < range.length; i++) {
     const item = range[i];
+    const parcial = item.mes === hojeMes && item.ano === hojeAno;
     if (item.mes === mes && item.ano === ano) {
-      if ((d.fatMes || 0) > 0 || (d.projecaoFat || 0) > 0) {
-        rows.push({
-          mes: item.mes,
-          ano: item.ano,
-          label: mkMesLabel_(item.mes, item.ano),
-          fatReal: Number(d.fatMes) || 0,
-          fatProjetado: Number(d.projecaoFat) || 0,
-          parcial: item.mes === hojeMes && item.ano === hojeAno
-        });
-      }
+      rows.push(mkHistoricoRowFromKpi_(item, d, parcial));
       continue;
     }
     try {
       const r = await api(Object.assign({ action: 'kpiMes', mes: item.mes, ano: item.ano, lite: '1' }, authP), 35000);
-      if (r && r.ok && ((r.fatMes || 0) > 0 || (r.projecaoFat || 0) > 0)) {
-        rows.push({
-          mes: item.mes,
-          ano: item.ano,
-          label: mkMesLabel_(item.mes, item.ano),
-          fatReal: Number(r.fatMes) || 0,
-          fatProjetado: Number(r.projecaoFat) || 0,
-          parcial: false
-        });
+      if (r && r.ok) {
+        rows.push(mkHistoricoRowFromKpi_(item, r, parcial));
       }
     } catch (e) { /* mês indisponível */ }
   }
@@ -1657,14 +1688,19 @@ function paintHistoricoMesesChart_(rows) {
 
   if (ins) {
     let acima = 0;
+    let comMov = 0;
     rows.forEach(function(r) {
+      if ((Number(r.fatReal) || 0) <= 0 && (Number(r.fatProjetado) || 0) <= 0) return;
+      comMov++;
       if ((Number(r.fatReal) || 0) >= (Number(r.fatProjetado) || 0) && (Number(r.fatProjetado) || 0) > 0) acima++;
     });
     const ult = rows[rows.length - 1];
     const msgs = [
-      acima + ' de ' + rows.length + ' meses com realizado ≥ projeção de fechamento.',
-      'Último: ' + ult.label + ' — ' + R2(ult.fatReal) + ' real vs ' + R2(ult.fatProjetado) + ' projetado'
-        + (ult.parcial ? ' (parcial).' : '.')
+      comMov > 0
+        ? (acima + ' de ' + comMov + ' meses com movimento bateram a projeção de fechamento.')
+        : 'Nenhum mês com movimento ainda.',
+      'Último: ' + ult.label + (ult.parcial ? ' *' : '') + ' — ' + R2(ult.fatReal) + ' real vs ' + R2(ult.fatProjetado) + ' projetado'
+        + (ult.parcial ? ' (em andamento).' : '.')
     ];
     ins.style.display = 'block';
     ins.textContent = msgs.join(' ');
@@ -1675,16 +1711,18 @@ function renderHistoricoMesesChart_(d) {
   if (!d) return;
   const reqId = ++_historicoMesesReq;
 
+  function applyRows(rows) {
+    if (reqId !== _historicoMesesReq || kpiData !== d) return;
+    paintHistoricoMesesChart_(rows);
+  }
+
   if (d.historicoMeses && d.historicoMeses.length) {
-    paintHistoricoMesesChart_(d.historicoMeses);
+    applyRows(d.historicoMeses);
     return;
   }
 
   setText2('nk-hist-meses-label', 'carregando histórico…');
-  fetchHistoricoMesesFallback_(d).then(function(rows) {
-    if (reqId !== _historicoMesesReq || kpiData !== d) return;
-    paintHistoricoMesesChart_(rows);
-  }).catch(function() {
+  fetchHistoricoMesesFallback_(d).then(applyRows).catch(function() {
     if (reqId !== _historicoMesesReq) return;
     setText2('nk-hist-meses-label', 'erro ao carregar');
   });
