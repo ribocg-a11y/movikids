@@ -397,7 +397,7 @@
       <div class="form-group">
         <label class="form-label">Telefone do Responsável *</label>
         <input id="inp-tel" class="form-input" type="tel" placeholder="(98) 9 9999-9999" autocomplete="off" inputmode="tel">
-        <div class="form-hint">SMS: DDD + 9 dígitos (ex: 98981972432). O gateway envia para +55…</div>
+        <div class="form-hint">Telefone com DDD + 9 dígitos (ex: 98981972432) para acompanhamento no portal.</div>
       </div>
       <div class="form-group">
         <label class="form-label" style="color:var(--txt2)">Observação <span style="font-size:11px;font-style:italic;color:var(--txt3)">(opcional)</span></label>
@@ -437,9 +437,9 @@
           <div class="pag-sub">Troco necessário</div>
         </div>
       </div>
-      <p class="nova-fechar-hint" id="nova-fechar-hint" style="display:none">O cronômetro só começa após ▶ Iniciar na Home. “Salvar e enviar SMS” não inicia a contagem.</p>
-      <button class="btn btn-primary" onclick="confirmarLocacaoEEnviarSms_()" id="btn-confirmar-iniciar" style="display:none">
-        ✓ Salvar e enviar SMS do portal
+      <p class="nova-fechar-hint" id="nova-fechar-hint" style="display:none">O cronômetro só começa após ▶ Iniciar na Home. Comunicação oficial via QR/portal.</p>
+      <button class="btn btn-primary" onclick="confirmarLocacao()" id="btn-confirmar-iniciar" style="display:none">
+        ✓ Salvar cadastro
       </button>
       <button class="btn btn-secondary" onclick="confirmarLocacao()" id="btn-confirmar" style="display:none;margin-top:8px">
         Só salvar cadastro (sem SMS agora)

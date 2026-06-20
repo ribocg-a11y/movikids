@@ -7,6 +7,7 @@ const NOVA_DRAFT_KEY = 'mk_nova_locacao_draft_v1';
 let _restoringNovaDraft = false;
 const NOVA_MAX_STEP = 2;
 let _novaRelSearchTimer = null;
+let _novaSavingInFlight = false;
 var relacionamentoCache = [];
 function novaDraftCampos_() {
   const val = id => {
@@ -107,18 +108,25 @@ function atualizarNovaSummaryBar_() {
 
 function toggleBotoesConfirmarNova_() {
   const ok = !!novaState.pagamento;
-  const qrOnly = typeof mkComunicacaoQrOnly_ === 'function' && mkComunicacaoQrOnly_();
   const b1 = document.getElementById('btn-confirmar');
   const b2 = document.getElementById('btn-confirmar-iniciar');
   const hint = document.getElementById('nova-fechar-hint');
   if (b1) b1.style.display = ok ? 'block' : 'none';
-  if (b2) b2.style.display = (ok && !qrOnly) ? 'block' : 'none';
+  if (b2) b2.style.display = 'none';
   if (hint) {
     hint.style.display = ok ? 'block' : 'none';
-    if (ok && qrOnly) {
-      hint.textContent = 'O cronômetro só começa após ▶ Iniciar na Home. Comunicação: QR do portal na mesa.';
-    }
+    if (ok) hint.textContent = 'O cronômetro só começa após ▶ Iniciar na Home. Comunicação: QR do portal na mesa.';
   }
+}
+
+function upsertSessaoPendenteLocal_(payload) {
+  const row = Number(payload && payload.rowIndex || 0);
+  const id = Number(payload && payload.id || 0);
+  const idx = sessions.findIndex(function(s) {
+    return (row && Number(s.rowIndex) === row) || (id && Number(s.id) === id);
+  });
+  if (idx >= 0) sessions[idx] = Object.assign({}, sessions[idx], payload);
+  else sessions.push(payload);
 }
 
 function rowIndexFromSalvar_(d) {
@@ -525,6 +533,10 @@ function abrirNovaComResponsavel(resp, novaCrianca = false) {
 }
 
 async function confirmarLocacao() {
+  if (_novaSavingInFlight) {
+    toast('Aguarde: já estamos salvando esta locação.', 'info');
+    return;
+  }
   const resp = document.getElementById('inp-resp').value.trim();
   const cri  = document.getElementById('inp-cri').value.trim();
   const tel  = document.getElementById('inp-tel').value.trim().replace(/\D/g,'');
@@ -536,6 +548,7 @@ async function confirmarLocacao() {
 
   const btn = document.getElementById('btn-confirmar');
   btn.textContent = '⏳ Salvando cadastro...'; btn.disabled = true;
+  _novaSavingInFlight = true;
 
   try {
     // Preço local como fallback caso GAS não conheça o tipo (ex: Triciclo em GAS antigo)
@@ -562,7 +575,7 @@ async function confirmarLocacao() {
 
     // Adiciona IMEDIATAMENTE com started=false (aguardando botão Iniciar)
     const rowIdx = rowIndexFromSalvar_(d);
-    sessions.push({
+    upsertSessaoPendenteLocal_({
       rowIndex:        rowIdx,
       id:              d.id,
       tipo:            novaState.tipo,
@@ -601,17 +614,20 @@ async function confirmarLocacao() {
   } catch(e) {
     toast((e && e.message) ? e.message : 'Erro de conexão. Tente novamente.', 'error');
   } finally {
+    _novaSavingInFlight = false;
     if (btn) { btn.textContent = 'Só salvar cadastro (sem SMS agora)'; btn.disabled = false; }
     const b2 = document.getElementById('btn-confirmar-iniciar');
-    if (b2) { b2.disabled = false; b2.textContent = '✓ Enviar SMS e iniciar locação'; }
+    if (b2) { b2.disabled = false; b2.textContent = '✓ Salvar e enviar SMS do portal'; }
   }
 }
 
 /** I20: salva Pendente + SMS portal — cronômetro só no ▶ Iniciar da Home. */
 async function confirmarLocacaoEEnviarSms_() {
-  if (typeof mkComunicacaoQrOnly_ === 'function' && mkComunicacaoQrOnly_()) {
-    return confirmarLocacao();
-  }
+  return confirmarLocacao();
+}
+
+/* Legacy path intentionally disabled (qr_only): kept only for compatibility. */
+async function confirmarLocacaoEEnviarSmsLegado_() {
   if (!novaState.veiculo || !novaState.pagamento) {
     toast('Complete veículo, plano e pagamento.', 'error');
     return;
