@@ -1,7 +1,7 @@
 # MOVI KIDS — Planejamento atual (pós-FASE 5)
 
-**Atualizado:** 20/06/2026 (FASE 15 · jornada v1.5.110 · FE v1.8.66 · **Plano Premium One UI FASES 16–22**)  
-**Produção:** FE **v1.8.66** · GAS repo **v1.5.110** (Nova versão Web se ping &lt; repo)  
+**Atualizado:** 20/06/2026 (FASE 15 · jornada v1.5.111 repo · FE v1.8.68 · **Plano Premium One UI FASES 16–22**)  
+**Produção:** FE **v1.8.68** · GAS repo **v1.5.111** · ping **v1.5.107** (Nova versão Web pendente)  
 **Documentos irmãos:** `PLANO_PRIORIDADES_2026-06.md` · `PLANO_CONTINUIDADE_2026-06.md` · `HANDOFF_NOVO_CHAT.md`  
 **Ciclo ativo:** **`PLANO_FASES_6_15_COCKPIT_EXECUTIVO_2026-06.md`** · FASE 15: **`FASE_15_GESTAO_PESSOAS.md`** 🟡  
 **Próximo ciclo:** **`PLANO_PREMIUM_ONEUI_FASES_16_22_2026-06.md`** ← manual Premium + One UI (20/06/2026)
@@ -12,7 +12,7 @@
 
 Ciclo **FASE 0–5 + P2/P3 concluído** (07–09/06/2026). Balcão homologado, portal QR, payback, CONFIG e APIs unificadas.
 
-**Modo atual:** **FASE 15 Gestão Pessoas** 🟡 (jornada v1.5.110 · FE v1.8.66) · **FASE 16 Premium One UI** 🔜 próximo · FASE 14 mini-DRE ✅
+**Modo atual:** **FASE 15 Gestão Pessoas** 🟡 (jornada v1.5.111 repo · FE v1.8.68) · **FASE 16 Premium One UI** 🔜 próximo · FASE 14 mini-DRE ✅
 
 ---
 
@@ -32,7 +32,7 @@ Ciclo **FASE 0–5 + P2/P3 concluído** (07–09/06/2026). Balcão homologado, p
 | **21** | Live BI frota | P2 | Herda FASE 13 |
 | **22** | Assistente IA gestão | P3 | Anexo — decisão sócio |
 
-**Sequência imediata:** fechar FASE 15 (GAS v1.5.110 + homolog) → kickoff FASE 16 mock comando.
+**Sequência imediata:** publicar GAS v1.5.111 (Nova versão Web) + homolog tablet → kickoff FASE 16 mock comando.
 
 ---
 
@@ -71,7 +71,7 @@ A–M (modularização FE), SMS P0, fixes I15–I21, Pacote K CRM, Pacote M M.1�
 | **12** | Drill-down + simulação margem | P2 | ⏳ | Dashboard gráficos |
 | **13** | Live BI Firebase | P2 | ⏳ | Dashboard widget frota |
 | **14** | Plano contas + mini-DRE | P2 | ⏳ | Dashboard + Custos |
-| **15** | Gestão Pessoas / colaboradores | P1 | 🟡 repo v1.8.49 · I29/I30 | `gestao-pessoas.html` · holerite |
+| **15** | Gestão Pessoas / colaboradores | P1 | 🟡 repo v1.8.68 · I29/I30 | `gestao-pessoas.html` · holerite |
 
 Detalhe entrega/melhoria/página: tabelas por fase no plano mestre · **FASE 16** (telemetria balcão) = backlog opcional · **Anexo A** = ROIC/ERP (fora do ciclo).
 
@@ -183,10 +183,10 @@ Legenda: **P0** bloqueia operação · **P1** valor imediato · **P2** próximo 
 
 **Ao homologar FASE 15** (tablet + abas planilha) · meio ciclo **FASE 10**.
 
-**Sequência imediata (18/06):**
+**Sequência imediata (20/06):**
 
-1. PC: `gestao-pessoas.html?force=1.8.49` — auth = balcão (dropdown → 4 PIN) · Ctrl+Shift+R
-2. **Nova versão Web GAS v1.5.99** se ping &lt; repo (I30 abas RH)
+1. PC: `gestao-pessoas.html?force=1.8.68` — auth = balcão (dropdown → 4 PIN) · Ctrl+Shift+R
+2. **Nova versão Web GAS v1.5.111** (ping atual v1.5.107)
 3. Tablet loja — F5/F7/F10/F11 regressão balcão
 4. Consultar **`DESIGN_SYSTEM_MOVIKIDS.md`** antes de qualquer UI nova (Regra 23 / I29)
 

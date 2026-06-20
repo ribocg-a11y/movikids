@@ -1,6 +1,6 @@
 # MOVI KIDS — Índice de documentação
 
-**Atualizado:** 18/06/2026 (FE **v1.8.49** · GAS repo **v1.5.99** · I29/I30)
+**Atualizado:** 20/06/2026 (FE **v1.8.68** · GAS repo **v1.5.111** · ping **v1.5.107** · I30)
 
 ## Comece aqui
 
@@ -50,7 +50,7 @@
 | [**PROTOCOLO_ATUALIZAR_TUDO.md**](ativos/PROTOCOLO_ATUALIZAR_TUDO.md) | **Comando "atualize tudo"** — checklist docs + planilha + pasta C |
 | [REGRAS_DE_PUBLICACAO_SEGURA.md](ativos/REGRAS_DE_PUBLICACAO_SEGURA.md) | Regras P0 deploy |
 | [ACESSOS_E_AUTORIZACOES.md](ativos/ACESSOS_E_AUTORIZACOES.md) | Papéis, PIN, agente vs humano |
-| [MAPA_ERROS_FALHAS_BUGS.md](ativos/MAPA_ERROS_FALHAS_BUGS.md) | Índice I1–I25 |
+| [MAPA_ERROS_FALHAS_BUGS.md](ativos/MAPA_ERROS_FALHAS_BUGS.md) | Índice I1–I30 |
 
 ## Operação e deploy
 

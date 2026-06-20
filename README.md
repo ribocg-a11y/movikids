@@ -6,13 +6,13 @@ Sistema operacional para locações — balcão (tablet), portal do responsável
 
 **Planejamento:** [PLANEJAMENTO_ATUAL_2026-06.md](docs/ativos/PLANEJAMENTO_ATUAL_2026-06.md) · [PLANO_PRIORIDADES](docs/ativos/PLANO_PRIORIDADES_2026-06.md)
 
-## Produção (18/06/2026 — FE v1.8.49 · GAS repo v1.5.99)
+## Produção (20/06/2026 — FE v1.8.68 · GAS repo v1.5.111)
 
 | Camada | Versão repo | Produção alvo |
 |--------|-------------|---------------|
-| Frontend | **v1.8.49** | https://ribocg-a11y.github.io/movikids/?force=1.8.49 |
-| Gestão Pessoas | **v1.8.49** | `gestao-pessoas.html?force=1.8.49` |
-| Apps Script | **v1.5.99** | Nova versão Web se ping &lt; repo |
+| Frontend | **v1.8.68** | https://ribocg-a11y.github.io/movikids/?force=1.8.68 |
+| Gestão Pessoas | **v1.8.68** | `gestao-pessoas.html?force=1.8.68` |
+| Apps Script | **v1.5.111** (repo) · ping **v1.5.107** | Publicar Nova versão Web para alinhar ping |
 | Design System | **v1.0** | [DESIGN_SYSTEM_MOVIKIDS.md](docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md) |
 | Aba FOLHA | memorial B68 | OK (I25) · B68 ~5269,96 |
 

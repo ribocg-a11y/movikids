@@ -57,9 +57,9 @@ Detalhe completo: [`ACESSOS_E_AUTORIZACOES.md`](docs/ativos/ACESSOS_E_AUTORIZACO
 
 | Camada | Versão repo | Ping produção |
 |--------|-------------|---------------|
-| Frontend | **v1.8.58** | https://ribocg-a11y.github.io/movikids/?force=1.8.58 |
-| Gestão Pessoas | **v1.8.58** | `gestao-pessoas.html?force=1.8.58` |
-| GAS | repo **v1.5.106** · ping **v1.5.105** | Nova versão Web no deploy `AKfycbwakQ...` |
+| Frontend | **v1.8.68** | https://ribocg-a11y.github.io/movikids/?force=1.8.68 |
+| Gestão Pessoas | **v1.8.68** | `gestao-pessoas.html?force=1.8.68` |
+| GAS | repo **v1.5.111** · ping **v1.5.107** | Nova versão Web no deploy `AKfycbwakQ...` pendente |
 | Design System | **v1.0** | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
 | Aba FOLHA | OK (I25) | B68 ~5269,96 · `folhaPlanejamento.fonte: FOLHA` |
 | Deploy ID | `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y` | |
@@ -93,12 +93,12 @@ Fonte de verdade: `mk-version.js`, header do `.gs`, ping GAS.
 - `docs/arquivo/obsoleto/` — rollback/changelog antigos
 - Arquivos em `arquivo-historico/` para deploy
 
-## Estado do projeto (18/06/2026)
+## Estado do projeto (20/06/2026)
 
 - **FASE 1–9:** ✅ prod
 - **FASE 14 mini-DRE:** ✅ prod (FE v1.8.16+)
-- **FASE 15 Gestão Pessoas:** 🟡 FE v1.8.49 DNA (I29) · GAS v1.5.99 (I30) · homolog tablet pendente
-- **Pendente:** Nova versão Web GAS · abas planilha · homolog tablet F5/F7/F10/F11 na loja
+- **FASE 15 Gestão Pessoas:** 🟡 FE v1.8.68 · GAS repo v1.5.111 · homolog tablet pendente
+- **Pendente:** Nova versão Web GAS (ping v1.5.107), homolog tablet F5/F7/F10/F11 na loja, kickoff FASE 16
 
 ## "Atualize tudo"
 

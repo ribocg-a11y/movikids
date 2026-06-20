@@ -55,7 +55,7 @@ Princípios Samsung One UI **traduzidos** — sem copiar visual Samsung; **refor
 | **Adaptive layout** | 1 col mobile · 2 col tablet · grid admin PC | Todas superfícies | Tabela crua sem scroll |
 | **Immediate feedback** | Flash ✓ ponto, badge sidebar, chip Turno | Ponto, auth | Loading silencioso |
 
-**Tipografia (correção imediata — já iniciada v1.8.66):**
+**Tipografia (correção imediata — já iniciada v1.8.68):**
 
 | Elemento | Antes (pesado) | Depois (One UI + DNA) |
 |----------|----------------|------------------------|
@@ -109,7 +109,7 @@ FASE 22  Assistente IA gestão (Anexo — decisão sócio)
 | 16.2 | **`painelComandoOperacional_`** API | GAS | Agrega: loc abertas, operadores logados, fat dia, alertas FASE 8 + ponto |
 | 16.3 | **KPI com contexto** — todo número + linha interpretativa | FE+GAS | Ex.: `R$ 1.240` + *"↑ 12% vs média 30 dias"* |
 | 16.4 | **One UI tokens v2** — `--mk-widget-*`, spacing 8/12/16/24 | CSS | `mk-design.css` §3 extensão; doc Design System v1.1 |
-| 16.5 | **Refino Presença + Ponto** — tipografia leve, cards widget | FE | `mk-gestao-pessoas*.css` (continua v1.8.66+) |
+| 16.5 | **Refino Presença + Ponto** — tipografia leve, cards widget | FE | `mk-gestao-pessoas*.css` (continua v1.8.68+) |
 | 16.6 | **Sidebar mobile admin** — acompanhamento rápido (read-only) | FE | KPIs comando + link balcão; **sem** escritas críticas |
 | 16.7 | **Status frota compacto** — disponível / em uso / manutenção | FE+GAS | Reusa CONFIG + locações ativas |
 | 16.8 | Teste **`TESTE_FASE16_COMANDO_READONLY.ps1`** | QA | |
@@ -137,7 +137,7 @@ FASE 22  Assistente IA gestão (Anexo — decisão sócio)
 
 | ID | Entrega | Status base |
 |----|---------|-------------|
-| 15b.1 | Jornada escala × ponto + banco projetado | 🟡 v1.5.110 / v1.8.66 |
+| 15b.1 | Jornada escala × ponto + banco projetado | 🟡 v1.5.111 / v1.8.68 |
 | 15b.2 | Holerite quinzenal admin + colaborador | ✅ v1.5.108 / v1.8.64 |
 | 15b.3 | **Comunicados** — faixa no hub colaborador (planilha `COMUNICADOS_RH`) | Novo |
 | 15b.4 | **Histórico desempenho** — loc/mês, metas atingidas, gráfico evolução | Novo |
@@ -305,8 +305,8 @@ Widget live: % frota em uso agora · overlay gráfico ocupação por horário.
 
 | # | Ação | Responsável | Prazo |
 |---|------|-------------|-------|
-| 1 | Publicar **GAS v1.5.110** (jornada fix) | Sócio | Imediato |
-| 2 | Push **FE v1.8.66** (tipografia + jornada UI) | Agente | Imediato |
+| 1 | Publicar **GAS v1.5.111** (ping ainda v1.5.107) | Sócio | Imediato |
+| 2 | FE **v1.8.68** já publicado (Carro 04 + layout 2x2 carros) | Agente | Concluído |
 | 3 | Homolog tablet F5/F7/F10/F11 | Ops loja | Esta semana |
 | 4 | Fechar FASE 15b.1–15b.2 checklist | Dev | Esta semana |
 | 5 | **Kickoff FASE 16** — mock `#mk-command-center` | Dev | Próxima sprint |

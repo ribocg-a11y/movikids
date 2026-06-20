@@ -2,7 +2,7 @@
 
 **Versão doc:** 1.0 · **18/06/2026**  
 **Status:** fonte de verdade visual — **consultar antes de criar ou alterar qualquer UI**  
-**Auditoria:** sistema completo FE v1.8.49 · portal v1.7.62+ · FASE 9 admin v1.8.28+
+**Auditoria:** sistema completo FE v1.8.68 · portal v1.7.62+ · FASE 9 admin v1.8.28+
 
 **Documentos irmãos:**
 - [`DESIGN_DNA_MOVIKIDS.md`](DESIGN_DNA_MOVIKIDS.md) — princípios de produto e missão visual (resumo filosófico)

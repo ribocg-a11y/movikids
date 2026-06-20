@@ -1,12 +1,12 @@
 # FASE 15 — Gestão de Pessoas (produção)
 
-**Atualizado:** 18/06/2026 · GAS **v1.5.99** · FE **v1.8.49** · Design System v1.0
+**Atualizado:** 20/06/2026 · GAS repo **v1.5.111** (ping **v1.5.107**) · FE **v1.8.68** · Design System v1.0
 
 ## URLs
 
 | Página | URL |
 |--------|-----|
-| **Produção colaboradores** | https://ribocg-a11y.github.io/movikids/gestao-pessoas.html?force=1.8.49 |
+| **Produção colaboradores** | https://ribocg-a11y.github.io/movikids/gestao-pessoas.html?force=1.8.68 |
 | Hub tablet → Colaboradores | `index.html` `#mk-hub-colab` |
 | Mockup (só protótipo) | https://ribocg-a11y.github.io/movikids/ponto-mockup.html?v=3.6 |
 
@@ -26,7 +26,7 @@
 
 ## Instalar abas
 
-**Após Nova versão Web GAS v1.5.99+** (corrige I30 getRange):
+**Após Nova versão Web GAS v1.5.111+** (inclui I30 getRange + Carro 04 fallback):
 ```powershell
 cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github
 .\scripts\instalar-abas-gestao-pessoas-gas.ps1
@@ -45,9 +45,9 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 
 ## Deploy checklist
 
-1. GAS **v1.5.99** → Nova versão Web (`AKfycbwakQ...`)
+1. GAS **v1.5.111** → Nova versão Web (`AKfycbwakQ...`)
 2. `instalar-abas-gestao-pessoas-gas.ps1`
-3. FE **v1.8.49** Pages (auth DNA)
+3. FE **v1.8.68** Pages (auth DNA)
 4. Homolog: dropdown + 4 PIN + hub 5 portas
 5. Tablet balcão: regressão F5/F7/F10/F11
 

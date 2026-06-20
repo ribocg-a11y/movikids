@@ -1,6 +1,6 @@
 # MOVI KIDS — Plano de prioridades (análise de sistemas)
 
-**Data:** 09/06/2026  
+**Data-base:** 09/06/2026 · **Revisado:** 20/06/2026  
 **Função:** documento único de **o que fazer agora**, por ordem de prioridade.  
 **Local:** `docs/ativos/` · **Índice:** `../INDICE.md`  
 **Handoff:** `HANDOFF_NOVO_CHAT.md` · **Complementa:** `ESTADO_ATUAL.md`, `PLANO_CONTINUIDADE_2026-06.md`, `REGRAS_DE_PUBLICACAO_SEGURA.md`.
@@ -26,13 +26,13 @@
 | **Dashboard narrativo + folha prop.** | ✅ prod | FE v1.8.11–1.8.15 · `DEPLOY_FE_v1.8.15_SEMANA_ATUAL.md` |
 | **FASE 14** Mini-DRE | ✅ prod | FE v1.8.16+ · cascata Dashboard |
 | **FE UX mobile + DNA admin** | ✅ prod | v1.8.23–1.8.30 · I28 · `CHECKLIST_FASE9_DNA_ADMIN.md` |
-| **FASE 15** Gestão Pessoas | 🟡 repo | FE **v1.8.49** · GAS **v1.5.99** · I29/I30 · `FASE_15_GESTAO_PESSOAS.md` |
+| **FASE 15** Gestão Pessoas | 🟡 repo | FE **v1.8.68** · GAS repo **v1.5.111** (ping **v1.5.107**) · I29/I30 · `FASE_15_GESTAO_PESSOAS.md` |
 | **Design System v1.0** | ✅ repo | `DESIGN_SYSTEM_MOVIKIDS.md` · regra Cursor obrigatória |
 
 **Próximo passo imediato:**
 
-1. PC: `gestao-pessoas.html?force=1.8.49` — validar I29 (auth DNA) · Design System §9
-2. **Nova versão Web GAS v1.5.99** — I30 abas RH (sócio)
+1. PC: `gestao-pessoas.html?force=1.8.68` — validar I29 (auth DNA) · Design System §9
+2. **Nova versão Web GAS v1.5.111** — alinhar ping (hoje v1.5.107)
 3. **Tablet loja** — F5/F7/F10/F11 (regressão balcão)
 4. **FASE 10** CRM LTV — próximo ciclo dev (GAS — pedir §7.3)
 
@@ -227,7 +227,7 @@ Objetivo: balcão mais rápido; menos ruído visual. **Próximo pacote de featur
 | **12** | Drill-down + simulação | P2 | v1.8.8 | v1.5.80 | Dashboard gráficos |
 | **13** | Live BI Firebase | P2 | v1.8.9 | v1.5.81 | Widget frota live |
 | **14** | Plano contas + mini-DRE | P2 | v1.8.16 | v1.5.82 | Cascata margens · 🟡 docs 11/06 |
-| **15** | Gestão Pessoas / holerite | P1 | v1.8.49 | v1.5.99 | `gestao-pessoas.html` |
+| **15** | Gestão Pessoas / holerite | P1 | v1.8.68 | v1.5.111 (repo) | `gestao-pessoas.html` |
 
 ---
 

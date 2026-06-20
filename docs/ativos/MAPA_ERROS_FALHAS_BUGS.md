@@ -1,6 +1,6 @@
 # MOVI KIDS — Mapa de erros, falhas e bugs
 
-**Atualizado:** 18/06/2026 — **I29** DNA Gestão Pessoas · **I30** abas RH getRange · GAS **v1.5.99** repo · FE **v1.8.49**  
+**Atualizado:** 20/06/2026 — **I30** abas RH getRange · GAS repo **v1.5.111** (ping **v1.5.107**) · FE **v1.8.68**  
 **Uso anterior:** 17/06/2026 — **I28** liberar sessão tablet · GAS **v1.5.92** prod. · FE **v1.8.30**  
 **Uso anterior:** 09/06/2026 — **I22 fechado** (hotfix FE v1.8.2)  
 **Uso:** consultar **antes de publicar** e **ao montar checklist de teste**. Cada linha tem trava e script de verificação quando existir.
@@ -199,8 +199,8 @@
 
 | Camada | Repo / produção | Mínimo operação |
 |--------|-----------------|-----------------|
-| Frontend | **v1.8.49** | `?force=1.8.49` · Gestão Pessoas `gestao-pessoas.html` |
-| GAS | **v1.5.99** (repo) · ping confirmar | Nova versão Web após v1.5.98+ |
+| Frontend | **v1.8.68** | `?force=1.8.68` · Gestão Pessoas `gestao-pessoas.html` |
+| GAS | **v1.5.111** (repo) · ping atual **v1.5.107** | Publicar Nova versão Web para alinhar |
 | Design System | **`docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md`** | Obrigatório antes de UI |
 | Aba FOLHA | B68 ~5269,96 · `fonte=FOLHA` | `repairFolhaAdmin` após deploy que toque FOLHA |
 

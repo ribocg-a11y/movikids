@@ -40,12 +40,13 @@ Sincronizar **documentação + estado operacional** do projeto com a realidade a
 
 ---
 
-## Produção atual (16/06/2026)
+## Produção atual (20/06/2026)
 
 | Camada | Versão | Evidência |
 |--------|--------|-----------|
-| GAS ping | **v1.5.92** | ping · @144 · desc. `v1.5.92` |
-| FE | **v1.8.27** | Pages live · Protocolo Mestre 16/06 |
+| GAS ping | **v1.5.107** | ping público `/exec?action=ping` |
+| GAS repo | **v1.5.111** | header do `.gs` canônico |
+| FE | **v1.8.68** | Pages live |
 | Aba FOLHA | **OK** (I25) | B25=15,38 · B68=5269,96 · D36=24 · `fonte=FOLHA` |
 | FASE 9 CLT | **verde 6/6** | `TESTE_FASE9_FOLHA_READONLY` · `CONTRATACAO_VIAVEL` |
 
