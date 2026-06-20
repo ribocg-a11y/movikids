@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.111
+// MOVI KIDS — Google Apps Script v1.5.112
+// v1.5.112: kpiMes.historicoMeses — faturamento real vs projetado mês a mês (Dashboard)
 // v1.5.111: frota — Carro 04 em VEICULOS_VALIDOS (4 carros elétricos)
 // v1.5.110: jornada — filtro ponto por mês/ano (cellToStr_) + atraso sem sinal + ponto aberto hoje
 // v1.5.109: jornada ponto × escala — extras/atraso dia a dia + banco de horas
@@ -2004,6 +2005,46 @@ function buildLeadingFinanceiros_(ctx) {
   };
 }
 
+/** Dashboard — histórico mês a mês: realizado vs projeção de fechamento (ritmo dias com movimento). */
+function buildHistoricoFatProjecao_(mesRef, anoRef, fatByPayback, diasOpByMonth, hoje) {
+  const MESES = ['', 'Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+  const mesRefInt = parseInt(mesRef, 10);
+  const anoRefInt = parseInt(anoRef, 10);
+  const cutoff = anoRefInt * 100 + mesRefInt;
+  const hojeMes = hoje.getMonth() + 1;
+  const hojeAno = hoje.getFullYear();
+  const keys = Object.keys(fatByPayback || {}).filter(function(k) {
+    const p = k.split('/');
+    if (p.length !== 2) return false;
+    const mk = parseInt(p[1], 10) * 100 + parseInt(p[0], 10);
+    return mk <= cutoff && (Number(fatByPayback[k]) || 0) > 0;
+  }).sort(function(a, b) {
+    const pa = a.split('/'), pb = b.split('/');
+    return (parseInt(pa[1], 10) * 100 + parseInt(pa[0], 10)) - (parseInt(pb[1], 10) * 100 + parseInt(pb[0], 10));
+  });
+  return keys.map(function(k) {
+    const p = k.split('/');
+    const mes = parseInt(p[0], 10);
+    const ano = parseInt(p[1], 10);
+    const diasMes = new Date(ano, mes, 0).getDate();
+    const fat = Math.round((Number(fatByPayback[k]) || 0) * 100) / 100;
+    const diasMap = diasOpByMonth[k] || {};
+    const diasOp = Object.keys(diasMap).length;
+    const fatProj = diasOp > 0 ? Math.round(fat / diasOp * diasMes * 100) / 100 : 0;
+    const parcial = mes === hojeMes && ano === hojeAno && mes === mesRefInt && ano === anoRefInt;
+    return {
+      mes: mes,
+      ano: ano,
+      label: MESES[mes] + '/' + String(ano).slice(-2),
+      fatReal: fat,
+      fatProjetado: fatProj,
+      parcial: parcial,
+      diasOperando: diasOp,
+      diasMes: diasMes
+    };
+  });
+}
+
 /** FASE 8 — últimos 3 meses (fat/cus/resultado) para semáforo empresa. */
 function buildMesesRecentesParaSinal_(mesAtual, anoAtual, fatByPayback, cusByPayback) {
   const meses = [];
@@ -2816,6 +2857,7 @@ function buildKpiMesPayload_(p) {
   const telMesCounts = {};
   const fatByPayback = {};
   const cusByPayback = {};
+  const diasOpByMonth = {};
 
   const lastLoc = shLoc.getLastRow();
   if (lastLoc >= DATA_ROW) {
@@ -2836,6 +2878,9 @@ function buildKpiMesPayload_(p) {
 
       const vt     = Number(r[10]);
       fatByPayback[mmyyR] = (fatByPayback[mmyyR] || 0) + vt;
+      const dkOp = pts[0].padStart(2, '0');
+      if (!diasOpByMonth[mmyyR]) diasOpByMonth[mmyyR] = {};
+      diasOpByMonth[mmyyR][dkOp] = true;
       if (dataR === dataHoje) { fatHoje += vt; nHoje++; }
 
       const tipo   = String(r[4]);
@@ -3005,6 +3050,7 @@ function buildKpiMesPayload_(p) {
     folhaMensal: viabilidadeContratacao.ok ? viabilidadeContratacao.folhaMensal : 0
   }));
 
+  const historicoMeses = buildHistoricoFatProjecao_(mesAtual, anoAtual, fatByPayback, diasOpByMonth, hoje);
   const mesesRecentes = buildMesesRecentesParaSinal_(mesAtual, anoAtual, fatByPayback, cusByPayback);
   const alertaCtx = Object.assign({}, narrativaCtx, {
     cusMes: Math.round(cusMes * 100) / 100,
@@ -3086,6 +3132,7 @@ function buildKpiMesPayload_(p) {
     sinalEmpresa: sinalEmpresa,
     folhaPlanejamento: folhaPlanejamento,
     viabilidadeContratacao: viabilidadeContratacao,
+    historicoMeses: historicoMeses,
     lite: skipAdvanced || false
   };
 }

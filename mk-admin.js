@@ -9,7 +9,8 @@ let _adminIdleWired = false;
 var kpiData         = null;
 var resumoDiaHoje   = null;
 let chartsRendered  = false;
-var chartDiario=null,chartExtrasDia=null,chartHistExt=null,chartHoras=null,chartMetaDia=null,chartReceitaMes=null;
+var chartDiario=null,chartExtrasDia=null,chartHistExt=null,chartHoras=null,chartMetaDia=null,chartReceitaMes=null,chartHistoricoMeses=null;
+let _historicoMesesReq = 0;
 let pinBuffer       = '';
 let _pinModalMode   = 'admin'; // 'admin' | 'ask'
 let _pinModalAskResolve = null;
@@ -1508,6 +1509,187 @@ function renderReceitaMesChart_(d) {
   }
 }
 
+const MK_MES_ABREV_ = ['', 'Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+
+function mkMesLabel_(mes, ano) {
+  return MK_MES_ABREV_[mes] + '/' + String(ano).slice(-2);
+}
+
+function mkHistoricoMesesRange_(mes, ano, maxBack) {
+  const out = [];
+  let m = mes;
+  let y = ano;
+  const n = maxBack || 12;
+  for (let i = 0; i < n; i++) {
+    out.unshift({ mes: m, ano: y });
+    m--;
+    if (m < 1) { m = 12; y--; }
+  }
+  return out;
+}
+
+async function fetchHistoricoMesesFallback_(d) {
+  const mes = d.mesAtual || new Date().getMonth() + 1;
+  const ano = d.anoAtual || new Date().getFullYear();
+  const hojeMes = new Date().getMonth() + 1;
+  const hojeAno = new Date().getFullYear();
+  const authP = apiParamsComAuth_();
+  const range = mkHistoricoMesesRange_(mes, ano, 12);
+  const rows = [];
+  for (let i = 0; i < range.length; i++) {
+    const item = range[i];
+    if (item.mes === mes && item.ano === ano) {
+      if ((d.fatMes || 0) > 0 || (d.projecaoFat || 0) > 0) {
+        rows.push({
+          mes: item.mes,
+          ano: item.ano,
+          label: mkMesLabel_(item.mes, item.ano),
+          fatReal: Number(d.fatMes) || 0,
+          fatProjetado: Number(d.projecaoFat) || 0,
+          parcial: item.mes === hojeMes && item.ano === hojeAno
+        });
+      }
+      continue;
+    }
+    try {
+      const r = await api(Object.assign({ action: 'kpiMes', mes: item.mes, ano: item.ano, lite: '1' }, authP), 35000);
+      if (r && r.ok && ((r.fatMes || 0) > 0 || (r.projecaoFat || 0) > 0)) {
+        rows.push({
+          mes: item.mes,
+          ano: item.ano,
+          label: mkMesLabel_(item.mes, item.ano),
+          fatReal: Number(r.fatMes) || 0,
+          fatProjetado: Number(r.projecaoFat) || 0,
+          parcial: false
+        });
+      }
+    } catch (e) { /* mês indisponível */ }
+  }
+  return rows;
+}
+
+function paintHistoricoMesesChart_(rows) {
+  const cv = document.getElementById('chart-historico-meses');
+  const ins = document.getElementById('nk-hist-meses-insight');
+  if (!cv || !window.Chart) return;
+  if (chartHistoricoMeses) chartHistoricoMeses.destroy();
+
+  if (!rows || !rows.length) {
+    setText2('nk-hist-meses-label', 'sem histórico');
+    if (ins) ins.style.display = 'none';
+    return;
+  }
+
+  const labels = rows.map(function(r) { return r.label + (r.parcial ? ' *' : ''); });
+  const reals = rows.map(function(r) { return Math.round(Number(r.fatReal) || 0); });
+  const projs = rows.map(function(r) { return Math.round(Number(r.fatProjetado) || 0); });
+  const maxY = Math.max.apply(null, reals.concat(projs).concat([1])) * 1.12;
+
+  setText2('nk-hist-meses-label', rows.length + ' meses · * = em andamento');
+
+  chartHistoricoMeses = new Chart(cv, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: 'Realizado',
+          data: reals,
+          backgroundColor: '#1565C0',
+          borderRadius: 4,
+          barPercentage: 0.82,
+          categoryPercentage: 0.72
+        },
+        {
+          label: 'Projetado',
+          data: projs,
+          backgroundColor: 'rgba(94,53,177,.62)',
+          borderRadius: 4,
+          barPercentage: 0.82,
+          categoryPercentage: 0.72
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: function(ctx) {
+              const r = rows[ctx.dataIndex];
+              const val = Math.round(ctx.parsed.y);
+              if (ctx.dataset.label === 'Projetado') {
+                return 'Projetado: ' + R2(val) + (r.parcial ? ' (fechamento)' : '');
+              }
+              const proj = Math.round(Number(r.fatProjetado) || 0);
+              const delta = val - proj;
+              const parts = ['Realizado: ' + R2(val)];
+              if (proj > 0) {
+                parts.push(delta >= 0 ? ('+' + R2(delta) + ' vs proj.') : (R2(delta) + ' vs proj.'));
+              }
+              if (r.parcial) parts.push('mês em andamento');
+              return parts.join(' · ');
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid: { display: false },
+          ticks: { font: { size: 10 }, color: '#666' }
+        },
+        y: {
+          grid: { color: 'rgba(0,0,0,.06)' },
+          ticks: {
+            font: { size: 9 },
+            color: '#888',
+            callback: function(v) { return 'R$' + Math.round(v); }
+          },
+          min: 0,
+          suggestedMax: maxY
+        }
+      }
+    }
+  });
+
+  if (ins) {
+    let acima = 0;
+    rows.forEach(function(r) {
+      if ((Number(r.fatReal) || 0) >= (Number(r.fatProjetado) || 0) && (Number(r.fatProjetado) || 0) > 0) acima++;
+    });
+    const ult = rows[rows.length - 1];
+    const msgs = [
+      acima + ' de ' + rows.length + ' meses com realizado ≥ projeção de fechamento.',
+      'Último: ' + ult.label + ' — ' + R2(ult.fatReal) + ' real vs ' + R2(ult.fatProjetado) + ' projetado'
+        + (ult.parcial ? ' (parcial).' : '.')
+    ];
+    ins.style.display = 'block';
+    ins.textContent = msgs.join(' ');
+  }
+}
+
+function renderHistoricoMesesChart_(d) {
+  if (!d) return;
+  const reqId = ++_historicoMesesReq;
+
+  if (d.historicoMeses && d.historicoMeses.length) {
+    paintHistoricoMesesChart_(d.historicoMeses);
+    return;
+  }
+
+  setText2('nk-hist-meses-label', 'carregando histórico…');
+  fetchHistoricoMesesFallback_(d).then(function(rows) {
+    if (reqId !== _historicoMesesReq || kpiData !== d) return;
+    paintHistoricoMesesChart_(rows);
+  }).catch(function() {
+    if (reqId !== _historicoMesesReq) return;
+    setText2('nk-hist-meses-label', 'erro ao carregar');
+  });
+}
+
 function renderDecisaoPanel_(d) {
   const panel = document.getElementById('mk-dash-decisao');
   if (!panel || !d) return;
@@ -1803,7 +1985,7 @@ function renderChartsBody_(d) {
   if (!d) return;
   if (typeof renderSemanasChart_ === 'function') renderSemanasChart_(d);
   if (!window.Chart) return;
-  [chartDiario, chartExtrasDia, chartHoras, chartMetaDia, chartReceitaMes].forEach(c => c && c.destroy());
+  [chartDiario, chartExtrasDia, chartHoras, chartMetaDia, chartReceitaMes, chartHistoricoMeses].forEach(c => c && c.destroy());
 
   const BLUE='#29B6F6',PINK='#F06292',GREEN='#2E7D32',AMBER='#FF8A65',GOLD='#FFD54F',GRID='rgba(21,101,192,.08)';
   const PLAN_LABELS = {'10min':'10 min','20min':'20 min','30min':'30 min','40min':'40 min','60min':'1 hora','3h':'3 horas'};
@@ -1916,6 +2098,7 @@ function renderChartsBody_(d) {
 
   renderMetaDiaChart_(d);
   renderReceitaMesChart_(d);
+  renderHistoricoMesesChart_(d);
 
   // Horários de pico
   const horasDat = (d.horasPico||[]).map((v,i)=>({h:(9+i)+'h',v:Number(v)||0}));
