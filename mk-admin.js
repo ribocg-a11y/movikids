@@ -9,7 +9,7 @@ let _adminIdleWired = false;
 var kpiData         = null;
 var resumoDiaHoje   = null;
 let chartsRendered  = false;
-var chartDiario=null,chartExtrasDia=null,chartHistExt=null,chartHoras=null,chartMetaDia=null;
+var chartDiario=null,chartExtrasDia=null,chartHistExt=null,chartHoras=null,chartMetaDia=null,chartReceitaMes=null;
 let pinBuffer       = '';
 let _pinModalMode   = 'admin'; // 'admin' | 'ask'
 let _pinModalAskResolve = null;
@@ -1369,6 +1369,145 @@ function renderMetaDiaChart_(d) {
   }
 }
 
+function renderReceitaMesChart_(d) {
+  const cv = document.getElementById('chart-receita-mes');
+  const ins = document.getElementById('nk-receita-mes-insight');
+  if (!cv || !window.Chart) return;
+  if (chartReceitaMes) chartReceitaMes.destroy();
+
+  const fatDia = d.fatPorDia || [];
+  const hojeD = (d.mesAtual === new Date().getMonth() + 1 && d.anoAtual === new Date().getFullYear())
+    ? new Date().getDate()
+    : fatDia.reduce(function(m, x) { return Math.max(m, x.dia || 0); }, 0);
+  const diasMes = Number(d.diasMes) || new Date(d.anoAtual || new Date().getFullYear(), d.mesAtual || 1, 0).getDate();
+  const mesStr = String(d.mesAtual || new Date().getMonth() + 1).padStart(2, '0');
+  const projFat = Number(d.projecaoFat) || 0;
+  const fatMes = Number(d.fatMes) || 0;
+  const diasOp = Number(d.diasOperando) || 0;
+  const mediaDia = Number(d.mediaDiaria) || 0;
+
+  if (hojeD <= 0 || diasOp <= 0 || projFat <= 0) {
+    setText2('nk-receita-mes-label', diasOp <= 0 ? 'sem dias com movimento' : 'projeção indisponível');
+    if (ins) ins.style.display = 'none';
+    return;
+  }
+
+  const fatMap = {};
+  fatDia.forEach(function(x) { fatMap[x.dia] = Number(x.valor) || 0; });
+
+  const labels = [];
+  for (let dd = 1; dd <= hojeD; dd++) labels.push(dd);
+
+  let acc = 0;
+  const acumulado = labels.map(function(dd) {
+    acc += fatMap[dd] || 0;
+    return Math.round(acc);
+  });
+  const projAcum = labels.map(function(dd) { return Math.round(projFat * dd / diasMes); });
+  const projHoje = Math.round(projFat * hojeD / diasMes);
+  const diff = fatMes - projHoje;
+  const pctDiff = projHoje > 0 ? Math.round(diff / projHoje * 100) : 0;
+
+  setText2('nk-receita-mes-label', 'acum. ' + R2(fatMes) + ' · proj. mês ' + R2(projFat));
+
+  const ptBg = acumulado.map(function(v, i) { return v >= projAcum[i] ? '#2E7D32' : '#FF8F00'; });
+  const maxY = Math.max(projFat, Math.max.apply(null, acumulado.concat([1]))) * 1.08;
+
+  chartReceitaMes = new Chart(cv, {
+    type: 'line',
+    data: {
+      labels: labels.map(function(dd) { return dd + '/' + mesStr; }),
+      datasets: [
+        {
+          label: 'Receita acumulada',
+          data: acumulado,
+          borderColor: '#1565C0',
+          backgroundColor: 'rgba(21,101,192,.12)',
+          borderWidth: 2.5,
+          pointRadius: labels.length > 20 ? 3 : 5,
+          pointHoverRadius: 7,
+          pointBackgroundColor: ptBg,
+          pointBorderColor: '#1565C0',
+          pointBorderWidth: 2,
+          tension: 0.2,
+          fill: true,
+          order: 1
+        },
+        {
+          label: 'Projeção acumulada',
+          data: projAcum,
+          borderColor: '#5E35B1',
+          borderWidth: 2,
+          borderDash: [6, 4],
+          pointRadius: 0,
+          tension: 0,
+          fill: false,
+          order: 0
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: function(ctx) {
+              const val = Math.round(ctx.parsed.y);
+              if (ctx.dataset.label === 'Projeção acumulada') {
+                return 'Projeção acum.: ' + R2(val);
+              }
+              const i = ctx.dataIndex;
+              const esperado = projAcum[i] || 0;
+              const delta = val - esperado;
+              const parts = ['Acumulado: ' + R2(val)];
+              if (esperado > 0) {
+                parts.push(delta >= 0
+                  ? ('+' + R2(delta) + ' vs ritmo projetado')
+                  : (R2(delta) + ' vs ritmo projetado'));
+              }
+              return parts.join(' · ');
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid: { display: false },
+          ticks: { font: { size: 9 }, color: '#888', maxTicksLimit: 12, maxRotation: 0 }
+        },
+        y: {
+          grid: { color: 'rgba(0,0,0,.06)' },
+          ticks: {
+            font: { size: 9 },
+            color: '#888',
+            callback: function(v) { return 'R$' + Math.round(v); }
+          },
+          min: 0,
+          suggestedMax: maxY
+        }
+      }
+    }
+  });
+
+  if (ins) {
+    const msgs = [];
+    if (diff >= 0) {
+      msgs.push('Acumulado ' + R2(fatMes) + ' — ' + (pctDiff > 0 ? pctDiff + '% acima' : 'no ritmo')
+        + ' do projetado para o dia ' + hojeD + ' (' + R2(projHoje) + ' esperado).');
+    } else {
+      msgs.push('Acumulado ' + R2(fatMes) + ' — ' + Math.abs(pctDiff) + '% abaixo do ritmo projetado ('
+        + R2(projHoje) + ' esperado até hoje).');
+    }
+    msgs.push('Fechamento projetado: ' + R2(projFat) + ' com média de ' + R2(mediaDia) + '/dia nos '
+      + diasOp + ' dias com movimento.');
+    ins.style.display = 'block';
+    ins.textContent = msgs.join(' ');
+  }
+}
+
 function renderDecisaoPanel_(d) {
   const panel = document.getElementById('mk-dash-decisao');
   if (!panel || !d) return;
@@ -1664,7 +1803,7 @@ function renderChartsBody_(d) {
   if (!d) return;
   if (typeof renderSemanasChart_ === 'function') renderSemanasChart_(d);
   if (!window.Chart) return;
-  [chartDiario, chartExtrasDia, chartHoras, chartMetaDia].forEach(c => c && c.destroy());
+  [chartDiario, chartExtrasDia, chartHoras, chartMetaDia, chartReceitaMes].forEach(c => c && c.destroy());
 
   const BLUE='#29B6F6',PINK='#F06292',GREEN='#2E7D32',AMBER='#FF8A65',GOLD='#FFD54F',GRID='rgba(21,101,192,.08)';
   const PLAN_LABELS = {'10min':'10 min','20min':'20 min','30min':'30 min','40min':'40 min','60min':'1 hora','3h':'3 horas'};
@@ -1776,6 +1915,7 @@ function renderChartsBody_(d) {
   }
 
   renderMetaDiaChart_(d);
+  renderReceitaMesChart_(d);
 
   // Horários de pico
   const horasDat = (d.horasPico||[]).map((v,i)=>({h:(9+i)+'h',v:Number(v)||0}));
