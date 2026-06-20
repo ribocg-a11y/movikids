@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>MOVI KIDS — Mockup Meta Raykelly (protótipo)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../mk-design.css?v=1.8.71">
+  <link rel="stylesheet" href="../../mk-app.css?v=1.8.71">
+  <style>
+    body { margin: 0; background: var(--bg, #EEF2F8); font-family: Nunito, system-ui, sans-serif; color: var(--txt, #1a1a2e); }
+    .mock-top {
+      background: var(--blue-dk, #0D47A1);
+      color: #fff;
+      text-align: center;
+      padding: 10px 14px;
+      font-size: 11px;
+      font-weight: 800;
+      line-height: 1.45;
+    }
+    .mock-top strong { color: var(--gold, #FFD54F); }
+    .mock-shell { max-width: 520px; margin: 0 auto; padding: 16px 14px 100px; }
+    .mock-ctrl {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 16px;
+      padding: 12px;
+      background: var(--card);
+      border: 1px dashed var(--border);
+      border-radius: 14px;
+    }
+    .mock-ctrl label { font-size: 11px; font-weight: 800; color: var(--txt2); width: 100%; }
+    .mock-ctrl input[type=range] { flex: 1; min-width: 120px; }
+    .mock-ctrl button {
+      flex: 1;
+      min-width: 100px;
+      padding: 10px 8px;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      background: var(--card);
+      font: inherit;
+      font-weight: 800;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .mock-ctrl button.on { border-color: var(--blue); background: #E8F2FF; color: var(--blue); }
+    .mock-context {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--txt2);
+      margin-bottom: 12px;
+      text-align: center;
+    }
+
+    /* ── Hero meta (proposta produção) ── */
+    .mk-meta-hero {
+      position: relative;
+      overflow: hidden;
+      border-radius: 18px;
+      padding: 18px 16px 16px;
+      margin-bottom: 14px;
+      background: linear-gradient(135deg, #FFF8E1 0%, #FFECB3 45%, #FFE082 100%);
+      border: 2px solid #FFB300;
+      box-shadow: 0 8px 24px rgba(251, 140, 0, 0.18);
+      transition: transform 0.35s ease, box-shadow 0.35s ease;
+    }
+    .mk-meta-hero.is-celebrate {
+      background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 40%, #A5D6A7 100%);
+      border-color: #43A047;
+      box-shadow: 0 12px 32px rgba(46, 125, 50, 0.25);
+      animation: mkMetaPop 0.5s ease;
+    }
+    @keyframes mkMetaPop {
+      0% { transform: scale(0.96); }
+      60% { transform: scale(1.02); }
+      100% { transform: scale(1); }
+    }
+    .mk-meta-hero-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .mk-meta-hero-badge {
+      font-size: 10px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #E65100;
+      background: rgba(255, 255, 255, 0.75);
+      padding: 4px 10px;
+      border-radius: 999px;
+    }
+    .mk-meta-hero.is-celebrate .mk-meta-hero-badge {
+      color: #2E7D32;
+    }
+    .mk-meta-hero-progress {
+      font-family: 'Fredoka One', cursive;
+      font-size: 22px;
+      color: #E65100;
+      line-height: 1;
+    }
+    .mk-meta-hero.is-celebrate .mk-meta-hero-progress { color: #2E7D32; }
+    .mk-meta-hero-count {
+      display: flex;
+      align-items: baseline;
+      justify-content: center;
+      gap: 8px;
+      margin: 8px 0 12px;
+    }
+    .mk-meta-hero-num {
+      font-family: 'Fredoka One', cursive;
+      font-size: 56px;
+      line-height: 1;
+      color: #FB8C00;
+      text-shadow: 0 2px 0 rgba(255, 255, 255, 0.6);
+    }
+    .mk-meta-hero.is-celebrate .mk-meta-hero-num { color: #2E7D32; font-size: 48px; }
+    .mk-meta-hero-count-lbl {
+      font-size: 15px;
+      font-weight: 900;
+      color: #BF360C;
+      max-width: 110px;
+      line-height: 1.25;
+      text-align: left;
+    }
+    .mk-meta-hero.is-celebrate .mk-meta-hero-count-lbl { color: #1B5E20; max-width: none; }
+    .mk-meta-hero-phrase {
+      font-size: 16px;
+      font-weight: 900;
+      line-height: 1.45;
+      color: #5D4037;
+      text-align: center;
+      margin: 0 0 12px;
+    }
+    .mk-meta-hero.is-celebrate .mk-meta-hero-phrase {
+      font-family: 'Fredoka One', cursive;
+      font-size: 20px;
+      color: #1B5E20;
+    }
+    .mk-meta-hero-bar {
+      height: 10px;
+      background: rgba(255, 255, 255, 0.65);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+    .mk-meta-hero-bar-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #FB8C00, #FFB300);
+      transition: width 0.6s cubic-bezier(0.34, 1.4, 0.64, 1);
+    }
+    .mk-meta-hero.is-celebrate .mk-meta-hero-bar-fill {
+      background: linear-gradient(90deg, #43A047, #66BB6A);
+    }
+    .mk-meta-hero-foot {
+      font-size: 11px;
+      font-weight: 700;
+      color: #8D6E63;
+      text-align: center;
+    }
+    .mk-meta-hero.is-celebrate .mk-meta-hero-foot { color: #2E7D32; }
+
+    /* Balões */
+    .mk-meta-balloons {
+      pointer-events: none;
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
+    .mk-meta-hero.is-celebrate .mk-meta-balloons { opacity: 1; }
+    .mk-balloon {
+      position: absolute;
+      bottom: -40px;
+      font-size: 28px;
+      animation: mkBalloonUp 4s ease-in infinite;
+    }
+    @keyframes mkBalloonUp {
+      0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+      10% { opacity: 1; }
+      100% { transform: translateY(-220px) rotate(12deg); opacity: 0; }
+    }
+
+    /* Confete canvas */
+    #mk-confetti-canvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    /* Mini preview cards originais */
+    .mk-stat-row.stats-bar { margin-bottom: 14px; }
+    .mock-note {
+      font-size: 12px;
+      font-weight: 700;
+      padding: 12px;
+      border-radius: 12px;
+      background: #E3F2FD;
+      border: 1px solid #90CAF9;
+      color: #1565C0;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="mk-confetti-canvas" aria-hidden="true"></canvas>
+
+  <div class="mock-top">
+    <strong>PROTÓTIPO</strong> — Meta operador Raykelly · não é produção ·
+    <a href="../../index.html?force=1.8.71" style="color:#FFD54F">balcão real</a>
+  </div>
+
+  <div class="mock-shell">
+    <p class="mock-context">Como ficaria no card da Home quando Raykelly está logada</p>
+
+    <div class="mock-ctrl" role="group" aria-label="Simular estados">
+      <label>Locações no turno: <strong id="lbl-n">15</strong> / 20</label>
+      <input type="range" id="rng-n" min="0" max="22" value="15" aria-label="Locações no turno">
+      <button type="button" id="btn-chase" class="on">Reta final</button>
+      <button type="button" id="btn-done">Meta batida 🎉</button>
+      <button type="button" id="btn-bonus">Bônus 21+ 🎊</button>
+    </div>
+
+    <!-- Proposta: substitui / expande #stat-meta-tile -->
+    <div class="mk-meta-hero" id="meta-hero" role="status" aria-live="polite">
+      <div class="mk-meta-balloons" id="balloons" aria-hidden="true"></div>
+      <div class="mk-meta-hero-head">
+        <span class="mk-meta-hero-badge">Meta · Raykelly</span>
+        <span class="mk-meta-hero-progress" id="hero-ratio">15/20</span>
+      </div>
+      <div class="mk-meta-hero-count" id="hero-count-wrap">
+        <span class="mk-meta-hero-num" id="hero-num">5</span>
+        <span class="mk-meta-hero-count-lbl" id="hero-count-lbl">locações<br>para a meta</span>
+      </div>
+      <p class="mk-meta-hero-phrase" id="hero-phrase">Raykelly, reta final! Cada família conta — você consegue! 💪</p>
+      <div class="mk-meta-hero-bar" aria-hidden="true">
+        <div class="mk-meta-hero-bar-fill" id="hero-bar"></div>
+      </div>
+      <p class="mk-meta-hero-foot" id="hero-foot">Turno 10h–20h · bônus R$ 100 na 21ª locação</p>
+    </div>
+
+    <div class="mk-stat-row stats-bar">
+      <div class="mk-stat-tile stat-card"><div class="stat-val mk-stat-val">0</div><div class="stat-lbl mk-stat-lbl">Ativas agora</div></div>
+      <div class="mk-stat-tile stat-card"><div class="stat-val mk-stat-val" id="mini-enc">15</div><div class="stat-lbl mk-stat-lbl">Encerradas hoje</div></div>
+    </div>
+
+    <p class="mock-note">
+      <strong>Produção (próximo passo):</strong> integrar em <code>mk-meta-operador.js</code> + CSS em <code>mk-design.css</code>.
+      Confete dispara uma vez ao cruzar 20/20; toast + animação leve na 21ª (bônus).
+      Frases rotacionam a cada nova loc encerrada no turno.
+    </p>
+  </div>
+
+  <script>
+    (function () {
+      var META = 20;
+      var BONUS = 100;
+      var PHRASES = [
+        'Raykelly, reta final! Cada família conta — você consegue! 💪',
+        'Quase lá! Mais {faltam} aventuras e a meta é sua ✨',
+        'Você manda! Faltam só {faltam} — foco na reta final 🎯',
+        'Cada sorriso na loja te aproxima da meta. Bora! 🚗💛',
+        'Raykelly, {faltam} locações te separam do R$ ' + BONUS + ' extra! 🔥'
+      ];
+      var PHRASES_DONE = [
+        'META BATIDA! Raykelly, você arrasou hoje! 🏆',
+        'Parabéns, Raykelly! 20 locações — orgulho Movi Kids! 🎉',
+        'Isso aí! Meta do turno conquistada com maestria! ⭐'
+      ];
+      var PHRASES_BONUS = [
+        'BÔNUS GARANTIDO! +R$ ' + BONUS + ' no holerite — sensacional! 🎊',
+        'Raykelly campeã! Mais uma locação = mais R$ ' + BONUS + '! 🌟'
+      ];
+
+      var n = 15;
+      var lastCelebrate = false;
+      var hero = document.getElementById('meta-hero');
+      var rng = document.getElementById('rng-n');
+      var lblN = document.getElementById('lbl-n');
+      var miniEnc = document.getElementById('mini-enc');
+
+      function faltam() { return Math.max(0, META - n); }
+
+      function pickPhrase(list, f) {
+        var tpl = list[Math.floor(Math.random() * list.length)];
+        return tpl.replace(/\{faltam\}/g, String(f));
+      }
+
+      function spawnBalloons() {
+        var box = document.getElementById('balloons');
+        box.innerHTML = '';
+        var emojis = ['🎈', '🎈', '🎈', '🎊', '⭐', '🎉'];
+        for (var i = 0; i < 8; i++) {
+          var b = document.createElement('span');
+          b.className = 'mk-balloon';
+          b.textContent = emojis[i % emojis.length];
+          b.style.left = (8 + i * 11 + Math.random() * 6) + '%';
+          b.style.animationDelay = (i * 0.35) + 's';
+          b.style.fontSize = (22 + Math.random() * 14) + 'px';
+          box.appendChild(b);
+        }
+      }
+
+      /* Confetti leve — canvas */
+      var canvas = document.getElementById('mk-confetti-canvas');
+      var ctx = canvas.getContext('2d');
+      var pieces = [];
+      var animating = false;
+
+      function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+      window.addEventListener('resize', resizeCanvas);
+      resizeCanvas();
+
+      function fireConfetti() {
+        pieces = [];
+        var colors = ['#FFD54F', '#FB8C00', '#29B6F6', '#66BB6A', '#EF5350', '#AB47BC'];
+        for (var i = 0; i < 120; i++) {
+          pieces.push({
+            x: Math.random() * canvas.width,
+            y: -20 - Math.random() * 80,
+            w: 6 + Math.random() * 6,
+            h: 10 + Math.random() * 8,
+            vy: 2 + Math.random() * 4,
+            vx: -2 + Math.random() * 4,
+            rot: Math.random() * 360,
+            vr: -6 + Math.random() * 12,
+            c: colors[i % colors.length]
+          });
+        }
+        if (!animating) {
+          animating = true;
+          tickConfetti();
+        }
+      }
+
+      function tickConfetti() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        var alive = 0;
+        pieces.forEach(function (p) {
+          p.y += p.vy;
+          p.x += p.vx;
+          p.rot += p.vr;
+          if (p.y < canvas.height + 40) alive++;
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.rot * Math.PI / 180);
+          ctx.fillStyle = p.c;
+          ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+          ctx.restore();
+        });
+        if (alive > 0) requestAnimationFrame(tickConfetti);
+        else { animating = false; ctx.clearRect(0, 0, canvas.width, canvas.height); }
+      }
+
+      function render(mode) {
+        var f = faltam();
+        lblN.textContent = String(n);
+        miniEnc.textContent = String(n);
+        rng.value = String(n);
+        document.getElementById('hero-ratio').textContent = n + '/' + META;
+        document.getElementById('hero-bar').style.width = Math.min(100, (n / META) * 100) + '%';
+
+        hero.classList.remove('is-celebrate');
+        document.getElementById('hero-count-wrap').style.display = '';
+
+        if (mode === 'bonus' || n > META) {
+          hero.classList.add('is-celebrate');
+          document.getElementById('hero-num').textContent = n + '/' + META + '+';
+          document.getElementById('hero-count-lbl').innerHTML = 'bônus<br>garantido!';
+          document.getElementById('hero-phrase').textContent = pickPhrase(PHRASES_BONUS, 0);
+          document.getElementById('hero-foot').textContent = '+' + (n - META) + ' acima da meta · R$ ' + BONUS + ' creditado no turno';
+          spawnBalloons();
+          if (!lastCelebrate) fireConfetti();
+          lastCelebrate = true;
+          return;
+        }
+
+        if (mode === 'done' || (n >= META && n <= META)) {
+          if (n >= META) {
+            hero.classList.add('is-celebrate');
+            document.getElementById('hero-num').textContent = '✓';
+            document.getElementById('hero-count-lbl').innerHTML = 'meta<br>conquistada!';
+            document.getElementById('hero-phrase').textContent = pickPhrase(PHRASES_DONE, 0);
+            document.getElementById('hero-foot').textContent = 'Parabéns, Raykelly! Agora cada loc extra vale R$ ' + BONUS;
+            spawnBalloons();
+            if (!lastCelebrate) fireConfetti();
+            lastCelebrate = true;
+            return;
+          }
+        }
+
+        lastCelebrate = false;
+        document.getElementById('hero-num').textContent = String(f);
+        document.getElementById('hero-count-lbl').innerHTML = f === 1 ? 'locação<br>para a meta' : 'locações<br>para a meta';
+        document.getElementById('hero-phrase').textContent = pickPhrase(PHRASES, f);
+        document.getElementById('hero-foot').textContent = 'Turno 10h–20h · bônus R$ ' + BONUS + ' na ' + (META + 1) + 'ª locação';
+      }
+
+      rng.addEventListener('input', function () {
+        n = parseInt(rng.value, 10) || 0;
+        document.querySelectorAll('.mock-ctrl button').forEach(function (b) { b.classList.remove('on'); });
+        render('chase');
+      });
+
+      document.getElementById('btn-chase').addEventListener('click', function () {
+        n = parseInt(rng.value, 10) || 14;
+        document.querySelectorAll('.mock-ctrl button').forEach(function (b) { b.classList.remove('on'); });
+        this.classList.add('on');
+        render('chase');
+      });
+      document.getElementById('btn-done').addEventListener('click', function () {
+        n = META;
+        rng.value = String(META);
+        document.querySelectorAll('.mock-ctrl button').forEach(function (b) { b.classList.remove('on'); });
+        this.classList.add('on');
+        lastCelebrate = false;
+        render('done');
+      });
+      document.getElementById('btn-bonus').addEventListener('click', function () {
+        n = 21;
+        rng.value = '21';
+        document.querySelectorAll('.mock-ctrl button').forEach(function (b) { b.classList.remove('on'); });
+        this.classList.add('on');
+        lastCelebrate = false;
+        render('bonus');
+      });
+
+      render('chase');
+    })();
+  </script>
+</body>
+</html>
