@@ -1,9 +1,10 @@
 # MOVI KIDS — Planejamento atual (pós-FASE 5)
 
-**Atualizado:** 18/06/2026 (FASE 15 · I29/I30 · Design System v1.0 · FE v1.8.49 · GAS v1.5.99)  
-**Produção:** FE **v1.8.49** · GAS repo **v1.5.99** (Nova versão Web se ping &lt; repo)  
+**Atualizado:** 20/06/2026 (FASE 15 · jornada v1.5.110 · FE v1.8.66 · **Plano Premium One UI FASES 16–22**)  
+**Produção:** FE **v1.8.66** · GAS repo **v1.5.110** (Nova versão Web se ping &lt; repo)  
 **Documentos irmãos:** `PLANO_PRIORIDADES_2026-06.md` · `PLANO_CONTINUIDADE_2026-06.md` · `HANDOFF_NOVO_CHAT.md`  
-**Ciclo ativo:** **`PLANO_FASES_6_15_COCKPIT_EXECUTIVO_2026-06.md`** · FASE 15: **`FASE_15_GESTAO_PESSOAS.md`** 🟡 · I29/I30 · **`DESIGN_SYSTEM_MOVIKIDS.md`**
+**Ciclo ativo:** **`PLANO_FASES_6_15_COCKPIT_EXECUTIVO_2026-06.md`** · FASE 15: **`FASE_15_GESTAO_PESSOAS.md`** 🟡  
+**Próximo ciclo:** **`PLANO_PREMIUM_ONEUI_FASES_16_22_2026-06.md`** ← manual Premium + One UI (20/06/2026)
 
 ---
 
@@ -11,7 +12,27 @@
 
 Ciclo **FASE 0–5 + P2/P3 concluído** (07–09/06/2026). Balcão homologado, portal QR, payback, CONFIG e APIs unificadas.
 
-**Modo atual:** **FASE 15 Gestão Pessoas** 🟡 FE **v1.8.49** (I29 DNA) · GAS **v1.5.99** (I30 abas RH) · **Design System v1.0** · FASE 14 mini-DRE ✅ · pendente homolog tablet + Nova versão Web GAS.
+**Modo atual:** **FASE 15 Gestão Pessoas** 🟡 (jornada v1.5.110 · FE v1.8.66) · **FASE 16 Premium One UI** 🔜 próximo · FASE 14 mini-DRE ✅
+
+---
+
+## 1b. Próximo ciclo — Premium + One UI (FASES 16–22)
+
+**Documento mestre:** [`PLANO_PREMIUM_ONEUI_FASES_16_22_2026-06.md`](PLANO_PREMIUM_ONEUI_FASES_16_22_2026-06.md)  
+**Origem:** Manual Plataforma Gestão Premium (26/06/2026)
+
+| Fase | Nome | Prioridade | Foco |
+|------|------|------------|------|
+| **16** | Premium One UI + Centro de Comando | **P1** | KPI com contexto · tempo real · tipografia leve |
+| **15b** | RH completo (comunicados, histórico, avaliações) | **P1** | Colaborador: *"sei o que fazer e acompanho crescimento"* |
+| **17** | Alertas inteligentes + permissões Gestor | **P1** | Banco horas, queda fat, frota parada |
+| **18** | Financeiro + previsão | P2 | Projeção mês · comparativo 30d |
+| **19** | Performance + gamificação saudável | P2 | Ranking opt-in · conquistas · badges |
+| **20** | Portal analytics + CONFIG UI | P2 | Herda FASE 15 original |
+| **21** | Live BI frota | P2 | Herda FASE 13 |
+| **22** | Assistente IA gestão | P3 | Anexo — decisão sócio |
+
+**Sequência imediata:** fechar FASE 15 (GAS v1.5.110 + homolog) → kickoff FASE 16 mock comando.
 
 ---
 
