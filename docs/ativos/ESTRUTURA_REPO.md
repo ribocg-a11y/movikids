@@ -108,6 +108,6 @@ Ver **`MAPA_FASES.md`** para tradução FASE 15 cockpit vs Gestão Pessoas vs Pr
 |------|-------------|
 | 27× `DEPLOY_*.md` em `ativos/` | ✅ movidos para `docs/arquivo/deploy/` (20/06) |
 | Mockups duplicados em `assets/` | Unificar links para `ponto-mockup.html` |
-| `HOMOLOGACAO_PRODUCAO_ASSISTIDA.md` | Obsoleto — usar `CHECKLIST_FASE5` + `TESTE_TABLET_*` |
+| `HOMOLOGACAO` legado v1.6 | Arquivado em `docs/arquivo/HOMOLOGACAO_*_OBSOLETO.md` |
 
 **Não fazer** sem janela: mover `mk-*.js`, mudar paths do portal, ou apagar mockups sem redirect.

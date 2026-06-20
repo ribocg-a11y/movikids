@@ -160,7 +160,7 @@ Legenda: **P0** bloqueia operação · **P1** valor imediato · **P2** próximo 
 | Publicar FE | `REGRAS_DE_PUBLICACAO_SEGURA.md` | `pre-push-check` → push |
 | Publicar GAS | `DEPLOY_GAS_v1.5.32_AUTH.md` | Nova versão Web |
 | Testar deploy | `PROTOCOLO_DIAGNOSTICO_E_TESTES.md` | `TESTE_PROTOCOLO_DIAGNOSTICO.ps1` · P3: `TESTE_P3_READONLY.ps1` |
-| Homologação tablet | `HOMOLOGACAO_PRODUCAO_ASSISTIDA.md` | Checklists K/L/FASE5 |
+| Homologação tablet | `CHECKLIST_FASE5_TABLET.md` | Checklists K/L/FASE5 |
 | Mock idle homolog | `assets/mock-idle-homolog.html` | HTTPS mesmo domínio |
 | Incidente novo | `MAPA_ERROS_FALHAS_BUGS.md` | + `docs/arquivo/incidentes/` |
 | Arquitetura | `MAPA_CODIGO_ARQUITETURA.md` | Fluxos F0–F14 |

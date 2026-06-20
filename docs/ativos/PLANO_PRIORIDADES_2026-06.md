@@ -229,7 +229,7 @@ Objetivo: balcão mais rápido; menos ruído visual. **Próximo pacote de featur
 | **12** | Drill-down + simulação | P2 | v1.8.8 | v1.5.80 | Dashboard gráficos |
 | **13** | Live BI Firebase | P2 | v1.8.9 | v1.5.81 | Widget frota live |
 | **14** | Plano contas + mini-DRE | P2 | v1.8.16 | v1.5.82 | Cascata margens · 🟡 docs 11/06 |
-| **15** | Gestão Pessoas / holerite | P1 | v1.8.68 | v1.5.111 (repo) | `gestao-pessoas.html` |
+| **15** | Gestão Pessoas / holerite | P1 | **v1.8.71** | v1.5.111 (repo · ping v1.5.107) | `gestao-pessoas.html` · `mk-holerite.js` |
 
 ---
 
@@ -291,7 +291,7 @@ Todos em `docs/ativos/` salvo indicação. Índice completo: `docs/INDICE.md`.
 | Payback fórmulas | `MEMORIAL_PAYBACK_INVESTIMENTO.md` |
 | **Ciclo FASE 6–15 (cockpit/UX/financeiro)** | **`PLANO_FASES_6_15_COCKPIT_EXECUTIVO_2026-06.md`** |
 | Portal / QR | `DECISAO_COMUNICACAO_QR_CODE_2026-06.md` |
-| Tablet QA | `HOMOLOGACAO_PRODUCAO_ASSISTIDA.md`, `CHECKLIST_PACOTE_K.md` |
+| Tablet QA | `CHECKLIST_FASE5_TABLET.md`, `TESTE_TABLET_F5_F7_F10_F11.ps1` |
 | Roadmap sprints | `PLANO_CONTINUIDADE_2026-06.md` |
 | **Prioridades** | **este arquivo** |
 

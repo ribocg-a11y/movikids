@@ -66,7 +66,7 @@
 | C.3 | Clicar ▶ | **⏳ Iniciando…** imediato; ativo ~**10:00** (±1 s), não 09:33 | [ ] |
 | C.4 | Encerrar locação teste | Sai das ativas | [ ] |
 
-Ref. completa: `HOMOLOGACAO_PRODUCAO_ASSISTIDA.md` seção **H**.
+Ref. completa: `CHECKLIST_FASE5_TABLET.md` + `TESTE_TABLET_F5_F7_F10_F11.ps1`.
 
 ---
 

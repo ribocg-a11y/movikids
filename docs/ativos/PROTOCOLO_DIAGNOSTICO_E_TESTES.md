@@ -2,7 +2,7 @@
 
 **Criado:** 07/06/2026 · **Atualizado:** 14/06/2026 (I25 fechado · PROTOCOLO_ATUALIZAR_TUDO)  
 **Função:** quando o usuário pedir *“rodar teste”*, *“diagnosticar”* ou *“validar deploy”*, o agente **segue este documento** — não improvisa escopo.  
-**Complementa:** `MAPA_ERROS_FALHAS_BUGS.md`, `INCIDENTE_I20_CRONOMETRO_RESOLUCAO_2026-06-07.md`, `MAPA_CODIGO_ARQUITETURA.md`, `HOMOLOGACAO_PRODUCAO_ASSISTIDA.md`
+**Complementa:** `MAPA_ERROS_FALHAS_BUGS.md`, `INCIDENTE_I20_CRONOMETRO_RESOLUCAO_2026-06-07.md`, `MAPA_CODIGO_ARQUITETURA.md`, `CHECKLIST_FASE5_TABLET.md`
 
 **Orquestrador:** `scripts/testes/TESTE_PROTOCOLO_DIAGNOSTICO.ps1`
 
@@ -75,6 +75,8 @@ Cada fluxo tem: **arquivos**, **incidentes**, **teste automático**, **tablet ob
 | **F13** | CRM relacionamento | busca responsável, badge cadastro | `index.html` rel, GAS | K.3 | `TESTE_RELACIONAMENTO` | opcional |
 | **F14** | HTTP / escrita browser | GET nas 5 actions críticas | `mk-api.js` | **I15** | `TESTE_PARIDADE_HTTP` | ✅ |
 | **F15** | Gestão Pessoas / RH | abas planilha, login colaborador, alertas ponto ADM | `gestao-pessoas.html`, `mk-gestao-pessoas*.js`, `mk-holerite.js`, GAS RH | I29–I34 | `TESTE_GESTAO_PESSOAS_READONLY` | PC / celular holerite |
+| **F16** | PWA boot / cache / force update | `?force=`, SW, stale sync, boot lento | `sw.js`, `mk-stale-sync.js`, `mk-cache-bust.js`, `mk-boot.js` | **I33** | F0 + `verify-publish-complete` | Tablet `?force=` |
+| **F17** | CONFIG admin (readonly) | frota/preços/encoding UTF-8 | GAS CONFIG + `salvarOperacaoConfigAdmin` | **I31** | `TESTE_OPERACAO_CONFIG_READONLY` | PC admin |
 
 ### 2.1 Grafo — o que conecta com o quê (zona sensível)
 
@@ -254,7 +256,7 @@ O orquestrador **completo** inclui scripts que **gravam** locações de teste. Q
 
 ## 6. Roteiro manual por fluxo (tablet + celular)
 
-Detalhe em `HOMOLOGACAO_PRODUCAO_ASSISTIDA.md` seções A–H. Resumo mínimo:
+Detalhe em `CHECKLIST_FASE5_TABLET.md` + `TESTE_TABLET_F5_F7_F10_F11.ps1`. Resumo mínimo:
 
 | Fluxo | Passos | Critério de aceite |
 |-------|--------|-------------------|

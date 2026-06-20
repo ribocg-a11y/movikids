@@ -1,6 +1,6 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 20/06/2026 (sessão operação — I31–I34 · holerite v1.8.71 · FE **v1.8.71** · GAS repo **v1.5.111** · ping prod. **v1.5.107** — publicar Web)  
+**Atualizado:** 20/06/2026 (doc alinhado · operação **LIVRE** 0 loc · I31–I34 · FE **v1.8.71** · GAS repo **v1.5.111** · ping **v1.5.107**)  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **Repo local:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`  
@@ -56,7 +56,7 @@ Mensagem mínima: *"Vamos dar continuidade ao projeto Movi Kids, tem uma pasta n
 | **Gestão Pessoas** | **v1.8.71** | https://ribocg-a11y.github.io/movikids/gestao-pessoas.html?force=1.8.71 |
 | **Service Worker** | **1.8.71** | `sw.js` |
 | **Holerite** | **mk-holerite.js** | CNPJ **66.664.255/0001-67** · PDF/imprimir |
-| **Apps Script (ping)** | repo **v1.5.111** · ping prod. **v1.5.107** | **Nova versão Web** no deploy `AKfycbwakQ...` (pendente) |
+| **Apps Script** | repo **v1.5.111** · Web **versão 165** (20/06 15:05) · ping string **v1.5.107** (cosmético) | ✅ funcional — Carro 04 + 10 veículos confirmados |
 | **Aba FOLHA** | **OK** (I25) | B68 ~5269,96 |
 | **Design System** | **v1.0** | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
 
@@ -82,21 +82,38 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 | 4 | `ESTADO_ATUAL.md` | Versões, entregas |
 | 5 | `MAPA_ERROS_FALHAS_BUGS.md` | I29–I34 + travas |
 | 6 | `REGRAS_DE_PUBLICACAO_SEGURA.md` | Push/deploy |
-| 7 | `../INDICE.md` | Mapa docs |
+| 7 | `MAPA_FASES.md` · `DEPLOY_ATUAL.md` · `ESTRUTURA_REPO.md` | Fases · deploy · layout repo |
+| 8 | `../INDICE.md` | Mapa docs |
 
 ---
 
+## Documentação — alinhamento (20/06/2026) ✅
+
+| Entrega | Doc |
+|---------|-----|
+| Versão única deploy | `DEPLOY_ATUAL.md` |
+| Tradução fases 15/16 | `MAPA_FASES.md` |
+| Layout GitHub / raiz | `ESTRUTURA_REPO.md` |
+| Deploy histórico | `docs/arquivo/deploy/` (26 movidos) |
+| Protocolo F15–F17 | `PROTOCOLO_DIAGNOSTICO_E_TESTES.md` |
+| Teste RH readonly | `TESTE_GESTAO_PESSOAS_READONLY.ps1` |
+| Homolog v1.6 obsoleto | `docs/arquivo/HOMOLOGACAO_*_OBSOLETO.md` |
+
+**Fonte de verdade versão:** `mk-version.js` → ping GAS → `DEPLOY_ATUAL.md` → este handoff.
+
 ## Próximo passo (20/06/2026)
 
-**FASE 15** homolog + GAS Web pendente · **FASE 16 Premium** ⏸ janela segura
+**FASE 15** homolog tablet pendente · **FASE 16 Premium** ⏸ janela segura
 
 | # | Ação | Quem |
 |---|------|------|
-| 1 | **Nova versão Web GAS v1.5.111** — Carro 04, CPF admin holerite, jornada | **Você** (janela sem loc) |
+| 1 | ~~Nova versão Web GAS v1.5.111~~ | ✅ **Feito** — versão **165** (20/06 15:05) · Carro 04 OK em prod |
 | 2 | Tablet loja: **1 locação** pós-I32 + boot `?force=1.8.71` | **Você** |
 | 3 | Validar holerite Raykelly (PDF + CNPJ) admin e colaborador | **Você** |
 | 4 | Investigar latência `carregarInicio` (~6s) se tablet lento (I33) | **Agente** |
-| 5 | Kickoff FASE 16 mock — **só após janela segura** | **Agente/dev** |
+| 5 | Kickoff FASE 16 mock — **só após homolog tablet** | **Agente/dev** |
+
+**Nota ping:** `action=ping` ainda retorna string `v1.5.107` (esquecido no bump v1.5.111) — **não afeta operação**; CONFIG/RH já em v1.5.111.
 
 Doc: `FASE_15_GESTAO_PESSOAS.md` · fases: **`MAPA_FASES.md`** · incidentes **I31–I34**
 
@@ -110,7 +127,7 @@ Doc: `FASE_15_GESTAO_PESSOAS.md` · fases: **`MAPA_FASES.md`** · incidentes **I
 | **I32** | Locação duplicada + SMS legado no Fechar | P0 | ✅ Fechado FE | `4485c09` · upsert + qr_only · doc `INCIDENTE_I32_*` |
 | **I33** | Tablet lento / não carrega | P1 | 🟡 Mitigado | Force update v1.8.69–71 · boot ~6s GAS aberto · doc `INCIDENTE_I33_*` |
 | **I34** | Holerite apresentação + CNPJ fictício | P2 | ✅ Fechado FE | `740d4ce`/`389552a` · `mk-holerite.js` · CNPJ **66.664.255/0001-67** |
-| **I26** | GAS repo v1.5.111 ≠ ping v1.5.107 | P1 | 🟡 Aberto | Nova versão Web pendente (Carro 04, cpf admin) |
+| **I26** | GAS repo v1.5.111 ≠ ping v1.5.107 | P1 | ✅ Fechado | Nova versão Web **165** 20/06 · funcional OK · ping string cosmética |
 
 **Entregas FE nesta sessão (commits):**
 
@@ -194,4 +211,4 @@ Esperado: ping alinhado ao header `.gs` · Pages **1.8.71** · pre-push verde.
 
 ---
 
-*Próxima revisão: após Nova versão Web GAS v1.5.111 + homologação tablet I32/I33.*
+*Próxima revisão: após homologação tablet I32/I33 + holerite.*

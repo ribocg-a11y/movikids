@@ -137,7 +137,7 @@ FASE 22  Assistente IA gestão (Anexo — decisão sócio)
 
 | ID | Entrega | Status base |
 |----|---------|-------------|
-| 15b.1 | Jornada escala × ponto + banco projetado | 🟡 v1.5.111 / v1.8.68 |
+| 15b.1 | Jornada escala × ponto + banco projetado | 🟡 v1.5.111 repo / **v1.8.71** FE |
 | 15b.2 | Holerite quinzenal admin + colaborador | ✅ v1.5.108 / v1.8.64 |
 | 15b.3 | **Comunicados** — faixa no hub colaborador (planilha `COMUNICADOS_RH`) | Novo |
 | 15b.4 | **Histórico desempenho** — loc/mês, metas atingidas, gráfico evolução | Novo |
@@ -306,7 +306,7 @@ Widget live: % frota em uso agora · overlay gráfico ocupação por horário.
 | # | Ação | Responsável | Prazo |
 |---|------|-------------|-------|
 | 1 | Publicar **GAS v1.5.111** (ping ainda v1.5.107) | Sócio | Imediato |
-| 2 | FE **v1.8.68** já publicado (Carro 04 + layout 2x2 carros) | Agente | Concluído |
+| 2 | FE **v1.8.71** em prod (I32–I34 holerite/CNPJ) | Agente | Concluído |
 | 3 | Homolog tablet F5/F7/F10/F11 | Ops loja | Esta semana |
 | 4 | Fechar FASE 15b.1–15b.2 checklist | Dev | Esta semana |
 | 5 | **Kickoff FASE 16** — mock `#mk-command-center` | Dev | Próxima sprint |

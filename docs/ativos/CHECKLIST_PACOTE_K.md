@@ -58,7 +58,7 @@
 ## Critério Sprint 2 fechada
 
 - [x] K.3 + K.4 marcados no tablet (operador) — **08/06/2026**
-- [x] Checklist I.5 (`HOMOLOGACAO_PRODUCAO_ASSISTIDA.md`) fechado — **08/06/2026**
+- [x] Checklist I.5 (`CHECKLIST_FASE5_TABLET.md`; legado `docs/arquivo/HOMOLOGACAO_*_OBSOLETO.md`) fechado — **08/06/2026**
 - [x] Tablet em **v1.7.87** (`?force=1.7.87`)
 
 **Sprint 2 fechada 08/06/2026.** Próximo: **FASE 2 payback** → depois **Pacote L** (Sprint 3). **Comunicação:** só **QR portal** — **não enviar SMS/WhatsApp** (`OPERACAO_COMUNICACAO_QR_ONLY.md`).

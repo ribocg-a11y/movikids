@@ -486,7 +486,7 @@ Nenhuma — usa `kpiMes` existente.
 | 15.2 | Dashboard widget **Acessos portal / locações com QR** | FE |
 | 15.3 | UI **CONFIG** em Sistema — editar frota/preços (FASE 4 backend) | FE + GAS existente |
 | 15.4 | Validação + preview antes de salvar CONFIG | FE |
-| 15.5 | **`TESTE_CONFIG_WRITE_ADMIN.ps1`** | QA |
+| 15.5 | **`TESTE_CONFIG_WRITE_ADMIN.ps1`** | QA — **backlog FASE 20 Premium** (não existe; readonly: `TESTE_OPERACAO_CONFIG_READONLY.ps1`) |
 
 ### Impacto visual
 

@@ -13,7 +13,7 @@ Use **este arquivo** para versão e ordem de publicação. Docs `DEPLOY_v1.5.xx_
 | **Frontend** | **v1.8.71** | https://ribocg-a11y.github.io/movikids/?force=1.8.71 | ✅ Pages |
 | **Gestão Pessoas** | **v1.8.71** | `gestao-pessoas.html?force=1.8.71` | ✅ |
 | **Service Worker** | **1.8.71** | `sw.js` | ✅ |
-| **GAS** | **v1.5.111** (header `.gs`) | ping **v1.5.107** | ⏸ Nova versão Web pendente |
+| **GAS** | **v1.5.111** (header `.gs`) | Web **versão 165** (20/06 15:05) · ping string v1.5.107 | ✅ funcional |
 
 **Ping:** https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec?action=ping
 
@@ -33,11 +33,14 @@ Arquivo no repo: `MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs` (nome 
 
 ## Ordem de publicação (janela segura)
 
-1. `check-operacao-livre.ps1` — sem loc Ativa/Pendente
-2. **GAS:** Editor → Implantar → **Editar** deploy `AKfycbwakQ...` → **Nova versão** (sócio; agente só com pedido §7.3)
-3. Ping → `versao: v1.5.111`
-4. **FE:** `pre-push-check.ps1` → commit → push → `verify-publish-complete.ps1`
-5. Tablet: `?force=1.8.71` + homolog 1 locação se mudou caminho quente
+**Verificado 20/06/2026:** `check-operacao-livre` → **0** loc · Nova versão Web **165** publicada 15:05 · CONFIG prod: **10 veículos incl. Carro 04**
+
+1. `check-operacao-livre.ps1` — sem loc Ativa/Pendente ✅ **20/06**
+2. **GAS editor:** `prepare-gas-push.ps1` ✅ **20/06 15:02** (3 arquivos: Code, appsscript, FinanceiroGeral)
+3. **GAS Web:** Editor → Implantar → **Editar** deploy `AKfycbwakQ...` → **Nova versão** ✅ **165** (20/06 15:05)
+4. Ping → string `v1.5.107` (cosmético) · validar CONFIG/RH em prod
+5. **FE:** `pre-push-check.ps1` → commit → push → `verify-publish-complete.ps1` (se mudou FE)
+6. Tablet: `?force=1.8.71` + homolog 1 locação se mudou caminho quente
 
 **Proibido:** `clasp deploy` sem `-i` · nova implantação GAS · POST no browser (I15).
 

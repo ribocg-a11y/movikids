@@ -73,7 +73,7 @@
 | [DEPLOY_GAS_v1.5.32_AUTH.md](ativos/DEPLOY_GAS_v1.5.32_AUTH.md) | Processo GAS mestre + link `.gs` |
 | [../referencia/FOLHA_PAGAMENTO_MEMORIAL_E_PLANILHA.md](../referencia/FOLHA_PAGAMENTO_MEMORIAL_E_PLANILHA.md) | Memorial aba FOLHA |
 | [arquivo/deploy/](arquivo/deploy/) | **Histórico** — todos `DEPLOY_v1.5.xx` / `DEPLOY_FE_v1.8.xx` (não usar versão) |
-| [HOMOLOGACAO_PRODUCAO_ASSISTIDA.md](ativos/HOMOLOGACAO_PRODUCAO_ASSISTIDA.md) | ⚠️ Obsoleto — usar `CHECKLIST_FASE5` + `TESTE_TABLET_*` |
+| [arquivo/HOMOLOGACAO_PRODUCAO_ASSISTIDA_v1.6_OBSOLETO.md](arquivo/HOMOLOGACAO_PRODUCAO_ASSISTIDA_v1.6_OBSOLETO.md) | ⚠️ **Obsoleto** v1.6 — usar `CHECKLIST_FASE5` + `TESTE_TABLET_*` |
 
 ## Negócio
 
@@ -90,7 +90,7 @@
 | [arquivo/incidentes/](arquivo/incidentes/) | Pós-mortems **I1–I34** |
 | [arquivo/deploy/](arquivo/deploy/) | Deploy notes históricos |
 | [arquivo/planos/](arquivo/planos/) | Planos antigos — **não usar para versão** |
-| [ativos/HOMOLOGACAO_PRODUCAO_ASSISTIDA.md](ativos/HOMOLOGACAO_PRODUCAO_ASSISTIDA.md) | ⚠️ **Obsoleto** — v1.6.x; usar `CHECKLIST_FASE5` + `TESTE_TABLET_*` |
+| [arquivo/HOMOLOGACAO_PRODUCAO_ASSISTIDA_v1.6_OBSOLETO.md](../arquivo/HOMOLOGACAO_PRODUCAO_ASSISTIDA_v1.6_OBSOLETO.md) | ⚠️ **Obsoleto** — v1.6.x; usar `CHECKLIST_FASE5` + `TESTE_TABLET_*` |
 | [../arquivo-historico/](../arquivo-historico/) | GAS legados |
 
 ## App (raiz)

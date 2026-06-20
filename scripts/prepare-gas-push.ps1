@@ -12,5 +12,5 @@ if ($gasId -like 'AKfycbzc*') { Write-Error "DEPLOY_ID morto AKfycbzc no Code.gs
 if ($gasId -like 'AKfycbwkvWg*') { Write-Error "DEPLOY_ID @139 proibido. Canonico: AKfycbwakQ..." }
 
 clasp push --force
-Write-Host "clasp push OK — codigo no editor. NAO publicou Web App." -ForegroundColor Green
+Write-Host "clasp push OK - codigo no editor. NAO publicou Web App." -ForegroundColor Green
 Write-Host "Socio: Implantar -> Editar AKfycbwakQ... -> Nova versao (mesmo ID)" -ForegroundColor Yellow
