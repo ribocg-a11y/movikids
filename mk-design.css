@@ -172,6 +172,8 @@
 .mk-meta-hero {
   position: relative;
   overflow: hidden;
+  flex-shrink: 0;
+  min-height: 168px;
   border-radius: 18px;
   padding: 18px 16px 16px;
   margin-bottom: 14px;
@@ -298,12 +300,14 @@
   10% { opacity: 1; }
   100% { transform: translateY(-220px) rotate(12deg); opacity: 0; }
 }
+.mk-meta-hero[hidden] { display: none !important; }
 .mk-meta-confetti-canvas {
   position: fixed;
   inset: 0;
   pointer-events: none;
   z-index: 9999;
 }
+#page-home .mk-meta-hero:not([hidden]) { display: block; }
 
 .mk-caixa-resumo { margin-bottom: 16px; }
 .mk-stat-hero {
