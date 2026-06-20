@@ -1,6 +1,6 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 20/06/2026 (doc alinhado · operação **LIVRE** 0 loc · I31–I34 · FE **v1.8.71** · GAS repo **v1.5.111** · ping **v1.5.107**)  
+**Atualizado:** 20/06/2026 (doc alinhado · operação **LIVRE** · FASE 15 **homolog tablet ✅** · FE **v1.8.71** · GAS **v1.5.111** Web **165**)  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **Repo local:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`  
@@ -103,17 +103,17 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 
 ## Próximo passo (20/06/2026)
 
-**FASE 15** homolog tablet pendente · **FASE 16 Premium** ⏸ janela segura
+**FASE 15** ✅ homolog tablet · **FASE 16 Premium** — disponível quando você quiser kickoff
 
 | # | Ação | Quem |
 |---|------|------|
-| 1 | ~~Nova versão Web GAS v1.5.111~~ | ✅ **Feito** — versão **165** (20/06 15:05) · Carro 04 OK em prod |
-| 2 | Tablet loja: **1 locação** pós-I32 + boot `?force=1.8.71` | **Você** |
-| 3 | Validar holerite Raykelly (PDF + CNPJ) admin e colaborador | **Você** |
-| 4 | Investigar latência `carregarInicio` (~6s) se tablet lento (I33) | **Agente** |
-| 5 | Kickoff FASE 16 mock — **só após homolog tablet** | **Agente/dev** |
+| 1 | ~~Nova versão Web GAS v1.5.111~~ | ✅ versão **165** (20/06 15:05) |
+| 2 | ~~Tablet: 1 locação pós-I32 + `?force=1.8.71`~~ | ✅ **Homolog loja** (20/06 — sem duplicata, sem SMS no Fechar) |
+| 3 | ~~Holerite Raykelly (PDF + CNPJ admin/colaborador)~~ | ✅ **Homolog loja** (20/06) |
+| 4 | **I33** latência `carregarInicio` — só se tablet ainda lento | **Agente** (sob demanda) |
+| 5 | Kickoff **FASE 16** mock Premium One UI | **Agente/dev** — janela aberta |
 
-**Nota ping:** `action=ping` ainda retorna string `v1.5.107` (esquecido no bump v1.5.111) — **não afeta operação**; CONFIG/RH já em v1.5.111.
+**Nota ping:** `action=ping` ainda retorna string `v1.5.107` (cosmético) — operação e RH OK em v1.5.111.
 
 Doc: `FASE_15_GESTAO_PESSOAS.md` · fases: **`MAPA_FASES.md`** · incidentes **I31–I34**
 
@@ -124,9 +124,9 @@ Doc: `FASE_15_GESTAO_PESSOAS.md` · fases: **`MAPA_FASES.md`** · incidentes **I
 | ID | Evento | Severidade | Status | Fix / evidência |
 |----|--------|------------|--------|-----------------|
 | **I31** | Pelúcias fora de operação — encoding CONFIG | P0 | ✅ Fechado | `salvarOperacaoConfigAdmin` UTF-8 · doc `INCIDENTE_I31_*` |
-| **I32** | Locação duplicada + SMS legado no Fechar | P0 | ✅ Fechado FE | `4485c09` · upsert + qr_only · doc `INCIDENTE_I32_*` |
-| **I33** | Tablet lento / não carrega | P1 | 🟡 Mitigado | Force update v1.8.69–71 · boot ~6s GAS aberto · doc `INCIDENTE_I33_*` |
-| **I34** | Holerite apresentação + CNPJ fictício | P2 | ✅ Fechado FE | `740d4ce`/`389552a` · `mk-holerite.js` · CNPJ **66.664.255/0001-67** |
+| **I32** | Locação duplicada + SMS legado no Fechar | P0 | ✅ Fechado | FE `4485c09` · **re-validado tablet** 20/06 |
+| **I33** | Tablet lento / não carrega | P1 | ✅ Fechado homolog | Force update v1.8.71 · boot OK loja 20/06 |
+| **I34** | Holerite apresentação + CNPJ fictício | P2 | ✅ Fechado | `mk-holerite.js` · CNPJ **66.664.255/0001-67** · **homolog tablet** 20/06 |
 | **I26** | GAS repo v1.5.111 ≠ ping v1.5.107 | P1 | ✅ Fechado | Nova versão Web **165** 20/06 · funcional OK · ping string cosmética |
 
 **Entregas FE nesta sessão (commits):**
@@ -211,4 +211,4 @@ Esperado: ping alinhado ao header `.gs` · Pages **1.8.71** · pre-push verde.
 
 ---
 
-*Próxima revisão: após homologação tablet I32/I33 + holerite.*
+*Próxima revisão: kickoff FASE 16 ou I33 se tablet voltar a travar.*

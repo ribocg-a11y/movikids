@@ -1,6 +1,6 @@
 # FASE 15 — Gestão de Pessoas (produção)
 
-**Atualizado:** 20/06/2026 · GAS repo **v1.5.111** (ping **v1.5.107**) · FE **v1.8.71** · Design System v1.0
+**Atualizado:** 20/06/2026 · GAS **v1.5.111** Web **165** · FE **v1.8.71** · **homolog tablet ✅** · Design System v1.0
 
 ## URLs
 
@@ -45,12 +45,13 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 
 ## Deploy checklist
 
-1. GAS **v1.5.111** → Nova versão Web (`AKfycbwakQ...`)
-2. `instalar-abas-gestao-pessoas-gas.ps1`
-3. FE **v1.8.71** Pages (auth DNA + holerite `mk-holerite.js`)
-4. Homolog: dropdown + 4 PIN + hub 5 portas
-5. Tablet balcão: regressão F5/F7/F10/F11
-6. Readonly RH: `TESTE_GESTAO_PESSOAS_READONLY.ps1`
+1. GAS **v1.5.111** → Nova versão Web (`AKfycbwakQ...`) ✅ **165** (20/06)
+2. `instalar-abas-gestao-pessoas-gas.ps1` ✅
+3. FE **v1.8.71** Pages (auth DNA + holerite `mk-holerite.js`) ✅
+4. Homolog: dropdown + 4 PIN + hub 5 portas ✅
+5. Tablet balcão: regressão F5/F7/F10/F11 + 1 loc pós-I32 ✅ **20/06 loja**
+6. Holerite Raykelly PDF + CNPJ admin/colaborador ✅ **20/06 loja**
+7. Readonly RH: `TESTE_GESTAO_PESSOAS_READONLY.ps1` ✅
 
 ## Incidentes
 

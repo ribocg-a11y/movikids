@@ -59,7 +59,7 @@ Detalhe completo: [`ACESSOS_E_AUTORIZACOES.md`](docs/ativos/ACESSOS_E_AUTORIZACO
 |--------|-------------|---------------|
 | Frontend | **v1.8.71** | https://ribocg-a11y.github.io/movikids/?force=1.8.71 |
 | Gestão Pessoas | **v1.8.71** | `gestao-pessoas.html?force=1.8.71` |
-| GAS | repo **v1.5.111** · ping **v1.5.107** | Nova versão Web no deploy `AKfycbwakQ...` pendente |
+| GAS | repo **v1.5.111** · Web **165** (20/06) | ping string v1.5.107 (cosmético) |
 | Design System | **v1.0** | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
 | Aba FOLHA | OK (I25) | B68 ~5269,96 · `folhaPlanejamento.fonte: FOLHA` |
 | Deploy ID | `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y` | |
@@ -97,8 +97,8 @@ Fonte de verdade: `mk-version.js`, header do `.gs`, ping GAS.
 
 - **FASE 1–9:** ✅ prod
 - **FASE 14 mini-DRE:** ✅ prod (FE v1.8.16+)
-- **FASE 15 Gestão Pessoas:** 🟡 FE v1.8.71 · GAS repo v1.5.111 · I31–I34 registrados · homolog tablet pendente
-- **Pendente:** Nova versão Web GAS (ping v1.5.107), homolog tablet F5/F7/F10/F11 na loja, kickoff FASE 16
+- **FASE 15 Gestão Pessoas:** ✅ FE v1.8.71 · GAS v1.5.111 Web 165 · homolog tablet 20/06
+- **Próximo:** kickoff FASE 16 Premium (quando você quiser)
 
 ## "Atualize tudo"
 

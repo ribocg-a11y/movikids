@@ -38,7 +38,7 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 **Teste rápido GAS (ping):**  
 https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec?action=ping  
-→ produção: `versao: v1.5.107` (repo v1.5.111 — publicar Nova versão Web)
+→ ping string `v1.5.107` (cosmético) · Web **165** funcional · homolog tablet **20/06** ✅
 
 **URL morta (não usar):** `AKfycbzc...` → 404
 

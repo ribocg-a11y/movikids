@@ -26,7 +26,7 @@
 | **Dashboard narrativo + folha prop.** | ✅ prod | FE v1.8.11–1.8.15 · `../arquivo/deploy/DEPLOY_FE_v1.8.15_SEMANA_ATUAL.md` |
 | **FASE 14** Mini-DRE | ✅ prod | FE v1.8.16+ · cascata Dashboard |
 | **FE UX mobile + DNA admin** | ✅ prod | v1.8.23–1.8.30 · I28 · `CHECKLIST_FASE9_DNA_ADMIN.md` |
-| **FASE 15** Gestão Pessoas | 🟡 repo | FE **v1.8.71** · GAS repo **v1.5.111** (ping **v1.5.107**) · I29–I34 · `FASE_15_GESTAO_PESSOAS.md` |
+| **FASE 15** Gestão Pessoas | ✅ prod | FE **v1.8.71** · GAS **v1.5.111** Web **165** · homolog tablet **20/06** · `FASE_15_GESTAO_PESSOAS.md` |
 | **Design System v1.0** | ✅ repo | `DESIGN_SYSTEM_MOVIKIDS.md` · regra Cursor obrigatória |
 
 **Próximo passo imediato:**
@@ -229,7 +229,7 @@ Objetivo: balcão mais rápido; menos ruído visual. **Próximo pacote de featur
 | **12** | Drill-down + simulação | P2 | v1.8.8 | v1.5.80 | Dashboard gráficos |
 | **13** | Live BI Firebase | P2 | v1.8.9 | v1.5.81 | Widget frota live |
 | **14** | Plano contas + mini-DRE | P2 | v1.8.16 | v1.5.82 | Cascata margens · 🟡 docs 11/06 |
-| **15** | Gestão Pessoas / holerite | P1 | **v1.8.71** | v1.5.111 (repo · ping v1.5.107) | `gestao-pessoas.html` · `mk-holerite.js` |
+| **15** | Gestão Pessoas / holerite | P1 | **v1.8.71** ✅ | v1.5.111 Web **165** | `gestao-pessoas.html` · homolog tablet 20/06 |
 
 ---
 

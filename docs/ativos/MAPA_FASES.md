@@ -10,7 +10,7 @@ Evita confusão entre **três planos** que usam o mesmo número para coisas dife
 
 | Status | Fase | Nome | Doc canônico |
 |--------|------|------|--------------|
-| 🟡 | **15** | Gestão Pessoas (RH) | `FASE_15_GESTAO_PESSOAS.md` |
+| ✅ | **15** | Gestão Pessoas (RH) | `FASE_15_GESTAO_PESSOAS.md` |
 | ⏸ | **16 Premium** | One UI + Centro de Comando | `PLANO_PREMIUM_ONEUI_FASES_16_22_2026-06.md` — **só após janela segura** |
 
 **Decisão 20/06:** manter planejamento; **não executar** FASE 16+ sem loja fechada e sem loc aberta.
@@ -36,7 +36,7 @@ Evita confusão entre **três planos** que usam o mesmo número para coisas dife
 | 6–9 | Cockpit, leading, alertas, folha CLT | ✅ repo/prod |
 | 9b | DNA admin | ✅ v1.8.28+ |
 | 14 | Mini-DRE | ✅ prod v1.8.16+ |
-| **15** | **Gestão Pessoas** | 🟡 homolog + GAS Web pendente |
+| **15** | **Gestão Pessoas** | ✅ homolog tablet 20/06 |
 | 10–13 | CRM, Holding, drill-down, Live BI | ⏳ backlog (cockpit) — não bloqueia operação |
 
 Detalhe entregas 6–15: `PLANO_FASES_6_15_COCKPIT_EXECUTIVO_2026-06.md` (histórico de planejamento).

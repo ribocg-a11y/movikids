@@ -1,9 +1,9 @@
 # MOVI KIDS — Planejamento atual (pós-FASE 5)
 
-**Atualizado:** 20/06/2026 (FASE 15 · jornada v1.5.111 repo · FE **v1.8.71** · Plano Premium FASES 16–22)  
-**Produção:** FE **v1.8.71** · GAS repo **v1.5.111** · ping **v1.5.107** (Nova versão Web pendente)  
+**Atualizado:** 20/06/2026 (FASE 15 **✅ homolog tablet** · jornada v1.5.111 · FE **v1.8.71**)  
+**Produção:** FE **v1.8.71** · GAS **v1.5.111** Web **165** (20/06)  
 **Documentos irmãos:** `PLANO_PRIORIDADES_2026-06.md` · `MAPA_FASES.md` · `DEPLOY_ATUAL.md` · `HANDOFF_NOVO_CHAT.md`  
-**Ciclo ativo:** **`PLANO_FASES_6_15_COCKPIT_EXECUTIVO_2026-06.md`** · FASE 15: **`FASE_15_GESTAO_PESSOAS.md`** 🟡  
+**Ciclo ativo:** **`PLANO_FASES_6_15_COCKPIT_EXECUTIVO_2026-06.md`** · FASE 15: **`FASE_15_GESTAO_PESSOAS.md`** ✅  
 **Próximo ciclo:** **`PLANO_PREMIUM_ONEUI_FASES_16_22_2026-06.md`** ← manual Premium + One UI (20/06/2026)
 
 ---
@@ -12,7 +12,7 @@
 
 Ciclo **FASE 0–5 + P2/P3 concluído** (07–09/06/2026). Balcão homologado, portal QR, payback, CONFIG e APIs unificadas.
 
-**Modo atual:** **FASE 15 Gestão Pessoas** 🟡 (jornada v1.5.111 repo · FE **v1.8.71**) · **FASE 16 Premium** ⏸ janela segura · FASE 14 mini-DRE ✅
+**Modo atual:** **FASE 15 Gestão Pessoas** ✅ (homolog tablet 20/06) · **FASE 16 Premium** — próximo ciclo · FASE 14 mini-DRE ✅
 
 ---
 
@@ -32,7 +32,7 @@ Ciclo **FASE 0–5 + P2/P3 concluído** (07–09/06/2026). Balcão homologado, p
 | **21** | Live BI frota | P2 | Herda FASE 13 |
 | **22** | Assistente IA gestão | P3 | Anexo — decisão sócio |
 
-**Sequência imediata:** publicar GAS v1.5.111 (Nova versão Web) + homolog tablet → kickoff FASE 16 mock comando.
+**Sequência imediata:** kickoff **FASE 16** mock Premium One UI (FASE 15 ✅ homolog tablet 20/06).
 
 ---
 
@@ -71,7 +71,7 @@ A–M (modularização FE), SMS P0, fixes I15–I21, Pacote K CRM, Pacote M M.1�
 | **12** | Drill-down + simulação margem | P2 | ⏳ | Dashboard gráficos |
 | **13** | Live BI Firebase | P2 | ⏳ | Dashboard widget frota |
 | **14** | Plano contas + mini-DRE | P2 | ⏳ | Dashboard + Custos |
-| **15** | Gestão Pessoas / colaboradores | P1 | 🟡 repo **v1.8.71** · I29–I34 | `gestao-pessoas.html` · `mk-holerite.js` |
+| **15** | Gestão Pessoas / colaboradores | P1 | ✅ **v1.8.71** homolog tablet 20/06 | `gestao-pessoas.html` · `mk-holerite.js` |
 
 Detalhe entrega/melhoria/página: tabelas por fase no plano mestre · **FASE 16** (telemetria balcão) = backlog opcional · **Anexo A** = ROIC/ERP (fora do ciclo).
 
@@ -188,6 +188,6 @@ Legenda: **P0** bloqueia operação · **P1** valor imediato · **P2** próximo 
 1. PC: `gestao-pessoas.html?force=1.8.71` — holerite PDF + CNPJ · auth DNA
 2. **Nova versão Web GAS v1.5.111** (ping atual v1.5.107) — **janela sem loc aberta**
 3. Tablet loja — 1 locação pós-I32 + F5/F7/F10/F11
-4. **FASE 16 Premium** — ⏸ aguardar janela segura (ver `MAPA_FASES.md`)
+4. **FASE 16 Premium** — próximo ciclo (janela aberta · ver `MAPA_FASES.md`)
 
 Incidentes: **I29–I34** — `MAPA_ERROS_FALHAS_BUGS.md`
