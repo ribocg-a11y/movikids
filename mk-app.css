@@ -339,7 +339,7 @@ html,body{height:100%;background:var(--bg);color:var(--txt);overflow:hidden}
 .nova-rel-item:hover,.nova-rel-item:focus{border-color:var(--blue);background:var(--blue-lt);outline:none}
 
 .tipo-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
-.veiculo-grid-carros{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}
+.veiculo-grid-carros{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px}
 .veiculo-grid-triciclos{display:grid;grid-template-columns:1fr;gap:8px;margin-bottom:10px}
 .veiculo-grid-pelucias{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px}
 .vc-card.mk-tile,
