@@ -1,5 +1,10 @@
 ﻿# MOVI KIDS - Homologacao em producao assistida
 
+> ⚠️ **OBSOLETO (v1.6.x / jun 2026)** — pasta `RELEASE_CANDIDATE_*` não existe mais.  
+> **Use:** `CHECKLIST_FASE5_TABLET.md` · `HOMOLOGACAO` balcão → `scripts/testes/TESTE_TABLET_F5_F7_F10_F11.ps1` · `docs/ativos/DEPLOY_ATUAL.md`
+
+---
+
 Data sugerida: fora do horario de pico.
 
 Objetivo: validar a correcao de sincronizacao com o sistema online, sem troca brusca e com rollback pronto.

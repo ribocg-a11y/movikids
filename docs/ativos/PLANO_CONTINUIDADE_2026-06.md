@@ -1,5 +1,8 @@
 # MOVI KIDS — Plano de continuidade (pós-FASE 5)
 
+> ⚠️ **Snapshot histórico (09/06/2026)** — FE v1.7.96 / GAS v1.5.72.  
+> **Estado atual:** `HANDOFF_NOVO_CHAT.md` · **`DEPLOY_ATUAL.md`** · **`MAPA_FASES.md`**
+
 **Data:** 09/06/2026 (revisão — **FASE 0–5 fechadas**)  
 **Produção:** FE **v1.7.96** · GAS **v1.5.72**  
 **Planejamento mestre:** **`PLANEJAMENTO_ATUAL_2026-06.md`**  

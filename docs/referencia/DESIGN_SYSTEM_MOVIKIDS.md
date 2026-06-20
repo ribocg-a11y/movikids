@@ -285,8 +285,10 @@ Nível 3 — DETALHE  → plano, histórico, accordion, tabela secundária
 
 ### 6.8 Holerite RH
 
-**Prefixo:** `.mk-hol-*` em `mk-gestao-pessoas.css`  
-**Head:** gradiente blue-dk → blue, Fredoka brand
+**Módulo:** `mk-holerite.js` — `mkHolBuildHtml_()`, `mkHolPrintPdf_()`  
+**Estilos:** `.mk-hol-*` em `mk-gestao-pessoas.css` + `@media print`  
+**Consumidores:** `mk-gestao-pessoas-admin.js`, `mk-gestao-pessoas-ui.js`  
+**CNPJ produção:** **66.664.255/0001-67** (I34)
 
 ---
 

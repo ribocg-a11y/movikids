@@ -14,8 +14,10 @@ Sincronizar **documentação + estado operacional** do projeto com a realidade a
 |------|------|
 | Handoff | `HANDOFF_NOVO_CHAT.md` |
 | Estado / versões | `ESTADO_ATUAL.md`, `README.md`, `AGENTS.md` |
-| Planejamento | `PLANEJAMENTO_ATUAL_2026-06.md`, `PLANO_PRIORIDADES_2026-06.md` |
-| Mapa de erros | `MAPA_ERROS_FALHAS_BUGS.md` (I29/I30) |
+| Planejamento | `PLANEJAMENTO_ATUAL_2026-06.md`, `PLANO_PRIORIDADES_2026-06.md`, **`MAPA_FASES.md`** |
+| Deploy atual | **`DEPLOY_ATUAL.md`** |
+| Estrutura repo | **`ESTRUTURA_REPO.md`** |
+| Mapa de erros | `MAPA_ERROS_FALHAS_BUGS.md` (I1–I34) |
 | **Design System** | **`docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md`** |
 | Protocolos | `PROTOCOLO_DIAGNOSTICO_E_TESTES.md`, **este arquivo** |
 | Arquitetura / fluxos / diagramas | `MAPA_CODIGO_ARQUITETURA.md`, `FASE_*.md` ativas |
@@ -46,7 +48,7 @@ Sincronizar **documentação + estado operacional** do projeto com a realidade a
 |--------|--------|-----------|
 | GAS ping | **v1.5.107** | ping público `/exec?action=ping` |
 | GAS repo | **v1.5.111** | header do `.gs` canônico |
-| FE | **v1.8.68** | Pages live |
+| FE | **v1.8.71** | Pages live |
 | Aba FOLHA | **OK** (I25) | B25=15,38 · B68=5269,96 · D36=24 · `fonte=FOLHA` |
 | FASE 9 CLT | **verde 6/6** | `TESTE_FASE9_FOLHA_READONLY` · `CONTRATACAO_VIAVEL` |
 

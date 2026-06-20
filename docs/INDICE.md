@@ -1,19 +1,23 @@
 # MOVI KIDS — Índice de documentação
 
-**Atualizado:** 20/06/2026 (FE **v1.8.68** · GAS repo **v1.5.111** · ping **v1.5.107** · I30)
+**Atualizado:** 20/06/2026 (FE **v1.8.71** · GAS repo **v1.5.111** · ping **v1.5.107** · I31–I34)
 
 ## Comece aqui
 
 | Documento | Para quê |
 |-----------|----------|
 | [**HANDOFF_NOVO_CHAT.md**](ativos/HANDOFF_NOVO_CHAT.md) | **Novo chat Cursor** — contexto, produção, armadilhas |
+| [**ESTRUTURA_REPO.md**](ativos/ESTRUTURA_REPO.md) | **Por que a raiz do GitHub é longa** — o que fica onde |
+| [**DEPLOY_ATUAL.md**](ativos/DEPLOY_ATUAL.md) | **Versões e ordem de publicação** (referência única) |
+| [**MAPA_FASES.md**](ativos/MAPA_FASES.md) | Tradução FASE 15 cockpit vs RH vs Premium 16–22 |
 | [**DESIGN_SYSTEM_MOVIKIDS.md**](referencia/DESIGN_SYSTEM_MOVIKIDS.md) | **Cartilha UI** — obrigatório antes de criar/alterar telas |
 | [**DESIGN_DNA_MOVIKIDS.md**](referencia/DESIGN_DNA_MOVIKIDS.md) | Princípios visuais e missão de produto |
 | [**PLANO_FASES_6_15_COCKPIT_EXECUTIVO_2026-06.md**](ativos/PLANO_FASES_6_15_COCKPIT_EXECUTIVO_2026-06.md) | **Ciclo ativo FASE 6–15** — benchmark, entregas, impacto visual por página |
 | [**PLANEJAMENTO_ATUAL_2026-06.md**](ativos/PLANEJAMENTO_ATUAL_2026-06.md) | Resumo operação + tabela fases 6–15 |
 | [PLANO_PRIORIDADES_2026-06.md](ativos/PLANO_PRIORIDADES_2026-06.md) | Fases 0–15 + execução |
 | [ESTADO_ATUAL.md](ativos/ESTADO_ATUAL.md) | Versões em produção, links, pacotes |
-| [PLANO_CONTINUIDADE_2026-06.md](ativos/PLANO_CONTINUIDADE_2026-06.md) | Roadmap 90 dias + sprints |
+| [PLANO_CONTINUIDADE_2026-06.md](ativos/PLANO_CONTINUIDADE_2026-06.md) | Roadmap 90 dias — **histórico** (ver HANDOFF) |
+| [**PLANO_PREMIUM_ONEUI_FASES_16_22_2026-06.md**](ativos/PLANO_PREMIUM_ONEUI_FASES_16_22_2026-06.md) | Próximo ciclo Premium — **aguardar janela segura** |
 | [AGENTS.md](../AGENTS.md) | Instruções resumidas para agentes (raiz) |
 
 ## Homologação e fases
@@ -50,12 +54,21 @@
 | [**PROTOCOLO_ATUALIZAR_TUDO.md**](ativos/PROTOCOLO_ATUALIZAR_TUDO.md) | **Comando "atualize tudo"** — checklist docs + planilha + pasta C |
 | [REGRAS_DE_PUBLICACAO_SEGURA.md](ativos/REGRAS_DE_PUBLICACAO_SEGURA.md) | Regras P0 deploy |
 | [ACESSOS_E_AUTORIZACOES.md](ativos/ACESSOS_E_AUTORIZACOES.md) | Papéis, PIN, agente vs humano |
-| [MAPA_ERROS_FALHAS_BUGS.md](ativos/MAPA_ERROS_FALHAS_BUGS.md) | Índice I1–I30 |
+| [MAPA_ERROS_FALHAS_BUGS.md](ativos/MAPA_ERROS_FALHAS_BUGS.md) | Índice I1–I34 |
+
+## Hierarquia (conflito de versão)
+
+1. **Versão** → `mk-version.js` + ping GAS  
+2. **Operação** → `HANDOFF_NOVO_CHAT.md`  
+3. **Deploy** → **`DEPLOY_ATUAL.md`** (não `DEPLOY_v1.5.xx` antigos)  
+4. **Fases** → **`MAPA_FASES.md`** + `PLANEJAMENTO_ATUAL`  
+5. **UI** → `DESIGN_SYSTEM_MOVIKIDS.md`
 
 ## Operação e deploy
 
 | Documento | Para quê |
 |-----------|----------|
+| [**DEPLOY_ATUAL.md**](ativos/DEPLOY_ATUAL.md) | **Deploy vigente** — versões e ordem |
 | [DEPLOY_GAS_v1.5.32_AUTH.md](ativos/DEPLOY_GAS_v1.5.32_AUTH.md) | Deploy GAS mestre + link `.gs` |
 | [DEPLOY_v1.5.91_FOLHA_REPAIR_USER_ENTERED.md](ativos/DEPLOY_v1.5.91_FOLHA_REPAIR_USER_ENTERED.md) | **Deploy GAS v1.5.91** — I25 FOLHA USER_ENTERED |
 | [DEPLOY_v1.5.81_FOLHA_PROPORCIONAL.md](ativos/DEPLOY_v1.5.81_FOLHA_PROPORCIONAL.md) | Deploy GAS v1.5.81 — folha proporcional + ping |
@@ -82,9 +95,10 @@
 
 | Pasta | Conteúdo |
 |-------|----------|
-| [arquivo/incidentes/](arquivo/incidentes/) | Pós-mortems I1–I25 |
+| [arquivo/incidentes/](arquivo/incidentes/) | Pós-mortems **I1–I34** |
 | [arquivo/deploy/](arquivo/deploy/) | Deploy notes históricos |
 | [arquivo/planos/](arquivo/planos/) | Planos antigos — **não usar para versão** |
+| [ativos/HOMOLOGACAO_PRODUCAO_ASSISTIDA.md](ativos/HOMOLOGACAO_PRODUCAO_ASSISTIDA.md) | ⚠️ **Obsoleto** — v1.6.x; usar `CHECKLIST_FASE5` + `TESTE_TABLET_*` |
 | [../arquivo-historico/](../arquivo-historico/) | GAS legados |
 
 ## App (raiz)

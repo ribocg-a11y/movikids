@@ -12,21 +12,17 @@ C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\m
 
 **Toda resposta do agente** termina com: `Mudança no AppScript: sim | não` + link acima se sim (**Regra 16** · `.cursor/rules/gas-deploy-caminho-pc.mdc`).
 
-Pacote atual: **`DEPLOY_v1.5.91_FOLHA_REPAIR_USER_ENTERED.md`** · FE **`DEPLOY_FE_v1.8.16`** (mini-DRE) · FASE 9 **`DEPLOY_v1.5.80_FASE9_FOLHA_VIABILIDADE.md`**
+Pacote atual: **`DEPLOY_ATUAL.md`** · histórico **`DEPLOY_v1.5.91_FOLHA_REPAIR_USER_ENTERED.md`**
 
 **Publicar em produção (obrigatório — I26):**
 
-```powershell
-.\scripts\deploy-gas.ps1
-```
+**Canônico (sócio):** Editor Apps Script → Implantar → **Editar** Web `AKfycbwakQ...` → **Nova versão** → ping `versao: v1.5.111`.
 
-Faz: sync → `clasp push` → **`clasp deploy -i AKfycbwakQ...`** → `verify-gas-deploy.ps1`. **Não basta** só push.
-
-Alternativa manual: colar no editor → **Implantar → Editar Web `AKfycbwakQ...` → Nova versão**.
+Alternativa com pedido explícito: `scripts/deploy-gas.ps1` (`clasp push` + `clasp deploy -i` + verify). Agente **não** republica Web sem §7.3.
 
 ## Código GAS no PC (copiar daqui → colar no script)
 
-**Arquivo canônico v1.5.63 (Payback projetado + INVESTIMENTO + histórico v1.5.32–62):**
+**Arquivo canônico (header = versão atual, ex. v1.5.111):**
 
 `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github\MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs`
 
@@ -40,11 +36,11 @@ Abrir no Explorer: cole o caminho na barra de endereço → Enter → duplo cliq
 | **Web app em produção (exec)** | https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec |
 | **Testar se o GAS está no ar (ping)** | https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec?action=ping |
 | **Planilha MOVIKIDS** | https://docs.google.com/spreadsheets/d/1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618/edit |
-| **App (GitHub Pages)** | https://ribocg-a11y.github.io/movikids/?force=1.8.10 |
+| **App (GitHub Pages)** | https://ribocg-a11y.github.io/movikids/?force=1.8.71 |
 
-**Nunca** `clasp deploy` **sem `-i`** (I1). Republicar sempre com `deploy-gas.ps1` ou Nova versão no **mesmo** Deploy ID (I26).
+**Nunca** `clasp deploy` **sem `-i`** (I1). Republicar Nova versão no **mesmo** Deploy ID (I26) — ver **`DEPLOY_ATUAL.md`**.
 
-Após implantar, o `ping` deve mostrar `versao` **v1.5.63** (ou header do `.gs`) e `postWriteActions` (Pacote E). `buscarKPIsAdmin` inclui **`payback`** projetado (v1.5.63) + **`investimento`**, **`fatAno`/`nAno`** (v1.5.59) + Pacote F. SMS: **v1.5.41** — ver `TROCA_SMS_GATEWAY_DJVJRL_2026-06-04.md`. Payback: **`DEPLOY_v1.5.63_PAYBACK.md`**.
+Após implantar, o `ping` deve mostrar `versao` **v1.5.111** (header do `.gs`) e `postWriteActions`.
 
 ### Propriedades do script (SMS — producao)
 

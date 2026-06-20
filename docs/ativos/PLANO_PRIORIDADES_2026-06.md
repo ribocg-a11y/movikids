@@ -26,15 +26,17 @@
 | **Dashboard narrativo + folha prop.** | ✅ prod | FE v1.8.11–1.8.15 · `DEPLOY_FE_v1.8.15_SEMANA_ATUAL.md` |
 | **FASE 14** Mini-DRE | ✅ prod | FE v1.8.16+ · cascata Dashboard |
 | **FE UX mobile + DNA admin** | ✅ prod | v1.8.23–1.8.30 · I28 · `CHECKLIST_FASE9_DNA_ADMIN.md` |
-| **FASE 15** Gestão Pessoas | 🟡 repo | FE **v1.8.68** · GAS repo **v1.5.111** (ping **v1.5.107**) · I29/I30 · `FASE_15_GESTAO_PESSOAS.md` |
+| **FASE 15** Gestão Pessoas | 🟡 repo | FE **v1.8.71** · GAS repo **v1.5.111** (ping **v1.5.107**) · I29–I34 · `FASE_15_GESTAO_PESSOAS.md` |
 | **Design System v1.0** | ✅ repo | `DESIGN_SYSTEM_MOVIKIDS.md` · regra Cursor obrigatória |
 
 **Próximo passo imediato:**
 
-1. PC: `gestao-pessoas.html?force=1.8.68` — validar I29 (auth DNA) · Design System §9
-2. **Nova versão Web GAS v1.5.111** — alinhar ping (hoje v1.5.107)
-3. **Tablet loja** — F5/F7/F10/F11 (regressão balcão)
-4. **FASE 10** CRM LTV — próximo ciclo dev (GAS — pedir §7.3)
+1. PC: `gestao-pessoas.html?force=1.8.71` — holerite + auth DNA · Design System §9
+2. **Nova versão Web GAS v1.5.111** — janela segura (ping hoje v1.5.107)
+3. **Tablet loja** — 1 loc pós-I32 + F5/F7/F10/F11
+4. **FASE 16 Premium** — ⏸ aguardar janela (`MAPA_FASES.md`)
+
+Ver **`MAPA_FASES.md`** para tradução FASE 10 CRM (cockpit) vs FASE 16 Premium.
 
 ### FASE 0 — checklist
 
@@ -61,17 +63,17 @@
 
 ### 1.1 Versões (fonte de verdade)
 
+> ⚠️ **Snapshot histórico abaixo (jun/09)** — para versão **atual** use `mk-version.js`, ping GAS e **`DEPLOY_ATUAL.md`**.
+
 | Camada | Repo (GitHub) | Produção (verificado) | Alinhado? |
 |--------|---------------|------------------------|-----------|
-| **Frontend** | **v1.8.10** (`mk-version.js`) | após push | ⏸ |
-| **Service Worker** | v1.8.10 (`sw.js`) | — | ✅ |
-| **GAS** | **v1.5.80** (header `.gs`) | Ping prod. **v1.5.79** · alvo **v1.5.80** | ⏸ |
+| **Frontend** | **v1.8.71** | Pages live | ✅ |
+| **Service Worker** | v1.8.71 | — | ✅ |
+| **GAS** | **v1.5.111** (header `.gs`) | Ping prod. **v1.5.107** | ⏸ Web pendente |
 | **Deploy ID** | `AKfycbwakQ...` | Mesmo ID | ✅ |
-| **Git main** | `dca694f` | `origin/main` alinhado | ✅ |
 
-**Teste rápido:** https://ribocg-a11y.github.io/movikids/?force=1.8.10  
-**Ping GAS:** `?action=ping` → alvo `versao: v1.5.80`  
-**CONFIG:** `TESTE_OPERACAO_CONFIG_READONLY.ps1` → baseline ok 08/06
+**Teste rápido:** https://ribocg-a11y.github.io/movikids/?force=1.8.71  
+**Ping GAS:** `?action=ping` → alvo `versao: v1.5.111` após Nova versão Web
 
 **I20 cronômetro:** RESOLVIDO — `INCIDENTE_I20_CRONOMETRO_RESOLUCAO_2026-06-07.md`. Não regredir sem `TESTE_I20_COMPLETO_PROD.ps1` + tablet.
 

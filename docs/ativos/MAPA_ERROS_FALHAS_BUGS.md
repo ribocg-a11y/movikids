@@ -1,6 +1,6 @@
 # MOVI KIDS — Mapa de erros, falhas e bugs
 
-**Atualizado:** 20/06/2026 — **I30** abas RH getRange · GAS repo **v1.5.111** (ping **v1.5.107**) · FE **v1.8.68**  
+**Atualizado:** 20/06/2026 — **I31–I34** sessão operação 20/06 · GAS repo **v1.5.111** (ping **v1.5.107**) · FE **v1.8.71**  
 **Uso anterior:** 17/06/2026 — **I28** liberar sessão tablet · GAS **v1.5.92** prod. · FE **v1.8.30**  
 **Uso anterior:** 09/06/2026 — **I22 fechado** (hotfix FE v1.8.2)  
 **Uso:** consultar **antes de publicar** e **ao montar checklist de teste**. Cada linha tem trava e script de verificação quando existir.
@@ -39,6 +39,10 @@
 | **I28** | **`prompt()` PIN admin + deslogar PIN-first no tablet** | Liberar/Deslogar balcão sem efeito; dual Milena+Admin | FE **v1.8.29** modal PIN + persist; **v1.8.30** banner dual + guards | `guard.auth.*` I28 | `TESTE_SESSAO_LIBERAR_READONLY.ps1` · tablet Liberar |
 | **I29** | **Gestão Pessoas UI fora do DNA** (mock-pick, PIN único, CSS paralelo, passos juntos) | Colaboradores feio/não responsivo; perda padrão Movi Kids | FE **v1.8.48–1.8.49** `#gp-auth-gate` = `#mk-auth-gate`; **`DESIGN_SYSTEM_MOVIKIDS.md`** | `guard.ui.design-system`, `guard.ui.auth-gate` | `gestao-pessoas.html?force=1.8.49` · checklist §9 Design System |
 | **I30** | **`getRange` numRows errado em `instalarAbasGestaoPessoas`** | Abas RH parciais (1 linha seed) | GAS **v1.5.99** — `getRange(2,1,seeds.length,cols)` | `guard.gas.getRange.numRows` | `gestaoPessoasStatus` · reinstalar abas |
+| **I31** | **CONFIG `veiculos_validos_json` encoding quebrado (Pelúcia)** | Pelúcias ilegíveis — locação bloqueada | `salvarOperacaoConfigAdmin` UTF-8 / `\u00facia` | `TESTE_OPERACAO_CONFIG_READONLY` | Nova locação Pelúcia 01 |
+| **I32** | **Nova locação `sessions.push` + SMS legado no Fechar** | Loc duplicada; fluxo SMS vs qr_only | FE **v1.8.68+** upsert + `_novaSavingInFlight` | `guard.nova.sms.sem.autoStart`; qr_only | tablet 1 loc · sem SMS Fechar |
+| **I33** | **PWA cache stale + `carregarInicio` ~6s** | Tablet lento / não abre | Force update FE; limpar site data tablet | I3 versões; `verify-publish-complete` | `?force=1.8.71` · boot tablet |
+| **I34** | **Holerite UX + CNPJ placeholder** | Doc RH abaixo padrão; CNPJ fictício | FE **v1.8.70–71** `mk-holerite.js` + CNPJ real | Design System § holerite | PDF holerite · CNPJ 66.664.255/0001-67 |
 | I2 | GAS offline + timer local | Extra fantasma | ADM `somentePlano`; offline v1.7.6 | `FIX_OFFLINE_ENCERRAR` | tablet encerrar |
 | I3 | Cache `?force=` / **`index.html ?v=` desatualizado** | JS antigo no tablet/admin | `mk-version` + `sw` + **index** alinhados | `pre-push-check` versões | `?force=VERSAO` · ver **11/06** |
 | **I25** | **FOLHA `#NAME?` — `setValue('=SE...')` no GAS** | Aba FOLHA quebrada; Dashboard usa fallback 4926 | GAS **v1.5.91** `folhaFlushFormulasUser_` (USER_ENTERED) + `repairFolhaAdmin` | Nunca `setValue`/`setFormula` PT para fórmulas FOLHA | `TESTE_FOLHA_FORMULAS_READONLY.ps1` · **fechado 14/06** |
@@ -88,6 +92,10 @@
 | `../arquivo/incidentes/INCIDENTE_I28_LIBERAR_SESSAO_TABLET_2026-06-17.md` | **I28** — prompt PIN / liberar balcão tablet |
 | `../arquivo/incidentes/INCIDENTE_I29_GESTAO_PESSOAS_DNA_UI_2026-06-18.md` | **I29** — UI colaboradores fora DNA; Design System |
 | `../arquivo/incidentes/INCIDENTE_I30_GAS_ABAS_GESTAO_RANGE_2026-06-18.md` | **I30** — abas RH getRange v1.5.99 |
+| `../arquivo/incidentes/INCIDENTE_I31_CONFIG_ENCODING_PELUCIAS_2026-06-20.md` | **I31** — Pelúcias CONFIG encoding |
+| `../arquivo/incidentes/INCIDENTE_I32_LOCACAO_DUPLICADA_SMS_2026-06-20.md` | **I32** — loc duplicada + SMS legado |
+| `../arquivo/incidentes/INCIDENTE_I33_PWA_CACHE_BOOT_LENTO_2026-06-20.md` | **I33** — PWA stale + boot lento |
+| `../arquivo/incidentes/INCIDENTE_I34_HOLERITE_APRESENTACAO_2026-06-20.md` | **I34** — holerite UX + CNPJ |
 | `TROCA_SMS_GATEWAY_DJVJRL_2026-06-04.md` | Gateway SMS |
 
 ---
@@ -192,14 +200,19 @@
 25. **Nunca** CSS auth paralelo fora de `mk-app.css` `#mk-auth-gate,#gp-auth-gate` (I29).
 26. **Sempre** host **`ribocg-a11y`** (hífen) — nunca `ribocg.a11y` (I29).
 27. **Revisar** `getRange` numRows ao gravar seeds em abas GAS (I30).
+28. **Nunca** gravar `veiculos_validos_json` sem validar acentos Pelúcia — usar Unicode explícito (I31).
+29. **Nunca** `sessions.push` após `salvarLocacao` — upsert por `rowIndex`/`id` + mutex save (I32).
+30. **Nunca** reexpor SMS no Fechar Nova locação enquanto `MK_COMUNICACAO_MODO=qr_only` (I32).
+31. **Sempre** force update FE após hotfix operacional + procedimento tablet `?force=` (I33).
+32. **Nunca** CNPJ/razão fictícios em holerite produção — usar dados reais da empresa (I34).
 
 ---
 
-## Versões de referência (18/06/2026)
+## Versões de referência (20/06/2026)
 
 | Camada | Repo / produção | Mínimo operação |
 |--------|-----------------|-----------------|
-| Frontend | **v1.8.68** | `?force=1.8.68` · Gestão Pessoas `gestao-pessoas.html` |
+| Frontend | **v1.8.71** | `?force=1.8.71` · Gestão Pessoas `gestao-pessoas.html` |
 | GAS | **v1.5.111** (repo) · ping atual **v1.5.107** | Publicar Nova versão Web para alinhar |
 | Design System | **`docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md`** | Obrigatório antes de UI |
 | Aba FOLHA | B68 ~5269,96 · `fonte=FOLHA` | `repairFolhaAdmin` após deploy que toque FOLHA |

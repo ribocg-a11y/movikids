@@ -1,6 +1,6 @@
 # MOVI KIDS — Mapa do código e arquitetura
 
-**Atualizado:** 20/06/2026 (FE **v1.8.68** · GAS repo **v1.5.111** · ping **v1.5.107** · FASE 15 ativa)  
+**Atualizado:** 20/06/2026 (FE **v1.8.71** · GAS repo **v1.5.111** · ping **v1.5.107** · FASE 15 ativa)  
 **Função:** anatomia do sistema — o que é cada parte, o que liga com o quê, o que é zona sensível.  
 **Complementa:** `ESTADO_ATUAL.md`, `ACESSOS_E_AUTORIZACOES.md`, `REGRAS_DE_PUBLICACAO_SEGURA.md`, `MAPA_ERROS_FALHAS_BUGS.md`, **`PROTOCOLO_DIAGNOSTICO_E_TESTES.md`**
 
@@ -58,6 +58,10 @@ movikids-github/
 │   └── sw.js               ← PWA cache
 ├── PERNAS (outros canais)
 │   ├── acompanhar.html     ← portal responsável
+│   ├── gestao-pessoas.html ← RH colaboradores (FASE 15)
+│   ├── mk-gestao-pessoas.js · mk-gestao-pessoas-ui.js · mk-gestao-pessoas-admin.js
+│   ├── mk-holerite.js      ← holerite HTML/PDF compartilhado (I34)
+│   ├── mk-gestao-pessoas.css
 │   ├── foto-moldura.html
 │   └── track.html          ← cronômetro curto
 ├── PELE
@@ -92,7 +96,7 @@ flowchart TB
     SW[sw.js]
     PORT[acompanhar.html]
   end
-  subgraph GAS["Apps Script v1.5.77"]
+  subgraph GAS["Apps Script v1.5.111"]
     RT[dispatchMoviAction_]
     SH[(Planilha Sheets)]
     PS[PropertiesService sessão]

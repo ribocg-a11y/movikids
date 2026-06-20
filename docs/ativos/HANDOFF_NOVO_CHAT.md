@@ -1,6 +1,6 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 20/06/2026 (Carro 04 + layout 2x2 carros · FE **v1.8.68** · GAS repo **v1.5.111** · ping prod. **v1.5.107** — publicar Web)  
+**Atualizado:** 20/06/2026 (sessão operação — I31–I34 · holerite v1.8.71 · FE **v1.8.71** · GAS repo **v1.5.111** · ping prod. **v1.5.107** — publicar Web)  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **Repo local:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`  
@@ -52,9 +52,10 @@ Mensagem mínima: *"Vamos dar continuidade ao projeto Movi Kids, tem uma pasta n
 
 | Camada | Versão | Verificação |
 |--------|--------|-------------|
-| **Frontend** | **v1.8.68** | https://ribocg-a11y.github.io/movikids/?force=1.8.68 |
-| **Gestão Pessoas** | **v1.8.68** | https://ribocg-a11y.github.io/movikids/gestao-pessoas.html?force=1.8.68 |
-| **Service Worker** | **1.8.68** | `sw.js` |
+| **Frontend** | **v1.8.71** | https://ribocg-a11y.github.io/movikids/?force=1.8.71 |
+| **Gestão Pessoas** | **v1.8.71** | https://ribocg-a11y.github.io/movikids/gestao-pessoas.html?force=1.8.71 |
+| **Service Worker** | **1.8.71** | `sw.js` |
+| **Holerite** | **mk-holerite.js** | CNPJ **66.664.255/0001-67** · PDF/imprimir |
 | **Apps Script (ping)** | repo **v1.5.111** · ping prod. **v1.5.107** | **Nova versão Web** no deploy `AKfycbwakQ...` (pendente) |
 | **Aba FOLHA** | **OK** (I25) | B68 ~5269,96 |
 | **Design System** | **v1.0** | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
@@ -79,7 +80,7 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 | 2 | **`DESIGN_SYSTEM_MOVIKIDS.md`** | Cartilha UI — **antes de qualquer tela** |
 | 3 | `PLANO_PRIORIDADES_2026-06.md` | Fases 0–15 |
 | 4 | `ESTADO_ATUAL.md` | Versões, entregas |
-| 5 | `MAPA_ERROS_FALHAS_BUGS.md` | I29/I30 + travas |
+| 5 | `MAPA_ERROS_FALHAS_BUGS.md` | I29–I34 + travas |
 | 6 | `REGRAS_DE_PUBLICACAO_SEGURA.md` | Push/deploy |
 | 7 | `../INDICE.md` | Mapa docs |
 
@@ -87,25 +88,46 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 
 ## Próximo passo (20/06/2026)
 
-**FASE 15/15b + transição FASE 16** — operação já com Carro 04; docs e deploy GAS ainda pendentes
+**FASE 15** homolog + GAS Web pendente · **FASE 16 Premium** ⏸ janela segura
 
 | # | Ação | Quem |
 |---|------|------|
-| 1 | **Nova versão Web GAS v1.5.111** (ping atual v1.5.107) | **Você** |
-| 2 | Rodar protocolo “atualize tudo” nos docs ativos (estado/planejamento/mapa) | **Agente** |
-| 3 | Validar **gestao-pessoas.html?force=1.8.68** + `index.html?force=1.8.68` | **Você** |
-| 4 | Tablet loja: homologação F5/F7/F10/F11 (regressão balcão) | **Você** |
-| 5 | Kickoff FASE 16: mock `#mk-command-center` + tokens One UI v2 | **Agente/dev** |
+| 1 | **Nova versão Web GAS v1.5.111** — Carro 04, CPF admin holerite, jornada | **Você** (janela sem loc) |
+| 2 | Tablet loja: **1 locação** pós-I32 + boot `?force=1.8.71` | **Você** |
+| 3 | Validar holerite Raykelly (PDF + CNPJ) admin e colaborador | **Você** |
+| 4 | Investigar latência `carregarInicio` (~6s) se tablet lento (I33) | **Agente** |
+| 5 | Kickoff FASE 16 mock — **só após janela segura** | **Agente/dev** |
 
-Doc: `FASE_15_GESTAO_PESSOAS.md` · incidentes `I29`, `I30`
+Doc: `FASE_15_GESTAO_PESSOAS.md` · fases: **`MAPA_FASES.md`** · incidentes **I31–I34**
 
-**Incidentes fechados nesta sessão (chat 18/06):**
+---
+
+## Incidentes — sessão 20/06/2026 (registrados)
+
+| ID | Evento | Severidade | Status | Fix / evidência |
+|----|--------|------------|--------|-----------------|
+| **I31** | Pelúcias fora de operação — encoding CONFIG | P0 | ✅ Fechado | `salvarOperacaoConfigAdmin` UTF-8 · doc `INCIDENTE_I31_*` |
+| **I32** | Locação duplicada + SMS legado no Fechar | P0 | ✅ Fechado FE | `4485c09` · upsert + qr_only · doc `INCIDENTE_I32_*` |
+| **I33** | Tablet lento / não carrega | P1 | 🟡 Mitigado | Force update v1.8.69–71 · boot ~6s GAS aberto · doc `INCIDENTE_I33_*` |
+| **I34** | Holerite apresentação + CNPJ fictício | P2 | ✅ Fechado FE | `740d4ce`/`389552a` · `mk-holerite.js` · CNPJ **66.664.255/0001-67** |
+| **I26** | GAS repo v1.5.111 ≠ ping v1.5.107 | P1 | 🟡 Aberto | Nova versão Web pendente (Carro 04, cpf admin) |
+
+**Entregas FE nesta sessão (commits):**
+
+| Commit | Entrega |
+|--------|---------|
+| `4485c09` | Fix locação duplicada + SMS off no Fechar |
+| `f2e58b7` | Force update cache global |
+| `740d4ce` | Holerite premium (CPF, refs, VT, PDF) |
+| `389552a` | CNPJ real MOVI KIDS |
+
+**Incidentes fechados sessão anterior (18/06):**
 
 | ID | Resumo | Fix |
 |----|--------|-----|
-| **I29** | Colaboradores fora DNA (mock-pick, PIN único, CSS paralelo) | FE v1.8.49 + Design System |
+| **I29** | Colaboradores fora DNA | FE v1.8.49 + Design System |
 | **I30** | Abas RH parciais getRange | GAS v1.5.99 |
-| **Frota** | Inclusão de **Carro 04** + grid carros 2x2 na Nova locação | FE v1.8.67/1.8.68 + CONFIG 10 veículos |
+| **Frota** | Carro 04 + grid 2x2 | FE v1.8.67+ · CONFIG 10 veículos |
 
 **Últimos commits FE (gestão pessoas + docs):**
 
@@ -126,7 +148,7 @@ Doc: `FASE_15_GESTAO_PESSOAS.md` · incidentes `I29`, `I30`
 | **Design System** | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
 | Versão FE | `mk-version.js` + `sw.js` + **`index.html ?v=`** |
 | CSS | `mk-design.css` + `mk-app.css` |
-| Colaboradores | `gestao-pessoas.html` + `mk-gestao-pessoas.css` (só pós-login) |
+| Colaboradores | `gestao-pessoas.html` + `mk-gestao-pessoas.css` + **`mk-holerite.js`** |
 
 **GAS PC:**
 
@@ -157,7 +179,7 @@ Invoke-RestMethod "https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5
 .\scripts\pre-push-check.ps1
 ```
 
-Esperado: ping alinhado ao header `.gs` · Pages **1.8.68** · pre-push verde.
+Esperado: ping alinhado ao header `.gs` · Pages **1.8.71** · pre-push verde.
 
 ---
 
@@ -172,4 +194,4 @@ Esperado: ping alinhado ao header `.gs` · Pages **1.8.68** · pre-push verde.
 
 ---
 
-*Próxima revisão: após Nova versão Web GAS v1.5.111 + homologação tablet F5/F7/F10/F11.*
+*Próxima revisão: após Nova versão Web GAS v1.5.111 + homologação tablet I32/I33.*

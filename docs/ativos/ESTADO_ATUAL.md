@@ -11,9 +11,10 @@ Referência única para alinhamento local × produção.
 **FASE 9 Folha CLT:** **`FASE_9_FOLHA_VIABILIDADE_CLT.md`**  
 **Memorial folha:** `../referencia/FOLHA_PAGAMENTO_MEMORIAL_E_PLANILHA.md`  
 **FASE 14 mini-DRE:** 🟡 memorial — `FASE_14_MINI_DRE.md` · `../referencia/MEMORIAL_MINI_DRE.md`  
-**Deploy GAS pacote:** **`DEPLOY_v1.5.91_FOLHA_REPAIR_USER_ENTERED.md`** · FE **`DEPLOY_FE_v1.8.15_SEMANA_ATUAL.md`** (v1.8.11–1.8.14: `DEPLOY_FE_v1.8.12_DASHBOARD_NARRATIVO.md`)  
+**Deploy GAS pacote:** **`DEPLOY_ATUAL.md`** · histórico `DEPLOY_v1.5.91_FOLHA_REPAIR_USER_ENTERED.md`  
 **Incidente I29 (DNA Gestão Pessoas):** `../arquivo/incidentes/INCIDENTE_I29_GESTAO_PESSOAS_DNA_UI_2026-06-18.md`  
-**Incidente I30 (abas RH getRange):** `../arquivo/incidentes/INCIDENTE_I30_GAS_ABAS_GESTAO_RANGE_2026-06-18.md`
+**Incidente I30 (abas RH getRange):** `../arquivo/incidentes/INCIDENTE_I30_GAS_ABAS_GESTAO_RANGE_2026-06-18.md`  
+**Incidentes sessão 20/06:** **I31** Pelúcias CONFIG · **I32** loc duplicada/SMS · **I33** PWA boot · **I34** holerite — ver `MAPA_ERROS_FALHAS_BUGS.md`
 
 ---
 
@@ -28,7 +29,7 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 | Camada | Versão repo | URL / ID |
 |--------|-------------|----------|
-| **Frontend** | **v1.8.68** | https://ribocg-a11y.github.io/movikids/?force=1.8.68 · **Colaboradores:** `gestao-pessoas.html?force=1.8.68` |
+| **Frontend** | **v1.8.71** | https://ribocg-a11y.github.io/movikids/?force=1.8.71 · **Colaboradores:** `gestao-pessoas.html?force=1.8.71` |
 | **Design System** | **v1.0** | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
 | **Apps Script (código + ping)** | repo **v1.5.111** · ping prod. **v1.5.107** | Nova versão Web no deploy `AKfycbwakQ...` |
 | **Aba FOLHA** | memorial B68 **OK** | [gid=179040058](https://docs.google.com/spreadsheets/d/1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618/edit#gid=179040058) · B68 ~5269,96 |
