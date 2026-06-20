@@ -330,7 +330,9 @@ function atualizarVeiculoGrid() {
     }
   });
 
-  const todosVeiculos = ['Carro 01','Carro 02','Carro 03','Triciclo 01','Triciclo 02','Pelúcia 01','Pelúcia 02','Pelúcia 03','Pelúcia 04'];
+  const todosVeiculos = (typeof TODOS_VEICULOS_DEF !== 'undefined' && TODOS_VEICULOS_DEF.length)
+    ? TODOS_VEICULOS_DEF.map(function(v) { return v.nome; })
+    : ['Carro 01','Carro 02','Carro 03','Carro 04','Triciclo 01','Triciclo 02','Pelúcia 01','Pelúcia 02','Pelúcia 03','Pelúcia 04'];
   todosVeiculos.forEach(nome => {
     const card = document.getElementById('vc-' + nome);
     const stEl = document.getElementById('vc-st-' + nome);

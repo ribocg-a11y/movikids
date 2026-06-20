@@ -23,7 +23,7 @@ function Add-CfgCheck([string]$Name, [string]$Status, [string]$Detail = "") {
 }
 
 $expectedVeiculos = @(
-  'Carro 01', 'Carro 02', 'Carro 03',
+  'Carro 01', 'Carro 02', 'Carro 03', 'Carro 04',
   'Triciclo 01', 'Triciclo 02',
   'Pelúcia 01', 'Pelúcia 02', 'Pelúcia 03', 'Pelúcia 04'
 )
@@ -45,10 +45,10 @@ try {
   } else {
     Add-CfgCheck "diag.fonte" "ok" $diag.fonte
   }
-  if ($diag.resumo.veiculos -ne 9) {
-    Add-CfgCheck "diag.veiculos" "warn" "esperado 9, obtido $($diag.resumo.veiculos)"
+  if ($diag.resumo.veiculos -ne 10) {
+    Add-CfgCheck "diag.veiculos" "warn" "esperado 10, obtido $($diag.resumo.veiculos)"
   } else {
-    Add-CfgCheck "diag.veiculos" "ok" "9 veiculos"
+    Add-CfgCheck "diag.veiculos" "ok" "10 veiculos"
   }
   $tipos = @($diag.resumo.tipos)
   foreach ($t in @('Carro', 'Triciclo')) {

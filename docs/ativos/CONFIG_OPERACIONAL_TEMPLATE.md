@@ -23,7 +23,7 @@
 
 ```json
 [
-  "Carro 01", "Carro 02", "Carro 03",
+  "Carro 01", "Carro 02", "Carro 03", "Carro 04",
   "Triciclo 01", "Triciclo 02",
   "Pelúcia 01", "Pelúcia 02", "Pelúcia 03", "Pelúcia 04"
 ]
@@ -107,7 +107,7 @@ Espelha `PRECOS` no GAS. Chaves de tipo: `Carro`, `Triciclo`, `Pelúcia`. Planos
 |-------|-------|
 | `okConfig` | `true` |
 | `fonte` | `config_ou_default` |
-| Veículos | 9 |
+| Veículos | 10 |
 | Carro 3h | 130 |
 | Pelúcia 3h | 150 |
 | KPI `ocupacaoFrota` | 9 itens |

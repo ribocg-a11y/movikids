@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.110
+// MOVI KIDS — Google Apps Script v1.5.111
+// v1.5.111: frota — Carro 04 em VEICULOS_VALIDOS (4 carros elétricos)
 // v1.5.110: jornada — filtro ponto por mês/ano (cellToStr_) + atraso sem sinal + ponto aberto hoje
 // v1.5.109: jornada ponto × escala — extras/atraso dia a dia + banco de horas
 // v1.5.108: holerite quinzenal — 40% dia 15 · 60%+benefícios dia 30/31 · proporcional admissão · VA R$400
@@ -142,9 +143,9 @@ const CONTRAT_MARGEM_MIN_ = 18;
 const CONTRAT_DIAS_MIN_ = 12;
 const CONTRAT_MARGEM_BASE_MIN_ = 10;
 
-// ── VEÍCULOS VÁLIDOS — v1.5.21: Triciclo 02 adicionado ───────
+// ── VEÍCULOS VÁLIDOS — v1.5.111: Carro 04 · v1.5.21: Triciclo 02 ───────
 const VEICULOS_VALIDOS = [
-  'Carro 01','Carro 02','Carro 03',
+  'Carro 01','Carro 02','Carro 03','Carro 04',
   'Triciclo 01','Triciclo 02',
   'Pelúcia 01','Pelúcia 02','Pelúcia 03','Pelúcia 04'
 ];
@@ -7098,7 +7099,7 @@ function buscarPainelColaborador_(p) {
         beneficios: { vaDiario: hol.vaDiario, vaDias: hol.vaDias, vaMensal: hol.vaMensal, vtPasses: hol.vtPasses, vaCoparticipacao: 0 },
         holerite: hol
       },
-      versao: 'v1.5.110'
+      versao: 'v1.5.111'
     });
   } catch (ex) {
     return err_('Abas Gestao Pessoas ausentes — rode scripts/criar-abas-gestao-pessoas.ps1', 503);
@@ -7317,7 +7318,7 @@ function painelGestaoPessoasAdmin_(p) {
       competencia: comp, colaboradores: colaboradores, escala: escala, folha: folha,
       alertas: alertasPack.alertas, alertasTotal: alertasPack.total,
       kpis: { total: colaboradores.length, presentes: presentes, comTurno: comTurno, alertas: alertasPack.total },
-      sessaoAtiva: sessao, versao: 'v1.5.110'
+      sessaoAtiva: sessao, versao: 'v1.5.111'
     });
   } catch (ex) {
     return err_('Abas Gestao Pessoas ausentes — rode instalar abas ou scripts/criar-abas-gestao-pessoas.ps1', 503);
