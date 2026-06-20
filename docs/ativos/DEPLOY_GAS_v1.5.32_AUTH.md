@@ -112,7 +112,7 @@ O script: sync → `clasp push` → **`clasp deploy -i AKfycbwakQ...`** → **`v
 | `corrigirFinanceiroLocacaoAdmin` | Ajuste locação encerrada + `zerarExtra` |
 | `limparLocacoesTesteAdmin` | Anula locações de teste (`adminPin=1416`, `motivo` ≥10 chars; opcional `soHoje=1`) |
 | `liberarSessaoOperadorAdmin` | ADM libera trava de sessão |
-| `importarResponsaveisAdmin` | K.1 — import LOCACOES→RESPONSAVEIS (`dryRun=1` primeiro) — ver `DEPLOY_v1.5.57_IMPORT_RESPONSAVEIS.md` |
+| `importarResponsaveisAdmin` | K.1 — import LOCACOES→RESPONSAVEIS (`dryRun=1` primeiro) — ver `../arquivo/deploy/DEPLOY_v1.5.57_IMPORT_RESPONSAVEIS.md` |
 | `encerrarLocacao` | Aceita `somentePlano=true` (sem extras — GAS instável) |
 
 ## Frontend

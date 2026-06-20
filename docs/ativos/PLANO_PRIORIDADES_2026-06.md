@@ -23,7 +23,7 @@
 | **FASE 7** Leading financeiros | ✅ repo + I23 | FE v1.8.4 → **v1.8.5** / GAS v1.5.77 → **v1.5.78** |
 | **FASE 8** Alertas proativos | ✅ repo | FE v1.8.9 / GAS v1.5.79 |
 | **FASE 9** Folha CLT + viabilidade | ✅ **prod fechado** | GAS **v1.5.91** · testes ok **14/06** · I25 fechado |
-| **Dashboard narrativo + folha prop.** | ✅ prod | FE v1.8.11–1.8.15 · `DEPLOY_FE_v1.8.15_SEMANA_ATUAL.md` |
+| **Dashboard narrativo + folha prop.** | ✅ prod | FE v1.8.11–1.8.15 · `../arquivo/deploy/DEPLOY_FE_v1.8.15_SEMANA_ATUAL.md` |
 | **FASE 14** Mini-DRE | ✅ prod | FE v1.8.16+ · cascata Dashboard |
 | **FE UX mobile + DNA admin** | ✅ prod | v1.8.23–1.8.30 · I28 · `CHECKLIST_FASE9_DNA_ADMIN.md` |
 | **FASE 15** Gestão Pessoas | 🟡 repo | FE **v1.8.71** · GAS repo **v1.5.111** (ping **v1.5.107**) · I29–I34 · `FASE_15_GESTAO_PESSOAS.md` |

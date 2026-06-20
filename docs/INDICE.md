@@ -12,6 +12,7 @@
 | [**MAPA_FASES.md**](ativos/MAPA_FASES.md) | Tradução FASE 15 cockpit vs RH vs Premium 16–22 |
 | [**DESIGN_SYSTEM_MOVIKIDS.md**](referencia/DESIGN_SYSTEM_MOVIKIDS.md) | **Cartilha UI** — obrigatório antes de criar/alterar telas |
 | [**DESIGN_DNA_MOVIKIDS.md**](referencia/DESIGN_DNA_MOVIKIDS.md) | Princípios visuais e missão de produto |
+| [prototipos/README.md](prototipos/README.md) | Mockups RH — URLs canônicas vs produção |
 | [**PLANO_FASES_6_15_COCKPIT_EXECUTIVO_2026-06.md**](ativos/PLANO_FASES_6_15_COCKPIT_EXECUTIVO_2026-06.md) | **Ciclo ativo FASE 6–15** — benchmark, entregas, impacto visual por página |
 | [**PLANEJAMENTO_ATUAL_2026-06.md**](ativos/PLANEJAMENTO_ATUAL_2026-06.md) | Resumo operação + tabela fases 6–15 |
 | [PLANO_PRIORIDADES_2026-06.md](ativos/PLANO_PRIORIDADES_2026-06.md) | Fases 0–15 + execução |

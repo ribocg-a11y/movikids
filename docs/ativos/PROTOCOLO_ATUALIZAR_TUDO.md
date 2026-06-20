@@ -21,7 +21,7 @@ Sincronizar **documentação + estado operacional** do projeto com a realidade a
 | **Design System** | **`docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md`** |
 | Protocolos | `PROTOCOLO_DIAGNOSTICO_E_TESTES.md`, **este arquivo** |
 | Arquitetura / fluxos / diagramas | `MAPA_CODIGO_ARQUITETURA.md`, `FASE_*.md` ativas |
-| Deploy / processos | `DEPLOY_*.md`, `DEPLOY_GAS_v1.5.32_AUTH.md`, `REGRAS_DE_PUBLICACAO_SEGURA.md` |
+| Deploy / processos | **`DEPLOY_ATUAL.md`**, `DEPLOY_GAS_v1.5.32_AUTH.md`, histórico `arquivo/deploy/` |
 | Histórico | `docs/arquivo/incidentes/`, `docs/arquivo/deploy/` |
 | Planilhas | Memorials `docs/referencia/`, IDs e métricas abas (FOLHA, CONFIG, etc.) |
 | Pasta no C | Caminhos PC em HANDOFF, AGENTS, regras `.cursor/rules/` |

@@ -65,7 +65,7 @@ Reduzir divergência entre app e planilha, e garantir que o ciclo **iniciar → 
 | GAS | `calcResumoDiaCore_` + `resumoDia` v1.5.70 |
 | FE | `mk-admin.js` v1.7.92 — Caixa + chip via `resumoDia` |
 | Teste | `TESTE_RESUMO_DIA_READONLY.ps1` |
-| Deploy | `DEPLOY_v1.5.70_RESUMO_DIA.md` |
+| Deploy | `../arquivo/deploy/DEPLOY_v1.5.70_RESUMO_DIA.md` |
 
 **Produção 08/06:** GAS v1.5.71 · `TESTE_RESUMO_DIA_READONLY.ps1` → ok (nHoje=4, fatHoje=103.2).
 
@@ -78,7 +78,7 @@ Reduzir divergência entre app e planilha, e garantir que o ciclo **iniciar → 
 | GAS | `buildKpiMesPayload_` + `kpiMes` v1.5.71 |
 | FE | Hub/Sistema: só `resumoDia` · Dashboard: `kpiMes` v1.7.93 |
 | Teste | `TESTE_KPI_MES_READONLY.ps1` |
-| Deploy | `DEPLOY_v1.5.71_KPI_MES.md` |
+| Deploy | `../arquivo/deploy/DEPLOY_v1.5.71_KPI_MES.md` |
 
 **Produção 08/06:** GAS v1.5.71 · `TESTE_KPI_MES_READONLY.ps1` → ok (paridade com `buscarKPIsAdmin`).
 
@@ -91,7 +91,7 @@ Reduzir divergência entre app e planilha, e garantir que o ciclo **iniciar → 
 | GAS | `lastActivityAt` + idle 1h + `touchSessaoOperador` v1.5.72 |
 | FE | Relógio real (`mkAuthIdleRemainingMs_`); `mkAuthReleaseBalcaoServer_`; PIN admin preserva operador local v1.7.94 |
 | Teste | `TESTE_SESSAO_IDLE_READONLY.ps1` |
-| Deploy | `DEPLOY_v1.5.72_SESSAO_IDLE.md` |
+| Deploy | `../arquivo/deploy/DEPLOY_v1.5.72_SESSAO_IDLE.md` |
 
 **Produção 09/06:** ping **v1.5.72** · `TESTE_SESSAO_IDLE_READONLY.ps1` → ok · protocolo F0+F1 ok.
 

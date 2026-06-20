@@ -72,5 +72,5 @@
 | Doc | Uso |
 |-----|-----|
 | `../referencia/MEMORIAL_MINI_DRE.md` | Fórmulas e cascata |
-| `DEPLOY_FE_v1.8.15_SEMANA_ATUAL.md` | FE atual em prod |
-| `DEPLOY_v1.5.91_FOLHA_REPAIR_USER_ENTERED.md` | GAS atual em prod (ping v1.5.91) |
+| `../arquivo/deploy/DEPLOY_FE_v1.8.15_SEMANA_ATUAL.md` | FE narrativo (histórico) |
+| `../arquivo/deploy/DEPLOY_v1.5.91_FOLHA_REPAIR_USER_ENTERED.md` | GAS I25 (histórico) |

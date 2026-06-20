@@ -224,7 +224,7 @@ sequenceDiagram
 11. Atualizar HANDOFF    → versões + checklist + MAPA_ERROS se incidente
 ```
 
-**Pacote deploy (regra de ouro):** toda entrega GAS+FE inclui doc `DEPLOY_v*.md` **completo** (modelo `DEPLOY_v1.5.76`) + FE quando aplicável — ver `DEPLOY_v1.5.78_FASE7_KPI_PERF.md`.
+**Pacote deploy (regra de ouro):** toda entrega GAS+FE inclui doc em `docs/arquivo/deploy/` **completo** (modelo `DEPLOY_v1.5.76`) + **`DEPLOY_ATUAL.md`** quando vigente.
 
 **Diretrizes claras:** `REGRAS_DE_PUBLICACAO_SEGURA.md` (12 regras), `.cursor/rules/`, `ACESSOS_E_AUTORIZACOES.md`.
 
@@ -382,7 +382,7 @@ sequenceDiagram
 
 **Depois v1.5.78 (I23 fase 2):** `kpiMes&lite=1` → topo rápido; cache GAS 90s + FE sessionStorage 5 min.
 
-**Incidentes:** I22 · I23 (`INCIDENTE_I23_*`) · deploy **`DEPLOY_v1.5.78_FASE7_KPI_PERF.md`**
+**Incidentes:** I22 · I23 (`INCIDENTE_I23_*`) · deploy histórico **`../arquivo/deploy/DEPLOY_v1.5.78_FASE7_KPI_PERF.md`**
 
 ---
 
@@ -410,7 +410,7 @@ flowchart LR
   via --> FE[#mk-contratacao-panel]
 ```
 
-Doc: **`FASE_9_FOLHA_VIABILIDADE_CLT.md`** · deploy **`DEPLOY_v1.5.91_FOLHA_REPAIR_USER_ENTERED.md`** · incidente **I25**
+Doc: **`FASE_9_FOLHA_VIABILIDADE_CLT.md`** · deploy histórico **`../arquivo/deploy/DEPLOY_v1.5.91_FOLHA_REPAIR_USER_ENTERED.md`** · incidente **I25**
 
 ---
 

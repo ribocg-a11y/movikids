@@ -42,9 +42,9 @@ Integrar custo folha (memorial aba FOLHA) ao Dashboard admin e dar **semáforo o
 
 ## Deploy
 
-- GAS base: `DEPLOY_v1.5.80_FASE9_FOLHA_VIABILIDADE.md`  
-- GAS repair I25: **`DEPLOY_v1.5.91_FOLHA_REPAIR_USER_ENTERED.md`**  
-- FE: `DEPLOY_FE_v1.8.10_FASE9_FOLHA_VIABILIDADE.md`  
+- GAS base: `../arquivo/deploy/DEPLOY_v1.5.80_FASE9_FOLHA_VIABILIDADE.md`  
+- GAS repair I25: **`../arquivo/deploy/DEPLOY_v1.5.91_FOLHA_REPAIR_USER_ENTERED.md`**  
+- FE: `../arquivo/deploy/DEPLOY_FE_v1.8.10_FASE9_FOLHA_VIABILIDADE.md`  
 - Memorial folha: `../referencia/FOLHA_PAGAMENTO_MEMORIAL_E_PLANILHA.md`  
 - Incidente: `../arquivo/incidentes/INCIDENTE_I25_FOLHA_FORMULAS_NAME_2026-06-13.md`
 

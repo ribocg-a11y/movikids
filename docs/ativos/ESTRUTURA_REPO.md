@@ -19,7 +19,7 @@
 | `FinanceiroGeral.gs` | Referência FASE 11 | `financeiro/` (não é deploy MOVI KIDS) |
 | `protocolo-mestre.ps1`, `verify-gas-deploy.ps1` | Atalhos PC | Raiz = conveniência; origem em `scripts/` |
 
-**Documentação de processo** (`DEPLOY_*.md`, incidentes, fases) **não precisa na raiz** — já está em `docs/ativos/` e `docs/arquivo/`. No GitHub aparece a pasta `docs/` (correto).
+**Documentação de processo** (incidentes, fases, deploy histórico) fica em **`docs/`** — ativos enxutos: `DEPLOY_ATUAL.md` + `DEPLOY_GAS_*.md`.
 
 ---
 
@@ -58,7 +58,8 @@ movikids-github/
 ├── PROTÓTIPOS (URLs legadas na raiz)
 │   ├── ponto-mockup.html       mock RH v3.6 (não produção)
 │   ├── ponto_mockup.html · mock-ponto.html  → redirect
-│   └── gestao-adm-operadores-mockup.html
+│   ├── gestao-adm-operadores-mockup.html
+│   └── docs/prototipos/      cópias estáticas + README
 │
 ├── OUTROS
 │   ├── assets/                 logos, QR, mocks espelhados

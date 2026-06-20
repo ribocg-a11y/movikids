@@ -228,7 +228,7 @@ Erros cometidos neste projeto que nao devem se repetir:
 2. **Dashboard** abre com **apenas** `action=kpiMes` — nao disparar `resumoDia` em paralelo na mesma tela.
 3. **GAS `resumoDia`:** usar `calcLeadingDiaPatch_` — **nunca** chamar `buildKpiMesPayload_` inteiro dentro de `resumoDia`.
 4. Ao entregar fase com KPIs: incluir `TESTE_KPI_MES_READONLY.ps1` + homolog **PC admin** Dashboard.
-5. Pacote deploy completo: **`DEPLOY_v1.5.78_FASE7_KPI_PERF.md`** + **`DEPLOY_FE_v1.8.5_DASHBOARD_PERF.md`** (modelo `DEPLOY_v1.5.76`).
+5. Pacote deploy completo: arquivar em **`docs/arquivo/deploy/`** + atualizar **`DEPLOY_ATUAL.md`** (modelo `DEPLOY_v1.5.76`).
 
 **Documentacao:** `../arquivo/incidentes/INCIDENTE_I23_DASHBOARD_LENTO_TRAVADO_2026-06-09.md` · `MAPA_CODIGO_ARQUITETURA.md` §12
 
@@ -312,7 +312,7 @@ C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\m
 - Versao = header do arquivo (ex. `v1.5.80`), nunca inventada.
 - **Nunca** omitir o bloco — mesmo em respostas so de documentacao ou diagnostico.
 - Regra Cursor: `.cursor/rules/gas-deploy-caminho-pc.mdc`
-- Doc deploy mestre: `DEPLOY_GAS_v1.5.32_AUTH.md` · pacote atual: `DEPLOY_v1.5.80_FASE9_FOLHA_VIABILIDADE.md`
+- Doc deploy mestre: `DEPLOY_GAS_v1.5.32_AUTH.md` · **vigente:** `DEPLOY_ATUAL.md` · histórico: `docs/arquivo/deploy/`
 
 Complementa **Regra 8** (Apps Script: sim/nao no resumo de pacote).
 

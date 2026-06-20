@@ -46,8 +46,8 @@ Ciclo **FASE 0–5 + P2/P3 concluído** (07–09/06/2026). Balcão homologado, p
 | **3** Pacote L | 08/06 | UX polish + QR balcão v1.7.91 | `CHECKLIST_PACOTE_L.md` |
 | **4** CONFIG | 08/06 | Frota/preços na planilha sem redeploy | `FASE_4_CONFIG_PLANILHA.md` |
 | **5** Confiabilidade | 09/06 | B7+B1+B2+B8, tablet Milena, I21 v1.7.96 | `CHECKLIST_FASE5_TABLET.md` |
-| **P3** Backlog produto | 09/06 | B3+B4+B5+N2, CRM recorrente | `DEPLOY_v1.5.73_P3_BACKLOG.md` |
-| **P2** Backlog técnico | 09/06 | B6 PIN GAS, CI, F10, schema | `DEPLOY_v1.5.74_B6_PIN_ADMIN.md` · `.github/workflows/ci.yml` |
+| **P3** Backlog produto | 09/06 | B3+B4+B5+N2, CRM recorrente | `../arquivo/deploy/DEPLOY_v1.5.73_P3_BACKLOG.md` |
+| **P2** Backlog técnico | 09/06 | B6 PIN GAS, CI, F10, schema | `../arquivo/deploy/DEPLOY_v1.5.74_B6_PIN_ADMIN.md` · `.github/workflows/ci.yml` |
 
 ### Pacotes históricos fechados (pré-fases)
 

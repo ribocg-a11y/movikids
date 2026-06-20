@@ -38,7 +38,7 @@ Antecipar problemas antes do P&L fechado: **semáforo verde/amarelo/vermelho** +
 | 8.2 | Port/adaptar `finSinalEmpresa_` → `movikidsSinalEmpresa_` | ✅ repo |
 | 8.3 | Campo `alertas: [{ nivel, codigo, titulo, mensagem, acionavel }]` em `kpiMes` | ✅ repo |
 | 8.4 | Campo `sinalEmpresa: { nivel, label, motivo }` em `kpiMes` | ✅ repo |
-| 8.5 | Doc **`DEPLOY_v1.5.79_FASE8_ALERTAS.md`** | ✅ |
+| 8.5 | Doc **`../arquivo/deploy/DEPLOY_v1.5.79_FASE8_ALERTAS.md`** | ✅ |
 
 ### FE v1.8.3
 

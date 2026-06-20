@@ -57,4 +57,4 @@ C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\m
 
 **Status 08/06/2026:** ✅ deploy concluído — ping `v1.5.69`.
 
-Guia: `DEPLOY_v1.5.69_GOLDEN_RELATORIO.md`
+Guia: `../arquivo/deploy/DEPLOY_v1.5.69_GOLDEN_RELATORIO.md`

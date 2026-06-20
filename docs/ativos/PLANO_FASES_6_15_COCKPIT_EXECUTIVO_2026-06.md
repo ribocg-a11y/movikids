@@ -112,7 +112,7 @@ Anexo A  ROIC/ERP/multi-loja — só com decisão sócio
 | 6.3 | **`narrativaExecutiva_`** — texto gerado no GAS (3–5 frases, comparativo mês ant.) | GAS | `buildKpiMesPayload_` → campo `narrativaExecutiva` |
 | 6.4 | Comparativos inline (↑↓ vs mês anterior) nos 5 KPIs | FE + GAS | reutiliza `fatMesAnt`, `margem`, payback |
 | 6.5 | Teste readonly **`TESTE_FASE6_COCKPIT_READONLY.ps1`** | QA | `scripts/testes/` |
-| 6.6 | Doc deploy **`DEPLOY_v1.5.75_FASE6_COCKPIT.md`** | Docs | `docs/ativos/` |
+| 6.6 | Doc deploy **`../arquivo/deploy/DEPLOY_v1.5.75_FASE6_COCKPIT.md`** | Docs | `docs/arquivo/deploy/` |
 
 ### Melhorias funcionais
 

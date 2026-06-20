@@ -2,7 +2,7 @@
 
 **Atualizado:** 20/06/2026
 
-Use **este arquivo** para versão e ordem de publicação. Docs `DEPLOY_v1.5.xx_*` e `DEPLOY_FE_v1.8.xx_*` em `docs/ativos/` são **histórico** — não substituem este.
+Use **este arquivo** para versão e ordem de publicação. Docs `DEPLOY_v1.5.xx_*` e `DEPLOY_FE_v1.8.xx_*` em **`docs/arquivo/deploy/`** são histórico — não substituem este.
 
 ---
 
