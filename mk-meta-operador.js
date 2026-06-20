@@ -6,6 +6,11 @@ let _metaLastN = null;
 let _metaCelebrateLevel = null;
 let _metaConfettiAnim = false;
 let _metaConfettiPieces = [];
+let _metaHeroDismissTimer = null;
+
+/** Hero motivacional: reta final (≤5 loc) + celebração; só sessão operador (não admin). */
+const MK_META_HERO_FALTAM_MAX = 5;
+const MK_META_HERO_DISMISS_MS = 8500;
 
 /** Meta 20 loc/turno · R$100 só se **21+** loc (acima da meta). */
 const MK_META_CFG = {
@@ -82,6 +87,45 @@ function mkMetaResolveOperadorId_(hint) {
     return Number(params.operadorId);
   }
   return 0;
+}
+
+/** Operador logado no balcão com meta ativa — oculta para admin/supervisor. */
+function mkMetaSessaoOperadorAtiva_() {
+  if (typeof mkAuthIsAdmin === 'function' && mkAuthIsAdmin()) return 0;
+  if (typeof window !== 'undefined' && window.isAdmin) return 0;
+  return mkMetaResolveOperadorId_();
+}
+
+function mkMetaShouldShowHero_(d) {
+  const sessOp = mkMetaSessaoOperadorAtiva_();
+  if (!sessOp) return false;
+  const dOp = Number(d.operadorId) || mkMetaResolveOperadorId_(d);
+  if (dOp !== sessOp) return false;
+
+  const h = d.hoje || {};
+  if (h.folga) return false;
+
+  const meta = Number(d.meta) || 20;
+  const n = Number(h.n) || 0;
+  const faltam = Math.max(0, meta - n);
+
+  if (_metaHeroDismissTimer) return true;
+
+  if (n >= meta) {
+    if (_metaLastN !== null && _metaLastN < meta && n >= meta) return true;
+    if (_metaLastN !== null && _metaLastN <= meta && n > meta) return true;
+    return false;
+  }
+
+  return faltam <= MK_META_HERO_FALTAM_MAX && faltam >= 1;
+}
+
+function mkMetaScheduleDismiss_() {
+  if (_metaHeroDismissTimer) clearTimeout(_metaHeroDismissTimer);
+  _metaHeroDismissTimer = setTimeout(function() {
+    _metaHeroDismissTimer = null;
+    mkMetaHideHero_();
+  }, MK_META_HERO_DISMISS_MS);
 }
 
 function mkMetaShiftLabel_(shift) {
@@ -247,6 +291,7 @@ function mkMetaCelebrate_(level, d, n, meta, bonusVal, nome) {
   _metaCelebrateLevel = level;
   mkMetaSpawnBalloons_();
   mkMetaFireConfetti_();
+  mkMetaScheduleDismiss_();
   if (typeof toast === 'function') {
     if (level === 'bonus') {
       toast('Bônus! ' + n + ' locações — +R$ ' + bonusVal + ' no turno 🎉', 'success', 6000);
@@ -257,6 +302,10 @@ function mkMetaCelebrate_(level, d, n, meta, bonusVal, nome) {
 }
 
 function mkMetaHideHero_() {
+  if (_metaHeroDismissTimer) {
+    clearTimeout(_metaHeroDismissTimer);
+    _metaHeroDismissTimer = null;
+  }
   mkMetaShowTile_(document.getElementById('stat-meta-tile'), false);
   mkMetaShowTile_(document.getElementById('mk-meta-hero-wrap'), false);
 }
@@ -264,6 +313,11 @@ function mkMetaHideHero_() {
 function mkMetaRenderHero_(d) {
   const hero = document.getElementById('mk-meta-hero-wrap');
   if (!hero || !d || !d.ok || d.configurado === false) {
+    mkMetaHideHero_();
+    return;
+  }
+
+  if (!mkMetaShouldShowHero_(d)) {
     mkMetaHideHero_();
     return;
   }
@@ -301,10 +355,7 @@ function mkMetaRenderHero_(d) {
     : '';
 
   if (h.folga) {
-    if (elNum) { elNum.textContent = 'Folga'; elNum.style.fontSize = '32px'; }
-    if (elCountLbl) elCountLbl.innerHTML = 'hoje';
-    if (elPhrase) elPhrase.textContent = nome + ', descanse — amanhã tem mais aventura! 😊';
-    if (elFoot) elFoot.textContent = 'Meta pausada no dia de folga';
+    mkMetaHideHero_();
     _metaLastN = n;
     return;
   }
@@ -371,7 +422,7 @@ function mkMetaRenderKpi_(d) {
 function mkMetaRefreshInstant_() {
   const hero = document.getElementById('mk-meta-hero-wrap');
   if (!hero) return;
-  const opId = mkMetaResolveOperadorId_(window._mkLastMetaTurno);
+  const opId = mkMetaSessaoOperadorAtiva_();
   if (!opId || !mkMetaCfgAtiva_(opId)) {
     mkMetaHideHero_();
     return;
@@ -388,7 +439,7 @@ function mkMetaApplyFromInicio_(d) {
     return;
   }
   window._mkLastMetaTurno = null;
-  const opId = mkMetaResolveOperadorId_();
+  const opId = mkMetaSessaoOperadorAtiva_();
   if (!opId || !mkMetaCfgAtiva_(opId)) {
     mkMetaHideHero_();
     return;
@@ -414,7 +465,7 @@ function mkMetaRefreshMesAsync_() {
 
 async function mkMetaRefreshMesFromServer_() {
   if (_metaRefreshBusy) return;
-  const opId = mkMetaResolveOperadorId_(window._mkLastMetaTurno);
+  const opId = mkMetaSessaoOperadorAtiva_() || mkMetaResolveOperadorId_(window._mkLastMetaTurno);
   if (!opId || !mkMetaCfgAtiva_(opId)) return;
   _metaRefreshBusy = true;
   try {
