@@ -69,19 +69,10 @@
 | Documento | Para quê |
 |-----------|----------|
 | [**DEPLOY_ATUAL.md**](ativos/DEPLOY_ATUAL.md) | **Deploy vigente** — versões e ordem |
-| [DEPLOY_GAS_v1.5.32_AUTH.md](ativos/DEPLOY_GAS_v1.5.32_AUTH.md) | Deploy GAS mestre + link `.gs` |
-| [DEPLOY_v1.5.91_FOLHA_REPAIR_USER_ENTERED.md](ativos/DEPLOY_v1.5.91_FOLHA_REPAIR_USER_ENTERED.md) | **Deploy GAS v1.5.91** — I25 FOLHA USER_ENTERED |
-| [DEPLOY_v1.5.81_FOLHA_PROPORCIONAL.md](ativos/DEPLOY_v1.5.81_FOLHA_PROPORCIONAL.md) | Deploy GAS v1.5.81 — folha proporcional + ping |
-| [DEPLOY_v1.5.80_FASE9_FOLHA_VIABILIDADE.md](ativos/DEPLOY_v1.5.80_FASE9_FOLHA_VIABILIDADE.md) | Deploy GAS v1.5.80 — FASE 9 folha CLT |
-| [DEPLOY_FE_v1.8.15_SEMANA_ATUAL.md](ativos/DEPLOY_FE_v1.8.15_SEMANA_ATUAL.md) | **Deploy FE v1.8.15** — semana atual + fix I3 cache-bust |
-| [DEPLOY_FE_v1.8.12_DASHBOARD_NARRATIVO.md](ativos/DEPLOY_FE_v1.8.12_DASHBOARD_NARRATIVO.md) | Deploy FE v1.8.11–1.8.14 — Dashboard narrativo |
-| [DEPLOY_FE_v1.8.10_FASE9_FOLHA_VIABILIDADE.md](ativos/DEPLOY_FE_v1.8.10_FASE9_FOLHA_VIABILIDADE.md) | Deploy FE v1.8.10 — painel viabilidade |
-| [DEPLOY_v1.5.79_FASE8_ALERTAS.md](ativos/DEPLOY_v1.5.79_FASE8_ALERTAS.md) | Deploy GAS v1.5.79 — FASE 8 |
+| [DEPLOY_GAS_v1.5.32_AUTH.md](ativos/DEPLOY_GAS_v1.5.32_AUTH.md) | Processo GAS mestre + link `.gs` |
 | [../referencia/FOLHA_PAGAMENTO_MEMORIAL_E_PLANILHA.md](../referencia/FOLHA_PAGAMENTO_MEMORIAL_E_PLANILHA.md) | Memorial aba FOLHA |
-| [DEPLOY_v1.5.77_FASE7_PERF.md](ativos/DEPLOY_v1.5.77_FASE7_PERF.md) | Deploy GAS v1.5.77 — I23 fase 1 |
-| [DEPLOY_v1.5.76_FASE7_LEADING.md](ativos/DEPLOY_v1.5.76_FASE7_LEADING.md) | Deploy GAS FASE 6–7 — regra de ouro completa |
-| [DEPLOY_FE_v1.8.2_HOTFIX_I22.md](ativos/DEPLOY_FE_v1.8.2_HOTFIX_I22.md) | Hotfix FE I22 — só Pages |
-| [HOMOLOGACAO_PRODUCAO_ASSISTIDA.md](ativos/HOMOLOGACAO_PRODUCAO_ASSISTIDA.md) | Checklist operação |
+| [arquivo/deploy/](arquivo/deploy/) | **Histórico** — todos `DEPLOY_v1.5.xx` / `DEPLOY_FE_v1.8.xx` (não usar versão) |
+| [HOMOLOGACAO_PRODUCAO_ASSISTIDA.md](ativos/HOMOLOGACAO_PRODUCAO_ASSISTIDA.md) | ⚠️ Obsoleto — usar `CHECKLIST_FASE5` + `TESTE_TABLET_*` |
 
 ## Negócio
 

@@ -74,6 +74,7 @@ Cada fluxo tem: **arquivos**, **incidentes**, **teste automático**, **tablet ob
 | **F12** | Admin — KPIs / payback / caixa / cockpit / **folha CLT** | Dashboard (`kpiMes`), Caixa (`resumoDia`), payback, viabilidade | `mk-admin.js`, GAS `buildKpiMesPayload_`, `lerFolhaPlanejamento_`, `repairFolhaAdmin` | I23, **I25**, payback M | `TESTE_KPI_MES_READONLY`, `TESTE_FOLHA_FORMULAS_READONLY`, `TESTE_FASE9_FOLHA_READONLY` | PC admin |
 | **F13** | CRM relacionamento | busca responsável, badge cadastro | `index.html` rel, GAS | K.3 | `TESTE_RELACIONAMENTO` | opcional |
 | **F14** | HTTP / escrita browser | GET nas 5 actions críticas | `mk-api.js` | **I15** | `TESTE_PARIDADE_HTTP` | ✅ |
+| **F15** | Gestão Pessoas / RH | abas planilha, login colaborador, alertas ponto ADM | `gestao-pessoas.html`, `mk-gestao-pessoas*.js`, `mk-holerite.js`, GAS RH | I29–I34 | `TESTE_GESTAO_PESSOAS_READONLY` | PC / celular holerite |
 
 ### 2.1 Grafo — o que conecta com o quê (zona sensível)
 

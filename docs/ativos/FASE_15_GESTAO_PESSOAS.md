@@ -50,6 +50,7 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 3. FE **v1.8.71** Pages (auth DNA + holerite `mk-holerite.js`)
 4. Homolog: dropdown + 4 PIN + hub 5 portas
 5. Tablet balcão: regressão F5/F7/F10/F11
+6. Readonly RH: `TESTE_GESTAO_PESSOAS_READONLY.ps1`
 
 ## Incidentes
 

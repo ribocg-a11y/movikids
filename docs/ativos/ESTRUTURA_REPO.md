@@ -102,7 +102,7 @@ Ver **`MAPA_FASES.md`** para tradução FASE 15 cockpit vs Gestão Pessoas vs Pr
 
 | Item | Ação futura |
 |------|-------------|
-| 27× `DEPLOY_*.md` em `ativos/` | Mover para `arquivo/deploy/`; manter `DEPLOY_ATUAL` + `DEPLOY_GAS` mestre |
+| 27× `DEPLOY_*.md` em `ativos/` | ✅ movidos para `docs/arquivo/deploy/` (20/06) |
 | Mockups duplicados em `assets/` | Unificar links para `ponto-mockup.html` |
 | `HOMOLOGACAO_PRODUCAO_ASSISTIDA.md` | Obsoleto — usar `CHECKLIST_FASE5` + `TESTE_TABLET_*` |
 

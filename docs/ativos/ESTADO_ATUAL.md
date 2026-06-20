@@ -11,7 +11,7 @@ Referência única para alinhamento local × produção.
 **FASE 9 Folha CLT:** **`FASE_9_FOLHA_VIABILIDADE_CLT.md`**  
 **Memorial folha:** `../referencia/FOLHA_PAGAMENTO_MEMORIAL_E_PLANILHA.md`  
 **FASE 14 mini-DRE:** 🟡 memorial — `FASE_14_MINI_DRE.md` · `../referencia/MEMORIAL_MINI_DRE.md`  
-**Deploy GAS pacote:** **`DEPLOY_ATUAL.md`** · histórico `DEPLOY_v1.5.91_FOLHA_REPAIR_USER_ENTERED.md`  
+**Deploy GAS pacote:** **`DEPLOY_ATUAL.md`** · histórico `../arquivo/deploy/DEPLOY_v1.5.91_FOLHA_REPAIR_USER_ENTERED.md`  
 **Incidente I29 (DNA Gestão Pessoas):** `../arquivo/incidentes/INCIDENTE_I29_GESTAO_PESSOAS_DNA_UI_2026-06-18.md`  
 **Incidente I30 (abas RH getRange):** `../arquivo/incidentes/INCIDENTE_I30_GAS_ABAS_GESTAO_RANGE_2026-06-18.md`  
 **Incidentes sessão 20/06:** **I31** Pelúcias CONFIG · **I32** loc duplicada/SMS · **I33** PWA boot · **I34** holerite — ver `MAPA_ERROS_FALHAS_BUGS.md`
@@ -49,7 +49,7 @@ https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPe
 | Artefato | Arquivo |
 |----------|---------|
 | GAS | `MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs` | `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github\MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs` |
-| Payback | `MEMORIAL_PAYBACK_INVESTIMENTO.md` · deploy `DEPLOY_v1.5.61_PAYBACK.md` (atualizar v1.5.63) |
+| Payback | `MEMORIAL_PAYBACK_INVESTIMENTO.md` · deploy histórico `../arquivo/deploy/DEPLOY_v1.5.63_PAYBACK.md` |
 | Clasp | `gas/Code.gs` (gerado por `scripts/sync-gas-to-clasp.ps1` — não editar à mão) |
 | Login | `mk-auth.js` + gate em `index.html` |
 | Versão FE | `mk-version.js`, `sw.js`, **`index.html ?v=`** (I3 — sempre os três) |
@@ -84,6 +84,7 @@ https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPe
 | **Comunicação balcão** | **`OPERACAO_COMUNICACAO_QR_ONLY.md`** · FE v1.8.20 · `MK_COMUNICACAO_MODO=qr_only` |
 | **Teste FOLHA fórmulas** | `TESTE_FOLHA_FORMULAS_READONLY.ps1` — gate pós-deploy I25 |
 | **Teste FASE 9 folha** | `TESTE_FASE9_FOLHA_READONLY.ps1` |
+| **Teste Gestão Pessoas** | `TESTE_GESTAO_PESSOAS_READONLY.ps1` — F15-RH readonly |
 | **Homologação tablet F5–F11** | `TESTE_TABLET_F5_F7_F10_F11.ps1` + `TESTE_TABLET_F5_F7_F10_F11_BROWSER.js` |
 | Mapa bugs | `MAPA_ERROS_FALHAS_BUGS.md` |
 | Emergência | `scripts/ops/liberar-*.html`, `scripts/corrigir-locacao-206.html` |

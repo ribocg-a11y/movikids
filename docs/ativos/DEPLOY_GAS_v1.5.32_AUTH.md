@@ -12,7 +12,7 @@ C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\m
 
 **Toda resposta do agente** termina com: `Mudança no AppScript: sim | não` + link acima se sim (**Regra 16** · `.cursor/rules/gas-deploy-caminho-pc.mdc`).
 
-Pacote atual: **`DEPLOY_ATUAL.md`** · histórico **`DEPLOY_v1.5.91_FOLHA_REPAIR_USER_ENTERED.md`**
+Pacote atual: **`DEPLOY_ATUAL.md`** · histórico **`../arquivo/deploy/DEPLOY_v1.5.91_FOLHA_REPAIR_USER_ENTERED.md`**
 
 **Publicar em produção (obrigatório — I26):**
 
