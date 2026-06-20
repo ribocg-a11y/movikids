@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Movi Kids">
 <title>Movi Kids</title>
-<script src="mk-canonical-host.js?v=1.8.71"></script>
+<script src="mk-canonical-host.js?v=1.8.72"></script>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png">
@@ -17,17 +17,17 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<script src="mk-stale-sync.js?v=1.8.71"></script>
-<script src="mk-version.js?v=1.8.71"></script>
-<script src="mk-api.js?v=1.8.71"></script>
-<link rel="stylesheet" href="mk-design.css?v=1.8.71">
+<script src="mk-stale-sync.js?v=1.8.72"></script>
+<script src="mk-version.js?v=1.8.72"></script>
+<script src="mk-api.js?v=1.8.72"></script>
+<link rel="stylesheet" href="mk-design.css?v=1.8.72">
 
-<script src="mk-cache-bust.js?v=1.8.71"></script>
+<script src="mk-cache-bust.js?v=1.8.72"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<link rel="stylesheet" href="mk-app.css?v=1.8.71">
-<link rel="stylesheet" href="mk-gestao-pessoas.css?v=1.8.71">
+<link rel="stylesheet" href="mk-app.css?v=1.8.72">
+<link rel="stylesheet" href="mk-gestao-pessoas.css?v=1.8.72">
 <!-- Firebase SDK — Realtime sync canonico para todos os dispositivos -->
-<script type="module" src="mk-firebase.js?v=1.8.71"></script>
+<script type="module" src="mk-firebase.js?v=1.8.72"></script>
 </head>
 
 <body>
@@ -260,12 +260,29 @@
     <div class="mk-stat-row stats-bar">
       <div class="mk-stat-tile stat-card"><div class="stat-val mk-stat-val" id="stat-ativas">0</div><div class="stat-lbl mk-stat-lbl">Ativas agora</div></div>
       <div class="mk-stat-tile stat-card"><div class="stat-val mk-stat-val" id="stat-nloc">0</div><div class="stat-lbl mk-stat-lbl">Encerradas hoje</div></div>
-      <div class="mk-stat-tile stat-card mk-stat-meta" id="stat-meta-tile" hidden>
+      <div class="mk-stat-tile stat-card mk-stat-meta" id="stat-meta-tile" hidden aria-hidden="true">
         <div class="stat-val mk-stat-val" id="stat-meta-val">—</div>
         <div class="stat-lbl mk-stat-lbl" id="stat-meta-lbl">Meta do turno</div>
         <div class="mk-stat-meta-sub" id="stat-meta-sub"></div>
       </div>
     </div>
+    <div id="mk-meta-hero-wrap" class="mk-meta-hero" hidden role="status" aria-live="polite">
+      <div class="mk-meta-balloons" id="mk-meta-balloons" aria-hidden="true"></div>
+      <div class="mk-meta-hero-head">
+        <span class="mk-meta-hero-badge" id="mk-meta-hero-badge">Meta · —</span>
+        <span class="mk-meta-hero-progress" id="mk-meta-hero-ratio">—/20</span>
+      </div>
+      <div class="mk-meta-hero-count" id="mk-meta-hero-count">
+        <span class="mk-meta-hero-num" id="mk-meta-hero-num">—</span>
+        <span class="mk-meta-hero-count-lbl" id="mk-meta-hero-count-lbl">locações<br>para a meta</span>
+      </div>
+      <p class="mk-meta-hero-phrase" id="mk-meta-hero-phrase"></p>
+      <div class="mk-meta-hero-bar" aria-hidden="true">
+        <div class="mk-meta-hero-bar-fill" id="mk-meta-hero-bar"></div>
+      </div>
+      <p class="mk-meta-hero-foot" id="mk-meta-hero-foot"></p>
+    </div>
+    <canvas id="mk-meta-confetti-canvas" class="mk-meta-confetti-canvas" aria-hidden="true"></canvas>
     <div class="mk-qr-balcao-card" id="mk-qr-balcao-strip" role="region" aria-label="Portal dos pais">
       <span class="mk-qr-balcao-ico" aria-hidden="true">📲</span>
       <div class="mk-qr-balcao-copy">
@@ -1762,26 +1779,26 @@
   </div>
 </div>
 
-<script src="mk-globals.js?v=1.8.71"></script>
-<script src="mk-core.js?v=1.8.71"></script>
-<script src="mk-nav.js?v=1.8.71"></script>
-<script src="mk-admin.js?v=1.8.71"></script>
-<script src="mk-historico.js?v=1.8.71"></script>
-<script src="mk-sessao.js?v=1.8.71"></script>
-<script src="mk-home.js?v=1.8.71"></script>
-<script src="mk-meta-operador.js?v=1.8.71"></script>
-<script src="mk-custos.js?v=1.8.71"></script>
-<script src="mk-avulso.js?v=1.8.71"></script>
-<script src="mk-sync.js?v=1.8.71"></script>
-<script src="mk-nova.js?v=1.8.71"></script>
-<script src="mk-relacionamento.js?v=1.8.71"></script>
-<script src="mk-operacao.js?v=1.8.71"></script>
-<script src="mk-drawer.js?v=1.8.71"></script>
-<script src="mk-update.js?v=1.8.71"></script>
-<script src="mk-gestao-pessoas.js?v=1.8.71"></script>
-<script src="mk-holerite.js?v=1.8.71"></script>
-<script src="mk-gestao-pessoas-admin.js?v=1.8.71"></script>
-<script src="mk-auth.js?v=1.8.71"></script>
-<script src="mk-boot.js?v=1.8.71"></script>
+<script src="mk-globals.js?v=1.8.72"></script>
+<script src="mk-core.js?v=1.8.72"></script>
+<script src="mk-nav.js?v=1.8.72"></script>
+<script src="mk-admin.js?v=1.8.72"></script>
+<script src="mk-historico.js?v=1.8.72"></script>
+<script src="mk-sessao.js?v=1.8.72"></script>
+<script src="mk-home.js?v=1.8.72"></script>
+<script src="mk-meta-operador.js?v=1.8.72"></script>
+<script src="mk-custos.js?v=1.8.72"></script>
+<script src="mk-avulso.js?v=1.8.72"></script>
+<script src="mk-sync.js?v=1.8.72"></script>
+<script src="mk-nova.js?v=1.8.72"></script>
+<script src="mk-relacionamento.js?v=1.8.72"></script>
+<script src="mk-operacao.js?v=1.8.72"></script>
+<script src="mk-drawer.js?v=1.8.72"></script>
+<script src="mk-update.js?v=1.8.72"></script>
+<script src="mk-gestao-pessoas.js?v=1.8.72"></script>
+<script src="mk-holerite.js?v=1.8.72"></script>
+<script src="mk-gestao-pessoas-admin.js?v=1.8.72"></script>
+<script src="mk-auth.js?v=1.8.72"></script>
+<script src="mk-boot.js?v=1.8.72"></script>
 </body>
 </html>

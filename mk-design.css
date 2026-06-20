@@ -168,6 +168,143 @@
 .mk-stat-tile.is-meta-warn .mk-stat-val { color: var(--orange, #FB8C00); }
 .mk-stat-tile.is-meta-idle .mk-stat-val { color: var(--txt3); font-size: 20px !important; }
 
+/* Meta operador — hero motivacional (FASE 15 · Raykelly) */
+.mk-meta-hero {
+  position: relative;
+  overflow: hidden;
+  border-radius: 18px;
+  padding: 18px 16px 16px;
+  margin-bottom: 14px;
+  background: linear-gradient(135deg, #FFF8E1 0%, #FFECB3 45%, #FFE082 100%);
+  border: 2px solid #FFB300;
+  box-shadow: 0 8px 24px rgba(251, 140, 0, 0.18);
+  transition: transform 0.35s ease, box-shadow 0.35s ease;
+}
+.mk-meta-hero.is-celebrate {
+  background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 40%, #A5D6A7 100%);
+  border-color: #43A047;
+  box-shadow: 0 12px 32px rgba(46, 125, 50, 0.25);
+  animation: mkMetaPop 0.5s ease;
+}
+@keyframes mkMetaPop {
+  0% { transform: scale(0.96); }
+  60% { transform: scale(1.02); }
+  100% { transform: scale(1); }
+}
+.mk-meta-hero-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.mk-meta-hero-badge {
+  font-size: 10px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #E65100;
+  background: rgba(255, 255, 255, 0.75);
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+.mk-meta-hero.is-celebrate .mk-meta-hero-badge { color: #2E7D32; }
+.mk-meta-hero-progress {
+  font-family: 'Fredoka One', cursive;
+  font-size: 22px;
+  color: #E65100;
+  line-height: 1;
+}
+.mk-meta-hero.is-celebrate .mk-meta-hero-progress { color: #2E7D32; }
+.mk-meta-hero-count {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 8px;
+  margin: 8px 0 12px;
+}
+.mk-meta-hero-num {
+  font-family: 'Fredoka One', cursive;
+  font-size: 56px;
+  line-height: 1;
+  color: var(--orange, #FB8C00);
+  text-shadow: 0 2px 0 rgba(255, 255, 255, 0.6);
+  font-variant-numeric: tabular-nums;
+}
+.mk-meta-hero.is-celebrate .mk-meta-hero-num { color: var(--green, #2E7D32); font-size: 48px; }
+.mk-meta-hero-count-lbl {
+  font-size: 15px;
+  font-weight: 900;
+  color: #BF360C;
+  max-width: 110px;
+  line-height: 1.25;
+  text-align: left;
+}
+.mk-meta-hero.is-celebrate .mk-meta-hero-count-lbl { color: #1B5E20; max-width: none; }
+.mk-meta-hero-phrase {
+  font-size: 16px;
+  font-weight: 900;
+  line-height: 1.45;
+  color: #5D4037;
+  text-align: center;
+  margin: 0 0 12px;
+}
+.mk-meta-hero.is-celebrate .mk-meta-hero-phrase {
+  font-family: 'Fredoka One', cursive;
+  font-size: 20px;
+  color: #1B5E20;
+}
+.mk-meta-hero-bar {
+  height: 10px;
+  background: rgba(255, 255, 255, 0.65);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+.mk-meta-hero-bar-fill {
+  height: 100%;
+  width: 0%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--orange, #FB8C00), var(--gold, #FFB300));
+  transition: width 0.6s cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+.mk-meta-hero.is-celebrate .mk-meta-hero-bar-fill {
+  background: linear-gradient(90deg, #43A047, #66BB6A);
+}
+.mk-meta-hero-foot {
+  font-size: 11px;
+  font-weight: 700;
+  color: #8D6E63;
+  text-align: center;
+}
+.mk-meta-hero.is-celebrate .mk-meta-hero-foot { color: #2E7D32; }
+.mk-meta-balloons {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+.mk-meta-hero.is-celebrate .mk-meta-balloons { opacity: 1; }
+.mk-balloon {
+  position: absolute;
+  bottom: -40px;
+  font-size: 28px;
+  animation: mkBalloonUp 4s ease-in infinite;
+}
+@keyframes mkBalloonUp {
+  0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+  10% { opacity: 1; }
+  100% { transform: translateY(-220px) rotate(12deg); opacity: 0; }
+}
+.mk-meta-confetti-canvas {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+}
+
 .mk-caixa-resumo { margin-bottom: 16px; }
 .mk-stat-hero {
   background: linear-gradient(135deg, var(--blue-dk), var(--blue));
