@@ -58,8 +58,11 @@ movikids-github/
 ├── PROTÓTIPOS (URLs legadas na raiz)
 │   ├── ponto-mockup.html       mock RH v3.6 (não produção)
 │   ├── ponto_mockup.html · mock-ponto.html  → redirect
-│   ├── gestao-adm-operadores-mockup.html
-│   └── docs/prototipos/      cópias estáticas + README
+│   ├── gestao-adm-operadores-mockup.html  → redirect (corpo em docs/prototipos/)
+│   └── docs/prototipos/      mockups + README
+│
+├── assets/
+│   ├── icon-192.png · icon-512.png · apple-touch-icon.png
 │
 ├── OUTROS
 │   ├── assets/                 logos, QR, mocks espelhados

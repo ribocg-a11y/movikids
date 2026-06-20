@@ -13,9 +13,10 @@
 
 | Arquivo | Destino |
 |---------|---------|
-| `mock-ponto.html` | `ponto-mockup.html?v=3.6` |
 | `ponto_mockup.html` | `ponto-mockup.html?v=3.6` (ou `gestao-pessoas.html?prod=1`) |
 | `assets/mock-ponto.html` | redirect para mock canônico |
+
+(`mock-ponto.html` na raiz removido — usar `ponto_mockup.html`.)
 
 ## Cópias nesta pasta
 
@@ -28,7 +29,7 @@ HTML estático para revisão no repo — **não** servidos pelo Pages salvo link
 
 ## Mock ADM na raiz
 
-`gestao-adm-operadores-mockup.html` — proposta UI ADM; depende de `mk-app.css` na raiz (Pages).
+`gestao-adm-operadores-mockup.html` — proposta UI ADM; corpo em **`docs/prototipos/gestao-adm-operadores-mockup.html`** (redirect na raiz).
 
 ## Produção
 

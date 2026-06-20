@@ -2,6 +2,22 @@
 
 Sistema operacional para locações — balcão (tablet), portal do responsável e painel admin.
 
+## Por que a raiz do GitHub tem ~50 arquivos?
+
+**GitHub Pages publica o app da raiz** — não dá para mover `mk-*.js` para subpastas sem quebrar o tablet.
+
+| Grupo | Qtd. | Exemplos | Pode mover? |
+|-------|------|----------|-------------|
+| **Módulos FE (Pacote M)** | ~25 | `mk-nova.js`, `mk-sync.js`, `mk-auth.js`… | **Não** — URLs do Pages |
+| **HTML produção** | 5 | `index.html`, `gestao-pessoas.html`, `acompanhar.html` | **Não** |
+| **CSS + boot** | 6 | `mk-app.css`, `sw.js`, `mk-version.js`, `manifest.json` | **Não** |
+| **Mock / redirect** | 3 | `ponto-mockup.html`, stubs finos | Parcial |
+| **GAS + config** | 2 | `MOVIKIDS_Code_...gs`, `gas-endpoint.json` | GAS: nome fixo |
+| **Docs + atalhos PC** | 4 | `README.md`, `AGENTS.md`, `protocolo-mestre.ps1` | Atalhos opcionais |
+| **Ícones PWA** | — | `assets/icon-*.png` | ✅ movidos para `assets/` |
+
+Detalhe: [docs/ativos/ESTRUTURA_REPO.md](docs/ativos/ESTRUTURA_REPO.md) · mockups: [docs/prototipos/README.md](docs/prototipos/README.md)
+
 ## Planejamento (09/06/2026)
 
 **Planejamento:** [PLANEJAMENTO_ATUAL_2026-06.md](docs/ativos/PLANEJAMENTO_ATUAL_2026-06.md) · [PLANO_PRIORIDADES](docs/ativos/PLANO_PRIORIDADES_2026-06.md)
