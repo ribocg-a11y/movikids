@@ -713,11 +713,33 @@
     function renderPagamento() {
       const p = PESSOAS[colabLogado];
       const pg = p.pagamento;
-      if ((pg.base || 0) <= 0 && !(pg.bonus || 0)) {
+      if ((pg.base || 0) <= 0 && !(pg.bonus || 0) && !(pg.holerite && pg.holerite.bruto)) {
         document.getElementById('pag-body').innerHTML = `<div class="mock-note info">${pg.obs || 'Sem demonstrativo CLT.'}</div>`;
         return;
       }
-      const c = (pg.holerite && pg.holerite.bruto) ? Object.assign({ vaCopart: 0, faltas: pg.faltas || 0 }, pg.holerite) : calcFolhaPagamento(pg);
+      if (typeof mkHolBuildHtml_ === 'function' && pg.holerite && (pg.holerite.bruto || pg.holerite.base)) {
+        document.getElementById('pag-body').innerHTML = mkHolBuildHtml_({
+          folha: {
+            id: p.id,
+            nome: p.label,
+            base: pg.base,
+            bonus: pg.bonus,
+            bonusDias: (p.meta && p.meta.diasMes) ? p.meta.diasMes.filter(function (d) { return d.bonusOk; }).length : 0,
+            holerite: pg.holerite
+          },
+          colab: {
+            id: p.id,
+            nome: p.label,
+            funcao: p.funcao,
+            admissao: p.admissao || (p.cadastro && p.cadastro.admissao) || '',
+            cpf: p.cadastro && p.cadastro.cpf
+          },
+          comp: pg.competencia,
+          toolbar: true
+        });
+        return;
+      }
+      const c = calcFolhaPagamento(pg);
       const cpfMask = p.cadastro && p.cadastro.cpf ? p.cadastro.cpf : '***.***.***-**';
       const adm = p.admissao ? p.admissao.split('-').reverse().join('/') : (pg.obs || '—');
       const refSal = (pg.diasTrabalhados && pg.diasMes) ? pg.diasTrabalhados + '/' + pg.diasMes + ' dias' : '30/30';

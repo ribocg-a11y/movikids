@@ -7270,6 +7270,7 @@ function painelGestaoPessoasAdmin_(p) {
       colaboradores.push({
         id: id, nome: rh ? rh.nome : String(r[1] || ''), hasPin: false, perfil: 'operador',
         funcao: rh ? rh.funcao : 'Colaborador', turno: rh ? rh.turno : '', admissao: rh ? rh.admissao : '',
+        cpf: rh ? rh.cpf : String(r[3] || '').trim(),
         cadastroPct: rh ? rh.cadastroPct : 0, temRh: true,
         escalaHoje: escalaHoje, escalaFolga: escalaHoje !== null && gpEscalaEhFolga_(escalaHoje),
         ponto: ponto, logadoBalcao: false,
