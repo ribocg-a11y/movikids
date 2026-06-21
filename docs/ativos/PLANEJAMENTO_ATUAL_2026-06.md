@@ -1,7 +1,7 @@
 # MOVI KIDS — Planejamento atual (pós-FASE 5)
 
-**Atualizado:** 21/06/2026 (operação **LIVRE** · protocolo **OK** · FE **v1.8.86** · GAS repo **v1.5.118**)  
-**Produção:** FE **v1.8.86** · GAS repo **v1.5.118** · Web **165** · Nova versão Web **pendente**  
+**Atualizado:** 21/06/2026 (operação **LIVRE** · FE **v1.8.93** · GAS repo **v1.5.123**)  
+**Produção:** FE **v1.8.93** · GAS repo **v1.5.123** · ping **v1.5.107** · Nova versão Web **pendente**  
 **Documentos irmãos:** `PLANO_PRIORIDADES_2026-06.md` · `MAPA_FASES.md` · `DEPLOY_ATUAL.md` · `HANDOFF_NOVO_CHAT.md`  
 **Ciclo ativo:** **`PLANO_FASES_6_15_COCKPIT_EXECUTIVO_2026-06.md`** · FASE 15: **`FASE_15_GESTAO_PESSOAS.md`** ✅  
 **Próximo ciclo:** **`PLANO_PREMIUM_ONEUI_FASES_16_22_2026-06.md`** ← manual Premium + One UI (20/06/2026)
@@ -12,7 +12,7 @@
 
 Ciclo **FASE 0–5 + P2/P3 concluído** (07–09/06/2026). Balcão homologado, portal QR, payback, CONFIG e APIs unificadas.
 
-**Modo atual:** **FASE 16 Premium One UI** ✅ FE · **FASE 17** — próximo ciclo · FASE 15 ✅ · FASE 14 mini-DRE ✅
+**Modo atual:** **FASE 15b.3** (Comunicados RH) · FASE 16 ✅ repo · FASE 17 🟡 · perf v1.8.93 ✅
 
 ---
 
@@ -185,11 +185,10 @@ Legenda: **P0** bloqueia operação · **P1** valor imediato · **P2** próximo 
 
 **Sequência imediata (21/06):**
 
-1. ✅ `check-operacao-livre` — **0 loc** (21/06 08:48)
-2. ✅ `TESTE_PROTOCOLO_DIAGNOSTICO` — **OK** (21/06 08:53)
-3. ⏳ **Nova versão Web GAS v1.5.116** — **sócio** (janela aberta)
-4. PC: Dashboard `?force=1.8.82` — gráfico Projetado acum. vs Real acum.
-5. Tablet: `?force=1.8.82` no PWA (fora do pico)
-6. **FASE 17 Alertas inteligentes** — kickoff após Nova versão Web GAS (`PLANO_PREMIUM_ONEUI_FASES_16_22_2026-06.md`)
+1. ✅ FE **v1.8.93** perf (SWR sync, prefetch admin, cache RH)
+2. ✅ Pré-visualização ADM colaborador (v1.8.92)
+3. ⏳ **Nova versão Web GAS v1.5.123** — sócio
+4. **Dev: FASE 15b.3 Comunicados** — aba `COMUNICADOS_RH` + faixa hub
+5. Tablet: homolog F5/F7/F10/F11 após GAS Web
 
-Incidentes: **I29–I34** — `MAPA_ERROS_FALHAS_BUGS.md`
+Doc mestre: `PLANO_PREMIUM_ONEUI_FASES_16_22_2026-06.md` §6 (15b.3)

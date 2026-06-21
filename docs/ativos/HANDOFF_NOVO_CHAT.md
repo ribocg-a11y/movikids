@@ -1,6 +1,6 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 21/06/2026 (FASE **15b.2** · FE **v1.8.91** · pré-visualização ADM colaborador)  
+**Atualizado:** 21/06/2026 (FASE **15b.3** kickoff · FE **v1.8.93** · perf SWR · GAS repo **v1.5.123**)  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **Repo local:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`  
@@ -52,11 +52,11 @@ Mensagem mínima: *"Vamos dar continuidade ao projeto Movi Kids, tem uma pasta n
 
 | Camada | Versão | Verificação |
 |--------|--------|-------------|
-| **Frontend** | **v1.8.90** | https://ribocg-a11y.github.io/movikids/?force=1.8.90 |
-| **Gestão Pessoas** | **v1.8.90** | `gestao-pessoas.html?force=1.8.90` |
-| **Service Worker** | **1.8.90** | `sw.js` |
+| **Frontend** | **v1.8.93** | https://ribocg-a11y.github.io/movikids/?force=1.8.93 |
+| **Gestão Pessoas** | **v1.8.93** | `gestao-pessoas.html?force=1.8.93` |
+| **Service Worker** | **1.8.93** | `sw.js` |
 | **Holerite** | **mk-holerite.js** | CNPJ **66.664.255/0001-67** · PDF/imprimir |
-| **Apps Script** | repo **v1.5.121** · clasp **OK** · ping **v1.5.107** · Web **165** | ⚠️ **Nova versão Web pendente** |
+| **Apps Script** | repo **v1.5.123** · clasp **OK** · ping **v1.5.107** · Web **165** | ⚠️ **Nova versão Web pendente** |
 | **Aba FOLHA** | **OK** (I25) | B68 ~5269,96 |
 | **Design System** | **v1.1** | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` (tokens `--mk-widget-*`) |
 
@@ -107,10 +107,11 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 
 | # | Ação | Quem | Status |
 |---|------|------|--------|
-| 1 | **Nova versão Web GAS v1.5.121** (alertas RH completos) | **Sócio** | ⏳ pendente |
-| 2 | Colaboradores: hero **Minha jornada hoje** `gestao-pessoas.html?force=1.8.90` | **Você** | ✅ FE após push |
-| 3 | **FASE 15b.2** — Comunicados RH no hub | **Agente** | ⏳ próximo |
-| 4 | Nova versão Web GAS v1.5.121 | **Sócio** | ⏳ pendente |
+| 1 | **Nova versão Web GAS v1.5.123** (perf + preview + comunicados quando pronto) | **Sócio** | ⏳ pendente |
+| 2 | Hero **Minha jornada hoje** + pré-visualização ADM | **Agente** | ✅ v1.8.90–v1.8.92 |
+| 3 | **Perf FE v1.8.93** — cache SWR, prefetch admin | **Agente** | ✅ publicado |
+| 4 | **FASE 15b.3** — Comunicados RH no hub colaborador | **Agente** | ⏳ **próximo dev** |
+| 5 | Homolog tablet F5/F7/F10/F11 (pós GAS Web) | **Ops loja** | ⏳ |
 
 **Nota ping:** string `v1.5.107` até Nova versão Web — código v1.5.117 já no editor.
 

@@ -138,9 +138,10 @@ FASE 22  Assistente IA gestão (Anexo — decisão sócio)
 
 | ID | Entrega | Status base |
 |----|---------|-------------|
-| 15b.1 | Jornada escala × ponto + banco projetado | 🟡 v1.5.111 repo / **v1.8.71** FE |
-| 15b.2 | Holerite quinzenal admin + colaborador | ✅ v1.5.108 / v1.8.64 |
-| 15b.3 | **Comunicados** — faixa no hub colaborador (planilha `COMUNICADOS_RH`) | Novo |
+| 15b.1 | Jornada escala × ponto + banco projetado + hero **Minha jornada hoje** | ✅ v1.5.111 / **v1.8.90** |
+| 15b.2 | Holerite quinzenal admin + colaborador + pré-visualização ADM | ✅ v1.5.108 / **v1.8.92** |
+| 15b.2b | Pré-visualização ADM (`admPreview=1`) somente leitura | ✅ v1.5.122 / **v1.8.92** |
+| 15b.3 | **Comunicados** — faixa no hub colaborador (planilha `COMUNICADOS_RH`) | ⏳ **próximo** |
 | 15b.4 | **Histórico desempenho** — loc/mês, metas atingidas, gráfico evolução | Novo |
 | 15b.5 | **Avaliações** — registro simples admin (nota + obs por competência) | Novo |
 | 15b.6 | **Benefícios visíveis** — VA, VT, copart no hub (não só holerite) | Parcial |
@@ -151,6 +152,31 @@ FASE 22  Assistente IA gestão (Anexo — decisão sócio)
 > *"Eu sei o que fazer e acompanho meu crescimento."*
 
 Hub 5 portas → hero **Minha jornada hoje** (escala + ponto + meta) antes das portas.
+
+### 15b.3 — Comunicados RH (kickoff 21/06/2026)
+
+**Objetivo:** colaborador vê avisos da gestão no hub, sem poluir o login.
+
+| Camada | Entrega |
+|--------|---------|
+| **Planilha** | Nova aba `COMUNICADOS_RH`: `id`, `data`, `titulo`, `mensagem`, `publico` (TODOS \| operadorId), `validoAte`, `ativo` (SIM/NAO), `prioridade` (info \| urgente) |
+| **GAS v1.5.124** | `listarComunicadosRh_` no painel colaborador · `salvarComunicadoRhAdmin_` (PIN 1416) · incluir em `instalarAbasGestaoPessoas` |
+| **FE v1.8.94** | Faixa `#gp-comunicados` abaixo do hero jornada · máx. 2 visíveis + "Ver todos" · dismiss local (session) |
+| **ADM** | Aba **Comunicados** em Operadores: formulário título + texto + público + validade |
+| **Preview ADM** | Mesma faixa na pré-visualização (dados reais ou demo) |
+| **QA** | `TESTE_COMUNICADOS_RH_READONLY.ps1` |
+
+**Regras UX (Design System §8 colaborador):**
+
+- Urgente = faixa âmbar (`--amber-lt`), info = azul claro (`--blue-lt`)
+- Uma linha de título + expandir detalhe (não modal)
+- Não bloquear ponto/metas — comunicado é apoio, não gate
+
+**Critério de pronto:**
+
+- [ ] Admin publica "Reunião sábado 10h" → Raykelly vê no hub em < 3 s (cache FE 5 min)
+- [ ] Comunicado expirado não aparece
+- [ ] Colaborador sem PIN admin não vê tela de edição
 
 ---
 
@@ -302,16 +328,17 @@ Widget live: % frota em uso agora · overlay gráfico ocupação por horário.
 
 ---
 
-## 15. Sequência imediata (atualizada 20/06/2026)
+## 15. Sequência imediata (atualizada 21/06/2026)
 
-| # | Ação | Responsável | Prazo |
-|---|------|-------------|-------|
-| 1 | Publicar **GAS v1.5.111** (ping ainda v1.5.107) | Sócio | Imediato |
-| 2 | FE **v1.8.71** em prod (I32–I34 holerite/CNPJ) | Agente | Concluído |
-| 3 | Homolog tablet F5/F7/F10/F11 | Ops loja | Esta semana |
-| 4 | Fechar FASE 15b.1–15b.2 checklist | Dev | Esta semana |
-| 5 | **Kickoff FASE 16** — mock `#mk-command-center` | Dev | Próxima sprint |
-| 6 | Design System **v1.1** — tokens One UI | Dev | Com FASE 16 |
+| # | Ação | Responsável | Status |
+|---|------|-------------|--------|
+| 1 | FE **v1.8.93** perf (SWR, prefetch, cache RH) | Agente | ✅ |
+| 2 | Pré-visualização ADM + fix JS colaborador | Agente | ✅ v1.8.92 |
+| 3 | **Nova versão Web GAS v1.5.123+** | Sócio | ⏳ |
+| 4 | **FASE 15b.3** Comunicados — spec §6 | Agente | ⏳ próximo |
+| 5 | Homolog tablet F5/F7/F10/F11 | Ops loja | ⏳ |
+| 6 | FASE 15b.4 Histórico desempenho | Agente | Backlog |
+| 7 | FASE 17 fechar perfil Gestor + homolog | Agente + Ops | 🟡 |
 
 ---
 
@@ -327,7 +354,24 @@ Widget live: % frota em uso agora · overlay gráfico ocupação por horário.
 
 ---
 
-## 17. Referência cruzada planos anteriores
+## 18. Progresso Premium One UI (21/06/2026)
+
+| Fase | Peso | % fase | Notas |
+|------|------|--------|-------|
+| **15b** RH completo | P1 ×2 | **~50%** | hero + holerite + preview ADM ✅ · comunicados ⏳ |
+| **16** Centro comando | P1 ×2 | **~88%** | FE+GAS repo ✅ · homolog tablet ⏳ |
+| **17** Alertas + Gestor | P1 ×2 | **~82%** | alertasInteligentes_ ✅ · perfil gestor 🟡 |
+| **18** Financeiro previsão | P2 | 0% | — |
+| **19** Gamificação | P2 | 0% | — |
+| **20** Portal analytics | P2 | 0% | — |
+| **21** Live BI frota | P2 | 0% | — |
+| **22** Assistente IA | P3 | 0% | Anexo |
+
+**Total plano (P1 peso 2×):** **~46% concluído · ~54% restante**
+
+---
+
+## 19. Referência cruzada planos anteriores
 
 | Plano antigo | Destino no Premium |
 |--------------|-------------------|
