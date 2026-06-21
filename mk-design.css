@@ -1529,6 +1529,20 @@
   --mk-admin-glass: rgba(255, 255, 255, 0.72);
   --mk-admin-glass-border: rgba(21, 101, 192, 0.12);
   --mk-admin-radius: 16px;
+  /* FASE 16 — One UI widget tokens v2 */
+  --mk-widget-gap: 12px;
+  --mk-widget-radius: 16px;
+  --mk-widget-pad: 14px 16px;
+  --mk-widget-val-size: 18px;
+  --mk-widget-lbl-size: 10px;
+  --mk-widget-ctx-size: 11px;
+  --mk-space-8: 8px;
+  --mk-space-12: 12px;
+  --mk-space-16: 16px;
+  --mk-space-24: 24px;
+  --mk-trend-up: #2E7D32;
+  --mk-trend-down: #C62828;
+  --mk-trend-neutral: #888;
 }
 
 /* Sidebar 9.10 — estado ativo portal-blue */
@@ -1608,11 +1622,6 @@
 .mk-admin-acc-body { padding: 4px 14px 16px; }
 
 /* FASE 16 — Centro de comando (One UI widgets) */
-.mk-admin-page {
-  --mk-widget-gap: 12px;
-  --mk-widget-radius: 16px;
-  --mk-widget-pad: 14px 16px;
-}
 .mk-dash-chapter-now .mk-dash-step-live {
   background: #C62828;
   color: #fff;
@@ -1680,7 +1689,7 @@
 }
 .mk-widget-val {
   font-family: 'Nunito', sans-serif;
-  font-size: 18px;
+  font-size: var(--mk-widget-val-size);
   font-weight: 800;
   color: #1a1a2e;
   line-height: 1.2;
@@ -1695,8 +1704,8 @@
   color: #888;
   line-height: 1.35;
 }
-.mk-widget-ctx.trend-up { color: #2E7D32; }
-.mk-widget-ctx.trend-down { color: #C62828; }
+.mk-widget-ctx.trend-up { color: var(--mk-trend-up); }
+.mk-widget-ctx.trend-down { color: var(--mk-trend-down); }
 .mk-cmd-frota-strip {
   margin-top: 12px;
   display: flex;

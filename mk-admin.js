@@ -736,6 +736,7 @@ async function carregarKPIsDashboard(mes, ano) {
       else renderCommandCenterFallback_();
     }).catch(function() {});
     carregarCommandCenter_().catch(function() {});
+    mkCommandCenterStartRefresh_();
     if (typeof showAdminHomeKpis === 'function') showAdminHomeKpis(kpiHubStub_());
     if (typeof atualizarHubAdmin_ === 'function') atualizarHubAdmin_();
   } catch (e) {
@@ -869,6 +870,14 @@ function setDeltaEl_(id, delta, suffix) {
   if (!el) return;
   el.textContent = fmtDeltaCockpit_(delta, suffix);
   el.className = 'mk-exec-kpi-delta' + (delta > 0 ? ' up' : delta < 0 ? ' down' : '');
+}
+
+/** FASE 16 — linha interpretativa sob KPI do cockpit. */
+function setCockpitCtx_(id, text, trend) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = text || '—';
+  el.className = 'mk-exec-kpi-delta' + (trend === 'up' ? ' up' : trend === 'down' ? ' down' : '');
 }
 
 function mkAlertPeriodKey_(d) {
@@ -1088,6 +1097,14 @@ async function carregarCommandCenter_() {
   renderCommandCenterFallback_();
 }
 
+function mkCommandCenterStartRefresh_() {
+  if (window._mkCmdRefreshTimer) clearInterval(window._mkCmdRefreshTimer);
+  window._mkCmdRefreshTimer = setInterval(function() {
+    const dash = document.getElementById('page-dashboard');
+    if (dash && dash.classList.contains('active')) carregarCommandCenter_().catch(function() {});
+  }, 90000);
+}
+
 function applySinalEmpresa_(d) {
   const box = document.getElementById('mk-exec-cockpit');
   const s = d && d.sinalEmpresa;
@@ -1160,7 +1177,22 @@ function renderExecCockpit_(d) {
 
   setText2('mk-exec-fat', R2(d.fatMes || 0));
   const ck = d.cockpit || {};
-  setDeltaEl_('mk-exec-fat-d', ck.deltaFatMesPct);
+  const fatAnt = Number(d.fatMesAnt) || 0;
+  const fatMes = Number(d.fatMes) || 0;
+  const deltaFat = ck.deltaFatMesPct;
+  let fatCtx = fmtDeltaCockpit_(deltaFat, 'vs mês ant.');
+  if (fatAnt > 0) {
+    const diffFat = Math.round(fatMes - fatAnt);
+    fatCtx += ' · ' + (diffFat >= 0 ? '+' : '') + R2(diffFat);
+  }
+  const projFat = Number(d.projecaoFat) || 0;
+  if (projFat > 0 && fatMes > 0) {
+    const pctProj = Math.round(fatMes / projFat * 100);
+    fatCtx += ' · ' + pctProj + '% do projetado (' + R2(projFat) + ')';
+  } else if (projFat > 0) {
+    fatCtx += ' · projetado ' + R2(projFat);
+  }
+  setCockpitCtx_('mk-exec-fat-d', fatCtx, deltaFat > 0 ? 'up' : deltaFat < 0 ? 'down' : null);
 
   const margem = Number(d.margem) || 0;
   applyMargemSemaforo_(margem);
@@ -1173,11 +1205,12 @@ function renderExecCockpit_(d) {
   }
   const resD = document.getElementById('mk-exec-res-d');
   if (resD) {
-    const nLoc = (d.nMes || 0) + ' locações · margem ' + margem + '%';
-    if (margem >= 20) { resD.textContent = nLoc; resD.className = 'mk-exec-kpi-delta up'; }
-    else if (margem >= 10) { resD.textContent = nLoc; resD.className = 'mk-exec-kpi-delta'; }
-    else if (margem > 0) { resD.textContent = nLoc; resD.className = 'mk-exec-kpi-delta down'; }
-    else { resD.textContent = nLoc; resD.className = 'mk-exec-kpi-delta down'; }
+    let resCtx = (d.nMes || 0) + ' locações · margem ' + margem + '%';
+    if (d.mediaDiaria > 0) {
+      resCtx += ' · média ' + R2(d.mediaDiaria) + '/dia';
+    }
+    const trendRes = margem >= 18 ? 'up' : margem < 10 ? 'down' : null;
+    setCockpitCtx_('mk-exec-res-d', resCtx, trendRes);
   }
 
   const pb = d.payback;
@@ -1202,10 +1235,9 @@ function renderExecCockpit_(d) {
   const occD = document.getElementById('mk-exec-ocup-d');
   if (occD) {
     const o = Number(occ) || 0;
-    if (o >= 40) { occD.textContent = 'Boa utilização'; occD.className = 'mk-exec-kpi-delta up'; }
-    else if (o >= 25) { occD.textContent = 'Espaço para crescer'; occD.className = 'mk-exec-kpi-delta'; }
-    else if (o > 0) { occD.textContent = 'Ocupação baixa'; occD.className = 'mk-exec-kpi-delta down'; }
-    else { occD.textContent = 'Sem locações no mês'; occD.className = 'mk-exec-kpi-delta'; }
+    let occCtx = o >= 40 ? 'Boa utilização da frota' : o >= 25 ? 'Espaço para crescer' : o > 0 ? 'Ocupação baixa — revisar horários' : 'Sem locações no mês';
+    if (d.diasOperando > 0) occCtx += ' · ' + d.diasOperando + ' dias com movimento';
+    setCockpitCtx_('mk-exec-ocup-d', occCtx, o >= 40 ? 'up' : o < 25 && o > 0 ? 'down' : null);
   }
 
   const nar = document.getElementById('mk-exec-narrativa');

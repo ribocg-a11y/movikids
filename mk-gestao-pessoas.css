@@ -134,12 +134,29 @@ body {
   margin-bottom: 12px;
 }
 
-#gp-app .mock-kpi { font-family: 'Fredoka One', cursive; font-size: 32px; color: var(--blue); }
-#gp-app .mock-kpi-lbl { font-size: 10px; font-weight: 800; color: var(--txt3); text-transform: uppercase; }
-#gp-app .mock-badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 10px; font-weight: 800; }
+#gp-app .mock-kpi {
+  font-family: 'Nunito', sans-serif;
+  font-size: var(--mk-widget-val-size, 18px);
+  font-weight: 800;
+  color: var(--blue);
+}
+#gp-app .mock-kpi-lbl {
+  font-size: var(--mk-widget-lbl-size, 10px);
+  font-weight: 700;
+  color: var(--txt3);
+  text-transform: none;
+}
+#gp-app .mock-badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 10px; font-weight: 700; }
 #gp-app .mock-badge.ok { background: #E8F5E9; color: var(--green); }
 #gp-app .mock-badge.gray { background: #ECEFF1; color: var(--txt3); }
-#gp-app .mock-clock { font-family: 'Fredoka One', cursive; font-size: 44px; color: var(--blue); text-align: center; }
+#gp-app .mock-clock {
+  font-family: 'Nunito', sans-serif;
+  font-size: 32px;
+  font-weight: 800;
+  color: var(--blue-dk, #1565C0);
+  text-align: center;
+  letter-spacing: 0.02em;
+}
 #gp-app .mock-table { width: 100%; border-collapse: collapse; font-size: 12px; font-weight: 700; }
 #gp-app .mock-table th,
 #gp-app .mock-table td { padding: 8px 6px; border: 1px solid var(--border); text-align: center; }
@@ -261,10 +278,30 @@ body {
   padding: 14px; box-shadow: var(--mk-shadow-1);
 }
 #page-operadores .gp-adm-kpi--sk { opacity: 0.55; animation: gp-adm-pulse 1.2s ease-in-out infinite; }
-#page-operadores .gp-adm-kpi-val { font-family: 'Fredoka One', cursive; font-size: 28px; color: var(--blue); line-height: 1; }
-#page-operadores .gp-adm-loading { font-weight: 800; color: var(--blue); }
+#page-operadores .gp-adm-kpi-val {
+  font-family: 'Nunito', sans-serif;
+  font-size: var(--mk-widget-val-size, 18px);
+  font-weight: 800;
+  color: var(--blue-dk, #1565C0);
+  line-height: 1.2;
+}
+#page-operadores .gp-adm-loading { font-weight: 700; color: var(--blue); }
 @keyframes gp-adm-pulse { 0%, 100% { opacity: 0.45; } 50% { opacity: 0.85; } }
-#page-operadores .gp-adm-kpi-lbl { font-size: 10px; font-weight: 800; color: var(--txt3); text-transform: uppercase; margin-top: 4px; }
+#page-operadores .gp-adm-kpi-lbl {
+  font-size: var(--mk-widget-lbl-size, 10px);
+  font-weight: 700;
+  color: var(--txt3);
+  text-transform: none;
+  margin-top: 4px;
+}
+#page-operadores .gp-adm-kpi-ctx,
+#gp-app .gp-adm-kpi-ctx {
+  font-size: var(--mk-widget-ctx-size, 11px);
+  font-weight: 600;
+  color: var(--txt3);
+  margin-top: 4px;
+  line-height: 1.35;
+}
 #page-operadores .gp-adm-card {
   background: var(--card); border: 1px solid var(--border); border-radius: var(--mk-radius, 16px);
   padding: 14px; margin-bottom: 12px; box-shadow: var(--mk-shadow-1);

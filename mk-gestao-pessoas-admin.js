@@ -211,9 +211,9 @@
     if (!el || !gpAdmData_) return;
     const k = gpAdmData_.kpis || {};
     el.innerHTML =
-      '<div class="gp-adm-kpi"><div class="gp-adm-kpi-val">' + (k.total || 0) + '</div><div class="gp-adm-kpi-lbl">Colaboradores</div></div>' +
-      '<div class="gp-adm-kpi"><div class="gp-adm-kpi-val" style="color:var(--green)">' + (k.presentes || 0) + '</div><div class="gp-adm-kpi-lbl">Presentes agora</div></div>' +
-      '<div class="gp-adm-kpi"><div class="gp-adm-kpi-val" style="color:var(--orange)">' + (k.alertas || 0) + '</div><div class="gp-adm-kpi-lbl">Alertas ponto</div></div>';
+      '<div class="gp-adm-kpi"><div class="gp-adm-kpi-val">' + (k.total || 0) + '</div><div class="gp-adm-kpi-lbl">Colaboradores</div><div class="gp-adm-kpi-ctx">' + (k.comTurno || 0) + ' com turno cadastrado</div></div>' +
+      '<div class="gp-adm-kpi"><div class="gp-adm-kpi-val" style="color:var(--green)">' + (k.presentes || 0) + '</div><div class="gp-adm-kpi-lbl">Presentes agora</div><div class="gp-adm-kpi-ctx">de ' + (k.total || 0) + ' na equipe ativa</div></div>' +
+      '<div class="gp-adm-kpi"><div class="gp-adm-kpi-val" style="color:var(--orange)">' + (k.alertas || 0) + '</div><div class="gp-adm-kpi-lbl">Alertas ponto</div><div class="gp-adm-kpi-ctx">' + (k.alertas > 0 ? 'Conferir aba Presença' : 'Tudo ok no ponto') + '</div></div>';
   }
 
   function gpAdmRenderHoje_() {
