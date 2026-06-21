@@ -1385,11 +1385,8 @@ function renderReceitaMesChart_(d) {
   const projFat = Number(d.projecaoFat) || 0;
   const fatMes = Number(d.fatMes) || 0;
   const diasOp = Number(d.diasOperando) || 0;
-  const mediaDia = Number(d.mediaDiaria) || 0;
   const metaMes = mkMetaProjecaoMes_(d);
-  const projDiaria = Number(d.projDiariaFixa) > 0
-    ? Number(d.projDiariaFixa)
-    : (metaMes > 0 ? Math.round(metaMes / diasMes * 100) / 100 : 0);
+  const projDiaria = metaMes > 0 ? Math.round(metaMes / diasMes * 100) / 100 : 0;
 
   if (hojeD <= 0 || diasOp <= 0 || metaMes <= 0 || projDiaria <= 0) {
     setText2('nk-receita-mes-label', diasOp <= 0 ? 'sem dias com movimento' : 'projeção indisponível');
@@ -1424,7 +1421,7 @@ function renderReceitaMesChart_(d) {
   const pctDiff = projHoje > 0 ? Math.round(diff / projHoje * 100) : 0;
 
   setText2('nk-receita-mes-label',
-    'acum. ' + R2(fatMes) + ' · proj. fixa ' + R2(metaMes) + ' (' + R2(projDiaria) + '/dia)');
+    'real ' + R2(fatMes) + ' · projetado ' + R2(metaMes) + ' (' + R2(projDiaria) + '/dia)');
 
   const ptBg = acumulado.map(function(v, i) { return v >= projAcum[i] ? '#2E7D32' : '#FF8F00'; });
   const maxY = Math.max(metaMes, projFat, Math.max.apply(null, acumulado.concat([1]))) * 1.08;
@@ -1450,7 +1447,7 @@ function renderReceitaMesChart_(d) {
           order: 1
         },
         {
-          label: 'Projeção acumulada',
+          label: 'Projetado acumulado',
           data: projAcum,
           borderColor: '#5E35B1',
           borderWidth: 2,
@@ -1472,10 +1469,10 @@ function renderReceitaMesChart_(d) {
           callbacks: {
             label: function(ctx) {
               const i = ctx.dataIndex;
-              if (ctx.dataset.label === 'Projeção acumulada') {
+              if (ctx.dataset.label === 'Projetado acumulado') {
                 return [
-                  'Proj. dia: ' + R2(projDiaArr[i] || 0),
-                  'Proj. acum.: ' + R2(Math.round(ctx.parsed.y))
+                  'Meta dia: ' + R2(projDiaArr[i] || 0),
+                  'Projetado acum.: ' + R2(Math.round(ctx.parsed.y))
                 ];
               }
               const rD = realDia[i] || 0;
@@ -1484,7 +1481,7 @@ function renderReceitaMesChart_(d) {
               return [
                 'Real dia: ' + R2(rD),
                 'Real acum.: ' + R2(Math.round(ctx.parsed.y)),
-                (delta >= 0 ? '+' + R2(delta) : R2(delta)) + ' vs proj. acum.'
+                (delta >= 0 ? '+' + R2(delta) : R2(delta)) + ' vs projetado acum.'
               ];
             }
           }
@@ -1513,48 +1510,25 @@ function renderReceitaMesChart_(d) {
     const msgs = [];
     if (diff >= 0) {
       msgs.push('Real acumulado ' + R2(fatMes) + ' — ' + (pctDiff > 0 ? pctDiff + '% acima' : 'no ritmo')
-        + ' da projeção fixa no dia ' + hojeD + ' (' + R2(projHoje) + ' proj. acum.).');
+        + ' do projetado no dia ' + hojeD + ' (' + R2(projHoje) + ' esperado).');
     } else {
-      msgs.push('Real acumulado ' + R2(fatMes) + ' — ' + Math.abs(pctDiff) + '% abaixo da projeção fixa ('
-        + R2(projHoje) + ' proj. acum. esperado).');
+      msgs.push('Real acumulado ' + R2(fatMes) + ' — ' + Math.abs(pctDiff) + '% abaixo do projetado ('
+        + R2(projHoje) + ' esperado até o dia ' + hojeD + ').');
     }
-    msgs.push('Projeção travada: ' + R2(metaMes) + ' no mês · ' + R2(projDiaria) + '/dia somando dia a dia (não recalcula).');
-    if (projFat > 0) {
-      msgs.push('Ritmo atual (dinâmico): ' + R2(projFat) + ' · média ' + R2(mediaDia) + '/dia nos '
-        + diasOp + ' dias com movimento.');
-    }
+    msgs.push('Faturamento projetado do mês: ' + R2(metaMes)
+      + ' · meta ' + R2(projDiaria) + '/dia somando dia a dia (= mesmo número do card acima).');
     ins.style.display = 'block';
     ins.textContent = msgs.join(' ');
   }
 }
 
-function mkInferMetaProjecaoFromFatDia_(fatDia, diasMes) {
-  const arr = (fatDia || []).slice().sort(function(a, b) { return (a.dia || 0) - (b.dia || 0); });
-  let fat = 0;
-  let n = 0;
-  for (let d = 1; d <= 7; d++) {
-    const row = arr.filter(function(x) { return x.dia === d; })[0];
-    const v = row ? Number(row.valor) || 0 : 0;
-    if (v > 0) { fat += v; n++; }
-  }
-  if (n < 2) {
-    for (let i = 0; i < arr.length && n < 3; i++) {
-      const v = Number(arr[i].valor) || 0;
-      if (v > 0) { fat += v; n++; }
-    }
-  }
-  if (n <= 0) return 0;
-  return Math.round(fat / n * diasMes);
-}
-
-/** Meta projeção fixa — GAS metaProjecaoMes ou inferida da 1ª semana + localStorage. */
+/** Meta mensal do gráfico = Faturamento projetado (projecaoFat) travado no 1º load do mês. */
 function mkMetaProjecaoMes_(d) {
-  const fromGas = Number(d.metaProjecaoMes) || Number(d.baselineFatMes) || 0;
+  const fromGas = Number(d.metaProjecaoMes) || 0;
   if (fromGas > 0) return fromGas;
   const mes = d.mesAtual || new Date().getMonth() + 1;
   const ano = d.anoAtual || new Date().getFullYear();
-  const diasMes = Number(d.diasMes) || 30;
-  const key = 'mk_proj_fat_v2_' + ano + '_' + mes;
+  const key = 'mk_proj_chart_' + ano + '_' + mes;
   try {
     const raw = localStorage.getItem(key);
     if (raw) {
@@ -1562,18 +1536,12 @@ function mkMetaProjecaoMes_(d) {
       if (o && Number(o.val) > 0) return Number(o.val);
     }
   } catch (e) { /* ignore */ }
-  let meta = mkInferMetaProjecaoFromFatDia_(d.fatPorDia, diasMes);
-  if (meta <= 0) meta = Number(d.projecaoFat) || 0;
-  if (meta <= 0 && d.leadingFinanceiro) {
-    const lf = d.leadingFinanceiro;
-    const be = lf.breakEvenLocacoesDia;
-    const ticket = Number(lf.ticketMedio) || 0;
-    if (be != null && ticket > 0) meta = Math.round(be * ticket * diasMes);
+  const projFat = Number(d.projecaoFat) || 0;
+  if (projFat > 0) {
+    try { localStorage.setItem(key, JSON.stringify({ val: projFat, at: Date.now() })); } catch (e) { /* ignore */ }
+    return projFat;
   }
-  if (meta > 0) {
-    try { localStorage.setItem(key, JSON.stringify({ val: meta, at: Date.now() })); } catch (e) { /* ignore */ }
-  }
-  return meta;
+  return 0;
 }
 
 const MK_MES_ABREV_ = ['', 'Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];

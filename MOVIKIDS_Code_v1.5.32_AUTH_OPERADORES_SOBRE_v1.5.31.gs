@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.115
+// MOVI KIDS — Google Apps Script v1.5.116
+// v1.5.116: metaProjecaoMes = projecaoFat travado (card Faturamento projetado) / diasMes
 // v1.5.115: metaProjecaoMes — projeção mensal fixa (1ª semana) + projDiariaFixa acumulada
 // v1.5.114: kpiMes.baselineFatMes — meta base fixa do mês (Script Property, não recalcula)
 // v1.5.113: historicoMeses — inclui meses vazios desde abr + proj. mês fechado no span real de operação
@@ -2028,14 +2029,14 @@ function inferMetaProjecaoFromFatDia_(fatDiaArr, diasMes) {
   return Math.round(fat / n * diasMes * 100) / 100;
 }
 
-/** Meta de projeção do mês — travada no 1º kpiMes (não recalcula com ritmo atual). */
+/** Meta de projeção do mês — trava projecaoFat (card Dashboard) no 1º kpiMes do mês. */
 function getOrSetMetaProjecaoMes_(mes, ano, projecaoFat, fatDiaArr, diasMes, lf) {
   const props = PropertiesService.getScriptProperties();
-  const key = 'PROJ_FAT_' + String(mes).padStart(2, '0') + '_' + ano;
+  const key = 'PROJ_CHART_' + String(mes).padStart(2, '0') + '_' + ano;
   const hit = props.getProperty(key);
   if (hit != null && hit !== '') return Math.round(Number(hit) * 100) / 100;
-  let meta = inferMetaProjecaoFromFatDia_(fatDiaArr, diasMes);
-  if (meta <= 0) meta = Math.round((Number(projecaoFat) || 0) * 100) / 100;
+  let meta = Math.round((Number(projecaoFat) || 0) * 100) / 100;
+  if (meta <= 0) meta = inferMetaProjecaoFromFatDia_(fatDiaArr, diasMes);
   if (meta <= 0 && lf) {
     const be = lf.breakEvenLocacoesDia;
     const ticket = Number(lf.ticketMedio) || 0;
