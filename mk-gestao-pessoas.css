@@ -580,6 +580,7 @@ body {
 #page-operadores .gp-adm-tabs {
   display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px;
   padding-bottom: 12px; border-bottom: 1px solid var(--border);
+  width: 100%;
 }
 #page-operadores .gp-adm-tab {
   padding: 7px 12px; border-radius: 10px; border: 1px solid transparent;
@@ -594,7 +595,7 @@ body {
   border-color: var(--blue); background: #E8F2FF; color: var(--blue-dk, #1565C0);
   box-shadow: var(--mk-shadow-1);
 }
-#page-operadores .gp-adm-panel { display: none; width: 100%; max-width: 920px; min-width: 0; }
+#page-operadores .gp-adm-panel { display: none; width: 100%; max-width: none; min-width: 0; }
 #page-operadores .gp-adm-panel.active { display: block; animation: gpFade .22s ease; }
 #page-operadores .gp-adm-stack { display: flex; flex-direction: column; gap: 12px; }
 #page-operadores .gp-adm-card {
@@ -612,8 +613,7 @@ body {
 }
 #page-operadores .gp-adm-card--table > .gp-adm-muted,
 #page-operadores .gp-adm-card--table > p { margin: 0; padding: 16px; }
-#page-operadores .gp-adm-card--table .gp-adm-table { border: 0; min-width: 640px; }
-#page-operadores #gp-adm-escala .gp-adm-table { min-width: 720px; }
+#page-operadores .gp-adm-card--table .gp-adm-table { border: 0; width: 100%; min-width: 0; table-layout: auto; }
 #page-operadores .gp-adm-card--table .gp-adm-table th:first-child,
 #page-operadores .gp-adm-card--table .gp-adm-table td:first-child { padding-left: 14px; }
 #page-operadores .gp-adm-card--list { padding: 8px 16px 12px; }
@@ -631,7 +631,7 @@ body {
 }
 #page-operadores .gp-adm-page-foot {
   margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border);
-  width: 100%; max-width: 920px; min-width: 0;
+  width: 100%; max-width: none; min-width: 0;
 }
 #page-operadores .gp-adm-btn-back { max-width: 360px; margin: 0 auto; display: block; }
 #page-operadores .gp-adm-card .form-group { margin-bottom: 12px; }
@@ -697,7 +697,7 @@ body {
 @media (max-width: 900px) { #page-operadores .gp-adm-ficha-cadastro-grid { grid-template-columns: 1fr 1fr; } }
 
 /* Ficha colaborador — duas colunas (perfil | jornada) */
-#page-operadores .gp-adm-ficha-page { display: flex; flex-direction: column; gap: 0; min-height: 320px; width: 100%; max-width: 920px; min-width: 0; }
+#page-operadores .gp-adm-ficha-page { display: flex; flex-direction: column; gap: 0; min-height: 320px; width: 100%; max-width: none; min-width: 0; }
 #page-operadores .gp-adm-ficha-bar {
   display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px 20px;
   padding: 14px 16px; background: var(--card); border: 1px solid var(--border);
@@ -710,7 +710,7 @@ body {
 #page-operadores .gp-adm-presenca-sel { min-width: 220px; max-width: 360px; margin: 0 !important; }
 #page-operadores .gp-adm-ficha-bar-badges { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
 #page-operadores .gp-adm-ficha-split {
-  display: grid; grid-template-columns: minmax(260px, 300px) minmax(0, 1fr);
+  display: grid; grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
   gap: 0; border: 1px solid var(--border); border-top: 0;
   border-radius: 0 0 var(--mk-radius, 16px) var(--mk-radius, 16px);
   overflow: visible; background: var(--card); box-shadow: var(--mk-shadow-1);
@@ -782,7 +782,7 @@ body {
 #page-operadores .gp-adm-jorn-table-wrap {
   border: 1px solid var(--border); border-radius: 12px; overflow: auto; max-height: 52vh;
 }
-#page-operadores .gp-adm-jorn-table-wrap .gp-adm-table { border: 0; min-width: 760px; }
+#page-operadores .gp-adm-jorn-table-wrap .gp-adm-table { border: 0; width: 100%; min-width: 0; }
 #page-operadores .gp-adm-jorn-table-wrap .gp-adm-table thead th {
   position: sticky; top: 0; z-index: 1; background: #F8FAFC;
 }
@@ -1006,6 +1006,9 @@ body {
   #page-operadores .gp-adm-kpi-grid { grid-template-columns: 1fr 1fr; }
 }
 @media (max-width: 720px) {
+  #page-operadores .gp-adm-card--table .gp-adm-table { min-width: 640px; width: auto; }
+  #page-operadores #gp-adm-escala .gp-adm-table { min-width: 720px; }
+  #page-operadores .gp-adm-jorn-table-wrap .gp-adm-table { min-width: 760px; width: auto; }
   #page-operadores .admin-badge {
     flex-wrap: wrap;
     gap: 10px;

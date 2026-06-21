@@ -1,6 +1,6 @@
 // MOVI KIDS - Service Worker 1.7.12
 
-const SW_VERSION = '1.8.101';
+const SW_VERSION = '1.8.102';
 
 const NETWORK_FIRST = [
   'script.google.com',
