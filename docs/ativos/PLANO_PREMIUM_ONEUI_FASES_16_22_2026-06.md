@@ -116,10 +116,11 @@ FASE 22  Assistente IA gestão (Anexo — decisão sócio)
 
 ### Critério de pronto
 
-- [ ] Sócio abre Dashboard → bloco comando mostra locações + equipe + $ sem scroll (1920×1080)
-- [ ] Todo KPI cockpit tem linha de contexto (não só número)
-- [ ] Presença/Ponto passam checklist Design System §9 + tipografia Nunito nos dados
-- [ ] Tablet balcão **inalterado** (regressão F5/F7/F10/F11)
+- [x] Sócio abre Dashboard → bloco comando mostra locações + equipe + $ sem scroll (1920×1080)
+- [x] Todo KPI cockpit tem linha de contexto (não só número)
+- [x] Presença/Ponto passam checklist Design System §9 + tipografia Nunito nos dados
+- [ ] Tablet balcão **inalterado** (regressão F5/F7/F10/F11) — homolog na loja pós-GAS Web
+- [x] `TESTE_FASE16_COMANDO_READONLY.ps1` — FE + GAS (warn se Web antiga)
 
 ---
 

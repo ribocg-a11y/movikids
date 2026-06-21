@@ -1,8 +1,8 @@
 # MOVI KIDS — Design System (cartilha oficial)
 
-**Versão doc:** 1.0 · **18/06/2026**  
+**Versão doc:** 1.1 · **21/06/2026**  
 **Status:** fonte de verdade visual — **consultar antes de criar ou alterar qualquer UI**  
-**Auditoria:** sistema completo FE v1.8.68 · portal v1.7.62+ · FASE 9 admin v1.8.28+
+**Auditoria:** sistema completo FE v1.8.86 · portal v1.7.62+ · FASE 9 admin v1.8.28+ · FASE 16 One UI widgets
 
 **Documentos irmãos:**
 - [`DESIGN_DNA_MOVIKIDS.md`](DESIGN_DNA_MOVIKIDS.md) — princípios de produto e missão visual (resumo filosófico)
@@ -140,6 +140,28 @@ Portal inclui também Nunito 400.
 | Extra | laranja | Tempo extra | `mk-portal-pulse` |
 
 **Regra técnica:** paridade `canonLoc_` / `timestampCanonico_` — nunca quebrar por estética (I16).
+
+### 3.6 Widgets One UI — FASE 16 (`mk-design.css` `:root` admin)
+
+Tokens para KPIs com contexto (centro de comando, cockpit, RH admin). **Números = Nunito**, não Fredoka.
+
+| Token | Valor | Uso |
+|-------|-------|-----|
+| `--mk-widget-gap` | `12px` | Grid entre widgets |
+| `--mk-widget-radius` | `16px` | Card widget |
+| `--mk-widget-pad` | `14px 16px` | Padding interno |
+| `--mk-widget-val-size` | `18px` | Valor KPI (Nunito 800) |
+| `--mk-widget-lbl-size` | `10px` | Label (sentence case) |
+| `--mk-widget-ctx-size` | `11px` | Linha interpretativa |
+| `--mk-space-8` | `8px` | Gap compacto |
+| `--mk-space-12` | `12px` | Gap padrão widget |
+| `--mk-space-16` | `16px` | Padding seção |
+| `--mk-space-24` | `24px` | Respiro entre blocos |
+| `--mk-trend-up` | `#2E7D32` | Contexto positivo (`.trend-up`) |
+| `--mk-trend-down` | `#C62828` | Contexto negativo (`.trend-down`) |
+| `--mk-trend-neutral` | `#888` | Neutro |
+
+**Classes:** `.mk-widget`, `.mk-widget-val`, `.mk-widget-ctx`, `.mk-command-center` (Dashboard) · `.mk-admin-mob-cmd` (sidebar mobile admin read-only).
 
 ---
 
@@ -318,6 +340,7 @@ Nível 3 — DETALHE  → plano, histórico, accordion, tabela secundária
 | Hub | `#mk-tablet-hub` | 3 portas, gradiente hub, logo 38px |
 | Auth | `#mk-auth-gate` | §6.1 completo |
 | Shell | `#app` sidebar + mob header + mob nav | Navy sidebar, Fredoka sb-logo |
+| **Sidebar mobile admin** | `#mk-admin-mob-cmd` | KPIs comando read-only + atalhos Balcao/Dashboard (FASE 16.6) |
 | **Home** | `#page-home` | stat-cards, session-cards, QR strip |
 | **Nova locação** | `#page-nova` | wizard 3 passos, `.vc-card` tiles |
 | **Relacionamento** | `#page-relacionamento` | `.mk-admin-soft`, CRM cards |
@@ -326,7 +349,7 @@ Nível 3 — DETALHE  → plano, histórico, accordion, tabela secundária
 | **Painel ops** | `#page-painel` | `.pcard` grid |
 | **Admin hub** | `#page-admin` | centro gestão |
 | **Caixa** | `#page-caixa` | hero R$ + accordion |
-| **Dashboard** | `#page-dashboard` | exec cockpit, charts paleta DNA |
+| **Dashboard** | `#page-dashboard` | `#mk-command-center`, exec cockpit, charts paleta DNA |
 | **Relatório** | `#page-relatorio` | mensal Golden |
 | **Histórico** | `#page-historico` | analytics |
 | **Operadores** | `#page-operadores` | gestão PIN |

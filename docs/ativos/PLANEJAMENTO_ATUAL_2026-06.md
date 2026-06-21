@@ -1,7 +1,7 @@
 # MOVI KIDS — Planejamento atual (pós-FASE 5)
 
-**Atualizado:** 21/06/2026 (operação **LIVRE** · protocolo **OK** · FE **v1.8.82** · GAS repo **v1.5.116**)  
-**Produção:** FE **v1.8.82** · GAS repo **v1.5.116** · Web **165** · Nova versão Web **pendente**  
+**Atualizado:** 21/06/2026 (operação **LIVRE** · protocolo **OK** · FE **v1.8.86** · GAS repo **v1.5.118**)  
+**Produção:** FE **v1.8.86** · GAS repo **v1.5.118** · Web **165** · Nova versão Web **pendente**  
 **Documentos irmãos:** `PLANO_PRIORIDADES_2026-06.md` · `MAPA_FASES.md` · `DEPLOY_ATUAL.md` · `HANDOFF_NOVO_CHAT.md`  
 **Ciclo ativo:** **`PLANO_FASES_6_15_COCKPIT_EXECUTIVO_2026-06.md`** · FASE 15: **`FASE_15_GESTAO_PESSOAS.md`** ✅  
 **Próximo ciclo:** **`PLANO_PREMIUM_ONEUI_FASES_16_22_2026-06.md`** ← manual Premium + One UI (20/06/2026)
@@ -12,7 +12,7 @@
 
 Ciclo **FASE 0–5 + P2/P3 concluído** (07–09/06/2026). Balcão homologado, portal QR, payback, CONFIG e APIs unificadas.
 
-**Modo atual:** **FASE 15 Gestão Pessoas** ✅ (homolog tablet 20/06) · **FASE 16 Premium** — próximo ciclo · FASE 14 mini-DRE ✅
+**Modo atual:** **FASE 16 Premium One UI** ✅ FE · **FASE 17** — próximo ciclo · FASE 15 ✅ · FASE 14 mini-DRE ✅
 
 ---
 
@@ -190,6 +190,6 @@ Legenda: **P0** bloqueia operação · **P1** valor imediato · **P2** próximo 
 3. ⏳ **Nova versão Web GAS v1.5.116** — **sócio** (janela aberta)
 4. PC: Dashboard `?force=1.8.82` — gráfico Projetado acum. vs Real acum.
 5. Tablet: `?force=1.8.82` no PWA (fora do pico)
-6. **FASE 16 Premium** — kickoff após GAS Web (`PLANO_PREMIUM_ONEUI_FASES_16_22_2026-06.md`)
+6. **FASE 17 Alertas inteligentes** — kickoff após Nova versão Web GAS (`PLANO_PREMIUM_ONEUI_FASES_16_22_2026-06.md`)
 
 Incidentes: **I29–I34** — `MAPA_ERROS_FALHAS_BUGS.md`
