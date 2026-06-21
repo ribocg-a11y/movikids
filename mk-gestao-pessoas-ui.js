@@ -40,6 +40,156 @@
     const MK_GP_PROD = !!window.MK_GP_PROD;
     let gpColabList = [];
     let gpSessionPin = '';
+    let gpAdmPreviewMode_ = false;
+    let gpAdmPreviewPin_ = '';
+    let admPreviewPins = [];
+
+    const GP_DEMO_COLAB = {
+      id: 'demo', label: 'Colaborador Demo', letra: 'D', owner: false, funcao: 'Pré-visualização',
+      turno: '14h–22h', cadastro: { ...VAZIO, admissao: '2026-06-01' }, statusHoje: 'fora',
+      pontoHoje: { status: 'fora', entrada: null, saida: null }, folha: [], jornada: null,
+      meta: { alvo: 20, atual: 8, bonusValor: 100, bonusMin: 21, admissao: '01/06/2026', diasMes: [] },
+      escala: ['14–22', 'OFF', '14–22', 'OFF', '14–22', '10–20', '13–21'],
+      bancoHoras: '+1h30',
+      pagamento: {
+        base: SALARIO_MINIMO_BASE, bonus: 0, faltas: 0, dependentes: 0,
+        competencia: '06/2026', pagamentoEm: '05/07/2026', diasTrabalhados: 8, diasMes: 30,
+        obs: 'Demonstração — dados fictícios para acompanhar mudanças de UI.',
+        beneficios: { vaDiario: 20, vaDias: 8, vtPasses: 0, vaCoparticipacao: 0 },
+        holerite: null
+      },
+      preview: true
+    };
+
+    function gpUrlAdmPreview_() {
+      try { return /(?:^|[?&])admPreview=1(?:&|$)/.test(location.search); } catch (e) { return false; }
+    }
+
+    function gpReadAdminPin_() {
+      try {
+        var s = sessionStorage.getItem('mk_admin_pin_sess_v1');
+        if (s && String(s).length === 4) return String(s);
+        var d = localStorage.getItem('mk_admin_pin_persist_v1');
+        var at = Number(localStorage.getItem('mk_admin_pin_persist_at') || 0);
+        if (d && String(d).length === 4 && at && Date.now() - at < 86400000) return String(d);
+      } catch (e) { /* ignore */ }
+      return '';
+    }
+
+    function gpPreviewVoltarAdmin_() {
+      var v = global.MK_VERSION || '1.8.91';
+      global.location.href = 'index.html?force=' + encodeURIComponent(v) + '#operadores';
+    }
+
+    function gpPreviewTrocar_() {
+      colabLogado = null;
+      gpAdmPreviewMode_ = true;
+      gpShowPreviewBanner_(false);
+      showAdmPreviewGate(!gpAdmPreviewPin_);
+    }
+
+    function gpShowPreviewBanner_(on) {
+      var el = document.getElementById('gp-preview-banner');
+      if (el) el.hidden = !on;
+    }
+
+    function showAdmPreviewGate(needPin) {
+      setGpView('auth-login');
+      document.querySelectorAll('#gp-auth-gate .mk-auth-step').forEach(function (el) {
+        el.classList.toggle('hidden', el.id !== 's-adm-preview');
+        el.style.display = el.id === 's-adm-preview' ? '' : 'none';
+      });
+      var pinBlock = document.getElementById('adm-preview-pin-block');
+      if (pinBlock) pinBlock.hidden = !needPin;
+      if (needPin) {
+        clearPinInputs(admPreviewPins);
+        admPreviewPins = buildPinRow('adm-preview-pin', admPreviewValidarPin_);
+        admPreviewPins[0]?.focus();
+      } else {
+        loadAdmPreviewColaboradores_();
+      }
+    }
+
+    function admPreviewValidarPin_() {
+      var pin = readPin(admPreviewPins);
+      var errEl = document.getElementById('adm-preview-pin-err');
+      if (pin.length < 4) {
+        if (errEl) { errEl.textContent = 'Digite os 4 números do PIN admin.'; errEl.hidden = false; }
+        return;
+      }
+      if (pin !== '1416') {
+        if (errEl) { errEl.textContent = 'PIN administrativo incorreto.'; errEl.hidden = false; }
+        clearPinInputs(admPreviewPins);
+        return;
+      }
+      gpAdmPreviewPin_ = pin;
+      if (errEl) errEl.hidden = true;
+      document.getElementById('adm-preview-pin-block').hidden = true;
+      loadAdmPreviewColaboradores_();
+    }
+
+    function loadAdmPreviewColaboradores_() {
+      var sel = document.getElementById('adm-preview-select');
+      var btn = document.getElementById('adm-preview-btn');
+      var errEl = document.getElementById('adm-preview-err');
+      if (!sel) return;
+      sel.innerHTML = '<option value="">Carregando…</option>';
+      if (btn) btn.disabled = true;
+      if (errEl) errEl.hidden = true;
+      var opts = [{ id: 'demo', nome: '👁 Colaborador Demo (genérico)', funcao: 'Pré-visualização' }];
+      function renderOpts(list) {
+        sel.innerHTML = '<option value="">Selecione quem visualizar</option>' +
+          list.map(function (o) {
+            return '<option value="' + o.id + '">' + (o.nome || o.id) + (o.funcao ? (' · ' + o.funcao) : '') + '</option>';
+          }).join('');
+        if (btn) btn.disabled = !sel.value;
+      }
+      if (!window.MK_GestaoPessoas || !gpAdmPreviewPin_) {
+        renderOpts(opts);
+        return;
+      }
+      MK_GestaoPessoas.listarColaboradoresPreview(gpAdmPreviewPin_).then(function (list) {
+        gpColabList = list || [];
+        renderOpts(opts.concat(gpColabList.map(function (o) {
+          return { id: o.id, nome: o.nome, funcao: o.funcao };
+        })));
+      }).catch(function (e) {
+        renderOpts(opts);
+        if (errEl) {
+          errEl.textContent = (e.message || 'Erro ao listar') + ' — use Demo genérico ou publique GAS v1.5.122.';
+          errEl.hidden = false;
+        }
+      });
+    }
+
+    function admPreviewEntrar() {
+      var sel = document.getElementById('adm-preview-select');
+      var errEl = document.getElementById('adm-preview-err');
+      if (!sel || !sel.value) {
+        if (errEl) { errEl.textContent = 'Selecione um colaborador ou Demo.'; errEl.hidden = false; }
+        return;
+      }
+      var uid = sel.value;
+      gpAdmPreviewMode_ = true;
+      if (uid === 'demo') {
+        PESSOAS.demo = Object.assign({}, GP_DEMO_COLAB);
+        colabLogado = 'demo';
+        go('s-colab-hub');
+        return;
+      }
+      if (!window.MK_GestaoPessoas || !gpAdmPreviewPin_) {
+        if (errEl) { errEl.textContent = 'PIN admin necessário.'; errEl.hidden = false; }
+        return;
+      }
+      MK_GestaoPessoas.loginPainelPreview(uid, gpAdmPreviewPin_).then(function (mapped) {
+        PESSOAS[uid] = Object.assign({}, PESSOAS[uid] || {}, mapped, { preview: true });
+        colabLogado = String(uid);
+        if (errEl) errEl.hidden = true;
+        go('s-colab-hub');
+      }).catch(function (e) {
+        if (errEl) { errEl.textContent = e.message || 'Erro ao abrir pré-visualização.'; errEl.hidden = false; }
+      });
+    }
 
     if (MK_GP_PROD) {
       document.title = 'Movi Kids — Colaboradores';
@@ -86,6 +236,8 @@
         }
       }
     };
+
+    PESSOAS.demo = GP_DEMO_COLAB;
 
     const DIAS = ['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'];
     let sessao = null; // { tipo:'balcao'|'colab', id }
@@ -512,6 +664,7 @@
       st.textContent = p.statusHoje==='dentro'?'Dentro':'Fora';
       st.className = 'mock-badge '+(p.statusHoje==='dentro'?'ok':'gray');
       renderHubJornada_(p);
+      gpShowPreviewBanner_(gpAdmPreviewMode_ || p.preview);
     }
 
     function gpDiaSemanaIdx_() {
@@ -701,6 +854,14 @@
     }
 
     function confirmarPonto() {
+      if (gpAdmPreviewMode_) {
+        var flash = document.getElementById('ponto-flash');
+        if (flash) {
+          flash.textContent = '👁 Pré-visualização — ponto não é registrado neste modo.';
+          flash.hidden = false;
+        }
+        return;
+      }
       const p = PESSOAS[colabLogado];
       const t = fmtTime(), hoje = fmtDataHoje(), dia = diaSemanaHoje();
       const flash = document.getElementById('ponto-flash');
@@ -923,6 +1084,11 @@ function gpVoltarInicio() {
 function colabSairProd() {
   colabLogado = null;
   gpSessionPin = '';
+  gpShowPreviewBanner_(false);
+  if (gpAdmPreviewMode_) {
+    showAdmPreviewGate(!gpAdmPreviewPin_);
+    return;
+  }
   if (MK_GP_PROD) {
     go('s-colab-login');
     return;
@@ -975,6 +1141,9 @@ function initGpUi() {
   global.colabEntrar = colabEntrar;
   global.colabCancelPin = colabCancelPin;
   global.colabSair = colabSair;
+  global.gpPreviewVoltarAdmin_ = gpPreviewVoltarAdmin_;
+  global.gpPreviewTrocar_ = gpPreviewTrocar_;
+  global.admPreviewEntrar = admPreviewEntrar;
   global.abrirModulo = abrirModulo;
   global.confirmarPonto = confirmarPonto;
   global.salvarCadastro = salvarCadastro;
@@ -983,6 +1152,21 @@ function initGpUi() {
     if (el && document.getElementById('s-ponto').classList.contains('active')) el.textContent = fmtTime();
   }, 1000);
   if (MK_GP_PROD) {
+    if (gpUrlAdmPreview_()) {
+      gpAdmPreviewMode_ = true;
+      gpAdmPreviewPin_ = gpReadAdminPin_();
+      showAdmPreviewGate(!gpAdmPreviewPin_);
+      var admSel = document.getElementById('adm-preview-select');
+      if (admSel) {
+        admSel.addEventListener('change', function () {
+          var btn = document.getElementById('adm-preview-btn');
+          if (btn) btn.disabled = !admSel.value;
+        });
+      }
+      var admBtn = document.getElementById('adm-preview-btn');
+      if (admBtn) admBtn.addEventListener('click', admPreviewEntrar);
+      return;
+    }
     setGpView('auth-login');
     renderColabLogin();
     return;

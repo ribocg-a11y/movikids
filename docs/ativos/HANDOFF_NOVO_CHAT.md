@@ -1,6 +1,6 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 21/06/2026 (FASE **15b.1** · FE **v1.8.90** · hero jornada colaborador)  
+**Atualizado:** 21/06/2026 (FASE **15b.2** · FE **v1.8.91** · pré-visualização ADM colaborador)  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **Repo local:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`  

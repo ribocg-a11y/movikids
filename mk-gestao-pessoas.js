@@ -67,6 +67,18 @@
         return gpMapPainel(operadorId, r);
       });
     },
+    loginPainelPreview: function (operadorId, adminPin) {
+      return gpApi('buscarPainelColaboradorPreview', { operadorId: operadorId, adminPin: adminPin }).then(function (r) {
+        const mapped = gpMapPainel(operadorId, r);
+        mapped.preview = true;
+        return mapped;
+      });
+    },
+    listarColaboradoresPreview: function (adminPin) {
+      return gpApi('listarColaboradoresGestaoPreview', { adminPin: adminPin }).then(function (r) {
+        return (r.colaboradores || []).filter(function (o) { return o.hasPin !== false; });
+      });
+    },
     registrarPonto: function (operadorId, pin, tipo) {
       return gpApi('registrarPontoColaborador', { operadorId: operadorId, pin: pin, tipo: tipo });
     },

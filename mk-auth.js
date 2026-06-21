@@ -540,6 +540,17 @@
     location.href = 'gestao-pessoas.html?force=' + encodeURIComponent(v) + '&from=index&_=' + Date.now();
   };
 
+  /** ADM — pré-visualizar hub colaborador (somente leitura, PIN 1416). */
+  window.mkAbrirColaboradoresPreview_ = async function mkAbrirColaboradoresPreview_() {
+    if (typeof mkAuthEnsureAdminPin_ === 'function') {
+      const ok = await mkAuthEnsureAdminPin_('Pré-visualizar colaborador');
+      if (!ok) return;
+    }
+    try { sessionStorage.removeItem('mk-mock-colab-uid'); } catch (e) { /* ignore */ }
+    const v = window.MK_VERSION || '1.8.91';
+    location.href = 'gestao-pessoas.html?admPreview=1&force=' + encodeURIComponent(v) + '&from=admin&_=' + Date.now();
+  };
+
   /** Sai do modo administrador: perfil ADM volta ao login; operador+PIN admin so fecha o painel ADM. */
   window.mkAuthExitAdmin_ = function mkAuthExitAdmin_() {
     const s = getSession();

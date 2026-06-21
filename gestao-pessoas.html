@@ -6,16 +6,16 @@
   <meta name="theme-color" content="#1565C0">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <title>Movi Kids — Colaboradores</title>
-  <script src="mk-canonical-host.js?v=1.8.90"></script>
+  <script src="mk-canonical-host.js?v=1.8.91"></script>
   <script>window.MK_GP_PROD = true;</script>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="mk-design.css?v=1.8.90">
-  <link rel="stylesheet" href="mk-app.css?v=1.8.90">
-  <link rel="stylesheet" href="mk-gestao-pessoas.css?v=1.8.90">
-  <script src="mk-version.js?v=1.8.90"></script>
-  <script src="mk-globals.js?v=1.8.90"></script>
-  <script src="mk-api.js?v=1.8.90"></script>
-  <script src="mk-gestao-pessoas.js?v=1.8.90"></script>
+  <link rel="stylesheet" href="mk-design.css?v=1.8.91">
+  <link rel="stylesheet" href="mk-app.css?v=1.8.91">
+  <link rel="stylesheet" href="mk-gestao-pessoas.css?v=1.8.91">
+  <script src="mk-version.js?v=1.8.91"></script>
+  <script src="mk-globals.js?v=1.8.91"></script>
+  <script src="mk-api.js?v=1.8.91"></script>
+  <script src="mk-gestao-pessoas.js?v=1.8.91"></script>
 </head>
 <body>
   <!--
@@ -57,11 +57,39 @@
           <button type="button" class="mk-btn" id="colab-btn-entrar">Entrar</button>
         </div>
       </section>
+      <section id="s-adm-preview" class="mk-auth-step hidden">
+        <button type="button" class="mk-hub-back" onclick="gpPreviewVoltarAdmin_()">← Voltar ao admin</button>
+        <div class="mk-logo">
+          <img class="mk-brand-img mk-brand-img--md" src="assets/logo-movi-kids.png" alt="Movi Kids" width="1080" height="1080" loading="lazy" decoding="async">
+          <div class="mk-logo-sub">Golden Shopping Calhau · Pré-visualização</div>
+        </div>
+        <span class="mk-step-tag gp-adm-preview-tag">Pré-visualização ADM</span>
+        <h2>Ver como colaborador</h2>
+        <p class="mk-hint">Escolha quem você quer acompanhar. <strong>Somente leitura</strong> — mesma tela do colaborador, sem o PIN dele.</p>
+        <div id="adm-preview-pin-block" hidden>
+          <p class="mk-hint" style="margin-bottom:10px">Digite seu PIN admin <strong>1416</strong> para continuar.</p>
+          <div class="mk-pin-row" id="adm-preview-pin"></div>
+          <div class="mk-err" id="adm-preview-pin-err"></div>
+        </div>
+        <div class="mk-op-select-wrap">
+          <label class="form-label" for="adm-preview-select">Colaborador</label>
+          <select id="adm-preview-select" class="mk-op-select" aria-label="Colaborador para pré-visualizar">
+            <option value="">Carregando…</option>
+          </select>
+        </div>
+        <div class="mk-err" id="adm-preview-err"></div>
+        <button type="button" class="mk-btn" id="adm-preview-btn" disabled>Abrir visão colaborador</button>
+      </section>
     </div>
   </div>
 
   <!-- Painel pós-login — mock-shell aprovado + mk-design (imagem 3) -->
   <div id="gp-app" style="display:none">
+    <div id="gp-preview-banner" class="gp-preview-banner" hidden role="status">
+      <span>👁 Pré-visualização ADM — somente leitura</span>
+      <button type="button" class="gp-preview-banner-btn" onclick="gpPreviewTrocar_()">Trocar</button>
+      <button type="button" class="gp-preview-banner-btn" onclick="gpPreviewVoltarAdmin_()">Voltar admin</button>
+    </div>
     <div class="gp-app-shell">
       <section class="mock-screen" id="s-colab-hub">
         <button type="button" class="mock-back" onclick="colabSair()">← Sair</button>
@@ -168,7 +196,7 @@
     </div>
   </div>
 
-  <script src="mk-holerite.js?v=1.8.90"></script>
-  <script src="mk-gestao-pessoas-ui.js?v=1.8.90"></script>
+  <script src="mk-holerite.js?v=1.8.91"></script>
+  <script src="mk-gestao-pessoas-ui.js?v=1.8.91"></script>
 </body>
 </html>

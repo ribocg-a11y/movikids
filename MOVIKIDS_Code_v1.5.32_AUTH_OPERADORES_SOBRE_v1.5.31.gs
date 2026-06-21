@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.121
+// MOVI KIDS — Google Apps Script v1.5.122
+// v1.5.122: FASE 15b — buscarPainelColaboradorPreview_ (ADM 1416)
 // v1.5.121: FASE 17 — operadorId em alerta banco horas
 // v1.5.120: FASE 17 — meta abaixo 3 dias + alertasInteligentes no painel RH
 // v1.5.119: FASE 17 — alertasInteligentes_ + perfil gestor (authRole)
@@ -400,7 +401,9 @@ function dispatchMoviAction_(p, method) {
       case 'controleFinanceiro':     return controleFinanceiro_();
       case 'gestaoPessoasStatus':    return gestaoPessoasStatus_();
       case 'listarColaboradoresGestao': return gpListarColaboradoresGestao_();
+      case 'listarColaboradoresGestaoPreview': return listarColaboradoresGestaoPreview_(p);
       case 'buscarPainelColaborador': return buscarPainelColaborador_(p);
+      case 'buscarPainelColaboradorPreview': return buscarPainelColaboradorPreview_(p);
       case 'registrarPontoColaborador': return registrarPontoColaborador_(p);
       case 'alertasPontoGestaoAdmin': return alertasPontoGestaoAdmin_(p);
       case 'painelGestaoPessoasAdmin': return painelGestaoPessoasAdmin_(p);
@@ -7667,35 +7670,69 @@ function buscarPainelColaborador_(p) {
       colab = { operadorId: opId, nome: auth.operador.nome, funcao: 'Colaborador', salarioBase: 1621, vaDiario: 20, metaLocDia: 20, bonusMeta: 100, turno: '', cadastroPct: 0, ativo: true };
     }
     const comp = String(p.competencia || gpCompetenciaAtual_());
-    const metas = gpMetasColab_(opId, comp);
-    const bonus = metas.bonusTotal || 0;
-    const folhaLen = gpFolhaPontoColab_(opId, comp).length;
-    const hol = gpCalcHollerite_(colab, bonus, 0, comp);
-    const pontoHoje = gpStatusPontoHoje_(opId);
-    const ctxJ = gpLoadContext_();
-    const jornada = gpAnaliseJornadaColab_(opId, comp, ctxJ, colab);
-    return resp_({
-      colaborador: {
-        id: opId, label: colab.nome || auth.operador.nome, funcao: colab.funcao, turno: colab.turno,
-        admissao: colab.admissao, cadastroPct: colab.cadastroPct,
-        cadastro: { nomeCompleto: colab.nome, cpf: colab.cpf, nascimento: colab.nascimento, telefone: colab.telefone, email: colab.email, endereco: colab.endereco, emergencia: colab.emergencia, admissao: colab.admissao, pix: colab.pix }
-      },
-      competencia: comp,
-      ponto: { statusHoje: pontoHoje.status, folha: gpFolhaPontoColab_(opId, comp), hoje: pontoHoje, jornada: jornada },
-      metas: metas, escala: gpEscalaColab_(opId, comp), bancoHoras: jornada.bancoProjetado || gpBancoHoras_(opId),
-      pagamento: {
-        base: hol.base, bonus: hol.bonus, faltas: 0, dependentes: 0, competencia: comp,
-        pagamentoEm: hol.pagamentoEm, quinzena: hol.quinzena, quinzenaLabel: hol.quinzenaLabel,
-        diasTrabalhados: hol.diasTrabalhados, diasMes: hol.diasMes, salarioContratual: hol.salarioContratual,
-        obs: hol.obs,
-        beneficios: { vaDiario: hol.vaDiario, vaDias: hol.vaDias, vaMensal: hol.vaMensal, vtPasses: hol.vtPasses, vaCoparticipacao: 0 },
-        holerite: hol
-      },
-      versao: 'v1.5.111'
-    });
+    return resp_(gpBuildPainelColaboradorPayload_(opId, comp, colab, auth.operador));
   } catch (ex) {
     return err_('Abas Gestao Pessoas ausentes — rode scripts/criar-abas-gestao-pessoas.ps1', 503);
   }
+}
+
+function gpBuildPainelColaboradorPayload_(opId, comp, colab, operador) {
+  colab = colab || gpColabRhByOpId_(opId);
+  const opNome = (operador && operador.nome) || (colab && colab.nome) || ('ID ' + opId);
+  if (!colab) {
+    colab = { operadorId: opId, nome: opNome, funcao: 'Colaborador', salarioBase: 1621, vaDiario: 20, metaLocDia: 20, bonusMeta: 100, turno: '', cadastroPct: 0, ativo: true };
+  }
+  const metas = gpMetasColab_(opId, comp);
+  const bonus = metas.bonusTotal || 0;
+  const hol = gpCalcHollerite_(colab, bonus, 0, comp);
+  const pontoHoje = gpStatusPontoHoje_(opId);
+  const ctxJ = gpLoadContext_();
+  const jornada = gpAnaliseJornadaColab_(opId, comp, ctxJ, colab);
+  return {
+    colaborador: {
+      id: opId, label: colab.nome || opNome, funcao: colab.funcao, turno: colab.turno,
+      admissao: colab.admissao, cadastroPct: colab.cadastroPct,
+      cadastro: { nomeCompleto: colab.nome, cpf: colab.cpf, nascimento: colab.nascimento, telefone: colab.telefone, email: colab.email, endereco: colab.endereco, emergencia: colab.emergencia, admissao: colab.admissao, pix: colab.pix }
+    },
+    competencia: comp,
+    ponto: { statusHoje: pontoHoje.status, folha: gpFolhaPontoColab_(opId, comp), hoje: pontoHoje, jornada: jornada },
+    metas: metas, escala: gpEscalaColab_(opId, comp), bancoHoras: jornada.bancoProjetado || gpBancoHoras_(opId),
+    pagamento: {
+      base: hol.base, bonus: hol.bonus, faltas: 0, dependentes: 0, competencia: comp,
+      pagamentoEm: hol.pagamentoEm, quinzena: hol.quinzena, quinzenaLabel: hol.quinzenaLabel,
+      diasTrabalhados: hol.diasTrabalhados, diasMes: hol.diasMes, salarioContratual: hol.salarioContratual,
+      obs: hol.obs,
+      beneficios: { vaDiario: hol.vaDiario, vaDias: hol.vaDias, vaMensal: hol.vaMensal, vtPasses: hol.vtPasses, vaCoparticipacao: 0 },
+      holerite: hol
+    },
+    versao: 'v1.5.122'
+  };
+}
+
+/** FASE 15b — ADM 1416 preview: mesma tela colaborador, sem PIN da pessoa. */
+function buscarPainelColaboradorPreview_(p) {
+  if (!adminPinOk_(p)) return err_('Acesso negado — PIN admin 1416', 403);
+  try {
+    const opId = Number(p.operadorId || p.id || 0);
+    if (!opId) return err_('operadorId obrigatorio', 400);
+    const found = operadorRowById_(opId);
+    if (!found) return err_('Operador nao encontrado', 404);
+    const op = operadorObjFromRow_(found.data);
+    const colab = gpColabRhByOpId_(opId);
+    if (!colab) return err_('Colaborador sem cadastro RH', 404);
+    const comp = String(p.competencia || gpCompetenciaAtual_());
+    const payload = gpBuildPainelColaboradorPayload_(opId, comp, colab, op);
+    payload.preview = true;
+    payload.previewModo = 'adm';
+    return resp_(payload);
+  } catch (ex) {
+    return err_('Abas Gestao Pessoas ausentes — rode scripts/criar-abas-gestao-pessoas.ps1', 503);
+  }
+}
+
+function listarColaboradoresGestaoPreview_(p) {
+  if (!adminPinOk_(p)) return err_('Acesso negado — PIN admin 1416', 403);
+  return gpListarColaboradoresGestao_();
 }
 
 function registrarPontoColaborador_(p) {

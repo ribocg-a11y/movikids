@@ -150,6 +150,38 @@ body {
   margin-top: 14px;
 }
 
+.gp-preview-banner {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px 12px;
+  padding: 10px 14px;
+  background: linear-gradient(90deg, #1565C0, #1E88E5);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 800;
+  box-shadow: 0 4px 12px rgba(21, 101, 192, 0.25);
+}
+.gp-preview-banner-btn {
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 6px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.gp-adm-preview-tag {
+  background: rgba(21, 101, 192, 0.12);
+  color: #1565C0;
+}
+
 #gp-app .mock-av {
   width: 48px;
   height: 48px;
