@@ -1,6 +1,6 @@
 // MOVI KIDS - Service Worker 1.7.12
 
-const SW_VERSION = '1.8.104';
+const SW_VERSION = '1.8.105';
 
 const NETWORK_FIRST = [
   'index.html',
@@ -35,6 +35,7 @@ const NETWORK_FIRST = [
   'mk-gestao-pessoas.js',
   'mk-gestao-pessoas-ui.js',
   'mk-gestao-pessoas-admin.js',
+  'mk-gp-boot.js',
   'gestao-pessoas.html',
 ];
 

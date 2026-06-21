@@ -478,12 +478,14 @@
       const inputs = [];
       for (let i = 0; i < 4; i++) {
         const inp = document.createElement('input');
-        inp.type = 'password';
+        inp.type = 'tel';
         inp.inputMode = 'numeric';
         inp.pattern = '[0-9]*';
         inp.maxLength = 1;
         inp.className = 'mk-pin-box';
         inp.autocomplete = 'off';
+        inp.setAttribute('autocorrect', 'off');
+        inp.setAttribute('autocapitalize', 'off');
         const idx = i;
         inp.addEventListener('input', () => {
           inp.value = inp.value.replace(/\D/g, '').slice(0, 1);
@@ -711,7 +713,12 @@
       clearPinInputs(colabPins);
       colabPins = buildPinRow('colab-pin', colabEntrar);
       if (MK_GP_PROD) go('s-colab-pin');
-      colabPins[0]?.focus();
+      setTimeout(function () {
+        if (colabPins[0]) {
+          colabPins[0].focus();
+          try { colabPins[0].scrollIntoView({ block: 'center', behavior: 'smooth' }); } catch (e) { /* ok */ }
+        }
+      }, 280);
     }
     function colabPick(id) {
       pickColab = id;

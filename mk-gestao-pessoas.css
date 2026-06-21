@@ -12,13 +12,32 @@ body {
 }
 
 /* Standalone gestao-pessoas.html — mk-app.css trava html/body overflow:hidden (balcão PWA).
-   Colaborador no PC precisa rolar hub + holerite; setas só rolam se a página for scrollável. */
+   Colaborador no PC/celular precisa rolar auth + hub; iOS Safari exige override forte. */
+html.gp-prod,
+html.gp-prod body,
 html,
 body {
-  height: auto;
+  height: auto !important;
   min-height: 100%;
-  overflow-x: hidden;
-  overflow-y: auto;
+  min-height: -webkit-fill-available;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;
+}
+#gp-auth-gate {
+  min-height: 100dvh;
+  min-height: -webkit-fill-available;
+  padding-bottom: max(40px, env(safe-area-inset-bottom));
+}
+#gp-app.gp-mode-app,
+html.gp-mode-app #gp-app {
+  min-height: 100dvh;
+  min-height: -webkit-fill-available;
+}
+#gp-auth-gate .mk-pin-box,
+#gp-app .mk-pin-box {
+  -webkit-text-security: disc;
+  text-security: disc;
 }
 
 #gp-app {
