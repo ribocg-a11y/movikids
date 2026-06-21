@@ -1386,10 +1386,13 @@ function renderReceitaMesChart_(d) {
   const fatMes = Number(d.fatMes) || 0;
   const diasOp = Number(d.diasOperando) || 0;
   const mediaDia = Number(d.mediaDiaria) || 0;
-  const baselineFat = mkBaselineFatMes_(d);
+  const metaMes = mkMetaProjecaoMes_(d);
+  const projDiaria = Number(d.projDiariaFixa) > 0
+    ? Number(d.projDiariaFixa)
+    : (metaMes > 0 ? Math.round(metaMes / diasMes * 100) / 100 : 0);
 
-  if (hojeD <= 0 || diasOp <= 0) {
-    setText2('nk-receita-mes-label', diasOp <= 0 ? 'sem dias com movimento' : 'sem dados');
+  if (hojeD <= 0 || diasOp <= 0 || metaMes <= 0 || projDiaria <= 0) {
+    setText2('nk-receita-mes-label', diasOp <= 0 ? 'sem dias com movimento' : 'projeção indisponível');
     if (ins) ins.style.display = 'none';
     return;
   }
@@ -1400,65 +1403,64 @@ function renderReceitaMesChart_(d) {
   const labels = [];
   for (let dd = 1; dd <= hojeD; dd++) labels.push(dd);
 
-  let acc = 0;
-  const acumulado = labels.map(function(dd) {
-    acc += fatMap[dd] || 0;
-    return Math.round(acc);
+  let accReal = 0;
+  let accProj = 0;
+  const acumulado = [];
+  const projAcum = [];
+  const realDia = [];
+  const projDiaArr = [];
+  labels.forEach(function(dd) {
+    const r = Math.round(fatMap[dd] || 0);
+    accReal += r;
+    accProj += projDiaria;
+    realDia.push(r);
+    projDiaArr.push(Math.round(projDiaria));
+    acumulado.push(Math.round(accReal));
+    projAcum.push(Math.round(accProj));
   });
-  const baseAcum = labels.map(function(dd) {
-    return baselineFat > 0 ? Math.round(baselineFat * dd / diasMes) : 0;
-  });
-  const baseHoje = baselineFat > 0 ? Math.round(baselineFat * hojeD / diasMes) : 0;
-  const diff = fatMes - baseHoje;
-  const pctDiff = baseHoje > 0 ? Math.round(diff / baseHoje * 100) : 0;
+
+  const projHoje = projAcum[projAcum.length - 1] || 0;
+  const diff = fatMes - projHoje;
+  const pctDiff = projHoje > 0 ? Math.round(diff / projHoje * 100) : 0;
 
   setText2('nk-receita-mes-label',
-    'acum. ' + R2(fatMes)
-    + (baselineFat > 0 ? ' · base fixa ' + R2(baselineFat) : '')
-    + (projFat > 0 ? ' · ritmo ' + R2(projFat) : ''));
+    'acum. ' + R2(fatMes) + ' · proj. fixa ' + R2(metaMes) + ' (' + R2(projDiaria) + '/dia)');
 
-  const ptBg = acumulado.map(function(v, i) {
-    if (baselineFat <= 0) return '#1565C0';
-    return v >= baseAcum[i] ? '#2E7D32' : '#FF8F00';
-  });
-  const maxY = Math.max(baselineFat, projFat, Math.max.apply(null, acumulado.concat([1]))) * 1.08;
-
-  const datasets = [
-    {
-      label: 'Receita acumulada',
-      data: acumulado,
-      borderColor: '#1565C0',
-      backgroundColor: 'rgba(21,101,192,.12)',
-      borderWidth: 2.5,
-      pointRadius: labels.length > 20 ? 3 : 5,
-      pointHoverRadius: 7,
-      pointBackgroundColor: ptBg,
-      pointBorderColor: '#1565C0',
-      pointBorderWidth: 2,
-      tension: 0.2,
-      fill: true,
-      order: 1
-    }
-  ];
-  if (baselineFat > 0) {
-    datasets.push({
-      label: 'Linha de base',
-      data: baseAcum,
-      borderColor: '#5E35B1',
-      borderWidth: 2,
-      borderDash: [6, 4],
-      pointRadius: 0,
-      tension: 0,
-      fill: false,
-      order: 0
-    });
-  }
+  const ptBg = acumulado.map(function(v, i) { return v >= projAcum[i] ? '#2E7D32' : '#FF8F00'; });
+  const maxY = Math.max(metaMes, projFat, Math.max.apply(null, acumulado.concat([1]))) * 1.08;
 
   chartReceitaMes = new Chart(cv, {
     type: 'line',
     data: {
       labels: labels.map(function(dd) { return dd + '/' + mesStr; }),
-      datasets: datasets
+      datasets: [
+        {
+          label: 'Real acumulado',
+          data: acumulado,
+          borderColor: '#1565C0',
+          backgroundColor: 'rgba(21,101,192,.12)',
+          borderWidth: 2.5,
+          pointRadius: labels.length > 20 ? 3 : 5,
+          pointHoverRadius: 7,
+          pointBackgroundColor: ptBg,
+          pointBorderColor: '#1565C0',
+          pointBorderWidth: 2,
+          tension: 0.2,
+          fill: true,
+          order: 1
+        },
+        {
+          label: 'Projeção acumulada',
+          data: projAcum,
+          borderColor: '#5E35B1',
+          borderWidth: 2,
+          borderDash: [6, 4],
+          pointRadius: 0,
+          tension: 0,
+          fill: false,
+          order: 0
+        }
+      ]
     },
     options: {
       responsive: true,
@@ -1469,20 +1471,21 @@ function renderReceitaMesChart_(d) {
         tooltip: {
           callbacks: {
             label: function(ctx) {
-              const val = Math.round(ctx.parsed.y);
-              if (ctx.dataset.label === 'Linha de base') {
-                return 'Base acum.: ' + R2(val) + ' (meta fixa do mês)';
-              }
               const i = ctx.dataIndex;
-              const esperado = baseAcum[i] || 0;
-              const delta = val - esperado;
-              const parts = ['Acumulado: ' + R2(val)];
-              if (baselineFat > 0 && esperado > 0) {
-                parts.push(delta >= 0
-                  ? ('+' + R2(delta) + ' vs base')
-                  : (R2(delta) + ' vs base'));
+              if (ctx.dataset.label === 'Projeção acumulada') {
+                return [
+                  'Proj. dia: ' + R2(projDiaArr[i] || 0),
+                  'Proj. acum.: ' + R2(Math.round(ctx.parsed.y))
+                ];
               }
-              return parts.join(' · ');
+              const rD = realDia[i] || 0;
+              const pA = projAcum[i] || 0;
+              const delta = Math.round(ctx.parsed.y) - pA;
+              return [
+                'Real dia: ' + R2(rD),
+                'Real acum.: ' + R2(Math.round(ctx.parsed.y)),
+                (delta >= 0 ? '+' + R2(delta) : R2(delta)) + ' vs proj. acum.'
+              ];
             }
           }
         }
@@ -1508,33 +1511,50 @@ function renderReceitaMesChart_(d) {
 
   if (ins) {
     const msgs = [];
-    if (baselineFat > 0) {
-      if (diff >= 0) {
-        msgs.push('Acumulado ' + R2(fatMes) + ' — ' + (pctDiff > 0 ? pctDiff + '% acima' : 'no ritmo')
-          + ' da meta base no dia ' + hojeD + ' (' + R2(baseHoje) + ' esperado).');
-      } else {
-        msgs.push('Acumulado ' + R2(fatMes) + ' — ' + Math.abs(pctDiff) + '% abaixo da meta base ('
-          + R2(baseHoje) + ' esperado até hoje).');
-      }
-      msgs.push('Meta base fixa do mês: ' + R2(baselineFat)
-        + ' (travada no início — linha reta até o fim do mês).');
+    if (diff >= 0) {
+      msgs.push('Real acumulado ' + R2(fatMes) + ' — ' + (pctDiff > 0 ? pctDiff + '% acima' : 'no ritmo')
+        + ' da projeção fixa no dia ' + hojeD + ' (' + R2(projHoje) + ' proj. acum.).');
+    } else {
+      msgs.push('Real acumulado ' + R2(fatMes) + ' — ' + Math.abs(pctDiff) + '% abaixo da projeção fixa ('
+        + R2(projHoje) + ' proj. acum. esperado).');
     }
+    msgs.push('Projeção travada: ' + R2(metaMes) + ' no mês · ' + R2(projDiaria) + '/dia somando dia a dia (não recalcula).');
     if (projFat > 0) {
-      msgs.push('Fechamento no ritmo atual: ' + R2(projFat) + ' · média ' + R2(mediaDia) + '/dia nos '
+      msgs.push('Ritmo atual (dinâmico): ' + R2(projFat) + ' · média ' + R2(mediaDia) + '/dia nos '
         + diasOp + ' dias com movimento.');
     }
-    ins.style.display = msgs.length ? 'block' : 'none';
+    ins.style.display = 'block';
     ins.textContent = msgs.join(' ');
   }
 }
 
-/** Meta base fixa — GAS baselineFatMes ou localStorage no 1º load do mês. */
-function mkBaselineFatMes_(d) {
-  const fromGas = Number(d.baselineFatMes);
+function mkInferMetaProjecaoFromFatDia_(fatDia, diasMes) {
+  const arr = (fatDia || []).slice().sort(function(a, b) { return (a.dia || 0) - (b.dia || 0); });
+  let fat = 0;
+  let n = 0;
+  for (let d = 1; d <= 7; d++) {
+    const row = arr.filter(function(x) { return x.dia === d; })[0];
+    const v = row ? Number(row.valor) || 0 : 0;
+    if (v > 0) { fat += v; n++; }
+  }
+  if (n < 2) {
+    for (let i = 0; i < arr.length && n < 3; i++) {
+      const v = Number(arr[i].valor) || 0;
+      if (v > 0) { fat += v; n++; }
+    }
+  }
+  if (n <= 0) return 0;
+  return Math.round(fat / n * diasMes);
+}
+
+/** Meta projeção fixa — GAS metaProjecaoMes ou inferida da 1ª semana + localStorage. */
+function mkMetaProjecaoMes_(d) {
+  const fromGas = Number(d.metaProjecaoMes) || Number(d.baselineFatMes) || 0;
   if (fromGas > 0) return fromGas;
   const mes = d.mesAtual || new Date().getMonth() + 1;
   const ano = d.anoAtual || new Date().getFullYear();
-  const key = 'mk_baseline_fat_v1_' + ano + '_' + mes;
+  const diasMes = Number(d.diasMes) || 30;
+  const key = 'mk_proj_fat_v2_' + ano + '_' + mes;
   try {
     const raw = localStorage.getItem(key);
     if (raw) {
@@ -1542,18 +1562,18 @@ function mkBaselineFatMes_(d) {
       if (o && Number(o.val) > 0) return Number(o.val);
     }
   } catch (e) { /* ignore */ }
-  let base = Number(d.fatMesAnt) || 0;
-  if (base <= 0 && d.leadingFinanceiro) {
+  let meta = mkInferMetaProjecaoFromFatDia_(d.fatPorDia, diasMes);
+  if (meta <= 0) meta = Number(d.projecaoFat) || 0;
+  if (meta <= 0 && d.leadingFinanceiro) {
     const lf = d.leadingFinanceiro;
     const be = lf.breakEvenLocacoesDia;
     const ticket = Number(lf.ticketMedio) || 0;
-    const diasMes = Number(d.diasMes) || 30;
-    if (be != null && ticket > 0) base = Math.round(be * ticket * diasMes);
+    if (be != null && ticket > 0) meta = Math.round(be * ticket * diasMes);
   }
-  if (base > 0) {
-    try { localStorage.setItem(key, JSON.stringify({ val: base, at: Date.now() })); } catch (e) { /* ignore */ }
+  if (meta > 0) {
+    try { localStorage.setItem(key, JSON.stringify({ val: meta, at: Date.now() })); } catch (e) { /* ignore */ }
   }
-  return base;
+  return meta;
 }
 
 const MK_MES_ABREV_ = ['', 'Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
