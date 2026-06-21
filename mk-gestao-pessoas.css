@@ -561,6 +561,12 @@ body {
 }
 
 /* ── ADM Operadores · Gestão Pessoas (#page-operadores) ── */
+#page-operadores {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
 #page-operadores .gp-adm-page-head { margin-bottom: 12px; }
 #page-operadores .gp-adm-page-comp { margin: 0; font-size: 13px; font-weight: 700; color: var(--txt2); }
 #page-operadores .gp-adm-panel-lead {
@@ -588,7 +594,7 @@ body {
   border-color: var(--blue); background: #E8F2FF; color: var(--blue-dk, #1565C0);
   box-shadow: var(--mk-shadow-1);
 }
-#page-operadores .gp-adm-panel { display: none; max-width: 920px; }
+#page-operadores .gp-adm-panel { display: none; width: 100%; max-width: 920px; min-width: 0; }
 #page-operadores .gp-adm-panel.active { display: block; animation: gpFade .22s ease; }
 #page-operadores .gp-adm-stack { display: flex; flex-direction: column; gap: 12px; }
 #page-operadores .gp-adm-card {
@@ -598,10 +604,16 @@ body {
 #page-operadores .gp-adm-card h3 {
   margin: 0 0 12px; font-size: 13px; font-weight: 900; letter-spacing: .02em; color: var(--txt);
 }
-#page-operadores .gp-adm-card--table { padding: 0; overflow: hidden; }
+#page-operadores .gp-adm-card--table {
+  padding: 0;
+  overflow-x: auto;
+  overflow-y: visible;
+  -webkit-overflow-scrolling: touch;
+}
 #page-operadores .gp-adm-card--table > .gp-adm-muted,
 #page-operadores .gp-adm-card--table > p { margin: 0; padding: 16px; }
-#page-operadores .gp-adm-card--table .gp-adm-table { border: 0; }
+#page-operadores .gp-adm-card--table .gp-adm-table { border: 0; min-width: 640px; }
+#page-operadores #gp-adm-escala .gp-adm-table { min-width: 720px; }
 #page-operadores .gp-adm-card--table .gp-adm-table th:first-child,
 #page-operadores .gp-adm-card--table .gp-adm-table td:first-child { padding-left: 14px; }
 #page-operadores .gp-adm-card--list { padding: 8px 16px 12px; }
@@ -618,7 +630,8 @@ body {
   width: 100%; max-width: none; box-sizing: border-box; margin: 0;
 }
 #page-operadores .gp-adm-page-foot {
-  margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border); max-width: 920px;
+  margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border);
+  width: 100%; max-width: 920px; min-width: 0;
 }
 #page-operadores .gp-adm-btn-back { max-width: 360px; margin: 0 auto; display: block; }
 #page-operadores .gp-adm-card .form-group { margin-bottom: 12px; }
@@ -684,7 +697,7 @@ body {
 @media (max-width: 900px) { #page-operadores .gp-adm-ficha-cadastro-grid { grid-template-columns: 1fr 1fr; } }
 
 /* Ficha colaborador — duas colunas (perfil | jornada) */
-#page-operadores .gp-adm-ficha-page { display: flex; flex-direction: column; gap: 0; min-height: 320px; }
+#page-operadores .gp-adm-ficha-page { display: flex; flex-direction: column; gap: 0; min-height: 320px; width: 100%; max-width: 920px; min-width: 0; }
 #page-operadores .gp-adm-ficha-bar {
   display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px 20px;
   padding: 14px 16px; background: var(--card); border: 1px solid var(--border);
@@ -700,7 +713,8 @@ body {
   display: grid; grid-template-columns: minmax(260px, 300px) minmax(0, 1fr);
   gap: 0; border: 1px solid var(--border); border-top: 0;
   border-radius: 0 0 var(--mk-radius, 16px) var(--mk-radius, 16px);
-  overflow: hidden; background: var(--card); box-shadow: var(--mk-shadow-1);
+  overflow: visible; background: var(--card); box-shadow: var(--mk-shadow-1);
+  min-width: 0;
 }
 @media (max-width: 860px) {
   #page-operadores .gp-adm-ficha-split { grid-template-columns: 1fr; }
@@ -768,7 +782,7 @@ body {
 #page-operadores .gp-adm-jorn-table-wrap {
   border: 1px solid var(--border); border-radius: 12px; overflow: auto; max-height: 52vh;
 }
-#page-operadores .gp-adm-jorn-table-wrap .gp-adm-table { border: 0; }
+#page-operadores .gp-adm-jorn-table-wrap .gp-adm-table { border: 0; min-width: 760px; }
 #page-operadores .gp-adm-jorn-table-wrap .gp-adm-table thead th {
   position: sticky; top: 0; z-index: 1; background: #F8FAFC;
 }
@@ -974,3 +988,59 @@ body {
 #page-operadores .mk-hol-note { padding: 10px 16px; background: #FFFBEB; border-bottom: 1px solid #FDE68A; font-size: 11px; font-weight: 800; color: #92400E; line-height: 1.45; }
 #page-operadores .mk-hol-toolbar { padding: 0 0 12px; }
 #page-operadores .mk-hol-toolbar .btn { width: 100%; }
+
+/* Operadores — responsivo (mobile / tablet estreito) */
+@media (max-width: 900px) {
+  #page-operadores .gp-adm-tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    gap: 8px;
+    margin-left: -2px;
+    margin-right: -2px;
+    padding-bottom: 10px;
+  }
+  #page-operadores .gp-adm-tabs::-webkit-scrollbar { display: none; }
+  #page-operadores .gp-adm-tab { flex-shrink: 0; white-space: nowrap; }
+  #page-operadores .gp-adm-kpi-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 720px) {
+  #page-operadores .admin-badge {
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  #page-operadores .gp-adm-kpi-grid { grid-template-columns: 1fr; }
+  #page-operadores .gp-adm-ficha-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  #page-operadores .gp-adm-presenca-sel {
+    width: 100%;
+    max-width: none;
+    min-width: 0;
+  }
+  #page-operadores .gp-adm-ficha-bar-badges { justify-content: flex-start; }
+  #page-operadores .gp-adm-row {
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  #page-operadores .gp-adm-row .gp-adm-av { flex-shrink: 0; }
+  #page-operadores .gp-adm-row-body { flex: 1 1 140px; min-width: 0; }
+  #page-operadores .gp-adm-row .gp-adm-badge,
+  #page-operadores .gp-adm-row .gp-adm-link { flex-shrink: 0; }
+  #page-operadores .gp-adm-btn-back { max-width: none; }
+  #page-operadores .mk-hol-tot { grid-template-columns: 1fr; }
+  #page-operadores .mk-hol-tot div { border-right: 0; border-bottom: 1px solid var(--border); }
+  #page-operadores .mk-hol-tot div:last-child { border-bottom: 0; }
+}
+@media (max-width: 480px) {
+  #page-operadores .gp-adm-aside-stats { grid-template-columns: 1fr; }
+  #page-operadores .gp-adm-card { padding: 12px; }
+  #page-operadores .gp-adm-card--list { padding: 4px 12px 8px; }
+  #page-operadores .gp-adm-ficha-aside,
+  #page-operadores .gp-adm-ficha-main { padding: 12px; }
+  #page-operadores .gp-adm-aside-block--warn { margin: 0 -12px -12px; padding: 12px; }
+}
