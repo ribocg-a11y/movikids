@@ -61,7 +61,18 @@
       preview: true,
       comunicados: [
         { id: 9001, titulo: 'Demonstração', mensagem: 'Esta é uma pré-visualização — comunicados reais vêm da planilha COMUNICADOS_RH.', prioridade: 'info', data: '21/06/2026' }
-      ]
+      ],
+      historicoDesempenho: {
+        metaAlvo: 20, bonusValor: 100,
+        meses: [
+          { competencia: '01/2026', label: 'Jan', locMes: 0, diasMeta: 0, bonusMes: 0 },
+          { competencia: '02/2026', label: 'Fev', locMes: 0, diasMeta: 0, bonusMes: 0 },
+          { competencia: '03/2026', label: 'Mar', locMes: 12, diasMeta: 0, bonusMes: 0 },
+          { competencia: '04/2026', label: 'Abr', locMes: 28, diasMeta: 1, bonusMes: 100 },
+          { competencia: '05/2026', label: 'Mai', locMes: 35, diasMeta: 2, bonusMes: 200 },
+          { competencia: '06/2026', label: 'Jun', locMes: 8, diasMeta: 0, bonusMes: 0 }
+        ]
+      }
     };
 
     function gpUrlAdmPreview_() {
@@ -80,7 +91,7 @@
     }
 
     function gpPreviewVoltarAdmin_() {
-      var v = global.MK_VERSION || '1.8.94';
+      var v = global.MK_VERSION || '1.8.95';
       global.location.href = 'index.html?force=' + encodeURIComponent(v) + '#operadores';
     }
 
@@ -999,11 +1010,41 @@
     }
     function metaDiasOk(m) { return (m.diasMes || []).filter(d => d.bonusOk); }
 
+    function renderHistoricoDesempenho_(p) {
+      var h = p.historicoDesempenho;
+      if (!h || !h.meses || !h.meses.length) return '';
+      var meses = h.meses;
+      var maxLoc = Math.max.apply(null, meses.map(function (m) { return Number(m.locMes) || 0; })) || 1;
+      var cur = meses[meses.length - 1] || {};
+      var totalBonus = meses.reduce(function (s, m) { return s + (Number(m.bonusMes) || 0); }, 0);
+      var totalDiasMeta = meses.reduce(function (s, m) { return s + (Number(m.diasMeta) || 0); }, 0);
+      var bars = meses.map(function (m) {
+        var loc = Number(m.locMes) || 0;
+        var pct = Math.round(loc / maxLoc * 100);
+        var metaHint = (Number(m.diasMeta) || 0) > 0
+          ? '<small class="gp-desempenho-meta-inline">' + m.diasMeta + ' meta</small>' : '';
+        return '<div class="gp-desempenho-bar-row">' +
+          '<span class="gp-desempenho-lbl">' + escHtml_(m.label || m.competencia || '') + '</span>' +
+          '<div class="gp-desempenho-bar" aria-hidden="true"><div class="gp-desempenho-bar-fill" style="width:' + pct + '%"></div></div>' +
+          '<span class="gp-desempenho-val">' + loc + metaHint + '</span></div>';
+      }).join('');
+      return '<div class="gp-desempenho">' +
+        '<h3 class="gp-desempenho-title">Seu desempenho</h3>' +
+        '<p class="gp-desempenho-lead">' + escHtml_(String(cur.locMes || 0)) + ' locações em ' + escHtml_(cur.label || 'este mês') +
+        ' · ' + totalDiasMeta + ' dia(s) com meta nos últimos ' + meses.length + ' meses</p>' +
+        '<div class="gp-desempenho-chart" role="img" aria-label="Gráfico de locações por mês">' + bars + '</div>' +
+        '<div class="gp-desempenho-foot">' +
+        '<span>Meta diária: <strong>' + (h.metaAlvo || 20) + ' loc</strong></span>' +
+        '<span>Bônus acumulado: <strong>R$ ' + fmtBRL(totalBonus) + '</strong></span>' +
+        '</div></div>';
+    }
+
     function renderMetas() {
       const p = PESSOAS[colabLogado];
       let html;
+      const historico = renderHistoricoDesempenho_(p);
       if (!p.meta) {
-        html = '<div class="mock-note info">Milena (sócia) não tem meta de locações por turno.</div>';
+        html = '<div class="mock-note info">Milena (sócia) não tem meta de locações por turno.</div>' + historico;
       } else {
         const m = p.meta;
         const pct = Math.min(100, Math.round(m.atual / m.alvo * 100));
@@ -1033,7 +1074,7 @@
             <div class="mock-prog" style="margin-top:12px"><div class="mock-prog-fill" style="width:${pct}%"></div></div>
             <p style="font-size:13px;font-weight:700;margin-top:10px;color:var(--txt2)">Bônus R$ ${fmtBRL(m.bonusValor)} ao fazer ${m.bonusMin}+ locações no turno.</p>
             <p style="font-size:11px;font-weight:700;margin-top:8px;color:var(--txt3)">Admissão ${m.admissao || p.admissao || '—'} · histórico só a partir desta data</p>
-          </div>${tabela}`;
+          </div>${tabela}${historico}`;
       }
       document.getElementById('metas-body').innerHTML = html;
     }
@@ -1182,7 +1223,7 @@ function gpVoltarInicio() {
     gpPreviewVoltarAdmin_();
     return;
   }
-  var v = global.MK_VERSION || '1.8.94';
+  var v = global.MK_VERSION || '1.8.95';
   global.location.href = 'index.html?force=' + encodeURIComponent(v);
 }
 function colabSairProd() {

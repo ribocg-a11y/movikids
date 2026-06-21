@@ -241,6 +241,83 @@ body {
   margin-top: 2px;
 }
 
+/* FASE 15b.4 — Histórico desempenho (Minhas metas) */
+#gp-app .gp-desempenho {
+  margin-top: 16px;
+  padding: 16px;
+  border-radius: var(--mk-widget-radius, 16px);
+  background: linear-gradient(145deg, rgba(255, 213, 79, 0.12), rgba(255, 255, 255, 0.98));
+  border: 1px solid rgba(255, 179, 0, 0.35);
+  box-shadow: var(--mk-shadow-1);
+}
+#gp-app .gp-desempenho-title {
+  margin: 0 0 6px;
+  font-family: 'Fredoka One', cursive;
+  font-size: 18px;
+  color: var(--blue-dk);
+  line-height: 1.2;
+}
+#gp-app .gp-desempenho-lead {
+  margin: 0 0 14px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--txt2);
+  line-height: 1.45;
+}
+#gp-app .gp-desempenho-chart { display: flex; flex-direction: column; gap: 8px; }
+#gp-app .gp-desempenho-bar-row {
+  display: grid;
+  grid-template-columns: 32px 1fr auto;
+  gap: 8px;
+  align-items: center;
+}
+#gp-app .gp-desempenho-lbl {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--txt3);
+  text-align: right;
+}
+#gp-app .gp-desempenho-bar {
+  height: 10px;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 999px;
+  overflow: hidden;
+  border: 1px solid rgba(21, 101, 192, 0.12);
+}
+#gp-app .gp-desempenho-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #1565C0, #42A5F5);
+  min-width: 2px;
+  transition: width 0.5s ease;
+}
+#gp-app .gp-desempenho-val {
+  font-size: 13px;
+  font-weight: 900;
+  color: var(--txt);
+  min-width: 36px;
+  text-align: right;
+  line-height: 1.2;
+}
+#gp-app .gp-desempenho-meta-inline {
+  display: block;
+  font-size: 9px;
+  font-weight: 800;
+  color: var(--green);
+}
+#gp-app .gp-desempenho-foot {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px dashed rgba(21, 101, 192, 0.15);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--txt2);
+}
+
 /* ADM — Comunicados RH */
 #page-operadores .gp-adm-com-form { display: grid; gap: 10px; margin-bottom: 16px; }
 #page-operadores .gp-adm-com-form .form-input,

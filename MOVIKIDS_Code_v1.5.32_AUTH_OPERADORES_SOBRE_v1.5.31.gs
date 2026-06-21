@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.124
+// MOVI KIDS — Google Apps Script v1.5.125
+// v1.5.125: FASE 15b.4 — historicoDesempenho colaborador (loc/mês, dias meta, 6 meses)
 // v1.5.124: FASE 15b.3 — COMUNICADOS_RH + listar/salvar admin + painel colaborador
 // v1.5.123: perf — carregarInicio leitura única LOCAÇÕES + cache 12s; resumoDia/gp cache
 // v1.5.122: FASE 15b — buscarPainelColaboradorPreview_ (ADM 1416)
@@ -7627,6 +7628,71 @@ function gpMetasColab_(opId, competencia) {
   return gpMetasPainel_(opId, competencia, gpLoadContext_());
 }
 
+function gpMesLabelShort_(comp) {
+  const m = parseInt(String(comp || '').slice(0, 2), 10);
+  const names = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+  return names[m - 1] || String(comp || '').slice(0, 2);
+}
+
+/** FASE 15b.4 — últimos N meses: locações, dias com meta e bônus estimado. */
+function gpHistoricoDesempenhoColab_(opId, nMeses, ctxIn) {
+  nMeses = Math.min(12, Math.max(3, Number(nMeses) || 6));
+  const ctx = ctxIn || gpLoadContext_();
+  const colab = gpColabRhFromCtx_(opId, ctx);
+  const opNome = colab ? colab.nome : '';
+  const cfg = metaOperadorCfg_(opId);
+  const metaAlvo = (cfg && cfg.meta) || (colab && colab.metaLocDia) || 20;
+  const bonusVal = (cfg && cfg.bonus) || (colab && colab.bonusMeta) || 100;
+  const comps = [];
+  const agora = new Date();
+  for (let i = nMeses - 1; i >= 0; i--) {
+    const d = new Date(agora.getFullYear(), agora.getMonth() - i, 1);
+    comps.push(String(d.getMonth() + 1).padStart(2, '0') + '/' + d.getFullYear());
+  }
+  const compSet = {};
+  comps.forEach(function (c) { compSet[c] = true; });
+  const auditLoc = {};
+  const sheetLoc = {};
+  const metaDias = {};
+  comps.forEach(function (c) { auditLoc[c] = 0; sheetLoc[c] = 0; metaDias[c] = 0; });
+  (ctx.metasRows || []).forEach(function (r) {
+    if (Number(r[1]) !== Number(opId)) return;
+    const ds = cellToStr_(r[2]);
+    const pts = ds.split('/');
+    if (pts.length < 3) return;
+    const comp = pts[1].padStart(2, '0') + '/' + pts[2];
+    if (!compSet[comp]) return;
+    sheetLoc[comp] += Number(r[3]) || 0;
+    if (String(r[5] || '').toUpperCase() === 'SIM') metaDias[comp]++;
+  });
+  (ctx.auditRows || []).forEach(function (r) {
+    if (String(r[1] || '').trim() !== 'encerrarLocacao') return;
+    if (!opNome || !metaOperadorNomeMatch_(String(r[7] || ''), opNome)) return;
+    const ts = auditTsMeta_(r[0]);
+    if (!ts.data) return;
+    const pts = ts.data.split('/');
+    if (pts.length < 3) return;
+    const comp = pts[1].padStart(2, '0') + '/' + pts[2];
+    if (!compSet[comp]) return;
+    auditLoc[comp]++;
+  });
+  return {
+    metaAlvo: metaAlvo,
+    bonusValor: bonusVal,
+    meses: comps.map(function (comp) {
+      const loc = Math.max(auditLoc[comp] || 0, sheetLoc[comp] || 0);
+      const dias = metaDias[comp] || 0;
+      return {
+        competencia: comp,
+        label: gpMesLabelShort_(comp),
+        locMes: loc,
+        diasMeta: dias,
+        bonusMes: dias * bonusVal
+      };
+    })
+  };
+}
+
 function gpEscalaColab_(opId, competencia) {
   const comp = gpNormCompetencia_(competencia);
   const row = gpRows_(SH_ESCALA_COLAB).find(function (r) {
@@ -7701,12 +7767,13 @@ function gpBuildPainelColaboradorPayload_(opId, comp, colab, operador) {
   if (!colab) {
     colab = { operadorId: opId, nome: opNome, funcao: 'Colaborador', salarioBase: 1621, vaDiario: 20, metaLocDia: 20, bonusMeta: 100, turno: '', cadastroPct: 0, ativo: true };
   }
-  const metas = gpMetasColab_(opId, comp);
+  const ctxJ = gpLoadContext_();
+  const metas = gpMetasPainel_(opId, comp, ctxJ);
   const bonus = metas.bonusTotal || 0;
   const hol = gpCalcHollerite_(colab, bonus, 0, comp);
   const pontoHoje = gpStatusPontoHoje_(opId);
-  const ctxJ = gpLoadContext_();
   const jornada = gpAnaliseJornadaColab_(opId, comp, ctxJ, colab);
+  const historicoDesempenho = gpHistoricoDesempenhoColab_(opId, 6, ctxJ);
   return {
     colaborador: {
       id: opId, label: colab.nome || opNome, funcao: colab.funcao, turno: colab.turno,
@@ -7725,7 +7792,8 @@ function gpBuildPainelColaboradorPayload_(opId, comp, colab, operador) {
       holerite: hol
     },
     comunicados: gpComunicadosForOp_(opId),
-    versao: 'v1.5.124'
+    historicoDesempenho: historicoDesempenho,
+    versao: 'v1.5.125'
   };
 }
 

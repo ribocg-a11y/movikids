@@ -53,7 +53,8 @@
         holerite: hol
       },
       _holerite: hol,
-      comunicados: data.comunicados || []
+      comunicados: data.comunicados || [],
+      historicoDesempenho: data.historicoDesempenho || null
     };
   }
 

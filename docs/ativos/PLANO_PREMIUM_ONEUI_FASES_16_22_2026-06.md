@@ -142,7 +142,7 @@ FASE 22  Assistente IA gestão (Anexo — decisão sócio)
 | 15b.2 | Holerite quinzenal admin + colaborador + pré-visualização ADM | ✅ v1.5.108 / **v1.8.92** |
 | 15b.2b | Pré-visualização ADM (`admPreview=1`) somente leitura | ✅ v1.5.122 / **v1.8.92** |
 | 15b.3 | **Comunicados** — faixa no hub colaborador (planilha `COMUNICADOS_RH`) | ✅ **v1.8.94** FE · GAS repo v1.5.124 |
-| 15b.4 | **Histórico desempenho** — loc/mês, metas atingidas, gráfico evolução | Novo |
+| 15b.4 | **Histórico desempenho** — loc/mês, metas atingidas, gráfico evolução | ✅ **v1.8.95** FE · GAS repo v1.5.125 |
 | 15b.5 | **Avaliações** — registro simples admin (nota + obs por competência) | Novo |
 | 15b.6 | **Benefícios visíveis** — VA, VT, copart no hub (não só holerite) | Parcial |
 | 15b.7 | Persistir **banco de horas** na aba `BANCO_HORAS` ao fechar competência | Novo |
@@ -337,7 +337,7 @@ Widget live: % frota em uso agora · overlay gráfico ocupação por horário.
 | 3 | **Nova versão Web GAS v1.5.123+** | Sócio | ⏳ |
 | 4 | **FASE 15b.3** Comunicados — spec §6 | Agente | ✅ v1.8.94 |
 | 5 | Homolog tablet F5/F7/F10/F11 | Ops loja | ⏳ |
-| 6 | FASE 15b.4 Histórico desempenho | Agente | Backlog |
+| 6 | FASE 15b.4 Histórico desempenho | Agente | ✅ v1.8.95 |
 | 7 | FASE 17 fechar perfil Gestor + homolog | Agente + Ops | 🟡 |
 
 ---
@@ -358,7 +358,7 @@ Widget live: % frota em uso agora · overlay gráfico ocupação por horário.
 
 | Fase | Peso | % fase | Notas |
 |------|------|--------|-------|
-| **15b** RH completo | P1 ×2 | **~75%** | hero + holerite + preview ADM + comunicados ✅ |
+| **15b** RH completo | P1 ×2 | **~88%** | hero + holerite + preview + comunicados + histórico ✅ |
 | **16** Centro comando | P1 ×2 | **~88%** | FE+GAS repo ✅ · homolog tablet ⏳ |
 | **17** Alertas + Gestor | P1 ×2 | **~82%** | alertasInteligentes_ ✅ · perfil gestor 🟡 |
 | **18** Financeiro previsão | P2 | 0% | — |
@@ -367,7 +367,7 @@ Widget live: % frota em uso agora · overlay gráfico ocupação por horário.
 | **21** Live BI frota | P2 | 0% | — |
 | **22** Assistente IA | P3 | 0% | Anexo |
 
-**Total plano (P1 peso 2×):** **~50% concluído · ~50% restante**
+**Total plano (P1 peso 2×):** **~53% concluído · ~47% restante**
 
 ---
 
