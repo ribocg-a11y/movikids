@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.126
+// MOVI KIDS — Google Apps Script v1.5.127
+// v1.5.127: fix salvarCadastroColaborador — getRange(row,col,1,7) cols cpf..admissao (nao endRow)
 // v1.5.126: FASE 15b.5 — cadastro RH obrigatorio + salvarCadastroColaborador + bloqueio balcao
 // v1.5.125: FASE 15b.4 — historicoDesempenho colaborador (loc/mês, dias meta, 6 meses)
 // v1.5.124: FASE 15b.3 — COMUNICADOS_RH + listar/salvar admin + painel colaborador
@@ -7034,7 +7035,7 @@ function salvarCadastroColaborador_(p) {
     const cad = { nomeCompleto: nome, cpf: cpf, nascimento: nasc, telefone: tel, email: email, endereco: end, emergencia: emerg, admissao: adm, pix: pix };
     if (!gpCadastroOk_(cad)) return err_('Preencha todos os campos obrigatorios do cadastro', 400);
     sh.getRange(r, 2).setValue(nome);
-    sh.getRange(r, 4, r, 10).setValues([[cpf, nasc, tel, email, end, emerg, adm]]);
+    sh.getRange(r, 4, 1, 7).setValues([[cpf, nasc, tel, email, end, emerg, adm]]);
     sh.getRange(r, 11).setValue(pix);
     const pct = 100;
     sh.getRange(r, 18).setValue(pct);
@@ -7042,7 +7043,7 @@ function salvarCadastroColaborador_(p) {
     sh.getRange(r, 5).setNumberFormat('@');
     sh.getRange(r, 10).setNumberFormat('@');
     try { CacheService.getScriptCache().remove('gp_painel_adm_' + gpNormCompetencia_(gpCompetenciaAtual_())); } catch (e) { /* ok */ }
-    return resp_({ cadastro: cad, cadastroPct: pct, cadastroOk: true, versao: 'v1.5.126' });
+    return resp_({ cadastro: cad, cadastroPct: pct, cadastroOk: true, versao: 'v1.5.127' });
   } catch (ex) {
     return err_('Erro ao salvar cadastro: ' + ex.message, 500);
   }
