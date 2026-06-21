@@ -77,7 +77,7 @@
     }
 
     function gpPreviewVoltarAdmin_() {
-      var v = global.MK_VERSION || '1.8.91';
+      var v = global.MK_VERSION || '1.8.92';
       global.location.href = 'index.html?force=' + encodeURIComponent(v) + '#operadores';
     }
 
@@ -94,7 +94,11 @@
     }
 
     function showAdmPreviewGate(needPin) {
-      setGpView('auth-login');
+      var gate = document.getElementById('gp-auth-gate');
+      var app = document.getElementById('gp-app');
+      if (gate) gate.style.display = '';
+      if (app) app.style.display = 'none';
+      document.documentElement.classList.remove('gp-mode-app');
       document.querySelectorAll('#gp-auth-gate .mk-auth-step').forEach(function (el) {
         el.classList.toggle('hidden', el.id !== 's-adm-preview');
         el.style.display = el.id === 's-adm-preview' ? '' : 'none';
@@ -854,8 +858,8 @@
     }
 
     function confirmarPonto() {
+      const flash = document.getElementById('ponto-flash');
       if (gpAdmPreviewMode_) {
-        var flash = document.getElementById('ponto-flash');
         if (flash) {
           flash.textContent = '👁 Pré-visualização — ponto não é registrado neste modo.';
           flash.hidden = false;
@@ -864,7 +868,6 @@
       }
       const p = PESSOAS[colabLogado];
       const t = fmtTime(), hoje = fmtDataHoje(), dia = diaSemanaHoje();
-      const flash = document.getElementById('ponto-flash');
       if (MK_GP_PROD && window.MK_GestaoPessoas && gpSessionPin) {
         const tipo = p.statusHoje !== 'dentro' ? 'entrada' : 'saida';
         MK_GestaoPessoas.registrarPonto(colabLogado, gpSessionPin, tipo).then(function (r) {
@@ -1078,7 +1081,11 @@
     
 
 function gpVoltarInicio() {
-  var v = global.MK_VERSION || '1.8.60';
+  if (gpAdmPreviewMode_ || gpUrlAdmPreview_()) {
+    gpPreviewVoltarAdmin_();
+    return;
+  }
+  var v = global.MK_VERSION || '1.8.92';
   global.location.href = 'index.html?force=' + encodeURIComponent(v);
 }
 function colabSairProd() {
