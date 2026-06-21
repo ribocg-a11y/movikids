@@ -494,8 +494,7 @@
       el.innerHTML = '<p class="gp-adm-muted">Folha indisponível — instale abas RH ou cadastre colaboradores.</p>';
       return;
     }
-    el.innerHTML = '<p class="gp-adm-muted" style="margin:0 0 10px">Pagamento quinzenal: <strong>40%</strong> dia 15 · <strong>60% + benefícios</strong> dia 30/31 · proporcional à admissão · VA R$ 400/mês.</p>' +
-      '<table class="gp-adm-table"><tr><th style="text-align:left">Nome</th><th>Quinzena</th><th>Pgto</th><th>Loc mês</th><th>Bônus</th><th>Líquido est.</th><th></th></tr>' +
+    el.innerHTML = '<table class="gp-adm-table"><tr><th style="text-align:left">Nome</th><th>Quinzena</th><th>Pgto</th><th>Loc mês</th><th>Bônus</th><th>Líquido est.</th><th></th></tr>' +
       folha.map(function (f) {
         const hol = f.holerite || {};
         const q = f.quinzenaLabel || hol.quinzenaLabel || (f.quinzena === 1 ? '1ª' : '2ª');

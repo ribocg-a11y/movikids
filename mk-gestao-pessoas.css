@@ -580,13 +580,58 @@ body {
   background: transparent; font: inherit; font-weight: 800; font-size: 12px; color: var(--txt3); cursor: pointer;
 }
 #page-operadores .gp-adm-tab:hover { background: #F1F5F9; color: var(--txt2); }
+#page-operadores .gp-adm-tab:focus { outline: none; }
+#page-operadores .gp-adm-tab:focus-visible {
+  outline: 2px solid var(--blue); outline-offset: 2px;
+}
 #page-operadores .gp-adm-tab.active {
-  border-color: var(--border); background: var(--card); color: var(--blue);
+  border-color: var(--blue); background: #E8F2FF; color: var(--blue-dk, #1565C0);
   box-shadow: var(--mk-shadow-1);
 }
-#page-operadores .gp-adm-panel { display: none; max-width: 1100px; }
+#page-operadores .gp-adm-panel { display: none; max-width: 920px; }
 #page-operadores .gp-adm-panel.active { display: block; animation: gpFade .22s ease; }
-#page-operadores[data-gp-tab="presenca"] .gp-adm-panel { max-width: none; }
+#page-operadores .gp-adm-stack { display: flex; flex-direction: column; gap: 12px; }
+#page-operadores .gp-adm-card {
+  background: var(--card); border: 1px solid var(--border); border-radius: var(--mk-radius, 16px);
+  padding: 16px; margin-bottom: 0; box-shadow: var(--mk-shadow-1);
+}
+#page-operadores .gp-adm-card h3 {
+  margin: 0 0 12px; font-size: 13px; font-weight: 900; letter-spacing: .02em; color: var(--txt);
+}
+#page-operadores .gp-adm-card--table { padding: 0; overflow: hidden; }
+#page-operadores .gp-adm-card--table > .gp-adm-muted,
+#page-operadores .gp-adm-card--table > p { margin: 0; padding: 16px; }
+#page-operadores .gp-adm-card--table .gp-adm-table { border: 0; }
+#page-operadores .gp-adm-card--table .gp-adm-table th:first-child,
+#page-operadores .gp-adm-card--table .gp-adm-table td:first-child { padding-left: 14px; }
+#page-operadores .gp-adm-card--list { padding: 8px 16px 12px; }
+#page-operadores .gp-adm-card--list > h3 { padding-top: 8px; margin-bottom: 4px; }
+#page-operadores .gp-adm-form-row {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+}
+@media (max-width: 560px) { #page-operadores .gp-adm-form-row { grid-template-columns: 1fr; } }
+#page-operadores .gp-adm-actions {
+  display: flex; flex-direction: column; gap: 10px; margin-top: 4px;
+}
+#page-operadores .gp-adm-actions--duo { gap: 10px; }
+#page-operadores .gp-adm-btn-block {
+  width: 100%; max-width: none; box-sizing: border-box; margin: 0;
+}
+#page-operadores .gp-adm-page-foot {
+  margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border); max-width: 920px;
+}
+#page-operadores .gp-adm-btn-back { max-width: 360px; margin: 0 auto; display: block; }
+#page-operadores .gp-adm-card .form-group { margin-bottom: 12px; }
+#page-operadores .gp-adm-card .form-group:last-child { margin-bottom: 0; }
+#page-operadores .gp-adm-com-form { display: flex; flex-direction: column; gap: 0; }
+#page-operadores #gp-adm-alertas .gp-adm-card { margin-bottom: 12px; }
+#page-operadores #gp-adm-alertas .gp-adm-card:last-child { margin-bottom: 0; }
+#page-operadores .gp-adm-row { padding: 12px 0; }
+#page-operadores .gp-adm-row-body { flex: 1; min-width: 0; }
+#page-operadores .gp-adm-link {
+  background: none; border: none; color: var(--blue); font: inherit; font-weight: 800; font-size: 12px;
+  cursor: pointer; padding: 6px 0; min-width: 64px; text-align: right;
+}
 #page-operadores #gp-adm-tab-hoje .gp-adm-kpi-grid { margin-bottom: 16px; }
 @media (max-width: 640px) { #page-operadores #gp-adm-tab-hoje .gp-adm-kpi-grid { grid-template-columns: 1fr; } }
 #page-operadores .gp-adm-kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
@@ -618,10 +663,6 @@ body {
   color: var(--txt3);
   margin-top: 4px;
   line-height: 1.35;
-}
-#page-operadores .gp-adm-card {
-  background: var(--card); border: 1px solid var(--border); border-radius: var(--mk-radius, 16px);
-  padding: 14px; margin-bottom: 12px; box-shadow: var(--mk-shadow-1);
 }
 #page-operadores .gp-adm-ficha-hero {
   display: flex; align-items: center; gap: 12px; margin-bottom: 14px; padding-bottom: 14px; border-bottom: 1px solid var(--border);
@@ -752,7 +793,21 @@ body {
 #page-operadores .gp-adm-cad-body span {
   display: block; font-size: 9px; font-weight: 800; color: var(--txt3); text-transform: uppercase; margin-bottom: 2px;
 }
-#page-operadores .gp-adm-preview-btn { width: 100%; max-width: 420px; margin-bottom: 14px; }
+#page-operadores .gp-adm-preview-btn { width: 100%; max-width: none; margin-bottom: 0; }
+#page-operadores #mk-admin-ops-list .mk-op-card {
+  display: flex; align-items: center; gap: 10px; padding: 12px 0;
+  border: 0; border-bottom: 1px solid var(--border); border-radius: 0;
+  background: transparent; box-shadow: none; margin: 0;
+}
+#page-operadores #mk-admin-ops-list .mk-op-card:last-child { border-bottom: 0; }
+#page-operadores #mk-admin-ops-list .mk-op-card-main { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
+#page-operadores #mk-admin-ops-list .mk-op-card-name { font-size: 14px; margin-right: 4px; }
+#page-operadores #mk-admin-ops-list .mk-op-card-badge {
+  display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 10px; font-weight: 800;
+  background: #ECEFF1; color: var(--txt3); margin: 0;
+}
+#page-operadores #mk-admin-ops-list .mk-op-card-badge.ok { background: #E8F5E9; color: var(--green); }
+#page-operadores #mk-admin-ops-list .mk-op-card-badge.warn { background: #FFF3E0; color: #E65100; }
 .gp-cad-view-row { display: flex; flex-direction: column; gap: 4px; padding: 12px 0; border-bottom: 1px solid var(--border); }
 .gp-cad-view-row:last-child { border-bottom: 0; }
 .gp-cad-view-lbl { font-size: 11px; font-weight: 800; color: var(--txt3); text-transform: uppercase; }
@@ -778,9 +833,6 @@ body {
 #page-operadores .gp-adm-badge.ok { background: #E8F5E9; color: var(--green); }
 #page-operadores .gp-adm-badge.warn { background: #FFF3E0; color: #E65100; }
 #page-operadores .gp-adm-badge.gray { background: #ECEFF1; color: var(--txt3); }
-#page-operadores .gp-adm-link {
-  background: none; border: none; color: var(--blue); font: inherit; font-weight: 800; font-size: 12px; cursor: pointer; padding: 4px 0;
-}
 #page-operadores .gp-adm-muted { font-size: 13px; color: var(--txt3); font-weight: 700; margin: 0; }
 #page-operadores .gp-adm-table-wrap { overflow-x: auto; }
 #page-operadores .gp-adm-table { width: 100%; border-collapse: collapse; font-size: 12px; font-weight: 700; }
