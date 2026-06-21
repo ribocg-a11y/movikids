@@ -34,6 +34,7 @@
         admissao: cad.admissao || c.admissao || '', pix: cad.pix || ''
       },
       statusHoje: (data.ponto && data.ponto.statusHoje) || 'fora',
+      pontoHoje: (data.ponto && data.ponto.hoje) || null,
       folha: (data.ponto && data.ponto.folha) || [],
       jornada: (data.ponto && data.ponto.jornada) || null,
       meta: m.alvo ? {

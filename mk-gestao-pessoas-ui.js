@@ -511,6 +511,94 @@
       const st = document.getElementById('hub-status');
       st.textContent = p.statusHoje==='dentro'?'Dentro':'Fora';
       st.className = 'mock-badge '+(p.statusHoje==='dentro'?'ok':'gray');
+      renderHubJornada_(p);
+    }
+
+    function gpDiaSemanaIdx_() {
+      const d = new Date().getDay();
+      return d === 0 ? 6 : d - 1;
+    }
+
+    function gpEscalaHoje_(p) {
+      const esc = p.escala || [];
+      const cel = esc[gpDiaSemanaIdx_()];
+      return cel && String(cel).trim() ? String(cel).trim() : '—';
+    }
+
+    function gpEscalaEhFolga_(cel) {
+      const s = String(cel || '').toUpperCase();
+      return !s || s === '—' || s === 'OFF' || s.indexOf('FOLGA') >= 0;
+    }
+
+    function gpPontoHojeResumo_(p) {
+      const hoje = fmtDataHoje();
+      const ph = p.pontoHoje || {};
+      let entrada = ph.entrada;
+      let saida = ph.saida;
+      if (entrada == null && p.folha && p.folha.length) {
+        const row = p.folha.find(function (r) { return r.data === hoje; });
+        if (row) {
+          entrada = row.entrada !== '—' ? row.entrada : null;
+          saida = row.saida !== '—' ? row.saida : null;
+        }
+      }
+      const status = ph.status || p.statusHoje || 'fora';
+      if (status === 'dentro' && entrada) {
+        return { val: entrada, ctx: 'Trabalhando · entrada ' + entrada, tone: 'ok' };
+      }
+      if (entrada && saida) {
+        return { val: saida, ctx: 'Turno encerrado · ' + entrada + ' → ' + saida, tone: 'gray' };
+      }
+      if (entrada) {
+        return { val: entrada, ctx: 'Entrada ' + entrada, tone: 'ok' };
+      }
+      return { val: 'Sem registro', ctx: 'Toque em Meu ponto para registrar', tone: 'warn' };
+    }
+
+    function gpMetaHojeResumo_(p) {
+      if (!p.meta) {
+        return { val: '—', ctx: 'Sem meta de locações', tone: 'gray' };
+      }
+      const m = p.meta;
+      const pct = m.alvo > 0 ? Math.min(100, Math.round(m.atual / m.alvo * 100)) : 0;
+      let ctx = m.atual + ' de ' + m.alvo + ' loc no turno';
+      if (pct >= 100) ctx = 'Meta do turno batida! ⭐';
+      else if (pct >= 50) ctx = 'Quase lá — faltam ' + Math.max(0, m.alvo - m.atual) + ' loc';
+      return { val: m.atual + '/' + m.alvo, ctx: ctx, tone: pct >= 100 ? 'ok' : (pct >= 50 ? 'amber' : 'blue') };
+    }
+
+    function renderHubJornada_(p) {
+      const el = document.getElementById('gp-hub-jornada');
+      if (!el || !p) return;
+      const escala = gpEscalaHoje_(p);
+      const folga = gpEscalaEhFolga_(escala);
+      const ponto = gpPontoHojeResumo_(p);
+      const meta = gpMetaHojeResumo_(p);
+      let lead = 'Resumo do seu dia — escala, ponto e meta em um lugar.';
+      if (folga) lead = 'Folga hoje — descanse bem!';
+      else if (p.statusHoje === 'dentro') lead = 'Você está em operação. Bom trabalho!';
+      else if (ponto.tone === 'warn') lead = 'Dia de trabalho — não esqueça de registrar o ponto.';
+      const escCtx = folga ? 'Sem turno hoje' : ('Turno ' + escala);
+      const escVal = folga ? 'Folga' : escala;
+      const escTone = folga ? 'off' : 'blue';
+      const showCta = !folga && p.statusHoje !== 'dentro' && ponto.tone === 'warn';
+      el.innerHTML =
+        '<header class="gp-hub-jornada-head">' +
+        '<h2 class="gp-hub-jornada-title">Minha jornada hoje</h2>' +
+        '<p class="gp-hub-jornada-lead">' + lead + '</p></header>' +
+        '<div class="gp-hub-jornada-grid">' +
+        gpHubJornadaWidget_('Escala', escVal, escCtx, escTone) +
+        gpHubJornadaWidget_('Ponto', ponto.val, ponto.ctx, ponto.tone) +
+        gpHubJornadaWidget_('Meta', meta.val, meta.ctx, meta.tone) +
+        '</div>' +
+        (showCta ? '<button type="button" class="gp-hub-jornada-cta mk-btn" onclick="abrirModulo(\'ponto\')">Registrar meu ponto</button>' : '');
+    }
+
+    function gpHubJornadaWidget_(lbl, val, ctx, tone) {
+      return '<div class="gp-hub-j-widget gp-hub-j-widget--' + (tone || 'blue') + '">' +
+        '<span class="gp-hub-j-lbl">' + lbl + '</span>' +
+        '<span class="gp-hub-j-val">' + val + '</span>' +
+        '<span class="gp-hub-j-ctx">' + ctx + '</span></div>';
     }
 
     function abrirModulo(mod) {

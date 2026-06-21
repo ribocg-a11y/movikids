@@ -74,6 +74,82 @@ body {
 #gp-app .gp-user-name { font-weight: 900; font-size: 17px; }
 #gp-app .gp-user-sub { font-size: 12px; color: var(--txt3); font-weight: 700; }
 
+/* FASE 15b — hero Minha jornada hoje (hub colaborador) */
+#gp-app .gp-hub-jornada {
+  margin-bottom: 16px;
+  padding: 16px;
+  border-radius: var(--mk-widget-radius, 16px);
+  background: linear-gradient(145deg, rgba(21, 101, 192, 0.07), rgba(255, 213, 79, 0.14));
+  border: 1px solid var(--border);
+  box-shadow: var(--mk-shadow-1);
+  animation: gpHubJornadaIn .35s ease;
+}
+@keyframes gpHubJornadaIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+#gp-app .gp-hub-jornada-head { margin-bottom: 12px; }
+#gp-app .gp-hub-jornada-title {
+  font-family: 'Fredoka One', cursive;
+  font-size: 20px;
+  color: var(--blue-dk);
+  margin: 0 0 4px;
+  line-height: 1.15;
+}
+#gp-app .gp-hub-jornada-lead {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--txt2);
+  line-height: 1.45;
+}
+#gp-app .gp-hub-jornada-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--mk-widget-gap, 10px);
+}
+@media (max-width: 520px) {
+  #gp-app .gp-hub-jornada-grid { grid-template-columns: 1fr; }
+}
+#gp-app .gp-hub-j-widget {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 12px 10px;
+  text-align: center;
+  min-height: 88px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+}
+#gp-app .gp-hub-j-widget--ok { border-color: rgba(46, 125, 50, 0.35); background: rgba(232, 245, 233, 0.65); }
+#gp-app .gp-hub-j-widget--warn { border-color: rgba(230, 81, 0, 0.35); background: rgba(255, 243, 224, 0.7); }
+#gp-app .gp-hub-j-widget--off { border-color: rgba(154, 170, 192, 0.4); background: rgba(240, 244, 250, 0.9); }
+#gp-app .gp-hub-j-widget--amber { border-color: rgba(255, 152, 0, 0.35); }
+#gp-app .gp-hub-j-lbl {
+  font-size: var(--mk-widget-lbl-size, 10px);
+  font-weight: 700;
+  color: var(--txt3);
+  letter-spacing: 0.02em;
+}
+#gp-app .gp-hub-j-val {
+  font-size: var(--mk-widget-val-size, 17px);
+  font-weight: 800;
+  color: var(--txt);
+  line-height: 1.2;
+}
+#gp-app .gp-hub-j-ctx {
+  font-size: var(--mk-widget-ctx-size, 11px);
+  font-weight: 600;
+  color: var(--txt2);
+  line-height: 1.35;
+}
+#gp-app .gp-hub-jornada-cta {
+  width: 100%;
+  margin-top: 14px;
+}
+
 #gp-app .mock-av {
   width: 48px;
   height: 48px;
