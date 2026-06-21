@@ -149,6 +149,42 @@
 
     function gpColabListCacheKey_() { return 'mk_gp_colab_list_v1'; }
 
+    function gpColabListLocalGet_() {
+      try {
+        var raw = localStorage.getItem(gpColabListCacheKey_());
+        if (!raw) return null;
+        var o = JSON.parse(raw);
+        if (!o || o.ts == null || !o.data) return null;
+        if (Date.now() - o.ts > 86400000) return null;
+        return o.data;
+      } catch (e) { return null; }
+    }
+    function gpColabListLocalSet_(list) {
+      try {
+        if (!list || !list.length) return;
+        localStorage.setItem(gpColabListCacheKey_(), JSON.stringify({ ts: Date.now(), data: list }));
+      } catch (e) { /* quota */ }
+    }
+    function gpColabListCachedGet_() {
+      var sess = typeof mkSessCacheGet_ === 'function' ? mkSessCacheGet_(gpColabListCacheKey_(), 600000) : null;
+      if (sess && sess.length) return sess;
+      return gpColabListLocalGet_();
+    }
+    function gpColabListCachedSet_(list) {
+      if (typeof mkSessCacheSet_ === 'function' && list && list.length) mkSessCacheSet_(gpColabListCacheKey_(), list);
+      gpColabListLocalSet_(list);
+    }
+    function gpNetworkErrMsg_(e) {
+      var m = String((e && e.message) || e || '');
+      if (/FetchEvent\.respondWith|Returned response is null/i.test(m)) {
+        return 'Sem ligação com o servidor Google. O Wi‑Fi precisa liberar internet (teste abrir google.com no Safari). Se não abrir, use 4G ou fale com o suporte da rede da loja.';
+      }
+      if (/timeout|Failed to fetch|NetworkError|Load failed|Sem conexao/i.test(m)) {
+        return 'Conexão instável ou Wi‑Fi sem saída para Google. Teste google.com no Safari ou use 4G.';
+      }
+      return m || 'Erro ao carregar colaboradores.';
+    }
+
     function loadAdmPreviewColaboradores_() {
       var sel = document.getElementById('adm-preview-select');
       var btn = document.getElementById('adm-preview-btn');
@@ -595,7 +631,7 @@
 
       if (sel) {
         if (MK_GP_PROD && window.MK_GestaoPessoas) {
-          var cachedColab = typeof mkSessCacheGet_ === 'function' ? mkSessCacheGet_(gpColabListCacheKey_(), 600000) : null;
+          var cachedColab = gpColabListCachedGet_();
           if (cachedColab && cachedColab.length) {
             gpColabList = cachedColab;
             renderColabSelect(gpColabList.map(function (o) {
@@ -607,13 +643,14 @@
           }
           MK_GestaoPessoas.listarColaboradores().then(function (list) {
             gpColabList = list || [];
-            if (typeof mkSessCacheSet_ === 'function' && gpColabList.length) mkSessCacheSet_(gpColabListCacheKey_(), gpColabList);
+            if (gpColabList.length) gpColabListCachedSet_(gpColabList);
             renderColabSelect(gpColabList.map(function (o) {
               return { id: o.id, nome: o.nome || o.id, funcao: o.funcao };
             }));
             gpTryCompleteCadastroUrl_();
           }).catch(function (e) {
-            if (!cachedColab || !cachedColab.length) renderColabSelect(null, false, e.message);
+            if (!cachedColab || !cachedColab.length) renderColabSelect(null, false, gpNetworkErrMsg_(e));
+            else showColabSelectErr('Lista em cache — sem internet agora. PIN ainda funciona se o servidor responder.');
           });
           return;
         }

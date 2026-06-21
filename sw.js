@@ -1,9 +1,8 @@
 // MOVI KIDS - Service Worker 1.7.12
 
-const SW_VERSION = '1.8.103';
+const SW_VERSION = '1.8.104';
 
 const NETWORK_FIRST = [
-  'script.google.com',
   'index.html',
   'acompanhar.html',
   'foto-moldura.html',
@@ -55,13 +54,32 @@ self.addEventListener('activate', event => {
   })());
 });
 
+function mkSwIsGasApi_(url) {
+  return url.includes('script.google.com') || url.includes('googleusercontent.com');
+}
+
+async function mkSwNetworkFirst_(request) {
+  try {
+    return await fetch(request);
+  } catch (e) {
+    const cached = await caches.match(request);
+    if (cached) return cached;
+    return new Response('{"ok":false,"erro":"Sem conexao com o servidor"}', {
+      status: 503,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+}
+
 self.addEventListener('fetch', event => {
   const url = event.request.url;
+  /* GAS: não interceptar — redirect googleusercontent + iOS PWA quebrava com respondWith null */
+  if (mkSwIsGasApi_(url)) return;
   if (NETWORK_FIRST.some(p => url.includes(p)) || event.request.mode === 'navigate') {
-    event.respondWith(
-      fetch(event.request).catch(() => caches.match(event.request))
-    );
+    event.respondWith(mkSwNetworkFirst_(event.request));
     return;
   }
-  event.respondWith(fetch(event.request));
+  event.respondWith(fetch(event.request).catch(function () {
+    return new Response('', { status: 503, statusText: 'Offline' });
+  }));
 });
