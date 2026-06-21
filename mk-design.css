@@ -1939,6 +1939,15 @@
   margin-bottom: 4px;
 }
 .gp-adm-act { display: block; margin-top: 4px; color: var(--txt3, #888); font-weight: 600; }
+.gp-adm-presenca-intel {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: rgba(255, 152, 0, 0.08);
+  border: 1px solid rgba(255, 152, 0, 0.22);
+}
+.gp-adm-presenca-intel .gp-adm-row { margin: 0; padding: 8px 0; border: none; }
+.gp-adm-presenca-intel .gp-adm-row + .gp-adm-row { border-top: 1px dashed rgba(0,0,0,0.08); }
 
 /* Dashboard — cockpit + strips glass */
 .mk-admin-page .mk-exec-cockpit,

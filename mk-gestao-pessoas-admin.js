@@ -116,6 +116,26 @@
     return (gpAdmData_.colaboradores || []).find(function (x) { return Number(x.id) === Number(id); });
   }
 
+  function gpAdmIntelForOp_(opId) {
+    const id = Number(opId);
+    const out = [];
+    (gpAdmData_.alertasInteligentes || []).forEach(function (a) {
+      if (a.operadorId && Number(a.operadorId) === id) { out.push(a); return; }
+      const c = String(a.codigo || '');
+      if (c === 'BANCO_HORAS_' + id || c === 'META_ABAIXO_' + id) out.push(a);
+    });
+    (gpAdmData_.alertas || []).forEach(function (a) {
+      if (Number(a.operadorId) !== id) return;
+      out.push({
+        titulo: 'Ponto pendente',
+        mensagem: a.mensagem || a.turno || 'Sem entrada registrada',
+        inteligente: true,
+        acionavel: 'RH — conferir presença'
+      });
+    });
+    return out;
+  }
+
   function gpAdmRenderFichaResumo_() {
     const el = document.getElementById('gp-adm-ficha-resumo');
     if (!el || !gpAdmData_) return;
@@ -125,6 +145,12 @@
       return;
     }
     const m = c.metas || {};
+    const intelRows = gpAdmIntelForOp_(c.id);
+    const intelBlock = intelRows.length
+      ? '<div class="gp-adm-presenca-intel">' + intelRows.map(function (a) {
+        return gpAdmAlertRowHtml_(a, 'Presença', a.nivel === 'vermelho' ? 'err' : 'warn');
+      }).join('') + '</div>'
+      : '';
     el.innerHTML =
       '<div class="gp-adm-ficha-hero">' +
       '<div class="gp-adm-av' + (gpAdmIsOwner_(c) ? ' owner' : '') + '">' + gpAdmInitial_(c.nome) + '</div>' +
@@ -138,7 +164,7 @@
       '<div><span>Loc no mês</span><strong>' + (m.locMes || 0) + '</strong></div>' +
       '<div><span>Cadastro RH</span><strong>' + (c.cadastroPct || 0) + '%</strong></div>' +
       '<div><span>Ponto hoje</span><strong>' + (c.ponto && c.ponto.entrada ? esc(c.ponto.entrada) + (c.ponto.saida ? ' → ' + esc(c.ponto.saida) : '') : 'Sem registro') + '</strong></div>' +
-      '</div>';
+      '</div>' + intelBlock;
   }
 
   function gpAdmRenderPresenca_() {
@@ -288,9 +314,12 @@
     const cols = gpAdmData_.colaboradores || [];
     el.innerHTML = cols.filter(function (c) { return c.temRh; }).map(function (c) {
       const m = c.metas || {};
+      const metaAlert = (gpAdmData_.alertasInteligentes || []).some(function (a) {
+        return String(a.codigo || '') === 'META_ABAIXO_' + c.id;
+      });
       return '<div class="gp-adm-row"><div class="gp-adm-av">' + gpAdmInitial_(c.nome) + '</div>' +
         '<div class="gp-adm-row-body"><strong>' + esc(c.nome) + '</strong><small>Meta ' + (m.alvo || 20) + ' loc · hoje ' + (m.atual || 0) + ' · mês ' + (m.locMes || 0) + ' loc</small></div>' +
-        (m.bonusDias ? '<span class="gp-adm-badge ok">' + m.bonusDias + ' dia(s) bônus</span>' : '<span class="gp-adm-badge gray">Sem bônus</span>') +
+        (metaAlert ? '<span class="gp-adm-badge warn">Proativo</span>' : (m.bonusDias ? '<span class="gp-adm-badge ok">' + m.bonusDias + ' dia(s) bônus</span>' : '<span class="gp-adm-badge gray">Sem bônus</span>')) +
         '</div>';
     }).join('') || '<p class="gp-adm-muted">Cadastre colaboradores na aba RH (planilha).</p>';
   }

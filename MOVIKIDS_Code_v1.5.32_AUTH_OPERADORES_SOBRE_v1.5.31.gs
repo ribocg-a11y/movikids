@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.120
+// MOVI KIDS — Google Apps Script v1.5.121
+// v1.5.121: FASE 17 — operadorId em alerta banco horas
 // v1.5.120: FASE 17 — meta abaixo 3 dias + alertasInteligentes no painel RH
 // v1.5.119: FASE 17 — alertasInteligentes_ + perfil gestor (authRole)
 // v1.5.118: FASE 16 — comandoOperacional comparativo 30d + frotaDetalhe por veículo
@@ -2683,7 +2684,8 @@ function alertasInteligentes_(opts) {
           inteligente: true,
           titulo: 'Banco de horas no limite',
           mensagem: gpNomeRhByOpId_(opId) + ' com saldo ' + String(r[1] || '') + ' (limite +/-20h).',
-          acionavel: 'RH — ajustar escala ou compensar'
+          acionavel: 'RH — ajustar escala ou compensar',
+          operadorId: opId, operador: gpNomeRhByOpId_(opId)
         });
       });
     } catch (e) {
