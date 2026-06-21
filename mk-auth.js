@@ -547,7 +547,7 @@
       if (!ok) return;
     }
     try { sessionStorage.removeItem('mk-mock-colab-uid'); } catch (e) { /* ignore */ }
-    const v = window.MK_VERSION || '1.8.93';
+    const v = window.MK_VERSION || '1.8.94';
     location.href = 'gestao-pessoas.html?admPreview=1&force=' + encodeURIComponent(v) + '&from=admin&_=' + Date.now();
   };
 

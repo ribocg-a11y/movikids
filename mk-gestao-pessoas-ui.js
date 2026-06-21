@@ -58,7 +58,10 @@
         beneficios: { vaDiario: 20, vaDias: 8, vtPasses: 0, vaCoparticipacao: 0 },
         holerite: null
       },
-      preview: true
+      preview: true,
+      comunicados: [
+        { id: 9001, titulo: 'Demonstração', mensagem: 'Esta é uma pré-visualização — comunicados reais vêm da planilha COMUNICADOS_RH.', prioridade: 'info', data: '21/06/2026' }
+      ]
     };
 
     function gpUrlAdmPreview_() {
@@ -77,7 +80,7 @@
     }
 
     function gpPreviewVoltarAdmin_() {
-      var v = global.MK_VERSION || '1.8.93';
+      var v = global.MK_VERSION || '1.8.94';
       global.location.href = 'index.html?force=' + encodeURIComponent(v) + '#operadores';
     }
 
@@ -687,7 +690,82 @@
       st.textContent = p.statusHoje==='dentro'?'Dentro':'Fora';
       st.className = 'mock-badge '+(p.statusHoje==='dentro'?'ok':'gray');
       renderHubJornada_(p);
+      renderHubComunicados_(p);
       gpShowPreviewBanner_(gpAdmPreviewMode_ || p.preview);
+    }
+
+    function gpComDismissKey_() { return 'mk_gp_com_dismiss_v1'; }
+
+    function gpComDismissedIds_() {
+      try {
+        return JSON.parse(sessionStorage.getItem(gpComDismissKey_()) || '[]') || [];
+      } catch (e) { return []; }
+    }
+
+    function gpComDismiss_(id) {
+      try {
+        var ids = gpComDismissedIds_();
+        if (ids.indexOf(Number(id)) < 0) ids.push(Number(id));
+        sessionStorage.setItem(gpComDismissKey_(), JSON.stringify(ids.slice(-50)));
+      } catch (e) { /* ignore */ }
+      renderHubComunicados_(PESSOAS[colabLogado]);
+    }
+
+    function renderHubComunicados_(p) {
+      var wrap = document.getElementById('gp-comunicados');
+      if (!wrap || !p) return;
+      var dismissed = gpComDismissedIds_();
+      var list = (p.comunicados || []).filter(function (c) {
+        return dismissed.indexOf(Number(c.id)) < 0;
+      });
+      if (!list.length) {
+        wrap.hidden = true;
+        wrap.innerHTML = '';
+        return;
+      }
+      wrap.hidden = false;
+      var expanded = wrap.dataset.expanded === '1';
+      var visible = expanded ? list : list.slice(0, 2);
+      var cards = visible.map(function (c) {
+        var urg = String(c.prioridade || '').toLowerCase() === 'urgente';
+        var cls = urg ? 'gp-com-card--urgente' : 'gp-com-card--info';
+        var msg = String(c.mensagem || '');
+        var body = msg.length > 120 && !expanded ? msg.slice(0, 117) + '…' : msg;
+        return '<article class="gp-com-card ' + cls + '">' +
+          '<div class="gp-com-card-head">' +
+          '<span class="gp-com-tag">' + (urg ? 'Urgente' : 'Aviso') + '</span>' +
+          '<button type="button" class="gp-com-dismiss" aria-label="Fechar aviso" onclick="gpComDismiss_(' + Number(c.id) + ')">×</button>' +
+          '</div>' +
+          '<h3 class="gp-com-title">' + escHtml_(c.titulo || 'Comunicado') + '</h3>' +
+          '<p class="gp-com-body">' + escHtml_(body) + '</p>' +
+          (c.data ? '<span class="gp-com-date">' + escHtml_(c.data) + '</span>' : '') +
+          '</article>';
+      }).join('');
+      var more = '';
+      if (!expanded && list.length > 2) {
+        more = '<button type="button" class="gp-com-more mk-btn sec" onclick="gpComExpandAll_()">Ver todos (' + list.length + ')</button>';
+      } else if (expanded && list.length > 2) {
+        more = '<button type="button" class="gp-com-more mk-btn sec" onclick="gpComCollapseAll_()">Mostrar menos</button>';
+      }
+      wrap.innerHTML = '<div class="gp-com-head"><span class="gp-com-head-lbl">Comunicados</span></div>' + cards + more;
+    }
+
+    function escHtml_(v) {
+      return String(v == null ? '' : v).replace(/[&<>"']/g, function (m) {
+        return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[m];
+      });
+    }
+
+    function gpComExpandAll_() {
+      var wrap = document.getElementById('gp-comunicados');
+      if (wrap) wrap.dataset.expanded = '1';
+      renderHubComunicados_(PESSOAS[colabLogado]);
+    }
+
+    function gpComCollapseAll_() {
+      var wrap = document.getElementById('gp-comunicados');
+      if (wrap) wrap.dataset.expanded = '0';
+      renderHubComunicados_(PESSOAS[colabLogado]);
     }
 
     function gpDiaSemanaIdx_() {
@@ -1104,7 +1182,7 @@ function gpVoltarInicio() {
     gpPreviewVoltarAdmin_();
     return;
   }
-  var v = global.MK_VERSION || '1.8.93';
+  var v = global.MK_VERSION || '1.8.94';
   global.location.href = 'index.html?force=' + encodeURIComponent(v);
 }
 function colabSairProd() {
@@ -1170,6 +1248,9 @@ function initGpUi() {
   global.gpPreviewVoltarAdmin_ = gpPreviewVoltarAdmin_;
   global.gpPreviewTrocar_ = gpPreviewTrocar_;
   global.admPreviewEntrar = admPreviewEntrar;
+  global.gpComDismiss_ = gpComDismiss_;
+  global.gpComExpandAll_ = gpComExpandAll_;
+  global.gpComCollapseAll_ = gpComCollapseAll_;
   global.abrirModulo = abrirModulo;
   global.confirmarPonto = confirmarPonto;
   global.salvarCadastro = salvarCadastro;

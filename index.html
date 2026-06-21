@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Movi Kids">
 <title>Movi Kids</title>
-<script src="mk-canonical-host.js?v=1.8.93"></script>
+<script src="mk-canonical-host.js?v=1.8.94"></script>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png">
@@ -17,17 +17,17 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<script src="mk-stale-sync.js?v=1.8.93"></script>
-<script src="mk-version.js?v=1.8.93"></script>
-<script src="mk-api.js?v=1.8.93"></script>
-<link rel="stylesheet" href="mk-design.css?v=1.8.93">
+<script src="mk-stale-sync.js?v=1.8.94"></script>
+<script src="mk-version.js?v=1.8.94"></script>
+<script src="mk-api.js?v=1.8.94"></script>
+<link rel="stylesheet" href="mk-design.css?v=1.8.94">
 
-<script src="mk-cache-bust.js?v=1.8.93"></script>
+<script src="mk-cache-bust.js?v=1.8.94"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<link rel="stylesheet" href="mk-app.css?v=1.8.93">
-<link rel="stylesheet" href="mk-gestao-pessoas.css?v=1.8.93">
+<link rel="stylesheet" href="mk-app.css?v=1.8.94">
+<link rel="stylesheet" href="mk-gestao-pessoas.css?v=1.8.94">
 <!-- Firebase SDK — Realtime sync canonico para todos os dispositivos -->
-<script type="module" src="mk-firebase.js?v=1.8.93"></script>
+<script type="module" src="mk-firebase.js?v=1.8.94"></script>
 </head>
 
 <body>
@@ -773,6 +773,7 @@
       <button type="button" class="gp-adm-tab" data-tab="escala" onclick="mkGpAdmSetTab('escala')">Escala</button>
       <button type="button" class="gp-adm-tab" data-tab="metas" onclick="mkGpAdmSetTab('metas')">Metas &amp; bônus</button>
       <button type="button" class="gp-adm-tab" data-tab="folha" onclick="mkGpAdmSetTab('folha')">Folha do mês</button>
+      <button type="button" class="gp-adm-tab" data-tab="comunicados" onclick="mkGpAdmSetTab('comunicados')">Comunicados</button>
       <button type="button" class="gp-adm-tab" data-tab="cadastro" onclick="mkGpAdmSetTab('cadastro')">Cadastro &amp; sessão</button>
     </div>
 
@@ -811,6 +812,47 @@
       <div id="gp-adm-holerite-view" class="gp-adm-holerite-page" hidden aria-hidden="true">
         <button type="button" class="dash-back gp-adm-back" onclick="mkGpAdmFecharHolerite_()">← Voltar à folha do mês</button>
         <div class="gp-adm-card gp-adm-holerite-card mk-glass-card" id="gp-adm-holerite-content"></div>
+      </div>
+    </section>
+
+    <section class="gp-adm-panel" id="gp-adm-tab-comunicados">
+      <div class="gp-adm-card">
+        <h3>Novo comunicado</h3>
+        <p class="gp-adm-muted" style="margin-top:0">Aparece no hub do colaborador (abaixo de Minha jornada). Máx. 2 visíveis + expandir.</p>
+        <div class="gp-adm-com-form">
+          <div class="form-group">
+            <label class="form-label" for="gp-com-titulo">Título</label>
+            <input id="gp-com-titulo" class="form-input" type="text" maxlength="80" placeholder="Ex: Treinamento sábado">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="gp-com-mensagem">Mensagem</label>
+            <textarea id="gp-com-mensagem" class="form-input" maxlength="500" placeholder="Texto visível ao colaborador"></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="gp-com-publico">Público</label>
+            <select id="gp-com-publico" class="form-input">
+              <option value="TODOS">Todos os colaboradores</option>
+            </select>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div class="form-group">
+              <label class="form-label" for="gp-com-valido">Válido até (opcional)</label>
+              <input id="gp-com-valido" class="form-input" type="text" placeholder="DD/MM/AAAA">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="gp-com-prioridade">Prioridade</label>
+              <select id="gp-com-prioridade" class="form-input">
+                <option value="info">Aviso (azul)</option>
+                <option value="urgente">Urgente (âmbar)</option>
+              </select>
+            </div>
+          </div>
+          <button type="button" class="btn btn-primary" style="width:100%" onclick="mkGpAdmSalvarComunicado_()">Publicar comunicado</button>
+        </div>
+      </div>
+      <div class="gp-adm-card">
+        <h3>Publicados</h3>
+        <div id="gp-adm-comunicados-list"></div>
       </div>
     </section>
 
@@ -1889,26 +1931,26 @@
   </div>
 </div>
 
-<script src="mk-globals.js?v=1.8.93"></script>
-<script src="mk-core.js?v=1.8.93"></script>
-<script src="mk-nav.js?v=1.8.93"></script>
-<script src="mk-admin.js?v=1.8.93"></script>
-<script src="mk-historico.js?v=1.8.93"></script>
-<script src="mk-sessao.js?v=1.8.93"></script>
-<script src="mk-home.js?v=1.8.93"></script>
-<script src="mk-meta-operador.js?v=1.8.93"></script>
-<script src="mk-custos.js?v=1.8.93"></script>
-<script src="mk-avulso.js?v=1.8.93"></script>
-<script src="mk-sync.js?v=1.8.93"></script>
-<script src="mk-nova.js?v=1.8.93"></script>
-<script src="mk-relacionamento.js?v=1.8.93"></script>
-<script src="mk-operacao.js?v=1.8.93"></script>
-<script src="mk-drawer.js?v=1.8.93"></script>
-<script src="mk-update.js?v=1.8.93"></script>
-<script src="mk-gestao-pessoas.js?v=1.8.93"></script>
-<script src="mk-holerite.js?v=1.8.93"></script>
-<script src="mk-gestao-pessoas-admin.js?v=1.8.93"></script>
-<script src="mk-auth.js?v=1.8.93"></script>
-<script src="mk-boot.js?v=1.8.93"></script>
+<script src="mk-globals.js?v=1.8.94"></script>
+<script src="mk-core.js?v=1.8.94"></script>
+<script src="mk-nav.js?v=1.8.94"></script>
+<script src="mk-admin.js?v=1.8.94"></script>
+<script src="mk-historico.js?v=1.8.94"></script>
+<script src="mk-sessao.js?v=1.8.94"></script>
+<script src="mk-home.js?v=1.8.94"></script>
+<script src="mk-meta-operador.js?v=1.8.94"></script>
+<script src="mk-custos.js?v=1.8.94"></script>
+<script src="mk-avulso.js?v=1.8.94"></script>
+<script src="mk-sync.js?v=1.8.94"></script>
+<script src="mk-nova.js?v=1.8.94"></script>
+<script src="mk-relacionamento.js?v=1.8.94"></script>
+<script src="mk-operacao.js?v=1.8.94"></script>
+<script src="mk-drawer.js?v=1.8.94"></script>
+<script src="mk-update.js?v=1.8.94"></script>
+<script src="mk-gestao-pessoas.js?v=1.8.94"></script>
+<script src="mk-holerite.js?v=1.8.94"></script>
+<script src="mk-gestao-pessoas-admin.js?v=1.8.94"></script>
+<script src="mk-auth.js?v=1.8.94"></script>
+<script src="mk-boot.js?v=1.8.94"></script>
 </body>
 </html>

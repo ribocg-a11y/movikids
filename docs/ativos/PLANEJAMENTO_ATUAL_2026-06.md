@@ -1,7 +1,7 @@
 # MOVI KIDS — Planejamento atual (pós-FASE 5)
 
-**Atualizado:** 21/06/2026 (operação **LIVRE** · FE **v1.8.93** · GAS repo **v1.5.123**)  
-**Produção:** FE **v1.8.93** · GAS repo **v1.5.123** · ping **v1.5.107** · Nova versão Web **pendente**  
+**Atualizado:** 21/06/2026 (operação **LIVRE** · FE **v1.8.94** · GAS repo **v1.5.124**)  
+**Produção:** FE **v1.8.94** · GAS repo **v1.5.124** · ping **v1.5.107** · Nova versão Web **pendente**  
 **Documentos irmãos:** `PLANO_PRIORIDADES_2026-06.md` · `MAPA_FASES.md` · `DEPLOY_ATUAL.md` · `HANDOFF_NOVO_CHAT.md`  
 **Ciclo ativo:** **`PLANO_FASES_6_15_COCKPIT_EXECUTIVO_2026-06.md`** · FASE 15: **`FASE_15_GESTAO_PESSOAS.md`** ✅  
 **Próximo ciclo:** **`PLANO_PREMIUM_ONEUI_FASES_16_22_2026-06.md`** ← manual Premium + One UI (20/06/2026)
@@ -12,7 +12,7 @@
 
 Ciclo **FASE 0–5 + P2/P3 concluído** (07–09/06/2026). Balcão homologado, portal QR, payback, CONFIG e APIs unificadas.
 
-**Modo atual:** **FASE 15b.3** (Comunicados RH) · FASE 16 ✅ repo · FASE 17 🟡 · perf v1.8.93 ✅
+**Modo atual:** **FASE 15b.3** ✅ Comunicados · FASE 16 ✅ repo · FASE 17 🟡 · perf v1.8.93 ✅
 
 ---
 
@@ -187,8 +187,8 @@ Legenda: **P0** bloqueia operação · **P1** valor imediato · **P2** próximo 
 
 1. ✅ FE **v1.8.93** perf (SWR sync, prefetch admin, cache RH)
 2. ✅ Pré-visualização ADM colaborador (v1.8.92)
-3. ⏳ **Nova versão Web GAS v1.5.123** — sócio
-4. **Dev: FASE 15b.3 Comunicados** — aba `COMUNICADOS_RH` + faixa hub
+3. ✅ **FASE 15b.3 Comunicados** — FE v1.8.94 · GAS repo v1.5.124 · `TESTE_COMUNICADOS_RH_READONLY.ps1`
+4. ⏳ **Nova versão Web GAS v1.5.124** — sócio (aba COMUNICADOS_RH se ausente)
 5. Tablet: homolog F5/F7/F10/F11 após GAS Web
 
 Doc mestre: `PLANO_PREMIUM_ONEUI_FASES_16_22_2026-06.md` §6 (15b.3)

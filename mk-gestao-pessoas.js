@@ -52,7 +52,8 @@
         beneficios: pg.beneficios || {},
         holerite: hol
       },
-      _holerite: hol
+      _holerite: hol,
+      comunicados: data.comunicados || []
     };
   }
 
@@ -93,6 +94,9 @@
     },
     instalarAbasAdmin: function (pinParams) {
       return gpApi('instalarAbasGestaoPessoasAdmin', pinParams || {});
+    },
+    salvarComunicado: function (pinParams, data) {
+      return gpApi('salvarComunicadoRhAdmin', Object.assign({}, pinParams || {}, data || {}));
     }
   };
 })(typeof window !== 'undefined' ? window : globalThis);

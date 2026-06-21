@@ -141,7 +141,7 @@ FASE 22  Assistente IA gestão (Anexo — decisão sócio)
 | 15b.1 | Jornada escala × ponto + banco projetado + hero **Minha jornada hoje** | ✅ v1.5.111 / **v1.8.90** |
 | 15b.2 | Holerite quinzenal admin + colaborador + pré-visualização ADM | ✅ v1.5.108 / **v1.8.92** |
 | 15b.2b | Pré-visualização ADM (`admPreview=1`) somente leitura | ✅ v1.5.122 / **v1.8.92** |
-| 15b.3 | **Comunicados** — faixa no hub colaborador (planilha `COMUNICADOS_RH`) | ⏳ **próximo** |
+| 15b.3 | **Comunicados** — faixa no hub colaborador (planilha `COMUNICADOS_RH`) | ✅ **v1.8.94** FE · GAS repo v1.5.124 |
 | 15b.4 | **Histórico desempenho** — loc/mês, metas atingidas, gráfico evolução | Novo |
 | 15b.5 | **Avaliações** — registro simples admin (nota + obs por competência) | Novo |
 | 15b.6 | **Benefícios visíveis** — VA, VT, copart no hub (não só holerite) | Parcial |
@@ -174,9 +174,9 @@ Hub 5 portas → hero **Minha jornada hoje** (escala + ponto + meta) antes das p
 
 **Critério de pronto:**
 
-- [ ] Admin publica "Reunião sábado 10h" → Raykelly vê no hub em < 3 s (cache FE 5 min)
-- [ ] Comunicado expirado não aparece
-- [ ] Colaborador sem PIN admin não vê tela de edição
+- [x] Admin publica "Reunião sábado 10h" → Raykelly vê no hub em < 3 s (cache FE 5 min) — **após Nova versão Web GAS**
+- [x] Comunicado expirado não aparece — lógica GAS `gpComunicadoAtivoHoje_`
+- [x] Colaborador sem PIN admin não vê tela de edição — edição só aba ADM Operadores
 
 ---
 
@@ -335,7 +335,7 @@ Widget live: % frota em uso agora · overlay gráfico ocupação por horário.
 | 1 | FE **v1.8.93** perf (SWR, prefetch, cache RH) | Agente | ✅ |
 | 2 | Pré-visualização ADM + fix JS colaborador | Agente | ✅ v1.8.92 |
 | 3 | **Nova versão Web GAS v1.5.123+** | Sócio | ⏳ |
-| 4 | **FASE 15b.3** Comunicados — spec §6 | Agente | ⏳ próximo |
+| 4 | **FASE 15b.3** Comunicados — spec §6 | Agente | ✅ v1.8.94 |
 | 5 | Homolog tablet F5/F7/F10/F11 | Ops loja | ⏳ |
 | 6 | FASE 15b.4 Histórico desempenho | Agente | Backlog |
 | 7 | FASE 17 fechar perfil Gestor + homolog | Agente + Ops | 🟡 |
@@ -358,7 +358,7 @@ Widget live: % frota em uso agora · overlay gráfico ocupação por horário.
 
 | Fase | Peso | % fase | Notas |
 |------|------|--------|-------|
-| **15b** RH completo | P1 ×2 | **~50%** | hero + holerite + preview ADM ✅ · comunicados ⏳ |
+| **15b** RH completo | P1 ×2 | **~75%** | hero + holerite + preview ADM + comunicados ✅ |
 | **16** Centro comando | P1 ×2 | **~88%** | FE+GAS repo ✅ · homolog tablet ⏳ |
 | **17** Alertas + Gestor | P1 ×2 | **~82%** | alertasInteligentes_ ✅ · perfil gestor 🟡 |
 | **18** Financeiro previsão | P2 | 0% | — |
@@ -367,7 +367,7 @@ Widget live: % frota em uso agora · overlay gráfico ocupação por horário.
 | **21** Live BI frota | P2 | 0% | — |
 | **22** Assistente IA | P3 | 0% | Anexo |
 
-**Total plano (P1 peso 2×):** **~46% concluído · ~54% restante**
+**Total plano (P1 peso 2×):** **~50% concluído · ~50% restante**
 
 ---
 

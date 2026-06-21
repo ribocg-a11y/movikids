@@ -25,7 +25,7 @@ function Add-GpCheck([string]$Name, [string]$Status, [string]$Detail = "") {
 
 $expectedAbas = @(
   'COLABORADORES_RH', 'FOLHA_PONTO', 'ESCALA_COLABORADORES',
-  'FALTAS_AUSENCIAS', 'HOLERITES', 'METAS_COLABORADORES', 'BANCO_HORAS'
+  'FALTAS_AUSENCIAS', 'HOLERITES', 'METAS_COLABORADORES', 'BANCO_HORAS', 'COMUNICADOS_RH'
 )
 
 try {

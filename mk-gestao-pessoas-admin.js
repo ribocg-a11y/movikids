@@ -420,6 +420,81 @@
     a.click();
   };
 
+  function gpAdmFillComPublicoSelect_() {
+    const sel = document.getElementById('gp-com-publico');
+    if (!sel || sel.dataset.gpFilled === '1') return;
+    const cols = (gpAdmData_ && gpAdmData_.colaboradores) || [];
+    cols.filter(function (c) { return c.temRh !== false; }).forEach(function (c) {
+      const opt = document.createElement('option');
+      opt.value = String(c.id);
+      opt.textContent = String(c.nome || '') + ' (ID ' + c.id + ')';
+      sel.appendChild(opt);
+    });
+    sel.dataset.gpFilled = '1';
+  }
+
+  function gpAdmRenderComunicados_() {
+    gpAdmFillComPublicoSelect_();
+    const el = document.getElementById('gp-adm-comunicados-list');
+    if (!el) return;
+    const list = (gpAdmData_ && gpAdmData_.comunicadosRh) || [];
+    if (!list.length) {
+      el.innerHTML = '<p class="gp-adm-muted">Nenhum comunicado — publique acima ou instale aba COMUNICADOS_RH.</p>';
+      return;
+    }
+    el.innerHTML = list.map(function (c) {
+      const urg = String(c.prioridade || '').toLowerCase() === 'urgente';
+      const cls = urg ? ' gp-adm-com-row--urgente' : '';
+      const badge = urg ? '<span class="gp-adm-badge warn">Urgente</span>' : '<span class="gp-adm-badge ok">Aviso</span>';
+      const ativo = c.ativo !== false ? '<span class="gp-adm-badge ok">Ativo</span>' : '<span class="gp-adm-badge gray">Inativo</span>';
+      const meta = [c.data, c.publico ? ('Público: ' + c.publico) : '', c.validoAte ? ('até ' + c.validoAte) : ''].filter(Boolean).join(' · ');
+      return '<div class="gp-adm-com-row' + cls + '">' +
+        '<div class="gp-adm-com-row-head">' + badge + ativo + '<strong>' + esc(c.titulo || 'Comunicado') + '</strong></div>' +
+        '<p class="gp-adm-muted" style="margin:0 0 6px">' + esc(c.mensagem || '') + '</p>' +
+        '<div class="gp-adm-com-meta">' + esc(meta || '—') + '</div></div>';
+    }).join('');
+  }
+
+  window.mkGpAdmSalvarComunicado_ = async function () {
+    const titulo = (document.getElementById('gp-com-titulo') || {}).value || '';
+    const mensagem = (document.getElementById('gp-com-mensagem') || {}).value || '';
+    const publico = (document.getElementById('gp-com-publico') || {}).value || 'TODOS';
+    const validoAte = (document.getElementById('gp-com-valido') || {}).value || '';
+    const prioridade = (document.getElementById('gp-com-prioridade') || {}).value || 'info';
+    if (!String(titulo).trim() || !String(mensagem).trim()) {
+      if (typeof toast === 'function') toast('Preencha título e mensagem', 'warning');
+      return;
+    }
+    try {
+      const d = await api(Object.assign({
+        action: 'salvarComunicadoRhAdmin',
+        titulo: String(titulo).trim(),
+        mensagem: String(mensagem).trim(),
+        publico: publico,
+        validoAte: String(validoAte).trim(),
+        prioridade: prioridade
+      }, gpAdmPinParams_()), 30000);
+      if (!d.ok) {
+        if (typeof toast === 'function') toast(d.erro || 'Erro ao publicar', 'error');
+        return;
+      }
+      if (typeof toast === 'function') toast('Comunicado publicado', 'success');
+      ['gp-com-titulo', 'gp-com-mensagem', 'gp-com-valido'].forEach(function (id) {
+        const inp = document.getElementById(id);
+        if (inp) inp.value = '';
+      });
+      const pri = document.getElementById('gp-com-prioridade');
+      if (pri) pri.value = 'info';
+      if (typeof sessionStorage !== 'undefined') {
+        try { sessionStorage.removeItem(gpAdmCacheKey_()); } catch (e) { /* ignore */ }
+      }
+      await window.mkGpAdmLoad_({ force: true });
+      mkGpAdmSetTab('comunicados');
+    } catch (e) {
+      if (typeof toast === 'function') toast((e && e.message) || 'Erro de conexão', 'error');
+    }
+  };
+
   function gpAdmRender_() {
     gpAdmRenderKpis_();
     gpAdmRenderHoje_();
@@ -427,6 +502,7 @@
     gpAdmRenderEscala_();
     gpAdmRenderMetas_();
     gpAdmRenderFolha_();
+    gpAdmRenderComunicados_();
     const compEl = document.getElementById('gp-adm-comp');
     if (compEl && gpAdmData_) compEl.textContent = gpAdmData_.competencia || '';
   }
