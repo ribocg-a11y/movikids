@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Movi Kids">
 <title>Movi Kids</title>
-<script src="mk-canonical-host.js?v=1.8.97"></script>
+<script src="mk-canonical-host.js?v=1.8.99"></script>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png">
@@ -17,17 +17,17 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<script src="mk-stale-sync.js?v=1.8.97"></script>
-<script src="mk-version.js?v=1.8.97"></script>
-<script src="mk-api.js?v=1.8.97"></script>
-<link rel="stylesheet" href="mk-design.css?v=1.8.97">
+<script src="mk-stale-sync.js?v=1.8.99"></script>
+<script src="mk-version.js?v=1.8.99"></script>
+<script src="mk-api.js?v=1.8.99"></script>
+<link rel="stylesheet" href="mk-design.css?v=1.8.99">
 
-<script src="mk-cache-bust.js?v=1.8.97"></script>
+<script src="mk-cache-bust.js?v=1.8.99"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<link rel="stylesheet" href="mk-app.css?v=1.8.97">
-<link rel="stylesheet" href="mk-gestao-pessoas.css?v=1.8.97">
+<link rel="stylesheet" href="mk-app.css?v=1.8.99">
+<link rel="stylesheet" href="mk-gestao-pessoas.css?v=1.8.99">
 <!-- Firebase SDK — Realtime sync canonico para todos os dispositivos -->
-<script type="module" src="mk-firebase.js?v=1.8.97"></script>
+<script type="module" src="mk-firebase.js?v=1.8.99"></script>
 </head>
 
 <body>
@@ -760,39 +760,44 @@
         <button class="btn-sair" onclick="adminLogout()">Sair</button>
       </div>
     </div>
-    <p class="gp-adm-lead">Equipe, presença, escala, metas e folha — competência <strong id="gp-adm-comp">—</strong>.</p>
-    <p style="margin:-8px 0 14px">
-      <button type="button" class="btn btn-secondary" style="width:100%;max-width:420px" onclick="mkAbrirColaboradoresPreview_()">👁 Ver como colaborador (pré-visualização ADM)</button>
-    </p>
+    <div class="gp-adm-page-head">
+      <p class="gp-adm-page-comp">Competência <strong id="gp-adm-comp">—</strong></p>
+    </div>
     <p id="gp-adm-err" class="gp-adm-err" role="alert" hidden></p>
-    <div id="mk-ops-sessao-banner" class="mk-sessao-lock mk-ops-sessao-banner" style="display:none;margin-bottom:12px"></div>
 
-    <div class="gp-adm-tabs" role="tablist">
+    <div class="gp-adm-tabs" role="tablist" aria-label="Gestão de pessoas">
       <button type="button" class="gp-adm-tab active" data-tab="hoje" onclick="mkGpAdmSetTab('hoje')">Hoje</button>
-      <button type="button" class="gp-adm-tab" data-tab="presenca" onclick="mkGpAdmSetTab('presenca')">Presença</button>
+      <button type="button" class="gp-adm-tab" data-tab="presenca" onclick="mkGpAdmSetTab('presenca')">Ficha</button>
       <button type="button" class="gp-adm-tab" data-tab="escala" onclick="mkGpAdmSetTab('escala')">Escala</button>
-      <button type="button" class="gp-adm-tab" data-tab="metas" onclick="mkGpAdmSetTab('metas')">Metas &amp; bônus</button>
-      <button type="button" class="gp-adm-tab" data-tab="folha" onclick="mkGpAdmSetTab('folha')">Folha do mês</button>
-      <button type="button" class="gp-adm-tab" data-tab="comunicados" onclick="mkGpAdmSetTab('comunicados')">Comunicados</button>
-      <button type="button" class="gp-adm-tab" data-tab="cadastro" onclick="mkGpAdmSetTab('cadastro')">Cadastro &amp; sessão</button>
+      <button type="button" class="gp-adm-tab" data-tab="metas" onclick="mkGpAdmSetTab('metas')">Metas</button>
+      <button type="button" class="gp-adm-tab" data-tab="folha" onclick="mkGpAdmSetTab('folha')">Folha</button>
+      <button type="button" class="gp-adm-tab" data-tab="comunicados" onclick="mkGpAdmSetTab('comunicados')">Avisos</button>
+      <button type="button" class="gp-adm-tab" data-tab="cadastro" onclick="mkGpAdmSetTab('cadastro')">Operadores</button>
     </div>
 
-    <div id="gp-adm-kpis" class="gp-adm-kpi-grid"></div>
-
     <section class="gp-adm-panel active" id="gp-adm-tab-hoje">
+      <p class="gp-adm-panel-lead">Quem está na loja agora e o que precisa de atenção hoje.</p>
+      <div id="gp-adm-kpis" class="gp-adm-kpi-grid"></div>
       <div id="gp-adm-alertas"></div>
       <div class="gp-adm-card">
-        <h3>Equipe agora</h3>
+        <h3>Equipe</h3>
         <div id="gp-adm-equipe"></div>
       </div>
     </section>
 
     <section class="gp-adm-panel" id="gp-adm-tab-presenca">
-      <div class="gp-adm-card">
-        <div id="gp-adm-ficha-resumo"></div>
-        <label class="form-label" for="gp-adm-presenca-sel">Colaborador</label>
-        <select id="gp-adm-presenca-sel" class="form-input" style="margin-bottom:12px"></select>
-        <div id="gp-adm-presenca-table"></div>
+      <div class="gp-adm-ficha-page">
+        <header class="gp-adm-ficha-bar">
+          <div class="gp-adm-ficha-bar-pick">
+            <label class="gp-adm-ficha-bar-lbl" for="gp-adm-presenca-sel">Colaborador</label>
+            <select id="gp-adm-presenca-sel" class="form-input gp-adm-presenca-sel" aria-label="Selecionar colaborador"></select>
+          </div>
+          <div id="gp-adm-ficha-badges" class="gp-adm-ficha-bar-badges"></div>
+        </header>
+        <div class="gp-adm-ficha-split">
+          <aside id="gp-adm-ficha-aside" class="gp-adm-ficha-aside" aria-label="Perfil e cadastro"></aside>
+          <div id="gp-adm-ficha-main" class="gp-adm-ficha-main" aria-label="Jornada e ponto"></div>
+        </div>
       </div>
     </section>
 
@@ -857,7 +862,9 @@
     </section>
 
     <section class="gp-adm-panel" id="gp-adm-tab-cadastro">
-      <p class="gp-adm-lead" style="margin-top:0">Cadastro de operadores, PIN e sessão do balcão (funcionalidade existente).</p>
+      <p class="gp-adm-panel-lead">PIN, novos operadores e sessão do balcão.</p>
+      <div id="mk-ops-sessao-banner" class="mk-sessao-lock mk-ops-sessao-banner" style="display:none;margin-bottom:12px"></div>
+      <button type="button" class="btn btn-secondary gp-adm-preview-btn" onclick="mkAbrirColaboradoresPreview_()">👁 Pré-visualizar hub colaborador</button>
       <button type="button" class="btn btn-secondary mk-liberar-sessao-btn" id="mk-btn-liberar-sessao" style="width:100%;margin-bottom:14px">🔓 Liberar sessão do balcão (operador esqueceu Sair)</button>
       <div class="sec-title">Cadastrados</div>
       <div class="fecha-card" style="margin-bottom:16px">
@@ -1931,26 +1938,26 @@
   </div>
 </div>
 
-<script src="mk-globals.js?v=1.8.97"></script>
-<script src="mk-core.js?v=1.8.97"></script>
-<script src="mk-nav.js?v=1.8.97"></script>
-<script src="mk-admin.js?v=1.8.97"></script>
-<script src="mk-historico.js?v=1.8.97"></script>
-<script src="mk-sessao.js?v=1.8.97"></script>
-<script src="mk-home.js?v=1.8.97"></script>
-<script src="mk-meta-operador.js?v=1.8.97"></script>
-<script src="mk-custos.js?v=1.8.97"></script>
-<script src="mk-avulso.js?v=1.8.97"></script>
-<script src="mk-sync.js?v=1.8.97"></script>
-<script src="mk-nova.js?v=1.8.97"></script>
-<script src="mk-relacionamento.js?v=1.8.97"></script>
-<script src="mk-operacao.js?v=1.8.97"></script>
-<script src="mk-drawer.js?v=1.8.97"></script>
-<script src="mk-update.js?v=1.8.97"></script>
-<script src="mk-gestao-pessoas.js?v=1.8.97"></script>
-<script src="mk-holerite.js?v=1.8.97"></script>
-<script src="mk-gestao-pessoas-admin.js?v=1.8.97"></script>
-<script src="mk-auth.js?v=1.8.97"></script>
-<script src="mk-boot.js?v=1.8.97"></script>
+<script src="mk-globals.js?v=1.8.99"></script>
+<script src="mk-core.js?v=1.8.99"></script>
+<script src="mk-nav.js?v=1.8.99"></script>
+<script src="mk-admin.js?v=1.8.99"></script>
+<script src="mk-historico.js?v=1.8.99"></script>
+<script src="mk-sessao.js?v=1.8.99"></script>
+<script src="mk-home.js?v=1.8.99"></script>
+<script src="mk-meta-operador.js?v=1.8.99"></script>
+<script src="mk-custos.js?v=1.8.99"></script>
+<script src="mk-avulso.js?v=1.8.99"></script>
+<script src="mk-sync.js?v=1.8.99"></script>
+<script src="mk-nova.js?v=1.8.99"></script>
+<script src="mk-relacionamento.js?v=1.8.99"></script>
+<script src="mk-operacao.js?v=1.8.99"></script>
+<script src="mk-drawer.js?v=1.8.99"></script>
+<script src="mk-update.js?v=1.8.99"></script>
+<script src="mk-gestao-pessoas.js?v=1.8.99"></script>
+<script src="mk-holerite.js?v=1.8.99"></script>
+<script src="mk-gestao-pessoas-admin.js?v=1.8.99"></script>
+<script src="mk-auth.js?v=1.8.99"></script>
+<script src="mk-boot.js?v=1.8.99"></script>
 </body>
 </html>

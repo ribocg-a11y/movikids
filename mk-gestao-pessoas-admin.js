@@ -5,6 +5,7 @@
   let gpAdmData_ = null;
   let gpAdmTab_ = 'hoje';
   let gpAdmSelId_ = null;
+  let gpAdmFichaSub_ = 'jornada';
   let gpAdmLoadPromise_ = null;
 
   const GP_ADM_CACHE_TTL = 5 * 60 * 1000;
@@ -98,6 +99,8 @@
 
   function gpAdmSetTab_(tab) {
     gpAdmTab_ = tab;
+    const page = document.getElementById('page-operadores');
+    if (page) page.dataset.gpTab = tab;
     document.querySelectorAll('#page-operadores .gp-adm-tab').forEach(function (btn) {
       btn.classList.toggle('active', btn.dataset.tab === tab);
     });
@@ -106,17 +109,24 @@
     });
   }
 
+  window.mkGpAdmFichaSub_ = function (sub) {
+    gpAdmFichaSub_ = sub || 'jornada';
+    const aside = document.getElementById('gp-adm-ficha-aside');
+    if (aside) aside.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
   window.mkGpAdmSetTab = function (tab) {
     if (tab !== 'folha' && typeof mkGpAdmFecharHolerite_ === 'function') mkGpAdmFecharHolerite_();
     gpAdmSetTab_(tab);
     if (tab === 'cadastro' && typeof refreshOperadoresAdmin_ === 'function') refreshOperadoresAdmin_();
   };
 
-  window.mkGpAdmVerFicha = function (id) {
+  window.mkGpAdmVerFicha = function (id, sub) {
     gpAdmSelId_ = Number(id);
+    if (sub === 'cadastro') gpAdmFichaSub_ = 'cadastro';
     if (!gpAdmData_) {
       if (typeof toast === 'function') toast('Carregando equipe…', 'warning');
-      window.mkGpAdmLoad_().then(function () { window.mkGpAdmVerFicha(id); });
+      window.mkGpAdmLoad_().then(function () { window.mkGpAdmVerFicha(id, sub); });
       return;
     }
     gpAdmSetTab_('presenca');
@@ -125,6 +135,7 @@
     if (panel) {
       try { panel.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e) { panel.scrollIntoView(true); }
     }
+    if (sub === 'cadastro' && typeof mkGpAdmFichaSub_ === 'function') mkGpAdmFichaSub_('cadastro');
   };
 
   function gpAdmColabById_(id) {
@@ -165,50 +176,96 @@
     ];
   }
 
-  function gpAdmRenderCadastroBlock_(c) {
-    const cad = c.cadastro || {};
-    const ok = c.cadastroOk === true;
-    const rows = gpAdmCadastroLabels_().map(function (f) {
-      const v = String(cad[f.key] || '').trim();
-      return '<div><span>' + esc(f.label) + '</span><strong>' + esc(v || '—') + '</strong></div>';
-    }).join('');
-    const badge = ok
-      ? '<span class="gp-adm-badge ok">Cadastro completo</span>'
-      : '<span class="gp-adm-badge warn">' + (c.cadastroPct || 0) + '% · incompleto</span>';
-    return '<div class="gp-adm-ficha-cadastro">' +
-      '<div class="gp-adm-ficha-cadastro-head"><h4>Dados cadastrais</h4>' + badge + '</div>' +
-      '<div class="gp-adm-ficha-grid gp-adm-ficha-cadastro-grid">' + rows + '</div></div>';
+  function gpAdmCadastroReqKeys_() {
+    return ['nomeCompleto', 'cpf', 'nascimento', 'telefone', 'endereco', 'emergencia', 'admissao', 'pix'];
   }
 
-  function gpAdmRenderFichaResumo_() {
-    const el = document.getElementById('gp-adm-ficha-resumo');
+  function gpAdmRenderCadastroPane_(c, compact) {
+    const cad = c.cadastro || {};
+    const ok = c.cadastroOk === true;
+    const pct = ok ? 100 : (c.cadastroPct || 0);
+    const reqKeys = gpAdmCadastroReqKeys_();
+    if (compact) {
+      const filledItems = [];
+      const pendingItems = [];
+      gpAdmCadastroLabels_().forEach(function (f) {
+        const v = String(cad[f.key] || '').trim();
+        const isReq = reqKeys.indexOf(f.key) >= 0;
+        if (v) filledItems.push({ label: f.label, v: v });
+        else if (isReq) pendingItems.push(f.label);
+      });
+      if (ok) {
+        const kv = filledItems.map(function (it) {
+          return '<div class="gp-adm-cad-kv"><span>' + esc(it.label) + '</span><strong>' + esc(it.v) + '</strong></div>';
+        }).join('');
+        return '<section class="gp-adm-aside-block">' +
+          '<h4>Cadastro RH</h4><span class="gp-adm-badge ok">Completo</span>' +
+          '<div class="gp-adm-cad-kv-grid">' + kv + '</div></section>';
+      }
+      const pend = pendingItems.map(function (lbl) {
+        return '<li class="gp-adm-cad-pend">' + esc(lbl) + '</li>';
+      }).join('');
+      return '<section class="gp-adm-aside-block gp-adm-aside-block--warn">' +
+        '<h4>Cadastro RH</h4><span class="gp-adm-badge warn">' + pct + '% · ' + pendingItems.length + ' pendente(s)</span>' +
+        '<div class="gp-adm-cad-progress" role="progressbar" aria-valuenow="' + pct + '"><div class="gp-adm-cad-progress-bar" style="width:' + pct + '%"></div></div>' +
+        '<p class="gp-adm-aside-hint">Complete em <strong>Colaboradores</strong> no tablet.</p>' +
+        '<ul class="gp-adm-cad-pend-list">' + pend + '</ul></section>';
+    }
+    let pending = 0;
+    const rows = gpAdmCadastroLabels_().map(function (f) {
+      const v = String(cad[f.key] || '').trim();
+      const isReq = reqKeys.indexOf(f.key) >= 0;
+      const filled = v.length > 0;
+      if (isReq && !filled) pending++;
+      const cls = filled ? 'gp-adm-cad-row--ok' : (isReq ? 'gp-adm-cad-row--pend' : 'gp-adm-cad-row--opt');
+      const icon = filled ? '✓' : (isReq ? '!' : '·');
+      return '<div class="gp-adm-cad-row ' + cls + '">' +
+        '<span class="gp-adm-cad-icon" aria-hidden="true">' + icon + '</span>' +
+        '<div class="gp-adm-cad-body"><span>' + esc(f.label) + '</span><strong>' + esc(v || (isReq ? 'Pendente' : '—')) + '</strong></div></div>';
+    }).join('');
+    const badge = ok
+      ? '<span class="gp-adm-badge ok">Completo</span>'
+      : '<span class="gp-adm-badge warn">' + pct + '% · ' + pending + ' pendente(s)</span>';
+    return '<div class="gp-adm-card gp-adm-cad-card">' +
+      '<div class="gp-adm-cad-head"><div><h3>Cadastro RH</h3></div>' + badge + '</div>' +
+      '<div class="gp-adm-cad-progress"><div class="gp-adm-cad-progress-bar" style="width:' + pct + '%"></div></div>' +
+      '<div class="gp-adm-cad-list">' + rows + '</div></div>';
+  }
+
+  function gpAdmRenderFichaBar_() {
+    const el = document.getElementById('gp-adm-ficha-badges');
+    if (!el || !gpAdmData_) return;
+    const c = gpAdmColabById_(gpAdmSelId_);
+    if (!c) { el.innerHTML = ''; return; }
+    const cadBadge = c.cadastroOk
+      ? '<span class="gp-adm-badge ok">Cadastro OK</span>'
+      : '<span class="gp-adm-badge warn">' + (c.cadastroPct || 0) + '% cadastro</span>';
+    el.innerHTML = gpAdmStatusBadge_(c) + cadBadge;
+  }
+
+  function gpAdmRenderFichaAside_() {
+    const el = document.getElementById('gp-adm-ficha-aside');
     if (!el || !gpAdmData_) return;
     const c = gpAdmColabById_(gpAdmSelId_);
     if (!c) {
-      el.innerHTML = '';
+      el.innerHTML = '<p class="gp-adm-muted">Escolha um colaborador acima.</p>';
       return;
     }
     const m = c.metas || {};
-    const intelRows = gpAdmIntelForOp_(c.id);
-    const intelBlock = intelRows.length
-      ? '<div class="gp-adm-presenca-intel">' + intelRows.map(function (a) {
-        return gpAdmAlertRowHtml_(a, 'Presença', a.nivel === 'vermelho' ? 'err' : 'warn');
-      }).join('') + '</div>'
-      : '';
+    const pontoTxt = (c.ponto && c.ponto.entrada)
+      ? esc(c.ponto.entrada) + (c.ponto.saida ? ' → ' + esc(c.ponto.saida) : ' · aberto')
+      : 'Sem registro';
     el.innerHTML =
-      '<div class="gp-adm-ficha-hero">' +
+      '<div class="gp-adm-aside-profile">' +
       '<div class="gp-adm-av' + (gpAdmIsOwner_(c) ? ' owner' : '') + '">' + gpAdmInitial_(c.nome) + '</div>' +
-      '<div class="gp-adm-ficha-hero-body"><h3>' + esc(c.nome) + '</h3>' +
-      '<p>' + esc(c.funcao || 'Operador') + (c.admissao ? ' · admissão ' + esc(c.admissao) : '') + '</p></div>' +
-      gpAdmStatusBadge_(c) + '</div>' +
-      '<div class="gp-adm-ficha-grid">' +
-      '<div><span>Turno cadastro</span><strong>' + esc(c.turno || '—') + '</strong></div>' +
+      '<div><h3>' + esc(c.nome) + '</h3><p>' + esc(c.funcao || 'Operador') + '</p></div></div>' +
+      '<div class="gp-adm-aside-stats">' +
+      '<div><span>Turno</span><strong>' + esc(c.turno || '—') + '</strong></div>' +
       '<div><span>Escala hoje</span><strong>' + esc(c.escalaHoje || '—') + '</strong></div>' +
-      '<div><span>Meta / loc hoje</span><strong>' + (m.alvo || 20) + ' · ' + (m.atual || 0) + '</strong></div>' +
-      '<div><span>Loc no mês</span><strong>' + (m.locMes || 0) + '</strong></div>' +
-      '<div><span>Cadastro RH</span><strong>' + (c.cadastroOk ? 'Completo' : (c.cadastroPct || 0) + '%') + '</strong></div>' +
-      '<div><span>Ponto hoje</span><strong>' + (c.ponto && c.ponto.entrada ? esc(c.ponto.entrada) + (c.ponto.saida ? ' → ' + esc(c.ponto.saida) : '') : 'Sem registro') + '</strong></div>' +
-      '</div>' + gpAdmRenderCadastroBlock_(c) + intelBlock;
+      '<div><span>Meta / loc</span><strong>' + (m.alvo || 20) + ' · ' + (m.atual || 0) + '</strong></div>' +
+      '<div><span>Ponto hoje</span><strong>' + pontoTxt + '</strong></div>' +
+      '</div>' +
+      gpAdmRenderCadastroPane_(c, true);
   }
 
   function gpAdmRenderPresenca_() {
@@ -222,12 +279,14 @@
       }).join('');
       sel.onchange = function () {
         gpAdmSelId_ = Number(sel.value);
-        gpAdmRenderFichaResumo_();
+        gpAdmRenderFichaBar_();
+        gpAdmRenderFichaAside_();
         gpAdmRenderPresencaTable_();
       };
       gpAdmSelId_ = Number(sel.value) || cur;
     }
-    gpAdmRenderFichaResumo_();
+    gpAdmRenderFichaBar_();
+    gpAdmRenderFichaAside_();
     gpAdmRenderPresencaTable_();
   }
 
@@ -243,30 +302,43 @@
   }
 
   function gpAdmRenderPresencaTable_() {
-    const el = document.getElementById('gp-adm-presenca-table');
+    const el = document.getElementById('gp-adm-ficha-main');
     if (!el || !gpAdmData_) return;
     const c = gpAdmColabById_(gpAdmSelId_);
     if (!c) {
       el.innerHTML = '<p class="gp-adm-muted">Selecione um colaborador.</p>';
       return;
     }
+    const intelRows = gpAdmIntelForOp_(c.id);
+    const intelBlock = intelRows.length
+      ? '<div class="gp-adm-main-alert">' + intelRows.map(function (a) {
+        return gpAdmAlertRowHtml_(a, 'Atenção', a.nivel === 'vermelho' ? 'err' : 'warn');
+      }).join('') + '</div>'
+      : '';
     const j = c.jornada;
     if (!j || !j.dias || !j.dias.length) {
-      el.innerHTML = '<p class="gp-adm-muted">Sem dias na competência (confira escala RH e admissão). Publique o GAS <strong>v1.5.110</strong> (Nova versão Web).</p>';
+      el.innerHTML = intelBlock +
+        '<div class="gp-adm-card"><p class="gp-adm-muted">Sem dias na competência (confira escala RH e admissão).</p></div>';
       return;
     }
     const t = j.totais || {};
+    const m = c.metas || {};
     const saldoCls = (t.saldoMesMin != null && t.saldoMesMin < 0) ? 'atraso' : 'extra';
-    const resumo = '<div class="gp-jorn-resumo">' +
-      '<div class="gp-jorn-kpi"><span>Previsto</span><strong>' + esc(t.previsto || '—') + '</strong></div>' +
-      '<div class="gp-jorn-kpi"><span>Trabalhado</span><strong>' + esc(t.trabalhado || '—') + '</strong></div>' +
+    const resumo = '<div class="gp-adm-jorn-hero">' +
+      '<h3>Jornada · ' + esc(gpAdmData_.competencia || '') + '</h3>' +
+      '<p class="gp-adm-muted">' + (m.locMes || 0) + ' locações no mês</p>' +
+      '<div class="gp-adm-jorn-hero-kpis">' +
+      '<div class="gp-adm-jorn-hero-kpi"><span>Previsto</span><strong>' + esc(t.previsto || '—') + '</strong></div>' +
+      '<div class="gp-adm-jorn-hero-kpi"><span>Trabalhado</span><strong>' + esc(t.trabalhado || '—') + '</strong></div>' +
+      '<div class="gp-adm-jorn-hero-kpi gp-adm-jorn-hero-kpi--' + saldoCls + '"><span>Saldo mês</span><strong>' + esc(t.saldoMes || '—') + '</strong></div>' +
+      '<div class="gp-adm-jorn-hero-kpi"><span>Banco</span><strong>' + esc(j.bancoProjetado || j.bancoSaldo || '0h00') + '</strong></div>' +
+      '</div>' +
+      '<details class="gp-adm-jorn-details"><summary>Mais detalhes (extras, atrasos, banco)</summary>' +
+      '<div class="gp-jorn-resumo gp-jorn-resumo--ficha">' +
       '<div class="gp-jorn-kpi gp-jorn-kpi--extra"><span>Extras</span><strong>' + esc(t.extras || '—') + '</strong></div>' +
       '<div class="gp-jorn-kpi gp-jorn-kpi--atraso"><span>Atraso / falta</span><strong>' + esc(t.atraso || '—') + '</strong></div>' +
-      '<div class="gp-jorn-kpi gp-jorn-kpi--' + saldoCls + '"><span>Saldo mês</span><strong>' + esc(t.saldoMes || '—') + '</strong></div>' +
       '<div class="gp-jorn-kpi"><span>Banco cadastro</span><strong>' + esc(j.bancoSaldo || '0h00') + '</strong></div>' +
-      '<div class="gp-jorn-kpi gp-jorn-kpi--banco"><span>Banco projetado</span><strong>' + esc(j.bancoProjetado || '0h00') + '</strong></div>' +
-      '</div>' +
-      '<p class="gp-adm-muted" style="margin:8px 0 12px">Escala × batidas · extras creditam e atrasos/faltas debitam o banco de horas.</p>';
+      '</div></details></div>';
     const rows = j.dias.map(function (r) {
       const trCls = r.folga ? ' class="gp-jorn-row-folga"' : '';
       return '<tr' + trCls + '>' +
@@ -281,8 +353,9 @@
         '<td class="gp-jorn-atraso">' + esc(r.atraso || '—') + '</td>' +
         '<td>' + gpAdmJornSitBadge_(r.sit) + '</td></tr>';
     }).join('');
-    el.innerHTML = resumo +
-      '<div class="gp-adm-table-wrap"><table class="gp-adm-table gp-jorn-table">' +
+    el.innerHTML = intelBlock + resumo +
+      '<div class="gp-adm-jorn-table-wrap">' +
+      '<table class="gp-adm-table gp-jorn-table">' +
       '<thead><tr><th style="text-align:left">Data</th><th>Dia</th><th>Escala</th><th>Entrada</th><th>Saída</th><th>Previsto</th><th>Trabalhado</th><th>Extras</th><th>Atraso</th><th>Sit.</th></tr></thead>' +
       '<tbody>' + rows + '</tbody></table></div>';
   }
@@ -329,7 +402,8 @@
         '<div class="gp-adm-av' + (gpAdmIsOwner_(c) ? ' owner' : '') + '">' + gpAdmInitial_(c.nome) + '</div>' +
         '<div class="gp-adm-row-body"><strong>' + esc(c.nome) + '</strong><small>' + gpAdmSubline_(c) + '</small></div>' +
         gpAdmStatusBadge_(c) +
-        '<button type="button" class="gp-adm-link" onclick="mkGpAdmVerFicha(' + c.id + ')">Ficha</button></div>';
+        (c.cadastroOk ? '' : '<span class="gp-adm-badge warn">' + (c.cadastroPct || 0) + '%</span>') +
+        '<button type="button" class="gp-adm-link" onclick="mkGpAdmVerFicha(' + c.id + (c.cadastroOk ? '' : ',\'cadastro\'') + ')">Ficha</button></div>';
     }).join('') || '<p class="gp-adm-muted">Nenhum colaborador.</p>';
   }
 
@@ -534,6 +608,7 @@
     gpAdmRenderComunicados_();
     const compEl = document.getElementById('gp-adm-comp');
     if (compEl && gpAdmData_) compEl.textContent = gpAdmData_.competencia || '';
+    gpAdmSetTab_(gpAdmTab_);
   }
 
   window.mkGpAdmInstalarAbas_ = async function () {

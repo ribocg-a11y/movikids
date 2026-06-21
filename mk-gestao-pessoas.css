@@ -561,21 +561,35 @@ body {
 }
 
 /* ── ADM Operadores · Gestão Pessoas (#page-operadores) ── */
+#page-operadores .gp-adm-page-head { margin-bottom: 12px; }
+#page-operadores .gp-adm-page-comp { margin: 0; font-size: 13px; font-weight: 700; color: var(--txt2); }
+#page-operadores .gp-adm-panel-lead {
+  margin: 0 0 14px; font-size: 13px; font-weight: 700; color: var(--txt3); line-height: 1.45;
+}
 #page-operadores .gp-adm-lead { font-size: 13px; color: var(--txt2); font-weight: 700; line-height: 1.55; margin-bottom: 14px; }
 #page-operadores .gp-adm-err { font-size: 13px; font-weight: 700; color: #B71C1C; margin-bottom: 12px; line-height: 1.55; padding: 12px 14px; background: #FFEBEE; border: 1px solid #EF9A9A; border-radius: 12px; }
 #page-operadores .gp-adm-err:empty,
 #page-operadores .gp-adm-err[hidden] { display: none !important; margin: 0; padding: 0; border: 0; }
 #page-operadores .gp-adm-err code { font-size: 11px; background: rgba(0,0,0,.06); padding: 1px 4px; border-radius: 4px; }
-#page-operadores .gp-adm-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
-#page-operadores .gp-adm-tab {
-  padding: 8px 14px; border-radius: 999px; border: 2px solid var(--border);
-  background: var(--card); font: inherit; font-weight: 800; font-size: 12px; color: var(--txt2); cursor: pointer;
+#page-operadores .gp-adm-tabs {
+  display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px;
+  padding-bottom: 12px; border-bottom: 1px solid var(--border);
 }
-#page-operadores .gp-adm-tab.active { border-color: var(--blue); background: #E8F2FF; color: var(--blue); }
-#page-operadores .gp-adm-panel { display: none; }
+#page-operadores .gp-adm-tab {
+  padding: 7px 12px; border-radius: 10px; border: 1px solid transparent;
+  background: transparent; font: inherit; font-weight: 800; font-size: 12px; color: var(--txt3); cursor: pointer;
+}
+#page-operadores .gp-adm-tab:hover { background: #F1F5F9; color: var(--txt2); }
+#page-operadores .gp-adm-tab.active {
+  border-color: var(--border); background: var(--card); color: var(--blue);
+  box-shadow: var(--mk-shadow-1);
+}
+#page-operadores .gp-adm-panel { display: none; max-width: 1100px; }
 #page-operadores .gp-adm-panel.active { display: block; animation: gpFade .22s ease; }
-#page-operadores .gp-adm-kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; }
-@media (max-width: 640px) { #page-operadores .gp-adm-kpi-grid { grid-template-columns: 1fr; } }
+#page-operadores[data-gp-tab="presenca"] .gp-adm-panel { max-width: none; }
+#page-operadores #gp-adm-tab-hoje .gp-adm-kpi-grid { margin-bottom: 16px; }
+@media (max-width: 640px) { #page-operadores #gp-adm-tab-hoje .gp-adm-kpi-grid { grid-template-columns: 1fr; } }
+#page-operadores .gp-adm-kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
 #page-operadores .gp-adm-kpi {
   background: var(--card); border: 1px solid var(--border); border-radius: var(--mk-radius, 16px);
   padding: 14px; box-shadow: var(--mk-shadow-1);
@@ -627,6 +641,118 @@ body {
 #page-operadores .gp-adm-ficha-cadastro-head h4 { margin: 0; font-size: 13px; font-weight: 900; text-transform: uppercase; letter-spacing: .04em; color: var(--txt2); }
 #page-operadores .gp-adm-ficha-cadastro-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 @media (max-width: 900px) { #page-operadores .gp-adm-ficha-cadastro-grid { grid-template-columns: 1fr 1fr; } }
+
+/* Ficha colaborador — duas colunas (perfil | jornada) */
+#page-operadores .gp-adm-ficha-page { display: flex; flex-direction: column; gap: 0; min-height: 320px; }
+#page-operadores .gp-adm-ficha-bar {
+  display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px 20px;
+  padding: 14px 16px; background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--mk-radius, 16px) var(--mk-radius, 16px) 0 0; box-shadow: var(--mk-shadow-1);
+}
+#page-operadores .gp-adm-ficha-bar-lbl {
+  display: block; font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: .05em;
+  color: var(--txt3); margin-bottom: 6px;
+}
+#page-operadores .gp-adm-presenca-sel { min-width: 220px; max-width: 360px; margin: 0 !important; }
+#page-operadores .gp-adm-ficha-bar-badges { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+#page-operadores .gp-adm-ficha-split {
+  display: grid; grid-template-columns: minmax(260px, 300px) minmax(0, 1fr);
+  gap: 0; border: 1px solid var(--border); border-top: 0;
+  border-radius: 0 0 var(--mk-radius, 16px) var(--mk-radius, 16px);
+  overflow: hidden; background: var(--card); box-shadow: var(--mk-shadow-1);
+}
+@media (max-width: 860px) {
+  #page-operadores .gp-adm-ficha-split { grid-template-columns: 1fr; }
+}
+#page-operadores .gp-adm-ficha-aside {
+  padding: 16px; background: #F8FAFC; border-right: 1px solid var(--border);
+}
+@media (max-width: 860px) {
+  #page-operadores .gp-adm-ficha-aside { border-right: 0; border-bottom: 1px solid var(--border); }
+}
+#page-operadores .gp-adm-ficha-main { padding: 16px; min-width: 0; background: var(--card); }
+#page-operadores .gp-adm-aside-profile {
+  display: flex; align-items: center; gap: 12px; margin-bottom: 14px;
+}
+#page-operadores .gp-adm-aside-profile h3 { margin: 0 0 2px; font-size: 17px; font-weight: 900; }
+#page-operadores .gp-adm-aside-profile p { margin: 0; font-size: 12px; font-weight: 700; color: var(--txt3); }
+#page-operadores .gp-adm-aside-stats {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px;
+}
+#page-operadores .gp-adm-aside-stats div {
+  background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 8px 10px;
+}
+#page-operadores .gp-adm-aside-stats span {
+  display: block; font-size: 9px; font-weight: 800; color: var(--txt3); text-transform: uppercase; margin-bottom: 2px;
+}
+#page-operadores .gp-adm-aside-stats strong { font-size: 12px; font-weight: 900; color: var(--txt); }
+#page-operadores .gp-adm-aside-block {
+  padding-top: 14px; border-top: 1px dashed var(--border);
+}
+#page-operadores .gp-adm-aside-block h4 {
+  margin: 0 0 8px; font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: .04em; color: var(--txt2);
+  display: inline-block; margin-right: 8px;
+}
+#page-operadores .gp-adm-aside-block--warn { background: rgba(255, 243, 224, 0.35); margin: 0 -16px -16px; padding: 14px 16px 16px; border-top-color: rgba(255, 152, 0, 0.25); }
+#page-operadores .gp-adm-aside-hint { margin: 8px 0 10px; font-size: 11px; line-height: 1.45; color: var(--txt2); }
+#page-operadores .gp-adm-cad-pend-list { margin: 0; padding: 0 0 0 18px; font-size: 12px; font-weight: 800; color: #E65100; }
+#page-operadores .gp-adm-cad-pend { margin-bottom: 4px; }
+#page-operadores .gp-adm-cad-kv-grid { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+#page-operadores .gp-adm-cad-kv span {
+  display: block; font-size: 9px; font-weight: 800; color: var(--txt3); text-transform: uppercase;
+}
+#page-operadores .gp-adm-cad-kv strong { font-size: 13px; font-weight: 800; word-break: break-word; }
+#page-operadores .gp-adm-main-alert {
+  margin-bottom: 12px; padding: 10px 12px; border-radius: 12px;
+  background: #FFEBEE; border: 1px solid #EF9A9A;
+}
+#page-operadores .gp-adm-main-alert .gp-adm-row { padding: 6px 0; border: none; }
+#page-operadores .gp-adm-jorn-hero { margin-bottom: 14px; }
+#page-operadores .gp-adm-jorn-hero h3 { margin: 0 0 4px; font-size: 16px; font-weight: 900; }
+#page-operadores .gp-adm-jorn-hero-kpis {
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-top: 12px;
+}
+@media (max-width: 640px) { #page-operadores .gp-adm-jorn-hero-kpis { grid-template-columns: repeat(2, 1fr); } }
+#page-operadores .gp-adm-jorn-hero-kpi {
+  background: #F8FAFC; border: 1px solid var(--border); border-radius: 12px; padding: 10px; text-align: center;
+}
+#page-operadores .gp-adm-jorn-hero-kpi span {
+  display: block; font-size: 9px; font-weight: 800; color: var(--txt3); text-transform: uppercase; margin-bottom: 4px;
+}
+#page-operadores .gp-adm-jorn-hero-kpi strong { font-size: 15px; font-weight: 900; color: var(--blue-dk, #1565C0); }
+#page-operadores .gp-adm-jorn-hero-kpi--atraso strong { color: var(--red, #C62828); }
+#page-operadores .gp-adm-jorn-hero-kpi--extra strong { color: var(--green); }
+#page-operadores .gp-adm-jorn-details { margin-top: 10px; font-size: 12px; font-weight: 700; color: var(--txt3); }
+#page-operadores .gp-adm-jorn-details summary { cursor: pointer; color: var(--blue); font-weight: 800; }
+#page-operadores .gp-adm-jorn-table-wrap {
+  border: 1px solid var(--border); border-radius: 12px; overflow: auto; max-height: 52vh;
+}
+#page-operadores .gp-adm-jorn-table-wrap .gp-adm-table { border: 0; }
+#page-operadores .gp-adm-jorn-table-wrap .gp-adm-table thead th {
+  position: sticky; top: 0; z-index: 1; background: #F8FAFC;
+}
+#page-operadores .gp-adm-cad-progress {
+  height: 6px; background: #ECEFF1; border-radius: 999px; overflow: hidden; margin: 8px 0 6px;
+}
+#page-operadores .gp-adm-cad-progress-bar {
+  height: 100%; background: linear-gradient(90deg, var(--blue), #42A5F5); border-radius: 999px;
+}
+#page-operadores .gp-adm-cad-list { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+@media (max-width: 640px) { #page-operadores .gp-adm-cad-list { grid-template-columns: 1fr; } }
+#page-operadores .gp-adm-cad-row {
+  display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px;
+  border-radius: 12px; border: 1px solid var(--border); background: #FAFBFC;
+}
+#page-operadores .gp-adm-cad-row--ok { border-color: rgba(76, 175, 80, 0.35); background: #F1F8E9; }
+#page-operadores .gp-adm-cad-row--pend { border-color: rgba(255, 152, 0, 0.4); background: #FFF8E1; }
+#page-operadores .gp-adm-cad-icon {
+  width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 900; flex-shrink: 0; background: #ECEFF1; color: var(--txt3);
+}
+#page-operadores .gp-adm-cad-body span {
+  display: block; font-size: 9px; font-weight: 800; color: var(--txt3); text-transform: uppercase; margin-bottom: 2px;
+}
+#page-operadores .gp-adm-preview-btn { width: 100%; max-width: 420px; margin-bottom: 14px; }
 .gp-cad-view-row { display: flex; flex-direction: column; gap: 4px; padding: 12px 0; border-bottom: 1px solid var(--border); }
 .gp-cad-view-row:last-child { border-bottom: 0; }
 .gp-cad-view-lbl { font-size: 11px; font-weight: 800; color: var(--txt3); text-transform: uppercase; }
