@@ -52,6 +52,9 @@ function sbSairSessaoClick_() {
 
 function mkPaginaGestaoPermitida_(name) {
   if (isAdmin || (typeof mkAuthIsAdmin === 'function' && mkAuthIsAdmin())) return true;
+  if (typeof mkAuthIsGestor === 'function' && mkAuthIsGestor()) {
+    return ['admin', 'dashboard', 'relatorio', 'historico', 'caixa', 'operadores'].indexOf(name) >= 0;
+  }
   if (typeof mkAuthIsSupervisor === 'function' && mkAuthIsSupervisor()) {
     return ['caixa', 'historico'].indexOf(name) >= 0;
   }
@@ -155,4 +158,19 @@ function showSupervisorSidebar() {
   const hideIds = ['sbn-adm','sbn-dash','sbn-rel','sbn-ops','sbn-cfg','sbn-sys'];
   hideIds.forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
   ['sbn-caixa','sbn-hist'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = ''; });
+}
+
+function showGestorSidebar() {
+  const sec = document.getElementById('sb-admin-section');
+  const btn = document.getElementById('sb-gerenciar-btn');
+  if (sec) sec.classList.add('visible');
+  if (btn) btn.style.display = 'none';
+  sbSetAdminNavOpen_(true, false);
+  const hideIds = ['sbn-cfg', 'sbn-sys'];
+  hideIds.forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
+  ['sbn-adm', 'sbn-dash', 'sbn-rel', 'sbn-ops', 'sbn-caixa', 'sbn-hist'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = '';
+  });
+  if (typeof mkAdminMobCmdOnSidebarShow_ === 'function') mkAdminMobCmdOnSidebarShow_();
 }

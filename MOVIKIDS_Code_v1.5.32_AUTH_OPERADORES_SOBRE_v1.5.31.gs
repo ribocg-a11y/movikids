@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.118
+// MOVI KIDS — Google Apps Script v1.5.119
+// v1.5.119: FASE 17 — alertasInteligentes_ + perfil gestor (authRole)
 // v1.5.118: FASE 16 — comandoOperacional comparativo 30d + frotaDetalhe por veículo
 // v1.5.117: FASE 16 — comandoOperacional (painel tempo real leve)
 // v1.5.116: metaProjecaoMes = projecaoFat travado (card Faturamento projetado) / diasMes
@@ -1264,7 +1265,7 @@ function calcResumoDiaCore_(dataFmt) {
 }
 
 function resumoDia_(p) {
-  if (!isAdminRequest_(p)) return err_('Acesso negado — resumoDia so para administrador', 403);
+  if (!isGestaoRequest_(p)) return err_('Acesso negado — resumoDia so para gestao (admin/gestor)', 403);
   const dataIn = (p.data || '').trim();
   const dataAlvo = dataIn || fmtData_(new Date());
   if (!parseDataStr_(dataAlvo)) return err_('data invalida — use dd/MM/yyyy', 400);
@@ -2189,6 +2190,8 @@ function buildPainelComandoOperacional_() {
     });
   }
 
+  const intel = alertasInteligentes_({ dataFmt: dataFmt, core: core, incluirRh: true, incluirPonto: true });
+  const alertasMerged = mergeAlertasLista_(intel, alertas, 6);
   const fatHoje = Math.round(core.fat * 100) / 100;
   const resHoje = Math.round(core.resultado * 100) / 100;
   const comp30 = calcMediaFatDiariaUltimosDias_(30);
@@ -2240,7 +2243,7 @@ function buildPainelComandoOperacional_() {
       disponivel: Math.max(0, frotaTotal - frotaEmUso),
       detalhe: frotaDetalhe
     },
-    alertas: alertas.slice(0, 3),
+    alertas: alertasMerged,
     widgets: [
       { id: 'loc', label: 'Locações abertas', valor: nAtiva + nPendente, ctx: ctxLoc, trend: nAtiva + nPendente > 0 ? 'neutral' : 'up' },
       { id: 'fat', label: 'Faturamento hoje', valor: fatHoje, ctx: ctxFat, trend: fatTrend },
@@ -2251,7 +2254,7 @@ function buildPainelComandoOperacional_() {
 }
 
 function comandoOperacional_(p) {
-  if (!isAdminRequest_(p)) return err_('Acesso negado — comandoOperacional so para administrador', 403);
+  if (!isGestaoRequest_(p)) return err_('Acesso negado — comandoOperacional so para gestao (admin/gestor)', 403);
   return resp_(buildPainelComandoOperacional_());
 }
 
@@ -2468,6 +2471,173 @@ function buildAlertasGestao_(ctx) {
         mensagem: viab.motivo,
         acionavel: 'Sócio — priorizar volume'
       });
+    }
+  }
+
+  const ord = { vermelho: 0, amarelo: 1, info: 2 };
+  alertas.sort(function(a, b) { return (ord[a.nivel] || 9) - (ord[b.nivel] || 9); });
+  return alertas;
+}
+
+/** FASE 17 — mescla alertas sem duplicar codigo. */
+function mergeAlertasLista_(extra, base, maxN) {
+  const ord = { vermelho: 0, amarelo: 1, info: 2 };
+  const seen = {};
+  const out = [];
+  function push(a) {
+    if (!a) return;
+    const k = String(a.codigo || a.titulo || '');
+    if (!k || seen[k]) return;
+    seen[k] = 1;
+    out.push(a);
+  }
+  (extra || []).forEach(push);
+  (base || []).forEach(push);
+  out.sort(function(a, b) { return (ord[a.nivel] || 9) - (ord[b.nivel] || 9); });
+  return out.slice(0, maxN || 8);
+}
+
+function calcMediaCustoDiariaUltimosDias_(nDias) {
+  const janela = Math.max(1, Math.min(60, Number(nDias) || 30));
+  const hoje = new Date();
+  hoje.setHours(0, 0, 0, 0);
+  const minTs = hoje.getTime() - (janela - 1) * 86400000;
+  const porDia = {};
+  const shCus = sh_(SH_CUS);
+  const lastCus = shCus.getLastRow();
+  if (lastCus >= DATA_ROW) {
+    const rows = shCus.getRange(DATA_ROW, 1, lastCus - DATA_ROW + 1, 6).getValues();
+    for (let i = 0; i < rows.length; i++) {
+      const r = rows[i];
+      if (!r[0]) continue;
+      const dataFmt = cellToStr_(r[1]);
+      const dt = parseDataStr_(dataFmt);
+      if (!dt) continue;
+      dt.setHours(0, 0, 0, 0);
+      const ts = dt.getTime();
+      if (ts < minTs || ts > hoje.getTime()) continue;
+      porDia[dataFmt] = (porDia[dataFmt] || 0) + (Number(r[5]) || 0);
+    }
+  }
+  const keys = Object.keys(porDia);
+  const total = keys.reduce(function(s, k) { return s + porDia[k]; }, 0);
+  const diasComMov = keys.length;
+  return {
+    media: diasComMov > 0 ? Math.round(total / diasComMov * 100) / 100 : 0,
+    diasComMov: diasComMov,
+    janela: janela
+  };
+}
+
+function calcVeiculosSemLocRecentes_(nDias) {
+  const janela = Math.max(1, Math.min(30, Number(nDias) || 7));
+  const hoje = new Date();
+  hoje.setHours(0, 0, 0, 0);
+  const minTs = hoje.getTime() - (janela - 1) * 86400000;
+  const usados = {};
+  const shLoc = sh_(SH_LOC);
+  const lastLoc = shLoc.getLastRow();
+  if (lastLoc >= DATA_ROW) {
+    const rows = shLoc.getRange(DATA_ROW, 1, lastLoc - DATA_ROW + 1, 16).getValues();
+    for (let i = 0; i < rows.length; i++) {
+      const r = rows[i];
+      if (!r[0] || String(r[14] || '').trim() !== 'Encerrada') continue;
+      const dt = parseDataStr_(cellToStr_(r[1]));
+      if (!dt) continue;
+      dt.setHours(0, 0, 0, 0);
+      const ts = dt.getTime();
+      if (ts < minTs || ts > hoje.getTime()) continue;
+      const veic = String(r[15] || '').trim();
+      if (veic) usados[veic] = 1;
+    }
+  }
+  return veiculosOp_().filter(function(v) { return !usados[v]; });
+}
+
+function gpNomeRhByOpId_(opId) {
+  const id = Number(opId);
+  const row = gpRows_(SH_COLAB_RH).find(function(r) { return Number(r[0]) === id; });
+  return row ? String(row[1] || '').trim() : ('ID ' + id);
+}
+
+/** FASE 17 — alertas proativos (operacao + financeiro + RH). */
+function alertasInteligentes_(opts) {
+  opts = opts || {};
+  const alertas = [];
+  const dataFmt = opts.dataFmt || fmtData_(new Date());
+  const core = opts.core || null;
+  const incluirRh = opts.incluirRh !== false;
+  const incluirPonto = opts.incluirPonto !== false;
+
+  const comp30 = calcMediaFatDiariaUltimosDias_(30);
+  const comp7 = calcMediaFatDiariaUltimosDias_(7);
+  if (comp30.media > 0 && comp7.diasComMov >= 2 && comp7.media < comp30.media * 0.85) {
+    alertas.push({
+      nivel: 'amarelo', codigo: 'FAT_QUEDA_7D', inteligente: true,
+      titulo: 'Faturamento abaixo do ritmo',
+      mensagem: 'Media 7d R$ ' + comp7.media + '/dia vs 30d R$ ' + comp30.media + '/dia (queda >15%).',
+      acionavel: 'Socio — revisar operacao comercial'
+    });
+  }
+
+  const coreDia = core || calcResumoDiaCore_(dataFmt);
+  const mediaCus = calcMediaCustoDiariaUltimosDias_(30);
+  if (coreDia.totalCus > 0 && mediaCus.media > 0 && coreDia.totalCus > mediaCus.media * 1.2) {
+    alertas.push({
+      nivel: 'amarelo', codigo: 'CUSTO_ELEVADO', inteligente: true,
+      titulo: 'Custo do dia elevado',
+      mensagem: 'R$ ' + Math.round(coreDia.totalCus * 100) / 100 + ' hoje vs media R$ ' + mediaCus.media + ' (+20%).',
+      acionavel: 'Ops — conferir lancamentos de custo'
+    });
+  }
+
+  calcVeiculosSemLocRecentes_(7).slice(0, 3).forEach(function(veic) {
+    alertas.push({
+      nivel: 'info', codigo: 'FROTA_PARADA_' + veic.replace(/\s+/g, '_'),
+      inteligente: true,
+      titulo: 'Frota parada',
+      mensagem: veic + ' sem locacoes nos ultimos 7 dias.',
+      acionavel: 'Ops — revisar veiculo ou manutencao'
+    });
+  });
+
+  if (incluirRh) {
+    try {
+      gpRows_(SH_BANCO_HORAS).forEach(function(r) {
+        const opId = Number(r[0]);
+        if (!opId) return;
+        const min = gpParseMinutosHhMm_(r[1]);
+        const horas = Math.abs(min) / 60;
+        if (horas < 20) return;
+        alertas.push({
+          nivel: horas >= 24 ? 'vermelho' : 'amarelo',
+          codigo: 'BANCO_HORAS_' + opId,
+          inteligente: true,
+          titulo: 'Banco de horas no limite',
+          mensagem: gpNomeRhByOpId_(opId) + ' com saldo ' + String(r[1] || '') + ' (limite +/-20h).',
+          acionavel: 'RH — ajustar escala ou compensar'
+        });
+      });
+    } catch (e) {
+      Logger.log('alertasInteligentes_ banco: ' + e.message);
+    }
+  }
+
+  if (incluirPonto) {
+    try {
+      const gpCtx = opts.gpCtx || gpLoadContext_();
+      const ponto = gpAlertasPontoFromCtx_(gpCtx);
+      (ponto.alertas || []).slice(0, 3).forEach(function(a) {
+        alertas.push({
+          nivel: 'amarelo', codigo: 'PONTO_' + a.operadorId,
+          inteligente: true,
+          titulo: 'Ponto pendente',
+          mensagem: a.mensagem,
+          acionavel: 'RH — conferir presenca'
+        });
+      });
+    } catch (e) {
+      Logger.log('alertasInteligentes_ ponto: ' + e.message);
     }
   }
 
@@ -3083,7 +3253,11 @@ function enrichResumoDiaLeading_(core, dataAlvo) {
         breakEvenLocacoesDia: patch.breakEvenLocacoesDia,
         ticketMedioMes: patch.ticketMedioMes,
         faltamBreakEven: patch.breakEvenLocacoesDia != null ? Math.max(0, patch.breakEvenLocacoesDia - nHoje) : null
-      }
+      },
+      alertasInteligentes: (dataAlvo === fmtData_(new Date()))
+        ? alertasInteligentes_({ dataFmt: dataAlvo, core: core, incluirRh: false, incluirPonto: false })
+            .filter(function(a) { return a.codigo === 'CUSTO_ELEVADO' || a.codigo === 'FAT_QUEDA_7D'; })
+        : []
     });
   } catch (e) {
     Logger.log('enrichResumoDiaLeading_: ' + e.message);
@@ -3341,7 +3515,9 @@ function buildKpiMesPayload_(p) {
     projecaoRes: projecaoRes,
     viabilidadeContratacao: viabilidadeContratacao
   });
-  const alertas = buildAlertasGestao_(alertaCtx);
+  const alertasGestao = buildAlertasGestao_(alertaCtx);
+  const intelMes = alertasInteligentes_({ dataFmt: dataHoje, core: calcResumoDiaCore_(dataHoje), incluirPonto: false });
+  const alertas = mergeAlertasLista_(intelMes, alertasGestao, 12);
   const sinalEmpresa = movikidsSinalEmpresa_(mesesRecentes, alertas);
 
   return {
@@ -3419,7 +3595,7 @@ function buildKpiMesPayload_(p) {
 }
 
 function kpiMes_(p) {
-  if (!isAdminRequest_(p)) return err_('Acesso negado — kpiMes so para administrador', 403);
+  if (!isGestaoRequest_(p)) return err_('Acesso negado — kpiMes so para gestao (admin/gestor)', 403);
   const hoje = new Date();
   const mes = p && p.mes ? parseInt(p.mes) : hoje.getMonth() + 1;
   const ano = p && p.ano ? parseInt(p.ano) : hoje.getFullYear();
@@ -6092,6 +6268,17 @@ function isAdminRequest_(p) {
   return adminPinOk_(p);
 }
 
+/** Gestor (authRole) — leitura gestao sem PIN admin. */
+function isGestorRequest_(p) {
+  if (!p) return false;
+  return String(p.authRole || '').trim().toLowerCase() === 'gestor';
+}
+
+/** Admin PIN ou perfil gestor autenticado no FE. */
+function isGestaoRequest_(p) {
+  return isAdminRequest_(p) || isGestorRequest_(p);
+}
+
 /** Supervisor (authRole) ou admin. */
 function isSupervisorOrAdminRequest_(p) {
   if (!p) return false;
@@ -6102,11 +6289,15 @@ function isSupervisorOrAdminRequest_(p) {
 function perfilNorm_(v) {
   const p = String(v || '').trim().toLowerCase();
   if (p === 'supervisor') return 'supervisor';
+  if (p === 'gestor') return 'gestor';
   return 'operador';
 }
 
 function roleFromPerfil_(perfil) {
-  return perfilNorm_(perfil) === 'supervisor' ? 'supervisor' : 'operador';
+  const p = perfilNorm_(perfil);
+  if (p === 'supervisor') return 'supervisor';
+  if (p === 'gestor') return 'gestor';
+  return 'operador';
 }
 
 function operadorRowById_(id) {
@@ -6406,8 +6597,8 @@ function definirPerfilOperadorAdmin_(p) {
   const found = operadorRowById_(p.operadorId || p.id);
   if (!found) return err_('Operador nao encontrado', 404);
   const perfil = perfilNorm_(p.perfil);
-  if (perfil !== 'operador' && perfil !== 'supervisor') {
-    return err_('Perfil invalido — use operador ou supervisor', 400);
+  if (perfil !== 'operador' && perfil !== 'supervisor' && perfil !== 'gestor') {
+    return err_('Perfil invalido — use operador, supervisor ou gestor', 400);
   }
   const sh = operadoresSheet_();
   sh.getRange(found.row, 8).setValue(perfil);

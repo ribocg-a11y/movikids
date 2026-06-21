@@ -1,6 +1,6 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 21/06/2026 (operação **LIVRE** · FASE **16 FE fechada** · FE **v1.8.86** · GAS repo **v1.5.118** · Nova versão Web **pendente**)  
+**Atualizado:** 21/06/2026 (operação **LIVRE** · FASE **17 kickoff** · FE **v1.8.87** · GAS repo **v1.5.119** · Nova versão Web **pendente**)  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **Repo local:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`  
@@ -52,11 +52,11 @@ Mensagem mínima: *"Vamos dar continuidade ao projeto Movi Kids, tem uma pasta n
 
 | Camada | Versão | Verificação |
 |--------|--------|-------------|
-| **Frontend** | **v1.8.86** | https://ribocg-a11y.github.io/movikids/?force=1.8.86 |
-| **Gestão Pessoas** | **v1.8.86** | https://ribocg-a11y.github.io/movikids/gestao-pessoas.html?force=1.8.86 |
-| **Service Worker** | **1.8.86** | `sw.js` |
+| **Frontend** | **v1.8.87** | https://ribocg-a11y.github.io/movikids/?force=1.8.87 |
+| **Gestão Pessoas** | **v1.8.87** | https://ribocg-a11y.github.io/movikids/gestao-pessoas.html?force=1.8.87 |
+| **Service Worker** | **1.8.87** | `sw.js` |
 | **Holerite** | **mk-holerite.js** | CNPJ **66.664.255/0001-67** · PDF/imprimir |
-| **Apps Script** | repo **v1.5.118** · clasp **OK** · ping **v1.5.107** · Web **165** | ⚠️ **Nova versão Web pendente** (comandoOperacional + gráfico acum.) |
+| **Apps Script** | repo **v1.5.119** · clasp **OK** · ping **v1.5.107** · Web **165** | ⚠️ **Nova versão Web pendente** (alertasInteligentes + gestor) |
 | **Aba FOLHA** | **OK** (I25) | B68 ~5269,96 |
 | **Design System** | **v1.1** | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` (tokens `--mk-widget-*`) |
 
@@ -107,11 +107,10 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 
 | # | Ação | Quem | Status |
 |---|------|------|--------|
-| 1 | **Nova versão Web GAS v1.5.118** (comandoOperacional + metaProjecaoMes + frota detalhe) | **Sócio** | ⏳ pendente |
-| 2 | Dashboard PC: **Centro de comando** + gráfico acum. `?force=1.8.86` | **Você** | ✅ FE live |
-| 3 | Tablet: `?force=1.8.86` no PWA (fora do pico) · regressão F5/F7/F10/F11 | **Ops** | ⏳ |
-| 4 | **FASE 16** — FE fechado (16.1–16.8) | **Agente** | ✅ · homolog tablet pós-GAS |
-| 5 | **Kickoff FASE 17** — alertas inteligentes + perfil Gestor | **Agente** | ⏳ próximo ciclo |
+| 1 | **Nova versão Web GAS v1.5.119** (alertasInteligentes + perfil gestor) | **Sócio** | ⏳ pendente |
+| 2 | Dashboard: alertas **Proativo** + Caixa custo elevado `?force=1.8.87` | **Você** | ✅ FE live após push |
+| 3 | Definir operador **gestor** na planilha (Operadores > Perfil) | **Ops** | ⏳ |
+| 4 | **FASE 17** — alertas inteligentes + permissões gestor | **Agente** | 🟡 17.1–17.2 entregues |
 
 **Nota ping:** string `v1.5.107` até Nova versão Web — código v1.5.117 já no editor.
 

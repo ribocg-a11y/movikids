@@ -54,6 +54,10 @@ function apiParamsComAuth_() {
       const pin = typeof mkAuthGetAdminPin_ === 'function' ? mkAuthGetAdminPin_() : '';
       if (pin) { out.adminPin = pin; out.authRole = 'admin'; }
     }
+  } else if (typeof mkAuthIsGestor === 'function' && mkAuthIsGestor()) {
+    out.authRole = 'gestor';
+    const s = typeof mkAuthGetSession === 'function' ? mkAuthGetSession() : null;
+    if (s && s.id) out.operadorId = s.id;
   }
   return out;
 }

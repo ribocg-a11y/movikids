@@ -45,6 +45,11 @@ function abrirAdmin() {
     adminLogin();
     return;
   }
+  if (typeof mkAuthIsGestor === 'function' && mkAuthIsGestor()) {
+    showGestorSidebar();
+    irAdmin('dashboard');
+    return;
+  }
   if (typeof mkAuthIsSupervisor === 'function' && mkAuthIsSupervisor()) {
     showSupervisorSidebar();
     irAdmin('caixa');
@@ -919,14 +924,16 @@ function mkAlertModalOpen_() {
 
 function mkAlertItemEl_(a, d, inModal) {
   const row = document.createElement('div');
-  row.className = 'mk-alert-item ' + (a.nivel || 'info');
+  row.className = 'mk-alert-item ' + (a.nivel || 'info') + (a.inteligente ? ' inteligente' : '');
   const dismissed = (function() {
     try { return !!sessionStorage.getItem(mkAlertDismissKey_(a.codigo, d)); } catch (e) { return false; }
   })();
   if (dismissed && !inModal) return null;
+  const badge = a.inteligente ? '<span class="mk-alert-intel-badge">Proativo</span>' : '';
   row.innerHTML =
     '<span class="mk-alert-item-icon">' + mkAlertIcon_(a.nivel) + '</span>' +
     '<div class="mk-alert-item-body">' +
+      badge +
       '<div class="mk-alert-item-title">' + (a.titulo || a.codigo || 'Alerta') + '</div>' +
       '<div class="mk-alert-item-msg">' + (a.mensagem || '') + '</div>' +
       (a.acionavel ? '<div class="mk-alert-item-act">' + a.acionavel + '</div>' : '') +
@@ -961,8 +968,9 @@ function updateDashAlertBadge_(d) {
 function renderAlertStrip_(d) {
   const strip = document.getElementById('mk-alert-strip');
   if (!strip) return;
-  const isAdm = (typeof mkAuthIsAdmin === 'function' && mkAuthIsAdmin()) || !!window.isAdmin;
-  if (!isAdm || !d || !d.ok || !d.alertas) {
+  const isGestao = (typeof mkAuthIsGestao_ === 'function' && mkAuthIsGestao_()) ||
+    (typeof mkAuthIsAdmin === 'function' && mkAuthIsAdmin()) || !!window.isAdmin;
+  if (!isGestao || !d || !d.ok || !d.alertas) {
     strip.style.display = 'none';
     updateDashAlertBadge_(null);
     return;
@@ -997,7 +1005,8 @@ function renderAlertStrip_(d) {
 let commandCenterData = null;
 
 function mkAdminMobCmdIsAdmin_() {
-  return (typeof mkAuthIsAdmin === 'function' && mkAuthIsAdmin()) || !!window.isAdmin;
+  return (typeof mkAuthIsGestao_ === 'function' && mkAuthIsGestao_()) ||
+    (typeof mkAuthIsAdmin === 'function' && mkAuthIsAdmin()) || !!window.isAdmin;
 }
 
 function mkAdminMobCmdShouldShow_() {
@@ -1163,8 +1172,10 @@ function renderCommandCenter_(d) {
       alertsEl.hidden = false;
       alertsEl.innerHTML = alertas.map(function(a) {
         const cls = a.nivel === 'vermelho' ? ' vermelho' : (a.nivel === 'amarelo' ? ' amarelo' : '');
-        return '<div class="mk-cmd-alert' + cls + '"><strong>' + (a.titulo || '') + '</strong> — '
-          + (a.mensagem || '') + '</div>';
+        const intel = a.inteligente ? ' inteligente' : '';
+        const badge = a.inteligente ? '<span class="mk-cmd-alert-badge">Proativo</span> ' : '';
+        return '<div class="mk-cmd-alert' + cls + intel + '">' + badge + '<strong>' + (a.titulo || '') + '</strong> — '
+          + (a.mensagem || '') + (a.acionavel ? ' · <em>' + a.acionavel + '</em>' : '') + '</div>';
       }).join('');
     }
   }
@@ -2692,6 +2703,21 @@ function renderCaixaFromResumo_(dataFmt, r) {
       }
     }
     const cxBe = document.getElementById('cx-breakeven');
+    const cxIntel = document.getElementById('cx-intel-alert');
+    if (cxIntel) {
+      const intel = r.alertasInteligentes || [];
+      if (intel.length) {
+        cxIntel.hidden = false;
+        cxIntel.innerHTML = intel.map(function(a) {
+          const cls = a.nivel === 'vermelho' ? ' vermelho' : (a.nivel === 'amarelo' ? ' amarelo' : '');
+          return '<div class="mk-caixa-intel' + cls + '"><span class="mk-caixa-intel-badge">Proativo</span> <strong>'
+            + (a.titulo || '') + '</strong> — ' + (a.mensagem || '') + '</div>';
+        }).join('');
+      } else {
+        cxIntel.hidden = true;
+        cxIntel.innerHTML = '';
+      }
+    }
     const ld = r.leadingDia;
     if (cxBe && ld && ld.breakEvenLocacoesDia != null) {
       cxBe.style.display = 'block';

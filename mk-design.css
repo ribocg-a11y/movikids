@@ -1861,6 +1861,41 @@
 }
 .mk-cmd-alert.amarelo { border-color: #E65100; background: rgba(230, 81, 0, 0.08); }
 .mk-cmd-alert.vermelho { border-color: #C62828; background: rgba(198, 40, 40, 0.08); }
+.mk-cmd-alert.inteligente { border-left-width: 4px; }
+.mk-cmd-alert-badge,
+.mk-alert-intel-badge,
+.mk-caixa-intel-badge {
+  display: inline-block;
+  font-size: 9px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: rgba(21, 101, 192, 0.12);
+  color: #1565C0;
+  margin-bottom: 4px;
+}
+.mk-alert-item.inteligente { border-left: 3px solid #1565C0; }
+.mk-caixa-intel-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 10px;
+}
+.mk-caixa-intel {
+  font-family: 'Nunito', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 8px 12px;
+  border-radius: 12px;
+  border-left: 4px solid #1565C0;
+  background: rgba(21, 101, 192, 0.06);
+  color: #333;
+}
+.mk-caixa-intel.amarelo { border-color: #E65100; background: rgba(230, 81, 0, 0.08); }
+.mk-caixa-intel.vermelho { border-color: #C62828; background: rgba(198, 40, 40, 0.08); }
+.mk-caixa-intel-wrap[hidden] { display: none !important; }
 
 /* Dashboard — cockpit + strips glass */
 .mk-admin-page .mk-exec-cockpit,

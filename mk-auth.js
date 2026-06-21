@@ -245,6 +245,11 @@
     const s = getSession();
     return !!(s && s.role === 'supervisor');
   };
+  window.mkAuthIsGestor = () => {
+    const s = getSession();
+    return !!(s && s.role === 'gestor');
+  };
+  window.mkAuthIsGestao_ = () => mkAuthIsAdmin() || mkAuthIsGestor() || !!(typeof window !== 'undefined' && window.isAdmin);
   window.mkAuthIsSupervisorOrAdmin_ = () => mkAuthIsAdmin() || mkAuthIsSupervisor();
   /** ADM pode encerrar/fechar alerta sem SMS de extra (emergencia operacional). */
   window.mkAdminIgnoraSmsObrigatorio_ = () => {
@@ -515,13 +520,15 @@
 
   function applyRoleNav_() {
     const admin = mkAuthIsAdmin() || !!(typeof window !== 'undefined' && window.isAdmin);
+    const gestor = mkAuthIsGestor();
     const supervisor = mkAuthIsSupervisor();
     const sbGer = document.getElementById('sb-gerenciar-btn');
-    if (sbGer) sbGer.style.display = (admin || supervisor) ? 'none' : '';
+    if (sbGer) sbGer.style.display = (admin || supervisor || gestor) ? 'none' : '';
     const s = getSession();
     const sbColab = document.getElementById('sbn-colab');
     if (sbColab) sbColab.hidden = !(s && s.nome);
     if (admin && typeof showAdminSidebar === 'function') showAdminSidebar();
+    else if (gestor && typeof showGestorSidebar === 'function') showGestorSidebar();
     else if (supervisor && typeof showSupervisorSidebar === 'function') showSupervisorSidebar();
     else if (typeof hideAdminSidebar === 'function') hideAdminSidebar();
   }
@@ -1181,15 +1188,15 @@
 
   window.mkOpSetPerfil = async function mkOpSetPerfil(id, nome, perfilAtual) {
     fecharMenusOperador_();
-    const atual = perfilAtual === 'supervisor' ? 'supervisor' : 'operador';
+    const atual = (perfilAtual === 'supervisor' || perfilAtual === 'gestor') ? perfilAtual : 'operador';
     const novo = prompt(
-      'Perfil de ' + nome + ':\n\noperador = balcao padrao\nsupervisor = editar/cancelar + caixa/historico\n\nDigite operador ou supervisor:',
+      'Perfil de ' + nome + ':\n\noperador = balcao padrao\nsupervisor = caixa/historico\n gestor = dashboard + equipe (sem CONFIG)\n\nDigite operador, supervisor ou gestor:',
       atual
     );
     if (novo === null) return;
     const limpo = String(novo).trim().toLowerCase();
-    if (limpo !== 'operador' && limpo !== 'supervisor') {
-      toast('Use operador ou supervisor', 'warning');
+    if (limpo !== 'operador' && limpo !== 'supervisor' && limpo !== 'gestor') {
+      toast('Use operador, supervisor ou gestor', 'warning');
       return;
     }
     try {
@@ -1290,7 +1297,7 @@
       el.innerHTML = ops.map(op => {
         const badgeCls = op.hasPin ? 'ok' : 'warn';
         const badgeTxt = op.hasPin ? 'PIN definido' : 'Sem PIN';
-        const perfil = (op.perfil === 'supervisor') ? 'Supervisor' : 'Operador';
+        const perfil = (op.perfil === 'supervisor') ? 'Supervisor' : ((op.perfil === 'gestor') ? 'Gestor' : 'Operador');
         const logadoAgora = sessaoId && Number(op.id) === sessaoId;
         const nomeJs = JSON.stringify(op.nome || '');
         return `<div class="mk-op-card" data-id="${op.id}">
