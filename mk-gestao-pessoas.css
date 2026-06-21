@@ -11,6 +11,16 @@ body {
   background: var(--bg);
 }
 
+/* Standalone gestao-pessoas.html — mk-app.css trava html/body overflow:hidden (balcão PWA).
+   Colaborador no PC precisa rolar hub + holerite; setas só rolam se a página for scrollável. */
+html,
+body {
+  height: auto;
+  min-height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
 #gp-app {
   min-height: 100dvh;
   background: var(--bg);

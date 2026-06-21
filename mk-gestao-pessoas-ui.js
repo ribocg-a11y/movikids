@@ -91,7 +91,7 @@
     }
 
     function gpPreviewVoltarAdmin_() {
-      var v = global.MK_VERSION || '1.8.95';
+      var v = global.MK_VERSION || '1.8.96';
       global.location.href = 'index.html?force=' + encodeURIComponent(v) + '#operadores';
     }
 
@@ -1223,7 +1223,7 @@ function gpVoltarInicio() {
     gpPreviewVoltarAdmin_();
     return;
   }
-  var v = global.MK_VERSION || '1.8.95';
+  var v = global.MK_VERSION || '1.8.96';
   global.location.href = 'index.html?force=' + encodeURIComponent(v);
 }
 function colabSairProd() {
@@ -1293,6 +1293,15 @@ function initGpUi() {
   global.gpComExpandAll_ = gpComExpandAll_;
   global.gpComCollapseAll_ = gpComCollapseAll_;
   global.abrirModulo = abrirModulo;
+  document.addEventListener('keydown', function (e) {
+    var app = document.getElementById('gp-app');
+    if (!app || app.style.display === 'none') return;
+    var ae = document.activeElement;
+    var tag = ae && ae.tagName;
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+    if (e.key === 'ArrowDown') { window.scrollBy({ top: 80, behavior: 'smooth' }); e.preventDefault(); }
+    else if (e.key === 'ArrowUp') { window.scrollBy({ top: -80, behavior: 'smooth' }); e.preventDefault(); }
+  });
   global.confirmarPonto = confirmarPonto;
   global.salvarCadastro = salvarCadastro;
   setInterval(function () {
