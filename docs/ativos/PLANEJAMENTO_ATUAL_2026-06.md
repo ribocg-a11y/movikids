@@ -1,7 +1,7 @@
 # MOVI KIDS — Planejamento atual (pós-FASE 5)
 
-**Atualizado:** 20/06/2026 (FASE 15 **✅ homolog tablet** · jornada v1.5.111 · FE **v1.8.71**)  
-**Produção:** FE **v1.8.71** · GAS **v1.5.111** Web **165** (20/06)  
+**Atualizado:** 21/06/2026 (operação **LIVRE** · protocolo **OK** · FE **v1.8.82** · GAS repo **v1.5.116**)  
+**Produção:** FE **v1.8.82** · GAS repo **v1.5.116** · Web **165** · Nova versão Web **pendente**  
 **Documentos irmãos:** `PLANO_PRIORIDADES_2026-06.md` · `MAPA_FASES.md` · `DEPLOY_ATUAL.md` · `HANDOFF_NOVO_CHAT.md`  
 **Ciclo ativo:** **`PLANO_FASES_6_15_COCKPIT_EXECUTIVO_2026-06.md`** · FASE 15: **`FASE_15_GESTAO_PESSOAS.md`** ✅  
 **Próximo ciclo:** **`PLANO_PREMIUM_ONEUI_FASES_16_22_2026-06.md`** ← manual Premium + One UI (20/06/2026)
@@ -183,11 +183,13 @@ Legenda: **P0** bloqueia operação · **P1** valor imediato · **P2** próximo 
 
 **Ao homologar FASE 15** (tablet + abas planilha) · meio ciclo **FASE 10**.
 
-**Sequência imediata (20/06):**
+**Sequência imediata (21/06):**
 
-1. PC: `gestao-pessoas.html?force=1.8.71` — holerite PDF + CNPJ · auth DNA
-2. **Nova versão Web GAS v1.5.111** (ping atual v1.5.107) — **janela sem loc aberta**
-3. Tablet loja — 1 locação pós-I32 + F5/F7/F10/F11
-4. **FASE 16 Premium** — próximo ciclo (janela aberta · ver `MAPA_FASES.md`)
+1. ✅ `check-operacao-livre` — **0 loc** (21/06 08:48)
+2. ✅ `TESTE_PROTOCOLO_DIAGNOSTICO` — **OK** (21/06 08:53)
+3. ⏳ **Nova versão Web GAS v1.5.116** — **sócio** (janela aberta)
+4. PC: Dashboard `?force=1.8.82` — gráfico Projetado acum. vs Real acum.
+5. Tablet: `?force=1.8.82` no PWA (fora do pico)
+6. **FASE 16 Premium** — kickoff após GAS Web (`PLANO_PREMIUM_ONEUI_FASES_16_22_2026-06.md`)
 
 Incidentes: **I29–I34** — `MAPA_ERROS_FALHAS_BUGS.md`

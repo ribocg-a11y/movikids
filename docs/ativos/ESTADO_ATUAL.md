@@ -1,4 +1,4 @@
-# MOVI KIDS — Estado atual (20/06/2026)
+# MOVI KIDS — Estado atual (21/06/2026)
 
 Referência única para alinhamento local × produção.
 
@@ -29,16 +29,16 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 | Camada | Versão repo | URL / ID |
 |--------|-------------|----------|
-| **Frontend** | **v1.8.71** | https://ribocg-a11y.github.io/movikids/?force=1.8.71 · **Colaboradores:** `gestao-pessoas.html?force=1.8.71` |
+| **Frontend** | **v1.8.82** | https://ribocg-a11y.github.io/movikids/?force=1.8.82 · **Colaboradores:** `gestao-pessoas.html?force=1.8.82` |
 | **Design System** | **v1.0** | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
-| **Apps Script (código + Web)** | repo **v1.5.111** · Web **versão 165** (20/06 15:05) | Deploy `AKfycbwakQ...` · CONFIG prod: Carro 04 + 10 veículos ✅ |
+| **Apps Script (código + Web)** | repo **v1.5.116** · clasp OK · Web **165** · ping **v1.5.107** | ⚠️ Nova versão Web pendente |
 | **Aba FOLHA** | memorial B68 **OK** | [gid=179040058](https://docs.google.com/spreadsheets/d/1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618/edit#gid=179040058) · B68 ~5269,96 |
 
 **Editor Apps Script:** https://script.google.com/home/projects/19SIhkX9Tk7FiJA1JXu1OrUwssHdr3H5zc8q3rOjmBvqgWfXuHlk8xyf8/edit
 
 **Teste rápido GAS (ping):**  
 https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec?action=ping  
-→ ping string `v1.5.107` (cosmético) · Web **165** funcional · homolog tablet **20/06** ✅
+→ ping string `v1.5.107` até Nova versão Web v1.5.116 · operação **LIVRE** 21/06 · protocolo **OK**
 
 **URL morta (não usar):** `AKfycbzc...` → 404
 

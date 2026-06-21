@@ -1,6 +1,6 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 20/06/2026 (doc alinhado · operação **LIVRE** · FASE 15 **homolog tablet ✅** · FE **v1.8.71** · GAS **v1.5.111** Web **165**)  
+**Atualizado:** 21/06/2026 (operação **LIVRE** · protocolo **OK** · FE **v1.8.82** · GAS repo **v1.5.116** · Nova versão Web **pendente**)  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **Repo local:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`  
@@ -48,15 +48,15 @@ Mensagem mínima: *"Vamos dar continuidade ao projeto Movi Kids, tem uma pasta n
 
 ---
 
-## Produção (20/06/2026)
+## Produção (21/06/2026)
 
 | Camada | Versão | Verificação |
 |--------|--------|-------------|
-| **Frontend** | **v1.8.71** | https://ribocg-a11y.github.io/movikids/?force=1.8.71 |
-| **Gestão Pessoas** | **v1.8.71** | https://ribocg-a11y.github.io/movikids/gestao-pessoas.html?force=1.8.71 |
-| **Service Worker** | **1.8.71** | `sw.js` |
+| **Frontend** | **v1.8.82** | https://ribocg-a11y.github.io/movikids/?force=1.8.82 |
+| **Gestão Pessoas** | **v1.8.82** | https://ribocg-a11y.github.io/movikids/gestao-pessoas.html?force=1.8.82 |
+| **Service Worker** | **1.8.82** | `sw.js` |
 | **Holerite** | **mk-holerite.js** | CNPJ **66.664.255/0001-67** · PDF/imprimir |
-| **Apps Script** | repo **v1.5.111** · Web **versão 165** (20/06 15:05) · ping string **v1.5.107** (cosmético) | ✅ funcional — Carro 04 + 10 veículos confirmados |
+| **Apps Script** | repo **v1.5.116** · clasp **OK** · ping **v1.5.107** · Web **165** | ⚠️ **Nova versão Web pendente** (gráfico projetado acum.) |
 | **Aba FOLHA** | **OK** (I25) | B68 ~5269,96 |
 | **Design System** | **v1.0** | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
 
@@ -101,21 +101,20 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 
 **Fonte de verdade versão:** `mk-version.js` → ping GAS → `DEPLOY_ATUAL.md` → este handoff.
 
-## Próximo passo (20/06/2026)
+## Próximo passo (21/06/2026)
 
-**FASE 15** ✅ homolog tablet · **FASE 16 Premium** — disponível quando você quiser kickoff
+**Janela segura aberta** — `check-operacao-livre` **0 loc** · `TESTE_PROTOCOLO_DIAGNOSTICO` **OK** (21/06 08:53)
 
-| # | Ação | Quem |
-|---|------|------|
-| 1 | ~~Nova versão Web GAS v1.5.111~~ | ✅ versão **165** (20/06 15:05) |
-| 2 | ~~Tablet: 1 locação pós-I32 + `?force=1.8.71`~~ | ✅ **Homolog loja** (20/06 — sem duplicata, sem SMS no Fechar) |
-| 3 | ~~Holerite Raykelly (PDF + CNPJ admin/colaborador)~~ | ✅ **Homolog loja** (20/06) |
-| 4 | **I33** latência `carregarInicio` — só se tablet ainda lento | **Agente** (sob demanda) |
-| 5 | Kickoff **FASE 16** mock Premium One UI | **Agente/dev** — janela aberta |
+| # | Ação | Quem | Status |
+|---|------|------|--------|
+| 1 | **Nova versão Web GAS v1.5.116** (metaProjecaoMes / gráfico acum.) | **Sócio** | ⏳ pendente |
+| 2 | Dashboard PC: gráfico **Projetado acum. vs Real acum.** `?force=1.8.82` | **Você** | ✅ FE live |
+| 3 | Tablet: `?force=1.8.82` no PWA balcão (fora do pico) | **Ops** | ⏳ |
+| 4 | Kickoff **FASE 16** Centro de Comando + One UI | **Agente** | próximo após GAS Web |
 
-**Nota ping:** `action=ping` ainda retorna string `v1.5.107` (cosmético) — operação e RH OK em v1.5.111.
+**Nota ping:** string `v1.5.107` até Nova versão Web — código v1.5.116 já no editor (`prepare-gas-push` OK 20/06).
 
-Doc: `FASE_15_GESTAO_PESSOAS.md` · fases: **`MAPA_FASES.md`** · incidentes **I31–I34**
+Doc: `PLANO_PREMIUM_ONEUI_FASES_16_22_2026-06.md` · fases: **`MAPA_FASES.md`**
 
 ---
 
@@ -196,7 +195,7 @@ Invoke-RestMethod "https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5
 .\scripts\pre-push-check.ps1
 ```
 
-Esperado: ping alinhado ao header `.gs` · Pages **1.8.71** · pre-push verde.
+Esperado: ping alinhado após Nova versão Web · Pages **1.8.82** · pre-push verde · operação livre.
 
 ---
 
@@ -211,4 +210,4 @@ Esperado: ping alinhado ao header `.gs` · Pages **1.8.71** · pre-push verde.
 
 ---
 
-*Próxima revisão: kickoff FASE 16 ou I33 se tablet voltar a travar.*
+*Próxima revisão: após Nova versão Web v1.5.116 · kickoff FASE 16.*
