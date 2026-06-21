@@ -101,8 +101,11 @@ function showPage(name, opts = {}) {
   if (name==='custos') loadCustosHoje();
   if (name==='historico') buscarHistorico();
   if (name==='admin' && isAdmin) { resetAdminTimer(); carregarKPIs(); }
-  if (name==='sistema' && isAdmin) { resetAdminTimer(); setTimeout(atualizarDiagnostico, 80); carregarKPIs(); }
-  if (name==='operadores' && isAdmin && typeof mkGpAdmLoad_ === 'function') mkGpAdmLoad_();
+  if (name==='sistema' && isAdmin) { resetAdminTimer(); setTimeout(atualizarDiagnostico, 80); carregarKPIs(); setTimeout(mkSistemaRefreshFrotaHint_, 150); }
+  if (name==='operadores' && typeof mkGpAdmLoad_ === 'function') {
+    const canOps = isAdmin || (typeof mkAuthIsGestor === 'function' && mkAuthIsGestor());
+    if (canOps) mkGpAdmLoad_();
+  }
   if (typeof showAdminHomeKpis === 'function') showAdminHomeKpis(typeof kpiHubStub_ === 'function' ? kpiHubStub_() : kpiData);
 }
 

@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.119
+// MOVI KIDS — Google Apps Script v1.5.120
+// v1.5.120: FASE 17 — meta abaixo 3 dias + alertasInteligentes no painel RH
 // v1.5.119: FASE 17 — alertasInteligentes_ + perfil gestor (authRole)
 // v1.5.118: FASE 16 — comandoOperacional comparativo 30d + frotaDetalhe por veículo
 // v1.5.117: FASE 16 — comandoOperacional (painel tempo real leve)
@@ -1550,6 +1551,72 @@ function metaOperadorTurno_(p) {
   return resp_(payload);
 }
 
+/** Loc/dia por operador com meta (AUDITORIA + turno). */
+function metaOperadorLocByDay_(opId, opNome, cfg) {
+  const byDay = {};
+  if (!cfg || !cfg.inicio) return byDay;
+  const inicioCmp = dateToCmp_(cfg.inicio);
+  const mesAtual = fmtData_(new Date()).slice(3);
+  try {
+    const shAud = ss_().getSheetByName('AUDITORIA');
+    if (shAud && shAud.getLastRow() >= 2) {
+      const dados = shAud.getRange(2, 1, shAud.getLastRow() - 1, 8).getValues();
+      dados.forEach(function(r) {
+        if (String(r[1] || '').trim() !== 'encerrarLocacao') return;
+        if (!metaOperadorNomeMatch_(String(r[7] || ''), opNome)) return;
+        const ts = auditTsMeta_(r[0]);
+        if (!ts.data || ts.data.slice(3) !== mesAtual) return;
+        if (dateToCmp_(ts.data) < inicioCmp) return;
+        const dow = weekdayFromDataStr_(ts.data);
+        const shift = cfg.escala[String(dow)];
+        if (!shift) return;
+        if (!metaOperadorInShift_(ts.mins, shift) && !ts.semHora) return;
+        byDay[ts.data] = (byDay[ts.data] || 0) + 1;
+      });
+    }
+  } catch (e) {
+    Logger.log('metaOperadorLocByDay_: ' + e.message);
+  }
+  return byDay;
+}
+
+/** FASE 17 — operador <50% meta em 3 dias seguidos de turno. */
+function calcMetaAbaixoAlertas_() {
+  const alertas = [];
+  const hoje = new Date();
+  hoje.setHours(0, 0, 0, 0);
+  [2, 3].forEach(function(opId) {
+    const cfg = metaOperadorCfg_(opId);
+    if (!cfg || cfg.ativo === false || !cfg.inicio) return;
+    const found = operadorRowById_(opId);
+    if (!found) return;
+    const op = operadorObjFromRow_(found.data);
+    const byDay = metaOperadorLocByDay_(opId, op.nome, cfg);
+    const meta = Number(cfg.meta) || META_LOC_TURNO_PADRAO_;
+    const limite = meta * 0.5;
+    let diasAbaixo = 0;
+    for (let i = 1; i <= 10 && diasAbaixo < 3; i++) {
+      const d = new Date(hoje);
+      d.setDate(d.getDate() - i);
+      const shift = cfg.escala[String(d.getDay())];
+      if (!shift) continue;
+      const n = byDay[fmtData_(d)] || 0;
+      if (n < limite) diasAbaixo++;
+      else break;
+    }
+    if (diasAbaixo >= 3) {
+      alertas.push({
+        nivel: 'amarelo', codigo: 'META_ABAIXO_' + opId, inteligente: true, categoria: 'meta',
+        titulo: 'Meta abaixo do esperado',
+        mensagem: op.nome + ': menos de 50% da meta (' + meta + ' loc/turno) em 3 dias seguidos.',
+        acionavel: 'Ops — conversar com operador',
+        operadorId: opId, operador: op.nome
+      });
+    }
+  });
+  return alertas;
+}
+
 // ── KPIs ADMIN — v1.5.3: fatPorTipo inclui Triciclo ──────────
 const DIA_NOME_PT_ = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
 
@@ -2568,6 +2635,7 @@ function alertasInteligentes_(opts) {
   const core = opts.core || null;
   const incluirRh = opts.incluirRh !== false;
   const incluirPonto = opts.incluirPonto !== false;
+  const incluirMeta = opts.incluirMeta !== false;
 
   const comp30 = calcMediaFatDiariaUltimosDias_(30);
   const comp7 = calcMediaFatDiariaUltimosDias_(7);
@@ -2620,6 +2688,9 @@ function alertasInteligentes_(opts) {
       });
     } catch (e) {
       Logger.log('alertasInteligentes_ banco: ' + e.message);
+    }
+    if (incluirMeta) {
+      calcMetaAbaixoAlertas_().forEach(function(a) { alertas.push(a); });
     }
   }
 
@@ -7740,7 +7811,7 @@ function gpEnsureEscalaRow_(opId, competencia, dias, obs) {
 }
 
 function painelGestaoPessoasAdmin_(p) {
-  if (!adminPinOk_(p)) return err_('Acesso negado — PIN admin 1416', 403);
+  if (!isGestaoRequest_(p)) return err_('Acesso negado — gestao pessoas (admin/gestor)', 403);
   try {
     const comp = String(p.competencia || gpCompetenciaAtual_());
     const ctx = gpLoadContext_();
@@ -7751,6 +7822,11 @@ function painelGestaoPessoasAdmin_(p) {
     const sessao = opsResp.sessaoAtiva || null;
     const sessaoId = sessao && sessao.operadorId ? Number(sessao.operadorId) : 0;
     const alertasPack = gpAlertasPontoFromCtx_(ctx);
+    const intelRh = alertasInteligentes_({ incluirRh: true, incluirPonto: false, incluirMeta: true })
+      .filter(function(a) {
+        const c = String(a.codigo || '');
+        return c.indexOf('BANCO_HORAS_') === 0 || c.indexOf('META_ABAIXO_') === 0;
+      });
     const colaboradores = [];
     const seen = {};
 
@@ -7837,8 +7913,12 @@ function painelGestaoPessoasAdmin_(p) {
     return resp_({
       competencia: comp, colaboradores: colaboradores, escala: escala, folha: folha,
       alertas: alertasPack.alertas, alertasTotal: alertasPack.total,
-      kpis: { total: colaboradores.length, presentes: presentes, comTurno: comTurno, alertas: alertasPack.total },
-      sessaoAtiva: sessao, versao: 'v1.5.111'
+      alertasInteligentes: intelRh,
+      kpis: {
+        total: colaboradores.length, presentes: presentes, comTurno: comTurno,
+        alertas: alertasPack.total, alertasIntel: intelRh.length
+      },
+      sessaoAtiva: sessao, versao: 'v1.5.120'
     });
   } catch (ex) {
     return err_('Abas Gestao Pessoas ausentes — rode instalar abas ou scripts/criar-abas-gestao-pessoas.ps1', 503);

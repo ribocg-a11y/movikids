@@ -349,6 +349,37 @@ function opCfgSyncTextareasFromVisual_() {
   if (taP) taP.value = JSON.stringify(data.precos, null, 2);
 }
 
+function mkSistemaRefreshFrotaHint_() {
+  const el = document.getElementById('mk-sys-frota-hint');
+  if (!el) return;
+  const isGestao = (typeof mkAuthIsGestao_ === 'function' && mkAuthIsGestao_()) ||
+    (typeof mkAuthIsAdmin === 'function' && mkAuthIsAdmin()) || !!window.isAdmin;
+  if (!isGestao) { el.hidden = true; return; }
+
+  function renderFromAlerts(list) {
+    const frota = (list || []).filter(function(a) {
+      return a && a.codigo && String(a.codigo).indexOf('FROTA_PARADA') === 0;
+    });
+    if (!frota.length) { el.hidden = true; el.innerHTML = ''; return; }
+    el.hidden = false;
+    el.innerHTML = '<span class="mk-sys-frota-hint-badge">Proativo</span> ' +
+      frota.map(function(a) { return '<span class="mk-sys-frota-hint-item">' + (a.mensagem || a.titulo) + '</span>'; }).join('');
+  }
+
+  if (commandCenterData && commandCenterData.alertas) {
+    renderFromAlerts(commandCenterData.alertas);
+    return;
+  }
+  const authP = typeof apiParamsComAuth_ === 'function' ? apiParamsComAuth_() : {};
+  api({ action: 'comandoOperacional', ...authP }, 20000).then(function(d) {
+    if (d && d.ok) {
+      commandCenterData = d;
+      renderFromAlerts(d.alertas);
+    }
+  }).catch(function() { el.hidden = true; });
+}
+window.mkSistemaRefreshFrotaHint_ = mkSistemaRefreshFrotaHint_;
+
 function opCfgRenderVeiculos_(veiculosOverride) {
   const box = document.getElementById('mk-opcfg-veic-list');
   if (!box) return;

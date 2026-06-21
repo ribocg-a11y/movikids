@@ -1897,6 +1897,49 @@
 .mk-caixa-intel.vermelho { border-color: #C62828; background: rgba(198, 40, 40, 0.08); }
 .mk-caixa-intel-wrap[hidden] { display: none !important; }
 
+.mk-sys-frota-hint {
+  margin: 0 0 12px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border-left: 4px solid #5E35B1;
+  background: rgba(94, 53, 177, 0.08);
+  font-family: 'Nunito', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  color: #4527A0;
+  line-height: 1.45;
+}
+.mk-sys-frota-hint[hidden] { display: none !important; }
+.mk-sys-frota-hint-badge {
+  display: inline-block;
+  font-size: 9px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: rgba(94, 53, 177, 0.15);
+  color: #5E35B1;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+.mk-sys-frota-hint-item { display: inline; }
+.mk-sys-frota-hint-item + .mk-sys-frota-hint-item::before { content: ' · '; opacity: 0.6; }
+
+.gp-adm-intel-badge {
+  display: inline-block;
+  font-size: 9px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: rgba(21, 101, 192, 0.12);
+  color: #1565C0;
+  margin-bottom: 4px;
+}
+.gp-adm-act { display: block; margin-top: 4px; color: var(--txt3, #888); font-weight: 600; }
+
 /* Dashboard — cockpit + strips glass */
 .mk-admin-page .mk-exec-cockpit,
 .mk-admin-page .mk-decisao-panel,

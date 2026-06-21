@@ -39,7 +39,18 @@
   }
 
   function gpAdmPinParams_() {
+    if (typeof apiParamsComAuth_ === 'function') return apiParamsComAuth_();
     return typeof mkAuthAdminPinParams_ === 'function' ? mkAuthAdminPinParams_() : {};
+  }
+
+  function gpAdmAlertRowHtml_(a, badgeLbl, badgeCls) {
+    const nome = a.nome || a.operador || (a.operadorId ? ('ID ' + a.operadorId) : 'Alerta');
+    const msg = a.mensagem || a.turno || '';
+    const intel = a.inteligente ? '<span class="gp-adm-intel-badge">Proativo</span> ' : '';
+    return '<div class="gp-adm-row"><div class="gp-adm-av">' + gpAdmInitial_(nome) + '</div>' +
+      '<div class="gp-adm-row-body">' + intel + '<strong>' + esc(a.titulo || nome) + '</strong><small>' + esc(msg) + '</small>' +
+      (a.acionavel ? '<small class="gp-adm-act">' + esc(a.acionavel) + '</small>' : '') +
+      '</div><span class="gp-adm-badge ' + (badgeCls || 'warn') + '">' + esc(badgeLbl || 'Alerta') + '</span></div>';
   }
 
   function gpAdmInitial_(nome) {
@@ -210,10 +221,12 @@
     const el = document.getElementById('gp-adm-kpis');
     if (!el || !gpAdmData_) return;
     const k = gpAdmData_.kpis || {};
+    const intelN = k.alertasIntel || (gpAdmData_.alertasInteligentes || []).length;
     el.innerHTML =
       '<div class="gp-adm-kpi"><div class="gp-adm-kpi-val">' + (k.total || 0) + '</div><div class="gp-adm-kpi-lbl">Colaboradores</div><div class="gp-adm-kpi-ctx">' + (k.comTurno || 0) + ' com turno cadastrado</div></div>' +
       '<div class="gp-adm-kpi"><div class="gp-adm-kpi-val" style="color:var(--green)">' + (k.presentes || 0) + '</div><div class="gp-adm-kpi-lbl">Presentes agora</div><div class="gp-adm-kpi-ctx">de ' + (k.total || 0) + ' na equipe ativa</div></div>' +
-      '<div class="gp-adm-kpi"><div class="gp-adm-kpi-val" style="color:var(--orange)">' + (k.alertas || 0) + '</div><div class="gp-adm-kpi-lbl">Alertas ponto</div><div class="gp-adm-kpi-ctx">' + (k.alertas > 0 ? 'Conferir aba Presença' : 'Tudo ok no ponto') + '</div></div>';
+      '<div class="gp-adm-kpi"><div class="gp-adm-kpi-val" style="color:var(--orange)">' + ((k.alertas || 0) + intelN) + '</div><div class="gp-adm-kpi-lbl">Alertas</div><div class="gp-adm-kpi-ctx">' +
+      (intelN > 0 ? (intelN + ' proativos · ') : '') + ((k.alertas || 0) > 0 ? 'Conferir aba Hoje' : 'Tudo ok') + '</div></div>';
   }
 
   function gpAdmRenderHoje_() {
@@ -221,17 +234,22 @@
     const teamEl = document.getElementById('gp-adm-equipe');
     if (!gpAdmData_ || !teamEl) return;
 
-    const alertas = gpAdmData_.alertas || [];
+    const intel = gpAdmData_.alertasInteligentes || [];
+    const ponto = gpAdmData_.alertas || [];
     if (alertEl) {
-      if (!alertas.length) {
-        alertEl.innerHTML = '<div class="gp-adm-card"><p class="gp-adm-muted">Nenhum alerta de ponto no momento.</p></div>';
+      if (!intel.length && !ponto.length) {
+        alertEl.innerHTML = '<div class="gp-adm-card"><p class="gp-adm-muted">Nenhum alerta no momento.</p></div>';
       } else {
-        alertEl.innerHTML = '<div class="gp-adm-card gp-adm-card--alert"><h3>⚠ Alertas de ponto</h3>' +
-          alertas.map(function (a) {
-            return '<div class="gp-adm-row"><div class="gp-adm-av">' + gpAdmInitial_(a.nome) + '</div>' +
-              '<div class="gp-adm-row-body"><strong>' + esc(a.nome) + '</strong><small>' + esc(a.mensagem || a.turno) + '</small></div>' +
-              '<span class="gp-adm-badge warn">Pendente</span></div>';
-          }).join('') + '</div>';
+        let html = '';
+        if (intel.length) {
+          html += '<div class="gp-adm-card gp-adm-card--alert"><h3>Proativos</h3>' +
+            intel.map(function (a) { return gpAdmAlertRowHtml_(a, 'RH', 'warn'); }).join('') + '</div>';
+        }
+        if (ponto.length) {
+          html += '<div class="gp-adm-card gp-adm-card--alert"><h3>Ponto</h3>' +
+            ponto.map(function (a) { return gpAdmAlertRowHtml_(a, 'Pendente', 'warn'); }).join('') + '</div>';
+        }
+        alertEl.innerHTML = html;
       }
     }
 

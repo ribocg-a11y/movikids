@@ -29,7 +29,8 @@ function Add-C17Check([string]$Name, [string]$Status, [string]$Detail = "") {
 
 $gsPath = Join-Path $RepoRoot "MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs"
 foreach ($pair in @(
-  @{ file = $gsPath; needle = "function alertasInteligentes_"; name = "gas.alertasInteligentes" },
+  @{ file = $gsPath; needle = "function calcMetaAbaixoAlertas_"; name = "gas.metaAbaixo" },
+  @{ file = $gsPath; needle = "alertasInteligentes"; name = "gas.painelIntelRh" },
   @{ file = $gsPath; needle = "function isGestaoRequest_"; name = "gas.isGestaoRequest" },
   @{ file = $gsPath; needle = "perfil !== 'gestor'"; name = "gas.perfilGestor" },
   @{ file = Join-Path $RepoRoot "mk-auth.js"; needle = "mkAuthIsGestor"; name = "fe.mkAuthIsGestor" },
@@ -53,7 +54,7 @@ try {
   $cmd = Invoke-CmdApi @{ action = "comandoOperacional"; adminPin = $AdminPin }
   if (-not $cmd.ok) {
     if ($cmd.erro -match "desconhecida") {
-      Add-C17Check "comandoOperacional" "warn" "publique GAS v1.5.119+ Nova versao Web"
+      Add-C17Check "comandoOperacional" "warn" "publique GAS v1.5.120+ Nova versao Web"
       $result.summary = "FE OK - GAS Web pendente"
     } else {
       throw "comandoOperacional: $($cmd.erro)"

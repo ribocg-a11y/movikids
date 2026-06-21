@@ -1,6 +1,6 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 21/06/2026 (operação **LIVRE** · FASE **17 kickoff** · FE **v1.8.87** · GAS repo **v1.5.119** · Nova versão Web **pendente**)  
+**Atualizado:** 21/06/2026 (FASE **17** · FE **v1.8.88** · GAS repo **v1.5.120** · Nova versão Web **pendente**)  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **Repo local:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`  
@@ -52,11 +52,11 @@ Mensagem mínima: *"Vamos dar continuidade ao projeto Movi Kids, tem uma pasta n
 
 | Camada | Versão | Verificação |
 |--------|--------|-------------|
-| **Frontend** | **v1.8.87** | https://ribocg-a11y.github.io/movikids/?force=1.8.87 |
-| **Gestão Pessoas** | **v1.8.87** | https://ribocg-a11y.github.io/movikids/gestao-pessoas.html?force=1.8.87 |
-| **Service Worker** | **1.8.87** | `sw.js` |
+| **Frontend** | **v1.8.88** | https://ribocg-a11y.github.io/movikids/?force=1.8.88 |
+| **Gestão Pessoas** | **v1.8.88** | `gestao-pessoas.html?force=1.8.88` |
+| **Service Worker** | **1.8.88** | `sw.js` |
 | **Holerite** | **mk-holerite.js** | CNPJ **66.664.255/0001-67** · PDF/imprimir |
-| **Apps Script** | repo **v1.5.119** · clasp **OK** · ping **v1.5.107** · Web **165** | ⚠️ **Nova versão Web pendente** (alertasInteligentes + gestor) |
+| **Apps Script** | repo **v1.5.120** · clasp **OK** · ping **v1.5.107** · Web **165** | ⚠️ **Nova versão Web pendente** |
 | **Aba FOLHA** | **OK** (I25) | B68 ~5269,96 |
 | **Design System** | **v1.1** | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` (tokens `--mk-widget-*`) |
 
@@ -107,10 +107,10 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 
 | # | Ação | Quem | Status |
 |---|------|------|--------|
-| 1 | **Nova versão Web GAS v1.5.119** (alertasInteligentes + perfil gestor) | **Sócio** | ⏳ pendente |
-| 2 | Dashboard: alertas **Proativo** + Caixa custo elevado `?force=1.8.87` | **Você** | ✅ FE live após push |
-| 3 | Definir operador **gestor** na planilha (Operadores > Perfil) | **Ops** | ⏳ |
-| 4 | **FASE 17** — alertas inteligentes + permissões gestor | **Agente** | 🟡 17.1–17.2 entregues |
+| 1 | **Nova versão Web GAS v1.5.120** (meta abaixo + alertas RH) | **Sócio** | ⏳ pendente |
+| 2 | Operadores > Hoje: alertas **Proativos** `?force=1.8.88` | **Você** | ✅ FE após push |
+| 3 | Definir operador **gestor** (Operadores > Perfil) | **Ops** | ⏳ |
+| 4 | **FASE 17** — alertas + gestor | **Agente** | 🟡 17.1–17.4 entregues |
 
 **Nota ping:** string `v1.5.107` até Nova versão Web — código v1.5.117 já no editor.
 

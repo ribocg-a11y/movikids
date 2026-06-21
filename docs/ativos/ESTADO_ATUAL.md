@@ -29,9 +29,9 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 | Camada | Versão repo | URL / ID |
 |--------|-------------|----------|
-| **Frontend** | **v1.8.86** | https://ribocg-a11y.github.io/movikids/?force=1.8.86 · **Colaboradores:** `gestao-pessoas.html?force=1.8.86` |
+| **Frontend** | **v1.8.88** | https://ribocg-a11y.github.io/movikids/?force=1.8.88 · **Colaboradores:** `gestao-pessoas.html?force=1.8.88` |
 | **Design System** | **v1.1** | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
-| **Apps Script (código + Web)** | repo **v1.5.118** · clasp OK · Web **165** · ping **v1.5.107** | ⚠️ Nova versão Web pendente |
+| **Apps Script (código + Web)** | repo **v1.5.120** · clasp OK · Web **165** · ping **v1.5.107** | ⚠️ Nova versão Web pendente |
 | **Aba FOLHA** | memorial B68 **OK** | [gid=179040058](https://docs.google.com/spreadsheets/d/1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618/edit#gid=179040058) · B68 ~5269,96 |
 
 **Editor Apps Script:** https://script.google.com/home/projects/19SIhkX9Tk7FiJA1JXu1OrUwssHdr3H5zc8q3rOjmBvqgWfXuHlk8xyf8/edit
@@ -106,6 +106,9 @@ https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPe
 
 | Versão | Entrega |
 |--------|---------|
+| **v1.8.88** + **GAS v1.5.120** | FASE 17 — meta abaixo 3d · alertas RH Operadores · frota parada Sistema |
+| **v1.8.87** + **GAS v1.5.119** | FASE 17 — alertasInteligentes_ · perfil gestor · badge Proativo |
+| **v1.8.86** + **GAS v1.5.118** | FASE 16 fechada — sidebar mobile admin · comando comparativo 30d |
 | **v1.8.68** | Nova locação — grid de **Carros** em 2x2 (simetria com Pelúcias) |
 | **v1.8.67** | Frota FE — **Carro 04** em Nova locação/painel/filtros |
 | **GAS repo v1.5.111** | `VEICULOS_VALIDOS` inclui **Carro 04** (ping produção ainda v1.5.107) |
