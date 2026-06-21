@@ -6,16 +6,16 @@
   <meta name="theme-color" content="#1565C0">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <title>Movi Kids — Colaboradores</title>
-  <script src="mk-canonical-host.js?v=1.8.96"></script>
+  <script src="mk-canonical-host.js?v=1.8.97"></script>
   <script>window.MK_GP_PROD = true;</script>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="mk-design.css?v=1.8.96">
-  <link rel="stylesheet" href="mk-app.css?v=1.8.96">
-  <link rel="stylesheet" href="mk-gestao-pessoas.css?v=1.8.96">
-  <script src="mk-version.js?v=1.8.96"></script>
-  <script src="mk-globals.js?v=1.8.96"></script>
-  <script src="mk-api.js?v=1.8.96"></script>
-  <script src="mk-gestao-pessoas.js?v=1.8.96"></script>
+  <link rel="stylesheet" href="mk-design.css?v=1.8.97">
+  <link rel="stylesheet" href="mk-app.css?v=1.8.97">
+  <link rel="stylesheet" href="mk-gestao-pessoas.css?v=1.8.97">
+  <script src="mk-version.js?v=1.8.97"></script>
+  <script src="mk-globals.js?v=1.8.97"></script>
+  <script src="mk-api.js?v=1.8.97"></script>
+  <script src="mk-gestao-pessoas.js?v=1.8.97"></script>
 </head>
 <body>
   <!--
@@ -130,6 +130,11 @@
               <span class="mk-hub-door-title">Meu pagamento</span>
               <span class="mk-hub-door-sub">Demonstrativo</span>
             </button>
+            <button type="button" class="mk-hub-door mk-hub-door--sys" onclick="abrirModulo('dados')">
+              <span class="mk-hub-door-icon">📋</span>
+              <span class="mk-hub-door-title">Meus dados</span>
+              <span class="mk-hub-door-sub">Cadastro RH</span>
+            </button>
           </div>
         </div>
       </section>
@@ -153,7 +158,7 @@
       </section>
 
       <section class="mock-screen" id="s-cadastro-bloq">
-        <button type="button" class="mock-back" onclick="go('s-colab-hub')">← Meu painel</button>
+        <button type="button" class="mock-back" id="gp-bloq-back" onclick="go('s-colab-hub')">← Meu painel</button>
         <div class="mock-h1">Cadastro incompleto</div>
         <p class="mock-lead" id="bloq-lead"></p>
         <div class="mock-card">
@@ -163,15 +168,18 @@
           <div class="mock-prog"><div class="mock-prog-fill" id="bloq-bar"></div></div>
           <ul class="mock-checklist" id="bloq-list"></ul>
         </div>
-        <div class="mock-note err">Preencha todos os campos obrigatórios (*) para liberar o ponto.</div>
-        <button type="button" class="mk-btn" onclick="go('s-cadastro-form')">Completar cadastro</button>
+        <div class="mock-note err" id="bloq-note">Preencha todos os campos obrigatórios (*) para liberar o balcão e o ponto.</div>
+        <button type="button" class="mk-btn" onclick="goCadastroForm(true); go('s-cadastro-form')">Completar cadastro</button>
       </section>
 
       <section class="mock-screen" id="s-cadastro-form">
-        <button type="button" class="mock-back" onclick="go('s-cadastro-bloq')">← Voltar</button>
+        <button type="button" class="mock-back" id="gp-cad-back" onclick="gpCadastroBack_()">← Voltar</button>
         <div class="mock-h1" id="cad-titulo">Cadastro</div>
         <div class="mock-card" id="cad-form"></div>
-        <button type="button" class="mk-btn" onclick="salvarCadastro()">Salvar cadastro</button>
+        <div id="gp-cad-actions">
+          <button type="button" class="mk-btn sec" id="gp-cad-edit-btn" hidden onclick="goCadastroForm(true)">Editar dados</button>
+          <button type="button" class="mk-btn" id="gp-cad-save-btn" onclick="salvarCadastro()">Salvar cadastro</button>
+        </div>
       </section>
 
       <section class="mock-screen" id="s-metas">
@@ -197,7 +205,7 @@
     </div>
   </div>
 
-  <script src="mk-holerite.js?v=1.8.96"></script>
-  <script src="mk-gestao-pessoas-ui.js?v=1.8.96"></script>
+  <script src="mk-holerite.js?v=1.8.97"></script>
+  <script src="mk-gestao-pessoas-ui.js?v=1.8.97"></script>
 </body>
 </html>

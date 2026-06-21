@@ -540,6 +540,16 @@
     location.href = 'gestao-pessoas.html?force=' + encodeURIComponent(v) + '&from=index&_=' + Date.now();
   };
 
+  /** Balcão bloqueado por cadastro RH incompleto — abre Colaboradores no fluxo de completar. */
+  function mkRedirectCadastroRh_(operadorId, msg) {
+    const v = window.MK_VERSION || '1.8.97';
+    const id = operadorId || (selectedOp && selectedOp.id) || '';
+    const qs = 'gestao-pessoas.html?completeCadastro=1&opId=' + encodeURIComponent(id) +
+      '&force=' + encodeURIComponent(v) + '&from=balcao&_=' + Date.now();
+    if (msg) showErr('mk-login-pin-err', msg);
+    setTimeout(function () { location.href = qs; }, 900);
+  }
+
   /** ADM — pré-visualizar hub colaborador (somente leitura, PIN 1416). */
   window.mkAbrirColaboradoresPreview_ = async function mkAbrirColaboradoresPreview_() {
     if (typeof mkAuthEnsureAdminPin_ === 'function') {
@@ -547,7 +557,7 @@
       if (!ok) return;
     }
     try { sessionStorage.removeItem('mk-mock-colab-uid'); } catch (e) { /* ignore */ }
-    const v = window.MK_VERSION || '1.8.96';
+    const v = window.MK_VERSION || '1.8.97';
     location.href = 'gestao-pessoas.html?admPreview=1&force=' + encodeURIComponent(v) + '&from=admin&_=' + Date.now();
   };
 
@@ -812,6 +822,11 @@
     try {
       const d = await apiCall({ action: 'loginOperador', operadorId: selectedOp.id, pin });
       if (!d.ok) {
+        if (d.code === 428 || d.cadastroIncompleto) {
+          mkRedirectCadastroRh_(d.operadorId || selectedOp.id, d.erro || 'Cadastro RH incompleto. Redirecionando para Colaboradores…');
+          clearPins(loginPins);
+          return;
+        }
         if (d.code === 409 || (d.erro && d.erro.indexOf('ja esta logado') >= 0)) {
           handleSessaoOcupada_(d, 'mk-login-pin-err');
           clearPins(loginPins);

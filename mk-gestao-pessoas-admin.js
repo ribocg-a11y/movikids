@@ -151,6 +151,35 @@
     return out;
   }
 
+  function gpAdmCadastroLabels_() {
+    return [
+      { key: 'nomeCompleto', label: 'Nome completo' },
+      { key: 'cpf', label: 'CPF' },
+      { key: 'nascimento', label: 'Data nascimento' },
+      { key: 'telefone', label: 'Telefone / WhatsApp' },
+      { key: 'email', label: 'E-mail' },
+      { key: 'endereco', label: 'Endereço completo' },
+      { key: 'emergencia', label: 'Contato emergência' },
+      { key: 'admissao', label: 'Data admissão' },
+      { key: 'pix', label: 'Chave PIX' }
+    ];
+  }
+
+  function gpAdmRenderCadastroBlock_(c) {
+    const cad = c.cadastro || {};
+    const ok = c.cadastroOk === true;
+    const rows = gpAdmCadastroLabels_().map(function (f) {
+      const v = String(cad[f.key] || '').trim();
+      return '<div><span>' + esc(f.label) + '</span><strong>' + esc(v || '—') + '</strong></div>';
+    }).join('');
+    const badge = ok
+      ? '<span class="gp-adm-badge ok">Cadastro completo</span>'
+      : '<span class="gp-adm-badge warn">' + (c.cadastroPct || 0) + '% · incompleto</span>';
+    return '<div class="gp-adm-ficha-cadastro">' +
+      '<div class="gp-adm-ficha-cadastro-head"><h4>Dados cadastrais</h4>' + badge + '</div>' +
+      '<div class="gp-adm-ficha-grid gp-adm-ficha-cadastro-grid">' + rows + '</div></div>';
+  }
+
   function gpAdmRenderFichaResumo_() {
     const el = document.getElementById('gp-adm-ficha-resumo');
     if (!el || !gpAdmData_) return;
@@ -177,9 +206,9 @@
       '<div><span>Escala hoje</span><strong>' + esc(c.escalaHoje || '—') + '</strong></div>' +
       '<div><span>Meta / loc hoje</span><strong>' + (m.alvo || 20) + ' · ' + (m.atual || 0) + '</strong></div>' +
       '<div><span>Loc no mês</span><strong>' + (m.locMes || 0) + '</strong></div>' +
-      '<div><span>Cadastro RH</span><strong>' + (c.cadastroPct || 0) + '%</strong></div>' +
+      '<div><span>Cadastro RH</span><strong>' + (c.cadastroOk ? 'Completo' : (c.cadastroPct || 0) + '%') + '</strong></div>' +
       '<div><span>Ponto hoje</span><strong>' + (c.ponto && c.ponto.entrada ? esc(c.ponto.entrada) + (c.ponto.saida ? ' → ' + esc(c.ponto.saida) : '') : 'Sem registro') + '</strong></div>' +
-      '</div>' + intelBlock;
+      '</div>' + gpAdmRenderCadastroBlock_(c) + intelBlock;
   }
 
   function gpAdmRenderPresenca_() {

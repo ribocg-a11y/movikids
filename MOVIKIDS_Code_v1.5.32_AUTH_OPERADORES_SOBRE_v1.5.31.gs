@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.125
+// MOVI KIDS — Google Apps Script v1.5.126
+// v1.5.126: FASE 15b.5 — cadastro RH obrigatorio + salvarCadastroColaborador + bloqueio balcao
 // v1.5.125: FASE 15b.4 — historicoDesempenho colaborador (loc/mês, dias meta, 6 meses)
 // v1.5.124: FASE 15b.3 — COMUNICADOS_RH + listar/salvar admin + painel colaborador
 // v1.5.123: perf — carregarInicio leitura única LOCAÇÕES + cache 12s; resumoDia/gp cache
@@ -413,6 +414,7 @@ function dispatchMoviAction_(p, method) {
       case 'instalarAbasGestaoPessoasAdmin': return instalarAbasGestaoPessoasAdmin_(p);
       case 'listarComunicadosRhAdmin': return listarComunicadosRhAdmin_(p);
       case 'salvarComunicadoRhAdmin': return salvarComunicadoRhAdmin_(p);
+      case 'salvarCadastroColaborador': return salvarCadastroColaborador_(p);
       default:
         return err_('Ação desconhecida: ' + action, 400);
     }
@@ -6595,6 +6597,20 @@ function loginOperador_(p) {
   if (!validPinFormat_(pin)) return err_('PIN invalido', 400);
   const computed = hashPin_(pin, salt);
   if (!computed || computed !== hash) return err_('PIN incorreto', 401);
+  const rh = gpColabRhByOpId_(op.id);
+  if (rh) {
+    const cad = gpCadastroFromRhObj_(rh);
+    if (!gpCadastroOk_(cad)) {
+      return ContentService.createTextOutput(JSON.stringify({
+        ok: false,
+        erro: 'Cadastro RH incompleto (' + gpCalcCadastroPct_(cad) + '%). Complete em Colaboradores antes de entrar no balcao.',
+        code: 428,
+        cadastroIncompleto: true,
+        cadastroPct: gpCalcCadastroPct_(cad),
+        operadorId: op.id
+      })).setMimeType(ContentService.MimeType.JSON);
+    }
+  }
   const sh = operadoresSheet_();
   sh.getRange(found.row, 7).setValue(fmtData_(new Date()) + ' ' + fmtHoraLocal_(new Date()));
   registrarSessaoOperadorAtiva_(op);
@@ -6950,8 +6966,40 @@ function gpColabRhByOpId_(opId) {
   return null;
 }
 
-function gpColabRhObjFromRow_(row, idx) {
+function gpCadastroReqKeys_() {
+  return ['nomeCompleto', 'cpf', 'nascimento', 'telefone', 'endereco', 'emergencia', 'admissao', 'pix'];
+}
+
+function gpCadastroFromRhObj_(colab) {
+  if (!colab) return {};
   return {
+    nomeCompleto: String(colab.nome || '').trim(),
+    cpf: String(colab.cpf || '').trim(),
+    nascimento: cellToStr_(colab.nascimento),
+    telefone: String(colab.telefone || '').trim(),
+    email: String(colab.email || '').trim(),
+    endereco: String(colab.endereco || '').trim(),
+    emergencia: String(colab.emergencia || '').trim(),
+    admissao: cellToStr_(colab.admissao),
+    pix: String(colab.pix || '').trim()
+  };
+}
+
+function gpCalcCadastroPct_(cad) {
+  const req = gpCadastroReqKeys_();
+  let ok = 0;
+  req.forEach(function (k) {
+    if (String((cad && cad[k]) || '').trim()) ok++;
+  });
+  return Math.round(ok / req.length * 100);
+}
+
+function gpCadastroOk_(cad) {
+  return gpCalcCadastroPct_(cad) >= 100;
+}
+
+function gpColabRhObjFromRow_(row, idx) {
+  const obj = {
     operadorId: Number(row[0]), nome: String(row[1] || '').trim(), funcao: String(row[2] || '').trim(),
     cpf: String(row[3] || '').trim(), nascimento: cellToStr_(row[4]), telefone: String(row[5] || '').trim(),
     email: String(row[6] || '').trim(), endereco: String(row[7] || '').trim(), emergencia: String(row[8] || '').trim(),
@@ -6959,8 +7007,45 @@ function gpColabRhObjFromRow_(row, idx) {
     vaDiario: Number(row[12]) || Math.round(GP_VA_MENSAL_PADRAO_ / 26 * 100) / 100,
     vaMensal: GP_VA_MENSAL_PADRAO_, metaLocDia: Number(row[13]) || 20, bonusMeta: Number(row[14]) || 100,
     turno: String(row[15] || '').trim(), ativo: String(row[16] || 'SIM').toUpperCase() !== 'NAO',
-    cadastroPct: Number(row[17]) || 0, row: GP_DATA_ROW + idx
+    row: GP_DATA_ROW + idx
   };
+  obj.cadastroPct = gpCalcCadastroPct_(gpCadastroFromRhObj_(obj));
+  return obj;
+}
+
+function salvarCadastroColaborador_(p) {
+  const opId = Number(p.operadorId || p.id || 0);
+  const auth = gpVerifyPinColaborador_(opId, p.pin);
+  if (!auth.ok) return auth.err;
+  const colab = gpColabRhByOpId_(opId);
+  if (!colab || !colab.row) return err_('Colaborador sem cadastro RH na planilha', 404);
+  try {
+    const sh = gpSheet_(SH_COLAB_RH);
+    const r = colab.row;
+    const nome = String(p.nomeCompleto || p.nome || colab.nome || '').trim();
+    const cpf = String(p.cpf || '').trim();
+    const nasc = String(p.nascimento || '').trim();
+    const tel = String(p.telefone || '').trim();
+    const email = String(p.email || '').trim();
+    const end = String(p.endereco || '').trim();
+    const emerg = String(p.emergencia || '').trim();
+    const adm = String(p.admissao || '').trim();
+    const pix = String(p.pix || '').trim();
+    const cad = { nomeCompleto: nome, cpf: cpf, nascimento: nasc, telefone: tel, email: email, endereco: end, emergencia: emerg, admissao: adm, pix: pix };
+    if (!gpCadastroOk_(cad)) return err_('Preencha todos os campos obrigatorios do cadastro', 400);
+    sh.getRange(r, 2).setValue(nome);
+    sh.getRange(r, 4, r, 10).setValues([[cpf, nasc, tel, email, end, emerg, adm]]);
+    sh.getRange(r, 11).setValue(pix);
+    const pct = 100;
+    sh.getRange(r, 18).setValue(pct);
+    sh.getRange(r, 19).setValue(fmtData_(new Date()) + ' ' + fmtHoraLocal_(new Date()));
+    sh.getRange(r, 5).setNumberFormat('@');
+    sh.getRange(r, 10).setNumberFormat('@');
+    try { CacheService.getScriptCache().remove('gp_painel_adm_' + gpNormCompetencia_(gpCompetenciaAtual_())); } catch (e) { /* ok */ }
+    return resp_({ cadastro: cad, cadastroPct: pct, cadastroOk: true, versao: 'v1.5.126' });
+  } catch (ex) {
+    return err_('Erro ao salvar cadastro: ' + ex.message, 500);
+  }
 }
 
 function gpLoadContext_() {
@@ -7778,7 +7863,8 @@ function gpBuildPainelColaboradorPayload_(opId, comp, colab, operador) {
     colaborador: {
       id: opId, label: colab.nome || opNome, funcao: colab.funcao, turno: colab.turno,
       admissao: colab.admissao, cadastroPct: colab.cadastroPct,
-      cadastro: { nomeCompleto: colab.nome, cpf: colab.cpf, nascimento: colab.nascimento, telefone: colab.telefone, email: colab.email, endereco: colab.endereco, emergencia: colab.emergencia, admissao: colab.admissao, pix: colab.pix }
+      cadastroOk: gpCadastroOk_(gpCadastroFromRhObj_(colab)),
+      cadastro: gpCadastroFromRhObj_(colab),
     },
     competencia: comp,
     ponto: { statusHoje: pontoHoje.status, folha: gpFolhaPontoColab_(opId, comp), hoje: pontoHoje, jornada: jornada },
@@ -7793,7 +7879,7 @@ function gpBuildPainelColaboradorPayload_(opId, comp, colab, operador) {
     },
     comunicados: gpComunicadosForOp_(opId),
     historicoDesempenho: historicoDesempenho,
-    versao: 'v1.5.125'
+    versao: 'v1.5.126'
   };
 }
 
@@ -7972,10 +8058,13 @@ function painelGestaoPessoasAdmin_(p) {
       const bonusDias = metas.bonusDias || 0;
       const folhaPonto = gpFolhaPontoFromCtx_(id, comp, ctx);
       const escalaHoje = gpEscalaCelulaHojeFromCtx_(id, ctx, comp);
+      const cadObj = rh ? gpCadastroFromRhObj_(rh) : null;
+      const cadPct = rh ? gpCalcCadastroPct_(cadObj) : 0;
       colaboradores.push({
         id: id, nome: op.nome, hasPin: op.hasPin, perfil: op.perfil || 'operador',
         funcao: rh ? rh.funcao : 'Operador', turno: rh ? rh.turno : '', admissao: rh ? rh.admissao : '',
-        cadastroPct: rh ? rh.cadastroPct : 0, temRh: !!rh,
+        cadastroPct: cadPct, cadastroOk: cadObj ? gpCadastroOk_(cadObj) : null,
+        cadastro: cadObj, temRh: !!rh,
         escalaHoje: escalaHoje, escalaFolga: escalaHoje !== null && gpEscalaEhFolga_(escalaHoje),
         ponto: ponto, logadoBalcao: sessaoId === id,
         metas: { alvo: metas.alvo, atual: metas.atual, locMes: locMes, bonusDias: bonusDias, bonusTotal: metas.bonusTotal || 0 },
@@ -7994,11 +8083,14 @@ function painelGestaoPessoasAdmin_(p) {
       const locMes = metas.locMes || 0;
       const bonusDias = metas.bonusDias || 0;
       const escalaHoje = gpEscalaCelulaHojeFromCtx_(id, ctx, comp);
+      const cadObj = rh ? gpCadastroFromRhObj_(rh) : null;
+      const cadPct = rh ? gpCalcCadastroPct_(cadObj) : 0;
       colaboradores.push({
         id: id, nome: rh ? rh.nome : String(r[1] || ''), hasPin: false, perfil: 'operador',
         funcao: rh ? rh.funcao : 'Colaborador', turno: rh ? rh.turno : '', admissao: rh ? rh.admissao : '',
         cpf: rh ? rh.cpf : String(r[3] || '').trim(),
-        cadastroPct: rh ? rh.cadastroPct : 0, temRh: true,
+        cadastroPct: cadPct, cadastroOk: cadObj ? gpCadastroOk_(cadObj) : null,
+        cadastro: cadObj, temRh: true,
         escalaHoje: escalaHoje, escalaFolga: escalaHoje !== null && gpEscalaEhFolga_(escalaHoje),
         ponto: ponto, logadoBalcao: false,
         metas: { alvo: metas.alvo, atual: metas.atual, locMes: locMes, bonusDias: bonusDias, bonusTotal: metas.bonusTotal || 0 },

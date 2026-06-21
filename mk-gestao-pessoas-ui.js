@@ -42,6 +42,7 @@
     let gpSessionPin = '';
     let gpAdmPreviewMode_ = false;
     let gpAdmPreviewPin_ = '';
+    let gpCadastroForced_ = false;
     let admPreviewPins = [];
 
     const GP_DEMO_COLAB = {
@@ -91,7 +92,7 @@
     }
 
     function gpPreviewVoltarAdmin_() {
-      var v = global.MK_VERSION || '1.8.96';
+      var v = global.MK_VERSION || '1.8.97';
       global.location.href = 'index.html?force=' + encodeURIComponent(v) + '#operadores';
     }
 
@@ -300,6 +301,13 @@
 
     function go(id) {
       window.scrollTo(0, 0);
+      if (gpCadastroForced_ && !gpAdmPreviewMode_) {
+        var allowedCad = ['s-cadastro-bloq', 's-cadastro-form'];
+        if (allowedCad.indexOf(id) < 0 && id !== 's-colab-login' && id !== 's-colab-pin') {
+          showBloqueio(true);
+          return;
+        }
+      }
       if (MK_GP_PROD) {
         if (id === 's-colab-login') {
           setGpView('auth-login');
@@ -393,7 +401,35 @@
       return tipo === 'd' ? '− ' + s : s;
     }
     function cadastroPct(p) { const r=CAMPOS.filter(f=>f.req); return Math.round(r.filter(f=>String(p.cadastro[f.key]||'').trim()).length/r.length*100); }
-    function cadastroOk(p) { return cadastroPct(p)===100; }
+    function cadastroOk(p) {
+      if (p && p.cadastroOk === true) return true;
+      return cadastroPct(p) === 100;
+    }
+
+    function gpAfterColabLogin_(uid) {
+      colabLogado = uid;
+      pickColab = uid;
+      if (gpAdmPreviewMode_) {
+        go('s-colab-hub');
+        return;
+      }
+      var p = PESSOAS[uid];
+      if (!cadastroOk(p)) {
+        gpCadastroForced_ = true;
+        showBloqueio(true);
+        return;
+      }
+      gpCadastroForced_ = false;
+      go('s-colab-hub');
+    }
+
+    function gpCadastroBack_() {
+      if (gpCadastroForced_ && !gpAdmPreviewMode_) {
+        showBloqueio(true);
+        return;
+      }
+      go(cadastroOk(PESSOAS[colabLogado]) ? 's-colab-hub' : 's-cadastro-bloq');
+    }
 
     let balcaoPins = [];
     let adminPins = [];
@@ -527,6 +563,24 @@
         if (btn) btn.disabled = !sel.value;
       }
     }
+    function gpTryCompleteCadastroUrl_() {
+      try {
+        var q = new URLSearchParams(location.search);
+        if (q.get('completeCadastro') !== '1') return;
+        var opId = q.get('opId') || q.get('operadorId');
+        if (!opId) return;
+        pickColab = String(opId);
+        sessionStorage.setItem('mk-mock-colab-uid', pickColab);
+        var sel = document.getElementById('colab-select');
+        var btnProceed = document.getElementById('colab-btn-proceed');
+        if (sel) {
+          sel.value = pickColab;
+          if (btnProceed) btnProceed.disabled = false;
+        }
+        showColabSelectErr('Complete seu cadastro RH para acessar o balcão.');
+        colabProceed();
+      } catch (e) { /* ignore */ }
+    }
     function renderColabLogin() {
       pickColab = null;
       sessionStorage.removeItem('mk-mock-colab-uid');
@@ -547,6 +601,7 @@
             renderColabSelect(gpColabList.map(function (o) {
               return { id: o.id, nome: o.nome || o.id, funcao: o.funcao };
             }));
+            gpTryCompleteCadastroUrl_();
           } else {
             renderColabSelect(null, true);
           }
@@ -556,6 +611,7 @@
             renderColabSelect(gpColabList.map(function (o) {
               return { id: o.id, nome: o.nome || o.id, funcao: o.funcao };
             }));
+            gpTryCompleteCadastroUrl_();
           }).catch(function (e) {
             if (!cachedColab || !cachedColab.length) renderColabSelect(null, false, e.message);
           });
@@ -564,6 +620,7 @@
         renderColabSelect(Object.values(PESSOAS).map(function (p) {
           return { id: p.id, nome: p.label, funcao: p.funcao };
         }));
+        gpTryCompleteCadastroUrl_();
         return;
       }
 
@@ -665,9 +722,7 @@
             PESSOAS[uid] = Object.assign({}, PESSOAS[uid] || {}, mapped, { pin: pin });
             gpSessionPin = pin;
             showColabErr('');
-            colabLogado = uid;
-            pickColab = uid;
-            go('s-colab-hub');
+            gpAfterColabLogin_(uid);
           }).catch(function (e) {
             showColabErr(e.message || 'PIN incorreto ou erro de conexão.');
             clearPinInputs(colabPins);
@@ -682,9 +737,7 @@
           return;
         }
         showColabErr('');
-        colabLogado = uid;
-        pickColab = uid;
-        go('s-colab-hub');
+        gpAfterColabLogin_(uid);
       } catch (e) {
         showColabErr('Erro ao entrar: ' + e.message);
       }
@@ -846,7 +899,7 @@
       const escCtx = folga ? 'Sem turno hoje' : ('Turno ' + escala);
       const escVal = folga ? 'Folga' : escala;
       const escTone = folga ? 'off' : 'blue';
-      const showCta = !folga && p.statusHoje !== 'dentro' && ponto.tone === 'warn';
+      const showCta = !folga && p.statusHoje !== 'dentro' && ponto.tone === 'warn' && (gpAdmPreviewMode_ || cadastroOk(p));
       el.innerHTML =
         '<header class="gp-hub-jornada-head">' +
         '<h2 class="gp-hub-jornada-title">Minha jornada hoje</h2>' +
@@ -867,43 +920,84 @@
     }
 
     function abrirModulo(mod) {
-      if (mod==='ponto') {
+      if (mod === 'dados') {
+        goCadastroForm(!cadastroOk(PESSOAS[colabLogado]));
+        go('s-cadastro-form');
+        return;
+      }
+      if (mod === 'ponto') {
         const p = PESSOAS[colabLogado];
-        if (!MK_GP_PROD && !cadastroOk(p)) { showBloqueio(); return; }
+        if (!gpAdmPreviewMode_ && !cadastroOk(p)) { showBloqueio(true); return; }
         go('s-ponto');
-      } else if (mod==='metas') go('s-metas');
-      else if (mod==='escala') go('s-escala');
-      else if (mod==='banco') go('s-banco');
-      else if (mod==='pagamento') go('s-pagamento');
+      } else if (mod === 'metas') {
+        if (!gpAdmPreviewMode_ && !cadastroOk(PESSOAS[colabLogado])) { showBloqueio(true); return; }
+        go('s-metas');
+      } else if (mod === 'escala') {
+        if (!gpAdmPreviewMode_ && !cadastroOk(PESSOAS[colabLogado])) { showBloqueio(true); return; }
+        go('s-escala');
+      } else if (mod === 'banco') {
+        if (!gpAdmPreviewMode_ && !cadastroOk(PESSOAS[colabLogado])) { showBloqueio(true); return; }
+        go('s-banco');
+      } else if (mod === 'pagamento') {
+        if (!gpAdmPreviewMode_ && !cadastroOk(PESSOAS[colabLogado])) { showBloqueio(true); return; }
+        go('s-pagamento');
+      }
     }
 
-    function showBloqueio() {
+    function showBloqueio(forced) {
       const p = PESSOAS[colabLogado];
       const pct = cadastroPct(p);
-      document.getElementById('bloq-lead').textContent = p.label+', complete o cadastro para registrar ponto.';
-      document.getElementById('bloq-pct').textContent = pct+'%';
-      document.getElementById('bloq-bar').style.width = pct+'%';
-      document.getElementById('bloq-list').innerHTML = CAMPOS.filter(f=>f.req).map(f => {
-        const ok = String(p.cadastro[f.key]||'').trim().length>0;
-        return `<li><span>${f.label}</span><span style="color:${ok?'var(--green)':'var(--orange)'}">${ok?'✓':'Pendente'}</span></li>`;
+      const lead = forced
+        ? p.label + ', complete o cadastro para acessar o balcão, o ponto e os módulos RH.'
+        : p.label + ', complete o cadastro para registrar ponto.';
+      document.getElementById('bloq-lead').textContent = lead;
+      document.getElementById('bloq-pct').textContent = pct + '%';
+      document.getElementById('bloq-bar').style.width = pct + '%';
+      document.getElementById('bloq-list').innerHTML = CAMPOS.filter(f => f.req).map(f => {
+        const ok = String(p.cadastro[f.key] || '').trim().length > 0;
+        return '<li><span>' + f.label + '</span><span style="color:' + (ok ? 'var(--green)' : 'var(--orange)') + '">' + (ok ? '✓' : 'Pendente') + '</span></li>';
       }).join('');
+      var back = document.getElementById('gp-bloq-back');
+      if (back) back.hidden = !!forced;
       go('s-cadastro-bloq');
     }
 
-    function goCadastroForm() {
+    function goCadastroForm(editable) {
       const p = PESSOAS[colabLogado];
-      document.getElementById('cad-titulo').textContent = 'Cadastro — '+p.label;
+      if (!p) return;
+      const readOnly = editable !== true && cadastroOk(p);
+      document.getElementById('cad-titulo').textContent = readOnly ? 'Meus dados' : ('Cadastro — ' + p.label);
       document.getElementById('cad-form').innerHTML = CAMPOS.map(f => {
-        const v = p.cadastro[f.key]||'';
-        return `<div class="mock-field"><label>${f.label}${f.req?' *':''}</label><input type="${f.type||'text'}" id="cad-${f.key}" value="${v}"></div>`;
+        const v = p.cadastro[f.key] || '';
+        if (readOnly) {
+          return '<div class="gp-cad-view-row"><span class="gp-cad-view-lbl">' + f.label + '</span><strong>' + escHtml_(v || '—') + '</strong></div>';
+        }
+        return '<div class="mock-field"><label>' + f.label + (f.req ? ' *' : '') + '</label><input type="' + (f.type || 'text') + '" id="cad-' + f.key + '" value="' + escHtml_(v) + '"></div>';
       }).join('');
+      var saveBtn = document.getElementById('gp-cad-save-btn');
+      var editBtn = document.getElementById('gp-cad-edit-btn');
+      if (saveBtn) saveBtn.hidden = readOnly;
+      if (editBtn) editBtn.hidden = !readOnly || gpAdmPreviewMode_;
     }
 
     function salvarCadastro() {
       const p = PESSOAS[colabLogado];
-      CAMPOS.forEach(f => { const el=document.getElementById('cad-'+f.key); if(el) p.cadastro[f.key]=el.value.trim(); });
+      CAMPOS.forEach(f => { const el = document.getElementById('cad-' + f.key); if (el) p.cadastro[f.key] = el.value.trim(); });
       if (!cadastroOk(p)) { alert('Preencha todos os campos obrigatórios (*).'); return; }
-      go('s-ponto');
+      if (MK_GP_PROD && window.MK_GestaoPessoas && gpSessionPin && !gpAdmPreviewMode_) {
+        MK_GestaoPessoas.salvarCadastro(colabLogado, gpSessionPin, p.cadastro).then(function (r) {
+          if (r.cadastro) p.cadastro = Object.assign({}, p.cadastro, r.cadastro);
+          p.cadastroOk = true;
+          p.cadastroPct = 100;
+          gpCadastroForced_ = false;
+          go('s-colab-hub');
+        }).catch(function (e) {
+          alert((e && e.message) || 'Erro ao salvar cadastro');
+        });
+        return;
+      }
+      gpCadastroForced_ = false;
+      go('s-colab-hub');
     }
 
     /* ── PONTO ── */
@@ -1223,7 +1317,7 @@ function gpVoltarInicio() {
     gpPreviewVoltarAdmin_();
     return;
   }
-  var v = global.MK_VERSION || '1.8.96';
+  var v = global.MK_VERSION || '1.8.97';
   global.location.href = 'index.html?force=' + encodeURIComponent(v);
 }
 function colabSairProd() {
@@ -1292,6 +1386,8 @@ function initGpUi() {
   global.gpComDismiss_ = gpComDismiss_;
   global.gpComExpandAll_ = gpComExpandAll_;
   global.gpComCollapseAll_ = gpComCollapseAll_;
+  global.gpCadastroBack_ = gpCadastroBack_;
+  global.goCadastroForm = goCadastroForm;
   global.abrirModulo = abrirModulo;
   document.addEventListener('keydown', function (e) {
     var app = document.getElementById('gp-app');

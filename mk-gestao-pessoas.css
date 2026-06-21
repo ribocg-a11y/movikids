@@ -622,6 +622,16 @@ body {
 #page-operadores .gp-adm-ficha-grid div { background: #F8FAFC; border-radius: 10px; padding: 10px; border: 1px solid var(--border); }
 #page-operadores .gp-adm-ficha-grid span { display: block; font-size: 10px; font-weight: 800; color: var(--txt3); text-transform: uppercase; margin-bottom: 4px; }
 #page-operadores .gp-adm-ficha-grid strong { font-size: 13px; color: var(--txt); }
+#page-operadores .gp-adm-ficha-cadastro { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border); }
+#page-operadores .gp-adm-ficha-cadastro-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
+#page-operadores .gp-adm-ficha-cadastro-head h4 { margin: 0; font-size: 13px; font-weight: 900; text-transform: uppercase; letter-spacing: .04em; color: var(--txt2); }
+#page-operadores .gp-adm-ficha-cadastro-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+@media (max-width: 900px) { #page-operadores .gp-adm-ficha-cadastro-grid { grid-template-columns: 1fr 1fr; } }
+.gp-cad-view-row { display: flex; flex-direction: column; gap: 4px; padding: 12px 0; border-bottom: 1px solid var(--border); }
+.gp-cad-view-row:last-child { border-bottom: 0; }
+.gp-cad-view-lbl { font-size: 11px; font-weight: 800; color: var(--txt3); text-transform: uppercase; }
+.gp-cad-view-row strong { font-size: 15px; font-weight: 800; color: var(--txt); word-break: break-word; }
+#gp-cad-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
 #page-operadores .gp-adm-card--alert { border-color: #EF9A9A; background: #FFEBEE; }
 #page-operadores .gp-adm-card--alert h3 { color: #C62828; }
 #page-operadores .gp-adm-row {

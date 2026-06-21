@@ -33,6 +33,8 @@
         email: cad.email || '', endereco: cad.endereco || '', emergencia: cad.emergencia || '',
         admissao: cad.admissao || c.admissao || '', pix: cad.pix || ''
       },
+      cadastroPct: typeof c.cadastroPct === 'number' ? c.cadastroPct : (data.cadastroPct || 0),
+      cadastroOk: c.cadastroOk === true || data.cadastroOk === true,
       statusHoje: (data.ponto && data.ponto.statusHoje) || 'fora',
       pontoHoje: (data.ponto && data.ponto.hoje) || null,
       folha: (data.ponto && data.ponto.folha) || [],
@@ -98,6 +100,9 @@
     },
     salvarComunicado: function (pinParams, data) {
       return gpApi('salvarComunicadoRhAdmin', Object.assign({}, pinParams || {}, data || {}));
+    },
+    salvarCadastro: function (operadorId, pin, cadastro) {
+      return gpApi('salvarCadastroColaborador', Object.assign({ operadorId: operadorId, pin: pin }, cadastro || {}));
     }
   };
 })(typeof window !== 'undefined' ? window : globalThis);
