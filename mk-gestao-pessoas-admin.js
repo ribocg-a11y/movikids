@@ -107,6 +107,10 @@
     document.querySelectorAll('#page-operadores .gp-adm-panel').forEach(function (p) {
       p.classList.toggle('active', p.id === 'gp-adm-tab-' + tab);
     });
+    const activeBtn = document.querySelector('#page-operadores .gp-adm-tab.active');
+    if (activeBtn && window.matchMedia('(max-width: 900px) and (min-width: 641px)').matches) {
+      activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    }
   }
 
   window.mkGpAdmFichaSub_ = function (sub) {
