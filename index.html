@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Movi Kids">
 <title>Movi Kids</title>
-<script src="mk-canonical-host.js?v=1.8.82"></script>
+<script src="mk-canonical-host.js?v=1.8.83"></script>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png">
@@ -17,17 +17,17 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<script src="mk-stale-sync.js?v=1.8.82"></script>
-<script src="mk-version.js?v=1.8.82"></script>
-<script src="mk-api.js?v=1.8.82"></script>
-<link rel="stylesheet" href="mk-design.css?v=1.8.82">
+<script src="mk-stale-sync.js?v=1.8.83"></script>
+<script src="mk-version.js?v=1.8.83"></script>
+<script src="mk-api.js?v=1.8.83"></script>
+<link rel="stylesheet" href="mk-design.css?v=1.8.83">
 
-<script src="mk-cache-bust.js?v=1.8.82"></script>
+<script src="mk-cache-bust.js?v=1.8.83"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<link rel="stylesheet" href="mk-app.css?v=1.8.82">
-<link rel="stylesheet" href="mk-gestao-pessoas.css?v=1.8.82">
+<link rel="stylesheet" href="mk-app.css?v=1.8.83">
+<link rel="stylesheet" href="mk-gestao-pessoas.css?v=1.8.83">
 <!-- Firebase SDK — Realtime sync canonico para todos os dispositivos -->
-<script type="module" src="mk-firebase.js?v=1.8.82"></script>
+<script type="module" src="mk-firebase.js?v=1.8.83"></script>
 </head>
 
 <body>
@@ -957,8 +957,48 @@
       </select>
     </div>
 
-    <!-- Narrativa Dashboard — ordem de leitura 1→5 -->
+    <!-- Narrativa Dashboard — ordem de leitura 0→5 -->
     <div id="mk-dash-narrative">
+
+    <!-- 0 · AGORA — centro de comando (FASE 16) -->
+    <section class="mk-dash-chapter mk-dash-chapter-now" id="mk-chapter-comando" aria-labelledby="mk-chapter-comando-h">
+      <header class="mk-dash-chapter-head">
+        <span class="mk-dash-step mk-dash-step-live" aria-hidden="true">●</span>
+        <div>
+          <h2 class="mk-dash-chapter-title" id="mk-chapter-comando-h">Agora na operação</h2>
+          <p class="mk-dash-chapter-lead">Tempo real: locações, equipe, faturamento de hoje e alertas críticos.</p>
+        </div>
+      </header>
+      <div id="mk-command-center" class="mk-command-center" style="display:none" aria-live="polite">
+        <div class="mk-cmd-head">
+          <span class="mk-cmd-label">Centro de comando</span>
+          <span class="mk-cmd-date" id="mk-cmd-date">—</span>
+        </div>
+        <div class="mk-cmd-grid" id="mk-cmd-grid">
+          <div class="mk-widget" id="mk-cmd-w-loc">
+            <span class="mk-widget-lbl">Locações abertas</span>
+            <span class="mk-widget-val" id="mk-cmd-loc-val">—</span>
+            <span class="mk-widget-ctx" id="mk-cmd-loc-ctx">—</span>
+          </div>
+          <div class="mk-widget" id="mk-cmd-w-fat">
+            <span class="mk-widget-lbl">Faturamento hoje</span>
+            <span class="mk-widget-val blue" id="mk-cmd-fat-val">—</span>
+            <span class="mk-widget-ctx" id="mk-cmd-fat-ctx">—</span>
+          </div>
+          <div class="mk-widget" id="mk-cmd-w-equipe">
+            <span class="mk-widget-lbl">Equipe presente</span>
+            <span class="mk-widget-val" id="mk-cmd-equipe-val">—</span>
+            <span class="mk-widget-ctx" id="mk-cmd-equipe-ctx">—</span>
+          </div>
+          <div class="mk-widget" id="mk-cmd-w-frota">
+            <span class="mk-widget-lbl">Frota em uso</span>
+            <span class="mk-widget-val purple" id="mk-cmd-frota-val">—</span>
+            <span class="mk-widget-ctx" id="mk-cmd-frota-ctx">—</span>
+          </div>
+        </div>
+        <div class="mk-cmd-alerts" id="mk-cmd-alerts" hidden></div>
+      </div>
+    </section>
 
     <!-- 1 · COMEÇO — panorama do mês -->
     <section class="mk-dash-chapter" id="mk-chapter-inicio" aria-labelledby="mk-chapter-inicio-h">
@@ -1813,26 +1853,26 @@
   </div>
 </div>
 
-<script src="mk-globals.js?v=1.8.82"></script>
-<script src="mk-core.js?v=1.8.82"></script>
-<script src="mk-nav.js?v=1.8.82"></script>
-<script src="mk-admin.js?v=1.8.82"></script>
-<script src="mk-historico.js?v=1.8.82"></script>
-<script src="mk-sessao.js?v=1.8.82"></script>
-<script src="mk-home.js?v=1.8.82"></script>
-<script src="mk-meta-operador.js?v=1.8.82"></script>
-<script src="mk-custos.js?v=1.8.82"></script>
-<script src="mk-avulso.js?v=1.8.82"></script>
-<script src="mk-sync.js?v=1.8.82"></script>
-<script src="mk-nova.js?v=1.8.82"></script>
-<script src="mk-relacionamento.js?v=1.8.82"></script>
-<script src="mk-operacao.js?v=1.8.82"></script>
-<script src="mk-drawer.js?v=1.8.82"></script>
-<script src="mk-update.js?v=1.8.82"></script>
-<script src="mk-gestao-pessoas.js?v=1.8.82"></script>
-<script src="mk-holerite.js?v=1.8.82"></script>
-<script src="mk-gestao-pessoas-admin.js?v=1.8.82"></script>
-<script src="mk-auth.js?v=1.8.82"></script>
-<script src="mk-boot.js?v=1.8.82"></script>
+<script src="mk-globals.js?v=1.8.83"></script>
+<script src="mk-core.js?v=1.8.83"></script>
+<script src="mk-nav.js?v=1.8.83"></script>
+<script src="mk-admin.js?v=1.8.83"></script>
+<script src="mk-historico.js?v=1.8.83"></script>
+<script src="mk-sessao.js?v=1.8.83"></script>
+<script src="mk-home.js?v=1.8.83"></script>
+<script src="mk-meta-operador.js?v=1.8.83"></script>
+<script src="mk-custos.js?v=1.8.83"></script>
+<script src="mk-avulso.js?v=1.8.83"></script>
+<script src="mk-sync.js?v=1.8.83"></script>
+<script src="mk-nova.js?v=1.8.83"></script>
+<script src="mk-relacionamento.js?v=1.8.83"></script>
+<script src="mk-operacao.js?v=1.8.83"></script>
+<script src="mk-drawer.js?v=1.8.83"></script>
+<script src="mk-update.js?v=1.8.83"></script>
+<script src="mk-gestao-pessoas.js?v=1.8.83"></script>
+<script src="mk-holerite.js?v=1.8.83"></script>
+<script src="mk-gestao-pessoas-admin.js?v=1.8.83"></script>
+<script src="mk-auth.js?v=1.8.83"></script>
+<script src="mk-boot.js?v=1.8.83"></script>
 </body>
 </html>

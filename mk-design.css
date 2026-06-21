@@ -1607,6 +1607,113 @@
 .mk-admin-acc-ico { font-size: 18px; line-height: 1; }
 .mk-admin-acc-body { padding: 4px 14px 16px; }
 
+/* FASE 16 — Centro de comando (One UI widgets) */
+.mk-admin-page {
+  --mk-widget-gap: 12px;
+  --mk-widget-radius: 16px;
+  --mk-widget-pad: 14px 16px;
+}
+.mk-dash-chapter-now .mk-dash-step-live {
+  background: #C62828;
+  color: #fff;
+  animation: mk-cmd-pulse 2s ease-in-out infinite;
+}
+@keyframes mk-cmd-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.65; }
+}
+.mk-command-center {
+  background: var(--mk-admin-glass);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--mk-admin-glass-border);
+  border-radius: var(--mk-admin-radius);
+  box-shadow: 0 6px 24px rgba(21, 101, 192, 0.06);
+  padding: 14px 16px 16px;
+  margin-bottom: 8px;
+}
+.mk-cmd-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.mk-cmd-label {
+  font-family: 'Fredoka One', cursive;
+  font-size: 14px;
+  color: var(--mk-admin-accent, #1565C0);
+}
+.mk-cmd-date {
+  font-family: 'Nunito', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  color: #888;
+}
+.mk-cmd-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--mk-widget-gap);
+}
+@media (max-width: 900px) {
+  .mk-cmd-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 480px) {
+  .mk-cmd-grid { grid-template-columns: 1fr; }
+}
+.mk-widget {
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(21, 101, 192, 0.1);
+  border-radius: var(--mk-widget-radius);
+  padding: var(--mk-widget-pad);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-height: 88px;
+}
+.mk-widget-lbl {
+  font-family: 'Nunito', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  color: #666;
+  text-transform: none;
+  letter-spacing: 0.02em;
+}
+.mk-widget-val {
+  font-family: 'Nunito', sans-serif;
+  font-size: 18px;
+  font-weight: 800;
+  color: #1a1a2e;
+  line-height: 1.2;
+}
+.mk-widget-val.blue { color: #1565C0; }
+.mk-widget-val.purple { color: #5E35B1; }
+.mk-widget-val.green { color: #2E7D32; }
+.mk-widget-ctx {
+  font-family: 'Nunito', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  color: #888;
+  line-height: 1.35;
+}
+.mk-cmd-alerts {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.mk-cmd-alert {
+  font-family: 'Nunito', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 8px 12px;
+  border-radius: 12px;
+  border-left: 4px solid #1565C0;
+  background: rgba(21, 101, 192, 0.06);
+  color: #333;
+}
+.mk-cmd-alert.amarelo { border-color: #E65100; background: rgba(230, 81, 0, 0.08); }
+.mk-cmd-alert.vermelho { border-color: #C62828; background: rgba(198, 40, 40, 0.08); }
+
 /* Dashboard — cockpit + strips glass */
 .mk-admin-page .mk-exec-cockpit,
 .mk-admin-page .mk-decisao-panel,

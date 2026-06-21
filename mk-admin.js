@@ -731,7 +731,11 @@ async function carregarKPIsDashboard(mes, ano) {
       }
     }
 
-    carregarResumoHojeAdmin_().catch(function() {});
+    carregarResumoHojeAdmin_().then(function() {
+      if (commandCenterData) renderCommandCenter_(commandCenterData);
+      else renderCommandCenterFallback_();
+    }).catch(function() {});
+    carregarCommandCenter_().catch(function() {});
     if (typeof showAdminHomeKpis === 'function') showAdminHomeKpis(kpiHubStub_());
     if (typeof atualizarHubAdmin_ === 'function') atualizarHubAdmin_();
   } catch (e) {
@@ -978,6 +982,84 @@ function renderAlertStrip_(d) {
     foot.appendChild(more);
     strip.appendChild(foot);
   }
+}
+
+/** FASE 16 — centro de comando operacional (tempo real). */
+let commandCenterData = null;
+
+function renderCommandCenter_(d) {
+  const box = document.getElementById('mk-command-center');
+  if (!box || !d) return;
+  box.style.display = '';
+
+  setText2('mk-cmd-date', d.data || fmtDataBrHoje_());
+
+  const widgets = d.widgets || [];
+  widgets.forEach(function(w) {
+    if (w.id === 'loc') {
+      setText2('mk-cmd-loc-val', String(w.valor != null ? w.valor : '—'));
+      setText2('mk-cmd-loc-ctx', w.ctx || '—');
+    } else if (w.id === 'fat') {
+      const v = Number(w.valor);
+      setText2('mk-cmd-fat-val', isNaN(v) ? String(w.valor) : R2(v));
+      setText2('mk-cmd-fat-ctx', w.ctx || '—');
+    } else if (w.id === 'equipe') {
+      setText2('mk-cmd-equipe-val', String(w.valor != null ? w.valor : '—'));
+      setText2('mk-cmd-equipe-ctx', w.ctx || '—');
+    } else if (w.id === 'frota') {
+      setText2('mk-cmd-frota-val', String(w.valor != null ? w.valor : '—'));
+      setText2('mk-cmd-frota-ctx', w.ctx || '—');
+    }
+  });
+
+  const alertsEl = document.getElementById('mk-cmd-alerts');
+  const alertas = d.alertas || [];
+  if (alertsEl) {
+    if (!alertas.length) {
+      alertsEl.hidden = true;
+      alertsEl.innerHTML = '';
+    } else {
+      alertsEl.hidden = false;
+      alertsEl.innerHTML = alertas.map(function(a) {
+        const cls = a.nivel === 'vermelho' ? ' vermelho' : (a.nivel === 'amarelo' ? ' amarelo' : '');
+        return '<div class="mk-cmd-alert' + cls + '"><strong>' + (a.titulo || '') + '</strong> — '
+          + (a.mensagem || '') + '</div>';
+      }).join('');
+    }
+  }
+}
+
+function renderCommandCenterFallback_() {
+  const fat = fatHojeCanonica_(kpiData);
+  const n = nHojeCanonica_();
+  const res = resumoDiaHoje && resumoDiaHoje.resultado != null ? Number(resumoDiaHoje.resultado) : 0;
+  renderCommandCenter_({
+    data: fmtDataBrHoje_(),
+    widgets: [
+      { id: 'loc', label: 'Locações abertas', valor: '—', ctx: 'Atualize GAS v1.5.117+ para tempo real' },
+      { id: 'fat', label: 'Faturamento hoje', valor: fat, ctx: n > 0 ? (n + ' loc · resultado ' + R2(res)) : 'Sem locações encerradas hoje' },
+      { id: 'equipe', label: 'Equipe', valor: '—', ctx: 'Painel RH após Nova versão Web' },
+      { id: 'frota', label: 'Frota', valor: '—', ctx: '—' }
+    ],
+    alertas: (kpiData && kpiData.alertas) ? kpiData.alertas.slice(0, 2) : []
+  });
+}
+
+async function carregarCommandCenter_() {
+  const dashPage = document.getElementById('page-dashboard');
+  if (!dashPage || !dashPage.classList.contains('active')) return;
+  try {
+    const authP = apiParamsComAuth_();
+    const d = await api({ action: 'comandoOperacional', ...authP }, 20000);
+    if (d && d.ok) {
+      commandCenterData = d;
+      renderCommandCenter_(d);
+      return;
+    }
+  } catch (e) {
+    console.warn('comandoOperacional:', e);
+  }
+  renderCommandCenterFallback_();
 }
 
 function applySinalEmpresa_(d) {

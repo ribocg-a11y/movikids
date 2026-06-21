@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.116
+// MOVI KIDS — Google Apps Script v1.5.117
+// v1.5.117: FASE 16 — comandoOperacional (painel tempo real leve)
 // v1.5.116: metaProjecaoMes = projecaoFat travado (card Faturamento projetado) / diasMes
 // v1.5.115: metaProjecaoMes — projeção mensal fixa (1ª semana) + projDiariaFixa acumulada
 // v1.5.114: kpiMes.baselineFatMes — meta base fixa do mês (Script Property, não recalcula)
@@ -344,6 +345,7 @@ function dispatchMoviAction_(p, method) {
       case 'listarCustos':        return listarCustos_(p);
       case 'buscarKPIsAdmin':     return buscarKPIsAdmin_(p);
       case 'kpiMes':              return kpiMes_(p);
+      case 'comandoOperacional':  return comandoOperacional_(p);
       case 'repairFolhaAdmin':    return repairFolhaFormulasAdmin_(p);
       case 'salvarRelatorioDrive':return salvarRelatorioDrive_(p);
       case 'listarRelatorios':    return listarRelatorios_();
@@ -2046,6 +2048,146 @@ function getOrSetMetaProjecaoMes_(mes, ano, projecaoFat, fatDiaArr, diasMes, lf)
   }
   props.setProperty(key, String(meta));
   return meta;
+}
+
+/** FASE 16 — centro de comando operacional (leitura única, tempo real). */
+function buildPainelComandoOperacional_() {
+  const agora = new Date();
+  const dataFmt = fmtData_(agora);
+  const core = calcResumoDiaCore_(dataFmt);
+  const mes = agora.getMonth() + 1;
+  const ano = agora.getFullYear();
+  const leading = calcLeadingDiaPatch_(mes, ano);
+
+  let nAtiva = 0;
+  let nPendente = 0;
+  const lista = [];
+  const veiculosEmUso = {};
+  const shLoc = sh_(SH_LOC);
+  const lastLoc = shLoc.getLastRow();
+  if (lastLoc >= DATA_ROW) {
+    const rows = shLoc.getRange(DATA_ROW, 1, lastLoc - DATA_ROW + 1, 16).getValues();
+    for (let i = 0; i < rows.length; i++) {
+      const r = rows[i];
+      if (!r[0]) continue;
+      const st = String(r[14] || '').trim();
+      if (st !== 'Ativa' && st !== 'Pendente') continue;
+      if (st === 'Ativa') nAtiva++;
+      else nPendente++;
+      const veic = String(r[15] || '').trim();
+      if (veic) veiculosEmUso[veic] = (veiculosEmUso[veic] || 0) + 1;
+      if (lista.length < 6) {
+        lista.push({
+          id: r[0],
+          status: st,
+          crianca: String(r[12] || '').trim(),
+          veiculo: veic,
+          responsavel: String(r[11] || '').trim().slice(0, 28)
+        });
+      }
+    }
+  }
+
+  const frotaTotal = veiculosOp_().length;
+  const frotaEmUso = Object.keys(veiculosEmUso).length;
+
+  let presentes = 0;
+  let equipeTotal = 0;
+  try {
+    gpRows_(SH_COLAB_RH).forEach(function(r) {
+      if (String(r[16] || 'SIM').toUpperCase() === 'NAO') return;
+      equipeTotal++;
+    });
+    const vistos = {};
+    gpRows_(SH_FOLHA_PONTO).forEach(function(r) {
+      if (cellToStr_(r[2]) !== dataFmt) return;
+      const opId = Number(r[1]);
+      const ent = String(r[4] || '').trim();
+      const sai = String(r[5] || '').trim();
+      if (ent && !sai && !vistos[opId]) {
+        vistos[opId] = 1;
+        presentes++;
+      }
+    });
+  } catch (e) {
+    Logger.log('buildPainelComandoOperacional_ RH: ' + e.message);
+  }
+
+  const sessao = sessaoOperadorPayload_(getSessaoOperadorAtiva_());
+  const alertas = [];
+  if (nAtiva + nPendente === 0) {
+    alertas.push({
+      nivel: 'info', codigo: 'BALCAO_LIVRE',
+      titulo: 'Balcão livre',
+      mensagem: 'Nenhuma locação aberta no momento.'
+    });
+  }
+  if (!sessao) {
+    alertas.push({
+      nivel: 'amarelo', codigo: 'SEM_SESSAO',
+      titulo: 'Sem operador logado',
+      mensagem: 'Nenhuma sessão ativa no tablet do balcão.'
+    });
+  }
+  if (nPendente > 0) {
+    alertas.push({
+      nivel: 'amarelo', codigo: 'PENDENTE',
+      titulo: nPendente + ' locação(ões) pendente(s)',
+      mensagem: 'Timer ainda não iniciado — conferir balcão.'
+    });
+  }
+
+  const fatHoje = Math.round(core.fat * 100) / 100;
+  const resHoje = Math.round(core.resultado * 100) / 100;
+  const ticket = leading && leading.ticketMedio ? Number(leading.ticketMedio) : 0;
+  const ctxFat = core.n > 0
+    ? (core.n + ' loc · resultado ' + (resHoje >= 0 ? '+' : '') + resHoje)
+    : 'Nenhuma locação encerrada hoje';
+  const ctxLoc = nAtiva + nPendente > 0
+    ? (nAtiva + ' ativa(s) · ' + nPendente + ' pendente(s)')
+    : 'Operação livre';
+  const ctxEquipe = sessao
+    ? (presentes + ' presente(s) · balcão: ' + sessao.nome)
+    : (presentes + ' presente(s) de ' + equipeTotal + ' na equipe');
+  const ctxFrota = frotaTotal > 0
+    ? (frotaEmUso + ' em uso · ' + Math.max(0, frotaTotal - frotaEmUso) + ' livre(s)')
+    : 'Frota não configurada';
+
+  return {
+    data: dataFmt,
+    locacoes: {
+      abertas: nAtiva + nPendente,
+      ativas: nAtiva,
+      pendentes: nPendente,
+      lista: lista
+    },
+    fatHoje: fatHoje,
+    nHoje: core.n,
+    resultadoHoje: resHoje,
+    leadingDia: leading,
+    equipe: {
+      presentes: presentes,
+      total: equipeTotal,
+      sessaoBalcao: sessao
+    },
+    frota: {
+      total: frotaTotal,
+      emUso: frotaEmUso,
+      disponivel: Math.max(0, frotaTotal - frotaEmUso)
+    },
+    alertas: alertas.slice(0, 3),
+    widgets: [
+      { id: 'loc', label: 'Locações abertas', valor: nAtiva + nPendente, ctx: ctxLoc },
+      { id: 'fat', label: 'Faturamento hoje', valor: fatHoje, ctx: ctxFat },
+      { id: 'equipe', label: 'Equipe', valor: presentes, ctx: ctxEquipe },
+      { id: 'frota', label: 'Frota', valor: frotaEmUso + '/' + frotaTotal, ctx: ctxFrota }
+    ]
+  };
+}
+
+function comandoOperacional_(p) {
+  if (!isAdminRequest_(p)) return err_('Acesso negado — comandoOperacional so para administrador', 403);
+  return resp_(buildPainelComandoOperacional_());
 }
 
 /** Projeção de fechamento para histórico mensal (mês corrente → fim do mês; fechado → span calendário operado). */
