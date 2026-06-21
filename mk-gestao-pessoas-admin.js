@@ -7,6 +7,21 @@
   let gpAdmSelId_ = null;
   let gpAdmLoadPromise_ = null;
 
+  const GP_ADM_CACHE_TTL = 5 * 60 * 1000;
+
+  function gpAdmCacheKey_() {
+    const now = new Date();
+    return 'mk_gp_adm_' + String(now.getMonth() + 1).padStart(2, '0') + now.getFullYear();
+  }
+
+  function gpAdmCacheGet_() {
+    return typeof mkSessCacheGet_ === 'function' ? mkSessCacheGet_(gpAdmCacheKey_(), GP_ADM_CACHE_TTL) : null;
+  }
+
+  function gpAdmCacheSet_(data) {
+    if (typeof mkSessCacheSet_ === 'function' && data && data.ok) mkSessCacheSet_(gpAdmCacheKey_(), data);
+  }
+
   function gpAdmSetErr_(html) {
     const errEl = document.getElementById('gp-adm-err');
     if (!errEl) return;
@@ -471,7 +486,15 @@
 
   window.mkGpAdmLoad_ = async function mkGpAdmLoad_(opts) {
     if (gpAdmLoadPromise_ && !opts?.force) return gpAdmLoadPromise_;
-    gpAdmShowLoading_();
+    const cached = !opts?.force ? gpAdmCacheGet_() : null;
+    if (cached && cached.ok) {
+      gpAdmData_ = cached;
+      if (typeof applySessaoAtivaFromApi_ === 'function') applySessaoAtivaFromApi_(cached);
+      gpAdmRender_();
+      gpAdmSetErr_('');
+    } else {
+      gpAdmShowLoading_();
+    }
     gpAdmSetErr_('');
     gpAdmLoadPromise_ = (async function () {
       try {
@@ -492,6 +515,7 @@
           return;
         }
         gpAdmData_ = d;
+        gpAdmCacheSet_(d);
         if (typeof applySessaoAtivaFromApi_ === 'function') applySessaoAtivaFromApi_(d);
         gpAdmRender_();
         gpAdmSetErr_('');

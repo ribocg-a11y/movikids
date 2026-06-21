@@ -29,13 +29,6 @@ function mkQrPortalUrl_() {
   return typeof PORTAL_RESPONSAVEL_URL !== 'undefined' ? PORTAL_RESPONSAVEL_URL : 'acompanhar.html';
 }
 
-function mkOrientarQrPortal_(contexto) {
-  const ctx = contexto ? (' ' + contexto) : '';
-  if (typeof toast === 'function') {
-    toast('Mostre o QR do portal na mesa para o responsável acompanhar' + ctx + '.', 'info');
-  }
-}
-
 function mkApplyComunicacaoModoUi_() {
   if (!mkComunicacaoQrOnly_()) return;
   const btnSmsNova = document.getElementById('btn-confirmar-iniciar');
@@ -52,4 +45,30 @@ function mkApplyComunicacaoModoUi_() {
   if (btnWaAlert) btnWaAlert.style.display = 'none';
   const btnWaBv = document.getElementById('btn-wa-bv-send');
   if (btnWaBv) btnWaBv.style.display = 'none';
+}
+
+/** Cache sessionStorage com TTL — acelerador FE (SWR). */
+function mkSessCacheGet_(key, ttlMs) {
+  try {
+    const raw = sessionStorage.getItem(key);
+    if (!raw) return null;
+    const o = JSON.parse(raw);
+    if (!o || o.ts == null || o.data == null) return null;
+    if (Date.now() - o.ts > (ttlMs || 300000)) return null;
+    return o.data;
+  } catch (e) { return null; }
+}
+
+function mkSessCacheSet_(key, data) {
+  try {
+    if (data == null) return;
+    sessionStorage.setItem(key, JSON.stringify({ ts: Date.now(), data: data }));
+  } catch (e) { /* quota */ }
+}
+
+function mkOrientarQrPortal_(contexto) {
+  const ctx = contexto ? (' ' + contexto) : '';
+  if (typeof toast === 'function') {
+    toast('Mostre o QR do portal na mesa para o responsável acompanhar' + ctx + '.', 'info');
+  }
 }

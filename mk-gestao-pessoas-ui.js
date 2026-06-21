@@ -77,7 +77,7 @@
     }
 
     function gpPreviewVoltarAdmin_() {
-      var v = global.MK_VERSION || '1.8.92';
+      var v = global.MK_VERSION || '1.8.93';
       global.location.href = 'index.html?force=' + encodeURIComponent(v) + '#operadores';
     }
 
@@ -132,6 +132,8 @@
       loadAdmPreviewColaboradores_();
     }
 
+    function gpColabListCacheKey_() { return 'mk_gp_colab_list_v1'; }
+
     function loadAdmPreviewColaboradores_() {
       var sel = document.getElementById('adm-preview-select');
       var btn = document.getElementById('adm-preview-btn');
@@ -148,17 +150,25 @@
           }).join('');
         if (btn) btn.disabled = !sel.value;
       }
+      var cached = typeof mkSessCacheGet_ === 'function' ? mkSessCacheGet_(gpColabListCacheKey_(), 600000) : null;
+      if (cached && cached.length) {
+        gpColabList = cached;
+        renderOpts(opts.concat(cached.map(function (o) {
+          return { id: o.id, nome: o.nome, funcao: o.funcao };
+        })));
+      }
       if (!window.MK_GestaoPessoas || !gpAdmPreviewPin_) {
-        renderOpts(opts);
+        if (!cached || !cached.length) renderOpts(opts);
         return;
       }
       MK_GestaoPessoas.listarColaboradoresPreview(gpAdmPreviewPin_).then(function (list) {
         gpColabList = list || [];
+        if (typeof mkSessCacheSet_ === 'function' && gpColabList.length) mkSessCacheSet_(gpColabListCacheKey_(), gpColabList);
         renderOpts(opts.concat(gpColabList.map(function (o) {
           return { id: o.id, nome: o.nome, funcao: o.funcao };
         })));
       }).catch(function (e) {
-        renderOpts(opts);
+        if (!cached || !cached.length) renderOpts(opts);
         if (errEl) {
           errEl.textContent = (e.message || 'Erro ao listar') + ' — use Demo genérico ou publique GAS v1.5.122.';
           errEl.hidden = false;
@@ -517,14 +527,23 @@
 
       if (sel) {
         if (MK_GP_PROD && window.MK_GestaoPessoas) {
-          renderColabSelect(null, true);
+          var cachedColab = typeof mkSessCacheGet_ === 'function' ? mkSessCacheGet_(gpColabListCacheKey_(), 600000) : null;
+          if (cachedColab && cachedColab.length) {
+            gpColabList = cachedColab;
+            renderColabSelect(gpColabList.map(function (o) {
+              return { id: o.id, nome: o.nome || o.id, funcao: o.funcao };
+            }));
+          } else {
+            renderColabSelect(null, true);
+          }
           MK_GestaoPessoas.listarColaboradores().then(function (list) {
             gpColabList = list || [];
+            if (typeof mkSessCacheSet_ === 'function' && gpColabList.length) mkSessCacheSet_(gpColabListCacheKey_(), gpColabList);
             renderColabSelect(gpColabList.map(function (o) {
               return { id: o.id, nome: o.nome || o.id, funcao: o.funcao };
             }));
           }).catch(function (e) {
-            renderColabSelect(null, false, e.message);
+            if (!cachedColab || !cachedColab.length) renderColabSelect(null, false, e.message);
           });
           return;
         }
@@ -1085,7 +1104,7 @@ function gpVoltarInicio() {
     gpPreviewVoltarAdmin_();
     return;
   }
-  var v = global.MK_VERSION || '1.8.92';
+  var v = global.MK_VERSION || '1.8.93';
   global.location.href = 'index.html?force=' + encodeURIComponent(v);
 }
 function colabSairProd() {

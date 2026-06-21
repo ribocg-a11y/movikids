@@ -196,11 +196,14 @@ function adminLogin() {
   showAdminSidebar();
   showPage('home');
   if (!kpiData) carregarKPIs();
-  try { localStorage.removeItem('mk_inicio_cache'); } catch(e) {}
-  if (typeof syncController === 'function') syncController(true, 0);
-  carregarHistRelatorios();
-  carregarConfig(); // Fase 6: carrega templates WA
+  if (typeof syncController === 'function') {
+    syncController(false, 0);
+    setTimeout(function () { syncController(true, 0); }, 400);
+  }
+  setTimeout(carregarHistRelatorios, 1500);
+  setTimeout(carregarConfig, 2000);
   if (typeof refreshOperadoresAdmin_ === 'function') refreshOperadoresAdmin_();
+  if (typeof mkPrefetchAdminWarm_ === 'function') mkPrefetchAdminWarm_();
   if (typeof atualizarOperadorUI_ === 'function') atualizarOperadorUI_();
   if (typeof mkAuthRefreshSessaoTurno_ === 'function') mkAuthRefreshSessaoTurno_();
   if (typeof mkMetaRefresh_ === 'function') mkMetaRefresh_();
@@ -672,9 +675,20 @@ function kpiHubStub_() {
 }
 
 async function carregarResumoHojeAdmin_() {
+  const dataHoje = fmtDataBrHoje_();
+  const cacheKey = 'mk_resumo_dia_' + dataHoje.replace(/\//g, '');
+  const cached = typeof mkSessCacheGet_ === 'function' ? mkSessCacheGet_(cacheKey, 60000) : null;
+  if (cached && cached.ok) {
+    resumoDiaHoje = cached;
+    return cached;
+  }
   const authP = apiParamsComAuth_();
-  const resumo = await api({ action: 'resumoDia', data: fmtDataBrHoje_(), ...authP });
-  if (resumo && resumo.ok) resumoDiaHoje = resumo;
+  const resumo = await api({ action: 'resumoDia', data: dataHoje, ...authP });
+  if (resumo && resumo.ok) {
+    resumoDiaHoje = resumo;
+    if (typeof mkSessCacheSet_ === 'function') mkSessCacheSet_(cacheKey, resumo);
+  }
+  return resumo;
 }
 
 /** Hub/Sistema: só resumoDia (leve). Dashboard usa carregarKPIsDashboard → kpiMes. */
@@ -744,6 +758,7 @@ async function carregarKPIsDashboard(mes, ano) {
   if (cached) kpiDashApply_(cached);
 
   kpiDashSetLoading_(true);
+  const cmdP = carregarCommandCenter_().catch(function () {});
   try {
     const authP = apiParamsComAuth_();
     const base = { action: 'kpiMes', mes: mesEff, ano: anoEff, ...authP };
@@ -771,7 +786,7 @@ async function carregarKPIsDashboard(mes, ano) {
       if (commandCenterData) applyCommandCenterData_(commandCenterData);
       else renderCommandCenterFallback_();
     }).catch(function() {});
-    carregarCommandCenter_().catch(function() {});
+    await cmdP;
     mkCommandCenterStartRefresh_();
     if (typeof showAdminHomeKpis === 'function') showAdminHomeKpis(kpiHubStub_());
     if (typeof atualizarHubAdmin_ === 'function') atualizarHubAdmin_();
@@ -786,6 +801,27 @@ async function carregarKPIsDashboard(mes, ano) {
     if (pending) carregarKPIsDashboard(pending.mes, pending.ano);
   }
 }
+
+/** Prefetch admin — dashboard lite + painel RH em paralelo (não bloqueia UI). */
+function mkPrefetchAdminWarm_() {
+  if (window._mkPrefetchAdminWarm) return;
+  window._mkPrefetchAdminWarm = true;
+  const authP = typeof apiParamsComAuth_ === 'function' ? apiParamsComAuth_() : {};
+  const hoje = new Date();
+  const mes = hoje.getMonth() + 1;
+  const ano = hoje.getFullYear();
+  const tasks = [];
+  if (!kpiDashCacheGet_(mes, ano)) {
+    tasks.push(api(Object.assign({ action: 'kpiMes', mes: mes, ano: ano, lite: '1' }, authP), 45000)
+      .then(function (d) { if (d && d.ok) kpiDashCacheSet_(mes, ano, d); })
+      .catch(function () {}));
+  }
+  if (typeof mkGpAdmLoad_ === 'function') {
+    tasks.push(mkGpAdmLoad_().catch(function () {}));
+  }
+  Promise.all(tasks).finally(function () { window._mkPrefetchAdminWarm = false; });
+}
+window.mkPrefetchAdminWarm_ = mkPrefetchAdminWarm_;
 // ── NOVO DASHBOARD v1.6.9 ────────────────────────────────────
 const MESES_DB = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
 const R2 = v => 'R$ ' + Math.round(Number(v)).toString().replace(/\B(?=(\d{3})+(?!\d))/g,'.');

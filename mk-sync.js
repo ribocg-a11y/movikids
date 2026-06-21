@@ -68,7 +68,8 @@ async function sincronizarServidor(force = false) {
 
   try {
     const CACHE_KEY = 'mk_inicio_cache_v2';
-    const CACHE_TTL = 5000;
+    const CACHE_TTL = 30000;
+    const STALE_MAX = 120000;
 
     if (!force) {
       const raw = localStorage.getItem(CACHE_KEY);
@@ -76,15 +77,18 @@ async function sincronizarServidor(force = false) {
         try {
           const { data, ts } = JSON.parse(raw);
           const age = Date.now() - ts;
-          _lastSyncAt = Math.max(_lastSyncAt, ts);
-          if (age < CACHE_TTL) {
+          if (data && data.ok && age < STALE_MAX) {
             aplicarDadosInicio(data);
             setStatus(true);
+            _lastSyncAt = Math.max(_lastSyncAt, ts);
+            if (age < CACHE_TTL) {
+              _syncInFlight = false;
+              return;
+            }
             _syncInFlight = false;
+            mkSyncRefreshInicioBg_();
             return;
           }
-          aplicarDadosInicio(data);
-          setStatus(true);
         } catch(e) {}
       }
     } else {
@@ -340,10 +344,15 @@ function mkSyncWireEvents_() {
   setInterval(() => {
     const dashPage = document.getElementById('page-dashboard');
     if (dashPage && dashPage.classList.contains('active') &&
-        document.visibilityState === 'visible') {
+        document.visibilityState === 'visible' && !window._kpiDashInFlight) {
       syncController(false, 0);
     }
-  }, 60000);
+  }, 90000);
+
+  setInterval(() => {
+    if (document.visibilityState !== 'visible') return;
+    syncController(true, 0);
+  }, 45000);
 
   setInterval(() => {
     if (document.visibilityState !== 'visible') return;
@@ -357,11 +366,6 @@ function mkSyncWireEvents_() {
 
   setInterval(() => {
     if (document.visibilityState !== 'visible') return;
-    syncController(true, 0);
-  }, 30000);
-
-  setInterval(() => {
-    if (document.visibilityState !== 'visible') return;
     if (typeof mkSyncRefreshAgeLabels_ === 'function') mkSyncRefreshAgeLabels_();
   }, 5000);
 }
@@ -372,3 +376,26 @@ window.sincronizarServidor = sincronizarServidor;
 window.setStatus = setStatus;
 window.mkSyncAgeSuffix_ = mkSyncAgeSuffix_;
 window.mkSyncRefreshAgeLabels_ = mkSyncRefreshAgeLabels_;
+
+function mkSyncRefreshInicioBg_() {
+  if (window._mkInicioBgRefresh) return;
+  window._mkInicioBgRefresh = true;
+  api({ action: 'carregarInicio', ...apiParamsComAuth_() })
+    .then(function (d) {
+      if (!d || !d.ok) return;
+      _syncFailCount = 0;
+      _syncBackoffMs = 0;
+      _lastSyncAt = Date.now();
+      try {
+        localStorage.setItem('mk_inicio_cache_v2', JSON.stringify({ data: d, ts: Date.now() }));
+      } catch (e) { /* ignore */ }
+      aplicarDadosInicio(d);
+      setStatus(true);
+    })
+    .catch(function (e) {
+      console.warn('[Sync] bg refresh', e.message || e);
+    })
+    .finally(function () {
+      window._mkInicioBgRefresh = false;
+    });
+}

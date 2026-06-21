@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.122
+// MOVI KIDS — Google Apps Script v1.5.123
+// v1.5.123: perf — carregarInicio leitura única LOCAÇÕES + cache 12s; resumoDia/gp cache
 // v1.5.122: FASE 15b — buscarPainelColaboradorPreview_ (ADM 1416)
 // v1.5.121: FASE 17 — operadorId em alerta banco horas
 // v1.5.120: FASE 17 — meta abaixo 3 dias + alertasInteligentes no painel RH
@@ -1274,8 +1275,16 @@ function resumoDia_(p) {
   const dataIn = (p.data || '').trim();
   const dataAlvo = dataIn || fmtData_(new Date());
   if (!parseDataStr_(dataAlvo)) return err_('data invalida — use dd/MM/yyyy', 400);
+  const cacheKey = 'resumoDia_' + dataAlvo.replace(/\//g, '');
+  try {
+    const hit = CacheService.getScriptCache().get(cacheKey);
+    if (hit) return ContentService.createTextOutput(hit).setMimeType(ContentService.MimeType.JSON);
+  } catch (e) { /* ok */ }
   const core = calcResumoDiaCore_(dataAlvo);
-  return resp_(enrichResumoDiaLeading_(core, dataAlvo));
+  const enriched = enrichResumoDiaLeading_(core, dataAlvo);
+  const out = JSON.stringify({ ok: true, ...enriched });
+  try { CacheService.getScriptCache().put(cacheKey, out, 25); } catch (e) { /* ok */ }
+  return ContentService.createTextOutput(out).setMimeType(ContentService.MimeType.JSON);
 }
 
 // ── Pacote F: operador / cancelamentos / ocupacao (AUDITORIA + frota) ──
@@ -3699,11 +3708,15 @@ function buscarKPIsAdmin_(p) {
 
 // ── CARREGAR INÍCIO ───────────────────────────────────────────
 function carregarInicio_(p) {
-  // HOTFIX: sem CacheService aqui. Cache antigo podia retornar objeto puro em vez de TextOutput
-  // e quebrar o WebApp com "tipo de valor retornado nao e compativel".
-
   const adm      = isAdminRequest_(p || {});
   const gestao   = isSupervisorOrAdminRequest_(p || {});
+  const metaOpId = metaOperadorIdFromRequest_(p || {}) || 0;
+  const cacheKey = 'inicio_v3_' + (gestao ? 'g' : 'o') + '_m' + metaOpId;
+  try {
+    const hit = CacheService.getScriptCache().get(cacheKey);
+    if (hit) return ContentService.createTextOutput(hit).setMimeType(ContentService.MimeType.JSON);
+  } catch (e) { /* ok */ }
+
   const hoje     = new Date();
   const dataHoje = fmtData_(hoje);
   const shLoc    = sh_(SH_LOC);
@@ -3711,6 +3724,7 @@ function carregarInicio_(p) {
   const lastLoc  = shLoc.getLastRow();
 
   const ativas = [];
+  const encHoje = [];
   let fatHoje = 0, nHoje = 0;
 
   if (lastLoc >= DATA_ROW) {
@@ -3758,6 +3772,20 @@ function carregarInicio_(p) {
       if (status === 'Encerrada' && dataR === dataHoje) {
         fatHoje += Number(r[10]);
         nHoje++;
+        const encObj = {
+          id:          r[0],
+          horaInicio:  cellToStr_(r[2]),
+          horaFim:     cellToStr_(r[3]),
+          tipo:        String(r[4]),
+          plano:       String(r[5]),
+          veiculo:     veiculo,
+          pagamento:   pagamento,
+          crianca:     String(r[12]),
+          responsavel: String(r[11]),
+          telefone:    String(r[13] || '')
+        };
+        if (gestao) encObj.valorTotal = Number(r[10]);
+        encHoje.push(encObj);
       }
     });
   }
@@ -3776,29 +3804,6 @@ function carregarInicio_(p) {
     });
   }
 
-  const encHoje = [];
-  if (lastLoc >= DATA_ROW) {
-    const dados2 = shLoc.getRange(DATA_ROW, 1, lastLoc - DATA_ROW + 1, 18).getValues();
-    dados2.forEach(r => {
-      if (!r[0] || String(r[14]).trim() !== 'Encerrada') return;
-      if (cellToStr_(r[1]) !== dataHoje) return;
-      const encObj = {
-        id:          r[0],
-        horaInicio:  cellToStr_(r[2]),
-        horaFim:     cellToStr_(r[3]),
-        tipo:        String(r[4]),
-        plano:       String(r[5]),
-        veiculo:     String(r[15] || ''),
-        pagamento:   String(r[16] || ''),
-        crianca:     String(r[12]),
-        responsavel: String(r[11]),
-        telefone:    String(r[13] || '')
-      };
-      if (gestao) encObj.valorTotal = Number(r[10]);
-      encHoje.push(encObj);
-    });
-  }
-
   const statsHoje = gestao ? { fat: fatHoje, n: nHoje } : { n: nHoje };
   const custosPayload = gestao ? custosHoje : custosHoje.map(c => ({
     id: c.id, data: c.data, hora: c.hora, descricao: c.descricao, categoria: c.categoria
@@ -3806,7 +3811,6 @@ function carregarInicio_(p) {
 
   const opCfg = operacaoConfig_();
   let metaTurno = null;
-  const metaOpId = metaOperadorIdFromRequest_(p || {});
   if (metaOpId) {
     try {
       metaTurno = buildMetaOperadorPayload_(metaOpId);
@@ -3814,8 +3818,8 @@ function carregarInicio_(p) {
       Logger.log('carregarInicio_ metaTurno: ' + e.message);
     }
   }
-  const resultado = resp_({
-    sistema:    'MOVI KIDS v1.5.66',
+  const payload = {
+    sistema:    'MOVI KIDS v1.5.123',
     timestamp:  dataHoje + ' ' + fmtHoraLocal_(hoje),
     ativos:     ativas,
     statsHoje,
@@ -3823,8 +3827,12 @@ function carregarInicio_(p) {
     encHoje,
     metaTurno:  metaTurno,
     operacaoConfig: payloadOperacaoConfigFe_(opCfg)
-  });
-  return resultado;
+  };
+  const out = JSON.stringify({ ok: true, ...payload });
+  try {
+    if (out.length < 95000) CacheService.getScriptCache().put(cacheKey, out, 12);
+  } catch (e) { /* ok */ }
+  return ContentService.createTextOutput(out).setMimeType(ContentService.MimeType.JSON);
 }
 
 // ── VERIFICAR SESSÃO ──────────────────────────────────────────
@@ -7642,6 +7650,11 @@ function gpStatusPontoHoje_(opId) {
 
 function gpListarColaboradoresGestao_() {
   try {
+    const cacheKey = 'gp_list_colab_v1';
+    try {
+      const hit = CacheService.getScriptCache().get(cacheKey);
+      if (hit) return ContentService.createTextOutput(hit).setMimeType(ContentService.MimeType.JSON);
+    } catch (e) { /* ok */ }
     const ops = listarOperadoresLogin_();
     const parsed = JSON.parse(ops.getContent());
     if (!parsed.ok) return ops;
@@ -7653,7 +7666,9 @@ function gpListarColaboradoresGestao_() {
       const c = gpColabRhByOpId_(o.id);
       return { id: o.id, nome: o.nome, hasPin: o.hasPin, funcao: c ? c.funcao : 'Colaborador', cadastroPct: c ? c.cadastroPct : 0 };
     });
-    return resp_(parsed);
+    const out = JSON.stringify(parsed);
+    try { CacheService.getScriptCache().put(cacheKey, out, 60); } catch (e) { /* ok */ }
+    return ContentService.createTextOutput(out).setMimeType(ContentService.MimeType.JSON);
   } catch (ex) {
     return err_('Abas Gestao Pessoas ausentes — rode scripts/criar-abas-gestao-pessoas.ps1', 503);
   }
@@ -7853,6 +7868,11 @@ function painelGestaoPessoasAdmin_(p) {
   if (!isGestaoRequest_(p)) return err_('Acesso negado — gestao pessoas (admin/gestor)', 403);
   try {
     const comp = String(p.competencia || gpCompetenciaAtual_());
+    const cacheKey = 'gp_painel_adm_' + gpNormCompetencia_(comp);
+    try {
+      const hit = CacheService.getScriptCache().get(cacheKey);
+      if (hit) return ContentService.createTextOutput(hit).setMimeType(ContentService.MimeType.JSON);
+    } catch (e) { /* ok */ }
     const ctx = gpLoadContext_();
     gpSyncRhColaboradoresPadrao_(ctx);
     const opsResp = JSON.parse(listarOperadoresLogin_().getContent());
@@ -7949,7 +7969,7 @@ function painelGestaoPessoasAdmin_(p) {
       if (c.turno) comTurno++;
     });
 
-    return resp_({
+    const payload = {
       competencia: comp, colaboradores: colaboradores, escala: escala, folha: folha,
       alertas: alertasPack.alertas, alertasTotal: alertasPack.total,
       alertasInteligentes: intelRh,
@@ -7957,8 +7977,13 @@ function painelGestaoPessoasAdmin_(p) {
         total: colaboradores.length, presentes: presentes, comTurno: comTurno,
         alertas: alertasPack.total, alertasIntel: intelRh.length
       },
-      sessaoAtiva: sessao, versao: 'v1.5.120'
-    });
+      sessaoAtiva: sessao, versao: 'v1.5.123'
+    };
+    const out = JSON.stringify({ ok: true, ...payload });
+    try {
+      if (out.length < 95000) CacheService.getScriptCache().put(cacheKey, out, 45);
+    } catch (e) { /* ok */ }
+    return ContentService.createTextOutput(out).setMimeType(ContentService.MimeType.JSON);
   } catch (ex) {
     return err_('Abas Gestao Pessoas ausentes — rode instalar abas ou scripts/criar-abas-gestao-pessoas.ps1', 503);
   }

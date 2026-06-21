@@ -77,6 +77,11 @@ function mkApiFetchJson_(url, init, timeoutMs) {
   return Promise.race([fetchP, timer]);
 }
 
+/** Resolve URL GAS cedo — evita latência na 1ª api(). */
+function mkApiWarm_() {
+  resolveGasUrl_().catch(function () { /* fallback WEBAPP_URL */ });
+}
+
 async function api(params, timeoutMs = 25000, fetchInit) {
   const gasUrl = await resolveGasUrl_();
   const action = String((params && params.action) || '');
@@ -90,3 +95,11 @@ async function api(params, timeoutMs = 25000, fetchInit) {
   return mkApiFetchJson_(`${gasUrl}?${qs}`, init, timeoutMs);
 }
 window.api = api;
+window.mkApiWarm_ = mkApiWarm_;
+if (typeof document !== 'undefined') {
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', mkApiWarm_);
+  } else {
+    mkApiWarm_();
+  }
+}

@@ -1,6 +1,6 @@
 // MOVI KIDS - Service Worker 1.7.12
 
-const SW_VERSION = '1.8.92';
+const SW_VERSION = '1.8.93';
 
 const NETWORK_FIRST = [
   'script.google.com',
@@ -33,7 +33,10 @@ const NETWORK_FIRST = [
   'mk-avulso.js',
   'mk-core.js',
   'mk-globals.js',
-  'mk-boot.js'
+  'mk-gestao-pessoas.js',
+  'mk-gestao-pessoas-ui.js',
+  'mk-gestao-pessoas-admin.js',
+  'gestao-pessoas.html',
 ];
 
 self.addEventListener('install', event => {
