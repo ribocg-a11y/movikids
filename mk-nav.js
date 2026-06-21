@@ -22,6 +22,7 @@ function mobMenuOpen_() {
   if (sb) sb.classList.add('mob-open');
   if (bd) bd.classList.add('show');
   document.body.style.overflow = 'hidden';
+  if (typeof mkAdminMobCmdOnSidebarShow_ === 'function') mkAdminMobCmdOnSidebarShow_();
 }
 
 function mobMenuClose_() {
@@ -129,6 +130,7 @@ function showAdminSidebar() {
   let open = false;
   try { open = localStorage.getItem('mk_sb_admin_open') === '1'; } catch (e) {}
   sbSetAdminNavOpen_(open, false);
+  if (typeof mkAdminMobCmdOnSidebarShow_ === 'function') mkAdminMobCmdOnSidebarShow_();
 }
 
 function hideAdminSidebar() {
@@ -137,6 +139,7 @@ function hideAdminSidebar() {
   if (sec) sec.classList.remove('visible');
   if (btn) btn.style.display = '';
   sbSetAdminNavOpen_(false, false);
+  if (typeof mkAdminMobCmdOnSidebarHide_ === 'function') mkAdminMobCmdOnSidebarHide_();
   ['sbn-adm','sbn-dash','sbn-rel','sbn-ops','sbn-cfg','sbn-sys','sbn-caixa','sbn-hist'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.style.display = '';

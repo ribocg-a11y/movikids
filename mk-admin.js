@@ -732,7 +732,7 @@ async function carregarKPIsDashboard(mes, ano) {
     }
 
     carregarResumoHojeAdmin_().then(function() {
-      if (commandCenterData) renderCommandCenter_(commandCenterData);
+      if (commandCenterData) applyCommandCenterData_(commandCenterData);
       else renderCommandCenterFallback_();
     }).catch(function() {});
     carregarCommandCenter_().catch(function() {});
@@ -996,6 +996,112 @@ function renderAlertStrip_(d) {
 /** FASE 16 — centro de comando operacional (tempo real). */
 let commandCenterData = null;
 
+function mkAdminMobCmdIsAdmin_() {
+  return (typeof mkAuthIsAdmin === 'function' && mkAuthIsAdmin()) || !!window.isAdmin;
+}
+
+function mkAdminMobCmdShouldShow_() {
+  if (!mkAdminMobCmdIsAdmin_()) return false;
+  if (window.innerWidth >= 1024) return false;
+  const sec = document.getElementById('sb-admin-section');
+  return !!(sec && sec.classList.contains('visible'));
+}
+
+function mkAdminMobCmdSetVal_(id, val) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = val != null && val !== '' ? String(val) : '—';
+}
+
+function renderAdminMobCmd_(d) {
+  const box = document.getElementById('mk-admin-mob-cmd');
+  if (!box) return;
+  if (!mkAdminMobCmdShouldShow_()) {
+    box.hidden = true;
+    return;
+  }
+  box.hidden = false;
+  const widgets = (d && d.widgets) ? d.widgets : [];
+  widgets.forEach(function(w) {
+    if (w.id === 'loc') mkAdminMobCmdSetVal_('mk-admin-mob-loc', w.valor);
+    else if (w.id === 'fat') {
+      const v = Number(w.valor);
+      mkAdminMobCmdSetVal_('mk-admin-mob-fat', isNaN(v) ? w.valor : R2(v));
+    } else if (w.id === 'equipe') mkAdminMobCmdSetVal_('mk-admin-mob-equipe', w.valor);
+    else if (w.id === 'frota') mkAdminMobCmdSetVal_('mk-admin-mob-frota', w.valor);
+  });
+  const syncEl = document.getElementById('mk-admin-mob-cmd-sync');
+  if (syncEl) {
+    const suffix = (typeof mkSyncAgeSuffix_ === 'function') ? mkSyncAgeSuffix_() : '';
+    syncEl.textContent = suffix ? suffix.replace(/^ · /, '') : 'agora';
+  }
+}
+
+function buildCommandCenterFallback_() {
+  const fat = fatHojeCanonica_(kpiData);
+  const n = nHojeCanonica_();
+  const res = resumoDiaHoje && resumoDiaHoje.resultado != null ? Number(resumoDiaHoje.resultado) : 0;
+  return {
+    data: fmtDataBrHoje_(),
+    widgets: [
+      { id: 'loc', label: 'Locações abertas', valor: '—', ctx: 'Atualize GAS v1.5.117+ para tempo real' },
+      { id: 'fat', label: 'Faturamento hoje', valor: fat, ctx: n > 0 ? (n + ' loc · resultado ' + R2(res)) : 'Sem locações encerradas hoje' },
+      { id: 'equipe', label: 'Equipe', valor: '—', ctx: 'Painel RH após Nova versão Web' },
+      { id: 'frota', label: 'Frota', valor: '—', ctx: '—' }
+    ],
+    alertas: (kpiData && kpiData.alertas) ? kpiData.alertas.slice(0, 2) : []
+  };
+}
+
+function applyCommandCenterData_(d) {
+  if (!d) return;
+  const dashPage = document.getElementById('page-dashboard');
+  if (dashPage && dashPage.classList.contains('active')) renderCommandCenter_(d);
+  renderAdminMobCmd_(d);
+}
+
+function mkAdminMobCmdOnSidebarShow_() {
+  if (typeof renderAdminMobCmd_ !== 'function') return;
+  if (commandCenterData) renderAdminMobCmd_(commandCenterData);
+  else if (kpiData) renderAdminMobCmd_(buildCommandCenterFallback_());
+  if (mkAdminMobCmdShouldShow_()) carregarAdminMobCmd_().catch(function() {});
+  mkAdminMobCmdStartRefresh_();
+}
+
+function mkAdminMobCmdOnSidebarHide_() {
+  const box = document.getElementById('mk-admin-mob-cmd');
+  if (box) box.hidden = true;
+  if (window._mkAdminMobRefreshTimer) {
+    clearInterval(window._mkAdminMobRefreshTimer);
+    window._mkAdminMobRefreshTimer = null;
+  }
+}
+
+async function carregarAdminMobCmd_() {
+  if (!mkAdminMobCmdShouldShow_()) return;
+  try {
+    const authP = apiParamsComAuth_();
+    const d = await api({ action: 'comandoOperacional', ...authP }, 20000);
+    if (d && d.ok) {
+      commandCenterData = d;
+      applyCommandCenterData_(d);
+      return;
+    }
+  } catch (e) {
+    console.warn('adminMobCmd:', e);
+  }
+  applyCommandCenterData_(buildCommandCenterFallback_());
+}
+
+function mkAdminMobCmdStartRefresh_() {
+  if (window._mkAdminMobRefreshTimer) clearInterval(window._mkAdminMobRefreshTimer);
+  if (!mkAdminMobCmdShouldShow_()) return;
+  window._mkAdminMobRefreshTimer = setInterval(function() {
+    if (mkAdminMobCmdShouldShow_()) carregarAdminMobCmd_().catch(function() {});
+  }, 90000);
+}
+window.mkAdminMobCmdOnSidebarShow_ = mkAdminMobCmdOnSidebarShow_;
+window.mkAdminMobCmdOnSidebarHide_ = mkAdminMobCmdOnSidebarHide_;
+
 function mkCmdSetWidget_(idPrefix, val, ctx, trend) {
   setText2(idPrefix + '-val', val);
   const ctxEl = document.getElementById(idPrefix + '-ctx');
@@ -1065,19 +1171,7 @@ function renderCommandCenter_(d) {
 }
 
 function renderCommandCenterFallback_() {
-  const fat = fatHojeCanonica_(kpiData);
-  const n = nHojeCanonica_();
-  const res = resumoDiaHoje && resumoDiaHoje.resultado != null ? Number(resumoDiaHoje.resultado) : 0;
-  renderCommandCenter_({
-    data: fmtDataBrHoje_(),
-    widgets: [
-      { id: 'loc', label: 'Locações abertas', valor: '—', ctx: 'Atualize GAS v1.5.117+ para tempo real' },
-      { id: 'fat', label: 'Faturamento hoje', valor: fat, ctx: n > 0 ? (n + ' loc · resultado ' + R2(res)) : 'Sem locações encerradas hoje' },
-      { id: 'equipe', label: 'Equipe', valor: '—', ctx: 'Painel RH após Nova versão Web' },
-      { id: 'frota', label: 'Frota', valor: '—', ctx: '—' }
-    ],
-    alertas: (kpiData && kpiData.alertas) ? kpiData.alertas.slice(0, 2) : []
-  });
+  applyCommandCenterData_(buildCommandCenterFallback_());
 }
 
 async function carregarCommandCenter_() {
@@ -1088,7 +1182,7 @@ async function carregarCommandCenter_() {
     const d = await api({ action: 'comandoOperacional', ...authP }, 20000);
     if (d && d.ok) {
       commandCenterData = d;
-      renderCommandCenter_(d);
+      applyCommandCenterData_(d);
       return;
     }
   } catch (e) {

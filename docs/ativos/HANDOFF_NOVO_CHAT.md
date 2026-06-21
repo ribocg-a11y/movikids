@@ -1,6 +1,6 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 21/06/2026 (operação **LIVRE** · protocolo **OK** · FE **v1.8.82** · GAS repo **v1.5.116** · Nova versão Web **pendente**)  
+**Atualizado:** 21/06/2026 (operação **LIVRE** · FASE **16 kickoff** · FE **v1.8.83** · GAS repo **v1.5.117** · Nova versão Web **pendente**)  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **Repo local:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`  
@@ -52,11 +52,11 @@ Mensagem mínima: *"Vamos dar continuidade ao projeto Movi Kids, tem uma pasta n
 
 | Camada | Versão | Verificação |
 |--------|--------|-------------|
-| **Frontend** | **v1.8.82** | https://ribocg-a11y.github.io/movikids/?force=1.8.82 |
-| **Gestão Pessoas** | **v1.8.82** | https://ribocg-a11y.github.io/movikids/gestao-pessoas.html?force=1.8.82 |
-| **Service Worker** | **1.8.82** | `sw.js` |
+| **Frontend** | **v1.8.83** | https://ribocg-a11y.github.io/movikids/?force=1.8.83 |
+| **Gestão Pessoas** | **v1.8.83** | https://ribocg-a11y.github.io/movikids/gestao-pessoas.html?force=1.8.83 |
+| **Service Worker** | **1.8.83** | `sw.js` |
 | **Holerite** | **mk-holerite.js** | CNPJ **66.664.255/0001-67** · PDF/imprimir |
-| **Apps Script** | repo **v1.5.116** · clasp **OK** · ping **v1.5.107** · Web **165** | ⚠️ **Nova versão Web pendente** (gráfico projetado acum.) |
+| **Apps Script** | repo **v1.5.117** · clasp **OK** · ping **v1.5.107** · Web **165** | ⚠️ **Nova versão Web pendente** (comandoOperacional + gráfico acum.) |
 | **Aba FOLHA** | **OK** (I25) | B68 ~5269,96 |
 | **Design System** | **v1.0** | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
 
@@ -107,12 +107,12 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 
 | # | Ação | Quem | Status |
 |---|------|------|--------|
-| 1 | **Nova versão Web GAS v1.5.116** (metaProjecaoMes / gráfico acum.) | **Sócio** | ⏳ pendente |
-| 2 | Dashboard PC: gráfico **Projetado acum. vs Real acum.** `?force=1.8.82` | **Você** | ✅ FE live |
-| 3 | Tablet: `?force=1.8.82` no PWA balcão (fora do pico) | **Ops** | ⏳ |
-| 4 | Kickoff **FASE 16** Centro de Comando + One UI | **Agente** | próximo após GAS Web |
+| 1 | **Nova versão Web GAS v1.5.117** (comandoOperacional + metaProjecaoMes) | **Sócio** | ⏳ pendente |
+| 2 | Dashboard PC: **Centro de comando** + gráfico acum. `?force=1.8.86` | **Você** | ✅ FE live |
+| 3 | Tablet: `?force=1.8.86` no PWA (fora do pico) | **Ops** | ⏳ |
+| 4 | FASE 16 — cockpit + sidebar mobile admin (16.6) | **Agente** | 🟡 16.1–16.6 entregues · 16.8 homolog pendente |
 
-**Nota ping:** string `v1.5.107` até Nova versão Web — código v1.5.116 já no editor (`prepare-gas-push` OK 20/06).
+**Nota ping:** string `v1.5.107` até Nova versão Web — código v1.5.117 já no editor.
 
 Doc: `PLANO_PREMIUM_ONEUI_FASES_16_22_2026-06.md` · fases: **`MAPA_FASES.md`**
 
@@ -195,7 +195,7 @@ Invoke-RestMethod "https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5
 .\scripts\pre-push-check.ps1
 ```
 
-Esperado: ping alinhado após Nova versão Web · Pages **1.8.82** · pre-push verde · operação livre.
+Esperado: ping alinhado após Nova versão Web · Pages **1.8.83** · pre-push verde · operação livre.
 
 ---
 

@@ -1631,6 +1631,114 @@
   0%, 100% { opacity: 1; }
   50% { opacity: 0.65; }
 }
+/* FASE 16.6 — sidebar mobile admin (read-only) */
+.mk-admin-mob-cmd {
+  margin: 0 0 10px;
+  padding: 12px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.28);
+  border: 1px solid rgba(255, 213, 79, 0.28);
+}
+.mk-admin-mob-cmd[hidden] { display: none !important; }
+@media (min-width: 1024px) {
+  .mk-admin-mob-cmd { display: none !important; }
+}
+.mk-admin-mob-cmd-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.mk-admin-mob-cmd-title {
+  font-family: 'Fredoka One', cursive;
+  font-size: 13px;
+  color: #FFD54F;
+  letter-spacing: 0.02em;
+}
+.mk-admin-mob-cmd-sync {
+  font-family: 'Nunito', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.45);
+}
+.mk-admin-mob-cmd-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.mk-admin-mob-cmd-kpi {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 8px 10px;
+  min-height: 52px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+}
+.mk-admin-mob-cmd-lbl {
+  font-family: 'Nunito', sans-serif;
+  font-size: 9px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.mk-admin-mob-cmd-val {
+  font-family: 'Nunito', sans-serif;
+  font-size: 16px;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1.15;
+}
+.mk-admin-mob-cmd-val--blue { color: #90CAF9; }
+.mk-admin-mob-cmd-val--purple { color: #CE93D8; }
+.mk-admin-mob-cmd-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.mk-admin-mob-cmd-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 9px 8px;
+  border-radius: 9px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.92);
+  font-family: 'Nunito', sans-serif;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+.mk-admin-mob-cmd-btn:hover {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.35);
+}
+.mk-admin-mob-cmd-btn--primary {
+  border-color: rgba(21, 101, 192, 0.55);
+  background: rgba(21, 101, 192, 0.35);
+}
+.mk-admin-mob-cmd-btn--primary:hover {
+  background: rgba(21, 101, 192, 0.48);
+}
+.mk-admin-mob-cmd-note {
+  margin: 0;
+  font-family: 'Nunito', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.38);
+  text-align: center;
+  line-height: 1.35;
+}
+
 .mk-command-center {
   background: var(--mk-admin-glass);
   backdrop-filter: blur(10px);
