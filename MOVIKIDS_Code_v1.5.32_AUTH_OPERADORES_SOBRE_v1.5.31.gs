@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.113
+// MOVI KIDS — Google Apps Script v1.5.114
+// v1.5.114: kpiMes.baselineFatMes — meta base fixa do mês (Script Property, não recalcula)
 // v1.5.113: historicoMeses — inclui meses vazios desde abr + proj. mês fechado no span real de operação
 // v1.5.112: kpiMes.historicoMeses — faturamento real vs projetado mês a mês (Dashboard)
 // v1.5.111: frota — Carro 04 em VEICULOS_VALIDOS (4 carros elétricos)
@@ -2006,6 +2007,24 @@ function buildLeadingFinanceiros_(ctx) {
   };
 }
 
+/** Meta base fixa do mês — gravada no 1º kpiMes do período (não recalcula com o ritmo). */
+function getOrSetBaselineFatMes_(mes, ano, fatMesAnt, lf, diasMes) {
+  const props = PropertiesService.getScriptProperties();
+  const key = 'BASELINE_FAT_' + String(mes).padStart(2, '0') + '_' + ano;
+  const hit = props.getProperty(key);
+  if (hit != null && hit !== '') return Math.round(Number(hit) * 100) / 100;
+  let base = Math.round((Number(fatMesAnt) || 0) * 100) / 100;
+  if (base <= 0 && lf) {
+    const be = lf.breakEvenLocacoesDia;
+    const ticket = Number(lf.ticketMedio) || 0;
+    if (be != null && ticket > 0) {
+      base = Math.round(be * ticket * diasMes * 100) / 100;
+    }
+  }
+  props.setProperty(key, String(base));
+  return base;
+}
+
 /** Projeção de fechamento para histórico mensal (mês corrente → fim do mês; fechado → span calendário operado). */
 function calcFatProjetadoHistorico_(fat, diasOp, diasMes, diasMap, mes, ano, hoje) {
   if (diasOp <= 0 || fat <= 0) return 0;
@@ -3078,6 +3097,7 @@ function buildKpiMesPayload_(p) {
   }));
 
   const historicoMeses = buildHistoricoFatProjecao_(mesAtual, anoAtual, fatByPayback, diasOpByMonth, hoje);
+  const baselineFatMes = getOrSetBaselineFatMes_(mesAtual, anoAtual, fatMesAnt, leadingFinanceiro, diasMes);
   const mesesRecentes = buildMesesRecentesParaSinal_(mesAtual, anoAtual, fatByPayback, cusByPayback);
   const alertaCtx = Object.assign({}, narrativaCtx, {
     cusMes: Math.round(cusMes * 100) / 100,
@@ -3160,6 +3180,7 @@ function buildKpiMesPayload_(p) {
     folhaPlanejamento: folhaPlanejamento,
     viabilidadeContratacao: viabilidadeContratacao,
     historicoMeses: historicoMeses,
+    baselineFatMes: baselineFatMes,
     lite: skipAdvanced || false
   };
 }

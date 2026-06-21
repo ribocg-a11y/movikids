@@ -1386,9 +1386,10 @@ function renderReceitaMesChart_(d) {
   const fatMes = Number(d.fatMes) || 0;
   const diasOp = Number(d.diasOperando) || 0;
   const mediaDia = Number(d.mediaDiaria) || 0;
+  const baselineFat = mkBaselineFatMes_(d);
 
-  if (hojeD <= 0 || diasOp <= 0 || projFat <= 0) {
-    setText2('nk-receita-mes-label', diasOp <= 0 ? 'sem dias com movimento' : 'projeção indisponível');
+  if (hojeD <= 0 || diasOp <= 0) {
+    setText2('nk-receita-mes-label', diasOp <= 0 ? 'sem dias com movimento' : 'sem dados');
     if (ins) ins.style.display = 'none';
     return;
   }
@@ -1404,48 +1405,60 @@ function renderReceitaMesChart_(d) {
     acc += fatMap[dd] || 0;
     return Math.round(acc);
   });
-  const projAcum = labels.map(function(dd) { return Math.round(projFat * dd / diasMes); });
-  const projHoje = Math.round(projFat * hojeD / diasMes);
-  const diff = fatMes - projHoje;
-  const pctDiff = projHoje > 0 ? Math.round(diff / projHoje * 100) : 0;
+  const baseAcum = labels.map(function(dd) {
+    return baselineFat > 0 ? Math.round(baselineFat * dd / diasMes) : 0;
+  });
+  const baseHoje = baselineFat > 0 ? Math.round(baselineFat * hojeD / diasMes) : 0;
+  const diff = fatMes - baseHoje;
+  const pctDiff = baseHoje > 0 ? Math.round(diff / baseHoje * 100) : 0;
 
-  setText2('nk-receita-mes-label', 'acum. ' + R2(fatMes) + ' · proj. mês ' + R2(projFat));
+  setText2('nk-receita-mes-label',
+    'acum. ' + R2(fatMes)
+    + (baselineFat > 0 ? ' · base fixa ' + R2(baselineFat) : '')
+    + (projFat > 0 ? ' · ritmo ' + R2(projFat) : ''));
 
-  const ptBg = acumulado.map(function(v, i) { return v >= projAcum[i] ? '#2E7D32' : '#FF8F00'; });
-  const maxY = Math.max(projFat, Math.max.apply(null, acumulado.concat([1]))) * 1.08;
+  const ptBg = acumulado.map(function(v, i) {
+    if (baselineFat <= 0) return '#1565C0';
+    return v >= baseAcum[i] ? '#2E7D32' : '#FF8F00';
+  });
+  const maxY = Math.max(baselineFat, projFat, Math.max.apply(null, acumulado.concat([1]))) * 1.08;
+
+  const datasets = [
+    {
+      label: 'Receita acumulada',
+      data: acumulado,
+      borderColor: '#1565C0',
+      backgroundColor: 'rgba(21,101,192,.12)',
+      borderWidth: 2.5,
+      pointRadius: labels.length > 20 ? 3 : 5,
+      pointHoverRadius: 7,
+      pointBackgroundColor: ptBg,
+      pointBorderColor: '#1565C0',
+      pointBorderWidth: 2,
+      tension: 0.2,
+      fill: true,
+      order: 1
+    }
+  ];
+  if (baselineFat > 0) {
+    datasets.push({
+      label: 'Linha de base',
+      data: baseAcum,
+      borderColor: '#5E35B1',
+      borderWidth: 2,
+      borderDash: [6, 4],
+      pointRadius: 0,
+      tension: 0,
+      fill: false,
+      order: 0
+    });
+  }
 
   chartReceitaMes = new Chart(cv, {
     type: 'line',
     data: {
       labels: labels.map(function(dd) { return dd + '/' + mesStr; }),
-      datasets: [
-        {
-          label: 'Receita acumulada',
-          data: acumulado,
-          borderColor: '#1565C0',
-          backgroundColor: 'rgba(21,101,192,.12)',
-          borderWidth: 2.5,
-          pointRadius: labels.length > 20 ? 3 : 5,
-          pointHoverRadius: 7,
-          pointBackgroundColor: ptBg,
-          pointBorderColor: '#1565C0',
-          pointBorderWidth: 2,
-          tension: 0.2,
-          fill: true,
-          order: 1
-        },
-        {
-          label: 'Projeção acumulada',
-          data: projAcum,
-          borderColor: '#5E35B1',
-          borderWidth: 2,
-          borderDash: [6, 4],
-          pointRadius: 0,
-          tension: 0,
-          fill: false,
-          order: 0
-        }
-      ]
+      datasets: datasets
     },
     options: {
       responsive: true,
@@ -1457,17 +1470,17 @@ function renderReceitaMesChart_(d) {
           callbacks: {
             label: function(ctx) {
               const val = Math.round(ctx.parsed.y);
-              if (ctx.dataset.label === 'Projeção acumulada') {
-                return 'Projeção acum.: ' + R2(val);
+              if (ctx.dataset.label === 'Linha de base') {
+                return 'Base acum.: ' + R2(val) + ' (meta fixa do mês)';
               }
               const i = ctx.dataIndex;
-              const esperado = projAcum[i] || 0;
+              const esperado = baseAcum[i] || 0;
               const delta = val - esperado;
               const parts = ['Acumulado: ' + R2(val)];
-              if (esperado > 0) {
+              if (baselineFat > 0 && esperado > 0) {
                 parts.push(delta >= 0
-                  ? ('+' + R2(delta) + ' vs ritmo projetado')
-                  : (R2(delta) + ' vs ritmo projetado'));
+                  ? ('+' + R2(delta) + ' vs base')
+                  : (R2(delta) + ' vs base'));
               }
               return parts.join(' · ');
             }
@@ -1495,18 +1508,52 @@ function renderReceitaMesChart_(d) {
 
   if (ins) {
     const msgs = [];
-    if (diff >= 0) {
-      msgs.push('Acumulado ' + R2(fatMes) + ' — ' + (pctDiff > 0 ? pctDiff + '% acima' : 'no ritmo')
-        + ' do projetado para o dia ' + hojeD + ' (' + R2(projHoje) + ' esperado).');
-    } else {
-      msgs.push('Acumulado ' + R2(fatMes) + ' — ' + Math.abs(pctDiff) + '% abaixo do ritmo projetado ('
-        + R2(projHoje) + ' esperado até hoje).');
+    if (baselineFat > 0) {
+      if (diff >= 0) {
+        msgs.push('Acumulado ' + R2(fatMes) + ' — ' + (pctDiff > 0 ? pctDiff + '% acima' : 'no ritmo')
+          + ' da meta base no dia ' + hojeD + ' (' + R2(baseHoje) + ' esperado).');
+      } else {
+        msgs.push('Acumulado ' + R2(fatMes) + ' — ' + Math.abs(pctDiff) + '% abaixo da meta base ('
+          + R2(baseHoje) + ' esperado até hoje).');
+      }
+      msgs.push('Meta base fixa do mês: ' + R2(baselineFat)
+        + ' (travada no início — linha reta até o fim do mês).');
     }
-    msgs.push('Fechamento projetado: ' + R2(projFat) + ' com média de ' + R2(mediaDia) + '/dia nos '
-      + diasOp + ' dias com movimento.');
-    ins.style.display = 'block';
+    if (projFat > 0) {
+      msgs.push('Fechamento no ritmo atual: ' + R2(projFat) + ' · média ' + R2(mediaDia) + '/dia nos '
+        + diasOp + ' dias com movimento.');
+    }
+    ins.style.display = msgs.length ? 'block' : 'none';
     ins.textContent = msgs.join(' ');
   }
+}
+
+/** Meta base fixa — GAS baselineFatMes ou localStorage no 1º load do mês. */
+function mkBaselineFatMes_(d) {
+  const fromGas = Number(d.baselineFatMes);
+  if (fromGas > 0) return fromGas;
+  const mes = d.mesAtual || new Date().getMonth() + 1;
+  const ano = d.anoAtual || new Date().getFullYear();
+  const key = 'mk_baseline_fat_v1_' + ano + '_' + mes;
+  try {
+    const raw = localStorage.getItem(key);
+    if (raw) {
+      const o = JSON.parse(raw);
+      if (o && Number(o.val) > 0) return Number(o.val);
+    }
+  } catch (e) { /* ignore */ }
+  let base = Number(d.fatMesAnt) || 0;
+  if (base <= 0 && d.leadingFinanceiro) {
+    const lf = d.leadingFinanceiro;
+    const be = lf.breakEvenLocacoesDia;
+    const ticket = Number(lf.ticketMedio) || 0;
+    const diasMes = Number(d.diasMes) || 30;
+    if (be != null && ticket > 0) base = Math.round(be * ticket * diasMes);
+  }
+  if (base > 0) {
+    try { localStorage.setItem(key, JSON.stringify({ val: base, at: Date.now() })); } catch (e) { /* ignore */ }
+  }
+  return base;
 }
 
 const MK_MES_ABREV_ = ['', 'Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
