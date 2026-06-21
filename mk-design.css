@@ -1695,6 +1695,37 @@
   color: #888;
   line-height: 1.35;
 }
+.mk-widget-ctx.trend-up { color: #2E7D32; }
+.mk-widget-ctx.trend-down { color: #C62828; }
+.mk-cmd-frota-strip {
+  margin-top: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+.mk-cmd-frota-lbl {
+  font-family: 'Nunito', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  color: #666;
+  margin-right: 4px;
+}
+.mk-cmd-veic {
+  font-family: 'Nunito', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(21, 101, 192, 0.12);
+  background: rgba(46, 125, 50, 0.1);
+  color: #2E7D32;
+}
+.mk-cmd-veic.em-uso {
+  background: rgba(94, 53, 177, 0.12);
+  color: #5E35B1;
+  border-color: rgba(94, 53, 177, 0.2);
+}
 .mk-cmd-alerts {
   margin-top: 12px;
   display: flex;

@@ -987,6 +987,34 @@ function renderAlertStrip_(d) {
 /** FASE 16 — centro de comando operacional (tempo real). */
 let commandCenterData = null;
 
+function mkCmdSetWidget_(idPrefix, val, ctx, trend) {
+  setText2(idPrefix + '-val', val);
+  const ctxEl = document.getElementById(idPrefix + '-ctx');
+  if (ctxEl) {
+    ctxEl.textContent = ctx || '—';
+    ctxEl.classList.remove('trend-up', 'trend-down');
+    if (trend === 'up') ctxEl.classList.add('trend-up');
+    else if (trend === 'down') ctxEl.classList.add('trend-down');
+  }
+}
+
+function renderCommandCenterFrotaStrip_(frota) {
+  const strip = document.getElementById('mk-cmd-frota-strip');
+  if (!strip) return;
+  const det = frota && frota.detalhe ? frota.detalhe : [];
+  if (!det.length) {
+    strip.hidden = true;
+    strip.innerHTML = '';
+    return;
+  }
+  strip.hidden = false;
+  strip.innerHTML = '<span class="mk-cmd-frota-lbl">Frota:</span>' + det.map(function(v) {
+    const cls = v.status === 'em_uso' ? 'mk-cmd-veic em-uso' : 'mk-cmd-veic';
+    const lbl = v.status === 'em_uso' ? (v.veiculo + ' · em uso') : (v.veiculo + ' · livre');
+    return '<span class="' + cls + '" title="' + lbl + '">' + v.veiculo + '</span>';
+  }).join('');
+}
+
 function renderCommandCenter_(d) {
   const box = document.getElementById('mk-command-center');
   if (!box || !d) return;
@@ -997,20 +1025,18 @@ function renderCommandCenter_(d) {
   const widgets = d.widgets || [];
   widgets.forEach(function(w) {
     if (w.id === 'loc') {
-      setText2('mk-cmd-loc-val', String(w.valor != null ? w.valor : '—'));
-      setText2('mk-cmd-loc-ctx', w.ctx || '—');
+      mkCmdSetWidget_('mk-cmd-loc', String(w.valor != null ? w.valor : '—'), w.ctx, w.trend);
     } else if (w.id === 'fat') {
       const v = Number(w.valor);
-      setText2('mk-cmd-fat-val', isNaN(v) ? String(w.valor) : R2(v));
-      setText2('mk-cmd-fat-ctx', w.ctx || '—');
+      mkCmdSetWidget_('mk-cmd-fat', isNaN(v) ? String(w.valor) : R2(v), w.ctx, w.trend);
     } else if (w.id === 'equipe') {
-      setText2('mk-cmd-equipe-val', String(w.valor != null ? w.valor : '—'));
-      setText2('mk-cmd-equipe-ctx', w.ctx || '—');
+      mkCmdSetWidget_('mk-cmd-equipe', String(w.valor != null ? w.valor : '—'), w.ctx, w.trend);
     } else if (w.id === 'frota') {
-      setText2('mk-cmd-frota-val', String(w.valor != null ? w.valor : '—'));
-      setText2('mk-cmd-frota-ctx', w.ctx || '—');
+      mkCmdSetWidget_('mk-cmd-frota', String(w.valor != null ? w.valor : '—'), w.ctx, w.trend);
     }
   });
+
+  renderCommandCenterFrotaStrip_(d.frota);
 
   const alertsEl = document.getElementById('mk-cmd-alerts');
   const alertas = d.alertas || [];

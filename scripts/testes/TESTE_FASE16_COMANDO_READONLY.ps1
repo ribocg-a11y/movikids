@@ -30,17 +30,19 @@ try {
 
   $cmd = Invoke-CmdApi @{ action = "comandoOperacional"; adminPin = $AdminPin }
   if ($cmd.erro -and $cmd.erro -match 'desconhecida') {
-    Add-C16Check "comandoOperacional" "warn" "action ausente — publique GAS v1.5.117+ Nova versao Web"
+    Add-C16Check "comandoOperacional" "warn" "action ausente — publique GAS v1.5.118+ Nova versao Web"
     $result.status = "warn"
     $result.summary = "FASE 16 API pendente deploy GAS"
   } elseif (-not $cmd.ok) {
     throw "comandoOperacional falhou: $($cmd.erro)"
   } else {
-    foreach ($field in @('data', 'locacoes', 'fatHoje', 'equipe', 'frota', 'widgets')) {
+    foreach ($field in @('data', 'locacoes', 'fatHoje', 'equipe', 'frota', 'widgets', 'comparativo30d')) {
       if ($null -eq $cmd.$field) { throw "campo ausente: $field" }
     }
+    if ($null -eq $cmd.frota.detalhe) { throw "frota.detalhe ausente" }
     Add-C16Check "comandoOperacional" "ok" ("abertas=" + $cmd.locacoes.abertas + " fatHoje=" + $cmd.fatHoje)
-    Add-C16Check "widgets" "ok" ("n=" + $cmd.widgets.Count)
+    Add-C16Check "frota.detalhe" "ok" ("n=" + $cmd.frota.detalhe.Count)
+    Add-C16Check "comparativo30d" "ok" ("media=" + $cmd.comparativo30d.media)
     $result.status = "ok"
     $result.summary = "FASE 16 comando OK"
   }

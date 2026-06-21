@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.117
+// MOVI KIDS — Google Apps Script v1.5.118
+// v1.5.118: FASE 16 — comandoOperacional comparativo 30d + frotaDetalhe por veículo
 // v1.5.117: FASE 16 — comandoOperacional (painel tempo real leve)
 // v1.5.116: metaProjecaoMes = projecaoFat travado (card Faturamento projetado) / diasMes
 // v1.5.115: metaProjecaoMes — projeção mensal fixa (1ª semana) + projDiariaFixa acumulada
@@ -2050,6 +2051,49 @@ function getOrSetMetaProjecaoMes_(mes, ano, projecaoFat, fatDiaArr, diasMes, lf)
   return meta;
 }
 
+/** Média de faturamento/dia nos últimos N dias calendário (só dias com movimento). */
+function calcMediaFatDiariaUltimosDias_(nDias) {
+  const janela = Math.max(1, Math.min(60, Number(nDias) || 30));
+  const hoje = new Date();
+  hoje.setHours(0, 0, 0, 0);
+  const minTs = hoje.getTime() - (janela - 1) * 86400000;
+  const porDia = {};
+  const shLoc = sh_(SH_LOC);
+  const lastLoc = shLoc.getLastRow();
+  if (lastLoc >= DATA_ROW) {
+    const rows = shLoc.getRange(DATA_ROW, 1, lastLoc - DATA_ROW + 1, 15).getValues();
+    for (let i = 0; i < rows.length; i++) {
+      const r = rows[i];
+      if (!r[0] || String(r[14] || '').trim() !== 'Encerrada') continue;
+      const dataFmt = cellToStr_(r[1]);
+      const dt = parseDataStr_(dataFmt);
+      if (!dt) continue;
+      dt.setHours(0, 0, 0, 0);
+      const ts = dt.getTime();
+      if (ts < minTs || ts > hoje.getTime()) continue;
+      porDia[dataFmt] = (porDia[dataFmt] || 0) + (Number(r[10]) || 0);
+    }
+  }
+  const keys = Object.keys(porDia);
+  const total = keys.reduce(function(s, k) { return s + porDia[k]; }, 0);
+  const diasComMov = keys.length;
+  return {
+    media: diasComMov > 0 ? Math.round(total / diasComMov * 100) / 100 : 0,
+    diasComMov: diasComMov,
+    janela: janela
+  };
+}
+
+function fmtComparativoPct_(atual, base, label) {
+  const a = Number(atual) || 0;
+  const b = Number(base) || 0;
+  if (b <= 0) return '';
+  const pct = Math.round((a - b) / b * 100);
+  if (pct > 0) return '↑ ' + pct + '% vs ' + label;
+  if (pct < 0) return '↓ ' + Math.abs(pct) + '% vs ' + label;
+  return 'No ritmo da ' + label;
+}
+
 /** FASE 16 — centro de comando operacional (leitura única, tempo real). */
 function buildPainelComandoOperacional_() {
   const agora = new Date();
@@ -2090,6 +2134,14 @@ function buildPainelComandoOperacional_() {
 
   const frotaTotal = veiculosOp_().length;
   const frotaEmUso = Object.keys(veiculosEmUso).length;
+  const frotaDetalhe = veiculosOp_().map(function(v) {
+    const nLoc = veiculosEmUso[v] || 0;
+    return {
+      veiculo: v,
+      status: nLoc > 0 ? 'em_uso' : 'disponivel',
+      nLoc: nLoc
+    };
+  });
 
   let presentes = 0;
   let equipeTotal = 0;
@@ -2139,13 +2191,24 @@ function buildPainelComandoOperacional_() {
 
   const fatHoje = Math.round(core.fat * 100) / 100;
   const resHoje = Math.round(core.resultado * 100) / 100;
-  const ticket = leading && leading.ticketMedio ? Number(leading.ticketMedio) : 0;
-  const ctxFat = core.n > 0
+  const comp30 = calcMediaFatDiariaUltimosDias_(30);
+  const cmpFat = fmtComparativoPct_(fatHoje, comp30.media, 'média 30d');
+  let ctxFat = core.n > 0
     ? (core.n + ' loc · resultado ' + (resHoje >= 0 ? '+' : '') + resHoje)
     : 'Nenhuma locação encerrada hoje';
-  const ctxLoc = nAtiva + nPendente > 0
+  if (cmpFat) ctxFat = cmpFat + (comp30.media > 0 ? ' (R$ ' + comp30.media + '/dia)' : '') + ' · ' + ctxFat;
+  else if (comp30.media > 0) ctxFat = 'Média 30d R$ ' + comp30.media + '/dia · ' + ctxFat;
+  const fatTrend = cmpFat.indexOf('↑') === 0 ? 'up' : (cmpFat.indexOf('↓') === 0 ? 'down' : 'neutral');
+
+  let ctxLoc = nAtiva + nPendente > 0
     ? (nAtiva + ' ativa(s) · ' + nPendente + ' pendente(s)')
     : 'Operação livre';
+  if (leading && leading.breakEvenLocacoesDia != null && core.n >= 0) {
+    const be = Number(leading.breakEvenLocacoesDia);
+    if (core.n >= be) ctxLoc += ' · meta dia OK (' + be + '+ loc)';
+    else ctxLoc += ' · faltam ' + Math.max(0, be - core.n) + ' loc p/ meta';
+  }
+
   const ctxEquipe = sessao
     ? (presentes + ' presente(s) · balcão: ' + sessao.nome)
     : (presentes + ' presente(s) de ' + equipeTotal + ' na equipe');
@@ -2164,6 +2227,7 @@ function buildPainelComandoOperacional_() {
     fatHoje: fatHoje,
     nHoje: core.n,
     resultadoHoje: resHoje,
+    comparativo30d: comp30,
     leadingDia: leading,
     equipe: {
       presentes: presentes,
@@ -2173,14 +2237,15 @@ function buildPainelComandoOperacional_() {
     frota: {
       total: frotaTotal,
       emUso: frotaEmUso,
-      disponivel: Math.max(0, frotaTotal - frotaEmUso)
+      disponivel: Math.max(0, frotaTotal - frotaEmUso),
+      detalhe: frotaDetalhe
     },
     alertas: alertas.slice(0, 3),
     widgets: [
-      { id: 'loc', label: 'Locações abertas', valor: nAtiva + nPendente, ctx: ctxLoc },
-      { id: 'fat', label: 'Faturamento hoje', valor: fatHoje, ctx: ctxFat },
-      { id: 'equipe', label: 'Equipe', valor: presentes, ctx: ctxEquipe },
-      { id: 'frota', label: 'Frota', valor: frotaEmUso + '/' + frotaTotal, ctx: ctxFrota }
+      { id: 'loc', label: 'Locações abertas', valor: nAtiva + nPendente, ctx: ctxLoc, trend: nAtiva + nPendente > 0 ? 'neutral' : 'up' },
+      { id: 'fat', label: 'Faturamento hoje', valor: fatHoje, ctx: ctxFat, trend: fatTrend },
+      { id: 'equipe', label: 'Equipe', valor: presentes, ctx: ctxEquipe, trend: presentes > 0 ? 'up' : 'neutral' },
+      { id: 'frota', label: 'Frota', valor: frotaEmUso + '/' + frotaTotal, ctx: ctxFrota, trend: 'neutral' }
     ]
   };
 }
