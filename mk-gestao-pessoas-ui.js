@@ -1200,6 +1200,33 @@
     }
     function metaDiasOk(m) { return (m.diasMes || []).filter(d => d.bonusOk); }
 
+    function gpNotaStars_(n) {
+      var out = '';
+      var v = Math.max(0, Math.min(5, Number(n) || 0));
+      for (var i = 1; i <= 5; i++) out += i <= v ? '★' : '☆';
+      return out;
+    }
+
+    function renderAvaliacoesColab_(p) {
+      var list = (p && p.avaliacoes) || [];
+      if (!list.length) return '';
+      var cards = list.map(function (a) {
+        var nota = Number(a.nota) || 0;
+        var tone = nota >= 4 ? 'ok' : (nota >= 3 ? 'mid' : 'low');
+        return '<article class="gp-av-card gp-av-card--' + tone + '">' +
+          '<div class="gp-av-card-head">' +
+          '<span class="gp-av-stars" aria-label="Nota ' + nota + ' de 5">' + gpNotaStars_(nota) + '</span>' +
+          '<span class="gp-av-area">' + escHtml_(a.area || 'Competência') + '</span></div>' +
+          (a.observacao ? '<p class="gp-av-obs">' + escHtml_(a.observacao) + '</p>' : '') +
+          '<span class="gp-av-meta">' + escHtml_(a.competencia || '') + (a.criadoEm ? ' · ' + escHtml_(a.criadoEm) : '') + '</span>' +
+          '</article>';
+      }).join('');
+      return '<div class="gp-avaliacoes">' +
+        '<h3 class="gp-avaliacoes-title">Feedback da gestão</h3>' +
+        '<p class="gp-avaliacoes-lead">Avaliações do mês por competência — use para evoluir no trabalho.</p>' +
+        '<div class="gp-avaliacoes-list">' + cards + '</div></div>';
+    }
+
     function renderHistoricoDesempenho_(p) {
       var h = p.historicoDesempenho;
       if (!h || !h.meses || !h.meses.length) return '';
@@ -1233,8 +1260,9 @@
       const p = PESSOAS[colabLogado];
       let html;
       const historico = renderHistoricoDesempenho_(p);
+      const avaliacoes = renderAvaliacoesColab_(p);
       if (!p.meta) {
-        html = '<div class="mock-note info">Milena (sócia) não tem meta de locações por turno.</div>' + historico;
+        html = '<div class="mock-note info">Milena (sócia) não tem meta de locações por turno.</div>' + historico + avaliacoes;
       } else {
         const m = p.meta;
         const pct = Math.min(100, Math.round(m.atual / m.alvo * 100));
@@ -1264,7 +1292,7 @@
             <div class="mock-prog" style="margin-top:12px"><div class="mock-prog-fill" style="width:${pct}%"></div></div>
             <p style="font-size:13px;font-weight:700;margin-top:10px;color:var(--txt2)">Bônus R$ ${fmtBRL(m.bonusValor)} ao fazer ${m.bonusMin}+ locações no turno.</p>
             <p style="font-size:11px;font-weight:700;margin-top:8px;color:var(--txt3)">Admissão ${m.admissao || p.admissao || '—'} · histórico só a partir desta data</p>
-          </div>${tabela}${historico}`;
+          </div>${tabela}${historico}${avaliacoes}`;
       }
       document.getElementById('metas-body').innerHTML = html;
     }

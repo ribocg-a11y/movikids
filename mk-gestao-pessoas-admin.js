@@ -4,6 +4,7 @@
 
   let gpAdmData_ = null;
   let gpAdmTab_ = 'hoje';
+  const GP_COMPETENCIAS_RH_ = ['Atendimento ao cliente', 'Pontualidade e presença', 'Metas de locação', 'Trabalho em equipe', 'Cuidado com a frota'];
   let gpAdmSelId_ = null;
   let gpAdmFichaSub_ = 'jornada';
   let gpAdmLoadPromise_ = null;
@@ -539,6 +540,103 @@
     sel.dataset.gpFilled = '1';
   }
 
+  function gpAdmNotaStars_(n) {
+    var out = '';
+    var v = Math.max(0, Math.min(5, Number(n) || 0));
+    for (var i = 1; i <= 5; i++) out += i <= v ? '★' : '☆';
+    return out;
+  }
+
+  function gpAdmNomeById_(id) {
+    const c = (gpAdmData_ && gpAdmData_.colaboradores || []).find(function (x) { return Number(x.id) === Number(id); });
+    return c ? c.nome : ('ID ' + id);
+  }
+
+  function gpAdmFillAvFormSelects_() {
+    const colSel = document.getElementById('gp-av-colab');
+    const areaSel = document.getElementById('gp-av-area');
+    const compInp = document.getElementById('gp-av-comp');
+    if (colSel && colSel.dataset.gpFilled !== '1') {
+      const cols = (gpAdmData_ && gpAdmData_.colaboradores) || [];
+      colSel.innerHTML = cols.filter(function (c) { return c.temRh !== false; }).map(function (c) {
+        return '<option value="' + c.id + '">' + esc(c.nome) + '</option>';
+      }).join('');
+      colSel.dataset.gpFilled = '1';
+    }
+    if (areaSel && areaSel.dataset.gpFilled !== '1') {
+      const areas = (gpAdmData_ && gpAdmData_.competenciasRh) || GP_COMPETENCIAS_RH_;
+      areaSel.innerHTML = areas.map(function (a) {
+        return '<option value="' + esc(a) + '">' + esc(a) + '</option>';
+      }).join('');
+      areaSel.dataset.gpFilled = '1';
+    }
+    if (compInp && !String(compInp.value || '').trim() && gpAdmData_) {
+      compInp.value = gpAdmData_.competencia || '';
+    }
+  }
+
+  function gpAdmRenderAvaliacoes_() {
+    gpAdmFillAvFormSelects_();
+    const el = document.getElementById('gp-adm-avaliacoes-list');
+    if (!el) return;
+    const list = (gpAdmData_ && gpAdmData_.avaliacoesRh) || [];
+    if (!list.length) {
+      el.innerHTML = '<p class="gp-adm-muted">Nenhuma avaliação — registre acima ou instale aba AVALIACOES_RH.</p>';
+      return;
+    }
+    el.innerHTML = list.map(function (a) {
+      const nota = Number(a.nota) || 0;
+      const tone = nota >= 4 ? 'ok' : (nota >= 3 ? 'blue' : 'warn');
+      const meta = [gpAdmNomeById_(a.operadorId), a.competencia, a.criadoEm].filter(Boolean).join(' · ');
+      return '<div class="gp-adm-av-row gp-adm-av-row--' + tone + '">' +
+        '<div class="gp-adm-av-row-head">' +
+        '<span class="gp-adm-badge ' + (nota >= 4 ? 'ok' : (nota >= 3 ? 'blue' : 'warn')) + '">' + gpAdmNotaStars_(nota) + '</span>' +
+        '<strong>' + esc(a.area || 'Competência') + '</strong></div>' +
+        (a.observacao ? '<p class="gp-adm-muted" style="margin:0 0 6px">' + esc(a.observacao) + '</p>' : '') +
+        '<div class="gp-adm-com-meta">' + esc(meta || '—') + '</div></div>';
+    }).join('');
+  }
+
+  window.mkGpAdmSalvarAvaliacao_ = async function () {
+    const opId = (document.getElementById('gp-av-colab') || {}).value;
+    const comp = (document.getElementById('gp-av-comp') || {}).value || (gpAdmData_ && gpAdmData_.competencia) || '';
+    const area = (document.getElementById('gp-av-area') || {}).value || '';
+    const nota = (document.getElementById('gp-av-nota') || {}).value || '3';
+    const observacao = (document.getElementById('gp-av-obs') || {}).value || '';
+    if (!opId) {
+      if (typeof toast === 'function') toast('Selecione o colaborador', 'warning');
+      return;
+    }
+    if (!String(area).trim()) {
+      if (typeof toast === 'function') toast('Selecione a competência avaliada', 'warning');
+      return;
+    }
+    try {
+      const d = await api(Object.assign({
+        action: 'salvarAvaliacaoRhAdmin',
+        operadorId: opId,
+        competencia: String(comp).trim(),
+        area: String(area).trim(),
+        nota: nota,
+        observacao: String(observacao).trim()
+      }, gpAdmPinParams_()), 30000);
+      if (!d.ok) {
+        if (typeof toast === 'function') toast(d.erro || 'Erro ao salvar', 'error');
+        return;
+      }
+      if (typeof toast === 'function') toast('Avaliação registrada', 'success');
+      const obsEl = document.getElementById('gp-av-obs');
+      if (obsEl) obsEl.value = '';
+      if (typeof sessionStorage !== 'undefined') {
+        try { sessionStorage.removeItem(gpAdmCacheKey_()); } catch (e) { /* ignore */ }
+      }
+      await window.mkGpAdmLoad_({ force: true });
+      mkGpAdmSetTab('avaliacoes');
+    } catch (e) {
+      if (typeof toast === 'function') toast((e && e.message) || 'Erro de conexão', 'error');
+    }
+  };
+
   function gpAdmRenderComunicados_() {
     gpAdmFillComPublicoSelect_();
     const el = document.getElementById('gp-adm-comunicados-list');
@@ -609,6 +707,7 @@
     gpAdmRenderMetas_();
     gpAdmRenderFolha_();
     gpAdmRenderComunicados_();
+    gpAdmRenderAvaliacoes_();
     const compEl = document.getElementById('gp-adm-comp');
     if (compEl && gpAdmData_) compEl.textContent = gpAdmData_.competencia || '';
     gpAdmSetTab_(gpAdmTab_);

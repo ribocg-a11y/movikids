@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.127
+// MOVI KIDS — Google Apps Script v1.5.128
+// v1.5.128: FASE 15b.5b — AVALIACOES_RH + salvar/listar admin + painel colaborador
 // v1.5.127: fix salvarCadastroColaborador — getRange(row,col,1,7) cols cpf..admissao (nao endRow)
 // v1.5.126: FASE 15b.5 — cadastro RH obrigatorio + salvarCadastroColaborador + bloqueio balcao
 // v1.5.125: FASE 15b.4 — historicoDesempenho colaborador (loc/mês, dias meta, 6 meses)
@@ -415,6 +416,8 @@ function dispatchMoviAction_(p, method) {
       case 'instalarAbasGestaoPessoasAdmin': return instalarAbasGestaoPessoasAdmin_(p);
       case 'listarComunicadosRhAdmin': return listarComunicadosRhAdmin_(p);
       case 'salvarComunicadoRhAdmin': return salvarComunicadoRhAdmin_(p);
+      case 'listarAvaliacoesRhAdmin': return listarAvaliacoesRhAdmin_(p);
+      case 'salvarAvaliacaoRhAdmin': return salvarAvaliacaoRhAdmin_(p);
       case 'salvarCadastroColaborador': return salvarCadastroColaborador_(p);
       default:
         return err_('Ação desconhecida: ' + action, 400);
@@ -6920,6 +6923,8 @@ const SH_HOLERITES = 'HOLERITES';
 const SH_METAS_COLAB = 'METAS_COLABORADORES';
 const SH_BANCO_HORAS = 'BANCO_HORAS';
 const SH_COMUNICADOS_RH = 'COMUNICADOS_RH';
+const SH_AVALIACOES_RH = 'AVALIACOES_RH';
+const GP_COMPETENCIAS_RH_ = ['Atendimento ao cliente', 'Pontualidade e presença', 'Metas de locação', 'Trabalho em equipe', 'Cuidado com a frota'];
 const GP_DATA_ROW = 2;
 
 function gpSheet_(name) {
@@ -7879,8 +7884,9 @@ function gpBuildPainelColaboradorPayload_(opId, comp, colab, operador) {
       holerite: hol
     },
     comunicados: gpComunicadosForOp_(opId),
+    avaliacoes: gpAvaliacoesForOp_(opId, comp),
     historicoDesempenho: historicoDesempenho,
-    versao: 'v1.5.126'
+    versao: 'v1.5.128'
   };
 }
 
@@ -8143,8 +8149,10 @@ function painelGestaoPessoasAdmin_(p) {
         total: colaboradores.length, presentes: presentes, comTurno: comTurno,
         alertas: alertasPack.total, alertasIntel: intelRh.length
       },
-      sessaoAtiva: sessao, versao: 'v1.5.124',
-      comunicadosRh: gpComunicadosAllAdmin_()
+      sessaoAtiva: sessao, versao: 'v1.5.128',
+      comunicadosRh: gpComunicadosAllAdmin_(),
+      avaliacoesRh: gpAvaliacoesAllAdmin_(),
+      competenciasRh: GP_COMPETENCIAS_RH_
     };
     const out = JSON.stringify({ ok: true, ...payload });
     try {
@@ -8158,9 +8166,9 @@ function painelGestaoPessoasAdmin_(p) {
 
 function gestaoPessoasStatus_() {
   const ss = ss_();
-  const abas = [SH_COLAB_RH, SH_FOLHA_PONTO, SH_ESCALA_COLAB, SH_FALTAS, SH_HOLERITES, SH_METAS_COLAB, SH_BANCO_HORAS, SH_COMUNICADOS_RH];
+  const abas = [SH_COLAB_RH, SH_FOLHA_PONTO, SH_ESCALA_COLAB, SH_FALTAS, SH_HOLERITES, SH_METAS_COLAB, SH_BANCO_HORAS, SH_COMUNICADOS_RH, SH_AVALIACOES_RH];
   const ok = abas.every(function (n) { return !!ss.getSheetByName(n); });
-  return resp_({ ok: ok, abas: abas.map(function (n) { return { nome: n, existe: !!ss.getSheetByName(n) }; }), versao: 'v1.5.124' });
+  return resp_({ ok: ok, abas: abas.map(function (n) { return { nome: n, existe: !!ss.getSheetByName(n) }; }), versao: 'v1.5.128' });
 }
 
 function gpComunicadosRowsSafe_() {
@@ -8256,6 +8264,74 @@ function salvarComunicadoRhAdmin_(p) {
   }
 }
 
+function gpAvaliacoesRowsSafe_() {
+  try {
+    const sh = ss_().getSheetByName(SH_AVALIACOES_RH);
+    if (!sh || sh.getLastRow() < GP_DATA_ROW) return [];
+    return sh.getRange(GP_DATA_ROW, 1, sh.getLastRow() - GP_DATA_ROW + 1, sh.getLastColumn()).getValues();
+  } catch (e) { return []; }
+}
+
+function gpAvaliacaoFromRow_(r) {
+  return {
+    id: Number(r[0]),
+    operadorId: Number(r[1]),
+    competencia: gpNormCompetencia_(cellToStr_(r[2])),
+    area: String(r[3] || '').trim(),
+    nota: Math.max(0, Math.min(5, Number(r[4]) || 0)),
+    observacao: String(r[5] || '').trim(),
+    criadoEm: cellToStr_(r[6])
+  };
+}
+
+function gpAvaliacoesForOp_(opId, competencia) {
+  const comp = gpNormCompetencia_(competencia || gpCompetenciaAtual_());
+  return gpAvaliacoesRowsSafe_()
+    .map(gpAvaliacaoFromRow_)
+    .filter(function (a) { return Number(a.operadorId) === Number(opId) && a.area && a.nota > 0; })
+    .filter(function (a) { return !comp || a.competencia === comp; })
+    .sort(function (a, b) { return String(b.criadoEm || '').localeCompare(String(a.criadoEm || '')); });
+}
+
+function gpAvaliacoesAllAdmin_() {
+  return gpAvaliacoesRowsSafe_()
+    .map(gpAvaliacaoFromRow_)
+    .filter(function (a) { return a.area && a.nota > 0; })
+    .sort(function (a, b) { return String(b.criadoEm || '').localeCompare(String(a.criadoEm || '')); });
+}
+
+function listarAvaliacoesRhAdmin_(p) {
+  if (!isGestaoRequest_(p)) return err_('Acesso negado — gestao (admin/gestor)', 403);
+  return resp_({ avaliacoes: gpAvaliacoesAllAdmin_(), competencias: GP_COMPETENCIAS_RH_, versao: 'v1.5.128' });
+}
+
+function salvarAvaliacaoRhAdmin_(p) {
+  if (!adminPinOk_(p)) return err_('Acesso negado — PIN admin 1416', 403);
+  try {
+    const opId = Number(p.operadorId || p.id || 0);
+    if (!opId) return err_('operadorId obrigatorio', 400);
+    const area = String(p.area || p.competenciaArea || '').trim();
+    if (!area) return err_('area (competencia) obrigatoria', 400);
+    const nota = Math.round(Number(p.nota || 0));
+    if (nota < 1 || nota > 5) return err_('nota deve ser de 1 a 5', 400);
+    const observacao = String(p.observacao || p.obs || '').trim().slice(0, 500);
+    const comp = gpNormCompetencia_(String(p.competencia || gpCompetenciaAtual_()));
+    const sh = gpSheet_(SH_AVALIACOES_RH);
+    const last = sh.getLastRow();
+    const nextId = last >= GP_DATA_ROW ? Number(sh.getRange(last, 1).getValue()) + 1 : 1;
+    const agora = fmtData_(new Date()) + ' ' + fmtHoraLocal_(new Date());
+    sh.appendRow([nextId, opId, comp, area, nota, observacao, agora]);
+    const lr = sh.getLastRow();
+    if (lr >= GP_DATA_ROW) {
+      sh.getRange(lr, 3).setNumberFormat('@');
+    }
+    try { CacheService.getScriptCache().remove('gp_painel_adm_' + gpNormCompetencia_(gpCompetenciaAtual_())); } catch (e) { /* ok */ }
+    return resp_({ id: nextId, operadorId: opId, competencia: comp, area: area, nota: nota, versao: 'v1.5.128' });
+  } catch (ex) {
+    return err_('Aba AVALIACOES_RH ausente — instale abas Gestao Pessoas (Operadores)', 503);
+  }
+}
+
 function instalarAbasGestaoPessoasCore_() {
   const ss = ss_();
   function ensure(name, color, headers, seeds) {
@@ -8294,6 +8370,11 @@ function instalarAbasGestaoPessoasCore_() {
   const shCom = ss.getSheetByName(SH_COMUNICADOS_RH);
   if (shCom && shCom.getLastRow() >= GP_DATA_ROW) {
     shCom.getRange(GP_DATA_ROW, 2, shCom.getLastRow() - GP_DATA_ROW + 1, 1).setNumberFormat('@');
+  }
+  ensure(SH_AVALIACOES_RH, '#7E57C2', ['id','operador_id','competencia','area','nota','observacao','criado_em'], []);
+  const shAv = ss.getSheetByName(SH_AVALIACOES_RH);
+  if (shAv && shAv.getLastRow() >= GP_DATA_ROW) {
+    shAv.getRange(GP_DATA_ROW, 3, shAv.getLastRow() - GP_DATA_ROW + 1, 1).setNumberFormat('@');
   }
 }
 

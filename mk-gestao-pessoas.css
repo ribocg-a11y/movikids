@@ -442,6 +442,60 @@ html.gp-mode-app #gp-app {
 #page-operadores .gp-adm-com-row-head strong { font-size: 15px; }
 #page-operadores .gp-adm-com-meta { font-size: 11px; font-weight: 700; color: var(--txt3); }
 
+/* FASE 15b.5b — Avaliações RH (admin + colaborador) */
+#page-operadores .gp-adm-av-form { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+#page-operadores .gp-adm-av-form .form-input,
+#page-operadores .gp-adm-av-form textarea { width: 100%; }
+#page-operadores .gp-adm-av-form textarea { min-height: 72px; resize: vertical; }
+#page-operadores .gp-adm-av-row {
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 12px 14px;
+  margin-bottom: 10px;
+  background: var(--card);
+}
+#page-operadores .gp-adm-av-row--ok { border-color: rgba(46, 125, 50, 0.35); background: rgba(232, 245, 233, 0.4); }
+#page-operadores .gp-adm-av-row--blue { border-color: rgba(21, 101, 192, 0.35); }
+#page-operadores .gp-adm-av-row--warn { border-color: rgba(230, 81, 0, 0.35); background: rgba(255, 243, 224, 0.35); }
+#page-operadores .gp-adm-av-row-head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 6px; }
+#page-operadores .gp-adm-av-row-head strong { font-size: 15px; }
+#page-operadores .gp-adm-badge.blue { background: rgba(227, 242, 253, 0.9); color: var(--blue-dk); }
+
+#gp-app .gp-avaliacoes {
+  margin-top: 16px;
+  padding: 14px;
+  border-radius: var(--mk-widget-radius, 16px);
+  border: 1px solid rgba(126, 87, 194, 0.35);
+  background: linear-gradient(145deg, rgba(237, 231, 246, 0.85), rgba(255, 255, 255, 0.98));
+}
+#gp-app .gp-avaliacoes-title {
+  font-family: 'Fredoka One', cursive;
+  font-size: 18px;
+  color: var(--blue-dk);
+  margin: 0 0 4px;
+}
+#gp-app .gp-avaliacoes-lead {
+  margin: 0 0 12px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--txt2);
+}
+#gp-app .gp-avaliacoes-list { display: flex; flex-direction: column; gap: 10px; }
+#gp-app .gp-av-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 12px;
+}
+#gp-app .gp-av-card--ok { border-color: rgba(46, 125, 50, 0.35); }
+#gp-app .gp-av-card--mid { border-color: rgba(21, 101, 192, 0.3); }
+#gp-app .gp-av-card--low { border-color: rgba(230, 81, 0, 0.35); }
+#gp-app .gp-av-card-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 4px; }
+#gp-app .gp-av-stars { color: #f9a825; font-size: 14px; letter-spacing: 1px; }
+#gp-app .gp-av-area { font-size: 13px; font-weight: 800; color: var(--txt); }
+#gp-app .gp-av-obs { margin: 0 0 6px; font-size: 13px; font-weight: 600; color: var(--txt2); line-height: 1.45; }
+#gp-app .gp-av-meta { font-size: 10px; font-weight: 700; color: var(--txt3); }
+
 .gp-preview-banner {
   position: sticky;
   top: 0;

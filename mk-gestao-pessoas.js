@@ -56,6 +56,7 @@
       },
       _holerite: hol,
       comunicados: data.comunicados || [],
+      avaliacoes: data.avaliacoes || [],
       historicoDesempenho: data.historicoDesempenho || null
     };
   }
@@ -103,6 +104,9 @@
     },
     salvarCadastro: function (operadorId, pin, cadastro) {
       return gpApi('salvarCadastroColaborador', Object.assign({ operadorId: operadorId, pin: pin }, cadastro || {}));
+    },
+    salvarAvaliacaoAdmin: function (pinParams, data) {
+      return gpApi('salvarAvaliacaoRhAdmin', Object.assign({}, pinParams || {}, data || {}));
     }
   };
 })(typeof window !== 'undefined' ? window : globalThis);

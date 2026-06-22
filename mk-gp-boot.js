@@ -1,6 +1,6 @@
 /* MOVI KIDS — boot Colaboradores (gestao-pessoas.html · Safari / PWA) */
 (function () {
-  var v = window.MK_VERSION || '1.8.106';
+  var v = window.MK_VERSION || '1.8.107';
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.addEventListener('message', function (event) {
       if (event.data && event.data.type === 'MK_UPDATE_READY' && event.data.version && event.data.version !== v) {
