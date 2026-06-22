@@ -65,7 +65,7 @@
     const msg = a.mensagem || a.turno || '';
     const intel = a.inteligente ? '<span class="gp-adm-intel-badge">Proativo</span> ' : '';
     return '<div class="gp-adm-row"><div class="gp-adm-av">' + gpAdmInitial_(nome) + '</div>' +
-      '<div class="gp-adm-row-body">' + intel + '<strong>' + esc(a.titulo || nome) + '</strong><small>' + esc(msg) + '</small>' +
+      '<div class="gp-adm-row-body">' + intel + '<span class="gp-adm-soft-title">' + esc(a.titulo || nome) + '</span><small>' + esc(msg) + '</small>' +
       (a.acionavel ? '<small class="gp-adm-act">' + esc(a.acionavel) + '</small>' : '') +
       '</div><span class="gp-adm-badge ' + (badgeCls || 'warn') + '">' + esc(badgeLbl || 'Alerta') + '</span></div>';
   }
@@ -201,7 +201,7 @@
       });
       if (ok) {
         const kv = filledItems.map(function (it) {
-          return '<div class="gp-adm-cad-kv"><span>' + esc(it.label) + '</span><strong>' + esc(it.v) + '</strong></div>';
+          return '<div class="gp-adm-cad-kv"><span>' + esc(it.label) + '</span><span class="gp-adm-soft-val">' + esc(it.v) + '</span></div>';
         }).join('');
         return '<section class="gp-adm-aside-block">' +
           '<h4>Cadastro RH</h4><span class="gp-adm-badge ok">Completo</span>' +
@@ -226,7 +226,7 @@
       const icon = filled ? '✓' : (isReq ? '!' : '·');
       return '<div class="gp-adm-cad-row ' + cls + '">' +
         '<span class="gp-adm-cad-icon" aria-hidden="true">' + icon + '</span>' +
-        '<div class="gp-adm-cad-body"><span>' + esc(f.label) + '</span><strong>' + esc(v || (isReq ? 'Pendente' : '—')) + '</strong></div></div>';
+        '<div class="gp-adm-cad-body"><span>' + esc(f.label) + '</span><span class="gp-adm-soft-val">' + esc(v || (isReq ? 'Pendente' : '—')) + '</span></div></div>';
     }).join('');
     const badge = ok
       ? '<span class="gp-adm-badge ok">Completo</span>'
@@ -265,10 +265,10 @@
       '<div class="gp-adm-av' + (gpAdmIsOwner_(c) ? ' owner' : '') + '">' + gpAdmInitial_(c.nome) + '</div>' +
       '<div><h3>' + esc(c.nome) + '</h3><p>' + esc(c.funcao || 'Operador') + '</p></div></div>' +
       '<div class="gp-adm-aside-stats">' +
-      '<div><span>Turno</span><strong>' + esc(c.turno || '—') + '</strong></div>' +
-      '<div><span>Escala hoje</span><strong>' + esc(c.escalaHoje || '—') + '</strong></div>' +
-      '<div><span>Meta / loc</span><strong>' + (m.alvo || 20) + ' · ' + (m.atual || 0) + '</strong></div>' +
-      '<div><span>Ponto hoje</span><strong>' + pontoTxt + '</strong></div>' +
+      '<div><span>Turno</span><span class="gp-adm-soft-val">' + esc(c.turno || '—') + '</span></div>' +
+      '<div><span>Escala hoje</span><span class="gp-adm-soft-val">' + esc(c.escalaHoje || '—') + '</span></div>' +
+      '<div><span>Meta / loc</span><span class="gp-adm-soft-val">' + (m.alvo || 20) + ' · ' + (m.atual || 0) + '</span></div>' +
+      '<div><span>Ponto hoje</span><span class="gp-adm-soft-val">' + pontoTxt + '</span></div>' +
       '</div>' +
       gpAdmRenderCadastroPane_(c, true);
   }
@@ -405,7 +405,7 @@
     teamEl.innerHTML = cols.map(function (c) {
       return '<div class="gp-adm-row">' +
         '<div class="gp-adm-av' + (gpAdmIsOwner_(c) ? ' owner' : '') + '">' + gpAdmInitial_(c.nome) + '</div>' +
-        '<div class="gp-adm-row-body"><strong>' + esc(c.nome) + '</strong><small>' + gpAdmSubline_(c) + '</small></div>' +
+        '<div class="gp-adm-row-body"><span class="gp-adm-soft-title">' + esc(c.nome) + '</span><small>' + gpAdmSubline_(c) + '</small></div>' +
         gpAdmStatusBadge_(c) +
         (c.cadastroOk ? '' : '<span class="gp-adm-badge warn">' + (c.cadastroPct || 0) + '%</span>') +
         '<button type="button" class="gp-adm-link" onclick="mkGpAdmVerFicha(' + c.id + (c.cadastroOk ? '' : ',\'cadastro\'') + ')">Ficha</button></div>';
@@ -423,7 +423,7 @@
     }
     el.innerHTML = '<table class="gp-adm-table"><tr><th>Nome</th>' + (e.colunas || []).map(function (d) { return '<th>' + esc(d) + '</th>'; }).join('') + '</tr>' +
       linhas.map(function (ln) {
-        return '<tr><td style="text-align:left;font-weight:800">' + esc(ln.nome) + '</td>' +
+        return '<tr><td class="gp-adm-name-cell">' + esc(ln.nome) + '</td>' +
           (ln.dias || []).map(function (cel) {
             const cls = cel === 'OFF' || cel === '—' ? 'off' : (String(cel).indexOf('10') >= 0 ? 'owner' : 'on');
             return '<td class="' + cls + '">' + esc(cel) + '</td>';
@@ -441,7 +441,7 @@
         return String(a.codigo || '') === 'META_ABAIXO_' + c.id;
       });
       return '<div class="gp-adm-row"><div class="gp-adm-av">' + gpAdmInitial_(c.nome) + '</div>' +
-        '<div class="gp-adm-row-body"><strong>' + esc(c.nome) + '</strong><small>Meta ' + (m.alvo || 20) + ' loc · hoje ' + (m.atual || 0) + ' · mês ' + (m.locMes || 0) + ' loc</small></div>' +
+        '<div class="gp-adm-row-body"><span class="gp-adm-soft-title">' + esc(c.nome) + '</span><small>Meta ' + (m.alvo || 20) + ' loc · hoje ' + (m.atual || 0) + ' · mês ' + (m.locMes || 0) + ' loc</small></div>' +
         (metaAlert ? '<span class="gp-adm-badge warn">Proativo</span>' : (m.bonusDias ? '<span class="gp-adm-badge ok">' + m.bonusDias + ' dia(s) bônus</span>' : '<span class="gp-adm-badge gray">Sem bônus</span>')) +
         '</div>';
     }).join('') || '<p class="gp-adm-muted">Cadastre colaboradores na aba RH (planilha).</p>';
@@ -504,8 +504,8 @@
         const hol = f.holerite || {};
         const q = f.quinzenaLabel || hol.quinzenaLabel || (f.quinzena === 1 ? '1ª' : '2ª');
         const pg = f.pagamentoEm || hol.pagamentoEm || '—';
-        return '<tr><td style="text-align:left;font-weight:800">' + esc(f.nome) + '</td><td>' + esc(q) + '</td><td>' + esc(pg) + '</td><td>' + (f.locMes || 0) + '</td><td>' + Number(f.bonus || 0).toLocaleString('pt-BR') + '</td>' +
-          '<td><strong>' + Number(f.total || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) + '</strong></td>' +
+        return '<tr><td class="gp-adm-name-cell">' + esc(f.nome) + '</td><td>' + esc(q) + '</td><td>' + esc(pg) + '</td><td>' + (f.locMes || 0) + '</td><td>' + Number(f.bonus || 0).toLocaleString('pt-BR') + '</td>' +
+          '<td><span class="gp-adm-soft-val">' + Number(f.total || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) + '</span></td>' +
           '<td><button type="button" class="gp-adm-link" onclick="mkGpAdmVerHolerite_(' + f.id + ')">Ver holerite</button></td></tr>';
       }).join('') + '</table>';
   }
@@ -591,7 +591,7 @@
       return '<div class="gp-adm-av-row gp-adm-av-row--' + tone + '">' +
         '<div class="gp-adm-av-row-head">' +
         '<span class="gp-adm-badge ' + (nota >= 4 ? 'ok' : (nota >= 3 ? 'blue' : 'warn')) + '">' + gpAdmNotaStars_(nota) + '</span>' +
-        '<strong>' + esc(a.area || 'Competência') + '</strong></div>' +
+        '<span class="gp-adm-soft-title">' + esc(a.area || 'Competência') + '</span></div>' +
         (a.observacao ? '<p class="gp-adm-muted" style="margin:0 0 6px">' + esc(a.observacao) + '</p>' : '') +
         '<div class="gp-adm-com-meta">' + esc(meta || '—') + '</div></div>';
     }).join('');
@@ -653,7 +653,7 @@
       const ativo = c.ativo !== false ? '<span class="gp-adm-badge ok">Ativo</span>' : '<span class="gp-adm-badge gray">Inativo</span>';
       const meta = [c.data, c.publico ? ('Público: ' + c.publico) : '', c.validoAte ? ('até ' + c.validoAte) : ''].filter(Boolean).join(' · ');
       return '<div class="gp-adm-com-row' + cls + '">' +
-        '<div class="gp-adm-com-row-head">' + badge + ativo + '<strong>' + esc(c.titulo || 'Comunicado') + '</strong></div>' +
+        '<div class="gp-adm-com-row-head">' + badge + ativo + '<span class="gp-adm-soft-title">' + esc(c.titulo || 'Comunicado') + '</span></div>' +
         '<p class="gp-adm-muted" style="margin:0 0 6px">' + esc(c.mensagem || '') + '</p>' +
         '<div class="gp-adm-com-meta">' + esc(meta || '—') + '</div></div>';
     }).join('');

@@ -520,7 +520,7 @@
       document.getElementById('balcao-picks').innerHTML = Object.values(PESSOAS).map(p =>
         `<button class="mock-pick" onclick="balcaoPick('${p.id}')" ${balcaoAtivo && balcaoAtivo!==p.id?'disabled style="opacity:.45"':''}>
           <div class="mock-av${p.owner?' owner':''}">${p.letra}</div>
-          <div><div style="font-weight:900">${p.label}</div><div style="font-size:12px;color:var(--txt3)">${p.funcao}</div></div>
+          <div><div class="gp-colab-pick-name">${p.label}</div><div class="gp-colab-pick-sub">${p.funcao}</div></div>
         </button>`).join('');
     }
     function balcaoPick(id) {
@@ -672,7 +672,7 @@
           picks.innerHTML = gpColabList.map(function (o) {
             return `<button type="button" class="mock-pick" data-uid="${o.id}">
               <div class="mock-av">${String(o.nome || '?').charAt(0)}</div>
-              <div><div style="font-weight:900">${o.nome}</div><div style="font-size:12px;color:var(--txt3)">${o.funcao || 'Colaborador'}</div></div>
+              <div><div class="gp-colab-pick-name">${o.nome}</div><div class="gp-colab-pick-sub">${o.funcao || 'Colaborador'}</div></div>
             </button>`;
           }).join('') || '<div class="mock-note err">Nenhum colaborador — crie abas na planilha.</div>';
         }).catch(function (e) {
@@ -683,7 +683,7 @@
       picks.innerHTML = Object.values(PESSOAS).map(function (p) {
         return `<button type="button" class="mock-pick" data-uid="${p.id}">
           <div class="mock-av${p.owner ? ' owner' : ''}">${p.letra}</div>
-          <div><div style="font-weight:900">${p.label}</div><div style="font-size:12px;color:var(--txt3)">${p.funcao}</div></div>
+          <div><div class="gp-colab-pick-name">${p.label}</div><div class="gp-colab-pick-sub">${p.funcao}</div></div>
         </button>`;
       }).join('');
     }
@@ -818,9 +818,17 @@
       };
     }
 
-    function gpHubBenefChip_(lbl, val, ctx, tone) {
+    function gpSecHead_(icon, title, trail) {
+      return '<header class="gp-sec-head">' +
+        '<span class="gp-sec-icon" aria-hidden="true">' + icon + '</span>' +
+        '<h2 class="gp-sec-title">' + title + '</h2>' +
+        (trail ? '<span class="gp-sec-trail">' + trail + '</span>' : '') +
+        '</header>';
+    }
+
+    function gpHubBenefChip_(lbl, val, ctx, tone, icon) {
       return '<div class="gp-hub-ben-chip gp-hub-ben-chip--' + (tone || 'va') + '">' +
-        '<span class="gp-hub-ben-lbl">' + lbl + '</span>' +
+        '<span class="gp-hub-ben-lbl"><span class="gp-chip-ico" aria-hidden="true">' + (icon || '') + '</span>' + lbl + '</span>' +
         '<span class="gp-hub-ben-val">' + val + '</span>' +
         '<span class="gp-hub-ben-ctx">' + ctx + '</span></div>';
     }
@@ -843,13 +851,11 @@
       const copVal = b.vaCopart > 0 ? 'R$ ' + fmtBRL(b.vaCopart) : 'Sem copart.';
       const copTone = b.vaCopart > 0 ? 'copart' : 'muted';
       el.innerHTML =
-        '<header class="gp-hub-ben-head">' +
-        '<h2 class="gp-hub-ben-title">Meus benefícios</h2>' +
-        '<span class="gp-hub-ben-comp">' + escHtml_(b.comp) + '</span></header>' +
+        gpSecHead_('🎁', 'Meus benefícios', escHtml_(b.comp)) +
         '<div class="gp-hub-ben-grid">' +
-        gpHubBenefChip_('Vale-alimentação', 'R$ ' + fmtBRL(b.vaTotal), vaCtx, 'va') +
-        gpHubBenefChip_('Vale-transporte', vtVal, vtCtx, 'vt') +
-        gpHubBenefChip_('Copart. VA', copVal, b.vaCopart > 0 ? '20% refeição fora' : 'Nada a descontar', copTone) +
+        gpHubBenefChip_('Vale-alimentação', 'R$ ' + fmtBRL(b.vaTotal), vaCtx, 'va', '🍽') +
+        gpHubBenefChip_('Vale-transporte', vtVal, vtCtx, 'vt', '🚌') +
+        gpHubBenefChip_('Copart. VA', copVal, b.vaCopart > 0 ? '20% refeição fora' : 'Nada a descontar', copTone, '💳') +
         '</div>' +
         '<button type="button" class="gp-hub-ben-cta mk-btn sec" onclick="abrirModulo(\'pagamento\')">Ver demonstrativo completo</button>';
     }
@@ -907,7 +913,7 @@
       } else if (expanded && list.length > 2) {
         more = '<button type="button" class="gp-com-more mk-btn sec" onclick="gpComCollapseAll_()">Mostrar menos</button>';
       }
-      wrap.innerHTML = '<div class="gp-com-head"><span class="gp-com-head-lbl">Comunicados</span></div>' + cards + more;
+      wrap.innerHTML = gpSecHead_('📢', 'Comunicados') + cards + more;
     }
 
     function escHtml_(v) {
@@ -997,20 +1003,19 @@
       const escTone = folga ? 'off' : 'blue';
       const showCta = !folga && p.statusHoje !== 'dentro' && ponto.tone === 'warn' && (gpAdmPreviewMode_ || cadastroOk(p));
       el.innerHTML =
-        '<header class="gp-hub-jornada-head">' +
-        '<h2 class="gp-hub-jornada-title">Minha jornada hoje</h2>' +
-        '<p class="gp-hub-jornada-lead">' + lead + '</p></header>' +
+        gpSecHead_('📅', 'Minha jornada hoje') +
+        '<p class="gp-hub-jornada-lead">' + lead + '</p>' +
         '<div class="gp-hub-jornada-grid">' +
-        gpHubJornadaWidget_('Escala', escVal, escCtx, escTone) +
-        gpHubJornadaWidget_('Ponto', ponto.val, ponto.ctx, ponto.tone) +
-        gpHubJornadaWidget_('Meta', meta.val, meta.ctx, meta.tone) +
+        gpHubJornadaWidget_('Escala', escVal, escCtx, escTone, '🗓') +
+        gpHubJornadaWidget_('Ponto', ponto.val, ponto.ctx, ponto.tone, '🕐') +
+        gpHubJornadaWidget_('Meta', meta.val, meta.ctx, meta.tone, '🎯') +
         '</div>' +
         (showCta ? '<button type="button" class="gp-hub-jornada-cta mk-btn" onclick="abrirModulo(\'ponto\')">Registrar meu ponto</button>' : '');
     }
 
-    function gpHubJornadaWidget_(lbl, val, ctx, tone) {
+    function gpHubJornadaWidget_(lbl, val, ctx, tone, icon) {
       return '<div class="gp-hub-j-widget gp-hub-j-widget--' + (tone || 'blue') + '">' +
-        '<span class="gp-hub-j-lbl">' + lbl + '</span>' +
+        '<span class="gp-hub-j-lbl"><span class="gp-chip-ico" aria-hidden="true">' + (icon || '') + '</span>' + lbl + '</span>' +
         '<span class="gp-hub-j-val">' + val + '</span>' +
         '<span class="gp-hub-j-ctx">' + ctx + '</span></div>';
     }
@@ -1222,7 +1227,7 @@
           '</article>';
       }).join('');
       return '<div class="gp-avaliacoes">' +
-        '<h3 class="gp-avaliacoes-title">Feedback da gestão</h3>' +
+        gpSecHead_('⭐', 'Feedback da gestão') +
         '<p class="gp-avaliacoes-lead">Avaliações do mês por competência — use para evoluir no trabalho.</p>' +
         '<div class="gp-avaliacoes-list">' + cards + '</div></div>';
     }
@@ -1246,13 +1251,13 @@
           '<span class="gp-desempenho-val">' + loc + metaHint + '</span></div>';
       }).join('');
       return '<div class="gp-desempenho">' +
-        '<h3 class="gp-desempenho-title">Seu desempenho</h3>' +
+        gpSecHead_('📈', 'Seu desempenho') +
         '<p class="gp-desempenho-lead">' + escHtml_(String(cur.locMes || 0)) + ' locações em ' + escHtml_(cur.label || 'este mês') +
         ' · ' + totalDiasMeta + ' dia(s) com meta nos últimos ' + meses.length + ' meses</p>' +
         '<div class="gp-desempenho-chart" role="img" aria-label="Gráfico de locações por mês">' + bars + '</div>' +
         '<div class="gp-desempenho-foot">' +
-        '<span>Meta diária: <strong>' + (h.metaAlvo || 20) + ' loc</strong></span>' +
-        '<span>Bônus acumulado: <strong>R$ ' + fmtBRL(totalBonus) + '</strong></span>' +
+        '<span>Meta diária: <span class="gp-soft-val">' + (h.metaAlvo || 20) + ' loc</span></span>' +
+        '<span>Bônus acumulado: <span class="gp-soft-val">R$ ' + fmtBRL(totalBonus) + '</span></span>' +
         '</div></div>';
     }
 
