@@ -31,12 +31,13 @@
 
 **Próximo passo imediato:**
 
-1. PC: `gestao-pessoas.html?force=1.8.71` — holerite + auth DNA · Design System §9
-2. **Nova versão Web GAS v1.5.111** — janela segura (ping hoje v1.5.107)
-3. **Tablet loja** — 1 loc pós-I32 + F5/F7/F10/F11
-4. **FASE 16 Premium** — ⏸ aguardar janela (`MAPA_FASES.md`)
+1. **Ops:** Raykelly Safari `gestao-pessoas.html?force=1.8.106` — hub + benefícios
+2. **Ops:** Tablet F5/F7/F10/F11 após cadastro OK
+3. **Dev:** **15b.5b** avaliações admin · FASE 16 polish
+4. **Dev:** **15b.5b** avaliações admin · polish **FASE 16** mobile
+5. **Cosmético:** `ping_()` → v1.5.127 no próximo bump GAS
 
-Ver **`MAPA_FASES.md`** para tradução FASE 10 CRM (cockpit) vs FASE 16 Premium.
+Ver **`PLANEJAMENTO_ATUAL_2026-06.md`** §8 · **`MAPA_FASES.md`**
 
 ### FASE 0 — checklist
 

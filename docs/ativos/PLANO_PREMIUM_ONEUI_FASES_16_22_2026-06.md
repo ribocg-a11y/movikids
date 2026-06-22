@@ -142,9 +142,10 @@ FASE 22  Assistente IA gestão (Anexo — decisão sócio)
 | 15b.2 | Holerite quinzenal admin + colaborador + pré-visualização ADM | ✅ v1.5.108 / **v1.8.92** |
 | 15b.2b | Pré-visualização ADM (`admPreview=1`) somente leitura | ✅ v1.5.122 / **v1.8.92** |
 | 15b.3 | **Comunicados** — faixa no hub colaborador (planilha `COMUNICADOS_RH`) | ✅ **v1.8.94** FE · GAS repo v1.5.124 |
-| 15b.4 | **Histórico desempenho** — loc/mês, metas atingidas, gráfico evolução | ✅ **v1.8.95** FE · GAS repo v1.5.125 |
-| 15b.5 | **Avaliações** — registro simples admin (nota + obs por competência) | Novo |
-| 15b.6 | **Benefícios visíveis** — VA, VT, copart no hub (não só holerite) | Parcial |
+| 15b.4 | **Histórico desempenho** — loc/mês, metas atingidas, gráfico evolução | ✅ **v1.8.95** FE · GAS v1.5.125 |
+| 15b.5 | **Cadastro RH obrigatório** — gate balcão, Meus dados, ficha ADM, `salvarCadastro` | ✅ **v1.8.97+** · GAS **v1.5.127** |
+| 15b.5b | **Avaliações** — registro simples admin (nota + obs por competência) | 📋 próximo |
+| 15b.6 | **Benefícios visíveis** — VA, VT, copart no hub (não só holerite) | ✅ v1.8.106 |
 | 15b.7 | Persistir **banco de horas** na aba `BANCO_HORAS` ao fechar competência | Novo |
 
 ### Sensação colaborador (manual)

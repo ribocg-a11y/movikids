@@ -798,8 +798,60 @@
       st.textContent = p.statusHoje==='dentro'?'Dentro':'Fora';
       st.className = 'mock-badge '+(p.statusHoje==='dentro'?'ok':'gray');
       renderHubJornada_(p);
+      renderHubBeneficios_(p);
       renderHubComunicados_(p);
       gpShowPreviewBanner_(gpAdmPreviewMode_ || p.preview);
+    }
+
+    function gpBeneficiosResumo_(p) {
+      const pg = p && p.pagamento;
+      if (!pg || !(Number(pg.base) > 0)) return null;
+      const calc = calcFolhaPagamento(pg);
+      return {
+        comp: pg.competencia || 'este mês',
+        vaTotal: calc.vaTotal,
+        vaDias: calc.vaDias,
+        vaDiario: calc.vaDiario,
+        vtPasses: calc.vtPasses,
+        vtDesconto: calc.vt,
+        vaCopart: calc.vaCopart
+      };
+    }
+
+    function gpHubBenefChip_(lbl, val, ctx, tone) {
+      return '<div class="gp-hub-ben-chip gp-hub-ben-chip--' + (tone || 'va') + '">' +
+        '<span class="gp-hub-ben-lbl">' + lbl + '</span>' +
+        '<span class="gp-hub-ben-val">' + val + '</span>' +
+        '<span class="gp-hub-ben-ctx">' + ctx + '</span></div>';
+    }
+
+    function renderHubBeneficios_(p) {
+      const el = document.getElementById('gp-hub-beneficios');
+      if (!el || !p) return;
+      const b = gpBeneficiosResumo_(p);
+      if (!b) {
+        el.hidden = true;
+        el.innerHTML = '';
+        return;
+      }
+      el.hidden = false;
+      const vaCtx = b.vaDias > 0
+        ? b.vaDias + ' dias × R$ ' + fmtBRL(b.vaDiario)
+        : 'Sem dias VA no mês';
+      const vtVal = b.vtPasses > 0 ? 'R$ ' + fmtBRL(b.vtPasses) : 'R$ ' + fmtBRL(b.vtDesconto);
+      const vtCtx = b.vtPasses > 0 ? 'Passes no mês' : 'Desconto prev. (6% base)';
+      const copVal = b.vaCopart > 0 ? 'R$ ' + fmtBRL(b.vaCopart) : 'Sem copart.';
+      const copTone = b.vaCopart > 0 ? 'copart' : 'muted';
+      el.innerHTML =
+        '<header class="gp-hub-ben-head">' +
+        '<h2 class="gp-hub-ben-title">Meus benefícios</h2>' +
+        '<span class="gp-hub-ben-comp">' + escHtml_(b.comp) + '</span></header>' +
+        '<div class="gp-hub-ben-grid">' +
+        gpHubBenefChip_('Vale-alimentação', 'R$ ' + fmtBRL(b.vaTotal), vaCtx, 'va') +
+        gpHubBenefChip_('Vale-transporte', vtVal, vtCtx, 'vt') +
+        gpHubBenefChip_('Copart. VA', copVal, b.vaCopart > 0 ? '20% refeição fora' : 'Nada a descontar', copTone) +
+        '</div>' +
+        '<button type="button" class="gp-hub-ben-cta mk-btn sec" onclick="abrirModulo(\'pagamento\')">Ver demonstrativo completo</button>';
     }
 
     function gpComDismissKey_() { return 'mk_gp_com_dismiss_v1'; }

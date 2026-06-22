@@ -57,9 +57,9 @@ Detalhe completo: [`ACESSOS_E_AUTORIZACOES.md`](docs/ativos/ACESSOS_E_AUTORIZACO
 
 | Camada | Versão repo | Ping produção |
 |--------|-------------|---------------|
-| Frontend | **v1.8.95** | https://ribocg-a11y.github.io/movikids/?force=1.8.95 |
-| Gestão Pessoas | **v1.8.95** | `gestao-pessoas.html?force=1.8.95` |
-| GAS | repo **v1.5.125** · Web **165** · ping **v1.5.107** | Nova versão Web pendente (sócio) |
+| Frontend | **v1.8.106** | https://ribocg-a11y.github.io/movikids/?force=1.8.106 |
+| Gestão Pessoas | **v1.8.106** | `gestao-pessoas.html?force=1.8.106` |
+| GAS | repo **v1.5.127** · Web implantada 21/06 · ping string **v1.5.107** | Cadastro RH OK |
 | Design System | **v1.1** | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
 | Aba FOLHA | OK (I25) | B68 ~5269,96 · `folhaPlanejamento.fonte: FOLHA` |
 | Deploy ID | `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y` | |
@@ -93,14 +93,13 @@ Fonte de verdade: `mk-version.js`, header do `.gs`, ping GAS.
 - `docs/arquivo/obsoleto/` — rollback/changelog antigos
 - Arquivos em `arquivo-historico/` para deploy
 
-## Estado do projeto (21/06/2026)
+## Estado do projeto (21/06/2026 — tarde)
 
 - **FASE 1–9:** ✅ prod
 - **FASE 14 mini-DRE:** ✅ prod (FE v1.8.16+)
-- **FASE 15 Gestão Pessoas:** ✅ homolog tablet 20/06 · **15b.3 Comunicados** ✅ FE v1.8.94
-- **FASE 16 Premium One UI:** ✅ FE v1.8.86 · GAS repo v1.5.118 · Nova versão Web pendente
-- **FASE 17 alertas + gestor:** 🟢 FE v1.8.89 · GAS repo v1.5.121 · Nova versão Web pendente · homolog tablet
-- **Próximo:** Nova versão Web GAS (sócio) → homolog tablet → kickoff **FASE 17** alertas inteligentes
+- **FASE 15 Gestão Pessoas:** ✅ **15b.1–15b.5** (cadastro RH · Raykelly 100%)
+- **FASE 16 Premium One UI:** 🟡 repo feito · polish mobile pendente
+- **Próximo:** homolog Safari Raykelly v1.8.106 · tablet F5/F7 · **15b.5b** avaliações admin · FASE 16 polish
 
 ## "Atualize tudo"
 

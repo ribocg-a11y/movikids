@@ -1,6 +1,6 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 21/06/2026 (FASE **15b.4** ✅ · FE **v1.8.95** · GAS repo **v1.5.125**)  
+**Atualizado:** 21/06/2026 (noite) · FASE **15b.6** ✅ · FE **v1.8.106** · GAS **v1.5.127** Web implantada  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **Repo local:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`  
@@ -52,11 +52,11 @@ Mensagem mínima: *"Vamos dar continuidade ao projeto Movi Kids, tem uma pasta n
 
 | Camada | Versão | Verificação |
 |--------|--------|-------------|
-| **Frontend** | **v1.8.95** | https://ribocg-a11y.github.io/movikids/?force=1.8.95 |
-| **Gestão Pessoas** | **v1.8.95** | `gestao-pessoas.html?force=1.8.95` |
-| **Service Worker** | **1.8.95** | `sw.js` |
+| **Frontend** | **v1.8.106** | https://ribocg-a11y.github.io/movikids/?force=1.8.106 |
+| **Gestão Pessoas** | **v1.8.106** | `gestao-pessoas.html?force=1.8.106` |
+| **Service Worker** | **1.8.106** | `sw.js` · GAS fora do intercept |
 | **Holerite** | **mk-holerite.js** | CNPJ **66.664.255/0001-67** · PDF/imprimir |
-| **Apps Script** | repo **v1.5.125** · clasp **OK** · ping **v1.5.107** · Web **165** | ⚠️ **Nova versão Web pendente** |
+| **Apps Script** | repo **v1.5.127** · Web implantada (sócio 21/06) · ping string **v1.5.107** | ✅ operação cadastro RH |
 | **Aba FOLHA** | **OK** (I25) | B68 ~5269,96 |
 | **Design System** | **v1.1** | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` (tokens `--mk-widget-*`) |
 
@@ -101,22 +101,35 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 
 **Fonte de verdade versão:** `mk-version.js` → ping GAS → `DEPLOY_ATUAL.md` → este handoff.
 
-## Próximo passo (21/06/2026)
+## Próximo passo (21/06/2026 — tarde)
 
-**Janela segura aberta** — `check-operacao-livre` **0 loc** · `TESTE_PROTOCOLO_DIAGNOSTICO` **OK** (21/06 08:53)
+**Janela segura** — cadastro Raykelly **100%** na planilha · GAS **v1.5.127** no ar
 
 | # | Ação | Quem | Status |
 |---|------|------|--------|
-| 1 | **Nova versão Web GAS v1.5.125** (comunicados + histórico desempenho) | **Sócio** | ⏳ pendente |
-| 2 | Hero **Minha jornada hoje** + pré-visualização ADM | **Agente** | ✅ v1.8.90–v1.8.92 |
-| 3 | **Perf FE v1.8.93** — cache SWR, prefetch admin | **Agente** | ✅ publicado |
-| 4 | **FASE 15b.3** — Comunicados RH no hub colaborador | **Agente** | ✅ v1.8.94 |
-| 4b | **FASE 15b.4** — Histórico desempenho (Minhas metas) | **Agente** | ✅ **v1.8.95** |
-| 5 | Homolog tablet F5/F7/F10/F11 (pós GAS Web) | **Ops loja** | ⏳ |
+| 1 | **FASE 15b.5** cadastro RH + gate balcão + Meus dados + ficha ADM | Agente | ✅ v1.8.97+ / GAS v1.5.126 |
+| 2 | Fix **salvarCadastro** (getRange) | Agente + sócio | ✅ **v1.5.127** |
+| 3 | Admin **Operadores** responsivo (desktop + mobile) | Agente | ✅ v1.8.100–103 |
+| 4 | **Safari iPhone** colaborador (stale-sync, SW, PIN) | Agente | ✅ **v1.8.105** |
+| 5 | Raykelly validar Safari `?force=1.8.106` — hub + benefícios + ponto | **Ops loja** | ⏳ |
+| 6 | Milena completar cadastro (25%) | Colaborador | ⏳ |
+| 7 | Aba **COMUNICADOS_RH** na planilha | Agente | ✅ 21/06 |
+| 8 | Homolog tablet F5/F7/F10/F11 | **Ops loja** | ⏳ |
+| 9 | **15b.6** benefícios no hub · **15b.5b** avaliações | Agente | ✅ 15b.6 **v1.8.106** · 📋 15b.5b |
 
-**Nota ping:** string `v1.5.107` até Nova versão Web — código v1.5.117 já no editor.
+**Nota ping:** string `v1.5.107` é cosmética — validar por `salvarCadastro` + `listarColaboradoresGestao` + cadastro Raykelly 100%.
 
-Doc: `PLANO_PREMIUM_ONEUI_FASES_16_22_2026-06.md` · fases: **`MAPA_FASES.md`**
+Doc: `PLANO_PREMIUM_ONEUI_FASES_16_22_2026-06.md` · `PLANEJAMENTO_ATUAL_2026-06.md` §8
+
+---
+
+## Incidentes — sessão 21/06/2026 (tarde)
+
+| ID | Evento | Fix |
+|----|--------|-----|
+| **I35** | PWA SW intercepta GAS → `FetchEvent respondWith null` no iPhone | SW não intercepta Google · FE **v1.8.104** |
+| **I36** | `salvarCadastro` getRange(linha,col,linha,10) — 2 linhas vs 1 dado | GAS **v1.5.127** · Raykelly 100% |
+| **I37** | `gestao-pessoas.html` sem stale-sync/SW boot — Safari cache antigo | `mk-stale-sync` + `mk-gp-boot.js` · **v1.8.105** |
 
 ---
 

@@ -1,7 +1,7 @@
 # MOVI KIDS — Planejamento atual (pós-FASE 5)
 
-**Atualizado:** 21/06/2026 (operação **LIVRE** · FE **v1.8.94** · GAS repo **v1.5.124**)  
-**Produção:** FE **v1.8.94** · GAS repo **v1.5.124** · ping **v1.5.107** · Nova versão Web **pendente**  
+**Atualizado:** 21/06/2026 (noite) · FE **v1.8.106** · GAS **v1.5.127** Web implantada (sócio)
+**Produção:** FE **v1.8.106** · GAS repo **v1.5.127** · ping string **v1.5.107** (cosmético)
 **Documentos irmãos:** `PLANO_PRIORIDADES_2026-06.md` · `MAPA_FASES.md` · `DEPLOY_ATUAL.md` · `HANDOFF_NOVO_CHAT.md`  
 **Ciclo ativo:** **`PLANO_FASES_6_15_COCKPIT_EXECUTIVO_2026-06.md`** · FASE 15: **`FASE_15_GESTAO_PESSOAS.md`** ✅  
 **Próximo ciclo:** **`PLANO_PREMIUM_ONEUI_FASES_16_22_2026-06.md`** ← manual Premium + One UI (20/06/2026)
@@ -12,7 +12,7 @@
 
 Ciclo **FASE 0–5 + P2/P3 concluído** (07–09/06/2026). Balcão homologado, portal QR, payback, CONFIG e APIs unificadas.
 
-**Modo atual:** **FASE 15b.3** ✅ Comunicados · FASE 16 ✅ repo · FASE 17 🟡 · perf v1.8.93 ✅
+**Modo atual:** **FASE 15b.5** ✅ cadastro RH · **15b.3–4** ✅ · Admin Operadores harmonizado · Safari/PWA colaborador · FASE 16 repo ✅ · FASE 17 🟡
 
 ---
 
@@ -32,7 +32,7 @@ Ciclo **FASE 0–5 + P2/P3 concluído** (07–09/06/2026). Balcão homologado, p
 | **21** | Live BI frota | P2 | Herda FASE 13 |
 | **22** | Assistente IA gestão | P3 | Anexo — decisão sócio |
 
-**Sequência imediata:** kickoff **FASE 16** mock Premium One UI (FASE 15 ✅ homolog tablet 20/06).
+**Sequência imediata:** homolog **Raykelly iPhone Safari v1.8.106** (hub + benefícios) → tablet F5/F7/F10/F11 → **15b.5b** avaliações admin → kickoff visual **FASE 16** refinamento.
 
 ---
 
@@ -91,7 +91,10 @@ Legenda: **P0** bloqueia operação · **P1** valor imediato · **P2** próximo 
 | POST no browser (I15) | Nunca reintroduzir | Dev |
 | Deploy ID GAS | Só Nova versão Web — nunca `clasp deploy` sem `-i` | Dev/Ops |
 | Regressão I20 cronômetro | Antes de mexer em timer: `TESTE_I20_COMPLETO_PROD.ps1` | Dev |
-| GAS repo ≠ ping (I26) | Publicar **v1.5.111** em janela segura | Sócio |
+| GAS repo ≠ ping (I26) | Ping string fixa — funcional OK se APIs respondem | Dev |
+| **I35** PWA intercepta GAS | SW não intercepta `script.google.com` — FE **v1.8.104+** | Dev |
+| **I36** `salvarCadastro` getRange | GAS **v1.5.127** — Raykelly 100% planilha | ✅ |
+| **I37** Colaboradores Safari sem stale-sync | `gestao-pessoas.html` + `mk-gp-boot.js` — **v1.8.105** | Dev |
 
 ### P1 — Operação contínua (sem feature nova)
 
@@ -181,14 +184,25 @@ Legenda: **P0** bloqueia operação · **P1** valor imediato · **P2** próximo 
 
 ## 8. Próxima revisão
 
-**Ao homologar FASE 15** (tablet + abas planilha) · meio ciclo **FASE 10**.
+**Ao homologar Raykelly Safari + tablet F5/F7** · meio ciclo **FASE 17**.
 
-**Sequência imediata (21/06):**
+**Sequência imediata (21/06 tarde):**
 
-1. ✅ FE **v1.8.93** perf (SWR sync, prefetch admin, cache RH)
-2. ✅ Pré-visualização ADM colaborador (v1.8.92)
-3. ✅ **FASE 15b.3 Comunicados** — FE v1.8.94 · GAS repo v1.5.124 · `TESTE_COMUNICADOS_RH_READONLY.ps1`
-4. ⏳ **Nova versão Web GAS v1.5.124** — sócio (aba COMUNICADOS_RH se ausente)
-5. Tablet: homolog F5/F7/F10/F11 após GAS Web
+| # | Ação | Quem | Status |
+|---|------|------|--------|
+| 1 | **FASE 15b.5** — cadastro RH obrigatório + gate balcão + ficha ADM | Agente | ✅ GAS v1.5.126 · FE v1.8.97+ |
+| 2 | **Fix salvarCadastro** getRange 1×7 cols | Agente + sócio | ✅ GAS **v1.5.127** implantado |
+| 3 | **Admin Operadores** — layout full-width + mobile abas grade | Agente | ✅ FE **v1.8.100–103** |
+| 4 | **PWA/Safari colaborador** — stale-sync, SW boot, PIN tel, scroll | Agente | ✅ FE **v1.8.104–105** |
+| 5 | **Raykelly** — validar Safari `gestao-pessoas.html?force=1.8.106` (hub + benefícios) | Ops loja | ⏳ |
+| 6 | **Milena** — completar cadastro RH (25% → 100%) | Colaborador | ⏳ |
+| 7 | Instalar aba **`COMUNICADOS_RH`** | Agente | ✅ 21/06 |
+| 8 | Homolog tablet **F5/F7/F10/F11** pós-cadastro | Ops loja | ⏳ |
+| 9 | **15b.6** benefícios visíveis no hub colaborador | Agente | ✅ FE **v1.8.106** |
+| 10 | **15b.5b** avaliações admin (nota + obs/competência) | Agente | 📋 backlog P1 |
+| 11 | Atualizar `ping_()` → v1.5.127 (evitar confusão testes) | Agente | 📋 cosmético |
+| 12 | **FASE 16** — refinamento Centro de Comando + KPI contexto mobile admin | Agente | 🟡 repo feito; polish |
 
-Doc mestre: `PLANO_PREMIUM_ONEUI_FASES_16_22_2026-06.md` §6 (15b.3)
+**Commits sessão 21/06 (tarde):** `288dd8f` cadastro RH · `febae92`–`93124ab` admin responsivo + PWA/Safari · `86686ba` GAS v1.5.127
+
+Doc mestre: `PLANO_PREMIUM_ONEUI_FASES_16_22_2026-06.md` §6 (15b) · §5 (FASE 16)
