@@ -76,8 +76,42 @@
       }
     };
 
+    const GP_ADM_PREVIEW_KEY = 'mk_gp_adm_preview_v1';
+
     function gpUrlAdmPreview_() {
       try { return /(?:^|[?&])admPreview=1(?:&|$)/.test(location.search); } catch (e) { return false; }
+    }
+
+    function gpUrlFromColabNormal_() {
+      try {
+        return /(?:^|[?&])(?:from=index|from=balcao|completeCadastro=1)(?:&|$)/.test(location.search);
+      } catch (e) { return false; }
+    }
+
+    function gpStripAdmPreviewFromUrl_() {
+      try {
+        if (!history.replaceState) return;
+        var q = location.search
+          .replace(/([?&])admPreview=1(&|$)/g, function (_m, p1, p2) { return p2 === '&' ? p1 : ''; })
+          .replace(/\?&/, '?')
+          .replace(/[?&]$/, '');
+        history.replaceState(null, '', location.pathname + q + location.hash);
+      } catch (e) { /* ok */ }
+    }
+
+    function gpClearAdmPreviewSession_() {
+      try { sessionStorage.removeItem(GP_ADM_PREVIEW_KEY); } catch (e) { /* ok */ }
+      gpAdmPreviewMode_ = false;
+      gpShowPreviewBanner_(false);
+    }
+
+    function gpArmAdmPreviewSession_() {
+      try { sessionStorage.setItem(GP_ADM_PREVIEW_KEY, '1'); } catch (e) { /* ok */ }
+      gpStripAdmPreviewFromUrl_();
+    }
+
+    function gpAdmPreviewSessionActive_() {
+      try { return sessionStorage.getItem(GP_ADM_PREVIEW_KEY) === '1'; } catch (e) { return false; }
     }
 
     function gpReadAdminPin_() {
@@ -92,6 +126,7 @@
     }
 
     function gpPreviewVoltarAdmin_() {
+      gpClearAdmPreviewSession_();
       var v = global.MK_VERSION || '1.8.97';
       global.location.href = 'index.html?force=' + encodeURIComponent(v) + '#operadores';
     }
@@ -757,6 +792,7 @@
     }
     function colabEntrar() {
       try {
+        gpClearAdmPreviewSession_();
         const uid = pickColab || sessionStorage.getItem('mk-mock-colab-uid');
         if (!uid) { showColabErr('Selecione seu nome na lista.'); return; }
         const pin = readColabPin();
@@ -1534,7 +1570,12 @@ function initGpUi() {
     if (el && document.getElementById('s-ponto').classList.contains('active')) el.textContent = fmtTime();
   }, 1000);
   if (MK_GP_PROD) {
-    if (gpUrlAdmPreview_()) {
+    if (gpUrlFromColabNormal_()) {
+      gpClearAdmPreviewSession_();
+    } else if (gpUrlAdmPreview_()) {
+      gpArmAdmPreviewSession_();
+    }
+    if (gpAdmPreviewSessionActive_()) {
       gpAdmPreviewMode_ = true;
       gpAdmPreviewPin_ = gpReadAdminPin_();
       showAdmPreviewGate(!gpAdmPreviewPin_);

@@ -1,7 +1,7 @@
 # MOVI KIDS — Planejamento atual (pós-FASE 5)
 
-**Atualizado:** 21/06/2026 (noite) · FE **v1.8.106** · GAS **v1.5.127** Web implantada (sócio)
-**Produção:** FE **v1.8.106** · GAS repo **v1.5.127** · ping string **v1.5.107** (cosmético)
+**Atualizado:** 22/06/2026 · FE **v1.8.108** · GAS repo **v1.5.128** · Web **v1.5.127** (cadastro) · ping **v1.5.107**
+**Produção:** FE **v1.8.108** · GAS repo **v1.5.128** · ping string **v1.5.107** (cosmético) · **Nova versão Web v1.5.128 pendente (sócio)**
 **Documentos irmãos:** `PLANO_PRIORIDADES_2026-06.md` · `MAPA_FASES.md` · `DEPLOY_ATUAL.md` · `HANDOFF_NOVO_CHAT.md`  
 **Ciclo ativo:** **`PLANO_FASES_6_15_COCKPIT_EXECUTIVO_2026-06.md`** · FASE 15: **`FASE_15_GESTAO_PESSOAS.md`** ✅  
 **Próximo ciclo:** **`PLANO_PREMIUM_ONEUI_FASES_16_22_2026-06.md`** ← manual Premium + One UI (20/06/2026)
@@ -12,7 +12,7 @@
 
 Ciclo **FASE 0–5 + P2/P3 concluído** (07–09/06/2026). Balcão homologado, portal QR, payback, CONFIG e APIs unificadas.
 
-**Modo atual:** **FASE 15b.5** ✅ cadastro RH · **15b.3–4** ✅ · Admin Operadores harmonizado · Safari/PWA colaborador · FASE 16 repo ✅ · FASE 17 🟡
+**Modo atual:** **FASE 15b** ~96% (falta **15b.7** banco horas) · **FASE 16** repo ✅ (homolog tablet ⏳) · **FASE 17** 🟢 **próxima fase ativa** (alertas + perfil Gestor)
 
 ---
 
@@ -32,7 +32,7 @@ Ciclo **FASE 0–5 + P2/P3 concluído** (07–09/06/2026). Balcão homologado, p
 | **21** | Live BI frota | P2 | Herda FASE 13 |
 | **22** | Assistente IA gestão | P3 | Anexo — decisão sócio |
 
-**Sequência imediata:** homolog **Raykelly iPhone Safari v1.8.106** (hub + benefícios) → tablet F5/F7/F10/F11 → **15b.5b** avaliações admin → kickoff visual **FASE 16** refinamento.
+**Sequência imediata:** **Nova versão Web GAS v1.5.128** (sócio) → Raykelly completar cadastro (25%) + Safari **v1.8.108** → homolog tablet F5/F7/F10/F11 → **fechar FASE 16** → **kickoff FASE 17** (alertas + Gestor).
 
 ---
 
@@ -184,25 +184,40 @@ Legenda: **P0** bloqueia operação · **P1** valor imediato · **P2** próximo 
 
 ## 8. Próxima revisão
 
-**Ao homologar Raykelly Safari + tablet F5/F7** · meio ciclo **FASE 17**.
+**Ao publicar GAS v1.5.128 Web + homolog tablet** · fechar **FASE 16** · sprint **FASE 17**.
 
-**Sequência imediata (21/06 tarde):**
+### 8a. Fechar pendências 15b + FASE 16 (pré-requisito)
 
 | # | Ação | Quem | Status |
 |---|------|------|--------|
-| 1 | **FASE 15b.5** — cadastro RH obrigatório + gate balcão + ficha ADM | Agente | ✅ GAS v1.5.126 · FE v1.8.97+ |
-| 2 | **Fix salvarCadastro** getRange 1×7 cols | Agente + sócio | ✅ GAS **v1.5.127** implantado |
-| 3 | **Admin Operadores** — layout full-width + mobile abas grade | Agente | ✅ FE **v1.8.100–103** |
-| 4 | **PWA/Safari colaborador** — stale-sync, SW boot, PIN tel, scroll | Agente | ✅ FE **v1.8.104–105** |
-| 5 | **Raykelly** — validar Safari `gestao-pessoas.html?force=1.8.106` (hub + benefícios) | Ops loja | ⏳ |
-| 6 | **Milena** — completar cadastro RH (25% → 100%) | Colaborador | ⏳ |
-| 7 | Instalar aba **`COMUNICADOS_RH`** | Agente | ✅ 21/06 |
-| 8 | Homolog tablet **F5/F7/F10/F11** pós-cadastro | Ops loja | ⏳ |
-| 9 | **15b.6** benefícios visíveis no hub colaborador | Agente | ✅ FE **v1.8.106** |
-| 10 | **15b.5b** avaliações admin (nota + obs/competência) | Agente | 📋 backlog P1 |
-| 11 | Atualizar `ping_()` → v1.5.127 (evitar confusão testes) | Agente | 📋 cosmético |
-| 12 | **FASE 16** — refinamento Centro de Comando + KPI contexto mobile admin | Agente | 🟡 repo feito; polish |
+| 1 | **15b.5–6** cadastro + benefícios + avaliações repo | Agente | ✅ FE **v1.8.107–108** · GAS **v1.5.128** repo |
+| 2 | **Nova versão Web GAS v1.5.128** (avaliações + alertas F17) | **Sócio** | ⏳ bloqueia prod |
+| 3 | **Raykelly** — cadastro 25% → 100% (`COLABORADORES_RH` id 3) | Colaborador | ⏳ |
+| 4 | **Milena** — cadastro 100% confirmado (id 2) | — | ✅ |
+| 5 | Safari Raykelly `gestao-pessoas.html?force=1.8.108` | Ops loja | ⏳ |
+| 6 | Homolog tablet **F5/F7/F10/F11** pós-GAS Web | Ops loja | ⏳ |
+| 7 | **FASE 16** — Centro de Comando repo + tipografia RH | Agente | ✅ repo · homolog ⏳ |
+| 8 | **15b.7** — persistir `BANCO_HORAS` ao fechar competência | Agente | 📋 último item 15b |
 
-**Commits sessão 21/06 (tarde):** `288dd8f` cadastro RH · `febae92`–`93124ab` admin responsivo + PWA/Safari · `86686ba` GAS v1.5.127
+### 8b. FASE 17 — Alertas inteligentes + Permissões Gestor (**próxima fase dev**)
 
-Doc mestre: `PLANO_PREMIUM_ONEUI_FASES_16_22_2026-06.md` §6 (15b) · §5 (FASE 16)
+**Objetivo:** alertas automáticos acionáveis + perfil **Gestor** (sem CONFIG/SMS).
+
+| # | ID | Entrega | Camada | Status |
+|---|-----|---------|--------|--------|
+| 1 | **17.0** | `alertasInteligentes_` em `comandoOperacional` + `kpiMes` | GAS | ✅ repo v1.5.118–120 |
+| 2 | **17.1** | Pills alertas no Dashboard com link (Caixa / Operadores / Comando) | FE | 📋 polish |
+| 3 | **17.2** | Presença admin — badges inteligentes por colaborador | FE | ✅ parcial v1.8.86+ |
+| 4 | **17.3** | Perfil `gestor` em `OPERADORES_SISTEMA` + `showGestorSidebar` | FE+GAS | ✅ repo · homolog ⏳ |
+| 5 | **17.4** | Matriz permissões documentada (Admin / Gestor / Supervisor / Colab) | Doc | 📋 |
+| 6 | **17.5** | Decisão **F9 Supervisor** — reativar ou manter pausado | Sócio | ⏳ |
+| 7 | **17.QA** | `TESTE_FASE17_ALERTAS_READONLY.ps1` verde em prod | QA | ⏳ pós-Web |
+
+**Critério de pronto FASE 17:**
+
+- [ ] Gestor loga no tablet/PC → vê Dashboard + Operação + Caixa + Equipe · **sem** CONFIG/Sistema
+- [ ] Dashboard mostra ≥1 alerta inteligente com ação clara quando regra dispara
+- [ ] Presença lista banco horas / meta abaixo / ponto pendente com badge
+- [ ] Balcão inalterado (F5/F7/F10/F11)
+
+Doc mestre: `PLANO_PREMIUM_ONEUI_FASES_16_22_2026-06.md` §7 · §5 (fechar F16) · §6 (15b.7)

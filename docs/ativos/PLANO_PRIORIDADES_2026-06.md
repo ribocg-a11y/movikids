@@ -1,6 +1,6 @@
 # MOVI KIDS — Plano de prioridades (análise de sistemas)
 
-**Data-base:** 09/06/2026 · **Revisado:** 20/06/2026  
+**Data-base:** 09/06/2026 · **Revisado:** 22/06/2026  
 **Função:** documento único de **o que fazer agora**, por ordem de prioridade.  
 **Local:** `docs/ativos/` · **Índice:** `../INDICE.md`  
 **Handoff:** `HANDOFF_NOVO_CHAT.md` · **Complementa:** `ESTADO_ATUAL.md`, `PLANO_CONTINUIDADE_2026-06.md`, `REGRAS_DE_PUBLICACAO_SEGURA.md`.
@@ -31,11 +31,11 @@
 
 **Próximo passo imediato:**
 
-1. **Ops:** Raykelly Safari `gestao-pessoas.html?force=1.8.106` — hub + benefícios
-2. **Ops:** Tablet F5/F7/F10/F11 após cadastro OK
-3. **Dev:** **15b.5b** avaliações admin · FASE 16 polish
-4. **Dev:** **15b.5b** avaliações admin · polish **FASE 16** mobile
-5. **Cosmético:** `ping_()` → v1.5.127 no próximo bump GAS
+1. **Sócio:** Nova versão Web GAS **v1.5.128** (avaliações + alertas F17 no ar)
+2. **Ops:** Raykelly completar cadastro (25%) · Safari `?force=1.8.108` · tablet F5/F7/F10/F11
+3. **Dev:** **FASE 17** — pills alertas Dashboard + homolog perfil Gestor
+4. **Dev:** **15b.7** banco horas persistido (fecha 15b)
+5. **Cosmético:** `ping_()` → v1.5.128 no próximo bump GAS
 
 Ver **`PLANEJAMENTO_ATUAL_2026-06.md`** §8 · **`MAPA_FASES.md`**
 

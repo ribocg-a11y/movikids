@@ -1,6 +1,6 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 21/06/2026 (noite) · FASE **15b.6** ✅ · FE **v1.8.106** · GAS **v1.5.127** Web implantada  
+**Atualizado:** 22/06/2026 · FASE **15b** ~96% · FE **v1.8.108** · GAS repo **v1.5.128** · Web **v1.5.127** (cadastro OK)  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **Repo local:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`  
@@ -52,11 +52,11 @@ Mensagem mínima: *"Vamos dar continuidade ao projeto Movi Kids, tem uma pasta n
 
 | Camada | Versão | Verificação |
 |--------|--------|-------------|
-| **Frontend** | **v1.8.106** | https://ribocg-a11y.github.io/movikids/?force=1.8.106 |
-| **Gestão Pessoas** | **v1.8.106** | `gestao-pessoas.html?force=1.8.106` |
-| **Service Worker** | **1.8.106** | `sw.js` · GAS fora do intercept |
+| **Frontend** | **v1.8.108** | https://ribocg-a11y.github.io/movikids/?force=1.8.108 |
+| **Gestão Pessoas** | **v1.8.108** | `gestao-pessoas.html?force=1.8.108` |
+| **Service Worker** | **1.8.108** | `sw.js` · GAS fora do intercept |
 | **Holerite** | **mk-holerite.js** | CNPJ **66.664.255/0001-67** · PDF/imprimir |
-| **Apps Script** | repo **v1.5.127** · Web implantada (sócio 21/06) · ping string **v1.5.107** | ✅ operação cadastro RH |
+| **Apps Script** | repo **v1.5.128** · Web **v1.5.127** (cadastro) · ping **v1.5.107** | ⏳ Nova versão Web **v1.5.128** pendente |
 | **Aba FOLHA** | **OK** (I25) | B68 ~5269,96 |
 | **Design System** | **v1.1** | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` (tokens `--mk-widget-*`) |
 
@@ -101,25 +101,22 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 
 **Fonte de verdade versão:** `mk-version.js` → ping GAS → `DEPLOY_ATUAL.md` → este handoff.
 
-## Próximo passo (21/06/2026 — tarde)
+## Próximo passo (22/06/2026)
 
-**Janela segura** — cadastro Raykelly **100%** na planilha · GAS **v1.5.127** no ar
+**Fase ativa:** **FASE 17** — Alertas inteligentes + perfil Gestor  
+**Pré-requisito:** Nova versão Web GAS **v1.5.128** + Raykelly cadastro 100%
 
 | # | Ação | Quem | Status |
 |---|------|------|--------|
-| 1 | **FASE 15b.5** cadastro RH + gate balcão + Meus dados + ficha ADM | Agente | ✅ v1.8.97+ / GAS v1.5.126 |
-| 2 | Fix **salvarCadastro** (getRange) | Agente + sócio | ✅ **v1.5.127** |
-| 3 | Admin **Operadores** responsivo (desktop + mobile) | Agente | ✅ v1.8.100–103 |
-| 4 | **Safari iPhone** colaborador (stale-sync, SW, PIN) | Agente | ✅ **v1.8.105** |
-| 5 | Raykelly validar Safari `?force=1.8.106` — hub + benefícios + ponto | **Ops loja** | ⏳ |
-| 6 | Milena completar cadastro (25%) | Colaborador | ⏳ |
-| 7 | Aba **COMUNICADOS_RH** na planilha | Agente | ✅ 21/06 |
-| 8 | Homolog tablet F5/F7/F10/F11 | **Ops loja** | ⏳ |
-| 9 | **15b.6** benefícios no hub · **15b.5b** avaliações | Agente | ✅ 15b.6 **v1.8.106** · 📋 15b.5b |
+| 1 | **Nova versão Web GAS v1.5.128** | **Sócio** | ⏳ |
+| 2 | Raykelly cadastro 25% → 100% | Colaborador | ⏳ |
+| 3 | Milena cadastro + ponto hoje | — | ✅ 100% · entrada registrada |
+| 4 | Safari `?force=1.8.108` + tablet F5/F7/F10/F11 | Ops loja | ⏳ |
+| 5 | **Fechar FASE 16** (homolog comando) | Ops + Agente | ⏳ |
+| 6 | **FASE 17** — pills alertas Dashboard + Gestor homolog | Agente | 🟢 próximo dev |
+| 7 | **15b.7** banco horas persistido | Agente | 📋 |
 
-**Nota ping:** string `v1.5.107` é cosmética — validar por `salvarCadastro` + `listarColaboradoresGestao` + cadastro Raykelly 100%.
-
-Doc: `PLANO_PREMIUM_ONEUI_FASES_16_22_2026-06.md` · `PLANEJAMENTO_ATUAL_2026-06.md` §8
+Doc: `PLANEJAMENTO_ATUAL_2026-06.md` §8b · `PLANO_PREMIUM_ONEUI_FASES_16_22_2026-06.md` §7
 
 ---
 

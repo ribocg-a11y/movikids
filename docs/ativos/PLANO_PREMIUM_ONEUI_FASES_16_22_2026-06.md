@@ -144,7 +144,7 @@ FASE 22  Assistente IA gestão (Anexo — decisão sócio)
 | 15b.3 | **Comunicados** — faixa no hub colaborador (planilha `COMUNICADOS_RH`) | ✅ **v1.8.94** FE · GAS repo v1.5.124 |
 | 15b.4 | **Histórico desempenho** — loc/mês, metas atingidas, gráfico evolução | ✅ **v1.8.95** FE · GAS v1.5.125 |
 | 15b.5 | **Cadastro RH obrigatório** — gate balcão, Meus dados, ficha ADM, `salvarCadastro` | ✅ **v1.8.97+** · GAS **v1.5.127** |
-| 15b.5b | **Avaliações** — registro simples admin (nota + obs por competência) | 📋 próximo |
+| 15b.5b | **Avaliações** — registro simples admin (nota + obs por competência) | ✅ v1.8.107 · GAS repo **v1.5.128** |
 | 15b.6 | **Benefícios visíveis** — VA, VT, copart no hub (não só holerite) | ✅ v1.8.106 |
 | 15b.7 | Persistir **banco de horas** na aba `BANCO_HORAS` ao fechar competência | Novo |
 
@@ -329,17 +329,17 @@ Widget live: % frota em uso agora · overlay gráfico ocupação por horário.
 
 ---
 
-## 15. Sequência imediata (atualizada 21/06/2026)
+## 15. Sequência imediata (atualizada 22/06/2026)
 
 | # | Ação | Responsável | Status |
 |---|------|-------------|--------|
-| 1 | FE **v1.8.93** perf (SWR, prefetch, cache RH) | Agente | ✅ |
-| 2 | Pré-visualização ADM + fix JS colaborador | Agente | ✅ v1.8.92 |
-| 3 | **Nova versão Web GAS v1.5.123+** | Sócio | ⏳ |
-| 4 | **FASE 15b.3** Comunicados — spec §6 | Agente | ✅ v1.8.94 |
-| 5 | Homolog tablet F5/F7/F10/F11 | Ops loja | ⏳ |
-| 6 | FASE 15b.4 Histórico desempenho | Agente | ✅ v1.8.95 |
-| 7 | FASE 17 fechar perfil Gestor + homolog | Agente + Ops | 🟡 |
+| 1 | FE **v1.8.108** tipografia RH One UI | Agente | ✅ |
+| 2 | **15b.5b** avaliações + GAS **v1.5.128** repo | Agente | ✅ |
+| 3 | **Nova versão Web GAS v1.5.128** | Sócio | ⏳ |
+| 4 | Raykelly cadastro 25% → 100% | Colaborador | ⏳ |
+| 5 | Homolog tablet F5/F7/F10/F11 + fechar **FASE 16** | Ops loja | ⏳ |
+| 6 | **FASE 17** — alertas pills + perfil Gestor homolog | Agente + Ops | 🟢 **próxima fase** |
+| 7 | **15b.7** banco horas persistido | Agente | 📋 |
 
 ---
 
@@ -355,20 +355,21 @@ Widget live: % frota em uso agora · overlay gráfico ocupação por horário.
 
 ---
 
-## 18. Progresso Premium One UI (21/06/2026)
+## 18. Progresso Premium One UI (22/06/2026)
 
 | Fase | Peso | % fase | Notas |
 |------|------|--------|-------|
-| **15b** RH completo | P1 ×2 | **~88%** | hero + holerite + preview + comunicados + histórico ✅ |
-| **16** Centro comando | P1 ×2 | **~88%** | FE+GAS repo ✅ · homolog tablet ⏳ |
-| **17** Alertas + Gestor | P1 ×2 | **~82%** | alertasInteligentes_ ✅ · perfil gestor 🟡 |
-| **18** Financeiro previsão | P2 | 0% | — |
+| **15b** RH completo | P1 ×2 | **~96%** | falta **15b.7** banco horas · resto ✅ |
+| **16** Centro comando | P1 ×2 | **~92%** | FE+GAS repo ✅ · homolog tablet ⏳ |
+| **17** Alertas + Gestor | P1 ×2 | **~85%** | GAS repo ✅ · FE pills + homolog Gestor ⏳ |
+| **18** Financeiro previsão | P2 | 0% | após F17 |
 | **19** Gamificação | P2 | 0% | — |
 | **20** Portal analytics | P2 | 0% | — |
 | **21** Live BI frota | P2 | 0% | — |
 | **22** Assistente IA | P3 | 0% | Anexo |
 
-**Total plano (P1 peso 2×):** **~53% concluído · ~47% restante**
+**Total plano (P1 peso 2×):** **~58% concluído · ~42% restante**  
+**Próxima fase ativa:** **FASE 17** (após Web GAS v1.5.128 + homolog F16)
 
 ---
 

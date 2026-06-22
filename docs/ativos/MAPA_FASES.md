@@ -1,6 +1,6 @@
 # MOVI KIDS — Mapa de fases (tradução)
 
-**Atualizado:** 20/06/2026
+**Atualizado:** 22/06/2026
 
 Evita confusão entre **três planos** que usam o mesmo número para coisas diferentes.
 
@@ -11,9 +11,11 @@ Evita confusão entre **três planos** que usam o mesmo número para coisas dife
 | Status | Fase | Nome | Doc canônico |
 |--------|------|------|--------------|
 | ✅ | **15** | Gestão Pessoas (RH) | `FASE_15_GESTAO_PESSOAS.md` |
-| ⏸ | **16 Premium** | One UI + Centro de Comando | `PLANO_PREMIUM_ONEUI_FASES_16_22_2026-06.md` — **só após janela segura** |
+| 🟡 | **15b** | RH premium | `PLANO_PREMIUM` §6 — **96%** (falta 15b.7) |
+| 🟡 | **16 Premium** | One UI + Centro de Comando | repo ✅ · homolog tablet ⏳ |
+| 🟢 | **17 Premium** | Alertas + perfil Gestor | **próxima fase ativa** |
 
-**Decisão 20/06:** manter planejamento; **não executar** FASE 16+ sem loja fechada e sem loc aberta.
+**Decisão 22/06:** FASE 16 código pronto no repo — fechar com homolog tablet após **Nova versão Web GAS v1.5.128**. Dev segue em **FASE 17**.
 
 ---
 

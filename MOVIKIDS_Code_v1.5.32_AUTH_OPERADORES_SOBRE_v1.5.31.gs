@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.128
+// MOVI KIDS — Google Apps Script v1.5.129
+// v1.5.129: trava VA/salario proporcional admissao — parseDataStr ISO + gpNormAdmissaoStr_ + repair planilha
 // v1.5.128: FASE 15b.5b — AVALIACOES_RH + salvar/listar admin + painel colaborador
 // v1.5.127: fix salvarCadastroColaborador — getRange(row,col,1,7) cols cpf..admissao (nao endRow)
 // v1.5.126: FASE 15b.5 — cadastro RH obrigatorio + salvarCadastroColaborador + bloqueio balcao
@@ -234,11 +235,56 @@ function cellToStr_(val) {
   return String(val);
 }
 
-// Converte "dd/MM/yyyy" → Date (usado para comparação de semanas) — v1.5.4
+/** Converte Date, yyyy-MM-dd ou dd/MM/yyyy → Date local (meia-noite). */
 function parseDataStr_(s) {
-  const p = s ? s.split('/') : [];
-  if (p.length < 3) return null;
-  return new Date(parseInt(p[2]), parseInt(p[1])-1, parseInt(p[0]));
+  if (s instanceof Date && !isNaN(s.getTime())) {
+    return new Date(s.getFullYear(), s.getMonth(), s.getDate());
+  }
+  const raw = String(s || '').trim();
+  if (!raw) return null;
+  const iso = raw.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (iso) {
+    const d = new Date(parseInt(iso[1], 10), parseInt(iso[2], 10) - 1, parseInt(iso[3], 10));
+    return isNaN(d.getTime()) ? null : d;
+  }
+  const p = raw.split('/');
+  if (p.length >= 3) {
+    const d = new Date(parseInt(p[2], 10), parseInt(p[1], 10) - 1, parseInt(p[0], 10));
+    return isNaN(d.getTime()) ? null : d;
+  }
+  return null;
+}
+
+/** Canoniza admissao/nascimento para dd/MM/yyyy (planilha + holerite). */
+function gpNormAdmissaoStr_(val) {
+  const d = val instanceof Date ? val : parseDataStr_(cellToStr_(val));
+  if (!d || isNaN(d.getTime())) return String(val || '').trim();
+  return fmtData_(d);
+}
+
+/** Repara celula admissao ISO → dd/MM/yyyy na planilha (1x por leitura). */
+function gpRepairAdmissaoRhCell_(rowNum, rawVal) {
+  const norm = gpNormAdmissaoStr_(rawVal);
+  if (!norm || !parseDataStr_(norm)) return cellToStr_(rawVal);
+  const raw = cellToStr_(rawVal);
+  if (raw === norm) return norm;
+  try {
+    const sh = gpSheet_(SH_COLAB_RH);
+    sh.getRange(rowNum, 10).setValue(norm);
+    sh.getRange(rowNum, 10).setNumberFormat('@');
+  } catch (e) {
+    Logger.log('gpRepairAdmissaoRhCell_: ' + e.message);
+  }
+  return norm;
+}
+
+/** Dias uteis VA memorial FOLHA (B12, padrao 26). */
+function gpVaDiasBase_() {
+  try {
+    const fp = lerFolhaPlanejamento_();
+    if (fp.ok && fp.diasVa >= 15 && fp.diasVa <= 31) return fp.diasVa;
+  } catch (e) { /* ok */ }
+  return 26;
 }
 
 /** B4 INVESTIMENTO: aceita Date, dd/MM/yyyy ou MM/yyyy → { mes, ano, label }. */
@@ -7005,11 +7051,14 @@ function gpCadastroOk_(cad) {
 }
 
 function gpColabRhObjFromRow_(row, idx) {
+  const rowNum = GP_DATA_ROW + idx;
+  const admissao = gpRepairAdmissaoRhCell_(rowNum, row[9]);
   const obj = {
     operadorId: Number(row[0]), nome: String(row[1] || '').trim(), funcao: String(row[2] || '').trim(),
-    cpf: String(row[3] || '').trim(), nascimento: cellToStr_(row[4]), telefone: String(row[5] || '').trim(),
+    cpf: String(row[3] || '').trim(), nascimento: gpNormAdmissaoStr_(row[4]) || cellToStr_(row[4]),
+    telefone: String(row[5] || '').trim(),
     email: String(row[6] || '').trim(), endereco: String(row[7] || '').trim(), emergencia: String(row[8] || '').trim(),
-    admissao: cellToStr_(row[9]), pix: String(row[10] || '').trim(), salarioBase: Number(row[11]) || 1621,
+    admissao: admissao, pix: String(row[10] || '').trim(), salarioBase: Number(row[11]) || 1621,
     vaDiario: Number(row[12]) || Math.round(GP_VA_MENSAL_PADRAO_ / 26 * 100) / 100,
     vaMensal: GP_VA_MENSAL_PADRAO_, metaLocDia: Number(row[13]) || 20, bonusMeta: Number(row[14]) || 100,
     turno: String(row[15] || '').trim(), ativo: String(row[16] || 'SIM').toUpperCase() !== 'NAO',
@@ -7035,12 +7084,15 @@ function salvarCadastroColaborador_(p) {
     const email = String(p.email || '').trim();
     const end = String(p.endereco || '').trim();
     const emerg = String(p.emergencia || '').trim();
-    const adm = String(p.admissao || '').trim();
+    const adm = gpNormAdmissaoStr_(String(p.admissao || '').trim());
+    const nascNorm = gpNormAdmissaoStr_(nasc);
     const pix = String(p.pix || '').trim();
-    const cad = { nomeCompleto: nome, cpf: cpf, nascimento: nasc, telefone: tel, email: email, endereco: end, emergencia: emerg, admissao: adm, pix: pix };
+    if (!parseDataStr_(adm)) return err_('Data de admissao invalida — use dd/MM/yyyy', 400);
+    if (nascNorm && !parseDataStr_(nascNorm)) return err_('Data de nascimento invalida — use dd/MM/yyyy', 400);
+    const cad = { nomeCompleto: nome, cpf: cpf, nascimento: nascNorm || nasc, telefone: tel, email: email, endereco: end, emergencia: emerg, admissao: adm, pix: pix };
     if (!gpCadastroOk_(cad)) return err_('Preencha todos os campos obrigatorios do cadastro', 400);
     sh.getRange(r, 2).setValue(nome);
-    sh.getRange(r, 4, 1, 7).setValues([[cpf, nasc, tel, email, end, emerg, adm]]);
+    sh.getRange(r, 4, 1, 7).setValues([[cpf, nascNorm || nasc, tel, email, end, emerg, adm]]);
     sh.getRange(r, 11).setValue(pix);
     const pct = 100;
     sh.getRange(r, 18).setValue(pct);
@@ -7048,7 +7100,7 @@ function salvarCadastroColaborador_(p) {
     sh.getRange(r, 5).setNumberFormat('@');
     sh.getRange(r, 10).setNumberFormat('@');
     try { CacheService.getScriptCache().remove('gp_painel_adm_' + gpNormCompetencia_(gpCompetenciaAtual_())); } catch (e) { /* ok */ }
-    return resp_({ cadastro: cad, cadastroPct: pct, cadastroOk: true, versao: 'v1.5.127' });
+    return resp_({ cadastro: cad, cadastroPct: pct, cadastroOk: true, versao: 'v1.5.129' });
   } catch (ex) {
     return err_('Erro ao salvar cadastro: ' + ex.message, 500);
   }
@@ -7558,7 +7610,12 @@ function gpDiasNoMes_(mes, ano) {
 
 function gpDiasTrabalhadosNoMes_(admissaoStr, mes, ano) {
   const diasMes = gpDiasNoMes_(mes, ano);
-  const adm = parseDataStr_(admissaoStr);
+  const admStr = String(admissaoStr || '').trim();
+  const adm = admStr ? parseDataStr_(gpNormAdmissaoStr_(admStr) || admStr) : null;
+  if (admStr && !adm) {
+    Logger.log('gpDiasTrabalhadosNoMes_: TRAVA admissao invalida "' + admStr + '" — 0 dias (nao mes cheio)');
+    return 0;
+  }
   const iniMes = new Date(ano, mes - 1, 1);
   const fimMes = new Date(ano, mes - 1, diasMes, 23, 59, 59);
   let inicio = iniMes;
@@ -7575,7 +7632,9 @@ function gpDiasNaQuinzena_(admissaoStr, mes, ano, quinzena) {
   const diasMes = gpDiasNoMes_(mes, ano);
   const qIni = quinzena === 1 ? 1 : 15;
   const qFim = quinzena === 1 ? Math.min(14, diasMes) : diasMes;
-  const adm = parseDataStr_(admissaoStr);
+  const admStr = String(admissaoStr || '').trim();
+  const adm = admStr ? parseDataStr_(gpNormAdmissaoStr_(admStr) || admStr) : null;
+  if (admStr && !adm) return 0;
   const iniQ = new Date(ano, mes - 1, qIni);
   const fimQ = new Date(ano, mes - 1, qFim, 23, 59, 59);
   let inicio = iniQ;
@@ -7691,7 +7750,10 @@ function gpCalcHollerite_(colab, bonus, faltas, competencia, refDate) {
 
   const totalDescontos = Math.round((inss + irrf + vt + faltas) * 100) / 100;
   const liquido = Math.round((bruto - totalDescontos) * 100) / 100;
-  const vaDiario = diasMes > 0 ? Math.round((vaMensal / diasMes) * 100) / 100 : 0;
+  const diasVaBase = gpVaDiasBase_();
+  const vaDiario = (diasTrab > 0 && vaTotal > 0)
+    ? Math.round((vaTotal / diasTrab) * 100) / 100
+    : Math.round((vaMensal / diasVaBase) * 100) / 100;
   const pagamentoEm = gpDataPagamentoQuinzena_(quinzena, mes, ano);
   const quinzenaLabel = quinzena === 1 ? '1ª quinzena · 40% salário' : '2ª quinzena · 60% + benefícios';
 
@@ -8332,6 +8394,20 @@ function salvarAvaliacaoRhAdmin_(p) {
   }
 }
 
+function gpRepairAllAdmissoesRh_() {
+  try {
+    const sh = gpSheet_(SH_COLAB_RH);
+    const rows = gpRows_(SH_COLAB_RH);
+    if (!rows.length) return;
+    rows.forEach(function (r, i) {
+      gpRepairAdmissaoRhCell_(GP_DATA_ROW + i, r[9]);
+    });
+    sh.getRange(GP_DATA_ROW, 10, rows.length, 1).setNumberFormat('@');
+  } catch (e) {
+    Logger.log('gpRepairAllAdmissoesRh_: ' + e.message);
+  }
+}
+
 function instalarAbasGestaoPessoasCore_() {
   const ss = ss_();
   function ensure(name, color, headers, seeds) {
@@ -8345,8 +8421,8 @@ function instalarAbasGestaoPessoasCore_() {
   }
   ensure(SH_COLAB_RH, '#2196F3', ['operador_id','nome','funcao','cpf','nascimento','telefone','email','endereco','emergencia','admissao','pix','salario_base','va_diario','meta_loc_dia','bonus_meta_r$','turno','ativo','cadastro_pct','atualizado_em'],
     [
-      [2,'Milena Nunes','Socia','','','','','','','2020-01-01','',1621,20,20,100,'10h–14h','SIM',100,''],
-      [3,'Raykelly','Atendente 1','','','','','','','2026-06-15','',1621,20,20,100,'14h–22h','SIM',100,'']
+      [2,'Milena Nunes','Socia','','','','','','','01/01/2020','',1621,20,20,100,'10h–14h','SIM',100,''],
+      [3,'Raykelly','Atendente 1','','','','','','','15/06/2026','',1621,20,20,100,'14h–22h','SIM',100,'']
     ]);
   ensure(SH_FOLHA_PONTO, '#4CAF50', ['id','operador_id','data','dia_semana','entrada','saida','horas','situacao','registrado_em'],
     [[1,3,'15/06/2026','Seg','13:58','21:05','7h07','OK','']]);
@@ -8376,6 +8452,7 @@ function instalarAbasGestaoPessoasCore_() {
   if (shAv && shAv.getLastRow() >= GP_DATA_ROW) {
     shAv.getRange(GP_DATA_ROW, 3, shAv.getLastRow() - GP_DATA_ROW + 1, 1).setNumberFormat('@');
   }
+  gpRepairAllAdmissoesRh_();
 }
 
 function instalarAbasGestaoPessoasAdmin_(p) {
