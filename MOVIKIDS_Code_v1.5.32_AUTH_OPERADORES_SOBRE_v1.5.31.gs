@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.138
+// MOVI KIDS — Google Apps Script v1.5.139
+// v1.5.139: I45b — salvarCadastroRhAdmin + repararRhPlanilhaAdmin + clasp export/busca + sync pct/datas
 // v1.5.138: I45 — instalarAbas nao apaga dados RH; diagnosticoPlanilhaCompleto; salvarCadastro A1+ cache
 // v1.5.137: I44 — banco horas: nao persistir em leitura painel; repair admin; equipe cmd
 // v1.5.136: HOTFIX I43 — carregarInicio lia 19 cols (sem col Y timestamp) → cronômetro zerava no sync
@@ -415,6 +416,10 @@ function dispatchMoviAction_(p, method) {
       case 'repairFolhaAdmin':    return repairFolhaFormulasAdmin_(p);
       case 'repairBancoHorasAdmin': return repairBancoHorasAdmin_(p);
       case 'diagnosticoPlanilhaCompletoAdmin': return diagnosticoPlanilhaCompletoAdmin_(p);
+      case 'salvarCadastroRhAdmin': return salvarCadastroRhAdmin_(p);
+      case 'repararRhPlanilhaAdmin': return repararRhPlanilhaAdmin_(p);
+      case 'exportarCadastroRhAdmin': return exportarCadastroRhAdmin_(p);
+      case 'buscarTextoPlanilhaAdmin': return buscarTextoPlanilhaAdmin_(p);
       case 'salvarRelatorioDrive':return salvarRelatorioDrive_(p);
       case 'listarRelatorios':    return listarRelatorios_();
       case 'verificarSessao':     return verificarSessao_(p);
@@ -502,9 +507,9 @@ function ping_() {
   const agora = new Date();
   return resp_({
     status:  'online',
-    versao:  'v1.5.136',
+    versao:  'v1.5.139',
     timestamp: fmtData_(agora) + ' ' + fmtHoraLocal_(agora),
-    sistema: 'MOVI KIDS v1.5.136',
+    sistema: 'MOVI KIDS v1.5.139',
     postWriteActions: WRITE_ACTIONS_CRITICAS_
   });
 }
@@ -7328,46 +7333,95 @@ function gpColabRhObjFromRow_(row, idx) {
   return obj;
 }
 
+function gpInvalidateRhCache_() {
+  try {
+    const cache = CacheService.getScriptCache();
+    cache.remove('gp_list_colab_v1');
+    cache.remove('gp_painel_adm_' + gpNormCompetencia_(gpCompetenciaAtual_()));
+  } catch (e) { /* ok */ }
+}
+
+/** Grava cadastro RH na linha — usado por colaborador e admin. */
+function gpPersistCadastroRhRow_(opId, p, opts) {
+  opts = opts || {};
+  const colab = gpColabRhByOpId_(opId);
+  if (!colab || !colab.row) return { ok: false, err: err_('Colaborador sem cadastro RH na planilha', 404) };
+  const sh = gpSheet_(SH_COLAB_RH);
+  const r = colab.row;
+  const nome = String(p.nomeCompleto || p.nome || colab.nome || '').trim();
+  const cpf = String(p.cpf || '').trim();
+  const nasc = String(p.nascimento || '').trim();
+  const tel = String(p.telefone || '').trim();
+  const email = String(p.email || '').trim();
+  const end = String(p.endereco || '').trim();
+  const emerg = String(p.emergencia || '').trim();
+  const admRaw = String(p.admissao || colab.admissao || '').trim();
+  const adm = gpNormAdmissaoStr_(admRaw);
+  const nascNorm = gpNormAdmissaoStr_(nasc);
+  const pix = String(p.pix || '').trim();
+  if (!parseDataStr_(adm)) return { ok: false, err: err_('Data de admissao invalida — use dd/MM/yyyy', 400) };
+  if (nascNorm && !parseDataStr_(nascNorm)) return { ok: false, err: err_('Data de nascimento invalida — use dd/MM/yyyy', 400) };
+  const cad = {
+    nomeCompleto: nome, cpf: cpf, nascimento: nascNorm || nasc, telefone: tel, email: email,
+    endereco: end, emergencia: emerg, admissao: adm, pix: pix
+  };
+  if (!opts.permitirParcial && !gpCadastroOk_(cad)) {
+    return { ok: false, err: err_('Preencha todos os campos obrigatorios do cadastro', 400) };
+  }
+  sh.getRange(r, 2).setValue(nome);
+  gpSetSheetRow_(sh, r, 4, [cpf, nascNorm || nasc, tel, email, end, emerg, adm]);
+  sh.getRange(r, 11).setValue(pix);
+  const pct = gpCalcCadastroPct_(cad);
+  sh.getRange(r, 18).setValue(pct);
+  sh.getRange(r, 19).setValue(fmtData_(new Date()) + ' ' + fmtHoraLocal_(new Date()));
+  sh.getRange(r, 5).setNumberFormat('@');
+  sh.getRange(r, 10).setNumberFormat('@');
+  gpInvalidateRhCache_();
+  return { ok: true, cadastro: cad, cadastroPct: pct, cadastroOk: gpCadastroOk_(cad), operadorId: opId, row: r };
+}
+
 function salvarCadastroColaborador_(p) {
   const opId = Number(p.operadorId || p.id || 0);
   const auth = gpVerifyPinColaborador_(opId, p.pin);
   if (!auth.ok) return auth.err;
-  const colab = gpColabRhByOpId_(opId);
-  if (!colab || !colab.row) return err_('Colaborador sem cadastro RH na planilha', 404);
   try {
-    const sh = gpSheet_(SH_COLAB_RH);
-    const r = colab.row;
-    const nome = String(p.nomeCompleto || p.nome || colab.nome || '').trim();
-    const cpf = String(p.cpf || '').trim();
-    const nasc = String(p.nascimento || '').trim();
-    const tel = String(p.telefone || '').trim();
-    const email = String(p.email || '').trim();
-    const end = String(p.endereco || '').trim();
-    const emerg = String(p.emergencia || '').trim();
-    const adm = gpNormAdmissaoStr_(String(p.admissao || '').trim());
-    const nascNorm = gpNormAdmissaoStr_(nasc);
-    const pix = String(p.pix || '').trim();
-    if (!parseDataStr_(adm)) return err_('Data de admissao invalida — use dd/MM/yyyy', 400);
-    if (nascNorm && !parseDataStr_(nascNorm)) return err_('Data de nascimento invalida — use dd/MM/yyyy', 400);
-    const cad = { nomeCompleto: nome, cpf: cpf, nascimento: nascNorm || nasc, telefone: tel, email: email, endereco: end, emergencia: emerg, admissao: adm, pix: pix };
-    if (!gpCadastroOk_(cad)) return err_('Preencha todos os campos obrigatorios do cadastro', 400);
-    sh.getRange(r, 2).setValue(nome);
-    gpSetSheetRow_(sh, r, 4, [cpf, nascNorm || nasc, tel, email, end, emerg, adm]);
-    sh.getRange(r, 11).setValue(pix);
-    const pct = 100;
-    sh.getRange(r, 18).setValue(pct);
-    sh.getRange(r, 19).setValue(fmtData_(new Date()) + ' ' + fmtHoraLocal_(new Date()));
-    sh.getRange(r, 5).setNumberFormat('@');
-    sh.getRange(r, 10).setNumberFormat('@');
-    try {
-      const cache = CacheService.getScriptCache();
-      cache.remove('gp_list_colab_v1');
-      cache.remove('gp_painel_adm_' + gpNormCompetencia_(gpCompetenciaAtual_()));
-    } catch (e) { /* ok */ }
-    return resp_({ cadastro: cad, cadastroPct: pct, cadastroOk: true, versao: 'v1.5.138' });
+    const out = gpPersistCadastroRhRow_(opId, p);
+    if (!out.ok) return out.err;
+    return resp_(Object.assign({}, out, { versao: 'v1.5.139' }));
   } catch (ex) {
     return err_('Erro ao salvar cadastro: ' + ex.message, 500);
   }
+}
+
+/** Admin restaura cadastro RH (recuperacao I45 — sem PIN colaborador). */
+function salvarCadastroRhAdmin_(p) {
+  if (!adminPinOk_(p)) return err_('Acesso negado — PIN admin 1416', 403);
+  const opId = Number(p.operadorId || p.id || 0);
+  if (!opId) return err_('operadorId obrigatorio', 400);
+  try {
+    const out = gpPersistCadastroRhRow_(opId, p);
+    if (!out.ok) return out.err;
+    return resp_(Object.assign({}, out, { mensagem: 'Cadastro RH gravado pelo admin', versao: 'v1.5.139' }));
+  } catch (ex) {
+    return err_('salvarCadastroRhAdmin: ' + ex.message, 500);
+  }
+}
+
+/** Export completo COLABORADORES_RH (admin — recuperacao). */
+function exportarCadastroRhAdmin_(p) {
+  if (!adminPinOk_(p)) return err_('Acesso negado — PIN admin 1416', 403);
+  const opId = Number(p.operadorId || p.id || 0);
+  const rows = gpRows_(SH_COLAB_RH);
+  const lista = rows.map(function (r, i) {
+    const obj = gpColabRhObjFromRow_(r, i);
+    const cad = gpCadastroFromRhObj_(obj);
+    return {
+      operadorId: obj.operadorId, nome: obj.nome, row: obj.row,
+      cadastro: cad, cadastroPct: gpCalcCadastroPct_(cad), cadastroOk: gpCadastroOk_(cad),
+      salarioBase: obj.salarioBase, turno: obj.turno, atualizadoEm: cellToStr_(r[18])
+    };
+  }).filter(function (x) { return !opId || Number(x.operadorId) === opId; });
+  return resp_({ colaboradores: lista, versao: 'v1.5.139' });
 }
 
 function gpLoadContext_() {
@@ -8451,8 +8505,8 @@ function gpSyncRhColaboradoresPadrao_(ctx) {
       return rows.some(function (r) { return Number(r[0]) === Number(id) && gpNormCompetencia_(r[1]) === compNorm; });
     };
     const comp = gpCompetenciaAtual_();
-    if (!hasRh(2)) gpEnsureRowByOpId_(SH_COLAB_RH, 2, [2, 'Milena Nunes', 'Socia', '', '', '', '', '', '', '2020-01-01', '', 1621, 20, 20, 100, '10h–14h', 'SIM', 100, '']);
-    if (!hasRh(3)) gpEnsureRowByOpId_(SH_COLAB_RH, 3, [3, 'Raykelly', 'Atendente 1', '', '', '', '', '', '', '2026-06-15', '', 1621, 20, 20, 100, '14h–22h', 'SIM', 100, '']);
+    if (!hasRh(2)) gpEnsureRowByOpId_(SH_COLAB_RH, 2, [2, 'Milena Nunes', 'Socia', '', '', '', '', '', '', '01/01/2020', '', 1621, 20, 20, 100, '10h–14h', 'SIM', 25, '']);
+    if (!hasRh(3)) gpEnsureRowByOpId_(SH_COLAB_RH, 3, [3, 'Raykelly', 'Atendente 1', '', '', '', '', '', '', '15/06/2026', '', 1621, 20, 20, 100, '14h–22h', 'SIM', 25, '']);
     if (!hasEscala(2, comp)) gpEnsureEscalaRow_(2, comp, ['10–14', '10–14', '10–14', '10–14', '10–14', 'OFF', 'OFF'], 'Socia — turno manha');
     if (!hasEscala(3, comp)) gpEnsureEscalaRow_(3, comp, ['14–22', 'OFF', '14–22', 'OFF', '14–22', '10–20', '13–21'], 'Rodizio dom');
     if (!gpRowExistsByOpId_(SH_BANCO_HORAS, 2)) gpEnsureRowByOpId_(SH_BANCO_HORAS, 2, [2, '0h00', '']);
@@ -8633,7 +8687,7 @@ function gestaoPessoasStatus_() {
   const ss = ss_();
   const abas = [SH_COLAB_RH, SH_FOLHA_PONTO, SH_ESCALA_COLAB, SH_FALTAS, SH_HOLERITES, SH_METAS_COLAB, SH_BANCO_HORAS, SH_COMUNICADOS_RH, SH_AVALIACOES_RH];
   const ok = abas.every(function (n) { return !!ss.getSheetByName(n); });
-  return resp_({ ok: ok, abas: abas.map(function (n) { return { nome: n, existe: !!ss.getSheetByName(n) }; }), versao: 'v1.5.138' });
+  return resp_({ ok: ok, abas: abas.map(function (n) { return { nome: n, existe: !!ss.getSheetByName(n) }; }), versao: 'v1.5.139' });
 }
 
 /** I45 — inventário completo da planilha + RH auditável (admin PIN). */
@@ -8720,7 +8774,7 @@ function diagnosticoPlanilhaCompletoAdmin_(p) {
       colaboradoresRh: colaboradoresRh,
       folhaPonto: folhaPonto,
       bancoHoras: bancoHoras,
-      versao: 'v1.5.138'
+      versao: 'v1.5.139'
     });
   } catch (ex) {
     return err_('diagnosticoPlanilhaCompleto: ' + ex.message, 500);
@@ -8894,12 +8948,107 @@ function gpRepairAllAdmissoesRh_() {
     const rows = gpRows_(SH_COLAB_RH);
     if (!rows.length) return;
     rows.forEach(function (r, i) {
-      gpRepairAdmissaoRhCell_(GP_DATA_ROW + i, r[9]);
+      const rowNum = GP_DATA_ROW + i;
+      gpRepairAdmissaoRhCell_(rowNum, r[9]);
+      const nascNorm = gpNormAdmissaoStr_(r[4]);
+      if (nascNorm && parseDataStr_(nascNorm) && cellToStr_(r[4]) !== nascNorm) {
+        sh.getRange(rowNum, 5).setValue(nascNorm);
+        sh.getRange(rowNum, 5).setNumberFormat('@');
+      }
+      const cad = gpCadastroFromRhObj_(gpColabRhObjFromRow_(r, i));
+      sh.getRange(rowNum, 18).setValue(gpCalcCadastroPct_(cad));
     });
+    sh.getRange(GP_DATA_ROW, 5, rows.length, 1).setNumberFormat('@');
     sh.getRange(GP_DATA_ROW, 10, rows.length, 1).setNumberFormat('@');
+    gpInvalidateRhCache_();
   } catch (e) {
     Logger.log('gpRepairAllAdmissoesRh_: ' + e.message);
   }
+}
+
+/** Admin — repara datas, cadastro_pct e formatos RH + opcional banco I44. */
+function repararRhPlanilhaAdmin_(p) {
+  if (!adminPinOk_(p)) return err_('Acesso negado — PIN admin 1416', 403);
+  try {
+    gpRepairAllAdmissoesRh_();
+    const shFp = gpSheet_(SH_FOLHA_PONTO);
+    const fpLast = shFp.getLastRow();
+    if (fpLast >= GP_DATA_ROW) {
+      shFp.getRange(GP_DATA_ROW, 3, fpLast - GP_DATA_ROW + 1, 1).setNumberFormat('@');
+    }
+    const shEsc = gpSheet_(SH_ESCALA_COLAB);
+    const escLast = shEsc.getLastRow();
+    if (escLast >= GP_DATA_ROW) {
+      shEsc.getRange(GP_DATA_ROW, 2, escLast - GP_DATA_ROW + 1, 1).setNumberFormat('@');
+    }
+    let bancoRepair = null;
+    if (String(p.repairBanco || 'sim').toLowerCase() !== 'nao') {
+      bancoRepair = JSON.parse(repairBancoHorasAdmin_(p).getContent());
+    }
+    const exportRh = JSON.parse(exportarCadastroRhAdmin_(p).getContent());
+    return resp_({
+      mensagem: 'Planilha RH reparada (datas, pct, formatos)',
+      colaboradores: exportRh.colaboradores,
+      bancoRepair: bancoRepair,
+      versao: 'v1.5.139'
+    });
+  } catch (ex) {
+    return err_('repararRhPlanilhaAdmin: ' + ex.message, 500);
+  }
+}
+
+/** clasp run — exporta cadastros RH (acesso direto planilha, sem Web deploy). */
+function mkClaspRunExportRh_() {
+  const rows = gpRows_(SH_COLAB_RH);
+  return rows.map(function (r, i) {
+    const obj = gpColabRhObjFromRow_(r, i);
+    const cad = gpCadastroFromRhObj_(obj);
+    return {
+      operadorId: obj.operadorId, row: obj.row, cadastro: cad,
+      cadastroPct: gpCalcCadastroPct_(cad), cadastroOk: gpCadastroOk_(cad)
+    };
+  });
+}
+
+/** clasp run / admin — busca texto em todas as abas (recuperar dados perdidos). */
+function mkClaspRunBuscarTextoPlanilha_(termo) {
+  termo = String(termo || 'Raykelly').trim();
+  if (!termo) return [];
+  const ss = ss_();
+  const hits = [];
+  const termoLow = termo.toLowerCase();
+  ss.getSheets().forEach(function (sh) {
+    const lr = Math.min(sh.getLastRow(), 500);
+    const lc = Math.min(sh.getLastColumn(), 30);
+    if (lr < 1 || lc < 1) return;
+    const data = sh.getRange(1, 1, lr, lc).getValues();
+    for (let r = 0; r < data.length; r++) {
+      for (let c = 0; c < data[r].length; c++) {
+        const v = String(data[r][c] || '');
+        if (v.length < 3) continue;
+        if (v.toLowerCase().indexOf(termoLow) >= 0) {
+          hits.push({ aba: sh.getName(), linha: r + 1, coluna: c + 1, valor: v.slice(0, 200) });
+        }
+      }
+    }
+  });
+  return hits;
+}
+
+/** Admin — busca texto em todas as abas (recuperacao dados). */
+function buscarTextoPlanilhaAdmin_(p) {
+  if (!adminPinOk_(p)) return err_('Acesso negado — PIN admin 1416', 403);
+  const termo = String(p.termo || p.q || 'Raykelly').trim();
+  if (!termo) return err_('termo obrigatorio', 400);
+  const hits = mkClaspRunBuscarTextoPlanilha_(termo);
+  return resp_({ termo: termo, total: hits.length, hits: hits, versao: 'v1.5.139' });
+}
+
+/** clasp run — repara RH + zera banco corrompido. */
+function mkClaspRunRepararRh_() {
+  gpRepairAllAdmissoesRh_();
+  const banco = JSON.parse(repairBancoHorasAdmin_({ adminPin: '1416' }).getContent());
+  return { colaboradores: mkClaspRunExportRh_(), banco: banco, versao: 'v1.5.139' };
 }
 
 function instalarAbasGestaoPessoasCore_(opts) {
