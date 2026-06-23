@@ -233,6 +233,21 @@ Legenda: **Alimenta** = quem lê/consome · **Gravado por** = quem escreve em ru
 
 Fonte: comentário `salvarLocacao_` + `locacaoObj_` no `.gs`.
 
+### CUSTOS (header linha 9)
+
+| Col | Header | Uso |
+|-----|--------|-----|
+| A | # | id |
+| B | Data | dd/mm |
+| C | Hora | HH:mm |
+| D | Descricao | texto |
+| E | Categoria | mini-DRE |
+| F | Valor | R$ |
+
+### CONFIG (linhas 1–61)
+
+Chaves JSON em colunas A–D: `veiculos_validos_json`, `precos_json`, `formas_pagamento_json`, `regras_operacionais_json`. Preços visuais e frota — ver `FASE_4_CONFIG_PLANILHA.md`. **Não editar manualmente** sem alinhar GAS `precosOp_()`.
+
 ### COLABORADORES_RH (header linha 1, dados linha 2+)
 
 | Col | Header planilha | Campo GAS | Obrigatório gate 428 |
@@ -305,7 +320,7 @@ Gate: `gpCadastroOk_` = 8 campos B,D,E,F,H,I,J,K preenchidos (100%).
 | I43 | LOCACOES col Y | timestamp cronômetro |
 | I44 | BANCO_HORAS | Não persistir em leitura painel |
 | I45 | COLABORADORES_RH | Installer `clear()` + FE falso save |
-| **I48** | FALTAS / HOLERITES | Admin leitura não pode `appendRow` |
+| **I48** | FALTAS / HOLERITES | Admin leitura não pode `appendRow` — **v1.5.142 prod** painel ~3s |
 
 Doc: `docs/arquivo/incidentes/INCIDENTE_I48_ADMIN_RH_LENTO_ESCRITA_LEITURA_2026-06-23.md`
 

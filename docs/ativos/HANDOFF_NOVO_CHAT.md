@@ -56,7 +56,7 @@ cursor "C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-mo
 | **Frontend** | **v1.8.118** | https://ribocg-a11y.github.io/movikids/?force=1.8.118 | I47 PIN duplo submit |
 | **Gestão Pessoas** | **v1.8.118** | `gestao-pessoas.html?force=1.8.118` | Ficha admin somente leitura |
 | **Service Worker** | **1.8.118** | `sw.js` | GAS fora do intercept |
-| **Apps Script** | **v1.5.142** (header `.gs`) | ping **v1.5.141** · publicar **v1.5.142** (I48 perf) | Deploy **@201** |
+| **Apps Script** | **v1.5.142** (header `.gs`) | ping **v1.5.142** ✅ I48 prod | Deploy **@201** |
 | **Aba BANCO_HORAS** | ✅ repair I44 | Milena/Raykelly **0h00** | `repararRhPlanilhaAdmin` 23/06 |
 | **COLABORADORES_RH** | Milena **100%** · Raykelly **25%** | Backup `backups/rh/cadastro-rh-2026-06-23_1657.json` | Raykelly completar em Colaboradores |
 | **Planilha** | 24 abas mapeadas | `MAPA_PLANILHA_ABAS_MOVIKIDS.md` | `diagnosticoPlanilhaCompletoAdmin` |
@@ -99,7 +99,7 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 
 | # | Ação | Quem | Status |
 |---|------|------|--------|
-| 1 | **Nova versão Web GAS v1.5.142** (I48 perf admin RH) | **Sócio** | ⏳ **P0** |
+| 1 | ~~Nova versão Web GAS v1.5.142~~ | **Sócio** | ✅ **I48 prod** — painel ~3s |
 | 2 | Tablet `?force=1.8.118` — login PIN Milena/Raykelly (I47) | Ops loja | ⏳ |
 | 3 | Raykelly cadastro **100%** em `gestao-pessoas.html` (PIN dela) | Colaborador | ⏳ 25% |
 | 4 | Homolog ▶ cronômetro (I43) + Caixa I42 + Gestor | Ops loja | ⏳ |

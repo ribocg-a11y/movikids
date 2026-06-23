@@ -34,7 +34,7 @@ try {
   Add-GpCheck "ping" "ok" $ping.versao
   if ($ping.versao -match 'v1\.5\.(10[0-6]|107)') {
     Add-GpCheck "gas.versao" "warn" "repo v1.5.134 - publicar Nova versao Web"
-  } elseif ($ping.versao -match 'v1\.5\.(10[89]|11[0-4]|13[0-4])') {
+  } elseif ($ping.versao -match 'v1\.5\.(10[89]|11[0-9]|12[0-9]|13[0-9]|14[0-2])') {
     Add-GpCheck "gas.versao" "ok" $ping.versao
   } else {
     Add-GpCheck "gas.versao" "warn" ("versao inesperada: " + $ping.versao)
@@ -96,10 +96,10 @@ try {
       } else {
         Add-GpCheck "painel.bancoProjetado" "ok" ("n=" + $comBanco)
       }
-      if ($painel.versao -and $painel.versao -match 'v1\.5\.13[0-4]') {
+      if ($painel.versao -and $painel.versao -match 'v1\.5\.14[0-2]') {
         Add-GpCheck "painel.versao" "ok" $painel.versao
-      } elseif ($painel.versao) {
-        Add-GpCheck "painel.versao" "warn" ("Web antiga: " + $painel.versao + " - esperado v1.5.134 para 15b.7")
+      } elseif ($painel.versao -and $painel.versao -match 'v1\.5\.13[0-9]') {
+        Add-GpCheck "painel.versao" "warn" ("Web sem I48: " + $painel.versao)
       }
     } else {
       Add-GpCheck "painelGestaoPessoasAdmin" "warn" ([string]$painel.erro)

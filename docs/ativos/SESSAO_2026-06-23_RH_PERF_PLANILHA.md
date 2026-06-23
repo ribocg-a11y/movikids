@@ -28,6 +28,6 @@
 
 ## Pendente sócio
 
-1. `prepare-gas-push.ps1` + **Nova versão Web v1.5.142**
+1. ~~Nova versão Web v1.5.142~~ ✅ prod 23/06 — painel admin ~3s (era ~26s)
 2. Tablet `?force=1.8.118`
 3. Raykelly completar cadastro
