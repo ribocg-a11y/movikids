@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.131
+// MOVI KIDS — Google Apps Script v1.5.132
+// v1.5.132: fix calcResumoDiaCore_ saldoDin (totalDin ref)
 // v1.5.131: conta do dia — mesmo telefone 10h-22h = 1 locação caixa; maquininha normalizada; col S conta_id
 // v1.5.130: RH audit — ping alinhado; VA/VT FOLHA; banco+holerite persist; meta RH cols; gpVaMensal va_diario
 // v1.5.129: trava VA/salario proporcional admissao — parseDataStr ISO + gpNormAdmissaoStr_ + repair planilha
@@ -1475,7 +1476,7 @@ function calcResumoDiaCore_(dataFmt) {
     totalDin: agg.totalDin,
     totalCus: Math.round(totalCus * 100) / 100,
     cusDin: Math.round(cusDin * 100) / 100,
-    saldoDin: Math.round((totalDin - cusDin) * 100) / 100,
+    saldoDin: Math.round((agg.totalDin - cusDin) * 100) / 100,
     resultado: Math.round((agg.fat - totalCus) * 100) / 100,
     locacoes: enc,
     custos: custos
