@@ -97,12 +97,11 @@ Fonte de verdade: `mk-version.js`, header do `.gs`, ping GAS.
 
 - **FASE 1–9:** ✅ prod
 - **FASE 14 mini-DRE:** ✅ prod
-- **FASE 15–17:** 🟡 homolog tablet · GAS Web **v1.5.142** pendente (I48)
+- **FASE 15–17:** 🟡 homolog tablet · GAS Web **v1.5.145** ✅ (I51)
 - **I43:** ✅ hotfix prod (cronômetro)
 - **I44:** ✅ banco reparado
-- **I45–I47:** RH governança + PIN — FE **v1.8.118**
-- **I48:** fix repo perf admin — publicar GAS v1.5.142
-- **Próximo:** Nova versão Web · Raykelly cadastro 100% · homolog tablet
+- **I45–I51:** RH governança + PIN + VA + restore ponto — FE **v1.8.118** · GAS **v1.5.145**
+- **Próximo:** Raykelly cadastro 100% · homolog tablet · ponto RH diário
 
 ## "Atualize tudo"
 

@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.145
+// MOVI KIDS — Google Apps Script v1.5.146
+// v1.5.146: I51b — restore ponto limpa FALTAS nao abonadas do mes (nao so Sync jornada)
 // v1.5.145: I51 — falta auto restaurada; abono ADM; salvarPontoRhAdmin + restore Raykelly
 // v1.5.144: I50 revertido — ponto perdido era a causa, nao a regra de falta
 // v1.5.143: I49 — VA teto R$400 fixo (va_diario planilha nao redefine mensal)
@@ -517,9 +518,9 @@ function ping_() {
   const agora = new Date();
   return resp_({
     status:  'online',
-    versao:  'v1.5.145',
+    versao:  'v1.5.146',
     timestamp: fmtData_(agora) + ' ' + fmtHoraLocal_(agora),
-    sistema: 'MOVI KIDS v1.5.145',
+    sistema: 'MOVI KIDS v1.5.146',
     postWriteActions: WRITE_ACTIONS_CRITICAS_
   });
 }
@@ -8115,6 +8116,30 @@ function gpRepairLimparFaltasSyncJornada_(opId) {
   }
 }
 
+/** Remove FALTAS nao abonadas do colaborador na competencia (apos restore ponto). */
+function gpRepairLimparFaltasOpMesNaoAbonadas_(opId, mes, ano) {
+  try {
+    const sh = gpSheet_(SH_FALTAS);
+    const rows = gpRows_(SH_FALTAS);
+    if (!rows.length) return 0;
+    let removidas = 0;
+    for (let i = rows.length - 1; i >= 0; i--) {
+      const r = rows[i];
+      if (Number(r[1]) !== Number(opId)) continue;
+      if (gpFaltaEhAbonadaRow_(r)) continue;
+      const d = parseDataStr_(cellToStr_(r[2]));
+      if (!d || (d.getMonth() + 1) !== mes || d.getFullYear() !== ano) continue;
+      sh.deleteRow(GP_DATA_ROW + i);
+      removidas++;
+    }
+    if (removidas > 0) gpInvalidateRhCache_();
+    return removidas;
+  } catch (e) {
+    Logger.log('gpRepairLimparFaltasOpMesNaoAbonadas_: ' + e.message);
+    return 0;
+  }
+}
+
 function gpSyncFaltasFromJornada_(opId, jornada, colab, comp) {
   if (!jornada || !jornada.dias || !jornada.dias.length) return;
   try {
@@ -8684,11 +8709,12 @@ function restaurarPontoRaykellyJun2026Admin_(p) {
   batidas.forEach(function (b) {
     log.push(gpUpsertPontoRhRow_(opId, b.data, b.entrada, b.saida, 'OK'));
   });
-  const faltasRemovidas = gpRepairLimparFaltasSyncJornada_(opId);
+  const faltasSyncRemovidas = gpRepairLimparFaltasSyncJornada_(opId);
+  const faltasMesRemovidas = gpRepairLimparFaltasOpMesNaoAbonadas_(opId, 6, 2026);
   gpInvalidateRhCache_();
   return resp_({
     ok: true, operadorId: opId, batidas: log.length, detalhe: log,
-    faltasSyncRemovidas: faltasRemovidas, versao: 'v1.5.145'
+    faltasSyncRemovidas: faltasSyncRemovidas, faltasMesRemovidas: faltasMesRemovidas, versao: 'v1.5.146'
   });
 }
 
@@ -8948,7 +8974,7 @@ function painelGestaoPessoasAdmin_(p) {
         total: colaboradores.length, presentes: presentes, comTurno: comTurno,
         alertas: alertasPack.total, alertasIntel: intelRh.length
       },
-      sessaoAtiva: sessao, versao: 'v1.5.145',
+      sessaoAtiva: sessao, versao: 'v1.5.146',
       comunicadosRh: gpComunicadosAllAdmin_(),
       avaliacoesRh: gpAvaliacoesAllAdmin_(),
       competenciasRh: GP_COMPETENCIAS_RH_
