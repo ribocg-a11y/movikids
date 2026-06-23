@@ -108,7 +108,9 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 | # | Ação | Quem | Status |
 |---|------|------|--------|
 | 1 | **Nova versão Web GAS v1.5.134** | **Sócio** | ✅ ping **v1.5.134** |
-| 2 | Instalar aba **AVALIACOES_RH** (`instalar-abas-gestao-pessoas-gas.ps1`) | Agente/Sócio | ⏳ |
+| 2 | Instalar aba **AVALIACOES_RH** (`instalar-abas-gestao-pessoas-gas.ps1`) | Agente | ✅ |
+| 3 | **GAS v1.5.135** — cache inicio/resumoDia em escritas | Agente | ✅ repo · Web pendente |
+| 4 | `TESTE_I42_CONTA_DIA_CAIXA.ps1` | Agente | ✅ 6/6 (12h janela) |
 | 3 | Homolog Caixa: mesmo telefone 2 sessões = 1 locação + maquininha | Ops loja | ⏳ 10h–22h |
 | 4 | Homolog **Gestor** — Dashboard/Caixa/Equipe sem CONFIG/Sistema | Ops loja | ⏳ |
 | 5 | Raykelly cadastro 25% → 100% | Colaborador | ⏳ |

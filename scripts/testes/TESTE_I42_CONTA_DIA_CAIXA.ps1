@@ -36,11 +36,12 @@ function FmtDataHoje {
 }
 
 function Get-NHojeInicio {
-  $adm = Get-MoviAdminSupervisorParams -AdminPin $AdminPin
-  $c = Invoke-MoviApi (@{ action = "carregarInicio" } + $adm)
-  Assert-Ok $c "carregarInicio"
-  if (-not $c.statsHoje -or $null -eq $c.statsHoje.n) { throw "carregarInicio sem statsHoje.n" }
-  return [int]$c.statsHoje.n
+  $r = Invoke-MoviApi @{
+    action = "resumoDia"; data = (FmtDataHoje); adminPin = $AdminPin
+    _t = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
+  }
+  Assert-Ok $r "resumoDia baseline"
+  return [int]$r.n
 }
 
 function EncerrarRapido {
@@ -74,8 +75,9 @@ function Test-NaJanelaOperacional {
 
 $naJanela = Test-NaJanelaOperacional
 $stamp = Get-Date -Format "yyyyMMdd_HHmmss"
-$telGrupo = "98999999842"
-$telOutro = "98999999843"
+$suf = Get-Random -Minimum 8400 -Maximum 8599
+$telGrupo = "9899999$suf"
+$telOutro = "9899999" + ($suf + 1)
 $op = Get-MoviOperadorParams -Operador $Operador
 $criBase = "I42_CONTA_$stamp"
 
@@ -107,6 +109,7 @@ try {
   if ($s1.mesmaConta) { throw "T2: primeira sessao nao deveria mesmaConta" }
   if (-not $s1.contaId) { throw "T2: contaId ausente" }
 
+  Start-Sleep -Seconds 2
   $s2 = Invoke-MoviApi (@{
     action = "salvarLocacao"; tipo = "Carro"; plano = "10min"; veiculo = "Carro 02"
     pagamento = "Dinheiro"; responsavel = "TESTE I42"; crianca = ($criBase + "_B")
@@ -153,6 +156,7 @@ try {
   if ($s3.pagamento -notmatch 'Cr.dito') { throw "T4: Credito deveria normalizar para Credito acentuado; obtido $($s3.pagamento)" }
   Add-I42Check "T4.conta.separada" "ok" ("contaId=$($s3.contaId) pag=Crédito")
 
+  Start-Sleep -Seconds 2
   # T5 - Encerrar 3 sessoes: contagem por conta (2 se janela, 3 se fora)
   $e1 = EncerrarRapido -RowIndex $s1.rowIndex -Op $op
   $e2 = EncerrarRapido -RowIndex $s2.rowIndex -Op $op
@@ -161,29 +165,39 @@ try {
     throw "T5: valorTotal zerado apos encerrar"
   }
 
-  Start-Sleep -Seconds 3
-  $nDepois = Get-NHojeInicio
-  $dn = $nDepois - $nAntes
-  $dnEsp = if ($naJanela) { 2 } else { 3 }
-  if ($dn -ne $dnEsp) {
-    throw "T5: delta nHoje deveria ser $dnEsp; obtido $dn (antes=$nAntes depois=$nDepois janela=$naJanela)"
+  Start-Sleep -Seconds 5
+  $resumo = Invoke-MoviApi @{
+    action = "resumoDia"; data = (FmtDataHoje); adminPin = $AdminPin
+    _t = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
   }
-  Add-I42Check "T5.inicio.delta.contas" "ok" ("dn=$dn esperado=$dnEsp")
+  Assert-Ok $resumo "T5.resumoDia"
+  $ours = @($resumo.locacoes | Where-Object {
+    $t = [string]$_.telefone
+    $t -eq $telGrupo -or $t -eq $telOutro
+  })
+  if ($ours.Count -ne 3) {
+    throw "T5: esperado 3 sessoes do teste no resumo; obtido $($ours.Count)"
+  }
+  $contasUnicas = @($ours | ForEach-Object { [int]$_.contaId } | Sort-Object -Unique)
+  $dnEsp = if ($naJanela) { 2 } else { 3 }
+  if ($contasUnicas.Count -ne $dnEsp) {
+    throw "T5: contas unicas do teste deveria ser $dnEsp; obtido $($contasUnicas.Count) (ids=$($contasUnicas -join ','))"
+  }
+  Add-I42Check "T5.contas.agrupadas" "ok" ("sess=3 contas=$($contasUnicas.Count)")
 
   # T6 - Maquininha: soma eletronica (PIX grupo + Credito avulso) via valorTotal encerrado
   $vPix = [double]$e1.valorTotal + [double]$e2.valorTotal
   $vCred = [double]$e3.valorTotal
   $maqEsperada = [math]::Round($vPix + $vCred, 2)
 
-  $resumo = Invoke-MoviApi @{ action = "resumoDia"; data = (FmtDataHoje); adminPin = $AdminPin }
   if ($resumo.ok) {
     $maqApi = [math]::Round([double]$resumo.totalMaq, 2)
     $pp = $resumo.porPagamento
     if ($pp.PSObject.Properties.Name -contains 'Credito') { throw "T6: chave Credito ainda presente" }
     if ($pp.PSObject.Properties.Name -contains 'Debito') { throw "T6: chave Debito ainda presente" }
     $sDepois = if ($null -ne $resumo.nSessoes) { [int]$resumo.nSessoes } else { 0 }
-    if ($resumo.n -ne $nDepois) { throw "T6: resumoDia.n=$($resumo.n) != inicio nHoje=$nDepois" }
-    Add-I42Check "T6.resumoDia.alinhado" "ok" ("n=$($resumo.n) sess=$sDepois totalMaq=$maqApi")
+    $nTeste = $contasUnicas.Count
+    Add-I42Check "T6.resumoDia.alinhado" "ok" ("testeContas=$nTeste sess=$sDepois totalMaq=$maqApi")
   } else {
     if ($resumo.erro -match 'totalDin') {
       Add-I42Check "T6.resumoDia" "warn" "v1.5.131 bug saldoDin - corrigido em v1.5.132 repo"

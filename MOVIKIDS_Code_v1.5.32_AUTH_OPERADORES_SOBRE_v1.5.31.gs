@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.134
+// MOVI KIDS — Google Apps Script v1.5.135
+// v1.5.135: fix cache inicio_v3 + resumoDia invalidado em escritas locação (I42 teste T5)
 // v1.5.134: 15b.7 — gpPersistBancoFromJornada_ no painel admin RH
 // v1.5.133: FASE 17 — alertas inteligentes campo destino (caixa/operadores/sistema/dashboard)
 // v1.5.132: fix calcResumoDiaCore_ saldoDin (totalDin ref)
@@ -496,9 +497,9 @@ function ping_() {
   const agora = new Date();
   return resp_({
     status:  'online',
-    versao:  'v1.5.134',
+    versao:  'v1.5.135',
     timestamp: fmtData_(agora) + ' ' + fmtHoraLocal_(agora),
-    sistema: 'MOVI KIDS v1.5.134',
+    sistema: 'MOVI KIDS v1.5.135',
     postWriteActions: WRITE_ACTIONS_CRITICAS_
   });
 }
@@ -817,7 +818,7 @@ function salvarLocacao_(p) {
   sheet.getRange(newRow, COL_CONTA_ID_).setValue(contaId);
   if (pagFinal) sheet.getRange(newRow, 17).setValue(pagFinal);
   sheet.getRange(newRow, 25).setValue(0);
-  try { CacheService.getScriptCache().remove('carregarInicio_v2'); } catch(e) {}
+  try { invalidateInicioResumoCache_(fmtData_(new Date())); } catch(e) {}
   // Firebase: notificar todos os dispositivos da nova sessão
   const newRowData = sheet.getRange(newRow, 1, 1, 28).getValues()[0];
   registrarAuditoriaLocacao_(newRow, 'salvarLocacao', {}, locacaoObj_(newRowData, newRow), 'Cadastro inicial', operadorAudit_(p));
@@ -1048,7 +1049,7 @@ function editarLocacao_(p) {
       sheet.getRange(rowIndex, 8).setValue(cfg.valor);
       sheet.getRange(rowIndex, 11).setValue(cfg.valor);
     }
-    try { CacheService.getScriptCache().remove('carregarInicio_v2'); } catch(e) {}
+    try { invalidateInicioResumoCache_(fmtData_(new Date())); } catch(e) {}
     const rowAfter = sheet.getRange(rowIndex, 1, 1, 28).getValues()[0];
     const depois = locacaoObj_(rowAfter, rowIndex);
     registrarAuditoriaLocacao_(rowIndex, 'editarLocacao', antes, depois, p.motivo || '', operadorAudit_(p));
@@ -1077,7 +1078,7 @@ function cancelarLocacao_(p) {
     const obsAtual = String(row[17] || '');
     const obsCancel = '[CANCELADA] ' + (p.tipoCancelamento || 'Cancelamento operacional') + ' - ' + motivo;
     sheet.getRange(rowIndex, 18).setValue(obsAtual ? obsAtual + '\n' + obsCancel : obsCancel);
-    try { CacheService.getScriptCache().remove('carregarInicio_v2'); } catch(e) {}
+    try { invalidateInicioResumoCache_(fmtData_(new Date())); } catch(e) {}
     const rowAfter = sheet.getRange(rowIndex, 1, 1, 28).getValues()[0];
     const depois = locacaoObj_(rowAfter, rowIndex);
     registrarAuditoriaLocacao_(rowIndex, 'cancelarLocacao', antes, depois, motivo, operadorAudit_(p));
@@ -1149,7 +1150,7 @@ function encerrarLocacao_(p) {
   sheet.getRange(rowIndex, 8).setNumberFormat('"R$" #,##0.00');
   sheet.getRange(rowIndex, 10).setNumberFormat('"R$" #,##0.00');
   sheet.getRange(rowIndex, 11).setNumberFormat('"R$" #,##0.00');
-  try { CacheService.getScriptCache().remove('carregarInicio_v2'); } catch(e) {}
+  try { invalidateInicioResumoCache_(fmtData_(new Date())); } catch(e) {}
 
   // Firebase: notificar todos os dispositivos que sessão encerrou
   try {
@@ -1375,6 +1376,20 @@ function listarCustos_(p) {
 }
 
 // ── B1 FASE 5: resumo do dia (Caixa + chip admin) ─────────────
+/** Invalida cache carregarInicio (v3) e resumoDia após escritas em LOCAÇÕES. */
+function invalidateInicioResumoCache_(dataFmt) {
+  const cache = CacheService.getScriptCache();
+  try {
+    cache.remove('carregarInicio_v2');
+    const df = String(dataFmt || fmtData_(new Date()));
+    cache.remove('resumoDia_' + df.replace(/\//g, ''));
+    for (let m = 0; m <= 24; m++) {
+      cache.remove('inicio_v3_g_m' + m);
+      cache.remove('inicio_v3_o_m' + m);
+    }
+  } catch (e) { /* ok */ }
+}
+
 function calcResumoDiaCore_(dataFmt) {
   const dataAlvo = String(dataFmt || '').trim();
   const empty = {
@@ -1491,10 +1506,13 @@ function resumoDia_(p) {
   const dataAlvo = dataIn || fmtData_(new Date());
   if (!parseDataStr_(dataAlvo)) return err_('data invalida — use dd/MM/yyyy', 400);
   const cacheKey = 'resumoDia_' + dataAlvo.replace(/\//g, '');
-  try {
-    const hit = CacheService.getScriptCache().get(cacheKey);
-    if (hit) return ContentService.createTextOutput(hit).setMimeType(ContentService.MimeType.JSON);
-  } catch (e) { /* ok */ }
+  const bust = String((p && p._t) || '').trim();
+  if (!bust) {
+    try {
+      const hit = CacheService.getScriptCache().get(cacheKey);
+      if (hit) return ContentService.createTextOutput(hit).setMimeType(ContentService.MimeType.JSON);
+    } catch (e) { /* ok */ }
+  }
   const core = calcResumoDiaCore_(dataAlvo);
   const enriched = enrichResumoDiaLeading_(core, dataAlvo);
   const out = JSON.stringify({ ok: true, ...enriched });
@@ -3983,10 +4001,13 @@ function carregarInicio_(p) {
   const gestao   = isSupervisorOrAdminRequest_(p || {});
   const metaOpId = metaOperadorIdFromRequest_(p || {}) || 0;
   const cacheKey = 'inicio_v3_' + (gestao ? 'g' : 'o') + '_m' + metaOpId;
-  try {
-    const hit = CacheService.getScriptCache().get(cacheKey);
-    if (hit) return ContentService.createTextOutput(hit).setMimeType(ContentService.MimeType.JSON);
-  } catch (e) { /* ok */ }
+  const bust = String((p && p._t) || '').trim();
+  if (!bust) {
+    try {
+      const hit = CacheService.getScriptCache().get(cacheKey);
+      if (hit) return ContentService.createTextOutput(hit).setMimeType(ContentService.MimeType.JSON);
+    } catch (e) { /* ok */ }
+  }
 
   const hoje     = new Date();
   const dataHoje = fmtData_(hoje);
@@ -4205,7 +4226,7 @@ function iniciarTimer_(p) {
   sheet.getRange(rowIndex, 25).setValue(canonTs);
   sheet.getRange(rowIndex, 3).setValue(horaInicio);
   sheet.getRange(rowIndex, 15).setValue('Ativa');
-  try { CacheService.getScriptCache().remove('carregarInicio_v2'); } catch(e) {}
+  try { invalidateInicioResumoCache_(fmtData_(new Date())); } catch(e) {}
   const rowDataI = sheet.getRange(rowIndex, 1, 1, 28).getValues()[0];
   registrarAuditoriaLocacao_(rowIndex, 'iniciarTimer', antesTimer, locacaoObj_(rowDataI, rowIndex), 'Inicio de contagem', operadorAudit_(p));
   firebaseSyncSessao_(rowIndex, fbDadosSessao_(rowDataI, 'Ativa', rowIndex));
@@ -5101,7 +5122,7 @@ function salvarOperacaoConfigAdmin_(p) {
     cfgSetValue_('precos_json', JSON.stringify(precos));
   }
   if (veiculos === null && precos === null) return err_('Informe veiculos_validos_json e/ou precos_json', 400);
-  try { CacheService.getScriptCache().remove('carregarInicio_v2'); } catch (e) {}
+  try { invalidateInicioResumoCache_(fmtData_(new Date())); } catch (e) {}
   const cfg = operacaoConfig_();
   return resp_({
     mensagem: 'Configuracao operacional salva',
@@ -6415,7 +6436,7 @@ function estenderLocacao_(p) {
     sheet.getRange(rowIndex, 27).setValue(newExtValor);
 
     // Invalidar cache
-    try { CacheService.getScriptCache().remove('carregarInicio_v2'); } catch(e) {}
+    try { invalidateInicioResumoCache_(fmtData_(new Date())); } catch(e) {}
 
     // Firebase: atualizar extensao em outros dispositivos sem bloquear a operacao.
     try {
@@ -7090,7 +7111,7 @@ function limparLocacoesTesteAdmin_(p) {
       if (out.anulada) anuladas.push(out);
       else ignoradas.push(out);
     }
-    try { CacheService.getScriptCache().remove('carregarInicio_v2'); } catch (e) {}
+    try { invalidateInicioResumoCache_(fmtData_(new Date())); } catch (e) {}
     return resp_({
       anuladas: anuladas,
       ignoradas: ignoradas,
@@ -7152,7 +7173,7 @@ function corrigirFinanceiroLocacaoAdmin_(p) {
     if (obs.indexOf(tag) < 0) {
       sheet.getRange(rowIndex, 18).setValue(obs ? obs + ' | ' + tag : tag);
     }
-    try { CacheService.getScriptCache().remove('carregarInicio_v2'); } catch (e) {}
+    try { invalidateInicioResumoCache_(fmtData_(new Date())); } catch (e) {}
     const rowAfter = sheet.getRange(rowIndex, 1, 1, 28).getValues()[0];
     const depois = locacaoObj_(rowAfter, rowIndex);
     registrarAuditoriaLocacao_(rowIndex, 'corrigirFinanceiroLocacaoAdmin', antes, depois, motivo, operadorAudit_(p));
