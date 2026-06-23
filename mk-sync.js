@@ -162,6 +162,12 @@ function mergeSessaoCanonica(serverSession, localSession = {}) {
     }
   }
 
+  // I43: GAS carregarInicio (v1.5.131–135) podia devolver Ativa sem col Y → preservar ts local
+  if (isAtiva && (!startTimestamp || startTimestamp < 1e12)) {
+    const localTs = Number(localSession._localTimerStart || localSession.startTimestamp || 0);
+    if (localTs >= 1e12) startTimestamp = localTs;
+  }
+
   const localStart = Number(localSession._localTimerStart || 0);
   if (localStart >= 1e12 && isAtiva && startTimestamp >= 1e12) {
     if (startTimestamp > localStart && startTimestamp - localStart <= 120000) {

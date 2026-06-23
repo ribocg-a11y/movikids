@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.135
+// MOVI KIDS — Google Apps Script v1.5.136
+// v1.5.136: HOTFIX I43 — carregarInicio lia 19 cols (sem col Y timestamp) → cronômetro zerava no sync
 // v1.5.135: fix cache inicio_v3 + resumoDia invalidado em escritas locação (I42 teste T5)
 // v1.5.134: 15b.7 — gpPersistBancoFromJornada_ no painel admin RH
 // v1.5.133: FASE 17 — alertas inteligentes campo destino (caixa/operadores/sistema/dashboard)
@@ -497,9 +498,9 @@ function ping_() {
   const agora = new Date();
   return resp_({
     status:  'online',
-    versao:  'v1.5.135',
+    versao:  'v1.5.136',
     timestamp: fmtData_(agora) + ' ' + fmtHoraLocal_(agora),
-    sistema: 'MOVI KIDS v1.5.135',
+    sistema: 'MOVI KIDS v1.5.136',
     postWriteActions: WRITE_ACTIONS_CRITICAS_
   });
 }
@@ -604,6 +605,8 @@ function validarSchema_() {
 // ── CONTA DO DIA (telefone + janela 10h–22h) ─────────────────
 /** Col S (19) — id da locação-mestre para faturamento/caixa (várias sessões = 1 conta). */
 const COL_CONTA_ID_ = 19;
+/** Leitura LOCAÇÕES com timestamp (Y=25) e ext (Z=26) — nunca usar só COL_CONTA_ID_ em sync/timer. */
+const COL_LOC_READ_ = 28;
 const JANELA_OP_INI_MIN_ = 10 * 60;
 const JANELA_OP_FIM_MIN_ = 22 * 60;
 
@@ -4021,7 +4024,7 @@ function carregarInicio_(p) {
   let fatHoje = 0, nHoje = 0;
 
   if (lastLoc >= DATA_ROW) {
-    const dados = shLoc.getRange(DATA_ROW, 1, lastLoc - DATA_ROW + 1, COL_CONTA_ID_).getValues();
+    const dados = shLoc.getRange(DATA_ROW, 1, lastLoc - DATA_ROW + 1, COL_LOC_READ_).getValues();
     dados.forEach((r, idx) => {
       if (!r[0]) return;
       const status  = String(r[14]).trim();
