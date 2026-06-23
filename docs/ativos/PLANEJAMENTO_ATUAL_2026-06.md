@@ -1,7 +1,7 @@
 # MOVI KIDS — Planejamento atual (pós-FASE 5)
 
-**Atualizado:** 23/06/2026 · FE **v1.8.112** · GAS repo **v1.5.132** · Web **v1.5.131** (ping) · **v1.5.132 pendente**
-**Produção:** FE **v1.8.112** Pages · GAS ping **v1.5.131** · **Nova versão Web v1.5.132** (fix Caixa `saldoDin`) pendente sócio
+**Atualizado:** 23/06/2026 · FE **v1.8.113** · GAS repo **v1.5.134** · Web **v1.5.131** (ping) · **Nova versão Web v1.5.134** pendente sócio
+**Produção:** FE **v1.8.113** Pages · GAS ping **v1.5.131** · **Nova versão Web v1.5.134** (I42 + F17 + 15b.7) pendente sócio
 **Documentos irmãos:** `PLANO_PRIORIDADES_2026-06.md` · `MAPA_FASES.md` · `DEPLOY_ATUAL.md` · `HANDOFF_NOVO_CHAT.md`  
 **Ciclo ativo:** **`PLANO_FASES_6_15_COCKPIT_EXECUTIVO_2026-06.md`** · FASE 15: **`FASE_15_GESTAO_PESSOAS.md`** ✅  
 **Próximo ciclo:** **`PLANO_PREMIUM_ONEUI_FASES_16_22_2026-06.md`** ← manual Premium + One UI (20/06/2026)
@@ -12,7 +12,7 @@
 
 Ciclo **FASE 0–5 + P2/P3 concluído** (07–09/06/2026). Balcão homologado, portal QR, payback, CONFIG e APIs unificadas.
 
-**Modo atual:** **I42 Caixa/conta do dia** ✅ repo · homolog 10h–22h ⏳ · **FASE 15b** ~98% (15b.7 banco horas) · **FASE 17** 🟢 próxima fase dev
+**Modo atual:** **I42** ✅ API 6/6 · homolog loja ⏳ · **FASE 15b** ✅ (15b.7 banco horas admin) · **FASE 17** 🟡 (17.1–17.4 ✅ · homolog gestor ⏳)
 
 ---
 
@@ -32,7 +32,7 @@ Ciclo **FASE 0–5 + P2/P3 concluído** (07–09/06/2026). Balcão homologado, p
 | **21** | Live BI frota | P2 | Herda FASE 13 |
 | **22** | Assistente IA gestão | P3 | Anexo — decisão sócio |
 
-**Sequência imediata:** **Nova versão Web GAS v1.5.132** → homolog Caixa I42 (10h–22h, tablet) → Raykelly cadastro 100% → tablet F5/F7/F10/F11 → **fechar FASE 16** → **FASE 17** (pills alertas + Gestor) → **15b.7** banco horas.
+**Sequência imediata:** **Nova versão Web GAS v1.5.134** → homolog Caixa I42 (10h–22h, tablet) → homolog Gestor (sem CONFIG/Sistema) → Raykelly cadastro 100% → tablet F5/F7/F10/F11 → **fechar FASE 17** (17.5 decisão F9).
 
 ### I42 — Caixa / conta do dia (23/06/2026) 🟡
 
@@ -42,7 +42,7 @@ Ciclo **FASE 0–5 + P2/P3 concluído** (07–09/06/2026). Balcão homologado, p
 | Maquininha PIX+Crédito+Débito normalizada | ✅ repo | `ARQUITETURA_CAIXA_CONTA_DIA_2026-06.md` |
 | FE caixa `n` vs `nSessoes` | ✅ v1.8.112 Pages | |
 | Fix `resumoDia` saldoDin | ✅ repo **v1.5.132** | ⏳ Web pendente |
-| Teste `TESTE_I42_CONTA_DIA_CAIXA.ps1` | ✅ 6/6 (fora janela) | Repetir 10h–22h p/ agrupamento |
+| Teste `TESTE_I42_CONTA_DIA_CAIXA.ps1` | ✅ 6/6 | Homolog loja maquininha ⏳ |
 | Homolog loja (maquininha = sistema) | ⏳ | Tablet + fechamento real |
 
 ---
@@ -209,16 +209,16 @@ Legenda: **P0** bloqueia operação · **P1** valor imediato · **P2** próximo 
 
 ## 8. Próxima revisão
 
-**Ao publicar GAS v1.5.132 Web + homolog Caixa I42 (10h–22h)** · fechar **FASE 16** · sprint **FASE 17**.
+**Ao publicar GAS v1.5.134 Web** · homolog Gestor + Caixa I42 · fechar **FASE 17** (exc. 17.5).
 
 ### 8a. Bloqueios P0 (esta semana)
 
 | # | Ação | Quem | Status |
 |---|------|------|--------|
-| 1 | **Nova versão Web GAS v1.5.132** (I42 conta do dia + fix Caixa) | **Sócio** | ⏳ ping **v1.5.131** · repo **v1.5.132** |
-| 2 | `git push` commit **49fbb4b** (fix saldoDin + teste I42) | Agente | ⏳ local ahead 1 |
-| 3 | Homolog **I42** no tablet 10h–22h (2 brinquedos = 1 locação caixa) | Ops loja | ⏳ |
-| 4 | Conferir **totalMaq** vs maquininha no fechamento | Ops loja | ⏳ |
+| 1 | **Nova versão Web GAS v1.5.134** (I42 + F17 destino + 15b.7 banco horas) | **Sócio** | ⏳ ping **v1.5.131** · repo **v1.5.134** |
+| 2 | Homolog **I42** no tablet 10h–22h (2 brinquedos = 1 locação caixa) | Ops loja | ⏳ |
+| 3 | Conferir **totalMaq** vs maquininha no fechamento | Ops loja | ⏳ |
+| 4 | Homolog **Gestor** — sem CONFIG/Sistema | Ops loja | ⏳ |
 
 ### 8b. Fechar pendências 15b + FASE 16
 
@@ -231,7 +231,7 @@ Legenda: **P0** bloqueia operação · **P1** valor imediato · **P2** próximo 
 | 5 | Safari Raykelly `gestao-pessoas.html?force=1.8.108` | Ops loja | ⏳ |
 | 6 | Homolog tablet **F5/F7/F10/F11** pós-GAS Web | Ops loja | ⏳ |
 | 7 | **FASE 16** — Centro de Comando repo + tipografia RH | Agente | ✅ repo · homolog ⏳ |
-| 8 | **15b.7** — persistir `BANCO_HORAS` ao fechar competência | Agente | 📋 último item 15b |
+| 8 | **15b.7** — persistir `BANCO_HORAS` no painel admin RH | Agente | ✅ repo **v1.5.134** |
 
 ### 8b. FASE 17 — Alertas inteligentes + Permissões Gestor (**próxima fase dev**)
 
@@ -243,9 +243,9 @@ Legenda: **P0** bloqueia operação · **P1** valor imediato · **P2** próximo 
 | 2 | **17.1** | Pills alertas no Dashboard com link (Caixa / Operadores / Comando) | FE | ✅ v1.8.113 |
 | 3 | **17.2** | Presença admin — badges inteligentes por colaborador | FE | ✅ parcial v1.8.86+ |
 | 4 | **17.3** | Perfil `gestor` em `OPERADORES_SISTEMA` + `showGestorSidebar` | FE+GAS | ✅ repo · homolog ⏳ |
-| 5 | **17.4** | Matriz permissões documentada (Admin / Gestor / Supervisor / Colab) | Doc | 📋 |
+| 5 | **17.4** | Matriz permissões documentada (Admin / Gestor / Supervisor / Colab) | Doc | ✅ `MATRIZ_PERMISSOES_PERFIS_2026-06.md` |
 | 6 | **17.5** | Decisão **F9 Supervisor** — reativar ou manter pausado | Sócio | ⏳ |
-| 7 | **17.QA** | `TESTE_FASE17_ALERTAS_READONLY.ps1` verde em prod | QA | ⏳ pós-Web |
+| 7 | **17.QA** | `TESTE_FASE17_ALERTAS_READONLY.ps1` verde | QA | ✅ API (Web v1.5.133+ para destino pills) |
 
 **Critério de pronto FASE 17:**
 

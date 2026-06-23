@@ -30,9 +30,9 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 | Camada | Versão repo | URL / ID |
 |--------|-------------|----------|
-| **Frontend** | **v1.8.112** (repo) | https://ribocg-a11y.github.io/movikids/?force=1.8.112 · **Colaboradores:** `gestao-pessoas.html?force=1.8.112` |
+| **Frontend** | **v1.8.113** (repo/Pages) | https://ribocg-a11y.github.io/movikids/?force=1.8.113 · **Colaboradores:** `gestao-pessoas.html?force=1.8.113` |
 | **Design System** | **v1.1** | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
-| **Apps Script** | repo **v1.5.131** · Web pendente | ⏳ Nova versão Web **v1.5.131** · conta do dia (I42) + RH |
+| **Apps Script** | repo **v1.5.134** · Web **v1.5.131** (ping) | ⏳ Nova versão Web **v1.5.134** · I42 + F17 + 15b.7 |
 | **Aba FOLHA** | memorial B68 **OK** | [gid=179040058](https://docs.google.com/spreadsheets/d/1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618/edit#gid=179040058) · B68 ~5269,96 |
 
 **Editor Apps Script:** https://script.google.com/home/projects/19SIhkX9Tk7FiJA1JXu1OrUwssHdr3H5zc8q3rOjmBvqgWfXuHlk8xyf8/edit

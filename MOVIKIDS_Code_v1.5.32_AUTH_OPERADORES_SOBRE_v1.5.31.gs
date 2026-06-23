@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.133
+// MOVI KIDS — Google Apps Script v1.5.134
+// v1.5.134: 15b.7 — gpPersistBancoFromJornada_ no painel admin RH
 // v1.5.133: FASE 17 — alertas inteligentes campo destino (caixa/operadores/sistema/dashboard)
 // v1.5.132: fix calcResumoDiaCore_ saldoDin (totalDin ref)
 // v1.5.131: conta do dia — mesmo telefone 10h-22h = 1 locação caixa; maquininha normalizada; col S conta_id
@@ -495,9 +496,9 @@ function ping_() {
   const agora = new Date();
   return resp_({
     status:  'online',
-    versao:  'v1.5.131',
+    versao:  'v1.5.134',
     timestamp: fmtData_(agora) + ' ' + fmtHoraLocal_(agora),
-    sistema: 'MOVI KIDS v1.5.131',
+    sistema: 'MOVI KIDS v1.5.134',
     postWriteActions: WRITE_ACTIONS_CRITICAS_
   });
 }
@@ -7950,6 +7951,13 @@ function gpPersistBancoHoras_(opId, saldoHhmm) {
   }
 }
 
+/** 15b.7 — persiste saldo projetado após análise de jornada (colaborador ou admin). */
+function gpPersistBancoFromJornada_(opId, jornada) {
+  if (jornada && jornada.bancoProjetado) {
+    gpPersistBancoHoras_(opId, jornada.bancoProjetado);
+  }
+}
+
 function gpPersistHoleriteSnapshot_(opId, comp, hol) {
   if (!hol || hol.liquido == null) return;
   try {
@@ -8238,9 +8246,7 @@ function gpBuildPainelColaboradorPayload_(opId, comp, colab, operador) {
   const hol = gpCalcHollerite_(colab, bonus, 0, comp);
   const pontoHoje = gpStatusPontoHoje_(opId);
   const jornada = gpAnaliseJornadaColab_(opId, comp, ctxJ, colab);
-  if (jornada && jornada.bancoProjetado) {
-    gpPersistBancoHoras_(opId, jornada.bancoProjetado);
-  }
+  gpPersistBancoFromJornada_(opId, jornada);
   gpSyncFaltasFromJornada_(opId, jornada);
   if (hol && hol.quinzena === 2 && hol.liquido != null) {
     gpPersistHoleriteSnapshot_(opId, comp, hol);
@@ -8489,6 +8495,10 @@ function painelGestaoPessoasAdmin_(p) {
 
     colaboradores.sort(function (a, b) { return String(a.nome).localeCompare(String(b.nome), 'pt-BR'); });
 
+    colaboradores.forEach(function (c) {
+      gpPersistBancoFromJornada_(c.id, c.jornada);
+    });
+
     const escalaNomes = colaboradores.filter(function (c) { return c.temRh; }).map(function (c) { return { id: c.id, nome: c.nome }; });
     const escalaRows = ctx.escalaRows.filter(function (r) { return gpNormCompetencia_(r[1]) === comp; });
     const escala = {
@@ -8530,7 +8540,7 @@ function painelGestaoPessoasAdmin_(p) {
         total: colaboradores.length, presentes: presentes, comTurno: comTurno,
         alertas: alertasPack.total, alertasIntel: intelRh.length
       },
-      sessaoAtiva: sessao, versao: 'v1.5.128',
+      sessaoAtiva: sessao, versao: 'v1.5.134',
       comunicadosRh: gpComunicadosAllAdmin_(),
       avaliacoesRh: gpAvaliacoesAllAdmin_(),
       competenciasRh: GP_COMPETENCIAS_RH_

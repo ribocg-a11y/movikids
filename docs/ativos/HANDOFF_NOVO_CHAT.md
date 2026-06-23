@@ -1,6 +1,6 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 23/06/2026 · FASE **17** em curso · FE **v1.8.113** · GAS repo **v1.5.133** · Web **v1.5.131** (ping)  
+**Atualizado:** 23/06/2026 · FASE **17** quase fechada · FE **v1.8.113** · GAS repo **v1.5.134** · Web **v1.5.131** (ping)  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **Repo local:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`  
@@ -56,7 +56,7 @@ Mensagem mínima: *"Vamos dar continuidade ao projeto Movi Kids, tem uma pasta n
 | **Gestão Pessoas** | **v1.8.113** | `gestao-pessoas.html?force=1.8.113` |
 | **Service Worker** | **1.8.113** | `sw.js` · GAS fora do intercept |
 | **Holerite** | **mk-holerite.js** | CNPJ **66.664.255/0001-67** · PDF/imprimir |
-| **Apps Script** | repo **v1.5.133** · Web **v1.5.131** (ping) | ⏳ Nova versão Web **v1.5.133** |
+| **Apps Script** | repo **v1.5.134** · Web **v1.5.131** (ping) | ⏳ Nova versão Web **v1.5.134** |
 | **Aba FOLHA** | **OK** (I25) | B68 ~5269,96 |
 | **Design System** | **v1.1** | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` (tokens `--mk-widget-*`) |
 
@@ -103,19 +103,19 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 
 ## Próximo passo (23/06/2026)
 
-**Foco imediato:** **I42 Caixa** em produção + homolog 10h–22h · depois **FASE 17**
+**Foco imediato:** **Nova versão Web GAS v1.5.134** · homolog I42 + Gestor no tablet · fechar FASE 17
 
 | # | Ação | Quem | Status |
 |---|------|------|--------|
-| 1 | **Nova versão Web GAS v1.5.132** | **Sócio** | ⏳ |
-| 2 | Homolog Caixa: mesmo telefone 2 sessões = 1 locação + maquininha | Ops loja | ⏳ após 10h |
-| 3 | `TESTE_I42_CONTA_DIA_CAIXA.ps1` entre 10h–22h | Agente | ⏳ |
+| 1 | **Nova versão Web GAS v1.5.134** (I42 + F17 destino + 15b.7) | **Sócio** | ⏳ ping **v1.5.131** |
+| 2 | Homolog Caixa: mesmo telefone 2 sessões = 1 locação + maquininha | Ops loja | ⏳ 10h–22h |
+| 3 | Homolog **Gestor** — Dashboard/Caixa/Equipe sem CONFIG/Sistema | Ops loja | ⏳ |
 | 4 | Raykelly cadastro 25% → 100% | Colaborador | ⏳ |
-| 5 | Tablet F5/F7/F10/F11 + Safari `?force=1.8.112` | Ops loja | ⏳ |
-| 6 | **FASE 17** — pills alertas Dashboard + Gestor | Agente | 🟢 próximo dev |
-| 7 | **15b.7** banco horas persistido | Agente | 📋 |
+| 5 | Tablet F5/F7/F10/F11 + Safari `?force=1.8.113` | Ops loja | ⏳ |
+| 6 | **17.5** decisão F9 Supervisor | Sócio | ⏳ |
+| 7 | **15b** + **17.1–17.4** repo | Agente | ✅ |
 
-Doc: `PLANEJAMENTO_ATUAL_2026-06.md` §8 · `ARQUITETURA_CAIXA_CONTA_DIA_2026-06.md`
+Doc: `PLANEJAMENTO_ATUAL_2026-06.md` §8 · `MATRIZ_PERMISSOES_PERFIS_2026-06.md` · `ARQUITETURA_CAIXA_CONTA_DIA_2026-06.md`
 
 ---
 
