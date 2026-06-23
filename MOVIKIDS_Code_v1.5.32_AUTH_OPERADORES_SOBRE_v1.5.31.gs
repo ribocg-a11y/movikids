@@ -8692,6 +8692,16 @@ function restaurarPontoRaykellyJun2026Admin_(p) {
   });
 }
 
+/**
+ * Editor GAS — menu Executar (mesmo efeito que scripts/testes/RESTAURAR_PONTO_RAYKELLY_JUN2026.ps1).
+ * Grava FOLHA_PONTO Raykelly id 3 · jun/2026 · limpa faltas sync.
+ */
+function RESTAURAR_PONTO_RAYKELLY_JUN2026() {
+  const r = JSON.parse(restaurarPontoRaykellyJun2026Admin_({ adminPin: '1416' }).getContent());
+  Logger.log(JSON.stringify(r, null, 2));
+  return r;
+}
+
 function registrarPontoColaborador_(p) {
   try {
     const opId = Number(p.operadorId || 0);

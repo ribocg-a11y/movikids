@@ -240,15 +240,17 @@ try {
     } else {
       Add-Check "guard.gas.carregarInicio.colY" "fail" "carregarInicio_ ausente no GAS"
     }
-    # I49 — VA teto R$400: gpVaMensalColab_ nao pode usar va_diario*dias como mensal
-    if ($gasRaw -match 'function gpVaMensalColab_[\s\S]{0,400}vaDiario \* gpVaDiasBase_') {
-      Add-Check "guard.va.teto400" "fail" "gpVaMensalColab_ usa va_diario*dias (I49 regressao 520)"
-    } elseif ($gasRaw -notmatch 'function gpVaMensalTeto_') {
+    # I49 — VA teto R$400: gpVaMensalColab_ deve retornar teto (va_diario*só para log/trava)
+    if ($gasRaw -notmatch 'function gpVaMensalTeto_') {
       Add-Check "guard.va.teto400" "fail" "gpVaMensalTeto_ ausente (I49)"
     } elseif ($gasRaw -notmatch 'TRAVA va_diario planilha infla VA') {
       Add-Check "guard.va.teto400" "fail" "trava VA planilha ausente (I49)"
-    } else {
+    } elseif ($gasRaw -match 'function gpVaMensalColab_[\s\S]{0,600}return\s+teto') {
       Add-Check "guard.va.teto400" "ok" "VA mensal = teto memorial 400"
+    } elseif ($gasRaw -match 'function gpVaMensalColab_[\s\S]{0,400}return[\s\S]{0,80}vaDiario \* gpVaDiasBase_') {
+      Add-Check "guard.va.teto400" "fail" "gpVaMensalColab_ retorna va_diario*dias (I49 regressao 520)"
+    } else {
+      Add-Check "guard.va.teto400" "fail" "gpVaMensalColab_ sem return teto (I49)"
     }
     # I51 — falta automatica em dia de escala sem ponto; abono so ADM
     if ($gasRaw -notmatch "sit = 'Falta'") {

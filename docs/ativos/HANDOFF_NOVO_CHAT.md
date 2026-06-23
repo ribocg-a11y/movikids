@@ -1,6 +1,6 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 23/06/2026 (pós-I48) · FE **v1.8.118** Pages · GAS repo **v1.5.142** · ping prod **v1.5.141** (publicar I48)  
+**Atualizado:** 23/06/2026 (pós-I51) · FE **v1.8.118** Pages · GAS repo **v1.5.145** · ping prod **v1.5.145** ✅  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **Repo local:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`  
@@ -56,7 +56,8 @@ cursor "C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-mo
 | **Frontend** | **v1.8.118** | https://ribocg-a11y.github.io/movikids/?force=1.8.118 | I47 PIN duplo submit |
 | **Gestão Pessoas** | **v1.8.118** | `gestao-pessoas.html?force=1.8.118` | Ficha admin somente leitura |
 | **Service Worker** | **1.8.118** | `sw.js` | GAS fora do intercept |
-| **Apps Script** | **v1.5.142** (header `.gs`) | ping **v1.5.142** ✅ I48 prod | Deploy **@201** |
+| **Apps Script** | **v1.5.145** (header `.gs`) | ping **v1.5.145** ✅ I51 prod | Deploy **@201** |
+| **FOLHA_PONTO Raykelly** | restore I51 | 6 batidas jun/2026 | `RESTAURAR_PONTO_RAYKELLY_JUN2026` |
 | **Aba BANCO_HORAS** | ✅ repair I44 | Milena/Raykelly **0h00** | `repararRhPlanilhaAdmin` 23/06 |
 | **COLABORADORES_RH** | Milena **100%** · Raykelly **25%** | Backup `backups/rh/cadastro-rh-2026-06-23_1657.json` | Raykelly completar em Colaboradores |
 | **Planilha** | 24 abas mapeadas | `MAPA_PLANILHA_ABAS_MOVIKIDS.md` | `diagnosticoPlanilhaCompletoAdmin` |
@@ -99,14 +100,25 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 
 | # | Ação | Quem | Status |
 |---|------|------|--------|
-| 1 | ~~Nova versão Web GAS v1.5.142~~ | **Sócio** | ✅ **I48 prod** — painel ~3s |
-| 2 | Tablet `?force=1.8.118` — login PIN Milena/Raykelly (I47) | Ops loja | ⏳ |
-| 3 | Raykelly cadastro **100%** em `gestao-pessoas.html` (PIN dela) | Colaborador | ⏳ 25% |
-| 4 | Homolog ▶ cronômetro (I43) + Caixa I42 + Gestor | Ops loja | ⏳ |
-| 5 | Ponto RH diário (`FOLHA_PONTO`) | Ops | ⏳ |
-| 6 | **17.5** decisão F9 Supervisor | Sócio | ⏳ |
+| 1 | ~~Nova versão Web GAS v1.5.145 (I48–I51)~~ | **Sócio** | ✅ prod |
+| 2 | ~~Restore ponto Raykelly jun/2026~~ | Agente | ✅ `RESTAURAR_PONTO_RAYKELLY_JUN2026` |
+| 3 | Tablet `?force=1.8.118` — login PIN Milena/Raykelly (I47) | Ops loja | ⏳ |
+| 4 | Raykelly cadastro **100%** em `gestao-pessoas.html` (PIN dela) | Colaborador | ⏳ 25% |
+| 5 | Homolog ▶ cronômetro (I43) + Caixa I42 + Gestor | Ops loja | ⏳ |
+| 6 | Ponto RH diário (`FOLHA_PONTO`) | Ops | ⏳ |
+| 7 | **17.5** decisão F9 Supervisor | Sócio | ⏳ |
 
-Docs: `INCIDENTE_I48_*` · `MAPA_PLANILHA_ABAS_MOVIKIDS.md` · `GOVERNANCA_DADOS_RH_2026-06-23.md`
+Docs: `INCIDENTE_I49_*` · `INCIDENTE_I51_*` · `MAPA_PLANILHA_ABAS_MOVIKIDS.md`
+
+---
+
+## Incidentes — sessão 23/06/2026 (noite)
+
+| ID | Evento | Fix |
+|----|--------|-----|
+| **I49** | VA holerite R$520 (va_diario×26) em vez de R$400 | GAS **v1.5.143** `gpVaMensalTeto_` |
+| **I50** | Tentativa desligar falta auto — **revertido** | I51 restaura regra correta |
+| **I51** | FOLHA_PONTO Raykelly apagado → faltas −R$270 falsas | GAS **v1.5.145** restore + falta auto + abono ADM |
 
 ---
 

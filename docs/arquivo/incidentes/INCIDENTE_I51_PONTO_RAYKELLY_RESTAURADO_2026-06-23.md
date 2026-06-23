@@ -27,8 +27,20 @@ Folgas (sem ponto): 16, 18, 20.
 - `restaurarPontoRaykellyJun2026Admin` — lote
 - `abonarFaltaRhAdmin` — abono ADM
 
-## Executar após Nova versão Web v1.5.145
+## Executar
+
+**Opção A — Editor GAS (recomendado após `prepare-gas-push`):**
+
+1. Menu **Executar** → `RESTAURAR_PONTO_RAYKELLY_JUN2026`
+2. Ver log (Execuções) — deve listar 6 batidas
+
+**Opção B — PowerShell no PC:**
 
 ```powershell
+cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github
 .\scripts\testes\RESTAURAR_PONTO_RAYKELLY_JUN2026.ps1
 ```
+
+**Opção C — URL Web (após Nova versão):**
+
+`?action=restaurarPontoRaykellyJun2026Admin&adminPin=1416`

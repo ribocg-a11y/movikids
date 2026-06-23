@@ -33,7 +33,7 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 |--------|-------------|----------|
 | **Frontend** | **v1.8.118** | https://ribocg-a11y.github.io/movikids/?force=1.8.118 · **Colaboradores:** `gestao-pessoas.html?force=1.8.118` |
 | **Design System** | **v1.1** | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
-| **Apps Script** | repo **v1.5.142** (I48) · Web ping **v1.5.141** | Nova versão Web **v1.5.142** pendente (I48 perf) |
+| **Apps Script** | repo **v1.5.145** (I51) · Web ping **v1.5.145** ✅ | `RESTAURAR_PONTO_RAYKELLY_JUN2026` · falta auto + abono ADM |
 | **Aba BANCO_HORAS** | ✅ repair 23/06 | Milena/Raykelly **0h00** |
 | **Aba FOLHA** | memorial B68 **OK** | [gid=179040058](https://docs.google.com/spreadsheets/d/1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618/edit#gid=179040058) · B68 ~5269,96 |
 
@@ -41,7 +41,7 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 **Teste rápido GAS (ping):**  
 https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec?action=ping  
-→ ping **v1.5.136** · repo **v1.5.137** · operação verificar com `check-operacao-livre.ps1`
+→ ping **v1.5.145** · repo **v1.5.145** · operação verificar com `check-operacao-livre.ps1`
 
 **URL morta (não usar):** `AKfycbzc...` → 404
 
