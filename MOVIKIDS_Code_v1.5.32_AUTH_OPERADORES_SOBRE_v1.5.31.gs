@@ -1,6 +1,7 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.144
-// v1.5.144: I50 — falta holerite só manual; sem ponto ≠ desconto; limpa sync jornada
+// MOVI KIDS — Google Apps Script v1.5.145
+// v1.5.145: I51 — falta auto restaurada; abono ADM; salvarPontoRhAdmin + restore Raykelly
+// v1.5.144: I50 revertido — ponto perdido era a causa, nao a regra de falta
 // v1.5.143: I49 — VA teto R$400 fixo (va_diario planilha nao redefine mensal)
 // v1.5.142: I48 — painelGestaoPessoasAdmin sem escrita FALTAS/HOLERITES (perf leitura admin)
 // v1.5.141: I47 — gpVerifyPinColaborador alinha strip hash/salt com loginOperador
@@ -424,6 +425,9 @@ function dispatchMoviAction_(p, method) {
       case 'salvarCadastroRhAdmin': return salvarCadastroRhAdmin_(p);
       case 'salvarDadosContratuaisRhAdmin': return salvarDadosContratuaisRhAdmin_(p);
       case 'repararRhPlanilhaAdmin': return repararRhPlanilhaAdmin_(p);
+      case 'salvarPontoRhAdmin': return salvarPontoRhAdmin_(p);
+      case 'abonarFaltaRhAdmin': return abonarFaltaRhAdmin_(p);
+      case 'restaurarPontoRaykellyJun2026Admin': return restaurarPontoRaykellyJun2026Admin_(p);
       case 'exportarCadastroRhAdmin': return exportarCadastroRhAdmin_(p);
       case 'buscarTextoPlanilhaAdmin': return buscarTextoPlanilhaAdmin_(p);
       case 'salvarRelatorioDrive':return salvarRelatorioDrive_(p);
@@ -513,9 +517,9 @@ function ping_() {
   const agora = new Date();
   return resp_({
     status:  'online',
-    versao:  'v1.5.144',
+    versao:  'v1.5.145',
     timestamp: fmtData_(agora) + ' ' + fmtHoraLocal_(agora),
-    sistema: 'MOVI KIDS v1.5.144',
+    sistema: 'MOVI KIDS v1.5.145',
     postWriteActions: WRITE_ACTIONS_CRITICAS_
   });
 }
@@ -7895,8 +7899,10 @@ function gpAnaliseJornadaColab_(opId, competencia, ctx, rh) {
       if (dateStr === hojeStr) {
         sit = 'Aguardando ponto';
       } else {
-        // I50 — sem ponto em dia de escala ≠ falta holerite (só RH confirma manualmente)
-        sit = 'Sem ponto';
+        atrasoMin = prevMin;
+        sit = 'Falta';
+        totAtraso += atrasoMin;
+        totPrev += prevMin;
       }
     } else if (ponto && entrada && !saidaOk) {
       sit = 'Aberto';
@@ -8080,14 +8086,13 @@ function gpVtPassesMes_() {
   return Math.round((5 * 24 * 2.34) * 100) / 100;
 }
 
-function gpFaltaEhConfirmadaRow_(r) {
-  const obs = String(r[6] || '').trim();
-  if (obs.indexOf('Sync jornada') >= 0) return false;
-  const tipo = String(r[3] || '').trim().toLowerCase();
-  return tipo === 'falta' || tipo === 'falta confirmada' || tipo.indexOf('falta') >= 0;
+function gpFaltaEhAbonadaRow_(r) {
+  const tipo = String(r[3] || '').toLowerCase();
+  const obs = String(r[6] || '').toLowerCase();
+  return tipo.indexOf('abon') >= 0 || obs.indexOf('abono adm') >= 0;
 }
 
-/** I50 — remove linhas auto-sync I46 (nao sao faltas reais). */
+/** I50 — remove linhas auto-sync obsoletas após ponto restaurado. */
 function gpRepairLimparFaltasSyncJornada_(opId) {
   try {
     const sh = gpSheet_(SH_FALTAS);
@@ -8110,9 +8115,34 @@ function gpRepairLimparFaltasSyncJornada_(opId) {
   }
 }
 
-/** Descontinuado I50 — nao gravar falta inferida na planilha. */
 function gpSyncFaltasFromJornada_(opId, jornada, colab, comp) {
-  return;
+  if (!jornada || !jornada.dias || !jornada.dias.length) return;
+  try {
+    const sh = gpSheet_(SH_FALTAS);
+    if (!sh) return;
+    const rows = gpRows_(SH_FALTAS);
+    let maxId = rows.length ? Math.max.apply(null, rows.map(function (r) { return Number(r[0]) || 0; })) : 0;
+    const diaDesc = gpFaltaDiaDesconto_(colab, comp || gpCompetenciaAtual_());
+    jornada.dias.forEach(function (d) {
+      if (d.sit !== 'Falta' || !d.data) return;
+      const dup = rows.some(function (r) {
+        if (Number(r[1]) !== Number(opId)) return false;
+        if (cellToStr_(r[2]) !== d.data) return false;
+        return !gpFaltaEhAbonadaRow_(r);
+      });
+      if (dup) return;
+      const abonada = rows.some(function (r) {
+        return Number(r[1]) === Number(opId) && cellToStr_(r[2]) === d.data && gpFaltaEhAbonadaRow_(r);
+      });
+      if (abonada) return;
+      maxId++;
+      const agora = fmtData_(new Date()) + ' ' + fmtHoraLocal_(new Date());
+      sh.appendRow([maxId, opId, d.data, 'Falta', d.previsto || '', diaDesc || 0, 'Sync jornada GP', agora]);
+      rows.push([maxId, opId, d.data]);
+    });
+  } catch (e) {
+    Logger.log('gpSyncFaltasFromJornada_: ' + e.message);
+  }
 }
 
 function gpPersistBancoHoras_(opId, saldoHhmm) {
@@ -8232,7 +8262,7 @@ function gpFaltaDiaDesconto_(colab, comp) {
   return Math.round((salarioProp / divisor) * 100) / 100;
 }
 
-/** Soma descontos de falta no mês — somente FALTAS_AUSENCIAS confirmadas (I50). */
+/** Soma descontos de falta — planilha (exceto abonadas) + jornada Falta se vazio. */
 function gpFaltasDescontoMes_(opId, comp, colab, jornada) {
   const compParsed = parseMesAnoPayback_(comp || gpCompetenciaAtual_());
   let total = 0;
@@ -8240,13 +8270,19 @@ function gpFaltasDescontoMes_(opId, comp, colab, jornada) {
     const rows = gpRows_(SH_FALTAS);
     rows.forEach(function (r) {
       if (Number(r[1]) !== Number(opId)) return;
-      if (!gpFaltaEhConfirmadaRow_(r)) return;
+      if (gpFaltaEhAbonadaRow_(r)) return;
       const d = parseDataStr_(cellToStr_(r[2]));
       if (!d || (d.getMonth() + 1) !== compParsed.mes || d.getFullYear() !== compParsed.ano) return;
       const v = Number(r[5]);
       if (!isNaN(v) && v > 0) total += v;
     });
   } catch (e) { /* ignore */ }
+  if (total <= 0 && jornada && jornada.dias) {
+    const diaDesc = gpFaltaDiaDesconto_(colab, compParsed);
+    jornada.dias.forEach(function (d) {
+      if (d.sit === 'Falta' && diaDesc > 0) total += diaDesc;
+    });
+  }
   return Math.round(total * 100) / 100;
 }
 
@@ -8541,6 +8577,121 @@ function listarColaboradoresGestaoPreview_(p) {
   return gpListarColaboradoresGestao_();
 }
 
+function gpCalcHorasPontoStr_(entrada, saida) {
+  const entMin = gpParseHoraMin_(entrada);
+  const saiMin = gpParseHoraMin_(saida);
+  if (entMin == null || saiMin == null) return '—';
+  let trabMin = saiMin - entMin;
+  if (trabMin < 0) trabMin += 24 * 60;
+  return gpFmtMinutosHhMm_(trabMin, true);
+}
+
+/** Admin — grava/atualiza entrada e saída em FOLHA_PONTO (restauração). */
+function gpUpsertPontoRhRow_(opId, dataStr, entrada, saida, situacao) {
+  const sh = gpSheet_(SH_FOLHA_PONTO);
+  const rows = gpRows_(SH_FOLHA_PONTO);
+  const d = parseDataStr_(dataStr);
+  const dias = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+  const diaSem = d ? dias[d.getDay()] : '';
+  let rowNum = 0;
+  let existId = 0;
+  for (let i = 0; i < rows.length; i++) {
+    if (Number(rows[i][1]) === Number(opId) && cellToStr_(rows[i][2]) === dataStr) {
+      rowNum = GP_DATA_ROW + i;
+      existId = Number(rows[i][0]) || 0;
+      break;
+    }
+  }
+  const horas = gpCalcHorasPontoStr_(entrada, saida);
+  const sit = situacao || 'OK';
+  const agora = fmtData_(new Date()) + ' ' + fmtHoraLocal_(new Date());
+  if (rowNum > 0) {
+    sh.getRange(rowNum, 5).setValue(entrada);
+    sh.getRange(rowNum, 6).setValue(saida);
+    sh.getRange(rowNum, 7).setValue(horas);
+    sh.getRange(rowNum, 8).setValue(sit);
+    sh.getRange(rowNum, 9).setValue(agora);
+    return { acao: 'atualizado', id: existId, row: rowNum, horas: horas };
+  }
+  const id = rows.length ? Math.max.apply(null, rows.map(function (r) { return Number(r[0]) || 0; })) + 1 : 1;
+  sh.appendRow([id, opId, dataStr, diaSem, entrada, saida, horas, sit, agora]);
+  const lr = sh.getLastRow();
+  sh.getRange(lr, 3).setNumberFormat('@');
+  return { acao: 'criado', id: id, row: lr, horas: horas };
+}
+
+function salvarPontoRhAdmin_(p) {
+  if (!adminPinOk_(p)) return err_('Acesso negado — PIN admin 1416', 403);
+  const opId = Number(p.operadorId || 0);
+  const dataStr = String(p.data || '').trim();
+  const entrada = String(p.entrada || '').trim();
+  const saida = String(p.saida || '').trim();
+  if (!opId || !dataStr || !entrada || !saida) {
+    return err_('operadorId, data, entrada e saida obrigatorios', 400);
+  }
+  try {
+    const r = gpUpsertPontoRhRow_(opId, dataStr, entrada, saida, p.situacao || 'OK');
+    gpRepairLimparFaltasSyncJornada_(opId);
+    gpInvalidateRhCache_();
+    return resp_(Object.assign({ ok: true, operadorId: opId, data: dataStr, entrada: entrada, saida: saida }, r));
+  } catch (ex) {
+    return err_('salvarPontoRhAdmin: ' + ex.message, 500);
+  }
+}
+
+/** Admin — abona falta de um dia (unico ator: ADM PIN 1416). */
+function abonarFaltaRhAdmin_(p) {
+  if (!adminPinOk_(p)) return err_('Acesso negado — PIN admin 1416', 403);
+  const opId = Number(p.operadorId || 0);
+  const dataStr = String(p.data || '').trim();
+  if (!opId || !dataStr) return err_('operadorId e data obrigatorios', 400);
+  try {
+    const sh = gpSheet_(SH_FALTAS);
+    const rows = gpRows_(SH_FALTAS);
+    const agora = fmtData_(new Date()) + ' ' + fmtHoraLocal_(new Date());
+    for (let i = 0; i < rows.length; i++) {
+      if (Number(rows[i][1]) === Number(opId) && cellToStr_(rows[i][2]) === dataStr) {
+        const r = GP_DATA_ROW + i;
+        sh.getRange(r, 3).setValue('Abonado');
+        sh.getRange(r, 6).setValue(0);
+        sh.getRange(r, 7).setValue('Abono ADM ' + agora);
+        gpInvalidateRhCache_();
+        return resp_({ ok: true, operadorId: opId, data: dataStr, acao: 'abonado_existente' });
+      }
+    }
+    const maxId = rows.length ? Math.max.apply(null, rows.map(function (r) { return Number(r[0]) || 0; })) + 1 : 1;
+    sh.appendRow([maxId, opId, dataStr, 'Abonado', '', 0, 'Abono ADM ' + agora, agora]);
+    gpInvalidateRhCache_();
+    return resp_({ ok: true, operadorId: opId, data: dataStr, acao: 'abono_criado', id: maxId });
+  } catch (ex) {
+    return err_('abonarFaltaRhAdmin: ' + ex.message, 500);
+  }
+}
+
+/** I51 — restaura batidas Raykelly jun/2026 (adm 15/06–23/06, dias de escala). */
+function restaurarPontoRaykellyJun2026Admin_(p) {
+  if (!adminPinOk_(p)) return err_('Acesso negado — PIN admin 1416', 403);
+  const opId = 3;
+  const batidas = [
+    { data: '15/06/2026', entrada: '13:58', saida: '21:05' },
+    { data: '17/06/2026', entrada: '13:57', saida: '21:03' },
+    { data: '19/06/2026', entrada: '14:01', saida: '21:08' },
+    { data: '21/06/2026', entrada: '13:59', saida: '22:00' },
+    { data: '22/06/2026', entrada: '09:58', saida: '20:05' },
+    { data: '23/06/2026', entrada: '13:02', saida: '21:01' }
+  ];
+  const log = [];
+  batidas.forEach(function (b) {
+    log.push(gpUpsertPontoRhRow_(opId, b.data, b.entrada, b.saida, 'OK'));
+  });
+  const faltasRemovidas = gpRepairLimparFaltasSyncJornada_(opId);
+  gpInvalidateRhCache_();
+  return resp_({
+    ok: true, operadorId: opId, batidas: log.length, detalhe: log,
+    faltasSyncRemovidas: faltasRemovidas, versao: 'v1.5.145'
+  });
+}
+
 function registrarPontoColaborador_(p) {
   try {
     const opId = Number(p.operadorId || 0);
@@ -8787,7 +8938,7 @@ function painelGestaoPessoasAdmin_(p) {
         total: colaboradores.length, presentes: presentes, comTurno: comTurno,
         alertas: alertasPack.total, alertasIntel: intelRh.length
       },
-      sessaoAtiva: sessao, versao: 'v1.5.144',
+      sessaoAtiva: sessao, versao: 'v1.5.145',
       comunicadosRh: gpComunicadosAllAdmin_(),
       avaliacoesRh: gpAvaliacoesAllAdmin_(),
       competenciasRh: GP_COMPETENCIAS_RH_
