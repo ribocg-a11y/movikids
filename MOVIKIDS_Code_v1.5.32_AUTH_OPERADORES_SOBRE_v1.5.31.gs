@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.136
+// MOVI KIDS — Google Apps Script v1.5.137
+// v1.5.137: I44 — banco horas: nao persistir em leitura painel; repair admin; equipe cmd
 // v1.5.136: HOTFIX I43 — carregarInicio lia 19 cols (sem col Y timestamp) → cronômetro zerava no sync
 // v1.5.135: fix cache inicio_v3 + resumoDia invalidado em escritas locação (I42 teste T5)
 // v1.5.134: 15b.7 — gpPersistBancoFromJornada_ no painel admin RH
@@ -411,6 +412,7 @@ function dispatchMoviAction_(p, method) {
       case 'kpiMes':              return kpiMes_(p);
       case 'comandoOperacional':  return comandoOperacional_(p);
       case 'repairFolhaAdmin':    return repairFolhaFormulasAdmin_(p);
+      case 'repairBancoHorasAdmin': return repairBancoHorasAdmin_(p);
       case 'salvarRelatorioDrive':return salvarRelatorioDrive_(p);
       case 'listarRelatorios':    return listarRelatorios_();
       case 'verificarSessao':     return verificarSessao_(p);
@@ -2560,7 +2562,7 @@ function buildPainelComandoOperacional_() {
   }
 
   const ctxEquipe = sessao
-    ? (presentes + ' presente(s) · balcão: ' + sessao.nome)
+    ? ((presentes > 0 ? (presentes + ' no ponto RH · ') : 'Ponto RH nao registrado · ') + 'balcao: ' + sessao.nome)
     : (presentes + ' presente(s) de ' + equipeTotal + ' na equipe');
   const ctxFrota = frotaTotal > 0
     ? (frotaEmUso + ' em uso · ' + Math.max(0, frotaTotal - frotaEmUso) + ' livre(s)')
@@ -7766,10 +7768,14 @@ function gpAnaliseJornadaColab_(opId, competencia, ctx, rh) {
     if (folga && ponto) {
       sit = 'Ponto em folga';
     } else if (!ponto && prevMin != null) {
-      atrasoMin = prevMin;
-      sit = 'Falta';
-      totAtraso += atrasoMin;
-      totPrev += prevMin;
+      if (dateStr === hojeStr) {
+        sit = 'Aguardando ponto';
+      } else {
+        atrasoMin = prevMin;
+        sit = 'Falta';
+        totAtraso += atrasoMin;
+        totPrev += prevMin;
+      }
     } else if (ponto && entrada && !saidaOk) {
       sit = 'Aberto';
       if (prevMin != null) totPrev += prevMin;
@@ -7975,7 +7981,30 @@ function gpPersistBancoHoras_(opId, saldoHhmm) {
   }
 }
 
-/** 15b.7 — persiste saldo projetado após análise de jornada (colaborador ou admin). */
+/** I44 — zera saldos corrompidos na aba BANCO_HORAS (admin). */
+function repairBancoHorasAdmin_(p) {
+  if (!adminPinOk_(p)) return err_('Acesso negado — PIN admin 1416', 403);
+  try {
+    const sh = gpSheet_(SH_BANCO_HORAS);
+    if (!sh) return err_('Aba BANCO_HORAS ausente', 503);
+    const rows = gpRows_(SH_BANCO_HORAS);
+    const agora = fmtData_(new Date()) + ' ' + fmtHoraLocal_(new Date());
+    const reset = [];
+    rows.forEach(function (r, i) {
+      const opId = Number(r[0]);
+      if (!opId) return;
+      const row = GP_DATA_ROW + i;
+      sh.getRange(row, 2).setValue('0h00');
+      sh.getRange(row, 3).setValue(agora);
+      reset.push({ operadorId: opId, saldo: '0h00' });
+    });
+    return resp_({ mensagem: 'Banco de horas zerado (I44 repair)', reset: reset, total: reset.length });
+  } catch (ex) {
+    return err_('repairBancoHorasAdmin: ' + ex.message, 500);
+  }
+}
+
+/** 15b.7 — persiste saldo projetado (somente apos saida de ponto ou repair explicito). */
 function gpPersistBancoFromJornada_(opId, jornada) {
   if (jornada && jornada.bancoProjetado) {
     gpPersistBancoHoras_(opId, jornada.bancoProjetado);
@@ -8270,7 +8299,6 @@ function gpBuildPainelColaboradorPayload_(opId, comp, colab, operador) {
   const hol = gpCalcHollerite_(colab, bonus, 0, comp);
   const pontoHoje = gpStatusPontoHoje_(opId);
   const jornada = gpAnaliseJornadaColab_(opId, comp, ctxJ, colab);
-  gpPersistBancoFromJornada_(opId, jornada);
   gpSyncFaltasFromJornada_(opId, jornada);
   if (hol && hol.quinzena === 2 && hol.liquido != null) {
     gpPersistHoleriteSnapshot_(opId, comp, hol);
@@ -8366,6 +8394,13 @@ function registrarPontoColaborador_(p) {
     }
     sh.getRange(rowHoje, 7).setValue(horasStr);
     sh.getRange(rowHoje, 9).setValue(fmtData_(new Date()) + ' ' + agora);
+    try {
+      const colab = gpColabRhByOpId_(opId);
+      const ctxJ = gpLoadContext_();
+      const comp = gpCompetenciaAtual_();
+      const jornada = gpAnaliseJornadaColab_(opId, comp, ctxJ, colab);
+      gpPersistBancoFromJornada_(opId, jornada);
+    } catch (e) { Logger.log('registrarPontoColaborador_ banco: ' + e.message); }
     return resp_({ mensagem: 'Saida registrada ' + agora, status: 'fora' });
   } catch (ex) {
     return err_('Abas Gestao Pessoas ausentes — rode scripts/criar-abas-gestao-pessoas.ps1', 503);
@@ -8518,10 +8553,6 @@ function painelGestaoPessoasAdmin_(p) {
     });
 
     colaboradores.sort(function (a, b) { return String(a.nome).localeCompare(String(b.nome), 'pt-BR'); });
-
-    colaboradores.forEach(function (c) {
-      gpPersistBancoFromJornada_(c.id, c.jornada);
-    });
 
     const escalaNomes = colaboradores.filter(function (c) { return c.temRh; }).map(function (c) { return { id: c.id, nome: c.nome }; });
     const escalaRows = ctx.escalaRows.filter(function (r) { return gpNormCompetencia_(r[1]) === comp; });
