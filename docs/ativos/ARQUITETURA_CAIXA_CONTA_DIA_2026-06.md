@@ -74,3 +74,7 @@ Linhas sem col S: `contaIdLocRow_` usa o próprio `id` → cada linha = 1 conta 
 
 - **FE:** commit + push GitHub Pages.
 - **GAS:** `prepare-gas-push.ps1` (com pedido) + **Nova versão Web** no deploy `AKfycbwakQ...` (sócio).
+
+## Armadilha I43 (cronômetro — não confundir com caixa)
+
+I42 introduziu `COL_CONTA_ID_ = 19` (col S) para **gravar** `conta_id`. **`carregarInicio_` e leituras que usam `r[24]`/`r[25]` (col Y/Z = `startTimestamp`/`endTimestamp`) devem usar `COL_LOC_READ_ = 28`**, não `COL_CONTA_ID_`. Regressão I43: timer revertia após ▶. Ver `INCIDENTE_I43_CARREGAR_INICIO_COL_Y_2026-06-23.md` e `TESTE_I43_CARREGAR_INICIO_READONLY.ps1`.

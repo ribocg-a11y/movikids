@@ -1,0 +1,36 @@
+---
+description: P0 cronômetro — carregarInicio col Y (I43 regressão I20/I42)
+globs: MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs,mk-sync.js,mk-operacao.js,mk-sessao.js,scripts/pre-push-check.ps1
+alwaysApply: true
+---
+
+# Cronômetro P0 — carregarInicio / col Y (I16, I20, I43)
+
+## Antes de editar
+
+Arquivos **P0 cronômetro** (qualquer mudança exige checklist):
+
+- `MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs` → `carregarInicio_`, `listarAtivas_`, `iniciarTimer_`, `salvarLocacao_`
+- `mk-sync.js` → `mergeSessaoCanonica`, `aplicarDadosInicio`
+- `mk-operacao.js` → `iniciarContagem`
+- `mk-sessao.js` → `canonSessao_`, `effectiveStartTs_`
+
+**Ler:** `MAPA_ERROS_FALHAS_BUGS.md` I16, I20, **I43** · `INCIDENTE_I43_CARREGAR_INICIO_COL_Y_2026-06-23.md`
+
+## Regra I43 (nunca repetir)
+
+- Col **Y** = `startTimestamp` (índice `r[24]` 0-based)
+- Col **Z** = `extendedMins` (`r[25]`)
+- Constante **`COL_LOC_READ_` = 28** — usar em `carregarInicio_` e qualquer sync que leia `r[24]`/`r[25]`
+- **`COL_CONTA_ID_` (19)** só para escrita/leitura de `conta_id` — **nunca** como limite de `getRange` se a função usa timestamp
+
+## Checklist obrigatório antes de push
+
+1. `.\scripts\pre-push-check.ps1` (inclui `guard.gas.carregarInicio.colY` + `teste.i43`)
+2. `.\scripts\testes\TESTE_I43_CARREGAR_INICIO_READONLY.ps1`
+3. `.\scripts\testes\TESTE_I20_COMPLETO_PROD.ps1` se mudou timer/sync GAS
+4. Tablet: ▶ → card permanece contando (não volta a Pendente)
+
+## I42 (conta do dia)
+
+Ao adicionar colunas em LOCAÇÕES, **não reduzir** `getRange` de funções de sync. Atualizar `COL_LOC_READ_` se novas cols após Y.

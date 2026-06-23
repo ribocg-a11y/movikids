@@ -1,6 +1,6 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 23/06/2026 · FASE **17** quase fechada · FE **v1.8.113** · GAS **v1.5.134** (repo + Web ping)  
+**Atualizado:** 23/06/2026 · **I43** hotfix cronômetro · FE **v1.8.114** · GAS **v1.5.136**  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **Repo local:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`  
@@ -52,11 +52,11 @@ Mensagem mínima: *"Vamos dar continuidade ao projeto Movi Kids, tem uma pasta n
 
 | Camada | Versão | Verificação |
 |--------|--------|-------------|
-| **Frontend** | **v1.8.113** | https://ribocg-a11y.github.io/movikids/?force=1.8.113 |
-| **Gestão Pessoas** | **v1.8.113** | `gestao-pessoas.html?force=1.8.113` |
+| **Frontend** | **v1.8.114** | https://ribocg-a11y.github.io/movikids/?force=1.8.114 |
+| **Gestão Pessoas** | **v1.8.114** | `gestao-pessoas.html?force=1.8.114` |
 | **Service Worker** | **1.8.113** | `sw.js` · GAS fora do intercept |
 | **Holerite** | **mk-holerite.js** | CNPJ **66.664.255/0001-67** · PDF/imprimir |
-| **Apps Script** | repo **v1.5.134** · Web **v1.5.134** (ping) | ✅ Nova versão Web publicada |
+| **Apps Script** | repo **v1.5.136** · Web **v1.5.136** (ping) | I43 em prod |
 | **Aba FOLHA** | **OK** (I25) | B68 ~5269,96 |
 | **Design System** | **v1.1** | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` (tokens `--mk-widget-*`) |
 
@@ -103,22 +103,26 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 
 ## Próximo passo (23/06/2026)
 
-**Foco imediato:** homolog I42 + Gestor no tablet · aba `AVALIACOES_RH` · fechar FASE 17
+**P0 resolvido:** **I43** cronômetro revertia após ▶ — FE **v1.8.114** · GAS **v1.5.136** · travas `TESTE_I43` no pre-push
 
 | # | Ação | Quem | Status |
 |---|------|------|--------|
-| 1 | **Nova versão Web GAS v1.5.134** | **Sócio** | ✅ ping **v1.5.134** |
-| 2 | Instalar aba **AVALIACOES_RH** (`instalar-abas-gestao-pessoas-gas.ps1`) | Agente | ✅ |
-| 3 | **GAS v1.5.135** — cache inicio/resumoDia em escritas | Agente | ✅ repo · Web pendente |
-| 4 | `TESTE_I42_CONTA_DIA_CAIXA.ps1` | Agente | ✅ 6/6 (12h janela) |
-| 3 | Homolog Caixa: mesmo telefone 2 sessões = 1 locação + maquininha | Ops loja | ⏳ 10h–22h |
-| 4 | Homolog **Gestor** — Dashboard/Caixa/Equipe sem CONFIG/Sistema | Ops loja | ⏳ |
-| 5 | Raykelly cadastro 25% → 100% | Colaborador | ⏳ |
-| 6 | Tablet F5/F7/F10/F11 + Safari `?force=1.8.113` | Ops loja | ⏳ |
-| 7 | **17.5** decisão F9 Supervisor | Sócio | ⏳ |
-| 8 | **15b** + **17.1–17.4** repo | Agente | ✅ |
+| 1 | **Tablet balcão** `?force=1.8.114` + ▶ não reverte | Ops loja | ⏳ **urgente** |
+| 2 | **Nova versão Web GAS v1.5.136** (I43 col Y) | **Sócio** | ✅ ping **v1.5.136** |
+| 3 | Homolog Caixa I42 (2 brinquedos = 1 locação) | Ops loja | ⏳ |
+| 4 | Homolog Gestor sem CONFIG/Sistema | Ops loja | ⏳ |
+| 5 | Raykelly cadastro 100% | Colaborador | ⏳ |
+| 6 | **17.5** decisão F9 Supervisor | Sócio | ⏳ |
 
-Doc: `PLANEJAMENTO_ATUAL_2026-06.md` §8 · `MATRIZ_PERMISSOES_PERFIS_2026-06.md` · `ARQUITETURA_CAIXA_CONTA_DIA_2026-06.md`
+Doc: `INCIDENTE_I43_CARREGAR_INICIO_COL_Y_2026-06-23.md` · `MAPA_ERROS` I43 · `.cursor/rules/cronometro-i43-carregar-inicio.mdc`
+
+---
+
+## Incidentes — sessão 23/06/2026 (I43 cronômetro)
+
+| ID | Evento | Fix |
+|----|--------|-----|
+| **I43** | `carregarInicio` leu 19 cols (I42) — col Y fora → sync reverte ▶ | GAS **v1.5.136** `COL_LOC_READ_`; FE **v1.8.114**; `TESTE_I43` no pre-push |
 
 ---
 

@@ -229,6 +229,7 @@ sequenceDiagram
 | ID | Relação |
 |----|---------|
 | **I16** | Paridade portal × balcão — **depende** de col Y correta; I20 garante **quando** Y é gravada |
+| **I43** | **Regressão 23/06** — I42 reduziu `getRange` em `carregarInicio_` sem ajustar `r[24]`; ver `INCIDENTE_I43_CARREGAR_INICIO_COL_Y_2026-06-23.md` |
 | **I15** | GET no browser — independente, mas testes tablet são comuns |
 | **I17–I19** | Auth/sync — não confundir com I20 |
 
@@ -248,3 +249,4 @@ Ver **`PROTOCOLO_DIAGNOSTICO_E_TESTES.md`** §1–3: maturidade 3→4, anti-padr
 |------|------|
 | 07/06/2026 | Criado após validação do operador (“ARRUMOU”); consolida fases A+B e travas |
 | 07/06/2026 | Protocolo mestre de diagnóstico derivado desta retrospectiva |
+| 23/06/2026 | **Regressão I43** — leitura `carregarInicio` sem col Y; travas `TESTE_I43` + `COL_LOC_READ_` |

@@ -1,4 +1,4 @@
-# MOVI KIDS — Estado atual (22/06/2026)
+# MOVI KIDS — Estado atual (23/06/2026)
 
 Referência única para alinhamento local × produção.
 
@@ -14,6 +14,7 @@ Referência única para alinhamento local × produção.
 **Deploy GAS pacote:** **`DEPLOY_ATUAL.md`** · histórico `../arquivo/deploy/DEPLOY_v1.5.91_FOLHA_REPAIR_USER_ENTERED.md`  
 **Incidente I29 (DNA Gestão Pessoas):** `../arquivo/incidentes/INCIDENTE_I29_GESTAO_PESSOAS_DNA_UI_2026-06-18.md`  
 **Incidente I30 (abas RH getRange):** `../arquivo/incidentes/INCIDENTE_I30_GAS_ABAS_GESTAO_RANGE_2026-06-18.md`  
+**Incidentes sessão 23/06:** **I43** cronômetro `carregarInicio` col Y — `INCIDENTE_I43_CARREGAR_INICIO_COL_Y_2026-06-23.md`  
 **Incidentes sessão 22/06:** **I38** preview banner · **I39** VA admissão · **I40** hub benefícios · auditoria `AUDITORIA_RH_FOLHA_PERSISTENCIA_2026-06-22.md`  
 **Incidentes sessão 20/06:** **I31** Pelúcias CONFIG · **I32** loc duplicada/SMS · **I33** PWA boot · **I34** holerite — ver `MAPA_ERROS_FALHAS_BUGS.md`
 
@@ -30,9 +31,9 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 | Camada | Versão repo | URL / ID |
 |--------|-------------|----------|
-| **Frontend** | **v1.8.113** (repo/Pages) | https://ribocg-a11y.github.io/movikids/?force=1.8.113 · **Colaboradores:** `gestao-pessoas.html?force=1.8.113` |
+| **Frontend** | **v1.8.114** (I43 hotfix) | https://ribocg-a11y.github.io/movikids/?force=1.8.114 · **Colaboradores:** `gestao-pessoas.html?force=1.8.114` |
 | **Design System** | **v1.1** | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
-| **Apps Script** | repo **v1.5.134** · Web **v1.5.134** (ping) | I42 + F17 + 15b.7 em prod |
+| **Apps Script** | repo **v1.5.136** (I43) · Web **v1.5.136** (ping) | I42 + I43 + F17 + 15b.7 |
 | **Aba FOLHA** | memorial B68 **OK** | [gid=179040058](https://docs.google.com/spreadsheets/d/1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618/edit#gid=179040058) · B68 ~5269,96 |
 
 **Editor Apps Script:** https://script.google.com/home/projects/19SIhkX9Tk7FiJA1JXu1OrUwssHdr3H5zc8q3rOjmBvqgWfXuHlk8xyf8/edit

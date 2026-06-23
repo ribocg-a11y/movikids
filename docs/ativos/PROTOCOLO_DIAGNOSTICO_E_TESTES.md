@@ -51,6 +51,14 @@ xychart-beta
 | **Declarar “resolvido” cedo** | Operador ainda via 09:33 com GAS novo + FE velho | Resolvido = **F0 + fluxo afetado + tablet** |
 | **Teste polui produção** | Cards `T1_SO_SALVAR_` na tela do operador | **F0 cleanup** sempre no `finally` |
 
+### 1.4 Regressão I43 (23/06/2026) — lição pós-I20
+
+| Anti-padrão | O que aconteceu | Regra nova |
+|-------------|-----------------|------------|
+| **Guard estático fraco** | `pre-push` checava funções existirem, não `getRange` vs `r[24]` | `guard.gas.carregarInicio.colY` + `COL_LOC_READ_` |
+| **Paridade só em ativos** | `TESTE_PARIDADE_CRONOMETRO` não cria locação de teste | `TESTE_I43` salvar→iniciar→carregarInicio |
+| **Mudança I42 sem matriz** | `COL_CONTA_ID_` aplicado em leitura de sync | Separar **gravar** (col S) de **ler** (28 cols) |
+
 ---
 
 ## 2. Mapa de fluxos do sistema (F0–F14)
@@ -212,6 +220,7 @@ O orquestrador **completo** inclui scripts que **gravam** locações de teste. Q
 | F14 | `TESTE_PARIDADE_HTTP_BROWSER_GAS.ps1` |
 | F11 | `TESTE_PORTAL_READONLY.ps1` |
 | F6/F11 | `TESTE_PARIDADE_CRONOMETRO_PORTAL_BALCAO.ps1` |
+| **I43** | `TESTE_I43_CARREGAR_INICIO_READONLY.ps1` (estático + API salvar→iniciar→carregarInicio) |
 | F13 | `TESTE_RELACIONAMENTO_MOVIKIDS_READONLY.ps1` |
 | CONFIG | `TESTE_OPERACAO_CONFIG_READONLY.ps1` |
 | B7 write | `TESTE_B7_REGRESSAO_WRITE.ps1` (grava + cleanup) |

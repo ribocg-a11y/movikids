@@ -1,7 +1,7 @@
 # MOVI KIDS — Mapa de erros, falhas e bugs
 
-**Atualizado:** 22/06/2026 — **I38–I41** auditoria RH 22/06 · GAS repo **v1.5.129** (ping **v1.5.107**) · FE **v1.8.110**  
-**Uso anterior:** 20/06/2026 — **I31–I34** sessão operação 20/06 · GAS repo **v1.5.111** (ping **v1.5.107**) · FE **v1.8.71**  
+**Atualizado:** 23/06/2026 — **I43** cronômetro revertia pós-I42 · FE **v1.8.114** · GAS **v1.5.136**  
+**Uso anterior:** 22/06/2026 — **I38–I41** auditoria RH 22/06 · GAS repo **v1.5.129** (ping **v1.5.107**) · FE **v1.8.110**  
 **Uso anterior:** 17/06/2026 — **I28** liberar sessão tablet · GAS **v1.5.92** prod. · FE **v1.8.30**  
 **Uso anterior:** 09/06/2026 — **I22 fechado** (hotfix FE v1.8.2)  
 **Uso:** consultar **antes de publicar** e **ao montar checklist de teste**. Cada linha tem trava e script de verificação quando existir.
@@ -19,8 +19,9 @@
 # Gate completo (recomendado antes de todo push)
 .\scripts\pre-push-check.ps1
 
-# Cronômetro portal × balcão (I16)
+# Cronômetro portal × balcão (I16) + regressão I43
 .\scripts\testes\TESTE_PARIDADE_CRONOMETRO_PORTAL_BALCAO.ps1
+.\scripts\testes\TESTE_I43_CARREGAR_INICIO_READONLY.ps1
 
 # HTTP tablet (I15)
 .\scripts\testes\TESTE_PARIDADE_HTTP_BROWSER_GAS.ps1
@@ -50,6 +51,8 @@
 | **I38** | **`p.preview` fantasma** — banner ADM com PIN colab | UX “somente leitura”; ponto parece bloqueado | FE **v1.8.110–111** — banner só `gpAdmPreviewMode_`; `preview: false` no login | `renderColabHub`; `colabEntrar` | preview admin → sair → login PIN → sem faixa |
 | **I39** | **VA/salário mês cheio** com admissão ISO/meio mês | Raykelly VA ~399 vs ~213 | GAS **v1.5.129–130** proporcional + trava 0 dias | `TESTE_VA_ADMISSAO_PROPORCIONAL_READONLY.ps1` | holerite após Web v1.5.130 |
 | **I40** | **Hub benefícios `calcFolhaPagamento`** ≠ GAS quinzenal | Chips VA/VT divergem do holerite | FE **v1.8.111** — hub usa `pg.holerite` | `gpBeneficiosResumo_` | hub vs tela holerite |
+| **I43** | **`carregarInicio` getRange 19 cols (I42) sem col Y** | **▶ inicia → sync reverte para Pendente 10:00** | GAS **v1.5.136** `COL_LOC_READ_=28`; FE **v1.8.114** merge I43 | `guard.gas.carregarInicio.colY`, `guard.sync.i43` | **`TESTE_I43_CARREGAR_INICIO_READONLY`** + tablet ▶ |
+| **I42** | Conta do dia — mesmo telefone 10h–22h | Caixa `n` vs sessões; maquininha | GAS **v1.5.131+** col S `conta_id` | `TESTE_I42_CONTA_DIA_CAIXA` | não reduzir `COL_LOC_READ_` (ver I43) |
 | **I41** | **`ping_` versão defasada** (v1.5.107 vs repo) | Confusão deploy / verify | GAS **v1.5.130** `ping_()` alinhado | `ping_` header alinhado | ping = v1.5.130 |
 | I2 | GAS offline + timer local | Extra fantasma | ADM `somentePlano`; offline v1.7.6 | `FIX_OFFLINE_ENCERRAR` | tablet encerrar |
 | I3 | Cache `?force=` / **`index.html ?v=` desatualizado** | JS antigo no tablet/admin | `mk-version` + `sw` + **index** alinhados | `pre-push-check` versões | `?force=VERSAO` · ver **11/06** |
@@ -104,6 +107,7 @@
 | `../arquivo/incidentes/INCIDENTE_I32_LOCACAO_DUPLICADA_SMS_2026-06-20.md` | **I32** — loc duplicada + SMS legado |
 | `../arquivo/incidentes/INCIDENTE_I33_PWA_CACHE_BOOT_LENTO_2026-06-20.md` | **I33** — PWA stale + boot lento |
 | `../arquivo/incidentes/INCIDENTE_I34_HOLERITE_APRESENTACAO_2026-06-20.md` | **I34** — holerite UX + CNPJ |
+| **`INCIDENTE_I43_CARREGAR_INICIO_COL_Y_2026-06-23.md`** | **I43** — regressão I42; col Y fora do getRange |
 | `../arquivo/incidentes/INCIDENTE_I38_PREVIEW_BANNER_PIN_COLAB_2026-06-22.md` | **I38** — banner preview com PIN colab |
 | `../arquivo/incidentes/INCIDENTE_I39_VA_ADMISSAO_PROPORCIONAL_2026-06-22.md` | **I39** — VA proporcional admissão |
 | **`AUDITORIA_RH_FOLHA_PERSISTENCIA_2026-06-22.md`** | Matriz abas RH · I40 · lacunas RH-G1–G15 |
@@ -127,6 +131,8 @@
 | `guard.fe.iniciar.otimista` | `mk-operacao.js` — `clickTs`, `_localTimerStart` | I20 |
 | `guard.sessao.effectiveStart` | `mk-sessao.js` — `effectiveStartTs_` | I20 |
 | `guard.sync.localTimer` | `mk-sync.js` — merge preserva `_localTimerStart` | I20 |
+| `guard.sync.i43` | `mk-sync.js` — Ativa sem `startTimestamp` preserva ts local | I43 |
+| `guard.gas.carregarInicio.colY` | `carregarInicio_` — `COL_LOC_READ_` se usa `r[24]` | I43 |
 | `guard.nova.sms.sem.autoStart` | `mk-nova.js` — cadastro não auto-inicia | I20 |
 | `guard.iniciar.direto` | `iniciarContagemDireto_` sem modal BV | I20 |
 | `guard.idle.locacao` | `mkHasLocacaoAbertaNoTablet_` em mk-auth | I18 |
@@ -150,6 +156,7 @@
 | `teste.paridade` | `scripts/testes/TESTE_PARIDADE_HTTP_BROWSER_GAS.ps1` | I15 |
 | `teste.portal` | `scripts/testes/TESTE_PORTAL_READONLY.ps1` | portal |
 | `teste.cronometro` | `scripts/testes/TESTE_PARIDADE_CRONOMETRO_PORTAL_BALCAO.ps1` | I16 |
+| `teste.i43` | `scripts/testes/TESTE_I43_CARREGAR_INICIO_READONLY.ps1` | I43 |
 | `teste.sessao.liberar` | `scripts/testes/TESTE_SESSAO_LIBERAR_READONLY.ps1` | I28 |
 
 ## Travas pos-push (Pacote J — após `git push` FE)
@@ -169,6 +176,8 @@
 - [ ] Nova locação **Pendente** mostra 10:00; timer **parado** até ▶ (I20)
 - [ ] ▶ responde na hora (“⏳ Iniciando…”); ativo começa **10:00** ±1 s — não 09:33 (I20)
 - [ ] `TESTE_I20_COMPLETO_PROD.ps1` verde após mudança em timer (I20)
+- [ ] `TESTE_I43_CARREGAR_INICIO_READONLY.ps1` verde após mudança em `carregarInicio_` (I43)
+- [ ] ▶ não reverte para Pendente após sync (I43) — tablet
 - [ ] ADM liberar sessão atualiza banner (I17)
 - [ ] Idle não desloga com locação Ativa (I18)
 - [ ] Chip **Turno: Nome** visível no header (I19) — PWA ícone
@@ -219,15 +228,17 @@
 33. **Nunca** confiar em `p.preview` no objeto colaborador — modo preview só `gpAdmPreviewMode_` + URL `admPreview=1` (I38).
 34. **Sempre** proporcional admissão em holerite — admissão inválida = 0 dias, nunca mês cheio (I39).
 35. **Hub benefícios** deve usar `pg.holerite` da API, não `calcFolhaPagamento` mensal (I40).
+36. **Nunca** usar `getRange(..., COL_CONTA_ID_)` em `carregarInicio_`/`listarAtivas_` se a função lê `r[24]`/`r[25]` — usar **`COL_LOC_READ_` = 28** (I43 regressão I42).
+37. **Sempre** rodar `TESTE_I43_CARREGAR_INICIO_READONLY.ps1` após mudança em sync/timer GAS (I43).
 
 ---
 
-## Versões de referência (22/06/2026)
+## Versões de referência (23/06/2026)
 
 | Camada | Repo / produção | Mínimo operação |
 |--------|-----------------|-----------------|
-| Frontend | **v1.8.111** (repo) | `?force=1.8.111` · Gestão Pessoas |
-| GAS | **v1.5.130** (repo) · Web pendente | Nova versão Web v1.5.130 |
+| Frontend | **v1.8.114** (I43 hotfix) | `?force=1.8.114` · cronômetro |
+| GAS | **v1.5.136** (I43) · Web **v1.5.136** | Nova versão após mudança em `carregarInicio` |
 | Design System | **`docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md`** | Obrigatório antes de UI |
 | Aba FOLHA | B68 ~5269,96 · `fonte=FOLHA` | `repairFolhaAdmin` após deploy que toque FOLHA |
 

@@ -200,6 +200,11 @@ try {
       } else {
         Add-Check "guard.sync.localTimer" "ok" "merge preserva instante do clique"
       }
+      if ($syncRaw -notmatch 'isAtiva && \(!startTimestamp') {
+        Add-Check "guard.sync.i43" "fail" "mergeSessaoCanonica sem guard Ativa sem ts (I43)"
+      } else {
+        Add-Check "guard.sync.i43" "ok" "merge preserva ts se Ativa sem col Y"
+      }
     }
     if (Test-Path $sessaoPath) {
       $sessaoRaw2 = Get-Content -Path $sessaoPath -Raw -Encoding UTF8
@@ -220,6 +225,20 @@ try {
       Add-Check "guard.gas.timestamp.noFallback" "fail" "timestampCanonico_ ainda infere por data/hora (I20)"
     } else {
       Add-Check "guard.gas.timestamp.noFallback" "ok" "timestampCanonico so col Y"
+    }
+    # I43 — carregarInicio: r[24] exige COL_LOC_READ_ (nao so COL_CONTA_ID_)
+    if ($gasRaw -match 'function carregarInicio_') {
+      if ($gasRaw -notmatch 'const COL_LOC_READ_\s*=\s*28') {
+        Add-Check "guard.gas.carregarInicio.colY" "fail" "COL_LOC_READ_=28 ausente (I43)"
+      } elseif ($gasRaw -match 'function carregarInicio_[\s\S]{0,15000}getRange\([^\)]*COL_CONTA_ID_\)[\s\S]{0,3000}r\[24\]') {
+        Add-Check "guard.gas.carregarInicio.colY" "fail" "carregarInicio getRange COL_CONTA_ID_ + r[24] (I43)"
+      } elseif ($gasRaw -match 'function carregarInicio_[\s\S]{0,15000}r\[24\]' -and $gasRaw -notmatch 'function carregarInicio_[\s\S]{0,15000}COL_LOC_READ_') {
+        Add-Check "guard.gas.carregarInicio.colY" "fail" "carregarInicio usa r[24] sem COL_LOC_READ_ (I43)"
+      } else {
+        Add-Check "guard.gas.carregarInicio.colY" "ok" "COL_LOC_READ_ em carregarInicio"
+      }
+    } else {
+      Add-Check "guard.gas.carregarInicio.colY" "fail" "carregarInicio_ ausente no GAS"
     }
     if ($gasRaw -notmatch 'function importarResponsaveisAdmin_') {
       Add-Check "guard.k1.import" "fail" "importarResponsaveisAdmin_ ausente (Pacote K.1)"
@@ -391,10 +410,17 @@ try {
     $cronOut = & $cron 2>&1 | Out-String
     if ($LASTEXITCODE -ne 0) { Add-Check "teste.cronometro" "fail" "exit $LASTEXITCODE" }
     else { Add-Check "teste.cronometro" "ok" "TESTE_PARIDADE_CRONOMETRO_PORTAL_BALCAO" }
+
+    $i43 = Join-Path $testDir "TESTE_I43_CARREGAR_INICIO_READONLY.ps1"
+    if (-not (Test-Path $i43)) { throw "TESTE_I43_CARREGAR_INICIO_READONLY.ps1 nao encontrado" }
+    $i43Out = & $i43 2>&1 | Out-String
+    if ($LASTEXITCODE -ne 0) { Add-Check "teste.i43" "fail" "exit $LASTEXITCODE" }
+    else { Add-Check "teste.i43" "ok" "TESTE_I43_CARREGAR_INICIO_READONLY" }
   } else {
     Add-Check "teste.paridade" "skip" "SkipNetworkTests"
     Add-Check "teste.portal" "skip" "SkipNetworkTests"
     Add-Check "teste.cronometro" "skip" "SkipNetworkTests"
+    Add-Check "teste.i43" "skip" "SkipNetworkTests"
   }
 } catch {
   $result.status = "fail"
