@@ -250,6 +250,16 @@ try {
     } else {
       Add-Check "guard.va.teto400" "ok" "VA mensal = teto memorial 400"
     }
+    # I50 — holerite nao desconta falta inferida de jornada
+    if ($gasRaw -match 'function gpFaltasDescontoMes_[\s\S]{0,1200}d\.sit === .Falta.') {
+      Add-Check "guard.faltas.manual" "fail" "gpFaltasDescontoMes_ usa sit Falta jornada (I50)"
+    } elseif ($gasRaw -notmatch 'gpFaltaEhConfirmadaRow_') {
+      Add-Check "guard.faltas.manual" "fail" "gpFaltaEhConfirmadaRow_ ausente (I50)"
+    } elseif ($gasRaw -notmatch "sit = 'Sem ponto'") {
+      Add-Check "guard.faltas.manual" "fail" "jornada ainda marca Falta auto (I50)"
+    } else {
+      Add-Check "guard.faltas.manual" "ok" "falta holerite so manual"
+    }
     if ($gasRaw -notmatch 'function importarResponsaveisAdmin_') {
       Add-Check "guard.k1.import" "fail" "importarResponsaveisAdmin_ ausente (Pacote K.1)"
     } else {

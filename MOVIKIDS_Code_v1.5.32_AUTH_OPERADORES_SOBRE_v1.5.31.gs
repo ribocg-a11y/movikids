@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.143
+// MOVI KIDS — Google Apps Script v1.5.144
+// v1.5.144: I50 — falta holerite só manual; sem ponto ≠ desconto; limpa sync jornada
 // v1.5.143: I49 — VA teto R$400 fixo (va_diario planilha nao redefine mensal)
 // v1.5.142: I48 — painelGestaoPessoasAdmin sem escrita FALTAS/HOLERITES (perf leitura admin)
 // v1.5.141: I47 — gpVerifyPinColaborador alinha strip hash/salt com loginOperador
@@ -512,9 +513,9 @@ function ping_() {
   const agora = new Date();
   return resp_({
     status:  'online',
-    versao:  'v1.5.143',
+    versao:  'v1.5.144',
     timestamp: fmtData_(agora) + ' ' + fmtHoraLocal_(agora),
-    sistema: 'MOVI KIDS v1.5.143',
+    sistema: 'MOVI KIDS v1.5.144',
     postWriteActions: WRITE_ACTIONS_CRITICAS_
   });
 }
@@ -7894,10 +7895,8 @@ function gpAnaliseJornadaColab_(opId, competencia, ctx, rh) {
       if (dateStr === hojeStr) {
         sit = 'Aguardando ponto';
       } else {
-        atrasoMin = prevMin;
-        sit = 'Falta';
-        totAtraso += atrasoMin;
-        totPrev += prevMin;
+        // I50 — sem ponto em dia de escala ≠ falta holerite (só RH confirma manualmente)
+        sit = 'Sem ponto';
       }
     } else if (ponto && entrada && !saidaOk) {
       sit = 'Aberto';
@@ -8081,28 +8080,39 @@ function gpVtPassesMes_() {
   return Math.round((5 * 24 * 2.34) * 100) / 100;
 }
 
-function gpSyncFaltasFromJornada_(opId, jornada, colab, comp) {
-  if (!jornada || !jornada.dias || !jornada.dias.length) return;
+function gpFaltaEhConfirmadaRow_(r) {
+  const obs = String(r[6] || '').trim();
+  if (obs.indexOf('Sync jornada') >= 0) return false;
+  const tipo = String(r[3] || '').trim().toLowerCase();
+  return tipo === 'falta' || tipo === 'falta confirmada' || tipo.indexOf('falta') >= 0;
+}
+
+/** I50 — remove linhas auto-sync I46 (nao sao faltas reais). */
+function gpRepairLimparFaltasSyncJornada_(opId) {
   try {
     const sh = gpSheet_(SH_FALTAS);
-    if (!sh) return;
     const rows = gpRows_(SH_FALTAS);
-    let maxId = rows.length ? Math.max.apply(null, rows.map(function (r) { return Number(r[0]) || 0; })) : 0;
-    const diaDesc = gpFaltaDiaDesconto_(colab, comp || gpCompetenciaAtual_());
-    jornada.dias.forEach(function (d) {
-      if (d.sit !== 'Falta' || !d.data) return;
-      const dup = rows.some(function (r) {
-        return Number(r[1]) === Number(opId) && cellToStr_(r[2]) === d.data;
-      });
-      if (dup) return;
-      maxId++;
-      const agora = fmtData_(new Date()) + ' ' + fmtHoraLocal_(new Date());
-      sh.appendRow([maxId, opId, d.data, 'Falta', d.previsto || '', diaDesc || 0, 'Sync jornada GP', agora]);
-      rows.push([maxId, opId, d.data]);
-    });
+    if (!rows.length) return 0;
+    let removidas = 0;
+    for (let i = rows.length - 1; i >= 0; i--) {
+      const r = rows[i];
+      if (opId != null && Number(r[1]) !== Number(opId)) continue;
+      const obs = String(r[6] || '');
+      if (obs.indexOf('Sync jornada') < 0) continue;
+      sh.deleteRow(GP_DATA_ROW + i);
+      removidas++;
+    }
+    if (removidas > 0) gpInvalidateRhCache_();
+    return removidas;
   } catch (e) {
-    Logger.log('gpSyncFaltasFromJornada_: ' + e.message);
+    Logger.log('gpRepairLimparFaltasSyncJornada_: ' + e.message);
+    return 0;
   }
+}
+
+/** Descontinuado I50 — nao gravar falta inferida na planilha. */
+function gpSyncFaltasFromJornada_(opId, jornada, colab, comp) {
+  return;
 }
 
 function gpPersistBancoHoras_(opId, saldoHhmm) {
@@ -8222,7 +8232,7 @@ function gpFaltaDiaDesconto_(colab, comp) {
   return Math.round((salarioProp / divisor) * 100) / 100;
 }
 
-/** Soma descontos de falta no mês (aba FALTAS_AUSENCIAS ou jornada). */
+/** Soma descontos de falta no mês — somente FALTAS_AUSENCIAS confirmadas (I50). */
 function gpFaltasDescontoMes_(opId, comp, colab, jornada) {
   const compParsed = parseMesAnoPayback_(comp || gpCompetenciaAtual_());
   let total = 0;
@@ -8230,26 +8240,13 @@ function gpFaltasDescontoMes_(opId, comp, colab, jornada) {
     const rows = gpRows_(SH_FALTAS);
     rows.forEach(function (r) {
       if (Number(r[1]) !== Number(opId)) return;
+      if (!gpFaltaEhConfirmadaRow_(r)) return;
       const d = parseDataStr_(cellToStr_(r[2]));
       if (!d || (d.getMonth() + 1) !== compParsed.mes || d.getFullYear() !== compParsed.ano) return;
       const v = Number(r[5]);
       if (!isNaN(v) && v > 0) total += v;
     });
   } catch (e) { /* ignore */ }
-  if (total <= 0 && jornada && jornada.dias) {
-    const diaDesc = gpFaltaDiaDesconto_(colab, compParsed);
-    jornada.dias.forEach(function (d) {
-      if (d.sit === 'Falta' && diaDesc > 0) total += diaDesc;
-    });
-  }
-  const salario = Number(colab && colab.salarioBase) || 1621;
-  const diasMes = gpDiasNoMes_(compParsed.mes, compParsed.ano);
-  const diasTrab = colab ? gpDiasTrabalhadosNoMes_(colab.admissao, compParsed.mes, compParsed.ano) : diasMes;
-  const salarioProp = diasMes > 0 ? Math.round(salario * (diasTrab / diasMes) * 100) / 100 : 0;
-  if (total > salarioProp && salarioProp > 0) {
-    Logger.log('gpFaltasDescontoMes_: TRAVA desconto faltas (' + total + ') > salario prop (' + salarioProp + ')');
-    total = salarioProp;
-  }
   return Math.round(total * 100) / 100;
 }
 
@@ -8790,7 +8787,7 @@ function painelGestaoPessoasAdmin_(p) {
         total: colaboradores.length, presentes: presentes, comTurno: comTurno,
         alertas: alertasPack.total, alertasIntel: intelRh.length
       },
-      sessaoAtiva: sessao, versao: 'v1.5.143',
+      sessaoAtiva: sessao, versao: 'v1.5.144',
       comunicadosRh: gpComunicadosAllAdmin_(),
       avaliacoesRh: gpAvaliacoesAllAdmin_(),
       competenciasRh: GP_COMPETENCIAS_RH_
@@ -9118,6 +9115,7 @@ function repararRhPlanilhaAdmin_(p) {
   try {
     gpRepairAllAdmissoesRh_();
     const vaReparados = gpRepairVaDiarioRhRows_();
+    const faltasSyncRemovidas = gpRepairLimparFaltasSyncJornada_(null);
     const shFp = gpSheet_(SH_FOLHA_PONTO);
     const fpLast = shFp.getLastRow();
     if (fpLast >= GP_DATA_ROW) {
@@ -9134,8 +9132,9 @@ function repararRhPlanilhaAdmin_(p) {
     }
     const exportRh = JSON.parse(exportarCadastroRhAdmin_(p).getContent());
     return resp_({
-      mensagem: 'Planilha RH reparada (datas, pct, formatos, va_diario)',
+      mensagem: 'Planilha RH reparada (datas, pct, va_diario, faltas sync)',
       vaDiarioReparados: vaReparados,
+      faltasSyncRemovidas: faltasSyncRemovidas,
       colaboradores: exportRh.colaboradores,
       bancoRepair: bancoRepair,
       versao: 'v1.5.142'
