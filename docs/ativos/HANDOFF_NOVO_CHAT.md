@@ -1,10 +1,12 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 23/06/2026 · **I43** hotfix cronômetro · FE **v1.8.114** · GAS **v1.5.136**  
+**Atualizado:** 23/06/2026 (fim de sessão) · FE **v1.8.115** · GAS repo **v1.5.137** · ping Web **v1.5.136**  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **Repo local:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`  
 **GitHub:** `ribocg-a11y/movikids` · branch `main`
+
+**Mensagem mínima no novo chat:** *"Vamos dar continuidade ao projeto Movi Kids, tem uma pasta no C da minha máquina."*
 
 ---
 
@@ -21,6 +23,7 @@
 2. O **tablet fica na operação** — homologação real exige **aparelho na loja**.
 3. **Sessão dual (I21):** PC com PIN admin 1416 = **TABLET: Administrador**; tablet operadores = **BALCÃO: Nome**.
 4. **UI nova:** consultar **`docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md`** §0 **antes** de codar (I29).
+5. **Push FE:** após `pre-push-check` OK → commit → push → **`verify-publish-complete.ps1`** (sem pedir permissão).
 
 Detalhe: `ACESSOS_E_AUTORIZACOES.md` §7 · incidentes I21 · I29.
 
@@ -28,13 +31,9 @@ Detalhe: `ACESSOS_E_AUTORIZACOES.md` §7 · incidentes I21 · I29.
 
 ## Como abrir o Cursor nesta pasta (novo chat)
 
-**Pasta:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`
-
 ```powershell
 cursor "C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github"
 ```
-
-Mensagem mínima: *"Vamos dar continuidade ao projeto Movi Kids, tem uma pasta no C da minha máquina."*
 
 ---
 
@@ -46,21 +45,26 @@ Mensagem mínima: *"Vamos dar continuidade ao projeto Movi Kids, tem uma pasta n
 - Testes, ping GAS, planilha OAuth, docs, incidentes no mapa I*
 - Toda resposta: `Mudança no AppScript: sim|não` + link `.gs` canônico (Regra 16)
 
+**Só com pedido explícito:** `clasp push` / `prepare-gas-push.ps1` · mudar auth/PIN · Nova versão Web GAS.
+
 ---
 
-## Produção (21/06/2026)
+## Produção (23/06/2026)
 
-| Camada | Versão | Verificação |
-|--------|--------|-------------|
-| **Frontend** | **v1.8.114** | https://ribocg-a11y.github.io/movikids/?force=1.8.114 |
-| **Gestão Pessoas** | **v1.8.114** | `gestao-pessoas.html?force=1.8.114` |
-| **Service Worker** | **1.8.113** | `sw.js` · GAS fora do intercept |
-| **Holerite** | **mk-holerite.js** | CNPJ **66.664.255/0001-67** · PDF/imprimir |
-| **Apps Script** | repo **v1.5.136** · Web **v1.5.136** (ping) | I43 em prod |
-| **Aba FOLHA** | **OK** (I25) | B68 ~5269,96 |
-| **Design System** | **v1.1** | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` (tokens `--mk-widget-*`) |
+| Camada | Repo | Produção (ping / Pages) | Notas |
+|--------|------|-------------------------|-------|
+| **Frontend** | **v1.8.115** | https://ribocg-a11y.github.io/movikids/?force=1.8.115 | I44 label "Ponto RH hoje" |
+| **Gestão Pessoas** | **v1.8.115** | `gestao-pessoas.html?force=1.8.115` | |
+| **Service Worker** | **1.8.115** | `sw.js` | GAS fora do intercept |
+| **Apps Script** | **v1.5.137** (header `.gs`) | ping **v1.5.136** | **Nova versão Web v1.5.137 pendente** (I44) |
+| **Aba FOLHA** | **OK** (I25) | B68 ~5269,96 | |
+| **Aba BANCO_HORAS** | ⚠️ corrompida I44 | Milena/Raykelly saldos absurdos | zerar manual ou `repairBancoHorasAdmin` após Web v1.5.137 |
+| **Design System** | **v1.1** | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` | |
 
 **Deploy ID GAS:** `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y`
+
+**GAS canônico (PC):**  
+`C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github\MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs`
 
 **Atalhos teste:**
 
@@ -68,6 +72,7 @@ Mensagem mínima: *"Vamos dar continuidade ao projeto Movi Kids, tem uma pasta n
 cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github
 .\verify-gas-deploy.ps1
 .\scripts\pre-push-check.ps1
+.\scripts\testes\_diag-dashboard-now.ps1
 ```
 
 ---
@@ -78,51 +83,40 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 |---|-----------|----------|
 | 1 | **Este arquivo** | Contexto, produção, próximo passo |
 | 2 | **`DESIGN_SYSTEM_MOVIKIDS.md`** | Cartilha UI — **antes de qualquer tela** |
-| 3 | `PLANO_PRIORIDADES_2026-06.md` | Fases 0–15 |
+| 3 | `PLANO_PRIORIDADES_2026-06.md` | Fases 0–17 |
 | 4 | `ESTADO_ATUAL.md` | Versões, entregas |
-| 5 | `MAPA_ERROS_FALHAS_BUGS.md` | I29–I34 + travas |
+| 5 | `MAPA_ERROS_FALHAS_BUGS.md` | I29–I44 + travas |
 | 6 | `REGRAS_DE_PUBLICACAO_SEGURA.md` | Push/deploy |
 | 7 | `MAPA_FASES.md` · `DEPLOY_ATUAL.md` · `ESTRUTURA_REPO.md` | Fases · deploy · layout repo |
 | 8 | `../INDICE.md` | Mapa docs |
 
----
-
-## Documentação — alinhamento (20/06/2026) ✅
-
-| Entrega | Doc |
-|---------|-----|
-| Versão única deploy | `DEPLOY_ATUAL.md` |
-| Tradução fases 15/16 | `MAPA_FASES.md` |
-| Layout GitHub / raiz | `ESTRUTURA_REPO.md` |
-| Deploy histórico | `docs/arquivo/deploy/` (26 movidos) |
-| Protocolo F15–F17 | `PROTOCOLO_DIAGNOSTICO_E_TESTES.md` |
-| Teste RH readonly | `TESTE_GESTAO_PESSOAS_READONLY.ps1` |
-| Homolog v1.6 obsoleto | `docs/arquivo/HOMOLOGACAO_*_OBSOLETO.md` |
-
 **Fonte de verdade versão:** `mk-version.js` → ping GAS → `DEPLOY_ATUAL.md` → este handoff.
 
-## Próximo passo (23/06/2026)
+---
 
-**P0 resolvido:** **I43** cronômetro revertia após ▶ — FE **v1.8.114** · GAS **v1.5.136** · travas `TESTE_I43` no pre-push
+## Próximo passo (23/06/2026 — novo chat)
 
 | # | Ação | Quem | Status |
 |---|------|------|--------|
-| 1 | **Tablet balcão** `?force=1.8.114` + ▶ não reverte | Ops loja | ⏳ **urgente** |
-| 2 | **Nova versão Web GAS v1.5.136** (I43 col Y) | **Sócio** | ✅ ping **v1.5.136** |
-| 3 | Homolog Caixa I42 (2 brinquedos = 1 locação) | Ops loja | ⏳ |
-| 4 | Homolog Gestor sem CONFIG/Sistema | Ops loja | ⏳ |
-| 5 | Raykelly cadastro 100% | Colaborador | ⏳ |
-| 6 | **17.5** decisão F9 Supervisor | Sócio | ⏳ |
+| 1 | **Nova versão Web GAS v1.5.137** (I44 banco horas + repair) | **Sócio** | ⏳ **P0** |
+| 2 | **`repairBancoHorasAdmin`** ou zerar aba `BANCO_HORAS` manual | Sócio/Agente | ⏳ após Web v1.5.137 |
+| 3 | Tablet `?force=1.8.115` + homolog ▶ cronômetro (I43) | Ops loja | ⏳ |
+| 4 | Ponto RH em Colaboradores (FOLHA_PONTO) — alimenta dashboard | Ops | ⏳ |
+| 5 | Homolog Caixa **I42** (2 brinquedos = 1 locação 10h–22h) | Ops loja | ⏳ |
+| 6 | Homolog **Gestor** — sem CONFIG/Sistema | Ops loja | ⏳ |
+| 7 | Raykelly cadastro 100% | Colaborador | ⏳ |
+| 8 | **17.5** decisão F9 Supervisor | Sócio | ⏳ |
 
-Doc: `INCIDENTE_I43_CARREGAR_INICIO_COL_Y_2026-06-23.md` · `MAPA_ERROS` I43 · `.cursor/rules/cronometro-i43-carregar-inicio.mdc`
+Docs: `INCIDENTE_I43_*` · `INCIDENTE_I44_*` · `ARQUITETURA_CAIXA_CONTA_DIA_2026-06.md` · `MATRIZ_PERMISSOES_PERFIS_2026-06.md`
 
 ---
 
-## Incidentes — sessão 23/06/2026 (I43 cronômetro)
+## Incidentes — sessão 23/06/2026
 
 | ID | Evento | Fix |
 |----|--------|-----|
-| **I43** | `carregarInicio` leu 19 cols (I42) — col Y fora → sync reverte ▶ | GAS **v1.5.136** `COL_LOC_READ_`; FE **v1.8.114**; `TESTE_I43` no pre-push |
+| **I43** | Cronômetro revertia após ▶ (`carregarInicio` 19 cols sem col Y) | GAS **v1.5.136** prod · FE **v1.8.114+** · `TESTE_I43` no pre-push |
+| **I44** | Banco horas corrompido (-544h→-884h) — persist em **leitura** painel RH | GAS **v1.5.137** repo · `repairBancoHorasAdmin` · FE label v1.8.115 |
 
 ---
 
@@ -131,115 +125,39 @@ Doc: `INCIDENTE_I43_CARREGAR_INICIO_COL_Y_2026-06-23.md` · `MAPA_ERROS` I43 · 
 | ID | Evento | Fix |
 |----|--------|-----|
 | **I38** | Banner “Pré-visualização ADM” com login PIN colab (`p.preview` fantasma) | FE **v1.8.110–111** |
-| **I39** | VA/salário mês cheio — admissão meio mês / ISO | GAS **v1.5.129–130** · Web pendente |
+| **I39** | VA/salário mês cheio — admissão meio mês / ISO | GAS **v1.5.129–130** |
 | **I40** | Hub benefícios ≠ holerite GAS quinzenal | FE **v1.8.111** `gpBeneficiosResumo_` |
 | **I41** | `ping_` defasado vs repo | GAS **v1.5.130** |
 | **RH-G1–G3** | Holerite/banco/faltas não persistiam | GAS **v1.5.130** snapshot+sync |
 
-**Doc mestre:** `AUDITORIA_RH_FOLHA_PERSISTENCIA_2026-06-22.md` — abas que gravam, lacunas RH-G1–G15.
+---
+
+## Armadilhas ativas (não regredir)
+
+| Tema | Regra |
+|------|-------|
+| **I15** | Escritas GAS no browser = **GET** apenas |
+| **I20/I43** | `carregarInicio` → `COL_LOC_READ_=28` · rodar `TESTE_I43` + tablet ▶ |
+| **I44** | **Nunca** `gpPersistBancoFromJornada_` em leitura de painel |
+| **Dashboard** | Login balcão ≠ Ponto RH (`FOLHA_PONTO`) — widget "Ponto RH hoje" |
+| **I22** | `check-operacao-livre.ps1` antes de push FE crítico |
+| **GAS deploy** | Nova versão no deploy `AKfycbwakQ...` — nunca `clasp deploy` |
 
 ---
 
-## Incidentes — sessão 21/06/2026 (tarde)
+## Modo de operação — máximo potencial
 
-| ID | Evento | Fix |
-|----|--------|-----|
-| **I35** | PWA SW intercepta GAS → `FetchEvent respondWith null` no iPhone | SW não intercepta Google · FE **v1.8.104** |
-| **I36** | `salvarCadastro` getRange(linha,col,linha,10) — 2 linhas vs 1 dado | GAS **v1.5.127** · Raykelly 100% |
-| **I37** | `gestao-pessoas.html` sem stale-sync/SW boot — Safari cache antigo | `mk-stale-sync` + `mk-gp-boot.js` · **v1.8.105** |
-
----
-
-## Incidentes — sessão 20/06/2026 (registrados)
-
-| ID | Evento | Severidade | Status | Fix / evidência |
-|----|--------|------------|--------|-----------------|
-| **I31** | Pelúcias fora de operação — encoding CONFIG | P0 | ✅ Fechado | `salvarOperacaoConfigAdmin` UTF-8 · doc `INCIDENTE_I31_*` |
-| **I32** | Locação duplicada + SMS legado no Fechar | P0 | ✅ Fechado | FE `4485c09` · **re-validado tablet** 20/06 |
-| **I33** | Tablet lento / não carrega | P1 | ✅ Fechado homolog | Force update v1.8.71 · boot OK loja 20/06 |
-| **I34** | Holerite apresentação + CNPJ fictício | P2 | ✅ Fechado | `mk-holerite.js` · CNPJ **66.664.255/0001-67** · **homolog tablet** 20/06 |
-| **I26** | GAS repo v1.5.111 ≠ ping v1.5.107 | P1 | ✅ Fechado | Nova versão Web **165** 20/06 · funcional OK · ping string cosmética |
-
-**Entregas FE nesta sessão (commits):**
-
-| Commit | Entrega |
-|--------|---------|
-| `4485c09` | Fix locação duplicada + SMS off no Fechar |
-| `f2e58b7` | Force update cache global |
-| `740d4ce` | Holerite premium (CPF, refs, VT, PDF) |
-| `389552a` | CNPJ real MOVI KIDS |
-
-**Incidentes fechados sessão anterior (18/06):**
-
-| ID | Resumo | Fix |
-|----|--------|-----|
-| **I29** | Colaboradores fora DNA | FE v1.8.49 + Design System |
-| **I30** | Abas RH parciais getRange | GAS v1.5.99 |
-| **Frota** | Carro 04 + grid 2x2 | FE v1.8.67+ · CONFIG 10 veículos |
-
-**Últimos commits FE (gestão pessoas + docs):**
-
-| Entrega |
-|---------|
-| v1.8.49 Design System + `#gp-auth-gate` DNA fixo |
-| v1.8.48 auth dropdown + passos separados |
-| v1.8.45–47 iterações DNA colaboradores |
-| v1.8.44 hub 3 portas FASE 15 |
+1. Fluxo **F0–F14** antes de codar (`PROTOCOLO_DIAGNOSTICO_E_TESTES.md`)
+2. PC ≠ tablet
+3. FE + GAS + planilha + PWA
+4. MAPA_ERROS I15/I18/I20/I21/I22/I23/I42/I43/I44
 
 ---
 
-## Arquivos canônicos
+## Commits recentes (referência)
 
-| Artefato | Caminho |
-|----------|---------|
-| **GAS** | `MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs` |
-| **Design System** | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
-| Versão FE | `mk-version.js` + `sw.js` + **`index.html ?v=`** |
-| CSS | `mk-design.css` + `mk-app.css` |
-| Colaboradores | `gestao-pessoas.html` + `mk-gestao-pessoas.css` + **`mk-holerite.js`** |
-
-**GAS PC:**
-
-```
-C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github\MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs
-```
-
----
-
-## Regras invioláveis (P0)
-
-| Regra | Detalhe |
-|-------|---------|
-| **I15** | Escritas GAS no browser = **GET** |
-| **I29** | **`DESIGN_SYSTEM_MOVIKIDS.md`** antes de UI |
-| **I22** | `check-operacao-livre.ps1` antes push FE crítico |
-| **Versões** | `mk-version.js` = `sw.js` = `index.html ?v=` |
-| **Host** | Sempre **`ribocg-a11y`** (I29) |
-| **Regra 16** | Resposta termina com Mudança AppScript + link `.gs` |
-
----
-
-## Validação rápida (início de sessão)
-
-```powershell
-cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github
-Invoke-RestMethod "https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec?action=ping"
-.\scripts\pre-push-check.ps1
-```
-
-Esperado: ping alinhado após Nova versão Web · Pages **1.8.83** · pre-push verde · operação livre.
-
----
-
-## O que NÃO usar
-
-| Caminho | Motivo |
-|---------|--------|
-| `ponto-mockup.html` em produção | Só protótipo v3.6 |
-| `mock-pick` / PIN único em auth | I29 — usar `#mk-auth-gate` |
-| `docs/arquivo/planos/HANDOFF_NOVO_CHAT_2026-06-05.md` | Defasado |
-| `ribocg.a11y.github.io` | Host errado (I29) |
-
----
-
-*Próxima revisão: após Nova versão Web v1.5.116 · kickoff FASE 16.*
+| Hash | Entrega |
+|------|---------|
+| `d39a7ac` | I44 banco horas · FE v1.8.115 · GAS v1.5.137 repo |
+| `ff84239` | I43 guards + `TESTE_I43` + docs |
+| `ef10dfa` | I43 hotfix cronômetro · FE v1.8.114 · GAS v1.5.136 |

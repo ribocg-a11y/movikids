@@ -1,6 +1,6 @@
 # MOVI KIDS — Protocolo "Atualize tudo"
 
-**Criado:** 14/06/2026  
+**Criado:** 14/06/2026 · **Última execução:** 23/06/2026 (handoff fim de sessão I43/I44)  
 **Função:** quando o usuário pedir **"atualize tudo"**, o agente segue **esta lista** — não só handoff parcial.  
 **Regra Cursor:** `.cursor/rules/atualize-tudo-movikids.mdc`
 
@@ -42,15 +42,15 @@ Sincronizar **documentação + estado operacional** do projeto com a realidade a
 
 ---
 
-## Produção atual (20/06/2026)
+## Produção atual (23/06/2026)
 
 | Camada | Versão | Evidência |
 |--------|--------|-----------|
-| GAS ping | **v1.5.107** | ping público `/exec?action=ping` |
-| GAS repo | **v1.5.111** | header do `.gs` canônico |
-| FE | **v1.8.71** | Pages live |
-| Aba FOLHA | **OK** (I25) | B25=15,38 · B68=5269,96 · D36=24 · `fonte=FOLHA` |
-| FASE 9 CLT | **verde 6/6** | `TESTE_FASE9_FOLHA_READONLY` · `CONTRATACAO_VIAVEL` |
+| GAS ping | **v1.5.136** | `/exec?action=ping` |
+| GAS repo | **v1.5.137** | header do `.gs` canônico |
+| FE | **v1.8.115** | Pages live |
+| Aba FOLHA | **OK** (I25) | B68 ~5269,96 · `fonte=FOLHA` |
+| Aba BANCO_HORAS | **⚠️ I44** | zerar / `repairBancoHorasAdmin` após Web v1.5.137 |
 
 ---
 

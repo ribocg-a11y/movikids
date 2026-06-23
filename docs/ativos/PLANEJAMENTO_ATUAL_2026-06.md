@@ -12,7 +12,7 @@
 
 Ciclo **FASE 0–5 + P2/P3 concluído** (07–09/06/2026). Balcão homologado, portal QR, payback, CONFIG e APIs unificadas.
 
-**Modo atual:** **I42** ✅ API 6/6 · homolog loja ⏳ · **FASE 15b** ✅ (15b.7 banco horas admin) · **FASE 17** 🟡 (17.1–17.4 ✅ · homolog gestor ⏳)
+**Modo atual:** **I43** ✅ prod · **I44** fix repo · **I42** ✅ API 6/6 · homolog loja ⏳ · **FASE 17** 🟡 (17.1–17.4 ✅ · homolog gestor ⏳)
 
 ---
 
@@ -32,7 +32,7 @@ Ciclo **FASE 0–5 + P2/P3 concluído** (07–09/06/2026). Balcão homologado, p
 | **21** | Live BI frota | P2 | Herda FASE 13 |
 | **22** | Assistente IA gestão | P3 | Anexo — decisão sócio |
 
-**Sequência imediata:** **Nova versão Web GAS v1.5.134** → homolog Caixa I42 (10h–22h, tablet) → homolog Gestor (sem CONFIG/Sistema) → Raykelly cadastro 100% → tablet F5/F7/F10/F11 → **fechar FASE 17** (17.5 decisão F9).
+**Sequência imediata:** **Nova versão Web GAS v1.5.137** (I44 repair) → zerar/repair `BANCO_HORAS` → homolog Caixa I42 → homolog Gestor → tablet `?force=1.8.115` + I43 ▶ → **fechar FASE 17** (17.5 F9).
 
 ### I42 — Caixa / conta do dia (23/06/2026) 🟡
 
@@ -209,17 +209,18 @@ Legenda: **P0** bloqueia operação · **P1** valor imediato · **P2** próximo 
 
 ## 8. Próxima revisão
 
-**Ao publicar GAS v1.5.134 Web** · homolog Gestor + Caixa I42 · fechar **FASE 17** (exc. 17.5).
+**Ao publicar GAS v1.5.137 Web** · repair BANCO_HORAS · homolog Gestor + Caixa I42 + cronômetro I43 · fechar **FASE 17** (exc. 17.5).
 
 ### 8a. Bloqueios P0 (esta semana)
 
 | # | Ação | Quem | Status |
 |---|------|------|--------|
-| 1 | **Nova versão Web GAS v1.5.134** (I42 + F17 destino + 15b.7 banco horas) | **Sócio** | ✅ ping **v1.5.134** |
-| 2 | Instalar aba **AVALIACOES_RH** na planilha | Agente/Sócio | ⏳ |
-| 2 | Homolog **I42** no tablet 10h–22h (2 brinquedos = 1 locação caixa) | Ops loja | ⏳ |
-| 3 | Conferir **totalMaq** vs maquininha no fechamento | Ops loja | ⏳ |
-| 4 | Homolog **Gestor** — sem CONFIG/Sistema | Ops loja | ⏳ |
+| 1 | **Nova versão Web GAS v1.5.137** (I44 banco horas + repair) | **Sócio** | ⏳ |
+| 2 | **repairBancoHorasAdmin** ou zerar aba `BANCO_HORAS` | Sócio/Agente | ⏳ |
+| 3 | Homolog **I43** tablet ▶ não reverte | Ops loja | ⏳ |
+| 4 | Homolog **I42** 10h–22h (2 brinquedos = 1 locação) | Ops loja | ⏳ |
+| 5 | Homolog **Gestor** — sem CONFIG/Sistema | Ops loja | ⏳ |
+| 6 | Ponto RH (FOLHA_PONTO) operadores | Ops | ⏳ |
 
 ### 8b. Fechar pendências 15b + FASE 16
 
@@ -232,7 +233,7 @@ Legenda: **P0** bloqueia operação · **P1** valor imediato · **P2** próximo 
 | 5 | Safari Raykelly `gestao-pessoas.html?force=1.8.108` | Ops loja | ⏳ |
 | 6 | Homolog tablet **F5/F7/F10/F11** pós-GAS Web | Ops loja | ⏳ |
 | 7 | **FASE 16** — Centro de Comando repo + tipografia RH | Agente | ✅ repo · homolog ⏳ |
-| 8 | **15b.7** — persistir `BANCO_HORAS` no painel admin RH | Agente | ✅ repo **v1.5.134** |
+| 8 | **15b.7** — persistir `BANCO_HORAS` | Agente | ⚠️ **revertido I44** — persist só na saída ponto · v1.5.137 |
 
 ### 8b. FASE 17 — Alertas inteligentes + Permissões Gestor (**próxima fase dev**)
 

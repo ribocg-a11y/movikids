@@ -1,6 +1,6 @@
 # MOVI KIDS — Plano de prioridades (análise de sistemas)
 
-**Data-base:** 09/06/2026 · **Revisado:** 22/06/2026  
+**Data-base:** 09/06/2026 · **Revisado:** 23/06/2026  
 **Função:** documento único de **o que fazer agora**, por ordem de prioridade.  
 **Local:** `docs/ativos/` · **Índice:** `../INDICE.md`  
 **Handoff:** `HANDOFF_NOVO_CHAT.md` · **Complementa:** `ESTADO_ATUAL.md`, `PLANO_CONTINUIDADE_2026-06.md`, `REGRAS_DE_PUBLICACAO_SEGURA.md`.
@@ -31,13 +31,12 @@
 
 **Próximo passo imediato:**
 
-1. **Sócio:** Nova versão Web GAS **v1.5.128** (avaliações + alertas F17 no ar)
-2. **Ops:** Raykelly completar cadastro (25%) · Safari `?force=1.8.108` · tablet F5/F7/F10/F11
-3. **Dev:** **FASE 17** — pills alertas Dashboard + homolog perfil Gestor
-4. **Dev:** **15b.7** banco horas persistido (fecha 15b)
-5. **Cosmético:** `ping_()` → v1.5.128 no próximo bump GAS
+1. **Sócio:** Nova versão Web GAS **v1.5.137** (I44) + `repairBancoHorasAdmin`
+2. **Ops:** Tablet `?force=1.8.115` · homolog I43 ▶ · ponto RH · Caixa I42 · Gestor
+3. **Dev:** Fechar homolog **FASE 17** (17.5 F9 decisão sócio)
+4. **Planilha:** zerar `BANCO_HORAS` se Web v1.5.137 ainda não publicada
 
-Ver **`PLANEJAMENTO_ATUAL_2026-06.md`** §8 · **`MAPA_FASES.md`**
+Ver **`PLANEJAMENTO_ATUAL_2026-06.md`** §8 · **`HANDOFF_NOVO_CHAT.md`**
 
 ### FASE 0 — checklist
 

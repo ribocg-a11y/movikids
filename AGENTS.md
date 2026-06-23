@@ -57,9 +57,9 @@ Detalhe completo: [`ACESSOS_E_AUTORIZACOES.md`](docs/ativos/ACESSOS_E_AUTORIZACO
 
 | Camada | Versão repo | Ping produção |
 |--------|-------------|---------------|
-| Frontend | **v1.8.114** | https://ribocg-a11y.github.io/movikids/?force=1.8.114 |
-| Gestão Pessoas | **v1.8.114** | `gestao-pessoas.html?force=1.8.114` |
-| GAS | repo **v1.5.136** · Web **v1.5.136** (ping) | I43 hotfix em prod |
+| Frontend | **v1.8.115** | https://ribocg-a11y.github.io/movikids/?force=1.8.115 |
+| Gestão Pessoas | **v1.8.115** | `gestao-pessoas.html?force=1.8.115` |
+| GAS | repo **v1.5.137** · ping **v1.5.136** | Nova versão Web v1.5.137 (I44) |
 | Design System | **v1.1** | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
 | Aba FOLHA | OK (I25) | B68 ~5269,96 · `folhaPlanejamento.fonte: FOLHA` |
 | Deploy ID | `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y` | |
@@ -93,13 +93,14 @@ Fonte de verdade: `mk-version.js`, header do `.gs`, ping GAS.
 - `docs/arquivo/obsoleto/` — rollback/changelog antigos
 - Arquivos em `arquivo-historico/` para deploy
 
-## Estado do projeto (23/06/2026)
+## Estado do projeto (23/06/2026 — fim de sessão)
 
 - **FASE 1–9:** ✅ prod
-- **FASE 14 mini-DRE:** ✅ prod (FE v1.8.16+)
-- **FASE 15 Gestão Pessoas:** 🟡 FE v1.8.114 · GAS repo v1.5.136
-- **I43 (P0):** hotfix cronômetro — travas `TESTE_I43` no pre-push · doc `INCIDENTE_I43_CARREGAR_INICIO_COL_Y_2026-06-23.md`
-- **Próximo:** Nova versão Web GAS v1.5.136 · tablet `?force=1.8.114` + ▶ homolog · FASE 17 fechar
+- **FASE 14 mini-DRE:** ✅ prod
+- **FASE 15–17:** 🟡 repo fechado · homolog tablet + GAS Web v1.5.137 pendente
+- **I43:** ✅ hotfix prod (cronômetro)
+- **I44:** fix repo — **repair BANCO_HORAS** após Nova versão Web
+- **Próximo:** GAS v1.5.137 Web · repair banco · homolog I42/Gestor/tablet
 
 ## "Atualize tudo"
 
