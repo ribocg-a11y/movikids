@@ -1862,6 +1862,7 @@
 .mk-cmd-alert.amarelo { border-color: #E65100; background: rgba(230, 81, 0, 0.08); }
 .mk-cmd-alert.vermelho { border-color: #C62828; background: rgba(198, 40, 40, 0.08); }
 .mk-cmd-alert.inteligente { border-left-width: 4px; }
+.mk-cmd-alert .mk-alert-pill { margin-top: 8px; }
 .mk-cmd-alert-badge,
 .mk-alert-intel-badge,
 .mk-caixa-intel-badge {

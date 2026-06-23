@@ -1,6 +1,6 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 22/06/2026 · FASE **15b** ~98% · FE **v1.8.112** · GAS repo **v1.5.131** · Web pendente · ping repo **v1.5.131**  
+**Atualizado:** 23/06/2026 · FASE **15b** ~98% · FE **v1.8.112** · GAS repo **v1.5.132** · Web **v1.5.131** (ping) · **v1.5.132 pendente**  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **Repo local:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`  
@@ -56,7 +56,7 @@ Mensagem mínima: *"Vamos dar continuidade ao projeto Movi Kids, tem uma pasta n
 | **Gestão Pessoas** | **v1.8.112** | `gestao-pessoas.html?force=1.8.112` |
 | **Service Worker** | **1.8.112** | `sw.js` · GAS fora do intercept |
 | **Holerite** | **mk-holerite.js** | CNPJ **66.664.255/0001-67** · PDF/imprimir |
-| **Apps Script** | repo **v1.5.131** · Web pendente | ⏳ Nova versão Web **v1.5.131** (conta do dia + caixa I42) |
+| **Apps Script** | repo **v1.5.132** · Web **v1.5.131** (ping) | ⏳ Nova versão Web **v1.5.132** (fix Caixa saldoDin + I42) |
 | **Aba FOLHA** | **OK** (I25) | B68 ~5269,96 |
 | **Design System** | **v1.1** | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` (tokens `--mk-widget-*`) |
 
@@ -101,22 +101,21 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 
 **Fonte de verdade versão:** `mk-version.js` → ping GAS → `DEPLOY_ATUAL.md` → este handoff.
 
-## Próximo passo (22/06/2026)
+## Próximo passo (23/06/2026)
 
-**Fase ativa:** **FASE 17** — Alertas inteligentes + perfil Gestor  
-**Pré-requisito:** Nova versão Web GAS **v1.5.128** + Raykelly cadastro 100%
+**Foco imediato:** **I42 Caixa** em produção + homolog 10h–22h · depois **FASE 17**
 
 | # | Ação | Quem | Status |
 |---|------|------|--------|
-| 1 | **Nova versão Web GAS v1.5.128** | **Sócio** | ⏳ |
-| 2 | Raykelly cadastro 25% → 100% | Colaborador | ⏳ |
-| 3 | Milena cadastro + ponto hoje | — | ✅ 100% · entrada registrada |
-| 4 | Safari `?force=1.8.108` + tablet F5/F7/F10/F11 | Ops loja | ⏳ |
-| 5 | **Fechar FASE 16** (homolog comando) | Ops + Agente | ⏳ |
-| 6 | **FASE 17** — pills alertas Dashboard + Gestor homolog | Agente | 🟢 próximo dev |
+| 1 | **Nova versão Web GAS v1.5.132** | **Sócio** | ⏳ |
+| 2 | Homolog Caixa: mesmo telefone 2 sessões = 1 locação + maquininha | Ops loja | ⏳ após 10h |
+| 3 | `TESTE_I42_CONTA_DIA_CAIXA.ps1` entre 10h–22h | Agente | ⏳ |
+| 4 | Raykelly cadastro 25% → 100% | Colaborador | ⏳ |
+| 5 | Tablet F5/F7/F10/F11 + Safari `?force=1.8.112` | Ops loja | ⏳ |
+| 6 | **FASE 17** — pills alertas Dashboard + Gestor | Agente | 🟢 próximo dev |
 | 7 | **15b.7** banco horas persistido | Agente | 📋 |
 
-Doc: `PLANEJAMENTO_ATUAL_2026-06.md` §8b · `PLANO_PREMIUM_ONEUI_FASES_16_22_2026-06.md` §7
+Doc: `PLANEJAMENTO_ATUAL_2026-06.md` §8 · `ARQUITETURA_CAIXA_CONTA_DIA_2026-06.md`
 
 ---
 

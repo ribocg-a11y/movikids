@@ -1,7 +1,7 @@
 # MOVI KIDS — Planejamento atual (pós-FASE 5)
 
-**Atualizado:** 22/06/2026 · FE **v1.8.110** · GAS repo **v1.5.129** · Web **v1.5.127** · ping **v1.5.107**
-**Produção:** FE **v1.8.110** (repo) · GAS repo **v1.5.129** · **Nova versão Web v1.5.129 pendente (sócio)**
+**Atualizado:** 23/06/2026 · FE **v1.8.112** · GAS repo **v1.5.132** · Web **v1.5.131** (ping) · **v1.5.132 pendente**
+**Produção:** FE **v1.8.112** Pages · GAS ping **v1.5.131** · **Nova versão Web v1.5.132** (fix Caixa `saldoDin`) pendente sócio
 **Documentos irmãos:** `PLANO_PRIORIDADES_2026-06.md` · `MAPA_FASES.md` · `DEPLOY_ATUAL.md` · `HANDOFF_NOVO_CHAT.md`  
 **Ciclo ativo:** **`PLANO_FASES_6_15_COCKPIT_EXECUTIVO_2026-06.md`** · FASE 15: **`FASE_15_GESTAO_PESSOAS.md`** ✅  
 **Próximo ciclo:** **`PLANO_PREMIUM_ONEUI_FASES_16_22_2026-06.md`** ← manual Premium + One UI (20/06/2026)
@@ -12,7 +12,7 @@
 
 Ciclo **FASE 0–5 + P2/P3 concluído** (07–09/06/2026). Balcão homologado, portal QR, payback, CONFIG e APIs unificadas.
 
-**Modo atual:** **FASE 15b** ~96% (falta **15b.7** banco horas) · **FASE 16** repo ✅ (homolog tablet ⏳) · **FASE 17** 🟢 **próxima fase ativa** (alertas + perfil Gestor)
+**Modo atual:** **I42 Caixa/conta do dia** ✅ repo · homolog 10h–22h ⏳ · **FASE 15b** ~98% (15b.7 banco horas) · **FASE 17** 🟢 próxima fase dev
 
 ---
 
@@ -32,7 +32,18 @@ Ciclo **FASE 0–5 + P2/P3 concluído** (07–09/06/2026). Balcão homologado, p
 | **21** | Live BI frota | P2 | Herda FASE 13 |
 | **22** | Assistente IA gestão | P3 | Anexo — decisão sócio |
 
-**Sequência imediata:** **Nova versão Web GAS v1.5.128** (sócio) → Raykelly completar cadastro (25%) + Safari **v1.8.108** → homolog tablet F5/F7/F10/F11 → **fechar FASE 16** → **kickoff FASE 17** (alertas + Gestor).
+**Sequência imediata:** **Nova versão Web GAS v1.5.132** → homolog Caixa I42 (10h–22h, tablet) → Raykelly cadastro 100% → tablet F5/F7/F10/F11 → **fechar FASE 16** → **FASE 17** (pills alertas + Gestor) → **15b.7** banco horas.
+
+### I42 — Caixa / conta do dia (23/06/2026) 🟡
+
+| Item | Status | Nota |
+|------|--------|------|
+| Conta do dia (telefone 10h–22h) | ✅ repo GAS v1.5.131+ | col S `conta_id` |
+| Maquininha PIX+Crédito+Débito normalizada | ✅ repo | `ARQUITETURA_CAIXA_CONTA_DIA_2026-06.md` |
+| FE caixa `n` vs `nSessoes` | ✅ v1.8.112 Pages | |
+| Fix `resumoDia` saldoDin | ✅ repo **v1.5.132** | ⏳ Web pendente |
+| Teste `TESTE_I42_CONTA_DIA_CAIXA.ps1` | ✅ 6/6 (fora janela) | Repetir 10h–22h p/ agrupamento |
+| Homolog loja (maquininha = sistema) | ⏳ | Tablet + fechamento real |
 
 ---
 
@@ -198,9 +209,18 @@ Legenda: **P0** bloqueia operação · **P1** valor imediato · **P2** próximo 
 
 ## 8. Próxima revisão
 
-**Ao publicar GAS v1.5.128 Web + homolog tablet** · fechar **FASE 16** · sprint **FASE 17**.
+**Ao publicar GAS v1.5.132 Web + homolog Caixa I42 (10h–22h)** · fechar **FASE 16** · sprint **FASE 17**.
 
-### 8a. Fechar pendências 15b + FASE 16 (pré-requisito)
+### 8a. Bloqueios P0 (esta semana)
+
+| # | Ação | Quem | Status |
+|---|------|------|--------|
+| 1 | **Nova versão Web GAS v1.5.132** (I42 conta do dia + fix Caixa) | **Sócio** | ⏳ ping **v1.5.131** · repo **v1.5.132** |
+| 2 | `git push` commit **49fbb4b** (fix saldoDin + teste I42) | Agente | ⏳ local ahead 1 |
+| 3 | Homolog **I42** no tablet 10h–22h (2 brinquedos = 1 locação caixa) | Ops loja | ⏳ |
+| 4 | Conferir **totalMaq** vs maquininha no fechamento | Ops loja | ⏳ |
+
+### 8b. Fechar pendências 15b + FASE 16
 
 | # | Ação | Quem | Status |
 |---|------|------|--------|
@@ -220,7 +240,7 @@ Legenda: **P0** bloqueia operação · **P1** valor imediato · **P2** próximo 
 | # | ID | Entrega | Camada | Status |
 |---|-----|---------|--------|--------|
 | 1 | **17.0** | `alertasInteligentes_` em `comandoOperacional` + `kpiMes` | GAS | ✅ repo v1.5.118–120 |
-| 2 | **17.1** | Pills alertas no Dashboard com link (Caixa / Operadores / Comando) | FE | 📋 polish |
+| 2 | **17.1** | Pills alertas no Dashboard com link (Caixa / Operadores / Comando) | FE | ✅ v1.8.113 |
 | 3 | **17.2** | Presença admin — badges inteligentes por colaborador | FE | ✅ parcial v1.8.86+ |
 | 4 | **17.3** | Perfil `gestor` em `OPERADORES_SISTEMA` + `showGestorSidebar` | FE+GAS | ✅ repo · homolog ⏳ |
 | 5 | **17.4** | Matriz permissões documentada (Admin / Gestor / Supervisor / Colab) | Doc | 📋 |

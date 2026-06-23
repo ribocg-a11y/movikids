@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.132
+// MOVI KIDS — Google Apps Script v1.5.133
+// v1.5.133: FASE 17 — alertas inteligentes campo destino (caixa/operadores/sistema/dashboard)
 // v1.5.132: fix calcResumoDiaCore_ saldoDin (totalDin ref)
 // v1.5.131: conta do dia — mesmo telefone 10h-22h = 1 locação caixa; maquininha normalizada; col S conta_id
 // v1.5.130: RH audit — ping alinhado; VA/VT FOLHA; banco+holerite persist; meta RH cols; gpVaMensal va_diario
@@ -1866,6 +1867,7 @@ function calcMetaAbaixoAlertas_() {
         titulo: 'Meta abaixo do esperado',
         mensagem: op.nome + ': menos de 50% da meta (' + meta + ' loc/turno) em 3 dias seguidos.',
         acionavel: 'Ops — conversar com operador',
+        destino: 'operadores',
         operadorId: opId, operador: op.nome
       });
     }
@@ -2900,7 +2902,8 @@ function alertasInteligentes_(opts) {
       nivel: 'amarelo', codigo: 'FAT_QUEDA_7D', inteligente: true,
       titulo: 'Faturamento abaixo do ritmo',
       mensagem: 'Media 7d R$ ' + comp7.media + '/dia vs 30d R$ ' + comp30.media + '/dia (queda >15%).',
-      acionavel: 'Socio — revisar operacao comercial'
+      acionavel: 'Socio — revisar operacao comercial',
+      destino: 'dashboard'
     });
   }
 
@@ -2911,7 +2914,8 @@ function alertasInteligentes_(opts) {
       nivel: 'amarelo', codigo: 'CUSTO_ELEVADO', inteligente: true,
       titulo: 'Custo do dia elevado',
       mensagem: 'R$ ' + Math.round(coreDia.totalCus * 100) / 100 + ' hoje vs media R$ ' + mediaCus.media + ' (+20%).',
-      acionavel: 'Ops — conferir lancamentos de custo'
+      acionavel: 'Ops — conferir lancamentos de custo',
+      destino: 'caixa'
     });
   }
 
@@ -2921,7 +2925,8 @@ function alertasInteligentes_(opts) {
       inteligente: true,
       titulo: 'Frota parada',
       mensagem: veic + ' sem locacoes nos ultimos 7 dias.',
-      acionavel: 'Ops — revisar veiculo ou manutencao'
+      acionavel: 'Ops — revisar veiculo ou manutencao',
+      destino: 'sistema'
     });
   });
 
@@ -2940,6 +2945,7 @@ function alertasInteligentes_(opts) {
           titulo: 'Banco de horas no limite',
           mensagem: gpNomeRhByOpId_(opId) + ' com saldo ' + String(r[1] || '') + ' (limite +/-20h).',
           acionavel: 'RH — ajustar escala ou compensar',
+          destino: 'operadores',
           operadorId: opId, operador: gpNomeRhByOpId_(opId)
         });
       });
@@ -2961,7 +2967,8 @@ function alertasInteligentes_(opts) {
           inteligente: true,
           titulo: 'Ponto pendente',
           mensagem: a.mensagem,
-          acionavel: 'RH — conferir presenca'
+          acionavel: 'RH — conferir presenca',
+          destino: 'operadores'
         });
       });
     } catch (e) {

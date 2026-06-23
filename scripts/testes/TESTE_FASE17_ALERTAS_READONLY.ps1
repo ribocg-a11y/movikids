@@ -34,6 +34,7 @@ foreach ($pair in @(
   @{ file = $gsPath; needle = "function isGestaoRequest_"; name = "gas.isGestaoRequest" },
   @{ file = $gsPath; needle = "perfil !== 'gestor'"; name = "gas.perfilGestor" },
   @{ file = Join-Path $RepoRoot "mk-auth.js"; needle = "mkAuthIsGestor"; name = "fe.mkAuthIsGestor" },
+  @{ file = Join-Path $RepoRoot "mk-admin.js"; needle = "mkAlertDestino_"; name = "fe.mkAlertDestino" },
   @{ file = Join-Path $RepoRoot "mk-nav.js"; needle = "showGestorSidebar"; name = "fe.showGestorSidebar" },
   @{ file = Join-Path $RepoRoot "mk-gestao-pessoas-admin.js"; needle = "gpAdmIntelForOp_"; name = "fe.gpAdmIntelPresenca" },
   @{ file = Join-Path $RepoRoot "mk-design.css"; needle = "mk-alert-intel-badge"; name = "fe.intel-css" },

@@ -972,6 +972,49 @@ function mkAlertIcon_(nivel) {
   return '🔵';
 }
 
+/** FASE 17 — destino clicável do alerta inteligente. */
+function mkAlertDestino_(a) {
+  const d = String((a && a.destino) || '').toLowerCase();
+  const labels = { caixa: 'Caixa', operadores: 'Equipe', sistema: 'Sistema', dashboard: 'Comando' };
+  if (labels[d]) {
+    return { page: d, label: labels[d], scroll: d === 'dashboard' ? 'mk-chapter-comando' : '' };
+  }
+  const c = String((a && a.codigo) || '').toUpperCase();
+  if (c.indexOf('CUSTO') >= 0) return { page: 'caixa', label: 'Caixa', scroll: '' };
+  if (c.indexOf('FROTA') >= 0) return { page: 'sistema', label: 'Frota', scroll: '' };
+  if (c.indexOf('BANCO_HORAS') >= 0 || c.indexOf('META_ABAIXO') >= 0 || c.indexOf('PONTO_') === 0) {
+    return { page: 'operadores', label: 'Equipe', scroll: '' };
+  }
+  if (c.indexOf('FAT_') >= 0) return { page: 'dashboard', label: 'Comando', scroll: 'mk-chapter-comando' };
+  return null;
+}
+
+function mkAlertNavigate_(dest) {
+  if (!dest || typeof irAdmin !== 'function') return;
+  irAdmin(dest.page);
+  if (dest.scroll) {
+    setTimeout(function() {
+      const el = document.getElementById(dest.scroll);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 250);
+  }
+}
+
+function mkAlertAttachPill_(container, a) {
+  if (!container || !a) return;
+  const dest = mkAlertDestino_(a);
+  if (!dest) return;
+  const pill = document.createElement('button');
+  pill.type = 'button';
+  pill.className = 'mk-alert-pill';
+  pill.textContent = '→ ' + dest.label;
+  pill.addEventListener('click', function(ev) {
+    ev.stopPropagation();
+    mkAlertNavigate_(dest);
+  });
+  container.appendChild(pill);
+}
+
 function mkAlertModalClose_() {
   const m = document.getElementById('mk-alert-modal');
   if (m) m.hidden = true;
@@ -1004,11 +1047,15 @@ function mkAlertItemEl_(a, d, inModal) {
       '<div class="mk-alert-item-title">' + (a.titulo || a.codigo || 'Alerta') + '</div>' +
       '<div class="mk-alert-item-msg">' + (a.mensagem || '') + '</div>' +
       (a.acionavel ? '<div class="mk-alert-item-act">' + a.acionavel + '</div>' : '') +
+      '<div class="mk-alert-item-pills"></div>' +
     '</div>' +
     (!inModal ? '<button type="button" class="mk-alert-item-dismiss" title="Dispensar nesta sessão">✕</button>' : '');
   if (!inModal) {
     const btn = row.querySelector('.mk-alert-item-dismiss');
     if (btn) btn.addEventListener('click', function() { mkAlertDismiss_(a.codigo); });
+  }
+  if (a.inteligente || a.destino) {
+    mkAlertAttachPill_(row.querySelector('.mk-alert-item-pills'), a);
   }
   return row;
 }
@@ -1237,13 +1284,18 @@ function renderCommandCenter_(d) {
       alertsEl.innerHTML = '';
     } else {
       alertsEl.hidden = false;
-      alertsEl.innerHTML = alertas.map(function(a) {
+      alertsEl.innerHTML = '';
+      alertas.forEach(function(a) {
         const cls = a.nivel === 'vermelho' ? ' vermelho' : (a.nivel === 'amarelo' ? ' amarelo' : '');
         const intel = a.inteligente ? ' inteligente' : '';
         const badge = a.inteligente ? '<span class="mk-cmd-alert-badge">Proativo</span> ' : '';
-        return '<div class="mk-cmd-alert' + cls + intel + '">' + badge + '<strong>' + (a.titulo || '') + '</strong> — '
-          + (a.mensagem || '') + (a.acionavel ? ' · <em>' + a.acionavel + '</em>' : '') + '</div>';
-      }).join('');
+        const row = document.createElement('div');
+        row.className = 'mk-cmd-alert' + cls + intel;
+        row.innerHTML = badge + '<strong>' + (a.titulo || '') + '</strong> — '
+          + (a.mensagem || '') + (a.acionavel ? ' · <em>' + a.acionavel + '</em>' : '');
+        if (a.inteligente || a.destino) mkAlertAttachPill_(row, a);
+        alertsEl.appendChild(row);
+      });
     }
   }
 }
