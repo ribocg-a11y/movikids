@@ -1,6 +1,6 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 22/06/2026 · FASE **15b** ~96% · FE **v1.8.108** · GAS repo **v1.5.128** · Web **v1.5.127** (cadastro OK)  
+**Atualizado:** 22/06/2026 · FASE **15b** ~98% · FE **v1.8.111** · GAS repo **v1.5.130** · Web **v1.5.127** · ping repo **v1.5.130**  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **Repo local:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`  
@@ -52,11 +52,11 @@ Mensagem mínima: *"Vamos dar continuidade ao projeto Movi Kids, tem uma pasta n
 
 | Camada | Versão | Verificação |
 |--------|--------|-------------|
-| **Frontend** | **v1.8.108** | https://ribocg-a11y.github.io/movikids/?force=1.8.108 |
-| **Gestão Pessoas** | **v1.8.108** | `gestao-pessoas.html?force=1.8.108` |
-| **Service Worker** | **1.8.108** | `sw.js` · GAS fora do intercept |
+| **Frontend** | **v1.8.111** | https://ribocg-a11y.github.io/movikids/?force=1.8.111 |
+| **Gestão Pessoas** | **v1.8.111** | `gestao-pessoas.html?force=1.8.111` |
+| **Service Worker** | **1.8.111** | `sw.js` · GAS fora do intercept |
 | **Holerite** | **mk-holerite.js** | CNPJ **66.664.255/0001-67** · PDF/imprimir |
-| **Apps Script** | repo **v1.5.128** · Web **v1.5.127** (cadastro) · ping **v1.5.107** | ⏳ Nova versão Web **v1.5.128** pendente |
+| **Apps Script** | repo **v1.5.130** · Web **v1.5.127** · ping repo **v1.5.130** | ⏳ Nova versão Web **v1.5.130** (VA+RH audit) |
 | **Aba FOLHA** | **OK** (I25) | B68 ~5269,96 |
 | **Design System** | **v1.1** | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` (tokens `--mk-widget-*`) |
 
@@ -117,6 +117,20 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 | 7 | **15b.7** banco horas persistido | Agente | 📋 |
 
 Doc: `PLANEJAMENTO_ATUAL_2026-06.md` §8b · `PLANO_PREMIUM_ONEUI_FASES_16_22_2026-06.md` §7
+
+---
+
+## Incidentes — sessão 22/06/2026 (auditoria RH)
+
+| ID | Evento | Fix |
+|----|--------|-----|
+| **I38** | Banner “Pré-visualização ADM” com login PIN colab (`p.preview` fantasma) | FE **v1.8.110–111** |
+| **I39** | VA/salário mês cheio — admissão meio mês / ISO | GAS **v1.5.129–130** · Web pendente |
+| **I40** | Hub benefícios ≠ holerite GAS quinzenal | FE **v1.8.111** `gpBeneficiosResumo_` |
+| **I41** | `ping_` defasado vs repo | GAS **v1.5.130** |
+| **RH-G1–G3** | Holerite/banco/faltas não persistiam | GAS **v1.5.130** snapshot+sync |
+
+**Doc mestre:** `AUDITORIA_RH_FOLHA_PERSISTENCIA_2026-06-22.md` — abas que gravam, lacunas RH-G1–G15.
 
 ---
 

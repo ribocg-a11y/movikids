@@ -1,6 +1,6 @@
 # MOVI KIDS — Índice de documentação
 
-**Atualizado:** 20/06/2026 (FE **v1.8.71** · GAS repo **v1.5.111** · ping **v1.5.107** · I31–I34)
+**Atualizado:** 22/06/2026 (FE **v1.8.110** · GAS repo **v1.5.129** · I38–I41 · auditoria RH)
 
 ## Comece aqui
 
@@ -13,6 +13,7 @@
 | [**DESIGN_SYSTEM_MOVIKIDS.md**](referencia/DESIGN_SYSTEM_MOVIKIDS.md) | **Cartilha UI** — obrigatório antes de criar/alterar telas |
 | [**DESIGN_DNA_MOVIKIDS.md**](referencia/DESIGN_DNA_MOVIKIDS.md) | Princípios visuais e missão de produto |
 | [prototipos/README.md](prototipos/README.md) | Mockups RH — URLs canônicas vs produção |
+| [**AUDITORIA_RH_FOLHA_PERSISTENCIA_2026-06-22.md**](ativos/AUDITORIA_RH_FOLHA_PERSISTENCIA_2026-06-22.md) | **Matriz RH** — abas, cálculos, lacunas RH-G1–G15 |
 | [**PLANO_FASES_6_15_COCKPIT_EXECUTIVO_2026-06.md**](ativos/PLANO_FASES_6_15_COCKPIT_EXECUTIVO_2026-06.md) | **Ciclo ativo FASE 6–15** — benchmark, entregas, impacto visual por página |
 | [**PLANEJAMENTO_ATUAL_2026-06.md**](ativos/PLANEJAMENTO_ATUAL_2026-06.md) | Resumo operação + tabela fases 6–15 |
 | [PLANO_PRIORIDADES_2026-06.md](ativos/PLANO_PRIORIDADES_2026-06.md) | Fases 0–15 + execução |

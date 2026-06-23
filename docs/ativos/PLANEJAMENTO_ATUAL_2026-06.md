@@ -1,7 +1,7 @@
 # MOVI KIDS — Planejamento atual (pós-FASE 5)
 
-**Atualizado:** 22/06/2026 · FE **v1.8.108** · GAS repo **v1.5.128** · Web **v1.5.127** (cadastro) · ping **v1.5.107**
-**Produção:** FE **v1.8.108** · GAS repo **v1.5.128** · ping string **v1.5.107** (cosmético) · **Nova versão Web v1.5.128 pendente (sócio)**
+**Atualizado:** 22/06/2026 · FE **v1.8.110** · GAS repo **v1.5.129** · Web **v1.5.127** · ping **v1.5.107**
+**Produção:** FE **v1.8.110** (repo) · GAS repo **v1.5.129** · **Nova versão Web v1.5.129 pendente (sócio)**
 **Documentos irmãos:** `PLANO_PRIORIDADES_2026-06.md` · `MAPA_FASES.md` · `DEPLOY_ATUAL.md` · `HANDOFF_NOVO_CHAT.md`  
 **Ciclo ativo:** **`PLANO_FASES_6_15_COCKPIT_EXECUTIVO_2026-06.md`** · FASE 15: **`FASE_15_GESTAO_PESSOAS.md`** ✅  
 **Próximo ciclo:** **`PLANO_PREMIUM_ONEUI_FASES_16_22_2026-06.md`** ← manual Premium + One UI (20/06/2026)
@@ -95,6 +95,20 @@ Legenda: **P0** bloqueia operação · **P1** valor imediato · **P2** próximo 
 | **I35** PWA intercepta GAS | SW não intercepta `script.google.com` — FE **v1.8.104+** | Dev |
 | **I36** `salvarCadastro` getRange | GAS **v1.5.127** — Raykelly 100% planilha | ✅ |
 | **I37** Colaboradores Safari sem stale-sync | `gestao-pessoas.html` + `mk-gp-boot.js` — **v1.8.105** | Dev |
+| **I38** Banner preview com PIN colab | FE **v1.8.110** — `p.preview` fantasma | ✅ repo |
+| **I39** VA proporcional admissão | GAS **v1.5.129** · Web pendente | ⏳ |
+| **I40** Hub benefícios ≠ holerite GAS | `gpBeneficiosResumo_` usa calc mensal | Aberto |
+
+### P1 — RH / folha (auditoria 22/06)
+
+| Item | Descrição | Doc |
+|------|-----------|-----|
+| **RH-G1** | Aba `HOLERITES` nunca gravada — arquivo mensal ausente | `AUDITORIA_RH_FOLHA_*` |
+| **RH-G2** | `BANCO_HORAS` não atualizado após jornada | FASE 15b.7 |
+| **RH-G3** | `FALTAS_AUSENCIAS` sem API — desconto falta não no holerite | backlog |
+| **I40** | Hub chips VA/VT alinhar com `pg.holerite` | FE fix |
+| **Deploy** | Nova versão Web GAS **v1.5.129** | sócio |
+| **Push** | FE **v1.8.110** Pages | dev |
 
 ### P1 — Operação contínua (sem feature nova)
 

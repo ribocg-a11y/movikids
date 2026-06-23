@@ -760,7 +760,7 @@
   }
 
   function gpAdmGasPendingHtml_() {
-    return '<strong>GAS v1.5.100 ainda não publicado.</strong> O layout das abas está certo, mas o servidor está em <strong>v1.5.99</strong> — falta a action <code>painelGestaoPessoasAdmin</code>. ' +
+    return '<strong>GAS desatualizado no Web App.</strong> Publique <strong>Nova versão Web</strong> do deploy <code>AKfycbwakQ...</code> com repo <strong>v1.5.130+</strong> para painel RH completo. ' +
       'No editor Apps Script: Implantar → Editar (lápis) → <strong>Nova versão</strong> (mesmo deploy). ' +
       'Arquivo: <code>MOVIKIDS_Code_v1.5.32...</code> header <strong>v1.5.102</strong>. ' +
       'Enquanto isso, aba <em>Cadastro &amp; sessão</em> funciona; aba <em>Hoje</em> mostra só operadores (modo limitado).';

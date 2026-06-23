@@ -1,28 +1,32 @@
 # FASE 15 — Gestão de Pessoas (produção)
 
-**Atualizado:** 20/06/2026 · GAS **v1.5.111** Web **165** · FE **v1.8.71** · **homolog tablet ✅** · Design System v1.0
+**Atualizado:** 22/06/2026 · GAS **v1.5.129** Web pendente · FE **v1.8.110** · **auditoria RH** 22/06
 
 ## URLs
 
 | Página | URL |
 |--------|-----|
-| **Produção colaboradores** | https://ribocg-a11y.github.io/movikids/gestao-pessoas.html?force=1.8.71 |
+| **Produção colaboradores** | https://ribocg-a11y.github.io/movikids/gestao-pessoas.html?force=1.8.110 |
 | Hub tablet → Colaboradores | `index.html` `#mk-hub-colab` |
 | Mockup (só protótipo) | https://ribocg-a11y.github.io/movikids/ponto-mockup.html?v=3.6 |
 
 **Auth colaboradores:** cópia literal `#mk-auth-gate` → `#gp-auth-gate` (I29 · Design System §6.1)
 
-## Abas planilha (7)
+## Abas planilha (9 GP + memorial)
 
-| Aba | Função |
-|-----|--------|
-| `COLABORADORES_RH` | Cadastro RH + salário/VA/meta |
-| `FOLHA_PONTO` | Entrada/saída |
-| `ESCALA_COLABORADORES` | Turnos por competência |
-| `FALTAS_AUSENCIAS` | Faltas e descontos |
-| `HOLERITES` | Snapshots mensais |
-| `METAS_COLABORADORES` | Meta loc/dia + bônus |
-| `BANCO_HORAS` | Saldo acumulado |
+| Aba | Grava runtime? | Função |
+|-----|----------------|--------|
+| `COLABORADORES_RH` | **Sim** (cadastro) | Cadastro RH + salário/VA/meta (seed) |
+| `FOLHA_PONTO` | **Sim** | Entrada/saída |
+| `ESCALA_COLABORADORES` | Parcial (seed) | Turnos por competência |
+| `COMUNICADOS_RH` | **Sim** (admin) | Comunicados |
+| `AVALIACOES_RH` | **Sim** (admin) | Avaliações |
+| `FALTAS_AUSENCIAS` | **Não** | Schema vazio — backlog |
+| `HOLERITES` | **Não** | Schema vazio — holerite só API |
+| `METAS_COLABORADORES` | **Não** (seed) | Metas vivas = AUDITORIA |
+| `BANCO_HORAS` | **Não** (seed) | Saldo não atualizado |
+
+**Matriz completa:** `AUDITORIA_RH_FOLHA_PERSISTENCIA_2026-06-22.md`
 
 ## Instalar abas
 
@@ -55,6 +59,7 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 
 ## Incidentes
 
-- **I29** — UI fora DNA → v1.8.49 + `DESIGN_SYSTEM_MOVIKIDS.md`
-- **I30** — abas parciais → v1.5.99 getRange fix
-- **I31–I34** — CONFIG Pelúcia, loc duplicada, PWA boot, holerite — ver `MAPA_ERROS_FALHAS_BUGS.md`
+- **I38** — banner preview com PIN colab → v1.8.110
+- **I39** — VA proporcional admissão → v1.5.129
+- **I40** — hub benefícios vs holerite GAS
+- **I31–I37** — ver `MAPA_ERROS_FALHAS_BUGS.md`

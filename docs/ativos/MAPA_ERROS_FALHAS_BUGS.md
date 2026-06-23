@@ -1,6 +1,7 @@
 # MOVI KIDS — Mapa de erros, falhas e bugs
 
-**Atualizado:** 20/06/2026 — **I31–I34** sessão operação 20/06 · GAS repo **v1.5.111** (ping **v1.5.107**) · FE **v1.8.71**  
+**Atualizado:** 22/06/2026 — **I38–I41** auditoria RH 22/06 · GAS repo **v1.5.129** (ping **v1.5.107**) · FE **v1.8.110**  
+**Uso anterior:** 20/06/2026 — **I31–I34** sessão operação 20/06 · GAS repo **v1.5.111** (ping **v1.5.107**) · FE **v1.8.71**  
 **Uso anterior:** 17/06/2026 — **I28** liberar sessão tablet · GAS **v1.5.92** prod. · FE **v1.8.30**  
 **Uso anterior:** 09/06/2026 — **I22 fechado** (hotfix FE v1.8.2)  
 **Uso:** consultar **antes de publicar** e **ao montar checklist de teste**. Cada linha tem trava e script de verificação quando existir.
@@ -43,6 +44,13 @@
 | **I32** | **Nova locação `sessions.push` + SMS legado no Fechar** | Loc duplicada; fluxo SMS vs qr_only | FE **v1.8.68+** upsert + `_novaSavingInFlight` | `guard.nova.sms.sem.autoStart`; qr_only | tablet 1 loc · sem SMS Fechar |
 | **I33** | **PWA cache stale + `carregarInicio` ~6s** | Tablet lento / não abre | Force update FE; limpar site data tablet | I3 versões; `verify-publish-complete` | `?force=1.8.71` · boot tablet |
 | **I34** | **Holerite UX + CNPJ placeholder** | Doc RH abaixo padrão; CNPJ fictício | FE **v1.8.70–71** `mk-holerite.js` + CNPJ real | Design System § holerite | PDF holerite · CNPJ 66.664.255/0001-67 |
+| **I35** | **PWA SW intercepta GAS** (`FetchEvent respondWith null`) | iPhone/Safari falha API | SW não intercepta `script.google.com` · FE **v1.8.104+** | `sw.js` NETWORK_FIRST exclui GAS | tablet iPhone ping + login |
+| **I36** | **`salvarCadastro` getRange numRows** (2 linhas vs 1) | Cadastro RH não grava 100% | GAS **v1.5.127** `getRange(r,4,1,7)` | review getRange cadastro | Raykelly/Milena 100% planilha |
+| **I37** | **`gestao-pessoas.html` sem stale-sync** | Safari cache antigo Colaboradores | `mk-stale-sync` + `mk-gp-boot.js` · **v1.8.105+** | boot GP | Safari `?force=` |
+| **I38** | **`p.preview` fantasma** — banner ADM com PIN colab | UX “somente leitura”; ponto parece bloqueado | FE **v1.8.110–111** — banner só `gpAdmPreviewMode_`; `preview: false` no login | `renderColabHub`; `colabEntrar` | preview admin → sair → login PIN → sem faixa |
+| **I39** | **VA/salário mês cheio** com admissão ISO/meio mês | Raykelly VA ~399 vs ~213 | GAS **v1.5.129–130** proporcional + trava 0 dias | `TESTE_VA_ADMISSAO_PROPORCIONAL_READONLY.ps1` | holerite após Web v1.5.130 |
+| **I40** | **Hub benefícios `calcFolhaPagamento`** ≠ GAS quinzenal | Chips VA/VT divergem do holerite | FE **v1.8.111** — hub usa `pg.holerite` | `gpBeneficiosResumo_` | hub vs tela holerite |
+| **I41** | **`ping_` versão defasada** (v1.5.107 vs repo) | Confusão deploy / verify | GAS **v1.5.130** `ping_()` alinhado | `ping_` header alinhado | ping = v1.5.130 |
 | I2 | GAS offline + timer local | Extra fantasma | ADM `somentePlano`; offline v1.7.6 | `FIX_OFFLINE_ENCERRAR` | tablet encerrar |
 | I3 | Cache `?force=` / **`index.html ?v=` desatualizado** | JS antigo no tablet/admin | `mk-version` + `sw` + **index** alinhados | `pre-push-check` versões | `?force=VERSAO` · ver **11/06** |
 | **I25** | **FOLHA `#NAME?` — `setValue('=SE...')` no GAS** | Aba FOLHA quebrada; Dashboard usa fallback 4926 | GAS **v1.5.91** `folhaFlushFormulasUser_` (USER_ENTERED) + `repairFolhaAdmin` | Nunca `setValue`/`setFormula` PT para fórmulas FOLHA | `TESTE_FOLHA_FORMULAS_READONLY.ps1` · **fechado 14/06** |
@@ -96,6 +104,9 @@
 | `../arquivo/incidentes/INCIDENTE_I32_LOCACAO_DUPLICADA_SMS_2026-06-20.md` | **I32** — loc duplicada + SMS legado |
 | `../arquivo/incidentes/INCIDENTE_I33_PWA_CACHE_BOOT_LENTO_2026-06-20.md` | **I33** — PWA stale + boot lento |
 | `../arquivo/incidentes/INCIDENTE_I34_HOLERITE_APRESENTACAO_2026-06-20.md` | **I34** — holerite UX + CNPJ |
+| `../arquivo/incidentes/INCIDENTE_I38_PREVIEW_BANNER_PIN_COLAB_2026-06-22.md` | **I38** — banner preview com PIN colab |
+| `../arquivo/incidentes/INCIDENTE_I39_VA_ADMISSAO_PROPORCIONAL_2026-06-22.md` | **I39** — VA proporcional admissão |
+| **`AUDITORIA_RH_FOLHA_PERSISTENCIA_2026-06-22.md`** | Matriz abas RH · I40 · lacunas RH-G1–G15 |
 | `TROCA_SMS_GATEWAY_DJVJRL_2026-06-04.md` | Gateway SMS |
 
 ---
@@ -205,15 +216,18 @@
 30. **Nunca** reexpor SMS no Fechar Nova locação enquanto `MK_COMUNICACAO_MODO=qr_only` (I32).
 31. **Sempre** force update FE após hotfix operacional + procedimento tablet `?force=` (I33).
 32. **Nunca** CNPJ/razão fictícios em holerite produção — usar dados reais da empresa (I34).
+33. **Nunca** confiar em `p.preview` no objeto colaborador — modo preview só `gpAdmPreviewMode_` + URL `admPreview=1` (I38).
+34. **Sempre** proporcional admissão em holerite — admissão inválida = 0 dias, nunca mês cheio (I39).
+35. **Hub benefícios** deve usar `pg.holerite` da API, não `calcFolhaPagamento` mensal (I40).
 
 ---
 
-## Versões de referência (20/06/2026)
+## Versões de referência (22/06/2026)
 
 | Camada | Repo / produção | Mínimo operação |
 |--------|-----------------|-----------------|
-| Frontend | **v1.8.71** | `?force=1.8.71` · Gestão Pessoas `gestao-pessoas.html` |
-| GAS | **v1.5.111** (repo) · ping atual **v1.5.107** | Publicar Nova versão Web para alinhar |
+| Frontend | **v1.8.111** (repo) | `?force=1.8.111` · Gestão Pessoas |
+| GAS | **v1.5.130** (repo) · Web pendente | Nova versão Web v1.5.130 |
 | Design System | **`docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md`** | Obrigatório antes de UI |
 | Aba FOLHA | B68 ~5269,96 · `fonte=FOLHA` | `repairFolhaAdmin` após deploy que toque FOLHA |
 

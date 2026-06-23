@@ -99,9 +99,16 @@
       } catch (e) { /* ok */ }
     }
 
+    function gpClearPessoasPreviewFlags_() {
+      Object.keys(PESSOAS).forEach(function (k) {
+        if (PESSOAS[k] && PESSOAS[k].preview) delete PESSOAS[k].preview;
+      });
+    }
+
     function gpClearAdmPreviewSession_() {
       try { sessionStorage.removeItem(GP_ADM_PREVIEW_KEY); } catch (e) { /* ok */ }
       gpAdmPreviewMode_ = false;
+      gpClearPessoasPreviewFlags_();
       gpShowPreviewBanner_(false);
     }
 
@@ -282,7 +289,7 @@
         return;
       }
       MK_GestaoPessoas.loginPainelPreview(uid, gpAdmPreviewPin_).then(function (mapped) {
-        PESSOAS[uid] = Object.assign({}, PESSOAS[uid] || {}, mapped, { preview: true });
+        PESSOAS[uid] = Object.assign({}, mapped, { preview: true });
         colabLogado = String(uid);
         if (errEl) errEl.hidden = true;
         go('s-colab-hub');
@@ -799,7 +806,7 @@
         if (pin.length < 4) { showColabErr('Digite os 4 números do PIN (ex.: 1111).'); return; }
         if (MK_GP_PROD && window.MK_GestaoPessoas) {
           MK_GestaoPessoas.loginPainel(uid, pin).then(function (mapped) {
-            PESSOAS[uid] = Object.assign({}, PESSOAS[uid] || {}, mapped, { pin: pin });
+            gpAssignColab_(uid, mapped, { pin: pin, preview: false });
             gpSessionPin = pin;
             showColabErr('');
             gpAfterColabLogin_(uid);
@@ -836,12 +843,37 @@
       renderHubJornada_(p);
       renderHubBeneficios_(p);
       renderHubComunicados_(p);
-      gpShowPreviewBanner_(gpAdmPreviewMode_ || p.preview);
+      gpShowPreviewBanner_(gpAdmPreviewMode_);
+    }
+
+    function gpAssignColab_(uid, mapped, extra) {
+      var patch = Object.assign({}, mapped, extra || {});
+      if (MK_GP_PROD) {
+        PESSOAS[uid] = patch;
+      } else {
+        PESSOAS[uid] = Object.assign({}, PESSOAS[uid] || {}, patch);
+      }
     }
 
     function gpBeneficiosResumo_(p) {
       const pg = p && p.pagamento;
-      if (!pg || !(Number(pg.base) > 0)) return null;
+      if (!pg) return null;
+      const hol = pg.holerite || p._holerite;
+      if (hol && (hol.vaTotal != null || hol.vtPasses != null || hol.vt != null || hol.base != null)) {
+        const vaDias = hol.vaDias || pg.diasTrabalhados || 0;
+        const vaTotal = hol.vaTotal != null ? hol.vaTotal : 0;
+        return {
+          comp: pg.competencia || hol.competencia || 'este mês',
+          vaTotal: vaTotal,
+          vaDias: vaDias,
+          vaDiario: hol.vaDiario || (vaDias > 0 ? Math.round(vaTotal / vaDias * 100) / 100 : 0),
+          vtPasses: hol.vtPasses || 0,
+          vtDesconto: hol.vt || 0,
+          vaCopart: 0,
+          quinzena: hol.quinzena
+        };
+      }
+      if (!(Number(pg.base) > 0)) return null;
       const calc = calcFolhaPagamento(pg);
       return {
         comp: pg.competencia || 'este mês',
@@ -1037,7 +1069,7 @@
       const escCtx = folga ? 'Sem turno hoje' : ('Turno ' + escala);
       const escVal = folga ? 'Folga' : escala;
       const escTone = folga ? 'off' : 'blue';
-      const showCta = !folga && p.statusHoje !== 'dentro' && ponto.tone === 'warn' && (gpAdmPreviewMode_ || cadastroOk(p));
+      const showCta = !gpAdmPreviewMode_ && !folga && p.statusHoje !== 'dentro' && ponto.tone === 'warn' && cadastroOk(p);
       el.innerHTML =
         gpSecHead_('📅', 'Minha jornada hoje') +
         '<p class="gp-hub-jornada-lead">' + lead + '</p>' +
@@ -1113,11 +1145,15 @@
       }).join('');
       var saveBtn = document.getElementById('gp-cad-save-btn');
       var editBtn = document.getElementById('gp-cad-edit-btn');
-      if (saveBtn) saveBtn.hidden = readOnly;
+      if (saveBtn) saveBtn.hidden = readOnly || gpAdmPreviewMode_;
       if (editBtn) editBtn.hidden = !readOnly || gpAdmPreviewMode_;
     }
 
     function salvarCadastro() {
+      if (gpAdmPreviewMode_) {
+        alert('Pré-visualização ADM — cadastro não pode ser alterado neste modo.');
+        return;
+      }
       const p = PESSOAS[colabLogado];
       CAMPOS.forEach(f => { const el = document.getElementById('cad-' + f.key); if (el) p.cadastro[f.key] = el.value.trim(); });
       if (!cadastroOk(p)) { alert('Preencha todos os campos obrigatórios (*).'); return; }
@@ -1215,7 +1251,7 @@
           flash.hidden = false;
           return MK_GestaoPessoas.loginPainel(colabLogado, gpSessionPin);
         }).then(function (mapped) {
-          PESSOAS[colabLogado] = Object.assign({}, p, mapped, { pin: gpSessionPin });
+          PESSOAS[colabLogado] = Object.assign({}, mapped, { pin: gpSessionPin, preview: false });
           renderPonto();
         }).catch(function (e) {
           flash.textContent = '✗ ' + (e.message || 'Erro ao registrar ponto');
@@ -1574,6 +1610,8 @@ function initGpUi() {
       gpClearAdmPreviewSession_();
     } else if (gpUrlAdmPreview_()) {
       gpArmAdmPreviewSession_();
+    } else if (gpAdmPreviewSessionActive_()) {
+      gpClearAdmPreviewSession_();
     }
     if (gpAdmPreviewSessionActive_()) {
       gpAdmPreviewMode_ = true;

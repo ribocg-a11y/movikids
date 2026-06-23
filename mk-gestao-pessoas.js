@@ -48,7 +48,7 @@
       escala: data.escala || [],
       bancoHoras: data.bancoHoras || '0h00',
       pagamento: {
-        base: pg.base || 1621, bonus: pg.bonus || 0, faltas: pg.faltas || 0, dependentes: pg.dependentes || 0,
+        base: pg.base != null ? pg.base : 1621, bonus: pg.bonus || 0, faltas: pg.faltas || 0, dependentes: pg.dependentes || 0,
         competencia: pg.competencia, pagamentoEm: pg.pagamentoEm, diasTrabalhados: pg.diasTrabalhados,
         diasMes: pg.diasMes, obs: pg.obs,
         beneficios: pg.beneficios || {},
@@ -69,7 +69,9 @@
     },
     loginPainel: function (operadorId, pin) {
       return gpApi('buscarPainelColaborador', { operadorId: operadorId, pin: pin }).then(function (r) {
-        return gpMapPainel(operadorId, r);
+        const mapped = gpMapPainel(operadorId, r);
+        mapped.preview = false;
+        return mapped;
       });
     },
     loginPainelPreview: function (operadorId, adminPin) {
