@@ -512,12 +512,24 @@
     let balcaoPins = [];
     let adminPins = [];
     let colabPins = [];
+    let colabPinBusy_ = false;
 
     function buildPinRow(containerId, onComplete) {
       const el = document.getElementById(containerId);
       if (!el) return [];
       el.innerHTML = '';
       const inputs = [];
+      const PIN_AUTO_MS = 320;
+      function pinReady_() {
+        return inputs.length === 4 && inputs.every(function (x) { return x.value.length === 1; });
+      }
+      function pinSubmit_() {
+        if (!onComplete || el._mkPinSubmitting || !pinReady_()) return;
+        el._mkPinSubmitting = true;
+        Promise.resolve(onComplete()).finally(function () {
+          el._mkPinSubmitting = false;
+        });
+      }
       for (let i = 0; i < 4; i++) {
         const inp = document.createElement('input');
         inp.type = 'tel';
@@ -529,17 +541,21 @@
         inp.setAttribute('autocorrect', 'off');
         inp.setAttribute('autocapitalize', 'off');
         const idx = i;
-        inp.addEventListener('input', () => {
+        inp.addEventListener('input', function () {
           inp.value = inp.value.replace(/\D/g, '').slice(0, 1);
           if (inp.value && idx < 3) inputs[idx + 1].focus();
-          if (inputs.every(x => x.value.length === 1) && onComplete) {
+          if (pinReady_()) {
             clearTimeout(el._pinTimer);
-            el._pinTimer = setTimeout(onComplete, 120);
+            el._pinTimer = setTimeout(pinSubmit_, PIN_AUTO_MS);
           }
         });
-        inp.addEventListener('keydown', e => {
+        inp.addEventListener('keydown', function (e) {
           if (e.key === 'Backspace' && !inp.value && idx > 0) inputs[idx - 1].focus();
-          if (e.key === 'Enter' && onComplete) onComplete();
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            clearTimeout(el._pinTimer);
+            pinSubmit_();
+          }
         });
         el.appendChild(inp);
         inputs.push(inp);
@@ -798,6 +814,7 @@
       document.querySelectorAll('#colab-picks .mock-pick').forEach(function (btn) { btn.classList.remove('sel'); });
     }
     function colabEntrar() {
+      if (colabPinBusy_) return;
       try {
         gpClearAdmPreviewSession_();
         const uid = pickColab || sessionStorage.getItem('mk-mock-colab-uid');
@@ -805,6 +822,7 @@
         const pin = readColabPin();
         if (pin.length < 4) { showColabErr('Digite os 4 números do PIN (ex.: 1111).'); return; }
         if (MK_GP_PROD && window.MK_GestaoPessoas) {
+          colabPinBusy_ = true;
           MK_GestaoPessoas.loginPainel(uid, pin).then(function (mapped) {
             gpAssignColab_(uid, mapped, { pin: pin, preview: false });
             gpSessionPin = pin;
@@ -813,6 +831,8 @@
           }).catch(function (e) {
             showColabErr(e.message || 'PIN incorreto ou erro de conexão.');
             clearPinInputs(colabPins);
+          }).finally(function () {
+            colabPinBusy_ = false;
           });
           return;
         }

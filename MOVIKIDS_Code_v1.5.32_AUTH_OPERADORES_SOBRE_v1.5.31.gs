@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.140
+// MOVI KIDS — Google Apps Script v1.5.141
+// v1.5.141: I47 — gpVerifyPinColaborador alinha strip hash/salt com loginOperador
 // v1.5.140: I46 — faltas no holerite; salvarDadosContratuaisRhAdmin; holerite admin com desconto falta
 // v1.5.139: I45b — salvarCadastroRhAdmin + repararRhPlanilhaAdmin + clasp export/busca + sync pct/datas
 // v1.5.138: I45 — instalarAbas nao apaga dados RH; diagnosticoPlanilhaCompleto; salvarCadastro A1+ cache
@@ -509,9 +510,9 @@ function ping_() {
   const agora = new Date();
   return resp_({
     status:  'online',
-    versao:  'v1.5.140',
+    versao:  'v1.5.141',
     timestamp: fmtData_(agora) + ' ' + fmtHoraLocal_(agora),
-    sistema: 'MOVI KIDS v1.5.140',
+    sistema: 'MOVI KIDS v1.5.141',
     postWriteActions: WRITE_ACTIONS_CRITICAS_
   });
 }
@@ -7268,8 +7269,8 @@ function gpVerifyPinColaborador_(operadorId, pin) {
   if (!found) return { ok: false, err: err_('Operador nao encontrado', 404) };
   const op = operadorObjFromRow_(found.data);
   if (!op.ativo) return { ok: false, err: err_('Colaborador inativo', 403) };
-  const hash = String(found.data[3] || '').trim();
-  const salt = String(found.data[4] || '').trim();
+  const hash = String(found.data[3] || '').trim().replace(/\s/g, '');
+  const salt = String(found.data[4] || '').trim().replace(/\s/g, '');
   if (!hash || !salt) return { ok: false, err: err_('PIN ainda nao definido', 403) };
   const pinNorm = pinDigits_(pin);
   if (!validPinFormat_(pinNorm)) return { ok: false, err: err_('PIN invalido', 400) };

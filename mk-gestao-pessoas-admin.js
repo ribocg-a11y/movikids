@@ -213,7 +213,7 @@
       return '<section class="gp-adm-aside-block gp-adm-aside-block--warn">' +
         '<h4>Cadastro RH</h4><span class="gp-adm-badge warn">' + pct + '% · ' + pendingItems.length + ' pendente(s)</span>' +
         '<div class="gp-adm-cad-progress" role="progressbar" aria-valuenow="' + pct + '"><div class="gp-adm-cad-progress-bar" style="width:' + pct + '%"></div></div>' +
-        '<p class="gp-adm-aside-hint">Complete em <strong>Colaboradores</strong> (PIN) ou use <strong>Restaurar cadastro</strong> abaixo.</p>' +
+        '<p class="gp-adm-aside-hint">Complete em <strong>Colaboradores</strong> no tablet.</p>' +
         '<ul class="gp-adm-cad-pend-list">' + pend + '</ul></section>';
     }
     let pending = 0;
@@ -236,124 +236,6 @@
       '<div class="gp-adm-cad-progress"><div class="gp-adm-cad-progress-bar" style="width:' + pct + '%"></div></div>' +
       '<div class="gp-adm-cad-list">' + rows + '</div></div>';
   }
-
-  function gpAdmRenderFichaForms_(c) {
-    const id = c.id;
-    const cad = c.cadastro || {};
-    const cadFields = gpAdmCadastroLabels_().map(function (f) {
-      const val = esc(cad[f.key] || '');
-      return '<div class="form-group"><label class="form-label" for="gp-adm-cad-' + f.key + '">' + esc(f.label) + '</label>' +
-        '<input id="gp-adm-cad-' + f.key + '" class="form-input" type="text" value="' + val + '" data-key="' + f.key + '"></div>';
-    }).join('');
-    const contrato = '<section class="gp-adm-aside-block" id="gp-adm-contrato-block">' +
-      '<h4>Contrato (planilha)</h4>' +
-      '<div class="form-group"><label class="form-label" for="gp-adm-sal">Salário base</label>' +
-      '<input id="gp-adm-sal" class="form-input" type="number" step="0.01" value="' + esc(c.salarioBase != null ? c.salarioBase : 1621) + '"></div>' +
-      '<div class="form-group"><label class="form-label" for="gp-adm-va">VA diário (ref.)</label>' +
-      '<input id="gp-adm-va" class="form-input" type="number" step="0.01" value="' + esc(c.vaDiario != null ? c.vaDiario : 20) + '"></div>' +
-      '<div class="form-group"><label class="form-label" for="gp-adm-meta">Meta loc/dia</label>' +
-      '<input id="gp-adm-meta" class="form-input" type="number" value="' + esc(c.metaLocDia != null ? c.metaLocDia : 20) + '"></div>' +
-      '<div class="form-group"><label class="form-label" for="gp-adm-bonus">Bônus meta R$</label>' +
-      '<input id="gp-adm-bonus" class="form-input" type="number" value="' + esc(c.bonusMeta != null ? c.bonusMeta : 100) + '"></div>' +
-      '<div class="form-group"><label class="form-label" for="gp-adm-turno">Turno</label>' +
-      '<input id="gp-adm-turno" class="form-input" type="text" value="' + esc(c.turno || '') + '"></div>' +
-      '<button type="button" class="btn btn-secondary gp-adm-btn-block" onclick="mkGpAdmSalvarContrato_(' + id + ')">💾 Gravar contrato na planilha</button>' +
-      '</section>';
-    const restore = '<section class="gp-adm-aside-block gp-adm-aside-block--warn" id="gp-adm-restore-block">' +
-      '<h4>Restaurar cadastro RH</h4>' +
-      '<p class="gp-adm-aside-hint">Grava direto em COLABORADORES_RH (admin). Use após perda de dados ou para completar sem PIN da colaboradora.</p>' +
-      '<div class="gp-adm-cad-restore">' + cadFields + '</div>' +
-      '<button type="button" class="btn btn-primary gp-adm-btn-block" onclick="mkGpAdmSalvarCadastroRh_(' + id + ')">✓ Gravar cadastro na planilha</button>' +
-      '<button type="button" class="btn btn-secondary gp-adm-btn-block" style="margin-top:8px" onclick="mkGpAdmExportCadastroRh_(' + id + ')">📥 Backup JSON desta pessoa</button>' +
-      '</section>';
-    return contrato + restore;
-  }
-
-  window.mkGpAdmSalvarContrato_ = async function (opId) {
-    const sal = (document.getElementById('gp-adm-sal') || {}).value;
-    const va = (document.getElementById('gp-adm-va') || {}).value;
-    const meta = (document.getElementById('gp-adm-meta') || {}).value;
-    const bonus = (document.getElementById('gp-adm-bonus') || {}).value;
-    const turno = (document.getElementById('gp-adm-turno') || {}).value || '';
-    try {
-      const d = await api(Object.assign({
-        action: 'salvarDadosContratuaisRhAdmin',
-        operadorId: opId,
-        salarioBase: sal,
-        vaDiario: va,
-        metaLocDia: meta,
-        bonusMeta: bonus,
-        turno: turno
-      }, gpAdmPinParams_()), 30000);
-      if (!d.ok) {
-        if (typeof toast === 'function') toast(d.erro || 'Erro ao gravar', 'error');
-        return;
-      }
-      if (typeof toast === 'function') toast('Contrato gravado na planilha', 'success');
-      if (typeof sessionStorage !== 'undefined') {
-        try { sessionStorage.removeItem(gpAdmCacheKey_()); } catch (e) { /* ignore */ }
-      }
-      await window.mkGpAdmLoad_({ force: true });
-      window.mkGpAdmVerFicha(opId, 'cadastro');
-    } catch (e) {
-      if (typeof toast === 'function') toast((e && e.message) || 'Erro de conexão', 'error');
-    }
-  };
-
-  window.mkGpAdmSalvarCadastroRh_ = async function (opId) {
-    const payload = { operadorId: opId, salvarParcial: 'sim' };
-    gpAdmCadastroLabels_().forEach(function (f) {
-      const el = document.getElementById('gp-adm-cad-' + f.key);
-      if (el) payload[f.key] = el.value || '';
-    });
-    try {
-      const d = await api(Object.assign({ action: 'salvarCadastroRhAdmin' }, gpAdmPinParams_(), payload), 45000);
-      if (!d.ok) {
-        if (typeof toast === 'function') toast(d.erro || 'Erro ao gravar cadastro', 'error');
-        return;
-      }
-      if (typeof toast === 'function') toast('Cadastro RH gravado (' + (d.cadastroPct || 0) + '%)', 'success');
-      if (typeof sessionStorage !== 'undefined') {
-        try { sessionStorage.removeItem(gpAdmCacheKey_()); } catch (e) { /* ignore */ }
-      }
-      await window.mkGpAdmLoad_({ force: true });
-      window.mkGpAdmVerFicha(opId, 'cadastro');
-    } catch (e) {
-      if (typeof toast === 'function') toast((e && e.message) || 'Erro de conexão', 'error');
-    }
-  };
-
-  window.mkGpAdmExportCadastroRh_ = async function (opId) {
-    try {
-      const d = await api(Object.assign({ action: 'exportarCadastroRhAdmin', operadorId: opId }, gpAdmPinParams_()), 30000);
-      if (!d.ok) {
-        if (typeof toast === 'function') toast(d.erro || 'Export falhou', 'error');
-        return;
-      }
-      const blob = new Blob([JSON.stringify(d, null, 2)], { type: 'application/json' });
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = 'cadastro-rh-id' + opId + '-' + (new Date().toISOString().slice(0, 10)) + '.json';
-      a.click();
-      if (typeof toast === 'function') toast('Backup baixado', 'success');
-    } catch (e) {
-      if (typeof toast === 'function') toast((e && e.message) || 'Erro de conexão', 'error');
-    }
-  };
-
-  window.mkGpAdmRepararPlanilhaRh_ = async function () {
-    try {
-      const d = await api(Object.assign({ action: 'repararRhPlanilhaAdmin', repairBanco: 'sim' }, gpAdmPinParams_()), 120000);
-      if (!d.ok) {
-        if (typeof toast === 'function') toast(d.erro || 'Repair falhou', 'error');
-        return;
-      }
-      if (typeof toast === 'function') toast('Planilha RH reparada', 'success');
-      await window.mkGpAdmLoad_({ force: true });
-    } catch (e) {
-      if (typeof toast === 'function') toast((e && e.message) || 'Erro de conexão', 'error');
-    }
-  };
 
   function gpAdmRenderFichaBar_() {
     const el = document.getElementById('gp-adm-ficha-badges');
@@ -388,8 +270,7 @@
       '<div><span>Meta / loc</span><span class="gp-adm-soft-val">' + (m.alvo || 20) + ' · ' + (m.atual || 0) + '</span></div>' +
       '<div><span>Ponto RH hoje</span><span class="gp-adm-soft-val">' + pontoTxt + '</span></div>' +
       '</div>' +
-      gpAdmRenderCadastroPane_(c, true) +
-      gpAdmRenderFichaForms_(c);
+      gpAdmRenderCadastroPane_(c, true);
   }
 
   function gpAdmRenderPresenca_() {
@@ -433,7 +314,6 @@
       el.innerHTML = '<p class="gp-adm-muted">Selecione um colaborador.</p>';
       return;
     }
-    const readOnlyNote = '<div class="gp-adm-gov-banner gp-adm-gov-banner--inline">Jornada abaixo é <strong>somente leitura</strong>. Ponto RH grava em <em>Colaboradores → Meu ponto</em> com PIN da colaboradora.</div>';
     const intelRows = gpAdmIntelForOp_(c.id);
     const intelBlock = intelRows.length
       ? '<div class="gp-adm-main-alert">' + intelRows.map(function (a) {
@@ -442,7 +322,7 @@
       : '';
     const j = c.jornada;
     if (!j || !j.dias || !j.dias.length) {
-      el.innerHTML = intelBlock + readOnlyNote +
+      el.innerHTML = intelBlock +
         '<div class="gp-adm-card"><p class="gp-adm-muted">Sem dias na competência (confira escala RH e admissão).</p></div>';
       return;
     }
@@ -478,7 +358,7 @@
         '<td class="gp-jorn-atraso">' + esc(r.atraso || '—') + '</td>' +
         '<td>' + gpAdmJornSitBadge_(r.sit) + '</td></tr>';
     }).join('');
-    el.innerHTML = intelBlock + readOnlyNote + resumo +
+    el.innerHTML = intelBlock + resumo +
       '<div class="gp-adm-jorn-table-wrap">' +
       '<table class="gp-adm-table gp-jorn-table">' +
       '<thead><tr><th style="text-align:left">Data</th><th>Dia</th><th>Escala</th><th>Entrada</th><th>Saída</th><th>Previsto</th><th>Trabalhado</th><th>Extras</th><th>Atraso</th><th>Sit.</th></tr></thead>' +

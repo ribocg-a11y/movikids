@@ -606,25 +606,43 @@
     if (!c) return [];
     c.innerHTML = '';
     const inputs = [];
+    const PIN_AUTO_MS = 320;
+    function pinReady_() {
+      return inputs.length === count && inputs.every(function (x) { return x.value.length === 1; });
+    }
+    function pinSubmit_() {
+      if (!onComplete || c._mkPinSubmitting || !pinReady_()) return;
+      c._mkPinSubmitting = true;
+      Promise.resolve(onComplete()).finally(function () {
+        c._mkPinSubmitting = false;
+      });
+    }
     for (let i = 0; i < count; i++) {
       const inp = document.createElement('input');
-      inp.type = 'password';
+      inp.type = 'tel';
       inp.inputMode = 'numeric';
+      inp.pattern = '[0-9]*';
       inp.maxLength = 1;
       inp.className = 'mk-pin-box';
       inp.autocomplete = 'off';
+      inp.setAttribute('autocorrect', 'off');
+      inp.setAttribute('autocapitalize', 'off');
       const idx = i;
-      inp.addEventListener('input', () => {
+      inp.addEventListener('input', function () {
         inp.value = inp.value.replace(/\D/g, '').slice(0, 1);
         if (inp.value && idx < count - 1) inputs[idx + 1].focus();
-        if (onComplete && inputs.every(x => x.value.length === 1)) {
+        if (pinReady_()) {
           clearTimeout(c._mkPinTimer);
-          c._mkPinTimer = setTimeout(() => onComplete(), 150);
+          c._mkPinTimer = setTimeout(pinSubmit_, PIN_AUTO_MS);
         }
       });
-      inp.addEventListener('keydown', e => {
+      inp.addEventListener('keydown', function (e) {
         if (e.key === 'Backspace' && !inp.value && idx > 0) inputs[idx - 1].focus();
-        if (e.key === 'Enter' && onComplete) onComplete();
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          clearTimeout(c._mkPinTimer);
+          pinSubmit_();
+        }
       });
       c.appendChild(inp);
       inputs.push(inp);
@@ -776,12 +794,14 @@
   }
 
   async function onSavePin() {
+    if (_authBusy) return;
     const pin = readPins(createPins1);
     const pin2 = readPins(createPins2);
     if (pin.length !== 4 || pin2.length !== 4) {
       showErr('mk-create-err', 'Digite 4 numeros em ambos os campos');
       return;
     }
+    _authBusy = true;
     try {
       const d = await apiCall({
         action: 'definirPinOperador',
@@ -805,10 +825,13 @@
       await finishLogin_(d.operador, d.role || 'operador', d);
     } catch (e) {
       showErr('mk-create-err', e.message || 'Sem conexão');
+    } finally {
+      _authBusy = false;
     }
   }
 
   async function onLoginPin() {
+    if (_authBusy) return;
     if (!selectedOp) {
       showErr('mk-login-pin-err', 'Selecione o operador novamente.');
       showStep('mk-step-select');
@@ -822,6 +845,7 @@
     const btn = document.getElementById('mk-btn-do-login');
     if (btn) { btn.disabled = true; btn.textContent = 'Entrando...'; }
     showErr('mk-login-pin-err', '');
+    _authBusy = true;
     try {
       const d = await apiCall({ action: 'loginOperador', operadorId: selectedOp.id, pin });
       if (!d.ok) {
@@ -845,6 +869,7 @@
       showErr('mk-login-pin-err', e.message || 'Sem conexão');
       clearPins(loginPins);
     } finally {
+      _authBusy = false;
       if (btn) { btn.disabled = false; btn.textContent = 'Entrar'; }
     }
   }
