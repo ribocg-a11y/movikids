@@ -2758,7 +2758,12 @@ function renderCaixaFromResumo_(dataFmt, r) {
     setKpi('cx-cus',   totalCus, '#A32D2D');
     setHero('cx-res', resultado, null);
     setKpi('cx-ext', totalExt, '#6A1B9A');
-    const nloc = document.getElementById('cx-nloc'); if(nloc) nloc.textContent = locacoes.length;
+    const nloc = document.getElementById('cx-nloc');
+    if (nloc) {
+      const nContas = Number(r.n) || locacoes.length;
+      const nSess = Number(r.nSessoes) || locacoes.length;
+      nloc.textContent = nContas + (nSess > nContas ? ' (' + nSess + ' sessões)' : '');
+    }
     const cxExtIns = document.getElementById('cx-ext-insight');
     if (cxExtIns) {
       if (totalExt > 0) {
@@ -2788,7 +2793,7 @@ function renderCaixaFromResumo_(dataFmt, r) {
     const ld = r.leadingDia;
     if (cxBe && ld && ld.breakEvenLocacoesDia != null) {
       cxBe.style.display = 'block';
-      const nLoc = locacoes.length;
+      const nLoc = Number(r.n) || locacoes.length;
       const falta = ld.faltamBreakEven != null ? ld.faltamBreakEven : Math.max(0, ld.breakEvenLocacoesDia - nLoc);
       cxBe.textContent = falta > 0
         ? ('Meta break-even do mês: ' + ld.breakEvenLocacoesDia + ' loc/dia · faltam ' + falta + ' hoje (' + nLoc + ' feitas)')

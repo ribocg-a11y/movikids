@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.130
+// MOVI KIDS — Google Apps Script v1.5.131
+// v1.5.131: conta do dia — mesmo telefone 10h-22h = 1 locação caixa; maquininha normalizada; col S conta_id
 // v1.5.130: RH audit — ping alinhado; VA/VT FOLHA; banco+holerite persist; meta RH cols; gpVaMensal va_diario
 // v1.5.129: trava VA/salario proporcional admissao — parseDataStr ISO + gpNormAdmissaoStr_ + repair planilha
 // v1.5.128: FASE 15b.5b — AVALIACOES_RH + salvar/listar admin + painel colaborador
@@ -492,9 +493,9 @@ function ping_() {
   const agora = new Date();
   return resp_({
     status:  'online',
-    versao:  'v1.5.130',
+    versao:  'v1.5.131',
     timestamp: fmtData_(agora) + ' ' + fmtHoraLocal_(agora),
-    sistema: 'MOVI KIDS v1.5.130',
+    sistema: 'MOVI KIDS v1.5.131',
     postWriteActions: WRITE_ACTIONS_CRITICAS_
   });
 }
@@ -596,6 +597,155 @@ function validarSchema_() {
   });
 }
 
+// ── CONTA DO DIA (telefone + janela 10h–22h) ─────────────────
+/** Col S (19) — id da locação-mestre para faturamento/caixa (várias sessões = 1 conta). */
+const COL_CONTA_ID_ = 19;
+const JANELA_OP_INI_MIN_ = 10 * 60;
+const JANELA_OP_FIM_MIN_ = 22 * 60;
+
+function normalizarPagamento_(p) {
+  const s = String(p || '').trim();
+  if (!s) return '';
+  const n = s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+  if (n === 'pix') return 'PIX';
+  if (n === 'credito') return 'Crédito';
+  if (n === 'debito') return 'Débito';
+  if (n === 'dinheiro') return 'Dinheiro';
+  if (s === 'Crédito' || s === 'Débito') return s;
+  return s;
+}
+
+function horaStrParaMinutos_(horaStr) {
+  const m = String(horaStr || '').trim().match(/(\d{1,2}):(\d{2})/);
+  if (!m) return null;
+  return parseInt(m[1], 10) * 60 + parseInt(m[2], 10);
+}
+
+function naJanelaOperacionalMin_(minutos) {
+  if (minutos == null || isNaN(minutos)) return false;
+  return minutos >= JANELA_OP_INI_MIN_ && minutos < JANELA_OP_FIM_MIN_;
+}
+
+function telefonesLocMatch_(a, b) {
+  const ka = telPortalKeys_(a);
+  const kb = telPortalKeys_(b);
+  for (let i = 0; i < ka.length; i++) {
+    for (let j = 0; j < kb.length; j++) {
+      if (ka[i] && ka[i] === kb[j]) return true;
+    }
+  }
+  return false;
+}
+
+function contaIdLocRow_(row) {
+  const raw = row[18];
+  const id = Number(row[0]) || 0;
+  const cid = Number(raw) || 0;
+  return cid > 0 ? cid : id;
+}
+
+/** Locação-mestre do mesmo telefone no dia (janela 10h–22h). */
+function findContaMestreParaNovaLoc_(telefone, dataFmt, agora) {
+  const tel = normTel_(telefone);
+  if (!tel || tel.length < 8) return null;
+  const agoraMin = agora.getHours() * 60 + agora.getMinutes();
+  if (!naJanelaOperacionalMin_(agoraMin)) return null;
+
+  const sh = sh_(SH_LOC);
+  const last = sh.getLastRow();
+  if (last < DATA_ROW) return null;
+
+  const dados = sh.getRange(DATA_ROW, 1, last - DATA_ROW + 1, COL_CONTA_ID_).getValues();
+  let bestId = null;
+  let bestPag = '';
+
+  for (let i = 0; i < dados.length; i++) {
+    const r = dados[i];
+    if (!r[0]) continue;
+    if (cellToStr_(r[1]) !== dataFmt) continue;
+    const status = String(r[14] || '').trim();
+    if (status === 'Cancelada') continue;
+    if (!telefonesLocMatch_(telefone, r[13])) continue;
+
+    const hi = cellToStr_(r[2]);
+    let rowMin = horaStrParaMinutos_(hi);
+    if (rowMin == null && (status === 'Pendente' || status === 'Ativa')) {
+      rowMin = agoraMin;
+    }
+    if (!naJanelaOperacionalMin_(rowMin)) continue;
+
+    const masterId = contaIdLocRow_(r);
+    if (!bestId || masterId < bestId) {
+      bestId = masterId;
+      bestPag = normalizarPagamento_(r[16]);
+    }
+  }
+  if (!bestId) return null;
+  return { masterId: bestId, pagamento: bestPag };
+}
+
+function contaKeyLocObj_(l) {
+  return Number(l.contaId) || Number(l.id) || 0;
+}
+
+/** Agrupa encerradas para caixa: n = contas, fat = soma sessões, pagamento por conta-mestre. */
+function agregarCaixaPorConta_(enc) {
+  const groups = {};
+  enc.forEach(function (l) {
+    const k = String(contaKeyLocObj_(l));
+    if (!groups[k]) groups[k] = [];
+    groups[k].push(l);
+  });
+  const porPagamento = {};
+  let fat = 0;
+  let totalExt = 0;
+  let nExt = 0;
+  Object.keys(groups).forEach(function (k) {
+    const items = groups[k];
+    const master = items.find(function (i) { return Number(i.id) === Number(k); }) || items[0];
+    const pag = normalizarPagamento_(master.pagamento) || 'Não informado';
+    let sumVal = 0;
+    let sumExt = 0;
+    items.forEach(function (i) {
+      sumVal += Number(i.valorTotal) || 0;
+      sumExt += Number(i.valorAdicional) || 0;
+      if (Number(i.valorAdicional) > 0) nExt++;
+    });
+    fat += sumVal;
+    totalExt += sumExt;
+    porPagamento[pag] = (porPagamento[pag] || 0) + sumVal;
+  });
+  const cred = (porPagamento['Crédito'] || 0);
+  const deb = (porPagamento['Débito'] || 0);
+  return {
+    n: Object.keys(groups).length,
+    nSessoes: enc.length,
+    fat: Math.round(fat * 100) / 100,
+    totalExt: Math.round(totalExt * 100) / 100,
+    nExt: nExt,
+    porPagamento: porPagamento,
+    totalMaq: Math.round(((porPagamento['PIX'] || 0) + cred + deb) * 100) / 100,
+    totalDin: Math.round((porPagamento['Dinheiro'] || 0) * 100) / 100
+  };
+}
+
+function syncPagamentoContaMestre_(rowIndex, row) {
+  const contaId = contaIdLocRow_(row);
+  const selfId = Number(row[0]) || 0;
+  if (!contaId || contaId === selfId) return;
+  const sh = sh_(SH_LOC);
+  const last = sh.getLastRow();
+  if (last < DATA_ROW) return;
+  const dados = sh.getRange(DATA_ROW, 1, last - DATA_ROW + 1, COL_CONTA_ID_).getValues();
+  for (let i = 0; i < dados.length; i++) {
+    if (Number(dados[i][0]) === contaId) {
+      const pag = normalizarPagamento_(dados[i][16]);
+      if (pag) sh.getRange(rowIndex, 17).setValue(pag);
+      return;
+    }
+  }
+}
+
 // ── SALVAR LOCAÇÃO ────────────────────────────────────────────
 // Cols: A=id B=data C=horaIni D=horaFim E=tipo F=plano G=mins
 //       H=valorPlano I=minAdic J=valAdic K=valTotal L=resp M=crianca
@@ -611,7 +761,7 @@ function salvarLocacao_(p) {
   const crianca     = (p.crianca     || '').trim();
   const telefone    = (p.telefone    || '').trim();
   const veiculo     = (p.veiculo     || '').trim();
-  const pagamento   = (p.pagamento   || '').trim();
+  const pagamento   = normalizarPagamento_((p.pagamento   || '').trim());
   const observacao  = (p.observacao  || '').trim();
 
   if (!tipo || !plano || !responsavel || !crianca) {
@@ -654,6 +804,15 @@ function salvarLocacao_(p) {
 
   sheet.appendRow(row);
   const newRow = sheet.getLastRow();
+  let contaId = id;
+  let pagFinal = pagamento;
+  const mestre = findContaMestreParaNovaLoc_(telefone, fmtData_(agora), agora);
+  if (mestre && mestre.masterId) {
+    contaId = mestre.masterId;
+    if (mestre.pagamento) pagFinal = mestre.pagamento;
+  }
+  sheet.getRange(newRow, COL_CONTA_ID_).setValue(contaId);
+  if (pagFinal) sheet.getRange(newRow, 17).setValue(pagFinal);
   sheet.getRange(newRow, 25).setValue(0);
   try { CacheService.getScriptCache().remove('carregarInicio_v2'); } catch(e) {}
   // Firebase: notificar todos os dispositivos da nova sessão
@@ -670,8 +829,10 @@ function salvarLocacao_(p) {
     tipo,
     plano,
     veiculo,
-    pagamento,
+    pagamento:       pagFinal,
     observacao,
+    contaId:         contaId,
+    mesmaConta:      mestre && mestre.masterId && mestre.masterId !== id,
     mins:            config.mins,
     valorPlano:      config.valor,
     adicionalPorMin: config.adicional,
@@ -848,7 +1009,8 @@ function locacaoObj_(row, rowIndex) {
     tipo: String(row[4] || ''), plano: String(row[5] || ''), mins: Number(row[6] || 0), valorPlano: Number(row[7] || 0),
     minAdicionais: Number(row[8] || 0), valorAdicional: Number(row[9] || 0), valorTotal: Number(row[10] || 0),
     responsavel: String(row[11] || ''), crianca: String(row[12] || ''), telefone: String(row[13] || ''),
-    status: status, veiculo: String(row[15] || ''), pagamento: String(row[16] || ''), observacao: String(row[17] || ''),
+    status: status, veiculo: String(row[15] || ''), pagamento: normalizarPagamento_(row[16] || ''), observacao: String(row[17] || ''),
+    contaId: contaIdLocRow_(row),
     startTimestamp: ts, started: status === 'Ativa' && ts > 0, extendedMins: Number(row[25] || 0), extendedValor: Number(row[26] || 0)
   };
 }
@@ -871,7 +1033,7 @@ function editarLocacao_(p) {
     if (p.crianca !== undefined) sheet.getRange(rowIndex, 13).setValue(String(p.crianca || '').trim());
     if (p.telefone !== undefined) sheet.getRange(rowIndex, 14).setValue(String(p.telefone || '').replace(/\D/g,''));
     if (p.veiculo !== undefined) sheet.getRange(rowIndex, 16).setValue(String(p.veiculo || '').trim());
-    if (p.pagamento !== undefined) sheet.getRange(rowIndex, 17).setValue(String(p.pagamento || '').trim());
+    if (p.pagamento !== undefined) sheet.getRange(rowIndex, 17).setValue(normalizarPagamento_(p.pagamento));
     if (p.observacao !== undefined) sheet.getRange(rowIndex, 18).setValue(String(p.observacao || '').trim());
     if (p.plano !== undefined) {
       if (started) return err_('Plano so pode ser alterado antes de iniciar. Use extensao.', 409);
@@ -970,6 +1132,8 @@ function encerrarLocacao_(p) {
   const minAdicionais  = Math.max(0, minUsados - minContratados);
   const valorAdicional = Math.round(minAdicionais * adicionalPorMin * 100) / 100;
   const valorTotal     = Math.round((valorPlano + valorAdicional) * 100) / 100;
+
+  syncPagamentoContaMestre_(rowIndex, row);
 
   const agora   = new Date();
   const horaFim = fmtHoraLocal_(agora);
@@ -1213,6 +1377,7 @@ function calcResumoDiaCore_(dataFmt) {
   const empty = {
     data: dataAlvo,
     n: 0,
+    nSessoes: 0,
     fat: 0,
     totalExt: 0,
     nExt: 0,
@@ -1232,7 +1397,7 @@ function calcResumoDiaCore_(dataFmt) {
   const shLoc = sh_(SH_LOC);
   const lastLoc = shLoc.getLastRow();
   if (lastLoc >= DATA_ROW) {
-    const dados = shLoc.getRange(DATA_ROW, 1, lastLoc - DATA_ROW + 1, 17).getValues();
+    const dados = shLoc.getRange(DATA_ROW, 1, lastLoc - DATA_ROW + 1, COL_CONTA_ID_).getValues();
     for (let i = 0; i < dados.length; i++) {
       const r = dados[i];
       if (!r[0]) continue;
@@ -1243,6 +1408,7 @@ function calcResumoDiaCore_(dataFmt) {
       enc.push({
         rowIndex:      DATA_ROW + i,
         id:            r[0],
+        contaId:       contaIdLocRow_(r),
         data:          data,
         horaInicio:    cellToStr_(r[2]),
         horaFim:       cellToStr_(r[3]),
@@ -1258,24 +1424,12 @@ function calcResumoDiaCore_(dataFmt) {
         telefone:      String(r[13]),
         status:        status,
         veiculo:       String(r[15] || ''),
-        pagamento:     String(r[16] || '')
+        pagamento:     normalizarPagamento_(r[16] || '')
       });
     }
   }
 
-  const porPagamento = {};
-  let fat = 0, totalExt = 0;
-  enc.forEach(function(l) {
-    const p = l.pagamento || 'Não informado';
-    porPagamento[p] = (porPagamento[p] || 0) + Number(l.valorTotal);
-    fat += Number(l.valorTotal);
-    totalExt += Number(l.valorAdicional) || 0;
-  });
-  const nExt = enc.filter(function(l) { return Number(l.valorAdicional) > 0; }).length;
-  const cred = (porPagamento['Crédito'] || porPagamento['Credito'] || 0);
-  const deb = (porPagamento['Débito'] || porPagamento['Debito'] || 0);
-  const totalMaq = (porPagamento['PIX'] || 0) + cred + deb;
-  const totalDin = porPagamento['Dinheiro'] || 0;
+  const agg = agregarCaixaPorConta_(enc);
 
   const custos = [];
   const shCus = sh_(SH_CUS);
@@ -1311,17 +1465,18 @@ function calcResumoDiaCore_(dataFmt) {
 
   return {
     data: dataAlvo,
-    n: enc.length,
-    fat: Math.round(fat * 100) / 100,
-    totalExt: Math.round(totalExt * 100) / 100,
-    nExt: nExt,
-    porPagamento: porPagamento,
-    totalMaq: Math.round(totalMaq * 100) / 100,
-    totalDin: Math.round(totalDin * 100) / 100,
+    n: agg.n,
+    nSessoes: agg.nSessoes,
+    fat: agg.fat,
+    totalExt: agg.totalExt,
+    nExt: agg.nExt,
+    porPagamento: agg.porPagamento,
+    totalMaq: agg.totalMaq,
+    totalDin: agg.totalDin,
     totalCus: Math.round(totalCus * 100) / 100,
     cusDin: Math.round(cusDin * 100) / 100,
     saldoDin: Math.round((totalDin - cusDin) * 100) / 100,
-    resultado: Math.round((fat - totalCus) * 100) / 100,
+    resultado: Math.round((agg.fat - totalCus) * 100) / 100,
     locacoes: enc,
     custos: custos
   };
@@ -3464,6 +3619,13 @@ function buildKpiMesPayload_(p) {
   let extMes = 0, nComExtra = 0;
   let fatSemana = 0, nSemana = 0, fatSemanaAnt = 0, nSemanaAnt = 0;
   let fatMesAnt = 0, nMesAnt = 0;
+  const contasHoje = {};
+  const contasMes = {};
+  const contasAno = {};
+  const contasMesAnt = {};
+  const contasSemana = {};
+  const contasSemanaAnt = {};
+  const contasPorDia = {};
   const diasComMov = new Set();
   const fatPorDia = {};
   const nPorDia = {};
@@ -3483,7 +3645,7 @@ function buildKpiMesPayload_(p) {
 
   const lastLoc = shLoc.getLastRow();
   if (lastLoc >= DATA_ROW) {
-    const dados = shLoc.getRange(DATA_ROW, 1, lastLoc - DATA_ROW + 1, 27).getValues();
+    const dados = shLoc.getRange(DATA_ROW, 1, lastLoc - DATA_ROW + 1, COL_CONTA_ID_).getValues();
     dados.forEach(r => {
       if (!r[0]) return;
       const status = String(r[14] || '').trim();
@@ -3491,6 +3653,7 @@ function buildKpiMesPayload_(p) {
       const pts   = dataR.split('/');
       if (pts.length < 3) return;
       const mmyyR  = pts[1].padStart(2,'0') + '/' + pts[2];
+      const cKey = String(contaIdLocRow_(r));
 
       if (status === 'Cancelada' && mmyyR === mmyy) {
         nCancelMes++;
@@ -3503,7 +3666,7 @@ function buildKpiMesPayload_(p) {
       const dkOp = pts[0].padStart(2, '0');
       if (!diasOpByMonth[mmyyR]) diasOpByMonth[mmyyR] = {};
       diasOpByMonth[mmyyR][dkOp] = true;
-      if (dataR === dataHoje) { fatHoje += vt; nHoje++; }
+      if (dataR === dataHoje) { fatHoje += vt; contasHoje[cKey] = true; }
 
       const tipo   = String(r[4]);
       const plano  = String(r[5]);
@@ -3512,33 +3675,35 @@ function buildKpiMesPayload_(p) {
       const ext    = Number(r[9]) || 0;
 
       // v1.5.4: mes anterior
-      if (mmyyR === mmyyPrev) { fatMesAnt += vt; nMesAnt++; }
+      if (mmyyR === mmyyPrev) { fatMesAnt += vt; contasMesAnt[cKey + '|' + dataR] = true; }
 
       const anoR = parseInt(pts[2], 10);
       if (anoR === anoAtual) {
         fatAno += vt;
-        nAno++;
+        contasAno[cKey + '|' + dataR] = true;
       }
 
       if (mmyyR === mmyy) {
-        fatMes += vt; nMes++;
+        fatMes += vt;
+        contasMes[cKey + '|' + dataR] = true;
         extMes += ext;
         if (ext > 0) nComExtra++;
         const dk = pts[0].padStart(2,'0');
         diasComMov.add(dk); // v1.5.4: rastreia dias com movimento
         if (ext > 0) extPorDia[dk] = (extPorDia[dk] || 0) + ext;
+        if (!contasPorDia[dk]) contasPorDia[dk] = {};
+        contasPorDia[dk][cKey] = true;
         // v1.5.4: comparativo semanal
         const dParsed = parseDataStr_(dataR);
         if (dParsed) {
-          if (dParsed >= monday)     { fatSemana   += vt; nSemana++; }
-          else if (dParsed >= mondayPrev) { fatSemanaAnt += vt; nSemanaAnt++; }
+          if (dParsed >= monday)     { fatSemana   += vt; contasSemana[cKey + '|' + dataR] = true; }
+          else if (dParsed >= mondayPrev) { fatSemanaAnt += vt; contasSemanaAnt[cKey + '|' + dataR] = true; }
         }
         fatPorDia[dk]      = (fatPorDia[dk]      || 0) + vt;
-        nPorDia[dk]        = (nPorDia[dk]        || 0) + 1;
         fatPorTipo[tipo]   = (fatPorTipo[tipo]    || 0) + vt;
         fatPorPlano[plano] = (fatPorPlano[plano]  || 0) + vt;
         fatPorVeiculo[veiculo]   = (fatPorVeiculo[veiculo]   || 0) + vt;
-        const pag = String(r[16] || 'Não informado');
+        const pag = normalizarPagamento_(r[16] || 'Não informado') || 'Não informado';
         fatPorPagamento[pag]     = (fatPorPagamento[pag]     || 0) + vt;
         horasPico[Math.min(Math.max(hora - 9, 0), 13)] += vt;
         nPorVeiculo[veiculo] = (nPorVeiculo[veiculo] || 0) + 1;
@@ -3548,6 +3713,16 @@ function buildKpiMesPayload_(p) {
         if (tel.length >= 10) telMesCounts[tel] = (telMesCounts[tel] || 0) + 1;
       }
     });
+    nHoje = Object.keys(contasHoje).length;
+    nMes = Object.keys(contasMes).length;
+    nAno = Object.keys(contasAno).length;
+    nMesAnt = Object.keys(contasMesAnt).length;
+    nSemana = Object.keys(contasSemana).length;
+    nSemanaAnt = Object.keys(contasSemanaAnt).length;
+    for (let d = 1; d <= diasMes; d++) {
+      const dk = String(d).padStart(2, '0');
+      nPorDia[dk] = contasPorDia[dk] ? Object.keys(contasPorDia[dk]).length : 0;
+    }
   }
 
   let cusMes = 0;
@@ -3812,10 +3987,11 @@ function carregarInicio_(p) {
 
   const ativas = [];
   const encHoje = [];
+  const encHojeContas = {};
   let fatHoje = 0, nHoje = 0;
 
   if (lastLoc >= DATA_ROW) {
-    const dados = shLoc.getRange(DATA_ROW, 1, lastLoc - DATA_ROW + 1, 26).getValues();
+    const dados = shLoc.getRange(DATA_ROW, 1, lastLoc - DATA_ROW + 1, COL_CONTA_ID_).getValues();
     dados.forEach((r, idx) => {
       if (!r[0]) return;
       const status  = String(r[14]).trim();
@@ -3858,9 +4034,11 @@ function carregarInicio_(p) {
 
       if (status === 'Encerrada' && dataR === dataHoje) {
         fatHoje += Number(r[10]);
-        nHoje++;
+        const cKey = String(contaIdLocRow_(r));
+        encHojeContas[cKey] = true;
         const encObj = {
           id:          r[0],
+          contaId:     contaIdLocRow_(r),
           horaInicio:  cellToStr_(r[2]),
           horaFim:     cellToStr_(r[3]),
           tipo:        String(r[4]),
@@ -3875,6 +4053,7 @@ function carregarInicio_(p) {
         encHoje.push(encObj);
       }
     });
+    nHoje = Object.keys(encHojeContas).length;
   }
 
   const custosHoje = [];
@@ -3891,7 +4070,7 @@ function carregarInicio_(p) {
     });
   }
 
-  const statsHoje = gestao ? { fat: fatHoje, n: nHoje } : { n: nHoje };
+  const statsHoje = gestao ? { fat: fatHoje, n: nHoje, nSessoes: encHoje.length } : { n: nHoje, nSessoes: encHoje.length };
   const custosPayload = gestao ? custosHoje : custosHoje.map(c => ({
     id: c.id, data: c.data, hora: c.hora, descricao: c.descricao, categoria: c.categoria
   }));

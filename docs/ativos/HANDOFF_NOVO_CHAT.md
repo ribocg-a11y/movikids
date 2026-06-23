@@ -1,6 +1,6 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 22/06/2026 · FASE **15b** ~98% · FE **v1.8.111** · GAS repo **v1.5.130** · Web **v1.5.127** · ping repo **v1.5.130**  
+**Atualizado:** 22/06/2026 · FASE **15b** ~98% · FE **v1.8.112** · GAS repo **v1.5.131** · Web pendente · ping repo **v1.5.131**  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **Repo local:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`  
@@ -52,11 +52,11 @@ Mensagem mínima: *"Vamos dar continuidade ao projeto Movi Kids, tem uma pasta n
 
 | Camada | Versão | Verificação |
 |--------|--------|-------------|
-| **Frontend** | **v1.8.111** | https://ribocg-a11y.github.io/movikids/?force=1.8.111 |
-| **Gestão Pessoas** | **v1.8.111** | `gestao-pessoas.html?force=1.8.111` |
-| **Service Worker** | **1.8.111** | `sw.js` · GAS fora do intercept |
+| **Frontend** | **v1.8.112** | https://ribocg-a11y.github.io/movikids/?force=1.8.112 |
+| **Gestão Pessoas** | **v1.8.112** | `gestao-pessoas.html?force=1.8.112` |
+| **Service Worker** | **1.8.112** | `sw.js` · GAS fora do intercept |
 | **Holerite** | **mk-holerite.js** | CNPJ **66.664.255/0001-67** · PDF/imprimir |
-| **Apps Script** | repo **v1.5.130** · Web **v1.5.127** · ping repo **v1.5.130** | ⏳ Nova versão Web **v1.5.130** (VA+RH audit) |
+| **Apps Script** | repo **v1.5.131** · Web pendente | ⏳ Nova versão Web **v1.5.131** (conta do dia + caixa I42) |
 | **Aba FOLHA** | **OK** (I25) | B68 ~5269,96 |
 | **Design System** | **v1.1** | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` (tokens `--mk-widget-*`) |
 

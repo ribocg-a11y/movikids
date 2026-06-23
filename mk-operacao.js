@@ -238,7 +238,7 @@ function renderOperacaoLocacaoForm_(rowIndex, tipo, bodyId) {
   if (!body) return false;
   const ativa = !!opSession.started;
   if (tipo === 'pagamento') {
-    body.innerHTML = `<div class="op-policy">Use quando o responsável pagou em outra forma.</div><div class="op-form"><div class="op-grid"><div class="op-field"><label>Atual</label><input value="${escHtml(opSession.pagamento || 'Não informado')}" disabled></div><div class="op-field"><label>Novo</label><select id="op-pagamento">${['PIX','Credito','Debito','Dinheiro'].map(p=>`<option ${normalizarTxt_(opSession.pagamento)===normalizarTxt_(p)?'selected':''}>${p}</option>`).join('')}</select></div></div><div class="op-field"><label>Motivo</label><textarea id="op-motivo">Responsável alterou a forma de pagamento.</textarea></div></div>`;
+    body.innerHTML = `<div class="op-policy">Use quando o responsável pagou em outra forma.</div><div class="op-form"><div class="op-grid"><div class="op-field"><label>Atual</label><input value="${escHtml(opSession.pagamento || 'Não informado')}" disabled></div><div class="op-field"><label>Novo</label><select id="op-pagamento">${['PIX','Crédito','Débito','Dinheiro'].map(p=>`<option ${normalizarTxt_(opSession.pagamento)===normalizarTxt_(p)?'selected':''}>${p}</option>`).join('')}</select></div></div><div class="op-field"><label>Motivo</label><textarea id="op-motivo">Responsável alterou a forma de pagamento.</textarea></div></div>`;
   } else if (tipo === 'veiculo') {
     const veiculosTroca = (typeof TODOS_VEICULOS_DEF !== 'undefined' && TODOS_VEICULOS_DEF.length)
       ? TODOS_VEICULOS_DEF.map(function(v) { return v.nome; })

@@ -575,13 +575,14 @@ async function confirmarLocacao() {
 
     // Adiciona IMEDIATAMENTE com started=false (aguardando botão Iniciar)
     const rowIdx = rowIndexFromSalvar_(d);
+    const pagResp = d.pagamento || novaState.pagamento;
     upsertSessaoPendenteLocal_({
       rowIndex:        rowIdx,
       id:              d.id,
       tipo:            novaState.tipo,
       plano:           novaState.plano,
       veiculo:         novaState.veiculo,
-      pagamento:       novaState.pagamento,
+      pagamento:       pagResp,
       observacao:      novaState.observacao || '',
       mins:            d.mins            || cfgLocal.m,   // fallback local
       valorPlano:      d.valorPlano      || cfgLocal.v,
@@ -601,7 +602,10 @@ async function confirmarLocacao() {
 
     resetNova();
     showPage('home');
-    toast(`✅ Cadastro salvo! Aperte ▶ para iniciar a contagem.`, 'success');
+    const msgConta = d.mesmaConta
+      ? '✅ Cadastro salvo na mesma conta do responsável (mesmo telefone hoje). Aperte ▶ para iniciar.'
+      : '✅ Cadastro salvo! Aperte ▶ para iniciar a contagem.';
+    toast(msgConta, 'success');
 
     // Invalida cache local para sync imediato em outros dispositivos
     try { localStorage.removeItem('mk_inicio_cache'); } catch(e) {}
