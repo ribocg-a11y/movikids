@@ -1,6 +1,6 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 23/06/2026 (I46) · FE **v1.8.117** · GAS repo **v1.5.140** · ping Web conforme deploy sócio  
+**Atualizado:** 23/06/2026 (pós-deploy I46) · FE **v1.8.117** Pages · GAS Web **@201** (sócio) · ping alinhar **v1.5.140+**  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **Repo local:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`  
@@ -56,9 +56,9 @@ cursor "C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-mo
 | **Frontend** | **v1.8.117** | https://ribocg-a11y.github.io/movikids/?force=1.8.117 | I46 governança RH + admin cadastro/contrato |
 | **Gestão Pessoas** | **v1.8.117** | `gestao-pessoas.html?force=1.8.117` | |
 | **Service Worker** | **1.8.117** | `sw.js` | GAS fora do intercept |
-| **Apps Script** | **v1.5.140** (header `.gs`) | ping conforme Web publicada | **Nova versão Web v1.5.140** (I46 faltas holerite + contrato admin) |
-| **Aba FOLHA** | **OK** (I25) | B68 ~5269,96 | |
-| **Aba BANCO_HORAS** | ⚠️ corrompida I44 | Milena/Raykelly saldos absurdos | zerar manual ou `repairBancoHorasAdmin` após Web v1.5.137 |
+| **Apps Script** | **v1.5.140** (header `.gs`) | ping **v1.5.139→140** após Nova versão | Deploy **@201** · I46 repair OK 23/06 |
+| **Aba BANCO_HORAS** | ✅ repair I44 | Milena/Raykelly **0h00** | `repararRhPlanilhaAdmin` 23/06 |
+| **COLABORADORES_RH** | Milena **100%** · Raykelly **25%** | Backup `backups/rh/cadastro-rh-2026-06-23_1657.json` | Restaurar Raykelly na Ficha admin |
 | **Design System** | **v1.1** | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` | |
 
 **Deploy ID GAS:** `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y`
