@@ -146,7 +146,7 @@ FASE 22  Assistente IA gestão (Anexo — decisão sócio)
 | 15b.5 | **Cadastro RH obrigatório** — gate balcão, Meus dados, ficha ADM, `salvarCadastro` | ✅ **v1.8.97+** · GAS **v1.5.127** |
 | 15b.5b | **Avaliações** — registro simples admin (nota + obs por competência) | ✅ v1.8.107 · GAS repo **v1.5.128** |
 | 15b.6 | **Benefícios visíveis** — VA, VT, copart no hub (não só holerite) | ✅ v1.8.106 |
-| 15b.7 | Persistir **banco de horas** na aba `BANCO_HORAS` ao fechar competência | Novo |
+| 15b.7 | Persistir **banco de horas** na aba `BANCO_HORAS` (colaborador + painel admin) | ✅ GAS **v1.5.134** |
 
 ### Sensação colaborador (manual)
 
@@ -329,17 +329,17 @@ Widget live: % frota em uso agora · overlay gráfico ocupação por horário.
 
 ---
 
-## 15. Sequência imediata (atualizada 22/06/2026)
+## 15. Sequência imediata (atualizada 23/06/2026)
 
 | # | Ação | Responsável | Status |
 |---|------|-------------|--------|
-| 1 | FE **v1.8.108** tipografia RH One UI | Agente | ✅ |
-| 2 | **15b.5b** avaliações + GAS **v1.5.128** repo | Agente | ✅ |
-| 3 | **Nova versão Web GAS v1.5.128** | Sócio | ⏳ |
-| 4 | Raykelly cadastro 25% → 100% | Colaborador | ⏳ |
-| 5 | Homolog tablet F5/F7/F10/F11 + fechar **FASE 16** | Ops loja | ⏳ |
-| 6 | **FASE 17** — alertas pills + perfil Gestor homolog | Agente + Ops | 🟢 **próxima fase** |
-| 7 | **15b.7** banco horas persistido | Agente | 📋 |
+| 1 | **Nova versão Web GAS v1.5.134** (I42 + F17 + 15b.7) | Sócio | ⏳ ping v1.5.131 |
+| 2 | Homolog **I42** Caixa 10h–22h + **Gestor** sem CONFIG | Ops loja | ⏳ |
+| 3 | Raykelly cadastro 25% → 100% | Colaborador | ⏳ |
+| 4 | Homolog tablet F5/F7/F10/F11 | Ops loja | ⏳ |
+| 5 | **FASE 17** fechar (exc. 17.5 F9) | Agente + Ops | 🟡 homolog ⏳ |
+| 6 | **15b.7** banco horas persistido | Agente | ✅ repo v1.5.134 |
+| 7 | **17.4** matriz permissões | Agente | ✅ |
 
 ---
 
@@ -355,13 +355,13 @@ Widget live: % frota em uso agora · overlay gráfico ocupação por horário.
 
 ---
 
-## 18. Progresso Premium One UI (22/06/2026)
+## 18. Progresso Premium One UI (23/06/2026)
 
 | Fase | Peso | % fase | Notas |
 |------|------|--------|-------|
-| **15b** RH completo | P1 ×2 | **~96%** | falta **15b.7** banco horas · resto ✅ |
+| **15b** RH completo | P1 ×2 | **100%** | 15b.7 ✅ repo · Web v1.5.134 pendente |
 | **16** Centro comando | P1 ×2 | **~92%** | FE+GAS repo ✅ · homolog tablet ⏳ |
-| **17** Alertas + Gestor | P1 ×2 | **~85%** | GAS repo ✅ · FE pills + homolog Gestor ⏳ |
+| **17** Alertas + Gestor | P1 ×2 | **~90%** | 17.1–17.4 ✅ · homolog Gestor + Web ⏳ |
 | **18** Financeiro previsão | P2 | 0% | após F17 |
 | **19** Gamificação | P2 | 0% | — |
 | **20** Portal analytics | P2 | 0% | — |

@@ -25,7 +25,7 @@ function Add-GpCheck([string]$Name, [string]$Status, [string]$Detail = "") {
 
 $expectedAbas = @(
   'COLABORADORES_RH', 'FOLHA_PONTO', 'ESCALA_COLABORADORES',
-  'FALTAS_AUSENCIAS', 'HOLERITES', 'METAS_COLABORADORES', 'BANCO_HORAS', 'COMUNICADOS_RH'
+  'FALTAS_AUSENCIAS', 'HOLERITES', 'METAS_COLABORADORES', 'BANCO_HORAS', 'COMUNICADOS_RH', 'AVALIACOES_RH'
 )
 
 try {
@@ -33,15 +33,15 @@ try {
   if (-not $ping.ok) { throw "ping falhou" }
   Add-GpCheck "ping" "ok" $ping.versao
   if ($ping.versao -match 'v1\.5\.(10[0-6]|107)') {
-    Add-GpCheck "gas.versao" "warn" "repo v1.5.111 - publicar Nova versao Web para Carro 04 + CPF holerite"
-  } elseif ($ping.versao -match 'v1\.5\.(10[89]|11[01])') {
+    Add-GpCheck "gas.versao" "warn" "repo v1.5.134 - publicar Nova versao Web"
+  } elseif ($ping.versao -match 'v1\.5\.(10[89]|11[0-4]|13[0-4])') {
     Add-GpCheck "gas.versao" "ok" $ping.versao
   } else {
     Add-GpCheck "gas.versao" "warn" ("versao inesperada: " + $ping.versao)
   }
 
   $st = Invoke-GpApi @{ action = "gestaoPessoasStatus" }
-  if (-not $st.ok) { throw "gestaoPessoasStatus: $($st.erro)" }
+  if ($null -eq $st.ok) { throw "gestaoPessoasStatus: resposta invalida" }
   $abaNames = @()
   if ($st.abas) {
     foreach ($a in @($st.abas)) {
@@ -49,12 +49,15 @@ try {
       elseif ($a.nome) { $abaNames += [string]$a.nome }
     }
   }
-  Add-GpCheck "gestaoPessoasStatus" "ok" ("n=" + $abaNames.Count)
+  if ($st.ok) {
+    Add-GpCheck "gestaoPessoasStatus" "ok" ("n=" + $abaNames.Count)
+  } else {
+    $faltam = @($st.abas | Where-Object { $_.existe -eq $false } | ForEach-Object { $_.nome })
+    Add-GpCheck "gestaoPessoasStatus" "warn" ("abas faltando: " + ($faltam -join ", "))
+  }
   foreach ($aba in $expectedAbas) {
     $row = @($st.abas | Where-Object { ($_.nome -eq $aba) -or ($_ -eq $aba) } | Select-Object -First 1)
-    $existe = $false
-    if ($row -and $row[0].existe -eq $true) { $existe = $true }
-    elseif ($abaNames -contains $aba) { $existe = $true }
+    $existe = ($row -and $row[0].existe -eq $true)
     if ($existe) {
       Add-GpCheck ("aba." + $aba) "ok" "presente"
     } else {
@@ -73,6 +76,37 @@ try {
   $na = 0
   if ($alertas.alertas) { $na = @($alertas.alertas).Count }
   Add-GpCheck "alertasPontoGestaoAdmin" "ok" ("alertas=" + $na)
+
+  try {
+    $painel = Invoke-GpApi @{ action = "painelGestaoPessoasAdmin"; adminPin = $AdminPin; _t = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds() }
+    if ($painel.ok) {
+      $comJornada = 0
+      $comBanco = 0
+      if ($painel.colaboradores) {
+        foreach ($c in @($painel.colaboradores)) {
+          if ($c.jornada) {
+            $comJornada++
+            if ($c.jornada.bancoProjetado) { $comBanco++ }
+          }
+        }
+      }
+      Add-GpCheck "painelGestaoPessoasAdmin" "ok" ("colab=" + @($painel.colaboradores).Count + " jornada=" + $comJornada + " banco=" + $comBanco)
+      if ($comJornada -gt 0 -and $comBanco -eq 0) {
+        Add-GpCheck "painel.bancoProjetado" "warn" "jornada sem bancoProjetado"
+      } else {
+        Add-GpCheck "painel.bancoProjetado" "ok" ("n=" + $comBanco)
+      }
+      if ($painel.versao -and $painel.versao -match 'v1\.5\.13[0-4]') {
+        Add-GpCheck "painel.versao" "ok" $painel.versao
+      } elseif ($painel.versao) {
+        Add-GpCheck "painel.versao" "warn" ("Web antiga: " + $painel.versao + " - esperado v1.5.134 para 15b.7")
+      }
+    } else {
+      Add-GpCheck "painelGestaoPessoasAdmin" "warn" ([string]$painel.erro)
+    }
+  } catch {
+    Add-GpCheck "painelGestaoPessoasAdmin" "warn" $_.Exception.Message
+  }
 
   $fail = @($result.checks | Where-Object { $_.status -eq "fail" })
   $warn = @($result.checks | Where-Object { $_.status -eq "warn" })

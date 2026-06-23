@@ -8559,7 +8559,7 @@ function gestaoPessoasStatus_() {
   const ss = ss_();
   const abas = [SH_COLAB_RH, SH_FOLHA_PONTO, SH_ESCALA_COLAB, SH_FALTAS, SH_HOLERITES, SH_METAS_COLAB, SH_BANCO_HORAS, SH_COMUNICADOS_RH, SH_AVALIACOES_RH];
   const ok = abas.every(function (n) { return !!ss.getSheetByName(n); });
-  return resp_({ ok: ok, abas: abas.map(function (n) { return { nome: n, existe: !!ss.getSheetByName(n) }; }), versao: 'v1.5.128' });
+  return resp_({ ok: ok, abas: abas.map(function (n) { return { nome: n, existe: !!ss.getSheetByName(n) }; }), versao: 'v1.5.134' });
 }
 
 function gpComunicadosRowsSafe_() {

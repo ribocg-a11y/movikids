@@ -215,7 +215,8 @@ Legenda: **P0** bloqueia operação · **P1** valor imediato · **P2** próximo 
 
 | # | Ação | Quem | Status |
 |---|------|------|--------|
-| 1 | **Nova versão Web GAS v1.5.134** (I42 + F17 destino + 15b.7 banco horas) | **Sócio** | ⏳ ping **v1.5.131** · repo **v1.5.134** |
+| 1 | **Nova versão Web GAS v1.5.134** (I42 + F17 destino + 15b.7 banco horas) | **Sócio** | ✅ ping **v1.5.134** |
+| 2 | Instalar aba **AVALIACOES_RH** na planilha | Agente/Sócio | ⏳ |
 | 2 | Homolog **I42** no tablet 10h–22h (2 brinquedos = 1 locação caixa) | Ops loja | ⏳ |
 | 3 | Conferir **totalMaq** vs maquininha no fechamento | Ops loja | ⏳ |
 | 4 | Homolog **Gestor** — sem CONFIG/Sistema | Ops loja | ⏳ |
