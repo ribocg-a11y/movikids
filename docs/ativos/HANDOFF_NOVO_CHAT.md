@@ -117,6 +117,7 @@ Docs: `INCIDENTE_I43_*` · `INCIDENTE_I44_*` · `ARQUITETURA_CAIXA_CONTA_DIA_202
 |----|--------|-----|
 | **I43** | Cronômetro revertia após ▶ (`carregarInicio` 19 cols sem col Y) | GAS **v1.5.136** prod · FE **v1.8.114+** · `TESTE_I43` no pre-push |
 | **I44** | Banco horas corrompido (-544h→-884h) — persist em **leitura** painel RH | GAS **v1.5.137** repo · `repairBancoHorasAdmin` · FE label v1.8.115 |
+| **I45** | Cadastro Raykelly não persistiu · installer apagava abas RH | GAS **v1.5.138** · FE **v1.8.116** · mapa `MAPA_PLANILHA_ABAS_MOVIKIDS.md` |
 
 ---
 

@@ -52,6 +52,7 @@
 | **I39** | **VA/salário mês cheio** com admissão ISO/meio mês | Raykelly VA ~399 vs ~213 | GAS **v1.5.129–130** proporcional + trava 0 dias | `TESTE_VA_ADMISSAO_PROPORCIONAL_READONLY.ps1` | holerite após Web v1.5.130 |
 | **I40** | **Hub benefícios `calcFolhaPagamento`** ≠ GAS quinzenal | Chips VA/VT divergem do holerite | FE **v1.8.111** — hub usa `pg.holerite` | `gpBeneficiosResumo_` | hub vs tela holerite |
 | **I44** | **`gpPersistBancoFromJornada_` em leitura painel RH** | BANCO_HORAS -544h→-884h; alertas absurdos | GAS **v1.5.137** — persist só na saída ponto; `repairBancoHorasAdmin` | não persist em read | zerar aba + repair API |
+| **I45** | **Cadastro RH não persistido / installer apagava abas** | Raykelly 25% após “completar”; FE falso sucesso | GAS **v1.5.138** · FE **v1.8.116** · `diagnosticoPlanilhaCompletoAdmin` | não `clear()` com dados · salvar exige PIN | Raykelly refazer cadastro |
 | **I43** | **`carregarInicio` getRange 19 cols (I42) sem col Y** | **▶ inicia → sync reverte para Pendente 10:00** | GAS **v1.5.136** `COL_LOC_READ_=28`; FE **v1.8.114** merge I43 | `guard.gas.carregarInicio.colY`, `guard.sync.i43` | **`TESTE_I43_CARREGAR_INICIO_READONLY`** + tablet ▶ |
 | **I42** | Conta do dia — mesmo telefone 10h–22h | Caixa `n` vs sessões; maquininha | GAS **v1.5.131+** col S `conta_id` | `TESTE_I42_CONTA_DIA_CAIXA` | não reduzir `COL_LOC_READ_` (ver I43) |
 | **I41** | **`ping_` versão defasada** (v1.5.107 vs repo) | Confusão deploy / verify | GAS **v1.5.130** `ping_()` alinhado | `ping_` header alinhado | ping = v1.5.130 |

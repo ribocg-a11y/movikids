@@ -16,6 +16,8 @@
 | [**AUDITORIA_RH_FOLHA_PERSISTENCIA_2026-06-22.md**](ativos/AUDITORIA_RH_FOLHA_PERSISTENCIA_2026-06-22.md) | **Matriz RH** — abas, cálculos, lacunas RH-G1–G15 |
 | [**INCIDENTE_I43_CARREGAR_INICIO_COL_Y_2026-06-23.md**](ativos/INCIDENTE_I43_CARREGAR_INICIO_COL_Y_2026-06-23.md) | **I43** — cronômetro revertia após ▶ |
 | [**INCIDENTE_I44_BANCO_HORAS_PERSIST_LEITURA_2026-06-23.md**](ativos/INCIDENTE_I44_BANCO_HORAS_PERSIST_LEITURA_2026-06-23.md) | **I44** — banco horas corrompido em leitura painel |
+| [**INCIDENTE_I45_CADASTRO_RH_NAO_PERSISTIDO_2026-06-23.md**](ativos/INCIDENTE_I45_CADASTRO_RH_NAO_PERSISTIDO_2026-06-23.md) | **I45** — cadastro Raykelly / installer apagava RH |
+| [**MAPA_PLANILHA_ABAS_MOVIKIDS.md**](referencia/MAPA_PLANILHA_ABAS_MOVIKIDS.md) | **Mapa canônico** — todas as abas · o que alimenta cada página |
 | [**PLANO_FASES_6_15_COCKPIT_EXECUTIVO_2026-06.md**](ativos/PLANO_FASES_6_15_COCKPIT_EXECUTIVO_2026-06.md) | **Ciclo ativo FASE 6–15** — benchmark, entregas, impacto visual por página |
 | [**PLANEJAMENTO_ATUAL_2026-06.md**](ativos/PLANEJAMENTO_ATUAL_2026-06.md) | Resumo operação + tabela fases 6–15 |
 | [PLANO_PRIORIDADES_2026-06.md](ativos/PLANO_PRIORIDADES_2026-06.md) | Fases 0–15 + execução |

@@ -1155,20 +1155,43 @@
         return;
       }
       const p = PESSOAS[colabLogado];
+      if (!p) {
+        alert('Selecione o colaborador e entre com seu PIN antes de salvar.');
+        go('s-colab-login');
+        return;
+      }
       CAMPOS.forEach(f => { const el = document.getElementById('cad-' + f.key); if (el) p.cadastro[f.key] = el.value.trim(); });
       if (!cadastroOk(p)) { alert('Preencha todos os campos obrigatórios (*).'); return; }
-      if (MK_GP_PROD && window.MK_GestaoPessoas && gpSessionPin && !gpAdmPreviewMode_) {
+      if (MK_GP_PROD) {
+        if (!window.MK_GestaoPessoas) {
+          alert('Sistema ainda carregando. Atualize a página (Ctrl+F5) e tente de novo.');
+          return;
+        }
+        if (!gpSessionPin) {
+          alert('Para salvar na planilha, entre com seu PIN em Colaboradores primeiro.');
+          go('s-colab-login');
+          return;
+        }
         MK_GestaoPessoas.salvarCadastro(colabLogado, gpSessionPin, p.cadastro).then(function (r) {
           if (r.cadastro) p.cadastro = Object.assign({}, p.cadastro, r.cadastro);
           p.cadastroOk = true;
           p.cadastroPct = 100;
           gpCadastroForced_ = false;
+          try {
+            var u = new URL(location.href);
+            u.searchParams.delete('completeCadastro');
+            u.searchParams.delete('opId');
+            u.searchParams.delete('operadorId');
+            history.replaceState(null, '', u.pathname + u.search + (u.search ? '' : ''));
+          } catch (e) { /* ignore */ }
+          if (typeof toast === 'function') toast('Cadastro salvo na planilha.', 'success');
           go('s-colab-hub');
         }).catch(function (e) {
-          alert((e && e.message) || 'Erro ao salvar cadastro');
+          alert((e && e.message) || 'Erro ao salvar cadastro na planilha. Verifique PIN e conexão.');
         });
         return;
       }
+      alert('Modo demonstração — cadastro não foi enviado ao servidor.');
       gpCadastroForced_ = false;
       go('s-colab-hub');
     }

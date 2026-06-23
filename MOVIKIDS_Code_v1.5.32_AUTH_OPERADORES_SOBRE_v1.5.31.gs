@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.137
+// MOVI KIDS — Google Apps Script v1.5.138
+// v1.5.138: I45 — instalarAbas nao apaga dados RH; diagnosticoPlanilhaCompleto; salvarCadastro A1+ cache
 // v1.5.137: I44 — banco horas: nao persistir em leitura painel; repair admin; equipe cmd
 // v1.5.136: HOTFIX I43 — carregarInicio lia 19 cols (sem col Y timestamp) → cronômetro zerava no sync
 // v1.5.135: fix cache inicio_v3 + resumoDia invalidado em escritas locação (I42 teste T5)
@@ -413,6 +414,7 @@ function dispatchMoviAction_(p, method) {
       case 'comandoOperacional':  return comandoOperacional_(p);
       case 'repairFolhaAdmin':    return repairFolhaFormulasAdmin_(p);
       case 'repairBancoHorasAdmin': return repairBancoHorasAdmin_(p);
+      case 'diagnosticoPlanilhaCompletoAdmin': return diagnosticoPlanilhaCompletoAdmin_(p);
       case 'salvarRelatorioDrive':return salvarRelatorioDrive_(p);
       case 'listarRelatorios':    return listarRelatorios_();
       case 'verificarSessao':     return verificarSessao_(p);
@@ -7231,6 +7233,19 @@ function gpRows_(name) {
   return sh.getRange(GP_DATA_ROW, 1, last - GP_DATA_ROW + 1, sh.getLastColumn()).getValues();
 }
 
+/** Grava 1 linha — getRange(row,col,numRows,numCols) sem ambiguidade. */
+function gpSetSheetRow_(sh, row, startCol, values) {
+  const arr = values || [];
+  if (!arr.length) return;
+  sh.getRange(row, startCol, 1, arr.length).setValues([arr]);
+}
+
+function gpMaskCpfForAudit_(cpf) {
+  const s = String(cpf || '').replace(/\D/g, '');
+  if (s.length < 4) return s ? '***' : '';
+  return '***' + s.slice(-4);
+}
+
 function gpCompetenciaAtual_() {
   const d = new Date();
   return String(d.getMonth() + 1).padStart(2, '0') + '/' + d.getFullYear();
@@ -7337,15 +7352,19 @@ function salvarCadastroColaborador_(p) {
     const cad = { nomeCompleto: nome, cpf: cpf, nascimento: nascNorm || nasc, telefone: tel, email: email, endereco: end, emergencia: emerg, admissao: adm, pix: pix };
     if (!gpCadastroOk_(cad)) return err_('Preencha todos os campos obrigatorios do cadastro', 400);
     sh.getRange(r, 2).setValue(nome);
-    sh.getRange(r, 4, 1, 7).setValues([[cpf, nascNorm || nasc, tel, email, end, emerg, adm]]);
+    gpSetSheetRow_(sh, r, 4, [cpf, nascNorm || nasc, tel, email, end, emerg, adm]);
     sh.getRange(r, 11).setValue(pix);
     const pct = 100;
     sh.getRange(r, 18).setValue(pct);
     sh.getRange(r, 19).setValue(fmtData_(new Date()) + ' ' + fmtHoraLocal_(new Date()));
     sh.getRange(r, 5).setNumberFormat('@');
     sh.getRange(r, 10).setNumberFormat('@');
-    try { CacheService.getScriptCache().remove('gp_painel_adm_' + gpNormCompetencia_(gpCompetenciaAtual_())); } catch (e) { /* ok */ }
-    return resp_({ cadastro: cad, cadastroPct: pct, cadastroOk: true, versao: 'v1.5.130' });
+    try {
+      const cache = CacheService.getScriptCache();
+      cache.remove('gp_list_colab_v1');
+      cache.remove('gp_painel_adm_' + gpNormCompetencia_(gpCompetenciaAtual_()));
+    } catch (e) { /* ok */ }
+    return resp_({ cadastro: cad, cadastroPct: pct, cadastroOk: true, versao: 'v1.5.138' });
   } catch (ex) {
     return err_('Erro ao salvar cadastro: ' + ex.message, 500);
   }
@@ -8027,7 +8046,7 @@ function gpPersistHoleriteSnapshot_(opId, comp, hol) {
     for (let i = 0; i < rows.length; i++) {
       if (Number(rows[i][1]) === Number(opId) && gpNormCompetencia_(cellToStr_(rows[i][2])) === compNorm) {
         const r = GP_DATA_ROW + i;
-        sh.getRange(r, 4, 1, 11).setValues([vals]);
+        gpSetSheetRow_(sh, r, 4, vals);
         sh.getRange(r, 15).setValue(agora);
         sh.getRange(r, 3).setNumberFormat('@');
         return;
@@ -8614,7 +8633,98 @@ function gestaoPessoasStatus_() {
   const ss = ss_();
   const abas = [SH_COLAB_RH, SH_FOLHA_PONTO, SH_ESCALA_COLAB, SH_FALTAS, SH_HOLERITES, SH_METAS_COLAB, SH_BANCO_HORAS, SH_COMUNICADOS_RH, SH_AVALIACOES_RH];
   const ok = abas.every(function (n) { return !!ss.getSheetByName(n); });
-  return resp_({ ok: ok, abas: abas.map(function (n) { return { nome: n, existe: !!ss.getSheetByName(n) }; }), versao: 'v1.5.134' });
+  return resp_({ ok: ok, abas: abas.map(function (n) { return { nome: n, existe: !!ss.getSheetByName(n) }; }), versao: 'v1.5.138' });
+}
+
+/** I45 — inventário completo da planilha + RH auditável (admin PIN). */
+function diagnosticoPlanilhaCompletoAdmin_(p) {
+  if (!adminPinOk_(p)) return err_('Acesso negado — PIN admin 1416', 403);
+  try {
+    const ss = ss_();
+    const mapaGAS = {
+      LOCACOES: 'Operação balcão · portal · caixa · dashboard',
+      CUSTOS: 'Caixa custos · dashboard',
+      CONFIG: 'Sistema · preços · frota',
+      DASHBOARD: 'KPIs mensais (fórmulas)',
+      FOLHA: 'Memorial folha CLT (planejamento)',
+      INVESTIMENTO: 'Payback',
+      PLANO_CONTAS: 'Mini-DRE categorias',
+      OPERADORES_SISTEMA: 'PIN balcão · perfis',
+      RESPONSAVEIS: 'CRM clientes',
+      RELATORIOS: 'PDFs mensais',
+      Analise: 'Legado',
+      AUDITORIA: 'Log locações · metas RH',
+      AUD_TURNO: 'Log login/logout balcão',
+      AUD_SMS: 'Log SMS (pausado)',
+      AUD_WHATSAPP: 'Log WhatsApp (pausado)',
+      AUD_RESPONSAVEIS: 'Log responsáveis',
+      COLABORADORES_RH: 'Cadastro RH colaboradores',
+      FOLHA_PONTO: 'Ponto entrada/saída',
+      ESCALA_COLABORADORES: 'Escala turnos',
+      FALTAS_AUSENCIAS: 'Faltas sync jornada',
+      HOLERITES: 'Snapshot holerite mensal',
+      METAS_COLABORADORES: 'Seed metas (vivas = AUDITORIA)',
+      BANCO_HORAS: 'Saldo banco horas',
+      COMUNICADOS_RH: 'Comunicados colaborador',
+      AVALIACOES_RH: 'Avaliações gestão'
+    };
+    const abas = ss.getSheets().map(function (sh) {
+      const nome = sh.getName();
+      const lastRow = sh.getLastRow();
+      const lastCol = sh.getLastColumn();
+      const dataRows = lastRow >= GP_DATA_ROW ? lastRow - GP_DATA_ROW + 1 : 0;
+      return {
+        nome: nome,
+        lastRow: lastRow,
+        lastCol: lastCol,
+        dataRows: dataRows,
+        funcao: mapaGAS[nome] || '(aba auxiliar ou legado)',
+        mapeadaGAS: !!mapaGAS[nome]
+      };
+    });
+    const rhRows = gpRows_(SH_COLAB_RH);
+    const colaboradoresRh = rhRows.map(function (r, i) {
+      const obj = gpColabRhObjFromRow_(r, i);
+      const cad = gpCadastroFromRhObj_(obj);
+      return {
+        operadorId: Number(r[0]),
+        nome: String(r[1] || '').trim(),
+        funcao: String(r[2] || '').trim(),
+        cpfMascara: gpMaskCpfForAudit_(r[3]),
+        telefonePreenchido: !!String(r[5] || '').trim(),
+        pixPreenchido: !!String(r[10] || '').trim(),
+        admissao: cellToStr_(r[9]),
+        cadastroPctPlanilha: Number(r[17]) || 0,
+        cadastroPctCalculado: gpCalcCadastroPct_(cad),
+        cadastroOk: gpCadastroOk_(cad),
+        atualizadoEm: cellToStr_(r[18])
+      };
+    });
+    const folhaPonto = gpRows_(SH_FOLHA_PONTO).map(function (r) {
+      return {
+        id: Number(r[0]),
+        operadorId: Number(r[1]),
+        data: cellToStr_(r[2]),
+        entrada: cellToStr_(r[4]),
+        saida: cellToStr_(r[5]),
+        horas: cellToStr_(r[6])
+      };
+    });
+    const bancoHoras = gpRows_(SH_BANCO_HORAS).map(function (r) {
+      return { operadorId: Number(r[0]), saldo: String(r[1] || ''), atualizadoEm: cellToStr_(r[2]) };
+    });
+    return resp_({
+      planilhaId: ss.getId(),
+      totalAbas: abas.length,
+      abas: abas,
+      colaboradoresRh: colaboradoresRh,
+      folhaPonto: folhaPonto,
+      bancoHoras: bancoHoras,
+      versao: 'v1.5.138'
+    });
+  } catch (ex) {
+    return err_('diagnosticoPlanilhaCompleto: ' + ex.message, 500);
+  }
 }
 
 function gpComunicadosRowsSafe_() {
@@ -8792,57 +8902,84 @@ function gpRepairAllAdmissoesRh_() {
   }
 }
 
-function instalarAbasGestaoPessoasCore_() {
+function instalarAbasGestaoPessoasCore_(opts) {
+  opts = opts || {};
+  const forceClear = opts.forceClear === true || String(opts.forceReset || '').toLowerCase() === 'sim';
   const ss = ss_();
+  function sheetHasData_(sh) {
+    const last = sh.getLastRow();
+    if (last < GP_DATA_ROW) return false;
+    const ids = sh.getRange(GP_DATA_ROW, 1, last - GP_DATA_ROW + 1, 1).getValues();
+    return ids.some(function (r) { return r[0] !== '' && r[0] != null; });
+  }
   function ensure(name, color, headers, seeds) {
     let sh = ss.getSheetByName(name);
+    const existed = !!sh;
     if (!sh) sh = ss.insertSheet(name);
+    if (existed && sheetHasData_(sh) && !forceClear) {
+      const hdr = sh.getRange(1, 1, 1, Math.max(headers.length, sh.getLastColumn())).getValues()[0];
+      if (!String(hdr[0] || '').trim()) {
+        sh.getRange(1, 1, 1, headers.length).setValues([headers]).setFontWeight('bold').setBackground('#E3F2FD');
+        sh.setFrozenRows(1);
+      }
+      if (color) sh.setTabColor(color);
+      return { nome: name, acao: 'preservada' };
+    }
     sh.clear();
     sh.getRange(1, 1, 1, headers.length).setValues([headers]).setFontWeight('bold').setBackground('#E3F2FD');
-    if (seeds && seeds.length) sh.getRange(2, 1, seeds.length, headers.length).setValues(seeds);
+    if (seeds && seeds.length) {
+      sh.getRange(GP_DATA_ROW, 1, seeds.length, headers.length).setValues(seeds);
+    }
     sh.setFrozenRows(1);
     if (color) sh.setTabColor(color);
+    return { nome: name, acao: forceClear ? 'reinstalada_force' : 'criada_ou_vazia' };
   }
-  ensure(SH_COLAB_RH, '#2196F3', ['operador_id','nome','funcao','cpf','nascimento','telefone','email','endereco','emergencia','admissao','pix','salario_base','va_diario','meta_loc_dia','bonus_meta_r$','turno','ativo','cadastro_pct','atualizado_em'],
+  const log = [];
+  log.push(ensure(SH_COLAB_RH, '#2196F3', ['operador_id','nome','funcao','cpf','nascimento','telefone','email','endereco','emergencia','admissao','pix','salario_base','va_diario','meta_loc_dia','bonus_meta_r$','turno','ativo','cadastro_pct','atualizado_em'],
     [
-      [2,'Milena Nunes','Socia','','','','','','','01/01/2020','',1621,20,20,100,'10h–14h','SIM',100,''],
-      [3,'Raykelly','Atendente 1','','','','','','','15/06/2026','',1621,20,20,100,'14h–22h','SIM',100,'']
-    ]);
-  ensure(SH_FOLHA_PONTO, '#4CAF50', ['id','operador_id','data','dia_semana','entrada','saida','horas','situacao','registrado_em'],
-    [[1,3,'15/06/2026','Seg','13:58','21:05','7h07','OK','']]);
-  ensure(SH_ESCALA_COLAB, '#9C27B0', ['operador_id','competencia','seg','ter','qua','qui','sex','sab','dom','obs'],
+      [2,'Milena Nunes','Socia','','','','','','','01/01/2020','',1621,20,20,100,'10h–14h','SIM',25,''],
+      [3,'Raykelly','Atendente 1','','','','','','','15/06/2026','',1621,20,20,100,'14h–22h','SIM',25,'']
+    ]));
+  log.push(ensure(SH_FOLHA_PONTO, '#4CAF50', ['id','operador_id','data','dia_semana','entrada','saida','horas','situacao','registrado_em'],
+    [[1,3,'15/06/2026','Seg','13:58','21:05','7h07','OK','']]));
+  log.push(ensure(SH_ESCALA_COLAB, '#9C27B0', ['operador_id','competencia','seg','ter','qua','qui','sex','sab','dom','obs'],
     [
       [2,'06/2026','10–14','10–14','10–14','10–14','10–14','OFF','OFF','Socia — turno manha'],
       [3,'06/2026','14–22','OFF','14–22','OFF','14–22','10–20','13–21','Rodizio dom']
-    ]);
+    ]));
   const shEsc = ss.getSheetByName(SH_ESCALA_COLAB);
   if (shEsc) {
     const escDataRows = shEsc.getLastRow() - 1;
     if (escDataRows >= 1) shEsc.getRange(2, 2, escDataRows, 1).setNumberFormat('@');
   }
-  ensure(SH_FALTAS, '#F44336', ['id','operador_id','data','tipo','horas','valor_desconto','obs','registrado_em'], []);
-  ensure(SH_HOLERITES, '#1976D2', ['id','operador_id','competencia','base','bonus','faltas','inss','irrf','vt','liquido','fgts','va_total','dias_trab','obs','gerado_em'], []);
-  ensure(SH_METAS_COLAB, '#FFC107', ['id','operador_id','data','locacoes','meta','bonus_ok','bonus_valor'],
-    [[1,3,'15/06/2026',21,20,'SIM',100]]);
-  ensure(SH_BANCO_HORAS, '#78909C', ['operador_id','saldo_hhmm','atualizado_em'], [[2,'0h00',''],[3,'0h00','']]);
-  ensure(SH_COMUNICADOS_RH, '#FF7043', ['id','data','titulo','mensagem','publico','valido_ate','prioridade','ativo','criado_em'],
-    [[1, fmtData_(new Date()), 'Bem-vindo ao hub', 'Use Meu ponto para registrar entrada e saída. Dúvidas? Fale com a administração.', 'TODOS', '', 'info', 'SIM', '']]);
+  log.push(ensure(SH_FALTAS, '#F44336', ['id','operador_id','data','tipo','horas','valor_desconto','obs','registrado_em'], []));
+  log.push(ensure(SH_HOLERITES, '#1976D2', ['id','operador_id','competencia','base','bonus','faltas','inss','irrf','vt','liquido','fgts','va_total','dias_trab','obs','gerado_em'], []));
+  log.push(ensure(SH_METAS_COLAB, '#FFC107', ['id','operador_id','data','locacoes','meta','bonus_ok','bonus_valor'],
+    [[1,3,'15/06/2026',21,20,'SIM',100]]));
+  log.push(ensure(SH_BANCO_HORAS, '#78909C', ['operador_id','saldo_hhmm','atualizado_em'], [[2,'0h00',''],[3,'0h00','']]));
+  log.push(ensure(SH_COMUNICADOS_RH, '#FF7043', ['id','data','titulo','mensagem','publico','valido_ate','prioridade','ativo','criado_em'],
+    [[1, fmtData_(new Date()), 'Bem-vindo ao hub', 'Use Meu ponto para registrar entrada e saída. Dúvidas? Fale com a administração.', 'TODOS', '', 'info', 'SIM', '']]));
   const shCom = ss.getSheetByName(SH_COMUNICADOS_RH);
   if (shCom && shCom.getLastRow() >= GP_DATA_ROW) {
     shCom.getRange(GP_DATA_ROW, 2, shCom.getLastRow() - GP_DATA_ROW + 1, 1).setNumberFormat('@');
   }
-  ensure(SH_AVALIACOES_RH, '#7E57C2', ['id','operador_id','competencia','area','nota','observacao','criado_em'], []);
+  log.push(ensure(SH_AVALIACOES_RH, '#7E57C2', ['id','operador_id','competencia','area','nota','observacao','criado_em'], []));
   const shAv = ss.getSheetByName(SH_AVALIACOES_RH);
   if (shAv && shAv.getLastRow() >= GP_DATA_ROW) {
     shAv.getRange(GP_DATA_ROW, 3, shAv.getLastRow() - GP_DATA_ROW + 1, 1).setNumberFormat('@');
   }
   gpRepairAllAdmissoesRh_();
+  return log;
 }
 
 function instalarAbasGestaoPessoasAdmin_(p) {
   if (!adminPinOk_(p)) return err_('Acesso negado — PIN admin 1416', 403);
-  instalarAbasGestaoPessoasCore_();
-  return gestaoPessoasStatus_();
+  const log = instalarAbasGestaoPessoasCore_({ forceReset: p.forceReset });
+  const st = gestaoPessoasStatus_();
+  const parsed = JSON.parse(st.getContent());
+  parsed.instalacao = log;
+  parsed.aviso = 'Abas com dados existentes foram preservadas. Use forceReset=sim para apagar tudo.';
+  return resp_(parsed);
 }
 
 // ── TRIGGERS ──────────────────────────────────────────────────
