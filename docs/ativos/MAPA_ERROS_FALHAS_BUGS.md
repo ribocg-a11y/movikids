@@ -1,6 +1,6 @@
 # MOVI KIDS — Mapa de erros, falhas e bugs
 
-**Atualizado:** 23/06/2026 — **I48** perf admin · **I47** PIN · **I45–I46** RH · FE **v1.8.118** · GAS **v1.5.142**  
+**Atualizado:** 23/06/2026 — **I49** VA 520 · **I48** perf · FE **v1.8.118** · GAS **v1.5.143**  
 **Uso anterior:** 22/06/2026 — **I38–I41** auditoria RH 22/06 · GAS repo **v1.5.129** (ping **v1.5.107**) · FE **v1.8.110**  
 **Uso anterior:** 17/06/2026 — **I28** liberar sessão tablet · GAS **v1.5.92** prod. · FE **v1.8.30**  
 **Uso anterior:** 09/06/2026 — **I22 fechado** (hotfix FE v1.8.2)  
@@ -55,6 +55,7 @@
 | **I45** | **Cadastro RH não persistido / installer apagava abas** | Raykelly 25% após “completar”; FE falso sucesso | GAS **v1.5.138** · FE **v1.8.116** · `diagnosticoPlanilhaCompletoAdmin` | não `clear()` com dados · salvar exige PIN | Raykelly refazer cadastro |
 | **I46** | **Faltas/holerite RH + sync jornada** | Holerite com desconto faltas; governança dados | GAS **v1.5.140** · FE **v1.8.117** | persist no colaborador, não admin | `GOVERNANCA_DADOS_RH_2026-06-23.md` |
 | **I47** | **PIN duplo submit + teclado password no tablet** | “PIN incorreto” falso; várias tentativas | FE **v1.8.118** `_authBusy` + `tel` · GAS **v1.5.141** hash strip | `onLoginPin` guard | tablet `?force=1.8.118` |
+| **I49** | **VA R$ 520** — `va_diario=20` na planilha × 26 dias | Holerite mostra 520/mês; VA ~277 em vez de ~213 | GAS **v1.5.143** `gpVaMensalTeto_` | nunca va_diario×dias como teto | `TESTE_VA_ADMISSAO_PROPORCIONAL` |
 | **I48** | **`painelGestaoPessoasAdmin` escrevia FALTAS/HOLERITES na leitura** (I46) | Operadores admin lento de novo | GAS **v1.5.142** — só cálculo em memória no admin | nunca append em read admin | 2× painelGestaoPessoasAdmin |
 | **I43** | **`carregarInicio` getRange 19 cols (I42) sem col Y** | **▶ inicia → sync reverte para Pendente 10:00** | GAS **v1.5.136** `COL_LOC_READ_=28`; FE **v1.8.114** merge I43 | `guard.gas.carregarInicio.colY`, `guard.sync.i43` | **`TESTE_I43_CARREGAR_INICIO_READONLY`** + tablet ▶ |
 | **I42** | Conta do dia — mesmo telefone 10h–22h | Caixa `n` vs sessões; maquininha | GAS **v1.5.131+** col S `conta_id` | `TESTE_I42_CONTA_DIA_CAIXA` | não reduzir `COL_LOC_READ_` (ver I43) |
@@ -231,7 +232,8 @@
 31. **Sempre** force update FE após hotfix operacional + procedimento tablet `?force=` (I33).
 32. **Nunca** CNPJ/razão fictícios em holerite produção — usar dados reais da empresa (I34).
 33. **Nunca** confiar em `p.preview` no objeto colaborador — modo preview só `gpAdmPreviewMode_` + URL `admPreview=1` (I38).
-34. **Sempre** proporcional admissão em holerite — admissão inválida = 0 dias, nunca mês cheio (I39).
+34. **Sempre** VA mensal = teto **R$ 400** (FOLHA B11) — `va_diario` planilha **não** redefine mensal (I49).
+35. **Sempre** proporcional admissão em holerite — admissão inválida = 0 dias, nunca mês cheio (I39).
 35. **Hub benefícios** deve usar `pg.holerite` da API, não `calcFolhaPagamento` mensal (I40).
 36. **Nunca** usar `getRange(..., COL_CONTA_ID_)` em `carregarInicio_`/`listarAtivas_` se a função lê `r[24]`/`r[25]` — usar **`COL_LOC_READ_` = 28** (I43 regressão I42).
 37. **Sempre** rodar `TESTE_I43_CARREGAR_INICIO_READONLY.ps1` após mudança em sync/timer GAS (I43).

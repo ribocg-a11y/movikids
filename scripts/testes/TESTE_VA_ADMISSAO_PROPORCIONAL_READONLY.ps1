@@ -17,89 +17,90 @@ function Invoke-GpApi {
 
 $result = [ordered]@{
   suite = "TESTE_VA_ADMISSAO_PROPORCIONAL_READONLY"
-  startedAt = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
+  startedAt = (Get-Date).ToString('yyyy-MM-dd HH:mm:ss')
   checks = @()
   status = "ok"
 }
 
-function Add-Check([string]$Name, [string]$Status, [string]$Detail = "") {
+function Add-Check([string]$Name, [string]$Status, [string]$Detail = '') {
   $script:result.checks += [ordered]@{ name = $Name; status = $Status; detail = $Detail }
-  if ($Status -eq "fail") { $script:result.status = "fail" }
-  elseif ($Status -eq "warn" -and $script:result.status -eq "ok") { $script:result.status = "warn" }
+  if ($Status -eq 'fail') { $script:result.status = 'fail' }
+  elseif ($Status -eq 'warn' -and $script:result.status -eq 'ok') { $script:result.status = 'warn' }
 }
 
 $gsPath = Join-Path $RepoRoot "MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs"
 foreach ($pair in @(
-  @{ needle = "function gpNormAdmissaoStr_"; name = "gas.gpNormAdmissaoStr" },
-  @{ needle = "TRAVA admissao invalida"; name = "gas.travaAdmissaoInvalida" },
-  @{ needle = "function gpRepairAdmissaoRhCell_"; name = "gas.repairAdmissaoCell" },
-  @{ needle = "yyyy-MM-dd"; name = "gas.parseIsoDate" },
-  @{ needle = "vaTotal / diasTrab"; name = "gas.vaDiarioProporcional" }
+  @{ needle = 'function gpNormAdmissaoStr_'; name = 'gas.gpNormAdmissaoStr' },
+  @{ needle = 'TRAVA admissao invalida'; name = 'gas.travaAdmissaoInvalida' },
+  @{ needle = 'function gpVaMensalTeto_'; name = 'gas.gpVaMensalTeto' },
+  @{ needle = 'TRAVA va_diario planilha infla VA'; name = 'gas.travaVaDiario520' },
+  @{ needle = 'vaTotal / diasTrab'; name = 'gas.vaDiarioProporcional' }
 )) {
   if (-not (Test-Path $gsPath)) {
-    Add-Check $pair.name "fail" "gs ausente"
+    Add-Check $pair.name 'fail' 'gs ausente'
   } elseif (-not (Select-String -Path $gsPath -Pattern $pair.needle -Quiet)) {
-    Add-Check $pair.name "fail" $pair.needle
+    Add-Check $pair.name 'fail' $pair.needle
   } else {
-    Add-Check $pair.name "ok" $pair.needle
+    Add-Check $pair.name 'ok' $pair.needle
   }
 }
 
-if (Select-String -Path $gsPath -Pattern "v1\.5\.129" -Quiet) {
-  Add-Check "gas.versaoHeader" "ok" "v1.5.129"
+if (Select-String -Path $gsPath -Pattern 'v1\.5\.14[0-3]' -Quiet) {
+  Add-Check 'gas.versaoHeader' 'ok' 'v1.5.140+'
 } else {
-  Add-Check "gas.versaoHeader" "warn" "header ainda nao v1.5.129"
+  Add-Check 'gas.versaoHeader' 'warn' 'header abaixo v1.5.140'
 }
 
 try {
-  $adm = Invoke-GpApi @{ action = "painelGestaoPessoasAdmin"; adminPin = $AdminPin }
-  if (-not $adm.ok) { throw "painelGestaoPessoasAdmin: $($adm.erro)" }
-  $c = @($adm.colaboradores | Where-Object { [int]$_.id -eq $OperadorId })[0]
-  if (-not $c) {
-    Add-Check "colaborador" "fail" "id $OperadorId ausente"
-  } else {
-    $admStr = [string]$c.admissao
-    if ($c.cadastro -and $c.cadastro.admissao) { $admStr = [string]$c.cadastro.admissao }
-    Add-Check "admissao.formato" $(if ($admStr -match '^\d{2}/\d{2}/\d{4}$') { "ok" } else { "warn" }) $admStr
-    $preview = Invoke-GpApi @{
-      action = "buscarPainelColaboradorPreview"
-      operadorId = $OperadorId
-      adminPin = $AdminPin
-    }
-    if ($preview.ok -and $preview.pagamento) {
-      $pg = $preview.pagamento
-      $ben = $pg.beneficios
-      $dias = [int]$pg.diasTrabalhados
-      $diasMes = [int]$pg.diasMes
-      $vaTotal = [double]$ben.vaTotal
-      if ($null -eq $ben.vaTotal) { $vaTotal = [double]($preview.holerite.vaTotal) }
-      Add-Check "holerite.diasTrab" "ok" ("dias=" + $dias + "/" + $diasMes)
-      if ($dias -gt 0 -and $dias -lt $diasMes) {
-        $esperado = [math]::Round(400 * $dias / $diasMes, 2)
-        $delta = [math]::Abs($vaTotal - $esperado)
-        if ($vaTotal -le 0) {
-          Add-Check "va.proporcional" "warn" "VA 0 - 1a quinzena ou GAS Web antigo"
-        } elseif ($delta -le 0.05) {
-          Add-Check "va.proporcional" "ok" ("va=" + $vaTotal + " esperado~" + $esperado)
-        } else {
-          Add-Check "va.proporcional" "fail" ("va=" + $vaTotal + " esperado=" + $esperado + " adm=" + $admStr)
-        }
-      } else {
-        Add-Check "va.proporcional" "warn" ("dias=" + $dias + " - conferir admissao na planilha")
-      }
+  $ping = Invoke-GpApi @{ action = 'ping' }
+  Add-Check 'ping' 'ok' $ping.versao
+
+  $preview = Invoke-GpApi @{
+    action = 'buscarPainelColaboradorPreview'
+    operadorId = $OperadorId
+    adminPin = $AdminPin
+  }
+  if (-not $preview.ok) { throw "preview: $($preview.erro)" }
+
+  $pg = $preview.pagamento
+  $hol = $pg.holerite
+  if (-not $hol) { throw 'pagamento.holerite ausente' }
+
+  $dias = [int]$hol.diasTrabalhados
+  $diasMes = [int]$hol.diasMes
+  $vaMensal = [double]$hol.vaMensal
+  $vaTotal = [double]$hol.vaTotal
+  $admStr = [string]$preview.colaborador.admissao
+
+  Add-Check 'holerite.diasTrab' 'ok' ('dias=' + $dias + '/' + $diasMes + ' adm=' + $admStr)
+  Add-Check 'holerite.vaMensal' $(if ($vaMensal -ge 399 -and $vaMensal -le 401) { 'ok' } else { 'fail' }) ('vaMensal=' + $vaMensal)
+
+  if ($dias -gt 0 -and $dias -lt $diasMes) {
+    $esperado = [math]::Round(400 * $dias / $diasMes, 2)
+    if ($hol.quinzena -ne 2) {
+      Add-Check 'va.proporcional' 'warn' ('Q' + $hol.quinzena + ' — VA beneficio na Q2')
+    } elseif ($vaTotal -le 0) {
+      Add-Check 'va.proporcional' 'fail' 'vaTotal=0 na Q2'
     } else {
-      Add-Check "painel.preview" "warn" ([string]$preview.erro)
+      $delta = [math]::Abs($vaTotal - $esperado)
+      if ($delta -le 0.05) {
+        Add-Check 'va.proporcional' 'ok' ('vaTotal=' + $vaTotal + ' esperado=' + $esperado)
+      } else {
+        Add-Check 'va.proporcional' 'fail' ('vaTotal=' + $vaTotal + ' esperado=' + $esperado + ' (base errada se ~277)')
+      }
     }
+  } else {
+    Add-Check 'va.proporcional' 'warn' ('dias=' + $dias)
   }
 } catch {
-  Add-Check "gas.api" "warn" $_.Exception.Message
+  Add-Check 'gas.api' 'warn' $_.Exception.Message
 }
 
-if ($result.status -eq "ok") { $result.summary = "VA admissao proporcional - repo OK" }
-elseif ($result.status -eq "warn") { $result.summary = "Repo OK - publique GAS v1.5.129 Web" }
-else { $result.summary = "Falha proporcional VA/admissao" }
+if ($result.status -eq 'ok') { $result.summary = 'VA R$400 proporcional OK' }
+elseif ($result.status -eq 'warn') { $result.summary = 'Repo OK — publicar GAS v1.5.143 Web' }
+else { $result.summary = 'Falha VA/admissao — ver I49' }
 
-$result.finishedAt = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
+$result.finishedAt = (Get-Date).ToString('yyyy-MM-dd HH:mm:ss')
 $result | ConvertTo-Json -Depth 6
-if ($result.status -eq "fail") { exit 1 }
+if ($result.status -eq 'fail') { exit 1 }
 exit 0

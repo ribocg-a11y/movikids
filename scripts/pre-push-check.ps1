@@ -240,6 +240,16 @@ try {
     } else {
       Add-Check "guard.gas.carregarInicio.colY" "fail" "carregarInicio_ ausente no GAS"
     }
+    # I49 — VA teto R$400: gpVaMensalColab_ nao pode usar va_diario*dias como mensal
+    if ($gasRaw -match 'function gpVaMensalColab_[\s\S]{0,400}vaDiario \* gpVaDiasBase_') {
+      Add-Check "guard.va.teto400" "fail" "gpVaMensalColab_ usa va_diario*dias (I49 regressao 520)"
+    } elseif ($gasRaw -notmatch 'function gpVaMensalTeto_') {
+      Add-Check "guard.va.teto400" "fail" "gpVaMensalTeto_ ausente (I49)"
+    } elseif ($gasRaw -notmatch 'TRAVA va_diario planilha infla VA') {
+      Add-Check "guard.va.teto400" "fail" "trava VA planilha ausente (I49)"
+    } else {
+      Add-Check "guard.va.teto400" "ok" "VA mensal = teto memorial 400"
+    }
     if ($gasRaw -notmatch 'function importarResponsaveisAdmin_') {
       Add-Check "guard.k1.import" "fail" "importarResponsaveisAdmin_ ausente (Pacote K.1)"
     } else {

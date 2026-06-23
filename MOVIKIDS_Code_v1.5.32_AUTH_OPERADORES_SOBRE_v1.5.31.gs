@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.142
+// MOVI KIDS — Google Apps Script v1.5.143
+// v1.5.143: I49 — VA teto R$400 fixo (va_diario planilha nao redefine mensal)
 // v1.5.142: I48 — painelGestaoPessoasAdmin sem escrita FALTAS/HOLERITES (perf leitura admin)
 // v1.5.141: I47 — gpVerifyPinColaborador alinha strip hash/salt com loginOperador
 // v1.5.140: I46 — faltas no holerite; salvarDadosContratuaisRhAdmin; holerite admin com desconto falta
@@ -511,9 +512,9 @@ function ping_() {
   const agora = new Date();
   return resp_({
     status:  'online',
-    versao:  'v1.5.142',
+    versao:  'v1.5.143',
     timestamp: fmtData_(agora) + ' ' + fmtHoraLocal_(agora),
-    sistema: 'MOVI KIDS v1.5.142',
+    sistema: 'MOVI KIDS v1.5.143',
     postWriteActions: WRITE_ACTIONS_CRITICAS_
   });
 }
@@ -7328,7 +7329,7 @@ function gpColabRhObjFromRow_(row, idx) {
     telefone: String(row[5] || '').trim(),
     email: String(row[6] || '').trim(), endereco: String(row[7] || '').trim(), emergencia: String(row[8] || '').trim(),
     admissao: admissao, pix: String(row[10] || '').trim(), salarioBase: Number(row[11]) || 1621,
-    vaDiario: Number(row[12]) || Math.round(GP_VA_MENSAL_PADRAO_ / gpVaDiasBase_() * 100) / 100,
+    vaDiario: gpVaDiarioCanonico_(),
     metaLocDia: Number(row[13]) || 20, bonusMeta: Number(row[14]) || 100,
     turno: String(row[15] || '').trim(), ativo: String(row[16] || 'SIM').toUpperCase() !== 'NAO',
     row: GP_DATA_ROW + idx
@@ -7974,8 +7975,42 @@ function gpAlertasPontoFromCtx_(ctx) {
 }
 
 const GP_VA_MENSAL_PADRAO_ = 400;
+const GP_VA_MENSAL_MAX_ = 400;
 const GP_PCT_QUINZENA_1_ = 0.40;
 const GP_PCT_QUINZENA_2_ = 0.60;
+
+/** Teto VA mensal — memorial FOLHA B11 ou R$ 400 (nunca va_diario da planilha). */
+function gpVaMensalTeto_() {
+  try {
+    const fp = lerFolhaPlanejamento_();
+    if (fp.ok && fp.vaMensal >= 100 && fp.vaMensal <= GP_VA_MENSAL_MAX_ + 50) {
+      return Math.min(fp.vaMensal, GP_VA_MENSAL_MAX_ + 50);
+    }
+  } catch (e) { /* ignore */ }
+  return GP_VA_MENSAL_PADRAO_;
+}
+
+/** VA/dia canonico para exibicao (teto / dias uteis memorial). */
+function gpVaDiarioCanonico_() {
+  const dias = gpVaDiasBase_();
+  return Math.round(gpVaMensalTeto_() / dias * 100) / 100;
+}
+
+/**
+ * I49 — Teto mensal VA por colaborador.
+ * va_diario em COLABORADORES_RH (seed 20) NAO redefine o mensal (20x26=520 bug).
+ */
+function gpVaMensalColab_(colab) {
+  const teto = gpVaMensalTeto_();
+  const vaDiario = Number(colab && colab.vaDiario);
+  if (vaDiario > 0) {
+    const inferido = Math.round(vaDiario * gpVaDiasBase_() * 100) / 100;
+    if (inferido > teto + 0.5) {
+      Logger.log('gpVaMensalColab_: TRAVA va_diario planilha infla VA (' + inferido + ') — teto ' + teto);
+    }
+  }
+  return teto;
+}
 
 function gpDiasNoMes_(mes, ano) {
   return new Date(ano, mes, 0).getDate();
@@ -8031,19 +8066,6 @@ function gpQuinzenaAtual_(refDate, mes, ano) {
 function gpDataPagamentoQuinzena_(quinzena, mes, ano) {
   if (quinzena === 1) return '15/' + String(mes).padStart(2, '0') + '/' + ano;
   return gpDiasNoMes_(mes, ano) + '/' + String(mes).padStart(2, '0') + '/' + ano;
-}
-
-function gpVaMensalColab_(colab) {
-  colab = colab || {};
-  const vaDiario = Number(colab.vaDiario);
-  if (vaDiario > 0) {
-    return Math.round(vaDiario * gpVaDiasBase_() * 100) / 100;
-  }
-  try {
-    const fp = lerFolhaPlanejamento_();
-    if (fp.ok && fp.vaMensal >= 100) return fp.vaMensal;
-  } catch (e) { /* ignore */ }
-  return GP_VA_MENSAL_PADRAO_;
 }
 
 function gpVtPassesMes_() {
@@ -8219,6 +8241,14 @@ function gpFaltasDescontoMes_(opId, comp, colab, jornada) {
     jornada.dias.forEach(function (d) {
       if (d.sit === 'Falta' && diaDesc > 0) total += diaDesc;
     });
+  }
+  const salario = Number(colab && colab.salarioBase) || 1621;
+  const diasMes = gpDiasNoMes_(compParsed.mes, compParsed.ano);
+  const diasTrab = colab ? gpDiasTrabalhadosNoMes_(colab.admissao, compParsed.mes, compParsed.ano) : diasMes;
+  const salarioProp = diasMes > 0 ? Math.round(salario * (diasTrab / diasMes) * 100) / 100 : 0;
+  if (total > salarioProp && salarioProp > 0) {
+    Logger.log('gpFaltasDescontoMes_: TRAVA desconto faltas (' + total + ') > salario prop (' + salarioProp + ')');
+    total = salarioProp;
   }
   return Math.round(total * 100) / 100;
 }
@@ -8436,7 +8466,7 @@ function buscarPainelColaborador_(p) {
     if (!auth.ok) return auth.err;
     let colab = gpColabRhByOpId_(opId);
     if (!colab) {
-      colab = { operadorId: opId, nome: auth.operador.nome, funcao: 'Colaborador', salarioBase: 1621, vaDiario: 20, metaLocDia: 20, bonusMeta: 100, turno: '', cadastroPct: 0, ativo: true };
+      colab = { operadorId: opId, nome: auth.operador.nome, funcao: 'Colaborador', salarioBase: 1621, vaDiario: gpVaDiarioCanonico_(), metaLocDia: 20, bonusMeta: 100, turno: '', cadastroPct: 0, ativo: true };
     }
     const comp = String(p.competencia || gpCompetenciaAtual_());
     return resp_(gpBuildPainelColaboradorPayload_(opId, comp, colab, auth.operador));
@@ -8449,7 +8479,7 @@ function gpBuildPainelColaboradorPayload_(opId, comp, colab, operador) {
   colab = colab || gpColabRhByOpId_(opId);
   const opNome = (operador && operador.nome) || (colab && colab.nome) || ('ID ' + opId);
   if (!colab) {
-    colab = { operadorId: opId, nome: opNome, funcao: 'Colaborador', salarioBase: 1621, vaDiario: 20, metaLocDia: 20, bonusMeta: 100, turno: '', cadastroPct: 0, ativo: true };
+    colab = { operadorId: opId, nome: opNome, funcao: 'Colaborador', salarioBase: 1621, vaDiario: gpVaDiarioCanonico_(), metaLocDia: 20, bonusMeta: 100, turno: '', cadastroPct: 0, ativo: true };
   }
   const ctxJ = gpLoadContext_();
   const metas = gpMetasPainel_(opId, comp, ctxJ);
@@ -8760,7 +8790,7 @@ function painelGestaoPessoasAdmin_(p) {
         total: colaboradores.length, presentes: presentes, comTurno: comTurno,
         alertas: alertasPack.total, alertasIntel: intelRh.length
       },
-      sessaoAtiva: sessao, versao: 'v1.5.142',
+      sessaoAtiva: sessao, versao: 'v1.5.143',
       comunicadosRh: gpComunicadosAllAdmin_(),
       avaliacoesRh: gpAvaliacoesAllAdmin_(),
       competenciasRh: GP_COMPETENCIAS_RH_
@@ -9034,6 +9064,30 @@ function salvarAvaliacaoRhAdmin_(p) {
   }
 }
 
+function gpRepairVaDiarioRhRows_() {
+  try {
+    const sh = gpSheet_(SH_COLAB_RH);
+    const last = sh.getLastRow();
+    if (last < GP_DATA_ROW) return 0;
+    const canon = gpVaDiarioCanonico_();
+    const teto = gpVaMensalTeto_();
+    let n = 0;
+    for (let r = GP_DATA_ROW; r <= last; r++) {
+      const raw = Number(sh.getRange(r, 13).getValue());
+      const inferido = raw > 0 ? Math.round(raw * gpVaDiasBase_() * 100) / 100 : 0;
+      if (raw <= 0 || inferido > teto + 0.5 || Math.abs(raw - canon) > 0.02) {
+        sh.getRange(r, 13).setValue(canon);
+        n++;
+      }
+    }
+    if (n > 0) gpInvalidateRhCache_();
+    return n;
+  } catch (e) {
+    Logger.log('gpRepairVaDiarioRhRows_: ' + e.message);
+    return 0;
+  }
+}
+
 function gpRepairAllAdmissoesRh_() {
   try {
     const sh = gpSheet_(SH_COLAB_RH);
@@ -9063,6 +9117,7 @@ function repararRhPlanilhaAdmin_(p) {
   if (!adminPinOk_(p)) return err_('Acesso negado — PIN admin 1416', 403);
   try {
     gpRepairAllAdmissoesRh_();
+    const vaReparados = gpRepairVaDiarioRhRows_();
     const shFp = gpSheet_(SH_FOLHA_PONTO);
     const fpLast = shFp.getLastRow();
     if (fpLast >= GP_DATA_ROW) {
@@ -9079,7 +9134,8 @@ function repararRhPlanilhaAdmin_(p) {
     }
     const exportRh = JSON.parse(exportarCadastroRhAdmin_(p).getContent());
     return resp_({
-      mensagem: 'Planilha RH reparada (datas, pct, formatos)',
+      mensagem: 'Planilha RH reparada (datas, pct, formatos, va_diario)',
+      vaDiarioReparados: vaReparados,
       colaboradores: exportRh.colaboradores,
       bancoRepair: bancoRepair,
       versao: 'v1.5.142'
@@ -9178,8 +9234,8 @@ function instalarAbasGestaoPessoasCore_(opts) {
   const log = [];
   log.push(ensure(SH_COLAB_RH, '#2196F3', ['operador_id','nome','funcao','cpf','nascimento','telefone','email','endereco','emergencia','admissao','pix','salario_base','va_diario','meta_loc_dia','bonus_meta_r$','turno','ativo','cadastro_pct','atualizado_em'],
     [
-      [2,'Milena Nunes','Socia','','','','','','','01/01/2020','',1621,20,20,100,'10h–14h','SIM',25,''],
-      [3,'Raykelly','Atendente 1','','','','','','','15/06/2026','',1621,20,20,100,'14h–22h','SIM',25,'']
+      [2,'Milena Nunes','Socia','','','','','','','01/01/2020','',1621,15.38,20,100,'10h–14h','SIM',25,''],
+      [3,'Raykelly','Atendente 1','','','','','','','15/06/2026','',1621,15.38,20,100,'14h–22h','SIM',25,'']
     ]));
   log.push(ensure(SH_FOLHA_PONTO, '#4CAF50', ['id','operador_id','data','dia_semana','entrada','saida','horas','situacao','registrado_em'],
     [[1,3,'15/06/2026','Seg','13:58','21:05','7h07','OK','']]));
