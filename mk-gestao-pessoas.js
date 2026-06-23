@@ -107,6 +107,18 @@
     salvarCadastro: function (operadorId, pin, cadastro) {
       return gpApi('salvarCadastroColaborador', Object.assign({ operadorId: operadorId, pin: pin }, cadastro || {}));
     },
+    salvarCadastroAdmin: function (pinParams, data) {
+      return gpApi('salvarCadastroRhAdmin', Object.assign({}, pinParams || {}, data || {}));
+    },
+    salvarContratoAdmin: function (pinParams, data) {
+      return gpApi('salvarDadosContratuaisRhAdmin', Object.assign({}, pinParams || {}, data || {}));
+    },
+    exportarCadastroAdmin: function (pinParams, operadorId) {
+      return gpApi('exportarCadastroRhAdmin', Object.assign({}, pinParams || {}, operadorId ? { operadorId: operadorId } : {}));
+    },
+    repararPlanilhaAdmin: function (pinParams, opts) {
+      return gpApi('repararRhPlanilhaAdmin', Object.assign({}, pinParams || {}, opts || {}));
+    },
     salvarAvaliacaoAdmin: function (pinParams, data) {
       return gpApi('salvarAvaliacaoRhAdmin', Object.assign({}, pinParams || {}, data || {}));
     }

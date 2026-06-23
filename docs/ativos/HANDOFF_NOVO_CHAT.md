@@ -1,6 +1,6 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 23/06/2026 (fim de sessão) · FE **v1.8.115** · GAS repo **v1.5.137** · ping Web **v1.5.136**  
+**Atualizado:** 23/06/2026 (I46) · FE **v1.8.117** · GAS repo **v1.5.140** · ping Web conforme deploy sócio  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **Repo local:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`  
@@ -53,10 +53,10 @@ cursor "C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-mo
 
 | Camada | Repo | Produção (ping / Pages) | Notas |
 |--------|------|-------------------------|-------|
-| **Frontend** | **v1.8.115** | https://ribocg-a11y.github.io/movikids/?force=1.8.115 | I44 label "Ponto RH hoje" |
-| **Gestão Pessoas** | **v1.8.115** | `gestao-pessoas.html?force=1.8.115` | |
-| **Service Worker** | **1.8.115** | `sw.js` | GAS fora do intercept |
-| **Apps Script** | **v1.5.137** (header `.gs`) | ping **v1.5.136** | **Nova versão Web v1.5.137 pendente** (I44) |
+| **Frontend** | **v1.8.117** | https://ribocg-a11y.github.io/movikids/?force=1.8.117 | I46 governança RH + admin cadastro/contrato |
+| **Gestão Pessoas** | **v1.8.117** | `gestao-pessoas.html?force=1.8.117` | |
+| **Service Worker** | **1.8.117** | `sw.js` | GAS fora do intercept |
+| **Apps Script** | **v1.5.140** (header `.gs`) | ping conforme Web publicada | **Nova versão Web v1.5.140** (I46 faltas holerite + contrato admin) |
 | **Aba FOLHA** | **OK** (I25) | B68 ~5269,96 | |
 | **Aba BANCO_HORAS** | ⚠️ corrompida I44 | Milena/Raykelly saldos absurdos | zerar manual ou `repairBancoHorasAdmin` após Web v1.5.137 |
 | **Design System** | **v1.1** | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` | |

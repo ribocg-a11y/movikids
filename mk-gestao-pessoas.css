@@ -719,6 +719,14 @@ html.gp-mode-app #gp-app {
   box-sizing: border-box;
 }
 #page-operadores .gp-adm-page-head { margin-bottom: 12px; }
+#page-operadores .gp-adm-gov-banner {
+  margin: 0 0 14px; padding: 12px 14px; border-radius: 14px;
+  background: rgba(33, 150, 243, 0.08); border: 1px solid rgba(33, 150, 243, 0.22);
+  font-size: 13px; font-weight: 700; line-height: 1.45; color: var(--txt2);
+}
+#page-operadores .gp-adm-gov-banner a { color: var(--blue); }
+#page-operadores .gp-adm-gov-banner--inline { margin-bottom: 12px; font-size: 12px; }
+#page-operadores .gp-adm-cad-restore { max-height: 280px; overflow-y: auto; margin-bottom: 10px; }
 #page-operadores .gp-adm-page-comp { margin: 0; font-size: 13px; font-weight: 700; color: var(--txt2); }
 #page-operadores .gp-adm-panel-lead {
   margin: 0 0 14px; font-size: 13px; font-weight: 700; color: var(--txt3); line-height: 1.45;

@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.139
+// MOVI KIDS — Google Apps Script v1.5.140
+// v1.5.140: I46 — faltas no holerite; salvarDadosContratuaisRhAdmin; holerite admin com desconto falta
 // v1.5.139: I45b — salvarCadastroRhAdmin + repararRhPlanilhaAdmin + clasp export/busca + sync pct/datas
 // v1.5.138: I45 — instalarAbas nao apaga dados RH; diagnosticoPlanilhaCompleto; salvarCadastro A1+ cache
 // v1.5.137: I44 — banco horas: nao persistir em leitura painel; repair admin; equipe cmd
@@ -417,6 +418,7 @@ function dispatchMoviAction_(p, method) {
       case 'repairBancoHorasAdmin': return repairBancoHorasAdmin_(p);
       case 'diagnosticoPlanilhaCompletoAdmin': return diagnosticoPlanilhaCompletoAdmin_(p);
       case 'salvarCadastroRhAdmin': return salvarCadastroRhAdmin_(p);
+      case 'salvarDadosContratuaisRhAdmin': return salvarDadosContratuaisRhAdmin_(p);
       case 'repararRhPlanilhaAdmin': return repararRhPlanilhaAdmin_(p);
       case 'exportarCadastroRhAdmin': return exportarCadastroRhAdmin_(p);
       case 'buscarTextoPlanilhaAdmin': return buscarTextoPlanilhaAdmin_(p);
@@ -7399,9 +7401,10 @@ function salvarCadastroRhAdmin_(p) {
   const opId = Number(p.operadorId || p.id || 0);
   if (!opId) return err_('operadorId obrigatorio', 400);
   try {
-    const out = gpPersistCadastroRhRow_(opId, p);
+    const parcial = String(p.salvarParcial || '').toLowerCase() === 'sim';
+    const out = gpPersistCadastroRhRow_(opId, p, { permitirParcial: parcial });
     if (!out.ok) return out.err;
-    return resp_(Object.assign({}, out, { mensagem: 'Cadastro RH gravado pelo admin', versao: 'v1.5.139' }));
+    return resp_(Object.assign({}, out, { mensagem: 'Cadastro RH gravado pelo admin', versao: 'v1.5.140' }));
   } catch (ex) {
     return err_('salvarCadastroRhAdmin: ' + ex.message, 500);
   }
@@ -7421,7 +7424,51 @@ function exportarCadastroRhAdmin_(p) {
       salarioBase: obj.salarioBase, turno: obj.turno, atualizadoEm: cellToStr_(r[18])
     };
   }).filter(function (x) { return !opId || Number(x.operadorId) === opId; });
-  return resp_({ colaboradores: lista, versao: 'v1.5.139' });
+  return resp_({ colaboradores: lista, versao: 'v1.5.140' });
+}
+
+/** Admin edita salário, VA, meta, bônus e turno (cols 12–16 COLABORADORES_RH). */
+function salvarDadosContratuaisRhAdmin_(p) {
+  if (!adminPinOk_(p)) return err_('Acesso negado — PIN admin 1416', 403);
+  const opId = Number(p.operadorId || p.id || 0);
+  if (!opId) return err_('operadorId obrigatorio', 400);
+  try {
+    const colab = gpColabRhByOpId_(opId);
+    if (!colab || !colab.row) return err_('Colaborador sem linha em COLABORADORES_RH', 404);
+    const sh = gpSheet_(SH_COLAB_RH);
+    const r = colab.row;
+    if (p.salarioBase != null && String(p.salarioBase) !== '') {
+      sh.getRange(r, 12).setValue(Number(p.salarioBase) || 1621);
+    }
+    if (p.vaDiario != null && String(p.vaDiario) !== '') {
+      sh.getRange(r, 13).setValue(Number(p.vaDiario) || 20);
+    }
+    if (p.metaLocDia != null && String(p.metaLocDia) !== '') {
+      sh.getRange(r, 14).setValue(Number(p.metaLocDia) || 20);
+    }
+    if (p.bonusMeta != null && String(p.bonusMeta) !== '') {
+      sh.getRange(r, 15).setValue(Number(p.bonusMeta) || 100);
+    }
+    if (p.turno != null) {
+      sh.getRange(r, 16).setValue(String(p.turno || '').trim());
+    }
+    sh.getRange(r, 19).setValue(fmtData_(new Date()) + ' ' + fmtHoraLocal_(new Date()));
+    gpInvalidateRhCache_();
+    const atual = gpColabRhByOpId_(opId);
+    return resp_({
+      ok: true,
+      operadorId: opId,
+      salarioBase: atual.salarioBase,
+      vaDiario: atual.vaDiario,
+      metaLocDia: atual.metaLocDia,
+      bonusMeta: atual.bonusMeta,
+      turno: atual.turno,
+      mensagem: 'Dados contratuais gravados na planilha',
+      versao: 'v1.5.140'
+    });
+  } catch (ex) {
+    return err_('salvarDadosContratuaisRhAdmin: ' + ex.message, 500);
+  }
 }
 
 function gpLoadContext_() {
@@ -8010,13 +8057,14 @@ function gpVtPassesMes_() {
   return Math.round((5 * 24 * 2.34) * 100) / 100;
 }
 
-function gpSyncFaltasFromJornada_(opId, jornada) {
+function gpSyncFaltasFromJornada_(opId, jornada, colab, comp) {
   if (!jornada || !jornada.dias || !jornada.dias.length) return;
   try {
     const sh = gpSheet_(SH_FALTAS);
     if (!sh) return;
     const rows = gpRows_(SH_FALTAS);
     let maxId = rows.length ? Math.max.apply(null, rows.map(function (r) { return Number(r[0]) || 0; })) : 0;
+    const diaDesc = gpFaltaDiaDesconto_(colab, comp || gpCompetenciaAtual_());
     jornada.dias.forEach(function (d) {
       if (d.sit !== 'Falta' || !d.data) return;
       const dup = rows.some(function (r) {
@@ -8025,7 +8073,7 @@ function gpSyncFaltasFromJornada_(opId, jornada) {
       if (dup) return;
       maxId++;
       const agora = fmtData_(new Date()) + ' ' + fmtHoraLocal_(new Date());
-      sh.appendRow([maxId, opId, d.data, 'Falta', d.previsto || '', 0, 'Sync jornada GP', agora]);
+      sh.appendRow([maxId, opId, d.data, 'Falta', d.previsto || '', diaDesc || 0, 'Sync jornada GP', agora]);
       rows.push([maxId, opId, d.data]);
     });
   } catch (e) {
@@ -8136,6 +8184,41 @@ function gpCalcIrrf_(baseIrrf) {
     }
   }
   return { irrf: 0, isento: true };
+}
+
+/** Desconto de 1 dia de falta (salário proporcional / dias trabalhados no mês). */
+function gpFaltaDiaDesconto_(colab, comp) {
+  const compParsed = (comp && comp.mes) ? comp : parseMesAnoPayback_(comp || gpCompetenciaAtual_());
+  const salario = Number(colab && colab.salarioBase) || 1621;
+  const diasMes = gpDiasNoMes_(compParsed.mes, compParsed.ano);
+  if (!diasMes) return 0;
+  const diasTrab = colab ? gpDiasTrabalhadosNoMes_(colab.admissao, compParsed.mes, compParsed.ano) : diasMes;
+  const salarioProp = Math.round(salario * (diasTrab / diasMes) * 100) / 100;
+  const divisor = diasTrab > 0 ? diasTrab : diasMes;
+  return Math.round((salarioProp / divisor) * 100) / 100;
+}
+
+/** Soma descontos de falta no mês (aba FALTAS_AUSENCIAS ou jornada). */
+function gpFaltasDescontoMes_(opId, comp, colab, jornada) {
+  const compParsed = parseMesAnoPayback_(comp || gpCompetenciaAtual_());
+  let total = 0;
+  try {
+    const rows = gpRows_(SH_FALTAS);
+    rows.forEach(function (r) {
+      if (Number(r[1]) !== Number(opId)) return;
+      const d = parseDataStr_(cellToStr_(r[2]));
+      if (!d || (d.getMonth() + 1) !== compParsed.mes || d.getFullYear() !== compParsed.ano) return;
+      const v = Number(r[5]);
+      if (!isNaN(v) && v > 0) total += v;
+    });
+  } catch (e) { /* ignore */ }
+  if (total <= 0 && jornada && jornada.dias) {
+    const diaDesc = gpFaltaDiaDesconto_(colab, compParsed);
+    jornada.dias.forEach(function (d) {
+      if (d.sit === 'Falta' && diaDesc > 0) total += diaDesc;
+    });
+  }
+  return Math.round(total * 100) / 100;
 }
 
 function gpCalcHollerite_(colab, bonus, faltas, competencia, refDate) {
@@ -8369,10 +8452,11 @@ function gpBuildPainelColaboradorPayload_(opId, comp, colab, operador) {
   const ctxJ = gpLoadContext_();
   const metas = gpMetasPainel_(opId, comp, ctxJ);
   const bonus = metas.bonusTotal || 0;
-  const hol = gpCalcHollerite_(colab, bonus, 0, comp);
   const pontoHoje = gpStatusPontoHoje_(opId);
   const jornada = gpAnaliseJornadaColab_(opId, comp, ctxJ, colab);
-  gpSyncFaltasFromJornada_(opId, jornada);
+  gpSyncFaltasFromJornada_(opId, jornada, colab, comp);
+  const faltasDesc = gpFaltasDescontoMes_(opId, comp, colab, jornada);
+  const hol = gpCalcHollerite_(colab, bonus, faltasDesc, comp);
   if (hol && hol.quinzena === 2 && hol.liquido != null) {
     gpPersistHoleriteSnapshot_(opId, comp, hol);
   }
@@ -8388,7 +8472,7 @@ function gpBuildPainelColaboradorPayload_(opId, comp, colab, operador) {
     ponto: { statusHoje: pontoHoje.status, folha: gpFolhaPontoColab_(opId, comp), hoje: pontoHoje, jornada: jornada },
     metas: metas, escala: gpEscalaColab_(opId, comp), bancoHoras: jornada.bancoProjetado || gpBancoHoras_(opId),
     pagamento: {
-      base: hol.base, bonus: hol.bonus, faltas: 0, dependentes: 0, competencia: comp,
+      base: hol.base, bonus: hol.bonus, faltas: faltasDesc, dependentes: 0, competencia: comp,
       pagamentoEm: hol.pagamentoEm, quinzena: hol.quinzena, quinzenaLabel: hol.quinzenaLabel,
       diasTrabalhados: hol.diasTrabalhados, diasMes: hol.diasMes, salarioContratual: hol.salarioContratual,
       obs: hol.obs,
@@ -8398,7 +8482,7 @@ function gpBuildPainelColaboradorPayload_(opId, comp, colab, operador) {
     comunicados: gpComunicadosForOp_(opId),
     avaliacoes: gpAvaliacoesForOp_(opId, comp),
     historicoDesempenho: historicoDesempenho,
-    versao: 'v1.5.130'
+    versao: 'v1.5.140'
   };
 }
 
@@ -8591,6 +8675,8 @@ function painelGestaoPessoasAdmin_(p) {
         funcao: rh ? rh.funcao : 'Operador', turno: rh ? rh.turno : '', admissao: rh ? rh.admissao : '',
         cadastroPct: cadPct, cadastroOk: cadObj ? gpCadastroOk_(cadObj) : null,
         cadastro: cadObj, temRh: !!rh,
+        salarioBase: rh ? rh.salarioBase : null, vaDiario: rh ? rh.vaDiario : null,
+        metaLocDia: rh ? rh.metaLocDia : null, bonusMeta: rh ? rh.bonusMeta : null,
         escalaHoje: escalaHoje, escalaFolga: escalaHoje !== null && gpEscalaEhFolga_(escalaHoje),
         ponto: ponto, logadoBalcao: sessaoId === id,
         metas: { alvo: metas.alvo, atual: metas.atual, locMes: locMes, bonusDias: bonusDias, bonusTotal: metas.bonusTotal || 0 },
@@ -8617,6 +8703,8 @@ function painelGestaoPessoasAdmin_(p) {
         cpf: rh ? rh.cpf : String(r[3] || '').trim(),
         cadastroPct: cadPct, cadastroOk: cadObj ? gpCadastroOk_(cadObj) : null,
         cadastro: cadObj, temRh: true,
+        salarioBase: rh ? rh.salarioBase : null, vaDiario: rh ? rh.vaDiario : null,
+        metaLocDia: rh ? rh.metaLocDia : null, bonusMeta: rh ? rh.bonusMeta : null,
         escalaHoje: escalaHoje, escalaFolga: escalaHoje !== null && gpEscalaEhFolga_(escalaHoje),
         ponto: ponto, logadoBalcao: false,
         metas: { alvo: metas.alvo, atual: metas.atual, locMes: locMes, bonusDias: bonusDias, bonusTotal: metas.bonusTotal || 0 },
@@ -8644,10 +8732,16 @@ function painelGestaoPessoasAdmin_(p) {
     const folha = colaboradores.filter(function (c) { return c.temRh; }).map(function (c) {
       const rh = gpColabRhFromCtx_(c.id, ctx);
       const bonus = c.metas.bonusTotal || 0;
-      const hol = gpCalcHollerite_(rh || { salarioBase: 1621, admissao: c.admissao }, bonus, 0, comp);
+      const jornada = c.jornada || gpAnaliseJornadaColab_(c.id, comp, ctx, rh);
+      gpSyncFaltasFromJornada_(c.id, jornada, rh, comp);
+      const faltasDesc = gpFaltasDescontoMes_(c.id, comp, rh, jornada);
+      const hol = gpCalcHollerite_(rh || { salarioBase: 1621, admissao: c.admissao }, bonus, faltasDesc, comp);
+      if (hol && hol.quinzena === 2 && hol.liquido != null) {
+        gpPersistHoleriteSnapshot_(c.id, comp, hol);
+      }
       return {
         id: c.id, nome: c.nome, locMes: c.metas.locMes, bonusDias: c.metas.bonusDias,
-        base: hol.base, bonus: hol.bonus, total: hol.liquido,
+        base: hol.base, bonus: hol.bonus, faltas: faltasDesc, total: hol.liquido,
         quinzena: hol.quinzena, quinzenaLabel: hol.quinzenaLabel, pagamentoEm: hol.pagamentoEm,
         holerite: hol
       };

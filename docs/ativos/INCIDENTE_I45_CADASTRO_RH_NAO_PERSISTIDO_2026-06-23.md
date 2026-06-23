@@ -31,7 +31,15 @@ Raykelly completou cadastro na tela, mas API mostra **25%** (só nome + admissã
 
 ## Recuperação Raykelly
 
-Não há backup automático dos campos. **Refazer:** Colaboradores → Raykelly → PIN → Meus dados → Salvar → conferir `diagnosticoPlanilhaCompletoAdmin`.
+**API 23/06 (diagnosticoPlanilhaCompletoAdmin):** id 3 · **25%** · CPF/telefone/PIX **vazios** na `COLABORADORES_RH`.
+
+**Histórico:** em **20/06** (GAS v1.5.127) cadastro chegou a **100%** — nome **Raykelly Dos Santos Silva** — depois **apagado** (installer `clear()` ou re-seed).
+
+**Milena id 2:** **100% intacta** (CPF na planilha, máscara audit `***6310`) — **não será apagada** pelos fixes.
+
+**Recuperar PII Raykelly:** (1) Histórico de versões da aba `COLABORADORES_RH` na planilha Google · (2) após Web v1.5.139 + acesso anônimo: `buscarTextoPlanilhaAdmin&termo=Raykelly` · (3) `salvarCadastroRhAdmin` com dados recuperados.
+
+**GAS v1.5.139:** `salvarCadastroRhAdmin` · `repararRhPlanilhaAdmin` · `exportarCadastroRhAdmin` · `buscarTextoPlanilhaAdmin`.
 
 ## Ponto
 
