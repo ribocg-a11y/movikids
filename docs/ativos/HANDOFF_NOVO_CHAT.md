@@ -1,6 +1,6 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 23/06/2026 (pós-deploy I46) · FE **v1.8.117** Pages · GAS Web **@201** (sócio) · ping alinhar **v1.5.140+**  
+**Atualizado:** 23/06/2026 (pós-I48) · FE **v1.8.118** Pages · GAS repo **v1.5.142** · ping prod **v1.5.141** (publicar I48)  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **Repo local:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`  
@@ -53,12 +53,13 @@ cursor "C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-mo
 
 | Camada | Repo | Produção (ping / Pages) | Notas |
 |--------|------|-------------------------|-------|
-| **Frontend** | **v1.8.117** | https://ribocg-a11y.github.io/movikids/?force=1.8.117 | I46 governança RH + admin cadastro/contrato |
-| **Gestão Pessoas** | **v1.8.117** | `gestao-pessoas.html?force=1.8.117` | |
-| **Service Worker** | **1.8.117** | `sw.js` | GAS fora do intercept |
-| **Apps Script** | **v1.5.140** (header `.gs`) | ping **v1.5.139→140** após Nova versão | Deploy **@201** · I46 repair OK 23/06 |
+| **Frontend** | **v1.8.118** | https://ribocg-a11y.github.io/movikids/?force=1.8.118 | I47 PIN duplo submit |
+| **Gestão Pessoas** | **v1.8.118** | `gestao-pessoas.html?force=1.8.118` | Ficha admin somente leitura |
+| **Service Worker** | **1.8.118** | `sw.js` | GAS fora do intercept |
+| **Apps Script** | **v1.5.142** (header `.gs`) | ping **v1.5.141** · publicar **v1.5.142** (I48 perf) | Deploy **@201** |
 | **Aba BANCO_HORAS** | ✅ repair I44 | Milena/Raykelly **0h00** | `repararRhPlanilhaAdmin` 23/06 |
-| **COLABORADORES_RH** | Milena **100%** · Raykelly **25%** | Backup `backups/rh/cadastro-rh-2026-06-23_1657.json` | Restaurar Raykelly na Ficha admin |
+| **COLABORADORES_RH** | Milena **100%** · Raykelly **25%** | Backup `backups/rh/cadastro-rh-2026-06-23_1657.json` | Raykelly completar em Colaboradores |
+| **Planilha** | 24 abas mapeadas | `MAPA_PLANILHA_ABAS_MOVIKIDS.md` | `diagnosticoPlanilhaCompletoAdmin` |
 | **Design System** | **v1.1** | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` | |
 
 **Deploy ID GAS:** `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y`
@@ -94,29 +95,38 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 
 ---
 
-## Próximo passo (23/06/2026 — novo chat)
+## Próximo passo (23/06/2026)
 
 | # | Ação | Quem | Status |
 |---|------|------|--------|
-| 1 | **Nova versão Web GAS v1.5.137** (I44 banco horas + repair) | **Sócio** | ⏳ **P0** |
-| 2 | **`repairBancoHorasAdmin`** ou zerar aba `BANCO_HORAS` manual | Sócio/Agente | ⏳ após Web v1.5.137 |
-| 3 | Tablet `?force=1.8.115` + homolog ▶ cronômetro (I43) | Ops loja | ⏳ |
-| 4 | Ponto RH em Colaboradores (FOLHA_PONTO) — alimenta dashboard | Ops | ⏳ |
-| 5 | Homolog Caixa **I42** (2 brinquedos = 1 locação 10h–22h) | Ops loja | ⏳ |
-| 6 | Homolog **Gestor** — sem CONFIG/Sistema | Ops loja | ⏳ |
-| 7 | Raykelly cadastro 100% | Colaborador | ⏳ |
-| 8 | **17.5** decisão F9 Supervisor | Sócio | ⏳ |
+| 1 | **Nova versão Web GAS v1.5.142** (I48 perf admin RH) | **Sócio** | ⏳ **P0** |
+| 2 | Tablet `?force=1.8.118` — login PIN Milena/Raykelly (I47) | Ops loja | ⏳ |
+| 3 | Raykelly cadastro **100%** em `gestao-pessoas.html` (PIN dela) | Colaborador | ⏳ 25% |
+| 4 | Homolog ▶ cronômetro (I43) + Caixa I42 + Gestor | Ops loja | ⏳ |
+| 5 | Ponto RH diário (`FOLHA_PONTO`) | Ops | ⏳ |
+| 6 | **17.5** decisão F9 Supervisor | Sócio | ⏳ |
 
-Docs: `INCIDENTE_I43_*` · `INCIDENTE_I44_*` · `ARQUITETURA_CAIXA_CONTA_DIA_2026-06.md` · `MATRIZ_PERMISSOES_PERFIS_2026-06.md`
+Docs: `INCIDENTE_I48_*` · `MAPA_PLANILHA_ABAS_MOVIKIDS.md` · `GOVERNANCA_DADOS_RH_2026-06-23.md`
 
 ---
 
-## Incidentes — sessão 23/06/2026
+## Incidentes — sessão 23/06/2026 (tarde)
+
+| ID | Evento | Fix |
+|----|--------|-----|
+| **I46** | Faltas/holerite RH + governança dados | GAS **v1.5.140–141** · FE **v1.8.117** (forms admin removidos em I47) |
+| **I47** | PIN duplo submit / teclado password tablet | FE **v1.8.118** · GAS **v1.5.141** |
+| **I48** | Admin Operadores lento — escrita FALTAS/HOLERITES na leitura (I46) | GAS **v1.5.142** — só cálculo em memória |
+
+---
+
+## Incidentes — sessão 23/06/2026 (manhã)
 
 | ID | Evento | Fix |
 |----|--------|-----|
 | **I43** | Cronômetro revertia após ▶ (`carregarInicio` 19 cols sem col Y) | GAS **v1.5.136** prod · FE **v1.8.114+** · `TESTE_I43` no pre-push |
-| **I44** | Banco horas corrompido (-544h→-884h) — persist em **leitura** painel RH | GAS **v1.5.137** repo · `repairBancoHorasAdmin` · FE label v1.8.115 |
+| **I44** | Banco horas corrompido — persist em **leitura** painel RH | GAS **v1.5.137** · `repairBancoHorasAdmin` |
+| **I48** | **painelGestaoPessoasAdmin** escrevia FALTAS/HOLERITES na leitura | GAS **v1.5.142** — nunca append em read admin |
 | **I45** | Cadastro Raykelly não persistiu · installer apagava abas RH | GAS **v1.5.138** · FE **v1.8.116** · mapa `MAPA_PLANILHA_ABAS_MOVIKIDS.md` |
 
 ---
@@ -151,7 +161,7 @@ Docs: `INCIDENTE_I43_*` · `INCIDENTE_I44_*` · `ARQUITETURA_CAIXA_CONTA_DIA_202
 1. Fluxo **F0–F14** antes de codar (`PROTOCOLO_DIAGNOSTICO_E_TESTES.md`)
 2. PC ≠ tablet
 3. FE + GAS + planilha + PWA
-4. MAPA_ERROS I15/I18/I20/I21/I22/I23/I42/I43/I44
+4. MAPA_ERROS I15/I18/I20/I21/I22/I23/I42/I43/I44/**I48**
 
 ---
 

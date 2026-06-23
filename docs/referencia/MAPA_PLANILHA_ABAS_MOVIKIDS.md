@@ -1,6 +1,6 @@
 # Mapa canônico — Planilha MOVI KIDS (hierarquia + controle)
 
-**Atualizado:** 23/06/2026 · GAS Web **v1.5.139** · FE **v1.8.116**  
+**Atualizado:** 23/06/2026 · GAS ping **v1.5.141** · repo **v1.5.142** · FE **v1.8.118**  
 **Workbook único:** [MOVIKIDS_Planilha_Base](https://docs.google.com/spreadsheets/d/1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618/edit) · ID `1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618`  
 **Inventário ao vivo:** `?action=diagnosticoPlanilhaCompletoAdmin&adminPin=1416`  
 **Teste:** `scripts/testes/TESTE_AUDITORIA_PLANILHA_COMPLETA_READONLY.ps1`
@@ -204,20 +204,95 @@ Legenda: **Alimenta** = quem lê/consome · **Gravado por** = quem escreve em ru
 
 ### LOCACOES (header linha 9, dados desde 11)
 
-| Col | Campo | Notas |
-|-----|-------|--------|
-| A–R | ids, status, veículo, valores… | Operação |
-| S (19) | conta_id | Conta do dia (I42) |
-| Y (25) | startTimestamp | **Cronômetro** — `COL_LOC_READ_=28` (I43) |
-| Z (26) | extendedMins | Extensão |
+| Col | Índice 0-based | Campo GAS | Gravado por |
+|-----|----------------|-----------|-------------|
+| A | r[0] | id | `salvarLocacao_` auto |
+| B | r[1] | data | auto dd/mm/aaaa |
+| C | r[2] | horaInicio | `iniciarTimer_` |
+| D | r[3] | horaFim | `encerrarLocacao_` |
+| E | r[4] | tipo | Carros / Pelúcias / Triciclos |
+| F | r[5] | plano | 30min / 1h / 3h … |
+| G | r[6] | mins contratados | CONFIG preços |
+| H | r[7] | valorPlano | R$ |
+| I | r[8] | minAdicionais | extensão |
+| J | r[9] | valorAdicional | R$ |
+| K | r[10] | valorTotal | R$ |
+| L | r[11] | responsavel | CRM |
+| M | r[12] | crianca | portal |
+| N | r[13] | telefone | portal / conta dia |
+| O | r[14] | status | Pendente / Ativa / Encerrada / Cancelada |
+| P | r[15] | veiculo | CONFIG frota |
+| Q | r[16] | pagamento | PIX / Crédito … |
+| R | r[17] | observacao | texto |
+| S | r[18] | **conta_id** | I42 — mesma conta 10h–22h |
+| T–X | r[19–23] | reservado / sync | não usar manual |
+| Y | r[24] | **startTimestamp** | cronômetro ms (I43) |
+| Z | r[25] | extendedMins | extensão timer |
+| AA | r[26] | extendedValor | R$ extensão |
+| AB | r[27] | *(se existir)* | leitura até `COL_LOC_READ_=28` |
+
+Fonte: comentário `salvarLocacao_` + `locacaoObj_` no `.gs`.
 
 ### COLABORADORES_RH (header linha 1, dados linha 2+)
 
-Ver tabela cols A–T na versão anterior — gate 8 campos obrigatórios via `gpCadastroOk_`.
+| Col | Header planilha | Campo GAS | Obrigatório gate 428 |
+|-----|-----------------|-----------|----------------------|
+| A | operador_id | `operadorId` | sim (FK OPERADORES) |
+| B | nome | `nomeCompleto` | **sim** |
+| C | funcao | `funcao` | não |
+| D | cpf | `cpf` | **sim** |
+| E | nascimento | `nascimento` | **sim** |
+| F | telefone | `telefone` | **sim** |
+| G | email | `email` | não |
+| H | endereco | `endereco` | **sim** |
+| I | emergencia | `emergencia` | **sim** |
+| J | admissao | `admissao` | **sim** |
+| K | pix | `pix` | **sim** |
+| L | salario_base | `salarioBase` | contrato |
+| M | va_diario | `vaDiario` | contrato |
+| N | meta_loc_dia | `metaLocDia` | contrato |
+| O | bonus_meta_r$ | `bonusMeta` | contrato |
+| P | turno | `turno` | contrato |
+| Q | ativo | `ativo` | SIM/NAO |
+| R | cadastro_pct | cache % | recalculado por GAS |
+| S | atualizado_em | auditoria | auto |
 
-### FOLHA_PONTO
+Gate: `gpCadastroOk_` = 8 campos B,D,E,F,H,I,J,K preenchidos (100%).
 
-Cols: id, operador_id, data, dia_semana, entrada, saida, horas, situacao, registrado_em.
+### FOLHA_PONTO (header linha 1)
+
+| Col | Header | Uso |
+|-----|--------|-----|
+| A | id | PK sequencial |
+| B | operador_id | FK colaborador |
+| C | data | dd/mm/aaaa |
+| D | dia_semana | texto |
+| E | entrada | HH:mm |
+| F | saida | HH:mm |
+| G | horas | ex. 7h07 |
+| H | situacao | OK / falta |
+| I | registrado_em | timestamp |
+
+### FALTAS_AUSENCIAS / HOLERITES / BANCO_HORAS
+
+| Aba | Cols | Escrita em runtime |
+|-----|------|-------------------|
+| FALTAS_AUSENCIAS | id, operador_id, data, tipo, horas, valor_desconto, obs, registrado_em | `gpSyncFaltasFromJornada_` no **login colaborador** — **não** no admin (I48) |
+| HOLERITES | id, operador_id, competencia, base, bonus, faltas, inss, irrf, vt, liquido, fgts, va_total, dias_trab, obs, gerado_em | `gpPersistHoleriteSnapshot_` no colaborador quinzena 2 |
+| BANCO_HORAS | operador_id, saldo_hhmm, atualizado_em | saída ponto + repair admin |
+
+### OPERADORES_SISTEMA (login balcão — ≠ RH)
+
+| Col | Campo |
+|-----|-------|
+| 1 | id |
+| 2 | nome |
+| 3 | perfil |
+| 4 | pin_hash |
+| 5 | pin_salt |
+| 6 | ativo |
+| 7 | ultimo_login |
+| 8 | observacao |
 
 ---
 
@@ -230,12 +305,34 @@ Cols: id, operador_id, data, dia_semana, entrada, saida, horas, situacao, regist
 | I43 | LOCACOES col Y | timestamp cronômetro |
 | I44 | BANCO_HORAS | Não persistir em leitura painel |
 | I45 | COLABORADORES_RH | Installer `clear()` + FE falso save |
+| **I48** | FALTAS / HOLERITES | Admin leitura não pode `appendRow` |
 
-Doc: `docs/ativos/INCIDENTE_I45_CADASTRO_RH_NAO_PERSISTIDO_2026-06-23.md`
+Doc: `docs/arquivo/incidentes/INCIDENTE_I48_ADMIN_RH_LENTO_ESCRITA_LEITURA_2026-06-23.md`
 
 ---
 
-## 8. Como auditar de novo
+## 8. Estado auditado (23/06/2026 19:29)
+
+Fonte: `diagnosticoPlanilhaCompletoAdmin` · ping **v1.5.141**
+
+| Métrica | Valor | OK? |
+|---------|-------|-----|
+| Total abas | **24** | ✅ todas `mapeadaGAS=true` |
+| LOCACOES | 803 linhas · 28 cols | ✅ col Y/Z presentes |
+| AUDITORIA | 2500 linhas | ✅ metas vivas |
+| COLABORADORES_RH | 2 colaboradores | Milena **100%** · Raykelly **25%** ⚠️ |
+| FOLHA_PONTO | 1 registro (Raykelly 15/06) | ✅ |
+| FALTAS_AUSENCIAS | 22 linhas | ⚠️ inflado por I46 admin — estabiliza após I48 |
+| BANCO_HORAS | saldos 0h00 | ✅ pós-repair I44 |
+| FOLHA memorial | 99 linhas · B68 ~5269 | ✅ |
+| PLANO_CONTAS | ausente | esperado (F14 opcional) |
+| Analise | legado 4 linhas | não usar |
+
+**Certeza célula a célula:** o GAS define headers em `instalarAbasGestaoPessoasCore_` e mapeia colunas em `gpColabRhObjFromRow_` / `COL_LOC_READ_=28`. Para LOCAÇÕES operacionais (cols A–AB), ver memorial em `FOLHA_PAGAMENTO_MEMORIAL` + constantes no `.gs`. Auditoria OAuth célula a célula: `google-drive-sheets-auth/scripts/auditar-planilha-movikids.js` (requer `npm run auth`).
+
+---
+
+## 9. Como auditar de novo
 
 ```powershell
 .\scripts\testes\TESTE_AUDITORIA_PLANILHA_COMPLETA_READONLY.ps1

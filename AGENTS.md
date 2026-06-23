@@ -57,9 +57,9 @@ Detalhe completo: [`ACESSOS_E_AUTORIZACOES.md`](docs/ativos/ACESSOS_E_AUTORIZACO
 
 | Camada | Versão repo | Ping produção |
 |--------|-------------|---------------|
-| Frontend | **v1.8.117** | https://ribocg-a11y.github.io/movikids/?force=1.8.117 |
-| Gestão Pessoas | **v1.8.117** | `gestao-pessoas.html?force=1.8.117` |
-| GAS | repo **v1.5.140** | Nova versão Web v1.5.140 (I46) |
+| Frontend | **v1.8.118** | https://ribocg-a11y.github.io/movikids/?force=1.8.118 |
+| Gestão Pessoas | **v1.8.118** | `gestao-pessoas.html?force=1.8.118` |
+| GAS | repo **v1.5.142** · ping **v1.5.141** | Nova versão Web **v1.5.142** (I48 perf) |
 | Design System | **v1.1** | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
 | Aba FOLHA | OK (I25) | B68 ~5269,96 · `folhaPlanejamento.fonte: FOLHA` |
 | Deploy ID | `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y` | |
@@ -97,10 +97,12 @@ Fonte de verdade: `mk-version.js`, header do `.gs`, ping GAS.
 
 - **FASE 1–9:** ✅ prod
 - **FASE 14 mini-DRE:** ✅ prod
-- **FASE 15–17:** 🟡 repo fechado · homolog tablet + GAS Web v1.5.137 pendente
+- **FASE 15–17:** 🟡 homolog tablet · GAS Web **v1.5.142** pendente (I48)
 - **I43:** ✅ hotfix prod (cronômetro)
-- **I44:** fix repo — **repair BANCO_HORAS** após Nova versão Web
-- **Próximo:** GAS v1.5.137 Web · repair banco · homolog I42/Gestor/tablet
+- **I44:** ✅ banco reparado
+- **I45–I47:** RH governança + PIN — FE **v1.8.118**
+- **I48:** fix repo perf admin — publicar GAS v1.5.142
+- **Próximo:** Nova versão Web · Raykelly cadastro 100% · homolog tablet
 
 ## "Atualize tudo"
 

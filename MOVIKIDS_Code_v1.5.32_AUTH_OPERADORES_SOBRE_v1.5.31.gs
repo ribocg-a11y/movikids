@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.141
+// MOVI KIDS — Google Apps Script v1.5.142
+// v1.5.142: I48 — painelGestaoPessoasAdmin sem escrita FALTAS/HOLERITES (perf leitura admin)
 // v1.5.141: I47 — gpVerifyPinColaborador alinha strip hash/salt com loginOperador
 // v1.5.140: I46 — faltas no holerite; salvarDadosContratuaisRhAdmin; holerite admin com desconto falta
 // v1.5.139: I45b — salvarCadastroRhAdmin + repararRhPlanilhaAdmin + clasp export/busca + sync pct/datas
@@ -510,9 +511,9 @@ function ping_() {
   const agora = new Date();
   return resp_({
     status:  'online',
-    versao:  'v1.5.141',
+    versao:  'v1.5.142',
     timestamp: fmtData_(agora) + ' ' + fmtHoraLocal_(agora),
-    sistema: 'MOVI KIDS v1.5.141',
+    sistema: 'MOVI KIDS v1.5.142',
     postWriteActions: WRITE_ACTIONS_CRITICAS_
   });
 }
@@ -8733,13 +8734,9 @@ function painelGestaoPessoasAdmin_(p) {
     const folha = colaboradores.filter(function (c) { return c.temRh; }).map(function (c) {
       const rh = gpColabRhFromCtx_(c.id, ctx);
       const bonus = c.metas.bonusTotal || 0;
-      const jornada = c.jornada || gpAnaliseJornadaColab_(c.id, comp, ctx, rh);
-      gpSyncFaltasFromJornada_(c.id, jornada, rh, comp);
+      const jornada = c.jornada;
       const faltasDesc = gpFaltasDescontoMes_(c.id, comp, rh, jornada);
       const hol = gpCalcHollerite_(rh || { salarioBase: 1621, admissao: c.admissao }, bonus, faltasDesc, comp);
-      if (hol && hol.quinzena === 2 && hol.liquido != null) {
-        gpPersistHoleriteSnapshot_(c.id, comp, hol);
-      }
       return {
         id: c.id, nome: c.nome, locMes: c.metas.locMes, bonusDias: c.metas.bonusDias,
         base: hol.base, bonus: hol.bonus, faltas: faltasDesc, total: hol.liquido,
@@ -8763,14 +8760,14 @@ function painelGestaoPessoasAdmin_(p) {
         total: colaboradores.length, presentes: presentes, comTurno: comTurno,
         alertas: alertasPack.total, alertasIntel: intelRh.length
       },
-      sessaoAtiva: sessao, versao: 'v1.5.134',
+      sessaoAtiva: sessao, versao: 'v1.5.142',
       comunicadosRh: gpComunicadosAllAdmin_(),
       avaliacoesRh: gpAvaliacoesAllAdmin_(),
       competenciasRh: GP_COMPETENCIAS_RH_
     };
     const out = JSON.stringify({ ok: true, ...payload });
     try {
-      if (out.length < 95000) CacheService.getScriptCache().put(cacheKey, out, 45);
+      if (out.length < 95000) CacheService.getScriptCache().put(cacheKey, out, 90);
     } catch (e) { /* ok */ }
     return ContentService.createTextOutput(out).setMimeType(ContentService.MimeType.JSON);
   } catch (ex) {
@@ -8782,7 +8779,7 @@ function gestaoPessoasStatus_() {
   const ss = ss_();
   const abas = [SH_COLAB_RH, SH_FOLHA_PONTO, SH_ESCALA_COLAB, SH_FALTAS, SH_HOLERITES, SH_METAS_COLAB, SH_BANCO_HORAS, SH_COMUNICADOS_RH, SH_AVALIACOES_RH];
   const ok = abas.every(function (n) { return !!ss.getSheetByName(n); });
-  return resp_({ ok: ok, abas: abas.map(function (n) { return { nome: n, existe: !!ss.getSheetByName(n) }; }), versao: 'v1.5.139' });
+  return resp_({ ok: ok, abas: abas.map(function (n) { return { nome: n, existe: !!ss.getSheetByName(n) }; }), versao: 'v1.5.142' });
 }
 
 /** I45 — inventário completo da planilha + RH auditável (admin PIN). */
@@ -8869,7 +8866,7 @@ function diagnosticoPlanilhaCompletoAdmin_(p) {
       colaboradoresRh: colaboradoresRh,
       folhaPonto: folhaPonto,
       bancoHoras: bancoHoras,
-      versao: 'v1.5.139'
+      versao: 'v1.5.142'
     });
   } catch (ex) {
     return err_('diagnosticoPlanilhaCompleto: ' + ex.message, 500);
@@ -9085,7 +9082,7 @@ function repararRhPlanilhaAdmin_(p) {
       mensagem: 'Planilha RH reparada (datas, pct, formatos)',
       colaboradores: exportRh.colaboradores,
       bancoRepair: bancoRepair,
-      versao: 'v1.5.139'
+      versao: 'v1.5.142'
     });
   } catch (ex) {
     return err_('repararRhPlanilhaAdmin: ' + ex.message, 500);

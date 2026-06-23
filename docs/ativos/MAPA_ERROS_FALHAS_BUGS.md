@@ -1,6 +1,6 @@
 # MOVI KIDS — Mapa de erros, falhas e bugs
 
-**Atualizado:** 23/06/2026 — **I43** cronômetro · **I44** banco horas · FE **v1.8.115** · GAS repo **v1.5.137** · ping **v1.5.136**  
+**Atualizado:** 23/06/2026 — **I48** perf admin · **I47** PIN · **I45–I46** RH · FE **v1.8.118** · GAS **v1.5.142**  
 **Uso anterior:** 22/06/2026 — **I38–I41** auditoria RH 22/06 · GAS repo **v1.5.129** (ping **v1.5.107**) · FE **v1.8.110**  
 **Uso anterior:** 17/06/2026 — **I28** liberar sessão tablet · GAS **v1.5.92** prod. · FE **v1.8.30**  
 **Uso anterior:** 09/06/2026 — **I22 fechado** (hotfix FE v1.8.2)  
@@ -53,6 +53,9 @@
 | **I40** | **Hub benefícios `calcFolhaPagamento`** ≠ GAS quinzenal | Chips VA/VT divergem do holerite | FE **v1.8.111** — hub usa `pg.holerite` | `gpBeneficiosResumo_` | hub vs tela holerite |
 | **I44** | **`gpPersistBancoFromJornada_` em leitura painel RH** | BANCO_HORAS -544h→-884h; alertas absurdos | GAS **v1.5.137** — persist só na saída ponto; `repairBancoHorasAdmin` | não persist em read | zerar aba + repair API |
 | **I45** | **Cadastro RH não persistido / installer apagava abas** | Raykelly 25% após “completar”; FE falso sucesso | GAS **v1.5.138** · FE **v1.8.116** · `diagnosticoPlanilhaCompletoAdmin` | não `clear()` com dados · salvar exige PIN | Raykelly refazer cadastro |
+| **I46** | **Faltas/holerite RH + sync jornada** | Holerite com desconto faltas; governança dados | GAS **v1.5.140** · FE **v1.8.117** | persist no colaborador, não admin | `GOVERNANCA_DADOS_RH_2026-06-23.md` |
+| **I47** | **PIN duplo submit + teclado password no tablet** | “PIN incorreto” falso; várias tentativas | FE **v1.8.118** `_authBusy` + `tel` · GAS **v1.5.141** hash strip | `onLoginPin` guard | tablet `?force=1.8.118` |
+| **I48** | **`painelGestaoPessoasAdmin` escrevia FALTAS/HOLERITES na leitura** (I46) | Operadores admin lento de novo | GAS **v1.5.142** — só cálculo em memória no admin | nunca append em read admin | 2× painelGestaoPessoasAdmin |
 | **I43** | **`carregarInicio` getRange 19 cols (I42) sem col Y** | **▶ inicia → sync reverte para Pendente 10:00** | GAS **v1.5.136** `COL_LOC_READ_=28`; FE **v1.8.114** merge I43 | `guard.gas.carregarInicio.colY`, `guard.sync.i43` | **`TESTE_I43_CARREGAR_INICIO_READONLY`** + tablet ▶ |
 | **I42** | Conta do dia — mesmo telefone 10h–22h | Caixa `n` vs sessões; maquininha | GAS **v1.5.131+** col S `conta_id` | `TESTE_I42_CONTA_DIA_CAIXA` | não reduzir `COL_LOC_READ_` (ver I43) |
 | **I41** | **`ping_` versão defasada** (v1.5.107 vs repo) | Confusão deploy / verify | GAS **v1.5.130** `ping_()` alinhado | `ping_` header alinhado | ping = v1.5.130 |
