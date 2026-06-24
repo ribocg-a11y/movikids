@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.148
+// MOVI KIDS — Google Apps Script v1.5.149
+// v1.5.149: I52 — LOCACOES schema 28 cols, listarAtivas COL_LOC_READ_, repair memorial/formatos/protecao
 // v1.5.148: I51d — jornada exibe Abonado (nao Falta) quando abono ADM na data
 // v1.5.147: I51c — holerite respeita abono na jornada; restore abona folga 20/06 Raykelly
 // v1.5.146: I51b — restore ponto limpa FALTAS nao abonadas do mes (nao so Sync jornada)
@@ -428,6 +429,7 @@ function dispatchMoviAction_(p, method) {
       case 'salvarCadastroRhAdmin': return salvarCadastroRhAdmin_(p);
       case 'salvarDadosContratuaisRhAdmin': return salvarDadosContratuaisRhAdmin_(p);
       case 'repararRhPlanilhaAdmin': return repararRhPlanilhaAdmin_(p);
+      case 'repararLocacoesPlanilhaAdmin': return repararLocacoesPlanilhaAdmin_(p);
       case 'salvarPontoRhAdmin': return salvarPontoRhAdmin_(p);
       case 'abonarFaltaRhAdmin': return abonarFaltaRhAdmin_(p);
       case 'restaurarPontoRaykellyJun2026Admin': return restaurarPontoRaykellyJun2026Admin_(p);
@@ -520,9 +522,9 @@ function ping_() {
   const agora = new Date();
   return resp_({
     status:  'online',
-    versao:  'v1.5.148',
+    versao:  'v1.5.149',
     timestamp: fmtData_(agora) + ' ' + fmtHoraLocal_(agora),
-    sistema: 'MOVI KIDS v1.5.148',
+    sistema: 'MOVI KIDS v1.5.149',
     postWriteActions: WRITE_ACTIONS_CRITICAS_
   });
 }
@@ -568,14 +570,23 @@ function diagnosticoSistema_() {
   });
 }
 
+/** Cabeçalho linha 9 — 28 colunas (A–AB). Fonte: MAPA_PLANILHA §6 + COL_LOC_READ_. */
+const LOC_HEADER_ROW_ = 9;
+const LOC_HEADERS_ = [
+  '#', 'Data', 'Hora inicio', 'Hora fim', 'Tipo', 'Plano', 'Min contratados', 'Valor plano',
+  'Min adicionais', 'Valor adicional', 'Valor total', 'Responsavel', 'Crianca', 'Telefone',
+  'Status', 'Veiculo', 'Pagamento', 'Observacao',
+  'conta_id', 'sync_1', 'sync_2', 'sync_3', 'sync_4', 'sync_5',
+  'startTimestamp', 'extendedMins', 'extendedValor', 'reservado'
+];
+/** Col S (19) — id da locação-mestre (I42). Leitura timer: COL_LOC_READ_ (28). */
+const COL_CONTA_ID_ = 19;
+const COL_LOC_READ_ = 28;
+
 function validarSchema_() {
   const ss = ss_();
   const esperado = {
-    LOCACOES: [
-      '#','Data','Hora','Hora','Tipo','Plano','Min','Valor',
-      'Min','Valor','Valor','Responsavel','Crianca','Telefone',
-      'Status','Veiculo','Pagamento','Observacao'
-    ],
+    LOCACOES: LOC_HEADERS_,
     CUSTOS: ['#','Data','Hora','Descricao','Categoria','Valor'],
     RELATORIOS: ['#','Mes','Data','Link','Tipo','Obs']
   };
@@ -588,8 +599,9 @@ function validarSchema_() {
       return;
     }
 
-    const headerRow = nome === 'RELATORIOS' ? 1 : 9;
-    const width = Math.min(sheet.getLastColumn(), esperado[nome].length);
+    const headerRow = nome === 'RELATORIOS' ? 1 : LOC_HEADER_ROW_;
+    const expLen = esperado[nome].length;
+    const width = nome === 'LOCACOES' ? expLen : Math.min(sheet.getLastColumn(), expLen);
     const headers = width > 0
       ? sheet.getRange(headerRow, 1, 1, width).getValues()[0].map(cellToStr_)
       : [];
@@ -618,17 +630,140 @@ function validarSchema_() {
   });
 
   return resp_({
-    versao: 'v1.5.31',
+    versao: 'v1.5.149',
     schemaOk: Object.values(resultado).every(r => r.ok),
     resultado
   });
 }
 
+/** I52 — memorial linhas 1–8, header 28 cols, congelar linha 9, proteger memorial. */
+function repairLocacoesMemorialCore_() {
+  const sheet = sh_(SH_LOC);
+  const memorial = [
+  'MOVI KIDS — LOCAÇÕES · dados operacionais (não editar manualmente)',
+  'Gravado pelo app balcão / GAS · Mapa: MAPA_PLANILHA_ABAS_MOVIKIDS.md §6',
+  'Cols críticas: S=conta_id (I42) · Y=startTimestamp ms (I43) · Z/AA=extensão',
+  '', '', '', '', ''
+  ];
+  memorial.forEach(function (txt, i) {
+    sheet.getRange(i + 1, 1).setValue(txt);
+  });
+  sheet.getRange(LOC_HEADER_ROW_, 1, 1, LOC_HEADERS_.length).setValues([LOC_HEADERS_]);
+  sheet.getRange(LOC_HEADER_ROW_, 1, 1, LOC_HEADERS_.length)
+    .setFontWeight('bold').setBackground('#E8F0FE');
+  sheet.setFrozenRows(LOC_HEADER_ROW_);
+  try {
+    sheet.getProtections(SpreadsheetApp.ProtectionType.RANGE).forEach(function (pr) {
+      const d = String(pr.getDescription() || '');
+      if (d.indexOf('MOVI KIDS memorial LOCACOES') >= 0) pr.remove();
+    });
+    sheet.getRange(1, 1, LOC_HEADER_ROW_, sheet.getMaxColumns()).protect()
+      .setDescription('MOVI KIDS memorial LOCACOES — nao editar')
+      .setWarningOnly(false);
+  } catch (e) {
+    Logger.log('repairLocacoesMemorial protect: ' + e.message);
+  }
+  return { memorialOk: true, headerCols: LOC_HEADERS_.length };
+}
+
+/** I52 — formatos dd/mm, hh:mm, R$, telefone texto, validação Status. */
+function repairLocacoesFormatosCore_(lastRow) {
+  const sheet = sh_(SH_LOC);
+  if (lastRow < DATA_ROW) return { linhas: 0 };
+  const n = lastRow - DATA_ROW + 1;
+  sheet.getRange(DATA_ROW, 2, n, 1).setNumberFormat('dd/mm/yyyy');
+  sheet.getRange(DATA_ROW, 3, n, 2).setNumberFormat('hh:mm');
+  sheet.getRange(DATA_ROW, 8, n, 1).setNumberFormat('"R$" #,##0.00');
+  sheet.getRange(DATA_ROW, 10, n, 2).setNumberFormat('"R$" #,##0.00');
+  if (lastRow >= DATA_ROW) {
+    sheet.getRange(DATA_ROW, 27, n, 1).setNumberFormat('"R$" #,##0.00');
+  }
+  sheet.getRange(DATA_ROW, 14, n, 1).setNumberFormat('@');
+  const statusRule = SpreadsheetApp.newDataValidation()
+    .requireValueInList(['Pendente', 'Ativa', 'Encerrada', 'Cancelada'], true)
+    .setAllowInvalid(false)
+    .build();
+  sheet.getRange(DATA_ROW, 15, n, 1).setDataValidation(statusRule);
+  return { linhas: n };
+}
+
+/** I52 — amostra últimas N linhas: status, timestamp Ativa, números. */
+function auditLocacoesSampleCore_(amostra) {
+  const sheet = sh_(SH_LOC);
+  const last = sheet.getLastRow();
+  if (last < DATA_ROW) return { amostra: 0, problemas: [], lastRow: last };
+  const n = Math.min(Math.max(parseInt(amostra, 10) || 20, 1), last - DATA_ROW + 1);
+  const start = last - n + 1;
+  const dados = sheet.getRange(start, 1, last - start + 1, COL_LOC_READ_).getValues();
+  const problemas = [];
+  const statusOk = { Pendente: 1, Ativa: 1, Encerrada: 1, Cancelada: 1 };
+  dados.forEach(function (r, idx) {
+    const rowIndex = start + idx;
+    if (!r[0]) return;
+    const st = String(r[14] || '').trim();
+    if (!statusOk[st]) problemas.push({ row: rowIndex, campo: 'Status', valor: st });
+    if (st === 'Ativa' && !(Number(r[24]) > 0)) {
+      problemas.push({ row: rowIndex, campo: 'startTimestamp', valor: 'Ativa sem col Y' });
+    }
+    if (r[7] !== '' && r[7] != null && isNaN(Number(r[7]))) {
+      problemas.push({ row: rowIndex, campo: 'valorPlano', valor: String(r[7]) });
+    }
+    if (isLocacaoTeste_(String(r[12] || ''), String(r[11] || ''), String(r[13] || ''), String(r[17] || ''))) {
+      problemas.push({ row: rowIndex, campo: 'teste', valor: String(r[12] || r[11] || '') });
+    }
+  });
+  return { amostra: dados.length, problemas: problemas, lastRow: last };
+}
+
+/** Admin — repair LOCACOES: memorial, headers, formatos, proteção; opcional limpar testes. */
+function repararLocacoesPlanilhaAdmin_(p) {
+  if (!adminPinOk_(p)) return err_('Acesso negado — PIN admin 1416', 403);
+  const dryRun = String(p.dryRun || '') === '1' || p.dryRun === true;
+  if (dryRun) {
+    const schemaJson = JSON.parse(validarSchema_().getContent());
+    return resp_({
+      dryRun: true,
+      audit: auditLocacoesSampleCore_(30),
+      schemaOk: schemaJson.schemaOk,
+      schemaLoc: schemaJson.resultado && schemaJson.resultado.LOCACOES,
+      versao: 'v1.5.149'
+    });
+  }
+  const lock = LockService.getScriptLock();
+  try { lock.waitLock(15000); } catch (ex) { return err_('Sistema ocupado', 503); }
+  try {
+    const sheet = sh_(SH_LOC);
+    const last = sheet.getLastRow();
+    const memorial = repairLocacoesMemorialCore_();
+    const formatos = repairLocacoesFormatosCore_(last);
+    let limpeza = null;
+    if (String(p.limparTeste || '') === '1' || p.limparTeste === true) {
+      const motivo = String(p.motivo || 'Limpeza locacoes teste pos repair I52').trim();
+      if (motivo.length < 10) return err_('Motivo obrigatorio (min 10 caracteres)', 400);
+      limpeza = JSON.parse(limparLocacoesTesteAdmin_({
+        adminPin: p.adminPin, motivo: motivo, soHoje: ''
+      }).getContent());
+    }
+    const audit = auditLocacoesSampleCore_(30);
+    try { invalidateInicioResumoCache_(fmtData_(new Date())); } catch (e) {}
+    const schemaJson = JSON.parse(validarSchema_().getContent());
+    return resp_({
+      mensagem: 'LOCACOES reparada (memorial, headers 28 cols, formatos, protecao)',
+      memorial: memorial,
+      formatos: formatos,
+      limpeza: limpeza,
+      audit: audit,
+      schemaOk: schemaJson.schemaOk,
+      versao: 'v1.5.149'
+    });
+  } catch (ex) {
+    return err_('repararLocacoesPlanilhaAdmin: ' + ex.message, 500);
+  } finally {
+    lock.releaseLock();
+  }
+}
+
 // ── CONTA DO DIA (telefone + janela 10h–22h) ─────────────────
-/** Col S (19) — id da locação-mestre para faturamento/caixa (várias sessões = 1 conta). */
-const COL_CONTA_ID_ = 19;
-/** Leitura LOCAÇÕES com timestamp (Y=25) e ext (Z=26) — nunca usar só COL_CONTA_ID_ em sync/timer. */
-const COL_LOC_READ_ = 28;
 const JANELA_OP_INI_MIN_ = 10 * 60;
 const JANELA_OP_FIM_MIN_ = 22 * 60;
 
@@ -882,7 +1017,7 @@ function listarAtivas_() {
   const last  = sheet.getLastRow();
   if (last < DATA_ROW) return resp_({ locacoes: [] });
 
-  const dados = sheet.getRange(DATA_ROW, 1, last - DATA_ROW + 1, 26).getValues();
+  const dados = sheet.getRange(DATA_ROW, 1, last - DATA_ROW + 1, COL_LOC_READ_).getValues();
   const ativas = [];
 
   dados.forEach((r, idx) => {
@@ -910,7 +1045,10 @@ function listarAtivas_() {
         responsavel:     String(r[11]),
         crianca:         String(r[12]),
         telefone:        String(r[13]),
-        status
+        status,
+        contaId:         contaIdLocRow_(r),
+        extendedMins:    Number(r[25] || 0),
+        extendedValor:   Number(r[26] || 0)
       });
     }
   });
@@ -9059,7 +9197,9 @@ function diagnosticoPlanilhaCompletoAdmin_(p) {
       const nome = sh.getName();
       const lastRow = sh.getLastRow();
       const lastCol = sh.getLastColumn();
-      const dataRows = lastRow >= GP_DATA_ROW ? lastRow - GP_DATA_ROW + 1 : 0;
+      const dataRows = (nome === 'LOCACOES' || nome === 'CUSTOS' || nome === 'INVESTIMENTO')
+        ? (lastRow >= DATA_ROW ? lastRow - DATA_ROW + 1 : 0)
+        : (lastRow >= GP_DATA_ROW ? lastRow - GP_DATA_ROW + 1 : 0);
       return {
         nome: nome,
         lastRow: lastRow,
@@ -9104,10 +9244,11 @@ function diagnosticoPlanilhaCompletoAdmin_(p) {
       planilhaId: ss.getId(),
       totalAbas: abas.length,
       abas: abas,
+      locacoesAudit: auditLocacoesSampleCore_(20),
       colaboradoresRh: colaboradoresRh,
       folhaPonto: folhaPonto,
       bancoHoras: bancoHoras,
-      versao: 'v1.5.142'
+      versao: 'v1.5.149'
     });
   } catch (ex) {
     return err_('diagnosticoPlanilhaCompleto: ' + ex.message, 500);

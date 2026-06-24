@@ -66,6 +66,11 @@ try {
     Add-I43Check "static.mk-sync.i43" "ok" "merge preserva ts local"
   }
 
+  if ($gs -notmatch 'function listarAtivas_[\s\S]{0,1200}COL_LOC_READ_') {
+    throw "listarAtivas sem COL_LOC_READ_ (I52)"
+  }
+  Add-I43Check "static.listarAtivas.COL_LOC_READ_" "ok" "28 cols"
+
   $ping = Invoke-MoviApi @{ action = "ping" }
   Assert-Ok $ping "ping"
   Add-I43Check "ping" "ok" $ping.versao

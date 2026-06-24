@@ -44,6 +44,16 @@ try {
     if ($diag.ok -eq $false) { throw $diag.erro }
     Add-Check 'diagnosticoPlanilhaCompletoAdmin' 'ok' ('totalAbas=' + $diag.totalAbas + ' versao=' + $diag.versao)
 
+    $locAba = @($diag.abas | Where-Object { $_.nome -eq 'LOCACOES' })[0]
+    if ($locAba) {
+      Add-Check 'locacoes.dataRows' 'ok' ('n=' + $locAba.dataRows + ' cols=' + $locAba.lastCol)
+    }
+    if ($diag.locacoesAudit) {
+      $nProb = @($diag.locacoesAudit.problemas).Count
+      $stLoc = if ($nProb -eq 0) { 'ok' } else { 'warn' }
+      Add-Check 'locacoes.audit' $stLoc ('problemas=' + $nProb + ' amostra=' + $diag.locacoesAudit.amostra)
+    }
+
     foreach ($c in @($diag.colaboradoresRh)) {
       $st = if ($c.cadastroOk) { 'ok' } else { 'warn' }
       Add-Check ('rh.id' + $c.operadorId + '.cadastro') $st ($c.nome + ' pct=' + $c.cadastroPctCalculado + ' ok=' + $c.cadastroOk)

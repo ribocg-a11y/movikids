@@ -234,9 +234,23 @@ try {
         Add-Check "guard.gas.carregarInicio.colY" "fail" "carregarInicio getRange COL_CONTA_ID_ + r[24] (I43)"
       } elseif ($gasRaw -match 'function carregarInicio_[\s\S]{0,15000}r\[24\]' -and $gasRaw -notmatch 'function carregarInicio_[\s\S]{0,15000}COL_LOC_READ_') {
         Add-Check "guard.gas.carregarInicio.colY" "fail" "carregarInicio usa r[24] sem COL_LOC_READ_ (I43)"
-      } else {
-        Add-Check "guard.gas.carregarInicio.colY" "ok" "COL_LOC_READ_ em carregarInicio"
-      }
+    } else {
+      Add-Check "guard.gas.carregarInicio.colY" "ok" "COL_LOC_READ_ em carregarInicio"
+    }
+    if ($gasRaw -match 'function listarAtivas_[\s\S]{0,1200}getRange\([^\)]*,\s*26\)') {
+      Add-Check "guard.gas.listarAtivas.colY" "fail" "listarAtivas getRange 26 cols (I43/I52)"
+    } elseif ($gasRaw -notmatch 'function listarAtivas_[\s\S]{0,1200}COL_LOC_READ_') {
+      Add-Check "guard.gas.listarAtivas.colY" "fail" "listarAtivas sem COL_LOC_READ_ (I52)"
+    } else {
+      Add-Check "guard.gas.listarAtivas.colY" "ok" "COL_LOC_READ_ em listarAtivas"
+    }
+    if ($gasRaw -notmatch 'LOC_HEADERS_') {
+      Add-Check "guard.gas.validarSchema.loc28" "fail" "LOC_HEADERS_ ausente (I52)"
+    } elseif ($gasRaw -notmatch 'function repararLocacoesPlanilhaAdmin_') {
+      Add-Check "guard.gas.validarSchema.loc28" "fail" "repararLocacoesPlanilhaAdmin ausente (I52)"
+    } else {
+      Add-Check "guard.gas.validarSchema.loc28" "ok" "schema LOC 28 cols + repair"
+    }
     } else {
       Add-Check "guard.gas.carregarInicio.colY" "fail" "carregarInicio_ ausente no GAS"
     }

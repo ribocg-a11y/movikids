@@ -176,7 +176,8 @@ Legenda: **Alimenta** = quem lê/consome · **Gravado por** = quem escreve em ru
 | `salvarCadastroRhAdmin` | Restaurar cadastro sem PIN colaborador |
 | `repairBancoHorasAdmin` | Zerar banco corrompido (I44) |
 | `gestaoPessoasStatus` | 9 abas RH existem? |
-| `validarSchema` | LOC/CUS/REL mínimo |
+| `validarSchema` | LOC 28 cols (A–AB) + CUS/REL mínimo |
+| `repararLocacoesPlanilhaAdmin` | Memorial, headers, formatos, proteção linhas 1–9 (I52) |
 
 ### 5.3 Regras de ouro (nunca violar)
 
