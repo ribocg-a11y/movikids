@@ -1,0 +1,58 @@
+---
+description: Encerramento obrigatório — tabela de versões FE/GAS + AppScript em toda resposta
+alwaysApply: true
+---
+
+# Encerramento MOVI KIDS — versões + AppScript
+
+## Toda resposta do agente (sem exceção)
+
+Encerrar com **bloco completo** abaixo. Não substituir só por "Mudança no AppScript".
+
+### 1. Rodar antes de encerrar (quando houve trabalho no repo)
+
+```powershell
+.\scripts\relatorio-versoes.ps1 -Markdown
+```
+
+Preencher `Mudança no AppScript` e link `.gs` conforme a sessão. Se houve push FE nesta sessão e Pages ainda não propagou, rodar `.\scripts\verify-publish-complete.ps1` e atualizar linha GitHub Pages.
+
+### 2. Formato obrigatório (copiar estrutura)
+
+```markdown
+## Versões (encerramento)
+
+| Artefato | Versão | Status |
+|----------|--------|--------|
+| mk-version.js | … | OK / desalinhado |
+| sw.js | … | OK / desalinhado |
+| index.html (?v=) | … | OK / desalinhado |
+| gestao-pessoas.html (?v=) | … | OK / desalinhado |
+| GAS repo (header) | v… | |
+| GAS ping produção | v… | alinhado / verificar |
+| GitHub Pages | … | confirmado ✅ / push pendente / … |
+
+---
+**Mudança no AppScript:** sim | não
+**Link canônico (.gs):** [caminho PC completo se sim · — se não]
+```
+
+### 3. Bump FE (I3) — quando alterar FE
+
+Subir **os três** juntos: `mk-version.js`, `sw.js`, `?v=` em `index.html` e `gestao-pessoas.html`.
+
+Sem bump FE = banner "Nova versão" **não aparece** (mesmo com GAS novo).
+
+### 4. Autonomia do agente (sem pedir permissão)
+
+Conforme `ACESSOS_E_AUTORIZACOES.md` §7.2 — **executar sem perguntar**:
+
+- `pre-push-check.ps1` → `git commit` → `git push` → `verify-publish-complete.ps1`
+- Bump `mk-version` / `sw.js` / `?v=` quando mudou FE
+- Testes `scripts/testes/`, ping GAS, docs, planilha OAuth
+
+Se o Cursor **Auto-review bloquear** push/script com PIN: retentar com `request_smart_mode_approval: true` — **não** transferir ao usuário tarefas do §7.2.
+
+**Só com pedido explícito (§7.3):** `clasp push`, editar `.gs`, Nova versão Web GAS, `api()`/auth/PIN, F4/F9.
+
+**Nunca pedir:** "quer que eu faça commit/push?" quando o protocolo já manda publicar FE.

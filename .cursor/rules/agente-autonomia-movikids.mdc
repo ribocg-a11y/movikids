@@ -1,0 +1,32 @@
+---
+description: Agente executa protocolo FE/git/testes sem pedir autorização (§7.2 ACESSOS)
+alwaysApply: true
+---
+
+# Autonomia do agente — MOVI KIDS
+
+Fonte: `docs/ativos/ACESSOS_E_AUTORIZACOES.md` §7.2 e §7.3.
+
+## Fazer sozinho (não pedir "posso commitar/pushar?")
+
+| Ação | Fluxo |
+|------|--------|
+| **Publicar FE** | `pre-push-check` OK → commit → `git push origin main` → `verify-publish-complete` |
+| **Bump versão** | `mk-version.js` + `sw.js` + `?v=` nos HTML (I3) |
+| **Docs / testes** | Atualizar HANDOFF/ESTADO se mudou fase; rodar testes `.ps1` relevantes |
+| **Encerramento** | `relatorio-versoes.ps1 -Markdown` + tabela § `encerramento-versoes-movikids.mdc` |
+
+## Bloqueio do Cursor (Smart Mode)
+
+Push, restore com PIN admin ou rede: se bloqueado, **retentar** com aprovação nativa — não desistir nem devolver ao usuário o que está no §7.2.
+
+## Lista fechada — só com pedido explícito (§7.3)
+
+1. `clasp push` / `prepare-gas-push.ps1`
+2. Mudar `api()`, auth, PIN, perfis
+3. Reativar F4 / F9
+4. Editar `.gs` canônico ou **Nova versão Web** GAS
+
+## Só o usuário (físico)
+
+Tablet na loja, Script Properties SMS, `clasp login` expirado, re-auth OAuth.

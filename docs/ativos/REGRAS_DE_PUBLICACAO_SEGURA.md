@@ -243,20 +243,16 @@ Toda regressao deve gerar:
 
 ## Regra 8 - Resumo Obrigatorio Depois De Cada Pacote
 
-Toda resposta depois de publicar deve conter:
+Toda resposta do agente deve encerrar com a **tabela de versões** (script `.\scripts\relatorio-versoes.ps1 -Markdown`) + rodapé AppScript.
 
-- `index.html`: sim/nao;
-- `sw.js`: sim/nao;
-- `track.html`: sim/nao;
-- Apps Script: sim/nao;
-- **Link canonico .gs** (se Apps Script = sim): caminho PC completo — ver **Regra 16**;
-- documentacao: sim/nao;
-- commit publicado;
-- versao publicada;
-- **Pages confirma versao: sim/nao** (`.\scripts\verify-publish-complete.ps1` apos push — I24);
-- teste executado;
-- proximo passo;
-- **`Mudança no AppScript: sim | não`** (obrigatorio toda resposta — Regra 16).
+Campos mínimos:
+
+- `mk-version.js`, `sw.js`, `index.html`/`gestao-pessoas.html` (`?v=`) — alinhados (I3);
+- GAS repo (header) + GAS ping produção;
+- GitHub Pages confirmado (`verify-publish-complete` após push FE — I24);
+- **`Mudança no AppScript: sim | não`** + link canônico `.gs` (Regra 16).
+
+Regra Cursor: `.cursor/rules/encerramento-versoes-movikids.mdc`
 
 Se algum desses itens faltar, a entrega nao esta completa.
 

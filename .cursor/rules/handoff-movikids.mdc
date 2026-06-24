@@ -35,7 +35,9 @@ Ao trabalhar neste repositório, **ler primeiro** (nesta ordem):
 
 ## Agente vs usuário (memória rápida)
 
-**Agente SOZINHO:** ler docs, editar FE/docs, `pre-push-check` → commit → push FE, ping GAS, testes `scripts/testes/`, validar versões FE, **planilha Google** (OAuth), PRs, APIs admin, limpar testes planilha.
+**Agente SOZINHO:** ler docs, editar FE/docs, `pre-push-check` → commit → push FE → `verify-publish-complete` (**sem pedir**), `relatorio-versoes.ps1` no encerramento, ping GAS, testes, planilha OAuth, PRs, APIs admin.
+
+**Não pedir autorização** para commit/push FE nem bump `mk-version` — ver `.cursor/rules/agente-autonomia-movikids.mdc` e `ACESSOS_E_AUTORIZACOES.md` §7.2.
 
 **Agente SÓ COM SEU PEDIDO (lista fechada §7.3 — única exceção):**
 

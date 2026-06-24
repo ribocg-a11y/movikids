@@ -109,4 +109,4 @@ Quando pedir **atualize tudo** — seguir **`docs/ativos/PROTOCOLO_ATUALIZAR_TUD
 
 ## Ao encerrar sessão
 
-Atualizar `HANDOFF_NOVO_CHAT.md`, checklist em `PLANO_PRIORIDADES`, e `ESTADO_ATUAL.md` se versões mudaram. **Sempre** terminar resposta com Regra 16 (AppScript sim/não + link).
+Atualizar `HANDOFF_NOVO_CHAT.md`, checklist em `PLANO_PRIORIDADES`, e `ESTADO_ATUAL.md` se versões mudaram. **Sempre** encerrar com `.\scripts\relatorio-versoes.ps1 -Markdown` + tabela § `encerramento-versoes-movikids.mdc` (Regra 8 / 16).

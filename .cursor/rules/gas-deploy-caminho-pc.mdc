@@ -26,18 +26,17 @@ Arquivo canônico único: `MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.g
 
 ## 2. Linha obrigatória no fim de TODA resposta do agente
 
-**Sempre** encerrar toda resposta (com ou sem alteração de código) com este bloco:
+**Sempre** encerrar com a tabela completa em `.cursor/rules/encerramento-versoes-movikids.mdc`.
 
+Gerar dados com:
+
+```powershell
+.\scripts\relatorio-versoes.ps1 -Markdown
 ```
----
-**Mudança no AppScript:** sim | não
-**Link canônico (.gs):** [caminho completo acima se sim · "—" se não]
-```
 
-- **sim** → colar o link canônico completo + versão do header + se aplicável lembrar Nova versão Web.
-- **não** → escrever `não` e link `—` (ou repetir link só se o usuário pediu referência).
+Incluir **Mudança no AppScript** + **link canônico (.gs)** no rodapé. Ver **Regra 8** e **Regra 16** em `REGRAS_DE_PUBLICACAO_SEGURA.md`.
 
-**Nunca omitir** este bloco. Faz parte da Regra 8 em `REGRAS_DE_PUBLICACAO_SEGURA.md` e Regra 16.
+**Nunca omitir** o bloco de encerramento.
 
 ## 3. Links canônicos de produção (referência rápida)
 
