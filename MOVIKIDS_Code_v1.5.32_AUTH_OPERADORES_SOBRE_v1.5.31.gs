@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.146
+// MOVI KIDS — Google Apps Script v1.5.147
+// v1.5.147: I51c — holerite respeita abono na jornada; restore abona folga 20/06 Raykelly
 // v1.5.146: I51b — restore ponto limpa FALTAS nao abonadas do mes (nao so Sync jornada)
 // v1.5.145: I51 — falta auto restaurada; abono ADM; salvarPontoRhAdmin + restore Raykelly
 // v1.5.144: I50 revertido — ponto perdido era a causa, nao a regra de falta
@@ -518,9 +519,9 @@ function ping_() {
   const agora = new Date();
   return resp_({
     status:  'online',
-    versao:  'v1.5.146',
+    versao:  'v1.5.147',
     timestamp: fmtData_(agora) + ' ' + fmtHoraLocal_(agora),
-    sistema: 'MOVI KIDS v1.5.146',
+    sistema: 'MOVI KIDS v1.5.147',
     postWriteActions: WRITE_ACTIONS_CRITICAS_
   });
 }
@@ -8304,8 +8305,14 @@ function gpFaltasDescontoMes_(opId, comp, colab, jornada) {
   } catch (e) { /* ignore */ }
   if (total <= 0 && jornada && jornada.dias) {
     const diaDesc = gpFaltaDiaDesconto_(colab, compParsed);
+    const faltaRows = gpRows_(SH_FALTAS);
     jornada.dias.forEach(function (d) {
-      if (d.sit === 'Falta' && diaDesc > 0) total += diaDesc;
+      if (d.sit !== 'Falta' || !d.data || diaDesc <= 0) return;
+      const abonada = faltaRows.some(function (r) {
+        return Number(r[1]) === Number(opId) && cellToStr_(r[2]) === d.data && gpFaltaEhAbonadaRow_(r);
+      });
+      if (abonada) return;
+      total += diaDesc;
     });
   }
   return Math.round(total * 100) / 100;
@@ -8711,10 +8718,12 @@ function restaurarPontoRaykellyJun2026Admin_(p) {
   });
   const faltasSyncRemovidas = gpRepairLimparFaltasSyncJornada_(opId);
   const faltasMesRemovidas = gpRepairLimparFaltasOpMesNaoAbonadas_(opId, 6, 2026);
+  const abono20 = JSON.parse(abonarFaltaRhAdmin_({ adminPin: '1416', operadorId: opId, data: '20/06/2026' }).getContent());
   gpInvalidateRhCache_();
   return resp_({
     ok: true, operadorId: opId, batidas: log.length, detalhe: log,
-    faltasSyncRemovidas: faltasSyncRemovidas, faltasMesRemovidas: faltasMesRemovidas, versao: 'v1.5.146'
+    faltasSyncRemovidas: faltasSyncRemovidas, faltasMesRemovidas: faltasMesRemovidas,
+    abonoFolga20: abono20, versao: 'v1.5.147'
   });
 }
 
@@ -8974,7 +8983,7 @@ function painelGestaoPessoasAdmin_(p) {
         total: colaboradores.length, presentes: presentes, comTurno: comTurno,
         alertas: alertasPack.total, alertasIntel: intelRh.length
       },
-      sessaoAtiva: sessao, versao: 'v1.5.146',
+      sessaoAtiva: sessao, versao: 'v1.5.147',
       comunicadosRh: gpComunicadosAllAdmin_(),
       avaliacoesRh: gpAvaliacoesAllAdmin_(),
       competenciasRh: GP_COMPETENCIAS_RH_
