@@ -1238,6 +1238,7 @@
       let cls = 'gray';
       if (s === 'OK') cls = 'ok';
       else if (s === 'Extra') cls = 'extra';
+      else if (s === 'Abonado') cls = 'ok';
       else if (s === 'Atraso' || s === 'Falta' || s === 'Ponto em folga') cls = 'warn';
       else if (s === 'Aberto') cls = 'open';
       else if (s === 'Folga') cls = 'off';

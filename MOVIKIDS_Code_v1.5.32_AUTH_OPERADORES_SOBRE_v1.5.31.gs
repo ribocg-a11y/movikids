@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.147
+// MOVI KIDS — Google Apps Script v1.5.148
+// v1.5.148: I51d — jornada exibe Abonado (nao Falta) quando abono ADM na data
 // v1.5.147: I51c — holerite respeita abono na jornada; restore abona folga 20/06 Raykelly
 // v1.5.146: I51b — restore ponto limpa FALTAS nao abonadas do mes (nao so Sync jornada)
 // v1.5.145: I51 — falta auto restaurada; abono ADM; salvarPontoRhAdmin + restore Raykelly
@@ -519,9 +520,9 @@ function ping_() {
   const agora = new Date();
   return resp_({
     status:  'online',
-    versao:  'v1.5.147',
+    versao:  'v1.5.148',
     timestamp: fmtData_(agora) + ' ' + fmtHoraLocal_(agora),
-    sistema: 'MOVI KIDS v1.5.147',
+    sistema: 'MOVI KIDS v1.5.148',
     postWriteActions: WRITE_ACTIONS_CRITICAS_
   });
 }
@@ -7495,6 +7496,7 @@ function gpLoadContext_() {
     hoje: fmtData_(new Date()),
     rhRows: gpRows_(SH_COLAB_RH),
     folhaRows: gpRows_(SH_FOLHA_PONTO),
+    faltasRows: gpRows_(SH_FALTAS),
     metasRows: gpRows_(SH_METAS_COLAB),
     escalaRows: gpRows_(SH_ESCALA_COLAB),
     bancoRows: gpRows_(SH_BANCO_HORAS),
@@ -7860,6 +7862,7 @@ function gpAnaliseJornadaColab_(opId, competencia, ctx, rh) {
   const admD = rh && rh.admissao ? parseDataStr_(rh.admissao) : null;
   const turnoFb = rh ? rh.turno : '';
   const pontoMap = gpBuildPontoMapMes_(opId, competencia, ctx);
+  const abonoMap = gpBuildAbonoFaltasMap_(opId, mes, ano, ctx);
 
   const dias = [];
   let totPrev = 0, totTrab = 0, totExtra = 0, totAtraso = 0;
@@ -7900,6 +7903,8 @@ function gpAnaliseJornadaColab_(opId, competencia, ctx, rh) {
     } else if (!ponto && prevMin != null) {
       if (dateStr === hojeStr) {
         sit = 'Aguardando ponto';
+      } else if (abonoMap[dateStr]) {
+        sit = 'Abonado';
       } else {
         atrasoMin = prevMin;
         sit = 'Falta';
@@ -8094,7 +8099,20 @@ function gpFaltaEhAbonadaRow_(r) {
   return tipo.indexOf('abon') >= 0 || obs.indexOf('abono adm') >= 0;
 }
 
-/** I50 — remove linhas auto-sync obsoletas após ponto restaurado. */
+/** Mapa dataStr → true para faltas abonadas do colaborador no mês. */
+function gpBuildAbonoFaltasMap_(opId, mes, ano, ctx) {
+  const map = {};
+  const rows = (ctx && ctx.faltasRows) ? ctx.faltasRows : gpRows_(SH_FALTAS);
+  rows.forEach(function (r) {
+    if (Number(r[1]) !== Number(opId)) return;
+    if (!gpFaltaEhAbonadaRow_(r)) return;
+    const d = parseDataStr_(cellToStr_(r[2]));
+    if (!d || (d.getMonth() + 1) !== mes || d.getFullYear() !== ano) return;
+    map[cellToStr_(r[2])] = true;
+  });
+  return map;
+}
+
 function gpRepairLimparFaltasSyncJornada_(opId) {
   try {
     const sh = gpSheet_(SH_FALTAS);
@@ -8723,7 +8741,7 @@ function restaurarPontoRaykellyJun2026Admin_(p) {
   return resp_({
     ok: true, operadorId: opId, batidas: log.length, detalhe: log,
     faltasSyncRemovidas: faltasSyncRemovidas, faltasMesRemovidas: faltasMesRemovidas,
-    abonoFolga20: abono20, versao: 'v1.5.147'
+    abonoFolga20: abono20, versao: 'v1.5.148'
   });
 }
 
@@ -8983,7 +9001,7 @@ function painelGestaoPessoasAdmin_(p) {
         total: colaboradores.length, presentes: presentes, comTurno: comTurno,
         alertas: alertasPack.total, alertasIntel: intelRh.length
       },
-      sessaoAtiva: sessao, versao: 'v1.5.147',
+      sessaoAtiva: sessao, versao: 'v1.5.148',
       comunicadosRh: gpComunicadosAllAdmin_(),
       avaliacoesRh: gpAvaliacoesAllAdmin_(),
       competenciasRh: GP_COMPETENCIAS_RH_
