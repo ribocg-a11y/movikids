@@ -1,6 +1,6 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 23/06/2026 (pós-I51) · FE **v1.8.118** Pages · GAS repo **v1.5.145** · ping prod **v1.5.145** ✅  
+**Atualizado:** 23/06/2026 (pós-I51d) · FE **v1.8.119** Pages · GAS repo **v1.5.148** · ping prod **v1.5.148**  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **Repo local:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`  
@@ -53,9 +53,9 @@ cursor "C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-mo
 
 | Camada | Repo | Produção (ping / Pages) | Notas |
 |--------|------|-------------------------|-------|
-| **Frontend** | **v1.8.118** | https://ribocg-a11y.github.io/movikids/?force=1.8.118 | I47 PIN duplo submit |
-| **Gestão Pessoas** | **v1.8.118** | `gestao-pessoas.html?force=1.8.118` | Ficha admin somente leitura |
-| **Service Worker** | **1.8.118** | `sw.js` | GAS fora do intercept |
+| **Frontend** | **v1.8.119** | https://ribocg-a11y.github.io/movikids/?force=1.8.119 | I51d badge Abonado jornada |
+| **Gestão Pessoas** | **v1.8.119** | `gestao-pessoas.html?force=1.8.119` | Ficha admin somente leitura |
+| **Service Worker** | **1.8.119** | `sw.js` | GAS fora do intercept |
 | **Apps Script** | **v1.5.145** (header `.gs`) | ping **v1.5.145** ✅ I51 prod | Deploy **@201** |
 | **FOLHA_PONTO Raykelly** | restore I51 | 6 batidas jun/2026 | `RESTAURAR_PONTO_RAYKELLY_JUN2026` |
 | **Aba BANCO_HORAS** | ✅ repair I44 | Milena/Raykelly **0h00** | `repararRhPlanilhaAdmin` 23/06 |

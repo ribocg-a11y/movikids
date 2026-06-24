@@ -31,7 +31,7 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 | Camada | Versão repo | URL / ID |
 |--------|-------------|----------|
-| **Frontend** | **v1.8.118** | https://ribocg-a11y.github.io/movikids/?force=1.8.118 · **Colaboradores:** `gestao-pessoas.html?force=1.8.118` |
+| **Frontend** | **v1.8.119** | https://ribocg-a11y.github.io/movikids/?force=1.8.119 · **Colaboradores:** `gestao-pessoas.html?force=1.8.119` |
 | **Design System** | **v1.1** | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
 | **Apps Script** | repo **v1.5.145** (I51) · Web ping **v1.5.145** ✅ | `RESTAURAR_PONTO_RAYKELLY_JUN2026` · falta auto + abono ADM |
 | **Aba BANCO_HORAS** | ✅ repair 23/06 | Milena/Raykelly **0h00** |
