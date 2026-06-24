@@ -59,7 +59,8 @@ Detalhe completo: [`ACESSOS_E_AUTORIZACOES.md`](docs/ativos/ACESSOS_E_AUTORIZACO
 |--------|-------------|---------------|
 | Frontend | **v1.8.119** | https://ribocg-a11y.github.io/movikids/?force=1.8.119 |
 | Gestão Pessoas | **v1.8.119** | `gestao-pessoas.html?force=1.8.119` |
-| GAS | repo **v1.5.148** · ping **v1.5.148** | I51d jornada Abonado |
+| GAS | repo **v1.5.149** · ping **v1.5.149** | I52 LOCACOES schema 28 cols |
+| LOCACOES planilha | repair I52 24/06 | `validarSchema` **schemaOk=True** |
 | Design System | **v1.1** | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
 | Aba FOLHA | OK (I25) | B68 ~5269,96 · `folhaPlanejamento.fonte: FOLHA` |
 | Deploy ID | `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y` | |
@@ -93,15 +94,14 @@ Fonte de verdade: `mk-version.js`, header do `.gs`, ping GAS.
 - `docs/arquivo/obsoleto/` — rollback/changelog antigos
 - Arquivos em `arquivo-historico/` para deploy
 
-## Estado do projeto (23/06/2026 — fim de sessão)
+## Estado do projeto (24/06/2026 — fim de sessão)
 
 - **FASE 1–9:** ✅ prod
 - **FASE 14 mini-DRE:** ✅ prod
-- **FASE 15–17:** 🟡 homolog tablet · GAS Web **v1.5.145** ✅ (I51)
-- **I43:** ✅ hotfix prod (cronômetro)
-- **I44:** ✅ banco reparado
-- **I45–I51:** RH governança + PIN + VA + restore ponto — FE **v1.8.118** · GAS **v1.5.145**
-- **Próximo:** Raykelly cadastro 100% · homolog tablet · ponto RH diário
+- **FASE 15–17:** 🟡 homolog tablet pendente
+- **I43:** ✅ prod (cronômetro)
+- **I52:** ✅ GAS v1.5.149 Web + repair LOCACOES (`schemaOk=True`)
+- **Próximo:** Raykelly cadastro 100% · homolog tablet I43/I42
 
 ## "Atualize tudo"
 

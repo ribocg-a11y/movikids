@@ -1,6 +1,6 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 23/06/2026 (pós-I51d) · FE **v1.8.119** Pages · GAS repo **v1.5.148** · ping prod **v1.5.148**  
+**Atualizado:** 24/06/2026 (pós-I52) · FE **v1.8.119** Pages · GAS repo **v1.5.149** · ping prod **v1.5.149**  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **Repo local:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`  
@@ -56,7 +56,8 @@ cursor "C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-mo
 | **Frontend** | **v1.8.119** | https://ribocg-a11y.github.io/movikids/?force=1.8.119 | I51d badge Abonado jornada |
 | **Gestão Pessoas** | **v1.8.119** | `gestao-pessoas.html?force=1.8.119` | Ficha admin somente leitura |
 | **Service Worker** | **1.8.119** | `sw.js` | GAS fora do intercept |
-| **Apps Script** | **v1.5.145** (header `.gs`) | ping **v1.5.145** ✅ I51 prod | Deploy **@201** |
+| **Apps Script** | **v1.5.149** (header `.gs`) | ping **v1.5.149** ✅ I52 prod | Deploy `AKfycbwakQ...` |
+| **LOCACOES (aba 1)** | ✅ repair I52 24/06 | `validarSchema` **schemaOk=True** · 28 cols · 833 linhas formatadas | `REPARAR_LOCACOES_PLANILHA_ADMIN.ps1` |
 | **FOLHA_PONTO Raykelly** | restore I51 | 6 batidas jun/2026 | `RESTAURAR_PONTO_RAYKELLY_JUN2026` |
 | **Aba BANCO_HORAS** | ✅ repair I44 | Milena/Raykelly **0h00** | `repararRhPlanilhaAdmin` 23/06 |
 | **COLABORADORES_RH** | Milena **100%** · Raykelly **25%** | Backup `backups/rh/cadastro-rh-2026-06-23_1657.json` | Raykelly completar em Colaboradores |
@@ -96,7 +97,31 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 
 ---
 
-## Próximo passo (23/06/2026)
+## Próximo passo (24/06/2026)
+
+| # | Ação | Quem | Status |
+|---|------|------|--------|
+| 1 | ~~Nova versão Web GAS v1.5.149 (I52)~~ | **Sócio** | ✅ prod |
+| 2 | ~~Repair LOCACOES planilha (memorial, 28 cols, formatos)~~ | Agente | ✅ `REPARAR_LOCACOES_PLANILHA_ADMIN` 24/06 |
+| 3 | Tablet `?force=1.8.119` — login PIN Milena/Raykelly (I47) | Ops loja | ⏳ |
+| 4 | Raykelly cadastro **100%** em `gestao-pessoas.html` (PIN dela) | Colaborador | ⏳ 25% |
+| 5 | Homolog ▶ cronômetro (I43) + Caixa I42 + Gestor | Ops loja | ⏳ |
+| 6 | Ponto RH diário (`FOLHA_PONTO`) | Ops | ⏳ |
+| 7 | **17.5** decisão F9 Supervisor | Sócio | ⏳ |
+
+Docs: `INCIDENTE_I49_*` · `INCIDENTE_I51_*` · `MAPA_PLANILHA_ABAS_MOVIKIDS.md` §6
+
+---
+
+## Incidentes — sessão 24/06/2026
+
+| ID | Evento | Fix |
+|----|--------|-----|
+| **I52** | `validarSchema` só 18 cols; `listarAtivas` 26 cols; LOCACOES sem memorial/formatos | GAS **v1.5.149** · `repararLocacoesPlanilhaAdmin` · repair planilha ✅ |
+
+---
+
+## Próximo passo (23/06/2026 — arquivo)
 
 | # | Ação | Quem | Status |
 |---|------|------|--------|
@@ -181,6 +206,7 @@ Docs: `INCIDENTE_I49_*` · `INCIDENTE_I51_*` · `MAPA_PLANILHA_ABAS_MOVIKIDS.md`
 
 | Hash | Entrega |
 |------|---------|
+| `b488148` | I52 LOCACOES schema 28 cols · repair planilha · `listarAtivas` COL_LOC_READ_ |
 | `d39a7ac` | I44 banco horas · FE v1.8.115 · GAS v1.5.137 repo |
 | `ff84239` | I43 guards + `TESTE_I43` + docs |
 | `ef10dfa` | I43 hotfix cronômetro · FE v1.8.114 · GAS v1.5.136 |

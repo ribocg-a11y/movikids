@@ -60,6 +60,7 @@
 | **I49** | **VA R$ 520** — `va_diario=20` na planilha × 26 dias | Holerite mostra 520/mês; VA ~277 em vez de ~213 | GAS **v1.5.143** `gpVaMensalTeto_` | nunca va_diario×dias como teto | `TESTE_VA_ADMISSAO_PROPORCIONAL` |
 | **I48** | **`painelGestaoPessoasAdmin` escrevia FALTAS/HOLERITES na leitura** (I46) | Operadores admin lento de novo | GAS **v1.5.142** — só cálculo em memória no admin | nunca append em read admin | 2× painelGestaoPessoasAdmin |
 | **I43** | **`carregarInicio` getRange 19 cols (I42) sem col Y** | **▶ inicia → sync reverte para Pendente 10:00** | GAS **v1.5.136** `COL_LOC_READ_=28`; FE **v1.8.114** merge I43 | `guard.gas.carregarInicio.colY`, `guard.sync.i43` | **`TESTE_I43_CARREGAR_INICIO_READONLY`** + tablet ▶ |
+| **I52** | **`validarSchema` 18 cols; `listarAtivas` 26 cols; LOCACOES sem padronização** | Schema falso negativo; extensão fora de listagem | GAS **v1.5.149** · `repararLocacoesPlanilhaAdmin` | `guard.gas.listarAtivas.colY`, `guard.gas.validarSchema.loc28` | **`REPARAR_LOCACOES_PLANILHA_ADMIN`** + `TESTE_REAUDITORIA_PLANILHA` |
 | **I42** | Conta do dia — mesmo telefone 10h–22h | Caixa `n` vs sessões; maquininha | GAS **v1.5.131+** col S `conta_id` | `TESTE_I42_CONTA_DIA_CAIXA` | não reduzir `COL_LOC_READ_` (ver I43) |
 | **I41** | **`ping_` versão defasada** (v1.5.107 vs repo) | Confusão deploy / verify | GAS **v1.5.130** `ping_()` alinhado | `ping_` header alinhado | ping = v1.5.130 |
 | I2 | GAS offline + timer local | Extra fantasma | ADM `somentePlano`; offline v1.7.6 | `FIX_OFFLINE_ENCERRAR` | tablet encerrar |
