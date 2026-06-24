@@ -1,6 +1,6 @@
 # Testes e limpeza — MOVI KIDS
 
-Scripts em `scripts/testes/`. Documentação: `docs/ativos/PROTOCOLO_DIAGNOSTICO_E_TESTES.md` · **"atualize tudo":** `PROTOCOLO_ATUALIZAR_TUDO.md`
+Scripts em `scripts/testes/`. Documentação: `docs/ativos/PROTOCOLO_DIAGNOSTICO_E_TESTES.md` · **Planilha por aba:** `docs/ativos/PROTOCOLO_AUDITORIA_ABAS_PLANILHA.md` · **"atualize tudo":** `PROTOCOLO_ATUALIZAR_TUDO.md`
 
 **Repo:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github` — scripts `.ps1` exigem `cd` nesta pasta **ou** caminho absoluto.
 
@@ -40,6 +40,18 @@ Use quando a loja está operando ou não quer poluir a planilha:
 .\scripts\testes\TESTE_SESSAO_IDLE_READONLY.ps1
 .\scripts\testes\TESTE_REGRESSAO_MOVIKIDS_PROD_SAFE.ps1
 # sem -RunWriteTests
+```
+
+## Planilha — protocolo por aba (P-ABA)
+
+Roteiro piloto **LOCACOES (I52)** fechado. Próxima: **CONFIG**.
+
+```powershell
+.\scripts\testes\TESTE_PROTOCOLO_ABA_PLANILHA.ps1 -Aba LOCACOES -DryRun
+.\scripts\testes\TESTE_PROTOCOLO_ABA_PLANILHA.ps1 -Aba LOCACOES
+.\scripts\testes\REPARAR_LOCACOES_PLANILHA_ADMIN.ps1
+.\scripts\testes\TESTE_REAUDITORIA_PLANILHA.ps1
+.\scripts\testes\TESTE_AUDITORIA_PLANILHA_COMPLETA_READONLY.ps1
 ```
 
 Validação estática (repo):

@@ -319,6 +319,7 @@ Gate: `gpCadastroOk_` = 8 campos B,D,E,F,H,I,J,K preenchidos (100%).
 | I31 | CONFIG | Encoding JSON frota |
 | I42 | LOCACOES col S | conta_id — não estreitar `getRange` |
 | I43 | LOCACOES col Y | timestamp cronômetro |
+| **I52** | LOCACOES schema/memorial | `repararLocacoesPlanilhaAdmin` · protocolo abas |
 | I44 | BANCO_HORAS | Não persistir em leitura painel |
 | I45 | COLABORADORES_RH | Installer `clear()` + FE falso save |
 | **I48** | FALTAS / HOLERITES | Admin leitura não pode `appendRow` — **v1.5.142 prod** painel ~3s |
@@ -350,10 +351,20 @@ Fonte: `diagnosticoPlanilhaCompletoAdmin` · ping **v1.5.141**
 
 ## 9. Como auditar de novo
 
+**Protocolo mestre por aba:** `docs/ativos/PROTOCOLO_AUDITORIA_ABAS_PLANILHA.md`  
+**Piloto fechado:** `docs/referencia/CHECKLIST_ABA_PLANILHA_LOCACOES.md`  
+**Template próxima aba:** `docs/referencia/CHECKLIST_ABA_PLANILHA_TEMPLATE.md`
+
 ```powershell
+# Por aba (LOCACOES piloto — CONFIG próximo)
+.\scripts\testes\TESTE_PROTOCOLO_ABA_PLANILHA.ps1 -Aba LOCACOES
+.\scripts\testes\TESTE_PROTOCOLO_ABA_PLANILHA.ps1 -Aba LOCACOES -DryRun
+.\scripts\testes\TESTE_PROTOCOLO_ABA_PLANILHA.ps1 -Aba CONFIG -SomenteLeitura
+
+# Suite geral
 .\scripts\testes\TESTE_AUDITORIA_PLANILHA_COMPLETA_READONLY.ps1
-.\scripts\testes\TESTE_GESTAO_PESSOAS_READONLY.ps1
-.\scripts\testes\TESTE_CADASTRO_RH_READONLY.ps1
+.\scripts\testes\TESTE_REAUDITORIA_PLANILHA.ps1
+.\scripts\testes\REPARAR_LOCACOES_PLANILHA_ADMIN.ps1
 ```
 
 OAuth célula a célula: `google-drive-sheets-auth\scripts\auditar-planilha-movikids.js` (requer `npm run auth`).
