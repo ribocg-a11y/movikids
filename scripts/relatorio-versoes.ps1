@@ -26,12 +26,13 @@ function Read-VerFromFile {
 function Read-HtmlCacheVersions {
   param([string]$Path)
   if (-not (Test-Path $Path)) { return @() }
-  $hits = Select-String -Path $Path -Pattern '\?v=(\d+\.\d+\.\d+)' -AllMatches
   $uniq = @{}
-  foreach ($line in $hits) {
+  $lines = Select-String -Path $Path -Pattern '\?v=([0-9]+\.[0-9]+\.[0-9]+)' -AllMatches
+  foreach ($line in $lines) {
     foreach ($m in $line.Matches) { $uniq[$m.Groups[1].Value] = $true }
   }
-  return @($uniq.Keys | Sort-Object)
+  $keys = @($uniq.Keys | Sort-Object | ForEach-Object { [string]$_ })
+  return ,$keys
 }
 
 function Status-Alinhado {
