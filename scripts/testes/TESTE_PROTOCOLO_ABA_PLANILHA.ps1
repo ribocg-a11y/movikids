@@ -13,7 +13,8 @@ param(
   [string]$AdminPin = "1421",
   [switch]$DryRun,
   [switch]$SomenteLeitura,
-  [switch]$SkipRepair
+  [switch]$SkipRepair,
+  [string]$ResultFile = ""
 )
 
 $ErrorActionPreference = "Stop"
@@ -397,4 +398,8 @@ try {
 }
 
 $result.finishedAt = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
-$result | ConvertTo-Json -Depth 8
+$json = $result | ConvertTo-Json -Depth 8
+if ($ResultFile) {
+  $json | Set-Content -Path $ResultFile -Encoding UTF8
+}
+$json
