@@ -357,6 +357,17 @@ try {
     } else {
       Add-Check "guard.pin.leak.gas" "ok" "Erros GAS sem PIN literal I64"
     }
+    $hdrM = [regex]::Match($gasRaw, 'Apps Script v([0-9]+\.[0-9]+\.[0-9]+)')
+    $pingM = [regex]::Match($gasRaw, "function ping_\(\)[\s\S]{0,400}versao:\s*'v([0-9]+\.[0-9]+\.[0-9]+)'")
+    if ($hdrM.Success -and $pingM.Success) {
+      if ($hdrM.Groups[1].Value -ne $pingM.Groups[1].Value) {
+        Add-Check "guard.gas.ping.versao" "fail" "header v$($hdrM.Groups[1].Value) != ping_ v$($pingM.Groups[1].Value)"
+      } else {
+        Add-Check "guard.gas.ping.versao" "ok" "ping_ alinhado ao header"
+      }
+    } else {
+      Add-Check "guard.gas.ping.versao" "warn" "nao foi possivel comparar header x ping_"
+    }
     $fePinLeak = @(
       (Get-Content (Join-Path $root "index.html") -Raw),
       (Get-Content (Join-Path $root "gestao-pessoas.html") -Raw),

@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.164
+// MOVI KIDS — Google Apps Script v1.5.165
+// v1.5.165: I66 — repairBancoHoras dedup operador_id; ping alinhado
 // v1.5.164: I65 — isLocacaoTeste TESTE_* / TESTE I43; historico oculta teste; tag anulada
 // v1.5.163: PIN admin 1421 (ADMIN_PIN_PLAIN + Script Property ADMIN_PIN)
 // v1.5.162: I64 — erros admin sem vazar PIN; ADMIN_PIN via Script Property
@@ -626,9 +627,9 @@ function ping_() {
   const agora = new Date();
   return resp_({
     status:  'online',
-    versao:  'v1.5.163',
+    versao:  'v1.5.165',
     timestamp: fmtData_(agora) + ' ' + fmtHoraLocal_(agora),
-    sistema: 'MOVI KIDS v1.5.163',
+    sistema: 'MOVI KIDS v1.5.165',
     postWriteActions: WRITE_ACTIONS_CRITICAS_
   });
 }
@@ -883,7 +884,12 @@ function auditLocacoesSampleCore_(amostra) {
       problemas.push({ row: rowIndex, campo: 'valorPlano', valor: String(r[7]) });
     }
     if (isLocacaoTeste_(String(r[12] || ''), String(r[11] || ''), String(r[13] || ''), String(r[17] || ''))) {
-      problemas.push({ row: rowIndex, campo: 'teste', valor: String(r[12] || r[11] || '') });
+      const obsT = String(r[17] || '');
+      const neutro = obsT.indexOf('[ANULADO TESTE ADM]') >= 0
+        || (st === 'Cancelada' && Number(r[10] || 0) === 0);
+      if (!neutro) {
+        problemas.push({ row: rowIndex, campo: 'teste', valor: String(r[12] || r[11] || '') });
+      }
     }
   });
   return { amostra: dados.length, problemas: problemas, lastRow: last };
@@ -10915,7 +10921,7 @@ function gpPersistBancoHoras_(opId, saldoHhmm) {
   }
 }
 
-/** I44 — zera saldos corrompidos na aba BANCO_HORAS (admin). */
+/** I44/I66 — zera saldos e remove linhas duplicadas por operador_id. */
 function repairBancoHorasAdmin_(p) {
   if (!adminPinOk_(p)) return err_('Acesso negado — PIN administrativo incorreto', 403);
   try {
@@ -10923,16 +10929,29 @@ function repairBancoHorasAdmin_(p) {
     if (!sh) return err_('Aba BANCO_HORAS ausente', 503);
     const rows = gpRows_(SH_BANCO_HORAS);
     const agora = fmtData_(new Date()) + ' ' + fmtHoraLocal_(new Date());
+    const seen = {};
+    const dupRows = [];
     const reset = [];
-    rows.forEach(function (r, i) {
-      const opId = Number(r[0]);
-      if (!opId) return;
+    for (let i = rows.length - 1; i >= 0; i--) {
+      const opId = Number(rows[i][0]);
+      if (!opId) continue;
       const row = GP_DATA_ROW + i;
+      if (seen[opId]) {
+        dupRows.push(row);
+        continue;
+      }
+      seen[opId] = true;
       sh.getRange(row, 2).setValue('0h00');
       sh.getRange(row, 3).setValue(agora);
       reset.push({ operadorId: opId, saldo: '0h00' });
+    }
+    dupRows.sort(function (a, b) { return b - a; }).forEach(function (row) { sh.deleteRow(row); });
+    return resp_({
+      mensagem: 'Banco de horas zerado (I44 repair)' + (dupRows.length ? ' · ' + dupRows.length + ' duplicata(s) removida(s)' : ''),
+      reset: reset,
+      duplicatasRemovidas: dupRows.length,
+      total: reset.length
     });
-    return resp_({ mensagem: 'Banco de horas zerado (I44 repair)', reset: reset, total: reset.length });
   } catch (ex) {
     return err_('repairBancoHorasAdmin: ' + ex.message, 500);
   }
