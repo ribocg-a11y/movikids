@@ -2,7 +2,7 @@
 $ErrorActionPreference = 'Stop'
 $base = 'https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec'
 $pinOk = $env:MK_ADMIN_PIN
-if (-not $pinOk) { $pinOk = '1416' }
+if (-not $pinOk) { $pinOk = '1421' }
 
 Write-Host '=== ping ===' -ForegroundColor Cyan
 $p = Invoke-RestMethod -Uri "$base`?action=ping" -Method Get -TimeoutSec 20

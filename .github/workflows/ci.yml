@@ -20,6 +20,7 @@ jobs:
       - name: B6 login admin readonly
         shell: pwsh
         env:
+          # Opcional: GitHub → Settings → Secrets → MK_ADMIN_PIN (evita default no script)
           MK_ADMIN_PIN: ${{ secrets.MK_ADMIN_PIN }}
         run: ./scripts/testes/TESTE_B6_LOGIN_ADMIN_READONLY.ps1
 
