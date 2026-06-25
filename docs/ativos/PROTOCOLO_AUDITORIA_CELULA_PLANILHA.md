@@ -102,9 +102,22 @@ Mesma ordem §5 de `PROTOCOLO_AUDITORIA_ABAS_PLANILHA.md` — LOCACOES primeiro 
 
 ---
 
-## Referências
+## Resultado 25/06/2026 (v1.5.165)
+
+| Camada | Resultado |
+|--------|-----------|
+| 1 GAS | `schemaOk=true` |
+| 2 (23 abas) | 22 ok · 1 warn (RESPONSAVEIS L233 tel. curto) |
+| 3 OAuth LOCACOES | 0 issues (853 linhas) |
+
+**Correção pós-auditoria:** FOLHA_PONTO L8 Milena — `SALVAR_PONTO_RH_ADMIN.ps1` · revalidação `problemas=0`.
+
+**P2 aberto:** RESPONSAVEIS L233 Neide — telefone `987203839` (9 dígitos) — corrigir manualmente na planilha.
+
+---
 
 - `scripts/testes/AUDITORIA_CELULA_PLANILHA.ps1`
 - `scripts/testes/HIGIENE_DADOS_PLANILHA.ps1`
+- `scripts/testes/SALVAR_PONTO_RH_ADMIN.ps1` — batida pontual ADM
 - OAuth: `C:\Users\riboc\Projects\google-drive-sheets-auth\scripts\auditar-planilha-movikids.js`
 - Mapa: `docs/referencia/MAPA_PLANILHA_ABAS_MOVIKIDS.md` §9

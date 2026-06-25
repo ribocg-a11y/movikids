@@ -34,3 +34,13 @@
 3. `.\scripts\testes\TESTE_RH_CAMADA5_READONLY.ps1`
 
 **BANCO_HORAS reset:** só com `-RepairBanco sim` (I44) — padrão **não** zera saldos.
+
+## Auditoria célula 25/06 (v1.5.165)
+
+| Aba | Resultado | Detalhe P2 |
+|-----|-----------|------------|
+| COLABORADORES_RH | ok | — |
+| BANCO_HORAS | ok | — |
+| FOLHA_PONTO | ok | L8 Milena 24/06 corrigida (`10:07`→`14:00`) via `SALVAR_PONTO_RH_ADMIN.ps1` |
+
+Ver `PROTOCOLO_AUDITORIA_CELULA_PLANILHA.md` · `AUDITORIA_CELULA_PLANILHA.ps1`
