@@ -16,6 +16,16 @@ Fonte: `docs/ativos/ACESSOS_E_AUTORIZACOES.md` §7.2 e §7.3.
 | **Docs / testes** | Atualizar HANDOFF/ESTADO se mudou fase; rodar testes `.ps1` relevantes |
 | **Encerramento** | `relatorio-versoes.ps1 -Markdown` + tabela § `encerramento-versoes-movikids.mdc` |
 
+## Não transferir ao usuário (25/06/2026)
+
+Executar no turno — **não** encerrar com "você deve rodar...":
+
+- `REPARAR_*_PLANILHA_ADMIN.ps1` · `TESTE_*_READONLY.ps1` · `TESTE_PROTOCOLO_ABA_PLANILHA.ps1`
+- `pre-push-check` · ping · `validarSchema` · `diagnosticoPlanilhaCompletoAdmin`
+- Planilha OAuth · atualizar HANDOFF/ESTADO/MAPA ao fechar tarefa
+
+**Único limite fixo (além §7.3):** colar `.gs` no Editor + **Nova versão Web** GAS — muda versão/acesso em produção; agente prepara repo + scripts + evidência.
+
 ## Bloqueio do Cursor (Smart Mode)
 
 Push, restore com PIN admin ou rede: se bloqueado, **retentar** com aprovação nativa — não desistir nem devolver ao usuário o que está no §7.2.

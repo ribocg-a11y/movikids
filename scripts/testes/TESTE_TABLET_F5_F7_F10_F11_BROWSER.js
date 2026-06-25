@@ -4,7 +4,7 @@
   const push = (id, ok, detail) => out.push({ id, ok, !!ok, detail: String(detail ?? '') });
   const op = Object.assign(
     typeof operadorApiParams_ === 'function' ? operadorApiParams_() : { operador: 'TESTE_CODEX' },
-    typeof mkAuthAdminPinParams_ === 'function' ? mkAuthAdminPinParams_() : { adminPin: '1416', authRole: 'admin' }
+    typeof mkAuthAdminPinParams_ === 'function' ? mkAuthAdminPinParams_() : { adminPin: '1421', authRole: 'admin' }
   );
   const stamp = Date.now();
   const tel = '989' + String(Math.floor(1e7 + Math.random() * 9e7));

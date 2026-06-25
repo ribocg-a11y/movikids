@@ -15,9 +15,12 @@
 | [prototipos/README.md](prototipos/README.md) | Mockups RH — URLs canônicas vs produção |
 | [**AUDITORIA_RH_FOLHA_PERSISTENCIA_2026-06-22.md**](ativos/AUDITORIA_RH_FOLHA_PERSISTENCIA_2026-06-22.md) | **Matriz RH** — abas, cálculos, lacunas RH-G1–G15 |
 | [**INCIDENTE_I43_CARREGAR_INICIO_COL_Y_2026-06-23.md**](ativos/INCIDENTE_I43_CARREGAR_INICIO_COL_Y_2026-06-23.md) | **I43** — cronômetro revertia após ▶ |
-| [**INCIDENTE_I44_BANCO_HORAS_PERSIST_LEITURA_2026-06-23.md**](ativos/INCIDENTE_I44_BANCO_HORAS_PERSIST_LEITURA_2026-06-23.md) | **I44** — banco horas corrompido em leitura painel |
+| [**INCIDENTE_I53_CONFIG_PLANILHA_REPAIR_2026-06-24.md**](arquivo/incidentes/INCIDENTE_I53_CONFIG_PLANILHA_REPAIR_2026-06-24.md) | **I53** — CONFIG memorial, schema, repair |
 | [**INCIDENTE_I45_CADASTRO_RH_NAO_PERSISTIDO_2026-06-23.md**](ativos/INCIDENTE_I45_CADASTRO_RH_NAO_PERSISTIDO_2026-06-23.md) | **I45** — cadastro Raykelly / installer apagava RH |
-| [**PROTOCOLO_AUDITORIA_ABAS_PLANILHA.md**](ativos/PROTOCOLO_AUDITORIA_ABAS_PLANILHA.md) | **Auditoria por aba** — roteiro LOCACOES + roadmap 24 abas |
+| [**PROTOCOLO_AUDITORIA_ABAS_PLANILHA.md**](ativos/PROTOCOLO_AUDITORIA_ABAS_PLANILHA.md) | **Auditoria por aba** — roteiro LOCACOES + CONFIG (I53) + roadmap 24 abas |
+| [**CHECKLIST_ABA_PLANILHA_CONFIG.md**](referencia/CHECKLIST_ABA_PLANILHA_CONFIG.md) | Checklist aba **CONFIG** (I53) |
+| [**CHECKLIST_ABA_PLANILHA_CUSTOS.md**](referencia/CHECKLIST_ABA_PLANILHA_CUSTOS.md) | Checklist aba **CUSTOS** (I55) |
+| [**CHECKLIST_ABA_PLANILHA_LOCACOES.md**](referencia/CHECKLIST_ABA_PLANILHA_LOCACOES.md) | Checklist piloto aba **LOCACOES** (I52) |
 | [**MAPA_PLANILHA_ABAS_MOVIKIDS.md**](referencia/MAPA_PLANILHA_ABAS_MOVIKIDS.md) | **Mapa canônico** — todas as abas · o que alimenta cada página |
 | [**PLANO_FASES_6_15_COCKPIT_EXECUTIVO_2026-06.md**](ativos/PLANO_FASES_6_15_COCKPIT_EXECUTIVO_2026-06.md) | **Ciclo ativo FASE 6–15** — benchmark, entregas, impacto visual por página |
 | [**PLANEJAMENTO_ATUAL_2026-06.md**](ativos/PLANEJAMENTO_ATUAL_2026-06.md) | Resumo operação + tabela fases 6–15 |

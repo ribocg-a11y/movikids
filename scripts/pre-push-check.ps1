@@ -251,6 +251,122 @@ try {
     } else {
       Add-Check "guard.gas.validarSchema.loc28" "ok" "schema LOC 28 cols + repair"
     }
+    if ($gasRaw -notmatch 'function validarConfigSchema_') {
+      Add-Check "guard.gas.validarSchema.config" "fail" "validarConfigSchema_ ausente (I53)"
+    } elseif ($gasRaw -notmatch 'function repararConfigPlanilhaAdmin_') {
+      Add-Check "guard.gas.validarSchema.config" "fail" "repararConfigPlanilhaAdmin ausente (I53)"
+    } elseif ($gasRaw -notmatch 'function cfgDataStartRow_') {
+      Add-Check "guard.gas.validarSchema.config" "fail" "cfgDataStartRow_ ausente (I53)"
+    } else {
+      Add-Check "guard.gas.validarSchema.config" "ok" "CONFIG memorial + repair I53"
+    }
+    if ($gasRaw -notmatch 'function validarOpsSchema_') {
+      Add-Check "guard.gas.validarSchema.ops" "fail" "validarOpsSchema_ ausente (I54)"
+    } elseif ($gasRaw -notmatch 'function repararOperadoresSistemaPlanilhaAdmin_') {
+      Add-Check "guard.gas.validarSchema.ops" "fail" "repararOperadoresSistemaPlanilhaAdmin ausente (I54)"
+    } elseif ($gasRaw -notmatch 'function opsDataStartRow_') {
+      Add-Check "guard.gas.validarSchema.ops" "fail" "opsDataStartRow_ ausente (I54)"
+    } else {
+      Add-Check "guard.gas.validarSchema.ops" "ok" "OPERADORES_SISTEMA memorial + repair I54"
+    }
+    if ($gasRaw -notmatch 'function validarCustosSchema_') {
+      Add-Check "guard.gas.validarSchema.cus" "fail" "validarCustosSchema_ ausente (I55)"
+    } elseif ($gasRaw -notmatch 'function repararCustosPlanilhaAdmin_') {
+      Add-Check "guard.gas.validarSchema.cus" "fail" "repararCustosPlanilhaAdmin ausente (I55)"
+    } elseif ($gasRaw -notmatch 'CUS_HEADERS_') {
+      Add-Check "guard.gas.validarSchema.cus" "fail" "CUS_HEADERS_ ausente (I55)"
+    } else {
+      Add-Check "guard.gas.validarSchema.cus" "ok" "CUSTOS memorial + repair I55"
+    }
+    if ($gasRaw -notmatch 'function validarDashboardSchema_') {
+      Add-Check "guard.gas.validarSchema.dash" "fail" "validarDashboardSchema_ ausente (I56)"
+    } elseif ($gasRaw -notmatch 'function repararDashboardPlanilhaAdmin_') {
+      Add-Check "guard.gas.validarSchema.dash" "fail" "repararDashboardPlanilhaAdmin ausente (I56)"
+    } elseif ($gasRaw -notmatch 'DASH_KPI_ROWS_') {
+      Add-Check "guard.gas.validarSchema.dash" "fail" "DASH_KPI_ROWS_ ausente (I56)"
+    } else {
+      Add-Check "guard.gas.validarSchema.dash" "ok" "DASHBOARD memorial + audit I56"
+    }
+    if ($gasRaw -notmatch 'function validarFolhaSchema_') {
+      Add-Check "guard.gas.validarSchema.folha" "fail" "validarFolhaSchema_ ausente (I57)"
+    } elseif ($gasRaw -notmatch 'function repararFolhaPlanilhaAdmin_') {
+      Add-Check "guard.gas.validarSchema.folha" "fail" "repararFolhaPlanilhaAdmin ausente (I57)"
+    } elseif ($gasRaw -notmatch 'FOLHA_KEY_CELLS_') {
+      Add-Check "guard.gas.validarSchema.folha" "fail" "FOLHA_KEY_CELLS_ ausente (I57)"
+    } else {
+      Add-Check "guard.gas.validarSchema.folha" "ok" "FOLHA memorial + audit I57"
+    }
+    if ($gasRaw -notmatch 'function validarInvestimentoSchema_') {
+      Add-Check "guard.gas.validarSchema.inv" "fail" "validarInvestimentoSchema_ ausente (I58)"
+    } elseif ($gasRaw -notmatch 'function repararInvestimentoPlanilhaAdmin_') {
+      Add-Check "guard.gas.validarSchema.inv" "fail" "repararInvestimentoPlanilhaAdmin ausente (I58)"
+    } elseif ($gasRaw -notmatch 'INV_HEADERS_') {
+      Add-Check "guard.gas.validarSchema.inv" "fail" "INV_HEADERS_ ausente (I58)"
+    } else {
+      Add-Check "guard.gas.validarSchema.inv" "ok" "INVESTIMENTO memorial + repair I58"
+    }
+    if ($gasRaw -notmatch 'function validarResponsaveisSchema_') {
+      Add-Check "guard.gas.validarSchema.resp" "fail" "validarResponsaveisSchema_ ausente (I59)"
+    } elseif ($gasRaw -notmatch 'function repararResponsaveisPlanilhaAdmin_') {
+      Add-Check "guard.gas.validarSchema.resp" "fail" "repararResponsaveisPlanilhaAdmin ausente (I59)"
+    } elseif ($gasRaw -notmatch 'RESP_HEADERS_') {
+      Add-Check "guard.gas.validarSchema.resp" "fail" "RESP_HEADERS_ ausente (I59)"
+    } else {
+      Add-Check "guard.gas.validarSchema.resp" "ok" "RESPONSAVEIS header + audit I59"
+    }
+    if ($gasRaw -notmatch 'function validarRelatoriosSchema_') {
+      Add-Check "guard.gas.validarSchema.rel" "fail" "validarRelatoriosSchema_ ausente (I60)"
+    } elseif ($gasRaw -notmatch 'function repararRelatoriosPlanilhaAdmin_') {
+      Add-Check "guard.gas.validarSchema.rel" "fail" "repararRelatoriosPlanilhaAdmin ausente (I60)"
+    } elseif ($gasRaw -notmatch 'REL_HEADERS_') {
+      Add-Check "guard.gas.validarSchema.rel" "fail" "REL_HEADERS_ ausente (I60)"
+    } else {
+      Add-Check "guard.gas.validarSchema.rel" "ok" "RELATORIOS header + audit I60"
+    }
+    if ($gasRaw -notmatch 'function validarAuditoriaSchema_') {
+      Add-Check "guard.gas.validarSchema.aud" "fail" "validarAuditoriaSchema_ ausente (I61)"
+    } elseif ($gasRaw -notmatch 'function repararAudCamada4PlanilhaAdmin_') {
+      Add-Check "guard.gas.validarSchema.aud" "fail" "repararAudCamada4PlanilhaAdmin ausente (I61)"
+    } elseif ($gasRaw -notmatch 'AUD_HEADERS_') {
+      Add-Check "guard.gas.validarSchema.aud" "fail" "AUD_HEADERS_ ausente (I61)"
+    } else {
+      Add-Check "guard.gas.validarSchema.aud" "ok" "Camada 4 AUD_* I61"
+    }
+    if ($gasRaw -notmatch 'function validarColaboradoresRhSchema_') {
+      Add-Check "guard.gas.validarSchema.rh" "fail" "validarColaboradoresRhSchema_ ausente (I62)"
+    } elseif ($gasRaw -notmatch 'function repararRhCamada5PlanilhaAdmin_') {
+      Add-Check "guard.gas.validarSchema.rh" "fail" "repararRhCamada5PlanilhaAdmin ausente (I62)"
+    } elseif ($gasRaw -notmatch 'COLAB_RH_HEADERS_') {
+      Add-Check "guard.gas.validarSchema.rh" "fail" "COLAB_RH_HEADERS_ ausente (I62)"
+    } else {
+      Add-Check "guard.gas.validarSchema.rh" "ok" "Camada 5 RH P0 I62"
+    }
+    if ($gasRaw -notmatch 'function validarEscalaSchema_') {
+      Add-Check "guard.gas.validarSchema.rhResto" "fail" "validarEscalaSchema_ ausente (I63)"
+    } elseif ($gasRaw -notmatch 'function repararRhCamada5RestoPlanilhaAdmin_') {
+      Add-Check "guard.gas.validarSchema.rhResto" "fail" "repararRhCamada5RestoPlanilhaAdmin ausente (I63)"
+    } elseif ($gasRaw -notmatch 'ESCALA_HEADERS_') {
+      Add-Check "guard.gas.validarSchema.rhResto" "fail" "ESCALA_HEADERS_ ausente (I63)"
+    } elseif ($gasRaw -notmatch '/\^-\?\\d\+h\\d\{2\}\$/') {
+      Add-Check "guard.gas.validarSchema.rhResto" "fail" "auditBancoHoras saldo negativo ausente (I63)"
+    } else {
+      Add-Check "guard.gas.validarSchema.rhResto" "ok" "Camada 5 RH resto I63"
+    }
+    if ($gasRaw -match "PIN admin 1416") {
+      Add-Check "guard.pin.leak.gas" "fail" "GAS ainda cita PIN 1416 em erro (I64)"
+    } else {
+      Add-Check "guard.pin.leak.gas" "ok" "Erros GAS sem PIN literal I64"
+    }
+    $fePinLeak = @(
+      (Get-Content (Join-Path $root "index.html") -Raw),
+      (Get-Content (Join-Path $root "gestao-pessoas.html") -Raw),
+      (Get-Content (Join-Path $root "mk-gestao-pessoas-ui.js") -Raw)
+    ) -join ""
+    if ($fePinLeak -match '1416') {
+      Add-Check "guard.pin.leak.fe" "fail" "PIN 1416 em index/gestao-pessoas/ui (I64)"
+    } else {
+      Add-Check "guard.pin.leak.fe" "ok" "UI producao sem PIN literal I64"
+    }
     } else {
       Add-Check "guard.gas.carregarInicio.colY" "fail" "carregarInicio_ ausente no GAS"
     }

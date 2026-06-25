@@ -9,7 +9,7 @@ function Get-MoviOperadorParams {
 # Fase 9 em pausa: editar/cancelar aceitam operador logado (authRole admin so em testes legados).
 function Get-MoviAdminSupervisorParams {
   param(
-    [string]$AdminPin = "1416",
+    [string]$AdminPin = "1421",
     [string]$Operador = "Administrador"
   )
   return @{
@@ -22,7 +22,7 @@ function Get-MoviAdminSupervisorParams {
 function Invoke-MoviTestCleanup {
   param(
     [string]$BaseUrl = "https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec",
-    [string]$AdminPin = "1416",
+    [string]$AdminPin = "1421",
     [switch]$SoHoje,
     [switch]$Quiet
   )

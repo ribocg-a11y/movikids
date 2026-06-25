@@ -120,6 +120,28 @@ Use como **referência** ao replicar nas demais abas.
 
 ---
 
+## 2b. Roteiro executado — aba CONFIG (I53)
+
+**Data:** 24/06/2026 · **GAS repo:** v1.5.150 · **Checklist:** `CHECKLIST_ABA_PLANILHA_CONFIG.md`
+
+### Resumo por fase
+
+| Fase | Entrega |
+|------|---------|
+| A | Chave-valor JSON · 4 chaves · alimenta nova locação e KPI frota |
+| B | `validarConfigSchema_` · `CONFIG_KEYS_REQUIRED_` · `cfgDataStartRow_` |
+| C | `auditConfigSampleCore_` · validação frota/preços JSON |
+| D | Memorial 1–3 · header 4 · migração legado (insert 3 linhas) |
+| E | Col A `@` · col B wrap |
+| F | Seed defaults · cache invalidate |
+| G | `repararConfigPlanilhaAdmin` · dispatch · v1.5.150 |
+| H | `REPARAR_CONFIG_PLANILHA_ADMIN.ps1` · `TESTE_OPERACAO_CONFIG_READONLY` |
+| I | M-CFG-1..3 backlog no checklist |
+
+**Pendente produção:** ~~`prepare-gas-push` + Nova versão Web v1.5.150 + repair ao vivo~~ ✅ 24/06
+
+---
+
 ## 3. Ciclo genérico — aplicar em **qualquer aba**
 
 ```mermaid
@@ -225,31 +247,33 @@ Ordem sugerida: **camada 1 → 2 → 3 → 4 → 5**, maior impacto primeiro.
 | # | Aba | Camada | Repair GAS | Protocolo | Status |
 |---|-----|--------|------------|-----------|--------|
 | 1 | **LOCACOES** | 1 | `repararLocacoesPlanilhaAdmin` | I52 ✅ | **Concluído 24/06** |
-| 2 | CONFIG | 1 | *a criar* | P-CONFIG | ⏳ |
-| 3 | OPERADORES_SISTEMA | 1 | *a criar* | P-OPS | ⏳ |
-| 4 | CUSTOS | 2 | *a criar* | P-CUS | ⏳ |
-| 5 | DASHBOARD | 2 | fórmulas — cuidado | P-DASH | ⏳ |
-| 6 | FOLHA | 2 | `repairFolhaAdmin` existe | P-FOLHA | 🟡 parcial I25 |
-| 7 | INVESTIMENTO | 2 | *a criar* | P-INV | ⏳ |
-| 8 | RESPONSAVEIS | 3 | *a criar* | P-RESP | ⏳ |
-| 9 | RELATORIOS | 2 | *a criar* | P-REL | ⏳ |
-| 10 | AUDITORIA | 4 | readonly preferencial | P-AUD | ⏳ |
-| 11 | AUD_TURNO | 4 | readonly | P-AUDT | ⏳ |
-| 12 | AUD_SMS | 4 | legado/pausado | P-SMS | ⏳ |
-| 13 | AUD_WHATSAPP | 4 | legado/pausado | P-WA | ⏳ |
-| 14 | AUD_RESPONSAVEIS | 4 | readonly | P-AUDR | ⏳ |
-| 15 | COLABORADORES_RH | 5 | `repararRhPlanilhaAdmin` | P-RH | 🟡 parcial I45 |
-| 16 | FOLHA_PONTO | 5 | `salvarPontoRhAdmin` | P-PONTO | 🟡 I51 |
-| 17 | ESCALA_COLABORADORES | 5 | em `repararRhPlanilhaAdmin` | P-ESC | ⏳ |
-| 18 | FALTAS_AUSENCIAS | 5 | sync jornada | P-FALTAS | ⏳ |
-| 19 | HOLERITES | 5 | snapshot | P-HOL | ⏳ |
-| 20 | METAS_COLABORADORES | 5 | seed | P-METAS | ⏳ |
-| 21 | BANCO_HORAS | 5 | `repairBancoHorasAdmin` | P-BH | 🟡 I44 |
-| 22 | COMUNICADOS_RH | 5 | *a criar* | P-COM | ⏳ |
-| 23 | AVALIACOES_RH | 5 | *a criar* | P-AVAL | ⏳ |
+| 2 | **CONFIG** | 1 | `repararConfigPlanilhaAdmin` | I53 ✅ | **Concluído 24/06** |
+| 3 | **OPERADORES_SISTEMA** | 1 | `repararOperadoresSistemaPlanilhaAdmin` | I54 ✅ | **Concluído 24/06** |
+| 4 | **CUSTOS** | 2 | `repararCustosPlanilhaAdmin` | I55 ✅ | **Concluído 24/06** |
+| 5 | **DASHBOARD** | 2 | `repararDashboardPlanilhaAdmin` | I56 ✅ | **Concluído 24/06** |
+| 6 | **FOLHA** | 2 | `repararFolhaPlanilhaAdmin` | I57 ✅ | **Concluído 24/06** |
+| 7 | **INVESTIMENTO** | 2 | `repararInvestimentoPlanilhaAdmin` | I58 ✅ | **Concluído 24/06** |
+| 8 | **RESPONSAVEIS** | 3 | `repararResponsaveisPlanilhaAdmin` | I59 ✅ | **Concluído 24/06** |
+| 9 | **RELATORIOS** | 2 | `repararRelatoriosPlanilhaAdmin` | I60 ✅ | **v1.5.158** prod · schemaOk |
+| 10 | **AUDITORIA** | 4 | `repararAuditoriaPlanilhaAdmin` | I61 ✅ | **v1.5.159** · 2657 reg |
+| 11 | **AUD_TURNO** | 4 | `repararAudTurnoPlanilhaAdmin` | I61 ✅ | 235 reg |
+| 12 | **AUD_SMS** | 4 | `repararAudSmsPlanilhaAdmin` | I61 ✅ | 630 reg · pausado |
+| 13 | **AUD_WHATSAPP** | 4 | `repararAudWhatsappPlanilhaAdmin` | I61 ✅ | 36 reg · pausado |
+| 14 | **AUD_RESPONSAVEIS** | 4 | `repararAudResponsaveisPlanilhaAdmin` | I61 ✅ | 240 reg |
+| 15 | **COLABORADORES_RH** | 5 | `repararColaboradoresRhPlanilhaAdmin` | I62 ✅ | **v1.5.160** · 2 colab |
+| 16 | **FOLHA_PONTO** | 5 | `repararFolhaPontoPlanilhaAdmin` | I62 ✅ | 9 registros |
+| 21 | **BANCO_HORAS** | 5 | `repararBancoHorasPlanilhaAdmin` | I62 ✅ | 4 registros |
+| 17 | **ESCALA_COLABORADORES** | 5 | `repararEscalaPlanilhaAdmin` | I63 ✅ | **v1.5.161** · 2 reg |
+| 18 | **FALTAS_AUSENCIAS** | 5 | `repararFaltasPlanilhaAdmin` | I63 ✅ | 1 reg |
+| 19 | **HOLERITES** | 5 | `repararHoleritesPlanilhaAdmin` | I63 ✅ | 2 reg |
+| 20 | **METAS_COLABORADORES** | 5 | `repararMetasPlanilhaAdmin` | I63 ✅ | 1 reg demo |
+| 22 | **COMUNICADOS_RH** | 5 | `repararComunicadosRhPlanilhaAdmin` | I63 ✅ | 1 reg |
+| 23 | **AVALIACOES_RH** | 5 | `repararAvaliacoesRhPlanilhaAdmin` | I63 ✅ | 0 reg |
 | 24 | Analise | — | arquivar | — | 🚫 legado |
 
-**Próxima aba recomendada:** **CONFIG** (camada 1, alimenta toda nova locação).
+**Camada 4 I61 ✅ · Camada 5 P0 I62 ✅ · Camada 5 resto I63 ✅ 25/06 — protocolo abas mapeadas fechado.**
+
+**Pendente I55:** ~~Nova versao Web v1.5.152 + repair~~ ✅ 24/06
 
 ---
 
@@ -264,8 +288,18 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 # Piloto LOCACOES — repair + validação
 .\scripts\testes\TESTE_PROTOCOLO_ABA_PLANILHA.ps1 -Aba LOCACOES
 
+# CONFIG I53 — após deploy Web v1.5.150
+.\scripts\testes\TESTE_PROTOCOLO_ABA_PLANILHA.ps1 -Aba CONFIG -DryRun
+.\scripts\testes\REPARAR_CONFIG_PLANILHA_ADMIN.ps1
+.\scripts\testes\TESTE_OPERACAO_CONFIG_READONLY.ps1
+
 # Qualquer aba — inventário readonly
 .\scripts\testes\TESTE_PROTOCOLO_ABA_PLANILHA.ps1 -Aba CONFIG -SomenteLeitura
+
+# I63 RH resto — após deploy Web v1.5.161
+.\scripts\testes\TESTE_RH_CAMADA5_RESTO_READONLY.ps1
+.\scripts\testes\REPARAR_RH_CAMADA5_RESTO_PLANILHA_ADMIN.ps1
+.\scripts\testes\TESTE_PROTOCOLO_ABA_PLANILHA.ps1 -Aba ESCALA_COLABORADORES -DryRun
 
 # Suite geral planilha
 .\scripts\testes\TESTE_AUDITORIA_PLANILHA_COMPLETA_READONLY.ps1

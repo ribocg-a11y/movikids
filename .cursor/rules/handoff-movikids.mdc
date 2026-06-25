@@ -35,7 +35,9 @@ Ao trabalhar neste repositório, **ler primeiro** (nesta ordem):
 
 ## Agente vs usuário (memória rápida)
 
-**Agente SOZINHO:** ler docs, editar FE/docs, `pre-push-check` → commit → push FE → `verify-publish-complete` (**sem pedir**), `relatorio-versoes.ps1` no encerramento, ping GAS, testes, planilha OAuth, PRs, APIs admin.
+**Agente SOZINHO:** ler docs, editar FE/docs, `pre-push-check` → commit → push FE → `verify-publish-complete` (**sem pedir**), `relatorio-versoes.ps1` no encerramento, ping GAS, **executar** testes/repair API (não transferir ao usuário), planilha OAuth, PRs, APIs admin.
+
+**Executar, não transferir:** `.cursor/rules/agente-autonomia-movikids.mdc` § "Não transferir" — único limite fixo além §7.3: não colar/reimplantar Nova versão Web GAS.
 
 **Não pedir autorização** para commit/push FE nem bump `mk-version` — ver `.cursor/rules/agente-autonomia-movikids.mdc` e `ACESSOS_E_AUTORIZACOES.md` §7.2.
 

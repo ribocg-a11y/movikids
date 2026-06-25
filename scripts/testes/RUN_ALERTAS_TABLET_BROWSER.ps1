@@ -1,7 +1,7 @@
 # Executa TESTE_ALERTAS_TABLET_BROWSER.js no Chrome via Playwright (login admin + checkTimer).
 param(
   [string]$FeUrl = "https://ribocg-a11y.github.io/movikids/?force=1.8.20",
-  [string]$AdminPin = "1416"
+  [string]$AdminPin = "1421"
 )
 
 $ErrorActionPreference = "Stop"

@@ -146,6 +146,12 @@
     }
 
     function gpShowPreviewBanner_(on) {
+      /* I64 — colaboradores nunca veem faixa ADM em produção */
+      if (MK_GP_PROD) {
+        var elProd = document.getElementById('gp-preview-banner');
+        if (elProd) elProd.hidden = true;
+        return;
+      }
       var el = document.getElementById('gp-preview-banner');
       if (el) el.hidden = !on;
     }
@@ -178,15 +184,22 @@
         if (errEl) { errEl.textContent = 'Digite os 4 números do PIN admin.'; errEl.hidden = false; }
         return;
       }
-      if (pin !== '1416') {
-        if (errEl) { errEl.textContent = 'PIN administrativo incorreto.'; errEl.hidden = false; }
-        clearPinInputs(admPreviewPins);
+      if (!window.api) {
+        if (errEl) { errEl.textContent = 'Servidor indisponível.'; errEl.hidden = false; }
         return;
       }
-      gpAdmPreviewPin_ = pin;
-      if (errEl) errEl.hidden = true;
-      document.getElementById('adm-preview-pin-block').hidden = true;
-      loadAdmPreviewColaboradores_();
+      api({ action: 'loginAdmin', adminPin: pin }).then(function (r) {
+        if (!r || r.ok === false) throw new Error((r && r.erro) || 'PIN administrativo incorreto.');
+        if (typeof mkAuthStoreAdminPin_ === 'function') mkAuthStoreAdminPin_(pin);
+        gpAdmPreviewPin_ = pin;
+        if (errEl) errEl.hidden = true;
+        var pinBlock = document.getElementById('adm-preview-pin-block');
+        if (pinBlock) pinBlock.hidden = true;
+        loadAdmPreviewColaboradores_();
+      }).catch(function (e) {
+        if (errEl) { errEl.textContent = e.message || 'PIN administrativo incorreto.'; errEl.hidden = false; }
+        clearPinInputs(admPreviewPins);
+      });
     }
 
     function gpColabListCacheKey_() { return 'mk_gp_colab_list_v1'; }
@@ -278,6 +291,7 @@
       }
       var uid = sel.value;
       gpAdmPreviewMode_ = true;
+      gpArmAdmPreviewSession_();
       if (uid === 'demo') {
         PESSOAS.demo = Object.assign({}, GP_DEMO_COLAB);
         colabLogado = 'demo';
@@ -485,12 +499,10 @@
     }
 
     function gpAfterColabLogin_(uid) {
+      gpClearAdmPreviewSession_();
+      gpAdmPreviewMode_ = false;
       colabLogado = uid;
       pickColab = uid;
-      if (gpAdmPreviewMode_) {
-        go('s-colab-hub');
-        return;
-      }
       var p = PESSOAS[uid];
       if (!cadastroOk(p)) {
         gpCadastroForced_ = true;
@@ -1542,11 +1554,17 @@
         const err = document.getElementById('adm-err');
         err.textContent = 'Digite os 4 números do PIN.'; err.hidden = false; return;
       }
-      if (pin !== '1416') {
-        const err = document.getElementById('adm-err');
-        err.textContent = 'PIN administrativo incorreto.'; err.hidden = false; return;
+      if (!window.api) {
+        go('s-adm-hub');
+        return;
       }
-      go('s-adm-hub');
+      api({ action: 'loginAdmin', adminPin: pin }).then(function (r) {
+        if (!r || r.ok === false) throw new Error((r && r.erro) || 'PIN incorreto');
+        go('s-adm-hub');
+      }).catch(function () {
+        const err = document.getElementById('adm-err');
+        err.textContent = 'PIN administrativo incorreto.'; err.hidden = false;
+      });
     }
 
     function demoAlertaPonto() {

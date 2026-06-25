@@ -44,12 +44,14 @@ Use quando a loja está operando ou não quer poluir a planilha:
 
 ## Planilha — protocolo por aba (P-ABA)
 
-Roteiro piloto **LOCACOES (I52)** fechado. Próxima: **CONFIG**.
+Roadmap I52–I63 **fechado** (23 abas · `validarSchema` global ok).
 
 ```powershell
 .\scripts\testes\TESTE_PROTOCOLO_ABA_PLANILHA.ps1 -Aba LOCACOES -DryRun
-.\scripts\testes\TESTE_PROTOCOLO_ABA_PLANILHA.ps1 -Aba LOCACOES
-.\scripts\testes\REPARAR_LOCACOES_PLANILHA_ADMIN.ps1
+.\scripts\testes\REPARAR_RH_CAMADA5_RESTO_PLANILHA_ADMIN.ps1
+.\scripts\testes\TESTE_RH_CAMADA5_RESTO_READONLY.ps1
+.\scripts\testes\REPARAR_RH_CAMADA5_PLANILHA_ADMIN.ps1
+.\scripts\testes\TESTE_RH_CAMADA5_READONLY.ps1
 .\scripts\testes\TESTE_REAUDITORIA_PLANILHA.ps1
 .\scripts\testes\TESTE_AUDITORIA_PLANILHA_COMPLETA_READONLY.ps1
 ```

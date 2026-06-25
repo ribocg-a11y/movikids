@@ -1,5 +1,19 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.149
+// MOVI KIDS — Google Apps Script v1.5.163
+// v1.5.163: PIN admin 1421 (ADMIN_PIN_PLAIN + Script Property ADMIN_PIN)
+// v1.5.162: I64 — erros admin sem vazar PIN; ADMIN_PIN via Script Property
+// v1.5.161: I63 — camada 5 RH resto (ESCALA, FALTAS, HOLERITES, METAS, COMUNICADOS, AVALIACOES)
+// v1.5.160: I62 — camada 5 RH P0 (COLABORADORES_RH, FOLHA_PONTO, BANCO_HORAS) audit + schema + repair
+// v1.5.159: I61 — camada 4 AUD_* (AUDITORIA, AUD_TURNO, AUD_SMS/WA/RESP) audit + schema + repair header
+// v1.5.158: I60 — audit RELATORIOS aceita link (email) quando tipo Email
+// v1.5.157: I60 — RELATORIOS header 6 cols, audit PDFs, repararRelatoriosPlanilhaAdmin
+// v1.5.156: I59 — RESPONSAVEIS header 9 cols, audit CRM, repararResponsaveisPlanilhaAdmin
+// v1.5.155: I58 — INVESTIMENTO memorial, schema 6 cols, repair/audit payback
+// v1.5.154: I57 — FOLHA protocolo memorial, audit B68/B25, repararFolhaPlanilhaAdmin + validarSchema
+// v1.5.153: I56 — DASHBOARD memorial, audit formulas, sync KPI C5-C11 (sem tocar formulas)
+// v1.5.152: I55 — CUSTOS memorial, schema 6 cols, repair/audit, formatos caixa
+// v1.5.151: I54 — OPERADORES_SISTEMA memorial, schema 8 cols, repair/audit, ops layout padronizado
+// v1.5.150: I53 — CONFIG memorial, chaves JSON, repair/audit, cfg layout padronizado
 // v1.5.149: I52 — LOCACOES schema 28 cols, listarAtivas COL_LOC_READ_, repair memorial/formatos/protecao
 // v1.5.148: I51d — jornada exibe Abonado (nao Falta) quando abono ADM na data
 // v1.5.147: I51c — holerite respeita abono na jornada; restore abona folga 20/06 Raykelly
@@ -156,14 +170,78 @@ const SH_DASH  = 'DASHBOARD';
 const SH_CFG   = 'CONFIG';
 const SH_ANA   = 'Analise';
 const SH_RESP  = 'RESPONSAVEIS';
+const SH_REL   = 'RELATORIOS';
 const SH_AUD_RESP = 'AUD_RESPONSAVEIS';
 const SH_AUD_WA = 'AUD_WHATSAPP';
 const SH_AUD_SMS = 'AUD_SMS';
+const SH_AUD = 'AUDITORIA';
+const SH_AUD_TURNO = 'AUD_TURNO';
+/** Camada 4 — logs append-only; header L1, dados L2+ (I61). */
+const AUD_LOG_HEADER_ROW_ = 1;
+const AUD_LOG_DATA_ROW_ = 2;
+const COL_AUD_READ_ = 8;
+const AUD_HEADERS_ = ['Timestamp', 'Acao', 'RowIndex', 'ID', 'Motivo', 'AntesJSON', 'DepoisJSON', 'Usuario'];
+const COL_AUDT_READ_ = 7;
+const AUDT_HEADERS_ = ['DataHora', 'Acao', 'OperadorId', 'Nome', 'Entrada', 'Saida', 'Detalhe'];
+const COL_AUDSMS_READ_ = 13;
+const AUDSMS_HEADERS_ = ['#', 'DataHora', 'Tipo', 'Status', 'RowIndex', 'Id', 'Responsavel', 'Crianca', 'Telefone', 'Origem', 'VersaoFrontend', 'GatewayId', 'Payload'];
+const COL_AUDWA_READ_ = 12;
+const AUDWA_HEADERS_ = ['#', 'DataHora', 'Tipo', 'Status', 'RowIndex', 'Id', 'Responsavel', 'Crianca', 'Telefone', 'Origem', 'VersaoFrontend', 'Payload'];
+const COL_AUDR_READ_ = 7;
+const AUDR_HEADERS_ = ['timestamp', 'acao', 'telefone', 'antesJson', 'depoisJson', 'motivo', 'usuario'];
+const AUD_ACOES_LOC_VALIDAS_ = ['salvarLocacao', 'editarLocacao', 'cancelarLocacao', 'encerrarLocacao', 'iniciarTimer', 'estenderLocacao', 'limparLocacaoTesteAdmin', 'corrigirFinanceiroLocacaoAdmin', 'lancamentoAvulso'];
+const AUD_ACOES_TURNO_VALIDAS_ = ['login', 'logout', 'logout_admin', 'logout_inatividade'];
+/** Camada 5 RH P0 — header L1, dados L2+ (I62). */
+const COL_COLAB_RH_READ_ = 19;
+const COLAB_RH_HEADERS_ = ['operador_id', 'nome', 'funcao', 'cpf', 'nascimento', 'telefone', 'email', 'endereco', 'emergencia', 'admissao', 'pix', 'salario_base', 'va_diario', 'meta_loc_dia', 'bonus_meta_r$', 'turno', 'ativo', 'cadastro_pct', 'atualizado_em'];
+const COL_FOLHA_PONTO_READ_ = 9;
+const FOLHA_PONTO_HEADERS_ = ['id', 'operador_id', 'data', 'dia_semana', 'entrada', 'saida', 'horas', 'situacao', 'registrado_em'];
+const COL_BANCO_HORAS_READ_ = 3;
+const BANCO_HORAS_HEADERS_ = ['operador_id', 'saldo_hhmm', 'atualizado_em'];
+/** Camada 5 RH resto — header L1, dados L2+ (I63). */
+const COL_ESCALA_READ_ = 10;
+const ESCALA_HEADERS_ = ['operador_id', 'competencia', 'seg', 'ter', 'qua', 'qui', 'sex', 'sab', 'dom', 'obs'];
+const COL_FALTAS_READ_ = 8;
+const FALTAS_HEADERS_ = ['id', 'operador_id', 'data', 'tipo', 'horas', 'valor_desconto', 'obs', 'registrado_em'];
+const COL_HOLERITES_READ_ = 15;
+const HOLERITES_HEADERS_ = ['id', 'operador_id', 'competencia', 'base', 'bonus', 'faltas', 'inss', 'irrf', 'vt', 'liquido', 'fgts', 'va_total', 'dias_trab', 'obs', 'gerado_em'];
+const COL_METAS_READ_ = 7;
+const METAS_HEADERS_ = ['id', 'operador_id', 'data', 'locacoes', 'meta', 'bonus_ok', 'bonus_valor'];
+const COL_COMUNICADOS_READ_ = 9;
+const COMUNICADOS_HEADERS_ = ['id', 'data', 'titulo', 'mensagem', 'publico', 'valido_ate', 'prioridade', 'ativo', 'criado_em'];
+const COL_AVALIACOES_READ_ = 7;
+const AVALIACOES_HEADERS_ = ['id', 'operador_id', 'competencia', 'area', 'nota', 'observacao', 'criado_em'];
 const SH_OPS = 'OPERADORES_SISTEMA';
-const ADMIN_PIN_PLAIN = '1416';
-const OP_DATA_ROW = 2;
+const ADMIN_PIN_PLAIN = '1421'; /* fallback — preferir Script Property ADMIN_PIN */
+/** OPERADORES_SISTEMA — memorial 1-3, header 4, dados 5+ (I54). Legado: header 1, dados 2. */
+const OPS_HEADER_ROW_ = 4;
+const OPS_DATA_ROW_ = 5;
+const COL_OPS_READ_ = 8;
+const OPS_HEADERS_ = [
+  'id', 'criadoEm', 'nome', 'pinHash', 'pinSalt', 'ativo', 'ultimoLogin', 'perfil'
+];
+const OPS_PERFIS_VALIDOS_ = ['operador', 'gestor', 'supervisor'];
 const DATA_ROW = 11;
 const INV_DATA_ROW = 11;
+const INV_HEADER_ROW_ = 9;
+const COL_INV_READ_ = 6;
+const INV_HEADERS_ = ['#', 'Categoria', 'Item', 'Valor', 'Entra?', 'Observacao'];
+/** RESPONSAVEIS — layout legado: header linha 1, dados linha 2+ (I59, sem migrar 240 linhas). */
+const RESP_HEADER_ROW_ = 1;
+const RESP_DATA_ROW_ = 2;
+const COL_RESP_READ_ = 9;
+const RESP_HEADERS_ = ['id', 'criadoEm', 'atualizadoEm', 'telefone', 'responsavel', 'criancasJson', 'observacao', 'origem', 'status'];
+/** RELATORIOS — header linha 1, dados linha 2+ (PDFs mensais). */
+const REL_HEADER_ROW_ = 1;
+const REL_DATA_ROW_ = 2;
+const COL_REL_READ_ = 6;
+const REL_HEADERS_ = ['#', 'Mes/Ano', 'Data Envio', 'Link', 'Tipo', 'Obs'];
+/** CONFIG — memorial 1-3, header 4, chaves JSON desde 5 (I53). Legado: header linha 1, dados linha 2. */
+const CONFIG_HEADER_ROW_ = 4;
+const CONFIG_DATA_ROW_ = 5;
+const CONFIG_KEYS_REQUIRED_ = [
+  'veiculos_validos_json', 'precos_json', 'formas_pagamento_json', 'regras_operacionais_json'
+];
 const PORTAL_RESPONSAVEL_URL = 'https://ribocg-a11y.github.io/movikids/acompanhar.html';
 const SMS_GATEWAY_URL = 'https://api.sms-gate.app/3rdparty/v1/messages';
 /** Device Cloud producao (aparelho remoto DJVJRL) — copiar da API se falhar; app pode confundir l/I */
@@ -424,12 +502,37 @@ function dispatchMoviAction_(p, method) {
       case 'kpiMes':              return kpiMes_(p);
       case 'comandoOperacional':  return comandoOperacional_(p);
       case 'repairFolhaAdmin':    return repairFolhaFormulasAdmin_(p);
+      case 'repararFolhaPlanilhaAdmin': return repararFolhaPlanilhaAdmin_(p);
+      case 'repararInvestimentoPlanilhaAdmin': return repararInvestimentoPlanilhaAdmin_(p);
+      case 'repararResponsaveisPlanilhaAdmin': return repararResponsaveisPlanilhaAdmin_(p);
+      case 'repararRelatoriosPlanilhaAdmin': return repararRelatoriosPlanilhaAdmin_(p);
+      case 'repararAuditoriaPlanilhaAdmin': return repararAuditoriaPlanilhaAdmin_(p);
+      case 'repararAudTurnoPlanilhaAdmin': return repararAudTurnoPlanilhaAdmin_(p);
+      case 'repararAudSmsPlanilhaAdmin': return repararAudSmsPlanilhaAdmin_(p);
+      case 'repararAudWhatsappPlanilhaAdmin': return repararAudWhatsappPlanilhaAdmin_(p);
+      case 'repararAudResponsaveisPlanilhaAdmin': return repararAudResponsaveisPlanilhaAdmin_(p);
+      case 'repararAudCamada4PlanilhaAdmin': return repararAudCamada4PlanilhaAdmin_(p);
+      case 'repararColaboradoresRhPlanilhaAdmin': return repararColaboradoresRhPlanilhaAdmin_(p);
+      case 'repararFolhaPontoPlanilhaAdmin': return repararFolhaPontoPlanilhaAdmin_(p);
+      case 'repararBancoHorasPlanilhaAdmin': return repararBancoHorasPlanilhaAdmin_(p);
+      case 'repararRhCamada5PlanilhaAdmin': return repararRhCamada5PlanilhaAdmin_(p);
+      case 'repararEscalaPlanilhaAdmin': return repararEscalaPlanilhaAdmin_(p);
+      case 'repararFaltasPlanilhaAdmin': return repararFaltasPlanilhaAdmin_(p);
+      case 'repararHoleritesPlanilhaAdmin': return repararHoleritesPlanilhaAdmin_(p);
+      case 'repararMetasPlanilhaAdmin': return repararMetasPlanilhaAdmin_(p);
+      case 'repararComunicadosRhPlanilhaAdmin': return repararComunicadosRhPlanilhaAdmin_(p);
+      case 'repararAvaliacoesRhPlanilhaAdmin': return repararAvaliacoesRhPlanilhaAdmin_(p);
+      case 'repararRhCamada5RestoPlanilhaAdmin': return repararRhCamada5RestoPlanilhaAdmin_(p);
       case 'repairBancoHorasAdmin': return repairBancoHorasAdmin_(p);
       case 'diagnosticoPlanilhaCompletoAdmin': return diagnosticoPlanilhaCompletoAdmin_(p);
       case 'salvarCadastroRhAdmin': return salvarCadastroRhAdmin_(p);
       case 'salvarDadosContratuaisRhAdmin': return salvarDadosContratuaisRhAdmin_(p);
       case 'repararRhPlanilhaAdmin': return repararRhPlanilhaAdmin_(p);
       case 'repararLocacoesPlanilhaAdmin': return repararLocacoesPlanilhaAdmin_(p);
+      case 'repararConfigPlanilhaAdmin': return repararConfigPlanilhaAdmin_(p);
+      case 'repararOperadoresSistemaPlanilhaAdmin': return repararOperadoresSistemaPlanilhaAdmin_(p);
+      case 'repararCustosPlanilhaAdmin': return repararCustosPlanilhaAdmin_(p);
+      case 'repararDashboardPlanilhaAdmin': return repararDashboardPlanilhaAdmin_(p);
       case 'salvarPontoRhAdmin': return salvarPontoRhAdmin_(p);
       case 'abonarFaltaRhAdmin': return abonarFaltaRhAdmin_(p);
       case 'restaurarPontoRaykellyJun2026Admin': return restaurarPontoRaykellyJun2026Admin_(p);
@@ -522,9 +625,9 @@ function ping_() {
   const agora = new Date();
   return resp_({
     status:  'online',
-    versao:  'v1.5.149',
+    versao:  'v1.5.163',
     timestamp: fmtData_(agora) + ' ' + fmtHoraLocal_(agora),
-    sistema: 'MOVI KIDS v1.5.149',
+    sistema: 'MOVI KIDS v1.5.163',
     postWriteActions: WRITE_ACTIONS_CRITICAS_
   });
 }
@@ -583,12 +686,16 @@ const LOC_HEADERS_ = [
 const COL_CONTA_ID_ = 19;
 const COL_LOC_READ_ = 28;
 
+/** CUSTOS — memorial 1-3, reservado 4-8, header 9, dados 11 (I55). */
+const CUS_HEADER_ROW_ = 9;
+const CUS_DATA_ROW_ = 11;
+const COL_CUS_READ_ = 6;
+const CUS_HEADERS_ = ['#', 'Data', 'Hora', 'Descricao', 'Categoria', 'Valor'];
+
 function validarSchema_() {
   const ss = ss_();
   const esperado = {
-    LOCACOES: LOC_HEADERS_,
-    CUSTOS: ['#','Data','Hora','Descricao','Categoria','Valor'],
-    RELATORIOS: ['#','Mes','Data','Link','Tipo','Obs']
+    LOCACOES: LOC_HEADERS_
   };
 
   const resultado = {};
@@ -599,7 +706,7 @@ function validarSchema_() {
       return;
     }
 
-    const headerRow = nome === 'RELATORIOS' ? 1 : LOC_HEADER_ROW_;
+    const headerRow = LOC_HEADER_ROW_;
     const expLen = esperado[nome].length;
     const width = nome === 'LOCACOES' ? expLen : Math.min(sheet.getLastColumn(), expLen);
     const headers = width > 0
@@ -629,8 +736,74 @@ function validarSchema_() {
     };
   });
 
+  const shCfg = ss.getSheetByName(SH_CFG);
+  resultado.CONFIG = shCfg ? validarConfigSchema_(shCfg) : { existe: false, ok: false, erro: 'Aba ausente' };
+
+  const shOps = ss.getSheetByName(SH_OPS);
+  resultado.OPERADORES_SISTEMA = shOps ? validarOpsSchema_(shOps) : { existe: false, ok: false, erro: 'Aba ausente' };
+
+  const shCus = ss.getSheetByName(SH_CUS);
+  resultado.CUSTOS = shCus ? validarCustosSchema_(shCus) : { existe: false, ok: false, erro: 'Aba ausente' };
+
+  const shDash = ss.getSheetByName(SH_DASH);
+  resultado.DASHBOARD = shDash ? validarDashboardSchema_(shDash) : { existe: false, ok: false, erro: 'Aba ausente' };
+
+  const shFolha = ss.getSheetByName(SH_FOLHA);
+  resultado.FOLHA = shFolha ? validarFolhaSchema_(shFolha) : { existe: false, ok: false, erro: 'Aba ausente' };
+
+  const shInv = ss.getSheetByName(SH_INV);
+  resultado.INVESTIMENTO = shInv ? validarInvestimentoSchema_(shInv) : { existe: false, ok: false, erro: 'Aba ausente' };
+
+  const shResp = ss.getSheetByName(SH_RESP);
+  resultado.RESPONSAVEIS = shResp ? validarResponsaveisSchema_(shResp) : { existe: false, ok: false, erro: 'Aba ausente' };
+
+  const shRel = ss.getSheetByName(SH_REL);
+  resultado.RELATORIOS = shRel ? validarRelatoriosSchema_(shRel) : { existe: false, ok: false, erro: 'Aba ausente' };
+
+  const shAud = ss.getSheetByName(SH_AUD);
+  resultado.AUDITORIA = shAud ? validarAuditoriaSchema_(shAud) : { existe: false, ok: false, erro: 'Aba ausente' };
+
+  const shAudT = ss.getSheetByName(SH_AUD_TURNO);
+  resultado.AUD_TURNO = shAudT ? validarAudTurnoSchema_(shAudT) : { existe: false, ok: false, erro: 'Aba ausente' };
+
+  const shAudSms = ss.getSheetByName(SH_AUD_SMS);
+  resultado.AUD_SMS = shAudSms ? validarAudSmsSchema_(shAudSms) : { existe: false, ok: false, erro: 'Aba ausente' };
+
+  const shAudWa = ss.getSheetByName(SH_AUD_WA);
+  resultado.AUD_WHATSAPP = shAudWa ? validarAudWhatsappSchema_(shAudWa) : { existe: false, ok: false, erro: 'Aba ausente' };
+
+  const shAudR = ss.getSheetByName(SH_AUD_RESP);
+  resultado.AUD_RESPONSAVEIS = shAudR ? validarAudResponsaveisSchema_(shAudR) : { existe: false, ok: false, erro: 'Aba ausente' };
+
+  const shColab = ss.getSheetByName('COLABORADORES_RH');
+  resultado.COLABORADORES_RH = shColab ? validarColaboradoresRhSchema_(shColab) : { existe: false, ok: false, erro: 'Aba ausente' };
+
+  const shFp = ss.getSheetByName('FOLHA_PONTO');
+  resultado.FOLHA_PONTO = shFp ? validarFolhaPontoSchema_(shFp) : { existe: false, ok: false, erro: 'Aba ausente' };
+
+  const shBh = ss.getSheetByName('BANCO_HORAS');
+  resultado.BANCO_HORAS = shBh ? validarBancoHorasSchema_(shBh) : { existe: false, ok: false, erro: 'Aba ausente' };
+
+  const shEsc = ss.getSheetByName('ESCALA_COLABORADORES');
+  resultado.ESCALA_COLABORADORES = shEsc ? validarEscalaSchema_(shEsc) : { existe: false, ok: false, erro: 'Aba ausente' };
+
+  const shFaltas = ss.getSheetByName('FALTAS_AUSENCIAS');
+  resultado.FALTAS_AUSENCIAS = shFaltas ? validarFaltasSchema_(shFaltas) : { existe: false, ok: false, erro: 'Aba ausente' };
+
+  const shHol = ss.getSheetByName('HOLERITES');
+  resultado.HOLERITES = shHol ? validarHoleritesSchema_(shHol) : { existe: false, ok: false, erro: 'Aba ausente' };
+
+  const shMetas = ss.getSheetByName('METAS_COLABORADORES');
+  resultado.METAS_COLABORADORES = shMetas ? validarMetasSchema_(shMetas) : { existe: false, ok: false, erro: 'Aba ausente' };
+
+  const shCom = ss.getSheetByName('COMUNICADOS_RH');
+  resultado.COMUNICADOS_RH = shCom ? validarComunicadosRhSchema_(shCom) : { existe: false, ok: false, erro: 'Aba ausente' };
+
+  const shAv = ss.getSheetByName('AVALIACOES_RH');
+  resultado.AVALIACOES_RH = shAv ? validarAvaliacoesRhSchema_(shAv) : { existe: false, ok: false, erro: 'Aba ausente' };
+
   return resp_({
-    versao: 'v1.5.149',
+    versao: 'v1.5.161',
     schemaOk: Object.values(resultado).every(r => r.ok),
     resultado
   });
@@ -717,7 +890,7 @@ function auditLocacoesSampleCore_(amostra) {
 
 /** Admin — repair LOCACOES: memorial, headers, formatos, proteção; opcional limpar testes. */
 function repararLocacoesPlanilhaAdmin_(p) {
-  if (!adminPinOk_(p)) return err_('Acesso negado — PIN admin 1416', 403);
+  if (!adminPinOk_(p)) return err_('Acesso negado — PIN administrativo incorreto', 403);
   const dryRun = String(p.dryRun || '') === '1' || p.dryRun === true;
   if (dryRun) {
     const schemaJson = JSON.parse(validarSchema_().getContent());
@@ -726,7 +899,7 @@ function repararLocacoesPlanilhaAdmin_(p) {
       audit: auditLocacoesSampleCore_(30),
       schemaOk: schemaJson.schemaOk,
       schemaLoc: schemaJson.resultado && schemaJson.resultado.LOCACOES,
-      versao: 'v1.5.149'
+      versao: 'v1.5.150'
     });
   }
   const lock = LockService.getScriptLock();
@@ -754,13 +927,2252 @@ function repararLocacoesPlanilhaAdmin_(p) {
       limpeza: limpeza,
       audit: audit,
       schemaOk: schemaJson.schemaOk,
-      versao: 'v1.5.149'
+      versao: 'v1.5.150'
     });
   } catch (ex) {
     return err_('repararLocacoesPlanilhaAdmin: ' + ex.message, 500);
   } finally {
     lock.releaseLock();
   }
+}
+
+/** I53 — primeira linha de dados CONFIG (layout novo linha 5 ou legado linha 2). */
+function cfgDataStartRow_() {
+  const sheet = sh_getOrCreate_(SH_CFG);
+  const a1 = String(sheet.getRange(1, 1).getValue() || '').trim().toLowerCase();
+  if (a1.indexOf('movi kids') >= 0 && a1.indexOf('config') >= 0) return CONFIG_DATA_ROW_;
+  const h4 = String(sheet.getRange(CONFIG_HEADER_ROW_, 1).getValue() || '').trim().toLowerCase();
+  if (h4 === 'chave' || h4.indexOf('chave') === 0) return CONFIG_DATA_ROW_;
+  if (a1 === 'chave' || a1.indexOf('chave') === 0) return 2;
+  return CONFIG_DATA_ROW_;
+}
+
+function cfgHeaderRow_() {
+  return cfgDataStartRow_() === 2 ? 1 : CONFIG_HEADER_ROW_;
+}
+
+function validarConfigSchema_(sheet) {
+  const headerRow = cfgHeaderRow_();
+  const headers = sheet.getRange(headerRow, 1, 1, 2).getValues()[0].map(cellToStr_);
+  const faltando = [];
+  ['Chave', 'Valor'].forEach(function (label, idx) {
+    const atual = String(headers[idx] || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+    const alvo = label.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+    if (!atual.includes(alvo)) faltando.push({ coluna: idx + 1, esperado: label, atual: headers[idx] || '' });
+  });
+  const map = cfgReadMap_();
+  CONFIG_KEYS_REQUIRED_.forEach(function (k) {
+    if (!map[k] || !String(map[k]).trim()) {
+      faltando.push({ coluna: 'A', esperado: k, atual: '(ausente)' });
+    }
+  });
+  const cfg = operacaoConfig_();
+  if (cfg.problemas && cfg.problemas.length) {
+    cfg.problemas.forEach(function (p) {
+      faltando.push({ coluna: 'JSON', esperado: 'valido', atual: p });
+    });
+  }
+  return {
+    existe: true,
+    ok: faltando.length === 0,
+    headerRow: headerRow,
+    lastRow: sheet.getLastRow(),
+    lastColumn: sheet.getLastColumn(),
+    faltando: faltando,
+    okConfig: cfg.problemas.length === 0,
+    fonte: cfg.fonte
+  };
+}
+
+function repairConfigMemorialCore_() {
+  const sheet = sh_getOrCreate_(SH_CFG);
+  const a1 = String(sheet.getRange(1, 1).getValue() || '');
+  if (a1.indexOf('MOVI KIDS') >= 0 && a1.indexOf('CONFIG') >= 0) {
+    sheet.getRange(CONFIG_HEADER_ROW_, 1, 1, 2).setValues([['Chave', 'Valor']]);
+    sheet.getRange(CONFIG_HEADER_ROW_, 1, 1, 2).setFontWeight('bold').setBackground('#E8F0FE');
+    sheet.setFrozenRows(CONFIG_HEADER_ROW_);
+    return { memorialOk: true, migrated: false, layout: 'i53' };
+  }
+  const last = sheet.getLastRow();
+  let pairs = [];
+  const h1 = String(sheet.getRange(1, 1).getValue() || '').trim().toLowerCase();
+  if (h1 === 'chave' || h1.indexOf('chave') === 0) {
+    if (last >= 2) {
+      pairs = sheet.getRange(2, 1, last - 1, 2).getValues().filter(function (r) {
+        return r[0] !== '' && r[0] !== null && r[0] !== undefined;
+      });
+    }
+  } else if (last >= 1) {
+    pairs = sheet.getRange(1, 1, last, 2).getValues().filter(function (r) {
+      return r[0] !== '' && r[0] !== null && r[0] !== undefined;
+    });
+  }
+  sheet.insertRowsBefore(1, 3);
+  const memorial = [
+    'MOVI KIDS — CONFIG · frota e preços (chaves JSON linha ' + CONFIG_DATA_ROW_ + '+)',
+    'Gravado por salvarOperacaoConfigAdmin / GAS · Mapa: MAPA_PLANILHA § CONFIG',
+    'Chaves: veiculos_validos_json · precos_json · formas_pagamento_json · regras_operacionais_json'
+  ];
+  memorial.forEach(function (txt, i) { sheet.getRange(i + 1, 1).setValue(txt); });
+  sheet.getRange(CONFIG_HEADER_ROW_, 1, 1, 2).setValues([['Chave', 'Valor']]);
+  sheet.getRange(CONFIG_HEADER_ROW_, 1, 1, 2).setFontWeight('bold').setBackground('#E8F0FE');
+  if (pairs.length) {
+    sheet.getRange(CONFIG_DATA_ROW_, 1, pairs.length, 2).setValues(pairs);
+  }
+  sheet.setFrozenRows(CONFIG_HEADER_ROW_);
+  try {
+    sheet.getProtections(SpreadsheetApp.ProtectionType.RANGE).forEach(function (pr) {
+      const d = String(pr.getDescription() || '');
+      if (d.indexOf('MOVI KIDS memorial CONFIG') >= 0) pr.remove();
+    });
+    sheet.getRange(1, 1, CONFIG_HEADER_ROW_, sheet.getMaxColumns()).protect()
+      .setDescription('MOVI KIDS memorial CONFIG — nao editar')
+      .setWarningOnly(false);
+  } catch (e) {
+    Logger.log('repairConfigMemorial protect: ' + e.message);
+  }
+  return { memorialOk: true, migrated: true, pares: pairs.length, layout: 'i53' };
+}
+
+function repairConfigFormatosCore_() {
+  const sheet = sh_getOrCreate_(SH_CFG);
+  const start = cfgDataStartRow_();
+  const last = sheet.getLastRow();
+  if (last < start) return { linhas: 0, seeded: 0 };
+  const n = last - start + 1;
+  sheet.getRange(start, 1, n, 1).setNumberFormat('@');
+  sheet.getRange(start, 2, n, 1).setWrap(true);
+  sheet.getRange(start, 2, n, 1).setVerticalAlignment('top');
+  let seeded = 0;
+  const map = cfgReadMap_();
+  if (!map.veiculos_validos_json) {
+    cfgSetValue_('veiculos_validos_json', JSON.stringify(OPERACAO_CONFIG_DEFAULTS.veiculos_validos));
+    seeded++;
+  }
+  if (!map.precos_json) {
+    cfgSetValue_('precos_json', JSON.stringify(OPERACAO_CONFIG_DEFAULTS.precos));
+    seeded++;
+  }
+  if (!map.formas_pagamento_json) {
+    cfgSetValue_('formas_pagamento_json', JSON.stringify(OPERACAO_CONFIG_DEFAULTS.formas_pagamento));
+    seeded++;
+  }
+  if (!map.regras_operacionais_json) {
+    cfgSetValue_('regras_operacionais_json', JSON.stringify(OPERACAO_CONFIG_DEFAULTS.regras));
+    seeded++;
+  }
+  return { linhas: n, seeded: seeded };
+}
+
+function auditConfigSampleCore_() {
+  const sheet = sh_getOrCreate_(SH_CFG);
+  const cfg = operacaoConfig_();
+  const map = cfgReadMap_();
+  const problemas = [];
+  CONFIG_KEYS_REQUIRED_.forEach(function (k) {
+    if (!map[k] || !String(map[k]).trim()) problemas.push({ row: cfgDataStartRow_(), campo: k, valor: 'ausente' });
+  });
+  (cfg.problemas || []).forEach(function (p) {
+    problemas.push({ row: 0, campo: 'JSON', valor: p });
+  });
+  const errosV = validarVeiculosConfig_(cfg.veiculos_validos);
+  errosV.forEach(function (e) { problemas.push({ row: 0, campo: 'frota', valor: e }); });
+  const errosP = validarPrecosConfig_(cfg.precos);
+  errosP.forEach(function (e) { problemas.push({ row: 0, campo: 'precos', valor: e }); });
+  return {
+    amostra: Object.keys(map).length,
+    problemas: problemas,
+    lastRow: sheet.getLastRow(),
+    okConfig: cfg.problemas.length === 0 && errosV.length === 0 && errosP.length === 0,
+    fonte: cfg.fonte,
+    veiculos: cfg.veiculos_validos.length
+  };
+}
+
+function repararConfigPlanilhaAdmin_(p) {
+  if (!adminPinOk_(p)) return err_('Acesso negado — PIN administrativo incorreto', 403);
+  const dryRun = String(p.dryRun || '') === '1' || p.dryRun === true;
+  if (dryRun) {
+    return resp_({
+      dryRun: true,
+      audit: auditConfigSampleCore_(),
+      schema: validarConfigSchema_(sh_getOrCreate_(SH_CFG)),
+      versao: 'v1.5.150'
+    });
+  }
+  const lock = LockService.getScriptLock();
+  try { lock.waitLock(15000); } catch (ex) { return err_('Sistema ocupado', 503); }
+  try {
+    const memorial = repairConfigMemorialCore_();
+    const formatos = repairConfigFormatosCore_();
+    const audit = auditConfigSampleCore_();
+    try { invalidateInicioResumoCache_(fmtData_(new Date())); } catch (e) {}
+    const schema = validarConfigSchema_(sh_getOrCreate_(SH_CFG));
+    return resp_({
+      mensagem: 'CONFIG reparada (memorial, chaves JSON, formatos, protecao)',
+      memorial: memorial,
+      formatos: formatos,
+      audit: audit,
+      schemaOk: schema.ok,
+      versao: 'v1.5.150'
+    });
+  } catch (ex) {
+    return err_('repararConfigPlanilhaAdmin: ' + ex.message, 500);
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+/** I54 — primeira linha de dados OPERADORES (layout I54 linha 5 ou legado linha 2). */
+function opsDataStartRow_() {
+  const sheet = sh_getOrCreate_(SH_OPS);
+  const a1 = String(sheet.getRange(1, 1).getValue() || '').trim().toLowerCase();
+  if (a1.indexOf('movi kids') >= 0 && a1.indexOf('operador') >= 0) return OPS_DATA_ROW_;
+  const h4 = String(sheet.getRange(OPS_HEADER_ROW_, 1).getValue() || '').trim().toLowerCase();
+  if (h4 === 'id') return OPS_DATA_ROW_;
+  if (a1 === 'id') return 2;
+  return OPS_DATA_ROW_;
+}
+
+function opsHeaderRow_() {
+  return opsDataStartRow_() === 2 ? 1 : OPS_HEADER_ROW_;
+}
+
+function validarOpsSchema_(sheet) {
+  const headerRow = opsHeaderRow_();
+  const headers = sheet.getRange(headerRow, 1, 1, COL_OPS_READ_).getValues()[0].map(cellToStr_);
+  const faltando = [];
+  OPS_HEADERS_.forEach(function (label, idx) {
+    const atual = String(headers[idx] || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+    const alvo = label.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+    if (!atual.includes(alvo)) faltando.push({ coluna: idx + 1, esperado: label, atual: headers[idx] || '' });
+  });
+  const audit = auditOpsSampleCore_();
+  (audit.problemas || []).forEach(function (p) {
+    if (p.campo === 'operador_padrao' || p.campo === 'id_duplicado') {
+      faltando.push({ coluna: p.campo, esperado: 'ok', atual: p.valor });
+    }
+  });
+  return {
+    existe: true,
+    ok: faltando.length === 0,
+    headerRow: headerRow,
+    lastRow: sheet.getLastRow(),
+    lastColumn: sheet.getLastColumn(),
+    faltando: faltando,
+    operadoresAtivos: audit.operadoresAtivos,
+    todosComPin: audit.todosComPin
+  };
+}
+
+function repairOpsMemorialCore_() {
+  const sheet = sh_getOrCreate_(SH_OPS);
+  const a1 = String(sheet.getRange(1, 1).getValue() || '');
+  if (a1.indexOf('MOVI KIDS') >= 0 && a1.indexOf('OPERADOR') >= 0) {
+    sheet.getRange(OPS_HEADER_ROW_, 1, 1, COL_OPS_READ_).setValues([OPS_HEADERS_]);
+    sheet.getRange(OPS_HEADER_ROW_, 1, 1, COL_OPS_READ_).setFontWeight('bold').setBackground('#E8F0FE');
+    sheet.setFrozenRows(OPS_HEADER_ROW_);
+    try {
+      sheet.getProtections(SpreadsheetApp.ProtectionType.RANGE).forEach(function (pr) {
+        const d = String(pr.getDescription() || '');
+        if (d.indexOf('MOVI KIDS memorial OPERADORES') >= 0) pr.remove();
+      });
+      sheet.getRange(1, 1, OPS_HEADER_ROW_, sheet.getMaxColumns()).protect()
+        .setDescription('MOVI KIDS memorial OPERADORES — nao editar')
+        .setWarningOnly(false);
+    } catch (e) { Logger.log('repairOpsMemorial protect: ' + e.message); }
+    return { memorialOk: true, migrated: false, layout: 'i54' };
+  }
+  const last = sheet.getLastRow();
+  let rows = [];
+  const h1 = String(sheet.getRange(1, 1).getValue() || '').trim().toLowerCase();
+  if (h1 === 'id') {
+    if (last >= 2) {
+      rows = sheet.getRange(2, 1, last - 1, COL_OPS_READ_).getValues().filter(function (r) {
+        return r[0] !== '' && r[0] !== null && r[0] !== undefined;
+      });
+    }
+  } else if (last >= OPS_DATA_ROW_) {
+    rows = sheet.getRange(OPS_DATA_ROW_, 1, last - OPS_DATA_ROW_ + 1, COL_OPS_READ_).getValues().filter(function (r) {
+      return r[0] !== '' && r[0] !== null && r[0] !== undefined;
+    });
+  }
+  sheet.insertRowsBefore(1, 3);
+  const memorial = [
+    'MOVI KIDS — OPERADORES_SISTEMA · login balcao PIN (nao editar manualmente)',
+    'Gravado por loginOperador / GAS · Mapa: MAPA_PLANILHA § OPERADORES_SISTEMA',
+    'Cols: pinHash/pinSalt (4-5) · ativo SIM/NAO · perfil operador|gestor|supervisor'
+  ];
+  memorial.forEach(function (txt, i) { sheet.getRange(i + 1, 1).setValue(txt); });
+  sheet.getRange(OPS_HEADER_ROW_, 1, 1, COL_OPS_READ_).setValues([OPS_HEADERS_]);
+  sheet.getRange(OPS_HEADER_ROW_, 1, 1, COL_OPS_READ_).setFontWeight('bold').setBackground('#E8F0FE');
+  if (rows.length) {
+    sheet.getRange(OPS_DATA_ROW_, 1, rows.length, COL_OPS_READ_).setValues(rows);
+  }
+  sheet.setFrozenRows(OPS_HEADER_ROW_);
+  try {
+    sheet.getProtections(SpreadsheetApp.ProtectionType.RANGE).forEach(function (pr) {
+      const d = String(pr.getDescription() || '');
+      if (d.indexOf('MOVI KIDS memorial OPERADORES') >= 0) pr.remove();
+    });
+    sheet.getRange(1, 1, OPS_HEADER_ROW_, sheet.getMaxColumns()).protect()
+      .setDescription('MOVI KIDS memorial OPERADORES — nao editar')
+      .setWarningOnly(false);
+  } catch (e) { Logger.log('repairOpsMemorial protect: ' + e.message); }
+  return { memorialOk: true, migrated: true, linhas: rows.length, layout: 'i54' };
+}
+
+function repairOpsFormatosCore_() {
+  const sheet = sh_getOrCreate_(SH_OPS);
+  const start = opsDataStartRow_();
+  const last = sheet.getLastRow();
+  if (last < start) return { linhas: 0 };
+  const n = last - start + 1;
+  sheet.getRange(start, 1, n, 1).setNumberFormat('0');
+  sheet.getRange(start, 2, n, 1).setNumberFormat('@');
+  sheet.getRange(start, 3, n, 1).setNumberFormat('@');
+  sheet.getRange(start, 4, n, 2).setNumberFormat('@');
+  sheet.getRange(start, 7, n, 1).setNumberFormat('@');
+  const ativoRule = SpreadsheetApp.newDataValidation()
+    .requireValueInList(['SIM', 'NAO'], true).setAllowInvalid(false).build();
+  sheet.getRange(start, 6, n, 1).setDataValidation(ativoRule);
+  const perfilRule = SpreadsheetApp.newDataValidation()
+    .requireValueInList(['operador', 'gestor', 'supervisor'], true).setAllowInvalid(false).build();
+  sheet.getRange(start, 8, n, 1).setDataValidation(perfilRule);
+  sincronizarOperadoresPadrao_(sheet);
+  return { linhas: n };
+}
+
+function auditOpsSampleCore_() {
+  const sheet = sh_getOrCreate_(SH_OPS);
+  const start = opsDataStartRow_();
+  const last = sheet.getLastRow();
+  const problemas = [];
+  const ids = {};
+  const nomesAtivos = [];
+  let operadoresAtivos = 0;
+  let todosComPin = true;
+  if (last >= start) {
+    const rows = sheet.getRange(start, 1, last - start + 1, COL_OPS_READ_).getValues();
+    rows.forEach(function (r, idx) {
+      const rowIndex = start + idx;
+      if (!r[0] && !r[2]) return;
+      const id = Number(r[0]);
+      const nome = String(r[2] || '').trim();
+      const ativo = String(r[5] || 'SIM').toUpperCase() !== 'NAO';
+      const perfil = perfilNorm_(r[7]);
+      const hasPin = !!String(r[3] || '').trim();
+      if (!id || id < 1) problemas.push({ row: rowIndex, campo: 'id', valor: String(r[0]) });
+      if (!nome) problemas.push({ row: rowIndex, campo: 'nome', valor: '(vazio)' });
+      if (ids[id]) problemas.push({ row: rowIndex, campo: 'id_duplicado', valor: String(id) });
+      ids[id] = true;
+      if (ativo) {
+        operadoresAtivos++;
+        nomesAtivos.push(nome.toLowerCase());
+        if (!hasPin) problemas.push({ row: rowIndex, campo: 'ativo_sem_pin', valor: nome });
+        if (!hasPin) todosComPin = false;
+      }
+      const rawPerfil = String(r[7] || '').trim().toLowerCase();
+      if (rawPerfil && OPS_PERFIS_VALIDOS_.indexOf(rawPerfil) < 0) {
+        problemas.push({ row: rowIndex, campo: 'perfil', valor: rawPerfil });
+      }
+      const legado = OPERADORES_RENOMEAR_LEGADO_[nome];
+      if (legado) problemas.push({ row: rowIndex, campo: 'nome_legado', valor: nome });
+    });
+  }
+  OPERADORES_PADRAO_.forEach(function (nome) {
+    if (nomesAtivos.indexOf(nome.toLowerCase()) < 0) {
+      problemas.push({ row: start, campo: 'operador_padrao', valor: 'ausente: ' + nome });
+    }
+  });
+  return {
+    amostra: Object.keys(ids).length,
+    problemas: problemas,
+    lastRow: last,
+    operadoresAtivos: operadoresAtivos,
+    todosComPin: todosComPin && operadoresAtivos > 0
+  };
+}
+
+function repararOperadoresSistemaPlanilhaAdmin_(p) {
+  if (!adminPinOk_(p)) return err_('Acesso negado — PIN administrativo incorreto', 403);
+  const dryRun = String(p.dryRun || '') === '1' || p.dryRun === true;
+  if (dryRun) {
+    return resp_({
+      dryRun: true,
+      audit: auditOpsSampleCore_(),
+      schema: validarOpsSchema_(sh_getOrCreate_(SH_OPS)),
+      versao: 'v1.5.152'
+    });
+  }
+  const lock = LockService.getScriptLock();
+  try { lock.waitLock(15000); } catch (ex) { return err_('Sistema ocupado', 503); }
+  try {
+    const memorial = repairOpsMemorialCore_();
+    const formatos = repairOpsFormatosCore_();
+    const audit = auditOpsSampleCore_();
+    const schema = validarOpsSchema_(sh_getOrCreate_(SH_OPS));
+    return resp_({
+      mensagem: 'OPERADORES_SISTEMA reparada (memorial, headers 8 cols, formatos, protecao)',
+      memorial: memorial,
+      formatos: formatos,
+      audit: audit,
+      schemaOk: schema.ok,
+      versao: 'v1.5.152'
+    });
+  } catch (ex) {
+    return err_('repararOperadoresSistemaPlanilhaAdmin: ' + ex.message, 500);
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+/** I55 — linha de dados CUSTOS (padrao 11 ou legado 2). */
+function cusDataStartRow_() {
+  const sheet = sh_getOrCreate_(SH_CUS);
+  const a1 = String(sheet.getRange(1, 1).getValue() || '').trim().toLowerCase();
+  if (a1.indexOf('movi kids') >= 0 && a1.indexOf('custo') >= 0) return CUS_DATA_ROW_;
+  const h9 = String(sheet.getRange(CUS_HEADER_ROW_, 1).getValue() || '').trim();
+  if (h9 === '#' || h9.indexOf('#') === 0) return CUS_DATA_ROW_;
+  if (a1 === '#' || a1.indexOf('#') === 0) return 2;
+  return CUS_DATA_ROW_;
+}
+
+function cusHeaderRow_() {
+  return cusDataStartRow_() === 2 ? 1 : CUS_HEADER_ROW_;
+}
+
+function validarCustosSchema_(sheet) {
+  const headerRow = cusHeaderRow_();
+  const headers = sheet.getRange(headerRow, 1, 1, COL_CUS_READ_).getValues()[0].map(cellToStr_);
+  const faltando = [];
+  CUS_HEADERS_.forEach(function (label, idx) {
+    const atual = String(headers[idx] || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+    const alvo = label.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+    if (!atual.includes(alvo)) faltando.push({ coluna: idx + 1, esperado: label, atual: headers[idx] || '' });
+  });
+  const audit = auditCustosSampleCore_(30);
+  (audit.problemas || []).forEach(function (p) {
+    if (p.campo === 'valor' || p.campo === 'id') {
+      faltando.push({ coluna: p.campo, esperado: 'ok', atual: p.valor });
+    }
+  });
+  return {
+    existe: true,
+    ok: faltando.length === 0,
+    headerRow: headerRow,
+    lastRow: sheet.getLastRow(),
+    lastColumn: sheet.getLastColumn(),
+    faltando: faltando,
+    linhasDados: audit.amostra,
+    somaAmostra: audit.somaAmostra
+  };
+}
+
+function repairCustosMemorialCore_() {
+  const sheet = sh_getOrCreate_(SH_CUS);
+  const a1 = String(sheet.getRange(1, 1).getValue() || '');
+  if (a1.indexOf('MOVI KIDS') >= 0 && a1.indexOf('CUSTO') >= 0) {
+    const memorial = [
+      'MOVI KIDS — CUSTOS · despesas caixa (nao editar manualmente)',
+      'Gravado por salvarCusto / GAS admin · Mapa: MAPA_PLANILHA § CUSTOS',
+      'Cols: Data/Hora · Categoria mini-DRE · Valor R$ col F',
+      '', '', '', '', ''
+    ];
+    memorial.forEach(function (txt, i) { sheet.getRange(i + 1, 1).setValue(txt); });
+    sheet.getRange(CUS_HEADER_ROW_, 1, 1, COL_CUS_READ_).setValues([CUS_HEADERS_]);
+    sheet.getRange(CUS_HEADER_ROW_, 1, 1, COL_CUS_READ_).setFontWeight('bold').setBackground('#E8F0FE');
+    sheet.setFrozenRows(CUS_HEADER_ROW_);
+    try {
+      sheet.getProtections(SpreadsheetApp.ProtectionType.RANGE).forEach(function (pr) {
+        const d = String(pr.getDescription() || '');
+        if (d.indexOf('MOVI KIDS memorial CUSTOS') >= 0) pr.remove();
+      });
+      sheet.getRange(1, 1, CUS_HEADER_ROW_, sheet.getMaxColumns()).protect()
+        .setDescription('MOVI KIDS memorial CUSTOS — nao editar')
+        .setWarningOnly(false);
+    } catch (e) { Logger.log('repairCustosMemorial protect: ' + e.message); }
+    return { memorialOk: true, migrated: false, layout: 'i55' };
+  }
+  const last = sheet.getLastRow();
+  let rows = [];
+  const h1 = String(sheet.getRange(1, 1).getValue() || '').trim();
+  const h9 = String(sheet.getRange(CUS_HEADER_ROW_, 1).getValue() || '').trim();
+  if (h1 === '#' || h1.indexOf('#') === 0) {
+    if (last >= 2) {
+      rows = sheet.getRange(2, 1, last - 1, COL_CUS_READ_).getValues().filter(function (r) {
+        return r[0] !== '' && r[0] !== null && r[0] !== undefined;
+      });
+    }
+    sheet.insertRowsBefore(1, 9);
+  } else if (h9 === '#' || h9.indexOf('#') === 0) {
+    if (last >= CUS_DATA_ROW_) {
+      rows = sheet.getRange(CUS_DATA_ROW_, 1, last - CUS_DATA_ROW_ + 1, COL_CUS_READ_).getValues().filter(function (r) {
+        return r[0] !== '' && r[0] !== null && r[0] !== undefined;
+      });
+    }
+  } else if (last >= 2) {
+    rows = sheet.getRange(2, 1, last - 1, COL_CUS_READ_).getValues().filter(function (r) {
+      return r[0] !== '' && r[0] !== null && r[0] !== undefined;
+    });
+    sheet.insertRowsBefore(1, 9);
+  }
+  const memorial = [
+    'MOVI KIDS — CUSTOS · despesas caixa (nao editar manualmente)',
+    'Gravado por salvarCusto / GAS admin · Mapa: MAPA_PLANILHA § CUSTOS',
+    'Cols: Data/Hora · Categoria mini-DRE · Valor R$ col F',
+    '', '', '', '', ''
+  ];
+  memorial.forEach(function (txt, i) { sheet.getRange(i + 1, 1).setValue(txt); });
+  sheet.getRange(CUS_HEADER_ROW_, 1, 1, COL_CUS_READ_).setValues([CUS_HEADERS_]);
+  sheet.getRange(CUS_HEADER_ROW_, 1, 1, COL_CUS_READ_).setFontWeight('bold').setBackground('#E8F0FE');
+  if (rows.length) {
+    sheet.getRange(CUS_DATA_ROW_, 1, rows.length, COL_CUS_READ_).setValues(rows);
+  }
+  sheet.setFrozenRows(CUS_HEADER_ROW_);
+  try {
+    sheet.getProtections(SpreadsheetApp.ProtectionType.RANGE).forEach(function (pr) {
+      const d = String(pr.getDescription() || '');
+      if (d.indexOf('MOVI KIDS memorial CUSTOS') >= 0) pr.remove();
+    });
+    sheet.getRange(1, 1, CUS_HEADER_ROW_, sheet.getMaxColumns()).protect()
+      .setDescription('MOVI KIDS memorial CUSTOS — nao editar')
+      .setWarningOnly(false);
+  } catch (e) { Logger.log('repairCustosMemorial protect: ' + e.message); }
+  return { memorialOk: true, migrated: true, linhas: rows.length, layout: 'i55' };
+}
+
+function repairCustosFormatosCore_() {
+  const sheet = sh_getOrCreate_(SH_CUS);
+  const start = cusDataStartRow_();
+  const last = sheet.getLastRow();
+  if (last < start) return { linhas: 0 };
+  const n = last - start + 1;
+  sheet.getRange(start, 1, n, 1).setNumberFormat('0');
+  sheet.getRange(start, 2, n, 1).setNumberFormat('dd/mm/yyyy');
+  sheet.getRange(start, 3, n, 1).setNumberFormat('hh:mm');
+  sheet.getRange(start, 4, n, 2).setNumberFormat('@');
+  sheet.getRange(start, 6, n, 1).setNumberFormat('"R$" #,##0.00');
+  return { linhas: n };
+}
+
+function auditCustosSampleCore_(amostra) {
+  const sheet = sh_getOrCreate_(SH_CUS);
+  const start = cusDataStartRow_();
+  const last = sheet.getLastRow();
+  if (last < start) return { amostra: 0, problemas: [], lastRow: last, somaAmostra: 0 };
+  const n = Math.min(Math.max(parseInt(amostra, 10) || 20, 1), last - start + 1);
+  const from = last - n + 1;
+  const dados = sheet.getRange(from, 1, last - from + 1, COL_CUS_READ_).getValues();
+  const problemas = [];
+  let soma = 0;
+  dados.forEach(function (r, idx) {
+    const rowIndex = from + idx;
+    if (!r[0]) return;
+    const val = Number(r[5]);
+    if (isNaN(val) || val <= 0) {
+      problemas.push({ row: rowIndex, campo: 'valor', valor: String(r[5]) });
+    } else {
+      soma += val;
+    }
+    if (!String(r[3] || '').trim()) {
+      problemas.push({ row: rowIndex, campo: 'descricao', valor: '(vazio)' });
+    }
+  });
+  return { amostra: dados.length, problemas: problemas, lastRow: last, somaAmostra: Math.round(soma * 100) / 100 };
+}
+
+function repararCustosPlanilhaAdmin_(p) {
+  if (!adminPinOk_(p)) return err_('Acesso negado — PIN administrativo incorreto', 403);
+  const dryRun = String(p.dryRun || '') === '1' || p.dryRun === true;
+  if (dryRun) {
+    return resp_({
+      dryRun: true,
+      audit: auditCustosSampleCore_(30),
+      schema: validarCustosSchema_(sh_getOrCreate_(SH_CUS)),
+      versao: 'v1.5.152'
+    });
+  }
+  const lock = LockService.getScriptLock();
+  try { lock.waitLock(15000); } catch (ex) { return err_('Sistema ocupado', 503); }
+  try {
+    const memorial = repairCustosMemorialCore_();
+    const formatos = repairCustosFormatosCore_();
+    const audit = auditCustosSampleCore_(30);
+    try { invalidateInicioResumoCache_(fmtData_(new Date())); } catch (e) {}
+    const schema = validarCustosSchema_(sh_getOrCreate_(SH_CUS));
+    return resp_({
+      mensagem: 'CUSTOS reparada (memorial, headers 6 cols, formatos, protecao)',
+      memorial: memorial,
+      formatos: formatos,
+      audit: audit,
+      schemaOk: schema.ok,
+      versao: 'v1.5.152'
+    });
+  } catch (ex) {
+    return err_('repararCustosPlanilhaAdmin: ' + ex.message, 500);
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+/** I56 — DASHBOARD: memorial + KPI C5-C11; nao altera formulas. */
+const DASH_MEMORIAL_ROWS_ = 3;
+const DASH_KPI_ROWS_ = [5, 6, 7, 8, 9, 10, 11];
+
+function dashMemorialOk_(sheet) {
+  const a1 = String(sheet.getRange(1, 1).getValue() || '');
+  return a1.indexOf('MOVI KIDS') >= 0 && a1.indexOf('DASHBOARD') >= 0;
+}
+
+function repairDashboardMemorialCore_() {
+  const sheet = sh_getOrCreate_(SH_DASH);
+  const memorial = [
+    'MOVI KIDS — DASHBOARD · KPIs mensais (formulas — nao editar estrutura)',
+    'Sync GAS: atualizarKPIs escreve C5-C11 · FE usa kpiMes/buscarKPIsAdmin (memoria)',
+    'SUMIFS referencia LOCACOES · ver MAPA_PLANILHA § DASHBOARD'
+  ];
+  memorial.forEach(function (txt, i) { sheet.getRange(i + 1, 1).setValue(txt); });
+  try {
+    sheet.getProtections(SpreadsheetApp.ProtectionType.RANGE).forEach(function (pr) {
+      const d = String(pr.getDescription() || '');
+      if (d.indexOf('MOVI KIDS memorial DASHBOARD') >= 0) pr.remove();
+    });
+    sheet.getRange(1, 1, DASH_MEMORIAL_ROWS_, sheet.getMaxColumns()).protect()
+      .setDescription('MOVI KIDS memorial DASHBOARD — nao editar')
+      .setWarningOnly(false);
+  } catch (e) { Logger.log('repairDashboardMemorial protect: ' + e.message); }
+  return { memorialOk: true, layout: 'i56' };
+}
+
+function repairDashboardKpiSyncCore_() {
+  try { atualizarKPIs(); } catch (e) { Logger.log('repairDashboardKpiSync: ' + e.message); }
+  const sheet = sh_getOrCreate_(SH_DASH);
+  const kpis = {};
+  DASH_KPI_ROWS_.forEach(function (row) {
+    kpis['C' + row] = sheet.getRange(row, 3).getValue();
+  });
+  return { kpis: kpis };
+}
+
+function auditDashboardSampleCore_() {
+  const sheet = sh_getOrCreate_(SH_DASH);
+  const lastRow = Math.min(Math.max(sheet.getLastRow(), 1), 50);
+  const lastCol = Math.min(Math.max(sheet.getLastColumn(), 1), 8);
+  const display = sheet.getRange(1, 1, lastRow, lastCol).getDisplayValues();
+  const problemas = [];
+  const errosSheet = /^#(REF|NAME|VALUE|N\/A|NUM|DIV\/0|ERROR)!?$/i;
+  display.forEach(function (row, ri) {
+    row.forEach(function (cell, ci) {
+      const s = String(cell || '').trim();
+      if (errosSheet.test(s)) {
+        problemas.push({ row: ri + 1, col: ci + 1, campo: 'formula', valor: s });
+      }
+    });
+  });
+  DASH_KPI_ROWS_.forEach(function (row) {
+    const v = sheet.getRange(row, 3).getValue();
+    if (v === '' || v === null || (typeof v === 'string' && errosSheet.test(String(v).trim()))) {
+      problemas.push({ row: row, col: 3, campo: 'kpi_c', valor: String(v) });
+    }
+  });
+  return {
+    amostra: lastRow * lastCol,
+    problemas: problemas,
+    lastRow: sheet.getLastRow(),
+    memorialOk: dashMemorialOk_(sheet)
+  };
+}
+
+function validarDashboardSchema_(sheet) {
+  const audit = auditDashboardSampleCore_();
+  const faltando = [];
+  if (!dashMemorialOk_(sheet)) {
+    faltando.push({ coluna: 'memorial', esperado: 'MOVI KIDS DASHBOARD', atual: String(sheet.getRange(1, 1).getValue() || '') });
+  }
+  (audit.problemas || []).forEach(function (p) {
+    if (p.campo === 'formula') {
+      faltando.push({ coluna: p.col + ':' + p.row, esperado: 'sem erro', atual: p.valor });
+    }
+  });
+  return {
+    existe: true,
+    ok: faltando.length === 0,
+    headerRow: 0,
+    lastRow: sheet.getLastRow(),
+    lastColumn: sheet.getLastColumn(),
+    faltando: faltando,
+    errosFormula: audit.problemas.filter(function (p) { return p.campo === 'formula'; }).length,
+    memorialOk: audit.memorialOk
+  };
+}
+
+function repararDashboardPlanilhaAdmin_(p) {
+  if (!adminPinOk_(p)) return err_('Acesso negado — PIN administrativo incorreto', 403);
+  const dryRun = String(p.dryRun || '') === '1' || p.dryRun === true;
+  if (dryRun) {
+    return resp_({
+      dryRun: true,
+      audit: auditDashboardSampleCore_(),
+      schema: validarDashboardSchema_(sh_getOrCreate_(SH_DASH)),
+      versao: 'v1.5.153'
+    });
+  }
+  const lock = LockService.getScriptLock();
+  try { lock.waitLock(15000); } catch (ex) { return err_('Sistema ocupado', 503); }
+  try {
+    const memorial = repairDashboardMemorialCore_();
+    const kpiSync = repairDashboardKpiSyncCore_();
+    const audit = auditDashboardSampleCore_();
+    const schema = validarDashboardSchema_(sh_getOrCreate_(SH_DASH));
+    return resp_({
+      mensagem: 'DASHBOARD reparada (memorial, sync KPI C5-C11, audit formulas)',
+      memorial: memorial,
+      kpiSync: kpiSync,
+      audit: audit,
+      schemaOk: schema.ok,
+      versao: 'v1.5.153'
+    });
+  } catch (ex) {
+    return err_('repararDashboardPlanilhaAdmin: ' + ex.message, 500);
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+/** I58 — INVESTIMENTO payback: memorial, header 6 cols, formatos (nao sobrescreve itens). */
+function invDataStartRow_() {
+  const sheet = sh_getOrCreate_(SH_INV);
+  const h9 = sheet.getRange(INV_HEADER_ROW_, 1, 1, COL_INV_READ_).getValues()[0].map(cellToStr_);
+  const ok9 = String(h9[2] || '').toLowerCase().indexOf('item') >= 0;
+  if (ok9) return INV_DATA_ROW;
+  const last = sheet.getLastRow();
+  for (let r = 1; r <= Math.min(last, 20); r++) {
+    const row = sheet.getRange(r, 1, 1, COL_INV_READ_).getValues()[0].map(cellToStr_);
+    const h2 = String(row[2] || '').toLowerCase();
+    if (h2.indexOf('item') >= 0) return r + 2;
+  }
+  return INV_DATA_ROW;
+}
+
+function invMemorialOk_(sheet) {
+  const a1 = String(sheet.getRange(1, 1).getValue() || '').toLowerCase();
+  return a1.indexOf('movi') >= 0 || a1.indexOf('investimento') >= 0 || a1.indexOf('payback') >= 0;
+}
+
+function repairInvestimentoMemorialCore_() {
+  const sheet = sh_getOrCreate_(SH_INV);
+  if (!invMemorialOk_(sheet)) {
+    const memorial = [
+      'MOVI KIDS — INVESTIMENTO · payback abertura (CAPEX)',
+      'B3=data inauguracao · B4=mes inicio payback · itens linha 11+',
+      'Col Entra=S entra no I · GAS lerInvestimento_ / calcPaybackAcumulado_'
+    ];
+    memorial.forEach(function (txt, i) { sheet.getRange(i + 1, 1).setValue(txt); });
+  }
+  sheet.getRange(INV_HEADER_ROW_, 1, 1, COL_INV_READ_).setValues([INV_HEADERS_]);
+  sheet.getRange(INV_HEADER_ROW_, 1, 1, COL_INV_READ_).setFontWeight('bold').setBackground('#E8F0FE');
+  sheet.setFrozenRows(INV_HEADER_ROW_);
+  try {
+    sheet.getProtections(SpreadsheetApp.ProtectionType.RANGE).forEach(function (pr) {
+      const d = String(pr.getDescription() || '');
+      if (d.indexOf('MOVI KIDS memorial INVESTIMENTO') >= 0) pr.remove();
+    });
+    sheet.getRange(1, 1, INV_HEADER_ROW_, sheet.getMaxColumns()).protect()
+      .setDescription('MOVI KIDS memorial INVESTIMENTO — nao editar')
+      .setWarningOnly(false);
+  } catch (e) { Logger.log('repairInvestimentoMemorial protect: ' + e.message); }
+  return { memorialOk: true, layout: invMemorialOk_(sheet) ? 'existente' : 'i58' };
+}
+
+function repairInvestimentoFormatosCore_() {
+  const sheet = sh_getOrCreate_(SH_INV);
+  const start = invDataStartRow_();
+  const last = sheet.getLastRow();
+  if (last < start) return { linhas: 0 };
+  const n = last - start + 1;
+  sheet.getRange(start, 1, n, 1).setNumberFormat('@');
+  sheet.getRange(start, 2, n, 2).setNumberFormat('@');
+  sheet.getRange(start, 4, n, 1).setNumberFormat('"R$" #,##0.00');
+  sheet.getRange(start, 5, n, 1).setNumberFormat('@');
+  sheet.getRange(start, 6, n, 1).setNumberFormat('@');
+  const entraRule = SpreadsheetApp.newDataValidation()
+    .requireValueInList(['S', 'N'], true).setAllowInvalid(true).build();
+  sheet.getRange(start, 5, n, 1).setDataValidation(entraRule);
+  return { linhas: n };
+}
+
+function auditInvestimentoSampleCore_(amostra) {
+  const sheet = sh_getOrCreate_(SH_INV);
+  const start = invDataStartRow_();
+  const last = sheet.getLastRow();
+  const problemas = [];
+  const b3 = cellToStr_(sheet.getRange('B3').getValue()).trim();
+  const b4 = cellToStr_(sheet.getRange('B4').getValue()).trim();
+  if (!b3) problemas.push({ campo: 'B3', valor: '(vazio)' });
+  if (!b4) problemas.push({ campo: 'B4', valor: '(vazio)' });
+  if (last >= start) {
+    const n = Math.min(Math.max(parseInt(amostra, 10) || 40, 1), last - start + 1);
+    const from = last - n + 1;
+    const display = sheet.getRange(from, 1, last - from + 1, COL_INV_READ_).getDisplayValues();
+    display.forEach(function (row, idx) {
+      const rowIndex = from + idx;
+      row.forEach(function (cell, ci) {
+        const s = String(cell || '').trim();
+        if (celulaComErro_(s)) {
+          problemas.push({ row: rowIndex, col: ci + 1, campo: 'formula', valor: s });
+        }
+      });
+      const item = String(row[2] || '').trim();
+      if (!item || item.indexOf('Subtotal') === 0) return;
+      const val = Number(sheet.getRange(rowIndex, 4).getValue());
+      if (val > 0 && !String(row[4] || '').trim()) {
+        problemas.push({ row: rowIndex, campo: 'entra', valor: '(vazio)' });
+      }
+    });
+  }
+  const inv = lerInvestimento_();
+  if (!inv.ok) problemas.push({ campo: 'lerInvestimento', valor: inv.erro || 'erro' });
+  else if (inv.investimentoTotal <= 0) {
+    problemas.push({ campo: 'investimentoTotal', valor: String(inv.investimentoTotal) });
+  }
+  return {
+    amostra: last >= start ? last - start + 1 : 0,
+    problemas: problemas,
+    lastRow: last,
+    memorialOk: invMemorialOk_(sheet),
+    investimentoTotal: inv.investimentoTotal || 0,
+    itens: (inv.itens || []).length,
+    dataInauguracao: b3,
+    mesInicioPayback: b4
+  };
+}
+
+function validarInvestimentoSchema_(sheet) {
+  const audit = auditInvestimentoSampleCore_(40);
+  const faltando = [];
+  if (!invMemorialOk_(sheet)) {
+    faltando.push({ coluna: 'memorial', esperado: 'titulo INVESTIMENTO', atual: String(sheet.getRange(1, 1).getValue() || '') });
+  }
+  const headers = sheet.getRange(INV_HEADER_ROW_, 1, 1, COL_INV_READ_).getValues()[0].map(cellToStr_);
+  INV_HEADERS_.forEach(function (label, idx) {
+    const atual = String(headers[idx] || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+    const alvo = String(label).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+    if (!atual || atual.indexOf(alvo.split(' ')[0]) < 0) {
+      faltando.push({ coluna: idx + 1, esperado: label, atual: headers[idx] || '' });
+    }
+  });
+  (audit.problemas || []).forEach(function (p) {
+    if (p.campo === 'investimentoTotal' || p.campo === 'lerInvestimento' || p.campo === 'B3' || p.campo === 'B4') {
+      faltando.push({ coluna: p.campo, esperado: 'preenchido', atual: p.valor });
+    }
+  });
+  return {
+    existe: true,
+    ok: faltando.length === 0,
+    headerRow: INV_HEADER_ROW_,
+    lastRow: sheet.getLastRow(),
+    lastColumn: sheet.getLastColumn(),
+    faltando: faltando,
+    investimentoTotal: audit.investimentoTotal,
+    itens: audit.itens,
+    memorialOk: audit.memorialOk
+  };
+}
+
+function repararInvestimentoPlanilhaAdmin_(p) {
+  if (!adminPinOk_(p)) return err_('Acesso negado — PIN administrativo incorreto', 403);
+  const dryRun = String(p.dryRun || '') === '1' || p.dryRun === true;
+  if (dryRun) {
+    return resp_({
+      dryRun: true,
+      audit: auditInvestimentoSampleCore_(40),
+      schema: validarInvestimentoSchema_(sh_getOrCreate_(SH_INV)),
+      versao: 'v1.5.155'
+    });
+  }
+  const lock = LockService.getScriptLock();
+  try { lock.waitLock(15000); } catch (ex) { return err_('Sistema ocupado', 503); }
+  try {
+    const memorial = repairInvestimentoMemorialCore_();
+    const formatos = repairInvestimentoFormatosCore_();
+    const audit = auditInvestimentoSampleCore_(40);
+    const schema = validarInvestimentoSchema_(sh_getOrCreate_(SH_INV));
+    return resp_({
+      mensagem: 'INVESTIMENTO reparada (memorial, header 6 cols, formatos, protecao)',
+      memorial: memorial,
+      formatos: formatos,
+      audit: audit,
+      schemaOk: schema.ok,
+      investimentoTotal: audit.investimentoTotal,
+      versao: 'v1.5.155'
+    });
+  } catch (ex) {
+    return err_('repararInvestimentoPlanilhaAdmin: ' + ex.message, 500);
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+/** I59 — RESPONSAVEIS CRM: header legado L1, audit telefones (nao reimporta LOCACOES). */
+function respDataStartRow_() {
+  const sheet = sh_getOrCreate_(SH_RESP);
+  const h1 = sheet.getRange(RESP_HEADER_ROW_, 1, 1, COL_RESP_READ_).getValues()[0].map(cellToStr_);
+  const ok = String(h1[3] || '').toLowerCase().indexOf('telefone') >= 0;
+  if (ok) return RESP_DATA_ROW_;
+  const last = sheet.getLastRow();
+  for (let r = 1; r <= Math.min(last, 15); r++) {
+    const row = sheet.getRange(r, 1, 1, COL_RESP_READ_).getValues()[0].map(cellToStr_);
+    if (String(row[3] || '').toLowerCase().indexOf('telefone') >= 0) return r + 1;
+  }
+  return RESP_DATA_ROW_;
+}
+
+function repairResponsaveisHeaderCore_() {
+  const sheet = sh_getOrCreate_(SH_RESP);
+  sheet.getRange(RESP_HEADER_ROW_, 1, 1, COL_RESP_READ_).setValues([RESP_HEADERS_]);
+  sheet.getRange(RESP_HEADER_ROW_, 1, 1, COL_RESP_READ_).setFontWeight('bold').setBackground('#1565C0').setFontColor('#ffffff');
+  sheet.setFrozenRows(RESP_HEADER_ROW_);
+  try {
+    sheet.getProtections(SpreadsheetApp.ProtectionType.RANGE).forEach(function (pr) {
+      const d = String(pr.getDescription() || '');
+      if (d.indexOf('MOVI KIDS header RESPONSAVEIS') >= 0) pr.remove();
+    });
+    sheet.getRange(RESP_HEADER_ROW_, 1, 1, COL_RESP_READ_).protect()
+      .setDescription('MOVI KIDS header RESPONSAVEIS — nao editar')
+      .setWarningOnly(false);
+  } catch (e) { Logger.log('repairResponsaveisHeader protect: ' + e.message); }
+  return { headerOk: true, layout: 'legado-l1' };
+}
+
+function repairResponsaveisFormatosCore_() {
+  const sheet = sh_getOrCreate_(SH_RESP);
+  const start = respDataStartRow_();
+  const last = sheet.getLastRow();
+  if (last < start) return { linhas: 0 };
+  const n = last - start + 1;
+  sheet.getRange(start, 1, n, 1).setNumberFormat('0');
+  sheet.getRange(start, 2, n, 2).setNumberFormat('@');
+  sheet.getRange(start, 4, n, 1).setNumberFormat('@');
+  sheet.getRange(start, 5, n, 3).setNumberFormat('@');
+  const statusRule = SpreadsheetApp.newDataValidation()
+    .requireValueInList(['Ativo', 'Inativo'], true).setAllowInvalid(true).build();
+  sheet.getRange(start, 9, n, 1).setDataValidation(statusRule);
+  return { linhas: n };
+}
+
+function auditResponsaveisSampleCore_(amostra) {
+  const sheet = sh_getOrCreate_(SH_RESP);
+  const start = respDataStartRow_();
+  const last = sheet.getLastRow();
+  const problemas = [];
+  const tels = {};
+  let cadastros = 0;
+  let ativos = 0;
+  if (last >= start) {
+    const n = Math.min(Math.max(parseInt(amostra, 10) || 50, 1), last - start + 1);
+    const from = last - n + 1;
+    const rows = sheet.getRange(from, 1, last - from + 1, COL_RESP_READ_).getValues();
+    rows.forEach(function (r, idx) {
+      const rowIndex = from + idx;
+      if (!r[0] && !r[3] && !r[4]) return;
+      cadastros++;
+      const tel = normTel_(r[3]);
+      const responsavel = String(r[4] || '').trim();
+      const status = String(r[8] || 'Ativo').trim() || 'Ativo';
+      if (!tel || tel.length < 10) {
+        problemas.push({ row: rowIndex, campo: 'telefone', valor: String(r[3] || '') });
+      } else if (tels[tel]) {
+        problemas.push({ row: rowIndex, campo: 'telefone_duplicado', valor: tel });
+      } else {
+        tels[tel] = rowIndex;
+      }
+      if (!responsavel) {
+        problemas.push({ row: rowIndex, campo: 'responsavel', valor: '(vazio)' });
+      }
+      if (status === 'Ativo') ativos++;
+      const rawJson = String(r[5] || '').trim();
+      if (rawJson && rawJson.charAt(0) === '[') {
+        try { JSON.parse(rawJson); } catch (e) {
+          problemas.push({ row: rowIndex, campo: 'criancasJson', valor: 'JSON invalido' });
+        }
+      }
+    });
+  }
+  const canon = lerResponsaveisCanonicos_();
+  return {
+    amostra: cadastros,
+    problemas: problemas,
+    lastRow: last,
+    cadastrosPlanilha: Math.max(0, last - start + 1),
+    cadastrosCanonicos: Object.keys(canon).length,
+    ativos: ativos,
+    telefonesUnicos: Object.keys(tels).length
+  };
+}
+
+function validarResponsaveisSchema_(sheet) {
+  const audit = auditResponsaveisSampleCore_(80);
+  const faltando = [];
+  const headers = sheet.getRange(RESP_HEADER_ROW_, 1, 1, COL_RESP_READ_).getValues()[0].map(cellToStr_);
+  RESP_HEADERS_.forEach(function (label, idx) {
+    const atual = String(headers[idx] || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+    const alvo = String(label).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+    if (!atual || atual.indexOf(alvo) < 0) {
+      faltando.push({ coluna: idx + 1, esperado: label, atual: headers[idx] || '' });
+    }
+  });
+  if (audit.cadastrosPlanilha < 1) {
+    faltando.push({ coluna: 'dados', esperado: '>=1 cadastro', atual: String(audit.cadastrosPlanilha) });
+  }
+  (audit.problemas || []).forEach(function (p) {
+    if (p.campo === 'criancasJson') {
+      faltando.push({ coluna: p.campo, esperado: 'ok', atual: p.valor });
+    }
+  });
+  return {
+    existe: true,
+    ok: faltando.length === 0,
+    headerRow: RESP_HEADER_ROW_,
+    lastRow: sheet.getLastRow(),
+    lastColumn: sheet.getLastColumn(),
+    faltando: faltando,
+    cadastros: audit.cadastrosPlanilha,
+    cadastrosCanonicos: audit.cadastrosCanonicos,
+    telefonesUnicos: audit.telefonesUnicos
+  };
+}
+
+function repararResponsaveisPlanilhaAdmin_(p) {
+  if (!adminPinOk_(p)) return err_('Acesso negado — PIN administrativo incorreto', 403);
+  const dryRun = String(p.dryRun || '') === '1' || p.dryRun === true;
+  if (dryRun) {
+    return resp_({
+      dryRun: true,
+      audit: auditResponsaveisSampleCore_(80),
+      schema: validarResponsaveisSchema_(sh_getOrCreate_(SH_RESP)),
+      versao: 'v1.5.156'
+    });
+  }
+  const lock = LockService.getScriptLock();
+  try { lock.waitLock(15000); } catch (ex) { return err_('Sistema ocupado', 503); }
+  try {
+    const header = repairResponsaveisHeaderCore_();
+    const formatos = repairResponsaveisFormatosCore_();
+    const audit = auditResponsaveisSampleCore_(80);
+    const schema = validarResponsaveisSchema_(sh_getOrCreate_(SH_RESP));
+    return resp_({
+      mensagem: 'RESPONSAVEIS reparada (header 9 cols, formatos, protecao L1)',
+      header: header,
+      formatos: formatos,
+      audit: audit,
+      schemaOk: schema.ok,
+      cadastros: audit.cadastrosPlanilha,
+      versao: 'v1.5.156'
+    });
+  } catch (ex) {
+    return err_('repararResponsaveisPlanilhaAdmin: ' + ex.message, 500);
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+/** I60 — RELATORIOS PDFs mensais: header L1, audit links (dados opcionais). */
+function relDataStartRow_() {
+  const sheet = sh_getOrCreate_(SH_REL);
+  const h1 = sheet.getRange(REL_HEADER_ROW_, 1, 1, COL_REL_READ_).getValues()[0].map(cellToStr_);
+  const ok = String(h1[0] || '').indexOf('#') >= 0 || String(h1[3] || '').toLowerCase().indexOf('link') >= 0;
+  if (ok) return REL_DATA_ROW_;
+  return REL_DATA_ROW_;
+}
+
+function repairRelatoriosHeaderCore_() {
+  const sheet = sh_getOrCreate_(SH_REL);
+  sheet.getRange(REL_HEADER_ROW_, 1, 1, COL_REL_READ_).setValues([REL_HEADERS_]);
+  sheet.getRange(REL_HEADER_ROW_, 1, 1, COL_REL_READ_).setFontWeight('bold').setBackground('#1565C0').setFontColor('#ffffff');
+  sheet.setFrozenRows(REL_HEADER_ROW_);
+  try {
+    sheet.getProtections(SpreadsheetApp.ProtectionType.RANGE).forEach(function (pr) {
+      const d = String(pr.getDescription() || '');
+      if (d.indexOf('MOVI KIDS header RELATORIOS') >= 0) pr.remove();
+    });
+    sheet.getRange(REL_HEADER_ROW_, 1, 1, COL_REL_READ_).protect()
+      .setDescription('MOVI KIDS header RELATORIOS — nao editar')
+      .setWarningOnly(false);
+  } catch (e) { Logger.log('repairRelatoriosHeader protect: ' + e.message); }
+  return { headerOk: true, layout: 'legado-l1' };
+}
+
+function repairRelatoriosFormatosCore_() {
+  const sheet = sh_getOrCreate_(SH_REL);
+  const start = relDataStartRow_();
+  const last = sheet.getLastRow();
+  if (last < start) return { linhas: 0 };
+  const n = last - start + 1;
+  sheet.getRange(start, 1, n, 1).setNumberFormat('0');
+  sheet.getRange(start, 2, n, 2).setNumberFormat('@');
+  sheet.getRange(start, 4, n, 3).setNumberFormat('@');
+  return { linhas: n };
+}
+
+function auditRelatoriosSampleCore_(amostra) {
+  const sheet = sh_getOrCreate_(SH_REL);
+  const start = relDataStartRow_();
+  const last = sheet.getLastRow();
+  const problemas = [];
+  let registros = 0;
+  if (last >= start) {
+    const n = Math.min(Math.max(parseInt(amostra, 10) || 20, 1), last - start + 1);
+    const from = last - n + 1;
+    const rows = sheet.getRange(from, 1, last - from + 1, COL_REL_READ_).getValues();
+    rows.forEach(function (r, idx) {
+      const rowIndex = from + idx;
+      if (!r[0]) return;
+      registros++;
+      const link = String(r[3] || '').trim();
+      const tipo = String(r[4] || '').trim();
+      const tipoN = tipo.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+      const linkEmailOk = link === '(email)' || tipoN === 'email';
+      if (link && link.indexOf('http') !== 0 && !linkEmailOk) {
+        problemas.push({ row: rowIndex, campo: 'link', valor: link });
+      }
+      if (!tipo) {
+        problemas.push({ row: rowIndex, campo: 'tipo', valor: '(vazio)' });
+      }
+    });
+  }
+  return {
+    amostra: registros,
+    problemas: problemas,
+    lastRow: last,
+    registros: Math.max(0, last - start + 1)
+  };
+}
+
+function validarRelatoriosSchema_(sheet) {
+  const audit = auditRelatoriosSampleCore_(20);
+  const faltando = [];
+  const headers = sheet.getRange(REL_HEADER_ROW_, 1, 1, COL_REL_READ_).getValues()[0].map(cellToStr_);
+  const alvos = ['#', 'mes', 'data', 'link', 'tipo', 'obs'];
+  alvos.forEach(function (alvo, idx) {
+    const atual = String(headers[idx] || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+    if (!atual || atual.indexOf(alvo) < 0) {
+      faltando.push({ coluna: idx + 1, esperado: REL_HEADERS_[idx], atual: headers[idx] || '' });
+    }
+  });
+  (audit.problemas || []).forEach(function (p) {
+    if (p.campo === 'link') {
+      faltando.push({ coluna: 'link', esperado: 'http(s)', atual: p.valor });
+    }
+  });
+  return {
+    existe: true,
+    ok: faltando.length === 0,
+    headerRow: REL_HEADER_ROW_,
+    lastRow: sheet.getLastRow(),
+    lastColumn: sheet.getLastColumn(),
+    faltando: faltando,
+    registros: audit.registros
+  };
+}
+
+function repararRelatoriosPlanilhaAdmin_(p) {
+  if (!adminPinOk_(p)) return err_('Acesso negado — PIN administrativo incorreto', 403);
+  const dryRun = String(p.dryRun || '') === '1' || p.dryRun === true;
+  if (dryRun) {
+    return resp_({
+      dryRun: true,
+      audit: auditRelatoriosSampleCore_(20),
+      schema: validarRelatoriosSchema_(sh_getOrCreate_(SH_REL)),
+      versao: 'v1.5.158'
+    });
+  }
+  const lock = LockService.getScriptLock();
+  try { lock.waitLock(15000); } catch (ex) { return err_('Sistema ocupado', 503); }
+  try {
+    const header = repairRelatoriosHeaderCore_();
+    const formatos = repairRelatoriosFormatosCore_();
+    const audit = auditRelatoriosSampleCore_(20);
+    const schema = validarRelatoriosSchema_(sh_getOrCreate_(SH_REL));
+    return resp_({
+      mensagem: 'RELATORIOS reparada (header 6 cols, formatos, protecao L1)',
+      header: header,
+      formatos: formatos,
+      audit: audit,
+      schemaOk: schema.ok,
+      registros: audit.registros,
+      versao: 'v1.5.158'
+    });
+  } catch (ex) {
+    return err_('repararRelatoriosPlanilhaAdmin: ' + ex.message, 500);
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+// ── I61 — Camada 4 AUD_* (append-only logs · repair header readonly) ──
+
+function audLogNormHeader_(label) {
+  return String(label || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+}
+
+function repairAudLogHeaderCore_(sheet, headers, descTag, bgColor) {
+  sheet.getRange(AUD_LOG_HEADER_ROW_, 1, 1, headers.length).setValues([headers]);
+  sheet.getRange(AUD_LOG_HEADER_ROW_, 1, 1, headers.length)
+    .setFontWeight('bold').setBackground(bgColor || '#E8F0FE').setFontColor('#000000');
+  sheet.setFrozenRows(AUD_LOG_HEADER_ROW_);
+  try {
+    sheet.getProtections(SpreadsheetApp.ProtectionType.RANGE).forEach(function (pr) {
+      const d = String(pr.getDescription() || '');
+      if (d.indexOf(descTag) >= 0) pr.remove();
+    });
+    sheet.getRange(AUD_LOG_HEADER_ROW_, 1, 1, headers.length).protect()
+      .setDescription(descTag + ' — nao editar')
+      .setWarningOnly(false);
+  } catch (e) { Logger.log('repairAudLogHeader protect: ' + e.message); }
+  return { headerOk: true, cols: headers.length };
+}
+
+function validarAudLogSchemaCore_(sheet, headers, colRead, audit) {
+  const faltando = [];
+  const hdr = sheet.getRange(AUD_LOG_HEADER_ROW_, 1, 1, colRead).getValues()[0].map(cellToStr_);
+  headers.forEach(function (label, idx) {
+    const atual = audLogNormHeader_(hdr[idx]);
+    const alvo = audLogNormHeader_(label);
+    if (!atual || atual.indexOf(alvo) < 0) {
+      faltando.push({ coluna: idx + 1, esperado: label, atual: hdr[idx] || '' });
+    }
+  });
+  return {
+    existe: true,
+    ok: faltando.length === 0,
+    headerRow: AUD_LOG_HEADER_ROW_,
+    lastRow: sheet.getLastRow(),
+    lastColumn: sheet.getLastColumn(),
+    faltando: faltando,
+    registros: audit.registros,
+    eventosAmostra: audit.amostra || 0
+  };
+}
+
+function auditAuditoriaSampleCore_(amostra) {
+  const sheet = sh_getOrCreate_(SH_AUD);
+  const start = AUD_LOG_DATA_ROW_;
+  const last = sheet.getLastRow();
+  const problemas = [];
+  let registros = 0;
+  if (last >= start) {
+    registros = last - start + 1;
+    const n = Math.min(Math.max(parseInt(amostra, 10) || 30, 1), last - start + 1);
+    const from = last - n + 1;
+    const rows = sheet.getRange(from, 1, last - from + 1, COL_AUD_READ_).getValues();
+    rows.forEach(function (r, idx) {
+      const rowIndex = from + idx;
+      const acao = String(r[1] || '').trim();
+      const usuario = String(r[7] || '').trim();
+      if (!acao) {
+        problemas.push({ row: rowIndex, campo: 'acao', valor: '(vazio)' });
+        return;
+      }
+      if (AUD_ACOES_LOC_VALIDAS_.indexOf(acao) < 0) {
+        problemas.push({ row: rowIndex, campo: 'acao', valor: acao });
+      }
+      if (!usuario) {
+        problemas.push({ row: rowIndex, campo: 'usuario', valor: '(vazio)' });
+      }
+    });
+  }
+  return { amostra: registros > 0 ? Math.min(parseInt(amostra, 10) || 30, registros) : 0, problemas: problemas, lastRow: last, registros: registros };
+}
+
+function validarAuditoriaSchema_(sheet) {
+  return validarAudLogSchemaCore_(sheet, AUD_HEADERS_, COL_AUD_READ_, auditAuditoriaSampleCore_(30));
+}
+
+function repairAuditoriaHeaderCore_() {
+  return repairAudLogHeaderCore_(sh_getOrCreate_(SH_AUD), AUD_HEADERS_, 'MOVI KIDS header AUDITORIA', '#E8F0FE');
+}
+
+function repararAuditoriaPlanilhaAdmin_(p) {
+  if (!adminPinOk_(p)) return err_('Acesso negado — PIN administrativo incorreto', 403);
+  const dryRun = String(p.dryRun || '') === '1' || p.dryRun === true;
+  if (dryRun) {
+    return resp_({ dryRun: true, audit: auditAuditoriaSampleCore_(30), schema: validarAuditoriaSchema_(sh_getOrCreate_(SH_AUD)), versao: 'v1.5.159' });
+  }
+  const lock = LockService.getScriptLock();
+  try { lock.waitLock(15000); } catch (ex) { return err_('Sistema ocupado', 503); }
+  try {
+    const header = repairAuditoriaHeaderCore_();
+    const audit = auditAuditoriaSampleCore_(30);
+    const schema = validarAuditoriaSchema_(sh_getOrCreate_(SH_AUD));
+    return resp_({ mensagem: 'AUDITORIA reparada (header 8 cols, protecao L1 — log intacto)', header: header, audit: audit, schemaOk: schema.ok, registros: audit.registros, versao: 'v1.5.159' });
+  } catch (ex) {
+    return err_('repararAuditoriaPlanilhaAdmin: ' + ex.message, 500);
+  } finally { lock.releaseLock(); }
+}
+
+function auditAudTurnoSampleCore_(amostra) {
+  const sheet = sh_getOrCreate_(SH_AUD_TURNO);
+  const start = AUD_LOG_DATA_ROW_;
+  const last = sheet.getLastRow();
+  const problemas = [];
+  let registros = 0;
+  if (last >= start) {
+    registros = last - start + 1;
+    const n = Math.min(Math.max(parseInt(amostra, 10) || 30, 1), last - start + 1);
+    const from = last - n + 1;
+    const rows = sheet.getRange(from, 1, last - from + 1, COL_AUDT_READ_).getValues();
+    rows.forEach(function (r, idx) {
+      const rowIndex = from + idx;
+      const acao = String(r[1] || '').trim();
+      if (!acao) {
+        problemas.push({ row: rowIndex, campo: 'acao', valor: '(vazio)' });
+        return;
+      }
+      if (AUD_ACOES_TURNO_VALIDAS_.indexOf(acao) < 0) {
+        problemas.push({ row: rowIndex, campo: 'acao', valor: acao });
+      }
+    });
+  }
+  return { amostra: registros > 0 ? Math.min(parseInt(amostra, 10) || 30, registros) : 0, problemas: problemas, lastRow: last, registros: registros };
+}
+
+function validarAudTurnoSchema_(sheet) {
+  return validarAudLogSchemaCore_(sheet, AUDT_HEADERS_, COL_AUDT_READ_, auditAudTurnoSampleCore_(30));
+}
+
+function repairAudTurnoHeaderCore_() {
+  return repairAudLogHeaderCore_(sh_getOrCreate_(SH_AUD_TURNO), AUDT_HEADERS_, 'MOVI KIDS header AUD_TURNO', '#FFF3E0');
+}
+
+function repararAudTurnoPlanilhaAdmin_(p) {
+  if (!adminPinOk_(p)) return err_('Acesso negado — PIN administrativo incorreto', 403);
+  const dryRun = String(p.dryRun || '') === '1' || p.dryRun === true;
+  if (dryRun) {
+    return resp_({ dryRun: true, audit: auditAudTurnoSampleCore_(30), schema: validarAudTurnoSchema_(sh_getOrCreate_(SH_AUD_TURNO)), versao: 'v1.5.159' });
+  }
+  const lock = LockService.getScriptLock();
+  try { lock.waitLock(15000); } catch (ex) { return err_('Sistema ocupado', 503); }
+  try {
+    const header = repairAudTurnoHeaderCore_();
+    const audit = auditAudTurnoSampleCore_(30);
+    const schema = validarAudTurnoSchema_(sh_getOrCreate_(SH_AUD_TURNO));
+    return resp_({ mensagem: 'AUD_TURNO reparada (header 7 cols, protecao L1)', header: header, audit: audit, schemaOk: schema.ok, registros: audit.registros, versao: 'v1.5.159' });
+  } catch (ex) {
+    return err_('repararAudTurnoPlanilhaAdmin: ' + ex.message, 500);
+  } finally { lock.releaseLock(); }
+}
+
+function auditAudSmsSampleCore_(amostra) {
+  const sheet = sh_getOrCreate_(SH_AUD_SMS);
+  const start = AUD_LOG_DATA_ROW_;
+  const last = sheet.getLastRow();
+  const problemas = [];
+  let registros = 0;
+  if (last >= start) {
+    registros = last - start + 1;
+    const n = Math.min(Math.max(parseInt(amostra, 10) || 20, 1), last - start + 1);
+    const from = last - n + 1;
+    const rows = sheet.getRange(from, 1, last - from + 1, COL_AUDSMS_READ_).getValues();
+    rows.forEach(function (r, idx) {
+      const rowIndex = from + idx;
+      const tipo = String(r[2] || '').trim();
+      const status = String(r[3] || '').trim();
+      if (!tipo) problemas.push({ row: rowIndex, campo: 'tipo', valor: '(vazio)' });
+      if (!status) problemas.push({ row: rowIndex, campo: 'status', valor: '(vazio)' });
+    });
+  }
+  return { amostra: registros > 0 ? Math.min(parseInt(amostra, 10) || 20, registros) : 0, problemas: problemas, lastRow: last, registros: registros, pausado: true };
+}
+
+function validarAudSmsSchema_(sheet) {
+  return validarAudLogSchemaCore_(sheet, AUDSMS_HEADERS_, COL_AUDSMS_READ_, auditAudSmsSampleCore_(20));
+}
+
+function repairAudSmsHeaderCore_() {
+  return repairAudLogHeaderCore_(sh_getOrCreate_(SH_AUD_SMS), AUDSMS_HEADERS_, 'MOVI KIDS header AUD_SMS', '#00695C');
+}
+
+function repararAudSmsPlanilhaAdmin_(p) {
+  if (!adminPinOk_(p)) return err_('Acesso negado — PIN administrativo incorreto', 403);
+  const dryRun = String(p.dryRun || '') === '1' || p.dryRun === true;
+  if (dryRun) {
+    return resp_({ dryRun: true, audit: auditAudSmsSampleCore_(20), schema: validarAudSmsSchema_(sh_getOrCreate_(SH_AUD_SMS)), versao: 'v1.5.159' });
+  }
+  const lock = LockService.getScriptLock();
+  try { lock.waitLock(15000); } catch (ex) { return err_('Sistema ocupado', 503); }
+  try {
+    const header = repairAudSmsHeaderCore_();
+    const audit = auditAudSmsSampleCore_(20);
+    const schema = validarAudSmsSchema_(sh_getOrCreate_(SH_AUD_SMS));
+    return resp_({ mensagem: 'AUD_SMS reparada (header 13 cols — SMS pausado, log intacto)', header: header, audit: audit, schemaOk: schema.ok, registros: audit.registros, versao: 'v1.5.159' });
+  } catch (ex) {
+    return err_('repararAudSmsPlanilhaAdmin: ' + ex.message, 500);
+  } finally { lock.releaseLock(); }
+}
+
+function auditAudWhatsappSampleCore_(amostra) {
+  const sheet = sh_getOrCreate_(SH_AUD_WA);
+  const start = AUD_LOG_DATA_ROW_;
+  const last = sheet.getLastRow();
+  const problemas = [];
+  let registros = 0;
+  if (last >= start) {
+    registros = last - start + 1;
+    const n = Math.min(Math.max(parseInt(amostra, 10) || 20, 1), last - start + 1);
+    const from = last - n + 1;
+    const rows = sheet.getRange(from, 1, last - from + 1, COL_AUDWA_READ_).getValues();
+    rows.forEach(function (r, idx) {
+      const rowIndex = from + idx;
+      const tipo = String(r[2] || '').trim();
+      const status = String(r[3] || '').trim();
+      if (!tipo) problemas.push({ row: rowIndex, campo: 'tipo', valor: '(vazio)' });
+      if (!status) problemas.push({ row: rowIndex, campo: 'status', valor: '(vazio)' });
+    });
+  }
+  return { amostra: registros > 0 ? Math.min(parseInt(amostra, 10) || 20, registros) : 0, problemas: problemas, lastRow: last, registros: registros, pausado: true };
+}
+
+function validarAudWhatsappSchema_(sheet) {
+  return validarAudLogSchemaCore_(sheet, AUDWA_HEADERS_, COL_AUDWA_READ_, auditAudWhatsappSampleCore_(20));
+}
+
+function repairAudWhatsappHeaderCore_() {
+  return repairAudLogHeaderCore_(sh_getOrCreate_(SH_AUD_WA), AUDWA_HEADERS_, 'MOVI KIDS header AUD_WHATSAPP', '#1565C0');
+}
+
+function repararAudWhatsappPlanilhaAdmin_(p) {
+  if (!adminPinOk_(p)) return err_('Acesso negado — PIN administrativo incorreto', 403);
+  const dryRun = String(p.dryRun || '') === '1' || p.dryRun === true;
+  if (dryRun) {
+    return resp_({ dryRun: true, audit: auditAudWhatsappSampleCore_(20), schema: validarAudWhatsappSchema_(sh_getOrCreate_(SH_AUD_WA)), versao: 'v1.5.159' });
+  }
+  const lock = LockService.getScriptLock();
+  try { lock.waitLock(15000); } catch (ex) { return err_('Sistema ocupado', 503); }
+  try {
+    const header = repairAudWhatsappHeaderCore_();
+    const audit = auditAudWhatsappSampleCore_(20);
+    const schema = validarAudWhatsappSchema_(sh_getOrCreate_(SH_AUD_WA));
+    return resp_({ mensagem: 'AUD_WHATSAPP reparada (header 12 cols — WA pausado, log intacto)', header: header, audit: audit, schemaOk: schema.ok, registros: audit.registros, versao: 'v1.5.159' });
+  } catch (ex) {
+    return err_('repararAudWhatsappPlanilhaAdmin: ' + ex.message, 500);
+  } finally { lock.releaseLock(); }
+}
+
+function auditAudResponsaveisSampleCore_(amostra) {
+  const sheet = sh_getOrCreate_(SH_AUD_RESP);
+  const start = AUD_LOG_DATA_ROW_;
+  const last = sheet.getLastRow();
+  const problemas = [];
+  let registros = 0;
+  if (last >= start) {
+    registros = last - start + 1;
+    const n = Math.min(Math.max(parseInt(amostra, 10) || 20, 1), last - start + 1);
+    const from = last - n + 1;
+    const rows = sheet.getRange(from, 1, last - from + 1, COL_AUDR_READ_).getValues();
+    rows.forEach(function (r, idx) {
+      const rowIndex = from + idx;
+      const acao = String(r[1] || '').trim();
+      if (!acao) problemas.push({ row: rowIndex, campo: 'acao', valor: '(vazio)' });
+    });
+  }
+  return { amostra: registros > 0 ? Math.min(parseInt(amostra, 10) || 20, registros) : 0, problemas: problemas, lastRow: last, registros: registros };
+}
+
+function validarAudResponsaveisSchema_(sheet) {
+  return validarAudLogSchemaCore_(sheet, AUDR_HEADERS_, COL_AUDR_READ_, auditAudResponsaveisSampleCore_(20));
+}
+
+function repairAudResponsaveisHeaderCore_() {
+  return repairAudLogHeaderCore_(sh_getOrCreate_(SH_AUD_RESP), AUDR_HEADERS_, 'MOVI KIDS header AUD_RESPONSAVEIS', '#6A1B9A');
+}
+
+function repararAudResponsaveisPlanilhaAdmin_(p) {
+  if (!adminPinOk_(p)) return err_('Acesso negado — PIN administrativo incorreto', 403);
+  const dryRun = String(p.dryRun || '') === '1' || p.dryRun === true;
+  if (dryRun) {
+    return resp_({ dryRun: true, audit: auditAudResponsaveisSampleCore_(20), schema: validarAudResponsaveisSchema_(sh_getOrCreate_(SH_AUD_RESP)), versao: 'v1.5.159' });
+  }
+  const lock = LockService.getScriptLock();
+  try { lock.waitLock(15000); } catch (ex) { return err_('Sistema ocupado', 503); }
+  try {
+    const header = repairAudResponsaveisHeaderCore_();
+    const audit = auditAudResponsaveisSampleCore_(20);
+    const schema = validarAudResponsaveisSchema_(sh_getOrCreate_(SH_AUD_RESP));
+    return resp_({ mensagem: 'AUD_RESPONSAVEIS reparada (header 7 cols, log intacto)', header: header, audit: audit, schemaOk: schema.ok, registros: audit.registros, versao: 'v1.5.159' });
+  } catch (ex) {
+    return err_('repararAudResponsaveisPlanilhaAdmin: ' + ex.message, 500);
+  } finally { lock.releaseLock(); }
+}
+
+function repararAudCamada4PlanilhaAdmin_(p) {
+  if (!adminPinOk_(p)) return err_('Acesso negado — PIN administrativo incorreto', 403);
+  const dryRun = String(p.dryRun || '') === '1' || p.dryRun === true;
+  const abas = [
+    { nome: 'AUDITORIA', repair: repairAuditoriaHeaderCore_, audit: auditAuditoriaSampleCore_, schema: validarAuditoriaSchema_, sheet: SH_AUD, n: 30 },
+    { nome: 'AUD_TURNO', repair: repairAudTurnoHeaderCore_, audit: auditAudTurnoSampleCore_, schema: validarAudTurnoSchema_, sheet: SH_AUD_TURNO, n: 30 },
+    { nome: 'AUD_SMS', repair: repairAudSmsHeaderCore_, audit: auditAudSmsSampleCore_, schema: validarAudSmsSchema_, sheet: SH_AUD_SMS, n: 20 },
+    { nome: 'AUD_WHATSAPP', repair: repairAudWhatsappHeaderCore_, audit: auditAudWhatsappSampleCore_, schema: validarAudWhatsappSchema_, sheet: SH_AUD_WA, n: 20 },
+    { nome: 'AUD_RESPONSAVEIS', repair: repairAudResponsaveisHeaderCore_, audit: auditAudResponsaveisSampleCore_, schema: validarAudResponsaveisSchema_, sheet: SH_AUD_RESP, n: 20 }
+  ];
+  if (dryRun) {
+    const out = {};
+    abas.forEach(function (a) {
+      out[a.nome] = { audit: a.audit(a.n), schema: a.schema(sh_getOrCreate_(a.sheet)) };
+    });
+    return resp_({ dryRun: true, abas: out, versao: 'v1.5.159' });
+  }
+  const lock = LockService.getScriptLock();
+  try { lock.waitLock(20000); } catch (ex) { return err_('Sistema ocupado', 503); }
+  try {
+    const resultado = {};
+    let schemaOk = true;
+    abas.forEach(function (a) {
+      const header = a.repair();
+      const audit = a.audit(a.n);
+      const schema = a.schema(sh_getOrCreate_(a.sheet));
+      if (!schema.ok) schemaOk = false;
+      resultado[a.nome] = { header: header, audit: audit, schemaOk: schema.ok, registros: audit.registros };
+    });
+    return resp_({ mensagem: 'Camada 4 AUD_* reparada (headers only, logs intactos)', resultado: resultado, schemaOk: schemaOk, versao: 'v1.5.159' });
+  } catch (ex) {
+    return err_('repararAudCamada4PlanilhaAdmin: ' + ex.message, 500);
+  } finally { lock.releaseLock(); }
+}
+
+// ── I62 — Camada 5 RH P0 (COLABORADORES_RH, FOLHA_PONTO, BANCO_HORAS) ──
+
+function rhNormHeader_(label) {
+  return String(label || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+}
+
+function rhOperadorIdsSet_() {
+  const set = {};
+  try {
+    const sh = ss_().getSheetByName(SH_OPS);
+    if (!sh) return set;
+    const start = opsDataStartRow_();
+    const last = sh.getLastRow();
+    if (last < start) return set;
+    sh.getRange(start, 1, last - start + 1, 1).getValues().forEach(function (r) {
+      const id = Number(r[0]);
+      if (id) set[id] = true;
+    });
+  } catch (e) { Logger.log('rhOperadorIdsSet_: ' + e.message); }
+  return set;
+}
+
+function repairRhHeaderCore_(sheet, headers, descTag, bgColor) {
+  sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+  sheet.getRange(1, 1, 1, headers.length)
+    .setFontWeight('bold').setBackground(bgColor || '#E3F2FD').setFontColor('#000000');
+  sheet.setFrozenRows(1);
+  try {
+    sheet.getProtections(SpreadsheetApp.ProtectionType.RANGE).forEach(function (pr) {
+      const d = String(pr.getDescription() || '');
+      if (d.indexOf(descTag) >= 0) pr.remove();
+    });
+    sheet.getRange(1, 1, 1, headers.length).protect()
+      .setDescription(descTag + ' — nao editar')
+      .setWarningOnly(false);
+  } catch (e) { Logger.log('repairRhHeader protect: ' + e.message); }
+  return { headerOk: true, cols: headers.length };
+}
+
+function validarRhSchemaCore_(sheet, headers, colRead, audit) {
+  const faltando = [];
+  const hdr = sheet.getRange(1, 1, 1, colRead).getValues()[0].map(cellToStr_);
+  headers.forEach(function (label, idx) {
+    const atual = rhNormHeader_(hdr[idx]);
+    const alvo = rhNormHeader_(label);
+    if (!atual || atual.indexOf(alvo) < 0) {
+      faltando.push({ coluna: idx + 1, esperado: label, atual: hdr[idx] || '' });
+    }
+  });
+  return {
+    existe: true,
+    ok: faltando.length === 0,
+    headerRow: 1,
+    lastRow: sheet.getLastRow(),
+    lastColumn: sheet.getLastColumn(),
+    faltando: faltando,
+    registros: audit.registros,
+    problemasAudit: (audit.problemas || []).length
+  };
+}
+
+function auditColaboradoresRhSampleCore_(amostra) {
+  const sheet = sh_getOrCreate_('COLABORADORES_RH');
+  const start = 2;
+  const last = sheet.getLastRow();
+  const problemas = [];
+  const opsIds = rhOperadorIdsSet_();
+  let registros = 0;
+  if (last >= start) {
+    registros = last - start + 1;
+    const n = Math.min(Math.max(parseInt(amostra, 10) || 10, 1), last - start + 1);
+    const from = last - n + 1;
+    const rows = sheet.getRange(from, 1, last - from + 1, COL_COLAB_RH_READ_).getValues();
+    rows.forEach(function (r, idx) {
+      const rowIndex = from + idx;
+      const opId = Number(r[0]);
+      if (!opId) {
+        problemas.push({ row: rowIndex, campo: 'operador_id', valor: '(vazio)' });
+        return;
+      }
+      if (!opsIds[opId]) {
+        problemas.push({ row: rowIndex, campo: 'operador_id', valor: String(opId) + ' sem FK OPERADORES' });
+      }
+      const pctPlan = Number(r[17]) || 0;
+      const cad = {
+        nomeCompleto: String(r[1] || '').trim(), cpf: String(r[3] || '').trim(),
+        nascimento: cellToStr_(r[4]), telefone: String(r[5] || '').trim(),
+        endereco: String(r[7] || '').trim(), emergencia: String(r[8] || '').trim(),
+        admissao: cellToStr_(r[9]), pix: String(r[10] || '').trim()
+      };
+      const pctCalc = gpCalcCadastroPct_(cad);
+      if (Math.abs(pctPlan - pctCalc) > 1) {
+        problemas.push({ row: rowIndex, campo: 'cadastro_pct', valor: pctPlan + ' vs ' + pctCalc });
+      }
+    });
+  }
+  return { amostra: registros > 0 ? Math.min(parseInt(amostra, 10) || 10, registros) : 0, problemas: problemas, lastRow: last, registros: registros };
+}
+
+function validarColaboradoresRhSchema_(sheet) {
+  return validarRhSchemaCore_(sheet, COLAB_RH_HEADERS_, COL_COLAB_RH_READ_, auditColaboradoresRhSampleCore_(10));
+}
+
+function repairColaboradoresRhHeaderCore_() {
+  return repairRhHeaderCore_(sh_getOrCreate_('COLABORADORES_RH'), COLAB_RH_HEADERS_, 'MOVI KIDS header COLABORADORES_RH', '#2196F3');
+}
+
+function repairColaboradoresRhFormatosCore_() {
+  const sheet = sh_getOrCreate_('COLABORADORES_RH');
+  const last = sheet.getLastRow();
+  if (last < 2) return { linhas: 0 };
+  const n = last - 1;
+  sheet.getRange(2, 5, n, 1).setNumberFormat('@');
+  sheet.getRange(2, 10, n, 1).setNumberFormat('@');
+  sheet.getRange(2, 19, n, 1).setNumberFormat('@');
+  return { linhas: n };
+}
+
+function repararColaboradoresRhPlanilhaAdmin_(p) {
+  if (!adminPinOk_(p)) return err_('Acesso negado — PIN administrativo incorreto', 403);
+  const dryRun = String(p.dryRun || '') === '1' || p.dryRun === true;
+  if (dryRun) {
+    return resp_({
+      dryRun: true,
+      audit: auditColaboradoresRhSampleCore_(10),
+      schema: validarColaboradoresRhSchema_(sh_getOrCreate_('COLABORADORES_RH')),
+      versao: 'v1.5.160'
+    });
+  }
+  const lock = LockService.getScriptLock();
+  try { lock.waitLock(15000); } catch (ex) { return err_('Sistema ocupado', 503); }
+  try {
+    const header = repairColaboradoresRhHeaderCore_();
+    const formatos = repairColaboradoresRhFormatosCore_();
+    gpRepairAllAdmissoesRh_();
+    const vaReparados = gpRepairVaDiarioRhRows_();
+    const audit = auditColaboradoresRhSampleCore_(10);
+    const schema = validarColaboradoresRhSchema_(sh_getOrCreate_('COLABORADORES_RH'));
+    return resp_({
+      mensagem: 'COLABORADORES_RH reparada (header, formatos, pct, va_diario)',
+      header: header, formatos: formatos, vaDiarioReparados: vaReparados,
+      audit: audit, schemaOk: schema.ok, registros: audit.registros, versao: 'v1.5.160'
+    });
+  } catch (ex) {
+    return err_('repararColaboradoresRhPlanilhaAdmin: ' + ex.message, 500);
+  } finally { lock.releaseLock(); }
+}
+
+function auditFolhaPontoSampleCore_(amostra) {
+  const sheet = sh_getOrCreate_('FOLHA_PONTO');
+  const start = 2;
+  const last = sheet.getLastRow();
+  const problemas = [];
+  const opsIds = rhOperadorIdsSet_();
+  let registros = 0;
+  if (last >= start) {
+    registros = last - start + 1;
+    const n = Math.min(Math.max(parseInt(amostra, 10) || 20, 1), last - start + 1);
+    const from = last - n + 1;
+    const rows = sheet.getRange(from, 1, last - from + 1, COL_FOLHA_PONTO_READ_).getValues();
+    rows.forEach(function (r, idx) {
+      const rowIndex = from + idx;
+      const opId = Number(r[1]);
+      if (!opId) problemas.push({ row: rowIndex, campo: 'operador_id', valor: '(vazio)' });
+      else if (!opsIds[opId]) problemas.push({ row: rowIndex, campo: 'operador_id', valor: String(opId) });
+      const sit = String(r[7] || '').trim().toUpperCase();
+      if (sit === 'OK' && (!String(r[4] || '').trim() || !String(r[5] || '').trim())) {
+        problemas.push({ row: rowIndex, campo: 'entrada/saida', valor: 'OK sem horario' });
+      }
+    });
+  }
+  return { amostra: registros > 0 ? Math.min(parseInt(amostra, 10) || 20, registros) : 0, problemas: problemas, lastRow: last, registros: registros };
+}
+
+function validarFolhaPontoSchema_(sheet) {
+  return validarRhSchemaCore_(sheet, FOLHA_PONTO_HEADERS_, COL_FOLHA_PONTO_READ_, auditFolhaPontoSampleCore_(20));
+}
+
+function repairFolhaPontoHeaderCore_() {
+  return repairRhHeaderCore_(sh_getOrCreate_('FOLHA_PONTO'), FOLHA_PONTO_HEADERS_, 'MOVI KIDS header FOLHA_PONTO', '#4CAF50');
+}
+
+function repairFolhaPontoFormatosCore_() {
+  const sheet = sh_getOrCreate_('FOLHA_PONTO');
+  const last = sheet.getLastRow();
+  if (last < 2) return { linhas: 0 };
+  const n = last - 1;
+  sheet.getRange(2, 3, n, 1).setNumberFormat('@');
+  return { linhas: n };
+}
+
+function repararFolhaPontoPlanilhaAdmin_(p) {
+  if (!adminPinOk_(p)) return err_('Acesso negado — PIN administrativo incorreto', 403);
+  const dryRun = String(p.dryRun || '') === '1' || p.dryRun === true;
+  if (dryRun) {
+    return resp_({
+      dryRun: true,
+      audit: auditFolhaPontoSampleCore_(20),
+      schema: validarFolhaPontoSchema_(sh_getOrCreate_('FOLHA_PONTO')),
+      versao: 'v1.5.160'
+    });
+  }
+  const lock = LockService.getScriptLock();
+  try { lock.waitLock(15000); } catch (ex) { return err_('Sistema ocupado', 503); }
+  try {
+    const header = repairFolhaPontoHeaderCore_();
+    const formatos = repairFolhaPontoFormatosCore_();
+    const audit = auditFolhaPontoSampleCore_(20);
+    const schema = validarFolhaPontoSchema_(sh_getOrCreate_('FOLHA_PONTO'));
+    return resp_({
+      mensagem: 'FOLHA_PONTO reparada (header, formato data)',
+      header: header, formatos: formatos, audit: audit, schemaOk: schema.ok, registros: audit.registros, versao: 'v1.5.160'
+    });
+  } catch (ex) {
+    return err_('repararFolhaPontoPlanilhaAdmin: ' + ex.message, 500);
+  } finally { lock.releaseLock(); }
+}
+
+function auditBancoHorasSampleCore_(amostra) {
+  const sheet = sh_getOrCreate_('BANCO_HORAS');
+  const start = 2;
+  const last = sheet.getLastRow();
+  const problemas = [];
+  const opsIds = rhOperadorIdsSet_();
+  let registros = 0;
+  if (last >= start) {
+    registros = last - start + 1;
+    const n = Math.min(Math.max(parseInt(amostra, 10) || 10, 1), last - start + 1);
+    const from = last - n + 1;
+    const rows = sheet.getRange(from, 1, last - from + 1, COL_BANCO_HORAS_READ_).getValues();
+    rows.forEach(function (r, idx) {
+      const rowIndex = from + idx;
+      const opId = Number(r[0]);
+      if (!opId) problemas.push({ row: rowIndex, campo: 'operador_id', valor: '(vazio)' });
+      else if (!opsIds[opId]) problemas.push({ row: rowIndex, campo: 'operador_id', valor: String(opId) });
+      const saldo = String(r[1] || '').trim();
+      if (saldo && !/^-?\d+h\d{2}$/.test(saldo)) {
+        problemas.push({ row: rowIndex, campo: 'saldo_hhmm', valor: saldo });
+      }
+    });
+  }
+  return { amostra: registros > 0 ? Math.min(parseInt(amostra, 10) || 10, registros) : 0, problemas: problemas, lastRow: last, registros: registros };
+}
+
+function validarBancoHorasSchema_(sheet) {
+  return validarRhSchemaCore_(sheet, BANCO_HORAS_HEADERS_, COL_BANCO_HORAS_READ_, auditBancoHorasSampleCore_(10));
+}
+
+function repairBancoHorasHeaderCore_() {
+  return repairRhHeaderCore_(sh_getOrCreate_('BANCO_HORAS'), BANCO_HORAS_HEADERS_, 'MOVI KIDS header BANCO_HORAS', '#78909C');
+}
+
+function repararBancoHorasPlanilhaAdmin_(p) {
+  if (!adminPinOk_(p)) return err_('Acesso negado — PIN administrativo incorreto', 403);
+  const dryRun = String(p.dryRun || '') === '1' || p.dryRun === true;
+  const resetBanco = String(p.resetBanco || p.repairBanco || 'nao').toLowerCase() === 'sim' || p.resetBanco === '1';
+  if (dryRun) {
+    return resp_({
+      dryRun: true,
+      audit: auditBancoHorasSampleCore_(10),
+      schema: validarBancoHorasSchema_(sh_getOrCreate_('BANCO_HORAS')),
+      versao: 'v1.5.160'
+    });
+  }
+  const lock = LockService.getScriptLock();
+  try { lock.waitLock(15000); } catch (ex) { return err_('Sistema ocupado', 503); }
+  try {
+    const header = repairBancoHorasHeaderCore_();
+    let bancoReset = null;
+    if (resetBanco) {
+      bancoReset = JSON.parse(repairBancoHorasAdmin_(p).getContent());
+    }
+    const audit = auditBancoHorasSampleCore_(10);
+    const schema = validarBancoHorasSchema_(sh_getOrCreate_('BANCO_HORAS'));
+    return resp_({
+      mensagem: 'BANCO_HORAS reparada (header' + (resetBanco ? ', saldos zerados I44' : '') + ')',
+      header: header, bancoReset: bancoReset, audit: audit, schemaOk: schema.ok, registros: audit.registros, versao: 'v1.5.160'
+    });
+  } catch (ex) {
+    return err_('repararBancoHorasPlanilhaAdmin: ' + ex.message, 500);
+  } finally { lock.releaseLock(); }
+}
+
+function repararRhCamada5PlanilhaAdmin_(p) {
+  if (!adminPinOk_(p)) return err_('Acesso negado — PIN administrativo incorreto', 403);
+  const dryRun = String(p.dryRun || '') === '1' || p.dryRun === true;
+  if (dryRun) {
+    return resp_({
+      dryRun: true,
+      colaboradores: { audit: auditColaboradoresRhSampleCore_(10), schema: validarColaboradoresRhSchema_(sh_getOrCreate_('COLABORADORES_RH')) },
+      folhaPonto: { audit: auditFolhaPontoSampleCore_(20), schema: validarFolhaPontoSchema_(sh_getOrCreate_('FOLHA_PONTO')) },
+      bancoHoras: { audit: auditBancoHorasSampleCore_(10), schema: validarBancoHorasSchema_(sh_getOrCreate_('BANCO_HORAS')) },
+      versao: 'v1.5.160'
+    });
+  }
+  const lock = LockService.getScriptLock();
+  try { lock.waitLock(20000); } catch (ex) { return err_('Sistema ocupado', 503); }
+  try {
+    const headerColab = repairColaboradoresRhHeaderCore_();
+    const fmtColab = repairColaboradoresRhFormatosCore_();
+    gpRepairAllAdmissoesRh_();
+    const vaReparados = gpRepairVaDiarioRhRows_();
+    const auditColab = auditColaboradoresRhSampleCore_(10);
+    const schemaColab = validarColaboradoresRhSchema_(sh_getOrCreate_('COLABORADORES_RH'));
+
+    const headerFp = repairFolhaPontoHeaderCore_();
+    const fmtFp = repairFolhaPontoFormatosCore_();
+    const auditFp = auditFolhaPontoSampleCore_(20);
+    const schemaFp = validarFolhaPontoSchema_(sh_getOrCreate_('FOLHA_PONTO'));
+
+    const headerBh = repairBancoHorasHeaderCore_();
+    let bancoReset = null;
+    if (String(p.resetBanco || p.repairBanco || 'nao').toLowerCase() === 'sim' || p.resetBanco === '1') {
+      bancoReset = JSON.parse(repairBancoHorasAdmin_(p).getContent());
+    }
+    const auditBh = auditBancoHorasSampleCore_(10);
+    const schemaBh = validarBancoHorasSchema_(sh_getOrCreate_('BANCO_HORAS'));
+
+    const faltasSyncRemovidas = gpRepairLimparFaltasSyncJornada_(null);
+    const schemaOk = !!(schemaColab.ok && schemaFp.ok && schemaBh.ok);
+    return resp_({
+      mensagem: 'Camada 5 RH P0 reparada (COLABORADORES_RH, FOLHA_PONTO, BANCO_HORAS)',
+      colaboradores: { header: headerColab, formatos: fmtColab, vaDiarioReparados: vaReparados, audit: auditColab, schemaOk: schemaColab.ok, registros: auditColab.registros },
+      folhaPonto: { header: headerFp, formatos: fmtFp, audit: auditFp, schemaOk: schemaFp.ok, registros: auditFp.registros },
+      bancoHoras: { header: headerBh, bancoReset: bancoReset, audit: auditBh, schemaOk: schemaBh.ok, registros: auditBh.registros },
+      faltasSyncRemovidas: faltasSyncRemovidas, schemaOk: schemaOk, versao: 'v1.5.160'
+    });
+  } catch (ex) {
+    return err_('repararRhCamada5PlanilhaAdmin: ' + ex.message, 500);
+  } finally { lock.releaseLock(); }
+}
+
+// ── I63 — Camada 5 RH resto (ESCALA, FALTAS, HOLERITES, METAS, COMUNICADOS, AVALIACOES) ──
+
+function auditRhOperadorFkSample_(sheetName, colRead, opColIdx, amostra) {
+  const sheet = sh_getOrCreate_(sheetName);
+  const start = 2;
+  const last = sheet.getLastRow();
+  const problemas = [];
+  const opsIds = rhOperadorIdsSet_();
+  let registros = 0;
+  if (last >= start) {
+    registros = last - start + 1;
+    const n = Math.min(Math.max(parseInt(amostra, 10) || 20, 1), last - start + 1);
+    const from = last - n + 1;
+    const rows = sheet.getRange(from, 1, last - from + 1, colRead).getValues();
+    rows.forEach(function (r, idx) {
+      const rowIndex = from + idx;
+      const opId = Number(r[opColIdx]);
+      if (!opId) problemas.push({ row: rowIndex, campo: 'operador_id', valor: '(vazio)' });
+      else if (!opsIds[opId]) problemas.push({ row: rowIndex, campo: 'operador_id', valor: String(opId) + ' sem FK OPERADORES' });
+    });
+  }
+  return { amostra: registros > 0 ? Math.min(parseInt(amostra, 10) || 20, registros) : 0, problemas: problemas, lastRow: last, registros: registros };
+}
+
+function auditEscalaSampleCore_(amostra) {
+  return auditRhOperadorFkSample_('ESCALA_COLABORADORES', COL_ESCALA_READ_, 0, amostra || 20);
+}
+
+function validarEscalaSchema_(sheet) {
+  return validarRhSchemaCore_(sheet, ESCALA_HEADERS_, COL_ESCALA_READ_, auditEscalaSampleCore_(20));
+}
+
+function repairEscalaHeaderCore_() {
+  return repairRhHeaderCore_(sh_getOrCreate_('ESCALA_COLABORADORES'), ESCALA_HEADERS_, 'MOVI KIDS header ESCALA_COLABORADORES', '#9C27B0');
+}
+
+function repairEscalaFormatosCore_() {
+  const sheet = sh_getOrCreate_('ESCALA_COLABORADORES');
+  const last = sheet.getLastRow();
+  if (last < 2) return { linhas: 0 };
+  const n = last - 1;
+  sheet.getRange(2, 2, n, 1).setNumberFormat('@');
+  return { linhas: n };
+}
+
+function repararEscalaPlanilhaAdmin_(p) {
+  if (!adminPinOk_(p)) return err_('Acesso negado — PIN administrativo incorreto', 403);
+  const dryRun = String(p.dryRun || '') === '1' || p.dryRun === true;
+  if (dryRun) {
+    return resp_({
+      dryRun: true,
+      audit: auditEscalaSampleCore_(20),
+      schema: validarEscalaSchema_(sh_getOrCreate_('ESCALA_COLABORADORES')),
+      versao: 'v1.5.161'
+    });
+  }
+  const lock = LockService.getScriptLock();
+  try { lock.waitLock(15000); } catch (ex) { return err_('Sistema ocupado', 503); }
+  try {
+    const header = repairEscalaHeaderCore_();
+    const formatos = repairEscalaFormatosCore_();
+    const audit = auditEscalaSampleCore_(20);
+    const schema = validarEscalaSchema_(sh_getOrCreate_('ESCALA_COLABORADORES'));
+    return resp_({
+      mensagem: 'ESCALA_COLABORADORES reparada (header, formato competencia)',
+      header: header, formatos: formatos, audit: audit, schemaOk: schema.ok, registros: audit.registros, versao: 'v1.5.161'
+    });
+  } catch (ex) {
+    return err_('repararEscalaPlanilhaAdmin: ' + ex.message, 500);
+  } finally { lock.releaseLock(); }
+}
+
+function auditFaltasSampleCore_(amostra) {
+  const base = auditRhOperadorFkSample_('FALTAS_AUSENCIAS', COL_FALTAS_READ_, 1, amostra || 30);
+  const sheet = sh_getOrCreate_('FALTAS_AUSENCIAS');
+  const start = 2;
+  const last = sheet.getLastRow();
+  if (last >= start) {
+    const n = Math.min(Math.max(parseInt(amostra, 10) || 30, 1), last - start + 1);
+    const from = last - n + 1;
+    const rows = sheet.getRange(from, 1, last - from + 1, COL_FALTAS_READ_).getValues();
+    rows.forEach(function (r, idx) {
+      const rowIndex = from + idx;
+      const obs = String(r[6] || '');
+      if (obs.indexOf('Sync jornada') >= 0) {
+        base.problemas.push({ row: rowIndex, campo: 'obs', valor: 'Sync jornada (limpar no repair)' });
+      }
+      if (!String(r[3] || '').trim()) {
+        base.problemas.push({ row: rowIndex, campo: 'tipo', valor: '(vazio)' });
+      }
+    });
+  }
+  return base;
+}
+
+function validarFaltasSchema_(sheet) {
+  return validarRhSchemaCore_(sheet, FALTAS_HEADERS_, COL_FALTAS_READ_, auditFaltasSampleCore_(30));
+}
+
+function repairFaltasHeaderCore_() {
+  return repairRhHeaderCore_(sh_getOrCreate_('FALTAS_AUSENCIAS'), FALTAS_HEADERS_, 'MOVI KIDS header FALTAS_AUSENCIAS', '#F44336');
+}
+
+function repairFaltasFormatosCore_() {
+  const sheet = sh_getOrCreate_('FALTAS_AUSENCIAS');
+  const last = sheet.getLastRow();
+  if (last < 2) return { linhas: 0 };
+  const n = last - 1;
+  sheet.getRange(2, 3, n, 1).setNumberFormat('@');
+  return { linhas: n };
+}
+
+function repararFaltasPlanilhaAdmin_(p) {
+  if (!adminPinOk_(p)) return err_('Acesso negado — PIN administrativo incorreto', 403);
+  const dryRun = String(p.dryRun || '') === '1' || p.dryRun === true;
+  const limparSync = String(p.limparFaltasSync || 'nao').toLowerCase() === 'sim' || p.limparFaltasSync === '1';
+  if (dryRun) {
+    return resp_({
+      dryRun: true,
+      audit: auditFaltasSampleCore_(30),
+      schema: validarFaltasSchema_(sh_getOrCreate_('FALTAS_AUSENCIAS')),
+      limparFaltasSync: limparSync,
+      versao: 'v1.5.161'
+    });
+  }
+  const lock = LockService.getScriptLock();
+  try { lock.waitLock(15000); } catch (ex) { return err_('Sistema ocupado', 503); }
+  try {
+    const header = repairFaltasHeaderCore_();
+    const formatos = repairFaltasFormatosCore_();
+    let faltasSyncRemovidas = 0;
+    if (limparSync) faltasSyncRemovidas = gpRepairLimparFaltasSyncJornada_(null);
+    const audit = auditFaltasSampleCore_(30);
+    const schema = validarFaltasSchema_(sh_getOrCreate_('FALTAS_AUSENCIAS'));
+    return resp_({
+      mensagem: 'FALTAS_AUSENCIAS reparada (header, formato data' + (limparSync ? ', sync jornada' : '') + ')',
+      header: header, formatos: formatos, faltasSyncRemovidas: faltasSyncRemovidas,
+      audit: audit, schemaOk: schema.ok, registros: audit.registros, versao: 'v1.5.161'
+    });
+  } catch (ex) {
+    return err_('repararFaltasPlanilhaAdmin: ' + ex.message, 500);
+  } finally { lock.releaseLock(); }
+}
+
+function auditHoleritesSampleCore_(amostra) {
+  return auditRhOperadorFkSample_('HOLERITES', COL_HOLERITES_READ_, 1, amostra || 20);
+}
+
+function validarHoleritesSchema_(sheet) {
+  return validarRhSchemaCore_(sheet, HOLERITES_HEADERS_, COL_HOLERITES_READ_, auditHoleritesSampleCore_(20));
+}
+
+function repairHoleritesHeaderCore_() {
+  return repairRhHeaderCore_(sh_getOrCreate_('HOLERITES'), HOLERITES_HEADERS_, 'MOVI KIDS header HOLERITES', '#1976D2');
+}
+
+function repairHoleritesFormatosCore_() {
+  const sheet = sh_getOrCreate_('HOLERITES');
+  const last = sheet.getLastRow();
+  if (last < 2) return { linhas: 0 };
+  const n = last - 1;
+  sheet.getRange(2, 3, n, 1).setNumberFormat('@');
+  return { linhas: n };
+}
+
+function repararHoleritesPlanilhaAdmin_(p) {
+  if (!adminPinOk_(p)) return err_('Acesso negado — PIN administrativo incorreto', 403);
+  const dryRun = String(p.dryRun || '') === '1' || p.dryRun === true;
+  if (dryRun) {
+    return resp_({
+      dryRun: true,
+      audit: auditHoleritesSampleCore_(20),
+      schema: validarHoleritesSchema_(sh_getOrCreate_('HOLERITES')),
+      versao: 'v1.5.161'
+    });
+  }
+  const lock = LockService.getScriptLock();
+  try { lock.waitLock(15000); } catch (ex) { return err_('Sistema ocupado', 503); }
+  try {
+    const header = repairHoleritesHeaderCore_();
+    const formatos = repairHoleritesFormatosCore_();
+    const audit = auditHoleritesSampleCore_(20);
+    const schema = validarHoleritesSchema_(sh_getOrCreate_('HOLERITES'));
+    return resp_({
+      mensagem: 'HOLERITES reparada (header, formato competencia)',
+      header: header, formatos: formatos, audit: audit, schemaOk: schema.ok, registros: audit.registros, versao: 'v1.5.161'
+    });
+  } catch (ex) {
+    return err_('repararHoleritesPlanilhaAdmin: ' + ex.message, 500);
+  } finally { lock.releaseLock(); }
+}
+
+function auditMetasSampleCore_(amostra) {
+  return auditRhOperadorFkSample_('METAS_COLABORADORES', COL_METAS_READ_, 1, amostra || 10);
+}
+
+function validarMetasSchema_(sheet) {
+  return validarRhSchemaCore_(sheet, METAS_HEADERS_, COL_METAS_READ_, auditMetasSampleCore_(10));
+}
+
+function repairMetasHeaderCore_() {
+  return repairRhHeaderCore_(sh_getOrCreate_('METAS_COLABORADORES'), METAS_HEADERS_, 'MOVI KIDS header METAS_COLABORADORES', '#FFC107');
+}
+
+function repararMetasPlanilhaAdmin_(p) {
+  if (!adminPinOk_(p)) return err_('Acesso negado — PIN administrativo incorreto', 403);
+  const dryRun = String(p.dryRun || '') === '1' || p.dryRun === true;
+  if (dryRun) {
+    return resp_({
+      dryRun: true,
+      audit: auditMetasSampleCore_(10),
+      schema: validarMetasSchema_(sh_getOrCreate_('METAS_COLABORADORES')),
+      versao: 'v1.5.161'
+    });
+  }
+  const lock = LockService.getScriptLock();
+  try { lock.waitLock(15000); } catch (ex) { return err_('Sistema ocupado', 503); }
+  try {
+    const header = repairMetasHeaderCore_();
+    const audit = auditMetasSampleCore_(10);
+    const schema = validarMetasSchema_(sh_getOrCreate_('METAS_COLABORADORES'));
+    return resp_({
+      mensagem: 'METAS_COLABORADORES reparada (header only, seed demo intacto)',
+      header: header, audit: audit, schemaOk: schema.ok, registros: audit.registros, versao: 'v1.5.161'
+    });
+  } catch (ex) {
+    return err_('repararMetasPlanilhaAdmin: ' + ex.message, 500);
+  } finally { lock.releaseLock(); }
+}
+
+function auditComunicadosRhSampleCore_(amostra) {
+  const sheet = sh_getOrCreate_('COMUNICADOS_RH');
+  const start = 2;
+  const last = sheet.getLastRow();
+  const problemas = [];
+  let registros = 0;
+  if (last >= start) {
+    registros = last - start + 1;
+    const n = Math.min(Math.max(parseInt(amostra, 10) || 10, 1), last - start + 1);
+    const from = last - n + 1;
+    const rows = sheet.getRange(from, 1, last - from + 1, COL_COMUNICADOS_READ_).getValues();
+    rows.forEach(function (r, idx) {
+      const rowIndex = from + idx;
+      if (!String(r[2] || '').trim()) {
+        problemas.push({ row: rowIndex, campo: 'titulo', valor: '(vazio)' });
+      }
+    });
+  }
+  return { amostra: registros > 0 ? Math.min(parseInt(amostra, 10) || 10, registros) : 0, problemas: problemas, lastRow: last, registros: registros };
+}
+
+function validarComunicadosRhSchema_(sheet) {
+  return validarRhSchemaCore_(sheet, COMUNICADOS_HEADERS_, COL_COMUNICADOS_READ_, auditComunicadosRhSampleCore_(10));
+}
+
+function repairComunicadosRhHeaderCore_() {
+  return repairRhHeaderCore_(sh_getOrCreate_('COMUNICADOS_RH'), COMUNICADOS_HEADERS_, 'MOVI KIDS header COMUNICADOS_RH', '#FF7043');
+}
+
+function repairComunicadosRhFormatosCore_() {
+  const sheet = sh_getOrCreate_('COMUNICADOS_RH');
+  const last = sheet.getLastRow();
+  if (last < 2) return { linhas: 0 };
+  const n = last - 1;
+  sheet.getRange(2, 2, n, 1).setNumberFormat('@');
+  sheet.getRange(2, 6, n, 1).setNumberFormat('@');
+  return { linhas: n };
+}
+
+function repararComunicadosRhPlanilhaAdmin_(p) {
+  if (!adminPinOk_(p)) return err_('Acesso negado — PIN administrativo incorreto', 403);
+  const dryRun = String(p.dryRun || '') === '1' || p.dryRun === true;
+  if (dryRun) {
+    return resp_({
+      dryRun: true,
+      audit: auditComunicadosRhSampleCore_(10),
+      schema: validarComunicadosRhSchema_(sh_getOrCreate_('COMUNICADOS_RH')),
+      versao: 'v1.5.161'
+    });
+  }
+  const lock = LockService.getScriptLock();
+  try { lock.waitLock(15000); } catch (ex) { return err_('Sistema ocupado', 503); }
+  try {
+    const header = repairComunicadosRhHeaderCore_();
+    const formatos = repairComunicadosRhFormatosCore_();
+    const audit = auditComunicadosRhSampleCore_(10);
+    const schema = validarComunicadosRhSchema_(sh_getOrCreate_('COMUNICADOS_RH'));
+    return resp_({
+      mensagem: 'COMUNICADOS_RH reparada (header, formatos data)',
+      header: header, formatos: formatos, audit: audit, schemaOk: schema.ok, registros: audit.registros, versao: 'v1.5.161'
+    });
+  } catch (ex) {
+    return err_('repararComunicadosRhPlanilhaAdmin: ' + ex.message, 500);
+  } finally { lock.releaseLock(); }
+}
+
+function auditAvaliacoesRhSampleCore_(amostra) {
+  const base = auditRhOperadorFkSample_('AVALIACOES_RH', COL_AVALIACOES_READ_, 1, amostra || 10);
+  const sheet = sh_getOrCreate_('AVALIACOES_RH');
+  const start = 2;
+  const last = sheet.getLastRow();
+  if (last >= start) {
+    const n = Math.min(Math.max(parseInt(amostra, 10) || 10, 1), last - start + 1);
+    const from = last - n + 1;
+    const rows = sheet.getRange(from, 1, last - from + 1, COL_AVALIACOES_READ_).getValues();
+    rows.forEach(function (r, idx) {
+      const rowIndex = from + idx;
+      const nota = Number(r[4]);
+      if (isNaN(nota) || nota < 0 || nota > 10) {
+        base.problemas.push({ row: rowIndex, campo: 'nota', valor: String(r[4]) });
+      }
+    });
+  }
+  return base;
+}
+
+function validarAvaliacoesRhSchema_(sheet) {
+  return validarRhSchemaCore_(sheet, AVALIACOES_HEADERS_, COL_AVALIACOES_READ_, auditAvaliacoesRhSampleCore_(10));
+}
+
+function repairAvaliacoesRhHeaderCore_() {
+  return repairRhHeaderCore_(sh_getOrCreate_('AVALIACOES_RH'), AVALIACOES_HEADERS_, 'MOVI KIDS header AVALIACOES_RH', '#7E57C2');
+}
+
+function repairAvaliacoesRhFormatosCore_() {
+  const sheet = sh_getOrCreate_('AVALIACOES_RH');
+  const last = sheet.getLastRow();
+  if (last < 2) return { linhas: 0 };
+  const n = last - 1;
+  sheet.getRange(2, 3, n, 1).setNumberFormat('@');
+  return { linhas: n };
+}
+
+function repararAvaliacoesRhPlanilhaAdmin_(p) {
+  if (!adminPinOk_(p)) return err_('Acesso negado — PIN administrativo incorreto', 403);
+  const dryRun = String(p.dryRun || '') === '1' || p.dryRun === true;
+  if (dryRun) {
+    return resp_({
+      dryRun: true,
+      audit: auditAvaliacoesRhSampleCore_(10),
+      schema: validarAvaliacoesRhSchema_(sh_getOrCreate_('AVALIACOES_RH')),
+      versao: 'v1.5.161'
+    });
+  }
+  const lock = LockService.getScriptLock();
+  try { lock.waitLock(15000); } catch (ex) { return err_('Sistema ocupado', 503); }
+  try {
+    const header = repairAvaliacoesRhHeaderCore_();
+    const formatos = repairAvaliacoesRhFormatosCore_();
+    const audit = auditAvaliacoesRhSampleCore_(10);
+    const schema = validarAvaliacoesRhSchema_(sh_getOrCreate_('AVALIACOES_RH'));
+    return resp_({
+      mensagem: 'AVALIACOES_RH reparada (header, formato competencia)',
+      header: header, formatos: formatos, audit: audit, schemaOk: schema.ok, registros: audit.registros, versao: 'v1.5.161'
+    });
+  } catch (ex) {
+    return err_('repararAvaliacoesRhPlanilhaAdmin: ' + ex.message, 500);
+  } finally { lock.releaseLock(); }
+}
+
+function repararRhCamada5RestoPlanilhaAdmin_(p) {
+  if (!adminPinOk_(p)) return err_('Acesso negado — PIN administrativo incorreto', 403);
+  const dryRun = String(p.dryRun || '') === '1' || p.dryRun === true;
+  const limparSync = String(p.limparFaltasSync || 'nao').toLowerCase() === 'sim' || p.limparFaltasSync === '1';
+  const abas = [
+    { key: 'escala', nome: 'ESCALA_COLABORADORES', header: repairEscalaHeaderCore_, formatos: repairEscalaFormatosCore_, audit: auditEscalaSampleCore_, schema: validarEscalaSchema_, n: 20 },
+    { key: 'faltas', nome: 'FALTAS_AUSENCIAS', header: repairFaltasHeaderCore_, formatos: repairFaltasFormatosCore_, audit: auditFaltasSampleCore_, schema: validarFaltasSchema_, n: 30 },
+    { key: 'holerites', nome: 'HOLERITES', header: repairHoleritesHeaderCore_, formatos: repairHoleritesFormatosCore_, audit: auditHoleritesSampleCore_, schema: validarHoleritesSchema_, n: 20 },
+    { key: 'metas', nome: 'METAS_COLABORADORES', header: repairMetasHeaderCore_, formatos: null, audit: auditMetasSampleCore_, schema: validarMetasSchema_, n: 10 },
+    { key: 'comunicados', nome: 'COMUNICADOS_RH', header: repairComunicadosRhHeaderCore_, formatos: repairComunicadosRhFormatosCore_, audit: auditComunicadosRhSampleCore_, schema: validarComunicadosRhSchema_, n: 10 },
+    { key: 'avaliacoes', nome: 'AVALIACOES_RH', header: repairAvaliacoesRhHeaderCore_, formatos: repairAvaliacoesRhFormatosCore_, audit: auditAvaliacoesRhSampleCore_, schema: validarAvaliacoesRhSchema_, n: 10 }
+  ];
+  if (dryRun) {
+    const out = {};
+    abas.forEach(function (a) {
+      out[a.key] = { audit: a.audit(a.n), schema: a.schema(sh_getOrCreate_(a.nome)) };
+    });
+    return resp_({ dryRun: true, abas: out, limparFaltasSync: limparSync, versao: 'v1.5.161' });
+  }
+  const lock = LockService.getScriptLock();
+  try { lock.waitLock(25000); } catch (ex) { return err_('Sistema ocupado', 503); }
+  try {
+    const resultado = {};
+    let schemaOk = true;
+    abas.forEach(function (a) {
+      const header = a.header();
+      const formatos = a.formatos ? a.formatos() : null;
+      const audit = a.audit(a.n);
+      const schema = a.schema(sh_getOrCreate_(a.nome));
+      if (!schema.ok) schemaOk = false;
+      resultado[a.key] = { header: header, formatos: formatos, audit: audit, schemaOk: schema.ok, registros: audit.registros };
+    });
+    let faltasSyncRemovidas = 0;
+    if (limparSync) faltasSyncRemovidas = gpRepairLimparFaltasSyncJornada_(null);
+    return resp_({
+      mensagem: 'Camada 5 RH resto reparada (ESCALA, FALTAS, HOLERITES, METAS, COMUNICADOS, AVALIACOES)',
+      resultado: resultado, faltasSyncRemovidas: faltasSyncRemovidas, schemaOk: schemaOk, versao: 'v1.5.161'
+    });
+  } catch (ex) {
+    return err_('repararRhCamada5RestoPlanilhaAdmin: ' + ex.message, 500);
+  } finally { lock.releaseLock(); }
 }
 
 // ── CONTA DO DIA (telefone + janela 10h–22h) ─────────────────
@@ -1506,11 +3918,12 @@ function listarCustos_(p) {
   const ano = p.ano ? parseInt(p.ano) : null;
   const sheet = sh_(SH_CUS);
   const last  = sheet.getLastRow();
-  if (last < DATA_ROW) {
+  const start = cusDataStartRow_();
+  if (last < start) {
     return adm ? resp_({ custos: [], total: 0, soma: 0 }) : resp_({ custos: [] });
   }
 
-  const dados = sheet.getRange(DATA_ROW, 1, last - DATA_ROW + 1, 6).getValues();
+  const dados = sheet.getRange(start, 1, last - start + 1, COL_CUS_READ_).getValues();
   let lista = dados.filter(r => r[0] !== '' && r[0] !== 0).map(r => ({
     id:        r[0],
     data:      cellToStr_(r[1]),
@@ -2196,12 +4609,13 @@ function lerInvestimento_() {
   const dataInauguracao = cellToStr_(sh.getRange('B3').getValue()).trim();
   const mesInicioParsed = parseMesAnoPayback_(sh.getRange('B4').getValue());
   const mesInicioPayback = mesInicioParsed.label;
+  const dataRow = invDataStartRow_();
   const last = sh.getLastRow();
   const itens = [];
   let total = 0;
-  if (last >= INV_DATA_ROW) {
-    const n = last - INV_DATA_ROW + 1;
-    const rows = sh.getRange(INV_DATA_ROW, 1, n, 6).getValues();
+  if (last >= dataRow) {
+    const n = last - dataRow + 1;
+    const rows = sh.getRange(dataRow, 1, n, COL_INV_READ_).getValues();
     rows.forEach(function(r) {
       const item = String(r[2] || '').trim();
       if (!item || item.indexOf('Subtotal') === 0) return;
@@ -3406,6 +5820,137 @@ function repairFolhaFormulasAdmin_(p) {
   });
 }
 
+/** I57 — FOLHA protocolo: memorial, audit chaves, repair formulas USER_ENTERED (I25). */
+const FOLHA_MEMORIAL_ROWS_ = 3;
+const FOLHA_KEY_CELLS_ = ['B5', 'B7', 'B11', 'B12', 'B25', 'B63', 'B68'];
+
+function folhaMemorialOk_(sheet) {
+  const a1 = String(sheet.getRange(1, 1).getValue() || '').toLowerCase();
+  return a1.indexOf('movi') >= 0 || a1.indexOf('folha') >= 0 || a1.indexOf('golden') >= 0 || a1.indexOf('clt') >= 0;
+}
+
+function repairFolhaMemorialCore_() {
+  const sheet = sh_getOrCreate_(SH_FOLHA);
+  if (folhaMemorialOk_(sheet)) {
+    return { memorialOk: true, layout: 'existente' };
+  }
+  const memorial = [
+    'MOVI KIDS — FOLHA · memorial planejamento CLT (nao e holerite oficial)',
+    'Formulas USER_ENTERED I25 · repairFolhaAdmin / repararFolhaPlanilhaAdmin',
+    'B68 = custo mensal · fonte kpiMes.folhaPlanejamento'
+  ];
+  memorial.forEach(function (txt, i) { sheet.getRange(i + 1, 1).setValue(txt); });
+  try {
+    sheet.getProtections(SpreadsheetApp.ProtectionType.RANGE).forEach(function (pr) {
+      const d = String(pr.getDescription() || '');
+      if (d.indexOf('MOVI KIDS memorial FOLHA') >= 0) pr.remove();
+    });
+    sheet.getRange(1, 1, FOLHA_MEMORIAL_ROWS_, sheet.getMaxColumns()).protect()
+      .setDescription('MOVI KIDS memorial FOLHA — nao editar')
+      .setWarningOnly(false);
+  } catch (e) { Logger.log('repairFolhaMemorial protect: ' + e.message); }
+  return { memorialOk: true, layout: 'i57' };
+}
+
+function auditFolhaSampleCore_() {
+  const sheet = sh_getOrCreate_(SH_FOLHA);
+  const problemas = [];
+  FOLHA_KEY_CELLS_.forEach(function (a1) {
+    const range = sheet.getRange(a1);
+    const display = String(range.getDisplayValue() || '').trim();
+    const val = range.getValue();
+    if (celulaComErro_(val) || celulaComErro_(display)) {
+      problemas.push({ campo: a1, valor: display || String(val) });
+    }
+  });
+  const scanEnd = Math.min(Math.max(sheet.getLastRow(), 49), 77);
+  const displayGrid = sheet.getRange(35, 1, scanEnd - 34, 9).getDisplayValues();
+  displayGrid.forEach(function (row, ri) {
+    row.forEach(function (cell, ci) {
+      const s = String(cell || '').trim();
+      if (celulaComErro_(s)) {
+        problemas.push({ row: ri + 35, col: ci + 1, campo: 'formula', valor: s });
+      }
+    });
+  });
+  const folha = lerFolhaPlanejamento_();
+  return {
+    amostra: FOLHA_KEY_CELLS_.length + displayGrid.length * 9,
+    problemas: problemas,
+    precisaRepair: folhaPrecisaRepair_(sheet),
+    memorialOk: folhaMemorialOk_(sheet),
+    b68: parseMoedaBr_(sheet.getRange('B68').getValue()),
+    b25: parseMoedaBr_(sheet.getRange('B25').getValue()),
+    folhaPlanejamento: folha
+  };
+}
+
+function validarFolhaSchema_(sheet) {
+  const audit = auditFolhaSampleCore_();
+  const faltando = [];
+  if (!folhaMemorialOk_(sheet)) {
+    faltando.push({ coluna: 'memorial', esperado: 'titulo FOLHA', atual: String(sheet.getRange(1, 1).getValue() || '') });
+  }
+  (audit.problemas || []).forEach(function (p) {
+    faltando.push({ coluna: p.campo || (p.col + ':' + p.row), esperado: 'sem erro', atual: p.valor });
+  });
+  if (audit.b68 <= 0) {
+    faltando.push({ coluna: 'B68', esperado: 'custoMensal>0', atual: String(audit.b68) });
+  }
+  const fp = audit.folhaPlanejamento || {};
+  if (!fp.ok || fp.fonte !== 'FOLHA') {
+    faltando.push({ coluna: 'folhaPlanejamento', esperado: 'fonte=FOLHA', atual: String(fp.fonte || 'erro') });
+  }
+  return {
+    existe: true,
+    ok: faltando.length === 0,
+    headerRow: 0,
+    lastRow: sheet.getLastRow(),
+    lastColumn: sheet.getLastColumn(),
+    faltando: faltando,
+    b68: audit.b68,
+    b25: audit.b25,
+    precisaRepair: audit.precisaRepair,
+    memorialOk: audit.memorialOk
+  };
+}
+
+function repararFolhaPlanilhaAdmin_(p) {
+  if (!adminPinOk_(p)) return err_('Acesso negado — PIN administrativo incorreto', 403);
+  const dryRun = String(p.dryRun || '') === '1' || p.dryRun === true;
+  if (dryRun) {
+    return resp_({
+      dryRun: true,
+      audit: auditFolhaSampleCore_(),
+      schema: validarFolhaSchema_(sh_getOrCreate_(SH_FOLHA)),
+      versao: 'v1.5.154'
+    });
+  }
+  const lock = LockService.getScriptLock();
+  try { lock.waitLock(15000); } catch (ex) { return err_('Sistema ocupado', 503); }
+  try {
+    const memorial = repairFolhaMemorialCore_();
+    const sh = sh_(SH_FOLHA);
+    if (!sh) return err_('Aba FOLHA ausente', 404);
+    repairFolhaFormulasCore_(sh);
+    const audit = auditFolhaSampleCore_();
+    const schema = validarFolhaSchema_(sh);
+    return resp_({
+      mensagem: 'FOLHA reparada (memorial, formulas USER_ENTERED, audit B68/B25)',
+      memorial: memorial,
+      formulas: { aplicado: true, b25: sh.getRange('B25').getValue(), b68: sh.getRange('B68').getValue() },
+      audit: audit,
+      schemaOk: schema.ok,
+      folhaPlanejamento: audit.folhaPlanejamento,
+      versao: 'v1.5.154'
+    });
+  } catch (ex) {
+    return err_('repararFolhaPlanilhaAdmin: ' + ex.message, 500);
+  } finally {
+    lock.releaseLock();
+  }
+}
+
 /** Lê memorial folha (aba FOLHA) — planejamento, não folha oficial. */
 function lerFolhaPlanejamento_() {
   const fallback = {
@@ -4525,11 +7070,12 @@ function salvarRelatorioExecutivoDrive_(p) {
 // ── LISTAR RELATÓRIOS ─────────────────────────────────────────
 function listarRelatorios_() {
   const ss = ss_();
-  const sh = ss.getSheetByName('RELATORIOS');
+  const sh = ss.getSheetByName(SH_REL);
   if (!sh) return resp_({ relatorios: [] });
+  const start = relDataStartRow_();
   const last = sh.getLastRow();
-  if (last < 2) return resp_({ relatorios: [] });
-  const dados = sh.getRange(2, 1, last - 1, 6).getValues();
+  if (last < start) return resp_({ relatorios: [] });
+  const dados = sh.getRange(start, 1, last - start + 1, COL_REL_READ_).getValues();
   const MESES_R = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho',
                    'Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
   const lista = dados.filter(r => r[0]).map(r => ({
@@ -4547,16 +7093,16 @@ function listarRelatorios_() {
 
 function registrarRelatorio_(mes, ano, nomeMes, link, tipo) {
   const ss = ss_();
-  let sh = ss.getSheetByName('RELATORIOS');
+  let sh = ss.getSheetByName(SH_REL);
   if (!sh) {
-    sh = ss.insertSheet('RELATORIOS');
-    sh.getRange(1,1,1,6).setValues([['#','Mês/Ano','Data Envio','Link','Tipo','Obs']]);
-    sh.getRange(1,1,1,6).setFontWeight('bold').setBackground('#1565C0').setFontColor('#fff');
+    sh = ss.insertSheet(SH_REL);
+    repairRelatoriosHeaderCore_();
   }
+  const start = relDataStartRow_();
   const last = sh.getLastRow();
-  const id   = last < 2 ? 1 : Number(sh.getRange(last, 1).getValue()) + 1;
+  const id   = last < start ? 1 : Number(sh.getRange(last, 1).getValue()) + 1;
   const hoje = new Date();
-  sh.appendRow([id, `${nomeMes}/${ano}`, fmtData_(hoje) + ' ' + fmtHoraLocal_(hoje), link, tipo, '']);
+  sh.appendRow([id, nomeMes + '/' + ano, fmtData_(hoje) + ' ' + fmtHoraLocal_(hoje), link, tipo, '']);
   sh.getRange(sh.getLastRow(), 2, 1, 3).setNumberFormat('@');
 }
 
@@ -5076,8 +7622,9 @@ function cfgReadMap_() {
   const out = {};
   const sheet = sh_getOrCreate_(SH_CFG);
   const last = sheet.getLastRow();
-  if (last >= 2) {
-    const dados = sheet.getRange(2, 1, last - 1, 2).getValues();
+  const start = cfgDataStartRow_();
+  if (last >= start) {
+    const dados = sheet.getRange(start, 1, last - start + 1, 2).getValues();
     dados.forEach(r => {
       if (r[0] !== '' && r[0] !== null && r[0] !== undefined) {
         out[String(r[0]).trim()] = String(r[1] !== undefined && r[1] !== null ? r[1] : '');
@@ -5233,17 +7780,19 @@ function validarPrecosConfig_(precos) {
 
 function cfgSetValue_(key, value) {
   const sheet = sh_getOrCreate_(SH_CFG);
-  if (sheet.getLastRow() < 1) {
-    sheet.getRange(1, 1, 1, 2).setValues([['Chave', 'Valor']]);
-    sheet.getRange(1, 1, 1, 2).setFontWeight('bold');
+  const headerRow = cfgHeaderRow_();
+  const start = cfgDataStartRow_();
+  if (sheet.getLastRow() < headerRow) {
+    sheet.getRange(headerRow, 1, 1, 2).setValues([['Chave', 'Valor']]);
+    sheet.getRange(headerRow, 1, 1, 2).setFontWeight('bold');
   }
   const last = sheet.getLastRow();
   let found = false;
-  if (last >= 2) {
-    const keys = sheet.getRange(2, 1, last - 1, 1).getValues();
+  if (last >= start) {
+    const keys = sheet.getRange(start, 1, last - start + 1, 1).getValues();
     for (let i = 0; i < keys.length; i++) {
       if (String(keys[i][0]).trim() === key) {
-        sheet.getRange(2 + i, 2).setValue(value);
+        sheet.getRange(start + i, 2).setValue(value);
         found = true;
         break;
       }
@@ -5433,10 +7982,8 @@ function normBusca_(v) {
 function responsaveisSheet_() {
   const sh = sh_getOrCreate_(SH_RESP);
   if (sh.getLastRow() < 1) {
-    sh.getRange(1, 1, 1, 9).setValues([[
-      'id','criadoEm','atualizadoEm','telefone','responsavel','criancasJson','observacao','origem','status'
-    ]]);
-    sh.getRange(1, 1, 1, 9).setFontWeight('bold').setBackground('#1565C0').setFontColor('#fff');
+    sh.getRange(RESP_HEADER_ROW_, 1, 1, COL_RESP_READ_).setValues([RESP_HEADERS_]);
+    sh.getRange(RESP_HEADER_ROW_, 1, 1, COL_RESP_READ_).setFontWeight('bold').setBackground('#1565C0').setFontColor('#fff');
   }
   return sh;
 }
@@ -5529,15 +8076,16 @@ function parseCriancasResp_(v) {
 function lerResponsaveisCanonicos_() {
   const sh = ss_().getSheetByName(SH_RESP);
   const mapa = {};
-  if (!sh || sh.getLastRow() < 2) return mapa;
+  if (!sh || sh.getLastRow() < respDataStartRow_()) return mapa;
 
-  const dados = sh.getRange(2, 1, sh.getLastRow() - 1, 9).getValues();
+  const start = respDataStartRow_();
+  const dados = sh.getRange(start, 1, sh.getLastRow() - start + 1, COL_RESP_READ_).getValues();
   dados.forEach((r, idx) => {
     const tel = normTel_(r[3]);
     if (!tel) return;
     mapa[tel] = {
       id: r[0],
-      rowIndex: idx + 2,
+      rowIndex: start + idx,
       telefone: tel,
       responsavel: String(r[4] || ''),
       criancas: parseCriancasResp_(r[5]),
@@ -6725,19 +9273,20 @@ function sincronizarOperadoresPadrao_(sh) {
   const last = sh.getLastRow();
   const agora = new Date();
   const ts = fmtData_(agora) + ' ' + fmtHoraLocal_(agora);
-  if (last < OP_DATA_ROW) {
+  const start = opsDataStartRow_();
+  if (last < start) {
     OPERADORES_PADRAO_.forEach(nome => {
       sh.appendRow([nextIdOperador_(sh), ts, nome, '', '', 'SIM', '', 'operador']);
     });
     return;
   }
-  const rows = sh.getRange(OP_DATA_ROW, 1, last - OP_DATA_ROW + 1, 8).getValues();
+  const rows = sh.getRange(start, 1, last - start + 1, COL_OPS_READ_).getValues();
   const nomesNorm = [];
   rows.forEach((r, i) => {
     const nome = String(r[2] || '').trim();
     const legado = OPERADORES_RENOMEAR_LEGADO_[nome];
     if (legado) {
-      sh.getRange(OP_DATA_ROW + i, 3).setValue(legado);
+      sh.getRange(start + i, 3).setValue(legado);
       nomesNorm.push(legado.toLowerCase());
     } else if (nome) {
       nomesNorm.push(nome.toLowerCase());
@@ -6753,12 +9302,13 @@ function sincronizarOperadoresPadrao_(sh) {
 
 function operadoresSheet_() {
   const sh = sh_getOrCreate_(SH_OPS);
-  if (sh.getLastRow() < 1) {
-    sh.getRange(1, 1, 1, 8).setValues([['id', 'criadoEm', 'nome', 'pinHash', 'pinSalt', 'ativo', 'ultimoLogin', 'perfil']]);
-    sh.getRange(1, 1, 1, 8).setFontWeight('bold');
+  const hdrRow = opsHeaderRow_();
+  if (sh.getLastRow() < hdrRow) {
+    sh.getRange(hdrRow, 1, 1, COL_OPS_READ_).setValues([OPS_HEADERS_]);
+    sh.getRange(hdrRow, 1, 1, COL_OPS_READ_).setFontWeight('bold');
   } else {
-    const hdr = String(sh.getRange(1, 8).getValue() || '').trim().toLowerCase();
-    if (!hdr) sh.getRange(1, 8).setValue('perfil');
+    const hdr = String(sh.getRange(hdrRow, 8).getValue() || '').trim().toLowerCase();
+    if (!hdr || hdr === 'observacao') sh.getRange(hdrRow, 8).setValue('perfil');
   }
   sincronizarOperadoresPadrao_(sh);
   return sh;
@@ -6766,8 +9316,9 @@ function operadoresSheet_() {
 
 function nextIdOperador_(sheet) {
   const last = sheet.getLastRow();
-  if (last < OP_DATA_ROW) return 1;
-  const ids = sheet.getRange(OP_DATA_ROW, 1, last - OP_DATA_ROW + 1, 1).getValues();
+  const start = opsDataStartRow_();
+  if (last < start) return 1;
+  const ids = sheet.getRange(start, 1, last - start + 1, 1).getValues();
   let max = 0;
   ids.forEach(r => { if (Number(r[0]) > max) max = Number(r[0]); });
   return max + 1;
@@ -6846,11 +9397,12 @@ function roleFromPerfil_(perfil) {
 function operadorRowById_(id) {
   const sh = operadoresSheet_();
   const last = sh.getLastRow();
-  if (last < OP_DATA_ROW) return null;
+  const start = opsDataStartRow_();
+  if (last < start) return null;
   const target = Number(id);
-  const rows = sh.getRange(OP_DATA_ROW, 1, last - OP_DATA_ROW + 1, 8).getValues();
+  const rows = sh.getRange(start, 1, last - start + 1, COL_OPS_READ_).getValues();
   for (let i = 0; i < rows.length; i++) {
-    if (Number(rows[i][0]) === target) return { row: OP_DATA_ROW + i, data: rows[i] };
+    if (Number(rows[i][0]) === target) return { row: start + i, data: rows[i] };
   }
   return null;
 }
@@ -6988,9 +9540,10 @@ function assertPodeLoginOperador_(operadorId) {
 function listarOperadoresLogin_() {
   const sh = operadoresSheet_();
   const last = sh.getLastRow();
+  const start = opsDataStartRow_();
   const operadores = [];
-  if (last >= OP_DATA_ROW) {
-    const rows = sh.getRange(OP_DATA_ROW, 1, last - OP_DATA_ROW + 1, 8).getValues();
+  if (last >= start) {
+    const rows = sh.getRange(start, 1, last - start + 1, COL_OPS_READ_).getValues();
     rows.forEach(r => {
       const op = operadorObjFromRow_(r);
       if (op.nome && op.ativo) operadores.push(op);
@@ -7087,7 +9640,7 @@ function liberarSessaoOperador_(p) {
 }
 
 function liberarSessaoOperadorAdmin_(p) {
-  if (!adminPinOk_(p)) return err_('Acesso negado — PIN admin 1416', 403);
+  if (!adminPinOk_(p)) return err_('Acesso negado — PIN administrativo incorreto', 403);
   liberarSessaoOperadorAtiva_(true, 'logout_admin');
   return resp_({ mensagem: 'Sessao do balcao liberada. Qualquer operador pode entrar.', sessaoAtiva: null });
 }
@@ -7112,8 +9665,9 @@ function cadastrarOperadorSistema_(p) {
   if (!nome) return err_('Nome do operador obrigatorio', 400);
   const sh = operadoresSheet_();
   const last = sh.getLastRow();
-  if (last >= OP_DATA_ROW) {
-    const nomes = sh.getRange(OP_DATA_ROW, 3, last - OP_DATA_ROW + 1, 1).getValues();
+  const start = opsDataStartRow_();
+  if (last >= start) {
+    const nomes = sh.getRange(start, 3, last - start + 1, 1).getValues();
     const dup = nomes.some(r => String(r[0] || '').trim().toLowerCase() === nome.toLowerCase());
     if (dup) return err_('Ja existe operador com este nome', 409);
   }
@@ -7125,8 +9679,9 @@ function cadastrarOperadorSistema_(p) {
 
 function operadorNomeDuplicado_(sh, nome, ignorarId) {
   const last = sh.getLastRow();
-  if (last < OP_DATA_ROW) return false;
-  const rows = sh.getRange(OP_DATA_ROW, 1, last - OP_DATA_ROW + 1, 8).getValues();
+  const start = opsDataStartRow_();
+  if (last < start) return false;
+  const rows = sh.getRange(start, 1, last - start + 1, COL_OPS_READ_).getValues();
   const alvo = nome.toLowerCase();
   return rows.some(r => {
     const id = Number(r[0]);
@@ -7169,9 +9724,10 @@ function excluirOperadorSistema_(p) {
   if (!found) return err_('Operador nao encontrado', 404);
   const sh = operadoresSheet_();
   const last = sh.getLastRow();
+  const start = opsDataStartRow_();
   let ativos = 0;
-  if (last >= OP_DATA_ROW) {
-    const rows = sh.getRange(OP_DATA_ROW, 1, last - OP_DATA_ROW + 1, 8).getValues();
+  if (last >= start) {
+    const rows = sh.getRange(start, 1, last - start + 1, COL_OPS_READ_).getValues();
     rows.forEach(r => {
       if (String(r[5] || 'SIM').toUpperCase() !== 'NAO' && String(r[2] || '').trim()) ativos++;
     });
@@ -7183,7 +9739,7 @@ function excluirOperadorSistema_(p) {
 }
 
 function resetarPinOperadorAdmin_(p) {
-  if (!adminPinOk_(p)) return err_('Acesso negado — use PIN administrativo 1416', 403);
+  if (!adminPinOk_(p)) return err_('Acesso negado — PIN administrativo incorreto', 403);
   const found = operadorRowById_(p.operadorId || p.id);
   if (!found) return err_('Operador nao encontrado', 404);
   const opId = Number(found.data[0]);
@@ -7249,7 +9805,7 @@ function anularLinhaTesteAdmin_(sheet, rowIndex, motivo) {
 }
 
 function limparLocacoesTesteAdmin_(p) {
-  if (!adminPinOk_(p)) return err_('Acesso negado — PIN admin 1416', 403);
+  if (!adminPinOk_(p)) return err_('Acesso negado — PIN administrativo incorreto', 403);
   const motivo = String(p.motivo || 'Limpeza locacoes de teste automatica Codex').trim();
   if (motivo.length < 10) return err_('Motivo obrigatorio (min 10 caracteres)', 400);
   const soHoje = String(p.soHoje || '') === '1' || p.soHoje === true;
@@ -7546,7 +10102,7 @@ function salvarCadastroColaborador_(p) {
 
 /** Admin restaura cadastro RH (recuperacao I45 — sem PIN colaborador). */
 function salvarCadastroRhAdmin_(p) {
-  if (!adminPinOk_(p)) return err_('Acesso negado — PIN admin 1416', 403);
+  if (!adminPinOk_(p)) return err_('Acesso negado — PIN administrativo incorreto', 403);
   const opId = Number(p.operadorId || p.id || 0);
   if (!opId) return err_('operadorId obrigatorio', 400);
   try {
@@ -7561,7 +10117,7 @@ function salvarCadastroRhAdmin_(p) {
 
 /** Export completo COLABORADORES_RH (admin — recuperacao). */
 function exportarCadastroRhAdmin_(p) {
-  if (!adminPinOk_(p)) return err_('Acesso negado — PIN admin 1416', 403);
+  if (!adminPinOk_(p)) return err_('Acesso negado — PIN administrativo incorreto', 403);
   const opId = Number(p.operadorId || p.id || 0);
   const rows = gpRows_(SH_COLAB_RH);
   const lista = rows.map(function (r, i) {
@@ -7578,7 +10134,7 @@ function exportarCadastroRhAdmin_(p) {
 
 /** Admin edita salário, VA, meta, bônus e turno (cols 12–16 COLABORADORES_RH). */
 function salvarDadosContratuaisRhAdmin_(p) {
-  if (!adminPinOk_(p)) return err_('Acesso negado — PIN admin 1416', 403);
+  if (!adminPinOk_(p)) return err_('Acesso negado — PIN administrativo incorreto', 403);
   const opId = Number(p.operadorId || p.id || 0);
   if (!opId) return err_('operadorId obrigatorio', 400);
   try {
@@ -8350,7 +10906,7 @@ function gpPersistBancoHoras_(opId, saldoHhmm) {
 
 /** I44 — zera saldos corrompidos na aba BANCO_HORAS (admin). */
 function repairBancoHorasAdmin_(p) {
-  if (!adminPinOk_(p)) return err_('Acesso negado — PIN admin 1416', 403);
+  if (!adminPinOk_(p)) return err_('Acesso negado — PIN administrativo incorreto', 403);
   try {
     const sh = gpSheet_(SH_BANCO_HORAS);
     if (!sh) return err_('Aba BANCO_HORAS ausente', 503);
@@ -8741,7 +11297,7 @@ function gpBuildPainelColaboradorPayload_(opId, comp, colab, operador) {
 
 /** FASE 15b — ADM 1416 preview: mesma tela colaborador, sem PIN da pessoa. */
 function buscarPainelColaboradorPreview_(p) {
-  if (!adminPinOk_(p)) return err_('Acesso negado — PIN admin 1416', 403);
+  if (!adminPinOk_(p)) return err_('Acesso negado — PIN administrativo incorreto', 403);
   try {
     const opId = Number(p.operadorId || p.id || 0);
     if (!opId) return err_('operadorId obrigatorio', 400);
@@ -8761,7 +11317,7 @@ function buscarPainelColaboradorPreview_(p) {
 }
 
 function listarColaboradoresGestaoPreview_(p) {
-  if (!adminPinOk_(p)) return err_('Acesso negado — PIN admin 1416', 403);
+  if (!adminPinOk_(p)) return err_('Acesso negado — PIN administrativo incorreto', 403);
   return gpListarColaboradoresGestao_();
 }
 
@@ -8809,7 +11365,7 @@ function gpUpsertPontoRhRow_(opId, dataStr, entrada, saida, situacao) {
 }
 
 function salvarPontoRhAdmin_(p) {
-  if (!adminPinOk_(p)) return err_('Acesso negado — PIN admin 1416', 403);
+  if (!adminPinOk_(p)) return err_('Acesso negado — PIN administrativo incorreto', 403);
   const opId = Number(p.operadorId || 0);
   const dataStr = String(p.data || '').trim();
   const entrada = String(p.entrada || '').trim();
@@ -8829,7 +11385,7 @@ function salvarPontoRhAdmin_(p) {
 
 /** Admin — abona falta de um dia (unico ator: ADM PIN 1416). */
 function abonarFaltaRhAdmin_(p) {
-  if (!adminPinOk_(p)) return err_('Acesso negado — PIN admin 1416', 403);
+  if (!adminPinOk_(p)) return err_('Acesso negado — PIN administrativo incorreto', 403);
   const opId = Number(p.operadorId || 0);
   const dataStr = String(p.data || '').trim();
   if (!opId || !dataStr) return err_('operadorId e data obrigatorios', 400);
@@ -8858,7 +11414,7 @@ function abonarFaltaRhAdmin_(p) {
 
 /** I51 — restaura batidas Raykelly jun/2026 (adm 15/06–23/06, dias de escala). */
 function restaurarPontoRaykellyJun2026Admin_(p) {
-  if (!adminPinOk_(p)) return err_('Acesso negado — PIN admin 1416', 403);
+  if (!adminPinOk_(p)) return err_('Acesso negado — PIN administrativo incorreto', 403);
   const opId = 3;
   const batidas = [
     { data: '15/06/2026', entrada: '13:58', saida: '21:05' },
@@ -8874,7 +11430,7 @@ function restaurarPontoRaykellyJun2026Admin_(p) {
   });
   const faltasSyncRemovidas = gpRepairLimparFaltasSyncJornada_(opId);
   const faltasMesRemovidas = gpRepairLimparFaltasOpMesNaoAbonadas_(opId, 6, 2026);
-  const abono20 = JSON.parse(abonarFaltaRhAdmin_({ adminPin: '1416', operadorId: opId, data: '20/06/2026' }).getContent());
+  const abono20 = JSON.parse(abonarFaltaRhAdmin_({ adminPin: '1421', operadorId: opId, data: '20/06/2026' }).getContent());
   gpInvalidateRhCache_();
   return resp_({
     ok: true, operadorId: opId, batidas: log.length, detalhe: log,
@@ -8888,7 +11444,7 @@ function restaurarPontoRaykellyJun2026Admin_(p) {
  * Grava FOLHA_PONTO Raykelly id 3 · jun/2026 · limpa faltas sync.
  */
 function RESTAURAR_PONTO_RAYKELLY_JUN2026() {
-  const r = JSON.parse(restaurarPontoRaykellyJun2026Admin_({ adminPin: '1416' }).getContent());
+  const r = JSON.parse(restaurarPontoRaykellyJun2026Admin_({ adminPin: '1421' }).getContent());
   Logger.log(JSON.stringify(r, null, 2));
   return r;
 }
@@ -8946,7 +11502,7 @@ function registrarPontoColaborador_(p) {
 }
 
 function alertasPontoGestaoAdmin_(p) {
-  if (!adminPinOk_(p)) return err_('Acesso negado — PIN admin 1416', 403);
+  if (!adminPinOk_(p)) return err_('Acesso negado — PIN administrativo incorreto', 403);
   try {
     return resp_(gpAlertasPontoCore_());
   } catch (ex) {
@@ -9163,7 +11719,7 @@ function gestaoPessoasStatus_() {
 
 /** I45 — inventário completo da planilha + RH auditável (admin PIN). */
 function diagnosticoPlanilhaCompletoAdmin_(p) {
-  if (!adminPinOk_(p)) return err_('Acesso negado — PIN admin 1416', 403);
+  if (!adminPinOk_(p)) return err_('Acesso negado — PIN administrativo incorreto', 403);
   try {
     const ss = ss_();
     const mapaGAS = {
@@ -9197,9 +11753,33 @@ function diagnosticoPlanilhaCompletoAdmin_(p) {
       const nome = sh.getName();
       const lastRow = sh.getLastRow();
       const lastCol = sh.getLastColumn();
-      const dataRows = (nome === 'LOCACOES' || nome === 'CUSTOS' || nome === 'INVESTIMENTO')
-        ? (lastRow >= DATA_ROW ? lastRow - DATA_ROW + 1 : 0)
-        : (lastRow >= GP_DATA_ROW ? lastRow - GP_DATA_ROW + 1 : 0);
+      const dataRows = (function () {
+        if (nome === 'LOCACOES' || nome === 'INVESTIMENTO') {
+          return lastRow >= DATA_ROW ? lastRow - DATA_ROW + 1 : 0;
+        }
+        if (nome === 'CUSTOS') {
+          try {
+            const start = cusDataStartRow_();
+            return lastRow >= start ? lastRow - start + 1 : 0;
+          } catch (e) { return 0; }
+        }
+        if (nome === 'CONFIG') {
+          try {
+            const start = cfgDataStartRow_();
+            return lastRow >= start ? lastRow - start + 1 : 0;
+          } catch (e) { return 0; }
+        }
+        if (nome === 'OPERADORES_SISTEMA') {
+          try {
+            const start = opsDataStartRow_();
+            return lastRow >= start ? lastRow - start + 1 : 0;
+          } catch (e) { return 0; }
+        }
+        if (nome === 'RELATORIOS' || nome === SH_AUD || nome === SH_AUD_TURNO || nome === SH_AUD_SMS || nome === SH_AUD_WA || nome === SH_AUD_RESP) {
+          return lastRow >= AUD_LOG_DATA_ROW_ ? lastRow - AUD_LOG_DATA_ROW_ + 1 : 0;
+        }
+        return lastRow >= GP_DATA_ROW ? lastRow - GP_DATA_ROW + 1 : 0;
+      })();
       return {
         nome: nome,
         lastRow: lastRow,
@@ -9245,10 +11825,32 @@ function diagnosticoPlanilhaCompletoAdmin_(p) {
       totalAbas: abas.length,
       abas: abas,
       locacoesAudit: auditLocacoesSampleCore_(20),
+      configAudit: auditConfigSampleCore_(),
+      opsAudit: auditOpsSampleCore_(),
+      custosAudit: auditCustosSampleCore_(20),
+      dashboardAudit: auditDashboardSampleCore_(),
+      folhaAudit: auditFolhaSampleCore_(),
+      investimentoAudit: auditInvestimentoSampleCore_(30),
+      responsaveisAudit: auditResponsaveisSampleCore_(50),
+      relatoriosAudit: auditRelatoriosSampleCore_(20),
+      auditoriaAudit: auditAuditoriaSampleCore_(30),
+      audTurnoAudit: auditAudTurnoSampleCore_(30),
+      audSmsAudit: auditAudSmsSampleCore_(20),
+      audWhatsappAudit: auditAudWhatsappSampleCore_(20),
+      audResponsaveisAudit: auditAudResponsaveisSampleCore_(20),
+      colaboradoresRhAudit: auditColaboradoresRhSampleCore_(10),
+      folhaPontoAudit: auditFolhaPontoSampleCore_(20),
+      bancoHorasAudit: auditBancoHorasSampleCore_(10),
+      escalaAudit: auditEscalaSampleCore_(20),
+      faltasAudit: auditFaltasSampleCore_(30),
+      holeritesAudit: auditHoleritesSampleCore_(20),
+      metasAudit: auditMetasSampleCore_(10),
+      comunicadosRhAudit: auditComunicadosRhSampleCore_(10),
+      avaliacoesRhAudit: auditAvaliacoesRhSampleCore_(10),
       colaboradoresRh: colaboradoresRh,
       folhaPonto: folhaPonto,
       bancoHoras: bancoHoras,
-      versao: 'v1.5.149'
+      versao: 'v1.5.161'
     });
   } catch (ex) {
     return err_('diagnosticoPlanilhaCompleto: ' + ex.message, 500);
@@ -9323,7 +11925,7 @@ function listarComunicadosRhAdmin_(p) {
 }
 
 function salvarComunicadoRhAdmin_(p) {
-  if (!adminPinOk_(p)) return err_('Acesso negado — PIN admin 1416', 403);
+  if (!adminPinOk_(p)) return err_('Acesso negado — PIN administrativo incorreto', 403);
   try {
     const titulo = String(p.titulo || '').trim();
     const mensagem = String(p.mensagem || '').trim();
@@ -9390,7 +11992,7 @@ function listarAvaliacoesRhAdmin_(p) {
 }
 
 function salvarAvaliacaoRhAdmin_(p) {
-  if (!adminPinOk_(p)) return err_('Acesso negado — PIN admin 1416', 403);
+  if (!adminPinOk_(p)) return err_('Acesso negado — PIN administrativo incorreto', 403);
   try {
     const opId = Number(p.operadorId || p.id || 0);
     if (!opId) return err_('operadorId obrigatorio', 400);
@@ -9466,7 +12068,7 @@ function gpRepairAllAdmissoesRh_() {
 
 /** Admin — repara datas, cadastro_pct e formatos RH + opcional banco I44. */
 function repararRhPlanilhaAdmin_(p) {
-  if (!adminPinOk_(p)) return err_('Acesso negado — PIN admin 1416', 403);
+  if (!adminPinOk_(p)) return err_('Acesso negado — PIN administrativo incorreto', 403);
   try {
     gpRepairAllAdmissoesRh_();
     const vaReparados = gpRepairVaDiarioRhRows_();
@@ -9539,7 +12141,7 @@ function mkClaspRunBuscarTextoPlanilha_(termo) {
 
 /** Admin — busca texto em todas as abas (recuperacao dados). */
 function buscarTextoPlanilhaAdmin_(p) {
-  if (!adminPinOk_(p)) return err_('Acesso negado — PIN admin 1416', 403);
+  if (!adminPinOk_(p)) return err_('Acesso negado — PIN administrativo incorreto', 403);
   const termo = String(p.termo || p.q || 'Raykelly').trim();
   if (!termo) return err_('termo obrigatorio', 400);
   const hits = mkClaspRunBuscarTextoPlanilha_(termo);
@@ -9549,7 +12151,7 @@ function buscarTextoPlanilhaAdmin_(p) {
 /** clasp run — repara RH + zera banco corrompido. */
 function mkClaspRunRepararRh_() {
   gpRepairAllAdmissoesRh_();
-  const banco = JSON.parse(repairBancoHorasAdmin_({ adminPin: '1416' }).getContent());
+  const banco = JSON.parse(repairBancoHorasAdmin_({ adminPin: '1421' }).getContent());
   return { colaboradores: mkClaspRunExportRh_(), banco: banco, versao: 'v1.5.139' };
 }
 
@@ -9624,7 +12226,7 @@ function instalarAbasGestaoPessoasCore_(opts) {
 }
 
 function instalarAbasGestaoPessoasAdmin_(p) {
-  if (!adminPinOk_(p)) return err_('Acesso negado — PIN admin 1416', 403);
+  if (!adminPinOk_(p)) return err_('Acesso negado — PIN administrativo incorreto', 403);
   const log = instalarAbasGestaoPessoasCore_({ forceReset: p.forceReset });
   const st = gestaoPessoasStatus_();
   const parsed = JSON.parse(st.getContent());

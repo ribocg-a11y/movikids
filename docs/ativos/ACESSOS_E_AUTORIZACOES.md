@@ -11,7 +11,7 @@
 | Papel | Como entra | O que pode | O que não pode |
 |-------|------------|------------|----------------|
 | **Operador** | Nome + PIN na tela de login | Nova locação, encerrar, estender, editar, cancelar, drawer · **comunicação: QR portal** (sem SMS/WA) | KPIs financeiros do mês, Dashboard admin, custos, config frota, import CRM |
-| **Administrador** | PIN **1416** (gate ou cadeado na sidebar) | Tudo do operador + Dashboard, Caixa detalhado, KPIs, payback, reset PIN, liberar sessão, corrigir financeiro, limpar testes, import RESPONSAVEIS | — |
+| **Administrador** | PIN **1421** (`ADMIN_PIN` Script Property GAS) | Tudo do operador + Dashboard, Caixa detalhado, KPIs, payback, reset PIN, liberar sessão, corrigir financeiro, limpar testes, import RESPONSAVEIS | — |
 | **Supervisor** | Perfil em `OPERADORES_SISTEMA` col. `perfil` | Código existe (v1.5.50) | **F9 PAUSADA** — em produção operadores têm autonomia total (v1.5.52 reverteu restrições) |
 | **Portal responsável** | Telefone em `acompanhar.html` | Ver cronômetro, foto moldura | Sem PIN; sem dados de outros responsáveis |
 
@@ -23,7 +23,7 @@
 
 ## 2. Dados financeiros e gestão (GAS v1.5.43+)
 
-Exigem `adminPin=1416` ou `authRole=admin` no request:
+Exigem `adminPin` válido ou `authRole=admin` no request:
 
 | API / área | Restrição |
 |------------|-----------|
@@ -38,7 +38,9 @@ Operador nas 5 escritas críticas: deve enviar `operador` / `operadorId` (GET no
 
 ---
 
-## 3. APIs administrativas (PIN 1416)
+## 3. APIs administrativas (PIN admin)
+
+**Valor atual (25/06/2026):** **1421** — Script Property `ADMIN_PIN` no GAS (fallback `ADMIN_PIN_PLAIN` no `.gs`).
 
 | Ação | API GAS | Parâmetros chave |
 |------|---------|------------------|
@@ -49,7 +51,7 @@ Operador nas 5 escritas críticas: deve enviar `operador` / `operadorId` (GET no
 | Limpar locações de teste | `limparLocacoesTesteAdmin` | `adminPin`, `motivo` ≥10 chars, `soHoje` opcional |
 | Import CRM (K.1) | `importarResponsaveisAdmin` | `adminPin`, `dryRun` |
 
-**No app:** menu Administrador (PIN 1416) → Operadores → reset / liberar sessão.
+**No app:** menu Administrador (PIN admin) → Operadores → reset / liberar sessão.
 
 **Emergência (browser local):** `scripts/ops/liberar-eduarda-agora.html`, `scripts/ops/liberar-milena-agora.html` — adaptar `operadorId`.
 
@@ -141,6 +143,8 @@ Esta seção responde: **o que o agente faz sozinho, o que valida, o que publica
 ### 7.2 EU (agente) — faço sozinho (sem pedir permissão)
 
 **Regra (17/06/2026):** tudo abaixo pode ser feito **sem** sua autorização prévia. A **única** exceção é a lista fechada §7.3.
+
+**Regra (25/06/2026):** o agente **executa** repair API, testes `.ps1`, `pre-push-check`, docs e planilha OAuth — **não** delega ao usuário. Ver `.cursor/rules/agente-autonomia-movikids.mdc` § "Não transferir". Único limite fixo além de §7.3: **não** colar/reimplantar Web GAS (Nova versão no Editor).
 
 | Ação | Como |
 |------|------|
@@ -267,7 +271,7 @@ Republicar Web GAS: agente **pode** executar **se você pedir** (§7.3.4); no di
 
 ## 9. Checklist rápido para novo chat
 
-1. **Operação balcão** = operador + PIN; **gestão** = admin 1416.
+1. **Operação balcão** = operador + PIN; **gestão** = PIN admin (1421).
 2. **Publicar FE** = agente após `pre-push-check` (**sem pedir**).
 3. **GAS** = agente só com pedido explícito — lista fechada §7.3 (4 itens).
 4. **Planilha** = agente via `google-drive-sheets-auth` (OAuth no PC).

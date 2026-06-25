@@ -6,7 +6,7 @@
 
 | Perfil | Entrada | `authRole` / sessão |
 |--------|---------|---------------------|
-| **Super Admin** | PIN **1416** no tablet/PC | `admin` |
+| **Super Admin** | PIN **1421** (`ADMIN_PIN` GAS) | `admin` |
 | **Gestor** | PIN na planilha `OPERADORES_SISTEMA` · col perfil `gestor` | `gestor` |
 | **Supervisor** | PIN · perfil `supervisor` (F9 pausado) | `supervisor` |
 | **Operador** | Nome + PIN balcão | `operador` |

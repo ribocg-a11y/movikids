@@ -496,7 +496,14 @@ html.gp-mode-app #gp-app {
 #gp-app .gp-av-obs { margin: 0 0 6px; font-size: 13px; font-weight: 600; color: var(--txt2); line-height: 1.45; }
 #gp-app .gp-av-meta { font-size: 10px; font-weight: 700; color: var(--txt3); }
 
-.gp-preview-banner {
+html.gp-prod #gp-preview-banner {
+  display: none !important;
+  visibility: hidden !important;
+  height: 0 !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
   position: sticky;
   top: 0;
   z-index: 50;

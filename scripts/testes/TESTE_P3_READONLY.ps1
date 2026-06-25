@@ -1,7 +1,7 @@
 # P3 readonly — auditoria, PDF executivo, recorrente CRM (GAS v1.5.73+)
 $ErrorActionPreference = 'Stop'
 $base = 'https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec'
-$pin = '1416'
+$pin = '1421'
 
 Write-Host '=== ping ===' -ForegroundColor Cyan
 $p = Invoke-RestMethod -Uri "$base`?action=ping" -Method Get -TimeoutSec 20

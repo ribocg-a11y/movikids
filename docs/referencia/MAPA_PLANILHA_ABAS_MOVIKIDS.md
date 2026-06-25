@@ -234,20 +234,34 @@ Legenda: **Alimenta** = quem lê/consome · **Gravado por** = quem escreve em ru
 
 Fonte: comentário `salvarLocacao_` + `locacaoObj_` no `.gs`.
 
-### CUSTOS (header linha 9)
+### CUSTOS (layout I55 — memorial 1–3, header 9, dados 11)
 
 | Col | Header | Uso |
 |-----|--------|-----|
-| A | # | id |
-| B | Data | dd/mm |
-| C | Hora | HH:mm |
-| D | Descricao | texto |
-| E | Categoria | mini-DRE |
-| F | Valor | R$ |
+| A | # | id sequencial |
+| B | Data | dd/mm/yyyy |
+| C | Hora | hh:mm |
+| D | Descricao | texto despesa |
+| E | Categoria | mini-DRE (CMV/OPEX) |
+| F | Valor | R$ numerico |
 
-### CONFIG (linhas 1–61)
+**Repair:** `repararCustosPlanilhaAdmin` · GAS **v1.5.152+** · checklist `CHECKLIST_ABA_PLANILHA_CUSTOS.md`
 
-Chaves JSON em colunas A–D: `veiculos_validos_json`, `precos_json`, `formas_pagamento_json`, `regras_operacionais_json`. Preços visuais e frota — ver `FASE_4_CONFIG_PLANILHA.md`. **Não editar manualmente** sem alinhar GAS `precosOp_()`.
+### CONFIG (layout I53 — memorial 1–3, header 4, dados 5+)
+
+| Linha | Conteúdo |
+|-------|----------|
+| 1–3 | Memorial MOVI KIDS — não editar manualmente |
+| 4 | Header **Chave** \| **Valor** (congelado + protegido) |
+| 5+ | Pares chave-valor JSON |
+
+**Chaves obrigatórias (col A):** `veiculos_validos_json`, `precos_json`, `formas_pagamento_json`, `regras_operacionais_json`.
+
+**Legado:** header linha 1 / dados linha 2 — migrado por `repararConfigPlanilhaAdmin` (I53).
+
+Preços e frota — ver `FASE_4_CONFIG_PLANILHA.md` · checklist `CHECKLIST_ABA_PLANILHA_CONFIG.md`. **Não editar manualmente** sem alinhar GAS `operacaoConfig_()`.
+
+**Repair GAS:** `repararConfigPlanilhaAdmin` · script `REPARAR_CONFIG_PLANILHA_ADMIN.ps1` · GAS **v1.5.150+**
 
 ### COLABORADORES_RH (header linha 1, dados linha 2+)
 
@@ -297,18 +311,25 @@ Gate: `gpCadastroOk_` = 8 campos B,D,E,F,H,I,J,K preenchidos (100%).
 | HOLERITES | id, operador_id, competencia, base, bonus, faltas, inss, irrf, vt, liquido, fgts, va_total, dias_trab, obs, gerado_em | `gpPersistHoleriteSnapshot_` no colaborador quinzena 2 |
 | BANCO_HORAS | operador_id, saldo_hhmm, atualizado_em | saída ponto + repair admin |
 
-### OPERADORES_SISTEMA (login balcão — ≠ RH)
+### OPERADORES_SISTEMA (login balcão — layout I54, ≠ RH)
 
-| Col | Campo |
-|-----|-------|
-| 1 | id |
-| 2 | nome |
-| 3 | perfil |
-| 4 | pin_hash |
-| 5 | pin_salt |
-| 6 | ativo |
-| 7 | ultimo_login |
-| 8 | observacao |
+| Linha | Conteúdo |
+|-------|----------|
+| 1–3 | Memorial MOVI KIDS — PIN login balcão |
+| 4 | Header 8 cols (congelado + protegido) |
+| 5+ | Operadores ativos |
+
+| Col | Campo GAS | Notas |
+|-----|-----------|-------|
+| A | id | FK ponto RH, locações |
+| B | criadoEm | timestamp cadastro |
+| C | nome | Eduarda, Milena Nunes (seed) |
+| D–E | pinHash, pinSalt | nunca editar manual |
+| F | ativo | SIM / NAO |
+| G | ultimoLogin | auditoria |
+| H | perfil | operador · gestor · supervisor |
+
+**Repair:** `repararOperadoresSistemaPlanilhaAdmin` · GAS **v1.5.151+** · checklist `CHECKLIST_ABA_PLANILHA_OPERADORES_SISTEMA.md`
 
 ---
 
@@ -353,13 +374,15 @@ Fonte: `diagnosticoPlanilhaCompletoAdmin` · ping **v1.5.141**
 
 **Protocolo mestre por aba:** `docs/ativos/PROTOCOLO_AUDITORIA_ABAS_PLANILHA.md`  
 **Piloto fechado:** `docs/referencia/CHECKLIST_ABA_PLANILHA_LOCACOES.md`  
+**CONFIG I53:** `docs/referencia/CHECKLIST_ABA_PLANILHA_CONFIG.md` (repo · Web pendente)  
 **Template próxima aba:** `docs/referencia/CHECKLIST_ABA_PLANILHA_TEMPLATE.md`
 
 ```powershell
-# Por aba (LOCACOES piloto — CONFIG próximo)
+# Por aba (LOCACOES ✅ · CONFIG após Web v1.5.150)
 .\scripts\testes\TESTE_PROTOCOLO_ABA_PLANILHA.ps1 -Aba LOCACOES
-.\scripts\testes\TESTE_PROTOCOLO_ABA_PLANILHA.ps1 -Aba LOCACOES -DryRun
-.\scripts\testes\TESTE_PROTOCOLO_ABA_PLANILHA.ps1 -Aba CONFIG -SomenteLeitura
+.\scripts\testes\TESTE_PROTOCOLO_ABA_PLANILHA.ps1 -Aba CONFIG -DryRun
+.\scripts\testes\REPARAR_CONFIG_PLANILHA_ADMIN.ps1
+.\scripts\testes\TESTE_OPERACAO_CONFIG_READONLY.ps1
 
 # Suite geral
 .\scripts\testes\TESTE_AUDITORIA_PLANILHA_COMPLETA_READONLY.ps1

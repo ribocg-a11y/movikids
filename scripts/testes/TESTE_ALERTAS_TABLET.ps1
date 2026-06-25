@@ -3,7 +3,7 @@ param(
   [string]$BaseUrl = "https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec",
   [string]$FeUrl = "https://ribocg-a11y.github.io/movikids/?force=1.8.21",
   [string]$Operador = "TESTE_ALERTAS",
-  [string]$AdminPin = "1416",
+  [string]$AdminPin = "1421",
   [switch]$GasOnly
 )
 

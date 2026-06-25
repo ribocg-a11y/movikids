@@ -33,8 +33,12 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 |--------|-------------|----------|
 | **Frontend** | **v1.8.119** | https://ribocg-a11y.github.io/movikids/?force=1.8.119 · **Colaboradores:** `gestao-pessoas.html?force=1.8.119` |
 | **Design System** | **v1.1** | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
-| **Apps Script** | repo **v1.5.149** (I52) · Web ping **v1.5.149** ✅ | `repararLocacoesPlanilhaAdmin` · `validarSchema` 28 cols |
-| **LOCACOES** | repair I52 24/06 | memorial + headers 28 cols · **schemaOk=True** |
+| **Apps Script** | **v1.5.161** | I63 RH resto ✅ · **schemaOk=True** (23 abas) |
+| **RELATORIOS** | repair I60 24/06 | 1 registro · **schemaOk=True** |
+| **RESPONSAVEIS** | repair I59 24/06 | **241** cadastros · **schemaOk=True** |
+| **FOLHA** | repair I57 24/06 | B68 **5269,96** · VA/dia **15,38** · **schemaOk=True** |
+| **OPERADORES_SISTEMA** | repair I54 24/06 | **schemaOk=True** |
+| **CUSTOS** | repair I55 24/06 | 10 linhas · soma mes ~3477 · **schemaOk=True** |
 | **Aba BANCO_HORAS** | ✅ repair 23/06 | Milena/Raykelly **0h00** |
 | **Aba FOLHA** | memorial B68 **OK** | [gid=179040058](https://docs.google.com/spreadsheets/d/1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618/edit#gid=179040058) · B68 ~5269,96 |
 
@@ -42,7 +46,7 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 **Teste rápido GAS (ping):**  
 https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec?action=ping  
-→ ping **v1.5.149** · repo **v1.5.149** · operação verificar com `check-operacao-livre.ps1`
+→ ping **v1.5.161** · `validarSchema` **schemaOk=True** (23 abas I52–I63)
 
 **URL morta (não usar):** `AKfycbzc...` → 404
 

@@ -1,7 +1,7 @@
 # I52 — repair aba LOCACOES: memorial, headers 28 cols, formatos, proteção, limpar testes
 param(
   [string]$BaseUrl = "https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec",
-  [string]$AdminPin = "1416",
+  [string]$AdminPin = "1421",
   [switch]$DryRun,
   [switch]$SkipLimparTeste
 )

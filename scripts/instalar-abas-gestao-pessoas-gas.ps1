@@ -1,6 +1,6 @@
 # Instala abas Gestão Pessoas via GAS (requer GAS v1.5.98 publicado)
 $GasUrl = "https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec"
-$Pin = "1416"
+$Pin = "1421"
 Write-Host "Instalando abas Gestao Pessoas via GAS admin..."
 try {
   $r = Invoke-RestMethod "$GasUrl`?action=instalarAbasGestaoPessoasAdmin&adminPin=$Pin&_t=$(Get-Date -UFormat %s)" -MaximumRedirection 5

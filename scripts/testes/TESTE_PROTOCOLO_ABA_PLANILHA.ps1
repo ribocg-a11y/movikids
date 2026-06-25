@@ -10,7 +10,7 @@ param(
   [Parameter(Mandatory = $true)]
   [string]$Aba,
   [string]$BaseUrl = "https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec",
-  [string]$AdminPin = "1416",
+  [string]$AdminPin = "1421",
   [switch]$DryRun,
   [switch]$SomenteLeitura,
   [switch]$SkipRepair
@@ -26,7 +26,138 @@ $repairActions = @{
     fluxoTeste = "TESTE_I43_CARREGAR_INICIO_READONLY.ps1"
     fluxoNome = "I43 cronometro col Y"
   }
-  # Proximas abas: adicionar ao implementar repair GAS
+  CONFIG = @{
+    repairAction = "repararConfigPlanilhaAdmin"
+    repairScript = "REPARAR_CONFIG_PLANILHA_ADMIN.ps1"
+    fluxoTeste = "TESTE_OPERACAO_CONFIG_READONLY.ps1"
+    fluxoNome = "CONFIG operacional frota precos"
+  }
+  OPERADORES_SISTEMA = @{
+    repairAction = "repararOperadoresSistemaPlanilhaAdmin"
+    repairScript = "REPARAR_OPERADORES_SISTEMA_PLANILHA_ADMIN.ps1"
+    fluxoTeste = "TESTE_SESSAO_LIBERAR_READONLY.ps1"
+    fluxoNome = "login operadores sessao admin"
+  }
+  CUSTOS = @{
+    repairAction = "repararCustosPlanilhaAdmin"
+    repairScript = "REPARAR_CUSTOS_PLANILHA_ADMIN.ps1"
+    fluxoTeste = "TESTE_CUSTOS_READONLY.ps1"
+    fluxoNome = "listarCustos resumoDia caixa"
+  }
+  DASHBOARD = @{
+    repairAction = "repararDashboardPlanilhaAdmin"
+    repairScript = "REPARAR_DASHBOARD_PLANILHA_ADMIN.ps1"
+    fluxoTeste = "TESTE_DASHBOARD_READONLY.ps1"
+    fluxoNome = "kpiMes audit formulas memorial"
+  }
+  FOLHA = @{
+    repairAction = "repararFolhaPlanilhaAdmin"
+    repairScript = "REPARAR_FOLHA_PLANILHA_ADMIN.ps1"
+    fluxoTeste = "TESTE_FOLHA_FORMULAS_READONLY.ps1"
+    fluxoNome = "formulas USER_ENTERED B68 folhaPlanejamento"
+  }
+  INVESTIMENTO = @{
+    repairAction = "repararInvestimentoPlanilhaAdmin"
+    repairScript = "REPARAR_INVESTIMENTO_PLANILHA_ADMIN.ps1"
+    fluxoTeste = "TESTE_INVESTIMENTO_READONLY.ps1"
+    fluxoNome = "payback kpiMes investimentoTotal"
+  }
+  RESPONSAVEIS = @{
+    repairAction = "repararResponsaveisPlanilhaAdmin"
+    repairScript = "REPARAR_RESPONSAVEIS_PLANILHA_ADMIN.ps1"
+    fluxoTeste = "TESTE_RELACIONAMENTO_MOVIKIDS_READONLY.ps1"
+    fluxoNome = "listarResponsaveis CRM portal"
+  }
+  RELATORIOS = @{
+    repairAction = "repararRelatoriosPlanilhaAdmin"
+    repairScript = "REPARAR_RELATORIOS_PLANILHA_ADMIN.ps1"
+    fluxoTeste = "TESTE_RELATORIOS_READONLY.ps1"
+    fluxoNome = "listarRelatorios PDFs mensais"
+  }
+  AUDITORIA = @{
+    repairAction = "repararAuditoriaPlanilhaAdmin"
+    repairScript = "REPARAR_AUD_CAMADA4_PLANILHA_ADMIN.ps1"
+    fluxoTeste = "TESTE_AUD_CAMADA4_READONLY.ps1"
+    fluxoNome = "listarAuditoriaAdmin metas RH"
+  }
+  AUD_TURNO = @{
+    repairAction = "repararAudTurnoPlanilhaAdmin"
+    repairScript = "REPARAR_AUD_CAMADA4_PLANILHA_ADMIN.ps1"
+    fluxoTeste = "TESTE_AUD_CAMADA4_READONLY.ps1"
+    fluxoNome = "login logout balcao log"
+  }
+  AUD_SMS = @{
+    repairAction = "repararAudSmsPlanilhaAdmin"
+    repairScript = "REPARAR_AUD_CAMADA4_PLANILHA_ADMIN.ps1"
+    fluxoTeste = "TESTE_AUD_CAMADA4_READONLY.ps1"
+    fluxoNome = "SMS pausado log historico"
+  }
+  AUD_WHATSAPP = @{
+    repairAction = "repararAudWhatsappPlanilhaAdmin"
+    repairScript = "REPARAR_AUD_CAMADA4_PLANILHA_ADMIN.ps1"
+    fluxoTeste = "TESTE_AUD_CAMADA4_READONLY.ps1"
+    fluxoNome = "WhatsApp pausado log"
+  }
+  AUD_RESPONSAVEIS = @{
+    repairAction = "repararAudResponsaveisPlanilhaAdmin"
+    repairScript = "REPARAR_AUD_CAMADA4_PLANILHA_ADMIN.ps1"
+    fluxoTeste = "TESTE_AUD_CAMADA4_READONLY.ps1"
+    fluxoNome = "import CRM audit log"
+  }
+  COLABORADORES_RH = @{
+    repairAction = "repararColaboradoresRhPlanilhaAdmin"
+    repairScript = "REPARAR_RH_CAMADA5_PLANILHA_ADMIN.ps1"
+    fluxoTeste = "TESTE_RH_CAMADA5_READONLY.ps1"
+    fluxoNome = "painelGestaoPessoas cadastro gate 428"
+  }
+  FOLHA_PONTO = @{
+    repairAction = "repararFolhaPontoPlanilhaAdmin"
+    repairScript = "REPARAR_RH_CAMADA5_PLANILHA_ADMIN.ps1"
+    fluxoTeste = "TESTE_RH_CAMADA5_READONLY.ps1"
+    fluxoNome = "ponto RH entrada saida"
+  }
+  BANCO_HORAS = @{
+    repairAction = "repararBancoHorasPlanilhaAdmin"
+    repairScript = "REPARAR_RH_CAMADA5_PLANILHA_ADMIN.ps1"
+    fluxoTeste = "TESTE_RH_CAMADA5_READONLY.ps1"
+    fluxoNome = "saldo banco horas I44"
+  }
+  ESCALA_COLABORADORES = @{
+    repairAction = "repararEscalaPlanilhaAdmin"
+    repairScript = "REPARAR_RH_CAMADA5_RESTO_PLANILHA_ADMIN.ps1"
+    fluxoTeste = "TESTE_RH_CAMADA5_RESTO_READONLY.ps1"
+    fluxoNome = "escala jornada GP"
+  }
+  FALTAS_AUSENCIAS = @{
+    repairAction = "repararFaltasPlanilhaAdmin"
+    repairScript = "REPARAR_RH_CAMADA5_RESTO_PLANILHA_ADMIN.ps1"
+    fluxoTeste = "TESTE_RH_CAMADA5_RESTO_READONLY.ps1"
+    fluxoNome = "faltas abono sync jornada"
+  }
+  HOLERITES = @{
+    repairAction = "repararHoleritesPlanilhaAdmin"
+    repairScript = "REPARAR_RH_CAMADA5_RESTO_PLANILHA_ADMIN.ps1"
+    fluxoTeste = "TESTE_RH_CAMADA5_RESTO_READONLY.ps1"
+    fluxoNome = "holerite competencia"
+  }
+  METAS_COLABORADORES = @{
+    repairAction = "repararMetasPlanilhaAdmin"
+    repairScript = "REPARAR_RH_CAMADA5_RESTO_PLANILHA_ADMIN.ps1"
+    fluxoTeste = "TESTE_RH_CAMADA5_RESTO_READONLY.ps1"
+    fluxoNome = "metas bonus demo"
+  }
+  COMUNICADOS_RH = @{
+    repairAction = "repararComunicadosRhPlanilhaAdmin"
+    repairScript = "REPARAR_RH_CAMADA5_RESTO_PLANILHA_ADMIN.ps1"
+    fluxoTeste = "TESTE_RH_CAMADA5_RESTO_READONLY.ps1"
+    fluxoNome = "comunicados portal RH"
+  }
+  AVALIACOES_RH = @{
+    repairAction = "repararAvaliacoesRhPlanilhaAdmin"
+    repairScript = "REPARAR_RH_CAMADA5_RESTO_PLANILHA_ADMIN.ps1"
+    fluxoTeste = "TESTE_RH_CAMADA5_RESTO_READONLY.ps1"
+    fluxoNome = "avaliacoes nota 0-10"
+  }
 }
 
 function Invoke-MkApi {
@@ -82,6 +213,116 @@ try {
     Add-Check "locacoes.audit" $(if ($nProb -eq 0) { "ok" } else { "warn" }) ("problemas=" + $nProb)
   }
 
+  if ($Aba -eq "CONFIG" -and $diag.configAudit) {
+    $nProb = @($diag.configAudit.problemas).Count
+    Add-Check "config.audit" $(if ($nProb -eq 0) { "ok" } else { "warn" }) ("problemas=" + $nProb + " veiculos=" + $diag.configAudit.veiculos)
+  }
+
+  if ($Aba -eq "OPERADORES_SISTEMA" -and $diag.opsAudit) {
+    $nProb = @($diag.opsAudit.problemas).Count
+    Add-Check "ops.audit" $(if ($nProb -eq 0) { "ok" } else { "warn" }) ("problemas=" + $nProb + " ativos=" + $diag.opsAudit.operadoresAtivos)
+  }
+
+  if ($Aba -eq "CUSTOS" -and $diag.custosAudit) {
+    $nProb = @($diag.custosAudit.problemas).Count
+    Add-Check "custos.audit" $(if ($nProb -eq 0) { "ok" } else { "warn" }) ("problemas=" + $nProb + " soma=" + $diag.custosAudit.somaAmostra)
+  }
+
+  if ($Aba -eq "DASHBOARD" -and $diag.dashboardAudit) {
+    $nProb = @($diag.dashboardAudit.problemas).Count
+    Add-Check "dashboard.audit" $(if ($nProb -eq 0) { "ok" } else { "warn" }) ("problemas=" + $nProb + " memorial=" + $diag.dashboardAudit.memorialOk)
+  }
+
+  if ($Aba -eq "FOLHA" -and $diag.folhaAudit) {
+    $nProb = @($diag.folhaAudit.problemas).Count
+    Add-Check "folha.audit" $(if ($nProb -eq 0) { "ok" } else { "warn" }) ("problemas=" + $nProb + " B68=" + $diag.folhaAudit.b68)
+  }
+
+  if ($Aba -eq "INVESTIMENTO" -and $diag.investimentoAudit) {
+    $nProb = @($diag.investimentoAudit.problemas).Count
+    Add-Check "investimento.audit" $(if ($nProb -eq 0) { "ok" } else { "warn" }) ("problemas=" + $nProb + " total=" + $diag.investimentoAudit.investimentoTotal)
+  }
+
+  if ($Aba -eq "RESPONSAVEIS" -and $diag.responsaveisAudit) {
+    $nProb = @($diag.responsaveisAudit.problemas).Count
+    Add-Check "responsaveis.audit" $(if ($nProb -eq 0) { "ok" } else { "warn" }) ("problemas=" + $nProb + " cadastros=" + $diag.responsaveisAudit.cadastrosPlanilha)
+  }
+
+  if ($Aba -eq "RELATORIOS" -and $diag.relatoriosAudit) {
+    $nProb = @($diag.relatoriosAudit.problemas).Count
+    Add-Check "relatorios.audit" $(if ($nProb -eq 0) { "ok" } else { "warn" }) ("problemas=" + $nProb + " registros=" + $diag.relatoriosAudit.registros)
+  }
+
+  if ($Aba -eq "AUDITORIA" -and $diag.auditoriaAudit) {
+    $nProb = @($diag.auditoriaAudit.problemas).Count
+    Add-Check "auditoria.audit" $(if ($nProb -eq 0) { "ok" } else { "warn" }) ("problemas=" + $nProb + " registros=" + $diag.auditoriaAudit.registros)
+  }
+
+  if ($Aba -eq "AUD_TURNO" -and $diag.audTurnoAudit) {
+    $nProb = @($diag.audTurnoAudit.problemas).Count
+    Add-Check "audTurno.audit" $(if ($nProb -eq 0) { "ok" } else { "warn" }) ("problemas=" + $nProb + " registros=" + $diag.audTurnoAudit.registros)
+  }
+
+  if ($Aba -eq "AUD_SMS" -and $diag.audSmsAudit) {
+    $nProb = @($diag.audSmsAudit.problemas).Count
+    Add-Check "audSms.audit" $(if ($nProb -eq 0) { "ok" } else { "warn" }) ("problemas=" + $nProb + " registros=" + $diag.audSmsAudit.registros)
+  }
+
+  if ($Aba -eq "AUD_WHATSAPP" -and $diag.audWhatsappAudit) {
+    $nProb = @($diag.audWhatsappAudit.problemas).Count
+    Add-Check "audWhatsapp.audit" $(if ($nProb -eq 0) { "ok" } else { "warn" }) ("problemas=" + $nProb + " registros=" + $diag.audWhatsappAudit.registros)
+  }
+
+  if ($Aba -eq "AUD_RESPONSAVEIS" -and $diag.audResponsaveisAudit) {
+    $nProb = @($diag.audResponsaveisAudit.problemas).Count
+    Add-Check "audResponsaveis.audit" $(if ($nProb -eq 0) { "ok" } else { "warn" }) ("problemas=" + $nProb + " registros=" + $diag.audResponsaveisAudit.registros)
+  }
+
+  if ($Aba -eq "COLABORADORES_RH" -and $diag.colaboradoresRhAudit) {
+    $nProb = @($diag.colaboradoresRhAudit.problemas).Count
+    Add-Check "colabRh.audit" $(if ($nProb -eq 0) { "ok" } else { "warn" }) ("problemas=" + $nProb + " registros=" + $diag.colaboradoresRhAudit.registros)
+  }
+
+  if ($Aba -eq "FOLHA_PONTO" -and $diag.folhaPontoAudit) {
+    $nProb = @($diag.folhaPontoAudit.problemas).Count
+    Add-Check "folhaPonto.audit" $(if ($nProb -eq 0) { "ok" } else { "warn" }) ("problemas=" + $nProb + " registros=" + $diag.folhaPontoAudit.registros)
+  }
+
+  if ($Aba -eq "BANCO_HORAS" -and $diag.bancoHorasAudit) {
+    $nProb = @($diag.bancoHorasAudit.problemas).Count
+    Add-Check "bancoHoras.audit" $(if ($nProb -eq 0) { "ok" } else { "warn" }) ("problemas=" + $nProb + " registros=" + $diag.bancoHorasAudit.registros)
+  }
+
+  if ($Aba -eq "ESCALA_COLABORADORES" -and $diag.escalaAudit) {
+    $nProb = @($diag.escalaAudit.problemas).Count
+    Add-Check "escala.audit" $(if ($nProb -eq 0) { "ok" } else { "warn" }) ("problemas=" + $nProb + " registros=" + $diag.escalaAudit.registros)
+  }
+
+  if ($Aba -eq "FALTAS_AUSENCIAS" -and $diag.faltasAudit) {
+    $nProb = @($diag.faltasAudit.problemas).Count
+    Add-Check "faltas.audit" $(if ($nProb -eq 0) { "ok" } else { "warn" }) ("problemas=" + $nProb + " registros=" + $diag.faltasAudit.registros)
+  }
+
+  if ($Aba -eq "HOLERITES" -and $diag.holeritesAudit) {
+    $nProb = @($diag.holeritesAudit.problemas).Count
+    Add-Check "holerites.audit" $(if ($nProb -eq 0) { "ok" } else { "warn" }) ("problemas=" + $nProb + " registros=" + $diag.holeritesAudit.registros)
+  }
+
+  if ($Aba -eq "METAS_COLABORADORES" -and $diag.metasAudit) {
+    $nProb = @($diag.metasAudit.problemas).Count
+    Add-Check "metas.audit" $(if ($nProb -eq 0) { "ok" } else { "warn" }) ("problemas=" + $nProb + " registros=" + $diag.metasAudit.registros)
+  }
+
+  if ($Aba -eq "COMUNICADOS_RH" -and $diag.comunicadosRhAudit) {
+    $nProb = @($diag.comunicadosRhAudit.problemas).Count
+    Add-Check "comunicadosRh.audit" $(if ($nProb -eq 0) { "ok" } else { "warn" }) ("problemas=" + $nProb + " registros=" + $diag.comunicadosRhAudit.registros)
+  }
+
+  if ($Aba -eq "AVALIACOES_RH" -and $diag.avaliacoesRhAudit) {
+    $nProb = @($diag.avaliacoesRhAudit.problemas).Count
+    Add-Check "avaliacoesRh.audit" $(if ($nProb -eq 0) { "ok" } else { "warn" }) ("problemas=" + $nProb + " registros=" + $diag.avaliacoesRhAudit.registros)
+  }
+
   $schema = Invoke-MkApi @{ action = "validarSchema" }
   if ($schema.resultado.$Aba) {
     $s = $schema.resultado.$Aba
@@ -107,9 +348,18 @@ try {
       $repair = Invoke-MkApi $rp
       if (-not $repair.ok) { throw $repair.erro }
       if ($repair.dryRun) {
-        Add-Check "repair.dryRun" "ok" ("schemaOk=" + $repair.schemaOk + " prob=" + @($repair.audit.problemas).Count)
+        $schemaOk = if ($null -ne $repair.schemaOk) { $repair.schemaOk } elseif ($repair.schema) { $repair.schema.ok } else { "?" }
+        Add-Check "repair.dryRun" "ok" ("schemaOk=" + $schemaOk + " prob=" + @($repair.audit.problemas).Count)
       } else {
-        Add-Check "repair.aplicado" "ok" ("schemaOk=" + $repair.schemaOk + " linhas=" + $repair.formatos.linhas)
+        $detail = "schemaOk=$($repair.schemaOk)"
+        if ($repair.formatos -and $repair.formatos.linhas) {
+          $detail += " linhas=$($repair.formatos.linhas)"
+        } elseif ($repair.kpiSync) {
+          $detail += " kpiSync=ok"
+        } elseif ($repair.formulas) {
+          $detail += " formulas B68=$($repair.formulas.b68)"
+        }
+        Add-Check "repair.aplicado" "ok" $detail
       }
     }
     if ($cfg.fluxoTeste -and (Test-Path (Join-Path $PSScriptRoot $cfg.fluxoTeste))) {

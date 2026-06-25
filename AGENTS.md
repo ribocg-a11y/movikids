@@ -50,7 +50,7 @@ Detalhe completo: [`ACESSOS_E_AUTORIZACOES.md`](docs/ativos/ACESSOS_E_AUTORIZACO
 | Papel | Entrada |
 |-------|---------|
 | Operador | Nome + PIN |
-| Admin | PIN **1416** |
+| Admin | PIN **1421** (Script Property `ADMIN_PIN` no GAS) |
 | Portal | Telefone |
 
 ## Produção atual
@@ -59,7 +59,7 @@ Detalhe completo: [`ACESSOS_E_AUTORIZACOES.md`](docs/ativos/ACESSOS_E_AUTORIZACO
 |--------|-------------|---------------|
 | Frontend | **v1.8.119** | https://ribocg-a11y.github.io/movikids/?force=1.8.119 |
 | Gestão Pessoas | **v1.8.119** | `gestao-pessoas.html?force=1.8.119` |
-| GAS | repo **v1.5.149** · ping **v1.5.149** | I52 LOCACOES schema 28 cols |
+| GAS | **v1.5.161** | I52–I63 abas protocolo (23 abas) ✅ |
 | LOCACOES planilha | repair I52 24/06 | `validarSchema` **schemaOk=True** |
 | Design System | **v1.1** | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
 | Aba FOLHA | OK (I25) | B68 ~5269,96 · `folhaPlanejamento.fonte: FOLHA` |
@@ -100,8 +100,19 @@ Fonte de verdade: `mk-version.js`, header do `.gs`, ping GAS.
 - **FASE 14 mini-DRE:** ✅ prod
 - **FASE 15–17:** 🟡 homolog tablet pendente
 - **I43:** ✅ prod (cronômetro)
-- **I52:** ✅ GAS v1.5.149 Web + repair LOCACOES (`schemaOk=True`)
-- **Próximo:** Raykelly cadastro 100% · homolog tablet I43/I42
+- **I52:** ✅ GAS v1.5.149+ LOCACOES repair (`schemaOk=True`)
+- **I53:** ✅ CONFIG prod v1.5.150
+- **I54:** ✅ OPERADORES prod v1.5.151
+- **I55:** ✅ CUSTOS prod v1.5.152 · `schemaOk=True`
+- **I56:** ✅ DASHBOARD prod v1.5.153 · `schemaOk=True`
+- **I57:** ✅ FOLHA prod v1.5.154 · B68=5269,96 · `schemaOk=True`
+- **I58:** ✅ INVESTIMENTO prod v1.5.155 · I=R$ 69.410 · `schemaOk=True`
+- **I59:** ✅ RESPONSAVEIS prod v1.5.156 · 241 cadastros · `schemaOk=True` (1 tel curto L233 aviso)
+- **I60:** ✅ RELATORIOS prod v1.5.158 · **schemaOk=True**
+- **I61:** ✅ Camada 4 AUD_* prod v1.5.159
+- **I62:** ✅ RH P0 prod v1.5.160 · **schemaOk=True** (17 abas)
+- **I63:** ✅ RH resto prod v1.5.161 · **schemaOk=True** (23 abas)
+- **Próximo:** RH camada 5 restante (ESCALA, FALTAS, HOLERITES)
 
 ## "Atualize tudo"
 

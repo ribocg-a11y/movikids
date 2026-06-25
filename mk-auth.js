@@ -553,7 +553,7 @@
     setTimeout(function () { location.href = qs; }, 900);
   }
 
-  /** ADM — pré-visualizar hub colaborador (somente leitura, PIN 1416). */
+  /** ADM — pré-visualizar hub colaborador (somente leitura; PIN validado no GAS). */
   window.mkAbrirColaboradoresPreview_ = async function mkAbrirColaboradoresPreview_() {
     if (typeof mkAuthEnsureAdminPin_ === 'function') {
       const ok = await mkAuthEnsureAdminPin_('Pré-visualizar colaborador');
