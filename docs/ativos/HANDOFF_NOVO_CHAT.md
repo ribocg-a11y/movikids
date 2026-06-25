@@ -121,6 +121,8 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 | 10 | ~~AUD_* camada 4 protocolo I61~~ | **Sócio** + agente | ✅ prod 25/06 |
 | 11 | ~~RH camada 5 P0 protocolo I62~~ | **Sócio** + agente | ✅ prod 25/06 |
 | 12 | ~~RH camada 5 restante I63~~ | **Sócio** + agente | ✅ prod 25/06 |
+| 12b | ~~Auditoria célula 3 camadas (I52–I63 + OAuth)~~ | Agente | ✅ 25/06 · **23/23 ok** · I67 Neide L233 |
+| 12c | ~~FOLHA_PONTO L8 Milena 24/06~~ | Agente | ✅ `SALVAR_PONTO_RH_ADMIN.ps1` |
 | 4 | Tablet `?force=1.8.119` — login PIN Milena/Raykelly (I47) | Ops loja | ⏳ |
 | 5 | Raykelly cadastro **100%** em `gestao-pessoas.html` (PIN dela) | Colaborador | ⏳ 25% |
 | 6 | Homolog ▶ cronômetro (I43) + Caixa I42 + Gestor | Ops loja | ⏳ |

@@ -107,12 +107,12 @@ Mesma ordem §5 de `PROTOCOLO_AUDITORIA_ABAS_PLANILHA.md` — LOCACOES primeiro 
 | Camada | Resultado |
 |--------|-----------|
 | 1 GAS | `schemaOk=true` |
-| 2 (23 abas) | 22 ok · 1 warn (RESPONSAVEIS L233 tel. curto) |
+| 2 (23 abas) | **23 ok** · 0 warns |
 | 3 OAuth LOCACOES | 0 issues (853 linhas) |
 
 **Correção pós-auditoria:** FOLHA_PONTO L8 Milena — `SALVAR_PONTO_RH_ADMIN.ps1` · revalidação `problemas=0`.
 
-**P2 aberto:** RESPONSAVEIS L233 Neide — telefone `987203839` (9 dígitos) — corrigir manualmente na planilha.
+**P2 aberto:** nenhum (I67 Neide L233 fechado 25/06).
 
 ---
 

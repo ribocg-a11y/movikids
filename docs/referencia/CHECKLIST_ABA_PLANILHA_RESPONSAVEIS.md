@@ -22,4 +22,4 @@
 
 **Deploy:** ✅ Nova versão Web v1.5.156 · repair 24/06
 
-**Aviso:** linha 233 telefone `987203839` (9 dígitos) — corrigir manualmente se necessário.
+**Aviso:** ~~linha 233 telefone `987203839`~~ — **I67** merge VERA `98987203839` + linha removida (25/06).
