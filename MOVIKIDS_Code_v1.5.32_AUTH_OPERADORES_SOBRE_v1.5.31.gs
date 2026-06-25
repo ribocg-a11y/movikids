@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.163
+// MOVI KIDS — Google Apps Script v1.5.164
+// v1.5.164: I65 — isLocacaoTeste TESTE_* / TESTE I43; historico oculta teste; tag anulada
 // v1.5.163: PIN admin 1421 (ADMIN_PIN_PLAIN + Script Property ADMIN_PIN)
 // v1.5.162: I64 — erros admin sem vazar PIN; ADMIN_PIN via Script Property
 // v1.5.161: I63 — camada 5 RH resto (ESCALA, FALTAS, HOLERITES, METAS, COMUNICADOS, AVALIACOES)
@@ -3812,7 +3813,7 @@ function listarHistorico_(p) {
     return resp_(empty);
   }
 
-  const dados = sheet.getRange(DATA_ROW, 1, last - DATA_ROW + 1, 17).getValues();
+  const dados = sheet.getRange(DATA_ROW, 1, last - DATA_ROW + 1, 18).getValues();
   const lista = [];
   const enc = [];
   const extPorDiaMap = {};
@@ -3820,6 +3821,7 @@ function listarHistorico_(p) {
   for (let i = dados.length - 1; i >= 0; i--) {
     const r = dados[i];
     if (!r[0] || r[0] === 0) continue;
+    if (isLocacaoTeste_(String(r[12] || ''), String(r[11] || ''), String(r[13] || ''), String(r[17] || ''))) continue;
     const data = cellToStr_(r[1]);
     const dcmp = dateToCmp_(data);
     if (!historicoInRange_(dcmp, filtroData, sCmp, eCmp)) continue;
@@ -9757,6 +9759,8 @@ function isLocacaoTeste_(crianca, responsavel, telefone, observacao) {
   const t = String(telefone || '').replace(/\D/g, '');
   const o = String(observacao || '').trim().toUpperCase();
   if (/^DRAWER_E_/i.test(c)) return true;
+  if (/^TESTE_/i.test(c)) return true;
+  if (/^TESTE[\s_]/i.test(r)) return true;
   if (/^TESTE_CODEX/i.test(c)) return true;
   if (/^TESTE_CODEX/i.test(r)) return true;
   if (r === 'TESTE_EDIT' || r === 'TESTE') return true;
@@ -9780,8 +9784,15 @@ function anularLinhaTesteAdmin_(sheet, rowIndex, motivo) {
   if (!row[0]) return { anulada: false, motivo: 'nao_encontrada' };
   const status = String(row[14] || '').trim();
   const valTotal = Number(row[10] || 0);
+  const obsAtual = String(row[17] || '').trim();
+  const tagAdm = '[ANULADO TESTE ADM]';
   if (status === 'Cancelada' && valTotal === 0) {
-    return { anulada: false, motivo: 'ja_anulada', id: row[0], crianca: String(row[12] || '') };
+    if (obsAtual.indexOf(tagAdm) >= 0) {
+      return { anulada: false, motivo: 'ja_anulada', id: row[0], crianca: String(row[12] || '') };
+    }
+    const tag = tagAdm + ' ' + motivo;
+    sheet.getRange(rowIndex, 18).setValue(obsAtual ? obsAtual + ' | ' + tag : tag);
+    return { anulada: true, motivo: 'tag_apenas', id: row[0], crianca: String(row[12] || ''), statusAntes: status };
   }
   const antes = locacaoObj_(row, rowIndex);
   sheet.getRange(rowIndex, 9, 1, 3).setValues([[0, 0, 0]]);

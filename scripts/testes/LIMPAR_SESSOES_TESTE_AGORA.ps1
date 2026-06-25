@@ -16,6 +16,7 @@ function Test-LocacaoTeste {
   if ($r -match '^Teste') { return $true }
   if ($r -in @('BT', 'P', 'X', 'BrowserTest', 'DebugTest', 'ParityTest', 'OperadorTeste', 'TestOp')) { return $true }
   if ($c -match '^TESTE_|^DRAWER_E_') { return $true }
+  if ($r -match '^TESTE[\s_]') { return $true }
   if ($r -in @('TESTE', 'TESTE_EDIT')) { return $true }
   if ($r -eq 'X' -and $c -eq 'Y') { return $true }
   return $false

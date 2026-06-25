@@ -2,6 +2,22 @@
 
 const HIST_CACHE_TTL_MS = 120000;
 
+function isLocacaoTesteHist_(l) {
+  const c = String(l && l.crianca || '').trim();
+  const r = String(l && l.responsavel || '').trim();
+  const t = String(l && l.telefone || '').replace(/\D/g, '');
+  if (/^DRAWER_E_/i.test(c)) return true;
+  if (/^TESTE_/i.test(c)) return true;
+  if (/^TESTE[\s_]/i.test(r)) return true;
+  if (/^9899999/.test(t)) return true;
+  if (r === 'TESTE' || r === 'TESTE_EDIT') return true;
+  return false;
+}
+
+function filtrarLocacoesHistorico_(locacoes) {
+  return (locacoes || []).filter(l => !isLocacaoTesteHist_(l));
+}
+
 // ═══════════════════════════════════════════════════════════
 // HISTÓRICO
 // ═══════════════════════════════════════════════════════════
@@ -49,9 +65,10 @@ function renderHistListLazy_(locacoes, container) {
 function aplicarHistorico_(res) {
   const container = document.getElementById('hist-container');
   if (!container) return;
-  histLocacoesAll = res.locacoes || [];
-  renderAnalyticsCards(res.stats);
-  renderHistExtChart_(res.stats);
+  const limpo = Object.assign({}, res, { locacoes: filtrarLocacoesHistorico_(res.locacoes) });
+  histLocacoesAll = limpo.locacoes || [];
+  renderAnalyticsCards(limpo.stats);
+  renderHistExtChart_(limpo.stats);
   const vf = document.getElementById('hist-veiculo-filter')?.value || '';
   const locs = vf ? histLocacoesAll.filter(l => l.veiculo === vf) : histLocacoesAll;
   renderVrankSection(locs);
