@@ -1,6 +1,6 @@
 # MOVI KIDS — Deploy atual (referência única)
 
-**Atualizado:** 23/06/2026
+**Atualizado:** 26/06/2026
 
 Use **este arquivo** para versão e ordem de publicação. Docs `DEPLOY_v1.5.xx_*` em **`docs/arquivo/deploy/`** são histórico.
 
@@ -10,14 +10,16 @@ Use **este arquivo** para versão e ordem de publicação. Docs `DEPLOY_v1.5.xx_
 
 | Camada | Repo | Produção (ping / Pages) | Alinhado? |
 |--------|------|-------------------------|-----------|
-| **Frontend** | **v1.8.115** | https://ribocg-a11y.github.io/movikids/?force=1.8.115 | ✅ Pages |
-| **Gestão Pessoas** | **v1.8.115** | `gestao-pessoas.html?force=1.8.115` | ✅ |
-| **Service Worker** | **1.8.115** | `sw.js` | ✅ |
-| **GAS** | **v1.5.137** (header `.gs`) | ping **v1.5.136** | ⚠️ Nova versão Web **v1.5.137** pendente (I44) |
+| **Frontend** | **v1.8.121** | https://ribocg-a11y.github.io/movikids/?force=1.8.121 | ✅ Pages |
+| **Gestão Pessoas** | **v1.8.121** | `gestao-pessoas.html?force=1.8.121` | ✅ |
+| **Service Worker** | **1.8.121** | `sw.js` | ✅ |
+| **GAS** | **v1.5.165** (header `.gs`) | ping **v1.5.165** | ✅ |
 
 **Ping:** https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec?action=ping
 
 **Deploy ID (único):** `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y`
+
+**PIN admin produção:** **1421** (Script Property `ADMIN_PIN`)
 
 ---
 
@@ -29,40 +31,35 @@ C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\m
 
 ---
 
-## Ordem de publicação (janela segura)
+## Ordem de publicação FE (ciclo One UI)
 
-1. `check-operacao-livre.ps1` — sem loc Ativa/Pendente
-2. **GAS editor:** `prepare-gas-push.ps1` (com pedido) → header **v1.5.137**
-3. **GAS Web:** Editor → Implantar → **Editar** deploy `AKfycbwakQ...` → **Nova versão** (sócio)
-4. Ping → validar `v1.5.137`
-5. **`repairBancoHorasAdmin`** — `?action=repairBancoHorasAdmin&adminPin=1416` (I44)
-6. **FE:** `pre-push-check.ps1` → commit → push → `verify-publish-complete.ps1`
-7. Tablet: `?force=1.8.115` + homolog
+1. `check-operacao-livre.ps1` — se mudou fluxo balcão
+2. Editar FE + **`DESIGN_SYSTEM_MOVIKIDS.md` §0**
+3. Bump **I3:** `mk-version.js` + `sw.js` + `?v=` em `index.html` e `gestao-pessoas.html`
+4. `pre-push-check.ps1` → commit → push → `verify-publish-complete.ps1`
+5. Homolog **PC admin** (PIN 1421) — tablet só se tocou balcão/auth/api
+
+**GAS neste ciclo:** manter v1.5.165 — Nova versão Web só com pedido explícito.
 
 **Proibido:** `clasp deploy` sem `-i` · nova implantação GAS · POST no browser (I15).
 
 ---
 
-## Entregas recentes (repo)
+## Ciclo ativo
 
-| Commit / tema | Entrega |
-|---------------|---------|
-| `d39a7ac` | **I44** — banco horas não grava em leitura · repair admin · FE v1.8.115 |
-| `ff84239` | **I43** — travas cronômetro · `TESTE_I43` |
-| `ef10dfa` | **I43** hotfix — `COL_LOC_READ_` · FE v1.8.114 · GAS v1.5.136 |
-| I42 | Conta do dia · `TESTE_I42_CONTA_DIA_CAIXA` 6/6 |
-| F17 | Alertas inteligentes · pills · matriz permissões |
-
-Incidentes: `MAPA_ERROS_FALHAS_BUGS.md` I42–I44.
+**Premium One UI** — alvo FE **v1.9.0** ao fechar Sprint A · ver `PLANEJAMENTO_ONE_UI_2026-06.md`
 
 ---
 
-## Testes pós-deploy
+## Testes pós-deploy FE
 
 ```powershell
 cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github
-.\verify-gas-deploy.ps1
+.\scripts\relatorio-versoes.ps1 -Markdown
+.\scripts\verify-gas-deploy.ps1
 .\scripts\pre-push-check.ps1
-.\scripts\testes\TESTE_I43_CARREGAR_INICIO_READONLY.ps1
-.\scripts\testes\TESTE_PROTOCOLO_DIAGNOSTICO.ps1 -SkipNetworkTests
+.\scripts\testes\TESTE_FASE16_COMANDO_READONLY.ps1
+.\scripts\testes\TESTE_FASE17_ALERTAS_READONLY.ps1
 ```
+
+Incidentes: `MAPA_ERROS_FALHAS_BUGS.md` I42–I67.

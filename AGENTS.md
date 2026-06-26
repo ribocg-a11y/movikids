@@ -2,110 +2,66 @@
 
 Sistema operacional de locações — balcão (tablet na loja), portal do responsável, painel admin.
 
-**Modelo operacional:** o sócio/dev trabalha no **computador** (Cursor, deploy, testes). O **tablet fica no balcão** com os operadores — homologação real é lá, não no PC. Ver `HANDOFF_NOVO_CHAT.md` § Modelo operacional.
+**Modelo operacional:** o sócio/dev trabalha no **computador** (Cursor, deploy, testes). O **tablet fica no balcão** com os operadores. Ver `HANDOFF_NOVO_CHAT.md` § Modelo operacional.
 
-**Modo agente (máximo potencial):** mapear fluxo F0–F14 antes de codar; `pre-push-check` + resumo publicação; checklist tablet na loja; sem UI operacional ocultável sem pedido. Ver HANDOFF § Modo de operação e `.cursor/rules/handoff-movikids.mdc`.
+**Ciclo ativo (26/06/2026):** **Premium One UI** — `docs/ativos/PLANEJAMENTO_ONE_UI_2026-06.md`
 
 **Repo neste PC:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`
 
 ## Mensagem mínima do usuário
 
-Esta frase **basta** para retomar o projeto — não exija caminhos, anexos nem bloco longo:
+> *Vamos dar continuidade ao projeto Movi Kids, tem uma pasta no C da minha máquina.*
 
-> Vamos dar continuidade ao projeto Movi Kids, tem uma pasta no C da minha máquina.
+**Para ciclo UI:**
 
-**O agente deve:** ler os 4 docs abaixo → resumir produção + próximo passo → só então trabalhar. Não perguntar "qual pasta?" se `AGENTS.md` ou `README.md` estiverem no workspace.
-
-**Melhor experiência:** abrir o Cursor **nesta pasta** (`movikids-github`) antes do chat.
+> *Continuar MOVI KIDS — ciclo One UI. Ler `PLANEJAMENTO_ONE_UI_2026-06.md` e começar por **UI-A1**.*
 
 ## Antes de qualquer trabalho
 
 Leia **nesta ordem**:
 
-1. [`docs/ativos/HANDOFF_NOVO_CHAT.md`](docs/ativos/HANDOFF_NOVO_CHAT.md) — contexto, produção, próximo passo
-2. [`docs/ativos/PLANO_PRIORIDADES_2026-06.md`](docs/ativos/PLANO_PRIORIDADES_2026-06.md) — o que fazer agora
-3. [`docs/ativos/ESTADO_ATUAL.md`](docs/ativos/ESTADO_ATUAL.md) — versões e links
-4. [`docs/ativos/REGRAS_DE_PUBLICACAO_SEGURA.md`](docs/ativos/REGRAS_DE_PUBLICACAO_SEGURA.md) — antes de publicar
-5. [`docs/ativos/ACESSOS_E_AUTORIZACOES.md`](docs/ativos/ACESSOS_E_AUTORIZACOES.md) — papéis, PIN admin, o que agente vs humano faz
+1. [`docs/ativos/HANDOFF_NOVO_CHAT.md`](docs/ativos/HANDOFF_NOVO_CHAT.md)
+2. [`docs/ativos/PLANEJAMENTO_ONE_UI_2026-06.md`](docs/ativos/PLANEJAMENTO_ONE_UI_2026-06.md) — **sprint UI ativo**
+3. [`docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md`](docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md) — **antes de qualquer tela**
+4. [`docs/ativos/ESTADO_ATUAL.md`](docs/ativos/ESTADO_ATUAL.md) · [`DEPLOY_ATUAL.md`](docs/ativos/DEPLOY_ATUAL.md)
+5. [`docs/ativos/REGRAS_DE_PUBLICACAO_SEGURA.md`](docs/ativos/REGRAS_DE_PUBLICACAO_SEGURA.md)
 
-Índice completo: [`docs/INDICE.md`](docs/INDICE.md)
-
-**Design System (UI):** [`docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md`](docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md) — consultar antes de criar/alterar qualquer interface.
-
-## Agente vs você (resumo)
-
-| Eu (agente) sozinho | Só com seu pedido (lista fechada §7.3) | Só você (físico / conta) |
-|---------------------|--------------------------------------|---------------------------|
-| FE, docs, testes, planilha OAuth, commit + push FE | `clasp push` / `prepare-gas-push.ps1` | Tablet balcão na loja |
-| `pre-push-check`, `protocolo-mestre`, APIs admin | Mudar `api()`, auth, PIN, perfis | Script Properties SMS |
-| PRs, limpar testes planilha, atualizar docs | Editar `.gs` ou Nova versão Web GAS | Re-auth OAuth / `clasp login` |
-| | Reativar F4 (WhatsApp/SMS) ou F9 (supervisor) | Homologação real no tablet |
-
-**Nunca (agente):** `clasp deploy` sem `-i`, nova implantação GAS, POST no browser, commit de segredos.
-
-Detalhe completo: [`ACESSOS_E_AUTORIZACOES.md`](docs/ativos/ACESSOS_E_AUTORIZACOES.md) §7.3.
-
-## Papéis no app (resumo)
-
-| Papel | Entrada |
-|-------|---------|
-| Operador | Nome + PIN |
-| Admin | PIN **1421** (Script Property `ADMIN_PIN` no GAS) |
-| Portal | Telefone |
+Índice: [`docs/INDICE.md`](docs/INDICE.md)
 
 ## Produção atual
 
-| Camada | Versão repo | Ping produção |
-|--------|-------------|---------------|
-| Frontend | **v1.8.119** | https://ribocg-a11y.github.io/movikids/?force=1.8.119 |
-| Gestão Pessoas | **v1.8.119** | `gestao-pessoas.html?force=1.8.119` |
-| GAS | **v1.5.161** | I52–I63 abas protocolo (23 abas) ✅ |
-| LOCACOES planilha | repair I52 24/06 | `validarSchema` **schemaOk=True** |
+| Camada | Versão | Link |
+|--------|--------|------|
+| Frontend | **v1.8.121** | https://ribocg-a11y.github.io/movikids/?force=1.8.121 |
+| Gestão Pessoas | **v1.8.121** | `gestao-pessoas.html?force=1.8.121` |
+| GAS | **v1.5.165** | ping alinhado |
 | Design System | **v1.1** | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
-| Aba FOLHA | OK (I25) | B68 ~5269,96 · `folhaPlanejamento.fonte: FOLHA` |
 | Deploy ID | `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y` | |
 
-**GAS canônico (sempre informar se alterou):**
-
+**GAS canônico:**  
 `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github\MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs`
 
-Fonte de verdade: `mk-version.js`, header do `.gs`, ping GAS.
+## Estado do projeto (26/06/2026)
 
-## Código canônico
-
-- **GAS:** `MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs` (único `.gs` na raiz)
-- **Legado:** `arquivo-historico/` — não implantar
-- **Testes:** `scripts/testes/`
-- **Protocolo teste/diagnóstico:** `docs/ativos/PROTOCOLO_DIAGNOSTICO_E_TESTES.md` → `TESTE_PROTOCOLO_DIAGNOSTICO.ps1`
-- **Protocolo mestre (varredura completa):** `TESTE_PROTOCOLO_MESTRE.ps1` · atalho `protocolo-mestre.ps1`
-- **CI:** `scripts/pre-push-check.ps1` — rodar **antes** do push
-- **Pos-push:** `scripts/verify-publish-complete.ps1` — obrigatório após `git push` FE (I24)
+- **FASE 0–15 + 15b:** ✅ prod
+- **FASE 14 mini-DRE:** ✅ prod
+- **FASE 16–17:** 🟡 ~92–95% — **Sprint One UI** fecha visual
+- **Homolog tablet:** ✅ 23/06 (I43, I42, I47, Gestor)
+- **Planilha:** ✅ 23/23 auditoria célula
+- **Próximo dev:** **UI-A1** sidebar admin mobile → FE alvo **v1.9.0**
 
 ## Regras P0
 
-- Escritas GAS no browser = **GET** (incidente I15 — nunca POST JSON no tablet)
+- Escritas GAS no browser = **GET** (I15)
 - GAS: **Nova versão** no mesmo Deploy ID — nunca `clasp deploy`
-- Tablet físico obrigatório após mudança em `api()` ou auth
-- F4 (WhatsApp auto) e F9 (supervisor) **pausados**
-
-## Não usar
-
-- `docs/arquivo/planos/HANDOFF_NOVO_CHAT_2026-06-05.md` — defasado
-- `docs/arquivo/obsoleto/` — rollback/changelog antigos
-- Arquivos em `arquivo-historico/` para deploy
-
-## Estado do projeto (23/06/2026)
-
-- **FASE 1–9:** ✅ prod
-- **FASE 14 mini-DRE:** ✅ prod
-- **FASE 15–17:** 🟡 homolog tablet **✅ 23/06** · fechamento F17 + 17.5 ⏳
-- **Homolog balcão:** I43 ▶ · I42 caixa · I47 PIN · Gestor — **confirmado usuário**
-- **Próximo:** Raykelly cadastro 100% → decisão 17.5 F9 → RH-G1 holerites
+- Tablet só se mudar `api()`, auth ou cronômetro
+- F4 (WhatsApp) e F9 (supervisor) **pausados**
+- Encerrar toda resposta com **Versões (encerramento)** + Regra 16
 
 ## "Atualize tudo"
 
-Quando pedir **atualize tudo** — seguir **`docs/ativos/PROTOCOLO_ATUALIZAR_TUDO.md`** (handoff, mapa erros, protocolos, arquitetura, diagramas, planilhas, histórico, pasta C).
+[`docs/ativos/PROTOCOLO_ATUALIZAR_TUDO.md`](docs/ativos/PROTOCOLO_ATUALIZAR_TUDO.md)
 
 ## Ao encerrar sessão
 
-Atualizar `HANDOFF_NOVO_CHAT.md`, checklist em `PLANO_PRIORIDADES`, e `ESTADO_ATUAL.md` se versões mudaram. **Sempre** encerrar com `.\scripts\relatorio-versoes.ps1 -Markdown` + tabela § `encerramento-versoes-movikids.mdc` (Regra 8 / 16).
+Atualizar `HANDOFF_NOVO_CHAT.md` se mudou produção ou próximo passo.

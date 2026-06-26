@@ -1,6 +1,6 @@
 # MOVI KIDS — Protocolo "Atualize tudo"
 
-**Criado:** 14/06/2026 · **Última execução:** 23/06/2026 (handoff fim de sessão I43/I44)  
+**Criado:** 14/06/2026 · **Última execução:** 26/06/2026 (handoff One UI + atualize tudo)  
 **Função:** quando o usuário pedir **"atualize tudo"**, o agente segue **esta lista** — não só handoff parcial.  
 **Regra Cursor:** `.cursor/rules/atualize-tudo-movikids.mdc`
 
@@ -42,15 +42,16 @@ Sincronizar **documentação + estado operacional** do projeto com a realidade a
 
 ---
 
-## Produção atual (23/06/2026)
+## Produção atual (26/06/2026)
 
 | Camada | Versão | Evidência |
 |--------|--------|-----------|
-| GAS ping | **v1.5.136** | `/exec?action=ping` |
-| GAS repo | **v1.5.137** | header do `.gs` canônico |
-| FE | **v1.8.115** | Pages live |
-| Aba FOLHA | **OK** (I25) | B68 ~5269,96 · `fonte=FOLHA` |
-| Aba BANCO_HORAS | **⚠️ I44** | zerar / `repairBancoHorasAdmin` após Web v1.5.137 |
+| GAS ping | **v1.5.165** | `/exec?action=ping` |
+| GAS repo | **v1.5.165** | header do `.gs` canônico |
+| FE | **v1.8.121** | Pages live · alvo ciclo UI **v1.9.0** |
+| Planilha | **OK** | `schemaOk=True` · auditoria **23/23** |
+| Homolog tablet | **✅** | 23/06 I43/I42/I47/Gestor |
+| Ciclo dev | **One UI** | `PLANEJAMENTO_ONE_UI_2026-06.md` |
 
 ---
 

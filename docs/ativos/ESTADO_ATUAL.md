@@ -1,9 +1,10 @@
-# MOVI KIDS — Estado atual (25/06/2026)
+# MOVI KIDS — Estado atual (26/06/2026)
 
 Referência única para alinhamento local × produção.
 
+**Ciclo dev ativo:** **`PLANEJAMENTO_ONE_UI_2026-06.md`** — Premium One UI  
 **Diagnóstico 6 camadas:** **`DIAGNOSTICO_SISTEMA_6_CAMADAS_2026-06.md`**  
-**Prioridades pós-diagnóstico:** **`PLANEJAMENTO_ATUAL_2026-06.md`** §9
+**Prioridades gerais:** **`PLANEJAMENTO_ATUAL_2026-06.md`** §9
 
 **Handoff (novo chat):** **`HANDOFF_NOVO_CHAT.md`** ← ler primeiro  
 **Design System (UI):** **`../referencia/DESIGN_SYSTEM_MOVIKIDS.md`** ← antes de qualquer tela  
@@ -30,13 +31,17 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 ---
 
-## Produção (verificar após cada deploy)
+## Produção (26/06/2026)
 
-| Camada | Versão repo | URL / ID |
-|--------|-------------|----------|
-| **Frontend** | **v1.8.121** | https://ribocg-a11y.github.io/movikids/?force=1.8.121 · **Colaboradores:** `gestao-pessoas.html?force=1.8.121` |
+| Camada | Versão | URL / evidência |
+|--------|--------|-----------------|
+| **Frontend** | **v1.8.121** | https://ribocg-a11y.github.io/movikids/?force=1.8.121 |
+| **Gestão Pessoas** | **v1.8.121** | `gestao-pessoas.html?force=1.8.121` |
+| **Apps Script** | **v1.5.165** | ping **v1.5.165** · PIN admin **1421** |
+| **Planilha** | 23 abas | `schemaOk=True` · auditoria célula **23/23** |
+| **Homolog tablet** | ✅ 23/06 | I43 · I42 · I47 · Gestor |
 | **Design System** | **v1.1** | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
-| **Apps Script** | **v1.5.165** | I66 dedup banco · PIN admin **1421** · **schemaOk=True** (23 abas) |
+| **Ciclo dev** | One UI | `PLANEJAMENTO_ONE_UI_2026-06.md` · alvo FE **v1.9.0** |
 | **RELATORIOS** | repair I60 24/06 | 1 registro · **schemaOk=True** |
 | **RESPONSAVEIS** | repair I59 24/06 | **241** cadastros · **schemaOk=True** |
 | **FOLHA** | repair I57 24/06 | B68 **5269,96** · VA/dia **15,38** · **schemaOk=True** |

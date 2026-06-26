@@ -1,6 +1,6 @@
 # MOVI KIDS — Plano de prioridades (análise de sistemas)
 
-**Data-base:** 09/06/2026 · **Revisado:** 23/06/2026 (homolog tablet confirmada)  
+**Data-base:** 09/06/2026 · **Revisado:** 26/06/2026 (ciclo One UI ativo)  
 **Função:** documento único de **o que fazer agora**, por ordem de prioridade.  
 **Local:** `docs/ativos/` · **Índice:** `../INDICE.md`  
 **Handoff:** `HANDOFF_NOVO_CHAT.md` · **Diagnóstico:** `DIAGNOSTICO_SISTEMA_6_CAMADAS_2026-06.md` · **Complementa:** `ESTADO_ATUAL.md`, `PLANO_CONTINUIDADE_2026-06.md`, `REGRAS_DE_PUBLICACAO_SEGURA.md`.
@@ -29,17 +29,17 @@
 | **FASE 15** Gestão Pessoas | ✅ prod | FE **v1.8.71** · GAS **v1.5.111** Web **165** · homolog tablet **20/06** · `FASE_15_GESTAO_PESSOAS.md` |
 | **Design System v1.0** | ✅ repo | `DESIGN_SYSTEM_MOVIKIDS.md` · regra Cursor obrigatória |
 
-**Próximo passo imediato (23/06):**
+**Próximo passo imediato (26/06 — ciclo One UI):**
 
-1. **Colaborador (P0):** Raykelly cadastro **100%** em `gestao-pessoas.html?force=1.8.121`
-2. **Sócio (P1):** Decisão **17.5 F9** Supervisor — manter pausado ou reativar
-3. **Ops + sócio (P1):** Assinar fechamento formal **FASE 17** (pills alertas + presença)
-4. **Ops (P1):** Ponto RH diário (`FOLHA_PONTO`)
-5. **Agente (P1):** Rotina mensal `HIGIENE` + `AUDITORIA_CELULA` + `BACKUP_RH`
+1. **Agente (UI):** Implementar **`PLANEJAMENTO_ONE_UI_2026-06.md`** — começar **UI-A1** (sidebar admin mobile)
+2. **Agente (UI):** Sprint A UI-A2…A6 — fechar FASE 16 visual → bump FE **v1.9.0**
+3. **Colaborador (P0):** Raykelly cadastro **100%** — `GUIA_RAYKELLY_CADASTRO_P0.md`
+4. **Sócio:** Decisão **17.5 F9** + assinar `CHECKLIST_FASE17_FECHAMENTO.md`
+5. **Ops:** Ponto RH diário (`FOLHA_PONTO`)
 
-**Fundação + operação balcão:** GAS **v1.5.165** · FE **v1.8.121** · homolog tablet **✅ 23/06** (I43, I42, I47, Gestor).
+**Fundação:** GAS **v1.5.165** · FE **v1.8.121** · homolog tablet ✅ · planilha **23/23**.
 
-Ver **`PLANEJAMENTO_ATUAL_2026-06.md`** §9 · **`HANDOFF_NOVO_CHAT.md`**
+Ver **`PLANEJAMENTO_ONE_UI_2026-06.md`** · **`HANDOFF_NOVO_CHAT.md`**
 
 ### FASE 0 — checklist
 

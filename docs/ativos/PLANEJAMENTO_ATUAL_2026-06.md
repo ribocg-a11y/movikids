@@ -1,28 +1,26 @@
 # MOVI KIDS — Planejamento atual (pós-FASE 5)
 
-**Atualizado:** 23/06/2026 · FE **v1.8.121** · GAS **v1.5.165** · Planilha **schemaOk=true** · Homolog tablet **✅ 23/06**  
+**Atualizado:** 26/06/2026 · FE **v1.8.121** · GAS **v1.5.165** · **Ciclo ativo: One UI**  
 **Diagnóstico:** [`DIAGNOSTICO_SISTEMA_6_CAMADAS_2026-06.md`](DIAGNOSTICO_SISTEMA_6_CAMADAS_2026-06.md)  
+**Sprint UI:** [`PLANEJAMENTO_ONE_UI_2026-06.md`](PLANEJAMENTO_ONE_UI_2026-06.md) ← **novo chat começa aqui**  
 **Documentos irmãos:** `PLANO_PRIORIDADES_2026-06.md` · `MAPA_FASES.md` · `DEPLOY_ATUAL.md` · `HANDOFF_NOVO_CHAT.md`  
 **Ciclo fechado:** FASE 0–5 · I52–I63 planilha · I64–I67 higiene/auditoria  
-**Ciclo ativo:** FASE **16–17** homolog · FASE **10–14** backlog · Premium 18–22
+**Ciclo ativo:** **Premium One UI** — `PLANEJAMENTO_ONE_UI_2026-06.md` · FASE **16** visual → **18**
 
 ---
 
 ## 1. Resumo executivo
 
-**Modo atual (23/06):** fundação **sólida** + **homolog tablet v1.8.121 fechada** (I43, I42, I47, Gestor). **Gap principal:** Raykelly cadastro 100% + fechamento formal **FASE 17** (decisão 17.5 F9).
+**Modo atual (26/06):** fundação + homolog tablet **fechados**. **Dev ativo = Premium One UI** (FASE 16 visual → FASE 18).
 
 | Área | Status |
 |------|--------|
-| Planilha I52–I63 + auditoria célula | ✅ **23/23 ok** |
-| GAS Web + FE Pages | ✅ v1.5.165 / v1.8.121 |
-| Homolog tablet (I43, I42, I47, Gestor) | ✅ **23/06** usuário |
-| FASE 15 Gestão Pessoas | ✅ repo · cadastro Raykelly ⏳ |
-| FASE 16 Centro Comando | ✅ repo · homolog ⏳ |
-| FASE 17 Alertas + Gestor | 🟡 homolog gestor ✅ · fechamento + **17.5** ⏳ |
-| FASE 10–14 (LTV, Holding, BI…) | ⏳ backlog P2 |
+| Planilha + GAS + homolog balcão | ✅ |
+| FASE 16 Centro Comando | 🟡 **~92%** — Sprint A UI |
+| FASE 17 Alertas + Gestor | 🟡 **~95%** — assinar + F9 |
+| Raykelly cadastro | ⏳ P0-5 paralelo |
 
-**Próximo passo único:** Raykelly cadastro **100%** em `gestao-pessoas.html?force=1.8.121` (P0-5) → em seguida decisão **17.5 F9** (sócio).
+**Próximo passo dev:** `PLANEJAMENTO_ONE_UI_2026-06.md` → **UI-A1** sidebar admin mobile.
 
 ---
 

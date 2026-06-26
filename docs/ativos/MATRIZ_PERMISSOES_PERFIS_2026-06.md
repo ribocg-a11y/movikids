@@ -1,6 +1,6 @@
 # Matriz de permissões — perfis MOVI KIDS (FASE 17.4)
 
-**Atualizado:** 23/06/2026 · FE **v1.8.113** · GAS **v1.5.134** (repo)
+**Atualizado:** 26/06/2026 · FE **v1.8.121** · GAS **v1.5.165**
 
 ## Perfis
 

@@ -2,7 +2,7 @@
 
 **Data:** 20/06/2026  
 **Origem:** `Manual_Plataforma_Gestao_Premium_Completo_260620_102237.pdf`  
-**Status:** **🟢 ATIVO** — próximo ciclo pós-FASE 15  
+**Status:** **🟢 ATIVO — ciclo UI** · Sprint em `PLANEJAMENTO_ONE_UI_2026-06.md`  
 **Documentos irmãos:** `PLANEJAMENTO_ATUAL_2026-06.md` · `PLANO_FASES_6_15_COCKPIT_EXECUTIVO_2026-06.md` · `DESIGN_SYSTEM_MOVIKIDS.md` · `DESIGN_DNA_MOVIKIDS.md`
 
 ---
@@ -21,7 +21,7 @@
 |----------|----------|----------------|-----|---------------|
 | **1** Visão produto | Centro de comando | FASE 6–9 cockpit, Dashboard, Caixa | Falta **visão unificada tempo real** (operação + pessoas + $) | **FASE 16** |
 | **2** Posicionamento | Premium, confiança | Portal ✅ · Admin 🟡 · Colaboradores 🟡 | Tipografia pesada, blocos densos em RH | **FASE 16** One UI |
-| **3** Arquitetura usuários | Admin / Gestor / Colaborador | Admin (PIN 1416) · Operador · Colaborador (gestao-pessoas) | **Perfil Gestor** inexistente; Supervisor pausado (F9) | **FASE 17** |
+| **3** Arquitetura usuários | Admin / Gestor / Colaborador | Admin (PIN **1421**) · Operador · Colaborador | Perfil Gestor ✅ homolog | **FASE 17** assinar |
 | **4.1** Central de gestão | Visão geral + alertas | Dashboard + sidebar alertas FASE 8 | Alertas ainda técnicos, pouco narrativos | **FASE 16** |
 | **4.2** Financeiro | Fluxo, previsão, relatórios | Caixa, mini-DRE FASE 14, payback | **Previsão financeira** e comparativo 30d explícito | **FASE 18** |
 | **4.3** Operação | Locações, frota, manutenção | Painel Operação, balcão, CONFIG | **Status frota/manutenção** não centralizado | **FASE 16** |
@@ -206,7 +206,7 @@ Hub 5 portas → hero **Minha jornada hoje** (escala + ponto + meta) antes das p
 
 | Perfil | Acesso | Implementação |
 |--------|--------|---------------|
-| **Super Admin** | Tudo (atual PIN 1416) | Mantém |
+| **Super Admin** | Tudo (atual PIN **1421**) | Mantém |
 | **Gestor** | Operação + equipes + relatórios · sem CONFIG/SMS | Novo PIN perfil `gestor` na planilha OPERADORES |
 | **Supervisor** | Painel operação + liberar sessão · sem financeiro | Reavaliar F9 pausado |
 | **Colaborador** | gestao-pessoas.html only | Mantém |
@@ -329,17 +329,16 @@ Widget live: % frota em uso agora · overlay gráfico ocupação por horário.
 
 ---
 
-## 15. Sequência imediata (atualizada 23/06/2026)
+## 15. Sequência imediata (atualizada 26/06/2026)
 
 | # | Ação | Responsável | Status |
 |---|------|-------------|--------|
-| 1 | **Nova versão Web GAS v1.5.134** (I42 + F17 + 15b.7) | Sócio | ⏳ ping v1.5.131 |
-| 2 | Homolog **I42** Caixa 10h–22h + **Gestor** sem CONFIG | Ops loja | ⏳ |
-| 3 | Raykelly cadastro 25% → 100% | Colaborador | ⏳ |
-| 4 | Homolog tablet F5/F7/F10/F11 | Ops loja | ⏳ |
-| 5 | **FASE 17** fechar (exc. 17.5 F9) | Agente + Ops | 🟡 homolog ⏳ |
-| 6 | **15b.7** banco horas persistido | Agente | ✅ repo v1.5.134 |
-| 7 | **17.4** matriz permissões | Agente | ✅ |
+| 1 | GAS Web **v1.5.165** + planilha 23/23 | Sócio + agente | ✅ |
+| 2 | Homolog tablet I43/I42/I47/Gestor | Ops loja | ✅ 23/06 |
+| 3 | **Sprint One UI** — `PLANEJAMENTO_ONE_UI_2026-06.md` | **Agente** | ⏳ **ativo** |
+| 4 | Raykelly cadastro 100% | Colaborador | ⏳ |
+| 5 | Assinar **FASE 17** + decisão **17.5 F9** | Sócio + Ops | ⏳ |
+| 6 | FASE 18 previsão UI (Sprint B) | Agente | backlog |
 
 ---
 
@@ -355,21 +354,21 @@ Widget live: % frota em uso agora · overlay gráfico ocupação por horário.
 
 ---
 
-## 18. Progresso Premium One UI (23/06/2026)
+## 18. Progresso Premium One UI (26/06/2026)
 
 | Fase | Peso | % fase | Notas |
 |------|------|--------|-------|
-| **15b** RH completo | P1 ×2 | **100%** | 15b.7 ✅ repo · Web v1.5.134 pendente |
-| **16** Centro comando | P1 ×2 | **~92%** | FE+GAS repo ✅ · homolog tablet ⏳ |
-| **17** Alertas + Gestor | P1 ×2 | **~90%** | 17.1–17.4 ✅ · homolog Gestor + Web ⏳ |
-| **18** Financeiro previsão | P2 | 0% | após F17 |
+| **15b** RH completo | P1 ×2 | **100%** | ✅ repo + prod |
+| **16** Centro comando | P1 ×2 | **~92%** | widgets ✅ · Sprint A UI ⏳ |
+| **17** Alertas + Gestor | P1 ×2 | **~95%** | homolog ✅ · assinar ⏳ |
+| **18** Financeiro previsão | P2 | 0% | Sprint B após A |
 | **19** Gamificação | P2 | 0% | — |
 | **20** Portal analytics | P2 | 0% | — |
 | **21** Live BI frota | P2 | 0% | — |
 | **22** Assistente IA | P3 | 0% | Anexo |
 
-**Total plano (P1 peso 2×):** **~58% concluído · ~42% restante**  
-**Próxima fase ativa:** **FASE 17** (após Web GAS v1.5.128 + homolog F16)
+**Total plano (P1 peso 2×):** **~62% concluído · ~38% restante**  
+**Próxima fase ativa dev:** **FASE 16 visual (One UI Sprint A)** → `PLANEJAMENTO_ONE_UI_2026-06.md`
 
 ---
 
