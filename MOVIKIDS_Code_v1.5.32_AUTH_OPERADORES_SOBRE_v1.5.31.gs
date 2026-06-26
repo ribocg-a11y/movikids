@@ -629,9 +629,9 @@ function ping_() {
   const agora = new Date();
   return resp_({
     status:  'online',
-    versao:  'v1.5.165',
+    versao:  'v1.5.167',
     timestamp: fmtData_(agora) + ' ' + fmtHoraLocal_(agora),
-    sistema: 'MOVI KIDS v1.5.165',
+    sistema: 'MOVI KIDS v1.5.167',
     postWriteActions: WRITE_ACTIONS_CRITICAS_
   });
 }

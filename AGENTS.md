@@ -34,7 +34,7 @@ Leia **nesta ordem**:
 |--------|--------|------|
 | Frontend | **v1.8.122** | https://ribocg-a11y.github.io/movikids/?force=1.8.122 |
 | Gestão Pessoas | **v1.8.122** | `gestao-pessoas.html?force=1.8.122` |
-| GAS | repo **v1.5.167** · ping **v1.5.165** | Nova versão Web I67 VT pendente |
+| GAS | **v1.5.167** | ping alinhado após reimplantar string ping |
 | Design System | **v1.1** | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
 | Deploy ID | `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y` | |
 

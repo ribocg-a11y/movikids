@@ -37,7 +37,8 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 |--------|--------|-----------------|
 | **Frontend** | **v1.8.122** (repo) | https://ribocg-a11y.github.io/movikids/?force=1.8.122 |
 | **Gestão Pessoas** | **v1.8.122** | `gestao-pessoas.html?force=1.8.122` |
-| **Apps Script** | **v1.5.167** (repo) | ping **v1.5.165** até Nova versão Web · PIN **1421** |
+| **Apps Script** | **v1.5.167** | ping **v1.5.167** (após reimplantar ping) · PIN **1421** |
+| **FOLHA VT I67** | ✅ 26/06 | B9 **8,80** · B10/B12 **22** · Milena VT **193,60** · Raykelly **103,25** |
 | **Planilha** | 23 abas | `schemaOk=True` · auditoria célula **23/23** |
 | **Homolog tablet** | ✅ 23/06 | I43 · I42 · I47 · Gestor |
 | **Design System** | **v1.1** | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
