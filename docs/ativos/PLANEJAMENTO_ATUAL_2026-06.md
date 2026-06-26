@@ -1,6 +1,6 @@
 # MOVI KIDS — Planejamento atual (pós-FASE 5)
 
-**Atualizado:** 26/06/2026 · FE **v1.8.121** · GAS **v1.5.165** · **Ciclo ativo: One UI**  
+**Atualizado:** 26/06/2026 · FE **v1.8.122** · GAS **v1.5.167** · **Ciclo ativo: One UI** · **I68 VT fechado**  
 **Diagnóstico:** [`DIAGNOSTICO_SISTEMA_6_CAMADAS_2026-06.md`](DIAGNOSTICO_SISTEMA_6_CAMADAS_2026-06.md)  
 **Sprint UI:** [`PLANEJAMENTO_ONE_UI_2026-06.md`](PLANEJAMENTO_ONE_UI_2026-06.md) ← **novo chat começa aqui**  
 **Documentos irmãos:** `PLANO_PRIORIDADES_2026-06.md` · `MAPA_FASES.md` · `DEPLOY_ATUAL.md` · `HANDOFF_NOVO_CHAT.md`  
@@ -18,7 +18,7 @@
 | Planilha + GAS + homolog balcão | ✅ |
 | FASE 16 Centro Comando | 🟡 **~92%** — Sprint A UI |
 | FASE 17 Alertas + Gestor | 🟡 **~95%** — assinar + F9 |
-| Raykelly cadastro | ⏳ P0-5 paralelo |
+| Raykelly cadastro | ✅ **100%** 26/06 |
 
 **Próximo passo dev:** `PLANEJAMENTO_ONE_UI_2026-06.md` → **UI-A1** sidebar admin mobile.
 

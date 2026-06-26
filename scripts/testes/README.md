@@ -37,6 +37,8 @@ Use quando a loja está operando ou não quer poluir a planilha:
 .\scripts\testes\TESTE_FOLHA_FORMULAS_READONLY.ps1
 .\scripts\testes\TESTE_FASE9_FOLHA_READONLY.ps1
 .\scripts\testes\TESTE_GESTAO_PESSOAS_READONLY.ps1
+.\scripts\testes\TESTE_INVESTIGACAO_VT_COLABORADORES.ps1
+.\scripts\testes\AJUSTAR_FOLHA_VT_I67.ps1
 .\scripts\testes\TESTE_SESSAO_IDLE_READONLY.ps1
 .\scripts\testes\TESTE_REGRESSAO_MOVIKIDS_PROD_SAFE.ps1
 # sem -RunWriteTests

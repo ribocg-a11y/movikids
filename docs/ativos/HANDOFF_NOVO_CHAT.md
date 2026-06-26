@@ -1,10 +1,11 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 26/06/2026 · FE **v1.8.122** · GAS **v1.5.167** · VT I67 aplicado (B9=8,80 · 22 dias) · **Ciclo ativo: Premium One UI**  
+**Atualizado:** 26/06/2026 (fim de sessão — I68 VT + timeout RH)  
+**FE:** **v1.8.122** · **GAS:** **v1.5.167** · **Ciclo ativo:** Premium One UI  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **Repo local:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`  
-**GitHub:** `ribocg-a11y/movikids` · branch `main`
+**GitHub:** `ribocg-a11y/movikids` · branch `main` · último commit handoff **26/06**
 
 **Mensagem mínima no novo chat:**
 
@@ -29,7 +30,7 @@
 2. O **tablet fica na operação** — homologação balcão **fechada 23/06**; só re-testar se mudar `api()`, auth ou cronômetro.
 3. **Sessão dual (I21):** PC com PIN admin **1421** = **TABLET: Administrador**; tablet operadores = **BALCÃO: Nome**.
 4. **UI nova:** consultar **`docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md`** §0 **antes** de codar (I29).
-5. **Push FE:** após `pre-push-check` OK → commit → push → **`verify-publish-complete.ps1`** (sem pedir permissão).
+5. **Push FE:** após `pre-push-check` OK → commit → push → **`verify-publish-complete.ps1`**.
 
 Detalhe: `ACESSOS_E_AUTORIZACOES.md` §7 · incidentes I21 · I29.
 
@@ -55,18 +56,21 @@ cursor "C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-mo
 
 ---
 
-## Produção (26/06/2026)
+## Produção (26/06/2026 — fim de sessão)
 
-| Camada | Repo | Produção | Notas |
-|--------|------|----------|-------|
-| **Frontend** | **v1.8.121** | https://ribocg-a11y.github.io/movikids/?force=1.8.121 | |
-| **Gestão Pessoas** | **v1.8.121** | `gestao-pessoas.html?force=1.8.121` | |
-| **Service Worker** | **1.8.121** | `sw.js` | |
-| **Apps Script** | **v1.5.165** | ping **v1.5.165** | PIN admin **1421** |
-| **Homolog tablet** | ✅ 23/06 | I43 · I42 · I47 · Gestor | |
-| **Planilha** | 23 abas | `schemaOk=True` · auditoria **23/23** | I52–I67 |
-| **COLABORADORES_RH** | Raykelly **25%** | `GUIA_RAYKELLY_CADASTRO_P0.md` | P0 paralelo |
-| **Design System** | **v1.1** | `DESIGN_SYSTEM_MOVIKIDS.md` | |
+| Camada | Versão | URL / evidência |
+|--------|--------|-----------------|
+| **Frontend** | **v1.8.122** | https://ribocg-a11y.github.io/movikids/?force=1.8.122 |
+| **Gestão Pessoas** | **v1.8.122** | `gestao-pessoas.html?force=1.8.122` |
+| **Service Worker** | **1.8.122** | `sw.js` |
+| **Apps Script** | **v1.5.167** | lógica I68 ativa · ping string **v1.5.167** no repo (reimplantar se ping antigo) |
+| **PIN admin** | **1421** | Script Property `ADMIN_PIN` |
+| **Homolog tablet** | ✅ 23/06 | I43 · I42 · I47 · Gestor |
+| **Planilha** | 23 abas | `schemaOk=True` · auditoria **23/23** |
+| **FOLHA VT (I68)** | ✅ 26/06 | B9 **8,80** · B10/B12 **22** · B68 **5253,96** · B25 **18,18** |
+| **VT holerite** | ✅ API | Milena **193,60** · Raykelly **103,25** |
+| **Raykelly cadastro** | ✅ **100%** | API 26/06 · id 3 |
+| **Design System** | **v1.1** | `DESIGN_SYSTEM_MOVIKIDS.md` |
 
 **Deploy ID GAS:** `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y`
 
@@ -79,8 +83,9 @@ cursor "C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-mo
 cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github
 .\scripts\relatorio-versoes.ps1 -Markdown
 .\scripts\pre-push-check.ps1
-.\scripts\testes\TESTE_FASE16_COMANDO_READONLY.ps1
+.\scripts\testes\TESTE_INVESTIGACAO_VT_COLABORADORES.ps1
 .\scripts\testes\TESTE_FASE17_ALERTAS_READONLY.ps1
+.\scripts\testes\AJUSTAR_FOLHA_VT_I67.ps1   # se resetar B9/B10/B12
 ```
 
 ---
@@ -94,23 +99,22 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 | 3 | **`DESIGN_SYSTEM_MOVIKIDS.md`** | Cartilha UI — **antes de qualquer tela** |
 | 4 | `PLANO_PREMIUM_ONEUI_FASES_16_22_2026-06.md` | Visão FASE 16–22 |
 | 5 | `PLANEJAMENTO_ATUAL_2026-06.md` §9 | Prioridades gerais |
-| 6 | `DIAGNOSTICO_SISTEMA_6_CAMADAS_2026-06.md` | Scorecard fundação |
-| 7 | `ESTADO_ATUAL.md` · `DEPLOY_ATUAL.md` | Versões |
-| 8 | `MAPA_ERROS_FALHAS_BUGS.md` | I* travas |
-| 9 | `../INDICE.md` | Mapa docs |
+| 6 | `ESTADO_ATUAL.md` · `DEPLOY_ATUAL.md` | Versões |
+| 7 | `MAPA_ERROS_FALHAS_BUGS.md` | I* travas (I68 VT) |
+| 8 | `../INDICE.md` | Mapa docs |
 
 **Fonte de verdade versão:** `mk-version.js` → ping GAS → `DEPLOY_ATUAL.md` → este handoff.
 
 ---
 
-## Próximo passo (26/06/2026)
+## Próximo passo (novo chat)
 
 | # | Ação | Quem | Status |
 |---|------|------|--------|
 | 1 | **UI-A1** Sidebar admin mobile read-only | **Agente (dev)** | ⏳ **próximo** |
-| 2 | Sprint A UI-A2…A6 — fechar FASE 16 visual | Agente | ⏳ |
-| 3 | Raykelly cadastro **100%** | Colaborador | ⏳ P0-5 |
-| 4 | Assinar **FASE 17** + decisão **17.5 F9** | Sócio + Ops | ⏳ |
+| 2 | Sprint A UI-A2…A6 — fechar FASE 16 visual → FE **v1.9.0** | Agente | ⏳ |
+| 3 | Assinar **FASE 17** + decisão **17.5 F9** | Sócio + Ops | ⏳ |
+| 4 | Tablet: Milena validar Colaboradores **v1.8.122** + VT **193,60** | Ops | ⏳ smoke |
 | 5 | Sprint B — FASE 18 previsão UI | Agente | backlog |
 
 Docs: `PLANEJAMENTO_ONE_UI_2026-06.md` · `CHECKLIST_FASE17_FECHAMENTO.md`
@@ -122,17 +126,19 @@ Docs: `PLANEJAMENTO_ONE_UI_2026-06.md` · `CHECKLIST_FASE17_FECHAMENTO.md`
 | Item | Data |
 |------|------|
 | Homolog tablet I43/I42/I47/Gestor | 23/06 |
-| GAS v1.5.165 Web · planilha 23/23 | 25/06 |
+| GAS v1.5.167 Web · planilha 23/23 | 26/06 |
+| **I68 VT folha** (4,40×2 · 22 dias) | 26/06 |
+| FE v1.8.122 timeout RH Colaboradores | 26/06 |
 | Diagnóstico 6 camadas | 25/06 |
-| FASE 16 comando + widgets Dashboard repo | jun/2026 |
 | FASE 17 API alertas (`TESTE_FASE17` ✅) | 26/06 |
+| Raykelly cadastro **100%** | 26/06 |
 
 ---
 
 ## Incidentes — referência rápida
 
-I15 POST browser · I20/I43 cronômetro · I42 conta dia · I44 banco horas · I52–I67 planilha · ver `MAPA_ERROS_FALHAS_BUGS.md`.
+I15 POST browser · I20/I43 cronômetro · I42 conta dia · I44 banco horas · **I68 VT folha** · I52–I67 planilha · ver `MAPA_ERROS_FALHAS_BUGS.md`.
 
 ---
 
-*Preparado para novo chat — ciclo Premium One UI.*
+*Preparado para novo chat — ciclo Premium One UI · sessão VT/RH fechada 26/06.*

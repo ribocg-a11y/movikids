@@ -22,15 +22,15 @@ Detalhe: [docs/ativos/ESTRUTURA_REPO.md](docs/ativos/ESTRUTURA_REPO.md) · mocku
 
 **Planejamento:** [PLANEJAMENTO_ATUAL_2026-06.md](docs/ativos/PLANEJAMENTO_ATUAL_2026-06.md) · [PLANO_PRIORIDADES](docs/ativos/PLANO_PRIORIDADES_2026-06.md)
 
-## Produção (26/06/2026 — FE v1.8.121 · GAS v1.5.165 · ciclo One UI)
+## Produção (26/06/2026 — FE v1.8.122 · GAS v1.5.167 · ciclo One UI)
 
 | Camada | Versão repo | Produção |
 |--------|-------------|----------|
-| Frontend | **v1.8.121** | https://ribocg-a11y.github.io/movikids/?force=1.8.121 |
-| Gestão Pessoas | **v1.8.121** | `gestao-pessoas.html?force=1.8.121` |
-| Apps Script | **v1.5.165** | ping **v1.5.165** |
+| Frontend | **v1.8.122** | https://ribocg-a11y.github.io/movikids/?force=1.8.122 |
+| Gestão Pessoas | **v1.8.122** | `gestao-pessoas.html?force=1.8.122` |
+| Apps Script | **v1.5.167** | I68 VT ativo |
 | Design System | **v1.1** | [DESIGN_SYSTEM_MOVIKIDS.md](docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md) |
-| **Ciclo dev** | One UI | [PLANEJAMENTO_ONE_UI_2026-06.md](docs/ativos/PLANEJAMENTO_ONE_UI_2026-06.md) |
+| **Ciclo dev** | One UI | [PLANEJAMENTO_ONE_UI_2026-06.md](docs/ativos/PLANEJAMENTO_ONE_UI_2026-06.md) · próximo **UI-A1** |
 
 ## Novo chat / agente Cursor
 

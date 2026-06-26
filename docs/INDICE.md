@@ -20,6 +20,7 @@
 | [**AUDITORIA_RH_FOLHA_PERSISTENCIA_2026-06-22.md**](ativos/AUDITORIA_RH_FOLHA_PERSISTENCIA_2026-06-22.md) | **Matriz RH** — abas, cálculos, lacunas RH-G1–G15 |
 | [**INCIDENTE_I43_CARREGAR_INICIO_COL_Y_2026-06-23.md**](ativos/INCIDENTE_I43_CARREGAR_INICIO_COL_Y_2026-06-23.md) | **I43** — cronômetro revertia após ▶ |
 | [**INCIDENTE_I53_CONFIG_PLANILHA_REPAIR_2026-06-24.md**](arquivo/incidentes/INCIDENTE_I53_CONFIG_PLANILHA_REPAIR_2026-06-24.md) | **I53** — CONFIG memorial, schema, repair |
+| [**INCIDENTE_I68_VT_FOLHA_DUPLO_2026-06-26.md**](arquivo/incidentes/INCIDENTE_I68_VT_FOLHA_DUPLO_2026-06-26.md) | **I68** — VT folha 4,40×2 · 22 dias · GAS v1.5.167 |
 | [**INCIDENTE_I45_CADASTRO_RH_NAO_PERSISTIDO_2026-06-23.md**](ativos/INCIDENTE_I45_CADASTRO_RH_NAO_PERSISTIDO_2026-06-23.md) | **I45** — cadastro Raykelly / installer apagava RH |
 | [**PROTOCOLO_AUDITORIA_ABAS_PLANILHA.md**](ativos/PROTOCOLO_AUDITORIA_ABAS_PLANILHA.md) | **Auditoria por aba** — roteiro LOCACOES + CONFIG (I53) + roadmap 24 abas |
 | [**CHECKLIST_ABA_PLANILHA_CONFIG.md**](referencia/CHECKLIST_ABA_PLANILHA_CONFIG.md) | Checklist aba **CONFIG** (I53) |

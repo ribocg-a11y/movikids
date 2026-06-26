@@ -1,6 +1,6 @@
 # MOVI KIDS — Deploy atual (referência única)
 
-**Atualizado:** 26/06/2026
+**Atualizado:** 26/06/2026 (fim de sessão — I68 VT + FE v1.8.122)
 
 Use **este arquivo** para versão e ordem de publicação. Docs `DEPLOY_v1.5.xx_*` em **`docs/arquivo/deploy/`** são histórico.
 
@@ -10,10 +10,10 @@ Use **este arquivo** para versão e ordem de publicação. Docs `DEPLOY_v1.5.xx_
 
 | Camada | Repo | Produção (ping / Pages) | Alinhado? |
 |--------|------|-------------------------|-----------|
-| **Frontend** | **v1.8.121** | https://ribocg-a11y.github.io/movikids/?force=1.8.121 | ✅ Pages |
-| **Gestão Pessoas** | **v1.8.121** | `gestao-pessoas.html?force=1.8.121` | ✅ |
-| **Service Worker** | **1.8.121** | `sw.js` | ✅ |
-| **GAS** | **v1.5.165** (header `.gs`) | ping **v1.5.165** | ✅ |
+| **Frontend** | **v1.8.122** | https://ribocg-a11y.github.io/movikids/?force=1.8.122 | ✅ Pages |
+| **Gestão Pessoas** | **v1.8.122** | `gestao-pessoas.html?force=1.8.122` | ✅ |
+| **Service Worker** | **1.8.122** | `sw.js` | ✅ |
+| **GAS** | **v1.5.167** (header `.gs`) | ping **v1.5.167** (reimplantar string se ainda 165) | ✅ lógica I68 |
 
 **Ping:** https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec?action=ping
 
@@ -29,6 +29,8 @@ Use **este arquivo** para versão e ordem de publicação. Docs `DEPLOY_v1.5.xx_
 C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github\MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs
 ```
 
+**Header:** v1.5.167 · I68 VT · `ajustarFolhaVtAdmin`
+
 ---
 
 ## Ordem de publicação FE (ciclo One UI)
@@ -39,9 +41,9 @@ C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\m
 4. `pre-push-check.ps1` → commit → push → `verify-publish-complete.ps1`
 5. Homolog **PC admin** (PIN 1421) — tablet só se tocou balcão/auth/api
 
-**GAS neste ciclo:** manter v1.5.165 — Nova versão Web só com pedido explícito.
+**GAS:** Nova versão Web no mesmo Deploy ID — **nunca** nova implantação.
 
-**Proibido:** `clasp deploy` sem `-i` · nova implantação GAS · POST no browser (I15).
+**Proibido:** `clasp deploy` sem `-i` · POST no browser (I15).
 
 ---
 
@@ -51,7 +53,26 @@ C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\m
 
 ---
 
-## Testes pós-deploy FE
+## FOLHA VT (I68 — 26/06)
+
+| Parâmetro | Valor |
+|-----------|-------|
+| B9 tarifa ida+volta/dia | **8,80** (2× R$ 4,40) |
+| B10 dias VT | **22** |
+| B12 dias VA | **22** |
+| B25 VA/dia | **18,18** |
+| B68 custo total | **5253,96** |
+| VT passes Milena | **193,60** |
+| VT passes Raykelly | **103,25** (prop.) |
+
+```powershell
+.\scripts\testes\AJUSTAR_FOLHA_VT_I67.ps1
+.\scripts\testes\TESTE_INVESTIGACAO_VT_COLABORADORES.ps1
+```
+
+---
+
+## Testes pós-deploy
 
 ```powershell
 cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github
@@ -60,6 +81,7 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 .\scripts\pre-push-check.ps1
 .\scripts\testes\TESTE_FASE16_COMANDO_READONLY.ps1
 .\scripts\testes\TESTE_FASE17_ALERTAS_READONLY.ps1
+.\scripts\testes\TESTE_INVESTIGACAO_VT_COLABORADORES.ps1
 ```
 
-Incidentes: `MAPA_ERROS_FALHAS_BUGS.md` I42–I67.
+Incidentes: `MAPA_ERROS_FALHAS_BUGS.md` I42–I68.

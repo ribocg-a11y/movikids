@@ -31,31 +31,33 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 ---
 
-## Produção (26/06/2026)
+## Produção (26/06/2026 — fim de sessão)
 
 | Camada | Versão | URL / evidência |
 |--------|--------|-----------------|
-| **Frontend** | **v1.8.122** (repo) | https://ribocg-a11y.github.io/movikids/?force=1.8.122 |
+| **Frontend** | **v1.8.122** | https://ribocg-a11y.github.io/movikids/?force=1.8.122 |
 | **Gestão Pessoas** | **v1.8.122** | `gestao-pessoas.html?force=1.8.122` |
-| **Apps Script** | **v1.5.167** | ping **v1.5.167** (após reimplantar ping) · PIN **1421** |
-| **FOLHA VT I67** | ✅ 26/06 | B9 **8,80** · B10/B12 **22** · Milena VT **193,60** · Raykelly **103,25** |
+| **Service Worker** | **1.8.122** | `sw.js` |
+| **Apps Script** | **v1.5.167** | I68 VT ativo · ping **v1.5.167** no repo |
+| **FOLHA VT I68** | ✅ 26/06 | B9 **8,80** · B10/B12 **22** · Milena VT **193,60** · Raykelly **103,25** |
 | **Planilha** | 23 abas | `schemaOk=True` · auditoria célula **23/23** |
 | **Homolog tablet** | ✅ 23/06 | I43 · I42 · I47 · Gestor |
+| **Raykelly cadastro** | ✅ **100%** | id 3 · API 26/06 |
 | **Design System** | **v1.1** | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
 | **Ciclo dev** | One UI | `PLANEJAMENTO_ONE_UI_2026-06.md` · alvo FE **v1.9.0** |
 | **RELATORIOS** | repair I60 24/06 | 1 registro · **schemaOk=True** |
 | **RESPONSAVEIS** | repair I59 24/06 | **241** cadastros · **schemaOk=True** |
-| **FOLHA** | repair I57 24/06 | B68 **5269,96** · VA/dia **15,38** · **schemaOk=True** |
+| **FOLHA** | I68 26/06 | B68 **5253,96** · VA/dia **18,18** · VT **193,60**/pessoa · **schemaOk=True** |
 | **OPERADORES_SISTEMA** | repair I54 24/06 | **schemaOk=True** |
 | **CUSTOS** | repair I55 24/06 | 10 linhas · soma mes ~3477 · **schemaOk=True** |
 | **Aba BANCO_HORAS** | ✅ repair 23/06 | Milena/Raykelly **0h00** |
-| **Aba FOLHA** | memorial B68 **OK** | [gid=179040058](https://docs.google.com/spreadsheets/d/1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618/edit#gid=179040058) · B68 ~5269,96 |
+| **Aba FOLHA** | I68 26/06 | [gid=179040058](https://docs.google.com/spreadsheets/d/1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618/edit#gid=179040058) · B68 **5253,96** · B9 **8,80** · 22 dias |
 
 **Editor Apps Script:** https://script.google.com/home/projects/19SIhkX9Tk7FiJA1JXu1OrUwssHdr3H5zc8q3rOjmBvqgWfXuHlk8xyf8/edit
 
 **Teste rápido GAS (ping):**  
 https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec?action=ping  
-→ ping **v1.5.165** · `validarSchema` **schemaOk=True** (23 abas I52–I63) · auditoria célula **23/23 ok**
+→ ping **v1.5.167** (repo) · `kpiMes` folha `vtTarifa=8.8` `diasVt=22` · `validarSchema` **schemaOk=True**
 
 **URL morta (não usar):** `AKfycbzc...` → 404
 

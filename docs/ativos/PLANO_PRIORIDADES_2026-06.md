@@ -33,11 +33,11 @@
 
 1. **Agente (UI):** Implementar **`PLANEJAMENTO_ONE_UI_2026-06.md`** — começar **UI-A1** (sidebar admin mobile)
 2. **Agente (UI):** Sprint A UI-A2…A6 — fechar FASE 16 visual → bump FE **v1.9.0**
-3. **Colaborador (P0):** Raykelly cadastro **100%** — `GUIA_RAYKELLY_CADASTRO_P0.md`
+3. **Colaborador (P0):** ~~Raykelly cadastro 100%~~ ✅ 26/06
 4. **Sócio:** Decisão **17.5 F9** + assinar `CHECKLIST_FASE17_FECHAMENTO.md`
 5. **Ops:** Ponto RH diário (`FOLHA_PONTO`)
 
-**Fundação:** GAS **v1.5.165** · FE **v1.8.121** · homolog tablet ✅ · planilha **23/23**.
+**Fundação:** GAS **v1.5.167** · FE **v1.8.122** · homolog tablet ✅ · planilha **23/23** · **I68 VT** ✅.
 
 Ver **`PLANEJAMENTO_ONE_UI_2026-06.md`** · **`HANDOFF_NOVO_CHAT.md`**
 

@@ -47,7 +47,7 @@ Leia **nesta ordem**:
 - **FASE 14 mini-DRE:** ✅ prod
 - **FASE 16–17:** 🟡 ~92–95% — **Sprint One UI** fecha visual
 - **Homolog tablet:** ✅ 23/06 (I43, I42, I47, Gestor)
-- **Planilha:** ✅ 23/23 auditoria célula
+- **Planilha:** ✅ 23/23 auditoria célula · **I68 VT** ✅ 26/06
 - **Próximo dev:** **UI-A1** sidebar admin mobile → FE alvo **v1.9.0**
 
 ## Regras P0

@@ -1,6 +1,6 @@
 # MOVI KIDS — Protocolo "Atualize tudo"
 
-**Criado:** 14/06/2026 · **Última execução:** 26/06/2026 (handoff One UI + atualize tudo)  
+**Criado:** 14/06/2026 · **Última execução:** 26/06/2026 (handoff novo chat — I68 VT + FE v1.8.122)  
 **Função:** quando o usuário pedir **"atualize tudo"**, o agente segue **esta lista** — não só handoff parcial.  
 **Regra Cursor:** `.cursor/rules/atualize-tudo-movikids.mdc`
 
@@ -42,16 +42,16 @@ Sincronizar **documentação + estado operacional** do projeto com a realidade a
 
 ---
 
-## Produção atual (26/06/2026)
+## Produção atual (26/06/2026 — fim de sessão)
 
 | Camada | Versão | Evidência |
 |--------|--------|-----------|
-| GAS ping | **v1.5.165** | `/exec?action=ping` |
-| GAS repo | **v1.5.165** | header do `.gs` canônico |
-| FE | **v1.8.121** | Pages live · alvo ciclo UI **v1.9.0** |
+| GAS | **v1.5.167** | I68 VT · `ajustarFolhaVtAdmin` |
+| FE | **v1.8.122** | Pages live · timeout RH 60s |
+| Planilha FOLHA | **OK** | B9=8,80 · B10/B12=22 · B68=5253,96 |
 | Planilha | **OK** | `schemaOk=True` · auditoria **23/23** |
 | Homolog tablet | **✅** | 23/06 I43/I42/I47/Gestor |
-| Ciclo dev | **One UI** | `PLANEJAMENTO_ONE_UI_2026-06.md` |
+| Ciclo dev | **One UI** | `PLANEJAMENTO_ONE_UI_2026-06.md` · próximo **UI-A1** |
 
 ---
 

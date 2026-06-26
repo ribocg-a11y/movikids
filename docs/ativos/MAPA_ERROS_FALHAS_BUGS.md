@@ -74,6 +74,7 @@
 | **I63** | **RH resto sem protocolo abas** | ESCALA/FALTAS/HOL sem schema | GAS **v1.5.161** prod | `guard.gas.validarSchema.rhResto` | **`REPARAR_RH_CAMADA5_RESTO_PLANILHA_ADMIN`** + `TESTE_RH_CAMADA5_RESTO_READONLY` |
 | **I64** | **PIN admin vazado + faixa preview colab** | 1416 na UI; banner ADM no hub | FE **v1.8.120** · GAS **v1.5.162** repo | `guard.pin.leak.fe` / `guard.pin.leak.gas` | `ROTACAO_PIN_ADMIN.md` · Script Property `ADMIN_PIN` |
 | **I67** | **RESPONSAVEIS L233 tel curto (import K.1)** | Audit célula warn; duplicata VERA `98987203839` | OAuth merge + delete L233 · **25/06** | `AUDITORIA_CELULA_PLANILHA` | `INCIDENTE_I67_RESP_NEIDE_L233_DUPLICATA_2026-06-25.md` |
+| **I68** | **VT folha dobrado + dias VA no lugar de VT** | ~R$ 437 passes; timeout 25s Colaboradores | GAS **v1.5.167** · FE **v1.8.122** · B9=8,80 B10=22 · **26/06** | `TESTE_INVESTIGACAO_VT_COLABORADORES` | `INCIDENTE_I68_VT_FOLHA_DUPLO_2026-06-26.md` |
 | **I42** | Conta do dia — mesmo telefone 10h–22h | Caixa `n` vs sessões; maquininha | GAS **v1.5.131+** col S `conta_id` | `TESTE_I42_CONTA_DIA_CAIXA` | não reduzir `COL_LOC_READ_` (ver I43) |
 | **I41** | **`ping_` versão defasada** (v1.5.107 vs repo) | Confusão deploy / verify | GAS **v1.5.130** `ping_()` alinhado | `ping_` header alinhado | ping = v1.5.130 |
 | I2 | GAS offline + timer local | Extra fantasma | ADM `somentePlano`; offline v1.7.6 | `FIX_OFFLINE_ENCERRAR` | tablet encerrar |
