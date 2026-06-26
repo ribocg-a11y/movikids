@@ -32,9 +32,9 @@ Leia **nesta ordem**:
 
 | Camada | Versão | Link |
 |--------|--------|------|
-| Frontend | **v1.8.121** | https://ribocg-a11y.github.io/movikids/?force=1.8.121 |
-| Gestão Pessoas | **v1.8.121** | `gestao-pessoas.html?force=1.8.121` |
-| GAS | **v1.5.165** | ping alinhado |
+| Frontend | **v1.8.122** | https://ribocg-a11y.github.io/movikids/?force=1.8.122 |
+| Gestão Pessoas | **v1.8.122** | `gestao-pessoas.html?force=1.8.122` |
+| GAS | repo **v1.5.167** · ping **v1.5.165** | Nova versão Web I67 VT pendente |
 | Design System | **v1.1** | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
 | Deploy ID | `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y` | |
 

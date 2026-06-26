@@ -1,6 +1,7 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.165
-// v1.5.165: I66 — repairBancoHoras dedup operador_id; ping alinhado
+// MOVI KIDS — Google Apps Script v1.5.167
+// v1.5.167: I67b — ajustarFolhaVtAdmin (B9=8,80 B10/B12=22 via Web App)
+// v1.5.166: I67 — VT passes: B9 ida+volta/dia (sem ×2); B10 dias VT (nao B12 VA)
 // v1.5.164: I65 — isLocacaoTeste TESTE_* / TESTE I43; historico oculta teste; tag anulada
 // v1.5.163: PIN admin 1421 (ADMIN_PIN_PLAIN + Script Property ADMIN_PIN)
 // v1.5.162: I64 — erros admin sem vazar PIN; ADMIN_PIN via Script Property
@@ -505,6 +506,7 @@ function dispatchMoviAction_(p, method) {
       case 'comandoOperacional':  return comandoOperacional_(p);
       case 'repairFolhaAdmin':    return repairFolhaFormulasAdmin_(p);
       case 'repararFolhaPlanilhaAdmin': return repararFolhaPlanilhaAdmin_(p);
+      case 'ajustarFolhaVtAdmin': return ajustarFolhaVtAdmin_(p);
       case 'repararInvestimentoPlanilhaAdmin': return repararInvestimentoPlanilhaAdmin_(p);
       case 'repararResponsaveisPlanilhaAdmin': return repararResponsaveisPlanilhaAdmin_(p);
       case 'repararRelatoriosPlanilhaAdmin': return repararRelatoriosPlanilhaAdmin_(p);
@@ -5923,6 +5925,39 @@ function validarFolhaSchema_(sheet) {
   };
 }
 
+function ajustarFolhaVtCanonicoCore_(sh) {
+  sh.getRange('B9').setValue(8.8);
+  sh.getRange('B10').setValue(22);
+  sh.getRange('B12').setValue(22);
+  return { b9: 8.8, b10: 22, b12: 22 };
+}
+
+/** I67 — Aplica tarifa VT 4,40×2/dia e 22 dias (2 folgas/semana). */
+function ajustarFolhaVtAdmin_(p) {
+  if (!adminPinOk_(p)) return err_('Acesso negado — PIN administrativo incorreto', 403);
+  const lock = LockService.getScriptLock();
+  try { lock.waitLock(15000); } catch (ex) { return err_('Sistema ocupado', 503); }
+  try {
+    const sh = sh_(SH_FOLHA);
+    if (!sh) return err_('Aba FOLHA ausente', 404);
+    const parametros = ajustarFolhaVtCanonicoCore_(sh);
+    repairFolhaFormulasCore_(sh);
+    const fp = lerFolhaPlanejamento_();
+    return resp_({
+      mensagem: 'Parametros VT I67 aplicados (B9=8,80 · B10/B12=22)',
+      parametros: parametros,
+      formulas: { b25: sh.getRange('B25').getValue(), b68: sh.getRange('B68').getValue() },
+      folhaPlanejamento: fp,
+      vtPassesMes: gpVtPassesMes_(),
+      versao: 'v1.5.167'
+    });
+  } catch (ex) {
+    return err_('ajustarFolhaVtAdmin: ' + ex.message, 500);
+  } finally {
+    lock.releaseLock();
+  }
+}
+
 function repararFolhaPlanilhaAdmin_(p) {
   if (!adminPinOk_(p)) return err_('Acesso negado — PIN administrativo incorreto', 403);
   const dryRun = String(p.dryRun || '') === '1' || p.dryRun === true;
@@ -5966,10 +6001,12 @@ function lerFolhaPlanejamento_() {
     nFuncionarios: 2,
     custoMensal: 4926,
     salarioBase: 1621,
-    vtTarifa: 8.4,
+    vtTarifa: 8.8,
+    vtDia: 8.8,
+    diasVt: 22,
     vaMensal: 400,
     vaDia: 15.38,
-    diasVa: 26,
+    diasVa: 22,
     fonte: 'default'
   };
   try {
@@ -5979,18 +6016,22 @@ function lerFolhaPlanejamento_() {
     const custoMensal = parseMoedaBr_(sh.getRange('B68').getValue());
     if (custoMensal <= 0 || celulaComErro_(sh.getRange('B68').getValue())) return fallback;
     const vaMensal = parseMoedaBr_(sh.getRange('B11').getValue()) || 400;
-    let diasVa = Math.max(1, parseInt(parseMoedaBr_(sh.getRange('B12').getValue()), 10) || 26);
-    if (diasVa < 15 || diasVa > 31) diasVa = 26;
+    let diasVa = Math.max(1, parseInt(parseMoedaBr_(sh.getRange('B12').getValue()), 10) || 22);
+    if (diasVa < 15 || diasVa > 31) diasVa = 22;
+    let diasVt = Math.max(1, parseInt(parseMoedaBr_(sh.getRange('B10').getValue()), 10) || diasVa);
+    if (diasVt < 15 || diasVt > 31) diasVt = diasVa;
     const vaDiaCalc = Math.round(vaMensal / diasVa * 100) / 100;
     let vaDiaCell = parseMoedaBr_(sh.getRange('B25').getValue());
     if (vaDiaCell <= 0 || vaDiaCell >= vaMensal * 0.9) vaDiaCell = vaDiaCalc;
+    const vtTarifaDia = parseMoedaBr_(sh.getRange('B9').getValue()) || 8.8;
     return {
       ok: true,
       nFuncionarios: Math.max(1, parseInt(parseMoedaBr_(sh.getRange('B5').getValue()), 10) || 2),
       custoMensal: Math.round(custoMensal * 100) / 100,
       salarioBase: parseMoedaBr_(sh.getRange('B7').getValue()) || 1621,
-      vtTarifa: parseMoedaBr_(sh.getRange('B9').getValue()) || 8.4,
-      vtDia: parseMoedaBr_(sh.getRange('B9').getValue()) || 8.4,
+      vtTarifa: vtTarifaDia,
+      vtDia: vtTarifaDia,
+      diasVt: diasVt,
       vaMensal: vaMensal,
       vaDia: vaDiaCell,
       diasVa: diasVa,
@@ -10795,13 +10836,14 @@ function gpVtPassesMes_() {
   try {
     const fp = lerFolhaPlanejamento_();
     if (fp.ok) {
-      const tarifa = fp.vtTarifa || 2.34;
-      const diasUteis = Math.max(1, fp.diasVa || 22);
-      const passes = Math.round(diasUteis * 2 * tarifa * 100) / 100;
+      // Memorial FOLHA: B9 = tarifa ida+volta/dia (ex. 4,40+4,40=8,80); B10 = dias VT no mês (2 folgas/sem.)
+      const tarifaDia = fp.vtTarifa || fp.vtDia || 8.8;
+      const diasVt = Math.max(1, fp.diasVt != null ? fp.diasVt : (fp.diasVa || 22));
+      const passes = Math.round(diasVt * tarifaDia * 100) / 100;
       if (passes > 0) return passes;
     }
   } catch (e) { /* ignore */ }
-  return Math.round((5 * 24 * 2.34) * 100) / 100;
+  return Math.round((22 * 8.8) * 100) / 100;
 }
 
 function gpFaltaEhAbonadaRow_(r) {

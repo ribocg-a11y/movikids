@@ -2,12 +2,21 @@
 (function (global) {
   'use strict';
 
+  var GP_API_TIMEOUT_MS = {
+    buscarPainelColaborador: 60000,
+    buscarPainelColaboradorPreview: 60000,
+    painelGestaoPessoasAdmin: 60000,
+    alertasPontoGestaoAdmin: 45000,
+    repararRhPlanilhaAdmin: 90000
+  };
+
   function gpApi(action, params) {
     if (typeof global.api !== 'function') {
       return Promise.reject(new Error('mk-api.js não carregado'));
     }
     const payload = Object.assign({ action: action }, params || {});
-    return global.api(payload).then(function (r) {
+    const timeoutMs = GP_API_TIMEOUT_MS[action] || 45000;
+    return global.api(payload, timeoutMs).then(function (r) {
       if (r && r.ok === false) throw new Error(r.erro || r.error || 'Erro GAS');
       return r;
     });

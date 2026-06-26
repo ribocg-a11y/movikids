@@ -46,7 +46,7 @@ No Simples, **INSS patronal (20%)**, SAT, Salário-Educação e Sistema S **não
 
 | Benefício | Custo empresa típico | Desconto empregado |
 |-----------|---------------------|-------------------|
-| Vale-transporte | Tarifa × dias úteis − desconto 6% | min(6% SM, custo VT) |
+| Vale-transporte | **B10 dias × B9 tarifa/dia** (B9 = 2× passagem) − desconto 6% | min(6% SM, custo VT) |
 | Vale-alimentação (PAT) | Valor/mês **máx.** por funcionário | **Sem desconto** (se política da empresa) |
 
 **Regra VA na aba:** **B11** = teto mensal (ex. R$ 400) · **B12** = dias trabalhados · **B25** = VA/dia = `B11÷B12` (nunca ultrapassa B11 no mês).
@@ -192,14 +192,17 @@ Custo_empresa_mês = Salário + FGTS + Provisões + VT_empresa + VA + (INSS_patr
 
 ## 8. Simulação rápida (2 × SM, jun/2026 — **exemplo**)
 
-Premissas: SM R$ 1.621 · VT R$ 8,40 × 24 dias · VA **R$ 400/mês** (≈ R$ 15,38/dia × 26) · Simples (sem 20% patronal separado).
+Premissas: SM R$ 1.621 · VT **R$ 4,40/passagem × 2/dia = R$ 8,80/dia** · **~22 dias VT/mês** (2 folgas/semana) · VA **R$ 400/mês** (≈ R$ 18,18/dia × 22) · Simples (sem 20% patronal separado).
+
+**Fórmula VT no GAS (v1.5.166+):** `B10 × B9` — **sem** multiplicar por 2 de novo (B9 já é ida+volta).
 
 | Item | Por funcionário | 2 funcionários |
 |------|-----------------|--------------|
 | Salário bruto | 1.621,00 | 3.242,00 |
 | FGTS 8% | 129,68 | 259,36 |
 | Provisões 23,44% | 379,96 | 759,92 |
-| VT (empresa, após 6%) | ~104,34 | ~208,68 |
+| VT passes (22×8,80) | **193,60** | **387,20** |
+| VT (empresa, após 6%) | ~96,34 | ~192,68 |
 | VA PAT (teto mensal) | **400,00** | **800,00** |
 | **Custo empregador ~** | **~2.635** | **~4.926/mês** |
 
@@ -228,7 +231,8 @@ Invoke-RestMethod -Uri "https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGL
 |---------|-------------------------------------|
 | B25 (VA/dia) | ~15,38 |
 | B68 (custo total) | ~5269,96 |
-| D36 (dias VT) | 24 |
+| D36 (dias VT) | ~22 (B10 — 2 folgas/semana) |
+| B9 (tarifa ida+volta/dia) | **8,80** (2× R$ 4,40) |
 | `folhaPlanejamento.fonte` | FOLHA |
 
 **Implementação:** `folhaFlushFormulasUser_` — Sheets Advanced Service, `valueInputOption: USER_ENTERED`.  

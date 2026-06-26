@@ -234,7 +234,10 @@
       if (/FetchEvent\.respondWith|Returned response is null/i.test(m)) {
         return 'Sem ligação com o servidor Google. O Wi‑Fi precisa liberar internet (teste abrir google.com no Safari). Se não abrir, use 4G ou fale com o suporte da rede da loja.';
       }
-      if (/timeout|Failed to fetch|NetworkError|Load failed|Sem conexao/i.test(m)) {
+      if (/timeout/i.test(m)) {
+        return 'O servidor demorou mais que o esperado (painel RH pesado). Aguarde e tente de novo — Wi‑Fi lento na loja costuma causar isso. Se repetir, avise o suporte.';
+      }
+      if (/Failed to fetch|NetworkError|Load failed|Sem conexao/i.test(m)) {
         return 'Conexão instável ou Wi‑Fi sem saída para Google. Teste google.com no Safari ou use 4G.';
       }
       return m || 'Erro ao carregar colaboradores.';

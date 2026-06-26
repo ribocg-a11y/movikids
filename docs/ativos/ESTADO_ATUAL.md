@@ -35,9 +35,9 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 | Camada | Versão | URL / evidência |
 |--------|--------|-----------------|
-| **Frontend** | **v1.8.121** | https://ribocg-a11y.github.io/movikids/?force=1.8.121 |
-| **Gestão Pessoas** | **v1.8.121** | `gestao-pessoas.html?force=1.8.121` |
-| **Apps Script** | **v1.5.165** | ping **v1.5.165** · PIN admin **1421** |
+| **Frontend** | **v1.8.122** (repo) | https://ribocg-a11y.github.io/movikids/?force=1.8.122 |
+| **Gestão Pessoas** | **v1.8.122** | `gestao-pessoas.html?force=1.8.122` |
+| **Apps Script** | **v1.5.167** (repo) | ping **v1.5.165** até Nova versão Web · PIN **1421** |
 | **Planilha** | 23 abas | `schemaOk=True` · auditoria célula **23/23** |
 | **Homolog tablet** | ✅ 23/06 | I43 · I42 · I47 · Gestor |
 | **Design System** | **v1.1** | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
