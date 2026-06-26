@@ -1,6 +1,9 @@
-# MOVI KIDS — Estado atual (24/06/2026)
+# MOVI KIDS — Estado atual (25/06/2026)
 
 Referência única para alinhamento local × produção.
+
+**Diagnóstico 6 camadas:** **`DIAGNOSTICO_SISTEMA_6_CAMADAS_2026-06.md`**  
+**Prioridades pós-diagnóstico:** **`PLANEJAMENTO_ATUAL_2026-06.md`** §9
 
 **Handoff (novo chat):** **`HANDOFF_NOVO_CHAT.md`** ← ler primeiro  
 **Design System (UI):** **`../referencia/DESIGN_SYSTEM_MOVIKIDS.md`** ← antes de qualquer tela  
@@ -31,9 +34,9 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 | Camada | Versão repo | URL / ID |
 |--------|-------------|----------|
-| **Frontend** | **v1.8.119** | https://ribocg-a11y.github.io/movikids/?force=1.8.119 · **Colaboradores:** `gestao-pessoas.html?force=1.8.119` |
+| **Frontend** | **v1.8.121** | https://ribocg-a11y.github.io/movikids/?force=1.8.121 · **Colaboradores:** `gestao-pessoas.html?force=1.8.121` |
 | **Design System** | **v1.1** | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
-| **Apps Script** | **v1.5.161** | I63 RH resto ✅ · **schemaOk=True** (23 abas) |
+| **Apps Script** | **v1.5.165** | I66 dedup banco · PIN admin **1421** · **schemaOk=True** (23 abas) |
 | **RELATORIOS** | repair I60 24/06 | 1 registro · **schemaOk=True** |
 | **RESPONSAVEIS** | repair I59 24/06 | **241** cadastros · **schemaOk=True** |
 | **FOLHA** | repair I57 24/06 | B68 **5269,96** · VA/dia **15,38** · **schemaOk=True** |
@@ -46,7 +49,7 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 **Teste rápido GAS (ping):**  
 https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec?action=ping  
-→ ping **v1.5.161** · `validarSchema` **schemaOk=True** (23 abas I52–I63)
+→ ping **v1.5.165** · `validarSchema` **schemaOk=True** (23 abas I52–I63) · auditoria célula **23/23 ok**
 
 **URL morta (não usar):** `AKfycbzc...` → 404
 

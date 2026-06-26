@@ -1,9 +1,9 @@
 # MOVI KIDS — Plano de prioridades (análise de sistemas)
 
-**Data-base:** 09/06/2026 · **Revisado:** 23/06/2026  
+**Data-base:** 09/06/2026 · **Revisado:** 23/06/2026 (homolog tablet confirmada)  
 **Função:** documento único de **o que fazer agora**, por ordem de prioridade.  
 **Local:** `docs/ativos/` · **Índice:** `../INDICE.md`  
-**Handoff:** `HANDOFF_NOVO_CHAT.md` · **Complementa:** `ESTADO_ATUAL.md`, `PLANO_CONTINUIDADE_2026-06.md`, `REGRAS_DE_PUBLICACAO_SEGURA.md`.
+**Handoff:** `HANDOFF_NOVO_CHAT.md` · **Diagnóstico:** `DIAGNOSTICO_SISTEMA_6_CAMADAS_2026-06.md` · **Complementa:** `ESTADO_ATUAL.md`, `PLANO_CONTINUIDADE_2026-06.md`, `REGRAS_DE_PUBLICACAO_SEGURA.md`.
 
 ---
 
@@ -29,14 +29,17 @@
 | **FASE 15** Gestão Pessoas | ✅ prod | FE **v1.8.71** · GAS **v1.5.111** Web **165** · homolog tablet **20/06** · `FASE_15_GESTAO_PESSOAS.md` |
 | **Design System v1.0** | ✅ repo | `DESIGN_SYSTEM_MOVIKIDS.md` · regra Cursor obrigatória |
 
-**Próximo passo imediato:**
+**Próximo passo imediato (23/06):**
 
-1. **Sócio:** Nova versão Web GAS **v1.5.137** (I44) + `repairBancoHorasAdmin`
-2. **Ops:** Tablet `?force=1.8.115` · homolog I43 ▶ · ponto RH · Caixa I42 · Gestor
-3. **Dev:** Fechar homolog **FASE 17** (17.5 F9 decisão sócio)
-4. **Planilha:** zerar `BANCO_HORAS` se Web v1.5.137 ainda não publicada
+1. **Colaborador (P0):** Raykelly cadastro **100%** em `gestao-pessoas.html?force=1.8.121`
+2. **Sócio (P1):** Decisão **17.5 F9** Supervisor — manter pausado ou reativar
+3. **Ops + sócio (P1):** Assinar fechamento formal **FASE 17** (pills alertas + presença)
+4. **Ops (P1):** Ponto RH diário (`FOLHA_PONTO`)
+5. **Agente (P1):** Rotina mensal `HIGIENE` + `AUDITORIA_CELULA` + `BACKUP_RH`
 
-Ver **`PLANEJAMENTO_ATUAL_2026-06.md`** §8 · **`HANDOFF_NOVO_CHAT.md`**
+**Fundação + operação balcão:** GAS **v1.5.165** · FE **v1.8.121** · homolog tablet **✅ 23/06** (I43, I42, I47, Gestor).
+
+Ver **`PLANEJAMENTO_ATUAL_2026-06.md`** §9 · **`HANDOFF_NOVO_CHAT.md`**
 
 ### FASE 0 — checklist
 

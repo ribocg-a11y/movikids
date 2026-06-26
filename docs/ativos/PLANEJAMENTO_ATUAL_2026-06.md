@@ -1,18 +1,28 @@
 # MOVI KIDS — Planejamento atual (pós-FASE 5)
 
-**Atualizado:** 23/06/2026 · FE **v1.8.113** · GAS repo **v1.5.134** · Web **v1.5.131** (ping) · **Nova versão Web v1.5.134** pendente sócio
-**Produção:** FE **v1.8.113** Pages · GAS ping **v1.5.131** · **Nova versão Web v1.5.134** (I42 + F17 + 15b.7) pendente sócio
+**Atualizado:** 23/06/2026 · FE **v1.8.121** · GAS **v1.5.165** · Planilha **schemaOk=true** · Homolog tablet **✅ 23/06**  
+**Diagnóstico:** [`DIAGNOSTICO_SISTEMA_6_CAMADAS_2026-06.md`](DIAGNOSTICO_SISTEMA_6_CAMADAS_2026-06.md)  
 **Documentos irmãos:** `PLANO_PRIORIDADES_2026-06.md` · `MAPA_FASES.md` · `DEPLOY_ATUAL.md` · `HANDOFF_NOVO_CHAT.md`  
-**Ciclo ativo:** **`PLANO_FASES_6_15_COCKPIT_EXECUTIVO_2026-06.md`** · FASE 15: **`FASE_15_GESTAO_PESSOAS.md`** ✅  
-**Próximo ciclo:** **`PLANO_PREMIUM_ONEUI_FASES_16_22_2026-06.md`** ← manual Premium + One UI (20/06/2026)
+**Ciclo fechado:** FASE 0–5 · I52–I63 planilha · I64–I67 higiene/auditoria  
+**Ciclo ativo:** FASE **16–17** homolog · FASE **10–14** backlog · Premium 18–22
 
 ---
 
 ## 1. Resumo executivo
 
-Ciclo **FASE 0–5 + P2/P3 concluído** (07–09/06/2026). Balcão homologado, portal QR, payback, CONFIG e APIs unificadas.
+**Modo atual (23/06):** fundação **sólida** + **homolog tablet v1.8.121 fechada** (I43, I42, I47, Gestor). **Gap principal:** Raykelly cadastro 100% + fechamento formal **FASE 17** (decisão 17.5 F9).
 
-**Modo atual:** **I43** ✅ prod · **I44** fix repo · **I42** ✅ API 6/6 · homolog loja ⏳ · **FASE 17** 🟡 (17.1–17.4 ✅ · homolog gestor ⏳)
+| Área | Status |
+|------|--------|
+| Planilha I52–I63 + auditoria célula | ✅ **23/23 ok** |
+| GAS Web + FE Pages | ✅ v1.5.165 / v1.8.121 |
+| Homolog tablet (I43, I42, I47, Gestor) | ✅ **23/06** usuário |
+| FASE 15 Gestão Pessoas | ✅ repo · cadastro Raykelly ⏳ |
+| FASE 16 Centro Comando | ✅ repo · homolog ⏳ |
+| FASE 17 Alertas + Gestor | 🟡 homolog gestor ✅ · fechamento + **17.5** ⏳ |
+| FASE 10–14 (LTV, Holding, BI…) | ⏳ backlog P2 |
+
+**Próximo passo único:** Raykelly cadastro **100%** em `gestao-pessoas.html?force=1.8.121` (P0-5) → em seguida decisão **17.5 F9** (sócio).
 
 ---
 
@@ -32,18 +42,17 @@ Ciclo **FASE 0–5 + P2/P3 concluído** (07–09/06/2026). Balcão homologado, p
 | **21** | Live BI frota | P2 | Herda FASE 13 |
 | **22** | Assistente IA gestão | P3 | Anexo — decisão sócio |
 
-**Sequência imediata:** **Nova versão Web GAS v1.5.137** (I44 repair) → zerar/repair `BANCO_HORAS` → homolog Caixa I42 → homolog Gestor → tablet `?force=1.8.115` + I43 ▶ → **fechar FASE 17** (17.5 F9).
+**Sequência imediata (pós-diagnóstico 25/06):** homolog tablet **P0** §9 → fechar **FASE 17** → rotina RH → backlog **FASE 10–14** / Premium **18–22**.
 
-### I42 — Caixa / conta do dia (23/06/2026) 🟡
+### I42 — Caixa / conta do dia — ✅ API · ⏳ homolog loja
 
 | Item | Status | Nota |
 |------|--------|------|
-| Conta do dia (telefone 10h–22h) | ✅ repo GAS v1.5.131+ | col S `conta_id` |
-| Maquininha PIX+Crédito+Débito normalizada | ✅ repo | `ARQUITETURA_CAIXA_CONTA_DIA_2026-06.md` |
-| FE caixa `n` vs `nSessoes` | ✅ v1.8.112 Pages | |
-| Fix `resumoDia` saldoDin | ✅ repo **v1.5.132** | ⏳ Web pendente |
-| Teste `TESTE_I42_CONTA_DIA_CAIXA.ps1` | ✅ 6/6 | Homolog loja maquininha ⏳ |
-| Homolog loja (maquininha = sistema) | ⏳ | Tablet + fechamento real |
+| Conta do dia (telefone 10h–22h) | ✅ GAS v1.5.165 | col S `conta_id` |
+| Maquininha PIX+Crédito+Débito normalizada | ✅ | `ARQUITETURA_CAIXA_CONTA_DIA_2026-06.md` |
+| FE caixa `n` vs `nSessoes` | ✅ v1.8.121 Pages | |
+| Teste `TESTE_I42_CONTA_DIA_CAIXA.ps1` | ✅ 6/6 | |
+| Homolog loja (maquininha = sistema) | ✅ **23/06** | Tablet I42 confirmado usuário |
 
 ---
 
@@ -209,51 +218,110 @@ Legenda: **P0** bloqueia operação · **P1** valor imediato · **P2** próximo 
 
 ## 8. Próxima revisão
 
-**Ao publicar GAS v1.5.137 Web** · repair BANCO_HORAS · homolog Gestor + Caixa I42 + cronômetro I43 · fechar **FASE 17** (exc. 17.5).
+**Ao fechar Raykelly 100%** · assinar **FASE 17** · decisão **17.5 F9** · iniciar **FASE 10** ou **RH-G1**.
 
-### 8a. Bloqueios P0 (esta semana)
+### 8a. Concluído desde 23/06 (não repetir)
 
-| # | Ação | Quem | Status |
-|---|------|------|--------|
-| 1 | **Nova versão Web GAS v1.5.137** (I44 banco horas + repair) | **Sócio** | ⏳ |
-| 2 | **repairBancoHorasAdmin** ou zerar aba `BANCO_HORAS` | Sócio/Agente | ⏳ |
-| 3 | Homolog **I43** tablet ▶ não reverte | Ops loja | ⏳ |
-| 4 | Homolog **I42** 10h–22h (2 brinquedos = 1 locação) | Ops loja | ⏳ |
-| 5 | Homolog **Gestor** — sem CONFIG/Sistema | Ops loja | ⏳ |
-| 6 | Ponto RH (FOLHA_PONTO) operadores | Ops | ⏳ |
+| Item | Status |
+|------|--------|
+| Nova versão Web GAS v1.5.137+ (I44 banco) | ✅ v1.5.165 |
+| Repair BANCO_HORAS + higiene I66 | ✅ |
+| Protocolo planilha I52–I63 | ✅ |
+| Auditoria célula 3 camadas + I67 | ✅ 25/06 |
+| FE Pages v1.8.121 | ✅ |
+| **Homolog tablet** I43 ▶ + I42 caixa + I47 PIN + Gestor | ✅ **23/06** |
 
-### 8b. Fechar pendências 15b + FASE 16
+### 8b. Bloqueios remanescentes (ver §9)
 
-| # | Ação | Quem | Status |
-|---|------|------|--------|
-| 1 | **15b.5–6** cadastro + benefícios + avaliações repo | Agente | ✅ FE **v1.8.107–108** · GAS **v1.5.128** repo |
-| 2 | **Nova versão Web GAS v1.5.128** (avaliações + alertas F17) | **Sócio** | ⏳ bloqueia prod |
-| 3 | **Raykelly** — cadastro 25% → 100% (`COLABORADORES_RH` id 3) | Colaborador | ⏳ |
-| 4 | **Milena** — cadastro 100% confirmado (id 2) | — | ✅ |
-| 5 | Safari Raykelly `gestao-pessoas.html?force=1.8.108` | Ops loja | ⏳ |
-| 6 | Homolog tablet **F5/F7/F10/F11** pós-GAS Web | Ops loja | ⏳ |
-| 7 | **FASE 16** — Centro de Comando repo + tipografia RH | Agente | ✅ repo · homolog ⏳ |
-| 8 | **15b.7** — persistir `BANCO_HORAS` | Agente | ⚠️ **revertido I44** — persist só na saída ponto · v1.5.137 |
+Raykelly cadastro · FASE 17 fechamento formal · decisão 17.5 F9 · RH-G1 holerites · ponto RH rotina.
 
-### 8b. FASE 17 — Alertas inteligentes + Permissões Gestor (**próxima fase dev**)
+---
 
-**Objetivo:** alertas automáticos acionáveis + perfil **Gestor** (sem CONFIG/SMS).
+## 9. Prioridades pós-diagnóstico 6 camadas (atualizado 23/06)
 
-| # | ID | Entrega | Camada | Status |
-|---|-----|---------|--------|--------|
-| 1 | **17.0** | `alertasInteligentes_` em `comandoOperacional` + `kpiMes` | GAS | ✅ repo v1.5.118–120 |
-| 2 | **17.1** | Pills alertas no Dashboard com link (Caixa / Operadores / Comando) | FE | ✅ v1.8.113 |
-| 3 | **17.2** | Presença admin — badges inteligentes por colaborador | FE | ✅ parcial v1.8.86+ |
-| 4 | **17.3** | Perfil `gestor` em `OPERADORES_SISTEMA` + `showGestorSidebar` | FE+GAS | ✅ repo · homolog ⏳ |
-| 5 | **17.4** | Matriz permissões documentada (Admin / Gestor / Supervisor / Colab) | Doc | ✅ `MATRIZ_PERMISSOES_PERFIS_2026-06.md` |
-| 6 | **17.5** | Decisão **F9 Supervisor** — reativar ou manter pausado | Sócio | ⏳ |
-| 7 | **17.QA** | `TESTE_FASE17_ALERTAS_READONLY.ps1` verde | QA | ✅ API (Web v1.5.133+ para destino pills) |
+**Fonte:** `DIAGNOSTICO_SISTEMA_6_CAMADAS_2026-06.md` · integra ciclo Premium 16–22 não finalizado.
 
-**Critério de pronto FASE 17:**
+Legenda: **P0** bloqueia confiança operacional · **P1** valor imediato · **P2** próximo ciclo dev · **P3** backlog produto · **P4** pausado
 
-- [ ] Gestor loga no tablet/PC → vê Dashboard + Operação + Caixa + Equipe · **sem** CONFIG/Sistema
-- [ ] Dashboard mostra ≥1 alerta inteligente com ação clara quando regra dispara
-- [ ] Presença lista banco horas / meta abaixo / ponto pendente com badge
-- [ ] Balcão inalterado (F5/F7/F10/F11)
+### P0 — Concluído / restante
 
-Doc mestre: `PLANO_PREMIUM_ONEUI_FASES_16_22_2026-06.md` §7 · §5 (fechar F16) · §6 (15b.7)
+| ID | Ação | Quem | Status |
+|----|------|------|--------|
+| **P0-1** | Tablet `?force=1.8.121` — checklist §9.1 | Ops loja | ✅ **23/06** |
+| **P0-2** | Homolog **I43** ▶ cronômetro não reverte | Ops loja | ✅ **23/06** |
+| **P0-3** | Homolog **I42** conta do dia 10h–22h | Ops loja | ✅ **23/06** |
+| **P0-4** | Login PIN **Milena + Raykelly** (I47) | Ops loja | ✅ **23/06** |
+| **P0-5** | Raykelly cadastro **100%** `gestao-pessoas.html` | Colaborador | ⏳ **próximo** |
+
+### P0-1 — Checklist homolog tablet ✅ (23/06 — confirmado usuário)
+
+1. ✅ `?force=1.8.121` no PWA balcão  
+2. ✅ Login operador — chip **Turno** visível  
+3. ✅ Nova locação → **▶** → card conta (I43)  
+4. ✅ Encerrar/anular locação teste  
+5. ✅ Caixa — `n` vs sessões (I42)  
+6. ✅ Perfil **Gestor** — sem CONFIG/Sistema (FASE 17)
+
+Doc: `CHECKLIST_FASE5_TABLET.md` · `MAPA_ERROS` I20/I43/I42
+
+### P1 — Próximas 2–4 semanas
+
+| ID | Ação | Quem | Nota |
+|----|------|------|------|
+| **P1-1** | Fechar **FASE 17** — critérios formais (pills + presença) | Ops + sócio | Gestor homolog ✅ · assinar checklist |
+| **P1-2** | Decisão **17.5 F9** Supervisor | **Sócio** | ⏳ **após P0-5** — manter pausado ou reativar |
+| **P1-3** | Ponto RH diário (`FOLHA_PONTO`) | Ops | Rotina entrada/saída |
+| **P1-4** | Rotina mensal dados | Agente | `HIGIENE` + `AUDITORIA_CELULA` + `BACKUP_RH` |
+| **P1-5** | Sincronizar docs versão | Agente | `ESTADO_ATUAL` · `MAPA_CODIGO` · HANDOFF |
+| **P1-6** | **RH-G1** — persistir aba `HOLERITES` | Dev | Arquivo mensal ausente |
+| **P1-7** | Liberar sessões fantasma (se balcão livre) | Agente | `TESTE_SESSAO_LIBERAR_READONLY` |
+
+### P2 — Ciclo produto 10–14 + técnico
+
+| ID | Fase / item | Foco |
+|----|-------------|------|
+| **P2-1** | **FASE 10** CRM LTV / cohort | Relacionamento + Dashboard |
+| **P2-2** | **FASE 12** Drill-down margem | Dashboard |
+| **P2-3** | **FASE 13** Live BI frota | Firebase widget |
+| **P2-4** | **FASE 14** Mini-DRE | ✅ prod — manter |
+| **P2-5** | CI job noturno com rede | Remover `-SkipNetworkTests` |
+| **P2-6** | Monitor externo ping GAS | UptimeRobot ou similar |
+| **P2-7** | **RH-G3** faltas no holerite | API + desconto |
+
+### P3 — Premium One UI 18–22
+
+Ver `PLANO_PREMIUM_ONEUI_FASES_16_22_2026-06.md` — **após** P0-5 Raykelly + FASE 17 assinada.
+
+| Fase | Nome | Prioridade |
+|------|------|------------|
+| 18 | Financeiro + previsão | P3 |
+| 19 | Gamificação saudável | P3 |
+| 20 | Portal analytics | P3 |
+| 21 | Live BI frota (reforço) | P3 |
+| 22 | Assistente IA | P4 decisão sócio |
+
+### P4 — Pausado (não iniciar)
+
+| Item | Motivo |
+|------|--------|
+| **F4** WhatsApp/SMS auto | QR only — `OPERACAO_COMUNICACAO_QR_ONLY.md` |
+| **F9** Supervisor | Aguarda decisão **P1-2** |
+
+### 9.1 — Sequência recomendada (roadmap 30 dias — revisado 23/06)
+
+```
+✅ Semana 1: P0-1…P0-4 homolog tablet (fechado 23/06)
+Agora:     P0-5 Raykelly 100%
+Semana 2:  P1-1 assinar FASE 17 + P1-2 decisão F9
+Semana 3:  P1-3 ponto RH + P1-4 rotina mensal dados
+Semana 4:  P1-6 RH-G1 holerites (dev) · P2-1 FASE 10 CRM
+Paralelo:  P1-4 mensal · pre-push · verify-publish
+```
+
+### 9.2 — O que NÃO é prioridade agora
+
+- Nova feature FASE 18+ antes de Raykelly 100% + FASE 17 assinada  
+- `clasp deploy` / nova implantação GAS  
+- Reabrir F4 SMS sem serviço contratado  
+- Refatoração grande do `.gs` sem incidente
+

@@ -94,25 +94,13 @@ Fonte de verdade: `mk-version.js`, header do `.gs`, ping GAS.
 - `docs/arquivo/obsoleto/` — rollback/changelog antigos
 - Arquivos em `arquivo-historico/` para deploy
 
-## Estado do projeto (24/06/2026 — fim de sessão)
+## Estado do projeto (23/06/2026)
 
 - **FASE 1–9:** ✅ prod
 - **FASE 14 mini-DRE:** ✅ prod
-- **FASE 15–17:** 🟡 homolog tablet pendente
-- **I43:** ✅ prod (cronômetro)
-- **I52:** ✅ GAS v1.5.149+ LOCACOES repair (`schemaOk=True`)
-- **I53:** ✅ CONFIG prod v1.5.150
-- **I54:** ✅ OPERADORES prod v1.5.151
-- **I55:** ✅ CUSTOS prod v1.5.152 · `schemaOk=True`
-- **I56:** ✅ DASHBOARD prod v1.5.153 · `schemaOk=True`
-- **I57:** ✅ FOLHA prod v1.5.154 · B68=5269,96 · `schemaOk=True`
-- **I58:** ✅ INVESTIMENTO prod v1.5.155 · I=R$ 69.410 · `schemaOk=True`
-- **I59:** ✅ RESPONSAVEIS prod v1.5.156 · 241 cadastros · `schemaOk=True` (1 tel curto L233 aviso)
-- **I60:** ✅ RELATORIOS prod v1.5.158 · **schemaOk=True**
-- **I61:** ✅ Camada 4 AUD_* prod v1.5.159
-- **I62:** ✅ RH P0 prod v1.5.160 · **schemaOk=True** (17 abas)
-- **I63:** ✅ RH resto prod v1.5.161 · **schemaOk=True** (23 abas)
-- **Próximo:** RH camada 5 restante (ESCALA, FALTAS, HOLERITES)
+- **FASE 15–17:** 🟡 homolog tablet **✅ 23/06** · fechamento F17 + 17.5 ⏳
+- **Homolog balcão:** I43 ▶ · I42 caixa · I47 PIN · Gestor — **confirmado usuário**
+- **Próximo:** Raykelly cadastro 100% → decisão 17.5 F9 → RH-G1 holerites
 
 ## "Atualize tudo"
 

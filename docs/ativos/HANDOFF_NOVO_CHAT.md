@@ -1,6 +1,6 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 25/06/2026 (I63 RH resto prod) · FE **v1.8.119** · GAS **v1.5.161** prod  
+**Atualizado:** 23/06/2026 (homolog tablet confirmada) · FE **v1.8.121** · GAS **v1.5.165** prod  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **Repo local:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`  
@@ -21,7 +21,7 @@
 
 1. **Você opera sempre do computador** — prints e chats costumam ser do **PC**, não do tablet do balcão.
 2. O **tablet fica na operação** — homologação real exige **aparelho na loja**.
-3. **Sessão dual (I21):** PC com PIN admin 1416 = **TABLET: Administrador**; tablet operadores = **BALCÃO: Nome**.
+3. **Sessão dual (I21):** PC com PIN admin **1421** = **TABLET: Administrador**; tablet operadores = **BALCÃO: Nome**.
 4. **UI nova:** consultar **`docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md`** §0 **antes** de codar (I29).
 5. **Push FE:** após `pre-push-check` OK → commit → push → **`verify-publish-complete.ps1`** (sem pedir permissão).
 
@@ -53,23 +53,17 @@ cursor "C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-mo
 
 | Camada | Repo | Produção (ping / Pages) | Notas |
 |--------|------|-------------------------|-------|
-| **Frontend** | **v1.8.119** | https://ribocg-a11y.github.io/movikids/?force=1.8.119 | I51d badge Abonado jornada |
-| **Gestão Pessoas** | **v1.8.119** | `gestao-pessoas.html?force=1.8.119` | Ficha admin somente leitura |
-| **Service Worker** | **1.8.119** | `sw.js` | GAS fora do intercept |
-| **Apps Script** | **v1.5.161** | ping **v1.5.161** I63 prod | Deploy `AKfycbwakQ...` |
-| **LOCACOES (aba 1)** | ✅ repair I52 24/06 | `validarSchema` **schemaOk=True** · 28 cols | `REPARAR_LOCACOES_PLANILHA_ADMIN.ps1` |
-| **CONFIG (aba 2)** | ✅ repair I53 24/06 | memorial I53 · **schemaOk=True** | `REPARAR_CONFIG_PLANILHA_ADMIN.ps1` |
-| **OPERADORES_SISTEMA (aba 3)** | ✅ repair I54 24/06 | memorial I54 · **schemaOk=True** | `REPARAR_OPERADORES_SISTEMA_PLANILHA_ADMIN.ps1` |
-| **CUSTOS (aba 4)** | ✅ repair I55 24/06 | memorial I55 · 10 linhas · **schemaOk=True** | `REPARAR_CUSTOS_PLANILHA_ADMIN.ps1` |
-| **DASHBOARD (aba 5)** | ✅ repair I56 24/06 | memorial I56 · KPI C5=10637 · **schemaOk=True** | `REPARAR_DASHBOARD_PLANILHA_ADMIN.ps1` |
-| **FOLHA (aba 6)** | ✅ repair I57 24/06 | B68=5269,96 · VA/dia 15,38 · **schemaOk=True** | `REPARAR_FOLHA_PLANILHA_ADMIN.ps1` |
-| **INVESTIMENTO (aba 7)** | ✅ repair I58 24/06 | I=R$ 69.410 · 36 itens · **schemaOk=True** | `REPARAR_INVESTIMENTO_PLANILHA_ADMIN.ps1` |
-| **RESPONSAVEIS (aba 8)** | ✅ repair I59 24/06 | 241 cadastros · **schemaOk=True** | `REPARAR_RESPONSAVEIS_PLANILHA_ADMIN.ps1` |
-| **FOLHA_PONTO Raykelly** | restore I51 | 6 batidas jun/2026 | `RESTAURAR_PONTO_RAYKELLY_JUN2026` |
-| **Aba BANCO_HORAS** | ✅ repair I44 | Milena/Raykelly **0h00** | `repararRhPlanilhaAdmin` 23/06 |
-| **COLABORADORES_RH** | Milena **100%** · Raykelly **25%** | Backup `backups/rh/cadastro-rh-2026-06-23_1657.json` | Raykelly completar em Colaboradores |
-| **Planilha** | 24 abas mapeadas | `MAPA_PLANILHA_ABAS_MOVIKIDS.md` | `diagnosticoPlanilhaCompletoAdmin` |
+| **Frontend** | **v1.8.121** | https://ribocg-a11y.github.io/movikids/?force=1.8.121 | |
+| **Gestão Pessoas** | **v1.8.121** | `gestao-pessoas.html?force=1.8.121` | Ficha admin somente leitura |
+| **Service Worker** | **1.8.121** | `sw.js` | GAS fora do intercept |
+| **Apps Script** | **v1.5.165** | ping **v1.5.165** | Deploy `AKfycbwakQ...` · PIN admin **1421** |
+| **Homolog tablet** | ✅ **23/06** | I43 ▶ · I42 caixa · I47 PIN · Gestor F17 | Confirmado usuário |
+| **Planilha (23 abas)** | ✅ I52–I63 + auditoria | `validarSchema` **schemaOk=True** · **23/23 ok** célula | I67 Neide L233 corrigido |
+| **COLABORADORES_RH** | Milena **100%** · Raykelly **25%** | Backup `backups/rh/` | **P0-5** — próximo passo |
+| **Aba BANCO_HORAS** | ✅ repair I44/I66 | Milena/Raykelly **0h00** | |
 | **Design System** | **v1.1** | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` | |
+
+**Diagnóstico sistema:** `DIAGNOSTICO_SISTEMA_6_CAMADAS_2026-06.md` · **Prioridades:** `PLANEJAMENTO_ATUAL_2026-06.md` §9
 
 **Deploy ID GAS:** `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y`
 
@@ -104,36 +98,22 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 
 ---
 
-## Próximo passo (24/06/2026)
+## Próximo passo (23/06/2026)
 
 | # | Ação | Quem | Status |
 |---|------|------|--------|
-| 1 | ~~Nova versão Web GAS v1.5.149 (I52)~~ | **Sócio** | ✅ prod |
-| 2 | ~~Repair LOCACOES planilha (memorial, 28 cols, formatos)~~ | Agente | ✅ `REPARAR_LOCACOES_PLANILHA_ADMIN` 24/06 |
-| 2b | ~~Nova versão Web GAS v1.5.150 (I53 CONFIG)~~ + repair planilha | **Sócio** + agente | ✅ prod 24/06 |
-| 3 | ~~OPERADORES_SISTEMA protocolo I54~~ + repair | Agente + Socio | ✅ prod 24/06 |
-| 4 | ~~CUSTOS protocolo I55~~ + repair | Agente + Socio | ✅ prod 24/06 |
-| 5 | ~~DASHBOARD protocolo I56~~ + repair | Agente + Socio | ✅ prod 24/06 |
-| 6 | ~~FOLHA protocolo I57~~ + repair | Agente + Socio | ✅ prod 24/06 |
-| 7 | ~~INVESTIMENTO protocolo I58~~ + repair | Agente + Socio | ✅ prod 24/06 |
-| 8 | ~~RESPONSAVEIS protocolo I59~~ + repair | Agente + Socio | ✅ prod 24/06 |
-| 9 | ~~RELATORIOS protocolo I60~~ | **Sócio** + agente | ✅ prod 24/06 |
-| 10 | ~~AUD_* camada 4 protocolo I61~~ | **Sócio** + agente | ✅ prod 25/06 |
-| 11 | ~~RH camada 5 P0 protocolo I62~~ | **Sócio** + agente | ✅ prod 25/06 |
-| 12 | ~~RH camada 5 restante I63~~ | **Sócio** + agente | ✅ prod 25/06 |
-| 12b | ~~Auditoria célula 3 camadas (I52–I63 + OAuth)~~ | Agente | ✅ 25/06 · **23/23 ok** · I67 Neide L233 |
-| 12c | ~~FOLHA_PONTO L8 Milena 24/06~~ | Agente | ✅ `SALVAR_PONTO_RH_ADMIN.ps1` |
-| 4 | Tablet `?force=1.8.119` — login PIN Milena/Raykelly (I47) | Ops loja | ⏳ |
-| 5 | Raykelly cadastro **100%** em `gestao-pessoas.html` (PIN dela) | Colaborador | ⏳ 25% |
-| 6 | Homolog ▶ cronômetro (I43) + Caixa I42 + Gestor | Ops loja | ⏳ |
-| 7 | Ponto RH diário (`FOLHA_PONTO`) | Ops | ⏳ |
-| 8 | **17.5** decisão F9 Supervisor | Sócio | ⏳ |
+| 1 | ~~Homolog tablet v1.8.121 (I43, I42, I47, Gestor)~~ | Ops loja | ✅ **23/06** |
+| 2 | Raykelly cadastro **100%** `gestao-pessoas.html` | Colaborador | ⏳ **próximo** |
+| 3 | Decisão **17.5 F9** Supervisor | **Sócio** | ⏳ |
+| 4 | Assinar fechamento formal **FASE 17** | Ops + sócio | ⏳ |
+| 5 | Ponto RH diário (`FOLHA_PONTO`) | Ops | ⏳ |
+| 6 | Rotina mensal `HIGIENE` + `AUDITORIA_CELULA` + `BACKUP_RH` | Agente | ⏳ |
 
-Docs: `INCIDENTE_I49_*` · `INCIDENTE_I51_*` · `MAPA_PLANILHA_ABAS_MOVIKIDS.md` §6
+Docs: `PLANEJAMENTO_ATUAL_2026-06.md` §9 · `DIAGNOSTICO_SISTEMA_6_CAMADAS_2026-06.md`
 
 ---
 
-## Incidentes — sessão 24/06/2026
+## Incidentes — sessão 24/06/2026 (arquivo)
 
 | ID | Evento | Fix |
 |----|--------|-----|
