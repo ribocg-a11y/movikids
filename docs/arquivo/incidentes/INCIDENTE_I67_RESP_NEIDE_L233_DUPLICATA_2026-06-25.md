@@ -12,6 +12,7 @@
 1. Mescla crianca **Anthony** em VERA (L232)
 2. Remove linha duplicata L233
 3. Dry-run `repararResponsaveisPlanilhaAdmin` → **problemas=0** · cadastros=240
+4. `criancasJson` VERA L232 normalizado → `["Anthony"]`
 
 ## Script OAuth (PC)
 
