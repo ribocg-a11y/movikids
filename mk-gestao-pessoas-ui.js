@@ -1320,8 +1320,22 @@
         return;
       }
       const p = PESSOAS[colabLogado];
-      const t = fmtTime(), hoje = fmtDataHoje(), dia = diaSemanaHoje();
-      if (MK_GP_PROD && window.MK_GestaoPessoas && gpSessionPin) {
+      if (!p) {
+        if (flash) {
+          flash.textContent = '✗ Selecione colaborador e entre com seu PIN.';
+          flash.hidden = false;
+        }
+        return;
+      }
+      if (MK_GP_PROD && window.MK_GestaoPessoas) {
+        if (!gpSessionPin) {
+          if (flash) {
+            flash.textContent = '✗ Sessão expirada — saia e entre de novo com seu PIN para registrar ponto.';
+            flash.hidden = false;
+          }
+          go('s-colab-pin');
+          return;
+        }
         const tipo = p.statusHoje !== 'dentro' ? 'entrada' : 'saida';
         MK_GestaoPessoas.registrarPonto(colabLogado, gpSessionPin, tipo).then(function (r) {
           p.statusHoje = r.status || (tipo === 'entrada' ? 'dentro' : 'fora');
@@ -1337,6 +1351,7 @@
         });
         return;
       }
+      const t = fmtTime(), hoje = fmtDataHoje(), dia = diaSemanaHoje();
       let row = p.folha.find(r=>r.data===hoje);
       if (!row) { row={data:hoje,dia,entrada:'—',saida:'—',horas:'—',sit:'ABERTO'}; p.folha.unshift(row); }
       if (p.statusHoje!=='dentro') {
