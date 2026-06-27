@@ -930,10 +930,10 @@
     }
 
     function gpHubBenefChip_(lbl, val, ctx, tone, icon) {
-      return '<div class="gp-hub-ben-chip gp-hub-ben-chip--' + (tone || 'va') + '">' +
-        '<span class="gp-hub-ben-lbl"><span class="gp-chip-ico" aria-hidden="true">' + (icon || '') + '</span>' + lbl + '</span>' +
-        '<span class="gp-hub-ben-val">' + val + '</span>' +
-        '<span class="gp-hub-ben-ctx">' + ctx + '</span></div>';
+      return '<div class="mk-widget gp-hub-ben-chip gp-hub-ben-chip--' + (tone || 'va') + '">' +
+        '<span class="mk-widget-lbl"><span class="gp-chip-ico" aria-hidden="true">' + (icon || '') + '</span> ' + lbl + '</span>' +
+        '<span class="mk-widget-val">' + val + '</span>' +
+        '<span class="mk-widget-ctx">' + ctx + '</span></div>';
     }
 
     function renderHubBeneficios_(p) {
@@ -955,7 +955,7 @@
       const copTone = b.vaCopart > 0 ? 'copart' : 'muted';
       el.innerHTML =
         gpSecHead_('🎁', 'Meus benefícios', escHtml_(b.comp)) +
-        '<div class="gp-hub-ben-grid">' +
+        '<div class="mk-cmd-grid gp-hub-ben-grid">' +
         gpHubBenefChip_('Vale-alimentação', 'R$ ' + fmtBRL(b.vaTotal), vaCtx, 'va', '🍽') +
         gpHubBenefChip_('Vale-transporte', vtVal, vtCtx, 'vt', '🚌') +
         gpHubBenefChip_('Copart. VA', copVal, b.vaCopart > 0 ? '20% refeição fora' : 'Nada a descontar', copTone, '💳') +
@@ -1090,6 +1090,17 @@
       return { val: m.atual + '/' + m.alvo, ctx: ctx, tone: pct >= 100 ? 'ok' : (pct >= 50 ? 'amber' : 'blue') };
     }
 
+    function gpHubHeroStatus_(p, folga, ponto, meta) {
+      if (folga) return { val: 'Folga', ctx: 'Sem turno hoje — aproveite o descanso', tone: 'off' };
+      if (p.statusHoje === 'dentro') {
+        return { val: 'Em operação', ctx: 'Ponto: ' + ponto.val + ' · Meta ' + meta.val, tone: 'ok' };
+      }
+      if (ponto.tone === 'warn') {
+        return { val: 'Registrar ponto', ctx: 'Dia de trabalho · escala ' + gpEscalaHoje_(p), tone: 'warn' };
+      }
+      return { val: 'Fora do turno', ctx: ponto.ctx || 'Confira escala e meta abaixo', tone: 'blue' };
+    }
+
     function renderHubJornada_(p) {
       const el = document.getElementById('gp-hub-jornada');
       if (!el || !p) return;
@@ -1097,6 +1108,7 @@
       const folga = gpEscalaEhFolga_(escala);
       const ponto = gpPontoHojeResumo_(p);
       const meta = gpMetaHojeResumo_(p);
+      const hero = gpHubHeroStatus_(p, folga, ponto, meta);
       let lead = 'Resumo do seu dia — escala, ponto e meta em um lugar.';
       if (folga) lead = 'Folga hoje — descanse bem!';
       else if (p.statusHoje === 'dentro') lead = 'Você está em operação. Bom trabalho!';
@@ -1105,10 +1117,16 @@
       const escVal = folga ? 'Folga' : escala;
       const escTone = folga ? 'off' : 'blue';
       const showCta = !gpAdmPreviewMode_ && !folga && p.statusHoje !== 'dentro' && ponto.tone === 'warn' && cadastroOk(p);
+      const heroValCls = hero.tone === 'ok' ? ' green' : (hero.tone === 'warn' ? '' : '');
+      const heroValStyle = hero.tone === 'warn' ? ' style="color:#E65100"' : (hero.tone === 'off' ? ' style="color:#9AAAC0"' : '');
       el.innerHTML =
         gpSecHead_('📅', 'Minha jornada hoje') +
         '<p class="gp-hub-jornada-lead">' + lead + '</p>' +
-        '<div class="gp-hub-jornada-grid">' +
+        '<div class="mk-widget mk-widget--hero gp-hub-hero">' +
+        '<span class="mk-widget-lbl">Status de hoje</span>' +
+        '<span class="mk-widget-val' + heroValCls + '"' + heroValStyle + '>' + hero.val + '</span>' +
+        '<span class="mk-widget-ctx">' + hero.ctx + '</span></div>' +
+        '<div class="mk-cmd-grid gp-hub-jornada-grid">' +
         gpHubJornadaWidget_('Escala', escVal, escCtx, escTone, '🗓') +
         gpHubJornadaWidget_('Ponto', ponto.val, ponto.ctx, ponto.tone, '🕐') +
         gpHubJornadaWidget_('Meta', meta.val, meta.ctx, meta.tone, '🎯') +
@@ -1117,10 +1135,11 @@
     }
 
     function gpHubJornadaWidget_(lbl, val, ctx, tone, icon) {
-      return '<div class="gp-hub-j-widget gp-hub-j-widget--' + (tone || 'blue') + '">' +
-        '<span class="gp-hub-j-lbl"><span class="gp-chip-ico" aria-hidden="true">' + (icon || '') + '</span>' + lbl + '</span>' +
-        '<span class="gp-hub-j-val">' + val + '</span>' +
-        '<span class="gp-hub-j-ctx">' + ctx + '</span></div>';
+      const toneCls = tone === 'ok' ? ' gp-hub-j-widget--ok' : (tone === 'warn' ? ' gp-hub-j-widget--warn' : (tone === 'off' ? ' gp-hub-j-widget--off' : (tone === 'amber' ? ' gp-hub-j-widget--amber' : '')));
+      return '<div class="mk-widget gp-hub-j-widget' + toneCls + '">' +
+        '<span class="mk-widget-lbl"><span class="gp-chip-ico" aria-hidden="true">' + (icon || '') + '</span> ' + lbl + '</span>' +
+        '<span class="mk-widget-val">' + val + '</span>' +
+        '<span class="mk-widget-ctx">' + ctx + '</span></div>';
     }
 
     function abrirModulo(mod) {
@@ -1493,6 +1512,15 @@
         ? holRow('405', 'VA — coparticipação PAT', '20%', '', holMoney(c.vaCopart, 'd'))
         : '';
       document.getElementById('pag-body').innerHTML = `
+        ${typeof mkHolWidgetHero_ === 'function' ? mkHolWidgetHero_({
+          comp: pg.competencia,
+          pagamentoEm: pg.pagamentoEm,
+          liquido: c.liquido,
+          bruto: c.bruto,
+          totalDescontos: c.totalDescontos,
+          quinzenaLabel: 'Demonstrativo'
+        }) : ''}
+        <p class="gp-hol-detail-lead">Detalhamento linha a linha abaixo.</p>
         <div class="mk-hol">
           <div class="mk-hol-head">
             <div class="mk-hol-brand">MOVI <span style="color:var(--gold,#FFD54F)">KIDS</span></div>

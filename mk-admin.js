@@ -1135,6 +1135,13 @@ function mkAdminMobCmdSetVal_(id, val) {
   if (el) el.textContent = val != null && val !== '' ? String(val) : '—';
 }
 
+function mkAdminMobCmdSetCtx_(id, ctx) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = ctx || '';
+  el.style.display = ctx ? '' : 'none';
+}
+
 function renderAdminMobCmd_(d) {
   const box = document.getElementById('mk-admin-mob-cmd');
   if (!box) return;
@@ -1145,12 +1152,20 @@ function renderAdminMobCmd_(d) {
   box.hidden = false;
   const widgets = (d && d.widgets) ? d.widgets : [];
   widgets.forEach(function(w) {
-    if (w.id === 'loc') mkAdminMobCmdSetVal_('mk-admin-mob-loc', w.valor);
-    else if (w.id === 'fat') {
+    if (w.id === 'loc') {
+      mkAdminMobCmdSetVal_('mk-admin-mob-loc', w.valor);
+      mkAdminMobCmdSetCtx_('mk-admin-mob-loc-ctx', w.ctx);
+    } else if (w.id === 'fat') {
       const v = Number(w.valor);
       mkAdminMobCmdSetVal_('mk-admin-mob-fat', isNaN(v) ? w.valor : R2(v));
-    } else if (w.id === 'equipe') mkAdminMobCmdSetVal_('mk-admin-mob-equipe', w.valor);
-    else if (w.id === 'frota') mkAdminMobCmdSetVal_('mk-admin-mob-frota', w.valor);
+      mkAdminMobCmdSetCtx_('mk-admin-mob-fat-ctx', w.ctx);
+    } else if (w.id === 'equipe') {
+      mkAdminMobCmdSetVal_('mk-admin-mob-equipe', w.valor);
+      mkAdminMobCmdSetCtx_('mk-admin-mob-equipe-ctx', w.ctx);
+    } else if (w.id === 'frota') {
+      mkAdminMobCmdSetVal_('mk-admin-mob-frota', w.valor);
+      mkAdminMobCmdSetCtx_('mk-admin-mob-frota-ctx', w.ctx);
+    }
   });
   const syncEl = document.getElementById('mk-admin-mob-cmd-sync');
   if (syncEl) {
@@ -1180,6 +1195,7 @@ function applyCommandCenterData_(d) {
   const dashPage = document.getElementById('page-dashboard');
   if (dashPage && dashPage.classList.contains('active')) renderCommandCenter_(d);
   renderAdminMobCmd_(d);
+  if (kpiData && kpiData.ok && typeof renderPrevisaoMes_ === 'function') renderPrevisaoMes_(kpiData);
 }
 
 function mkAdminMobCmdOnSidebarShow_() {
@@ -1236,6 +1252,23 @@ function mkCmdSetWidget_(idPrefix, val, ctx, trend) {
   }
 }
 
+function mkCmdFrotaStatusClass_(v) {
+  const st = String((v && v.status) || 'disponivel');
+  if (st === 'em_uso') return 'mk-cmd-veic em-uso';
+  if (st === 'manutencao') return 'mk-cmd-veic manutencao';
+  return 'mk-cmd-veic disponivel';
+}
+
+function mkCmdFrotaStatusLabel_(v) {
+  const st = String((v && v.status) || 'disponivel');
+  const nome = v.veiculo || '—';
+  if (st === 'em_uso') {
+    return nome + ' · em uso' + (v.nLoc > 1 ? ' (' + v.nLoc + ' loc)' : '');
+  }
+  if (st === 'manutencao') return nome + ' · manutenção';
+  return nome + ' · disponível';
+}
+
 function renderCommandCenterFrotaStrip_(frota) {
   const strip = document.getElementById('mk-cmd-frota-strip');
   if (!strip) return;
@@ -1245,11 +1278,15 @@ function renderCommandCenterFrotaStrip_(frota) {
     strip.innerHTML = '';
     return;
   }
+  const emUso = det.filter(function(v) { return v.status === 'em_uso'; }).length;
+  const livre = det.filter(function(v) { return v.status !== 'em_uso' && v.status !== 'manutencao'; }).length;
+  const manut = det.filter(function(v) { return v.status === 'manutencao'; }).length;
+  let summary = emUso + ' em uso · ' + livre + ' disponível';
+  if (manut) summary += ' · ' + manut + ' manutenção';
   strip.hidden = false;
-  strip.innerHTML = '<span class="mk-cmd-frota-lbl">Frota:</span>' + det.map(function(v) {
-    const cls = v.status === 'em_uso' ? 'mk-cmd-veic em-uso' : 'mk-cmd-veic';
-    const lbl = v.status === 'em_uso' ? (v.veiculo + ' · em uso') : (v.veiculo + ' · livre');
-    return '<span class="' + cls + '" title="' + lbl + '">' + v.veiculo + '</span>';
+  strip.innerHTML = '<span class="mk-cmd-frota-lbl" title="' + summary + '">Frota:</span>' + det.map(function(v) {
+    const lbl = mkCmdFrotaStatusLabel_(v);
+    return '<span class="' + mkCmdFrotaStatusClass_(v) + '" title="' + lbl + '">' + (v.veiculo || '—') + '</span>';
   }).join('');
 }
 
@@ -2303,9 +2340,119 @@ function renderContratacaoPanel_(d) {
   }
 }
 
+function calcPrevisaoMes7d_(d) {
+  const fatMes = Number(d.fatMes) || 0;
+  const cusMes = Number(d.cusMes) || 0;
+  const resultado = Number(d.resultado) || 0;
+  const diasOp = Number(d.diasOperando) || 0;
+  const diasMes = Number(d.diasMes) || new Date(d.anoAtual || new Date().getFullYear(), d.mesAtual || 1, 0).getDate();
+  const hoje = new Date();
+  const isCorrente = d.mesAtual === hoje.getMonth() + 1 && d.anoAtual === hoje.getFullYear();
+  const fatPorDia = d.fatPorDia || [];
+  const fatMap = {};
+  fatPorDia.forEach(function(x) {
+    const dia = Number(x.dia) || 0;
+    if (dia > 0) fatMap[dia] = Number(x.valor) || 0;
+  });
+  const diaRef = isCorrente
+    ? hoje.getDate()
+    : Object.keys(fatMap).reduce(function(m, k) { return Math.max(m, Number(k)); }, 0);
+  let sum7 = 0;
+  let count7 = 0;
+  for (let i = 0; i < 7; i++) {
+    const dd = diaRef - i;
+    if (dd < 1) break;
+    sum7 += fatMap[dd] || 0;
+    count7++;
+  }
+  const media7 = count7 > 0 ? sum7 / count7 : 0;
+  const diasRest = isCorrente ? Math.max(0, diasMes - diaRef) : 0;
+  const previsaoFat = isCorrente
+    ? Math.round((fatMes + media7 * diasRest) * 100) / 100
+    : Math.round(fatMes * 100) / 100;
+  const margemOp = fatMes > 0 ? resultado / fatMes : 0;
+  const previsaoRes = Math.round(previsaoFat * margemOp * 100) / 100;
+  return {
+    previsaoFat: previsaoFat,
+    previsaoRes: previsaoRes,
+    media7: Math.round(media7 * 100) / 100,
+    diasRest: diasRest,
+    count7: count7,
+    fatMes: fatMes,
+    cusMes: cusMes,
+    isCorrente: isCorrente,
+    projGas: Number(d.projecaoFat) || 0,
+    projResGas: Number(d.projecaoRes) || 0,
+    mediaDiaria: Number(d.mediaDiaria) || (diasOp > 0 ? fatMes / diasOp : 0),
+    diasOp: diasOp
+  };
+}
+
+function mkPrevSetCtx_(id, text, trend) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = text || '—';
+  el.classList.remove('trend-up', 'trend-down');
+  if (trend === 'up') el.classList.add('trend-up');
+  else if (trend === 'down') el.classList.add('trend-down');
+}
+
+/** FASE 18 UI-B1/B2 — previsão fim de mês + comparativo 30d (FE, kpiMes + comando). */
+function renderPrevisaoMes_(d) {
+  const box = document.getElementById('mk-previsao-mes');
+  if (!box || !d) return;
+  box.style.display = '';
+
+  const p = calcPrevisaoMes7d_(d);
+  const comp30 = (commandCenterData && commandCenterData.comparativo30d) || {};
+  const media30 = Number(comp30.media) || 0;
+
+  setText2('mk-prev-fat', R2(p.previsaoFat));
+  const fatCtx = p.isCorrente
+    ? ('Média 7d ' + R2(p.media7) + '/dia · ' + p.diasRest + ' dia(s) restante(s)')
+    : ('Mês fechado · real ' + R2(p.fatMes));
+  mkPrevSetCtx_('mk-prev-fat-ctx', fatCtx, null);
+
+  const resEl = document.getElementById('mk-prev-res');
+  if (resEl) {
+    resEl.textContent = R2(p.previsaoRes);
+    resEl.className = 'mk-widget-val ' + (p.previsaoRes >= 0 ? 'green' : '');
+    if (p.previsaoRes < 0) resEl.style.color = '#C62828';
+    else resEl.style.color = '';
+  }
+  mkPrevSetCtx_('mk-prev-res-ctx', p.isCorrente
+    ? ('Margem operacional atual · GAS proj. ' + R2(p.projResGas))
+    : ('Resultado real do mês'), p.previsaoRes >= 0 ? 'up' : 'down');
+
+  setText2('mk-prev-gas', R2(p.projGas));
+  mkPrevSetCtx_('mk-prev-gas-ctx', p.diasOp + ' dias com movimento · ritmo dias operando', null);
+
+  const mediaDia = Number(p.mediaDiaria) || 0;
+  if (media30 > 0) {
+    const diffPct = Math.round((mediaDia - media30) / media30 * 1000) / 10;
+    const sign = diffPct > 0 ? '+' : '';
+    setText2('mk-prev-cmp-fat', sign + diffPct + '%');
+    mkPrevSetCtx_('mk-prev-cmp-fat-ctx', R2(mediaDia) + '/dia vs média 30d ' + R2(media30),
+      diffPct > 2 ? 'up' : diffPct < -2 ? 'down' : null);
+  } else {
+    setText2('mk-prev-cmp-fat', R2(mediaDia) + '/dia');
+    mkPrevSetCtx_('mk-prev-cmp-fat-ctx', 'Média diária do mês selecionado', null);
+  }
+
+  const cusPct = p.fatMes > 0 ? Math.round(p.cusMes / p.fatMes * 1000) / 10 : 0;
+  setText2('mk-prev-cmp-cus', cusPct + '%');
+  const cusDia = p.diasOp > 0 ? p.cusMes / p.diasOp : 0;
+  const cusTrend = cusPct > 35 ? 'down' : cusPct < 20 && p.fatMes > 0 ? 'up' : null;
+  mkPrevSetCtx_('mk-prev-cmp-cus-ctx', R2(p.cusMes) + ' no mês · ~' + R2(cusDia) + '/dia operando', cusTrend);
+
+  const badge = document.getElementById('mk-prev-badge');
+  if (badge) badge.textContent = p.isCorrente ? ('7d · ' + p.count7 + ' dias') : 'Fechado';
+}
+
 function renderDashboardCore_(d) {
   if (!d) return;
   renderExecCockpit_(d);
+  renderPrevisaoMes_(d);
   renderDecisaoPanel_(d);
   renderContratacaoPanel_(d);
   renderAlertStrip_(d);
@@ -2788,33 +2935,48 @@ function renderCaixaFromResumo_(dataFmt, r) {
     const cusDin = Number(r.cusDin) || 0;
     const saldoDin = Number(r.saldoDin) || 0;
     const resultado = Number(r.resultado) || 0;
+    const nContas = Number(r.n) || locacoes.length;
+    const nSess = Number(r.nSessoes) || locacoes.length;
 
-    // KPIs
-    const setKpi = (id, val, cor) => {
+    const setText = (id, val) => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = val;
+    };
+    const setVal = (id, val, cor) => {
       const el = document.getElementById(id);
       if (el) {
         el.textContent = fmtR(val);
         if (cor) el.style.color = cor;
       }
     };
-    const setHero = (id, val, cor) => {
-      const el = document.getElementById(id);
-      if (el) {
-        el.textContent = fmtR(val);
-        if (cor) el.style.color = cor;
-      }
-    };
-    setKpi('cx-total', totalEnt, '#3B6D11');
-    setKpi('cx-maq',   totalMaq, '#185FA5');
-    setKpi('cx-din',   totalDin, '#854F0B');
-    setKpi('cx-cus',   totalCus, '#A32D2D');
-    setHero('cx-res', resultado, null);
-    setKpi('cx-ext', totalExt, '#6A1B9A');
+
+    const dataLbl = document.getElementById('cx-data-label');
+    if (dataLbl) dataLbl.textContent = dataFmt;
+
+    setVal('cx-total', totalEnt);
+    setVal('cx-maq', totalMaq);
+    setVal('cx-din', totalDin);
+    setVal('cx-cus', totalCus, '#C62828');
+    setVal('cx-ext', totalExt);
+    const resEl = document.getElementById('cx-res');
+    if (resEl) {
+      resEl.textContent = fmtR(resultado);
+      resEl.classList.remove('green', 'blue');
+      resEl.style.color = resultado >= 0 ? '#2E7D32' : '#C62828';
+    }
+    setText('cx-res-ctx', fmtR(totalEnt) + ' − ' + fmtR(totalCus) + ' custos');
+    setText('cx-total-ctx', nContas + ' conta(s)' + (nSess > nContas ? ' · ' + nSess + ' sessões' : ''));
+    setText('cx-maq-ctx', 'PIX R$ ' + Number(totPag.PIX || 0).toFixed(2).replace('.', ',') + ' · cartões');
+    setText('cx-din-ctx', 'Saldo espécie ' + fmtR(saldoDin));
+    setText('cx-cus-ctx', custos.length + ' lançamento(s)');
     const nloc = document.getElementById('cx-nloc');
-    if (nloc) {
-      const nContas = Number(r.n) || locacoes.length;
-      const nSess = Number(r.nSessoes) || locacoes.length;
-      nloc.textContent = nContas + (nSess > nContas ? ' (' + nSess + ' sessões)' : '');
+    if (nloc) nloc.textContent = String(nContas);
+    setText('cx-nloc-ctx', nSess > nContas ? nSess + ' sessões no dia' : 'Contas encerradas');
+    if (totalExt > 0) {
+      const pct = totalEnt > 0 ? Math.round(totalExt / totalEnt * 1000) / 10 : 0;
+      setText('cx-ext-ctx', nExt + ' loc · ' + pct + '% do fat.');
+    } else {
+      setText('cx-ext-ctx', 'Sem extras hoje');
     }
     const cxExtIns = document.getElementById('cx-ext-insight');
     if (cxExtIns) {

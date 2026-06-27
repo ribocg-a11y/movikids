@@ -1,0 +1,48 @@
+---
+description: I24 — bump FE obriga publicar na mesma sessão (commit+push+verify)
+alwaysApply: true
+---
+
+# I24 — Publicação FE obrigatória (banner Nova versão)
+
+## Problema recorrente
+
+Bump em `mk-version.js` / `sw.js` / `?v=` **sem** `git push` → GitHub Pages fica na versão antiga → **faixa "Nova versão" nunca aparece** (local = remoto = versão velha).
+
+## Regra dura (agente)
+
+**Alterou FE ou bumpou versão I3** → na **mesma sessão**, antes de dizer "concluído":
+
+1. `.\scripts\pre-push-check.ps1`
+2. `git commit` (mensagem clara)
+3. `git push origin main`
+4. `.\scripts\verify-publish-complete.ps1`
+5. `.\scripts\encerramento-sessao.ps1` → **exit 0 obrigatório**
+
+**Proibido encerrar** com `Pages != mk-version.js local` ou `git ahead > 0` em commits que tocam I3.
+
+## Encerramento
+
+Substituir só `relatorio-versoes.ps1` por:
+
+```powershell
+.\scripts\encerramento-sessao.ps1
+```
+
+Se `-Strict` / guard falhar: **executar push**, não explicar ao usuário "falta push".
+
+## Exceção única
+
+Usuário disse explicitamente **"não commitar"** / **"não pushar"** → `-AllowUnpublished` só nesse caso; avisar na resposta que banner não funcionará até publicar.
+
+## Scripts
+
+| Script | Função |
+|--------|--------|
+| `scripts/guard-i24-publicacao.ps1` | Trava I24 (Sessao / PrePush / PosPush) |
+| `scripts/encerramento-sessao.ps1` | Relatório + guard — gate fim de sessão |
+| `scripts/verify-publish-complete.ps1` | Pós-push: git + Pages live |
+
+## Mapa
+
+`MAPA_ERROS_FALHAS_BUGS.md` → **I24** · incidente I3

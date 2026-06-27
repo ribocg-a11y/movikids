@@ -1696,6 +1696,15 @@
 }
 .mk-admin-mob-cmd-val--blue { color: #90CAF9; }
 .mk-admin-mob-cmd-val--purple { color: #CE93D8; }
+.mk-admin-mob-cmd-ctx {
+  font-family: 'Nunito', sans-serif;
+  font-size: 9px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.42);
+  line-height: 1.25;
+  margin-top: 1px;
+}
+.mk-admin-mob-cmd-ctx:empty { display: none; }
 .mk-admin-mob-cmd-actions {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -1842,6 +1851,98 @@
   background: rgba(94, 53, 177, 0.12);
   color: #5E35B1;
   border-color: rgba(94, 53, 177, 0.2);
+}
+.mk-cmd-veic.disponivel {
+  background: rgba(46, 125, 50, 0.1);
+  color: #2E7D32;
+  border-color: rgba(46, 125, 50, 0.18);
+}
+.mk-cmd-veic.manutencao {
+  background: rgba(230, 81, 0, 0.1);
+  color: #E65100;
+  border-color: rgba(230, 81, 0, 0.22);
+}
+
+/* UI-A2 — Caixa One UI */
+.mk-caixa-command {
+  margin-bottom: 16px;
+  padding: 14px 16px 16px;
+}
+.mk-caixa-widgets-grid {
+  margin-top: 12px;
+}
+@media (max-width: 900px) {
+  .mk-caixa-widgets-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 480px) {
+  .mk-caixa-widgets-grid { grid-template-columns: 1fr; }
+}
+.mk-widget--hero {
+  margin-top: 4px;
+  background: rgba(21, 101, 192, 0.06);
+  border-color: rgba(21, 101, 192, 0.14);
+}
+.mk-widget--hero .mk-widget-val {
+  font-size: 22px;
+}
+
+/* UI-A3 — Histórico widgets */
+.mk-hist-widgets {
+  margin-bottom: 14px;
+}
+
+/* UI-A4 — RH admin widgets na página operadores */
+#page-operadores .gp-adm-kpi-grid.mk-cmd-grid {
+  grid-template-columns: repeat(3, 1fr);
+}
+#page-operadores .gp-adm-jorn-widgets {
+  margin: 12px 0 14px;
+}
+@media (max-width: 768px) {
+  #page-operadores .gp-adm-kpi-grid.mk-cmd-grid,
+  #page-operadores .gp-adm-jorn-widgets {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* FASE 18 UI-B1 — previsão fim de mês */
+.mk-previsao-mes {
+  margin-top: 14px;
+  padding: 14px 16px 16px;
+}
+.mk-previsao-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.mk-previsao-title {
+  font-family: 'Fredoka One', cursive;
+  font-size: 15px;
+  font-weight: 400;
+  color: var(--mk-admin-blue-dk, #1565C0);
+  margin: 0;
+}
+.mk-previsao-badge {
+  font-family: 'Nunito', sans-serif;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(255, 213, 79, 0.35);
+  color: #5D4037;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+.mk-previsao-grid {
+  margin-top: 12px;
+}
+@media (max-width: 900px) {
+  .mk-previsao-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 480px) {
+  .mk-previsao-grid { grid-template-columns: 1fr; }
 }
 .mk-cmd-alerts {
   margin-top: 12px;

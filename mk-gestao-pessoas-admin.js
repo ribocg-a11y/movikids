@@ -317,7 +317,7 @@
     }
     const intelRows = gpAdmIntelForOp_(c.id);
     const intelBlock = intelRows.length
-      ? '<div class="gp-adm-main-alert">' + intelRows.map(function (a) {
+      ? '<div class="gp-adm-presenca-intel">' + intelRows.map(function (a) {
         return gpAdmAlertRowHtml_(a, 'Atenção', a.nivel === 'vermelho' ? 'err' : 'warn');
       }).join('') + '</div>'
       : '';
@@ -330,14 +330,17 @@
     const t = j.totais || {};
     const m = c.metas || {};
     const saldoCls = (t.saldoMesMin != null && t.saldoMesMin < 0) ? 'atraso' : 'extra';
+    const saldoValAttr = saldoCls === 'atraso'
+      ? 'class="mk-widget-val" style="color:#C62828"'
+      : 'class="mk-widget-val green"';
     const resumo = '<div class="gp-adm-jorn-hero">' +
       '<h3>Jornada · ' + esc(gpAdmData_.competencia || '') + '</h3>' +
       '<p class="gp-adm-muted">' + (m.locMes || 0) + ' locações no mês</p>' +
-      '<div class="gp-adm-jorn-hero-kpis">' +
-      '<div class="gp-adm-jorn-hero-kpi"><span>Previsto</span><strong>' + esc(t.previsto || '—') + '</strong></div>' +
-      '<div class="gp-adm-jorn-hero-kpi"><span>Trabalhado</span><strong>' + esc(t.trabalhado || '—') + '</strong></div>' +
-      '<div class="gp-adm-jorn-hero-kpi gp-adm-jorn-hero-kpi--' + saldoCls + '"><span>Saldo mês</span><strong>' + esc(t.saldoMes || '—') + '</strong></div>' +
-      '<div class="gp-adm-jorn-hero-kpi"><span>Banco</span><strong>' + esc(j.bancoProjetado || j.bancoSaldo || '0h00') + '</strong></div>' +
+      '<div class="mk-cmd-grid gp-adm-jorn-widgets">' +
+      '<div class="mk-widget"><span class="mk-widget-lbl">Previsto</span><span class="mk-widget-val">' + esc(t.previsto || '—') + '</span><span class="mk-widget-ctx">Competência</span></div>' +
+      '<div class="mk-widget"><span class="mk-widget-lbl">Trabalhado</span><span class="mk-widget-val blue">' + esc(t.trabalhado || '—') + '</span><span class="mk-widget-ctx">Horas registradas</span></div>' +
+      '<div class="mk-widget"><span class="mk-widget-lbl">Saldo mês</span><span ' + saldoValAttr + '>' + esc(t.saldoMes || '—') + '</span><span class="mk-widget-ctx">' + (saldoCls === 'atraso' ? 'Atenção RH' : 'Dentro da meta') + '</span></div>' +
+      '<div class="mk-widget"><span class="mk-widget-lbl">Banco horas</span><span class="mk-widget-val purple">' + esc(j.bancoProjetado || j.bancoSaldo || '0h00') + '</span><span class="mk-widget-ctx">Projetado</span></div>' +
       '</div>' +
       '<details class="gp-adm-jorn-details"><summary>Mais detalhes (extras, atrasos, banco)</summary>' +
       '<div class="gp-jorn-resumo gp-jorn-resumo--ficha">' +
@@ -372,10 +375,10 @@
     const k = gpAdmData_.kpis || {};
     const intelN = k.alertasIntel || (gpAdmData_.alertasInteligentes || []).length;
     el.innerHTML =
-      '<div class="gp-adm-kpi"><div class="gp-adm-kpi-val">' + (k.total || 0) + '</div><div class="gp-adm-kpi-lbl">Colaboradores</div><div class="gp-adm-kpi-ctx">' + (k.comTurno || 0) + ' com turno cadastrado</div></div>' +
-      '<div class="gp-adm-kpi"><div class="gp-adm-kpi-val" style="color:var(--green)">' + (k.presentes || 0) + '</div><div class="gp-adm-kpi-lbl">Presentes agora</div><div class="gp-adm-kpi-ctx">de ' + (k.total || 0) + ' na equipe ativa</div></div>' +
-      '<div class="gp-adm-kpi"><div class="gp-adm-kpi-val" style="color:var(--orange)">' + ((k.alertas || 0) + intelN) + '</div><div class="gp-adm-kpi-lbl">Alertas</div><div class="gp-adm-kpi-ctx">' +
-      (intelN > 0 ? (intelN + ' proativos · ') : '') + ((k.alertas || 0) > 0 ? 'Conferir aba Hoje' : 'Tudo ok') + '</div></div>';
+      '<div class="mk-widget"><span class="mk-widget-lbl">Colaboradores</span><span class="mk-widget-val">' + (k.total || 0) + '</span><span class="mk-widget-ctx">' + (k.comTurno || 0) + ' com turno cadastrado</span></div>' +
+      '<div class="mk-widget"><span class="mk-widget-lbl">Presentes agora</span><span class="mk-widget-val green">' + (k.presentes || 0) + '</span><span class="mk-widget-ctx">de ' + (k.total || 0) + ' na equipe ativa</span></div>' +
+      '<div class="mk-widget"><span class="mk-widget-lbl">Alertas</span><span class="mk-widget-val" style="color:var(--orange)">' + ((k.alertas || 0) + intelN) + '</span><span class="mk-widget-ctx">' +
+      (intelN > 0 ? (intelN + ' proativos · ') : '') + ((k.alertas || 0) > 0 ? 'Conferir aba Hoje' : 'Tudo ok') + '</span></div>';
   }
 
   function gpAdmRenderHoje_() {

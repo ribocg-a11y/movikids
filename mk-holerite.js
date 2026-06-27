@@ -53,6 +53,32 @@
     return note;
   }
 
+  function mkHolWidgetHero_(opts) {
+    opts = opts || {};
+    var hol = opts.holerite || {};
+    var comp = opts.comp || hol.competencia || '—';
+    var liquido = hol.liquido != null ? hol.liquido : Number(opts.liquido) || 0;
+    var bruto = hol.bruto != null ? hol.bruto : Number(opts.bruto) || 0;
+    var totalDescontos = hol.totalDescontos != null ? hol.totalDescontos : Number(opts.totalDescontos) || 0;
+    var qLabel = hol.quinzenaLabel || opts.quinzenaLabel ||
+      (hol.quinzena === 1 ? '1ª quinzena' : (hol.quinzena === 2 ? '2ª quinzena' : 'Quinzena'));
+    var pgto = hol.pagamentoEm || opts.pagamentoEm || '—';
+    return '<div class="gp-hol-widgets" aria-label="Resumo do pagamento">' +
+      '<div class="mk-widget mk-widget--hero gp-hol-hero">' +
+      '<span class="mk-widget-lbl">Líquido desta quinzena</span>' +
+      '<span class="mk-widget-val green">' + mkHolFmtMoney_(liquido) + '</span>' +
+      '<span class="mk-widget-ctx">' + esc(qLabel) + ' · pgto ' + esc(pgto) + '</span></div>' +
+      '<div class="mk-cmd-grid gp-hol-widget-grid">' +
+      '<div class="mk-widget"><span class="mk-widget-lbl">Competência</span><span class="mk-widget-val">' + esc(comp) + '</span>' +
+      '<span class="mk-widget-ctx">Referência do mês</span></div>' +
+      '<div class="mk-widget"><span class="mk-widget-lbl">Vencimentos</span><span class="mk-widget-val">' + mkHolFmtMoney_(bruto) + '</span>' +
+      '<span class="mk-widget-ctx">Proventos da quinzena</span></div>' +
+      '<div class="mk-widget"><span class="mk-widget-lbl">Descontos</span>' +
+      '<span class="mk-widget-val" style="color:var(--red,#C62828)">' + mkHolFmtMoney_(totalDescontos, 'd') + '</span>' +
+      '<span class="mk-widget-ctx">INSS, IRRF, VT e outros</span></div>' +
+      '</div></div>';
+  }
+
   function mkHolBuildHtml_(opts) {
     opts = opts || {};
     var f = opts.folha || {};
@@ -117,7 +143,16 @@
       ? '<div class="mk-hol-toolbar no-print"><button type="button" class="btn btn-secondary" onclick="mkHolPrintPdf_()">📄 Salvar PDF / Imprimir</button></div>'
       : '';
 
-    return '<div class="mk-hol-print-root">' + toolbar +
+    var heroWidgets = mkHolWidgetHero_({
+      holerite: hol,
+      comp: comp,
+      bruto: bruto,
+      liquido: liquido,
+      totalDescontos: totalDescontos
+    });
+
+    return '<div class="mk-hol-print-root">' + toolbar + heroWidgets +
+      '<p class="gp-hol-detail-lead no-print">Detalhamento linha a linha abaixo — use PDF para arquivo.</p>' +
       '<div class="mk-hol" id="mk-hol-doc">' +
       '<div class="mk-hol-head"><div class="mk-hol-brand">MOVI <span style="color:var(--gold,#FFD54F)">KIDS</span></div>' +
       '<div class="mk-hol-sub">' + esc(EMPRESA.razao) + '<br>CNPJ ' + esc(EMPRESA.cnpj) + ' · ' + esc(EMPRESA.endereco) + '</div></div>' +
@@ -175,6 +210,7 @@
   }
 
   global.mkHolFmtMoney_ = mkHolFmtMoney_;
+  global.mkHolWidgetHero_ = mkHolWidgetHero_;
   global.mkHolBuildHtml_ = mkHolBuildHtml_;
   global.mkHolPrintPdf_ = mkHolPrintPdf_;
 })(typeof window !== 'undefined' ? window : globalThis);

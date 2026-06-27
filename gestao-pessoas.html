@@ -6,17 +6,17 @@
   <meta name="theme-color" content="#1565C0">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <title>Movi Kids — Colaboradores</title>
-  <script src="mk-stale-sync.js?v=1.8.122"></script>
-  <script src="mk-canonical-host.js?v=1.8.122"></script>
+  <script src="mk-stale-sync.js?v=1.9.2"></script>
+  <script src="mk-canonical-host.js?v=1.9.2"></script>
   <script>window.MK_GP_PROD = true;</script>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="mk-design.css?v=1.8.122">
-  <link rel="stylesheet" href="mk-app.css?v=1.8.122">
-  <link rel="stylesheet" href="mk-gestao-pessoas.css?v=1.8.122">
-  <script src="mk-version.js?v=1.8.122"></script>
-  <script src="mk-globals.js?v=1.8.122"></script>
-  <script src="mk-api.js?v=1.8.122"></script>
-  <script src="mk-gestao-pessoas.js?v=1.8.122"></script>
+  <link rel="stylesheet" href="mk-design.css?v=1.9.2">
+  <link rel="stylesheet" href="mk-app.css?v=1.9.2">
+  <link rel="stylesheet" href="mk-gestao-pessoas.css?v=1.9.2">
+  <script src="mk-version.js?v=1.9.2"></script>
+  <script src="mk-globals.js?v=1.9.2"></script>
+  <script src="mk-api.js?v=1.9.2"></script>
+  <script src="mk-gestao-pessoas.js?v=1.9.2"></script>
 </head>
 <body>
   <!--
@@ -92,9 +92,9 @@
       <button type="button" class="gp-preview-banner-btn" onclick="gpPreviewVoltarAdmin_()">Voltar admin</button>
     </div>
     <div class="gp-app-shell">
-      <section class="mock-screen" id="s-colab-hub">
+      <section class="mock-screen gp-colab-hub-oneui" id="s-colab-hub">
         <button type="button" class="mock-back" onclick="colabSair()">← Sair</button>
-        <div class="mock-user-bar">
+        <div class="mock-user-bar gp-hub-user-bar">
           <div class="mock-av" id="hub-av">R</div>
           <div class="gp-user-meta">
             <div class="gp-user-name" id="hub-nome">—</div>
@@ -199,16 +199,19 @@
         <div class="mock-h1">Banco de horas</div>
         <div id="banco-body"></div>
       </section>
-      <section class="mock-screen" id="s-pagamento">
+      <section class="mock-screen gp-colab-pag-oneui" id="s-pagamento">
         <button type="button" class="mock-back" onclick="go('s-colab-hub')">← Meu painel</button>
-        <div class="mock-h1">Holerite · demonstrativo de pagamento</div>
+        <div class="gp-pag-head">
+          <div class="mock-h1">Meu pagamento</div>
+          <p class="gp-pag-lead">Quinzena em destaque — detalhes completos abaixo.</p>
+        </div>
         <div id="pag-body"></div>
       </section>
     </div>
   </div>
 
-  <script src="mk-holerite.js?v=1.8.122"></script>
-  <script src="mk-gestao-pessoas-ui.js?v=1.8.122"></script>
-  <script src="mk-gp-boot.js?v=1.8.122"></script>
+  <script src="mk-holerite.js?v=1.9.2"></script>
+  <script src="mk-gestao-pessoas-ui.js?v=1.9.2"></script>
+  <script src="mk-gp-boot.js?v=1.9.2"></script>
 </body>
 </html>

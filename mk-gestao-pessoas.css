@@ -257,6 +257,55 @@ html.gp-mode-app #gp-app {
   margin-top: 10px;
 }
 
+/* Premium One UI — Sprint C hub colaborador + holerite widgets */
+#gp-app #s-colab-hub.gp-colab-hub-oneui {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+#gp-app .gp-hub-user-bar { margin-bottom: 2px; }
+#gp-app .gp-hub-hero {
+  margin: 0 0 10px;
+  text-align: center;
+}
+#gp-app .gp-hub-j-widget.mk-widget,
+#gp-app .gp-hub-ben-chip.mk-widget {
+  min-height: 88px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  gap: 2px;
+}
+#gp-app .gp-hub-j-widget--ok { border-color: rgba(46, 125, 50, 0.35); background: rgba(232, 245, 233, 0.65); }
+#gp-app .gp-hub-j-widget--warn { border-color: rgba(230, 81, 0, 0.35); background: rgba(255, 243, 224, 0.7); }
+#gp-app .gp-hub-j-widget--off { border-color: rgba(154, 170, 192, 0.4); background: rgba(240, 244, 250, 0.9); }
+#gp-app .gp-hub-j-widget--amber { border-color: rgba(255, 152, 0, 0.35); background: rgba(255, 248, 225, 0.75); }
+#gp-app .gp-hub-ben-chip.mk-widget { min-height: 76px; }
+#gp-app .gp-pag-head { margin-bottom: 12px; }
+#gp-app .gp-pag-lead {
+  margin: 4px 0 0;
+  font-size: 13px;
+  font-weight: var(--gp-body-weight, 600);
+  color: var(--txt2);
+  line-height: 1.45;
+}
+#gp-app .gp-hol-widgets {
+  margin-bottom: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+#gp-app .gp-hol-hero { text-align: center; }
+#gp-app .gp-hol-widget-grid .mk-widget { text-align: center; }
+#gp-app .gp-hol-detail-lead {
+  margin: 0 0 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--txt3);
+}
+
 /* FASE 15b.3 — Comunicados RH (hub colaborador) */
 #gp-app .gp-comunicados {
   margin-bottom: 16px;

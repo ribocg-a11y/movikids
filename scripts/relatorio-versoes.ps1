@@ -7,6 +7,7 @@
 param(
   [switch]$Markdown,
   [switch]$SkipNetwork,
+  [switch]$Strict,
   [string]$GasPingUrl = "https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec?action=ping",
   [string]$PagesBase = "https://ribocg-a11y.github.io/movikids"
 )
@@ -135,3 +136,27 @@ if ($Markdown) {
   Write-Host "GitHub Pages      : $pagesVer ($pagesStatus)"
   if ($gitAhead -gt 0) { Write-Host "git               : ahead $gitAhead commit(s) - push pendente" -ForegroundColor Yellow }
 }
+
+$strictFail = $false
+if ($Strict) {
+  if (-not $SkipNetwork -and $pagesVer -and $mkVer -and $pagesVer -ne $mkVer) {
+    $strictFail = $true
+    if ($Markdown) {
+      Write-Output ""
+      Write-Output "**I24 BLOQUEIO:** GitHub Pages ($pagesVer) != local ($mkVer) - banner Nova versao nao aparece ate git push + verify-publish-complete."
+    } else {
+      Write-Host "I24 BLOQUEIO: Pages != local - publicar FE" -ForegroundColor Red
+    }
+  }
+  if ($gitAhead -gt 0) {
+    $strictFail = $true
+    if ($Markdown) {
+      Write-Output "**I24 BLOQUEIO:** git ahead $gitAhead commit(s) - push pendente."
+    } else {
+      Write-Host "I24 BLOQUEIO: push pendente - $gitAhead commit(s)" -ForegroundColor Red
+    }
+  }
+}
+
+if ($strictFail) { exit 1 }
+exit 0

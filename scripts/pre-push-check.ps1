@@ -78,6 +78,30 @@ try {
     Add-Check "versao.index-cache-bust" "ok" ("?v=" + $mkVer)
   }
 
+  $gpPath = Join-Path $root "gestao-pessoas.html"
+  if (Test-Path $gpPath) {
+    $gpRaw = Get-Content -Path $gpPath -Raw -Encoding UTF8
+    $gpTags = [regex]::Matches($gpRaw, '\?(?:v|nocache)=([0-9]+\.[0-9]+(?:\.[0-9]+)?)')
+    $gpBad = @($gpTags | ForEach-Object { $_.Groups[1].Value } | Where-Object { $_ -ne $mkVer })
+    if ($gpBad.Count -gt 0) {
+      Add-Check "versao.gestao-pessoas-cache-bust" "fail" ("desalinhado: " + ($gpBad | Select-Object -Unique) -join ", ")
+    } else {
+      Add-Check "versao.gestao-pessoas-cache-bust" "ok" ("?v=" + $mkVer)
+    }
+  } else {
+    Add-Check "versao.gestao-pessoas-cache-bust" "fail" "gestao-pessoas.html ausente"
+  }
+
+  $i24Guard = Join-Path $root "scripts\guard-i24-publicacao.ps1"
+  if (Test-Path $i24Guard) {
+    & $i24Guard -Mode PrePush -SkipNetwork 2>&1 | Out-Null
+    if ($LASTEXITCODE -ne 0) {
+      Add-Check "guard.i24.pre-push" "fail" "arquivos I3 sujos ou bump sem commit - ver guard-i24-publicacao"
+    } else {
+      Add-Check "guard.i24.pre-push" "ok" "I3 limpo para push"
+    }
+  }
+
   $apiPath = Join-Path $root "mk-api.js"
   $apiRaw = if (Test-Path $apiPath) { Get-Content -Path $apiPath -Raw -Encoding UTF8 } else { "" }
   if ($indexRaw -notmatch 'mkGuardEscritaBrowser_' -and $apiRaw -notmatch 'mkGuardEscritaBrowser_') {

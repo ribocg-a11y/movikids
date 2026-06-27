@@ -1,6 +1,6 @@
 # MOVI KIDS — Planejamento ativo: Premium One UI (jun/2026)
 
-**Atualizado:** 26/06/2026 · FE **v1.8.121** · GAS **v1.5.165** · **Ciclo dev:** UI / One UX  
+**Atualizado:** 27/06/2026 · FE **v1.9.0** · GAS **v1.5.167** · **Sprint A One UI ✅**  
 **Documento mestre:** `PLANO_PREMIUM_ONEUI_FASES_16_22_2026-06.md`  
 **Cartilha obrigatória:** `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` §0 · §3 widgets · §8 admin  
 **Handoff:** `HANDOFF_NOVO_CHAT.md`
@@ -37,27 +37,27 @@ Tokens existentes em `mk-design.css`: `--mk-widget-*`, `.mk-widget`, `.mk-comman
 
 | ID | Entrega | Arquivos principais | Critério pronto |
 |----|---------|-------------------|-----------------|
-| **UI-A1** | **16.6** Sidebar admin **mobile** read-only — KPIs comando + link balcão | `mk-nav.js`, `mk-app.css`, `index.html` | ≤768px: strip KPIs sem escritas críticas |
-| **UI-A2** Página **Caixa** — KPIs em `.mk-widget` + linha contexto | `mk-admin.js` (caixa), `mk-design.css` | Paridade visual com `#mk-command-center` |
-| **UI-A3** **Relatório** + **Histórico** — cards widget, tipografia Nunito 600/800 | `mk-admin.js`, seções HTML admin | Sem Fredoka em números de dados |
-| **UI-A4** **Presença** operadores — badges inteligentes + cards widget | `mk-gestao-pessoas-ui.js` / admin presença | `gp-adm-presenca-intel` + Design System §9 |
-| **UI-A5** **Frota compacto** no comando — status disponível/em uso/manutenção | `mk-admin.js`, GAS `comandoOperacional` (só leitura) | Já parcial em `#mk-cmd-w-frota` — polir copy |
-| **UI-A6** Teste + bump FE **v1.9.0** | `mk-version.js`, `sw.js`, `?v=`, `TESTE_FASE16_COMANDO_READONLY.ps1` | pre-push verde · verify-publish |
+| **UI-A1** | **16.6** Sidebar admin **mobile** read-only — KPIs comando + link balcão | `mk-nav.js`, `mk-design.css`, `index.html` | ✅ v1.9.0 |
+| **UI-A2** Página **Caixa** — KPIs em `.mk-widget` + linha contexto | `mk-admin.js`, `mk-design.css` | ✅ v1.9.0 |
+| **UI-A3** **Relatório** + **Histórico** — cards widget, tipografia Nunito 600/800 | `mk-admin.js`, seções HTML admin | ✅ v1.9.0 |
+| **UI-A4** **Presença** operadores — badges inteligentes + cards widget | `mk-gestao-pessoas-admin.js` | ✅ v1.9.0 |
+| **UI-A5** **Frota compacto** no comando — status disponível/em uso/manutenção | `mk-admin.js` | ✅ v1.9.0 |
+| **UI-A6** Teste + bump FE **v1.9.0** | `mk-version.js`, `sw.js`, `?v=`, `TESTE_FASE16_COMANDO_READONLY.ps1` | ✅ 27/06 |
 
 ### Sprint B — FASE 18 financeiro (UI primeiro) (P2)
 
 | ID | Entrega | Arquivos | Critério |
 |----|---------|----------|----------|
-| **UI-B1** Widget **previsão fim de mês** no Dashboard | `mk-admin.js`, GAS leitura `kpiMes` estendido ou calc FE | Hero: valor projetado + *"com base nos últimos 7 dias"* |
-| **UI-B2** Insight **comparativo 30d** em fat/custo | Dashboard widgets | Linha `mk-widget-ctx trend-up/down` |
-| **UI-B3** Doc `FASE_18_FINANCEIRO_PREVISAO.md` + Design System §8.4 | `docs/ativos/` | Memorial fórmulas |
+| **UI-B1** Widget **previsão fim de mês** no Dashboard | `mk-admin.js`, `index.html` | ✅ v1.9.1 |
+| **UI-B2** Insight **comparativo 30d** em fat/custo | Dashboard `#mk-previsao-mes` | ✅ v1.9.1 |
+| **UI-B3** Doc `FASE_18_FINANCEIRO_PREVISAO.md` + Design System §8.4 | `docs/ativos/` | ✅ 27/06 |
 
 ### Sprint C — RH One UI polish (paralelo, baixo risco)
 
 | ID | Entrega | Arquivos |
 |----|---------|----------|
-| **UI-C1** Hub colaborador — hero jornada + spacing One UI | `gestao-pessoas.html`, `mk-gestao-pessoas.css` |
-| **UI-C2** Holerite quinzena — card widget, não tabela crua | `mk-gestao-pessoas-ui.js` |
+| **UI-C1** Hub colaborador — hero jornada + spacing One UI | `gestao-pessoas.html`, `mk-gestao-pessoas.css` | ✅ v1.9.2 |
+| **UI-C2** Holerite quinzena — card widget, não tabela crua | `mk-gestao-pessoas-ui.js`, `mk-holerite.js` | ✅ v1.9.2 |
 
 ### Não iniciar neste ciclo UI
 
@@ -98,7 +98,7 @@ Tokens existentes em `mk-design.css`: `--mk-widget-*`, `.mk-widget`, `.mk-comman
 
 | Camada | Atual | Alvo ciclo UI |
 |--------|-------|---------------|
-| FE | v1.8.121 | **v1.9.0** (Sprint A fechado) → v1.9.1+ |
+| FE | v1.8.121 | **v1.9.2** (Sprints A–C fechados) |
 | GAS | v1.5.165 | manter (só leitura) salvo UI-B exigir campo |
 | Design System doc | v1.1 | v1.2 ao nascer componente novo |
 
@@ -117,11 +117,9 @@ Tokens existentes em `mk-design.css`: `--mk-widget-*`, `.mk-widget`, `.mk-comman
 
 ## 8. Próximo passo único (novo chat)
 
-**UI-A1** — Sidebar admin mobile read-only com KPIs do Centro de Comando.
+**Sprint C fechado** — publicar v1.9.2 (commit + push pendente).
 
-Comando inicial sugerido no chat:
-
-> *Continuar MOVI KIDS — ciclo One UI. Ler `PLANEJAMENTO_ONE_UI_2026-06.md` e implementar **UI-A1**.*
+Sprint A **fechado 27/06** · Sprint B **fechado 27/06** · Sprint C **fechado 26/06** — FE **v1.9.2**
 
 ---
 

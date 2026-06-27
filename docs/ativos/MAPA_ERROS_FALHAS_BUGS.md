@@ -80,7 +80,7 @@
 | I2 | GAS offline + timer local | Extra fantasma | ADM `somentePlano`; offline v1.7.6 | `FIX_OFFLINE_ENCERRAR` | tablet encerrar |
 | I3 | Cache `?force=` / **`index.html ?v=` desatualizado** | JS antigo no tablet/admin | `mk-version` + `sw` + **index** alinhados | `pre-push-check` versões | `?force=VERSAO` · ver **11/06** |
 | **I25** | **FOLHA `#NAME?` — `setValue('=SE...')` no GAS** | Aba FOLHA quebrada; Dashboard usa fallback 4926 | GAS **v1.5.91** `folhaFlushFormulasUser_` (USER_ENTERED) + `repairFolhaAdmin` | Nunca `setValue`/`setFormula` PT para fórmulas FOLHA | `TESTE_FOLHA_FORMULAS_READONLY.ps1` · **fechado 14/06** |
-| **I24** | **Commit local sem `git push`** / Pages desatualizada | Mesmo sintoma I3; remoto em versão antiga | `git push` + **`verify-publish-complete.ps1`** | `git.not-ahead-of-origin`, `pages.version-live` | curl Pages `mk-version.js` · **11/06** |
+| **I24** | **Commit local sem `git push`** / Pages desatualizada | Banner "Nova versão" nunca aparece; remoto = local = versão velha | **`encerramento-sessao.ps1`** exit 0 · `guard-i24-publicacao.ps1` · push + **`verify-publish-complete.ps1`** | `guard.i24.*`, `git.not-ahead-of-origin`, `pages.version-live` | curl Pages `mk-version.js` · doc **26/06 controles** |
 | I4 | `mk-login-err` duplicado | Erro PIN invisível | ID único `mk-login-pin-err` | review HTML ids | login PIN errado |
 | I5 | Liberar sessão sem refresh UI (v1) | ADM acha que botão falhou | `refreshOperadoresAdmin_` | — | ADM liberar |
 | I6 | Sessão única sem liberar | 409 operador | `liberarSessaoOperadorAdmin` | GAS sessão TTL | login 2º op |
@@ -120,6 +120,7 @@
 | `../arquivo/incidentes/INCIDENTE_I3_CACHE_BUST_INDEX_2026-06-11.md` | **I3 recorrência** — v1.8.15 não carregava (index.html) |
 | `../arquivo/incidentes/INCIDENTE_I25_FOLHA_FORMULAS_NAME_2026-06-13.md` | **I25** — FOLHA USER_ENTERED |
 | `../arquivo/incidentes/INCIDENTE_I24_COMMIT_SEM_PUSH_2026-06-11.md` | **I24** — v1.8.18 commit sem push |
+| `../arquivo/incidentes/INCIDENTE_I24_CONTROLES_PUBLICACAO_FE_2026-06-26.md` | **I24** — travas definitivas guard + encerramento-sessao |
 | `../arquivo/incidentes/INCIDENTE_I23_DASHBOARD_LENTO_TRAVADO_2026-06-09.md` | **I23** — Dashboard lento; mutex KPI + GAS perf |
 | `../arquivo/incidentes/INCIDENTE_I26_GAS_EDITOR_VS_EXEC_2026-06-14.md` | **I26** — push sem republicar |
 | `../arquivo/incidentes/INCIDENTE_I27_GAS_LOGIN_ANONIMO_2026-06-14.md` | **I27** — ServiceLogin / Failed to fetch |
@@ -187,6 +188,8 @@
 | Check | Script | Incidente |
 |-------|--------|-----------|
 | `git.not-ahead-of-origin` | `verify-publish-complete.ps1` | I24 |
+| `guard.i24.pre-push` | `pre-push-check.ps1` | I24 — I3 sujo |
+| `guard.i24.sessao` | `encerramento-sessao.ps1` | I24 — Pages vs local |
 | `gas.deploy.verify` | `verify-gas-deploy.ps1` | I26, I27 |
 
 ---

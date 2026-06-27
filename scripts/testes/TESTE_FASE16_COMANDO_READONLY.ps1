@@ -39,7 +39,14 @@ foreach ($pair in @(
   @{ file = $indexPath; needle = "mk-admin-mob-loc"; name = "fe.admin-mob-kpis" },
   @{ file = $mkAdminPath; needle = "carregarAdminMobCmd_"; name = "fe.admin-mob-loader" },
   @{ file = $mkDesignPath; needle = "mk-admin-mob-cmd"; name = "fe.admin-mob-css" },
-  @{ file = $mkDesignPath; needle = "--mk-widget-val-size"; name = "fe.widget-tokens" }
+  @{ file = $mkDesignPath; needle = "--mk-widget-val-size"; name = "fe.widget-tokens" },
+  @{ file = $indexPath; needle = "mk-caixa-command"; name = "fe.caixa-widgets" },
+  @{ file = $indexPath; needle = "mk-hist-widgets"; name = "fe.hist-widgets" },
+  @{ file = $mkAdminPath; needle = "calcPrevisaoMes7d_"; name = "fe.previsao-7d" },
+  @{ file = $indexPath; needle = "mk-previsao-mes"; name = "fe.previsao-widget" },
+  @{ file = (Join-Path $RepoRoot "gestao-pessoas.html"); needle = "gp-colab-hub-oneui"; name = "fe.gp-hub-oneui" },
+  @{ file = (Join-Path $RepoRoot "mk-gestao-pessoas-ui.js"); needle = "gpHubHeroStatus_"; name = "fe.gp-hub-hero" },
+  @{ file = (Join-Path $RepoRoot "mk-holerite.js"); needle = "mkHolWidgetHero_"; name = "fe.hol-widget-hero" }
 )) {
   if (-not (Test-Path $pair.file)) {
     Add-C16Check $pair.name "fail" ("arquivo ausente: " + $pair.file)

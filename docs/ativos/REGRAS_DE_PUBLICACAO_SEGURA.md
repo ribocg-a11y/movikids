@@ -250,6 +250,7 @@ Campos mínimos:
 - `mk-version.js`, `sw.js`, `index.html`/`gestao-pessoas.html` (`?v=`) — alinhados (I3);
 - GAS repo (header) + GAS ping produção;
 - GitHub Pages confirmado (`verify-publish-complete` após push FE — I24);
+- **`encerramento-sessao.ps1` exit 0** após qualquer bump FE (trava I24 — ver `fe-i24-publicacao-obrigatoria.mdc`);
 - **`Mudança no AppScript: sim | não`** + link canônico `.gs` (Regra 16).
 
 Regra Cursor: `.cursor/rules/encerramento-versoes-movikids.mdc`

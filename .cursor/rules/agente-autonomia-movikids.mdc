@@ -11,10 +11,10 @@ Fonte: `docs/ativos/ACESSOS_E_AUTORIZACOES.md` §7.2 e §7.3.
 
 | Ação | Fluxo |
 |------|--------|
-| **Publicar FE** | `pre-push-check` OK → commit → `git push origin main` → `verify-publish-complete` |
-| **Bump versão** | `mk-version.js` + `sw.js` + `?v=` nos HTML (I3) |
+| **Publicar FE** | `pre-push-check` OK → commit → `git push origin main` → `verify-publish-complete` → **`encerramento-sessao.ps1` exit 0** |
+| **Bump versão** | `mk-version.js` + `sw.js` + `?v=` nos HTML (I3) — **obrigatório push na mesma sessão** (I24) |
 | **Docs / testes** | Atualizar HANDOFF/ESTADO se mudou fase; rodar testes `.ps1` relevantes |
-| **Encerramento** | `relatorio-versoes.ps1 -Markdown` + tabela § `encerramento-versoes-movikids.mdc` |
+| **Encerramento** | `encerramento-sessao.ps1` (substitui só relatorio quando houve FE) |
 
 ## Não transferir ao usuário (25/06/2026)
 

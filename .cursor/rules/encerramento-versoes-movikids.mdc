@@ -12,10 +12,12 @@ Encerrar com **bloco completo** abaixo. Não substituir só por "Mudança no App
 ### 1. Rodar antes de encerrar (quando houve trabalho no repo)
 
 ```powershell
-.\scripts\relatorio-versoes.ps1 -Markdown
+.\scripts\encerramento-sessao.ps1
 ```
 
-Preencher `Mudança no AppScript` e link `.gs` conforme a sessão. Se houve push FE nesta sessão e Pages ainda não propagou, rodar `.\scripts\verify-publish-complete.ps1` e atualizar linha GitHub Pages.
+**Exit 0 obrigatório** antes de declarar tarefa concluída. Se falhar → `git push` + `verify-publish-complete.ps1` — não encerrar só com relatório.
+
+Alternativa legado (sem trava I24): `.\scripts\relatorio-versoes.ps1 -Markdown -Strict`
 
 ### 2. Formato obrigatório (copiar estrutura)
 

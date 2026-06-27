@@ -1,7 +1,7 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 26/06/2026 (fim de sessão — I68 VT + timeout RH)  
-**FE:** **v1.8.122** · **GAS:** **v1.5.167** · **Ciclo ativo:** Premium One UI  
+**Atualizado:** 26/06/2026 · **Sprints A–C One UI ✅**  
+**FE:** **v1.9.2** (repo local, push pendente) · **GAS:** **v1.5.167** · **Ciclo ativo:** Premium One UI — publicar v1.9.2  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **Repo local:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`  
@@ -13,7 +13,7 @@
 
 **Mensagem para ciclo UI (recomendada):**
 
-> *Continuar MOVI KIDS — ciclo One UI. Ler `PLANEJAMENTO_ONE_UI_2026-06.md` e começar por **UI-A1**.*
+> *Continuar MOVI KIDS — publicar v1.9.2 (Sprints A–C) ou iniciar próximo ciclo pós-One UI.*
 
 ---
 
@@ -60,9 +60,9 @@ cursor "C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-mo
 
 | Camada | Versão | URL / evidência |
 |--------|--------|-----------------|
-| **Frontend** | **v1.8.122** | https://ribocg-a11y.github.io/movikids/?force=1.8.122 |
-| **Gestão Pessoas** | **v1.8.122** | `gestao-pessoas.html?force=1.8.122` |
-| **Service Worker** | **1.8.122** | `sw.js` |
+| **Frontend** | **v1.9.2** (repo local) | https://ribocg-a11y.github.io/movikids/?force=1.9.2 após push |
+| **Gestão Pessoas** | **v1.9.2** | `gestao-pessoas.html?force=1.9.2` |
+| **Service Worker** | **1.9.2** | `sw.js` |
 | **Apps Script** | **v1.5.167** | lógica I68 ativa · ping string **v1.5.167** no repo (reimplantar se ping antigo) |
 | **PIN admin** | **1421** | Script Property `ADMIN_PIN` |
 | **Homolog tablet** | ✅ 23/06 | I43 · I42 · I47 · Gestor |
@@ -111,11 +111,12 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 
 | # | Ação | Quem | Status |
 |---|------|------|--------|
-| 1 | **UI-A1** Sidebar admin mobile read-only | **Agente (dev)** | ⏳ **próximo** |
-| 2 | Sprint A UI-A2…A6 — fechar FASE 16 visual → FE **v1.9.0** | Agente | ⏳ |
-| 3 | Assinar **FASE 17** + decisão **17.5 F9** | Sócio + Ops | ⏳ |
-| 4 | Tablet: Milena validar Colaboradores **v1.8.122** + VT **193,60** | Ops | ⏳ smoke |
-| 5 | Sprint B — FASE 18 previsão UI | Agente | backlog |
+| 1 | **Publicar FE v1.9.2** (Sprints A–C) — commit + push + verify | **Agente (dev)** | ⏳ **próximo** |
+| 2 | Sprint C UI-C1…C2 — hub colaborador + holerite widget | Agente | ✅ **26/06 v1.9.2** |
+| 3 | Sprint B UI-B1…B3 — previsão fim de mês | Agente | ✅ **27/06 v1.9.1** |
+| 4 | Sprint A UI-A1…A6 — FASE 16 visual | Agente | ✅ **27/06 v1.9.0** |
+| 5 | Assinar **FASE 17** + decisão **17.5 F9** | Sócio + Ops | ⏳ |
+| 6 | Tablet: Milena validar Colaboradores + VT | Ops | ⏳ smoke |
 
 Docs: `PLANEJAMENTO_ONE_UI_2026-06.md` · `CHECKLIST_FASE17_FECHAMENTO.md`
 

@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Movi Kids">
 <title>Movi Kids</title>
-<script src="mk-canonical-host.js?v=1.8.122"></script>
+<script src="mk-canonical-host.js?v=1.9.2"></script>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png">
@@ -17,17 +17,17 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<script src="mk-stale-sync.js?v=1.8.122"></script>
-<script src="mk-version.js?v=1.8.122"></script>
-<script src="mk-api.js?v=1.8.122"></script>
-<link rel="stylesheet" href="mk-design.css?v=1.8.122">
+<script src="mk-stale-sync.js?v=1.9.2"></script>
+<script src="mk-version.js?v=1.9.2"></script>
+<script src="mk-api.js?v=1.9.2"></script>
+<link rel="stylesheet" href="mk-design.css?v=1.9.2">
 
-<script src="mk-cache-bust.js?v=1.8.122"></script>
+<script src="mk-cache-bust.js?v=1.9.2"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<link rel="stylesheet" href="mk-app.css?v=1.8.122">
-<link rel="stylesheet" href="mk-gestao-pessoas.css?v=1.8.122">
+<link rel="stylesheet" href="mk-app.css?v=1.9.2">
+<link rel="stylesheet" href="mk-gestao-pessoas.css?v=1.9.2">
 <!-- Firebase SDK — Realtime sync canonico para todos os dispositivos -->
-<script type="module" src="mk-firebase.js?v=1.8.122"></script>
+<script type="module" src="mk-firebase.js?v=1.9.2"></script>
 </head>
 
 <body>
@@ -196,18 +196,22 @@
           <div class="mk-admin-mob-cmd-kpi">
             <span class="mk-admin-mob-cmd-lbl">Abertas</span>
             <span class="mk-admin-mob-cmd-val" id="mk-admin-mob-loc">—</span>
+            <span class="mk-admin-mob-cmd-ctx" id="mk-admin-mob-loc-ctx"></span>
           </div>
           <div class="mk-admin-mob-cmd-kpi">
             <span class="mk-admin-mob-cmd-lbl">Fat. hoje</span>
             <span class="mk-admin-mob-cmd-val mk-admin-mob-cmd-val--blue" id="mk-admin-mob-fat">—</span>
+            <span class="mk-admin-mob-cmd-ctx" id="mk-admin-mob-fat-ctx"></span>
           </div>
           <div class="mk-admin-mob-cmd-kpi">
             <span class="mk-admin-mob-cmd-lbl">Presentes</span>
             <span class="mk-admin-mob-cmd-val" id="mk-admin-mob-equipe">—</span>
+            <span class="mk-admin-mob-cmd-ctx" id="mk-admin-mob-equipe-ctx"></span>
           </div>
           <div class="mk-admin-mob-cmd-kpi">
             <span class="mk-admin-mob-cmd-lbl">Frota</span>
             <span class="mk-admin-mob-cmd-val mk-admin-mob-cmd-val--purple" id="mk-admin-mob-frota">—</span>
+            <span class="mk-admin-mob-cmd-ctx" id="mk-admin-mob-frota-ctx"></span>
           </div>
         </div>
         <div class="mk-admin-mob-cmd-actions">
@@ -778,7 +782,7 @@
 
     <section class="gp-adm-panel active" id="gp-adm-tab-hoje">
       <p class="gp-adm-panel-lead">Quem está na loja agora e o que precisa de atenção hoje.</p>
-      <div id="gp-adm-kpis" class="gp-adm-kpi-grid"></div>
+      <div id="gp-adm-kpis" class="gp-adm-kpi-grid mk-cmd-grid"></div>
       <div id="gp-adm-alertas"></div>
       <div class="gp-adm-card gp-adm-card--list">
         <h3 class="gp-sec-head-inline"><span class="gp-sec-icon">👥</span> Equipe</h3>
@@ -988,22 +992,51 @@
       </button>
     </div>
 
-    <div class="mk-caixa-resumo mk-glass-card mk-caixa-hero" id="caixa-kpis">
-      <div class="mk-stat-hero">
-        <div class="mk-stat-hero-val" id="cx-res">...</div>
-        <div class="mk-stat-hero-lbl">Resultado do dia</div>
+    <div class="mk-caixa-command mk-glass-card" id="caixa-kpis">
+      <div class="mk-cmd-head">
+        <span class="mk-cmd-label">Caixa do dia</span>
+        <span class="mk-cmd-date" id="cx-data-label">—</span>
       </div>
-      <div class="mk-stat-pills">
-        <div class="mk-stat-pill blue"><div class="mk-stat-pill-val" id="cx-total">...</div><div class="mk-stat-pill-lbl">Faturamento</div></div>
-        <div class="mk-stat-pill blue"><div class="mk-stat-pill-val" id="cx-maq">...</div><div class="mk-stat-pill-lbl">Maquininha</div></div>
-        <div class="mk-stat-pill gold"><div class="mk-stat-pill-val" id="cx-din">...</div><div class="mk-stat-pill-lbl">Dinheiro</div></div>
-        <div class="mk-stat-pill red"><div class="mk-stat-pill-val" id="cx-cus">...</div><div class="mk-stat-pill-lbl">Custos</div></div>
-        <div class="mk-stat-pill neutral"><div class="mk-stat-pill-val" id="cx-nloc">...</div><div class="mk-stat-pill-lbl">Locações</div></div>
-        <div class="mk-stat-pill" style="background:#F3E5F5"><div class="mk-stat-pill-val" id="cx-ext" style="color:#6A1B9A">...</div><div class="mk-stat-pill-lbl">Extras</div></div>
+      <div class="mk-widget mk-widget--hero">
+        <span class="mk-widget-lbl">Resultado do dia</span>
+        <span class="mk-widget-val" id="cx-res">...</span>
+        <span class="mk-widget-ctx" id="cx-res-ctx">Entradas − custos</span>
       </div>
-      <div class="db-insight" id="cx-ext-insight" style="display:none;margin-top:8px;font-size:12px"></div>
+      <div class="mk-cmd-grid mk-caixa-widgets-grid">
+        <div class="mk-widget">
+          <span class="mk-widget-lbl">Faturamento</span>
+          <span class="mk-widget-val green" id="cx-total">...</span>
+          <span class="mk-widget-ctx" id="cx-total-ctx">—</span>
+        </div>
+        <div class="mk-widget">
+          <span class="mk-widget-lbl">Maquininha</span>
+          <span class="mk-widget-val blue" id="cx-maq">...</span>
+          <span class="mk-widget-ctx" id="cx-maq-ctx">PIX + cartões</span>
+        </div>
+        <div class="mk-widget">
+          <span class="mk-widget-lbl">Dinheiro</span>
+          <span class="mk-widget-val" id="cx-din">...</span>
+          <span class="mk-widget-ctx" id="cx-din-ctx">Espécie recebida</span>
+        </div>
+        <div class="mk-widget">
+          <span class="mk-widget-lbl">Custos</span>
+          <span class="mk-widget-val" id="cx-cus" style="color:#C62828">...</span>
+          <span class="mk-widget-ctx" id="cx-cus-ctx">Saídas do dia</span>
+        </div>
+        <div class="mk-widget">
+          <span class="mk-widget-lbl">Locações</span>
+          <span class="mk-widget-val" id="cx-nloc">...</span>
+          <span class="mk-widget-ctx" id="cx-nloc-ctx">Contas encerradas</span>
+        </div>
+        <div class="mk-widget">
+          <span class="mk-widget-lbl">Extras</span>
+          <span class="mk-widget-val purple" id="cx-ext">...</span>
+          <span class="mk-widget-ctx" id="cx-ext-ctx">Minutos adicionais</span>
+        </div>
+      </div>
+      <div class="mk-widget-ctx" id="cx-ext-insight" style="display:none;margin-top:10px"></div>
       <div id="cx-intel-alert" class="mk-caixa-intel-wrap" hidden aria-live="polite"></div>
-      <div class="db-insight" id="cx-breakeven" style="display:none;margin-top:8px;font-size:12px;font-weight:600"></div>
+      <div class="mk-widget-ctx" id="cx-breakeven" style="display:none;margin-top:8px;font-weight:700"></div>
     </div>
 
     <details class="mk-admin-acc">
@@ -1222,6 +1255,41 @@
         </div>
       </div>
       <p class="mk-exec-narrativa" id="mk-exec-narrativa">Carregando leitura do mês…</p>
+    </div>
+
+    <!-- FASE 18 — previsão fim de mês (One UI Sprint B) -->
+    <div id="mk-previsao-mes" class="mk-previsao-mes mk-glass-card" style="display:none" aria-labelledby="mk-previsao-mes-h" aria-live="polite">
+      <header class="mk-previsao-head">
+        <h3 class="mk-previsao-title" id="mk-previsao-mes-h">Previsão fim de mês</h3>
+        <span class="mk-previsao-badge" id="mk-prev-badge">7 dias</span>
+      </header>
+      <div class="mk-widget mk-widget--hero mk-previsao-hero">
+        <span class="mk-widget-lbl">Faturamento projetado</span>
+        <span class="mk-widget-val blue" id="mk-prev-fat">—</span>
+        <span class="mk-widget-ctx" id="mk-prev-fat-ctx">Com base nos últimos 7 dias</span>
+      </div>
+      <div class="mk-cmd-grid mk-previsao-grid">
+        <div class="mk-widget">
+          <span class="mk-widget-lbl">Resultado projetado</span>
+          <span class="mk-widget-val green" id="mk-prev-res">—</span>
+          <span class="mk-widget-ctx" id="mk-prev-res-ctx">—</span>
+        </div>
+        <div class="mk-widget">
+          <span class="mk-widget-lbl">Ritmo GAS (mês cheio)</span>
+          <span class="mk-widget-val" id="mk-prev-gas">—</span>
+          <span class="mk-widget-ctx" id="mk-prev-gas-ctx">Dias com movimento</span>
+        </div>
+        <div class="mk-widget">
+          <span class="mk-widget-lbl">Fat. vs média 30d</span>
+          <span class="mk-widget-val" id="mk-prev-cmp-fat">—</span>
+          <span class="mk-widget-ctx" id="mk-prev-cmp-fat-ctx">—</span>
+        </div>
+        <div class="mk-widget">
+          <span class="mk-widget-lbl">Custos vs fat. mês</span>
+          <span class="mk-widget-val" id="mk-prev-cmp-cus">—</span>
+          <span class="mk-widget-ctx" id="mk-prev-cmp-cus-ctx">—</span>
+        </div>
+      </div>
     </div>
     </section>
 
@@ -1660,8 +1728,10 @@
   <!-- ──────── PAGE: RELATÓRIO ──────── -->
   <div id="page-relatorio" class="page mk-admin-page">
     <div class="dash-back" onclick="irAdmin('admin')">← Voltar</div>
-    <div class="sec-title">Relatório Mensal</div>
-    <p style="font-size:12px;color:var(--txt3);margin:-6px 0 12px">Versão enviada ao Golden Shopping: movimentação (locações, planos, horários) + CTO contratual. Sem custos internos nem gestão ADM.</p>
+    <div class="mk-admin-page-head">
+      <div class="sec-title">Relatório Mensal</div>
+      <p class="mk-admin-page-lead">Golden Shopping — movimentação + CTO contratual. Sem custos internos nem gestão ADM.</p>
+    </div>
 
     <div class="rel-mes-sel">
       <select id="rel-mes">
@@ -1772,7 +1842,10 @@
   <!-- ──────── PAGE: HISTÓRICO ANALYTICS (admin) ──────── -->
   <div id="page-historico" class="page mk-admin-page">
     <div class="dash-back" onclick="irAdmin('admin')">← Voltar</div>
-    <div class="sec-title">Histórico & Analytics</div>
+    <div class="mk-admin-page-head">
+      <div class="sec-title">Histórico &amp; Analytics</div>
+      <p class="mk-admin-page-lead">Período filtrado — faturamento, ticket e extras em widgets; ranking e tabelas abaixo.</p>
+    </div>
 
     <!-- Filtro por veículo (Fase 4) -->
     <div class="vf-filter-row">
@@ -1810,12 +1883,28 @@
       <button onclick="buscarHistorico()">Buscar</button>
     </div>
 
-    <!-- Cards de resumo do período -->
-    <div class="analytics-grid" id="analytics-cards" style="display:none">
-      <div class="analytics-card blue"><div class="ac-val" id="ac-fat">R$0</div><div class="ac-lbl">Faturamento</div></div>
-      <div class="analytics-card green"><div class="ac-val" id="ac-n">0</div><div class="ac-lbl">Atendimentos</div></div>
-      <div class="analytics-card amber"><div class="ac-val" id="ac-ticket">R$0</div><div class="ac-lbl">Ticket médio</div></div>
-      <div class="analytics-card purple"><div class="ac-val" id="ac-extras">R$0</div><div class="ac-lbl">Extras cobrados</div></div>
+    <!-- Cards de resumo do período (One UI widgets) -->
+    <div class="mk-cmd-grid mk-hist-widgets" id="analytics-cards" style="display:none">
+      <div class="mk-widget">
+        <span class="mk-widget-lbl">Faturamento</span>
+        <span class="mk-widget-val blue" id="ac-fat">R$0</span>
+        <span class="mk-widget-ctx" id="ac-fat-ctx">—</span>
+      </div>
+      <div class="mk-widget">
+        <span class="mk-widget-lbl">Atendimentos</span>
+        <span class="mk-widget-val green" id="ac-n">0</span>
+        <span class="mk-widget-ctx" id="ac-n-ctx">Locações encerradas</span>
+      </div>
+      <div class="mk-widget">
+        <span class="mk-widget-lbl">Ticket médio</span>
+        <span class="mk-widget-val" id="ac-ticket">R$0</span>
+        <span class="mk-widget-ctx" id="ac-ticket-ctx">Por locação</span>
+      </div>
+      <div class="mk-widget">
+        <span class="mk-widget-lbl">Extras cobrados</span>
+        <span class="mk-widget-val purple" id="ac-extras">R$0</span>
+        <span class="mk-widget-ctx" id="ac-extras-ctx">—</span>
+      </div>
     </div>
 
     <div class="new-chart-card" id="hist-ext-chart-wrap" style="display:none;margin-bottom:14px">
@@ -2003,26 +2092,26 @@
   </div>
 </div>
 
-<script src="mk-globals.js?v=1.8.122"></script>
-<script src="mk-core.js?v=1.8.122"></script>
-<script src="mk-nav.js?v=1.8.122"></script>
-<script src="mk-admin.js?v=1.8.122"></script>
-<script src="mk-historico.js?v=1.8.122"></script>
-<script src="mk-sessao.js?v=1.8.122"></script>
-<script src="mk-home.js?v=1.8.122"></script>
-<script src="mk-meta-operador.js?v=1.8.122"></script>
-<script src="mk-custos.js?v=1.8.122"></script>
-<script src="mk-avulso.js?v=1.8.122"></script>
-<script src="mk-sync.js?v=1.8.122"></script>
-<script src="mk-nova.js?v=1.8.122"></script>
-<script src="mk-relacionamento.js?v=1.8.122"></script>
-<script src="mk-operacao.js?v=1.8.122"></script>
-<script src="mk-drawer.js?v=1.8.122"></script>
-<script src="mk-update.js?v=1.8.122"></script>
-<script src="mk-gestao-pessoas.js?v=1.8.122"></script>
-<script src="mk-holerite.js?v=1.8.122"></script>
-<script src="mk-gestao-pessoas-admin.js?v=1.8.122"></script>
-<script src="mk-auth.js?v=1.8.122"></script>
-<script src="mk-boot.js?v=1.8.122"></script>
+<script src="mk-globals.js?v=1.9.2"></script>
+<script src="mk-core.js?v=1.9.2"></script>
+<script src="mk-nav.js?v=1.9.2"></script>
+<script src="mk-admin.js?v=1.9.2"></script>
+<script src="mk-historico.js?v=1.9.2"></script>
+<script src="mk-sessao.js?v=1.9.2"></script>
+<script src="mk-home.js?v=1.9.2"></script>
+<script src="mk-meta-operador.js?v=1.9.2"></script>
+<script src="mk-custos.js?v=1.9.2"></script>
+<script src="mk-avulso.js?v=1.9.2"></script>
+<script src="mk-sync.js?v=1.9.2"></script>
+<script src="mk-nova.js?v=1.9.2"></script>
+<script src="mk-relacionamento.js?v=1.9.2"></script>
+<script src="mk-operacao.js?v=1.9.2"></script>
+<script src="mk-drawer.js?v=1.9.2"></script>
+<script src="mk-update.js?v=1.9.2"></script>
+<script src="mk-gestao-pessoas.js?v=1.9.2"></script>
+<script src="mk-holerite.js?v=1.9.2"></script>
+<script src="mk-gestao-pessoas-admin.js?v=1.9.2"></script>
+<script src="mk-auth.js?v=1.9.2"></script>
+<script src="mk-boot.js?v=1.9.2"></script>
 </body>
 </html>

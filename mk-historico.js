@@ -303,6 +303,14 @@ function renderAnalyticsCards(stats) {
   set('ac-n', stats.n);
   set('ac-ticket', R(stats.ticketMedio));
   set('ac-extras', R(stats.totalExt));
+  set('ac-fat-ctx', stats.n + ' locações no período');
+  set('ac-n-ctx', stats.n === 1 ? '1 atendimento' : stats.n + ' atendimentos');
+  set('ac-ticket-ctx', stats.totalFat > 0 ? 'Fat. ÷ locações' : '—');
+  if (stats.pctExt != null) {
+    set('ac-extras-ctx', stats.pctExt + '% do faturamento' + (stats.nComExtra ? ' · ' + stats.nComExtra + ' com extra' : ''));
+  } else {
+    set('ac-extras-ctx', stats.totalExt > 0 ? 'Minutos adicionais' : 'Sem extras');
+  }
   if (stats.pctExt != null && rankInsight) {
     const extraLine = stats.pctExt >= 15
       ? '💡 Extras em ' + stats.pctExt + '% do faturamento — alto; alinhe aviso de tempo com operadores.'
