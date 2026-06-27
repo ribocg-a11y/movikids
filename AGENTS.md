@@ -4,7 +4,7 @@ Sistema operacional de locações — balcão (tablet na loja), portal do respon
 
 **Modelo operacional:** o sócio/dev trabalha no **computador** (Cursor, deploy, testes). O **tablet fica no balcão** com os operadores. Ver `HANDOFF_NOVO_CHAT.md` § Modelo operacional.
 
-**Ciclo ativo (26/06/2026):** **Premium One UI** — `docs/ativos/PLANEJAMENTO_ONE_UI_2026-06.md`
+**Ciclo ativo (27/06/2026):** **Sprint D pós One UI** — `docs/ativos/PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`
 
 **Repo neste PC:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`
 
@@ -12,20 +12,21 @@ Sistema operacional de locações — balcão (tablet na loja), portal do respon
 
 > *Vamos dar continuidade ao projeto Movi Kids, tem uma pasta no C da minha máquina.*
 
-**Para ciclo UI:**
+**Para ciclo ativo:**
 
-> *Continuar MOVI KIDS — ciclo One UI. Ler `PLANEJAMENTO_ONE_UI_2026-06.md` e começar por **UI-A1**.*
+> *Continuar MOVI KIDS — Sprint D: `PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md` → **D1** homolog admin v1.9.2.*
 
 ## Antes de qualquer trabalho
 
 Leia **nesta ordem**:
 
 1. [`docs/ativos/HANDOFF_NOVO_CHAT.md`](docs/ativos/HANDOFF_NOVO_CHAT.md)
-2. [`docs/ativos/PLANEJAMENTO_ONE_UI_2026-06.md`](docs/ativos/PLANEJAMENTO_ONE_UI_2026-06.md) — **sprint UI ativo**
-3. [`docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md`](docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md) — **antes de qualquer tela**
-4. [`docs/ativos/ESTADO_ATUAL.md`](docs/ativos/ESTADO_ATUAL.md) · [`DEPLOY_ATUAL.md`](docs/ativos/DEPLOY_ATUAL.md)
-5. [`docs/ativos/REGRAS_DE_PUBLICACAO_SEGURA.md`](docs/ativos/REGRAS_DE_PUBLICACAO_SEGURA.md)
-6. [`docs/ativos/ROTEIRO_AGENTE_OBRIGATORIO.md`](docs/ativos/ROTEIRO_AGENTE_OBRIGATORIO.md) — **ordem fixa commit/push/verify**
+2. [`docs/ativos/PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`](docs/ativos/PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md) — **ciclo ativo Sprint D**
+3. [`docs/ativos/PLANEJAMENTO_ONE_UI_2026-06.md`](docs/ativos/PLANEJAMENTO_ONE_UI_2026-06.md) — One UI fechado (referência)
+4. [`docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md`](docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md) — **antes de qualquer tela**
+5. [`docs/ativos/ESTADO_ATUAL.md`](docs/ativos/ESTADO_ATUAL.md) · [`DEPLOY_ATUAL.md`](docs/ativos/DEPLOY_ATUAL.md)
+6. [`docs/ativos/REGRAS_DE_PUBLICACAO_SEGURA.md`](docs/ativos/REGRAS_DE_PUBLICACAO_SEGURA.md)
+7. [`docs/ativos/ROTEIRO_AGENTE_OBRIGATORIO.md`](docs/ativos/ROTEIRO_AGENTE_OBRIGATORIO.md) — **ordem fixa commit/push/verify**
 
 Índice: [`docs/INDICE.md`](docs/INDICE.md)
 
@@ -52,7 +53,7 @@ Leia **nesta ordem**:
 - **Homolog tablet:** ✅ 23/06 · smoke **v1.9.2** pendente
 - **Planilha:** ✅ 23/23 · **I68 VT** ✅
 - **Travas I24:** ✅ `guard-i24-publicacao` + `encerramento-sessao`
-- **Próximo:** FASE 17 assinatura · smoke tablet · GAS ping Web v1.5.167
+- **Próximo dev:** **Sprint D1** homolog PC admin v1.9.2 · `PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`
 
 ## Regras P0
 

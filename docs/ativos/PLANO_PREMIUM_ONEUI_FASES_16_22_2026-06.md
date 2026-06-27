@@ -2,7 +2,7 @@
 
 **Data:** 20/06/2026  
 **Origem:** `Manual_Plataforma_Gestao_Premium_Completo_260620_102237.pdf`  
-**Status:** **🟢 ATIVO — ciclo UI** · Sprint em `PLANEJAMENTO_ONE_UI_2026-06.md`  
+**Status:** **🟢 ATIVO — Sprint D pós One UI** · `PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`  
 **Documentos irmãos:** `PLANEJAMENTO_ATUAL_2026-06.md` · `PLANO_FASES_6_15_COCKPIT_EXECUTIVO_2026-06.md` · `DESIGN_SYSTEM_MOVIKIDS.md` · `DESIGN_DNA_MOVIKIDS.md`
 
 ---
@@ -329,16 +329,17 @@ Widget live: % frota em uso agora · overlay gráfico ocupação por horário.
 
 ---
 
-## 15. Sequência imediata (atualizada 26/06/2026)
+## 15. Sequência imediata (atualizada 27/06/2026)
 
 | # | Ação | Responsável | Status |
 |---|------|-------------|--------|
-| 1 | GAS Web **v1.5.165** + planilha 23/23 | Sócio + agente | ✅ |
-| 2 | Homolog tablet I43/I42/I47/Gestor | Ops loja | ✅ 23/06 |
-| 3 | **Sprint One UI** — `PLANEJAMENTO_ONE_UI_2026-06.md` | **Agente** | ⏳ **ativo** |
-| 4 | Raykelly cadastro 100% | Colaborador | ⏳ |
-| 5 | Assinar **FASE 17** + decisão **17.5 F9** | Sócio + Ops | ⏳ |
-| 6 | FASE 18 previsão UI (Sprint B) | Agente | backlog |
+| 1 | One UI Sprints A–C **v1.9.2** | Agente | ✅ 27/06 |
+| 2 | Travas I24 publicação FE | Agente | ✅ 27/06 |
+| 3 | **Sprint D** — homolog + assinar FASE 16/17 | Agente + Ops + sócio | ⏳ **ativo** |
+| 4 | Raykelly cadastro 100% | Colaborador | ✅ 26/06 |
+| 5 | Decisão **17.5 F9** + smoke tablet v1.9.2 | Sócio + Ops | ⏳ Sprint D |
+| 6 | GAS ping Web **v1.5.167** | Sócio | ⏳ opcional |
+| 7 | **Sprint E** FASE 19 gamificação | Agente | backlog |
 
 ---
 
@@ -354,21 +355,21 @@ Widget live: % frota em uso agora · overlay gráfico ocupação por horário.
 
 ---
 
-## 18. Progresso Premium One UI (26/06/2026)
+## 18. Progresso Premium One UI (27/06/2026)
 
 | Fase | Peso | % fase | Notas |
 |------|------|--------|-------|
 | **15b** RH completo | P1 ×2 | **100%** | ✅ repo + prod |
-| **16** Centro comando | P1 ×2 | **~92%** | widgets ✅ · Sprint A UI ⏳ |
-| **17** Alertas + Gestor | P1 ×2 | **~95%** | homolog ✅ · assinar ⏳ |
-| **18** Financeiro previsão | P2 | 0% | Sprint B após A |
-| **19** Gamificação | P2 | 0% | — |
-| **20** Portal analytics | P2 | 0% | — |
-| **21** Live BI frota | P2 | 0% | — |
+| **16** Centro comando | P1 ×2 | **~98%** | One UI ✅ v1.9.2 · assinar D |
+| **17** Alertas + Gestor | P1 ×2 | **~95%** | homolog D1 · F9 ⏳ |
+| **18** Financeiro previsão | P2 | **~70%** | UI ✅ Sprint B · PDF Sprint H |
+| **19** Gamificação | P2 | 0% | Sprint E |
+| **20** Portal analytics | P2 | ~15% | — |
+| **21** Live BI frota | P2 | ~10% | — |
 | **22** Assistente IA | P3 | 0% | Anexo |
 
-**Total plano (P1 peso 2×):** **~62% concluído · ~38% restante**  
-**Próxima fase ativa dev:** **FASE 16 visual (One UI Sprint A)** → `PLANEJAMENTO_ONE_UI_2026-06.md`
+**Total plano (P1 peso 2×):** **~78% concluído · ~22% restante**  
+**Próxima fase ativa dev:** **Sprint D** fechar FASE 16/17 → `PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`
 
 ---
 

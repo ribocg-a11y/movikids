@@ -1,11 +1,10 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 27/06/2026 · **Sprints A–C One UI ✅ publicados**  
-**FE:** **v1.9.2** · **GAS:** **v1.5.167** · **Ciclo:** Premium One UI fechado (visual) · **Roteiro agente:** `ROTEIRO_AGENTE_OBRIGATORIO.md`  
+**Atualizado:** 27/06/2026 · FE **v1.9.2** · GAS **v1.5.167** · **Ciclo:** Sprint D pós One UI  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **Repo local:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`  
-**GitHub:** `ribocg-a11y/movikids` · branch `main` · commit **4c3ea70** (27/06 v1.9.2)
+**GitHub:** `ribocg-a11y/movikids` · branch `main` · commit **3d5cacc** (roteiro I24)
 
 **Mensagem mínima no novo chat:**
 
@@ -13,7 +12,7 @@
 
 **Mensagem para ciclo UI (recomendada):**
 
-> *Continuar MOVI KIDS — ler `HANDOFF_NOVO_CHAT.md` + `ROTEIRO_AGENTE_OBRIGATORIO.md`.*
+> *Continuar MOVI KIDS — Sprint D: `PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`*
 
 ---
 
@@ -95,7 +94,8 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 | # | Documento | Para quê |
 |---|-----------|----------|
 | 1 | **Este arquivo** | Contexto, produção |
-| 2 | **`PLANEJAMENTO_ONE_UI_2026-06.md`** | **Ciclo ativo UI** — backlog UI-A1… |
+| 2 | **`PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`** | **Ciclo ativo** — Sprint D→G |
+| 3 | `PLANEJAMENTO_ONE_UI_2026-06.md` | One UI fechado (referência) |
 | 3 | **`DESIGN_SYSTEM_MOVIKIDS.md`** | Cartilha UI — **antes de qualquer tela** |
 | 4 | `PLANO_PREMIUM_ONEUI_FASES_16_22_2026-06.md` | Visão FASE 16–22 |
 | 5 | `PLANEJAMENTO_ATUAL_2026-06.md` §9 | Prioridades gerais |
@@ -111,12 +111,13 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 
 | # | Ação | Quem | Status |
 |---|------|------|--------|
-| 1 | Assinar **FASE 17** + decisão **17.5 F9** | Sócio + Ops | ⏳ |
-| 2 | Tablet: smoke **v1.9.2** (admin One UI + Colaboradores) | Ops | ⏳ |
-| 3 | Sprint One UI A–C + travas I24 | Agente | ✅ **27/06 v1.9.2** |
-| 4 | GAS ping **v1.5.167** Web (se ping ainda 165) | Sócio | ⏳ opcional |
+| 1 | **Sprint D1** — homolog PC admin v1.9.2 (pills + badges F17) | Agente + sócio | ⏳ **próximo** |
+| 2 | Assinar **FASE 17** + decisão **17.5 F9** | Sócio + Ops | ⏳ Sprint D |
+| 3 | Smoke tablet **v1.9.2** (regressão balcão) | Ops | ⏳ Sprint D4 |
+| 4 | Sprint One UI A–C + I24 | Agente | ✅ **v1.9.2** |
+| 5 | GAS ping Web **v1.5.167** | Sócio | ⏳ opcional |
 
-Docs: `PLANEJAMENTO_ONE_UI_2026-06.md` · `CHECKLIST_FASE17_FECHAMENTO.md`
+Docs: `PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md` · `CHECKLIST_FASE17_FECHAMENTO.md`
 
 ---
 

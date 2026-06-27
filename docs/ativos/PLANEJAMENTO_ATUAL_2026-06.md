@@ -2,25 +2,27 @@
 
 **Atualizado:** 27/06/2026 · FE **v1.9.2** · GAS **v1.5.167** · **One UI ✅** · **I68 VT fechado**  
 **Diagnóstico:** [`DIAGNOSTICO_SISTEMA_6_CAMADAS_2026-06.md`](DIAGNOSTICO_SISTEMA_6_CAMADAS_2026-06.md)  
-**Sprint UI:** [`PLANEJAMENTO_ONE_UI_2026-06.md`](PLANEJAMENTO_ONE_UI_2026-06.md) ← **novo chat começa aqui**  
+**Sprint UI:** [`PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`](PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md) ← **ciclo ativo pós v1.9.2**  
+**One UI (fechado):** [`PLANEJAMENTO_ONE_UI_2026-06.md`](PLANEJAMENTO_ONE_UI_2026-06.md)  
 **Documentos irmãos:** `PLANO_PRIORIDADES_2026-06.md` · `MAPA_FASES.md` · `DEPLOY_ATUAL.md` · `HANDOFF_NOVO_CHAT.md`  
 **Ciclo fechado:** FASE 0–5 · I52–I63 planilha · I64–I67 higiene/auditoria  
-**Ciclo ativo:** **Premium One UI** — `PLANEJAMENTO_ONE_UI_2026-06.md` · FASE **16** visual → **18**
+**Ciclo ativo:** **Sprint D pós One UI** — `PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md` · fechar FASE **16/17**
 
 ---
 
 ## 1. Resumo executivo
 
-**Modo atual (26/06):** fundação + homolog tablet **fechados**. **Dev ativo = Premium One UI** (FASE 16 visual → FASE 18).
+**Modo atual (27/06):** One UI **Sprints A–C ✅ v1.9.2**. **Ciclo ativo = Sprint D** (fechar FASE 16/17).
 
 | Área | Status |
 |------|--------|
-| Planilha + GAS + homolog balcão | ✅ |
-| FASE 16 Centro Comando | 🟡 **~92%** — Sprint A UI |
-| FASE 17 Alertas + Gestor | 🟡 **~95%** — assinar + F9 |
+| Planilha + GAS + homolog balcão base | ✅ |
+| FASE 16 Centro Comando | ✅ **~98%** — assinatura Sprint D |
+| FASE 17 Alertas + Gestor | 🟡 **~95%** — pills/badges + F9 |
+| FASE 18 Financeiro UI | ✅ Sprint B · complemento Sprint H |
 | Raykelly cadastro | ✅ **100%** 26/06 |
 
-**Próximo passo dev:** `PLANEJAMENTO_ONE_UI_2026-06.md` → **UI-A1** sidebar admin mobile.
+**Próximo passo dev:** `PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md` → **Sprint D1** homolog admin v1.9.2
 
 ---
 
@@ -249,7 +251,7 @@ Legenda: **P0** bloqueia confiança operacional · **P1** valor imediato · **P2
 | **P0-2** | Homolog **I43** ▶ cronômetro não reverte | Ops loja | ✅ **23/06** |
 | **P0-3** | Homolog **I42** conta do dia 10h–22h | Ops loja | ✅ **23/06** |
 | **P0-4** | Login PIN **Milena + Raykelly** (I47) | Ops loja | ✅ **23/06** |
-| **P0-5** | Raykelly cadastro **100%** `gestao-pessoas.html` | Colaborador | ⏳ **próximo** |
+| **P0-5** | Raykelly cadastro **100%** | Colaborador | ✅ **26/06** |
 
 ### P0-1 — Checklist homolog tablet ✅ (23/06 — confirmado usuário)
 
@@ -286,17 +288,17 @@ Doc: `CHECKLIST_FASE5_TABLET.md` · `MAPA_ERROS` I20/I43/I42
 | **P2-6** | Monitor externo ping GAS | UptimeRobot ou similar |
 | **P2-7** | **RH-G3** faltas no holerite | API + desconto |
 
-### P3 — Premium One UI 18–22
+### P3 — Premium pós One UI (18–22)
 
-Ver `PLANO_PREMIUM_ONEUI_FASES_16_22_2026-06.md` — **após** P0-5 Raykelly + FASE 17 assinada.
+Sprints A–C ✅ **v1.9.2** · ciclo ativo: **`PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`**
 
-| Fase | Nome | Prioridade |
-|------|------|------------|
-| 18 | Financeiro + previsão | P3 |
-| 19 | Gamificação saudável | P3 |
-| 20 | Portal analytics | P3 |
-| 21 | Live BI frota (reforço) | P3 |
-| 22 | Assistente IA | P4 decisão sócio |
+| Fase | Nome | Prioridade | Sprint |
+|------|------|------------|--------|
+| 16–17 | Fechamento formal | **P1** | **D** |
+| 19 | Gamificação saudável | **P2** | **E** |
+| 10 | CRM LTV | **P2** | **G** |
+| 18 | Financeiro complemento | P2 | H |
+| 20–22 | Analytics / BI / IA | P3–P4 | backlog |
 
 ### P4 — Pausado (não iniciar)
 
@@ -308,12 +310,11 @@ Ver `PLANO_PREMIUM_ONEUI_FASES_16_22_2026-06.md` — **após** P0-5 Raykelly + F
 ### 9.1 — Sequência recomendada (roadmap 30 dias — revisado 23/06)
 
 ```
-✅ Semana 1: P0-1…P0-4 homolog tablet (fechado 23/06)
-Agora:     P0-5 Raykelly 100%
-Semana 2:  P1-1 assinar FASE 17 + P1-2 decisão F9
-Semana 3:  P1-3 ponto RH + P1-4 rotina mensal dados
-Semana 4:  P1-6 RH-G1 holerites (dev) · P2-1 FASE 10 CRM
-Paralelo:  P1-4 mensal · pre-push · verify-publish
+✅ One UI Sprints A–C (v1.9.2) — fechado 27/06
+Semana 1: Sprint D — FASE 16/17 assinatura · smoke v1.9.2 · F9
+Semana 2–3: Sprint E — FASE 19 gamificação (v1.9.3–4)
+Semana 4: Sprint G — FASE 10 CRM LTV
+Paralelo: RH-G1 holerites · ponto RH · rotina mensal dados
 ```
 
 ### 9.2 — O que NÃO é prioridade agora

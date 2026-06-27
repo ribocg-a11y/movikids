@@ -1,6 +1,6 @@
 # MOVI KIDS — Índice de documentação
 
-**Atualizado:** 26/06/2026 (FE **v1.8.121** · GAS **v1.5.165** · ciclo One UI)
+**Atualizado:** 27/06/2026 (FE **v1.9.2** · GAS **v1.5.167** · Sprint D pós One UI)
 
 ## Comece aqui
 
@@ -8,7 +8,7 @@
 |-----------|----------|
 | [**ROTEIRO_AGENTE_OBRIGATORIO.md**](ativos/ROTEIRO_AGENTE_OBRIGATORIO.md) | **Agente** — ordem fixa commit/push/verify (I24) |
 | [**HANDOFF_NOVO_CHAT.md**](ativos/HANDOFF_NOVO_CHAT.md) | **Novo chat Cursor** — contexto, produção |
-| [**PLANEJAMENTO_ONE_UI_2026-06.md**](ativos/PLANEJAMENTO_ONE_UI_2026-06.md) | **Ciclo ativo UI** — backlog UI-A1… |
+| [**PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md**](ativos/PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md) | **Ciclo ativo** — Sprint D→G pós v1.9.2 |
 | [**DIAGNOSTICO_SISTEMA_6_CAMADAS_2026-06.md**](ativos/DIAGNOSTICO_SISTEMA_6_CAMADAS_2026-06.md) | **Scorecard 6 camadas** — buracos P0–P2 · rotinas |
 | [**CHECKLIST_FASE17_FECHAMENTO.md**](ativos/CHECKLIST_FASE17_FECHAMENTO.md) | **FASE 17** — critérios assinatura + decisão 17.5 F9 |
 | [**GUIA_RAYKELLY_CADASTRO_P0.md**](ativos/GUIA_RAYKELLY_CADASTRO_P0.md) | **P0-5** — campos faltantes Raykelly |
@@ -29,12 +29,12 @@
 | [**CHECKLIST_ABA_PLANILHA_LOCACOES.md**](referencia/CHECKLIST_ABA_PLANILHA_LOCACOES.md) | Checklist piloto aba **LOCACOES** (I52) |
 | [**MAPA_PLANILHA_ABAS_MOVIKIDS.md**](referencia/MAPA_PLANILHA_ABAS_MOVIKIDS.md) | **Mapa canônico** — todas as abas · o que alimenta cada página |
 | [**PLANO_FASES_6_15_COCKPIT_EXECUTIVO_2026-06.md**](ativos/PLANO_FASES_6_15_COCKPIT_EXECUTIVO_2026-06.md) | **Ciclo ativo FASE 6–15** — benchmark, entregas, impacto visual por página |
-| [**PLANEJAMENTO_ONE_UI_2026-06.md**](ativos/PLANEJAMENTO_ONE_UI_2026-06.md) | **Sprint UI ativo** — One UX backlog |
+| [**PLANEJAMENTO_ONE_UI_2026-06.md**](ativos/PLANEJAMENTO_ONE_UI_2026-06.md) | One UI fechado (Sprints A–C v1.9.2) |
 | [**PLANEJAMENTO_ATUAL_2026-06.md**](ativos/PLANEJAMENTO_ATUAL_2026-06.md) | Resumo operação + §9 prioridades |
 | [PLANO_PRIORIDADES_2026-06.md](ativos/PLANO_PRIORIDADES_2026-06.md) | Fases 0–15 + execução |
 | [ESTADO_ATUAL.md](ativos/ESTADO_ATUAL.md) | Versões em produção, links, pacotes |
 | [PLANO_CONTINUIDADE_2026-06.md](ativos/PLANO_CONTINUIDADE_2026-06.md) | Roadmap 90 dias — **histórico** (ver HANDOFF) |
-| [**PLANO_PREMIUM_ONEUI_FASES_16_22_2026-06.md**](ativos/PLANO_PREMIUM_ONEUI_FASES_16_22_2026-06.md) | Próximo ciclo Premium — **aguardar janela segura** |
+| [**PLANO_PREMIUM_ONEUI_FASES_16_22_2026-06.md**](ativos/PLANO_PREMIUM_ONEUI_FASES_16_22_2026-06.md) | Premium 16–22 — Sprint D em `PLANEJAMENTO_CICLO_POS_ONEUI` |
 | [AGENTS.md](../AGENTS.md) | Instruções resumidas para agentes (raiz) |
 
 ## Homologação e fases

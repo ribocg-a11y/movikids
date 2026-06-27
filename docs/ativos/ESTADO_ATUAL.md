@@ -2,7 +2,7 @@
 
 Referência única para alinhamento local × produção.
 
-**Ciclo dev ativo:** **`PLANEJAMENTO_ONE_UI_2026-06.md`** — Premium One UI  
+**Ciclo dev ativo:** **`PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`** — Sprint D (fechar FASE 16/17)  
 **Diagnóstico 6 camadas:** **`DIAGNOSTICO_SISTEMA_6_CAMADAS_2026-06.md`**  
 **Prioridades gerais:** **`PLANEJAMENTO_ATUAL_2026-06.md`** §9
 
@@ -44,7 +44,7 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 | **Homolog tablet** | ✅ 23/06 | I43 · I42 · I47 · Gestor — smoke v1.9.2 pendente Ops |
 | **Raykelly cadastro** | ✅ **100%** | id 3 · API 26/06 |
 | **Design System** | **v1.1** | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
-| **Ciclo dev** | One UI ✅ | Sprints A–C **v1.9.2** · travas I24 · `ROTEIRO_AGENTE_OBRIGATORIO.md` |
+| **Ciclo dev** | Sprint D | One UI A–C ✅ **v1.9.2** · `PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md` |
 | **RELATORIOS** | repair I60 24/06 | 1 registro · **schemaOk=True** |
 | **RESPONSAVEIS** | repair I59 24/06 | **241** cadastros · **schemaOk=True** |
 | **FOLHA** | I68 26/06 | B68 **5253,96** · VA/dia **18,18** · VT **193,60**/pessoa · **schemaOk=True** |

@@ -1,22 +1,22 @@
 # MOVI KIDS — Mapa de fases (tradução)
 
-**Atualizado:** 26/06/2026
+**Atualizado:** 27/06/2026
 
 Evita confusão entre **três planos** que usam o mesmo número para coisas diferentes.
 
 ---
 
-## Ciclo ativo agora — Premium One UI
+## Ciclo ativo agora — pós One UI (Sprint D)
 
 | Status | Fase | Nome | Doc canônico |
 |--------|------|------|--------------|
 | ✅ | **15** | Gestão Pessoas (RH) | `FASE_15_GESTAO_PESSOAS.md` |
 | ✅ | **15b** | RH premium | `PLANO_PREMIUM` §6 — **100%** repo |
-| 🟡 | **16** | One UI + Centro de Comando | **~92%** · Sprint A em `PLANEJAMENTO_ONE_UI_2026-06.md` |
-| 🟡 | **17** | Alertas + Gestor | **~95%** · assinar `CHECKLIST_FASE17_FECHAMENTO.md` |
-| ⏳ | **18** | Financeiro previsão (UI) | Sprint B — após Sprint A |
+| 🟡 | **16** | One UI + Centro de Comando | **~98%** · assinatura Sprint D · UI ✅ v1.9.2 |
+| 🟡 | **17** | Alertas + Gestor | **~95%** · homolog D1 · `CHECKLIST_FASE17_FECHAMENTO.md` |
+| ✅ | **18** | Financeiro previsão (UI) | Sprint B ✅ · complemento Sprint H |
 
-**Decisão 26/06:** fundação + homolog tablet fechados → **dev ativo = UI One UX** (FASE 16 visual → FASE 18).
+**Decisão 27/06:** One UI Sprints A–C ✅ **v1.9.2** → **dev ativo = Sprint D** fechar FASE 16/17.
 
 ---
 
@@ -46,14 +46,15 @@ Evita confusão entre **três planos** que usam o mesmo número para coisas dife
 ## Próximo ciclo Premium (16–22)
 
 Doc mestre: **`PLANO_PREMIUM_ONEUI_FASES_16_22_2026-06.md`**  
-**Sprint ativo:** **`PLANEJAMENTO_ONE_UI_2026-06.md`**
+**Sprint ativo:** **`PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`**
 
-| Fase | Nome | Status UI |
-|------|------|-----------|
-| 16 | One UI + Centro comando | 🟡 Sprint A |
-| 17 | Alertas + Gestor | 🟡 assinar |
-| 18 | Financeiro previsão | ⏳ Sprint B |
-| 19–22 | Gamificação, portal, BI, IA | backlog |
+| Fase | Nome | Status |
+|------|------|--------|
+| 16 | One UI + Centro comando | 🟡 ~98% — assinar D |
+| 17 | Alertas + Gestor | 🟡 ~95% — D1/D2/D3 |
+| 18 | Financeiro previsão | ✅ UI · Sprint H complemento |
+| 19 | Gamificação | ⏳ Sprint E |
+| 20–22 | Portal, BI, IA | backlog |
 
 ---
 
@@ -62,7 +63,8 @@ Doc mestre: **`PLANO_PREMIUM_ONEUI_FASES_16_22_2026-06.md`**
 ```
 Versão          → mk-version.js + ping GAS
 Operação hoje   → HANDOFF_NOVO_CHAT.md
-Ciclo UI ativo  → PLANEJAMENTO_ONE_UI_2026-06.md
+Ciclo UI ativo  → PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md
+One UI (ref)    → PLANEJAMENTO_ONE_UI_2026-06.md
 Fase / visão    → este arquivo + PLANO_PREMIUM
 Prioridades     → PLANEJAMENTO_ATUAL §9
 ```

@@ -30,7 +30,7 @@ Detalhe: [docs/ativos/ESTRUTURA_REPO.md](docs/ativos/ESTRUTURA_REPO.md) · mocku
 | Gestão Pessoas | **v1.9.2** | `gestao-pessoas.html?force=1.9.2` |
 | Apps Script | **v1.5.167** | I68 VT ativo |
 | Design System | **v1.1** | [DESIGN_SYSTEM_MOVIKIDS.md](docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md) |
-| **Ciclo dev** | One UI ✅ | [PLANEJAMENTO_ONE_UI_2026-06.md](docs/ativos/PLANEJAMENTO_ONE_UI_2026-06.md) · [ROTEIRO_AGENTE_OBRIGATORIO.md](docs/ativos/ROTEIRO_AGENTE_OBRIGATORIO.md) |
+| **Ciclo dev** | Sprint D | [PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md](docs/ativos/PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md) · One UI ✅ [ref](docs/ativos/PLANEJAMENTO_ONE_UI_2026-06.md) |
 
 ## Novo chat / agente Cursor
 

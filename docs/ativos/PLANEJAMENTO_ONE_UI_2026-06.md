@@ -1,6 +1,7 @@
 # MOVI KIDS — Planejamento ativo: Premium One UI (jun/2026)
 
-**Atualizado:** 27/06/2026 · FE **v1.9.2** · GAS **v1.5.167** · **Sprints A–C One UI ✅**  
+**Atualizado:** 27/06/2026 · FE **v1.9.2** · GAS **v1.5.167** · **Sprints A–C ✅ FECHADOS**  
+**Ciclo ativo:** → **`PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`**  
 **Documento mestre:** `PLANO_PREMIUM_ONEUI_FASES_16_22_2026-06.md`  
 **Cartilha obrigatória:** `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` §0 · §3 widgets · §8 admin  
 **Handoff:** `HANDOFF_NOVO_CHAT.md`
@@ -12,12 +13,13 @@
 | Área | Status | Nota |
 |------|--------|------|
 | Planilha I52–I63 + auditoria célula | ✅ 23/23 | `DIAGNOSTICO_SISTEMA_6_CAMADAS_2026-06.md` |
-| GAS Web + FE Pages | ✅ v1.5.165 / v1.8.121 | alinhados |
-| Homolog tablet (I43, I42, I47, Gestor) | ✅ 23/06 | balcão validado |
-| FASE 15b RH | ✅ 100% repo | 15b.7 banco horas |
-| FASE 16 Centro Comando | 🟡 **~92%** | widgets Dashboard ✅ · rollout outras telas ⏳ |
-| FASE 17 Alertas + Gestor | 🟡 **~95%** | API ✅ · assinatura + 17.5 F9 ⏳ |
-| Raykelly cadastro | ⏳ P0-5 | `GUIA_RAYKELLY_CADASTRO_P0.md` — não bloqueia UI admin |
+| GAS Web + FE Pages | ✅ v1.5.167 / **v1.9.2** | publicado 27/06 |
+| Homolog tablet (I43, I42, I47, Gestor) | ✅ 23/06 | smoke v1.9.2 ⏳ Sprint D |
+| FASE 15b RH | ✅ 100% repo | |
+| FASE 16 Centro Comando | ✅ **~98%** | Sprint D assinatura |
+| FASE 17 Alertas + Gestor | 🟡 **~95%** | Sprint D + decisão F9 |
+| FASE 18 Financeiro UI | ✅ Sprint B | complemento Sprint H |
+| Raykelly cadastro | ✅ **100%** | 26/06 |
 
 **Novo chat deve codar UI** — não repetir repair planilha, homolog balcão nem schema.
 
@@ -117,9 +119,9 @@ Tokens existentes em `mk-design.css`: `--mk-widget-*`, `.mk-widget`, `.mk-comman
 
 ## 8. Próximo passo único (novo chat)
 
-**Sprint One UI fechado 27/06** — FE **v1.9.2** publicado · travas I24 · roteiro `ROTEIRO_AGENTE_OBRIGATORIO.md`
+**Ciclo One UI fechado** — ver **`PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`**
 
-**Próximo:** FASE 17 assinatura Ops · smoke tablet v1.9.2
+**Sprint D1:** homolog PC admin v1.9.2 (pills + badges FASE 17) → assinar checklist F17
 
 ---
 
