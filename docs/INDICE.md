@@ -6,6 +6,7 @@
 
 | Documento | Para quê |
 |-----------|----------|
+| [**ROTEIRO_AGENTE_OBRIGATORIO.md**](ativos/ROTEIRO_AGENTE_OBRIGATORIO.md) | **Agente** — ordem fixa commit/push/verify (I24) |
 | [**HANDOFF_NOVO_CHAT.md**](ativos/HANDOFF_NOVO_CHAT.md) | **Novo chat Cursor** — contexto, produção |
 | [**PLANEJAMENTO_ONE_UI_2026-06.md**](ativos/PLANEJAMENTO_ONE_UI_2026-06.md) | **Ciclo ativo UI** — backlog UI-A1… |
 | [**DIAGNOSTICO_SISTEMA_6_CAMADAS_2026-06.md**](ativos/DIAGNOSTICO_SISTEMA_6_CAMADAS_2026-06.md) | **Scorecard 6 camadas** — buracos P0–P2 · rotinas |

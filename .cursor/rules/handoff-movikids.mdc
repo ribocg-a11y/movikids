@@ -30,12 +30,13 @@ Ao trabalhar neste repositório, **ler primeiro** (nesta ordem):
 5. `docs/ativos/ESTADO_ATUAL.md` — versões e links canônicos
 6. `docs/ativos/REGRAS_DE_PUBLICACAO_SEGURA.md` — antes de commit/push/deploy
 7. `docs/ativos/ACESSOS_E_AUTORIZACOES.md` — papéis, PIN admin, agente vs humano
+8. **`docs/ativos/ROTEIRO_AGENTE_OBRIGATORIO.md`** — ordem fixa publicação FE (I24)
 
 Índice: `docs/INDICE.md` · Entrada raiz: `AGENTS.md` · `README.md`
 
 ## Agente vs usuário (memória rápida)
 
-**Agente SOZINHO:** ler docs, editar FE/docs, `pre-push-check` → commit → push FE → `verify-publish-complete` (**sem pedir**), `relatorio-versoes.ps1` no encerramento, ping GAS, **executar** testes/repair API (não transferir ao usuário), planilha OAuth, PRs, APIs admin.
+**Agente SOZINHO:** ler docs, editar FE/docs, **`git commit` → `pre-push-check` → `git push` → `verify-publish-complete` → `encerramento-sessao` exit 0** (**sem pedir**), testes/repair API, planilha OAuth, docs.
 
 **Executar, não transferir:** `.cursor/rules/agente-autonomia-movikids.mdc` § "Não transferir" — único limite fixo além §7.3: não colar/reimplantar Nova versão Web GAS.
 

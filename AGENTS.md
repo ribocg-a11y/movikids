@@ -25,6 +25,7 @@ Leia **nesta ordem**:
 3. [`docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md`](docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md) — **antes de qualquer tela**
 4. [`docs/ativos/ESTADO_ATUAL.md`](docs/ativos/ESTADO_ATUAL.md) · [`DEPLOY_ATUAL.md`](docs/ativos/DEPLOY_ATUAL.md)
 5. [`docs/ativos/REGRAS_DE_PUBLICACAO_SEGURA.md`](docs/ativos/REGRAS_DE_PUBLICACAO_SEGURA.md)
+6. [`docs/ativos/ROTEIRO_AGENTE_OBRIGATORIO.md`](docs/ativos/ROTEIRO_AGENTE_OBRIGATORIO.md) — **ordem fixa commit/push/verify**
 
 Índice: [`docs/INDICE.md`](docs/INDICE.md)
 
@@ -32,23 +33,26 @@ Leia **nesta ordem**:
 
 | Camada | Versão | Link |
 |--------|--------|------|
-| Frontend | **v1.8.122** | https://ribocg-a11y.github.io/movikids/?force=1.8.122 |
-| Gestão Pessoas | **v1.8.122** | `gestao-pessoas.html?force=1.8.122` |
-| GAS | **v1.5.167** | ping alinhado após reimplantar string ping |
+| Frontend | **v1.9.2** | https://ribocg-a11y.github.io/movikids/?force=1.9.2 |
+| Gestão Pessoas | **v1.9.2** | `gestao-pessoas.html?force=1.9.2` |
+| GAS | **v1.5.167** | ping Web pode mostrar v1.5.165 até Nova versão |
 | Design System | **v1.1** | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
 | Deploy ID | `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y` | |
+
+**Roteiro agente (obrigatório):** `docs/ativos/ROTEIRO_AGENTE_OBRIGATORIO.md`
 
 **GAS canônico:**  
 `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github\MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs`
 
-## Estado do projeto (26/06/2026)
+## Estado do projeto (27/06/2026)
 
 - **FASE 0–15 + 15b:** ✅ prod
 - **FASE 14 mini-DRE:** ✅ prod
-- **FASE 16–17:** 🟡 ~92–95% — **Sprint One UI** fecha visual
-- **Homolog tablet:** ✅ 23/06 (I43, I42, I47, Gestor)
-- **Planilha:** ✅ 23/23 auditoria célula · **I68 VT** ✅ 26/06
-- **Próximo dev:** **UI-A1** sidebar admin mobile → FE alvo **v1.9.0**
+- **FASE 16–17:** ✅ visual One UI **v1.9.2** · assinatura FASE 17 pendente Ops
+- **Homolog tablet:** ✅ 23/06 · smoke **v1.9.2** pendente
+- **Planilha:** ✅ 23/23 · **I68 VT** ✅
+- **Travas I24:** ✅ `guard-i24-publicacao` + `encerramento-sessao`
+- **Próximo:** FASE 17 assinatura · smoke tablet · GAS ping Web v1.5.167
 
 ## Regras P0
 

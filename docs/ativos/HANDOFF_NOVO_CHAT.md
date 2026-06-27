@@ -1,11 +1,11 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 26/06/2026 · **Sprints A–C One UI ✅**  
-**FE:** **v1.9.2** (repo local, push pendente) · **GAS:** **v1.5.167** · **Ciclo ativo:** Premium One UI — publicar v1.9.2  
+**Atualizado:** 27/06/2026 · **Sprints A–C One UI ✅ publicados**  
+**FE:** **v1.9.2** · **GAS:** **v1.5.167** · **Ciclo:** Premium One UI fechado (visual) · **Roteiro agente:** `ROTEIRO_AGENTE_OBRIGATORIO.md`  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **Repo local:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`  
-**GitHub:** `ribocg-a11y/movikids` · branch `main` · último commit handoff **26/06**
+**GitHub:** `ribocg-a11y/movikids` · branch `main` · commit **4c3ea70** (27/06 v1.9.2)
 
 **Mensagem mínima no novo chat:**
 
@@ -13,7 +13,7 @@
 
 **Mensagem para ciclo UI (recomendada):**
 
-> *Continuar MOVI KIDS — publicar v1.9.2 (Sprints A–C) ou iniciar próximo ciclo pós-One UI.*
+> *Continuar MOVI KIDS — ler `HANDOFF_NOVO_CHAT.md` + `ROTEIRO_AGENTE_OBRIGATORIO.md`.*
 
 ---
 
@@ -30,7 +30,7 @@
 2. O **tablet fica na operação** — homologação balcão **fechada 23/06**; só re-testar se mudar `api()`, auth ou cronômetro.
 3. **Sessão dual (I21):** PC com PIN admin **1421** = **TABLET: Administrador**; tablet operadores = **BALCÃO: Nome**.
 4. **UI nova:** consultar **`docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md`** §0 **antes** de codar (I29).
-5. **Push FE:** após `pre-push-check` OK → commit → push → **`verify-publish-complete.ps1`**.
+5. **Push FE:** `git commit` → `pre-push-check` → `git push` → `verify-publish-complete` → `encerramento-sessao` exit 0 — **sem pedir** (§7.2 · I24)
 
 Detalhe: `ACESSOS_E_AUTORIZACOES.md` §7 · incidentes I21 · I29.
 
@@ -56,11 +56,11 @@ cursor "C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-mo
 
 ---
 
-## Produção (26/06/2026 — fim de sessão)
+## Produção (27/06/2026)
 
 | Camada | Versão | URL / evidência |
 |--------|--------|-----------------|
-| **Frontend** | **v1.9.2** (repo local) | https://ribocg-a11y.github.io/movikids/?force=1.9.2 após push |
+| **Frontend** | **v1.9.2** | https://ribocg-a11y.github.io/movikids/?force=1.9.2 |
 | **Gestão Pessoas** | **v1.9.2** | `gestao-pessoas.html?force=1.9.2` |
 | **Service Worker** | **1.9.2** | `sw.js` |
 | **Apps Script** | **v1.5.167** | lógica I68 ativa · ping string **v1.5.167** no repo (reimplantar se ping antigo) |
@@ -111,12 +111,10 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 
 | # | Ação | Quem | Status |
 |---|------|------|--------|
-| 1 | **Publicar FE v1.9.2** (Sprints A–C) — commit + push + verify | **Agente (dev)** | ⏳ **próximo** |
-| 2 | Sprint C UI-C1…C2 — hub colaborador + holerite widget | Agente | ✅ **26/06 v1.9.2** |
-| 3 | Sprint B UI-B1…B3 — previsão fim de mês | Agente | ✅ **27/06 v1.9.1** |
-| 4 | Sprint A UI-A1…A6 — FASE 16 visual | Agente | ✅ **27/06 v1.9.0** |
-| 5 | Assinar **FASE 17** + decisão **17.5 F9** | Sócio + Ops | ⏳ |
-| 6 | Tablet: Milena validar Colaboradores + VT | Ops | ⏳ smoke |
+| 1 | Assinar **FASE 17** + decisão **17.5 F9** | Sócio + Ops | ⏳ |
+| 2 | Tablet: smoke **v1.9.2** (admin One UI + Colaboradores) | Ops | ⏳ |
+| 3 | Sprint One UI A–C + travas I24 | Agente | ✅ **27/06 v1.9.2** |
+| 4 | GAS ping **v1.5.167** Web (se ping ainda 165) | Sócio | ⏳ opcional |
 
 Docs: `PLANEJAMENTO_ONE_UI_2026-06.md` · `CHECKLIST_FASE17_FECHAMENTO.md`
 

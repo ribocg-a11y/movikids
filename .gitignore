@@ -5,3 +5,7 @@ package-lock.json
 portal_server.out.log
 portal_server.err.log
 financeiro/logs/
+scripts/testes/_*.txt
+scripts/testes/_*.log
+scripts/testes/_*.json
+backups/

@@ -1,4 +1,4 @@
-# MOVI KIDS — Estado atual (26/06/2026)
+# MOVI KIDS — Estado atual (27/06/2026)
 
 Referência única para alinhamento local × produção.
 
@@ -31,20 +31,20 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 ---
 
-## Produção (26/06/2026 — fim de sessão)
+## Produção (27/06/2026)
 
 | Camada | Versão | URL / evidência |
 |--------|--------|-----------------|
-| **Frontend** | **v1.8.122** | https://ribocg-a11y.github.io/movikids/?force=1.8.122 |
-| **Gestão Pessoas** | **v1.8.122** | `gestao-pessoas.html?force=1.8.122` |
-| **Service Worker** | **1.8.122** | `sw.js` |
-| **Apps Script** | **v1.5.167** | I68 VT ativo · ping **v1.5.167** no repo |
+| **Frontend** | **v1.9.2** | https://ribocg-a11y.github.io/movikids/?force=1.9.2 |
+| **Gestão Pessoas** | **v1.9.2** | `gestao-pessoas.html?force=1.9.2` |
+| **Service Worker** | **1.9.2** | `sw.js` |
+| **Apps Script** | **v1.5.167** | I68 VT · ping Web pode mostrar v1.5.165 até Nova versão |
 | **FOLHA VT I68** | ✅ 26/06 | B9 **8,80** · B10/B12 **22** · Milena VT **193,60** · Raykelly **103,25** |
 | **Planilha** | 23 abas | `schemaOk=True` · auditoria célula **23/23** |
-| **Homolog tablet** | ✅ 23/06 | I43 · I42 · I47 · Gestor |
+| **Homolog tablet** | ✅ 23/06 | I43 · I42 · I47 · Gestor — smoke v1.9.2 pendente Ops |
 | **Raykelly cadastro** | ✅ **100%** | id 3 · API 26/06 |
 | **Design System** | **v1.1** | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
-| **Ciclo dev** | One UI | `PLANEJAMENTO_ONE_UI_2026-06.md` · alvo FE **v1.9.0** |
+| **Ciclo dev** | One UI ✅ | Sprints A–C **v1.9.2** · travas I24 · `ROTEIRO_AGENTE_OBRIGATORIO.md` |
 | **RELATORIOS** | repair I60 24/06 | 1 registro · **schemaOk=True** |
 | **RESPONSAVEIS** | repair I59 24/06 | **241** cadastros · **schemaOk=True** |
 | **FOLHA** | I68 26/06 | B68 **5253,96** · VA/dia **18,18** · VT **193,60**/pessoa · **schemaOk=True** |

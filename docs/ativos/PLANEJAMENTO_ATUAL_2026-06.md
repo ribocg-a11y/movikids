@@ -1,6 +1,6 @@
 # MOVI KIDS — Planejamento atual (pós-FASE 5)
 
-**Atualizado:** 26/06/2026 · FE **v1.8.122** · GAS **v1.5.167** · **Ciclo ativo: One UI** · **I68 VT fechado**  
+**Atualizado:** 27/06/2026 · FE **v1.9.2** · GAS **v1.5.167** · **One UI ✅** · **I68 VT fechado**  
 **Diagnóstico:** [`DIAGNOSTICO_SISTEMA_6_CAMADAS_2026-06.md`](DIAGNOSTICO_SISTEMA_6_CAMADAS_2026-06.md)  
 **Sprint UI:** [`PLANEJAMENTO_ONE_UI_2026-06.md`](PLANEJAMENTO_ONE_UI_2026-06.md) ← **novo chat começa aqui**  
 **Documentos irmãos:** `PLANO_PRIORIDADES_2026-06.md` · `MAPA_FASES.md` · `DEPLOY_ATUAL.md` · `HANDOFF_NOVO_CHAT.md`  

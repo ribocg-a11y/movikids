@@ -1,6 +1,6 @@
 # MOVI KIDS — Planejamento ativo: Premium One UI (jun/2026)
 
-**Atualizado:** 27/06/2026 · FE **v1.9.0** · GAS **v1.5.167** · **Sprint A One UI ✅**  
+**Atualizado:** 27/06/2026 · FE **v1.9.2** · GAS **v1.5.167** · **Sprints A–C One UI ✅**  
 **Documento mestre:** `PLANO_PREMIUM_ONEUI_FASES_16_22_2026-06.md`  
 **Cartilha obrigatória:** `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` §0 · §3 widgets · §8 admin  
 **Handoff:** `HANDOFF_NOVO_CHAT.md`
@@ -72,7 +72,7 @@ Tokens existentes em `mk-design.css`: `--mk-widget-*`, `.mk-widget`, `.mk-comman
 2. Mock mental / inspecionar acompanhar.html + Dashboard atual
 3. Editar FE (mk-design.css → mk-admin.js → HTML se necessário)
 4. Bump v1.9.x nos 4 artefatos (I3) se mudou FE
-5. pre-push-check.ps1 → commit → push → verify-publish-complete.ps1
+5. **`git commit`** → `pre-push-check.ps1` → **`git push`** → `verify-publish-complete.ps1` → **`encerramento-sessao.ps1` exit 0**
 6. Homolog PC admin (PIN 1421) — NÃO exige tablet se só admin CSS
 7. Encerrar com relatorio-versoes.ps1 + Regra 16
 ```
@@ -117,9 +117,9 @@ Tokens existentes em `mk-design.css`: `--mk-widget-*`, `.mk-widget`, `.mk-comman
 
 ## 8. Próximo passo único (novo chat)
 
-**Sprint C fechado** — publicar v1.9.2 (commit + push pendente).
+**Sprint One UI fechado 27/06** — FE **v1.9.2** publicado · travas I24 · roteiro `ROTEIRO_AGENTE_OBRIGATORIO.md`
 
-Sprint A **fechado 27/06** · Sprint B **fechado 27/06** · Sprint C **fechado 26/06** — FE **v1.9.2**
+**Próximo:** FASE 17 assinatura Ops · smoke tablet v1.9.2
 
 ---
 

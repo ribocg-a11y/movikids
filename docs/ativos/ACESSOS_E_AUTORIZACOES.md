@@ -1,6 +1,6 @@
 # MOVI KIDS — Acessos e autorizações
 
-**Atualizado:** 17/06/2026 (lista fechada §7.3 — permissão explícita)  
+**Atualizado:** 27/06/2026 (roteiro agente I24 · FE v1.9.2)  
 **Função:** mapa único de **quem pode o quê** — app, infraestrutura e agente Cursor.  
 **Complementa:** `ESTADO_ATUAL.md`, `REGRAS_DE_PUBLICACAO_SEGURA.md`, `DEPLOY_GAS_v1.5.32_AUTH.md`
 
@@ -150,7 +150,8 @@ Esta seção responde: **o que o agente faz sozinho, o que valida, o que publica
 |------|------|
 | Ler handoff, prioridades, estado, regras, este arquivo | Abrir `docs/ativos/` |
 | Explorar e editar **frontend** e docs | `index.html`, `mk-*.js` (exceto `api()`/auth), `sw.js`, CSS, docs |
-| `git add`, `git commit`, `git push` | Após `pre-push-check.ps1` · `verify-publish-complete.ps1` pós-push FE |
+| `git add`, `git commit`, `git push` | Ordem I24: **commit** → `pre-push-check` → push → `verify-publish-complete` → **`encerramento-sessao` exit 0** |
+| Roteiro obrigatório | `docs/ativos/ROTEIRO_AGENTE_OBRIGATORIO.md` · `.cursor/rules/roteiro-agente-movikids.mdc` |
 | Criar branch, PR (`gh pr create`) | Quando fizer sentido no pacote |
 | Rodar validação e testes | `pre-push-check`, `protocolo-mestre`, `scripts/testes/TESTE_*.ps1` |
 | Validar versão FE | `mk-version.js`, `sw.js`, `index.html ?v=` |

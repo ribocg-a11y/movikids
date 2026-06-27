@@ -1,10 +1,13 @@
 # Pacote J - gate local antes de git push (versoes FE + paridade HTTP + portal readonly)
 # Uso:
 #   .\scripts\pre-push-check.ps1
-#   .\scripts\pre-push-check.ps1 -SkipNetworkTests   # offline / so versao
+#   .\scripts\pre-push-check.ps1 -SkipNetworkTests
+#
+# Ordem I24: git commit (I3) ANTES deste script — guard.i24.pre-push exige working tree limpa
 #
 # Pos-push (obrigatorio apos git push FE — Regra 8 / I24):
 #   .\scripts\verify-publish-complete.ps1
+#   .\scripts\encerramento-sessao.ps1
 #
 # Hook opcional (uma vez no repo):
 #   git config core.hooksPath githooks

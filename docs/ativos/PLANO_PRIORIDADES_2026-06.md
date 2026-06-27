@@ -37,7 +37,7 @@
 4. **Sócio:** Decisão **17.5 F9** + assinar `CHECKLIST_FASE17_FECHAMENTO.md`
 5. **Ops:** Ponto RH diário (`FOLHA_PONTO`)
 
-**Fundação:** GAS **v1.5.167** · FE **v1.8.122** · homolog tablet ✅ · planilha **23/23** · **I68 VT** ✅.
+**Fundação:** GAS **v1.5.167** · FE **v1.9.2** · homolog tablet ✅ · planilha **23/23** · **I68 VT** ✅ · **I24 travas** ✅.
 
 Ver **`PLANEJAMENTO_ONE_UI_2026-06.md`** · **`HANDOFF_NOVO_CHAT.md`**
 

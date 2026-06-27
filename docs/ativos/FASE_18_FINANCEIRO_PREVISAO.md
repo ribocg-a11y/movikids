@@ -1,6 +1,6 @@
 # FASE 18 — Financeiro + previsão (memorial)
 
-**Atualizado:** 27/06/2026 · FE **v1.9.1** · GAS **v1.5.167** (sem alteração)  
+**Atualizado:** 27/06/2026 · FE **v1.9.2** · GAS **v1.5.167** (sem alteração)  
 **UI:** `#mk-previsao-mes` no Dashboard · Sprint B `PLANEJAMENTO_ONE_UI_2026-06.md`
 
 ---

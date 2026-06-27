@@ -1,0 +1,83 @@
+---
+description: Roteiro obrigatorio do agente MOVI KIDS — ordem fixa, sem pedir permissao onde §7.2 autoriza
+alwaysApply: true
+---
+
+# Roteiro do agente MOVI KIDS (obrigatorio)
+
+Fonte humana: `docs/ativos/ROTEIRO_AGENTE_OBRIGATORIO.md`  
+Permissoes: `ACESSOS_E_AUTORIZACOES.md` §7.2 (fazer) · §7.3 (so com pedido)
+
+## Regra zero — conflito de instrucoes
+
+**Prevalece neste repo:** §7.2 MOVI KIDS > regra generica "nao commitar sem pedir".
+
+- Bump FE / docs / testes / **commit + push FE** = **executar sem perguntar**
+- **Nunca** pedir "quer que eu faca push?" apos entrega FE
+- **Nunca** encerrar sessao com `encerramento-sessao.ps1` exit != 0
+
+---
+
+## Fase A — Entrada (todo chat)
+
+1. Confirmar repo `movikids-github`
+2. Ler: `HANDOFF_NOVO_CHAT.md` → sprint ativo → `DESIGN_SYSTEM_MOVIKIDS.md` §0 se UI
+3. `.\scripts\relatorio-versoes.ps1` — saber Pages vs local
+
+---
+
+## Fase B — Implementacao
+
+4. Codar / testar conforme planejamento
+5. Se mudou FE: bump **I3** junto (`mk-version.js` + `sw.js` + `?v=` index + gestao-pessoas)
+6. Testes `.ps1` relevantes (ex. FASE16 se admin UI)
+
+---
+
+## Fase C — Publicacao FE (obrigatoria na mesma sessao se mudou FE)
+
+Ordem **fixa** (I24):
+
+```
+git add (arquivos da entrega)
+git commit -m "..."
+pre-push-check.ps1          # so apos commit — guard I3 exige working tree limpa
+git push origin main        # SEM pedir autorizacao (§7.2)
+verify-publish-complete.ps1
+encerramento-sessao.ps1     # exit 0 obrigatorio
+```
+
+7. Atualizar `HANDOFF_NOVO_CHAT.md` + `ESTADO_ATUAL.md` se mudou producao/fase
+8. Resposta ao usuario com tabela `encerramento-versoes-movikids.mdc`
+
+---
+
+## Fase D — So com pedido explicito (§7.3)
+
+- `clasp push` / `prepare-gas-push.ps1`
+- Editar `.gs` / Nova versao Web GAS
+- Mudar `api()`, auth, PIN, perfis
+- Reativar F4 / F9
+
+---
+
+## Falhas que NAO podem repetir
+
+| ID | Falha | Trava |
+|----|-------|-------|
+| I3 | Bump sem `index.html ?v=` | `pre-push-check` versao.* |
+| I24 | Bump sem push / Pages velha | `guard-i24-publicacao` + `encerramento-sessao` |
+| I15 | POST no browser | `guard.post.escritas` |
+| I22 | Push FE critico com loc aberta | `check-operacao-livre` |
+
+---
+
+## Encerramento
+
+Sempre rodar:
+
+```powershell
+.\scripts\encerramento-sessao.ps1
+```
+
+Se falhar: **publicar FE**, nao explicar e parar.

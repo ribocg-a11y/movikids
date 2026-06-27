@@ -1,6 +1,6 @@
 # MOVI KIDS — Protocolo "Atualize tudo"
 
-**Criado:** 14/06/2026 · **Última execução:** 26/06/2026 (handoff novo chat — I68 VT + FE v1.8.122)  
+**Criado:** 14/06/2026 · **Última execução:** 27/06/2026 (v1.9.2 One UI + travas I24 + roteiro agente)  
 **Função:** quando o usuário pedir **"atualize tudo"**, o agente segue **esta lista** — não só handoff parcial.  
 **Regra Cursor:** `.cursor/rules/atualize-tudo-movikids.mdc`
 
@@ -42,16 +42,16 @@ Sincronizar **documentação + estado operacional** do projeto com a realidade a
 
 ---
 
-## Produção atual (26/06/2026 — fim de sessão)
+## Produção atual (27/06/2026)
 
 | Camada | Versão | Evidência |
 |--------|--------|-----------|
-| GAS | **v1.5.167** | I68 VT · `ajustarFolhaVtAdmin` |
-| FE | **v1.8.122** | Pages live · timeout RH 60s |
+| GAS | **v1.5.167** | I68 VT · ping Web verificar |
+| FE | **v1.9.2** | Pages live · Sprints A–C One UI |
 | Planilha FOLHA | **OK** | B9=8,80 · B10/B12=22 · B68=5253,96 |
 | Planilha | **OK** | `schemaOk=True` · auditoria **23/23** |
-| Homolog tablet | **✅** | 23/06 I43/I42/I47/Gestor |
-| Ciclo dev | **One UI** | `PLANEJAMENTO_ONE_UI_2026-06.md` · próximo **UI-A1** |
+| Homolog tablet | **✅** | 23/06 · smoke v1.9.2 pendente |
+| Ciclo dev | **One UI ✅** | `ROTEIRO_AGENTE_OBRIGATORIO.md` · travas I24 |
 
 ---
 
