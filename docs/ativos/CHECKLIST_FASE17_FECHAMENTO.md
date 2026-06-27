@@ -12,8 +12,8 @@
 |---|----------|-----------|--------|
 | 1 | **Gestor** loga (PIN perfil `gestor`) → vê Dashboard + Operação + Caixa + Equipe | Tablet/PC homolog 23/06 | ✅ |
 | 2 | Gestor **sem** CONFIG / Sistema / diagnóstico | Homolog tablet 23/06 | ✅ |
-| 3 | Dashboard exibe **≥1 pill** de alerta inteligente com destino (Caixa / Equipe / Comando) | One UI v1.9.2 · homolog PC **D1** | 🟡 |
-| 4 | Presença admin — badges inteligentes (banco horas / meta / ponto pendente) | One UI v1.9.2 · homolog PC **D1** | 🟡 |
+| 3 | Dashboard exibe **≥1 pill** de alerta inteligente com destino (Caixa / Equipe / Comando) | PC homolog 27/06 · pills **→ Comando** / **→ Equipe** / Ver todos (8) | ✅ |
+| 4 | Presença admin — badges inteligentes (banco horas / meta / ponto pendente) | API intel=5 · repo `gpAdmIntelForOp_` · aba Ficha: assinatura sócio | 🟡 |
 | 5 | Balcão inalterado — F5/F7/F10/F11 após homolog | Homolog I43/I42 23/06 | ✅ |
 | 6 | `TESTE_FASE17_ALERTAS_READONLY.ps1` verde | 26/06 execução | ✅ |
 | 7 | **17.5** decisão **F9 Supervisor** documentada | `MATRIZ_PERMISSOES` § Decisões pendentes | ⏳ **sócio** |

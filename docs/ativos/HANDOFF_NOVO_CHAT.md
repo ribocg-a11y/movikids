@@ -111,7 +111,7 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 
 | # | Ação | Quem | Status |
 |---|------|------|--------|
-| 1 | **Sprint D1** — homolog PC admin v1.9.2 (pills + badges F17) | Agente + sócio | ⏳ **próximo** |
+| 1 | **Sprint D1** homolog PC admin v1.9.2 | Agente | ✅ **27/06** |
 | 2 | Assinar **FASE 17** + decisão **17.5 F9** | Sócio + Ops | ⏳ Sprint D |
 | 3 | Smoke tablet **v1.9.2** (regressão balcão) | Ops | ⏳ Sprint D4 |
 | 4 | Sprint One UI A–C + I24 | Agente | ✅ **v1.9.2** |

@@ -47,7 +47,7 @@
 
 | ID | Entrega | Quem | Critério pronto |
 |----|---------|------|-----------------|
-| **D1** | Homolog **PC admin** v1.9.2 — comando, pills alerta, presença badges | Agente + sócio | PIN 1421 · 3 pills intel · badges visíveis |
+| **D1** | Homolog **PC admin** v1.9.2 — comando, pills alerta, presença badges | Agente + sócio | ✅ **27/06** — ver `EVIDENCIA_SPRINT_D1_HOMOLOG_2026-06-27.md` |
 | **D2** | Checklist **FASE 17** critérios 3–4 ✅ | Ops/sócio | `CHECKLIST_FASE17_FECHAMENTO.md` assinado |
 | **D3** | Decisão **17.5 F9** Supervisor | **Sócio** | Registro em `MATRIZ_PERMISSOES_PERFIS_2026-06.md` |
 | **D4** | Smoke tablet **v1.9.2** (sem regressão balcão) | Ops loja | F5/F7/F10/F11 + 1 locação teste |
@@ -151,9 +151,9 @@ Paralelo contínuo:      ponto RH · pre-push · encerramento-sessao I24
 
 ## 7. Próximo passo único (agente)
 
-**Sprint D1** — Homolog PC admin v1.9.2: abrir Dashboard com PIN 1421, validar `#mk-command-center`, pills alerta inteligente, Presença badges — registrar evidência no checklist F17.
+**Sprint D1** — ✅ homolog PC 27/06 (evidência `EVIDENCIA_SPRINT_D1_HOMOLOG_2026-06-27.md`).
 
-**Paralelo sócio:** D3 decisão F9 · D6 GAS ping se necessário.
+**Paralelo sócio:** D2 assinar F17 · D3 decisão F9 · D6 GAS ping se necessário.
 
 **Ops:** D4 smoke tablet v1.9.2.
 
