@@ -24,7 +24,9 @@
 | Pills alerta inteligente Dashboard | **→ Comando** · **→ Equipe** · **Ver todos (8)** | ✅ |
 | Centro de gestão One UI | 3 portas (Operação dia / Gestão mês / Sistema) | ✅ |
 | Previsão fim de mês widget | Dashboard carregado Jun/2026 | ✅ |
-| Presença badges intel | Repo + API `alertasInteligentes` · aba **Hoje** Colaboradores carrega equipe | 🟡 assinatura sócio aba Ficha |
+| Presença badges intel | Admin → **Operadores** → aba **Ficha** · Milena: alerta **Meta abaixo** (`.gp-adm-presenca-intel`) | ✅ |
+
+**Colaboradores testados (Ficha):** Eduarda (badges Fora/cadastro) · **Milena** (intel meta) · Raykelly (No balcão/Cadastro OK)
 
 ---
 

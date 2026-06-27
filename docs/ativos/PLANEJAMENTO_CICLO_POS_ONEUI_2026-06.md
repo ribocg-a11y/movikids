@@ -24,7 +24,7 @@
 | Fase | Nome | % | Falta fechar |
 |------|------|---|--------------|
 | **16** | One UI + Centro Comando | **~98%** | Assinatura formal + smoke tablet v1.9.2 |
-| **17** | Alertas + Gestor | **~95%** | Homolog visual pills/badges v1.9.2 · decisão **17.5 F9** |
+| **17** | Alertas + Gestor | **~98%** | Assinatura D2 · decisão **17.5 F9** |
 | **18** | Financeiro previsão | **~70%** | UI ✅ · PDF premium · campos GAS opcionais |
 | **19** | Performance / gamificação | **0%** | Próximo ciclo dev **P2** |
 | **20** | Portal analytics + CONFIG UI | **~15%** | Herda FASE 15 |
@@ -48,7 +48,7 @@
 | ID | Entrega | Quem | Critério pronto |
 |----|---------|------|-----------------|
 | **D1** | Homolog **PC admin** v1.9.2 — comando, pills alerta, presença badges | Agente + sócio | ✅ **27/06** — ver `EVIDENCIA_SPRINT_D1_HOMOLOG_2026-06-27.md` |
-| **D2** | Checklist **FASE 17** critérios 3–4 ✅ | Ops/sócio | `CHECKLIST_FASE17_FECHAMENTO.md` assinado |
+| **D2** | Checklist **FASE 17** critérios 3–4 ✅ | Ops/sócio | Critérios 1–6 ✅ · falta **7 F9** + assinatura |
 | **D3** | Decisão **17.5 F9** Supervisor | **Sócio** | Registro em `MATRIZ_PERMISSOES_PERFIS_2026-06.md` |
 | **D4** | Smoke tablet **v1.9.2** (sem regressão balcão) | Ops loja | F5/F7/F10/F11 + 1 locação teste |
 | **D5** | Marcar FASE 16/17 ✅ em `PLANO_PRIORIDADES` + `MAPA_FASES` | Agente | docs alinhados |
