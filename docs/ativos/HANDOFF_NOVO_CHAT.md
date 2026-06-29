@@ -1,6 +1,6 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 27/06/2026 · FE **v1.9.2** · GAS **v1.5.167** · **Ciclo:** Sprint D pós One UI  
+**Atualizado:** 27/06/2026 · FE **v1.9.3** (commit local · **push pendente**) · GAS **v1.5.167** · **Ciclo:** Sprint D pós One UI  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **Repo local:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`  
@@ -59,9 +59,9 @@ cursor "C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-mo
 
 | Camada | Versão | URL / evidência |
 |--------|--------|-----------------|
-| **Frontend** | **v1.9.2** | https://ribocg-a11y.github.io/movikids/?force=1.9.2 |
-| **Gestão Pessoas** | **v1.9.2** | `gestao-pessoas.html?force=1.9.2` |
-| **Service Worker** | **1.9.2** | `sw.js` |
+| **Frontend** | **v1.9.2** (Pages) · **v1.9.3** local | https://ribocg-a11y.github.io/movikids/?force=1.9.2 |
+| **Gestão Pessoas** | **v1.9.2** (Pages) · **v1.9.3** local | `gestao-pessoas.html?force=1.9.2` |
+| **Service Worker** | **1.9.2** (Pages) · **1.9.3** local | `sw.js` |
 | **Apps Script** | **v1.5.167** | lógica I68 ativa · ping string **v1.5.167** no repo (reimplantar se ping antigo) |
 | **PIN admin** | **1421** | Script Property `ADMIN_PIN` |
 | **Homolog tablet** | ✅ 23/06 | I43 · I42 · I47 · Gestor |
@@ -112,6 +112,7 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 | # | Ação | Quem | Status |
 |---|------|------|--------|
 | 1 | **Sprint D1** homolog PC admin v1.9.2 | Agente | ✅ **27/06** |
+| 1b | **I69** hotfix ponto mock → **v1.9.3** | Agente | ✅ commit · ⏳ **push** |
 | 2 | Assinar **FASE 17** (só falta **17.5 F9**) + smoke tablet D4 | Sócio + Ops | ⏳ **próximo** |
 | 3 | Smoke tablet **v1.9.2** (regressão balcão) | Ops | ⏳ Sprint D4 |
 | 4 | Sprint One UI A–C + I24 | Agente | ✅ **v1.9.2** |
@@ -137,7 +138,7 @@ Docs: `PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md` · `CHECKLIST_FASE17_FECHAMENTO.
 
 ## Incidentes — referência rápida
 
-I15 POST browser · I20/I43 cronômetro · I42 conta dia · I44 banco horas · **I68 VT folha** · I52–I67 planilha · ver `MAPA_ERROS_FALHAS_BUGS.md`.
+I15 POST browser · I20/I43 cronômetro · I42 conta dia · I44 banco horas · **I68 VT folha** · **I69 ponto mock** · I52–I67 planilha · ver `MAPA_ERROS_FALHAS_BUGS.md`.
 
 ---
 

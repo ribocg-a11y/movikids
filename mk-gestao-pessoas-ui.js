@@ -835,7 +835,10 @@
         const uid = pickColab || sessionStorage.getItem('mk-mock-colab-uid');
         if (!uid) { showColabErr('Selecione seu nome na lista.'); return; }
         const pin = readColabPin();
-        if (pin.length < 4) { showColabErr('Digite os 4 números do PIN (ex.: 1111).'); return; }
+        if (pin.length < 4) {
+          showColabErr(MK_GP_PROD ? 'Digite os 4 números do seu PIN.' : 'Digite os 4 números do PIN (ex.: 1111).');
+          return;
+        }
         if (MK_GP_PROD && window.MK_GestaoPessoas) {
           colabPinBusy_ = true;
           MK_GestaoPessoas.loginPainel(uid, pin).then(function (mapped) {
