@@ -34,8 +34,8 @@ Leia **nesta ordem**:
 
 | Camada | Versão | Link |
 |--------|--------|------|
-| Frontend | **v1.9.2** | https://ribocg-a11y.github.io/movikids/?force=1.9.2 |
-| Gestão Pessoas | **v1.9.2** | `gestao-pessoas.html?force=1.9.2` |
+| Frontend | **v1.9.3** | https://ribocg-a11y.github.io/movikids/?force=1.9.3 |
+| Gestão Pessoas | **v1.9.3** | `gestao-pessoas.html?force=1.9.3` |
 | GAS | **v1.5.167** | ping Web pode mostrar v1.5.165 até Nova versão |
 | Design System | **v1.1** | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
 | Deploy ID | `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y` | |
@@ -49,11 +49,11 @@ Leia **nesta ordem**:
 
 - **FASE 0–15 + 15b:** ✅ prod
 - **FASE 14 mini-DRE:** ✅ prod
-- **FASE 16–17:** ✅ visual One UI **v1.9.2** · assinatura FASE 17 pendente Ops
-- **Homolog tablet:** ✅ 23/06 · smoke **v1.9.2** pendente
+- **FASE 16–17:** ✅ visual One UI **v1.9.3** · assinatura FASE 17 pendente Ops
+- **Homolog tablet:** ✅ 23/06 · smoke **v1.9.3** pendente (D4)
 - **Planilha:** ✅ 23/23 · **I68 VT** ✅
 - **Travas I24:** ✅ `guard-i24-publicacao` + `encerramento-sessao`
-- **Próximo dev:** **Sprint D1** homolog PC admin v1.9.2 · `PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`
+- **Próximo:** Sprint D2–D4 — assinar FASE 17 · smoke tablet v1.9.3 · `PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`
 
 ## Regras P0
 

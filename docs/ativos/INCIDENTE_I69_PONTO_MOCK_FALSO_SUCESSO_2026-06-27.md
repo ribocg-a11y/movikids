@@ -1,7 +1,7 @@
 # I69 — Ponto colaborador: mock com falso sucesso (Raykelly)
 
 **Registrado:** 27/06/2026  
-**Status:** fix FE **v1.9.3** (commit local · push pendente)  
+**Status:** fix FE **v1.9.3** · **Pages confirmado 29/06**
 **Mapa:** `MAPA_ERROS_FALHAS_BUGS.md` I69 · relacionado **I45** (cadastro)
 
 ## Sintoma

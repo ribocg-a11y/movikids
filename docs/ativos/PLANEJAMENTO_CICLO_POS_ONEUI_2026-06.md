@@ -1,7 +1,7 @@
 # MOVI KIDS — Planejamento pós One UI (jun–jul/2026)
 
 **Criado:** 27/06/2026 · **Substitui backlog ativo** de `PLANEJAMENTO_ONE_UI_2026-06.md` (Sprints A–C ✅)  
-**Produção:** FE **v1.9.2** · GAS **v1.5.167** · Pages confirmado  
+**Produção:** FE **v1.9.3** · GAS **v1.5.167** · Pages confirmado 29/06  
 **Mestre:** `PLANO_PREMIUM_ONEUI_FASES_16_22_2026-06.md` · **Roteiro agente:** `ROTEIRO_AGENTE_OBRIGATORIO.md`
 
 ---
@@ -15,6 +15,7 @@
 | Sprint C — RH hub + holerite widget | v1.9.2 | 27/06 |
 | Travas I24 publicação FE | scripts + regras | 27/06 |
 | Raykelly cadastro 100% | API | 26/06 |
+| **I69** ponto mock (Raykelly) | v1.9.3 | 27–29/06 |
 | Homolog tablet I43/I42/I47/Gestor | loja | 23/06 |
 
 ---
