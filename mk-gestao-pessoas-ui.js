@@ -42,6 +42,7 @@
     let gpSessionPin = '';
     let gpCompetenciaSel_ = '';
     let gpPagCompBusy_ = false;
+    let gpPagLoadSeq_ = 0;
     let gpAdmPreviewMode_ = false;
     let gpAdmPreviewPin_ = '';
     let gpCadastroForced_ = false;
@@ -1530,6 +1531,12 @@
       }).join('');
       if (cur) sel.value = cur;
       sel.disabled = gpPagCompBusy_;
+      if (sel.dataset.gpBound !== '1') {
+        sel.dataset.gpBound = '1';
+        sel.addEventListener('change', function () {
+          window.gpPagCompChange_(sel.value);
+        });
+      }
     }
 
     function gpFetchPainelComp_(comp) {
@@ -1549,24 +1556,30 @@
       const prev = gpCompetenciaSel_;
       const next = String(comp || '').trim();
       if (!next || next === prev) return;
+      const seq = ++gpPagLoadSeq_;
       gpCompetenciaSel_ = next;
+      gpPagCompBusy_ = true;
       gpFillPagCompSelect_(next);
       const body = document.getElementById('pag-body');
       if (body) body.innerHTML = '<p class="gp-adm-muted">Carregando holerite de ' + escHtml_(gpCompetenciaLabel_(next)) + '…</p>';
-      gpPagCompBusy_ = true;
       gpFetchPainelComp_(next).then(function (mapped) {
+        if (seq !== gpPagLoadSeq_) return;
         if (!mapped) return;
         gpCompetenciaSel_ = (mapped.pagamento && mapped.pagamento.competencia) || mapped.competenciaAtiva || next;
         gpAssignColab_(colabLogado, mapped, gpAdmPreviewMode_ ? { preview: true } : { pin: gpSessionPin, preview: false });
         renderPagamento();
+        if (typeof toast === 'function') toast('Demonstrativo de ' + gpCompetenciaLabel_(gpCompetenciaSel_) + ' carregado', 'success');
       }).catch(function (e) {
+        if (seq !== gpPagLoadSeq_) return;
         gpCompetenciaSel_ = prev;
         if (typeof toast === 'function') toast((e && e.message) || 'Erro ao carregar mês', 'error');
         gpFillPagCompSelect_(prev);
         renderPagamento();
       }).finally(function () {
-        gpPagCompBusy_ = false;
-        gpFillPagCompSelect_(gpCompetenciaSel_);
+        if (seq === gpPagLoadSeq_) {
+          gpPagCompBusy_ = false;
+          gpFillPagCompSelect_(gpCompetenciaSel_);
+        }
       });
     };
 

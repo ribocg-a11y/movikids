@@ -9,6 +9,7 @@
   let gpAdmFichaSub_ = 'jornada';
   let gpAdmLoadPromise_ = null;
   let gpAdmCompSel_ = '';
+  let gpAdmLoadSeq_ = 0;
 
   const GP_ADM_CACHE_TTL = 5 * 60 * 1000;
 
@@ -51,6 +52,7 @@
   }
 
   function gpAdmSyncCompSelect_() {
+    gpAdmBindCompSelect_();
     const sel = document.getElementById('gp-adm-comp-sel');
     if (!sel) return;
     const cur = (gpAdmData_ && gpAdmData_.competencia) || gpAdmCompSel_ || '';
@@ -62,16 +64,42 @@
         sel.appendChild(opt);
       });
     }
-    if (cur) sel.value = cur;
+    if (cur) {
+      gpAdmCompSel_ = cur;
+      sel.value = cur;
+    }
+  }
+
+  function gpAdmBindCompSelect_() {
+    const sel = document.getElementById('gp-adm-comp-sel');
+    if (!sel || sel.dataset.gpBound === '1') return;
+    sel.dataset.gpBound = '1';
+    sel.addEventListener('change', function () {
+      window.mkGpAdmCompChange_(sel.value);
+    });
+  }
+
+  function gpAdmShowFolhaLoading_(compLabel) {
+    const folha = document.getElementById('gp-adm-folha');
+    if (folha) {
+      folha.innerHTML = '<p class="gp-adm-muted gp-adm-loading">Carregando folha de ' + esc(compLabel || '…') + '…</p>';
+    }
+    mkGpAdmFecharHolerite_();
   }
 
   window.mkGpAdmCompChange_ = function (comp) {
-    gpAdmCompSel_ = String(comp || '').trim();
-    mkGpAdmFecharHolerite_();
+    const next = String(comp || '').trim();
+    if (!next || next === gpAdmCompSel_) return;
+    gpAdmCompSel_ = next;
+    const sel = document.getElementById('gp-adm-comp-sel');
+    if (sel) sel.disabled = true;
+    gpAdmShowFolhaLoading_(gpAdmCompLabel_(next));
     if (typeof sessionStorage !== 'undefined') {
       try { sessionStorage.removeItem(gpAdmCacheKey_(gpAdmCompSel_)); } catch (e) { /* ignore */ }
     }
-    window.mkGpAdmLoad_({ force: true, competencia: gpAdmCompSel_ });
+    window.mkGpAdmLoad_({ force: true, competencia: gpAdmCompSel_ }).finally(function () {
+      if (sel) sel.disabled = false;
+    });
   };
 
   function gpAdmSetErr_(html) {
@@ -538,7 +566,9 @@
   window.mkGpAdmFecharHolerite_ = function () {
     const list = document.getElementById('gp-adm-folha-list');
     const view = document.getElementById('gp-adm-holerite-view');
+    const content = document.getElementById('gp-adm-holerite-content');
     if (list) list.hidden = false;
+    if (content) content.innerHTML = '';
     if (view) {
       view.hidden = true;
       view.setAttribute('aria-hidden', 'true');
@@ -548,12 +578,14 @@
   function gpAdmRenderFolha_() {
     const el = document.getElementById('gp-adm-folha');
     if (!el || !gpAdmData_) return;
+    const compLbl = gpAdmCompLabel_(gpAdmData_.competencia || gpAdmCompSel_ || '');
     const folha = gpAdmData_.folha || [];
     if (!folha.length) {
-      el.innerHTML = '<p class="gp-adm-muted">Folha indisponível — instale abas RH ou cadastre colaboradores.</p>';
+      el.innerHTML = '<p class="gp-adm-muted">Folha indisponível para ' + esc(compLbl) + ' — instale abas RH ou cadastre colaboradores.</p>';
       return;
     }
-    el.innerHTML = '<table class="gp-adm-table"><tr><th style="text-align:left">Nome</th><th>Quinzena</th><th>Pgto</th><th>Loc mês</th><th>Bônus</th><th>Líquido est.</th><th></th></tr>' +
+    el.innerHTML = '<p class="gp-adm-folha-comp-hint">Exibindo competência <strong>' + esc(compLbl) + '</strong></p>' +
+      '<table class="gp-adm-table"><tr><th style="text-align:left">Nome</th><th>Quinzena</th><th>Pgto</th><th>Loc mês</th><th>Bônus</th><th>Líquido est.</th><th></th></tr>' +
       folha.map(function (f) {
         const hol = f.holerite || {};
         const q = f.quinzenaLabel || hol.quinzenaLabel || (f.quinzena === 1 ? '1ª' : '2ª');
@@ -820,14 +852,20 @@
   }
 
   window.mkGpAdmLoad_ = async function mkGpAdmLoad_(opts) {
+    const seq = ++gpAdmLoadSeq_;
     if (gpAdmLoadPromise_ && !opts?.force) return gpAdmLoadPromise_;
     const compReq = (opts && opts.competencia) ? String(opts.competencia).trim() : (gpAdmCompSel_ || '');
+    if (compReq) gpAdmCompSel_ = compReq;
     const cached = !opts?.force ? gpAdmCacheGet_(compReq) : null;
     if (cached && cached.ok) {
+      if (seq !== gpAdmLoadSeq_) return gpAdmLoadPromise_;
       gpAdmData_ = cached;
+      gpAdmCompSel_ = cached.competencia || compReq || gpAdmCompSel_;
       if (typeof applySessaoAtivaFromApi_ === 'function') applySessaoAtivaFromApi_(cached);
       gpAdmRender_();
       gpAdmSetErr_('');
+    } else if (opts?.force && compReq) {
+      gpAdmShowFolhaLoading_(gpAdmCompLabel_(compReq));
     } else {
       gpAdmShowLoading_();
     }
@@ -837,6 +875,7 @@
         const apiPayload = Object.assign({ action: 'painelGestaoPessoasAdmin', _t: Date.now() }, gpAdmPinParams_());
         if (compReq) apiPayload.competencia = compReq;
         const d = await api(apiPayload, 45000);
+        if (seq !== gpAdmLoadSeq_) return;
         if (!d.ok) {
           const msg = d.erro || 'Erro ao carregar gestão';
           const gasPending = String(msg).indexOf('painelGestaoPessoasAdmin') >= 0 || String(msg).indexOf('desconhecida') >= 0;
@@ -858,8 +897,12 @@
         if (typeof applySessaoAtivaFromApi_ === 'function') applySessaoAtivaFromApi_(d);
         gpAdmRender_();
         gpAdmSetErr_('');
+        if (opts?.force && compReq && typeof toast === 'function') {
+          toast('Folha de ' + gpAdmCompLabel_(gpAdmCompSel_) + ' carregada', 'success');
+        }
         if (gpAdmTab_ === 'cadastro' && typeof refreshOperadoresAdmin_ === 'function') await refreshOperadoresAdmin_();
       } catch (e) {
+        if (seq !== gpAdmLoadSeq_) return;
         const msg = (e && e.message) || 'Erro de conexão';
         if (String(msg).indexOf('timeout') >= 0) {
           gpAdmSetErr_('Demorou demais — publique GAS v1.5.107+ (AUDITORIA lida uma vez).');
@@ -869,9 +912,11 @@
         } else gpAdmSetErr_(esc(msg));
         if (typeof refreshOperadoresAdmin_ === 'function') await refreshOperadoresAdmin_();
       } finally {
-        gpAdmLoadPromise_ = null;
+        if (seq === gpAdmLoadSeq_) gpAdmLoadPromise_ = null;
       }
     })();
     return gpAdmLoadPromise_;
   };
+
+  gpAdmBindCompSelect_();
 })();

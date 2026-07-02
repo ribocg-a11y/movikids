@@ -816,6 +816,13 @@ html.gp-prod #gp-preview-banner {
   max-width: 220px;
   font-weight: 700;
 }
+#page-operadores .gp-adm-folha-comp-hint {
+  margin: 0 0 10px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--txt3);
+}
+#page-operadores .gp-adm-folha-comp-hint strong { color: var(--txt2); }
 #page-operadores .gp-adm-panel-lead {
   margin: 0 0 14px; font-size: 13px; font-weight: 700; color: var(--txt3); line-height: 1.45;
 }
