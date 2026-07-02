@@ -8,21 +8,71 @@
   let gpAdmSelId_ = null;
   let gpAdmFichaSub_ = 'jornada';
   let gpAdmLoadPromise_ = null;
+  let gpAdmCompSel_ = '';
 
   const GP_ADM_CACHE_TTL = 5 * 60 * 1000;
 
-  function gpAdmCacheKey_() {
+  function gpAdmCacheKey_(comp) {
+    const raw = comp || gpAdmCompSel_ || '';
+    const norm = String(raw).replace(/\//g, '');
     const now = new Date();
-    return 'mk_gp_adm_' + String(now.getMonth() + 1).padStart(2, '0') + now.getFullYear();
+    const cur = String(now.getMonth() + 1).padStart(2, '0') + String(now.getFullYear());
+    return 'mk_gp_adm_' + (norm || cur);
   }
 
-  function gpAdmCacheGet_() {
-    return typeof mkSessCacheGet_ === 'function' ? mkSessCacheGet_(gpAdmCacheKey_(), GP_ADM_CACHE_TTL) : null;
+  function gpAdmCacheGet_(comp) {
+    return typeof mkSessCacheGet_ === 'function' ? mkSessCacheGet_(gpAdmCacheKey_(comp), GP_ADM_CACHE_TTL) : null;
   }
 
   function gpAdmCacheSet_(data) {
-    if (typeof mkSessCacheSet_ === 'function' && data && data.ok) mkSessCacheSet_(gpAdmCacheKey_(), data);
+    if (typeof mkSessCacheSet_ === 'function' && data && data.ok) {
+      mkSessCacheSet_(gpAdmCacheKey_(data.competencia || gpAdmCompSel_), data);
+    }
   }
+
+  function gpAdmCompOptions_() {
+    if (window.MK_GestaoPessoas && typeof MK_GestaoPessoas.competenciasList === 'function') {
+      return MK_GestaoPessoas.competenciasList(12);
+    }
+    const list = [];
+    const now = new Date();
+    for (let i = 0; i < 12; i++) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      list.push(String(d.getMonth() + 1).padStart(2, '0') + '/' + d.getFullYear());
+    }
+    return list;
+  }
+
+  function gpAdmCompLabel_(comp) {
+    if (window.MK_GestaoPessoas && typeof MK_GestaoPessoas.mesLabel === 'function') {
+      return MK_GestaoPessoas.mesLabel(comp);
+    }
+    return comp;
+  }
+
+  function gpAdmSyncCompSelect_() {
+    const sel = document.getElementById('gp-adm-comp-sel');
+    if (!sel) return;
+    const cur = (gpAdmData_ && gpAdmData_.competencia) || gpAdmCompSel_ || '';
+    if (!sel.options.length) {
+      gpAdmCompOptions_().forEach(function (c) {
+        const opt = document.createElement('option');
+        opt.value = c;
+        opt.textContent = gpAdmCompLabel_(c);
+        sel.appendChild(opt);
+      });
+    }
+    if (cur) sel.value = cur;
+  }
+
+  window.mkGpAdmCompChange_ = function (comp) {
+    gpAdmCompSel_ = String(comp || '').trim();
+    mkGpAdmFecharHolerite_();
+    if (typeof sessionStorage !== 'undefined') {
+      try { sessionStorage.removeItem(gpAdmCacheKey_(gpAdmCompSel_)); } catch (e) { /* ignore */ }
+    }
+    window.mkGpAdmLoad_({ force: true, competencia: gpAdmCompSel_ });
+  };
 
   function gpAdmSetErr_(html) {
     const errEl = document.getElementById('gp-adm-err');
@@ -44,8 +94,8 @@
     if (team) team.innerHTML = '<p class="gp-adm-muted gp-adm-loading">Carregando equipe…</p>';
     const alertEl = document.getElementById('gp-adm-alertas');
     if (alertEl) alertEl.innerHTML = '';
-    const compEl = document.getElementById('gp-adm-comp');
-    if (compEl) compEl.textContent = '…';
+    const compEl = document.getElementById('gp-adm-comp-sel');
+    if (compEl && !compEl.options.length) gpAdmSyncCompSelect_();
   }
 
   function esc(v) {
@@ -712,8 +762,7 @@
     gpAdmRenderFolha_();
     gpAdmRenderComunicados_();
     gpAdmRenderAvaliacoes_();
-    const compEl = document.getElementById('gp-adm-comp');
-    if (compEl && gpAdmData_) compEl.textContent = gpAdmData_.competencia || '';
+    gpAdmSyncCompSelect_();
     gpAdmSetTab_(gpAdmTab_);
   }
 
@@ -772,7 +821,8 @@
 
   window.mkGpAdmLoad_ = async function mkGpAdmLoad_(opts) {
     if (gpAdmLoadPromise_ && !opts?.force) return gpAdmLoadPromise_;
-    const cached = !opts?.force ? gpAdmCacheGet_() : null;
+    const compReq = (opts && opts.competencia) ? String(opts.competencia).trim() : (gpAdmCompSel_ || '');
+    const cached = !opts?.force ? gpAdmCacheGet_(compReq) : null;
     if (cached && cached.ok) {
       gpAdmData_ = cached;
       if (typeof applySessaoAtivaFromApi_ === 'function') applySessaoAtivaFromApi_(cached);
@@ -784,7 +834,9 @@
     gpAdmSetErr_('');
     gpAdmLoadPromise_ = (async function () {
       try {
-        const d = await api(Object.assign({ action: 'painelGestaoPessoasAdmin', _t: Date.now() }, gpAdmPinParams_()), 45000);
+        const apiPayload = Object.assign({ action: 'painelGestaoPessoasAdmin', _t: Date.now() }, gpAdmPinParams_());
+        if (compReq) apiPayload.competencia = compReq;
+        const d = await api(apiPayload, 45000);
         if (!d.ok) {
           const msg = d.erro || 'Erro ao carregar gestão';
           const gasPending = String(msg).indexOf('painelGestaoPessoasAdmin') >= 0 || String(msg).indexOf('desconhecida') >= 0;
@@ -801,6 +853,7 @@
           return;
         }
         gpAdmData_ = d;
+        gpAdmCompSel_ = d.competencia || compReq || gpAdmCompSel_;
         gpAdmCacheSet_(d);
         if (typeof applySessaoAtivaFromApi_ === 'function') applySessaoAtivaFromApi_(d);
         gpAdmRender_();

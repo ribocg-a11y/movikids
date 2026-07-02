@@ -66,29 +66,57 @@
       _holerite: hol,
       comunicados: data.comunicados || [],
       avaliacoes: data.avaliacoes || [],
-      historicoDesempenho: data.historicoDesempenho || null
+      historicoDesempenho: data.historicoDesempenho || null,
+      competenciaAtiva: data.competencia || (pg.competencia || '')
     };
   }
 
+  function gpCompetenciasList_(nMonths) {
+    nMonths = Math.min(24, Math.max(3, Number(nMonths) || 12));
+    const list = [];
+    const now = new Date();
+    for (let i = 0; i < nMonths; i++) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      list.push(String(d.getMonth() + 1).padStart(2, '0') + '/' + d.getFullYear());
+    }
+    return list;
+  }
+
   global.MK_GestaoPessoas = {
+    competenciasList: gpCompetenciasList_,
+    mesLabel: function (comp) {
+      const m = parseInt(String(comp || '').slice(0, 2), 10);
+      const names = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+      const pts = String(comp || '').split('/');
+      return (names[m - 1] || String(comp || '').slice(0, 2)) + '/' + (pts[1] || '');
+    },
     listarColaboradores: function () {
       return gpApi('listarColaboradoresGestao').then(function (r) {
         return (r.colaboradores || r.operadores || []).filter(function (o) { return o.hasPin !== false; });
       });
     },
-    loginPainel: function (operadorId, pin) {
-      return gpApi('buscarPainelColaborador', { operadorId: operadorId, pin: pin }).then(function (r) {
+    loginPainel: function (operadorId, pin, opts) {
+      const params = { operadorId: operadorId, pin: pin };
+      if (opts && opts.competencia) params.competencia = String(opts.competencia).trim();
+      return gpApi('buscarPainelColaborador', params).then(function (r) {
         const mapped = gpMapPainel(operadorId, r);
         mapped.preview = false;
         return mapped;
       });
     },
-    loginPainelPreview: function (operadorId, adminPin) {
-      return gpApi('buscarPainelColaboradorPreview', { operadorId: operadorId, adminPin: adminPin }).then(function (r) {
+    loginPainelPreview: function (operadorId, adminPin, opts) {
+      const params = { operadorId: operadorId, adminPin: adminPin };
+      if (opts && opts.competencia) params.competencia = String(opts.competencia).trim();
+      return gpApi('buscarPainelColaboradorPreview', params).then(function (r) {
         const mapped = gpMapPainel(operadorId, r);
         mapped.preview = true;
         return mapped;
       });
+    },
+    painelAdmin: function (pinParams, opts) {
+      const payload = Object.assign({}, pinParams || {});
+      if (opts && opts.competencia) payload.competencia = String(opts.competencia).trim();
+      return gpApi('painelGestaoPessoasAdmin', payload);
     },
     listarColaboradoresPreview: function (adminPin) {
       return gpApi('listarColaboradoresGestaoPreview', { adminPin: adminPin }).then(function (r) {
@@ -100,9 +128,6 @@
     },
     statusAbas: function () {
       return gpApi('gestaoPessoasStatus');
-    },
-    painelAdmin: function (pinParams) {
-      return gpApi('painelGestaoPessoasAdmin', pinParams || {});
     },
     alertasAdmin: function (pinParams) {
       return gpApi('alertasPontoGestaoAdmin', pinParams || {});

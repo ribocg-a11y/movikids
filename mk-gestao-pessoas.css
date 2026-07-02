@@ -775,7 +775,47 @@ html.gp-prod #gp-preview-banner {
   box-sizing: border-box;
 }
 #page-operadores .gp-adm-page-head { margin-bottom: 12px; }
-#page-operadores .gp-adm-page-comp { margin: 0; font-size: 13px; font-weight: 700; color: var(--txt2); }
+#gp-app .gp-pag-filter {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 0 0 14px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 1px solid var(--border, #E2E8F0);
+  background: rgba(255, 255, 255, 0.72);
+}
+#gp-app .gp-pag-filter-lbl {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--txt2);
+  white-space: nowrap;
+}
+#gp-app .gp-pag-comp-sel {
+  flex: 1;
+  min-width: 140px;
+  max-width: 220px;
+  font-weight: 700;
+}
+#page-operadores .gp-adm-page-comp {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+#page-operadores .gp-adm-comp-lbl {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--txt2);
+  white-space: nowrap;
+}
+#page-operadores .gp-adm-comp-sel {
+  min-width: 150px;
+  max-width: 220px;
+  font-weight: 700;
+}
 #page-operadores .gp-adm-panel-lead {
   margin: 0 0 14px; font-size: 13px; font-weight: 700; color: var(--txt3); line-height: 1.45;
 }

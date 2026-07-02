@@ -40,6 +40,8 @@
     const MK_GP_PROD = !!window.MK_GP_PROD;
     let gpColabList = [];
     let gpSessionPin = '';
+    let gpCompetenciaSel_ = '';
+    let gpPagCompBusy_ = false;
     let gpAdmPreviewMode_ = false;
     let gpAdmPreviewPin_ = '';
     let gpCadastroForced_ = false;
@@ -844,6 +846,7 @@
           MK_GestaoPessoas.loginPainel(uid, pin).then(function (mapped) {
             gpAssignColab_(uid, mapped, { pin: pin, preview: false });
             gpSessionPin = pin;
+            gpCompetenciaSel_ = mapped.competenciaAtiva || (mapped.pagamento && mapped.pagamento.competencia) || '';
             showColabErr('');
             gpAfterColabLogin_(uid);
           }).catch(function (e) {
@@ -1491,7 +1494,84 @@
         <div class="mock-note info" style="margin-top:12px">Horas extras entram no banco; atrasos e faltas são descontados. Detalhe dia a dia em <strong>Ponto</strong>.</div>`;
     }
 
+    function gpCompetenciaOptions_(p) {
+      const hist = p && p.historicoDesempenho && p.historicoDesempenho.meses;
+      if (hist && hist.length) {
+        return hist.map(function (m) { return m.competencia; }).filter(Boolean);
+      }
+      if (window.MK_GestaoPessoas && typeof MK_GestaoPessoas.competenciasList === 'function') {
+        return MK_GestaoPessoas.competenciasList(12);
+      }
+      const list = [];
+      const now = new Date();
+      for (let i = 0; i < 12; i++) {
+        const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        list.push(String(d.getMonth() + 1).padStart(2, '0') + '/' + d.getFullYear());
+      }
+      return list;
+    }
+
+    function gpCompetenciaLabel_(comp) {
+      if (window.MK_GestaoPessoas && typeof MK_GestaoPessoas.mesLabel === 'function') {
+        return MK_GestaoPessoas.mesLabel(comp);
+      }
+      return comp;
+    }
+
+    function gpFillPagCompSelect_(selected) {
+      const sel = document.getElementById('gp-pag-comp');
+      if (!sel) return;
+      const p = PESSOAS[colabLogado];
+      const opts = gpCompetenciaOptions_(p);
+      const cur = selected || gpCompetenciaSel_ || (p && p.pagamento && p.pagamento.competencia) || (p && p.competenciaAtiva) || opts[0] || '';
+      gpCompetenciaSel_ = cur;
+      sel.innerHTML = opts.map(function (c) {
+        return '<option value="' + escHtml_(c) + '">' + escHtml_(gpCompetenciaLabel_(c)) + '</option>';
+      }).join('');
+      if (cur) sel.value = cur;
+      sel.disabled = gpPagCompBusy_;
+    }
+
+    function gpFetchPainelComp_(comp) {
+      if (!MK_GP_PROD || !window.MK_GestaoPessoas || !colabLogado) {
+        return Promise.resolve(null);
+      }
+      if (gpAdmPreviewMode_) {
+        if (!gpAdmPreviewPin_) return Promise.reject(new Error('Sessão ADM expirada'));
+        return MK_GestaoPessoas.loginPainelPreview(colabLogado, gpAdmPreviewPin_, { competencia: comp });
+      }
+      if (!gpSessionPin) return Promise.reject(new Error('Sessão expirada — entre de novo com seu PIN.'));
+      return MK_GestaoPessoas.loginPainel(colabLogado, gpSessionPin, { competencia: comp });
+    }
+
+    window.gpPagCompChange_ = function (comp) {
+      if (gpPagCompBusy_ || !colabLogado) return;
+      const prev = gpCompetenciaSel_;
+      const next = String(comp || '').trim();
+      if (!next || next === prev) return;
+      gpCompetenciaSel_ = next;
+      gpFillPagCompSelect_(next);
+      const body = document.getElementById('pag-body');
+      if (body) body.innerHTML = '<p class="gp-adm-muted">Carregando holerite de ' + escHtml_(gpCompetenciaLabel_(next)) + '…</p>';
+      gpPagCompBusy_ = true;
+      gpFetchPainelComp_(next).then(function (mapped) {
+        if (!mapped) return;
+        gpCompetenciaSel_ = (mapped.pagamento && mapped.pagamento.competencia) || mapped.competenciaAtiva || next;
+        gpAssignColab_(colabLogado, mapped, gpAdmPreviewMode_ ? { preview: true } : { pin: gpSessionPin, preview: false });
+        renderPagamento();
+      }).catch(function (e) {
+        gpCompetenciaSel_ = prev;
+        if (typeof toast === 'function') toast((e && e.message) || 'Erro ao carregar mês', 'error');
+        gpFillPagCompSelect_(prev);
+        renderPagamento();
+      }).finally(function () {
+        gpPagCompBusy_ = false;
+        gpFillPagCompSelect_(gpCompetenciaSel_);
+      });
+    };
+
     function renderPagamento() {
+      gpFillPagCompSelect_(gpCompetenciaSel_);
       const p = PESSOAS[colabLogado];
       const pg = p.pagamento;
       if ((pg.base || 0) <= 0 && !(pg.bonus || 0) && !(pg.holerite && pg.holerite.bruto)) {

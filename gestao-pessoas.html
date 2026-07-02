@@ -6,17 +6,17 @@
   <meta name="theme-color" content="#1565C0">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <title>Movi Kids — Colaboradores</title>
-  <script src="mk-stale-sync.js?v=1.9.3"></script>
-  <script src="mk-canonical-host.js?v=1.9.3"></script>
+  <script src="mk-stale-sync.js?v=1.9.4"></script>
+  <script src="mk-canonical-host.js?v=1.9.4"></script>
   <script>window.MK_GP_PROD = true;</script>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="mk-design.css?v=1.9.3">
-  <link rel="stylesheet" href="mk-app.css?v=1.9.3">
-  <link rel="stylesheet" href="mk-gestao-pessoas.css?v=1.9.3">
-  <script src="mk-version.js?v=1.9.3"></script>
-  <script src="mk-globals.js?v=1.9.3"></script>
-  <script src="mk-api.js?v=1.9.3"></script>
-  <script src="mk-gestao-pessoas.js?v=1.9.3"></script>
+  <link rel="stylesheet" href="mk-design.css?v=1.9.4">
+  <link rel="stylesheet" href="mk-app.css?v=1.9.4">
+  <link rel="stylesheet" href="mk-gestao-pessoas.css?v=1.9.4">
+  <script src="mk-version.js?v=1.9.4"></script>
+  <script src="mk-globals.js?v=1.9.4"></script>
+  <script src="mk-api.js?v=1.9.4"></script>
+  <script src="mk-gestao-pessoas.js?v=1.9.4"></script>
 </head>
 <body>
   <!--
@@ -205,13 +205,17 @@
           <div class="mock-h1">Meu pagamento</div>
           <p class="gp-pag-lead">Quinzena em destaque — detalhes completos abaixo.</p>
         </div>
+        <div class="gp-pag-filter">
+          <label for="gp-pag-comp" class="gp-pag-filter-lbl">Competência</label>
+          <select id="gp-pag-comp" class="form-input gp-pag-comp-sel" aria-label="Filtrar holerite por mês" onchange="gpPagCompChange_(this.value)"></select>
+        </div>
         <div id="pag-body"></div>
       </section>
     </div>
   </div>
 
-  <script src="mk-holerite.js?v=1.9.3"></script>
-  <script src="mk-gestao-pessoas-ui.js?v=1.9.3"></script>
-  <script src="mk-gp-boot.js?v=1.9.3"></script>
+  <script src="mk-holerite.js?v=1.9.4"></script>
+  <script src="mk-gestao-pessoas-ui.js?v=1.9.4"></script>
+  <script src="mk-gp-boot.js?v=1.9.4"></script>
 </body>
 </html>
