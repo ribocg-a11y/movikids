@@ -86,6 +86,26 @@ Se passo 6 falhar: **não declarar concluído** — voltar ao passo 4 ou corrigi
 
 ---
 
+## Fase F — Instruir deploy GAS ao usuário (I76)
+
+Quando o agente **não** edita o `.gs` mas precisa orientar o sócio a republicar:
+
+1. **Link para colar:** sempre URL **raw GitHub** (nunca `C:\` como link clicável):
+
+   https://raw.githubusercontent.com/ribocg-a11y/movikids/main/MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs
+
+2. **Passos:** Editor → `Code.gs` → Ctrl+A → colar do raw → Salvar → Implantar → **Editar** Deploy ID → Nova versão.
+
+3. **Validar:** ping = header do `.gs` **e** endpoint afetado (ex. `listarColaboradoresGestao` após I75).
+
+4. **Caminho Windows** (`C:\Users\riboc\...`) — só no rodapé Regra 16 quando **o agente** alterou o `.gs` nesta sessão.
+
+5. **Nunca** pedir ao usuário colar linhas de comentário `// v1.5.xxx` no PowerShell ou Explorer.
+
+Doc: `INCIDENTE_SESSAO_2026-07-09_I70_I75.md` · MAPA **I76**
+
+---
+
 ## Travas automáticas (27/06/2026)
 
 | Script | Função |

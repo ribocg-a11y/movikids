@@ -1,10 +1,10 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 09/07/2026 · FE **v1.9.5** · GAS **v1.5.169** (repo) · **Ciclo:** Sprint D pós One UI  
+**Atualizado:** 09/07/2026 · FE **v1.9.9** · GAS **v1.5.173** (Web) · **Ciclo:** Sprint D pós One UI  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **Repo local:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`  
-**GitHub:** `ribocg-a11y/movikids` · branch `main` · commit **3d5cacc** (roteiro I24)
+**GitHub:** `ribocg-a11y/movikids` · branch `main` · commit **341386b** (I75 Julia RH)
 
 **Mensagem mínima no novo chat:**
 
@@ -59,17 +59,18 @@ cursor "C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-mo
 
 | Camada | Versão | URL / evidência |
 |--------|--------|-----------------|
-| **Frontend** | **v1.9.5** | https://ribocg-a11y.github.io/movikids/?force=1.9.5 |
-| **Gestão Pessoas** | **v1.9.5** | `gestao-pessoas.html?force=1.9.5` |
-| **Portal acompanhar** | **v1.9.5** | `acompanhar.html` cache bust alinhado |
-| **Service Worker** | **1.9.5** | `sw.js` |
-| **Apps Script** | **v1.5.169** (repo) | Web **v1.5.168** até Nova versão v1.5.169 |
+| **Frontend** | **v1.9.9** | https://ribocg-a11y.github.io/movikids/?force=1.9.9 |
+| **Gestão Pessoas** | **v1.9.9** | `gestao-pessoas.html?force=1.9.9` |
+| **Portal acompanhar** | **v1.9.9** | `acompanhar.html` cache bust alinhado |
+| **Service Worker** | **1.9.9** | `sw.js` |
+| **Apps Script** | **v1.5.173** | ping Web **v1.5.173** ✅ Nova versão 09/07 |
 | **PIN admin** | **1421** | Script Property `ADMIN_PIN` |
-| **Homolog tablet** | ✅ 23/06 | I43 · I42 · I47 · Gestor |
+| **Homolog tablet** | ✅ 23/06 | I43 · I42 · I47 · Gestor — smoke **v1.9.9** pendente Ops |
 | **Planilha** | 23 abas | `schemaOk=True` · auditoria **23/23** |
 | **FOLHA VT (I68)** | ✅ 26/06 | B9 **8,80** · B10/B12 **22** · B68 **5253,96** · B25 **18,18** |
-| **FOLHA_PONTO audit** | ⚠️ I70 | 5 linhas OK sem horário — repair v1.5.168 + `repararRhCamada5PlanilhaAdmin` |
+| **FOLHA_PONTO audit** | ✅ I70 | 5 linhas reparadas via API 09/07 |
 | **VT holerite** | ✅ API | Milena **193,60** · Raykelly **103,25** |
+| **Colaboradores RH** | ✅ I75 | Julia sync COLABORADORES_RH · cache `gp_list_colab_v2` |
 | **Raykelly cadastro** | ✅ **100%** | API 26/06 · id 3 |
 | **Design System** | **v1.1** | `DESIGN_SYSTEM_MOVIKIDS.md` |
 
@@ -115,11 +116,11 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 |---|------|------|--------|
 | 1 | **Sprint D1** homolog PC admin v1.9.2 | Agente | ✅ **27/06** |
 | 1b | **I69** hotfix ponto mock → **v1.9.3** | Agente | ✅ **29/06** Pages |
-| 1c | **I70** varredura — versões GAS + FOLHA_PONTO repair | Agente | ✅ **09/07** repo v1.5.168 |
+| 1c | **I70–I75** varredura — GAS/FE/Dashboard/GP/Julia | Agente | ✅ **09/07** FE v1.9.9 · GAS v1.5.173 |
 | 2 | Assinar **FASE 17** (só falta **17.5 F9**) + smoke tablet D4 | Sócio + Ops | ⏳ **próximo** |
-| 3 | Smoke tablet **v1.9.5** (regressão balcão) | Ops | ⏳ Sprint D4 |
-| 4 | Sprint One UI A–C + I24 | Agente | ✅ **v1.9.2** |
-| 5 | GAS Nova versão Web **v1.5.169** (I70 + holerite comp.) | Sócio | ⏳ colar `.gs` + Nova versão |
+| 3 | Smoke tablet **v1.9.9** (regressão balcão) | Ops | ⏳ Sprint D4 |
+| 4 | Sprint One UI A–C + I24 | Agente | ✅ **v1.9.9** |
+| 5 | Validar Julia + dropdown GP + gráfico Dashboard | Sócio PC | ⏳ `?force=1.9.9` |
 
 Docs: `PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md` · `CHECKLIST_FASE17_FECHAMENTO.md`
 
@@ -142,7 +143,7 @@ Docs: `PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md` · `CHECKLIST_FASE17_FECHAMENTO.
 
 ## Incidentes — referência rápida
 
-I15 POST browser · I20/I43 cronômetro · I42 conta dia · I44 banco horas · **I68 VT folha** · **I69 ponto mock** · I52–I67 planilha · ver `MAPA_ERROS_FALHAS_BUGS.md`.
+I15 POST browser · I20/I43 cronômetro · I42 conta dia · I44 banco horas · **I68 VT folha** · **I69 ponto mock** · **I70–I76 sessão 09/07** · I52–I67 planilha · ver `MAPA_ERROS_FALHAS_BUGS.md` · `INCIDENTE_SESSAO_2026-07-09_I70_I75.md`.
 
 ---
 

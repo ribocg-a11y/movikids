@@ -35,17 +35,17 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 | Camada | Versão | URL / evidência |
 |--------|--------|-----------------|
-| **Frontend** | **v1.9.5** | https://ribocg-a11y.github.io/movikids/?force=1.9.5 |
-| **Gestão Pessoas** | **v1.9.5** | `gestao-pessoas.html?force=1.9.5` |
-| **Portal acompanhar** | **v1.9.5** | `acompanhar.html` |
-| **Service Worker** | **1.9.5** | `sw.js` |
-| **Apps Script** | **v1.5.169** (repo) | ping Web **v1.5.168** até Nova versão v1.5.169 |
+| **Frontend** | **v1.9.9** | https://ribocg-a11y.github.io/movikids/?force=1.9.9 |
+| **Gestão Pessoas** | **v1.9.9** | `gestao-pessoas.html?force=1.9.9` |
+| **Portal acompanhar** | **v1.9.9** | `acompanhar.html` |
+| **Service Worker** | **1.9.9** | `sw.js` |
+| **Apps Script** | **v1.5.173** | ping Web **v1.5.173** ✅ |
 | **FOLHA VT I68** | ✅ 26/06 | B9 **8,80** · B10/B12 **22** · Milena VT **193,60** · Raykelly **103,25** |
 | **Planilha** | 23 abas | `schemaOk=True` · auditoria célula **23/23** |
-| **Homolog tablet** | ✅ 23/06 | I43 · I42 · I47 · Gestor — smoke v1.9.5 pendente Ops |
+| **Homolog tablet** | ✅ 23/06 | I43 · I42 · I47 · Gestor — smoke v1.9.9 pendente Ops |
 | **Raykelly cadastro** | ✅ **100%** | id 3 · API 26/06 |
 | **Design System** | **v1.1** | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
-| **Ciclo dev** | Sprint D | One UI A–C ✅ **v1.9.5** · `PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md` |
+| **Ciclo dev** | Sprint D | One UI A–C ✅ **v1.9.9** · `PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md` |
 | **RELATORIOS** | repair I60 24/06 | 1 registro · **schemaOk=True** |
 | **RESPONSAVEIS** | repair I59 24/06 | **241** cadastros · **schemaOk=True** |
 | **FOLHA** | I68 26/06 | B68 **5253,96** · VA/dia **18,18** · VT **193,60**/pessoa · **schemaOk=True** |
@@ -58,7 +58,7 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 **Teste rápido GAS (ping):**  
 https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec?action=ping  
-→ ping **v1.5.167** (Web) · repo **v1.5.168** (I70) · `kpiMes` folha `vtTarifa=8.8` `diasVt=22` · `validarSchema` **schemaOk=True**
+→ ping **v1.5.173** (Web) · repo **v1.5.173** · `kpiMes` folha `vtTarifa=8.8` `diasVt=22` · `validarSchema` **schemaOk=True**
 
 **URL morta (não usar):** `AKfycbzc...` → 404
 

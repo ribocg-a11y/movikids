@@ -1,6 +1,6 @@
 # MOVI KIDS — Mapa de erros, falhas e bugs
 
-**Atualizado:** 09/07/2026 — **I70** versões GAS · FE **v1.9.5** · GAS repo **v1.5.168**  
+**Atualizado:** 09/07/2026 — **I70–I76** sessão Dashboard/GP/Julia · FE **v1.9.9** · GAS **v1.5.173** (ping Web alinhado)  
 **Uso anterior:** 22/06/2026 — **I38–I41** auditoria RH 22/06 · GAS repo **v1.5.129** (ping **v1.5.107**) · FE **v1.8.110**  
 **Uso anterior:** 17/06/2026 — **I28** liberar sessão tablet · GAS **v1.5.92** prod. · FE **v1.8.30**  
 **Uso anterior:** 09/06/2026 — **I22 fechado** (hotfix FE v1.8.2)  
@@ -82,6 +82,7 @@
 | **I73** | **Dashboard lento pós I72 — kpiMes lite+full sequencial + alertas pesados** | Spinner longo; dados demoram | GAS **v1.5.171** lite sem `alertasInteligentes_` · FE **v1.9.7** full em background | `kpiMes83_*` cache | Dashboard abre após lite (~1 chamada) |
 | **I74** | **Gestão Pessoas dropdown vazio / lento (~23s)** | Colaborador sem opções; fila GAS com Dashboard | GAS **v1.5.172** `gpIntelRhAlertasFromCtx_` · FE **v1.9.8** loading dropdown + sem prefetch GP | `gp_painel_adm_v2_*` | Operadores → Ficha lista 4 colaboradores |
 | **I75** | **Operador novo não aparece em Colaboradores (Julia)** | Cadastro só em OPERADORES_SISTEMA; filtro exige COLABORADORES_RH | GAS **v1.5.173** `gpSyncOperadoresAtivosToRh_` no cadastro + listar | `gp_list_colab_v2` | gestao-pessoas.html lista todos com PIN |
+| **I76** | **Agente orientou deploy GAS com caminho Windows / docs defasados** | Usuário cola `.gs` errado; comentários `// v1.5.x` no PowerShell; HANDOFF atrasado | **Raw GitHub** para colar Editor; C:\ só rodapé Regra 16; Fase D roteiro na mesma sessão | `ROTEIRO_AGENTE` Fase F | raw URL header = ping · `INCIDENTE_SESSAO_2026-07-09_I70_I75.md` |
 | **I42** | Conta do dia — mesmo telefone 10h–22h | Caixa `n` vs sessões; maquininha | GAS **v1.5.131+** col S `conta_id` | `TESTE_I42_CONTA_DIA_CAIXA` | não reduzir `COL_LOC_READ_` (ver I43) |
 | **I41** | **`ping_` versão defasada** (v1.5.107 vs repo) | Confusão deploy / verify | GAS **v1.5.130** `ping_()` alinhado | `ping_` header alinhado | ping = v1.5.130 |
 | I2 | GAS offline + timer local | Extra fantasma | ADM `somentePlano`; offline v1.7.6 | `FIX_OFFLINE_ENCERRAR` | tablet encerrar |
@@ -143,6 +144,7 @@
 | `../arquivo/incidentes/INCIDENTE_I39_VA_ADMISSAO_PROPORCIONAL_2026-06-22.md` | **I39** — VA proporcional admissão |
 | **`AUDITORIA_RH_FOLHA_PERSISTENCIA_2026-06-22.md`** | Matriz abas RH · I40 · lacunas RH-G1–G15 |
 | `TROCA_SMS_GATEWAY_DJVJRL_2026-06-04.md` | Gateway SMS |
+| **`INCIDENTE_SESSAO_2026-07-09_I70_I75.md`** | **I70–I76** — Dashboard perf, gráfico meta, GP dropdown, Julia RH, deploy agente |
 
 ---
 
@@ -265,6 +267,12 @@
 36. **Nunca** usar `getRange(..., COL_CONTA_ID_)` em `carregarInicio_`/`listarAtivas_` se a função lê `r[24]`/`r[25]` — usar **`COL_LOC_READ_` = 28** (I43 regressão I42).
 37. **Sempre** rodar `TESTE_I43_CARREGAR_INICIO_READONLY.ps1` após mudança em sync/timer GAS (I43).
 38. **Nunca** `gpPersistBancoFromJornada_` em leitura de painel admin/colaborador — só na **saída de ponto** (I44).
+39. **Nunca** travar meta projeção no dia 1 do mês — usar `metaProjecaoStale_` + trava após 3 dias (I72).
+40. **Nunca** rodar `alertasInteligentes_` no `kpiMes` lite — só no full em background (I73).
+41. **Nunca** prefetch `painelGestaoPessoasAdmin` junto com warm Dashboard — GP compete na fila GAS (I74).
+42. **Sempre** sync OPERADORES_SISTEMA → COLABORADORES_RH ao cadastrar operador ativo (I75).
+43. **Nunca** passar `C:\Users\...` como link clicável para deploy GAS — usar **raw GitHub** (I76).
+44. **Sempre** atualizar HANDOFF/ESTADO/DEPLOY/AGENTS ao encerrar sessão com mudança de versão (I76).
 
 ---
 
