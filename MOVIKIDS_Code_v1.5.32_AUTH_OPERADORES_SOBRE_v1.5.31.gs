@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.172
+// MOVI KIDS — Google Apps Script v1.5.173
+// v1.5.173: I75 — operador novo → COLABORADORES_RH auto (Julia no hub Colaboradores)
 // v1.5.172: I74 — painelGestaoPessoasAdmin: alertas RH do ctx (sem alertasInteligentes_ duplicado)
 // v1.5.171: I73 — kpiMes lite pula alertasInteligentes/narrativa (perf Dashboard)
 // v1.5.170: I72 — metaProjecaoMes grafico: nao trava cedo; recalcula meta stale (ex. R$372 vs R$13k)
@@ -165,8 +166,8 @@
 
 // ── CONSTANTES ───────────────────────────────────────────────
 /** Versão exposta em ping, carregarInicio, validarSchema, gestaoPessoasStatus (bump com header). */
-const MK_GAS_VERSAO_  = 'v1.5.172';
-const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.172';
+const MK_GAS_VERSAO_  = 'v1.5.173';
+const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.173';
 const SHEET_ID   = '1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618';
 const DEPLOY_ID  = 'AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y';
 const WEBAPP_URL = `https://script.google.com/macros/s/${DEPLOY_ID}/exec`;
@@ -9863,6 +9864,7 @@ function cadastrarOperadorSistema_(p) {
   const agora = new Date();
   const id = nextIdOperador_(sh);
   sh.appendRow([id, fmtData_(agora) + ' ' + fmtHoraLocal_(agora), nome, '', '', 'SIM', '', 'operador']);
+  gpEnsureRhColaboradorFromOperador_(id, nome, 'Operador');
   return resp_({ operador: { id, nome, hasPin: false, ativo: true, perfil: 'operador' } });
 }
 
@@ -10241,9 +10243,45 @@ function gpColabRhObjFromRow_(row, idx) {
 function gpInvalidateRhCache_() {
   try {
     const cache = CacheService.getScriptCache();
+    const comp = gpNormCompetencia_(gpCompetenciaAtual_());
     cache.remove('gp_list_colab_v1');
-    cache.remove('gp_painel_adm_' + gpNormCompetencia_(gpCompetenciaAtual_()));
+    cache.remove('gp_list_colab_v2');
+    cache.remove('gp_painel_adm_' + comp);
+    cache.remove('gp_painel_adm_v2_' + comp);
   } catch (e) { /* ok */ }
+}
+
+/** I75 — linha mínima COLABORADORES_RH + BANCO_HORAS para operador do balcão. */
+function gpEnsureRhColaboradorFromOperador_(opId, nome, funcao) {
+  const id = Number(opId);
+  if (!id) return false;
+  let added = false;
+  if (!gpRowExistsByOpId_(SH_COLAB_RH, id)) {
+    const hoje = fmtData_(new Date());
+    const va = gpVaDiarioCanonico_();
+    gpEnsureRowByOpId_(SH_COLAB_RH, id, [
+      id, String(nome || '').trim() || ('ID ' + id), funcao || 'Operador',
+      '', '', '', '', '', '', hoje, '', 1621, va, 20, 100, '', 'SIM', 0, ''
+    ]);
+    added = true;
+  }
+  if (!gpRowExistsByOpId_(SH_BANCO_HORAS, id)) {
+    gpEnsureRowByOpId_(SH_BANCO_HORAS, id, [id, '0h00', '']);
+    added = true;
+  }
+  if (added) gpInvalidateRhCache_();
+  return added;
+}
+
+/** I75 — todo operador ativo com PIN deve existir em COLABORADORES_RH (hub Colaboradores). */
+function gpSyncOperadoresAtivosToRh_(operadores) {
+  (operadores || []).forEach(function (op) {
+    const id = Number(op.id);
+    if (!id) return;
+    if (String(op.ativo || 'SIM').toUpperCase() === 'NAO') return;
+    const funcao = op.perfil === 'gestor' ? 'Gestor' : (op.perfil === 'supervisor' ? 'Supervisor' : 'Operador');
+    gpEnsureRhColaboradorFromOperador_(id, op.nome, funcao);
+  });
 }
 
 /** Grava cadastro RH na linha — usado por colaborador e admin. */
@@ -11425,7 +11463,7 @@ function gpStatusPontoHoje_(opId) {
 
 function gpListarColaboradoresGestao_() {
   try {
-    const cacheKey = 'gp_list_colab_v1';
+    const cacheKey = 'gp_list_colab_v2';
     try {
       const hit = CacheService.getScriptCache().get(cacheKey);
       if (hit) return ContentService.createTextOutput(hit).setMimeType(ContentService.MimeType.JSON);
@@ -11433,10 +11471,11 @@ function gpListarColaboradoresGestao_() {
     const ops = listarOperadoresLogin_();
     const parsed = JSON.parse(ops.getContent());
     if (!parsed.ok) return ops;
+    gpSyncOperadoresAtivosToRh_(parsed.operadores || []);
     const rh = gpRows_(SH_COLAB_RH);
     const idsRh = rh.map(function (r) { return Number(r[0]); });
     parsed.colaboradores = (parsed.operadores || []).filter(function (o) {
-      return idsRh.indexOf(Number(o.id)) >= 0;
+      return o.hasPin && idsRh.indexOf(Number(o.id)) >= 0;
     }).map(function (o) {
       const c = gpColabRhByOpId_(o.id);
       return { id: o.id, nome: o.nome, hasPin: o.hasPin, funcao: c ? c.funcao : 'Colaborador', cadastroPct: c ? c.cadastroPct : 0 };
@@ -11730,6 +11769,8 @@ function gpAlertasPontoCore_() {
 
 function gpSyncRhColaboradoresPadrao_(ctx) {
   try {
+    const opsResp = JSON.parse(listarOperadoresLogin_().getContent());
+    if (opsResp.ok) gpSyncOperadoresAtivosToRh_(opsResp.operadores || []);
     const hasRh = function (id) {
       if (ctx && ctx.rhRows) return ctx.rhRows.some(function (r) { return Number(r[0]) === Number(id); });
       return gpRows_(SH_COLAB_RH).some(function (r) { return Number(r[0]) === Number(id); });

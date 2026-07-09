@@ -205,7 +205,7 @@
       });
     }
 
-    function gpColabListCacheKey_() { return 'mk_gp_colab_list_v1'; }
+    function gpColabListCacheKey_() { return 'mk_gp_colab_list_v2'; }
 
     function gpColabListLocalGet_() {
       try {
