@@ -1,6 +1,6 @@
 # MOVI KIDS — Mapa de erros, falhas e bugs
 
-**Atualizado:** 09/07/2026 — **I79** Julia escala Atendente 2 · FE **v1.9.13** · GAS **v1.5.176**  
+**Atualizado:** 09/07/2026 — **I80** Julia admissão/sync completo · **I79** escala · FE **v1.9.13** · GAS **v1.5.177**  
 **Uso anterior:** 22/06/2026 — **I38–I41** auditoria RH 22/06 · GAS repo **v1.5.129** (ping **v1.5.107**) · FE **v1.8.110**  
 **Uso anterior:** 17/06/2026 — **I28** liberar sessão tablet · GAS **v1.5.92** prod. · FE **v1.8.30**  
 **Uso anterior:** 09/06/2026 — **I22 fechado** (hotfix FE v1.8.2)  

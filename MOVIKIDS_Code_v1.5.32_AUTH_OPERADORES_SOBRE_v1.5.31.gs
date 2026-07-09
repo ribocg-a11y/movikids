@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.176
+// MOVI KIDS — Google Apps Script v1.5.177
+// v1.5.177: I80 — Julia admissão 01/07/2026 sync completo; painel null row; meta alertas id 4
 // v1.5.176: I79 — Julia (id 4) escala Atendente 2 + meta turno ativa; sync ESCALA_COLABORADORES
 // v1.5.175: I77b — FOLHA_PONTO linha null (r[4]) quebrava painelGestaoPessoasAdmin
 // v1.5.174: I77 — painelGestaoPessoasAdmin: sync RH + ctx refresh; erro real no catch; AUDITORIA tail read
@@ -169,7 +170,7 @@
 
 // ── CONSTANTES ───────────────────────────────────────────────
 /** Versão exposta em ping, carregarInicio, validarSchema, gestaoPessoasStatus (bump com header). */
-const MK_GAS_VERSAO_  = 'v1.5.176';
+const MK_GAS_VERSAO_  = 'v1.5.177';
 const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.173';
 const SHEET_ID   = '1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618';
 const DEPLOY_ID  = 'AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y';
@@ -4477,12 +4478,22 @@ function metaOperadorLocByDay_(opId, opNome, cfg) {
   return byDay;
 }
 
+/** Operadores com meta turno ativa (FASE 17 + Julia I79). */
+function gpMetaOperadoresIdsAtivos_() {
+  const ids = [];
+  [2, 3, 4].forEach(function (opId) {
+    const cfg = metaOperadorCfg_(opId);
+    if (cfg && cfg.ativo !== false && cfg.inicio) ids.push(opId);
+  });
+  return ids;
+}
+
 /** FASE 17 — operador <50% meta em 3 dias seguidos de turno. */
 function calcMetaAbaixoAlertas_() {
   const alertas = [];
   const hoje = new Date();
   hoje.setHours(0, 0, 0, 0);
-  [2, 3].forEach(function(opId) {
+  gpMetaOperadoresIdsAtivos_().forEach(function(opId) {
     const cfg = metaOperadorCfg_(opId);
     if (!cfg || cfg.ativo === false || !cfg.inicio) return;
     const found = operadorRowById_(opId);
@@ -4521,7 +4532,7 @@ function gpMetaAbaixoAlertasFromCtx_(ctx) {
   const hoje = new Date();
   hoje.setHours(0, 0, 0, 0);
   const byOp = ctx.metaByDayByOpId || {};
-  [2, 3].forEach(function (opId) {
+  gpMetaOperadoresIdsAtivos_().forEach(function (opId) {
     const cfg = metaOperadorCfg_(opId);
     if (!cfg || cfg.ativo === false || !cfg.inicio) return;
     const found = operadorRowById_(opId);
@@ -4557,6 +4568,7 @@ function gpMetaAbaixoAlertasFromCtx_(ctx) {
 function gpIntelRhAlertasFromCtx_(ctx) {
   const alertas = [];
   (ctx.bancoRows || []).forEach(function (r) {
+    if (!gpRowValid_(r)) return;
     const opId = Number(r[0]);
     if (!opId) return;
     const min = gpParseMinutosHhMm_(r[1]);
@@ -9737,7 +9749,8 @@ function listarOperadoresLogin_() {
   const operadores = [];
   if (last >= start) {
     const rows = sh.getRange(start, 1, last - start + 1, COL_OPS_READ_).getValues();
-    rows.forEach(r => {
+    rows.forEach(function (r) {
+      if (!r || typeof r.length !== 'number') return;
       const op = operadorObjFromRow_(r);
       if (op.nome && op.ativo) operadores.push(op);
     });
@@ -10142,7 +10155,7 @@ function gpSheet_(name) {
 }
 
 function gpRowValid_(r) {
-  return r && typeof r.length === 'number';
+  return r && typeof r.length === 'number' && r.length > 0 && r[0] !== null && r[0] !== undefined && String(r[0]).trim() !== '';
 }
 
 function gpRows_(name) {
@@ -10193,6 +10206,7 @@ function gpVerifyPinColaborador_(operadorId, pin) {
 function gpColabRhByOpId_(opId) {
   const rows = gpRows_(SH_COLAB_RH);
   for (let i = 0; i < rows.length; i++) {
+    if (!gpRowValid_(rows[i])) continue;
     if (Number(rows[i][0]) === Number(opId)) return gpColabRhObjFromRow_(rows[i], i);
   }
   return null;
@@ -10231,6 +10245,7 @@ function gpCadastroOk_(cad) {
 }
 
 function gpColabRhObjFromRow_(row, idx) {
+  if (!gpRowValid_(row)) return null;
   const rowNum = GP_DATA_ROW + idx;
   const admissao = gpRepairAdmissaoRhCell_(rowNum, row[9]);
   const obj = {
@@ -10464,6 +10479,7 @@ function gpEnrichContextAudit_(ctx, competencia, operadores) {
     metaByDayByOpId[id] = {};
   });
   ctx.rhRows.forEach(function (r) {
+    if (!gpRowValid_(r)) return;
     const id = Number(r[0]);
     if (!id || auditLocByOpId[id]) return;
     opList.push({ id: id, nome: String(r[1] || ''), cfg: metaOperadorCfg_(id) });
@@ -10536,7 +10552,9 @@ function gpMetaPayloadFromCtx_(opId, ctx) {
 
 function gpColabRhFromCtx_(opId, ctx) {
   for (let i = 0; i < ctx.rhRows.length; i++) {
-    if (Number(ctx.rhRows[i][0]) === Number(opId)) return gpColabRhObjFromRow_(ctx.rhRows[i], i);
+    const row = ctx.rhRows[i];
+    if (!gpRowValid_(row)) continue;
+    if (Number(row[0]) === Number(opId)) return gpColabRhObjFromRow_(row, i);
   }
   return null;
 }
@@ -11491,6 +11509,9 @@ function gpListarColaboradoresGestao_() {
     const parsed = JSON.parse(ops.getContent());
     if (!parsed.ok) return ops;
     gpSyncOperadoresAtivosToRh_(parsed.operadores || []);
+    try {
+      gpSyncJuliaPadrao_(null, gpCompetenciaAtual_());
+    } catch (e) { Logger.log('gpListarColaboradoresGestao_ sync Julia: ' + e.message); }
     const rh = gpRows_(SH_COLAB_RH);
     const idsRh = rh.map(function (r) { return Number(r[0]); });
     parsed.colaboradores = (parsed.operadores || []).filter(function (o) {
@@ -11804,16 +11825,9 @@ function gpSyncRhColaboradoresPadrao_(ctx) {
     if (!hasRh(3)) gpEnsureRowByOpId_(SH_COLAB_RH, 3, [3, 'Raykelly', 'Atendente 1', '', '', '', '', '', '', '15/06/2026', '', 1621, 20, 20, 100, '14h–22h', 'SIM', 25, '']);
     if (!hasEscala(2, comp)) gpEnsureEscalaRow_(2, comp, ['10–14', '10–14', '10–14', '10–14', '10–14', 'OFF', 'OFF'], 'Socia — turno manha');
     if (!hasEscala(3, comp)) gpEnsureEscalaRow_(3, comp, ['14–22', 'OFF', '14–22', 'OFF', '14–22', '10–20', '13–21'], 'Rodizio dom');
-    const juliaEscala = ['OFF', '14–22', 'OFF', '14–22', '14–22', '12–22', '13–21'];
-    if (!hasRh(4)) {
-      gpEnsureRowByOpId_(SH_COLAB_RH, 4, [4, 'Julia', 'Atendente 2', '', '', '', '', '', '', '01/07/2026', '', 1621, 20, 20, 100, '14h–22h', 'SIM', 0, '']);
-    } else {
-      gpPatchRhRowFields_(4, { nome: 'Julia', funcao: 'Atendente 2', turno: '14h–22h' });
-    }
-    gpUpsertEscalaRow_(4, comp, juliaEscala, 'Julia — Atendente 2', { force: true });
+    gpSyncJuliaPadrao_(ctx, comp);
     if (!gpRowExistsByOpId_(SH_BANCO_HORAS, 2)) gpEnsureRowByOpId_(SH_BANCO_HORAS, 2, [2, '0h00', '']);
     if (!gpRowExistsByOpId_(SH_BANCO_HORAS, 3)) gpEnsureRowByOpId_(SH_BANCO_HORAS, 3, [3, '0h00', '']);
-    if (!gpRowExistsByOpId_(SH_BANCO_HORAS, 4)) gpEnsureRowByOpId_(SH_BANCO_HORAS, 4, [4, '0h00', '']);
   } catch (e) {
     Logger.log('gpSyncRhColaboradoresPadrao_: ' + e.message);
   }
@@ -11881,9 +11895,56 @@ function gpPatchRhRowFields_(opId, fields) {
   const r = colab.row;
   if (fields.nome != null) sh.getRange(r, 2).setValue(String(fields.nome));
   if (fields.funcao != null) sh.getRange(r, 3).setValue(String(fields.funcao));
+  if (fields.admissao != null) {
+    sh.getRange(r, 10).setValue(String(fields.admissao));
+    sh.getRange(r, 10).setNumberFormat('@');
+  }
+  if (fields.salarioBase != null) sh.getRange(r, 12).setValue(Number(fields.salarioBase) || 1621);
+  if (fields.vaDiario != null) sh.getRange(r, 13).setValue(Number(fields.vaDiario) || gpVaDiarioCanonico_());
+  if (fields.metaLocDia != null) sh.getRange(r, 14).setValue(Number(fields.metaLocDia) || 20);
+  if (fields.bonusMeta != null) sh.getRange(r, 15).setValue(Number(fields.bonusMeta) || 100);
   if (fields.turno != null) sh.getRange(r, 16).setValue(String(fields.turno));
+  if (fields.ativo != null) sh.getRange(r, 17).setValue(String(fields.ativo));
   gpInvalidateRhCache_();
   return true;
+}
+
+const GP_JULIA_OP_ID_ = 4;
+const GP_JULIA_ADMISSAO_ = '01/07/2026';
+const GP_JULIA_ESCALA_ = ['OFF', '14–22', 'OFF', '14–22', '14–22', '12–22', '13–21'];
+
+/** I79/I80 — Julia Atendente 2: RH + escala + contrato canonico (admissao 01/07/2026). */
+function gpSyncJuliaPadrao_(ctx, competencia) {
+  const comp = competencia || gpCompetenciaAtual_();
+  const va = gpVaDiarioCanonico_();
+  const id = GP_JULIA_OP_ID_;
+  const hasRh = function () {
+    const rows = (ctx && ctx.rhRows) ? ctx.rhRows : gpRows_(SH_COLAB_RH);
+    return rows.some(function (r) { return gpRowValid_(r) && Number(r[0]) === id; });
+  };
+  if (!hasRh()) {
+    gpEnsureRowByOpId_(SH_COLAB_RH, id, [
+      id, 'Julia', 'Atendente 2', '', '', '', '', '', '', GP_JULIA_ADMISSAO_, '', 1621, va, 20, 100, '14h–22h', 'SIM', 0, ''
+    ]);
+  } else {
+    gpPatchRhRowFields_(id, {
+      nome: 'Julia', funcao: 'Atendente 2', turno: '14h–22h', admissao: GP_JULIA_ADMISSAO_,
+      salarioBase: 1621, vaDiario: va, metaLocDia: 20, bonusMeta: 100, ativo: 'SIM'
+    });
+  }
+  gpUpsertEscalaRow_(id, comp, GP_JULIA_ESCALA_, 'Julia — Atendente 2', { force: true });
+  if (!gpRowExistsByOpId_(SH_BANCO_HORAS, id)) {
+    gpEnsureRowByOpId_(SH_BANCO_HORAS, id, [id, '0h00', '']);
+  }
+}
+
+function gpRefreshRhCtx_(ctx) {
+  if (!ctx) return;
+  ctx.rhRows = gpRows_(SH_COLAB_RH);
+  ctx.folhaRows = gpRows_(SH_FOLHA_PONTO);
+  ctx.escalaRows = gpRows_(SH_ESCALA_COLAB);
+  ctx.bancoRows = gpRows_(SH_BANCO_HORAS);
+  ctx.faltasRows = gpRows_(SH_FALTAS);
 }
 
 function painelGestaoPessoasAdmin_(p) {
@@ -11900,8 +11961,7 @@ function painelGestaoPessoasAdmin_(p) {
     const opsResp = JSON.parse(listarOperadoresLogin_().getContent());
     const operadores = opsResp.operadores || [];
     gpSyncOperadoresAtivosToRh_(operadores);
-    ctx.rhRows = gpRows_(SH_COLAB_RH);
-    ctx.bancoRows = gpRows_(SH_BANCO_HORAS);
+    gpRefreshRhCtx_(ctx);
     gpEnrichContextAudit_(ctx, comp, operadores);
     const sessao = opsResp.sessaoAtiva || null;
     const sessaoId = sessao && sessao.operadorId ? Number(sessao.operadorId) : 0;
@@ -11945,6 +12005,7 @@ function painelGestaoPessoasAdmin_(p) {
     });
 
     ctx.rhRows.forEach(function (r) {
+      if (!gpRowValid_(r)) return;
       if (String(r[16] || 'SIM').toUpperCase() === 'NAO') return;
       const id = Number(r[0]);
       if (seen[id]) return;
@@ -11982,7 +12043,7 @@ function painelGestaoPessoasAdmin_(p) {
     colaboradores.sort(function (a, b) { return String(a.nome).localeCompare(String(b.nome), 'pt-BR'); });
 
     const escalaNomes = colaboradores.filter(function (c) { return c.temRh; }).map(function (c) { return { id: c.id, nome: c.nome }; });
-    const escalaRows = ctx.escalaRows.filter(function (r) { return gpNormCompetencia_(r[1]) === comp; });
+    const escalaRows = ctx.escalaRows.filter(function (r) { return gpRowValid_(r) && gpNormCompetencia_(r[1]) === comp; });
     const escala = {
       competencia: comp,
       colunas: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'],
