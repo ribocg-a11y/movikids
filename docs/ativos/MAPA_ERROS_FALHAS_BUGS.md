@@ -1,6 +1,6 @@
 # MOVI KIDS — Mapa de erros, falhas e bugs
 
-**Atualizado:** 09/07/2026 — **I78** cadastro 0% regressão I77 · FE **v1.9.12** · GAS **v1.5.175**  
+**Atualizado:** 09/07/2026 — **I79** Julia escala Atendente 2 · FE **v1.9.13** · GAS **v1.5.176**  
 **Uso anterior:** 22/06/2026 — **I38–I41** auditoria RH 22/06 · GAS repo **v1.5.129** (ping **v1.5.107**) · FE **v1.8.110**  
 **Uso anterior:** 17/06/2026 — **I28** liberar sessão tablet · GAS **v1.5.92** prod. · FE **v1.8.30**  
 **Uso anterior:** 09/06/2026 — **I22 fechado** (hotfix FE v1.8.2)  
@@ -85,6 +85,7 @@
 | **I76** | **Agente orientou deploy GAS com caminho Windows / docs defasados** | Usuário cola `.gs` errado; comentários `// v1.5.x` no PowerShell; HANDOFF atrasado | **Raw GitHub** para colar Editor; C:\ só rodapé Regra 16; Fase D roteiro na mesma sessão | `ROTEIRO_AGENTE` Fase F | raw URL header = ping · `INCIDENTE_SESSAO_2026-07-09_I70_I75.md` |
 | **I77** | **Operadores preso/lento — painel GAS null row + FE bloqueava 18s** | Dropdown/jornada vazios; banner GAS v1.5.102 falso | GAS **v1.5.175** `gpRowValid_` FOLHA_PONTO · FE **v1.9.11** load rápido + painel background | `gpAdmLoadPainelBackground_` | Operadores abre ≤5s |
 | **I78** | **Regressão I77 — cadastro 0% na aba Hoje (modo parcial)** | Todas 0% apesar de RH 100% (I45/I36) | FE **v1.9.12** quick load usa `listarColaboradoresGestao` (cadastroPct planilha) | `gpAdmFetchColabListRh_` | Hoje: Eduarda 25% · demais 100% |
+| **I79** | **Julia (id 4) sem escala RH / meta turno inativa** | Folga errada; jornada/ponto/alertas/meta hero ignoram Atendente 2 | GAS **v1.5.176** `gpUpsertEscalaRow_` + sync Julia · FE **v1.9.13** `MK_META_CFG[4]` ativo | `gpSyncRhColaboradoresPadrao_` | painel Operadores → Julia escala hoje; meta hero no turno |
 | **I42** | Conta do dia — mesmo telefone 10h–22h | Caixa `n` vs sessões; maquininha | GAS **v1.5.131+** col S `conta_id` | `TESTE_I42_CONTA_DIA_CAIXA` | não reduzir `COL_LOC_READ_` (ver I43) |
 | **I41** | **`ping_` versão defasada** (v1.5.107 vs repo) | Confusão deploy / verify | GAS **v1.5.130** `ping_()` alinhado | `ping_` header alinhado | ping = v1.5.130 |
 | I2 | GAS offline + timer local | Extra fantasma | ADM `somentePlano`; offline v1.7.6 | `FIX_OFFLINE_ENCERRAR` | tablet encerrar |

@@ -1,6 +1,6 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 09/07/2026 · FE **v1.9.9** · GAS **v1.5.173** (Web) · **Ciclo:** Sprint D pós One UI  
+**Atualizado:** 09/07/2026 · FE **v1.9.13** · GAS **v1.5.176** (repo; Web após Nova versão) · **Ciclo:** Sprint D pós One UI  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **Repo local:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`  
@@ -70,7 +70,7 @@ cursor "C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-mo
 | **FOLHA VT (I68)** | ✅ 26/06 | B9 **8,80** · B10/B12 **22** · B68 **5253,96** · B25 **18,18** |
 | **FOLHA_PONTO audit** | ✅ I70 | 5 linhas reparadas via API 09/07 |
 | **VT holerite** | ✅ API | Milena **193,60** · Raykelly **103,25** |
-| **Colaboradores RH** | ✅ I75 | Julia sync COLABORADORES_RH · cache `gp_list_colab_v2` |
+| **Colaboradores RH** | ✅ I75+I79 | Julia sync RH + escala Atendente 2 (07/2026) · meta turno ativa |
 | **Raykelly cadastro** | ✅ **100%** | API 26/06 · id 3 |
 | **Design System** | **v1.1** | `DESIGN_SYSTEM_MOVIKIDS.md` |
 

@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.175
+// MOVI KIDS — Google Apps Script v1.5.176
+// v1.5.176: I79 — Julia (id 4) escala Atendente 2 + meta turno ativa; sync ESCALA_COLABORADORES
 // v1.5.175: I77b — FOLHA_PONTO linha null (r[4]) quebrava painelGestaoPessoasAdmin
 // v1.5.174: I77 — painelGestaoPessoasAdmin: sync RH + ctx refresh; erro real no catch; AUDITORIA tail read
 // v1.5.173: I75 — operador novo → COLABORADORES_RH auto (Julia no hub Colaboradores)
@@ -168,7 +169,7 @@
 
 // ── CONSTANTES ───────────────────────────────────────────────
 /** Versão exposta em ping, carregarInicio, validarSchema, gestaoPessoasStatus (bump com header). */
-const MK_GAS_VERSAO_  = 'v1.5.173';
+const MK_GAS_VERSAO_  = 'v1.5.176';
 const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.173';
 const SHEET_ID   = '1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618';
 const DEPLOY_ID  = 'AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y';
@@ -4269,10 +4270,10 @@ function metaOperadorCfg_(opId) {
     };
   } else if (id === 4) {
     cfg = {
-      ativo: false,
+      ativo: true,
       meta: META_LOC_TURNO_PADRAO_,
       bonus: META_BONUS_DIA_REAIS_,
-      inicio: '',
+      inicio: '01/07/2026',
       escala: {
         '0': [13, 21],
         '1': null,
@@ -11803,8 +11804,16 @@ function gpSyncRhColaboradoresPadrao_(ctx) {
     if (!hasRh(3)) gpEnsureRowByOpId_(SH_COLAB_RH, 3, [3, 'Raykelly', 'Atendente 1', '', '', '', '', '', '', '15/06/2026', '', 1621, 20, 20, 100, '14h–22h', 'SIM', 25, '']);
     if (!hasEscala(2, comp)) gpEnsureEscalaRow_(2, comp, ['10–14', '10–14', '10–14', '10–14', '10–14', 'OFF', 'OFF'], 'Socia — turno manha');
     if (!hasEscala(3, comp)) gpEnsureEscalaRow_(3, comp, ['14–22', 'OFF', '14–22', 'OFF', '14–22', '10–20', '13–21'], 'Rodizio dom');
+    const juliaEscala = ['OFF', '14–22', 'OFF', '14–22', '14–22', '12–22', '13–21'];
+    if (!hasRh(4)) {
+      gpEnsureRowByOpId_(SH_COLAB_RH, 4, [4, 'Julia', 'Atendente 2', '', '', '', '', '', '', '01/07/2026', '', 1621, 20, 20, 100, '14h–22h', 'SIM', 0, '']);
+    } else {
+      gpPatchRhRowFields_(4, { nome: 'Julia', funcao: 'Atendente 2', turno: '14h–22h' });
+    }
+    gpUpsertEscalaRow_(4, comp, juliaEscala, 'Julia — Atendente 2', { force: true });
     if (!gpRowExistsByOpId_(SH_BANCO_HORAS, 2)) gpEnsureRowByOpId_(SH_BANCO_HORAS, 2, [2, '0h00', '']);
     if (!gpRowExistsByOpId_(SH_BANCO_HORAS, 3)) gpEnsureRowByOpId_(SH_BANCO_HORAS, 3, [3, '0h00', '']);
+    if (!gpRowExistsByOpId_(SH_BANCO_HORAS, 4)) gpEnsureRowByOpId_(SH_BANCO_HORAS, 4, [4, '0h00', '']);
   } catch (e) {
     Logger.log('gpSyncRhColaboradoresPadrao_: ' + e.message);
   }
@@ -11840,6 +11849,40 @@ function gpEnsureEscalaRow_(opId, competencia, dias, obs) {
   sh.appendRow([opId, competencia].concat(dias).concat([obs || '']));
   const lr = sh.getLastRow();
   if (lr >= 2) sh.getRange(lr, 2).setNumberFormat('@');
+  return true;
+}
+
+/** Atualiza seg–dom se linha existir; senão append (I79 Julia). */
+function gpUpsertEscalaRow_(opId, competencia, dias, obs, opts) {
+  opts = opts || {};
+  const sh = gpSheet_(SH_ESCALA_COLAB);
+  const comp = gpNormCompetencia_(competencia);
+  const last = sh.getLastRow();
+  if (last >= GP_DATA_ROW) {
+    const rows = sh.getRange(GP_DATA_ROW, 1, last, 2).getValues();
+    for (let i = 0; i < rows.length; i++) {
+      if (Number(rows[i][0]) === Number(opId) && gpNormCompetencia_(rows[i][1]) === comp) {
+        if (!opts.force) return false;
+        const r = GP_DATA_ROW + i;
+        sh.getRange(r, 3, r, 9).setValues([dias]);
+        if (obs != null) sh.getRange(r, 10).setValue(obs);
+        sh.getRange(r, 2).setNumberFormat('@');
+        return true;
+      }
+    }
+  }
+  return gpEnsureEscalaRow_(opId, competencia, dias, obs);
+}
+
+function gpPatchRhRowFields_(opId, fields) {
+  const colab = gpColabRhByOpId_(opId);
+  if (!colab || !colab.row) return false;
+  const sh = gpSheet_(SH_COLAB_RH);
+  const r = colab.row;
+  if (fields.nome != null) sh.getRange(r, 2).setValue(String(fields.nome));
+  if (fields.funcao != null) sh.getRange(r, 3).setValue(String(fields.funcao));
+  if (fields.turno != null) sh.getRange(r, 16).setValue(String(fields.turno));
+  gpInvalidateRhCache_();
   return true;
 }
 
@@ -12482,14 +12525,16 @@ function instalarAbasGestaoPessoasCore_(opts) {
   log.push(ensure(SH_COLAB_RH, '#2196F3', ['operador_id','nome','funcao','cpf','nascimento','telefone','email','endereco','emergencia','admissao','pix','salario_base','va_diario','meta_loc_dia','bonus_meta_r$','turno','ativo','cadastro_pct','atualizado_em'],
     [
       [2,'Milena Nunes','Socia','','','','','','','01/01/2020','',1621,15.38,20,100,'10h–14h','SIM',25,''],
-      [3,'Raykelly','Atendente 1','','','','','','','15/06/2026','',1621,15.38,20,100,'14h–22h','SIM',25,'']
+      [3,'Raykelly','Atendente 1','','','','','','','15/06/2026','',1621,15.38,20,100,'14h–22h','SIM',25,''],
+      [4,'Julia','Atendente 2','','','','','','','01/07/2026','',1621,15.38,20,100,'14h–22h','SIM',0,'']
     ]));
   log.push(ensure(SH_FOLHA_PONTO, '#4CAF50', ['id','operador_id','data','dia_semana','entrada','saida','horas','situacao','registrado_em'],
     [[1,3,'15/06/2026','Seg','13:58','21:05','7h07','OK','']]));
   log.push(ensure(SH_ESCALA_COLAB, '#9C27B0', ['operador_id','competencia','seg','ter','qua','qui','sex','sab','dom','obs'],
     [
       [2,'06/2026','10–14','10–14','10–14','10–14','10–14','OFF','OFF','Socia — turno manha'],
-      [3,'06/2026','14–22','OFF','14–22','OFF','14–22','10–20','13–21','Rodizio dom']
+      [3,'06/2026','14–22','OFF','14–22','OFF','14–22','10–20','13–21','Rodizio dom'],
+      [4,'07/2026','OFF','14–22','OFF','14–22','14–22','12–22','13–21','Julia — Atendente 2']
     ]));
   const shEsc = ss.getSheetByName(SH_ESCALA_COLAB);
   if (shEsc) {
@@ -12500,7 +12545,7 @@ function instalarAbasGestaoPessoasCore_(opts) {
   log.push(ensure(SH_HOLERITES, '#1976D2', ['id','operador_id','competencia','base','bonus','faltas','inss','irrf','vt','liquido','fgts','va_total','dias_trab','obs','gerado_em'], []));
   log.push(ensure(SH_METAS_COLAB, '#FFC107', ['id','operador_id','data','locacoes','meta','bonus_ok','bonus_valor'],
     [[1,3,'15/06/2026',21,20,'SIM',100]]));
-  log.push(ensure(SH_BANCO_HORAS, '#78909C', ['operador_id','saldo_hhmm','atualizado_em'], [[2,'0h00',''],[3,'0h00','']]));
+  log.push(ensure(SH_BANCO_HORAS, '#78909C', ['operador_id','saldo_hhmm','atualizado_em'], [[2,'0h00',''],[3,'0h00',''],[4,'0h00','']]));
   log.push(ensure(SH_COMUNICADOS_RH, '#FF7043', ['id','data','titulo','mensagem','publico','valido_ate','prioridade','ativo','criado_em'],
     [[1, fmtData_(new Date()), 'Bem-vindo ao hub', 'Use Meu ponto para registrar entrada e saída. Dúvidas? Fale com a administração.', 'TODOS', '', 'info', 'SIM', '']]));
   const shCom = ss.getSheetByName(SH_COMUNICADOS_RH);

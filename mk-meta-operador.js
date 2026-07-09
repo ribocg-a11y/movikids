@@ -31,11 +31,11 @@ const MK_META_CFG = {
     }
   },
   4: {
-    nome: 'Atendente 2',
-    ativo: false,
+    nome: 'Julia',
+    ativo: true,
     meta: 20,
     bonus: 100,
-    inicio: '',
+    inicio: '2026-07-01',
     escala: {
       0: [13, 21],
       1: null,
