@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.179
+// MOVI KIDS — Google Apps Script v1.5.180
+// v1.5.180: I84 — meta operador conta/dia (I42) — 1 loc por telefone/conta_id no turno
 // v1.5.179: I82 — painelGestaoPessoasAdmin null row [4] (metas/comunicados/avaliacoes); Operadores/Escala
 // v1.5.178: I81 — restaurarPontoJuliaJul2026Admin (FOLHA_PONTO adm 01/07–09/07, hoje +20min)
 // v1.5.177: I80 — Julia admissão 01/07/2026 sync completo; painel null row; meta alertas id 4
@@ -172,7 +173,7 @@
 
 // ── CONSTANTES ───────────────────────────────────────────────
 /** Versão exposta em ping, carregarInicio, validarSchema, gestaoPessoasStatus (bump com header). */
-const MK_GAS_VERSAO_  = 'v1.5.179';
+const MK_GAS_VERSAO_  = 'v1.5.180';
 const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.173';
 const SHEET_ID   = '1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618';
 const DEPLOY_ID  = 'AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y';
@@ -4370,6 +4371,34 @@ function metaOperadorIdFromRequest_(p) {
   return 0;
 }
 
+/** I84 — chave conta/dia para meta (alinhado I42 caixa: 1 cobrança por telefone/dia). */
+function metaOperadorContaKeyFromAuditRow_(r) {
+  const ts = auditTsMeta_(r[0]);
+  const data = ts.data || '';
+  if (!data) return '';
+  try {
+    const depois = JSON.parse(String(r[6] || '{}'));
+    const cid = Number(depois.contaId) || 0;
+    if (cid > 0) return data + '|c:' + cid;
+    const tel = normTel_(depois.telefone);
+    if (tel && tel.length >= 8) return data + '|t:' + tel;
+    const lid = Number(depois.id) || Number(r[3]) || 0;
+    if (lid > 0) return data + '|id:' + lid;
+  } catch (e) { /* ok */ }
+  const lid2 = Number(r[3]) || 0;
+  return lid2 > 0 ? (data + '|id:' + lid2) : '';
+}
+
+/** Marca conta/dia — retorna false se já contada (dedup meta). */
+function metaOperadorSeenMark_(seen, dataStr, auditRow) {
+  const ck = metaOperadorContaKeyFromAuditRow_(auditRow);
+  if (!ck) return true;
+  if (!seen[dataStr]) seen[dataStr] = {};
+  if (seen[dataStr][ck]) return false;
+  seen[dataStr][ck] = true;
+  return true;
+}
+
 function buildMetaOperadorPayload_(opId) {
   const found = operadorRowById_(opId);
   if (!found) return { ok: false, configurado: false, operadorId: opId };
@@ -4388,6 +4417,7 @@ function buildMetaOperadorPayload_(opId) {
   const shiftHoje = cfg.escala[String(dowHoje)];
   const minsAgora = agora.getHours() * 60 + agora.getMinutes();
   const emTurno = metaOperadorInShift_(minsAgora, shiftHoje);
+  const seenContas = {};
 
   try {
     const shAud = ss_().getSheetByName('AUDITORIA');
@@ -4403,6 +4433,7 @@ function buildMetaOperadorPayload_(opId) {
         const shift = cfg.escala[String(dow)];
         if (!shift) return;
         if (!metaOperadorInShift_(ts.mins, shift) && !ts.semHora) return;
+        if (!metaOperadorSeenMark_(seenContas, ts.data, r)) return;
         byDay[ts.data] = (byDay[ts.data] || 0) + 1;
       });
     }
@@ -4459,6 +4490,7 @@ function metaOperadorLocByDay_(opId, opNome, cfg) {
   if (!cfg || !cfg.inicio) return byDay;
   const inicioCmp = dateToCmp_(cfg.inicio);
   const mesAtual = fmtData_(new Date()).slice(3);
+  const seenContas = {};
   try {
     const shAud = ss_().getSheetByName('AUDITORIA');
     if (shAud && shAud.getLastRow() >= 2) {
@@ -4473,6 +4505,7 @@ function metaOperadorLocByDay_(opId, opNome, cfg) {
         const shift = cfg.escala[String(dow)];
         if (!shift) return;
         if (!metaOperadorInShift_(ts.mins, shift) && !ts.semHora) return;
+        if (!metaOperadorSeenMark_(seenContas, ts.data, r)) return;
         byDay[ts.data] = (byDay[ts.data] || 0) + 1;
       });
     }
@@ -10479,6 +10512,8 @@ function gpEnrichContextAudit_(ctx, competencia, operadores) {
   const auditLocByOpId = {};
   const metaByDayByOpId = {};
   const opList = [];
+  const seenLocMes = {};
+  const seenMetaDay = {};
 
   (operadores || []).forEach(function (op) {
     const id = Number(op.id);
@@ -10508,8 +10543,11 @@ function gpEnrichContextAudit_(ctx, competencia, operadores) {
       const op = opList[i];
       if (!metaOperadorNomeMatch_(usuario, op.nome)) continue;
       if (compRow === compNorm) {
-        auditLocByOpId[op.id].locMes++;
-        if (ts.data === hoje) auditLocByOpId[op.id].locHoje++;
+        if (!seenLocMes[op.id]) seenLocMes[op.id] = {};
+        if (metaOperadorSeenMark_(seenLocMes[op.id], ts.data, r)) {
+          auditLocByOpId[op.id].locMes++;
+          if (ts.data === hoje) auditLocByOpId[op.id].locHoje++;
+        }
       }
       const cfg = op.cfg;
       if (!cfg || cfg.ativo === false || !cfg.inicio) continue;
@@ -10518,6 +10556,8 @@ function gpEnrichContextAudit_(ctx, competencia, operadores) {
       const shift = cfg.escala[String(weekdayFromDataStr_(ts.data))];
       if (!shift) continue;
       if (!metaOperadorInShift_(ts.mins, shift) && !ts.semHora) continue;
+      if (!seenMetaDay[op.id]) seenMetaDay[op.id] = {};
+      if (!metaOperadorSeenMark_(seenMetaDay[op.id], ts.data, r)) continue;
       const byDay = metaByDayByOpId[op.id];
       byDay[ts.data] = (byDay[ts.data] || 0) + 1;
     }
@@ -10612,6 +10652,7 @@ function gpLocStatsFromAuditoria_(opId, competencia, ctx) {
       return shAud.getRange(2, 1, shAud.getLastRow(), 8).getValues();
     })();
     const compNorm = gpNormCompetencia_(competencia);
+    const seenLoc = {};
     dados.forEach(function (r) {
       if (String(r[1] || '').trim() !== 'encerrarLocacao') return;
       if (!metaOperadorNomeMatch_(String(r[7] || ''), op.nome)) return;
@@ -10621,6 +10662,7 @@ function gpLocStatsFromAuditoria_(opId, competencia, ctx) {
       if (pts.length < 3) return;
       const comp = pts[1].padStart(2, '0') + '/' + pts[2];
       if (comp !== compNorm) return;
+      if (!metaOperadorSeenMark_(seenLoc, ts.data, r)) return;
       locMes++;
       if (ts.data === hoje) locHoje++;
     });

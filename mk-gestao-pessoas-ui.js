@@ -397,8 +397,23 @@
       showAuthStep(mode === 'auth-pin' ? 's-colab-pin' : 's-colab-login');
     }
 
-    function go(id) {
-      window.scrollTo(0, 0);
+    function gpScrollToScreenContent_(id) {
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+          var screen = document.getElementById(id);
+          if (!screen) return;
+          var target = screen.querySelector('.mock-h1, .gp-pag-head, .mock-user-bar, .mock-back, .mock-clock, #metas-body, #ponto-folha') || screen;
+          try {
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          } catch (e) {
+            try { target.scrollIntoView(true); } catch (e2) { window.scrollTo(0, 0); }
+          }
+        });
+      });
+    }
+
+    function go(id, opts) {
+      opts = opts || {};
       if (gpCadastroForced_ && !gpAdmPreviewMode_) {
         var allowedCad = ['s-cadastro-bloq', 's-cadastro-form'];
         if (allowedCad.indexOf(id) < 0 && id !== 's-colab-login' && id !== 's-colab-pin') {
@@ -434,6 +449,13 @@
       if (id === 's-banco') renderBanco();
       if (id === 's-pagamento') renderPagamento();
       if (id === 's-cadastro-form') goCadastroForm();
+      if (!opts.keepScroll) {
+        if (id === 's-colab-hub') {
+          try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) { window.scrollTo(0, 0); }
+        } else if (id && id.indexOf('s-') === 0) {
+          gpScrollToScreenContent_(id);
+        }
+      }
     }
 
     function fmtTime() { return new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}); }

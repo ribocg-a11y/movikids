@@ -1,6 +1,6 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 09/07/2026 · FE **v1.9.15** · GAS **v1.5.179** Web ✅ · **Ciclo:** Sprint D pós One UI  
+**Atualizado:** 09/07/2026 · FE **v1.9.16** · GAS **v1.5.180** repo (Web **v1.5.179** até Nova versão) · **Ciclo:** Sprint D pós One UI  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **Repo local:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`  
@@ -118,10 +118,11 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 | 1b | **I69** hotfix ponto mock → **v1.9.3** | Agente | ✅ **29/06** Pages |
 | 1c | **I70–I75** varredura — GAS/FE/Dashboard/GP/Julia | Agente | ✅ **09/07** FE v1.9.9 · GAS v1.5.173 |
 | 1d | **I79–I83** Julia + Operadores quebrado + race Escala/Metas | Agente | ✅ FE **v1.9.15** · GAS **v1.5.179** Web |
+| 1e | **I84** scroll hub Colaboradores + meta conta/dia (I42) | Agente | ✅ FE **v1.9.16** · GAS **v1.5.180** repo — **Web pendente** |
 | 2 | Assinar **FASE 17** (só falta **17.5 F9**) + smoke tablet D4 | Sócio + Ops | ⏳ **próximo** |
 | 3 | Smoke tablet **v1.9.9** (regressão balcão) | Ops | ⏳ Sprint D4 |
 | 4 | Sprint One UI A–C + I24 | Agente | ✅ **v1.9.9** |
-| 5 | Validar Operadores/Escala + Julia ponto | Sócio PC | ⏳ `?force=1.9.15` |
+| 5 | Validar Operadores/Escala + Julia ponto + meta dedup | Sócio PC | ⏳ `?force=1.9.16` + GAS Web v1.5.180 |
 
 Docs: `PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md` · `CHECKLIST_FASE17_FECHAMENTO.md`
 
