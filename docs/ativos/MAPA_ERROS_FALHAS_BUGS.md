@@ -1,6 +1,6 @@
 # MOVI KIDS — Mapa de erros, falhas e bugs
 
-**Atualizado:** 09/07/2026 — **I77b** painel null row · FE **v1.9.11** · GAS **v1.5.175**  
+**Atualizado:** 09/07/2026 — **I78** cadastro 0% regressão I77 · FE **v1.9.12** · GAS **v1.5.175**  
 **Uso anterior:** 22/06/2026 — **I38–I41** auditoria RH 22/06 · GAS repo **v1.5.129** (ping **v1.5.107**) · FE **v1.8.110**  
 **Uso anterior:** 17/06/2026 — **I28** liberar sessão tablet · GAS **v1.5.92** prod. · FE **v1.8.30**  
 **Uso anterior:** 09/06/2026 — **I22 fechado** (hotfix FE v1.8.2)  
@@ -83,7 +83,8 @@
 | **I74** | **Gestão Pessoas dropdown vazio / lento (~23s)** | Colaborador sem opções; fila GAS com Dashboard | GAS **v1.5.172** `gpIntelRhAlertasFromCtx_` · FE **v1.9.8** loading dropdown + sem prefetch GP | `gp_painel_adm_v2_*` | Operadores → Ficha lista 4 colaboradores |
 | **I75** | **Operador novo não aparece em Colaboradores (Julia)** | Cadastro só em OPERADORES_SISTEMA; filtro exige COLABORADORES_RH | GAS **v1.5.173** `gpSyncOperadoresAtivosToRh_` no cadastro + listar | `gp_list_colab_v2` | gestao-pessoas.html lista todos com PIN |
 | **I76** | **Agente orientou deploy GAS com caminho Windows / docs defasados** | Usuário cola `.gs` errado; comentários `// v1.5.x` no PowerShell; HANDOFF atrasado | **Raw GitHub** para colar Editor; C:\ só rodapé Regra 16; Fase D roteiro na mesma sessão | `ROTEIRO_AGENTE` Fase F | raw URL header = ping · `INCIDENTE_SESSAO_2026-07-09_I70_I75.md` |
-| **I77** | **Operadores preso/lento — painel GAS null row + FE bloqueava 18s** | Dropdown/jornada vazios; banner GAS v1.5.102 falso | GAS **v1.5.175** `gpRowValid_` FOLHA_PONTO · FE **v1.9.11** load rápido + painel background | `gpAdmLoadPainelBackground_` | Operadores abre ≤5s · painel full em background |
+| **I77** | **Operadores preso/lento — painel GAS null row + FE bloqueava 18s** | Dropdown/jornada vazios; banner GAS v1.5.102 falso | GAS **v1.5.175** `gpRowValid_` FOLHA_PONTO · FE **v1.9.11** load rápido + painel background | `gpAdmLoadPainelBackground_` | Operadores abre ≤5s |
+| **I78** | **Regressão I77 — cadastro 0% na aba Hoje (modo parcial)** | Todas 0% apesar de RH 100% (I45/I36) | FE **v1.9.12** quick load usa `listarColaboradoresGestao` (cadastroPct planilha) | `gpAdmFetchColabListRh_` | Hoje: Eduarda 25% · demais 100% |
 | **I42** | Conta do dia — mesmo telefone 10h–22h | Caixa `n` vs sessões; maquininha | GAS **v1.5.131+** col S `conta_id` | `TESTE_I42_CONTA_DIA_CAIXA` | não reduzir `COL_LOC_READ_` (ver I43) |
 | **I41** | **`ping_` versão defasada** (v1.5.107 vs repo) | Confusão deploy / verify | GAS **v1.5.130** `ping_()` alinhado | `ping_` header alinhado | ping = v1.5.130 |
 | I2 | GAS offline + timer local | Extra fantasma | ADM `somentePlano`; offline v1.7.6 | `FIX_OFFLINE_ENCERRAR` | tablet encerrar |
@@ -274,6 +275,7 @@
 42. **Sempre** sync OPERADORES_SISTEMA → COLABORADORES_RH ao cadastrar operador ativo (I75).
 43. **Nunca** passar `C:\Users\...` como link clicável para deploy GAS — usar **raw GitHub** (I76).
 44. **Sempre** atualizar HANDOFF/ESTADO/DEPLOY/AGENTS ao encerrar sessão com mudança de versão (I76).
+45. **Nunca** modo parcial Operadores com `listarOperadoresAdmin` sozinho — **`cadastroPct` vem de `listarColaboradoresGestao`** (I78 · lição I45/I36).
 
 ---
 

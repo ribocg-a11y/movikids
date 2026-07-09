@@ -833,21 +833,40 @@
     }
   };
 
+  function gpAdmMapColabQuick_(c, sessaoId) {
+    const pct = typeof c.cadastroPct === 'number' ? c.cadastroPct : 0;
+    return {
+      id: c.id, nome: c.nome, hasPin: c.hasPin !== false, perfil: c.perfil || 'operador',
+      funcao: c.funcao || 'Operador', turno: c.turno || '', admissao: c.admissao || '',
+      cadastroPct: pct, cadastroOk: pct >= 100, temRh: true,
+      ponto: { status: 'fora', entrada: null, saida: null },
+      logadoBalcao: sessaoId === Number(c.id),
+      metas: { alvo: 20, atual: 0, locMes: 0, bonusDias: 0, bonusTotal: 0 },
+      folhaPonto: []
+    };
+  }
+
+  async function gpAdmFetchColabListRh_() {
+    if (window.MK_GestaoPessoas && typeof MK_GestaoPessoas.listarColaboradores === 'function') {
+      const list = await MK_GestaoPessoas.listarColaboradores();
+      let sessaoAtiva = null;
+      try {
+        const pin = gpAdmPinParams_();
+        const ops = await api(Object.assign({ action: 'listarOperadoresAdmin', _t: Date.now() }, pin), 15000);
+        if (ops && ops.ok) sessaoAtiva = ops.sessaoAtiva || null;
+      } catch (e) { /* ok */ }
+      return { ok: true, colaboradores: list, sessaoAtiva: sessaoAtiva };
+    }
+    return api({ action: 'listarColaboradoresGestao', _t: Date.now() }, 30000);
+  }
+
   async function gpAdmHydrateColabQuick_() {
     try {
-      const r = await api(Object.assign({ action: 'listarOperadoresAdmin', _t: Date.now() }, gpAdmPinParams_()), 30000);
+      const r = await gpAdmFetchColabListRh_();
       if (!r || !r.ok) return false;
       const sessaoId = r.sessaoAtiva && r.sessaoAtiva.operadorId ? Number(r.sessaoAtiva.operadorId) : 0;
-      const cols = (r.operadores || []).filter(function (o) { return o.hasPin !== false; }).map(function (op) {
-        return {
-          id: op.id, nome: op.nome, hasPin: op.hasPin, perfil: op.perfil || 'operador',
-          funcao: 'Operador', turno: '', admissao: '', cadastroPct: 0, temRh: false,
-          ponto: { status: 'fora', entrada: null, saida: null },
-          logadoBalcao: sessaoId === Number(op.id),
-          metas: { alvo: 20, atual: 0, locMes: 0, bonusDias: 0, bonusTotal: 0 },
-          folhaPonto: []
-        };
-      });
+      const cols = (r.colaboradores || []).filter(function (c) { return c.hasPin !== false; })
+        .map(function (c) { return gpAdmMapColabQuick_(c, sessaoId); });
       cols.sort(function (a, b) { return String(a.nome).localeCompare(String(b.nome), 'pt-BR'); });
       const now = new Date();
       const comp = gpAdmCompSel_ || (String(now.getMonth() + 1).padStart(2, '0') + '/' + now.getFullYear());
@@ -875,7 +894,13 @@
 
   async function gpAdmLoadFallback_(errMsg) {
     const pin = gpAdmPinParams_();
-    const ops = await api(Object.assign({ action: 'listarOperadoresAdmin', _t: Date.now() }, pin), 30000);
+    let rh = { ok: false, colaboradores: [], sessaoAtiva: null };
+    try {
+      rh = await gpAdmFetchColabListRh_();
+    } catch (e) { /* fallback operadores */ }
+    const ops = rh.ok && rh.colaboradores.length
+      ? rh
+      : await api(Object.assign({ action: 'listarOperadoresAdmin', _t: Date.now() }, pin), 30000);
     if (!ops.ok) throw new Error(ops.erro || errMsg);
     let alertas = { alertas: [], total: 0 };
     try {
@@ -884,15 +909,18 @@
     const sessaoId = ops.sessaoAtiva && ops.sessaoAtiva.operadorId ? Number(ops.sessaoAtiva.operadorId) : 0;
     const now = new Date();
     const comp = String(now.getMonth() + 1).padStart(2, '0') + '/' + now.getFullYear();
-    const colaboradores = (ops.operadores || []).map(function (op) {
-      return {
-        id: op.id, nome: op.nome, hasPin: op.hasPin, perfil: op.perfil || 'operador',
-        funcao: 'Operador', turno: '', admissao: '', cadastroPct: 0, temRh: false,
-        ponto: { status: 'fora', entrada: null, saida: null },
-        logadoBalcao: sessaoId === Number(op.id),
-        metas: { alvo: 20, atual: 0, locMes: 0, bonusDias: 0, bonusTotal: 0 },
-        folhaPonto: []
-      };
+    const src = ops.colaboradores || ops.operadores || [];
+    const colaboradores = src.filter(function (c) { return c.hasPin !== false; }).map(function (c) {
+      return typeof c.cadastroPct === 'number'
+        ? gpAdmMapColabQuick_(c, sessaoId)
+        : {
+          id: c.id, nome: c.nome, hasPin: c.hasPin, perfil: c.perfil || 'operador',
+          funcao: 'Operador', turno: '', admissao: '', cadastroPct: 0, temRh: false,
+          ponto: { status: 'fora', entrada: null, saida: null },
+          logadoBalcao: sessaoId === Number(c.id),
+          metas: { alvo: 20, atual: 0, locMes: 0, bonusDias: 0, bonusTotal: 0 },
+          folhaPonto: []
+        };
     });
     gpAdmData_ = {
       competencia: comp, colaboradores: colaboradores,
