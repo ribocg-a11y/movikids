@@ -818,9 +818,7 @@ function mkPrefetchAdminWarm_() {
       .then(function (d) { if (d && d.ok) kpiDashCacheSet_(mes, ano, d); })
       .catch(function () {}));
   }
-  if (typeof mkGpAdmLoad_ === 'function') {
-    tasks.push(mkGpAdmLoad_().catch(function () {}));
-  }
+  /* I74 — Gestão Pessoas só ao abrir Operadores (evita fila GAS com kpiMes). */
   Promise.all(tasks).finally(function () { window._mkPrefetchAdminWarm = false; });
 }
 window.mkPrefetchAdminWarm_ = mkPrefetchAdminWarm_;

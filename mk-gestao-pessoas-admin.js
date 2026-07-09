@@ -124,6 +124,15 @@
     if (alertEl) alertEl.innerHTML = '';
     const compEl = document.getElementById('gp-adm-comp-sel');
     if (compEl && !compEl.options.length) gpAdmSyncCompSelect_();
+    const presSel = document.getElementById('gp-adm-presenca-sel');
+    if (presSel) {
+      presSel.innerHTML = '<option value="">Carregando colaboradores…</option>';
+      presSel.disabled = true;
+    }
+    const fichaMain = document.getElementById('gp-adm-ficha-main');
+    if (fichaMain) fichaMain.innerHTML = '<p class="gp-adm-muted gp-adm-loading">Carregando jornada…</p>';
+    const fichaAside = document.getElementById('gp-adm-ficha-aside');
+    if (fichaAside) fichaAside.innerHTML = '<p class="gp-adm-muted gp-adm-loading">Carregando perfil…</p>';
   }
 
   function esc(v) {
@@ -201,6 +210,7 @@
   window.mkGpAdmSetTab = function (tab) {
     if (tab !== 'folha' && typeof mkGpAdmFecharHolerite_ === 'function') mkGpAdmFecharHolerite_();
     gpAdmSetTab_(tab);
+    if (!gpAdmData_ && typeof window.mkGpAdmLoad_ === 'function') window.mkGpAdmLoad_();
     if (tab === 'cadastro' && typeof refreshOperadoresAdmin_ === 'function') refreshOperadoresAdmin_();
   };
 
@@ -353,20 +363,31 @@
 
   function gpAdmRenderPresenca_() {
     const sel = document.getElementById('gp-adm-presenca-sel');
-    if (!gpAdmData_) return;
+    if (!gpAdmData_) {
+      if (sel) {
+        sel.innerHTML = '<option value="">Carregando colaboradores…</option>';
+        sel.disabled = true;
+      }
+      return;
+    }
     const cols = gpAdmData_.colaboradores || [];
     if (sel) {
-      const cur = gpAdmSelId_ || (cols[0] && cols[0].id);
-      sel.innerHTML = cols.map(function (c) {
-        return '<option value="' + c.id + '"' + (Number(c.id) === Number(cur) ? ' selected' : '') + '>' + esc(c.nome) + '</option>';
-      }).join('');
-      sel.onchange = function () {
-        gpAdmSelId_ = Number(sel.value);
-        gpAdmRenderFichaBar_();
-        gpAdmRenderFichaAside_();
-        gpAdmRenderPresencaTable_();
-      };
-      gpAdmSelId_ = Number(sel.value) || cur;
+      sel.disabled = false;
+      if (!cols.length) {
+        sel.innerHTML = '<option value="">Nenhum colaborador cadastrado</option>';
+      } else {
+        const cur = gpAdmSelId_ || (cols[0] && cols[0].id);
+        sel.innerHTML = cols.map(function (c) {
+          return '<option value="' + c.id + '"' + (Number(c.id) === Number(cur) ? ' selected' : '') + '>' + esc(c.nome) + '</option>';
+        }).join('');
+        sel.onchange = function () {
+          gpAdmSelId_ = Number(sel.value);
+          gpAdmRenderFichaBar_();
+          gpAdmRenderFichaAside_();
+          gpAdmRenderPresencaTable_();
+        };
+        gpAdmSelId_ = Number(sel.value) || cur;
+      }
     }
     gpAdmRenderFichaBar_();
     gpAdmRenderFichaAside_();

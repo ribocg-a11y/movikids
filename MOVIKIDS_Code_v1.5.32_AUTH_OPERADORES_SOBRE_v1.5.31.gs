@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.171
+// MOVI KIDS — Google Apps Script v1.5.172
+// v1.5.172: I74 — painelGestaoPessoasAdmin: alertas RH do ctx (sem alertasInteligentes_ duplicado)
 // v1.5.171: I73 — kpiMes lite pula alertasInteligentes/narrativa (perf Dashboard)
 // v1.5.170: I72 — metaProjecaoMes grafico: nao trava cedo; recalcula meta stale (ex. R$372 vs R$13k)
 // v1.5.169: holerite competencia passada — bonus dias/meta da AUDITORIA do mes (nao mes corrente)
@@ -164,8 +165,8 @@
 
 // ── CONSTANTES ───────────────────────────────────────────────
 /** Versão exposta em ping, carregarInicio, validarSchema, gestaoPessoasStatus (bump com header). */
-const MK_GAS_VERSAO_  = 'v1.5.171';
-const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.171';
+const MK_GAS_VERSAO_  = 'v1.5.172';
+const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.172';
 const SHEET_ID   = '1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618';
 const DEPLOY_ID  = 'AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y';
 const WEBAPP_URL = `https://script.google.com/macros/s/${DEPLOY_ID}/exec`;
@@ -4507,6 +4508,68 @@ function calcMetaAbaixoAlertas_() {
       });
     }
   });
+  return alertas;
+}
+
+/** I74 — alertas RH proativos só com ctx (banco + meta abaixo), sem reler planilha. */
+function gpMetaAbaixoAlertasFromCtx_(ctx) {
+  const alertas = [];
+  const hoje = new Date();
+  hoje.setHours(0, 0, 0, 0);
+  const byOp = ctx.metaByDayByOpId || {};
+  [2, 3].forEach(function (opId) {
+    const cfg = metaOperadorCfg_(opId);
+    if (!cfg || cfg.ativo === false || !cfg.inicio) return;
+    const found = operadorRowById_(opId);
+    if (!found) return;
+    const op = operadorObjFromRow_(found.data);
+    const byDay = byOp[opId] || {};
+    const meta = Number(cfg.meta) || META_LOC_TURNO_PADRAO_;
+    const limite = meta * 0.5;
+    let diasAbaixo = 0;
+    for (let i = 1; i <= 10 && diasAbaixo < 3; i++) {
+      const d = new Date(hoje);
+      d.setDate(d.getDate() - i);
+      const shift = cfg.escala[String(d.getDay())];
+      if (!shift) continue;
+      const n = byDay[fmtData_(d)] || 0;
+      if (n < limite) diasAbaixo++;
+      else break;
+    }
+    if (diasAbaixo >= 3) {
+      alertas.push({
+        nivel: 'amarelo', codigo: 'META_ABAIXO_' + opId, inteligente: true, categoria: 'meta',
+        titulo: 'Meta abaixo do esperado',
+        mensagem: op.nome + ': menos de 50% da meta (' + meta + ' loc/turno) em 3 dias seguidos.',
+        acionavel: 'Ops — conversar com operador',
+        destino: 'operadores',
+        operadorId: opId, operador: op.nome
+      });
+    }
+  });
+  return alertas;
+}
+
+function gpIntelRhAlertasFromCtx_(ctx) {
+  const alertas = [];
+  (ctx.bancoRows || []).forEach(function (r) {
+    const opId = Number(r[0]);
+    if (!opId) return;
+    const min = gpParseMinutosHhMm_(r[1]);
+    const horas = Math.abs(min) / 60;
+    if (horas < 20) return;
+    alertas.push({
+      nivel: horas >= 24 ? 'vermelho' : 'amarelo',
+      codigo: 'BANCO_HORAS_' + opId,
+      inteligente: true,
+      titulo: 'Banco de horas no limite',
+      mensagem: gpNomeRhByOpId_(opId) + ' com saldo ' + String(r[1] || '') + ' (limite +/-20h).',
+      acionavel: 'RH — ajustar escala ou compensar',
+      destino: 'operadores',
+      operadorId: opId, operador: gpNomeRhByOpId_(opId)
+    });
+  });
+  gpMetaAbaixoAlertasFromCtx_(ctx).forEach(function (a) { alertas.push(a); });
   return alertas;
 }
 
@@ -11725,7 +11788,7 @@ function painelGestaoPessoasAdmin_(p) {
   if (!isGestaoRequest_(p)) return err_('Acesso negado — gestao pessoas (admin/gestor)', 403);
   try {
     const comp = String(p.competencia || gpCompetenciaAtual_());
-    const cacheKey = 'gp_painel_adm_' + gpNormCompetencia_(comp);
+    const cacheKey = 'gp_painel_adm_v2_' + gpNormCompetencia_(comp);
     try {
       const hit = CacheService.getScriptCache().get(cacheKey);
       if (hit) return ContentService.createTextOutput(hit).setMimeType(ContentService.MimeType.JSON);
@@ -11738,11 +11801,7 @@ function painelGestaoPessoasAdmin_(p) {
     const sessao = opsResp.sessaoAtiva || null;
     const sessaoId = sessao && sessao.operadorId ? Number(sessao.operadorId) : 0;
     const alertasPack = gpAlertasPontoFromCtx_(ctx);
-    const intelRh = alertasInteligentes_({ incluirRh: true, incluirPonto: false, incluirMeta: true })
-      .filter(function(a) {
-        const c = String(a.codigo || '');
-        return c.indexOf('BANCO_HORAS_') === 0 || c.indexOf('META_ABAIXO_') === 0;
-      });
+    const intelRh = gpIntelRhAlertasFromCtx_(ctx);
     const colaboradores = [];
     const seen = {};
 
@@ -11853,7 +11912,7 @@ function painelGestaoPessoasAdmin_(p) {
     };
     const out = JSON.stringify({ ok: true, ...payload });
     try {
-      if (out.length < 95000) CacheService.getScriptCache().put(cacheKey, out, 90);
+      if (out.length < 95000) CacheService.getScriptCache().put(cacheKey, out, 120);
     } catch (e) { /* ok */ }
     return ContentService.createTextOutput(out).setMimeType(ContentService.MimeType.JSON);
   } catch (ex) {
