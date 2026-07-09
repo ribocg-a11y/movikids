@@ -39,7 +39,7 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 | **Gestão Pessoas** | **v1.9.5** | `gestao-pessoas.html?force=1.9.5` |
 | **Portal acompanhar** | **v1.9.5** | `acompanhar.html` |
 | **Service Worker** | **1.9.5** | `sw.js` |
-| **Apps Script** | **v1.5.168** (repo) | ping Web **v1.5.167** até Nova versão I70 |
+| **Apps Script** | **v1.5.169** (repo) | ping Web **v1.5.168** até Nova versão v1.5.169 |
 | **FOLHA VT I68** | ✅ 26/06 | B9 **8,80** · B10/B12 **22** · Milena VT **193,60** · Raykelly **103,25** |
 | **Planilha** | 23 abas | `schemaOk=True` · auditoria célula **23/23** |
 | **Homolog tablet** | ✅ 23/06 | I43 · I42 · I47 · Gestor — smoke v1.9.5 pendente Ops |

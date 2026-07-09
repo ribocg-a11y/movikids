@@ -14,7 +14,7 @@ Use **este arquivo** para versão e ordem de publicação. Docs `DEPLOY_v1.5.xx_
 | **Gestão Pessoas** | **v1.9.5** | `gestao-pessoas.html?force=1.9.5` | ✅ |
 | **Portal acompanhar** | **v1.9.5** | `acompanhar.html` | ✅ |
 | **Service Worker** | **1.9.5** | `sw.js` | ✅ |
-| **GAS** | **v1.5.168** (header `.gs`) | ping Web **v1.5.167** (Nova versão I70 pendente) | ⚠️ colar `.gs` |
+| **GAS** | **v1.5.169** (header `.gs`) | ping Web **v1.5.168** (Nova versão v1.5.169 pendente) | ⚠️ colar `.gs` |
 
 **Ping:** https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec?action=ping
 

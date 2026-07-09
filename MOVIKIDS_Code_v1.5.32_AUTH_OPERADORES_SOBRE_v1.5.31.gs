@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.168
+// MOVI KIDS — Google Apps Script v1.5.169
+// v1.5.169: holerite competencia passada — bonus dias/meta da AUDITORIA do mes (nao mes corrente)
 // v1.5.168: I70 — MK_GAS_VERSAO_ unificada (ping/carregarInicio/validarSchema); repair FOLHA_PONTO OK sem horario
 // v1.5.167: I67b — ajustarFolhaVtAdmin (B9=8,80 B10/B12=22 via Web App)
 // v1.5.166: I67 — VT passes: B9 ida+volta/dia (sem ×2); B10 dias VT (nao B12 VA)
@@ -161,8 +162,8 @@
 
 // ── CONSTANTES ───────────────────────────────────────────────
 /** Versão exposta em ping, carregarInicio, validarSchema, gestaoPessoasStatus (bump com header). */
-const MK_GAS_VERSAO_  = 'v1.5.168';
-const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.168';
+const MK_GAS_VERSAO_  = 'v1.5.169';
+const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.169';
 const SHEET_ID   = '1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618';
 const DEPLOY_ID  = 'AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y';
 const WEBAPP_URL = `https://script.google.com/macros/s/${DEPLOY_ID}/exec`;
@@ -10289,7 +10290,6 @@ function gpLoadContext_() {
 function gpEnrichContextAudit_(ctx, competencia, operadores) {
   const compNorm = gpNormCompetencia_(competencia);
   const hoje = ctx.hoje;
-  const mesAtual = hoje.slice(3);
   const auditLocByOpId = {};
   const metaByDayByOpId = {};
   const opList = [];
@@ -10326,7 +10326,7 @@ function gpEnrichContextAudit_(ctx, competencia, operadores) {
       }
       const cfg = op.cfg;
       if (!cfg || cfg.ativo === false || !cfg.inicio) continue;
-      if (ts.data.slice(3) !== mesAtual) continue;
+      if (ts.data.slice(3) !== compNorm) continue;
       if (dateToCmp_(ts.data) < dateToCmp_(cfg.inicio)) continue;
       const shift = cfg.escala[String(weekdayFromDataStr_(ts.data))];
       if (!shift) continue;
@@ -10440,24 +10440,27 @@ function gpMetasPainel_(opId, competencia, ctx) {
   const locMesSheet = (sheet.diasMes || []).reduce(function (s, d) { return s + (Number(d.loc) || 0); }, 0);
   const bonusDiasSheet = (sheet.diasMes || []).filter(function (d) { return d.bonusOk; }).length;
   const auditLoc = gpLocStatsFromAuditoria_(opId, competencia, ctx);
+  const compAtual = gpNormCompetencia_(gpCompetenciaAtual_());
+  const compSel = gpNormCompetencia_(competencia);
+  const isCompAtual = compSel === compAtual;
   const live = (ctx && ctx.metaByDayByOpId)
     ? gpMetaPayloadFromCtx_(opId, ctx)
     : buildMetaOperadorPayload_(opId);
   if (!live.ok || !live.configurado) {
     return {
-      alvo: sheet.alvo, atual: Math.max(sheet.atual || 0, auditLoc.locHoje),
+      alvo: sheet.alvo, atual: isCompAtual ? Math.max(sheet.atual || 0, auditLoc.locHoje) : (sheet.atual || 0),
       locMes: Math.max(locMesSheet, auditLoc.locMes),
       bonusDias: bonusDiasSheet, bonusTotal: sheet.bonusTotal || 0,
       bonusValor: sheet.bonusValor, bonusMin: sheet.bonusMin, diasMes: sheet.diasMes
     };
   }
   const locMesLive = live.mes && live.mes.locTotal ? live.mes.locTotal : 0;
-  const atualLive = live.hoje && live.hoje.n ? live.hoje.n : 0;
+  const atualLive = isCompAtual && live.hoje && live.hoje.n ? live.hoje.n : 0;
   const bonusDiasLive = live.mes && live.mes.diasComMeta ? live.mes.diasComMeta : 0;
   const bonusLive = live.mes && live.mes.bonusEstimado ? live.mes.bonusEstimado : 0;
   return {
     alvo: live.meta || sheet.alvo,
-    atual: Math.max(atualLive, auditLoc.locHoje, sheet.atual || 0),
+    atual: isCompAtual ? Math.max(atualLive, auditLoc.locHoje, sheet.atual || 0) : Math.max(sheet.atual || 0, auditLoc.locHoje),
     locMes: Math.max(locMesLive, locMesSheet, auditLoc.locMes),
     bonusDias: Math.max(bonusDiasLive, bonusDiasSheet),
     bonusTotal: Math.max(bonusLive, sheet.bonusTotal || 0),
@@ -11390,7 +11393,7 @@ function gpBuildPainelColaboradorPayload_(opId, comp, colab, operador) {
     comunicados: gpComunicadosForOp_(opId),
     avaliacoes: gpAvaliacoesForOp_(opId, comp),
     historicoDesempenho: historicoDesempenho,
-    versao: 'v1.5.140'
+    versao: MK_GAS_VERSAO_
   };
 }
 
@@ -11794,7 +11797,7 @@ function painelGestaoPessoasAdmin_(p) {
         total: colaboradores.length, presentes: presentes, comTurno: comTurno,
         alertas: alertasPack.total, alertasIntel: intelRh.length
       },
-      sessaoAtiva: sessao, versao: 'v1.5.148',
+      sessaoAtiva: sessao, versao: MK_GAS_VERSAO_,
       comunicadosRh: gpComunicadosAllAdmin_(),
       avaliacoesRh: gpAvaliacoesAllAdmin_(),
       competenciasRh: GP_COMPETENCIAS_RH_

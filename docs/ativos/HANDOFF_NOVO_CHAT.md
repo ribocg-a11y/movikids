@@ -1,6 +1,6 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 09/07/2026 · FE **v1.9.5** · GAS **v1.5.168** (repo) / **v1.5.167** (Web até Nova versão) · **Ciclo:** Sprint D pós One UI  
+**Atualizado:** 09/07/2026 · FE **v1.9.5** · GAS **v1.5.169** (repo) · **Ciclo:** Sprint D pós One UI  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **Repo local:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`  
@@ -63,7 +63,7 @@ cursor "C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-mo
 | **Gestão Pessoas** | **v1.9.5** | `gestao-pessoas.html?force=1.9.5` |
 | **Portal acompanhar** | **v1.9.5** | `acompanhar.html` cache bust alinhado |
 | **Service Worker** | **1.9.5** | `sw.js` |
-| **Apps Script** | **v1.5.168** (repo) | Web **v1.5.167** até Nova versão I70 |
+| **Apps Script** | **v1.5.169** (repo) | Web **v1.5.168** até Nova versão v1.5.169 |
 | **PIN admin** | **1421** | Script Property `ADMIN_PIN` |
 | **Homolog tablet** | ✅ 23/06 | I43 · I42 · I47 · Gestor |
 | **Planilha** | 23 abas | `schemaOk=True` · auditoria **23/23** |
@@ -119,7 +119,7 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 | 2 | Assinar **FASE 17** (só falta **17.5 F9**) + smoke tablet D4 | Sócio + Ops | ⏳ **próximo** |
 | 3 | Smoke tablet **v1.9.5** (regressão balcão) | Ops | ⏳ Sprint D4 |
 | 4 | Sprint One UI A–C + I24 | Agente | ✅ **v1.9.2** |
-| 5 | GAS Nova versão Web **v1.5.168** (I70) | Sócio | ⏳ após colar `.gs` |
+| 5 | GAS Nova versão Web **v1.5.169** (I70 + holerite comp.) | Sócio | ⏳ colar `.gs` + Nova versão |
 
 Docs: `PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md` · `CHECKLIST_FASE17_FECHAMENTO.md`
 
