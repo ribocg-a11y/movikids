@@ -1,6 +1,6 @@
 # MOVI KIDS — Mapa de erros, falhas e bugs
 
-**Atualizado:** 23/06/2026 — **I49** VA 520 · **I48** perf · FE **v1.8.118** · GAS **v1.5.143**  
+**Atualizado:** 09/07/2026 — **I70** versões GAS · FE **v1.9.5** · GAS repo **v1.5.168**  
 **Uso anterior:** 22/06/2026 — **I38–I41** auditoria RH 22/06 · GAS repo **v1.5.129** (ping **v1.5.107**) · FE **v1.8.110**  
 **Uso anterior:** 17/06/2026 — **I28** liberar sessão tablet · GAS **v1.5.92** prod. · FE **v1.8.30**  
 **Uso anterior:** 09/06/2026 — **I22 fechado** (hotfix FE v1.8.2)  
@@ -76,6 +76,7 @@
 | **I67** | **RESPONSAVEIS L233 tel curto (import K.1)** | Audit célula warn; duplicata VERA `98987203839` | OAuth merge + delete L233 · **25/06** | `AUDITORIA_CELULA_PLANILHA` | `INCIDENTE_I67_RESP_NEIDE_L233_DUPLICATA_2026-06-25.md` |
 | **I68** | **VT folha dobrado + dias VA no lugar de VT** | ~R$ 437 passes; timeout 25s Colaboradores | GAS **v1.5.167** · FE **v1.9.2** · B9=8,80 B10=22 · **26/06** | `TESTE_INVESTIGACAO_VT_COLABORADORES` | `INCIDENTE_I68_VT_FOLHA_DUPLO_2026-06-26.md` |
 | **I69** | **Ponto mock falso sucesso sem `gpSessionPin`** | Raykelly: tela OK mas planilha vazia / confusão PIN | FE **v1.9.3** · **27/06** | `gestao-pessoas.html` `MK_GP_PROD` | `INCIDENTE_I69_PONTO_MOCK_FALSO_SUCESSO_2026-06-27.md` |
+| **I70** | **Strings versão GAS defasadas + FOLHA_PONTO OK sem horário** | `carregarInicio` v1.5.123; audit 5 linhas | GAS **v1.5.168** · `MK_GAS_VERSAO_` · `repairFolhaPontoOkSemHorarioCore_` | `guard.gas.versao` | **`REPARAR_RH_CAMADA5_PLANILHA_ADMIN`** após Nova versão Web |
 | **I42** | Conta do dia — mesmo telefone 10h–22h | Caixa `n` vs sessões; maquininha | GAS **v1.5.131+** col S `conta_id` | `TESTE_I42_CONTA_DIA_CAIXA` | não reduzir `COL_LOC_READ_` (ver I43) |
 | **I41** | **`ping_` versão defasada** (v1.5.107 vs repo) | Confusão deploy / verify | GAS **v1.5.130** `ping_()` alinhado | `ping_` header alinhado | ping = v1.5.130 |
 | I2 | GAS offline + timer local | Extra fantasma | ADM `somentePlano`; offline v1.7.6 | `FIX_OFFLINE_ENCERRAR` | tablet encerrar |

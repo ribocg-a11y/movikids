@@ -1,6 +1,6 @@
 # MOVI KIDS — Deploy atual (referência única)
 
-**Atualizado:** 27/06/2026 (Premium One UI v1.9.2 + travas I24)
+**Atualizado:** 09/07/2026 (FE v1.9.5 + GAS repo v1.5.168 I70)
 
 Use **este arquivo** para versão e ordem de publicação. Docs `DEPLOY_v1.5.xx_*` em **`docs/arquivo/deploy/`** são histórico.
 
@@ -10,10 +10,11 @@ Use **este arquivo** para versão e ordem de publicação. Docs `DEPLOY_v1.5.xx_
 
 | Camada | Repo | Produção (ping / Pages) | Alinhado? |
 |--------|------|-------------------------|-----------|
-| **Frontend** | **v1.9.2** | https://ribocg-a11y.github.io/movikids/?force=1.9.2 | ✅ Pages |
-| **Gestão Pessoas** | **v1.9.2** | `gestao-pessoas.html?force=1.9.2` | ✅ |
-| **Service Worker** | **1.9.2** | `sw.js` | ✅ |
-| **GAS** | **v1.5.167** (header `.gs`) | ping Web **v1.5.165–167** (reimplantar se desalinhado) | ⚠️ verificar ping |
+| **Frontend** | **v1.9.5** | https://ribocg-a11y.github.io/movikids/?force=1.9.5 | ✅ Pages |
+| **Gestão Pessoas** | **v1.9.5** | `gestao-pessoas.html?force=1.9.5` | ✅ |
+| **Portal acompanhar** | **v1.9.5** | `acompanhar.html` | ✅ |
+| **Service Worker** | **1.9.5** | `sw.js` | ✅ |
+| **GAS** | **v1.5.168** (header `.gs`) | ping Web **v1.5.167** (Nova versão I70 pendente) | ⚠️ colar `.gs` |
 
 **Ping:** https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec?action=ping
 

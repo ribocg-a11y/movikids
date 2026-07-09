@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.167
+// MOVI KIDS — Google Apps Script v1.5.168
+// v1.5.168: I70 — MK_GAS_VERSAO_ unificada (ping/carregarInicio/validarSchema); repair FOLHA_PONTO OK sem horario
 // v1.5.167: I67b — ajustarFolhaVtAdmin (B9=8,80 B10/B12=22 via Web App)
 // v1.5.166: I67 — VT passes: B9 ida+volta/dia (sem ×2); B10 dias VT (nao B12 VA)
 // v1.5.164: I65 — isLocacaoTeste TESTE_* / TESTE I43; historico oculta teste; tag anulada
@@ -159,6 +160,9 @@
 // ═══════════════════════════════════════════════════════════
 
 // ── CONSTANTES ───────────────────────────────────────────────
+/** Versão exposta em ping, carregarInicio, validarSchema, gestaoPessoasStatus (bump com header). */
+const MK_GAS_VERSAO_  = 'v1.5.168';
+const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.168';
 const SHEET_ID   = '1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618';
 const DEPLOY_ID  = 'AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y';
 const WEBAPP_URL = `https://script.google.com/macros/s/${DEPLOY_ID}/exec`;
@@ -629,9 +633,9 @@ function ping_() {
   const agora = new Date();
   return resp_({
     status:  'online',
-    versao:  'v1.5.167',
+    versao:  MK_GAS_VERSAO_,
     timestamp: fmtData_(agora) + ' ' + fmtHoraLocal_(agora),
-    sistema: 'MOVI KIDS v1.5.167',
+    sistema: MK_GAS_SISTEMA_,
     postWriteActions: WRITE_ACTIONS_CRITICAS_
   });
 }
@@ -807,7 +811,7 @@ function validarSchema_() {
   resultado.AVALIACOES_RH = shAv ? validarAvaliacoesRhSchema_(shAv) : { existe: false, ok: false, erro: 'Aba ausente' };
 
   return resp_({
-    versao: 'v1.5.161',
+    versao: MK_GAS_VERSAO_,
     schemaOk: Object.values(resultado).every(r => r.ok),
     resultado
   });
@@ -2640,6 +2644,28 @@ function repairFolhaPontoFormatosCore_() {
   return { linhas: n };
 }
 
+/** I70 — situacao OK sem entrada/saida quebra audit I62; corrige para Folga ou Aberto. */
+function repairFolhaPontoOkSemHorarioCore_() {
+  const sheet = sh_getOrCreate_('FOLHA_PONTO');
+  const start = 2;
+  const last = sheet.getLastRow();
+  let corrigidos = 0;
+  if (last < start) return { corrigidos: 0 };
+  const rows = sheet.getRange(start, 1, last - start + 1, COL_FOLHA_PONTO_READ_).getValues();
+  rows.forEach(function (r, idx) {
+    const rowIndex = start + idx;
+    const sit = String(r[7] || '').trim().toUpperCase();
+    if (sit !== 'OK') return;
+    const ent = String(r[4] || '').trim();
+    const sai = String(r[5] || '').trim();
+    if (ent && sai) return;
+    const novoSit = ent && !sai ? 'Aberto' : 'Folga';
+    sheet.getRange(rowIndex, 8).setValue(novoSit);
+    corrigidos++;
+  });
+  return { corrigidos: corrigidos };
+}
+
 function repararFolhaPontoPlanilhaAdmin_(p) {
   if (!adminPinOk_(p)) return err_('Acesso negado — PIN administrativo incorreto', 403);
   const dryRun = String(p.dryRun || '') === '1' || p.dryRun === true;
@@ -2656,11 +2682,12 @@ function repararFolhaPontoPlanilhaAdmin_(p) {
   try {
     const header = repairFolhaPontoHeaderCore_();
     const formatos = repairFolhaPontoFormatosCore_();
+    const situacao = repairFolhaPontoOkSemHorarioCore_();
     const audit = auditFolhaPontoSampleCore_(20);
     const schema = validarFolhaPontoSchema_(sh_getOrCreate_('FOLHA_PONTO'));
     return resp_({
-      mensagem: 'FOLHA_PONTO reparada (header, formato data)',
-      header: header, formatos: formatos, audit: audit, schemaOk: schema.ok, registros: audit.registros, versao: 'v1.5.160'
+      mensagem: 'FOLHA_PONTO reparada (header, formato data, situacao OK sem horario)',
+      header: header, formatos: formatos, situacao: situacao, audit: audit, schemaOk: schema.ok, registros: audit.registros, versao: MK_GAS_VERSAO_
     });
   } catch (ex) {
     return err_('repararFolhaPontoPlanilhaAdmin: ' + ex.message, 500);
@@ -6872,7 +6899,7 @@ function carregarInicio_(p) {
     }
   }
   const payload = {
-    sistema:    'MOVI KIDS v1.5.123',
+    sistema:    MK_GAS_SISTEMA_,
     timestamp:  dataHoje + ' ' + fmtHoraLocal_(hoje),
     ativos:     ativas,
     statsHoje,
@@ -11786,7 +11813,7 @@ function gestaoPessoasStatus_() {
   const ss = ss_();
   const abas = [SH_COLAB_RH, SH_FOLHA_PONTO, SH_ESCALA_COLAB, SH_FALTAS, SH_HOLERITES, SH_METAS_COLAB, SH_BANCO_HORAS, SH_COMUNICADOS_RH, SH_AVALIACOES_RH];
   const ok = abas.every(function (n) { return !!ss.getSheetByName(n); });
-  return resp_({ ok: ok, abas: abas.map(function (n) { return { nome: n, existe: !!ss.getSheetByName(n) }; }), versao: 'v1.5.142' });
+  return resp_({ ok: ok, abas: abas.map(function (n) { return { nome: n, existe: !!ss.getSheetByName(n) }; }), versao: MK_GAS_VERSAO_ });
 }
 
 /** I45 — inventário completo da planilha + RH auditável (admin PIN). */

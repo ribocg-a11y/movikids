@@ -1,6 +1,6 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 29/06/2026 · FE **v1.9.3** · GAS **v1.5.167** · **Ciclo:** Sprint D pós One UI  
+**Atualizado:** 09/07/2026 · FE **v1.9.5** · GAS **v1.5.168** (repo) / **v1.5.167** (Web até Nova versão) · **Ciclo:** Sprint D pós One UI  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **Repo local:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`  
@@ -55,18 +55,20 @@ cursor "C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-mo
 
 ---
 
-## Produção (27/06/2026)
+## Produção (09/07/2026)
 
 | Camada | Versão | URL / evidência |
 |--------|--------|-----------------|
-| **Frontend** | **v1.9.3** | https://ribocg-a11y.github.io/movikids/?force=1.9.3 |
-| **Gestão Pessoas** | **v1.9.3** | `gestao-pessoas.html?force=1.9.3` |
-| **Service Worker** | **1.9.3** | `sw.js` |
-| **Apps Script** | **v1.5.167** | lógica I68 ativa · ping string **v1.5.167** no repo (reimplantar se ping antigo) |
+| **Frontend** | **v1.9.5** | https://ribocg-a11y.github.io/movikids/?force=1.9.5 |
+| **Gestão Pessoas** | **v1.9.5** | `gestao-pessoas.html?force=1.9.5` |
+| **Portal acompanhar** | **v1.9.5** | `acompanhar.html` cache bust alinhado |
+| **Service Worker** | **1.9.5** | `sw.js` |
+| **Apps Script** | **v1.5.168** (repo) | Web **v1.5.167** até Nova versão I70 |
 | **PIN admin** | **1421** | Script Property `ADMIN_PIN` |
 | **Homolog tablet** | ✅ 23/06 | I43 · I42 · I47 · Gestor |
 | **Planilha** | 23 abas | `schemaOk=True` · auditoria **23/23** |
 | **FOLHA VT (I68)** | ✅ 26/06 | B9 **8,80** · B10/B12 **22** · B68 **5253,96** · B25 **18,18** |
+| **FOLHA_PONTO audit** | ⚠️ I70 | 5 linhas OK sem horário — repair v1.5.168 + `repararRhCamada5PlanilhaAdmin` |
 | **VT holerite** | ✅ API | Milena **193,60** · Raykelly **103,25** |
 | **Raykelly cadastro** | ✅ **100%** | API 26/06 · id 3 |
 | **Design System** | **v1.1** | `DESIGN_SYSTEM_MOVIKIDS.md` |
@@ -113,10 +115,11 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 |---|------|------|--------|
 | 1 | **Sprint D1** homolog PC admin v1.9.2 | Agente | ✅ **27/06** |
 | 1b | **I69** hotfix ponto mock → **v1.9.3** | Agente | ✅ **29/06** Pages |
+| 1c | **I70** varredura — versões GAS + FOLHA_PONTO repair | Agente | ✅ **09/07** repo v1.5.168 |
 | 2 | Assinar **FASE 17** (só falta **17.5 F9**) + smoke tablet D4 | Sócio + Ops | ⏳ **próximo** |
-| 3 | Smoke tablet **v1.9.3** (regressão balcão) | Ops | ⏳ Sprint D4 |
+| 3 | Smoke tablet **v1.9.5** (regressão balcão) | Ops | ⏳ Sprint D4 |
 | 4 | Sprint One UI A–C + I24 | Agente | ✅ **v1.9.2** |
-| 5 | GAS ping Web **v1.5.167** | Sócio | ⏳ opcional |
+| 5 | GAS Nova versão Web **v1.5.168** (I70) | Sócio | ⏳ após colar `.gs` |
 
 Docs: `PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md` · `CHECKLIST_FASE17_FECHAMENTO.md`
 
