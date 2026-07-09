@@ -517,11 +517,18 @@
 
   function gpAdmRenderEscala_() {
     const el = document.getElementById('gp-adm-escala');
-    if (!el || !gpAdmData_ || !gpAdmData_.escala) return;
+    if (!el || !gpAdmData_) return;
     const e = gpAdmData_.escala;
+    if (!e) {
+      el.innerHTML = '<p class="gp-adm-muted gp-adm-loading">Carregando escala…</p>';
+      return;
+    }
     const linhas = e.linhas || [];
     if (!linhas.length) {
-      el.innerHTML = '<p class="gp-adm-muted">Escala não cadastrada para ' + esc(e.competencia || '') + '.</p>';
+      const hint = gpAdmData_._partial
+        ? 'Aguardando painel RH (GAS v1.5.179+). Se persistir, republicar Nova versão Web.'
+        : 'Escala não cadastrada para ' + esc(e.competencia || '') + '.';
+      el.innerHTML = '<p class="gp-adm-muted">' + hint + '</p>';
       return;
     }
     el.innerHTML = '<table class="gp-adm-table"><tr><th>Nome</th>' + (e.colunas || []).map(function (d) { return '<th>' + esc(d) + '</th>'; }).join('') + '</tr>' +
@@ -934,7 +941,7 @@
   }
 
   function gpAdmGasPendingHtml_() {
-    return '<strong>Painel RH completo indisponível.</strong> Republicar GAS header <strong>v1.5.175</strong> (Nova versão Web no deploy <code>AKfycbwakQ...</code>). ' +
+    return '<strong>Painel RH completo indisponível.</strong> Republicar GAS header <strong>v1.5.179</strong> (Nova versão Web no deploy <code>AKfycbwakQ...</code>). ' +
       'Modo básico abaixo — lista e alertas de ponto.';
   }
 
@@ -958,11 +965,12 @@
         const d = await api(apiPayload, 60000);
         if (seq !== gpAdmLoadSeq_) return;
         if (!d.ok) {
-          if (!gpAdmData_ || !gpAdmData_._partial) {
-            gpAdmSetErr_(esc(d.erro || 'Erro painel RH') + ' <span class="gp-adm-muted">Modo básico ativo.</span>');
-          }
+          const errTxt = esc(d.erro || 'Erro painel RH');
+          gpAdmSetErr_('<strong>Painel RH:</strong> ' + errTxt + ' · Republicar GAS <strong>v1.5.179</strong> (Nova versão Web).');
+          if (typeof toast === 'function') toast(d.erro || 'Painel RH indisponível', 'error');
           return;
         }
+        delete d._partial;
         gpAdmData_ = d;
         gpAdmCompSel_ = d.competencia || compReq || gpAdmCompSel_;
         gpAdmCacheSet_(d);
