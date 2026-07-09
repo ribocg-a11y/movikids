@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.174
+// MOVI KIDS — Google Apps Script v1.5.175
+// v1.5.175: I77b — FOLHA_PONTO linha null (r[4]) quebrava painelGestaoPessoasAdmin
 // v1.5.174: I77 — painelGestaoPessoasAdmin: sync RH + ctx refresh; erro real no catch; AUDITORIA tail read
 // v1.5.173: I75 — operador novo → COLABORADORES_RH auto (Julia no hub Colaboradores)
 // v1.5.172: I74 — painelGestaoPessoasAdmin: alertas RH do ctx (sem alertasInteligentes_ duplicado)
@@ -10139,11 +10140,16 @@ function gpSheet_(name) {
   return sh;
 }
 
+function gpRowValid_(r) {
+  return r && typeof r.length === 'number';
+}
+
 function gpRows_(name) {
   const sh = gpSheet_(name);
   const last = sh.getLastRow();
   if (last < GP_DATA_ROW) return [];
-  return sh.getRange(GP_DATA_ROW, 1, last - GP_DATA_ROW + 1, sh.getLastColumn()).getValues();
+  const raw = sh.getRange(GP_DATA_ROW, 1, last - GP_DATA_ROW + 1, sh.getLastColumn()).getValues();
+  return raw.filter(gpRowValid_);
 }
 
 /** Grava 1 linha — getRange(row,col,numRows,numCols) sem ambiguidade. */
@@ -10535,9 +10541,12 @@ function gpColabRhFromCtx_(opId, ctx) {
 }
 
 function gpStatusPontoFromCtx_(opId, ctx) {
-  const rows = ctx.folhaRows.filter(function (r) { return Number(r[1]) === Number(opId) && cellToStr_(r[2]) === ctx.hoje; });
+  const rows = ctx.folhaRows.filter(function (r) {
+    return gpRowValid_(r) && Number(r[1]) === Number(opId) && cellToStr_(r[2]) === ctx.hoje;
+  });
   if (!rows.length) return { status: 'fora', entrada: null, saida: null };
   const r = rows[rows.length - 1];
+  if (!gpRowValid_(r)) return { status: 'fora', entrada: null, saida: null };
   const ent = cellToStr_(r[4]); const sai = cellToStr_(r[5]);
   if (ent && !sai) return { status: 'dentro', entrada: ent, saida: null };
   if (ent && sai) return { status: 'fora', entrada: ent, saida: sai };
@@ -10651,6 +10660,7 @@ function gpDataNaCompetencia_(dataVal, competencia) {
 function gpBuildPontoMapMes_(opId, competencia, ctx) {
   const map = {};
   ctx.folhaRows.forEach(function (r) {
+    if (!gpRowValid_(r)) return;
     if (Number(r[1]) !== Number(opId)) return;
     if (!gpDataNaCompetencia_(r[2], competencia)) return;
     const dataKey = cellToStr_(r[2]);
@@ -11457,9 +11467,12 @@ function gpBancoHoras_(opId) {
 
 function gpStatusPontoHoje_(opId) {
   const hoje = fmtData_(new Date());
-  const rows = gpRows_(SH_FOLHA_PONTO).filter(function (r) { return Number(r[1]) === Number(opId) && cellToStr_(r[2]) === hoje; });
+  const rows = gpRows_(SH_FOLHA_PONTO).filter(function (r) {
+    return gpRowValid_(r) && Number(r[1]) === Number(opId) && cellToStr_(r[2]) === hoje;
+  });
   if (!rows.length) return { status: 'fora', entrada: null, saida: null };
   const r = rows[rows.length - 1];
+  if (!gpRowValid_(r)) return { status: 'fora', entrada: null, saida: null };
   const ent = cellToStr_(r[4]); const sai = cellToStr_(r[5]);
   if (ent && !sai) return { status: 'dentro', entrada: ent, saida: null };
   if (ent && sai) return { status: 'fora', entrada: ent, saida: sai };

@@ -866,6 +866,7 @@
       if (typeof applySessaoAtivaFromApi_ === 'function') applySessaoAtivaFromApi_(r);
       gpAdmRenderPresenca_();
       gpAdmRenderKpis_();
+      gpAdmRenderHoje_();
       return true;
     } catch (e) {
       return false;
@@ -905,10 +906,55 @@
   }
 
   function gpAdmGasPendingHtml_() {
-    return '<strong>GAS desatualizado no Web App.</strong> Publique <strong>Nova versão Web</strong> do deploy <code>AKfycbwakQ...</code> com repo <strong>v1.5.130+</strong> para painel RH completo. ' +
-      'No editor Apps Script: Implantar → Editar (lápis) → <strong>Nova versão</strong> (mesmo deploy). ' +
-      'Arquivo: <code>MOVIKIDS_Code_v1.5.32...</code> header <strong>v1.5.102</strong>. ' +
-      'Enquanto isso, aba <em>Cadastro &amp; sessão</em> funciona; aba <em>Hoje</em> mostra só operadores (modo limitado).';
+    return '<strong>Painel RH completo indisponível.</strong> Republicar GAS header <strong>v1.5.175</strong> (Nova versão Web no deploy <code>AKfycbwakQ...</code>). ' +
+      'Modo básico abaixo — lista e alertas de ponto.';
+  }
+
+  async function gpAdmLoadAlertasQuick_() {
+    try {
+      const alertas = await api(Object.assign({ action: 'alertasPontoGestaoAdmin', _t: Date.now() }, gpAdmPinParams_()), 25000);
+      if (!alertas || !alertas.ok || !gpAdmData_) return;
+      gpAdmData_.alertas = alertas.alertas || [];
+      gpAdmData_.alertasTotal = alertas.total || 0;
+      if (gpAdmData_.kpis) gpAdmData_.kpis.alertas = alertas.total || 0;
+      gpAdmRenderHoje_();
+      gpAdmRenderKpis_();
+    } catch (e) { /* ok */ }
+  }
+
+  function gpAdmLoadPainelBackground_(seq, compReq, opts) {
+    const apiPayload = Object.assign({ action: 'painelGestaoPessoasAdmin', _t: Date.now() }, gpAdmPinParams_());
+    if (compReq) apiPayload.competencia = compReq;
+    (async function () {
+      try {
+        const d = await api(apiPayload, 60000);
+        if (seq !== gpAdmLoadSeq_) return;
+        if (!d.ok) {
+          if (!gpAdmData_ || !gpAdmData_._partial) {
+            gpAdmSetErr_(esc(d.erro || 'Erro painel RH') + ' <span class="gp-adm-muted">Modo básico ativo.</span>');
+          }
+          return;
+        }
+        gpAdmData_ = d;
+        gpAdmCompSel_ = d.competencia || compReq || gpAdmCompSel_;
+        gpAdmCacheSet_(d);
+        if (typeof applySessaoAtivaFromApi_ === 'function') applySessaoAtivaFromApi_(d);
+        gpAdmRender_();
+        gpAdmSetErr_('');
+        if (opts && opts.force && compReq && typeof toast === 'function') {
+          toast('Folha de ' + gpAdmCompLabel_(gpAdmCompSel_) + ' carregada', 'success');
+        }
+        if (gpAdmTab_ === 'cadastro' && typeof refreshOperadoresAdmin_ === 'function') await refreshOperadoresAdmin_();
+      } catch (e) {
+        if (seq !== gpAdmLoadSeq_) return;
+        if (!gpAdmData_ || !gpAdmData_._partial) {
+          const msg = (e && e.message) || 'Erro de conexão';
+          gpAdmSetErr_(esc(msg) + ' <span class="gp-adm-muted">Modo básico ativo.</span>');
+        }
+      } finally {
+        if (seq === gpAdmLoadSeq_) gpAdmLoadPromise_ = null;
+      }
+    })();
   }
 
   window.mkGpAdmLoad_ = async function mkGpAdmLoad_(opts) {
@@ -933,49 +979,15 @@
     gpAdmLoadPromise_ = (async function () {
       try {
         await gpAdmHydrateColabQuick_();
-        const apiPayload = Object.assign({ action: 'painelGestaoPessoasAdmin', _t: Date.now() }, gpAdmPinParams_());
-        if (compReq) apiPayload.competencia = compReq;
-        const d = await api(apiPayload, 90000);
-        if (seq !== gpAdmLoadSeq_) return;
-        if (!d.ok) {
-          const msg = d.erro || 'Erro ao carregar gestão';
-          const gasPending = String(msg).indexOf('painelGestaoPessoasAdmin') >= 0 || String(msg).indexOf('desconhecida') >= 0;
-          if (gasPending) {
-            gpAdmSetErr_(gpAdmGasPendingHtml_());
-          } else {
-            gpAdmSetErr_(esc(msg) + (String(msg).indexOf('ausentes') >= 0
-              ? ' <button type="button" class="gp-adm-link" onclick="mkGpAdmInstalarAbas_()">Instalar abas agora</button>'
-              : ' <span class="gp-adm-muted">Lista básica carregada abaixo.</span>'));
-          }
-          try { await gpAdmLoadFallback_(msg); } catch (e) { /* partial quick list */ }
-          if (typeof refreshOperadoresAdmin_ === 'function') await refreshOperadoresAdmin_();
-          return;
-        }
-        gpAdmData_ = d;
-        gpAdmCompSel_ = d.competencia || compReq || gpAdmCompSel_;
-        gpAdmCacheSet_(d);
-        if (typeof applySessaoAtivaFromApi_ === 'function') applySessaoAtivaFromApi_(d);
-        gpAdmRender_();
+        await gpAdmLoadAlertasQuick_();
+        gpAdmRenderHoje_();
         gpAdmSetErr_('');
-        if (opts?.force && compReq && typeof toast === 'function') {
-          toast('Folha de ' + gpAdmCompLabel_(gpAdmCompSel_) + ' carregada', 'success');
-        }
-        if (gpAdmTab_ === 'cadastro' && typeof refreshOperadoresAdmin_ === 'function') await refreshOperadoresAdmin_();
+        gpAdmLoadPainelBackground_(seq, compReq, opts);
       } catch (e) {
         if (seq !== gpAdmLoadSeq_) return;
-        const msg = (e && e.message) || 'Erro de conexão';
-        if (String(msg).indexOf('timeout') >= 0) {
-          gpAdmSetErr_('Demorou demais — lista básica abaixo. Publique GAS v1.5.174+ se jornada não aparecer.');
-        } else if (String(msg).indexOf('painelGestaoPessoasAdmin') >= 0) {
-          gpAdmSetErr_(gpAdmGasPendingHtml_());
-        } else {
-          gpAdmSetErr_(esc(msg) + ' <span class="gp-adm-muted">Lista básica abaixo.</span>');
-        }
-        try { await gpAdmLoadFallback_(msg); } catch (e2) { /* partial quick list */ }
+        try { await gpAdmLoadFallback_(e.message || 'Erro'); } catch (e2) { /* ignore */ }
         if (!gpAdmData_) await gpAdmHydrateColabQuick_();
-        if (gpAdmData_) gpAdmRenderPresenca_();
-        if (typeof refreshOperadoresAdmin_ === 'function') await refreshOperadoresAdmin_();
-      } finally {
+        gpAdmSetErr_('');
         if (seq === gpAdmLoadSeq_) gpAdmLoadPromise_ = null;
       }
     })();
