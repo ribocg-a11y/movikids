@@ -18,7 +18,29 @@
     const norm = String(raw).replace(/\//g, '');
     const now = new Date();
     const cur = String(now.getMonth() + 1).padStart(2, '0') + String(now.getFullYear());
-    return 'mk_gp_adm_' + (norm || cur);
+    return 'mk_gp_adm_v3_' + (norm || cur);
+  }
+
+  function gpAdmIsFullPanel_(d) {
+    if (!d || d._partial) return false;
+    const esc = d.escala && d.escala.linhas && d.escala.linhas.length;
+    const fol = d.folha && d.folha.length;
+    return !!(esc || fol);
+  }
+
+  function gpAdmTabNeedsFullPanel_(tab) {
+    return tab === 'escala' || tab === 'metas' || tab === 'folha' || tab === 'comunicados' || tab === 'avaliacoes';
+  }
+
+  function gpAdmRenderTab_(tab) {
+    if (!gpAdmData_) return;
+    if (tab === 'escala') gpAdmRenderEscala_();
+    else if (tab === 'metas') gpAdmRenderMetas_();
+    else if (tab === 'folha') gpAdmRenderFolha_();
+    else if (tab === 'comunicados') gpAdmRenderComunicados_();
+    else if (tab === 'avaliacoes') gpAdmRenderAvaliacoes_();
+    else if (tab === 'hoje') { gpAdmRenderKpis_(); gpAdmRenderHoje_(); }
+    else if (tab === 'presenca') gpAdmRenderPresenca_();
   }
 
   function gpAdmCacheGet_(comp) {
@@ -210,7 +232,12 @@
   window.mkGpAdmSetTab = function (tab) {
     if (tab !== 'folha' && typeof mkGpAdmFecharHolerite_ === 'function') mkGpAdmFecharHolerite_();
     gpAdmSetTab_(tab);
-    if (!gpAdmData_ && typeof window.mkGpAdmLoad_ === 'function') window.mkGpAdmLoad_();
+    gpAdmRenderTab_(tab);
+    if (!gpAdmData_ && typeof window.mkGpAdmLoad_ === 'function') {
+      window.mkGpAdmLoad_();
+    } else if (gpAdmTabNeedsFullPanel_(tab) && gpAdmData_ && gpAdmData_._partial && typeof window.mkGpAdmLoad_ === 'function') {
+      window.mkGpAdmLoad_({ force: true, competencia: gpAdmCompSel_ || gpAdmData_.competencia });
+    }
     if (tab === 'cadastro' && typeof refreshOperadoresAdmin_ === 'function') refreshOperadoresAdmin_();
   };
 
@@ -877,22 +904,47 @@
       cols.sort(function (a, b) { return String(a.nome).localeCompare(String(b.nome), 'pt-BR'); });
       const now = new Date();
       const comp = gpAdmCompSel_ || (String(now.getMonth() + 1).padStart(2, '0') + '/' + now.getFullYear());
-      gpAdmData_ = {
-        ok: true, competencia: comp, colaboradores: cols,
-        escala: { competencia: comp, colunas: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'], linhas: [] },
-        folha: [], alertas: [], alertasTotal: 0, alertasInteligentes: [],
-        kpis: {
-          total: cols.length,
-          presentes: cols.filter(function (c) { return c.logadoBalcao; }).length,
-          comTurno: 0, alertas: 0, alertasIntel: 0
-        },
-        sessaoAtiva: r.sessaoAtiva, _partial: true
-      };
+      if (gpAdmIsFullPanel_(gpAdmData_)) {
+        const byId = {};
+        cols.forEach(function (c) { byId[c.id] = c; });
+        gpAdmData_.colaboradores = (gpAdmData_.colaboradores || []).map(function (c) {
+          const q = byId[c.id];
+          if (!q) return c;
+          return Object.assign({}, c, {
+            cadastroPct: q.cadastroPct, cadastroOk: q.cadastroOk, logadoBalcao: q.logadoBalcao,
+            funcao: q.funcao || c.funcao, admissao: q.admissao || c.admissao, turno: q.turno || c.turno
+          });
+        });
+        cols.forEach(function (q) {
+          if (!(gpAdmData_.colaboradores || []).some(function (c) { return Number(c.id) === Number(q.id); })) {
+            gpAdmData_.colaboradores.push(q);
+          }
+        });
+        gpAdmData_.colaboradores.sort(function (a, b) { return String(a.nome).localeCompare(String(b.nome), 'pt-BR'); });
+        if (gpAdmData_.kpis) {
+          gpAdmData_.kpis.total = gpAdmData_.colaboradores.length;
+          gpAdmData_.kpis.presentes = gpAdmData_.colaboradores.filter(function (c) { return c.logadoBalcao; }).length;
+        }
+      } else {
+        gpAdmData_ = {
+          ok: true, competencia: comp, colaboradores: cols,
+          escala: { competencia: comp, colunas: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'], linhas: [] },
+          folha: [], alertas: [], alertasTotal: 0, alertasInteligentes: [],
+          kpis: {
+            total: cols.length,
+            presentes: cols.filter(function (c) { return c.logadoBalcao; }).length,
+            comTurno: 0, alertas: 0, alertasIntel: 0
+          },
+          sessaoAtiva: r.sessaoAtiva, _partial: true
+        };
+      }
       gpAdmCompSel_ = comp;
       if (typeof applySessaoAtivaFromApi_ === 'function') applySessaoAtivaFromApi_(r);
       gpAdmRenderPresenca_();
       gpAdmRenderKpis_();
       gpAdmRenderHoje_();
+      gpAdmRenderEscala_();
+      gpAdmRenderMetas_();
       return true;
     } catch (e) {
       return false;
