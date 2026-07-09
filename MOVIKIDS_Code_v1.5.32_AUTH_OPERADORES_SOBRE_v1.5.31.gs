@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.170
+// MOVI KIDS — Google Apps Script v1.5.171
+// v1.5.171: I73 — kpiMes lite pula alertasInteligentes/narrativa (perf Dashboard)
 // v1.5.170: I72 — metaProjecaoMes grafico: nao trava cedo; recalcula meta stale (ex. R$372 vs R$13k)
 // v1.5.169: holerite competencia passada — bonus dias/meta da AUDITORIA do mes (nao mes corrente)
 // v1.5.168: I70 — MK_GAS_VERSAO_ unificada (ping/carregarInicio/validarSchema); repair FOLHA_PONTO OK sem horario
@@ -163,8 +164,8 @@
 
 // ── CONSTANTES ───────────────────────────────────────────────
 /** Versão exposta em ping, carregarInicio, validarSchema, gestaoPessoasStatus (bump com header). */
-const MK_GAS_VERSAO_  = 'v1.5.170';
-const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.170';
+const MK_GAS_VERSAO_  = 'v1.5.171';
+const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.171';
 const SHEET_ID   = '1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618';
 const DEPLOY_ID  = 'AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y';
 const WEBAPP_URL = `https://script.google.com/macros/s/${DEPLOY_ID}/exec`;
@@ -6692,8 +6693,8 @@ function buildKpiMesPayload_(p) {
     folhaPlanejamento: folhaPlanejamento,
     viabilidadeContratacao: viabilidadeContratacao
   };
-  const narrativaExecutiva = buildNarrativaExecutiva_(narrativaCtx);
-  const cockpit = buildCockpitMeta_(Object.assign({}, narrativaCtx, { payback: payback }));
+  const narrativaExecutiva = skipAdvanced ? '' : buildNarrativaExecutiva_(narrativaCtx);
+  const cockpit = skipAdvanced ? {} : buildCockpitMeta_(Object.assign({}, narrativaCtx, { payback: payback }));
   const leadingFinanceiro = buildLeadingFinanceiros_(Object.assign({}, narrativaCtx, {
     payback: payback,
     diasOperando: diasOperando,
@@ -6721,8 +6722,10 @@ function buildKpiMesPayload_(p) {
     viabilidadeContratacao: viabilidadeContratacao
   });
   const alertasGestao = buildAlertasGestao_(alertaCtx);
-  const intelMes = alertasInteligentes_({ dataFmt: dataHoje, core: calcResumoDiaCore_(dataHoje), incluirPonto: false });
-  const alertas = mergeAlertasLista_(intelMes, alertasGestao, 12);
+  const intelMes = skipAdvanced
+    ? []
+    : alertasInteligentes_({ dataFmt: dataHoje, core: calcResumoDiaCore_(dataHoje), incluirPonto: false });
+  const alertas = skipAdvanced ? alertasGestao.slice(0, 12) : mergeAlertasLista_(intelMes, alertasGestao, 12);
   const sinalEmpresa = movikidsSinalEmpresa_(mesesRecentes, alertas);
 
   return {
@@ -6805,7 +6808,7 @@ function kpiMes_(p) {
   const mes = p && p.mes ? parseInt(p.mes) : hoje.getMonth() + 1;
   const ano = p && p.ano ? parseInt(p.ano) : hoje.getFullYear();
   const lite = (p && (String(p.lite || '') === '1' || String(p.lite || '').toLowerCase() === 'true')) ? '1' : '0';
-  const cacheKey = 'kpiMes82_' + mes + '_' + ano + '_L' + lite;
+  const cacheKey = 'kpiMes83_' + mes + '_' + ano + '_L' + lite;
   try {
     const cache = CacheService.getScriptCache();
     const hit = cache.get(cacheKey);

@@ -773,13 +773,15 @@ async function carregarKPIsDashboard(mes, ano) {
     }
     kpiDashApply_(dLite);
     kpiDashCacheSet_(mesEff, anoEff, dLite);
+    kpiDashSetLoading_(false);
 
     if (dLite.lite) {
-      const dFull = await api(base, 45000);
-      if (dFull && dFull.ok) {
-        kpiDashApply_(dFull);
-        kpiDashCacheSet_(mesEff, anoEff, dFull);
-      }
+      api(base, 45000).then(function (dFull) {
+        if (dFull && dFull.ok) {
+          kpiDashApply_(dFull);
+          kpiDashCacheSet_(mesEff, anoEff, dFull);
+        }
+      }).catch(function (e) { console.warn('kpiMes full (bg):', e); });
     }
 
     carregarResumoHojeAdmin_().then(function() {
@@ -1937,11 +1939,18 @@ function mkMetaProjecaoMes_(d) {
   }
 
   if (fromGas > 0 && !staleMeta_(fromGas)) {
-    try { localStorage.setItem(key, JSON.stringify({ val: fromGas, at: Date.now() })); } catch (e) { /* ignore */ }
+    try {
+      const prev = localStorage.getItem(key);
+      const next = JSON.stringify({ val: fromGas, at: Date.now() });
+      if (prev !== next) localStorage.setItem(key, next);
+    } catch (e) { /* ignore */ }
     return fromGas;
   }
   if (fromGas > 0 && staleMeta_(fromGas) && projFat > 0) {
-    try { localStorage.setItem(key, JSON.stringify({ val: projFat, at: Date.now() })); } catch (e) { /* ignore */ }
+    try {
+      const next = JSON.stringify({ val: projFat, at: Date.now() });
+      localStorage.setItem(key, next);
+    } catch (e) { /* ignore */ }
     return projFat;
   }
 
