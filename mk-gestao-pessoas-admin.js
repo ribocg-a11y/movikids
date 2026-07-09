@@ -833,6 +833,45 @@
     }
   };
 
+  async function gpAdmHydrateColabQuick_() {
+    try {
+      const r = await api(Object.assign({ action: 'listarOperadoresAdmin', _t: Date.now() }, gpAdmPinParams_()), 30000);
+      if (!r || !r.ok) return false;
+      const sessaoId = r.sessaoAtiva && r.sessaoAtiva.operadorId ? Number(r.sessaoAtiva.operadorId) : 0;
+      const cols = (r.operadores || []).filter(function (o) { return o.hasPin !== false; }).map(function (op) {
+        return {
+          id: op.id, nome: op.nome, hasPin: op.hasPin, perfil: op.perfil || 'operador',
+          funcao: 'Operador', turno: '', admissao: '', cadastroPct: 0, temRh: false,
+          ponto: { status: 'fora', entrada: null, saida: null },
+          logadoBalcao: sessaoId === Number(op.id),
+          metas: { alvo: 20, atual: 0, locMes: 0, bonusDias: 0, bonusTotal: 0 },
+          folhaPonto: []
+        };
+      });
+      cols.sort(function (a, b) { return String(a.nome).localeCompare(String(b.nome), 'pt-BR'); });
+      const now = new Date();
+      const comp = gpAdmCompSel_ || (String(now.getMonth() + 1).padStart(2, '0') + '/' + now.getFullYear());
+      gpAdmData_ = {
+        ok: true, competencia: comp, colaboradores: cols,
+        escala: { competencia: comp, colunas: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'], linhas: [] },
+        folha: [], alertas: [], alertasTotal: 0, alertasInteligentes: [],
+        kpis: {
+          total: cols.length,
+          presentes: cols.filter(function (c) { return c.logadoBalcao; }).length,
+          comTurno: 0, alertas: 0, alertasIntel: 0
+        },
+        sessaoAtiva: r.sessaoAtiva, _partial: true
+      };
+      gpAdmCompSel_ = comp;
+      if (typeof applySessaoAtivaFromApi_ === 'function') applySessaoAtivaFromApi_(r);
+      gpAdmRenderPresenca_();
+      gpAdmRenderKpis_();
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
   async function gpAdmLoadFallback_(errMsg) {
     const pin = gpAdmPinParams_();
     const ops = await api(Object.assign({ action: 'listarOperadoresAdmin', _t: Date.now() }, pin), 30000);
@@ -893,22 +932,22 @@
     gpAdmSetErr_('');
     gpAdmLoadPromise_ = (async function () {
       try {
+        await gpAdmHydrateColabQuick_();
         const apiPayload = Object.assign({ action: 'painelGestaoPessoasAdmin', _t: Date.now() }, gpAdmPinParams_());
         if (compReq) apiPayload.competencia = compReq;
-        const d = await api(apiPayload, 45000);
+        const d = await api(apiPayload, 90000);
         if (seq !== gpAdmLoadSeq_) return;
         if (!d.ok) {
           const msg = d.erro || 'Erro ao carregar gestão';
           const gasPending = String(msg).indexOf('painelGestaoPessoasAdmin') >= 0 || String(msg).indexOf('desconhecida') >= 0;
           if (gasPending) {
             gpAdmSetErr_(gpAdmGasPendingHtml_());
-            try { await gpAdmLoadFallback_(msg); } catch (e) { /* cadastro only */ }
-            if (typeof refreshOperadoresAdmin_ === 'function') await refreshOperadoresAdmin_();
-            return;
+          } else {
+            gpAdmSetErr_(esc(msg) + (String(msg).indexOf('ausentes') >= 0
+              ? ' <button type="button" class="gp-adm-link" onclick="mkGpAdmInstalarAbas_()">Instalar abas agora</button>'
+              : ' <span class="gp-adm-muted">Lista básica carregada abaixo.</span>'));
           }
-          gpAdmSetErr_(esc(msg) + (String(msg).indexOf('ausentes') >= 0
-            ? ' <button type="button" class="gp-adm-link" onclick="mkGpAdmInstalarAbas_()">Instalar abas agora</button>'
-            : ''));
+          try { await gpAdmLoadFallback_(msg); } catch (e) { /* partial quick list */ }
           if (typeof refreshOperadoresAdmin_ === 'function') await refreshOperadoresAdmin_();
           return;
         }
@@ -926,11 +965,15 @@
         if (seq !== gpAdmLoadSeq_) return;
         const msg = (e && e.message) || 'Erro de conexão';
         if (String(msg).indexOf('timeout') >= 0) {
-          gpAdmSetErr_('Demorou demais — publique GAS v1.5.107+ (AUDITORIA lida uma vez).');
+          gpAdmSetErr_('Demorou demais — lista básica abaixo. Publique GAS v1.5.174+ se jornada não aparecer.');
         } else if (String(msg).indexOf('painelGestaoPessoasAdmin') >= 0) {
           gpAdmSetErr_(gpAdmGasPendingHtml_());
-          try { await gpAdmLoadFallback_(msg); } catch (e2) { /* ignore */ }
-        } else gpAdmSetErr_(esc(msg));
+        } else {
+          gpAdmSetErr_(esc(msg) + ' <span class="gp-adm-muted">Lista básica abaixo.</span>');
+        }
+        try { await gpAdmLoadFallback_(msg); } catch (e2) { /* partial quick list */ }
+        if (!gpAdmData_) await gpAdmHydrateColabQuick_();
+        if (gpAdmData_) gpAdmRenderPresenca_();
         if (typeof refreshOperadoresAdmin_ === 'function') await refreshOperadoresAdmin_();
       } finally {
         if (seq === gpAdmLoadSeq_) gpAdmLoadPromise_ = null;

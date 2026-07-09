@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.173
+// MOVI KIDS — Google Apps Script v1.5.174
+// v1.5.174: I77 — painelGestaoPessoasAdmin: sync RH + ctx refresh; erro real no catch; AUDITORIA tail read
 // v1.5.173: I75 — operador novo → COLABORADORES_RH auto (Julia no hub Colaboradores)
 // v1.5.172: I74 — painelGestaoPessoasAdmin: alertas RH do ctx (sem alertasInteligentes_ duplicado)
 // v1.5.171: I73 — kpiMes lite pula alertasInteligentes/narrativa (perf Dashboard)
@@ -10417,7 +10418,11 @@ function gpLoadContext_() {
   try {
     const shAud = ss_().getSheetByName('AUDITORIA');
     if (shAud && shAud.getLastRow() >= 2) {
-      auditRows = shAud.getRange(2, 1, shAud.getLastRow(), 8).getValues();
+      const last = shAud.getLastRow();
+      const GP_AUD_TAIL_MAX_ = 4000;
+      const startRow = Math.max(2, last - GP_AUD_TAIL_MAX_ + 1);
+      const numRows = last - startRow + 1;
+      auditRows = shAud.getRange(startRow, 1, numRows, 8).getValues();
     }
   } catch (e) {
     Logger.log('gpLoadContext_ AUDITORIA: ' + e.message);
@@ -11838,6 +11843,9 @@ function painelGestaoPessoasAdmin_(p) {
     gpSyncRhColaboradoresPadrao_(ctx);
     const opsResp = JSON.parse(listarOperadoresLogin_().getContent());
     const operadores = opsResp.operadores || [];
+    gpSyncOperadoresAtivosToRh_(operadores);
+    ctx.rhRows = gpRows_(SH_COLAB_RH);
+    ctx.bancoRows = gpRows_(SH_BANCO_HORAS);
     gpEnrichContextAudit_(ctx, comp, operadores);
     const sessao = opsResp.sessaoAtiva || null;
     const sessaoId = sessao && sessao.operadorId ? Number(sessao.operadorId) : 0;
@@ -11858,6 +11866,13 @@ function painelGestaoPessoasAdmin_(p) {
       const escalaHoje = gpEscalaCelulaHojeFromCtx_(id, ctx, comp);
       const cadObj = rh ? gpCadastroFromRhObj_(rh) : null;
       const cadPct = rh ? gpCalcCadastroPct_(cadObj) : 0;
+      let jornadaOp = null;
+      try {
+        jornadaOp = gpAnaliseJornadaColab_(id, comp, ctx, rh);
+      } catch (jEx) {
+        Logger.log('painel jornada op ' + id + ': ' + jEx.message);
+        jornadaOp = { dias: [], totais: {}, bancoSaldo: '0h00', bancoProjetado: '0h00' };
+      }
       colaboradores.push({
         id: id, nome: op.nome, hasPin: op.hasPin, perfil: op.perfil || 'operador',
         funcao: rh ? rh.funcao : 'Operador', turno: rh ? rh.turno : '', admissao: rh ? rh.admissao : '',
@@ -11869,7 +11884,7 @@ function painelGestaoPessoasAdmin_(p) {
         ponto: ponto, logadoBalcao: sessaoId === id,
         metas: { alvo: metas.alvo, atual: metas.atual, locMes: locMes, bonusDias: bonusDias, bonusTotal: metas.bonusTotal || 0 },
         folhaPonto: folhaPonto,
-        jornada: gpAnaliseJornadaColab_(id, comp, ctx, rh)
+        jornada: jornadaOp
       });
     });
 
@@ -11885,6 +11900,13 @@ function painelGestaoPessoasAdmin_(p) {
       const escalaHoje = gpEscalaCelulaHojeFromCtx_(id, ctx, comp);
       const cadObj = rh ? gpCadastroFromRhObj_(rh) : null;
       const cadPct = rh ? gpCalcCadastroPct_(cadObj) : 0;
+      let jornadaRh = null;
+      try {
+        jornadaRh = gpAnaliseJornadaColab_(id, comp, ctx, rh);
+      } catch (jEx2) {
+        Logger.log('painel jornada rh ' + id + ': ' + jEx2.message);
+        jornadaRh = { dias: [], totais: {}, bancoSaldo: '0h00', bancoProjetado: '0h00' };
+      }
       colaboradores.push({
         id: id, nome: rh ? rh.nome : String(r[1] || ''), hasPin: false, perfil: 'operador',
         funcao: rh ? rh.funcao : 'Colaborador', turno: rh ? rh.turno : '', admissao: rh ? rh.admissao : '',
@@ -11897,7 +11919,7 @@ function painelGestaoPessoasAdmin_(p) {
         ponto: ponto, logadoBalcao: false,
         metas: { alvo: metas.alvo, atual: metas.atual, locMes: locMes, bonusDias: bonusDias, bonusTotal: metas.bonusTotal || 0 },
         folhaPonto: gpFolhaPontoFromCtx_(id, comp, ctx),
-        jornada: gpAnaliseJornadaColab_(id, comp, ctx, rh)
+        jornada: jornadaRh
       });
     });
 
@@ -11951,13 +11973,18 @@ function painelGestaoPessoasAdmin_(p) {
       avaliacoesRh: gpAvaliacoesAllAdmin_(),
       competenciasRh: GP_COMPETENCIAS_RH_
     };
-    const out = JSON.stringify({ ok: true, ...payload });
+    const out = JSON.stringify(Object.assign({ ok: true }, payload));
     try {
       if (out.length < 95000) CacheService.getScriptCache().put(cacheKey, out, 120);
     } catch (e) { /* ok */ }
     return ContentService.createTextOutput(out).setMimeType(ContentService.MimeType.JSON);
   } catch (ex) {
-    return err_('Abas Gestao Pessoas ausentes — rode instalar abas ou scripts/criar-abas-gestao-pessoas.ps1', 503);
+    Logger.log('painelGestaoPessoasAdmin_: ' + (ex && ex.message ? ex.message : ex));
+    const detail = ex && ex.message ? String(ex.message) : String(ex);
+    if (detail.indexOf('ausente') >= 0 || detail.indexOf('Aba ') >= 0) {
+      return err_('Abas Gestao Pessoas ausentes — rode instalar abas ou scripts/criar-abas-gestao-pessoas.ps1', 503);
+    }
+    return err_('painelGestaoPessoasAdmin: ' + detail, 500);
   }
 }
 
