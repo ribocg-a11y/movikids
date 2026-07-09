@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.177
+// MOVI KIDS — Google Apps Script v1.5.178
+// v1.5.178: I81 — restaurarPontoJuliaJul2026Admin (FOLHA_PONTO adm 01/07–09/07, hoje +20min)
 // v1.5.177: I80 — Julia admissão 01/07/2026 sync completo; painel null row; meta alertas id 4
 // v1.5.176: I79 — Julia (id 4) escala Atendente 2 + meta turno ativa; sync ESCALA_COLABORADORES
 // v1.5.175: I77b — FOLHA_PONTO linha null (r[4]) quebrava painelGestaoPessoasAdmin
@@ -170,7 +171,7 @@
 
 // ── CONSTANTES ───────────────────────────────────────────────
 /** Versão exposta em ping, carregarInicio, validarSchema, gestaoPessoasStatus (bump com header). */
-const MK_GAS_VERSAO_  = 'v1.5.177';
+const MK_GAS_VERSAO_  = 'v1.5.178';
 const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.173';
 const SHEET_ID   = '1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618';
 const DEPLOY_ID  = 'AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y';
@@ -551,8 +552,10 @@ function dispatchMoviAction_(p, method) {
       case 'repararCustosPlanilhaAdmin': return repararCustosPlanilhaAdmin_(p);
       case 'repararDashboardPlanilhaAdmin': return repararDashboardPlanilhaAdmin_(p);
       case 'salvarPontoRhAdmin': return salvarPontoRhAdmin_(p);
+      case 'excluirPontoRhAdmin': return excluirPontoRhAdmin_(p);
       case 'abonarFaltaRhAdmin': return abonarFaltaRhAdmin_(p);
       case 'restaurarPontoRaykellyJun2026Admin': return restaurarPontoRaykellyJun2026Admin_(p);
+      case 'restaurarPontoJuliaJul2026Admin': return restaurarPontoJuliaJul2026Admin_(p);
       case 'exportarCadastroRhAdmin': return exportarCadastroRhAdmin_(p);
       case 'buscarTextoPlanilhaAdmin': return buscarTextoPlanilhaAdmin_(p);
       case 'salvarRelatorioDrive':return salvarRelatorioDrive_(p);
@@ -11738,6 +11741,71 @@ function restaurarPontoRaykellyJun2026Admin_(p) {
  */
 function RESTAURAR_PONTO_RAYKELLY_JUN2026() {
   const r = JSON.parse(restaurarPontoRaykellyJun2026Admin_({ adminPin: '1421' }).getContent());
+  Logger.log(JSON.stringify(r, null, 2));
+  return r;
+}
+
+/** I81 — Julia id 4 · jul/2026 · dias de escala desde admissão 01/07; hoje entrada +20min. */
+function gpDeletePontoRhRow_(opId, dataStr) {
+  const sh = gpSheet_(SH_FOLHA_PONTO);
+  const rows = gpRows_(SH_FOLHA_PONTO);
+  for (let i = rows.length - 1; i >= 0; i--) {
+    if (!gpRowValid_(rows[i])) continue;
+    if (Number(rows[i][1]) === Number(opId) && cellToStr_(rows[i][2]) === dataStr) {
+      sh.deleteRow(GP_DATA_ROW + i);
+      return true;
+    }
+  }
+  return false;
+}
+
+function excluirPontoRhAdmin_(p) {
+  if (!adminPinOk_(p)) return err_('Acesso negado — PIN administrativo incorreto', 403);
+  const opId = Number(p.operadorId || 0);
+  const dataStr = String(p.data || '').trim();
+  if (!opId || !dataStr) return err_('operadorId e data obrigatorios', 400);
+  try {
+    const ok = gpDeletePontoRhRow_(opId, dataStr);
+    gpRepairLimparFaltasSyncJornada_(opId);
+    gpInvalidateRhCache_();
+    return resp_({ ok: true, operadorId: opId, data: dataStr, removido: ok });
+  } catch (ex) {
+    return err_('excluirPontoRhAdmin: ' + ex.message, 500);
+  }
+}
+
+function restaurarPontoJuliaJul2026Admin_(p) {
+  if (!adminPinOk_(p)) return err_('Acesso negado — PIN administrativo incorreto', 403);
+  const opId = GP_JULIA_OP_ID_;
+  ['01/07/2026', '06/07/2026'].forEach(function (d) { gpDeletePontoRhRow_(opId, d); });
+  const batidas = [
+    { data: '02/07/2026', entrada: '14:02', saida: '21:58', situacao: 'OK' },
+    { data: '03/07/2026', entrada: '13:58', saida: '22:01', situacao: 'OK' },
+    { data: '04/07/2026', entrada: '12:05', saida: '22:00', situacao: 'OK' },
+    { data: '05/07/2026', entrada: '13:00', saida: '21:02', situacao: 'OK' },
+    { data: '07/07/2026', entrada: '14:00', saida: '21:55', situacao: 'OK' },
+    { data: '09/07/2026', entrada: '14:20', saida: '22:00', situacao: 'Atraso' }
+  ];
+  const log = [];
+  batidas.forEach(function (b) {
+    log.push(gpUpsertPontoRhRow_(opId, b.data, b.entrada, b.saida, b.situacao || 'OK'));
+  });
+  const faltasSyncRemovidas = gpRepairLimparFaltasSyncJornada_(opId);
+  const faltasMesRemovidas = gpRepairLimparFaltasOpMesNaoAbonadas_(opId, 7, 2026);
+  const ctx = gpLoadContext_();
+  const rh = gpColabRhByOpId_(opId);
+  const jornada = gpAnaliseJornadaColab_(opId, '07/2026', ctx, rh);
+  gpPersistBancoHoras_(opId, jornada.bancoProjetado || '0h00');
+  gpInvalidateRhCache_();
+  return resp_({
+    ok: true, operadorId: opId, batidas: log.length, detalhe: log,
+    faltasSyncRemovidas: faltasSyncRemovidas, faltasMesRemovidas: faltasMesRemovidas,
+    bancoHoras: jornada.bancoProjetado, versao: MK_GAS_VERSAO_
+  });
+}
+
+function RESTAURAR_PONTO_JULIA_JUL2026() {
+  const r = JSON.parse(restaurarPontoJuliaJul2026Admin_({ adminPin: '1421' }).getContent());
   Logger.log(JSON.stringify(r, null, 2));
   return r;
 }
