@@ -78,6 +78,7 @@
 | **I69** | **Ponto mock falso sucesso sem `gpSessionPin`** | Raykelly: tela OK mas planilha vazia / confusão PIN | FE **v1.9.3** · **27/06** | `gestao-pessoas.html` `MK_GP_PROD` | `INCIDENTE_I69_PONTO_MOCK_FALSO_SUCESSO_2026-06-27.md` |
 | **I70** | **Strings versão GAS defasadas + FOLHA_PONTO OK sem horário** | `carregarInicio` v1.5.123; audit 5 linhas | GAS **v1.5.169** · `MK_GAS_VERSAO_` · `repairFolhaPontoOkSemHorarioCore_` | `guard.gas.versao` | **`REPARAR_RH_CAMADA5_PLANILHA_ADMIN`** após Nova versão Web |
 | **I71** | **Holerite competência passada — bonus dias/meta do mês errado** | Filtro mês anterior mostrava bonus/loc do mês corrente | GAS **v1.5.169** · `gpEnrichContextAudit_` usa `compNorm` | FE v1.9.5 competencia param | painel admin/colab holerite mês anterior |
+| **I72** | **Gráfico projeção — meta travada cedo demais (R$372 vs R$13k)** | Linha roxa colada no zero; 3000%+ acima projetado | GAS **v1.5.170** · `metaProjecaoStale_` + trava após 3 dias · FE **v1.9.6** | `PROJ_CHART_MM_YYYY` Script Property | Dashboard gráfico projetado vs real |
 | **I42** | Conta do dia — mesmo telefone 10h–22h | Caixa `n` vs sessões; maquininha | GAS **v1.5.131+** col S `conta_id` | `TESTE_I42_CONTA_DIA_CAIXA` | não reduzir `COL_LOC_READ_` (ver I43) |
 | **I41** | **`ping_` versão defasada** (v1.5.107 vs repo) | Confusão deploy / verify | GAS **v1.5.130** `ping_()` alinhado | `ping_` header alinhado | ping = v1.5.130 |
 | I2 | GAS offline + timer local | Extra fantasma | ADM `somentePlano`; offline v1.7.6 | `FIX_OFFLINE_ENCERRAR` | tablet encerrar |

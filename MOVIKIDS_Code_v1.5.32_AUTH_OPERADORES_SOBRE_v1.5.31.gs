@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.169
+// MOVI KIDS — Google Apps Script v1.5.170
+// v1.5.170: I72 — metaProjecaoMes grafico: nao trava cedo; recalcula meta stale (ex. R$372 vs R$13k)
 // v1.5.169: holerite competencia passada — bonus dias/meta da AUDITORIA do mes (nao mes corrente)
 // v1.5.168: I70 — MK_GAS_VERSAO_ unificada (ping/carregarInicio/validarSchema); repair FOLHA_PONTO OK sem horario
 // v1.5.167: I67b — ajustarFolhaVtAdmin (B9=8,80 B10/B12=22 via Web App)
@@ -162,8 +163,8 @@
 
 // ── CONSTANTES ───────────────────────────────────────────────
 /** Versão exposta em ping, carregarInicio, validarSchema, gestaoPessoasStatus (bump com header). */
-const MK_GAS_VERSAO_  = 'v1.5.169';
-const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.169';
+const MK_GAS_VERSAO_  = 'v1.5.170';
+const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.170';
 const SHEET_ID   = '1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618';
 const DEPLOY_ID  = 'AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y';
 const WEBAPP_URL = `https://script.google.com/macros/s/${DEPLOY_ID}/exec`;
@@ -4992,13 +4993,47 @@ function inferMetaProjecaoFromFatDia_(fatDiaArr, diasMes) {
   return Math.round(fat / n * diasMes * 100) / 100;
 }
 
-/** Meta de projeção do mês — trava projecaoFat (card Dashboard) no 1º kpiMes do mês. */
-function getOrSetMetaProjecaoMes_(mes, ano, projecaoFat, fatDiaArr, diasMes, lf) {
+/** I72 — piso mínimo sensato para meta do gráfico (break-even × ticket × mês). */
+function pisoMetaProjecaoMes_(lf, diasMes) {
+  if (!lf) return 0;
+  const be = Number(lf.breakEvenLocacoesDia);
+  const ticket = Number(lf.ticketMedio) || 0;
+  if (!(be > 0) || ticket <= 0 || diasMes <= 0) return 0;
+  return Math.round(be * ticket * diasMes * 100) / 100;
+}
+
+/** I72 — meta travada absurdamente abaixo da projeção atual (ex. dia 1 com R$12). */
+function metaProjecaoStale_(locked, projAtual, diasOperando) {
+  const L = Number(locked) || 0;
+  const P = Number(projAtual) || 0;
+  const d = Number(diasOperando) || 0;
+  if (L <= 0 || P <= 0 || d < 3) return false;
+  return L < P * 0.35;
+}
+
+/** Meta de projeção do mês — baseline do gráfico; trava só com amostra mínima (I72). */
+function getOrSetMetaProjecaoMes_(mes, ano, projecaoFat, fatDiaArr, diasMes, lf, diasOperando, diaCalendario) {
   const props = PropertiesService.getScriptProperties();
   const key = 'PROJ_CHART_' + String(mes).padStart(2, '0') + '_' + ano;
+  const projAtual = Math.round((Number(projecaoFat) || 0) * 100) / 100;
+  const diasOp = Number(diasOperando) || 0;
+  const diaCal = Number(diaCalendario) || 0;
+  const piso = pisoMetaProjecaoMes_(lf, diasMes);
+  const prontoTravar = diasOp >= 3 || diaCal >= 7;
+
   const hit = props.getProperty(key);
-  if (hit != null && hit !== '') return Math.round(Number(hit) * 100) / 100;
-  let meta = Math.round((Number(projecaoFat) || 0) * 100) / 100;
+  if (hit != null && hit !== '') {
+    const locked = Math.round(Number(hit) * 100) / 100;
+    if (locked > 0) {
+      if (metaProjecaoStale_(locked, projAtual, diasOp)) {
+        props.deleteProperty(key);
+      } else {
+        return locked;
+      }
+    }
+  }
+
+  let meta = projAtual;
   if (meta <= 0) meta = inferMetaProjecaoFromFatDia_(fatDiaArr, diasMes);
   if (meta <= 0 && lf) {
     const be = lf.breakEvenLocacoesDia;
@@ -5007,8 +5042,19 @@ function getOrSetMetaProjecaoMes_(mes, ano, projecaoFat, fatDiaArr, diasMes, lf)
       meta = Math.round(be * ticket * diasMes * 100) / 100;
     }
   }
-  props.setProperty(key, String(meta));
-  return meta;
+  if (piso > 0 && meta > 0 && meta < piso * 0.25) meta = piso;
+  if (piso > 0 && meta <= 0) meta = piso;
+
+  if (!prontoTravar) {
+    return meta > 0 ? meta : (projAtual > 0 ? projAtual : 0);
+  }
+
+  const toLock = meta > 0 ? meta : projAtual;
+  if (toLock > 0) {
+    props.setProperty(key, String(toLock));
+    return toLock;
+  }
+  return 0;
 }
 
 /** Média de faturamento/dia nos últimos N dias calendário (só dias com movimento). */
@@ -6660,7 +6706,7 @@ function buildKpiMesPayload_(p) {
   }));
 
   const historicoMeses = buildHistoricoFatProjecao_(mesAtual, anoAtual, fatByPayback, diasOpByMonth, hoje);
-  const metaProjecaoMes = getOrSetMetaProjecaoMes_(mesAtual, anoAtual, projecaoFat, fatDiaArr, diasMes, leadingFinanceiro);
+  const metaProjecaoMes = getOrSetMetaProjecaoMes_(mesAtual, anoAtual, projecaoFat, fatDiaArr, diasMes, leadingFinanceiro, diasOperando, hoje.getDate());
   const projDiariaFixa = metaProjecaoMes > 0 ? Math.round(metaProjecaoMes / diasMes * 100) / 100 : 0;
   const mesesRecentes = buildMesesRecentesParaSinal_(mesAtual, anoAtual, fatByPayback, cusByPayback);
   const alertaCtx = Object.assign({}, narrativaCtx, {

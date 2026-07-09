@@ -1923,26 +1923,42 @@ function renderReceitaMesChart_(d) {
   }
 }
 
-/** Meta mensal do gráfico = Faturamento projetado (projecaoFat) travado no 1º load do mês. */
+/** Meta mensal do gráfico — GAS trava após amostra mínima; FE ignora meta stale (I72). */
 function mkMetaProjecaoMes_(d) {
+  const projFat = Number(d.projecaoFat) || 0;
+  const diasOp = Number(d.diasOperando) || 0;
   const fromGas = Number(d.metaProjecaoMes) || 0;
-  if (fromGas > 0) return fromGas;
   const mes = d.mesAtual || new Date().getMonth() + 1;
   const ano = d.anoAtual || new Date().getFullYear();
   const key = 'mk_proj_chart_' + ano + '_' + mes;
+
+  function staleMeta_(meta) {
+    return meta > 0 && projFat > 0 && diasOp >= 3 && meta < projFat * 0.35;
+  }
+
+  if (fromGas > 0 && !staleMeta_(fromGas)) {
+    try { localStorage.setItem(key, JSON.stringify({ val: fromGas, at: Date.now() })); } catch (e) { /* ignore */ }
+    return fromGas;
+  }
+  if (fromGas > 0 && staleMeta_(fromGas) && projFat > 0) {
+    try { localStorage.setItem(key, JSON.stringify({ val: projFat, at: Date.now() })); } catch (e) { /* ignore */ }
+    return projFat;
+  }
+
   try {
     const raw = localStorage.getItem(key);
     if (raw) {
       const o = JSON.parse(raw);
-      if (o && Number(o.val) > 0) return Number(o.val);
+      const cached = o && Number(o.val) > 0 ? Number(o.val) : 0;
+      if (cached > 0 && !staleMeta_(cached)) return cached;
     }
   } catch (e) { /* ignore */ }
-  const projFat = Number(d.projecaoFat) || 0;
+
   if (projFat > 0) {
     try { localStorage.setItem(key, JSON.stringify({ val: projFat, at: Date.now() })); } catch (e) { /* ignore */ }
     return projFat;
   }
-  return 0;
+  return fromGas > 0 ? fromGas : 0;
 }
 
 const MK_MES_ABREV_ = ['', 'Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
