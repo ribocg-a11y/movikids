@@ -2953,6 +2953,17 @@ function inicializarCaixa() {
   carregarCaixa();
 }
 
+const CX_PAY_ORDER_ = ['PIX', 'Débito', 'Crédito', 'Dinheiro'];
+
+function cxPayCtxBreakdown_(pag, totPag, extrasPorPag) {
+  const tot = Number(totPag[pag] || 0);
+  const ext = Number(extrasPorPag[pag] || 0);
+  const plano = Math.round((tot - ext) * 100) / 100;
+  if (tot <= 0) return 'Sem entradas';
+  if (ext > 0) return fmtR(plano) + ' plano + ' + fmtR(ext) + ' extras';
+  return fmtR(plano) + ' plano';
+}
+
 function renderCaixaFromResumo_(dataFmt, r) {
     const locacoes = r.locacoes || [];
     const custos = r.custos || [];
@@ -2984,17 +2995,24 @@ function renderCaixaFromResumo_(dataFmt, r) {
     const dataLbl = document.getElementById('cx-data-label');
     if (dataLbl) dataLbl.textContent = dataFmt;
 
-    setVal('cx-total', totalEnt);
+    const extrasPorPag = r.extrasPorPagamento || {};
     const pixVal = Number(totPag.PIX || 0);
-    const credVal = Number(totPag['Crédito'] || 0);
     const debVal = Number(totPag['Débito'] || 0);
+    const credVal = Number(totPag['Crédito'] || 0);
+
     setVal('cx-pix', pixVal);
-    setVal('cx-cred', credVal);
     setVal('cx-deb', debVal);
-    setVal('cx-maq', totalMaq);
+    setVal('cx-cred', credVal);
     setVal('cx-din', totalDin);
+    setVal('cx-maq', totalMaq);
+    const somaPag = Math.round((pixVal + debVal + credVal + totalDin) * 100) / 100;
+    setVal('cx-total', somaPag > 0 ? somaPag : totalEnt);
     setVal('cx-cus', totalCus, '#C62828');
     setVal('cx-ext', totalExt);
+    CX_PAY_ORDER_.forEach(function (pag) {
+      const extId = { PIX: 'cx-ext-pix', 'Débito': 'cx-ext-deb', 'Crédito': 'cx-ext-cred', 'Dinheiro': 'cx-ext-din' }[pag];
+      if (extId) setVal(extId, Number(extrasPorPag[pag] || 0));
+    });
     const resEl = document.getElementById('cx-res');
     if (resEl) {
       resEl.textContent = fmtR(resultado);
@@ -3002,12 +3020,13 @@ function renderCaixaFromResumo_(dataFmt, r) {
       resEl.style.color = resultado >= 0 ? '#2E7D32' : '#C62828';
     }
     setText('cx-res-ctx', fmtR(totalEnt) + ' − ' + fmtR(totalCus) + ' custos');
-    setText('cx-total-ctx', nSess + ' locação(ões)' + (nSess > nContas ? ' · ' + nContas + ' contas' : ''));
-    setText('cx-pix-ctx', 'PIX');
-    setText('cx-cred-ctx', 'Crédito');
-    setText('cx-deb-ctx', 'Débito');
-    setText('cx-maq-ctx', '= PIX + crédito + débito');
-    setText('cx-din-ctx', 'Saldo espécie ' + fmtR(saldoDin));
+    setText('cx-pix-ctx', cxPayCtxBreakdown_('PIX', totPag, extrasPorPag));
+    setText('cx-deb-ctx', cxPayCtxBreakdown_('Débito', totPag, extrasPorPag));
+    setText('cx-cred-ctx', cxPayCtxBreakdown_('Crédito', totPag, extrasPorPag));
+    setText('cx-din-ctx', cxPayCtxBreakdown_('Dinheiro', totPag, extrasPorPag) + (saldoDin !== totalDin ? ' · saldo espécie ' + fmtR(saldoDin) : ''));
+    setText('cx-maq-ctx', '= PIX + débito + crédito');
+    setText('cx-total-ctx', '= PIX + débito + crédito + dinheiro · ' + nSess + ' locação(ões)'
+      + (nSess > nContas ? ' · ' + nContas + ' contas' : ''));
     setText('cx-cus-ctx', custos.length + ' lançamento(s)');
     const nloc = document.getElementById('cx-nloc');
     if (nloc) nloc.textContent = String(nSess);
@@ -3021,27 +3040,11 @@ function renderCaixaFromResumo_(dataFmt, r) {
       setText('cx-ext-ctx', 'Sem extras hoje');
     }
     const cxExtIns = document.getElementById('cx-ext-insight');
-    const extrasPorPag = r.extrasPorPagamento || {};
     const extrasCancel = r.extrasCancelados || [];
     const cxExtDet = document.getElementById('cx-extras-detail');
     if (cxExtDet) {
-      const epKeys = ['PIX', 'Crédito', 'Débito', 'Dinheiro'].filter(function (k) {
-        return Number(extrasPorPag[k] || 0) > 0;
-      });
-      if (epKeys.length) {
-        cxExtDet.hidden = false;
-        cxExtDet.innerHTML = '<div class="mk-caixa-extras-title">Extras cobrados por forma de pagamento</div>'
-          + epKeys.map(function (k) {
-            return '<div class="mk-caixa-extras-row"><span>' + k + '</span><strong>' + fmtR(extrasPorPag[k]) + '</strong></div>';
-          }).join('');
-      } else if (totalExt > 0) {
-        cxExtDet.hidden = false;
-        cxExtDet.innerHTML = '<div class="mk-caixa-extras-title">Extras no faturamento</div>'
-          + '<div class="mk-caixa-extras-row"><span>Total extras</span><strong>' + fmtR(totalExt) + '</strong></div>';
-      } else {
-        cxExtDet.hidden = true;
-        cxExtDet.innerHTML = '';
-      }
+      cxExtDet.hidden = true;
+      cxExtDet.innerHTML = '';
     }
     const cxExtCan = document.getElementById('cx-extras-cancel');
     if (cxExtCan) {
@@ -3062,7 +3065,7 @@ function renderCaixaFromResumo_(dataFmt, r) {
       if (totalExt > 0) {
         const pct = totalEnt > 0 ? Math.round(totalExt / totalEnt * 1000) / 10 : 0;
         cxExtIns.style.display = 'block';
-        cxExtIns.textContent = 'Extras do dia: ' + fmtR(totalExt) + ' (' + nExt + ' locações) — ' + pct + '% do faturamento do dia.';
+        cxExtIns.textContent = 'Extras de R$ ' + fmtR(totalExt) + ' já estão somados no faturamento (' + nExt + ' locações · ' + pct + '% do dia).';
       } else {
         cxExtIns.style.display = 'none';
       }
@@ -3104,7 +3107,7 @@ function renderCaixaFromResumo_(dataFmt, r) {
     // Conferência maquininha
     const maqEl = document.getElementById('cx-conf-maq');
     if(maqEl) {
-      const formasMaq = ['PIX','Crédito','Débito'];
+      const formasMaq = ['PIX', 'Débito', 'Crédito'];
       maqEl.innerHTML = formasMaq.map(f =>
         `<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:0.5px solid var(--border);font-size:13px">
           <span style="color:var(--txt2)">${pagPill(f)} ${f}</span>

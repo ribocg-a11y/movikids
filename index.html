@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Movi Kids">
 <title>Movi Kids</title>
-<script src="mk-canonical-host.js?v=1.9.18"></script>
+<script src="mk-canonical-host.js?v=1.9.19"></script>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png">
@@ -17,17 +17,17 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<script src="mk-stale-sync.js?v=1.9.18"></script>
-<script src="mk-version.js?v=1.9.18"></script>
-<script src="mk-api.js?v=1.9.18"></script>
-<link rel="stylesheet" href="mk-design.css?v=1.9.18">
+<script src="mk-stale-sync.js?v=1.9.19"></script>
+<script src="mk-version.js?v=1.9.19"></script>
+<script src="mk-api.js?v=1.9.19"></script>
+<link rel="stylesheet" href="mk-design.css?v=1.9.19">
 
-<script src="mk-cache-bust.js?v=1.9.18"></script>
+<script src="mk-cache-bust.js?v=1.9.19"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<link rel="stylesheet" href="mk-app.css?v=1.9.18">
-<link rel="stylesheet" href="mk-gestao-pessoas.css?v=1.9.18">
+<link rel="stylesheet" href="mk-app.css?v=1.9.19">
+<link rel="stylesheet" href="mk-gestao-pessoas.css?v=1.9.19">
 <!-- Firebase SDK — Realtime sync canonico para todos os dispositivos -->
-<script type="module" src="mk-firebase.js?v=1.9.18"></script>
+<script type="module" src="mk-firebase.js?v=1.9.19"></script>
 </head>
 
 <body>
@@ -1005,11 +1005,63 @@
         <span class="mk-widget-val" id="cx-res">...</span>
         <span class="mk-widget-ctx" id="cx-res-ctx">Entradas − custos</span>
       </div>
+      <div class="mk-caixa-section-lbl">Entradas por forma de pagamento (plano + extras)</div>
       <div class="mk-cmd-grid mk-caixa-widgets-grid mk-caixa-pay-grid">
-        <div class="mk-widget">
-          <span class="mk-widget-lbl">Faturamento</span>
+        <div class="mk-widget mk-widget--pay">
+          <span class="mk-widget-lbl">PIX</span>
+          <span class="mk-widget-val blue" id="cx-pix">...</span>
+          <span class="mk-widget-ctx" id="cx-pix-ctx">Plano + extras</span>
+        </div>
+        <div class="mk-widget mk-widget--pay">
+          <span class="mk-widget-lbl">Débito</span>
+          <span class="mk-widget-val blue" id="cx-deb">...</span>
+          <span class="mk-widget-ctx" id="cx-deb-ctx">Plano + extras</span>
+        </div>
+        <div class="mk-widget mk-widget--pay">
+          <span class="mk-widget-lbl">Crédito</span>
+          <span class="mk-widget-val blue" id="cx-cred">...</span>
+          <span class="mk-widget-ctx" id="cx-cred-ctx">Plano + extras</span>
+        </div>
+        <div class="mk-widget mk-widget--pay">
+          <span class="mk-widget-lbl">Dinheiro</span>
+          <span class="mk-widget-val" id="cx-din">...</span>
+          <span class="mk-widget-ctx" id="cx-din-ctx">Plano + extras</span>
+        </div>
+        <div class="mk-widget mk-widget--pay mk-widget--maq">
+          <span class="mk-widget-lbl">Maquininha</span>
+          <span class="mk-widget-val blue" id="cx-maq">...</span>
+          <span class="mk-widget-ctx" id="cx-maq-ctx">PIX + débito + crédito</span>
+        </div>
+      </div>
+      <div class="mk-caixa-section-lbl">Minutos extras por forma de pagamento</div>
+      <div class="mk-cmd-grid mk-caixa-widgets-grid mk-caixa-pay-grid mk-caixa-extras-pay-grid">
+        <div class="mk-widget mk-widget--pay mk-widget--ext">
+          <span class="mk-widget-lbl">Extras PIX</span>
+          <span class="mk-widget-val purple" id="cx-ext-pix">R$ 0,00</span>
+        </div>
+        <div class="mk-widget mk-widget--pay mk-widget--ext">
+          <span class="mk-widget-lbl">Extras débito</span>
+          <span class="mk-widget-val purple" id="cx-ext-deb">R$ 0,00</span>
+        </div>
+        <div class="mk-widget mk-widget--pay mk-widget--ext">
+          <span class="mk-widget-lbl">Extras crédito</span>
+          <span class="mk-widget-val purple" id="cx-ext-cred">R$ 0,00</span>
+        </div>
+        <div class="mk-widget mk-widget--pay mk-widget--ext">
+          <span class="mk-widget-lbl">Extras dinheiro</span>
+          <span class="mk-widget-val purple" id="cx-ext-din">R$ 0,00</span>
+        </div>
+        <div class="mk-widget mk-widget--pay mk-widget--ext mk-widget--ext-tot">
+          <span class="mk-widget-lbl">Total extras</span>
+          <span class="mk-widget-val purple" id="cx-ext">R$ 0,00</span>
+          <span class="mk-widget-ctx" id="cx-ext-ctx">Minutos adicionais</span>
+        </div>
+      </div>
+      <div class="mk-cmd-grid mk-caixa-widgets-grid mk-caixa-summary-grid">
+        <div class="mk-widget mk-widget--hero mk-widget--fat">
+          <span class="mk-widget-lbl">Faturamento do dia</span>
           <span class="mk-widget-val green" id="cx-total">...</span>
-          <span class="mk-widget-ctx" id="cx-total-ctx">—</span>
+          <span class="mk-widget-ctx" id="cx-total-ctx">= PIX + débito + crédito + dinheiro</span>
         </div>
         <div class="mk-widget">
           <span class="mk-widget-lbl">Locações</span>
@@ -1020,36 +1072,6 @@
           <span class="mk-widget-lbl">Custos</span>
           <span class="mk-widget-val" id="cx-cus" style="color:#C62828">...</span>
           <span class="mk-widget-ctx" id="cx-cus-ctx">Saídas do dia</span>
-        </div>
-        <div class="mk-widget">
-          <span class="mk-widget-lbl">Extras cobrados</span>
-          <span class="mk-widget-val purple" id="cx-ext">...</span>
-          <span class="mk-widget-ctx" id="cx-ext-ctx">Minutos adicionais</span>
-        </div>
-        <div class="mk-widget mk-widget--pay">
-          <span class="mk-widget-lbl">PIX</span>
-          <span class="mk-widget-val blue" id="cx-pix">...</span>
-          <span class="mk-widget-ctx" id="cx-pix-ctx">Entradas PIX</span>
-        </div>
-        <div class="mk-widget mk-widget--pay">
-          <span class="mk-widget-lbl">Crédito</span>
-          <span class="mk-widget-val blue" id="cx-cred">...</span>
-          <span class="mk-widget-ctx" id="cx-cred-ctx">Cartão crédito</span>
-        </div>
-        <div class="mk-widget mk-widget--pay">
-          <span class="mk-widget-lbl">Débito</span>
-          <span class="mk-widget-val blue" id="cx-deb">...</span>
-          <span class="mk-widget-ctx" id="cx-deb-ctx">Cartão débito</span>
-        </div>
-        <div class="mk-widget mk-widget--pay">
-          <span class="mk-widget-lbl">Dinheiro</span>
-          <span class="mk-widget-val" id="cx-din">...</span>
-          <span class="mk-widget-ctx" id="cx-din-ctx">Espécie recebida</span>
-        </div>
-        <div class="mk-widget mk-widget--pay mk-widget--maq">
-          <span class="mk-widget-lbl">Maquininha</span>
-          <span class="mk-widget-val blue" id="cx-maq">...</span>
-          <span class="mk-widget-ctx" id="cx-maq-ctx">PIX + crédito + débito</span>
         </div>
       </div>
       <div class="mk-caixa-extras-detail" id="cx-extras-detail" hidden></div>
@@ -2131,26 +2153,26 @@
   </div>
 </div>
 
-<script src="mk-globals.js?v=1.9.18"></script>
-<script src="mk-core.js?v=1.9.18"></script>
-<script src="mk-nav.js?v=1.9.18"></script>
-<script src="mk-admin.js?v=1.9.18"></script>
-<script src="mk-historico.js?v=1.9.18"></script>
-<script src="mk-sessao.js?v=1.9.18"></script>
-<script src="mk-home.js?v=1.9.18"></script>
-<script src="mk-meta-operador.js?v=1.9.18"></script>
-<script src="mk-custos.js?v=1.9.18"></script>
-<script src="mk-avulso.js?v=1.9.18"></script>
-<script src="mk-sync.js?v=1.9.18"></script>
-<script src="mk-nova.js?v=1.9.18"></script>
-<script src="mk-relacionamento.js?v=1.9.18"></script>
-<script src="mk-operacao.js?v=1.9.18"></script>
-<script src="mk-drawer.js?v=1.9.18"></script>
-<script src="mk-update.js?v=1.9.18"></script>
-<script src="mk-gestao-pessoas.js?v=1.9.18"></script>
-<script src="mk-holerite.js?v=1.9.18"></script>
-<script src="mk-gestao-pessoas-admin.js?v=1.9.18"></script>
-<script src="mk-auth.js?v=1.9.18"></script>
-<script src="mk-boot.js?v=1.9.18"></script>
+<script src="mk-globals.js?v=1.9.19"></script>
+<script src="mk-core.js?v=1.9.19"></script>
+<script src="mk-nav.js?v=1.9.19"></script>
+<script src="mk-admin.js?v=1.9.19"></script>
+<script src="mk-historico.js?v=1.9.19"></script>
+<script src="mk-sessao.js?v=1.9.19"></script>
+<script src="mk-home.js?v=1.9.19"></script>
+<script src="mk-meta-operador.js?v=1.9.19"></script>
+<script src="mk-custos.js?v=1.9.19"></script>
+<script src="mk-avulso.js?v=1.9.19"></script>
+<script src="mk-sync.js?v=1.9.19"></script>
+<script src="mk-nova.js?v=1.9.19"></script>
+<script src="mk-relacionamento.js?v=1.9.19"></script>
+<script src="mk-operacao.js?v=1.9.19"></script>
+<script src="mk-drawer.js?v=1.9.19"></script>
+<script src="mk-update.js?v=1.9.19"></script>
+<script src="mk-gestao-pessoas.js?v=1.9.19"></script>
+<script src="mk-holerite.js?v=1.9.19"></script>
+<script src="mk-gestao-pessoas-admin.js?v=1.9.19"></script>
+<script src="mk-auth.js?v=1.9.19"></script>
+<script src="mk-boot.js?v=1.9.19"></script>
 </body>
 </html>
