@@ -45,7 +45,7 @@ Detalhe: `ACESSOS_E_AUTORIZACOES.md` §7 · incidentes I21 · I29.
 | **Apps Script** | **v1.5.185** repo | ping Web **v1.5.182** — **Nova versão Web pendente** |
 | **PIN admin** | **1421** | Script Property `ADMIN_PIN` |
 | **Homolog tablet** | ✅ 23/06 | Smoke **v1.9.26** pendente Ops (I91 cache/timer) |
-| **Planilha** | 23 abas | `schemaOk=True` · 4 loc teste usuário Encerrada R$0 (rows 1272–1275) |
+| **Planilha** | 23 abas | `schemaOk=True` · loc teste Ana/Ann/Db/Dd **anuladas** 10/07 (Cancelada) |
 | **Design System** | **v1.1** | `DESIGN_SYSTEM_MOVIKIDS.md` |
 
 **Deploy ID GAS:** `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y`
