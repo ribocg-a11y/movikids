@@ -357,24 +357,26 @@ function iniciarNovaPeloVeiculo(veiculo, tipo) {
   }, 80);
 }
 
-/** Contas do dia (telefones únicos / I42) — número no card da Home. */
+/** Contas do dia (telefones/conta_id únicos — I42) — tile Home. */
 function mkContasEncHoje_(list) {
-  if (statsHoje && statsHoje.n != null && statsHoje.n > 0) return statsHoje.n;
   const data = list || encHojeData || [];
-  if (!data.length) return 0;
-  const seen = {};
-  data.forEach(function (e) {
-    const tel = String(e.telefone || '').replace(/\D/g, '');
-    if (tel.length >= 8) seen[tel] = true;
-    else {
-      const ck = Number(e.contaId) || Number(e.id) || 0;
-      if (ck > 0) seen['c:' + ck] = true;
-    }
-  });
-  return Object.keys(seen).length;
+  if (data.length) {
+    const seen = {};
+    data.forEach(function (e) {
+      const tel = String(e.telefone || '').replace(/\D/g, '');
+      if (tel.length >= 8) seen[tel] = true;
+      else {
+        const ck = Number(e.contaId) || Number(e.id) || 0;
+        if (ck > 0) seen['c:' + ck] = true;
+      }
+    });
+    return Object.keys(seen).length;
+  }
+  if (statsHoje && statsHoje.n != null && statsHoje.n > 0) return statsHoje.n;
+  return 0;
 }
 
-/** Sessões encerradas hoje — deve bater com a lista #enc-hoje-list. */
+/** Todas as sessões encerradas hoje — Caixa / chip admin. */
 function mkSessoesEncHoje_(list) {
   const data = list || encHojeData || [];
   if (data.length) return data.length;
@@ -385,7 +387,7 @@ function mkSessoesEncHoje_(list) {
 function mkUpdateEncHojeKpis_(list) {
   encHojeData = list || [];
   const nLoc = document.getElementById('stat-nloc');
-  if (nLoc) nLoc.textContent = String(mkSessoesEncHoje_(encHojeData));
+  if (nLoc) nLoc.textContent = String(mkContasEncHoje_(encHojeData));
 }
 window.mkUpdateEncHojeKpis_ = mkUpdateEncHojeKpis_;
 window.mkContasEncHoje_ = mkContasEncHoje_;
@@ -394,10 +396,18 @@ window.mkSessoesEncHoje_ = mkSessoesEncHoje_;
 function renderEncHojeList_(list) {
   const section = document.getElementById('enc-hoje-section');
   const container = document.getElementById('enc-hoje-list');
+  const lead = document.getElementById('enc-hoje-lead');
   if (!section || !container) return;
   const data = list || encHojeData || [];
   if (!data.length) { section.style.display = 'none'; return; }
   section.style.display = 'block';
+  const nSess = data.length;
+  const nContas = typeof mkContasEncHoje_ === 'function' ? mkContasEncHoje_(data) : nSess;
+  if (lead) {
+    lead.textContent = nSess > nContas
+      ? (nSess + ' locações · ' + nContas + ' contas na maquininha')
+      : (nSess + (nSess === 1 ? ' locação' : ' locações'));
+  }
   const fin = mkExibirFinanceiro_();
   const admSms = (typeof mkAuthIsAdmin === 'function' && mkAuthIsAdmin()) || window.isAdmin;
   container.innerHTML = data.map(e=>{
