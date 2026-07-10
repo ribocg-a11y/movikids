@@ -445,6 +445,32 @@ html,body{height:100%;background:var(--bg);color:var(--txt);overflow:hidden}
   font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;cursor:pointer
 }
 .nova-cesta-add-btn:active{transform:scale(.98);background:var(--blue-lt)}
+.nova-cesta-panel:not([hidden]){display:block}
+.nova-cesta-lead{font-size:13px;color:var(--txt2);margin:0 0 12px;line-height:1.45}
+.nova-pick-panel:not([hidden]){display:block}
+.nova-pick-lead{font-size:13px;color:var(--txt2);margin:0 0 12px;line-height:1.45}
+.nova-pick-voltar{
+  display:block;width:100%;margin:0 0 12px;padding:10px 14px;background:var(--card);
+  border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--blue-dk);
+  font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;cursor:pointer;text-align:left
+}
+.nova-pick-voltar:active{background:var(--blue-lt)}
+.nova-pick-voltar:not([hidden]){display:block}
+.nova-saving-overlay{
+  position:fixed;inset:0;z-index:9000;background:rgba(26,35,64,.55);
+  display:flex;align-items:center;justify-content:center;padding:20px
+}
+.nova-saving-overlay:not([hidden]){display:flex}
+.nova-saving-box{
+  background:var(--card);border-radius:var(--radius);padding:24px 28px;max-width:320px;width:100%;
+  text-align:center;box-shadow:0 12px 40px rgba(13,71,161,.2);border:1px solid var(--border)
+}
+.nova-saving-spinner{
+  width:40px;height:40px;margin:0 auto 14px;border:3px solid var(--blue-lt);
+  border-top-color:var(--blue);border-radius:50%;animation:spin .8s linear infinite
+}
+.nova-saving-title{display:block;font-size:17px;font-weight:900;color:var(--blue-dk);font-family:var(--font-display);margin-bottom:8px}
+.nova-saving-sub{font-size:13px;color:var(--txt2);margin:0;line-height:1.45}
 .nova-resumo-rows{display:flex;flex-direction:column;gap:6px;margin:8px 0 12px}
 .review-card .nova-cesta-row{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.22)}
 .review-card .nova-cesta-row-title,.review-card .nova-cesta-row-sub{color:#fff}

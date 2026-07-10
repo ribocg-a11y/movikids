@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Movi Kids">
 <title>Movi Kids</title>
-<script src="mk-canonical-host.js?v=1.9.29"></script>
+<script src="mk-canonical-host.js?v=1.9.30"></script>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png">
@@ -17,17 +17,17 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<script src="mk-stale-sync.js?v=1.9.29"></script>
-<script src="mk-version.js?v=1.9.29"></script>
-<script src="mk-api.js?v=1.9.29"></script>
-<link rel="stylesheet" href="mk-design.css?v=1.9.29">
+<script src="mk-stale-sync.js?v=1.9.30"></script>
+<script src="mk-version.js?v=1.9.30"></script>
+<script src="mk-api.js?v=1.9.30"></script>
+<link rel="stylesheet" href="mk-design.css?v=1.9.30">
 
-<script src="mk-cache-bust.js?v=1.9.29"></script>
+<script src="mk-cache-bust.js?v=1.9.30"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<link rel="stylesheet" href="mk-app.css?v=1.9.29">
-<link rel="stylesheet" href="mk-gestao-pessoas.css?v=1.9.29">
+<link rel="stylesheet" href="mk-app.css?v=1.9.30">
+<link rel="stylesheet" href="mk-gestao-pessoas.css?v=1.9.30">
 <!-- Firebase SDK — Realtime sync canonico para todos os dispositivos -->
-<script type="module" src="mk-firebase.js?v=1.9.29"></script>
+<script type="module" src="mk-firebase.js?v=1.9.30"></script>
 </head>
 
 <body>
@@ -356,7 +356,31 @@
 
     <!-- Passo 1: veículo + plano -->
     <div id="step-0" class="step-page active">
-      <div class="sec-title">O quê — veículo e plano</div>
+      <div class="sec-title" id="nova-step0-title">O quê — escolha o veículo</div>
+
+      <div id="nova-cesta-panel" class="nova-cesta-panel" hidden>
+        <p class="nova-cesta-lead">Sua locação — revise e continue, ou inclua mais um veículo.</p>
+        <div id="nova-itens-basket" class="nova-cesta">
+          <div class="nova-cesta-head">
+            <span class="nova-cesta-label">Veículos incluídos</span>
+            <span id="nova-cesta-count" class="nova-cesta-count"></span>
+          </div>
+          <div id="nova-itens-list" class="nova-cesta-rows" aria-live="polite"></div>
+          <div id="nova-itens-total" class="nova-cesta-total"></div>
+        </div>
+        <button type="button" class="nova-cesta-add-btn" id="btn-nova-add-outro" onclick="novaIniciarPick_()">
+          + Adicionar outro veículo
+        </button>
+        <button type="button" class="btn btn-primary" id="btn-nova-continuar-quem" style="margin-top:12px" onclick="nextStep()">
+          Continuar para Quem →
+        </button>
+      </div>
+
+      <div id="nova-pick-panel" class="nova-pick-panel">
+        <p class="nova-pick-lead" id="nova-pick-lead">Toque no veículo livre, depois no plano.</p>
+        <button type="button" class="nova-pick-voltar" id="btn-nova-voltar-cesta" hidden onclick="novaVoltarCesta_()">
+          ← Voltar à locação
+        </button>
       <div class="vc-section-label">Carros elétricos</div>
       <div class="veiculo-grid-carros" id="vc-grid-carros">
         <div class="vc-card mk-tile" id="vc-Carro 01" onclick="selectVeiculo(this,'Carro 01','Carro')">
@@ -421,20 +445,7 @@
         <div class="sec-title" style="margin-top:0">Plano</div>
         <div class="plano-list" id="plano-list"></div>
       </div>
-      <div id="nova-itens-basket" class="nova-cesta" hidden>
-        <div class="nova-cesta-head">
-          <span class="nova-cesta-label">Nesta locação</span>
-          <span id="nova-cesta-count" class="nova-cesta-count"></span>
-        </div>
-        <div id="nova-itens-list" class="nova-cesta-rows" aria-live="polite"></div>
-        <div id="nova-itens-total" class="nova-cesta-total"></div>
-      </div>
-      <button type="button" class="nova-cesta-add-btn" id="btn-nova-add-outro" style="display:none" onclick="novaAddOutroVeiculo_()">
-        + Outro veículo ou brinquedo
-      </button>
-      <button type="button" class="btn btn-primary" id="btn-nova-continuar-quem" style="display:none;margin-top:12px" onclick="nextStep()">
-        Continuar para Quem →
-      </button>
+      </div><!-- /nova-pick-panel -->
     </div>
 
     <!-- Passo 2: Quem -->
@@ -516,6 +527,14 @@
       <button class="btn btn-secondary" onclick="backStep()" style="margin-top:8px">
         ← Voltar
       </button>
+    </div>
+
+    <div id="nova-saving-overlay" class="nova-saving-overlay" hidden aria-live="polite" aria-busy="true">
+      <div class="nova-saving-box">
+        <div class="nova-saving-spinner" aria-hidden="true"></div>
+        <strong id="nova-saving-title" class="nova-saving-title">Salvando locação…</strong>
+        <p id="nova-saving-sub" class="nova-saving-sub">Registrando na planilha. Aguarde.</p>
+      </div>
     </div>
 
   </div>
@@ -2398,27 +2417,27 @@
   </div>
 </div>
 
-<script src="mk-globals.js?v=1.9.29"></script>
-<script src="mk-core.js?v=1.9.29"></script>
-<script src="mk-nav.js?v=1.9.29"></script>
-<script src="mk-admin.js?v=1.9.29"></script>
-<script src="mk-historico.js?v=1.9.29"></script>
-<script src="mk-custos-historico.js?v=1.9.29"></script>
-<script src="mk-sessao.js?v=1.9.29"></script>
-<script src="mk-home.js?v=1.9.29"></script>
-<script src="mk-meta-operador.js?v=1.9.29"></script>
-<script src="mk-custos.js?v=1.9.29"></script>
-<script src="mk-avulso.js?v=1.9.29"></script>
-<script src="mk-sync.js?v=1.9.29"></script>
-<script src="mk-nova.js?v=1.9.29"></script>
-<script src="mk-relacionamento.js?v=1.9.29"></script>
-<script src="mk-operacao.js?v=1.9.29"></script>
-<script src="mk-drawer.js?v=1.9.29"></script>
-<script src="mk-update.js?v=1.9.29"></script>
-<script src="mk-gestao-pessoas.js?v=1.9.29"></script>
-<script src="mk-holerite.js?v=1.9.29"></script>
-<script src="mk-gestao-pessoas-admin.js?v=1.9.29"></script>
-<script src="mk-auth.js?v=1.9.29"></script>
-<script src="mk-boot.js?v=1.9.29"></script>
+<script src="mk-globals.js?v=1.9.30"></script>
+<script src="mk-core.js?v=1.9.30"></script>
+<script src="mk-nav.js?v=1.9.30"></script>
+<script src="mk-admin.js?v=1.9.30"></script>
+<script src="mk-historico.js?v=1.9.30"></script>
+<script src="mk-custos-historico.js?v=1.9.30"></script>
+<script src="mk-sessao.js?v=1.9.30"></script>
+<script src="mk-home.js?v=1.9.30"></script>
+<script src="mk-meta-operador.js?v=1.9.30"></script>
+<script src="mk-custos.js?v=1.9.30"></script>
+<script src="mk-avulso.js?v=1.9.30"></script>
+<script src="mk-sync.js?v=1.9.30"></script>
+<script src="mk-nova.js?v=1.9.30"></script>
+<script src="mk-relacionamento.js?v=1.9.30"></script>
+<script src="mk-operacao.js?v=1.9.30"></script>
+<script src="mk-drawer.js?v=1.9.30"></script>
+<script src="mk-update.js?v=1.9.30"></script>
+<script src="mk-gestao-pessoas.js?v=1.9.30"></script>
+<script src="mk-holerite.js?v=1.9.30"></script>
+<script src="mk-gestao-pessoas-admin.js?v=1.9.30"></script>
+<script src="mk-auth.js?v=1.9.30"></script>
+<script src="mk-boot.js?v=1.9.30"></script>
 </body>
 </html>

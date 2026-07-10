@@ -5,7 +5,8 @@
 let novaState = {
   tipo: null, plano: null, veiculo: null,
   itens: [],
-  pagamento: null, observacao: '', step: 0
+  pagamento: null, observacao: '', step: 0,
+  subModo: 'pick'
 };
 let novaPrefillResponsavel = null;
 const NOVA_DRAFT_KEY = 'mk_nova_locacao_draft_v1';
@@ -89,35 +90,96 @@ function incluirItemNova_() {
     plano: novaState.plano
   });
   novaLimparSelecaoAtual_();
+  novaState.subModo = 'cesta';
   renderNovaItensBasket_();
   atualizarNovaSummaryBar_();
   salvarNovaDraft_();
-  novaMarcarCestaGrid_();
+  novaAtualizarSubModoUI_();
   return true;
+}
+
+function novaAtualizarSubModoUI_() {
+  const n = (novaState.itens || []).length;
+  if (n === 0) novaState.subModo = 'pick';
+  const pick = novaState.subModo === 'pick';
+
+  const pickPanel = document.getElementById('nova-pick-panel');
+  const cestaPanel = document.getElementById('nova-cesta-panel');
+  const title = document.getElementById('nova-step0-title');
+  const btnVoltar = document.getElementById('btn-nova-voltar-cesta');
+  const pickLead = document.getElementById('nova-pick-lead');
+
+  if (pickPanel) pickPanel.hidden = !pick;
+  if (cestaPanel) cestaPanel.hidden = pick;
+  if (title) {
+    title.textContent = pick
+      ? (n > 0 ? 'O quê — próximo veículo' : 'O quê — escolha o veículo')
+      : 'O quê — sua locação';
+  }
+  if (btnVoltar) btnVoltar.hidden = !(pick && n > 0);
+  if (pickLead) {
+    pickLead.textContent = n > 0
+      ? 'Toque em um veículo livre abaixo e escolha o plano.'
+      : 'Toque no veículo livre, depois no plano.';
+  }
+  novaMarcarCestaGrid_();
+}
+
+function novaIniciarPick_() {
+  novaState.subModo = 'pick';
+  novaLimparSelecaoAtual_();
+  novaAtualizarSubModoUI_();
+  if (typeof atualizarVeiculoGrid === 'function') atualizarVeiculoGrid();
+}
+
+function novaVoltarCesta_() {
+  if (!(novaState.itens || []).length) return;
+  novaState.subModo = 'cesta';
+  novaLimparSelecaoAtual_();
+  novaAtualizarSubModoUI_();
+}
+
+function novaShowSaving_(i, n, veiculo) {
+  const o = document.getElementById('nova-saving-overlay');
+  const t = document.getElementById('nova-saving-title');
+  const s = document.getElementById('nova-saving-sub');
+  if (o) o.hidden = false;
+  if (t) {
+    t.textContent = n > 1 ? ('Salvando ' + (i + 1) + ' de ' + n + '…') : 'Salvando locação…';
+  }
+  if (s) {
+    s.textContent = n > 1
+      ? ('Registrando ' + veiculo + ' na planilha (~15s cada).')
+      : 'Registrando na planilha. Aguarde.';
+  }
+}
+
+function novaHideSaving_() {
+  const o = document.getElementById('nova-saving-overlay');
+  if (o) o.hidden = true;
 }
 
 function novaMarcarCestaGrid_() {
   const naCesta = {};
   (novaState.itens || []).forEach(function(it) { naCesta[it.veiculo] = true; });
-  document.querySelectorAll('#page-nova .vc-card').forEach(function(card) {
+  const pick = novaState.subModo === 'pick';
+  document.querySelectorAll('#nova-pick-panel .vc-card').forEach(function(card) {
     const id = card.id || '';
     if (!id.startsWith('vc-')) return;
     const nome = id.slice(3);
     const busy = card.classList.contains('vc-busy') || card.classList.contains('vc-busy-pink');
     const stEl = document.getElementById('vc-st-' + nome);
+    card.classList.remove('vc-basket', 'vc-sel', 'vc-sel-pink');
+    if (pick && naCesta[nome]) {
+      card.style.display = 'none';
+      return;
+    }
+    card.style.display = '';
     if (busy) return;
-    if (naCesta[nome]) {
-      card.classList.remove('vc-sel', 'vc-sel-pink');
-      card.classList.add('vc-basket');
-      card.style.pointerEvents = 'none';
-      if (stEl) { stEl.className = 'vc-status na-cesta'; stEl.textContent = '✓ Incluído'; }
-    } else {
-      card.classList.remove('vc-basket');
-      card.style.pointerEvents = '';
-      if (stEl && stEl.classList.contains('na-cesta')) {
-        stEl.className = 'vc-status livre';
-        stEl.textContent = '✓ Livre';
-      }
+    card.style.pointerEvents = '';
+    if (stEl && !busy) {
+      stEl.className = 'vc-status livre';
+      stEl.textContent = '✓ Livre';
     }
   });
 }
@@ -125,16 +187,14 @@ function novaMarcarCestaGrid_() {
 function removerItemNova_(idx) {
   if (!novaState.itens || idx < 0 || idx >= novaState.itens.length) return;
   novaState.itens.splice(idx, 1);
+  if (!novaState.itens.length) novaState.subModo = 'pick';
   renderNovaItensBasket_();
   atualizarNovaSummaryBar_();
   salvarNovaDraft_();
-  novaMarcarCestaGrid_();
+  novaAtualizarSubModoUI_();
 }
 
-function novaAddOutroVeiculo_() {
-  novaLimparSelecaoAtual_();
-  novaMarcarCestaGrid_();
-}
+function novaAddOutroVeiculo_() { novaIniciarPick_(); }
 
 function novaHtmlItemRow_(it, idx, opts) {
   const cfg = novaCfgPlano_(it.tipo, it.plano);
@@ -152,21 +212,16 @@ function novaHtmlItemRow_(it, idx, opts) {
 }
 
 function renderNovaItensBasket_() {
-  const box = document.getElementById('nova-itens-basket');
   const list = document.getElementById('nova-itens-list');
   const totalEl = document.getElementById('nova-itens-total');
   const countEl = document.getElementById('nova-cesta-count');
-  const btnOutro = document.getElementById('btn-nova-add-outro');
-  const btnQuem = document.getElementById('btn-nova-continuar-quem');
   const n = (novaState.itens || []).length;
-  if (box) box.hidden = n === 0;
-  if (btnOutro) btnOutro.style.display = n > 0 ? 'block' : 'none';
-  if (btnQuem) btnQuem.style.display = (novaState.step === 0 && n > 0) ? 'block' : 'none';
   if (countEl) countEl.textContent = n ? (n + (n > 1 ? ' veículos' : ' veículo')) : '';
   if (!list) return;
   if (!n) {
     list.innerHTML = '';
     if (totalEl) totalEl.textContent = '';
+    novaAtualizarSubModoUI_();
     return;
   }
   const fin = mkExibirFinanceiro_();
@@ -179,6 +234,7 @@ function renderNovaItensBasket_() {
   } else if (totalEl) {
     totalEl.textContent = n + ' veículo' + (n > 1 ? 's' : '') + ' · 1 pagamento';
   }
+  novaAtualizarSubModoUI_();
 }
 
 function renderNovaResumoFechar_() {
@@ -287,8 +343,6 @@ function aplicarStepNova_(step) {
     renderNovaResumoFechar_();
   }
   renderNovaItensBasket_();
-  const btnQuem = document.getElementById('btn-nova-continuar-quem');
-  if (btnQuem) btnQuem.style.display = (safeStep === 0 && (novaState.itens || []).length > 0) ? 'block' : 'none';
   atualizarNovaSummaryBar_();
 }
 
@@ -514,7 +568,7 @@ function restaurarNovaDraft_() {
 
   _restoringNovaDraft = true;
   try {
-    novaState = Object.assign({ tipo:null, plano:null, veiculo:null, itens:[], pagamento:null, observacao:'', step:0 }, draft.state);
+    novaState = Object.assign({ tipo:null, plano:null, veiculo:null, itens:[], pagamento:null, observacao:'', step:0, subModo:'pick' }, draft.state);
     if (!Array.isArray(novaState.itens)) novaState.itens = [];
     if (novaState.tipo) renderPlanosNova_(novaState.tipo);
     if (novaState.veiculo) {
@@ -588,12 +642,12 @@ function atualizarVeiculoGrid() {
     if (!card || !stEl) return;
     const isPink = nome.startsWith('Pelúcia');
     const info   = emUso[nome];
-    const naCesta = typeof novaVeiculoNaCesta_ === 'function' && novaVeiculoNaCesta_(nome);
 
     // Remover timer antigo se existir
     const oldTimer = card.querySelector('.vc-timer');
     if (oldTimer) oldTimer.remove();
     card.classList.remove('vc-basket');
+    card.style.display = '';
 
     if (info) {
       // Em uso
@@ -619,12 +673,6 @@ function atualizarVeiculoGrid() {
         timerDiv.innerHTML = `<div class="vc-timer-time${isWarn?' warn':''}">${fmtTime(rem)}</div>`;
       }
       card.appendChild(timerDiv);
-    } else if (naCesta) {
-      card.classList.remove('vc-sel', 'vc-sel-pink', 'vc-busy', 'vc-busy-pink');
-      card.classList.add('vc-basket');
-      card.style.pointerEvents = 'none';
-      stEl.className = 'vc-status na-cesta';
-      stEl.textContent = '📋 Nesta locação';
     } else {
       // Livre
       card.classList.remove('vc-busy','vc-busy-pink');
@@ -633,6 +681,7 @@ function atualizarVeiculoGrid() {
       stEl.textContent = '✓ Livre';
     }
   });
+  if (typeof novaMarcarCestaGrid_ === 'function') novaMarcarCestaGrid_();
 }
 
 function destacarSecaoVeiculoNova_(tipo) {
@@ -750,7 +799,7 @@ function capitalizarNome(el) {
 function resetNova(opts = {}) {
   novaState = {
     tipo: null, plano: null, veiculo: null, itens: [],
-    pagamento: null, observacao: '', step: 0
+    pagamento: null, observacao: '', step: 0, subModo: 'pick'
   };
   const pageNova = document.getElementById('page-nova');
   if (pageNova) pageNova.classList.remove('step-0-veiculo');
@@ -806,9 +855,9 @@ async function confirmarLocacao() {
 
   const btn = document.getElementById('btn-confirmar');
   const n = itens.length;
-  btn.textContent = n > 1 ? ('⏳ Salvando ' + n + ' locações...') : '⏳ Salvando cadastro...';
-  btn.disabled = true;
+  if (btn) { btn.disabled = true; btn.textContent = 'Salvando…'; }
   _novaSavingInFlight = true;
+  novaShowSaving_(0, n, itens[0] && itens[0].veiculo);
 
   let salvos = 0;
   let ultimaMesmaConta = false;
@@ -817,7 +866,7 @@ async function confirmarLocacao() {
     for (let i = 0; i < itens.length; i++) {
       const it = itens[i];
       const cfgLocal = novaCfgPlano_(it.tipo, it.plano) || {};
-      if (btn && n > 1) btn.textContent = '⏳ Salvando ' + (i + 1) + ' de ' + n + '…';
+      novaShowSaving_(i, n, it.veiculo);
 
       const d = await api({
         action: 'salvarLocacao',
@@ -870,9 +919,9 @@ async function confirmarLocacao() {
         status:          d.status || 'Pendente'
       });
       salvos++;
+      saveSessions();
     }
 
-    saveSessions();
     mkRefreshHomeUI_();
     resetNova();
     showPage('home');
@@ -884,11 +933,14 @@ async function confirmarLocacao() {
     toast(msg, 'success');
 
     if (typeof mkInvalidateInicioCache_ === 'function') mkInvalidateInicioCache_();
-    if (typeof syncController === 'function') syncController(false, 2500);
+    setTimeout(function() {
+      if (typeof syncController === 'function') syncController(false, 4000);
+    }, 200);
 
   } catch(e) {
     toast((e && e.message) ? e.message : 'Erro de conexão. Tente novamente.', 'error');
   } finally {
+    novaHideSaving_();
     _novaSavingInFlight = false;
     if (btn) { btn.textContent = 'Só salvar cadastro (sem SMS agora)'; btn.disabled = false; }
     const b2 = document.getElementById('btn-confirmar-iniciar');
@@ -992,5 +1044,7 @@ window.confirmarLocacao = confirmarLocacao;
 window.confirmarLocacaoEEnviarSms_ = confirmarLocacaoEEnviarSms_;
 window.mkRefreshHomeUI_ = mkRefreshHomeUI_;
 window.removerItemNova_ = removerItemNova_;
+window.novaIniciarPick_ = novaIniciarPick_;
+window.novaVoltarCesta_ = novaVoltarCesta_;
 window.novaAddOutroVeiculo_ = novaAddOutroVeiculo_;
 
