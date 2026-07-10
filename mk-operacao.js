@@ -628,10 +628,11 @@ async function iniciarContagem(rowIndex, opts) {
   s.started = true;
   s.status = 'Ativa';
   saveSessions();
-  renderCards();
+  if (typeof mkRefreshHomeUI_ === 'function') mkRefreshHomeUI_();
+  else renderCards();
 
   try {
-    const d = await api({ action: 'iniciarTimer', rowIndex, timestamp: clickTs, ...operadorApiParams_() });
+    const d = await api({ action: 'iniciarTimer', rowIndex, timestamp: clickTs, ...operadorApiParams_() }, 15000);
     if (!d.ok) throw new Error(d.erro || 'Servidor não confirmou o início.');
     const serverTs = Number(d.startTimestamp || 0);
     if (serverTs < 1e12) throw new Error('Servidor não gravou o início da contagem.');
@@ -645,7 +646,8 @@ async function iniciarContagem(rowIndex, opts) {
     delete s._iniciandoTimer;
     s._localTimerStart = s.startTimestamp;
     saveSessions();
-    renderCards();
+    if (typeof mkRefreshHomeUI_ === 'function') mkRefreshHomeUI_();
+    else renderCards();
     toast('⏱ Contagem iniciada!', 'success');
   } catch(e) {
     delete s._localTimerStart;
@@ -673,7 +675,7 @@ async function iniciarContagem(rowIndex, opts) {
   }
 
   broadcastInvalidate();
-  syncController(true, 2500);
+  syncController(false, 4000);
 }
 
 // ═══════════════════════════════════════════════════════════

@@ -129,6 +129,13 @@ function upsertSessaoPendenteLocal_(payload) {
   else sessions.push(payload);
 }
 
+/** I91 — Home imediata após salvar/▶ (não esperar carregarInicio). */
+function mkRefreshHomeUI_() {
+  if (typeof renderCards === 'function') renderCards();
+  if (typeof updateStats === 'function') updateStats();
+  if (typeof atualizarVeiculoGrid === 'function') atualizarVeiculoGrid();
+}
+
 function rowIndexFromSalvar_(d) {
   const ri = Number(d && d.rowIndex);
   if (ri >= 11) return ri;
@@ -565,11 +572,10 @@ async function confirmarLocacao() {
       responsavel:  resp,
       crianca:      cri,
       telefone:     tel,
-      // Enviado para que o GAS possa usar se o tipo for novo (Triciclo etc.)
       valorPlano:      cfgLocal.v || 0,
       mins:            cfgLocal.m || 0,
       adicionalPorMin: cfgLocal.a || 1.00
-    });
+    }, 18000);
 
     if (!d.ok) { toast('Erro: ' + d.erro, 'error'); return; }
 
@@ -584,7 +590,7 @@ async function confirmarLocacao() {
       veiculo:         novaState.veiculo,
       pagamento:       pagResp,
       observacao:      novaState.observacao || '',
-      mins:            d.mins            || cfgLocal.m,   // fallback local
+      mins:            d.mins            || cfgLocal.m,
       valorPlano:      d.valorPlano      || cfgLocal.v,
       adicionalPorMin: d.adicionalPorMin || cfgLocal.a,
       responsavel:     resp,
@@ -592,14 +598,14 @@ async function confirmarLocacao() {
       telefone:        tel,
       horaInicio:      d.horaInicio,
       data:            d.data,
-      startTimestamp:  0,   // explicitamente 0 = aguardando Iniciar
+      startTimestamp:  0,
       started:         false,
       alertFired5:     false,
       alertFiredExp:   false,
       status:          d.status || 'Pendente'
     });
     saveSessions();
-
+    mkRefreshHomeUI_();
     resetNova();
     showPage('home');
     const msgConta = d.mesmaConta
@@ -607,14 +613,8 @@ async function confirmarLocacao() {
       : '✅ Cadastro salvo! Aperte ▶ para iniciar a contagem.';
     toast(msgConta, 'success');
 
-    // Invalida cache local para sync imediato em outros dispositivos
     if (typeof mkInvalidateInicioCache_ === 'function') mkInvalidateInicioCache_();
-    else try { localStorage.removeItem('mk_inicio_cache_v2'); localStorage.removeItem('mk_inicio_cache'); } catch (e) {}
-    try { if(window._bc) window._bc.postMessage('sync'); } catch(e) {}
-    // MSG 1: disparada pelo operador no modal de boas-vindas (antes de iniciar contagem)
-
-    // Sync via controller (deduplicado, com debounce)
-    broadcastInvalidate(); syncController(true, 800);
+    if (typeof syncController === 'function') syncController(false, 6000);
 
   } catch(e) {
     toast((e && e.message) ? e.message : 'Erro de conexão. Tente novamente.', 'error');
@@ -720,4 +720,5 @@ async function confirmarLocacaoEEnviarSmsLegado_() {
 window.atualizarVeiculoGrid = atualizarVeiculoGrid;
 window.confirmarLocacao = confirmarLocacao;
 window.confirmarLocacaoEEnviarSms_ = confirmarLocacaoEEnviarSms_;
+window.mkRefreshHomeUI_ = mkRefreshHomeUI_;
 

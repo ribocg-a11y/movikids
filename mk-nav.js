@@ -93,6 +93,11 @@ function showPage(name, opts = {}) {
     }
   }
   if (name==='painel') renderPainel();
+  if (name==='home') {
+    if (typeof renderCards === 'function') renderCards();
+    if (typeof updateStats === 'function') updateStats();
+    if (typeof atualizarVeiculoGrid === 'function') atualizarVeiculoGrid();
+  }
   if (name==='relacionamento') carregarRelacionamento();
   if (name==='dashboard') {
     if (kpiData && kpiData.ok) renderCharts(kpiData);
