@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.183
+// MOVI KIDS — Google Apps Script v1.5.184
+// v1.5.184: I92 — anularLocacoesRowAdmin (anula Encerrada/Pendente/Ativa por rowIndex, sem filtro TESTE_)
 // v1.5.183: I88 — porSemana dashboard: semanas segunda–domingo (não blocos 1–7 fixos)
 // v1.5.182: I87 — histórico custos admin (listarCustosHistorico + listarPlanoContas)
 // v1.5.181: I85 — extras pagamento obrigatório + cancelamento justificado + caixa PIX/créd/déb/din
@@ -176,7 +177,7 @@
 
 // ── CONSTANTES ───────────────────────────────────────────────
 /** Versão exposta em ping, carregarInicio, validarSchema, gestaoPessoasStatus (bump com header). */
-const MK_GAS_VERSAO_  = 'v1.5.182';
+const MK_GAS_VERSAO_  = 'v1.5.184';
 const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.173';
 const SHEET_ID   = '1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618';
 const DEPLOY_ID  = 'AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y';
@@ -605,6 +606,7 @@ function dispatchMoviAction_(p, method) {
       case 'resetarPinOperadorAdmin': return resetarPinOperadorAdmin_(p);
       case 'corrigirFinanceiroLocacaoAdmin': return corrigirFinanceiroLocacaoAdmin_(p);
       case 'limparLocacoesTesteAdmin': return limparLocacoesTesteAdmin_(p);
+      case 'anularLocacoesRowAdmin': return anularLocacoesRowAdmin_(p);
       case 'liberarSessaoOperador': return liberarSessaoOperador_(p);
       case 'liberarSessaoOperadorAdmin': return liberarSessaoOperadorAdmin_(p);
       case 'touchSessaoOperador': return touchSessaoOperador_(p);
@@ -10444,6 +10446,41 @@ function anularLinhaTesteAdmin_(sheet, rowIndex, motivo) {
     responsavel: String(row[11] || ''),
     statusAntes: status
   };
+}
+
+/** Admin — anula locações por rowIndex (Encerrada/Pendente/Ativa), sem filtro isLocacaoTeste_. */
+function anularLocacoesRowAdmin_(p) {
+  if (!adminPinOk_(p)) return err_('Acesso negado — PIN administrativo incorreto', 403);
+  const motivo = String(p.motivo || '').trim();
+  if (motivo.length < 10) return err_('Motivo obrigatorio (min 10 caracteres)', 400);
+  const raw = String(p.rowIndexes || p.rowIndex || '').trim();
+  if (!raw) return err_('rowIndexes obrigatorio (ex: 1272,1273)', 400);
+  const indexes = raw.split(/[,;\s]+/).map(function (x) { return parseInt(x, 10); }).filter(function (n) { return n >= DATA_ROW; });
+  if (!indexes.length) return err_('Nenhum rowIndex valido', 400);
+  const lock = LockService.getScriptLock();
+  try { lock.waitLock(15000); } catch (ex) { return err_('Sistema ocupado', 503); }
+  try {
+    const sheet = sh_(SH_LOC);
+    const last = sheet.getLastRow();
+    const anuladas = [];
+    const ignoradas = [];
+    indexes.forEach(function (rowIndex) {
+      if (rowIndex > last) {
+        ignoradas.push({ rowIndex: rowIndex, motivo: 'fora_range' });
+        return;
+      }
+      const out = anularLinhaTesteAdmin_(sheet, rowIndex, motivo);
+      if (out.anulada) anuladas.push(out);
+      else ignoradas.push(out);
+    });
+    try { invalidateInicioResumoCache_(fmtData_(new Date())); } catch (e) {}
+    return resp_({
+      anuladas: anuladas,
+      ignoradas: ignoradas,
+      total: anuladas.length,
+      mensagem: anuladas.length + ' locacao(oes) anulada(s) por rowIndex'
+    });
+  } finally { lock.releaseLock(); }
 }
 
 function limparLocacoesTesteAdmin_(p) {
