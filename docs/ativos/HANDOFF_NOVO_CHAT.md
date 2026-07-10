@@ -118,7 +118,8 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 | 1b | **I69** hotfix ponto mock → **v1.9.3** | Agente | ✅ **29/06** Pages |
 | 1c | **I70–I75** varredura — GAS/FE/Dashboard/GP/Julia | Agente | ✅ **09/07** FE v1.9.9 · GAS v1.5.173 |
 | 1d | **I79–I83** Julia + Operadores quebrado + race Escala/Metas | Agente | ✅ FE **v1.9.15** · GAS **v1.5.179** Web |
-| 1e | **I84** scroll hub Colaboradores + meta conta/dia (I42) | Agente | ✅ FE **v1.9.16** · GAS **v1.5.180** repo — **Web pendente** |
+| 1e | **I84** scroll hub Colaboradores + meta conta/dia (I42) | Agente | ✅ FE **v1.9.16** · GAS **v1.5.180** |
+| 1f | **I85** caixa PIX/créd/déb/din + extras pagamento obrigatório | Agente | ✅ FE **v1.9.18** · GAS **v1.5.181** repo — **Web pendente** |
 | 2 | Assinar **FASE 17** (só falta **17.5 F9**) + smoke tablet D4 | Sócio + Ops | ⏳ **próximo** |
 | 3 | Smoke tablet **v1.9.9** (regressão balcão) | Ops | ⏳ Sprint D4 |
 | 4 | Sprint One UI A–C + I24 | Agente | ✅ **v1.9.9** |
