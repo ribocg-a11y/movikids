@@ -331,6 +331,16 @@ function setStatus(online) {
   if (typeof syncSidebarStatus === 'function') syncSidebarStatus(efectivo);
 }
 
+function mkSyncDeferHeavy_() {
+  if (window._kpiDashInFlight || window._kpiHubInFlight) return true;
+  if (window._resumoDiaBgRefresh) return true;
+  const heavy = ['page-dashboard', 'page-caixa', 'page-operadores', 'page-historico'];
+  return heavy.some(function (id) {
+    const el = document.getElementById(id);
+    return el && el.classList.contains('active');
+  });
+}
+
 function mkSyncWireEvents_() {
   try {
     const bc = new BroadcastChannel('movikids_sync');
@@ -360,15 +370,17 @@ function mkSyncWireEvents_() {
   setInterval(() => {
     const dashPage = document.getElementById('page-dashboard');
     if (dashPage && dashPage.classList.contains('active') &&
-        document.visibilityState === 'visible' && !window._kpiDashInFlight) {
+        document.visibilityState === 'visible' && !window._kpiDashInFlight &&
+        !mkSyncDeferHeavy_()) {
       syncController(false, 0);
     }
-  }, 90000);
+  }, 120000);
 
   setInterval(() => {
     if (document.visibilityState !== 'visible') return;
-    syncController(true, 0);
-  }, 45000);
+    if (mkSyncDeferHeavy_()) return;
+    syncController(false, 0);
+  }, 90000);
 
   setInterval(() => {
     if (document.visibilityState !== 'visible') return;

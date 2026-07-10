@@ -98,13 +98,15 @@ async function buscarHistorico() {
   if (cards) cards.style.display = 'none';
 
   try {
-    const resStats = await api({ action: 'listarHistorico', startDate: dates.s, endDate: dates.e, statsOnly: '1', ...apiParamsComAuth_() });
+    const authP = apiParamsComAuth_();
+    const resStatsP = api({ action: 'listarHistorico', startDate: dates.s, endDate: dates.e, statsOnly: '1', ...authP });
+    const resFullP = api({ action: 'listarHistorico', startDate: dates.s, endDate: dates.e, ...authP });
+    const resStats = await resStatsP;
     if (resStats.ok && resStats.stats) {
       renderAnalyticsCards(resStats.stats);
       renderHistExtChart_(resStats.stats);
     }
-
-    const res = await api({ action: 'listarHistorico', startDate: dates.s, endDate: dates.e, ...apiParamsComAuth_() });
+    const res = await resFullP;
     if (!res.ok) { container.innerHTML = '<div class="empty"><p>Erro.</p></div>'; return; }
 
     try {

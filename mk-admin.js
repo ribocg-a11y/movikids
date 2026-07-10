@@ -196,10 +196,7 @@ function adminLogin() {
   showAdminSidebar();
   showPage('home');
   if (!kpiData) carregarKPIs();
-  if (typeof syncController === 'function') {
-    syncController(false, 0);
-    setTimeout(function () { syncController(true, 0); }, 400);
-  }
+  if (typeof syncController === 'function') syncController(false, 0);
   setTimeout(carregarHistRelatorios, 1500);
   setTimeout(carregarConfig, 2000);
   if (typeof refreshOperadoresAdmin_ === 'function') refreshOperadoresAdmin_();
@@ -254,7 +251,7 @@ function irAdmin(page) {
   if (window.innerWidth < 1024 && typeof mobMenuClose_ === 'function') mobMenuClose_();
   showPage(page);
   if (page === 'dashboard') {
-    carregarKPIsDashboard();
+    /* showPage já chama carregarKPIsDashboard — evita fila dupla GAS (I86) */
   }
   if (page === 'relatorio') {
     initRelMesSel();
@@ -682,19 +679,44 @@ function kpiHubStub_() {
   return { ok: true, nHoje: nHojeCanonica_(), nSessoesHoje: nSessoesHojeCanonica_() };
 }
 
-async function carregarResumoHojeAdmin_() {
+function resumoDiaCacheRead_(cacheKey, staleMs) {
+  try {
+    const raw = sessionStorage.getItem(cacheKey);
+    if (!raw) return null;
+    const o = JSON.parse(raw);
+    if (!o || o.ts == null || !o.data || !o.data.ok) return null;
+    const ageMs = Date.now() - o.ts;
+    if (ageMs > staleMs) return null;
+    return { data: o.data, ageMs: ageMs };
+  } catch (e) { return null; }
+}
+
+async function carregarResumoHojeAdmin_(opts) {
+  const force = !!(opts && opts.force);
   const dataHoje = fmtDataBrHoje_();
   const cacheKey = 'mk_resumo_dia_' + dataHoje.replace(/\//g, '');
-  const cached = typeof mkSessCacheGet_ === 'function' ? mkSessCacheGet_(cacheKey, 60000) : null;
-  if (cached && cached.ok) {
-    resumoDiaHoje = cached;
-    return cached;
+  const RESUMO_FRESH_MS = 60000;
+  const RESUMO_STALE_MS = 5 * 60 * 1000;
+  if (!force) {
+    const hit = resumoDiaCacheRead_(cacheKey, RESUMO_STALE_MS);
+    if (hit) {
+      resumoDiaHoje = hit.data;
+      if (hit.ageMs < RESUMO_FRESH_MS) return hit.data;
+      if (!window._resumoDiaBgRefresh) {
+        window._resumoDiaBgRefresh = true;
+        carregarResumoHojeAdmin_({ force: true }).finally(function () {
+          window._resumoDiaBgRefresh = false;
+        });
+      }
+      return hit.data;
+    }
   }
   const authP = apiParamsComAuth_();
   const resumo = await api({ action: 'resumoDia', data: dataHoje, ...authP });
   if (resumo && resumo.ok) {
     resumoDiaHoje = resumo;
     if (typeof mkSessCacheSet_ === 'function') mkSessCacheSet_(cacheKey, resumo);
+    if (typeof atualizarHubAdmin_ === 'function') atualizarHubAdmin_();
   }
   return resumo;
 }
@@ -2049,6 +2071,26 @@ async function fetchHistoricoMesesFallback_(d) {
   const authP = apiParamsComAuth_();
   const range = mkHistoricoMesesRangeOperacao_(mes, ano);
   const rows = [];
+  const pending = [];
+
+  function histMesCacheGet_(m, y) {
+    try {
+      const raw = sessionStorage.getItem('mk_kpi_hist_' + m + '_' + y);
+      if (!raw) return null;
+      const o = JSON.parse(raw);
+      if (!o || !o.ts || !o.data || !o.data.ok) return null;
+      if (Date.now() - o.ts > 10 * 60 * 1000) return null;
+      return o.data;
+    } catch (e) { return null; }
+  }
+
+  function histMesCacheSet_(m, y, data) {
+    try {
+      if (!data || !data.ok) return;
+      sessionStorage.setItem('mk_kpi_hist_' + m + '_' + y, JSON.stringify({ ts: Date.now(), data: data }));
+    } catch (e) { /* quota */ }
+  }
+
   for (let i = 0; i < range.length; i++) {
     const item = range[i];
     const parcial = item.mes === hojeMes && item.ano === hojeAno;
@@ -2056,13 +2098,29 @@ async function fetchHistoricoMesesFallback_(d) {
       rows.push(mkHistoricoRowFromKpi_(item, d, parcial));
       continue;
     }
-    try {
-      const r = await api(Object.assign({ action: 'kpiMes', mes: item.mes, ano: item.ano, lite: '1' }, authP), 35000);
-      if (r && r.ok) {
-        rows.push(mkHistoricoRowFromKpi_(item, r, parcial));
-      }
-    } catch (e) { /* mês indisponível */ }
+    const cached = histMesCacheGet_(item.mes, item.ano);
+    if (cached) {
+      rows.push(mkHistoricoRowFromKpi_(item, cached, parcial));
+      continue;
+    }
+    pending.push((async function () {
+      try {
+        const r = await api(Object.assign({ action: 'kpiMes', mes: item.mes, ano: item.ano, lite: '1' }, authP), 35000);
+        if (r && r.ok) {
+          histMesCacheSet_(item.mes, item.ano, r);
+          return mkHistoricoRowFromKpi_(item, r, parcial);
+        }
+      } catch (e) { /* mês indisponível */ }
+      return null;
+    })());
   }
+
+  const fetched = await Promise.all(pending);
+  fetched.forEach(function (row) { if (row) rows.push(row); });
+  rows.sort(function (a, b) {
+    if (a.ano !== b.ano) return a.ano - b.ano;
+    return a.mes - b.mes;
+  });
   return rows;
 }
 
@@ -3183,19 +3241,38 @@ async function carregarCaixa() {
   if (!dataEl) return;
   const [y,m,d] = dataEl.value.split('-');
   const dataFmt = `${d}/${m}/${y}`;
+  const hoje = fmtDataBrHoje_();
 
   ['cx-total','cx-maq','cx-din','cx-cus','cx-res','cx-nloc','cx-ext'].forEach(id => {
     const el = document.getElementById(id); if(el) el.textContent = '...';
   });
 
   try {
-    const authP = apiParamsComAuth_();
-    const r = await api({ action: 'resumoDia', data: dataFmt, ...authP });
-    if (!r.ok) {
-      toast(r.erro || 'Erro ao carregar caixa', 'error');
+    if (dataFmt === hoje && resumoDiaHoje && resumoDiaHoje.ok) {
+      renderCaixaFromResumo_(dataFmt, resumoDiaHoje);
+    } else if (dataFmt === hoje) {
+      const hit = resumoDiaCacheRead_('mk_resumo_dia_' + hoje.replace(/\//g, ''), 5 * 60 * 1000);
+      if (hit) {
+        resumoDiaHoje = hit.data;
+        renderCaixaFromResumo_(dataFmt, hit.data);
+      }
+    }
+
+    let r;
+    if (dataFmt === hoje) {
+      r = await carregarResumoHojeAdmin_();
+    } else {
+      const authP = apiParamsComAuth_();
+      r = await api({ action: 'resumoDia', data: dataFmt, ...authP });
+      if (r && r.ok && typeof mkSessCacheSet_ === 'function') {
+        mkSessCacheSet_('mk_resumo_dia_' + dataFmt.replace(/\//g, ''), r);
+      }
+    }
+    if (!r || !r.ok) {
+      toast((r && r.erro) || 'Erro ao carregar caixa', 'error');
       return;
     }
-    if (dataFmt === fmtDataBrHoje_()) resumoDiaHoje = r;
+    if (dataFmt === hoje) resumoDiaHoje = r;
     renderCaixaFromResumo_(dataFmt, r);
     if (typeof atualizarHubAdmin_ === 'function') atualizarHubAdmin_();
   } catch(e) {

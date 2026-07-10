@@ -75,6 +75,30 @@ async function carregarRelacionamento() {
   const q = document.getElementById('rel-busca')?.value.trim() || '';
   const container = document.getElementById('rel-container');
   if (!container) return;
+
+  const cacheKey = 'mk_rel_' + (q || '_all');
+  if (!q) {
+    try {
+      const raw = sessionStorage.getItem(cacheKey);
+      if (raw) {
+        const o = JSON.parse(raw);
+        if (o && o.ts && o.data && Date.now() - o.ts < 3 * 60 * 1000) {
+          relacionamentoCache = o.data;
+          renderRelacionamentoList_(container);
+          api({ action: 'listarResponsaveis', q: '', limite: 80 }, 25000).then(function (res) {
+            if (!res || !res.ok) return;
+            relacionamentoCache = (res.responsaveis || []).slice().sort(function (a, b) {
+              return String(a.responsavel || '').trim().localeCompare(String(b.responsavel || '').trim(), 'pt-BR', { sensitivity: 'base' });
+            });
+            try { sessionStorage.setItem(cacheKey, JSON.stringify({ ts: Date.now(), data: relacionamentoCache })); } catch (e) {}
+            renderRelacionamentoList_(container);
+          }).catch(function () {});
+          return;
+        }
+      }
+    } catch (e) { /* ignora */ }
+  }
+
   container.innerHTML = '<div class="skeleton"></div><div class="skeleton"></div>';
 
   try {
@@ -88,11 +112,22 @@ async function carregarRelacionamento() {
       const bn = String(b.responsavel || '').trim();
       return an.localeCompare(bn, 'pt-BR', { sensitivity: 'base' });
     });
-    if (!relacionamentoCache.length) {
-      container.innerHTML = '<div class="empty"><div class="empty-icon">👥</div><h3>Nenhum responsavel encontrado</h3><p>Tente outro nome ou telefone.</p></div>';
-      return;
+    if (!q) {
+      try { sessionStorage.setItem(cacheKey, JSON.stringify({ ts: Date.now(), data: relacionamentoCache })); } catch (e) {}
     }
-    container.innerHTML = relacionamentoCache.map((r, idx) => {
+    renderRelacionamentoList_(container);
+  } catch {
+    container.innerHTML = '<div class="empty"><p>Erro de conexão.</p></div>';
+  }
+}
+
+function renderRelacionamentoList_(container) {
+  if (!container) return;
+  if (!relacionamentoCache.length) {
+    container.innerHTML = '<div class="empty"><div class="empty-icon">👥</div><h3>Nenhum responsavel encontrado</h3><p>Tente outro nome ou telefone.</p></div>';
+    return;
+  }
+  container.innerHTML = relacionamentoCache.map((r, idx) => {
       const nome = String(r.responsavel || 'Responsavel sem nome').trim();
       const initial = escHtml((nome.charAt(0) || '?').toUpperCase());
       const kids = (r.criancas || []).map(c => `<span class="rel-kid mk-rel-tab">${escHtml(c)}</span>`).join('') || '<span class="rel-kid mk-rel-tab">Sem crianca</span>';
@@ -126,7 +161,4 @@ async function carregarRelacionamento() {
         <div class="rel-history" id="rel-hist-${idx}">${hist || '<div class="rel-hitem"><span>Sem histórico detalhado</span></div>'}</div>
       </div>`;
     }).join('');
-  } catch(e) {
-    container.innerHTML = '<div class="empty"><div class="empty-icon">⚠️</div><h3>Falha ao carregar</h3><p>Verifique internet e se o Apps Script v1.5.23 foi reimplantado.</p></div>';
-  }
 }
