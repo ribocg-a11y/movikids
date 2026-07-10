@@ -1,10 +1,10 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 10/07/2026 · FE **v1.9.36** · GAS **v1.5.187** (ping alinhado após Nova versão)  
+**Atualizado:** 10/07/2026 · FE **v1.9.39** · GAS **v1.5.187** (ping alinhado · batch `salvarLocacoesMulti`)  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **Repo local:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`  
-**GitHub:** `ribocg-a11y/movikids` · branch `main` · commit **341386b** (I75 Julia RH)
+**GitHub:** `ribocg-a11y/movikids` · branch `main` · commit **bf049b0** (I103 encerradas/caixa)
 
 **Mensagem mínima no novo chat:**
 
@@ -59,13 +59,13 @@ cursor "C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-mo
 
 | Camada | Versão | URL / evidência |
 |--------|--------|-----------------|
-| **Frontend** | **v1.9.36** | https://ribocg-a11y.github.io/movikids/?force=1.9.36 |
-| **Gestão Pessoas** | **v1.9.36** | `gestao-pessoas.html?force=1.9.36` |
-| **Service Worker** | **1.9.36** | `sw.js` |
-| **Apps Script** | **v1.5.187** | ping + batch `salvarLocacoesMulti` — **Nova versão Web** após pull |
+| **Frontend** | **v1.9.39** | https://ribocg-a11y.github.io/movikids/?force=1.9.39 |
+| **Gestão Pessoas** | **v1.9.39** | `gestao-pessoas.html?force=1.9.39` |
+| **Service Worker** | **1.9.39** | `sw.js` |
+| **Apps Script** | **v1.5.187** | ping `salvarLocacoesMulti` · **Nova versão Web** publicada |
 | **Baseline P0** | ✅ | `docs/ativos/BASELINE_CODIGO_P0.md` |
 | **PIN admin** | **1421** | Script Property `ADMIN_PIN` |
-| **Homolog tablet** | ✅ 23/06 | I43 · I42 · I47 · Gestor — smoke **v1.9.9** pendente Ops |
+| **Homolog tablet** | ✅ 23/06 | I43 · I42 · I47 · Gestor — smoke **v1.9.39** pendente Ops |
 | **Planilha** | 23 abas | `schemaOk=True` · auditoria **23/23** |
 | **FOLHA VT (I68)** | ✅ 26/06 | B9 **8,80** · B10/B12 **22** · B68 **5253,96** · B25 **18,18** |
 | **FOLHA_PONTO audit** | ✅ I70 | 5 linhas reparadas via API 09/07 |
@@ -73,11 +73,20 @@ cursor "C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-mo
 | **Colaboradores RH** | ✅ I75+I79 | Julia sync RH + escala Atendente 2 (07/2026) · meta turno ativa |
 | **Raykelly cadastro** | ✅ **100%** | API 26/06 · id 3 |
 | **Design System** | **v1.1** | `DESIGN_SYSTEM_MOVIKIDS.md` |
+| **Multi-veículo** | ✅ I97–I99 | Cesta Nova locação · batch GAS · overlay watchdog |
+| **I103 contagem** | ✅ v1.9.39 | Encerradas = contas únicas · Caixa = todas locações |
 
 **Deploy ID GAS:** `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y`
 
 **GAS canônico (PC):**  
 `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github\MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs`
+
+**Regra I103 (contagem dia):**
+
+| Onde | Mostra |
+|------|--------|
+| Tile **Contas hoje** + lista **Encerradas** + painel **Encerrados** | **Números únicos** (telefone/conta_id — I42) |
+| **Caixa** (chip, página, hub, dashboard) | **Todas as locações** (`nSessoes`) |
 
 **Atalhos teste:**
 
@@ -103,7 +112,7 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 | 4 | `PLANO_PREMIUM_ONEUI_FASES_16_22_2026-06.md` | Visão FASE 16–22 |
 | 5 | `PLANEJAMENTO_ATUAL_2026-06.md` §9 | Prioridades gerais |
 | 6 | `ESTADO_ATUAL.md` · `DEPLOY_ATUAL.md` | Versões |
-| 7 | `MAPA_ERROS_FALHAS_BUGS.md` | I* travas (I68 VT) |
+| 7 | `MAPA_ERROS_FALHAS_BUGS.md` | I* travas (I68 VT · I96–I103) |
 | 8 | `../INDICE.md` | Mapa docs |
 
 **Fonte de verdade versão:** `mk-version.js` → ping GAS → `DEPLOY_ATUAL.md` → este handoff.
@@ -116,16 +125,15 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 |---|------|------|--------|
 | 1 | **Sprint D1** homolog PC admin v1.9.2 | Agente | ✅ **27/06** |
 | 1b | **I69** hotfix ponto mock → **v1.9.3** | Agente | ✅ **29/06** Pages |
-| 1c | **I70–I75** varredura — GAS/FE/Dashboard/GP/Julia | Agente | ✅ **09/07** FE v1.9.9 · GAS v1.5.173 |
-| 1d | **I79–I83** Julia + Operadores quebrado + race Escala/Metas | Agente | ✅ FE **v1.9.15** · GAS **v1.5.179** Web |
-| 1e | **I84** scroll hub Colaboradores + meta conta/dia (I42) | Agente | ✅ FE **v1.9.16** · GAS **v1.5.180** |
-| 1f | **I85** caixa PIX/créd/déb/din + extras pagamento obrigatório | Agente | ✅ FE **v1.9.18** · GAS **v1.5.181** repo — **Web pendente** |
+| 1c | **I70–I75** varredura — GAS/FE/Dashboard/GP/Julia | Agente | ✅ **09/07** |
+| 1d | **I79–I83** Julia + Operadores + race Escala/Metas | Agente | ✅ FE **v1.9.15** · GAS **v1.5.179** |
+| 1e | **I84–I87** meta conta/dia · caixa pagamento · perf admin | Agente | ✅ FE **v1.9.21** · GAS **v1.5.182** |
+| 1f | **I96–I103** multi-veículo + contagem encerradas/caixa | Agente | ✅ FE **v1.9.39** · GAS **v1.5.187** Web |
 | 2 | Assinar **FASE 17** (só falta **17.5 F9**) + smoke tablet D4 | Sócio + Ops | ⏳ **próximo** |
-| 3 | Smoke tablet **v1.9.9** (regressão balcão) | Ops | ⏳ Sprint D4 |
+| 3 | Smoke tablet **v1.9.39** (multi-veículo + overlay + timer) | Ops | ⏳ Sprint D4 |
 | 4 | Sprint One UI A–C + I24 | Agente | ✅ **v1.9.9** |
-| 5 | Validar Operadores/Escala + Julia ponto + meta dedup | Sócio PC | ⏳ `?force=1.9.16` + GAS Web v1.5.180 |
 
-Docs: `PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md` · `CHECKLIST_FASE17_FECHAMENTO.md`
+Docs: `PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md` · `CHECKLIST_FASE17_FECHAMENTO.md` · `INCIDENTE_I96_I99_MULTI_VEICULO_2026-07-10.md`
 
 ---
 
@@ -136,18 +144,17 @@ Docs: `PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md` · `CHECKLIST_FASE17_FECHAMENTO.
 | Homolog tablet I43/I42/I47/Gestor | 23/06 |
 | GAS v1.5.167 Web · planilha 23/23 | 26/06 |
 | **I68 VT folha** (4,40×2 · 22 dias) | 26/06 |
-| FE v1.8.122 timeout RH Colaboradores | 26/06 |
-| Diagnóstico 6 camadas | 25/06 |
-| FASE 17 API alertas (`TESTE_FASE17` ✅) | 26/06 |
-| Raykelly cadastro **100%** | 26/06 |
+| **I96–I99** multi-veículo + overlay | 10/07 |
+| **I101** MK_GAS_VERSAO_ alinhado | 10/07 |
+| **I103** encerradas únicas / caixa todas | 10/07 |
 | **I69** ponto mock FE **v1.9.3** | 29/06 |
 
 ---
 
 ## Incidentes — referência rápida
 
-I15 POST browser · I20/I43 cronômetro · I42 conta dia · I44 banco horas · **I68 VT folha** · **I69 ponto mock** · **I70–I76 sessão 09/07** · I52–I67 planilha · ver `MAPA_ERROS_FALHAS_BUGS.md` · `INCIDENTE_SESSAO_2026-07-09_I70_I75.md`.
+I15 POST browser · I20/I43 cronômetro · I42 conta dia · **I68 VT folha** · **I69 ponto mock** · **I70–I76 sessão 09/07** · **I96–I103 multi-veículo/contagem** · ver `MAPA_ERROS_FALHAS_BUGS.md` · `INCIDENTE_I96_I99_MULTI_VEICULO_2026-07-10.md`.
 
 ---
 
-*Preparado para novo chat — ciclo Premium One UI · sessão VT/RH fechada 26/06.*
+*Preparado para novo chat — ciclo Premium One UI · sessão multi-veículo + I103 fechada 10/07.*

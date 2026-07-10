@@ -1,4 +1,4 @@
-# MOVI KIDS — Estado atual (09/07/2026)
+# MOVI KIDS — Estado atual (10/07/2026)
 
 Referência única para alinhamento local × produção.
 
@@ -31,21 +31,22 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 ---
 
-## Produção (09/07/2026)
+## Produção (10/07/2026)
 
 | Camada | Versão | URL / evidência |
 |--------|--------|-----------------|
-| **Frontend** | **v1.9.9** | https://ribocg-a11y.github.io/movikids/?force=1.9.9 |
-| **Gestão Pessoas** | **v1.9.9** | `gestao-pessoas.html?force=1.9.9` |
-| **Portal acompanhar** | **v1.9.9** | `acompanhar.html` |
-| **Service Worker** | **1.9.9** | `sw.js` |
-| **Apps Script** | **v1.5.173** | ping Web **v1.5.173** ✅ |
+| **Frontend** | **v1.9.39** | https://ribocg-a11y.github.io/movikids/?force=1.9.39 |
+| **Gestão Pessoas** | **v1.9.39** | `gestao-pessoas.html?force=1.9.39` |
+| **Portal acompanhar** | **v1.9.39** | `acompanhar.html` |
+| **Service Worker** | **1.9.39** | `sw.js` |
+| **Apps Script** | **v1.5.187** | ping Web **v1.5.187** ✅ · `salvarLocacoesMulti` |
 | **FOLHA VT I68** | ✅ 26/06 | B9 **8,80** · B10/B12 **22** · Milena VT **193,60** · Raykelly **103,25** |
 | **Planilha** | 23 abas | `schemaOk=True` · auditoria célula **23/23** |
-| **Homolog tablet** | ✅ 23/06 | I43 · I42 · I47 · Gestor — smoke v1.9.9 pendente Ops |
+| **Homolog tablet** | ✅ 23/06 | I43 · I42 · I47 · Gestor — smoke v1.9.39 pendente Ops |
 | **Raykelly cadastro** | ✅ **100%** | id 3 · API 26/06 |
 | **Design System** | **v1.1** | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
-| **Ciclo dev** | Sprint D | One UI A–C ✅ **v1.9.9** · `PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md` |
+| **Ciclo dev** | Sprint D | One UI A–C ✅ · I96–I103 multi-veículo ✅ |
+| **I103 contagem** | ✅ v1.9.39 | Encerradas = contas únicas · Caixa = todas locações |
 | **RELATORIOS** | repair I60 24/06 | 1 registro · **schemaOk=True** |
 | **RESPONSAVEIS** | repair I59 24/06 | **241** cadastros · **schemaOk=True** |
 | **FOLHA** | I68 26/06 | B68 **5253,96** · VA/dia **18,18** · VT **193,60**/pessoa · **schemaOk=True** |
@@ -58,7 +59,7 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 **Teste rápido GAS (ping):**  
 https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec?action=ping  
-→ ping **v1.5.173** (Web) · repo **v1.5.173** · `kpiMes` folha `vtTarifa=8.8` `diasVt=22` · `validarSchema` **schemaOk=True**
+→ ping **v1.5.187** (Web) · repo **v1.5.187** · `kpiMes` folha `vtTarifa=8.8` `diasVt=22` · `validarSchema` **schemaOk=True**
 
 **URL morta (não usar):** `AKfycbzc...` → 404
 
@@ -126,7 +127,11 @@ https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPe
 
 | Versão | Entrega |
 |--------|---------|
-| **v1.8.89** + **GAS v1.5.121** | FASE 17.5 — alertas Proativos na ficha Presença + Metas |
+| **v1.9.39** | **I103** — Encerradas contas únicas · Caixa todas locações · `mkEncHojePorConta_` |
+| **v1.9.28–1.9.34** | **I97–I99** — multi-veículo cesta · overlay watchdog · batch FE |
+| **GAS v1.5.187** | **I98** — `salvarLocacoesMulti` validate-first · **I101** versão ping |
+| **v1.9.18** + **GAS v1.5.181** | **I85** — caixa PIX/créd/déb/din + extras pagamento |
+| **v1.9.9** + **GAS v1.5.173** | **I70–I75** — Dashboard perf · Julia RH · GP timeout |
 | **v1.8.88** + **GAS v1.5.120** | FASE 17 — meta abaixo 3d · alertas RH Operadores · frota parada Sistema |
 | **v1.8.87** + **GAS v1.5.119** | FASE 17 — alertasInteligentes_ · perfil gestor · badge Proativo |
 | **v1.8.86** + **GAS v1.5.118** | FASE 16 fechada — sidebar mobile admin · comando comparativo 30d |
@@ -317,11 +322,13 @@ Commits de referência: `3d9d106` (v1.7.25), `e1a56db` (Pacote E), `1454bc8` (fi
 | Métrica | Onde |
 |---------|------|
 | Faturamento **hoje** (detalhe) | **Caixa** |
-| Chip “Hoje” na Home admin | Atalho → Caixa |
+| Chip “Hoje” na Home admin | Atalho → Caixa (**todas locações**) |
 | Faturamento **mês**, margem, resultado, payback, ocupação | **Cockpit** `#mk-exec-cockpit` |
 | Ticket médio, R$/h, break-even | **Leading** `#mk-leading-row` |
-| Ano, locações, custos, extras, caixa hoje | **Dashboard** linha `#new-kpi-row` |
-| Ativas / encerradas hoje (contagem) | **Home** stats-bar |
+| Ano, locações, custos, extras, caixa hoje | **Dashboard** linha `#new-kpi-row` (**locações totais**) |
+| **Contas únicas hoje** (maquininha — I42) | **Home** tile `stat-nloc` + lista **Encerradas** agrupada |
+| **Locações encerradas hoje** (todas) | **Caixa** `cx-nloc` · chip admin · hub dia |
+| Ativas agora | **Home** `stat-ativas` |
 | Diagnóstico técnico | **Sistema** |
 
 ---

@@ -1,6 +1,6 @@
 # MOVI KIDS — Índice de documentação
 
-**Atualizado:** 27/06/2026 (FE **v1.9.2** · GAS **v1.5.167** · Sprint D pós One UI)
+**Atualizado:** 10/07/2026 (FE **v1.9.39** · GAS **v1.5.187** · I96–I103)
 
 ## Comece aqui
 
@@ -21,7 +21,8 @@
 | [**AUDITORIA_RH_FOLHA_PERSISTENCIA_2026-06-22.md**](ativos/AUDITORIA_RH_FOLHA_PERSISTENCIA_2026-06-22.md) | **Matriz RH** — abas, cálculos, lacunas RH-G1–G15 |
 | [**INCIDENTE_I43_CARREGAR_INICIO_COL_Y_2026-06-23.md**](ativos/INCIDENTE_I43_CARREGAR_INICIO_COL_Y_2026-06-23.md) | **I43** — cronômetro revertia após ▶ |
 | [**INCIDENTE_I53_CONFIG_PLANILHA_REPAIR_2026-06-24.md**](arquivo/incidentes/INCIDENTE_I53_CONFIG_PLANILHA_REPAIR_2026-06-24.md) | **I53** — CONFIG memorial, schema, repair |
-| [**INCIDENTE_I68_VT_FOLHA_DUPLO_2026-06-26.md**](arquivo/incidentes/INCIDENTE_I68_VT_FOLHA_DUPLO_2026-06-26.md) | **I68** — VT folha 4,40×2 · 22 dias · GAS v1.5.167 |
+| [**INCIDENTE_I96_I99_MULTI_VEICULO_2026-07-10.md**](arquivo/incidentes/INCIDENTE_I96_I99_MULTI_VEICULO_2026-07-10.md) | **I96–I103** — multi-veículo · overlay · contagem encerradas/caixa |
+| [**BASELINE_CODIGO_P0.md**](ativos/BASELINE_CODIGO_P0.md) | **Zonas congeladas** — não mexer em P0 sem pedido |
 | [**INCIDENTE_I45_CADASTRO_RH_NAO_PERSISTIDO_2026-06-23.md**](ativos/INCIDENTE_I45_CADASTRO_RH_NAO_PERSISTIDO_2026-06-23.md) | **I45** — cadastro Raykelly / installer apagava RH |
 | [**PROTOCOLO_AUDITORIA_ABAS_PLANILHA.md**](ativos/PROTOCOLO_AUDITORIA_ABAS_PLANILHA.md) | **Auditoria por aba** — roteiro LOCACOES + CONFIG (I53) + roadmap 24 abas |
 | [**CHECKLIST_ABA_PLANILHA_CONFIG.md**](referencia/CHECKLIST_ABA_PLANILHA_CONFIG.md) | Checklist aba **CONFIG** (I53) |
@@ -71,7 +72,7 @@
 | [**PROTOCOLO_ATUALIZAR_TUDO.md**](ativos/PROTOCOLO_ATUALIZAR_TUDO.md) | **Comando "atualize tudo"** — checklist docs + planilha + pasta C |
 | [REGRAS_DE_PUBLICACAO_SEGURA.md](ativos/REGRAS_DE_PUBLICACAO_SEGURA.md) | Regras P0 deploy |
 | [ACESSOS_E_AUTORIZACOES.md](ativos/ACESSOS_E_AUTORIZACOES.md) | Papéis, PIN, agente vs humano |
-| [MAPA_ERROS_FALHAS_BUGS.md](ativos/MAPA_ERROS_FALHAS_BUGS.md) | Índice I1–I34 |
+| [MAPA_ERROS_FALHAS_BUGS.md](ativos/MAPA_ERROS_FALHAS_BUGS.md) | Índice I1–I103 |
 
 ## Hierarquia (conflito de versão)
 

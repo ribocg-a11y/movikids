@@ -1,6 +1,6 @@
 # MOVI KIDS — Protocolo "Atualize tudo"
 
-**Criado:** 14/06/2026 · **Última execução:** 27/06/2026 (v1.9.2 One UI + travas I24 + roteiro agente)  
+**Criado:** 14/06/2026 · **Última execução:** 10/07/2026 (FE **v1.9.39** · GAS **v1.5.187** · I103 contagem)  
 **Função:** quando o usuário pedir **"atualize tudo"**, o agente segue **esta lista** — não só handoff parcial.  
 **Regra Cursor:** `.cursor/rules/atualize-tudo-movikids.mdc`
 
@@ -42,16 +42,16 @@ Sincronizar **documentação + estado operacional** do projeto com a realidade a
 
 ---
 
-## Produção atual (27/06/2026)
+## Produção atual (10/07/2026)
 
 | Camada | Versão | Evidência |
 |--------|--------|-----------|
-| GAS | **v1.5.167** | I68 VT · ping Web verificar |
-| FE | **v1.9.2** | Pages live · Sprints A–C One UI |
+| GAS | **v1.5.187** | ping Web · `salvarLocacoesMulti` |
+| FE | **v1.9.39** | Pages live · I103 encerradas/caixa |
 | Planilha FOLHA | **OK** | B9=8,80 · B10/B12=22 · B68=5253,96 |
 | Planilha | **OK** | `schemaOk=True` · auditoria **23/23** |
-| Homolog tablet | **✅** | 23/06 · smoke v1.9.2 pendente |
-| Ciclo dev | **One UI ✅** | `ROTEIRO_AGENTE_OBRIGATORIO.md` · travas I24 |
+| Homolog tablet | **✅** | 23/06 · smoke v1.9.39 pendente |
+| Ciclo dev | **I96–I103 ✅** | multi-veículo · `ROTEIRO_AGENTE_OBRIGATORIO.md` · travas I24 |
 
 ---
 

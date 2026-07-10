@@ -1,6 +1,6 @@
 # MOVI KIDS — Deploy atual (referência única)
 
-**Atualizado:** 09/07/2026 (FE v1.9.9 + GAS v1.5.173 I70–I75)
+**Atualizado:** 10/07/2026 (FE **v1.9.39** + GAS **v1.5.187** I96–I103)
 
 Use **este arquivo** para versão e ordem de publicação. Docs `DEPLOY_v1.5.xx_*` em **`docs/arquivo/deploy/`** são histórico.
 
@@ -10,11 +10,11 @@ Use **este arquivo** para versão e ordem de publicação. Docs `DEPLOY_v1.5.xx_
 
 | Camada | Repo | Produção (ping / Pages) | Alinhado? |
 |--------|------|-------------------------|-----------|
-| **Frontend** | **v1.9.9** | https://ribocg-a11y.github.io/movikids/?force=1.9.9 | ✅ Pages |
-| **Gestão Pessoas** | **v1.9.9** | `gestao-pessoas.html?force=1.9.9` | ✅ |
-| **Portal acompanhar** | **v1.9.9** | `acompanhar.html` | ✅ |
-| **Service Worker** | **1.9.9** | `sw.js` | ✅ |
-| **GAS** | **v1.5.173** (header `.gs`) | ping Web **v1.5.173** | ✅ |
+| **Frontend** | **v1.9.39** | https://ribocg-a11y.github.io/movikids/?force=1.9.39 | ✅ Pages |
+| **Gestão Pessoas** | **v1.9.39** | `gestao-pessoas.html?force=1.9.39` | ✅ |
+| **Portal acompanhar** | **v1.9.39** | `acompanhar.html` | ✅ |
+| **Service Worker** | **1.9.39** | `sw.js` | ✅ |
+| **GAS** | **v1.5.187** (header `.gs`) | ping Web **v1.5.187** | ✅ |
 
 **Ping:** https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec?action=ping
 
@@ -36,7 +36,7 @@ C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\m
 
 https://raw.githubusercontent.com/ribocg-a11y/movikids/main/MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs
 
-**Header:** v1.5.173 · I75 Julia RH · I74 GP perf · I73 kpiMes lite · I72 meta gráfico
+**Header:** v1.5.187 · I98 `salvarLocacoesMulti` validate-first · I101 `MK_GAS_VERSAO_` alinhado
 
 ---
 
@@ -61,9 +61,11 @@ Roteiro completo: **`ROTEIRO_AGENTE_OBRIGATORIO.md`**
 
 ## Ciclo ativo
 
-**Premium One UI** — Sprints A–C ✅ **v1.9.9** · próximo: FASE 17 assinatura + smoke tablet v1.9.9
+**Premium One UI** — Sprints A–C ✅ · **I96–I103** multi-veículo ✅ · próximo: FASE 17 assinatura + smoke tablet v1.9.39
 
-**Sessão 09/07:** I70–I75 — ver `INCIDENTE_SESSAO_2026-07-09_I70_I75.md`
+**Sessão 10/07:** I96–I103 — ver `INCIDENTE_I96_I99_MULTI_VEICULO_2026-07-10.md`
+
+**Regra I103:** Encerradas = contas únicas (`mkContasEncHoje_`) · Caixa = todas locações (`nSessoesHojeCanonica_`).
 
 ---
 
@@ -96,6 +98,7 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 .\scripts\testes\TESTE_FASE16_COMANDO_READONLY.ps1
 .\scripts\testes\TESTE_FASE17_ALERTAS_READONLY.ps1
 .\scripts\testes\TESTE_INVESTIGACAO_VT_COLABORADORES.ps1
+.\scripts\testes\TESTE_PARIDADE_HTTP_BROWSER_GAS.ps1
 ```
 
-Incidentes: `MAPA_ERROS_FALHAS_BUGS.md` I42–I76 · I24 travas publicação FE.
+Incidentes: `MAPA_ERROS_FALHAS_BUGS.md` I42–I103 · I24 travas publicação FE.

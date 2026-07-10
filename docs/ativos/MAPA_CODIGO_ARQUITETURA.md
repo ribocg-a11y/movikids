@@ -300,8 +300,10 @@ Antes de alterar, **declarar escopo** (Regra 1) e **pedir OK** do responsável:
 | Custo por locação (derivado) | **Leading** `#mk-leading-row` |
 | Custos por categoria (detalhe) | **Gestão avançada** (abaixo) |
 | Ticket médio, R$/h, break-even | **Leading** `#mk-leading-row` |
-| Ano, locações, cancelamentos, extras, caixa hoje | **Dashboard** linha `#new-kpi-row` |
-| Contagem ativas/encerradas hoje | **Home** stats-bar |
+| Ano, locações, cancelamentos, extras, caixa hoje | **Dashboard** linha `#new-kpi-row` (**locações totais**) |
+| **Contas únicas hoje** (I42 — maquininha) | **Home** `stat-nloc` + **Encerradas** agrupada (`mkEncHojePorConta_`) |
+| **Locações encerradas hoje** (todas) | **Caixa** `cx-nloc` · chip admin · hub dia |
+| Ativas agora | **Home** `stat-ativas` |
 | Diagnóstico técnico | **Sistema** |
 
 Duplicar KPI em Home operador = **proibido** (Pacote I).

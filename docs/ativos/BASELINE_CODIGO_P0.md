@@ -1,6 +1,6 @@
 # MOVI KIDS — Baseline código P0 (não mexer)
 
-**Criado:** 10/07/2026 · **FE baseline:** v1.9.35 · **GAS prod (ping):** v1.5.182  
+**Criado:** 10/07/2026 · **FE baseline:** v1.9.39 · **GAS prod (ping):** v1.5.187  
 **Objetivo:** zona congelada — agente só edita o que o pedido exige; **correção cirúrgica**, não refatoração.
 
 ---
@@ -43,17 +43,17 @@ Antes de editar qualquer arquivo P0: ler este doc + `MAPA_ERROS_FALHAS_BUGS.md` 
 
 1. Escritas GAS no browser = **GET** (`action=salvarLocacao`, params query).
 2. **1 veículo** → uma chamada `salvarLocacao` → card Pendente → ▶ inicia timer.
-3. **N veículos** → N× `salvarLocacao` sequencial (GAS prod v1.5.182) — mesma conta via I42 no GAS.
+3. **N veículos** → batch `salvarLocacoesMulti` se `ping.postWriteActions` listar (GAS **v1.5.187** Web); senão N× `salvarLocacao` sequencial.
 4. Overlay salvamento: sempre some no `finally`; watchdog + dismiss se travar.
 5. `_novaSavingInFlight` + `_novaSaveGen` — mutex anti-duplicata; sync defer durante save (mk-sync).
 
 ---
 
-## Batch GAS (futuro — OFF em prod)
+## Batch GAS (prod v1.5.187+)
 
-- Action `salvarLocacoesMulti` existe **só no repo** GAS v1.5.187+.
-- FE **não chama** batch enquanto `ping.postWriteActions` não listar a action.
-- Flag: `window._mkGasBatchOk` (warm no boot, default `false`).
+- Action `salvarLocacoesMulti` ativa quando `ping.postWriteActions` incluir a action.
+- FE chama batch após warm no boot (`window._mkGasBatchOk`).
+- GAS valida **todos** os itens antes de `appendRow` (I98c).
 
 ---
 
@@ -70,4 +70,4 @@ Antes de editar qualquer arquivo P0: ler este doc + `MAPA_ERROS_FALHAS_BUGS.md` 
 
 ## Referência commit baseline FE
 
-Branch `main` após **baseline-fe-v1.9.36** (10/07/2026): debounce draft/grid, sync defer no save, código morto removido.
+Branch `main` após **I103 v1.9.39** (10/07/2026): encerradas contas únicas · caixa todas locações · multi-veículo cesta.
