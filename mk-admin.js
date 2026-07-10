@@ -869,6 +869,168 @@ function mudarMesDash() {
 let _semanaSelIdx = null;
 let _semanaMesKey = null;
 
+const MK_DIA_NOME_PT_ = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
+
+/** I88 — Reagrupa porSemana seg→dom a partir de fatPorDia/locPorDia (funciona mesmo com GAS antigo). */
+function mkPorSemanaSegDom_(d) {
+  if (!d || !d.mesAtual || !d.anoAtual) return null;
+  const mes = d.mesAtual;
+  const ano = d.anoAtual;
+  const diasMes = new Date(ano, mes, 0).getDate();
+  const fatMap = {};
+  (d.fatPorDia || []).forEach(function (x) { fatMap[x.dia] = Number(x.valor) || 0; });
+  const nMap = {};
+  (d.locPorDia || []).forEach(function (x) { nMap[x.dia] = Number(x.n) || 0; });
+  const extMap = {};
+  (d.extPorDia || []).forEach(function (x) { extMap[x.dia] = Number(x.valor) || 0; });
+  if (!Object.keys(fatMap).length && !(d.fatPorDia || []).length) return null;
+
+  let diasComMov = 0;
+  for (let dd = 1; dd <= diasMes; dd++) {
+    if ((fatMap[dd] || 0) > 0) diasComMov++;
+  }
+  const fatMes = d.fatMes != null ? Number(d.fatMes) : Object.keys(fatMap).reduce(function (s, k) {
+    return s + (fatMap[k] || 0);
+  }, 0);
+  const mediaDiariaMes = diasComMov > 0 ? Math.round(fatMes / diasComMov * 100) / 100 : 0;
+
+  const weekRanges = [];
+  let wIni = 1;
+  for (let day = 1; day <= diasMes; day++) {
+    const dt = new Date(ano, mes - 1, day);
+    if (dt.getDay() === 0 || day === diasMes) {
+      weekRanges.push({ diaIni: wIni, diaFim: day });
+      wIni = day + 1;
+    }
+  }
+
+  const semanas = [];
+  let maxFat = 0;
+  let maxN = 0;
+
+  weekRanges.forEach(function (range, s) {
+    const diaIni = range.diaIni;
+    const diaFim = range.diaFim;
+    let fat = 0;
+    let n = 0;
+    let ext = 0;
+    const porDia = [];
+    let melhorDia = null;
+
+    for (let dd = diaIni; dd <= diaFim; dd++) {
+      const f = Math.round((fatMap[dd] || 0) * 100) / 100;
+      const nn = nMap[dd] || 0;
+      const e = Math.round((extMap[dd] || 0) * 100) / 100;
+      fat += f;
+      n += nn;
+      ext += e;
+      const dt = new Date(ano, mes - 1, dd);
+      const diaSem = MK_DIA_NOME_PT_[dt.getDay()];
+      const dk = String(dd).padStart(2, '0');
+      porDia.push({ dia: dd, fat: f, n: nn, ext: e, diaSemana: diaSem });
+      if (f > 0 && (!melhorDia || f > melhorDia.fat || (f === melhorDia.fat && nn > melhorDia.n))) {
+        melhorDia = {
+          dia: dd, fat: f, n: nn, ext: e, diaSemana: diaSem,
+          label: dk + '/' + String(mes).padStart(2, '0')
+        };
+      }
+    }
+
+    fat = Math.round(fat * 100) / 100;
+    ext = Math.round(ext * 100) / 100;
+    const ticket = n > 0 ? Math.round(fat / n * 100) / 100 : 0;
+    const diasComMovSem = porDia.filter(function (x) { return x.fat > 0; }).length;
+    const mediaDiaSem = diasComMovSem > 0 ? Math.round(fat / diasComMovSem * 100) / 100 : 0;
+
+    if (melhorDia && melhorDia.fat > 0) {
+      const motivos = [];
+      const pctSem = fat > 0 ? Math.round(melhorDia.fat / fat * 1000) / 10 : 0;
+      motivos.push(melhorDia.diaSemana + ' (' + melhorDia.label + ') concentrou ' + pctSem + '% da receita da semana.');
+      if (mediaDiaSem > 0 && melhorDia.fat > mediaDiaSem) {
+        const acima = Math.round((melhorDia.fat / mediaDiaSem - 1) * 100);
+        if (acima > 0) motivos.push('Faturamento ' + acima + '% acima da media diaria desta semana (R$ ' + mediaDiaSem + ').');
+      }
+      if (melhorDia.n > 0 && n > 0) {
+        motivos.push(melhorDia.n + ' atendimentos (' + Math.round(melhorDia.n / n * 1000) / 10 + '% do volume semanal).');
+      }
+      if (melhorDia.ext > 0) motivos.push('Inclui R$ ' + melhorDia.ext + ' em minutos extras.');
+      if (mediaDiariaMes > 0 && melhorDia.fat >= mediaDiariaMes * 1.15) {
+        motivos.push('Superou a media diaria do mes (R$ ' + mediaDiariaMes + ').');
+      }
+      melhorDia.motivos = motivos;
+      melhorDia.porque = motivos.join(' ');
+    }
+
+    const insights = [];
+    if (fat <= 0) {
+      insights.push('Sem receita registrada nesta semana.');
+    } else {
+      if (melhorDia && melhorDia.porque) insights.push('Melhor dia: ' + melhorDia.porque);
+      if (ext > 0) {
+        insights.push('Extras representam ' + Math.round(ext / fat * 1000) / 10 + '% do faturamento semanal (R$ ' + ext + ').');
+      }
+      if (ticket > 0) insights.push('Ticket medio da semana: R$ ' + ticket + '.');
+    }
+
+    semanas.push({
+      semana: s + 1,
+      label: 'Sem ' + String(s + 1).padStart(2, '0'),
+      diaIni: diaIni,
+      diaFim: diaFim,
+      periodo: String(diaIni).padStart(2, '0') + '-' + String(diaFim).padStart(2, '0'),
+      fat: fat,
+      n: n,
+      ext: ext,
+      ticketMedio: ticket,
+      porDia: porDia,
+      melhorDia: melhorDia || null,
+      insights: insights
+    });
+    if (fat > maxFat) maxFat = fat;
+    if (n > maxN) maxN = n;
+  });
+
+  semanas.forEach(function (sem) {
+    sem.pctFat = maxFat > 0 ? Math.round(sem.fat / maxFat * 1000) / 10 : 0;
+    sem.pctN = maxN > 0 ? Math.round(sem.n / maxN * 1000) / 10 : 0;
+  });
+
+  for (let i = 1; i < semanas.length; i++) {
+    const ant = semanas[i - 1];
+    const cur = semanas[i];
+    if (cur.fat > 0 && ant.fat > 0) {
+      const diff = Math.round((cur.fat - ant.fat) / ant.fat * 100);
+      cur.insights.unshift((diff >= 0 ? 'Crescimento de ' : 'Queda de ') + Math.abs(diff) + '% vs ' + ant.label + '.');
+    }
+  }
+
+  let melhorSemanaIdx = 0;
+  let melhorFat = -1;
+  semanas.forEach(function (sem, idx) {
+    if (sem.fat > melhorFat) {
+      melhorFat = sem.fat;
+      melhorSemanaIdx = idx;
+    }
+  });
+  const melhor = semanas[melhorSemanaIdx];
+  return {
+    semanas: semanas,
+    melhorSemanaIdx: melhorSemanaIdx,
+    melhorSemanaLabel: melhor ? melhor.label : '',
+    melhorSemanaFat: melhor ? melhor.fat : 0
+  };
+}
+
+function mkAplicarPorSemanaSegDom_(d) {
+  const pack = mkPorSemanaSegDom_(d);
+  if (!pack || !pack.semanas.length) return d.porSemana || [];
+  d.porSemana = pack.semanas;
+  d.melhorSemanaIdx = pack.melhorSemanaIdx;
+  d.melhorSemanaLabel = pack.melhorSemanaLabel;
+  d.melhorSemanaFat = pack.melhorSemanaFat;
+  return pack.semanas;
+}
+
 function resolverSemanaDefaultIdx_(semanas, d) {
   const hoje = new Date();
   const mesVista = d.mesAtual;
@@ -884,7 +1046,7 @@ function resolverSemanaDefaultIdx_(semanas, d) {
 function renderSemanasChart_(d) {
   const grid = document.getElementById('mk-semana-grid');
   if (!grid) return;
-  const semanas = d.porSemana || [];
+  const semanas = mkAplicarPorSemanaSegDom_(d);
   if (!semanas.length) {
     grid.innerHTML = '<p style="color:var(--txt3);font-size:12px;grid-column:1/-1">Sem dados de semanas neste mês.</p>';
     return;
