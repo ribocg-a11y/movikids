@@ -615,6 +615,7 @@ async function iniciarContagem(rowIndex, opts) {
   }
 
   const clickTs = Date.now();
+  window._mkTimerInFlight = true;
   if (typeof mkInvalidateInicioCache_ === 'function') mkInvalidateInicioCache_();
   else try { localStorage.removeItem('mk_inicio_cache_v2'); localStorage.removeItem('mk_inicio_cache'); } catch (e) {}
 
@@ -642,10 +643,10 @@ async function iniciarContagem(rowIndex, opts) {
     }
     if (d.horaInicio) s.horaInicio = d.horaInicio;
     delete s._iniciandoTimer;
+    s._localTimerStart = s.startTimestamp;
     saveSessions();
     renderCards();
     toast('⏱ Contagem iniciada!', 'success');
-    try { if(window._bc) window._bc.postMessage('sync'); } catch(e) {}
   } catch(e) {
     delete s._localTimerStart;
     delete s._iniciandoTimer;
@@ -658,6 +659,8 @@ async function iniciarContagem(rowIndex, opts) {
     toast('Início não confirmado no servidor. Tente iniciar novamente.', 'error');
     syncController(true, 0);
     return;
+  } finally {
+    window._mkTimerInFlight = false;
   }
 
   if (opts.sendPortalSms) {
@@ -669,7 +672,8 @@ async function iniciarContagem(rowIndex, opts) {
     } catch (eSms) {}
   }
 
-  broadcastInvalidate(); syncController(true, 500);
+  broadcastInvalidate();
+  syncController(true, 2500);
 }
 
 // ═══════════════════════════════════════════════════════════

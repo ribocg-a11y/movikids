@@ -40,23 +40,19 @@ function mkInvalidateInicioCache_() {
   try { localStorage.removeItem(MK_INICIO_CACHE_LEGACY); } catch (e) { /* ignore */ }
 }
 
-/** I89 — local já iniciou ▶ mas cache/servidor ainda Pendente (race). */
-function mkLocalAheadOfServerInicio_(data) {
-  try {
-    const stored = JSON.parse(localStorage.getItem('mk_sessions') || '[]');
-    if (!stored.length || !data || !Array.isArray(data.ativos)) return false;
-    const serverMap = {};
-    data.ativos.forEach(function (a) { serverMap[a.rowIndex] = a; });
-    return stored.some(function (loc) {
-      if (loc._iniciandoTimer) return true;
-      const localTs = Number(loc._localTimerStart || loc.startTimestamp || 0);
-      if (loc.status !== 'Ativa' || localTs < 1e12) return false;
-      const srv = serverMap[loc.rowIndex];
-      if (!srv) return false;
-      if (srv.status === 'Ativa' && Number(srv.startTimestamp) >= 1e12) return false;
-      return Date.now() - localTs < 180000;
-    });
-  } catch (e) { return false; }
+/** I90 — operação ativa: nunca servir cache stale (causa cronômetro louco). */
+function mkSyncOperacaoAtiva_() {
+  if (window._mkTimerInFlight) return true;
+  if (!Array.isArray(sessions)) return false;
+  return sessions.some(function (s) {
+    return s._iniciandoTimer || s.status === 'Ativa' || s.status === 'Pendente';
+  });
+}
+
+function mkSyncHomeVisible_() {
+  const home = document.getElementById('page-home');
+  const painel = document.getElementById('page-painel');
+  return (home && home.classList.contains('active')) || (painel && painel.classList.contains('active'));
 }
 
 function syncController(force = false, delayMs = 0) {
@@ -95,52 +91,64 @@ async function sincronizarServidor(force = false) {
 
   try {
     const CACHE_KEY = MK_INICIO_CACHE_KEY;
-    const CACHE_TTL = 30000;
-    const STALE_MAX = 120000;
+    const skipCache = force || mkSyncOperacaoAtiva_() || mkSyncHomeVisible_();
 
-    if (!force) {
-      const raw = localStorage.getItem(CACHE_KEY);
-      if (raw) {
-        try {
-          const { data, ts } = JSON.parse(raw);
-          const age = Date.now() - ts;
-          if (data && data.ok && age < STALE_MAX) {
-            if (mkLocalAheadOfServerInicio_(data)) {
-              _syncInFlight = false;
-              mkSyncRefreshInicioBg_();
-              return;
-            }
-            aplicarDadosInicio(data);
-            setStatus(true);
-            _lastSyncAt = Math.max(_lastSyncAt, ts);
-            if (age < CACHE_TTL) {
-              _syncInFlight = false;
-              return;
-            }
-            _syncInFlight = false;
-            mkSyncRefreshInicioBg_();
-            return;
-          }
-        } catch(e) {}
-      }
-    } else {
-      try { localStorage.removeItem(CACHE_KEY); } catch(e) {}
+    if (force) {
+      try { localStorage.removeItem(CACHE_KEY); } catch (e) { /* ignore */ }
     }
 
     if (_syncBackoffMs > 0) {
       const sinceLastFail = Date.now() - (_lastFailAt || 0);
-      if (sinceLastFail < _syncBackoffMs) return;
+      if (sinceLastFail < _syncBackoffMs) {
+        if (!skipCache) {
+          const raw = localStorage.getItem(CACHE_KEY);
+          if (raw) {
+            try {
+              const { data } = JSON.parse(raw);
+              if (data && data.ok) aplicarDadosInicio(data);
+            } catch (e) { /* ignore */ }
+          }
+        }
+        return;
+      }
     }
 
     if (_syncFailCount > 0) setStatus(null);
 
-    const d = await api({ action: 'carregarInicio', ...apiParamsComAuth_() });
+    let d;
+    try {
+      d = await api({ action: 'carregarInicio', ...apiParamsComAuth_() });
+    } catch (apiErr) {
+      if (!skipCache) {
+        const raw = localStorage.getItem(CACHE_KEY);
+        if (raw) {
+          try {
+            const { data } = JSON.parse(raw);
+            if (data && data.ok) {
+              aplicarDadosInicio(data);
+              setStatus(true);
+              return;
+            }
+          } catch (e) { /* ignore */ }
+        }
+      }
+      throw apiErr;
+    }
 
     if (!d.ok) {
       _syncFailCount++;
       _lastFailAt   = Date.now();
       _syncBackoffMs = Math.min(_syncBackoffMs ? _syncBackoffMs * 2 : 5000, _BACKOFF_MAX);
       if (_syncFailCount >= _FAIL_THRESH) setStatus(false);
+      if (!skipCache) {
+        const raw = localStorage.getItem(CACHE_KEY);
+        if (raw) {
+          try {
+            const { data } = JSON.parse(raw);
+            if (data && data.ok) aplicarDadosInicio(data);
+          } catch (e) { /* ignore */ }
+        }
+      }
       return;
     }
 
@@ -148,7 +156,7 @@ async function sincronizarServidor(force = false) {
     _syncBackoffMs = 0;
     _lastSyncAt    = Date.now();
     if (typeof agendarProximoPoll === 'function') agendarProximoPoll();
-    try { localStorage.setItem(CACHE_KEY, JSON.stringify({ data: d, ts: Date.now() })); } catch(e) {}
+    try { localStorage.setItem(CACHE_KEY, JSON.stringify({ data: d, ts: Date.now() })); } catch (e) { /* ignore */ }
     setStatus(true);
     aplicarDadosInicio(d);
 
@@ -216,6 +224,8 @@ function mergeSessaoCanonica(serverSession, localSession = {}) {
     }
   }
 
+  const mergedStarted = isAtiva && startTimestamp >= 1e12;
+
   return {
     ...serverSession,
     status,
@@ -226,7 +236,7 @@ function mergeSessaoCanonica(serverSession, localSession = {}) {
     originalMins: canon.originalMins,
     extendedMins: canon.extendedMins,
     extendedValor,
-    started: typeof sessaoTimerIniciado_ === 'function' ? sessaoTimerIniciado_(canon) : (isAtiva && startTimestamp >= 1e12),
+    started: mergedStarted,
     alertFired5: Boolean(localSession.alertFired5) || Boolean(serverSession.smsFlags && serverSession.smsFlags.alerta),
     alertFiredExp: Boolean(localSession.alertFiredExp) || Boolean(serverSession.smsFlags && serverSession.smsFlags.esgotado),
     extraWaSentAt: localSession.extraWaSentAt || localStorage.getItem(extraWaKey_(serverSession)) ||
