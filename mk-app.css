@@ -1691,15 +1691,90 @@ html,body{height:100%;background:var(--bg);color:var(--txt);overflow:hidden}
 .mk-caixa-plano-badge{
   display:inline-block;font-size:11px;font-weight:800;padding:4px 10px;border-radius:999px;
   background:rgba(21,101,192,.1);color:#1565C0;margin-top:8px}
-.cus-hist-nat{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;padding:2px 6px;border-radius:6px}
+/* ── Histórico custos · UI gerencial (I87 / v1.9.22) ── */
+.mk-cus-page{padding-bottom:32px}
+.mk-cus-top{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:16px;margin:8px 0 18px}
+.mk-cus-eyebrow{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--txt2);margin:0 0 4px}
+.mk-cus-title{font-family:'Fredoka One',cursive;font-size:clamp(22px,4vw,28px);color:var(--mk-admin-blue-dk,#1565C0);margin:0 0 6px;line-height:1.15}
+.mk-cus-sub{font-size:14px;font-weight:700;color:var(--txt2);margin:0;max-width:520px;line-height:1.45}
+.mk-cus-top-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.mk-cus-plano-pill{font-size:11px;font-weight:800;padding:6px 12px;border-radius:999px;background:rgba(255,152,0,.12);color:#E65100;border:1px solid rgba(255,152,0,.25)}
+.mk-cus-plano-pill--ok{background:rgba(46,125,50,.1);color:#2E7D32;border-color:rgba(46,125,50,.22)}
+.mk-cus-toolbar{padding:14px 16px;margin-bottom:18px;display:flex;flex-direction:column;gap:12px}
+.mk-cus-toolbar-row{display:flex;align-items:center;flex-wrap:wrap;gap:10px}
+.mk-cus-toolbar-lbl,.mk-cus-filter-lbl{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--txt2);min-width:52px}
+.mk-cus-periods .period-btn{font-size:12px;padding:6px 12px}
+.mk-cus-custom{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding-top:4px;border-top:1px dashed rgba(0,0,0,.06)}
+.mk-cus-custom-sep{font-size:12px;font-weight:700;color:var(--txt2)}
+.mk-cus-filters{margin-top:2px;padding-top:10px;border-top:1px dashed rgba(0,0,0,.06)}
+.mk-cus-select{min-width:160px;max-width:220px;font-size:13px}
+.mk-cus-empty{text-align:center;padding:40px 24px;margin-bottom:20px}
+.mk-cus-empty .empty-icon{font-size:40px;margin-bottom:8px}
+.mk-cus-empty h3{font-family:'Fredoka One',cursive;font-size:18px;margin:0 0 8px;color:var(--mk-admin-blue-dk)}
+.mk-cus-empty p{font-size:13px;font-weight:700;color:var(--txt2);margin:0}
+.mk-cus-loading{padding:24px}
+.mk-cus-loading p{font-size:13px;font-weight:700;color:var(--txt2);margin-top:12px}
+.mk-cus-cockpit{margin-bottom:14px}
+.mk-cus-hero-val{font-family:'Fredoka One',cursive;font-size:clamp(32px,7vw,44px);color:#C62828;line-height:1;margin:8px 0 6px;letter-spacing:.02em}
+.mk-cus-hero-delta{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px;font-size:13px;font-weight:800}
+.mk-cus-delta-pct{padding:3px 8px;border-radius:999px;font-size:12px}
+.mk-cus-delta-val{color:var(--txt2);font-weight:700}
+.mk-cus-delta--up .mk-cus-delta-pct{background:rgba(198,40,40,.12);color:#C62828}
+.mk-cus-delta--down .mk-cus-delta-pct{background:rgba(46,125,50,.12);color:#2E7D32}
+.mk-cus-delta--flat .mk-cus-delta-pct{background:rgba(84,110,122,.12);color:var(--txt2)}
+.mk-cus-kpis{margin-bottom:14px}
+.mk-cus-nature{padding:14px 16px;margin-bottom:4px}
+.mk-cus-nature-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}
+.mk-cus-nature-title{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--txt2)}
+.mk-cus-nature-total{font-family:'Fredoka One',cursive;font-size:16px;color:var(--mk-admin-blue-dk)}
+.mk-cus-nature-bar{display:flex;height:12px;border-radius:999px;overflow:hidden;background:rgba(21,101,192,.08);margin-bottom:12px}
+.mk-cus-nature-seg{min-width:2px;height:100%;transition:width .3s ease}
+.mk-cus-nature-seg--empty{background:rgba(0,0,0,.06)}
+.mk-cus-nature-legend{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px 16px}
+.mk-cus-nature-key{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;flex-wrap:wrap}
+.mk-cus-nature-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.mk-cus-nature-key-lbl{color:var(--txt);flex:1;min-width:48px}
+.mk-cus-nature-key-val{font-weight:800;color:var(--txt)}
+.mk-cus-nature-key-pct{color:var(--txt2);font-size:11px}
+.mk-cus-analytics-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:14px;margin-bottom:4px}
+@media(max-width:900px){.mk-cus-analytics-grid{grid-template-columns:1fr}}
+.mk-cus-chart-card,.mk-cus-dre-panel{padding:14px 16px;display:flex;flex-direction:column;min-height:280px}
+.mk-cus-card-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px}
+.mk-cus-card-title{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--txt2)}
+.mk-cus-card-note{font-size:11px;font-weight:700;color:var(--txt2);opacity:.85}
+.mk-cus-chart-box{flex:1;min-height:200px;position:relative}
+.mk-cus-chart-box canvas{width:100%!important;height:100%!important}
+.mk-cus-dre-table-wrap{flex:0 0 auto;margin-bottom:8px}
+.mk-cus-donut-wrap{flex:1;min-height:140px;max-height:180px;position:relative}
+.mk-cus-donut-wrap.is-empty{display:none}
+.mk-cus-chart-card.is-empty .mk-cus-chart-box{opacity:.35}
+.mk-cus-table{width:100%;border-collapse:collapse;font-size:13px}
+.mk-cus-table th{text-align:left;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--txt2);padding:8px 10px;border-bottom:1px solid var(--border)}
+.mk-cus-table td{padding:10px;border-bottom:0.5px solid var(--border);font-weight:700;color:var(--txt);vertical-align:middle}
+.mk-cus-table th.num,.mk-cus-table td.num{text-align:right}
+.mk-cus-table--full td:first-child,.mk-cus-table--full th:first-child{padding-left:14px}
+.mk-cus-table--full td:last-child,.mk-cus-table--full th:last-child{padding-right:14px}
+.mk-cus-table-wrap--scroll{max-height:420px;overflow:auto}
+.mk-cus-table-card{padding:0;overflow:hidden}
+.mk-cus-table-card .mk-cus-table-wrap{padding:0}
+.mk-cus-val{color:#C62828;font-weight:900;font-family:'Fredoka One',cursive;font-size:14px;letter-spacing:.01em}
+.mk-cus-dre-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle}
+.mk-cus-ledger-desc{max-width:220px;white-space:normal;line-height:1.35}
+.mk-cus-empty-cell{text-align:center!important;color:var(--txt2)!important;padding:24px!important;font-weight:700!important}
+.mk-cus-insights-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.mk-cus-insight{padding:14px 16px;border-radius:14px;border:1px solid var(--border);background:var(--mk-admin-glass,rgba(255,255,255,.85))}
+.mk-cus-insight-head{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.mk-cus-insight-icon{font-size:16px;line-height:1}
+.mk-cus-insight-title{font-family:'Fredoka One',cursive;font-size:14px;margin:0;color:var(--mk-admin-blue-dk);line-height:1.2}
+.mk-cus-insight-body{font-size:13px;font-weight:700;color:var(--txt);margin:0;line-height:1.45}
+.mk-cus-insight--warn{border-color:rgba(255,152,0,.35);background:rgba(255,152,0,.06)}
+.mk-cus-insight--alert{border-color:rgba(198,40,40,.25);background:rgba(198,40,40,.04)}
+.mk-cus-insight--trend{border-color:rgba(21,101,192,.25);background:rgba(21,101,192,.05)}
+.mk-cus-insight--ok{border-color:rgba(46,125,50,.25);background:rgba(46,125,50,.05)}
+.cus-hist-nat{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;padding:3px 8px;border-radius:6px;white-space:nowrap}
 .cus-hist-nat--fixo{background:rgba(21,101,192,.12);color:#1565C0}
 .cus-hist-nat--var{background:rgba(230,81,0,.12);color:#E65100}
 .cus-hist-nat--invest{background:rgba(46,125,50,.12);color:#2E7D32}
-.cus-hist-classif-row{padding:10px 0;border-bottom:0.5px solid var(--border)}
-.cus-hist-classif-main{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px}
-.cus-hist-classif-val{font-size:13px;font-weight:700;color:#C62828;margin-bottom:6px}
-.cus-hist-insight-item{font-size:13px;font-weight:700;color:var(--txt);padding:8px 0;border-bottom:0.5px solid var(--border);line-height:1.45}
-.cus-hist-item .hi-valor{font-weight:900}
 
 .danger-wa{background:#C62828!important;color:#fff!important;border-color:#C62828!important}
 .warn-wa{background:#E65100!important;color:#fff!important;border-color:#E65100!important}

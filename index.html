@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Movi Kids">
 <title>Movi Kids</title>
-<script src="mk-canonical-host.js?v=1.9.21"></script>
+<script src="mk-canonical-host.js?v=1.9.22"></script>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png">
@@ -17,17 +17,17 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<script src="mk-stale-sync.js?v=1.9.21"></script>
-<script src="mk-version.js?v=1.9.21"></script>
-<script src="mk-api.js?v=1.9.21"></script>
-<link rel="stylesheet" href="mk-design.css?v=1.9.21">
+<script src="mk-stale-sync.js?v=1.9.22"></script>
+<script src="mk-version.js?v=1.9.22"></script>
+<script src="mk-api.js?v=1.9.22"></script>
+<link rel="stylesheet" href="mk-design.css?v=1.9.22">
 
-<script src="mk-cache-bust.js?v=1.9.21"></script>
+<script src="mk-cache-bust.js?v=1.9.22"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<link rel="stylesheet" href="mk-app.css?v=1.9.21">
-<link rel="stylesheet" href="mk-gestao-pessoas.css?v=1.9.21">
+<link rel="stylesheet" href="mk-app.css?v=1.9.22">
+<link rel="stylesheet" href="mk-gestao-pessoas.css?v=1.9.22">
 <!-- Firebase SDK — Realtime sync canonico para todos os dispositivos -->
-<script type="module" src="mk-firebase.js?v=1.9.21"></script>
+<script type="module" src="mk-firebase.js?v=1.9.22"></script>
 </head>
 
 <body>
@@ -1988,100 +1988,224 @@
   </div>
 
   <!-- ──────── PAGE: HISTÓRICO CUSTOS (admin) ──────── -->
-  <div id="page-custos-historico" class="page mk-admin-page">
+  <div id="page-custos-historico" class="page mk-admin-page mk-cus-page">
     <div class="dash-back" onclick="irAdmin('admin')">← Voltar</div>
-    <div class="mk-admin-page-head">
-      <div class="sec-title">Histórico de custos</div>
-      <p class="mk-admin-page-lead">Para onde vai o dinheiro — classificação por plano de contas, fixo vs variável e insights para controle gerencial.</p>
-      <span class="mk-caixa-plano-badge" id="cus-hist-plano-badge">Plano de contas</span>
-    </div>
 
-    <div class="vf-filter-row">
-      <label>Categoria:</label>
-      <select class="vf-select" id="cus-hist-cat-filter" onchange="buscarCustosHistorico()">
-        <option value="">Todas categorias</option>
-      </select>
-      <label>Grupo DRE:</label>
-      <select class="vf-select" id="cus-hist-grupo-filter" onchange="buscarCustosHistorico()">
-        <option value="">Todos grupos</option>
-        <option value="OPEX_FIXO">Despesas fixas</option>
-        <option value="OPEX_VAR">Despesas variáveis</option>
-        <option value="CMV">CMV operacional</option>
-        <option value="INVESTIMENTO">Investimento</option>
-      </select>
-    </div>
-
-    <div class="period-filters">
-      <button class="period-btn" onclick="cusHistSetPeriod('hoje',this)">Hoje</button>
-      <button class="period-btn" onclick="cusHistSetPeriod('semana',this)">Esta semana</button>
-      <button class="period-btn active" onclick="cusHistSetPeriod('mes',this)">Este mês</button>
-      <button class="period-btn" onclick="cusHistSetPeriod('ano',this)">Este ano</button>
-      <button class="period-btn" onclick="cusHistSetPeriod('mesant',this)">Mês anterior</button>
-      <button class="period-btn" onclick="cusHistSetPeriod('custom',this)">Personalizado</button>
-    </div>
-
-    <div class="period-custom" id="cus-hist-custom-row" style="display:none">
-      <input type="date" id="cus-hist-start">
-      <span style="align-self:center;font-size:13px;color:var(--txt3)">até</span>
-      <input type="date" id="cus-hist-end">
-      <button onclick="buscarCustosHistorico()">Buscar</button>
-    </div>
-
-    <div class="mk-cmd-grid mk-hist-widgets" id="cus-hist-widgets" style="display:none">
-      <div class="mk-widget mk-widget--hero">
-        <span class="mk-widget-lbl">Total de custos</span>
-        <span class="mk-widget-val" id="cus-hist-total" style="color:#C62828">R$0</span>
-        <span class="mk-widget-ctx" id="cus-hist-total-ctx">—</span>
+    <header class="mk-cus-top">
+      <div class="mk-cus-top-main">
+        <p class="mk-cus-eyebrow">Financeiro · Despesas</p>
+        <h1 class="mk-cus-title">Controle de custos</h1>
+        <p class="mk-cus-sub">Visão gerencial do período — classificação contábil, natureza do gasto e leitura para decisão.</p>
       </div>
-      <div class="mk-widget">
-        <span class="mk-widget-lbl">Lançamentos</span>
-        <span class="mk-widget-val" id="cus-hist-n">0</span>
-        <span class="mk-widget-ctx" id="cus-hist-n-ctx">—</span>
+      <div class="mk-cus-top-actions">
+        <span class="mk-cus-plano-pill" id="cus-hist-plano-badge" title="Fonte da classificação">Plano de contas</span>
+        <button type="button" class="btn btn-primary btn-sm" onclick="buscarCustosHistorico()">↻ Atualizar</button>
       </div>
-      <div class="mk-widget">
-        <span class="mk-widget-lbl">Média diária</span>
-        <span class="mk-widget-val" id="cus-hist-media">R$0</span>
-        <span class="mk-widget-ctx" id="cus-hist-media-ctx">Dias com gasto</span>
+    </header>
+
+    <div class="mk-cus-toolbar mk-glass-card">
+      <div class="mk-cus-toolbar-row">
+        <span class="mk-cus-toolbar-lbl">Período</span>
+        <div class="period-filters mk-cus-periods">
+          <button class="period-btn" onclick="cusHistSetPeriod('hoje',this)">Hoje</button>
+          <button class="period-btn" onclick="cusHistSetPeriod('semana',this)">Semana</button>
+          <button class="period-btn active" onclick="cusHistSetPeriod('mes',this)">Mês</button>
+          <button class="period-btn" onclick="cusHistSetPeriod('ano',this)">Ano</button>
+          <button class="period-btn" onclick="cusHistSetPeriod('mesant',this)">Mês ant.</button>
+          <button class="period-btn" onclick="cusHistSetPeriod('custom',this)">Personalizado</button>
+        </div>
       </div>
-      <div class="mk-widget">
-        <span class="mk-widget-lbl">Perfil fixo</span>
-        <span class="mk-widget-val blue" id="cus-hist-fixo">0%</span>
-        <span class="mk-widget-ctx" id="cus-hist-fixo-ctx">Fixo vs variável</span>
+      <div class="period-custom mk-cus-custom" id="cus-hist-custom-row" style="display:none">
+        <input type="date" id="cus-hist-start" class="form-input">
+        <span class="mk-cus-custom-sep">até</span>
+        <input type="date" id="cus-hist-end" class="form-input">
+        <button type="button" class="btn btn-primary btn-sm" onclick="buscarCustosHistorico()">Aplicar</button>
+      </div>
+      <div class="mk-cus-toolbar-row mk-cus-filters">
+        <label class="mk-cus-filter-lbl">Conta</label>
+        <select class="vf-select mk-cus-select" id="cus-hist-cat-filter" onchange="buscarCustosHistorico()">
+          <option value="">Todas as categorias</option>
+        </select>
+        <label class="mk-cus-filter-lbl">Grupo DRE</label>
+        <select class="vf-select mk-cus-select" id="cus-hist-grupo-filter" onchange="buscarCustosHistorico()">
+          <option value="">Todos os grupos</option>
+          <option value="OPEX_FIXO">Despesas fixas</option>
+          <option value="OPEX_VAR">Despesas variáveis</option>
+          <option value="CMV">CMV operacional</option>
+          <option value="INVESTIMENTO">Investimentos</option>
+        </select>
       </div>
     </div>
 
-    <div class="mk-cmd-grid mk-caixa-pay-grid" id="cus-hist-grupo-grid" style="margin:12px 0"></div>
-
-    <div class="new-chart-card" id="cus-hist-dia-wrap" style="display:none;margin-bottom:14px">
-      <div class="new-chart-title">Custos por dia <span class="nct-note">no período</span></div>
-      <div style="position:relative;height:200px">
-        <canvas id="chart-cus-dia" role="img" aria-label="Custos por dia"></canvas>
-      </div>
+    <div id="cus-hist-empty" class="mk-cus-empty mk-glass-card" hidden>
+      <div class="empty-icon">📊</div>
+      <h3>Sem despesas no período</h3>
+      <p>Altere o filtro ou registre custos em <strong>Registrar Custo</strong> no balcão.</p>
     </div>
 
-    <div class="new-chart-card" id="cus-hist-grupo-wrap" style="display:none;margin-bottom:14px">
-      <div class="new-chart-title">Distribuição por grupo (plano de contas)</div>
-      <div style="position:relative;height:220px;max-width:320px;margin:0 auto">
-        <canvas id="chart-cus-grupo" role="img" aria-label="Grupos de custo"></canvas>
-      </div>
-    </div>
+    <div id="cus-hist-body" hidden>
 
-    <div class="ranking-card" id="cus-hist-classif" style="display:none">
-      <div class="chart-title">Classificação de contas — por categoria</div>
-      <div id="cus-hist-classif-rows"></div>
-    </div>
+      <!-- 1 · Panorama executivo -->
+      <section class="mk-dash-chapter" aria-labelledby="mk-cus-ch1-h">
+        <header class="mk-dash-chapter-head">
+          <span class="mk-dash-step" aria-hidden="true">1</span>
+          <div>
+            <h2 class="mk-dash-chapter-title" id="mk-cus-ch1-h">Panorama do período</h2>
+            <p class="mk-dash-chapter-lead">Total consolidado · <strong id="cus-hist-period-label">—</strong></p>
+          </div>
+        </header>
 
-    <div class="mk-caixa-intel-wrap" id="cus-hist-insights" style="display:none;margin:14px 0">
-      <div class="mk-caixa-extras-title">Insights gerenciais</div>
-      <div id="cus-hist-insights-list"></div>
-    </div>
+        <div class="mk-exec-cockpit mk-cus-cockpit">
+          <div class="mk-exec-head">
+            <div>
+              <div class="mk-exec-label">Total de despesas</div>
+              <div class="mk-exec-periodo" id="cus-hist-hero-period">—</div>
+            </div>
+            <span class="mk-exec-badge" id="cus-hist-hero-badge">—</span>
+          </div>
+          <div class="mk-cus-hero-val" id="cus-hist-hero-total">R$ 0,00</div>
+          <div class="mk-cus-hero-delta" id="cus-hist-hero-delta"></div>
+        </div>
 
-    <div class="sec-title" style="margin-top:16px">Lançamentos do período</div>
-    <div id="cus-hist-container">
-      <div class="empty">
-        <div class="empty-icon">📂</div>
-        <h3>Carregando custos…</h3>
-      </div>
+        <div class="mk-exec-kpis mk-exec-kpis-4 mk-cus-kpis">
+          <div class="mk-exec-kpi">
+            <div class="mk-exec-kpi-lbl">Lançamentos</div>
+            <div class="mk-exec-kpi-val" id="cus-hist-kpi-n">0</div>
+            <div class="mk-exec-kpi-delta" id="cus-hist-kpi-n-ctx">—</div>
+          </div>
+          <div class="mk-exec-kpi">
+            <div class="mk-exec-kpi-lbl">Média / dia c/ gasto</div>
+            <div class="mk-exec-kpi-val amber" id="cus-hist-kpi-media">R$ 0</div>
+            <div class="mk-exec-kpi-delta" id="cus-hist-kpi-media-ctx">—</div>
+          </div>
+          <div class="mk-exec-kpi">
+            <div class="mk-exec-kpi-lbl">Despesas fixas</div>
+            <div class="mk-exec-kpi-val blue" id="cus-hist-kpi-fixo">0%</div>
+            <div class="mk-exec-kpi-delta" id="cus-hist-kpi-fixo-val">—</div>
+          </div>
+          <div class="mk-exec-kpi">
+            <div class="mk-exec-kpi-lbl">Despesas variáveis</div>
+            <div class="mk-exec-kpi-val purple" id="cus-hist-kpi-var">0%</div>
+            <div class="mk-exec-kpi-delta" id="cus-hist-kpi-var-val">—</div>
+          </div>
+        </div>
+
+        <div class="mk-cus-nature mk-glass-card">
+          <div class="mk-cus-nature-head">
+            <span class="mk-cus-nature-title">Composição por natureza (plano de contas)</span>
+            <span class="mk-cus-nature-total" id="cus-hist-nature-total">—</span>
+          </div>
+          <div class="mk-cus-nature-bar" id="cus-hist-nature-bar" role="img" aria-label="Barra fixo vs variável"></div>
+          <div class="mk-cus-nature-legend" id="cus-hist-nature-legend"></div>
+        </div>
+      </section>
+
+      <!-- 2 · Análise visual -->
+      <section class="mk-dash-chapter" aria-labelledby="mk-cus-ch2-h">
+        <header class="mk-dash-chapter-head">
+          <span class="mk-dash-step" aria-hidden="true">2</span>
+          <div>
+            <h2 class="mk-dash-chapter-title" id="mk-cus-ch2-h">Para onde vai o dinheiro</h2>
+            <p class="mk-dash-chapter-lead">Evolução diária e distribuição por grupo contábil.</p>
+          </div>
+        </header>
+
+        <div class="mk-cus-analytics-grid">
+          <div class="mk-glass-card mk-cus-chart-card" id="cus-hist-dia-wrap">
+            <div class="mk-cus-card-head">
+              <span class="mk-cus-card-title">Despesas por dia</span>
+              <span class="mk-cus-card-note" id="cus-hist-dia-note">no período</span>
+            </div>
+            <div class="mk-cus-chart-box">
+              <canvas id="chart-cus-dia" role="img" aria-label="Despesas por dia"></canvas>
+            </div>
+          </div>
+          <div class="mk-glass-card mk-cus-dre-panel" id="cus-hist-dre-panel">
+            <div class="mk-cus-card-head">
+              <span class="mk-cus-card-title">Grupos DRE</span>
+              <span class="mk-cus-card-note">% do total</span>
+            </div>
+            <div class="mk-cus-dre-table-wrap">
+              <table class="mk-cus-table" id="cus-hist-dre-table">
+                <thead><tr><th>Grupo</th><th>Valor</th><th>%</th></tr></thead>
+                <tbody></tbody>
+              </table>
+            </div>
+            <div class="mk-cus-donut-wrap" id="cus-hist-grupo-wrap">
+              <canvas id="chart-cus-grupo" role="img" aria-label="Distribuição por grupo"></canvas>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3 · Classificação -->
+      <section class="mk-dash-chapter" aria-labelledby="mk-cus-ch3-h">
+        <header class="mk-dash-chapter-head">
+          <span class="mk-dash-step" aria-hidden="true">3</span>
+          <div>
+            <h2 class="mk-dash-chapter-title" id="mk-cus-ch3-h">Classificação de contas</h2>
+            <p class="mk-dash-chapter-lead">Cada lançamento mapeado para categoria e grupo do plano de contas.</p>
+          </div>
+        </header>
+        <div class="mk-glass-card mk-cus-table-card" id="cus-hist-classif">
+          <div class="mk-cus-table-wrap">
+            <table class="mk-cus-table mk-cus-table--full">
+              <thead>
+                <tr>
+                  <th>Categoria</th>
+                  <th>Grupo DRE</th>
+                  <th>Natureza</th>
+                  <th class="num">Lanç.</th>
+                  <th class="num">Valor</th>
+                  <th class="num">%</th>
+                </tr>
+              </thead>
+              <tbody id="cus-hist-classif-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4 · Insights -->
+      <section class="mk-dash-chapter" aria-labelledby="mk-cus-ch4-h">
+        <header class="mk-dash-chapter-head">
+          <span class="mk-dash-step" aria-hidden="true">4</span>
+          <div>
+            <h2 class="mk-dash-chapter-title" id="mk-cus-ch4-h">Leitura gerencial</h2>
+            <p class="mk-dash-chapter-lead">Alertas automáticos para controle de gastos fixos, sazonais e concentração.</p>
+          </div>
+        </header>
+        <div class="mk-cus-insights-grid" id="cus-hist-insights"></div>
+      </section>
+
+      <!-- 5 · Razão -->
+      <section class="mk-dash-chapter" aria-labelledby="mk-cus-ch5-h">
+        <header class="mk-dash-chapter-head">
+          <span class="mk-dash-step" aria-hidden="true">5</span>
+          <div>
+            <h2 class="mk-dash-chapter-title" id="mk-cus-ch5-h">Razão de lançamentos</h2>
+            <p class="mk-dash-chapter-lead">Extrato detalhado — todos os registros do período filtrado.</p>
+          </div>
+        </header>
+        <div class="mk-glass-card mk-cus-table-card">
+          <div class="mk-cus-table-wrap mk-cus-table-wrap--scroll">
+            <table class="mk-cus-table mk-cus-table--full mk-cus-table--ledger">
+              <thead>
+                <tr>
+                  <th>Data</th>
+                  <th>Hora</th>
+                  <th>Descrição</th>
+                  <th>Categoria</th>
+                  <th>Grupo</th>
+                  <th class="num">Valor</th>
+                </tr>
+              </thead>
+              <tbody id="cus-hist-ledger-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
     </div>
   </div>
 
@@ -2257,27 +2381,27 @@
   </div>
 </div>
 
-<script src="mk-globals.js?v=1.9.21"></script>
-<script src="mk-core.js?v=1.9.21"></script>
-<script src="mk-nav.js?v=1.9.21"></script>
-<script src="mk-admin.js?v=1.9.21"></script>
-<script src="mk-historico.js?v=1.9.21"></script>
-<script src="mk-custos-historico.js?v=1.9.21"></script>
-<script src="mk-sessao.js?v=1.9.21"></script>
-<script src="mk-home.js?v=1.9.21"></script>
-<script src="mk-meta-operador.js?v=1.9.21"></script>
-<script src="mk-custos.js?v=1.9.21"></script>
-<script src="mk-avulso.js?v=1.9.21"></script>
-<script src="mk-sync.js?v=1.9.21"></script>
-<script src="mk-nova.js?v=1.9.21"></script>
-<script src="mk-relacionamento.js?v=1.9.21"></script>
-<script src="mk-operacao.js?v=1.9.21"></script>
-<script src="mk-drawer.js?v=1.9.21"></script>
-<script src="mk-update.js?v=1.9.21"></script>
-<script src="mk-gestao-pessoas.js?v=1.9.21"></script>
-<script src="mk-holerite.js?v=1.9.21"></script>
-<script src="mk-gestao-pessoas-admin.js?v=1.9.21"></script>
-<script src="mk-auth.js?v=1.9.21"></script>
-<script src="mk-boot.js?v=1.9.21"></script>
+<script src="mk-globals.js?v=1.9.22"></script>
+<script src="mk-core.js?v=1.9.22"></script>
+<script src="mk-nav.js?v=1.9.22"></script>
+<script src="mk-admin.js?v=1.9.22"></script>
+<script src="mk-historico.js?v=1.9.22"></script>
+<script src="mk-custos-historico.js?v=1.9.22"></script>
+<script src="mk-sessao.js?v=1.9.22"></script>
+<script src="mk-home.js?v=1.9.22"></script>
+<script src="mk-meta-operador.js?v=1.9.22"></script>
+<script src="mk-custos.js?v=1.9.22"></script>
+<script src="mk-avulso.js?v=1.9.22"></script>
+<script src="mk-sync.js?v=1.9.22"></script>
+<script src="mk-nova.js?v=1.9.22"></script>
+<script src="mk-relacionamento.js?v=1.9.22"></script>
+<script src="mk-operacao.js?v=1.9.22"></script>
+<script src="mk-drawer.js?v=1.9.22"></script>
+<script src="mk-update.js?v=1.9.22"></script>
+<script src="mk-gestao-pessoas.js?v=1.9.22"></script>
+<script src="mk-holerite.js?v=1.9.22"></script>
+<script src="mk-gestao-pessoas-admin.js?v=1.9.22"></script>
+<script src="mk-auth.js?v=1.9.22"></script>
+<script src="mk-boot.js?v=1.9.22"></script>
 </body>
 </html>
