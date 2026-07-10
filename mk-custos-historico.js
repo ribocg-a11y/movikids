@@ -1,7 +1,6 @@
 /* MOVI KIDS — Histórico de custos (admin/gestor) · I87 · UI gerencial v1.9.22 */
 
 const CUS_HIST_CACHE_TTL_MS = 120000;
-const CUS_MESES_SERIES_N_ = 12;
 let cusHistPeriod_ = 'mes';
 let cusHistAll_ = [];
 let cusHistStats_ = null;
@@ -321,8 +320,9 @@ function cusHistFmtBr_(d) {
 
 function cusHistMesesRange_() {
   const hoje = new Date();
-  const start = new Date(hoje.getFullYear(), hoje.getMonth() - (CUS_MESES_SERIES_N_ - 1), 1);
-  return { s: cusHistFmtBr_(start), e: cusHistFmtBr_(hoje) };
+  const ano = hoje.getFullYear();
+  const start = new Date(ano, 0, 1);
+  return { s: cusHistFmtBr_(start), e: cusHistFmtBr_(hoje), ano: ano };
 }
 
 function cusHistMesKeyFromData_(dataBr) {
@@ -333,29 +333,31 @@ function cusHistMesKeyFromData_(dataBr) {
 
 function cusHistBuildMesesSeries_(custos) {
   const hoje = new Date();
-  const keys = [];
+  const ano = hoje.getFullYear();
+  const mesAtual = hoje.getMonth() + 1;
   const map = {};
-  for (let i = CUS_MESES_SERIES_N_ - 1; i >= 0; i--) {
-    const d = new Date(hoje.getFullYear(), hoje.getMonth() - i, 1);
-    const key = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
-    keys.push(key);
-    map[key] = 0;
+  for (let m = 1; m <= mesAtual; m++) {
+    map[ano + '-' + String(m).padStart(2, '0')] = 0;
   }
   (custos || []).forEach(function (c) {
     const key = cusHistMesKeyFromData_(c.data);
     if (!key || map[key] == null) return;
     map[key] += Number(c.valor) || 0;
   });
+
+  const keysComDado = Object.keys(map).filter(function (k) { return map[k] > 0; }).sort();
+  if (!keysComDado.length) return [];
+
+  const firstKey = keysComDado[0];
+  const keys = Object.keys(map).filter(function (k) { return k >= firstKey; }).sort();
   const MES_CURTO = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
-  const curKey = hoje.getFullYear() + '-' + String(hoje.getMonth() + 1).padStart(2, '0');
+  const curKey = ano + '-' + String(mesAtual).padStart(2, '0');
+
   return keys.map(function (key) {
-    const parts = key.split('-');
-    const y = parseInt(parts[0], 10);
-    const m = parseInt(parts[1], 10);
-    const label = MES_CURTO[m - 1] + '/' + String(y).slice(2);
+    const m = parseInt(key.split('-')[1], 10);
     return {
       key: key,
-      label: label,
+      label: MES_CURTO[m - 1],
       valor: Math.round((map[key] || 0) * 100) / 100,
       atual: key === curKey
     };
@@ -368,10 +370,11 @@ function renderCusHistMesesChart_(rows) {
   if (!wrap || !window.Chart) return;
 
   const hasVal = (rows || []).some(function (r) { return r.valor > 0; });
+  const ano = new Date().getFullYear();
   if (noteEl) {
     noteEl.textContent = hasVal
-      ? (CUS_MESES_SERIES_N_ + ' meses · barra escura = mês atual')
-      : 'últimos 12 meses';
+      ? (ano + ' · desde o 1º mês com gasto · barra escura = atual')
+      : ('ano ' + ano);
   }
 
   if (!hasVal) {
@@ -385,10 +388,18 @@ function renderCusHistMesesChart_(rows) {
   if (!cv) return;
   if (chartCusMeses_) chartCusMeses_.destroy();
 
+  const n = rows.length;
+  const boxH = Math.max(96, Math.min(160, 48 + n * 36));
+  const chartBox = wrap.querySelector('.mk-cus-chart-box--meses');
+  if (chartBox) {
+    chartBox.style.height = boxH + 'px';
+    chartBox.style.minHeight = boxH + 'px';
+  }
+
   const vals = rows.map(function (r) { return r.valor; });
   const maxVal = Math.max.apply(null, vals.concat([1]));
   const colors = rows.map(function (r) {
-    return r.atual ? '#1565C0' : 'rgba(21, 101, 192, 0.45)';
+    return r.atual ? '#1565C0' : 'rgba(21, 101, 192, 0.55)';
   });
 
   chartCusMeses_ = new Chart(cv, {
@@ -400,12 +411,16 @@ function renderCusHistMesesChart_(rows) {
         backgroundColor: colors,
         hoverBackgroundColor: '#0D47A1',
         borderRadius: 6,
-        maxBarThickness: 36
+        maxBarThickness: 28,
+        barPercentage: 0.72,
+        categoryPercentage: 0.7
       }]
     },
     options: {
+      indexAxis: 'y',
       responsive: true,
       maintainAspectRatio: false,
+      layout: { padding: { right: 48 } },
       plugins: {
         legend: { display: false },
         tooltip: {
@@ -420,19 +435,44 @@ function renderCusHistMesesChart_(rows) {
       },
       scales: {
         x: {
-          grid: { display: false },
-          ticks: { font: { size: 10, weight: '700' }, maxRotation: 0 }
+          min: 0,
+          suggestedMax: maxVal * 1.08,
+          grid: { color: 'rgba(21,101,192,.08)' },
+          ticks: {
+            callback: function (v) {
+              if (v >= 1000) return 'R$' + (Math.round(v / 100) / 10) + 'k';
+              return 'R$' + v;
+            },
+            font: { size: 10, weight: '700' },
+            maxTicksLimit: 5
+          }
         },
         y: {
-          ticks: {
-            callback: function (v) { return 'R$' + v; },
-            font: { size: 10 }
-          },
-          min: 0,
-          suggestedMax: maxVal * 1.15
+          grid: { display: false },
+          ticks: { font: { size: 12, weight: '800' } }
         }
       }
-    }
+    },
+    plugins: [{
+      id: 'cusMesesValueLabels',
+      afterDatasetsDraw: function (chart) {
+        const meta = chart.getDatasetMeta(0);
+        const ctx = chart.ctx;
+        ctx.save();
+        ctx.font = '700 11px Nunito, sans-serif';
+        ctx.fillStyle = '#37474F';
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'middle';
+        meta.data.forEach(function (bar, i) {
+          const v = vals[i] || 0;
+          if (v <= 0) return;
+          const x = bar.x + 6;
+          const y = bar.y;
+          ctx.fillText(cusHistR_(v), x, y);
+        });
+        ctx.restore();
+      }
+    }]
   });
 }
 
@@ -440,7 +480,7 @@ async function buscarCustosMesesSerie_() {
   const range = cusHistMesesRange_();
   const cat = document.getElementById('cus-hist-cat-filter')?.value || '';
   const grp = document.getElementById('cus-hist-grupo-filter')?.value || '';
-  const cacheKey = 'mk_cus_meses_v1_' + range.s + '_' + range.e + '_' + cat + '_' + grp;
+  const cacheKey = 'mk_cus_meses_v2_' + range.ano + '_' + range.s + '_' + range.e + '_' + cat + '_' + grp;
   const gen = ++cusHistMesesFetchGen_;
 
   try {
