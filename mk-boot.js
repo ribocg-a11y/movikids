@@ -2,6 +2,7 @@
 
 document.addEventListener('DOMContentLoaded', () => {
   if (typeof novaRecoveryOverlayStale_ === 'function') novaRecoveryOverlayStale_();
+  if (typeof mkWarmGasBatchFlag_ === 'function') mkWarmGasBatchFlag_();
   if (typeof mkAuthBoot === 'function') {
     mkAuthBoot().catch(e => {
       console.error('[mk-auth]', e);

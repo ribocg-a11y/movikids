@@ -1,0 +1,27 @@
+# Baseline P0 — não mexer no que funciona
+
+Fonte: `docs/ativos/BASELINE_CODIGO_P0.md`
+
+## Antes de codar
+
+1. Ler `BASELINE_CODIGO_P0.md` — se o arquivo está na zona **Congelado**, **pare**.
+2. Correção **cirúrgica** — diff mínimo no escopo do pedido.
+3. **GAS:** não editar `.gs` nem orientar Nova versão Web salvo pedido explícito §7.3.
+
+## Congelado (default)
+
+- `mk-sync.js`, `mk-sessao.js`, `mk-operacao.js` (cronômetro I20/I43)
+- `mk-api.js` (I15 GET)
+- `mk-auth.js` (PIN/sessão)
+- `MOVIKIDS_Code_*.gs`
+- Timer ativo em `mk-home.js`
+
+## Nova locação — permitido
+
+- `mk-nova.js`, `#page-nova`, CSS `.nova-*`
+- Multi-veículo: **sequencial** `salvarLocacao` enquanto prod não tiver batch
+- Overlay: watchdog + `_novaSaveGen` — não remover
+
+## Batch OFF
+
+`window._mkGasBatchOk === false` até ping listar `salvarLocacoesMulti`. Não bloquear save com ping no clique.

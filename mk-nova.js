@@ -169,14 +169,35 @@ function novaForceUnstickSave_(msg) {
 }
 
 async function mkGasTemSalvarLocacoesMulti_() {
-  if (typeof _mkGasBatchOk === 'boolean') return _mkGasBatchOk;
-  try {
-    const p = await api({ action: 'ping' }, 8000);
-    _mkGasBatchOk = !!(p && Array.isArray(p.postWriteActions) && p.postWriteActions.indexOf('salvarLocacoesMulti') >= 0);
-  } catch (e) {
-    _mkGasBatchOk = false;
+  return window._mkGasBatchOk === true;
+}
+
+function mkWarmGasBatchFlag_() {
+  if (typeof window._mkGasBatchOk === 'boolean') return;
+  window._mkGasBatchOk = false;
+  if (typeof api !== 'function') return;
+  api({ action: 'ping' }, 8000).then(function(p) {
+    window._mkGasBatchOk = !!(p && Array.isArray(p.postWriteActions) && p.postWriteActions.indexOf('salvarLocacoesMulti') >= 0);
+  }).catch(function() { window._mkGasBatchOk = false; });
+}
+
+async function novaSalvarLoopSequencial_(itens, basePayload, observacao, saveGen) {
+  const n = itens.length;
+  let ultimaMesmaConta = false;
+  for (let i = 0; i < n; i++) {
+    novaShowSaving_(i, n, itens[i].veiculo);
+    const r = await novaSalvarItemSequencial_(itens[i], basePayload, observacao, i === 0 ? 32000 : 28000);
+    if (saveGen !== _novaSaveGen) return null;
+    ultimaMesmaConta = !!r.mesmaConta;
+    if (i === 0) {
+      mkRefreshHomeUI_();
+      resetNova();
+      showPage('home');
+    } else {
+      mkRefreshHomeUI_();
+    }
   }
-  return _mkGasBatchOk;
+  return { ultimaMesmaConta: ultimaMesmaConta, salvos: n };
 }
 
 function novaShowSaving_(i, n, veiculo, modo) {
@@ -196,7 +217,7 @@ function novaShowSaving_(i, n, veiculo, modo) {
   }
   if (s) {
     if (modo === 'batch') s.textContent = 'Uma operação na planilha (~15s).';
-    else if (n > 1) s.textContent = 'Registrando ' + veiculo + ' na planilha (~15s cada).';
+    else if (n > 1) s.textContent = 'Veículo ' + (i + 1) + ' de ' + n + ' — ~15s cada.';
     else s.textContent = 'Registrando na planilha. Aguarde.';
   }
   if (_novaSaveWatchdog) clearTimeout(_novaSaveWatchdog);
@@ -1042,7 +1063,7 @@ async function confirmarLocacao() {
   const saveGen = ++_novaSaveGen;
   _novaSavingInFlight = true;
   aplicarStepNova_(2);
-  novaShowSaving_(0, n, itens[0] && itens[0].veiculo, n > 1 ? 'batch' : null);
+  novaShowSaving_(0, n, itens[0] && itens[0].veiculo, null);
 
   let ultimaMesmaConta = false;
   let salvos = 0;
@@ -1050,67 +1071,7 @@ async function confirmarLocacao() {
   try {
     if (saveGen !== _novaSaveGen) return;
 
-    if (n > 1) {
-      const temBatch = await mkGasTemSalvarLocacoesMulti_();
-
-      if (temBatch) {
-        novaAplicarOtimistaMulti_(itens, resp, cri, tel, novaState.pagamento, observacao);
-        mkRefreshHomeUI_();
-        resetNova();
-        showPage('home');
-        novaShowSaving_(0, n, itens.map(function(it) { return it.veiculo; }).join(', '), 'batch');
-
-        let batchRes = null;
-        try {
-          batchRes = await api(Object.assign({
-            action: 'salvarLocacoesMulti',
-            itens: novaBuildItensBatchJson_(itens)
-          }, basePayload), 32000);
-        } catch (batchErr) {
-          batchRes = null;
-        }
-        if (saveGen !== _novaSaveGen) return;
-
-        if (batchRes && batchRes.ok && batchRes.batch && Array.isArray(batchRes.locacoes)) {
-          novaLimparOtimistas_();
-          novaAplicarBatchReal_(batchRes, observacao);
-          salvos = n;
-        } else {
-          novaLimparOtimistas_();
-          mkRefreshHomeUI_();
-          toast('Salvando um por um…', 'info');
-          for (let i = 0; i < itens.length; i++) {
-            novaShowSaving_(i, n, itens[i].veiculo);
-            const r = await novaSalvarItemSequencial_(itens[i], basePayload, observacao, i === 0 ? 32000 : 28000);
-            if (saveGen !== _novaSaveGen) return;
-            ultimaMesmaConta = !!r.mesmaConta;
-            salvos++;
-            if (i === 0) {
-              mkRefreshHomeUI_();
-              resetNova();
-              showPage('home');
-            } else {
-              mkRefreshHomeUI_();
-            }
-          }
-        }
-      } else {
-        for (let i = 0; i < itens.length; i++) {
-          novaShowSaving_(i, n, itens[i].veiculo);
-          const r = await novaSalvarItemSequencial_(itens[i], basePayload, observacao, i === 0 ? 32000 : 28000);
-          if (saveGen !== _novaSaveGen) return;
-          ultimaMesmaConta = !!r.mesmaConta;
-          salvos++;
-          if (i === 0) {
-            mkRefreshHomeUI_();
-            resetNova();
-            showPage('home');
-          } else {
-            mkRefreshHomeUI_();
-          }
-        }
-      }
-    } else {
+    if (n === 1) {
       novaShowSaving_(0, 1, itens[0].veiculo);
       const r = await novaSalvarItemSequencial_(itens[0], basePayload, observacao, 32000);
       if (saveGen !== _novaSaveGen) return;
@@ -1119,10 +1080,37 @@ async function confirmarLocacao() {
       mkRefreshHomeUI_();
       resetNova();
       showPage('home');
+    } else if (mkGasTemSalvarLocacoesMulti_()) {
+      novaShowSaving_(0, n, itens.map(function(it) { return it.veiculo; }).join(', '), 'batch');
+      let batchRes = null;
+      try {
+        batchRes = await api(Object.assign({
+          action: 'salvarLocacoesMulti',
+          itens: novaBuildItensBatchJson_(itens)
+        }, basePayload), 32000);
+      } catch (batchErr) { batchRes = null; }
+      if (saveGen !== _novaSaveGen) return;
+      if (batchRes && batchRes.ok && batchRes.batch && Array.isArray(batchRes.locacoes)) {
+        novaAplicarBatchReal_(batchRes, observacao);
+        salvos = n;
+        mkRefreshHomeUI_();
+        resetNova();
+        showPage('home');
+      } else {
+        const seq = await novaSalvarLoopSequencial_(itens, basePayload, observacao, saveGen);
+        if (!seq) return;
+        ultimaMesmaConta = seq.ultimaMesmaConta;
+        salvos = seq.salvos;
+      }
+    } else {
+      const seq = await novaSalvarLoopSequencial_(itens, basePayload, observacao, saveGen);
+      if (!seq) return;
+      ultimaMesmaConta = seq.ultimaMesmaConta;
+      salvos = seq.salvos;
     }
 
-    mkRefreshHomeUI_();
     if (saveGen !== _novaSaveGen) return;
+    mkRefreshHomeUI_();
 
     const msg = n > 1
       ? ('✅ ' + n + ' locações salvas na mesma conta! Aperte ▶ em cada card.')
@@ -1259,6 +1247,7 @@ window.mkRefreshHomeUI_ = mkRefreshHomeUI_;
 window.novaForceUnstickSave_ = novaForceUnstickSave_;
 window.novaHideSaving_ = novaHideSaving_;
 window.novaRecoveryOverlayStale_ = novaRecoveryOverlayStale_;
+window.mkWarmGasBatchFlag_ = mkWarmGasBatchFlag_;
 window.removerItemNova_ = removerItemNova_;
 window.novaIniciarPick_ = novaIniciarPick_;
 window.novaVoltarCesta_ = novaVoltarCesta_;
