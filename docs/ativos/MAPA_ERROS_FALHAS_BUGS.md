@@ -1,6 +1,6 @@
 # MOVI KIDS — Mapa de erros, falhas e bugs
 
-**Atualizado:** 09/07/2026 — **I80** Julia admissão/sync completo · **I79** escala · FE **v1.9.13** · GAS **v1.5.177**  
+**Atualizado:** 10/07/2026 — **I87–I95** cronômetro/cache/testes · FE **v1.9.26** · GAS repo **v1.5.185** (ping **v1.5.182** Web pendente)  
 **Uso anterior:** 22/06/2026 — **I38–I41** auditoria RH 22/06 · GAS repo **v1.5.129** (ping **v1.5.107**) · FE **v1.8.110**  
 **Uso anterior:** 17/06/2026 — **I28** liberar sessão tablet · GAS **v1.5.92** prod. · FE **v1.8.30**  
 **Uso anterior:** 09/06/2026 — **I22 fechado** (hotfix FE v1.8.2)  
@@ -91,8 +91,16 @@
 | **I82** | **Operadores/Escala vazio — `painelGestaoPessoasAdmin` null row [4]** | Todas abas RH vazias; FE modo parcial `_partial` | GAS **v1.5.179** `gpSafeRows_` · FE **v1.9.14** erro visível | `TESTE_GESTAO_PESSOAS_READONLY.ps1` | painel ok · escala linhas preenchidas |
 | **I83** | **Escala/Metas vazias com Folha OK — race quick load FE** | Quick load sobrescrevia painel completo; abas não re-renderizavam | FE **v1.9.15** `gpAdmRenderTab_` · não downgrade painel · cache `v3` | trocar aba Escala/Metas | 3 colaboradores · escala Jul/2026 |
 | **I85** | **Caixa PIX/créd/déb/din abertos + extras pagamento obrigatório** | Encerrar sem dizer pagamento extra; extras cancelados invisíveis | GAS **v1.5.181** col AB `EP:`/`EC:` · FE **v1.9.18** | `resumoDia` extrasPorPagamento | modal encerrar + caixa |
+| **I87** | **Histórico custos admin ilegível** | Sem visão gerencial | GAS **v1.5.182** `listarCustosHistorico` · FE **v1.9.22** `mk-cus-*` | Design System § dashboard | Admin → Hist. custos |
+| **I88** | **Gráfico semanal blocos 1–7 fixos** | Semanas não seg→dom | GAS **v1.5.183** `buildPorSemanaMes_` · FE **v1.9.23** `mkPorSemanaSegDom_` | `fatPorDia` | Dashboard semanas |
+| **I89** | **Cache `mk_inicio_cache_v2` stale após ▶** | Card volta Pendente / timer louco | FE **v1.9.24** invalidate + merge 180s | `mkInvalidateInicioCache_` | ▶ → sync ≤3min |
+| **I90** | **`started` antes do merge + cache em ops** | Pendente após iniciar | FE **v1.9.25** recalc post-merge; `skipCache` ops | `mkSyncOperacaoAtiva_` | T6–T9 validação 10 |
+| **I91** | **UI Home não atualiza pós-salvar/▶** | Usuário acha que falhou | FE **v1.9.26** `mkRefreshHomeUI_()` | chamar após salvar/iniciar | salvar → card visível |
+| **I92** | **Teste manual (nome real) não limpa** | encHoje/histórico poluído | GAS **v1.5.184** `anularLocacoesRowAdmin` | prefixo `TESTE_` ou rowIndex | `TESTE_VALIDACAO_COMPLETA_10.sh` |
+| **I93** | **`getRange` 19 cols lê r[25]/r[27]** | Caixa/KPI perde extras e min veículo | GAS **v1.5.185** `COL_LOC_READ_` em resumo/kpi | guard getRange width | audit calcResumoDia |
+| **I94** | **`zerarExtra=1` ≠ zerar total** | corrigirFinanceiro repõe R$12 | Usar `valorTotal=0` explícito | doc API admin | corrigir loc teste |
+| **I95** | **Backoff GAS + skipCache = no-op Home** | Tela vazia/lenta intermitente | FE backlog: fetch em backoff se ops | `mk-sync.js` | Home com loc ativa |
 | **I86** | **Páginas lentas — fila GAS duplicada + sync agressivo** | Dashboard/Caixa/Histórico demoram; spinner longo | FE **v1.9.20** — dedupe dashboard, SWR resumoDia/caixa, hist paralelo, sync defer | `mkSyncDeferHeavy_` | abrir Caixa/Dashboard após admin login |
-| **I87** | **Histórico custos admin — classificação + insights** | Sem visão gerencial de gastos por período | GAS **v1.5.182** `listarCustosHistorico` · FE **v1.9.21** | PLANO_CONTAS grupos DRE | Admin → Hist. custos |
 | **I84** | **Meta colaborador contava sessões, não contas (I42)** | 4 encerramentos mesmo telefone = 4 loc na meta | GAS **v1.5.180** `metaOperadorSeenMark_` conta_id/telefone · FE **v1.9.16** scroll módulo | `metaOperadorTurno` | 1 loc por telefone/dia |
 | **I42** | Conta do dia — mesmo telefone 10h–22h | Caixa `n` vs sessões; maquininha | GAS **v1.5.131+** col S `conta_id` | `TESTE_I42_CONTA_DIA_CAIXA` | não reduzir `COL_LOC_READ_` (ver I43) |
 | **I41** | **`ping_` versão defasada** (v1.5.107 vs repo) | Confusão deploy / verify | GAS **v1.5.130** `ping_()` alinhado | `ping_` header alinhado | ping = v1.5.130 |
@@ -155,6 +163,7 @@
 | `../arquivo/incidentes/INCIDENTE_I39_VA_ADMISSAO_PROPORCIONAL_2026-06-22.md` | **I39** — VA proporcional admissão |
 | **`AUDITORIA_RH_FOLHA_PERSISTENCIA_2026-06-22.md`** | Matriz abas RH · I40 · lacunas RH-G1–G15 |
 | `TROCA_SMS_GATEWAY_DJVJRL_2026-06-04.md` | Gateway SMS |
+| **`INCIDENTE_SESSAO_2026-07-10_I87_I95.md`** | **I87–I95** — cronômetro, cache, testes 10, erros ocultos |
 | **`INCIDENTE_SESSAO_2026-07-09_I70_I75.md`** | **I70–I76** — Dashboard perf, gráfico meta, GP dropdown, Julia RH, deploy agente |
 
 ---
@@ -285,16 +294,22 @@
 43. **Nunca** passar `C:\Users\...` como link clicável para deploy GAS — usar **raw GitHub** (I76).
 44. **Sempre** atualizar HANDOFF/ESTADO/DEPLOY/AGENTS ao encerrar sessão com mudança de versão (I76).
 45. **Nunca** modo parcial Operadores com `listarOperadoresAdmin` sozinho — **`cadastroPct` vem de `listarColaboradoresGestao`** (I78 · lição I45/I36).
+46. **Nunca** confiar em cache `localStorage` carregarInicio durante operação ativa — invalidar após ▶/salvar/cancel (I89).
+47. **Sempre** `mkRefreshHomeUI_()` após salvar locação ou ▶ — não esperar só sync GAS (I91).
+48. **Nunca** `getRange(..., COL_CONTA_ID_)` se função lê cols Y–AB — usar **`COL_LOC_READ_=28`** (I93 · extensão I43).
+49. **Nunca** `zerarExtra=1` esperando R$0 total — usar `valorTotal=0` explícito (I94).
+50. **Testes manuais** na planilha: prefixo `TESTE_` ou cleanup `anularLocacoesRowAdmin` (I92).
+51. **Sempre** rodar `TESTE_VALIDACAO_COMPLETA_10.sh` ou protocolo I20+I43 após mudança timer/sync.
 
 ---
 
-## Versões de referência (23/06/2026)
+## Versões de referência (10/07/2026)
 
 | Camada | Repo / produção | Mínimo operação |
 |--------|-----------------|-----------------|
-| Frontend | **v1.8.115** | `?force=1.8.115` |
-| GAS | repo **v1.5.137** · ping **v1.5.136** | Nova versão Web v1.5.137 (I44) |
+| Frontend | **v1.9.26** Pages | `?force=1.9.26` |
+| GAS | repo **v1.5.185** · ping **v1.5.182** | Nova versão Web v1.5.185 |
 | Design System | **`docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md`** | Obrigatório antes de UI |
-| Aba FOLHA | B68 ~5269,96 · `fonte=FOLHA` | `repairFolhaAdmin` após deploy que toque FOLHA |
+| Teste 10 | **`scripts/testes/TESTE_VALIDACAO_COMPLETA_10.sh`** | pós mudança operação |
 
 Ver `ESTADO_ATUAL.md` para URLs e editor GAS.

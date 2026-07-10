@@ -1,4 +1,4 @@
-# MOVI KIDS — Estado atual (09/07/2026)
+# MOVI KIDS — Estado atual (10/07/2026)
 
 Referência única para alinhamento local × produção.
 
@@ -31,15 +31,17 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 ---
 
-## Produção (09/07/2026)
+## Produção (10/07/2026)
 
 | Camada | Versão | URL / evidência |
 |--------|--------|-----------------|
-| **Frontend** | **v1.9.9** | https://ribocg-a11y.github.io/movikids/?force=1.9.9 |
-| **Gestão Pessoas** | **v1.9.9** | `gestao-pessoas.html?force=1.9.9` |
-| **Portal acompanhar** | **v1.9.9** | `acompanhar.html` |
-| **Service Worker** | **1.9.9** | `sw.js` |
-| **Apps Script** | **v1.5.173** | ping Web **v1.5.173** ✅ |
+| **Frontend** | **v1.9.26** | https://ribocg-a11y.github.io/movikids/?force=1.9.26 |
+| **Gestão Pessoas** | **v1.9.26** | `gestao-pessoas.html?force=1.9.26` |
+| **Portal acompanhar** | **v1.9.26** | `acompanhar.html` |
+| **Service Worker** | **1.9.26** | `sw.js` |
+| **Apps Script** | **v1.5.185** repo | ping Web **v1.5.182** — Nova versão pendente |
+| **Incidente sessão** | I87–I95 | `INCIDENTE_SESSAO_2026-07-10_I87_I95.md` |
+| **Teste validação 10** | bash | `scripts/testes/TESTE_VALIDACAO_COMPLETA_10.sh` |
 | **FOLHA VT I68** | ✅ 26/06 | B9 **8,80** · B10/B12 **22** · Milena VT **193,60** · Raykelly **103,25** |
 | **Planilha** | 23 abas | `schemaOk=True` · auditoria célula **23/23** |
 | **Homolog tablet** | ✅ 23/06 | I43 · I42 · I47 · Gestor — smoke v1.9.9 pendente Ops |

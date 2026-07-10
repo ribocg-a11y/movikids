@@ -16,6 +16,10 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 # Orquestrador F0-F14 (subset)
 .\scripts\testes\TESTE_PROTOCOLO_DIAGNOSTICO.ps1
 
+# 10 testes validação completa (Linux/bash — cloud agent)
+bash scripts/testes/TESTE_VALIDACAO_COMPLETA_10.sh
+ANULAR_ROWS=1272,1273,1274,1275 bash scripts/testes/TESTE_VALIDACAO_COMPLETA_10.sh  # pós GAS v1.5.184+ Web
+
 # Sem rede (só pre-push + guards)
 .\scripts\testes\TESTE_PROTOCOLO_DIAGNOSTICO.ps1 -SkipNetworkTests
 ```
@@ -69,6 +73,7 @@ Get-ChildItem mk-*.js | ForEach-Object { node --check $_.FullName }
 | Script | O que grava |
 |--------|-------------|
 | `TESTE_I20_COMPLETO_PROD.ps1` | Locações `TESTE I20`, `B2_*`, etc. |
+| `TESTE_VALIDACAO_COMPLETA_10.sh` | 1 loc TESTE_VAL10 + 10 checks curl (Linux) |
 | `TESTE_4_FLUXOS_CADASTRO_I20.ps1` | Locações cadastro I20 |
 | `TESTE_DRAWER_E_PACOTE_E.ps1` | Locações `DRAWER_E_*` |
 | `TESTE_PACOTE_F_KPI_READONLY.ps1` | Salvar/editar/cancelar `TESTE_PACOTE_F` (nome enganoso) |

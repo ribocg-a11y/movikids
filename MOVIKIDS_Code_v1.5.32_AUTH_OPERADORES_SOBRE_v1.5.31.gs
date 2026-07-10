@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.184
+// MOVI KIDS — Google Apps Script v1.5.185
+// v1.5.185: I93 — calcResumoDia/buildKpiMes COL_LOC_READ_ (r[25]/r[27]); encHoje filtra isLocacaoTeste_
 // v1.5.184: I92 — anularLocacoesRowAdmin (anula Encerrada/Pendente/Ativa por rowIndex, sem filtro TESTE_)
 // v1.5.183: I88 — porSemana dashboard: semanas segunda–domingo (não blocos 1–7 fixos)
 // v1.5.182: I87 — histórico custos admin (listarCustosHistorico + listarPlanoContas)
@@ -177,8 +178,8 @@
 
 // ── CONSTANTES ───────────────────────────────────────────────
 /** Versão exposta em ping, carregarInicio, validarSchema, gestaoPessoasStatus (bump com header). */
-const MK_GAS_VERSAO_  = 'v1.5.184';
-const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.173';
+const MK_GAS_VERSAO_  = 'v1.5.185';
+const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.185';
 const SHEET_ID   = '1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618';
 const DEPLOY_ID  = 'AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y';
 const WEBAPP_URL = `https://script.google.com/macros/s/${DEPLOY_ID}/exec`;
@@ -4414,7 +4415,7 @@ function calcResumoDiaCore_(dataFmt) {
   const shLoc = sh_(SH_LOC);
   const lastLoc = shLoc.getLastRow();
   if (lastLoc >= DATA_ROW) {
-    const dados = shLoc.getRange(DATA_ROW, 1, lastLoc - DATA_ROW + 1, COL_CONTA_ID_).getValues();
+    const dados = shLoc.getRange(DATA_ROW, 1, lastLoc - DATA_ROW + 1, COL_LOC_READ_).getValues();
     for (let i = 0; i < dados.length; i++) {
       const r = dados[i];
       if (!r[0]) continue;
@@ -4422,6 +4423,7 @@ function calcResumoDiaCore_(dataFmt) {
       if (data !== dataAlvo) continue;
       const status = String(r[14]).trim();
       if (status !== 'Encerrada') continue;
+      if (isLocacaoTeste_(String(r[12] || ''), String(r[11] || ''), String(r[13] || ''), String(r[17] || ''))) continue;
       enc.push({
         rowIndex:      DATA_ROW + i,
         id:            r[0],
@@ -7011,11 +7013,12 @@ function buildKpiMesPayload_(p) {
 
   const lastLoc = shLoc.getLastRow();
   if (lastLoc >= DATA_ROW) {
-    const dados = shLoc.getRange(DATA_ROW, 1, lastLoc - DATA_ROW + 1, COL_CONTA_ID_).getValues();
+    const dados = shLoc.getRange(DATA_ROW, 1, lastLoc - DATA_ROW + 1, COL_LOC_READ_).getValues();
     dados.forEach(r => {
       if (!r[0]) return;
       const status = String(r[14] || '').trim();
       const dataR = cellToStr_(r[1]);
+      if (status === 'Encerrada' && isLocacaoTeste_(String(r[12] || ''), String(r[11] || ''), String(r[13] || ''), String(r[17] || ''))) return;
       const pts   = dataR.split('/');
       if (pts.length < 3) return;
       const mmyyR  = pts[1].padStart(2,'0') + '/' + pts[2];
@@ -7404,6 +7407,7 @@ function carregarInicio_(p) {
       }
 
       if (status === 'Encerrada' && dataR === dataHoje) {
+        if (isLocacaoTeste_(String(r[12] || ''), String(r[11] || ''), String(r[13] || ''), String(r[17] || ''))) return;
         fatHoje += Number(r[10]);
         const cKey = String(contaIdLocRow_(r));
         encHojeContas[cKey] = true;

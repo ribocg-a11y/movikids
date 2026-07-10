@@ -1,6 +1,6 @@
 # MOVI KIDS — Protocolo "Atualize tudo"
 
-**Criado:** 14/06/2026 · **Última execução:** 27/06/2026 (v1.9.2 One UI + travas I24 + roteiro agente)  
+**Criado:** 14/06/2026 · **Última execução:** 10/07/2026 (v1.9.26 + GAS v1.5.185 · I87–I95 · teste 10 · auditoria código)  
 **Função:** quando o usuário pedir **"atualize tudo"**, o agente segue **esta lista** — não só handoff parcial.  
 **Regra Cursor:** `.cursor/rules/atualize-tudo-movikids.mdc`
 
@@ -42,16 +42,15 @@ Sincronizar **documentação + estado operacional** do projeto com a realidade a
 
 ---
 
-## Produção atual (27/06/2026)
+## Produção atual (10/07/2026)
 
 | Camada | Versão | Evidência |
 |--------|--------|-----------|
-| GAS | **v1.5.167** | I68 VT · ping Web verificar |
-| FE | **v1.9.2** | Pages live · Sprints A–C One UI |
-| Planilha FOLHA | **OK** | B9=8,80 · B10/B12=22 · B68=5253,96 |
-| Planilha | **OK** | `schemaOk=True` · auditoria **23/23** |
-| Homolog tablet | **✅** | 23/06 · smoke v1.9.2 pendente |
-| Ciclo dev | **One UI ✅** | `ROTEIRO_AGENTE_OBRIGATORIO.md` · travas I24 |
+| GAS repo | **v1.5.185** | I93 COL_LOC_READ_ · I92 anular rows |
+| GAS ping Web | **v1.5.182** | Nova versão pendente |
+| FE | **v1.9.26** | Pages live · I89–I91 timer/cache |
+| Teste 10 | ✅ 10/07 | `TESTE_VALIDACAO_COMPLETA_10.sh` |
+| Incidente | I87–I95 | `INCIDENTE_SESSAO_2026-07-10_I87_I95.md` |
 
 ---
 

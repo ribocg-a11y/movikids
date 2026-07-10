@@ -1,6 +1,6 @@
 # MOVI KIDS — Deploy atual (referência única)
 
-**Atualizado:** 09/07/2026 (FE v1.9.9 + GAS v1.5.173 I70–I75)
+**Atualizado:** 10/07/2026 (FE v1.9.26 + GAS repo v1.5.185 · ping Web v1.5.182 pendente Nova versão)
 
 Use **este arquivo** para versão e ordem de publicação. Docs `DEPLOY_v1.5.xx_*` em **`docs/arquivo/deploy/`** são histórico.
 
@@ -10,11 +10,11 @@ Use **este arquivo** para versão e ordem de publicação. Docs `DEPLOY_v1.5.xx_
 
 | Camada | Repo | Produção (ping / Pages) | Alinhado? |
 |--------|------|-------------------------|-----------|
-| **Frontend** | **v1.9.9** | https://ribocg-a11y.github.io/movikids/?force=1.9.9 | ✅ Pages |
-| **Gestão Pessoas** | **v1.9.9** | `gestao-pessoas.html?force=1.9.9` | ✅ |
-| **Portal acompanhar** | **v1.9.9** | `acompanhar.html` | ✅ |
-| **Service Worker** | **1.9.9** | `sw.js` | ✅ |
-| **GAS** | **v1.5.173** (header `.gs`) | ping Web **v1.5.173** | ✅ |
+| **Frontend** | **v1.9.26** | https://ribocg-a11y.github.io/movikids/?force=1.9.26 | ✅ Pages |
+| **Gestão Pessoas** | **v1.9.26** | `gestao-pessoas.html?force=1.9.26` | ✅ |
+| **Portal acompanhar** | **v1.9.26** | `acompanhar.html` | ✅ |
+| **Service Worker** | **1.9.26** | `sw.js` | ✅ |
+| **GAS** | **v1.5.185** (header `.gs`) | ping Web **v1.5.182** | ❌ Nova versão Web |
 
 **Ping:** https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec?action=ping
 
@@ -36,7 +36,7 @@ C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\m
 
 https://raw.githubusercontent.com/ribocg-a11y/movikids/main/MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs
 
-**Header:** v1.5.173 · I75 Julia RH · I74 GP perf · I73 kpiMes lite · I72 meta gráfico
+**Header:** v1.5.185 · I93 COL_LOC_READ_ caixa/kpi · I92 anularLocacoesRowAdmin · I88 porSemana · I87 custos histórico
 
 ---
 
