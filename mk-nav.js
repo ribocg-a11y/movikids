@@ -53,7 +53,7 @@ function sbSairSessaoClick_() {
 function mkPaginaGestaoPermitida_(name) {
   if (isAdmin || (typeof mkAuthIsAdmin === 'function' && mkAuthIsAdmin())) return true;
   if (typeof mkAuthIsGestor === 'function' && mkAuthIsGestor()) {
-    return ['admin', 'dashboard', 'relatorio', 'historico', 'caixa', 'operadores'].indexOf(name) >= 0;
+    return ['admin', 'dashboard', 'relatorio', 'historico', 'custos-historico', 'caixa', 'operadores'].indexOf(name) >= 0;
   }
   if (typeof mkAuthIsSupervisor === 'function' && mkAuthIsSupervisor()) {
     return ['caixa', 'historico'].indexOf(name) >= 0;
@@ -63,7 +63,7 @@ function mkPaginaGestaoPermitida_(name) {
 
 function showPage(name, opts = {}) {
   if (window.innerWidth < 1024) mobMenuClose_();
-  const adminPages = ['admin','sistema','operadores','dashboard','relatorio','historico','caixa','config'];
+  const adminPages = ['admin','sistema','operadores','dashboard','relatorio','historico','custos-historico','caixa','config'];
   if (adminPages.includes(name) && !mkPaginaGestaoPermitida_(name)) { abrirAdmin(); return; }
   const wasNovaActive = !!document.getElementById('page-nova')?.classList.contains('active');
   if (wasNovaActive && name !== 'nova') salvarNovaDraft_();
@@ -100,6 +100,7 @@ function showPage(name, opts = {}) {
   }
   if (name==='custos') loadCustosHoje();
   if (name==='historico') buscarHistorico();
+  if (name==='custos-historico' && typeof initCustosHistorico_ === 'function') initCustosHistorico_();
   if (name==='admin' && isAdmin) { resetAdminTimer(); carregarKPIs(); }
   if (name==='sistema' && isAdmin) { resetAdminTimer(); setTimeout(atualizarDiagnostico, 80); carregarKPIs(); setTimeout(mkSistemaRefreshFrotaHint_, 150); }
   if (name==='operadores' && typeof mkGpAdmLoad_ === 'function') {
@@ -113,7 +114,7 @@ function syncSidebar(page) {
   document.querySelectorAll('.sb-btn').forEach(b => b.classList.remove('active'));
   const map = {
     'home':'sbn-home','nova':'sbn-nova','relacionamento':'sbn-relacionamento','custos':'sbn-custos','painel':'sbn-painel','lancamento':'sbn-avulso',
-    'admin':'sbn-adm','sistema':'sbn-sys','operadores':'sbn-ops','dashboard':'sbn-dash','relatorio':'sbn-rel','historico':'sbn-hist','caixa':'sbn-caixa','config':'sbn-cfg'
+    'admin':'sbn-adm','sistema':'sbn-sys','operadores':'sbn-ops','dashboard':'sbn-dash','relatorio':'sbn-rel','historico':'sbn-hist','custos-historico':'sbn-custos-hist','caixa':'sbn-caixa','config':'sbn-cfg'
   };
   if (map[page]) { const el=document.getElementById(map[page]); if(el) el.classList.add('active'); }
 }

@@ -334,7 +334,7 @@ function setStatus(online) {
 function mkSyncDeferHeavy_() {
   if (window._kpiDashInFlight || window._kpiHubInFlight) return true;
   if (window._resumoDiaBgRefresh) return true;
-  const heavy = ['page-dashboard', 'page-caixa', 'page-operadores', 'page-historico'];
+  const heavy = ['page-dashboard', 'page-caixa', 'page-operadores', 'page-historico', 'page-custos-historico'];
   return heavy.some(function (id) {
     const el = document.getElementById(id);
     return el && el.classList.contains('active');

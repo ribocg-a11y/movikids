@@ -1688,6 +1688,19 @@ html,body{height:100%;background:var(--bg);color:var(--txt);overflow:hidden}
 .mk-caixa-cancel-row{flex-direction:column;align-items:flex-start}
 .mk-caixa-cancel-row em{font-style:normal;color:var(--txt2);font-weight:700}
 
+.mk-caixa-plano-badge{
+  display:inline-block;font-size:11px;font-weight:800;padding:4px 10px;border-radius:999px;
+  background:rgba(21,101,192,.1);color:#1565C0;margin-top:8px}
+.cus-hist-nat{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;padding:2px 6px;border-radius:6px}
+.cus-hist-nat--fixo{background:rgba(21,101,192,.12);color:#1565C0}
+.cus-hist-nat--var{background:rgba(230,81,0,.12);color:#E65100}
+.cus-hist-nat--invest{background:rgba(46,125,50,.12);color:#2E7D32}
+.cus-hist-classif-row{padding:10px 0;border-bottom:0.5px solid var(--border)}
+.cus-hist-classif-main{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px}
+.cus-hist-classif-val{font-size:13px;font-weight:700;color:#C62828;margin-bottom:6px}
+.cus-hist-insight-item{font-size:13px;font-weight:700;color:var(--txt);padding:8px 0;border-bottom:0.5px solid var(--border);line-height:1.45}
+.cus-hist-item .hi-valor{font-weight:900}
+
 .danger-wa{background:#C62828!important;color:#fff!important;border-color:#C62828!important}
 .warn-wa{background:#E65100!important;color:#fff!important;border-color:#E65100!important}
 .warn-wa:hover{background:#BF360C!important}

@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.181
+// MOVI KIDS — Google Apps Script v1.5.182
+// v1.5.182: I87 — histórico custos admin (listarCustosHistorico + listarPlanoContas)
 // v1.5.181: I85 — extras pagamento obrigatório + cancelamento justificado + caixa PIX/créd/déb/din
 // v1.5.180: I84 — meta operador conta/dia (I42) — 1 loc por telefone/conta_id no turno
 // v1.5.179: I82 — painelGestaoPessoasAdmin null row [4] (metas/comunicados/avaliacoes); Operadores/Escala
@@ -174,7 +175,7 @@
 
 // ── CONSTANTES ───────────────────────────────────────────────
 /** Versão exposta em ping, carregarInicio, validarSchema, gestaoPessoasStatus (bump com header). */
-const MK_GAS_VERSAO_  = 'v1.5.181';
+const MK_GAS_VERSAO_  = 'v1.5.182';
 const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.173';
 const SHEET_ID   = '1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618';
 const DEPLOY_ID  = 'AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y';
@@ -518,6 +519,8 @@ function dispatchMoviAction_(p, method) {
       case 'resumoDia':           return resumoDia_(p);
       case 'salvarCusto':         return salvarCusto_(p);
       case 'listarCustos':        return listarCustos_(p);
+      case 'listarCustosHistorico': return listarCustosHistorico_(p);
+      case 'listarPlanoContas':   return listarPlanoContas_(p);
       case 'buscarKPIsAdmin':     return buscarKPIsAdmin_(p);
       case 'kpiMes':              return kpiMes_(p);
       case 'comandoOperacional':  return comandoOperacional_(p);
@@ -4064,6 +4067,308 @@ function listarCustos_(p) {
 
   const soma = lista.reduce((acc, r) => acc + (Number(r.valor) || 0), 0);
   return resp_({ custos: lista, total: lista.length, soma: Math.round(soma * 100) / 100 });
+}
+
+function grupoDreLabel_(grupo) {
+  const g = String(grupo || '').toUpperCase();
+  if (g === 'CMV') return 'CMV — custo operacional';
+  if (g === 'OPEX_FIXO') return 'Despesa fixa';
+  if (g === 'OPEX_VAR') return 'Despesa variável';
+  if (g === 'INVESTIMENTO') return 'Investimento';
+  return g || 'Outros';
+}
+
+function grupoDreTipoNatureza_(grupo) {
+  const g = String(grupo || '').toUpperCase();
+  if (g === 'OPEX_FIXO') return 'fixo';
+  if (g === 'INVESTIMENTO') return 'investimento';
+  if (g === 'CMV') return 'variavel';
+  return 'variavel';
+}
+
+function resolveGrupoCategoria_(categoria, planoMap) {
+  const cat = String(categoria || 'Outros').trim();
+  const map = planoMap || defaultPlanoContasMap_();
+  let grupo = map[cat];
+  if (!grupo) grupo = 'OPEX_VAR';
+  return String(grupo).toUpperCase();
+}
+
+function buildCusPorDiaArr_(byDay) {
+  const keys = Object.keys(byDay || {}).sort();
+  return keys.map(function (k) {
+    const dia = k.length === 8 ? (k.slice(6, 8) + '/' + k.slice(4, 6)) : k;
+    return { dia: dia, label: dia, valor: Math.round((byDay[k] || 0) * 100) / 100 };
+  });
+}
+
+function cmpToDataBr_(cmp) {
+  if (!cmp || cmp.length < 8) return '';
+  return cmp.slice(6, 8) + '/' + cmp.slice(4, 6) + '/' + cmp.slice(0, 4);
+}
+
+function shiftCmpDays_(cmp, deltaDays) {
+  if (!cmp || cmp.length < 8) return cmp;
+  const y = parseInt(cmp.slice(0, 4), 10);
+  const m = parseInt(cmp.slice(4, 6), 10) - 1;
+  const d = parseInt(cmp.slice(6, 8), 10);
+  const dt = new Date(y, m, d);
+  dt.setDate(dt.getDate() + deltaDays);
+  return String(dt.getFullYear())
+    + String(dt.getMonth() + 1).padStart(2, '0')
+    + String(dt.getDate()).padStart(2, '0');
+}
+
+function cmpDiffDays_(sCmp, eCmp) {
+  if (!sCmp || !eCmp) return 0;
+  const sy = parseInt(sCmp.slice(0, 4), 10);
+  const sm = parseInt(sCmp.slice(4, 6), 10) - 1;
+  const sd = parseInt(sCmp.slice(6, 8), 10);
+  const ey = parseInt(eCmp.slice(0, 4), 10);
+  const em = parseInt(eCmp.slice(4, 6), 10) - 1;
+  const ed = parseInt(eCmp.slice(6, 8), 10);
+  const ms = new Date(ey, em, ed) - new Date(sy, sm, sd);
+  return Math.max(0, Math.round(ms / 86400000));
+}
+
+function buildCustosHistoricoInsights_(stats, prevTotal) {
+  const insights = [];
+  const total = Number(stats.totalCus) || 0;
+  if (total <= 0) {
+    insights.push('Nenhum custo no período — ótimo para margem, mas confira se todos os gastos foram lançados.');
+    return insights;
+  }
+  const classif = stats.classificacao || [];
+  const top = classif[0];
+  if (top && top.pct >= 35) {
+    insights.push('Concentração: ' + top.categoria + ' responde por ' + top.pct + '% dos custos — avalie negociação ou revisão de contrato.');
+  }
+  const pg = stats.porGrupoDre || {};
+  const fixo = Number(pg.OPEX_FIXO || 0);
+  const variavel = Number(pg.OPEX_VAR || 0) + Number(pg.CMV || 0);
+  const pctFixo = total > 0 ? Math.round(fixo / total * 1000) / 10 : 0;
+  const pctVar = total > 0 ? Math.round(variavel / total * 1000) / 10 : 0;
+  if (pctFixo >= 55) {
+    insights.push('Perfil majoritariamente fixo (' + pctFixo + '%) — ideal para meta mensal previsível; cuidado com sazonalidade na receita.');
+  } else if (pctVar >= 55) {
+    insights.push('Perfil majoritariamente variável (' + pctVar + '%) — acompanhe semanalmente; picos podem ser sazonais (material, manutenção).');
+  } else {
+    insights.push('Mix equilibrado fixo (' + pctFixo + '%) vs variável (' + pctVar + '%) — use o gráfico diário para achar picos.');
+  }
+  if (prevTotal != null && prevTotal > 0) {
+    const delta = Math.round((total - prevTotal) * 100) / 100;
+    const pct = Math.round(delta / prevTotal * 1000) / 10;
+    if (Math.abs(pct) >= 8) {
+      insights.push('Vs período anterior: ' + (delta >= 0 ? '+' : '') + 'R$ ' + delta.toFixed(2).replace('.', ',')
+        + ' (' + (pct >= 0 ? '+' : '') + pct + '%) — ' + (delta > 0 ? 'investigar aumento.' : 'redução positiva.'));
+    }
+  }
+  const dias = stats.diasComCusto || 0;
+  const media = Number(stats.mediaDiaria) || 0;
+  if (dias > 0 && media > 0) {
+    insights.push('Média diária R$ ' + media.toFixed(2).replace('.', ',') + ' em ' + dias + ' dia(s) com lançamento.');
+  }
+  if (Number(stats.cusSemPlano || 0) > 0) {
+    insights.push('R$ ' + Number(stats.cusSemPlano).toFixed(2).replace('.', ',') + ' sem classificação no PLANO_CONTAS — padronize categorias no registro.');
+  }
+  insights.push('Controle: defina teto mensal por grupo (fixo / variável) e revise toda segunda no Caixa + este relatório.');
+  return insights.slice(0, 6);
+}
+
+function listarCustosHistorico_(p) {
+  if (!isGestaoRequest_(p)) return err_('Acesso negado — historico custos so para gestao (admin/gestor)', 403);
+  const startDate = String(p.startDate || '').trim();
+  const endDate = String(p.endDate || '').trim();
+  if (!startDate || !endDate) return err_('startDate e endDate obrigatorios (dd/MM/yyyy)', 400);
+  if (!parseDataStr_(startDate) || !parseDataStr_(endDate)) return err_('Datas invalidas — use dd/MM/yyyy', 400);
+
+  const statsOnly = String(p.statsOnly || '') === '1' || p.statsOnly === true;
+  const categoriaFiltro = String(p.categoria || '').trim();
+  const grupoFiltro = String(p.grupoDre || '').trim().toUpperCase();
+  const bustCache = String(p.bustCache || '') === '1';
+  const cacheKey = 'cusHist_v1_' + startDate.replace(/\//g, '') + '_' + endDate.replace(/\//g, '')
+    + (statsOnly ? '_s' : '_f') + '_' + categoriaFiltro + '_' + grupoFiltro;
+
+  if (!bustCache) {
+    try {
+      const hit = CacheService.getScriptCache().get(cacheKey);
+      if (hit) return ContentService.createTextOutput(hit).setMimeType(ContentService.MimeType.JSON);
+    } catch (e) { /* ok */ }
+  }
+
+  const sCmp = dateToCmp_(startDate);
+  const eCmp = dateToCmp_(endDate);
+  if (sCmp > eCmp) return err_('startDate deve ser <= endDate', 400);
+
+  const planoPack = lerPlanoContas_();
+  const planoMap = planoPack.map || defaultPlanoContasMap_();
+  const sheet = sh_(SH_CUS);
+  const last = sheet.getLastRow();
+  const start = cusDataStartRow_();
+  const emptyStats = {
+    n: 0, totalCus: 0, ticketMedio: 0, mediaDiaria: 0, diasComCusto: 0,
+    porCategoria: {}, porGrupoDre: { CMV: 0, OPEX_FIXO: 0, OPEX_VAR: 0, INVESTIMENTO: 0 },
+    cusPorDia: [], classificacao: [], pctFixo: 0, pctVariavel: 0, cusSemPlano: 0,
+    insights: ['Nenhum custo no período.']
+  };
+
+  if (last < start) {
+    const outEmpty = JSON.stringify({ ok: true, custos: [], total: 0, stats: emptyStats, planoFonte: planoPack.fonte, planoOk: !!planoPack.ok });
+    return ContentService.createTextOutput(outEmpty).setMimeType(ContentService.MimeType.JSON);
+  }
+
+  const dados = sheet.getRange(start, 1, last - start + 1, COL_CUS_READ_).getValues();
+  const all = [];
+  const porCategoria = {};
+  const porGrupoDre = { CMV: 0, OPEX_FIXO: 0, OPEX_VAR: 0, INVESTIMENTO: 0 };
+  const cusPorDiaMap = {};
+  let cusSemPlano = 0;
+
+  dados.forEach(function (r) {
+    if (!r[0] && r[0] !== 0) return;
+    const data = cellToStr_(r[1]);
+    const dcmp = dateToCmp_(data);
+    if (!historicoInRange_(dcmp, '', sCmp, eCmp)) return;
+
+    const cat = String(r[4] || 'Outros').trim() || 'Outros';
+    const valor = Number(r[5]) || 0;
+    if (valor <= 0) return;
+
+    const grupo = resolveGrupoCategoria_(cat, planoMap);
+    if (categoriaFiltro && cat !== categoriaFiltro) return;
+    if (grupoFiltro && grupo !== grupoFiltro) return;
+    if (!planoMap[cat]) cusSemPlano += valor;
+
+    const item = {
+      id: r[0],
+      data: data,
+      hora: cellToStr_(r[2]),
+      descricao: String(r[3] || ''),
+      categoria: cat,
+      valor: valor,
+      grupoDre: grupo,
+      grupoLabel: grupoDreLabel_(grupo),
+      natureza: grupoDreTipoNatureza_(grupo)
+    };
+    all.push(item);
+
+    if (!porCategoria[cat]) porCategoria[cat] = { n: 0, valor: 0, grupo: grupo };
+    porCategoria[cat].n++;
+    porCategoria[cat].valor += valor;
+    porGrupoDre[grupo] = (porGrupoDre[grupo] || 0) + valor;
+    if (dcmp) cusPorDiaMap[dcmp] = (cusPorDiaMap[dcmp] || 0) + valor;
+  });
+
+  all.sort(function (a, b) {
+    const dc = dateToCmp_(b.data).localeCompare(dateToCmp_(a.data));
+    if (dc !== 0) return dc;
+    return String(b.hora || '').localeCompare(String(a.hora || ''));
+  });
+
+  const totalCus = Math.round(all.reduce(function (s, x) { return s + x.valor; }, 0) * 100) / 100;
+  const n = all.length;
+  const diasComCusto = Object.keys(cusPorDiaMap).length;
+  const mediaDiaria = diasComCusto > 0 ? Math.round(totalCus / diasComCusto * 100) / 100 : 0;
+
+  const classificacao = Object.keys(porCategoria).map(function (cat) {
+    const o = porCategoria[cat];
+    return {
+      categoria: cat,
+      grupo: o.grupo,
+      grupoLabel: grupoDreLabel_(o.grupo),
+      natureza: grupoDreTipoNatureza_(o.grupo),
+      n: o.n,
+      valor: Math.round(o.valor * 100) / 100,
+      pct: totalCus > 0 ? Math.round(o.valor / totalCus * 1000) / 10 : 0
+    };
+  }).sort(function (a, b) { return b.valor - a.valor; });
+
+  Object.keys(porGrupoDre).forEach(function (k) {
+    porGrupoDre[k] = Math.round((porGrupoDre[k] || 0) * 100) / 100;
+  });
+
+  const fixoVal = Number(porGrupoDre.OPEX_FIXO || 0);
+  const varVal = Number(porGrupoDre.OPEX_VAR || 0) + Number(porGrupoDre.CMV || 0);
+  const pctFixo = totalCus > 0 ? Math.round(fixoVal / totalCus * 1000) / 10 : 0;
+  const pctVariavel = totalCus > 0 ? Math.round(varVal / totalCus * 1000) / 10 : 0;
+
+  // Período anterior (mesma duração) para comparativo
+  const span = cmpDiffDays_(sCmp, eCmp) + 1;
+  const prevEndCmp = shiftCmpDays_(sCmp, -1);
+  const prevStartCmp = shiftCmpDays_(prevEndCmp, -(span - 1));
+  let prevTotal = 0;
+  dados.forEach(function (r) {
+    if (!r[0] && r[0] !== 0) return;
+    const dcmp = dateToCmp_(cellToStr_(r[1]));
+    if (!dcmp || dcmp < prevStartCmp || dcmp > prevEndCmp) return;
+    const cat = String(r[4] || 'Outros').trim() || 'Outros';
+    const valor = Number(r[5]) || 0;
+    if (valor <= 0) return;
+    const grupo = resolveGrupoCategoria_(cat, planoMap);
+    if (categoriaFiltro && cat !== categoriaFiltro) return;
+    if (grupoFiltro && grupo !== grupoFiltro) return;
+    prevTotal += valor;
+  });
+  prevTotal = Math.round(prevTotal * 100) / 100;
+
+  const stats = {
+    n: n,
+    totalCus: totalCus,
+    ticketMedio: n > 0 ? Math.round(totalCus / n * 100) / 100 : 0,
+    mediaDiaria: mediaDiaria,
+    diasComCusto: diasComCusto,
+    porCategoria: porCategoria,
+    porGrupoDre: porGrupoDre,
+    cusPorDia: buildCusPorDiaArr_(cusPorDiaMap),
+    classificacao: classificacao,
+    pctFixo: pctFixo,
+    pctVariavel: pctVariavel,
+    cusSemPlano: Math.round(cusSemPlano * 100) / 100,
+    prevTotal: prevTotal,
+    prevStart: cmpToDataBr_(prevStartCmp),
+    prevEnd: cmpToDataBr_(prevEndCmp),
+    topCategoria: classificacao.length ? classificacao[0].categoria : '',
+    insights: []
+  };
+  stats.insights = buildCustosHistoricoInsights_(stats, prevTotal);
+
+  const payload = {
+    ok: true,
+    custos: statsOnly ? [] : all.slice(0, 500),
+    total: statsOnly ? n : Math.min(all.length, 500),
+    stats: stats,
+    planoFonte: planoPack.fonte || 'default',
+    planoOk: !!planoPack.ok
+  };
+
+  try {
+    const out = JSON.stringify(payload);
+    if (out.length < 95000) CacheService.getScriptCache().put(cacheKey, out, 120);
+    return ContentService.createTextOutput(out).setMimeType(ContentService.MimeType.JSON);
+  } catch (e) {
+    return resp_(payload);
+  }
+}
+
+function listarPlanoContas_(p) {
+  if (!isGestaoRequest_(p)) return err_('Acesso negado — plano contas so para gestao', 403);
+  const pack = lerPlanoContas_();
+  const map = pack.map || defaultPlanoContasMap_();
+  const categorias = Object.keys(map).sort().map(function (cat) {
+    const g = String(map[cat] || 'OPEX_VAR').toUpperCase();
+    return {
+      categoria: cat,
+      grupo: g,
+      grupoLabel: grupoDreLabel_(g),
+      natureza: grupoDreTipoNatureza_(g)
+    };
+  });
+  return resp_({
+    ok: true,
+    categorias: categorias,
+    fonte: pack.fonte || 'default',
+    planoOk: !!pack.ok
+  });
 }
 
 // ── B1 FASE 5: resumo do dia (Caixa + chip admin) ─────────────
