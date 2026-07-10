@@ -1,6 +1,6 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 10/07/2026 · FE **v1.9.36** · GAS prod **v1.5.182** · perf FE + baseline  
+**Atualizado:** 10/07/2026 · FE **v1.9.36** · GAS **v1.5.187** (ping alinhado após Nova versão)  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **Repo local:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`  
@@ -62,7 +62,7 @@ cursor "C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-mo
 | **Frontend** | **v1.9.36** | https://ribocg-a11y.github.io/movikids/?force=1.9.36 |
 | **Gestão Pessoas** | **v1.9.36** | `gestao-pessoas.html?force=1.9.36` |
 | **Service Worker** | **1.9.36** | `sw.js` |
-| **Apps Script** | **v1.5.182** ping | **Sem Nova versão necessária** — multi = N×salvarLocacao |
+| **Apps Script** | **v1.5.187** | ping + batch `salvarLocacoesMulti` — **Nova versão Web** após pull |
 | **Baseline P0** | ✅ | `docs/ativos/BASELINE_CODIGO_P0.md` |
 | **PIN admin** | **1421** | Script Property `ADMIN_PIN` |
 | **Homolog tablet** | ✅ 23/06 | I43 · I42 · I47 · Gestor — smoke **v1.9.9** pendente Ops |

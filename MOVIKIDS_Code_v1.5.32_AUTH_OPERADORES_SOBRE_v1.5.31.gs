@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
 // MOVI KIDS — Google Apps Script v1.5.187
+// v1.5.187: I98b — MK_GAS_VERSAO_/SISTEMA_ alinhados ao header (ping I70)
 // v1.5.187: I98 — salvarLocacoesMulti valida todos os itens antes de appendRow
 // v1.5.186: I98 — salvarLocacoesMulti (N veículos, 1 lock, 1 round-trip)
 // v1.5.183: I88 — porSemana dashboard: semanas segunda–domingo (não blocos 1–7 fixos)
@@ -178,8 +179,8 @@
 
 // ── CONSTANTES ───────────────────────────────────────────────
 /** Versão exposta em ping, carregarInicio, validarSchema, gestaoPessoasStatus (bump com header). */
-const MK_GAS_VERSAO_  = 'v1.5.182';
-const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.173';
+const MK_GAS_VERSAO_  = 'v1.5.187';
+const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.187';
 const SHEET_ID   = '1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618';
 const DEPLOY_ID  = 'AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y';
 const WEBAPP_URL = `https://script.google.com/macros/s/${DEPLOY_ID}/exec`;

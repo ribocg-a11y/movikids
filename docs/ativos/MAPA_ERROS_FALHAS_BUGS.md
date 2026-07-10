@@ -1,6 +1,6 @@
 # MOVI KIDS — Mapa de erros, falhas e bugs
 
-**Atualizado:** 10/07/2026 — **I96–I99** multi-veículo · FE **v1.9.34** · GAS repo **v1.5.187** (ping **v1.5.182**)  
+**Atualizado:** 10/07/2026 — **I96–I99** multi-veículo · FE **v1.9.36** · GAS **v1.5.187**  
 **Uso anterior:** 22/06/2026 — **I38–I41** auditoria RH 22/06 · GAS repo **v1.5.129** (ping **v1.5.107**) · FE **v1.8.110**  
 **Uso anterior:** 17/06/2026 — **I28** liberar sessão tablet · GAS **v1.5.92** prod. · FE **v1.8.30**  
 **Uso anterior:** 09/06/2026 — **I22 fechado** (hotfix FE v1.8.2)  
@@ -97,6 +97,7 @@
 | **I97** | **Multi-veículo UX iterativo (cesta/pick/overlay)** | Confusão layout; scroll; overlay na página errada | FE **v1.9.28–1.9.31** · telas pick/cesta · overlay global | Design System § Nova | tablet 2 carros planos diferentes |
 | **I98** | **Lentidão N×salvarLocacao + batch parcial GAS** | ~30s+ 2 carros; item 2 inválido gravava item 1 | GAS **v1.5.187** validate-first + `salvarLocacoesMulti` · FE **v1.9.32+** | ping `postWriteActions` | batch após Nova versão Web |
 | **I99** | **Overlay "Salvando…" preso + dismiss duplicava save** | Tablet travado; re-save duplicava loc | FE **v1.9.33–1.9.34** CSS hidden · watchdog · `_novaSaveGen` | `novaRecoveryOverlayStale_` boot | `INCIDENTE_I96_I99_MULTI_VEICULO_2026-07-10.md` |
+| **I101** | **Header GAS v1.5.187 mas `MK_GAS_VERSAO_` v1.5.182** | Ping/relatório mentem versão; confusão deploy | GAS **v1.5.187** constantes alinhadas ao header (I70) | bump header + `MK_GAS_VERSAO_` juntos | ping `versao` = header |
 | **I84** | **Meta colaborador contava sessões, não contas (I42)** | 4 encerramentos mesmo telefone = 4 loc na meta | GAS **v1.5.180** `metaOperadorSeenMark_` conta_id/telefone · FE **v1.9.16** scroll módulo | `metaOperadorTurno` | 1 loc por telefone/dia |
 | **I42** | Conta do dia — mesmo telefone 10h–22h | Caixa `n` vs sessões; maquininha | GAS **v1.5.131+** col S `conta_id` | `TESTE_I42_CONTA_DIA_CAIXA` | não reduzir `COL_LOC_READ_` (ver I43) |
 | **I41** | **`ping_` versão defasada** (v1.5.107 vs repo) | Confusão deploy / verify | GAS **v1.5.130** `ping_()` alinhado | `ping_` header alinhado | ping = v1.5.130 |
