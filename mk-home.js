@@ -45,6 +45,27 @@ function buildCard(s) {
   // ── Card pendente (aguardando início) ────────────────────────────────
   if (!s.started) {
     const vPlano = PRECOS[s.tipo]?.[s.plano]?.v || 0;
+    if (s._optimistic) {
+      return `<div class="session-card pending pending-optimistic" id="card-opt-${s.id}" data-row="0">
+      <div class="sc-top">
+        <div class="sc-tipo">
+          <span class="sc-tipo-icon">${icon}</span>
+          <span class="sc-tipo-name">${s.veiculo || s.tipo}</span>
+        </div>
+        <div class="sc-head-actions">
+          <span class="sc-plano-badge ${badgeCls}">${s.plano}</span>
+        </div>
+      </div>
+      <div class="sc-names">
+        <div class="sc-crianca">${escHtml(s.crianca)}</div>
+        <div class="sc-resp">👤 ${escHtml(s.responsavel)} ${s.telefone ? '· ' + s.telefone : ''}</div>
+      </div>
+      <div class="frozen-timer">
+        <div class="frozen-time">${fmtTime(s.mins * 60)}</div>
+        <div class="frozen-label">⏳ Salvando na planilha…</div>
+      </div>
+    </div>`;
+    }
     return `<div class="session-card pending" id="card-${s.rowIndex}" data-row="${s.rowIndex}">
       <div class="sc-top">
         <div class="sc-tipo">

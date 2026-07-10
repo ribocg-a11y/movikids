@@ -17,6 +17,7 @@ let _novaSavingInFlight = false;
 let _novaSaveWatchdog = null;
 let _novaSaveDismissTimer = null;
 let _mkGasBatchOk = null;
+let _novaSaveGen = 0;
 var relacionamentoCache = [];
 
 function novaPageEl_() {
@@ -158,6 +159,7 @@ function novaHideSaving_() {
 }
 
 function novaForceUnstickSave_(msg) {
+  _novaSaveGen++;
   _novaSavingInFlight = false;
   novaHideSaving_();
   novaLimparOtimistas_();
@@ -1037,6 +1039,7 @@ async function confirmarLocacao() {
   });
 
   if (btn) { btn.disabled = true; btn.textContent = 'Salvando…'; }
+  const saveGen = ++_novaSaveGen;
   _novaSavingInFlight = true;
   aplicarStepNova_(2);
   novaShowSaving_(0, n, itens[0] && itens[0].veiculo, n > 1 ? 'batch' : null);
@@ -1045,6 +1048,8 @@ async function confirmarLocacao() {
   let salvos = 0;
 
   try {
+    if (saveGen !== _novaSaveGen) return;
+
     if (n > 1) {
       const temBatch = await mkGasTemSalvarLocacoesMulti_();
 
@@ -1064,6 +1069,7 @@ async function confirmarLocacao() {
         } catch (batchErr) {
           batchRes = null;
         }
+        if (saveGen !== _novaSaveGen) return;
 
         if (batchRes && batchRes.ok && batchRes.batch && Array.isArray(batchRes.locacoes)) {
           novaLimparOtimistas_();
@@ -1076,6 +1082,7 @@ async function confirmarLocacao() {
           for (let i = 0; i < itens.length; i++) {
             novaShowSaving_(i, n, itens[i].veiculo);
             const r = await novaSalvarItemSequencial_(itens[i], basePayload, observacao, i === 0 ? 32000 : 28000);
+            if (saveGen !== _novaSaveGen) return;
             ultimaMesmaConta = !!r.mesmaConta;
             salvos++;
             if (i === 0) {
@@ -1091,6 +1098,7 @@ async function confirmarLocacao() {
         for (let i = 0; i < itens.length; i++) {
           novaShowSaving_(i, n, itens[i].veiculo);
           const r = await novaSalvarItemSequencial_(itens[i], basePayload, observacao, i === 0 ? 32000 : 28000);
+          if (saveGen !== _novaSaveGen) return;
           ultimaMesmaConta = !!r.mesmaConta;
           salvos++;
           if (i === 0) {
@@ -1105,6 +1113,7 @@ async function confirmarLocacao() {
     } else {
       novaShowSaving_(0, 1, itens[0].veiculo);
       const r = await novaSalvarItemSequencial_(itens[0], basePayload, observacao, 32000);
+      if (saveGen !== _novaSaveGen) return;
       ultimaMesmaConta = !!r.mesmaConta;
       salvos = 1;
       mkRefreshHomeUI_();
@@ -1113,6 +1122,8 @@ async function confirmarLocacao() {
     }
 
     mkRefreshHomeUI_();
+    if (saveGen !== _novaSaveGen) return;
+
     const msg = n > 1
       ? ('✅ ' + n + ' locações salvas na mesma conta! Aperte ▶ em cada card.')
       : (ultimaMesmaConta
@@ -1126,6 +1137,7 @@ async function confirmarLocacao() {
     }, 200);
 
   } catch(e) {
+    if (saveGen !== _novaSaveGen) return;
     novaLimparOtimistas_();
     mkRefreshHomeUI_();
     const errMsg = (e && e.veiculo)
@@ -1134,11 +1146,13 @@ async function confirmarLocacao() {
     toast(errMsg, 'error');
     if (salvos > 0 && n > 1) toast(salvos + ' de ' + n + ' salvos — complete o restante.', 'warning');
   } finally {
-    novaHideSaving_();
-    _novaSavingInFlight = false;
-    if (btn) { btn.textContent = 'Só salvar cadastro (sem SMS agora)'; btn.disabled = false; }
-    const b2 = document.getElementById('btn-confirmar-iniciar');
-    if (b2) { b2.disabled = false; b2.textContent = '✓ Salvar e enviar SMS do portal'; }
+    if (saveGen === _novaSaveGen) {
+      novaHideSaving_();
+      _novaSavingInFlight = false;
+      if (btn) { btn.textContent = 'Só salvar cadastro (sem SMS agora)'; btn.disabled = false; }
+      const b2 = document.getElementById('btn-confirmar-iniciar');
+      if (b2) { b2.disabled = false; b2.textContent = '✓ Salvar e enviar SMS do portal'; }
+    }
   }
 }
 

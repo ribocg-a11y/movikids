@@ -1,6 +1,6 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 10/07/2026 · FE **v1.9.18** · GAS **v1.5.181** repo (Web pendente Nova versão) · **Ciclo:** Sprint D pós One UI · **I85** caixa pagamentos + extras  
+**Atualizado:** 10/07/2026 · FE **v1.9.34** · GAS **v1.5.187** repo (ping **v1.5.182**) · **I96–I99** multi-veículo cadastro  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **Repo local:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`  
@@ -55,15 +55,15 @@ cursor "C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-mo
 
 ---
 
-## Produção (09/07/2026)
+## Produção (10/07/2026)
 
 | Camada | Versão | URL / evidência |
 |--------|--------|-----------------|
-| **Frontend** | **v1.9.18** | https://ribocg-a11y.github.io/movikids/?force=1.9.18 |
-| **Gestão Pessoas** | **v1.9.18** | `gestao-pessoas.html?force=1.9.18` |
-| **Portal acompanhar** | **v1.9.18** | `acompanhar.html` cache bust alinhado |
-| **Service Worker** | **1.9.18** | `sw.js` |
-| **Apps Script** | **v1.5.181** | repo pronto · **Nova versão Web pendente** (sócio cola .gs) |
+| **Frontend** | **v1.9.34** | https://ribocg-a11y.github.io/movikids/?force=1.9.34 |
+| **Gestão Pessoas** | **v1.9.34** | `gestao-pessoas.html?force=1.9.34` |
+| **Service Worker** | **1.9.34** | `sw.js` |
+| **Apps Script** | **v1.5.187** repo · **v1.5.182** ping | Nova versão Web pendente (batch multi I98) |
+| **Multi-veículo** | I97–I99 | Cadastro cesta · overlay fix · batch após GAS novo |
 | **PIN admin** | **1421** | Script Property `ADMIN_PIN` |
 | **Homolog tablet** | ✅ 23/06 | I43 · I42 · I47 · Gestor — smoke **v1.9.9** pendente Ops |
 | **Planilha** | 23 abas | `schemaOk=True` · auditoria **23/23** |

@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.186
+// MOVI KIDS — Google Apps Script v1.5.187
+// v1.5.187: I98 — salvarLocacoesMulti valida todos os itens antes de appendRow
 // v1.5.186: I98 — salvarLocacoesMulti (N veículos, 1 lock, 1 round-trip)
 // v1.5.183: I88 — porSemana dashboard: semanas segunda–domingo (não blocos 1–7 fixos)
 // v1.5.182: I87 — histórico custos admin (listarCustosHistorico + listarPlanoContas)
@@ -3527,6 +3528,7 @@ function salvarLocacoesMulti_(p) {
     const locacoes = [];
     let firstNewMasterId = null;
     const veiculosVistos = {};
+    const itensValidados = [];
 
     for (let i = 0; i < itensRaw.length; i++) {
       const item = itensRaw[i];
@@ -3538,8 +3540,15 @@ function salvarLocacoesMulti_(p) {
       if (veiculo && veiculosOp.indexOf(veiculo) < 0) return err_('Veiculo invalido: ' + veiculo, 400);
       if (veiculo && veiculosVistos[veiculo]) return err_('Veiculo duplicado: ' + veiculo, 400);
       if (veiculo) veiculosVistos[veiculo] = true;
+      itensValidados.push({ tipo: tipo, plano: plano, veiculo: veiculo, config: precosOp[tipo][plano] });
+    }
 
-      const config = precosOp[tipo][plano];
+    for (let i = 0; i < itensValidados.length; i++) {
+      const item = itensValidados[i];
+      const tipo = item.tipo;
+      const plano = item.plano;
+      const veiculo = item.veiculo;
+      const config = item.config;
       const id = nextId_(sheet);
       const row = [
         id, dataFmt, '', '', tipo, plano, config.mins, config.valor, 0, 0, config.valor,
