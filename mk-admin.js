@@ -2985,6 +2985,12 @@ function renderCaixaFromResumo_(dataFmt, r) {
     if (dataLbl) dataLbl.textContent = dataFmt;
 
     setVal('cx-total', totalEnt);
+    const pixVal = Number(totPag.PIX || 0);
+    const credVal = Number(totPag['Crédito'] || 0);
+    const debVal = Number(totPag['Débito'] || 0);
+    setVal('cx-pix', pixVal);
+    setVal('cx-cred', credVal);
+    setVal('cx-deb', debVal);
     setVal('cx-maq', totalMaq);
     setVal('cx-din', totalDin);
     setVal('cx-cus', totalCus, '#C62828');
@@ -2997,7 +3003,10 @@ function renderCaixaFromResumo_(dataFmt, r) {
     }
     setText('cx-res-ctx', fmtR(totalEnt) + ' − ' + fmtR(totalCus) + ' custos');
     setText('cx-total-ctx', nSess + ' locação(ões)' + (nSess > nContas ? ' · ' + nContas + ' contas' : ''));
-    setText('cx-maq-ctx', 'PIX R$ ' + Number(totPag.PIX || 0).toFixed(2).replace('.', ',') + ' · cartões');
+    setText('cx-pix-ctx', 'PIX');
+    setText('cx-cred-ctx', 'Crédito');
+    setText('cx-deb-ctx', 'Débito');
+    setText('cx-maq-ctx', '= PIX + crédito + débito');
     setText('cx-din-ctx', 'Saldo espécie ' + fmtR(saldoDin));
     setText('cx-cus-ctx', custos.length + ' lançamento(s)');
     const nloc = document.getElementById('cx-nloc');
@@ -3012,6 +3021,43 @@ function renderCaixaFromResumo_(dataFmt, r) {
       setText('cx-ext-ctx', 'Sem extras hoje');
     }
     const cxExtIns = document.getElementById('cx-ext-insight');
+    const extrasPorPag = r.extrasPorPagamento || {};
+    const extrasCancel = r.extrasCancelados || [];
+    const cxExtDet = document.getElementById('cx-extras-detail');
+    if (cxExtDet) {
+      const epKeys = ['PIX', 'Crédito', 'Débito', 'Dinheiro'].filter(function (k) {
+        return Number(extrasPorPag[k] || 0) > 0;
+      });
+      if (epKeys.length) {
+        cxExtDet.hidden = false;
+        cxExtDet.innerHTML = '<div class="mk-caixa-extras-title">Extras cobrados por forma de pagamento</div>'
+          + epKeys.map(function (k) {
+            return '<div class="mk-caixa-extras-row"><span>' + k + '</span><strong>' + fmtR(extrasPorPag[k]) + '</strong></div>';
+          }).join('');
+      } else if (totalExt > 0) {
+        cxExtDet.hidden = false;
+        cxExtDet.innerHTML = '<div class="mk-caixa-extras-title">Extras no faturamento</div>'
+          + '<div class="mk-caixa-extras-row"><span>Total extras</span><strong>' + fmtR(totalExt) + '</strong></div>';
+      } else {
+        cxExtDet.hidden = true;
+        cxExtDet.innerHTML = '';
+      }
+    }
+    const cxExtCan = document.getElementById('cx-extras-cancel');
+    if (cxExtCan) {
+      if (extrasCancel.length) {
+        cxExtCan.hidden = false;
+        const minsTot = extrasCancel.reduce(function (s, x) { return s + (Number(x.mins) || 0); }, 0);
+        cxExtCan.innerHTML = '<div class="mk-caixa-extras-title">Extras cancelados (' + extrasCancel.length + ' · ' + minsTot + ' min)</div>'
+          + extrasCancel.map(function (x) {
+            return '<div class="mk-caixa-cancel-row"><span>' + escHtml(x.horaInicio || '—') + ' · ' + escHtml(x.crianca || x.veiculo || '—')
+              + ' (' + (x.mins || 0) + ' min)</span><em>' + escHtml(x.justificativa || '—') + '</em></div>';
+          }).join('');
+      } else {
+        cxExtCan.hidden = true;
+        cxExtCan.innerHTML = '';
+      }
+    }
     if (cxExtIns) {
       if (totalExt > 0) {
         const pct = totalEnt > 0 ? Math.round(totalExt / totalEnt * 1000) / 10 : 0;

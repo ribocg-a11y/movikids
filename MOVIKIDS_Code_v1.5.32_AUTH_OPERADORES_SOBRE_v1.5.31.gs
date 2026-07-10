@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.180
+// MOVI KIDS — Google Apps Script v1.5.181
+// v1.5.181: I85 — extras pagamento obrigatório + cancelamento justificado + caixa PIX/créd/déb/din
 // v1.5.180: I84 — meta operador conta/dia (I42) — 1 loc por telefone/conta_id no turno
 // v1.5.179: I82 — painelGestaoPessoasAdmin null row [4] (metas/comunicados/avaliacoes); Operadores/Escala
 // v1.5.178: I81 — restaurarPontoJuliaJul2026Admin (FOLHA_PONTO adm 01/07–09/07, hoje +20min)
@@ -173,7 +174,7 @@
 
 // ── CONSTANTES ───────────────────────────────────────────────
 /** Versão exposta em ping, carregarInicio, validarSchema, gestaoPessoasStatus (bump com header). */
-const MK_GAS_VERSAO_  = 'v1.5.180';
+const MK_GAS_VERSAO_  = 'v1.5.181';
 const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.173';
 const SHEET_ID   = '1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618';
 const DEPLOY_ID  = 'AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y';
@@ -3314,7 +3315,7 @@ function contaKeyLocObj_(l) {
   return Number(l.contaId) || Number(l.id) || 0;
 }
 
-/** Agrupa encerradas para caixa: n = contas, fat = soma sessões, pagamento por conta-mestre. */
+/** Agrupa encerradas para caixa: n = contas, fat = soma sessões, pagamento plano + extra separados. */
 function agregarCaixaPorConta_(enc) {
   const groups = {};
   enc.forEach(function (l) {
@@ -3323,23 +3324,36 @@ function agregarCaixaPorConta_(enc) {
     groups[k].push(l);
   });
   const porPagamento = {};
+  const extrasPorPagamento = {};
+  const extrasCancelados = [];
   let fat = 0;
   let totalExt = 0;
   let nExt = 0;
-  Object.keys(groups).forEach(function (k) {
-    const items = groups[k];
-    const master = items.find(function (i) { return Number(i.id) === Number(k); }) || items[0];
-    const pag = normalizarPagamento_(master.pagamento) || 'Não informado';
-    let sumVal = 0;
-    let sumExt = 0;
-    items.forEach(function (i) {
-      sumVal += Number(i.valorTotal) || 0;
-      sumExt += Number(i.valorAdicional) || 0;
-      if (Number(i.valorAdicional) > 0) nExt++;
-    });
-    fat += sumVal;
-    totalExt += sumExt;
-    porPagamento[pag] = (porPagamento[pag] || 0) + sumVal;
+  enc.forEach(function (i) {
+    if (Number(i.extrasCancelados) > 0) {
+      extrasCancelados.push({
+        id: i.id,
+        crianca: i.crianca,
+        veiculo: i.veiculo,
+        horaInicio: i.horaInicio,
+        mins: Number(i.extrasCancelados) || 0,
+        justificativa: String(i.extrasJustificativa || '')
+      });
+    }
+  });
+  enc.forEach(function (i) {
+    const vPlano = Number(i.valorPlano) || 0;
+    const vExt = Number(i.valorAdicional) || 0;
+    const pagPlano = normalizarPagamento_(i.pagamento) || 'Não informado';
+    const pagExt = i.extraPagamento ? normalizarPagamento_(i.extraPagamento) : pagPlano;
+    fat += vPlano + vExt;
+    porPagamento[pagPlano] = (porPagamento[pagPlano] || 0) + vPlano;
+    if (vExt > 0) {
+      totalExt += vExt;
+      nExt++;
+      porPagamento[pagExt] = (porPagamento[pagExt] || 0) + vExt;
+      extrasPorPagamento[pagExt] = (extrasPorPagamento[pagExt] || 0) + vExt;
+    }
   });
   const cred = (porPagamento['Crédito'] || 0);
   const deb = (porPagamento['Débito'] || 0);
@@ -3350,6 +3364,8 @@ function agregarCaixaPorConta_(enc) {
     totalExt: Math.round(totalExt * 100) / 100,
     nExt: nExt,
     porPagamento: porPagamento,
+    extrasPorPagamento: extrasPorPagamento,
+    extrasCancelados: extrasCancelados,
     totalMaq: Math.round(((porPagamento['PIX'] || 0) + cred + deb) * 100) / 100,
     totalDin: Math.round((porPagamento['Dinheiro'] || 0) * 100) / 100
   };
@@ -3628,11 +3644,28 @@ function listarAuditoriaAdmin_(p) {
   }
 }
 
+function parseExtraMetaCol_(val) {
+  const s = String(val || '').trim();
+  if (!s) return { extraPagamento: '', extrasCancelados: 0, extrasJustificativa: '' };
+  if (s.indexOf('EP:') === 0) {
+    return { extraPagamento: normalizarPagamento_(s.slice(3).trim()), extrasCancelados: 0, extrasJustificativa: '' };
+  }
+  if (s.indexOf('EC:') === 0) {
+    const rest = s.slice(3);
+    const pipe = rest.indexOf('|');
+    const mins = pipe >= 0 ? parseInt(rest.slice(0, pipe), 10) : parseInt(rest, 10);
+    const just = pipe >= 0 ? rest.slice(pipe + 1).trim() : '';
+    return { extraPagamento: '', extrasCancelados: mins || 0, extrasJustificativa: just };
+  }
+  return { extraPagamento: '', extrasCancelados: 0, extrasJustificativa: '' };
+}
+
 function locacaoObj_(row, rowIndex) {
   const status = String(row[14] || '').trim();
   const ts = status === 'Ativa' || status === 'Encerrada'
     ? timestampCanonico_(row[1], row[2], row[24])
     : 0;
+  const extraMeta = parseExtraMetaCol_(row[27]);
   return {
     rowIndex: rowIndex, id: row[0], data: cellToStr_(row[1]), horaInicio: cellToStr_(row[2]), horaFim: cellToStr_(row[3]),
     tipo: String(row[4] || ''), plano: String(row[5] || ''), mins: Number(row[6] || 0), valorPlano: Number(row[7] || 0),
@@ -3640,6 +3673,9 @@ function locacaoObj_(row, rowIndex) {
     responsavel: String(row[11] || ''), crianca: String(row[12] || ''), telefone: String(row[13] || ''),
     status: status, veiculo: String(row[15] || ''), pagamento: normalizarPagamento_(row[16] || ''), observacao: String(row[17] || ''),
     contaId: contaIdLocRow_(row),
+    extraPagamento: extraMeta.extraPagamento,
+    extrasCancelados: extraMeta.extrasCancelados,
+    extrasJustificativa: extraMeta.extrasJustificativa,
     startTimestamp: ts, started: status === 'Ativa' && ts > 0, extendedMins: Number(row[25] || 0), extendedValor: Number(row[26] || 0)
   };
 }
@@ -3758,9 +3794,35 @@ function encerrarLocacao_(p) {
     );
   }
 
-  const minAdicionais  = Math.max(0, minUsados - minContratados);
-  const valorAdicional = Math.round(minAdicionais * adicionalPorMin * 100) / 100;
-  const valorTotal     = Math.round((valorPlano + valorAdicional) * 100) / 100;
+  let minAdicionais  = Math.max(0, minUsados - minContratados);
+  let valorAdicional = Math.round(minAdicionais * adicionalPorMin * 100) / 100;
+  let valorTotal     = Math.round((valorPlano + valorAdicional) * 100) / 100;
+
+  const cancelarExtras = String(p.cancelarExtras || '') === 'true' || p.cancelarExtras === true;
+  const justificativaExtras = String(p.justificativaExtras || '').trim();
+  const extraPagamento = normalizarPagamento_(p.extraPagamento || '');
+  const minExtraCancelados = parseInt(p.minExtraCancelados || '0', 10) || 0;
+
+  if (minAdicionais > 0 && !somentePlano) {
+    if (cancelarExtras) {
+      if (justificativaExtras.length < 5) {
+        lockE.releaseLock();
+        return err_('Justificativa obrigatoria para cancelar minutos extras (min. 5 caracteres)', 400);
+      }
+      const minsCanc = minExtraCancelados > 0 ? minExtraCancelados : minAdicionais;
+      sheet.getRange(rowIndex, 28).setValue('EC:' + minsCanc + '|' + justificativaExtras.slice(0, 240));
+      minUsados = minContratados;
+      minAdicionais = 0;
+      valorAdicional = 0;
+      valorTotal = valorPlano;
+    } else {
+      if (!extraPagamento || extraPagamento === 'Não informado') {
+        lockE.releaseLock();
+        return err_('Informe como os minutos extras foram pagos (PIX, Credito, Debito ou Dinheiro)', 400);
+      }
+      sheet.getRange(rowIndex, 28).setValue('EP:' + extraPagamento);
+    }
+  }
 
   syncPagamentoContaMestre_(rowIndex, row);
 
@@ -3782,6 +3844,8 @@ function encerrarLocacao_(p) {
     const rowDataE = sheet.getRange(rowIndex, 1, 1, 28).getValues()[0];
     const detEnc = 'Encerramento operacional; minUsados=' + minUsados +
       (somentePlano ? '; somente plano (GAS instavel/offline)' : '') +
+      (cancelarExtras ? '; extras cancelados: ' + (minExtraCancelados || minAdicionais) + 'min; ' + justificativaExtras.slice(0, 120) : '') +
+      (extraPagamento ? '; extraPag=' + extraPagamento : '') +
       (String(p.ignorarSmsObrigatorio || '') === 'true' || p.ignorarSmsObrigatorio === true ? '; ADM sem SMS obrigatorio' : '');
     registrarAuditoriaLocacao_(rowIndex, 'encerrarLocacao', antesEncerrar, locacaoObj_(rowDataE, rowIndex), detEnc, operadorAudit_(p));
     firebaseSyncSessao_(rowIndex, fbDadosSessao_(rowDataE, 'Encerrada', rowIndex));
@@ -4069,7 +4133,12 @@ function calcResumoDiaCore_(dataFmt) {
         telefone:      String(r[13]),
         status:        status,
         veiculo:       String(r[15] || ''),
-        pagamento:     normalizarPagamento_(r[16] || '')
+        pagamento:     normalizarPagamento_(r[16] || ''),
+        valorPlano:    Number(r[7] || 0),
+        valorAdicional:Number(r[9] || 0),
+        extraPagamento: parseExtraMetaCol_(r[27]).extraPagamento,
+        extrasCancelados: parseExtraMetaCol_(r[27]).extrasCancelados,
+        extrasJustificativa: parseExtraMetaCol_(r[27]).extrasJustificativa
       });
     }
   }
@@ -4116,6 +4185,8 @@ function calcResumoDiaCore_(dataFmt) {
     totalExt: agg.totalExt,
     nExt: agg.nExt,
     porPagamento: agg.porPagamento,
+    extrasPorPagamento: agg.extrasPorPagamento || {},
+    extrasCancelados: agg.extrasCancelados || [],
     totalMaq: agg.totalMaq,
     totalDin: agg.totalDin,
     totalCus: Math.round(totalCus * 100) / 100,
