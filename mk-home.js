@@ -237,7 +237,9 @@ function renderPainel() {
     (typeof sessaoTimerIniciado_ === 'function' ? sessaoTimerIniciado_(s) : (s.started && s.status === 'Ativa'))
   ).length;
   const pendentes = sessions.filter(s => s.status === 'Pendente' || (!s.started && s.status === 'Ativa')).length;
-  const encHoje   = encHojeData ? encHojeData.length : 0;
+  const encHoje   = typeof mkContasEncHoje_ === 'function'
+    ? mkContasEncHoje_(encHojeData)
+    : (encHojeData ? encHojeData.length : 0);
 
   const phAtivos  = document.getElementById('ph-ativos');
   const phEnc     = document.getElementById('ph-enc-hoje');
@@ -357,23 +359,57 @@ function iniciarNovaPeloVeiculo(veiculo, tipo) {
   }, 80);
 }
 
-/** Contas do dia (telefones/conta_id únicos — I42) — tile Home. */
+/** Chave única de conta (telefone I42 ou conta_id). */
+function mkEncHojeChaveConta_(e) {
+  const tel = String((e && e.telefone) || '').replace(/\D/g, '');
+  if (tel.length >= 8) return 't:' + tel;
+  const ck = Number((e && e.contaId) || (e && e.id) || 0);
+  if (ck > 0) return 'c:' + ck;
+  return '';
+}
+
+/** Contas do dia (telefones/conta_id únicos — I42) — tile Home / Encerradas. */
 function mkContasEncHoje_(list) {
   const data = list || encHojeData || [];
   if (data.length) {
     const seen = {};
     data.forEach(function (e) {
-      const tel = String(e.telefone || '').replace(/\D/g, '');
-      if (tel.length >= 8) seen[tel] = true;
-      else {
-        const ck = Number(e.contaId) || Number(e.id) || 0;
-        if (ck > 0) seen['c:' + ck] = true;
-      }
+      const k = mkEncHojeChaveConta_(e);
+      if (k) seen[k] = true;
     });
     return Object.keys(seen).length;
   }
   if (statsHoje && statsHoje.n != null && statsHoje.n > 0) return statsHoje.n;
   return 0;
+}
+
+/** Uma linha por conta — lista Encerradas (não repetir o mesmo telefone). */
+function mkEncHojePorConta_(list) {
+  const data = list || encHojeData || [];
+  const groups = {};
+  const order = [];
+  data.forEach(function (e) {
+    const k = mkEncHojeChaveConta_(e) || ('x:' + order.length);
+    if (!groups[k]) {
+      groups[k] = [];
+      order.push(k);
+    }
+    groups[k].push(e);
+  });
+  return order.map(function (k) {
+    const items = groups[k];
+    const head = items[0];
+    if (items.length === 1) return head;
+    const valorTotal = items.reduce(function (s, x) {
+      return s + (Number(x.valorTotal) || 0);
+    }, 0);
+    const veiculos = items.map(function (x) { return x.crianca || x.veiculo || '—'; }).join(', ');
+    return Object.assign({}, head, {
+      _nLocGrupo: items.length,
+      _veiculosGrupo: veiculos,
+      valorTotal: valorTotal > 0 ? valorTotal : head.valorTotal
+    });
+  });
 }
 
 /** Todas as sessões encerradas hoje — Caixa / chip admin. */
@@ -392,6 +428,7 @@ function mkUpdateEncHojeKpis_(list) {
 window.mkUpdateEncHojeKpis_ = mkUpdateEncHojeKpis_;
 window.mkContasEncHoje_ = mkContasEncHoje_;
 window.mkSessoesEncHoje_ = mkSessoesEncHoje_;
+window.mkEncHojePorConta_ = mkEncHojePorConta_;
 
 function renderEncHojeList_(list) {
   const section = document.getElementById('enc-hoje-section');
@@ -401,30 +438,34 @@ function renderEncHojeList_(list) {
   const data = list || encHojeData || [];
   if (!data.length) { section.style.display = 'none'; return; }
   section.style.display = 'block';
-  const nSess = data.length;
-  const nContas = typeof mkContasEncHoje_ === 'function' ? mkContasEncHoje_(data) : nSess;
+  const nContas = typeof mkContasEncHoje_ === 'function' ? mkContasEncHoje_(data) : data.length;
+  const porConta = typeof mkEncHojePorConta_ === 'function' ? mkEncHojePorConta_(data) : data;
   if (lead) {
-    lead.textContent = nSess > nContas
-      ? (nSess + ' locações · ' + nContas + ' contas na maquininha')
-      : (nSess + (nSess === 1 ? ' locação' : ' locações'));
+    lead.textContent = nContas + (nContas === 1 ? ' conta na maquininha' : ' contas na maquininha');
   }
   const fin = mkExibirFinanceiro_();
   const admSms = (typeof mkAuthIsAdmin === 'function' && mkAuthIsAdmin()) || window.isAdmin;
-  container.innerHTML = data.map(e=>{
+  container.innerHTML = porConta.map(function (e) {
     const icon = tipoIcon(e.tipo);
+    const nGrupo = Number(e._nLocGrupo) || 0;
+    const titulo = nGrupo > 1
+      ? (nGrupo + ' locações · ' + escHtml(e._veiculosGrupo || e.crianca || ''))
+      : (icon + ' ' + escHtml(e.crianca));
     const v = fin && e.valorTotal != null
-      ? `<div class="enc-valor">R$ ${Number(e.valorTotal).toFixed(2).replace('.',',')}</div>` : '';
-    return `<div class="enc-item">
-      <div class="enc-left">
-        <div class="enc-crianca">${icon} ${escHtml(e.crianca)}</div>
-        <div class="enc-det">👤 ${escHtml(e.responsavel)} · ${e.plano}</div>
-      </div>
-      <div class="enc-right">
-        ${v}
-        <div class="enc-horario">${e.horaInicio} → ${e.horaFim||'--:--'}</div>
-        ${admSms && e.telefone && !(typeof mkComunicacaoQrOnly_ === 'function' && mkComunicacaoQrOnly_()) ? '<button class="enc-wa-btn" onclick=\'waAgradecimento(' + JSON.stringify(e).replace(/\'/g,"\\\'")+')\'>SMS agradecer</button>' : ''}
-      </div>
-    </div>`;
+      ? '<div class="enc-valor">R$ ' + Number(e.valorTotal).toFixed(2).replace('.', ',') + '</div>' : '';
+    const detExtra = nGrupo > 1 ? (' · ' + nGrupo + ' veículos') : '';
+    return '<div class="enc-item">'
+      + '<div class="enc-left">'
+      + '<div class="enc-crianca">' + titulo + '</div>'
+      + '<div class="enc-det">👤 ' + escHtml(e.responsavel) + detExtra + ' · ' + escHtml(e.plano || '') + '</div>'
+      + '</div>'
+      + '<div class="enc-right">'
+      + v
+      + '<div class="enc-horario">' + (e.horaInicio || '—') + ' → ' + (e.horaFim || '--:--') + '</div>'
+      + (admSms && e.telefone && !(typeof mkComunicacaoQrOnly_ === 'function' && mkComunicacaoQrOnly_())
+        ? '<button class="enc-wa-btn" onclick=\'waAgradecimento(' + JSON.stringify(e).replace(/\'/g, "\\'") + ')\'>SMS agradecer</button>' : '')
+      + '</div>'
+      + '</div>';
   }).join('');
 }
 window.renderEncHojeList_ = renderEncHojeList_;

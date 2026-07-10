@@ -1369,13 +1369,13 @@ function renderAdminMobCmd_(d) {
 
 function buildCommandCenterFallback_() {
   const fat = fatHojeCanonica_(kpiData);
-  const n = nHojeCanonica_();
+  const nSess = nSessoesHojeCanonica_();
   const res = resumoDiaHoje && resumoDiaHoje.resultado != null ? Number(resumoDiaHoje.resultado) : 0;
   return {
     data: fmtDataBrHoje_(),
     widgets: [
       { id: 'loc', label: 'Locações abertas', valor: '—', ctx: 'Atualize GAS v1.5.117+ para tempo real' },
-      { id: 'fat', label: 'Faturamento hoje', valor: fat, ctx: n > 0 ? (n + ' loc · resultado ' + R2(res)) : 'Sem locações encerradas hoje' },
+      { id: 'fat', label: 'Faturamento hoje', valor: fat, ctx: nSess > 0 ? (nSess + ' loc · resultado ' + R2(res)) : 'Sem locações encerradas hoje' },
       { id: 'equipe', label: 'Equipe', valor: '—', ctx: 'Painel RH após Nova versão Web' },
       { id: 'frota', label: 'Frota', valor: '—', ctx: '—' }
     ],
@@ -2737,9 +2737,9 @@ function renderDashboardCore_(d) {
   setText2('nk-extmes', R2(extVal));
   setText2('nk-extmes-sub', (d.nComExtra || 0) + ' loc. com extra' + (pctExt > 0 ? ' · ' + pctExt + '% fat.' : ''));
   const fatHoje = fatHojeCanonica_(d);
-  const nHoje = nHojeCanonica_();
+  const nSessHoje = nSessoesHojeCanonica_();
   setText2('nk-fathoje', R2(fatHoje));
-  setText2('nk-cushoje', nHoje + (nHoje === 1 ? ' locação hoje' : ' locações hoje') + ' · ver detalhes');
+  setText2('nk-cushoje', nSessHoje + (nSessHoje === 1 ? ' locação hoje' : ' locações hoje') + ' · ver detalhes');
 
   // CTO
   setText2('nk-cto-fat',  R2(d.fatMes));
@@ -3837,8 +3837,8 @@ function atualizarHubAdmin_() {
   const dia = document.getElementById('hub-dia-sub');
   const mes = document.getElementById('hub-mes-sub');
   if (d && d.ok) {
-    const nHoje = nHojeCanonica_();
-    if (dia) dia.textContent = nHoje + (nHoje === 1 ? ' locação hoje' : ' locações hoje') + ' · conferência no caixa';
+    const nSessHoje = nSessoesHojeCanonica_();
+    if (dia) dia.textContent = nSessHoje + (nSessHoje === 1 ? ' locação hoje' : ' locações hoje') + ' · conferência no caixa';
     if (mes) mes.textContent = 'KPIs do mês, CTO e gestão avançada';
   }
   const gasOnline = typeof _syncFailCount !== 'undefined' && _syncFailCount === 0;
