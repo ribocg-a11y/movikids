@@ -413,6 +413,41 @@ html,body{height:100%;background:var(--bg);color:var(--txt);overflow:hidden}
 .form-input.pink:focus{border-color:var(--pink)}
 .form-hint{font-size:11px;color:var(--txt3);margin-top:5px;line-height:1.35}
 .nova-fechar-hint{font-size:12px;color:var(--txt2);margin:0 0 10px;line-height:1.4}
+.nova-mesma-conta-banner{
+  display:none;margin:-4px 0 14px;padding:12px 14px;border-radius:var(--radius-sm);
+  background:linear-gradient(135deg,var(--blue-lt) 0%,#fff 100%);border:1px solid rgba(13,71,161,.15)
+}
+.nova-mesma-conta-banner:not([hidden]){display:block}
+.nova-mesma-conta-badge{
+  display:inline-block;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.06em;
+  color:var(--blue-dk);background:#fff;padding:3px 8px;border-radius:999px;margin-bottom:6px
+}
+.nova-mesma-conta-banner-text{font-size:13px;color:var(--txt2);margin:0;line-height:1.45}
+.nova-mesma-conta-pag-fixo{
+  margin-bottom:14px;padding:14px;border-radius:var(--radius-sm);background:var(--bg2);border:1px dashed var(--blue)
+}
+.nova-mesma-conta-pag-fixo:not([hidden]){display:block}
+.nova-mesma-conta-pag-label{display:block;font-size:11px;font-weight:800;color:var(--txt3);text-transform:uppercase;margin-bottom:4px}
+.nova-mesma-conta-pag-val{font-size:20px;color:var(--blue-dk);font-family:var(--font-display)}
+.nova-mesma-conta-pag-hint{font-size:12px;color:var(--txt3);margin:8px 0 0;line-height:1.4}
+#page-nova.nova-mesma-conta-mode .nova-rel-block{display:none}
+.form-input.nova-field-locked{background:var(--bg2);color:var(--txt2);border-style:dashed}
+.mk-mesma-conta-cta{
+  margin:0 0 14px;padding:0;border-radius:16px;background:linear-gradient(135deg,#E3F2FD 0%,#FFF8E1 100%);
+  border:2px solid rgba(13,71,161,.12);box-shadow:0 4px 14px rgba(13,71,161,.08)
+}
+.mk-mesma-conta-cta:not([hidden]){display:block}
+.mk-mesma-conta-cta-inner{display:flex;flex-wrap:wrap;align-items:center;gap:10px 12px;padding:12px 14px}
+.mk-mesma-conta-cta-ico{font-size:22px;line-height:1}
+.mk-mesma-conta-cta-copy{flex:1;min-width:140px}
+.mk-mesma-conta-cta-title{display:block;font-size:14px;font-weight:900;color:var(--blue-dk);font-family:var(--font-display)}
+.mk-mesma-conta-cta-text{display:block;font-size:12px;color:var(--txt2);margin-top:2px;line-height:1.35}
+.mk-mesma-conta-cta-btn{flex-shrink:0;padding:10px 16px;font-size:13px;white-space:nowrap}
+.mk-mesma-conta-cta-dismiss{
+  flex-shrink:0;width:36px;height:36px;border:none;border-radius:50%;background:rgba(0,0,0,.06);
+  color:var(--txt3);font-size:16px;cursor:pointer;line-height:1
+}
+.mk-mesma-conta-cta-dismiss:active{transform:scale(.96)}
 
 /* Review card */
 .review-card{background:linear-gradient(135deg,var(--blue),var(--blue-dk));

@@ -1,14 +1,130 @@
 /* MOVI KIDS — Nova locação (Pacote M.6)
  * Zona P0: confirmarLocacao → salvarLocacao via GET (api/mk-api.js).
  */
-let novaState = { tipo: null, plano: null, veiculo: null, pagamento: null, observacao: '', step: 0 };
+let novaState = { tipo: null, plano: null, veiculo: null, pagamento: null, observacao: '', step: 0, mesmaConta: false };
 let novaPrefillResponsavel = null;
 const NOVA_DRAFT_KEY = 'mk_nova_locacao_draft_v1';
+const NOVA_MESMA_CONTA_KEY = 'mk_nova_mesma_conta_v1';
+const NOVA_MESMA_CONTA_TTL_MS = 6 * 60 * 60 * 1000;
 let _restoringNovaDraft = false;
 const NOVA_MAX_STEP = 2;
 let _novaRelSearchTimer = null;
 let _novaSavingInFlight = false;
 var relacionamentoCache = [];
+/** I96 — mesma conta (I42): 2º/3º veículo sem refazer cadastro completo. */
+function lerMesmaContaCtx_() {
+  try {
+    const raw = sessionStorage.getItem(NOVA_MESMA_CONTA_KEY);
+    if (!raw) return null;
+    const ctx = JSON.parse(raw);
+    if (!ctx || !ctx.telefone) return null;
+    if (ctx.ts && Date.now() - Number(ctx.ts) > NOVA_MESMA_CONTA_TTL_MS) {
+      sessionStorage.removeItem(NOVA_MESMA_CONTA_KEY);
+      return null;
+    }
+    return ctx;
+  } catch (e) { return null; }
+}
+
+function salvarMesmaContaCtx_(ctx) {
+  if (!ctx || !ctx.telefone) return;
+  const payload = Object.assign({}, ctx, { ts: Date.now() });
+  try { sessionStorage.setItem(NOVA_MESMA_CONTA_KEY, JSON.stringify(payload)); } catch (e) {}
+  renderHomeMesmaContaCta_(payload);
+}
+
+function dismissMesmaContaCta_() {
+  try { sessionStorage.removeItem(NOVA_MESMA_CONTA_KEY); } catch (e) {}
+  renderHomeMesmaContaCta_(null);
+}
+
+function renderHomeMesmaContaCta_(ctxOpt) {
+  const el = document.getElementById('home-mesma-conta-cta');
+  const txt = document.getElementById('home-mesma-conta-text');
+  if (!el) return;
+  const ctx = ctxOpt !== undefined ? ctxOpt : lerMesmaContaCtx_();
+  if (!ctx || !ctx.telefone) {
+    el.hidden = true;
+    return;
+  }
+  el.hidden = false;
+  if (txt) {
+    const pag = ctx.pagamento || 'pagamento';
+    const resp = ctx.responsavel || 'Responsável';
+    txt.textContent = resp + ' · ' + pag + ' — adicionar outro veículo na mesma conta (1 cobrança na maquininha)';
+  }
+}
+
+function abrirNovaMesmaContaFromHome_() {
+  const ctx = lerMesmaContaCtx_();
+  if (!ctx) {
+    toast('Oferta expirada. Faça uma nova locação com pagamento.', 'warning');
+    renderHomeMesmaContaCta_(null);
+    return;
+  }
+  abrirNovaMesmaConta_(ctx);
+}
+
+function aplicarPagamentoFixoNova_(forma) {
+  if (!forma) return;
+  novaState.pagamento = forma;
+  const idMap = { PIX: 'pag-PIX', 'Crédito': 'pag-Credito', 'Débito': 'pag-Debito', Dinheiro: 'pag-Dinheiro' };
+  const targetId = idMap[forma] || '';
+  document.querySelectorAll('.pag-btn').forEach(function(b) {
+    b.classList.toggle('sel', b.id === targetId);
+  });
+  const valEl = document.getElementById('nova-mesma-conta-pag-val');
+  if (valEl) valEl.textContent = forma;
+}
+
+function setNovaCampoLocked_(id, locked) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.readOnly = !!locked;
+  el.classList.toggle('nova-field-locked', !!locked);
+  if (locked) el.setAttribute('aria-readonly', 'true');
+  else el.removeAttribute('aria-readonly');
+}
+
+function aplicarNovaMesmaContaUI_(ativo) {
+  const page = document.getElementById('page-nova');
+  const banner = document.getElementById('nova-mesma-conta-banner');
+  const pagFixo = document.getElementById('nova-mesma-conta-pag-fixo');
+  const pagGrid = document.getElementById('nova-pag-grid');
+  const pagTitle = document.getElementById('nova-pag-grid-title');
+  if (page) page.classList.toggle('nova-mesma-conta-mode', !!ativo);
+  if (banner) banner.hidden = !ativo;
+  if (pagFixo) pagFixo.hidden = !ativo;
+  if (pagGrid) pagGrid.style.display = ativo ? 'none' : '';
+  if (pagTitle) pagTitle.style.display = ativo ? 'none' : '';
+  setNovaCampoLocked_('inp-resp', ativo);
+  setNovaCampoLocked_('inp-tel', ativo);
+}
+
+function abrirNovaMesmaConta_(ctx) {
+  if (!ctx || !ctx.telefone) {
+    toast('Dados da conta incompletos.', 'error');
+    return;
+  }
+  novaPrefillResponsavel = null;
+  limparNovaDraft_();
+  resetNova({ preserveDraft: true, preserveMesmaConta: false });
+  novaState.mesmaConta = true;
+  novaState.pagamento = ctx.pagamento || null;
+  const set = function(id, v) {
+    const el = document.getElementById(id);
+    if (el) el.value = v || '';
+  };
+  set('inp-resp', ctx.responsavel);
+  set('inp-tel', ctx.telefone);
+  set('inp-cri', ctx.crianca || '');
+  aplicarNovaMesmaContaUI_(true);
+  aplicarPagamentoFixoNova_(ctx.pagamento);
+  toggleBotoesConfirmarNova_();
+  showPage('nova', { mesmaConta: true });
+  toast('Escolha o próximo veículo — mesma conta, pagamento ' + (ctx.pagamento || 'herdado') + '.', 'success');
+}
+
 function novaDraftCampos_() {
   const val = id => {
     const el = document.getElementById(id);
@@ -134,6 +250,7 @@ function mkRefreshHomeUI_() {
   if (typeof renderCards === 'function') renderCards();
   if (typeof updateStats === 'function') updateStats();
   if (typeof atualizarVeiculoGrid === 'function') atualizarVeiculoGrid();
+  renderHomeMesmaContaCta_();
 }
 
 function rowIndexFromSalvar_(d) {
@@ -325,6 +442,7 @@ function inicializarDraftNova_() {
     }));
   });
   window.addEventListener('beforeunload', salvarNovaDraft_);
+  renderHomeMesmaContaCta_();
 }
 
 function abrirNovaLocacao() {
@@ -504,7 +622,12 @@ function capitalizarNome(el) {
 }
 
 function resetNova(opts = {}) {
-  novaState = { tipo: null, plano: null, veiculo: null, pagamento: null, observacao: '', step: 0 };
+  const keepMesmaConta = !!(opts.preserveMesmaConta && novaState.mesmaConta);
+  novaState = {
+    tipo: null, plano: null, veiculo: null, pagamento: null,
+    observacao: '', step: 0, mesmaConta: keepMesmaConta
+  };
+  if (!keepMesmaConta) aplicarNovaMesmaContaUI_(false);
   const pageNova = document.getElementById('page-nova');
   if (pageNova) pageNova.classList.remove('step-0-veiculo');
   document.querySelectorAll('#page-nova .vc-section-label').forEach(l => { l.style.display = ''; l.classList.remove('nova-vc-outro'); });
@@ -605,6 +728,12 @@ async function confirmarLocacao() {
       status:          d.status || 'Pendente'
     });
     saveSessions();
+    salvarMesmaContaCtx_({
+      responsavel: resp,
+      telefone: tel,
+      pagamento: pagResp,
+      crianca: cri
+    });
     mkRefreshHomeUI_();
     resetNova();
     showPage('home');
@@ -721,4 +850,7 @@ window.atualizarVeiculoGrid = atualizarVeiculoGrid;
 window.confirmarLocacao = confirmarLocacao;
 window.confirmarLocacaoEEnviarSms_ = confirmarLocacaoEEnviarSms_;
 window.mkRefreshHomeUI_ = mkRefreshHomeUI_;
+window.abrirNovaMesmaContaFromHome_ = abrirNovaMesmaContaFromHome_;
+window.dismissMesmaContaCta_ = dismissMesmaContaCta_;
+window.abrirNovaMesmaConta_ = abrirNovaMesmaConta_;
 
