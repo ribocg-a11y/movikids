@@ -1,11 +1,14 @@
 /* MOVI KIDS — Histórico de custos (admin/gestor) · I87 · UI gerencial v1.9.22 */
 
 const CUS_HIST_CACHE_TTL_MS = 120000;
+const CUS_MESES_SERIES_N_ = 12;
 let cusHistPeriod_ = 'mes';
 let cusHistAll_ = [];
 let cusHistStats_ = null;
 let chartCusDia_ = null;
 let chartCusGrupo_ = null;
+let chartCusMeses_ = null;
+let cusHistMesesFetchGen_ = 0;
 
 const CUS_DRE_META_ = {
   OPEX_FIXO: { label: 'Despesas fixas', color: '#1565C0', short: 'Fixas' },
@@ -310,6 +313,174 @@ function renderCusHistInsights_(stats) {
   }).join('');
 }
 
+function cusHistFmtBr_(d) {
+  return String(d.getDate()).padStart(2, '0') + '/'
+    + String(d.getMonth() + 1).padStart(2, '0') + '/'
+    + d.getFullYear();
+}
+
+function cusHistMesesRange_() {
+  const hoje = new Date();
+  const start = new Date(hoje.getFullYear(), hoje.getMonth() - (CUS_MESES_SERIES_N_ - 1), 1);
+  return { s: cusHistFmtBr_(start), e: cusHistFmtBr_(hoje) };
+}
+
+function cusHistMesKeyFromData_(dataBr) {
+  const p = String(dataBr || '').split('/');
+  if (p.length !== 3) return '';
+  return p[2] + '-' + p[1];
+}
+
+function cusHistBuildMesesSeries_(custos) {
+  const hoje = new Date();
+  const keys = [];
+  const map = {};
+  for (let i = CUS_MESES_SERIES_N_ - 1; i >= 0; i--) {
+    const d = new Date(hoje.getFullYear(), hoje.getMonth() - i, 1);
+    const key = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+    keys.push(key);
+    map[key] = 0;
+  }
+  (custos || []).forEach(function (c) {
+    const key = cusHistMesKeyFromData_(c.data);
+    if (!key || map[key] == null) return;
+    map[key] += Number(c.valor) || 0;
+  });
+  const MES_CURTO = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
+  const curKey = hoje.getFullYear() + '-' + String(hoje.getMonth() + 1).padStart(2, '0');
+  return keys.map(function (key) {
+    const parts = key.split('-');
+    const y = parseInt(parts[0], 10);
+    const m = parseInt(parts[1], 10);
+    const label = MES_CURTO[m - 1] + '/' + String(y).slice(2);
+    return {
+      key: key,
+      label: label,
+      valor: Math.round((map[key] || 0) * 100) / 100,
+      atual: key === curKey
+    };
+  });
+}
+
+function renderCusHistMesesChart_(rows) {
+  const wrap = document.getElementById('cus-hist-meses-wrap');
+  const noteEl = document.getElementById('cus-hist-meses-note');
+  if (!wrap || !window.Chart) return;
+
+  const hasVal = (rows || []).some(function (r) { return r.valor > 0; });
+  if (noteEl) {
+    noteEl.textContent = hasVal
+      ? (CUS_MESES_SERIES_N_ + ' meses · barra escura = mês atual')
+      : 'últimos 12 meses';
+  }
+
+  if (!hasVal) {
+    wrap.classList.add('is-empty');
+    if (chartCusMeses_) { chartCusMeses_.destroy(); chartCusMeses_ = null; }
+    return;
+  }
+
+  wrap.classList.remove('is-empty');
+  const cv = document.getElementById('chart-cus-meses');
+  if (!cv) return;
+  if (chartCusMeses_) chartCusMeses_.destroy();
+
+  const vals = rows.map(function (r) { return r.valor; });
+  const maxVal = Math.max.apply(null, vals.concat([1]));
+  const colors = rows.map(function (r) {
+    return r.atual ? '#1565C0' : 'rgba(21, 101, 192, 0.45)';
+  });
+
+  chartCusMeses_ = new Chart(cv, {
+    type: 'bar',
+    data: {
+      labels: rows.map(function (r) { return r.label; }),
+      datasets: [{
+        data: vals,
+        backgroundColor: colors,
+        hoverBackgroundColor: '#0D47A1',
+        borderRadius: 6,
+        maxBarThickness: 36
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: function (ctx) {
+              const r = rows[ctx.dataIndex];
+              const tag = r && r.atual ? ' · mês atual' : '';
+              return cusHistR_(ctx.raw || 0) + tag;
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid: { display: false },
+          ticks: { font: { size: 10, weight: '700' }, maxRotation: 0 }
+        },
+        y: {
+          ticks: {
+            callback: function (v) { return 'R$' + v; },
+            font: { size: 10 }
+          },
+          min: 0,
+          suggestedMax: maxVal * 1.15
+        }
+      }
+    }
+  });
+}
+
+async function buscarCustosMesesSerie_() {
+  const range = cusHistMesesRange_();
+  const cat = document.getElementById('cus-hist-cat-filter')?.value || '';
+  const grp = document.getElementById('cus-hist-grupo-filter')?.value || '';
+  const cacheKey = 'mk_cus_meses_v1_' + range.s + '_' + range.e + '_' + cat + '_' + grp;
+  const gen = ++cusHistMesesFetchGen_;
+
+  try {
+    const raw = sessionStorage.getItem(cacheKey);
+    if (raw) {
+      const cached = JSON.parse(raw);
+      if (cached.ts && Date.now() - cached.ts < CUS_HIST_CACHE_TTL_MS && cached.rows) {
+        if (gen === cusHistMesesFetchGen_) renderCusHistMesesChart_(cached.rows);
+        return;
+      }
+    }
+  } catch (e) { /* ignora */ }
+
+  try {
+    const authP = apiParamsComAuth_();
+    const base = {
+      action: 'listarCustosHistorico',
+      startDate: range.s,
+      endDate: range.e,
+      ...authP
+    };
+    if (cat) base.categoria = cat;
+    if (grp) base.grupoDre = grp;
+    const res = await api(base);
+    if (gen !== cusHistMesesFetchGen_) return;
+    if (!res || !res.ok) {
+      renderCusHistMesesChart_([]);
+      return;
+    }
+    const rows = cusHistBuildMesesSeries_(res.custos || []);
+    try {
+      sessionStorage.setItem(cacheKey, JSON.stringify({ ts: Date.now(), rows: rows }));
+    } catch (e) { /* quota */ }
+    renderCusHistMesesChart_(rows);
+  } catch (e) {
+    console.error('buscarCustosMesesSerie_:', e);
+    if (gen === cusHistMesesFetchGen_) renderCusHistMesesChart_([]);
+  }
+}
+
 function renderCusHistLedger_(custos) {
   const tbody = document.getElementById('cus-hist-ledger-body');
   if (!tbody) return;
@@ -453,6 +624,7 @@ function aplicarCustosHistorico_(res) {
   renderCusHistClassifTable_(stats);
   renderCusHistInsights_(stats);
   renderCusHistCharts_(stats);
+  buscarCustosMesesSerie_();
 
   const catF = document.getElementById('cus-hist-cat-filter')?.value || '';
   const grpF = document.getElementById('cus-hist-grupo-filter')?.value || '';
@@ -514,6 +686,7 @@ async function buscarCustosHistorico() {
         renderCusHistClassifTable_(resStats.stats);
         renderCusHistInsights_(resStats.stats);
         renderCusHistCharts_(resStats.stats);
+        buscarCustosMesesSerie_();
       }
     }
     const res = await resFullP;
