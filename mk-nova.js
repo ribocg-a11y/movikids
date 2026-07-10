@@ -14,6 +14,9 @@ let _restoringNovaDraft = false;
 const NOVA_MAX_STEP = 2;
 let _novaRelSearchTimer = null;
 let _novaSavingInFlight = false;
+let _novaSaveWatchdog = null;
+let _novaSaveDismissTimer = null;
+let _mkGasBatchOk = null;
 var relacionamentoCache = [];
 
 function novaPageEl_() {
@@ -141,11 +144,50 @@ function novaVoltarCesta_() {
   novaAtualizarSubModoUI_();
 }
 
+function novaHideSaving_() {
+  const o = document.getElementById('nova-saving-overlay');
+  if (o) {
+    o.hidden = true;
+    o.setAttribute('aria-hidden', 'true');
+    o.style.display = 'none';
+  }
+  const dismiss = document.getElementById('nova-saving-dismiss');
+  if (dismiss) dismiss.hidden = true;
+  if (_novaSaveWatchdog) { clearTimeout(_novaSaveWatchdog); _novaSaveWatchdog = null; }
+  if (_novaSaveDismissTimer) { clearTimeout(_novaSaveDismissTimer); _novaSaveDismissTimer = null; }
+}
+
+function novaForceUnstickSave_(msg) {
+  _novaSavingInFlight = false;
+  novaHideSaving_();
+  novaLimparOtimistas_();
+  if (typeof mkRefreshHomeUI_ === 'function') mkRefreshHomeUI_();
+  if (typeof syncController === 'function') syncController(true, 800);
+  toast(msg || 'Salvamento pode continuar na planilha. Atualizamos a Home — confira os cards.', 'warning');
+}
+
+async function mkGasTemSalvarLocacoesMulti_() {
+  if (typeof _mkGasBatchOk === 'boolean') return _mkGasBatchOk;
+  try {
+    const p = await api({ action: 'ping' }, 8000);
+    _mkGasBatchOk = !!(p && Array.isArray(p.postWriteActions) && p.postWriteActions.indexOf('salvarLocacoesMulti') >= 0);
+  } catch (e) {
+    _mkGasBatchOk = false;
+  }
+  return _mkGasBatchOk;
+}
+
 function novaShowSaving_(i, n, veiculo, modo) {
   const o = document.getElementById('nova-saving-overlay');
   const t = document.getElementById('nova-saving-title');
   const s = document.getElementById('nova-saving-sub');
-  if (o) o.hidden = false;
+  const dismiss = document.getElementById('nova-saving-dismiss');
+  if (o) {
+    o.hidden = false;
+    o.removeAttribute('aria-hidden');
+    o.style.display = 'flex';
+  }
+  if (dismiss) dismiss.hidden = true;
   if (t) {
     if (modo === 'batch' && n > 1) t.textContent = 'Salvando ' + n + ' veículos…';
     else t.textContent = n > 1 ? ('Salvando ' + (i + 1) + ' de ' + n + '…') : 'Salvando locação…';
@@ -155,11 +197,14 @@ function novaShowSaving_(i, n, veiculo, modo) {
     else if (n > 1) s.textContent = 'Registrando ' + veiculo + ' na planilha (~15s cada).';
     else s.textContent = 'Registrando na planilha. Aguarde.';
   }
-}
-
-function novaHideSaving_() {
-  const o = document.getElementById('nova-saving-overlay');
-  if (o) o.hidden = true;
+  if (_novaSaveWatchdog) clearTimeout(_novaSaveWatchdog);
+  _novaSaveWatchdog = setTimeout(function() {
+    if (_novaSavingInFlight) novaForceUnstickSave_('Demorou demais. A Home foi liberada — se o cadastro não aparecer, tente salvar de novo.');
+  }, 42000);
+  if (_novaSaveDismissTimer) clearTimeout(_novaSaveDismissTimer);
+  _novaSaveDismissTimer = setTimeout(function() {
+    if (dismiss && _novaSavingInFlight) dismiss.hidden = false;
+  }, 14000);
 }
 
 function novaGuardSaveBusy_() {
@@ -1001,48 +1046,65 @@ async function confirmarLocacao() {
 
   try {
     if (n > 1) {
-      novaAplicarOtimistaMulti_(itens, resp, cri, tel, novaState.pagamento, observacao);
-      mkRefreshHomeUI_();
-      resetNova();
-      showPage('home');
-      novaShowSaving_(0, n, itens.map(function(it) { return it.veiculo; }).join(', '), 'batch');
+      const temBatch = await mkGasTemSalvarLocacoesMulti_();
 
-      let batchRes = null;
-      try {
-        batchRes = await api(Object.assign({
-          action: 'salvarLocacoesMulti',
-          itens: novaBuildItensBatchJson_(itens)
-        }, basePayload), 28000);
-      } catch (batchErr) {
-        batchRes = null;
-      }
-
-      if (batchRes && batchRes.ok && batchRes.batch && Array.isArray(batchRes.locacoes)) {
-        novaLimparOtimistas_();
-        novaAplicarBatchReal_(batchRes, observacao);
-        salvos = n;
-      } else {
-        novaLimparOtimistas_();
+      if (temBatch) {
+        novaAplicarOtimistaMulti_(itens, resp, cri, tel, novaState.pagamento, observacao);
         mkRefreshHomeUI_();
-        toast('Salvando um por um (atualize o GAS para acelerar)…', 'info');
+        resetNova();
+        showPage('home');
+        novaShowSaving_(0, n, itens.map(function(it) { return it.veiculo; }).join(', '), 'batch');
 
-        for (let i = 0; i < itens.length; i++) {
-          novaShowSaving_(i, n, itens[i].veiculo);
-          try {
-            const r = await novaSalvarItemSequencial_(itens[i], basePayload, observacao, i === 0 ? 18000 : 14000);
+        let batchRes = null;
+        try {
+          batchRes = await api(Object.assign({
+            action: 'salvarLocacoesMulti',
+            itens: novaBuildItensBatchJson_(itens)
+          }, basePayload), 32000);
+        } catch (batchErr) {
+          batchRes = null;
+        }
+
+        if (batchRes && batchRes.ok && batchRes.batch && Array.isArray(batchRes.locacoes)) {
+          novaLimparOtimistas_();
+          novaAplicarBatchReal_(batchRes, observacao);
+          salvos = n;
+        } else {
+          novaLimparOtimistas_();
+          mkRefreshHomeUI_();
+          toast('Salvando um por um…', 'info');
+          for (let i = 0; i < itens.length; i++) {
+            novaShowSaving_(i, n, itens[i].veiculo);
+            const r = await novaSalvarItemSequencial_(itens[i], basePayload, observacao, i === 0 ? 32000 : 28000);
             ultimaMesmaConta = !!r.mesmaConta;
             salvos++;
+            if (i === 0) {
+              mkRefreshHomeUI_();
+              resetNova();
+              showPage('home');
+            } else {
+              mkRefreshHomeUI_();
+            }
+          }
+        }
+      } else {
+        for (let i = 0; i < itens.length; i++) {
+          novaShowSaving_(i, n, itens[i].veiculo);
+          const r = await novaSalvarItemSequencial_(itens[i], basePayload, observacao, i === 0 ? 32000 : 28000);
+          ultimaMesmaConta = !!r.mesmaConta;
+          salvos++;
+          if (i === 0) {
             mkRefreshHomeUI_();
-          } catch (seqErr) {
-            toast('Erro no veículo ' + (seqErr.veiculo || itens[i].veiculo) + ': ' + seqErr.message, 'error');
-            if (salvos > 0) toast(salvos + ' de ' + n + ' salvos — complete o restante.', 'warning');
-            return;
+            resetNova();
+            showPage('home');
+          } else {
+            mkRefreshHomeUI_();
           }
         }
       }
     } else {
       novaShowSaving_(0, 1, itens[0].veiculo);
-      const r = await novaSalvarItemSequencial_(itens[0], basePayload, observacao, 18000);
+      const r = await novaSalvarItemSequencial_(itens[0], basePayload, observacao, 32000);
       ultimaMesmaConta = !!r.mesmaConta;
       salvos = 1;
       mkRefreshHomeUI_();
@@ -1066,7 +1128,11 @@ async function confirmarLocacao() {
   } catch(e) {
     novaLimparOtimistas_();
     mkRefreshHomeUI_();
-    toast((e && e.message) ? e.message : 'Erro de conexão. Tente novamente.', 'error');
+    const errMsg = (e && e.veiculo)
+      ? ('Erro no veículo ' + e.veiculo + ': ' + e.message)
+      : ((e && e.message) ? e.message : 'Erro de conexão. Tente novamente.');
+    toast(errMsg, 'error');
+    if (salvos > 0 && n > 1) toast(salvos + ' de ' + n + ' salvos — complete o restante.', 'warning');
   } finally {
     novaHideSaving_();
     _novaSavingInFlight = false;
@@ -1167,10 +1233,18 @@ async function confirmarLocacaoEEnviarSmsLegado_() {
   }
 }
 
+function novaRecoveryOverlayStale_() {
+  const o = document.getElementById('nova-saving-overlay');
+  if (o && !o.hidden && !_novaSavingInFlight) novaHideSaving_();
+}
+
 window.atualizarVeiculoGrid = atualizarVeiculoGrid;
 window.confirmarLocacao = confirmarLocacao;
 window.confirmarLocacaoEEnviarSms_ = confirmarLocacaoEEnviarSms_;
 window.mkRefreshHomeUI_ = mkRefreshHomeUI_;
+window.novaForceUnstickSave_ = novaForceUnstickSave_;
+window.novaHideSaving_ = novaHideSaving_;
+window.novaRecoveryOverlayStale_ = novaRecoveryOverlayStale_;
 window.removerItemNova_ = removerItemNova_;
 window.novaIniciarPick_ = novaIniciarPick_;
 window.novaVoltarCesta_ = novaVoltarCesta_;

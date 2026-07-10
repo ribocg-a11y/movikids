@@ -1,6 +1,7 @@
 /* MOVI KIDS - boot PWA + auth (Pacote M.17) */
 
 document.addEventListener('DOMContentLoaded', () => {
+  if (typeof novaRecoveryOverlayStale_ === 'function') novaRecoveryOverlayStale_();
   if (typeof mkAuthBoot === 'function') {
     mkAuthBoot().catch(e => {
       console.error('[mk-auth]', e);

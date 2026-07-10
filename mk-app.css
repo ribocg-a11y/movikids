@@ -458,7 +458,10 @@ html,body{height:100%;background:var(--bg);color:var(--txt);overflow:hidden}
 .nova-pick-voltar:not([hidden]){display:block}
 .nova-saving-overlay{
   position:fixed;inset:0;z-index:99999;background:rgba(26,35,64,.72);
-  display:flex;align-items:center;justify-content:center;padding:20px
+  align-items:center;justify-content:center;padding:20px
+}
+.nova-saving-overlay[hidden]{
+  display:none !important;visibility:hidden;pointer-events:none
 }
 .nova-saving-overlay:not([hidden]){display:flex}
 .nova-saving-box{
@@ -471,6 +474,13 @@ html,body{height:100%;background:var(--bg);color:var(--txt);overflow:hidden}
 }
 .nova-saving-title{display:block;font-size:17px;font-weight:900;color:var(--blue-dk);font-family:var(--font-display);margin-bottom:8px}
 .nova-saving-sub{font-size:13px;color:var(--txt2);margin:0;line-height:1.45}
+.nova-saving-dismiss{
+  margin-top:16px;width:100%;padding:12px 14px;border-radius:var(--radius-sm);
+  border:2px solid var(--border);background:#fff;color:var(--blue-dk);
+  font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;cursor:pointer
+}
+.nova-saving-dismiss:not([hidden]){display:block}
+.nova-saving-dismiss:active{background:var(--blue-lt)}
 .nova-resumo-rows{display:flex;flex-direction:column;gap:6px;margin:8px 0 12px}
 .review-card .nova-cesta-row{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.22)}
 .review-card .nova-cesta-row-title,.review-card .nova-cesta-row-sub{color:#fff}
