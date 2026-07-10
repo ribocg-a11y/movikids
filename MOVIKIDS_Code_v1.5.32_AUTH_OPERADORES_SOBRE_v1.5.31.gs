@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.182
+// MOVI KIDS — Google Apps Script v1.5.183
+// v1.5.183: I88 — porSemana dashboard: semanas segunda–domingo (não blocos 1–7 fixos)
 // v1.5.182: I87 — histórico custos admin (listarCustosHistorico + listarPlanoContas)
 // v1.5.181: I85 — extras pagamento obrigatório + cancelamento justificado + caixa PIX/créd/déb/din
 // v1.5.180: I84 — meta operador conta/dia (I42) — 1 loc por telefone/conta_id no turno
@@ -5006,14 +5007,26 @@ function gpIntelRhAlertasFromCtx_(ctx) {
 const DIA_NOME_PT_ = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
 
 function buildPorSemanaMes_(fatMap, nMap, extMap, diasMes, mesAtual, anoAtual, mediaDiariaMes) {
-  const nSemanas = Math.ceil(diasMes / 7);
+  // I88 — semanas calendário (segunda→domingo), dias recortados ao mês vigente
+  const weekRanges = [];
+  let wIni = 1;
+  for (let d = 1; d <= diasMes; d++) {
+    const dt = new Date(anoAtual, mesAtual - 1, d);
+    const isSunday = dt.getDay() === 0;
+    const isLastDay = d === diasMes;
+    if (isSunday || isLastDay) {
+      weekRanges.push({ diaIni: wIni, diaFim: d });
+      wIni = d + 1;
+    }
+  }
+
   const semanas = [];
   let maxFat = 0;
   let maxN = 0;
 
-  for (let s = 0; s < nSemanas; s++) {
-    const diaIni = s * 7 + 1;
-    const diaFim = Math.min((s + 1) * 7, diasMes);
+  for (let s = 0; s < weekRanges.length; s++) {
+    const diaIni = weekRanges[s].diaIni;
+    const diaFim = weekRanges[s].diaFim;
     let fat = 0;
     let n = 0;
     let ext = 0;
