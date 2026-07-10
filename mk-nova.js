@@ -15,6 +15,16 @@ let _novaRelSearchTimer = null;
 let _novaSavingInFlight = false;
 var relacionamentoCache = [];
 
+function novaPageEl_() {
+  return document.getElementById('page-nova');
+}
+
+/** Sem scroll agressivo — evita “pulo” pro topo do tablet. */
+function novaScrollSuave_(el) {
+  if (!el) return;
+  try { el.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' }); } catch (e) {}
+}
+
 function novaCfgPlano_(tipo, plano) {
   return (PRECOS[tipo] && PRECOS[tipo][plano]) ? PRECOS[tipo][plano] : null;
 }
@@ -82,8 +92,34 @@ function incluirItemNova_() {
   renderNovaItensBasket_();
   atualizarNovaSummaryBar_();
   salvarNovaDraft_();
-  if (typeof atualizarVeiculoGrid === 'function') atualizarVeiculoGrid();
+  novaMarcarCestaGrid_();
   return true;
+}
+
+function novaMarcarCestaGrid_() {
+  const naCesta = {};
+  (novaState.itens || []).forEach(function(it) { naCesta[it.veiculo] = true; });
+  document.querySelectorAll('#page-nova .vc-card').forEach(function(card) {
+    const id = card.id || '';
+    if (!id.startsWith('vc-')) return;
+    const nome = id.slice(3);
+    const busy = card.classList.contains('vc-busy') || card.classList.contains('vc-busy-pink');
+    const stEl = document.getElementById('vc-st-' + nome);
+    if (busy) return;
+    if (naCesta[nome]) {
+      card.classList.remove('vc-sel', 'vc-sel-pink');
+      card.classList.add('vc-basket');
+      card.style.pointerEvents = 'none';
+      if (stEl) { stEl.className = 'vc-status na-cesta'; stEl.textContent = '✓ Incluído'; }
+    } else {
+      card.classList.remove('vc-basket');
+      card.style.pointerEvents = '';
+      if (stEl && stEl.classList.contains('na-cesta')) {
+        stEl.className = 'vc-status livre';
+        stEl.textContent = '✓ Livre';
+      }
+    }
+  });
 }
 
 function removerItemNova_(idx) {
@@ -92,30 +128,41 @@ function removerItemNova_(idx) {
   renderNovaItensBasket_();
   atualizarNovaSummaryBar_();
   salvarNovaDraft_();
-  if (typeof atualizarVeiculoGrid === 'function') atualizarVeiculoGrid();
+  novaMarcarCestaGrid_();
 }
 
 function novaAddOutroVeiculo_() {
   novaLimparSelecaoAtual_();
-  toast('Escolha o próximo veículo e o plano (pode ser diferente).', '');
-  const grid = document.getElementById('vc-grid-carros');
-  if (grid) {
-    setTimeout(function() {
-      try { grid.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e) { grid.scrollIntoView(true); }
-    }, 80);
-  }
+  novaMarcarCestaGrid_();
+}
+
+function novaHtmlItemRow_(it, idx, opts) {
+  const cfg = novaCfgPlano_(it.tipo, it.plano);
+  const planoLbl = PLANO_LABELS[it.plano] || it.plano;
+  const fin = mkExibirFinanceiro_();
+  const val = cfg && fin ? ('R$ ' + String(cfg.v).replace('.', ',')) : '';
+  const rm = (opts && opts.removable && idx != null)
+    ? ('<button type="button" class="nova-cesta-row-rm" onclick="removerItemNova_(' + idx + ')" aria-label="Remover">✕</button>')
+    : '';
+  return '<div class="nova-cesta-row">' +
+    '<div class="nova-cesta-row-main">' +
+    '<span class="nova-cesta-row-title">' + escHtml(tipoIcon(it.tipo) + ' ' + it.veiculo) + '</span>' +
+    '<span class="nova-cesta-row-sub">' + escHtml(planoLbl + (val ? ' · ' + val : '')) + '</span>' +
+    '</div>' + rm + '</div>';
 }
 
 function renderNovaItensBasket_() {
   const box = document.getElementById('nova-itens-basket');
   const list = document.getElementById('nova-itens-list');
   const totalEl = document.getElementById('nova-itens-total');
+  const countEl = document.getElementById('nova-cesta-count');
   const btnOutro = document.getElementById('btn-nova-add-outro');
   const btnQuem = document.getElementById('btn-nova-continuar-quem');
   const n = (novaState.itens || []).length;
   if (box) box.hidden = n === 0;
   if (btnOutro) btnOutro.style.display = n > 0 ? 'block' : 'none';
   if (btnQuem) btnQuem.style.display = (novaState.step === 0 && n > 0) ? 'block' : 'none';
+  if (countEl) countEl.textContent = n ? (n + (n > 1 ? ' veículos' : ' veículo')) : '';
   if (!list) return;
   if (!n) {
     list.innerHTML = '';
@@ -124,19 +171,13 @@ function renderNovaItensBasket_() {
   }
   const fin = mkExibirFinanceiro_();
   list.innerHTML = novaState.itens.map(function(it, i) {
-    const cfg = novaCfgPlano_(it.tipo, it.plano);
-    const planoLbl = PLANO_LABELS[it.plano] || it.plano;
-    const val = cfg && fin ? (' · R$ ' + String(cfg.v).replace('.', ',')) : '';
-    return '<li class="nova-item-row">' +
-      '<span class="nova-item-main">' + escHtml(tipoIcon(it.tipo) + ' ' + it.veiculo + ' · ' + planoLbl + val) + '</span>' +
-      '<button type="button" class="nova-item-rm" onclick="removerItemNova_(' + i + ')" aria-label="Remover">✕</button>' +
-      '</li>';
+    return novaHtmlItemRow_(it, i, { removable: true });
   }).join('');
   if (totalEl && fin) {
     const tot = novaTotalPlanos_(novaState.itens);
-    totalEl.innerHTML = '<strong>Total dos planos:</strong> R$ ' + tot.toFixed(2).replace('.', ',');
+    totalEl.textContent = 'Total dos planos: R$ ' + tot.toFixed(2).replace('.', ',');
   } else if (totalEl) {
-    totalEl.innerHTML = '<strong>' + n + '</strong> veículo' + (n > 1 ? 's' : '') + ' nesta locação';
+    totalEl.textContent = n + ' veículo' + (n > 1 ? 's' : '') + ' · 1 pagamento';
   }
 }
 
@@ -144,7 +185,8 @@ function renderNovaResumoFechar_() {
   const box = document.getElementById('nova-resumo-fechar');
   const list = document.getElementById('nova-resumo-list');
   const totalEl = document.getElementById('nova-resumo-total');
-  const nCards = document.getElementById('nova-resumo-n-cards');
+  const badge = document.getElementById('nova-resumo-badge');
+  const hint = document.getElementById('nova-resumo-hint');
   const itens = novaItensParaSalvar_();
   if (!box || !list) return;
   if (!itens.length) {
@@ -153,19 +195,19 @@ function renderNovaResumoFechar_() {
   }
   box.hidden = false;
   const fin = mkExibirFinanceiro_();
-  list.innerHTML = itens.map(function(it) {
-    const cfg = novaCfgPlano_(it.tipo, it.plano);
-    const planoLbl = PLANO_LABELS[it.plano] || it.plano;
-    const val = cfg && fin ? (' · R$ ' + String(cfg.v).replace('.', ',')) : '';
-    return '<li>' + escHtml(tipoIcon(it.tipo) + ' ' + it.veiculo + ' · ' + planoLbl + val) + '</li>';
-  }).join('');
+  const n = itens.length;
+  if (badge) badge.textContent = n > 1 ? (n + ' veículos · mesma conta') : 'Resumo da locação';
+  list.innerHTML = itens.map(function(it) { return novaHtmlItemRow_(it, null, { removable: false }); }).join('');
   if (totalEl && fin) {
-    const tot = novaTotalPlanos_(itens);
-    totalEl.innerHTML = '<span class="nova-resumo-total-lbl">Total</span> R$ ' + tot.toFixed(2).replace('.', ',');
+    totalEl.textContent = 'R$ ' + novaTotalPlanos_(itens).toFixed(2).replace('.', ',');
   } else if (totalEl) {
-    totalEl.textContent = itens.length + ' veículo(s)';
+    totalEl.textContent = n + ' veículo' + (n > 1 ? 's' : '');
   }
-  if (nCards) nCards.textContent = String(itens.length);
+  if (hint) {
+    hint.textContent = n > 1
+      ? ('1 cobrança na maquininha · ' + n + ' cards na Home (▶ em cada um)')
+      : '1 cobrança · 1 card na Home';
+  }
 }
 
 function novaDraftCampos_() {
@@ -219,7 +261,7 @@ function migrateDraftStep_(step) {
 }
 
 function aplicarStepNova_(step) {
-  // migrateDraftStep_ só ao restaurar rascunho antigo (4 passos) — não no fluxo ao vivo
+  const prevStep = novaState.step;
   const safeStep = Math.max(0, Math.min(Number(step) || 0, NOVA_MAX_STEP));
   document.querySelectorAll('#page-nova .step-page').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('#page-nova .step-dot').forEach(d => d.classList.remove('active'));
@@ -235,7 +277,10 @@ function aplicarStepNova_(step) {
   if (planoSec) planoSec.classList.toggle('visible', !!(novaState.veiculo && novaState.tipo));
   if (safeStep === 1) {
     aplicarPrefillResponsavel_();
-    setTimeout(() => document.getElementById('nova-rel-q')?.focus(), 80);
+    setTimeout(function() {
+      const q = document.getElementById('nova-rel-q');
+      if (q) try { q.focus({ preventScroll: true }); } catch (e) { q.focus(); }
+    }, 80);
   }
   if (safeStep === 2) {
     toggleBotoesConfirmarNova_();
@@ -252,17 +297,16 @@ function atualizarNovaSummaryBar_() {
   if (!bar) return;
   const parts = [];
   const itens = novaState.itens || [];
-  if (itens.length) {
-    itens.forEach(function(it) {
-      const cfg = novaCfgPlano_(it.tipo, it.plano);
-      const pl = PLANO_LABELS[it.plano] || it.plano;
-      let s = tipoIcon(it.tipo) + ' ' + it.veiculo + ' · ' + pl;
-      if (cfg && mkExibirFinanceiro_()) s += ' · R$ ' + cfg.v;
-      parts.push(s);
-    });
-    if (mkExibirFinanceiro_() && itens.length > 1) {
-      parts.push('Total R$ ' + novaTotalPlanos_(itens).toFixed(2).replace('.', ','));
-    }
+  const fin = mkExibirFinanceiro_();
+  if (itens.length > 1) {
+    parts.push(itens.length + ' veículos');
+    if (fin) parts.push('R$ ' + novaTotalPlanos_(itens).toFixed(2).replace('.', ','));
+  } else if (itens.length === 1) {
+    const it = itens[0];
+    const cfg = novaCfgPlano_(it.tipo, it.plano);
+    parts.push(tipoIcon(it.tipo) + ' ' + it.veiculo);
+    parts.push(PLANO_LABELS[it.plano] || it.plano);
+    if (cfg && fin) parts.push('R$ ' + cfg.v);
   } else {
     const { tipo, plano, veiculo } = novaState;
     if (veiculo || tipo) parts.push(tipoIcon(tipo || '') + ' ' + (veiculo || tipo || '—'));
@@ -499,6 +543,7 @@ function restaurarNovaDraft_() {
     novaState.step = migrateDraftStep_(novaState.step || 0);
     aplicarStepNova_(novaState.step);
     renderNovaItensBasket_();
+    novaMarcarCestaGrid_();
   } finally {
     _restoringNovaDraft = false;
   }
@@ -608,10 +653,7 @@ function destacarSecaoVeiculoNova_(tipo) {
 }
 
 function scrollParaPlanosNova_() {
-  const sec = document.getElementById('nova-plano-section');
-  if (sec && sec.classList.contains('visible')) {
-    setTimeout(() => { try { sec.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e) { sec.scrollIntoView(true); } }, 80);
-  }
+  /* Intencionalmente sem scroll — operador permanece onde está no tablet. */
 }
 
 function selectVeiculo(el, veiculo, tipo) {
@@ -633,7 +675,6 @@ function selectVeiculo(el, veiculo, tipo) {
   aplicarEstiloInputsNova_(tipo);
   atualizarNovaSummaryBar_();
   salvarNovaDraft_();
-  toast(veiculo + ' selecionado — escolha o plano abaixo.', 'success');
   scrollParaPlanosNova_();
 }
 
@@ -654,12 +695,7 @@ function selectPlano(plano, el) {
   aplicarEstiloInputsNova_(novaState.tipo);
   atualizarNovaSummaryBar_();
   if (novaState.step === 0) {
-    if (incluirItemNova_()) {
-      const last = novaState.itens[novaState.itens.length - 1];
-      const cfg = novaCfgPlano_(last.tipo, last.plano);
-      const v = cfg && mkExibirFinanceiro_() ? (' · R$ ' + cfg.v) : '';
-      toast('Incluído: ' + last.veiculo + ' · ' + (PLANO_LABELS[last.plano] || last.plano) + v, 'success');
-    }
+    incluirItemNova_();
   } else {
     salvarNovaDraft_();
   }
@@ -676,10 +712,6 @@ function nextStep() {
   }
   aplicarStepNova_(novaState.step + 1);
   salvarNovaDraft_();
-  if (novaState.step === 1) {
-    const pg = document.getElementById('step-1');
-    if (pg) setTimeout(() => { try { pg.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e) { pg.scrollIntoView(true); } }, 80);
-  }
 }
 
 function backStep() {
@@ -729,7 +761,7 @@ function resetNova(opts = {}) {
   });
   document.querySelectorAll('.tipo-btn').forEach(b => b.classList.remove('sel'));
   document.querySelectorAll('.plano-btn').forEach(b => b.classList.remove('sel'));
-  document.querySelectorAll('.vc-card').forEach(c => c.classList.remove('vc-sel','vc-sel-pink'));
+  document.querySelectorAll('.vc-card').forEach(c => c.classList.remove('vc-sel','vc-sel-pink','vc-basket'));
   ['inp-resp','inp-cri','inp-tel'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
   const obsEl = document.getElementById('inp-obs'); if (obsEl) obsEl.value = '';
   const relQ = document.getElementById('nova-rel-q'); if (relQ) relQ.value = '';
@@ -741,6 +773,7 @@ function resetNova(opts = {}) {
   renderNovaItensBasket_();
   renderNovaResumoFechar_();
   aplicarStepNova_(0);
+  novaMarcarCestaGrid_();
   toggleBotoesConfirmarNova_();
   if (!opts.preserveDraft) limparNovaDraft_();
 }
@@ -784,6 +817,7 @@ async function confirmarLocacao() {
     for (let i = 0; i < itens.length; i++) {
       const it = itens[i];
       const cfgLocal = novaCfgPlano_(it.tipo, it.plano) || {};
+      if (btn && n > 1) btn.textContent = '⏳ Salvando ' + (i + 1) + ' de ' + n + '…';
 
       const d = await api({
         action: 'salvarLocacao',
@@ -799,7 +833,7 @@ async function confirmarLocacao() {
         valorPlano:      cfgLocal.v || 0,
         mins:            cfgLocal.m || 0,
         adicionalPorMin: cfgLocal.a || 1.00
-      }, 18000);
+      }, i === 0 ? 18000 : 14000);
 
       if (!d.ok) {
         toast('Erro no veículo ' + it.veiculo + ': ' + d.erro, 'error');
@@ -850,7 +884,7 @@ async function confirmarLocacao() {
     toast(msg, 'success');
 
     if (typeof mkInvalidateInicioCache_ === 'function') mkInvalidateInicioCache_();
-    if (typeof syncController === 'function') syncController(false, 6000);
+    if (typeof syncController === 'function') syncController(false, 2500);
 
   } catch(e) {
     toast((e && e.message) ? e.message : 'Erro de conexão. Tente novamente.', 'error');

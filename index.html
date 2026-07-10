@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Movi Kids">
 <title>Movi Kids</title>
-<script src="mk-canonical-host.js?v=1.9.28"></script>
+<script src="mk-canonical-host.js?v=1.9.29"></script>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png">
@@ -17,17 +17,17 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<script src="mk-stale-sync.js?v=1.9.28"></script>
-<script src="mk-version.js?v=1.9.28"></script>
-<script src="mk-api.js?v=1.9.28"></script>
-<link rel="stylesheet" href="mk-design.css?v=1.9.28">
+<script src="mk-stale-sync.js?v=1.9.29"></script>
+<script src="mk-version.js?v=1.9.29"></script>
+<script src="mk-api.js?v=1.9.29"></script>
+<link rel="stylesheet" href="mk-design.css?v=1.9.29">
 
-<script src="mk-cache-bust.js?v=1.9.28"></script>
+<script src="mk-cache-bust.js?v=1.9.29"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<link rel="stylesheet" href="mk-app.css?v=1.9.28">
-<link rel="stylesheet" href="mk-gestao-pessoas.css?v=1.9.28">
+<link rel="stylesheet" href="mk-app.css?v=1.9.29">
+<link rel="stylesheet" href="mk-gestao-pessoas.css?v=1.9.29">
 <!-- Firebase SDK — Realtime sync canonico para todos os dispositivos -->
-<script type="module" src="mk-firebase.js?v=1.9.28"></script>
+<script type="module" src="mk-firebase.js?v=1.9.29"></script>
 </head>
 
 <body>
@@ -417,18 +417,20 @@
         </div>
       </div>
       <div id="nova-plano-section" class="nova-plano-section">
-        <div class="nova-plano-hint" id="nova-plano-hint">↓ Escolha o plano — entra na locação automaticamente</div>
+        <div class="nova-plano-hint" id="nova-plano-hint">↓ Escolha o plano</div>
         <div class="sec-title" style="margin-top:0">Plano</div>
         <div class="plano-list" id="plano-list"></div>
       </div>
-      <div id="nova-itens-basket" class="nova-itens-basket" hidden>
-        <div class="sec-title" style="margin-top:14px">Veículos nesta locação</div>
-        <ul id="nova-itens-list" class="nova-itens-list" aria-live="polite"></ul>
-        <div id="nova-itens-total" class="nova-itens-total"></div>
-        <p class="nova-itens-hint">Um pagamento na maquininha · cada veículo vira um card na Home (▶ separado).</p>
+      <div id="nova-itens-basket" class="nova-cesta" hidden>
+        <div class="nova-cesta-head">
+          <span class="nova-cesta-label">Nesta locação</span>
+          <span id="nova-cesta-count" class="nova-cesta-count"></span>
+        </div>
+        <div id="nova-itens-list" class="nova-cesta-rows" aria-live="polite"></div>
+        <div id="nova-itens-total" class="nova-cesta-total"></div>
       </div>
-      <button type="button" class="btn btn-secondary" id="btn-nova-add-outro" style="display:none;margin-top:10px" onclick="novaAddOutroVeiculo_()">
-        + Adicionar outro veículo ou brinquedo
+      <button type="button" class="nova-cesta-add-btn" id="btn-nova-add-outro" style="display:none" onclick="novaAddOutroVeiculo_()">
+        + Outro veículo ou brinquedo
       </button>
       <button type="button" class="btn btn-primary" id="btn-nova-continuar-quem" style="display:none;margin-top:12px" onclick="nextStep()">
         Continuar para Quem →
@@ -474,11 +476,11 @@
 
     <!-- Passo 3: Fechar -->
     <div id="step-2" class="step-page">
-      <div id="nova-resumo-fechar" class="nova-resumo-fechar" hidden>
-        <div class="sec-title" style="margin-top:0">Resumo da locação</div>
-        <ul id="nova-resumo-list" class="nova-resumo-list"></ul>
-        <div id="nova-resumo-total" class="nova-resumo-total"></div>
-        <p class="nova-resumo-conta-hint">Mesma conta — <strong>1 cobrança</strong> na maquininha · <strong id="nova-resumo-n-cards">0</strong> cards na Home</p>
+      <div id="nova-resumo-fechar" class="review-card" hidden>
+        <div class="rc-tipo" id="nova-resumo-badge">Resumo</div>
+        <div id="nova-resumo-list" class="nova-resumo-rows"></div>
+        <div class="rc-plano" id="nova-resumo-total">—</div>
+        <div class="rc-names" id="nova-resumo-hint">1 cobrança na maquininha</div>
       </div>
       <div class="sec-title">Fechar — pagamento</div>
       <div class="sec-title" id="nova-pag-grid-title">Forma de pagamento *</div>
@@ -2396,27 +2398,27 @@
   </div>
 </div>
 
-<script src="mk-globals.js?v=1.9.28"></script>
-<script src="mk-core.js?v=1.9.28"></script>
-<script src="mk-nav.js?v=1.9.28"></script>
-<script src="mk-admin.js?v=1.9.28"></script>
-<script src="mk-historico.js?v=1.9.28"></script>
-<script src="mk-custos-historico.js?v=1.9.28"></script>
-<script src="mk-sessao.js?v=1.9.28"></script>
-<script src="mk-home.js?v=1.9.28"></script>
-<script src="mk-meta-operador.js?v=1.9.28"></script>
-<script src="mk-custos.js?v=1.9.28"></script>
-<script src="mk-avulso.js?v=1.9.28"></script>
-<script src="mk-sync.js?v=1.9.28"></script>
-<script src="mk-nova.js?v=1.9.28"></script>
-<script src="mk-relacionamento.js?v=1.9.28"></script>
-<script src="mk-operacao.js?v=1.9.28"></script>
-<script src="mk-drawer.js?v=1.9.28"></script>
-<script src="mk-update.js?v=1.9.28"></script>
-<script src="mk-gestao-pessoas.js?v=1.9.28"></script>
-<script src="mk-holerite.js?v=1.9.28"></script>
-<script src="mk-gestao-pessoas-admin.js?v=1.9.28"></script>
-<script src="mk-auth.js?v=1.9.28"></script>
-<script src="mk-boot.js?v=1.9.28"></script>
+<script src="mk-globals.js?v=1.9.29"></script>
+<script src="mk-core.js?v=1.9.29"></script>
+<script src="mk-nav.js?v=1.9.29"></script>
+<script src="mk-admin.js?v=1.9.29"></script>
+<script src="mk-historico.js?v=1.9.29"></script>
+<script src="mk-custos-historico.js?v=1.9.29"></script>
+<script src="mk-sessao.js?v=1.9.29"></script>
+<script src="mk-home.js?v=1.9.29"></script>
+<script src="mk-meta-operador.js?v=1.9.29"></script>
+<script src="mk-custos.js?v=1.9.29"></script>
+<script src="mk-avulso.js?v=1.9.29"></script>
+<script src="mk-sync.js?v=1.9.29"></script>
+<script src="mk-nova.js?v=1.9.29"></script>
+<script src="mk-relacionamento.js?v=1.9.29"></script>
+<script src="mk-operacao.js?v=1.9.29"></script>
+<script src="mk-drawer.js?v=1.9.29"></script>
+<script src="mk-update.js?v=1.9.29"></script>
+<script src="mk-gestao-pessoas.js?v=1.9.29"></script>
+<script src="mk-holerite.js?v=1.9.29"></script>
+<script src="mk-gestao-pessoas-admin.js?v=1.9.29"></script>
+<script src="mk-auth.js?v=1.9.29"></script>
+<script src="mk-boot.js?v=1.9.29"></script>
 </body>
 </html>

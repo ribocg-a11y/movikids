@@ -413,43 +413,45 @@ html,body{height:100%;background:var(--bg);color:var(--txt);overflow:hidden}
 .form-input.pink:focus{border-color:var(--pink)}
 .form-hint{font-size:11px;color:var(--txt3);margin-top:5px;line-height:1.35}
 .nova-fechar-hint{font-size:12px;color:var(--txt2);margin:0 0 10px;line-height:1.4}
-/* I97 — multi-veículo no cadastro */
-.nova-itens-basket{
-  margin-top:12px;padding:12px 14px;border-radius:var(--radius-sm);
-  background:linear-gradient(135deg,var(--blue-lt) 0%,#fff 100%);border:1px solid rgba(13,71,161,.12)
+/* I97 — cesta multi-veículo (DNA operação: card + border, sem gradiente solto) */
+.nova-cesta{
+  margin-top:12px;padding:12px 14px;background:var(--card);
+  border:1px solid var(--border);border-radius:var(--radius-sm);box-shadow:var(--shadow-sm)
 }
-.nova-itens-basket:not([hidden]){display:block}
-.nova-itens-list{list-style:none;margin:0;padding:0}
-.nova-item-row{
-  display:flex;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid rgba(13,71,161,.08)
+.nova-cesta:not([hidden]){display:block}
+.nova-cesta-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px}
+.nova-cesta-label{font-size:12px;font-weight:800;color:var(--txt);text-transform:uppercase;letter-spacing:.04em}
+.nova-cesta-count{font-size:11px;font-weight:800;color:var(--blue-dk);background:var(--blue-lt);padding:3px 10px;border-radius:999px}
+.nova-cesta-rows{display:flex;flex-direction:column;gap:6px}
+.nova-cesta-row{
+  display:flex;align-items:center;gap:8px;padding:10px 12px;
+  background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm)
 }
-.nova-item-row:last-child{border-bottom:none}
-.nova-item-main{flex:1;font-size:14px;font-weight:800;color:var(--blue-dk);line-height:1.35}
-.nova-item-rm{
-  flex-shrink:0;width:32px;height:32px;border:none;border-radius:50%;background:rgba(0,0,0,.06);
-  font-size:14px;cursor:pointer;color:var(--txt2)
+.nova-cesta-row-main{flex:1;min-width:0}
+.nova-cesta-row-title{display:block;font-size:13px;font-weight:800;color:var(--txt);line-height:1.3}
+.nova-cesta-row-sub{display:block;font-size:11px;font-weight:700;color:var(--txt3);margin-top:2px}
+.nova-cesta-row-rm{
+  flex-shrink:0;width:32px;height:32px;border:none;border-radius:50%;background:var(--card);
+  border:1px solid var(--border);font-size:13px;cursor:pointer;color:var(--txt3)
 }
-.nova-item-rm:active{transform:scale(.94)}
-.nova-itens-total{margin-top:10px;font-size:15px;font-weight:900;color:var(--blue-dk);font-family:var(--font-display)}
-.nova-itens-hint{font-size:12px;color:var(--txt3);margin:8px 0 0;line-height:1.4}
-.nova-resumo-fechar{
-  margin-bottom:16px;padding:14px;border-radius:var(--radius-sm);
-  background:var(--bg2);border:2px solid var(--blue-lt)
+.nova-cesta-row-rm:active{transform:scale(.94)}
+.nova-cesta-total{
+  margin-top:10px;padding-top:10px;border-top:2px dashed var(--border);
+  font-size:14px;font-weight:900;color:var(--blue-dk)
 }
-.nova-resumo-fechar:not([hidden]){display:block}
-.nova-resumo-list{list-style:none;margin:0 0 10px;padding:0}
-.nova-resumo-list li{
-  padding:8px 0;font-size:14px;font-weight:800;color:var(--txt);border-bottom:1px dashed var(--border)
+.nova-cesta-add-btn{
+  display:block;width:100%;margin-top:10px;padding:12px 14px;background:var(--card);
+  border:2px dashed var(--blue);border-radius:var(--radius-sm);color:var(--blue-dk);
+  font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;cursor:pointer
 }
-.nova-resumo-list li:last-child{border-bottom:none}
-.nova-resumo-total{
-  font-size:22px;font-weight:900;color:var(--blue-dk);font-family:var(--font-display);margin-bottom:8px
-}
-.nova-resumo-total-lbl{display:block;font-size:11px;font-weight:800;color:var(--txt3);text-transform:uppercase}
-.nova-resumo-conta-hint{font-size:12px;color:var(--txt2);margin:0;line-height:1.45}
-.vc-card.vc-basket{opacity:.72;border-style:dashed;pointer-events:none}
+.nova-cesta-add-btn:active{transform:scale(.98);background:var(--blue-lt)}
+.nova-resumo-rows{display:flex;flex-direction:column;gap:6px;margin:8px 0 12px}
+.review-card .nova-cesta-row{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.22)}
+.review-card .nova-cesta-row-title,.review-card .nova-cesta-row-sub{color:#fff}
+.review-card .nova-cesta-row-sub{opacity:.85}
+.vc-card.vc-basket{opacity:.75;border-style:dashed;border-color:var(--blue);background:var(--blue-lt)}
 .vc-status.na-cesta{color:var(--blue-dk);font-weight:800}
-.form-input.nova-field-locked{background:var(--bg2);color:var(--txt2);border-style:dashed}
+#page-nova .nova-summary-bar.visible{position:relative;top:auto;box-shadow:none}
 
 /* Review card */
 .review-card{background:linear-gradient(135deg,var(--blue),var(--blue-dk));
