@@ -301,7 +301,7 @@ async function confirmarEncerrar() {
       toast('✅ Locação encerrada!', 'success');
     }
 
-    statsHoje.n++;
+    statsHoje.nSessoes = (Number(statsHoje.nSessoes) || 0) + 1;
 
     fecharSessaoDrawer();
     fecharAlerta();
@@ -314,16 +314,23 @@ async function confirmarEncerrar() {
     const mm2 = String(agora.getMinutes()).padStart(2,'0');
     encHojeData.push({
       id:          d.id || encSession.id,
+      contaId:     d.contaId || encSession.contaId || d.id || encSession.id,
       tipo:        d.tipo,
       plano:       d.plano,
       veiculo:     d.veiculo || encSession.veiculo || '',
       crianca:     d.crianca,
       responsavel: d.responsavel,
+      telefone:    d.telefone || encSession.telefone || '',
       horaInicio:  d.horaInicio,
       horaFim:     hh + ':' + mm2,
       valorTotal:  d.valorTotal
     });
-    renderEncHoje(encHojeData);
+    if (typeof mkUpdateEncHojeKpis_ === 'function') mkUpdateEncHojeKpis_(encHojeData);
+    else if (typeof renderEncHoje === 'function') renderEncHoje(encHojeData);
+    if (typeof mkContasEncHoje_ === 'function') statsHoje.n = mkContasEncHoje_(encHojeData);
+    if (typeof showAdminHomeKpis === 'function' && mkExibirFinanceiro_()) {
+      showAdminHomeKpis(typeof kpiHubStub_ === 'function' ? kpiHubStub_() : { ok: true, nSessoesHoje: encHojeData.length });
+    }
     if (typeof mkMetaRefresh_ === 'function') mkMetaRefresh_();
     renderCards();
     updateStats();

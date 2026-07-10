@@ -16,7 +16,7 @@ const PLANO_LABELS = { '10min':'10 minutos','20min':'20 minutos','30min':'30 min
                         '40min':'40 minutos','60min':'1 hora','3h':'3 horas' };
 
 let sessions = [];
-let statsHoje = { fat: 0, n: 0 };
+let statsHoje = { fat: 0, n: 0, nSessoes: 0 };
 
 /** Operação jun/2026: sem envio SMS/WhatsApp — só QR portal até serviço de mensagens contratado. */
 const MK_COMUNICACAO_MODO = 'qr_only';

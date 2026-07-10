@@ -197,7 +197,7 @@ function mergeSessaoCanonica(serverSession, localSession = {}) {
 
 function sanitizarDadosInicioOperador_(d) {
   if (!d || mkExibirFinanceiro_()) return d;
-  if (d.statsHoje) d.statsHoje = { n: d.statsHoje.n };
+  if (d.statsHoje) d.statsHoje = { n: d.statsHoje.n, nSessoes: d.statsHoje.nSessoes };
   if (Array.isArray(d.encHoje)) {
     d.encHoje = d.encHoje.map(e => {
       const o = Object.assign({}, e);
@@ -237,17 +237,27 @@ function aplicarDadosInicio(d) {
 
     if (d.statsHoje) {
       statsHoje.n = d.statsHoje.n;
+      statsHoje.nSessoes = Number(d.statsHoje.nSessoes) || 0;
       if (mkExibirFinanceiro_()) statsHoje.fat = Number(d.statsHoje.fat) || 0;
       else statsHoje.fat = 0;
     }
 
     if (d.encHoje && d.fonte !== 'firebase') {
+      if (!statsHoje.nSessoes && d.encHoje.length) statsHoje.nSessoes = d.encHoje.length;
       if (typeof mkUpdateEncHojeKpis_ === 'function') mkUpdateEncHojeKpis_(d.encHoje);
       else {
         encHojeData = d.encHoje;
         const nLoc = document.getElementById('stat-nloc');
-        if (nLoc) nLoc.textContent = encHojeData.length;
+        if (nLoc) {
+          const nContas = typeof mkContasEncHoje_ === 'function'
+            ? mkContasEncHoje_(encHojeData)
+            : encHojeData.length;
+          nLoc.textContent = String(nContas);
+        }
       }
+    }
+    if (typeof showAdminHomeKpis === 'function' && mkExibirFinanceiro_()) {
+      showAdminHomeKpis(typeof kpiHubStub_ === 'function' ? kpiHubStub_() : null);
     }
     if (typeof mkMetaApplyFromInicio_ === 'function') mkMetaApplyFromInicio_(d);
 

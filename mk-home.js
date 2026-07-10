@@ -336,12 +336,37 @@ function iniciarNovaPeloVeiculo(veiculo, tipo) {
   }, 80);
 }
 
+/** Contas do dia (telefones únicos / I42) — número no card da Home. */
+function mkContasEncHoje_(list) {
+  if (statsHoje && statsHoje.n != null && statsHoje.n > 0) return statsHoje.n;
+  const data = list || encHojeData || [];
+  if (!data.length) return 0;
+  const seen = {};
+  data.forEach(function (e) {
+    const tel = String(e.telefone || '').replace(/\D/g, '');
+    if (tel.length >= 8) seen[tel] = true;
+    else {
+      const ck = Number(e.contaId) || Number(e.id) || 0;
+      if (ck > 0) seen['c:' + ck] = true;
+    }
+  });
+  return Object.keys(seen).length;
+}
+
+/** Sessões encerradas (locações reais) — chip Caixa na Home. */
+function mkSessoesEncHoje_(list) {
+  if (statsHoje && statsHoje.nSessoes != null && statsHoje.nSessoes > 0) return statsHoje.nSessoes;
+  return (list || encHojeData || []).length;
+}
+
 function mkUpdateEncHojeKpis_(list) {
   encHojeData = list || [];
   const nLoc = document.getElementById('stat-nloc');
-  if (nLoc) nLoc.textContent = encHojeData.length;
+  if (nLoc) nLoc.textContent = String(mkContasEncHoje_(encHojeData));
 }
 window.mkUpdateEncHojeKpis_ = mkUpdateEncHojeKpis_;
+window.mkContasEncHoje_ = mkContasEncHoje_;
+window.mkSessoesEncHoje_ = mkSessoesEncHoje_;
 
 function renderEncHojeList_(list) {
   const section = document.getElementById('enc-hoje-section');
@@ -397,8 +422,10 @@ function showAdminHomeKpis(d) {
   if (chip) {
     chip.hidden = !homeOn;
     if (homeOn) {
-      const n = d.nHoje != null ? d.nHoje : 0;
-      set('admin-chip-fat', n + (n === 1 ? ' locação' : ' locações'));
+      const nSess = (d && d.nSessoesHoje != null)
+        ? Number(d.nSessoesHoje)
+        : (typeof mkSessoesEncHoje_ === 'function' ? mkSessoesEncHoje_(encHojeData) : 0);
+      set('admin-chip-fat', nSess + (nSess === 1 ? ' locação' : ' locações'));
     }
   }
   if (typeof atualizarHubAdmin_ === 'function') atualizarHubAdmin_();

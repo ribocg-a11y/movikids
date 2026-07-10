@@ -660,6 +660,14 @@ function fmtDataBrHoje_() {
 function nHojeCanonica_() {
   if (resumoDiaHoje && resumoDiaHoje.n != null) return resumoDiaHoje.n;
   if (kpiData && kpiData.nHoje != null) return kpiData.nHoje;
+  if (typeof statsHoje !== 'undefined' && statsHoje.n != null) return statsHoje.n;
+  return 0;
+}
+
+function nSessoesHojeCanonica_() {
+  if (resumoDiaHoje && resumoDiaHoje.nSessoes != null) return Number(resumoDiaHoje.nSessoes);
+  if (typeof statsHoje !== 'undefined' && statsHoje.nSessoes != null) return Number(statsHoje.nSessoes);
+  if (typeof mkSessoesEncHoje_ === 'function') return mkSessoesEncHoje_(typeof encHojeData !== 'undefined' ? encHojeData : []);
   return 0;
 }
 
@@ -671,7 +679,7 @@ function fatHojeCanonica_(d) {
 }
 
 function kpiHubStub_() {
-  return { ok: true, nHoje: nHojeCanonica_() };
+  return { ok: true, nHoje: nHojeCanonica_(), nSessoesHoje: nSessoesHojeCanonica_() };
 }
 
 async function carregarResumoHojeAdmin_() {
@@ -2988,13 +2996,15 @@ function renderCaixaFromResumo_(dataFmt, r) {
       resEl.style.color = resultado >= 0 ? '#2E7D32' : '#C62828';
     }
     setText('cx-res-ctx', fmtR(totalEnt) + ' − ' + fmtR(totalCus) + ' custos');
-    setText('cx-total-ctx', nContas + ' conta(s)' + (nSess > nContas ? ' · ' + nSess + ' sessões' : ''));
+    setText('cx-total-ctx', nSess + ' locação(ões)' + (nSess > nContas ? ' · ' + nContas + ' contas' : ''));
     setText('cx-maq-ctx', 'PIX R$ ' + Number(totPag.PIX || 0).toFixed(2).replace('.', ',') + ' · cartões');
     setText('cx-din-ctx', 'Saldo espécie ' + fmtR(saldoDin));
     setText('cx-cus-ctx', custos.length + ' lançamento(s)');
     const nloc = document.getElementById('cx-nloc');
-    if (nloc) nloc.textContent = String(nContas);
-    setText('cx-nloc-ctx', nSess > nContas ? nSess + ' sessões no dia' : 'Contas encerradas');
+    if (nloc) nloc.textContent = String(nSess);
+    setText('cx-nloc-ctx', nSess > nContas
+      ? (nSess + ' locações · ' + nContas + ' contas')
+      : 'Locações encerradas');
     if (totalExt > 0) {
       const pct = totalEnt > 0 ? Math.round(totalExt / totalEnt * 1000) / 10 : 0;
       setText('cx-ext-ctx', nExt + ' loc · ' + pct + '% do fat.');
