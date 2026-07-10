@@ -457,7 +457,7 @@ html,body{height:100%;background:var(--bg);color:var(--txt);overflow:hidden}
 .nova-pick-voltar:active{background:var(--blue-lt)}
 .nova-pick-voltar:not([hidden]){display:block}
 .nova-saving-overlay{
-  position:fixed;inset:0;z-index:9000;background:rgba(26,35,64,.55);
+  position:fixed;inset:0;z-index:99999;background:rgba(26,35,64,.72);
   display:flex;align-items:center;justify-content:center;padding:20px
 }
 .nova-saving-overlay:not([hidden]){display:flex}

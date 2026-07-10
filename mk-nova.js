@@ -126,6 +126,7 @@ function novaAtualizarSubModoUI_() {
 }
 
 function novaIniciarPick_() {
+  if (novaGuardSaveBusy_()) return;
   novaState.subModo = 'pick';
   novaLimparSelecaoAtual_();
   novaAtualizarSubModoUI_();
@@ -133,6 +134,7 @@ function novaIniciarPick_() {
 }
 
 function novaVoltarCesta_() {
+  if (novaGuardSaveBusy_()) return;
   if (!(novaState.itens || []).length) return;
   novaState.subModo = 'cesta';
   novaLimparSelecaoAtual_();
@@ -157,6 +159,14 @@ function novaShowSaving_(i, n, veiculo) {
 function novaHideSaving_() {
   const o = document.getElementById('nova-saving-overlay');
   if (o) o.hidden = true;
+}
+
+function novaGuardSaveBusy_() {
+  if (_novaSavingInFlight) {
+    toast('Aguarde — salvando na planilha.', 'info');
+    return true;
+  }
+  return false;
 }
 
 function novaMarcarCestaGrid_() {
@@ -706,6 +716,7 @@ function scrollParaPlanosNova_() {
 }
 
 function selectVeiculo(el, veiculo, tipo) {
+  if (novaGuardSaveBusy_()) return;
   if (el.classList.contains('vc-busy') || el.classList.contains('vc-busy-pink')) return;
   if (novaVeiculoNaCesta_(veiculo)) {
     toast(veiculo + ' já está nesta locação.', 'warning');
@@ -737,6 +748,7 @@ function selectTipo(tipo, el) {
 }
 
 function selectPlano(plano, el) {
+  if (novaGuardSaveBusy_()) return;
   if (!novaState.tipo) { toast('Selecione o veículo primeiro.', 'error'); return; }
   document.querySelectorAll('.plano-btn').forEach(b => b.classList.remove('sel'));
   el.classList.add('sel');
@@ -751,6 +763,7 @@ function selectPlano(plano, el) {
 }
 
 function nextStep() {
+  if (novaGuardSaveBusy_()) return;
   if (novaState.step >= NOVA_MAX_STEP) return;
   if (novaState.step === 0) {
     const n = (novaState.itens || []).length;
@@ -764,6 +777,7 @@ function nextStep() {
 }
 
 function backStep() {
+  if (novaGuardSaveBusy_()) return;
   if (novaState.step <= 0) return;
   aplicarStepNova_(novaState.step - 1);
   salvarNovaDraft_();
@@ -857,10 +871,12 @@ async function confirmarLocacao() {
   const n = itens.length;
   if (btn) { btn.disabled = true; btn.textContent = 'Salvando…'; }
   _novaSavingInFlight = true;
+  aplicarStepNova_(2);
   novaShowSaving_(0, n, itens[0] && itens[0].veiculo);
 
   let salvos = 0;
   let ultimaMesmaConta = false;
+  let foiHome = false;
 
   try {
     for (let i = 0; i < itens.length; i++) {
@@ -920,11 +936,23 @@ async function confirmarLocacao() {
       });
       salvos++;
       saveSessions();
+
+      if (n > 1 && i === 0 && !foiHome) {
+        mkRefreshHomeUI_();
+        resetNova();
+        showPage('home');
+        foiHome = true;
+      }
     }
 
-    mkRefreshHomeUI_();
-    resetNova();
-    showPage('home');
+    if (!foiHome) {
+      mkRefreshHomeUI_();
+      resetNova();
+      showPage('home');
+    } else {
+      mkRefreshHomeUI_();
+      resetNova();
+    }
     const msg = n > 1
       ? ('✅ ' + n + ' locações salvas na mesma conta! Aperte ▶ em cada card.')
       : (ultimaMesmaConta
