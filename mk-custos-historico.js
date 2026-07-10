@@ -396,6 +396,9 @@ function renderCusHistMesesChart_(rows) {
 
   const vals = rows.map(function (r) { return r.valor; });
   const maxVal = Math.max.apply(null, vals.concat([1]));
+  const yMax = maxVal <= 4000
+    ? 4000
+    : Math.ceil((maxVal * 1.08) / 1000) * 1000;
   const n = rows.length;
   const colors = rows.map(function (r) {
     return r.atual ? '#1565C0' : 'rgba(21, 101, 192, 0.55)';
@@ -439,15 +442,16 @@ function renderCusHistMesesChart_(rows) {
         },
         y: {
           min: 0,
-          suggestedMax: maxVal * 1.2,
+          max: yMax,
           grid: { color: 'rgba(21,101,192,.08)', drawBorder: false },
           ticks: {
+            stepSize: yMax <= 4000 ? 1000 : undefined,
             callback: function (v) {
               if (v >= 1000) return 'R$' + (Math.round(v / 100) / 10) + 'k';
               return 'R$' + v;
             },
             font: { size: 10, weight: '700' },
-            maxTicksLimit: 4
+            maxTicksLimit: 5
           }
         }
       }
@@ -480,7 +484,7 @@ async function buscarCustosMesesSerie_() {
   const range = cusHistMesesRange_();
   const cat = document.getElementById('cus-hist-cat-filter')?.value || '';
   const grp = document.getElementById('cus-hist-grupo-filter')?.value || '';
-  const cacheKey = 'mk_cus_meses_v3_' + range.ano + '_' + range.s + '_' + range.e + '_' + cat + '_' + grp;
+  const cacheKey = 'mk_cus_meses_v4_' + range.ano + '_' + range.s + '_' + range.e + '_' + cat + '_' + grp;
   const gen = ++cusHistMesesFetchGen_;
 
   try {
