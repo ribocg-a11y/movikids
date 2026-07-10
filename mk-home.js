@@ -374,16 +374,18 @@ function mkContasEncHoje_(list) {
   return Object.keys(seen).length;
 }
 
-/** Sessões encerradas (locações reais) — chip Caixa na Home. */
+/** Sessões encerradas hoje — deve bater com a lista #enc-hoje-list. */
 function mkSessoesEncHoje_(list) {
+  const data = list || encHojeData || [];
+  if (data.length) return data.length;
   if (statsHoje && statsHoje.nSessoes != null && statsHoje.nSessoes > 0) return statsHoje.nSessoes;
-  return (list || encHojeData || []).length;
+  return 0;
 }
 
 function mkUpdateEncHojeKpis_(list) {
   encHojeData = list || [];
   const nLoc = document.getElementById('stat-nloc');
-  if (nLoc) nLoc.textContent = String(mkContasEncHoje_(encHojeData));
+  if (nLoc) nLoc.textContent = String(mkSessoesEncHoje_(encHojeData));
 }
 window.mkUpdateEncHojeKpis_ = mkUpdateEncHojeKpis_;
 window.mkContasEncHoje_ = mkContasEncHoje_;

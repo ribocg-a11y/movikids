@@ -300,10 +300,10 @@ function aplicarDadosInicio(d) {
         encHojeData = d.encHoje;
         const nLoc = document.getElementById('stat-nloc');
         if (nLoc) {
-          const nContas = typeof mkContasEncHoje_ === 'function'
-            ? mkContasEncHoje_(encHojeData)
+          const nEnc = typeof mkSessoesEncHoje_ === 'function'
+            ? mkSessoesEncHoje_(encHojeData)
             : encHojeData.length;
-          nLoc.textContent = String(nContas);
+          nLoc.textContent = String(nEnc);
         }
       }
     }
