@@ -4,7 +4,7 @@
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **Repo local:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`  
-**GitHub:** `ribocg-a11y/movikids` · branch `main` · commit **bf049b0** (I103 encerradas/caixa)
+**GitHub:** `ribocg-a11y/movikids` · branch `main` · commit **5ec4ab6** (docs atualize tudo · I103)
 
 **Mensagem mínima no novo chat:**
 
