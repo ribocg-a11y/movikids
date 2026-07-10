@@ -1,128 +1,171 @@
 /* MOVI KIDS — Nova locação (Pacote M.6)
  * Zona P0: confirmarLocacao → salvarLocacao via GET (api/mk-api.js).
+ * I97: multi-veículo no próprio cadastro (cesta + resumo + N cards).
  */
-let novaState = { tipo: null, plano: null, veiculo: null, pagamento: null, observacao: '', step: 0, mesmaConta: false };
+let novaState = {
+  tipo: null, plano: null, veiculo: null,
+  itens: [],
+  pagamento: null, observacao: '', step: 0
+};
 let novaPrefillResponsavel = null;
 const NOVA_DRAFT_KEY = 'mk_nova_locacao_draft_v1';
-const NOVA_MESMA_CONTA_KEY = 'mk_nova_mesma_conta_v1';
-const NOVA_MESMA_CONTA_TTL_MS = 6 * 60 * 60 * 1000;
 let _restoringNovaDraft = false;
 const NOVA_MAX_STEP = 2;
 let _novaRelSearchTimer = null;
 let _novaSavingInFlight = false;
 var relacionamentoCache = [];
-/** I96 — mesma conta (I42): 2º/3º veículo sem refazer cadastro completo. */
-function lerMesmaContaCtx_() {
-  try {
-    const raw = sessionStorage.getItem(NOVA_MESMA_CONTA_KEY);
-    if (!raw) return null;
-    const ctx = JSON.parse(raw);
-    if (!ctx || !ctx.telefone) return null;
-    if (ctx.ts && Date.now() - Number(ctx.ts) > NOVA_MESMA_CONTA_TTL_MS) {
-      sessionStorage.removeItem(NOVA_MESMA_CONTA_KEY);
-      return null;
-    }
-    return ctx;
-  } catch (e) { return null; }
+
+function novaCfgPlano_(tipo, plano) {
+  return (PRECOS[tipo] && PRECOS[tipo][plano]) ? PRECOS[tipo][plano] : null;
 }
 
-function salvarMesmaContaCtx_(ctx) {
-  if (!ctx || !ctx.telefone) return;
-  const payload = Object.assign({}, ctx, { ts: Date.now() });
-  try { sessionStorage.setItem(NOVA_MESMA_CONTA_KEY, JSON.stringify(payload)); } catch (e) {}
-  renderHomeMesmaContaCta_(payload);
+function novaVeiculoNaCesta_(veiculo) {
+  return (novaState.itens || []).some(function(it) { return it.veiculo === veiculo; });
 }
 
-function dismissMesmaContaCta_() {
-  try { sessionStorage.removeItem(NOVA_MESMA_CONTA_KEY); } catch (e) {}
-  renderHomeMesmaContaCta_(null);
-}
-
-function renderHomeMesmaContaCta_(ctxOpt) {
-  const el = document.getElementById('home-mesma-conta-cta');
-  const txt = document.getElementById('home-mesma-conta-text');
-  if (!el) return;
-  const ctx = ctxOpt !== undefined ? ctxOpt : lerMesmaContaCtx_();
-  if (!ctx || !ctx.telefone) {
-    el.hidden = true;
-    return;
+function novaItensParaSalvar_() {
+  if (novaState.itens && novaState.itens.length) return novaState.itens.slice();
+  if (novaState.veiculo && novaState.tipo && novaState.plano) {
+    return [{ veiculo: novaState.veiculo, tipo: novaState.tipo, plano: novaState.plano }];
   }
-  el.hidden = false;
-  if (txt) {
-    const pag = ctx.pagamento || 'pagamento';
-    const resp = ctx.responsavel || 'Responsável';
-    txt.textContent = resp + ' · ' + pag + ' — adicionar outro veículo na mesma conta (1 cobrança na maquininha)';
-  }
+  return [];
 }
 
-function abrirNovaMesmaContaFromHome_() {
-  const ctx = lerMesmaContaCtx_();
-  if (!ctx) {
-    toast('Oferta expirada. Faça uma nova locação com pagamento.', 'warning');
-    renderHomeMesmaContaCta_(null);
-    return;
-  }
-  abrirNovaMesmaConta_(ctx);
-}
-
-function aplicarPagamentoFixoNova_(forma) {
-  if (!forma) return;
-  novaState.pagamento = forma;
-  const idMap = { PIX: 'pag-PIX', 'Crédito': 'pag-Credito', 'Débito': 'pag-Debito', Dinheiro: 'pag-Dinheiro' };
-  const targetId = idMap[forma] || '';
-  document.querySelectorAll('.pag-btn').forEach(function(b) {
-    b.classList.toggle('sel', b.id === targetId);
+function novaTotalPlanos_(itens) {
+  let t = 0;
+  (itens || []).forEach(function(it) {
+    const cfg = novaCfgPlano_(it.tipo, it.plano);
+    if (cfg) t += Number(cfg.v) || 0;
   });
-  const valEl = document.getElementById('nova-mesma-conta-pag-val');
-  if (valEl) valEl.textContent = forma;
+  return t;
 }
 
-function setNovaCampoLocked_(id, locked) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  el.readOnly = !!locked;
-  el.classList.toggle('nova-field-locked', !!locked);
-  if (locked) el.setAttribute('aria-readonly', 'true');
-  else el.removeAttribute('aria-readonly');
+function novaLimparSelecaoAtual_() {
+  novaState.veiculo = null;
+  novaState.tipo = null;
+  novaState.plano = null;
+  document.querySelectorAll('.plano-btn').forEach(function(b) { b.classList.remove('sel'); });
+  document.querySelectorAll('.vc-card').forEach(function(c) { c.classList.remove('vc-sel', 'vc-sel-pink'); });
+  const sec = document.getElementById('nova-plano-section');
+  if (sec) sec.classList.remove('visible');
+  const pageNova = document.getElementById('page-nova');
+  if (pageNova) pageNova.classList.remove('step-0-veiculo');
+  document.querySelectorAll('#page-nova .vc-section-label').forEach(function(l) {
+    l.style.display = '';
+    l.classList.remove('nova-vc-outro');
+  });
+  ['vc-grid-carros', 'vc-grid-triciclos', 'vc-grid-pelucias'].forEach(function(id) {
+    const g = document.getElementById(id);
+    if (g) g.style.display = '';
+  });
 }
 
-function aplicarNovaMesmaContaUI_(ativo) {
-  const page = document.getElementById('page-nova');
-  const banner = document.getElementById('nova-mesma-conta-banner');
-  const pagFixo = document.getElementById('nova-mesma-conta-pag-fixo');
-  const pagGrid = document.getElementById('nova-pag-grid');
-  const pagTitle = document.getElementById('nova-pag-grid-title');
-  if (page) page.classList.toggle('nova-mesma-conta-mode', !!ativo);
-  if (banner) banner.hidden = !ativo;
-  if (pagFixo) pagFixo.hidden = !ativo;
-  if (pagGrid) pagGrid.style.display = ativo ? 'none' : '';
-  if (pagTitle) pagTitle.style.display = ativo ? 'none' : '';
-  setNovaCampoLocked_('inp-resp', ativo);
-  setNovaCampoLocked_('inp-tel', ativo);
+function incluirItemNova_() {
+  if (!novaState.veiculo || !novaState.tipo || !novaState.plano) {
+    toast('Selecione veículo e plano.', 'error');
+    return false;
+  }
+  if (novaVeiculoNaCesta_(novaState.veiculo)) {
+    toast(novaState.veiculo + ' já está nesta locação.', 'warning');
+    return false;
+  }
+  if (!novaCfgPlano_(novaState.tipo, novaState.plano)) {
+    toast('Plano inválido.', 'error');
+    return false;
+  }
+  novaState.itens.push({
+    veiculo: novaState.veiculo,
+    tipo: novaState.tipo,
+    plano: novaState.plano
+  });
+  novaLimparSelecaoAtual_();
+  renderNovaItensBasket_();
+  atualizarNovaSummaryBar_();
+  salvarNovaDraft_();
+  if (typeof atualizarVeiculoGrid === 'function') atualizarVeiculoGrid();
+  return true;
 }
 
-function abrirNovaMesmaConta_(ctx) {
-  if (!ctx || !ctx.telefone) {
-    toast('Dados da conta incompletos.', 'error');
+function removerItemNova_(idx) {
+  if (!novaState.itens || idx < 0 || idx >= novaState.itens.length) return;
+  novaState.itens.splice(idx, 1);
+  renderNovaItensBasket_();
+  atualizarNovaSummaryBar_();
+  salvarNovaDraft_();
+  if (typeof atualizarVeiculoGrid === 'function') atualizarVeiculoGrid();
+}
+
+function novaAddOutroVeiculo_() {
+  novaLimparSelecaoAtual_();
+  toast('Escolha o próximo veículo e o plano (pode ser diferente).', '');
+  const grid = document.getElementById('vc-grid-carros');
+  if (grid) {
+    setTimeout(function() {
+      try { grid.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e) { grid.scrollIntoView(true); }
+    }, 80);
+  }
+}
+
+function renderNovaItensBasket_() {
+  const box = document.getElementById('nova-itens-basket');
+  const list = document.getElementById('nova-itens-list');
+  const totalEl = document.getElementById('nova-itens-total');
+  const btnOutro = document.getElementById('btn-nova-add-outro');
+  const btnQuem = document.getElementById('btn-nova-continuar-quem');
+  const n = (novaState.itens || []).length;
+  if (box) box.hidden = n === 0;
+  if (btnOutro) btnOutro.style.display = n > 0 ? 'block' : 'none';
+  if (btnQuem) btnQuem.style.display = (novaState.step === 0 && n > 0) ? 'block' : 'none';
+  if (!list) return;
+  if (!n) {
+    list.innerHTML = '';
+    if (totalEl) totalEl.textContent = '';
     return;
   }
-  novaPrefillResponsavel = null;
-  limparNovaDraft_();
-  resetNova({ preserveDraft: true, preserveMesmaConta: false });
-  novaState.mesmaConta = true;
-  novaState.pagamento = ctx.pagamento || null;
-  const set = function(id, v) {
-    const el = document.getElementById(id);
-    if (el) el.value = v || '';
-  };
-  set('inp-resp', ctx.responsavel);
-  set('inp-tel', ctx.telefone);
-  set('inp-cri', ctx.crianca || '');
-  aplicarNovaMesmaContaUI_(true);
-  aplicarPagamentoFixoNova_(ctx.pagamento);
-  toggleBotoesConfirmarNova_();
-  showPage('nova', { mesmaConta: true });
-  toast('Escolha o próximo veículo — mesma conta, pagamento ' + (ctx.pagamento || 'herdado') + '.', 'success');
+  const fin = mkExibirFinanceiro_();
+  list.innerHTML = novaState.itens.map(function(it, i) {
+    const cfg = novaCfgPlano_(it.tipo, it.plano);
+    const planoLbl = PLANO_LABELS[it.plano] || it.plano;
+    const val = cfg && fin ? (' · R$ ' + String(cfg.v).replace('.', ',')) : '';
+    return '<li class="nova-item-row">' +
+      '<span class="nova-item-main">' + escHtml(tipoIcon(it.tipo) + ' ' + it.veiculo + ' · ' + planoLbl + val) + '</span>' +
+      '<button type="button" class="nova-item-rm" onclick="removerItemNova_(' + i + ')" aria-label="Remover">✕</button>' +
+      '</li>';
+  }).join('');
+  if (totalEl && fin) {
+    const tot = novaTotalPlanos_(novaState.itens);
+    totalEl.innerHTML = '<strong>Total dos planos:</strong> R$ ' + tot.toFixed(2).replace('.', ',');
+  } else if (totalEl) {
+    totalEl.innerHTML = '<strong>' + n + '</strong> veículo' + (n > 1 ? 's' : '') + ' nesta locação';
+  }
+}
+
+function renderNovaResumoFechar_() {
+  const box = document.getElementById('nova-resumo-fechar');
+  const list = document.getElementById('nova-resumo-list');
+  const totalEl = document.getElementById('nova-resumo-total');
+  const nCards = document.getElementById('nova-resumo-n-cards');
+  const itens = novaItensParaSalvar_();
+  if (!box || !list) return;
+  if (!itens.length) {
+    box.hidden = true;
+    return;
+  }
+  box.hidden = false;
+  const fin = mkExibirFinanceiro_();
+  list.innerHTML = itens.map(function(it) {
+    const cfg = novaCfgPlano_(it.tipo, it.plano);
+    const planoLbl = PLANO_LABELS[it.plano] || it.plano;
+    const val = cfg && fin ? (' · R$ ' + String(cfg.v).replace('.', ',')) : '';
+    return '<li>' + escHtml(tipoIcon(it.tipo) + ' ' + it.veiculo + ' · ' + planoLbl + val) + '</li>';
+  }).join('');
+  if (totalEl && fin) {
+    const tot = novaTotalPlanos_(itens);
+    totalEl.innerHTML = '<span class="nova-resumo-total-lbl">Total</span> R$ ' + tot.toFixed(2).replace('.', ',');
+  } else if (totalEl) {
+    totalEl.textContent = itens.length + ' veículo(s)';
+  }
+  if (nCards) nCards.textContent = String(itens.length);
 }
 
 function novaDraftCampos_() {
@@ -145,6 +188,7 @@ function hasNovaDraft_() {
 function isNovaDirty_() {
   const c = novaDraftCampos_();
   return !!(
+    (novaState.itens && novaState.itens.length) ||
     novaState.tipo || novaState.plano || novaState.veiculo || novaState.pagamento ||
     c.responsavel.trim() || c.crianca.trim() || c.telefone.trim() || c.observacao.trim()
   );
@@ -193,23 +237,41 @@ function aplicarStepNova_(step) {
     aplicarPrefillResponsavel_();
     setTimeout(() => document.getElementById('nova-rel-q')?.focus(), 80);
   }
-  if (safeStep === 2) toggleBotoesConfirmarNova_();
+  if (safeStep === 2) {
+    toggleBotoesConfirmarNova_();
+    renderNovaResumoFechar_();
+  }
+  renderNovaItensBasket_();
   const btnQuem = document.getElementById('btn-nova-continuar-quem');
-  if (btnQuem) btnQuem.style.display = (safeStep === 0 && novaState.plano) ? 'block' : 'none';
+  if (btnQuem) btnQuem.style.display = (safeStep === 0 && (novaState.itens || []).length > 0) ? 'block' : 'none';
   atualizarNovaSummaryBar_();
 }
 
 function atualizarNovaSummaryBar_() {
   const bar = document.getElementById('nova-summary-bar');
   if (!bar) return;
-  const { tipo, plano, veiculo } = novaState;
   const parts = [];
-  if (veiculo || tipo) parts.push(tipoIcon(tipo || '') + ' ' + (veiculo || tipo || '—'));
-  if (plano && tipo && PRECOS[tipo] && PRECOS[tipo][plano]) {
-    parts.push(PLANO_LABELS[plano] || plano);
-    if (mkExibirFinanceiro_()) parts.push('R$ ' + PRECOS[tipo][plano].v);
-  } else if (veiculo && tipo) {
-    parts.push('escolha o plano');
+  const itens = novaState.itens || [];
+  if (itens.length) {
+    itens.forEach(function(it) {
+      const cfg = novaCfgPlano_(it.tipo, it.plano);
+      const pl = PLANO_LABELS[it.plano] || it.plano;
+      let s = tipoIcon(it.tipo) + ' ' + it.veiculo + ' · ' + pl;
+      if (cfg && mkExibirFinanceiro_()) s += ' · R$ ' + cfg.v;
+      parts.push(s);
+    });
+    if (mkExibirFinanceiro_() && itens.length > 1) {
+      parts.push('Total R$ ' + novaTotalPlanos_(itens).toFixed(2).replace('.', ','));
+    }
+  } else {
+    const { tipo, plano, veiculo } = novaState;
+    if (veiculo || tipo) parts.push(tipoIcon(tipo || '') + ' ' + (veiculo || tipo || '—'));
+    if (plano && tipo && PRECOS[tipo] && PRECOS[tipo][plano]) {
+      parts.push(PLANO_LABELS[plano] || plano);
+      if (mkExibirFinanceiro_()) parts.push('R$ ' + PRECOS[tipo][plano].v);
+    } else if (veiculo && tipo) {
+      parts.push('escolha o plano');
+    }
   }
   const c = novaDraftCampos_();
   if (c.responsavel) parts.push(c.responsavel + ' / ' + (c.crianca || '—'));
@@ -224,14 +286,23 @@ function atualizarNovaSummaryBar_() {
 
 function toggleBotoesConfirmarNova_() {
   const ok = !!novaState.pagamento;
+  const n = novaItensParaSalvar_().length;
   const b1 = document.getElementById('btn-confirmar');
   const b2 = document.getElementById('btn-confirmar-iniciar');
   const hint = document.getElementById('nova-fechar-hint');
-  if (b1) b1.style.display = ok ? 'block' : 'none';
+  const lbl = n > 1 ? ('Salvar ' + n + ' locações') : 'Só salvar cadastro (sem SMS agora)';
+  if (b1) {
+    b1.style.display = ok ? 'block' : 'none';
+    if (ok && n > 1) b1.textContent = lbl;
+  }
   if (b2) b2.style.display = 'none';
   if (hint) {
     hint.style.display = ok ? 'block' : 'none';
-    if (ok) hint.textContent = 'O cronômetro só começa após ▶ Iniciar na Home. Comunicação: QR do portal na mesa.';
+    if (ok) {
+      hint.textContent = n > 1
+        ? ('Serão ' + n + ' cards na Home — ▶ Iniciar em cada um. 1 cobrança na maquininha.')
+        : 'O cronômetro só começa após ▶ Iniciar na Home. Comunicação: QR do portal na mesa.';
+    }
   }
 }
 
@@ -250,7 +321,6 @@ function mkRefreshHomeUI_() {
   if (typeof renderCards === 'function') renderCards();
   if (typeof updateStats === 'function') updateStats();
   if (typeof atualizarVeiculoGrid === 'function') atualizarVeiculoGrid();
-  renderHomeMesmaContaCta_();
 }
 
 function rowIndexFromSalvar_(d) {
@@ -400,7 +470,8 @@ function restaurarNovaDraft_() {
 
   _restoringNovaDraft = true;
   try {
-    novaState = Object.assign({ tipo:null, plano:null, veiculo:null, pagamento:null, observacao:'', step:0 }, draft.state);
+    novaState = Object.assign({ tipo:null, plano:null, veiculo:null, itens:[], pagamento:null, observacao:'', step:0 }, draft.state);
+    if (!Array.isArray(novaState.itens)) novaState.itens = [];
     if (novaState.tipo) renderPlanosNova_(novaState.tipo);
     if (novaState.veiculo) {
       const card = document.getElementById('vc-' + novaState.veiculo);
@@ -427,6 +498,7 @@ function restaurarNovaDraft_() {
     });
     novaState.step = migrateDraftStep_(novaState.step || 0);
     aplicarStepNova_(novaState.step);
+    renderNovaItensBasket_();
   } finally {
     _restoringNovaDraft = false;
   }
@@ -442,7 +514,6 @@ function inicializarDraftNova_() {
     }));
   });
   window.addEventListener('beforeunload', salvarNovaDraft_);
-  renderHomeMesmaContaCta_();
 }
 
 function abrirNovaLocacao() {
@@ -472,10 +543,12 @@ function atualizarVeiculoGrid() {
     if (!card || !stEl) return;
     const isPink = nome.startsWith('Pelúcia');
     const info   = emUso[nome];
+    const naCesta = typeof novaVeiculoNaCesta_ === 'function' && novaVeiculoNaCesta_(nome);
 
     // Remover timer antigo se existir
     const oldTimer = card.querySelector('.vc-timer');
     if (oldTimer) oldTimer.remove();
+    card.classList.remove('vc-basket');
 
     if (info) {
       // Em uso
@@ -501,6 +574,12 @@ function atualizarVeiculoGrid() {
         timerDiv.innerHTML = `<div class="vc-timer-time${isWarn?' warn':''}">${fmtTime(rem)}</div>`;
       }
       card.appendChild(timerDiv);
+    } else if (naCesta) {
+      card.classList.remove('vc-sel', 'vc-sel-pink', 'vc-busy', 'vc-busy-pink');
+      card.classList.add('vc-basket');
+      card.style.pointerEvents = 'none';
+      stEl.className = 'vc-status na-cesta';
+      stEl.textContent = '📋 Nesta locação';
     } else {
       // Livre
       card.classList.remove('vc-busy','vc-busy-pink');
@@ -537,6 +616,10 @@ function scrollParaPlanosNova_() {
 
 function selectVeiculo(el, veiculo, tipo) {
   if (el.classList.contains('vc-busy') || el.classList.contains('vc-busy-pink')) return;
+  if (novaVeiculoNaCesta_(veiculo)) {
+    toast(veiculo + ' já está nesta locação.', 'warning');
+    return;
+  }
   document.querySelectorAll('.vc-card').forEach(function(c) { c.classList.remove('vc-sel','vc-sel-pink'); });
   el.classList.add(tipo === 'Pelúcia' ? 'vc-sel-pink' : 'vc-sel');
   novaState.veiculo = veiculo;
@@ -570,15 +653,26 @@ function selectPlano(plano, el) {
   novaState.plano = plano;
   aplicarEstiloInputsNova_(novaState.tipo);
   atualizarNovaSummaryBar_();
-  if (novaState.step === 0) nextStep();
-  else salvarNovaDraft_();
+  if (novaState.step === 0) {
+    if (incluirItemNova_()) {
+      const last = novaState.itens[novaState.itens.length - 1];
+      const cfg = novaCfgPlano_(last.tipo, last.plano);
+      const v = cfg && mkExibirFinanceiro_() ? (' · R$ ' + cfg.v) : '';
+      toast('Incluído: ' + last.veiculo + ' · ' + (PLANO_LABELS[last.plano] || last.plano) + v, 'success');
+    }
+  } else {
+    salvarNovaDraft_();
+  }
 }
 
 function nextStep() {
   if (novaState.step >= NOVA_MAX_STEP) return;
-  if (novaState.step === 0 && !novaState.plano) {
-    toast('Escolha o plano antes de continuar.', 'error');
-    return;
+  if (novaState.step === 0) {
+    const n = (novaState.itens || []).length;
+    if (!n) {
+      if (novaState.veiculo && novaState.plano && incluirItemNova_()) { /* ok */ }
+      else { toast('Inclua pelo menos um veículo (escolha plano).', 'error'); return; }
+    }
   }
   aplicarStepNova_(novaState.step + 1);
   salvarNovaDraft_();
@@ -598,7 +692,7 @@ function avancarParaFechar_() {
   const resp = document.getElementById('inp-resp').value.trim();
   const cri  = document.getElementById('inp-cri').value.trim();
   const tel  = document.getElementById('inp-tel').value.trim().replace(/\D/g,'');
-  if (!novaState.plano) { toast('Escolha o plano.', 'error'); return; }
+  if (!novaItensParaSalvar_().length) { toast('Inclua pelo menos um veículo com plano.', 'error'); return; }
   if (!resp || !cri || !tel) { toast('Preencha responsável, criança e telefone.', 'error'); return; }
   novaState.observacao = (document.getElementById('inp-obs')?.value.trim() || '');
   atualizarNovaSummaryBar_();
@@ -622,12 +716,10 @@ function capitalizarNome(el) {
 }
 
 function resetNova(opts = {}) {
-  const keepMesmaConta = !!(opts.preserveMesmaConta && novaState.mesmaConta);
   novaState = {
-    tipo: null, plano: null, veiculo: null, pagamento: null,
-    observacao: '', step: 0, mesmaConta: keepMesmaConta
+    tipo: null, plano: null, veiculo: null, itens: [],
+    pagamento: null, observacao: '', step: 0
   };
-  if (!keepMesmaConta) aplicarNovaMesmaContaUI_(false);
   const pageNova = document.getElementById('page-nova');
   if (pageNova) pageNova.classList.remove('step-0-veiculo');
   document.querySelectorAll('#page-nova .vc-section-label').forEach(l => { l.style.display = ''; l.classList.remove('nova-vc-outro'); });
@@ -646,6 +738,8 @@ function resetNova(opts = {}) {
   if (_novaRelSearchTimer) { clearTimeout(_novaRelSearchTimer); _novaRelSearchTimer = null; }
   document.querySelectorAll('.pag-btn').forEach(b => b.classList.remove('sel'));
   const sec = document.getElementById('nova-plano-section'); if (sec) sec.classList.remove('visible');
+  renderNovaItensBasket_();
+  renderNovaResumoFechar_();
   aplicarStepNova_(0);
   toggleBotoesConfirmarNova_();
   if (!opts.preserveDraft) limparNovaDraft_();
@@ -670,77 +764,90 @@ async function confirmarLocacao() {
   const resp = document.getElementById('inp-resp').value.trim();
   const cri  = document.getElementById('inp-cri').value.trim();
   const tel  = document.getElementById('inp-tel').value.trim().replace(/\D/g,'');
+  const itens = novaItensParaSalvar_();
 
-  if (!novaState.veiculo) { toast('Selecione um veículo!', 'error'); return; }
+  if (!itens.length) { toast('Inclua pelo menos um veículo!', 'error'); return; }
   if (!resp || !cri || !tel) { toast('Preencha todos os campos!', 'error'); return; }
   if (!novaState.pagamento) { toast('Selecione a forma de pagamento!', 'error'); return; }
   if (!mkRequireOperadorEscrita_()) return;
 
   const btn = document.getElementById('btn-confirmar');
-  btn.textContent = '⏳ Salvando cadastro...'; btn.disabled = true;
+  const n = itens.length;
+  btn.textContent = n > 1 ? ('⏳ Salvando ' + n + ' locações...') : '⏳ Salvando cadastro...';
+  btn.disabled = true;
   _novaSavingInFlight = true;
 
+  let salvos = 0;
+  let ultimaMesmaConta = false;
+
   try {
-    // Preço local como fallback caso GAS não conheça o tipo (ex: Triciclo em GAS antigo)
-    const cfgLocal = (PRECOS[novaState.tipo] && PRECOS[novaState.tipo][novaState.plano]) || {};
+    for (let i = 0; i < itens.length; i++) {
+      const it = itens[i];
+      const cfgLocal = novaCfgPlano_(it.tipo, it.plano) || {};
 
-    const d = await api({
-      action: 'salvarLocacao',
-      ...operadorApiParams_(),
-      tipo:         novaState.tipo,
-      plano:        novaState.plano,
-      veiculo:      novaState.veiculo,
-      pagamento:    novaState.pagamento,
-      observacao:   novaState.observacao || '',
-      responsavel:  resp,
-      crianca:      cri,
-      telefone:     tel,
-      valorPlano:      cfgLocal.v || 0,
-      mins:            cfgLocal.m || 0,
-      adicionalPorMin: cfgLocal.a || 1.00
-    }, 18000);
+      const d = await api({
+        action: 'salvarLocacao',
+        ...operadorApiParams_(),
+        tipo:         it.tipo,
+        plano:        it.plano,
+        veiculo:      it.veiculo,
+        pagamento:    novaState.pagamento,
+        observacao:   novaState.observacao || '',
+        responsavel:  resp,
+        crianca:      cri,
+        telefone:     tel,
+        valorPlano:      cfgLocal.v || 0,
+        mins:            cfgLocal.m || 0,
+        adicionalPorMin: cfgLocal.a || 1.00
+      }, 18000);
 
-    if (!d.ok) { toast('Erro: ' + d.erro, 'error'); return; }
+      if (!d.ok) {
+        toast('Erro no veículo ' + it.veiculo + ': ' + d.erro, 'error');
+        if (salvos > 0) {
+          mkRefreshHomeUI_();
+          toast(salvos + ' de ' + n + ' salvos — corrija e complete o restante.', 'warning');
+        }
+        return;
+      }
 
-    // Adiciona IMEDIATAMENTE com started=false (aguardando botão Iniciar)
-    const rowIdx = rowIndexFromSalvar_(d);
-    const pagResp = d.pagamento || novaState.pagamento;
-    upsertSessaoPendenteLocal_({
-      rowIndex:        rowIdx,
-      id:              d.id,
-      tipo:            novaState.tipo,
-      plano:           novaState.plano,
-      veiculo:         novaState.veiculo,
-      pagamento:       pagResp,
-      observacao:      novaState.observacao || '',
-      mins:            d.mins            || cfgLocal.m,
-      valorPlano:      d.valorPlano      || cfgLocal.v,
-      adicionalPorMin: d.adicionalPorMin || cfgLocal.a,
-      responsavel:     resp,
-      crianca:         cri,
-      telefone:        tel,
-      horaInicio:      d.horaInicio,
-      data:            d.data,
-      startTimestamp:  0,
-      started:         false,
-      alertFired5:     false,
-      alertFiredExp:   false,
-      status:          d.status || 'Pendente'
-    });
+      const rowIdx = rowIndexFromSalvar_(d);
+      const pagResp = d.pagamento || novaState.pagamento;
+      ultimaMesmaConta = !!d.mesmaConta;
+      upsertSessaoPendenteLocal_({
+        rowIndex:        rowIdx,
+        id:              d.id,
+        tipo:            it.tipo,
+        plano:           it.plano,
+        veiculo:         it.veiculo,
+        pagamento:       pagResp,
+        observacao:      novaState.observacao || '',
+        mins:            d.mins            || cfgLocal.m,
+        valorPlano:      d.valorPlano      || cfgLocal.v,
+        adicionalPorMin: d.adicionalPorMin || cfgLocal.a,
+        responsavel:     resp,
+        crianca:         cri,
+        telefone:        tel,
+        horaInicio:      d.horaInicio,
+        data:            d.data,
+        startTimestamp:  0,
+        started:         false,
+        alertFired5:     false,
+        alertFiredExp:   false,
+        status:          d.status || 'Pendente'
+      });
+      salvos++;
+    }
+
     saveSessions();
-    salvarMesmaContaCtx_({
-      responsavel: resp,
-      telefone: tel,
-      pagamento: pagResp,
-      crianca: cri
-    });
     mkRefreshHomeUI_();
     resetNova();
     showPage('home');
-    const msgConta = d.mesmaConta
-      ? '✅ Cadastro salvo na mesma conta do responsável (mesmo telefone hoje). Aperte ▶ para iniciar.'
-      : '✅ Cadastro salvo! Aperte ▶ para iniciar a contagem.';
-    toast(msgConta, 'success');
+    const msg = n > 1
+      ? ('✅ ' + n + ' locações salvas na mesma conta! Aperte ▶ em cada card.')
+      : (ultimaMesmaConta
+        ? '✅ Cadastro salvo na mesma conta do responsável. Aperte ▶ para iniciar.'
+        : '✅ Cadastro salvo! Aperte ▶ para iniciar a contagem.');
+    toast(msg, 'success');
 
     if (typeof mkInvalidateInicioCache_ === 'function') mkInvalidateInicioCache_();
     if (typeof syncController === 'function') syncController(false, 6000);
@@ -850,7 +957,6 @@ window.atualizarVeiculoGrid = atualizarVeiculoGrid;
 window.confirmarLocacao = confirmarLocacao;
 window.confirmarLocacaoEEnviarSms_ = confirmarLocacaoEEnviarSms_;
 window.mkRefreshHomeUI_ = mkRefreshHomeUI_;
-window.abrirNovaMesmaContaFromHome_ = abrirNovaMesmaContaFromHome_;
-window.dismissMesmaContaCta_ = dismissMesmaContaCta_;
-window.abrirNovaMesmaConta_ = abrirNovaMesmaConta_;
+window.removerItemNova_ = removerItemNova_;
+window.novaAddOutroVeiculo_ = novaAddOutroVeiculo_;
 

@@ -77,9 +77,7 @@ function showPage(name, opts = {}) {
   syncSidebar(name);
   if (name === 'lancamento') resetAvulsoForm_();
   if (name==='nova') {
-    if (opts.mesmaConta) {
-      atualizarVeiculoGrid();
-    } else if (opts.freshNova) {
+    if (opts.freshNova) {
       limparNovaDraft_();
       resetNova({ preserveDraft: true });
       atualizarVeiculoGrid();
@@ -101,7 +99,6 @@ function showPage(name, opts = {}) {
       if (typeof renderCards === 'function') renderCards();
       if (typeof updateStats === 'function') updateStats();
       if (typeof atualizarVeiculoGrid === 'function') atualizarVeiculoGrid();
-      if (typeof renderHomeMesmaContaCta_ === 'function') renderHomeMesmaContaCta_();
     }
   }
   if (name==='relacionamento') carregarRelacionamento();

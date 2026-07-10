@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Movi Kids">
 <title>Movi Kids</title>
-<script src="mk-canonical-host.js?v=1.9.27"></script>
+<script src="mk-canonical-host.js?v=1.9.28"></script>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png">
@@ -17,17 +17,17 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<script src="mk-stale-sync.js?v=1.9.27"></script>
-<script src="mk-version.js?v=1.9.27"></script>
-<script src="mk-api.js?v=1.9.27"></script>
-<link rel="stylesheet" href="mk-design.css?v=1.9.27">
+<script src="mk-stale-sync.js?v=1.9.28"></script>
+<script src="mk-version.js?v=1.9.28"></script>
+<script src="mk-api.js?v=1.9.28"></script>
+<link rel="stylesheet" href="mk-design.css?v=1.9.28">
 
-<script src="mk-cache-bust.js?v=1.9.27"></script>
+<script src="mk-cache-bust.js?v=1.9.28"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<link rel="stylesheet" href="mk-app.css?v=1.9.27">
-<link rel="stylesheet" href="mk-gestao-pessoas.css?v=1.9.27">
+<link rel="stylesheet" href="mk-app.css?v=1.9.28">
+<link rel="stylesheet" href="mk-gestao-pessoas.css?v=1.9.28">
 <!-- Firebase SDK — Realtime sync canonico para todos os dispositivos -->
-<script type="module" src="mk-firebase.js?v=1.9.27"></script>
+<script type="module" src="mk-firebase.js?v=1.9.28"></script>
 </head>
 
 <body>
@@ -329,17 +329,6 @@
         <a class="mk-qr-balcao-btn mk-qr-balcao-btn--sec" href="acompanhar.html" target="_blank" rel="noopener">Abrir portal</a>
       </div>
     </div>
-    <div id="home-mesma-conta-cta" class="mk-mesma-conta-cta" hidden>
-      <div class="mk-mesma-conta-cta-inner">
-        <span class="mk-mesma-conta-cta-ico" aria-hidden="true">🚗+</span>
-        <div class="mk-mesma-conta-cta-copy">
-          <strong class="mk-mesma-conta-cta-title">Mesma família — outro veículo</strong>
-          <span class="mk-mesma-conta-cta-text" id="home-mesma-conta-text">Pagamento único na maquininha</span>
-        </div>
-        <button type="button" class="btn btn-primary mk-mesma-conta-cta-btn" onclick="abrirNovaMesmaContaFromHome_()">+ Outro carro</button>
-        <button type="button" class="mk-mesma-conta-cta-dismiss" onclick="dismissMesmaContaCta_()" aria-label="Dispensar">✕</button>
-      </div>
-    </div>
     <div id="admin-home-chip" class="mk-admin-chip" hidden>
       <span>Caixa hoje: <strong id="admin-chip-fat">—</strong></span>
       <button type="button" class="mk-admin-chip-btn" onclick="if(typeof irAdmin==='function')irAdmin('caixa');else{showPage('caixa');if(typeof carregarCaixa==='function')carregarCaixa();}">→ Caixa</button>
@@ -353,11 +342,6 @@
   <div id="page-nova" class="page">
 
     <div id="nova-summary-bar" class="nova-summary-bar" aria-live="polite"></div>
-
-    <div id="nova-mesma-conta-banner" class="nova-mesma-conta-banner" hidden role="status">
-      <span class="nova-mesma-conta-badge">Mesma conta</span>
-      <p class="nova-mesma-conta-banner-text">Pagamento único na maquininha — escolha só o <strong>próximo veículo</strong> e a criança se for diferente.</p>
-    </div>
 
     <div class="steps">
       <div class="step-dot active" id="dot-0" title="O quê"></div>
@@ -433,10 +417,19 @@
         </div>
       </div>
       <div id="nova-plano-section" class="nova-plano-section">
-        <div class="nova-plano-hint" id="nova-plano-hint">↓ Escolha o plano para continuar</div>
+        <div class="nova-plano-hint" id="nova-plano-hint">↓ Escolha o plano — entra na locação automaticamente</div>
         <div class="sec-title" style="margin-top:0">Plano</div>
         <div class="plano-list" id="plano-list"></div>
       </div>
+      <div id="nova-itens-basket" class="nova-itens-basket" hidden>
+        <div class="sec-title" style="margin-top:14px">Veículos nesta locação</div>
+        <ul id="nova-itens-list" class="nova-itens-list" aria-live="polite"></ul>
+        <div id="nova-itens-total" class="nova-itens-total"></div>
+        <p class="nova-itens-hint">Um pagamento na maquininha · cada veículo vira um card na Home (▶ separado).</p>
+      </div>
+      <button type="button" class="btn btn-secondary" id="btn-nova-add-outro" style="display:none;margin-top:10px" onclick="novaAddOutroVeiculo_()">
+        + Adicionar outro veículo ou brinquedo
+      </button>
       <button type="button" class="btn btn-primary" id="btn-nova-continuar-quem" style="display:none;margin-top:12px" onclick="nextStep()">
         Continuar para Quem →
       </button>
@@ -481,12 +474,13 @@
 
     <!-- Passo 3: Fechar -->
     <div id="step-2" class="step-page">
-      <div class="sec-title">Fechar — pagamento</div>
-      <div id="nova-mesma-conta-pag-fixo" class="nova-mesma-conta-pag-fixo" hidden>
-        <span class="nova-mesma-conta-pag-label">Pagamento (mesma conta)</span>
-        <strong id="nova-mesma-conta-pag-val" class="nova-mesma-conta-pag-val">—</strong>
-        <p class="nova-mesma-conta-pag-hint">Um único débito/crédito/PIX na maquininha — o caixa soma cada veículo.</p>
+      <div id="nova-resumo-fechar" class="nova-resumo-fechar" hidden>
+        <div class="sec-title" style="margin-top:0">Resumo da locação</div>
+        <ul id="nova-resumo-list" class="nova-resumo-list"></ul>
+        <div id="nova-resumo-total" class="nova-resumo-total"></div>
+        <p class="nova-resumo-conta-hint">Mesma conta — <strong>1 cobrança</strong> na maquininha · <strong id="nova-resumo-n-cards">0</strong> cards na Home</p>
       </div>
+      <div class="sec-title">Fechar — pagamento</div>
       <div class="sec-title" id="nova-pag-grid-title">Forma de pagamento *</div>
       <div class="pag-grid" id="nova-pag-grid">
         <div class="pag-btn" id="pag-PIX" onclick="selPagamento(this,'PIX')">
@@ -2402,27 +2396,27 @@
   </div>
 </div>
 
-<script src="mk-globals.js?v=1.9.27"></script>
-<script src="mk-core.js?v=1.9.27"></script>
-<script src="mk-nav.js?v=1.9.27"></script>
-<script src="mk-admin.js?v=1.9.27"></script>
-<script src="mk-historico.js?v=1.9.27"></script>
-<script src="mk-custos-historico.js?v=1.9.27"></script>
-<script src="mk-sessao.js?v=1.9.27"></script>
-<script src="mk-home.js?v=1.9.27"></script>
-<script src="mk-meta-operador.js?v=1.9.27"></script>
-<script src="mk-custos.js?v=1.9.27"></script>
-<script src="mk-avulso.js?v=1.9.27"></script>
-<script src="mk-sync.js?v=1.9.27"></script>
-<script src="mk-nova.js?v=1.9.27"></script>
-<script src="mk-relacionamento.js?v=1.9.27"></script>
-<script src="mk-operacao.js?v=1.9.27"></script>
-<script src="mk-drawer.js?v=1.9.27"></script>
-<script src="mk-update.js?v=1.9.27"></script>
-<script src="mk-gestao-pessoas.js?v=1.9.27"></script>
-<script src="mk-holerite.js?v=1.9.27"></script>
-<script src="mk-gestao-pessoas-admin.js?v=1.9.27"></script>
-<script src="mk-auth.js?v=1.9.27"></script>
-<script src="mk-boot.js?v=1.9.27"></script>
+<script src="mk-globals.js?v=1.9.28"></script>
+<script src="mk-core.js?v=1.9.28"></script>
+<script src="mk-nav.js?v=1.9.28"></script>
+<script src="mk-admin.js?v=1.9.28"></script>
+<script src="mk-historico.js?v=1.9.28"></script>
+<script src="mk-custos-historico.js?v=1.9.28"></script>
+<script src="mk-sessao.js?v=1.9.28"></script>
+<script src="mk-home.js?v=1.9.28"></script>
+<script src="mk-meta-operador.js?v=1.9.28"></script>
+<script src="mk-custos.js?v=1.9.28"></script>
+<script src="mk-avulso.js?v=1.9.28"></script>
+<script src="mk-sync.js?v=1.9.28"></script>
+<script src="mk-nova.js?v=1.9.28"></script>
+<script src="mk-relacionamento.js?v=1.9.28"></script>
+<script src="mk-operacao.js?v=1.9.28"></script>
+<script src="mk-drawer.js?v=1.9.28"></script>
+<script src="mk-update.js?v=1.9.28"></script>
+<script src="mk-gestao-pessoas.js?v=1.9.28"></script>
+<script src="mk-holerite.js?v=1.9.28"></script>
+<script src="mk-gestao-pessoas-admin.js?v=1.9.28"></script>
+<script src="mk-auth.js?v=1.9.28"></script>
+<script src="mk-boot.js?v=1.9.28"></script>
 </body>
 </html>
