@@ -1799,8 +1799,8 @@ html,body{height:100%;background:var(--bg);color:var(--txt);overflow:hidden}
 .mk-cus-delta--down .mk-cus-delta-pct{background:rgba(46,125,50,.12);color:#2E7D32}
 .mk-cus-delta--flat .mk-cus-delta-pct{background:rgba(84,110,122,.12);color:var(--txt2)}
 .mk-cus-kpis{margin-bottom:14px}
-.mk-cus-meses-card{margin-bottom:14px;min-height:0}
-.mk-cus-chart-box--meses{min-height:96px;height:120px}
+.mk-cus-meses-card{margin-bottom:14px;min-height:0;padding:12px 14px}
+.mk-cus-chart-box--meses{min-height:150px;height:150px}
 .mk-cus-meses-card.is-empty .mk-cus-chart-box{opacity:.35}
 .mk-cus-nature{padding:14px 16px;margin-bottom:4px}
 .mk-cus-nature-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}

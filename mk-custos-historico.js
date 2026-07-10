@@ -373,7 +373,7 @@ function renderCusHistMesesChart_(rows) {
   const ano = new Date().getFullYear();
   if (noteEl) {
     noteEl.textContent = hasVal
-      ? (ano + ' · desde o 1º mês com gasto · barra escura = atual')
+      ? (ano + ' · 1º mês com gasto → atual')
       : ('ano ' + ano);
   }
 
@@ -388,16 +388,15 @@ function renderCusHistMesesChart_(rows) {
   if (!cv) return;
   if (chartCusMeses_) chartCusMeses_.destroy();
 
-  const n = rows.length;
-  const boxH = Math.max(96, Math.min(160, 48 + n * 36));
   const chartBox = wrap.querySelector('.mk-cus-chart-box--meses');
   if (chartBox) {
-    chartBox.style.height = boxH + 'px';
-    chartBox.style.minHeight = boxH + 'px';
+    chartBox.style.height = '150px';
+    chartBox.style.minHeight = '150px';
   }
 
   const vals = rows.map(function (r) { return r.valor; });
   const maxVal = Math.max.apply(null, vals.concat([1]));
+  const n = rows.length;
   const colors = rows.map(function (r) {
     return r.atual ? '#1565C0' : 'rgba(21, 101, 192, 0.55)';
   });
@@ -410,46 +409,46 @@ function renderCusHistMesesChart_(rows) {
         data: vals,
         backgroundColor: colors,
         hoverBackgroundColor: '#0D47A1',
-        borderRadius: 6,
-        maxBarThickness: 28,
-        barPercentage: 0.72,
-        categoryPercentage: 0.7
+        borderRadius: 8,
+        maxBarThickness: n <= 3 ? 56 : (n <= 6 ? 40 : 28),
+        categoryPercentage: n <= 3 ? 0.45 : 0.65,
+        barPercentage: 0.85
       }]
     },
     options: {
-      indexAxis: 'y',
       responsive: true,
       maintainAspectRatio: false,
-      layout: { padding: { right: 48 } },
+      layout: { padding: { top: 22, right: 8 } },
       plugins: {
         legend: { display: false },
         tooltip: {
           callbacks: {
-            label: function (ctx) {
-              const r = rows[ctx.dataIndex];
-              const tag = r && r.atual ? ' · mês atual' : '';
-              return cusHistR_(ctx.raw || 0) + tag;
-            }
+            title: function (items) {
+              const i = items && items[0] ? items[0].dataIndex : 0;
+              const r = rows[i];
+              return r ? (r.label + (r.atual ? ' (atual)' : '')) : '';
+            },
+            label: function (ctx) { return cusHistR_(ctx.raw || 0); }
           }
         }
       },
       scales: {
         x: {
+          grid: { display: false },
+          ticks: { font: { size: 12, weight: '800' }, color: '#455A64' }
+        },
+        y: {
           min: 0,
-          suggestedMax: maxVal * 1.08,
-          grid: { color: 'rgba(21,101,192,.08)' },
+          suggestedMax: maxVal * 1.2,
+          grid: { color: 'rgba(21,101,192,.08)', drawBorder: false },
           ticks: {
             callback: function (v) {
               if (v >= 1000) return 'R$' + (Math.round(v / 100) / 10) + 'k';
               return 'R$' + v;
             },
             font: { size: 10, weight: '700' },
-            maxTicksLimit: 5
+            maxTicksLimit: 4
           }
-        },
-        y: {
-          grid: { display: false },
-          ticks: { font: { size: 12, weight: '800' } }
         }
       }
     },
@@ -459,16 +458,17 @@ function renderCusHistMesesChart_(rows) {
         const meta = chart.getDatasetMeta(0);
         const ctx = chart.ctx;
         ctx.save();
-        ctx.font = '700 11px Nunito, sans-serif';
+        ctx.font = '800 11px Nunito, sans-serif';
         ctx.fillStyle = '#37474F';
-        ctx.textAlign = 'left';
-        ctx.textBaseline = 'middle';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'bottom';
         meta.data.forEach(function (bar, i) {
           const v = vals[i] || 0;
           if (v <= 0) return;
-          const x = bar.x + 6;
-          const y = bar.y;
-          ctx.fillText(cusHistR_(v), x, y);
+          const label = v >= 1000
+            ? ('R$ ' + (Math.round(v / 10) / 100).toFixed(2).replace('.', ',') + 'k')
+            : cusHistR_(v);
+          ctx.fillText(label, bar.x, bar.y - 4);
         });
         ctx.restore();
       }
@@ -480,7 +480,7 @@ async function buscarCustosMesesSerie_() {
   const range = cusHistMesesRange_();
   const cat = document.getElementById('cus-hist-cat-filter')?.value || '';
   const grp = document.getElementById('cus-hist-grupo-filter')?.value || '';
-  const cacheKey = 'mk_cus_meses_v2_' + range.ano + '_' + range.s + '_' + range.e + '_' + cat + '_' + grp;
+  const cacheKey = 'mk_cus_meses_v3_' + range.ano + '_' + range.s + '_' + range.e + '_' + cat + '_' + grp;
   const gen = ++cusHistMesesFetchGen_;
 
   try {
