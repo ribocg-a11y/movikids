@@ -383,6 +383,7 @@ function setStatus(online) {
 }
 
 function mkSyncDeferHeavy_() {
+  if (window._novaSavingInFlight) return true;
   if (window._kpiDashInFlight || window._kpiHubInFlight) return true;
   if (window._resumoDiaBgRefresh) return true;
   const heavy = ['page-dashboard', 'page-caixa', 'page-operadores', 'page-historico', 'page-custos-historico'];

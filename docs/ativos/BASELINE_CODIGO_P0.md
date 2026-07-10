@@ -21,7 +21,7 @@ Antes de editar qualquer arquivo P0: ler este doc + `MAPA_ERROS_FALHAS_BUGS.md` 
 | **API browser** | `mk-api.js` (`api`, `mkGuardEscritaBrowser_`, `MK_WRITE_ACTIONS`) | I15 — GET only |
 | **Auth / PIN** | `mk-auth.js`, gates `#mk-auth-gate`, `#gp-auth-gate` | I28, I47, I64 |
 | **Apps Script canônico** | `MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs` | Só sócio + Nova versão Web |
-| **Sync pesado** | `mk-sync.js` (controller principal), `carregarInicio` consumers | I20, I86 |
+| **Sync pesado** | `mk-sync.js` (controller principal), `carregarInicio` consumers | I20, I86 — exceção: 1 linha `_novaSavingInFlight` em `mkSyncDeferHeavy_` |
 | **Home cards ativos** | `mk-home.js` (`buildCard` timer ativo, `calcRemaining`) | I20 paridade |
 | **SW GAS bypass** | `sw.js` (não interceptar script.google.com) | I35 |
 
@@ -45,7 +45,7 @@ Antes de editar qualquer arquivo P0: ler este doc + `MAPA_ERROS_FALHAS_BUGS.md` 
 2. **1 veículo** → uma chamada `salvarLocacao` → card Pendente → ▶ inicia timer.
 3. **N veículos** → N× `salvarLocacao` sequencial (GAS prod v1.5.182) — mesma conta via I42 no GAS.
 4. Overlay salvamento: sempre some no `finally`; watchdog + dismiss se travar.
-5. `_novaSavingInFlight` + `_novaSaveGen` — mutex anti-duplicata (I32, I99).
+5. `_novaSavingInFlight` + `_novaSaveGen` — mutex anti-duplicata; sync defer durante save (mk-sync).
 
 ---
 
@@ -70,4 +70,4 @@ Antes de editar qualquer arquivo P0: ler este doc + `MAPA_ERROS_FALHAS_BUGS.md` 
 
 ## Referência commit baseline FE
 
-Branch `main` após **baseline-fe-v1.9.35** (10/07/2026): multi sequencial puro, overlay I99, batch OFF até ping, sem UI otimista.
+Branch `main` após **baseline-fe-v1.9.36** (10/07/2026): debounce draft/grid, sync defer no save, código morto removido.

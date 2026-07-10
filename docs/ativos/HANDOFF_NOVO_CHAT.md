@@ -1,6 +1,6 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 10/07/2026 · FE **v1.9.35** · GAS prod **v1.5.182** (sem batch) · **BASELINE P0** ativo  
+**Atualizado:** 10/07/2026 · FE **v1.9.36** · GAS prod **v1.5.182** · perf FE + baseline  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **Repo local:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`  
@@ -59,9 +59,9 @@ cursor "C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-mo
 
 | Camada | Versão | URL / evidência |
 |--------|--------|-----------------|
-| **Frontend** | **v1.9.35** | https://ribocg-a11y.github.io/movikids/?force=1.9.35 |
-| **Gestão Pessoas** | **v1.9.35** | `gestao-pessoas.html?force=1.9.35` |
-| **Service Worker** | **1.9.35** | `sw.js` |
+| **Frontend** | **v1.9.36** | https://ribocg-a11y.github.io/movikids/?force=1.9.36 |
+| **Gestão Pessoas** | **v1.9.36** | `gestao-pessoas.html?force=1.9.36` |
+| **Service Worker** | **1.9.36** | `sw.js` |
 | **Apps Script** | **v1.5.182** ping | **Sem Nova versão necessária** — multi = N×salvarLocacao |
 | **Baseline P0** | ✅ | `docs/ativos/BASELINE_CODIGO_P0.md` |
 | **PIN admin** | **1421** | Script Property `ADMIN_PIN` |

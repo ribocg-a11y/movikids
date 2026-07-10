@@ -17,6 +17,11 @@ let _novaSavingInFlight = false;
 let _novaSaveWatchdog = null;
 let _novaSaveDismissTimer = null;
 let _novaSaveGen = 0;
+let _novaDraftTimer = null;
+let _vcGridRaf = null;
+const NOVA_DRAFT_DEBOUNCE_MS = 350;
+const NOVA_SAVE_TIMEOUT_1_MS = 32000;
+const NOVA_SAVE_TIMEOUT_N_MS = 28000;
 var relacionamentoCache = [];
 
 function novaPageEl_() {
@@ -159,11 +164,13 @@ function novaHideSaving_() {
 
 function novaForceUnstickSave_(msg) {
   _novaSaveGen++;
-  _novaSavingInFlight = false;
+  novaSetSavingBusy_(false);
   novaHideSaving_();
   novaLimparOtimistas_();
   if (typeof mkRefreshHomeUI_ === 'function') mkRefreshHomeUI_();
-  if (typeof syncController === 'function') syncController(true, 800);
+  setTimeout(function() {
+    if (typeof syncController === 'function') syncController(false, 3000);
+  }, 500);
   toast(msg || 'Salvamento pode continuar na planilha. Atualizamos a Home — confira os cards.', 'warning');
 }
 
@@ -175,9 +182,12 @@ function mkWarmGasBatchFlag_() {
   if (typeof window._mkGasBatchOk === 'boolean') return;
   window._mkGasBatchOk = false;
   if (typeof api !== 'function') return;
-  api({ action: 'ping' }, 8000).then(function(p) {
-    window._mkGasBatchOk = !!(p && Array.isArray(p.postWriteActions) && p.postWriteActions.indexOf('salvarLocacoesMulti') >= 0);
-  }).catch(function() { window._mkGasBatchOk = false; });
+  setTimeout(function() {
+    if (typeof window._mkGasBatchOk === 'boolean' && window._mkGasBatchOk !== false) return;
+    api({ action: 'ping' }, 8000).then(function(p) {
+      window._mkGasBatchOk = !!(p && Array.isArray(p.postWriteActions) && p.postWriteActions.indexOf('salvarLocacoesMulti') >= 0);
+    }).catch(function() { window._mkGasBatchOk = false; });
+  }, 6000);
 }
 
 async function novaSalvarLoopSequencial_(itens, basePayload, observacao, saveGen) {
@@ -185,16 +195,10 @@ async function novaSalvarLoopSequencial_(itens, basePayload, observacao, saveGen
   let ultimaMesmaConta = false;
   for (let i = 0; i < n; i++) {
     novaShowSaving_(i, n, itens[i].veiculo);
-    const r = await novaSalvarItemSequencial_(itens[i], basePayload, observacao, i === 0 ? 32000 : 28000);
+    const r = await novaSalvarItemSequencial_(itens[i], basePayload, observacao, i === 0 ? NOVA_SAVE_TIMEOUT_1_MS : NOVA_SAVE_TIMEOUT_N_MS);
     if (saveGen !== _novaSaveGen) return null;
     ultimaMesmaConta = !!r.mesmaConta;
-    if (i === 0) {
-      mkRefreshHomeUI_();
-      resetNova();
-      showPage('home');
-    } else {
-      mkRefreshHomeUI_();
-    }
+    novaRefreshAposItemSalvo_(i);
   }
   return { ultimaMesmaConta: ultimaMesmaConta, salvos: n };
 }
@@ -370,7 +374,7 @@ function isNovaDirty_() {
   );
 }
 
-function salvarNovaDraft_() {
+function salvarNovaDraftNow_() {
   if (_restoringNovaDraft) return;
   if (!isNovaDirty_()) return;
   const c = novaDraftCampos_();
@@ -380,6 +384,19 @@ function salvarNovaDraft_() {
     updatedAt: Date.now()
   };
   try { localStorage.setItem(NOVA_DRAFT_KEY, JSON.stringify(draft)); } catch(e) {}
+}
+
+function salvarNovaDraft_() {
+  if (_novaDraftTimer) clearTimeout(_novaDraftTimer);
+  _novaDraftTimer = setTimeout(function() {
+    _novaDraftTimer = null;
+    salvarNovaDraftNow_();
+  }, NOVA_DRAFT_DEBOUNCE_MS);
+}
+
+function salvarNovaDraftFlush_() {
+  if (_novaDraftTimer) { clearTimeout(_novaDraftTimer); _novaDraftTimer = null; }
+  salvarNovaDraftNow_();
 }
 
 function limparNovaDraft_() {
@@ -690,7 +707,7 @@ function inicializarDraftNova_() {
       atualizarNovaSummaryBar_();
     }));
   });
-  window.addEventListener('beforeunload', salvarNovaDraft_);
+  window.addEventListener('beforeunload', salvarNovaDraftFlush_);
 }
 
 function abrirNovaLocacao() {
@@ -700,7 +717,7 @@ function abrirNovaLocacao() {
   resetNova({ preserveDraft: true });
   showPage('nova', { freshNova: true });
 }
-function atualizarVeiculoGrid() {
+function atualizarVeiculoGridCore_() {
   // Veículos em uso = sessions ativas com veiculo definido
   const emUso = {};
   sessions.forEach(s => {
@@ -760,6 +777,14 @@ function atualizarVeiculoGrid() {
     }
   });
   if (typeof novaMarcarCestaGrid_ === 'function') novaMarcarCestaGrid_();
+}
+
+function atualizarVeiculoGrid() {
+  if (_vcGridRaf) cancelAnimationFrame(_vcGridRaf);
+  _vcGridRaf = requestAnimationFrame(function() {
+    _vcGridRaf = null;
+    atualizarVeiculoGridCore_();
+  });
 }
 
 function destacarSecaoVeiculoNova_(tipo) {
@@ -920,41 +945,33 @@ function abrirNovaComResponsavel(resp, novaCrianca = false) {
   toast(novaCrianca ? 'Responsável selecionado. Cadastre a nova criança após escolher o plano.' : 'Responsável selecionado. Escolha o veículo e o plano.', '');
 }
 
+function novaPosSaveSync_() {
+  if (typeof mkInvalidateInicioCache_ === 'function') mkInvalidateInicioCache_();
+  setTimeout(function() {
+    if (typeof syncController === 'function') syncController(false, 4500);
+  }, 300);
+}
+
+function novaRefreshAposItemSalvo_(i) {
+  if (i === 0) {
+    mkRefreshHomeUI_();
+    resetNova();
+    showPage('home');
+  } else {
+    if (typeof renderCards === 'function') renderCards();
+    if (typeof atualizarVeiculoGrid === 'function') atualizarVeiculoGrid();
+  }
+}
+
+function novaSetSavingBusy_(busy) {
+  _novaSavingInFlight = !!busy;
+  window._novaSavingInFlight = _novaSavingInFlight;
+}
+
 function novaBuildItensBatchJson_(itens) {
   return JSON.stringify(itens.map(function(it) {
     return { tipo: it.tipo, plano: it.plano, veiculo: it.veiculo };
   }));
-}
-
-function novaAplicarOtimistaMulti_(itens, resp, cri, tel, pagamento, observacao) {
-  const stamp = Date.now();
-  itens.forEach(function(it, idx) {
-    const cfgLocal = novaCfgPlano_(it.tipo, it.plano) || {};
-    upsertSessaoPendenteLocal_({
-      rowIndex: 0,
-      id: 'opt-' + stamp + '-' + idx,
-      tipo: it.tipo,
-      plano: it.plano,
-      veiculo: it.veiculo,
-      pagamento: pagamento,
-      observacao: observacao || '',
-      mins: cfgLocal.m || 0,
-      valorPlano: cfgLocal.v || 0,
-      adicionalPorMin: cfgLocal.a || 1.00,
-      responsavel: resp,
-      crianca: cri,
-      telefone: tel,
-      horaInicio: '',
-      data: '',
-      startTimestamp: 0,
-      started: false,
-      alertFired5: false,
-      alertFiredExp: false,
-      status: 'Pendente',
-      _optimistic: true
-    });
-  });
-  saveSessions();
 }
 
 function novaLimparOtimistas_() {
@@ -1060,7 +1077,7 @@ async function confirmarLocacao() {
 
   if (btn) { btn.disabled = true; btn.textContent = 'Salvando…'; }
   const saveGen = ++_novaSaveGen;
-  _novaSavingInFlight = true;
+  novaSetSavingBusy_(true);
   aplicarStepNova_(2);
   novaShowSaving_(0, n, itens[0] && itens[0].veiculo, null);
 
@@ -1072,7 +1089,7 @@ async function confirmarLocacao() {
 
     if (n === 1) {
       novaShowSaving_(0, 1, itens[0].veiculo);
-      const r = await novaSalvarItemSequencial_(itens[0], basePayload, observacao, 32000);
+      const r = await novaSalvarItemSequencial_(itens[0], basePayload, observacao, NOVA_SAVE_TIMEOUT_1_MS);
       if (saveGen !== _novaSaveGen) return;
       ultimaMesmaConta = !!r.mesmaConta;
       salvos = 1;
@@ -1117,11 +1134,7 @@ async function confirmarLocacao() {
         ? '✅ Cadastro salvo na mesma conta do responsável. Aperte ▶ para iniciar.'
         : '✅ Cadastro salvo! Aperte ▶ para iniciar a contagem.');
     toast(msg, 'success');
-
-    if (typeof mkInvalidateInicioCache_ === 'function') mkInvalidateInicioCache_();
-    setTimeout(function() {
-      if (typeof syncController === 'function') syncController(false, 4000);
-    }, 200);
+    novaPosSaveSync_();
 
   } catch(e) {
     if (saveGen !== _novaSaveGen) return;
@@ -1135,7 +1148,7 @@ async function confirmarLocacao() {
   } finally {
     if (saveGen === _novaSaveGen) {
       novaHideSaving_();
-      _novaSavingInFlight = false;
+      novaSetSavingBusy_(false);
       if (btn) { btn.textContent = 'Só salvar cadastro (sem SMS agora)'; btn.disabled = false; }
       const b2 = document.getElementById('btn-confirmar-iniciar');
       if (b2) { b2.disabled = false; b2.textContent = '✓ Salvar e enviar SMS do portal'; }
