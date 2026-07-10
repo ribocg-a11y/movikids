@@ -141,18 +141,19 @@ function novaVoltarCesta_() {
   novaAtualizarSubModoUI_();
 }
 
-function novaShowSaving_(i, n, veiculo) {
+function novaShowSaving_(i, n, veiculo, modo) {
   const o = document.getElementById('nova-saving-overlay');
   const t = document.getElementById('nova-saving-title');
   const s = document.getElementById('nova-saving-sub');
   if (o) o.hidden = false;
   if (t) {
-    t.textContent = n > 1 ? ('Salvando ' + (i + 1) + ' de ' + n + '…') : 'Salvando locação…';
+    if (modo === 'batch' && n > 1) t.textContent = 'Salvando ' + n + ' veículos…';
+    else t.textContent = n > 1 ? ('Salvando ' + (i + 1) + ' de ' + n + '…') : 'Salvando locação…';
   }
   if (s) {
-    s.textContent = n > 1
-      ? ('Registrando ' + veiculo + ' na planilha (~15s cada).')
-      : 'Registrando na planilha. Aguarde.';
+    if (modo === 'batch') s.textContent = 'Uma operação na planilha (~15s).';
+    else if (n > 1) s.textContent = 'Registrando ' + veiculo + ' na planilha (~15s cada).';
+    else s.textContent = 'Registrando na planilha. Aguarde.';
   }
 }
 
@@ -852,6 +853,118 @@ function abrirNovaComResponsavel(resp, novaCrianca = false) {
   toast(novaCrianca ? 'Responsável selecionado. Cadastre a nova criança após escolher o plano.' : 'Responsável selecionado. Escolha o veículo e o plano.', '');
 }
 
+function novaBuildItensBatchJson_(itens) {
+  return JSON.stringify(itens.map(function(it) {
+    return { tipo: it.tipo, plano: it.plano, veiculo: it.veiculo };
+  }));
+}
+
+function novaAplicarOtimistaMulti_(itens, resp, cri, tel, pagamento, observacao) {
+  const stamp = Date.now();
+  itens.forEach(function(it, idx) {
+    const cfgLocal = novaCfgPlano_(it.tipo, it.plano) || {};
+    upsertSessaoPendenteLocal_({
+      rowIndex: 0,
+      id: 'opt-' + stamp + '-' + idx,
+      tipo: it.tipo,
+      plano: it.plano,
+      veiculo: it.veiculo,
+      pagamento: pagamento,
+      observacao: observacao || '',
+      mins: cfgLocal.m || 0,
+      valorPlano: cfgLocal.v || 0,
+      adicionalPorMin: cfgLocal.a || 1.00,
+      responsavel: resp,
+      crianca: cri,
+      telefone: tel,
+      horaInicio: '',
+      data: '',
+      startTimestamp: 0,
+      started: false,
+      alertFired5: false,
+      alertFiredExp: false,
+      status: 'Pendente',
+      _optimistic: true
+    });
+  });
+  saveSessions();
+}
+
+function novaLimparOtimistas_() {
+  const antes = sessions.length;
+  sessions = sessions.filter(function(s) { return !s._optimistic; });
+  if (sessions.length !== antes) saveSessions();
+}
+
+function novaAplicarBatchReal_(batchRes, observacaoFallback) {
+  (batchRes.locacoes || []).forEach(function(loc) {
+    upsertSessaoPendenteLocal_({
+      rowIndex: loc.rowIndex,
+      id: loc.id,
+      tipo: loc.tipo,
+      plano: loc.plano,
+      veiculo: loc.veiculo,
+      pagamento: loc.pagamento,
+      observacao: loc.observacao || observacaoFallback || '',
+      mins: loc.mins,
+      valorPlano: loc.valorPlano,
+      adicionalPorMin: loc.adicionalPorMin,
+      responsavel: loc.responsavel,
+      crianca: loc.crianca,
+      telefone: loc.telefone,
+      horaInicio: loc.horaInicio || '',
+      data: loc.data || '',
+      startTimestamp: 0,
+      started: false,
+      alertFired5: false,
+      alertFiredExp: false,
+      status: loc.status || 'Pendente'
+    });
+  });
+  saveSessions();
+}
+
+async function novaSalvarItemSequencial_(it, basePayload, observacao, timeoutMs) {
+  const cfgLocal = novaCfgPlano_(it.tipo, it.plano) || {};
+  const d = await api(Object.assign({
+    action: 'salvarLocacao',
+    tipo: it.tipo,
+    plano: it.plano,
+    veiculo: it.veiculo,
+    valorPlano: cfgLocal.v || 0,
+    mins: cfgLocal.m || 0,
+    adicionalPorMin: cfgLocal.a || 1.00
+  }, basePayload), timeoutMs || 18000);
+
+  if (!d.ok) throw Object.assign(new Error(d.erro || ('Erro ao salvar ' + it.veiculo)), { veiculo: it.veiculo, partial: true });
+
+  const rowIdx = rowIndexFromSalvar_(d);
+  upsertSessaoPendenteLocal_({
+    rowIndex: rowIdx,
+    id: d.id,
+    tipo: it.tipo,
+    plano: it.plano,
+    veiculo: it.veiculo,
+    pagamento: d.pagamento || basePayload.pagamento,
+    observacao: observacao || '',
+    mins: d.mins || cfgLocal.m,
+    valorPlano: d.valorPlano || cfgLocal.v,
+    adicionalPorMin: d.adicionalPorMin || cfgLocal.a,
+    responsavel: basePayload.responsavel,
+    crianca: basePayload.crianca,
+    telefone: basePayload.telefone,
+    horaInicio: d.horaInicio,
+    data: d.data,
+    startTimestamp: 0,
+    started: false,
+    alertFired5: false,
+    alertFiredExp: false,
+    status: d.status || 'Pendente'
+  });
+  saveSessions();
+  return { mesmaConta: !!d.mesmaConta };
+}
+
 async function confirmarLocacao() {
   if (_novaSavingInFlight) {
     toast('Aguarde: já estamos salvando esta locação.', 'info');
@@ -869,90 +982,75 @@ async function confirmarLocacao() {
 
   const btn = document.getElementById('btn-confirmar');
   const n = itens.length;
+  const observacao = novaState.observacao || '';
+  const basePayload = Object.assign({}, operadorApiParams_(), {
+    pagamento: novaState.pagamento,
+    observacao: observacao,
+    responsavel: resp,
+    crianca: cri,
+    telefone: tel
+  });
+
   if (btn) { btn.disabled = true; btn.textContent = 'Salvando…'; }
   _novaSavingInFlight = true;
   aplicarStepNova_(2);
-  novaShowSaving_(0, n, itens[0] && itens[0].veiculo);
+  novaShowSaving_(0, n, itens[0] && itens[0].veiculo, n > 1 ? 'batch' : null);
 
-  let salvos = 0;
   let ultimaMesmaConta = false;
-  let foiHome = false;
+  let salvos = 0;
 
   try {
-    for (let i = 0; i < itens.length; i++) {
-      const it = itens[i];
-      const cfgLocal = novaCfgPlano_(it.tipo, it.plano) || {};
-      novaShowSaving_(i, n, it.veiculo);
-
-      const d = await api({
-        action: 'salvarLocacao',
-        ...operadorApiParams_(),
-        tipo:         it.tipo,
-        plano:        it.plano,
-        veiculo:      it.veiculo,
-        pagamento:    novaState.pagamento,
-        observacao:   novaState.observacao || '',
-        responsavel:  resp,
-        crianca:      cri,
-        telefone:     tel,
-        valorPlano:      cfgLocal.v || 0,
-        mins:            cfgLocal.m || 0,
-        adicionalPorMin: cfgLocal.a || 1.00
-      }, i === 0 ? 18000 : 14000);
-
-      if (!d.ok) {
-        toast('Erro no veículo ' + it.veiculo + ': ' + d.erro, 'error');
-        if (salvos > 0) {
-          mkRefreshHomeUI_();
-          toast(salvos + ' de ' + n + ' salvos — corrija e complete o restante.', 'warning');
-        }
-        return;
-      }
-
-      const rowIdx = rowIndexFromSalvar_(d);
-      const pagResp = d.pagamento || novaState.pagamento;
-      ultimaMesmaConta = !!d.mesmaConta;
-      upsertSessaoPendenteLocal_({
-        rowIndex:        rowIdx,
-        id:              d.id,
-        tipo:            it.tipo,
-        plano:           it.plano,
-        veiculo:         it.veiculo,
-        pagamento:       pagResp,
-        observacao:      novaState.observacao || '',
-        mins:            d.mins            || cfgLocal.m,
-        valorPlano:      d.valorPlano      || cfgLocal.v,
-        adicionalPorMin: d.adicionalPorMin || cfgLocal.a,
-        responsavel:     resp,
-        crianca:         cri,
-        telefone:        tel,
-        horaInicio:      d.horaInicio,
-        data:            d.data,
-        startTimestamp:  0,
-        started:         false,
-        alertFired5:     false,
-        alertFiredExp:   false,
-        status:          d.status || 'Pendente'
-      });
-      salvos++;
-      saveSessions();
-
-      if (n > 1 && i === 0 && !foiHome) {
-        mkRefreshHomeUI_();
-        resetNova();
-        showPage('home');
-        foiHome = true;
-      }
-    }
-
-    if (!foiHome) {
+    if (n > 1) {
+      novaAplicarOtimistaMulti_(itens, resp, cri, tel, novaState.pagamento, observacao);
       mkRefreshHomeUI_();
       resetNova();
       showPage('home');
+      novaShowSaving_(0, n, itens.map(function(it) { return it.veiculo; }).join(', '), 'batch');
+
+      let batchRes = null;
+      try {
+        batchRes = await api(Object.assign({
+          action: 'salvarLocacoesMulti',
+          itens: novaBuildItensBatchJson_(itens)
+        }, basePayload), 28000);
+      } catch (batchErr) {
+        batchRes = null;
+      }
+
+      if (batchRes && batchRes.ok && batchRes.batch && Array.isArray(batchRes.locacoes)) {
+        novaLimparOtimistas_();
+        novaAplicarBatchReal_(batchRes, observacao);
+        salvos = n;
+      } else {
+        novaLimparOtimistas_();
+        mkRefreshHomeUI_();
+        toast('Salvando um por um (atualize o GAS para acelerar)…', 'info');
+
+        for (let i = 0; i < itens.length; i++) {
+          novaShowSaving_(i, n, itens[i].veiculo);
+          try {
+            const r = await novaSalvarItemSequencial_(itens[i], basePayload, observacao, i === 0 ? 18000 : 14000);
+            ultimaMesmaConta = !!r.mesmaConta;
+            salvos++;
+            mkRefreshHomeUI_();
+          } catch (seqErr) {
+            toast('Erro no veículo ' + (seqErr.veiculo || itens[i].veiculo) + ': ' + seqErr.message, 'error');
+            if (salvos > 0) toast(salvos + ' de ' + n + ' salvos — complete o restante.', 'warning');
+            return;
+          }
+        }
+      }
     } else {
+      novaShowSaving_(0, 1, itens[0].veiculo);
+      const r = await novaSalvarItemSequencial_(itens[0], basePayload, observacao, 18000);
+      ultimaMesmaConta = !!r.mesmaConta;
+      salvos = 1;
       mkRefreshHomeUI_();
       resetNova();
+      showPage('home');
     }
+
+    mkRefreshHomeUI_();
     const msg = n > 1
       ? ('✅ ' + n + ' locações salvas na mesma conta! Aperte ▶ em cada card.')
       : (ultimaMesmaConta
@@ -966,6 +1064,8 @@ async function confirmarLocacao() {
     }, 200);
 
   } catch(e) {
+    novaLimparOtimistas_();
+    mkRefreshHomeUI_();
     toast((e && e.message) ? e.message : 'Erro de conexão. Tente novamente.', 'error');
   } finally {
     novaHideSaving_();

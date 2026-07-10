@@ -28,7 +28,7 @@ async function resolveGasUrl_() {
 }
 
 const MK_WRITE_ACTIONS = new Set([
-  'salvarLocacao', 'editarLocacao', 'cancelarLocacao', 'encerrarLocacao', 'estenderLocacao'
+  'salvarLocacao', 'salvarLocacoesMulti', 'editarLocacao', 'cancelarLocacao', 'encerrarLocacao', 'estenderLocacao'
 ]);
 
 /** Pacote J (T1): bloqueia POST no browser para escritas criticas — incidente P0 05/06/2026. */

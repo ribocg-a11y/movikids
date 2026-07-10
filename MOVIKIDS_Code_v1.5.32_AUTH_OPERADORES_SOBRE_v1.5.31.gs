@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.183
+// MOVI KIDS — Google Apps Script v1.5.186
+// v1.5.186: I98 — salvarLocacoesMulti (N veículos, 1 lock, 1 round-trip)
 // v1.5.183: I88 — porSemana dashboard: semanas segunda–domingo (não blocos 1–7 fixos)
 // v1.5.182: I87 — histórico custos admin (listarCustosHistorico + listarPlanoContas)
 // v1.5.181: I85 — extras pagamento obrigatório + cancelamento justificado + caixa PIX/créd/déb/din
@@ -473,7 +474,7 @@ function ctoMinimo_(mes) {
 
 // ── ROTEADOR (Pacote E: POST + operador em escritas criticas) ──
 const WRITE_ACTIONS_CRITICAS_ = [
-  'salvarLocacao', 'editarLocacao', 'cancelarLocacao', 'encerrarLocacao', 'estenderLocacao'
+  'salvarLocacao', 'salvarLocacoesMulti', 'editarLocacao', 'cancelarLocacao', 'encerrarLocacao', 'estenderLocacao'
 ];
 
 function parseRequestParams_(e) {
@@ -512,6 +513,7 @@ function dispatchMoviAction_(p, method) {
       case 'diagnosticoSistema':  return diagnosticoSistema_();
       case 'validarSchema':       return validarSchema_();
       case 'salvarLocacao':       return salvarLocacao_(p);
+      case 'salvarLocacoesMulti': return salvarLocacoesMulti_(p);
       case 'editarLocacao':       return editarLocacao_(p);
       case 'cancelarLocacao':     return cancelarLocacao_(p);
       case 'listarAtivas':        return listarAtivas_();
@@ -3490,6 +3492,108 @@ function salvarLocacao_(p) {
     startTimestamp:  0,
     status:          'Pendente'
   });
+  } finally { lockS.releaseLock(); }
+}
+
+/** I98 — multi-veículo: 1 lock + 1 findContaMestre (evita N round-trips). */
+function salvarLocacoesMulti_(p) {
+  const lockS = LockService.getScriptLock();
+  try { lockS.waitLock(12000); } catch (ex) { return err_('Sistema ocupado, tente novamente.', 503); }
+  try {
+    let itensRaw = p.itens;
+    if (typeof itensRaw === 'string') {
+      try { itensRaw = JSON.parse(itensRaw); } catch (e) { return err_('itens JSON invalido', 400); }
+    }
+    if (!Array.isArray(itensRaw) || itensRaw.length < 1) return err_('itens obrigatorio', 400);
+    if (itensRaw.length > 8) return err_('Maximo 8 veiculos por cadastro', 400);
+
+    const responsavel = String(p.responsavel || '').trim();
+    const crianca     = String(p.crianca || '').trim();
+    const telefone    = String(p.telefone || '').trim();
+    const pagamento   = normalizarPagamento_(String(p.pagamento || '').trim());
+    const observacao  = String(p.observacao || '').trim();
+    if (!responsavel || !crianca || !telefone) return err_('responsavel, crianca, telefone obrigatorios', 400);
+    if (!pagamento) return err_('pagamento obrigatorio', 400);
+
+    const precosOp = precosOp_();
+    const veiculosOp = veiculosOp_();
+    const agora = new Date();
+    const dataFmt = fmtData_(agora);
+    const sheet = sh_(SH_LOC);
+    const mestrePre = findContaMestreParaNovaLoc_(telefone, dataFmt, agora);
+    let pagFinal = pagamento;
+    if (mestrePre && mestrePre.pagamento) pagFinal = mestrePre.pagamento;
+
+    const locacoes = [];
+    let firstNewMasterId = null;
+    const veiculosVistos = {};
+
+    for (let i = 0; i < itensRaw.length; i++) {
+      const item = itensRaw[i];
+      const tipo = String(item.tipo || '').trim();
+      const plano = String(item.plano || '').trim();
+      const veiculo = String(item.veiculo || '').trim();
+      if (!tipo || !plano) return err_('Item ' + (i + 1) + ': tipo e plano obrigatorios', 400);
+      if (!precosOp[tipo] || !precosOp[tipo][plano]) return err_('Plano invalido item ' + (i + 1), 400);
+      if (veiculo && veiculosOp.indexOf(veiculo) < 0) return err_('Veiculo invalido: ' + veiculo, 400);
+      if (veiculo && veiculosVistos[veiculo]) return err_('Veiculo duplicado: ' + veiculo, 400);
+      if (veiculo) veiculosVistos[veiculo] = true;
+
+      const config = precosOp[tipo][plano];
+      const id = nextId_(sheet);
+      const row = [
+        id, dataFmt, '', '', tipo, plano, config.mins, config.valor, 0, 0, config.valor,
+        responsavel, crianca, telefone, 'Pendente', veiculo, pagFinal, observacao
+      ];
+      sheet.appendRow(row);
+      const newRow = sheet.getLastRow();
+
+      let contaId = id;
+      if (mestrePre && mestrePre.masterId) {
+        contaId = mestrePre.masterId;
+      } else if (firstNewMasterId) {
+        contaId = firstNewMasterId;
+      } else {
+        firstNewMasterId = id;
+      }
+
+      sheet.getRange(newRow, COL_CONTA_ID_).setValue(contaId);
+      sheet.getRange(newRow, 17).setValue(pagFinal);
+      sheet.getRange(newRow, 25).setValue(0);
+
+      const newRowData = sheet.getRange(newRow, 1, 1, COL_LOC_READ_).getValues()[0];
+      registrarAuditoriaLocacao_(newRow, 'salvarLocacao', {}, locacaoObj_(newRowData, newRow), 'Cadastro multi I98', operadorAudit_(p));
+      firebaseSyncSessao_(newRow, fbDadosSessao_(newRowData, 'Pendente', newRow));
+      sheet.getRange(newRow, 8).setNumberFormat('"R$" #,##0.00');
+      sheet.getRange(newRow, 10).setNumberFormat('"R$" #,##0.00');
+      sheet.getRange(newRow, 11).setNumberFormat('"R$" #,##0.00');
+
+      const mesmaConta = !!(mestrePre && mestrePre.masterId && mestrePre.masterId !== id) || i > 0;
+      locacoes.push({
+        id: id,
+        rowIndex: newRow,
+        tipo: tipo,
+        plano: plano,
+        veiculo: veiculo,
+        pagamento: pagFinal,
+        observacao: observacao,
+        contaId: contaId,
+        mesmaConta: mesmaConta,
+        mins: config.mins,
+        valorPlano: config.valor,
+        adicionalPorMin: config.adicional,
+        responsavel: responsavel,
+        crianca: crianca,
+        telefone: telefone,
+        horaInicio: '',
+        data: dataFmt,
+        startTimestamp: 0,
+        status: 'Pendente'
+      });
+    }
+
+    try { invalidateInicioResumoCache_(dataFmt); } catch (e) {}
+    return resp_({ ok: true, batch: true, n: locacoes.length, locacoes: locacoes });
   } finally { lockS.releaseLock(); }
 }
 
