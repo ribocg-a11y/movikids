@@ -16,7 +16,6 @@ let _novaRelSearchTimer = null;
 let _novaSavingInFlight = false;
 let _novaSaveWatchdog = null;
 let _novaSaveDismissTimer = null;
-let _mkGasBatchOk = null;
 let _novaSaveGen = 0;
 var relacionamentoCache = [];
 

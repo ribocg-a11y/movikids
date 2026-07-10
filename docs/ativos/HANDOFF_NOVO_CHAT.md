@@ -59,11 +59,11 @@ cursor "C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-mo
 
 | Camada | Versão | URL / evidência |
 |--------|--------|-----------------|
-| **Frontend** | **v1.9.34** | https://ribocg-a11y.github.io/movikids/?force=1.9.34 |
-| **Gestão Pessoas** | **v1.9.34** | `gestao-pessoas.html?force=1.9.34` |
-| **Service Worker** | **1.9.34** | `sw.js` |
-| **Apps Script** | **v1.5.187** repo · **v1.5.182** ping | Nova versão Web pendente (batch multi I98) |
-| **Multi-veículo** | I97–I99 | Cadastro cesta · overlay fix · batch após GAS novo |
+| **Frontend** | **v1.9.35** | https://ribocg-a11y.github.io/movikids/?force=1.9.35 |
+| **Gestão Pessoas** | **v1.9.35** | `gestao-pessoas.html?force=1.9.35` |
+| **Service Worker** | **1.9.35** | `sw.js` |
+| **Apps Script** | **v1.5.182** ping | **Sem Nova versão necessária** — multi = N×salvarLocacao |
+| **Baseline P0** | ✅ | `docs/ativos/BASELINE_CODIGO_P0.md` |
 | **PIN admin** | **1421** | Script Property `ADMIN_PIN` |
 | **Homolog tablet** | ✅ 23/06 | I43 · I42 · I47 · Gestor — smoke **v1.9.9** pendente Ops |
 | **Planilha** | 23 abas | `schemaOk=True` · auditoria **23/23** |
