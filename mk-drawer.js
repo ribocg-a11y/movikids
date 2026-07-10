@@ -408,7 +408,8 @@ async function confirmarEncerrar() {
     fecharSessaoDrawer();
     fecharAlerta();
     // Invalida cache para outros dispositivos verem encerramento imediatamente
-    try { localStorage.removeItem('mk_inicio_cache'); } catch(e) {}
+    if (typeof mkInvalidateInicioCache_ === 'function') mkInvalidateInicioCache_();
+    else try { localStorage.removeItem('mk_inicio_cache_v2'); localStorage.removeItem('mk_inicio_cache'); } catch (e) {}
 
     // Atualiza encHoje localmente SEM esperar servidor (UX imediato)
     const agora = new Date();

@@ -151,7 +151,8 @@ function adminTeardownUI_() {
   const chipEl = document.getElementById('admin-home-chip');
   if (chipEl) chipEl.hidden = true;
   if (typeof showAdminHomeKpis === 'function') showAdminHomeKpis(null);
-  try { localStorage.removeItem('mk_inicio_cache'); } catch (e) {}
+  if (typeof mkInvalidateInicioCache_ === 'function') mkInvalidateInicioCache_();
+  else try { localStorage.removeItem('mk_inicio_cache_v2'); localStorage.removeItem('mk_inicio_cache'); } catch (e) {}
   try { localStorage.removeItem('mk_admin_ui_persist'); } catch (e) {}
 }
 window.adminTeardownUI_ = adminTeardownUI_;

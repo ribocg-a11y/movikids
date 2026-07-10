@@ -31,6 +31,33 @@ const _BACKOFF_MAX  = 60000;
 let _lastFailAt     = 0;
 let _syncSafetyTimer = null;
 const _IDLE_MS      = 5 * 60 * 1000;
+const MK_INICIO_CACHE_KEY = 'mk_inicio_cache_v2';
+const MK_INICIO_CACHE_LEGACY = 'mk_inicio_cache';
+
+/** I89 — invalida cache carregarInicio (v2 + legado). Chamar após ▶, nova loc, cancel, encerrar. */
+function mkInvalidateInicioCache_() {
+  try { localStorage.removeItem(MK_INICIO_CACHE_KEY); } catch (e) { /* ignore */ }
+  try { localStorage.removeItem(MK_INICIO_CACHE_LEGACY); } catch (e) { /* ignore */ }
+}
+
+/** I89 — local já iniciou ▶ mas cache/servidor ainda Pendente (race). */
+function mkLocalAheadOfServerInicio_(data) {
+  try {
+    const stored = JSON.parse(localStorage.getItem('mk_sessions') || '[]');
+    if (!stored.length || !data || !Array.isArray(data.ativos)) return false;
+    const serverMap = {};
+    data.ativos.forEach(function (a) { serverMap[a.rowIndex] = a; });
+    return stored.some(function (loc) {
+      if (loc._iniciandoTimer) return true;
+      const localTs = Number(loc._localTimerStart || loc.startTimestamp || 0);
+      if (loc.status !== 'Ativa' || localTs < 1e12) return false;
+      const srv = serverMap[loc.rowIndex];
+      if (!srv) return false;
+      if (srv.status === 'Ativa' && Number(srv.startTimestamp) >= 1e12) return false;
+      return Date.now() - localTs < 180000;
+    });
+  } catch (e) { return false; }
+}
 
 function syncController(force = false, delayMs = 0) {
   if (delayMs > 0) {
@@ -67,7 +94,7 @@ async function sincronizarServidor(force = false) {
   }, 35000);
 
   try {
-    const CACHE_KEY = 'mk_inicio_cache_v2';
+    const CACHE_KEY = MK_INICIO_CACHE_KEY;
     const CACHE_TTL = 30000;
     const STALE_MAX = 120000;
 
@@ -78,6 +105,11 @@ async function sincronizarServidor(force = false) {
           const { data, ts } = JSON.parse(raw);
           const age = Date.now() - ts;
           if (data && data.ok && age < STALE_MAX) {
+            if (mkLocalAheadOfServerInicio_(data)) {
+              _syncInFlight = false;
+              mkSyncRefreshInicioBg_();
+              return;
+            }
             aplicarDadosInicio(data);
             setStatus(true);
             _lastSyncAt = Math.max(_lastSyncAt, ts);
@@ -160,6 +192,15 @@ function mergeSessaoCanonica(serverSession, localSession = {}) {
       isAtiva = true;
       startTimestamp = Number(localSession._localTimerStart || localSession.startTimestamp || 0);
     }
+  }
+
+  // I89: cache stale pode trazer Pendente logo após ▶ confirmado localmente
+  const localTsGuard = Number(localSession._localTimerStart || localSession.startTimestamp || 0);
+  if (!isAtiva && status === 'Pendente' && localTsGuard >= 1e12
+      && localSession.status === 'Ativa' && Date.now() - localTsGuard < 180000) {
+    status = 'Ativa';
+    isAtiva = true;
+    startTimestamp = localTsGuard;
   }
 
   // I43: GAS carregarInicio (v1.5.131–135) podia devolver Ativa sem col Y → preservar ts local
@@ -404,6 +445,7 @@ window.sincronizarServidor = sincronizarServidor;
 window.setStatus = setStatus;
 window.mkSyncAgeSuffix_ = mkSyncAgeSuffix_;
 window.mkSyncRefreshAgeLabels_ = mkSyncRefreshAgeLabels_;
+window.mkInvalidateInicioCache_ = mkInvalidateInicioCache_;
 
 function mkSyncRefreshInicioBg_() {
   if (window._mkInicioBgRefresh) return;

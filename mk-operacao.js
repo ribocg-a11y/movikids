@@ -301,6 +301,7 @@ async function salvarOperacaoLocacao() {
       if (idx >= 0) sessions[idx] = Object.assign({}, sessions[idx], d.locacao || {});
     }
     saveSessions(); renderCards(); updateStats(); atualizarVeiculoGrid();
+    if (typeof mkInvalidateInicioCache_ === 'function') mkInvalidateInicioCache_();
     fecharSessaoDrawer();
     toast(opTipo === 'cancelar' ? 'Locacao cancelada com auditoria.' : 'Alteracao salva e sincronizada.', 'success');
     broadcastInvalidate(); syncController(true, 400);
@@ -614,7 +615,8 @@ async function iniciarContagem(rowIndex, opts) {
   }
 
   const clickTs = Date.now();
-  try { localStorage.removeItem('mk_inicio_cache'); } catch(e) {}
+  if (typeof mkInvalidateInicioCache_ === 'function') mkInvalidateInicioCache_();
+  else try { localStorage.removeItem('mk_inicio_cache_v2'); localStorage.removeItem('mk_inicio_cache'); } catch (e) {}
 
   // I20: início otimista no clique — cronômetro não perde segundos na latência da API
   s._localTimerStart = clickTs;

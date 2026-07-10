@@ -608,7 +608,8 @@ async function confirmarLocacao() {
     toast(msgConta, 'success');
 
     // Invalida cache local para sync imediato em outros dispositivos
-    try { localStorage.removeItem('mk_inicio_cache'); } catch(e) {}
+    if (typeof mkInvalidateInicioCache_ === 'function') mkInvalidateInicioCache_();
+    else try { localStorage.removeItem('mk_inicio_cache_v2'); localStorage.removeItem('mk_inicio_cache'); } catch (e) {}
     try { if(window._bc) window._bc.postMessage('sync'); } catch(e) {}
     // MSG 1: disparada pelo operador no modal de boas-vindas (antes de iniciar contagem)
 
@@ -692,7 +693,8 @@ async function confirmarLocacaoEEnviarSmsLegado_() {
     saveSessions();
     limparNovaDraft_();
     resetNova();
-    try { localStorage.removeItem('mk_inicio_cache'); } catch (e) {}
+    if (typeof mkInvalidateInicioCache_ === 'function') mkInvalidateInicioCache_();
+    else try { localStorage.removeItem('mk_inicio_cache_v2'); localStorage.removeItem('mk_inicio_cache'); } catch (e) {}
     broadcastInvalidate();
     syncController(true, 800);
     showPage('home');
