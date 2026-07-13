@@ -1,10 +1,10 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 10/07/2026 · FE **v1.9.39** · GAS **v1.5.187** (ping alinhado · batch `salvarLocacoesMulti`)  
+**Atualizado:** 13/07/2026 · FE **v1.9.46** · GAS **v1.5.187** (ping alinhado · batch `salvarLocacoesMulti`)  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **Repo local:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`  
-**GitHub:** `ribocg-a11y/movikids` · branch `main` · commit **5ec4ab6** (docs atualize tudo · I103)
+**GitHub:** `ribocg-a11y/movikids` · branch `main` · commit **f0002fc** (I104 conferência POS · v1.9.46)
 
 **Mensagem mínima no novo chat:**
 
@@ -55,13 +55,13 @@ cursor "C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-mo
 
 ---
 
-## Produção (10/07/2026)
+## Produção (13/07/2026)
 
 | Camada | Versão | URL / evidência |
 |--------|--------|-----------------|
-| **Frontend** | **v1.9.39** | https://ribocg-a11y.github.io/movikids/?force=1.9.39 |
-| **Gestão Pessoas** | **v1.9.39** | `gestao-pessoas.html?force=1.9.39` |
-| **Service Worker** | **1.9.39** | `sw.js` |
+| **Frontend** | **v1.9.46** | https://ribocg-a11y.github.io/movikids/?force=1.9.46 |
+| **Gestão Pessoas** | **v1.9.46** | `gestao-pessoas.html?force=1.9.46` |
+| **Service Worker** | **1.9.46** | `sw.js` |
 | **Apps Script** | **v1.5.187** | ping `salvarLocacoesMulti` · **Nova versão Web** publicada |
 | **Baseline P0** | ✅ | `docs/ativos/BASELINE_CODIGO_P0.md` |
 | **PIN admin** | **1421** | Script Property `ADMIN_PIN` |
@@ -75,6 +75,7 @@ cursor "C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-mo
 | **Design System** | **v1.1** | `DESIGN_SYSTEM_MOVIKIDS.md` |
 | **Multi-veículo** | ✅ I97–I99 | Cesta Nova locação · batch GAS · overlay watchdog |
 | **I103 contagem** | ✅ v1.9.39 | Encerradas = contas únicas · Caixa = todas locações |
+| **I104 conferência POS** | ✅ v1.9.46 | Caixa: contas no cartão (não locações) vs vendas maquininha |
 
 **Deploy ID GAS:** `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y`
 
