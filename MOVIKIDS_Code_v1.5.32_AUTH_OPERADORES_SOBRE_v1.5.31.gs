@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.168
+// MOVI KIDS — Google Apps Script v1.5.169
+// v1.5.169: I104 — caixa porPagamento por locação (conferência maquininha)
 // v1.5.168: I70 — MK_GAS_VERSAO_ unificada (ping/carregarInicio/validarSchema); repair FOLHA_PONTO OK sem horario
 // v1.5.167: I67b — ajustarFolhaVtAdmin (B9=8,80 B10/B12=22 via Web App)
 // v1.5.166: I67 — VT passes: B9 ida+volta/dia (sem ×2); B10 dias VT (nao B12 VA)
@@ -161,7 +162,7 @@
 
 // ── CONSTANTES ───────────────────────────────────────────────
 /** Versão exposta em ping, carregarInicio, validarSchema, gestaoPessoasStatus (bump com header). */
-const MK_GAS_VERSAO_  = 'v1.5.168';
+const MK_GAS_VERSAO_  = 'v1.5.169';
 const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.168';
 const SHEET_ID   = '1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618';
 const DEPLOY_ID  = 'AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y';
@@ -3300,7 +3301,7 @@ function contaKeyLocObj_(l) {
   return Number(l.contaId) || Number(l.id) || 0;
 }
 
-/** Agrupa encerradas para caixa: n = contas, fat = soma sessões, pagamento por conta-mestre. */
+/** Agrupa encerradas para caixa: n = contas · pagamento por locação (bater maquininha). */
 function agregarCaixaPorConta_(enc) {
   const groups = {};
   enc.forEach(function (l) {
@@ -3312,20 +3313,14 @@ function agregarCaixaPorConta_(enc) {
   let fat = 0;
   let totalExt = 0;
   let nExt = 0;
-  Object.keys(groups).forEach(function (k) {
-    const items = groups[k];
-    const master = items.find(function (i) { return Number(i.id) === Number(k); }) || items[0];
-    const pag = normalizarPagamento_(master.pagamento) || 'Não informado';
-    let sumVal = 0;
-    let sumExt = 0;
-    items.forEach(function (i) {
-      sumVal += Number(i.valorTotal) || 0;
-      sumExt += Number(i.valorAdicional) || 0;
-      if (Number(i.valorAdicional) > 0) nExt++;
-    });
-    fat += sumVal;
-    totalExt += sumExt;
-    porPagamento[pag] = (porPagamento[pag] || 0) + sumVal;
+  enc.forEach(function (l) {
+    const pag = normalizarPagamento_(l.pagamento) || 'Não informado';
+    const val = Number(l.valorTotal) || 0;
+    const ext = Number(l.valorAdicional) || 0;
+    fat += val;
+    totalExt += ext;
+    if (ext > 0) nExt++;
+    porPagamento[pag] = (porPagamento[pag] || 0) + val;
   });
   const cred = (porPagamento['Crédito'] || 0);
   const deb = (porPagamento['Débito'] || 0);

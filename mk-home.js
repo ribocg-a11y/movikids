@@ -216,7 +216,9 @@ function renderPainel() {
     (typeof sessaoTimerIniciado_ === 'function' ? sessaoTimerIniciado_(s) : (s.started && s.status === 'Ativa'))
   ).length;
   const pendentes = sessions.filter(s => s.status === 'Pendente' || (!s.started && s.status === 'Ativa')).length;
-  const encHoje   = encHojeData ? encHojeData.length : 0;
+  const encHoje   = typeof mkContasEncHoje_ === 'function'
+    ? mkContasEncHoje_(encHojeData)
+    : (encHojeData ? encHojeData.length : 0);
 
   const phAtivos  = document.getElementById('ph-ativos');
   const phEnc     = document.getElementById('ph-enc-hoje');
@@ -339,34 +341,88 @@ function iniciarNovaPeloVeiculo(veiculo, tipo) {
 function mkUpdateEncHojeKpis_(list) {
   encHojeData = list || [];
   const nLoc = document.getElementById('stat-nloc');
-  if (nLoc) nLoc.textContent = encHojeData.length;
+  if (nLoc) nLoc.textContent = String(mkContasEncHoje_(encHojeData));
 }
 window.mkUpdateEncHojeKpis_ = mkUpdateEncHojeKpis_;
+
+function mkEncHojeChaveConta_(e) {
+  const tel = String((e && e.telefone) || '').replace(/\D/g, '');
+  if (tel.length >= 8) return 't:' + tel;
+  const ck = Number((e && e.contaId) || (e && e.id) || 0);
+  if (ck > 0) return 'c:' + ck;
+  return '';
+}
+
+function mkContasEncHoje_(list) {
+  const data = list || encHojeData || [];
+  if (!data.length) return 0;
+  const seen = {};
+  data.forEach(function (e) {
+    const k = mkEncHojeChaveConta_(e);
+    if (k) seen[k] = true;
+  });
+  return Object.keys(seen).length;
+}
+
+function mkSessoesEncHoje_(list) {
+  const data = list || encHojeData || [];
+  return data.length;
+}
+
+function mkEncHojePorConta_(list) {
+  const data = list || encHojeData || [];
+  const groups = {};
+  const order = [];
+  data.forEach(function (e) {
+    const k = mkEncHojeChaveConta_(e) || ('x:' + order.length);
+    if (!groups[k]) { groups[k] = []; order.push(k); }
+    groups[k].push(e);
+  });
+  return order.map(function (k) {
+    const items = groups[k];
+    const head = items[0];
+    if (items.length === 1) return head;
+    const valorTotal = items.reduce(function (s, x) { return s + (Number(x.valorTotal) || 0); }, 0);
+    return Object.assign({}, head, {
+      _nLocGrupo: items.length,
+      _veiculosGrupo: items.map(function (x) { return x.crianca || x.veiculo || '—'; }).join(', '),
+      valorTotal: valorTotal > 0 ? valorTotal : head.valorTotal
+    });
+  });
+}
+
+window.mkContasEncHoje_ = mkContasEncHoje_;
+window.mkSessoesEncHoje_ = mkSessoesEncHoje_;
+window.mkEncHojePorConta_ = mkEncHojePorConta_;
 
 function renderEncHojeList_(list) {
   const section = document.getElementById('enc-hoje-section');
   const container = document.getElementById('enc-hoje-list');
+  const lead = document.getElementById('enc-hoje-lead');
   if (!section || !container) return;
   const data = list || encHojeData || [];
   if (!data.length) { section.style.display = 'none'; return; }
   section.style.display = 'block';
+  const nContas = mkContasEncHoje_(data);
+  const porConta = mkEncHojePorConta_(data);
+  if (lead) lead.textContent = nContas + (nContas === 1 ? ' conta na maquininha' : ' contas na maquininha');
   const fin = mkExibirFinanceiro_();
   const admSms = (typeof mkAuthIsAdmin === 'function' && mkAuthIsAdmin()) || window.isAdmin;
-  container.innerHTML = data.map(e=>{
+  container.innerHTML = porConta.map(function (e) {
     const icon = tipoIcon(e.tipo);
+    const nGrupo = Number(e._nLocGrupo) || 0;
+    const titulo = nGrupo > 1
+      ? (nGrupo + ' locações · ' + escHtml(e._veiculosGrupo || e.crianca || ''))
+      : (icon + ' ' + escHtml(e.crianca));
     const v = fin && e.valorTotal != null
-      ? `<div class="enc-valor">R$ ${Number(e.valorTotal).toFixed(2).replace('.',',')}</div>` : '';
-    return `<div class="enc-item">
-      <div class="enc-left">
-        <div class="enc-crianca">${icon} ${escHtml(e.crianca)}</div>
-        <div class="enc-det">👤 ${escHtml(e.responsavel)} · ${e.plano}</div>
-      </div>
-      <div class="enc-right">
-        ${v}
-        <div class="enc-horario">${e.horaInicio} → ${e.horaFim||'--:--'}</div>
-        ${admSms && e.telefone && !(typeof mkComunicacaoQrOnly_ === 'function' && mkComunicacaoQrOnly_()) ? '<button class="enc-wa-btn" onclick=\'waAgradecimento(' + JSON.stringify(e).replace(/\'/g,"\\\'")+')\'>SMS agradecer</button>' : ''}
-      </div>
-    </div>`;
+      ? '<div class="enc-valor">R$ ' + Number(e.valorTotal).toFixed(2).replace('.', ',') + '</div>' : '';
+    const detExtra = nGrupo > 1 ? (' · ' + nGrupo + ' veículos') : '';
+    return '<div class="enc-item"><div class="enc-left"><div class="enc-crianca">' + titulo + '</div>'
+      + '<div class="enc-det">👤 ' + escHtml(e.responsavel) + detExtra + ' · ' + escHtml(e.plano || '') + '</div></div>'
+      + '<div class="enc-right">' + v + '<div class="enc-horario">' + (e.horaInicio || '—') + ' → ' + (e.horaFim || '--:--') + '</div>'
+      + (admSms && e.telefone && !(typeof mkComunicacaoQrOnly_ === 'function' && mkComunicacaoQrOnly_())
+        ? '<button class="enc-wa-btn" onclick=\'waAgradecimento(' + JSON.stringify(e).replace(/\'/g, "\\'") + ')\'>SMS agradecer</button>' : '')
+      + '</div></div>';
   }).join('');
 }
 window.renderEncHojeList_ = renderEncHojeList_;
@@ -397,8 +453,10 @@ function showAdminHomeKpis(d) {
   if (chip) {
     chip.hidden = !homeOn;
     if (homeOn) {
-      const n = d.nHoje != null ? d.nHoje : 0;
-      set('admin-chip-fat', n + (n === 1 ? ' locação' : ' locações'));
+      const nSess = (d && d.nSessoesHoje != null)
+        ? Number(d.nSessoesHoje)
+        : (typeof mkSessoesEncHoje_ === 'function' ? mkSessoesEncHoje_(encHojeData) : (d.nHoje != null ? d.nHoje : 0));
+      set('admin-chip-fat', nSess + (nSess === 1 ? ' locação' : ' locações'));
     }
   }
   if (typeof atualizarHubAdmin_ === 'function') atualizarHubAdmin_();

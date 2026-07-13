@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Movi Kids">
 <title>Movi Kids</title>
-<script src="mk-canonical-host.js?v=1.9.5"></script>
+<script src="mk-canonical-host.js?v=1.9.6"></script>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png">
@@ -17,17 +17,17 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<script src="mk-stale-sync.js?v=1.9.5"></script>
-<script src="mk-version.js?v=1.9.5"></script>
-<script src="mk-api.js?v=1.9.5"></script>
-<link rel="stylesheet" href="mk-design.css?v=1.9.5">
+<script src="mk-stale-sync.js?v=1.9.6"></script>
+<script src="mk-version.js?v=1.9.6"></script>
+<script src="mk-api.js?v=1.9.6"></script>
+<link rel="stylesheet" href="mk-design.css?v=1.9.6">
 
-<script src="mk-cache-bust.js?v=1.9.5"></script>
+<script src="mk-cache-bust.js?v=1.9.6"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<link rel="stylesheet" href="mk-app.css?v=1.9.5">
-<link rel="stylesheet" href="mk-gestao-pessoas.css?v=1.9.5">
+<link rel="stylesheet" href="mk-app.css?v=1.9.6">
+<link rel="stylesheet" href="mk-gestao-pessoas.css?v=1.9.6">
 <!-- Firebase SDK — Realtime sync canonico para todos os dispositivos -->
-<script type="module" src="mk-firebase.js?v=1.9.5"></script>
+<script type="module" src="mk-firebase.js?v=1.9.6"></script>
 </head>
 
 <body>
@@ -293,7 +293,7 @@
   <div id="page-home" class="page active">
     <div class="mk-stat-row stats-bar">
       <div class="mk-stat-tile stat-card"><div class="stat-val mk-stat-val" id="stat-ativas">0</div><div class="stat-lbl mk-stat-lbl">Ativas agora</div></div>
-      <div class="mk-stat-tile stat-card"><div class="stat-val mk-stat-val" id="stat-nloc">0</div><div class="stat-lbl mk-stat-lbl">Encerradas hoje</div></div>
+      <div class="mk-stat-tile stat-card"><div class="stat-val mk-stat-val" id="stat-nloc">0</div><div class="stat-lbl mk-stat-lbl">Contas hoje</div></div>
       <div class="mk-stat-tile stat-card mk-stat-meta" id="stat-meta-tile" hidden aria-hidden="true">
         <div class="stat-val mk-stat-val" id="stat-meta-val">—</div>
         <div class="stat-lbl mk-stat-lbl" id="stat-meta-lbl">Meta do turno</div>
@@ -334,7 +334,11 @@
     </div>
     <div class="sec-title">Sessões ativas</div>
     <div id="sessions-container"><div class="skeleton"></div><div class="skeleton"></div></div>
-    <div id="enc-hoje-section" style="display:none"><div class="sec-title">Encerradas hoje</div><div id="enc-hoje-list"></div></div>
+    <div id="enc-hoje-section" style="display:none">
+      <div class="sec-title">Encerradas hoje</div>
+      <p class="enc-hoje-lead" id="enc-hoje-lead">Contas na maquininha</p>
+      <div id="enc-hoje-list"></div>
+    </div>
   </div>
 
   <!-- ──────── PAGE: NOVA (Pacote C — 3 passos) ──────── -->
@@ -1029,7 +1033,7 @@
         <div class="mk-widget">
           <span class="mk-widget-lbl">Locações</span>
           <span class="mk-widget-val" id="cx-nloc">...</span>
-          <span class="mk-widget-ctx" id="cx-nloc-ctx">Contas encerradas</span>
+          <span class="mk-widget-ctx" id="cx-nloc-ctx">Locações encerradas</span>
         </div>
         <div class="mk-widget">
           <span class="mk-widget-lbl">Extras</span>
@@ -1050,7 +1054,7 @@
       <div class="cx-conf">
         <div class="cx-conf-title">💳 Conferência maquininha</div>
         <div id="cx-conf-maq"></div>
-        <div class="cx-conf-hint">✓ Bater com o total na maquininha</div>
+        <div class="cx-conf-hint">✓ Bater vendas e total com a maquininha (1 locação = 1 venda no cartão)</div>
       </div>
       <div class="cx-conf">
         <div class="cx-conf-title">💵 Conferência dinheiro</div>
@@ -2095,26 +2099,26 @@
   </div>
 </div>
 
-<script src="mk-globals.js?v=1.9.5"></script>
-<script src="mk-core.js?v=1.9.5"></script>
-<script src="mk-nav.js?v=1.9.5"></script>
-<script src="mk-admin.js?v=1.9.5"></script>
-<script src="mk-historico.js?v=1.9.5"></script>
-<script src="mk-sessao.js?v=1.9.5"></script>
-<script src="mk-home.js?v=1.9.5"></script>
-<script src="mk-meta-operador.js?v=1.9.5"></script>
-<script src="mk-custos.js?v=1.9.5"></script>
-<script src="mk-avulso.js?v=1.9.5"></script>
-<script src="mk-sync.js?v=1.9.5"></script>
-<script src="mk-nova.js?v=1.9.5"></script>
-<script src="mk-relacionamento.js?v=1.9.5"></script>
-<script src="mk-operacao.js?v=1.9.5"></script>
-<script src="mk-drawer.js?v=1.9.5"></script>
-<script src="mk-update.js?v=1.9.5"></script>
-<script src="mk-gestao-pessoas.js?v=1.9.5"></script>
-<script src="mk-holerite.js?v=1.9.5"></script>
-<script src="mk-gestao-pessoas-admin.js?v=1.9.5"></script>
-<script src="mk-auth.js?v=1.9.5"></script>
-<script src="mk-boot.js?v=1.9.5"></script>
+<script src="mk-globals.js?v=1.9.6"></script>
+<script src="mk-core.js?v=1.9.6"></script>
+<script src="mk-nav.js?v=1.9.6"></script>
+<script src="mk-admin.js?v=1.9.6"></script>
+<script src="mk-historico.js?v=1.9.6"></script>
+<script src="mk-sessao.js?v=1.9.6"></script>
+<script src="mk-home.js?v=1.9.6"></script>
+<script src="mk-meta-operador.js?v=1.9.6"></script>
+<script src="mk-custos.js?v=1.9.6"></script>
+<script src="mk-avulso.js?v=1.9.6"></script>
+<script src="mk-sync.js?v=1.9.6"></script>
+<script src="mk-nova.js?v=1.9.6"></script>
+<script src="mk-relacionamento.js?v=1.9.6"></script>
+<script src="mk-operacao.js?v=1.9.6"></script>
+<script src="mk-drawer.js?v=1.9.6"></script>
+<script src="mk-update.js?v=1.9.6"></script>
+<script src="mk-gestao-pessoas.js?v=1.9.6"></script>
+<script src="mk-holerite.js?v=1.9.6"></script>
+<script src="mk-gestao-pessoas-admin.js?v=1.9.6"></script>
+<script src="mk-auth.js?v=1.9.6"></script>
+<script src="mk-boot.js?v=1.9.6"></script>
 </body>
 </html>

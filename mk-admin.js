@@ -663,6 +663,13 @@ function nHojeCanonica_() {
   return 0;
 }
 
+function nSessoesHojeCanonica_() {
+  if (resumoDiaHoje && resumoDiaHoje.nSessoes != null) return Number(resumoDiaHoje.nSessoes);
+  if (resumoDiaHoje && resumoDiaHoje.locacoes && resumoDiaHoje.locacoes.length) return resumoDiaHoje.locacoes.length;
+  if (typeof encHojeData !== 'undefined' && encHojeData && encHojeData.length) return encHojeData.length;
+  return nHojeCanonica_();
+}
+
 function fatHojeCanonica_(d) {
   if (resumoDiaHoje && resumoDiaHoje.fat != null) return Number(resumoDiaHoje.fat);
   if (d && d.fatHoje != null) return Number(d.fatHoje);
@@ -671,7 +678,7 @@ function fatHojeCanonica_(d) {
 }
 
 function kpiHubStub_() {
-  return { ok: true, nHoje: nHojeCanonica_() };
+  return { ok: true, nHoje: nHojeCanonica_(), nSessoesHoje: nSessoesHojeCanonica_() };
 }
 
 async function carregarResumoHojeAdmin_() {
@@ -2487,7 +2494,8 @@ function renderDashboardCore_(d) {
   const fatHoje = fatHojeCanonica_(d);
   const nHoje = nHojeCanonica_();
   setText2('nk-fathoje', R2(fatHoje));
-  setText2('nk-cushoje', nHoje + (nHoje === 1 ? ' locação hoje' : ' locações hoje') + ' · ver detalhes');
+  const nSessHoje = nSessoesHojeCanonica_();
+  setText2('nk-cushoje', nSessHoje + (nSessHoje === 1 ? ' locação hoje' : ' locações hoje') + ' · ver detalhes');
 
   // CTO
   setText2('nk-cto-fat',  R2(d.fatMes));
@@ -2914,6 +2922,46 @@ function renderChartsBody_(d) {
 const fmtR = v => 'R$ ' + Number(v).toFixed(2).replace('.',',').replace(/\B(?=(\d{3})+(?!\d))/g,'.');
 const pagCor = {'PIX':'background:#E6F1FB;color:#0C447C','Crédito':'background:#EEEDFE;color:#3C3489','Débito':'background:#EAF3DE;color:#27500A','Dinheiro':'background:#FAEEDA;color:#633806'};
 const pagPill = p => `<span style="font-size:11px;padding:2px 8px;border-radius:20px;font-weight:500;${pagCor[p]||'background:var(--bg2);color:var(--txt)'}">${p||'—'}</span>`;
+const CX_FORMAS_MAQ_ = ['PIX', 'Crédito', 'Débito'];
+
+function mkNormPagCaixa_(p) {
+  const s = String(p || '').trim();
+  if (!s) return '';
+  const n = s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+  if (n === 'pix') return 'PIX';
+  if (n === 'credito') return 'Crédito';
+  if (n === 'debito') return 'Débito';
+  if (n === 'dinheiro') return 'Dinheiro';
+  if (s === 'Crédito' || s === 'Débito') return s;
+  return s;
+}
+
+/** Conferência maquininha = 1 linha por locação (como o POS), não por conta I42. */
+function totPagPorLocacao_(locacoes) {
+  const porPagamento = {};
+  let fat = 0;
+  (locacoes || []).forEach(function (l) {
+    const pag = mkNormPagCaixa_(l.pagamento) || 'Não informado';
+    const val = Number(l.valorTotal) || 0;
+    fat += val;
+    porPagamento[pag] = (porPagamento[pag] || 0) + val;
+  });
+  const cred = Number(porPagamento['Crédito'] || 0);
+  const deb = Number(porPagamento['Débito'] || 0);
+  const pix = Number(porPagamento['PIX'] || 0);
+  const din = Number(porPagamento['Dinheiro'] || 0);
+  const totalMaq = Math.round((pix + cred + deb) * 100) / 100;
+  const nMaq = (locacoes || []).filter(function (l) {
+    return CX_FORMAS_MAQ_.indexOf(mkNormPagCaixa_(l.pagamento)) >= 0;
+  }).length;
+  return {
+    porPagamento: porPagamento,
+    fat: Math.round(fat * 100) / 100,
+    totalMaq: totalMaq,
+    totalDin: Math.round(din * 100) / 100,
+    nMaq: nMaq
+  };
+}
 
 function inicializarCaixa() {
   const hoje = new Date();
@@ -2925,10 +2973,11 @@ function inicializarCaixa() {
 function renderCaixaFromResumo_(dataFmt, r) {
     const locacoes = r.locacoes || [];
     const custos = r.custos || [];
-    const totPag = r.porPagamento || {};
-    const totalEnt = Number(r.fat) || 0;
-    const totalMaq = Number(r.totalMaq) || 0;
-    const totalDin = Number(r.totalDin) || 0;
+    const porLoc = totPagPorLocacao_(locacoes);
+    const totPag = porLoc.porPagamento;
+    const totalEnt = porLoc.fat || Number(r.fat) || 0;
+    const totalMaq = porLoc.totalMaq || Number(r.totalMaq) || 0;
+    const totalDin = porLoc.totalDin != null ? porLoc.totalDin : (Number(r.totalDin) || 0);
     const totalCus = Number(r.totalCus) || 0;
     const totalExt = Number(r.totalExt) || 0;
     const nExt = Number(r.nExt) || 0;
@@ -2965,13 +3014,15 @@ function renderCaixaFromResumo_(dataFmt, r) {
       resEl.style.color = resultado >= 0 ? '#2E7D32' : '#C62828';
     }
     setText('cx-res-ctx', fmtR(totalEnt) + ' − ' + fmtR(totalCus) + ' custos');
-    setText('cx-total-ctx', nContas + ' conta(s)' + (nSess > nContas ? ' · ' + nSess + ' sessões' : ''));
-    setText('cx-maq-ctx', 'PIX R$ ' + Number(totPag.PIX || 0).toFixed(2).replace('.', ',') + ' · cartões');
+    setText('cx-total-ctx', nSess + (nSess === 1 ? ' locação' : ' locações')
+      + (nContas < nSess ? ' · ' + nContas + ' contas' : ''));
+    setText('cx-maq-ctx', porLoc.nMaq + (porLoc.nMaq === 1 ? ' venda' : ' vendas') + ' no cartão · PIX + débito + crédito');
     setText('cx-din-ctx', 'Saldo espécie ' + fmtR(saldoDin));
     setText('cx-cus-ctx', custos.length + ' lançamento(s)');
     const nloc = document.getElementById('cx-nloc');
-    if (nloc) nloc.textContent = String(nContas);
-    setText('cx-nloc-ctx', nSess > nContas ? nSess + ' sessões no dia' : 'Contas encerradas');
+    if (nloc) nloc.textContent = String(nSess);
+    setText('cx-nloc-ctx', porLoc.nMaq + (porLoc.nMaq === 1 ? ' venda maquininha' : ' vendas maquininha')
+      + ' · ' + nSess + (nSess === 1 ? ' locação' : ' locações'));
     if (totalExt > 0) {
       const pct = totalEnt > 0 ? Math.round(totalExt / totalEnt * 1000) / 10 : 0;
       setText('cx-ext-ctx', nExt + ' loc · ' + pct + '% do fat.');
@@ -3024,8 +3075,8 @@ function renderCaixaFromResumo_(dataFmt, r) {
 
     // Conferência maquininha
     const maqEl = document.getElementById('cx-conf-maq');
-    if(maqEl) {
-      const formasMaq = ['PIX','Crédito','Débito'];
+    if (maqEl) {
+      const formasMaq = CX_FORMAS_MAQ_;
       maqEl.innerHTML = formasMaq.map(f =>
         `<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:0.5px solid var(--border);font-size:13px">
           <span style="color:var(--txt2)">${pagPill(f)} ${f}</span>
@@ -3034,7 +3085,12 @@ function renderCaixaFromResumo_(dataFmt, r) {
       ).join('') +
       `<div style="display:flex;justify-content:space-between;padding:8px 0 4px;font-size:14px;font-weight:500;border-top:1px solid var(--border);margin-top:4px">
         <span>Total maquininha</span><span style="color:#185FA5">${fmtR(totalMaq)}</span>
-      </div>`;
+      </div>` +
+      `<div style="font-size:11px;color:var(--txt3);margin-top:6px;line-height:1.35">`
+      + porLoc.nMaq + (porLoc.nMaq === 1 ? ' locação' : ' locações') + ' no cartão/PIX'
+      + ' — bater com <strong>' + porLoc.nMaq + (porLoc.nMaq === 1 ? ' venda</strong>' : ' vendas</strong>') + ' na maquininha'
+      + (porLoc.nMaq !== nSess ? ' · ' + (nSess - porLoc.nMaq) + ' em dinheiro' : '')
+      + '</div>';
     }
 
     // Conferência dinheiro
@@ -3093,7 +3149,7 @@ function renderCaixaFromResumo_(dataFmt, r) {
     }
 
     // Guardar dados para copiar
-    window._caixaData = { dataFmt, totalEnt, totalMaq, totalDin, totalCus, saldoDin, resultado, totPag, locacoes, custos };
+    window._caixaData = { dataFmt, totalEnt, totalMaq, totalDin, totalCus, saldoDin, resultado, totPag, locacoes, custos, nSess, nMaq: porLoc.nMaq };
 }
 
 async function carregarCaixa() {
@@ -3136,7 +3192,7 @@ function buildFechamentoTexto_() {
     `  TOTAL:      ${fmtR(d.totalEnt)}`,
     ``,
     `CONFERÊNCIA MAQUININHA`,
-    `  PIX + Crédito + Débito = ${fmtR(d.totalMaq)}`,
+    `  ${d.nMaq != null ? d.nMaq : '—'} vendas (PIX + cartões) = ${fmtR(d.totalMaq)}`,
     ``,
     `DINHEIRO EM ESPÉCIE`,
     `  Entradas:   ${fmtR(d.totalDin)}`,
@@ -3145,7 +3201,7 @@ function buildFechamentoTexto_() {
     `CUSTOS DO DIA: ${fmtR(d.totalCus)}`,
     `${'─'.repeat(35)}`,
     `RESULTADO: ${fmtR(d.resultado)}`,
-    `Locações: ${d.locacoes.length}`,
+    `Locações: ${d.nSess != null ? d.nSess : d.locacoes.length}`,
   ].join('\n');
 }
 
@@ -3515,8 +3571,8 @@ function atualizarHubAdmin_() {
   const dia = document.getElementById('hub-dia-sub');
   const mes = document.getElementById('hub-mes-sub');
   if (d && d.ok) {
-    const nHoje = nHojeCanonica_();
-    if (dia) dia.textContent = nHoje + (nHoje === 1 ? ' locação hoje' : ' locações hoje') + ' · conferência no caixa';
+    const nSessHoje = nSessoesHojeCanonica_();
+    if (dia) dia.textContent = nSessHoje + (nSessHoje === 1 ? ' locação hoje' : ' locações hoje') + ' · conferência no caixa';
     if (mes) mes.textContent = 'KPIs do mês, CTO e gestão avançada';
   }
   const gasOnline = typeof _syncFailCount !== 'undefined' && _syncFailCount === 0;

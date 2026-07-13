@@ -246,7 +246,11 @@ function aplicarDadosInicio(d) {
       else {
         encHojeData = d.encHoje;
         const nLoc = document.getElementById('stat-nloc');
-        if (nLoc) nLoc.textContent = encHojeData.length;
+        if (nLoc) {
+          nLoc.textContent = String(typeof mkContasEncHoje_ === 'function'
+            ? mkContasEncHoje_(encHojeData)
+            : encHojeData.length);
+        }
       }
     }
     if (typeof mkMetaApplyFromInicio_ === 'function') mkMetaApplyFromInicio_(d);
