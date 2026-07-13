@@ -3246,13 +3246,14 @@ function renderCaixaFromResumo_(dataFmt, r) {
     setText('cx-cred-ctx', cxPayCtxBreakdown_('Crédito', totPag, extrasPorPag));
     setText('cx-din-ctx', cxPayCtxBreakdown_('Dinheiro', totPag, extrasPorPag) + (saldoDin !== totalDin ? ' · saldo espécie ' + fmtR(saldoDin) : ''));
     setText('cx-maq-ctx', '= PIX + débito + crédito');
-    setText('cx-total-ctx', '= PIX + débito + crédito + dinheiro · ' + nSess + ' locação(ões)'
-      + (nSess > nContas ? ' · ' + nContas + ' contas' : ''));
+    setText('cx-total-ctx', nSess > nContas
+      ? ('= PIX + débito + crédito + dinheiro · ' + nSess + ' locações em ' + nContas + ' contas (multi-veículo)')
+      : ('= PIX + débito + crédito + dinheiro · ' + nSess + ' locação(ões)'));
     setText('cx-cus-ctx', custos.length + ' lançamento(s)');
     const nloc = document.getElementById('cx-nloc');
     if (nloc) nloc.textContent = String(nSess);
     setText('cx-nloc-ctx', nSess > nContas
-      ? (nSess + ' locações · ' + nContas + ' contas')
+      ? (nSess + ' veículos/locações · ' + nContas + ' contas (telefone)')
       : 'Locações encerradas');
     if (totalExt > 0) {
       const pct = totalEnt > 0 ? Math.round(totalExt / totalEnt * 1000) / 10 : 0;
@@ -3310,11 +3311,14 @@ function renderCaixaFromResumo_(dataFmt, r) {
     const ld = r.leadingDia;
     if (cxBe && ld && ld.breakEvenLocacoesDia != null) {
       cxBe.style.display = 'block';
-      const nLoc = Number(r.n) || locacoes.length;
-      const falta = ld.faltamBreakEven != null ? ld.faltamBreakEven : Math.max(0, ld.breakEvenLocacoesDia - nLoc);
+      const nLocContas = Number(r.n) || locacoes.length;
+      const falta = ld.faltamBreakEven != null ? ld.faltamBreakEven : Math.max(0, ld.breakEvenLocacoesDia - nLocContas);
+      const feitoLbl = nSess > nLocContas
+        ? (nLocContas + ' contas / ' + nSess + ' locações')
+        : (nLocContas + ' feitas');
       cxBe.textContent = falta > 0
-        ? ('Meta break-even do mês: ' + ld.breakEvenLocacoesDia + ' loc/dia · faltam ' + falta + ' hoje (' + nLoc + ' feitas)')
-        : ('Meta break-even do mês atingida hoje (' + ld.breakEvenLocacoesDia + ' loc/dia · ' + nLoc + ' feitas)');
+        ? ('Meta break-even do mês: ' + ld.breakEvenLocacoesDia + ' contas/dia · faltam ' + falta + ' hoje (' + feitoLbl + ')')
+        : ('Meta break-even do mês atingida hoje (' + ld.breakEvenLocacoesDia + ' contas/dia · ' + feitoLbl + ')');
       cxBe.style.color = falta > 0 ? '#E65100' : '#2E7D32';
     } else if (cxBe) {
       cxBe.style.display = 'none';
