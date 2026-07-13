@@ -1,6 +1,6 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 13/07/2026 · FE **v1.9.46** · GAS **v1.5.187** (ping alinhado · batch `salvarLocacoesMulti`)  
+**Atualizado:** 13/07/2026 · FE **v1.9.46** · GAS **v1.5.188** (I105 busca admin + observacao)  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **Repo local:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`  
