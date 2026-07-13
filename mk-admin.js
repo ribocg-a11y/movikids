@@ -3175,6 +3175,26 @@ function inicializarCaixa() {
 }
 
 const CX_PAY_ORDER_ = ['PIX', 'Débito', 'Crédito', 'Dinheiro'];
+const CX_FORMAS_MAQ_ = ['PIX', 'Crédito', 'Débito'];
+
+function mkNormPagCaixa_(p) {
+  const s = String(p || '').trim();
+  if (!s) return '';
+  const n = s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+  if (n === 'pix') return 'PIX';
+  if (n === 'credito') return 'Crédito';
+  if (n === 'debito') return 'Débito';
+  if (n === 'dinheiro') return 'Dinheiro';
+  if (s === 'Crédito' || s === 'Débito') return s;
+  return s;
+}
+
+/** Vendas na maquininha = locações pagas no cartão/PIX (1 loc ≈ 1 venda no POS). */
+function nVendasMaquininha_(locacoes) {
+  return (locacoes || []).filter(function (l) {
+    return CX_FORMAS_MAQ_.indexOf(mkNormPagCaixa_(l.pagamento)) >= 0;
+  }).length;
+}
 
 function cxPayCtxBreakdown_(pag, totPag, extrasPorPag) {
   const tot = Number(totPag[pag] || 0);
@@ -3200,6 +3220,7 @@ function renderCaixaFromResumo_(dataFmt, r) {
     const resultado = Number(r.resultado) || 0;
     const nContas = Number(r.n) || locacoes.length;
     const nSess = Number(r.nSessoes) || locacoes.length;
+    const nVendasMaq = nVendasMaquininha_(locacoes);
 
     const setText = (id, val) => {
       const el = document.getElementById(id);
@@ -3245,16 +3266,16 @@ function renderCaixaFromResumo_(dataFmt, r) {
     setText('cx-deb-ctx', cxPayCtxBreakdown_('Débito', totPag, extrasPorPag));
     setText('cx-cred-ctx', cxPayCtxBreakdown_('Crédito', totPag, extrasPorPag));
     setText('cx-din-ctx', cxPayCtxBreakdown_('Dinheiro', totPag, extrasPorPag) + (saldoDin !== totalDin ? ' · saldo espécie ' + fmtR(saldoDin) : ''));
-    setText('cx-maq-ctx', '= PIX + débito + crédito');
+    setText('cx-maq-ctx', nVendasMaq + (nVendasMaq === 1 ? ' venda' : ' vendas') + ' no cartão · = PIX + débito + crédito');
     setText('cx-total-ctx', nSess > nContas
       ? ('= PIX + débito + crédito + dinheiro · ' + nSess + ' locações em ' + nContas + ' contas (multi-veículo)')
       : ('= PIX + débito + crédito + dinheiro · ' + nSess + ' locação(ões)'));
     setText('cx-cus-ctx', custos.length + ' lançamento(s)');
     const nloc = document.getElementById('cx-nloc');
     if (nloc) nloc.textContent = String(nSess);
-    setText('cx-nloc-ctx', nSess > nContas
-      ? (nSess + ' veículos/locações · ' + nContas + ' contas (telefone)')
-      : 'Locações encerradas');
+    setText('cx-nloc-ctx', nVendasMaq + (nVendasMaq === 1 ? ' venda maquininha' : ' vendas maquininha')
+      + ' · ' + nSess + (nSess === 1 ? ' locação' : ' locações')
+      + (nContas < nSess ? ' · ' + nContas + ' contas' : ''));
     if (totalExt > 0) {
       const pct = totalEnt > 0 ? Math.round(totalExt / totalEnt * 1000) / 10 : 0;
       setText('cx-ext-ctx', nExt + ' loc · ' + pct + '% do fat.');
@@ -3341,7 +3362,14 @@ function renderCaixaFromResumo_(dataFmt, r) {
       ).join('') +
       `<div style="display:flex;justify-content:space-between;padding:8px 0 4px;font-size:14px;font-weight:500;border-top:1px solid var(--border);margin-top:4px">
         <span>Total maquininha</span><span style="color:#185FA5">${fmtR(totalMaq)}</span>
-      </div>`;
+      </div>` +
+      `<div style="font-size:11px;color:var(--txt3);margin-top:6px;line-height:1.4">`
+      + '<strong>' + nVendasMaq + (nVendasMaq === 1 ? ' venda</strong> no relatório resumido da maquininha'
+        : ' vendas</strong> no relatório resumido da maquininha')
+      + (nVendasMaq !== nSess ? ' · ' + nSess + ' locações no app ('
+        + (nSess - nVendasMaq) + (nSess - nVendasMaq === 1 ? ' em dinheiro)' : ' em dinheiro)')
+        : ' · bater com total R$ ' + Number(totalMaq).toFixed(2).replace('.', ','))
+      + '</div>';
     }
 
     // Conferência dinheiro
