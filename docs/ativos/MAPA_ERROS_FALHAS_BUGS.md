@@ -1,6 +1,6 @@
 # MOVI KIDS — Mapa de erros, falhas e bugs
 
-**Atualizado:** 13/07/2026 — **I104** conferência POS · FE **v1.9.46** · GAS **v1.5.187**  
+**Atualizado:** 13/07/2026 — **I105** busca admin sem teto 500 · GAS **v1.5.188** (repo; ping até Nova versão Web) · FE **v1.9.46**  
 **Uso anterior:** 22/06/2026 — **I38–I41** auditoria RH 22/06 · GAS repo **v1.5.129** (ping **v1.5.107**) · FE **v1.8.110**  
 **Uso anterior:** 17/06/2026 — **I28** liberar sessão tablet · GAS **v1.5.92** prod. · FE **v1.8.30**  
 **Uso anterior:** 09/06/2026 — **I22 fechado** (hotfix FE v1.8.2)  

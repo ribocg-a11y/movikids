@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.187
+// MOVI KIDS — Google Apps Script v1.5.188
+// v1.5.188: I105 — buscaTextoAdmin sem teto 500 linhas (lê fim da aba) + observacao em historico/resumoDia
 // v1.5.187: I98b — MK_GAS_VERSAO_/SISTEMA_ alinhados ao header (ping I70)
 // v1.5.187: I98 — salvarLocacoesMulti valida todos os itens antes de appendRow
 // v1.5.186: I98 — salvarLocacoesMulti (N veículos, 1 lock, 1 round-trip)
@@ -179,8 +180,8 @@
 
 // ── CONSTANTES ───────────────────────────────────────────────
 /** Versão exposta em ping, carregarInicio, validarSchema, gestaoPessoasStatus (bump com header). */
-const MK_GAS_VERSAO_  = 'v1.5.187';
-const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.187';
+const MK_GAS_VERSAO_  = 'v1.5.188';
+const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.188';
 const SHEET_ID   = '1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618';
 const DEPLOY_ID  = 'AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y';
 const WEBAPP_URL = `https://script.google.com/macros/s/${DEPLOY_ID}/exec`;
@@ -4028,7 +4029,7 @@ function listarHistorico_(p) {
 
   const sCmp = filtroData ? dateToCmp_(filtroData) : (startDate ? dateToCmp_(startDate) : '');
   const eCmp = filtroData ? sCmp : (endDate ? dateToCmp_(endDate) : '');
-  const cacheKey = 'hist_v37_' + (filtroData || (startDate + '_' + endDate)) + (statsOnly ? '_s' : '_f');
+  const cacheKey = 'hist_v38_' + (filtroData || (startDate + '_' + endDate)) + (statsOnly ? '_s' : '_f');
   const cache = CacheService.getScriptCache();
   if (!bustCache) {
     const hit = cache.get(cacheKey);
@@ -4076,7 +4077,8 @@ function listarHistorico_(p) {
       telefone:      String(r[13]),
       status:        status,
       veiculo:       String(r[15] || ''),
-      pagamento:     String(r[16] || '')
+      pagamento:     String(r[16] || ''),
+      observacao:    String(r[17] || '')
     };
 
     if (status === 'Encerrada') {
@@ -4554,6 +4556,7 @@ function calcResumoDiaCore_(dataFmt) {
         status:        status,
         veiculo:       String(r[15] || ''),
         pagamento:     normalizarPagamento_(r[16] || ''),
+        observacao:    String(r[17] || ''),
         valorPlano:    Number(r[7] || 0),
         valorAdicional:Number(r[9] || 0),
         extraPagamento: parseExtraMetaCol_(r[27]).extraPagamento,
@@ -13149,37 +13152,74 @@ function mkClaspRunExportRh_() {
 }
 
 /** clasp run / admin — busca texto em todas as abas (recuperar dados perdidos). */
-function mkClaspRunBuscarTextoPlanilha_(termo) {
+/**
+ * Busca texto em abas da planilha.
+ * I105: não corta em 500 linhas — prioriza o final da aba (dados recentes).
+ * opts: { aba, maxLinhas, maxHits, minLen }
+ */
+function mkClaspRunBuscarTextoPlanilha_(termo, opts) {
   termo = String(termo || 'Raykelly').trim();
   if (!termo) return [];
+  opts = opts || {};
   const ss = ss_();
   const hits = [];
   const termoLow = termo.toLowerCase();
-  ss.getSheets().forEach(function (sh) {
-    const lr = Math.min(sh.getLastRow(), 500);
+  const abaFiltro = String(opts.aba || '').trim().toLowerCase();
+  const maxLinhas = Math.min(Math.max(parseInt(opts.maxLinhas || '8000', 10) || 8000, 100), 20000);
+  const maxHits = Math.min(Math.max(parseInt(opts.maxHits || '200', 10) || 200, 10), 500);
+  const minLen = Math.min(Math.max(parseInt(opts.minLen || '2', 10) || 2, 1), 20);
+  const sheets = ss.getSheets();
+  for (let s = 0; s < sheets.length; s++) {
+    if (hits.length >= maxHits) break;
+    const sh = sheets[s];
+    const nome = sh.getName();
+    if (abaFiltro && nome.toLowerCase().indexOf(abaFiltro) < 0) continue;
+    const lrFull = sh.getLastRow();
     const lc = Math.min(sh.getLastColumn(), 30);
-    if (lr < 1 || lc < 1) return;
-    const data = sh.getRange(1, 1, lr, lc).getValues();
-    for (let r = 0; r < data.length; r++) {
+    if (lrFull < 1 || lc < 1) continue;
+    // Preferir linhas recentes (fim da aba) quando exceder maxLinhas
+    const nRead = Math.min(lrFull, maxLinhas);
+    const startRow = lrFull - nRead + 1;
+    const data = sh.getRange(startRow, 1, nRead, lc).getValues();
+    // Percorre do fim → início (mais recente primeiro)
+    for (let r = data.length - 1; r >= 0; r--) {
+      if (hits.length >= maxHits) break;
       for (let c = 0; c < data[r].length; c++) {
         const v = String(data[r][c] || '');
-        if (v.length < 3) continue;
+        if (v.length < minLen) continue;
         if (v.toLowerCase().indexOf(termoLow) >= 0) {
-          hits.push({ aba: sh.getName(), linha: r + 1, coluna: c + 1, valor: v.slice(0, 200) });
+          hits.push({
+            aba: nome,
+            linha: startRow + r,
+            coluna: c + 1,
+            valor: v.slice(0, 400)
+          });
+          if (hits.length >= maxHits) break;
         }
       }
     }
-  });
+  }
   return hits;
 }
 
-/** Admin — busca texto em todas as abas (recuperacao dados). */
+/** Admin — busca texto em todas as abas (recuperacao dados). I105 sem teto 500. */
 function buscarTextoPlanilhaAdmin_(p) {
   if (!adminPinOk_(p)) return err_('Acesso negado — PIN administrativo incorreto', 403);
   const termo = String(p.termo || p.q || 'Raykelly').trim();
   if (!termo) return err_('termo obrigatorio', 400);
-  const hits = mkClaspRunBuscarTextoPlanilha_(termo);
-  return resp_({ termo: termo, total: hits.length, hits: hits, versao: 'v1.5.139' });
+  const hits = mkClaspRunBuscarTextoPlanilha_(termo, {
+    aba: p.aba || p.sheet || '',
+    maxLinhas: p.maxLinhas || p.limitRows || 8000,
+    maxHits: p.maxHits || p.limite || 200,
+    minLen: p.minLen || 2
+  });
+  return resp_({
+    termo: termo,
+    total: hits.length,
+    hits: hits,
+    escopo: 'ultimas_' + String(p.maxLinhas || p.limitRows || 8000) + '_linhas_por_aba',
+    versao: MK_GAS_VERSAO_
+  });
 }
 
 /** clasp run — repara RH + zera banco corrompido. */
