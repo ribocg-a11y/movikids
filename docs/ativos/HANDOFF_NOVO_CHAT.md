@@ -1,6 +1,6 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 13/07/2026 · FE **v1.9.46** · GAS **v1.5.188** (I105 busca admin + observacao)  
+**Atualizado:** 14/07/2026 · FE **v1.9.47** · GAS **v1.5.188** (I106 conferência POS)  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **Repo local:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`  
@@ -59,10 +59,10 @@ cursor "C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-mo
 
 | Camada | Versão | URL / evidência |
 |--------|--------|-----------------|
-| **Frontend** | **v1.9.46** | https://ribocg-a11y.github.io/movikids/?force=1.9.46 |
-| **Gestão Pessoas** | **v1.9.46** | `gestao-pessoas.html?force=1.9.46` |
-| **Service Worker** | **1.9.46** | `sw.js` |
-| **Apps Script** | **v1.5.187** | ping `salvarLocacoesMulti` · **Nova versão Web** publicada |
+| **Frontend** | **v1.9.47** | https://ribocg-a11y.github.io/movikids/?force=1.9.47 |
+| **Gestão Pessoas** | **v1.9.47** | `gestao-pessoas.html?force=1.9.47` |
+| **Service Worker** | **1.9.47** | `sw.js` |
+| **Apps Script** | **v1.5.188** | ping alinhado · I105 buscaTexto + observacao |
 | **Baseline P0** | ✅ | `docs/ativos/BASELINE_CODIGO_P0.md` |
 | **PIN admin** | **1421** | Script Property `ADMIN_PIN` |
 | **Homolog tablet** | ✅ 23/06 | I43 · I42 · I47 · Gestor — smoke **v1.9.39** pendente Ops |
@@ -76,6 +76,7 @@ cursor "C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-mo
 | **Multi-veículo** | ✅ I97–I99 | Cesta Nova locação · batch GAS · overlay watchdog |
 | **I103 contagem** | ✅ v1.9.39 | Encerradas = contas únicas · Caixa = todas locações |
 | **I104 conferência POS** | ✅ v1.9.46 | Caixa: contas no cartão (não locações) vs vendas maquininha |
+| **I106 POS gate** | ✅ v1.9.47 | Painel bruto POS + trava comprovante na Nova + cancel sem placeholder |
 
 **Deploy ID GAS:** `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y`
 

@@ -346,6 +346,7 @@ function renderNovaResumoFechar_() {
       ? ('1 cobrança na maquininha · ' + n + ' cards na Home (▶ em cada um)')
       : '1 cobrança · 1 card na Home';
   }
+  novaAtualizarPosConfirm_();
 }
 
 function novaDraftCampos_() {
@@ -892,8 +893,38 @@ function selPagamento(el, forma) {
   document.querySelectorAll('.pag-btn').forEach(b => b.classList.remove('sel'));
   el.classList.add('sel');
   novaState.pagamento = forma;
+  novaAtualizarPosConfirm_();
   toggleBotoesConfirmarNova_();
   salvarNovaDraft_();
+}
+
+/** I106 — exige confirmação de valor = comprovante em PIX/cartão. */
+function novaPagamentoExigePosConfirm_(forma) {
+  const f = String(forma || '').trim();
+  return f === 'PIX' || f === 'Crédito' || f === 'Débito';
+}
+
+function novaAtualizarPosConfirm_() {
+  const box = document.getElementById('nova-pos-confirm');
+  const lbl = document.getElementById('nova-pos-check-lbl');
+  const ck = document.getElementById('nova-pos-ok');
+  if (!box) return;
+  const forma = novaState.pagamento;
+  const need = novaPagamentoExigePosConfirm_(forma);
+  box.hidden = !need;
+  if (!need) {
+    if (ck) ck.checked = false;
+    return;
+  }
+  const itens = typeof novaItensParaSalvar_ === 'function' ? novaItensParaSalvar_() : [];
+  const tot = typeof novaTotalPlanos_ === 'function' ? novaTotalPlanos_(itens) : 0;
+  const n = itens.length || 1;
+  const totLbl = 'R$ ' + Number(tot).toFixed(2).replace('.', ',');
+  if (lbl) {
+    lbl.innerHTML = 'Já cobrei na maquininha/PIX o valor <strong>exato</strong> deste cadastro: <strong id="nova-pos-valor">'
+      + totLbl + '</strong>'
+      + (n > 1 ? (' <span style="color:var(--txt2)">(1 passagem · ' + n + ' veículos)</span>') : '');
+  }
 }
 
 function capitalizarNome(el) {
@@ -920,6 +951,8 @@ function resetNova(opts = {}) {
   document.querySelectorAll('.vc-card').forEach(c => c.classList.remove('vc-sel','vc-sel-pink','vc-basket'));
   ['inp-resp','inp-cri','inp-tel'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
   const obsEl = document.getElementById('inp-obs'); if (obsEl) obsEl.value = '';
+  const posOk = document.getElementById('nova-pos-ok'); if (posOk) posOk.checked = false;
+  const posBox = document.getElementById('nova-pos-confirm'); if (posBox) posBox.hidden = true;
   const relQ = document.getElementById('nova-rel-q'); if (relQ) relQ.value = '';
   const relBox = document.getElementById('nova-rel-results');
   if (relBox) { relBox.innerHTML = ''; relBox.classList.remove('has-items'); }
@@ -1063,6 +1096,22 @@ async function confirmarLocacao() {
   if (!resp || !cri || !tel) { toast('Preencha todos os campos!', 'error'); return; }
   if (!novaState.pagamento) { toast('Selecione a forma de pagamento!', 'error'); return; }
   if (!mkRequireOperadorEscrita_()) return;
+
+  if (novaPagamentoExigePosConfirm_(novaState.pagamento)) {
+    novaAtualizarPosConfirm_();
+    const ck = document.getElementById('nova-pos-ok');
+    if (!ck || !ck.checked) {
+      toast('Confirme no checkbox: valor do comprovante = valor do cadastro.', 'error');
+      const box = document.getElementById('nova-pos-confirm');
+      if (box) {
+        box.hidden = false;
+        box.classList.add('nova-pos-confirm--shake');
+        setTimeout(function () { box.classList.remove('nova-pos-confirm--shake'); }, 500);
+        box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      return;
+    }
+  }
 
   const btn = document.getElementById('btn-confirmar');
   const n = itens.length;

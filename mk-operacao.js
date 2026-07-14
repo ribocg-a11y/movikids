@@ -249,7 +249,7 @@ function renderOperacaoLocacaoForm_(rowIndex, tipo, bodyId) {
     const planos = Object.keys(PRECOS[opSession.tipo] || {});
     body.innerHTML = `<div class="op-policy">Depois do início, use extensão para preservar faturamento.</div><div class="op-form"><div class="op-field"><label>Novo plano</label><select id="op-plano">${planos.map(p=>`<option ${p===opSession.plano?'selected':''}>${p}</option>`).join('')}</select></div><div class="op-field"><label>Motivo</label><textarea id="op-motivo">Cliente pediu alteração antes de iniciar.</textarea></div></div>`;
   } else if (tipo === 'cancelar') {
-    body.innerHTML = `<div class="op-policy danger">${ativa ? 'Informe o motivo para não quebrar caixa e histórico.' : 'Cadastro não iniciado será marcado como Cancelada.'}</div><div class="op-form"><div class="op-field"><label>Tipo</label><select id="op-motivo-tipo"><option>Erro de cadastro</option><option>Cliente desistiu</option><option>Manutenção do veículo</option><option>Cortesia autorizada</option></select></div><div class="op-field"><label>Justificativa obrigatória</label><textarea id="op-motivo">Descreva o motivo do cancelamento.</textarea></div></div>`;
+    body.innerHTML = `<div class="op-policy danger">${ativa ? 'Informe o motivo para não quebrar caixa e histórico.' : 'Cadastro não iniciado será marcado como Cancelada.'}</div><div class="op-form"><div class="op-field"><label>Tipo</label><select id="op-motivo-tipo"><option>Erro de cadastro</option><option>Cliente desistiu</option><option>Manutenção do veículo</option><option>Cortesia autorizada</option></select></div><div class="op-field"><label>Justificativa obrigatória</label><textarea id="op-motivo" placeholder="Escreva o motivo real (não deixe em branco)"></textarea></div></div>`;
   } else {
     body.innerHTML = `<div class="op-policy">Toda alteração será sincronizada e registrada.</div><div class="op-form"><div class="op-field"><label>Criança</label><input id="op-crianca" value="${escHtml(opSession.crianca || '')}"></div><div class="op-field"><label>Responsável</label><input id="op-responsavel" value="${escHtml(opSession.responsavel || '')}"></div><div class="op-field"><label>Telefone</label><input id="op-telefone" value="${escHtml(opSession.telefone || '')}"></div><div class="op-field"><label>Observação</label><textarea id="op-observacao">${escHtml(opSession.observacao || '')}</textarea></div><div class="op-field"><label>Motivo</label><textarea id="op-motivo">Correção operacional solicitada no atendimento.</textarea></div></div>`;
   }
@@ -281,7 +281,22 @@ async function salvarOperacaoLocacao() {
   btn.disabled = true;
   btn.textContent = 'Salvando...';
   try {
-    const motivo = document.getElementById('op-motivo')?.value || '';
+    const motivo = String(document.getElementById('op-motivo')?.value || '').trim();
+    if (opTipo === 'cancelar') {
+      const placeholders = [
+        'descreva o motivo do cancelamento.',
+        'descreva o motivo do cancelamento',
+        'escreva o motivo real (não deixe em branco)',
+        'escreva o motivo real'
+      ];
+      const motLow = motivo.toLowerCase();
+      if (!motivo || motivo.length < 8 || placeholders.indexOf(motLow) >= 0) {
+        toast('Escreva o motivo real do cancelamento (mín. 8 caracteres).', 'error');
+        const ta = document.getElementById('op-motivo');
+        if (ta) { ta.focus(); ta.classList.add('nova-pos-confirm--shake'); }
+        return;
+      }
+    }
     const payload = { action: opTipo === 'cancelar' ? 'cancelarLocacao' : 'editarLocacao', rowIndex: opSession.rowIndex, motivo, ...operadorApiParams_() };
     if (opTipo === 'pagamento') payload.pagamento = document.getElementById('op-pagamento')?.value || '';
     else if (opTipo === 'veiculo') payload.veiculo = document.getElementById('op-veiculo')?.value || '';

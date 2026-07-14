@@ -1,6 +1,6 @@
 # MOVI KIDS — Mapa de erros, falhas e bugs
 
-**Atualizado:** 13/07/2026 — **I105** busca admin sem teto 500 · GAS **v1.5.188** (repo; ping até Nova versão Web) · FE **v1.9.46**  
+**Atualizado:** 14/07/2026 — **I106** conferência POS · FE **v1.9.47** · GAS **v1.5.188**  
 **Uso anterior:** 22/06/2026 — **I38–I41** auditoria RH 22/06 · GAS repo **v1.5.129** (ping **v1.5.107**) · FE **v1.8.110**  
 **Uso anterior:** 17/06/2026 — **I28** liberar sessão tablet · GAS **v1.5.92** prod. · FE **v1.8.30**  
 **Uso anterior:** 09/06/2026 — **I22 fechado** (hotfix FE v1.8.2)  
@@ -102,6 +102,7 @@
 | **I103** | **Encerradas = contas únicas · Caixa = todas locações** | Painel/lista mostravam sessões; hub Caixa usava contas | FE **v1.9.39** `mkEncHojePorConta_` · `ph-enc-hoje` · hub/cx `nSessoesHojeCanonica_` | I42 | encerradas N contas · caixa N loc |
 | **I104** | **Caixa contava locações como vendas POS** | Conferência maquininha: 6 loc vs 4 vendas POS (13/07); 39 vs 37 (12/07) | FE **v1.9.46** `nContasCartao_` · hint `cxHintConferenciaPos_` — comparar **contas no cartão** + R$ bruto | I42 · I103 | 13/07: 4 contas = 4 POS · 12/07: valor R$ 804≈805 |
 | **I105** | **`buscarTextoPlanilhaAdmin` só lia 500 linhas** | Motivo cancelamento/obs na ~linha 1424 invisível | GAS **v1.5.188** lê até 8k do **fim** da aba + `observacao` em `listarHistorico`/`resumoDia` | I70 | buscar `CANCELADA` / id 1513 após Nova versão Web |
+| **I106** | **Caixa × POS sem conferência operacional** | R$ batia mal (ex. 491 vs 496) sem alerta; cadastro sem trava de comprovante | FE **v1.9.47** painel POS + checkbox Nova + cancelamento sem placeholder | I104 | digitar bruto/vendas POS · diferença gritante |
 | **I84** | **Meta colaborador contava sessões, não contas (I42)** | 4 encerramentos mesmo telefone = 4 loc na meta | GAS **v1.5.180** `metaOperadorSeenMark_` conta_id/telefone · FE **v1.9.16** scroll módulo | `metaOperadorTurno` | 1 loc por telefone/dia |
 | **I42** | Conta do dia — mesmo telefone 10h–22h | Caixa `n` vs sessões; maquininha | GAS **v1.5.131+** col S `conta_id` | `TESTE_I42_CONTA_DIA_CAIXA` | não reduzir `COL_LOC_READ_` (ver I43) |
 | **I41** | **`ping_` versão defasada** (v1.5.107 vs repo) | Confusão deploy / verify | GAS **v1.5.130** `ping_()` alinhado | `ping_` header alinhado | ping = v1.5.130 |
