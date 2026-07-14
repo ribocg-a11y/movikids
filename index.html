@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Movi Kids">
 <title>Movi Kids</title>
-<script src="mk-canonical-host.js?v=1.9.47"></script>
+<script src="mk-canonical-host.js?v=1.9.48"></script>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png">
@@ -17,17 +17,17 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<script src="mk-stale-sync.js?v=1.9.47"></script>
-<script src="mk-version.js?v=1.9.47"></script>
-<script src="mk-api.js?v=1.9.47"></script>
-<link rel="stylesheet" href="mk-design.css?v=1.9.47">
+<script src="mk-stale-sync.js?v=1.9.48"></script>
+<script src="mk-version.js?v=1.9.48"></script>
+<script src="mk-api.js?v=1.9.48"></script>
+<link rel="stylesheet" href="mk-design.css?v=1.9.48">
 
-<script src="mk-cache-bust.js?v=1.9.47"></script>
+<script src="mk-cache-bust.js?v=1.9.48"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<link rel="stylesheet" href="mk-app.css?v=1.9.47">
-<link rel="stylesheet" href="mk-gestao-pessoas.css?v=1.9.47">
+<link rel="stylesheet" href="mk-app.css?v=1.9.48">
+<link rel="stylesheet" href="mk-gestao-pessoas.css?v=1.9.48">
 <!-- Firebase SDK — Realtime sync canonico para todos os dispositivos -->
-<script type="module" src="mk-firebase.js?v=1.9.47"></script>
+<script type="module" src="mk-firebase.js?v=1.9.48"></script>
 </head>
 
 <body>
@@ -1406,9 +1406,9 @@
         <span class="mk-previsao-badge" id="mk-prev-badge">7 dias</span>
       </header>
       <div class="mk-widget mk-widget--hero mk-previsao-hero">
-        <span class="mk-widget-lbl">Faturamento projetado</span>
+        <span class="mk-widget-lbl">Faturamento projetado (7d)</span>
         <span class="mk-widget-val blue" id="mk-prev-fat">—</span>
-        <span class="mk-widget-ctx" id="mk-prev-fat-ctx">Com base nos últimos 7 dias</span>
+        <span class="mk-widget-ctx" id="mk-prev-fat-ctx">Últimos 7 dias — complementar à âncora realista</span>
       </div>
       <div class="mk-cmd-grid mk-previsao-grid">
         <div class="mk-widget">
@@ -1681,15 +1681,15 @@
           <span class="f5-val" id="nk-dias-op">—</span>
         </div>
         <div class="f5-line">
-          <span class="f5-lbl">Média/dia</span>
+          <span class="f5-lbl">Média/dia (ritmo · âncora)</span>
           <span class="f5-val amber" id="nk-med-dia">—</span>
         </div>
         <div class="f5-line">
-          <span class="f5-lbl">Faturamento projetado</span>
+          <span class="f5-lbl">Fat. projetado (realista)</span>
           <span class="f5-val blue" id="nk-proj-fat">—</span>
         </div>
         <div class="f5-line">
-          <span class="f5-lbl">Resultado projetado</span>
+          <span class="f5-lbl">Resultado projetado (realista)</span>
           <span class="f5-val" id="nk-proj-res">—</span>
         </div>
         <div class="f5-line">
@@ -1711,7 +1711,7 @@
     <div class="new-chart-card" style="margin-bottom:14px">
       <div class="new-chart-title">
         Faturamento diário
-        <span class="nct-note" id="nk-avg-label">média R$0/dia com movimento</span>
+        <span class="nct-note" id="nk-avg-label">ritmo do mês · âncora histórica</span>
       </div>
       <div style="position:relative;height:300px">
         <canvas id="chart-diario" role="img" aria-label="Faturamento diário do mês">Faturamento diário.</canvas>
@@ -2485,27 +2485,27 @@
   </div>
 </div>
 
-<script src="mk-globals.js?v=1.9.47"></script>
-<script src="mk-core.js?v=1.9.47"></script>
-<script src="mk-nav.js?v=1.9.47"></script>
-<script src="mk-admin.js?v=1.9.47"></script>
-<script src="mk-historico.js?v=1.9.47"></script>
-<script src="mk-custos-historico.js?v=1.9.47"></script>
-<script src="mk-sessao.js?v=1.9.47"></script>
-<script src="mk-home.js?v=1.9.47"></script>
-<script src="mk-meta-operador.js?v=1.9.47"></script>
-<script src="mk-custos.js?v=1.9.47"></script>
-<script src="mk-avulso.js?v=1.9.47"></script>
-<script src="mk-sync.js?v=1.9.47"></script>
-<script src="mk-nova.js?v=1.9.47"></script>
-<script src="mk-relacionamento.js?v=1.9.47"></script>
-<script src="mk-operacao.js?v=1.9.47"></script>
-<script src="mk-drawer.js?v=1.9.47"></script>
-<script src="mk-update.js?v=1.9.47"></script>
-<script src="mk-gestao-pessoas.js?v=1.9.47"></script>
-<script src="mk-holerite.js?v=1.9.47"></script>
-<script src="mk-gestao-pessoas-admin.js?v=1.9.47"></script>
-<script src="mk-auth.js?v=1.9.47"></script>
-<script src="mk-boot.js?v=1.9.47"></script>
+<script src="mk-globals.js?v=1.9.48"></script>
+<script src="mk-core.js?v=1.9.48"></script>
+<script src="mk-nav.js?v=1.9.48"></script>
+<script src="mk-admin.js?v=1.9.48"></script>
+<script src="mk-historico.js?v=1.9.48"></script>
+<script src="mk-custos-historico.js?v=1.9.48"></script>
+<script src="mk-sessao.js?v=1.9.48"></script>
+<script src="mk-home.js?v=1.9.48"></script>
+<script src="mk-meta-operador.js?v=1.9.48"></script>
+<script src="mk-custos.js?v=1.9.48"></script>
+<script src="mk-avulso.js?v=1.9.48"></script>
+<script src="mk-sync.js?v=1.9.48"></script>
+<script src="mk-nova.js?v=1.9.48"></script>
+<script src="mk-relacionamento.js?v=1.9.48"></script>
+<script src="mk-operacao.js?v=1.9.48"></script>
+<script src="mk-drawer.js?v=1.9.48"></script>
+<script src="mk-update.js?v=1.9.48"></script>
+<script src="mk-gestao-pessoas.js?v=1.9.48"></script>
+<script src="mk-holerite.js?v=1.9.48"></script>
+<script src="mk-gestao-pessoas-admin.js?v=1.9.48"></script>
+<script src="mk-auth.js?v=1.9.48"></script>
+<script src="mk-boot.js?v=1.9.48"></script>
 </body>
 </html>

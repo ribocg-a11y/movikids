@@ -1,6 +1,6 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 14/07/2026 · FE **v1.9.47** · GAS **v1.5.188** (I106 conferência POS)  
+**Atualizado:** 14/07/2026 · FE **v1.9.48** · GAS **v1.5.188** (I107 ritmo realista Dashboard)  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **Repo local:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`  

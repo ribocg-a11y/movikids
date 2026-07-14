@@ -1640,11 +1640,16 @@ function renderExecCockpit_(d) {
     fatCtx += ' · ' + (diffFat >= 0 ? '+' : '') + R2(diffFat);
   }
   const projFat = Number(d.projecaoFat) || 0;
-  if (projFat > 0 && fatMes > 0) {
-    const pctProj = Math.round(fatMes / projFat * 100);
-    fatCtx += ' · ' + pctProj + '% do projetado (' + R2(projFat) + ')';
-  } else if (projFat > 0) {
-    fatCtx += ' · projetado ' + R2(projFat);
+  const ritmoCx = mkRitmoRealistaDash_(d);
+  const projShow = ritmoCx.projRealista > 0 ? ritmoCx.projRealista : projFat;
+  if (projShow > 0 && fatMes > 0) {
+    const pctProj = Math.round(fatMes / projShow * 100);
+    fatCtx += ' · ' + pctProj + '% do projetado realista (' + R2(projShow) + ')';
+    if (projFat > 0 && Math.abs(projFat - projShow) > 50) {
+      fatCtx += ' · ritmo puro ' + R2(projFat);
+    }
+  } else if (projShow > 0) {
+    fatCtx += ' · projetado ' + R2(projShow);
   }
   setCockpitCtx_('mk-exec-fat-d', fatCtx, deltaFat > 0 ? 'up' : deltaFat < 0 ? 'down' : null);
 
@@ -1660,8 +1665,12 @@ function renderExecCockpit_(d) {
   const resD = document.getElementById('mk-exec-res-d');
   if (resD) {
     let resCtx = (d.nMes || 0) + ' locações · margem ' + margem + '%';
-    if (d.mediaDiaria > 0) {
-      resCtx += ' · média ' + R2(d.mediaDiaria) + '/dia';
+    const ritmoRes = mkRitmoRealistaDash_(d);
+    if (ritmoRes.mediaAtual > 0) {
+      resCtx += ' · ritmo ' + R2(ritmoRes.mediaAtual) + '/dia';
+    }
+    if (ritmoRes.mediaHist > 0) {
+      resCtx += ' · âncora ' + R2(ritmoRes.mediaHist) + '/dia';
     }
     const trendRes = margem >= 18 ? 'up' : margem < 10 ? 'down' : null;
     setCockpitCtx_('mk-exec-res-d', resCtx, trendRes);
@@ -2116,8 +2125,98 @@ function renderReceitaMesChart_(d) {
   }
 }
 
-/** Meta mensal do gráfico — GAS trava após amostra mínima; FE ignora meta stale (I72). */
+/**
+ * I107 — ritmo realista do Dashboard.
+ * Não extrapolar o mês só com a média dos dias bons correntes.
+ * Âncora = média de meses cheios (histórico) + blend leve com ritmo atual.
+ */
+function mkRitmoRealistaDash_(d) {
+  d = d || {};
+  const fatMes = Number(d.fatMes) || 0;
+  const diasOp = Number(d.diasOperando) || 0;
+  const diasMes = Number(d.diasMes)
+    || new Date(d.anoAtual || new Date().getFullYear(), d.mesAtual || new Date().getMonth() + 1, 0).getDate();
+  const mediaAtual = diasOp > 0 ? Math.round(fatMes / diasOp * 100) / 100 : 0;
+  const projHot = Number(d.projecaoFat) || (mediaAtual > 0 ? Math.round(mediaAtual * diasMes * 100) / 100 : 0);
+  const projResHot = Number(d.projecaoRes) || 0;
+
+  const hoje = new Date();
+  const isCorrente = (Number(d.mesAtual) === hoje.getMonth() + 1 && Number(d.anoAtual) === hoje.getFullYear());
+  const diaCal = isCorrente ? hoje.getDate() : diasMes;
+  const diasRest = isCorrente ? Math.max(0, diasMes - diaCal) : 0;
+
+  let mediaHist = 0;
+  let refHist = '';
+  let nMesesCheios = 0;
+  const hist = Array.isArray(d.historicoMeses) ? d.historicoMeses : [];
+  hist.forEach(function (h) {
+    if (!h || h.parcial) return;
+    const dop = Number(h.diasOperando) || 0;
+    const dm = Number(h.diasMes) || 30;
+    const fat = Number(h.fatReal) || 0;
+    if (fat <= 0 || dop < Math.max(20, Math.floor(dm * 0.8))) return;
+    mediaHist += fat / dop;
+    nMesesCheios++;
+    refHist = h.label || refHist;
+  });
+  if (nMesesCheios > 0) {
+    mediaHist = Math.round(mediaHist / nMesesCheios * 100) / 100;
+  } else {
+    const fatAnt = Number(d.fatMesAnt) || 0;
+    if (fatAnt > 0) {
+      const mes = Number(d.mesAtual) || (hoje.getMonth() + 1);
+      const ano = Number(d.anoAtual) || hoje.getFullYear();
+      const prevMes = mes <= 1 ? 12 : mes - 1;
+      const prevAno = mes <= 1 ? ano - 1 : ano;
+      const diasPrev = new Date(prevAno, prevMes, 0).getDate();
+      mediaHist = Math.round(fatAnt / Math.max(1, diasPrev) * 100) / 100;
+      refHist = 'mês anterior';
+      nMesesCheios = 1;
+    }
+  }
+
+  const baseline = Number(d.baselineFatMes) || Number(d.metaProjecaoMes) || 0;
+  let projRealista = projHot;
+  if (isCorrente && mediaHist > 0) {
+    const mediaBlend = (mediaAtual * 0.35) + (mediaHist * 0.65);
+    projRealista = Math.round((fatMes + mediaBlend * diasRest) * 100) / 100;
+    projRealista = Math.min(projHot || projRealista, projRealista);
+    if (baseline > 0) {
+      projRealista = Math.round(Math.max(projRealista, baseline * 0.9) * 100) / 100;
+      projRealista = Math.min(projHot || projRealista, projRealista);
+    }
+  } else if (!isCorrente && fatMes > 0) {
+    projRealista = fatMes;
+  } else if (baseline > 0 && baseline < projHot) {
+    projRealista = baseline;
+  }
+
+  const margem = fatMes > 0 ? ((Number(d.resultado) || 0) / fatMes) : 0;
+  const projResRealista = Math.round(projRealista * margem * 100) / 100;
+
+  return {
+    mediaAtual: mediaAtual,
+    mediaHist: mediaHist,
+    refHist: refHist,
+    nMesesCheios: nMesesCheios,
+    projHot: projHot,
+    projResHot: projResHot,
+    projRealista: Math.round(projRealista * 100) / 100,
+    projResRealista: projResRealista,
+    baseline: baseline,
+    diasOp: diasOp,
+    diasMes: diasMes,
+    diasRest: diasRest,
+    isCorrente: isCorrente
+  };
+}
+window.mkRitmoRealistaDash_ = mkRitmoRealistaDash_;
+
+/** Meta mensal do gráfico — I107 usa âncora realista; fallback I72. */
 function mkMetaProjecaoMes_(d) {
+  const ritmo = mkRitmoRealistaDash_(d);
+  if (ritmo.projRealista > 0) return ritmo.projRealista;
+
   const projFat = Number(d.projecaoFat) || 0;
   const diasOp = Number(d.diasOperando) || 0;
   const fromGas = Number(d.metaProjecaoMes) || 0;
@@ -2826,20 +2925,25 @@ function renderChartsBody_(d) {
   const BLUE='#29B6F6',PINK='#F06292',GREEN='#2E7D32',AMBER='#FF8A65',GOLD='#FFD54F',GRID='rgba(21,101,192,.08)';
   const PLAN_LABELS = {'10min':'10 min','20min':'20 min','30min':'30 min','40min':'40 min','60min':'1 hora','3h':'3 horas'};
 
-  // Faturamento diário — todos os dias do mês até hoje (zeros inclusive)
-  // Os zeros mostram a linha do tempo completa e quando o negócio arrancou
+  // Faturamento diário — I107: média do mês + âncora meses cheios
   const fatDia  = d.fatPorDia || [];
   const hojeD   = d.mesAtual === new Date().getMonth()+1 ? new Date().getDate() : 31;
-  const dias    = fatDia.filter(x => x.dia <= hojeD); // TODOS os dias, com ou sem receita
+  const dias    = fatDia.filter(x => x.dia <= hojeD);
   const comMov  = dias.filter(x => x.valor > 0);
   const total   = comMov.reduce((a,b) => a + b.valor, 0);
   const avgDia  = comMov.length > 0 ? Math.round(total / comMov.length) : 0;
   const mesStr  = String(d.mesAtual || new Date().getMonth()+1).padStart(2,'0');
+  const ritmo = mkRitmoRealistaDash_(d);
+  const avgHist = Math.round(Number(ritmo.mediaHist) || 0);
 
-  setText2('nk-avg-label',
-    comMov.length > 0
-      ? comMov.length + ' dias com movimento — média R$' + avgDia + '/dia'
-      : 'sem dados ainda neste mês');
+  let avgLbl = 'sem dados ainda neste mês';
+  if (comMov.length > 0) {
+    avgLbl = comMov.length + ' dias c/ mov. · ritmo R$' + avgDia + '/dia';
+    if (avgHist > 0) {
+      avgLbl += ' · âncora ' + (ritmo.refHist || 'meses cheios') + ' R$' + avgHist + '/dia';
+    }
+  }
+  setText2('nk-avg-label', avgLbl);
 
   if (dias.length === 0) {
     const cvEl = document.getElementById('chart-diario');
@@ -2847,26 +2951,52 @@ function renderChartsBody_(d) {
     if (wEl) wEl.innerHTML = '<p style="text-align:center;color:var(--txt3);padding:40px 0;font-size:13px">Sem dados neste mês</p>';
   } else {
     const valsR = dias.map(x => Math.round(x.valor));
-    // Colore de cinza os dias sem movimento, azul os dias com receita
     const colors = valsR.map(v => v > 0 ? '#B5D4F4' : '#E8E8E8');
+    const datasets = [
+      {label:'Faturamento', data:valsR, backgroundColor:colors, borderRadius:3, minBarLength:4, order:3}
+    ];
+    if (avgDia > 0) {
+      datasets.push({
+        label: 'Ritmo deste mês',
+        data: dias.map(function () { return avgDia; }),
+        type: 'line',
+        borderColor: BLUE,
+        borderWidth: 1.5,
+        pointRadius: 0,
+        tension: 0,
+        borderDash: [4, 3],
+        order: 2
+      });
+    }
+    if (avgHist > 0 && Math.abs(avgHist - avgDia) >= 15) {
+      datasets.push({
+        label: 'Âncora meses cheios' + (ritmo.refHist ? ' (' + ritmo.refHist + ')' : ''),
+        data: dias.map(function () { return avgHist; }),
+        type: 'line',
+        borderColor: '#E65100',
+        borderWidth: 1.75,
+        pointRadius: 0,
+        tension: 0,
+        borderDash: [2, 4],
+        order: 1
+      });
+    }
     chartDiario = new Chart(document.getElementById('chart-diario'), {
       type:'bar',
-      data:{ labels: dias.map(x => x.dia + '/' + mesStr),
-        datasets:[
-          {label:'Faturamento', data:valsR, backgroundColor:colors, borderRadius:3, minBarLength:4, order:2},
-          ...(avgDia > 0 ? [{label:'Média', data:dias.map(()=>avgDia), type:'line',
-            borderColor:BLUE, borderWidth:1.5, pointRadius:0, tension:0, borderDash:[4,3], order:1}] : [])
-        ]},
+      data:{ labels: dias.map(x => x.dia + '/' + mesStr), datasets: datasets },
       options:{responsive:true, maintainAspectRatio:false,
-        plugins:{legend:{display:false},
+        plugins:{legend:{display: datasets.length > 2, labels:{boxWidth:10, font:{size:10}}},
           tooltip:{mode:'index', intersect:false,
             callbacks:{label:ctx => {
-              if (ctx.dataset.label === 'Média') return 'Média: R$ ' + Math.round(ctx.parsed.y);
+              if (ctx.dataset.label && ctx.dataset.label.indexOf('Ritmo') === 0)
+                return 'Ritmo deste mês: R$ ' + Math.round(ctx.parsed.y);
+              if (ctx.dataset.label && ctx.dataset.label.indexOf('Âncora') === 0)
+                return ctx.dataset.label + ': R$ ' + Math.round(ctx.parsed.y);
               return ctx.parsed.y > 0 ? 'Faturamento: R$ ' + Math.round(ctx.parsed.y) : 'Sem movimento';
             }}}},
         scales:{
           x:{grid:{display:false}, ticks:{font:{size:9}, color:'#888', maxTicksLimit:10, maxRotation:0}},
-          y:{grid:{color:GRID}, ticks:{font:{size:9}, color:'#888', callback:v=>'R$'+v}, min:0, suggestedMax: Math.max(...valsR, 1) * 1.2}
+          y:{grid:{color:GRID}, ticks:{font:{size:9}, color:'#888', callback:v=>'R$'+v}, min:0, suggestedMax: Math.max(...valsR, avgHist || 0, 1) * 1.2}
         }}
     });
   }
@@ -3141,25 +3271,50 @@ function renderChartsBody_(d) {
     }
   }
 
-  // Comparativo semana corrida (seg–hoje)
+  // Comparativo semana corrida — I107: em semana incompleta compara ritmo/dia, não total
   setText2('nk-sem-atual', R2(d.fatSemana || 0));
   setText2('nk-sem-ant',   R2(d.fatSemanaAnt || 0));
   setText2('nk-mes-ant',   R2(d.fatMesAnt || 0) + ' (' + (d.nMesAnt||0) + ' loc)');
   const badgeEl = document.getElementById('nk-sem-badge');
   if (badgeEl && (d.fatSemanaAnt || 0) > 0) {
-    const diff = Math.round(((d.fatSemana||0) - d.fatSemanaAnt) / d.fatSemanaAnt * 100);
-    badgeEl.textContent = (diff >= 0 ? '+' : '') + diff + '%';
+    const hoje = new Date();
+    const dow = hoje.getDay(); // 0=dom
+    const diasSemanaCorrida = dow === 0 ? 7 : dow; // seg=1 … dom=7
+    const paceAtual = (Number(d.fatSemana) || 0) / Math.max(1, diasSemanaCorrida);
+    const paceAnt = (Number(d.fatSemanaAnt) || 0) / 7;
+    const incompleta = diasSemanaCorrida < 5;
+    const base = incompleta ? paceAnt : (Number(d.fatSemanaAnt) || 0);
+    const atual = incompleta ? paceAtual : (Number(d.fatSemana) || 0);
+    const diff = base > 0 ? Math.round((atual - base) / base * 100) : 0;
+    badgeEl.textContent = (diff >= 0 ? '+' : '') + diff + '%' + (incompleta ? ' ritmo/dia' : '');
+    badgeEl.title = incompleta
+      ? ('Semana incompleta (' + diasSemanaCorrida + 'd): compara R$/dia, não o total. Anterior = ' + R2(paceAnt) + '/dia · atual = ' + R2(Math.round(paceAtual)) + '/dia')
+      : 'Variação do total da semana corrida vs semana anterior';
     badgeEl.className = 'f5-badge ' + (diff > 0 ? 'up' : diff < 0 ? 'dn' : 'eq');
-  } else if (badgeEl) badgeEl.textContent = '';
+  } else if (badgeEl) { badgeEl.textContent = ''; badgeEl.title = ''; }
 
-  // Projeção do mês
+  // Projeção do mês — I107 âncora realista
+  const ritmoP = mkRitmoRealistaDash_(d);
   setText2('nk-dias-op',  (d.diasOperando || 0) + ' dias');
-  setText2('nk-med-dia',  R2(d.mediaDiaria || 0) + '/dia');
-  setText2('nk-proj-fat', R2(d.projecaoFat || 0));
+  if (ritmoP.mediaHist > 0) {
+    setText2('nk-med-dia', R2(ritmoP.mediaAtual) + '/dia agora · âncora ' + R2(ritmoP.mediaHist));
+  } else {
+    setText2('nk-med-dia', R2(d.mediaDiaria || 0) + '/dia');
+  }
+  setText2('nk-proj-fat', R2(ritmoP.projRealista || d.projecaoFat || 0));
+  const projFatLbl = document.querySelector('#nk-proj-fat') && document.querySelector('#nk-proj-fat').previousElementSibling;
+  // subtitle via title on value
+  const projFatEl = document.getElementById('nk-proj-fat');
+  if (projFatEl) {
+    projFatEl.title = ritmoP.projHot > 0 && Math.abs(ritmoP.projHot - ritmoP.projRealista) > 50
+      ? ('Ritmo só deste mês → ' + R2(ritmoP.projHot) + '. Card usa âncora realista (meses cheios' + (ritmoP.refHist ? ': ' + ritmoP.refHist : '') + ').')
+      : 'Projeção com âncora de meses cheios';
+  }
   const projResEl = document.getElementById('nk-proj-res');
   if (projResEl) {
-    projResEl.textContent = R2(d.projecaoRes || 0);
-    projResEl.className = 'f5-val ' + ((d.projecaoRes||0) >= 0 ? 'green' : 'red');
+    const pr = ritmoP.projResRealista != null ? ritmoP.projResRealista : (d.projecaoRes || 0);
+    projResEl.textContent = R2(pr);
+    projResEl.className = 'f5-val ' + (pr >= 0 ? 'green' : 'red');
   }
 }
 // ── CAIXA DO DIA ─────────────────────────────────────────────────────────
