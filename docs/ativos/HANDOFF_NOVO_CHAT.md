@@ -59,9 +59,9 @@ cursor "C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-mo
 
 | Camada | Versão | URL / evidência |
 |--------|--------|-----------------|
-| **Frontend** | **v1.9.47** | https://ribocg-a11y.github.io/movikids/?force=1.9.47 |
-| **Gestão Pessoas** | **v1.9.47** | `gestao-pessoas.html?force=1.9.47` |
-| **Service Worker** | **1.9.47** | `sw.js` |
+| **Frontend** | **v1.9.48** | https://ribocg-a11y.github.io/movikids/?force=1.9.48 |
+| **Gestão Pessoas** | **v1.9.48** | `gestao-pessoas.html?force=1.9.48` |
+| **Service Worker** | **1.9.48** | `sw.js` |
 | **Apps Script** | **v1.5.188** | ping alinhado · I105 buscaTexto + observacao |
 | **Baseline P0** | ✅ | `docs/ativos/BASELINE_CODIGO_P0.md` |
 | **PIN admin** | **1421** | Script Property `ADMIN_PIN` |
