@@ -91,8 +91,26 @@
       return (names[m - 1] || String(comp || '').slice(0, 2)) + '/' + (pts[1] || '');
     },
     listarColaboradores: function () {
+      var CACHE_KEY = 'mk_gp_list_colab_v1';
+      var CACHE_MS = 120000;
+      try {
+        var raw = sessionStorage.getItem(CACHE_KEY);
+        if (raw) {
+          var packed = JSON.parse(raw);
+          if (packed && packed.at && (Date.now() - packed.at) < CACHE_MS && Array.isArray(packed.list) && packed.list.length) {
+            // Refresh em background; devolve cache na hora (I115)
+            gpApi('listarColaboradoresGestao').then(function (r) {
+              var list = (r.colaboradores || r.operadores || []).filter(function (o) { return o.hasPin !== false; });
+              try { sessionStorage.setItem(CACHE_KEY, JSON.stringify({ at: Date.now(), list: list })); } catch (e) { /* ok */ }
+            }).catch(function () { /* ok */ });
+            return Promise.resolve(packed.list);
+          }
+        }
+      } catch (e) { /* ok */ }
       return gpApi('listarColaboradoresGestao').then(function (r) {
-        return (r.colaboradores || r.operadores || []).filter(function (o) { return o.hasPin !== false; });
+        var list = (r.colaboradores || r.operadores || []).filter(function (o) { return o.hasPin !== false; });
+        try { sessionStorage.setItem(CACHE_KEY, JSON.stringify({ at: Date.now(), list: list })); } catch (e2) { /* ok */ }
+        return list;
       });
     },
     loginPainel: function (operadorId, pin, opts) {
@@ -101,6 +119,9 @@
       return gpApi('buscarPainelColaborador', params).then(function (r) {
         const mapped = gpMapPainel(operadorId, r);
         mapped.preview = false;
+        try {
+          sessionStorage.setItem('mk_gp_painel_' + String(operadorId), JSON.stringify({ at: Date.now(), mapped: mapped }));
+        } catch (e) { /* ok */ }
         return mapped;
       });
     },

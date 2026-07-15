@@ -1,10 +1,10 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 15/07/2026 · FE **v1.9.56** · GAS repo **v1.5.194** (I112 bônus na cesta) — ping até Nova versão  
+**Atualizado:** 15/07/2026 · FE **v1.9.57** · GAS **v1.5.194** Web · **I115** Colaboradores lento (mitigação FE; slim GAS pendente §7.3)  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **Repo local:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`  
-**GitHub:** `ribocg-a11y/movikids` · branch `main` · commit pending (I111 Q1 VT já pago · v1.9.53)
+**GitHub:** `ribocg-a11y/movikids` · branch `main` · commit **I115** (perf colab login FE)
 
 **Mensagem mínima no novo chat:**
 
@@ -59,9 +59,9 @@ cursor "C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-mo
 
 | Camada | Versão | URL / evidência |
 |--------|--------|-----------------|
-| **Frontend** | **v1.9.56** | https://ribocg-a11y.github.io/movikids/?force=1.9.56 |
-| **Gestão Pessoas** | **v1.9.56** | `gestao-pessoas.html?force=1.9.56` |
-| **Service Worker** | **1.9.56** | `sw.js` |
+| **Frontend** | **v1.9.57** | https://ribocg-a11y.github.io/movikids/?force=1.9.57 |
+| **Gestão Pessoas** | **v1.9.57** | `gestao-pessoas.html?force=1.9.57` |
+| **Service Worker** | **1.9.57** | `sw.js` |
 | **Apps Script** | **v1.5.194** repo · ping até Nova versão | I112 bônus na cesta · I111 VT Q1=0 |
 | **Baseline P0** | ✅ | `docs/ativos/BASELINE_CODIGO_P0.md` |
 | **PIN admin** | **1421** | Script Property `ADMIN_PIN` |
@@ -125,17 +125,18 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 
 | # | Ação | Quem | Status |
 |---|------|------|--------|
+| **0** | **I115** slim GAS login Colaboradores (sem write-on-read + 1× ctx) | Agente **após §7.3** + sócio colar Web | ⏳ **próximo P1** |
 | 1 | **Sprint D1** homolog PC admin v1.9.2 | Agente | ✅ **27/06** |
 | 1b | **I69** hotfix ponto mock → **v1.9.3** | Agente | ✅ **29/06** Pages |
 | 1c | **I70–I75** varredura — GAS/FE/Dashboard/GP/Julia | Agente | ✅ **09/07** |
 | 1d | **I79–I83** Julia + Operadores + race Escala/Metas | Agente | ✅ FE **v1.9.15** · GAS **v1.5.179** |
 | 1e | **I84–I87** meta conta/dia · caixa pagamento · perf admin | Agente | ✅ FE **v1.9.21** · GAS **v1.5.182** |
 | 1f | **I96–I103** multi-veículo + contagem encerradas/caixa | Agente | ✅ FE **v1.9.39** · GAS **v1.5.187** Web |
-| 2 | Assinar **FASE 17** (só falta **17.5 F9**) + smoke tablet D4 | Sócio + Ops | ⏳ **próximo** |
+| 2 | Assinar **FASE 17** (só falta **17.5 F9**) + smoke tablet D4 | Sócio + Ops | ⏳ |
 | 3 | Smoke tablet **v1.9.39** (multi-veículo + overlay + timer) | Ops | ⏳ Sprint D4 |
 | 4 | Sprint One UI A–C + I24 | Agente | ✅ **v1.9.9** |
 
-Docs: `PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md` · `CHECKLIST_FASE17_FECHAMENTO.md` · `INCIDENTE_I96_I99_MULTI_VEICULO_2026-07-10.md`
+Docs: `INCIDENTE_I115_COLAB_LOGIN_LENTO_2026-07-15.md` · `BASELINE_CODIGO_P0.md` · `PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`
 
 ---
 

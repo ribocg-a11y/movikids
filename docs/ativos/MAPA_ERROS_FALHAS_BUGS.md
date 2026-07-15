@@ -1,6 +1,7 @@
 # MOVI KIDS — Mapa de erros, falhas e bugs
 
-**Atualizado:** 15/07/2026 — **I114** vencimentos sem bônus · FE **v1.9.56** · GAS **v1.5.194**  
+**Atualizado:** 15/07/2026 — **I115** login Colaboradores ~61s · FE **v1.9.57** (mitigação) · GAS **v1.5.194**  
+**Uso anterior:** 15/07/2026 — **I114** vencimentos sem bônus · FE **v1.9.56** · GAS **v1.5.194**  
 **Uso anterior:** 15/07/2026 — **I110** Q1 sem faltas + pacote holerite · FE **v1.9.52** · GAS **v1.5.192**  
 **Uso anterior:** 15/07/2026 — **I109b** pot FSS R$50 cada · FE **v1.9.51** · GAS **v1.5.191**  
 **Uso anterior:** 15/07/2026 — **I109** bônus FSS metade · FE **v1.9.50** · GAS **v1.5.190**  
@@ -116,6 +117,7 @@
 | **I112** | **Bônus no salário/vencimentos** | Base INSS/líquido misturava metas | GAS **v1.5.194** bruto=só salário · bônus na cesta · FE **v1.9.54** | I108 · I111 | cód 500 na cesta · Base INSS = salário |
 | **I113** | **FE cache mostrou pacote com VT** | Print em force=1.9.53 ainda somava VT | FE **v1.9.55** `mkHolNormalizeHol_` zera VT Q1 no pacote + faixa “já pago” | I111 | Reabrir com `?force=1.9.55` |
 | **I114** | **Total vencimentos = salário+bônus** | Julia 748,40 com bônus na cesta | FE **v1.9.56** bruto/líquido = só salário | I112 | Total = 648,40 · bônus só cód 500 |
+| **I115** | **Login Colaboradores lento/trava** | Raykelly ~61s no painel pós-PIN | FE **v1.9.57** cache listar + UX wait · GAS slim **pendente §7.3** (I48 write-on-read + AUD×N) | I48 · I68 · I74 · I110 | PIN &lt;12s warm · ver `INCIDENTE_I115_...` |
 | **I84** | **Meta colaborador contava sessões, não contas (I42)** | 4 encerramentos mesmo telefone = 4 loc na meta | GAS **v1.5.180** `metaOperadorSeenMark_` conta_id/telefone · FE **v1.9.16** scroll módulo | `metaOperadorTurno` | 1 loc por telefone/dia |
 | **I42** | Conta do dia — mesmo telefone 10h–22h | Caixa `n` vs sessões; maquininha | GAS **v1.5.131+** col S `conta_id` | `TESTE_I42_CONTA_DIA_CAIXA` | não reduzir `COL_LOC_READ_` (ver I43) |
 | **I41** | **`ping_` versão defasada** (v1.5.107 vs repo) | Confusão deploy / verify | GAS **v1.5.130** `ping_()` alinhado | `ping_` header alinhado | ping = v1.5.130 |
@@ -304,7 +306,7 @@
 38. **Nunca** `gpPersistBancoFromJornada_` em leitura de painel admin/colaborador — só na **saída de ponto** (I44).
 39. **Nunca** travar meta projeção no dia 1 do mês — usar `metaProjecaoStale_` + trava após 3 dias (I72).
 40. **Nunca** rodar `alertasInteligentes_` no `kpiMes` lite — só no full em background (I73).
-41. **Nunca** prefetch `painelGestaoPessoasAdmin` junto com warm Dashboard — GP compete na fila GAS (I74).
+42. **Nunca** montar login colaborador com escritas FALTAS/HOLERITES + 2× `gpLoadContext_` + varredura AUDITORIA inteira — slim espelho I48 (I115).
 42. **Sempre** sync OPERADORES_SISTEMA → COLABORADORES_RH ao cadastrar operador ativo (I75).
 43. **Nunca** passar `C:\Users\...` como link clicável para deploy GAS — usar **raw GitHub** (I76).
 44. **Sempre** atualizar HANDOFF/ESTADO/DEPLOY/AGENTS ao encerrar sessão com mudança de versão (I76).

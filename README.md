@@ -22,12 +22,12 @@ Detalhe: [docs/ativos/ESTRUTURA_REPO.md](docs/ativos/ESTRUTURA_REPO.md) · mocku
 
 **Planejamento:** [PLANEJAMENTO_ATUAL_2026-06.md](docs/ativos/PLANEJAMENTO_ATUAL_2026-06.md) · [PLANO_PRIORIDADES](docs/ativos/PLANO_PRIORIDADES_2026-06.md)
 
-## Produção (15/07/2026 — FE v1.9.56 · GAS v1.5.194 I111)
+## Produção (15/07/2026 — FE v1.9.57 · GAS v1.5.194 I111)
 
 | Camada | Versão repo | Produção |
 |--------|-------------|----------|
-| Frontend | **v1.9.56** | https://ribocg-a11y.github.io/movikids/?force=1.9.56 |
-| Gestão Pessoas | **v1.9.56** | `gestao-pessoas.html?force=1.9.56` |
+| Frontend | **v1.9.57** | https://ribocg-a11y.github.io/movikids/?force=1.9.57 |
+| Gestão Pessoas | **v1.9.57** | `gestao-pessoas.html?force=1.9.57` |
 | Apps Script | **v1.5.194** | I111 Q1 VT já pago · I110 · I109b · I108 |
 | Design System | **v1.1** | [DESIGN_SYSTEM_MOVIKIDS.md](docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md) |
 | **Ciclo dev** | Sprint D | [PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md](docs/ativos/PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md) · One UI ✅ |

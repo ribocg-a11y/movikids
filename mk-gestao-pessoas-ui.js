@@ -872,11 +872,22 @@
         }
         if (MK_GP_PROD && window.MK_GestaoPessoas) {
           colabPinBusy_ = true;
+          showColabErr('');
+          var waitEl = document.getElementById('colab-err');
+          if (waitEl) {
+            waitEl.hidden = false;
+            waitEl.className = 'mock-note info';
+            waitEl.textContent = 'Montando seu painel (metas + holerite)… pode levar até 1 minuto. Aguarde.';
+          }
+          var t0 = Date.now();
           MK_GestaoPessoas.loginPainel(uid, pin).then(function (mapped) {
             gpAssignColab_(uid, mapped, { pin: pin, preview: false });
             gpSessionPin = pin;
             gpCompetenciaSel_ = mapped.competenciaAtiva || (mapped.pagamento && mapped.pagamento.competencia) || '';
             showColabErr('');
+            if (typeof toast === 'function' && (Date.now() - t0) > 8000) {
+              toast('Painel carregado em ' + Math.round((Date.now() - t0) / 1000) + 's', 'info');
+            }
             gpAfterColabLogin_(uid);
           }).catch(function (e) {
             showColabErr(e.message || 'PIN incorreto ou erro de conexão.');
