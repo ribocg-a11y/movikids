@@ -1,6 +1,6 @@
 # MOVI KIDS — Protocolo "Atualize tudo"
 
-**Criado:** 14/06/2026 · **Última execução:** 15/07/2026 (FE **v1.9.52** · GAS **v1.5.192** · I110 holerite Q1)  
+**Criado:** 14/06/2026 · **Última execução:** 15/07/2026 (FE **v1.9.52** Pages ✅ · GAS **v1.5.192** Web ✅ · I110)  
 **Função:** quando o usuário pedir **"atualize tudo"**, o agente segue **esta lista** — não só handoff parcial.  
 **Regra Cursor:** `.cursor/rules/atualize-tudo-movikids.mdc`
 
@@ -46,8 +46,8 @@ Sincronizar **documentação + estado operacional** do projeto com a realidade a
 
 | Camada | Versão | Evidência |
 |--------|--------|-----------|
-| GAS | **v1.5.192** | repo · Nova versão Web pendente I110 |
-| FE | **v1.9.52** | Pages · holerite pacote Q1 |
+| GAS | **v1.5.192** | ping Web = repo ✅ (sócio colou + Nova versão) |
+| FE | **v1.9.52** | Pages live ✅ · holerite pacote Q1 |
 | Planilha FOLHA | **OK** | B9=8,80 · B10/B12=22 · B68=5253,96 |
 | Planilha | **OK** | auditoria **23/23** |
 | Homolog tablet | **✅** | 23/06 |

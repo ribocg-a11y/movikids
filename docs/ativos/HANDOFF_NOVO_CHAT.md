@@ -1,10 +1,10 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 15/07/2026 · FE **v1.9.52** · GAS repo **v1.5.192** (I110 holerite Q1) — ping até Nova versão  
+**Atualizado:** 15/07/2026 · FE **v1.9.52** · GAS **v1.5.192** Web ✅ (I110 holerite Q1 alinhado)  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **Repo local:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`  
-**GitHub:** `ribocg-a11y/movikids` · branch `main` · commit **f0002fc** (I104 conferência POS · v1.9.46)
+**GitHub:** `ribocg-a11y/movikids` · branch `main` · commit **92c637c** (I110 holerite Q1 · v1.9.52)
 
 **Mensagem mínima no novo chat:**
 
@@ -62,7 +62,7 @@ cursor "C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-mo
 | **Frontend** | **v1.9.52** | https://ribocg-a11y.github.io/movikids/?force=1.9.52 |
 | **Gestão Pessoas** | **v1.9.52** | `gestao-pessoas.html?force=1.9.52` |
 | **Service Worker** | **1.9.52** | `sw.js` |
-| **Apps Script** | **v1.5.192** repo · ping até Nova versão Web | I110 Q1 sem faltas + holerite pacote |
+| **Apps Script** | **v1.5.192** repo = Web ✅ | ping `versao=v1.5.192` · I110 Q1 sem faltas + pacote |
 | **Baseline P0** | ✅ | `docs/ativos/BASELINE_CODIGO_P0.md` |
 | **PIN admin** | **1421** | Script Property `ADMIN_PIN` |
 | **Homolog tablet** | ✅ 23/06 | I43 · I42 · I47 · Gestor — smoke **v1.9.39** pendente Ops |
@@ -143,6 +143,7 @@ Docs: `PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md` · `CHECKLIST_FASE17_FECHAMENTO.
 
 | Item | Data |
 |------|------|
+| **I108–I110** holerite Q1 (50% VA/bônus/VT · FSS pot · sem faltas Q1) · GAS **v1.5.192** Web · FE **v1.9.52** | 15/07 |
 | Homolog tablet I43/I42/I47/Gestor | 23/06 |
 | GAS v1.5.167 Web · planilha 23/23 | 26/06 |
 | **I68 VT folha** (4,40×2 · 22 dias) | 26/06 |
@@ -155,8 +156,8 @@ Docs: `PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md` · `CHECKLIST_FASE17_FECHAMENTO.
 
 ## Incidentes — referência rápida
 
-I15 POST browser · I20/I43 cronômetro · I42 conta dia · **I68 VT folha** · **I69 ponto mock** · **I70–I76 sessão 09/07** · **I96–I103 multi-veículo/contagem** · ver `MAPA_ERROS_FALHAS_BUGS.md` · `INCIDENTE_I96_I99_MULTI_VEICULO_2026-07-10.md`.
+I15 POST browser · I20/I43 cronômetro · I42 conta dia · **I68 VT folha** · **I69 ponto mock** · **I70–I76 sessão 09/07** · **I96–I103 multi-veículo/contagem** · **I108–I110 holerite Q1** · ver `MAPA_ERROS_FALHAS_BUGS.md` · `INCIDENTE_I96_I99_MULTI_VEICULO_2026-07-10.md`.
 
 ---
 
-*Preparado para novo chat — ciclo Premium One UI · sessão multi-veículo + I103 fechada 10/07.*
+*Preparado para novo chat — ciclo Premium One UI · I110 Web alinhado 15/07 · próximo: FASE 17 / smoke tablet.*

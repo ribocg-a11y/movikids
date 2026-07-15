@@ -1,6 +1,6 @@
 # MOVI KIDS — Deploy atual (referência única)
 
-**Atualizado:** 15/07/2026 (FE **v1.9.52** + GAS **v1.5.192** I110 holerite Q1)
+**Atualizado:** 15/07/2026 (FE **v1.9.52** Pages ✅ + GAS **v1.5.192** Web ✅ I110)
 
 Use **este arquivo** para versão e ordem de publicação. Docs `DEPLOY_v1.5.xx_*` em **`docs/arquivo/deploy/`** são histórico.
 
@@ -10,11 +10,11 @@ Use **este arquivo** para versão e ordem de publicação. Docs `DEPLOY_v1.5.xx_
 
 | Camada | Repo | Produção (ping / Pages) | Alinhado? |
 |--------|------|-------------------------|-----------|
-| **Frontend** | **v1.9.52** | https://ribocg-a11y.github.io/movikids/?force=1.9.52 | Pages após push |
-| **Gestão Pessoas** | **v1.9.52** | `gestao-pessoas.html?force=1.9.52` | |
-| **Portal acompanhar** | **v1.9.52** | `acompanhar.html` | |
-| **Service Worker** | **1.9.52** | `sw.js` | |
-| **GAS** | **v1.5.192** (header `.gs`) | ping até **Nova versão** I110 | ⚠️ colar + implantar |
+| **Frontend** | **v1.9.52** | https://ribocg-a11y.github.io/movikids/?force=1.9.52 | ✅ Pages live |
+| **Gestão Pessoas** | **v1.9.52** | `gestao-pessoas.html?force=1.9.52` | ✅ |
+| **Portal acompanhar** | **v1.9.52** | `acompanhar.html` | ✅ |
+| **Service Worker** | **1.9.52** | `sw.js` | ✅ |
+| **GAS** | **v1.5.192** (header `.gs`) | ping **v1.5.192** | ✅ Web = repo (I110) |
 
 **Ping:** https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec?action=ping
 

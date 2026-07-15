@@ -37,7 +37,7 @@ Leia **nesta ordem**:
 |--------|--------|------|
 | Frontend | **v1.9.52** | https://ribocg-a11y.github.io/movikids/?force=1.9.52 |
 | Gestão Pessoas | **v1.9.52** | `gestao-pessoas.html?force=1.9.52` |
-| GAS | **v1.5.192** (repo) | ping Web até Nova versão I110 |
+| GAS | **v1.5.192** | ping Web **v1.5.192** ✅ (I110) |
 | Design System | **v1.1** | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
 | Deploy ID | `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y` | |
 
@@ -48,14 +48,15 @@ Leia **nesta ordem**:
 **GAS canônico:**  
 `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github\MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs`
 
-## Estado do projeto (10/07/2026)
+## Estado do projeto (15/07/2026)
 
 - **FASE 0–15 + 15b:** ✅ prod
 - **FASE 14 mini-DRE:** ✅ prod
-- **FASE 16–17:** ✅ visual One UI **v1.9.39** · assinatura FASE 17 pendente Ops
+- **FASE 16–17:** ✅ visual One UI **v1.9.52** · assinatura FASE 17 pendente Ops
 - **Homolog tablet:** ✅ 23/06 · smoke **v1.9.39** pendente (D4)
 - **Planilha:** ✅ 23/23 · **I68 VT** ✅ · **I75 Julia RH** ✅
 - **I96–I103:** ✅ multi-veículo + contagem encerradas/caixa
+- **I108–I110:** ✅ holerite Q1 · GAS **v1.5.192** Web · FE **v1.9.52**
 - **Travas I24:** ✅ `guard-i24-publicacao` + `encerramento-sessao`
 - **Próximo:** Sprint D2–D4 — assinar FASE 17 · smoke tablet v1.9.39
 
