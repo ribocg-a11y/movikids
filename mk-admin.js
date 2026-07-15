@@ -3373,7 +3373,7 @@ function nContasCartao_(locacoes) {
   return Object.keys(seen).length;
 }
 
-function cxHintConferenciaPos_(nContasMaq, nLocMaq, nContas, nSess, totalMaq) {
+function cxHintConferenciaPos_(nContasMaq, nLocMaq, nContas, nSess, totalMaq, nAbertas) {
   const parts = [];
   parts.push('<strong>' + nContasMaq + (nContasMaq === 1 ? ' conta</strong> no cartão'
     : ' contas</strong> no cartão') + ' — bater <em>quantidade</em> com vendas do POS');
@@ -3389,8 +3389,20 @@ function cxHintConferenciaPos_(nContasMaq, nLocMaq, nContas, nSess, totalMaq) {
     const rest = nSess - nLocMaq;
     parts.push(rest + (rest === 1 ? ' locação em dinheiro' : ' locações em dinheiro'));
   }
+  const nAb = Number(nAbertas) || 0;
+  if (nAb > 0) {
+    parts.push(nAb + (nAb === 1 ? ' aberta (Ativa/Pendente) já conta no maquininha — pay-first' : ' abertas já contam no maquininha — pay-first'));
+  }
   parts.push('Não comparar locações (' + nSess + ') com vendas POS — use contas no cartão');
   return parts.join(' · ');
+}
+
+function cxStatusPill_(status) {
+  const s = String(status || '').trim();
+  if (s === 'Ativa') return '<span style="font-size:10px;font-weight:700;color:#185FA5;background:#E6F1FB;padding:2px 6px;border-radius:6px">Ativa</span>';
+  if (s === 'Pendente') return '<span style="font-size:10px;font-weight:700;color:#854F0B;background:#FAEEDA;padding:2px 6px;border-radius:6px">Pendente</span>';
+  if (s === 'Encerrada') return '<span style="font-size:10px;font-weight:700;color:#3B6D11;background:#EAF3DE;padding:2px 6px;border-radius:6px">Encerrada</span>';
+  return s ? '<span style="font-size:10px;color:var(--txt3)">' + escHtml(s) + '</span>' : '';
 }
 
 const CX_POS_LS_KEY_ = 'mk_cx_pos_conf_v1_';
@@ -3646,6 +3658,11 @@ function renderCaixaFromResumo_(dataFmt, r) {
     const nSess = Number(r.nSessoes) || locacoes.length;
     const nContasMaq = nContasCartao_(locacoes);
     const nLocMaq = nLocCartao_(locacoes);
+    const nAbertas = Number(r.nAbertas) || locacoes.filter(function (l) {
+      const st = String(l.status || '');
+      return st === 'Ativa' || st === 'Pendente';
+    }).length;
+    const fatAbertas = Number(r.fatAbertas) || 0;
 
     const setText = (id, val) => {
       const el = document.getElementById(id);
@@ -3692,16 +3709,22 @@ function renderCaixaFromResumo_(dataFmt, r) {
     setText('cx-cred-ctx', cxPayCtxBreakdown_('Crédito', totPag, extrasPorPag));
     setText('cx-din-ctx', cxPayCtxBreakdown_('Dinheiro', totPag, extrasPorPag) + (saldoDin !== totalDin ? ' · saldo espécie ' + fmtR(saldoDin) : ''));
     setText('cx-maq-ctx', nContasMaq + (nContasMaq === 1 ? ' conta' : ' contas') + ' no cartão · = PIX + débito + crédito'
-      + (nLocMaq > nContasMaq ? ' · ' + nLocMaq + ' loc (multi-veículo)' : ''));
+      + (nLocMaq > nContasMaq ? ' · ' + nLocMaq + ' loc (multi-veículo)' : '')
+      + (nAbertas > 0 ? ' · inclui ' + nAbertas + ' aberta(s)' : ''));
     setText('cx-total-ctx', nSess > nContas
-      ? ('= PIX + débito + crédito + dinheiro · ' + nSess + ' locações em ' + nContas + ' contas (multi-veículo)')
-      : ('= PIX + débito + crédito + dinheiro · ' + nSess + ' locação(ões)'));
+      ? ('= PIX + débito + crédito + dinheiro · ' + nSess + ' locações em ' + nContas + ' contas (multi-veículo)'
+        + (nAbertas > 0 ? ' · pay-first' : ''))
+      : ('= PIX + débito + crédito + dinheiro · ' + nSess + ' locação(ões)'
+        + (nAbertas > 0 ? ' · pay-first' : '')));
     setText('cx-cus-ctx', custos.length + ' lançamento(s)');
     const nloc = document.getElementById('cx-nloc');
     if (nloc) nloc.textContent = String(nSess);
     setText('cx-nloc-ctx', nSess + (nSess === 1 ? ' locação' : ' locações')
       + ' · ' + nContas + (nContas === 1 ? ' conta' : ' contas')
-      + ' · ' + nContasMaq + (nContasMaq === 1 ? ' no cartão' : ' no cartão'));
+      + ' · ' + nContasMaq + (nContasMaq === 1 ? ' no cartão' : ' no cartão')
+      + (nAbertas > 0
+        ? (' · ' + nAbertas + ' aberta(s)' + (fatAbertas > 0 ? ' ' + fmtR(fatAbertas) : ''))
+        : ''));
     if (totalExt > 0) {
       const pct = totalEnt > 0 ? Math.round(totalExt / totalEnt * 1000) / 10 : 0;
       setText('cx-ext-ctx', nExt + ' loc · ' + pct + '% do fat.');
@@ -3790,7 +3813,7 @@ function renderCaixaFromResumo_(dataFmt, r) {
         <span>Total maquininha</span><span style="color:#185FA5">${fmtR(totalMaq)}</span>
       </div>` +
       `<div style="font-size:11px;color:var(--txt3);margin-top:6px;line-height:1.45">`
-      + cxHintConferenciaPos_(nContasMaq, nLocMaq, nContas, nSess, totalMaq)
+      + cxHintConferenciaPos_(nContasMaq, nLocMaq, nContas, nSess, totalMaq, nAbertas)
       + '</div>';
     }
 
@@ -3802,7 +3825,8 @@ function renderCaixaFromResumo_(dataFmt, r) {
       nContasMaq: nContasMaq,
       nContas: nContas,
       nSess: nSess,
-      nLocMaq: nLocMaq
+      nLocMaq: nLocMaq,
+      nAbertas: nAbertas
     };
     cxPosHydrate_(dataFmt);
 
@@ -3819,11 +3843,15 @@ function renderCaixaFromResumo_(dataFmt, r) {
           return b.sum - a.sum;
         }).map(function (c) {
           const det = c.locs.map(function (l) {
-            return (l.veiculo || l.tipo || '—') + ' ' + fmtR(l.valorTotal);
+            const st = String(l.status || '');
+            const tag = (st === 'Ativa' || st === 'Pendente') ? (' [' + st + ']') : '';
+            return (l.veiculo || l.tipo || '—') + ' ' + fmtR(l.valorTotal) + tag;
           }).join(' · ');
-          const maq = CX_FORMAS_MAQ_.indexOf(c.pagamento) >= 0;
+          const temAtiva = c.locs.some(function (l) { return String(l.status || '') === 'Ativa'; });
+          const temPend = c.locs.some(function (l) { return String(l.status || '') === 'Pendente'; });
+          const statusTag = temAtiva ? ' ' + cxStatusPill_('Ativa') : (temPend ? ' ' + cxStatusPill_('Pendente') : '');
           return '<tr' + (maq ? '' : ' style="opacity:.85"') + '>'
-            + '<td>' + escHtml(c.responsavel || '—') + '</td>'
+            + '<td>' + escHtml(c.responsavel || '—') + statusTag + '</td>'
             + '<td>' + c.locs.length + '</td>'
             + '<td>' + pagPill(c.pagamento) + (maq ? '' : ' <span style="font-size:10px;color:var(--txt3)">fora POS</span>') + '</td>'
             + '<td style="text-align:right;font-weight:600">' + fmtR(c.sum) + '</td>'
@@ -3854,17 +3882,19 @@ function renderCaixaFromResumo_(dataFmt, r) {
     const tbody = document.getElementById('cx-body-ent');
     if(tbody) {
       if(!locacoes.length) {
-        tbody.innerHTML = '<tr><td colspan="6" style="padding:20px;text-align:center;color:var(--txt3)">Nenhuma locação encerrada neste dia</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" style="padding:20px;text-align:center;color:var(--txt3)">Nenhuma locação paga neste dia</td></tr>';
       } else {
         tbody.innerHTML = [...locacoes].sort((a,b)=>a.horaInicio.localeCompare(b.horaInicio)).map(l => {
           const temExtra = Number(l.minAdicionais) > 0;
           const planoStr = (PLANO_LABELS[l.plano]||l.plano) + (temExtra ? ` +${l.minAdicionais}min extra` : '');
-          return `<tr>
+          const aberta = String(l.status || '') === 'Ativa' || String(l.status || '') === 'Pendente';
+          return `<tr${aberta ? ' style="background:#F8FBFF"' : ''}>
             <td>${l.horaInicio||'—'}</td>
             <td>${l.veiculo||l.tipo}</td>
             <td>${planoStr}</td>
             <td>${l.responsavel||'—'}</td>
             <td>${pagPill(l.pagamento)}</td>
+            <td>${cxStatusPill_(l.status)}</td>
             <td>${fmtR(l.valorTotal)}</td>
           </tr>`;
         }).join('');

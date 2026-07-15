@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.196
+// MOVI KIDS — Google Apps Script v1.5.197
+// v1.5.197: I117 — caixa pay-first: calcResumoDiaCore_ inclui Ativa/Pendente (plano já pago na maquininha)
 // v1.5.196: I116 — enrich audit login só ops listados (sem expandir todo RH); escala/banco via ctx
 // v1.5.195: I115 — login Colaboradores slim: 1× ctx + enrich audit; sem write FALTAS/HOLERITES; cache 90s
 // v1.5.194: I112 — bônus meta na cesta (não integra salário/bruto/INSS)
@@ -188,8 +189,8 @@
 
 // ── CONSTANTES ───────────────────────────────────────────────
 /** Versão exposta em ping, carregarInicio, validarSchema, gestaoPessoasStatus (bump com header). */
-const MK_GAS_VERSAO_  = 'v1.5.196';
-const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.196';
+const MK_GAS_VERSAO_  = 'v1.5.197';
+const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.197';
 const SHEET_ID   = '1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618';
 const DEPLOY_ID  = 'AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y';
 const WEBAPP_URL = `https://script.google.com/macros/s/${DEPLOY_ID}/exec`;
@@ -4527,23 +4528,39 @@ function calcResumoDiaCore_(dataFmt) {
     cusDin: 0,
     saldoDin: 0,
     resultado: 0,
+    nAbertas: 0,
+    fatAbertas: 0,
+    caixaIncluiAbertas: true,
     locacoes: [],
     custos: []
   };
   if (!dataAlvo) return empty;
 
+  // Pay-first: Ativa/Pendente já pagaram o plano na maquininha — entram no caixa/POS.
+  // Encerrada inclui plano + extras. Cancelada fora.
+  // COL_LOC_READ_=28: precisa col AB (extras meta) + conta_id — não usar COL_CONTA_ID_=19.
   const enc = [];
+  let nAbertas = 0;
+  let fatAbertas = 0;
   const shLoc = sh_(SH_LOC);
   const lastLoc = shLoc.getLastRow();
   if (lastLoc >= DATA_ROW) {
-    const dados = shLoc.getRange(DATA_ROW, 1, lastLoc - DATA_ROW + 1, COL_CONTA_ID_).getValues();
+    const dados = shLoc.getRange(DATA_ROW, 1, lastLoc - DATA_ROW + 1, COL_LOC_READ_).getValues();
     for (let i = 0; i < dados.length; i++) {
       const r = dados[i];
       if (!r[0]) continue;
       const data = cellToStr_(r[1]);
       if (data !== dataAlvo) continue;
       const status = String(r[14]).trim();
-      if (status !== 'Encerrada') continue;
+      if (status !== 'Encerrada' && status !== 'Ativa' && status !== 'Pendente') continue;
+      const valorPlano = Number(r[7] || 0) || 0;
+      const valorAdic = Number(r[9] || 0) || 0;
+      const valorTotal = Number(r[10] || 0) || (valorPlano + valorAdic);
+      if (status === 'Ativa' || status === 'Pendente') {
+        nAbertas++;
+        fatAbertas += valorTotal;
+      }
+      const extraMeta = parseExtraMetaCol_(r[27]);
       enc.push({
         rowIndex:      DATA_ROW + i,
         id:            r[0],
@@ -4554,10 +4571,10 @@ function calcResumoDiaCore_(dataFmt) {
         tipo:          String(r[4]),
         plano:         String(r[5]),
         mins:          Number(r[6]),
-        valorPlano:    Number(r[7]),
+        valorPlano:    valorPlano,
         minAdicionais: Number(r[8]),
-        valorAdicional:Number(r[9]),
-        valorTotal:    Number(r[10]),
+        valorAdicional: valorAdic,
+        valorTotal:    valorTotal,
         responsavel:   String(r[11]),
         crianca:       String(r[12]),
         telefone:      String(r[13]),
@@ -4565,11 +4582,9 @@ function calcResumoDiaCore_(dataFmt) {
         veiculo:       String(r[15] || ''),
         pagamento:     normalizarPagamento_(r[16] || ''),
         observacao:    String(r[17] || ''),
-        valorPlano:    Number(r[7] || 0),
-        valorAdicional:Number(r[9] || 0),
-        extraPagamento: parseExtraMetaCol_(r[27]).extraPagamento,
-        extrasCancelados: parseExtraMetaCol_(r[27]).extrasCancelados,
-        extrasJustificativa: parseExtraMetaCol_(r[27]).extrasJustificativa
+        extraPagamento: extraMeta.extraPagamento,
+        extrasCancelados: extraMeta.extrasCancelados,
+        extrasJustificativa: extraMeta.extrasJustificativa
       });
     }
   }
@@ -4624,6 +4639,9 @@ function calcResumoDiaCore_(dataFmt) {
     cusDin: Math.round(cusDin * 100) / 100,
     saldoDin: Math.round((agg.totalDin - cusDin) * 100) / 100,
     resultado: Math.round((agg.fat - totalCus) * 100) / 100,
+    nAbertas: nAbertas,
+    fatAbertas: Math.round(fatAbertas * 100) / 100,
+    caixaIncluiAbertas: true,
     locacoes: enc,
     custos: custos
   };
