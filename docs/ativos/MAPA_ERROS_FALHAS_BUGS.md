@@ -1,6 +1,7 @@
 # MOVI KIDS — Mapa de erros, falhas e bugs
 
-**Atualizado:** 15/07/2026 — **I115** slim login Colaboradores · FE **v1.9.58** · GAS repo **v1.5.195** (colar Web)  
+**Atualizado:** 15/07/2026 — **Estudo negócio** break-even/ticket (`ESTUDO_NEGOCIO_BREAK_EVEN_TICKET_2026-07.md`) · I115/I116  
+**Uso anterior:** 15/07/2026 — **I115** slim login Colaboradores · FE **v1.9.58** · GAS repo **v1.5.195** (colar Web)  
 **Uso anterior:** 15/07/2026 — **I115** login Colaboradores ~61s · FE **v1.9.57** (mitigação) · GAS **v1.5.194**  
 **Uso anterior:** 15/07/2026 — **I110** Q1 sem faltas + pacote holerite · FE **v1.9.52** · GAS **v1.5.192**  
 **Uso anterior:** 15/07/2026 — **I109b** pot FSS R$50 cada · FE **v1.9.51** · GAS **v1.5.191**  

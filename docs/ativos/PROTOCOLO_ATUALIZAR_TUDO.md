@@ -16,6 +16,7 @@ Sincronizar **documentação + estado operacional** do projeto com a realidade a
 | Estado / versões | `ESTADO_ATUAL.md`, `README.md`, `AGENTS.md` |
 | Planejamento | `PLANEJAMENTO_ATUAL_2026-06.md`, `PLANO_PRIORIDADES_2026-06.md`, **`MAPA_FASES.md`** |
 | Deploy atual | **`DEPLOY_ATUAL.md`** |
+| Estudo do negócio | **`ESTUDO_NEGOCIO_BREAK_EVEN_TICKET_2026-07.md`** (quando fechar mês / ticket) |
 | Estrutura repo | **`ESTRUTURA_REPO.md`** |
 | Mapa de erros | `MAPA_ERROS_FALHAS_BUGS.md` (I1–I34) |
 | **Design System** | **`docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md`** |

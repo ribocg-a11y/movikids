@@ -125,7 +125,9 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 
 | # | Ação | Quem | Status |
 |---|------|------|--------|
-| **0** | **I115** slim GAS login Colaboradores **v1.5.195** — colar + Nova versão Web | Sócio | ⏳ **colar agora** |
+| **0** | **Estudo do negócio** — break-even, ticket sáb×útil, CUSTOS fixos | Agente | ✅ **15/07** → `ESTUDO_NEGOCIO_BREAK_EVEN_TICKET_2026-07.md` |
+| **0b** | Lançar CUSTOS fixos faltantes (contadora, manutenção…) | Sócio | ⏳ **urgente** — BE hoje subestima |
+| **0c** | I115/I116 slim login — Web **v1.5.196** se já colou | Sócio | verificar ping |
 | 1 | **Sprint D1** homolog PC admin v1.9.2 | Agente | ✅ **27/06** |
 | 1b | **I69** hotfix ponto mock → **v1.9.3** | Agente | ✅ **29/06** Pages |
 | 1c | **I70–I75** varredura — GAS/FE/Dashboard/GP/Julia | Agente | ✅ **09/07** |
@@ -136,7 +138,7 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 | 3 | Smoke tablet **v1.9.39** (multi-veículo + overlay + timer) | Ops | ⏳ Sprint D4 |
 | 4 | Sprint One UI A–C + I24 | Agente | ✅ **v1.9.9** |
 
-Docs: `INCIDENTE_I115_COLAB_LOGIN_LENTO_2026-07-15.md` · `BASELINE_CODIGO_P0.md` · `PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`
+Docs: **`ESTUDO_NEGOCIO_BREAK_EVEN_TICKET_2026-07.md`** · `INCIDENTE_I115_*` · `BASELINE_CODIGO_P0.md` · `PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`
 
 ---
 
@@ -144,6 +146,7 @@ Docs: `INCIDENTE_I115_COLAB_LOGIN_LENTO_2026-07-15.md` · `BASELINE_CODIGO_P0.md
 
 | Item | Data |
 |------|------|
+| **Estudo do negócio** break-even + ticket sábado×útil (débito desde abertura) | 15/07 |
 | **I108–I110** holerite Q1 (50% VA/bônus/VT · FSS pot · sem faltas Q1) · GAS **v1.5.192** Web · FE **v1.9.52** | 15/07 |
 | Homolog tablet I43/I42/I47/Gestor | 23/06 |
 | GAS v1.5.167 Web · planilha 23/23 | 26/06 |

@@ -3,6 +3,7 @@
 Referência única para alinhamento local × produção.
 
 **Ciclo dev ativo:** **`PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`** — Sprint D (fechar FASE 16/17)  
+**Estudo do negócio (break-even / ticket):** **`ESTUDO_NEGOCIO_BREAK_EVEN_TICKET_2026-07.md`** ← sócio  
 **Diagnóstico 6 camadas:** **`DIAGNOSTICO_SISTEMA_6_CAMADAS_2026-06.md`**  
 **Prioridades gerais:** **`PLANEJAMENTO_ATUAL_2026-06.md`** §9
 
