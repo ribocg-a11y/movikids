@@ -1,6 +1,6 @@
 # MOVI KIDS — Protocolo "Atualize tudo"
 
-**Criado:** 14/06/2026 · **Última execução:** 10/07/2026 (FE **v1.9.39** · GAS **v1.5.187** · I103 contagem)  
+**Criado:** 14/06/2026 · **Última execução:** 15/07/2026 (FE **v1.9.52** · GAS **v1.5.192** · I110 holerite Q1)  
 **Função:** quando o usuário pedir **"atualize tudo"**, o agente segue **esta lista** — não só handoff parcial.  
 **Regra Cursor:** `.cursor/rules/atualize-tudo-movikids.mdc`
 
@@ -42,16 +42,16 @@ Sincronizar **documentação + estado operacional** do projeto com a realidade a
 
 ---
 
-## Produção atual (10/07/2026)
+## Produção atual (15/07/2026)
 
 | Camada | Versão | Evidência |
 |--------|--------|-----------|
-| GAS | **v1.5.187** | ping Web · `salvarLocacoesMulti` |
-| FE | **v1.9.39** | Pages live · I103 encerradas/caixa |
+| GAS | **v1.5.192** | repo · Nova versão Web pendente I110 |
+| FE | **v1.9.52** | Pages · holerite pacote Q1 |
 | Planilha FOLHA | **OK** | B9=8,80 · B10/B12=22 · B68=5253,96 |
-| Planilha | **OK** | `schemaOk=True` · auditoria **23/23** |
-| Homolog tablet | **✅** | 23/06 · smoke v1.9.39 pendente |
-| Ciclo dev | **I96–I103 ✅** | multi-veículo · `ROTEIRO_AGENTE_OBRIGATORIO.md` · travas I24 |
+| Planilha | **OK** | auditoria **23/23** |
+| Homolog tablet | **✅** | 23/06 |
+| Holerite | I108–I110 | Ray/Julia Q1 15/07 |
 
 ---
 

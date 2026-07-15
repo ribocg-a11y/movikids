@@ -35,9 +35,9 @@ Leia **nesta ordem**:
 
 | Camada | Versão | Link |
 |--------|--------|------|
-| Frontend | **v1.9.51** | https://ribocg-a11y.github.io/movikids/?force=1.9.51 |
-| Gestão Pessoas | **v1.9.51** | `gestao-pessoas.html?force=1.9.51` |
-| GAS | **v1.5.191** (repo) | ping Web até Nova versão I109b |
+| Frontend | **v1.9.52** | https://ribocg-a11y.github.io/movikids/?force=1.9.52 |
+| Gestão Pessoas | **v1.9.52** | `gestao-pessoas.html?force=1.9.52` |
+| GAS | **v1.5.192** (repo) | ping Web até Nova versão I110 |
 | Design System | **v1.1** | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
 | Deploy ID | `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y` | |
 

@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.191
+// MOVI KIDS — Google Apps Script v1.5.192
+// v1.5.192: I110 — Q1 sem desconto de faltas; snapshot HOLERITES também na 1ª quinzena; pacoteQuinzena
 // v1.5.191: I109b — FSS pot R$100: meta fecha (eu OU parceira) → R$50 pra cada (não só quem bateu)
 // v1.5.190: I109 — bônus meta sex/sáb/dom com Raykelly+Julia: R$50 cada (metade do R$100)
 // v1.5.189: I108 — 1ª quinzena: 40% salário + 50% VA + 50% bônus + 50% VT (2ª: restates + encargos)
@@ -183,8 +184,8 @@
 
 // ── CONSTANTES ───────────────────────────────────────────────
 /** Versão exposta em ping, carregarInicio, validarSchema, gestaoPessoasStatus (bump com header). */
-const MK_GAS_VERSAO_  = 'v1.5.191';
-const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.191';
+const MK_GAS_VERSAO_  = 'v1.5.192';
+const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.192';
 const SHEET_ID   = '1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618';
 const DEPLOY_ID  = 'AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y';
 const WEBAPP_URL = `https://script.google.com/macros/s/${DEPLOY_ID}/exec`;
@@ -12037,8 +12038,11 @@ function gpCalcHollerite_(colab, bonus, faltas, competencia, refDate) {
     fgts = Math.round(brutoMes * 0.08 * 100) / 100;
   }
 
-  const totalDescontos = Math.round((inss + irrf + vt + faltas) * 100) / 100;
+  // I110 — faltas / INSS / IRRF / VT 6% só na 2ª quinzena
+  const faltasQuinz = (quinzena === 2 && temQuinzena) ? Number(faltas) || 0 : 0;
+  const totalDescontos = Math.round((inss + irrf + vt + faltasQuinz) * 100) / 100;
   const liquido = Math.round((bruto - totalDescontos) * 100) / 100;
+  const pacoteQuinzena = Math.round((liquido + vaTotal + vtPasses) * 100) / 100;
   const diasVaBase = gpVaDiasBase_();
   // Diário de referência = VA mensal / dias memorial (não metade do VA da quinzena)
   const vaDiario = Math.round((vaMensal / diasVaBase) * 100) / 100;
@@ -12049,11 +12053,12 @@ function gpCalcHollerite_(colab, bonus, faltas, competencia, refDate) {
 
   return {
     base: basePag, salarioContratual: salarioContratual, salarioProporcional: salarioProp,
-    bonus: bonusQuinz, bonusMes: Number(bonus) || 0, faltas: faltas, bruto: bruto,
+    bonus: bonusQuinz, bonusMes: Number(bonus) || 0, faltas: faltasQuinz, faltasMes: Number(faltas) || 0,
+    bruto: bruto,
     inss: inss, inssAli: inssAli, irrf: irrf, irrfIsento: irrfIsento, vt: vt, fgts: fgts,
     vaTotal: vaTotal, vaDias: vaDias, vaDiario: vaDiario, vaMensal: vaMensal, vtPasses: vtPasses,
     vtPassesMes: vtPassesMesProp, pctBeneficios: pctBenef,
-    totalDescontos: totalDescontos, liquido: liquido,
+    totalDescontos: totalDescontos, liquido: liquido, pacoteQuinzena: pacoteQuinzena,
     baseInss: quinzena === 2 ? salarioProp + bonus : bruto,
     irrfBase: irrfBase, competencia: compLabel, quinzena: quinzena, quinzenaLabel: quinzenaLabel,
     pctQuinzena: pctQuinz, pagamentoEm: pagamentoEm, diasTrabalhados: diasTrab, diasMes: diasMes,
@@ -12226,7 +12231,8 @@ function gpBuildPainelColaboradorPayload_(opId, comp, colab, operador) {
   gpSyncFaltasFromJornada_(opId, jornada, colab, comp);
   const faltasDesc = gpFaltasDescontoMes_(opId, comp, colab, jornada);
   const hol = gpCalcHollerite_(colab, bonus, faltasDesc, comp);
-  if (hol && hol.quinzena === 2 && hol.liquido != null) {
+  // I110 — snapshot também na 1ª (dia 15) para o app/planilha refletirem o adiantamento
+  if (hol && hol.diasQuinzena > 0 && hol.liquido != null) {
     gpPersistHoleriteSnapshot_(opId, comp, hol);
   }
   const historicoDesempenho = gpHistoricoDesempenhoColab_(opId, 6, ctxJ);

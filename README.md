@@ -22,13 +22,13 @@ Detalhe: [docs/ativos/ESTRUTURA_REPO.md](docs/ativos/ESTRUTURA_REPO.md) · mocku
 
 **Planejamento:** [PLANEJAMENTO_ATUAL_2026-06.md](docs/ativos/PLANEJAMENTO_ATUAL_2026-06.md) · [PLANO_PRIORIDADES](docs/ativos/PLANO_PRIORIDADES_2026-06.md)
 
-## Produção (10/07/2026 — FE v1.9.39 · GAS v1.5.187 · I103 ✅)
+## Produção (15/07/2026 — FE v1.9.52 · GAS v1.5.192 · I110)
 
 | Camada | Versão repo | Produção |
 |--------|-------------|----------|
-| Frontend | **v1.9.39** | https://ribocg-a11y.github.io/movikids/?force=1.9.39 |
-| Gestão Pessoas | **v1.9.39** | `gestao-pessoas.html?force=1.9.39` |
-| Apps Script | **v1.5.187** | I96–I103 multi-veículo + batch |
+| Frontend | **v1.9.52** | https://ribocg-a11y.github.io/movikids/?force=1.9.52 |
+| Gestão Pessoas | **v1.9.52** | `gestao-pessoas.html?force=1.9.52` |
+| Apps Script | **v1.5.192** | I110 holerite Q1 · I109b pot FSS · I108 |
 | Design System | **v1.1** | [DESIGN_SYSTEM_MOVIKIDS.md](docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md) |
 | **Ciclo dev** | Sprint D | [PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md](docs/ativos/PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md) · One UI ✅ |
 

@@ -60,22 +60,28 @@
     var liquido = hol.liquido != null ? hol.liquido : Number(opts.liquido) || 0;
     var bruto = hol.bruto != null ? hol.bruto : Number(opts.bruto) || 0;
     var totalDescontos = hol.totalDescontos != null ? hol.totalDescontos : Number(opts.totalDescontos) || 0;
+    var vaTotal = Number(hol.vaTotal) || 0;
+    var vtPasses = Number(hol.vtPasses) || 0;
+    var pacote = hol.pacoteQuinzena != null
+      ? Number(hol.pacoteQuinzena)
+      : Math.round((liquido + vaTotal + vtPasses) * 100) / 100;
     var qLabel = hol.quinzenaLabel || opts.quinzenaLabel ||
       (hol.quinzena === 1 ? '1ª quinzena' : (hol.quinzena === 2 ? '2ª quinzena' : 'Quinzena'));
     var pgto = hol.pagamentoEm || opts.pagamentoEm || '—';
     return '<div class="gp-hol-widgets" aria-label="Resumo do pagamento">' +
       '<div class="mk-widget mk-widget--hero gp-hol-hero">' +
-      '<span class="mk-widget-lbl">Líquido desta quinzena</span>' +
-      '<span class="mk-widget-val green">' + mkHolFmtMoney_(liquido) + '</span>' +
-      '<span class="mk-widget-ctx">' + esc(qLabel) + ' · pgto ' + esc(pgto) + '</span></div>' +
+      '<span class="mk-widget-lbl">Pacote desta quinzena</span>' +
+      '<span class="mk-widget-val green">' + mkHolFmtMoney_(pacote) + '</span>' +
+      '<span class="mk-widget-ctx">' + esc(qLabel) + ' · pgto ' + esc(pgto) +
+      ' · PIX ' + mkHolFmtMoney_(liquido) + (vaTotal || vtPasses ? ' + VA/VT' : '') + '</span></div>' +
       '<div class="mk-cmd-grid gp-hol-widget-grid">' +
       '<div class="mk-widget"><span class="mk-widget-lbl">Competência</span><span class="mk-widget-val">' + esc(comp) + '</span>' +
       '<span class="mk-widget-ctx">Referência do mês</span></div>' +
       '<div class="mk-widget"><span class="mk-widget-lbl">Vencimentos</span><span class="mk-widget-val">' + mkHolFmtMoney_(bruto) + '</span>' +
-      '<span class="mk-widget-ctx">Proventos da quinzena</span></div>' +
+      '<span class="mk-widget-ctx">Salário + bônus da quinzena</span></div>' +
       '<div class="mk-widget"><span class="mk-widget-lbl">Descontos</span>' +
       '<span class="mk-widget-val" style="color:var(--red,#C62828)">' + mkHolFmtMoney_(totalDescontos, 'd') + '</span>' +
-      '<span class="mk-widget-ctx">INSS, IRRF, VT e outros</span></div>' +
+      '<span class="mk-widget-ctx">' + (hol.quinzena === 1 ? 'Na 1ª: sem faltas/INSS (só 2ª)' : 'INSS, IRRF, VT, faltas') + '</span></div>' +
       '</div></div>';
   }
 
