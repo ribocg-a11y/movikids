@@ -1,10 +1,10 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 15/07/2026 · FE **v1.9.59** (I117) · GAS repo **v1.5.197** (pendente Nova versão Web; ping ainda 196 até colar)  
+**Atualizado:** 15/07/2026 · FE **v1.9.59** (I117) · GAS **v1.5.197** Web ✅  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **Repo local:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`  
-**GitHub:** `ribocg-a11y/movikids` · branch `main` · I117 caixa pay-first (PR)
+**GitHub:** `ribocg-a11y/movikids` · branch `main` · I117 caixa pay-first Web ✅
 
 **Mensagem mínima no novo chat:**
 
@@ -59,10 +59,10 @@ cursor "C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-mo
 
 | Camada | Versão | URL / evidência |
 |--------|--------|-----------------|
-| **Frontend** | **v1.9.59** | https://ribocg-a11y.github.io/movikids/?force=1.9.59 (após merge/push main) |
+| **Frontend** | **v1.9.59** | https://ribocg-a11y.github.io/movikids/?force=1.9.59 |
 | **Gestão Pessoas** | **v1.9.59** | `gestao-pessoas.html?force=1.9.59` |
 | **Service Worker** | **1.9.59** | `sw.js` |
-| **Apps Script** | **v1.5.197** repo · ping Web até colar | I117 pay-first caixa · Web ainda **v1.5.196** até Nova versão |
+| **Apps Script** | **v1.5.197** Web ✅ | I117 pay-first caixa · ping alinhado 15/07 |
 | **Baseline P0** | ✅ | `docs/ativos/BASELINE_CODIGO_P0.md` |
 | **PIN admin** | **1421** | Script Property `ADMIN_PIN` |
 | **Homolog tablet** | ✅ 23/06 | I43 · I42 · I47 · Gestor — smoke **v1.9.39** pendente Ops |
@@ -77,7 +77,7 @@ cursor "C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-mo
 | **I103 contagem** | ✅ v1.9.39 | Encerradas = contas únicas · Caixa = todas locações |
 | **I104 conferência POS** | ✅ v1.9.46 | Caixa: contas no cartão (não locações) vs vendas maquininha |
 | **I106 POS gate** | ✅ v1.9.47 | Painel bruto POS + trava comprovante na Nova + cancel sem placeholder |
-| **I117 caixa pay-first** | 🔧 repo | Ativa/Pendente entram em `resumoDia` — bater POS com brincando |
+| **I117 caixa pay-first** | ✅ Web+FE | Ativa/Pendente entram em `resumoDia` — bater POS com brincando |
 
 **Deploy ID GAS:** `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y`
 
@@ -126,7 +126,7 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 
 | # | Ação | Quem | Status |
 |---|------|------|--------|
-| **0** | **I117** caixa pay-first — colar GAS **v1.5.197** + Nova versão Web · FE **v1.9.59** | Sócio (GAS) + merge FE | 🔧 **15/07** |
+| **0** | **I117** caixa pay-first — GAS **v1.5.197** Web ✅ · FE **v1.9.59** | Sócio+Agente | ✅ **15/07** |
 | **0a** | **I116** GAS **v1.5.196** Web ✅ — validado 15/07 (ping 196 · GP OK · Ray warm ~4s) | Sócio+Agente | ✅ **15/07** |
 | **0b** | Frios Colab ~20–23s — residual `gpLoadContext_` AUD/tail (não regredir P0) | Agente | 📋 backlog |
 | 0c | Backlog: `kpiMes` / `painelGestaoPessoasAdmin` frios (I116) | Agente | 📋 |
@@ -164,7 +164,7 @@ Docs: `MAPA_ERROS` I117 · `INCIDENTE_I116_ENRICH_RH_KPI_LENTIDAO_2026-07-15.md`
 
 ## Incidentes — referência rápida
 
-I15 POST browser · I20/I43 cronômetro · I42 conta dia · **I68 VT folha** · **I69 ponto mock** · **I70–I76 sessão 09/07** · **I96–I103 multi-veículo/contagem** · **I108–I114 holerite** · **I115–I116 login/lentidão** · ver `MAPA_ERROS_FALHAS_BUGS.md` · `INCIDENTE_I96_I99_MULTI_VEICULO_2026-07-10.md`.
+I15 POST browser · I20/I43 cronômetro · I42 conta dia · **I68 VT folha** · **I69 ponto mock** · **I70–I76 sessão 09/07** · **I96–I103 multi-veículo/contagem** · **I108–I114 holerite** · **I115–I116 login/lentidão** · **I117 caixa pay-first** · ver `MAPA_ERROS_FALHAS_BUGS.md` · `INCIDENTE_I96_I99_MULTI_VEICULO_2026-07-10.md`.
 
 ---
 
