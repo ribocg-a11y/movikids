@@ -1,10 +1,10 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 15/07/2026 · FE **v1.9.58** · GAS repo **v1.5.195** (I115 slim login) — ping até Nova versão  
+**Atualizado:** 15/07/2026 · FE **v1.9.58** · GAS repo **v1.5.196** (I116) · ping Web **v1.5.195** até Nova versão  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **Repo local:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`  
-**GitHub:** `ribocg-a11y/movikids` · branch `main` · commit I115 slim GAS + FE v1.9.58
+**GitHub:** `ribocg-a11y/movikids` · branch `main` · commit I115 Web ✅ · I116 expandRh no repo
 
 **Mensagem mínima no novo chat:**
 
@@ -62,7 +62,7 @@ cursor "C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-mo
 | **Frontend** | **v1.9.58** | https://ribocg-a11y.github.io/movikids/?force=1.9.58 |
 | **Gestão Pessoas** | **v1.9.58** | `gestao-pessoas.html?force=1.9.58` |
 | **Service Worker** | **1.9.58** | `sw.js` |
-| **Apps Script** | **v1.5.195** repo · ping até Nova versão | I115 slim login Colaboradores |
+| **Apps Script** | **v1.5.196** repo · ping Web **v1.5.195** até Nova versão I116 | I115 Web ✅ · I116 enrich login |
 | **Baseline P0** | ✅ | `docs/ativos/BASELINE_CODIGO_P0.md` |
 | **PIN admin** | **1421** | Script Property `ADMIN_PIN` |
 | **Homolog tablet** | ✅ 23/06 | I43 · I42 · I47 · Gestor — smoke **v1.9.39** pendente Ops |
@@ -125,7 +125,9 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 
 | # | Ação | Quem | Status |
 |---|------|------|--------|
-| **0** | **I115** slim GAS login Colaboradores **v1.5.195** — colar + Nova versão Web | Sócio | ⏳ **colar agora** |
+| **0** | **I116** GAS **v1.5.196** — colar + Nova versão Web (enrich login sem todo RH) | Sócio | ⏳ **colar agora** |
+| **0b** | **I115** validado pós-195 — Ray warm ~3s · frio 16–29s · testes GP OK | Agente | ✅ **15/07** |
+| 0c | Backlog: `kpiMes` ~34s / `painelGestaoPessoasAdmin` ~45s (I116 doc) | Agente | 📋 pós I116 Web |
 | 1 | **Sprint D1** homolog PC admin v1.9.2 | Agente | ✅ **27/06** |
 | 1b | **I69** hotfix ponto mock → **v1.9.3** | Agente | ✅ **29/06** Pages |
 | 1c | **I70–I75** varredura — GAS/FE/Dashboard/GP/Julia | Agente | ✅ **09/07** |
@@ -136,7 +138,7 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 | 3 | Smoke tablet **v1.9.39** (multi-veículo + overlay + timer) | Ops | ⏳ Sprint D4 |
 | 4 | Sprint One UI A–C + I24 | Agente | ✅ **v1.9.9** |
 
-Docs: `INCIDENTE_I115_COLAB_LOGIN_LENTO_2026-07-15.md` · `BASELINE_CODIGO_P0.md` · `PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`
+Docs: `INCIDENTE_I116_ENRICH_RH_KPI_LENTIDAO_2026-07-15.md` · `INCIDENTE_I115_COLAB_LOGIN_LENTO_2026-07-15.md` · `BASELINE_CODIGO_P0.md` · `PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`
 
 ---
 
@@ -145,6 +147,8 @@ Docs: `INCIDENTE_I115_COLAB_LOGIN_LENTO_2026-07-15.md` · `BASELINE_CODIGO_P0.md
 | Item | Data |
 |------|------|
 | **I108–I110** holerite Q1 (50% VA/bônus/VT · FSS pot · sem faltas Q1) · GAS **v1.5.192** Web · FE **v1.9.52** | 15/07 |
+| **I111–I114** VT Q1=0 · bônus cesta · hardclamp FE · totais | 15/07 |
+| **I115** slim login Colaboradores Web **v1.5.195** + FE **v1.9.58** | 15/07 |
 | Homolog tablet I43/I42/I47/Gestor | 23/06 |
 | GAS v1.5.167 Web · planilha 23/23 | 26/06 |
 | **I68 VT folha** (4,40×2 · 22 dias) | 26/06 |
@@ -157,7 +161,7 @@ Docs: `INCIDENTE_I115_COLAB_LOGIN_LENTO_2026-07-15.md` · `BASELINE_CODIGO_P0.md
 
 ## Incidentes — referência rápida
 
-I15 POST browser · I20/I43 cronômetro · I42 conta dia · **I68 VT folha** · **I69 ponto mock** · **I70–I76 sessão 09/07** · **I96–I103 multi-veículo/contagem** · **I108–I110 holerite Q1** · ver `MAPA_ERROS_FALHAS_BUGS.md` · `INCIDENTE_I96_I99_MULTI_VEICULO_2026-07-10.md`.
+I15 POST browser · I20/I43 cronômetro · I42 conta dia · **I68 VT folha** · **I69 ponto mock** · **I70–I76 sessão 09/07** · **I96–I103 multi-veículo/contagem** · **I108–I114 holerite** · **I115–I116 login/lentidão** · ver `MAPA_ERROS_FALHAS_BUGS.md` · `INCIDENTE_I96_I99_MULTI_VEICULO_2026-07-10.md`.
 
 ---
 

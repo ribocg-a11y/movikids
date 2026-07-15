@@ -34,7 +34,7 @@ try {
   Add-GpCheck "ping" "ok" $ping.versao
   if ($ping.versao -match 'v1\.5\.(10[0-6]|107)') {
     Add-GpCheck "gas.versao" "warn" "repo v1.5.134 - publicar Nova versao Web"
-  } elseif ($ping.versao -match 'v1\.5\.(10[89]|11[0-9]|12[0-9]|13[0-9]|14[0-2])') {
+  } elseif ($ping.versao -match 'v1\.5\.(10[89]|11[0-9]|12[0-9]|13[0-9]|14[0-9]|15[0-9]|16[0-9]|17[0-9]|18[0-9]|19[0-9])') {
     Add-GpCheck "gas.versao" "ok" $ping.versao
   } else {
     Add-GpCheck "gas.versao" "warn" ("versao inesperada: " + $ping.versao)

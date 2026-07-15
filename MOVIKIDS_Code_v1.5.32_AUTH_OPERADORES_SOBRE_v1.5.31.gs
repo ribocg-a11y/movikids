@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.195
+// MOVI KIDS — Google Apps Script v1.5.196
+// v1.5.196: I116 — enrich audit login só ops listados (sem expandir todo RH); escala/banco via ctx
 // v1.5.195: I115 — login Colaboradores slim: 1× ctx + enrich audit; sem write FALTAS/HOLERITES; cache 90s
 // v1.5.194: I112 — bônus meta na cesta (não integra salário/bruto/INSS)
 // v1.5.193: I111 — Q1 VT passes = 0 (já pago nos ~15 dias); pacote = PIX+VA
@@ -187,8 +188,8 @@
 
 // ── CONSTANTES ───────────────────────────────────────────────
 /** Versão exposta em ping, carregarInicio, validarSchema, gestaoPessoasStatus (bump com header). */
-const MK_GAS_VERSAO_  = 'v1.5.195';
-const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.195';
+const MK_GAS_VERSAO_  = 'v1.5.196';
+const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.196';
 const SHEET_ID   = '1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618';
 const DEPLOY_ID  = 'AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y';
 const WEBAPP_URL = `https://script.google.com/macros/s/${DEPLOY_ID}/exec`;
@@ -11111,8 +11112,14 @@ function gpLoadContext_() {
   };
 }
 
-/** Uma passagem na AUDITORIA — loc mês/hoje + meta turno por operador (evita N leituras). */
-function gpEnrichContextAudit_(ctx, competencia, operadores) {
+/**
+ * Uma passagem na AUDITORIA — loc mês/hoje + meta turno por operador (evita N leituras).
+ * I116: se `operadores` vier preenchido e opts.expandRh === false, NÃO expande todo RH
+ * (login Colaboradores: só op + parceiro FSS). Admin painel mantém expandRh default true.
+ */
+function gpEnrichContextAudit_(ctx, competencia, operadores, opts) {
+  opts = opts || {};
+  const expandRh = opts.expandRh !== false;
   const compNorm = gpNormCompetencia_(competencia);
   const hoje = ctx.hoje;
   const auditLocByOpId = {};
@@ -11128,14 +11135,16 @@ function gpEnrichContextAudit_(ctx, competencia, operadores) {
     auditLocByOpId[id] = { locMes: 0, locHoje: 0 };
     metaByDayByOpId[id] = {};
   });
-  ctx.rhRows.forEach(function (r) {
-    if (!gpRowValid_(r)) return;
-    const id = Number(r[0]);
-    if (!id || auditLocByOpId[id]) return;
-    opList.push({ id: id, nome: String(r[1] || ''), cfg: metaOperadorCfg_(id) });
-    auditLocByOpId[id] = { locMes: 0, locHoje: 0 };
-    metaByDayByOpId[id] = {};
-  });
+  if (expandRh) {
+    ctx.rhRows.forEach(function (r) {
+      if (!gpRowValid_(r)) return;
+      const id = Number(r[0]);
+      if (!id || auditLocByOpId[id]) return;
+      opList.push({ id: id, nome: String(r[1] || ''), cfg: metaOperadorCfg_(id) });
+      auditLocByOpId[id] = { locMes: 0, locHoje: 0 };
+      metaByDayByOpId[id] = {};
+    });
+  }
 
   (ctx.auditRows || []).forEach(function (r) {
     if (String(r[1] || '').trim() !== 'encerrarLocacao') return;
@@ -12160,17 +12169,19 @@ function gpHistoricoDesempenhoColab_(opId, nMeses, ctxIn) {
   };
 }
 
-function gpEscalaColab_(opId, competencia) {
+function gpEscalaColab_(opId, competencia, ctxIn) {
   const comp = gpNormCompetencia_(competencia);
-  const row = gpRows_(SH_ESCALA_COLAB).find(function (r) {
+  const rows = (ctxIn && ctxIn.escalaRows) ? ctxIn.escalaRows : gpRows_(SH_ESCALA_COLAB);
+  const row = rows.find(function (r) {
     return Number(r[0]) === Number(opId) && gpNormCompetencia_(r[1]) === comp;
   });
   if (!row) return ['—', '—', '—', '—', '—', '—', '—'];
   return [String(row[2] || ''), String(row[3] || ''), String(row[4] || ''), String(row[5] || ''), String(row[6] || ''), String(row[7] || ''), String(row[8] || '')];
 }
 
-function gpBancoHoras_(opId) {
-  const row = gpRows_(SH_BANCO_HORAS).find(function (r) { return Number(r[0]) === Number(opId); });
+function gpBancoHoras_(opId, ctxIn) {
+  const rows = (ctxIn && ctxIn.bancoRows) ? ctxIn.bancoRows : gpRows_(SH_BANCO_HORAS);
+  const row = rows.find(function (r) { return Number(r[0]) === Number(opId); });
   return row ? String(row[1] || '0h00') : '0h00';
 }
 
@@ -12266,7 +12277,7 @@ function gpBuildPainelColaboradorPayload_(opId, comp, colab, operador) {
       const pRh = gpColabRhFromCtx_(partnerId, ctxJ) || gpColabRhByOpId_(partnerId);
       opsMini.push({ id: Number(partnerId), nome: (pRh && pRh.nome) || '' });
     }
-    gpEnrichContextAudit_(ctxJ, comp, opsMini);
+    gpEnrichContextAudit_(ctxJ, comp, opsMini, { expandRh: false });
   } catch (eEn) {
     Logger.log('gpBuildPainel enrich: ' + eEn.message);
   }
@@ -12287,7 +12298,7 @@ function gpBuildPainelColaboradorPayload_(opId, comp, colab, operador) {
     },
     competencia: comp,
     ponto: { statusHoje: pontoHoje.status, folha: gpFolhaPontoFromCtx_(opId, comp, ctxJ), hoje: pontoHoje, jornada: jornada },
-    metas: metas, escala: gpEscalaColab_(opId, comp), bancoHoras: jornada.bancoProjetado || gpBancoHoras_(opId),
+    metas: metas, escala: gpEscalaColab_(opId, comp, ctxJ), bancoHoras: jornada.bancoProjetado || gpBancoHoras_(opId, ctxJ),
     pagamento: {
       base: hol.base, bonus: hol.bonus, faltas: faltasDesc, dependentes: 0, competencia: comp,
       pagamentoEm: hol.pagamentoEm, quinzena: hol.quinzena, quinzenaLabel: hol.quinzenaLabel,

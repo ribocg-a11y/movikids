@@ -72,7 +72,7 @@
 | [**PROTOCOLO_ATUALIZAR_TUDO.md**](ativos/PROTOCOLO_ATUALIZAR_TUDO.md) | **Comando "atualize tudo"** — checklist docs + planilha + pasta C |
 | [REGRAS_DE_PUBLICACAO_SEGURA.md](ativos/REGRAS_DE_PUBLICACAO_SEGURA.md) | Regras P0 deploy |
 | [ACESSOS_E_AUTORIZACOES.md](ativos/ACESSOS_E_AUTORIZACOES.md) | Papéis, PIN, agente vs humano |
-| [MAPA_ERROS_FALHAS_BUGS.md](ativos/MAPA_ERROS_FALHAS_BUGS.md) | Índice I1–I103 |
+| [MAPA_ERROS_FALHAS_BUGS.md](ativos/MAPA_ERROS_FALHAS_BUGS.md) | Índice I1–I116 |
 
 ## Hierarquia (conflito de versão)
 

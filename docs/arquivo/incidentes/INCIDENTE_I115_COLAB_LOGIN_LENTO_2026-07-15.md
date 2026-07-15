@@ -1,7 +1,7 @@
 # INCIDENTE I115 — Login Colaboradores lento / trava (Raykelly)
 
 **Data:** 15/07/2026  
-**FE:** v1.9.58 · **GAS repo:** v1.5.195 (Web até Nova versão)  
+**FE:** v1.9.58 · **GAS Web:** v1.5.195 ✅ · **GAS repo follow-up:** v1.5.196 (I116)  
 **Severidade:** P1 operação — colaborador não entra no hub em tempo aceitável
 
 ---
@@ -21,11 +21,21 @@
 | `buscarPainelColaboradorPreview` Raykelly | **~61 s** |
 | mesma action Julia | ~27 s |
 
+## Evidência pós Nova versão **v1.5.195** (15/07)
+
+| Action | Tempo |
+|--------|------:|
+| Raykelly frio | **~16–29 s** (variação carga) |
+| Raykelly warm | **~3,2–3,8 s** |
+| Julia frio / warm | ~21–27 s / ~3,6–3,8 s |
+| listar frio / warm | ~6 s / ~2 s |
+| `TESTE_GESTAO_PESSOAS_READONLY` | **ok** (APIs RH) |
+
 ## Causa raiz (classe I48 / I68 / I74)
 
 No login, um único request montava o painel com AUDITORIA ×N, **escritas** FALTAS/HOLERITES (I110 também Q1) e **2×** `gpLoadContext_`.
 
-## Correção GAS v1.5.195 (§7.3 autorizado)
+## Correção GAS v1.5.195 (§7.3 autorizado) — Web ✅
 
 | Mudança | Detalhe |
 |---------|---------|
@@ -36,16 +46,14 @@ No login, um único request montava o painel com AUDITORIA ×N, **escritas** FAL
 | Listar | Sync Julia só se RH ausente; cache listar 90s `gp_list_colab_v3` |
 | Defer writes | Faltas/holerite snapshot na **saída de ponto** |
 
+## Residual → I116
+
+Enrich ainda expandia **todo RH** no nested loop · frio Colab incompleto · `kpiMes`/`painelGestaoPessoasAdmin` continuam lentos (app-wide).  
+Ver `INCIDENTE_I116_ENRICH_RH_KPI_LENTIDAO_2026-07-15.md`.
+
 ## Mitigação FE (já em v1.9.57+)
 
 Cache listar sessionStorage + mensagem “até 1 minuto” no PIN.
-
-## Sócio — publicar
-
-1. Raw (confira **linha 2 = v1.5.195**):  
-   https://raw.githubusercontent.com/ribocg-a11y/movikids/main/MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs  
-2. Colar Editor → **Nova versão** (mesmo Deploy ID)  
-3. App: `?force=1.9.58` · medir login Raykelly  
 
 ## Teste
 
@@ -55,8 +63,8 @@ Cache listar sessionStorage + mensagem “até 1 minuto” no PIN.
 .\scripts\testes\TESTE_GESTAO_PESSOAS_READONLY.ps1
 ```
 
-Alvo: frio **&lt; 15–20 s** · warm cache **&lt; 3 s**.
+Alvo pós-195: warm **&lt; 4 s**. Alvo pós-196 (I116): frio **&lt; 12 s**.
 
 ## MAPA
 
-`MAPA_ERROS_FALHAS_BUGS.md` → **I115**
+`MAPA_ERROS_FALHAS_BUGS.md` → **I115** · **I116**
