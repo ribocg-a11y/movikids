@@ -53,9 +53,43 @@
     return note;
   }
 
+  /** I111/I113 — na 1ª quinzena VT nunca entra no pacote (já pago nos ~15 dias). */
+  function mkHolNormalizeHol_(holIn) {
+    var hol = Object.assign({}, holIn || {});
+    var q = Number(hol.quinzena) || 0;
+    if (q !== 1) return hol;
+    var vtRaw = Number(hol.vtPasses) || 0;
+    var vtJa = Number(hol.vtPassesJaPago) || 0;
+    if (vtRaw > 0 && vtJa <= 0) vtJa = vtRaw;
+    hol.vtPasses = 0;
+    hol.vtPassesJaPago = vtJa;
+    var base = Number(hol.base) || 0;
+    var bruto = hol.bruto != null ? Number(hol.bruto) : base;
+    var bonus = Number(hol.bonus) || 0;
+    var liquido = hol.liquido != null ? Number(hol.liquido) : bruto;
+    var vaTotal = Number(hol.vaTotal) || 0;
+    var pix;
+    if (hol.pixQuinzena != null) {
+      pix = Number(hol.pixQuinzena);
+    } else if (Math.abs(bruto - base) < 0.02) {
+      // I112+: bruto = só salário → PIX = líquido + bônus cesta
+      pix = Math.round((liquido + bonus) * 100) / 100;
+    } else {
+      // legado: líquido já trazia salário+bônus
+      pix = liquido;
+    }
+    hol.pixQuinzena = pix;
+    // Hardclamp: pacote Q1 = PIX + VA (sem VT), ignore pacote da API se legado
+    hol.pacoteQuinzena = Math.round((pix + vaTotal) * 100) / 100;
+    if (!hol.quinzenaLabel || String(hol.quinzenaLabel).indexOf('VT') < 0) {
+      hol.quinzenaLabel = '1ª quinzena · 40% salário + cesta (bônus/VA) · VT já pago';
+    }
+    return hol;
+  }
+
   function mkHolWidgetHero_(opts) {
     opts = opts || {};
-    var hol = opts.holerite || {};
+    var hol = mkHolNormalizeHol_(opts.holerite || {});
     var comp = opts.comp || hol.competencia || '—';
     var liquido = hol.liquido != null ? hol.liquido : Number(opts.liquido) || 0;
     var bruto = hol.bruto != null ? hol.bruto : Number(opts.bruto) || 0;
@@ -74,8 +108,10 @@
       (hol.quinzena === 1 ? '1ª quinzena' : (hol.quinzena === 2 ? '2ª quinzena' : 'Quinzena'));
     var pgto = hol.pagamentoEm || opts.pagamentoEm || '—';
     var benefCtx = '';
-    if (vaTotal && vtPasses) benefCtx = ' + VA/VT';
-    else if (vaTotal) benefCtx = vtJaPago ? ' + VA · VT já pago' : ' + VA';
+    if (hol.quinzena === 1) {
+      benefCtx = vaTotal ? (' + VA · VT ' + (vtJaPago ? mkHolFmtMoney_(vtJaPago) + ' já pago' : 'já pago')) : ' · VT já pago';
+    } else if (vaTotal && vtPasses) benefCtx = ' + VA/VT';
+    else if (vaTotal) benefCtx = ' + VA';
     else if (vtPasses) benefCtx = ' + VT';
     return '<div class="gp-hol-widgets" aria-label="Resumo do pagamento">' +
       '<div class="mk-widget mk-widget--hero gp-hol-hero">' +
@@ -83,6 +119,10 @@
       '<span class="mk-widget-val green">' + mkHolFmtMoney_(pacote) + '</span>' +
       '<span class="mk-widget-ctx">' + esc(qLabel) + ' · pgto ' + esc(pgto) +
       ' · PIX ' + mkHolFmtMoney_(pix) + ' (salário+bônus)' + benefCtx + '</span></div>' +
+      (hol.quinzena === 1
+        ? '<div class="mk-note info" style="margin:8px 0 0;padding:10px 12px;border-radius:12px;background:#FEF3C7;color:#92400E;font-weight:700">VT dos ~15 dias já pago — R$ 0,00 no holerite' +
+          (vtJaPago ? ' (ref. ' + mkHolFmtMoney_(vtJaPago) + ' pago fora)' : '') + '. Pacote = PIX + VA.</div>'
+        : '') +
       '<div class="mk-cmd-grid gp-hol-widget-grid">' +
       '<div class="mk-widget"><span class="mk-widget-lbl">Competência</span><span class="mk-widget-val">' + esc(comp) + '</span>' +
       '<span class="mk-widget-ctx">Referência do mês</span></div>' +
@@ -99,7 +139,7 @@
     var f = opts.folha || {};
     var colab = opts.colab || {};
     var comp = opts.comp || '';
-    var hol = f.holerite || {};
+    var hol = mkHolNormalizeHol_(f.holerite || {});
     var base = Number(f.base != null ? f.base : hol.base) || 0;
     var bonus = Number(f.bonus != null ? f.bonus : hol.bonus) || 0;
 
@@ -147,10 +187,10 @@
 
     var benPctLbl = (hol.pctBeneficios != null ? Math.round(Number(hol.pctBeneficios) * 100) : 50) + '%';
     var vtJaPago = Number(hol.vtPassesJaPago) || 0;
-    var vtLinhaRef = hol.quinzena === 1 && vtJaPago > 0
-      ? 'já pago nos ~15 dias (fora) · ref. ' + mkHolFmtMoney_(vtJaPago)
+    var vtLinhaRef = hol.quinzena === 1
+      ? ('JÁ PAGO nos ~15 dias — não entra no pacote' + (vtJaPago > 0 ? ' · ref. ' + mkHolFmtMoney_(vtJaPago) : ''))
       : benPctLbl + ' do benefício mês prop.';
-    var vtLinhaVal = hol.vtPasses ? mkHolFmtMoney_(hol.vtPasses) : (hol.quinzena === 1 && vtJaPago > 0 ? 'R$ 0,00' : '—');
+    var vtLinhaVal = hol.quinzena === 1 ? 'R$ 0,00' : (hol.vtPasses ? mkHolFmtMoney_(hol.vtPasses) : '—');
     var bonusRef = '';
     if (bonus > 0) {
       var bonusMes = hol.bonusMes != null ? Number(hol.bonusMes) : null;
