@@ -37,7 +37,7 @@ Leia **nesta ordem**:
 |--------|--------|------|
 | Frontend | **v1.9.58** | https://ribocg-a11y.github.io/movikids/?force=1.9.58 |
 | Gestão Pessoas | **v1.9.58** | `gestao-pessoas.html?force=1.9.58` |
-| GAS | **v1.5.195** | repo · ping até Nova versão I111 |
+| GAS | **v1.5.196** Web ✅ | I115+I116 |
 | Design System | **v1.1** | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
 | Deploy ID | `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y` | |
 

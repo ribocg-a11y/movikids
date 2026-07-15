@@ -1,5 +1,7 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.195
+// MOVI KIDS — Google Apps Script v1.5.197
+// v1.5.197: I117 — caixa pay-first: calcResumoDiaCore_ inclui Ativa/Pendente (plano já pago na maquininha)
+// v1.5.196: I116 — enrich audit login só ops listados (sem expandir todo RH); escala/banco via ctx
 // v1.5.195: I115 — login Colaboradores slim: 1× ctx + enrich audit; sem write FALTAS/HOLERITES; cache 90s
 // v1.5.194: I112 — bônus meta na cesta (não integra salário/bruto/INSS)
 // v1.5.193: I111 — Q1 VT passes = 0 (já pago nos ~15 dias); pacote = PIX+VA
@@ -187,8 +189,8 @@
 
 // ── CONSTANTES ───────────────────────────────────────────────
 /** Versão exposta em ping, carregarInicio, validarSchema, gestaoPessoasStatus (bump com header). */
-const MK_GAS_VERSAO_  = 'v1.5.195';
-const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.195';
+const MK_GAS_VERSAO_  = 'v1.5.197';
+const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.197';
 const SHEET_ID   = '1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618';
 const DEPLOY_ID  = 'AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y';
 const WEBAPP_URL = `https://script.google.com/macros/s/${DEPLOY_ID}/exec`;
@@ -4526,23 +4528,39 @@ function calcResumoDiaCore_(dataFmt) {
     cusDin: 0,
     saldoDin: 0,
     resultado: 0,
+    nAbertas: 0,
+    fatAbertas: 0,
+    caixaIncluiAbertas: true,
     locacoes: [],
     custos: []
   };
   if (!dataAlvo) return empty;
 
+  // Pay-first: Ativa/Pendente já pagaram o plano na maquininha — entram no caixa/POS.
+  // Encerrada inclui plano + extras. Cancelada fora.
+  // COL_LOC_READ_=28: precisa col AB (extras meta) + conta_id — não usar COL_CONTA_ID_=19.
   const enc = [];
+  let nAbertas = 0;
+  let fatAbertas = 0;
   const shLoc = sh_(SH_LOC);
   const lastLoc = shLoc.getLastRow();
   if (lastLoc >= DATA_ROW) {
-    const dados = shLoc.getRange(DATA_ROW, 1, lastLoc - DATA_ROW + 1, COL_CONTA_ID_).getValues();
+    const dados = shLoc.getRange(DATA_ROW, 1, lastLoc - DATA_ROW + 1, COL_LOC_READ_).getValues();
     for (let i = 0; i < dados.length; i++) {
       const r = dados[i];
       if (!r[0]) continue;
       const data = cellToStr_(r[1]);
       if (data !== dataAlvo) continue;
       const status = String(r[14]).trim();
-      if (status !== 'Encerrada') continue;
+      if (status !== 'Encerrada' && status !== 'Ativa' && status !== 'Pendente') continue;
+      const valorPlano = Number(r[7] || 0) || 0;
+      const valorAdic = Number(r[9] || 0) || 0;
+      const valorTotal = Number(r[10] || 0) || (valorPlano + valorAdic);
+      if (status === 'Ativa' || status === 'Pendente') {
+        nAbertas++;
+        fatAbertas += valorTotal;
+      }
+      const extraMeta = parseExtraMetaCol_(r[27]);
       enc.push({
         rowIndex:      DATA_ROW + i,
         id:            r[0],
@@ -4553,10 +4571,10 @@ function calcResumoDiaCore_(dataFmt) {
         tipo:          String(r[4]),
         plano:         String(r[5]),
         mins:          Number(r[6]),
-        valorPlano:    Number(r[7]),
+        valorPlano:    valorPlano,
         minAdicionais: Number(r[8]),
-        valorAdicional:Number(r[9]),
-        valorTotal:    Number(r[10]),
+        valorAdicional: valorAdic,
+        valorTotal:    valorTotal,
         responsavel:   String(r[11]),
         crianca:       String(r[12]),
         telefone:      String(r[13]),
@@ -4564,11 +4582,9 @@ function calcResumoDiaCore_(dataFmt) {
         veiculo:       String(r[15] || ''),
         pagamento:     normalizarPagamento_(r[16] || ''),
         observacao:    String(r[17] || ''),
-        valorPlano:    Number(r[7] || 0),
-        valorAdicional:Number(r[9] || 0),
-        extraPagamento: parseExtraMetaCol_(r[27]).extraPagamento,
-        extrasCancelados: parseExtraMetaCol_(r[27]).extrasCancelados,
-        extrasJustificativa: parseExtraMetaCol_(r[27]).extrasJustificativa
+        extraPagamento: extraMeta.extraPagamento,
+        extrasCancelados: extraMeta.extrasCancelados,
+        extrasJustificativa: extraMeta.extrasJustificativa
       });
     }
   }
@@ -4623,6 +4639,9 @@ function calcResumoDiaCore_(dataFmt) {
     cusDin: Math.round(cusDin * 100) / 100,
     saldoDin: Math.round((agg.totalDin - cusDin) * 100) / 100,
     resultado: Math.round((agg.fat - totalCus) * 100) / 100,
+    nAbertas: nAbertas,
+    fatAbertas: Math.round(fatAbertas * 100) / 100,
+    caixaIncluiAbertas: true,
     locacoes: enc,
     custos: custos
   };
@@ -11111,8 +11130,14 @@ function gpLoadContext_() {
   };
 }
 
-/** Uma passagem na AUDITORIA — loc mês/hoje + meta turno por operador (evita N leituras). */
-function gpEnrichContextAudit_(ctx, competencia, operadores) {
+/**
+ * Uma passagem na AUDITORIA — loc mês/hoje + meta turno por operador (evita N leituras).
+ * I116: se `operadores` vier preenchido e opts.expandRh === false, NÃO expande todo RH
+ * (login Colaboradores: só op + parceiro FSS). Admin painel mantém expandRh default true.
+ */
+function gpEnrichContextAudit_(ctx, competencia, operadores, opts) {
+  opts = opts || {};
+  const expandRh = opts.expandRh !== false;
   const compNorm = gpNormCompetencia_(competencia);
   const hoje = ctx.hoje;
   const auditLocByOpId = {};
@@ -11128,14 +11153,16 @@ function gpEnrichContextAudit_(ctx, competencia, operadores) {
     auditLocByOpId[id] = { locMes: 0, locHoje: 0 };
     metaByDayByOpId[id] = {};
   });
-  ctx.rhRows.forEach(function (r) {
-    if (!gpRowValid_(r)) return;
-    const id = Number(r[0]);
-    if (!id || auditLocByOpId[id]) return;
-    opList.push({ id: id, nome: String(r[1] || ''), cfg: metaOperadorCfg_(id) });
-    auditLocByOpId[id] = { locMes: 0, locHoje: 0 };
-    metaByDayByOpId[id] = {};
-  });
+  if (expandRh) {
+    ctx.rhRows.forEach(function (r) {
+      if (!gpRowValid_(r)) return;
+      const id = Number(r[0]);
+      if (!id || auditLocByOpId[id]) return;
+      opList.push({ id: id, nome: String(r[1] || ''), cfg: metaOperadorCfg_(id) });
+      auditLocByOpId[id] = { locMes: 0, locHoje: 0 };
+      metaByDayByOpId[id] = {};
+    });
+  }
 
   (ctx.auditRows || []).forEach(function (r) {
     if (String(r[1] || '').trim() !== 'encerrarLocacao') return;
@@ -12160,17 +12187,19 @@ function gpHistoricoDesempenhoColab_(opId, nMeses, ctxIn) {
   };
 }
 
-function gpEscalaColab_(opId, competencia) {
+function gpEscalaColab_(opId, competencia, ctxIn) {
   const comp = gpNormCompetencia_(competencia);
-  const row = gpRows_(SH_ESCALA_COLAB).find(function (r) {
+  const rows = (ctxIn && ctxIn.escalaRows) ? ctxIn.escalaRows : gpRows_(SH_ESCALA_COLAB);
+  const row = rows.find(function (r) {
     return Number(r[0]) === Number(opId) && gpNormCompetencia_(r[1]) === comp;
   });
   if (!row) return ['—', '—', '—', '—', '—', '—', '—'];
   return [String(row[2] || ''), String(row[3] || ''), String(row[4] || ''), String(row[5] || ''), String(row[6] || ''), String(row[7] || ''), String(row[8] || '')];
 }
 
-function gpBancoHoras_(opId) {
-  const row = gpRows_(SH_BANCO_HORAS).find(function (r) { return Number(r[0]) === Number(opId); });
+function gpBancoHoras_(opId, ctxIn) {
+  const rows = (ctxIn && ctxIn.bancoRows) ? ctxIn.bancoRows : gpRows_(SH_BANCO_HORAS);
+  const row = rows.find(function (r) { return Number(r[0]) === Number(opId); });
   return row ? String(row[1] || '0h00') : '0h00';
 }
 
@@ -12266,7 +12295,7 @@ function gpBuildPainelColaboradorPayload_(opId, comp, colab, operador) {
       const pRh = gpColabRhFromCtx_(partnerId, ctxJ) || gpColabRhByOpId_(partnerId);
       opsMini.push({ id: Number(partnerId), nome: (pRh && pRh.nome) || '' });
     }
-    gpEnrichContextAudit_(ctxJ, comp, opsMini);
+    gpEnrichContextAudit_(ctxJ, comp, opsMini, { expandRh: false });
   } catch (eEn) {
     Logger.log('gpBuildPainel enrich: ' + eEn.message);
   }
@@ -12287,7 +12316,7 @@ function gpBuildPainelColaboradorPayload_(opId, comp, colab, operador) {
     },
     competencia: comp,
     ponto: { statusHoje: pontoHoje.status, folha: gpFolhaPontoFromCtx_(opId, comp, ctxJ), hoje: pontoHoje, jornada: jornada },
-    metas: metas, escala: gpEscalaColab_(opId, comp), bancoHoras: jornada.bancoProjetado || gpBancoHoras_(opId),
+    metas: metas, escala: gpEscalaColab_(opId, comp, ctxJ), bancoHoras: jornada.bancoProjetado || gpBancoHoras_(opId, ctxJ),
     pagamento: {
       base: hol.base, bonus: hol.bonus, faltas: faltasDesc, dependentes: 0, competencia: comp,
       pagamentoEm: hol.pagamentoEm, quinzena: hol.quinzena, quinzenaLabel: hol.quinzenaLabel,

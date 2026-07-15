@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Movi Kids">
 <title>Movi Kids</title>
-<script src="mk-canonical-host.js?v=1.9.58"></script>
+<script src="mk-canonical-host.js?v=1.9.59"></script>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png">
@@ -17,17 +17,17 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<script src="mk-stale-sync.js?v=1.9.58"></script>
-<script src="mk-version.js?v=1.9.58"></script>
-<script src="mk-api.js?v=1.9.58"></script>
-<link rel="stylesheet" href="mk-design.css?v=1.9.58">
+<script src="mk-stale-sync.js?v=1.9.59"></script>
+<script src="mk-version.js?v=1.9.59"></script>
+<script src="mk-api.js?v=1.9.59"></script>
+<link rel="stylesheet" href="mk-design.css?v=1.9.59">
 
-<script src="mk-cache-bust.js?v=1.9.58"></script>
+<script src="mk-cache-bust.js?v=1.9.59"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<link rel="stylesheet" href="mk-app.css?v=1.9.58">
-<link rel="stylesheet" href="mk-gestao-pessoas.css?v=1.9.58">
+<link rel="stylesheet" href="mk-app.css?v=1.9.59">
+<link rel="stylesheet" href="mk-gestao-pessoas.css?v=1.9.59">
 <!-- Firebase SDK — Realtime sync canonico para todos os dispositivos -->
-<script type="module" src="mk-firebase.js?v=1.9.58"></script>
+<script type="module" src="mk-firebase.js?v=1.9.59"></script>
 </head>
 
 <body>
@@ -1149,7 +1149,7 @@
         <div class="mk-widget">
           <span class="mk-widget-lbl">Locações</span>
           <span class="mk-widget-val" id="cx-nloc">...</span>
-          <span class="mk-widget-ctx" id="cx-nloc-ctx">Locações encerradas</span>
+          <span class="mk-widget-ctx" id="cx-nloc-ctx">Pagas (encerradas + abertas)</span>
         </div>
         <div class="mk-widget">
           <span class="mk-widget-lbl">Custos</span>
@@ -1183,7 +1183,7 @@
 
     <div class="cx-card" id="cx-contas-card">
       <div class="cx-card-header">
-        <span>Contas do dia (1 linha = 1 cobrança / comparar com vendas POS)</span>
+        <span>Contas do dia (pay-first: inclui Ativa/Pendente · 1 linha ≈ 1 venda POS)</span>
         <span style="font-weight:500;color:var(--txt2)" id="cx-contas-n">—</span>
       </div>
       <div style="overflow-x:auto">
@@ -1201,17 +1201,17 @@
     <!-- Tabela Entradas -->
     <div class="cx-card">
       <div class="cx-card-header">
-        <span>↑ Entradas — locações do dia</span>
+        <span>↑ Entradas — locações do dia (plano já pago + extras)</span>
         <span style="font-weight:500;color:var(--green)" id="cx-total-ent">R$ 0,00</span>
       </div>
       <div style="overflow-x:auto">
         <table class="cx-table" id="cx-tabela-ent">
           <thead><tr>
             <th>Horário</th><th>Veículo</th><th>Plano</th>
-            <th>Responsável</th><th>Pagamento</th><th style="text-align:right">Valor</th>
+            <th>Responsável</th><th>Pagamento</th><th>Status</th><th style="text-align:right">Valor</th>
           </tr></thead>
           <tbody id="cx-body-ent">
-            <tr><td colspan="6" style="padding:20px;text-align:center;color:var(--txt3)">Carregando...</td></tr>
+            <tr><td colspan="7" style="padding:20px;text-align:center;color:var(--txt3)">Carregando...</td></tr>
           </tbody>
         </table>
       </div>
@@ -2485,27 +2485,27 @@
   </div>
 </div>
 
-<script src="mk-globals.js?v=1.9.58"></script>
-<script src="mk-core.js?v=1.9.58"></script>
-<script src="mk-nav.js?v=1.9.58"></script>
-<script src="mk-admin.js?v=1.9.58"></script>
-<script src="mk-historico.js?v=1.9.58"></script>
-<script src="mk-custos-historico.js?v=1.9.58"></script>
-<script src="mk-sessao.js?v=1.9.58"></script>
-<script src="mk-home.js?v=1.9.58"></script>
-<script src="mk-meta-operador.js?v=1.9.58"></script>
-<script src="mk-custos.js?v=1.9.58"></script>
-<script src="mk-avulso.js?v=1.9.58"></script>
-<script src="mk-sync.js?v=1.9.58"></script>
-<script src="mk-nova.js?v=1.9.58"></script>
-<script src="mk-relacionamento.js?v=1.9.58"></script>
-<script src="mk-operacao.js?v=1.9.58"></script>
-<script src="mk-drawer.js?v=1.9.58"></script>
-<script src="mk-update.js?v=1.9.58"></script>
-<script src="mk-gestao-pessoas.js?v=1.9.58"></script>
-<script src="mk-holerite.js?v=1.9.58"></script>
-<script src="mk-gestao-pessoas-admin.js?v=1.9.58"></script>
-<script src="mk-auth.js?v=1.9.58"></script>
-<script src="mk-boot.js?v=1.9.58"></script>
+<script src="mk-globals.js?v=1.9.59"></script>
+<script src="mk-core.js?v=1.9.59"></script>
+<script src="mk-nav.js?v=1.9.59"></script>
+<script src="mk-admin.js?v=1.9.59"></script>
+<script src="mk-historico.js?v=1.9.59"></script>
+<script src="mk-custos-historico.js?v=1.9.59"></script>
+<script src="mk-sessao.js?v=1.9.59"></script>
+<script src="mk-home.js?v=1.9.59"></script>
+<script src="mk-meta-operador.js?v=1.9.59"></script>
+<script src="mk-custos.js?v=1.9.59"></script>
+<script src="mk-avulso.js?v=1.9.59"></script>
+<script src="mk-sync.js?v=1.9.59"></script>
+<script src="mk-nova.js?v=1.9.59"></script>
+<script src="mk-relacionamento.js?v=1.9.59"></script>
+<script src="mk-operacao.js?v=1.9.59"></script>
+<script src="mk-drawer.js?v=1.9.59"></script>
+<script src="mk-update.js?v=1.9.59"></script>
+<script src="mk-gestao-pessoas.js?v=1.9.59"></script>
+<script src="mk-holerite.js?v=1.9.59"></script>
+<script src="mk-gestao-pessoas-admin.js?v=1.9.59"></script>
+<script src="mk-auth.js?v=1.9.59"></script>
+<script src="mk-boot.js?v=1.9.59"></script>
 </body>
 </html>
