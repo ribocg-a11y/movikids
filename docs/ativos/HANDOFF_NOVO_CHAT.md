@@ -1,10 +1,10 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 15/07/2026 · FE **v1.9.57** · GAS **v1.5.194** Web · **I115** Colaboradores lento (mitigação FE; slim GAS pendente §7.3)  
+**Atualizado:** 15/07/2026 · FE **v1.9.58** · GAS repo **v1.5.195** (I115 slim login) — ping até Nova versão  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **Repo local:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`  
-**GitHub:** `ribocg-a11y/movikids` · branch `main` · commit **I115** (perf colab login FE)
+**GitHub:** `ribocg-a11y/movikids` · branch `main` · commit I115 slim GAS + FE v1.9.58
 
 **Mensagem mínima no novo chat:**
 
@@ -59,10 +59,10 @@ cursor "C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-mo
 
 | Camada | Versão | URL / evidência |
 |--------|--------|-----------------|
-| **Frontend** | **v1.9.57** | https://ribocg-a11y.github.io/movikids/?force=1.9.57 |
-| **Gestão Pessoas** | **v1.9.57** | `gestao-pessoas.html?force=1.9.57` |
-| **Service Worker** | **1.9.57** | `sw.js` |
-| **Apps Script** | **v1.5.194** repo · ping até Nova versão | I112 bônus na cesta · I111 VT Q1=0 |
+| **Frontend** | **v1.9.58** | https://ribocg-a11y.github.io/movikids/?force=1.9.58 |
+| **Gestão Pessoas** | **v1.9.58** | `gestao-pessoas.html?force=1.9.58` |
+| **Service Worker** | **1.9.58** | `sw.js` |
+| **Apps Script** | **v1.5.195** repo · ping até Nova versão | I115 slim login Colaboradores |
 | **Baseline P0** | ✅ | `docs/ativos/BASELINE_CODIGO_P0.md` |
 | **PIN admin** | **1421** | Script Property `ADMIN_PIN` |
 | **Homolog tablet** | ✅ 23/06 | I43 · I42 · I47 · Gestor — smoke **v1.9.39** pendente Ops |
@@ -125,7 +125,7 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 
 | # | Ação | Quem | Status |
 |---|------|------|--------|
-| **0** | **I115** slim GAS login Colaboradores (sem write-on-read + 1× ctx) | Agente **após §7.3** + sócio colar Web | ⏳ **próximo P1** |
+| **0** | **I115** slim GAS login Colaboradores **v1.5.195** — colar + Nova versão Web | Sócio | ⏳ **colar agora** |
 | 1 | **Sprint D1** homolog PC admin v1.9.2 | Agente | ✅ **27/06** |
 | 1b | **I69** hotfix ponto mock → **v1.9.3** | Agente | ✅ **29/06** Pages |
 | 1c | **I70–I75** varredura — GAS/FE/Dashboard/GP/Julia | Agente | ✅ **09/07** |

@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.194
+// MOVI KIDS — Google Apps Script v1.5.195
+// v1.5.195: I115 — login Colaboradores slim: 1× ctx + enrich audit; sem write FALTAS/HOLERITES; cache 90s
 // v1.5.194: I112 — bônus meta na cesta (não integra salário/bruto/INSS)
 // v1.5.193: I111 — Q1 VT passes = 0 (já pago nos ~15 dias); pacote = PIX+VA
 // v1.5.192: I110 — Q1 sem desconto de faltas; snapshot HOLERITES também na 1ª quinzena; pacoteQuinzena
@@ -186,8 +187,8 @@
 
 // ── CONSTANTES ───────────────────────────────────────────────
 /** Versão exposta em ping, carregarInicio, validarSchema, gestaoPessoasStatus (bump com header). */
-const MK_GAS_VERSAO_  = 'v1.5.194';
-const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.194';
+const MK_GAS_VERSAO_  = 'v1.5.195';
+const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.195';
 const SHEET_ID   = '1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618';
 const DEPLOY_ID  = 'AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y';
 const WEBAPP_URL = `https://script.google.com/macros/s/${DEPLOY_ID}/exec`;
@@ -12189,7 +12190,7 @@ function gpStatusPontoHoje_(opId) {
 
 function gpListarColaboradoresGestao_() {
   try {
-    const cacheKey = 'gp_list_colab_v2';
+    const cacheKey = 'gp_list_colab_v3';
     try {
       const hit = CacheService.getScriptCache().get(cacheKey);
       if (hit) return ContentService.createTextOutput(hit).setMimeType(ContentService.MimeType.JSON);
@@ -12198,8 +12199,13 @@ function gpListarColaboradoresGestao_() {
     const parsed = JSON.parse(ops.getContent());
     if (!parsed.ok) return ops;
     gpSyncOperadoresAtivosToRh_(parsed.operadores || []);
+    // I115 — sync Julia só se RH ausente (sem patch/force a cada listar)
     try {
-      gpSyncJuliaPadrao_(null, gpCompetenciaAtual_());
+      const rhCheck = gpRows_(SH_COLAB_RH);
+      const hasJulia = rhCheck.some(function (r) {
+        return gpRowValid_(r) && Number(r[0]) === Number(GP_JULIA_OP_ID_);
+      });
+      if (!hasJulia) gpSyncJuliaPadrao_(null, gpCompetenciaAtual_());
     } catch (e) { Logger.log('gpListarColaboradoresGestao_ sync Julia: ' + e.message); }
     const rh = gpRows_(SH_COLAB_RH);
     const idsRh = rh.map(function (r) { return Number(r[0]); });
@@ -12210,7 +12216,7 @@ function gpListarColaboradoresGestao_() {
       return { id: o.id, nome: o.nome, hasPin: o.hasPin, funcao: c ? c.funcao : 'Colaborador', cadastroPct: c ? c.cadastroPct : 0 };
     });
     const out = JSON.stringify(parsed);
-    try { CacheService.getScriptCache().put(cacheKey, out, 60); } catch (e) { /* ok */ }
+    try { CacheService.getScriptCache().put(cacheKey, out, 90); } catch (e) { /* ok */ }
     return ContentService.createTextOutput(out).setMimeType(ContentService.MimeType.JSON);
   } catch (ex) {
     return err_('Abas Gestao Pessoas ausentes — rode scripts/criar-abas-gestao-pessoas.ps1', 503);
@@ -12228,7 +12234,18 @@ function buscarPainelColaborador_(p) {
       colab = { operadorId: opId, nome: auth.operador.nome, funcao: 'Colaborador', salarioBase: 1621, vaDiario: gpVaDiarioCanonico_(), metaLocDia: 20, bonusMeta: 100, turno: '', cadastroPct: 0, ativo: true };
     }
     const comp = String(p.competencia || gpCompetenciaAtual_());
-    return resp_(gpBuildPainelColaboradorPayload_(opId, comp, colab, auth.operador));
+    const cacheKey = 'gp_colab_pnl_v1_' + opId + '_' + gpNormCompetencia_(comp);
+    try {
+      const hit = CacheService.getScriptCache().get(cacheKey);
+      if (hit) return ContentService.createTextOutput(hit).setMimeType(ContentService.MimeType.JSON);
+    } catch (eC) { /* ok */ }
+    const payload = gpBuildPainelColaboradorPayload_(opId, comp, colab, auth.operador);
+    const outObj = Object.assign({ ok: true }, payload);
+    delete outObj.preview;
+    delete outObj.previewModo;
+    const out = JSON.stringify(outObj);
+    try { CacheService.getScriptCache().put(cacheKey, out, 90); } catch (eP) { /* ok */ }
+    return ContentService.createTextOutput(out).setMimeType(ContentService.MimeType.JSON);
   } catch (ex) {
     return err_('Abas Gestao Pessoas ausentes — rode scripts/criar-abas-gestao-pessoas.ps1', 503);
   }
@@ -12241,17 +12258,25 @@ function gpBuildPainelColaboradorPayload_(opId, comp, colab, operador) {
     colab = { operadorId: opId, nome: opNome, funcao: 'Colaborador', salarioBase: 1621, vaDiario: gpVaDiarioCanonico_(), metaLocDia: 20, bonusMeta: 100, turno: '', cadastroPct: 0, ativo: true };
   }
   const ctxJ = gpLoadContext_();
+  // I115 — enrich 1× (op + parceiro FSS) → metas usam ctx; sem varredura inteira da planilha
+  try {
+    const opsMini = [{ id: Number(opId), nome: opNome }];
+    const partnerId = META_BONUS_PAR_IDS_[Number(opId)];
+    if (partnerId) {
+      const pRh = gpColabRhFromCtx_(partnerId, ctxJ) || gpColabRhByOpId_(partnerId);
+      opsMini.push({ id: Number(partnerId), nome: (pRh && pRh.nome) || '' });
+    }
+    gpEnrichContextAudit_(ctxJ, comp, opsMini);
+  } catch (eEn) {
+    Logger.log('gpBuildPainel enrich: ' + eEn.message);
+  }
   const metas = gpMetasPainel_(opId, comp, ctxJ);
   const bonus = metas.bonusTotal || 0;
-  const pontoHoje = gpStatusPontoHoje_(opId);
+  const pontoHoje = gpStatusPontoFromCtx_(opId, ctxJ);
   const jornada = gpAnaliseJornadaColab_(opId, comp, ctxJ, colab);
-  gpSyncFaltasFromJornada_(opId, jornada, colab, comp);
+  // I115 — calc em memória (espelho I48); sem append FALTAS/HOLERITES no login
   const faltasDesc = gpFaltasDescontoMes_(opId, comp, colab, jornada);
   const hol = gpCalcHollerite_(colab, bonus, faltasDesc, comp);
-  // I110 — snapshot também na 1ª (dia 15) para o app/planilha refletirem o adiantamento
-  if (hol && hol.diasQuinzena > 0 && hol.liquido != null) {
-    gpPersistHoleriteSnapshot_(opId, comp, hol);
-  }
   const historicoDesempenho = gpHistoricoDesempenhoColab_(opId, 6, ctxJ);
   return {
     colaborador: {
@@ -12261,7 +12286,7 @@ function gpBuildPainelColaboradorPayload_(opId, comp, colab, operador) {
       cadastro: gpCadastroFromRhObj_(colab),
     },
     competencia: comp,
-    ponto: { statusHoje: pontoHoje.status, folha: gpFolhaPontoColab_(opId, comp), hoje: pontoHoje, jornada: jornada },
+    ponto: { statusHoje: pontoHoje.status, folha: gpFolhaPontoFromCtx_(opId, comp, ctxJ), hoje: pontoHoje, jornada: jornada },
     metas: metas, escala: gpEscalaColab_(opId, comp), bancoHoras: jornada.bancoProjetado || gpBancoHoras_(opId),
     pagamento: {
       base: hol.base, bonus: hol.bonus, faltas: faltasDesc, dependentes: 0, competencia: comp,
@@ -12278,6 +12303,22 @@ function gpBuildPainelColaboradorPayload_(opId, comp, colab, operador) {
   };
 }
 
+/** I115 — invalida cache do painel colaborador (após ponto / escrita RH). */
+function gpInvalidateColabPainelCache_(opId, competencia) {
+  try {
+    const cache = CacheService.getScriptCache();
+    const comps = [];
+    if (competencia) comps.push(gpNormCompetencia_(competencia));
+    comps.push(gpNormCompetencia_(gpCompetenciaAtual_()));
+    const seen = {};
+    comps.forEach(function (c) {
+      if (!c || seen[c]) return;
+      seen[c] = true;
+      cache.remove('gp_colab_pnl_v1_' + Number(opId) + '_' + c);
+    });
+  } catch (e) { /* ok */ }
+}
+
 /** FASE 15b — ADM 1416 preview: mesma tela colaborador, sem PIN da pessoa. */
 function buscarPainelColaboradorPreview_(p) {
   if (!adminPinOk_(p)) return err_('Acesso negado — PIN administrativo incorreto', 403);
@@ -12290,10 +12331,24 @@ function buscarPainelColaboradorPreview_(p) {
     const colab = gpColabRhByOpId_(opId);
     if (!colab) return err_('Colaborador sem cadastro RH', 404);
     const comp = String(p.competencia || gpCompetenciaAtual_());
+    const cacheKey = 'gp_colab_pnl_v1_' + opId + '_' + gpNormCompetencia_(comp);
+    try {
+      const hit = CacheService.getScriptCache().get(cacheKey);
+      if (hit) {
+        const parsed = JSON.parse(hit);
+        parsed.preview = true;
+        parsed.previewModo = 'adm';
+        return ContentService.createTextOutput(JSON.stringify(parsed)).setMimeType(ContentService.MimeType.JSON);
+      }
+    } catch (eC) { /* ok */ }
     const payload = gpBuildPainelColaboradorPayload_(opId, comp, colab, op);
-    payload.preview = true;
-    payload.previewModo = 'adm';
-    return resp_(payload);
+    const outObj = Object.assign({ ok: true }, payload);
+    delete outObj.preview;
+    delete outObj.previewModo;
+    const out = JSON.stringify(outObj);
+    try { CacheService.getScriptCache().put(cacheKey, out, 90); } catch (eP) { /* ok */ }
+    const serve = Object.assign({}, outObj, { preview: true, previewModo: 'adm' });
+    return ContentService.createTextOutput(JSON.stringify(serve)).setMimeType(ContentService.MimeType.JSON);
   } catch (ex) {
     return err_('Abas Gestao Pessoas ausentes — rode scripts/criar-abas-gestao-pessoas.ps1', 503);
   }
@@ -12520,6 +12575,7 @@ function registrarPontoColaborador_(p) {
       }
       const id = rows.length ? Math.max.apply(null, rows.map(function (r) { return Number(r[0]) || 0; })) + 1 : 1;
       sh.appendRow([id, opId, hoje, diaSem, agora, '', '', 'OK', fmtData_(new Date()) + ' ' + agora]);
+      gpInvalidateColabPainelCache_(opId, null);
       return resp_({ mensagem: 'Entrada registrada ' + agora, status: 'dentro' });
     }
     if (!rowHoje) return err_('Nenhuma entrada hoje — registre entrada primeiro', 400);
@@ -12542,6 +12598,15 @@ function registrarPontoColaborador_(p) {
       const comp = gpCompetenciaAtual_();
       const jornada = gpAnaliseJornadaColab_(opId, comp, ctxJ, colab);
       gpPersistBancoFromJornada_(opId, jornada);
+      // I115 — sync faltas/holerite na SAIDAde ponto (não no login)
+      try { gpSyncFaltasFromJornada_(opId, jornada, colab, comp); } catch (eF) { /* ok */ }
+      try {
+        const metas = gpMetasPainel_(opId, comp, ctxJ);
+        const faltasDesc = gpFaltasDescontoMes_(opId, comp, colab, jornada);
+        const hol = gpCalcHollerite_(colab, metas.bonusTotal || 0, faltasDesc, comp);
+        if (hol && hol.diasQuinzena > 0 && hol.liquido != null) gpPersistHoleriteSnapshot_(opId, comp, hol);
+      } catch (eH) { /* ok */ }
+      gpInvalidateColabPainelCache_(opId, comp);
     } catch (e) { Logger.log('registrarPontoColaborador_ banco: ' + e.message); }
     return resp_({ mensagem: 'Saida registrada ' + agora, status: 'fora' });
   } catch (ex) {
