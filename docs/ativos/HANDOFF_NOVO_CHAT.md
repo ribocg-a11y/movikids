@@ -1,6 +1,6 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 15/07/2026 · FE **v1.9.50** · GAS repo **v1.5.190** (I109 bônus FSS) — ping Web até Nova versão  
+**Atualizado:** 15/07/2026 · FE **v1.9.51** · GAS repo **v1.5.191** (I109b pot FSS) — ping Web até Nova versão  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **Repo local:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`  
@@ -59,10 +59,10 @@ cursor "C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-mo
 
 | Camada | Versão | URL / evidência |
 |--------|--------|-----------------|
-| **Frontend** | **v1.9.50** | https://ribocg-a11y.github.io/movikids/?force=1.9.50 |
-| **Gestão Pessoas** | **v1.9.50** | `gestao-pessoas.html?force=1.9.50` |
-| **Service Worker** | **1.9.50** | `sw.js` |
-| **Apps Script** | **v1.5.190** repo · ping até Nova versão Web | I109 bônus FSS R$50 |
+| **Frontend** | **v1.9.51** | https://ribocg-a11y.github.io/movikids/?force=1.9.51 |
+| **Gestão Pessoas** | **v1.9.51** | `gestao-pessoas.html?force=1.9.51` |
+| **Service Worker** | **1.9.51** | `sw.js` |
+| **Apps Script** | **v1.5.191** repo · ping até Nova versão Web | I109b pot FSS R$50 cada |
 | **Baseline P0** | ✅ | `docs/ativos/BASELINE_CODIGO_P0.md` |
 | **PIN admin** | **1421** | Script Property `ADMIN_PIN` |
 | **Homolog tablet** | ✅ 23/06 | I43 · I42 · I47 · Gestor — smoke **v1.9.39** pendente Ops |

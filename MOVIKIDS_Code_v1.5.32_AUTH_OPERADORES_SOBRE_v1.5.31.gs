@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.190
+// MOVI KIDS — Google Apps Script v1.5.191
+// v1.5.191: I109b — FSS pot R$100: meta fecha (eu OU parceira) → R$50 pra cada (não só quem bateu)
 // v1.5.190: I109 — bônus meta sex/sáb/dom com Raykelly+Julia: R$50 cada (metade do R$100)
 // v1.5.189: I108 — 1ª quinzena: 40% salário + 50% VA + 50% bônus + 50% VT (2ª: restates + encargos)
 // v1.5.188: I105 — buscaTextoAdmin sem teto 500 linhas (lê fim da aba) + observacao em historico/resumoDia
@@ -182,8 +183,8 @@
 
 // ── CONSTANTES ───────────────────────────────────────────────
 /** Versão exposta em ping, carregarInicio, validarSchema, gestaoPessoasStatus (bump com header). */
-const MK_GAS_VERSAO_  = 'v1.5.190';
-const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.190';
+const MK_GAS_VERSAO_  = 'v1.5.191';
+const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.191';
 const SHEET_ID   = '1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618';
 const DEPLOY_ID  = 'AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y';
 const WEBAPP_URL = `https://script.google.com/macros/s/${DEPLOY_ID}/exec`;
@@ -4748,14 +4749,78 @@ function metaParceirasJuntasNoDia_(opId, dataStr) {
   return !!(shiftA && shiftB);
 }
 
-/** Valor do bônus do dia (0 se não atingiu). I109: FSS juntas = R$50. */
-function metaBonusValorDoDia_(opId, dataStr, atingiu, bonusCheio) {
-  if (!atingiu) return 0;
+/** I109b — pot R$100 no FSS: se a meta do dia fecha (eu OU a parceira), as duas levam R$50. */
+function metaBonusValorDoDia_(opId, dataStr, nOwn, nPartner, metaAlvo, bonusCheio) {
+  const meta = Number(metaAlvo) > 0 ? Number(metaAlvo) : META_LOC_TURNO_PADRAO_;
   const full = Number(bonusCheio) > 0 ? Number(bonusCheio) : META_BONUS_DIA_REAIS_;
-  if (metaParceirasJuntasNoDia_(opId, dataStr)) {
-    return Math.min(META_BONUS_FIM_SEMANA_MEIO_, Math.round(full / 2));
+  const nEu = Number(nOwn) || 0;
+  const nPar = Number(nPartner) || 0;
+  const juntas = metaParceirasJuntasNoDia_(opId, dataStr);
+  if (juntas) {
+    const potFechou = (nEu > meta) || (nPar > meta) || ((nEu + nPar) > meta);
+    return potFechou ? Math.min(META_BONUS_FIM_SEMANA_MEIO_, Math.round(full / 2)) : 0;
   }
-  return full;
+  return nEu > meta ? full : 0;
+}
+
+function metaParceiraByDay_(opId, ctx) {
+  const outro = META_BONUS_PAR_IDS_[Number(opId)];
+  if (!outro) return {};
+  if (ctx && ctx.metaByDayByOpId && ctx.metaByDayByOpId[outro]) {
+    return ctx.metaByDayByOpId[outro];
+  }
+  try {
+    const cfgB = metaOperadorCfg_(outro);
+    const found = operadorRowById_(outro);
+    if (!found || !cfgB) return {};
+    const op = operadorObjFromRow_(found.data);
+    return metaOperadorLocByDay_(outro, op.nome, cfgB);
+  } catch (e) {
+    return {};
+  }
+}
+
+function metaBonusAcumularMes_(opId, byDay, cfg, byDayPartner) {
+  const meta = Number(cfg.meta) || META_LOC_TURNO_PADRAO_;
+  const full = Number(cfg.bonus) || META_BONUS_DIA_REAIS_;
+  const partner = byDayPartner || {};
+  const daySet = {};
+  Object.keys(byDay || {}).forEach(function (d) { daySet[d] = true; });
+  Object.keys(partner).forEach(function (d) {
+    if (metaParceirasJuntasNoDia_(opId, d)) daySet[d] = true;
+  });
+  let diasComBonus = 0;
+  let locMesTotal = 0;
+  let bonusEstimado = 0;
+  const diasDetalhe = [];
+  Object.keys(byDay || {}).forEach(function (d) { locMesTotal += Number(byDay[d]) || 0; });
+  Object.keys(daySet).forEach(function (d) {
+    const n = Number((byDay && byDay[d]) || 0);
+    const nPar = Number(partner[d] || 0);
+    const bonusDia = metaBonusValorDoDia_(opId, d, n, nPar, meta, full);
+    if (bonusDia > 0) {
+      diasComBonus++;
+      bonusEstimado += bonusDia;
+      diasDetalhe.push({
+        data: d,
+        loc: n,
+        locParceira: nPar,
+        meta: meta,
+        bonusOk: true,
+        bonusValor: bonusDia,
+        fimSemana: metaEhFimDeSemanaData_(d),
+        juntas: metaParceirasJuntasNoDia_(opId, d)
+      });
+    }
+  });
+  diasDetalhe.sort(function (a, b) { return dateToCmp_(a.data) - dateToCmp_(b.data); });
+  return {
+    diasComBonus: diasComBonus,
+    locMesTotal: locMesTotal,
+    bonusEstimado: bonusEstimado,
+    diasDetalhe: diasDetalhe,
+    diasTrabalhados: Object.keys(byDay || {}).length
+  };
 }
 
 function metaOperadorEscalaFromRh_(turno) {
@@ -4970,34 +5035,9 @@ function buildMetaOperadorPayload_(opId) {
   }
 
   const nHoje = byDay[dataHoje] || 0;
-  let diasComBonus = 0;
-  let diasTrabalhados = 0;
-  let locMesTotal = 0;
-  let bonusEstimado = 0;
-  const diasDetalhe = [];
-  Object.keys(byDay).forEach(function (d) {
-    diasTrabalhados++;
-    const n = byDay[d];
-    locMesTotal += n;
-    const atingiu = n > cfg.meta;
-    const bonusDia = metaBonusValorDoDia_(opId, d, atingiu, cfg.bonus);
-    if (atingiu) {
-      diasComBonus++;
-      bonusEstimado += bonusDia;
-      diasDetalhe.push({
-        data: d,
-        loc: n,
-        meta: cfg.meta,
-        bonusOk: true,
-        bonusValor: bonusDia,
-        fimSemana: metaEhFimDeSemanaData_(d),
-        juntas: metaParceirasJuntasNoDia_(opId, d)
-      });
-    }
-  });
-  diasDetalhe.sort(function (a, b) {
-    return dateToCmp_(a.data) - dateToCmp_(b.data);
-  });
+  const partnerByDay = metaParceiraByDay_(opId, null);
+  const acum = metaBonusAcumularMes_(opId, byDay, cfg, partnerByDay);
+  const nParHoje = Number(partnerByDay[dataHoje] || 0);
 
   return {
     ok: true,
@@ -5014,14 +5054,14 @@ function buildMetaOperadorPayload_(opId) {
       emTurno: emTurno,
       folga: !shiftHoje,
       shiftLabel: metaOperadorShiftLabel_(shiftHoje),
-      bonusValorHoje: metaBonusValorDoDia_(opId, dataHoje, nHoje > cfg.meta, cfg.bonus)
+      bonusValorHoje: metaBonusValorDoDia_(opId, dataHoje, nHoje, nParHoje, cfg.meta, cfg.bonus)
     },
     mes: {
-      locTotal: locMesTotal,
-      diasComMeta: diasComBonus,
-      diasTrabalhados: diasTrabalhados,
-      bonusEstimado: bonusEstimado,
-      diasBonus: diasDetalhe
+      locTotal: acum.locMesTotal,
+      diasComMeta: acum.diasComBonus,
+      diasTrabalhados: acum.diasTrabalhados,
+      bonusEstimado: acum.bonusEstimado,
+      diasBonus: acum.diasDetalhe
     }
   };
 }
@@ -11141,32 +11181,9 @@ function gpMetaPayloadFromCtx_(opId, ctx) {
   const shiftHoje = cfg.escala[String(dowHoje)];
   const minsAgora = agora.getHours() * 60 + agora.getMinutes();
   const nHoje = byDay[dataHoje] || 0;
-  let diasComBonus = 0;
-  let locMesTotal = 0;
-  let bonusEstimado = 0;
-  const diasDetalhe = [];
-  Object.keys(byDay).forEach(function (d) {
-    const n = byDay[d];
-    locMesTotal += n;
-    const atingiu = n > cfg.meta;
-    const bonusDia = metaBonusValorDoDia_(opId, d, atingiu, cfg.bonus);
-    if (atingiu) {
-      diasComBonus++;
-      bonusEstimado += bonusDia;
-      diasDetalhe.push({
-        data: d,
-        loc: n,
-        meta: cfg.meta,
-        bonusOk: true,
-        bonusValor: bonusDia,
-        fimSemana: metaEhFimDeSemanaData_(d),
-        juntas: metaParceirasJuntasNoDia_(opId, d)
-      });
-    }
-  });
-  diasDetalhe.sort(function (a, b) {
-    return dateToCmp_(a.data) - dateToCmp_(b.data);
-  });
+  const partnerByDay = metaParceiraByDay_(opId, ctx);
+  const acum = metaBonusAcumularMes_(opId, byDay, cfg, partnerByDay);
+  const nParHoje = Number(partnerByDay[dataHoje] || 0);
   return {
     ok: true,
     configurado: true,
@@ -11176,9 +11193,9 @@ function gpMetaPayloadFromCtx_(opId, ctx) {
     hoje: { n: nHoje, meta: cfg.meta, metaOk: nHoje >= cfg.meta, atingiu: nHoje > cfg.meta,
       emTurno: metaOperadorInShift_(minsAgora, shiftHoje), folga: !shiftHoje,
       shiftLabel: metaOperadorShiftLabel_(shiftHoje),
-      bonusValorHoje: metaBonusValorDoDia_(opId, dataHoje, nHoje > cfg.meta, cfg.bonus) },
-    mes: { locTotal: locMesTotal, diasComMeta: diasComBonus, diasTrabalhados: Object.keys(byDay).length,
-      bonusEstimado: bonusEstimado, diasBonus: diasDetalhe }
+      bonusValorHoje: metaBonusValorDoDia_(opId, dataHoje, nHoje, nParHoje, cfg.meta, cfg.bonus) },
+    mes: { locTotal: acum.locMesTotal, diasComMeta: acum.diasComBonus, diasTrabalhados: acum.diasTrabalhados,
+      bonusEstimado: acum.bonusEstimado, diasBonus: acum.diasDetalhe }
   };
 }
 
