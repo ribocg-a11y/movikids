@@ -3,11 +3,38 @@
 **Criado:** 15/07/2026 · **Atualizado:** 15/07/2026  
 **Status:** ✅ **documento vivo** (era dívida desde o início do negócio)  
 **Fonte de dados:** produção GAS **v1.5.196** · `kpiMes` julho/2026 · FOLHA B68 · CTO contrato  
-**Dashboard:** gráfico *Meta de locações — dia a dia* (`#chart-meta-dia`)
+**Dashboard:** gráfico *Meta de locações — dia a dia* (`#chart-meta-dia`)  
+**Sheet memorial:** aba **`VIABILIDADE_NEGOCIO`** · installer `scripts/planilha/instalarAbaViabilidadeNegocio.gs` · CSV `VIABILIDADE_NEGOCIO_MEMORIAL.csv`
 
 ---
 
-## 0. O que já existia × o que faltava
+## 0. Respostas executivas (15/07/2026)
+
+| Pergunta | Resposta curta | Detalhe |
+|----------|----------------|---------|
+| **O negócio está bem?** | **Sim** | Ritmo ~22 loc/dia >> BE com folha (10). Resultado sem folha ~R$ 6.066/15 dias · margem ~81%. Viabilidade CLT **verde** 6/6. Payback ~24% (meta ~11/2026). |
+| **Métricas corretas?** | **Quase** | Loc/ticket/extras/BE do Dashboard **corretos**. **Furo:** CUSTOS julho só Energia — contadora/manutenção **não** estão no BE ainda → lucro parece um pouco melhor que o real. |
+| **Ajustes já feitos?** | **Produto sim / plano CUSTOS não** | Leading BE, FOLHA, CTO, mini-DRE, payback, holerite I108–I114, perf I115/I116: **feitos**. Lançar fixos na aba CUSTOS: **sócio agora**. |
+| **Metas sustentam o negócio?** | **Sim, no ritmo atual** | Meta 2 loc (sem folha) e 10 loc (com folha) são **matemática do mês** (custos÷ticket). Dias normais passam de 10; vales são exceção (jogo) ou incompletos (15 parcial). |
+| **Visão clara / para onde vamos?** | **Sim, com este pacote** | Curto: completar CUSTOS. Médio: escala sábado + extra dia útil. Estrutural: payback até ~11/2026 sem regredir operação tablet. |
+
+---
+
+## 0b. Sheet memorial (criar agora)
+
+**Planilha:** https://docs.google.com/spreadsheets/d/1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618/edit  
+
+1. Extensões → Apps Script  
+2. Colar `scripts/planilha/instalarAbaViabilidadeNegocio.gs`  
+3. Executar `instalarAbaViabilidadeNegocio`  
+4. Preencher amarelo: **B21 Manutenção · B22 Contadora · B23 Material · B24 Sistemas**  
+
+Espelho CSV (importar se preferir): `docs/ativos/VIABILIDADE_NEGOCIO_MEMORIAL.csv`  
+Atalho: `.\scripts\criar-aba-viabilidade-negocio.ps1`
+
+---
+
+## 0c. O que já existia × o que faltava
 
 | Já no sistema / docs | Gap (esta peça) |
 |----------------------|-----------------|

@@ -125,8 +125,8 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 
 | # | Ação | Quem | Status |
 |---|------|------|--------|
-| **0** | **Estudo do negócio** — break-even, ticket sáb×útil, CUSTOS fixos | Agente | ✅ **15/07** → `ESTUDO_NEGOCIO_BREAK_EVEN_TICKET_2026-07.md` |
-| **0b** | Lançar CUSTOS fixos faltantes (contadora, manutenção…) | Sócio | ⏳ **urgente** — BE hoje subestima |
+| **0** | **Estudo + sheet VIABILIDADE_NEGOCIO** | Agente | ✅ doc + `instalarAbaViabilidadeNegocio.gs` |
+| **0b** | **Rodar installer** da aba + lançar contadora/manutenção | Sócio | ⏳ **urgente** |
 | **0c** | I115/I116 slim login — Web **v1.5.196** se já colou | Sócio | verificar ping |
 | 1 | **Sprint D1** homolog PC admin v1.9.2 | Agente | ✅ **27/06** |
 | 1b | **I69** hotfix ponto mock → **v1.9.3** | Agente | ✅ **29/06** Pages |

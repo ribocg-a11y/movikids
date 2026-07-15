@@ -1,0 +1,67 @@
+MOVI KIDS — VIABILIDADE_NEGOCIO (memorial de cálculo)
+Importar: Planilha → Arquivo → Importar → Substituir / nova aba · OU rodar scripts/planilha/instalarAbaViabilidadeNegocio.gs
+
+A — ENTRADA DO MÊS
+Campo;Valor;Nota
+Competência;07/2026;
+Dias no mês;31;
+Dias operando;15;até 15/07 (15 parcial)
+Faturamento mês;7467;kpiMes
+Nº locações;330;kpiMes
+Extras mês;375;kpiMes
+Loc com extra;50;kpiMes
+
+B — CUSTOS FIXOS MENSAIS
+Item;Valor R$;Fonte;Status
+CTO / aluguel;1300;ctoPagar 3º mês;OK
+Folha B68;5253,96;aba FOLHA;OK
+Energia;100,8;CUSTOS;OK
+Manutenção;0;CUSTOS;LANÇAR
+Contadora;0;CUSTOS Outros;LANÇAR
+Material;0;CUSTOS;LANÇAR
+Sistemas/outros;0;CUSTOS;LANÇAR
+
+C — FÓRMULAS (referência)
+Indicador;Fórmula;Valor jul/2026
+Ticket médio;fat/nLoc;22,63
+% extras;ext/fat;5,0%
+Fat/dia;fat/diasOp;497,80
+Loc/dia;n/diasOp;22,0
+Custo/dia sem folha;(CUS+CTO)/diasMes;45,19
+Custo/dia com folha;(CUS+CTO+FOLHA)/diasMes;214,67
+BE sem folha;ceil(custoDia/ticket);2
+BE com folha;ceil(custoDiaFolha/ticket);10
+Resultado sem folha;fat-CUS-CTO;6066,20
+Margem sem folha;res/fat;81,2%
+Folha pro-rata;folha*diasOp/diasMes;2542,24
+Resultado com folha pro-rata;resSem-folhaPr;3523,96
+
+D — GATES
+Gate;Critério;Resultado
+Negócio base;margem sem folha ≥10%;SIM 81%
+BE com folha;loc/dia ≥ BE;SIM 22 ≥ 10
+Reserva;resultado pro-rata ≥2500;SIM 3524
+Dados;dias ≥12;SIM 15
+CUSTOS completos;contadora+manut>0;NÃO — LANÇAR
+
+E — SÁBADO × ÚTIL (01–14/07)
+Grupo;Dias;Loc;Fat;Extra;Loc/dia;Fat/dia;Ticket;%extra
+Sábados;2;81;1630,80;29,80;40,5;815,40;20,13;1,8%
+Dias úteis;10;207;4876,00;344,00;20,7;487,60;23,56;7,1%
+Domingos;2;37;874,20;1,20;18,5;437,10;23,63;0,1%
+
+F — VEREDITO
+Pergunta;Resposta
+Negócio está bem?;SIM — volume cobre BE com folha; margem alta; payback ~24%
+Métricas corretas?;PARCIAL — Dashboard OK; falta lançar fixos (contadora/manutenção) na aba CUSTOS
+Ajustes já feitos?;SIM produto (leading BE, FOLHA, CTO, I115/I116); NÃO completa plano CUSTOS
+Metas sustentam?;SIM no ritmo atual (≥10 loc/dia na maioria dos dias); meta 10 é realista
+Visão clara?;SIM com este memorial + ESTUDO_NEGOCIO_*.md + Dashboard
+Para onde vamos?;Completar CUSTOS → escala sábado → extra dia útil → payback ~11/2026
+
+G — PAYBACK SNAPSHOT
+Investimento;69410
+Acumulado;16711,57
+% recuperado;24,1%
+Falta;52698,43
+Previsão;11/2026
