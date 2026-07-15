@@ -21,13 +21,14 @@ Sistema operacional de locações — balcão (tablet na loja), portal do respon
 Leia **nesta ordem**:
 
 1. [`docs/ativos/HANDOFF_NOVO_CHAT.md`](docs/ativos/HANDOFF_NOVO_CHAT.md)
-2. [`docs/ativos/BASELINE_CODIGO_P0.md`](docs/ativos/BASELINE_CODIGO_P0.md) — **zonas congeladas — não mexer**
-3. [`docs/ativos/PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`](docs/ativos/PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md) — **ciclo ativo Sprint D**
-4. [`docs/ativos/PLANEJAMENTO_ONE_UI_2026-06.md`](docs/ativos/PLANEJAMENTO_ONE_UI_2026-06.md) — One UI fechado (referência)
-5. [`docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md`](docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md) — **antes de qualquer tela**
-6. [`docs/ativos/ESTADO_ATUAL.md`](docs/ativos/ESTADO_ATUAL.md) · [`DEPLOY_ATUAL.md`](docs/ativos/DEPLOY_ATUAL.md)
-7. [`docs/ativos/REGRAS_DE_PUBLICACAO_SEGURA.md`](docs/ativos/REGRAS_DE_PUBLICACAO_SEGURA.md)
-8. [`docs/ativos/ROTEIRO_AGENTE_OBRIGATORIO.md`](docs/ativos/ROTEIRO_AGENTE_OBRIGATORIO.md) — **ordem fixa commit/push/verify**
+2. [`docs/ativos/ESTUDO_NEGOCIO_BREAK_EVEN_TICKET_2026-07.md`](docs/ativos/ESTUDO_NEGOCIO_BREAK_EVEN_TICKET_2026-07.md) — **quebra-even, ticket, custos fixos**
+3. [`docs/ativos/BASELINE_CODIGO_P0.md`](docs/ativos/BASELINE_CODIGO_P0.md) — **zonas congeladas — não mexer**
+4. [`docs/ativos/PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`](docs/ativos/PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md) — **ciclo ativo Sprint D**
+5. [`docs/ativos/PLANEJAMENTO_ONE_UI_2026-06.md`](docs/ativos/PLANEJAMENTO_ONE_UI_2026-06.md) — One UI fechado (referência)
+6. [`docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md`](docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md) — **antes de qualquer tela**
+7. [`docs/ativos/ESTADO_ATUAL.md`](docs/ativos/ESTADO_ATUAL.md) · [`DEPLOY_ATUAL.md`](docs/ativos/DEPLOY_ATUAL.md)
+8. [`docs/ativos/REGRAS_DE_PUBLICACAO_SEGURA.md`](docs/ativos/REGRAS_DE_PUBLICACAO_SEGURA.md)
+9. [`docs/ativos/ROTEIRO_AGENTE_OBRIGATORIO.md`](docs/ativos/ROTEIRO_AGENTE_OBRIGATORIO.md) — **ordem fixa commit/push/verify**
 
 Índice: [`docs/INDICE.md`](docs/INDICE.md)
 
