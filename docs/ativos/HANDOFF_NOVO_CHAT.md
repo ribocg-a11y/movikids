@@ -1,6 +1,6 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 15/07/2026 · FE **v1.9.53** · GAS repo **v1.5.193** (I111 Q1 VT já pago) — ping até Nova versão  
+**Atualizado:** 15/07/2026 · FE **v1.9.54** · GAS repo **v1.5.194** (I112 bônus na cesta) — ping até Nova versão  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **Repo local:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`  
@@ -59,10 +59,10 @@ cursor "C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-mo
 
 | Camada | Versão | URL / evidência |
 |--------|--------|-----------------|
-| **Frontend** | **v1.9.53** | https://ribocg-a11y.github.io/movikids/?force=1.9.53 |
-| **Gestão Pessoas** | **v1.9.53** | `gestao-pessoas.html?force=1.9.53` |
-| **Service Worker** | **1.9.53** | `sw.js` |
-| **Apps Script** | **v1.5.193** repo · ping até Nova versão | I111 Q1 VT=0 (já pago) · pacote PIX+VA |
+| **Frontend** | **v1.9.54** | https://ribocg-a11y.github.io/movikids/?force=1.9.54 |
+| **Gestão Pessoas** | **v1.9.54** | `gestao-pessoas.html?force=1.9.54` |
+| **Service Worker** | **1.9.54** | `sw.js` |
+| **Apps Script** | **v1.5.194** repo · ping até Nova versão | I112 bônus na cesta · I111 VT Q1=0 |
 | **Baseline P0** | ✅ | `docs/ativos/BASELINE_CODIGO_P0.md` |
 | **PIN admin** | **1421** | Script Property `ADMIN_PIN` |
 | **Homolog tablet** | ✅ 23/06 | I43 · I42 · I47 · Gestor — smoke **v1.9.39** pendente Ops |

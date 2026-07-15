@@ -496,8 +496,9 @@
       const vaDias = ben.vaDias || 0;
       const vaTotal = Math.round(vaDiario * vaDias * 100) / 100;
       const vaCopart = ben.vaCoparticipacao || 0;
-      const bruto = base + bonus;
-      const baseInss = bruto;
+      // I112 — bruto/líquido = só salário; bônus na cesta
+      const bruto = base;
+      const baseInss = base;
       const inssCalc = calcInssProgressivo(baseInss);
       const inss = inssCalc.inss;
       const vt = Math.round(base * 0.06 * 100) / 100;
@@ -505,10 +506,15 @@
       const irrf = irrfCalc.irrf;
       const fgts = Math.round(baseInss * 0.08 * 100) / 100;
       const totalDescontos = inss + irrf + vt + faltas + vaCopart;
+      const liquido = bruto - totalDescontos;
+      const pixQuinzena = Math.round((liquido + bonus) * 100) / 100;
+      const vtPasses = ben.vtPasses || 0;
       return {
         bruto, inss, inssAli: inssCalc.aliEfetiva, irrf, irrfBase: irrfCalc.base, irrfAli: irrfCalc.ali, irrfIsento: irrfCalc.isento,
-        vt, faltas, vaTotal, vaCopart, vaDiario, vaDias, vtPasses: ben.vtPasses || 0,
-        fgts, baseInss, totalDescontos, liquido: bruto - totalDescontos
+        vt, faltas, vaTotal, vaCopart, vaDiario, vaDias, vtPasses: vtPasses, bonus: bonus,
+        fgts, baseInss, totalDescontos, liquido: liquido,
+        pixQuinzena: pixQuinzena,
+        pacoteQuinzena: Math.round((pixQuinzena + vaTotal + vtPasses) * 100) / 100
       };
     }
     function holRow(cod, desc, ref, venc, descVal, sec) {

@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.193
+// MOVI KIDS — Google Apps Script v1.5.194
+// v1.5.194: I112 — bônus meta na cesta (não integra salário/bruto/INSS)
 // v1.5.193: I111 — Q1 VT passes = 0 (já pago nos ~15 dias); pacote = PIX+VA
 // v1.5.192: I110 — Q1 sem desconto de faltas; snapshot HOLERITES também na 1ª quinzena; pacoteQuinzena
 // v1.5.191: I109b — FSS pot R$100: meta fecha (eu OU parceira) → R$50 pra cada (não só quem bateu)
@@ -185,8 +186,8 @@
 
 // ── CONSTANTES ───────────────────────────────────────────────
 /** Versão exposta em ping, carregarInicio, validarSchema, gestaoPessoasStatus (bump com header). */
-const MK_GAS_VERSAO_  = 'v1.5.193';
-const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.193';
+const MK_GAS_VERSAO_  = 'v1.5.194';
+const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.194';
 const SHEET_ID   = '1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618';
 const DEPLOY_ID  = 'AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y';
 const WEBAPP_URL = `https://script.google.com/macros/s/${DEPLOY_ID}/exec`;
@@ -12035,35 +12036,36 @@ function gpCalcHollerite_(colab, bonus, faltas, competencia, refDate) {
     }
   }
 
-  const bruto = basePag + bonusQuinz;
+  const bruto = basePag;
   let inss = 0, irrf = 0, vt = 0, inssAli = 0, irrfIsento = true, irrfBase = 0, fgts = 0;
 
   if (quinzena === 2 && temQuinzena) {
-    const brutoMes = salarioProp + bonus;
-    const inssCalc = gpCalcInss_(brutoMes);
-    const irrfCalc = gpCalcIrrf_(brutoMes - inssCalc.inss);
+    // I112 — encargos só sobre salário (bônus não integra)
+    const inssCalc = gpCalcInss_(salarioProp);
+    const irrfCalc = gpCalcIrrf_(salarioProp - inssCalc.inss);
     inss = inssCalc.inss;
     inssAli = inssCalc.aliEf;
     irrf = irrfCalc.irrf;
     irrfIsento = irrfCalc.isento;
-    irrfBase = Math.round((brutoMes - inss) * 100) / 100;
+    irrfBase = Math.round((salarioProp - inss) * 100) / 100;
     vt = Math.round(salarioProp * 0.06 * 100) / 100;
-    fgts = Math.round(brutoMes * 0.08 * 100) / 100;
+    fgts = Math.round(salarioProp * 0.08 * 100) / 100;
   }
 
   // I110 — faltas / INSS / IRRF / VT 6% só na 2ª quinzena
   const faltasQuinz = (quinzena === 2 && temQuinzena) ? Number(faltas) || 0 : 0;
   const totalDescontos = Math.round((inss + irrf + vt + faltasQuinz) * 100) / 100;
   const liquido = Math.round((bruto - totalDescontos) * 100) / 100;
-  // Pacote a pagar: PIX + VA (+ VT só se ainda não pago — Q2)
-  const pacoteQuinzena = Math.round((liquido + vaTotal + vtPasses) * 100) / 100;
+  // I112 — PIX = salário líquido + bônus cesta; pacote = PIX + VA (+ VT se Q2)
+  const pixQuinzena = Math.round((liquido + bonusQuinz) * 100) / 100;
+  const pacoteQuinzena = Math.round((pixQuinzena + vaTotal + vtPasses) * 100) / 100;
   const diasVaBase = gpVaDiasBase_();
   // Diário de referência = VA mensal / dias memorial (não metade do VA da quinzena)
   const vaDiario = Math.round((vaMensal / diasVaBase) * 100) / 100;
   const pagamentoEm = gpDataPagamentoQuinzena_(quinzena, mes, ano);
   const quinzenaLabel = quinzena === 1
-    ? '1ª quinzena · 40% salário + 50% VA/bônus · VT já pago'
-    : '2ª quinzena · 60% salário + 50% VA/bônus/VT − encargos';
+    ? '1ª quinzena · 40% salário + cesta 50% (bônus/VA) · VT já pago'
+    : '2ª quinzena · 60% salário + cesta 50% (bônus/VA/VT) − encargos';
 
   return {
     base: basePag, salarioContratual: salarioContratual, salarioProporcional: salarioProp,
@@ -12072,9 +12074,9 @@ function gpCalcHollerite_(colab, bonus, faltas, competencia, refDate) {
     inss: inss, inssAli: inssAli, irrf: irrf, irrfIsento: irrfIsento, vt: vt, fgts: fgts,
     vaTotal: vaTotal, vaDias: vaDias, vaDiario: vaDiario, vaMensal: vaMensal, vtPasses: vtPasses,
     vtPassesJaPago: vtPassesJaPago, vtPassesMes: vtPassesMesProp, pctBeneficios: pctBenef,
-    totalDescontos: totalDescontos, liquido: liquido, pacoteQuinzena: pacoteQuinzena,
-    baseInss: quinzena === 2 ? salarioProp + bonus : bruto,
-    irrfBase: irrfBase, competencia: compLabel, quinzena: quinzena, quinzenaLabel: quinzenaLabel,
+    totalDescontos: totalDescontos, liquido: liquido, pixQuinzena: pixQuinzena, pacoteQuinzena: pacoteQuinzena,
+    baseInss: salarioProp,
+    irrfBase: quinzena === 2 ? irrfBase : 0, competencia: compLabel, quinzena: quinzena, quinzenaLabel: quinzenaLabel,
     pctQuinzena: pctQuinz, pagamentoEm: pagamentoEm, diasTrabalhados: diasTrab, diasMes: diasMes,
     diasQuinzena: diasQuinz, incluiBeneficios: incluiBeneficios, fatorMes: Math.round(fatorMes * 10000) / 10000,
     obs: compLabel + ' · ' + quinzenaLabel + ' · pgto ' + pagamentoEm +

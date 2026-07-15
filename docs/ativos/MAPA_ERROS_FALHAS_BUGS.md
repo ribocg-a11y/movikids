@@ -1,6 +1,6 @@
 # MOVI KIDS — Mapa de erros, falhas e bugs
 
-**Atualizado:** 15/07/2026 — **I111** Q1 VT já pago · FE **v1.9.53** · GAS **v1.5.193**  
+**Atualizado:** 15/07/2026 — **I112** bônus na cesta · FE **v1.9.54** · GAS **v1.5.194**  
 **Uso anterior:** 15/07/2026 — **I110** Q1 sem faltas + pacote holerite · FE **v1.9.52** · GAS **v1.5.192**  
 **Uso anterior:** 15/07/2026 — **I109b** pot FSS R$50 cada · FE **v1.9.51** · GAS **v1.5.191**  
 **Uso anterior:** 15/07/2026 — **I109** bônus FSS metade · FE **v1.9.50** · GAS **v1.5.190**  
@@ -113,6 +113,7 @@
 | **I109** | **Bônus FSS Raykelly+Julia** | Pot R$100 deve ser metade pra cada (não R$100 só pra quem bateu) | GAS **v1.5.191** `metaBonusValorDoDia_` pot FSS · FE **v1.9.51** | I84 | Ray **300** · Julia **200** (live jul) |
 | **I110** | **Faltas descontadas na 1ª quinzena** | Julia Q1 liquido −209; faltas só no acerto do mês | GAS **v1.5.192** Web ✅ faltas só Q2 · snapshot Q1 · FE **v1.9.52** pacote | I108 · I46 | Q1: PIX+VA+VT sem faltas · **fechado 15/07** |
 | **I111** | **Pacote Q1 incluía VT já pago** | App 1.095/1.045 com VT; sócio paga PIX+VA | GAS **v1.5.193** `vtPasses=0` na Q1 · FE **v1.9.53** | I108 · I110 | Ray **998,40** · Julia **948,40** |
+| **I112** | **Bônus no salário/vencimentos** | Base INSS/líquido misturava metas | GAS **v1.5.194** bruto=só salário · bônus na cesta · FE **v1.9.54** | I108 · I111 | cód 500 na cesta · Base INSS = salário |
 | **I84** | **Meta colaborador contava sessões, não contas (I42)** | 4 encerramentos mesmo telefone = 4 loc na meta | GAS **v1.5.180** `metaOperadorSeenMark_` conta_id/telefone · FE **v1.9.16** scroll módulo | `metaOperadorTurno` | 1 loc por telefone/dia |
 | **I42** | Conta do dia — mesmo telefone 10h–22h | Caixa `n` vs sessões; maquininha | GAS **v1.5.131+** col S `conta_id` | `TESTE_I42_CONTA_DIA_CAIXA` | não reduzir `COL_LOC_READ_` (ver I43) |
 | **I41** | **`ping_` versão defasada** (v1.5.107 vs repo) | Confusão deploy / verify | GAS **v1.5.130** `ping_()` alinhado | `ping_` header alinhado | ping = v1.5.130 |

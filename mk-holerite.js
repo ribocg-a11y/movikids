@@ -59,13 +59,17 @@
     var comp = opts.comp || hol.competencia || '—';
     var liquido = hol.liquido != null ? hol.liquido : Number(opts.liquido) || 0;
     var bruto = hol.bruto != null ? hol.bruto : Number(opts.bruto) || 0;
+    var bonus = Number(hol.bonus) || 0;
     var totalDescontos = hol.totalDescontos != null ? hol.totalDescontos : Number(opts.totalDescontos) || 0;
     var vaTotal = Number(hol.vaTotal) || 0;
     var vtPasses = Number(hol.vtPasses) || 0;
     var vtJaPago = Number(hol.vtPassesJaPago) || 0;
+    var pix = hol.pixQuinzena != null
+      ? Number(hol.pixQuinzena)
+      : Math.round((liquido + bonus) * 100) / 100;
     var pacote = hol.pacoteQuinzena != null
       ? Number(hol.pacoteQuinzena)
-      : Math.round((liquido + vaTotal + vtPasses) * 100) / 100;
+      : Math.round((pix + vaTotal + vtPasses) * 100) / 100;
     var qLabel = hol.quinzenaLabel || opts.quinzenaLabel ||
       (hol.quinzena === 1 ? '1ª quinzena' : (hol.quinzena === 2 ? '2ª quinzena' : 'Quinzena'));
     var pgto = hol.pagamentoEm || opts.pagamentoEm || '—';
@@ -78,12 +82,12 @@
       '<span class="mk-widget-lbl">Pacote desta quinzena</span>' +
       '<span class="mk-widget-val green">' + mkHolFmtMoney_(pacote) + '</span>' +
       '<span class="mk-widget-ctx">' + esc(qLabel) + ' · pgto ' + esc(pgto) +
-      ' · PIX ' + mkHolFmtMoney_(liquido) + benefCtx + '</span></div>' +
+      ' · PIX ' + mkHolFmtMoney_(pix) + ' (salário+bônus)' + benefCtx + '</span></div>' +
       '<div class="mk-cmd-grid gp-hol-widget-grid">' +
       '<div class="mk-widget"><span class="mk-widget-lbl">Competência</span><span class="mk-widget-val">' + esc(comp) + '</span>' +
       '<span class="mk-widget-ctx">Referência do mês</span></div>' +
       '<div class="mk-widget"><span class="mk-widget-lbl">Vencimentos</span><span class="mk-widget-val">' + mkHolFmtMoney_(bruto) + '</span>' +
-      '<span class="mk-widget-ctx">Salário + bônus da quinzena</span></div>' +
+      '<span class="mk-widget-ctx">Só salário da quinzena</span></div>' +
       '<div class="mk-widget"><span class="mk-widget-lbl">Descontos</span>' +
       '<span class="mk-widget-val" style="color:var(--red,#C62828)">' + mkHolFmtMoney_(totalDescontos, 'd') + '</span>' +
       '<span class="mk-widget-ctx">' + (hol.quinzena === 1 ? 'Na 1ª: sem faltas/INSS · VT já pago' : 'INSS, IRRF, VT, faltas') + '</span></div>' +
@@ -103,7 +107,7 @@
       return '<p class="gp-adm-muted">Sem pagamento nesta quinzena — admissão posterior ou período não trabalhado.</p>';
     }
 
-    var bruto = hol.bruto != null ? hol.bruto : base + bonus;
+    var bruto = hol.bruto != null ? hol.bruto : base;
     var inss = hol.inss || 0;
     var irrf = hol.irrf || 0;
     var vt = hol.vt || 0;
@@ -147,17 +151,6 @@
       ? 'já pago nos ~15 dias (fora) · ref. ' + mkHolFmtMoney_(vtJaPago)
       : benPctLbl + ' do benefício mês prop.';
     var vtLinhaVal = hol.vtPasses ? mkHolFmtMoney_(hol.vtPasses) : (hol.quinzena === 1 && vtJaPago > 0 ? 'R$ 0,00' : '—');
-    var benBlock = hol.incluiBeneficios
-      ? '<div class="mk-hol-comp" style="border-top:1px solid var(--border);border-bottom:none;background:#F0FDF4;color:#166534">Benefícios · ' + benPctLbl + ' nesta quinzena · não integram salário</div>' +
-        '<table class="mk-hol-tbl"><thead><tr><th>Cód</th><th>Benefício</th><th>Referência</th><th colspan="2">Valor concedido</th></tr></thead><tbody>' +
-        mkHolRow_('501', 'Vale-alimentação (VA)', benPctLbl + ' de R$ ' + (hol.vaMensal || 400) + '/mês prop. ' + diasTrab + '/' + diasMes, hol.vaTotal ? mkHolFmtMoney_(hol.vaTotal) : 'R$ 0,00', '') +
-        mkHolRow_('502', 'Concessão passes VT', vtLinhaRef, vtLinhaVal, '') +
-        (hol.quinzena === 2
-          ? mkHolRow_('503', 'FGTS 8% — encargo empregador (informativo)', 'sobre base INSS do mês', hol.fgts ? mkHolFmtMoney_(hol.fgts) : '—', '')
-          : '') +
-        '</tbody></table>'
-      : '<p class="gp-adm-muted" style="padding:12px 16px;margin:0">Sem benefícios nesta quinzena (admissão posterior ao período).</p>';
-
     var bonusRef = '';
     if (bonus > 0) {
       var bonusMes = hol.bonusMes != null ? Number(hol.bonusMes) : null;
@@ -165,6 +158,22 @@
         ? benPctLbl + ' de R$ ' + mkHolFmtMoney_(bonusMes).replace('R$\u00a0', '').replace('R$ ', '') + ' (mês)'
         : (bonusDias + ' dia(s) · ' + benPctLbl + ' desta quinzena');
     }
+    var showCesta = !!(hol.incluiBeneficios || bonus > 0);
+    var benBlock = showCesta
+      ? '<div class="mk-hol-comp" style="border-top:1px solid var(--border);border-bottom:none;background:#F0FDF4;color:#166534">Cesta · ' + benPctLbl + ' nesta quinzena · bônus/VA/VT não integram salário</div>' +
+        '<table class="mk-hol-tbl"><thead><tr><th>Cód</th><th>Benefício</th><th>Referência</th><th colspan="2">Valor concedido</th></tr></thead><tbody>' +
+        (bonus > 0
+          ? mkHolRow_('500', 'Bônus metas (cesta)', bonusRef, mkHolFmtMoney_(bonus), '')
+          : '') +
+        (hol.incluiBeneficios
+          ? mkHolRow_('501', 'Vale-alimentação (VA)', benPctLbl + ' de R$ ' + (hol.vaMensal || 400) + '/mês prop. ' + diasTrab + '/' + diasMes, hol.vaTotal ? mkHolFmtMoney_(hol.vaTotal) : 'R$ 0,00', '') +
+            mkHolRow_('502', 'Concessão passes VT', vtLinhaRef, vtLinhaVal, '') +
+            (hol.quinzena === 2
+              ? mkHolRow_('503', 'FGTS 8% — encargo empregador (informativo)', 'sobre base INSS do mês', hol.fgts ? mkHolFmtMoney_(hol.fgts) : '—', '')
+              : '')
+          : '') +
+        '</tbody></table>'
+      : '<p class="gp-adm-muted" style="padding:12px 16px;margin:0">Sem cesta nesta quinzena (admissão posterior ao período).</p>';
 
     var toolbar = opts.toolbar !== false
       ? '<div class="mk-hol-toolbar no-print"><button type="button" class="btn btn-secondary" onclick="mkHolPrintPdf_()">📄 Salvar PDF / Imprimir</button></div>'
@@ -196,24 +205,23 @@
       (notaProp ? '<div class="mk-hol-note">' + esc(notaProp) + '</div>' : '') +
       '<div class="mk-hol-comp">Demonstrativo · ' + esc(qLabel) + ' · pgto ' + esc(pgto) + '</div>' +
       '<table class="mk-hol-tbl"><thead><tr><th>Cód</th><th>Descrição</th><th>Referência</th><th>Vencimentos</th><th>Descontos</th></tr></thead><tbody>' +
-      mkHolRow_('', '', '', '', '', 'Proventos') +
+      mkHolRow_('', '', '', '', '', 'Proventos (salário)') +
       mkHolRow_('001', 'Salário ' + pctSal + ' (proporcional)', refSal, mkHolFmtMoney_(base), '') +
-      (bonus > 0 ? mkHolRow_('105', 'Bônus metas (variável)', bonusRef, mkHolFmtMoney_(bonus), '') : '') +
       descRows +
       '</tbody></table>' +
       '<div class="mk-hol-tot">' +
       '<div><div class="lbl">Total vencimentos</div><div class="val">' + mkHolFmtMoney_(bruto) + '</div></div>' +
       '<div><div class="lbl">Total descontos</div><div class="val" style="color:var(--red)">' + mkHolFmtMoney_(totalDescontos, 'd') + '</div></div>' +
-      '<div><div class="lbl">Líquido a receber</div><div class="val">' + mkHolFmtMoney_(liquido) + '</div></div>' +
+      '<div><div class="lbl">Salário líquido</div><div class="val">' + mkHolFmtMoney_(liquido) + '</div></div>' +
       '</div>' +
       benBlock +
       '<div class="mk-hol-bases">' +
       '<div><span>Salário contratual</span>' + mkHolFmtMoney_(salContr) + '</div>' +
-      '<div><span>Base INSS (mês prop.)</span>' + mkHolFmtMoney_(hol.baseInss || hol.salarioProporcional || bruto) + '</div>' +
-      '<div><span>Base IRRF</span>' + mkHolFmtMoney_(hol.irrfBase || (bruto - inss)) + '</div>' +
-      '<div><span>Líquido desta quinzena</span>' + mkHolFmtMoney_(liquido) + '</div>' +
+      '<div><span>Base INSS (salário prop.)</span>' + mkHolFmtMoney_(hol.baseInss != null ? hol.baseInss : (hol.salarioProporcional || bruto)) + '</div>' +
+      '<div><span>Base IRRF</span>' + mkHolFmtMoney_(hol.irrfBase || 0) + '</div>' +
+      '<div><span>Salário líquido</span>' + mkHolFmtMoney_(liquido) + '</div>' +
       '</div>' +
-      '<div class="mk-hol-foot">Regra MOVI KIDS (I108+I111): 1ª quinzena (dia 15) = 40% salário + 50% VA + 50% bônus · VT dos ~15 dias já pago (não entra no pacote) · 2ª quinzena (dia 30/31) = 60% salário + 50% VA/bônus/VT − INSS/IRRF/VT 6%/faltas · proporcional à admissão. Documento informativo — conferir com contador.</div>' +
+      '<div class="mk-hol-foot">Regra MOVI KIDS (I108–I112): 1ª quinzena = 40% salário + cesta 50% (bônus+VA; VT já pago) · 2ª = 60% salário + cesta 50% (bônus+VA+VT) − encargos sobre salário · bônus não integra salário/INSS. Documento informativo — conferir com contador.</div>' +
       '</div></div>';
   }
 
