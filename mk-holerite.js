@@ -57,33 +57,50 @@
   function mkHolNormalizeHol_(holIn) {
     var hol = Object.assign({}, holIn || {});
     var q = Number(hol.quinzena) || 0;
+    var base = Number(hol.base) || 0;
+    var bonus = Number(hol.bonus) || 0;
+    var bruto = hol.bruto != null ? Number(hol.bruto) : base;
+    var liquido = hol.liquido != null ? Number(hol.liquido) : bruto;
+
+    // I114 — se bruto/líquido ainda vierem com bônus (GAS/cache legado), strip
+    if (bonus > 0 && base > 0) {
+      if (Math.abs(bruto - (base + bonus)) < 0.05) bruto = base;
+      if (Math.abs(liquido - (base + bonus)) < 0.05) liquido = base;
+      if (Math.abs(liquido - (bruto + bonus)) < 0.05) liquido = bruto;
+      if (bruto > base + 0.05) bruto = base;
+      if (q === 1 && liquido > base + 0.05) liquido = base;
+    }
+    hol.bruto = bruto;
+    hol.liquido = liquido;
+    if (q === 1) {
+      hol.faltas = 0;
+      hol.totalDescontos = 0;
+    }
+
     if (q !== 1) return hol;
+
     var vtRaw = Number(hol.vtPasses) || 0;
     var vtJa = Number(hol.vtPassesJaPago) || 0;
     if (vtRaw > 0 && vtJa <= 0) vtJa = vtRaw;
     hol.vtPasses = 0;
     hol.vtPassesJaPago = vtJa;
-    var base = Number(hol.base) || 0;
-    var bruto = hol.bruto != null ? Number(hol.bruto) : base;
-    var bonus = Number(hol.bonus) || 0;
-    var liquido = hol.liquido != null ? Number(hol.liquido) : bruto;
     var vaTotal = Number(hol.vaTotal) || 0;
     var pix;
     if (hol.pixQuinzena != null) {
       pix = Number(hol.pixQuinzena);
-    } else if (Math.abs(bruto - base) < 0.02) {
-      // I112+: bruto = só salário → PIX = líquido + bônus cesta
-      pix = Math.round((liquido + bonus) * 100) / 100;
+      // pix legado às vezes = salário+bônus already; ok. Se veio sem bônus e bruto era legado, recompute
+      if (bonus > 0 && Math.abs(pix - liquido) < 0.05) {
+        pix = Math.round((liquido + bonus) * 100) / 100;
+      }
     } else {
-      // legado: líquido já trazia salário+bônus
-      pix = liquido;
+      pix = Math.round((liquido + bonus) * 100) / 100;
     }
     hol.pixQuinzena = pix;
-    // Hardclamp: pacote Q1 = PIX + VA (sem VT), ignore pacote da API se legado
     hol.pacoteQuinzena = Math.round((pix + vaTotal) * 100) / 100;
     if (!hol.quinzenaLabel || String(hol.quinzenaLabel).indexOf('VT') < 0) {
       hol.quinzenaLabel = '1ª quinzena · 40% salário + cesta (bônus/VA) · VT já pago';
     }
+    hol.incluiBeneficios = true;
     return hol;
   }
 
@@ -147,13 +164,16 @@
       return '<p class="gp-adm-muted">Sem pagamento nesta quinzena — admissão posterior ou período não trabalhado.</p>';
     }
 
-    var bruto = hol.bruto != null ? hol.bruto : base;
-    var inss = hol.inss || 0;
-    var irrf = hol.irrf || 0;
-    var vt = hol.vt || 0;
-    var faltas = hol.faltas || 0;
-    var liquido = hol.liquido != null ? hol.liquido : bruto - inss - irrf - vt - faltas;
-    var totalDescontos = hol.totalDescontos != null ? hol.totalDescontos : inss + irrf + vt + faltas;
+    var bruto = base; // I114 — Total vencimentos = só salário (bônus na cesta)
+    var inss = Number(hol.quinzena) === 1 ? 0 : (hol.inss || 0);
+    var irrf = Number(hol.quinzena) === 1 ? 0 : (hol.irrf || 0);
+    var vt = Number(hol.quinzena) === 1 ? 0 : (hol.vt || 0);
+    var faltas = Number(hol.quinzena) === 1 ? 0 : (hol.faltas || 0);
+    var liquido = hol.liquido != null ? Number(hol.liquido) : bruto - inss - irrf - vt - faltas;
+    if (Number(hol.quinzena) === 1) liquido = base;
+    var totalDescontos = Number(hol.quinzena) === 1
+      ? 0
+      : (hol.totalDescontos != null ? hol.totalDescontos : inss + irrf + vt + faltas);
     var diasMes = hol.diasMes || 30;
     var diasTrab = hol.diasTrabalhados != null ? hol.diasTrabalhados : 0;
     var refSal = mkHolRefSalario_(hol);

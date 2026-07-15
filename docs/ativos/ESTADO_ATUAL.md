@@ -35,10 +35,10 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 | Camada | Versão | URL / evidência |
 |--------|--------|-----------------|
-| **Frontend** | **v1.9.55** | https://ribocg-a11y.github.io/movikids/?force=1.9.55 |
-| **Gestão Pessoas** | **v1.9.55** | `gestao-pessoas.html?force=1.9.55` |
-| **Portal acompanhar** | **v1.9.55** | `acompanhar.html` |
-| **Service Worker** | **1.9.55** | `sw.js` |
+| **Frontend** | **v1.9.56** | https://ribocg-a11y.github.io/movikids/?force=1.9.56 |
+| **Gestão Pessoas** | **v1.9.56** | `gestao-pessoas.html?force=1.9.56` |
+| **Portal acompanhar** | **v1.9.56** | `acompanhar.html` |
+| **Service Worker** | **1.9.56** | `sw.js` |
 | **Apps Script** | **v1.5.194** | repo · ping até Nova versão **I111** (Q1 VT já pago) |
 | **Holerite Q1 15/07** | I108+I109b+I110+**I111** | Ray pacote **R$ 998,40** · Julia **R$ 948,40** (VT Q1=0) |
 | **Bônus jul live** | I109b | Ray **R$ 300** · Julia **R$ 200** |
