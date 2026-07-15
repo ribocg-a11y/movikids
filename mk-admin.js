@@ -3509,12 +3509,19 @@ function cxPosRefreshUI_() {
     const ok = Math.abs(diff) < 0.009;
     if (!ok) estado = 'alert';
     else if (estado === 'wait') estado = 'ok';
+    let hintAberta = '';
+    const nAb = Number(snap.nAbertas) || 0;
+    const fatAb = Number(snap.fatAbertas) || 0;
+    if (!ok && nAb > 0 && Math.abs(Math.abs(diff) - fatAb) < 0.05) {
+      hintAberta = ' · tip: diferença ≈ ' + nAb + ' aberta(s) ' + fmtR(fatAb)
+        + ' — atualize o relatório POS (pay-first já conta Ativa/Pendente no app)';
+    }
     rows.push({
       ok: ok,
       label: 'Valor R$ (POS × sistema)',
       value: ok
         ? ('Bate · ' + fmtR(posBruto))
-        : ('Diferença ' + fmtR(diff) + ' · POS ' + fmtR(posBruto) + ' × app ' + fmtR(sysMaq))
+        : ('Diferença ' + fmtR(diff) + ' · POS ' + fmtR(posBruto) + ' × app ' + fmtR(sysMaq) + hintAberta)
     });
   }
 
@@ -3826,7 +3833,8 @@ function renderCaixaFromResumo_(dataFmt, r) {
       nContas: nContas,
       nSess: nSess,
       nLocMaq: nLocMaq,
-      nAbertas: nAbertas
+      nAbertas: nAbertas,
+      fatAbertas: fatAbertas
     };
     cxPosHydrate_(dataFmt);
 
@@ -3850,6 +3858,7 @@ function renderCaixaFromResumo_(dataFmt, r) {
           const temAtiva = c.locs.some(function (l) { return String(l.status || '') === 'Ativa'; });
           const temPend = c.locs.some(function (l) { return String(l.status || '') === 'Pendente'; });
           const statusTag = temAtiva ? ' ' + cxStatusPill_('Ativa') : (temPend ? ' ' + cxStatusPill_('Pendente') : '');
+          const maq = CX_FORMAS_MAQ_.indexOf(c.pagamento) >= 0;
           return '<tr' + (maq ? '' : ' style="opacity:.85"') + '>'
             + '<td>' + escHtml(c.responsavel || '—') + statusTag + '</td>'
             + '<td>' + c.locs.length + '</td>'
