@@ -1,6 +1,6 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 14/07/2026 · FE **v1.9.48** · GAS **v1.5.188** (I107 ritmo realista Dashboard)  
+**Atualizado:** 15/07/2026 · FE **v1.9.49** · GAS repo **v1.5.189** (I108 holerite Q1) — ping Web até Nova versão  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **Repo local:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`  
@@ -55,14 +55,14 @@ cursor "C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-mo
 
 ---
 
-## Produção (13/07/2026)
+## Produção (15/07/2026)
 
 | Camada | Versão | URL / evidência |
 |--------|--------|-----------------|
-| **Frontend** | **v1.9.48** | https://ribocg-a11y.github.io/movikids/?force=1.9.48 |
-| **Gestão Pessoas** | **v1.9.48** | `gestao-pessoas.html?force=1.9.48` |
-| **Service Worker** | **1.9.48** | `sw.js` |
-| **Apps Script** | **v1.5.188** | ping alinhado · I105 buscaTexto + observacao |
+| **Frontend** | **v1.9.49** | https://ribocg-a11y.github.io/movikids/?force=1.9.49 |
+| **Gestão Pessoas** | **v1.9.49** | `gestao-pessoas.html?force=1.9.49` |
+| **Service Worker** | **1.9.49** | `sw.js` |
+| **Apps Script** | **v1.5.189** repo · ping até Nova versão Web | I108 holerite Q1 50% VA/bônus/VT |
 | **Baseline P0** | ✅ | `docs/ativos/BASELINE_CODIGO_P0.md` |
 | **PIN admin** | **1421** | Script Property `ADMIN_PIN` |
 | **Homolog tablet** | ✅ 23/06 | I43 · I42 · I47 · Gestor — smoke **v1.9.39** pendente Ops |

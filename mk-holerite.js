@@ -130,14 +130,25 @@
         mkHolRow_('410', 'Adiantamento quinzenal — descontos na 2ª quinzena', '—', '', 'R$ 0,00');
     }
 
+    var benPctLbl = (hol.pctBeneficios != null ? Math.round(Number(hol.pctBeneficios) * 100) : 50) + '%';
     var benBlock = hol.incluiBeneficios
-      ? '<div class="mk-hol-comp" style="border-top:1px solid var(--border);border-bottom:none;background:#F0FDF4;color:#166534">Benefícios · pagos na 2ª quinzena · não integram salário</div>' +
+      ? '<div class="mk-hol-comp" style="border-top:1px solid var(--border);border-bottom:none;background:#F0FDF4;color:#166534">Benefícios · ' + benPctLbl + ' nesta quinzena · não integram salário</div>' +
         '<table class="mk-hol-tbl"><thead><tr><th>Cód</th><th>Benefício</th><th>Referência</th><th colspan="2">Valor concedido</th></tr></thead><tbody>' +
-        mkHolRow_('501', 'Vale-alimentação (VA)', 'R$ ' + (hol.vaMensal || 400) + '/mês prop. ' + diasTrab + '/' + diasMes, hol.vaTotal ? mkHolFmtMoney_(hol.vaTotal) : 'R$ 0,00', '') +
-        mkHolRow_('502', 'Concessão passes VT', 'benefício mês prop.', hol.vtPasses ? mkHolFmtMoney_(hol.vtPasses) : '—', '') +
-        mkHolRow_('503', 'FGTS 8% — encargo empregador (informativo)', 'sobre base INSS', hol.fgts ? mkHolFmtMoney_(hol.fgts) : '—', '') +
+        mkHolRow_('501', 'Vale-alimentação (VA)', benPctLbl + ' de R$ ' + (hol.vaMensal || 400) + '/mês prop. ' + diasTrab + '/' + diasMes, hol.vaTotal ? mkHolFmtMoney_(hol.vaTotal) : 'R$ 0,00', '') +
+        mkHolRow_('502', 'Concessão passes VT', benPctLbl + ' do benefício mês prop.', hol.vtPasses ? mkHolFmtMoney_(hol.vtPasses) : '—', '') +
+        (hol.quinzena === 2
+          ? mkHolRow_('503', 'FGTS 8% — encargo empregador (informativo)', 'sobre base INSS do mês', hol.fgts ? mkHolFmtMoney_(hol.fgts) : '—', '')
+          : '') +
         '</tbody></table>'
-      : '<p class="gp-adm-muted" style="padding:12px 16px;margin:0">Benefícios (VA R$ 400/mês, VT) creditados na <strong>2ª quinzena</strong> (pagamento dia 30/31).</p>';
+      : '<p class="gp-adm-muted" style="padding:12px 16px;margin:0">Sem benefícios nesta quinzena (admissão posterior ao período).</p>';
+
+    var bonusRef = '';
+    if (bonus > 0) {
+      var bonusMes = hol.bonusMes != null ? Number(hol.bonusMes) : null;
+      bonusRef = bonusMes != null && bonusMes > 0
+        ? benPctLbl + ' de R$ ' + mkHolFmtMoney_(bonusMes).replace('R$\u00a0', '').replace('R$ ', '') + ' (mês)'
+        : (bonusDias + ' dia(s) · ' + benPctLbl + ' desta quinzena');
+    }
 
     var toolbar = opts.toolbar !== false
       ? '<div class="mk-hol-toolbar no-print"><button type="button" class="btn btn-secondary" onclick="mkHolPrintPdf_()">📄 Salvar PDF / Imprimir</button></div>'
@@ -171,7 +182,7 @@
       '<table class="mk-hol-tbl"><thead><tr><th>Cód</th><th>Descrição</th><th>Referência</th><th>Vencimentos</th><th>Descontos</th></tr></thead><tbody>' +
       mkHolRow_('', '', '', '', '', 'Proventos') +
       mkHolRow_('001', 'Salário ' + pctSal + ' (proporcional)', refSal, mkHolFmtMoney_(base), '') +
-      (bonus > 0 ? mkHolRow_('105', 'Bônus metas (variável)', bonusDias + ' dia(s)', mkHolFmtMoney_(bonus), '') : '') +
+      (bonus > 0 ? mkHolRow_('105', 'Bônus metas (variável)', bonusRef, mkHolFmtMoney_(bonus), '') : '') +
       descRows +
       '</tbody></table>' +
       '<div class="mk-hol-tot">' +
@@ -186,7 +197,7 @@
       '<div><span>Base IRRF</span>' + mkHolFmtMoney_(hol.irrfBase || (bruto - inss)) + '</div>' +
       '<div><span>Líquido desta quinzena</span>' + mkHolFmtMoney_(liquido) + '</div>' +
       '</div>' +
-      '<div class="mk-hol-foot">Regra MOVI KIDS: 1ª quinzena 40% salário (dia 15) · 2ª quinzena 60% + benefícios (dia 30/31) · proporcional à admissão. Documento informativo — conferir com contador.</div>' +
+      '<div class="mk-hol-foot">Regra MOVI KIDS (I108): 1ª quinzena (dia 15) = 40% salário + 50% VA + 50% bônus + 50% VT · 2ª quinzena (dia 30/31) = 60% salário + 50% VA/bônus/VT − INSS/IRRF/VT 6%/faltas · proporcional à admissão. Documento informativo — conferir com contador.</div>' +
       '</div></div>';
   }
 

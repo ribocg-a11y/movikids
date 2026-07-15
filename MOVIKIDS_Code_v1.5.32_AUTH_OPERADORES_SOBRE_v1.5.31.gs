@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.188
+// MOVI KIDS — Google Apps Script v1.5.189
+// v1.5.189: I108 — 1ª quinzena: 40% salário + 50% VA + 50% bônus + 50% VT (2ª: restates + encargos)
 // v1.5.188: I105 — buscaTextoAdmin sem teto 500 linhas (lê fim da aba) + observacao em historico/resumoDia
 // v1.5.187: I98b — MK_GAS_VERSAO_/SISTEMA_ alinhados ao header (ping I70)
 // v1.5.187: I98 — salvarLocacoesMulti valida todos os itens antes de appendRow
@@ -180,8 +181,8 @@
 
 // ── CONSTANTES ───────────────────────────────────────────────
 /** Versão exposta em ping, carregarInicio, validarSchema, gestaoPessoasStatus (bump com header). */
-const MK_GAS_VERSAO_  = 'v1.5.188';
-const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.188';
+const MK_GAS_VERSAO_  = 'v1.5.189';
+const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.189';
 const SHEET_ID   = '1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618';
 const DEPLOY_ID  = 'AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y';
 const WEBAPP_URL = `https://script.google.com/macros/s/${DEPLOY_ID}/exec`;
@@ -11518,6 +11519,8 @@ const GP_VA_MENSAL_PADRAO_ = 400;
 const GP_VA_MENSAL_MAX_ = 400;
 const GP_PCT_QUINZENA_1_ = 0.40;
 const GP_PCT_QUINZENA_2_ = 0.60;
+/** I108 — VA, bônus meta e VT passes: metade em cada quinzena. */
+const GP_PCT_BENEFICIO_QUINZENA_ = 0.50;
 
 /** Teto VA mensal — memorial FOLHA B11 ou R$ 400 (nunca va_diario da planilha). */
 function gpVaMensalTeto_() {
@@ -11597,10 +11600,12 @@ function gpDiasNaQuinzena_(admissaoStr, mes, ano, quinzena) {
 
 function gpQuinzenaAtual_(refDate, mes, ano) {
   const d = refDate || new Date();
+  // Dia 15 = dia de pagamento da 1ª — ainda exibe/calcula Q1 (I108).
+  // Q2 a partir do dia 16.
   if (d.getFullYear() !== ano || d.getMonth() + 1 !== mes) {
-    return d < new Date(ano, mes - 1, 15) ? 1 : 2;
+    return d < new Date(ano, mes - 1, 16) ? 1 : 2;
   }
-  return d.getDate() <= 14 ? 1 : 2;
+  return d.getDate() <= 15 ? 1 : 2;
 }
 
 function gpDataPagamentoQuinzena_(quinzena, mes, ano) {
@@ -11906,16 +11911,17 @@ function gpCalcHollerite_(colab, bonus, faltas, competencia, refDate) {
   let vaDias = 0;
   let vtPasses = 0;
   let incluiBeneficios = false;
+  const pctBenef = GP_PCT_BENEFICIO_QUINZENA_;
+  const vtPassesMesProp = Math.round(vtPassesMes * fatorMes * 100) / 100;
 
   if (temQuinzena) {
     basePag = Math.round(salarioProp * pctQuinz * 100) / 100;
-    if (quinzena === 2) {
-      bonusQuinz = bonus;
-      incluiBeneficios = true;
-      vaTotal = vaProp;
-      vaDias = diasTrab;
-      vtPasses = Math.round(vtPassesMes * fatorMes * 100) / 100;
-    }
+    // I108 — cada quinzena: 50% VA + 50% bônus + 50% VT passes (salário continua 40/60)
+    incluiBeneficios = true;
+    bonusQuinz = Math.round(Number(bonus) * pctBenef * 100) / 100;
+    vaTotal = Math.round(vaProp * pctBenef * 100) / 100;
+    vaDias = diasTrab;
+    vtPasses = Math.round(vtPassesMesProp * pctBenef * 100) / 100;
   }
 
   const bruto = basePag + bonusQuinz;
@@ -11937,17 +11943,19 @@ function gpCalcHollerite_(colab, bonus, faltas, competencia, refDate) {
   const totalDescontos = Math.round((inss + irrf + vt + faltas) * 100) / 100;
   const liquido = Math.round((bruto - totalDescontos) * 100) / 100;
   const diasVaBase = gpVaDiasBase_();
-  const vaDiario = (diasTrab > 0 && vaTotal > 0)
-    ? Math.round((vaTotal / diasTrab) * 100) / 100
-    : Math.round((vaMensal / diasVaBase) * 100) / 100;
+  // Diário de referência = VA mensal / dias memorial (não metade do VA da quinzena)
+  const vaDiario = Math.round((vaMensal / diasVaBase) * 100) / 100;
   const pagamentoEm = gpDataPagamentoQuinzena_(quinzena, mes, ano);
-  const quinzenaLabel = quinzena === 1 ? '1ª quinzena · 40% salário' : '2ª quinzena · 60% + benefícios';
+  const quinzenaLabel = quinzena === 1
+    ? '1ª quinzena · 40% salário + 50% VA/bônus/VT'
+    : '2ª quinzena · 60% salário + 50% VA/bônus/VT − encargos';
 
   return {
     base: basePag, salarioContratual: salarioContratual, salarioProporcional: salarioProp,
-    bonus: bonusQuinz, faltas: faltas, bruto: bruto,
+    bonus: bonusQuinz, bonusMes: Number(bonus) || 0, faltas: faltas, bruto: bruto,
     inss: inss, inssAli: inssAli, irrf: irrf, irrfIsento: irrfIsento, vt: vt, fgts: fgts,
     vaTotal: vaTotal, vaDias: vaDias, vaDiario: vaDiario, vaMensal: vaMensal, vtPasses: vtPasses,
+    vtPassesMes: vtPassesMesProp, pctBeneficios: pctBenef,
     totalDescontos: totalDescontos, liquido: liquido,
     baseInss: quinzena === 2 ? salarioProp + bonus : bruto,
     irrfBase: irrfBase, competencia: compLabel, quinzena: quinzena, quinzenaLabel: quinzenaLabel,

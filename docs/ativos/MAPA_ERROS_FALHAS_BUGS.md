@@ -1,6 +1,7 @@
 # MOVI KIDS — Mapa de erros, falhas e bugs
 
-**Atualizado:** 14/07/2026 — **I107** ritmo realista Dashboard · FE **v1.9.48** · GAS **v1.5.188**  
+**Atualizado:** 15/07/2026 — **I108** 1ª quinzena 50% VA/bônus/VT · FE **v1.9.49** · GAS **v1.5.189**  
+**Uso anterior:** 14/07/2026 — **I107** ritmo realista Dashboard · FE **v1.9.48** · GAS **v1.5.188**  
 **Uso anterior:** 22/06/2026 — **I38–I41** auditoria RH 22/06 · GAS repo **v1.5.129** (ping **v1.5.107**) · FE **v1.8.110**  
 **Uso anterior:** 17/06/2026 — **I28** liberar sessão tablet · GAS **v1.5.92** prod. · FE **v1.8.30**  
 **Uso anterior:** 09/06/2026 — **I22 fechado** (hotfix FE v1.8.2)  
@@ -104,6 +105,7 @@
 | **I105** | **`buscarTextoPlanilhaAdmin` só lia 500 linhas** | Motivo cancelamento/obs na ~linha 1424 invisível | GAS **v1.5.188** lê até 8k do **fim** da aba + `observacao` em `listarHistorico`/`resumoDia` | I70 | buscar `CANCELADA` / id 1513 após Nova versão Web |
 | **I106** | **Caixa × POS sem conferência operacional** | R$ batia mal (ex. 491 vs 496) sem alerta; cadastro sem trava de comprovante | FE **v1.9.47** painel POS + checkbox Nova + cancelamento sem placeholder | I104 | digitar bruto/vendas POS · diferença gritante |
 | **I107** | **Média/projeção Dashboard otimista** | Extrapolava só dias c/ movimento do mês (ex. R$533→R$16,5k) ignorando meses cheios (~R$450) | FE **v1.9.48** `mkRitmoRealistaDash_` · âncora histórica + 2 linhas no gráfico · badge semana por ritmo/dia | I72 | Card “realista”; ritmo puro no tooltip |
+| **I108** | **1ª quinzena sem VA/bônus/VT** | Pagamento dia 15 só 40% salário; VA/bônus/VT 100% só no fechamento | GAS **v1.5.189** `gpCalcHollerite_` 50% VA/bônus/VT em cada quinzena · dia 15 ainda = Q1 · FE **v1.9.49** `mk-holerite.js` | I39 · I68 | Raykelly Q1: 648,40+250+200+96,80 |
 | **I84** | **Meta colaborador contava sessões, não contas (I42)** | 4 encerramentos mesmo telefone = 4 loc na meta | GAS **v1.5.180** `metaOperadorSeenMark_` conta_id/telefone · FE **v1.9.16** scroll módulo | `metaOperadorTurno` | 1 loc por telefone/dia |
 | **I42** | Conta do dia — mesmo telefone 10h–22h | Caixa `n` vs sessões; maquininha | GAS **v1.5.131+** col S `conta_id` | `TESTE_I42_CONTA_DIA_CAIXA` | não reduzir `COL_LOC_READ_` (ver I43) |
 | **I41** | **`ping_` versão defasada** (v1.5.107 vs repo) | Confusão deploy / verify | GAS **v1.5.130** `ping_()` alinhado | `ping_` header alinhado | ping = v1.5.130 |
