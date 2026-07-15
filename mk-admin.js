@@ -3373,27 +3373,21 @@ function nContasCartao_(locacoes) {
   return Object.keys(seen).length;
 }
 
-function cxHintConferenciaPos_(nContasMaq, nLocMaq, nContas, nSess, totalMaq, nAbertas) {
+function cxHintConferenciaMaq_(nContasMaq, nLocMaq, nContas, nSess, totalMaq, nAbertas) {
   const parts = [];
   parts.push('<strong>' + nContasMaq + (nContasMaq === 1 ? ' conta</strong> no cartão'
-    : ' contas</strong> no cartão') + ' — bater <em>quantidade</em> com vendas do POS');
-  parts.push('Valor R$ ' + Number(totalMaq).toFixed(2).replace('.', ',') + ' — bater com bruto da maquininha');
+    : ' contas</strong> no cartão') + ' · R$ ' + Number(totalMaq).toFixed(2).replace('.', ','));
   if (nLocMaq > nContasMaq) {
-    parts.push('Multi-veículo: ' + nLocMaq + ' locações no cartão, ' + nContasMaq + ' passagem(ns) esperada(s)');
+    parts.push('Multi-veículo: ' + nLocMaq + ' locações → ' + nContasMaq + ' cobrança(s)');
   }
   if (nContas > nContasMaq) {
     const din = nContas - nContasMaq;
     parts.push(din + (din === 1 ? ' conta só em dinheiro' : ' contas só em dinheiro'));
   }
-  if (nSess > nLocMaq) {
-    const rest = nSess - nLocMaq;
-    parts.push(rest + (rest === 1 ? ' locação em dinheiro' : ' locações em dinheiro'));
-  }
   const nAb = Number(nAbertas) || 0;
   if (nAb > 0) {
-    parts.push(nAb + (nAb === 1 ? ' aberta (Ativa/Pendente) já conta no maquininha — pay-first' : ' abertas já contam no maquininha — pay-first'));
+    parts.push(nAb + (nAb === 1 ? ' aberta já conta (pay-first)' : ' abertas já contam (pay-first)'));
   }
-  parts.push('Não comparar locações (' + nSess + ') com vendas POS — use contas no cartão');
   return parts.join(' · ');
 }
 
@@ -3403,39 +3397,6 @@ function cxStatusPill_(status) {
   if (s === 'Pendente') return '<span style="font-size:10px;font-weight:700;color:#854F0B;background:#FAEEDA;padding:2px 6px;border-radius:6px">Pendente</span>';
   if (s === 'Encerrada') return '<span style="font-size:10px;font-weight:700;color:#3B6D11;background:#EAF3DE;padding:2px 6px;border-radius:6px">Encerrada</span>';
   return s ? '<span style="font-size:10px;color:var(--txt3)">' + escHtml(s) + '</span>' : '';
-}
-
-const CX_POS_LS_KEY_ = 'mk_cx_pos_conf_v1_';
-window._cxPosSnap = window._cxPosSnap || null;
-window._cxPosBound = false;
-
-function cxPosParseMoney_(raw) {
-  let s = String(raw == null ? '' : raw).trim();
-  if (!s) return null;
-  s = s.replace(/[R$\s]/gi, '');
-  if (s.indexOf(',') >= 0 && s.indexOf('.') >= 0) s = s.replace(/\./g, '').replace(',', '.');
-  else if (s.indexOf(',') >= 0) s = s.replace(',', '.');
-  const n = Number(s);
-  return isFinite(n) ? Math.round(n * 100) / 100 : null;
-}
-
-function cxPosStorageKey_(dataFmt) {
-  return CX_POS_LS_KEY_ + String(dataFmt || '').replace(/\//g, '-');
-}
-
-function cxPosLoadSaved_(dataFmt) {
-  try {
-    const raw = localStorage.getItem(cxPosStorageKey_(dataFmt));
-    if (!raw) return null;
-    return JSON.parse(raw);
-  } catch (e) { return null; }
-}
-
-function cxPosSaveSaved_(dataFmt, payload) {
-  try {
-    localStorage.setItem(cxPosStorageKey_(dataFmt), JSON.stringify(payload));
-    return true;
-  } catch (e) { return false; }
 }
 
 function cxAgruparContasCaixa_(locacoes) {
@@ -3460,184 +3421,6 @@ function cxAgruparContasCaixa_(locacoes) {
   });
   return order.map(function (k) { return groups[k]; });
 }
-
-function cxPosBindOnce_() {
-  if (window._cxPosBound) return;
-  window._cxPosBound = true;
-  const bruto = document.getElementById('cx-pos-bruto');
-  const vendas = document.getElementById('cx-pos-vendas');
-  const onChange = function () { cxPosRefreshUI_(); };
-  if (bruto) {
-    bruto.addEventListener('input', onChange);
-    bruto.addEventListener('change', onChange);
-  }
-  if (vendas) {
-    vendas.addEventListener('input', onChange);
-    vendas.addEventListener('change', onChange);
-  }
-}
-
-function cxPosRefreshUI_() {
-  const snap = window._cxPosSnap;
-  const checks = document.getElementById('cx-pos-checks');
-  const chip = document.getElementById('cx-pos-chip');
-  const gate = document.getElementById('cx-pos-gate');
-  if (!snap || !checks) return;
-
-  const brutoRaw = (document.getElementById('cx-pos-bruto') || {}).value;
-  const vendasRaw = (document.getElementById('cx-pos-vendas') || {}).value;
-  const posBruto = cxPosParseMoney_(brutoRaw);
-  const posVendas = String(vendasRaw || '').trim() === '' ? null : parseInt(vendasRaw, 10);
-  const sysMaq = Number(snap.totalMaq) || 0;
-  const sysContas = Number(snap.nContasMaq) || 0;
-  const sysDin = Number(snap.totalDin) || 0;
-  const sysFat = Number(snap.totalEnt) || 0;
-
-  const rows = [];
-  let estado = 'wait'; // wait | ok | alert
-
-  rows.push({
-    ok: null,
-    label: 'Sistema maquininha',
-    value: fmtR(sysMaq) + ' · ' + sysContas + (sysContas === 1 ? ' conta' : ' contas') + ' no cartão'
-  });
-
-  if (posBruto == null) {
-    rows.push({ ok: null, label: 'Valor POS', value: 'Digite o total bruto do relatório' });
-  } else {
-    const diff = Math.round((posBruto - sysMaq) * 100) / 100;
-    const ok = Math.abs(diff) < 0.009;
-    if (!ok) estado = 'alert';
-    else if (estado === 'wait') estado = 'ok';
-    let hintAberta = '';
-    const nAb = Number(snap.nAbertas) || 0;
-    const fatAb = Number(snap.fatAbertas) || 0;
-    if (!ok && nAb > 0 && Math.abs(Math.abs(diff) - fatAb) < 0.05) {
-      hintAberta = ' · tip: diferença ≈ ' + nAb + ' aberta(s) ' + fmtR(fatAb)
-        + ' — atualize o relatório POS (pay-first já conta Ativa/Pendente no app)';
-    }
-    rows.push({
-      ok: ok,
-      label: 'Valor R$ (POS × sistema)',
-      value: ok
-        ? ('Bate · ' + fmtR(posBruto))
-        : ('Diferença ' + fmtR(diff) + ' · POS ' + fmtR(posBruto) + ' × app ' + fmtR(sysMaq) + hintAberta)
-    });
-  }
-
-  if (posVendas == null || isNaN(posVendas)) {
-    rows.push({ ok: null, label: 'Qtd vendas POS', value: 'Digite o nº de vendas do relatório' });
-  } else {
-    const ok = posVendas === sysContas;
-    if (!ok) estado = 'alert';
-    else if (estado === 'wait') estado = 'ok';
-    let extra = '';
-    if (!ok && posVendas > sysContas) extra = ' · POS maior: cliente(s) passou(ram) cartão 2× ou há venda avulsa';
-    if (!ok && posVendas < sysContas) extra = ' · app maior: conferir pagamento digitado / conta sem passagem';
-    rows.push({
-      ok: ok,
-      label: 'Quantidade (vendas × contas cartão)',
-      value: ok
-        ? ('Bate · ' + posVendas + ' = ' + sysContas)
-        : ('POS ' + posVendas + ' × app ' + sysContas + extra)
-    });
-  }
-
-  if (posBruto != null && posVendas != null && !isNaN(posVendas) && Math.abs(posBruto - sysMaq) < 0.009 && posVendas === sysContas) {
-    estado = 'ok';
-  } else if (posBruto == null && (posVendas == null || isNaN(posVendas))) {
-    estado = 'wait';
-  }
-
-  rows.push({
-    ok: null,
-    label: 'Fora do POS',
-    value: 'Dinheiro ' + fmtR(sysDin) + ' · faturamento total ' + fmtR(sysFat) + ' (não compare com a máquina)'
-  });
-
-  checks.innerHTML = rows.map(function (r) {
-    const cls = r.ok === true ? ' ok' : (r.ok === false ? ' bad' : '');
-    const mark = r.ok === true ? '✓' : (r.ok === false ? '✗' : '·');
-    return '<div class="mk-cx-pos-row' + cls + '"><span class="mk-cx-pos-mark">' + mark + '</span><div><strong>'
-      + r.label + '</strong><div>' + r.value + '</div></div></div>';
-  }).join('');
-
-  if (chip) {
-    chip.className = 'mk-cx-pos-chip' + (estado === 'ok' ? ' ok' : (estado === 'alert' ? ' alert' : ''));
-    chip.textContent = estado === 'ok' ? 'Caixa × POS alinhados' : (estado === 'alert' ? 'Divergência — revisar' : 'Aguardando POS');
-  }
-  if (gate) {
-    gate.classList.toggle('is-ok', estado === 'ok');
-    gate.classList.toggle('is-alert', estado === 'alert');
-  }
-}
-
-function cxPosHydrate_(dataFmt) {
-  cxPosBindOnce_();
-  const saved = cxPosLoadSaved_(dataFmt);
-  const bruto = document.getElementById('cx-pos-bruto');
-  const vendas = document.getElementById('cx-pos-vendas');
-  if (bruto && document.activeElement !== bruto) {
-    bruto.value = saved && saved.bruto != null && saved.bruto !== '' ? String(saved.bruto) : '';
-  }
-  if (vendas && document.activeElement !== vendas) {
-    vendas.value = saved && saved.vendas != null && saved.vendas !== '' ? String(saved.vendas) : '';
-  }
-  cxPosRefreshUI_();
-}
-
-function cxPosSalvar_() {
-  const snap = window._cxPosSnap;
-  if (!snap || !snap.dataFmt) { toast('Carregue o caixa primeiro', 'error'); return; }
-  const brutoEl = document.getElementById('cx-pos-bruto');
-  const vendasEl = document.getElementById('cx-pos-vendas');
-  const payload = {
-    dataFmt: snap.dataFmt,
-    bruto: brutoEl ? brutoEl.value.trim() : '',
-    vendas: vendasEl ? vendasEl.value.trim() : '',
-    sysMaq: snap.totalMaq,
-    sysContas: snap.nContasMaq,
-    savedAt: new Date().toISOString()
-  };
-  if (cxPosSaveSaved_(snap.dataFmt, payload)) {
-    toast('Conferência POS salva neste aparelho (' + snap.dataFmt + ')', 'success');
-    cxPosRefreshUI_();
-  } else {
-    toast('Não foi possível salvar a conferência', 'error');
-  }
-}
-
-function cxPosCopiar_() {
-  const snap = window._cxPosSnap;
-  if (!snap) { toast('Sem dados do caixa', 'error'); return; }
-  const bruto = cxPosParseMoney_((document.getElementById('cx-pos-bruto') || {}).value);
-  const vendasRaw = (document.getElementById('cx-pos-vendas') || {}).value;
-  const posVendas = String(vendasRaw || '').trim() === '' ? null : parseInt(vendasRaw, 10);
-  const lines = [
-    'MOVI KIDS — Conferência caixa × POS',
-    'Data: ' + snap.dataFmt,
-    'Sistema maquininha: ' + fmtR(snap.totalMaq) + ' · ' + snap.nContasMaq + ' contas no cartão',
-    'POS informado: ' + (bruto == null ? '—' : fmtR(bruto)) + ' · ' + (posVendas == null || isNaN(posVendas) ? '—' : (posVendas + ' vendas')),
-    'Diferença R$: ' + (bruto == null ? '—' : fmtR(Math.round((bruto - snap.totalMaq) * 100) / 100)),
-    'Diferença qtd: ' + (posVendas == null || isNaN(posVendas) ? '—' : String(posVendas - snap.nContasMaq)),
-    'Dinheiro (fora POS): ' + fmtR(snap.totalDin),
-    'Faturamento total: ' + fmtR(snap.totalEnt),
-    'Locações: ' + snap.nSess + ' · Contas: ' + snap.nContas
-  ];
-  const txt = lines.join('\n');
-  if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(txt).then(function () {
-      toast('Resumo da conferência copiado', 'success');
-    }).catch(function () {
-      window.prompt('Copie o resumo:', txt);
-    });
-  } else {
-    window.prompt('Copie o resumo:', txt);
-  }
-}
-window.cxPosSalvar_ = cxPosSalvar_;
-window.cxPosCopiar_ = cxPosCopiar_;
-window.cxPosRefreshUI_ = cxPosRefreshUI_;
 
 function cxPayCtxBreakdown_(pag, totPag, extrasPorPag) {
   const tot = Number(totPag[pag] || 0);
@@ -3820,25 +3603,11 @@ function renderCaixaFromResumo_(dataFmt, r) {
         <span>Total maquininha</span><span style="color:#185FA5">${fmtR(totalMaq)}</span>
       </div>` +
       `<div style="font-size:11px;color:var(--txt3);margin-top:6px;line-height:1.45">`
-      + cxHintConferenciaPos_(nContasMaq, nLocMaq, nContas, nSess, totalMaq, nAbertas)
+      + cxHintConferenciaMaq_(nContasMaq, nLocMaq, nContas, nSess, totalMaq, nAbertas)
       + '</div>';
     }
 
-    window._cxPosSnap = {
-      dataFmt: dataFmt,
-      totalMaq: totalMaq,
-      totalDin: totalDin,
-      totalEnt: totalEnt,
-      nContasMaq: nContasMaq,
-      nContas: nContas,
-      nSess: nSess,
-      nLocMaq: nLocMaq,
-      nAbertas: nAbertas,
-      fatAbertas: fatAbertas
-    };
-    cxPosHydrate_(dataFmt);
-
-    // Contas do dia (1 linha = cobrança ≈ venda POS)
+    // Contas do dia (1 linha = cobrança)
     const contas = cxAgruparContasCaixa_(locacoes);
     const cxContasN = document.getElementById('cx-contas-n');
     if (cxContasN) cxContasN.textContent = contas.length + (contas.length === 1 ? ' conta' : ' contas');
