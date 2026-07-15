@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Movi Kids">
 <title>Movi Kids</title>
-<script src="mk-canonical-host.js?v=1.9.60"></script>
+<script src="mk-canonical-host.js?v=1.9.61"></script>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png">
@@ -17,17 +17,17 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<script src="mk-stale-sync.js?v=1.9.60"></script>
-<script src="mk-version.js?v=1.9.60"></script>
-<script src="mk-api.js?v=1.9.60"></script>
-<link rel="stylesheet" href="mk-design.css?v=1.9.60">
+<script src="mk-stale-sync.js?v=1.9.61"></script>
+<script src="mk-version.js?v=1.9.61"></script>
+<script src="mk-api.js?v=1.9.61"></script>
+<link rel="stylesheet" href="mk-design.css?v=1.9.61">
 
-<script src="mk-cache-bust.js?v=1.9.60"></script>
+<script src="mk-cache-bust.js?v=1.9.61"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<link rel="stylesheet" href="mk-app.css?v=1.9.60">
-<link rel="stylesheet" href="mk-gestao-pessoas.css?v=1.9.60">
+<link rel="stylesheet" href="mk-app.css?v=1.9.61">
+<link rel="stylesheet" href="mk-gestao-pessoas.css?v=1.9.61">
 <!-- Firebase SDK — Realtime sync canonico para todos os dispositivos -->
-<script type="module" src="mk-firebase.js?v=1.9.60"></script>
+<script type="module" src="mk-firebase.js?v=1.9.61"></script>
 </head>
 
 <body>
@@ -1061,33 +1061,6 @@
         <span class="mk-widget-ctx" id="cx-res-ctx">Entradas − custos</span>
       </div>
 
-      <!-- I106 — Conferência POS bruta (sempre visível) -->
-      <div class="mk-cx-pos-gate" id="cx-pos-gate" aria-live="polite">
-        <div class="mk-cx-pos-head">
-          <div>
-            <strong class="mk-cx-pos-title">Conferência POS × sistema</strong>
-            <p class="mk-cx-pos-lead">Digite o relatório da maquininha. O sistema compara sozinho — diferença fica gritante.</p>
-          </div>
-          <span class="mk-cx-pos-chip" id="cx-pos-chip">Aguardando POS</span>
-        </div>
-        <div class="mk-cx-pos-grid">
-          <label class="mk-cx-pos-field">
-            <span>Total bruto POS (R$)</span>
-            <input id="cx-pos-bruto" class="form-input" type="text" inputmode="decimal" placeholder="Ex: 496,00" autocomplete="off">
-          </label>
-          <label class="mk-cx-pos-field">
-            <span>Nº vendas POS</span>
-            <input id="cx-pos-vendas" class="form-input" type="number" min="0" step="1" placeholder="Ex: 19" inputmode="numeric">
-          </label>
-        </div>
-        <div class="mk-cx-pos-checks" id="cx-pos-checks"></div>
-        <div class="mk-cx-pos-actions">
-          <button type="button" class="btn btn-primary" style="padding:8px 14px;font-size:13px" onclick="cxPosSalvar_()">Salvar conferência deste dia</button>
-          <button type="button" class="btn btn-secondary" style="padding:8px 14px;font-size:13px" onclick="cxPosCopiar_()">Copiar resumo</button>
-        </div>
-        <p class="mk-cx-pos-note">Regra: contas no cartão ↔ vendas POS · R$ maquininha ↔ bruto POS. Nunca compare locações nem faturamento (que inclui dinheiro) com a máquina.</p>
-      </div>
-
       <div class="mk-caixa-section-lbl">Entradas por forma de pagamento (plano + extras)</div>
       <div class="mk-cmd-grid mk-caixa-widgets-grid mk-caixa-pay-grid">
         <div class="mk-widget mk-widget--pay">
@@ -1172,18 +1145,18 @@
       <div class="cx-conf">
         <div class="cx-conf-title">💳 Conferência maquininha</div>
         <div id="cx-conf-maq"></div>
-        <div class="cx-conf-hint">✓ Use o painel POS acima — ele é a fonte da verdade da conferência</div>
+        <div class="cx-conf-hint">✓ Comparar PIX+débito+crédito com a maquininha (contas no cartão · pay-first)</div>
       </div>
       <div class="cx-conf">
         <div class="cx-conf-title">💵 Conferência dinheiro</div>
         <div id="cx-conf-din"></div>
-        <div class="cx-conf-hint">✓ Contar o dinheiro em espécie (não entra no POS)</div>
+        <div class="cx-conf-hint">✓ Contar o dinheiro em espécie (não entra na maquininha)</div>
       </div>
     </div>
 
     <div class="cx-card" id="cx-contas-card">
       <div class="cx-card-header">
-        <span>Contas do dia (pay-first: inclui Ativa/Pendente · 1 linha ≈ 1 venda POS)</span>
+        <span>Contas do dia (pay-first: inclui Ativa/Pendente · 1 linha ≈ 1 cobrança)</span>
         <span style="font-weight:500;color:var(--txt2)" id="cx-contas-n">—</span>
       </div>
       <div style="overflow-x:auto">
@@ -2485,27 +2458,27 @@
   </div>
 </div>
 
-<script src="mk-globals.js?v=1.9.60"></script>
-<script src="mk-core.js?v=1.9.60"></script>
-<script src="mk-nav.js?v=1.9.60"></script>
-<script src="mk-admin.js?v=1.9.60"></script>
-<script src="mk-historico.js?v=1.9.60"></script>
-<script src="mk-custos-historico.js?v=1.9.60"></script>
-<script src="mk-sessao.js?v=1.9.60"></script>
-<script src="mk-home.js?v=1.9.60"></script>
-<script src="mk-meta-operador.js?v=1.9.60"></script>
-<script src="mk-custos.js?v=1.9.60"></script>
-<script src="mk-avulso.js?v=1.9.60"></script>
-<script src="mk-sync.js?v=1.9.60"></script>
-<script src="mk-nova.js?v=1.9.60"></script>
-<script src="mk-relacionamento.js?v=1.9.60"></script>
-<script src="mk-operacao.js?v=1.9.60"></script>
-<script src="mk-drawer.js?v=1.9.60"></script>
-<script src="mk-update.js?v=1.9.60"></script>
-<script src="mk-gestao-pessoas.js?v=1.9.60"></script>
-<script src="mk-holerite.js?v=1.9.60"></script>
-<script src="mk-gestao-pessoas-admin.js?v=1.9.60"></script>
-<script src="mk-auth.js?v=1.9.60"></script>
-<script src="mk-boot.js?v=1.9.60"></script>
+<script src="mk-globals.js?v=1.9.61"></script>
+<script src="mk-core.js?v=1.9.61"></script>
+<script src="mk-nav.js?v=1.9.61"></script>
+<script src="mk-admin.js?v=1.9.61"></script>
+<script src="mk-historico.js?v=1.9.61"></script>
+<script src="mk-custos-historico.js?v=1.9.61"></script>
+<script src="mk-sessao.js?v=1.9.61"></script>
+<script src="mk-home.js?v=1.9.61"></script>
+<script src="mk-meta-operador.js?v=1.9.61"></script>
+<script src="mk-custos.js?v=1.9.61"></script>
+<script src="mk-avulso.js?v=1.9.61"></script>
+<script src="mk-sync.js?v=1.9.61"></script>
+<script src="mk-nova.js?v=1.9.61"></script>
+<script src="mk-relacionamento.js?v=1.9.61"></script>
+<script src="mk-operacao.js?v=1.9.61"></script>
+<script src="mk-drawer.js?v=1.9.61"></script>
+<script src="mk-update.js?v=1.9.61"></script>
+<script src="mk-gestao-pessoas.js?v=1.9.61"></script>
+<script src="mk-holerite.js?v=1.9.61"></script>
+<script src="mk-gestao-pessoas-admin.js?v=1.9.61"></script>
+<script src="mk-auth.js?v=1.9.61"></script>
+<script src="mk-boot.js?v=1.9.61"></script>
 </body>
 </html>
