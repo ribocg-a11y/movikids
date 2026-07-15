@@ -45,6 +45,7 @@
 | [**FASE_14_MINI_DRE.md**](ativos/FASE_14_MINI_DRE.md) | 🟡 **FASE 14** — plano contas + mini-DRE |
 | [**MEMORIAL_MINI_DRE.md**](referencia/MEMORIAL_MINI_DRE.md) | Fórmulas cascata margens |
 | [**ESTUDO_NEGOCIO_BREAK_EVEN_TICKET_2026-07.md**](ativos/ESTUDO_NEGOCIO_BREAK_EVEN_TICKET_2026-07.md) | 🟢 **Estudo do negócio** — gráfico meta, ticket sáb×útil, custos fixos |
+| [VIABILIDADE_NEGOCIO_MEMORIAL.csv](ativos/VIABILIDADE_NEGOCIO_MEMORIAL.csv) | Memorial planilha · aba `VIABILIDADE_NEGOCIO` (`instalarAbaViabilidadeNegocio.gs`) |
 | [**FASE_9_FOLHA_VIABILIDADE_CLT.md**](ativos/FASE_9_FOLHA_VIABILIDADE_CLT.md) | 🟢 **FASE 9** — folha B68 + semáforo contratação |
 | [**FASE_8_ALERTAS_SEMAFOROS.md**](ativos/FASE_8_ALERTAS_SEMAFOROS.md) | ✅ **FASE 8** — alertas + semáforos (repo) |
 | [**FASE_15_GESTAO_PESSOAS.md**](ativos/FASE_15_GESTAO_PESSOAS.md) | 🟡 **FASE 15** — colaboradores · I29/I30 |
