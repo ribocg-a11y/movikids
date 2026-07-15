@@ -1,6 +1,6 @@
 # MOVI KIDS — Protocolo "Atualize tudo"
 
-**Criado:** 14/06/2026 · **Última execução:** 15/07/2026 (FE **v1.9.58** · GAS repo **v1.5.196** / Web **v1.5.195** · I115 validado · I116)  
+**Criado:** 14/06/2026 · **Última execução:** 15/07/2026 (FE **v1.9.58** · GAS Web **v1.5.196** I116 validado)  
 **Função:** quando o usuário pedir **"atualize tudo"**, o agente segue **esta lista** — não só handoff parcial.  
 **Regra Cursor:** `.cursor/rules/atualize-tudo-movikids.mdc`
 
@@ -46,13 +46,13 @@ Sincronizar **documentação + estado operacional** do projeto com a realidade a
 
 | Camada | Versão | Evidência |
 |--------|--------|-----------|
-| GAS | **v1.5.196** repo · Web **v1.5.195** | I115 ✅ · I116 no repo (colar) |
+| GAS | **v1.5.196** Web ✅ | I115+I116 validados 15/07 |
 | FE | **v1.9.58** | I115 UX wait + cache listar |
 | Planilha FOLHA | **OK** | B9=8,80 · B10/B12=22 · B68=5253,96 |
 | Planilha | **OK** | auditoria **23/23** |
 | Homolog tablet | **✅** | 23/06 |
 | Holerite | I108–I114 | Ray/Julia Q1 15/07 |
-| Perf | I115+I116 | Colab warm ~3s · kpiMes ~34s backlog |
+| Perf | I115+I116 | Colab warm ~4s · frio ~20s · admin GP warm ~2s |
 
 ---
 

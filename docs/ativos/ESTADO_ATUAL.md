@@ -39,9 +39,9 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 | **Gestão Pessoas** | **v1.9.58** | `gestao-pessoas.html?force=1.9.58` |
 | **Portal acompanhar** | **v1.9.58** | `acompanhar.html` |
 | **Service Worker** | **1.9.58** | `sw.js` |
-| **Apps Script** | **v1.5.196** repo · Web **v1.5.195** | I115 ✅ Web · I116 expandRh no repo — colar Nova versão |
+| **Apps Script** | **v1.5.196** Web ✅ | I115+I116 · ping alinhado 15/07 |
 | **Holerite Q1 15/07** | I108+I109b+I110+**I111**–I114 | Ray pacote **R$ 998,40** · Julia **R$ 948,40** (VT Q1=0) |
-| **Perf Colaboradores** | I115+I116 | Web 195: Ray warm **~3s** · frio **~16–29s** · enriquecer 196 |
+| **Perf Colaboradores** | I115+I116 ✅ | Ray warm **~4s** · frio **~20s** · listar ~2s · GP teste OK |
 | **Bônus jul live** | I109b | Ray **R$ 300** · Julia **R$ 200** |
 | **FOLHA VT I68** | ✅ 26/06 | B9 **8,80** · B10/B12 **22** · Milena VT **193,60** · Raykelly prop. mês |
 | **Planilha** | 23 abas | `schemaOk=True` · auditoria célula **23/23** |
@@ -63,7 +63,7 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 **Teste rápido GAS (ping):**  
 https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec?action=ping  
-→ ping Web **v1.5.195** (I115) · repo **v1.5.196** (I116) · Q1 pacote = PIX+VA
+→ ping Web **v1.5.196** (I116) · Q1 pacote = PIX+VA
 
 **URL morta (não usar):** `AKfycbzc...` → 404
 
