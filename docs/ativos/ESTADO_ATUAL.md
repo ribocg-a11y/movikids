@@ -35,12 +35,12 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 | Camada | Versão | URL / evidência |
 |--------|--------|-----------------|
-| **Frontend** | **v1.9.52** | https://ribocg-a11y.github.io/movikids/?force=1.9.52 |
-| **Gestão Pessoas** | **v1.9.52** | `gestao-pessoas.html?force=1.9.52` |
-| **Portal acompanhar** | **v1.9.52** | `acompanhar.html` |
-| **Service Worker** | **1.9.52** | `sw.js` |
-| **Apps Script** | **v1.5.192** | ping Web **v1.5.192** ✅ · I110 Q1 sem faltas + snapshot |
-| **Holerite Q1 15/07** | I108+I109b+I110 | Ray pacote **R$ 1.095,20** · Julia **R$ 1.045,20** (VT se já pago, abater 96,80) |
+| **Frontend** | **v1.9.53** | https://ribocg-a11y.github.io/movikids/?force=1.9.53 |
+| **Gestão Pessoas** | **v1.9.53** | `gestao-pessoas.html?force=1.9.53` |
+| **Portal acompanhar** | **v1.9.53** | `acompanhar.html` |
+| **Service Worker** | **1.9.53** | `sw.js` |
+| **Apps Script** | **v1.5.193** | repo · ping até Nova versão **I111** (Q1 VT já pago) |
+| **Holerite Q1 15/07** | I108+I109b+I110+**I111** | Ray pacote **R$ 998,40** · Julia **R$ 948,40** (VT Q1=0) |
 | **Bônus jul live** | I109b | Ray **R$ 300** · Julia **R$ 200** |
 | **FOLHA VT I68** | ✅ 26/06 | B9 **8,80** · B10/B12 **22** · Milena VT **193,60** · Raykelly prop. mês |
 | **Planilha** | 23 abas | `schemaOk=True` · auditoria célula **23/23** |
@@ -62,7 +62,7 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 **Teste rápido GAS (ping):**  
 https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec?action=ping  
-→ ping **v1.5.192** (Web) ✅ · repo **v1.5.192** · I110 holerite Q1 · `kpiMes` folha `vtTarifa=8.8` `diasVt=22`
+→ ping até Nova versão **v1.5.193** (I111) · repo **v1.5.193** · Q1 pacote = PIX+VA
 
 **URL morta (não usar):** `AKfycbzc...` → 404
 

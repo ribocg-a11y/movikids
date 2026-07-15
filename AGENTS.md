@@ -35,9 +35,9 @@ Leia **nesta ordem**:
 
 | Camada | Versão | Link |
 |--------|--------|------|
-| Frontend | **v1.9.52** | https://ribocg-a11y.github.io/movikids/?force=1.9.52 |
-| Gestão Pessoas | **v1.9.52** | `gestao-pessoas.html?force=1.9.52` |
-| GAS | **v1.5.192** | ping Web **v1.5.192** ✅ (I110) |
+| Frontend | **v1.9.53** | https://ribocg-a11y.github.io/movikids/?force=1.9.53 |
+| Gestão Pessoas | **v1.9.53** | `gestao-pessoas.html?force=1.9.53` |
+| GAS | **v1.5.193** | repo · ping até Nova versão I111 |
 | Design System | **v1.1** | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
 | Deploy ID | `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y` | |
 
@@ -52,11 +52,11 @@ Leia **nesta ordem**:
 
 - **FASE 0–15 + 15b:** ✅ prod
 - **FASE 14 mini-DRE:** ✅ prod
-- **FASE 16–17:** ✅ visual One UI **v1.9.52** · assinatura FASE 17 pendente Ops
+- **FASE 16–17:** ✅ visual One UI **v1.9.53** · assinatura FASE 17 pendente Ops
 - **Homolog tablet:** ✅ 23/06 · smoke **v1.9.39** pendente (D4)
 - **Planilha:** ✅ 23/23 · **I68 VT** ✅ · **I75 Julia RH** ✅
 - **I96–I103:** ✅ multi-veículo + contagem encerradas/caixa
-- **I108–I110:** ✅ holerite Q1 · GAS **v1.5.192** Web · FE **v1.9.52**
+- **I108–I111:** holerite Q1 · GAS **v1.5.193** (colar Web) · FE **v1.9.53**
 - **Travas I24:** ✅ `guard-i24-publicacao` + `encerramento-sessao`
 - **Próximo:** Sprint D2–D4 — assinar FASE 17 · smoke tablet v1.9.39
 

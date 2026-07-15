@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.192
+// MOVI KIDS — Google Apps Script v1.5.193
+// v1.5.193: I111 — Q1 VT passes = 0 (já pago nos ~15 dias); pacote = PIX+VA
 // v1.5.192: I110 — Q1 sem desconto de faltas; snapshot HOLERITES também na 1ª quinzena; pacoteQuinzena
 // v1.5.191: I109b — FSS pot R$100: meta fecha (eu OU parceira) → R$50 pra cada (não só quem bateu)
 // v1.5.190: I109 — bônus meta sex/sáb/dom com Raykelly+Julia: R$50 cada (metade do R$100)
@@ -184,8 +185,8 @@
 
 // ── CONSTANTES ───────────────────────────────────────────────
 /** Versão exposta em ping, carregarInicio, validarSchema, gestaoPessoasStatus (bump com header). */
-const MK_GAS_VERSAO_  = 'v1.5.192';
-const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.192';
+const MK_GAS_VERSAO_  = 'v1.5.193';
+const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.193';
 const SHEET_ID   = '1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618';
 const DEPLOY_ID  = 'AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y';
 const WEBAPP_URL = `https://script.google.com/macros/s/${DEPLOY_ID}/exec`;
@@ -12012,14 +12013,26 @@ function gpCalcHollerite_(colab, bonus, faltas, competencia, refDate) {
   const pctBenef = GP_PCT_BENEFICIO_QUINZENA_;
   const vtPassesMesProp = Math.round(vtPassesMes * fatorMes * 100) / 100;
 
+  // I111 — metade teórica de VT (referência); na 1ª não entra no pacote (já pago nos ~15 dias)
+  const vtPassesMetade = temQuinzena
+    ? Math.round(vtPassesMesProp * pctBenef * 100) / 100
+    : 0;
+  let vtPassesJaPago = 0;
+
   if (temQuinzena) {
     basePag = Math.round(salarioProp * pctQuinz * 100) / 100;
-    // I108 — cada quinzena: 50% VA + 50% bônus + 50% VT passes (salário continua 40/60)
+    // I108 — VA + bônus 50% cada quinzena (salário 40/60)
     incluiBeneficios = true;
     bonusQuinz = Math.round(Number(bonus) * pctBenef * 100) / 100;
     vaTotal = Math.round(vaProp * pctBenef * 100) / 100;
     vaDias = diasTrab;
-    vtPasses = Math.round(vtPassesMesProp * pctBenef * 100) / 100;
+    if (quinzena === 1) {
+      // I111 — VT dos ~15 dias já pago fora; linha 0 no holerite Q1
+      vtPasses = 0;
+      vtPassesJaPago = vtPassesMetade;
+    } else {
+      vtPasses = vtPassesMetade;
+    }
   }
 
   const bruto = basePag + bonusQuinz;
@@ -12042,13 +12055,14 @@ function gpCalcHollerite_(colab, bonus, faltas, competencia, refDate) {
   const faltasQuinz = (quinzena === 2 && temQuinzena) ? Number(faltas) || 0 : 0;
   const totalDescontos = Math.round((inss + irrf + vt + faltasQuinz) * 100) / 100;
   const liquido = Math.round((bruto - totalDescontos) * 100) / 100;
+  // Pacote a pagar: PIX + VA (+ VT só se ainda não pago — Q2)
   const pacoteQuinzena = Math.round((liquido + vaTotal + vtPasses) * 100) / 100;
   const diasVaBase = gpVaDiasBase_();
   // Diário de referência = VA mensal / dias memorial (não metade do VA da quinzena)
   const vaDiario = Math.round((vaMensal / diasVaBase) * 100) / 100;
   const pagamentoEm = gpDataPagamentoQuinzena_(quinzena, mes, ano);
   const quinzenaLabel = quinzena === 1
-    ? '1ª quinzena · 40% salário + 50% VA/bônus/VT'
+    ? '1ª quinzena · 40% salário + 50% VA/bônus · VT já pago'
     : '2ª quinzena · 60% salário + 50% VA/bônus/VT − encargos';
 
   return {
@@ -12057,14 +12071,15 @@ function gpCalcHollerite_(colab, bonus, faltas, competencia, refDate) {
     bruto: bruto,
     inss: inss, inssAli: inssAli, irrf: irrf, irrfIsento: irrfIsento, vt: vt, fgts: fgts,
     vaTotal: vaTotal, vaDias: vaDias, vaDiario: vaDiario, vaMensal: vaMensal, vtPasses: vtPasses,
-    vtPassesMes: vtPassesMesProp, pctBeneficios: pctBenef,
+    vtPassesJaPago: vtPassesJaPago, vtPassesMes: vtPassesMesProp, pctBeneficios: pctBenef,
     totalDescontos: totalDescontos, liquido: liquido, pacoteQuinzena: pacoteQuinzena,
     baseInss: quinzena === 2 ? salarioProp + bonus : bruto,
     irrfBase: irrfBase, competencia: compLabel, quinzena: quinzena, quinzenaLabel: quinzenaLabel,
     pctQuinzena: pctQuinz, pagamentoEm: pagamentoEm, diasTrabalhados: diasTrab, diasMes: diasMes,
     diasQuinzena: diasQuinz, incluiBeneficios: incluiBeneficios, fatorMes: Math.round(fatorMes * 10000) / 10000,
     obs: compLabel + ' · ' + quinzenaLabel + ' · pgto ' + pagamentoEm +
-      (diasTrab < diasMes ? ' · prop. ' + diasTrab + '/' + diasMes + ' dias' : '')
+      (diasTrab < diasMes ? ' · prop. ' + diasTrab + '/' + diasMes + ' dias' : '') +
+      (vtPassesJaPago > 0 ? ' · VT ' + vtPassesJaPago.toFixed(2).replace('.', ',') + ' já pago' : '')
   };
 }
 
