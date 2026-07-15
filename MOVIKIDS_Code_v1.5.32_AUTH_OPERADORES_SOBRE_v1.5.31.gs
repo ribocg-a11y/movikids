@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.189
+// MOVI KIDS — Google Apps Script v1.5.190
+// v1.5.190: I109 — bônus meta sex/sáb/dom com Raykelly+Julia: R$50 cada (metade do R$100)
 // v1.5.189: I108 — 1ª quinzena: 40% salário + 50% VA + 50% bônus + 50% VT (2ª: restates + encargos)
 // v1.5.188: I105 — buscaTextoAdmin sem teto 500 linhas (lê fim da aba) + observacao em historico/resumoDia
 // v1.5.187: I98b — MK_GAS_VERSAO_/SISTEMA_ alinhados ao header (ping I70)
@@ -181,8 +182,8 @@
 
 // ── CONSTANTES ───────────────────────────────────────────────
 /** Versão exposta em ping, carregarInicio, validarSchema, gestaoPessoasStatus (bump com header). */
-const MK_GAS_VERSAO_  = 'v1.5.189';
-const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.189';
+const MK_GAS_VERSAO_  = 'v1.5.190';
+const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.190';
 const SHEET_ID   = '1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618';
 const DEPLOY_ID  = 'AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y';
 const WEBAPP_URL = `https://script.google.com/macros/s/${DEPLOY_ID}/exec`;
@@ -4721,9 +4722,41 @@ function kpiAvancadosMes_(mmyy, nMes, nCancelMes, diasOperando, nPorVeiculo, min
   };
 }
 
-/** Meta operacional — Milena (2) sócia + Raykelly (3) + reserva id 4. Fora: Eduarda (1). */
+/** Meta operacional — Milena (2) sócia + Raykelly (3) + Julia (4). Fora: Eduarda (1). */
 const META_LOC_TURNO_PADRAO_ = 20;
 const META_BONUS_DIA_REAIS_ = 100;
+/** I109 — sex/sáb/dom com o par Raykelly+Julia na escala: metade do bônus cada. */
+const META_BONUS_FIM_SEMANA_MEIO_ = 50;
+const META_BONUS_PAR_IDS_ = { 3: 4, 4: 3 };
+
+function metaEhFimDeSemanaData_(dataStr) {
+  const dow = weekdayFromDataStr_(dataStr);
+  return dow === 0 || dow === 5 || dow === 6; // dom · sex · sáb
+}
+
+/** Ambas (Raykelly+Julia) têm turno na escala neste dia de fim de semana. */
+function metaParceirasJuntasNoDia_(opId, dataStr) {
+  const id = Number(opId);
+  const outro = META_BONUS_PAR_IDS_[id];
+  if (!outro || !metaEhFimDeSemanaData_(dataStr)) return false;
+  const cfgA = metaOperadorCfg_(id);
+  const cfgB = metaOperadorCfg_(outro);
+  if (!cfgA || !cfgB || cfgA.ativo === false || cfgB.ativo === false) return false;
+  const dow = weekdayFromDataStr_(dataStr);
+  const shiftA = cfgA.escala && cfgA.escala[String(dow)];
+  const shiftB = cfgB.escala && cfgB.escala[String(dow)];
+  return !!(shiftA && shiftB);
+}
+
+/** Valor do bônus do dia (0 se não atingiu). I109: FSS juntas = R$50. */
+function metaBonusValorDoDia_(opId, dataStr, atingiu, bonusCheio) {
+  if (!atingiu) return 0;
+  const full = Number(bonusCheio) > 0 ? Number(bonusCheio) : META_BONUS_DIA_REAIS_;
+  if (metaParceirasJuntasNoDia_(opId, dataStr)) {
+    return Math.min(META_BONUS_FIM_SEMANA_MEIO_, Math.round(full / 2));
+  }
+  return full;
+}
 
 function metaOperadorEscalaFromRh_(turno) {
   const m = String(turno || '').match(/(\d{1,2})\s*(?:h|:)?\s*[–\-]\s*(\d{1,2})/i);
@@ -4940,10 +4973,30 @@ function buildMetaOperadorPayload_(opId) {
   let diasComBonus = 0;
   let diasTrabalhados = 0;
   let locMesTotal = 0;
+  let bonusEstimado = 0;
+  const diasDetalhe = [];
   Object.keys(byDay).forEach(function (d) {
     diasTrabalhados++;
-    locMesTotal += byDay[d];
-    if (byDay[d] > cfg.meta) diasComBonus++;
+    const n = byDay[d];
+    locMesTotal += n;
+    const atingiu = n > cfg.meta;
+    const bonusDia = metaBonusValorDoDia_(opId, d, atingiu, cfg.bonus);
+    if (atingiu) {
+      diasComBonus++;
+      bonusEstimado += bonusDia;
+      diasDetalhe.push({
+        data: d,
+        loc: n,
+        meta: cfg.meta,
+        bonusOk: true,
+        bonusValor: bonusDia,
+        fimSemana: metaEhFimDeSemanaData_(d),
+        juntas: metaParceirasJuntasNoDia_(opId, d)
+      });
+    }
+  });
+  diasDetalhe.sort(function (a, b) {
+    return dateToCmp_(a.data) - dateToCmp_(b.data);
   });
 
   return {
@@ -4960,13 +5013,15 @@ function buildMetaOperadorPayload_(opId) {
       atingiu: nHoje > cfg.meta,
       emTurno: emTurno,
       folga: !shiftHoje,
-      shiftLabel: metaOperadorShiftLabel_(shiftHoje)
+      shiftLabel: metaOperadorShiftLabel_(shiftHoje),
+      bonusValorHoje: metaBonusValorDoDia_(opId, dataHoje, nHoje > cfg.meta, cfg.bonus)
     },
     mes: {
       locTotal: locMesTotal,
       diasComMeta: diasComBonus,
       diasTrabalhados: diasTrabalhados,
-      bonusEstimado: diasComBonus * cfg.bonus
+      bonusEstimado: bonusEstimado,
+      diasBonus: diasDetalhe
     }
   };
 }
@@ -11088,9 +11143,29 @@ function gpMetaPayloadFromCtx_(opId, ctx) {
   const nHoje = byDay[dataHoje] || 0;
   let diasComBonus = 0;
   let locMesTotal = 0;
+  let bonusEstimado = 0;
+  const diasDetalhe = [];
   Object.keys(byDay).forEach(function (d) {
-    locMesTotal += byDay[d];
-    if (byDay[d] > cfg.meta) diasComBonus++;
+    const n = byDay[d];
+    locMesTotal += n;
+    const atingiu = n > cfg.meta;
+    const bonusDia = metaBonusValorDoDia_(opId, d, atingiu, cfg.bonus);
+    if (atingiu) {
+      diasComBonus++;
+      bonusEstimado += bonusDia;
+      diasDetalhe.push({
+        data: d,
+        loc: n,
+        meta: cfg.meta,
+        bonusOk: true,
+        bonusValor: bonusDia,
+        fimSemana: metaEhFimDeSemanaData_(d),
+        juntas: metaParceirasJuntasNoDia_(opId, d)
+      });
+    }
+  });
+  diasDetalhe.sort(function (a, b) {
+    return dateToCmp_(a.data) - dateToCmp_(b.data);
   });
   return {
     ok: true,
@@ -11100,9 +11175,10 @@ function gpMetaPayloadFromCtx_(opId, ctx) {
     bonus: cfg.bonus,
     hoje: { n: nHoje, meta: cfg.meta, metaOk: nHoje >= cfg.meta, atingiu: nHoje > cfg.meta,
       emTurno: metaOperadorInShift_(minsAgora, shiftHoje), folga: !shiftHoje,
-      shiftLabel: metaOperadorShiftLabel_(shiftHoje) },
+      shiftLabel: metaOperadorShiftLabel_(shiftHoje),
+      bonusValorHoje: metaBonusValorDoDia_(opId, dataHoje, nHoje > cfg.meta, cfg.bonus) },
     mes: { locTotal: locMesTotal, diasComMeta: diasComBonus, diasTrabalhados: Object.keys(byDay).length,
-      bonusEstimado: diasComBonus * cfg.bonus }
+      bonusEstimado: bonusEstimado, diasBonus: diasDetalhe }
   };
 }
 
@@ -11201,16 +11277,20 @@ function gpMetasPainel_(opId, competencia, ctx) {
   const locMesLive = live.mes && live.mes.locTotal ? live.mes.locTotal : 0;
   const atualLive = isCompAtual && live.hoje && live.hoje.n ? live.hoje.n : 0;
   const bonusDiasLive = live.mes && live.mes.diasComMeta ? live.mes.diasComMeta : 0;
-  const bonusLive = live.mes && live.mes.bonusEstimado ? live.mes.bonusEstimado : 0;
+  const bonusLive = live.mes && live.mes.bonusEstimado != null ? live.mes.bonusEstimado : 0;
+  // I109 — no mês corrente preferir live (metade FSS); mês passado: sheet ou max
+  const preferLive = !!(live.configurado && isCompAtual);
   return {
     alvo: live.meta || sheet.alvo,
     atual: isCompAtual ? Math.max(atualLive, auditLoc.locHoje, sheet.atual || 0) : Math.max(sheet.atual || 0, auditLoc.locHoje),
     locMes: Math.max(locMesLive, locMesSheet, auditLoc.locMes),
-    bonusDias: Math.max(bonusDiasLive, bonusDiasSheet),
-    bonusTotal: Math.max(bonusLive, sheet.bonusTotal || 0),
+    bonusDias: preferLive ? bonusDiasLive : Math.max(bonusDiasLive, bonusDiasSheet),
+    bonusTotal: preferLive ? bonusLive : Math.max(bonusLive, sheet.bonusTotal || 0),
     bonusValor: live.bonus || sheet.bonusValor,
     bonusMin: (live.meta || sheet.alvo || 20) + 1,
-    diasMes: sheet.diasMes
+    diasMes: (preferLive && live.mes && live.mes.diasBonus && live.mes.diasBonus.length)
+      ? live.mes.diasBonus
+      : sheet.diasMes
   };
 }
 

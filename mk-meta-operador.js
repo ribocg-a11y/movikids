@@ -1,4 +1,4 @@
-/* MOVI KIDS — Meta operadores (20 loc/turno · R$100/dia) + hero motivacional */
+/* MOVI KIDS — Meta operadores (20 loc/turno · R$100/dia · FSS juntas R$50) + hero motivacional */
 
 let _metaLastBonus = null;
 let _metaRefreshBusy = false;
@@ -12,7 +12,7 @@ let _metaHeroDismissTimer = null;
 const MK_META_HERO_FALTAM_MAX = 5;
 const MK_META_HERO_DISMISS_MS = 8500;
 
-/** Meta 20 loc/turno · R$100 só se **21+** loc (acima da meta). */
+/** Meta 20 loc/turno · R$100 se 21+ loc; sex/sáb/dom com o par = R$50 (I109). */
 const MK_META_CFG = {
   3: {
     nome: 'Raykelly',
