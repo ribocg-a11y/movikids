@@ -1235,7 +1235,13 @@
       const p = PESSOAS[colabLogado];
       if (!p) return;
       const readOnly = editable !== true && cadastroOk(p);
-      document.getElementById('cad-titulo').textContent = readOnly ? 'Meus dados' : ('Cadastro — ' + p.label);
+      var tit = readOnly ? 'Meus dados' : ('Cadastro — ' + p.label);
+      if (p.id === 'demo' || gpAdmPreviewMode_) {
+        tit = (p.id === 'demo')
+          ? 'Pré-visualização — Colaborador Demo (não é a Julia)'
+          : ('Pré-visualização ADM — ' + p.label + ' (somente leitura)');
+      }
+      document.getElementById('cad-titulo').textContent = tit;
       document.getElementById('cad-form').innerHTML = CAMPOS.map(f => {
         const v = p.cadastro[f.key] || '';
         if (readOnly) {

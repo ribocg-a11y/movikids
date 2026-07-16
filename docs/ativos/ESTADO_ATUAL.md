@@ -35,11 +35,11 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 | Camada | Versão | URL / evidência |
 |--------|--------|-----------------|
-| **Frontend** | **v1.9.61** | https://ribocg-a11y.github.io/movikids/?force=1.9.59 |
-| **Gestão Pessoas** | **v1.9.61** | `gestao-pessoas.html?force=1.9.59` |
-| **Portal acompanhar** | **v1.9.61** | `acompanhar.html` |
+| **Frontend** | **v1.9.62** | https://ribocg-a11y.github.io/movikids/?force=1.9.59 |
+| **Gestão Pessoas** | **v1.9.62** | `gestao-pessoas.html?force=1.9.59` |
+| **Portal acompanhar** | **v1.9.62** | `acompanhar.html` |
 | **Service Worker** | **1.9.59** | `sw.js` |
-| **Apps Script** | **v1.5.197** Web ✅ | I117 pay-first caixa · ping alinhado 15/07 |
+| **Apps Script** | **v1.5.198** Web ✅ | I117 pay-first caixa · ping alinhado 15/07 |
 | **Holerite Q1 15/07** | I108+I109b+I110+**I111**–I114 | Ray pacote **R$ 998,40** · Julia **R$ 948,40** (VT Q1=0) |
 | **Perf Colaboradores** | I115+I116 ✅ | Ray warm **~4s** · frio **~20s** · listar ~2s · GP teste OK |
 | **Bônus jul live** | I109b | Ray **R$ 300** · Julia **R$ 200** |
@@ -63,7 +63,7 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 **Teste rápido GAS (ping):**  
 https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec?action=ping  
-→ ping Web **v1.5.197** (I117) · Q1 pacote = PIX+VA
+→ ping Web **v1.5.198** (I117) · Q1 pacote = PIX+VA
 
 **URL morta (não usar):** `AKfycbzc...` → 404
 
