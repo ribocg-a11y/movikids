@@ -105,3 +105,5 @@ flowchart TD
 ---
 
 *Revisar quando mudar versão FE/GAS ou fechar incidente.*
+
+- Estudo negócio: `ESTUDO_NEGOCIO_BREAK_EVEN_TICKET_2026-07.md` · memorial CSV · aba VIABILIDADE_NEGOCIO (OAuth script).

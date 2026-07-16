@@ -75,3 +75,7 @@ Leia **nesta ordem**:
 ## Ao encerrar sessão
 
 Atualizar `HANDOFF_NOVO_CHAT.md` se mudou produção ou próximo passo.
+
+## Estudo do negócio
+
+Memorial break-even / ticket: [`docs/ativos/ESTUDO_NEGOCIO_BREAK_EVEN_TICKET_2026-07.md`](docs/ativos/ESTUDO_NEGOCIO_BREAK_EVEN_TICKET_2026-07.md) · CSV `docs/ativos/VIABILIDADE_NEGOCIO_MEMORIAL.csv` · script OAuth `scripts/criar-aba-viabilidade-negocio-oauth.cjs`.
