@@ -4658,8 +4658,11 @@ function resumoDia_(p) {
   const dataAlvo = dataIn || fmtData_(new Date());
   if (!parseDataStr_(dataAlvo)) return err_('data invalida — use dd/MM/yyyy', 400);
   const cacheKey = 'resumoDia_' + dataAlvo.replace(/\//g, '');
-  const bust = String((p && p._t) || '').trim();
-  if (!bust) {
+  // I121: FE sempre manda _t — não bustar cache (só force=1); escritas já invalidam
+  const forceBust = String((p && p.force) || '') === '1'
+    || String((p && p.nocache) || '').toLowerCase() === '1'
+    || String((p && p.nocache) || '').toLowerCase() === 'true';
+  if (!forceBust) {
     try {
       const hit = CacheService.getScriptCache().get(cacheKey);
       if (hit) return ContentService.createTextOutput(hit).setMimeType(ContentService.MimeType.JSON);
@@ -7143,19 +7146,22 @@ function calcLeadingDiaPatch_(mes, ano) {
   const shLoc = sh_(SH_LOC);
   const lastLoc = shLoc.getLastRow();
   if (lastLoc >= DATA_ROW) {
-    // I121: mesma regra pay-first do kpiMes/resumoDia (Encerrada + Ativa + Pendente)
-    shLoc.getRange(DATA_ROW, 1, lastLoc - DATA_ROW + 1, 15).getValues().forEach(function(r) {
+    // I121: pay-first + nMes por conta/dia (paridade kpiMes / I42) — não contar sessão
+    const contasMes = {};
+    shLoc.getRange(DATA_ROW, 1, lastLoc - DATA_ROW + 1, COL_CONTA_ID_).getValues().forEach(function(r) {
       if (!r[0]) return;
       const st = String(r[14] || '').trim();
       if (st !== 'Encerrada' && st !== 'Ativa' && st !== 'Pendente') return;
-      const pts = cellToStr_(r[1]).split('/');
+      const dataR = cellToStr_(r[1]);
+      const pts = dataR.split('/');
       if (pts.length < 3) return;
       const mmyyR = pts[1].padStart(2, '0') + '/' + pts[2];
       if (mmyyR !== mmyy) return;
       fatMes += Number(r[10]);
-      nMes++;
+      contasMes[String(contaIdLocRow_(r)) + '|' + dataR] = true;
       diasComMov[pts[0].padStart(2, '0')] = 1;
     });
+    nMes = Object.keys(contasMes).length;
   }
   let cusMes = 0;
   const shCus = sh_(SH_CUS);
