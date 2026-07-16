@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.199
+// MOVI KIDS — Google Apps Script v1.5.200
+// v1.5.200: I121 — kpiMes/leading paridade I117 (Ativa/Pendente); invalidate cache kpi+comando em escritas
 // v1.5.199: I120b — comando cache ignora _t (só force=1); lite AUD slim; Julia sync idempotente (sem rewrite)
 // v1.5.198: I120 — perf admin: painel lite + expandRh false; cache comandoOperacional; invalidate v2 comunicados
 // v1.5.197: I117 — caixa pay-first: calcResumoDiaCore_ inclui Ativa/Pendente (plano já pago na maquininha)
@@ -191,8 +192,8 @@
 
 // ── CONSTANTES ───────────────────────────────────────────────
 /** Versão exposta em ping, carregarInicio, validarSchema, gestaoPessoasStatus (bump com header). */
-const MK_GAS_VERSAO_  = 'v1.5.199';
-const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.199';
+const MK_GAS_VERSAO_  = 'v1.5.200';
+const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.200';
 const SHEET_ID   = '1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618';
 const DEPLOY_ID  = 'AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y';
 const WEBAPP_URL = `https://script.google.com/macros/s/${DEPLOY_ID}/exec`;
@@ -4511,6 +4512,8 @@ function invalidateInicioResumoCache_(dataFmt) {
       cache.remove('inicio_v3_g_m' + m);
       cache.remove('inicio_v3_o_m' + m);
     }
+    // I121: dashboard/comando acompanham escritas (Meta/gráficos ≠ Centro)
+    invalidateDashCaches_();
   } catch (e) { /* ok */ }
 }
 
@@ -7140,8 +7143,11 @@ function calcLeadingDiaPatch_(mes, ano) {
   const shLoc = sh_(SH_LOC);
   const lastLoc = shLoc.getLastRow();
   if (lastLoc >= DATA_ROW) {
+    // I121: mesma regra pay-first do kpiMes/resumoDia (Encerrada + Ativa + Pendente)
     shLoc.getRange(DATA_ROW, 1, lastLoc - DATA_ROW + 1, 15).getValues().forEach(function(r) {
-      if (!r[0] || String(r[14] || '').trim() !== 'Encerrada') return;
+      if (!r[0]) return;
+      const st = String(r[14] || '').trim();
+      if (st !== 'Encerrada' && st !== 'Ativa' && st !== 'Pendente') return;
       const pts = cellToStr_(r[1]).split('/');
       if (pts.length < 3) return;
       const mmyyR = pts[1].padStart(2, '0') + '/' + pts[2];
@@ -7277,7 +7283,8 @@ function buildKpiMesPayload_(p) {
         nCancelMes++;
         return;
       }
-      if (status !== 'Encerrada') return;
+      // I121: pay-first — Ativa/Pendente já pagas (paridade I117/resumoDia/comando)
+      if (status !== 'Encerrada' && status !== 'Ativa' && status !== 'Pendente') return;
 
       const vt     = Number(r[10]);
       fatByPayback[mmyyR] = (fatByPayback[mmyyR] || 0) + vt;
@@ -7557,8 +7564,28 @@ function buildKpiMesPayload_(p) {
     metaProjecaoMes: metaProjecaoMes,
     projDiariaFixa: projDiariaFixa,
     baselineFatMes: metaProjecaoMes,
+    caixaIncluiAbertas: true,
     lite: skipAdvanced || false
   };
+}
+
+/** I121 — zera caches de dashboard/comando após escrita de locação (tempo real). */
+function invalidateDashCaches_() {
+  try {
+    const cache = CacheService.getScriptCache();
+    const hoje = new Date();
+    const mes = hoje.getMonth() + 1;
+    const ano = hoje.getFullYear();
+    const mPrev = mes === 1 ? 12 : mes - 1;
+    const aPrev = mes === 1 ? ano - 1 : ano;
+    [mes, mPrev].forEach(function (m, idx) {
+      const a = idx === 0 ? ano : aPrev;
+      cache.remove('kpiMes83_' + m + '_' + a + '_L0');
+      cache.remove('kpiMes83_' + m + '_' + a + '_L1');
+    });
+    cache.remove('comandoOp_v2_' + fmtData_(hoje).replace(/\//g, ''));
+    cache.remove('comandoOp_v1_' + fmtData_(hoje).replace(/\//g, ''));
+  } catch (e) { /* ok */ }
 }
 
 function kpiMes_(p) {
@@ -7568,6 +7595,9 @@ function kpiMes_(p) {
   const ano = p && p.ano ? parseInt(p.ano) : hoje.getFullYear();
   const lite = (p && (String(p.lite || '') === '1' || String(p.lite || '').toLowerCase() === 'true')) ? '1' : '0';
   const cacheKey = 'kpiMes83_' + mes + '_' + ano + '_L' + lite;
+  // I121: mês corrente TTL curto (25s) — Meta/gráficos não ficam atrás do Centro de comando
+  const isCorrente = mes === (hoje.getMonth() + 1) && ano === hoje.getFullYear();
+  const ttl = isCorrente ? 25 : 90;
   try {
     const cache = CacheService.getScriptCache();
     const hit = cache.get(cacheKey);
@@ -7576,7 +7606,7 @@ function kpiMes_(p) {
     }
     const payload = buildKpiMesPayload_(p);
     const out = JSON.stringify({ ok: true, ...payload });
-    if (out.length < 95000) cache.put(cacheKey, out, 90);
+    if (out.length < 95000) cache.put(cacheKey, out, ttl);
     return ContentService.createTextOutput(out).setMimeType(ContentService.MimeType.JSON);
   } catch (e) {
     Logger.log('kpiMes_ cache: ' + e.message);

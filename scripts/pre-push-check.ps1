@@ -462,8 +462,35 @@ try {
     } else {
       Add-Check "guard.i117.caixa.abertas" "ok" "resumoDia inclui Ativa/Pendente"
     }
+    # I121 — kpiMes/leading mesma regra pay-first; invalidate dash em escritas
+    if ($gasRaw -notmatch 'function invalidateDashCaches_') {
+      Add-Check "guard.i121.dash.invalidate" "fail" "invalidateDashCaches_ ausente (I121)"
+    } elseif ($gasRaw -notmatch 'invalidateInicioResumoCache_[\s\S]{0,900}invalidateDashCaches_') {
+      Add-Check "guard.i121.dash.invalidate" "fail" "escritas nao invalidam dash/comando (I121)"
+    } else {
+      Add-Check "guard.i121.dash.invalidate" "ok" "kpiMes+comando invalidados em escrita"
+    }
+    if ($gasRaw -notmatch 'I121: pay-first — Ativa/Pendente já pagas \(paridade I117') {
+      Add-Check "guard.i121.kpi.payfirst" "fail" "kpiMes ainda so Encerrada (I121)"
+    } elseif ($gasRaw -notmatch 'function calcLeadingDiaPatch_[\s\S]{0,800}Ativa') {
+      Add-Check "guard.i121.kpi.payfirst" "fail" "calcLeadingDiaPatch_ sem Ativa (I121)"
+    } else {
+      Add-Check "guard.i121.kpi.payfirst" "ok" "kpiMes+leading incluem Ativa/Pendente"
+    }
   } else {
     Add-Check "guard.gas.portal.canon" "warn" ".gs canonico nao encontrado"
+  }
+
+  $adminJs = Join-Path $root "mk-admin.js"
+  if (Test-Path $adminJs) {
+    $adminRaw = Get-Content -Path $adminJs -Raw -Encoding UTF8
+    if ($adminRaw -notmatch 'function mkSyncKpiHojeFromComando_') {
+      Add-Check "guard.i121.fe.sync" "fail" "mkSyncKpiHojeFromComando_ ausente (I121)"
+    } elseif ($adminRaw -notmatch 'KPI_DASH_CACHE_TTL_CORRENTE_MS') {
+      Add-Check "guard.i121.fe.sync" "fail" "TTL kpi corrente ausente (I121)"
+    } else {
+      Add-Check "guard.i121.fe.sync" "ok" "Meta/graficos sync com Centro de comando"
+    }
   }
 
   $authPath = Join-Path $root "mk-auth.js"
@@ -639,12 +666,19 @@ try {
     $i120Out = & $i120 2>&1 | Out-String
     if ($LASTEXITCODE -ne 0) { Add-Check "teste.i120" "fail" "exit $LASTEXITCODE" }
     else { Add-Check "teste.i120" "ok" "TESTE_I120_ADMIN_PERF_READONLY" }
+
+    $i121 = Join-Path $testDir "TESTE_I121_DASH_SYNC_READONLY.ps1"
+    if (-not (Test-Path $i121)) { throw "TESTE_I121_DASH_SYNC_READONLY.ps1 nao encontrado" }
+    $i121Out = & $i121 2>&1 | Out-String
+    if ($LASTEXITCODE -ne 0) { Add-Check "teste.i121" "fail" "exit $LASTEXITCODE" }
+    else { Add-Check "teste.i121" "ok" "TESTE_I121_DASH_SYNC_READONLY" }
   } else {
     Add-Check "teste.paridade" "skip" "SkipNetworkTests"
     Add-Check "teste.portal" "skip" "SkipNetworkTests"
     Add-Check "teste.cronometro" "skip" "SkipNetworkTests"
     Add-Check "teste.i43" "skip" "SkipNetworkTests"
     Add-Check "teste.i120" "skip" "SkipNetworkTests"
+    Add-Check "teste.i121" "skip" "SkipNetworkTests"
   }
 } catch {
   $result.status = "fail"

@@ -656,9 +656,13 @@ function fmtDataBrHoje_() {
 }
 
 function nHojeCanonica_() {
-  if (resumoDiaHoje && resumoDiaHoje.n != null) return resumoDiaHoje.n;
-  if (kpiData && kpiData.nHoje != null) return kpiData.nHoje;
-  if (typeof statsHoje !== 'undefined' && statsHoje.n != null) return statsHoje.n;
+  // I121: comando/resumoDia (pay-first) antes de kpiMes (pode estar em cache)
+  if (typeof commandCenterData !== 'undefined' && commandCenterData && commandCenterData.nHoje != null) {
+    return Number(commandCenterData.nHoje);
+  }
+  if (resumoDiaHoje && resumoDiaHoje.n != null) return Number(resumoDiaHoje.n);
+  if (kpiData && kpiData.nHoje != null) return Number(kpiData.nHoje);
+  if (typeof statsHoje !== 'undefined' && statsHoje.n != null) return Number(statsHoje.n);
   return 0;
 }
 
@@ -670,6 +674,9 @@ function nSessoesHojeCanonica_() {
 }
 
 function fatHojeCanonica_(d) {
+  if (typeof commandCenterData !== 'undefined' && commandCenterData && commandCenterData.fatHoje != null) {
+    return Number(commandCenterData.fatHoje);
+  }
   if (resumoDiaHoje && resumoDiaHoje.fat != null) return Number(resumoDiaHoje.fat);
   if (d && d.fatHoje != null) return Number(d.fatHoje);
   if (kpiData && kpiData.fatHoje != null) return Number(kpiData.fatHoje);
@@ -735,10 +742,20 @@ async function carregarKPIs() {
 }
 
 /** B2: Dashboard — kpiMes (visualização mensal). v1.8.5: cache SWR + lite→full. */
+/** I121: mês corrente — TTL curto p/ Meta/gráficos acompanharem Centro (pay-first). */
 const KPI_DASH_CACHE_TTL_MS = 5 * 60 * 1000;
+const KPI_DASH_CACHE_TTL_CORRENTE_MS = 45 * 1000;
 
 function kpiDashCacheKey_(mes, ano) {
   return 'mk_kpi_dash_' + mes + '_' + ano;
+}
+
+function kpiDashCacheTtlMs_(mes, ano) {
+  const agora = new Date();
+  if (Number(mes) === agora.getMonth() + 1 && Number(ano) === agora.getFullYear()) {
+    return KPI_DASH_CACHE_TTL_CORRENTE_MS;
+  }
+  return KPI_DASH_CACHE_TTL_MS;
 }
 
 function kpiDashCacheGet_(mes, ano) {
@@ -747,9 +764,18 @@ function kpiDashCacheGet_(mes, ano) {
     if (!raw) return null;
     const o = JSON.parse(raw);
     if (!o || !o.ts || !o.data || !o.data.ok) return null;
-    if (Date.now() - o.ts > KPI_DASH_CACHE_TTL_MS) return null;
+    if (Date.now() - o.ts > kpiDashCacheTtlMs_(mes, ano)) return null;
     return o.data;
   } catch (e) { return null; }
+}
+
+function kpiDashCacheInvalidate_(mes, ano) {
+  try {
+    const agora = new Date();
+    const m = mes || (agora.getMonth() + 1);
+    const a = ano || agora.getFullYear();
+    sessionStorage.removeItem(kpiDashCacheKey_(m, a));
+  } catch (e) { /* ok */ }
 }
 
 function kpiDashCacheSet_(mes, ano, data) {
@@ -1383,11 +1409,99 @@ function buildCommandCenterFallback_() {
   };
 }
 
+/**
+ * I121 — Centro de comando é a fonte fresca do dia (resumoDia/I117).
+ * Espelha nHoje/fatHoje no kpiData e redesenha Meta + gráficos do dia.
+ */
+function mkSyncKpiHojeFromComando_(d) {
+  if (!d || !d.ok) return false;
+  const nCmd = d.nHoje != null ? Number(d.nHoje) : null;
+  const fatCmd = d.fatHoje != null ? Number(d.fatHoje) : null;
+  if (nCmd == null && fatCmd == null) return false;
+
+  let changed = false;
+  if (!kpiData || !kpiData.ok) {
+    // ainda sem kpi — só guarda resumo canônico se existir
+  } else {
+    const nOld = Number(kpiData.nHoje) || 0;
+    const fatOld = Number(kpiData.fatHoje) || 0;
+    if (nCmd != null && nCmd !== nOld) {
+      kpiData.nHoje = nCmd;
+      changed = true;
+    }
+    if (fatCmd != null && Math.abs(fatCmd - fatOld) > 0.009) {
+      kpiData.fatHoje = fatCmd;
+      changed = true;
+    }
+    if (changed) {
+      const dia = new Date().getDate();
+      if (Array.isArray(kpiData.fatPorDia)) {
+        const row = kpiData.fatPorDia.find(function (x) { return Number(x.dia) === dia; });
+        if (row) row.valor = fatCmd != null ? fatCmd : row.valor;
+      }
+      if (Array.isArray(kpiData.porSemana)) {
+        kpiData.porSemana.forEach(function (sem) {
+          (sem.porDia || []).forEach(function (x) {
+            if (Number(x.dia) === dia) {
+              if (nCmd != null) x.n = nCmd;
+              if (fatCmd != null) x.fat = fatCmd;
+            }
+          });
+        });
+      }
+      if (d.leadingDia && d.leadingDia.breakEvenLocacoesDia != null && kpiData.leadingFinanceiro) {
+        // não sobrescreve BE do kpiMes (folha) — só Meta usa n fresco
+      }
+      try {
+        kpiDashCacheSet_(kpiData.mesAtual || (new Date().getMonth() + 1),
+          kpiData.anoAtual || new Date().getFullYear(), kpiData);
+      } catch (e) { /* ok */ }
+      if (typeof renderMetaHoje_ === 'function') renderMetaHoje_(kpiData);
+      if (typeof renderMetaDiaChart_ === 'function') renderMetaDiaChart_(kpiData);
+      if (typeof renderChartsBody_ === 'function') {
+        const dash = document.getElementById('page-dashboard');
+        if (dash && dash.classList.contains('active')) {
+          requestAnimationFrame(function () { renderChartsBody_(kpiData); });
+        }
+      }
+      // refetch kpiMes lite em bg (sem reentrar comando → evita loop)
+      if (!window._kpiHojeResyncInFlight && !window._kpiDashInFlight) {
+        window._kpiHojeResyncInFlight = true;
+        const mesR = kpiData.mesAtual || (new Date().getMonth() + 1);
+        const anoR = kpiData.anoAtual || new Date().getFullYear();
+        kpiDashCacheInvalidate_(mesR, anoR);
+        const authP = typeof apiParamsComAuth_ === 'function' ? apiParamsComAuth_() : {};
+        api(Object.assign({ action: 'kpiMes', mes: mesR, ano: anoR, lite: '1' }, authP), 45000)
+          .then(function (fresh) {
+            if (!fresh || !fresh.ok) return;
+            // mantém n/fat do comando se ainda for a fonte mais recente
+            if (commandCenterData && commandCenterData.ok) {
+              if (commandCenterData.nHoje != null) fresh.nHoje = Number(commandCenterData.nHoje);
+              if (commandCenterData.fatHoje != null) fresh.fatHoje = Number(commandCenterData.fatHoje);
+            }
+            kpiDashApply_(fresh);
+            kpiDashCacheSet_(mesR, anoR, fresh);
+          })
+          .catch(function () { /* ok */ })
+          .finally(function () { window._kpiHojeResyncInFlight = false; });
+      }
+    }
+  }
+
+  if (resumoDiaHoje && resumoDiaHoje.ok) {
+    if (nCmd != null && Number(resumoDiaHoje.n) !== nCmd) resumoDiaHoje.n = nCmd;
+    if (fatCmd != null && Math.abs(Number(resumoDiaHoje.fat) - fatCmd) > 0.009) resumoDiaHoje.fat = fatCmd;
+  }
+  return changed;
+}
+
 function applyCommandCenterData_(d) {
   if (!d) return;
+  commandCenterData = d;
   const dashPage = document.getElementById('page-dashboard');
   if (dashPage && dashPage.classList.contains('active')) renderCommandCenter_(d);
   renderAdminMobCmd_(d);
+  mkSyncKpiHojeFromComando_(d);
   if (kpiData && kpiData.ok && typeof renderPrevisaoMes_ === 'function') renderPrevisaoMes_(kpiData);
 }
 
@@ -1553,10 +1667,21 @@ async function carregarCommandCenter_() {
 
 function mkCommandCenterStartRefresh_() {
   if (window._mkCmdRefreshTimer) clearInterval(window._mkCmdRefreshTimer);
+  // I121: 45s no Dashboard ativo — Meta/Centro acompanham operação
   window._mkCmdRefreshTimer = setInterval(function() {
     const dash = document.getElementById('page-dashboard');
     if (dash && dash.classList.contains('active')) carregarCommandCenter_().catch(function() {});
-  }, 90000);
+  }, 45000);
+  if (!window._mkDashVisBound) {
+    window._mkDashVisBound = true;
+    document.addEventListener('visibilitychange', function () {
+      if (document.hidden) return;
+      const dash = document.getElementById('page-dashboard');
+      if (!dash || !dash.classList.contains('active')) return;
+      carregarCommandCenter_().catch(function () {});
+      carregarResumoHojeAdmin_({ force: true }).catch(function () {});
+    });
+  }
 }
 
 function applySinalEmpresa_(d) {
@@ -1782,7 +1907,10 @@ function renderMetaHoje_(d) {
     return;
   }
   const locMap = extractLocPorDia_(d);
-  const nHoje = d.nHoje != null ? Number(d.nHoje) : (locMap[now.getDate()] || 0);
+  // I121: canônico do dia (comando/resumo) — não kpiMes stale
+  let nHoje = typeof nHojeCanonica_ === 'function' ? Number(nHojeCanonica_()) : 0;
+  if (!nHoje && d.nHoje != null) nHoje = Number(d.nHoje);
+  if (!nHoje) nHoje = locMap[now.getDate()] || 0;
   box.style.display = '';
 
   const mesStr = String(d.mesAtual).padStart(2, '0');
@@ -2023,8 +2151,10 @@ function renderReceitaMesChart_(d) {
   const diff = fatMes - projHoje;
   const pctDiff = projHoje > 0 ? Math.round(diff / projHoje * 100) : 0;
 
+  // I121: label distingue meta do mês vs linha roxa (acumulado até hoje)
   setText2('nk-receita-mes-label',
-    'real ' + R2(fatMes) + ' · projetado ' + R2(metaMes) + ' (' + R2(projDiaria) + '/dia)');
+    'real ' + R2(fatMes) + ' · acum. proj. ' + R2(projHoje)
+    + ' · meta mês ' + R2(metaMes) + ' (' + R2(projDiaria) + '/dia)');
 
   const ptBg = acumulado.map(function(v, i) { return v >= projAcum[i] ? '#2E7D32' : '#FF8F00'; });
   const maxY = Math.max(metaMes, projFat, Math.max.apply(null, acumulado.concat([1]))) * 1.08;

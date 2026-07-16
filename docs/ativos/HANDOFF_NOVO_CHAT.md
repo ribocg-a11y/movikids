@@ -1,10 +1,10 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 16/07/2026 · FE **v1.9.62** · GAS repo **v1.5.199** (I120b) · Web ping ainda **v1.5.198** até Nova versão  
+**Atualizado:** 16/07/2026 · FE **v1.9.63** (I121) · GAS repo **v1.5.200** · Web ping ainda **v1.5.198** até Nova versão  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **GAS canônico (raw):** https://raw.githubusercontent.com/ribocg-a11y/movikids/main/MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs  
-**GitHub:** `ribocg-a11y/movikids` · branch `main` · I120b: cache comando + Julia idempotente + `TESTE_I120_*`
+**GitHub:** `ribocg-a11y/movikids` · branch `main` · I121: Meta/gráficos sync com Centro (pay-first)
 
 **Mensagem mínima no novo chat:**
 
@@ -59,10 +59,10 @@ cursor "C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-mo
 
 | Camada | Versão | URL / evidência |
 |--------|--------|-----------------|
-| **Frontend** | **v1.9.62** | https://ribocg-a11y.github.io/movikids/?force=1.9.59 |
-| **Gestão Pessoas** | **v1.9.62** | `gestao-pessoas.html?force=1.9.59` |
-| **Service Worker** | **1.9.59** | `sw.js` |
-| **Apps Script** | repo **v1.5.199** · Web **v1.5.198** ⏳ | Colar `.gs` + **Nova versão** Web → I120b (cache `_t` + Julia sem rewrite) |
+| **Frontend** | **v1.9.63** | https://ribocg-a11y.github.io/movikids/?force=1.9.63 |
+| **Gestão Pessoas** | **v1.9.63** | `gestao-pessoas.html?force=1.9.63` |
+| **Service Worker** | **1.9.63** | `sw.js` |
+| **Apps Script** | repo **v1.5.200** · Web **v1.5.198** ⏳ | Colar `.gs` + **Nova versão** → I120b+I121 (cache + dash sync) |
 | **Baseline P0** | ✅ | `docs/ativos/BASELINE_CODIGO_P0.md` |
 | **PIN admin** | **1421** | Script Property `ADMIN_PIN` |
 | **Homolog tablet** | ✅ 23/06 | I43 · I42 · I47 · Gestor — smoke **v1.9.39** pendente Ops |
@@ -128,7 +128,7 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 |---|------|------|--------|
 | **0** | **I117** caixa pay-first — GAS **v1.5.198** Web ✅ · FE **v1.9.62** | Sócio+Agente | ✅ **15/07** |
 | **0a** | **I116** GAS **v1.5.196** Web ✅ — validado 15/07 (ping 196 · GP OK · Ray warm ~4s) | Sócio+Agente | ✅ **15/07** |
-| **0b** | **I120b** GAS **v1.5.199** repo — colar + Nova versão Web · `TESTE_I120_ADMIN_PERF_READONLY` | Sócio+Agente | ⏳ **16/07** |
+| **0b** | **I120b+I121** GAS **v1.5.200** + FE **v1.9.63** — colar Nova versão · `TESTE_I120_*` + `TESTE_I121_*` | Sócio+Agente | ⏳ **16/07** |
 | **0c** | Frios Colab residual (AUD/tail full) — lite já slim; não regredir P0 | Agente | 📋 backlog |
 | 1 | **Sprint D1** homolog PC admin v1.9.2 | Agente | ✅ **27/06** |
 | 1b | **I69** hotfix ponto mock → **v1.9.3** | Agente | ✅ **29/06** Pages |
