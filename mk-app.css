@@ -1420,6 +1420,10 @@ html,body{height:100%;background:var(--bg);color:var(--txt);overflow:hidden}
 .mk-meta-leg-loc i{height:4px;background:#185FA5}
 .mk-meta-leg-sem i{border-top:2px dashed #2E7D32;background:transparent;height:0;width:22px}
 .mk-meta-leg-folha i{border-top:2px dashed #5E35B1;background:transparent;height:0;width:22px}
+/* I123 — DNA admin: real corporate · base âmbar · ritmo sky (sem roxo) */
+.mk-meta-leg-real i{height:4px;background:#1565C0}
+.mk-meta-leg-base i{border-top:2px dashed #E65100;background:transparent;height:0;width:22px}
+.mk-meta-leg-ritmo i{border-top:2px dashed #29B6F6;background:transparent;height:0;width:22px}
 .mk-meta-leg-ok i{width:10px;height:10px;border-radius:50%;background:#2E7D32;border:2px solid #fff;box-shadow:0 0 0 1px #2E7D32}
 .mk-meta-leg-fail i{width:10px;height:10px;border-radius:50%;background:#C62828;border:2px solid #fff;box-shadow:0 0 0 1px #C62828}
 

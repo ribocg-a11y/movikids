@@ -2101,6 +2101,84 @@ function renderMetaDiaChart_(d) {
   }
 }
 
+/**
+ * I123 — base de sustentação do mês (âncora histórica), travada no FE.
+ * Não usa blend 35/65 — evita a linha ambígua ~491.
+ * Chave localStorage: mk_proj_base_AAAA_M
+ */
+function mkBaseSustentacaoMes_(d) {
+  d = d || {};
+  const ritmo = mkRitmoRealistaDash_(d);
+  const diasMes = Number(d.diasMes) || ritmo.diasMes
+    || new Date(d.anoAtual || new Date().getFullYear(), d.mesAtual || 1, 0).getDate();
+  const mes = Number(d.mesAtual) || (new Date().getMonth() + 1);
+  const ano = Number(d.anoAtual) || new Date().getFullYear();
+  const key = 'mk_proj_base_' + ano + '_' + mes;
+
+  try {
+    const raw = localStorage.getItem(key);
+    if (raw) {
+      const o = JSON.parse(raw);
+      const diaria = o && Number(o.diaria) > 0 ? Number(o.diaria) : 0;
+      if (diaria > 0) {
+        return {
+          diaria: diaria,
+          mes: Math.round(diaria * diasMes * 100) / 100,
+          locked: true,
+          ref: (o && o.ref) || ritmo.refHist || ''
+        };
+      }
+    }
+  } catch (e) { /* ignore */ }
+
+  let diariaCand = Number(ritmo.mediaHist) || 0;
+  if (diariaCand <= 0) {
+    const fromGas = Number(d.metaProjecaoMes) || Number(d.baselineFatMes) || 0;
+    if (fromGas > 0 && diasMes > 0) {
+      diariaCand = Math.round(fromGas / diasMes * 100) / 100;
+    }
+  }
+  if (diariaCand <= 0) {
+    return { diaria: 0, mes: 0, locked: false, ref: '' };
+  }
+
+  const mesVal = Math.round(diariaCand * diasMes * 100) / 100;
+  try {
+    localStorage.setItem(key, JSON.stringify({
+      diaria: diariaCand,
+      mes: mesVal,
+      ref: ritmo.refHist || '',
+      at: Date.now()
+    }));
+  } catch (e) { /* ignore */ }
+
+  return {
+    diaria: diariaCand,
+    mes: mesVal,
+    locked: false,
+    ref: ritmo.refHist || ''
+  };
+}
+window.mkBaseSustentacaoMes_ = mkBaseSustentacaoMes_;
+
+/** I123 — ritmo alcançável = extrapolação se o ritmo atual se mantiver. */
+function mkRitmoAlcancavelMes_(d) {
+  d = d || {};
+  const fatMes = Number(d.fatMes) || 0;
+  const diasOp = Number(d.diasOperando) || 0;
+  const diasMes = Number(d.diasMes)
+    || new Date(d.anoAtual || new Date().getFullYear(), d.mesAtual || 1, 0).getDate();
+  const diaria = diasOp > 0 ? Math.round(fatMes / diasOp * 100) / 100 : 0;
+  const mesVal = Number(d.projecaoFat) > 0
+    ? Number(d.projecaoFat)
+    : (diaria > 0 ? Math.round(diaria * diasMes * 100) / 100 : 0);
+  return {
+    diaria: diaria,
+    mes: Math.round(mesVal * 100) / 100
+  };
+}
+window.mkRitmoAlcancavelMes_ = mkRitmoAlcancavelMes_;
+
 function renderReceitaMesChart_(d) {
   const cv = document.getElementById('chart-receita-mes');
   const ins = document.getElementById('nk-receita-mes-insight');
@@ -2113,13 +2191,16 @@ function renderReceitaMesChart_(d) {
     : fatDia.reduce(function(m, x) { return Math.max(m, x.dia || 0); }, 0);
   const diasMes = Number(d.diasMes) || new Date(d.anoAtual || new Date().getFullYear(), d.mesAtual || 1, 0).getDate();
   const mesStr = String(d.mesAtual || new Date().getMonth() + 1).padStart(2, '0');
-  const projFat = Number(d.projecaoFat) || 0;
   const fatMes = Number(d.fatMes) || 0;
   const diasOp = Number(d.diasOperando) || 0;
-  const metaMes = mkMetaProjecaoMes_(d);
-  const projDiaria = metaMes > 0 ? Math.round(metaMes / diasMes * 100) / 100 : 0;
+  const base = mkBaseSustentacaoMes_(d);
+  const ritmo = mkRitmoAlcancavelMes_(d);
+  const baseDiaria = Number(base.diaria) || 0;
+  const ritmoDiaria = Number(ritmo.diaria) || 0;
+  const baseMes = Number(base.mes) || 0;
+  const ritmoMes = Number(ritmo.mes) || 0;
 
-  if (hojeD <= 0 || diasOp <= 0 || metaMes <= 0 || projDiaria <= 0) {
+  if (hojeD <= 0 || diasOp <= 0 || (baseDiaria <= 0 && ritmoDiaria <= 0)) {
     setText2('nk-receita-mes-label', diasOp <= 0 ? 'sem dias com movimento' : 'projeção indisponível');
     if (ins) ins.style.display = 'none';
     return;
@@ -2132,65 +2213,94 @@ function renderReceitaMesChart_(d) {
   for (let dd = 1; dd <= hojeD; dd++) labels.push(dd);
 
   let accReal = 0;
-  let accProj = 0;
+  let accBase = 0;
+  let accRitmo = 0;
   const acumulado = [];
-  const projAcum = [];
+  const baseAcum = [];
+  const ritmoAcum = [];
   const realDia = [];
-  const projDiaArr = [];
   labels.forEach(function(dd) {
     const r = Math.round(fatMap[dd] || 0);
     accReal += r;
-    accProj += projDiaria;
+    accBase += baseDiaria;
+    accRitmo += ritmoDiaria;
     realDia.push(r);
-    projDiaArr.push(Math.round(projDiaria));
     acumulado.push(Math.round(accReal));
-    projAcum.push(Math.round(accProj));
+    baseAcum.push(Math.round(accBase));
+    ritmoAcum.push(Math.round(accRitmo));
   });
 
-  const projHoje = projAcum[projAcum.length - 1] || 0;
-  const diff = fatMes - projHoje;
-  const pctDiff = projHoje > 0 ? Math.round(diff / projHoje * 100) : 0;
+  const baseHoje = baseAcum[baseAcum.length - 1] || 0;
+  const ritmoHoje = ritmoAcum[ritmoAcum.length - 1] || 0;
+  const diffBase = fatMes - baseHoje;
+  const pctBase = baseHoje > 0 ? Math.round(diffBase / baseHoje * 100) : 0;
+  const diffRitmo = fatMes - ritmoHoje;
+  const pctRitmo = ritmoHoje > 0 ? Math.round(diffRitmo / ritmoHoje * 100) : 0;
 
-  // I121: label distingue meta do mês vs linha roxa (acumulado até hoje)
+  // I123: label com as 3 referências (sem “meta mês” ambígua)
   setText2('nk-receita-mes-label',
-    'real ' + R2(fatMes) + ' · acum. proj. ' + R2(projHoje)
-    + ' · meta mês ' + R2(metaMes) + ' (' + R2(projDiaria) + '/dia)');
+    'real ' + R2(fatMes)
+    + ' · base ' + R2(baseHoje) + ' (' + R2(baseDiaria) + '/dia)'
+    + ' · ritmo → ' + R2(ritmoMes) + ' (' + R2(ritmoDiaria) + '/dia)');
 
-  const ptBg = acumulado.map(function(v, i) { return v >= projAcum[i] ? '#2E7D32' : '#FF8F00'; });
-  const maxY = Math.max(metaMes, projFat, Math.max.apply(null, acumulado.concat([1]))) * 1.08;
+  // Pontos: verde se ≥ base; âmbar se abaixo da base (DNA admin)
+  const ptBg = acumulado.map(function(v, i) {
+    return v >= (baseAcum[i] || 0) ? '#2E7D32' : '#E65100';
+  });
+  const maxY = Math.max(
+    baseMes, ritmoMes, baseHoje, ritmoHoje,
+    Math.max.apply(null, acumulado.concat([1]))
+  ) * 1.08;
+
+  const datasets = [
+    {
+      label: 'Real acumulado',
+      data: acumulado,
+      borderColor: '#1565C0',
+      backgroundColor: 'rgba(21,101,192,.10)',
+      borderWidth: 2.5,
+      pointRadius: labels.length > 20 ? 3 : 5,
+      pointHoverRadius: 7,
+      pointBackgroundColor: ptBg,
+      pointBorderColor: '#1565C0',
+      pointBorderWidth: 2,
+      tension: 0.2,
+      fill: true,
+      order: 2
+    }
+  ];
+  if (baseDiaria > 0) {
+    datasets.push({
+      label: 'Base sustentação',
+      data: baseAcum,
+      borderColor: '#E65100',
+      borderWidth: 2,
+      borderDash: [8, 5],
+      pointRadius: 0,
+      tension: 0,
+      fill: false,
+      order: 0
+    });
+  }
+  if (ritmoDiaria > 0) {
+    datasets.push({
+      label: 'Ritmo alcançável',
+      data: ritmoAcum,
+      borderColor: '#29B6F6',
+      borderWidth: 2,
+      borderDash: [3, 4],
+      pointRadius: 0,
+      tension: 0,
+      fill: false,
+      order: 1
+    });
+  }
 
   chartReceitaMes = new Chart(cv, {
     type: 'line',
     data: {
       labels: labels.map(function(dd) { return dd + '/' + mesStr; }),
-      datasets: [
-        {
-          label: 'Real acumulado',
-          data: acumulado,
-          borderColor: '#1565C0',
-          backgroundColor: 'rgba(21,101,192,.12)',
-          borderWidth: 2.5,
-          pointRadius: labels.length > 20 ? 3 : 5,
-          pointHoverRadius: 7,
-          pointBackgroundColor: ptBg,
-          pointBorderColor: '#1565C0',
-          pointBorderWidth: 2,
-          tension: 0.2,
-          fill: true,
-          order: 1
-        },
-        {
-          label: 'Projetado acumulado',
-          data: projAcum,
-          borderColor: '#5E35B1',
-          borderWidth: 2,
-          borderDash: [6, 4],
-          pointRadius: 0,
-          tension: 0,
-          fill: false,
-          order: 0
-        }
-      ]
+      datasets: datasets
     },
     options: {
       responsive: true,
@@ -2202,19 +2312,29 @@ function renderReceitaMesChart_(d) {
           callbacks: {
             label: function(ctx) {
               const i = ctx.dataIndex;
-              if (ctx.dataset.label === 'Projetado acumulado') {
+              const y = Math.round(ctx.parsed.y);
+              if (ctx.dataset.label === 'Base sustentação') {
                 return [
-                  'Meta dia: ' + R2(projDiaArr[i] || 0),
-                  'Projetado acum.: ' + R2(Math.round(ctx.parsed.y))
+                  'Base dia: ' + R2(baseDiaria),
+                  'Base acum.: ' + R2(y)
+                ];
+              }
+              if (ctx.dataset.label === 'Ritmo alcançável') {
+                return [
+                  'Ritmo dia: ' + R2(ritmoDiaria),
+                  'Ritmo acum.: ' + R2(y)
                 ];
               }
               const rD = realDia[i] || 0;
-              const pA = projAcum[i] || 0;
-              const delta = Math.round(ctx.parsed.y) - pA;
+              const bA = baseAcum[i] || 0;
+              const rA = ritmoAcum[i] || 0;
+              const dB = y - bA;
+              const dR = y - rA;
               return [
                 'Real dia: ' + R2(rD),
-                'Real acum.: ' + R2(Math.round(ctx.parsed.y)),
-                (delta >= 0 ? '+' + R2(delta) : R2(delta)) + ' vs projetado acum.'
+                'Real acum.: ' + R2(y),
+                (dB >= 0 ? '+' + R2(dB) : R2(dB)) + ' vs base',
+                (dR >= 0 ? '+' + R2(dR) : R2(dR)) + ' vs ritmo'
               ];
             }
           }
@@ -2241,15 +2361,29 @@ function renderReceitaMesChart_(d) {
 
   if (ins) {
     const msgs = [];
-    if (diff >= 0) {
-      msgs.push('Real acumulado ' + R2(fatMes) + ' — ' + (pctDiff > 0 ? pctDiff + '% acima' : 'no ritmo')
-        + ' do projetado no dia ' + hojeD + ' (' + R2(projHoje) + ' esperado).');
-    } else {
-      msgs.push('Real acumulado ' + R2(fatMes) + ' — ' + Math.abs(pctDiff) + '% abaixo do projetado ('
-        + R2(projHoje) + ' esperado até o dia ' + hojeD + ').');
+    if (baseHoje > 0) {
+      if (diffBase >= 0) {
+        msgs.push('Real ' + R2(fatMes) + ' — '
+          + (pctBase > 0 ? pctBase + '% acima' : 'no nível')
+          + ' da base no dia ' + hojeD + ' (' + R2(baseHoje) + ').');
+      } else {
+        msgs.push('Real ' + R2(fatMes) + ' — ' + Math.abs(pctBase)
+          + '% abaixo da base (' + R2(baseHoje) + ' esperado até o dia ' + hojeD + ').');
+      }
     }
-    msgs.push('Faturamento projetado do mês: ' + R2(metaMes)
-      + ' · meta ' + R2(projDiaria) + '/dia somando dia a dia (= mesmo número do card acima).');
+    if (ritmoHoje > 0) {
+      if (Math.abs(pctRitmo) < 1) {
+        msgs.push('No ritmo atual (' + R2(ritmoDiaria) + '/dia → ' + R2(ritmoMes) + ' no mês).');
+      } else if (diffRitmo >= 0) {
+        msgs.push(pctRitmo + '% acima do ritmo acumulado (' + R2(ritmoHoje) + ').');
+      } else {
+        msgs.push(Math.abs(pctRitmo) + '% abaixo do ritmo acumulado (' + R2(ritmoHoje) + ').');
+      }
+    }
+    if (baseMes > 0) {
+      msgs.push('Base do mês: ' + R2(baseMes) + ' (' + R2(baseDiaria) + '/dia'
+        + (base.ref ? ' · ' + base.ref : '') + ', travada).');
+    }
     ins.style.display = 'block';
     ins.textContent = msgs.join(' ');
   }
