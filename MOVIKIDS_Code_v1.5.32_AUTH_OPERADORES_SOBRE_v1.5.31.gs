@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.198
+// MOVI KIDS — Google Apps Script v1.5.199
+// v1.5.199: I120b — comando cache ignora _t (só force=1); lite AUD slim; Julia sync idempotente (sem rewrite)
 // v1.5.198: I120 — perf admin: painel lite + expandRh false; cache comandoOperacional; invalidate v2 comunicados
 // v1.5.197: I117 — caixa pay-first: calcResumoDiaCore_ inclui Ativa/Pendente (plano já pago na maquininha)
 // v1.5.196: I116 — enrich audit login só ops listados (sem expandir todo RH); escala/banco via ctx
@@ -190,8 +191,8 @@
 
 // ── CONSTANTES ───────────────────────────────────────────────
 /** Versão exposta em ping, carregarInicio, validarSchema, gestaoPessoasStatus (bump com header). */
-const MK_GAS_VERSAO_  = 'v1.5.198';
-const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.198';
+const MK_GAS_VERSAO_  = 'v1.5.199';
+const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.199';
 const SHEET_ID   = '1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618';
 const DEPLOY_ID  = 'AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y';
 const WEBAPP_URL = `https://script.google.com/macros/s/${DEPLOY_ID}/exec`;
@@ -6004,9 +6005,13 @@ function buildPainelComandoOperacional_() {
 
 function comandoOperacional_(p) {
   if (!isGestaoRequest_(p)) return err_('Acesso negado — comandoOperacional so para gestao (admin/gestor)', 403);
-  const bust = String((p && p._t) || '').trim();
-  const cacheKey = 'comandoOp_v1_' + fmtData_(new Date()).replace(/\//g, '');
-  if (!bust) {
+  // I120b: FE sempre manda _t (anti-stale browser) — NÃO bustar cache por _t.
+  // Só force=1 / nocache=1 força rebuild (refresh manual).
+  const forceBust = String((p && p.force) || '') === '1'
+    || String((p && p.nocache) || '').toLowerCase() === '1'
+    || String((p && p.nocache) || '').toLowerCase() === 'true';
+  const cacheKey = 'comandoOp_v2_' + fmtData_(new Date()).replace(/\//g, '');
+  if (!forceBust) {
     try {
       const hit = CacheService.getScriptCache().get(cacheKey);
       if (hit) return ContentService.createTextOutput(hit).setMimeType(ContentService.MimeType.JSON);
@@ -11116,13 +11121,20 @@ function salvarDadosContratuaisRhAdmin_(p) {
   }
 }
 
-function gpLoadContext_() {
+/**
+ * Carrega abas RH + cauda AUDITORIA.
+ * opts.lite=true (I120b): AUD menor + sem FALTAS/BANCO (1º paint Operadores).
+ */
+function gpLoadContext_(opts) {
+  opts = opts || {};
+  const lite = !!opts.lite;
   let auditRows = [];
   try {
     const shAud = ss_().getSheetByName('AUDITORIA');
     if (shAud && shAud.getLastRow() >= 2) {
       const last = shAud.getLastRow();
-      const GP_AUD_TAIL_MAX_ = 4000;
+      // Full: 4000 · Lite: 900 (metas do mês corrente costumam estar no fim)
+      const GP_AUD_TAIL_MAX_ = lite ? 900 : 4000;
       const startRow = Math.max(2, last - GP_AUD_TAIL_MAX_ + 1);
       const numRows = last - startRow + 1;
       auditRows = shAud.getRange(startRow, 1, numRows, 8).getValues();
@@ -11134,13 +11146,14 @@ function gpLoadContext_() {
     hoje: fmtData_(new Date()),
     rhRows: gpRows_(SH_COLAB_RH),
     folhaRows: gpRows_(SH_FOLHA_PONTO),
-    faltasRows: gpRows_(SH_FALTAS),
+    faltasRows: lite ? [] : gpRows_(SH_FALTAS),
     metasRows: gpRows_(SH_METAS_COLAB),
     escalaRows: gpRows_(SH_ESCALA_COLAB),
-    bancoRows: gpRows_(SH_BANCO_HORAS),
+    bancoRows: lite ? [] : gpRows_(SH_BANCO_HORAS),
     auditRows: auditRows,
     auditLocByOpId: null,
-    metaByDayByOpId: null
+    metaByDayByOpId: null,
+    lite: lite
   };
 }
 
@@ -12781,21 +12794,58 @@ function gpSyncJuliaPadrao_(ctx, competencia) {
   const comp = competencia || gpCompetenciaAtual_();
   const va = gpVaDiarioCanonico_();
   const id = GP_JULIA_OP_ID_;
-  const hasRh = function () {
-    const rows = (ctx && ctx.rhRows) ? ctx.rhRows : gpRows_(SH_COLAB_RH);
-    return rows.some(function (r) { return gpRowValid_(r) && Number(r[0]) === id; });
-  };
-  if (!hasRh()) {
+  const rows = (ctx && ctx.rhRows) ? ctx.rhRows : gpRows_(SH_COLAB_RH);
+  let rhObj = null;
+  for (let i = 0; i < rows.length; i++) {
+    if (!gpRowValid_(rows[i])) continue;
+    if (Number(rows[i][0]) === id) {
+      rhObj = gpColabRhObjFromRow_(rows[i], i);
+      break;
+    }
+  }
+  if (!rhObj) {
     gpEnsureRowByOpId_(SH_COLAB_RH, id, [
       id, 'Julia', 'Atendente 2', '', '', '', '', '', '', GP_JULIA_ADMISSAO_, '', 1621, va, 20, 100, '14h–22h', 'SIM', 0, ''
     ]);
   } else {
-    gpPatchRhRowFields_(id, {
-      nome: 'Julia', funcao: 'Atendente 2', turno: '14h–22h', admissao: GP_JULIA_ADMISSAO_,
-      salarioBase: 1621, vaDiario: va, metaLocDia: 20, bonusMeta: 100, ativo: 'SIM'
-    });
+    // I120b: só escreve se divergir — rewrite a cada painel friava admin ~40s+
+    const needPatch =
+      String(rhObj.nome || '').trim() !== 'Julia'
+      || String(rhObj.funcao || '').trim() !== 'Atendente 2'
+      || String(rhObj.turno || '').trim() !== '14h–22h'
+      || cellToStr_(rhObj.admissao) !== GP_JULIA_ADMISSAO_
+      || Number(rhObj.salarioBase) !== 1621
+      || Number(rhObj.vaDiario) !== Number(va)
+      || Number(rhObj.metaLocDia) !== 20
+      || Number(rhObj.bonusMeta) !== 100
+      || rhObj.ativo === false;
+    if (needPatch) {
+      gpPatchRhRowFields_(id, {
+        nome: 'Julia', funcao: 'Atendente 2', turno: '14h–22h', admissao: GP_JULIA_ADMISSAO_,
+        salarioBase: 1621, vaDiario: va, metaLocDia: 20, bonusMeta: 100, ativo: 'SIM'
+      });
+    }
   }
-  gpUpsertEscalaRow_(id, comp, GP_JULIA_ESCALA_, 'Julia — Atendente 2', { force: true });
+  // Escala: só force se célula diferir (evita setValues em todo open do painel)
+  const escalaRows = (ctx && ctx.escalaRows) ? ctx.escalaRows : gpRows_(SH_ESCALA_COLAB);
+  const compNorm = gpNormCompetencia_(comp);
+  let escalaOk = false;
+  for (let ei = 0; ei < escalaRows.length; ei++) {
+    const er = escalaRows[ei];
+    if (!gpRowValid_(er)) continue;
+    if (Number(er[0]) !== id || gpNormCompetencia_(er[1]) !== compNorm) continue;
+    escalaOk = true;
+    for (let d = 0; d < 7; d++) {
+      if (String(er[2 + d] || '').trim() !== String(GP_JULIA_ESCALA_[d] || '').trim()) {
+        escalaOk = false;
+        break;
+      }
+    }
+    break;
+  }
+  if (!escalaOk) {
+    gpUpsertEscalaRow_(id, comp, GP_JULIA_ESCALA_, 'Julia — Atendente 2', { force: true });
+  }
   if (!gpRowExistsByOpId_(SH_BANCO_HORAS, id)) {
     gpEnsureRowByOpId_(SH_BANCO_HORAS, id, [id, '0h00', '']);
   }
@@ -12806,8 +12856,10 @@ function gpRefreshRhCtx_(ctx) {
   ctx.rhRows = gpRows_(SH_COLAB_RH);
   ctx.folhaRows = gpRows_(SH_FOLHA_PONTO);
   ctx.escalaRows = gpRows_(SH_ESCALA_COLAB);
-  ctx.bancoRows = gpRows_(SH_BANCO_HORAS);
-  ctx.faltasRows = gpRows_(SH_FALTAS);
+  if (!ctx.lite) {
+    ctx.bancoRows = gpRows_(SH_BANCO_HORAS);
+    ctx.faltasRows = gpRows_(SH_FALTAS);
+  }
   ctx.metasRows = gpRows_(SH_METAS_COLAB);
 }
 
@@ -12821,7 +12873,7 @@ function painelGestaoPessoasAdmin_(p) {
       const hit = CacheService.getScriptCache().get(cacheKey);
       if (hit) return ContentService.createTextOutput(hit).setMimeType(ContentService.MimeType.JSON);
     } catch (e) { /* ok */ }
-    const ctx = gpLoadContext_();
+    const ctx = gpLoadContext_({ lite: lite });
     gpSyncRhColaboradoresPadrao_(ctx);
     const opsResp = JSON.parse(listarOperadoresLogin_().getContent());
     const operadores = opsResp.operadores || [];

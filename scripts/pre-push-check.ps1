@@ -435,6 +435,33 @@ try {
     } else {
       Add-Check "guard.k1.import" "ok" "import K.1 presente no GAS"
     }
+    # I120b — comandoOperacional: FE sempre manda _t; cache so busta com force/nocache
+    if ($gasRaw -match 'function comandoOperacional_\([\s\S]{0,600}const bust = String\(\(p && p\._t\)') {
+      Add-Check "guard.i120.comando.cache" "fail" "comandoOperacional_ ainda bustar cache por _t (I120b)"
+    } elseif ($gasRaw -notmatch 'comandoOp_v2_') {
+      Add-Check "guard.i120.comando.cache" "fail" "comandoOp_v2_ ausente (I120b)"
+    } elseif ($gasRaw -notmatch 'forceBust') {
+      Add-Check "guard.i120.comando.cache" "fail" "forceBust ausente em comandoOperacional_ (I120b)"
+    } else {
+      Add-Check "guard.i120.comando.cache" "ok" "comando cache ignora _t (force=1)"
+    }
+    if ($gasRaw -notmatch 'gp_painel_adm_lite_') {
+      Add-Check "guard.i120.painel.lite" "fail" "cache/invalidate lite painel ausente (I120)"
+    } elseif ($gasRaw -notmatch 'gpLoadContext_\(\{\s*lite:\s*lite\s*\}\)') {
+      Add-Check "guard.i120.painel.lite" "fail" "gpLoadContext_ lite nao usado no painel (I120b)"
+    } else {
+      Add-Check "guard.i120.painel.lite" "ok" "painel lite + loadContext slim"
+    }
+    if ($gasRaw -notmatch 'I120b: s[oó] escreve se divergir') {
+      Add-Check "guard.i120.julia.idempotent" "fail" "gpSyncJuliaPadrao_ sem sync idempotente (I120b)"
+    } else {
+      Add-Check "guard.i120.julia.idempotent" "ok" "Julia sync so escreve se divergir"
+    }
+    if ($gasRaw -notmatch 'caixaIncluiAbertas') {
+      Add-Check "guard.i117.caixa.abertas" "fail" "caixaIncluiAbertas ausente (I117 pay-first)"
+    } else {
+      Add-Check "guard.i117.caixa.abertas" "ok" "resumoDia inclui Ativa/Pendente"
+    }
   } else {
     Add-Check "guard.gas.portal.canon" "warn" ".gs canonico nao encontrado"
   }
@@ -606,11 +633,18 @@ try {
     $i43Out = & $i43 2>&1 | Out-String
     if ($LASTEXITCODE -ne 0) { Add-Check "teste.i43" "fail" "exit $LASTEXITCODE" }
     else { Add-Check "teste.i43" "ok" "TESTE_I43_CARREGAR_INICIO_READONLY" }
+
+    $i120 = Join-Path $testDir "TESTE_I120_ADMIN_PERF_READONLY.ps1"
+    if (-not (Test-Path $i120)) { throw "TESTE_I120_ADMIN_PERF_READONLY.ps1 nao encontrado" }
+    $i120Out = & $i120 2>&1 | Out-String
+    if ($LASTEXITCODE -ne 0) { Add-Check "teste.i120" "fail" "exit $LASTEXITCODE" }
+    else { Add-Check "teste.i120" "ok" "TESTE_I120_ADMIN_PERF_READONLY" }
   } else {
     Add-Check "teste.paridade" "skip" "SkipNetworkTests"
     Add-Check "teste.portal" "skip" "SkipNetworkTests"
     Add-Check "teste.cronometro" "skip" "SkipNetworkTests"
     Add-Check "teste.i43" "skip" "SkipNetworkTests"
+    Add-Check "teste.i120" "skip" "SkipNetworkTests"
   }
 } catch {
   $result.status = "fail"
