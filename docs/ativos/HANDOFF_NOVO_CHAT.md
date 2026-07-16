@@ -1,10 +1,10 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 15/07/2026 · FE **v1.9.62** (I117) · GAS **v1.5.198** Web ✅  
+**Atualizado:** 16/07/2026 · FE **v1.9.64** (I122) · GAS repo **v1.5.201** · Web ping **v1.5.200** até Nova versão 201  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
-**Repo local:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`  
-**GitHub:** `ribocg-a11y/movikids` · branch `main` · I117 caixa pay-first Web ✅
+**GAS canônico (raw):** https://raw.githubusercontent.com/ribocg-a11y/movikids/main/MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs  
+**GitHub:** `ribocg-a11y/movikids` · branch `main` · I122: sync celular / anti locação fantasma
 
 **Mensagem mínima no novo chat:**
 
@@ -59,10 +59,10 @@ cursor "C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-mo
 
 | Camada | Versão | URL / evidência |
 |--------|--------|-----------------|
-| **Frontend** | **v1.9.62** | https://ribocg-a11y.github.io/movikids/?force=1.9.59 |
-| **Gestão Pessoas** | **v1.9.62** | `gestao-pessoas.html?force=1.9.59` |
-| **Service Worker** | **1.9.59** | `sw.js` |
-| **Apps Script** | **v1.5.198** Web ✅ | I117 pay-first caixa · ping alinhado 15/07 |
+| **Frontend** | **v1.9.64** | https://ribocg-a11y.github.io/movikids/?force=1.9.64 |
+| **Gestão Pessoas** | **v1.9.64** | `gestao-pessoas.html?force=1.9.64` |
+| **Service Worker** | **1.9.64** | `sw.js` |
+| **Apps Script** | repo **v1.5.201** · Web **v1.5.200** ⏳ | Colar `.gs` + **Nova versão** → I122 (carregarInicio cache / anti-fantasma) |
 | **Baseline P0** | ✅ | `docs/ativos/BASELINE_CODIGO_P0.md` |
 | **PIN admin** | **1421** | Script Property `ADMIN_PIN` |
 | **Homolog tablet** | ✅ 23/06 | I43 · I42 · I47 · Gestor — smoke **v1.9.39** pendente Ops |
@@ -128,8 +128,8 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 |---|------|------|--------|
 | **0** | **I117** caixa pay-first — GAS **v1.5.198** Web ✅ · FE **v1.9.62** | Sócio+Agente | ✅ **15/07** |
 | **0a** | **I116** GAS **v1.5.196** Web ✅ — validado 15/07 (ping 196 · GP OK · Ray warm ~4s) | Sócio+Agente | ✅ **15/07** |
-| **0b** | Frios Colab ~20–23s — residual `gpLoadContext_` AUD/tail (não regredir P0) | Agente | 📋 backlog |
-| 0c | Backlog: `kpiMes` / `painelGestaoPessoasAdmin` frios (I116) | Agente | 📋 |
+| **0b** | **I122** GAS **v1.5.201** + FE **v1.9.64** — colar Nova versão · limpar site data tablet se fantasma persistir | Sócio+Agente | ⏳ **16/07** |
+| **0c** | Frios Colab residual (AUD/tail full) — lite já slim; não regredir P0 | Agente | 📋 backlog |
 | 1 | **Sprint D1** homolog PC admin v1.9.2 | Agente | ✅ **27/06** |
 | 1b | **I69** hotfix ponto mock → **v1.9.3** | Agente | ✅ **29/06** Pages |
 | 1c | **I70–I75** varredura — GAS/FE/Dashboard/GP/Julia | Agente | ✅ **09/07** |
@@ -164,7 +164,7 @@ Docs: `MAPA_ERROS` I117 · `INCIDENTE_I116_ENRICH_RH_KPI_LENTIDAO_2026-07-15.md`
 
 ## Incidentes — referência rápida
 
-I15 POST browser · I20/I43 cronômetro · I42 conta dia · **I68 VT folha** · **I69 ponto mock** · **I70–I76 sessão 09/07** · **I96–I103 multi-veículo/contagem** · **I108–I114 holerite** · **I115–I116 login/lentidão** · **I117 caixa pay-first** · ver `MAPA_ERROS_FALHAS_BUGS.md` · `INCIDENTE_I96_I99_MULTI_VEICULO_2026-07-10.md`.
+I15 POST browser · I20/I43 cronômetro · I42 conta dia · **I68 VT folha** · **I69 ponto mock** · **I70–I76 sessão 09/07** · **I96–I103 multi-veículo/contagem** · **I108–I114 holerite** · **I115–I116 login/lentidão** · **I117 caixa pay-first** · **I120/I120b admin perf** · ver `MAPA_ERROS_FALHAS_BUGS.md` · `INCIDENTE_I96_I99_MULTI_VEICULO_2026-07-10.md`.
 
 ---
 

@@ -435,8 +435,81 @@ try {
     } else {
       Add-Check "guard.k1.import" "ok" "import K.1 presente no GAS"
     }
+    # I120b — comandoOperacional: FE sempre manda _t; cache so busta com force/nocache
+    if ($gasRaw -match 'function comandoOperacional_\([\s\S]{0,600}const bust = String\(\(p && p\._t\)') {
+      Add-Check "guard.i120.comando.cache" "fail" "comandoOperacional_ ainda bustar cache por _t (I120b)"
+    } elseif ($gasRaw -notmatch 'comandoOp_v2_') {
+      Add-Check "guard.i120.comando.cache" "fail" "comandoOp_v2_ ausente (I120b)"
+    } elseif ($gasRaw -notmatch 'forceBust') {
+      Add-Check "guard.i120.comando.cache" "fail" "forceBust ausente em comandoOperacional_ (I120b)"
+    } else {
+      Add-Check "guard.i120.comando.cache" "ok" "comando cache ignora _t (force=1)"
+    }
+    if ($gasRaw -notmatch 'gp_painel_adm_lite_') {
+      Add-Check "guard.i120.painel.lite" "fail" "cache/invalidate lite painel ausente (I120)"
+    } elseif ($gasRaw -notmatch 'gpLoadContext_\(\{\s*lite:\s*lite\s*\}\)') {
+      Add-Check "guard.i120.painel.lite" "fail" "gpLoadContext_ lite nao usado no painel (I120b)"
+    } else {
+      Add-Check "guard.i120.painel.lite" "ok" "painel lite + loadContext slim"
+    }
+    if ($gasRaw -notmatch 'I120b: s[oó] escreve se divergir') {
+      Add-Check "guard.i120.julia.idempotent" "fail" "gpSyncJuliaPadrao_ sem sync idempotente (I120b)"
+    } else {
+      Add-Check "guard.i120.julia.idempotent" "ok" "Julia sync so escreve se divergir"
+    }
+    if ($gasRaw -notmatch 'caixaIncluiAbertas') {
+      Add-Check "guard.i117.caixa.abertas" "fail" "caixaIncluiAbertas ausente (I117 pay-first)"
+    } else {
+      Add-Check "guard.i117.caixa.abertas" "ok" "resumoDia inclui Ativa/Pendente"
+    }
+    # I121 — kpiMes/leading mesma regra pay-first; invalidate dash em escritas
+    if ($gasRaw -notmatch 'function invalidateDashCaches_') {
+      Add-Check "guard.i121.dash.invalidate" "fail" "invalidateDashCaches_ ausente (I121)"
+    } elseif ($gasRaw -notmatch 'invalidateInicioResumoCache_[\s\S]{0,900}invalidateDashCaches_') {
+      Add-Check "guard.i121.dash.invalidate" "fail" "escritas nao invalidam dash/comando (I121)"
+    } else {
+      Add-Check "guard.i121.dash.invalidate" "ok" "kpiMes+comando invalidados em escrita"
+    }
+    if ($gasRaw -notmatch 'I121: pay-first — Ativa/Pendente já pagas \(paridade I117') {
+      Add-Check "guard.i121.kpi.payfirst" "fail" "kpiMes ainda so Encerrada (I121)"
+    } elseif ($gasRaw -notmatch 'function calcLeadingDiaPatch_[\s\S]{0,800}Ativa') {
+      Add-Check "guard.i121.kpi.payfirst" "fail" "calcLeadingDiaPatch_ sem Ativa (I121)"
+    } else {
+      Add-Check "guard.i121.kpi.payfirst" "ok" "kpiMes+leading incluem Ativa/Pendente"
+    }
   } else {
     Add-Check "guard.gas.portal.canon" "warn" ".gs canonico nao encontrado"
+  }
+
+  $adminJs = Join-Path $root "mk-admin.js"
+  if (Test-Path $adminJs) {
+    $adminRaw = Get-Content -Path $adminJs -Raw -Encoding UTF8
+    if ($adminRaw -notmatch 'function mkSyncKpiHojeFromComando_') {
+      Add-Check "guard.i121.fe.sync" "fail" "mkSyncKpiHojeFromComando_ ausente (I121)"
+    } elseif ($adminRaw -notmatch 'KPI_DASH_CACHE_TTL_CORRENTE_MS') {
+      Add-Check "guard.i121.fe.sync" "fail" "TTL kpi corrente ausente (I121)"
+    } else {
+      Add-Check "guard.i121.fe.sync" "ok" "Meta/graficos sync com Centro de comando"
+    }
+  }
+  # I122 — carregarInicio nao busta cache por _t; FE timeout > 25s
+  if ($gasRaw -match 'function carregarInicio_\([\s\S]{0,700}const bust = String\(\(p && p\._t\)') {
+    Add-Check "guard.i122.inicio.cache" "fail" "carregarInicio_ ainda bustar cache por _t (I122)"
+  } elseif ($gasRaw -notmatch 'inicio_v4_') {
+    Add-Check "guard.i122.inicio.cache" "fail" "inicio_v4_ ausente (I122)"
+  } else {
+    Add-Check "guard.i122.inicio.cache" "ok" "carregarInicio cache ignora _t"
+  }
+  $syncPath = Join-Path $root "mk-sync.js"
+  if (Test-Path $syncPath) {
+    $syncRaw = Get-Content -Path $syncPath -Raw -Encoding UTF8
+    if ($syncRaw -notmatch 'MK_INICIO_API_TIMEOUT_MS') {
+      Add-Check "guard.i122.fe.timeout" "fail" "MK_INICIO_API_TIMEOUT_MS ausente (I122)"
+    } elseif ($syncRaw -notmatch 'mkInicioCacheFresh_') {
+      Add-Check "guard.i122.fe.timeout" "fail" "mkInicioCacheFresh_ ausente (I122)"
+    } else {
+      Add-Check "guard.i122.fe.timeout" "ok" "sync timeout 55s + sem cache fantasma"
+    }
   }
 
   $authPath = Join-Path $root "mk-auth.js"
@@ -606,11 +679,25 @@ try {
     $i43Out = & $i43 2>&1 | Out-String
     if ($LASTEXITCODE -ne 0) { Add-Check "teste.i43" "fail" "exit $LASTEXITCODE" }
     else { Add-Check "teste.i43" "ok" "TESTE_I43_CARREGAR_INICIO_READONLY" }
+
+    $i120 = Join-Path $testDir "TESTE_I120_ADMIN_PERF_READONLY.ps1"
+    if (-not (Test-Path $i120)) { throw "TESTE_I120_ADMIN_PERF_READONLY.ps1 nao encontrado" }
+    $i120Out = & $i120 2>&1 | Out-String
+    if ($LASTEXITCODE -ne 0) { Add-Check "teste.i120" "fail" "exit $LASTEXITCODE" }
+    else { Add-Check "teste.i120" "ok" "TESTE_I120_ADMIN_PERF_READONLY" }
+
+    $i121 = Join-Path $testDir "TESTE_I121_DASH_SYNC_READONLY.ps1"
+    if (-not (Test-Path $i121)) { throw "TESTE_I121_DASH_SYNC_READONLY.ps1 nao encontrado" }
+    $i121Out = & $i121 2>&1 | Out-String
+    if ($LASTEXITCODE -ne 0) { Add-Check "teste.i121" "fail" "exit $LASTEXITCODE" }
+    else { Add-Check "teste.i121" "ok" "TESTE_I121_DASH_SYNC_READONLY" }
   } else {
     Add-Check "teste.paridade" "skip" "SkipNetworkTests"
     Add-Check "teste.portal" "skip" "SkipNetworkTests"
     Add-Check "teste.cronometro" "skip" "SkipNetworkTests"
     Add-Check "teste.i43" "skip" "SkipNetworkTests"
+    Add-Check "teste.i120" "skip" "SkipNetworkTests"
+    Add-Check "teste.i121" "skip" "SkipNetworkTests"
   }
 } catch {
   $result.status = "fail"

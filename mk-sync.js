@@ -72,6 +72,19 @@ function syncController(force = false, delayMs = 0) {
   document.addEventListener(ev, () => { _lastActivity = Date.now(); }, { passive: true })
 );
 
+/** I122 — timeout dedicado: carregarInicio frio pode passar de 25s; default api() gerava fantasma. */
+const MK_INICIO_API_TIMEOUT_MS = 55000;
+const MK_INICIO_CACHE_MAX_AGE_MS = 45000;
+
+function mkInicioCacheFresh_(raw) {
+  try {
+    const o = JSON.parse(raw);
+    if (!o || !o.data || !o.data.ok || o.ts == null) return null;
+    if (Date.now() - Number(o.ts) > MK_INICIO_CACHE_MAX_AGE_MS) return null;
+    return o.data;
+  } catch (e) { return null; }
+}
+
 async function sincronizarServidor(force = false) {
   if (_syncInFlight) {
     if (force) _syncPending = true;
@@ -79,6 +92,7 @@ async function sincronizarServidor(force = false) {
   }
   _syncInFlight = true;
   clearTimeout(_syncSafetyTimer);
+  // I122: safety > timeout API (não cortar sync legítimo em ~30s)
   _syncSafetyTimer = setTimeout(() => {
     if (_syncInFlight) {
       console.warn('[Sync] safety timeout — liberando lock travado');
@@ -87,10 +101,11 @@ async function sincronizarServidor(force = false) {
       _lastFailAt = Date.now();
       _syncBackoffMs = Math.min(_syncBackoffMs ? _syncBackoffMs * 2 : 5000, _BACKOFF_MAX);
     }
-  }, 35000);
+  }, MK_INICIO_API_TIMEOUT_MS + 10000);
 
   try {
     const CACHE_KEY = MK_INICIO_CACHE_KEY;
+    // I122: com operação ativa NUNCA reaplicar cache local (fantasma pós-timeout)
     const skipCache = force || mkSyncOperacaoAtiva_() || mkSyncHomeVisible_();
 
     if (force) {
@@ -102,12 +117,8 @@ async function sincronizarServidor(force = false) {
       if (sinceLastFail < _syncBackoffMs) {
         if (!skipCache) {
           const raw = localStorage.getItem(CACHE_KEY);
-          if (raw) {
-            try {
-              const { data } = JSON.parse(raw);
-              if (data && data.ok) aplicarDadosInicio(data);
-            } catch (e) { /* ignore */ }
-          }
+          const cached = raw ? mkInicioCacheFresh_(raw) : null;
+          if (cached) aplicarDadosInicio(cached);
         }
         return;
       }
@@ -117,19 +128,18 @@ async function sincronizarServidor(force = false) {
 
     let d;
     try {
-      d = await api({ action: 'carregarInicio', ...apiParamsComAuth_() });
+      const inicioParams = Object.assign({ action: 'carregarInicio' }, apiParamsComAuth_());
+      if (force) inicioParams.force = '1';
+      d = await api(inicioParams, MK_INICIO_API_TIMEOUT_MS);
     } catch (apiErr) {
+      // I122: timeout/erro com loc aberta → NÃO reaplicar mk_inicio_cache (fantasma)
       if (!skipCache) {
         const raw = localStorage.getItem(CACHE_KEY);
-        if (raw) {
-          try {
-            const { data } = JSON.parse(raw);
-            if (data && data.ok) {
-              aplicarDadosInicio(data);
-              setStatus(true);
-              return;
-            }
-          } catch (e) { /* ignore */ }
+        const cached = raw ? mkInicioCacheFresh_(raw) : null;
+        if (cached) {
+          aplicarDadosInicio(cached);
+          setStatus(true);
+          return;
         }
       }
       throw apiErr;
@@ -142,12 +152,8 @@ async function sincronizarServidor(force = false) {
       if (_syncFailCount >= _FAIL_THRESH) setStatus(false);
       if (!skipCache) {
         const raw = localStorage.getItem(CACHE_KEY);
-        if (raw) {
-          try {
-            const { data } = JSON.parse(raw);
-            if (data && data.ok) aplicarDadosInicio(data);
-          } catch (e) { /* ignore */ }
-        }
+        const cached = raw ? mkInicioCacheFresh_(raw) : null;
+        if (cached) aplicarDadosInicio(cached);
       }
       return;
     }
@@ -461,14 +467,14 @@ window.mkInvalidateInicioCache_ = mkInvalidateInicioCache_;
 function mkSyncRefreshInicioBg_() {
   if (window._mkInicioBgRefresh) return;
   window._mkInicioBgRefresh = true;
-  api({ action: 'carregarInicio', ...apiParamsComAuth_() })
+  api(Object.assign({ action: 'carregarInicio' }, apiParamsComAuth_()), MK_INICIO_API_TIMEOUT_MS)
     .then(function (d) {
       if (!d || !d.ok) return;
       _syncFailCount = 0;
       _syncBackoffMs = 0;
       _lastSyncAt = Date.now();
       try {
-        localStorage.setItem('mk_inicio_cache_v2', JSON.stringify({ data: d, ts: Date.now() }));
+        localStorage.setItem(MK_INICIO_CACHE_KEY, JSON.stringify({ data: d, ts: Date.now() }));
       } catch (e) { /* ignore */ }
       aplicarDadosInicio(d);
       setStatus(true);
