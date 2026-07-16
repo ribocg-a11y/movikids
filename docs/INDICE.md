@@ -113,3 +113,5 @@
 ## App (raiz)
 
 `index.html`, `mk-*.js`, `sw.js`, `mk-version.js`, `acompanhar.html`, `MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs`
+
+| Estudo negócio / break-even | [`ativos/ESTUDO_NEGOCIO_BREAK_EVEN_TICKET_2026-07.md`](ativos/ESTUDO_NEGOCIO_BREAK_EVEN_TICKET_2026-07.md) · CSV `VIABILIDADE_NEGOCIO_MEMORIAL.csv` |
