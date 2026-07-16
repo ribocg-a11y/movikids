@@ -1,6 +1,6 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 15/07/2026 · FE **v1.9.61** (I117) · GAS **v1.5.197** Web ✅  
+**Atualizado:** 15/07/2026 · FE **v1.9.62** (I117) · GAS **v1.5.198** Web ✅  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **Repo local:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`  
@@ -59,10 +59,10 @@ cursor "C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-mo
 
 | Camada | Versão | URL / evidência |
 |--------|--------|-----------------|
-| **Frontend** | **v1.9.61** | https://ribocg-a11y.github.io/movikids/?force=1.9.59 |
-| **Gestão Pessoas** | **v1.9.61** | `gestao-pessoas.html?force=1.9.59` |
+| **Frontend** | **v1.9.62** | https://ribocg-a11y.github.io/movikids/?force=1.9.59 |
+| **Gestão Pessoas** | **v1.9.62** | `gestao-pessoas.html?force=1.9.59` |
 | **Service Worker** | **1.9.59** | `sw.js` |
-| **Apps Script** | **v1.5.197** Web ✅ | I117 pay-first caixa · ping alinhado 15/07 |
+| **Apps Script** | **v1.5.198** Web ✅ | I117 pay-first caixa · ping alinhado 15/07 |
 | **Baseline P0** | ✅ | `docs/ativos/BASELINE_CODIGO_P0.md` |
 | **PIN admin** | **1421** | Script Property `ADMIN_PIN` |
 | **Homolog tablet** | ✅ 23/06 | I43 · I42 · I47 · Gestor — smoke **v1.9.39** pendente Ops |
@@ -126,7 +126,7 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 
 | # | Ação | Quem | Status |
 |---|------|------|--------|
-| **0** | **I117** caixa pay-first — GAS **v1.5.197** Web ✅ · FE **v1.9.61** | Sócio+Agente | ✅ **15/07** |
+| **0** | **I117** caixa pay-first — GAS **v1.5.198** Web ✅ · FE **v1.9.62** | Sócio+Agente | ✅ **15/07** |
 | **0a** | **I116** GAS **v1.5.196** Web ✅ — validado 15/07 (ping 196 · GP OK · Ray warm ~4s) | Sócio+Agente | ✅ **15/07** |
 | **0b** | Frios Colab ~20–23s — residual `gpLoadContext_` AUD/tail (não regredir P0) | Agente | 📋 backlog |
 | 0c | Backlog: `kpiMes` / `painelGestaoPessoasAdmin` frios (I116) | Agente | 📋 |

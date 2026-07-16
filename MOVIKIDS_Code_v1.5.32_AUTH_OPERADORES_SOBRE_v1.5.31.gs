@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.197
+// MOVI KIDS — Google Apps Script v1.5.198
+// v1.5.198: I120 — perf admin: painel lite + expandRh false; cache comandoOperacional; invalidate v2 comunicados
 // v1.5.197: I117 — caixa pay-first: calcResumoDiaCore_ inclui Ativa/Pendente (plano já pago na maquininha)
 // v1.5.196: I116 — enrich audit login só ops listados (sem expandir todo RH); escala/banco via ctx
 // v1.5.195: I115 — login Colaboradores slim: 1× ctx + enrich audit; sem write FALTAS/HOLERITES; cache 90s
@@ -189,8 +190,8 @@
 
 // ── CONSTANTES ───────────────────────────────────────────────
 /** Versão exposta em ping, carregarInicio, validarSchema, gestaoPessoasStatus (bump com header). */
-const MK_GAS_VERSAO_  = 'v1.5.197';
-const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.197';
+const MK_GAS_VERSAO_  = 'v1.5.198';
+const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.198';
 const SHEET_ID   = '1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618';
 const DEPLOY_ID  = 'AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y';
 const WEBAPP_URL = `https://script.google.com/macros/s/${DEPLOY_ID}/exec`;
@@ -5937,7 +5938,8 @@ function buildPainelComandoOperacional_() {
     });
   }
 
-  const intel = alertasInteligentes_({ dataFmt: dataFmt, core: core, incluirRh: true, incluirPonto: true });
+  // I120: intel leve no comando (sem RH/ponto — já pesa em painelGestaoPessoasAdmin)
+  const intel = alertasInteligentes_({ dataFmt: dataFmt, core: core, incluirRh: false, incluirPonto: false });
   const alertasMerged = mergeAlertasLista_(intel, alertas, 6);
   const fatHoje = Math.round(core.fat * 100) / 100;
   const resHoje = Math.round(core.resultado * 100) / 100;
@@ -6002,7 +6004,18 @@ function buildPainelComandoOperacional_() {
 
 function comandoOperacional_(p) {
   if (!isGestaoRequest_(p)) return err_('Acesso negado — comandoOperacional so para gestao (admin/gestor)', 403);
-  return resp_(buildPainelComandoOperacional_());
+  const bust = String((p && p._t) || '').trim();
+  const cacheKey = 'comandoOp_v1_' + fmtData_(new Date()).replace(/\//g, '');
+  if (!bust) {
+    try {
+      const hit = CacheService.getScriptCache().get(cacheKey);
+      if (hit) return ContentService.createTextOutput(hit).setMimeType(ContentService.MimeType.JSON);
+    } catch (e) { /* ok */ }
+  }
+  const payload = buildPainelComandoOperacional_();
+  const out = JSON.stringify(Object.assign({ ok: true }, payload));
+  try { CacheService.getScriptCache().put(cacheKey, out, 40); } catch (e) { /* ok */ }
+  return ContentService.createTextOutput(out).setMimeType(ContentService.MimeType.JSON);
 }
 
 /** Projeção de fechamento para histórico mensal (mês corrente → fim do mês; fechado → span calendário operado). */
@@ -10938,6 +10951,7 @@ function gpInvalidateRhCache_() {
     cache.remove('gp_list_colab_v2');
     cache.remove('gp_painel_adm_' + comp);
     cache.remove('gp_painel_adm_v2_' + comp);
+    cache.remove('gp_painel_adm_lite_' + comp);
   } catch (e) { /* ok */ }
 }
 
@@ -12801,7 +12815,8 @@ function painelGestaoPessoasAdmin_(p) {
   if (!isGestaoRequest_(p)) return err_('Acesso negado — gestao pessoas (admin/gestor)', 403);
   try {
     const comp = String(p.competencia || gpCompetenciaAtual_());
-    const cacheKey = 'gp_painel_adm_v2_' + gpNormCompetencia_(comp);
+    const lite = String((p && p.lite) || '') === '1' || String((p && p.lite) || '').toLowerCase() === 'true';
+    const cacheKey = (lite ? 'gp_painel_adm_lite_' : 'gp_painel_adm_v2_') + gpNormCompetencia_(comp);
     try {
       const hit = CacheService.getScriptCache().get(cacheKey);
       if (hit) return ContentService.createTextOutput(hit).setMimeType(ContentService.MimeType.JSON);
@@ -12812,11 +12827,12 @@ function painelGestaoPessoasAdmin_(p) {
     const operadores = opsResp.operadores || [];
     gpSyncOperadoresAtivosToRh_(operadores);
     gpRefreshRhCtx_(ctx);
-    gpEnrichContextAudit_(ctx, comp, operadores);
+    // I120: enrich só ops listados (igual login I116) — evita varrer todo RH × AUD
+    gpEnrichContextAudit_(ctx, comp, operadores, { expandRh: false });
     const sessao = opsResp.sessaoAtiva || null;
     const sessaoId = sessao && sessao.operadorId ? Number(sessao.operadorId) : 0;
     const alertasPack = gpAlertasPontoFromCtx_(ctx);
-    const intelRh = gpIntelRhAlertasFromCtx_(ctx);
+    const intelRh = lite ? [] : gpIntelRhAlertasFromCtx_(ctx);
     const colaboradores = [];
     const seen = {};
 
@@ -12833,12 +12849,14 @@ function painelGestaoPessoasAdmin_(p) {
       const escalaHoje = gpEscalaCelulaHojeFromCtx_(id, ctx, comp);
       const cadObj = rh ? gpCadastroFromRhObj_(rh) : null;
       const cadPct = rh ? gpCalcCadastroPct_(cadObj) : 0;
-      let jornadaOp = null;
-      try {
-        jornadaOp = gpAnaliseJornadaColab_(id, comp, ctx, rh);
-      } catch (jEx) {
-        Logger.log('painel jornada op ' + id + ': ' + jEx.message);
-        jornadaOp = { dias: [], totais: {}, bancoSaldo: '0h00', bancoProjetado: '0h00' };
+      let jornadaOp = { dias: [], totais: {}, bancoSaldo: '0h00', bancoProjetado: '0h00', _lite: true };
+      if (!lite) {
+        try {
+          jornadaOp = gpAnaliseJornadaColab_(id, comp, ctx, rh);
+        } catch (jEx) {
+          Logger.log('painel jornada op ' + id + ': ' + jEx.message);
+          jornadaOp = { dias: [], totais: {}, bancoSaldo: '0h00', bancoProjetado: '0h00' };
+        }
       }
       colaboradores.push({
         id: id, nome: op.nome, hasPin: op.hasPin, perfil: op.perfil || 'operador',
@@ -12871,12 +12889,14 @@ function painelGestaoPessoasAdmin_(p) {
       const escalaHoje = gpEscalaCelulaHojeFromCtx_(id, ctx, comp);
       const cadObj = rh ? gpCadastroFromRhObj_(rh) : null;
       const cadPct = rh ? gpCalcCadastroPct_(cadObj) : 0;
-      let jornadaRh = null;
-      try {
-        jornadaRh = gpAnaliseJornadaColab_(id, comp, ctx, rh);
-      } catch (jEx2) {
-        Logger.log('painel jornada rh ' + id + ': ' + jEx2.message);
-        jornadaRh = { dias: [], totais: {}, bancoSaldo: '0h00', bancoProjetado: '0h00' };
+      let jornadaRh = { dias: [], totais: {}, bancoSaldo: '0h00', bancoProjetado: '0h00', _lite: true };
+      if (!lite) {
+        try {
+          jornadaRh = gpAnaliseJornadaColab_(id, comp, ctx, rh);
+        } catch (jEx2) {
+          Logger.log('painel jornada rh ' + id + ': ' + jEx2.message);
+          jornadaRh = { dias: [], totais: {}, bancoSaldo: '0h00', bancoProjetado: '0h00' };
+        }
       }
       colaboradores.push({
         id: id, nome: rh ? rh.nome : String(r[1] || ''), hasPin: false, perfil: 'operador',
@@ -12911,23 +12931,25 @@ function painelGestaoPessoasAdmin_(p) {
     };
 
     const folha = [];
-    colaboradores.filter(function (c) { return c.temRh; }).forEach(function (c) {
-      try {
-        const rh = gpColabRhFromCtx_(c.id, ctx);
-        const bonus = c.metas.bonusTotal || 0;
-        const jornada = c.jornada;
-        const faltasDesc = gpFaltasDescontoMes_(c.id, comp, rh, jornada);
-        const hol = gpCalcHollerite_(rh || { salarioBase: 1621, admissao: c.admissao }, bonus, faltasDesc, comp);
-        folha.push({
-          id: c.id, nome: c.nome, locMes: c.metas.locMes, bonusDias: c.metas.bonusDias,
-          base: hol.base, bonus: hol.bonus, faltas: faltasDesc, total: hol.liquido,
-          quinzena: hol.quinzena, quinzenaLabel: hol.quinzenaLabel, pagamentoEm: hol.pagamentoEm,
-          holerite: hol
-        });
-      } catch (fEx) {
-        Logger.log('painel folha ' + c.id + ': ' + fEx.message);
-      }
-    });
+    if (!lite) {
+      colaboradores.filter(function (c) { return c.temRh; }).forEach(function (c) {
+        try {
+          const rh = gpColabRhFromCtx_(c.id, ctx);
+          const bonus = c.metas.bonusTotal || 0;
+          const jornada = c.jornada;
+          const faltasDesc = gpFaltasDescontoMes_(c.id, comp, rh, jornada);
+          const hol = gpCalcHollerite_(rh || { salarioBase: 1621, admissao: c.admissao }, bonus, faltasDesc, comp);
+          folha.push({
+            id: c.id, nome: c.nome, locMes: c.metas.locMes, bonusDias: c.metas.bonusDias,
+            base: hol.base, bonus: hol.bonus, faltas: faltasDesc, total: hol.liquido,
+            quinzena: hol.quinzena, quinzenaLabel: hol.quinzenaLabel, pagamentoEm: hol.pagamentoEm,
+            holerite: hol
+          });
+        } catch (fEx) {
+          Logger.log('painel folha ' + c.id + ': ' + fEx.message);
+        }
+      });
+    }
 
     let presentes = 0;
     let comTurno = 0;
@@ -12944,15 +12966,16 @@ function painelGestaoPessoasAdmin_(p) {
     const payload = {
       competencia: comp, colaboradores: colaboradores, escala: escala, folha: folha,
       alertas: alertasPack.alertas, alertasTotal: alertasPack.total,
-      alertasInteligentes: intelRh,
+      alertasInteligentes: lite ? [] : intelRh,
       kpis: {
         total: colaboradores.length, presentes: presentes, comTurno: comTurno,
-        alertas: alertasPack.total, alertasIntel: intelRh.length
+        alertas: alertasPack.total, alertasIntel: lite ? 0 : intelRh.length
       },
       sessaoAtiva: sessao, versao: MK_GAS_VERSAO_,
       comunicadosRh: comunicadosRh,
-      avaliacoesRh: avaliacoesRh,
-      competenciasRh: GP_COMPETENCIAS_RH_
+      avaliacoesRh: lite ? [] : avaliacoesRh,
+      competenciasRh: GP_COMPETENCIAS_RH_,
+      lite: !!lite
     };
     const out = JSON.stringify(Object.assign({ ok: true }, payload));
     try {
@@ -13202,8 +13225,8 @@ function salvarComunicadoRhAdmin_(p) {
       sh.getRange(lr, 2).setNumberFormat('@');
       if (validoAte) sh.getRange(lr, 6).setNumberFormat('@');
     }
-    try { CacheService.getScriptCache().remove('gp_painel_adm_' + gpNormCompetencia_(gpCompetenciaAtual_())); } catch (e) { /* ok */ }
-    return resp_({ id: nextId, titulo: titulo, publico: publico, prioridade: prioridade, versao: 'v1.5.124' });
+    gpInvalidateRhCache_();
+    return resp_({ id: nextId, titulo: titulo, publico: publico, prioridade: prioridade, versao: MK_GAS_VERSAO_ });
   } catch (ex) {
     return err_('Aba COMUNICADOS_RH ausente — instale abas Gestao Pessoas (Operadores)', 503);
   }
@@ -13270,8 +13293,8 @@ function salvarAvaliacaoRhAdmin_(p) {
     if (lr >= GP_DATA_ROW) {
       sh.getRange(lr, 3).setNumberFormat('@');
     }
-    try { CacheService.getScriptCache().remove('gp_painel_adm_' + gpNormCompetencia_(gpCompetenciaAtual_())); } catch (e) { /* ok */ }
-    return resp_({ id: nextId, operadorId: opId, competencia: comp, area: area, nota: nota, versao: 'v1.5.128' });
+    gpInvalidateRhCache_();
+    return resp_({ id: nextId, operadorId: opId, competencia: comp, area: area, nota: nota, versao: MK_GAS_VERSAO_ });
   } catch (ex) {
     return err_('Aba AVALIACOES_RH ausente — instale abas Gestao Pessoas (Operadores)', 503);
   }

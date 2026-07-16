@@ -305,6 +305,7 @@
     const ok = c.cadastroOk === true;
     const pct = ok ? 100 : (c.cadastroPct || 0);
     const reqKeys = gpAdmCadastroReqKeys_();
+    const editBtn = '<button type="button" class="btn btn-secondary gp-adm-cad-edit-btn" style="margin-top:10px;width:100%;padding:8px 12px;font-size:13px" onclick="mkGpAdmEditarCadastro_(' + Number(c.id) + ')">Editar cadastro (nome, CPF…)</button>';
     if (compact) {
       const filledItems = [];
       const pendingItems = [];
@@ -320,7 +321,7 @@
         }).join('');
         return '<section class="gp-adm-aside-block">' +
           '<h4>Cadastro RH</h4><span class="gp-adm-badge ok">Completo</span>' +
-          '<div class="gp-adm-cad-kv-grid">' + kv + '</div></section>';
+          '<div class="gp-adm-cad-kv-grid">' + kv + '</div>' + editBtn + '</section>';
       }
       const pend = pendingItems.map(function (lbl) {
         return '<li class="gp-adm-cad-pend">' + esc(lbl) + '</li>';
@@ -328,8 +329,8 @@
       return '<section class="gp-adm-aside-block gp-adm-aside-block--warn">' +
         '<h4>Cadastro RH</h4><span class="gp-adm-badge warn">' + pct + '% · ' + pendingItems.length + ' pendente(s)</span>' +
         '<div class="gp-adm-cad-progress" role="progressbar" aria-valuenow="' + pct + '"><div class="gp-adm-cad-progress-bar" style="width:' + pct + '%"></div></div>' +
-        '<p class="gp-adm-aside-hint">Complete em <strong>Colaboradores</strong> no tablet.</p>' +
-        '<ul class="gp-adm-cad-pend-list">' + pend + '</ul></section>';
+        '<p class="gp-adm-aside-hint">Admin pode editar abaixo · colaborador também em <strong>Meus dados</strong>.</p>' +
+        '<ul class="gp-adm-cad-pend-list">' + pend + '</ul>' + editBtn + '</section>';
     }
     let pending = 0;
     const rows = gpAdmCadastroLabels_().map(function (f) {
@@ -349,8 +350,70 @@
     return '<div class="gp-adm-card gp-adm-cad-card">' +
       '<div class="gp-adm-cad-head"><div><h3>Cadastro RH</h3></div>' + badge + '</div>' +
       '<div class="gp-adm-cad-progress"><div class="gp-adm-cad-progress-bar" style="width:' + pct + '%"></div></div>' +
-      '<div class="gp-adm-cad-list">' + rows + '</div></div>';
+      '<div class="gp-adm-cad-list">' + rows + '</div>' + editBtn + '</div>';
   }
+
+  window.mkGpAdmEditarCadastro_ = function (opId) {
+    const c = gpAdmColabById_(opId);
+    if (!c) {
+      if (typeof toast === 'function') toast('Colaborador não encontrado', 'warning');
+      return;
+    }
+    const cad = c.cadastro || {};
+    const host = document.getElementById('gp-adm-ficha-aside') || document.getElementById('gp-adm-comunicados-list');
+    if (!host) return;
+    const fields = gpAdmCadastroLabels_();
+    const formHtml = fields.map(function (f) {
+      const v = String(cad[f.key] || '').trim();
+      const req = gpAdmCadastroReqKeys_().indexOf(f.key) >= 0;
+      return '<label class="gp-adm-cad-edit-field" style="display:block;margin:0 0 8px">' +
+        '<span style="font-size:11px;font-weight:800;color:var(--txt2)">' + esc(f.label) + (req ? ' *' : '') + '</span>' +
+        '<input class="form-input" data-cad-key="' + esc(f.key) + '" value="' + esc(v) + '" style="width:100%;margin-top:3px"></label>';
+    }).join('');
+    let box = document.getElementById('gp-adm-cad-edit-box');
+    if (!box) {
+      box = document.createElement('div');
+      box.id = 'gp-adm-cad-edit-box';
+      box.className = 'gp-adm-aside-block';
+      box.style.marginTop = '12px';
+      host.appendChild(box);
+    }
+    box.innerHTML =
+      '<h4>Editar cadastro — ' + esc(c.nome || ('ID ' + opId)) + '</h4>' +
+      '<p class="gp-adm-aside-hint">Salva na planilha RH (admin). Julia também pode editar em Colaboradores → Meus dados.</p>' +
+      formHtml +
+      '<div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">' +
+      '<button type="button" class="btn btn-primary" style="padding:8px 14px;font-size:13px" onclick="mkGpAdmSalvarCadastro_(' + Number(opId) + ')">Salvar cadastro</button>' +
+      '<button type="button" class="btn btn-secondary" style="padding:8px 14px;font-size:13px" onclick="document.getElementById(\'gp-adm-cad-edit-box\').remove()">Cancelar</button>' +
+      '</div>';
+    box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  };
+
+  window.mkGpAdmSalvarCadastro_ = async function (opId) {
+    const box = document.getElementById('gp-adm-cad-edit-box');
+    if (!box) return;
+    const payload = { operadorId: opId, salvarParcial: 'sim' };
+    box.querySelectorAll('[data-cad-key]').forEach(function (inp) {
+      payload[inp.getAttribute('data-cad-key')] = String(inp.value || '').trim();
+    });
+    if (!String(payload.nomeCompleto || '').trim()) {
+      if (typeof toast === 'function') toast('Nome completo é obrigatório', 'warning');
+      return;
+    }
+    try {
+      const d = await api(Object.assign({ action: 'salvarCadastroRhAdmin' }, payload, gpAdmPinParams_()), 45000);
+      if (!d || !d.ok) {
+        if (typeof toast === 'function') toast((d && d.erro) || 'Erro ao salvar cadastro', 'error');
+        return;
+      }
+      if (typeof toast === 'function') toast('Cadastro RH atualizado', 'success');
+      box.remove();
+      try { sessionStorage.removeItem(gpAdmCacheKey_()); } catch (e) { /* ignore */ }
+      await window.mkGpAdmLoad_({ force: true });
+    } catch (e) {
+      if (typeof toast === 'function') toast((e && e.message) || 'Erro de conexão', 'error');
+    }
+  };
 
   function gpAdmRenderFichaBar_() {
     const el = document.getElementById('gp-adm-ficha-badges');
@@ -670,15 +733,16 @@
 
   function gpAdmFillComPublicoSelect_() {
     const sel = document.getElementById('gp-com-publico');
-    if (!sel || sel.dataset.gpFilled === '1') return;
+    if (!sel) return;
+    const cur = String(sel.value || 'TODOS');
     const cols = (gpAdmData_ && gpAdmData_.colaboradores) || [];
-    cols.filter(function (c) { return c.temRh !== false; }).forEach(function (c) {
-      const opt = document.createElement('option');
-      opt.value = String(c.id);
-      opt.textContent = String(c.nome || '') + ' (ID ' + c.id + ')';
-      sel.appendChild(opt);
-    });
-    sel.dataset.gpFilled = '1';
+    sel.innerHTML = '<option value="TODOS">TODOS</option>' + cols.filter(function (c) {
+      return c.temRh !== false;
+    }).map(function (c) {
+      return '<option value="' + c.id + '">' + esc(c.nome || '') + ' (ID ' + c.id + ')</option>';
+    }).join('');
+    sel.value = cur;
+    if (!sel.value) sel.value = 'TODOS';
   }
 
   function gpAdmNotaStars_(n) {
@@ -792,7 +856,11 @@
       const cls = urg ? ' gp-adm-com-row--urgente' : '';
       const badge = urg ? '<span class="gp-adm-badge warn">Urgente</span>' : '<span class="gp-adm-badge ok">Aviso</span>';
       const ativo = c.ativo !== false ? '<span class="gp-adm-badge ok">Ativo</span>' : '<span class="gp-adm-badge gray">Inativo</span>';
-      const meta = [c.data, c.publico ? ('Público: ' + c.publico) : '', c.validoAte ? ('até ' + c.validoAte) : ''].filter(Boolean).join(' · ');
+      const pubRaw = String(c.publico || 'TODOS').trim();
+      const pubLabel = (!pubRaw || pubRaw.toUpperCase() === 'TODOS')
+        ? 'TODOS'
+        : (gpAdmNomeById_(pubRaw) + ' (ID ' + pubRaw + ')');
+      const meta = [c.data, 'Público: ' + pubLabel, c.validoAte ? ('até ' + c.validoAte) : ''].filter(Boolean).join(' · ');
       return '<div class="gp-adm-com-row' + cls + '">' +
         '<div class="gp-adm-com-row-head">' + badge + ativo + '<span class="gp-adm-soft-title">' + esc(c.titulo || 'Comunicado') + '</span></div>' +
         '<p class="gp-adm-muted" style="margin:0 0 6px">' + esc(c.mensagem || '') + '</p>' +
@@ -1010,16 +1078,33 @@
   }
 
   function gpAdmLoadPainelBackground_(seq, compReq, opts) {
-    const apiPayload = Object.assign({ action: 'painelGestaoPessoasAdmin', _t: Date.now() }, gpAdmPinParams_());
-    if (compReq) apiPayload.competencia = compReq;
     (async function () {
       try {
-        const d = await api(apiPayload, 60000);
+        // I120: lite primeiro (sem jornada/holerite) → UI rápida; full em seguida
+        const litePayload = Object.assign({
+          action: 'painelGestaoPessoasAdmin', lite: '1', _t: Date.now()
+        }, gpAdmPinParams_());
+        if (compReq) litePayload.competencia = compReq;
+        const lite = await api(litePayload, 45000);
+        if (seq !== gpAdmLoadSeq_) return;
+        if (lite && lite.ok) {
+          lite._partial = true;
+          gpAdmData_ = lite;
+          gpAdmCompSel_ = lite.competencia || compReq || gpAdmCompSel_;
+          if (typeof applySessaoAtivaFromApi_ === 'function') applySessaoAtivaFromApi_(lite);
+          gpAdmRender_();
+          gpAdmSetErr_('');
+        }
+        const apiPayload = Object.assign({ action: 'painelGestaoPessoasAdmin', _t: Date.now() }, gpAdmPinParams_());
+        if (compReq) apiPayload.competencia = compReq;
+        const d = await api(apiPayload, 90000);
         if (seq !== gpAdmLoadSeq_) return;
         if (!d.ok) {
-          const errTxt = esc(d.erro || 'Erro painel RH');
-          gpAdmSetErr_('<strong>Painel RH:</strong> ' + errTxt + ' · Republicar GAS <strong>v1.5.179</strong> (Nova versão Web).');
-          if (typeof toast === 'function') toast(d.erro || 'Painel RH indisponível', 'error');
+          if (!(lite && lite.ok)) {
+            const errTxt = esc(d.erro || 'Erro painel RH');
+            gpAdmSetErr_('<strong>Painel RH:</strong> ' + errTxt + ' · Republicar GAS <strong>v1.5.198</strong> (Nova versão Web).');
+            if (typeof toast === 'function') toast(d.erro || 'Painel RH indisponível', 'error');
+          }
           return;
         }
         delete d._partial;
