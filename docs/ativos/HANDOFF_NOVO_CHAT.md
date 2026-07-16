@@ -1,10 +1,10 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 16/07/2026 · FE **v1.9.64** (I122) · GAS repo **v1.5.201** · Web ping **v1.5.200** até Nova versão 201  
+**Atualizado:** 16/07/2026 · FE **v1.9.65** (I123) · GAS repo **v1.5.201** · Web ping **v1.5.200** até Nova versão 201  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **GAS canônico (raw):** https://raw.githubusercontent.com/ribocg-a11y/movikids/main/MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs  
-**GitHub:** `ribocg-a11y/movikids` · branch `main` · I122: sync celular / anti locação fantasma
+**GitHub:** `ribocg-a11y/movikids` · branch `main` · I123: gráfico Dashboard Base × Ritmo × Real
 
 **Mensagem mínima no novo chat:**
 
@@ -59,9 +59,9 @@ cursor "C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-mo
 
 | Camada | Versão | URL / evidência |
 |--------|--------|-----------------|
-| **Frontend** | **v1.9.64** | https://ribocg-a11y.github.io/movikids/?force=1.9.64 |
-| **Gestão Pessoas** | **v1.9.64** | `gestao-pessoas.html?force=1.9.64` |
-| **Service Worker** | **1.9.64** | `sw.js` |
+| **Frontend** | **v1.9.65** | https://ribocg-a11y.github.io/movikids/?force=1.9.65 |
+| **Gestão Pessoas** | **v1.9.65** | `gestao-pessoas.html?force=1.9.65` |
+| **Service Worker** | **1.9.65** | `sw.js` |
 | **Apps Script** | repo **v1.5.201** · Web **v1.5.200** ⏳ | Colar `.gs` + **Nova versão** → I122 (carregarInicio cache / anti-fantasma) |
 | **Baseline P0** | ✅ | `docs/ativos/BASELINE_CODIGO_P0.md` |
 | **PIN admin** | **1421** | Script Property `ADMIN_PIN` |
@@ -78,6 +78,7 @@ cursor "C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-mo
 | **I104 conferência POS** | ✅ v1.9.46 | Caixa: contas no cartão (não locações) vs vendas maquininha |
 | **I106 POS gate** | ✅ v1.9.47 | Painel bruto POS + trava comprovante na Nova + cancel sem placeholder |
 | **I117 caixa pay-first** | ✅ Web+FE | Ativa/Pendente entram em `resumoDia` — bater POS com brincando |
+| **I123 gráfico Base×Ritmo×Real** | ✅ FE v1.9.65 | Dashboard: base travada · ritmo atual · real (DNA admin) |
 
 **Deploy ID GAS:** `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y`
 
@@ -129,6 +130,7 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 | **0** | **I117** caixa pay-first — GAS **v1.5.198** Web ✅ · FE **v1.9.62** | Sócio+Agente | ✅ **15/07** |
 | **0a** | **I116** GAS **v1.5.196** Web ✅ — validado 15/07 (ping 196 · GP OK · Ray warm ~4s) | Sócio+Agente | ✅ **15/07** |
 | **0b** | **I122** GAS **v1.5.201** + FE **v1.9.64** — colar Nova versão · limpar site data tablet se fantasma persistir | Sócio+Agente | ⏳ **16/07** |
+| **0b2** | **I123** gráfico Base × Ritmo × Real — FE **v1.9.65** (só Dashboard; P0 zero) | Agente | ✅ **16/07** |
 | **0c** | Frios Colab residual (AUD/tail full) — lite já slim; não regredir P0 | Agente | 📋 backlog |
 | 1 | **Sprint D1** homolog PC admin v1.9.2 | Agente | ✅ **27/06** |
 | 1b | **I69** hotfix ponto mock → **v1.9.3** | Agente | ✅ **29/06** Pages |
