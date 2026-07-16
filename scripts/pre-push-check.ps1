@@ -492,6 +492,25 @@ try {
       Add-Check "guard.i121.fe.sync" "ok" "Meta/graficos sync com Centro de comando"
     }
   }
+  # I122 — carregarInicio nao busta cache por _t; FE timeout > 25s
+  if ($gasRaw -match 'function carregarInicio_\([\s\S]{0,700}const bust = String\(\(p && p\._t\)') {
+    Add-Check "guard.i122.inicio.cache" "fail" "carregarInicio_ ainda bustar cache por _t (I122)"
+  } elseif ($gasRaw -notmatch 'inicio_v4_') {
+    Add-Check "guard.i122.inicio.cache" "fail" "inicio_v4_ ausente (I122)"
+  } else {
+    Add-Check "guard.i122.inicio.cache" "ok" "carregarInicio cache ignora _t"
+  }
+  $syncPath = Join-Path $root "mk-sync.js"
+  if (Test-Path $syncPath) {
+    $syncRaw = Get-Content -Path $syncPath -Raw -Encoding UTF8
+    if ($syncRaw -notmatch 'MK_INICIO_API_TIMEOUT_MS') {
+      Add-Check "guard.i122.fe.timeout" "fail" "MK_INICIO_API_TIMEOUT_MS ausente (I122)"
+    } elseif ($syncRaw -notmatch 'mkInicioCacheFresh_') {
+      Add-Check "guard.i122.fe.timeout" "fail" "mkInicioCacheFresh_ ausente (I122)"
+    } else {
+      Add-Check "guard.i122.fe.timeout" "ok" "sync timeout 55s + sem cache fantasma"
+    }
+  }
 
   $authPath = Join-Path $root "mk-auth.js"
   if (Test-Path $authPath) {

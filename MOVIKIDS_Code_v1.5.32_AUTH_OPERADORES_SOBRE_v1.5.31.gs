@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.200
+// MOVI KIDS — Google Apps Script v1.5.201
+// v1.5.201: I122 — carregarInicio cache ignora _t (só force=1); evita timeout 25s → loc fantasma no celular
 // v1.5.200: I121 — kpiMes/leading paridade I117 (Ativa/Pendente); invalidate cache kpi+comando em escritas
 // v1.5.199: I120b — comando cache ignora _t (só force=1); lite AUD slim; Julia sync idempotente (sem rewrite)
 // v1.5.198: I120 — perf admin: painel lite + expandRh false; cache comandoOperacional; invalidate v2 comunicados
@@ -192,8 +193,8 @@
 
 // ── CONSTANTES ───────────────────────────────────────────────
 /** Versão exposta em ping, carregarInicio, validarSchema, gestaoPessoasStatus (bump com header). */
-const MK_GAS_VERSAO_  = 'v1.5.200';
-const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.200';
+const MK_GAS_VERSAO_  = 'v1.5.201';
+const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.201';
 const SHEET_ID   = '1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618';
 const DEPLOY_ID  = 'AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y';
 const WEBAPP_URL = `https://script.google.com/macros/s/${DEPLOY_ID}/exec`;
@@ -4511,6 +4512,9 @@ function invalidateInicioResumoCache_(dataFmt) {
     for (let m = 0; m <= 24; m++) {
       cache.remove('inicio_v3_g_m' + m);
       cache.remove('inicio_v3_o_m' + m);
+      // I122
+      cache.remove('inicio_v4_g_m' + m);
+      cache.remove('inicio_v4_o_m' + m);
     }
     // I121: dashboard/comando acompanham escritas (Meta/gráficos ≠ Centro)
     invalidateDashCaches_();
@@ -7629,9 +7633,13 @@ function carregarInicio_(p) {
   const adm      = isAdminRequest_(p || {});
   const gestao   = isSupervisorOrAdminRequest_(p || {});
   const metaOpId = metaOperadorIdFromRequest_(p || {}) || 0;
-  const cacheKey = 'inicio_v3_' + (gestao ? 'g' : 'o') + '_m' + metaOpId;
-  const bust = String((p && p._t) || '').trim();
-  if (!bust) {
+  // I122: FE poll a cada 5s sempre manda _t — NÃO bustar. Escritas já chamam invalidateInicioResumoCache_.
+  // Sem isso: carregarInicio ~25–36s → timeout FE 25s → cache local = locação fantasma no celular/PWA.
+  const cacheKey = 'inicio_v4_' + (gestao ? 'g' : 'o') + '_m' + metaOpId;
+  const forceBust = String((p && p.force) || '') === '1'
+    || String((p && p.nocache) || '').toLowerCase() === '1'
+    || String((p && p.nocache) || '').toLowerCase() === 'true';
+  if (!forceBust) {
     try {
       const hit = CacheService.getScriptCache().get(cacheKey);
       if (hit) return ContentService.createTextOutput(hit).setMimeType(ContentService.MimeType.JSON);
