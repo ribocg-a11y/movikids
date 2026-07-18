@@ -1764,17 +1764,14 @@ function renderExecCockpit_(d) {
     const diffFat = Math.round(fatMes - fatAnt);
     fatCtx += ' · ' + (diffFat >= 0 ? '+' : '') + R2(diffFat);
   }
-  const projFat = Number(d.projecaoFat) || 0;
-  const ritmoCx = mkRitmoRealistaDash_(d);
-  const projShow = ritmoCx.projRealista > 0 ? ritmoCx.projRealista : projFat;
+  // I124: no cockpit só REAL + referência ao ritmo (projeção detalhada = seção 2)
+  const cen = typeof mkDashCenariosMes_ === 'function' ? mkDashCenariosMes_(d) : null;
+  const projShow = cen && cen.ritmoMes > 0 ? cen.ritmoMes : (Number(d.projecaoFat) || 0);
   if (projShow > 0 && fatMes > 0) {
     const pctProj = Math.round(fatMes / projShow * 100);
-    fatCtx += ' · ' + pctProj + '% do projetado realista (' + R2(projShow) + ')';
-    if (projFat > 0 && Math.abs(projFat - projShow) > 50) {
-      fatCtx += ' · ritmo puro ' + R2(projFat);
-    }
+    fatCtx += ' · ' + pctProj + '% do ritmo projetado (' + R2(projShow) + ')';
   } else if (projShow > 0) {
-    fatCtx += ' · projetado ' + R2(projShow);
+    fatCtx += ' · ritmo projetado ' + R2(projShow);
   }
   setCockpitCtx_('mk-exec-fat-d', fatCtx, deltaFat > 0 ? 'up' : deltaFat < 0 ? 'down' : null);
 
@@ -1790,12 +1787,8 @@ function renderExecCockpit_(d) {
   const resD = document.getElementById('mk-exec-res-d');
   if (resD) {
     let resCtx = (d.nMes || 0) + ' locações · margem ' + margem + '%';
-    const ritmoRes = mkRitmoRealistaDash_(d);
-    if (ritmoRes.mediaAtual > 0) {
-      resCtx += ' · ritmo ' + R2(ritmoRes.mediaAtual) + '/dia';
-    }
-    if (ritmoRes.mediaHist > 0) {
-      resCtx += ' · âncora ' + R2(ritmoRes.mediaHist) + '/dia';
+    if (cen && cen.ritmoDiaria > 0) {
+      resCtx += ' · média ' + R2(cen.ritmoDiaria) + '/dia';
     }
     const trendRes = margem >= 18 ? 'up' : margem < 10 ? 'down' : null;
     setCockpitCtx_('mk-exec-res-d', resCtx, trendRes);
@@ -2813,7 +2806,7 @@ function renderDecisaoPanel_(d) {
     const projSem = v.projecaoResSemFolha != null ? v.projecaoResSemFolha : projRes;
     const margProjSem = v.margemProjSemFolha != null ? v.margemProjSemFolha : margemProjSem;
     setDecisaoCell_('mk-dec-proj-sem', projSem, margProjSem,
-      'Fat. projetado ' + R2(v.projecaoFat || projFat));
+      'Fat. no ritmo ' + R2(v.projecaoFat || projFat));
 
     setDecisaoCell_('mk-dec-proj-folha', v.projecaoResComFolha, v.margemProjComFolha,
       'Folha integral ' + R2(v.folhaMensal) + '/mês');
@@ -2823,7 +2816,7 @@ function renderDecisaoPanel_(d) {
       if (el) el.textContent = 'Configure aba FOLHA + GAS v1.5.81';
     });
     setDecisaoCell_('mk-dec-proj-sem', projRes, margemProjSem,
-      'Fat. projetado ' + R2(projFat));
+      'Fat. no ritmo ' + R2(projFat));
   }
 
   const mediaLocDia = (diasOp > 0 && d.nMes > 0)
@@ -2838,10 +2831,10 @@ function renderDecisaoPanel_(d) {
 
   const base = document.getElementById('mk-decisao-base');
   if (base) {
-    base.textContent = 'Mesma base por linha: até hoje usa fat/custos/CTO reais'
-      + (folhaOk ? ' e folha proporcional (' + diasOp + '/' + diasMes + ' dias)' : '')
-      + '; projeção extrapola o ritmo dos dias com movimento'
-      + (folhaOk ? ' e desconta a folha mensal integral.' : '.');
+    base.textContent = 'Linha 1 = realizado até hoje'
+      + (folhaOk ? ' (folha proporcional ' + diasOp + '/' + diasMes + ' dias)' : '')
+      + '. Linha 2 = mesma projeção da seção 2 (ritmo atual)'
+      + (folhaOk ? ', com folha mensal integral na coluna da direita.' : '.');
   }
 
   const foot = document.getElementById('mk-decisao-foot');
@@ -2955,23 +2948,40 @@ function renderContratacaoPanel_(d) {
   }
 }
 
-function calcPrevisaoMes7d_(d) {
+/**
+ * I124 — fonte única dos cenários de faturamento do Dashboard.
+ * Hero = ritmo atual. Base e 7d são cenários laterais (mesma unidade: R$ fim de mês).
+ * Resultado projetado = só sobre o ritmo (não mistura com 7d nem GAS paralelo).
+ */
+function mkDashCenariosMes_(d) {
+  d = d || {};
   const fatMes = Number(d.fatMes) || 0;
-  const cusMes = Number(d.cusMes) || 0;
   const resultado = Number(d.resultado) || 0;
   const diasOp = Number(d.diasOperando) || 0;
-  const diasMes = Number(d.diasMes) || new Date(d.anoAtual || new Date().getFullYear(), d.mesAtual || 1, 0).getDate();
+  const diasMes = Number(d.diasMes)
+    || new Date(d.anoAtual || new Date().getFullYear(), d.mesAtual || 1, 0).getDate();
   const hoje = new Date();
-  const isCorrente = d.mesAtual === hoje.getMonth() + 1 && d.anoAtual === hoje.getFullYear();
+  const isCorrente = Number(d.mesAtual) === hoje.getMonth() + 1
+    && Number(d.anoAtual) === hoje.getFullYear();
+  const diaCal = isCorrente ? hoje.getDate() : diasMes;
+  const diasRest = isCorrente ? Math.max(0, diasMes - diaCal) : 0;
+
+  const base = typeof mkBaseSustentacaoMes_ === 'function'
+    ? mkBaseSustentacaoMes_(d)
+    : { diaria: 0, mes: 0, ref: '' };
+  const ritmo = typeof mkRitmoAlcancavelMes_ === 'function'
+    ? mkRitmoAlcancavelMes_(d)
+    : { diaria: diasOp > 0 ? fatMes / diasOp : 0, mes: Number(d.projecaoFat) || 0 };
+
   const fatPorDia = d.fatPorDia || [];
   const fatMap = {};
-  fatPorDia.forEach(function(x) {
+  fatPorDia.forEach(function (x) {
     const dia = Number(x.dia) || 0;
     if (dia > 0) fatMap[dia] = Number(x.valor) || 0;
   });
   const diaRef = isCorrente
     ? hoje.getDate()
-    : Object.keys(fatMap).reduce(function(m, k) { return Math.max(m, Number(k)); }, 0);
+    : Object.keys(fatMap).reduce(function (m, k) { return Math.max(m, Number(k)); }, 0);
   let sum7 = 0;
   let count7 = 0;
   for (let i = 0; i < 7; i++) {
@@ -2980,26 +2990,60 @@ function calcPrevisaoMes7d_(d) {
     sum7 += fatMap[dd] || 0;
     count7++;
   }
-  const media7 = count7 > 0 ? sum7 / count7 : 0;
-  const diasRest = isCorrente ? Math.max(0, diasMes - diaRef) : 0;
-  const previsaoFat = isCorrente
+  const media7 = count7 > 0 ? Math.round(sum7 / count7 * 100) / 100 : 0;
+  const cen7Mes = isCorrente
     ? Math.round((fatMes + media7 * diasRest) * 100) / 100
     : Math.round(fatMes * 100) / 100;
-  const margemOp = fatMes > 0 ? resultado / fatMes : 0;
-  const previsaoRes = Math.round(previsaoFat * margemOp * 100) / 100;
+
+  const ritmoDiaria = Number(ritmo.diaria) || 0;
+  const ritmoMes = Number(ritmo.mes) || (ritmoDiaria > 0
+    ? Math.round(ritmoDiaria * diasMes * 100) / 100
+    : 0);
+  const baseDiaria = Number(base.diaria) || 0;
+  const baseMes = Number(base.mes) || (baseDiaria > 0
+    ? Math.round(baseDiaria * diasMes * 100) / 100
+    : 0);
+
+  const margem = fatMes > 0 ? resultado / fatMes : 0;
+  const resProjetado = Math.round(ritmoMes * margem * 100) / 100;
+
   return {
-    previsaoFat: previsaoFat,
-    previsaoRes: previsaoRes,
-    media7: Math.round(media7 * 100) / 100,
-    diasRest: diasRest,
-    count7: count7,
     fatMes: fatMes,
-    cusMes: cusMes,
-    isCorrente: isCorrente,
-    projGas: Number(d.projecaoFat) || 0,
-    projResGas: Number(d.projecaoRes) || 0,
-    mediaDiaria: Number(d.mediaDiaria) || (diasOp > 0 ? fatMes / diasOp : 0),
-    diasOp: diasOp
+    resultado: resultado,
+    margem: margem,
+    baseDiaria: baseDiaria,
+    baseMes: baseMes,
+    baseRef: (base && base.ref) || '',
+    ritmoDiaria: ritmoDiaria,
+    ritmoMes: ritmoMes,
+    media7: media7,
+    count7: count7,
+    cen7Mes: cen7Mes,
+    resProjetado: resProjetado,
+    diasOp: diasOp,
+    diasMes: diasMes,
+    diasRest: diasRest,
+    isCorrente: isCorrente
+  };
+}
+window.mkDashCenariosMes_ = mkDashCenariosMes_;
+
+/** @deprecated I124 — use mkDashCenariosMes_; mantido p/ compat. */
+function calcPrevisaoMes7d_(d) {
+  const c = mkDashCenariosMes_(d);
+  return {
+    previsaoFat: c.ritmoMes,
+    previsaoRes: c.resProjetado,
+    media7: c.media7,
+    diasRest: c.diasRest,
+    count7: c.count7,
+    fatMes: c.fatMes,
+    cusMes: Number(d.cusMes) || 0,
+    isCorrente: c.isCorrente,
+    projGas: c.ritmoMes,
+    projResGas: c.resProjetado,
+    mediaDiaria: c.ritmoDiaria,
+    diasOp: c.diasOp
   };
 }
 
@@ -3012,56 +3056,63 @@ function mkPrevSetCtx_(id, text, trend) {
   else if (trend === 'down') el.classList.add('trend-down');
 }
 
-/** FASE 18 UI-B1/B2 — previsão fim de mês + comparativo 30d (FE, kpiMes + comando). */
+/** I124 — previsão unificada: hero = ritmo · cenários Base / Ritmo / 7d · 1 resultado. */
 function renderPrevisaoMes_(d) {
   const box = document.getElementById('mk-previsao-mes');
   if (!box || !d) return;
   box.style.display = '';
 
-  const p = calcPrevisaoMes7d_(d);
-  const comp30 = (commandCenterData && commandCenterData.comparativo30d) || {};
-  const media30 = Number(comp30.media) || 0;
+  const c = mkDashCenariosMes_(d);
 
-  setText2('mk-prev-fat', R2(p.previsaoFat));
-  const fatCtx = p.isCorrente
-    ? ('Média 7d ' + R2(p.media7) + '/dia · ' + p.diasRest + ' dia(s) restante(s)')
-    : ('Mês fechado · real ' + R2(p.fatMes));
+  setText2('mk-prev-fat', R2(c.ritmoMes));
+  const fatCtx = c.isCorrente
+    ? (R2(c.ritmoDiaria) + '/dia × ' + c.diasMes + ' dias · já ' + R2(c.fatMes)
+      + ' · faltam ' + c.diasRest + ' dia(s)')
+    : ('Mês fechado · real ' + R2(c.fatMes));
   mkPrevSetCtx_('mk-prev-fat-ctx', fatCtx, null);
+
+  setText2('mk-prev-base', R2(c.baseMes));
+  mkPrevSetCtx_('mk-prev-base-ctx',
+    c.baseDiaria > 0
+      ? (R2(c.baseDiaria) + '/dia' + (c.baseRef ? ' · ' + c.baseRef : '') + ' · travada')
+      : 'Sem âncora ainda',
+    null);
+
+  setText2('mk-prev-ritmo', R2(c.ritmoMes));
+  mkPrevSetCtx_('mk-prev-ritmo-ctx',
+    c.diasOp + ' dias com movimento · ' + R2(c.ritmoDiaria) + '/dia',
+    null);
+
+  setText2('mk-prev-7d', R2(c.cen7Mes));
+  mkPrevSetCtx_('mk-prev-7d-ctx',
+    c.count7 > 0
+      ? ('Média ' + R2(c.media7) + '/dia nos últimos ' + c.count7 + 'd')
+      : 'Sem amostra 7d',
+    null);
+
+  // legado oculto: mesmo valor do ritmo (evita “número fantasma” paralelo)
+  setText2('mk-prev-gas', R2(c.ritmoMes));
+  mkPrevSetCtx_('mk-prev-gas-ctx', 'alias ritmo', null);
 
   const resEl = document.getElementById('mk-prev-res');
   if (resEl) {
-    resEl.textContent = R2(p.previsaoRes);
-    resEl.className = 'mk-widget-val ' + (p.previsaoRes >= 0 ? 'green' : '');
-    if (p.previsaoRes < 0) resEl.style.color = '#C62828';
+    resEl.textContent = R2(c.resProjetado);
+    resEl.className = 'mk-widget-val ' + (c.resProjetado >= 0 ? 'green' : '');
+    if (c.resProjetado < 0) resEl.style.color = '#C62828';
     else resEl.style.color = '';
   }
-  mkPrevSetCtx_('mk-prev-res-ctx', p.isCorrente
-    ? ('Margem operacional atual · GAS proj. ' + R2(p.projResGas))
-    : ('Resultado real do mês'), p.previsaoRes >= 0 ? 'up' : 'down');
-
-  setText2('mk-prev-gas', R2(p.projGas));
-  mkPrevSetCtx_('mk-prev-gas-ctx', p.diasOp + ' dias com movimento · ritmo dias operando', null);
-
-  const mediaDia = Number(p.mediaDiaria) || 0;
-  if (media30 > 0) {
-    const diffPct = Math.round((mediaDia - media30) / media30 * 1000) / 10;
-    const sign = diffPct > 0 ? '+' : '';
-    setText2('mk-prev-cmp-fat', sign + diffPct + '%');
-    mkPrevSetCtx_('mk-prev-cmp-fat-ctx', R2(mediaDia) + '/dia vs média 30d ' + R2(media30),
-      diffPct > 2 ? 'up' : diffPct < -2 ? 'down' : null);
-  } else {
-    setText2('mk-prev-cmp-fat', R2(mediaDia) + '/dia');
-    mkPrevSetCtx_('mk-prev-cmp-fat-ctx', 'Média diária do mês selecionado', null);
-  }
-
-  const cusPct = p.fatMes > 0 ? Math.round(p.cusMes / p.fatMes * 1000) / 10 : 0;
-  setText2('mk-prev-cmp-cus', cusPct + '%');
-  const cusDia = p.diasOp > 0 ? p.cusMes / p.diasOp : 0;
-  const cusTrend = cusPct > 35 ? 'down' : cusPct < 20 && p.fatMes > 0 ? 'up' : null;
-  mkPrevSetCtx_('mk-prev-cmp-cus-ctx', R2(p.cusMes) + ' no mês · ~' + R2(cusDia) + '/dia operando', cusTrend);
+  const margemPct = Math.round(c.margem * 1000) / 10;
+  mkPrevSetCtx_('mk-prev-res-ctx', c.isCorrente
+    ? ('Margem de hoje ' + margemPct + '% · aplicada só ao ritmo ' + R2(c.ritmoMes))
+    : ('Resultado real do mês'),
+    c.resProjetado >= 0 ? 'up' : 'down');
 
   const badge = document.getElementById('mk-prev-badge');
-  if (badge) badge.textContent = p.isCorrente ? ('7d · ' + p.count7 + ' dias') : 'Fechado';
+  if (badge) {
+    badge.textContent = c.isCorrente
+      ? (c.diasOp + 'd op · ' + c.diasRest + ' rest.')
+      : 'Fechado';
+  }
 }
 
 function renderDashboardCore_(d) {
@@ -3557,28 +3608,26 @@ function renderChartsBody_(d) {
     badgeEl.className = 'f5-badge ' + (diff > 0 ? 'up' : diff < 0 ? 'dn' : 'eq');
   } else if (badgeEl) { badgeEl.textContent = ''; badgeEl.title = ''; }
 
-  // Projeção do mês — I107 âncora realista
-  const ritmoP = mkRitmoRealistaDash_(d);
-  setText2('nk-dias-op',  (d.diasOperando || 0) + ' dias');
-  if (ritmoP.mediaHist > 0) {
-    setText2('nk-med-dia', R2(ritmoP.mediaAtual) + '/dia agora · âncora ' + R2(ritmoP.mediaHist));
+  // I124: ids ocultos espelham seção 2 (ritmo) — sem 2ª “projeção realista” na UI
+  const cenCharts = typeof mkDashCenariosMes_ === 'function' ? mkDashCenariosMes_(d) : null;
+  setText2('nk-dias-op', (d.diasOperando || 0) + ' dias');
+  if (cenCharts) {
+    setText2('nk-med-dia', R2(cenCharts.ritmoDiaria) + '/dia');
+    setText2('nk-proj-fat', R2(cenCharts.ritmoMes));
+    const projResEl = document.getElementById('nk-proj-res');
+    if (projResEl) {
+      projResEl.textContent = R2(cenCharts.resProjetado);
+      projResEl.className = 'f5-val ' + (cenCharts.resProjetado >= 0 ? 'green' : 'red');
+    }
   } else {
     setText2('nk-med-dia', R2(d.mediaDiaria || 0) + '/dia');
-  }
-  setText2('nk-proj-fat', R2(ritmoP.projRealista || d.projecaoFat || 0));
-  const projFatLbl = document.querySelector('#nk-proj-fat') && document.querySelector('#nk-proj-fat').previousElementSibling;
-  // subtitle via title on value
-  const projFatEl = document.getElementById('nk-proj-fat');
-  if (projFatEl) {
-    projFatEl.title = ritmoP.projHot > 0 && Math.abs(ritmoP.projHot - ritmoP.projRealista) > 50
-      ? ('Ritmo só deste mês → ' + R2(ritmoP.projHot) + '. Card usa âncora realista (meses cheios' + (ritmoP.refHist ? ': ' + ritmoP.refHist : '') + ').')
-      : 'Projeção com âncora de meses cheios';
-  }
-  const projResEl = document.getElementById('nk-proj-res');
-  if (projResEl) {
-    const pr = ritmoP.projResRealista != null ? ritmoP.projResRealista : (d.projecaoRes || 0);
-    projResEl.textContent = R2(pr);
-    projResEl.className = 'f5-val ' + (pr >= 0 ? 'green' : 'red');
+    setText2('nk-proj-fat', R2(d.projecaoFat || 0));
+    const projResEl = document.getElementById('nk-proj-res');
+    if (projResEl) {
+      const pr = Number(d.projecaoRes) || 0;
+      projResEl.textContent = R2(pr);
+      projResEl.className = 'f5-val ' + (pr >= 0 ? 'green' : 'red');
+    }
   }
 }
 // ── CAIXA DO DIA ─────────────────────────────────────────────────────────
