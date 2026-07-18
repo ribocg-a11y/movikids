@@ -1905,9 +1905,9 @@
   }
 }
 
-/* FASE 18 UI-B1 — previsão fim de mês */
+/* I124 — previsão fim de mês (hero ritmo + 3 cenários) */
 .mk-previsao-mes {
-  margin-top: 14px;
+  margin-top: 0;
   padding: 14px 16px 16px;
 }
 .mk-previsao-head {
@@ -1930,13 +1930,79 @@
   font-weight: 800;
   padding: 4px 10px;
   border-radius: 999px;
-  background: rgba(255, 213, 79, 0.35);
-  color: #5D4037;
+  background: rgba(41, 182, 246, 0.18);
+  color: #1565C0;
   letter-spacing: 0.03em;
   text-transform: uppercase;
 }
+.mk-previsao-hero {
+  margin-bottom: 4px;
+}
+.mk-cenarios-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 14px 0 12px;
+}
+.mk-cenario {
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(21, 101, 192, 0.12);
+  border-radius: 14px;
+  padding: 12px 12px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+.mk-cenario-ativo {
+  border-color: rgba(41, 182, 246, 0.55);
+  box-shadow: 0 0 0 1px rgba(41, 182, 246, 0.25);
+  background: rgba(41, 182, 246, 0.08);
+}
+.mk-cenario-tag {
+  font-family: 'Nunito', sans-serif;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.mk-cenario-tag-base { color: #E65100; }
+.mk-cenario-tag-ritmo { color: #1565C0; }
+.mk-cenario-tag-7d { color: #5D4037; }
+.mk-cenario-val {
+  font-family: 'Nunito', sans-serif;
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--txt, #1a1a1a);
+  line-height: 1.15;
+  word-break: break-word;
+}
+.mk-cenario-ativo .mk-cenario-val { color: #1565C0; }
+.mk-cenario-ctx {
+  font-family: 'Nunito', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--txt3, #888);
+  line-height: 1.35;
+}
+.mk-prev-resultado {
+  margin-top: 4px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: rgba(46, 125, 50, 0.06);
+  border-left: 3px solid #2E7D32;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.mk-prev-resultado .mk-widget-val {
+  font-size: 22px;
+}
 .mk-previsao-grid {
   margin-top: 12px;
+}
+@media (max-width: 720px) {
+  .mk-cenarios-row { grid-template-columns: 1fr; }
 }
 @media (max-width: 900px) {
   .mk-previsao-grid { grid-template-columns: repeat(2, 1fr); }

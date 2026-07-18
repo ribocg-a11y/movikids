@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Movi Kids">
 <title>Movi Kids</title>
-<script src="mk-canonical-host.js?v=1.9.65"></script>
+<script src="mk-canonical-host.js?v=1.9.66"></script>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png">
@@ -17,17 +17,17 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<script src="mk-stale-sync.js?v=1.9.65"></script>
-<script src="mk-version.js?v=1.9.65"></script>
-<script src="mk-api.js?v=1.9.65"></script>
-<link rel="stylesheet" href="mk-design.css?v=1.9.65">
+<script src="mk-stale-sync.js?v=1.9.66"></script>
+<script src="mk-version.js?v=1.9.66"></script>
+<script src="mk-api.js?v=1.9.66"></script>
+<link rel="stylesheet" href="mk-design.css?v=1.9.66">
 
-<script src="mk-cache-bust.js?v=1.9.65"></script>
+<script src="mk-cache-bust.js?v=1.9.66"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<link rel="stylesheet" href="mk-app.css?v=1.9.65">
-<link rel="stylesheet" href="mk-gestao-pessoas.css?v=1.9.65">
+<link rel="stylesheet" href="mk-app.css?v=1.9.66">
+<link rel="stylesheet" href="mk-gestao-pessoas.css?v=1.9.66">
 <!-- Firebase SDK — Realtime sync canonico para todos os dispositivos -->
-<script type="module" src="mk-firebase.js?v=1.9.65"></script>
+<script type="module" src="mk-firebase.js?v=1.9.66"></script>
 </head>
 
 <body>
@@ -1298,13 +1298,13 @@
       </div>
     </section>
 
-    <!-- 1 · COMEÇO — panorama do mês -->
+    <!-- 1 · REALIZADO — só fatos até hoje -->
     <section class="mk-dash-chapter" id="mk-chapter-inicio" aria-labelledby="mk-chapter-inicio-h">
       <header class="mk-dash-chapter-head">
         <span class="mk-dash-step" aria-hidden="true">1</span>
         <div>
-          <h2 class="mk-dash-chapter-title" id="mk-chapter-inicio-h">Como está o negócio este mês?</h2>
-          <p class="mk-dash-chapter-lead">Comece aqui: faturamento, lucro <strong>sem folha</strong> e saúde geral (margem, payback, ocupação).</p>
+          <h2 class="mk-dash-chapter-title" id="mk-chapter-inicio-h">Realizado este mês</h2>
+          <p class="mk-dash-chapter-lead">Só o que já aconteceu: faturamento, lucro <strong>sem folha</strong>, margem, payback e ocupação. Projeções ficam na seção 2.</p>
         </div>
       </header>
     <div id="mk-exec-cockpit" class="mk-exec-cockpit" style="display:none" aria-live="polite">
@@ -1371,50 +1371,66 @@
       </div>
       <p class="mk-exec-narrativa" id="mk-exec-narrativa">Carregando leitura do mês…</p>
     </div>
+    </section>
 
-    <!-- FASE 18 — previsão fim de mês (One UI Sprint B) -->
+    <!-- 2 · PROJEÇÃO — um hero + três cenários (mesma unidade: R$ fim de mês) -->
+    <section class="mk-dash-chapter" id="mk-chapter-projecao" aria-labelledby="mk-chapter-projecao-h">
+      <header class="mk-dash-chapter-head">
+        <span class="mk-dash-step" aria-hidden="true">2</span>
+        <div>
+          <h2 class="mk-dash-chapter-title" id="mk-chapter-projecao-h">Previsão de faturamento</h2>
+          <p class="mk-dash-chapter-lead">Um número principal (ritmo atual) e dois cenários ao lado — todos em <strong>R$ no fim do mês</strong>. Resultado projetado usa o mesmo cenário principal.</p>
+        </div>
+      </header>
     <div id="mk-previsao-mes" class="mk-previsao-mes mk-glass-card" style="display:none" aria-labelledby="mk-previsao-mes-h" aria-live="polite">
       <header class="mk-previsao-head">
-        <h3 class="mk-previsao-title" id="mk-previsao-mes-h">Previsão fim de mês</h3>
-        <span class="mk-previsao-badge" id="mk-prev-badge">7 dias</span>
+        <h3 class="mk-previsao-title" id="mk-previsao-mes-h">Cenário principal · ritmo atual</h3>
+        <span class="mk-previsao-badge" id="mk-prev-badge">—</span>
       </header>
       <div class="mk-widget mk-widget--hero mk-previsao-hero">
-        <span class="mk-widget-lbl">Faturamento projetado (7d)</span>
+        <span class="mk-widget-lbl">Faturamento se mantiver o ritmo</span>
         <span class="mk-widget-val blue" id="mk-prev-fat">—</span>
-        <span class="mk-widget-ctx" id="mk-prev-fat-ctx">Últimos 7 dias — complementar à âncora realista</span>
+        <span class="mk-widget-ctx" id="mk-prev-fat-ctx">—</span>
       </div>
-      <div class="mk-cmd-grid mk-previsao-grid">
-        <div class="mk-widget">
-          <span class="mk-widget-lbl">Resultado projetado</span>
-          <span class="mk-widget-val green" id="mk-prev-res">—</span>
-          <span class="mk-widget-ctx" id="mk-prev-res-ctx">—</span>
+      <div class="mk-cenarios-row" role="list" aria-label="Cenários de faturamento no fim do mês">
+        <div class="mk-cenario" role="listitem">
+          <span class="mk-cenario-tag mk-cenario-tag-base">Base</span>
+          <span class="mk-cenario-val" id="mk-prev-base">—</span>
+          <span class="mk-cenario-ctx" id="mk-prev-base-ctx">Piso / âncora do mês</span>
         </div>
-        <div class="mk-widget">
-          <span class="mk-widget-lbl">Ritmo GAS (mês cheio)</span>
-          <span class="mk-widget-val" id="mk-prev-gas">—</span>
-          <span class="mk-widget-ctx" id="mk-prev-gas-ctx">Dias com movimento</span>
+        <div class="mk-cenario mk-cenario-ativo" role="listitem">
+          <span class="mk-cenario-tag mk-cenario-tag-ritmo">Ritmo</span>
+          <span class="mk-cenario-val" id="mk-prev-ritmo">—</span>
+          <span class="mk-cenario-ctx" id="mk-prev-ritmo-ctx">Principal (= hero)</span>
         </div>
-        <div class="mk-widget">
-          <span class="mk-widget-lbl">Fat. vs média 30d</span>
-          <span class="mk-widget-val" id="mk-prev-cmp-fat">—</span>
-          <span class="mk-widget-ctx" id="mk-prev-cmp-fat-ctx">—</span>
+        <div class="mk-cenario" role="listitem">
+          <span class="mk-cenario-tag mk-cenario-tag-7d">Últimos 7d</span>
+          <span class="mk-cenario-val" id="mk-prev-7d">—</span>
+          <span class="mk-cenario-ctx" id="mk-prev-7d-ctx">Se o fim do mês for como a semana</span>
         </div>
-        <div class="mk-widget">
-          <span class="mk-widget-lbl">Custos vs fat. mês</span>
-          <span class="mk-widget-val" id="mk-prev-cmp-cus">—</span>
-          <span class="mk-widget-ctx" id="mk-prev-cmp-cus-ctx">—</span>
-        </div>
+      </div>
+      <!-- ids legados ocultos: scripts antigos / testes não quebram -->
+      <span id="mk-prev-gas" hidden aria-hidden="true">—</span>
+      <span id="mk-prev-gas-ctx" hidden aria-hidden="true"></span>
+      <span id="mk-prev-cmp-fat" hidden aria-hidden="true">—</span>
+      <span id="mk-prev-cmp-fat-ctx" hidden aria-hidden="true"></span>
+      <span id="mk-prev-cmp-cus" hidden aria-hidden="true">—</span>
+      <span id="mk-prev-cmp-cus-ctx" hidden aria-hidden="true"></span>
+      <div class="mk-prev-resultado">
+        <span class="mk-widget-lbl">Resultado operacional projetado</span>
+        <span class="mk-widget-val green" id="mk-prev-res">—</span>
+        <span class="mk-widget-ctx" id="mk-prev-res-ctx">Sobre o ritmo atual · mesma margem de hoje</span>
       </div>
     </div>
     </section>
 
-    <!-- 2 · MEIO — lucro e meta diária -->
+    <!-- 3 · RESULTADO — lucro, meta e folha -->
     <section class="mk-dash-chapter" id="mk-chapter-lucro" aria-labelledby="mk-chapter-lucro-h">
       <header class="mk-dash-chapter-head">
-        <span class="mk-dash-step" aria-hidden="true">2</span>
+        <span class="mk-dash-step" aria-hidden="true">3</span>
         <div>
-          <h2 class="mk-dash-chapter-title" id="mk-chapter-lucro-h">Lucro e meta de locações por dia</h2>
-          <p class="mk-dash-chapter-lead">Mesma base em cada linha: <strong>até hoje</strong> (fat/custos reais + folha proporcional) vs <strong>projeção mês cheio</strong> (ritmo atual + folha integral).</p>
+          <h2 class="mk-dash-chapter-title" id="mk-chapter-lucro-h">Resultado e meta de locações</h2>
+          <p class="mk-dash-chapter-lead"><strong>Até hoje</strong> (real) vs <strong>projeção no ritmo</strong> — sem e com folha. Meta loc/dia = break-even do mês.</p>
         </div>
       </header>
 
@@ -1484,10 +1500,10 @@
     </div>
     </section>
 
-    <!-- 3 · ALERTAS — ação imediata -->
+    <!-- 4 · ALERTAS -->
     <section class="mk-dash-chapter mk-dash-chapter-compact" id="mk-chapter-alertas" aria-labelledby="mk-chapter-alertas-h">
       <header class="mk-dash-chapter-head">
-        <span class="mk-dash-step" aria-hidden="true">3</span>
+        <span class="mk-dash-step" aria-hidden="true">4</span>
         <div>
           <h2 class="mk-dash-chapter-title" id="mk-chapter-alertas-h">O que exige atenção agora</h2>
           <p class="mk-dash-chapter-lead">Alertas automáticos — resolva ou monitore antes de decidir contratar.</p>
@@ -1496,13 +1512,13 @@
     <div id="mk-alert-strip" class="mk-alert-strip" style="display:none" aria-live="polite"></div>
     </section>
 
-    <!-- 4 · DETALHE — composição -->
+    <!-- 5 · DETALHE operacional -->
     <section class="mk-dash-chapter" id="mk-chapter-detalhe" aria-labelledby="mk-chapter-detalhe-h">
       <header class="mk-dash-chapter-head">
-        <span class="mk-dash-step" aria-hidden="true">4</span>
+        <span class="mk-dash-step" aria-hidden="true">5</span>
         <div>
-          <h2 class="mk-dash-chapter-title" id="mk-chapter-detalhe-h">De onde vêm os números</h2>
-          <p class="mk-dash-chapter-lead">Ticket, custos, CTO Golden e indicadores complementares do mês.</p>
+          <h2 class="mk-dash-chapter-title" id="mk-chapter-detalhe-h">Detalhe operacional</h2>
+          <p class="mk-dash-chapter-lead">Ticket, produtividade, break-even, CTO e indicadores complementares — sem nova projeção de faturamento.</p>
         </div>
       </header>
 
@@ -1616,13 +1632,13 @@
     </details>
     </section>
 
-    <!-- 5 · FUNDO — tendência e gráficos -->
+    <!-- 6 · GRÁFICOS -->
     <section class="mk-dash-chapter" id="mk-chapter-tendencia" aria-labelledby="mk-chapter-tendencia-h">
       <header class="mk-dash-chapter-head">
-        <span class="mk-dash-step" aria-hidden="true">5</span>
+        <span class="mk-dash-step" aria-hidden="true">6</span>
         <div>
-          <h2 class="mk-dash-chapter-title" id="mk-chapter-tendencia-h">Tendência, projeção e detalhe</h2>
-          <p class="mk-dash-chapter-lead">Semanas, projeção do mês cheio e gráficos — use depois de entender o panorama (seções 1 e 2).</p>
+          <h2 class="mk-dash-chapter-title" id="mk-chapter-tendencia-h">Gráficos e tendência</h2>
+          <p class="mk-dash-chapter-lead">Visual do mês: semanas, Base × Ritmo × Real (mesmos cenários da seção 2) e detalhe por dia/tipo.</p>
         </div>
       </header>
 
@@ -1645,26 +1661,10 @@
       <div class="mk-semana-foot" id="mk-semana-foot">Passe o mouse ou toque em uma semana para ver a leitura.</div>
     </div>
 
-    <!-- Projeção (Fase 5) -->
+    <!-- Comparativos de período (sem 2ª projeção de faturamento — ver seção 2) -->
     <div class="f5-row" style="grid-template-columns:1fr">
       <div class="f5-card">
-        <div class="f5-title">Projeção do mês</div>
-        <div class="f5-line">
-          <span class="f5-lbl">Dias operando</span>
-          <span class="f5-val" id="nk-dias-op">—</span>
-        </div>
-        <div class="f5-line">
-          <span class="f5-lbl">Média/dia (ritmo · âncora)</span>
-          <span class="f5-val amber" id="nk-med-dia">—</span>
-        </div>
-        <div class="f5-line">
-          <span class="f5-lbl">Fat. projetado (realista)</span>
-          <span class="f5-val blue" id="nk-proj-fat">—</span>
-        </div>
-        <div class="f5-line">
-          <span class="f5-lbl">Resultado projetado (realista)</span>
-          <span class="f5-val" id="nk-proj-res">—</span>
-        </div>
+        <div class="f5-title">Comparativos de período</div>
         <div class="f5-line">
           <span class="f5-lbl">Semana corrida (seg–hoje)</span>
           <span><span class="f5-val blue" id="nk-sem-atual">—</span><span class="f5-badge" id="nk-sem-badge"></span></span>
@@ -1677,6 +1677,11 @@
           <span class="f5-lbl">Mês anterior</span>
           <span class="f5-val" id="nk-mes-ant">—</span>
         </div>
+        <!-- ids legados (projeção unificada na seção 2) -->
+        <span id="nk-dias-op" hidden aria-hidden="true">—</span>
+        <span id="nk-med-dia" hidden aria-hidden="true">—</span>
+        <span id="nk-proj-fat" hidden aria-hidden="true">—</span>
+        <span id="nk-proj-res" hidden aria-hidden="true">—</span>
       </div>
     </div>
 
@@ -2459,27 +2464,27 @@
   </div>
 </div>
 
-<script src="mk-globals.js?v=1.9.65"></script>
-<script src="mk-core.js?v=1.9.65"></script>
-<script src="mk-nav.js?v=1.9.65"></script>
-<script src="mk-admin.js?v=1.9.65"></script>
-<script src="mk-historico.js?v=1.9.65"></script>
-<script src="mk-custos-historico.js?v=1.9.65"></script>
-<script src="mk-sessao.js?v=1.9.65"></script>
-<script src="mk-home.js?v=1.9.65"></script>
-<script src="mk-meta-operador.js?v=1.9.65"></script>
-<script src="mk-custos.js?v=1.9.65"></script>
-<script src="mk-avulso.js?v=1.9.65"></script>
-<script src="mk-sync.js?v=1.9.65"></script>
-<script src="mk-nova.js?v=1.9.65"></script>
-<script src="mk-relacionamento.js?v=1.9.65"></script>
-<script src="mk-operacao.js?v=1.9.65"></script>
-<script src="mk-drawer.js?v=1.9.65"></script>
-<script src="mk-update.js?v=1.9.65"></script>
-<script src="mk-gestao-pessoas.js?v=1.9.65"></script>
-<script src="mk-holerite.js?v=1.9.65"></script>
-<script src="mk-gestao-pessoas-admin.js?v=1.9.65"></script>
-<script src="mk-auth.js?v=1.9.65"></script>
-<script src="mk-boot.js?v=1.9.65"></script>
+<script src="mk-globals.js?v=1.9.66"></script>
+<script src="mk-core.js?v=1.9.66"></script>
+<script src="mk-nav.js?v=1.9.66"></script>
+<script src="mk-admin.js?v=1.9.66"></script>
+<script src="mk-historico.js?v=1.9.66"></script>
+<script src="mk-custos-historico.js?v=1.9.66"></script>
+<script src="mk-sessao.js?v=1.9.66"></script>
+<script src="mk-home.js?v=1.9.66"></script>
+<script src="mk-meta-operador.js?v=1.9.66"></script>
+<script src="mk-custos.js?v=1.9.66"></script>
+<script src="mk-avulso.js?v=1.9.66"></script>
+<script src="mk-sync.js?v=1.9.66"></script>
+<script src="mk-nova.js?v=1.9.66"></script>
+<script src="mk-relacionamento.js?v=1.9.66"></script>
+<script src="mk-operacao.js?v=1.9.66"></script>
+<script src="mk-drawer.js?v=1.9.66"></script>
+<script src="mk-update.js?v=1.9.66"></script>
+<script src="mk-gestao-pessoas.js?v=1.9.66"></script>
+<script src="mk-holerite.js?v=1.9.66"></script>
+<script src="mk-gestao-pessoas-admin.js?v=1.9.66"></script>
+<script src="mk-auth.js?v=1.9.66"></script>
+<script src="mk-boot.js?v=1.9.66"></script>
 </body>
 </html>
