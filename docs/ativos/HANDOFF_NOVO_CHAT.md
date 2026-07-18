@@ -79,6 +79,7 @@ cursor "C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-mo
 | **I106 POS gate** | ✅ v1.9.47 | Painel bruto POS + trava comprovante na Nova + cancel sem placeholder |
 | **I117 caixa pay-first** | ✅ Web+FE | Ativa/Pendente entram em `resumoDia` — bater POS com brincando |
 | **I123 gráfico Base×Ritmo×Real** | ✅ FE v1.9.65 | Dashboard: base travada · ritmo atual · real (DNA admin) |
+| **BANCO_HORAS** | ✅ zerado 18/07 | I44 `repairBancoHorasAdmin` — ops 1–4 em **0h00** (cumprindo horário) |
 | **I124 Dashboard saneado** | ✅ FE v1.9.66 | Capítulos Real / Previsão (ritmo) / Resultado |
 
 **Deploy ID GAS:** `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y`
