@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.202
+// MOVI KIDS — Google Apps Script v1.5.203
+// v1.5.203: I125b — salvar/▶ sem Firebase/format no caminho crítico (FB UrlFetch 2–6s); lock só na planilha
 // v1.5.202: I125 — salvar/▶ rápido: nextId O(1), findContaMestre só dia, invalidate sem dash no path loc, iniciarTimer batch
 // v1.5.201: I122 — carregarInicio cache ignora _t (só force=1); evita timeout 25s → loc fantasma no celular
 // v1.5.200: I121 — kpiMes/leading paridade I117 (Ativa/Pendente); invalidate cache kpi+comando em escritas
@@ -194,8 +195,8 @@
 
 // ── CONSTANTES ───────────────────────────────────────────────
 /** Versão exposta em ping, carregarInicio, validarSchema, gestaoPessoasStatus (bump com header). */
-const MK_GAS_VERSAO_  = 'v1.5.202';
-const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.202';
+const MK_GAS_VERSAO_  = 'v1.5.203';
+const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.203';
 const SHEET_ID   = '1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618';
 const DEPLOY_ID  = 'AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y';
 const WEBAPP_URL = `https://script.google.com/macros/s/${DEPLOY_ID}/exec`;
@@ -3432,6 +3433,8 @@ function salvarLocacao_(p) {
   // CONCORRÊNCIA v1.5.6: LockService evita ID duplicado quando 2 dispositivos salvam juntos
   const lockS = LockService.getScriptLock();
   try { lockS.waitLock(8000); } catch(ex) { return err_('Sistema ocupado, tente novamente.', 503); }
+  let payload = null;
+  let auditRow = null;
   try {
   const tipo        = (p.tipo        || '').trim();
   const plano       = (p.plano       || '').trim();
@@ -3496,35 +3499,41 @@ function salvarLocacao_(p) {
   sheet.getRange(newRow, 25).setValue(0);
   try { invalidateInicioResumoCache_(dataFmt); } catch(e) {}
   const newRowData = sheet.getRange(newRow, 1, 1, 28).getValues()[0];
-  registrarAuditoriaLocacao_(newRow, 'salvarLocacao', {}, locacaoObj_(newRowData, newRow), 'Cadastro inicial', operadorAudit_(p));
-  try { firebaseSyncSessao_(newRow, fbDadosSessao_(newRowData, 'Pendente', newRow)); } catch (eFb) { Logger.log('Firebase salvarLocacao: ' + eFb.message); }
-  try {
-    sheet.getRange(newRow, 8).setNumberFormat('"R$" #,##0.00');
-    sheet.getRange(newRow, 10, 1, 2).setNumberFormat('"R$" #,##0.00');
-  } catch (eFmt) { /* ok */ }
-
-  return resp_({
-    id,
-    rowIndex:        newRow,
-    tipo,
-    plano,
-    veiculo,
-    pagamento:       pagFinal,
-    observacao,
-    contaId:         contaId,
-    mesmaConta:      !!(mestre && mestre.masterId && mestre.masterId !== id),
-    mins:            config.mins,
-    valorPlano:      config.valor,
+  auditBag = {
+    rowIndex: newRow,
+    depois: locacaoObj_(newRowData, newRow),
+    operador: operadorAudit_(p)
+  };
+  payload = {
+    id: id,
+    rowIndex: newRow,
+    tipo: tipo,
+    plano: plano,
+    veiculo: veiculo,
+    pagamento: pagFinal,
+    observacao: observacao,
+    contaId: contaId,
+    mesmaConta: !!(mestre && mestre.masterId && mestre.masterId !== id),
+    mins: config.mins,
+    valorPlano: config.valor,
     adicionalPorMin: config.adicional,
-    responsavel,
-    crianca,
-    telefone,
-    horaInicio:      '',
-    data:            dataFmt,
-    startTimestamp:  0,
-    status:          'Pendente'
-  });
+    responsavel: responsavel,
+    crianca: crianca,
+    telefone: telefone,
+    horaInicio: '',
+    data: dataFmt,
+    startTimestamp: 0,
+    status: 'Pendente'
+  };
   } finally { lockS.releaseLock(); }
+  // I125b: auditoria fora do lock; Firebase/format FORA do request (UrlFetch 2–6s no tablet)
+  if (auditBag) {
+    try {
+      registrarAuditoriaLocacao_(auditBag.rowIndex, 'salvarLocacao', {}, auditBag.depois, 'Cadastro inicial', auditBag.operador);
+    } catch (eAud) { Logger.log('aud salvarLocacao: ' + eAud.message); }
+  }
+  if (!payload) return err_('Falha ao salvar locacao', 500);
+  return resp_(payload);
 }
 
 /** I98 — multi-veículo: 1 lock + 1 findContaMestre (evita N round-trips). */
@@ -3603,11 +3612,7 @@ function salvarLocacoesMulti_(p) {
 
       const newRowData = sheet.getRange(newRow, 1, 1, COL_LOC_READ_).getValues()[0];
       registrarAuditoriaLocacao_(newRow, 'salvarLocacao', {}, locacaoObj_(newRowData, newRow), 'Cadastro multi I98', operadorAudit_(p));
-      firebaseSyncSessao_(newRow, fbDadosSessao_(newRowData, 'Pendente', newRow));
-      sheet.getRange(newRow, 8).setNumberFormat('"R$" #,##0.00');
-      sheet.getRange(newRow, 10).setNumberFormat('"R$" #,##0.00');
-      sheet.getRange(newRow, 11).setNumberFormat('"R$" #,##0.00');
-
+      // I125b: sem Firebase/format por item (N×UrlFetch no multi)
       const mesmaConta = !!(mestrePre && mestrePre.masterId && mestrePre.masterId !== id) || i > 0;
       locacoes.push({
         id: id,
@@ -7890,8 +7895,10 @@ function iniciarTimer_(p) {
   rowWrite[24] = canonTs;
   sheet.getRange(rowIndex, 1, 1, 28).setValues([rowWrite]);
   try { invalidateInicioResumoCache_(fmtData_(new Date())); } catch(e) {}
-  registrarAuditoriaLocacao_(rowIndex, 'iniciarTimer', antesTimer, locacaoObj_(rowWrite, rowIndex), 'Inicio de contagem', operadorAudit_(p));
-  try { firebaseSyncSessao_(rowIndex, fbDadosSessao_(rowWrite, 'Ativa', rowIndex)); } catch (eFb) { Logger.log('Firebase iniciarTimer: ' + eFb.message); }
+  try {
+    registrarAuditoriaLocacao_(rowIndex, 'iniciarTimer', antesTimer, locacaoObj_(rowWrite, rowIndex), 'Inicio de contagem', operadorAudit_(p));
+  } catch (eAud) { Logger.log('aud iniciarTimer: ' + eAud.message); }
+  // I125b: sem Firebase no ▶ — FE já otimista (I20) + sync carregarInicio; UrlFetch atrasava 2–6s
   return resp_({ startTimestamp: canonTs, horaInicio: horaInicio });
 }
 
