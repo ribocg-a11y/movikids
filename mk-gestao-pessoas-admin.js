@@ -10,6 +10,8 @@
   let gpAdmLoadPromise_ = null;
   let gpAdmCompSel_ = '';
   let gpAdmLoadSeq_ = 0;
+  /** Última lista rápida (inclui órfãos fora do painel RH, ex. cadastro incompleto). */
+  let gpAdmQuickCols_ = null;
 
   const GP_ADM_CACHE_TTL = 5 * 60 * 1000;
 
@@ -18,14 +20,92 @@
     const norm = String(raw).replace(/\//g, '');
     const now = new Date();
     const cur = String(now.getMonth() + 1).padStart(2, '0') + String(now.getFullYear());
-    return 'mk_gp_adm_v3_' + (norm || cur);
+    return 'mk_gp_adm_v4_' + (norm || cur);
   }
 
+  /** Painel full (escala+folha) — abas pesadas. */
   function gpAdmIsFullPanel_(d) {
-    if (!d || d._partial) return false;
+    if (!d || d._partial || d._fromQuick) return false;
     const esc = d.escala && d.escala.linhas && d.escala.linhas.length;
     const fol = d.folha && d.folha.length;
     return !!(esc || fol);
+  }
+
+  /**
+   * I126 — payload já veio de painelGestaoPessoasAdmin (lite ou full).
+   * Nunca substituir por stubs do hydrate rápido.
+   */
+  function gpAdmHasPanelPayload_(d) {
+    if (!d || d._fromQuick) return false;
+    if (d.lite === true || d.lite === false) return true;
+    if (d.escala && d.escala.linhas && d.escala.linhas.length) return true;
+    if (d.folha && d.folha.length) return true;
+    return (d.colaboradores || []).some(function (c) {
+      return c && c.ponto && (c.ponto.entrada || c.ponto.status === 'dentro');
+    });
+  }
+
+  /** Presente = ponto aberto OU logado no balcão (mesma regra do badge). */
+  function gpAdmIsPresente_(c) {
+    if (!c) return false;
+    if (c.logadoBalcao) return true;
+    if (c.ponto && c.ponto.status === 'dentro') return true;
+    return false;
+  }
+
+  function gpAdmRecalcKpis_(d) {
+    if (!d) return;
+    const cols = d.colaboradores || [];
+    if (!d.kpis) d.kpis = {};
+    d.kpis.total = cols.length;
+    d.kpis.presentes = cols.filter(gpAdmIsPresente_).length;
+    if (!d._fromQuick) {
+      d.kpis.comTurno = cols.filter(function (c) { return !!(c.turno); }).length;
+    }
+  }
+
+  /** Mantém colaboradores da lista rápida que o painel RH omitiu (ex. throw no GAS / cadastro incompleto). */
+  function gpAdmMergeQuickOrphans_(panelCols) {
+    const cols = (panelCols || []).slice();
+    const quick = gpAdmQuickCols_ || [];
+    if (!quick.length) return cols;
+    const seen = {};
+    cols.forEach(function (c) { seen[Number(c.id)] = true; });
+    quick.forEach(function (q) {
+      const id = Number(q.id);
+      if (!seen[id]) {
+        seen[id] = true;
+        cols.push(Object.assign({}, q, { _orphanQuick: true }));
+      }
+    });
+    cols.sort(function (a, b) { return String(a.nome).localeCompare(String(b.nome), 'pt-BR'); });
+    return cols;
+  }
+
+  function gpAdmSyncStatusBanner_() {
+    if (!gpAdmData_) {
+      gpAdmSetErr_('');
+      return;
+    }
+    if (gpAdmData_._fromQuick) {
+      gpAdmSetErr_('<strong>Carregando painel RH…</strong> Status de ponto e escala ainda provisórios. Se persistir, use <code>?force=</code> ou limpe o cache do site.');
+      return;
+    }
+    if (gpAdmData_._partial || gpAdmData_.lite === true) {
+      gpAdmSetErr_('<strong>Painel rápido ativo.</strong> Folha e avaliações completas ainda carregando…');
+      return;
+    }
+    if (gpAdmData_._fallback) {
+      gpAdmSetErr_(gpAdmGasPendingHtml_());
+      return;
+    }
+    const orphans = (gpAdmData_.colaboradores || []).filter(function (c) { return c._orphanQuick; });
+    if (orphans.length) {
+      gpAdmSetErr_('<strong>RH incompleto:</strong> ' + orphans.map(function (c) { return esc(c.nome); }).join(', ') +
+        ' na lista rápida, mas fora do painel RH (cadastro/ponto). Complete a ficha ou republicar GAS se o erro persistir.');
+      return;
+    }
+    gpAdmSetErr_('');
   }
 
   function gpAdmTabNeedsFullPanel_(tab) {
@@ -189,6 +269,7 @@
 
   function gpAdmStatusBadge_(c) {
     if (c.logadoBalcao) return '<span class="gp-adm-badge ok">No balcão</span>';
+    if (c._orphanQuick) return '<span class="gp-adm-badge warn">Fora do RH</span>';
     if (c.escalaFolga) return '<span class="gp-adm-badge gray">Folga hoje</span>';
     if (c.ponto && c.ponto.status === 'dentro') return '<span class="gp-adm-badge ok">Presente</span>';
     if (c.ponto && c.ponto.entrada && c.ponto.saida) return '<span class="gp-adm-badge gray">Turno encerrado</span>';
@@ -561,13 +642,18 @@
   function gpAdmRenderKpis_() {
     const el = document.getElementById('gp-adm-kpis');
     if (!el || !gpAdmData_) return;
+    gpAdmRecalcKpis_(gpAdmData_);
     const k = gpAdmData_.kpis || {};
     const intelN = k.alertasIntel || (gpAdmData_.alertasInteligentes || []).length;
+    const ctxPres = gpAdmData_._fromQuick
+      ? 'provisório (lista rápida)'
+      : ('de ' + (k.total || 0) + ' na equipe ativa');
     el.innerHTML =
       '<div class="mk-widget"><span class="mk-widget-lbl">Colaboradores</span><span class="mk-widget-val">' + (k.total || 0) + '</span><span class="mk-widget-ctx">' + (k.comTurno || 0) + ' com turno cadastrado</span></div>' +
-      '<div class="mk-widget"><span class="mk-widget-lbl">Presentes agora</span><span class="mk-widget-val green">' + (k.presentes || 0) + '</span><span class="mk-widget-ctx">de ' + (k.total || 0) + ' na equipe ativa</span></div>' +
+      '<div class="mk-widget"><span class="mk-widget-lbl">Presentes agora</span><span class="mk-widget-val green">' + (k.presentes || 0) + '</span><span class="mk-widget-ctx">' + ctxPres + '</span></div>' +
       '<div class="mk-widget"><span class="mk-widget-lbl">Alertas</span><span class="mk-widget-val" style="color:var(--orange)">' + ((k.alertas || 0) + intelN) + '</span><span class="mk-widget-ctx">' +
       (intelN > 0 ? (intelN + ' proativos · ') : '') + ((k.alertas || 0) > 0 ? 'Conferir aba Hoje' : 'Tudo ok') + '</span></div>';
+    gpAdmSyncStatusBanner_();
   }
 
   function gpAdmRenderHoje_() {
@@ -941,7 +1027,7 @@
       id: c.id, nome: c.nome, hasPin: c.hasPin !== false, perfil: c.perfil || 'operador',
       funcao: c.funcao || 'Operador', turno: c.turno || '', admissao: c.admissao || '',
       cadastroPct: pct, cadastroOk: pct >= 100, temRh: true,
-      ponto: { status: 'fora', entrada: null, saida: null },
+      ponto: { status: 'fora', entrada: null, saida: null, _provisorio: true },
       logadoBalcao: sessaoId === Number(c.id),
       metas: { alvo: 20, atual: 0, locMes: 0, bonusDias: 0, bonusTotal: 0 },
       folhaPonto: []
@@ -970,40 +1056,38 @@
       const cols = (r.colaboradores || []).filter(function (c) { return c.hasPin !== false; })
         .map(function (c) { return gpAdmMapColabQuick_(c, sessaoId); });
       cols.sort(function (a, b) { return String(a.nome).localeCompare(String(b.nome), 'pt-BR'); });
+      gpAdmQuickCols_ = cols;
       const now = new Date();
       const comp = gpAdmCompSel_ || (String(now.getMonth() + 1).padStart(2, '0') + '/' + now.getFullYear());
-      if (gpAdmIsFullPanel_(gpAdmData_)) {
+      // I126: se lite/full já chegou, só mescla cadastro/sessão — nunca zera ponto/escala
+      if (gpAdmHasPanelPayload_(gpAdmData_)) {
         const byId = {};
-        cols.forEach(function (c) { byId[c.id] = c; });
+        cols.forEach(function (c) { byId[Number(c.id)] = c; });
         gpAdmData_.colaboradores = (gpAdmData_.colaboradores || []).map(function (c) {
-          const q = byId[c.id];
+          const q = byId[Number(c.id)];
           if (!q) return c;
           return Object.assign({}, c, {
             cadastroPct: q.cadastroPct, cadastroOk: q.cadastroOk, logadoBalcao: q.logadoBalcao,
-            funcao: q.funcao || c.funcao, admissao: q.admissao || c.admissao, turno: q.turno || c.turno
+            funcao: q.funcao || c.funcao, admissao: q.admissao || c.admissao,
+            turno: c.turno || q.turno
           });
         });
-        cols.forEach(function (q) {
-          if (!(gpAdmData_.colaboradores || []).some(function (c) { return Number(c.id) === Number(q.id); })) {
-            gpAdmData_.colaboradores.push(q);
-          }
-        });
-        gpAdmData_.colaboradores.sort(function (a, b) { return String(a.nome).localeCompare(String(b.nome), 'pt-BR'); });
-        if (gpAdmData_.kpis) {
-          gpAdmData_.kpis.total = gpAdmData_.colaboradores.length;
-          gpAdmData_.kpis.presentes = gpAdmData_.colaboradores.filter(function (c) { return c.logadoBalcao; }).length;
-        }
+        gpAdmData_.colaboradores = gpAdmMergeQuickOrphans_(gpAdmData_.colaboradores);
+        gpAdmRecalcKpis_(gpAdmData_);
       } else {
         gpAdmData_ = {
           ok: true, competencia: comp, colaboradores: cols,
           escala: { competencia: comp, colunas: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'], linhas: [] },
-          folha: [], alertas: [], alertasTotal: 0, alertasInteligentes: [],
+          folha: [], alertas: (gpAdmData_ && gpAdmData_.alertas) || [], alertasTotal: (gpAdmData_ && gpAdmData_.alertasTotal) || 0,
+          alertasInteligentes: [],
           kpis: {
             total: cols.length,
-            presentes: cols.filter(function (c) { return c.logadoBalcao; }).length,
-            comTurno: 0, alertas: 0, alertasIntel: 0
+            presentes: cols.filter(gpAdmIsPresente_).length,
+            comTurno: cols.filter(function (c) { return !!c.turno; }).length,
+            alertas: (gpAdmData_ && gpAdmData_.kpis && gpAdmData_.kpis.alertas) || 0,
+            alertasIntel: 0
           },
-          sessaoAtiva: r.sessaoAtiva, _partial: true
+          sessaoAtiva: r.sessaoAtiva, _partial: true, _fromQuick: true
         };
       }
       gpAdmCompSel_ = comp;
@@ -1049,12 +1133,18 @@
           folhaPonto: []
         };
     });
+    gpAdmQuickCols_ = colaboradores;
     gpAdmData_ = {
       competencia: comp, colaboradores: colaboradores,
       escala: { competencia: comp, colunas: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'], linhas: [] },
       folha: [], alertas: alertas.alertas || [], alertasTotal: alertas.total || 0,
-      kpis: { total: colaboradores.length, presentes: colaboradores.filter(function (c) { return c.logadoBalcao; }).length, comTurno: 0, alertas: alertas.total || 0 },
-      sessaoAtiva: ops.sessaoAtiva, _fallback: true
+      kpis: {
+        total: colaboradores.length,
+        presentes: colaboradores.filter(gpAdmIsPresente_).length,
+        comTurno: colaboradores.filter(function (c) { return !!c.turno; }).length,
+        alertas: alertas.total || 0
+      },
+      sessaoAtiva: ops.sessaoAtiva, _fallback: true, _fromQuick: true, _partial: true
     };
     if (typeof applySessaoAtivaFromApi_ === 'function') applySessaoAtivaFromApi_(ops);
     gpAdmRender_();
@@ -1077,10 +1167,35 @@
     } catch (e) { /* ok */ }
   }
 
+  function gpAdmApplyPanelPayload_(d, compReq, opts) {
+    if (!d || !d.ok) return false;
+    const isLite = d.lite === true || opts && opts.asLite;
+    d._fromQuick = false;
+    if (isLite) {
+      d._partial = true;
+    } else {
+      delete d._partial;
+    }
+    d.colaboradores = gpAdmMergeQuickOrphans_(d.colaboradores || []);
+    gpAdmRecalcKpis_(d);
+    // Preserva alertas rápidos se o painel vier sem eles
+    if ((!d.alertas || !d.alertas.length) && gpAdmData_ && gpAdmData_.alertas && gpAdmData_.alertas.length) {
+      d.alertas = gpAdmData_.alertas;
+      d.alertasTotal = gpAdmData_.alertasTotal || d.alertas.length;
+      if (d.kpis) d.kpis.alertas = d.alertasTotal;
+    }
+    gpAdmData_ = d;
+    gpAdmCompSel_ = d.competencia || compReq || gpAdmCompSel_;
+    if (typeof applySessaoAtivaFromApi_ === 'function') applySessaoAtivaFromApi_(d);
+    gpAdmRender_();
+    gpAdmSyncStatusBanner_();
+    return true;
+  }
+
   function gpAdmLoadPainelBackground_(seq, compReq, opts) {
     (async function () {
       try {
-        // I120: lite primeiro (sem jornada/holerite) → UI rápida; full em seguida
+        // I120/I126: lite primeiro → UI com ponto/escala reais; full em seguida
         const litePayload = Object.assign({
           action: 'painelGestaoPessoasAdmin', lite: '1', _t: Date.now()
         }, gpAdmPinParams_());
@@ -1088,12 +1203,7 @@
         const lite = await api(litePayload, 45000);
         if (seq !== gpAdmLoadSeq_) return;
         if (lite && lite.ok) {
-          lite._partial = true;
-          gpAdmData_ = lite;
-          gpAdmCompSel_ = lite.competencia || compReq || gpAdmCompSel_;
-          if (typeof applySessaoAtivaFromApi_ === 'function') applySessaoAtivaFromApi_(lite);
-          gpAdmRender_();
-          gpAdmSetErr_('');
+          gpAdmApplyPanelPayload_(lite, compReq, { asLite: true });
         }
         const apiPayload = Object.assign({ action: 'painelGestaoPessoasAdmin', _t: Date.now() }, gpAdmPinParams_());
         if (compReq) apiPayload.competencia = compReq;
@@ -1102,27 +1212,26 @@
         if (!d.ok) {
           if (!(lite && lite.ok)) {
             const errTxt = esc(d.erro || 'Erro painel RH');
-            gpAdmSetErr_('<strong>Painel RH:</strong> ' + errTxt + ' · Republicar GAS <strong>v1.5.198</strong> (Nova versão Web).');
+            gpAdmSetErr_('<strong>Painel RH:</strong> ' + errTxt + ' · Republicar GAS <strong>v1.5.205</strong> (Nova versão Web).');
             if (typeof toast === 'function') toast(d.erro || 'Painel RH indisponível', 'error');
+          } else {
+            gpAdmSyncStatusBanner_();
           }
           return;
         }
-        delete d._partial;
-        gpAdmData_ = d;
-        gpAdmCompSel_ = d.competencia || compReq || gpAdmCompSel_;
-        gpAdmCacheSet_(d);
-        if (typeof applySessaoAtivaFromApi_ === 'function') applySessaoAtivaFromApi_(d);
-        gpAdmRender_();
-        gpAdmSetErr_('');
+        gpAdmApplyPanelPayload_(d, compReq, {});
+        gpAdmCacheSet_(gpAdmData_);
         if (opts && opts.force && compReq && typeof toast === 'function') {
           toast('Folha de ' + gpAdmCompLabel_(gpAdmCompSel_) + ' carregada', 'success');
         }
         if (gpAdmTab_ === 'cadastro' && typeof refreshOperadoresAdmin_ === 'function') await refreshOperadoresAdmin_();
       } catch (e) {
         if (seq !== gpAdmLoadSeq_) return;
-        if (!gpAdmData_ || !gpAdmData_._partial) {
+        if (!gpAdmHasPanelPayload_(gpAdmData_)) {
           const msg = (e && e.message) || 'Erro de conexão';
           gpAdmSetErr_(esc(msg) + ' <span class="gp-adm-muted">Modo básico ativo.</span>');
+        } else {
+          gpAdmSyncStatusBanner_();
         }
       } finally {
         if (seq === gpAdmLoadSeq_) gpAdmLoadPromise_ = null;
@@ -1138,29 +1247,32 @@
     const cached = !opts?.force ? gpAdmCacheGet_(compReq) : null;
     if (cached && cached.ok) {
       if (seq !== gpAdmLoadSeq_) return gpAdmLoadPromise_;
+      cached._fromQuick = false;
       gpAdmData_ = cached;
       gpAdmCompSel_ = cached.competencia || compReq || gpAdmCompSel_;
       if (typeof applySessaoAtivaFromApi_ === 'function') applySessaoAtivaFromApi_(cached);
       gpAdmRender_();
-      gpAdmSetErr_('');
+      gpAdmSyncStatusBanner_();
     } else if (opts?.force && compReq) {
       gpAdmShowFolhaLoading_(gpAdmCompLabel_(compReq));
     } else {
       gpAdmShowLoading_();
     }
-    gpAdmSetErr_('');
     gpAdmLoadPromise_ = (async function () {
       try {
+        // I126: painel em paralelo com lista rápida — não esperar 8–16s de hydrate/alertas
+        gpAdmLoadPainelBackground_(seq, compReq, opts);
         await gpAdmHydrateColabQuick_();
         await gpAdmLoadAlertasQuick_();
         gpAdmRenderHoje_();
-        gpAdmSetErr_('');
-        gpAdmLoadPainelBackground_(seq, compReq, opts);
+        gpAdmSyncStatusBanner_();
       } catch (e) {
         if (seq !== gpAdmLoadSeq_) return;
-        try { await gpAdmLoadFallback_(e.message || 'Erro'); } catch (e2) { /* ignore */ }
-        if (!gpAdmData_) await gpAdmHydrateColabQuick_();
-        gpAdmSetErr_('');
+        if (!gpAdmHasPanelPayload_(gpAdmData_)) {
+          try { await gpAdmLoadFallback_(e.message || 'Erro'); } catch (e2) { /* ignore */ }
+          if (!gpAdmData_) await gpAdmHydrateColabQuick_();
+        }
+        gpAdmSyncStatusBanner_();
         if (seq === gpAdmLoadSeq_) gpAdmLoadPromise_ = null;
       }
     })();
