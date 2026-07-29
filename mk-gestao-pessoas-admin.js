@@ -101,22 +101,42 @@
     gpAdmSetErr_('');
   }
 
-  /** Só Folha e Avaliações precisam do painel full (holerite / lista avaliações). */
+  /** Folha, Avaliações e Ficha (jornada/ponto dia a dia) precisam do painel full. */
   function gpAdmTabNeedsFullPanel_(tab) {
-    return tab === 'folha' || tab === 'avaliacoes';
+    return tab === 'folha' || tab === 'avaliacoes' || tab === 'presenca';
   }
 
   function gpAdmHasFolhaData_() {
     return !!(gpAdmData_ && gpAdmData_.folha && gpAdmData_.folha.length);
   }
 
+  function gpAdmHasFullJornada_() {
+    return (gpAdmData_ && gpAdmData_.colaboradores || []).some(function (c) {
+      return c && c.jornada && c.jornada.dias && c.jornada.dias.length && !c.jornada._lite;
+    });
+  }
+
+  function gpAdmPanelStillPartial_() {
+    return !!(gpAdmData_ && (gpAdmData_._partial || gpAdmData_.lite === true || gpAdmData_._fromQuick));
+  }
+
+  function gpAdmShowJornadaLoading_() {
+    const el = document.getElementById('gp-adm-ficha-main');
+    if (el) {
+      el.innerHTML = '<p class="gp-adm-muted gp-adm-loading">Carregando jornada / ponto da competência…</p>';
+    }
+  }
+
   function gpAdmEnsureFullPanel_(reason) {
-    if (gpAdmHasFolhaData_() && !(gpAdmData_ && (gpAdmData_._partial || gpAdmData_.lite === true))) return;
+    // Já temos full (folha ou jornada real) e não estamos em lite
+    if (!gpAdmPanelStillPartial_() && (gpAdmHasFolhaData_() || gpAdmHasFullJornada_())) return;
     if (gpAdmPanelInFlight_) {
       if (reason === 'folha') gpAdmShowFolhaLoading_(gpAdmCompLabel_(gpAdmCompSel_ || (gpAdmData_ && gpAdmData_.competencia) || ''));
+      if (reason === 'presenca') gpAdmShowJornadaLoading_();
       return;
     }
     if (typeof window.mkGpAdmLoad_ === 'function') {
+      if (reason === 'presenca') gpAdmShowJornadaLoading_();
       window.mkGpAdmLoad_({
         force: true,
         skipLite: true,
@@ -345,6 +365,8 @@
     }
     gpAdmSetTab_('presenca');
     gpAdmRenderPresenca_();
+    // I128 — Ficha precisa da jornada full (lite vem com dias [])
+    gpAdmEnsureFullPanel_('presenca');
     const panel = document.getElementById('gp-adm-tab-presenca');
     if (panel) {
       try { panel.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e) { panel.scrollIntoView(true); }
@@ -605,7 +627,15 @@
       }).join('') + '</div>'
       : '';
     const j = c.jornada;
-    if (!j || !j.dias || !j.dias.length) {
+    if (!j || !j.dias || !j.dias.length || j._lite) {
+      // I128 — lite/partial ainda sem jornada: carregar full em vez de “sem dias”
+      if (gpAdmPanelStillPartial_() || gpAdmPanelInFlight_ || !gpAdmHasFullJornada_()) {
+        el.innerHTML = intelBlock +
+          '<div class="gp-adm-card"><p class="gp-adm-muted gp-adm-loading">Carregando jornada / ponto de ' +
+          esc(c.nome || 'colaborador') + '…</p></div>';
+        gpAdmEnsureFullPanel_('presenca');
+        return;
+      }
       el.innerHTML = intelBlock +
         '<div class="gp-adm-card"><p class="gp-adm-muted">Sem dias na competência (confira escala RH e admissão).</p></div>';
       return;
