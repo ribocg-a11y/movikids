@@ -513,10 +513,10 @@ try {
   }
 
   # I125 — salvar/▶ sem scan full-sheet; invalidate loc sem dash
-  if ($gasRaw -notmatch 'LOOKBACK = 500') {
-    Add-Check "guard.i125.conta.mestre" "fail" "findContaMestre LOOKBACK 500 ausente (I125)"
-  } elseif ($gasRaw -notmatch 'IDs monotônicos|lastId \+ 1') {
-    Add-Check "guard.i125.nextId" "fail" "nextId_ O\(1\) ausente (I125)"
+  if ($gasRaw -notmatch 'LOOKBACK = 120') {
+    Add-Check "guard.i125.conta.mestre" "fail" "findContaMestre LOOKBACK 120 ausente (I125/I125c)"
+  } elseif ($gasRaw -notmatch 'IDs monotônicos|lastId \+ 1|loc_next_id_v1') {
+    Add-Check "guard.i125.nextId" "fail" "nextId_ O\(1\)/cache ausente (I125)"
   } elseif ($gasRaw -match 'function invalidateInicioResumoCache_\([\s\S]{0,900}invalidateDashCaches_\(\);\s*\r?\n\s*\} catch') {
     Add-Check "guard.i125.invalidate.dash" "fail" "invalidateInicio ainda chama dash sempre (I125)"
   } elseif ($gasRaw -notmatch 'includeDash') {
@@ -532,6 +532,18 @@ try {
     Add-Check "guard.i125c.lookback" "fail" "LOOKBACK 120 ausente (I125c)"
   } else {
     Add-Check "guard.i125c.ss.cache" "ok" "ss_ cache + invalidate leve + lookback 120"
+  }
+
+  if ($gasRaw -notmatch '_locLastRow_|locLastRow_') {
+    Add-Check "guard.i125d.lastRow" "fail" "locLastRow_ ausente (I125d)"
+  } elseif ($gasRaw -notmatch 'loc_next_id_v1') {
+    Add-Check "guard.i125d.nextId.cache" "fail" "nextId ScriptCache ausente (I125d)"
+  } elseif ($gasRaw -notmatch 'function iniciarTimer_[\s\S]{0,2500}getRange\(rowIndex, 3, 1, 23\)') {
+    Add-Check "guard.i125d.iniciar.batch" "fail" "iniciarTimer sem batch C→Y (I125d)"
+  } elseif ($gasRaw -notmatch 'function salvarLocacao_[\s\S]{0,3500}getRange\(newRow, 1, 1, 25\)') {
+    Add-Check "guard.i125d.salvar.batch" "fail" "salvarLocacao sem setValues\(25\) (I125d)"
+  } else {
+    Add-Check "guard.i125d.batch" "ok" "lastRow 1x + nextId cache + salvar/▶ batch write"
   }
 
   }

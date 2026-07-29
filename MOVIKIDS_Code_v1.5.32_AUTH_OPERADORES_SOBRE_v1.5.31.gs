@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.204
+// MOVI KIDS — Google Apps Script v1.5.205
+// v1.5.205: I125d — 1 getLastRow/request; nextId cache; salvar 1 setValues(25); ▶ 1 read+1 write C→Y
 // v1.5.204: I125c — cache ss_() na request; invalidate leve; ▶ só 3 células; salvar sem auditoria bloqueante
 // v1.5.203: I125b — salvar/▶ sem Firebase/format no caminho crítico (FB UrlFetch 2–6s); lock só na planilha
 // v1.5.202: I125 — salvar/▶ rápido: nextId O(1), findContaMestre só dia, invalidate sem dash no path loc, iniciarTimer batch
@@ -196,8 +197,8 @@
 
 // ── CONSTANTES ───────────────────────────────────────────────
 /** Versão exposta em ping, carregarInicio, validarSchema, gestaoPessoasStatus (bump com header). */
-const MK_GAS_VERSAO_  = 'v1.5.204';
-const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.204';
+const MK_GAS_VERSAO_  = 'v1.5.205';
+const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.205';
 const SHEET_ID   = '1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618';
 const DEPLOY_ID  = 'AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y';
 const WEBAPP_URL = `https://script.google.com/macros/s/${DEPLOY_ID}/exec`;
@@ -349,6 +350,16 @@ function sh_getOrCreate_(name) {
   return ss.getSheetByName(name) || ss.insertSheet(name);
 }
 
+// I125d: getLastRow da LOCACOES 1× por request (antes 2–3× no salvar)
+var _locLastRow_ = null;
+function locLastRow_(sheet) {
+  if (_locLastRow_ == null) _locLastRow_ = sheet.getLastRow();
+  return _locLastRow_;
+}
+function locBumpLastRow_(n) {
+  _locLastRow_ = n;
+}
+
 // Timezone da planilha — único ponto de verdade para formatação
 // Evita o bug de +1h causado por discrepância entre fuso do código e da sheet
 let _TZ = null;
@@ -472,15 +483,31 @@ function err_(msg, code) {
 }
 
 function nextId_(sheet) {
-  const last = sheet.getLastRow();
+  const last = locLastRow_(sheet);
   if (last < DATA_ROW) return 1;
+  // I125d: cache Script sob lock — evita getRange na linha final a cada salvar
+  try {
+    const cache = CacheService.getScriptCache();
+    const hit = cache.get('loc_next_id_v1');
+    if (hit) {
+      const n = Number(hit) + 1;
+      if (n > 0) {
+        cache.put('loc_next_id_v1', String(n), 600);
+        return n;
+      }
+    }
+  } catch (eId) { /* ok */ }
   // I125: IDs monotônicos no append — O(1) em vez de scan de 2k+ linhas no salvar
   const lastId = Number(sheet.getRange(last, 1).getValue() || 0);
-  if (lastId > 0) return lastId + 1;
-  const ids = sheet.getRange(DATA_ROW, 1, last - DATA_ROW + 1, 1).getValues();
-  let max = 0;
-  ids.forEach(r => { if (Number(r[0]) > max) max = Number(r[0]); });
-  return max + 1;
+  let out = lastId > 0 ? lastId + 1 : 0;
+  if (!out) {
+    const ids = sheet.getRange(DATA_ROW, 1, last - DATA_ROW + 1, 1).getValues();
+    let max = 0;
+    ids.forEach(r => { if (Number(r[0]) > max) max = Number(r[0]); });
+    out = max + 1;
+  }
+  try { CacheService.getScriptCache().put('loc_next_id_v1', String(out), 600); } catch (ePut) { /* ok */ }
+  return out;
 }
 
 // Mês de locação = aniversário da data de assinatura (contrato Golden Calhau)
@@ -661,6 +688,7 @@ function dispatchMoviAction_(p, method) {
 }
 
 function doGet(e) {
+  _locLastRow_ = null;
   try {
     return dispatchMoviAction_(parseRequestParams_(e), 'GET');
   } catch (ex) {
@@ -669,6 +697,7 @@ function doGet(e) {
 }
 
 function doPost(e) {
+  _locLastRow_ = null;
   try {
     return dispatchMoviAction_(parseRequestParams_(e), 'POST');
   } catch (ex) {
@@ -3312,10 +3341,10 @@ function findContaMestreParaNovaLoc_(telefone, dataFmt, agora) {
   if (!naJanelaOperacionalMin_(agoraMin)) return null;
 
   const sh = sh_(SH_LOC);
-  const last = sh.getLastRow();
+  const last = locLastRow_(sh);
   if (last < DATA_ROW) return null;
 
-  // I125c: lookback 120 do dia (append cronológico) — evita getValues pesado
+  // I125c/I125d: lookback 120 do dia (append cronológico) — evita getValues pesado
   const LOOKBACK = 120;
   const startRow = Math.max(DATA_ROW, last - LOOKBACK + 1);
   const nRows = last - startRow + 1;
@@ -3467,6 +3496,8 @@ function salvarLocacao_(p) {
   const agora  = new Date();
   const sheet  = sh_(SH_LOC);
   const dataFmt = fmtData_(agora);
+  // I125d: 1× getLastRow compartilhado (findConta + nextId + insert)
+  const last = locLastRow_(sheet);
   const mestre = findContaMestreParaNovaLoc_(telefone, dataFmt, agora);
   const id     = nextId_(sheet);
 
@@ -3477,7 +3508,8 @@ function salvarLocacao_(p) {
     if (mestre.pagamento) pagFinal = mestre.pagamento;
   }
 
-  const row = [
+  // I125d: 1 setValues A–Y (25 cols) — antes appendRow + 2 setValue = 3 writes
+  const fullRow = [
     id,
     dataFmt,
     '',
@@ -3495,13 +3527,18 @@ function salvarLocacao_(p) {
     'Pendente',
     veiculo,
     pagFinal,
-    observacao
+    observacao,
+    contaId,
+    '',
+    '',
+    '',
+    '',
+    '',
+    0
   ];
-
-  sheet.appendRow(row);
-  const newRow = sheet.getLastRow();
-  sheet.getRange(newRow, COL_CONTA_ID_).setValue(contaId);
-  sheet.getRange(newRow, 25).setValue(0);
+  const newRow = last + 1;
+  sheet.getRange(newRow, 1, 1, 25).setValues([fullRow]);
+  locBumpLastRow_(newRow);
   try { invalidateInicioResumoCache_(dataFmt); } catch(e) {}
 
   // I125c: sem getRange 28 + sem auditoria no request (AUDITORIA abria outra aba = +2–4s)
@@ -3554,6 +3591,7 @@ function salvarLocacoesMulti_(p) {
     const agora = new Date();
     const dataFmt = fmtData_(agora);
     const sheet = sh_(SH_LOC);
+    locLastRow_(sheet); // I125d: 1× getLastRow no multi
     const mestrePre = findContaMestreParaNovaLoc_(telefone, dataFmt, agora);
     let pagFinal = pagamento;
     if (mestrePre && mestrePre.pagamento) pagFinal = mestrePre.pagamento;
@@ -3583,13 +3621,6 @@ function salvarLocacoesMulti_(p) {
       const veiculo = item.veiculo;
       const config = item.config;
       const id = nextId_(sheet);
-      const row = [
-        id, dataFmt, '', '', tipo, plano, config.mins, config.valor, 0, 0, config.valor,
-        responsavel, crianca, telefone, 'Pendente', veiculo, pagFinal, observacao
-      ];
-      sheet.appendRow(row);
-      const newRow = sheet.getLastRow();
-
       let contaId = id;
       if (mestrePre && mestrePre.masterId) {
         contaId = mestrePre.masterId;
@@ -3599,13 +3630,16 @@ function salvarLocacoesMulti_(p) {
         firstNewMasterId = id;
       }
 
-      sheet.getRange(newRow, COL_CONTA_ID_).setValue(contaId);
-      sheet.getRange(newRow, 17).setValue(pagFinal);
-      sheet.getRange(newRow, 25).setValue(0);
+      // I125d: 1 setValues/item (sem append + 3 setValue + getRange 28 + auditoria)
+      const fullRow = [
+        id, dataFmt, '', '', tipo, plano, config.mins, config.valor, 0, 0, config.valor,
+        responsavel, crianca, telefone, 'Pendente', veiculo, pagFinal, observacao,
+        contaId, '', '', '', '', '', 0
+      ];
+      const newRow = locLastRow_(sheet) + 1;
+      sheet.getRange(newRow, 1, 1, 25).setValues([fullRow]);
+      locBumpLastRow_(newRow);
 
-      const newRowData = sheet.getRange(newRow, 1, 1, COL_LOC_READ_).getValues()[0];
-      registrarAuditoriaLocacao_(newRow, 'salvarLocacao', {}, locacaoObj_(newRowData, newRow), 'Cadastro multi I98', operadorAudit_(p));
-      // I125b: sem Firebase/format por item (N×UrlFetch no multi)
       const mesmaConta = !!(mestrePre && mestrePre.masterId && mestrePre.masterId !== id) || i > 0;
       locacoes.push({
         id: id,
@@ -7859,21 +7893,22 @@ function iniciarTimer_(p) {
   if (!clientTs || clientTs < 1e12)     return err_('timestamp inválido', 400);
 
   const sheet = sh_(SH_LOC);
-  // I125c: 1 leitura O→Y (status + timestamp); sem rewrite de 28 cols
-  const bloco = sheet.getRange(rowIndex, 15, 1, 11).getValues()[0];
-  if (bloco[0] === '' && !sheet.getRange(rowIndex, 1).getValue()) {
+  // I125d: 1 leitura C→Y (23 cols); 1 escrita — antes 1 get + 3 setValue (~4–6s)
+  const rng = sheet.getRange(rowIndex, 3, 1, 23);
+  const row = rng.getValues()[0];
+  if (row[0] === '' && row[12] === '' && !sheet.getRange(rowIndex, 1).getValue()) {
     return err_('Sessao nao encontrada', 404);
   }
-  const statusAtual = String(bloco[0] || '').trim();
+  const statusAtual = String(row[12] || '').trim(); // O = col 15 = index 12 desde C
   if (statusAtual === 'Encerrada' || statusAtual === 'Cancelada') {
     return err_('Sessao nao pode iniciar neste status: ' + statusAtual, 409);
   }
   if (statusAtual && statusAtual !== 'Pendente' && statusAtual !== 'Ativa') {
     return err_('Status invalido para iniciar: ' + statusAtual, 409);
   }
-  const tsExistente = Number(bloco[10] || 0);
+  const tsExistente = Number(row[22] || 0); // Y = col 25 = index 22 desde C
   if (statusAtual === 'Ativa' && tsExistente >= 1e12) {
-    const horaExistente = cellToStr_(sheet.getRange(rowIndex, 3).getValue());
+    const horaExistente = cellToStr_(row[0]);
     return resp_({ startTimestamp: tsExistente, horaInicio: horaExistente, jaIniciada: true });
   }
   const agora    = new Date();
@@ -7885,10 +7920,10 @@ function iniciarTimer_(p) {
   const clientOk = clientTs >= 1e12;
   const canonTs  = (clientOk && driftMs <= 120 * 1000) ? clientTs : serverTs;
   const horaInicio = fmtHoraLocal_(new Date(canonTs));
-  // I125c: só C + O + Y (3 writes) — setValues(28) recalculava a linha inteira
-  sheet.getRange(rowIndex, 3).setValue(horaInicio);
-  sheet.getRange(rowIndex, 15).setValue('Ativa');
-  sheet.getRange(rowIndex, 25).setValue(canonTs);
+  row[0] = horaInicio;   // C
+  row[12] = 'Ativa';     // O
+  row[22] = canonTs;     // Y
+  rng.setValues([row]);
   try { invalidateInicioResumoCache_(fmtData_(agora)); } catch(e) {}
   // I125c: sem auditoria/Firebase no ▶ (FE otimista I20)
   return resp_({ startTimestamp: canonTs, horaInicio: horaInicio });
