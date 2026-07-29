@@ -523,6 +523,17 @@ try {
     Add-Check "guard.i125.invalidate.dash" "fail" "includeDash ausente em invalidateInicio (I125)"
   } else {
     Add-Check "guard.i125.salvar.iniciar" "ok" "nextId O(1)+conta dia+invalidate sem dash"
+
+  if ($gasRaw -notmatch '_ssCache_') {
+    Add-Check "guard.i125c.ss.cache" "fail" "ss_() sem cache de request (I125c)"
+  } elseif ($gasRaw -notmatch 'removeAll') {
+    Add-Check "guard.i125c.invalidate" "fail" "invalidateInicio sem removeAll (I125c)"
+  } elseif ($gasRaw -notmatch 'LOOKBACK = 120') {
+    Add-Check "guard.i125c.lookback" "fail" "LOOKBACK 120 ausente (I125c)"
+  } else {
+    Add-Check "guard.i125c.ss.cache" "ok" "ss_ cache + invalidate leve + lookback 120"
+  }
+
   }
   $novaPath = Join-Path $root "mk-nova.js"
   $opPath = Join-Path $root "mk-operacao.js"

@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.203
+// MOVI KIDS — Google Apps Script v1.5.204
+// v1.5.204: I125c — cache ss_() na request; invalidate leve; ▶ só 3 células; salvar sem auditoria bloqueante
 // v1.5.203: I125b — salvar/▶ sem Firebase/format no caminho crítico (FB UrlFetch 2–6s); lock só na planilha
 // v1.5.202: I125 — salvar/▶ rápido: nextId O(1), findContaMestre só dia, invalidate sem dash no path loc, iniciarTimer batch
 // v1.5.201: I122 — carregarInicio cache ignora _t (só force=1); evita timeout 25s → loc fantasma no celular
@@ -195,8 +196,8 @@
 
 // ── CONSTANTES ───────────────────────────────────────────────
 /** Versão exposta em ping, carregarInicio, validarSchema, gestaoPessoasStatus (bump com header). */
-const MK_GAS_VERSAO_  = 'v1.5.203';
-const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.203';
+const MK_GAS_VERSAO_  = 'v1.5.204';
+const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.204';
 const SHEET_ID   = '1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618';
 const DEPLOY_ID  = 'AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y';
 const WEBAPP_URL = `https://script.google.com/macros/s/${DEPLOY_ID}/exec`;
@@ -336,7 +337,12 @@ const PRECOS = {
 };
 
 // ── UTILITÁRIOS ───────────────────────────────────────────────
-function ss_()     { return SpreadsheetApp.openById(SHEET_ID); }
+// I125c: openById 1× por request (antes reabria a planilha em CADA sh_())
+var _ssCache_ = null;
+function ss_() {
+  if (!_ssCache_) _ssCache_ = SpreadsheetApp.openById(SHEET_ID);
+  return _ssCache_;
+}
 function sh_(name) { return ss_().getSheetByName(name); }
 function sh_getOrCreate_(name) {
   const ss = ss_();
@@ -3309,8 +3315,8 @@ function findContaMestreParaNovaLoc_(telefone, dataFmt, agora) {
   const last = sh.getLastRow();
   if (last < DATA_ROW) return null;
 
-  // I125: só bloco do dia (append cronológico) — lookback 500 evita getValues da planilha inteira
-  const LOOKBACK = 500;
+  // I125c: lookback 120 do dia (append cronológico) — evita getValues pesado
+  const LOOKBACK = 120;
   const startRow = Math.max(DATA_ROW, last - LOOKBACK + 1);
   const nRows = last - startRow + 1;
   const dados = sh.getRange(startRow, 1, nRows, COL_CONTA_ID_).getValues();
@@ -3433,8 +3439,6 @@ function salvarLocacao_(p) {
   // CONCORRÊNCIA v1.5.6: LockService evita ID duplicado quando 2 dispositivos salvam juntos
   const lockS = LockService.getScriptLock();
   try { lockS.waitLock(8000); } catch(ex) { return err_('Sistema ocupado, tente novamente.', 503); }
-  let payload = null;
-  let auditRow = null;
   try {
   const tipo        = (p.tipo        || '').trim();
   const plano       = (p.plano       || '').trim();
@@ -3448,8 +3452,10 @@ function salvarLocacao_(p) {
   if (!tipo || !plano || !responsavel || !crianca) {
     return err_('Campos obrigatórios: tipo, plano, responsavel, crianca', 400);
   }
-  const precosOp = precosOp_();
-  const veiculosOp = veiculosOp_();
+  // I125c: 1× operacaoConfig (antes precos+veiculos = 2× leitura CONFIG)
+  const opCfg = operacaoConfig_();
+  const precosOp = opCfg.precos;
+  const veiculosOp = opCfg.veiculos_validos;
   if (!precosOp[tipo])        return err_('Tipo inválido: ' + tipo, 400);
   if (!precosOp[tipo][plano]) return err_('Plano inválido: ' + plano, 400);
 
@@ -3461,7 +3467,6 @@ function salvarLocacao_(p) {
   const agora  = new Date();
   const sheet  = sh_(SH_LOC);
   const dataFmt = fmtData_(agora);
-  // I125: conta mestre ANTES do append (lookback do dia; não inclui a linha nova)
   const mestre = findContaMestreParaNovaLoc_(telefone, dataFmt, agora);
   const id     = nextId_(sheet);
 
@@ -3498,13 +3503,9 @@ function salvarLocacao_(p) {
   sheet.getRange(newRow, COL_CONTA_ID_).setValue(contaId);
   sheet.getRange(newRow, 25).setValue(0);
   try { invalidateInicioResumoCache_(dataFmt); } catch(e) {}
-  const newRowData = sheet.getRange(newRow, 1, 1, 28).getValues()[0];
-  auditBag = {
-    rowIndex: newRow,
-    depois: locacaoObj_(newRowData, newRow),
-    operador: operadorAudit_(p)
-  };
-  payload = {
+
+  // I125c: sem getRange 28 + sem auditoria no request (AUDITORIA abria outra aba = +2–4s)
+  return resp_({
     id: id,
     rowIndex: newRow,
     tipo: tipo,
@@ -3524,16 +3525,8 @@ function salvarLocacao_(p) {
     data: dataFmt,
     startTimestamp: 0,
     status: 'Pendente'
-  };
+  });
   } finally { lockS.releaseLock(); }
-  // I125b: auditoria fora do lock; Firebase/format FORA do request (UrlFetch 2–6s no tablet)
-  if (auditBag) {
-    try {
-      registrarAuditoriaLocacao_(auditBag.rowIndex, 'salvarLocacao', {}, auditBag.depois, 'Cadastro inicial', auditBag.operador);
-    } catch (eAud) { Logger.log('aud salvarLocacao: ' + eAud.message); }
-  }
-  if (!payload) return err_('Falha ao salvar locacao', 500);
-  return resp_(payload);
 }
 
 /** I98 — multi-veículo: 1 lock + 1 findContaMestre (evita N round-trips). */
@@ -4525,22 +4518,27 @@ function listarPlanoContas_(p) {
 // ── B1 FASE 5: resumo do dia (Caixa + chip admin) ─────────────
 /** Invalida cache carregarInicio (v3) e resumoDia após escritas em LOCAÇÕES. */
 /**
- * I125: path de locação (salvar/▶/encerrar) NÃO invalida dash — TTL kpiMes 25s (I121) basta.
- * Passar includeDash:true só quando a escrita for de gestão/admin que mexe em KPI.
+ * I125/I125c: path de locação NÃO invalida dash.
+ * I125c: removeAll só das chaves ativas (antes: 50+ remove individuais).
  */
 function invalidateInicioResumoCache_(dataFmt, opts) {
-  const cache = CacheService.getScriptCache();
   try {
-    cache.remove('carregarInicio_v2');
-    const df = String(dataFmt || fmtData_(new Date()));
-    cache.remove('resumoDia_' + df.replace(/\//g, ''));
-    for (let m = 0; m <= 24; m++) {
-      cache.remove('inicio_v3_g_m' + m);
-      cache.remove('inicio_v3_o_m' + m);
-      // I122
-      cache.remove('inicio_v4_g_m' + m);
-      cache.remove('inicio_v4_o_m' + m);
+    const cache = CacheService.getScriptCache();
+    const df = String(dataFmt || fmtData_(new Date())).replace(/\//g, '');
+    const keys = [
+      'carregarInicio_v2',
+      'resumoDia_' + df,
+      'inicio_v4_g_m0',
+      'inicio_v4_o_m0',
+      'inicio_v3_g_m0',
+      'inicio_v3_o_m0'
+    ];
+    // operadores 1–8 (metaTurno) — chaves pequenas
+    for (let m = 1; m <= 8; m++) {
+      keys.push('inicio_v4_g_m' + m);
+      keys.push('inicio_v4_o_m' + m);
     }
+    cache.removeAll(keys);
     if (opts && (opts.includeDash === true || opts.includeDash === 1 || String(opts.includeDash || '') === '1')) {
       invalidateDashCaches_();
     }
@@ -7861,24 +7859,23 @@ function iniciarTimer_(p) {
   if (!clientTs || clientTs < 1e12)     return err_('timestamp inválido', 400);
 
   const sheet = sh_(SH_LOC);
-  if (rowIndex > sheet.getLastRow()) return err_('Sessao nao encontrada', 404);
-  // I125: 1 leitura da linha (status + Y + auditoria) em vez de N getRange
-  const rowAntesTimer = sheet.getRange(rowIndex, 1, 1, 28).getValues()[0];
-  if (!rowAntesTimer[0]) return err_('Sessao nao encontrada', 404);
-  const statusAtual = String(rowAntesTimer[14] || '').trim();
+  // I125c: 1 leitura O→Y (status + timestamp); sem rewrite de 28 cols
+  const bloco = sheet.getRange(rowIndex, 15, 1, 11).getValues()[0];
+  if (bloco[0] === '' && !sheet.getRange(rowIndex, 1).getValue()) {
+    return err_('Sessao nao encontrada', 404);
+  }
+  const statusAtual = String(bloco[0] || '').trim();
   if (statusAtual === 'Encerrada' || statusAtual === 'Cancelada') {
     return err_('Sessao nao pode iniciar neste status: ' + statusAtual, 409);
   }
   if (statusAtual && statusAtual !== 'Pendente' && statusAtual !== 'Ativa') {
     return err_('Status invalido para iniciar: ' + statusAtual, 409);
   }
-  const tsExistente = Number(rowAntesTimer[24] || 0);
+  const tsExistente = Number(bloco[10] || 0);
   if (statusAtual === 'Ativa' && tsExistente >= 1e12) {
-    const horaExistente = cellToStr_(rowAntesTimer[2]);
+    const horaExistente = cellToStr_(sheet.getRange(rowIndex, 3).getValue());
     return resp_({ startTimestamp: tsExistente, horaInicio: horaExistente, jaIniciada: true });
   }
-  const antesTimer = locacaoObj_(rowAntesTimer, rowIndex);
-  // v1.5.66 / I20: col Y = instante do CLIQUE (clientTs) quando drift <= 2min — portal e balcao iguais
   const agora    = new Date();
   const serverTs = agora.getTime();
   const driftMs  = Math.abs(clientTs - serverTs);
@@ -7888,17 +7885,12 @@ function iniciarTimer_(p) {
   const clientOk = clientTs >= 1e12;
   const canonTs  = (clientOk && driftMs <= 120 * 1000) ? clientTs : serverTs;
   const horaInicio = fmtHoraLocal_(new Date(canonTs));
-  // I125: 1 setValues (C + O + Y) 
-  const rowWrite = rowAntesTimer.slice();
-  rowWrite[2] = horaInicio;
-  rowWrite[14] = 'Ativa';
-  rowWrite[24] = canonTs;
-  sheet.getRange(rowIndex, 1, 1, 28).setValues([rowWrite]);
-  try { invalidateInicioResumoCache_(fmtData_(new Date())); } catch(e) {}
-  try {
-    registrarAuditoriaLocacao_(rowIndex, 'iniciarTimer', antesTimer, locacaoObj_(rowWrite, rowIndex), 'Inicio de contagem', operadorAudit_(p));
-  } catch (eAud) { Logger.log('aud iniciarTimer: ' + eAud.message); }
-  // I125b: sem Firebase no ▶ — FE já otimista (I20) + sync carregarInicio; UrlFetch atrasava 2–6s
+  // I125c: só C + O + Y (3 writes) — setValues(28) recalculava a linha inteira
+  sheet.getRange(rowIndex, 3).setValue(horaInicio);
+  sheet.getRange(rowIndex, 15).setValue('Ativa');
+  sheet.getRange(rowIndex, 25).setValue(canonTs);
+  try { invalidateInicioResumoCache_(fmtData_(agora)); } catch(e) {}
+  // I125c: sem auditoria/Firebase no ▶ (FE otimista I20)
   return resp_({ startTimestamp: canonTs, horaInicio: horaInicio });
 }
 
@@ -8607,6 +8599,11 @@ function cfgJsonOrDefault_(map, key, fallback, problemas) {
 }
 
 function operacaoConfig_() {
+  // I125c: cache 60s — salvar/▶ não relê CONFIG a cada request
+  try {
+    const hit = CacheService.getScriptCache().get('operacaoConfig_v1');
+    if (hit) return JSON.parse(hit);
+  } catch (eC) { /* ok */ }
   const problemas = [];
   const map = cfgReadMap_();
   const veiculos = cfgJsonOrDefault_(map, 'veiculos_validos_json', OPERACAO_CONFIG_DEFAULTS.veiculos_validos, problemas);
@@ -8621,7 +8618,7 @@ function operacaoConfig_() {
     problemas.push('precos_json: objeto invalido, usando fallback');
   }
 
-  return {
+  const out = {
     veiculos_validos: Array.isArray(veiculos) && veiculos.length ? veiculos : OPERACAO_CONFIG_DEFAULTS.veiculos_validos,
     precos: precos && typeof precos === 'object' && !Array.isArray(precos) ? precos : OPERACAO_CONFIG_DEFAULTS.precos,
     formas_pagamento: Array.isArray(pagamentos) && pagamentos.length ? pagamentos : OPERACAO_CONFIG_DEFAULTS.formas_pagamento,
@@ -8629,6 +8626,11 @@ function operacaoConfig_() {
     fonte: problemas.length ? 'fallback_parcial' : 'config_ou_default',
     problemas
   };
+  try {
+    const raw = JSON.stringify(out);
+    if (raw.length < 90000) CacheService.getScriptCache().put('operacaoConfig_v1', raw, 60);
+  } catch (eP) { /* ok */ }
+  return out;
 }
 
 function precosOp_() {
