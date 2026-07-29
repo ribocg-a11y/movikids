@@ -10,6 +10,8 @@
   let gpAdmLoadPromise_ = null;
   let gpAdmCompSel_ = '';
   let gpAdmLoadSeq_ = 0;
+  /** true só enquanto lite/full do painel RH está em voo (não confundir com Promise resolvida). */
+  let gpAdmPanelInFlight_ = false;
   /** Última lista rápida (inclui órfãos fora do painel RH, ex. cadastro incompleto). */
   let gpAdmQuickCols_ = null;
 
@@ -82,34 +84,45 @@
     return cols;
   }
 
+  /**
+   * I126c — sem faixa vermelha de “painel rápido”.
+   * Escala/Hoje/Metas já funcionam no lite; Folha/Avaliações mostram loading no próprio painel.
+   * Só alerta erro real (falha de API / fallback sem painel).
+   */
   function gpAdmSyncStatusBanner_() {
     if (!gpAdmData_) {
       gpAdmSetErr_('');
       return;
     }
-    if (gpAdmData_._fromQuick) {
-      gpAdmSetErr_('<strong>Carregando painel RH…</strong> Status de ponto e escala ainda provisórios. Se persistir, use <code>?force=</code> ou limpe o cache do site.');
-      return;
-    }
-    if (gpAdmData_._partial || gpAdmData_.lite === true) {
-      gpAdmSetErr_('<strong>Painel rápido ativo.</strong> Folha e avaliações completas ainda carregando…');
-      return;
-    }
-    if (gpAdmData_._fallback) {
+    if (gpAdmData_._fallback && !gpAdmHasPanelPayload_(gpAdmData_)) {
       gpAdmSetErr_(gpAdmGasPendingHtml_());
-      return;
-    }
-    const orphans = (gpAdmData_.colaboradores || []).filter(function (c) { return c._orphanQuick; });
-    if (orphans.length) {
-      gpAdmSetErr_('<strong>RH incompleto:</strong> ' + orphans.map(function (c) { return esc(c.nome); }).join(', ') +
-        ' na lista rápida, mas fora do painel RH (cadastro/ponto). Complete a ficha ou republicar GAS se o erro persistir.');
       return;
     }
     gpAdmSetErr_('');
   }
 
+  /** Só Folha e Avaliações precisam do painel full (holerite / lista avaliações). */
   function gpAdmTabNeedsFullPanel_(tab) {
-    return tab === 'escala' || tab === 'metas' || tab === 'folha' || tab === 'comunicados' || tab === 'avaliacoes';
+    return tab === 'folha' || tab === 'avaliacoes';
+  }
+
+  function gpAdmHasFolhaData_() {
+    return !!(gpAdmData_ && gpAdmData_.folha && gpAdmData_.folha.length);
+  }
+
+  function gpAdmEnsureFullPanel_(reason) {
+    if (gpAdmHasFolhaData_() && !(gpAdmData_ && (gpAdmData_._partial || gpAdmData_.lite === true))) return;
+    if (gpAdmPanelInFlight_) {
+      if (reason === 'folha') gpAdmShowFolhaLoading_(gpAdmCompLabel_(gpAdmCompSel_ || (gpAdmData_ && gpAdmData_.competencia) || ''));
+      return;
+    }
+    if (typeof window.mkGpAdmLoad_ === 'function') {
+      window.mkGpAdmLoad_({
+        force: true,
+        skipLite: true,
+        competencia: gpAdmCompSel_ || (gpAdmData_ && gpAdmData_.competencia) || ''
+      });
+    }
   }
 
   function gpAdmRenderTab_(tab) {
@@ -316,17 +329,8 @@
     gpAdmRenderTab_(tab);
     if (!gpAdmData_ && typeof window.mkGpAdmLoad_ === 'function') {
       window.mkGpAdmLoad_();
-    } else if (gpAdmTabNeedsFullPanel_(tab) && gpAdmData_ && (gpAdmData_._partial || gpAdmData_.lite === true || gpAdmData_._fromQuick)) {
-      // I126b: se full já está a caminho, não cancelar com force — só reforça loading da Folha
-      if (gpAdmLoadPromise_) {
-        if (tab === 'folha') gpAdmShowFolhaLoading_(gpAdmCompLabel_(gpAdmCompSel_ || gpAdmData_.competencia || ''));
-      } else if (typeof window.mkGpAdmLoad_ === 'function') {
-        window.mkGpAdmLoad_({
-          force: true,
-          skipLite: true,
-          competencia: gpAdmCompSel_ || gpAdmData_.competencia
-        });
-      }
+    } else if (gpAdmTabNeedsFullPanel_(tab)) {
+      gpAdmEnsureFullPanel_(tab);
     }
     if (tab === 'cadastro' && typeof refreshOperadoresAdmin_ === 'function') refreshOperadoresAdmin_();
   };
@@ -1182,12 +1186,14 @@
 
   function gpAdmApplyPanelPayload_(d, compReq, opts) {
     if (!d || !d.ok) return false;
-    const isLite = d.lite === true || opts && opts.asLite;
+    const isLite = d.lite === true || !!(opts && opts.asLite);
     d._fromQuick = false;
     if (isLite) {
       d._partial = true;
+      d.lite = true;
     } else {
       delete d._partial;
+      d.lite = false;
     }
     d.colaboradores = gpAdmMergeQuickOrphans_(d.colaboradores || []);
     gpAdmRecalcKpis_(d);
@@ -1205,11 +1211,12 @@
     return true;
   }
 
+  /** Retorna Promise do lite→full. I126c: inFlight separado; full sempre. */
   function gpAdmLoadPainelBackground_(seq, compReq, opts) {
-    (async function () {
+    gpAdmPanelInFlight_ = true;
+    return (async function () {
       let liteOk = false;
       const skipLite = !!(opts && opts.skipLite);
-      // I120/I126/I126b: lite primeiro (opcional); full sempre — timeout do lite não aborta a Folha
       if (!skipLite) {
         try {
           const litePayload = Object.assign({
@@ -1224,7 +1231,6 @@
           }
         } catch (eLite) {
           if (seq !== gpAdmLoadSeq_) return;
-          /* segue para full */
         }
       }
       try {
@@ -1233,19 +1239,18 @@
         const d = await api(apiPayload, 90000);
         if (seq !== gpAdmLoadSeq_) return;
         if (!d.ok) {
-          if (!liteOk) {
+          if (!liteOk && !gpAdmHasPanelPayload_(gpAdmData_)) {
             const errTxt = esc(d.erro || 'Erro painel RH');
             gpAdmSetErr_('<strong>Painel RH:</strong> ' + errTxt + ' · Republicar GAS <strong>v1.5.205</strong> (Nova versão Web).');
             if (typeof toast === 'function') toast(d.erro || 'Painel RH indisponível', 'error');
-          } else {
-            gpAdmSetErr_('<strong>Folha incompleta.</strong> Painel rápido ok, mas o full falhou: ' + esc(d.erro || 'erro') + '. Tente de novo na aba Folha.');
-            if (typeof toast === 'function') toast(d.erro || 'Folha indisponível', 'error');
+          } else if (gpAdmTab_ === 'folha' || gpAdmTab_ === 'avaliacoes') {
+            if (typeof toast === 'function') toast(d.erro || 'Folha indisponível — tente de novo', 'error');
           }
           return;
         }
         gpAdmApplyPanelPayload_(d, compReq, {});
         gpAdmCacheSet_(gpAdmData_);
-        if (opts && opts.force && compReq && typeof toast === 'function') {
+        if (opts && opts.force && (gpAdmTab_ === 'folha' || gpAdmTab_ === 'avaliacoes') && typeof toast === 'function') {
           toast('Folha de ' + gpAdmCompLabel_(gpAdmCompSel_) + ' carregada', 'success');
         }
         if (gpAdmTab_ === 'cadastro' && typeof refreshOperadoresAdmin_ === 'function') await refreshOperadoresAdmin_();
@@ -1254,47 +1259,49 @@
         if (!gpAdmHasPanelPayload_(gpAdmData_)) {
           const msg = (e && e.message) || 'Erro de conexão';
           gpAdmSetErr_(esc(msg) + ' <span class="gp-adm-muted">Modo básico ativo.</span>');
-        } else if (gpAdmData_ && (gpAdmData_._partial || gpAdmData_.lite === true)) {
-          gpAdmSetErr_('<strong>Folha ainda não chegou.</strong> ' + esc((e && e.message) || 'timeout') +
-            ' — abra Folha de novo ou recarregue com <code>?force=1.9.71</code>.');
-          if (typeof toast === 'function') toast('Folha: falha ao carregar painel completo', 'error');
-        } else {
-          gpAdmSyncStatusBanner_();
+        } else if ((gpAdmTab_ === 'folha' || gpAdmTab_ === 'avaliacoes') && typeof toast === 'function') {
+          toast('Folha: falha ao carregar — abra a aba de novo', 'error');
         }
       } finally {
-        if (seq === gpAdmLoadSeq_) gpAdmLoadPromise_ = null;
+        if (seq === gpAdmLoadSeq_) gpAdmPanelInFlight_ = false;
       }
     })();
   }
 
   window.mkGpAdmLoad_ = async function mkGpAdmLoad_(opts) {
-    // I126b: NÃO incrementar seq antes do early-return — senão cancela o full em voo
-    if (gpAdmLoadPromise_ && !opts?.force) return gpAdmLoadPromise_;
+    // I126b/c: early-return ANTES do seq++; promise resolvida não bloqueia Folha (usa panelInFlight)
+    if (gpAdmPanelInFlight_ && !opts?.force) return gpAdmLoadPromise_ || Promise.resolve();
+    if (gpAdmLoadPromise_ && !opts?.force && !gpAdmPanelInFlight_) {
+      /* hydrate já terminou e painel também — ok reutilizar */
+      if (gpAdmHasFolhaData_() || gpAdmHasPanelPayload_(gpAdmData_)) return gpAdmLoadPromise_;
+    }
     const seq = ++gpAdmLoadSeq_;
     const compReq = (opts && opts.competencia) ? String(opts.competencia).trim() : (gpAdmCompSel_ || '');
     if (compReq) gpAdmCompSel_ = compReq;
     const cached = !opts?.force ? gpAdmCacheGet_(compReq) : null;
-    if (cached && cached.ok && !(cached._partial || cached.lite === true)) {
+    if (cached && cached.ok && !(cached._partial || cached.lite === true) && cached.folha && cached.folha.length) {
       if (seq !== gpAdmLoadSeq_) return gpAdmLoadPromise_;
       cached._fromQuick = false;
       delete cached._partial;
+      cached.lite = false;
       gpAdmData_ = cached;
       gpAdmCompSel_ = cached.competencia || compReq || gpAdmCompSel_;
       if (typeof applySessaoAtivaFromApi_ === 'function') applySessaoAtivaFromApi_(cached);
       gpAdmRender_();
       gpAdmSyncStatusBanner_();
-    } else if (opts?.force && (opts.skipLite || gpAdmTabNeedsFullPanel_(gpAdmTab_))) {
+    } else if (opts?.force && opts.skipLite) {
       gpAdmShowFolhaLoading_(gpAdmCompLabel_(compReq || gpAdmCompSel_ || ''));
     } else if (!gpAdmHasPanelPayload_(gpAdmData_)) {
       gpAdmShowLoading_();
     }
     gpAdmLoadPromise_ = (async function () {
       try {
-        // I126: painel em paralelo com lista rápida — não esperar 8–16s de hydrate/alertas
-        gpAdmLoadPainelBackground_(seq, compReq, opts);
+        const panelP = gpAdmLoadPainelBackground_(seq, compReq, opts);
         await gpAdmHydrateColabQuick_();
         await gpAdmLoadAlertasQuick_();
         gpAdmRenderHoje_();
+        gpAdmSyncStatusBanner_();
+        await panelP;
         gpAdmSyncStatusBanner_();
       } catch (e) {
         if (seq !== gpAdmLoadSeq_) return;
@@ -1303,7 +1310,11 @@
           if (!gpAdmData_) await gpAdmHydrateColabQuick_();
         }
         gpAdmSyncStatusBanner_();
-        if (seq === gpAdmLoadSeq_) gpAdmLoadPromise_ = null;
+      } finally {
+        if (seq === gpAdmLoadSeq_) {
+          gpAdmLoadPromise_ = null;
+          gpAdmPanelInFlight_ = false;
+        }
       }
     })();
     return gpAdmLoadPromise_;
