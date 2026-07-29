@@ -39,9 +39,28 @@
   }
 
   function mkHolRefSalario_(hol) {
-    var qNum = hol.quinzena === 1 ? '1ª' : '2ª';
-    var pct = hol.quinzena === 1 ? '40%' : '60%';
-    return pct + ' da ' + qNum + ' quinzena';
+    if (Number(hol.quinzena) === 1) return '40% · adiantamento 1ª quinzena';
+    return 'salário do mês (proporcional)';
+  }
+
+  /**
+   * I127 — prática DP/RH (Portal Contábeis + art. 462 CLT):
+   * 1ª quinzena = adiantamento salarial; 2ª = salário do mês − adiantamento − encargos.
+   * Valor do adiantamento Q1 = 40% do salário proporcional do mês.
+   */
+  function mkHolAdiantamentoQ1_(hol) {
+    if (hol.adiantamentoQ1 != null && hol.adiantamentoQ1 !== '') {
+      return Math.round(Number(hol.adiantamentoQ1) * 100) / 100;
+    }
+    var salProp = Number(hol.salarioProporcional);
+    if (!(salProp > 0)) {
+      var base = Number(hol.base) || 0;
+      var q = Number(hol.quinzena) || 0;
+      if (q === 1 && base > 0) return base;
+      if (q === 2 && base > 0) return Math.round((base * 0.4 / 0.6) * 100) / 100;
+      return 0;
+    }
+    return Math.round(salProp * 0.4 * 100) / 100;
   }
 
   function mkHolNotaProp_(hol, adm) {
@@ -109,12 +128,15 @@
     var hol = mkHolNormalizeHol_(opts.holerite || {});
     var comp = opts.comp || hol.competencia || '—';
     var liquido = hol.liquido != null ? hol.liquido : Number(opts.liquido) || 0;
-    var bruto = hol.bruto != null ? hol.bruto : Number(opts.bruto) || 0;
+    var bruto = opts.bruto != null ? Number(opts.bruto) : (hol.bruto != null ? Number(hol.bruto) : 0);
     var bonus = Number(hol.bonus) || 0;
-    var totalDescontos = hol.totalDescontos != null ? hol.totalDescontos : Number(opts.totalDescontos) || 0;
+    var totalDescontos = opts.totalDescontos != null
+      ? Number(opts.totalDescontos)
+      : (hol.totalDescontos != null ? Number(hol.totalDescontos) : 0);
     var vaTotal = Number(hol.vaTotal) || 0;
     var vtPasses = Number(hol.vtPasses) || 0;
     var vtJaPago = Number(hol.vtPassesJaPago) || 0;
+    var adianta = Number(opts.adiantamentoQ1) || mkHolAdiantamentoQ1_(hol);
     var pix = hol.pixQuinzena != null
       ? Number(hol.pixQuinzena)
       : Math.round((liquido + bonus) * 100) / 100;
@@ -130,6 +152,10 @@
     } else if (vaTotal && vtPasses) benefCtx = ' + VA/VT';
     else if (vaTotal) benefCtx = ' + VA';
     else if (vtPasses) benefCtx = ' + VT';
+    var vencCtx = hol.quinzena === 2 ? 'Salário do mês (proporcional)' : 'Adiantamento 1ª quinzena';
+    var descCtx = hol.quinzena === 1
+      ? 'Na 1ª: sem encargos · VT já pago'
+      : ('Adiantamento Q1 ' + mkHolFmtMoney_(adianta) + ' + INSS/IRRF/VT/faltas');
     return '<div class="gp-hol-widgets" aria-label="Resumo do pagamento">' +
       '<div class="mk-widget mk-widget--hero gp-hol-hero">' +
       '<span class="mk-widget-lbl">Pacote desta quinzena</span>' +
@@ -139,15 +165,18 @@
       (hol.quinzena === 1
         ? '<div class="mk-note info" style="margin:8px 0 0;padding:10px 12px;border-radius:12px;background:#FEF3C7;color:#92400E;font-weight:700">VT dos ~15 dias já pago — R$ 0,00 no holerite' +
           (vtJaPago ? ' (ref. ' + mkHolFmtMoney_(vtJaPago) + ' pago fora)' : '') + '. Pacote = PIX + VA.</div>'
-        : '') +
+        : (adianta > 0
+          ? '<div class="mk-note info" style="margin:8px 0 0;padding:10px 12px;border-radius:12px;background:#FEE2E2;color:#991B1B;font-weight:700">Adiantamento da 1ª quinzena (' +
+            mkHolFmtMoney_(adianta) + ') entra como desconto nesta 2ª — art. 462 CLT / prática DP.</div>'
+          : '')) +
       '<div class="mk-cmd-grid gp-hol-widget-grid">' +
       '<div class="mk-widget"><span class="mk-widget-lbl">Competência</span><span class="mk-widget-val">' + esc(comp) + '</span>' +
       '<span class="mk-widget-ctx">Referência do mês</span></div>' +
       '<div class="mk-widget"><span class="mk-widget-lbl">Vencimentos</span><span class="mk-widget-val">' + mkHolFmtMoney_(bruto) + '</span>' +
-      '<span class="mk-widget-ctx">Só salário da quinzena</span></div>' +
+      '<span class="mk-widget-ctx">' + vencCtx + '</span></div>' +
       '<div class="mk-widget"><span class="mk-widget-lbl">Descontos</span>' +
       '<span class="mk-widget-val" style="color:var(--red,#C62828)">' + mkHolFmtMoney_(totalDescontos, 'd') + '</span>' +
-      '<span class="mk-widget-ctx">' + (hol.quinzena === 1 ? 'Na 1ª: sem faltas/INSS · VT já pago' : 'INSS, IRRF, VT, faltas') + '</span></div>' +
+      '<span class="mk-widget-ctx">' + descCtx + '</span></div>' +
       '</div></div>';
   }
 
@@ -159,21 +188,30 @@
     var hol = mkHolNormalizeHol_(f.holerite || {});
     var base = Number(f.base != null ? f.base : hol.base) || 0;
     var bonus = Number(f.bonus != null ? f.bonus : hol.bonus) || 0;
+    var qNum = Number(hol.quinzena) || 0;
 
     if (hol.diasQuinzena === 0 || (base <= 0 && bonus <= 0)) {
       return '<p class="gp-adm-muted">Sem pagamento nesta quinzena — admissão posterior ou período não trabalhado.</p>';
     }
 
-    var bruto = base; // I114 — Total vencimentos = só salário (bônus na cesta)
-    var inss = Number(hol.quinzena) === 1 ? 0 : (hol.inss || 0);
-    var irrf = Number(hol.quinzena) === 1 ? 0 : (hol.irrf || 0);
-    var vt = Number(hol.quinzena) === 1 ? 0 : (hol.vt || 0);
-    var faltas = Number(hol.quinzena) === 1 ? 0 : (hol.faltas || 0);
-    var liquido = hol.liquido != null ? Number(hol.liquido) : bruto - inss - irrf - vt - faltas;
-    if (Number(hol.quinzena) === 1) liquido = base;
-    var totalDescontos = Number(hol.quinzena) === 1
+    var salProp = Number(hol.salarioProporcional) || 0;
+    if (!(salProp > 0) && base > 0) {
+      salProp = qNum === 1 ? Math.round((base / 0.4) * 100) / 100
+        : (qNum === 2 ? Math.round((base / 0.6) * 100) / 100 : base);
+    }
+    var adiantaQ1 = mkHolAdiantamentoQ1_(Object.assign({}, hol, { salarioProporcional: salProp, base: base }));
+    // I127 — Q2: vencimentos = salário do mês; Q1: vencimentos = adiantamento (40%)
+    var bruto = qNum === 2 ? (salProp || base) : base;
+    var inss = qNum === 1 ? 0 : (hol.inss || 0);
+    var irrf = qNum === 1 ? 0 : (hol.irrf || 0);
+    var vt = qNum === 1 ? 0 : (hol.vt || 0);
+    var faltas = qNum === 1 ? 0 : (hol.faltas || 0);
+    var encargos = Math.round((inss + irrf + vt + faltas) * 100) / 100;
+    var totalDescontos = qNum === 1
       ? 0
-      : (hol.totalDescontos != null ? hol.totalDescontos : inss + irrf + vt + faltas);
+      : Math.round((adiantaQ1 + encargos) * 100) / 100;
+    var liquido = hol.liquido != null ? Number(hol.liquido) : (qNum === 1 ? base : Math.round((bruto - totalDescontos) * 100) / 100);
+    if (qNum === 1) liquido = base;
     var diasMes = hol.diasMes || 30;
     var diasTrab = hol.diasTrabalhados != null ? hol.diasTrabalhados : 0;
     var refSal = mkHolRefSalario_(hol);
@@ -186,23 +224,29 @@
     var adm = colab.admissao || '—';
     var cpf = colab.cpf || (colab.cadastro && colab.cadastro.cpf) || '';
     var matricula = mkHolMatricula_(colab.id || f.id);
-    var qLabel = hol.quinzenaLabel || (hol.quinzena === 1 ? '1ª quinzena' : '2ª quinzena');
+    var qLabel = hol.quinzenaLabel || (qNum === 1 ? '1ª quinzena' : '2ª quinzena');
+    if (qNum === 2 && String(qLabel).indexOf('adiantamento') < 0) {
+      qLabel = '2ª quinzena · salário do mês − adiantamento 1ª − encargos';
+    }
     var pgto = hol.pagamentoEm || '—';
     var salContr = hol.salarioContratual || 1621;
-    var pctSal = hol.quinzena === 1 ? '40%' : '60%';
     var bonusDias = f.bonusDias != null ? f.bonusDias : 0;
+    var proventoCod = qNum === 1 ? '010' : '001';
+    var proventoDesc = qNum === 1
+      ? 'Adiantamento salarial (1ª quinzena)'
+      : 'Salário mensal (proporcional)';
 
     var descRows = '';
-    if (hol.quinzena === 2) {
+    if (qNum === 2) {
       descRows = mkHolRow_('', '', '', '', '', 'Descontos legais e autorizados') +
+        mkHolRow_('410', 'Adiantamento 1ª quinzena (já pago)', '40% salário prop. · art. 462 CLT', '', mkHolFmtMoney_(adiantaQ1, 'd')) +
         mkHolRow_('401', 'INSS — previdência', inssAli, '', mkHolFmtMoney_(inss, 'd')) +
         mkHolRow_('402', 'IRRF — imposto de renda', irrfRef, '', irrf > 0 ? mkHolFmtMoney_(irrf, 'd') : 'R$ 0,00') +
         mkHolRow_('403', 'Desconto VT (6% do salário)', '6,0% salário prop.', '', mkHolFmtMoney_(vt, 'd')) +
-        mkHolRow_('404', 'Faltas / atrasos', faltas > 0 ? 'proporcional' : '0 dia', '', faltas > 0 ? mkHolFmtMoney_(faltas, 'd') : 'R$ 0,00') +
-        mkHolRow_('410', 'Adiantamento 1ª quinzena (desconto)', hol.diasQuinzena > 0 && hol.quinzena === 2 ? 'na 2ª quinzena' : '—', '', 'R$ 0,00');
+        mkHolRow_('404', 'Faltas / atrasos', faltas > 0 ? 'proporcional' : '0 dia', '', faltas > 0 ? mkHolFmtMoney_(faltas, 'd') : 'R$ 0,00');
     } else {
       descRows = mkHolRow_('', '', '', '', '', 'Descontos') +
-        mkHolRow_('410', 'Adiantamento quinzenal — descontos na 2ª quinzena', '—', '', 'R$ 0,00');
+        mkHolRow_('—', 'Sem descontos nesta quinzena', 'Encargos e adiantamento na 2ª', '', 'R$ 0,00');
     }
 
     var benPctLbl = (hol.pctBeneficios != null ? Math.round(Number(hol.pctBeneficios) * 100) : 50) + '%';
@@ -244,7 +288,8 @@
       comp: comp,
       bruto: bruto,
       liquido: liquido,
-      totalDescontos: totalDescontos
+      totalDescontos: totalDescontos,
+      adiantamentoQ1: adiantaQ1
     });
 
     return '<div class="mk-hol-print-root">' + toolbar + heroWidgets +
@@ -260,13 +305,13 @@
       '<div><span>Quinzena / pagamento</span>' + esc(qLabel) + ' · pgto ' + esc(pgto) + '</div>' +
       '<div><span>Admissão</span>' + esc(adm) + '</div>' +
       '<div><span>Salário contratual</span>' + mkHolFmtMoney_(salContr) + '</div>' +
-      '<div><span>Proporcional mês</span>' + mkHolFmtMoney_(hol.salarioProporcional || base) + ' (' + diasTrab + '/' + diasMes + ' dias)</div>' +
+      '<div><span>Proporcional mês</span>' + mkHolFmtMoney_(salProp || hol.salarioProporcional || base) + ' (' + diasTrab + '/' + diasMes + ' dias)</div>' +
       '</div>' +
       (notaProp ? '<div class="mk-hol-note">' + esc(notaProp) + '</div>' : '') +
       '<div class="mk-hol-comp">Demonstrativo · ' + esc(qLabel) + ' · pgto ' + esc(pgto) + '</div>' +
       '<table class="mk-hol-tbl"><thead><tr><th>Cód</th><th>Descrição</th><th>Referência</th><th>Vencimentos</th><th>Descontos</th></tr></thead><tbody>' +
-      mkHolRow_('', '', '', '', '', 'Proventos (salário)') +
-      mkHolRow_('001', 'Salário ' + pctSal + ' (proporcional)', refSal, mkHolFmtMoney_(base), '') +
+      mkHolRow_('', '', '', '', '', qNum === 1 ? 'Proventos (adiantamento)' : 'Proventos (salário do mês)') +
+      mkHolRow_(proventoCod, proventoDesc, refSal, mkHolFmtMoney_(bruto), '') +
       descRows +
       '</tbody></table>' +
       '<div class="mk-hol-tot">' +
@@ -277,11 +322,11 @@
       benBlock +
       '<div class="mk-hol-bases">' +
       '<div><span>Salário contratual</span>' + mkHolFmtMoney_(salContr) + '</div>' +
-      '<div><span>Base INSS (salário prop.)</span>' + mkHolFmtMoney_(hol.baseInss != null ? hol.baseInss : (hol.salarioProporcional || bruto)) + '</div>' +
-      '<div><span>Base IRRF</span>' + mkHolFmtMoney_(hol.irrfBase || 0) + '</div>' +
+      '<div><span>Base INSS (salário prop.)</span>' + mkHolFmtMoney_(hol.baseInss != null ? hol.baseInss : salProp || bruto) + '</div>' +
+      '<div><span>Adiantamento 1ª (desconto Q2)</span>' + mkHolFmtMoney_(adiantaQ1) + '</div>' +
       '<div><span>Salário líquido</span>' + mkHolFmtMoney_(liquido) + '</div>' +
       '</div>' +
-      '<div class="mk-hol-foot">Regra MOVI KIDS (I108–I112): 1ª quinzena = 40% salário + cesta 50% (bônus+VA; VT já pago) · 2ª = 60% salário + cesta 50% (bônus+VA+VT) − encargos sobre salário · bônus não integra salário/INSS. Documento informativo — conferir com contador.</div>' +
+      '<div class="mk-hol-foot">Modelo DP (Portal Contábeis / art. 462 CLT): 1ª quinzena = adiantamento 40%; 2ª = salário do mês − adiantamento − encargos (INSS/IRRF/VT/faltas). Cesta 50% (bônus/VA/VT) fora do salário. PIX desta quinzena = líquido + bônus. Documento informativo — conferir com contador.</div>' +
       '</div></div>';
   }
 

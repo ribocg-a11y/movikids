@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.205
+// MOVI KIDS — Google Apps Script v1.5.206
+// v1.5.206: I127 — holerite adiantamentoQ1 (40%) para discriminar desconto na 2ª quinzena (art. 462 CLT)
 // v1.5.205: I125d — 1 getLastRow/request; nextId cache; salvar 1 setValues(25); ▶ 1 read+1 write C→Y
 // v1.5.204: I125c — cache ss_() na request; invalidate leve; ▶ só 3 células; salvar sem auditoria bloqueante
 // v1.5.203: I125b — salvar/▶ sem Firebase/format no caminho crítico (FB UrlFetch 2–6s); lock só na planilha
@@ -197,8 +198,8 @@
 
 // ── CONSTANTES ───────────────────────────────────────────────
 /** Versão exposta em ping, carregarInicio, validarSchema, gestaoPessoasStatus (bump com header). */
-const MK_GAS_VERSAO_  = 'v1.5.205';
-const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.205';
+const MK_GAS_VERSAO_  = 'v1.5.206';
+const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.206';
 const SHEET_ID   = '1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618';
 const DEPLOY_ID  = 'AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y';
 const WEBAPP_URL = `https://script.google.com/macros/s/${DEPLOY_ID}/exec`;
@@ -12205,6 +12206,10 @@ function gpCalcHollerite_(colab, bonus, faltas, competencia, refDate) {
   }
 
   const bruto = basePag;
+  // I127 — adiantamento da 1ª (40%) para discriminar na 2ª (art. 462 CLT / prática DP)
+  const adiantamentoQ1 = temQuinzena
+    ? Math.round(salarioProp * GP_PCT_QUINZENA_1_ * 100) / 100
+    : 0;
   let inss = 0, irrf = 0, vt = 0, inssAli = 0, irrfIsento = true, irrfBase = 0, fgts = 0;
 
   if (quinzena === 2 && temQuinzena) {
@@ -12221,6 +12226,8 @@ function gpCalcHollerite_(colab, bonus, faltas, competencia, refDate) {
   }
 
   // I110 — faltas / INSS / IRRF / VT 6% só na 2ª quinzena
+  // totalDescontos/liquido = encargos sobre a parcela desta quinzena (caixa);
+  // adiantamentoQ1 é discriminado no demonstrativo FE (não soma de novo no líquido).
   const faltasQuinz = (quinzena === 2 && temQuinzena) ? Number(faltas) || 0 : 0;
   const totalDescontos = Math.round((inss + irrf + vt + faltasQuinz) * 100) / 100;
   const liquido = Math.round((bruto - totalDescontos) * 100) / 100;
@@ -12237,6 +12244,7 @@ function gpCalcHollerite_(colab, bonus, faltas, competencia, refDate) {
 
   return {
     base: basePag, salarioContratual: salarioContratual, salarioProporcional: salarioProp,
+    adiantamentoQ1: adiantamentoQ1,
     bonus: bonusQuinz, bonusMes: Number(bonus) || 0, faltas: faltasQuinz, faltasMes: Number(faltas) || 0,
     bruto: bruto,
     inss: inss, inssAli: inssAli, irrf: irrf, irrfIsento: irrfIsento, vt: vt, fgts: fgts,
