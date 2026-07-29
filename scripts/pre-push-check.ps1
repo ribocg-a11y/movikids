@@ -512,6 +512,32 @@ try {
     }
   }
 
+  # I125 — salvar/▶ sem scan full-sheet; invalidate loc sem dash
+  if ($gasRaw -notmatch 'LOOKBACK = 500') {
+    Add-Check "guard.i125.conta.mestre" "fail" "findContaMestre LOOKBACK 500 ausente (I125)"
+  } elseif ($gasRaw -notmatch 'IDs monotônicos|lastId \+ 1') {
+    Add-Check "guard.i125.nextId" "fail" "nextId_ O\(1\) ausente (I125)"
+  } elseif ($gasRaw -match 'function invalidateInicioResumoCache_\([\s\S]{0,900}invalidateDashCaches_\(\);\s*\r?\n\s*\} catch') {
+    Add-Check "guard.i125.invalidate.dash" "fail" "invalidateInicio ainda chama dash sempre (I125)"
+  } elseif ($gasRaw -notmatch 'includeDash') {
+    Add-Check "guard.i125.invalidate.dash" "fail" "includeDash ausente em invalidateInicio (I125)"
+  } else {
+    Add-Check "guard.i125.salvar.iniciar" "ok" "nextId O(1)+conta dia+invalidate sem dash"
+  }
+  $novaPath = Join-Path $root "mk-nova.js"
+  $opPath = Join-Path $root "mk-operacao.js"
+  if ((Test-Path $novaPath) -and (Test-Path $opPath)) {
+    $novaRaw = Get-Content -Path $novaPath -Raw -Encoding UTF8
+    $opRaw = Get-Content -Path $opPath -Raw -Encoding UTF8
+    if ($novaRaw -match 'novaPosSaveSync_[\s\S]{0,400}syncController\(true') {
+      Add-Check "guard.i125.fe.sync" "fail" "novaPosSaveSync_ usa force=true (I125)"
+    } elseif ($opRaw -match 'broadcastInvalidate\(\);\s*\r?\n\s*syncController\(true') {
+      Add-Check "guard.i125.fe.sync" "fail" "iniciarContagem force=true pos-▶ (I125)"
+    } else {
+      Add-Check "guard.i125.fe.sync" "ok" "pos-save/▶ sync suave sem force"
+    }
+  }
+
   $authPath = Join-Path $root "mk-auth.js"
   if (Test-Path $authPath) {
     $authRaw = Get-Content -Path $authPath -Raw -Encoding UTF8

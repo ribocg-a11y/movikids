@@ -690,7 +690,8 @@ async function iniciarContagem(rowIndex, opts) {
   }
 
   broadcastInvalidate();
-  syncController(false, 4000);
+  // I125: nunca force=1 após ▶ — invalidate GAS + poll warm; force frio trava tablet
+  syncController(false, 2500);
 }
 
 // ═══════════════════════════════════════════════════════════

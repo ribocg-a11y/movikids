@@ -1,10 +1,10 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 18/07/2026 · FE **v1.9.66** (I124) · GAS repo **v1.5.201** · Web ping **v1.5.201**  
+**Atualizado:** 29/07/2026 · FE **v1.9.67** (I125) · GAS repo **v1.5.202** · Web ping **v1.5.201** ⏳ Nova versão I125  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **GAS canônico (raw):** https://raw.githubusercontent.com/ribocg-a11y/movikids/main/MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs  
-**GitHub:** `ribocg-a11y/movikids` · branch `main` · I124: Dashboard saneado (Real / Previsão / Resultado)
+**GitHub:** `ribocg-a11y/movikids` · branch `main` · **I125:** salvar/▶ rápido (acaba latência reincidente)
 
 **Mensagem mínima no novo chat:**
 

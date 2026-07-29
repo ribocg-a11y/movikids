@@ -980,9 +980,10 @@ function abrirNovaComResponsavel(resp, novaCrianca = false) {
 
 function novaPosSaveSync_() {
   if (typeof mkInvalidateInicioCache_ === 'function') mkInvalidateInicioCache_();
+  // I125: sync suave (sem force) — cache Script já invalidado no GAS; force=1 = frio 10–12s
   setTimeout(function() {
-    if (typeof syncController === 'function') syncController(false, 4500);
-  }, 300);
+    if (typeof syncController === 'function') syncController(false, 2500);
+  }, 200);
 }
 
 function novaRefreshAposItemSalvo_(i) {
