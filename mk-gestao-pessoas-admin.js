@@ -316,8 +316,17 @@
     gpAdmRenderTab_(tab);
     if (!gpAdmData_ && typeof window.mkGpAdmLoad_ === 'function') {
       window.mkGpAdmLoad_();
-    } else if (gpAdmTabNeedsFullPanel_(tab) && gpAdmData_ && gpAdmData_._partial && typeof window.mkGpAdmLoad_ === 'function') {
-      window.mkGpAdmLoad_({ force: true, competencia: gpAdmCompSel_ || gpAdmData_.competencia });
+    } else if (gpAdmTabNeedsFullPanel_(tab) && gpAdmData_ && (gpAdmData_._partial || gpAdmData_.lite === true || gpAdmData_._fromQuick)) {
+      // I126b: se full já está a caminho, não cancelar com force — só reforça loading da Folha
+      if (gpAdmLoadPromise_) {
+        if (tab === 'folha') gpAdmShowFolhaLoading_(gpAdmCompLabel_(gpAdmCompSel_ || gpAdmData_.competencia || ''));
+      } else if (typeof window.mkGpAdmLoad_ === 'function') {
+        window.mkGpAdmLoad_({
+          force: true,
+          skipLite: true,
+          competencia: gpAdmCompSel_ || gpAdmData_.competencia
+        });
+      }
     }
     if (tab === 'cadastro' && typeof refreshOperadoresAdmin_ === 'function') refreshOperadoresAdmin_();
   };
@@ -785,7 +794,11 @@
     const compLbl = gpAdmCompLabel_(gpAdmData_.competencia || gpAdmCompSel_ || '');
     const folha = gpAdmData_.folha || [];
     if (!folha.length) {
-      el.innerHTML = '<p class="gp-adm-muted">Folha indisponível para ' + esc(compLbl) + ' — instale abas RH ou cadastre colaboradores.</p>';
+      if (gpAdmData_._partial || gpAdmData_.lite === true || gpAdmData_._fromQuick || gpAdmLoadPromise_) {
+        el.innerHTML = '<p class="gp-adm-muted gp-adm-loading">Carregando folha de <strong>' + esc(compLbl) + '</strong>…</p>';
+      } else {
+        el.innerHTML = '<p class="gp-adm-muted">Folha indisponível para ' + esc(compLbl) + ' — instale abas RH ou cadastre colaboradores.</p>';
+      }
       return;
     }
     el.innerHTML = '<p class="gp-adm-folha-comp-hint">Exibindo competência <strong>' + esc(compLbl) + '</strong></p>' +
@@ -1194,28 +1207,39 @@
 
   function gpAdmLoadPainelBackground_(seq, compReq, opts) {
     (async function () {
-      try {
-        // I120/I126: lite primeiro → UI com ponto/escala reais; full em seguida
-        const litePayload = Object.assign({
-          action: 'painelGestaoPessoasAdmin', lite: '1', _t: Date.now()
-        }, gpAdmPinParams_());
-        if (compReq) litePayload.competencia = compReq;
-        const lite = await api(litePayload, 45000);
-        if (seq !== gpAdmLoadSeq_) return;
-        if (lite && lite.ok) {
-          gpAdmApplyPanelPayload_(lite, compReq, { asLite: true });
+      let liteOk = false;
+      const skipLite = !!(opts && opts.skipLite);
+      // I120/I126/I126b: lite primeiro (opcional); full sempre — timeout do lite não aborta a Folha
+      if (!skipLite) {
+        try {
+          const litePayload = Object.assign({
+            action: 'painelGestaoPessoasAdmin', lite: '1', _t: Date.now()
+          }, gpAdmPinParams_());
+          if (compReq) litePayload.competencia = compReq;
+          const lite = await api(litePayload, 45000);
+          if (seq !== gpAdmLoadSeq_) return;
+          if (lite && lite.ok) {
+            liteOk = true;
+            gpAdmApplyPanelPayload_(lite, compReq, { asLite: true });
+          }
+        } catch (eLite) {
+          if (seq !== gpAdmLoadSeq_) return;
+          /* segue para full */
         }
+      }
+      try {
         const apiPayload = Object.assign({ action: 'painelGestaoPessoasAdmin', _t: Date.now() }, gpAdmPinParams_());
         if (compReq) apiPayload.competencia = compReq;
         const d = await api(apiPayload, 90000);
         if (seq !== gpAdmLoadSeq_) return;
         if (!d.ok) {
-          if (!(lite && lite.ok)) {
+          if (!liteOk) {
             const errTxt = esc(d.erro || 'Erro painel RH');
             gpAdmSetErr_('<strong>Painel RH:</strong> ' + errTxt + ' · Republicar GAS <strong>v1.5.205</strong> (Nova versão Web).');
             if (typeof toast === 'function') toast(d.erro || 'Painel RH indisponível', 'error');
           } else {
-            gpAdmSyncStatusBanner_();
+            gpAdmSetErr_('<strong>Folha incompleta.</strong> Painel rápido ok, mas o full falhou: ' + esc(d.erro || 'erro') + '. Tente de novo na aba Folha.');
+            if (typeof toast === 'function') toast(d.erro || 'Folha indisponível', 'error');
           }
           return;
         }
@@ -1230,6 +1254,10 @@
         if (!gpAdmHasPanelPayload_(gpAdmData_)) {
           const msg = (e && e.message) || 'Erro de conexão';
           gpAdmSetErr_(esc(msg) + ' <span class="gp-adm-muted">Modo básico ativo.</span>');
+        } else if (gpAdmData_ && (gpAdmData_._partial || gpAdmData_.lite === true)) {
+          gpAdmSetErr_('<strong>Folha ainda não chegou.</strong> ' + esc((e && e.message) || 'timeout') +
+            ' — abra Folha de novo ou recarregue com <code>?force=1.9.71</code>.');
+          if (typeof toast === 'function') toast('Folha: falha ao carregar painel completo', 'error');
         } else {
           gpAdmSyncStatusBanner_();
         }
@@ -1240,22 +1268,24 @@
   }
 
   window.mkGpAdmLoad_ = async function mkGpAdmLoad_(opts) {
-    const seq = ++gpAdmLoadSeq_;
+    // I126b: NÃO incrementar seq antes do early-return — senão cancela o full em voo
     if (gpAdmLoadPromise_ && !opts?.force) return gpAdmLoadPromise_;
+    const seq = ++gpAdmLoadSeq_;
     const compReq = (opts && opts.competencia) ? String(opts.competencia).trim() : (gpAdmCompSel_ || '');
     if (compReq) gpAdmCompSel_ = compReq;
     const cached = !opts?.force ? gpAdmCacheGet_(compReq) : null;
-    if (cached && cached.ok) {
+    if (cached && cached.ok && !(cached._partial || cached.lite === true)) {
       if (seq !== gpAdmLoadSeq_) return gpAdmLoadPromise_;
       cached._fromQuick = false;
+      delete cached._partial;
       gpAdmData_ = cached;
       gpAdmCompSel_ = cached.competencia || compReq || gpAdmCompSel_;
       if (typeof applySessaoAtivaFromApi_ === 'function') applySessaoAtivaFromApi_(cached);
       gpAdmRender_();
       gpAdmSyncStatusBanner_();
-    } else if (opts?.force && compReq) {
-      gpAdmShowFolhaLoading_(gpAdmCompLabel_(compReq));
-    } else {
+    } else if (opts?.force && (opts.skipLite || gpAdmTabNeedsFullPanel_(gpAdmTab_))) {
+      gpAdmShowFolhaLoading_(gpAdmCompLabel_(compReq || gpAdmCompSel_ || ''));
+    } else if (!gpAdmHasPanelPayload_(gpAdmData_)) {
       gpAdmShowLoading_();
     }
     gpAdmLoadPromise_ = (async function () {
