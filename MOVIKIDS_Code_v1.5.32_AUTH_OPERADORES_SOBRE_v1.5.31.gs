@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.208
+// MOVI KIDS — Google Apps Script v1.5.209
+// v1.5.209: I134 — abonarFalta casa Date do Sheets (zera Sync jornada); Julia sem falta fantasma
 // v1.5.208: I133 — abono falta: chave DD/MM/YYYY (match jornada); holerite Q1 na cesta (FE)
 // v1.5.207: I129 — ponto colab: force bypass cache; banco não dobra na saída; salvarBancoHorasRhAdmin
 // v1.5.206: I127 — holerite adiantamentoQ1 (40%) para discriminar desconto na 2ª quinzena (art. 462 CLT)
@@ -200,8 +201,8 @@
 
 // ── CONSTANTES ───────────────────────────────────────────────
 /** Versão exposta em ping, carregarInicio, validarSchema, gestaoPessoasStatus (bump com header). */
-const MK_GAS_VERSAO_  = 'v1.5.208';
-const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.208';
+const MK_GAS_VERSAO_  = 'v1.5.209';
+const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.209';
 const SHEET_ID   = '1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618';
 const DEPLOY_ID  = 'AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y';
 const WEBAPP_URL = `https://script.google.com/macros/s/${DEPLOY_ID}/exec`;
@@ -12644,24 +12645,37 @@ function abonarFaltaRhAdmin_(p) {
   const opId = Number(p.operadorId || 0);
   const dataStr = String(p.data || '').trim();
   if (!opId || !dataStr) return err_('operadorId e data obrigatorios', 400);
+  const dataAlvo = parseDataStr_(dataStr);
+  if (!dataAlvo) return err_('data invalida — use DD/MM/YYYY', 400);
+  const dataKey = fmtData_(dataAlvo);
   try {
     const sh = gpSheet_(SH_FALTAS);
     const rows = gpRows_(SH_FALTAS);
     const agora = fmtData_(new Date()) + ' ' + fmtHoraLocal_(new Date());
+    let abonados = 0;
+    // I134 — casar por data canônica (Date do Sheets ≠ string "10/07/2026")
     for (let i = 0; i < rows.length; i++) {
-      if (Number(rows[i][1]) === Number(opId) && cellToStr_(rows[i][2]) === dataStr) {
-        const r = GP_DATA_ROW + i;
-        sh.getRange(r, 3).setValue('Abonado');
-        sh.getRange(r, 6).setValue(0);
-        sh.getRange(r, 7).setValue('Abono ADM ' + agora);
-        gpInvalidateRhCache_();
-        return resp_({ ok: true, operadorId: opId, data: dataStr, acao: 'abonado_existente' });
-      }
+      if (Number(rows[i][1]) !== opId) continue;
+      const dRow = parseDataStr_(cellToStr_(rows[i][2]));
+      if (!dRow || fmtData_(dRow) !== dataKey) continue;
+      const r = GP_DATA_ROW + i;
+      sh.getRange(r, 3).setValue('Abonado');
+      sh.getRange(r, 6).setValue(0);
+      sh.getRange(r, 7).setValue('Abono ADM ' + agora);
+      abonados++;
+    }
+    if (abonados > 0) {
+      gpInvalidateRhCache_();
+      gpInvalidateColabPainelCache_(opId, null);
+      return resp_({ ok: true, operadorId: opId, data: dataKey, acao: 'abonado_existente', linhas: abonados, versao: MK_GAS_VERSAO_ });
     }
     const maxId = rows.length ? Math.max.apply(null, rows.map(function (r) { return Number(r[0]) || 0; })) + 1 : 1;
-    sh.appendRow([maxId, opId, dataStr, 'Abonado', '', 0, 'Abono ADM ' + agora, agora]);
+    sh.appendRow([maxId, opId, dataKey, 'Abonado', '', 0, 'Abono ADM ' + agora, agora]);
+    const lr = sh.getLastRow();
+    sh.getRange(lr, 3).setNumberFormat('@');
     gpInvalidateRhCache_();
-    return resp_({ ok: true, operadorId: opId, data: dataStr, acao: 'abono_criado', id: maxId });
+    gpInvalidateColabPainelCache_(opId, null);
+    return resp_({ ok: true, operadorId: opId, data: dataKey, acao: 'abono_criado', id: maxId, versao: MK_GAS_VERSAO_ });
   } catch (ex) {
     return err_('abonarFaltaRhAdmin: ' + ex.message, 500);
   }

@@ -1,6 +1,7 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 30/07/2026 · FE **v1.9.79** (I133 holerite cesta) · GAS repo **v1.5.208** · Web **v1.5.207** ⏳ Nova versão ✅ 
+**Atualizado:** 30/07/2026 · FE **v1.9.79** · GAS repo **v1.5.209** · Web **v1.5.208** ⏳ Nova versão (I134 Julia faltas)  
+
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **GAS canônico (raw):** https://raw.githubusercontent.com/ribocg-a11y/movikids/main/MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs  
