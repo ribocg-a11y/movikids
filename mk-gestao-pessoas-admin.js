@@ -19,7 +19,8 @@
   /** Última lista rápida (inclui órfãos fora do painel RH, ex. cadastro incompleto). */
   let gpAdmQuickCols_ = null;
 
-  const GP_ADM_CACHE_TTL = 5 * 60 * 1000;
+  // I137 — 15 min: evita re-pedir painel full a cada troca de aba / F5 leve
+  const GP_ADM_CACHE_TTL = 15 * 60 * 1000;
 
   function gpAdmCacheKey_(comp) {
     const raw = comp || gpAdmCompSel_ || '';
