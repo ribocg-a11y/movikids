@@ -622,6 +622,7 @@ function dispatchMoviAction_(p, method) {
       case 'excluirPontoRhAdmin': return excluirPontoRhAdmin_(p);
       case 'salvarBancoHorasRhAdmin': return salvarBancoHorasRhAdmin_(p);
       case 'abonarFaltaRhAdmin': return abonarFaltaRhAdmin_(p);
+      case 'limparFaltasOpMesAdmin': return limparFaltasOpMesAdmin_(p);
       case 'restaurarPontoRaykellyJun2026Admin': return restaurarPontoRaykellyJun2026Admin_(p);
       case 'restaurarPontoJuliaJul2026Admin': return restaurarPontoJuliaJul2026Admin_(p);
       case 'exportarCadastroRhAdmin': return exportarCadastroRhAdmin_(p);
@@ -12636,6 +12637,27 @@ function salvarBancoHorasRhAdmin_(p) {
     return resp_({ ok: true, operadorId: opId, saldo: saldo, versao: MK_GAS_VERSAO_ });
   } catch (ex) {
     return err_('salvarBancoHorasRhAdmin: ' + ex.message, 500);
+  }
+}
+
+/** Admin — remove FALTAS não abonadas do mês (ex.: Sync jornada fantasma). */
+function limparFaltasOpMesAdmin_(p) {
+  if (!adminPinOk_(p)) return err_('Acesso negado — PIN administrativo incorreto', 403);
+  const opId = Number(p.operadorId || 0);
+  if (!opId) return err_('operadorId obrigatorio', 400);
+  const comp = parseMesAnoPayback_(p.competencia || gpCompetenciaAtual_());
+  try {
+    const syncRem = gpRepairLimparFaltasSyncJornada_(opId);
+    const mesRem = gpRepairLimparFaltasOpMesNaoAbonadas_(opId, comp.mes, comp.ano);
+    gpInvalidateRhCache_();
+    gpInvalidateColabPainelCache_(opId, null);
+    return resp_({
+      ok: true, operadorId: opId, competencia: comp.label,
+      faltasSyncRemovidas: syncRem, faltasMesRemovidas: mesRem,
+      versao: MK_GAS_VERSAO_
+    });
+  } catch (ex) {
+    return err_('limparFaltasOpMesAdmin: ' + ex.message, 500);
   }
 }
 
