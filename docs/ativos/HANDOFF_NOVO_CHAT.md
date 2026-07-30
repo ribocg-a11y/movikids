@@ -1,6 +1,8 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 30/07/2026 · FE **v1.9.84** · GAS repo/Web **v1.5.209** · **I135** Operadores Folha/Escala timeout+retry  
+**Atualizado:** 30/07/2026 · FE **v1.9.85** · GAS repo/Web **v1.5.209** · **I135** Operadores Folha/Escala timeout+retry  
+
+**I140 (30/07):** FGTS fora da cesta (rodapé).
 
 **I139 (30/07):** Metas badge mostra R$ (FSS R$50).
 

@@ -396,8 +396,9 @@
       '<div><span>Base INSS (salário prop.)</span>' + mkHolFmtMoney_(hol.baseInss != null ? hol.baseInss : salProp || bruto) + '</div>' +
       '<div><span>Adiantamento 1ª (desconto Q2)</span>' + mkHolFmtMoney_(adiantaQ1) + '</div>' +
       '<div><span>Salário líquido</span>' + mkHolFmtMoney_(liquido) + '</div>' +
+      fgtsRodape +
       '</div>' +
-      '<div class="mk-hol-foot">Modelo DP: 1ª = adiantamento 40% + cesta (bônus/VA); 2ª = salário do mês − adiantamento − encargos + cesta. VT é pago toda semana e nunca soma no pacote. PIX = líquido + bônus. Documento informativo — conferir com contador.</div>' +
+      '<div class="mk-hol-foot">Modelo DP: 1ª = adiantamento 40% + cesta (bônus/VA); 2ª = salário do mês − adiantamento − encargos + cesta. VT é pago toda semana e nunca soma no pacote. PIX = líquido + bônus. FGTS 8% é encargo do empregador (informativo — não desconta da colaboradora). Documento informativo — conferir com contador.</div>' +
       '</div></div>';
   }
 
