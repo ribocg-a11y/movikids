@@ -1,6 +1,6 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 29/07/2026 · FE **v1.9.74** (I128 Ficha jornada/ponto) · GAS repo **v1.5.206** · Web **v1.5.205** ⏳ Nova versão  
+**Atualizado:** 29/07/2026 · FE **v1.9.75** (I129 ponto colab + banco) · GAS repo **v1.5.207** · Web **v1.5.205** ⏳ Nova versão (colar I129)  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **GAS canônico (raw):** https://raw.githubusercontent.com/ribocg-a11y/movikids/main/MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs  
@@ -79,7 +79,8 @@ cursor "C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-mo
 | **I106 POS gate** | ✅ v1.9.47 | Painel bruto POS + trava comprovante na Nova + cancel sem placeholder |
 | **I117 caixa pay-first** | ✅ Web+FE | Ativa/Pendente entram em `resumoDia` — bater POS com brincando |
 | **I123 gráfico Base×Ritmo×Real** | ✅ FE v1.9.65 | Dashboard: base travada · ritmo atual · real (DNA admin) |
-| **BANCO_HORAS** | ✅ zerado 18/07 | I44 `repairBancoHorasAdmin` — ops 1–4 em **0h00** (cumprindo horário) |
+| **BANCO_HORAS** | ✅ zerado 29/07 | I129 `repairBancoHorasAdmin` — ops 1–4 **0h00** (anti-dobra no GAS v1.5.207) |
+| **I129 ponto colab** | ✅ FE v1.9.75 · dados OK | Raykelly vê batida; Web GAS ⏳ Nova versão v1.5.207 |
 | **I124 Dashboard saneado** | ✅ FE v1.9.66 | Capítulos Real / Previsão (ritmo) / Resultado |
 
 **Deploy ID GAS:** `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y`

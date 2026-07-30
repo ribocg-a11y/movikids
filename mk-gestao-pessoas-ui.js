@@ -460,7 +460,30 @@
 
     function fmtTime() { return new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}); }
     function fmtDate() { return new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'short',year:'numeric'}); }
-    function fmtDataHoje() { const d=new Date(); return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0'); }
+    /** I129 — sempre DD/MM/YYYY (folha/jornada GAS); antes só DD/MM e o ponto “sumia”. */
+    function fmtDataHoje() {
+      const d = new Date();
+      return String(d.getDate()).padStart(2, '0') + '/' + String(d.getMonth() + 1).padStart(2, '0') + '/' + d.getFullYear();
+    }
+    function gpNormDataKey_(s) {
+      const t = String(s || '').trim();
+      if (!t || t === '—') return '';
+      const m = t.match(/^(\d{1,2})\/(\d{1,2})(?:\/(\d{2,4}))?/);
+      if (!m) return t;
+      const dd = String(parseInt(m[1], 10)).padStart(2, '0');
+      const mm = String(parseInt(m[2], 10)).padStart(2, '0');
+      let yy = m[3];
+      if (!yy) yy = String(new Date().getFullYear());
+      else if (yy.length === 2) yy = '20' + yy;
+      return dd + '/' + mm + '/' + yy;
+    }
+    function gpSameDay_(a, b) {
+      const ka = gpNormDataKey_(a);
+      const kb = gpNormDataKey_(b);
+      if (!ka || !kb) return false;
+      if (ka === kb) return true;
+      return ka.slice(0, 5) === kb.slice(0, 5);
+    }
     function diaSemanaHoje() { return DIAS[(new Date().getDay()+6)%7]; }
     function fmtBRL(n) { return Number(n).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
     function calcInssProgressivo(baseInss) {
@@ -1104,13 +1127,29 @@
       const ph = p.pontoHoje || {};
       let entrada = ph.entrada;
       let saida = ph.saida;
-      if (entrada == null && p.folha && p.folha.length) {
-        const row = p.folha.find(function (r) { return r.data === hoje; });
-        if (row) {
-          entrada = row.entrada !== '—' ? row.entrada : null;
-          saida = row.saida !== '—' ? row.saida : null;
+      function pickHora_(v) {
+        if (v == null) return null;
+        const s = String(v).trim();
+        if (!s || s === '—' || s === '-') return null;
+        return s;
+      }
+      if (!pickHora_(entrada)) {
+        const jdias = (p.jornada && p.jornada.dias) || [];
+        const jd = jdias.find(function (r) { return gpSameDay_(r.data, hoje); });
+        if (jd) {
+          entrada = pickHora_(jd.entrada);
+          saida = pickHora_(jd.saida);
         }
       }
+      if (!pickHora_(entrada) && p.folha && p.folha.length) {
+        const row = p.folha.find(function (r) { return gpSameDay_(r.data, hoje); });
+        if (row) {
+          entrada = pickHora_(row.entrada);
+          saida = pickHora_(row.saida);
+        }
+      }
+      entrada = pickHora_(entrada);
+      saida = pickHora_(saida);
       const status = ph.status || p.statusHoje || 'fora';
       if (status === 'dentro' && entrada) {
         return { val: entrada, ctx: 'Trabalhando · entrada ' + entrada, tone: 'ok' };
@@ -1120,6 +1159,9 @@
       }
       if (entrada) {
         return { val: entrada, ctx: 'Entrada ' + entrada, tone: 'ok' };
+      }
+      if (status === 'dentro') {
+        return { val: 'Dentro', ctx: 'Ponto aberto hoje — confira Meu ponto', tone: 'ok' };
       }
       return { val: 'Sem registro', ctx: 'Toque em Meu ponto para registrar', tone: 'warn' };
     }
@@ -1346,7 +1388,7 @@
           <div class="gp-jorn-kpi gp-jorn-kpi--banco"><span>Banco</span><strong>${j.bancoProjetado || p.bancoHoras || '0h00'}</strong></div>
         </div>`;
         const rows = j.dias.map(r => {
-          const cls = r.folga ? ' class="off"' : (r.data === hoje ? ' class="hoje"' : '');
+          const cls = r.folga ? ' class="off"' : (gpSameDay_(r.data, hoje) ? ' class="hoje"' : '');
           return `<tr${cls}><td>${r.data}</td><td>${r.dia || ''}</td><td>${r.escala || '—'}</td><td>${r.entrada || '—'}</td><td>${r.saida || '—'}</td><td>${r.previsto || '—'}</td><td>${r.trabalhado || '—'}</td><td class="gp-jorn-extra">${r.extras || '—'}</td><td class="gp-jorn-atraso">${r.atraso || '—'}</td><td>${gpJornSitBadge(r.sit)}</td></tr>`;
         }).join('');
         return resumo + `<div class="mock-card" style="overflow-x:auto;margin-top:12px"><table class="mock-table gp-jorn-table">
@@ -1354,7 +1396,7 @@
           <tbody>${rows}</tbody></table></div>`;
       }
       const rows = p.folha.map(r => {
-        const cls = r.data===hoje?' class="hoje"':'';
+        const cls = gpSameDay_(r.data, hoje) ? ' class="hoje"' : '';
         return `<tr${cls}><td>${r.data}</td><td>${r.dia}</td><td>${r.entrada}</td><td>${r.saida}</td><td>${r.horas}</td><td>${r.sit}</td></tr>`;
       }).join('');
       return `<div class="mock-card" style="overflow-x:auto"><table class="mock-table">
@@ -1390,21 +1432,70 @@
         }
         const tipo = p.statusHoje !== 'dentro' ? 'entrada' : 'saida';
         MK_GestaoPessoas.registrarPonto(colabLogado, gpSessionPin, tipo).then(function (r) {
+          const horaMsg = String((r && r.mensagem) || '').match(/(\d{1,2}:\d{2})/);
+          const hora = horaMsg ? horaMsg[1] : fmtTime();
           p.statusHoje = r.status || (tipo === 'entrada' ? 'dentro' : 'fora');
+          p.pontoHoje = p.pontoHoje || {};
+          if (tipo === 'entrada') {
+            p.pontoHoje = { status: 'dentro', entrada: hora, saida: null };
+          } else {
+            p.pontoHoje = {
+              status: 'fora',
+              entrada: (p.pontoHoje && p.pontoHoje.entrada) || hora,
+              saida: hora
+            };
+          }
+          const hojeKey = fmtDataHoje();
+          if (!Array.isArray(p.folha)) p.folha = [];
+          let rowF = p.folha.find(function (x) { return gpSameDay_(x.data, hojeKey); });
+          if (!rowF) {
+            rowF = { data: hojeKey, dia: diaSemanaHoje(), entrada: '—', saida: '—', horas: '—', sit: 'Aberto' };
+            p.folha.unshift(rowF);
+          }
+          if (tipo === 'entrada') {
+            rowF.entrada = hora;
+            rowF.saida = rowF.saida && rowF.saida !== '—' ? rowF.saida : '—';
+            rowF.sit = 'Aberto';
+          } else {
+            rowF.saida = hora;
+            rowF.sit = 'OK';
+          }
+          if (p.jornada && Array.isArray(p.jornada.dias)) {
+            let jd = p.jornada.dias.find(function (x) { return gpSameDay_(x.data, hojeKey); });
+            if (!jd) {
+              jd = { data: hojeKey, dia: diaSemanaHoje(), entrada: '—', saida: '—', sit: 'Aberto' };
+              p.jornada.dias.unshift(jd);
+            }
+            if (tipo === 'entrada') {
+              jd.entrada = hora;
+              jd.saida = '—';
+              jd.sit = 'Aberto';
+            } else {
+              jd.saida = hora;
+              jd.sit = 'OK';
+            }
+          }
           flash.textContent = '✓ ' + (r.mensagem || 'Ponto registrado');
           flash.hidden = false;
-          return MK_GestaoPessoas.loginPainel(colabLogado, gpSessionPin);
+          renderPonto();
+          try { sessionStorage.removeItem('mk_gp_painel_' + String(colabLogado)); } catch (e0) { /* ok */ }
+          return MK_GestaoPessoas.loginPainel(colabLogado, gpSessionPin, { force: true });
         }).then(function (mapped) {
+          if (!mapped) return;
           PESSOAS[colabLogado] = Object.assign({}, mapped, { pin: gpSessionPin, preview: false });
           renderPonto();
+          if (document.getElementById('s-colab-hub') && document.getElementById('s-colab-hub').classList.contains('active')) {
+            renderColabHub();
+          }
         }).catch(function (e) {
           flash.textContent = '✗ ' + (e.message || 'Erro ao registrar ponto');
           flash.hidden = false;
+          renderPonto();
         });
         return;
       }
       const t = fmtTime(), hoje = fmtDataHoje(), dia = diaSemanaHoje();
-      let row = p.folha.find(r=>r.data===hoje);
+      let row = p.folha.find(r => gpSameDay_(r.data, hoje));
       if (!row) { row={data:hoje,dia,entrada:'—',saida:'—',horas:'—',sit:'ABERTO'}; p.folha.unshift(row); }
       if (p.statusHoje!=='dentro') {
         row.entrada=t; p.statusHoje='dentro';

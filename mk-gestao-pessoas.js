@@ -116,6 +116,8 @@
     loginPainel: function (operadorId, pin, opts) {
       const params = { operadorId: operadorId, pin: pin };
       if (opts && opts.competencia) params.competencia = String(opts.competencia).trim();
+      // I129 — após bater ponto, força rebuild (evita cache 90s sem a batida)
+      if (opts && (opts.force === true || opts.force === 1 || opts.force === '1')) params.force = '1';
       return gpApi('buscarPainelColaborador', params).then(function (r) {
         const mapped = gpMapPainel(operadorId, r);
         mapped.preview = false;

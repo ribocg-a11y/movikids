@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.206
+// MOVI KIDS — Google Apps Script v1.5.207
+// v1.5.207: I129 — ponto colab: force bypass cache; banco não dobra na saída; salvarBancoHorasRhAdmin
 // v1.5.206: I127 — holerite adiantamentoQ1 (40%) para discriminar desconto na 2ª quinzena (art. 462 CLT)
 // v1.5.205: I125d — 1 getLastRow/request; nextId cache; salvar 1 setValues(25); ▶ 1 read+1 write C→Y
 // v1.5.204: I125c — cache ss_() na request; invalidate leve; ▶ só 3 células; salvar sem auditoria bloqueante
@@ -198,8 +199,8 @@
 
 // ── CONSTANTES ───────────────────────────────────────────────
 /** Versão exposta em ping, carregarInicio, validarSchema, gestaoPessoasStatus (bump com header). */
-const MK_GAS_VERSAO_  = 'v1.5.206';
-const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.206';
+const MK_GAS_VERSAO_  = 'v1.5.207';
+const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.207';
 const SHEET_ID   = '1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618';
 const DEPLOY_ID  = 'AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y';
 const WEBAPP_URL = `https://script.google.com/macros/s/${DEPLOY_ID}/exec`;
@@ -617,6 +618,7 @@ function dispatchMoviAction_(p, method) {
       case 'repararDashboardPlanilhaAdmin': return repararDashboardPlanilhaAdmin_(p);
       case 'salvarPontoRhAdmin': return salvarPontoRhAdmin_(p);
       case 'excluirPontoRhAdmin': return excluirPontoRhAdmin_(p);
+      case 'salvarBancoHorasRhAdmin': return salvarBancoHorasRhAdmin_(p);
       case 'abonarFaltaRhAdmin': return abonarFaltaRhAdmin_(p);
       case 'restaurarPontoRaykellyJun2026Admin': return restaurarPontoRaykellyJun2026Admin_(p);
       case 'restaurarPontoJuliaJul2026Admin': return restaurarPontoJuliaJul2026Admin_(p);
@@ -11074,6 +11076,14 @@ function gpInvalidateRhCache_() {
   } catch (e) { /* ok */ }
 }
 
+/** I129 — zera cache do painel colaborador (todas competências vistas no mês). */
+function gpInvalidateColabPainelAllOps_(opIds) {
+  try {
+    const ids = opIds || [];
+    ids.forEach(function (id) { gpInvalidateColabPainelCache_(id, null); });
+  } catch (e) { /* ok */ }
+}
+
 /** I75 — linha mínima COLABORADORES_RH + BANCO_HORAS para operador do balcão. */
 function gpEnsureRhColaboradorFromOperador_(opId, nome, funcao) {
   const id = Number(opId);
@@ -12050,10 +12060,14 @@ function repairBancoHorasAdmin_(p) {
 }
 
 /** 15b.7 — persiste saldo projetado (somente apos saida de ponto ou repair explicito). */
+/**
+ * I129 — NÃO persistir bancoProjetado (abertura + saldoMes) a cada saída.
+ * Isso dobrava o saldo no mês (Raykelly ~-1117h · Julia ~-6217h).
+ * BANCO_HORAS = saldo de abertura; tela mostra projetado = abertura + mês.
+ * Ajuste de abertura: salvarBancoHorasRhAdmin / repairBancoHorasAdmin.
+ */
 function gpPersistBancoFromJornada_(opId, jornada) {
-  if (jornada && jornada.bancoProjetado) {
-    gpPersistBancoHoras_(opId, jornada.bancoProjetado);
-  }
+  return;
 }
 
 function gpPersistHoleriteSnapshot_(opId, comp, hol) {
@@ -12412,9 +12426,13 @@ function buscarPainelColaborador_(p) {
     }
     const comp = String(p.competencia || gpCompetenciaAtual_());
     const cacheKey = 'gp_colab_pnl_v1_' + opId + '_' + gpNormCompetencia_(comp);
+    const force = String(p.force || '') === '1' || p.force === true || p.force === 1;
     try {
-      const hit = CacheService.getScriptCache().get(cacheKey);
-      if (hit) return ContentService.createTextOutput(hit).setMimeType(ContentService.MimeType.JSON);
+      if (force) CacheService.getScriptCache().remove(cacheKey);
+      else {
+        const hit = CacheService.getScriptCache().get(cacheKey);
+        if (hit) return ContentService.createTextOutput(hit).setMimeType(ContentService.MimeType.JSON);
+      }
     } catch (eC) { /* ok */ }
     const payload = gpBuildPainelColaboradorPayload_(opId, comp, colab, auth.operador);
     const outObj = Object.assign({ ok: true }, payload);
@@ -12592,9 +12610,27 @@ function salvarPontoRhAdmin_(p) {
     const r = gpUpsertPontoRhRow_(opId, dataStr, entrada, saida, p.situacao || 'OK');
     gpRepairLimparFaltasSyncJornada_(opId);
     gpInvalidateRhCache_();
+    gpInvalidateColabPainelCache_(opId, null);
     return resp_(Object.assign({ ok: true, operadorId: opId, data: dataStr, entrada: entrada, saida: saida }, r));
   } catch (ex) {
     return err_('salvarPontoRhAdmin: ' + ex.message, 500);
+  }
+}
+
+/** I129 — define saldo de abertura do banco de horas (hhmm, ex. 0h00 ou -2h30). */
+function salvarBancoHorasRhAdmin_(p) {
+  if (!adminPinOk_(p)) return err_('Acesso negado — PIN administrativo incorreto', 403);
+  const opId = Number(p.operadorId || 0);
+  const saldo = String(p.saldo || p.bancoHoras || p.saldoHhmm || '').trim();
+  if (!opId || !saldo) return err_('operadorId e saldo (ex. 0h00) obrigatorios', 400);
+  if (!/^[+-]?\d+h\d{2}$/.test(saldo)) return err_('saldo invalido — use formato NhMM ou -NhMM', 400);
+  try {
+    gpPersistBancoHoras_(opId, saldo);
+    gpInvalidateRhCache_();
+    gpInvalidateColabPainelCache_(opId, null);
+    return resp_({ ok: true, operadorId: opId, saldo: saldo, versao: MK_GAS_VERSAO_ });
+  } catch (ex) {
+    return err_('salvarBancoHorasRhAdmin: ' + ex.message, 500);
   }
 }
 
@@ -12687,6 +12723,7 @@ function excluirPontoRhAdmin_(p) {
     const ok = gpDeletePontoRhRow_(opId, dataStr);
     gpRepairLimparFaltasSyncJornada_(opId);
     gpInvalidateRhCache_();
+    gpInvalidateColabPainelCache_(opId, null);
     return resp_({ ok: true, operadorId: opId, data: dataStr, removido: ok });
   } catch (ex) {
     return err_('excluirPontoRhAdmin: ' + ex.message, 500);
