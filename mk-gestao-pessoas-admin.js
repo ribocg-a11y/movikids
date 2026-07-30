@@ -14,6 +14,8 @@
   let gpAdmPanelInFlight_ = false;
   /** I130 — fetch pontual da jornada na Ficha (evita “Carregando…” eterno se full > timeout). */
   let gpAdmFichaJornadaInFlight_ = {};
+  /** I131 — cache de jornada por colaborador (sobrevive a lite/full trocar gpAdmData_). */
+  let gpAdmFichaJornadaCache_ = {};
   /** Última lista rápida (inclui órfãos fora do painel RH, ex. cadastro incompleto). */
   let gpAdmQuickCols_ = null;
 
@@ -124,21 +126,31 @@
 
   function gpAdmShowJornadaLoading_() {
     const el = document.getElementById('gp-adm-ficha-main');
-    if (el) {
-      el.innerHTML = '<p class="gp-adm-muted gp-adm-loading">Carregando jornada / ponto da competência…</p>';
+    if (!el) return;
+    // I131 — não apagar tabela / erro se já há jornada ou fetch em andamento
+    const selId = Number(gpAdmSelId_);
+    if (selId && gpAdmFichaJornadaCache_[selId] && gpAdmFichaJornadaCache_[selId].dias && gpAdmFichaJornadaCache_[selId].dias.length) {
+      return;
     }
+    if (selId && gpAdmFichaJornadaInFlight_[selId]) return;
+    const c = selId ? gpAdmColabById_(selId) : null;
+    if (c && c.jornada && c.jornada.dias && c.jornada.dias.length && !c.jornada._lite) return;
+    el.innerHTML = '<p class="gp-adm-muted gp-adm-loading">Carregando jornada / ponto da competência…</p>';
   }
 
   function gpAdmEnsureFullPanel_(reason) {
     // Já temos full (folha ou jornada real) e não estamos em lite
     if (!gpAdmPanelStillPartial_() && (gpAdmHasFolhaData_() || gpAdmHasFullJornada_())) return;
+    // I131 — Ficha usa preview pontual; não bloquear a UI no painel full
+    if (reason === 'presenca') {
+      if (gpAdmSelId_) gpAdmFetchFichaJornada_(gpAdmSelId_);
+      return;
+    }
     if (gpAdmPanelInFlight_) {
       if (reason === 'folha') gpAdmShowFolhaLoading_(gpAdmCompLabel_(gpAdmCompSel_ || (gpAdmData_ && gpAdmData_.competencia) || ''));
-      if (reason === 'presenca') gpAdmShowJornadaLoading_();
       return;
     }
     if (typeof window.mkGpAdmLoad_ === 'function') {
-      if (reason === 'presenca') gpAdmShowJornadaLoading_();
       window.mkGpAdmLoad_({
         force: true,
         skipLite: true,
@@ -148,62 +160,102 @@
   }
 
   /**
-   * I130 — Ficha: carrega jornada do colaborador via preview (rápido) em paralelo ao painel full.
-   * Full admin ~95s costuma estourar timeout e deixava “Carregando…” para sempre.
+   * I130/I131 — Ficha: carrega jornada via preview (não depende do painel full ~95s).
+   * I131 — operadorId da Ficha sempre por último no payload (auth do balcão não pode trocar a pessoa).
    */
   function gpAdmFetchFichaJornada_(opId) {
     const id = Number(opId);
     if (!id || !gpAdmData_) return Promise.resolve();
+    if (gpAdmFichaJornadaCache_[id] && gpAdmFichaJornadaCache_[id].dias && gpAdmFichaJornadaCache_[id].dias.length) {
+      gpAdmApplyFichaJornadaToColab_(id, gpAdmFichaJornadaCache_[id], gpAdmFichaJornadaCache_[id]._meta || {});
+      return Promise.resolve();
+    }
     const c0 = gpAdmColabById_(id);
     if (c0 && c0.jornada && c0.jornada.dias && c0.jornada.dias.length && !c0.jornada._lite) {
+      gpAdmFichaJornadaCache_[id] = c0.jornada;
       return Promise.resolve();
     }
     if (gpAdmFichaJornadaInFlight_[id]) return gpAdmFichaJornadaInFlight_[id];
-    const pinParams = gpAdmPinParams_();
-    const comp = gpAdmCompSel_ || (gpAdmData_ && gpAdmData_.competencia) || '';
-    const payload = Object.assign({
-      action: 'buscarPainelColaboradorPreview',
-      operadorId: id,
-      _t: Date.now()
-    }, pinParams);
-    if (comp) payload.competencia = comp;
-    gpAdmFichaJornadaInFlight_[id] = api(payload, 90000).then(function (r) {
-      if (!r || r.ok === false) throw new Error((r && (r.erro || r.error)) || 'Falha ao carregar jornada');
-      const ponto = r.ponto || {};
-      const j = ponto.jornada;
-      if (!gpAdmData_ || !gpAdmData_.colaboradores) return;
-      let c = gpAdmColabById_(id);
-      if (!c) {
-        c = { id: id, nome: (r.colaborador && r.colaborador.label) || ('ID ' + id) };
-        gpAdmData_.colaboradores.push(c);
-      }
-      if (j && j.dias && j.dias.length) {
-        c.jornada = j;
-        delete c.jornada._lite;
-      }
-      if (ponto.statusHoje != null || ponto.hoje) {
-        c.ponto = {
-          status: ponto.statusHoje || (ponto.hoje && ponto.hoje.status) || 'fora',
-          entrada: (ponto.hoje && ponto.hoje.entrada) || null,
-          saida: (ponto.hoje && ponto.hoje.saida) || null
+
+    gpAdmFichaJornadaInFlight_[id] = (async function () {
+      try {
+        if (typeof mkAuthEnsureAdminPin_ === 'function') {
+          const pinOk = await mkAuthEnsureAdminPin_('Ver jornada na Ficha');
+          if (!pinOk) throw new Error('PIN admin necessário para ver o ponto');
+        }
+        const pinParams = gpAdmPinParams_() || {};
+        if (!pinParams.adminPin) throw new Error('PIN admin ausente — entre de novo como Administrador');
+        const comp = gpAdmCompSel_ || (gpAdmData_ && gpAdmData_.competencia) || '';
+        // operadorId da Ficha por último — não deixar auth do balcão trocar a pessoa
+        const payload = Object.assign({}, pinParams, {
+          action: 'buscarPainelColaboradorPreview',
+          operadorId: id,
+          _t: Date.now()
+        });
+        if (comp) payload.competencia = comp;
+        const r = await api(payload, 90000);
+        if (!r || r.ok === false) throw new Error((r && (r.erro || r.error)) || 'Falha ao carregar jornada');
+        const ponto = r.ponto || {};
+        const j = ponto.jornada;
+        if (!j || !j.dias || !j.dias.length) {
+          throw new Error('Sem dias na competência — confira escala RH e admissão');
+        }
+        const meta = {
+          ponto: {
+            status: ponto.statusHoje || (ponto.hoje && ponto.hoje.status) || 'fora',
+            entrada: (ponto.hoje && ponto.hoje.entrada) || null,
+            saida: (ponto.hoje && ponto.hoje.saida) || null
+          },
+          bancoHoras: r.bancoHoras || j.bancoProjetado || j.bancoSaldo,
+          turno: (r.colaborador && r.colaborador.turno) || '',
+          escala: r.escala || null,
+          label: (r.colaborador && (r.colaborador.label || r.colaborador.nome)) || ''
         };
+        delete j._lite;
+        j._meta = meta;
+        gpAdmFichaJornadaCache_[id] = j;
+        gpAdmApplyFichaJornadaToColab_(id, j, meta);
+        if (Number(gpAdmSelId_) === id && gpAdmTab_ === 'presenca') {
+          gpAdmRenderPresenca_();
+        }
+      } catch (e) {
+        if (Number(gpAdmSelId_) !== id || gpAdmTab_ !== 'presenca') return;
+        const el = document.getElementById('gp-adm-ficha-main');
+        if (!el) return;
+        const msg = (e && e.message) || 'Erro ao carregar jornada';
+        el.innerHTML = '<div class="gp-adm-card"><p class="gp-adm-muted">Não foi possível carregar o ponto: ' +
+          esc(msg) + '</p><button type="button" class="btn btn-secondary" style="margin-top:10px" onclick="mkGpAdmVerFicha(' +
+          id + ')">Tentar de novo</button></div>';
+      } finally {
+        delete gpAdmFichaJornadaInFlight_[id];
       }
-      if (r.bancoHoras) c.bancoHoras = r.bancoHoras;
-      if (Number(gpAdmSelId_) === id && gpAdmTab_ === 'presenca') {
-        gpAdmRenderPresenca_();
-      }
-    }).catch(function (e) {
-      if (Number(gpAdmSelId_) !== id || gpAdmTab_ !== 'presenca') return;
-      const el = document.getElementById('gp-adm-ficha-main');
-      if (!el) return;
-      const msg = (e && e.message) || 'Erro ao carregar jornada';
-      el.innerHTML = '<div class="gp-adm-card"><p class="gp-adm-muted">Não foi possível carregar o ponto: ' +
-        esc(msg) + '</p><button type="button" class="btn btn-secondary" style="margin-top:10px" onclick="mkGpAdmVerFicha(' +
-        id + ')">Tentar de novo</button></div>';
-    }).finally(function () {
-      delete gpAdmFichaJornadaInFlight_[id];
-    });
+    })();
     return gpAdmFichaJornadaInFlight_[id];
+  }
+
+  function gpAdmApplyFichaJornadaToColab_(opId, jornada, meta) {
+    if (!gpAdmData_) return;
+    if (!gpAdmData_.colaboradores) gpAdmData_.colaboradores = [];
+    let c = gpAdmColabById_(opId);
+    if (!c) {
+      c = { id: Number(opId), nome: (meta && meta.label) || ('ID ' + opId) };
+      gpAdmData_.colaboradores.push(c);
+    }
+    c.jornada = jornada;
+    if (meta && meta.ponto) c.ponto = meta.ponto;
+    if (meta && meta.bancoHoras) c.bancoHoras = meta.bancoHoras;
+    if (meta && meta.turno) c.turno = meta.turno || c.turno;
+  }
+
+  /** Reaplica cache de jornada da Ficha após lite/full substituir gpAdmData_. */
+  function gpAdmRestoreFichaJornadasFromCache_() {
+    if (!gpAdmData_ || !gpAdmData_.colaboradores) return;
+    Object.keys(gpAdmFichaJornadaCache_).forEach(function (k) {
+      const id = Number(k);
+      const j = gpAdmFichaJornadaCache_[id];
+      if (!j || !j.dias || !j.dias.length) return;
+      gpAdmApplyFichaJornadaToColab_(id, j, j._meta || {});
+    });
   }
 
   function gpAdmRenderTab_(tab) {
@@ -689,14 +741,11 @@
       : '';
     const j = c.jornada;
     if (!j || !j.dias || !j.dias.length || j._lite) {
-      // I128/I130 — lite sem jornada: fetch pontual (preview) + full em paralelo
+      // I131 — só preview pontual (painel full não bloqueia mais a Ficha)
       el.innerHTML = intelBlock +
         '<div class="gp-adm-card"><p class="gp-adm-muted gp-adm-loading">Carregando jornada / ponto de ' +
         esc(c.nome || 'colaborador') + '…</p></div>';
       gpAdmFetchFichaJornada_(c.id);
-      if (gpAdmPanelStillPartial_() || !gpAdmHasFullJornada_()) {
-        gpAdmEnsureFullPanel_('presenca');
-      }
       return;
     }
     const t = j.totais || {};
@@ -1294,6 +1343,7 @@
     }
     gpAdmData_ = d;
     gpAdmCompSel_ = d.competencia || compReq || gpAdmCompSel_;
+    gpAdmRestoreFichaJornadasFromCache_();
     if (typeof applySessaoAtivaFromApi_ === 'function') applySessaoAtivaFromApi_(d);
     gpAdmRender_();
     gpAdmSyncStatusBanner_();
