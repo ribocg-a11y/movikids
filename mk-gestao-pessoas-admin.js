@@ -182,9 +182,27 @@
     });
   };
 
+  function gpAdmFichaHasJornada_(opId) {
+    const id = Number(opId);
+    if (gpAdmFichaJornadaCache_[id] && gpAdmFichaJornadaCache_[id].dias && gpAdmFichaJornadaCache_[id].dias.length) {
+      return true;
+    }
+    const c = gpAdmColabById_(id);
+    return !!(c && c.jornada && c.jornada.dias && c.jornada.dias.length && !c.jornada._lite);
+  }
+
+  function gpAdmFichaLoadingHtml_(nome, waitingPanel) {
+    const tip = waitingPanel
+      ? 'O painel RH do mês ainda está baixando (~1–2 min na 1ª vez). A tabela de ponto sai assim que ele terminar — sem pedido extra.'
+      : 'Buscando ponto desta pessoa… se passar de 90s, use Tentar de novo.';
+    return '<div class="gp-adm-card" data-gp-ficha-loading="1"><p class="gp-adm-muted gp-adm-loading">Carregando jornada / ponto de ' +
+      esc(nome || 'colaborador') + '…</p>' +
+      '<p class="gp-adm-muted" style="margin-top:8px;font-size:12px">' + tip + '</p></div>';
+  }
+
   /**
-   * I130/I131 — Ficha: carrega jornada via preview (não depende do painel full ~95s).
-   * I131 — operadorId da Ficha sempre por último no payload (auth do balcão não pode trocar a pessoa).
+   * I130/I131/I136 — Ficha: jornada via painel full (se em voo) OU preview pontual.
+   * I136 — NÃO disparar preview em paralelo com painelGestaoPessoasAdmin (GAS fila → “Carregando…” eterno).
    */
   function gpAdmFetchFichaJornada_(opId) {
     const id = Number(opId);
@@ -202,6 +220,24 @@
 
     gpAdmFichaJornadaInFlight_[id] = (async function () {
       try {
+        // I136 — esperar painel em voo; full já traz jornada e evita fila no Apps Script
+        if (gpAdmPanelInFlight_ && gpAdmLoadPromise_) {
+          try { await gpAdmLoadPromise_; } catch (eWait) { /* segue para preview */ }
+          if (gpAdmFichaHasJornada_(id)) {
+            if (gpAdmFichaJornadaCache_[id]) {
+              gpAdmApplyFichaJornadaToColab_(id, gpAdmFichaJornadaCache_[id], gpAdmFichaJornadaCache_[id]._meta || {});
+            }
+            if (Number(gpAdmSelId_) === id && gpAdmTab_ === 'presenca') gpAdmRenderPresencaTable_();
+            return;
+          }
+          const cAfter = gpAdmColabById_(id);
+          if (cAfter && cAfter.jornada && cAfter.jornada.dias && cAfter.jornada.dias.length && !cAfter.jornada._lite) {
+            gpAdmFichaJornadaCache_[id] = cAfter.jornada;
+            if (Number(gpAdmSelId_) === id && gpAdmTab_ === 'presenca') gpAdmRenderPresencaTable_();
+            return;
+          }
+        }
+
         if (typeof mkAuthEnsureAdminPin_ === 'function') {
           const pinOk = await mkAuthEnsureAdminPin_('Ver jornada na Ficha');
           if (!pinOk) throw new Error('PIN admin necessário para ver o ponto');
@@ -239,7 +275,7 @@
         gpAdmFichaJornadaCache_[id] = j;
         gpAdmApplyFichaJornadaToColab_(id, j, meta);
         if (Number(gpAdmSelId_) === id && gpAdmTab_ === 'presenca') {
-          gpAdmRenderPresenca_();
+          gpAdmRenderPresencaTable_();
         }
       } catch (e) {
         if (Number(gpAdmSelId_) !== id || gpAdmTab_ !== 'presenca') return;
@@ -764,10 +800,11 @@
       : '';
     const j = c.jornada;
     if (!j || !j.dias || !j.dias.length || j._lite) {
-      // I131 — só preview pontual (painel full não bloqueia mais a Ficha)
-      el.innerHTML = intelBlock +
-        '<div class="gp-adm-card"><p class="gp-adm-muted gp-adm-loading">Carregando jornada / ponto de ' +
-        esc(c.nome || 'colaborador') + '…</p></div>';
+      // I136 — não reescrever loading a cada hydrate (evita flicker); esperar painel antes de preview
+      const waitingPanel = !!(gpAdmPanelInFlight_ || gpAdmLoadPromise_);
+      if (!el.querySelector('[data-gp-ficha-loading="1"]')) {
+        el.innerHTML = intelBlock + gpAdmFichaLoadingHtml_(c.nome, waitingPanel);
+      }
       gpAdmFetchFichaJornada_(c.id);
       return;
     }
