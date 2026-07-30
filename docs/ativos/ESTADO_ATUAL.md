@@ -56,7 +56,8 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 | **FOLHA** | I68 26/06 | B68 **5253,96** · VA/dia **18,18** · VT **193,60**/pessoa · **schemaOk=True** |
 | **OPERADORES_SISTEMA** | repair I54 24/06 | **schemaOk=True** |
 | **CUSTOS** | repair I55 24/06 | 10 linhas · soma mes ~3477 · **schemaOk=True** |
-| **Aba BANCO_HORAS** | ✅ repair 23/06 | Milena/Raykelly **0h00** |
+| **Aba BANCO_HORAS** | ✅ repair 29/07 I129 | ops 1–4 **0h00** (anti-dobra GAS v1.5.207) |
+| **I129 ponto colab** | ✅ FE **v1.9.75** | Raykelly batida visível · Web GAS ⏳ Nova versão |
 | **Aba FOLHA** | I68 26/06 | [gid=179040058](https://docs.google.com/spreadsheets/d/1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618/edit#gid=179040058) · B68 **5253,96** · B9 **8,80** · 22 dias |
 
 **Editor Apps Script:** https://script.google.com/home/projects/19SIhkX9Tk7FiJA1JXu1OrUwssHdr3H5zc8q3rOjmBvqgWfXuHlk8xyf8/edit
