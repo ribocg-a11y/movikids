@@ -3,9 +3,9 @@
   'use strict';
 
   var GP_API_TIMEOUT_MS = {
-    buscarPainelColaborador: 60000,
-    buscarPainelColaboradorPreview: 60000,
-    painelGestaoPessoasAdmin: 60000,
+    buscarPainelColaborador: 90000,
+    buscarPainelColaboradorPreview: 90000,
+    painelGestaoPessoasAdmin: 120000,
     alertasPontoGestaoAdmin: 45000,
     repararRhPlanilhaAdmin: 90000
   };
