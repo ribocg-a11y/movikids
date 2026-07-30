@@ -942,20 +942,25 @@
       el.innerHTML = '<p class="gp-adm-muted">Cadastre colaboradores na aba RH (planilha).</p>';
       return;
     }
-    // I135 — stub rápido: nome + “Meta” colados; avisar se painel ainda não trouxe números
+    // I135/I139 — stub rápido; badge mostra dias + R$ (FSS = R$50, não 13×R$100)
     const stubOnly = !!(gpAdmData_._fromQuick && !gpAdmHasPanelPayload_(gpAdmData_));
+    const hintFss = '<p class="gp-adm-muted" style="margin:0 0 12px;font-size:12px">Sex/sáb/dom com Raykelly+Julia juntas: pot R$ 100 → <strong>R$ 50 cada</strong> (I109). Dias úteis sozinha: R$ 100.</p>';
     el.innerHTML = (stubOnly
       ? '<p class="gp-adm-muted gp-adm-loading" style="margin-bottom:10px">Atualizando metas do mês…</p>'
-      : '') +
+      : hintFss) +
       rhCols.map(function (c) {
       const m = c.metas || {};
       const metaAlert = (gpAdmData_.alertasInteligentes || []).some(function (a) {
         return String(a.codigo || '') === 'META_ABAIXO_' + c.id;
       });
+      const bonusRs = Number(m.bonusTotal) || 0;
+      const bonusLbl = m.bonusDias
+        ? (m.bonusDias + ' dia(s) · R$ ' + bonusRs.toLocaleString('pt-BR'))
+        : '';
       return '<div class="gp-adm-row"><div class="gp-adm-av">' + gpAdmInitial_(c.nome) + '</div>' +
         '<div class="gp-adm-row-body"><span class="gp-adm-soft-title">' + esc(c.nome) + '</span>' +
         '<small>Meta ' + (m.alvo || 20) + ' loc · hoje ' + (m.atual || 0) + ' · mês ' + (m.locMes || 0) + ' loc</small></div>' +
-        (metaAlert ? '<span class="gp-adm-badge warn">Proativo</span>' : (m.bonusDias ? '<span class="gp-adm-badge ok">' + m.bonusDias + ' dia(s) bônus</span>' : '<span class="gp-adm-badge gray">Sem bônus</span>')) +
+        (metaAlert ? '<span class="gp-adm-badge warn">Proativo</span>' : (bonusLbl ? '<span class="gp-adm-badge ok">' + esc(bonusLbl) + '</span>' : '<span class="gp-adm-badge gray">Sem bônus</span>')) +
         '</div>';
     }).join('');
   }

@@ -1,6 +1,8 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 30/07/2026 · FE **v1.9.83** · GAS repo/Web **v1.5.209** · **I135** Operadores Folha/Escala timeout+retry  
+**Atualizado:** 30/07/2026 · FE **v1.9.84** · GAS repo/Web **v1.5.209** · **I135** Operadores Folha/Escala timeout+retry  
+
+**I139 (30/07):** Metas badge mostra R$ (FSS R$50).
 
 **I138 (30/07):** holerite VT semanal fora do pacote · total 1ª = R$ 948,40 (memorial).
 
