@@ -1,6 +1,8 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 30/07/2026 · FE **v1.9.81** · GAS repo/Web **v1.5.209** · **I135** Operadores Folha/Escala timeout+retry  
+**Atualizado:** 30/07/2026 · FE **v1.9.82** · GAS repo/Web **v1.5.209** · **I135** Operadores Folha/Escala timeout+retry  
+
+**I137 (30/07):** cache full do Operadores não re-pede painel GAS.
 
 **I136 (30/07):** Ficha não dispara preview enquanto painel RH full está em voo (fila GAS).
 

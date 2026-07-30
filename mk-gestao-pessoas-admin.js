@@ -1514,9 +1514,20 @@
       cached.lite = false;
       gpAdmData_ = cached;
       gpAdmCompSel_ = cached.competencia || compReq || gpAdmCompSel_;
+      gpAdmRestoreFichaJornadasFromCache_();
       if (typeof applySessaoAtivaFromApi_ === 'function') applySessaoAtivaFromApi_(cached);
       gpAdmRender_();
       gpAdmSyncStatusBanner_();
+      // I137 — cache full hit: NÃO disparar lite+full de novo (era a fila GAS / “Carregando…” eterno)
+      gpAdmLoadPromise_ = Promise.resolve();
+      gpAdmPanelInFlight_ = false;
+      // hydrate leve em paralelo (lista/cadastro) — sem painelGestaoPessoasAdmin
+      gpAdmHydrateColabQuick_().then(function () {
+        if (seq !== gpAdmLoadSeq_) return;
+        gpAdmLoadAlertasQuick_();
+        gpAdmSyncStatusBanner_();
+      }).catch(function () { /* ok */ });
+      return gpAdmLoadPromise_;
     } else if (opts?.force && opts.skipLite) {
       gpAdmShowFolhaLoading_(gpAdmCompLabel_(compReq || gpAdmCompSel_ || ''));
     } else if (!gpAdmHasPanelPayload_(gpAdmData_)) {
