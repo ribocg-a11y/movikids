@@ -337,14 +337,17 @@
           : '') +
         (hol.incluiBeneficios
           ? mkHolRow_('501', 'Vale-alimentação (VA)', benPctLbl + ' de R$ ' + (hol.vaMensal || 400) + '/mês prop. ' + diasTrab + '/' + diasMes, hol.vaTotal ? mkHolFmtMoney_(hol.vaTotal) : 'R$ 0,00', '') +
-            mkHolRow_('502', 'Passes VT (semanal)', vtLinhaRef, vtLinhaVal, '') +
-            (hol.quinzena === 2
-              ? mkHolRow_('503', 'FGTS 8% — encargo empregador (informativo)', 'sobre base INSS do mês', hol.fgts ? mkHolFmtMoney_(hol.fgts) : '—', '')
-              : '')
+            mkHolRow_('502', 'Passes VT (semanal)', vtLinhaRef, vtLinhaVal, '')
           : '') +
         q1CestaRows +
         '</tbody></table>'
       : '<p class="gp-adm-muted" style="padding:12px 16px;margin:0">Sem cesta nesta quinzena (admissão posterior ao período).</p>';
+
+    // I140 — FGTS é encargo do empregador: rodapé informativo, nunca na cesta
+    var fgtsVal = Number(hol.fgts) || 0;
+    var fgtsRodape = (qNum === 2 && fgtsVal > 0)
+      ? '<div><span>FGTS 8% (encargo empregador)</span>' + mkHolFmtMoney_(fgtsVal) + '</div>'
+      : '';
 
     var toolbar = opts.toolbar !== false
       ? '<div class="mk-hol-toolbar no-print"><button type="button" class="btn btn-secondary" onclick="mkHolPrintPdf_()">📄 Salvar PDF / Imprimir</button></div>'
