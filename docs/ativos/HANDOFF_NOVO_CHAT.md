@@ -1,6 +1,9 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 30/07/2026 · FE **v1.9.79** · GAS repo **v1.5.209** · Web **v1.5.208** ⏳ Nova versão (I134 Julia faltas)  
+**Atualizado:** 30/07/2026 · FE **v1.9.80** · GAS repo/Web **v1.5.209** · **I135** Operadores Folha/Escala timeout+retry  
+
+**I135 (30/07):** Folha/Escala “não carrega” = timeout lite 45s &lt; ~50s real → stub rápido; FE **v1.9.80** sobe timeouts + botão Tentar de novo + CSS `NomeMeta`.  
+
 
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 

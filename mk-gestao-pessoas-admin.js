@@ -146,6 +146,7 @@
       if (gpAdmSelId_) gpAdmFetchFichaJornada_(gpAdmSelId_);
       return;
     }
+    // I135 — Escala/Metas usam lite; não cancelar full em andamento
     if (gpAdmPanelInFlight_) {
       if (reason === 'folha') gpAdmShowFolhaLoading_(gpAdmCompLabel_(gpAdmCompSel_ || (gpAdmData_ && gpAdmData_.competencia) || ''));
       return;
@@ -153,11 +154,33 @@
     if (typeof window.mkGpAdmLoad_ === 'function') {
       window.mkGpAdmLoad_({
         force: true,
-        skipLite: true,
+        // Folha precisa do full; se lite já veio, skipLite evita 50s+ desperdiçados
+        skipLite: reason === 'folha' || gpAdmHasPanelPayload_(gpAdmData_),
         competencia: gpAdmCompSel_ || (gpAdmData_ && gpAdmData_.competencia) || ''
       });
     }
   }
+
+  /** I135 — botão retry quando painel full falhou / timeout (não “Carregando…” eterno). */
+  function gpAdmRetryPanelHtml_(msg) {
+    return '<div class="gp-adm-card"><p class="gp-adm-muted">' + esc(msg || 'Painel RH demorou ou falhou.') +
+      '</p><button type="button" class="btn btn-secondary" style="margin-top:10px" onclick="mkGpAdmRetryPanel_()">Tentar de novo</button></div>';
+  }
+
+  window.mkGpAdmRetryPanel_ = function () {
+    if (typeof window.mkGpAdmLoad_ !== 'function') return;
+    if (gpAdmTab_ === 'folha') {
+      gpAdmShowFolhaLoading_(gpAdmCompLabel_(gpAdmCompSel_ || (gpAdmData_ && gpAdmData_.competencia) || ''));
+    } else if (gpAdmTab_ === 'escala') {
+      const el = document.getElementById('gp-adm-escala');
+      if (el) el.innerHTML = '<p class="gp-adm-muted gp-adm-loading">Carregando escala da competência…</p>';
+    }
+    window.mkGpAdmLoad_({
+      force: true,
+      skipLite: gpAdmTab_ === 'folha' || gpAdmHasPanelPayload_(gpAdmData_),
+      competencia: gpAdmCompSel_ || (gpAdmData_ && gpAdmData_.competencia) || ''
+    });
+  };
 
   /**
    * I130/I131 — Ficha: carrega jornada via preview (não depende do painel full ~95s).
@@ -852,10 +875,14 @@
     }
     const linhas = e.linhas || [];
     if (!linhas.length) {
-      const hint = gpAdmData_._partial
-        ? 'Aguardando painel RH (GAS v1.5.179+). Se persistir, republicar Nova versão Web.'
-        : 'Escala não cadastrada para ' + esc(e.competencia || '') + '.';
-      el.innerHTML = '<p class="gp-adm-muted">' + hint + '</p>';
+      // I135 — não deixar “Aguardando painel RH” eterno após timeout
+      if (gpAdmPanelInFlight_) {
+        el.innerHTML = '<p class="gp-adm-muted gp-adm-loading">Carregando escala da competência…</p>';
+      } else if (gpAdmData_._partial || gpAdmData_._fromQuick || gpAdmData_.lite === true) {
+        el.innerHTML = gpAdmRetryPanelHtml_('Escala ainda não chegou do painel RH. Toque para tentar de novo.');
+      } else {
+        el.innerHTML = '<p class="gp-adm-muted">Escala não cadastrada para ' + esc(e.competencia || '') + '.</p>';
+      }
       return;
     }
     el.innerHTML = '<table class="gp-adm-table"><tr><th>Nome</th>' + (e.colunas || []).map(function (d) { return '<th>' + esc(d) + '</th>'; }).join('') + '</tr>' +
@@ -872,16 +899,27 @@
     const el = document.getElementById('gp-adm-metas');
     if (!el || !gpAdmData_) return;
     const cols = gpAdmData_.colaboradores || [];
-    el.innerHTML = cols.filter(function (c) { return c.temRh; }).map(function (c) {
+    const rhCols = cols.filter(function (c) { return c.temRh; });
+    if (!rhCols.length) {
+      el.innerHTML = '<p class="gp-adm-muted">Cadastre colaboradores na aba RH (planilha).</p>';
+      return;
+    }
+    // I135 — stub rápido: nome + “Meta” colados; avisar se painel ainda não trouxe números
+    const stubOnly = !!(gpAdmData_._fromQuick && !gpAdmHasPanelPayload_(gpAdmData_));
+    el.innerHTML = (stubOnly
+      ? '<p class="gp-adm-muted gp-adm-loading" style="margin-bottom:10px">Atualizando metas do mês…</p>'
+      : '') +
+      rhCols.map(function (c) {
       const m = c.metas || {};
       const metaAlert = (gpAdmData_.alertasInteligentes || []).some(function (a) {
         return String(a.codigo || '') === 'META_ABAIXO_' + c.id;
       });
       return '<div class="gp-adm-row"><div class="gp-adm-av">' + gpAdmInitial_(c.nome) + '</div>' +
-        '<div class="gp-adm-row-body"><span class="gp-adm-soft-title">' + esc(c.nome) + '</span><small>Meta ' + (m.alvo || 20) + ' loc · hoje ' + (m.atual || 0) + ' · mês ' + (m.locMes || 0) + ' loc</small></div>' +
+        '<div class="gp-adm-row-body"><span class="gp-adm-soft-title">' + esc(c.nome) + '</span>' +
+        '<small>Meta ' + (m.alvo || 20) + ' loc · hoje ' + (m.atual || 0) + ' · mês ' + (m.locMes || 0) + ' loc</small></div>' +
         (metaAlert ? '<span class="gp-adm-badge warn">Proativo</span>' : (m.bonusDias ? '<span class="gp-adm-badge ok">' + m.bonusDias + ' dia(s) bônus</span>' : '<span class="gp-adm-badge gray">Sem bônus</span>')) +
         '</div>';
-    }).join('') || '<p class="gp-adm-muted">Cadastre colaboradores na aba RH (planilha).</p>';
+    }).join('');
   }
 
   function gpAdmFmtMoney_(v, tipo) {
@@ -936,8 +974,12 @@
     const compLbl = gpAdmCompLabel_(gpAdmData_.competencia || gpAdmCompSel_ || '');
     const folha = gpAdmData_.folha || [];
     if (!folha.length) {
-      if (gpAdmData_._partial || gpAdmData_.lite === true || gpAdmData_._fromQuick || gpAdmLoadPromise_) {
-        el.innerHTML = '<p class="gp-adm-muted gp-adm-loading">Carregando folha de <strong>' + esc(compLbl) + '</strong>…</p>';
+      // I135 — só inFlight (não LoadPromise: ela fica viva no hydrate e fingia loading eterno)
+      if (gpAdmPanelInFlight_) {
+        el.innerHTML = '<p class="gp-adm-muted gp-adm-loading">Carregando folha de <strong>' + esc(compLbl) + '</strong>…</p>' +
+          '<p class="gp-adm-muted" style="margin-top:8px;font-size:12px">Pode levar até ~2 min na 1ª carga do mês.</p>';
+      } else if (gpAdmData_._partial || gpAdmData_.lite === true || gpAdmData_._fromQuick) {
+        el.innerHTML = gpAdmRetryPanelHtml_('Folha de ' + compLbl + ' não chegou (timeout ou falha). Tente de novo — a carga completa pode levar ~2 min.');
       } else {
         el.innerHTML = '<p class="gp-adm-muted">Folha indisponível para ' + esc(compLbl) + ' — instale abas RH ou cadastre colaboradores.</p>';
       }
@@ -1214,7 +1256,7 @@
       gpAdmQuickCols_ = cols;
       const now = new Date();
       const comp = gpAdmCompSel_ || (String(now.getMonth() + 1).padStart(2, '0') + '/' + now.getFullYear());
-      // I126: se lite/full já chegou, só mescla cadastro/sessão — nunca zera ponto/escala
+      // I126/I135: reavaliar APÓS await — lite pode ter pousado durante a lista
       if (gpAdmHasPanelPayload_(gpAdmData_)) {
         const byId = {};
         cols.forEach(function (c) { byId[Number(c.id)] = c; });
@@ -1362,7 +1404,8 @@
             action: 'painelGestaoPessoasAdmin', lite: '1', _t: Date.now()
           }, gpAdmPinParams_());
           if (compReq) litePayload.competencia = compReq;
-          const lite = await api(litePayload, 45000);
+          // I135 — lite real ~50s; 45s matava Escala/Metas e deixava stub “NomeMeta”
+          const lite = await api(litePayload, 90000);
           if (seq !== gpAdmLoadSeq_) return;
           if (lite && lite.ok) {
             liteOk = true;
@@ -1375,16 +1418,18 @@
       try {
         const apiPayload = Object.assign({ action: 'painelGestaoPessoasAdmin', _t: Date.now() }, gpAdmPinParams_());
         if (compReq) apiPayload.competencia = compReq;
-        const d = await api(apiPayload, 120000);
+        // I135 — full ~90–110s em Jul/2026; margem para não cair em “Carregando…” eterno
+        const d = await api(apiPayload, 150000);
         if (seq !== gpAdmLoadSeq_) return;
         if (!d.ok) {
           if (!liteOk && !gpAdmHasPanelPayload_(gpAdmData_)) {
             const errTxt = esc(d.erro || 'Erro painel RH');
-            gpAdmSetErr_('<strong>Painel RH:</strong> ' + errTxt + ' · Republicar GAS <strong>v1.5.205</strong> (Nova versão Web).');
+            gpAdmSetErr_('<strong>Painel RH:</strong> ' + errTxt + ' · Confira GAS Web (ping) e tente de novo.');
             if (typeof toast === 'function') toast(d.erro || 'Painel RH indisponível', 'error');
           } else if (gpAdmTab_ === 'folha' || gpAdmTab_ === 'avaliacoes') {
             if (typeof toast === 'function') toast(d.erro || 'Folha indisponível — tente de novo', 'error');
           }
+          // sai do finally com inFlight=false → Folha/Escala mostram retry
           return;
         }
         gpAdmApplyPanelPayload_(d, compReq, {});
@@ -1399,10 +1444,17 @@
           const msg = (e && e.message) || 'Erro de conexão';
           gpAdmSetErr_(esc(msg) + ' <span class="gp-adm-muted">Modo básico ativo.</span>');
         } else if ((gpAdmTab_ === 'folha' || gpAdmTab_ === 'avaliacoes') && typeof toast === 'function') {
-          toast('Folha: falha ao carregar — abra a aba de novo', 'error');
+          toast('Folha: falha ao carregar — use Tentar de novo', 'error');
         }
       } finally {
-        if (seq === gpAdmLoadSeq_) gpAdmPanelInFlight_ = false;
+        if (seq === gpAdmLoadSeq_) {
+          gpAdmPanelInFlight_ = false;
+          // I135 — re-pinta Folha/Escala após timeout (sai do “Carregando…” eterno)
+          if (gpAdmTab_ === 'folha') gpAdmRenderFolha_();
+          else if (gpAdmTab_ === 'escala') gpAdmRenderEscala_();
+          else if (gpAdmTab_ === 'metas') gpAdmRenderMetas_();
+          else if (gpAdmTab_ === 'avaliacoes' && typeof gpAdmRenderAvaliacoes_ === 'function') gpAdmRenderAvaliacoes_();
+        }
       }
     })();
   }
@@ -1453,6 +1505,9 @@
         if (seq === gpAdmLoadSeq_) {
           gpAdmLoadPromise_ = null;
           gpAdmPanelInFlight_ = false;
+          if (gpAdmTab_ === 'folha') gpAdmRenderFolha_();
+          else if (gpAdmTab_ === 'escala') gpAdmRenderEscala_();
+          else if (gpAdmTab_ === 'metas') gpAdmRenderMetas_();
         }
       }
     })();

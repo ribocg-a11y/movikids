@@ -5,7 +5,8 @@
   var GP_API_TIMEOUT_MS = {
     buscarPainelColaborador: 90000,
     buscarPainelColaboradorPreview: 90000,
-    painelGestaoPessoasAdmin: 120000,
+    // I135 — lite ~50s / full ~90–110s; margem para Operadores Folha/Escala
+    painelGestaoPessoasAdmin: 150000,
     alertasPontoGestaoAdmin: 45000,
     repararRhPlanilhaAdmin: 90000
   };

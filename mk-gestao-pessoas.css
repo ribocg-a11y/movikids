@@ -1524,9 +1524,14 @@ html.gp-prod #gp-preview-banner {
   text-transform: none;
 }
 #page-operadores .gp-adm-soft-title {
+  display: block;
   font-size: 14px;
   font-weight: var(--gp-data-weight);
   color: var(--txt);
+  margin-bottom: 2px;
+}
+#page-operadores .gp-adm-row-body .gp-adm-soft-title + small {
+  display: block;
 }
 #page-operadores .gp-adm-soft-val,
 #gp-app .gp-colab-pick-name {
