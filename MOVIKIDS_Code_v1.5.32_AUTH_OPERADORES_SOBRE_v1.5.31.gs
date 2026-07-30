@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.207
+// MOVI KIDS — Google Apps Script v1.5.208
+// v1.5.208: I133 — abono falta: chave DD/MM/YYYY (match jornada); holerite Q1 na cesta (FE)
 // v1.5.207: I129 — ponto colab: force bypass cache; banco não dobra na saída; salvarBancoHorasRhAdmin
 // v1.5.206: I127 — holerite adiantamentoQ1 (40%) para discriminar desconto na 2ª quinzena (art. 462 CLT)
 // v1.5.205: I125d — 1 getLastRow/request; nextId cache; salvar 1 setValues(25); ▶ 1 read+1 write C→Y
@@ -199,8 +200,8 @@
 
 // ── CONSTANTES ───────────────────────────────────────────────
 /** Versão exposta em ping, carregarInicio, validarSchema, gestaoPessoasStatus (bump com header). */
-const MK_GAS_VERSAO_  = 'v1.5.207';
-const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.207';
+const MK_GAS_VERSAO_  = 'v1.5.208';
+const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.208';
 const SHEET_ID   = '1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618';
 const DEPLOY_ID  = 'AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y';
 const WEBAPP_URL = `https://script.google.com/macros/s/${DEPLOY_ID}/exec`;
@@ -11921,7 +11922,8 @@ function gpBuildAbonoFaltasMap_(opId, mes, ano, ctx) {
     if (!gpFaltaEhAbonadaRow_(r)) return;
     const d = parseDataStr_(cellToStr_(r[2]));
     if (!d || (d.getMonth() + 1) !== mes || d.getFullYear() !== ano) return;
-    map[cellToStr_(r[2])] = true;
+    // I133 — chave sempre DD/MM/YYYY (cellToStr_ de Date do Sheets quebrava o match)
+    map[fmtData_(d)] = true;
   });
   return map;
 }
@@ -12157,7 +12159,9 @@ function gpFaltasDescontoMes_(opId, comp, colab, jornada) {
     jornada.dias.forEach(function (d) {
       if (d.sit !== 'Falta' || !d.data || diaDesc <= 0) return;
       const abonada = faltaRows.some(function (r) {
-        return Number(r[1]) === Number(opId) && cellToStr_(r[2]) === d.data && gpFaltaEhAbonadaRow_(r);
+        if (Number(r[1]) !== Number(opId) || !gpFaltaEhAbonadaRow_(r)) return false;
+        const dd = parseDataStr_(cellToStr_(r[2]));
+        return dd && fmtData_(dd) === d.data;
       });
       if (abonada) return;
       total += diaDesc;
