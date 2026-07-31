@@ -130,15 +130,17 @@ if ($dirty.Count -gt 0) {
 }
 
 $ahead = Get-GitAheadCount
+$aheadTouchesVersion = Test-AheadTouchesVersion -Ahead $ahead
+# PrePush: ahead e esperado (commit ja feito, falta push). Sessao/PosPush: ahead = bloqueio.
+$aheadStatus = if ($Mode -eq 'PrePush') { 'warn' } else { 'fail' }
 if ($ahead -gt 0) {
-  Add-I24Check "git.ahead-of-origin" "fail" ("push pendente: $ahead commit(s) (I24)")
+  Add-I24Check "git.ahead-of-origin" $aheadStatus ("push pendente: $ahead commit(s) (I24)")
 } else {
   Add-I24Check "git.ahead-of-origin" "ok" "HEAD = origin/main"
 }
 
-$aheadTouchesVersion = Test-AheadTouchesVersion -Ahead $ahead
 if ($ahead -gt 0 -and $aheadTouchesVersion) {
-  Add-I24Check "git.ahead-touches-i3" "fail" "commits locais alteram mk-version/sw/index/gestao-pessoas"
+  Add-I24Check "git.ahead-touches-i3" $aheadStatus "commits locais alteram mk-version/sw/index/gestao-pessoas"
 } elseif ($ahead -gt 0) {
   Add-I24Check "git.ahead-touches-i3" "warn" "ahead sem arquivos I3 no diff"
 } else {
@@ -164,7 +166,9 @@ if (-not $SkipNetwork) {
 if ($pagesVer -and $pagesVer -ne $localVer) {
   $detail = "Pages=$pagesVer local=$localVer"
   if (Test-VerNewer $localVer $pagesVer) {
-    Add-I24Check "pages.vs-local" "fail" ($detail + " - banner Nova versao impossivel ate git push + verify-publish-complete")
+    # PrePush: local > Pages e o estado normal apos bump+commit (falha so em Sessao/PosPush)
+    $pageStatus = if ($Mode -eq 'PrePush') { 'warn' } else { 'fail' }
+    Add-I24Check "pages.vs-local" $pageStatus ($detail + " - banner Nova versao impossivel ate git push + verify-publish-complete")
   } else {
     Add-I24Check "pages.vs-local" "warn" ($detail + " - local mais antigo que Pages")
   }

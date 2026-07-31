@@ -241,7 +241,10 @@ try {
         Add-Check "guard.sessao.effectiveStart" "ok" "calcRemaining usa effectiveStartTs_"
       }
     }
-    if ($gasRaw -notmatch 'function salvarLocacao_[\s\S]{0,3500}fmtData_\(agora\),\s*''') {
+    # I20/I125d: col C vazia — appendRow legado OU setValues fullRow com '' na 3ª posição
+    $salvarHoraVazia = ($gasRaw -match 'function salvarLocacao_[\s\S]{0,3500}fmtData_\(agora\),\s*''') -or
+      ($gasRaw -match 'function salvarLocacao_[\s\S]{0,4500}const fullRow = \[[\s\S]{0,200}?dataFmt,\s*'''',\s*''''')
+    if (-not $salvarHoraVazia) {
       Add-Check "guard.gas.salvar.horaVazia" "fail" "salvarLocacao_ grava hora na col C (I20)"
     } else {
       Add-Check "guard.gas.salvar.horaVazia" "ok" "col C vazia no cadastro"
@@ -554,10 +557,14 @@ try {
     $opRaw = Get-Content -Path $opPath -Raw -Encoding UTF8
     if ($novaRaw -match 'novaPosSaveSync_[\s\S]{0,400}syncController\(true') {
       Add-Check "guard.i125.fe.sync" "fail" "novaPosSaveSync_ usa force=true (I125)"
-    } elseif ($opRaw -match 'broadcastInvalidate\(\);\s*\r?\n\s*syncController\(true') {
+    } elseif ($opRaw -match 'function iniciarContagem[\s\S]{0,8000}broadcastInvalidate\(\);\s*\r?\n\s*syncController\(true') {
       Add-Check "guard.i125.fe.sync" "fail" "iniciarContagem force=true pos-▶ (I125)"
+    } elseif ($opRaw -match 'function iniciarContagem[\s\S]{0,8000}broadcastInvalidate\(\);\s*\r?\n\s*//[^\n]*\r?\n\s*syncController\(false') {
+      Add-Check "guard.i125.fe.sync" "ok" "iniciarContagem sync suave sem force"
+    } elseif ($opRaw -match 'function iniciarContagem[\s\S]{0,8000}syncController\(false') {
+      Add-Check "guard.i125.fe.sync" "ok" "iniciarContagem sync suave sem force"
     } else {
-      Add-Check "guard.i125.fe.sync" "ok" "pos-save/▶ sync suave sem force"
+      Add-Check "guard.i125.fe.sync" "fail" "iniciarContagem force=true pos-▶ (I125)"
     }
   }
 
