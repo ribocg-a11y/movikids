@@ -75,33 +75,30 @@ cursor "C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-mo
 
 ---
 
-## Produção (15/07/2026)
+## Produção (31/07/2026)
 
 | Camada | Versão | URL / evidência |
 |--------|--------|-----------------|
-| **Frontend** | **v1.9.66** | https://ribocg-a11y.github.io/movikids/?force=1.9.66 |
-| **Gestão Pessoas** | **v1.9.66** | `gestao-pessoas.html?force=1.9.66` |
-| **Service Worker** | **1.9.66** | `sw.js` |
-| **Apps Script** | repo **v1.5.201** · Web **v1.5.200** ⏳ | Colar `.gs` + **Nova versão** → I122 (carregarInicio cache / anti-fantasma) |
+| **Frontend** | **v1.9.88** | https://ribocg-a11y.github.io/movikids/?force=1.9.88 |
+| **Gestão Pessoas** | **v1.9.88** | `gestao-pessoas.html?force=1.9.88` |
+| **Service Worker** | **1.9.88** | `sw.js` |
+| **Apps Script** | repo/Web **v1.5.209** ✅ | ping alinhado · I134 abono faltas |
 | **Baseline P0** | ✅ | `docs/ativos/BASELINE_CODIGO_P0.md` |
 | **PIN admin** | **1421** | Script Property `ADMIN_PIN` |
-| **Homolog tablet** | ✅ 23/06 | I43 · I42 · I47 · Gestor — smoke **v1.9.39** pendente Ops |
-| **Planilha** | 23 abas | `schemaOk=True` · auditoria **23/23** |
+| **Homolog tablet** | ✅ 23/06 | I43 · I42 · I47 · Gestor — smoke FE recente pendente Ops (D4) |
+| **Planilha** | 23 abas | `schemaOk=True` · `validarSchema` **31/07** |
 | **FOLHA VT (I68)** | ✅ 26/06 | B9 **8,80** · B10/B12 **22** · B68 **5253,96** · B25 **18,18** |
-| **FOLHA_PONTO audit** | ✅ I70 | 5 linhas reparadas via API 09/07 |
-| **VT holerite** | ✅ API | Milena **193,60** · Raykelly **103,25** |
-| **Colaboradores RH** | ✅ I75+I79 | Julia sync RH + escala Atendente 2 (07/2026) · meta turno ativa |
-| **Raykelly cadastro** | ✅ **100%** | API 26/06 · id 3 |
+| **Holerite Q2 31/07** | ✅ I141+I142 | Ray pacote **1652,22** · Julia **1702,22** · bônus resto |
+| **PDFs mês** | ✅ entregas | https://ribocg-a11y.github.io/movikids/entregas/holerite-mes-2026-07/ |
+| **Bônus jul** | ✅ 13 dias | Ray/Julia **R$ 850** (FSS R$50) |
+| **Colaboradores RH** | ✅ I75+I79 | Julia Atendente 2 · Raykelly id 3 · 100% |
 | **Design System** | **v1.1** | `DESIGN_SYSTEM_MOVIKIDS.md` |
-| **Multi-veículo** | ✅ I97–I99 | Cesta Nova locação · batch GAS · overlay watchdog |
-| **I103 contagem** | ✅ v1.9.39 | Encerradas = contas únicas · Caixa = todas locações |
-| **I104 conferência POS** | ✅ v1.9.46 | Caixa: contas no cartão (não locações) vs vendas maquininha |
-| **I106 POS gate** | ✅ v1.9.47 | Painel bruto POS + trava comprovante na Nova + cancel sem placeholder |
-| **I117 caixa pay-first** | ✅ Web+FE | Ativa/Pendente entram em `resumoDia` — bater POS com brincando |
-| **I123 gráfico Base×Ritmo×Real** | ✅ FE v1.9.65 | Dashboard: base travada · ritmo atual · real (DNA admin) |
-| **BANCO_HORAS** | ✅ zerado 29/07 | I129 `repairBancoHorasAdmin` — ops 1–4 **0h00** (anti-dobra no GAS v1.5.207) |
-| **I129 ponto colab** | ✅ FE v1.9.75 · dados OK | Raykelly vê batida; Web GAS ⏳ Nova versão v1.5.207 |
-| **I124 Dashboard saneado** | ✅ FE v1.9.66 | Capítulos Real / Previsão (ritmo) / Resultado |
+| **Multi-veículo** | ✅ I97–I99 | Cesta Nova locação · batch GAS · overlay |
+| **I103 / I117** | ✅ | Encerradas=contas · Caixa=todas · pay-first |
+| **I123–I124** | ✅ | Dashboard Base×Ritmo×Real · capítulos |
+| **I125d perf** | ✅ | salvar/▶ batch · mediana ~4.9s / ~3.4s |
+| **BANCO_HORAS** | ✅ I129 | ops 1–4 **0h00** |
+| **I129 ponto colab** | ✅ | FE v1.9.75+ · GAS Web **v1.5.209** |
 
 **Deploy ID GAS:** `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y`
 
@@ -150,23 +147,16 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 
 | # | Ação | Quem | Status |
 |---|------|------|--------|
-| **0** | **I117** caixa pay-first — GAS **v1.5.198** Web ✅ · FE **v1.9.62** | Sócio+Agente | ✅ **15/07** |
-| **0a** | **I116** GAS **v1.5.196** Web ✅ — validado 15/07 (ping 196 · GP OK · Ray warm ~4s) | Sócio+Agente | ✅ **15/07** |
-| **0b** | **I122** GAS **v1.5.201** + FE **v1.9.64** — colar Nova versão · limpar site data tablet se fantasma persistir | Sócio+Agente | ⏳ **16/07** |
-| **0b2** | **I123** gráfico Base × Ritmo × Real — FE **v1.9.65** (só Dashboard; P0 zero) | Agente | ✅ **16/07** |
-| **0b3** | **I124** Dashboard saneado — FE **v1.9.66** (Real / Previsão ritmo / Resultado) | Agente | ✅ **18/07** |
+| **0** | **I141–I142b** holerite Q2 resto + PDF conferência mês | Agente | ✅ **31/07** FE **v1.9.88** · PDFs em `entregas/` |
+| **0a** | **I125–I137** perf balcão/Operadores/ficha/cache | Agente | ✅ jul/2026 |
+| **0b** | **I122** carregarInicio cache / anti-fantasma | Agente+Sócio | ✅ GAS Web **v1.5.209** |
 | **0c** | Frios Colab residual (AUD/tail full) — lite já slim; não regredir P0 | Agente | 📋 backlog |
-| 1 | **Sprint D1** homolog PC admin v1.9.2 | Agente | ✅ **27/06** |
-| 1b | **I69** hotfix ponto mock → **v1.9.3** | Agente | ✅ **29/06** Pages |
-| 1c | **I70–I75** varredura — GAS/FE/Dashboard/GP/Julia | Agente | ✅ **09/07** |
-| 1d | **I79–I83** Julia + Operadores + race Escala/Metas | Agente | ✅ FE **v1.9.15** · GAS **v1.5.179** |
-| 1e | **I84–I87** meta conta/dia · caixa pagamento · perf admin | Agente | ✅ FE **v1.9.21** · GAS **v1.5.182** |
-| 1f | **I96–I103** multi-veículo + contagem encerradas/caixa | Agente | ✅ FE **v1.9.39** · GAS **v1.5.187** Web |
-| 2 | Assinar **FASE 17** (só falta **17.5 F9**) + smoke tablet D4 | Sócio + Ops | ⏳ |
-| 3 | Smoke tablet **v1.9.39** (multi-veículo + overlay + timer) | Ops | ⏳ Sprint D4 |
-| 4 | Sprint One UI A–C + I24 | Agente | ✅ **v1.9.9** |
+| 1 | **Sprint D1** homolog PC admin | Agente | ✅ **27/06** |
+| 2 | Assinar **FASE 17** (só falta **17.5 F9**) + smoke tablet D4 | Sócio + Ops | ⏳ **próximo Ops** |
+| 3 | Smoke tablet **v1.9.88** (multi-veículo + overlay + timer) | Ops | ⏳ Sprint D4 |
+| 4 | Sprint E — FASE 19 Performance (ranking opt-in) | Agente | 📋 após D2–D4 |
 
-Docs: `MAPA_ERROS` I117 · `INCIDENTE_I116_ENRICH_RH_KPI_LENTIDAO_2026-07-15.md` · `INCIDENTE_I115_COLAB_LOGIN_LENTO_2026-07-15.md` · `BASELINE_CODIGO_P0.md` · `PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`
+Docs: `MAPA_ERROS` I138–I142 · `entregas/holerite-mes-2026-07/` · `PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`
 
 ---
 
@@ -194,4 +184,4 @@ I15 POST browser · I20/I43 cronômetro · I42 conta dia · **I68 VT folha** · 
 
 ---
 
-*Preparado para novo chat — ciclo Premium One UI · I110 Web alinhado 15/07 · próximo: FASE 17 / smoke tablet.*
+*Preparado para novo chat — ciclo Premium One UI · FE v1.9.88 · GAS v1.5.209 · I141/I142 holerite PDF · próximo: FASE 17 / smoke tablet D4.*

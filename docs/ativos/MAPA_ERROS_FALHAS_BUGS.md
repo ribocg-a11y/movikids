@@ -1,7 +1,8 @@
 # MOVI KIDS — Mapa de erros, falhas e bugs
 
-**Atualizado:** 15/07/2026 — **I116** Web ✅ **v1.5.196** · FE **v1.9.58** · Ray warm ~4s · frio ~20s  
-**Uso anterior:** 15/07/2026 — **I116** enrich login sem expandir RH · GAS repo **v1.5.196** · FE **v1.9.58** · Web **v1.5.195** até Nova versão  
+**Atualizado:** 31/07/2026 — **I142b** PDF janela isolada · FE **v1.9.88** · GAS Web **v1.5.209** · holerite Q2 resto (I141)  
+**Uso anterior:** 31/07/2026 — **I141** bônus Q2 = mês − Q1 memorial · FE **v1.9.86**  
+**Uso anterior:** 15/07/2026 — **I116** Web ✅ **v1.5.196** · FE **v1.9.58** · Ray warm ~4s · frio ~20s  
 **Uso anterior:** 15/07/2026 — **I115** Web ✅ v1.5.195 · Ray frio ~16s / warm ~3s · residual enrich-all-RH + kpiMes ~34s  
 **Uso anterior:** 15/07/2026 — **I115** login Colaboradores ~61s · FE **v1.9.57** (mitigação) · GAS **v1.5.194**  
 **Uso anterior:** 15/07/2026 — **I110** Q1 sem faltas + pacote holerite · FE **v1.9.52** · GAS **v1.5.192**  
@@ -136,6 +137,8 @@
 | **I126c** | **Faixa vermelha “Painel rápido” eterna + Escala OK** | Banner `_partial` em `gp-adm-err`; Escala já vinha do lite; promise resolvida bloqueava Folha full | FE **v1.9.72** remove banner lite · full só Folha/Avaliações · `gpAdmPanelInFlight_` | `mk-gestao-pessoas-admin.js` | sem faixa vermelha · Folha carrega ao abrir |
 | **I127** | **Holerite Q2: adiantamento 1ª = R$ 0** | Cód 410 zerado; DP exige desconto do adiantamento na 2ª (art. 462 CLT / Contábeis) | FE **v1.9.73** `mk-holerite.js` · GAS **v1.5.206** `adiantamentoQ1` | Q2: salário mês − adiantamento 40% − encargos | Raykelly: 410 ≈ R$ 648,40 |
 | **I128** | **Ficha: “Sem dias na competência” com ponto aberto** | Lite deixa `jornada.dias=[]`; full só rodava em Folha/Avaliações | FE **v1.9.74** Ficha pede full + loading jornada | `gpAdmEnsureFullPanel_('presenca')` | Raykelly Jul: 29 dias + 14:04 Aberto |
+| **I142b** | **PDF holerite em branco no Chrome** | `visibility:hidden` em ancestrais do SPA — filho `visible` não aparece | FE **v1.9.88** `mkHolPrintPdf_` abre janela isolada | `mk-holerite.js` | Salvar PDF mostra tabelas |
+| **I142** | **Falta conferência mês no PDF (Q1/Q2/Soma + dias bônus)** | Só demonstrativo da quinzena; sócio precisava tabela mês + dias | FE **v1.9.87** `mkHolMesResumo_` + dias via `metaOperadorTurno` · PDFs em `entregas/` | `teste-i141-bonus-resto.cjs` · `gerar-pdf-holerite-mes.cjs` | https://ribocg-a11y.github.io/movikids/entregas/holerite-mes-2026-07/ |
 | **I141** | **Holerite Q2: bônus = 50% do mês final (errado)** | GAS `gpCalcHollerite_` metade; 1ª já pagou acumulado da época (Ray 150≠425) | FE **v1.9.86** `bonusQ2 = mês − Q1 memorial` · Ray 700 · Julia 750 | `mk-holerite.js` · `teste-i141-bonus-resto.cjs` | pacote 31/07: Ray **1652,22** · Julia **1702,22** |
 | **I140** | **FGTS na cesta do holerite** | Encargo empregador misturado com bônus/VA | FE **v1.9.85** FGTS só no rodapé | `mk-holerite.js` | cesta sem cód 503 |
 | **I139** | **Metas: “13 dias” parecia 13×R$100** | Badge só contava dias; FSS já era R$50 no GAS | FE **v1.9.84** badge dias+R$ + hint FSS | `gpAdmRenderMetas_` | Ray 13 dias · R$ 850 |

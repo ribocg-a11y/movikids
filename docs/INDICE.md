@@ -1,6 +1,6 @@
 # MOVI KIDS — Índice de documentação
 
-**Atualizado:** 10/07/2026 (FE **v1.9.39** · GAS **v1.5.187** · I96–I103)
+**Atualizado:** 31/07/2026 (FE **v1.9.88** · GAS **v1.5.209** · I141–I142 holerite PDF)
 
 ## Comece aqui
 
@@ -22,6 +22,7 @@
 | [**INCIDENTE_I43_CARREGAR_INICIO_COL_Y_2026-06-23.md**](ativos/INCIDENTE_I43_CARREGAR_INICIO_COL_Y_2026-06-23.md) | **I43** — cronômetro revertia após ▶ |
 | [**INCIDENTE_I53_CONFIG_PLANILHA_REPAIR_2026-06-24.md**](arquivo/incidentes/INCIDENTE_I53_CONFIG_PLANILHA_REPAIR_2026-06-24.md) | **I53** — CONFIG memorial, schema, repair |
 | [**INCIDENTE_I96_I99_MULTI_VEICULO_2026-07-10.md**](arquivo/incidentes/INCIDENTE_I96_I99_MULTI_VEICULO_2026-07-10.md) | **I96–I103** — multi-veículo · overlay · contagem encerradas/caixa |
+| [**INCIDENTE_I142_HOLERITE_PDF_CONFERENCIA_2026-07-31.md**](ativos/INCIDENTE_I142_HOLERITE_PDF_CONFERENCIA_2026-07-31.md) | **I141–I142b** — bônus resto · PDF mês · print branco |
 | [**BASELINE_CODIGO_P0.md**](ativos/BASELINE_CODIGO_P0.md) | **Zonas congeladas** — não mexer em P0 sem pedido |
 | [**INCIDENTE_I45_CADASTRO_RH_NAO_PERSISTIDO_2026-06-23.md**](ativos/INCIDENTE_I45_CADASTRO_RH_NAO_PERSISTIDO_2026-06-23.md) | **I45** — cadastro Raykelly / installer apagava RH |
 | [**PROTOCOLO_AUDITORIA_ABAS_PLANILHA.md**](ativos/PROTOCOLO_AUDITORIA_ABAS_PLANILHA.md) | **Auditoria por aba** — roteiro LOCACOES + CONFIG (I53) + roadmap 24 abas |
@@ -72,7 +73,7 @@
 | [**PROTOCOLO_ATUALIZAR_TUDO.md**](ativos/PROTOCOLO_ATUALIZAR_TUDO.md) | **Comando "atualize tudo"** — checklist docs + planilha + pasta C |
 | [REGRAS_DE_PUBLICACAO_SEGURA.md](ativos/REGRAS_DE_PUBLICACAO_SEGURA.md) | Regras P0 deploy |
 | [ACESSOS_E_AUTORIZACOES.md](ativos/ACESSOS_E_AUTORIZACOES.md) | Papéis, PIN, agente vs humano |
-| [MAPA_ERROS_FALHAS_BUGS.md](ativos/MAPA_ERROS_FALHAS_BUGS.md) | Índice I1–I116 |
+| [MAPA_ERROS_FALHAS_BUGS.md](ativos/MAPA_ERROS_FALHAS_BUGS.md) | Índice I1–I142b |
 
 ## Hierarquia (conflito de versão)
 

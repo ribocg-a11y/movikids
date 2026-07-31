@@ -1,7 +1,7 @@
 # MOVI KIDS — Planejamento pós One UI (jun–jul/2026)
 
 **Criado:** 27/06/2026 · **Substitui backlog ativo** de `PLANEJAMENTO_ONE_UI_2026-06.md` (Sprints A–C ✅)  
-**Produção (10/07/2026):** FE **v1.9.39** · GAS **v1.5.187** · Pages confirmado · I96–I103 ✅  
+**Produção (31/07/2026):** FE **v1.9.88** · GAS **v1.5.209** · Pages confirmado · I96–I142 ✅  
 **Mestre:** `PLANO_PREMIUM_ONEUI_FASES_16_22_2026-06.md` · **Roteiro agente:** `ROTEIRO_AGENTE_OBRIGATORIO.md`
 
 ---
@@ -152,11 +152,14 @@ Paralelo contínuo:      ponto RH · pre-push · encerramento-sessao I24
 
 ## 7. Próximo passo único (agente)
 
-**Sprint D1** — ✅ homolog PC 27/06 (evidência `EVIDENCIA_SPRINT_D1_HOMOLOG_2026-06-27.md`).
+**Sprint D1** — ✅ homolog PC 27/06.  
+**Holerite jul** — ✅ I141/I142 FE v1.9.88 · PDFs em `entregas/holerite-mes-2026-07/`.  
+**GAS** — ✅ ping Web **v1.5.209**.
 
-**Paralelo sócio:** D2 assinar F17 · D3 decisão F9 · D6 GAS ping se necessário.
+**Paralelo sócio:** D2 assinar F17 · D3 decisão F9.
 
-**Ops:** D4 smoke tablet v1.9.2.
+**Ops:** D4 smoke tablet **v1.9.88** (multi-veículo + timer + holerite).  
+**Depois:** Sprint E (FASE 19) se D2–D4 fecharem.
 
 ---
 

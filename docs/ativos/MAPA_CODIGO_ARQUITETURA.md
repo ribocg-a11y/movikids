@@ -1,6 +1,6 @@
 # MOVI KIDS — Mapa do código e arquitetura
 
-**Atualizado:** 20/06/2026 (FE **v1.8.71** · GAS repo **v1.5.111** · ping **v1.5.107** · FASE 15 ativa)  
+**Atualizado:** 31/07/2026 (FE **v1.9.88** · GAS repo/ping **v1.5.209** · I141–I142 holerite · FASE 15+ One UI)  
 **Função:** anatomia do sistema — o que é cada parte, o que liga com o quê, o que é zona sensível.  
 **Complementa:** `ESTADO_ATUAL.md`, `ACESSOS_E_AUTORIZACOES.md`, `REGRAS_DE_PUBLICACAO_SEGURA.md`, `MAPA_ERROS_FALHAS_BUGS.md`, **`PROTOCOLO_DIAGNOSTICO_E_TESTES.md`**
 
@@ -60,7 +60,7 @@ movikids-github/
 │   ├── acompanhar.html     ← portal responsável
 │   ├── gestao-pessoas.html ← RH colaboradores (FASE 15)
 │   ├── mk-gestao-pessoas.js · mk-gestao-pessoas-ui.js · mk-gestao-pessoas-admin.js
-│   ├── mk-holerite.js      ← holerite HTML/PDF compartilhado (I34)
+│   ├── mk-holerite.js      ← holerite HTML/PDF + resumo mês Q1/Q2 (I34 · I141 · I142)
 │   ├── mk-gestao-pessoas.css
 │   ├── foto-moldura.html
 │   └── track.html          ← cronômetro curto

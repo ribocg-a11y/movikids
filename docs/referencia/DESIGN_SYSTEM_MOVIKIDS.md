@@ -307,10 +307,14 @@ Nível 3 — DETALHE  → plano, histórico, accordion, tabela secundária
 
 ### 6.8 Holerite RH
 
-**Módulo:** `mk-holerite.js` — `mkHolBuildHtml_()`, `mkHolPrintPdf_()`  
-**Estilos:** `.mk-hol-*` em `mk-gestao-pessoas.css` + `@media print`  
+**Módulo:** `mk-holerite.js` — `mkHolBuildHtml_()`, `mkHolMesResumo_()`, `mkHolPrintPdf_()`  
+**Estilos:** `.mk-hol-*` / `.mk-hol-mes-resumo` em `mk-gestao-pessoas.css`  
 **Consumidores:** `mk-gestao-pessoas-admin.js`, `mk-gestao-pessoas-ui.js`  
-**CNPJ produção:** **66.664.255/0001-67** (I34)
+**CNPJ produção:** **66.664.255/0001-67** (I34)  
+**PDF (I142):** conferência do mês (Salário/VA/VT\*/Bônus Q1·Q2·Soma) + dias de bônus **antes** do demonstrativo da quinzena.  
+**Print (I142b):** `mkHolPrintPdf_()` abre **janela isolada** — não usar `visibility:hidden` no SPA (página em branco).  
+**Regra I141:** bônus Q2 = ganho mês − pago na 1ª (memorial); VT nunca no pacote.  
+**Entregas estáticas:** `entregas/holerite-mes-2026-07/`
 
 ---
 

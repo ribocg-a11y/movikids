@@ -12,7 +12,7 @@
 
 ## 1. Resumo executivo
 
-**Modo atual (27/06):** One UI **Sprints A–C ✅ v1.9.2**. **Ciclo ativo = Sprint D** (fechar FASE 16/17).
+**Modo atual (31/07):** One UI **Sprints A–C ✅**. **Ciclo ativo = Sprint D** (assinar FASE 17 · smoke tablet) · holerite Q2/PDF ✅.
 
 | Área | Status |
 |------|--------|
@@ -22,7 +22,7 @@
 | FASE 18 Financeiro UI | ✅ Sprint B · complemento Sprint H |
 | Raykelly cadastro | ✅ **100%** 26/06 |
 
-**Próximo passo dev:** `PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md` → **Sprint D1** homolog admin v1.9.2
+**Próximo passo:** `PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md` → **D2–D4** assinar F17 + smoke tablet v1.9.88 → Sprint E
 
 ---
 

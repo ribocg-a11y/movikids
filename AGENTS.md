@@ -4,7 +4,7 @@ Sistema operacional de locações — balcão (tablet na loja), portal do respon
 
 **Modelo operacional:** o sócio/dev trabalha no **computador** (Cursor, deploy, testes). O **tablet fica no balcão** com os operadores. Ver `HANDOFF_NOVO_CHAT.md` § Modelo operacional.
 
-**Ciclo ativo (27/06/2026):** **Sprint D pós One UI** — `docs/ativos/PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`
+**Ciclo ativo (31/07/2026):** **Sprint D pós One UI** — `docs/ativos/PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md` · FE **v1.9.88** · GAS **v1.5.209**
 
 **Repo neste PC:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`
 
@@ -14,7 +14,7 @@ Sistema operacional de locações — balcão (tablet na loja), portal do respon
 
 **Para ciclo ativo:**
 
-> *Continuar MOVI KIDS — Sprint D: `PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md` → **D1** homolog admin v1.9.2.*
+> *Continuar MOVI KIDS — Sprint D: `PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md` → assinar FASE 17 · smoke tablet D4.*
 
 ## Antes de qualquer trabalho
 
@@ -35,11 +35,12 @@ Leia **nesta ordem**:
 
 | Camada | Versão | Link |
 |--------|--------|------|
-| Frontend | **v1.9.58** | https://ribocg-a11y.github.io/movikids/?force=1.9.58 |
-| Gestão Pessoas | **v1.9.58** | `gestao-pessoas.html?force=1.9.58` |
-| GAS | **v1.5.196** Web ✅ | I115+I116 |
+| Frontend | **v1.9.88** | https://ribocg-a11y.github.io/movikids/?force=1.9.88 |
+| Gestão Pessoas | **v1.9.88** | `gestao-pessoas.html?force=1.9.88` |
+| GAS | **v1.5.209** Web ✅ | ping alinhado · I134 |
 | Design System | **v1.1** | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
 | Deploy ID | `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y` | |
+| Holerites PDF | jul/2026 | https://ribocg-a11y.github.io/movikids/entregas/holerite-mes-2026-07/ |
 
 **GAS raw (colar Editor — I76):** https://raw.githubusercontent.com/ribocg-a11y/movikids/main/MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs
 
@@ -48,17 +49,17 @@ Leia **nesta ordem**:
 **GAS canônico:**  
 `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github\MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs`
 
-## Estado do projeto (15/07/2026)
+## Estado do projeto (31/07/2026)
 
 - **FASE 0–15 + 15b:** ✅ prod
 - **FASE 14 mini-DRE:** ✅ prod
-- **FASE 16–17:** ✅ visual One UI **v1.9.58** · assinatura FASE 17 pendente Ops
-- **Homolog tablet:** ✅ 23/06 · smoke **v1.9.39** pendente (D4)
-- **Planilha:** ✅ 23/23 · **I68 VT** ✅ · **I75 Julia RH** ✅
-- **I96–I103:** ✅ multi-veículo + contagem encerradas/caixa
-- **I108–I111:** holerite Q1 · GAS **v1.5.195** (colar Web) · FE **v1.9.58**
+- **FASE 16–17:** ✅ visual One UI · assinatura FASE 17 pendente Ops (**17.5 F9**)
+- **Homolog tablet:** ✅ 23/06 · smoke **v1.9.88** pendente (D4)
+- **Planilha:** ✅ `schemaOk=True` 31/07 · **I68 VT** ✅ · Julia/Raykelly RH ✅
+- **I96–I103 / I117 / I125:** ✅ multi-veículo · caixa · perf salvar/▶
+- **I138–I142:** ✅ holerite Q2 resto · PDF conferência · print janela isolada
 - **Travas I24:** ✅ `guard-i24-publicacao` + `encerramento-sessao`
-- **Próximo:** Sprint D2–D4 — assinar FASE 17 · smoke tablet v1.9.39
+- **Próximo:** Sprint D2–D4 — assinar FASE 17 · smoke tablet · depois Sprint E (FASE 19)
 
 ## Regras P0
 
