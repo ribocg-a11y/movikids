@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Movi Kids">
 <title>Movi Kids</title>
-<script src="mk-canonical-host.js?v=1.9.91"></script>
+<script src="mk-canonical-host.js?v=1.9.92"></script>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png">
@@ -17,17 +17,17 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<script src="mk-stale-sync.js?v=1.9.91"></script>
-<script src="mk-version.js?v=1.9.91"></script>
-<script src="mk-api.js?v=1.9.91"></script>
-<link rel="stylesheet" href="mk-design.css?v=1.9.91">
+<script src="mk-stale-sync.js?v=1.9.92"></script>
+<script src="mk-version.js?v=1.9.92"></script>
+<script src="mk-api.js?v=1.9.92"></script>
+<link rel="stylesheet" href="mk-design.css?v=1.9.92">
 
-<script src="mk-cache-bust.js?v=1.9.91"></script>
+<script src="mk-cache-bust.js?v=1.9.92"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<link rel="stylesheet" href="mk-app.css?v=1.9.91">
-<link rel="stylesheet" href="mk-gestao-pessoas.css?v=1.9.91">
+<link rel="stylesheet" href="mk-app.css?v=1.9.92">
+<link rel="stylesheet" href="mk-gestao-pessoas.css?v=1.9.92">
 <!-- Firebase SDK — Realtime sync canonico para todos os dispositivos -->
-<script type="module" src="mk-firebase.js?v=1.9.91"></script>
+<script type="module" src="mk-firebase.js?v=1.9.92"></script>
 </head>
 
 <body>
@@ -322,10 +322,10 @@
       <span class="mk-qr-balcao-ico" aria-hidden="true">📲</span>
       <div class="mk-qr-balcao-copy">
         <span class="mk-qr-balcao-title">Portal dos pais</span>
-        <span class="mk-qr-balcao-sub">Mostre o QR na mesa para o responsável acompanhar o tempo</span>
+        <span class="mk-qr-balcao-sub">Mostre o QR no tablet para o responsável acompanhar o tempo</span>
       </div>
       <div class="mk-qr-balcao-actions">
-        <a class="mk-qr-balcao-btn" href="assets/qr-balcao-imprimir.html" target="_blank" rel="noopener">Cartaz QR</a>
+        <button type="button" class="mk-qr-balcao-btn" id="mk-qr-balcao-btn-ver" aria-haspopup="dialog">Ver QR</button>
         <a class="mk-qr-balcao-btn mk-qr-balcao-btn--sec" href="acompanhar.html" target="_blank" rel="noopener">Abrir portal</a>
       </div>
     </div>
@@ -2295,6 +2295,20 @@
   </div><!-- /main-content -->
 </div><!-- /app -->
 
+<!-- ──────── QR PORTAL RESPONSÁVEL (balcão) ──────── -->
+<div id="mk-qr-portal-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="mk-qr-portal-title">
+  <div class="modal-sheet mk-qr-portal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="mk-qr-portal-title">Portal dos responsáveis</div>
+    <div class="modal-sub">Peça para o responsável apontar a câmera do celular</div>
+    <img class="mk-qr-portal-img" id="mk-qr-portal-img" src="assets/qr-portal-acompanhar.png" width="512" height="512" alt="QR Code — portal Movi Kids">
+    <p class="mk-qr-portal-url" id="mk-qr-portal-url"></p>
+    <div class="modal-btns">
+      <button type="button" class="btn btn-primary" id="mk-qr-portal-fechar">Fechar</button>
+    </div>
+  </div>
+</div>
+
 <!-- ──────── ALERT MODAL (5min / expired) ──────── -->
 <div id="alert-modal" class="modal-overlay alert-modal">
   <div class="modal-sheet">
@@ -2464,27 +2478,27 @@
   </div>
 </div>
 
-<script src="mk-globals.js?v=1.9.91"></script>
-<script src="mk-core.js?v=1.9.91"></script>
-<script src="mk-nav.js?v=1.9.91"></script>
-<script src="mk-admin.js?v=1.9.91"></script>
-<script src="mk-historico.js?v=1.9.91"></script>
-<script src="mk-custos-historico.js?v=1.9.91"></script>
-<script src="mk-sessao.js?v=1.9.91"></script>
-<script src="mk-home.js?v=1.9.91"></script>
-<script src="mk-meta-operador.js?v=1.9.91"></script>
-<script src="mk-custos.js?v=1.9.91"></script>
-<script src="mk-avulso.js?v=1.9.91"></script>
-<script src="mk-sync.js?v=1.9.91"></script>
-<script src="mk-nova.js?v=1.9.91"></script>
-<script src="mk-relacionamento.js?v=1.9.91"></script>
-<script src="mk-operacao.js?v=1.9.91"></script>
-<script src="mk-drawer.js?v=1.9.91"></script>
-<script src="mk-update.js?v=1.9.91"></script>
-<script src="mk-gestao-pessoas.js?v=1.9.91"></script>
-<script src="mk-holerite.js?v=1.9.91"></script>
-<script src="mk-gestao-pessoas-admin.js?v=1.9.91"></script>
-<script src="mk-auth.js?v=1.9.91"></script>
-<script src="mk-boot.js?v=1.9.91"></script>
+<script src="mk-globals.js?v=1.9.92"></script>
+<script src="mk-core.js?v=1.9.92"></script>
+<script src="mk-nav.js?v=1.9.92"></script>
+<script src="mk-admin.js?v=1.9.92"></script>
+<script src="mk-historico.js?v=1.9.92"></script>
+<script src="mk-custos-historico.js?v=1.9.92"></script>
+<script src="mk-sessao.js?v=1.9.92"></script>
+<script src="mk-home.js?v=1.9.92"></script>
+<script src="mk-meta-operador.js?v=1.9.92"></script>
+<script src="mk-custos.js?v=1.9.92"></script>
+<script src="mk-avulso.js?v=1.9.92"></script>
+<script src="mk-sync.js?v=1.9.92"></script>
+<script src="mk-nova.js?v=1.9.92"></script>
+<script src="mk-relacionamento.js?v=1.9.92"></script>
+<script src="mk-operacao.js?v=1.9.92"></script>
+<script src="mk-drawer.js?v=1.9.92"></script>
+<script src="mk-update.js?v=1.9.92"></script>
+<script src="mk-gestao-pessoas.js?v=1.9.92"></script>
+<script src="mk-holerite.js?v=1.9.92"></script>
+<script src="mk-gestao-pessoas-admin.js?v=1.9.92"></script>
+<script src="mk-auth.js?v=1.9.92"></script>
+<script src="mk-boot.js?v=1.9.92"></script>
 </body>
 </html>

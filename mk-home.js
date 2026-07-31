@@ -476,13 +476,50 @@ function renderEncHoje(list) {
   renderEncHojeList_(list);
 }
 
+function mkQrPortalModalEl_() {
+  return document.getElementById('mk-qr-portal-modal');
+}
+function mkFecharQrPortalModal_() {
+  const m = mkQrPortalModalEl_();
+  if (!m) return;
+  m.classList.remove('show');
+}
+function mkAbrirQrPortalModal_() {
+  const m = mkQrPortalModalEl_();
+  if (!m) return;
+  const url = (typeof mkQrPortalUrl_ === 'function')
+    ? mkQrPortalUrl_()
+    : 'https://ribocg-a11y.github.io/movikids/acompanhar.html';
+  const urlEl = document.getElementById('mk-qr-portal-url');
+  if (urlEl) urlEl.textContent = url;
+  m.classList.add('show');
+}
 function mkInitQrBalcaoStrip_() {
   const el = document.getElementById('mk-qr-balcao-strip');
   if (!el) return;
   el.hidden = false;
   try { localStorage.removeItem('mk_qr_strip_off'); } catch (e) {}
+  const btn = document.getElementById('mk-qr-balcao-btn-ver');
+  if (btn && !btn.dataset.bound) {
+    btn.dataset.bound = '1';
+    btn.addEventListener('click', mkAbrirQrPortalModal_);
+  }
+  const fechar = document.getElementById('mk-qr-portal-fechar');
+  if (fechar && !fechar.dataset.bound) {
+    fechar.dataset.bound = '1';
+    fechar.addEventListener('click', mkFecharQrPortalModal_);
+  }
+  const modal = mkQrPortalModalEl_();
+  if (modal && !modal.dataset.bound) {
+    modal.dataset.bound = '1';
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) mkFecharQrPortalModal_();
+    });
+  }
 }
 window.mkInitQrBalcaoStrip_ = mkInitQrBalcaoStrip_;
+window.mkAbrirQrPortalModal_ = mkAbrirQrPortalModal_;
+window.mkFecharQrPortalModal_ = mkFecharQrPortalModal_;
 
 function showAdminHomeKpis(d) {
   const chip = document.getElementById('admin-home-chip');
