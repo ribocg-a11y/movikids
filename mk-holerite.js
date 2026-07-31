@@ -677,23 +677,38 @@
       '</div></div>';
   }
 
+  /**
+   * I142b — imprimir em janela isolada (evita página em branco:
+   * visibility:hidden em ancestrais do SPA não deixa o holerite aparecer).
+   */
   function mkHolPrintPdf_() {
-    var root = document.querySelector('.mk-hol-print-root .mk-hol') || document.getElementById('mk-hol-doc');
+    var wrap = document.querySelector('.mk-hol-print-root');
+    var root = (wrap && wrap.querySelector('.mk-hol')) || document.getElementById('mk-hol-doc');
     if (!root) {
       if (typeof global.toast === 'function') global.toast('Holerite não encontrado na tela.', 'warning');
       return;
     }
     var title = 'MOVI-KIDS-Holerite';
-    var meta = document.querySelector('.mk-hol-meta');
+    var meta = root.querySelector('.mk-hol-meta');
     if (meta) title = 'MOVI-KIDS-Holerite-' + String(meta.textContent || '').replace(/\s+/g, '-').slice(0, 40);
-    var oldTitle = document.title;
-    document.title = title;
-    document.body.classList.add('mk-hol-printing');
-    global.print();
-    setTimeout(function () {
-      document.body.classList.remove('mk-hol-printing');
-      document.title = oldTitle;
-    }, 400);
+    var html = '<!DOCTYPE html><html lang="pt-BR"><head><meta charset="utf-8"><title>' +
+      String(title).replace(/[<>&]/g, '') + '</title>' +
+      '<link rel="stylesheet" href="mk-gestao-pessoas.css">' +
+      '<style>body{margin:12px;background:#fff;font-family:Nunito,Segoe UI,sans-serif}' +
+      '.mk-hol{box-shadow:none!important;border:1px solid #CBD5E1}' +
+      '.no-print,.mk-hol-toolbar,.gp-hol-detail-lead,.mk-hol-widgets{display:none!important}' +
+      '@page{margin:12mm}</style></head><body>' +
+      root.outerHTML +
+      '<script>window.onload=function(){setTimeout(function(){window.print()},200)}<\/script>' +
+      '</body></html>';
+    var w = global.open('', '_blank', 'noopener,noreferrer,width=900,height=1000');
+    if (!w) {
+      if (typeof global.toast === 'function') global.toast('Permita pop-up para gerar o PDF.', 'warning');
+      return;
+    }
+    w.document.open();
+    w.document.write(html);
+    w.document.close();
   }
 
   global.mkHolFmtMoney_ = mkHolFmtMoney_;

@@ -1,6 +1,8 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 31/07/2026 · FE **v1.9.87** · GAS repo/Web **v1.5.209** · **I142** PDF holerite (Q1/Q2/Soma + dias bônus)
+**Atualizado:** 31/07/2026 · FE **v1.9.88** · GAS repo/Web **v1.5.209** · **I142b** PDF janela isolada + entregas HTML/PDF
+
+**I142b (31/07):** print SPA saía em branco → print em janela isolada. PDFs prontos: `entregas/holerite-mes-2026-07/` (Raykelly + Julia).
 
 **I142 (31/07):** holerite PDF com conferência do mês (Salário/VA/VT/Bônus Q1·Q2·Soma) + tabela dias de bônus · botão Salvar PDF. Teste `teste-i141-bonus-resto.cjs` (I141+I142).
 
