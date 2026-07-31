@@ -1029,13 +1029,21 @@
       return;
     }
     el.innerHTML = '<p class="gp-adm-folha-comp-hint">Exibindo competência <strong>' + esc(compLbl) + '</strong></p>' +
-      '<table class="gp-adm-table"><tr><th style="text-align:left">Nome</th><th>Quinzena</th><th>Pgto</th><th>Loc mês</th><th>Bônus</th><th>Líquido est.</th><th></th></tr>' +
+      '<table class="gp-adm-table"><tr><th style="text-align:left">Nome</th><th>Quinzena</th><th>Pgto</th><th>Loc mês</th><th>Bônus</th><th>PIX est.</th><th></th></tr>' +
       folha.map(function (f) {
-        const hol = f.holerite || {};
+        const holRaw = f.holerite || {};
+        const hol = (typeof mkHolNormalizeHol_ === 'function')
+          ? mkHolNormalizeHol_(holRaw, { opId: f.id, comp: gpAdmData_.competencia || '' })
+          : holRaw;
         const q = f.quinzenaLabel || hol.quinzenaLabel || (f.quinzena === 1 ? '1ª' : '2ª');
         const pg = f.pagamentoEm || hol.pagamentoEm || '—';
-        return '<tr><td class="gp-adm-name-cell">' + esc(f.nome) + '</td><td>' + esc(q) + '</td><td>' + esc(pg) + '</td><td>' + (f.locMes || 0) + '</td><td>' + Number(f.bonus || 0).toLocaleString('pt-BR') + '</td>' +
-          '<td><span class="gp-adm-soft-val">' + Number(f.total || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) + '</span></td>' +
+        // I141 — bônus/PIX pós-regra (resto na 2ª), não o 50% bruto do GAS
+        const bonusShow = hol.bonus != null ? Number(hol.bonus) : Number(f.bonus || 0);
+        const pixShow = hol.pixQuinzena != null
+          ? Number(hol.pixQuinzena)
+          : Number(f.total || 0);
+        return '<tr><td class="gp-adm-name-cell">' + esc(f.nome) + '</td><td>' + esc(q) + '</td><td>' + esc(pg) + '</td><td>' + (f.locMes || 0) + '</td><td>' + bonusShow.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) + '</td>' +
+          '<td><span class="gp-adm-soft-val">' + pixShow.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) + '</span></td>' +
           '<td><button type="button" class="gp-adm-link" onclick="mkGpAdmVerHolerite_(' + f.id + ')">Ver holerite</button></td></tr>';
       }).join('') + '</table>';
   }
@@ -1046,9 +1054,15 @@
       if (typeof toast === 'function') toast('Nada para exportar', 'warning');
       return;
     }
-    const lines = ['Nome,Loc mes,Bonus dias,Base,Bonus R$,Total'];
+    const lines = ['Nome,Loc mes,Bonus dias,Base,Bonus R$,PIX,Pacote'];
     folha.forEach(function (f) {
-      lines.push([f.nome, f.locMes, f.bonusDias, f.base, f.bonus, f.total].join(','));
+      const hol = (typeof mkHolNormalizeHol_ === 'function')
+        ? mkHolNormalizeHol_(f.holerite || {}, { opId: f.id, comp: gpAdmData_.competencia || '' })
+        : (f.holerite || {});
+      const bonus = hol.bonus != null ? hol.bonus : f.bonus;
+      const pix = hol.pixQuinzena != null ? hol.pixQuinzena : '';
+      const pacote = hol.pacoteQuinzena != null ? hol.pacoteQuinzena : f.total;
+      lines.push([f.nome, f.locMes, f.bonusDias, f.base, bonus, pix, pacote].join(','));
     });
     const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8' });
     const a = document.createElement('a');

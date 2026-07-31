@@ -73,10 +73,83 @@
   }
 
   /**
+   * I141 — bônus quinzenal (regra de ouro):
+   * 1ª = o que foi pago no dia 15 (50% do acumulado NAQUELA data — memorial/snapshot).
+   * 2ª = RESTO = (bônus ganho no mês) − (bônus já pago na 1ª).
+   * Nunca repetir “50% do mês final” na 2ª.
+   */
+  function mkHolBonusRestoQ2_(bonusMes, q1BonusPago) {
+    return Math.round(Math.max(0, (Number(bonusMes) || 0) - (Number(q1BonusPago) || 0)) * 100) / 100;
+  }
+
+  /**
+   * I138 — pacote real pago no dia 15 (PIX + VA, sem VT).
+   * Memorial 07/2026 = pagamento real I111 (Ray 998,40 · Julia 948,40).
+   */
+  var MK_HOL_Q1_PAGO_MEMORIAL_ = {
+    '07/2026': {
+      3: { adianta: 648.4, bonus: 150, va: 200, pacote: 998.4 },
+      4: { adianta: 648.4, bonus: 100, va: 200, pacote: 948.4 }
+    }
+  };
+
+  function mkHolCompKey_(comp) {
+    var s = String(comp || '').trim();
+    var m = s.match(/^(\d{1,2})\/(\d{4})$/);
+    if (m) return (m[1].length === 1 ? '0' + m[1] : m[1]) + '/' + m[2];
+    return s;
+  }
+
+  function mkHolQ1PagoMemorial_(opId, comp) {
+    var byComp = MK_HOL_Q1_PAGO_MEMORIAL_[mkHolCompKey_(comp)];
+    if (!byComp) return null;
+    return byComp[Number(opId)] || null;
+  }
+
+  /** Resolve bônus já pago na 1ª: memorial → snapshot GAS → null (desconhecido). */
+  function mkHolResolveQ1BonusPago_(opId, comp, hol) {
+    var mem = mkHolQ1PagoMemorial_(opId, comp || (hol && hol.competencia) || '');
+    if (mem && mem.bonus != null) return Number(mem.bonus) || 0;
+    if (hol && hol.bonusPagoQ1 != null && hol.bonusPagoQ1 !== '') return Number(hol.bonusPagoQ1) || 0;
+    if (hol && hol.bonusQ1Pago != null && hol.bonusQ1Pago !== '') return Number(hol.bonusQ1Pago) || 0;
+    return null;
+  }
+
+  /**
+   * I141 — aplica resto do bônus na 2ª e recalcula PIX/pacote.
+   * Retorna o mesmo objeto hol (mutado).
+   */
+  function mkHolApplyBonusRegra_(hol, opId, comp) {
+    if (!hol) return hol;
+    var q = Number(hol.quinzena) || 0;
+    if (q !== 2) return hol;
+    var bonusMes = hol.bonusMes != null ? Number(hol.bonusMes) : null;
+    if (!(bonusMes >= 0)) return hol;
+    var q1Pago = mkHolResolveQ1BonusPago_(opId, comp, hol);
+    if (q1Pago == null) {
+      hol.bonusRegra = 'incompleta';
+      hol.bonusRegraAviso = 'Sem memorial da 1ª — bônus da 2ª pode estar errado (não use 50% do mês final).';
+      return hol;
+    }
+    var resto = mkHolBonusRestoQ2_(bonusMes, q1Pago);
+    hol.bonus = resto;
+    hol.bonusQ1Pago = q1Pago;
+    hol.bonusRegra = 'resto';
+    hol.pctBeneficios = null;
+    var liquido = Number(hol.liquido) || 0;
+    var vaTotal = Number(hol.vaTotal) || 0;
+    hol.pixQuinzena = Math.round((liquido + resto) * 100) / 100;
+    hol.pacoteQuinzena = Math.round((hol.pixQuinzena + vaTotal) * 100) / 100;
+    return hol;
+  }
+
+  /**
    * I138 — VT é pago TODA SEMANA (fora do holerite). Nunca soma no pacote (Q1 nem Q2).
    * I111/I113 — Q1 já zerava VT; agora vale para as duas quinzenas.
+   * I141 — ctx.opId/ctx.comp ativam regra do resto na 2ª.
    */
-  function mkHolNormalizeHol_(holIn) {
+  function mkHolNormalizeHol_(holIn, ctx) {
+    ctx = ctx || {};
     var hol = Object.assign({}, holIn || {});
     var q = Number(hol.quinzena) || 0;
     var base = Number(hol.base) || 0;
@@ -128,38 +201,23 @@
         hol.quinzenaLabel = '1ª quinzena · 40% salário + cesta (bônus/VA) · VT semanal já pago';
       }
       hol.incluiBeneficios = true;
+      hol.bonusRegra = 'q1';
     }
+
+    // I141 — 2ª = resto (mês − pago na 1ª); nunca 50% do mês final de novo
+    var opId = ctx.opId != null ? Number(ctx.opId) : (hol.operadorId != null ? Number(hol.operadorId) : 0);
+    var comp = ctx.comp || hol.competencia || '';
+    if (q === 2 && opId) mkHolApplyBonusRegra_(hol, opId, comp);
+
     return hol;
-  }
-
-  /**
-   * I138 — pacote real pago no dia 15 (PIX + VA, sem VT).
-   * Memorial 07/2026 = valores I111 / pagamento real (não recalcular com meta atual).
-   */
-  var MK_HOL_Q1_PAGO_MEMORIAL_ = {
-    '07/2026': {
-      3: { adianta: 648.4, bonus: 100, va: 200, pacote: 948.4 },
-      4: { adianta: 648.4, bonus: 100, va: 200, pacote: 948.4 }
-    }
-  };
-
-  function mkHolCompKey_(comp) {
-    var s = String(comp || '').trim();
-    var m = s.match(/^(\d{1,2})\/(\d{4})$/);
-    if (m) return (m[1].length === 1 ? '0' + m[1] : m[1]) + '/' + m[2];
-    return s;
-  }
-
-  function mkHolQ1PagoMemorial_(opId, comp) {
-    var byComp = MK_HOL_Q1_PAGO_MEMORIAL_[mkHolCompKey_(comp)];
-    if (!byComp) return null;
-    return byComp[Number(opId)] || null;
   }
 
   function mkHolWidgetHero_(opts) {
     opts = opts || {};
-    var hol = mkHolNormalizeHol_(opts.holerite || {});
-    var comp = opts.comp || hol.competencia || '—';
+    var opId = opts.opId != null ? Number(opts.opId) : 0;
+    var compCtx = opts.comp || '';
+    var hol = mkHolNormalizeHol_(opts.holerite || {}, { opId: opId, comp: compCtx });
+    var comp = compCtx || hol.competencia || '—';
     var liquido = hol.liquido != null ? hol.liquido : Number(opts.liquido) || 0;
     var bruto = opts.bruto != null ? Number(opts.bruto) : (hol.bruto != null ? Number(hol.bruto) : 0);
     var bonus = Number(hol.bonus) || 0;
@@ -188,15 +246,23 @@
       ? 'Na 1ª: sem encargos · VT semanal já pago'
       : ('Adiantamento Q1 ' + mkHolFmtMoney_(adianta) +
         ' + INSS/IRRF/desc. VT 6%' + (faltasHero > 0 ? ' + faltas' : ''));
+    var bonusCtx = hol.bonusRegra === 'resto'
+      ? (' · bônus resto ' + mkHolFmtMoney_(bonus) + ' (mês − 1ª)')
+      : (bonus > 0 ? (' · bônus ' + mkHolFmtMoney_(bonus)) : '');
+    var avisoRegra = hol.bonusRegraAviso
+      ? '<div class="mk-note warn" style="margin:8px 0 0;padding:10px 12px;border-radius:12px;background:#FEE2E2;color:#991B1B;font-weight:700">' +
+        esc(hol.bonusRegraAviso) + '</div>'
+      : '';
     return '<div class="gp-hol-widgets" aria-label="Resumo do pagamento">' +
       '<div class="mk-widget mk-widget--hero gp-hol-hero">' +
       '<span class="mk-widget-lbl">Pacote desta quinzena</span>' +
       '<span class="mk-widget-val green">' + mkHolFmtMoney_(pacote) + '</span>' +
       '<span class="mk-widget-ctx">' + esc(qLabel) + ' · pgto ' + esc(pgto) +
-      ' · PIX ' + mkHolFmtMoney_(pix) + ' (salário+bônus)' + benefCtx + '</span></div>' +
+      ' · PIX ' + mkHolFmtMoney_(pix) + ' (salário+bônus)' + bonusCtx + benefCtx + '</span></div>' +
+      avisoRegra +
       '<div class="mk-note info" style="margin:8px 0 0;padding:10px 12px;border-radius:12px;background:#FEF3C7;color:#92400E;font-weight:700">VT é pago toda semana — R$ 0,00 no pacote do holerite' +
         (vtJaPago ? ' (ref. quinzena ' + mkHolFmtMoney_(vtJaPago) + ' já pago fora)' : '') +
-        '. Pacote = PIX + VA.</div>' +
+        '. Pacote = PIX + VA. Na 2ª o bônus é o resto do mês (não 50% de novo).</div>' +
       '<div class="mk-cmd-grid gp-hol-widget-grid">' +
       '<div class="mk-widget"><span class="mk-widget-lbl">Competência</span><span class="mk-widget-val">' + esc(comp) + '</span>' +
       '<span class="mk-widget-ctx">Referência do mês</span></div>' +
@@ -213,9 +279,12 @@
     var f = opts.folha || {};
     var colab = opts.colab || {};
     var comp = opts.comp || '';
-    var hol = mkHolNormalizeHol_(f.holerite || {});
+    var opIdHol = Number(colab.id || f.id) || 0;
+    // I141 — normaliza com opId para aplicar resto do bônus na 2ª (ambos holerites)
+    var hol = mkHolNormalizeHol_(f.holerite || {}, { opId: opIdHol, comp: comp });
     var base = Number(f.base != null ? f.base : hol.base) || 0;
-    var bonus = Number(f.bonus != null ? f.bonus : hol.bonus) || 0;
+    // Preferir hol.bonus pós-regra (não f.bonus bruto do GAS = 50% do mês)
+    var bonus = Number(hol.bonus) || 0;
     var qNum = Number(hol.quinzena) || 0;
 
     if (hol.diasQuinzena === 0 || (base <= 0 && bonus <= 0)) {
@@ -280,22 +349,29 @@
         mkHolRow_('—', 'Sem descontos nesta quinzena', 'Encargos e adiantamento na 2ª', '', 'R$ 0,00');
     }
 
-    var benPctLbl = (hol.pctBeneficios != null ? Math.round(Number(hol.pctBeneficios) * 100) : 50) + '%';
+    var isResto = hol.bonusRegra === 'resto';
+    var benPctLbl = isResto
+      ? 'resto'
+      : ((hol.pctBeneficios != null ? Math.round(Number(hol.pctBeneficios) * 100) : 50) + '%');
     var vtJaPago = Number(hol.vtPassesJaPago) || 0;
     // I138 — VT semanal: sempre R$ 0,00 no holerite (nunca soma no fim)
     var vtLinhaRef = 'JÁ PAGO toda semana — não entra no pacote' +
       (vtJaPago > 0 ? ' · ref. ' + mkHolFmtMoney_(vtJaPago) : '');
     var vtLinhaVal = 'R$ 0,00';
+    var bonusMesVal = hol.bonusMes != null ? Number(hol.bonusMes) : null;
     var bonusRef = '';
     if (bonus > 0) {
-      var bonusMes = hol.bonusMes != null ? Number(hol.bonusMes) : null;
-      bonusRef = bonusMes != null && bonusMes > 0
-        ? benPctLbl + ' de R$ ' + mkHolFmtMoney_(bonusMes).replace('R$\u00a0', '').replace('R$ ', '') + ' (mês)'
-        : (bonusDias + ' dia(s) · ' + benPctLbl + ' desta quinzena');
+      if (isResto && bonusMesVal != null) {
+        bonusRef = 'resto · ganho mês ' + mkHolFmtMoney_(bonusMesVal).replace('R$\u00a0', '').replace('R$ ', '') +
+          ' − pago na 1ª ' + mkHolFmtMoney_(hol.bonusQ1Pago || 0).replace('R$\u00a0', '').replace('R$ ', '');
+      } else if (bonusMesVal != null && bonusMesVal > 0) {
+        bonusRef = benPctLbl + ' de R$ ' + mkHolFmtMoney_(bonusMesVal).replace('R$\u00a0', '').replace('R$ ', '') + ' (mês)';
+      } else {
+        bonusRef = bonusDias + ' dia(s) · ' + benPctLbl + ' desta quinzena';
+      }
     }
 
-    // I133/I138 — “já pago na 1ª” = PIX + VA do dia 15 (sem VT). Memorial evita meta atual inflar o total.
-    var opIdHol = Number(colab.id || f.id) || 0;
+    // I133/I138/I141 — “já pago na 1ª” = memorial do dia 15 (nunca meta atual / nunca 50% do mês final)
     var memQ1 = qNum === 2 ? mkHolQ1PagoMemorial_(opIdHol, comp || hol.competencia || '') : null;
     var q1BonusPago = 0;
     var q1VaPago = 0;
@@ -307,8 +383,8 @@
         q1BonusPago = memQ1.bonus;
         q1VaPago = memQ1.va;
         q1PacotePago = memQ1.pacote;
-      } else {
-        q1BonusPago = bonus;
+      } else if (hol.bonusQ1Pago != null) {
+        q1BonusPago = Number(hol.bonusQ1Pago) || 0;
         q1VaPago = Number(hol.vaTotal) || 0;
         q1PacotePago = Math.round((q1AdiantaPago + q1BonusPago + q1VaPago) * 100) / 100;
       }
@@ -319,7 +395,7 @@
         mkHolRow_('', '', '', '', '', 'Já pago na 1ª quinzena (dia 15) · sem VT') +
         mkHolRow_('010', 'Adiantamento salarial', '40% · descontado nesta 2ª', mkHolFmtMoney_(q1AdiantaPago), '') +
         (q1BonusPago > 0
-          ? mkHolRow_('500', 'Bônus metas (já pago)', 'cota da 1ª · dia 15', mkHolFmtMoney_(q1BonusPago), '')
+          ? mkHolRow_('500', 'Bônus metas (já pago)', 'pago no dia 15 (não recalcular)', mkHolFmtMoney_(q1BonusPago), '')
           : '') +
         (q1VaPago > 0
           ? mkHolRow_('501', 'VA (já pago)', '50% do mês prop.', mkHolFmtMoney_(q1VaPago), '')
@@ -328,15 +404,20 @@
         mkHolRow_('—', 'Total pago na 1ª (PIX + VA)', 'VT fora · não se paga de novo', mkHolFmtMoney_(q1PacotePago), '');
     }
 
+    var cestaTitulo = isResto
+      ? 'Cesta · bônus = resto do mês (− já pago na 1ª) · VA nesta quinzena · VT semanal fora'
+      : ('Cesta · ' + benPctLbl + ' nesta quinzena · bônus/VA na cesta · VT semanal fora do pacote');
     var showCesta = !!(hol.incluiBeneficios || bonus > 0 || (qNum === 2 && q1AdiantaPago > 0));
     var benBlock = showCesta
-      ? '<div class="mk-hol-comp" style="border-top:1px solid var(--border);border-bottom:none;background:#F0FDF4;color:#166534">Cesta · ' + benPctLbl + ' nesta quinzena · bônus/VA na cesta · VT semanal fora do pacote</div>' +
+      ? '<div class="mk-hol-comp" style="border-top:1px solid var(--border);border-bottom:none;background:#F0FDF4;color:#166534">' + cestaTitulo + '</div>' +
         '<table class="mk-hol-tbl"><thead><tr><th>Cód</th><th>Benefício</th><th>Referência</th><th colspan="2">Valor concedido</th></tr></thead><tbody>' +
         (bonus > 0
-          ? mkHolRow_('500', 'Bônus metas (cesta)', bonusRef, mkHolFmtMoney_(bonus), '')
+          ? mkHolRow_('500', isResto ? 'Bônus metas (resto do mês)' : 'Bônus metas (cesta)', bonusRef, mkHolFmtMoney_(bonus), '')
           : '') +
         (hol.incluiBeneficios
-          ? mkHolRow_('501', 'Vale-alimentação (VA)', benPctLbl + ' de R$ ' + (hol.vaMensal || 400) + '/mês prop. ' + diasTrab + '/' + diasMes, hol.vaTotal ? mkHolFmtMoney_(hol.vaTotal) : 'R$ 0,00', '') +
+          ? mkHolRow_('501', 'Vale-alimentação (VA)',
+            (isResto ? '50%' : benPctLbl) + ' de R$ ' + (hol.vaMensal || 400) + '/mês prop. ' + diasTrab + '/' + diasMes,
+            hol.vaTotal ? mkHolFmtMoney_(hol.vaTotal) : 'R$ 0,00', '') +
             mkHolRow_('502', 'Passes VT (semanal)', vtLinhaRef, vtLinhaVal, '')
           : '') +
         q1CestaRows +
@@ -355,6 +436,7 @@
 
     var heroWidgets = mkHolWidgetHero_({
       holerite: hol,
+      opId: opIdHol,
       comp: comp,
       bruto: bruto,
       liquido: liquido,
@@ -398,7 +480,7 @@
       '<div><span>Salário líquido</span>' + mkHolFmtMoney_(liquido) + '</div>' +
       fgtsRodape +
       '</div>' +
-      '<div class="mk-hol-foot">Modelo DP: 1ª = adiantamento 40% + cesta (bônus/VA); 2ª = salário do mês − adiantamento − encargos + cesta. VT é pago toda semana e nunca soma no pacote. PIX = líquido + bônus. FGTS 8% é encargo do empregador (informativo — não desconta da colaboradora). Documento informativo — conferir com contador.</div>' +
+      '<div class="mk-hol-foot">Modelo DP: 1ª = adiantamento 40% + cesta (bônus/VA do acumulado na data); 2ª = salário do mês − adiantamento − encargos + cesta, com bônus = resto do mês (ganho − pago na 1ª). VT é pago toda semana e nunca soma no pacote. PIX = líquido + bônus · Pacote = PIX + VA. FGTS 8% é encargo do empregador (informativo). Documento informativo — conferir com contador.</div>' +
       '</div></div>';
   }
 
@@ -422,6 +504,10 @@
   }
 
   global.mkHolFmtMoney_ = mkHolFmtMoney_;
+  global.mkHolNormalizeHol_ = mkHolNormalizeHol_;
+  global.mkHolBonusRestoQ2_ = mkHolBonusRestoQ2_;
+  global.mkHolQ1PagoMemorial_ = mkHolQ1PagoMemorial_;
+  global.mkHolApplyBonusRegra_ = mkHolApplyBonusRegra_;
   global.mkHolWidgetHero_ = mkHolWidgetHero_;
   global.mkHolBuildHtml_ = mkHolBuildHtml_;
   global.mkHolPrintPdf_ = mkHolPrintPdf_;

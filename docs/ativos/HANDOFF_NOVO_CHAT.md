@@ -1,12 +1,14 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 30/07/2026 · FE **v1.9.85** · GAS repo/Web **v1.5.209** · **I135** Operadores Folha/Escala timeout+retry  
+**Atualizado:** 31/07/2026 · FE **v1.9.86** · GAS repo/Web **v1.5.209** · **I141** bônus Q2 = resto (mês − pago na 1ª)
+
+**I141 (31/07):** bônus 2ª = resto do mês (não 50% de novo). Memorial Q1: Ray **150/998,40** · Julia **100/948,40**. Pacote 31/07: Ray **1652,22** · Julia **1702,22**. Teste `scripts/testes/teste-i141-bonus-resto.cjs`.
 
 **I140 (30/07):** FGTS fora da cesta (rodapé).
 
 **I139 (30/07):** Metas badge mostra R$ (FSS R$50).
 
-**I138 (30/07):** holerite VT semanal fora do pacote · total 1ª = R$ 948,40 (memorial).
+**I138 (30/07):** holerite VT semanal fora do pacote · memorial Q1 (corrigido I141 por pessoa).
 
 **I137 (30/07):** cache full do Operadores não re-pede painel GAS.
 
