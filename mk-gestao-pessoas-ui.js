@@ -1728,13 +1728,14 @@
         return;
       }
       if (typeof mkHolBuildHtml_ === 'function' && pg.holerite && (pg.holerite.bruto || pg.holerite.base)) {
+        var diasBonusColab = (p.meta && p.meta.diasMes) ? p.meta.diasMes.filter(function (d) { return d.bonusOk; }) : [];
         document.getElementById('pag-body').innerHTML = mkHolBuildHtml_({
           folha: {
             id: p.id,
             nome: p.label,
             base: pg.base,
             bonus: pg.bonus,
-            bonusDias: (p.meta && p.meta.diasMes) ? p.meta.diasMes.filter(function (d) { return d.bonusOk; }).length : 0,
+            bonusDias: diasBonusColab.length,
             holerite: pg.holerite
           },
           colab: {
@@ -1742,8 +1743,10 @@
             nome: p.label,
             funcao: p.funcao,
             admissao: p.admissao || (p.cadastro && p.cadastro.admissao) || '',
-            cpf: p.cadastro && p.cadastro.cpf
+            cpf: p.cadastro && p.cadastro.cpf,
+            metas: { diasMes: diasBonusColab, bonusDias: diasBonusColab.length }
           },
+          diasBonus: diasBonusColab,
           comp: pg.competencia,
           toolbar: true
         });

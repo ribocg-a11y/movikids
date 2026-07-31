@@ -758,6 +758,17 @@ html.gp-prod #gp-preview-banner {
 #gp-app .mk-hol-note { padding: 10px 16px; background: #FFFBEB; border-bottom: 1px solid #FDE68A; font-size: 11px; font-weight: 800; color: #92400E; line-height: 1.45; }
 #gp-app .mk-hol-toolbar { padding: 0 0 12px; }
 #gp-app .mk-hol-toolbar .btn { width: 100%; }
+#gp-app .mk-hol-mes-resumo { border-top: 2px solid var(--blue); }
+#gp-app .mk-hol-mes-note {
+  margin: 0;
+  padding: 8px 16px 12px;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--txt3);
+  line-height: 1.45;
+}
+#gp-app .mk-hol-tbl-mes th:first-child,
+#gp-app .mk-hol-tbl-mes td:first-child { text-align: left; }
 @media print {
   body.mk-hol-printing * { visibility: hidden !important; }
   body.mk-hol-printing .mk-hol-print-root,
@@ -765,6 +776,7 @@ html.gp-prod #gp-preview-banner {
   body.mk-hol-printing .mk-hol-print-root { position: absolute; left: 0; top: 0; width: 100%; }
   body.mk-hol-printing .no-print { display: none !important; }
   body.mk-hol-printing .mk-hol { box-shadow: none; border: none; }
+  body.mk-hol-printing .mk-hol-mes-resumo { break-inside: avoid; page-break-inside: avoid; }
 }
 
 /* ── ADM Operadores · Gestão Pessoas (#page-operadores) ── */
@@ -1242,6 +1254,17 @@ html.gp-prod #gp-preview-banner {
 #page-operadores .mk-hol-note { padding: 10px 16px; background: #FFFBEB; border-bottom: 1px solid #FDE68A; font-size: 11px; font-weight: 800; color: #92400E; line-height: 1.45; }
 #page-operadores .mk-hol-toolbar { padding: 0 0 12px; }
 #page-operadores .mk-hol-toolbar .btn { width: 100%; }
+#page-operadores .mk-hol-mes-resumo { border-top: 2px solid var(--blue); }
+#page-operadores .mk-hol-mes-note {
+  margin: 0;
+  padding: 8px 16px 12px;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--txt3);
+  line-height: 1.45;
+}
+#page-operadores .mk-hol-tbl-mes th:first-child,
+#page-operadores .mk-hol-tbl-mes td:first-child { text-align: left; }
 
 /* Operadores — responsivo (mobile / tablet estreito) */
 @media (max-width: 900px) {

@@ -1,8 +1,10 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 31/07/2026 · FE **v1.9.86** · GAS repo/Web **v1.5.209** · **I141** bônus Q2 = resto (mês − pago na 1ª)
+**Atualizado:** 31/07/2026 · FE **v1.9.87** · GAS repo/Web **v1.5.209** · **I142** PDF holerite (Q1/Q2/Soma + dias bônus)
 
-**I141 (31/07):** bônus 2ª = resto do mês (não 50% de novo). Memorial Q1: Ray **150/998,40** · Julia **100/948,40**. Pacote 31/07: Ray **1652,22** · Julia **1702,22**. Teste `scripts/testes/teste-i141-bonus-resto.cjs`.
+**I142 (31/07):** holerite PDF com conferência do mês (Salário/VA/VT/Bônus Q1·Q2·Soma) + tabela dias de bônus · botão Salvar PDF. Teste `teste-i141-bonus-resto.cjs` (I141+I142).
+
+**I141 (31/07):** bônus 2ª = resto do mês (não 50% de novo). Memorial Q1: Ray **150/998,40** · Julia **100/948,40**. Pacote 31/07: Ray **1652,22** · Julia **1702,22**.
 
 **I140 (30/07):** FGTS fora da cesta (rodapé).
 

@@ -969,16 +969,31 @@
     return typeof mkHolFmtMoney_ === 'function' ? mkHolFmtMoney_(v, tipo) : ('R$ ' + Number(v || 0).toFixed(2));
   }
 
-  function gpAdmBuildHoleriteHtml_(f, colab, comp) {
+  function gpAdmBuildHoleriteHtml_(f, colab, comp, diasBonus) {
     if (typeof mkHolBuildHtml_ !== 'function') {
       return '<p class="gp-adm-muted">Carregue mk-holerite.js para ver o demonstrativo.</p>';
     }
+    const c = colab || {};
+    const metas = Object.assign({}, c.metas || {});
+    if (Array.isArray(diasBonus) && diasBonus.length) metas.diasMes = diasBonus;
     return mkHolBuildHtml_({
       folha: f,
-      colab: colab || {},
+      colab: Object.assign({}, c, { metas: metas }),
       comp: comp,
+      diasBonus: Array.isArray(diasBonus) ? diasBonus : (metas.diasMes || null),
       toolbar: true
     });
+  }
+
+  /** I142 — enriquece PDF com dias de bônus (metaOperadorTurno · mês corrente). */
+  function gpAdmEnrichHoleriteDiasBonus_(id, f, colab, comp, content) {
+    if (!content || typeof api !== 'function') return;
+    api({ action: 'metaOperadorTurno', operadorId: id, _t: Date.now() }, 20000).then(function (r) {
+      const dias = (r && r.ok !== false && r.mes && r.mes.diasBonus) || [];
+      if (!dias.length) return;
+      if (!document.getElementById('gp-adm-holerite-content') || content !== document.getElementById('gp-adm-holerite-content')) return;
+      content.innerHTML = gpAdmBuildHoleriteHtml_(f, colab, comp, dias);
+    }).catch(function () { /* lista agregada já no holerite */ });
   }
 
   window.mkGpAdmVerHolerite_ = function (id) {
@@ -992,11 +1007,13 @@
       if (typeof toast === 'function') toast('Holerite indisponível', 'warning');
       return;
     }
-    content.innerHTML = gpAdmBuildHoleriteHtml_(f, colab, gpAdmData_.competencia);
+    const comp = gpAdmData_.competencia;
+    content.innerHTML = gpAdmBuildHoleriteHtml_(f, colab, comp);
     if (list) list.hidden = true;
     view.hidden = false;
     view.setAttribute('aria-hidden', 'false');
     try { view.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e) { view.scrollIntoView(true); }
+    gpAdmEnrichHoleriteDiasBonus_(id, f, colab, comp, content);
   };
 
   window.mkGpAdmFecharHolerite_ = function () {

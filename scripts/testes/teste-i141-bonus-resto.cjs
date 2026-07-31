@@ -90,6 +90,34 @@ assert(htmlJul.indexOf('1.702,22') >= 0 || htmlJul.indexOf('1702,22') >= 0, 'HTM
 assert(htmlJul.indexOf('R$ 750,00') >= 0, 'HTML Julia bônus 750');
 assert(htmlJul.indexOf('R$ 100,00') >= 0, 'HTML Julia já pago 100');
 
+// I142 — conferência mês no PDF
+assert(typeof g.mkHolMesResumo_ === 'function', 'export mkHolMesResumo_');
+const resRay = g.mkHolMesResumo_(holGasQ2(850), 3, '07/2026');
+assert(resRay.ok, 'resumo Ray ok');
+const bonusRub = resRay.rubricas.find(function (r) { return r.nome === 'Bônus'; });
+assert(bonusRub && bonusRub.q1 === 150 && bonusRub.q2 === 700 && bonusRub.soma === 850, 'Ray bônus Q1/Q2/Soma');
+assert(Math.abs(resRay.pacote.q2 - 1652.22) < 0.01, 'Ray pacote Q2');
+assert(Math.abs(resRay.pacote.soma - 2650.62) < 0.01, 'Ray pacote mês');
+const resJul = g.mkHolMesResumo_(holGasQ2(850), 4, '07/2026');
+const bonusJul = resJul.rubricas.find(function (r) { return r.nome === 'Bônus'; });
+assert(bonusJul && bonusJul.q1 === 100 && bonusJul.q2 === 750 && bonusJul.soma === 850, 'Julia bônus Q1/Q2/Soma');
+assert(htmlRay.indexOf('Conferência do mês') >= 0, 'HTML Ray tem conferência mês');
+assert(htmlRay.indexOf('Dias com bônus') >= 0, 'HTML Ray tem tabela dias bônus');
+assert(htmlRay.indexOf('data-i142') >= 0, 'HTML Ray marca I142');
+
+const htmlRayDias = g.mkHolBuildHtml_({
+  folha: { id: 3, nome: 'Raykelly', base: 972.6, bonus: 425, bonusDias: 2, holerite: holGasQ2(850) },
+  colab: { id: 3, nome: 'Raykelly', funcao: 'Operadora', admissao: '01/06/2026' },
+  comp: '07/2026',
+  diasBonus: [
+    { data: '04/07/2026', loc: 22, bonusOk: true, bonusValor: 100 },
+    { data: '05/07/2026', loc: 21, bonusOk: true, bonusValor: 50, juntas: true }
+  ],
+  toolbar: false
+});
+assert(htmlRayDias.indexOf('04/07/2026') >= 0, 'HTML lista dia bônus');
+assert(htmlRayDias.indexOf('R$ 100,00') >= 0, 'HTML valor dia bônus');
+
 // Sem memorial → aviso (não inventar 50%)
 const sem = g.mkHolNormalizeHol_(Object.assign(holGasQ2(850), { competencia: '08/2026' }), { opId: 3, comp: '08/2026' });
 assert(sem.bonusRegra === 'incompleta', 'sem memorial = regra incompleta');
@@ -99,5 +127,5 @@ if (failed) {
   console.error('\nI141 FALHOU:', failed, 'assert(s)');
   process.exit(1);
 }
-console.log('\nI141 OK — ambos holerites (Ray 700/1652.22 · Julia 750/1702.22)');
+console.log('\nI141+I142 OK — holerites + PDF conferência (Ray 700/1652.22 · Julia 750/1702.22)');
 process.exit(0);

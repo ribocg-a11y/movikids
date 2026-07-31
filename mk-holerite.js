@@ -212,6 +212,180 @@
     return hol;
   }
 
+  /** Labels Q1/Q2 a partir da competência MM/yyyy. */
+  function mkHolMesPgtoLabels_(comp) {
+    var key = mkHolCompKey_(comp);
+    var m = key.match(/^(\d{2})\/(\d{4})$/);
+    if (!m) return { q1: 'Q1', q2: 'Q2', mesLbl: key || '—' };
+    var mm = m[1];
+    var yyyy = Number(m[2]);
+    var last = new Date(yyyy, Number(mm), 0).getDate();
+    return {
+      q1: 'Q1 (15/' + mm + ')',
+      q2: 'Q2 (' + last + '/' + mm + ')',
+      mesLbl: mm + '/' + yyyy
+    };
+  }
+
+  function mkHolDiaSemana_(dataStr) {
+    var p = String(dataStr || '').split('/');
+    if (p.length < 3) return '';
+    var d = new Date(Number(p[2]), Number(p[1]) - 1, Number(p[0]));
+    if (isNaN(d.getTime())) return '';
+    return ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'][d.getDay()] || '';
+  }
+
+  /**
+   * I142 — resumo do mês (Q1 / Q2 / Soma) a partir do memorial da 1ª + holerite atual (regra I141).
+   * Pacote = PIX + VA (VT só referência, fora do PIX).
+   */
+  function mkHolMesResumo_(holIn, opId, comp) {
+    var hol = mkHolNormalizeHol_(holIn || {}, { opId: opId, comp: comp });
+    var mem = mkHolQ1PagoMemorial_(opId, comp || hol.competencia || '');
+    var q = Number(hol.quinzena) || 0;
+    var labels = mkHolMesPgtoLabels_(comp || hol.competencia || '');
+    var vtMes = Number(hol.vtPassesMes) || 0;
+    var vtHalf = Number(hol.vtPassesJaPago) || 0;
+    if (vtHalf <= 0 && vtMes > 0) vtHalf = Math.round(vtMes * 0.5 * 100) / 100;
+    if (vtMes <= 0 && vtHalf > 0) vtMes = Math.round(vtHalf * 2 * 100) / 100;
+
+    var salQ1 = 0;
+    var salQ2 = 0;
+    var vaQ1 = 0;
+    var vaQ2 = 0;
+    var vtQ1 = vtHalf;
+    var vtQ2 = vtHalf;
+    var bonusQ1 = 0;
+    var bonusQ2 = 0;
+    var pacoteQ1 = 0;
+    var pacoteQ2 = 0;
+    var ok = false;
+
+    if (mem) {
+      salQ1 = Number(mem.adianta) || 0;
+      vaQ1 = Number(mem.va) || 0;
+      bonusQ1 = Number(mem.bonus) || 0;
+      pacoteQ1 = Number(mem.pacote) || 0;
+      ok = true;
+    }
+
+    if (q === 2) {
+      salQ2 = Number(hol.liquido) || 0;
+      vaQ2 = Number(hol.vaTotal) || 0;
+      bonusQ2 = Number(hol.bonus) || 0;
+      pacoteQ2 = Number(hol.pacoteQuinzena) || 0;
+      if (!mem && hol.bonusQ1Pago != null) {
+        bonusQ1 = Number(hol.bonusQ1Pago) || 0;
+        salQ1 = mkHolAdiantamentoQ1_(hol);
+        vaQ1 = vaQ2;
+        pacoteQ1 = Math.round((salQ1 + bonusQ1 + vaQ1) * 100) / 100;
+        ok = true;
+      }
+    } else if (q === 1) {
+      salQ1 = Number(hol.base) || salQ1;
+      vaQ1 = Number(hol.vaTotal) || vaQ1;
+      bonusQ1 = Number(hol.bonus) || bonusQ1;
+      pacoteQ1 = Number(hol.pacoteQuinzena) || pacoteQ1;
+      // 2ª ainda não fechada — soma parcial = só Q1
+      ok = true;
+    }
+
+    function soma(a, b) { return Math.round((Number(a) + Number(b)) * 100) / 100; }
+
+    return {
+      ok: ok,
+      labels: labels,
+      regraBonus: hol.bonusRegra || (q === 1 ? 'q1' : ''),
+      bonusMes: hol.bonusMes != null ? Number(hol.bonusMes) : soma(bonusQ1, bonusQ2),
+      rubricas: [
+        { nome: 'Salário', q1: salQ1, q2: salQ2, soma: soma(salQ1, salQ2) },
+        { nome: 'VA', q1: vaQ1, q2: vaQ2, soma: soma(vaQ1, vaQ2) },
+        { nome: 'VT*', q1: vtQ1, q2: vtQ2, soma: soma(vtQ1, vtQ2), nota: true },
+        { nome: 'Bônus', q1: bonusQ1, q2: bonusQ2, soma: soma(bonusQ1, bonusQ2) }
+      ],
+      pacote: { q1: pacoteQ1, q2: pacoteQ2, soma: soma(pacoteQ1, pacoteQ2) }
+    };
+  }
+
+  function mkHolBuildDiasBonusHtml_(diasBonus, bonusDiasCount, bonusMesVal) {
+    var dias = [];
+    if (Array.isArray(diasBonus) && diasBonus.length) {
+      dias = diasBonus.filter(function (d) {
+        if (!d) return false;
+        if (d.bonusOk === false) return false;
+        return d.bonusOk === true || (Number(d.bonusValor) || 0) > 0;
+      });
+    }
+    var total = dias.reduce(function (s, d) { return s + (Number(d.bonusValor) || 0); }, 0);
+    if (!(total > 0) && bonusMesVal != null) total = Number(bonusMesVal) || 0;
+    var nDias = dias.length || Number(bonusDiasCount) || 0;
+
+    var rows = dias.map(function (d) {
+      var data = d.data || '—';
+      var dow = d.diaSemana || mkHolDiaSemana_(data);
+      var loc = d.loc != null ? d.loc : (d.locacoes != null ? d.locacoes : '—');
+      var bv = Number(d.bonusValor) || 0;
+      var hint = d.juntas ? ' · FSS' : '';
+      return '<tr><td class="c">' + esc(data) + '</td><td class="c">' + esc(dow || '—') + '</td>' +
+        '<td class="c">' + esc(String(loc)) + '</td><td class="n v">' + mkHolFmtMoney_(bv) + hint + '</td></tr>';
+    }).join('');
+
+    if (!rows) {
+      rows = '<tr><td colspan="4" class="c">Sem detalhe dia a dia neste painel' +
+        (nDias > 0 ? ' · ' + nDias + ' dia(s) com bônus no mês' : '') +
+        (total > 0 ? ' · total ' + mkHolFmtMoney_(total) : '') +
+        '</td></tr>';
+    }
+
+    return '<div class="mk-hol-comp">Dias com bônus de meta</div>' +
+      '<table class="mk-hol-tbl mk-hol-tbl-mes"><thead><tr>' +
+      '<th>Data</th><th>Dia</th><th>Locações</th><th>Bônus do dia</th></tr></thead><tbody>' +
+      rows +
+      '<tr class="sec"><td colspan="3">Total bônus do mês · ' + nDias + ' dia(s)</td>' +
+      '<td class="n v">' + mkHolFmtMoney_(total) + '</td></tr>' +
+      '</tbody></table>';
+  }
+
+  function mkHolBuildMesResumoHtml_(opts) {
+    opts = opts || {};
+    var opId = Number(opts.opId) || 0;
+    var comp = opts.comp || '';
+    var nome = opts.nome || '—';
+    var resumo = mkHolMesResumo_(opts.holerite || {}, opId, comp);
+    if (!resumo.ok) return '';
+
+    var lbl = resumo.labels;
+    var body = resumo.rubricas.map(function (r) {
+      return '<tr><td>' + esc(r.nome) + '</td>' +
+        '<td class="n v">' + mkHolFmtMoney_(r.q1) + '</td>' +
+        '<td class="n v">' + mkHolFmtMoney_(r.q2) + '</td>' +
+        '<td class="n v">' + mkHolFmtMoney_(r.soma) + '</td></tr>';
+    }).join('');
+
+    var pac = resumo.pacote;
+    var regraNota = resumo.regraBonus === 'resto'
+      ? 'Bônus Q2 = resto (ganho mês − pago na 1ª). Pacote = PIX + VA · VT fora do PIX.'
+      : 'Pacote = PIX + VA · VT fora do PIX. Na 2ª o bônus deve ser o resto do mês (I141).';
+
+    return '<div class="mk-hol-mes-resumo" data-i142="1">' +
+      '<div class="mk-hol-comp">Conferência do mês · ' + esc(nome) + ' · ' + esc(lbl.mesLbl) + '</div>' +
+      '<table class="mk-hol-tbl mk-hol-tbl-mes"><thead><tr>' +
+      '<th>Rubrica</th><th>' + esc(lbl.q1) + '</th><th>' + esc(lbl.q2) + '</th><th>Soma</th>' +
+      '</tr></thead><tbody>' + body + '</tbody></table>' +
+      '<p class="mk-hol-mes-note">*VT = referência da quinzena (pago por semana, fora do PIX)</p>' +
+      '<div class="mk-hol-comp">Pacote (PIX + VA, sem VT)</div>' +
+      '<table class="mk-hol-tbl mk-hol-tbl-mes"><thead><tr>' +
+      '<th></th><th>' + esc(lbl.q1) + '</th><th>' + esc(lbl.q2) + '</th><th>Mês</th></tr></thead><tbody>' +
+      '<tr><td>Pacote</td>' +
+      '<td class="n v">' + mkHolFmtMoney_(pac.q1) + '</td>' +
+      '<td class="n v">' + mkHolFmtMoney_(pac.q2) + '</td>' +
+      '<td class="n v">' + mkHolFmtMoney_(pac.soma) + '</td></tr>' +
+      '</tbody></table>' +
+      '<p class="mk-hol-mes-note">' + esc(regraNota) + '</p>' +
+      mkHolBuildDiasBonusHtml_(opts.diasBonus, opts.bonusDias, resumo.bonusMes) +
+      '</div>';
+  }
+
   function mkHolWidgetHero_(opts) {
     opts = opts || {};
     var opId = opts.opId != null ? Number(opts.opId) : 0;
@@ -430,8 +604,26 @@
       ? '<div><span>FGTS 8% (encargo empregador)</span>' + mkHolFmtMoney_(fgtsVal) + '</div>'
       : '';
 
-    var toolbar = opts.toolbar !== false
-      ? '<div class="mk-hol-toolbar no-print"><button type="button" class="btn btn-secondary" onclick="mkHolPrintPdf_()">📄 Salvar PDF / Imprimir</button></div>'
+  var diasBonusList = opts.diasBonus ||
+    (colab.metas && colab.metas.diasMes) ||
+    f.diasBonusList ||
+    null;
+  var bonusDiasCount = f.bonusDias != null ? f.bonusDias
+    : (colab.metas && colab.metas.bonusDias != null ? colab.metas.bonusDias : bonusDias);
+
+  var mesResumoHtml = mkHolBuildMesResumoHtml_({
+    opId: opIdHol,
+    comp: comp || hol.competencia || '',
+    nome: nome,
+    holerite: hol,
+    diasBonus: diasBonusList,
+    bonusDias: bonusDiasCount
+  });
+
+  var toolbar = opts.toolbar !== false
+      ? '<div class="mk-hol-toolbar no-print">' +
+        '<button type="button" class="btn btn-secondary" onclick="mkHolPrintPdf_()">📄 Salvar PDF / Imprimir</button>' +
+        '</div>'
       : '';
 
     var heroWidgets = mkHolWidgetHero_({
@@ -446,7 +638,7 @@
     });
 
     return '<div class="mk-hol-print-root">' + toolbar + heroWidgets +
-      '<p class="gp-hol-detail-lead no-print">Detalhamento linha a linha abaixo — use PDF para arquivo.</p>' +
+      '<p class="gp-hol-detail-lead no-print">Detalhamento + conferência do mês abaixo — use PDF para arquivo por colaboradora.</p>' +
       '<div class="mk-hol" id="mk-hol-doc">' +
       '<div class="mk-hol-head"><div class="mk-hol-brand">MOVI <span style="color:var(--gold,#FFD54F)">KIDS</span></div>' +
       '<div class="mk-hol-sub">' + esc(EMPRESA.razao) + '<br>CNPJ ' + esc(EMPRESA.cnpj) + ' · ' + esc(EMPRESA.endereco) + '</div></div>' +
@@ -461,6 +653,7 @@
       '<div><span>Proporcional mês</span>' + mkHolFmtMoney_(salProp || hol.salarioProporcional || base) + ' (' + diasTrab + '/' + diasMes + ' dias)</div>' +
       '</div>' +
       (notaProp ? '<div class="mk-hol-note">' + esc(notaProp) + '</div>' : '') +
+      mesResumoHtml +
       '<div class="mk-hol-comp">Demonstrativo · ' + esc(qLabel) + ' · pgto ' + esc(pgto) + '</div>' +
       '<table class="mk-hol-tbl"><thead><tr><th>Cód</th><th>Descrição</th><th>Referência</th><th>Vencimentos</th><th>Descontos</th></tr></thead><tbody>' +
       mkHolRow_('', '', '', '', '', qNum === 1 ? 'Proventos (adiantamento)' : 'Proventos (salário do mês)') +
@@ -508,6 +701,8 @@
   global.mkHolBonusRestoQ2_ = mkHolBonusRestoQ2_;
   global.mkHolQ1PagoMemorial_ = mkHolQ1PagoMemorial_;
   global.mkHolApplyBonusRegra_ = mkHolApplyBonusRegra_;
+  global.mkHolMesResumo_ = mkHolMesResumo_;
+  global.mkHolBuildMesResumoHtml_ = mkHolBuildMesResumoHtml_;
   global.mkHolWidgetHero_ = mkHolWidgetHero_;
   global.mkHolBuildHtml_ = mkHolBuildHtml_;
   global.mkHolPrintPdf_ = mkHolPrintPdf_;
