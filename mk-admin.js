@@ -1715,26 +1715,71 @@ function applyMargemSemaforo_(margem) {
   else if (margem > 0) kpi.classList.add('mk-sem-vermelho');
 }
 
-/** FASE 14 — decomposição mini-DRE (tabela vertical). */
+/** FASE 14 — decomposição mini-DRE (tabela vertical) + categorias CUSTOS. */
 function renderMiniDreCascade_(d) {
   const box = document.getElementById('mk-dre-cascata');
   if (!box) return;
-  const md = d && d.miniDre;
-  if (!md || !(d.fatMes > 0)) {
+  const fat = Number(d && d.fatMes) || 0;
+  if (!(fat > 0)) {
     box.style.display = 'none';
     return;
   }
+  const md = (d && d.miniDre) || {};
+  const cto = Number(md.ctoPagar != null ? md.ctoPagar : d.ctoPagar) || 0;
+  const cusMes = Number(d.cusMes) || 0;
+  const cusCMV = Number(md.cusCMV) || 0;
+  const cusOPEX = Number(md.cusOPEX) || Math.max(0, cusMes - cusCMV - (Number(md.cusInvestimento) || 0));
+  const resultado = Number(d.resultado != null ? d.resultado : md.margemOperacional) || 0;
+  const margemBruta = md.margemBruta != null ? Number(md.margemBruta) : (fat - cusCMV);
+  const totalSaida = Math.round((fat - resultado) * 100) / 100;
+  const margem = Number(d.margem) || Number(md.margemOperacionalPct) || 0;
+
   box.style.display = '';
-  setText2('mk-dre-fat', R2(md.fatMes || d.fatMes));
-  setText2('mk-dre-cmv', '− ' + R2(md.cusCMV || 0));
-  setText2('mk-dre-bruta', R2(md.margemBruta || 0));
+  setText2('mk-dre-lucro-ref', R2(resultado));
+  setText2('mk-dre-fat', R2(md.fatMes || fat));
+  setText2('mk-dre-cmv', '− ' + R2(cusCMV));
+  setText2('mk-dre-bruta', R2(margemBruta));
   const bp = document.getElementById('mk-dre-bruta-pct');
-  if (bp) bp.textContent = '(' + (md.margemBrutaPct != null ? md.margemBrutaPct : 0) + '%)';
-  setText2('mk-dre-opex', '− ' + R2(md.cusOPEX || 0));
-  setText2('mk-dre-cto', '− ' + R2(md.ctoPagar || d.ctoPagar || 0));
-  setText2('mk-dre-oper', R2(md.margemOperacional != null ? md.margemOperacional : d.resultado));
+  if (bp) {
+    const pctB = md.margemBrutaPct != null
+      ? md.margemBrutaPct
+      : (fat > 0 ? Math.round(margemBruta / fat * 1000) / 10 : 0);
+    bp.textContent = '(' + pctB + '%)';
+  }
+  setText2('mk-dre-opex', '− ' + R2(cusOPEX));
+  setText2('mk-dre-cto', '− ' + R2(cto));
+  setText2('mk-dre-total-custos', '− ' + R2(totalSaida > 0 ? totalSaida : (cusMes + cto)));
+  setText2('mk-dre-oper', R2(resultado));
   const op = document.getElementById('mk-dre-oper-pct');
-  if (op) op.textContent = '(' + (md.margemOperacionalPct != null ? md.margemOperacionalPct : d.margem) + '%)';
+  if (op) op.textContent = '(' + (md.margemOperacionalPct != null ? md.margemOperacionalPct : margem) + '%)';
+
+  const bridge = document.getElementById('mk-dre-bridge');
+  if (bridge) {
+    bridge.textContent = R2(fat) + ' − ' + R2(totalSaida > 0 ? totalSaida : (cusMes + cto))
+      + ' custos/CTO = ' + R2(resultado) + ' (sem folha)';
+  }
+
+  const catsEl = document.getElementById('mk-dre-cats');
+  if (catsEl) {
+    const cats = Array.isArray(d.cusPorCategoria) ? d.cusPorCategoria.slice() : [];
+    cats.sort(function (a, b) { return (Number(b.valor) || 0) - (Number(a.valor) || 0); });
+    if (!cats.length) {
+      catsEl.hidden = true;
+      catsEl.innerHTML = '';
+    } else {
+      catsEl.hidden = false;
+      catsEl.innerHTML = '<div class="mk-dre-cats-title">Detalhe dos custos (aba CUSTOS)</div>'
+        + cats.map(function (c) {
+          const nome = String(c.categoria || 'Outros');
+          const val = Number(c.valor) || 0;
+          return '<div class="mk-dre-row mk-dre-row-cat" role="row">'
+            + '<span class="mk-dre-row-lbl" role="rowheader">' + escHtml(nome) + '</span>'
+            + '<span class="mk-dre-row-val" role="cell">− ' + R2(val) + '</span>'
+            + '</div>';
+        }).join('');
+    }
+  }
+
   const badge = document.getElementById('mk-dre-plano-badge');
   if (badge) {
     badge.textContent = md.planoOk ? 'Plano de contas' : 'Mapeamento padrão';
@@ -1786,7 +1831,11 @@ function renderExecCockpit_(d) {
   }
   const resD = document.getElementById('mk-exec-res-d');
   if (resD) {
-    let resCtx = (d.nMes || 0) + ' locações · margem ' + margem + '%';
+    const cusMesCtx = Number(d.cusMes) || 0;
+    const ctoCtx = Number(d.ctoPagar) || 0;
+    const saidaCtx = Math.round((fatMes - resultado) * 100) / 100;
+    let resCtx = '− ' + R2(saidaCtx > 0 ? saidaCtx : (cusMesCtx + ctoCtx)) + ' custos/CTO';
+    resCtx += ' · ' + (d.nMes || 0) + ' locações · margem ' + margem + '%';
     if (cen && cen.ritmoDiaria > 0) {
       resCtx += ' · média ' + R2(cen.ritmoDiaria) + '/dia';
     }
