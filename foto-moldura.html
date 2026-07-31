@@ -10,7 +10,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="mk-design.css?v=1.8.50">
+<link rel="stylesheet" href="mk-design.css?v=1.9.89">
+<script src="mk-version.js?v=1.9.89"></script>
 </head>
 <body class="mk-portal-page mk-frame-page" data-step="start">
 
@@ -147,7 +148,14 @@ function setErr(msg) { document.getElementById('frame-err').textContent = msg ||
 function updateNomeUI_() {
   const nome = nomeAtual_();
   const nomeEl = document.getElementById('frame-nome');
-  if (nomeEl) nomeEl.textContent = nome || '⭐';
+  if (nomeEl) {
+    nomeEl.textContent = nome || '⭐';
+    nomeEl.setAttribute('aria-label', nome ? ('Nome: ' + nome) : 'Sem nome');
+    // I143 — reforço inline (cache CSS antigo podia deixar texto branco no amarelo)
+    nomeEl.style.color = '#1a237e';
+    nomeEl.style.opacity = '1';
+    nomeEl.style.fontWeight = '900';
+  }
   document.getElementById('frame-subtitle').textContent = nome ? 'Foto de ' + nome : 'Sua foto na moldura Movi Kids';
   document.getElementById('frame-caption-hint').textContent = igCaption_();
 }
@@ -527,11 +535,19 @@ async function renderExemploPreview_() {
 
   await loadGasUrl_();
   if (tel) await loadCriancas_(tel);
-  if (!criancas_.length && nomeUrl) criancas_ = [nomeUrl];
-  if (isExemplo && !criancas_.length) criancas_ = ['Maria', 'João'];
-  if (nomeUrl && criancas_.length) {
-    const ni = criancas_.findIndex(n => n.toLowerCase() === nomeUrl.toLowerCase());
-    kidIdx_ = ni >= 0 ? ni : 0;
+  // I143 — ?nome= da URL sempre ganha (portal pode demorar / falhar / nomes diferentes)
+  let nomeDecoded = nomeUrl;
+  try { nomeDecoded = decodeURIComponent(nomeUrl.replace(/\+/g, ' ')).trim(); } catch (e) {}
+  if (nomeDecoded) {
+    const ni = criancas_.findIndex(n => n.toLowerCase() === nomeDecoded.toLowerCase());
+    if (ni >= 0) {
+      kidIdx_ = ni;
+    } else {
+      criancas_.unshift(nomeDecoded);
+      kidIdx_ = 0;
+    }
+  } else if (isExemplo && !criancas_.length) {
+    criancas_ = ['Maria', 'João'];
   }
 
   updateNomeUI_();

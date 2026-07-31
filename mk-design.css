@@ -1327,17 +1327,24 @@
 .mk-frame-brand span { color: var(--gold); }
 .mk-frame-name {
   margin: 0;
-  padding: 6px 18px;
+  padding: 7px 20px;
   border-radius: 99px;
   background: linear-gradient(90deg, #FFD54F, #ffb300);
-  color: #1a237e;
-  font-size: clamp(12px, 3.8vw, 15px);
+  /* I143 — nunca herdar branco do .mk-portal-page (invisível no amarelo) */
+  color: #1a237e !important;
+  font-family: 'Nunito', system-ui, sans-serif;
+  font-size: clamp(14px, 4.2vw, 17px);
   font-weight: 900;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.22);
   max-width: 88%;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  opacity: 1 !important;
+  z-index: 4;
+  position: relative;
 }
 .mk-frame-slot {
   position: absolute;
