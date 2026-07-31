@@ -10,8 +10,28 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="mk-design.css?v=1.9.92">
-<script src="mk-version.js?v=1.9.92"></script>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<link rel="stylesheet" href="mk-design.css?v=1.9.93">
+<script src="mk-version.js?v=1.9.93"></script>
+<script>
+(function () {
+  var CURRENT = (window.MK_VERSION || '1.9.93');
+  var KEY = 'mk_portal_loaded_version';
+  try {
+    var stored = localStorage.getItem(KEY) || '';
+    var m = location.search.match(/force[=:\-]+([0-9]+\.[0-9]+(?:\.[0-9]+)?)/i);
+    var urlVer = m ? m[1] : '';
+    if (stored === CURRENT && (!urlVer || urlVer === CURRENT)) return;
+    localStorage.setItem(KEY, CURRENT);
+    if (window.caches) caches.keys().then(function (keys) { keys.forEach(function (k) { caches.delete(k); }); });
+    if (urlVer === CURRENT && location.search.indexOf('t=') >= 0) return;
+    var p = new URLSearchParams(location.search);
+    p.set('force', CURRENT);
+    p.set('t', String(Date.now()));
+    location.replace(location.pathname + '?' + p.toString());
+  } catch (e) {}
+})();
+</script>
 </head>
 <body class="mk-portal-page mk-frame-page" data-step="start">
 

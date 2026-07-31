@@ -8,11 +8,39 @@
 <meta name="apple-mobile-web-app-title" content="Movi Kids">
 <meta name="robots" content="noindex,nofollow">
 <title>Movi Kids — Acompanhar</title>
-<script src="mk-canonical-host.js?v=1.9.92"></script>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<script src="mk-version.js?v=1.9.93"></script>
+<script src="mk-canonical-host.js?v=1.9.93"></script>
+<script>
+/* Portal: bust cache sem perder ?tel= (mk-cache-bust do balcão descarta query) */
+(function () {
+  var CURRENT = (window.MK_VERSION || '1.9.93');
+  var KEY = 'mk_portal_loaded_version';
+  try {
+    var stored = localStorage.getItem(KEY) || '';
+    var m = location.search.match(/force[=:\-]+([0-9]+\.[0-9]+(?:\.[0-9]+)?)/i);
+    var urlVer = m ? m[1] : '';
+    var need = !stored || stored !== CURRENT || (urlVer && urlVer !== CURRENT);
+    if (!need) return;
+    localStorage.setItem(KEY, CURRENT);
+    if (window.caches) caches.keys().then(function (keys) { keys.forEach(function (k) { caches.delete(k); }); });
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(function (regs) {
+        regs.forEach(function (r) { r.unregister(); });
+      });
+    }
+    if (urlVer === CURRENT && location.search.indexOf('t=') >= 0) return;
+    var p = new URLSearchParams(location.search);
+    p.set('force', CURRENT);
+    p.set('t', String(Date.now()));
+    location.replace(location.pathname + '?' + p.toString());
+  } catch (e) {}
+})();
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="mk-design.css?v=1.9.92">
+<link rel="stylesheet" href="mk-design.css?v=1.9.93">
 </head>
 <body class="mk-portal-page" data-view="gate">
 
