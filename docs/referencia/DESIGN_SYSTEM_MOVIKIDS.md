@@ -134,12 +134,14 @@ Portal inclui também Nunito 400.
 
 | Estado | Cor | Label | Animação |
 |--------|-----|-------|----------|
-| Pendente | branco suave | Já já começa | anel cheio |
-| Ativa ok | azul | Falta | decrescendo |
+| Pendente | branco suave | Já já começa | anel cheio (pronto) |
+| Ativa ok | azul | Falta | **enche** com tempo decorrido |
 | Quase lá (≤5 min) | amarelo | Quase lá! | `mk-portal-tick` |
-| Extra | laranja | Tempo extra | `mk-portal-pulse` |
+| Extra | laranja | Tempo extra | anel cheio + `mk-portal-pulse` |
 
-**Regra técnica:** paridade `canonLoc_` / `timestampCanonico_` — nunca quebrar por estética (I16).
+**Semântica do anel:** arco = progresso da brincadeira (decorrido / plano). O número no centro continua sendo o **restante** (“Falta”). Não secar o anel com o countdown.
+
+**Regra técnica:** paridade `canonLoc_` / `timestampCanonico_` — nunca quebrar por estética (I16). Superfícies: `acompanhar.html` · `mk-home.js` · `track.html`.
 
 ### 3.6 Widgets One UI — FASE 16 (`mk-design.css` `:root` admin)
 

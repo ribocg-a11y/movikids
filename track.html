@@ -248,7 +248,7 @@ function tick() {
     const extSec = Math.abs(rem);
     const extM   = Math.floor(extSec / 60);
     const extV   = parseFloat((extM * adic).toFixed(2));
-    prog.style.strokeDashoffset = '0';
+    prog.style.strokeDashoffset = '0'; // anel cheio no extra
     prog.style.stroke = '#FF5252';
     tEl.textContent = '+' + fmtTime(extSec);
     tEl.style.color = '#FF8A65';
@@ -263,8 +263,9 @@ function tick() {
     const pending = extVal + extV;
     document.getElementById('val-total').textContent = fmtR(pending);
   } else {
-    const pct = Math.max(0, rem / planSec);
-    prog.style.strokeDashoffset = (CIRCUM*(1-pct)).toFixed(1);
+    // Anel enche com decorrido; número = restante (paridade portal)
+    const pctElapsed = Math.max(0, Math.min(1, elapsed / planSec));
+    prog.style.strokeDashoffset = (CIRCUM * (1 - pctElapsed)).toFixed(1);
     prog.style.stroke = isWarn ? '#FF8A65' : color;
     tEl.textContent   = fmtTime(rem);
     tEl.style.color   = isWarn ? '#FF8A65' : '#fff';

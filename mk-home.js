@@ -123,9 +123,9 @@ function buildCard(s) {
     timerLabel   = 'RESTANTE';
   }
 
-  // Progress ring
+  // Progress ring — enche com tempo decorrido (paridade portal acompanhar.html)
   const CIRCUM   = 220;
-  const progress = isOver ? 0 : Math.max(0, rem / total);
+  const progress = isOver ? 1 : Math.max(0, Math.min(1, 1 - (rem / total)));
   const offset   = CIRCUM * (1 - progress);
   const ringColor= isOver ? '#B71C1C' : isWarn ? '#E65100' : tipoCor(s.tipo);
 
