@@ -10,7 +10,7 @@ function Invoke-PortalApi {
   $query = ($Params.GetEnumerator() | ForEach-Object {
     "{0}={1}" -f [uri]::EscapeDataString([string]$_.Key), [uri]::EscapeDataString([string]$_.Value)
   }) -join "&"
-  return Invoke-RestMethod -Uri "$BaseUrl`?$query" -Method Get -TimeoutSec 30
+  return Invoke-RestMethod -Uri "$BaseUrl`?$query" -Method Get -TimeoutSec 55
 }
 
 $result = [ordered]@{
