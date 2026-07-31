@@ -1,12 +1,12 @@
 # MOVI KIDS — Planejamento atual (pós-FASE 5)
 
-**Atualizado:** 27/06/2026 · FE **v1.9.2** · GAS **v1.5.167** · **One UI ✅** · **I68 VT fechado**  
+**Atualizado:** 31/07/2026 · FE **v1.9.88** · GAS **v1.5.209** · **One UI ✅** · **I141/I142 holerite ✅**  
 **Diagnóstico:** [`DIAGNOSTICO_SISTEMA_6_CAMADAS_2026-06.md`](DIAGNOSTICO_SISTEMA_6_CAMADAS_2026-06.md)  
-**Sprint UI:** [`PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`](PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md) ← **ciclo ativo pós v1.9.2**  
+**Sprint UI:** [`PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`](PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md) ← **ciclo ativo**  
 **One UI (fechado):** [`PLANEJAMENTO_ONE_UI_2026-06.md`](PLANEJAMENTO_ONE_UI_2026-06.md)  
 **Documentos irmãos:** `PLANO_PRIORIDADES_2026-06.md` · `MAPA_FASES.md` · `DEPLOY_ATUAL.md` · `HANDOFF_NOVO_CHAT.md`  
 **Ciclo fechado:** FASE 0–5 · I52–I63 planilha · I64–I67 higiene/auditoria  
-**Ciclo ativo:** **Sprint D pós One UI** — `PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md` · fechar FASE **16/17**
+**Ciclo ativo:** **Sprint D** — assinar FASE **16/17** · smoke tablet D4
 
 ---
 
