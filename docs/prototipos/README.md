@@ -24,6 +24,7 @@ HTML estático para revisão no repo — **não** servidos pelo Pages salvo link
 
 | Arquivo | Nota |
 |---------|------|
+| `portal-cronometro-interativo-mockup.html` | Portal responsável — fases (coach, marcos, foto/share, família) |
 | `gestao-pessoas-mockup*.html` | Iterações colaborador/gestor |
 | `gestao-pessoas-mockup.html` | Hub antigo |
 

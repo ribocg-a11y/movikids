@@ -8,11 +8,11 @@
 <meta name="apple-mobile-web-app-title" content="Movi Kids">
 <meta name="robots" content="noindex,nofollow">
 <title>Movi Kids — Acompanhar</title>
-<script src="mk-canonical-host.js?v=1.9.90"></script>
+<script src="mk-canonical-host.js?v=1.9.91"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="mk-design.css?v=1.9.90">
+<link rel="stylesheet" href="mk-design.css?v=1.9.91">
 </head>
 <body class="mk-portal-page" data-view="gate">
 
@@ -42,6 +42,8 @@ let _telAtual = '';
 let _refreshTimer = null;
 let _carouselIdx = 0;
 let _touchStartX = null;
+let _lastVibePhase_ = '';
+const TROPHY_KEY_ = 'mk_portal_trophy_v1';
 
 function esc(v) {
   return String(v == null ? '' : v).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
@@ -137,10 +139,138 @@ function locStats_(l) {
   const ringClass = extra ? 'extra' : (pend ? 'wait' : (warn ? 'warn' : 'ok'));
   const timeTxt = extra ? '+' + fmt(Math.abs(rem)) : fmt(rem);
   const dash = ringDash_(Math.max(0, rem), totalSec, extra, pend);
-  const lbl = extra ? 'Tempo extra' : (pend ? 'Já já começa' : 'Falta');
-  const lblUpper = extra ? 'TEMPO EXTRA' : (pend ? 'JÁ JÁ COMEÇA' : 'FALTA');
+  const quase = warn;
+  const lbl = extra ? 'Tempo extra' : (pend ? 'Já já começa' : (quase ? 'Quase lá!' : 'Falta'));
+  const lblUpper = extra ? 'TEMPO EXTRA' : (pend ? 'JÁ JÁ COMEÇA' : (quase ? 'QUASE LÁ!' : 'FALTA'));
   const cardCls = 'mk-portal-play' + (extra ? ' is-extra' : '') + (warn ? ' is-warn' : '') + (pend ? ' is-wait' : '');
-  return { rem, totalSec, extra, pend, warn, ringClass, timeTxt, dash, lbl, lblUpper, cardCls };
+  const elapsedFrac = (!extra && !pend && totalSec > 0)
+    ? (1 - Math.max(0, Math.min(1, rem / totalSec)))
+    : (extra || pend ? 1 : 0);
+  const mid = !extra && !pend && elapsedFrac >= 0.45 && elapsedFrac <= 0.58;
+  const nearEnd = !extra && !pend && rem > 0 && rem <= 120;
+  return {
+    rem, totalSec, extra, pend, warn, quase, mid, nearEnd, elapsedFrac,
+    ringClass, timeTxt, dash, lbl, lblUpper, cardCls
+  };
+}
+function readTrophies_() {
+  try { return JSON.parse(localStorage.getItem(TROPHY_KEY_) || '{}') || {}; } catch (e) { return {}; }
+}
+function writeTrophies_(o) {
+  try { localStorage.setItem(TROPHY_KEY_, JSON.stringify(o)); } catch (e) {}
+}
+function ensureTrophies_(l, nKids) {
+  const t = readTrophies_();
+  const nome = String(l.crianca || '').trim();
+  const out = [];
+  if (nome) {
+    const k = 'first:' + nome.toLowerCase();
+    if (!t[k]) {
+      t[k] = Date.now();
+      writeTrophies_(t);
+      out.push('🏅 1ª volta de ' + nome + ' neste app');
+    }
+  }
+  if (nKids >= 2) {
+    const k2 = 'family:' + (_telAtual || 'x');
+    if (!t[k2]) {
+      t[k2] = Date.now();
+      writeTrophies_(t);
+      out.push('👨‍👧‍👦 ' + nKids + ' crianças no mesmo telefone — família em ação');
+    } else if (!out.length) {
+      out.push('👨‍👧‍👦 ' + nKids + ' crianças no mesmo telefone');
+    }
+  }
+  return out;
+}
+function coachFor_(l, stats, nKids) {
+  const nome = String(l.crianca || 'a criança').trim() || 'a criança';
+  const veic = String(l.veiculo || l.tipo || 'veículo').trim() || 'veículo';
+  if (stats.pend) {
+    return {
+      cls: '',
+      kicker: 'Agora',
+      title: 'Preparando o ' + veic + '…',
+      sub: 'Pode ficar por perto — em instantes a brincadeira começa.'
+    };
+  }
+  if (stats.extra) {
+    return {
+      cls: 'is-extra',
+      kicker: 'Agora',
+      title: 'Busque ' + nome + ' no balcão',
+      sub: 'O tempo do plano acabou — o operador já está ciente.'
+    };
+  }
+  if (stats.warn) {
+    return {
+      cls: 'is-warn',
+      kicker: 'Atenção',
+      title: 'Hora de voltar perto do balcão',
+      sub: 'Faltam poucos minutos — melhor estar por perto.'
+    };
+  }
+  if (stats.mid) {
+    return {
+      cls: 'is-magic',
+      kicker: 'Marco',
+      title: 'A brincadeira está no auge',
+      sub: 'Ainda dá tempo de um lanche rápido — a página te chama nos 5 minutos finais.'
+    };
+  }
+  if (stats.elapsedFrac < 0.25) {
+    return {
+      cls: '',
+      kicker: 'O que fazer agora',
+      title: 'Pode passear no corredor',
+      sub: 'Falta bastante tempo — avisamos aqui quando for hora de voltar.'
+    };
+  }
+  if (nKids > 1) {
+    return {
+      cls: '',
+      kicker: 'Família',
+      title: nKids + ' crianças brincando',
+      sub: 'Deslize ou toque para ver o tempo das outras.'
+    };
+  }
+  return {
+    cls: '',
+    kicker: 'O que fazer agora',
+    title: nome + ' está na aventura',
+    sub: 'Deixe esta página aberta — ela te avisa quando faltar pouco.'
+  };
+}
+function fotoLabelFor_(stats) {
+  if (stats.pend) return '📸 Depois: tire uma foto';
+  if (stats.extra) return '📸 Foto da despedida';
+  if (stats.warn || stats.nearEnd) return '📸 Última foto da volta';
+  if (stats.mid) return '📸 Captura o momento';
+  return '📸 Captura o momento';
+}
+function alertFor_(l, stats) {
+  const nome = String(l.crianca || 'Criança').trim() || 'Criança';
+  if (stats.extra) return { text: nome + ' em tempo extra — buscar!', extra: true };
+  if (stats.warn) return { text: nome + ' em ' + stats.timeTxt + ' — atenção!', extra: false };
+  return null;
+}
+function maybeVibrate_(stats) {
+  const phase = stats.extra ? 'extra' : (stats.warn ? 'warn' : (stats.mid ? 'mid' : 'ok'));
+  if (phase === _lastVibePhase_) return;
+  const prev = _lastVibePhase_;
+  _lastVibePhase_ = phase;
+  if (!prev) return;
+  if ((phase === 'warn' || phase === 'extra' || phase === 'mid') && navigator.vibrate) {
+    try { navigator.vibrate(phase === 'extra' ? [80, 40, 80] : 40); } catch (e) {}
+  }
+}
+function coachHtml_(c) {
+  if (!c) return '';
+  return `<div class="mk-portal-coach ${esc(c.cls || '')}">
+    <p class="mk-portal-coach-kicker">${esc(c.kicker)}</p>
+    <p class="mk-portal-coach-title">${esc(c.title)}</p>
+    <p class="mk-portal-coach-sub">${esc(c.sub)}</p>
+  </div>`;
 }
 function ringBlockHtml_(stats) {
   return `<div class="mk-portal-play-ring">
@@ -304,19 +434,44 @@ function render() {
     ${outros}
   </section>` : '';
 
+  maybeVibrate_(stats);
+  const coach = coachFor_(atual, stats, n);
+  const alert = alertFor_(atual, stats);
+  const milestone = stats.mid
+    ? `<div class="mk-portal-milestone">✨ Metade da aventura de ${esc(atual.crianca || 'criança')}</div>`
+    : '';
+  const trophies = ensureTrophies_(atual, n);
+  const trophyHtml = trophies.length
+    ? `<div class="mk-portal-trophy">${esc(trophies[0])}</div>`
+    : '';
+  const extendHtml = (stats.warn || stats.nearEnd) && !stats.extra && !stats.pend
+    ? `<button type="button" class="mk-portal-extend" data-action="extend">⏱ Quero mais tempo — peço no balcão</button>
+       <p class="mk-portal-extend-toast" id="extend-toast" hidden>Peça ao operador no balcão — ele estende aí.</p>`
+    : '';
+  const alertHtml = alert
+    ? `<p class="mk-portal-alert${alert.extra ? ' is-extra' : ''}">${esc(alert.text)}</p>`
+    : '';
+  const fotoMuted = stats.pend ? ' style="opacity:.55"' : '';
+
   box.innerHTML = `<div class="mk-portal-carousel">
     <p class="mk-portal-subtitle">📱 ${esc(telFmt)} · ${brincandoLabel_(n)} · <button type="button" class="mk-portal-tel-link" id="btn-trocar-tel">Trocar telefone</button></p>
     ${tabs ? `<div class="mk-portal-tabs" role="tablist">${tabs}</div>` : ''}
     ${n > 1 ? `<p class="mk-portal-counter">Criança ${_carouselIdx + 1} de ${n}</p>` : ''}
+    ${alertHtml}
     <article class="${stats.cardCls}">
       <div class="mk-portal-play-hero">
         ${avatarHtml_(atual.crianca, 'lg')}
         ${n === 1 ? `<div class="mk-portal-play-name">${esc(atual.crianca)}</div>` : ''}
       </div>
+      ${milestone}
       ${ringBlockHtml_(stats)}
-      ${infoBasicaHtml_(atual)}
       ${stats.pend ? '<p class="mk-portal-play-msg">Preparando o veículo…</p>' : ''}
-      <button type="button" class="mk-portal-foto-btn" data-action="foto">📸 Tira uma foto</button>
+      ${coachHtml_(coach)}
+      ${infoBasicaHtml_(atual)}
+      ${trophyHtml}
+      <button type="button" class="mk-portal-foto-btn" data-action="foto"${fotoMuted}>${fotoLabelFor_(stats)}</button>
+      ${extendHtml}
+      <p class="mk-portal-pwa-hint">💡 Dica: adicione à tela inicial e deixe aberto no corredor</p>
     </article>
     ${dots ? `<div class="mk-portal-dots">${dots}</div>` : ''}
     ${swipeHint}
@@ -403,6 +558,12 @@ document.getElementById('btn').addEventListener('click', () => buscar(false));
 document.getElementById('resultado').addEventListener('click', (e) => {
   if (e.target.closest('[data-action="foto"]')) {
     goFotoMoldura_();
+    return;
+  }
+  if (e.target.closest('[data-action="extend"]')) {
+    const toast = document.getElementById('extend-toast');
+    if (toast) toast.hidden = false;
+    if (navigator.vibrate) { try { navigator.vibrate(20); } catch (err) {} }
     return;
   }
   if (e.target.id === 'btn-trocar-tel' || e.target.closest('#btn-trocar-tel')) {

@@ -10,8 +10,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="mk-design.css?v=1.9.90">
-<script src="mk-version.js?v=1.9.90"></script>
+<link rel="stylesheet" href="mk-design.css?v=1.9.91">
+<script src="mk-version.js?v=1.9.91"></script>
 </head>
 <body class="mk-portal-page mk-frame-page" data-step="start">
 
@@ -67,7 +67,10 @@
   </div>
 
   <div class="mk-frame-toolbar mk-frame-toolbar--done">
-    <button type="button" class="mk-portal-btn" id="btn-share">Compartilhar no Instagram</button>
+    <div class="mk-portal-share-row" style="max-width:100%">
+      <button type="button" class="mk-portal-share-btn" id="btn-share">Stories / IG</button>
+      <button type="button" class="mk-portal-share-btn sec" id="btn-share-wa">WhatsApp</button>
+    </div>
     <div class="mk-frame-mini-row">
       <button type="button" class="mk-frame-link" id="btn-download">Baixar</button>
       <button type="button" class="mk-frame-link" id="btn-retry">Nova foto</button>
@@ -429,7 +432,7 @@ function download_() {
   a.click();
 }
 
-async function share_() {
+async function share_(mode) {
   if (!lastBlob_) return;
   setErr('');
   const cap = igCaption_();
@@ -443,8 +446,15 @@ async function share_() {
       if (e.name === 'AbortError') return;
     }
   }
+  if (mode === 'wa') {
+    download_();
+    const wa = 'https://wa.me/?text=' + encodeURIComponent(cap);
+    setErr('Foto salva. Cole a legenda no WhatsApp (já copiada).');
+    setTimeout(() => window.open(wa, '_blank', 'noopener'), 400);
+    return;
+  }
   download_();
-  setErr('Foto salva. Abra o Instagram e marque @movikidsslz');
+  setErr('Foto salva. Abra o Instagram Stories e marque @movikidsslz (legenda copiada).');
   setTimeout(() => window.open(IG_PROFILE, '_blank', 'noopener'), 500);
 }
 
@@ -491,7 +501,8 @@ document.getElementById('btn-flip').addEventListener('click', () => {
 });
 document.getElementById('btn-snap').addEventListener('click', snap_);
 document.getElementById('file-pick').addEventListener('change', e => useFile_(e.target.files[0]));
-document.getElementById('btn-share').addEventListener('click', share_);
+document.getElementById('btn-share').addEventListener('click', () => share_('ig'));
+document.getElementById('btn-share-wa').addEventListener('click', () => share_('wa'));
 document.getElementById('btn-download').addEventListener('click', download_);
 document.getElementById('btn-retry').addEventListener('click', retry_);
 

@@ -141,6 +141,19 @@ Portal inclui também Nunito 400.
 
 **Semântica do anel:** arco = progresso da brincadeira (decorrido / plano). O número no centro continua sendo o **restante** (“Falta”). Não secar o anel com o countdown.
 
+**Camada experiência (portal v1.9.91+):**
+| Bloco | Classe | Quando |
+|-------|--------|--------|
+| Coach “o que fazer agora” | `.mk-portal-coach` (+ `.is-warn` / `.is-extra` / `.is-magic`) | Sempre no play |
+| Marco 50% | `.mk-portal-milestone` | ~45–58% decorrido |
+| Troféu leve | `.mk-portal-trophy` | 1ª volta / família (localStorage) |
+| CTA extensão | `.mk-portal-extend` | ≤5 min (pedir no balcão) |
+| Ritual foto | `.mk-portal-foto-btn` label contextual | Pendente → extra |
+| Share moldura | `.mk-portal-share-row` | `foto-moldura.html` done |
+| PWA hint | `.mk-portal-pwa-hint` | Rodapé play |
+
+**Mockup fases:** `docs/prototipos/portal-cronometro-interativo-mockup.html`
+
 **Regra técnica:** paridade `canonLoc_` / `timestampCanonico_` — nunca quebrar por estética (I16). Superfícies: `acompanhar.html` · `mk-home.js` · `track.html`.
 
 ### 3.6 Widgets One UI — FASE 16 (`mk-design.css` `:root` admin)
@@ -278,7 +291,7 @@ Nível 3 — DETALHE  → plano, histórico, accordion, tabela secundária
 
 **Referência:** `acompanhar.html`  
 **Prefixo:** `mk-portal-*` (~40 classes em `mk-design.css` § Portal)  
-**Fluxo:** gate (telefone) → stage carrossel (tabs, alert, ring, info-bar, others, back)
+**Fluxo:** gate (telefone) → stage carrossel (tabs, alert, milestone, ring, coach, info-bar, trophy, foto, extend, others, back)
 
 ### 6.4 Session card (Home balcão)
 

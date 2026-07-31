@@ -88,9 +88,9 @@ Nunca três heróis do mesmo tamanho na mesma dobra (erro do layout empilhado an
 | Estado | Cor anel | Label | Comportamento |
 |--------|----------|-------|---------------|
 | Pendente | branco suave | Já já começa | Anel cheio (pronto) |
-| Ativa ok | azul | Falta | Anel **enche** com o decorrido |
-| Quase lá (≤5 min) | amarelo | Quase lá! | Tick leve no número |
-| Extra | laranja | Tempo extra | Anel cheio + pulso + mensagem buscar |
+| Ativa ok | azul | Falta | Anel **enche** com o decorrido + coach “pode passear” |
+| Quase lá (≤5 min) | amarelo | Quase lá! | Tick + coach “volte ao balcão” + CTA mais tempo |
+| Extra | laranja | Tempo extra | Anel cheio + pulso + coach “busque agora” |
 
 Mesma lógica no **balcão** (`mergeSessaoCanonica`) e **portal** (`canonLoc_`) — beleza **não** pode quebrar paridade (incidente I16).
 

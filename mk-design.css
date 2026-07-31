@@ -1197,6 +1197,133 @@
 }
 .mk-portal-foto-btn:active { transform: scale(0.98); }
 
+/* Portal — coach / marcos / troféu / extensão (experiência responsável) */
+.mk-portal-coach {
+  width: 100%;
+  max-width: 340px;
+  margin: 12px auto 0;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.10);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  text-align: left;
+  animation: mk-portal-pop 0.35s ease-out;
+}
+.mk-portal-coach-kicker {
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.7;
+  margin: 0 0 4px;
+}
+.mk-portal-coach-title {
+  margin: 0 0 2px;
+  font-size: 15px;
+  font-weight: 900;
+  line-height: 1.25;
+}
+.mk-portal-coach-sub {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 700;
+  opacity: 0.8;
+  line-height: 1.35;
+}
+.mk-portal-coach.is-warn {
+  background: rgba(255, 213, 79, 0.18);
+  border-color: rgba(255, 213, 79, 0.45);
+}
+.mk-portal-coach.is-extra {
+  background: rgba(255, 138, 101, 0.2);
+  border-color: rgba(255, 138, 101, 0.5);
+}
+.mk-portal-coach.is-magic {
+  background: linear-gradient(135deg, rgba(79, 195, 247, 0.22), rgba(255, 213, 79, 0.16));
+  border-color: rgba(255, 255, 255, 0.28);
+}
+.mk-portal-milestone {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 10px auto 0;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(255, 213, 79, 0.2);
+  border: 1px solid rgba(255, 213, 79, 0.4);
+  font-size: 12px;
+  font-weight: 900;
+  color: #FFE082;
+  animation: mk-portal-pop 0.4s ease-out;
+}
+.mk-portal-trophy {
+  margin: 10px auto 0;
+  max-width: 340px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px dashed rgba(255, 213, 79, 0.45);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.35;
+}
+.mk-portal-extend {
+  display: block;
+  width: 100%;
+  max-width: 340px;
+  margin: 10px auto 0;
+  height: 44px;
+  border-radius: 22px;
+  border: 2px solid rgba(255, 213, 79, 0.55);
+  background: rgba(255, 213, 79, 0.12);
+  color: #FFE082;
+  font-family: inherit;
+  font-weight: 900;
+  font-size: 13px;
+  cursor: pointer;
+}
+.mk-portal-extend:active { transform: scale(0.98); }
+.mk-portal-pwa-hint {
+  margin: 14px auto 0;
+  max-width: 340px;
+  font-size: 11px;
+  font-weight: 800;
+  opacity: 0.65;
+  line-height: 1.35;
+}
+.mk-portal-share-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  width: 100%;
+  max-width: 340px;
+  margin: 10px auto 0;
+}
+.mk-portal-share-btn {
+  height: 44px;
+  border: none;
+  border-radius: 22px;
+  font-family: inherit;
+  font-weight: 900;
+  font-size: 13px;
+  cursor: pointer;
+  color: #1a237e;
+  background: linear-gradient(180deg, #FFD54F, #ffb300);
+}
+.mk-portal-share-btn.sec {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+.mk-portal-share-btn:active { transform: scale(0.98); }
+.mk-portal-extend-toast {
+  margin: 8px auto 0;
+  max-width: 340px;
+  font-size: 12px;
+  font-weight: 800;
+  color: #FFE082;
+}
+
 /* ── Foto moldura redes sociais (foto-moldura.html) ── */
 .mk-frame-page {
   justify-content: flex-start;
