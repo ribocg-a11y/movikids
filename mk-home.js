@@ -492,13 +492,40 @@ function mkAbrirQrPortalModal_() {
     : 'https://ribocg-a11y.github.io/movikids/acompanhar.html';
   const urlEl = document.getElementById('mk-qr-portal-url');
   if (urlEl) urlEl.textContent = url;
+  // QR estático aponta para acompanhar.html (portal atualizado no Pages)
+  const img = document.getElementById('mk-qr-portal-img');
+  if (img) img.src = 'assets/qr-portal-acompanhar.png?v=' + encodeURIComponent(window.MK_VERSION || '1');
   m.classList.add('show');
+}
+function mkPortalResponsavelHref_() {
+  const ver = (typeof window !== 'undefined' && window.MK_VERSION) ? String(window.MK_VERSION) : '';
+  const base = (typeof mkQrPortalUrl_ === 'function')
+    ? mkQrPortalUrl_()
+    : 'https://ribocg-a11y.github.io/movikids/acompanhar.html';
+  try {
+    const u = new URL(base, location.href);
+    if (ver) u.searchParams.set('force', ver);
+    u.searchParams.set('t', String(Date.now()));
+    // Link relativo no mesmo host Pages (ou absoluto se URL canônica)
+    if (u.origin === location.origin) {
+      return u.pathname + u.search;
+    }
+    return u.toString();
+  } catch (e) {
+    return 'acompanhar.html' + (ver ? ('?force=' + encodeURIComponent(ver)) : '');
+  }
 }
 function mkInitQrBalcaoStrip_() {
   const el = document.getElementById('mk-qr-balcao-strip');
   if (!el) return;
   el.hidden = false;
   try { localStorage.removeItem('mk_qr_strip_off'); } catch (e) {}
+  const openPortal = el.querySelector('a.mk-qr-balcao-btn--sec');
+  if (openPortal) {
+    openPortal.href = mkPortalResponsavelHref_();
+    openPortal.target = '_blank';
+    openPortal.rel = 'noopener';
+  }
   const btn = document.getElementById('mk-qr-balcao-btn-ver');
   if (btn && !btn.dataset.bound) {
     btn.dataset.bound = '1';

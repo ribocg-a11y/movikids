@@ -11,11 +11,11 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<link rel="stylesheet" href="mk-design.css?v=1.9.93">
-<script src="mk-version.js?v=1.9.93"></script>
+<link rel="stylesheet" href="mk-design.css?v=1.9.94">
+<script src="mk-version.js?v=1.9.94"></script>
 <script>
 (function () {
-  var CURRENT = (window.MK_VERSION || '1.9.93');
+  var CURRENT = (window.MK_VERSION || '1.9.94');
   var KEY = 'mk_portal_loaded_version';
   try {
     var stored = localStorage.getItem(KEY) || '';
@@ -290,19 +290,28 @@ function drawMoldura_(nome) {
   const logoBottom = drawMolduraLogo_(ctx);
 
   const nomeTxt = String(nome || '').trim() || '⭐';
-  ctx.font = 'bold 30px Nunito, sans-serif';
-  const nw = Math.min(640, Math.max(220, ctx.measureText(nomeTxt).width + 72));
+  // Nome completo na moldura exportada — reduz fonte até caber (sem slice/ellipsis)
+  let nomeSize = 30;
+  const nomeMaxW = 920;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  do {
+    ctx.font = '900 ' + nomeSize + 'px Nunito, sans-serif';
+    if (ctx.measureText(nomeTxt).width <= nomeMaxW - 56) break;
+    nomeSize -= 1;
+  } while (nomeSize > 16);
+  const nw = Math.min(nomeMaxW, Math.max(220, ctx.measureText(nomeTxt).width + 56));
+  const nh = Math.max(48, nomeSize + 22);
   const nx = (OUT_W - nw) / 2;
-  const ny = logoBottom + 12;
-  const ng = ctx.createLinearGradient(nx, ny, nx + nw, ny + 48);
+  const ny = logoBottom + 10;
+  const ng = ctx.createLinearGradient(nx, ny, nx + nw, ny + nh);
   ng.addColorStop(0, '#FFD54F');
   ng.addColorStop(1, '#ffb300');
   ctx.fillStyle = ng;
-  roundRect_(ctx, nx, ny, nw, 48, 24);
+  roundRect_(ctx, nx, ny, nw, nh, Math.min(24, nh / 2));
   ctx.fill();
   ctx.fillStyle = '#1a237e';
-  ctx.textAlign = 'center';
-  ctx.fillText(nomeTxt.slice(0, 26), OUT_W / 2, ny + 33);
+  ctx.fillText(nomeTxt, OUT_W / 2, ny + nh / 2);
 
   ctx.fillStyle = '#37474f';
   roundRect_(ctx, PHOTO.x, PHOTO.y, PHOTO.w, PHOTO.h, 28);
