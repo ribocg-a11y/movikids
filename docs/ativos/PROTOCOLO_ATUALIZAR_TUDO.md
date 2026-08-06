@@ -1,6 +1,6 @@
 # MOVI KIDS — Protocolo "Atualize tudo"
 
-**Criado:** 14/06/2026 · **Última execução:** 31/07/2026 (FE **v1.9.88** · GAS Web **v1.5.209** · I141/I142)  
+**Criado:** 14/06/2026 · **Última execução:** 06/08/2026 (FE **v1.9.96** · GAS Web **v1.5.210** · I143)  
 **Função:** quando o usuário pedir **"atualize tudo"**, o agente segue **esta lista** — não só handoff parcial.  
 **Regra Cursor:** `.cursor/rules/atualize-tudo-movikids.mdc`
 
@@ -17,7 +17,7 @@ Sincronizar **documentação + estado operacional** do projeto com a realidade a
 | Planejamento | `PLANEJAMENTO_ATUAL_2026-06.md`, `PLANO_PRIORIDADES_2026-06.md`, **`MAPA_FASES.md`**, **`PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`** |
 | Deploy atual | **`DEPLOY_ATUAL.md`** |
 | Estrutura repo | **`ESTRUTURA_REPO.md`** |
-| Mapa de erros | `MAPA_ERROS_FALHAS_BUGS.md` (I* até I142+) |
+| Mapa de erros | `MAPA_ERROS_FALHAS_BUGS.md` (I* até I143+) |
 | **Design System** | **`docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md`** |
 | Protocolos | `PROTOCOLO_DIAGNOSTICO_E_TESTES.md`, **este arquivo** |
 | Arquitetura / fluxos / diagramas | `MAPA_CODIGO_ARQUITETURA.md`, `FASE_*.md` ativas |
@@ -43,17 +43,17 @@ Sincronizar **documentação + estado operacional** do projeto com a realidade a
 
 ---
 
-## Produção atual (31/07/2026)
+## Produção atual (06/08/2026)
 
 | Camada | Versão | Evidência |
 |--------|--------|-----------|
-| GAS | **v1.5.209** Web ✅ | ping + `validarSchema` schemaOk=True |
-| FE | **v1.9.88** | Pages confirmado · I142b print |
+| GAS | **v1.5.210** Web ✅ | ping + `validarSchema` ok · I143 |
+| FE | **v1.9.96** | main · `?force=1.9.96` |
 | Planilha FOLHA | **OK** | B9=8,80 · B10/B12=22 · B68=5253,96 |
-| Planilha | **OK** | schemaOk=True 31/07 |
-| Homolog tablet | **✅** | 23/06 · smoke D4 pendente |
+| Planilha | **OK** | schema 06/08 |
+| Homolog tablet | **✅** | 23/06 · smoke I143 |
 | Holerite | I138–I142 | Q2 resto · PDF mês Ray/Julia |
-| Perf | I115–I125 | Colab warm ~4s · salvar/▶ batch |
+| Perf | I115–I125 · **I143** | salvar/▶ ~3.9s/~3.1s · anti-dup 409 |
 
 ---
 

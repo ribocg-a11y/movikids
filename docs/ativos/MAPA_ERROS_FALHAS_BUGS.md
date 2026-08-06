@@ -1,6 +1,7 @@
 # MOVI KIDS — Mapa de erros, falhas e bugs
 
-**Atualizado:** 31/07/2026 — **I142b** PDF janela isolada · FE **v1.9.88** · GAS Web **v1.5.209** · holerite Q2 resto (I141)  
+**Atualizado:** 06/08/2026 — **I143** salvar/▶ timeout+duplicata · FE **v1.9.96** · GAS Web **v1.5.210** ✅  
+**Uso anterior:** 31/07/2026 — **I142b** PDF janela isolada · FE **v1.9.88** · GAS Web **v1.5.209** · holerite Q2 resto (I141)  
 **Uso anterior:** 31/07/2026 — **I141** bônus Q2 = mês − Q1 memorial · FE **v1.9.86**  
 **Uso anterior:** 15/07/2026 — **I116** Web ✅ **v1.5.196** · FE **v1.9.58** · Ray warm ~4s · frio ~20s  
 **Uso anterior:** 15/07/2026 — **I115** Web ✅ v1.5.195 · Ray frio ~16s / warm ~3s · residual enrich-all-RH + kpiMes ~34s  
@@ -19,6 +20,27 @@
 
 **Índice de incidentes longos:** `INCIDENTE_*.md` (pós-mortems).  
 **Regras anti-repetição:** `REGRAS_DE_PUBLICACAO_SEGURA.md` Regra 6–7.
+
+---
+
+## Diagnóstico de família — por que I143 “voltou” (06/08/2026)
+
+**Veredito:** não foi regressão do batch I125d (salvar/▶ isolados seguem ~4s/~3s). Foi **reabertura da família timeout→retry→duplicata**, já vista em I32/I99/I122, porque a política FE do ▶ (timeout 15s + rollback + `force=1`) nunca foi endurecida junto com I125.
+
+| Incidente | O que ensinou | O que faltou no I125 | Como I143 herdou |
+|-----------|---------------|---------------------|------------------|
+| **I20** | ▶ otimista + `clientTs` | OK mantido | Timeout **desfazia** o otimista (anti-I20) |
+| **I32** | upsert + mutex save | OK parcial | Retry após “erro” ainda criava linha nova |
+| **I33 / I86** | PWA/sync lento trava UX | Sync frio ainda ~30–80s | `force=1` no catch ▶ piorava a fila |
+| **I43** | sync sem col Y reverte timer | COL_LOC_READ_=28 OK | Sintoma parecido (timer some) mas causa diferente |
+| **I98 / I99** | overlay + dismiss duplicava | Watchdog ainda dizia “salve de novo” | Mesmo padrão de retry |
+| **I122** | `_t` + timeout 25s → fantasma | Timeout ▶ ainda 15s | Timeout curto + force sync |
+| **I125d** | caminho crítico rápido | Não mudou FE catch/timeout | Mediana OK; cauda/fila ainda estoura 15s |
+| **I143** | — | — | FE keep-optimistic + dedup + GAS `veiculoJaAberto_` |
+
+**Pressão estrutural:** aba LOCAÇÕES ~2400 linhas → `carregarInicio` frio e `listarAtivas` sobem; qualquer `force=1` ou fila RH/admin no mesmo Deploy compete com salvar/▶.
+
+Doc longo: `INCIDENTE_I143_SALVAR_DUP_TIMEOUT_FORCE_2026-08-06.md`
 
 ---
 
@@ -137,7 +159,7 @@
 | **I126c** | **Faixa vermelha “Painel rápido” eterna + Escala OK** | Banner `_partial` em `gp-adm-err`; Escala já vinha do lite; promise resolvida bloqueava Folha full | FE **v1.9.72** remove banner lite · full só Folha/Avaliações · `gpAdmPanelInFlight_` | `mk-gestao-pessoas-admin.js` | sem faixa vermelha · Folha carrega ao abrir |
 | **I127** | **Holerite Q2: adiantamento 1ª = R$ 0** | Cód 410 zerado; DP exige desconto do adiantamento na 2ª (art. 462 CLT / Contábeis) | FE **v1.9.73** `mk-holerite.js` · GAS **v1.5.206** `adiantamentoQ1` | Q2: salário mês − adiantamento 40% − encargos | Raykelly: 410 ≈ R$ 648,40 |
 | **I128** | **Ficha: “Sem dias na competência” com ponto aberto** | Lite deixa `jornada.dias=[]`; full só rodava em Folha/Avaliações | FE **v1.9.74** Ficha pede full + loading jornada | `gpAdmEnsureFullPanel_('presenca')` | Raykelly Jul: 29 dias + 14:04 Aberto |
-| **I143** | **Salvar erro + ▶ some + duplicatas ao retentar** | timeout ▶ 15s → rollback + `force=1` (~80s); unstick pedia “salvar de novo” | FE **v1.9.96** keep-optimistic + dedup 90s · GAS **v1.5.210** `veiculoJaAberto_` | `guard.i143.*` | sem duplicata Carro já aberto |
+| **I143** | **Salvar erro + ▶ some + duplicatas ao retentar** | timeout ▶ 15s → rollback + `force=1` (~80s); unstick pedia “salvar de novo” | FE **v1.9.96** keep-optimistic + dedup 90s · GAS **v1.5.210** `veiculoJaAberto_` Web ✅ | `guard.i143.*` · `INCIDENTE_I143_*` | sem duplicata Carro já aberto · mediana salvar~3.9s ▶~3.1s |
 | **I142b** | **PDF holerite em branco no Chrome** | `visibility:hidden` em ancestrais do SPA — filho `visible` não aparece | FE **v1.9.88** `mkHolPrintPdf_` abre janela isolada | `mk-holerite.js` | Salvar PDF mostra tabelas |
 | **I142** | **Falta conferência mês no PDF (Q1/Q2/Soma + dias bônus)** | Só demonstrativo da quinzena; sócio precisava tabela mês + dias | FE **v1.9.87** `mkHolMesResumo_` + dias via `metaOperadorTurno` · PDFs em `entregas/` | `teste-i141-bonus-resto.cjs` · `gerar-pdf-holerite-mes.cjs` | https://ribocg-a11y.github.io/movikids/entregas/holerite-mes-2026-07/ |
 | **I141** | **Holerite Q2: bônus = 50% do mês final (errado)** | GAS `gpCalcHollerite_` metade; 1ª já pagou acumulado da época (Ray 150≠425) | FE **v1.9.86** `bonusQ2 = mês − Q1 memorial` · Ray 700 · Julia 750 | `mk-holerite.js` · `teste-i141-bonus-resto.cjs` | pacote 31/07: Ray **1652,22** · Julia **1702,22** |

@@ -1,6 +1,6 @@
 # MOVI KIDS — Índice de documentação
 
-**Atualizado:** 31/07/2026 (FE **v1.9.88** · GAS **v1.5.209** · I141–I142 holerite PDF)
+**Atualizado:** 06/08/2026 (FE **v1.9.96** · GAS **v1.5.210** · I143 anti-duplicata salvar/▶)
 
 ## Comece aqui
 

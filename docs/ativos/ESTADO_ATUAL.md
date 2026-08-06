@@ -1,8 +1,8 @@
-# MOVI KIDS — Estado atual (31/07/2026)
+# MOVI KIDS — Estado atual (06/08/2026)
 
 Referência única para alinhamento local × produção.
 
-**Ciclo dev ativo:** **`PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`** — Sprint D (fechar FASE 16/17) · holerite I141/I142 ✅  
+**Ciclo dev ativo:** **`PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`** — Sprint D · **I143** anti-duplicata salvar/▶ ✅  
 **Diagnóstico 6 camadas:** **`DIAGNOSTICO_SISTEMA_6_CAMADAS_2026-06.md`**  
 **Prioridades gerais:** **`PLANEJAMENTO_ATUAL_2026-06.md`** §9
 
@@ -11,7 +11,8 @@ Referência única para alinhamento local × produção.
 **Acessos:** **`ACESSOS_E_AUTORIZACOES.md`** — papéis, PIN admin, agente vs humano  
 **Índice:** `../INDICE.md` · **Prioridades:** **`PLANO_PRIORIDADES_2026-06.md`**  
 **Planejamento ativo:** `PLANEJAMENTO_ATUAL_2026-06.md`  
-**Mapa de erros/bugs:** **`MAPA_ERROS_FALHAS_BUGS.md`**  
+**Mapa de erros/bugs:** **`MAPA_ERROS_FALHAS_BUGS.md`** (família I20/I32/I99/I122/I125/**I143**)  
+**Incidente I143:** **`INCIDENTE_I143_SALVAR_DUP_TIMEOUT_FORCE_2026-08-06.md`**  
 **FASE 9 Folha CLT:** **`FASE_9_FOLHA_VIABILIDADE_CLT.md`**  
 **Memorial folha:** `../referencia/FOLHA_PAGAMENTO_MEMORIAL_E_PLANILHA.md`  
 **FASE 14 mini-DRE:** 🟡 memorial — `FASE_14_MINI_DRE.md` · `../referencia/MEMORIAL_MINI_DRE.md`  
@@ -31,36 +32,37 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 ---
 
-## Produção (31/07/2026)
+## Produção (06/08/2026)
 
 | Camada | Versão | URL / evidência |
 |--------|--------|-----------------|
-| **Frontend** | **v1.9.88** | https://ribocg-a11y.github.io/movikids/?force=1.9.88 |
-| **Gestão Pessoas** | **v1.9.88** | `gestao-pessoas.html?force=1.9.88` |
-| **Portal acompanhar** | **v1.9.88** | `acompanhar.html` |
-| **Service Worker** | **1.9.88** | `sw.js` |
-| **Apps Script** | **v1.5.209** Web ✅ | ping alinhado 31/07 · I134 abono |
+| **Frontend** | **v1.9.96** | https://ribocg-a11y.github.io/movikids/?force=1.9.96 |
+| **Gestão Pessoas** | **v1.9.96** | `gestao-pessoas.html?force=1.9.96` |
+| **Portal acompanhar** | **v1.9.96** | `acompanhar.html` |
+| **Service Worker** | **1.9.96** | `sw.js` |
+| **Apps Script** | **v1.5.210** Web ✅ | ping alinhado 06/08 · I143 |
+| **I143 salvar/▶** | ✅ | mediana ~3.9s / ~3.1s · dup 409 · limpeza OK |
 | **Holerite Q1 15/07** | I108–I114+I138 | Ray pacote **R$ 998,40** · Julia **R$ 948,40** (VT fora) |
 | **Holerite Q2 31/07** | I141+I142 | Ray **1652,22** · Julia **1702,22** · bônus resto (700/750) |
 | **PDFs mês** | entregas | https://ribocg-a11y.github.io/movikids/entregas/holerite-mes-2026-07/ |
 | **Perf Colaboradores** | I115+I116 ✅ | Ray warm **~4s** · frio **~20s** |
 | **Bônus jul** | I109b+I139 | Ray/Julia **13 dias · R$ 850** (FSS R$50) |
 | **FOLHA VT I68** | ✅ 26/06 | B9 **8,80** · B10/B12 **22** · Milena VT **193,60** |
-| **Planilha** | 23 abas | `schemaOk=True` · `validarSchema` **31/07** |
-| **Homolog tablet** | ✅ 23/06 | smoke FE recente pendente Ops (D4) |
+| **Planilha** | 23 abas | `schemaOk` · `validarSchema` **06/08** |
+| **Homolog tablet** | ✅ 23/06 | smoke **v1.9.96** + I143 no balcão |
 | **Raykelly / Julia** | ✅ | ids 3 / 4 · cadastro OK · meta turno |
 | **Design System** | **v1.1** | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
-| **Ciclo dev** | Sprint D | One UI ✅ · I125–I142 holerite/perf |
+| **Ciclo dev** | Sprint D | One UI ✅ · I125–I143 |
 | **I103 / I117** | ✅ | Encerradas=contas · Caixa pay-first |
 | **BANCO_HORAS** | ✅ I129 | ops 1–4 **0h00** |
-| **I129 ponto colab** | ✅ | FE v1.9.75+ · GAS Web **v1.5.209** |
+| **I129 ponto colab** | ✅ | FE v1.9.75+ · GAS Web **v1.5.210** |
 | **Aba FOLHA** | I68 | [gid=179040058](https://docs.google.com/spreadsheets/d/1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618/edit#gid=179040058) · B68 **5253,96** |
 
 **Editor Apps Script:** https://script.google.com/home/projects/19SIhkX9Tk7FiJA1JXu1OrUwssHdr3H5zc8q3rOjmBvqgWfXuHlk8xyf8/edit
 
 **Teste rápido GAS (ping):**  
 https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec?action=ping  
-→ ping Web **v1.5.209** · pacote = PIX+VA · bônus Q2 = resto (I141)
+→ ping Web **v1.5.210** · I143 anti-duplicata veículo
 
 **URL morta (não usar):** `AKfycbzc...` → 404
 
