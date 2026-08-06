@@ -2,7 +2,7 @@
 
 Scripts em `scripts/testes/`. Documentação: `docs/ativos/PROTOCOLO_DIAGNOSTICO_E_TESTES.md` · **Planilha por aba:** `docs/ativos/PROTOCOLO_AUDITORIA_ABAS_PLANILHA.md` · **"atualize tudo":** `PROTOCOLO_ATUALIZAR_TUDO.md`
 
-**Versões de referência (31/07/2026):** FE **v1.9.88** · GAS ping **v1.5.209** · mínimo operação balcão **v1.7.35** (I15 GET).
+**Versões de referência (06/08/2026):** FE **v1.9.96** · GAS ping **v1.5.210** · mínimo operação balcão **v1.7.35** (I15 GET).
 
 | **I141/I142 holerite** | `node scripts/testes/teste-i141-bonus-resto.cjs` · PDFs `entregas/holerite-mes-2026-07/` |
 
