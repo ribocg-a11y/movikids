@@ -647,7 +647,8 @@ async function iniciarContagem(rowIndex, opts) {
   else renderCards();
 
   try {
-    const d = await api({ action: 'iniciarTimer', rowIndex, timestamp: clickTs, ...operadorApiParams_() }, 15000);
+    // I143: 28s — 15s gerava timeout falso + rollback + force sync frio (~80s)
+    const d = await api({ action: 'iniciarTimer', rowIndex, timestamp: clickTs, ...operadorApiParams_() }, 28000);
     if (!d.ok) throw new Error(d.erro || 'Servidor não confirmou o início.');
     const serverTs = Number(d.startTimestamp || 0);
     if (serverTs < 1e12) throw new Error('Servidor não gravou o início da contagem.');
@@ -665,6 +666,18 @@ async function iniciarContagem(rowIndex, opts) {
     else renderCards();
     toast('⏱ Contagem iniciada!', 'success');
   } catch(e) {
+    const msg = String((e && e.message) || '');
+    const isTimeout = /timeout/i.test(msg);
+    // I143: timeout NÃO desfaz o ▶ otimista — GAS pode ter gravado; force=1 trava o tablet
+    if (isTimeout) {
+      delete s._iniciandoTimer;
+      saveSessions();
+      if (typeof mkRefreshHomeUI_ === 'function') mkRefreshHomeUI_();
+      else renderCards();
+      toast('Servidor lento — cronômetro segue no tablet. Confirmando…', 'warning');
+      if (typeof syncController === 'function') syncController(false, 2500);
+      return;
+    }
     delete s._localTimerStart;
     delete s._iniciandoTimer;
     s.started = false;
@@ -674,7 +687,7 @@ async function iniciarContagem(rowIndex, opts) {
     saveSessions();
     renderCards();
     toast('Início não confirmado no servidor. Tente iniciar novamente.', 'error');
-    syncController(true, 0);
+    if (typeof syncController === 'function') syncController(false, 2500);
     return;
   } finally {
     window._mkTimerInFlight = false;

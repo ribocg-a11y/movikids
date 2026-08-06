@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.209
+// MOVI KIDS — Google Apps Script v1.5.210
+// v1.5.210: I143 — bloquear salvar se veículo já Ativa/Pendente (anti-duplicata retry tablet)
 // v1.5.209: I134 — abonarFalta casa Date do Sheets (zera Sync jornada); Julia sem falta fantasma
 // v1.5.208: I133 — abono falta: chave DD/MM/YYYY (match jornada); holerite Q1 na cesta (FE)
 // v1.5.207: I129 — ponto colab: force bypass cache; banco não dobra na saída; salvarBancoHorasRhAdmin
@@ -201,8 +202,8 @@
 
 // ── CONSTANTES ───────────────────────────────────────────────
 /** Versão exposta em ping, carregarInicio, validarSchema, gestaoPessoasStatus (bump com header). */
-const MK_GAS_VERSAO_  = 'v1.5.209';
-const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.209';
+const MK_GAS_VERSAO_  = 'v1.5.210';
+const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.210';
 const SHEET_ID   = '1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618';
 const DEPLOY_ID  = 'AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y';
 const WEBAPP_URL = `https://script.google.com/macros/s/${DEPLOY_ID}/exec`;
@@ -3470,6 +3471,28 @@ function syncPagamentoContaMestre_(rowIndex, row) {
 // Cols: A=id B=data C=horaIni D=horaFim E=tipo F=plano G=mins
 //       H=valorPlano I=minAdic J=valAdic K=valTotal L=resp M=crianca
 //       N=tel O=status P=veiculo Q=pagamento R=observacao Y=timestamp
+/** Locação aberta (Ativa/Pendente) com o mesmo veículo no lookback. I143 anti-duplicata. */
+function veiculoJaAberto_(veiculo, lastOpt) {
+  const v = String(veiculo || '').trim();
+  if (!v) return null;
+  const sh = sh_(SH_LOC);
+  const last = lastOpt != null ? lastOpt : locLastRow_(sh);
+  if (last < DATA_ROW) return null;
+  const LOOKBACK = 80;
+  const startRow = Math.max(DATA_ROW, last - LOOKBACK + 1);
+  const nRows = last - startRow + 1;
+  // O=status (15), P=veiculo (16)
+  const dados = sh.getRange(startRow, 15, nRows, 2).getValues();
+  for (let i = dados.length - 1; i >= 0; i--) {
+    const status = String(dados[i][0] || '').trim();
+    if (status !== 'Ativa' && status !== 'Pendente') continue;
+    if (String(dados[i][1] || '').trim() === v) {
+      return { rowIndex: startRow + i, status: status };
+    }
+  }
+  return null;
+}
+
 function salvarLocacao_(p) {
   // CONCORRÊNCIA v1.5.6: LockService evita ID duplicado quando 2 dispositivos salvam juntos
   const lockS = LockService.getScriptLock();
@@ -3504,6 +3527,13 @@ function salvarLocacao_(p) {
   const dataFmt = fmtData_(agora);
   // I125d: 1× getLastRow compartilhado (findConta + nextId + insert)
   const last = locLastRow_(sheet);
+  // I143: bloqueia 2ª locação do mesmo veículo ainda aberto (retry do tablet)
+  if (veiculo) {
+    const ocup = veiculoJaAberto_(veiculo, last);
+    if (ocup) {
+      return err_('Veículo já em uso (' + ocup.status + '). Não salve de novo — use o card na Home.', 409);
+    }
+  }
   const mestre = findContaMestreParaNovaLoc_(telefone, dataFmt, agora);
   const id     = nextId_(sheet);
 
@@ -3616,6 +3646,11 @@ function salvarLocacoesMulti_(p) {
       if (!precosOp[tipo] || !precosOp[tipo][plano]) return err_('Plano invalido item ' + (i + 1), 400);
       if (veiculo && veiculosOp.indexOf(veiculo) < 0) return err_('Veiculo invalido: ' + veiculo, 400);
       if (veiculo && veiculosVistos[veiculo]) return err_('Veiculo duplicado: ' + veiculo, 400);
+      // I143: já aberto na planilha (retry)
+      if (veiculo) {
+        const ocup = veiculoJaAberto_(veiculo, locLastRow_(sheet));
+        if (ocup) return err_('Veiculo ja em uso (' + ocup.status + '): ' + veiculo, 409);
+      }
       if (veiculo) veiculosVistos[veiculo] = true;
       itensValidados.push({ tipo: tipo, plano: plano, veiculo: veiculo, config: precosOp[tipo][plano] });
     }

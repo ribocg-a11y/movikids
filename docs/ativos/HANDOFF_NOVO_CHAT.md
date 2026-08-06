@@ -1,6 +1,9 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 31/07/2026 · FE **v1.9.88** · GAS repo/Web **v1.5.209** · **I142b** PDF janela isolada + entregas HTML/PDF
+**Atualizado:** 06/08/2026 · FE **v1.9.96** · GAS repo **v1.5.210** · Web ⏳ Nova versão I143 (anti-duplicata)  
+**Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
+
+**I143 (06/08):** salvar/▶ “erro” + cronômetro some + várias locações ao retentar — timeout ▶ fazia rollback + `force=1` (sync frio ~80s); unstick pedia salvar de novo. FE keep-optimistic + dedup 90s; GAS bloqueia veículo já Ativa/Pendente.
 
 **I142b (31/07):** print SPA saía em branco → print em janela isolada. PDFs prontos: `entregas/holerite-mes-2026-07/` (Raykelly + Julia).
 

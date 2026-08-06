@@ -566,6 +566,21 @@ try {
     } else {
       Add-Check "guard.i125.fe.sync" "fail" "iniciarContagem force=true pos-▶ (I125)"
     }
+    if ($opRaw -match 'Início não confirmado[\s\S]{0,250}syncController\(true') {
+      Add-Check "guard.i143.iniciar.noForce" "fail" "iniciarContagem catch ainda usa force=1 (I143)"
+    } elseif ($opRaw -notmatch 'isTimeout' -or $opRaw -notmatch '28000') {
+      Add-Check "guard.i143.iniciar.timeout" "fail" "iniciarContagem sem keep-optimistic em timeout 28s (I143)"
+    } elseif ($novaRaw -notmatch 'NOVA_SAVE_DEDUP_MS' -or $novaRaw -notmatch 'NÃO salve de novo') {
+      Add-Check "guard.i143.salvar.dedup" "fail" "anti-duplicata FE ausente (I143)"
+    } else {
+      Add-Check "guard.i143.fe" "ok" "▶ timeout keep + salvar dedup 90s"
+    }
+  }
+
+  if ($gasRaw -notmatch 'function veiculoJaAberto_') {
+    Add-Check "guard.i143.gas.veiculo" "fail" "veiculoJaAberto_ ausente (I143)"
+  } else {
+    Add-Check "guard.i143.gas.veiculo" "ok" "GAS bloqueia veiculo ja aberto"
   }
 
   $authPath = Join-Path $root "mk-auth.js"

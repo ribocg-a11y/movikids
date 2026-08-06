@@ -22,6 +22,15 @@ let _vcGridRaf = null;
 const NOVA_DRAFT_DEBOUNCE_MS = 350;
 const NOVA_SAVE_TIMEOUT_1_MS = 32000;
 const NOVA_SAVE_TIMEOUT_N_MS = 28000;
+/** I143 — evita retry que duplica locação quando GAS ainda está gravando. */
+let _novaLastSaveFp_ = '';
+let _novaLastSaveAt_ = 0;
+const NOVA_SAVE_DEDUP_MS = 90000;
+
+function novaSaveFingerprint_(tel, itens) {
+  const veis = (itens || []).map(function (it) { return String(it.veiculo || ''); }).filter(Boolean).sort();
+  return String(tel || '') + '|' + veis.join(',');
+}
 var relacionamentoCache = [];
 
 function novaPageEl_() {
@@ -166,12 +175,13 @@ function novaForceUnstickSave_(msg) {
   _novaSaveGen++;
   novaSetSavingBusy_(false);
   novaHideSaving_();
-  novaLimparOtimistas_();
+  // I143: NÃO limpar otimistas nem pedir "salvar de novo" — isso gerava duplicata
   if (typeof mkRefreshHomeUI_ === 'function') mkRefreshHomeUI_();
+  if (typeof showPage === 'function') showPage('home');
   setTimeout(function() {
-    if (typeof syncController === 'function') syncController(false, 3000);
-  }, 500);
-  toast(msg || 'Salvamento pode continuar na planilha. Atualizamos a Home — confira os cards.', 'warning');
+    if (typeof syncController === 'function') syncController(false, 2000);
+  }, 400);
+  toast(msg || 'Ainda sincronizando. Não salve de novo — confira os cards na Home.', 'warning');
 }
 
 async function mkGasTemSalvarLocacoesMulti_() {
@@ -225,7 +235,7 @@ function novaShowSaving_(i, n, veiculo, modo) {
   }
   if (_novaSaveWatchdog) clearTimeout(_novaSaveWatchdog);
   _novaSaveWatchdog = setTimeout(function() {
-    if (_novaSavingInFlight) novaForceUnstickSave_('Demorou demais. A Home foi liberada — se o cadastro não aparecer, tente salvar de novo.');
+    if (_novaSavingInFlight) novaForceUnstickSave_('Demorou demais. Home liberada — NÃO salve de novo; aguarde o card aparecer.');
   }, 42000);
   if (_novaSaveDismissTimer) clearTimeout(_novaSaveDismissTimer);
   _novaSaveDismissTimer = setTimeout(function() {
@@ -1098,6 +1108,31 @@ async function confirmarLocacao() {
   if (!novaState.pagamento) { toast('Selecione a forma de pagamento!', 'error'); return; }
   if (!mkRequireOperadorEscrita_()) return;
 
+  // I143: mesmo tel+veículo em <90s → sync, não novo salvar (duplicata no retry)
+  const saveFp = novaSaveFingerprint_(tel, itens);
+  if (_novaLastSaveFp_ === saveFp && (Date.now() - _novaLastSaveAt_) < NOVA_SAVE_DEDUP_MS) {
+    toast('Este cadastro pode já ter sido salvo. Atualizando a Home — não duplique.', 'warning');
+    if (typeof showPage === 'function') showPage('home');
+    if (typeof mkRefreshHomeUI_ === 'function') mkRefreshHomeUI_();
+    novaPosSaveSync_();
+    return;
+  }
+
+  // I143: veículo já Ativa/Pendente na sessão local → bloqueia retry cego
+  const ocupLocal = {};
+  (typeof sessions !== 'undefined' ? sessions : []).forEach(function (s) {
+    const st = String(s.status || '');
+    if ((st === 'Ativa' || st === 'Pendente') && s.veiculo) ocupLocal[String(s.veiculo)] = true;
+  });
+  for (let oi = 0; oi < itens.length; oi++) {
+    const v = String(itens[oi].veiculo || '');
+    if (v && ocupLocal[v]) {
+      toast(v + ' já está em uso na Home. Não salve de novo — use o card existente.', 'error');
+      if (typeof showPage === 'function') showPage('home');
+      return;
+    }
+  }
+
   if (novaPagamentoExigePosConfirm_(novaState.pagamento)) {
     novaAtualizarPosConfirm_();
     const ck = document.getElementById('nova-pos-ok');
@@ -1177,6 +1212,8 @@ async function confirmarLocacao() {
 
     if (saveGen !== _novaSaveGen) return;
     mkRefreshHomeUI_();
+    _novaLastSaveFp_ = saveFp;
+    _novaLastSaveAt_ = Date.now();
 
     const msg = n > 1
       ? ('✅ ' + n + ' locações salvas na mesma conta! Aperte ▶ em cada card.')
@@ -1188,13 +1225,25 @@ async function confirmarLocacao() {
 
   } catch(e) {
     if (saveGen !== _novaSaveGen) return;
-    novaLimparOtimistas_();
-    mkRefreshHomeUI_();
-    const errMsg = (e && e.veiculo)
-      ? ('Erro no veículo ' + e.veiculo + ': ' + e.message)
-      : ((e && e.message) ? e.message : 'Erro de conexão. Tente novamente.');
-    toast(errMsg, 'error');
-    if (salvos > 0 && n > 1) toast(salvos + ' de ' + n + ' salvos — complete o restante.', 'warning');
+    const errRaw = String((e && e.message) || '');
+    const isTimeout = /timeout/i.test(errRaw);
+    // I143: timeout — GAS pode ter gravado; marca fingerprint e NÃO incentiva retry
+    if (isTimeout) {
+      _novaLastSaveFp_ = saveFp;
+      _novaLastSaveAt_ = Date.now();
+      if (typeof showPage === 'function') showPage('home');
+      if (typeof mkRefreshHomeUI_ === 'function') mkRefreshHomeUI_();
+      novaPosSaveSync_();
+      toast('Servidor demorou a responder. NÃO salve de novo — confira a Home.', 'warning');
+    } else {
+      novaLimparOtimistas_();
+      mkRefreshHomeUI_();
+      const errMsg = (e && e.veiculo)
+        ? ('Erro no veículo ' + e.veiculo + ': ' + e.message)
+        : (errRaw || 'Erro de conexão. Tente novamente.');
+      toast(errMsg, 'error');
+      if (salvos > 0 && n > 1) toast(salvos + ' de ' + n + ' salvos — complete o restante.', 'warning');
+    }
   } finally {
     if (saveGen === _novaSaveGen) {
       novaHideSaving_();
