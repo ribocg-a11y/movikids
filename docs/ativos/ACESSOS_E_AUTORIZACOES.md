@@ -115,7 +115,7 @@ Esta seção responde: **o que o agente faz sozinho, o que valida, o que publica
 |---|-------------------------------|----------------------------|
 | **Quem usa** | Sócio/dev — gestão, deploy, código | Operadores — locação do dia a dia |
 | **Onde fica** | Escritório / casa (Windows) | Fixo na operação (shopping) |
-| **Sessão típica** | PIN admin **1416** → sidebar “Administrador” | PIN operador → “BALCÃO: Milena/Eduarda” |
+| **Sessão típica** | PIN admin **1421** → sidebar “Administrador” | PIN operador → “BALCÃO: Milena/Eduarda” |
 | **O que o agente vê** | Repo, testes `.ps1`, browser MCP no **seu PC** | **Nada** — agente não tem o tablet físico |
 | **Homologação** | Ping, protocolo HTTP, `pre-push-check` | Chip Turno, ▶ timer, idle, PWA ícone — **só no tablet** |
 
@@ -131,7 +131,7 @@ Esta seção responde: **o que o agente faz sozinho, o que valida, o que publica
 | **Git local + remote** | `.git` → `ribocg-a11y/movikids` | `status`, `diff`, `commit`, `push` (push pode pedir sua aprovação no Cursor) |
 | **Clasp** | `.clasp.json` → projeto `19SIhkX9...` · `~/.clasprc.json` no PC | `clasp push` via `scripts/deploy-gas.ps1` (login clasp ativo) |
 | **GitHub CLI (`gh`)** | Instalado no PC (se configurado) | PRs, issues, checks — quando você pedir tarefa GitHub |
-| **HTTP público GAS** | URL `exec?action=...` | Ping, APIs admin (`adminPin=1416`), testes nos `.ps1` |
+| **HTTP público GAS** | URL `exec?action=...` | Ping, APIs admin (`adminPin=1421`), testes nos `.ps1` · emerg. celular: `ops-balcao.html` (I144) |
 | **Google Sheets OAuth** | `C:\Users\riboc\Projects\google-drive-sheets-auth` | Ler/escrever **MOVIKIDS_Planilha_Base** via API — token em `~/.config/google-api/` |
 | **Browser MCP** | Cursor | GitHub Pages, URLs públicas |
 | **AGENTS.md + HANDOFF** | Raiz e `docs/ativos/` | Entrada automática em todo chat novo na pasta |
@@ -159,7 +159,7 @@ Esta seção responde: **o que o agente faz sozinho, o que valida, o que publica
 | Informar caminho do `.gs` no PC | Regra `gas-deploy-caminho-pc.mdc` |
 | Abrir app público no browser MCP | `ribocg-a11y.github.io/movikids/?force=...` |
 | **Ler e escrever planilha** | OAuth `google-drive-sheets-auth` · limpar testes · INVESTIMENTO · auditoria |
-| Escritas via GAS (dados operacionais) | APIs `exec?action=...` com `adminPin=1416` · limpar/corrigir quando necessário |
+| Escritas via GAS (dados operacionais) | APIs `exec?action=...` com `adminPin=1421` · limpar/corrigir quando necessário · emerg. `ops-balcao.html` |
 | Atualizar documentação ativa | Handoff, estado, protocolos — inclusive comando **"atualize tudo"** |
 
 O Cursor pode mostrar **card de aprovação** antes de `git push` — isso é mecânica do IDE, não substitui §7.3.

@@ -1,6 +1,7 @@
 # MOVI KIDS — Mapa de erros, falhas e bugs
 
-**Atualizado:** 06/08/2026 — **I143** salvar/▶ timeout+duplicata · FE **v1.9.96** · GAS Web **v1.5.210** ✅  
+**Atualizado:** 12/08/2026 — **I144** ops liberar balcão com PIN 1416 morto · FE **v1.9.96** + `ops-balcao.html` · GAS Web **v1.5.210** ✅  
+**Uso anterior:** 06/08/2026 — **I143** salvar/▶ timeout+duplicata · FE **v1.9.96** · GAS Web **v1.5.210** ✅  
 **Uso anterior:** 31/07/2026 — **I142b** PDF janela isolada · FE **v1.9.88** · GAS Web **v1.5.209** · holerite Q2 resto (I141)  
 **Uso anterior:** 31/07/2026 — **I141** bônus Q2 = mês − Q1 memorial · FE **v1.9.86**  
 **Uso anterior:** 15/07/2026 — **I116** Web ✅ **v1.5.196** · FE **v1.9.58** · Ray warm ~4s · frio ~20s  
@@ -36,6 +37,7 @@
 | **I98 / I99** | overlay + dismiss duplicava | Watchdog ainda dizia “salve de novo” | Mesmo padrão de retry |
 | **I122** | `_t` + timeout 25s → fantasma | Timeout ▶ ainda 15s | Timeout curto + force sync |
 | **I125d** | caminho crítico rápido | Não mudou FE catch/timeout | Mediana OK; cauda/fila ainda estoura 15s |
+| **I144** | — | — | `ops-balcao.html` PIN digitado (sem 1416) |
 | **I143** | — | — | FE keep-optimistic + dedup + GAS `veiculoJaAberto_` |
 
 **Pressão estrutural:** aba LOCAÇÕES ~2400 linhas → `carregarInicio` frio e `listarAtivas` sobem; qualquer `force=1` ou fila RH/admin no mesmo Deploy compete com salvar/▶.
@@ -159,6 +161,7 @@ Doc longo: `INCIDENTE_I143_SALVAR_DUP_TIMEOUT_FORCE_2026-08-06.md`
 | **I126c** | **Faixa vermelha “Painel rápido” eterna + Escala OK** | Banner `_partial` em `gp-adm-err`; Escala já vinha do lite; promise resolvida bloqueava Folha full | FE **v1.9.72** remove banner lite · full só Folha/Avaliações · `gpAdmPanelInFlight_` | `mk-gestao-pessoas-admin.js` | sem faixa vermelha · Folha carrega ao abrir |
 | **I127** | **Holerite Q2: adiantamento 1ª = R$ 0** | Cód 410 zerado; DP exige desconto do adiantamento na 2ª (art. 462 CLT / Contábeis) | FE **v1.9.73** `mk-holerite.js` · GAS **v1.5.206** `adiantamentoQ1` | Q2: salário mês − adiantamento 40% − encargos | Raykelly: 410 ≈ R$ 648,40 |
 | **I128** | **Ficha: “Sem dias na competência” com ponto aberto** | Lite deixa `jornada.dias=[]`; full só rodava em Folha/Avaliações | FE **v1.9.74** Ficha pede full + loading jornada | `gpAdmEnsureFullPanel_('presenca')` | Raykelly Jul: 29 dias + 14:04 Aberto |
+| **I144** | **Liberar balcão pelo celular falhava (PIN 1416)** | HTML ops ainda mandava `adminPin=1416` (morto I64); 1421 OK | `ops-balcao.html` + liberar-* com PIN digitado · **sem** App Script | `INCIDENTE_I144_*` | liberar com PIN atual → `sessaoAtiva` null |
 | **I143** | **Salvar erro + ▶ some + duplicatas ao retentar** | timeout ▶ 15s → rollback + `force=1` (~80s); unstick pedia “salvar de novo” | FE **v1.9.96** keep-optimistic + dedup 90s · GAS **v1.5.210** `veiculoJaAberto_` Web ✅ | `guard.i143.*` · `INCIDENTE_I143_*` | sem duplicata Carro já aberto · mediana salvar~3.9s ▶~3.1s |
 | **I142b** | **PDF holerite em branco no Chrome** | `visibility:hidden` em ancestrais do SPA — filho `visible` não aparece | FE **v1.9.88** `mkHolPrintPdf_` abre janela isolada | `mk-holerite.js` | Salvar PDF mostra tabelas |
 | **I142** | **Falta conferência mês no PDF (Q1/Q2/Soma + dias bônus)** | Só demonstrativo da quinzena; sócio precisava tabela mês + dias | FE **v1.9.87** `mkHolMesResumo_` + dias via `metaOperadorTurno` · PDFs em `entregas/` | `teste-i141-bonus-resto.cjs` · `gerar-pdf-holerite-mes.cjs` | https://ribocg-a11y.github.io/movikids/entregas/holerite-mes-2026-07/ |

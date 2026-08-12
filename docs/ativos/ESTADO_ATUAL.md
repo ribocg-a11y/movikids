@@ -1,8 +1,8 @@
-# MOVI KIDS — Estado atual (06/08/2026)
+# MOVI KIDS — Estado atual (12/08/2026)
 
 Referência única para alinhamento local × produção.
 
-**Ciclo dev ativo:** **`PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`** — Sprint D · **I143** anti-duplicata salvar/▶ ✅  
+**Ciclo dev ativo:** **`PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`** — Sprint D · **I143** ✅ · **I144** ops PIN liberar ✅  
 **Diagnóstico 6 camadas:** **`DIAGNOSTICO_SISTEMA_6_CAMADAS_2026-06.md`**  
 **Prioridades gerais:** **`PLANEJAMENTO_ATUAL_2026-06.md`** §9
 
@@ -11,7 +11,8 @@ Referência única para alinhamento local × produção.
 **Acessos:** **`ACESSOS_E_AUTORIZACOES.md`** — papéis, PIN admin, agente vs humano  
 **Índice:** `../INDICE.md` · **Prioridades:** **`PLANO_PRIORIDADES_2026-06.md`**  
 **Planejamento ativo:** `PLANEJAMENTO_ATUAL_2026-06.md`  
-**Mapa de erros/bugs:** **`MAPA_ERROS_FALHAS_BUGS.md`** (família I20/I32/I99/I122/I125/**I143**)  
+**Mapa de erros/bugs:** **`MAPA_ERROS_FALHAS_BUGS.md`** (família I20/I32/I99/I122/I125/I143/**I144**)  
+**Incidente I144:** **`INCIDENTE_I144_OPS_PIN_1416_LIBERAR_BALCAO_2026-08-12.md`** · `ops-balcao.html`  
 **Incidente I143:** **`INCIDENTE_I143_SALVAR_DUP_TIMEOUT_FORCE_2026-08-06.md`**  
 **FASE 9 Folha CLT:** **`FASE_9_FOLHA_VIABILIDADE_CLT.md`**  
 **Memorial folha:** `../referencia/FOLHA_PAGAMENTO_MEMORIAL_E_PLANILHA.md`  
@@ -228,7 +229,7 @@ Commits de referência: `3d9d106` (v1.7.25), `e1a56db` (Pacote E), `1454bc8` (fi
 
 | Ação | API |
 |------|-----|
-| Resetar PIN | `resetarPinOperadorAdmin` + `adminPin=1416` |
+| Resetar PIN | `resetarPinOperadorAdmin` + `adminPin=1421` · celular: `ops-balcao.html` (I144) |
 | Liberar balcão | `liberarSessaoOperadorAdmin` |
 | Corrigir locação encerrada | `corrigirFinanceiroLocacaoAdmin` + `zerarExtra` (v1.5.36+) |
 | Limpar locações de teste | `limparLocacoesTesteAdmin` + `motivo` ≥10 chars |

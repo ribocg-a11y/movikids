@@ -1,7 +1,9 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 06/08/2026 · FE **v1.9.96** · GAS repo/Web **v1.5.210** ✅ · **I143** anti-duplicata salvar/▶  
+**Atualizado:** 12/08/2026 · FE **v1.9.96** · GAS repo/Web **v1.5.210** ✅ · **I144** ops liberar PIN · **I143** anti-duplicata  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
+
+**I144 (12/08):** diagnóstico balcão sem App Script — Milena **logada** 10:51 · locação **2714** salva/encerrada 10:54 (Alcides Neto / Cadu E Carlos). Anormalidade: páginas `liberar-*-agora.html` ainda usavam PIN **1416** (rejeitado). Correção: **`ops-balcao.html`** + PIN digitado. Doc: `INCIDENTE_I144_OPS_PIN_1416_LIBERAR_BALCAO_2026-08-12.md` · URL: https://ribocg-a11y.github.io/movikids/ops-balcao.html
 
 **I143 (06/08):** salvar/▶ “erro” + cronômetro some + várias locações ao retentar — timeout ▶ fazia rollback + `force=1` (sync frio ~80s); unstick pedia salvar de novo. FE keep-optimistic + dedup 90s; GAS `veiculoJaAberto_`. Validação: salvar~3.9s · ▶~3.1s · dup 409 · limpeza OK. Doc: `INCIDENTE_I143_SALVAR_DUP_TIMEOUT_FORCE_2026-08-06.md`
 
