@@ -415,7 +415,9 @@ function mkSyncWireEvents_() {
     } else {
       const hiddenMs = _wasHiddenAt ? Date.now() - _wasHiddenAt : 0;
       _wasHiddenAt = null;
-      if (hiddenMs > 30000) syncController(true, 0);
+      // I145: tela desligada NÃO dispara force=1 — sync frio (7–80s) compete com
+      // salvar/▶ e, se estourar timeout, reabre fantasma I122. Warm usa cache inicio_v4_.
+      if (hiddenMs > 30000) syncController(false, 0);
       else syncController(false, 500);
     }
   });
@@ -445,8 +447,8 @@ function mkSyncWireEvents_() {
     const idleMs = Date.now() - _lastActivity;
     if (idleMs > _IDLE_MS) {
       _lastActivity = Date.now();
-      if (_syncBackoffMs === 0) syncController(true, 0);
-      else syncController(false, 0);
+      // I145: idle 5 min = sync WARM. force=1 só após escrita (BroadcastChannel invalidate).
+      syncController(false, 0);
     }
   }, 60000);
 

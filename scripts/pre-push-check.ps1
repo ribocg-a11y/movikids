@@ -577,6 +577,18 @@ try {
     }
   }
 
+  $syncPath = Join-Path $root "mk-sync.js"
+  if (Test-Path $syncPath) {
+    $syncRaw = Get-Content -Path $syncPath -Raw -Encoding UTF8
+    if ($syncRaw -match 'hiddenMs > 30000\) syncController\(true') {
+      Add-Check "guard.i145.visibility.noForce" "fail" "visibility>30s ainda force=1 (I145)"
+    } elseif ($syncRaw -match 'idleMs > _IDLE_MS[\s\S]{0,280}syncController\(true') {
+      Add-Check "guard.i145.idle.noForce" "fail" "idle 5min ainda force=1 (I145)"
+    } else {
+      Add-Check "guard.i145.sync.warm" "ok" "idle/visibility sync warm sem force=1"
+    }
+  }
+
   if ($gasRaw -notmatch 'function veiculoJaAberto_') {
     Add-Check "guard.i143.gas.veiculo" "fail" "veiculoJaAberto_ ausente (I143)"
   } else {

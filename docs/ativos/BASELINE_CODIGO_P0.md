@@ -21,7 +21,7 @@ Antes de editar qualquer arquivo P0: ler este doc + `MAPA_ERROS_FALHAS_BUGS.md` 
 | **API browser** | `mk-api.js` (`api`, `mkGuardEscritaBrowser_`, `MK_WRITE_ACTIONS`) | I15 — GET only |
 | **Auth / PIN** | `mk-auth.js`, gates `#mk-auth-gate`, `#gp-auth-gate` | I28, I47, I64 |
 | **Apps Script canônico** | `MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs` | Só sócio + Nova versão Web · **I115/I116:** slim painel Colaboradores só com §7.3 |
-| **Sync pesado** | `mk-sync.js` (controller principal), `carregarInicio` consumers | I20, I86 — exceção: 1 linha `_novaSavingInFlight` em `mkSyncDeferHeavy_` |
+| **Sync pesado** | `mk-sync.js` (controller principal), `carregarInicio` consumers | I20, I86, **I145** — exceções: `_novaSavingInFlight` em `mkSyncDeferHeavy_`; idle/visibility **sem** `force=1` |
 | **Home cards ativos** | `mk-home.js` (`buildCard` timer ativo, `calcRemaining`) | I20 paridade |
 | **SW GAS bypass** | `sw.js` (não interceptar script.google.com) | I35 |
 

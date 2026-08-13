@@ -1,8 +1,8 @@
-# MOVI KIDS — Estado atual (06/08/2026)
+# MOVI KIDS — Estado atual (13/08/2026)
 
 Referência única para alinhamento local × produção.
 
-**Ciclo dev ativo:** **`PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`** — Sprint D · **I143** anti-duplicata salvar/▶ ✅  
+**Ciclo dev ativo:** **`PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`** — Sprint D · **I143** ✅ · **I145** sync idle warm ✅  
 **Diagnóstico 6 camadas:** **`DIAGNOSTICO_SISTEMA_6_CAMADAS_2026-06.md`**  
 **Prioridades gerais:** **`PLANEJAMENTO_ATUAL_2026-06.md`** §9
 
@@ -11,7 +11,8 @@ Referência única para alinhamento local × produção.
 **Acessos:** **`ACESSOS_E_AUTORIZACOES.md`** — papéis, PIN admin, agente vs humano  
 **Índice:** `../INDICE.md` · **Prioridades:** **`PLANO_PRIORIDADES_2026-06.md`**  
 **Planejamento ativo:** `PLANEJAMENTO_ATUAL_2026-06.md`  
-**Mapa de erros/bugs:** **`MAPA_ERROS_FALHAS_BUGS.md`** (família I20/I32/I99/I122/I125/**I143**)  
+**Mapa de erros/bugs:** **`MAPA_ERROS_FALHAS_BUGS.md`** (família I20/I32/I99/I122/I125/I143/**I145**)  
+**Incidente I145:** **`INCIDENTE_I145_SYNC_FORCE_IDLE_2026-08-13.md`**  
 **Incidente I143:** **`INCIDENTE_I143_SALVAR_DUP_TIMEOUT_FORCE_2026-08-06.md`**  
 **FASE 9 Folha CLT:** **`FASE_9_FOLHA_VIABILIDADE_CLT.md`**  
 **Memorial folha:** `../referencia/FOLHA_PAGAMENTO_MEMORIAL_E_PLANILHA.md`  
@@ -32,15 +33,16 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 ---
 
-## Produção (06/08/2026)
+## Produção (13/08/2026)
 
 | Camada | Versão | URL / evidência |
 |--------|--------|-----------------|
-| **Frontend** | **v1.9.96** | https://ribocg-a11y.github.io/movikids/?force=1.9.96 |
-| **Gestão Pessoas** | **v1.9.96** | `gestao-pessoas.html?force=1.9.96` |
+| **Frontend** | **v1.9.97** | https://ribocg-a11y.github.io/movikids/?force=1.9.97 |
+| **Gestão Pessoas** | **v1.9.97** | `gestao-pessoas.html?force=1.9.97` |
 | **Portal acompanhar** | **v1.9.96** | `acompanhar.html` |
-| **Service Worker** | **1.9.96** | `sw.js` |
-| **Apps Script** | **v1.5.210** Web ✅ | ping alinhado 06/08 · I143 |
+| **Service Worker** | **1.9.97** | `sw.js` |
+| **Apps Script** | **v1.5.210** Web ✅ | ping alinhado 13/08 · I143 + I145 FE |
+| **I145 sync idle** | ✅ | idle/visibility **sem** force=1 · warm ~1–2s |
 | **I143 salvar/▶** | ✅ | mediana ~3.9s / ~3.1s · dup 409 · limpeza OK |
 | **Holerite Q1 15/07** | I108–I114+I138 | Ray pacote **R$ 998,40** · Julia **R$ 948,40** (VT fora) |
 | **Holerite Q2 31/07** | I141+I142 | Ray **1652,22** · Julia **1702,22** · bônus resto (700/750) |
