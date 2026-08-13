@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex">
+  <title>MOVI KIDS — Status balcão (celular)</title>
+  <style>
+    :root {
+      --bg: #0b1f33;
+      --card: #122a44;
+      --ink: #f4f7fb;
+      --muted: #9db0c7;
+      --ok: #2ecc71;
+      --warn: #f1c40f;
+      --err: #e74c3c;
+      --blue: #2f80ed;
+      --radius: 16px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Nunito, system-ui, sans-serif;
+      background: radial-gradient(1200px 600px at 10% -10%, #1a3b5c 0%, var(--bg) 55%);
+      color: var(--ink);
+      min-height: 100vh;
+      padding: 20px 16px 40px;
+    }
+    h1 { font-family: Fredoka One, Nunito, sans-serif; font-size: 1.45rem; margin: 0 0 6px; font-weight: 400; }
+    .sub { color: var(--muted); margin: 0 0 18px; font-size: 0.95rem; }
+    .card {
+      background: color-mix(in srgb, var(--card) 88%, #000 12%);
+      border: 1px solid #2a4666;
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      margin: 0 0 14px;
+    }
+    .row { display: flex; justify-content: space-between; gap: 12px; margin: 8px 0; font-size: 0.95rem; }
+    .label { color: var(--muted); }
+    .val { font-weight: 800; text-align: right; }
+    .pill {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 800;
+    }
+    .pill.ok { background: color-mix(in srgb, var(--ok) 25%, transparent); color: var(--ok); }
+    .pill.warn { background: color-mix(in srgb, var(--warn) 25%, transparent); color: var(--warn); }
+    .pill.err { background: color-mix(in srgb, var(--err) 25%, transparent); color: var(--err); }
+    label { display: block; font-size: 0.85rem; color: var(--muted); margin: 10px 0 6px; }
+    input, select {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid #355575;
+      background: #0d2238;
+      color: var(--ink);
+      font-size: 1.05rem;
+    }
+    button {
+      width: 100%;
+      margin-top: 10px;
+      padding: 14px 16px;
+      border: 0;
+      border-radius: 14px;
+      font-weight: 800;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    .btn-primary { background: var(--blue); color: #fff; }
+    .btn-secondary { background: #243c58; color: var(--ink); }
+    .btn-danger { background: #8e2a2a; color: #fff; }
+    pre {
+      white-space: pre-wrap;
+      word-break: break-word;
+      background: #0a1828;
+      border-radius: 12px;
+      padding: 12px;
+      font-size: 0.78rem;
+      color: #c9d7e8;
+      max-height: 240px;
+      overflow: auto;
+    }
+    .hint { font-size: 0.85rem; color: var(--muted); margin-top: 8px; line-height: 1.4; }
+    a { color: #7eb6ff; }
+  </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+</head>
+<body>
+  <h1>Status do balcão</h1>
+  <p class="sub">Diagnóstico e liberação de sessão pelo celular — sem App Script.</p>
+
+  <div class="card" id="status-card">
+    <div class="row"><span class="label">GAS</span><span class="val" id="st-gas">…</span></div>
+    <div class="row"><span class="label">Sessão balcão</span><span class="val" id="st-sessao">…</span></div>
+    <div class="row"><span class="label">Locações abertas</span><span class="val" id="st-ativas">…</span></div>
+    <div class="row"><span class="label">Hoje (encerradas)</span><span class="val" id="st-hoje">…</span></div>
+    <div class="row"><span class="label">Atualizado</span><span class="val" id="st-ts">…</span></div>
+    <button type="button" class="btn-secondary" id="btn-refresh">Atualizar agora</button>
+  </div>
+
+  <div class="card">
+    <strong>Liberar sessão do balcão</strong>
+    <p class="hint">Use se alguém não consegue entrar porque outro operador “ficou” no servidor. Digite o PIN admin (não fica salvo nesta página).</p>
+    <label for="admin-pin">PIN admin</label>
+    <input id="admin-pin" type="password" inputmode="numeric" maxlength="8" autocomplete="one-time-code" placeholder="4 dígitos">
+    <button type="button" class="btn-primary" id="btn-liberar">Liberar sessão agora</button>
+    <p class="hint">Depois no tablet: abra <a href="./?force=1">movikids ?force=1</a> → escolha o operador → PIN.</p>
+  </div>
+
+  <div class="card">
+    <strong>Resetar PIN de operador (só se esquecer)</strong>
+    <p class="hint">Não use se a pessoa já está trabalhando. Após reset, ela cria PIN novo no login.</p>
+    <label for="op-reset">Operador</label>
+    <select id="op-reset">
+      <option value="2">Milena Nunes (id 2)</option>
+      <option value="3">Raykelly (id 3)</option>
+      <option value="4">Julia (id 4)</option>
+      <option value="1">Eduarda (id 1)</option>
+    </select>
+    <button type="button" class="btn-danger" id="btn-reset">Resetar PIN deste operador</button>
+  </div>
+
+  <div class="card">
+    <strong>Log</strong>
+    <pre id="log">Pronto.</pre>
+  </div>
+
+  <script>
+    const GAS = 'https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec';
+    const logEl = document.getElementById('log');
+    function log(msg) {
+      const t = new Date().toLocaleTimeString('pt-BR');
+      logEl.textContent = '[' + t + '] ' + msg + '\n' + logEl.textContent;
+    }
+    async function api(params) {
+      const q = new URLSearchParams(params);
+      q.set('_t', String(Date.now()));
+      const r = await fetch(GAS + '?' + q.toString(), { cache: 'no-store' });
+      return r.json();
+    }
+    function pinAdmin() {
+      return String(document.getElementById('admin-pin').value || '').replace(/\D/g, '');
+    }
+    async function refresh() {
+      try {
+        const ping = await api({ action: 'ping' });
+        const gasEl = document.getElementById('st-gas');
+        if (ping && ping.ok) {
+          gasEl.innerHTML = '<span class="pill ok">online ' + (ping.versao || '') + '</span>';
+        } else {
+          gasEl.innerHTML = '<span class="pill err">falhou</span>';
+        }
+
+        const ops = await api({ action: 'listarOperadoresLogin' });
+        const sess = ops && ops.sessaoAtiva;
+        const sessEl = document.getElementById('st-sessao');
+        if (sess && sess.nome) {
+          const when = sess.loggedAt ? new Date(Number(sess.loggedAt)).toLocaleString('pt-BR') : '';
+          sessEl.innerHTML = '<span class="pill warn">' + sess.nome + '</span><div style="font-size:0.8rem;color:var(--muted);margin-top:4px">' + when + '</div>';
+        } else {
+          sessEl.innerHTML = '<span class="pill ok">livre</span>';
+        }
+
+        const ativas = await api({ action: 'listarAtivas' });
+        const n = (ativas && ativas.locacoes && ativas.locacoes.length) || 0;
+        document.getElementById('st-ativas').innerHTML = n
+          ? '<span class="pill warn">' + n + '</span>'
+          : '<span class="pill ok">0</span>';
+
+        const inicio = await api({ action: 'carregarInicio' });
+        const enc = (inicio && inicio.encHoje) || [];
+        const stats = (inicio && inicio.statsHoje) || {};
+        document.getElementById('st-hoje').textContent = (stats.nSessoes != null ? stats.nSessoes : enc.length) + ' sessão(ões)';
+        document.getElementById('st-ts').textContent = (inicio && inicio.timestamp) || new Date().toLocaleString('pt-BR');
+        log('Status OK · sessão=' + (sess && sess.nome ? sess.nome : 'livre') + ' · abertas=' + n);
+      } catch (e) {
+        log('Erro ao atualizar: ' + e.message);
+        document.getElementById('st-gas').innerHTML = '<span class="pill err">erro</span>';
+      }
+    }
+
+    document.getElementById('btn-refresh').onclick = refresh;
+    document.getElementById('btn-liberar').onclick = async () => {
+      const pin = pinAdmin();
+      if (pin.length < 4) { alert('Digite o PIN admin.'); return; }
+      if (!confirm('Liberar a sessão ativa do balcão no servidor?')) return;
+      try {
+        const d = await api({ action: 'liberarSessaoOperadorAdmin', adminPin: pin });
+        log('Liberar: ' + JSON.stringify(d));
+        if (d && d.ok) alert('Sessão liberada. Peça para a operadora entrar de novo no tablet.');
+        else alert((d && d.erro) || 'Falha ao liberar');
+        await refresh();
+      } catch (e) {
+        log('Erro liberar: ' + e.message);
+        alert('Erro: ' + e.message);
+      }
+    };
+    document.getElementById('btn-reset').onclick = async () => {
+      const pin = pinAdmin();
+      if (pin.length < 4) { alert('Digite o PIN admin.'); return; }
+      const opId = document.getElementById('op-reset').value;
+      if (!confirm('Resetar PIN do operador id ' + opId + '? Ela/ele vai criar um PIN novo.')) return;
+      try {
+        const d = await api({ action: 'resetarPinOperadorAdmin', adminPin: pin, operadorId: opId });
+        log('Reset PIN: ' + JSON.stringify(d));
+        if (d && d.ok) alert('PIN resetado. No tablet: escolher operador → criar PIN novo.');
+        else alert((d && d.erro) || 'Falha no reset');
+        await refresh();
+      } catch (e) {
+        log('Erro reset: ' + e.message);
+        alert('Erro: ' + e.message);
+      }
+    };
+    refresh();
+  </script>
+</body>
+</html>
