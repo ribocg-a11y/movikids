@@ -1,6 +1,7 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
 **Atualizado:** 13/08/2026 · FE **v1.9.97** · GAS repo/Web **v1.5.210** ✅ · **I145** sync idle · **I144** ops PIN · **I143** anti-duplicata  
+**Ambiente do agente:** **This PC** (Windows) — **não** Cloud. Pasta C já alinhada `8d3214f` (`git pull` 13/08).  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **I145 (13/08):** lentidão recorrente não foi regressão I143 — `mk-sync` ainda disparava `carregarInicio?force=1` ao desligar a tela (30s) e no idle 5 min. Planilha **0** Pendente/Ativa (fantasmas = cache PWA). FE warm sync. Doc: `INCIDENTE_I145_SYNC_FORCE_IDLE_2026-08-13.md`
@@ -37,7 +38,11 @@
 
 > *Vamos dar continuidade ao projeto Movi Kids, tem uma pasta no C da minha máquina.*
 
-**Mensagem para ciclo UI (recomendada):**
+**Mensagem para retomar deste ponto (13/08 — cole esta):**
+
+> *Continuar MOVI KIDS no PC — HANDOFF_NOVO_CHAT.md. FE v1.9.97 / GAS v1.5.210. I145 idle sem force=1 já em Pages. Próximo: tablet `?force=1.9.97` (PWA) · depois Sprint D: assinar FASE 17 · smoke D4. This PC, não Cloud. Sem App Script.*
+
+**Mensagem para ciclo UI:**
 
 > *Continuar MOVI KIDS — Sprint D: `PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`*
 
@@ -62,11 +67,28 @@ Detalhe: `ACESSOS_E_AUTORIZACOES.md` §7 · incidentes I21 · I29.
 
 ---
 
-## Como abrir o Cursor nesta pasta (novo chat)
+## Como abrir o Cursor **já no PC** (novo agente)
+
+**Continue on → This PC** (não Cloud). Cloud não vê a pasta C.
+
+1. PowerShell (alinhar — já feito 13/08; repetir se o C atrasar):
+
+```powershell
+cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github
+git pull origin main
+```
+
+2. Abrir o repo no Cursor Desktop:
 
 ```powershell
 cursor "C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github"
 ```
+
+3. Novo Agent chat · colar a mensagem “retomar deste ponto” acima.
+
+4. Tablet (Ops): https://ribocg-a11y.github.io/movikids/?force=1.9.97 — se card fantasma, limpar dados só do ícone PWA.
+
+Emergência celular: https://ribocg-a11y.github.io/movikids/ops-balcao.html
 
 ---
 
@@ -82,14 +104,15 @@ cursor "C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-mo
 
 ---
 
-## Produção (31/07/2026)
+## Produção (13/08/2026)
 
 | Camada | Versão | URL / evidência |
 |--------|--------|-----------------|
-| **Frontend** | **v1.9.88** | https://ribocg-a11y.github.io/movikids/?force=1.9.88 |
-| **Gestão Pessoas** | **v1.9.88** | `gestao-pessoas.html?force=1.9.88` |
-| **Service Worker** | **1.9.88** | `sw.js` |
-| **Apps Script** | repo/Web **v1.5.209** ✅ | ping alinhado · I134 abono faltas |
+| **Frontend** | **v1.9.97** | https://ribocg-a11y.github.io/movikids/?force=1.9.97 |
+| **Gestão Pessoas** | **v1.9.97** | `gestao-pessoas.html?force=1.9.97` |
+| **Service Worker** | **1.9.97** | `sw.js` |
+| **Apps Script** | repo/Web **v1.5.210** ✅ | ping alinhado · I143 · I145 FE |
+| **Pasta C** | `8d3214f` | `git pull` 13/08 ✅ |
 | **Baseline P0** | ✅ | `docs/ativos/BASELINE_CODIGO_P0.md` |
 | **PIN admin** | **1421** | Script Property `ADMIN_PIN` |
 | **Homolog tablet** | ✅ 23/06 | I43 · I42 · I47 · Gestor — smoke FE recente pendente Ops (D4) |
@@ -105,7 +128,7 @@ cursor "C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-mo
 | **I123–I124** | ✅ | Dashboard Base×Ritmo×Real · capítulos |
 | **I125d perf** | ✅ | salvar/▶ batch · mediana ~4.9s / ~3.4s |
 | **BANCO_HORAS** | ✅ I129 | ops 1–4 **0h00** |
-| **I129 ponto colab** | ✅ | FE v1.9.75+ · GAS Web **v1.5.209** |
+| **I129 ponto colab** | ✅ | FE v1.9.75+ · GAS Web **v1.5.210** |
 
 **Deploy ID GAS:** `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y`
 
@@ -154,16 +177,18 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 
 | # | Ação | Quem | Status |
 |---|------|------|--------|
+| **T** | Tablet PWA **v1.9.97** (`?force=1.9.97`) — I145 idle/tela off | Ops | ⏳ **primeiro** |
+| **0d** | **I145** sync idle/visibility sem `force=1` | Agente | ✅ **13/08** Pages + C |
+| **0e** | **I144** `ops-balcao.html` PIN digitado | Agente | ✅ **13/08** |
 | **0** | **I141–I142b** holerite Q2 resto + PDF conferência mês | Agente | ✅ **31/07** FE **v1.9.88** · PDFs em `entregas/` |
 | **0a** | **I125–I137** perf balcão/Operadores/ficha/cache | Agente | ✅ jul/2026 |
-| **0b** | **I122** carregarInicio cache / anti-fantasma | Agente+Sócio | ✅ GAS Web **v1.5.209** |
-| **0c** | Frios Colab residual (AUD/tail full) — lite já slim; não regredir P0 | Agente | 📋 backlog |
+| **0b** | **I122** / **I143** anti-fantasma + anti-duplicata salvar/▶ | Agente | ✅ GAS **v1.5.210** · FE **v1.9.96+** |
 | 1 | **Sprint D1** homolog PC admin | Agente | ✅ **27/06** |
-| 2 | Assinar **FASE 17** (só falta **17.5 F9**) + smoke tablet D4 | Sócio + Ops | ⏳ **próximo Ops** |
-| 3 | Smoke tablet **v1.9.88** (multi-veículo + overlay + timer) | Ops | ⏳ Sprint D4 |
+| 2 | Assinar **FASE 17** (só falta **17.5 F9**) + smoke tablet D4 | Sócio + Ops | ⏳ após T |
+| 3 | Smoke tablet **v1.9.97** (multi-veículo + overlay + timer + I145) | Ops | ⏳ Sprint D4 |
 | 4 | Sprint E — FASE 19 Performance (ranking opt-in) | Agente | 📋 após D2–D4 |
 
-Docs: `MAPA_ERROS` I138–I142 · `entregas/holerite-mes-2026-07/` · `PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`
+Docs: `INCIDENTE_I145_*` · `INCIDENTE_I144_*` · `MAPA_ERROS` · `PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`
 
 ---
 

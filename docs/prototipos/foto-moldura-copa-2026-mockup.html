@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mockup — Moldura Copa 2026 · Movi Kids</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Fredoka+One&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --br-amarelo: #FFDF00;
+    --br-verde: #009739;
+    --br-azul: #002776;
+    --gold: #D4AF37;
+    --gold-light: #F5E6A8;
+    --card-bg: #0a1628;
+    --txt: #f5f7fa;
+    --txt2: #94a3b8;
+    --radius: 20px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: Nunito, sans-serif;
+    background: linear-gradient(160deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+    color: var(--txt);
+    min-height: 100vh;
+    padding: 24px 16px 48px;
+  }
+  .wrap { max-width: 1100px; margin: 0 auto; }
+  h1 {
+    font-family: Fredoka One, sans-serif;
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    text-align: center;
+    margin-bottom: 8px;
+  }
+  h1 span { color: var(--br-amarelo); }
+  .lead {
+    text-align: center;
+    color: var(--txt2);
+    font-size: 0.95rem;
+    max-width: 640px;
+    margin: 0 auto 28px;
+    line-height: 1.5;
+  }
+  .badge-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 32px;
+  }
+  .badge {
+    font-size: 11px;
+    font-weight: 800;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: rgba(255, 223, 0, 0.12);
+    border: 1px solid rgba(255, 223, 0, 0.35);
+    color: var(--br-amarelo);
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+  @media (min-width: 860px) {
+    .grid { grid-template-columns: 1fr 1fr; align-items: start; }
+  }
+  .panel {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: var(--radius);
+    padding: 20px;
+  }
+  .panel h2 {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--txt2);
+    margin-bottom: 14px;
+  }
+  .panel h2 strong { color: var(--txt); }
+  .phone {
+    max-width: 320px;
+    margin: 0 auto;
+    background: #111;
+    border-radius: 32px;
+    padding: 12px;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+  }
+  .phone-screen {
+    border-radius: 22px;
+    overflow: hidden;
+    background: #1565c0;
+  }
+  /* ── Moldura ATUAL (simplificada) ── */
+  .frame-atual {
+    aspect-ratio: 4/5;
+    background: linear-gradient(180deg, #3949ab 0%, #1565c0 40%, #3949ab 100%);
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+  }
+  .frame-atual .logo {
+    font-family: Fredoka One, sans-serif;
+    font-size: 22px;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+  .frame-atual .logo em { color: #FFD54F; font-style: normal; }
+  .frame-atual .nome {
+    background: linear-gradient(90deg, #FFD54F, #ffb300);
+    color: #1a237e;
+    font-weight: 800;
+    font-size: 12px;
+    padding: 4px 16px;
+    border-radius: 20px;
+    margin-bottom: 10px;
+  }
+  .frame-atual .slot {
+    flex: 1;
+    width: 100%;
+    background: #37474f;
+    border-radius: 14px;
+    border: 4px solid #FFD54F;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+  }
+  .frame-atual .foot {
+    margin-top: 10px;
+    font-size: 10px;
+    font-weight: 700;
+    color: #90caf9;
+    text-align: center;
+  }
+  /* ── Moldura PROPOSTA — figurinha Panini viral ── */
+  .frame-copa {
+    aspect-ratio: 4/5;
+    position: relative;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 0%, rgba(255, 223, 0, 0.15), transparent),
+      linear-gradient(165deg, #001a4d 0%, #002776 35%, #004d25 70%, #001a4d 100%);
+    padding: 10px;
+    overflow: hidden;
+  }
+  .frame-copa::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      repeating-linear-gradient(45deg, transparent, transparent 20px, rgba(255,255,255,0.02) 20px, rgba(255,255,255,0.02) 21px);
+    pointer-events: none;
+  }
+  .holo-border {
+    position: absolute;
+    inset: 6px;
+    border-radius: 12px;
+    border: 3px solid transparent;
+    background: linear-gradient(135deg, var(--gold-light), var(--gold), #fff8dc, var(--gold)) border-box;
+    -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+  .br-side {
+    position: absolute;
+    left: 4px;
+    top: 50%;
+    transform: translateY(-50%) rotate(-90deg);
+    font-family: Bebas Neue, sans-serif;
+    font-size: 28px;
+    letter-spacing: 0.2em;
+    color: var(--br-verde);
+    text-shadow: 0 0 12px rgba(0, 151, 57, 0.6);
+    white-space: nowrap;
+  }
+  .copa-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: var(--br-amarelo);
+    color: var(--br-azul);
+    font-family: Bebas Neue, sans-serif;
+    font-size: 14px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    letter-spacing: 0.05em;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  }
+  .mk-mini {
+    position: absolute;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: Fredoka One, sans-serif;
+    font-size: 14px;
+    color: #fff;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+  }
+  .mk-mini em { color: var(--br-amarelo); font-style: normal; }
+  .photo-area {
+    position: absolute;
+    top: 52px;
+    left: 28px;
+    right: 28px;
+    bottom: 72px;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 2px solid rgba(255, 223, 0, 0.5);
+    box-shadow: inset 0 0 30px rgba(0,0,0,0.4);
+  }
+  .photo-area img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .photo-placeholder {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #42a5f5, #1565c0);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 64px;
+  }
+  .jersey-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 68px;
+    background: linear-gradient(90deg, var(--br-amarelo) 0%, #ffe566 50%, var(--br-amarelo) 100%);
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    gap: 12px;
+  }
+  .jersey-num {
+    font-family: Bebas Neue, sans-serif;
+    font-size: 42px;
+    color: var(--br-azul);
+    line-height: 1;
+    text-shadow: 1px 1px 0 rgba(255,255,255,0.3);
+  }
+  .jersey-info { flex: 1; min-width: 0; }
+  .jersey-name {
+    font-family: Bebas Neue, sans-serif;
+    font-size: 22px;
+    color: var(--br-azul);
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .jersey-role {
+    font-size: 10px;
+    font-weight: 800;
+    color: var(--br-verde);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .flag-dot {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: linear-gradient(180deg, var(--br-amarelo) 33%, var(--br-verde) 33% 66%, var(--br-azul) 66%);
+    border: 2px solid #fff;
+    flex-shrink: 0;
+  }
+  .stickers {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+  .stickers span {
+    position: absolute;
+    font-size: 18px;
+    opacity: 0.85;
+    animation: float 3s ease-in-out infinite alternate;
+  }
+  .stickers .s1 { top: 18%; left: 6%; animation-delay: 0s; }
+  .stickers .s2 { top: 55%; right: 5%; animation-delay: 0.5s; }
+  .stickers .s3 { bottom: 28%; left: 4%; animation-delay: 1s; font-size: 14px; }
+  @keyframes float { from { transform: translateY(0) rotate(-5deg); } to { transform: translateY(-6px) rotate(5deg); } }
+  .notes {
+    margin-top: 32px;
+    display: grid;
+    gap: 16px;
+  }
+  @media (min-width: 700px) {
+    .notes { grid-template-columns: 1fr 1fr 1fr; }
+  }
+  .note {
+    background: rgba(255, 255, 255, 0.04);
+    border-radius: 14px;
+    padding: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+  }
+  .note h3 {
+    font-size: 0.85rem;
+    color: var(--br-amarelo);
+    margin-bottom: 8px;
+  }
+  .note p, .note li {
+    font-size: 0.82rem;
+    color: var(--txt2);
+    line-height: 1.45;
+  }
+  .note ul { padding-left: 18px; }
+  .cta {
+    margin-top: 28px;
+    text-align: center;
+    padding: 20px;
+    background: rgba(0, 151, 57, 0.12);
+    border: 1px solid rgba(0, 151, 57, 0.3);
+    border-radius: var(--radius);
+  }
+  .cta p { font-size: 0.9rem; color: var(--txt2); margin-bottom: 4px; }
+  .cta strong { color: var(--br-amarelo); }
+  .picker {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 12px;
+  }
+  .picker button {
+    font-family: Nunito, sans-serif;
+    font-weight: 800;
+    font-size: 12px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.06);
+    color: var(--txt);
+    cursor: pointer;
+  }
+  .picker button.is-active {
+    background: var(--br-verde);
+    border-color: var(--br-verde);
+    color: #fff;
+  }
+  .ref-img {
+    max-width: 280px;
+    margin: 20px auto 0;
+    display: block;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Moldura <span>Copa 2026</span> · Proposta Movi Kids</h1>
+  <p class="lead">
+    Verificação do portal em produção + proposta visual inspirada na trend viral de
+    <strong>figurinhas Panini / cartão colecionável</strong> (ChatGPT, Canva, CapCut — maio/jun 2026).
+  </p>
+  <div class="badge-row">
+    <span class="badge">Trend: figurinha IA</span>
+    <span class="badge">Amarelo · Verde · Azul</span>
+    <span class="badge">Formato 4:5 Instagram</span>
+    <span class="badge">Nome + número camisa</span>
+    <span class="badge">Sem logo FIFA oficial</span>
+  </div>
+
+  <div class="grid">
+    <section class="panel">
+      <h2><strong>Hoje</strong> — moldura genérica (prod v1.8.50)</h2>
+      <div class="phone">
+        <div class="phone-screen">
+          <div class="frame-atual">
+            <div class="logo">Movi <em>Kids</em></div>
+            <div class="nome">Pedro</div>
+            <div class="slot">😊</div>
+            <div class="foot">📸 @movikidsslz · Golden Shopping</div>
+          </div>
+        </div>
+      </div>
+      <p style="font-size:12px;color:var(--txt2);margin-top:14px;text-align:center;line-height:1.5">
+        Azul/dourado Movi Kids · stickers veículos · funcional (câmera, galeria, share IG).
+        <br><code>acompanhar.html</code> → botão <strong>📸 Tira uma foto</strong>
+      </p>
+    </section>
+
+    <section class="panel">
+      <h2><strong>Proposta</strong> — Mini Craque Brasil 🇧🇷</h2>
+      <div class="phone">
+        <div class="phone-screen">
+          <div class="frame-copa" id="frame-preview">
+            <div class="holo-border"></div>
+            <span class="br-side">BRASIL</span>
+            <span class="copa-badge">COPA 2026</span>
+            <div class="mk-mini">Movi <em>Kids</em></div>
+            <div class="stickers" aria-hidden="true">
+              <span class="s1">⚽</span>
+              <span class="s2">⭐</span>
+              <span class="s3">🏆</span>
+            </div>
+            <div class="photo-area">
+              <div class="photo-placeholder" id="photo-ph">😊</div>
+            </div>
+            <div class="jersey-bar">
+              <span class="jersey-num" id="preview-num">10</span>
+              <div class="jersey-info">
+                <div class="jersey-name" id="preview-nome">PEDRO</div>
+                <div class="jersey-role">Mini craque · @movikidsslz</div>
+              </div>
+              <span class="flag-dot" aria-label="Brasil"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="picker">
+        <button type="button" class="is-active" data-nome="Pedro" data-num="10">Pedro · 10</button>
+        <button type="button" data-nome="Maria" data-num="7">Maria · 7</button>
+        <button type="button" data-nome="Raykelly" data-num="9">Raykelly · 9</button>
+      </div>
+    </section>
+  </div>
+
+  <div class="notes">
+    <article class="note">
+      <h3>Por que essa arte?</h3>
+      <ul>
+        <li>Figurinha Panini é a trend #1 da Copa 2026 no IG/TikTok</li>
+        <li>Cartão amarelo + barra de camisa = reconhecimento instantâneo</li>
+        <li>Texto vertical “BRASIL” (estilo adesivo Dreamina/CapCut)</li>
+        <li>Borda dourada holográfica = sensação “colecionável premium”</li>
+      </ul>
+    </article>
+    <article class="note">
+      <h3>Integração técnica</h3>
+      <ul>
+        <li>Substituir <code>drawMoldura_()</code> em <code>foto-moldura.html</code></li>
+        <li>Manter canvas 1080×1350 e fluxo câmera/share</li>
+        <li>Número: idade da criança ou aleatório 1–11</li>
+        <li>Legenda: <code>#Copa2026 #Hexa #MoviKids #GoldenShopping</code></li>
+      </ul>
+    </article>
+    <article class="note">
+      <h3>Variações futuras</h3>
+      <ul>
+        <li><strong>A</strong> Mini Craque (esta) — figurinha</li>
+        <li><strong>B</strong> Torcedor — faixa verde/amarela + bandeira</li>
+        <li><strong>C</strong> Gol! — confete + placar “1×0 diversão”</li>
+        <li>Troca sazonal automática jun–jul/2026</li>
+      </ul>
+    </article>
+  </div>
+
+  <div class="cta">
+    <p><strong>Próximo passo:</strong> sua aprovação desta direção (A — Mini Craque)</p>
+    <p>Implemento no <code>foto-moldura.html</code> + bump FE · sem mudança GAS</p>
+  </div>
+</div>
+<script>
+document.querySelectorAll('.picker button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.picker button').forEach(b => b.classList.remove('is-active'));
+    btn.classList.add('is-active');
+    document.getElementById('preview-nome').textContent = btn.dataset.nome.toUpperCase();
+    document.getElementById('preview-num').textContent = btn.dataset.num;
+  });
+});
+</script>
+</body>
+</html>

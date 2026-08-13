@@ -12,9 +12,9 @@ Sistema operacional de locações — balcão (tablet na loja), portal do respon
 
 > *Vamos dar continuidade ao projeto Movi Kids, tem uma pasta no C da minha máquina.*
 
-**Para ciclo ativo:**
+**Para ciclo ativo / novo agente no PC:**
 
-> *Continuar MOVI KIDS — Sprint D: `PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md` → assinar FASE 17 · smoke tablet D4.*
+> *Continuar MOVI KIDS no PC — HANDOFF_NOVO_CHAT.md. FE v1.9.97 / GAS v1.5.210. I145 idle sem force=1 já em Pages. Próximo: tablet `?force=1.9.97` (PWA) · depois Sprint D: assinar FASE 17 · smoke D4. This PC, não Cloud. Sem App Script.*
 
 ## Antes de qualquer trabalho
 
