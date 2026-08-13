@@ -1,6 +1,6 @@
 # MOVI KIDS — Deploy atual (referência única)
 
-**Atualizado:** 06/08/2026 (FE **v1.9.96** + GAS **v1.5.210** Web ✅ · I143)
+**Atualizado:** 13/08/2026 (FE **v1.9.97** + GAS **v1.5.210** Web ✅ · I145 / I144 / I143)
 
 Use **este arquivo** para versão e ordem de publicação. Docs `DEPLOY_v1.5.xx_*` em **`docs/arquivo/deploy/`** são histórico.
 
@@ -10,10 +10,10 @@ Use **este arquivo** para versão e ordem de publicação. Docs `DEPLOY_v1.5.xx_
 
 | Camada | Repo | Produção (ping / Pages) | Alinhado? |
 |--------|------|-------------------------|-----------|
-| **Frontend** | **v1.9.96** | https://ribocg-a11y.github.io/movikids/?force=1.9.96 | ⏳ Pages CDN (main já 1.9.96) |
-| **Gestão Pessoas** | **v1.9.96** | `gestao-pessoas.html?force=1.9.96` | ⏳ |
-| **Portal acompanhar** | **v1.9.96** | `acompanhar.html` | ⏳ |
-| **Service Worker** | **1.9.96** | `sw.js` | ⏳ |
+| **Frontend** | **v1.9.97** | https://ribocg-a11y.github.io/movikids/?force=1.9.97 | ✅ Pages |
+| **Gestão Pessoas** | **v1.9.97** | `gestao-pessoas.html?force=1.9.97` | ✅ |
+| **Portal acompanhar** | **v1.9.96** | `acompanhar.html` | portal |
+| **Service Worker** | **1.9.97** | `sw.js` | ✅ |
 | **GAS** | **v1.5.210** (header `.gs`) | ping **v1.5.210** | ✅ |
 
 **Ping:** https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec?action=ping
@@ -52,7 +52,7 @@ https://raw.githubusercontent.com/ribocg-a11y/movikids/main/MOVIKIDS_Code_v1.5.3
 | ▶ mediana | **~3.1s** · drift **0** ✅ |
 | 2º salvar mesmo veículo | **409 bloqueado** ✅ |
 | limpeza TESTE_ | fantasma **0** ✅ |
-| Pages `mk-version.js` | main **1.9.96** · CDN pode atrasar — usar `?force=1.9.96` |
+| Pages `mk-version.js` | **1.9.97** live |
 
 Artefato: `/opt/cursor/artifacts/teste-i143-pos-deploy.json`
 

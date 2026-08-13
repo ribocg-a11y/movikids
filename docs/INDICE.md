@@ -1,6 +1,6 @@
 # MOVI KIDS — Índice de documentação
 
-**Atualizado:** 06/08/2026 (FE **v1.9.96** · GAS **v1.5.210** · I143 anti-duplicata salvar/▶)
+**Atualizado:** 13/08/2026 (FE **v1.9.97** · GAS **v1.5.210** · I145 sync idle · I144 ops)
 
 ## Comece aqui
 
