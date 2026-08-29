@@ -2,7 +2,7 @@
 
 Scripts em `scripts/testes/`. Documentação: `docs/ativos/PROTOCOLO_DIAGNOSTICO_E_TESTES.md` · **Planilha por aba:** `docs/ativos/PROTOCOLO_AUDITORIA_ABAS_PLANILHA.md` · **"atualize tudo":** `PROTOCOLO_ATUALIZAR_TUDO.md`
 
-**Versões de referência (06/08/2026):** FE **v1.9.96** · GAS ping **v1.5.210** · mínimo operação balcão **v1.7.35** (I15 GET).
+**Versões de referência (29/08/2026):** FE **v1.9.102** · GAS ping **v1.5.210** · mínimo operação balcão **v1.7.35** (I15 GET).
 
 | **I141/I142 holerite** | `node scripts/testes/teste-i141-bonus-resto.cjs` · PDFs `entregas/holerite-mes-2026-07/` |
 
@@ -10,6 +10,7 @@ Scripts em `scripts/testes/`. Documentação: `docs/ativos/PROTOCOLO_DIAGNOSTICO
 
 | **I125 salvar/▶ perf** | `TESTE_I125_SALVAR_INICIAR_PERF.ps1` (após Nova versão GAS **v1.5.202+**) |
 | **I143 anti-duplicata** | salvar + 2º salvar mesmo veículo → 409; ▶ drift 0; limpar TESTE_ |
+| **I146 P0 local-first** | boot snapshot · IndexedDB · chip local/nuvem · `?force=1.9.102` |
 
 | **Protocolo mestre (varredura completa)** | **`TESTE_PROTOCOLO_MESTRE.ps1`** ou **`.\protocolo-mestre.ps1`** na raiz do repo |
 

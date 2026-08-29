@@ -1,7 +1,7 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
 **Atualizado:** 29/08/2026 · FE **v1.9.102** · GAS repo/Web **v1.5.210** ✅ · **I145** · **I143** · encerrar extra **I85** v1.9.98–100  
-**Ambiente do agente:** **This PC** (Windows) — **não** Cloud. Pasta C já alinhada `8d3214f` (`git pull` 13/08).  
+**Ambiente do agente:** **This PC** (Windows) — **não** Cloud. Pasta C: alinhar com `git pull` ou `.\scripts\sync-pasta-c-pc.ps1` após cada push FE.  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **I85 encerrar extra (29/08):** FE **v1.9.98–v1.9.101** — pagamento extra no alerta/drawer · justificativa · sync cards · toque.
@@ -75,7 +75,14 @@ Detalhe: `ACESSOS_E_AUTORIZACOES.md` §7 · incidentes I21 · I29.
 
 **Continue on → This PC** (não Cloud). Cloud não vê a pasta C.
 
-1. PowerShell (alinhar — já feito 13/08; repetir se o C atrasar):
+1. PowerShell (alinhar pasta C após push FE):
+
+```powershell
+cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github
+.\scripts\sync-pasta-c-pc.ps1
+```
+
+Ou manualmente:
 
 ```powershell
 cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github
@@ -90,7 +97,7 @@ cursor "C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-mo
 
 3. Novo Agent chat · colar a mensagem “retomar deste ponto” acima.
 
-4. Tablet (Ops): https://ribocg-a11y.github.io/movikids/?force=1.9.97 — se card fantasma, limpar dados só do ícone PWA.
+4. Tablet (Ops): https://ribocg-a11y.github.io/movikids/?force=1.9.102 — chip **local · nuvem** · se card fantasma, Diagnóstico → Limpar cache local + sync.
 
 Emergência celular: https://ribocg-a11y.github.io/movikids/ops-balcao.html
 
@@ -108,15 +115,15 @@ Emergência celular: https://ribocg-a11y.github.io/movikids/ops-balcao.html
 
 ---
 
-## Produção (13/08/2026)
+## Produção (29/08/2026)
 
 | Camada | Versão | URL / evidência |
 |--------|--------|-----------------|
-| **Frontend** | **v1.9.101** | https://ribocg-a11y.github.io/movikids/?force=1.9.97 |
-| **Gestão Pessoas** | **v1.9.101** | `gestao-pessoas.html?force=1.9.97` |
-| **Service Worker** | **1.9.97** | `sw.js` |
+| **Frontend** | **v1.9.102** | https://ribocg-a11y.github.io/movikids/?force=1.9.102 |
+| **Gestão Pessoas** | **v1.9.102** | `gestao-pessoas.html?force=1.9.102` |
+| **Service Worker** | **1.9.102** | `sw.js` · `mk-idb-store.js` |
 | **Apps Script** | repo/Web **v1.5.210** ✅ | ping alinhado · I143 · I145 FE |
-| **Pasta C** | `8d3214f` | `git pull` 13/08 ✅ |
+| **Pasta C** | `10f1dc6+` | `sync-pasta-c-pc.ps1` após push |
 | **Baseline P0** | ✅ | `docs/ativos/BASELINE_CODIGO_P0.md` |
 | **PIN admin** | **1421** | Script Property `ADMIN_PIN` |
 | **Homolog tablet** | ✅ 23/06 | I43 · I42 · I47 · Gestor — smoke FE recente pendente Ops (D4) |
@@ -181,15 +188,16 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 
 | # | Ação | Quem | Status |
 |---|------|------|--------|
-| **T** | Tablet PWA **v1.9.101** (`?force=1.9.97`) — I145 idle/tela off | Ops | ⏳ **primeiro** |
+| **T** | Tablet PWA **v1.9.102** (`?force=1.9.102`) — I146 chip local/nuvem · I145 idle | Ops | ⏳ **primeiro** |
 | **0d** | **I145** sync idle/visibility sem `force=1` | Agente | ✅ **13/08** Pages + C |
+| **0f** | **I146** P0 local-first · IndexedDB Fase 1 · anti-fantasma boot | Agente | ✅ **29/08** FE **v1.9.102** |
 | **0e** | **I144** `ops-balcao.html` PIN digitado | Agente | ✅ **13/08** |
 | **0** | **I141–I142b** holerite Q2 resto + PDF conferência mês | Agente | ✅ **31/07** FE **v1.9.88** · PDFs em `entregas/` |
 | **0a** | **I125–I137** perf balcão/Operadores/ficha/cache | Agente | ✅ jul/2026 |
 | **0b** | **I122** / **I143** anti-fantasma + anti-duplicata salvar/▶ | Agente | ✅ GAS **v1.5.210** · FE **v1.9.96+** |
 | 1 | **Sprint D1** homolog PC admin | Agente | ✅ **27/06** |
 | 2 | Assinar **FASE 17** (só falta **17.5 F9**) + smoke tablet D4 | Sócio + Ops | ⏳ após T |
-| 3 | Smoke tablet **v1.9.101** (multi-veículo + overlay + timer + I145) | Ops | ⏳ Sprint D4 |
+| 3 | Smoke tablet **v1.9.102** (multi-veículo + overlay + timer + I145 + I146) | Ops | ⏳ Sprint D4 |
 | 4 | Sprint E — FASE 19 Performance (ranking opt-in) | Agente | 📋 após D2–D4 |
 
 Docs: `INCIDENTE_I145_*` · `INCIDENTE_I144_*` · `MAPA_ERROS` · `PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`

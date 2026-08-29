@@ -1,6 +1,6 @@
 # MOVI KIDS — Deploy atual (referência única)
 
-**Atualizado:** 13/08/2026 (FE **v1.9.97** + GAS **v1.5.210** Web ✅ · I145 / I144 / I143)
+**Atualizado:** 29/08/2026 (FE **v1.9.102** + GAS **v1.5.210** Web ✅ · I146 / I145 / I144 / I143)
 
 Use **este arquivo** para versão e ordem de publicação. Docs `DEPLOY_v1.5.xx_*` em **`docs/arquivo/deploy/`** são histórico.
 
@@ -10,10 +10,10 @@ Use **este arquivo** para versão e ordem de publicação. Docs `DEPLOY_v1.5.xx_
 
 | Camada | Repo | Produção (ping / Pages) | Alinhado? |
 |--------|------|-------------------------|-----------|
-| **Frontend** | **v1.9.97** | https://ribocg-a11y.github.io/movikids/?force=1.9.97 | ✅ Pages |
-| **Gestão Pessoas** | **v1.9.97** | `gestao-pessoas.html?force=1.9.97` | ✅ |
+| **Frontend** | **v1.9.102** | https://ribocg-a11y.github.io/movikids/?force=1.9.102 | ✅ Pages |
+| **Gestão Pessoas** | **v1.9.102** | `gestao-pessoas.html?force=1.9.102` | ✅ |
 | **Portal acompanhar** | **v1.9.96** | `acompanhar.html` | portal |
-| **Service Worker** | **1.9.97** | `sw.js` | ✅ |
+| **Service Worker** | **1.9.102** | `sw.js` · inclui `mk-idb-store.js` | ✅ |
 | **GAS** | **v1.5.210** (header `.gs`) | ping **v1.5.210** | ✅ |
 
 **Ping:** https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec?action=ping
@@ -42,19 +42,17 @@ https://raw.githubusercontent.com/ribocg-a11y/movikids/main/MOVIKIDS_Code_v1.5.3
 
 ---
 
-## Validação 06/08/2026 (I143)
+## Validação 29/08/2026 (I146 P0 local-first)
 
 | Check | Resultado |
 |-------|-----------|
 | ping | **v1.5.210** ✅ |
-| `validarSchema` | **ok** ✅ |
-| salvar mediana | **~3.9s** ✅ |
-| ▶ mediana | **~3.1s** · drift **0** ✅ |
-| 2º salvar mesmo veículo | **409 bloqueado** ✅ |
-| limpeza TESTE_ | fantasma **0** ✅ |
-| Pages `mk-version.js` | **1.9.97** live |
+| `listarAtivas` | **0** Pendente/Ativa ✅ |
+| Pages `mk-version.js` | **1.9.102** live ✅ |
+| Fase 1 IndexedDB | `mk-idb-store.js` + boot async ✅ |
+| Chip status | **local · nuvem** ✅ |
 
-Artefato: `/opt/cursor/artifacts/teste-i143-pos-deploy.json`
+Doc: `INCIDENTE_I146_BOOT_MK_SESSIONS_FANTASMA_2026-08-29.md`
 
 ---
 
@@ -62,6 +60,12 @@ Artefato: `/opt/cursor/artifacts/teste-i143-pos-deploy.json`
 
 ```
 git commit → pre-push-check → git push origin main → verify-publish-complete → encerramento-sessao
+```
+
+**Alinhar pasta C após push:**
+
+```powershell
+.\scripts\sync-pasta-c-pc.ps1
 ```
 
 **I24 PrePush:** ahead/Pages desalinhado = **warn** (esperado pós-commit); dirty I3 = **fail**. Sessao/PosPush ainda bloqueiam ahead.

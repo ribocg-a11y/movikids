@@ -1,6 +1,6 @@
 # MOVI KIDS — Índice de documentação
 
-**Atualizado:** 13/08/2026 (FE **v1.9.97** · GAS **v1.5.210** · I145 sync idle · I144 ops)
+**Atualizado:** 29/08/2026 (FE **v1.9.102** · GAS **v1.5.210** · I146 P0 local-first · I145 / I144 / I143)
 
 ## Comece aqui
 
@@ -22,7 +22,7 @@
 | [**INCIDENTE_I43_CARREGAR_INICIO_COL_Y_2026-06-23.md**](ativos/INCIDENTE_I43_CARREGAR_INICIO_COL_Y_2026-06-23.md) | **I43** — cronômetro revertia após ▶ |
 | [**INCIDENTE_I53_CONFIG_PLANILHA_REPAIR_2026-06-24.md**](arquivo/incidentes/INCIDENTE_I53_CONFIG_PLANILHA_REPAIR_2026-06-24.md) | **I53** — CONFIG memorial, schema, repair |
 | [**INCIDENTE_I96_I99_MULTI_VEICULO_2026-07-10.md**](arquivo/incidentes/INCIDENTE_I96_I99_MULTI_VEICULO_2026-07-10.md) | **I96–I103** — multi-veículo · overlay · contagem encerradas/caixa |
-| [**INCIDENTE_I142_HOLERITE_PDF_CONFERENCIA_2026-07-31.md**](ativos/INCIDENTE_I142_HOLERITE_PDF_CONFERENCIA_2026-07-31.md) | **I141–I142b** — bônus resto · PDF mês · print branco |
+| [**INCIDENTE_I146_BOOT_MK_SESSIONS_FANTASMA_2026-08-29.md**](ativos/INCIDENTE_I146_BOOT_MK_SESSIONS_FANTASMA_2026-08-29.md) | **I146** — fantasma PWA · boot snapshot IndexedDB |
 | [**BASELINE_CODIGO_P0.md**](ativos/BASELINE_CODIGO_P0.md) | **Zonas congeladas** — não mexer em P0 sem pedido |
 | [**INCIDENTE_I45_CADASTRO_RH_NAO_PERSISTIDO_2026-06-23.md**](ativos/INCIDENTE_I45_CADASTRO_RH_NAO_PERSISTIDO_2026-06-23.md) | **I45** — cadastro Raykelly / installer apagava RH |
 | [**PROTOCOLO_AUDITORIA_ABAS_PLANILHA.md**](ativos/PROTOCOLO_AUDITORIA_ABAS_PLANILHA.md) | **Auditoria por aba** — roteiro LOCACOES + CONFIG (I53) + roadmap 24 abas |

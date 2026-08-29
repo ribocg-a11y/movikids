@@ -1,7 +1,7 @@
 # MOVI KIDS — Planejamento pós One UI (jun–jul/2026)
 
 **Criado:** 27/06/2026 · **Substitui backlog ativo** de `PLANEJAMENTO_ONE_UI_2026-06.md` (Sprints A–C ✅)  
-**Produção (31/07/2026):** FE **v1.9.88** · GAS **v1.5.209** · Pages confirmado · I96–I142 ✅  
+**Produção (29/08/2026):** FE **v1.9.102** · GAS **v1.5.210** · Pages confirmado · I96–I142 · **I146** P0 local-first ✅  
 **Mestre:** `PLANO_PREMIUM_ONEUI_FASES_16_22_2026-06.md` · **Roteiro agente:** `ROTEIRO_AGENTE_OBRIGATORIO.md`
 
 ---

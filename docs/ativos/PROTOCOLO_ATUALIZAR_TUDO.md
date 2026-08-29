@@ -1,6 +1,6 @@
 # MOVI KIDS — Protocolo "Atualize tudo"
 
-**Criado:** 14/06/2026 · **Última execução:** 13/08/2026 (FE **v1.9.97** · GAS Web **v1.5.210** · I145 / I144 / I143)  
+**Criado:** 14/06/2026 · **Última execução:** 29/08/2026 (FE **v1.9.102** · GAS Web **v1.5.210** · I146 / I145 / I143 / I85)  
 **Função:** quando o usuário pedir **"atualize tudo"**, o agente segue **esta lista** — não só handoff parcial.  
 **Regra Cursor:** `.cursor/rules/atualize-tudo-movikids.mdc`
 
@@ -17,14 +17,14 @@ Sincronizar **documentação + estado operacional** do projeto com a realidade a
 | Planejamento | `PLANEJAMENTO_ATUAL_2026-06.md`, `PLANO_PRIORIDADES_2026-06.md`, **`MAPA_FASES.md`**, **`PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`** |
 | Deploy atual | **`DEPLOY_ATUAL.md`** |
 | Estrutura repo | **`ESTRUTURA_REPO.md`** |
-| Mapa de erros | `MAPA_ERROS_FALHAS_BUGS.md` (I* até I143+) |
+| Mapa de erros | `MAPA_ERROS_FALHAS_BUGS.md` (I* até I146+) |
 | **Design System** | **`docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md`** |
 | Protocolos | `PROTOCOLO_DIAGNOSTICO_E_TESTES.md`, **este arquivo** |
 | Arquitetura / fluxos / diagramas | `MAPA_CODIGO_ARQUITETURA.md`, `FASE_*.md` ativas |
 | Deploy / processos | **`DEPLOY_ATUAL.md`**, `DEPLOY_GAS_v1.5.32_AUTH.md`, histórico `arquivo/deploy/` |
 | Histórico | `docs/arquivo/incidentes/`, `docs/ativos/INCIDENTE_*.md` |
 | Planilhas | Memorials `docs/referencia/`, IDs e métricas abas (FOLHA, CONFIG, etc.) |
-| Pasta no C | Caminhos PC em HANDOFF, AGENTS, regras `.cursor/rules/` |
+| Pasta no C | `scripts/sync-pasta-c-pc.ps1` · caminhos PC em HANDOFF, AGENTS, regras `.cursor/rules/` |
 | Testes | `scripts/testes/README.md`, versões nos `.ps1` |
 | Entregas PDF | `entregas/holerite-mes-2026-07/` |
 
@@ -43,17 +43,17 @@ Sincronizar **documentação + estado operacional** do projeto com a realidade a
 
 ---
 
-## Produção atual (13/08/2026)
+## Produção atual (29/08/2026)
 
 | Camada | Versão | Evidência |
 |--------|--------|-----------|
 | GAS | **v1.5.210** Web ✅ | ping + I143 |
-| FE | **v1.9.97** | Pages live · `?force=1.9.97` · I145 |
+| FE | **v1.9.102** | Pages live · `?force=1.9.102` · I146 Fase 1 IndexedDB |
 | Planilha FOLHA | **OK** | B9=8,80 · B10/B12=22 · B68=5253,96 |
-| Planilha | **OK** | schema 13/08 · 0 ativas |
-| Homolog tablet | **✅** | 23/06 · smoke I143 · FE **v1.9.97** |
+| Planilha | **OK** | schema 13/08 · **0** abertas 29/08 |
+| Homolog tablet | **⏳** | smoke D4 · FE **v1.9.102** |
 | Holerite | I138–I142 | Q2 resto · PDF mês Ray/Julia |
-| Perf | I115–I125 · **I143** · **I145** | salvar/▶ gates · idle sem force=1 |
+| Perf | I115–I125 · **I143** · **I145** · **I146** | salvar/▶ gates · idle warm · boot snapshot |
 
 ---
 
@@ -61,6 +61,7 @@ Sincronizar **documentação + estado operacional** do projeto com a realidade a
 
 ```powershell
 cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github
+.\scripts\sync-pasta-c-pc.ps1
 .\scripts\relatorio-versoes.ps1 -Markdown
 node scripts\testes\teste-i141-bonus-resto.cjs
 Invoke-RestMethod ".../exec?action=ping"
@@ -102,3 +103,4 @@ flowchart TD
 
 - Estudo negócio: `ESTUDO_NEGOCIO_BREAK_EVEN_TICKET_2026-07.md` · memorial CSV · aba VIABILIDADE_NEGOCIO (OAuth script).
 - Holerite PDF: `INCIDENTE_I142_HOLERITE_PDF_CONFERENCIA_2026-07-31.md`
+- P0 local-first: `INCIDENTE_I146_BOOT_MK_SESSIONS_FANTASMA_2026-08-29.md`
