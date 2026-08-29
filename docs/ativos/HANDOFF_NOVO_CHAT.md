@@ -1,10 +1,12 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 29/08/2026 · FE **v1.9.100** · GAS repo/Web **v1.5.210** ✅ · **I145** · **I143** · encerrar extra **I85** v1.9.98–100  
+**Atualizado:** 29/08/2026 · FE **v1.9.101** · GAS repo/Web **v1.5.210** ✅ · **I145** · **I143** · encerrar extra **I85** v1.9.98–100  
 **Ambiente do agente:** **This PC** (Windows) — **não** Cloud. Pasta C já alinhada `8d3214f` (`git pull` 13/08).  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
-**I85 encerrar extra (29/08):** FE **v1.9.98–v1.9.100** — pagamento extra no alerta/drawer · justificativa com espaços (v1.9.100) · sync preserva card Pendente/▶ 120s · toque responsivo. Tablet: `?force=1.9.100`. Limpeza testes: `node scripts/limpar-testes-pos-auditoria.cjs`
+**I85 encerrar extra (29/08):** FE **v1.9.98–v1.9.101** — pagamento extra no alerta/drawer · justificativa · sync cards · toque.
+
+**P0 local-first (29/08):** FE **v1.9.101** — boot sem `mk_sessions` cru · snapshot `mk_snapshot_v1` · poll idle **60 s** · cache 1 h · sync horário warm · botão limpar cache no Diagnóstico. Tablet: `?force=1.9.101`.
 
 **I145 (13/08):** lentidão recorrente não foi regressão I143 — `mk-sync` ainda disparava `carregarInicio?force=1` ao desligar a tela (30s) e no idle 5 min. Planilha **0** Pendente/Ativa (fantasmas = cache PWA). FE warm sync. Doc: `INCIDENTE_I145_SYNC_FORCE_IDLE_2026-08-13.md`
 
@@ -42,7 +44,7 @@
 
 **Mensagem para retomar deste ponto (13/08 — cole esta):**
 
-> *Continuar MOVI KIDS no PC — HANDOFF_NOVO_CHAT.md. FE v1.9.100 / GAS v1.5.210. Tablet `?force=1.9.100` (PWA). Próximo: Sprint D smoke D4 · assinar FASE 17. Sem App Script.*
+> *Continuar MOVI KIDS no PC — HANDOFF_NOVO_CHAT.md. FE v1.9.101 / GAS v1.5.210. Tablet `?force=1.9.100` (PWA). Próximo: Sprint D smoke D4 · assinar FASE 17. Sem App Script.*
 
 **Mensagem para ciclo UI:**
 
@@ -110,8 +112,8 @@ Emergência celular: https://ribocg-a11y.github.io/movikids/ops-balcao.html
 
 | Camada | Versão | URL / evidência |
 |--------|--------|-----------------|
-| **Frontend** | **v1.9.100** | https://ribocg-a11y.github.io/movikids/?force=1.9.97 |
-| **Gestão Pessoas** | **v1.9.100** | `gestao-pessoas.html?force=1.9.97` |
+| **Frontend** | **v1.9.101** | https://ribocg-a11y.github.io/movikids/?force=1.9.97 |
+| **Gestão Pessoas** | **v1.9.101** | `gestao-pessoas.html?force=1.9.97` |
 | **Service Worker** | **1.9.97** | `sw.js` |
 | **Apps Script** | repo/Web **v1.5.210** ✅ | ping alinhado · I143 · I145 FE |
 | **Pasta C** | `8d3214f` | `git pull` 13/08 ✅ |
@@ -179,7 +181,7 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 
 | # | Ação | Quem | Status |
 |---|------|------|--------|
-| **T** | Tablet PWA **v1.9.100** (`?force=1.9.97`) — I145 idle/tela off | Ops | ⏳ **primeiro** |
+| **T** | Tablet PWA **v1.9.101** (`?force=1.9.97`) — I145 idle/tela off | Ops | ⏳ **primeiro** |
 | **0d** | **I145** sync idle/visibility sem `force=1` | Agente | ✅ **13/08** Pages + C |
 | **0e** | **I144** `ops-balcao.html` PIN digitado | Agente | ✅ **13/08** |
 | **0** | **I141–I142b** holerite Q2 resto + PDF conferência mês | Agente | ✅ **31/07** FE **v1.9.88** · PDFs em `entregas/` |
@@ -187,7 +189,7 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 | **0b** | **I122** / **I143** anti-fantasma + anti-duplicata salvar/▶ | Agente | ✅ GAS **v1.5.210** · FE **v1.9.96+** |
 | 1 | **Sprint D1** homolog PC admin | Agente | ✅ **27/06** |
 | 2 | Assinar **FASE 17** (só falta **17.5 F9**) + smoke tablet D4 | Sócio + Ops | ⏳ após T |
-| 3 | Smoke tablet **v1.9.100** (multi-veículo + overlay + timer + I145) | Ops | ⏳ Sprint D4 |
+| 3 | Smoke tablet **v1.9.101** (multi-veículo + overlay + timer + I145) | Ops | ⏳ Sprint D4 |
 | 4 | Sprint E — FASE 19 Performance (ranking opt-in) | Agente | 📋 após D2–D4 |
 
 Docs: `INCIDENTE_I145_*` · `INCIDENTE_I144_*` · `MAPA_ERROS` · `PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`
