@@ -41,8 +41,8 @@ function renderCards() {
         <div class="empty-logo" aria-hidden="true">
           <img class="mk-brand-img mk-brand-img--lg" src="assets/logo-movi-kids.png" alt="Movi Kids" width="1080" height="1080" loading="lazy" decoding="async">
         </div>
-        <h3>Sincronizando…</h3>
-        <p>Conectando com o servidor. Locações fantasmas não aparecem mais aqui.</p>
+        <h3>Aguardando servidor…</h3>
+        <p>Buscando locações ativas na planilha.</p>
       </div>`
       : `
       <div class="empty">

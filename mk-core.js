@@ -216,6 +216,10 @@ async function init() {
 
   syncController();
 
+  setTimeout(function () {
+    if (typeof mkSyncClearBootPending_ === 'function') mkSyncClearBootPending_(true);
+  }, 65000);
+
   agendarProximoPoll();
   if (typeof mkSyncWireEvents_ === 'function') mkSyncWireEvents_();
 

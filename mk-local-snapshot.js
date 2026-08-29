@@ -102,6 +102,7 @@ function mkBootLocalFirstFinish_(snap, inflight) {
 
   if (snap) {
     mkSnapshotApply_(snap);
+    window._mkSyncBootPending = false;
     applied = true;
   } else {
     sessions = [];

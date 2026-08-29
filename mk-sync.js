@@ -85,6 +85,13 @@ function mkInicioCacheFresh_(raw) {
   } catch (e) { return null; }
 }
 
+function mkSyncClearBootPending_(rerender) {
+  if (!window._mkSyncBootPending) return;
+  window._mkSyncBootPending = false;
+  if (rerender !== false && typeof renderCards === 'function') renderCards();
+}
+window.mkSyncClearBootPending_ = mkSyncClearBootPending_;
+
 async function sincronizarServidor(force = false) {
   if (_syncInFlight) {
     if (force) _syncPending = true;
@@ -143,6 +150,7 @@ async function sincronizarServidor(force = false) {
         }
         if (typeof mkSnapshotApplyFallback_ === 'function' && mkSnapshotApplyFallback_()) {
           setStatus(true);
+          mkSyncClearBootPending_(true);
           return;
         }
       }
@@ -169,7 +177,7 @@ async function sincronizarServidor(force = false) {
     try { localStorage.setItem(CACHE_KEY, JSON.stringify({ data: d, ts: Date.now() })); } catch (e) { /* ignore */ }
     setStatus(true);
     aplicarDadosInicio(d);
-    window._mkSyncBootPending = false;
+    mkSyncClearBootPending_(false);
 
   } catch(e) {
     _syncFailCount++;
@@ -181,6 +189,7 @@ async function sincronizarServidor(force = false) {
   } finally {
     clearTimeout(_syncSafetyTimer);
     _syncInFlight = false;
+    mkSyncClearBootPending_(true);
     if (_syncPending) {
       _syncPending = false;
       setTimeout(() => sincronizarServidor(true), 300);
