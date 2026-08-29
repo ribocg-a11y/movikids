@@ -549,6 +549,7 @@ async function abrirWaMsg(s) {
 
 function encerrarDireto() {
   if (!alertSession) return;
+  if (window._mkEncerrarInFlight) return;
   const fin = typeof mkEncExtraFinForSession_ === 'function'
     ? mkEncExtraFinForSession_(alertSession, false) : { minExtraCobrados: 0 };
   if (typeof mkEncExtraSyncJustToSession_ === 'function') {
