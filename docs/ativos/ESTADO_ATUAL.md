@@ -38,10 +38,10 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 | Camada | Versão | URL / evidência |
 |--------|--------|-----------------|
-| **Frontend** | **v1.9.100** | https://ribocg-a11y.github.io/movikids/?force=1.9.97 |
-| **Gestão Pessoas** | **v1.9.100** | `gestao-pessoas.html?force=1.9.97` |
+| **Frontend** | **v1.9.102** | https://ribocg-a11y.github.io/movikids/?force=1.9.102 |
+| **Gestão Pessoas** | **v1.9.102** | `gestao-pessoas.html?force=1.9.102` |
 | **Portal acompanhar** | **v1.9.96** | `acompanhar.html` |
-| **Service Worker** | **1.9.97** | `sw.js` |
+| **Service Worker** | **1.9.102** | `sw.js` · Fase 1 IndexedDB |
 | **Apps Script** | **v1.5.210** Web ✅ | ping alinhado 13/08 · I143 + I145 FE |
 | **I145 sync idle** | ✅ | idle/visibility **sem** force=1 · warm ~1–2s |
 | **I143 salvar/▶** | ✅ | mediana ~3.9s / ~3.1s · dup 409 · limpeza OK |
