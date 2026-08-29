@@ -1,4 +1,4 @@
-# MOVI KIDS — Estado atual (13/08/2026)
+# MOVI KIDS — Estado atual (29/08/2026)
 
 Referência única para alinhamento local × produção.
 
@@ -34,12 +34,12 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 ---
 
-## Produção (13/08/2026)
+## Produção (29/08/2026)
 
 | Camada | Versão | URL / evidência |
 |--------|--------|-----------------|
-| **Frontend** | **v1.9.97** | https://ribocg-a11y.github.io/movikids/?force=1.9.97 |
-| **Gestão Pessoas** | **v1.9.97** | `gestao-pessoas.html?force=1.9.97` |
+| **Frontend** | **v1.9.100** | https://ribocg-a11y.github.io/movikids/?force=1.9.97 |
+| **Gestão Pessoas** | **v1.9.100** | `gestao-pessoas.html?force=1.9.97` |
 | **Portal acompanhar** | **v1.9.96** | `acompanhar.html` |
 | **Service Worker** | **1.9.97** | `sw.js` |
 | **Apps Script** | **v1.5.210** Web ✅ | ping alinhado 13/08 · I143 + I145 FE |
