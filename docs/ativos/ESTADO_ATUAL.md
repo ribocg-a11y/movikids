@@ -6,7 +6,7 @@ Referência única para alinhamento local × produção.
 **Diagnóstico 6 camadas:** **`DIAGNOSTICO_SISTEMA_6_CAMADAS_2026-06.md`**  
 **Prioridades gerais:** **`PLANEJAMENTO_ATUAL_2026-06.md`** §9
 
-**Handoff (novo chat):** **`HANDOFF_NOVO_CHAT.md`** ← ler primeiro  
+**Handoff (novo chat PC):** **`HANDOFF_NOVO_CHAT.md`** ← ler primeiro · workspace C: `movikids-github` · **não Cloud**  
 **Design System (UI):** **`../referencia/DESIGN_SYSTEM_MOVIKIDS.md`** ← antes de qualquer tela  
 **Acessos:** **`ACESSOS_E_AUTORIZACOES.md`** — papéis, PIN admin, agente vs humano  
 **Índice:** `../INDICE.md` · **Prioridades:** **`PLANO_PRIORIDADES_2026-06.md`**  

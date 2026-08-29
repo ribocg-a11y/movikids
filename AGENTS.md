@@ -6,9 +6,9 @@ Sistema operacional de locações — balcão (tablet na loja), portal do respon
 
 **Repo neste PC:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`
 
-**Para retomar:**
+**Para retomar (agente local PC — pasta C):**
 
-> *Continuar MOVI KIDS no PC — HANDOFF_NOVO_CHAT.md. FE v1.9.105 / GAS v1.5.211. Tablet `?force=1.9.105`. Fase 2 offline ✅. Próximo: smoke D4 · FASE 17.*
+> *Continuar MOVI KIDS **no PC** — workspace `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`. Ler HANDOFF_NOVO_CHAT.md. FE v1.9.105 / GAS v1.5.211 ✅. Planilha 0 abertas. Próximo: smoke tablet D4 + teste offline. **Não Cloud.***
 
 ## Produção atual
 
