@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MOVI KIDS — Mockup encerrar extras v1.9.98 (I85 UX)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../mk-app.css?v=1.9.98">
+  <style>
+    body { margin: 0; background: #E8EEF5; font-family: 'Nunito', sans-serif; color: var(--txt, #1a1a2e); }
+    .mock-page { max-width: 1200px; margin: 0 auto; padding: 24px 16px 48px; }
+    .mock-head { text-align: center; margin-bottom: 28px; }
+    .mock-head h1 { font-family: 'Fredoka One', cursive; font-size: 28px; color: #1565C0; margin: 0 0 8px; }
+    .mock-head p { margin: 0; font-size: 14px; font-weight: 700; color: #546E7A; }
+    .mock-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; }
+    .mock-panel { background: #fff; border-radius: 20px; padding: 16px; box-shadow: 0 8px 32px rgba(21,101,192,.12); }
+    .mock-label { font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: .08em; color: #1565C0; margin: 0 0 12px; }
+    .mock-label span { display: block; font-size: 13px; text-transform: none; letter-spacing: 0; color: #37474F; margin-top: 4px; font-weight: 800; }
+    .tablet-frame { background: #111; border-radius: 24px; padding: 12px; max-width: 400px; margin: 0 auto; }
+    .tablet-screen { background: var(--bg, #F5F7FA); border-radius: 16px; overflow: hidden; min-height: 520px; position: relative; }
+    /* card compact */
+    .session-card.danger { border: 2px solid #B71C1C; }
+    .session-card { background: #fff; border-radius: 16px; padding: 14px; margin: 12px; box-shadow: 0 2px 12px rgba(0,0,0,.08); }
+    .sc-top { display: flex; justify-content: space-between; align-items: center; }
+    .sc-crianca { font-family: 'Fredoka One', cursive; font-size: 20px; }
+    .sc-timer-big { font-family: 'Fredoka One', cursive; font-size: 36px; color: #B71C1C; }
+    .sc-btns { display: flex; gap: 8px; margin-top: 12px; }
+    .sc-btns .btn { flex: 1; padding: 12px; border: none; border-radius: 12px; font-weight: 900; font-size: 13px; cursor: default; font-family: inherit; }
+    .btn-encerrar { background: #B71C1C; color: #fff; }
+    .btn-encerrar.danger { box-shadow: 0 0 0 2px rgba(183,28,28,.3); }
+    .btn.enc-btn-blocked { background: #90A4AE; opacity: .85; }
+    /* modal in frame */
+    .mock-modal-wrap { padding: 8px; }
+    .modal-sheet { background: #fff; border-radius: 20px 20px 0 0; padding: 20px 16px 16px; border-top: 4px solid #B71C1C; background: #FFEBEE; }
+    .modal-icon { font-size: 40px; text-align: center; }
+    .modal-title { font-family: 'Fredoka One', cursive; font-size: 22px; text-align: center; color: #B71C1C; }
+    .modal-sub { font-size: 13px; font-weight: 700; text-align: center; color: #546E7A; margin: 8px 0 14px; line-height: 1.4; }
+    .modal-info-row { display: flex; justify-content: space-between; font-size: 13px; font-weight: 700; padding: 6px 0; border-bottom: 1px solid rgba(0,0,0,.06); }
+    .modal-btns { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+    .btn-primary { background: #1565C0; color: #fff; padding: 14px; border: none; border-radius: 12px; font-weight: 900; font-size: 14px; font-family: inherit; }
+    .btn-wa { background: #fff; border: 2px solid #1565C0; color: #1565C0; padding: 12px; border-radius: 12px; font-weight: 800; }
+    .sess-drawer-head-title { font-family: 'Fredoka One', cursive; font-size: 20px; }
+    .sess-drawer-head-meta { font-size: 12px; font-weight: 700; color: #546E7A; margin-top: 4px; }
+    .flow-arrow { text-align: center; font-size: 24px; color: #1565C0; padding: 8px 0; font-weight: 900; }
+    .mock-flow { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: stretch; justify-content: center; gap: 16px; padding: 20px; background: linear-gradient(135deg,#E3F2FD,#FFF8E1); border-radius: 16px; margin-bottom: 8px; }
+    .mock-flow-step { flex: 1; min-width: 140px; max-width: 180px; text-align: center; font-size: 12px; font-weight: 800; }
+    .mock-flow-num { display: inline-flex; width: 32px; height: 32px; align-items: center; justify-content: center; background: #1565C0; color: #fff; border-radius: 50%; font-family: 'Fredoka One', cursive; margin-bottom: 6px; }
+  </style>
+</head>
+<body>
+<div class="mock-page">
+  <div class="mock-head">
+    <h1>Encerrar com extras — v1.9.98</h1>
+    <p>Mockup operacional · I85 UX · modo QR-only · sem App Script</p>
+  </div>
+
+  <div class="mock-flow">
+    <div class="mock-flow-step"><div class="mock-flow-num">1</div>Tempo esgota<br>alerta vermelho</div>
+    <div class="flow-arrow">→</div>
+    <div class="mock-flow-step"><div class="mock-flow-num">2</div>Toque pagamento<br>do extra</div>
+    <div class="flow-arrow">→</div>
+    <div class="mock-flow-step"><div class="mock-flow-num">3</div>Checklist ✓<br>botão libera</div>
+    <div class="flow-arrow">→</div>
+    <div class="mock-flow-step"><div class="mock-flow-num">4</div>Encerrar<br>1 toque</div>
+  </div>
+
+  <div class="mock-grid">
+
+    <!-- A: Card pendente -->
+    <div class="mock-panel">
+      <p class="mock-label">Tela Home — card em extra<span>Operador ainda não informou pagamento</span></p>
+      <div class="tablet-frame">
+        <div class="tablet-screen">
+          <div class="session-card danger carro">
+            <div class="sc-top"><span>🚗 Carro 03</span><span class="sc-plano-badge">10min</span></div>
+            <div class="sc-crianca">Athos</div>
+            <div class="sc-resp" style="font-size:12px;font-weight:700;color:#78909C">👤 Carlos</div>
+            <div style="margin:12px 0">
+              <div style="font-size:10px;font-weight:700;color:#B71C1C">TEMPO EXTRA</div>
+              <div class="sc-timer-big">+12:34</div>
+              <div style="font-size:12px;font-weight:800;color:#E65100">+12min = R$ 12,00</div>
+            </div>
+            <div class="sc-extra-pay-warn">⏱ 12 min extra · toque como pagou antes de encerrar</div>
+            <div class="sc-btns">
+              <button class="btn btn-encerrar danger">✓ Encerrar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- B: Card pronto -->
+    <div class="mock-panel">
+      <p class="mock-label">Tela Home — extra registrado<span>Depois de tocar Débito no alerta</span></p>
+      <div class="tablet-frame">
+        <div class="tablet-screen">
+          <div class="session-card danger carro">
+            <div class="sc-top"><span>🚗 Carro 03</span><span class="sc-plano-badge">10min</span></div>
+            <div class="sc-crianca">Athos</div>
+            <div style="margin:12px 0">
+              <div class="sc-timer-big">+12:34</div>
+            </div>
+            <div class="sc-extra-pay-ok">Extra: Débito ✓ · toque Encerrar</div>
+            <div class="sc-btns">
+              <button class="btn btn-encerrar danger">✓ Encerrar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- C: Alerta bloqueado -->
+    <div class="mock-panel">
+      <p class="mock-label">Alerta vermelho — passo 1<span>Botão bloqueado até informar pagamento</span></p>
+      <div class="tablet-frame">
+        <div class="tablet-screen mock-modal-wrap">
+          <div class="modal-sheet">
+            <div class="modal-icon">🔴</div>
+            <div class="modal-title">Tempo esgotado!</div>
+            <div class="modal-sub">Minutos extras em andamento. Passo 1: toque como o cliente pagou. Passo 2: encerre.</div>
+            <div class="modal-info">
+              <div class="modal-info-row"><span>🚗 Carro 03</span><span>10min</span></div>
+              <div class="modal-info-row"><span>Criança</span><span>Athos</span></div>
+              <div class="modal-info-row"><span>Responsável</span><span>Carlos</span></div>
+            </div>
+            <div id="enc-checklist" class="enc-checklist">
+              <div class="enc-checklist-row ok"><span class="enc-checklist-icon">✓</span><span>Tempo contabilizado (32 min)</span></div>
+              <div class="enc-checklist-row pending"><span class="enc-checklist-icon">○</span><span>Informar pagamento dos minutos extras</span></div>
+              <div class="enc-checklist-row pending"><span class="enc-checklist-icon">○</span><span>Confirmar encerramento (bloqueado)</span></div>
+            </div>
+            <div class="enc-extra-wrap enc-extra-wrap--alert">
+              <div class="enc-extra-title">Passo 1 — como o cliente pagou o extra?</div>
+              <p class="enc-extra-lead">12 min extras · R$ 12,00 — toque como o cliente pagou (ou marque não cobrar).</p>
+              <button type="button" class="enc-extra-same-btn">↩ Mesmo pagamento do plano (Débito)</button>
+              <div class="enc-extra-pag-grid">
+                <button type="button" class="enc-extra-pag-btn">PIX</button>
+                <button type="button" class="enc-extra-pag-btn">Crédito</button>
+                <button type="button" class="enc-extra-pag-btn">Débito</button>
+                <button type="button" class="enc-extra-pag-btn">Dinheiro</button>
+              </div>
+              <label class="enc-extra-cancel-lbl"><input type="checkbox"> <span>Não cobrar minutos extras (precisa justificativa)</span></label>
+            </div>
+            <div class="modal-btns">
+              <button class="btn btn-wa">Mostrar QR do portal</button>
+              <button class="btn btn-encerrar enc-btn-blocked" disabled>① Informe pagamento do extra</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- D: Alerta liberado -->
+    <div class="mock-panel">
+      <p class="mock-label">Alerta vermelho — pronto<span>Operador tocou Débito · encerrar liberado</span></p>
+      <div class="tablet-frame">
+        <div class="tablet-screen mock-modal-wrap">
+          <div class="modal-sheet" style="border-top-color:#2E7D32;background:#E8F5E9">
+            <div class="modal-icon">🔴</div>
+            <div class="modal-title" style="color:#B71C1C">Tempo esgotado!</div>
+            <div id="enc-checklist" class="enc-checklist">
+              <div class="enc-checklist-row ok"><span class="enc-checklist-icon">✓</span><span>Tempo contabilizado (32 min)</span></div>
+              <div class="enc-checklist-row ok"><span class="enc-checklist-icon">✓</span><span>Extra pago via Débito</span></div>
+              <div class="enc-checklist-row ok"><span class="enc-checklist-icon">✓</span><span>Pronto para encerrar</span></div>
+            </div>
+            <div class="enc-extra-wrap enc-extra-wrap--alert">
+              <div class="enc-extra-title">Passo 1 — como o cliente pagou o extra?</div>
+              <p class="enc-extra-lead">12 min extras · R$ 12,00</p>
+              <button type="button" class="enc-extra-same-btn" disabled>↩ Mesmo pagamento do plano (Débito)</button>
+              <div class="enc-extra-pag-grid">
+                <button type="button" class="enc-extra-pag-btn">PIX</button>
+                <button type="button" class="enc-extra-pag-btn">Crédito</button>
+                <button type="button" class="enc-extra-pag-btn active">Débito</button>
+                <button type="button" class="enc-extra-pag-btn">Dinheiro</button>
+              </div>
+            </div>
+            <div class="modal-btns">
+              <button class="btn btn-encerrar">✓ Encerrar locação</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- E: Drawer encerrar -->
+    <div class="mock-panel" style="grid-column: span 2;">
+      <p class="mock-label">Drawer Encerrar — confirmação final<span>Mesmo estado se operador abrir pelo card · botão só ativo com passo 1 OK</span></p>
+      <div class="tablet-frame" style="max-width:420px">
+        <div class="tablet-screen" style="padding:12px">
+          <div class="sess-drawer-head-title">🚗 Athos</div>
+          <div class="sess-drawer-head-meta">Carro 03 · 10min · Extra 12:34</div>
+          <div style="margin:14px 0;padding:12px;background:#fff;border-radius:12px;font-size:13px">
+            <div class="modal-info-row"><span>Tempo utilizado</span><span>32 min</span></div>
+            <div class="modal-info-row"><span>Min. adicionais</span><span>12 min</span></div>
+            <div class="modal-info-row"><span>Valor adicional</span><span>R$ 12,00</span></div>
+            <div class="modal-info-row total" style="font-weight:900;border:none;padding-top:10px"><span>TOTAL A COBRAR</span><span>R$ 24,00</span></div>
+          </div>
+          <div class="enc-checklist">
+            <div class="enc-checklist-row ok"><span class="enc-checklist-icon">✓</span><span>Tempo contabilizado (32 min)</span></div>
+            <div class="enc-checklist-row ok"><span class="enc-checklist-icon">✓</span><span>Extra pago via Débito</span></div>
+            <div class="enc-checklist-row ok"><span class="enc-checklist-icon">✓</span><span>Pronto para encerrar</span></div>
+          </div>
+          <div class="enc-extra-wrap">
+            <div class="enc-extra-title">Passo 1 — pagamento dos minutos extras</div>
+            <p class="enc-extra-lead">12 min extras · R$ 12,00</p>
+            <div class="enc-extra-pag-grid">
+              <button type="button" class="enc-extra-pag-btn">PIX</button>
+              <button type="button" class="enc-extra-pag-btn">Crédito</button>
+              <button type="button" class="enc-extra-pag-btn active">Débito</button>
+              <button type="button" class="enc-extra-pag-btn">Dinheiro</button>
+            </div>
+          </div>
+          <button class="btn btn-primary" style="width:100%;margin-top:8px">✓ Confirmar encerramento</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</body>
+</html>
