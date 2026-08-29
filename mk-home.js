@@ -168,6 +168,7 @@ function buildCard(s) {
         <div class="sc-timer-big" style="color:${ringColor}">${timerDisplay}</div>
         ${extraCost}
         <div class="sc-valor">${planoLinha}</div>
+        ${typeof mkEncExtraCardBannerHtml_ === 'function' ? mkEncExtraCardBannerHtml_(s) : ''}
         <div class="sc-valor" style="font-size:11px;color:var(--txt3)">Início: ${s.horaInicio}</div>
         ${smsStatusHtml_(s)}
       </div>

@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Movi Kids">
 <title>Movi Kids</title>
-<script src="mk-canonical-host.js?v=1.9.97"></script>
+<script src="mk-canonical-host.js?v=1.9.98"></script>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png">
@@ -17,17 +17,17 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<script src="mk-stale-sync.js?v=1.9.97"></script>
-<script src="mk-version.js?v=1.9.97"></script>
-<script src="mk-api.js?v=1.9.97"></script>
-<link rel="stylesheet" href="mk-design.css?v=1.9.97">
+<script src="mk-stale-sync.js?v=1.9.98"></script>
+<script src="mk-version.js?v=1.9.98"></script>
+<script src="mk-api.js?v=1.9.98"></script>
+<link rel="stylesheet" href="mk-design.css?v=1.9.98">
 
-<script src="mk-cache-bust.js?v=1.9.97"></script>
+<script src="mk-cache-bust.js?v=1.9.98"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<link rel="stylesheet" href="mk-app.css?v=1.9.97">
-<link rel="stylesheet" href="mk-gestao-pessoas.css?v=1.9.97">
+<link rel="stylesheet" href="mk-app.css?v=1.9.98">
+<link rel="stylesheet" href="mk-gestao-pessoas.css?v=1.9.98">
 <!-- Firebase SDK — Realtime sync canonico para todos os dispositivos -->
-<script type="module" src="mk-firebase.js?v=1.9.97"></script>
+<script type="module" src="mk-firebase.js?v=1.9.98"></script>
 </head>
 
 <body>
@@ -2323,6 +2323,27 @@
     <div class="modal-title" id="alert-title">Tempo quase no fim!</div>
     <div class="modal-sub" id="alert-sub">Faltam 5 minutos para encerrar a locação.</div>
     <div class="modal-info" id="alert-info"></div>
+    <div id="alert-enc-checklist" class="enc-checklist" hidden></div>
+    <div id="alert-enc-extra-wrap" class="enc-extra-wrap enc-extra-wrap--alert" hidden>
+      <div class="enc-extra-title">Passo 1 — como o cliente pagou o extra?</div>
+      <p class="enc-extra-lead" id="alert-enc-extra-lead">Toque a forma de pagamento dos minutos adicionais.</p>
+      <button type="button" class="enc-extra-same-btn" id="alert-enc-extra-same-btn" hidden onclick="mkEncExtraPickSamePag_('alert')"></button>
+      <div class="enc-extra-pag-grid">
+        <button type="button" class="enc-extra-pag-btn" data-pag="PIX" onclick="mkEncExtraPickPag_('PIX','alert')">PIX</button>
+        <button type="button" class="enc-extra-pag-btn" data-pag="Crédito" onclick="mkEncExtraPickPag_('Crédito','alert')">Crédito</button>
+        <button type="button" class="enc-extra-pag-btn" data-pag="Débito" onclick="mkEncExtraPickPag_('Débito','alert')">Débito</button>
+        <button type="button" class="enc-extra-pag-btn" data-pag="Dinheiro" onclick="mkEncExtraPickPag_('Dinheiro','alert')">Dinheiro</button>
+      </div>
+      <label class="enc-extra-cancel-lbl">
+        <input type="checkbox" id="alert-enc-extra-cancel" onchange="mkEncExtraToggleCancel_('alert')">
+        <span>Não cobrar minutos extras (precisa justificativa)</span>
+      </label>
+      <div id="alert-enc-extra-just-wrap" class="enc-extra-just-wrap" hidden>
+        <label class="enc-extra-just-lbl" for="alert-enc-extra-just">Por quê não cobrar?</label>
+        <textarea id="alert-enc-extra-just" class="form-input enc-extra-just" rows="2" placeholder="Ex.: acordo com gerência; cliente recusou…" oninput="mkEncExtraOnJustInput_('alert')"></textarea>
+      </div>
+      <p id="alert-enc-extra-hint" class="enc-extra-hint" hidden></p>
+    </div>
     <div class="modal-btns">
       <button class="btn btn-wa" onclick="abrirWhatsApp()" id="btn-wa">
         Enviar SMS ao responsável
@@ -2373,24 +2394,27 @@
     <div id="sess-drawer-panel-encerrar" class="sess-drawer-panel">
       <div class="modal-info" id="enc-info"></div>
       <div id="enc-offline-warn" class="op-policy danger" style="display:none;margin:0 0 12px"></div>
+      <div id="enc-checklist" class="enc-checklist" hidden></div>
       <div id="enc-extra-wrap" class="enc-extra-wrap" hidden>
-        <div class="enc-extra-title">Minutos extras — como foram pagos?</div>
-        <p class="enc-extra-lead" id="enc-extra-lead">Selecione a forma de pagamento dos minutos adicionais antes de encerrar.</p>
+        <div class="enc-extra-title">Passo 1 — pagamento dos minutos extras</div>
+        <p class="enc-extra-lead" id="enc-extra-lead">Toque como o cliente pagou os minutos adicionais.</p>
+        <button type="button" class="enc-extra-same-btn" id="enc-extra-same-btn" hidden onclick="mkEncExtraPickSamePag_('drawer')"></button>
         <div class="enc-extra-pag-grid" id="enc-extra-pag-opts">
-          <button type="button" class="enc-extra-pag-btn" data-pag="PIX" onclick="mkEncExtraPickPag_('PIX')">PIX</button>
-          <button type="button" class="enc-extra-pag-btn" data-pag="Crédito" onclick="mkEncExtraPickPag_('Crédito')">Crédito</button>
-          <button type="button" class="enc-extra-pag-btn" data-pag="Débito" onclick="mkEncExtraPickPag_('Débito')">Débito</button>
-          <button type="button" class="enc-extra-pag-btn" data-pag="Dinheiro" onclick="mkEncExtraPickPag_('Dinheiro')">Dinheiro</button>
+          <button type="button" class="enc-extra-pag-btn" data-pag="PIX" onclick="mkEncExtraPickPag_('PIX','drawer')">PIX</button>
+          <button type="button" class="enc-extra-pag-btn" data-pag="Crédito" onclick="mkEncExtraPickPag_('Crédito','drawer')">Crédito</button>
+          <button type="button" class="enc-extra-pag-btn" data-pag="Débito" onclick="mkEncExtraPickPag_('Débito','drawer')">Débito</button>
+          <button type="button" class="enc-extra-pag-btn" data-pag="Dinheiro" onclick="mkEncExtraPickPag_('Dinheiro','drawer')">Dinheiro</button>
         </div>
         <label class="enc-extra-cancel-lbl">
-          <input type="checkbox" id="enc-extra-cancel" onchange="mkEncExtraToggleCancel_()">
-          <span>Não cobrar minutos extras (cancelar cobrança)</span>
+          <input type="checkbox" id="enc-extra-cancel" onchange="mkEncExtraToggleCancel_('drawer')">
+          <span>Não cobrar minutos extras (precisa justificativa)</span>
         </label>
         <div id="enc-extra-just-wrap" class="enc-extra-just-wrap" hidden>
-          <label class="enc-extra-just-lbl" for="enc-extra-just">Justificativa obrigatória</label>
-          <textarea id="enc-extra-just" class="form-input enc-extra-just" rows="3" placeholder="Ex.: responsável recusou pagar; acordo com gerência; erro de operação…"></textarea>
-          <p class="enc-extra-just-hint">O sistema só encerra após preencher a justificativa.</p>
+          <label class="enc-extra-just-lbl" for="enc-extra-just">Por quê não cobrar?</label>
+          <textarea id="enc-extra-just" class="form-input enc-extra-just" rows="3" placeholder="Ex.: responsável recusou pagar; acordo com gerência; erro de operação…" oninput="mkEncExtraOnJustInput_('drawer')"></textarea>
+          <p class="enc-extra-just-hint">Mínimo 5 caracteres para liberar o encerramento.</p>
         </div>
+        <p id="enc-extra-hint" class="enc-extra-hint" hidden></p>
       </div>
       <label id="enc-adm-extra-wrap" style="display:none;align-items:flex-start;gap:8px;font-size:13px;font-weight:700;margin:0 0 12px;cursor:pointer">
         <input type="checkbox" id="enc-adm-extra-local" style="margin-top:3px">
@@ -2484,27 +2508,28 @@
   </div>
 </div>
 
-<script src="mk-globals.js?v=1.9.97"></script>
-<script src="mk-core.js?v=1.9.97"></script>
-<script src="mk-nav.js?v=1.9.97"></script>
-<script src="mk-admin.js?v=1.9.97"></script>
-<script src="mk-historico.js?v=1.9.97"></script>
-<script src="mk-custos-historico.js?v=1.9.97"></script>
-<script src="mk-sessao.js?v=1.9.97"></script>
-<script src="mk-home.js?v=1.9.97"></script>
-<script src="mk-meta-operador.js?v=1.9.97"></script>
-<script src="mk-custos.js?v=1.9.97"></script>
-<script src="mk-avulso.js?v=1.9.97"></script>
-<script src="mk-sync.js?v=1.9.97"></script>
-<script src="mk-nova.js?v=1.9.97"></script>
-<script src="mk-relacionamento.js?v=1.9.97"></script>
-<script src="mk-operacao.js?v=1.9.97"></script>
-<script src="mk-drawer.js?v=1.9.97"></script>
-<script src="mk-update.js?v=1.9.97"></script>
-<script src="mk-gestao-pessoas.js?v=1.9.97"></script>
-<script src="mk-holerite.js?v=1.9.97"></script>
-<script src="mk-gestao-pessoas-admin.js?v=1.9.97"></script>
-<script src="mk-auth.js?v=1.9.97"></script>
-<script src="mk-boot.js?v=1.9.97"></script>
+<script src="mk-globals.js?v=1.9.98"></script>
+<script src="mk-core.js?v=1.9.98"></script>
+<script src="mk-nav.js?v=1.9.98"></script>
+<script src="mk-admin.js?v=1.9.98"></script>
+<script src="mk-historico.js?v=1.9.98"></script>
+<script src="mk-custos-historico.js?v=1.9.98"></script>
+<script src="mk-sessao.js?v=1.9.98"></script>
+<script src="mk-home.js?v=1.9.98"></script>
+<script src="mk-meta-operador.js?v=1.9.98"></script>
+<script src="mk-custos.js?v=1.9.98"></script>
+<script src="mk-avulso.js?v=1.9.98"></script>
+<script src="mk-sync.js?v=1.9.98"></script>
+<script src="mk-nova.js?v=1.9.98"></script>
+<script src="mk-relacionamento.js?v=1.9.98"></script>
+<script src="mk-operacao.js?v=1.9.98"></script>
+<script src="mk-drawer.js?v=1.9.98"></script>
+<script src="mk-enc-extra.js?v=1.9.98"></script>
+<script src="mk-update.js?v=1.9.98"></script>
+<script src="mk-gestao-pessoas.js?v=1.9.98"></script>
+<script src="mk-holerite.js?v=1.9.98"></script>
+<script src="mk-gestao-pessoas-admin.js?v=1.9.98"></script>
+<script src="mk-auth.js?v=1.9.98"></script>
+<script src="mk-boot.js?v=1.9.98"></script>
 </body>
 </html>

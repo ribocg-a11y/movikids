@@ -206,7 +206,11 @@ function renderEncerrarModal_(session, fin) {
     html += '<div class="modal-info-row total"><span>TOTAL A COBRAR</span><span>R$ ' + vTotalStr + '</span></div>';
   }
   document.getElementById('enc-info').innerHTML = html;
-  mkEncExtraResetUi_(session, fin);
+  if (typeof mkEncExtraInitForSession_ === 'function') {
+    mkEncExtraInitForSession_(session, 'drawer');
+  } else {
+    mkEncExtraResetUi_(session, fin);
+  }
 
   const warn = document.getElementById('enc-offline-warn');
   const admWrap = document.getElementById('enc-adm-extra-wrap');
@@ -246,95 +250,30 @@ function fecharEncModal() {
   const w = document.getElementById('enc-offline-warn');
   const wrap = document.getElementById('enc-adm-extra-wrap');
   const chk = document.getElementById('enc-adm-extra-local');
-  mkEncExtraResetUi_(null, null);
   if (w) { w.style.display = 'none'; w.textContent = ''; }
   if (wrap) wrap.style.display = 'none';
   if (chk) chk.checked = false;
   encSession = null;
 }
 
+/** Legado — fallback se mk-enc-extra.js não carregou */
 function mkEncExtraResetUi_(session, fin) {
-  const box = document.getElementById('enc-extra-wrap');
-  const cancel = document.getElementById('enc-extra-cancel');
-  const justWrap = document.getElementById('enc-extra-just-wrap');
-  const just = document.getElementById('enc-extra-just');
-  const lead = document.getElementById('enc-extra-lead');
-  if (!box) return;
-  const show = fin && fin.minExtraCobrados > 0 && !fin.somentePlano;
-  box.hidden = !show;
-  if (cancel) cancel.checked = false;
-  if (just) just.value = '';
-  if (justWrap) justWrap.hidden = true;
-  document.querySelectorAll('.enc-extra-pag-btn').forEach(function (b) {
-    b.classList.remove('active');
-    b.disabled = false;
-  });
-  if (session) {
-    session._extraPagamento = '';
-    session._cancelarExtras = false;
-    session._justificativaExtras = '';
-  }
-  if (lead && show) {
-    lead.textContent = fin.minExtraCobrados + ' min extras · R$ '
-      + fin.vExtra.toFixed(2).replace('.', ',') + ' — informe o pagamento ou cancele com justificativa.';
-  }
-}
-
-function mkEncExtraPickPag_(pag) {
-  if (!encSession) return;
-  const cancel = document.getElementById('enc-extra-cancel');
-  if (cancel && cancel.checked) return;
-  encSession._extraPagamento = pag;
-  encSession._cancelarExtras = false;
-  document.querySelectorAll('.enc-extra-pag-btn').forEach(function (b) {
-    b.classList.toggle('active', b.getAttribute('data-pag') === pag);
-  });
-}
-
-function mkEncExtraToggleCancel_() {
-  if (!encSession) return;
-  const cancel = document.getElementById('enc-extra-cancel');
-  const justWrap = document.getElementById('enc-extra-just-wrap');
-  const just = document.getElementById('enc-extra-just');
-  const on = !!(cancel && cancel.checked);
-  encSession._cancelarExtras = on;
-  if (on) {
-    encSession._extraPagamento = '';
-    document.querySelectorAll('.enc-extra-pag-btn').forEach(function (b) {
-      b.classList.remove('active');
-      b.disabled = true;
-    });
-    if (justWrap) justWrap.hidden = false;
-    if (just) just.focus();
-  } else {
-    document.querySelectorAll('.enc-extra-pag-btn').forEach(function (b) { b.disabled = false; });
-    if (justWrap) justWrap.hidden = true;
-    if (just) just.value = '';
-    encSession._justificativaExtras = '';
+  if (typeof mkEncExtraInitForSession_ === 'function') {
+    mkEncExtraInitForSession_(session, 'drawer');
+    return;
   }
 }
 
 function mkEncExtraValidate_(session, fin) {
+  if (typeof mkEncExtraSyncJustToSession_ === 'function') {
+    mkEncExtraSyncJustToSession_(session, 'drawer');
+  }
+  if (typeof mkEncExtraValidateState_ === 'function') {
+    return mkEncExtraValidateState_(session, fin);
+  }
   if (!fin || fin.minExtraCobrados <= 0 || fin.somentePlano) return { ok: true };
-  const cancel = document.getElementById('enc-extra-cancel');
-  const just = document.getElementById('enc-extra-just');
-  if (cancel && cancel.checked) {
-    const txt = String((just && just.value) || '').trim();
-    if (txt.length < 5) {
-      return { ok: false, msg: 'Informe a justificativa para cancelar os minutos extras (mín. 5 caracteres).' };
-    }
-    session._cancelarExtras = true;
-    session._justificativaExtras = txt;
-    return { ok: true, cancelarExtras: true, justificativaExtras: txt };
-  }
-  const pag = session._extraPagamento || '';
-  if (!pag) {
-    return { ok: false, msg: 'Selecione como os minutos extras foram pagos (PIX, crédito, débito ou dinheiro).' };
-  }
-  return { ok: true, extraPagamento: pag };
+  return { ok: false, msg: 'Informe o pagamento dos minutos extras.' };
 }
-window.mkEncExtraPickPag_ = mkEncExtraPickPag_;
-window.mkEncExtraToggleCancel_ = mkEncExtraToggleCancel_;
 
 async function confirmarEncerrar() {
   if (!encSession) return;
@@ -351,10 +290,11 @@ async function confirmarEncerrar() {
     const extraVal = mkEncExtraValidate_(encSession, fin);
     if (!extraVal.ok) {
       toast(extraVal.msg, 'error');
+      if (typeof mkEncExtraRefreshAll_ === 'function') mkEncExtraRefreshAll_(encSession);
+      const box = document.getElementById('enc-extra-wrap');
+      if (box) box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       const just = document.getElementById('enc-extra-just');
-      if (just && document.getElementById('enc-extra-cancel') && document.getElementById('enc-extra-cancel').checked) {
-        just.focus();
-      }
+      if (just && extraVal.field === 'just') just.focus();
       return;
     }
 
@@ -390,6 +330,8 @@ async function confirmarEncerrar() {
     });
 
     if (!d.ok) { toast('Erro: ' + d.erro, 'error'); return; }
+
+    if (typeof mkExtraPagClear_ === 'function') mkExtraPagClear_(encSession);
 
     // Remove from local sessions
     sessions = sessions.filter(s => s.rowIndex !== encSession.rowIndex);
@@ -461,7 +403,12 @@ async function confirmarEncerrar() {
   } catch(e) {
     toast('Erro de conexão.', 'error');
   } finally {
-    btn.textContent = '✓ Confirmar encerramento'; btn.disabled = false;
+    if (encSession && typeof mkEncExtraRefreshAll_ === 'function') {
+      mkEncExtraRefreshAll_(encSession);
+    } else {
+      btn.textContent = '✓ Confirmar encerramento';
+      btn.disabled = false;
+    }
   }
 }
 

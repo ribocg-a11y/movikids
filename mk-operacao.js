@@ -38,7 +38,7 @@ function showAlertModal(s, expired) {
   document.getElementById('alert-title').textContent = expired ? 'Tempo esgotado!' : 'Faltam 5 minutos!';
   document.getElementById('alert-sub').textContent   = expired
     ? (qrOnly
-      ? 'Minutos extras em andamento. Oriente o responsável pelo QR do portal na mesa.'
+      ? 'Minutos extras em andamento. Passo 1: toque como o cliente pagou. Passo 2: encerre.'
       : (admIgnoraSms
         ? 'Administrador: você pode encerrar sem enviar SMS (use em falha de rede ou emergência).'
         : 'Envie a mensagem ao responsável informando que minutos extras serão cobrados.'))
@@ -59,7 +59,22 @@ function showAlertModal(s, expired) {
   const btnEncAlert = document.getElementById('btn-enc-alert');
   if (btnEncAlert) {
     btnEncAlert.className = 'btn btn-encerrar' + (smsExtraObrigatorio ? ' danger' : '');
-    btnEncAlert.textContent = admIgnoraSms && expired ? '✓ Encerrar sem SMS (ADM)' : '✓ Encerrar locação';
+  }
+
+  const alertExtraWrap = document.getElementById('alert-enc-extra-wrap');
+  const showExtraPay = expired && qrOnly && s.started;
+  if (alertExtraWrap) {
+    alertExtraWrap.hidden = !showExtraPay;
+  }
+  if (showExtraPay && typeof mkEncExtraInitForSession_ === 'function') {
+    mkEncExtraInitForSession_(s, 'alert');
+  } else if (typeof mkEncExtraUpdateConfirmBtn_ === 'function') {
+    const finAlert = typeof mkEncExtraFinForSession_ === 'function'
+      ? mkEncExtraFinForSession_(s, false) : { minExtraCobrados: 0 };
+    mkEncExtraUpdateConfirmBtn_(s, finAlert, 'btn-enc-alert');
+    if (btnEncAlert) {
+      btnEncAlert.textContent = admIgnoraSms && expired ? '✓ Encerrar locação' : '✓ Encerrar locação';
+    }
   }
 
   const btnPular = document.getElementById('btn-pular-alerta');
@@ -534,6 +549,21 @@ async function abrirWaMsg(s) {
 
 function encerrarDireto() {
   if (!alertSession) return;
+  const fin = typeof mkEncExtraFinForSession_ === 'function'
+    ? mkEncExtraFinForSession_(alertSession, false) : { minExtraCobrados: 0 };
+  if (typeof mkEncExtraSyncJustToSession_ === 'function') {
+    mkEncExtraSyncJustToSession_(alertSession, 'alert');
+  }
+  if (typeof mkEncExtraValidateState_ === 'function') {
+    const extraVal = mkEncExtraValidateState_(alertSession, fin);
+    if (!extraVal.ok) {
+      toast(extraVal.msg, 'error');
+      if (typeof mkEncExtraRefreshAll_ === 'function') mkEncExtraRefreshAll_(alertSession);
+      const wrap = document.getElementById('alert-enc-extra-wrap');
+      if (wrap) wrap.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      return;
+    }
+  }
   const rowIndex = alertSession.rowIndex;
   const qrOnly = typeof mkComunicacaoQrOnly_ === 'function' && mkComunicacaoQrOnly_();
   const admIgnoraSms = qrOnly || (typeof mkAdminIgnoraSmsObrigatorio_ === 'function' && mkAdminIgnoraSmsObrigatorio_());
