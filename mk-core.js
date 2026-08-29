@@ -222,6 +222,7 @@ async function init() {
 
   agendarProximoPoll();
   if (typeof mkSyncWireEvents_ === 'function') mkSyncWireEvents_();
+  if (typeof mkOfflineWire_ === 'function') mkOfflineWire_();
 
   setInterval(() => {
     const adminPage = document.getElementById('page-admin');

@@ -92,7 +92,14 @@ async function api(params, timeoutMs = 25000, fetchInit) {
     Object.assign(payload, operadorApiParams_());
   }
   const qs = new URLSearchParams(payload).toString();
-  return mkApiFetchJson_(`${gasUrl}?${qs}`, init, timeoutMs);
+  try {
+    return await mkApiFetchJson_(`${gasUrl}?${qs}`, init, timeoutMs);
+  } catch (e) {
+    if (typeof mkOfflineHandleWriteFail_ === 'function' && typeof mkOfflineCanQueue_ === 'function' && mkOfflineCanQueue_(action)) {
+      return mkOfflineHandleWriteFail_(payload, e);
+    }
+    throw e;
+  }
 }
 window.api = api;
 window.mkApiWarm_ = mkApiWarm_;

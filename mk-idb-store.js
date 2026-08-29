@@ -1,8 +1,9 @@
-/* MOVI KIDS — IndexedDB local store (Fase 1 leitura offline) v1.9.102 */
+/* MOVI KIDS — IndexedDB local store (Fase 1 leitura + Fase 2 fila) v1.9.104 */
 
 const MK_IDB_NAME = 'movikids_local_v1';
-const MK_IDB_VER = 1;
+const MK_IDB_VER = 2;
 const MK_IDB_STORE = 'kv';
+const MK_IDB_QUEUE = 'queue';
 
 function mkIdbOpen_() {
   return new Promise(function (resolve, reject) {
@@ -12,7 +13,9 @@ function mkIdbOpen_() {
     }
     const req = indexedDB.open(MK_IDB_NAME, MK_IDB_VER);
     req.onupgradeneeded = function (ev) {
-      ev.target.result.createObjectStore(MK_IDB_STORE);
+      const db = ev.target.result;
+      if (!db.objectStoreNames.contains(MK_IDB_STORE)) db.createObjectStore(MK_IDB_STORE);
+      if (!db.objectStoreNames.contains(MK_IDB_QUEUE)) db.createObjectStore(MK_IDB_QUEUE, { keyPath: 'id' });
     };
     req.onsuccess = function () { resolve(req.result); };
     req.onerror = function () { reject(req.error || new Error('idb open')); };
@@ -78,6 +81,51 @@ async function mkIdbClearSnapshot_() {
   }
 }
 
+function mkIdbQueueList_() {
+  return mkIdbOpen_().then(function (db) {
+    return new Promise(function (resolve, reject) {
+      const tx = db.transaction(MK_IDB_QUEUE, 'readonly');
+      const req = tx.objectStore(MK_IDB_QUEUE).getAll();
+      req.onsuccess = function () {
+        const list = (req.result || []).sort(function (a, b) { return (a.createdAt || 0) - (b.createdAt || 0); });
+        resolve(list);
+      };
+      req.onerror = function () { reject(req.error); };
+    });
+  }).catch(function () { return []; });
+}
+
+function mkIdbQueuePush_(item) {
+  return mkIdbOpen_().then(function (db) {
+    return new Promise(function (resolve, reject) {
+      const tx = db.transaction(MK_IDB_QUEUE, 'readwrite');
+      tx.objectStore(MK_IDB_QUEUE).put(item);
+      tx.oncomplete = function () { resolve(true); };
+      tx.onerror = function () { reject(tx.error); };
+    });
+  });
+}
+
+function mkIdbQueueRemove_(id) {
+  return mkIdbOpen_().then(function (db) {
+    return new Promise(function (resolve, reject) {
+      const tx = db.transaction(MK_IDB_QUEUE, 'readwrite');
+      tx.objectStore(MK_IDB_QUEUE).delete(id);
+      tx.oncomplete = function () { resolve(true); };
+      tx.onerror = function () { reject(tx.error); };
+    });
+  });
+}
+
+async function mkIdbQueueCount_() {
+  const list = await mkIdbQueueList_();
+  return list.length;
+}
+
 window.mkIdbGetSnapshot_ = mkIdbGetSnapshot_;
 window.mkIdbPutSnapshot_ = mkIdbPutSnapshot_;
 window.mkIdbClearSnapshot_ = mkIdbClearSnapshot_;
+window.mkIdbQueueList_ = mkIdbQueueList_;
+window.mkIdbQueuePush_ = mkIdbQueuePush_;
+window.mkIdbQueueRemove_ = mkIdbQueueRemove_;
+window.mkIdbQueueCount_ = mkIdbQueueCount_;

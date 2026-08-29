@@ -178,6 +178,7 @@ async function sincronizarServidor(force = false) {
     setStatus(true);
     aplicarDadosInicio(d);
     mkSyncClearBootPending_(false);
+    if (typeof mkOfflineFlush_ === 'function') mkOfflineFlush_().catch(function () { /* ignore */ });
 
   } catch(e) {
     _syncFailCount++;

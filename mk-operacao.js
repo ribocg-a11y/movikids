@@ -689,6 +689,14 @@ async function iniciarContagem(rowIndex, opts) {
   try {
     // I143: 28s — 15s gerava timeout falso + rollback + force sync frio (~80s)
     const d = await api({ action: 'iniciarTimer', rowIndex, timestamp: clickTs, ...operadorApiParams_() }, 28000);
+    if (d._offlineQueued) {
+      delete s._iniciandoTimer;
+      s._offlineTimerPending = true;
+      saveSessions();
+      if (typeof mkRefreshHomeUI_ === 'function') mkRefreshHomeUI_();
+      else renderCards();
+      return;
+    }
     if (!d.ok) throw new Error(d.erro || 'Servidor não confirmou o início.');
     const serverTs = Number(d.startTimestamp || 0);
     if (serverTs < 1e12) throw new Error('Servidor não gravou o início da contagem.');

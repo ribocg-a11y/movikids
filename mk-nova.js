@@ -1088,7 +1088,9 @@ async function novaSalvarItemSequencial_(it, basePayload, observacao, timeoutMs)
     started: false,
     alertFired5: false,
     alertFiredExp: false,
-    status: d.status || 'Pendente'
+    status: d.status || 'Pendente',
+    _offlinePending: !!d._offlineQueued,
+    _clientRequestId: d.clientRequestId || null
   });
   saveSessions();
   return { mesmaConta: !!d.mesmaConta };
