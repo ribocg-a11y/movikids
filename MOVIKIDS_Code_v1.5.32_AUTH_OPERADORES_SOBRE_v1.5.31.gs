@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.211
+// MOVI KIDS — Google Apps Script v1.5.212
+// v1.5.212: I148 — encerrarLocacao cancelarExtras/somentePlano: minUsados let (V8 const crash)
 // v1.5.211: I147 — Fase 2 offline: idempotencia clientRequestId em salvarLocacao + iniciarTimer (Cache 6h)
 // v1.5.210: I143 — bloquear salvar se veículo já Ativa/Pendente (anti-duplicata retry tablet)
 // v1.5.209: I134 — abonarFalta casa Date do Sheets (zera Sync jornada); Julia sem falta fantasma
@@ -203,8 +204,8 @@
 
 // ── CONSTANTES ───────────────────────────────────────────────
 /** Versão exposta em ping, carregarInicio, validarSchema, gestaoPessoasStatus (bump com header). */
-const MK_GAS_VERSAO_  = 'v1.5.211';
-const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.211';
+const MK_GAS_VERSAO_  = 'v1.5.212';
+const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.212';
 const SHEET_ID   = '1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618';
 const DEPLOY_ID  = 'AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y';
 const WEBAPP_URL = `https://script.google.com/macros/s/${DEPLOY_ID}/exec`;
@@ -4011,7 +4012,7 @@ function encerrarLocacao_(p) {
   const lockE = LockService.getScriptLock();
   try { lockE.waitLock(6000); } catch(ex) { return err_('Sistema ocupado.', 503); }
   const rowIndex  = parseInt(p.rowIndex  || '0');
-  const minUsados = parseInt(p.minUsados || '0');
+  let minUsados = parseInt(p.minUsados || '0');
 
   if (!rowIndex || rowIndex < DATA_ROW) return err_('rowIndex inválido', 400);
   if (isNaN(minUsados) || minUsados < 0) return err_('minUsados inválido', 400);
