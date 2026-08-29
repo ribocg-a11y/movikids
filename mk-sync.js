@@ -318,11 +318,28 @@ function aplicarDadosInicio(d) {
     }
     if (typeof mkMetaApplyFromInicio_ === 'function') mkMetaApplyFromInicio_(d);
 
-    sessions = d.ativos.map(s => mergeSessaoCanonica(s, storedMap[s.rowIndex] || {}));
+    const merged = d.ativos.map(s => mergeSessaoCanonica(s, storedMap[s.rowIndex] || {}));
+    const mergedRows = new Set(merged.map(s => s.rowIndex));
+    // I122/I143: não apagar Pendente/▶ local enquanto sync lento ainda não listou a linha
+    const orphans = cleanedStored.filter(function (s) {
+      if (!s || !s.rowIndex || mergedRows.has(s.rowIndex)) return false;
+      if (s._optimistic || s._iniciandoTimer) return true;
+      if (window._mkTimerInFlight && s.status === 'Ativa') return true;
+      if (s.status === 'Pendente' || s.status === 'Ativa') {
+        const age = Date.now() - Number(s._savedAt || s._criado || 0);
+        if (s._savedAt || s._criado) return age < 120000;
+      }
+      return false;
+    });
+    sessions = merged.concat(orphans);
     saveSessions();
 
-    renderCards();
-    updateStats();
+    if (typeof mkShouldRefreshHomeCards_ === 'function' && !mkShouldRefreshHomeCards_()) {
+      updateStats();
+    } else {
+      renderCards();
+      updateStats();
+    }
 
     if (d.encHoje && d.fonte !== 'firebase') {
       if (typeof renderEncHojeList_ === 'function') renderEncHojeList_(d.encHoje);

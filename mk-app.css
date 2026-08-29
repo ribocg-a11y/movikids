@@ -272,6 +272,7 @@ html,body{height:100%;background:var(--bg);color:var(--txt);overflow:hidden}
   border:none;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:800;
   border-radius:var(--radius-sm);padding:10px 8px;font-size:13px;
   transition:transform .1s,opacity .2s;display:flex;align-items:center;justify-content:center;gap:6px;
+  touch-action:manipulation;-webkit-tap-highlight-color:transparent;min-height:44px;
 }
 .btn:active{transform:scale(.96)}
 .btn-wa{background:#25D366;color:#fff}
@@ -1762,7 +1763,7 @@ html,body{height:100%;background:var(--bg);color:var(--txt);overflow:hidden}
 .enc-extra-cancel-lbl{display:flex;align-items:flex-start;gap:8px;font-size:12px;font-weight:700;margin:8px 0;color:var(--txt)}
 .enc-extra-just-wrap{margin-top:10px}
 .enc-extra-just-lbl{display:block;font-size:12px;font-weight:800;margin-bottom:6px;color:var(--txt)}
-.enc-extra-just{width:100%;min-height:72px;resize:vertical}
+.enc-extra-just{width:100%;min-height:72px;resize:vertical;user-select:text;-webkit-user-select:text}
 .enc-extra-just-hint{font-size:11px;color:var(--orange);font-weight:700;margin:6px 0 0}
 .enc-extra-wrap--alert{margin:0 0 12px;padding:12px;border-radius:14px;background:rgba(255,255,255,.65)}
 .enc-extra-same-btn{

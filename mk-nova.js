@@ -516,8 +516,9 @@ function upsertSessaoPendenteLocal_(payload) {
   const idx = sessions.findIndex(function(s) {
     return (row && Number(s.rowIndex) === row) || (id && Number(s.id) === id);
   });
-  if (idx >= 0) sessions[idx] = Object.assign({}, sessions[idx], payload);
-  else sessions.push(payload);
+  const merged = Object.assign({}, payload, { _savedAt: Date.now() });
+  if (idx >= 0) sessions[idx] = Object.assign({}, sessions[idx], merged);
+  else sessions.push(merged);
 }
 
 /** I91 — Home imediata após salvar/▶ (não esperar carregarInicio). */

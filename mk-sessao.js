@@ -302,8 +302,10 @@ function startTimerLoop() {
     sessions.forEach(s => checkTimer(s));
     sessions.forEach(s => checkShake(s));
     reconsultarSmsPendentes_();
-    renderCards();
-    updateStats();
+    if (typeof mkShouldRefreshHomeCards_ !== 'function' || mkShouldRefreshHomeCards_()) {
+      renderCards();
+      updateStats();
+    }
     const painelPage = document.getElementById('page-painel');
     if (painelPage && painelPage.classList.contains('active') && typeof renderPainel === 'function') renderPainel();
   }, 1000);

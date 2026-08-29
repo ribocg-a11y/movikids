@@ -277,6 +277,8 @@ function mkEncExtraValidate_(session, fin) {
 
 async function confirmarEncerrar() {
   if (!encSession) return;
+  if (window._mkEncerrarInFlight) return;
+  window._mkEncerrarInFlight = true;
   const btn = document.getElementById('btn-enc-confirm');
   btn.textContent = '⏳ Encerrando...'; btn.disabled = true;
 
@@ -403,6 +405,7 @@ async function confirmarEncerrar() {
   } catch(e) {
     toast('Erro de conexão.', 'error');
   } finally {
+    window._mkEncerrarInFlight = false;
     if (encSession && typeof mkEncExtraRefreshAll_ === 'function') {
       mkEncExtraRefreshAll_(encSession);
     } else {

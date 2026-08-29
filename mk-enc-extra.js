@@ -41,15 +41,18 @@ function mkEncExtraNeedsInput_(fin) {
   return !!(fin && fin.minExtraCobrados > 0 && !fin.somentePlano);
 }
 
-function mkEncExtraReadJustFromDom_(scope) {
+function mkEncExtraReadJustFromDom_(scope, forValidate) {
   const id = scope === 'alert' ? 'alert-enc-extra-just' : 'enc-extra-just';
   const el = document.getElementById(id);
-  return el ? String(el.value || '').trim() : '';
+  if (!el) return '';
+  const v = String(el.value || '');
+  // I85: nunca .trim() no oninput — apaga espaço entre palavras enquanto digita
+  return forValidate ? v.trim() : v;
 }
 
 function mkEncExtraSyncJustToSession_(session, scope) {
   if (!session || !session._cancelarExtras) return;
-  session._justificativaExtras = mkEncExtraReadJustFromDom_(scope);
+  session._justificativaExtras = mkEncExtraReadJustFromDom_(scope, false);
 }
 
 function mkEncExtraValidateState_(session, fin) {
@@ -186,7 +189,9 @@ function mkEncExtraSyncScopeUi_(session, fin, scope) {
   const just = document.getElementById(isAlert ? 'alert-enc-extra-just' : 'enc-extra-just');
   if (cancel) cancel.checked = !!session._cancelarExtras;
   if (justWrap) justWrap.hidden = !session._cancelarExtras;
-  if (just && session._justificativaExtras) just.value = session._justificativaExtras;
+  if (just && document.activeElement !== just) {
+    just.value = session._justificativaExtras || '';
+  }
 
   mkEncExtraSyncPagButtons_(session, scope);
 
@@ -255,19 +260,38 @@ function mkEncExtraUpdateConfirmBtn_(session, fin, btnId) {
   mkEncExtraBindConfirmBtn_(session, fin, btnId, ready);
 }
 
-function mkEncExtraRefreshAll_(session) {
-  if (!session) return;
-  mkExtraPagRestore_(session);
-  const admChk = document.getElementById('enc-adm-extra-local');
-  const fin = mkEncExtraFinForSession_(session, !!(admChk && admChk.checked));
-  mkEncExtraSyncScopeUi_(session, fin, 'drawer');
-  mkEncExtraSyncScopeUi_(session, fin, 'alert');
+function mkEncExtraRefreshUiOnly_(session, fin) {
+  mkEncExtraRenderChecklist_(session, fin, 'enc-checklist');
+  mkEncExtraRenderChecklist_(session, fin, 'alert-enc-checklist');
+  mkEncExtraRenderHint_(session, fin, 'enc-extra-hint', 'drawer');
+  mkEncExtraRenderHint_(session, fin, 'alert-enc-extra-hint', 'alert');
   mkEncExtraUpdateConfirmBtn_(session, fin, 'btn-enc-confirm');
   mkEncExtraUpdateConfirmBtn_(session, fin, 'btn-enc-alert');
-  if (typeof renderCards === 'function') renderCards();
 }
 
+function mkEncExtraRefreshAll_(session, opts) {
+  opts = opts || {};
+  if (!session) return;
+  if (!opts.skipRestore) mkExtraPagRestore_(session);
+  const admChk = document.getElementById('enc-adm-extra-local');
+  const fin = mkEncExtraFinForSession_(session, !!(admChk && admChk.checked));
+  if (opts.light) {
+    mkEncExtraRefreshUiOnly_(session, fin);
+  } else {
+    mkEncExtraSyncScopeUi_(session, fin, 'drawer');
+    mkEncExtraSyncScopeUi_(session, fin, 'alert');
+    mkEncExtraUpdateConfirmBtn_(session, fin, 'btn-enc-confirm');
+    mkEncExtraUpdateConfirmBtn_(session, fin, 'btn-enc-alert');
+  }
+  if (!opts.skipCards && typeof renderCards === 'function') renderCards();
+}
+
+var _mkEncExtraPickGuardAt_ = 0;
+
 function mkEncExtraPickPag_(pag, scope) {
+  const now = Date.now();
+  if (now - _mkEncExtraPickGuardAt_ < 350) return;
+  _mkEncExtraPickGuardAt_ = now;
   const session = scope === 'alert'
     ? (typeof alertSession !== 'undefined' ? alertSession : null)
     : (typeof encSession !== 'undefined' ? encSession : null);
@@ -323,9 +347,9 @@ function mkEncExtraOnJustInput_(scope) {
     ? (typeof alertSession !== 'undefined' ? alertSession : null)
     : (typeof encSession !== 'undefined' ? encSession : null);
   if (!session) return;
-  session._justificativaExtras = mkEncExtraReadJustFromDom_(scope);
+  session._justificativaExtras = mkEncExtraReadJustFromDom_(scope, false);
   mkExtraPagPersist_(session);
-  mkEncExtraRefreshAll_(session);
+  mkEncExtraRefreshAll_(session, { light: true, skipCards: true, skipRestore: true });
 }
 
 function mkEncExtraCardBannerHtml_(s) {

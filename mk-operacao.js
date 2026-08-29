@@ -621,15 +621,24 @@ function fecharBvSemIniciar_() {
 
 /** I20: ▶ na Home — sem modal SMS, sem SMS automático. */
 function iniciarContagemDireto_(rowIndex) {
+  window._mkStartRowsInFlight = window._mkStartRowsInFlight || {};
+  if (window._mkStartRowsInFlight[rowIndex]) return;
+  const s0 = sessions.find(x => x.rowIndex === rowIndex);
+  if (s0 && (typeof sessaoTimerIniciado_ === 'function' ? sessaoTimerIniciado_(s0) : (s0.started && s0.status === 'Ativa'))) {
+    toast('Contagem já iniciada.', 'info');
+    return;
+  }
   const card = document.getElementById('card-' + rowIndex);
   const btn = card && card.querySelector('.btn-iniciar');
   if (btn && btn.disabled) return;
+  window._mkStartRowsInFlight[rowIndex] = true;
   if (btn) {
     btn.disabled = true;
     btn.style.opacity = '0.7';
     btn.innerHTML = '⏳ Iniciando...';
   }
   iniciarContagem(rowIndex, { skipAutoPortal: true }).finally(() => {
+    delete window._mkStartRowsInFlight[rowIndex];
     const s = sessions.find(x => x.rowIndex === rowIndex);
     if (s && !s.started && btn) {
       btn.disabled = false;

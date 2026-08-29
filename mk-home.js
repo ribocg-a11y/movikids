@@ -19,6 +19,18 @@ function updateUI() {
   // atualizarVeiculoGrid: chamada apenas quando necessário (não a cada 1s)
 }
 
+/** Drawer/modal aberto — evita re-render pesado a cada 1s (toque/teclado mais fluido). */
+function mkShouldRefreshHomeCards_() {
+  const drawer = document.getElementById('sess-drawer');
+  if (drawer && drawer.classList.contains('show')) return false;
+  const alertM = document.getElementById('alert-modal');
+  if (alertM && alertM.classList.contains('show')) return false;
+  const waBv = document.getElementById('wa-bv-modal');
+  if (waBv && waBv.classList.contains('show')) return false;
+  return true;
+}
+window.mkShouldRefreshHomeCards_ = mkShouldRefreshHomeCards_;
+
 function renderCards() {
   const container = document.getElementById('sessions-container');
 
