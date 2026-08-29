@@ -2,7 +2,7 @@
 
 Referência única para alinhamento local × produção.
 
-**Ciclo dev ativo:** **`PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`** — Sprint D · **I146** P0 local-first ✅ · **I143** ✅ · **I144** ops PIN ✅ · **I145** sync idle warm ✅  
+**Ciclo dev ativo:** **`PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`** — Sprint D · **I147** Fase 2 offline ✅ · **I146** ✅ · **I145** ✅ · **I143** ✅  
 **Diagnóstico 6 camadas:** **`DIAGNOSTICO_SISTEMA_6_CAMADAS_2026-06.md`**  
 **Prioridades gerais:** **`PLANEJAMENTO_ATUAL_2026-06.md`** §9
 
@@ -11,7 +11,7 @@ Referência única para alinhamento local × produção.
 **Acessos:** **`ACESSOS_E_AUTORIZACOES.md`** — papéis, PIN admin, agente vs humano  
 **Índice:** `../INDICE.md` · **Prioridades:** **`PLANO_PRIORIDADES_2026-06.md`**  
 **Planejamento ativo:** `PLANEJAMENTO_ATUAL_2026-06.md`  
-**Mapa de erros/bugs:** **`MAPA_ERROS_FALHAS_BUGS.md`** (família I20/I32/I99/I122/I125/I143/I144/**I145**/**I146**)  
+**Mapa de erros/bugs:** **`MAPA_ERROS_FALHAS_BUGS.md`** (família I20/I32/I99/I122/I125/I143/I144/**I145**/**I146**/**I147**)  
 **Incidente I145:** **`INCIDENTE_I145_SYNC_FORCE_IDLE_2026-08-13.md`**  
 **Incidente I144:** **`INCIDENTE_I144_OPS_PIN_1416_LIBERAR_BALCAO_2026-08-12.md`** · `ops-balcao.html`  
 **Incidente I143:** **`INCIDENTE_I143_SALVAR_DUP_TIMEOUT_FORCE_2026-08-06.md`**  
@@ -38,11 +38,11 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 | Camada | Versão | URL / evidência |
 |--------|--------|-----------------|
-| **Frontend** | **v1.9.102** | https://ribocg-a11y.github.io/movikids/?force=1.9.102 |
-| **Gestão Pessoas** | **v1.9.102** | `gestao-pessoas.html?force=1.9.102` |
+| **Frontend** | **v1.9.105** | https://ribocg-a11y.github.io/movikids/?force=1.9.105 |
+| **Gestão Pessoas** | **v1.9.105** | `gestao-pessoas.html?force=1.9.105` |
 | **Portal acompanhar** | **v1.9.96** | `acompanhar.html` |
-| **Service Worker** | **1.9.102** | `sw.js` · Fase 1 IndexedDB |
-| **Apps Script** | **v1.5.210** Web ✅ | ping alinhado 13/08 · I143 + I145 FE |
+| **Service Worker** | **1.9.105** | `sw.js` · Fase 1 IDB + Fase 2 fila |
+| **Apps Script** | **v1.5.211** Web ✅ | ping alinhado · I147 · I143 |
 | **I145 sync idle** | ✅ | idle/visibility **sem** force=1 · warm ~1–2s |
 | **I143 salvar/▶** | ✅ | mediana ~3.9s / ~3.1s · dup 409 · limpeza OK |
 | **Holerite Q1 15/07** | I108–I114+I138 | Ray pacote **R$ 998,40** · Julia **R$ 948,40** (VT fora) |
@@ -58,14 +58,14 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 | **Ciclo dev** | Sprint D | One UI ✅ · I125–I143 |
 | **I103 / I117** | ✅ | Encerradas=contas · Caixa pay-first |
 | **BANCO_HORAS** | ✅ I129 | ops 1–4 **0h00** |
-| **I129 ponto colab** | ✅ | FE v1.9.75+ · GAS Web **v1.5.210** |
+| **I129 ponto colab** | ✅ | FE v1.9.75+ · GAS Web **v1.5.211** |
 | **Aba FOLHA** | I68 | [gid=179040058](https://docs.google.com/spreadsheets/d/1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618/edit#gid=179040058) · B68 **5253,96** |
 
 **Editor Apps Script:** https://script.google.com/home/projects/19SIhkX9Tk7FiJA1JXu1OrUwssHdr3H5zc8q3rOjmBvqgWfXuHlk8xyf8/edit
 
 **Teste rápido GAS (ping):**  
 https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec?action=ping  
-→ ping Web **v1.5.210** · I143 anti-duplicata veículo
+→ ping Web **v1.5.211** · I147 idempotência offline · I143 anti-duplicata
 
 **URL morta (não usar):** `AKfycbzc...` → 404
 

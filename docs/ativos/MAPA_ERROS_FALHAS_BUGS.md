@@ -1,6 +1,7 @@
 # MOVI KIDS — Mapa de erros, falhas e bugs
 
-**Atualizado:** 29/08/2026 — **I146** boot snapshot IndexedDB · FE **v1.9.102** · GAS Web **v1.5.210** ✅  
+**Atualizado:** 29/08/2026 — **I147** Fase 2 offline idempotência · FE **v1.9.105** · GAS Web **v1.5.211** ✅  
+**Uso anterior:** 29/08/2026 — **I146** boot snapshot IndexedDB · FE **v1.9.102** · GAS Web **v1.5.210** ✅  
 **Uso anterior:** 13/08/2026 — **I145** idle/visibility sem force=1 · FE **v1.9.97** · GAS Web **v1.5.210** ✅
 **Uso anterior:** 06/08/2026 — **I143** salvar/▶ timeout+duplicata · FE **v1.9.96** · GAS Web **v1.5.210** ✅  
 **Uso anterior:** 31/07/2026 — **I142b** PDF janela isolada · FE **v1.9.88** · GAS Web **v1.5.209** · holerite Q2 resto (I141)  
@@ -163,6 +164,7 @@ Doc longo: `INCIDENTE_I143_SALVAR_DUP_TIMEOUT_FORCE_2026-08-06.md`
 | **I126c** | **Faixa vermelha “Painel rápido” eterna + Escala OK** | Banner `_partial` em `gp-adm-err`; Escala já vinha do lite; promise resolvida bloqueava Folha full | FE **v1.9.72** remove banner lite · full só Folha/Avaliações · `gpAdmPanelInFlight_` | `mk-gestao-pessoas-admin.js` | sem faixa vermelha · Folha carrega ao abrir |
 | **I127** | **Holerite Q2: adiantamento 1ª = R$ 0** | Cód 410 zerado; DP exige desconto do adiantamento na 2ª (art. 462 CLT / Contábeis) | FE **v1.9.73** `mk-holerite.js` · GAS **v1.5.206** `adiantamentoQ1` | Q2: salário mês − adiantamento 40% − encargos | Raykelly: 410 ≈ R$ 648,40 |
 | **I128** | **Ficha: “Sem dias na competência” com ponto aberto** | Lite deixa `jornada.dias=[]`; full só rodava em Folha/Avaliações | FE **v1.9.74** Ficha pede full + loading jornada | `gpAdmEnsureFullPanel_('presenca')` | Raykelly Jul: 29 dias + 14:04 Aberto |
+| **I147** | **Fase 2 offline: replay duplicava salvar/▶** | Fila FE reenvia ao voltar rede; GAS sem idempotência | FE **v1.9.104–105** `clientRequestId` + fila · GAS **v1.5.211** `mkIdemLoad_/Store_` Cache 6h | `INCIDENTE_I147_*` · `mk-offline-queue.js` | replay devolve mesmo id/rowIndex/startTs |
 | **I146** | **Cards fantasma no boot (mk_sessions cru)** | `init()` carregava `mk_sessions` antes do sync; PWA mantém LS 24h | FE **v1.9.101–102** boot snapshot LS+**IndexedDB** · chip **local·nuvem** · limpar cache Diagnóstico | `INCIDENTE_I146_*` · `mk-local-snapshot.js` · `mk-idb-store.js` | planilha 0 abertas; UI sem fantasma |
 | **I145** | **Lentidão recorrente + fantasma PWA após idle/tela off** | `mk-sync` ainda `force=1` aos 30s hidden e 5 min idle — I143 só cortou o catch do ▶ | FE **v1.9.97** idle/visibility **warm** · `guard.i145.sync.warm` | `INCIDENTE_I145_*` | warm `carregarInicio` ~1–2s; sem force no unlock |
 | **I144** | **Liberar balcão pelo celular falhava (PIN 1416)** | HTML ops ainda mandava `adminPin=1416` (morto I64); 1421 OK | `ops-balcao.html` + liberar-* com PIN digitado · **sem** App Script | `INCIDENTE_I144_*` | liberar com PIN atual → `sessaoAtiva` null |

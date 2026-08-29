@@ -1,6 +1,6 @@
 # MOVI KIDS — Mapa do código e arquitetura
 
-**Atualizado:** 29/08/2026 (FE **v1.9.102** · GAS repo/ping **v1.5.210** · I146 P0 local-first · I141–I142 holerite · FASE 15+ One UI)  
+**Atualizado:** 29/08/2026 (FE **v1.9.105** · GAS repo/ping **v1.5.211** · I147 Fase 2 offline · I146 P0 local-first · I141–I142 holerite · FASE 15+ One UI)  
 **Função:** anatomia do sistema — o que é cada parte, o que liga com o quê, o que é zona sensível.  
 **Complementa:** `ESTADO_ATUAL.md`, `ACESSOS_E_AUTORIZACOES.md`, `REGRAS_DE_PUBLICACAO_SEGURA.md`, `MAPA_ERROS_FALHAS_BUGS.md`, **`PROTOCOLO_DIAGNOSTICO_E_TESTES.md`**
 
@@ -11,7 +11,7 @@
 | Parte | O que é no MOVI KIDS | Arquivos / camada |
 |-------|----------------------|-------------------|
 | **Cérebro** | Regras de negócio, dados, financeiro, auth servidor | `MOVIKIDS_Code_...gs` (GAS) + planilha `MOVIKIDS_Planilha_Base` |
-| **Coração** | Pulso operacional — sync balcão, timer, locações ativas | `carregarInicio` (GAS) + `syncController` (`mk-sync.js`) + snapshot local (`mk-local-snapshot.js` · `mk-idb-store.js`) + Firebase `sessoes` |
+| **Coração** | Pulso operacional — sync balcão, timer, locações ativas | `carregarInicio` (GAS) + `syncController` (`mk-sync.js`) + snapshot local (`mk-local-snapshot.js` · `mk-idb-store.js`) + fila offline (`mk-offline-queue.js`) + Firebase `sessoes` |
 | **Sistema nervoso** | Comunicação FE ↔ GAS | `api()` em `mk-api.js` + `doGet`/`dispatchMoviAction_` (GAS) |
 | **Rosto / identidade** | Versão, URL GAS, cache | `mk-version.js`, `sw.js`, bloco anti-stale no `index.html` |
 | **Imunológico** | Travas P0, CI, incidentes | `pre-push-check.ps1`, `.cursor/rules/`, `REGRAS_DE_PUBLICACAO_SEGURA.md` |
@@ -44,6 +44,7 @@ movikids-github/
 │   ├── mk-sync.js          ← syncController + merge (M.4)
 │   ├── mk-idb-store.js     ← IndexedDB snapshot Fase 1 (v1.9.102)
 │   ├── mk-local-snapshot.js← boot local-first P0/P1 (v1.9.102)
+│   ├── mk-offline-queue.js ← fila offline salvar/▶ Fase 2 (v1.9.104)
 │   ├── mk-sessao.js        ← SMS + timer sessão (M.5)
 │   ├── mk-nova.js          ← Nova locação (M.6)
 │   ├── mk-drawer.js        ← Drawer + encerrar (M.7)

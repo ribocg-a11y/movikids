@@ -1,6 +1,6 @@
 # MOVI KIDS — Protocolo "Atualize tudo"
 
-**Criado:** 14/06/2026 · **Última execução:** 29/08/2026 (FE **v1.9.102** · GAS Web **v1.5.210** · I146 / I145 / I143 / I85)  
+**Criado:** 14/06/2026 · **Última execução:** 29/08/2026 (FE **v1.9.105** · GAS Web **v1.5.211** · I147 / I146 / I145 / I143 / I85)  
 **Função:** quando o usuário pedir **"atualize tudo"**, o agente segue **esta lista** — não só handoff parcial.  
 **Regra Cursor:** `.cursor/rules/atualize-tudo-movikids.mdc`
 
@@ -47,13 +47,13 @@ Sincronizar **documentação + estado operacional** do projeto com a realidade a
 
 | Camada | Versão | Evidência |
 |--------|--------|-----------|
-| GAS | **v1.5.210** Web ✅ | ping + I143 |
-| FE | **v1.9.102** | Pages live · `?force=1.9.102` · I146 Fase 1 IndexedDB |
+| GAS | **v1.5.211** Web ✅ | ping + I147 idempotência offline |
+| FE | **v1.9.105** | Pages live · `?force=1.9.105` · I147 Fase 2 offline + I146 IndexedDB |
 | Planilha FOLHA | **OK** | B9=8,80 · B10/B12=22 · B68=5253,96 |
 | Planilha | **OK** | schema 13/08 · **0** abertas 29/08 |
-| Homolog tablet | **⏳** | smoke D4 · FE **v1.9.102** |
+| Homolog tablet | **⏳** | smoke D4 · FE **v1.9.105** · teste offline I147 |
 | Holerite | I138–I142 | Q2 resto · PDF mês Ray/Julia |
-| Perf | I115–I125 · **I143** · **I145** · **I146** | salvar/▶ gates · idle warm · boot snapshot |
+| Perf | I115–I125 · **I143** · **I145** · **I146** · **I147** | salvar/▶ gates · idle warm · boot snapshot · fila offline |
 
 ---
 

@@ -1,7 +1,7 @@
 # MOVI KIDS — Planejamento pós One UI (jun–jul/2026)
 
 **Criado:** 27/06/2026 · **Substitui backlog ativo** de `PLANEJAMENTO_ONE_UI_2026-06.md` (Sprints A–C ✅)  
-**Produção (29/08/2026):** FE **v1.9.102** · GAS **v1.5.210** · Pages confirmado · I96–I142 · **I146** P0 local-first ✅  
+**Produção (29/08/2026):** FE **v1.9.105** · GAS **v1.5.211** · Pages confirmado · I96–I142 · **I146** P0 local-first ✅ · **I147** Fase 2 offline ✅  
 **Mestre:** `PLANO_PREMIUM_ONEUI_FASES_16_22_2026-06.md` · **Roteiro agente:** `ROTEIRO_AGENTE_OBRIGATORIO.md`
 
 ---
@@ -51,7 +51,7 @@
 | **D1** | Homolog **PC admin** v1.9.2 — comando, pills alerta, presença badges | Agente + sócio | ✅ **27/06** — ver `EVIDENCIA_SPRINT_D1_HOMOLOG_2026-06-27.md` |
 | **D2** | Checklist **FASE 17** critérios 3–4 ✅ | Ops/sócio | Critérios 1–6 ✅ · falta **7 F9** + assinatura |
 | **D3** | Decisão **17.5 F9** Supervisor | **Sócio** | Registro em `MATRIZ_PERMISSOES_PERFIS_2026-06.md` |
-| **D4** | Smoke tablet **v1.9.2** (sem regressão balcão) | Ops loja | F5/F7/F10/F11 + 1 locação teste |
+| **D4** | Smoke tablet **v1.9.105** (sem regressão balcão + teste offline) | Ops loja | F5/F7/F10/F11 + 1 locação teste + avião→salvar→rede |
 | **D5** | Marcar FASE 16/17 ✅ em `PLANO_PRIORIDADES` + `MAPA_FASES` | Agente | docs alinhados |
 | **D6** | GAS ping Web **v1.5.167** (se ainda 165) | Sócio | Nova versão Web · ping alinhado |
 
@@ -158,7 +158,7 @@ Paralelo contínuo:      ponto RH · pre-push · encerramento-sessao I24
 
 **Paralelo sócio:** D2 assinar F17 · D3 decisão F9.
 
-**Ops:** D4 smoke tablet **v1.9.88** (multi-veículo + timer + holerite).  
+**Ops:** D4 smoke tablet **v1.9.105** (multi-veículo + timer + holerite + offline I147).  
 **Depois:** Sprint E (FASE 19) se D2–D4 fecharem.
 
 ---

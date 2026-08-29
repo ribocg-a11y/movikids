@@ -2,93 +2,38 @@
 
 Sistema operacional de locações — balcão (tablet na loja), portal do responsável, painel admin.
 
-**Modelo operacional:** o sócio/dev trabalha no **computador** (Cursor, deploy, testes). O **tablet fica no balcão** com os operadores. Ver `HANDOFF_NOVO_CHAT.md` § Modelo operacional.
-
-**Ciclo ativo (29/08/2026):** **Sprint D pós One UI** — `docs/ativos/PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md` · FE **v1.9.102** · GAS **v1.5.210** · **I146** / **I145** / **I143** / **I85 enc extra**
+**Ciclo ativo (29/08/2026):** Sprint D · FE **v1.9.105** · GAS **v1.5.211** · **I147** / **I146** / **I145** / **I143**
 
 **Repo neste PC:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`
 
-## Mensagem mínima do usuário
+**Para retomar:**
 
-> *Vamos dar continuidade ao projeto Movi Kids, tem uma pasta no C da minha máquina.*
-
-**Para ciclo ativo / novo agente no PC:**
-
-> *Continuar MOVI KIDS no PC — HANDOFF_NOVO_CHAT.md. FE v1.9.102 / GAS v1.5.210. Tablet `?force=1.9.102`. Próximo: Sprint D smoke D4 · assinar FASE 17. Sem App Script.*
-
-## Antes de qualquer trabalho
-
-Leia **nesta ordem**:
-
-1. [`docs/ativos/HANDOFF_NOVO_CHAT.md`](docs/ativos/HANDOFF_NOVO_CHAT.md)
-2. [`docs/ativos/BASELINE_CODIGO_P0.md`](docs/ativos/BASELINE_CODIGO_P0.md) — **zonas congeladas — não mexer**
-3. [`docs/ativos/PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`](docs/ativos/PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md) — **ciclo ativo Sprint D**
-4. [`docs/ativos/PLANEJAMENTO_ONE_UI_2026-06.md`](docs/ativos/PLANEJAMENTO_ONE_UI_2026-06.md) — One UI fechado (referência)
-5. [`docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md`](docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md) — **antes de qualquer tela**
-6. [`docs/ativos/ESTADO_ATUAL.md`](docs/ativos/ESTADO_ATUAL.md) · [`DEPLOY_ATUAL.md`](docs/ativos/DEPLOY_ATUAL.md)
-7. [`docs/ativos/REGRAS_DE_PUBLICACAO_SEGURA.md`](docs/ativos/REGRAS_DE_PUBLICACAO_SEGURA.md)
-8. [`docs/ativos/ROTEIRO_AGENTE_OBRIGATORIO.md`](docs/ativos/ROTEIRO_AGENTE_OBRIGATORIO.md) — **ordem fixa commit/push/verify**
-
-Índice: [`docs/INDICE.md`](docs/INDICE.md)
+> *Continuar MOVI KIDS no PC — HANDOFF_NOVO_CHAT.md. FE v1.9.105 / GAS v1.5.211. Tablet `?force=1.9.105`. Fase 2 offline ✅. Próximo: smoke D4 · FASE 17.*
 
 ## Produção atual
 
 | Camada | Versão | Link |
 |--------|--------|------|
-| Frontend | **v1.9.102** | https://ribocg-a11y.github.io/movikids/?force=1.9.102 |
-| Gestão Pessoas | **v1.9.102** | `gestao-pessoas.html?force=1.9.102` |
-| GAS | **v1.5.210** Web ✅ | ping alinhado · I143 |
+| Frontend | **v1.9.105** | https://ribocg-a11y.github.io/movikids/?force=1.9.105 |
+| Gestão Pessoas | **v1.9.105** | `gestao-pessoas.html?force=1.9.105` |
+| GAS | **v1.5.211** Web ✅ | ping · I147 idempotência offline |
 | Design System | **v1.1** | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
-| Deploy ID | `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y` | |
-| Holerites PDF | jul/2026 | https://ribocg-a11y.github.io/movikids/entregas/holerite-mes-2026-07/ |
 
-**GAS raw (colar Editor — I76):** https://raw.githubusercontent.com/ribocg-a11y/movikids/main/MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs
+**GAS raw:** https://raw.githubusercontent.com/ribocg-a11y/movikids/main/MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs
 
-**Roteiro agente (obrigatório):** `docs/ativos/ROTEIRO_AGENTE_OBRIGATORIO.md`
-
-**GAS canônico:**  
+**GAS canônico (PC):**  
 `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github\MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs`
-
-**Alinhar pasta C (após push):**
 
 ```powershell
 cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github
 .\scripts\sync-pasta-c-pc.ps1
 ```
 
-## Estado do projeto (29/08/2026)
+## Estado (29/08/2026)
 
-- **FASE 0–15 + 15b:** ✅ prod
-- **FASE 14 mini-DRE:** ✅ prod
-- **FASE 16–17:** ✅ visual One UI · assinatura FASE 17 pendente Ops (**17.5 F9**)
-- **P0 local-first Fase 1:** ✅ FE **v1.9.102** — IndexedDB + snapshot · chip local/nuvem (**I146**)
-- **Homolog tablet:** ✅ 23/06 · FE atual **v1.9.102** — smoke D4 pendente Ops
-- **Planilha:** ✅ schema 13/08 · **0** abertas (29/08) · **I68 VT** ✅
-- **I96–I103 / I117 / I125:** ✅ multi-veículo · caixa · perf salvar/▶
-- **I138–I142:** ✅ holerite Q2 resto · PDF conferência · print janela isolada
-- **I143:** ✅ anti-duplicata salvar/▶
-- **I144:** ✅ ops-balcao.html PIN digitado
-- **I145:** ✅ idle/tela off sem force=1
-- **I146:** ✅ boot sem mk_sessions cru · fantasma PWA
-- **Travas I24:** ✅ `guard-i24-publicacao` + `encerramento-sessao`
-- **Próximo:** Tablet `?force=1.9.102` · Sprint D2–D4 — assinar FASE 17 · smoke tablet · Fase 2 offline (§7.3)
+- **Fase 1 local-first:** ✅ IndexedDB + snapshot (**I146**)
+- **Fase 2 offline:** ✅ fila FE + idempotência GAS (**I147**)
+- **Próximo (Ops):** tablet smoke D4 · teste offline · assinar FASE 17
+- **Encerrar toda resposta** com bloco **Versões (encerramento)** + Regra 16
 
-## Regras P0
-
-- Escritas GAS no browser = **GET** (I15)
-- GAS: **Nova versão** no mesmo Deploy ID — nunca `clasp deploy`
-- Tablet só se mudar `api()`, auth ou cronômetro
-- F4 (WhatsApp) e F9 (supervisor) **pausados**
-- Encerrar toda resposta com **Versões (encerramento)** + Regra 16
-
-## "Atualize tudo"
-
-[`docs/ativos/PROTOCOLO_ATUALIZAR_TUDO.md`](docs/ativos/PROTOCOLO_ATUALIZAR_TUDO.md)
-
-## Ao encerrar sessão
-
-Atualizar `HANDOFF_NOVO_CHAT.md` se mudou produção ou próximo passo.
-
-## Estudo do negócio
-
-Memorial break-even / ticket: [`docs/ativos/ESTUDO_NEGOCIO_BREAK_EVEN_TICKET_2026-07.md`](docs/ativos/ESTUDO_NEGOCIO_BREAK_EVEN_TICKET_2026-07.md) · CSV `docs/ativos/VIABILIDADE_NEGOCIO_MEMORIAL.csv` · script OAuth `scripts/criar-aba-viabilidade-negocio-oauth.cjs`.
+Ver `docs/ativos/HANDOFF_NOVO_CHAT.md` · `docs/ativos/PROTOCOLO_ATUALIZAR_TUDO.md`
