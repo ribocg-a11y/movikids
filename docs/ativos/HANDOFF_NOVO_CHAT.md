@@ -1,12 +1,12 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 29/08/2026 · FE **v1.9.101** · GAS repo/Web **v1.5.210** ✅ · **I145** · **I143** · encerrar extra **I85** v1.9.98–100  
+**Atualizado:** 29/08/2026 · FE **v1.9.102** · GAS repo/Web **v1.5.210** ✅ · **I145** · **I143** · encerrar extra **I85** v1.9.98–100  
 **Ambiente do agente:** **This PC** (Windows) — **não** Cloud. Pasta C já alinhada `8d3214f` (`git pull` 13/08).  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
 **I85 encerrar extra (29/08):** FE **v1.9.98–v1.9.101** — pagamento extra no alerta/drawer · justificativa · sync cards · toque.
 
-**P0 local-first (29/08):** FE **v1.9.101** — boot sem `mk_sessions` cru · snapshot `mk_snapshot_v1` · poll idle **60 s** · cache 1 h · sync horário warm · botão limpar cache no Diagnóstico. Tablet: `?force=1.9.101`.
+**P0 local-first (29/08):** FE **v1.9.101–102** — boot sem `mk_sessions` cru · snapshot `mk_snapshot_v1` (LS + **IndexedDB** Fase 1) · chip status **local · nuvem** · poll idle **60 s** · cache 1 h · sync horário warm · botão limpar cache no Diagnóstico. Tablet: `?force=1.9.102`.
 
 **I145 (13/08):** lentidão recorrente não foi regressão I143 — `mk-sync` ainda disparava `carregarInicio?force=1` ao desligar a tela (30s) e no idle 5 min. Planilha **0** Pendente/Ativa (fantasmas = cache PWA). FE warm sync. Doc: `INCIDENTE_I145_SYNC_FORCE_IDLE_2026-08-13.md`
 
@@ -44,7 +44,7 @@
 
 **Mensagem para retomar deste ponto (13/08 — cole esta):**
 
-> *Continuar MOVI KIDS no PC — HANDOFF_NOVO_CHAT.md. FE v1.9.101 / GAS v1.5.210. Tablet `?force=1.9.100` (PWA). Próximo: Sprint D smoke D4 · assinar FASE 17. Sem App Script.*
+> *Continuar MOVI KIDS no PC — HANDOFF_NOVO_CHAT.md. FE v1.9.102 / GAS v1.5.210. Tablet `?force=1.9.102` (PWA). Próximo: Sprint D smoke D4 · assinar FASE 17. Sem App Script.*
 
 **Mensagem para ciclo UI:**
 

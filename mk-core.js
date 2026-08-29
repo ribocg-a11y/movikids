@@ -194,7 +194,9 @@ async function init() {
   inicializarDraftNova_();
 
   const cached = JSON.parse(localStorage.getItem('mk_sessions') || '[]');
-  if (typeof mkBootLocalFirst_ === 'function') {
+  if (typeof mkBootLocalFirstAsync_ === 'function') {
+    await mkBootLocalFirstAsync_();
+  } else if (typeof mkBootLocalFirst_ === 'function') {
     mkBootLocalFirst_();
   } else if (cached.length > 0) {
     sessions = cached;

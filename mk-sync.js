@@ -376,13 +376,17 @@ function formatSyncAge_(diffMs) {
 }
 
 function mkSyncAgeSuffix_() {
-  if (!_lastSyncAt) {
-    if (window._mkSnapshotTs && typeof mkSnapshotAgeLabel_ === 'function') {
-      return ' · local ' + mkSnapshotAgeLabel_(window._mkSnapshotTs);
-    }
-    return '';
+  const parts = [];
+  if (window._mkSnapshotTs && typeof mkSnapshotAgeLabel_ === 'function') {
+    parts.push('local ' + mkSnapshotAgeLabel_(window._mkSnapshotTs));
   }
-  return ' · sync ' + formatSyncAge_(Date.now() - _lastSyncAt);
+  if (_lastSyncAt) {
+    parts.push('nuvem ' + formatSyncAge_(Date.now() - _lastSyncAt));
+  }
+  if (!parts.length && window._mkSnapshotTs && typeof mkSnapshotAgeLabel_ === 'function') {
+    return ' · local ' + mkSnapshotAgeLabel_(window._mkSnapshotTs);
+  }
+  return parts.length ? ' · ' + parts.join(' · ') : '';
 }
 
 function mkSyncRefreshAgeLabels_() {
