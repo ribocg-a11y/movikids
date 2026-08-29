@@ -1,6 +1,6 @@
 // MOVI KIDS - Service Worker 1.7.12
 
-const SW_VERSION = '1.9.98';
+const SW_VERSION = '1.9.99';
 
 const NETWORK_FIRST = [
   'index.html',
@@ -21,6 +21,7 @@ const NETWORK_FIRST = [
   'mk-sessao.js',
   'mk-nova.js',
   'mk-drawer.js',
+  'mk-enc-extra.js',
   'mk-operacao.js',
   'mk-home.js',
   'mk-meta-operador.js',

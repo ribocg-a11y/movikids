@@ -194,24 +194,65 @@ function mkEncExtraSyncScopeUi_(session, fin, scope) {
   mkEncExtraRenderHint_(session, fin, isAlert ? 'alert-enc-extra-hint' : 'enc-extra-hint', scope);
 }
 
+function mkEncExtraScrollToPay_(scope) {
+  const id = scope === 'alert' ? 'alert-enc-extra-wrap' : 'enc-extra-wrap';
+  const wrap = document.getElementById(id);
+  if (wrap) {
+    wrap.hidden = false;
+    wrap.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+}
+
+function mkEncExtraBindConfirmBtn_(session, fin, btnId, ready) {
+  const btn = document.getElementById(btnId);
+  if (!btn) return;
+  if (btnId === 'btn-enc-alert') {
+    btn.onclick = ready
+      ? function () { if (typeof encerrarDireto === 'function') encerrarDireto(); }
+      : function (e) {
+          if (e) { e.preventDefault(); e.stopPropagation(); }
+          mkEncExtraScrollToPay_('alert');
+          if (typeof toast === 'function') {
+            toast('Toque PIX, Crédito, Débito ou Dinheiro abaixo.', 'warning');
+          }
+          mkEncExtraRefreshAll_(session);
+        };
+  } else {
+    btn.onclick = ready
+      ? function () { if (typeof confirmarEncerrar === 'function') confirmarEncerrar(); }
+      : function (e) {
+          if (e) { e.preventDefault(); e.stopPropagation(); }
+          mkEncExtraScrollToPay_('drawer');
+          if (typeof toast === 'function') {
+            toast('Toque como o cliente pagou os minutos extras.', 'warning');
+          }
+          mkEncExtraRefreshAll_(session);
+        };
+  }
+}
+
 function mkEncExtraUpdateConfirmBtn_(session, fin, btnId) {
   const btn = document.getElementById(btnId);
   if (!btn) return;
   if (!mkEncExtraNeedsInput_(fin)) {
     btn.disabled = false;
+    btn.removeAttribute('aria-disabled');
     btn.classList.remove('enc-btn-blocked');
     if (btnId === 'btn-enc-alert') btn.textContent = '✓ Encerrar locação';
     else btn.textContent = '✓ Confirmar encerramento';
+    mkEncExtraBindConfirmBtn_(session, fin, btnId, true);
     return;
   }
   const ready = mkEncExtraValidateState_(session, fin).ok;
-  btn.disabled = !ready;
+  btn.disabled = false;
+  btn.setAttribute('aria-disabled', ready ? 'false' : 'true');
   btn.classList.toggle('enc-btn-blocked', !ready);
   if (btnId === 'btn-enc-alert') {
     btn.textContent = ready ? '✓ Encerrar locação' : '① Informe pagamento do extra';
   } else {
     btn.textContent = ready ? '✓ Confirmar encerramento' : '① Informe pagamento do extra';
   }
+  mkEncExtraBindConfirmBtn_(session, fin, btnId, ready);
 }
 
 function mkEncExtraRefreshAll_(session) {
