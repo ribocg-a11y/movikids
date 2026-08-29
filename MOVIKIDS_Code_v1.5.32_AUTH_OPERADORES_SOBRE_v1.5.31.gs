@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.212
+// MOVI KIDS — Google Apps Script v1.5.213
+// v1.5.213: I148 — corrigirCanceladaParaEncerradaAdmin (Cancelada→Encerrada caixa ADM)
 // v1.5.212: I148 — encerrarLocacao cancelarExtras/somentePlano: minUsados let (V8 const crash)
 // v1.5.211: I147 — Fase 2 offline: idempotencia clientRequestId em salvarLocacao + iniciarTimer (Cache 6h)
 // v1.5.210: I143 — bloquear salvar se veículo já Ativa/Pendente (anti-duplicata retry tablet)
@@ -204,8 +205,8 @@
 
 // ── CONSTANTES ───────────────────────────────────────────────
 /** Versão exposta em ping, carregarInicio, validarSchema, gestaoPessoasStatus (bump com header). */
-const MK_GAS_VERSAO_  = 'v1.5.212';
-const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.212';
+const MK_GAS_VERSAO_  = 'v1.5.213';
+const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.213';
 const SHEET_ID   = '1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618';
 const DEPLOY_ID  = 'AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y';
 const WEBAPP_URL = `https://script.google.com/macros/s/${DEPLOY_ID}/exec`;
@@ -239,7 +240,7 @@ const COL_AUDWA_READ_ = 12;
 const AUDWA_HEADERS_ = ['#', 'DataHora', 'Tipo', 'Status', 'RowIndex', 'Id', 'Responsavel', 'Crianca', 'Telefone', 'Origem', 'VersaoFrontend', 'Payload'];
 const COL_AUDR_READ_ = 7;
 const AUDR_HEADERS_ = ['timestamp', 'acao', 'telefone', 'antesJson', 'depoisJson', 'motivo', 'usuario'];
-const AUD_ACOES_LOC_VALIDAS_ = ['salvarLocacao', 'editarLocacao', 'cancelarLocacao', 'encerrarLocacao', 'iniciarTimer', 'estenderLocacao', 'limparLocacaoTesteAdmin', 'corrigirFinanceiroLocacaoAdmin', 'lancamentoAvulso'];
+const AUD_ACOES_LOC_VALIDAS_ = ['salvarLocacao', 'editarLocacao', 'cancelarLocacao', 'encerrarLocacao', 'iniciarTimer', 'estenderLocacao', 'limparLocacaoTesteAdmin', 'corrigirFinanceiroLocacaoAdmin', 'corrigirCanceladaParaEncerradaAdmin', 'lancamentoAvulso'];
 const AUD_ACOES_TURNO_VALIDAS_ = ['login', 'logout', 'logout_admin', 'logout_inatividade'];
 /** Camada 5 RH P0 — header L1, dados L2+ (I62). */
 const COL_COLAB_RH_READ_ = 19;
@@ -699,6 +700,7 @@ function dispatchMoviAction_(p, method) {
       case 'excluirOperadorSistema': return excluirOperadorSistema_(p);
       case 'resetarPinOperadorAdmin': return resetarPinOperadorAdmin_(p);
       case 'corrigirFinanceiroLocacaoAdmin': return corrigirFinanceiroLocacaoAdmin_(p);
+      case 'corrigirCanceladaParaEncerradaAdmin': return corrigirCanceladaParaEncerradaAdmin_(p);
       case 'limparLocacoesTesteAdmin': return limparLocacoesTesteAdmin_(p);
       case 'liberarSessaoOperador': return liberarSessaoOperador_(p);
       case 'liberarSessaoOperadorAdmin': return liberarSessaoOperadorAdmin_(p);
@@ -10991,6 +10993,77 @@ function corrigirFinanceiroLocacaoAdmin_(p) {
     const depois = locacaoObj_(rowAfter, rowIndex);
     registrarAuditoriaLocacao_(rowIndex, 'corrigirFinanceiroLocacaoAdmin', antes, depois, motivo, operadorAudit_(p));
     return resp_({ locacao: depois, mensagem: 'Locacao corrigida. Caixa e historico usam estes valores.' });
+  } finally { lock.releaseLock(); }
+}
+
+/** I148 — Cancelada→Encerrada (encerramento operacional perdido / caixa ADM). */
+function corrigirCanceladaParaEncerradaAdmin_(p) {
+  if (!isAdminRequest_(p)) return err_('Acesso negado — admin necessario', 403);
+  const rowIndex = parseInt(p.rowIndex || '0', 10);
+  const motivo = String(p.motivo || '').trim();
+  if (!rowIndex || rowIndex < DATA_ROW) return err_('rowIndex invalido', 400);
+  if (motivo.length < 10) return err_('Motivo obrigatorio (min 10 caracteres)', 400);
+  const lock = LockService.getScriptLock();
+  try { lock.waitLock(6000); } catch (ex) { return err_('Sistema ocupado', 503); }
+  try {
+    const sheet = sh_(SH_LOC);
+    if (rowIndex > sheet.getLastRow()) return err_('Locacao nao encontrada', 404);
+    const row = sheet.getRange(rowIndex, 1, 1, 28).getValues()[0];
+    if (!row[0]) return err_('Locacao nao encontrada', 404);
+    const status = String(row[14] || '').trim();
+    if (status !== 'Cancelada') {
+      return err_('Somente locacoes Cancelada podem ser convertidas (status=' + status + ')', 409);
+    }
+    const antes = locacaoObj_(row, rowIndex);
+    const minContratados = Number(row[6] || 0);
+    const valorPlano = Number(row[7] || 0);
+    const extMins = Number(row[25] || 0);
+    const extValor = Number(row[26] || 0);
+    const cancelarExtras = String(p.cancelarExtras || '') === 'true' || p.cancelarExtras === true;
+    const justificativaExtras = String(p.justificativaExtras || motivo).trim();
+
+    let minAdic = p.minAdicionais !== undefined ? Number(p.minAdicionais) : Math.max(0, extMins);
+    let valAdic = p.valorAdicional !== undefined ? Number(p.valorAdicional) : Math.max(0, extValor);
+    let valTotal = p.valorTotal !== undefined ? Number(p.valorTotal) : Math.round((valorPlano + valAdic) * 100) / 100;
+
+    if (cancelarExtras) {
+      minAdic = 0;
+      valAdic = 0;
+      valTotal = valorPlano;
+      if (justificativaExtras.length < 5) {
+        return err_('Justificativa obrigatoria para nao cobrar extras (min 5 caracteres)', 400);
+      }
+      sheet.getRange(rowIndex, 28).setValue('EC:' + Math.max(0, extMins) + '|' + justificativaExtras.slice(0, 240));
+    }
+
+    let horaFim = String(p.horaFim || '').trim();
+    if (!/^\d{1,2}:\d{2}$/.test(horaFim)) {
+      horaFim = cellToStr_(row[3]) || fmtHoraLocal_(new Date());
+    }
+
+    sheet.getRange(rowIndex, 4).setValue(horaFim);
+    sheet.getRange(rowIndex, 9).setValue(minAdic);
+    sheet.getRange(rowIndex, 10).setValue(valAdic);
+    sheet.getRange(rowIndex, 11).setValue(valTotal);
+    sheet.getRange(rowIndex, 15).setValue('Encerrada');
+
+    const obs = String(row[17] || '').trim();
+    const tag = '[CORRECAO ADM encerrar] ' + motivo;
+    if (obs.indexOf(tag) < 0) {
+      sheet.getRange(rowIndex, 18).setValue(obs ? obs + '\n' + tag : tag);
+    }
+
+    try { invalidateInicioResumoCache_(cellToStr_(row[1])); } catch (e) {}
+    const rowAfter = sheet.getRange(rowIndex, 1, 1, 28).getValues()[0];
+    const depois = locacaoObj_(rowAfter, rowIndex);
+    registrarAuditoriaLocacao_(rowIndex, 'corrigirCanceladaParaEncerradaAdmin', antes, depois, motivo, operadorAudit_(p));
+    try { firebaseSyncSessao_(rowIndex, fbDadosSessao_(rowAfter, 'Encerrada', rowIndex)); } catch (eFb) { /* ok */ }
+    return resp_({
+      locacao: depois,
+      mensagem: 'Cancelada convertida para Encerrada. Caixa atualizado.',
+      minContratados: minContratados,
+      valorTotal: valTotal
+    });
   } finally { lock.releaseLock(); }
 }
 
