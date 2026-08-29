@@ -217,6 +217,10 @@ async function init() {
   syncController();
 
   setTimeout(function () {
+    if (typeof mkSyncBootFastPath_ === 'function') mkSyncBootFastPath_();
+  }, 12000);
+
+  setTimeout(function () {
     if (typeof mkSyncClearBootPending_ === 'function') mkSyncClearBootPending_(true);
   }, 65000);
 

@@ -75,6 +75,55 @@ function syncController(force = false, delayMs = 0) {
 /** I122 — timeout dedicado: carregarInicio frio pode passar de 25s; default api() gerava fantasma. */
 const MK_INICIO_API_TIMEOUT_MS = 55000;
 const MK_INICIO_CACHE_MAX_AGE_MS = 3600000;
+/** I148 — listarAtivas ~5–15s vs carregarInicio 25–55s; fallback operacional. */
+const MK_LISTAR_ATIVAS_TIMEOUT_MS = 30000;
+const MK_BOOT_FAST_PATH_MS = 12000;
+let _listarAtivasInFlight = false;
+
+function mkInicioFromListarAtivas_(d) {
+  if (!d || !d.ok || !Array.isArray(d.locacoes)) return null;
+  return {
+    ok: true,
+    ativos: d.locacoes.map(function (s) {
+      const ext = Number(s.extendedMins || 0);
+      const base = Number(s.mins || 0);
+      const originalMins = s.originalMins != null ? Number(s.originalMins) : Math.max(0, base - ext);
+      return Object.assign({}, s, { originalMins, mins: originalMins + ext });
+    }),
+    fonte: 'listarAtivas',
+    parcial: true
+  };
+}
+
+async function mkSyncListarAtivasFallback_(opts) {
+  opts = opts || {};
+  if (_listarAtivasInFlight) return false;
+  _listarAtivasInFlight = true;
+  try {
+    const d = await api({ action: 'listarAtivas' }, opts.timeoutMs || MK_LISTAR_ATIVAS_TIMEOUT_MS);
+    const payload = mkInicioFromListarAtivas_(d);
+    if (!payload) return false;
+    aplicarDadosInicio(payload);
+    mkSyncClearBootPending_(true);
+    setStatus(true);
+    if (payload.ativos.length && typeof toast === 'function' && !opts.silent) {
+      toast('Locações carregadas (sync completo em segundo plano).', 'success');
+    }
+    return true;
+  } catch (e) {
+    console.warn('[Sync] listarAtivas fallback', e.message || e);
+    return false;
+  } finally {
+    _listarAtivasInFlight = false;
+  }
+}
+
+function mkSyncBootFastPath_() {
+  if (!window._mkSyncBootPending && Array.isArray(sessions) && sessions.length) return;
+  mkSyncListarAtivasFallback_({ silent: true });
+}
+window.mkSyncListarAtivasFallback_ = mkSyncListarAtivasFallback_;
+window.mkSyncBootFastPath_ = mkSyncBootFastPath_;
 
 function mkInicioCacheFresh_(raw) {
   try {
@@ -139,6 +188,12 @@ async function sincronizarServidor(force = false) {
       if (force) inicioParams.force = '1';
       d = await api(inicioParams, MK_INICIO_API_TIMEOUT_MS);
     } catch (apiErr) {
+      // I148: carregarInicio lento/timeout — listarAtivas traz sessões ativas mais rápido
+      const fbOk = await mkSyncListarAtivasFallback_({ silent: true });
+      if (fbOk) {
+        setStatus(true);
+        return;
+      }
       // I122: timeout/erro com loc aberta → NÃO reaplicar mk_inicio_cache (fantasma)
       if (!skipCache) {
         const raw = localStorage.getItem(CACHE_KEY);
