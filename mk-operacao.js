@@ -687,8 +687,8 @@ async function iniciarContagem(rowIndex, opts) {
   else renderCards();
 
   try {
-    // I143: 28s — 15s gerava timeout falso + rollback + force sync frio (~80s)
-    const d = await api({ action: 'iniciarTimer', rowIndex, timestamp: clickTs, ...operadorApiParams_() }, 28000);
+    const playReqId = (typeof mkOfflineGenRequestId_ === 'function') ? mkOfflineGenRequestId_() : ('mkpl_' + rowIndex + '_' + clickTs);
+    const d = await api({ action: 'iniciarTimer', rowIndex, timestamp: clickTs, clientRequestId: playReqId, ...operadorApiParams_() }, 28000);
     if (d._offlineQueued) {
       delete s._iniciandoTimer;
       s._offlineTimerPending = true;

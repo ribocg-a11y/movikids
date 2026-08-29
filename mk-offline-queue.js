@@ -93,6 +93,20 @@ async function mkOfflineHandleWriteFail_(params, err) {
   throw err;
 }
 
+async function mkOfflineRemapRowInQueue_(tempRow, realRow) {
+  if (!tempRow || !realRow || tempRow === realRow) return;
+  if (typeof mkIdbQueueList_ !== 'function' || typeof mkIdbQueuePush_ !== 'function') return;
+  const queue = await mkIdbQueueList_();
+  for (let i = 0; i < queue.length; i++) {
+    const item = queue[i];
+    if (!item || !item.params) continue;
+    if (Number(item.params.rowIndex) === Number(tempRow)) {
+      item.params.rowIndex = realRow;
+      await mkIdbQueuePush_(item);
+    }
+  }
+}
+
 async function mkOfflineReplaceTempSession_(tempRow, real) {
   if (!Array.isArray(sessions) || !tempRow || !real) return;
   const idx = sessions.findIndex(function (s) {
@@ -133,6 +147,7 @@ async function mkOfflineFlush_() {
         if (!d || !d.ok) break;
         if (item.action === 'salvarLocacao' && d.rowIndex) {
           const tempRow = mkOfflineTempRowIndex_(item.id);
+          await mkOfflineRemapRowInQueue_(tempRow, d.rowIndex);
           await mkOfflineReplaceTempSession_(tempRow, Object.assign({}, d, { clientRequestId: item.id }));
         }
         await mkIdbQueueRemove_(item.id);

@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.210
+// MOVI KIDS — Google Apps Script v1.5.211
+// v1.5.211: I147 — Fase 2 offline: idempotencia clientRequestId em salvarLocacao + iniciarTimer (Cache 6h)
 // v1.5.210: I143 — bloquear salvar se veículo já Ativa/Pendente (anti-duplicata retry tablet)
 // v1.5.209: I134 — abonarFalta casa Date do Sheets (zera Sync jornada); Julia sem falta fantasma
 // v1.5.208: I133 — abono falta: chave DD/MM/YYYY (match jornada); holerite Q1 na cesta (FE)
@@ -202,8 +203,8 @@
 
 // ── CONSTANTES ───────────────────────────────────────────────
 /** Versão exposta em ping, carregarInicio, validarSchema, gestaoPessoasStatus (bump com header). */
-const MK_GAS_VERSAO_  = 'v1.5.210';
-const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.210';
+const MK_GAS_VERSAO_  = 'v1.5.211';
+const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.211';
 const SHEET_ID   = '1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618';
 const DEPLOY_ID  = 'AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y';
 const WEBAPP_URL = `https://script.google.com/macros/s/${DEPLOY_ID}/exec`;
@@ -485,6 +486,36 @@ function err_(msg, code) {
   return ContentService
     .createTextOutput(JSON.stringify({ ok: false, erro: msg, code: code || 400 }))
     .setMimeType(ContentService.MimeType.JSON);
+}
+
+/** I147 — Fase 2 offline: replay seguro da fila FE (clientRequestId). TTL max CacheService = 6h. */
+const MK_IDEM_CACHE_TTL_ = 21600;
+
+function mkIdemKey_(reqId) {
+  const id = String(reqId || '').trim();
+  if (!id || id.length > 100) return '';
+  return 'mk_idem_v1_' + id.replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 72);
+}
+
+function mkIdemLoad_(reqId) {
+  const key = mkIdemKey_(reqId);
+  if (!key) return null;
+  try {
+    const hit = CacheService.getScriptCache().get(key);
+    if (!hit) return null;
+    const o = JSON.parse(hit);
+    if (o && typeof o === 'object' && Object.keys(o).length) return o;
+  } catch (e) { /* ok */ }
+  return null;
+}
+
+function mkIdemStore_(reqId, dataObj) {
+  const key = mkIdemKey_(reqId);
+  if (!key || !dataObj) return;
+  try {
+    const raw = JSON.stringify(dataObj);
+    if (raw.length < 95000) CacheService.getScriptCache().put(key, raw, MK_IDEM_CACHE_TTL_);
+  } catch (e) { /* ok */ }
 }
 
 function nextId_(sheet) {
@@ -3498,6 +3529,9 @@ function salvarLocacao_(p) {
   const lockS = LockService.getScriptLock();
   try { lockS.waitLock(8000); } catch(ex) { return err_('Sistema ocupado, tente novamente.', 503); }
   try {
+  const reqId = String(p.clientRequestId || '').trim();
+  const idemSalvar = mkIdemLoad_(reqId);
+  if (idemSalvar) return resp_(idemSalvar);
   const tipo        = (p.tipo        || '').trim();
   const plano       = (p.plano       || '').trim();
   const responsavel = (p.responsavel || '').trim();
@@ -3578,7 +3612,7 @@ function salvarLocacao_(p) {
   try { invalidateInicioResumoCache_(dataFmt); } catch(e) {}
 
   // I125c: sem getRange 28 + sem auditoria no request (AUDITORIA abria outra aba = +2–4s)
-  return resp_({
+  const salvarPayload = {
     id: id,
     rowIndex: newRow,
     tipo: tipo,
@@ -3598,7 +3632,9 @@ function salvarLocacao_(p) {
     data: dataFmt,
     startTimestamp: 0,
     status: 'Pendente'
-  });
+  };
+  if (reqId) mkIdemStore_(reqId, salvarPayload);
+  return resp_(salvarPayload);
   } finally { lockS.releaseLock(); }
 }
 
@@ -7928,6 +7964,9 @@ function verificarSessao_(p) {
 
 // ── INICIAR TIMER ─────────────────────────────────────────────
 function iniciarTimer_(p) {
+  const reqId = String(p.clientRequestId || '').trim();
+  const idemTimer = mkIdemLoad_(reqId);
+  if (idemTimer) return resp_(idemTimer);
   const rowIndex = parseInt(p.rowIndex  || '0');
   const clientTs = parseInt(p.timestamp || '0');
   if (!rowIndex || rowIndex < DATA_ROW) return err_('rowIndex inválido', 400);
@@ -7950,7 +7989,9 @@ function iniciarTimer_(p) {
   const tsExistente = Number(row[22] || 0); // Y = col 25 = index 22 desde C
   if (statusAtual === 'Ativa' && tsExistente >= 1e12) {
     const horaExistente = cellToStr_(row[0]);
-    return resp_({ startTimestamp: tsExistente, horaInicio: horaExistente, jaIniciada: true });
+    const jaPayload = { startTimestamp: tsExistente, horaInicio: horaExistente, jaIniciada: true };
+    if (reqId) mkIdemStore_(reqId, jaPayload);
+    return resp_(jaPayload);
   }
   const agora    = new Date();
   const serverTs = agora.getTime();
@@ -7967,7 +8008,9 @@ function iniciarTimer_(p) {
   rng.setValues([row]);
   try { invalidateInicioResumoCache_(fmtData_(agora)); } catch(e) {}
   // I125c: sem auditoria/Firebase no ▶ (FE otimista I20)
-  return resp_({ startTimestamp: canonTs, horaInicio: horaInicio });
+  const timerPayload = { startTimestamp: canonTs, horaInicio: horaInicio };
+  if (reqId) mkIdemStore_(reqId, timerPayload);
+  return resp_(timerPayload);
 }
 
 // ── GERAR RELATÓRIO ───────────────────────────────────────────

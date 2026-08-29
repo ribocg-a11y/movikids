@@ -1057,6 +1057,7 @@ async function novaSalvarItemSequencial_(it, basePayload, observacao, timeoutMs)
   const cfgLocal = novaCfgPlano_(it.tipo, it.plano) || {};
   const d = await api(Object.assign({
     action: 'salvarLocacao',
+    clientRequestId: (typeof mkOfflineGenRequestId_ === 'function') ? mkOfflineGenRequestId_() : ('mksv_' + Date.now()),
     tipo: it.tipo,
     plano: it.plano,
     veiculo: it.veiculo,
