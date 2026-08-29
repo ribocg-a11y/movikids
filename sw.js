@@ -1,6 +1,6 @@
 // MOVI KIDS - Service Worker 1.7.12
 
-const SW_VERSION = '1.9.100';
+const SW_VERSION = '1.9.101';
 
 const NETWORK_FIRST = [
   'index.html',
@@ -18,6 +18,7 @@ const NETWORK_FIRST = [
   'mk-firebase.js',
   'mk-api.js',
   'mk-sync.js',
+  'mk-local-snapshot.js',
   'mk-sessao.js',
   'mk-nova.js',
   'mk-drawer.js',

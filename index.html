@@ -744,6 +744,10 @@
     <div class="diag-card mk-glass-card" id="diag-card">
       <div class="diag-row"><div class="diag-dot ok" id="diag-dot-gas"></div><span>GAS / Servidor</span><span class="diag-val" id="diag-gas">—</span></div>
       <div class="diag-row"><div class="diag-dot ok" id="diag-dot-sync"></div><span>Última sincronização</span><span class="diag-val" id="diag-sync">—</span></div>
+      <div class="diag-row"><div class="diag-dot ok" id="diag-dot-snap"></div><span>Snapshot local (P0)</span><span class="diag-val" id="diag-snap">—</span></div>
+      <div class="diag-row" style="margin-top:10px">
+        <button type="button" class="btn btn-secondary" style="width:100%;font-size:12px" onclick="mkSnapshotClearLocal_(true); toast('Cache local limpo — sincronizando…','info');">🧹 Limpar cache local + sync</button>
+      </div>
       <div class="diag-row"><div class="diag-dot ok" id="diag-dot-ver"></div><span>Versão frontend</span><span class="diag-val" id="diag-ver">—</span></div>
       <div class="diag-row"><div class="diag-dot ok" id="diag-dot-sess"></div><span>Sessões ativas agora</span><span class="diag-val" id="diag-sess">—</span></div>
       <div class="diag-row"><div class="diag-dot ok" id="diag-dot-extra"></div><span>Sessões em tempo extra</span><span class="diag-val" id="diag-extra">—</span></div>
@@ -2519,7 +2523,8 @@
 <script src="mk-meta-operador.js?v=1.9.99"></script>
 <script src="mk-custos.js?v=1.9.99"></script>
 <script src="mk-avulso.js?v=1.9.99"></script>
-<script src="mk-sync.js?v=1.9.99"></script>
+<script src="mk-sync.js?v=1.9.101"></script>
+<script src="mk-local-snapshot.js?v=1.9.101"></script>
 <script src="mk-nova.js?v=1.9.99"></script>
 <script src="mk-relacionamento.js?v=1.9.99"></script>
 <script src="mk-operacao.js?v=1.9.99"></script>

@@ -4458,6 +4458,16 @@ function atualizarDiagnostico() {
   const vSync = document.getElementById('diag-sync');
   if (vSync) vSync.textContent = syncTxt;
 
+  const snap = typeof mkSnapshotLoad_ === 'function' ? mkSnapshotLoad_() : null;
+  const vSnap = document.getElementById('diag-snap');
+  const dotSnap = document.getElementById('diag-dot-snap');
+  if (vSnap) {
+    vSnap.textContent = snap
+      ? (typeof mkSnapshotAgeLabel_ === 'function' ? mkSnapshotAgeLabel_(snap.ts) : 'ok')
+      : 'Nenhum';
+  }
+  if (dotSnap) dotSnap.className = 'diag-dot ' + (snap ? 'ok' : 'warn');
+
   // Versão
   const verEl = document.getElementById('diag-ver');
   if (verEl) verEl.textContent = (typeof APP_VERSION !== 'undefined' ? APP_VERSION : '—');

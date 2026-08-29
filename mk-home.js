@@ -35,7 +35,16 @@ function renderCards() {
   const container = document.getElementById('sessions-container');
 
   if (sessions.length === 0) {
-    container.innerHTML = `
+    const syncing = !!window._mkSyncBootPending;
+    container.innerHTML = syncing
+      ? `<div class="empty">
+        <div class="empty-logo" aria-hidden="true">
+          <img class="mk-brand-img mk-brand-img--lg" src="assets/logo-movi-kids.png" alt="Movi Kids" width="1080" height="1080" loading="lazy" decoding="async">
+        </div>
+        <h3>Sincronizando…</h3>
+        <p>Conectando com o servidor. Locações fantasmas não aparecem mais aqui.</p>
+      </div>`
+      : `
       <div class="empty">
         <div class="empty-logo" aria-hidden="true">
           <img class="mk-brand-img mk-brand-img--lg" src="assets/logo-movi-kids.png" alt="Movi Kids" width="1080" height="1080" loading="lazy" decoding="async">

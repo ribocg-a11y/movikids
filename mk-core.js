@@ -194,8 +194,14 @@ async function init() {
   inicializarDraftNova_();
 
   const cached = JSON.parse(localStorage.getItem('mk_sessions') || '[]');
-  if (cached.length > 0) {
+  if (typeof mkBootLocalFirst_ === 'function') {
+    mkBootLocalFirst_();
+  } else if (cached.length > 0) {
     sessions = cached;
+    renderCards();
+    updateStats();
+  } else {
+    sessions = [];
     renderCards();
     updateStats();
   }

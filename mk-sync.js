@@ -2,7 +2,7 @@
  * Carregar após o script inline principal (sessions, renderCards, etc.).
  */
 const _POLL_ACTIVE = 5000;
-const _POLL_IDLE   = 15000;
+const _POLL_IDLE   = 60000;
 let   _mainPollTimer = null;
 
 function agendarProximoPoll() {
@@ -74,7 +74,7 @@ function syncController(force = false, delayMs = 0) {
 
 /** I122 — timeout dedicado: carregarInicio frio pode passar de 25s; default api() gerava fantasma. */
 const MK_INICIO_API_TIMEOUT_MS = 55000;
-const MK_INICIO_CACHE_MAX_AGE_MS = 45000;
+const MK_INICIO_CACHE_MAX_AGE_MS = 3600000;
 
 function mkInicioCacheFresh_(raw) {
   try {
@@ -106,7 +106,7 @@ async function sincronizarServidor(force = false) {
   try {
     const CACHE_KEY = MK_INICIO_CACHE_KEY;
     // I122: com operação ativa NUNCA reaplicar cache local (fantasma pós-timeout)
-    const skipCache = force || mkSyncOperacaoAtiva_() || mkSyncHomeVisible_();
+    const skipCache = force || mkSyncOperacaoAtiva_();
 
     if (force) {
       try { localStorage.removeItem(CACHE_KEY); } catch (e) { /* ignore */ }
@@ -141,6 +141,10 @@ async function sincronizarServidor(force = false) {
           setStatus(true);
           return;
         }
+        if (typeof mkSnapshotApplyFallback_ === 'function' && mkSnapshotApplyFallback_()) {
+          setStatus(true);
+          return;
+        }
       }
       throw apiErr;
     }
@@ -165,6 +169,7 @@ async function sincronizarServidor(force = false) {
     try { localStorage.setItem(CACHE_KEY, JSON.stringify({ data: d, ts: Date.now() })); } catch (e) { /* ignore */ }
     setStatus(true);
     aplicarDadosInicio(d);
+    window._mkSyncBootPending = false;
 
   } catch(e) {
     _syncFailCount++;
@@ -354,6 +359,9 @@ function aplicarDadosInicio(d) {
     console.error('aplicarDadosInicio:', e);
     setStatus(false);
   }
+  if (d && Array.isArray(d.ativos) && d.fonte !== 'firebase' && !d.parcial && d.fonte !== 'snapshot' && typeof mkSnapshotSave_ === 'function') {
+    mkSnapshotSave_(Object.assign({ ok: true }, d));
+  }
 }
 window.aplicarDadosInicio = aplicarDadosInicio;
 
@@ -368,7 +376,12 @@ function formatSyncAge_(diffMs) {
 }
 
 function mkSyncAgeSuffix_() {
-  if (!_lastSyncAt) return '';
+  if (!_lastSyncAt) {
+    if (window._mkSnapshotTs && typeof mkSnapshotAgeLabel_ === 'function') {
+      return ' · local ' + mkSnapshotAgeLabel_(window._mkSnapshotTs);
+    }
+    return '';
+  }
   return ' · sync ' + formatSyncAge_(Date.now() - _lastSyncAt);
 }
 
@@ -456,8 +469,9 @@ function mkSyncWireEvents_() {
   setInterval(() => {
     if (document.visibilityState !== 'visible') return;
     if (mkSyncDeferHeavy_()) return;
+    if (typeof mkSyncOperacaoAtiva_ === 'function' && mkSyncOperacaoAtiva_()) return;
     syncController(false, 0);
-  }, 90000);
+  }, 3600000);
 
   setInterval(() => {
     if (document.visibilityState !== 'visible') return;
