@@ -11,12 +11,25 @@ $ErrorActionPreference = "Stop"
 $root = Split-Path -Parent (Split-Path -Parent $MyInvocation.MyCommand.Path)
 Set-Location $root
 
+function Invoke-GitSafe {
+  param([Parameter(Mandatory = $true)][string[]]$GitArgs)
+  $prevEap = $ErrorActionPreference
+  $ErrorActionPreference = "Continue"
+  $out = & git @GitArgs 2>&1
+  $code = $LASTEXITCODE
+  $ErrorActionPreference = $prevEap
+  if ($out) { $out | ForEach-Object { Write-Host $_ } }
+  if ($code -ne 0) {
+    throw ("git {0} falhou (exit {1})" -f ($GitArgs -join " "), $code)
+  }
+}
+
 Write-Host "MOVI KIDS - sync pasta C / repo local" -ForegroundColor Cyan
 Write-Host "Repo: $root"
 
 if (-not $SkipPull) {
-  git fetch origin main 2>&1 | Out-Host
-  git pull origin main 2>&1 | Out-Host
+  Invoke-GitSafe @("fetch", "origin", "main")
+  Invoke-GitSafe @("pull", "origin", "main")
 }
 
 $head = git rev-parse --short HEAD
