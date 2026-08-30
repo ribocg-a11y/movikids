@@ -1,4 +1,4 @@
-# MOVI KIDS — Estado atual (29/08/2026)
+# MOVI KIDS — Estado atual (30/08/2026 · FE v1.9.107 · I146–I149)
 
 Referência única para alinhamento local × produção.
 

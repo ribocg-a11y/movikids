@@ -2,21 +2,21 @@
 
 Sistema operacional de locações — balcão (tablet na loja), portal do responsável, painel admin.
 
-**Ciclo ativo (30/08/2026):** Sprint D · FE **v1.9.107** local (Pages 1.9.106 até I22) · GAS **v1.5.211** · **I149** / **I148** / **I147**
+**Ciclo ativo (30/08/2026):** Sprint D · FE **v1.9.107** Pages ✅ · GAS ping **v1.5.211** · **I149** / **I148** / **I147** / **I146**
 
 **Repo neste PC:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`
 
 **Para retomar (agente local PC — pasta C):**
 
-> *Continuar MOVI KIDS **no PC** — workspace `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`. Ler HANDOFF_NOVO_CHAT.md. FE v1.9.107 local / Pages 1.9.106 até I22 · GAS v1.5.211. Próximo: push 1.9.107 com loja vazia. **Não Cloud.***
+> *Continuar MOVI KIDS **no PC** — workspace `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`. Ler HANDOFF_NOVO_CHAT.md. FE v1.9.107 Pages ✅ · GAS ping v1.5.211. Cadeia I146–I149. Tablet ?force=1.9.107. **Não Cloud.***
 
 ## Produção atual
 
 | Camada | Versão | Link |
 |--------|--------|------|
-| Frontend | **v1.9.105** | https://ribocg-a11y.github.io/movikids/?force=1.9.105 |
-| Gestão Pessoas | **v1.9.105** | `gestao-pessoas.html?force=1.9.105` |
-| GAS | **v1.5.211** Web ✅ | ping · I147 idempotência offline |
+| Frontend | **v1.9.107** | https://ribocg-a11y.github.io/movikids/?force=1.9.107 |
+| Gestão Pessoas | **v1.9.107** | `gestao-pessoas.html?force=1.9.107` |
+| GAS | ping **v1.5.211** · repo **v1.5.213** | Nova versão Web pendente |
 | Design System | **v1.1** | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
 
 **GAS raw:** https://raw.githubusercontent.com/ribocg-a11y/movikids/main/MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs

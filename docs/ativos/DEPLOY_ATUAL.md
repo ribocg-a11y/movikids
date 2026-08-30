@@ -1,6 +1,6 @@
 # MOVI KIDS — Deploy atual (referência única)
 
-**Atualizado:** 29/08/2026 (FE **v1.9.105** + GAS **v1.5.211** Web ✅ · I147 / I146 / I145 / I143)
+**Atualizado:** 30/08/2026 (FE **v1.9.107** Pages ✅ · GAS ping **v1.5.211** · repo **v1.5.213** · I149 / I148 / I147)
 
 Use **este arquivo** para versão e ordem de publicação.
 
@@ -10,11 +10,11 @@ Use **este arquivo** para versão e ordem de publicação.
 
 | Camada | Repo | Produção (ping / Pages) | Alinhado? |
 |--------|------|-------------------------|-----------|
-| **Frontend** | **v1.9.105** | https://ribocg-a11y.github.io/movikids/?force=1.9.105 | ✅ Pages |
-| **Gestão Pessoas** | **v1.9.105** | `gestao-pessoas.html?force=1.9.105` | ✅ |
-| **Portal acompanhar** | **v1.9.96** | `acompanhar.html` | portal |
-| **Service Worker** | **1.9.105** | `sw.js` · IDB + fila offline | ✅ |
-| **GAS** | **v1.5.211** (header `.gs`) | ping **v1.5.211** | ✅ |
+| **Frontend** | **v1.9.107** | https://ribocg-a11y.github.io/movikids/?force=1.9.107 | ✅ Pages |
+| **Gestão Pessoas** | **v1.9.107** | `gestao-pessoas.html?force=1.9.107` | ✅ |
+| **Portal acompanhar** | **v1.9.107** | `acompanhar.html?v=1.9.107` | ✅ |
+| **Service Worker** | **1.9.107** | I148 + I149 | ✅ |
+| **GAS** | **v1.5.213** (header `.gs`) | ping **v1.5.211** | ⏳ Nova versão Web |
 
 **Ping:** https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec?action=ping
 
@@ -30,11 +30,11 @@ Use **este arquivo** para versão e ordem de publicação.
 C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github\MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs
 ```
 
-**Raw (colar Editor — linha 2 = v1.5.211):**
+**Raw (colar Editor — linha 2 = v1.5.213 no repo; ping produção ainda v1.5.211):**
 
 https://raw.githubusercontent.com/ribocg-a11y/movikids/main/MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs
 
-**Header:** v1.5.211 · I147 idempotência offline · I143 `veiculoJaAberto_`
+**Header repo:** v1.5.213 · I148 admin/minUsados · I147 idempotência · I143 `veiculoJaAberto_`
 
 ---
 

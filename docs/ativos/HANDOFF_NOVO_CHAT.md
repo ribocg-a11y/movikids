@@ -4,7 +4,7 @@
 **Ambiente do agente:** **This PC (Windows)** — pasta no **C:** · **não** Cloud Agent.  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
-**GitHub:** `ribocg-a11y/movikids` · branch `main` · HEAD **`f524e82`**
+**GitHub:** `ribocg-a11y/movikids` · branch `main` · FE Pages **v1.9.107**
 
 ---
 
@@ -15,7 +15,7 @@
 | **Workspace obrigatório** | `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github` |
 | **Modo Cursor** | **Agent local / This PC** — o agente precisa rodar `.ps1`, `git`, ping GAS e OAuth no Windows |
 | **Não usar** | Cloud Agent (VM Linux sem pasta C nem `clasp`/OAuth local) |
-| **Confirmar no 1º turno** | `Test-Path .\scripts\relatorio-versoes.ps1` → `True` · `git rev-parse --short HEAD` → `f524e82` |
+| **Confirmar no 1º turno** | `Test-Path .\scripts\relatorio-versoes.ps1` → `True` · Pages **1.9.107** |
 
 **Sincronizar pasta C antes de codar** (se veio de outro chat / Cloud):
 
@@ -29,7 +29,7 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 
 ## Mensagem para colar no novo chat (PC)
 
-> *Continuar MOVI KIDS **no PC** — workspace pasta C (`movikids-github`). Ler `HANDOFF_NOVO_CHAT.md`. FE **v1.9.107** local / Pages **1.9.106** até I22 livre · GAS **v1.5.211**. Próximo: loja vazia → push 1.9.107 · tablet `?force=1.9.107`. **Não Cloud — This PC.***
+> *Continuar MOVI KIDS **no PC** — workspace pasta C (`movikids-github`). Ler `HANDOFF_NOVO_CHAT.md`. FE **v1.9.107** Pages ✅ · GAS ping **v1.5.211** (repo v1.5.213). Cadeia I146–I149. Tablet `?force=1.9.107`. **Não Cloud — This PC.***
 
 **Mensagem mínima** (também funciona):
 
@@ -79,7 +79,7 @@ Invoke-RestMethod -Uri "${GAS}?action=listarAtivas" | ConvertTo-Json -Depth 5
 | **Gestão / dev** | **Computador** (Windows + Cursor **local**) | **Sócio/dev** | Código, `.ps1`, planilha OAuth, browser no PC |
 | **Operação balcão** | **Tablet** fixo no shopping | **Operadores** | Locações, timer, PIN, PWA na loja |
 
-**Tablet (Ops):** https://ribocg-a11y.github.io/movikids/?force=1.9.106
+**Tablet (Ops):** https://ribocg-a11y.github.io/movikids/?force=1.9.107
 
 ---
 
@@ -90,9 +90,9 @@ Invoke-RestMethod -Uri "${GAS}?action=listarAtivas" | ConvertTo-Json -Depth 5
 | **Frontend** | **v1.9.107** | https://ribocg-a11y.github.io/movikids/?force=1.9.107 |
 | **Gestão Pessoas** | **v1.9.107** | `gestao-pessoas.html?force=1.9.107` |
 | **Service Worker** | **1.9.107** | I148 unificado + I149 meta |
-| **Apps Script** | repo/Web **v1.5.211** ✅ | ping alinhado · I147 · I143 |
-| **Pasta C** | **`f524e82`** | validado PC 29/08 |
-| **Planilha** | 23 abas | **0** Ativa/Pendente (PC + API 29/08) |
+| **Apps Script** | repo **v1.5.213** · ping **v1.5.211** | Nova versão Web pendente |
+| **Pasta C** | este repo | `movikids-github` no C: |
+| **Planilha** | 23 abas | operação viva 30/08 |
 | **Homolog tablet** | ⏳ | smoke D4 + teste offline I147 |
 
 **Deploy ID GAS:** `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y`
@@ -117,7 +117,16 @@ Invoke-RestMethod -Uri "${GAS}?action=listarAtivas" | ConvertTo-Json -Depth 5
 
 **Paridade diária (PC):** `listarAtivas.total` = número de cards Pendente+Ativa no tablet.
 
-Docs: `INCIDENTE_I147_*` · `INCIDENTE_I146_*` · `PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`
+## Cadeia 29–30/08 (quatro falhas)
+
+| # | ID | O quê | Status |
+|---|-----|------|--------|
+| 1 | **I146** | Cards fantasma no boot (PWA / `mk_sessions`) | ✅ FE 1.9.102+ |
+| 2 | **I147** | Offline duplicava salvar/▶ | ✅ GAS Web 1.5.211 · teste avião Ops ⏳ |
+| 3 | **I148** | Encerrar no servidor, card fica · extra Iza · Home 12 vs caixa 22 (local velho) | ✅ FE 1.9.107 · GAS repo 1.5.213 · Web ⏳ |
+| 4 | **I149** | Meta festeja R$ 100 no domingo com as duas | ✅ FE 1.9.107 · tablet `?force=` ⏳ |
+
+Docs: `INCIDENTE_I149_*` · `INCIDENTE_I148_*` · `INCIDENTE_I147_*` · `INCIDENTE_I146_*` · `PLANO_SINERGIA_PONTAS_2026-08-30.md`
 
 ---
 
