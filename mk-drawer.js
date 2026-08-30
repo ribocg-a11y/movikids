@@ -331,13 +331,26 @@ async function confirmarEncerrar() {
       minUsados: minUsadosApi
     });
 
-    if (!d.ok) { toast('Erro: ' + d.erro, 'error'); return; }
+    if (!d.ok) {
+      const jaEnc = /j[aá]\s+foi\s+encerrada|n[aã]o est[aá] ativa/i.test(String(d.erro || ''));
+      if (jaEnc) {
+        mkEncerrarPurgeLocal_(encSession);
+        toast('Já estava encerrada no servidor. Tirei o card da tela. Se faltou extra, corrija no Caixa.', 'warning');
+        fecharSessaoDrawer();
+        fecharAlerta();
+        renderCards();
+        updateStats();
+        if (typeof mkInvalidateInicioCache_ === 'function') mkInvalidateInicioCache_();
+        if (typeof syncController === 'function') syncController(true, 400);
+        return;
+      }
+      toast('Erro: ' + d.erro, 'error');
+      return;
+    }
 
     if (typeof mkExtraPagClear_ === 'function') mkExtraPagClear_(encSession);
 
-    // Remove from local sessions
-    sessions = sessions.filter(s => s.rowIndex !== encSession.rowIndex);
-    saveSessions();
+    mkEncerrarPurgeLocal_(encSession);
 
     if (mkExibirFinanceiro_() && d.valorTotal != null) {
       const vT = Number(d.valorTotal).toFixed(2).replace('.',',');
@@ -413,6 +426,14 @@ async function confirmarEncerrar() {
       btn.disabled = false;
     }
   }
+}
+
+function mkEncerrarPurgeLocal_(sess) {
+  if (!sess) return;
+  const ri = sess.rowIndex;
+  sessions = sessions.filter(s => s.rowIndex !== ri);
+  if (typeof saveSessions === 'function') saveSessions();
+  if (typeof mkSnapshotDropAtivo_ === 'function') mkSnapshotDropAtivo_(ri);
 }
 
 window.abrirSessaoDrawer = abrirSessaoDrawer;

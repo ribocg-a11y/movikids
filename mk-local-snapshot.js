@@ -46,6 +46,21 @@ function mkSnapshotPersist_(payload) {
   }
 }
 
+function mkSnapshotDropAtivo_(rowIndex) {
+  const ri = Number(rowIndex);
+  if (!ri) return;
+  const snap = mkSnapshotLoad_();
+  if (!snap || !snap.data || !Array.isArray(snap.data.ativos)) return;
+  const nextAtivos = snap.data.ativos.filter(function (s) {
+    return Number(s && s.rowIndex) !== ri;
+  });
+  if (nextAtivos.length === snap.data.ativos.length) return;
+  mkSnapshotPersist_({
+    ts: Date.now(),
+    data: Object.assign({}, snap.data, { ativos: nextAtivos })
+  });
+}
+
 function mkSnapshotSave_(d) {
   if (!d || !d.ok) return;
   if (d.fonte === 'firebase' || d.parcial) return;
@@ -168,6 +183,7 @@ async function mkSnapshotClearLocal_(reload) {
 window.mkSnapshotLoad_ = mkSnapshotLoad_;
 window.mkSnapshotLoadAsync_ = mkSnapshotLoadAsync_;
 window.mkSnapshotSave_ = mkSnapshotSave_;
+window.mkSnapshotDropAtivo_ = mkSnapshotDropAtivo_;
 window.mkBootLocalFirst_ = mkBootLocalFirst_;
 window.mkBootLocalFirstAsync_ = mkBootLocalFirstAsync_;
 window.mkSnapshotApplyFallback_ = mkSnapshotApplyFallback_;

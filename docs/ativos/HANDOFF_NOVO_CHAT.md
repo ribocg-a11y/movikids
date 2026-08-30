@@ -1,6 +1,6 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 29/08/2026 · FE **v1.9.105** · GAS repo/Web **v1.5.211** ✅ · **I147** · **I146** · **I145** · **I143**  
+**Atualizado:** 30/08/2026 · FE **v1.9.106** · GAS repo/Web **v1.5.211** ✅ · **I148** encerrar fantasma · **I147** · **I146**  
 **Ambiente do agente:** **This PC (Windows)** — pasta no **C:** · **não** Cloud Agent.  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
@@ -79,7 +79,7 @@ Invoke-RestMethod -Uri "${GAS}?action=listarAtivas" | ConvertTo-Json -Depth 5
 | **Gestão / dev** | **Computador** (Windows + Cursor **local**) | **Sócio/dev** | Código, `.ps1`, planilha OAuth, browser no PC |
 | **Operação balcão** | **Tablet** fixo no shopping | **Operadores** | Locações, timer, PIN, PWA na loja |
 
-**Tablet (Ops):** https://ribocg-a11y.github.io/movikids/?force=1.9.105
+**Tablet (Ops):** https://ribocg-a11y.github.io/movikids/?force=1.9.106
 
 ---
 
@@ -87,9 +87,9 @@ Invoke-RestMethod -Uri "${GAS}?action=listarAtivas" | ConvertTo-Json -Depth 5
 
 | Camada | Versão | URL / evidência |
 |--------|--------|-----------------|
-| **Frontend** | **v1.9.105** | https://ribocg-a11y.github.io/movikids/?force=1.9.105 |
-| **Gestão Pessoas** | **v1.9.105** | `gestao-pessoas.html?force=1.9.105` |
-| **Service Worker** | **1.9.105** | `sw.js` · `mk-idb-store.js` · `mk-offline-queue.js` |
+| **Frontend** | **v1.9.106** | https://ribocg-a11y.github.io/movikids/?force=1.9.106 |
+| **Gestão Pessoas** | **v1.9.106** | `gestao-pessoas.html?force=1.9.106` |
+| **Service Worker** | **1.9.106** | `sw.js` · I148 encerrar já-fechada some o card |
 | **Apps Script** | repo/Web **v1.5.211** ✅ | ping alinhado · I147 · I143 |
 | **Pasta C** | **`f524e82`** | validado PC 29/08 |
 | **Planilha** | 23 abas | **0** Ativa/Pendente (PC + API 29/08) |
@@ -106,7 +106,7 @@ Invoke-RestMethod -Uri "${GAS}?action=listarAtivas" | ConvertTo-Json -Depth 5
 
 | # | Ação | Quem | Status |
 |---|------|------|--------|
-| **T1** | Tablet `?force=1.9.105` — **0 cards** se planilha `total:0` | Ops | ⏳ **primeiro** |
+| **T1** | Tablet `?force=1.9.106` — I148 card some se já Encerrada | Ops | ⏳ **hoje** |
 | **T2** | Teste offline: avião → salvar → rede → planilha **+1** sem duplicata | Ops | ⏳ |
 | **T3** | Smoke D4 (timer, multi-veículo, idle 10 min) | Ops | ⏳ |
 | **0g** | **I147** Fase 2 offline + idempotência GAS | Agente | ✅ **29/08** |
