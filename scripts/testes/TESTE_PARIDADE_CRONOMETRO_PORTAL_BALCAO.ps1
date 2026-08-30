@@ -133,3 +133,4 @@ try {
 $result.finishedAt = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
 $result | ConvertTo-Json -Depth 6
 if ($result.status -ne "ok") { exit 1 }
+exit 0
