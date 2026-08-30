@@ -1,6 +1,6 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 30/08/2026 · FE **v1.9.107** (local; Pages ainda 1.9.106 até I22 livre) · GAS repo/Web **v1.5.211** ✅ · **I149** meta · **I148** · **I147** · **I146**  
+**Atualizado:** 30/08/2026 · FE **v1.9.107** Pages ✅ · GAS ping **v1.5.211** (repo header v1.5.213) · **I149** meta · **I148**  
 **Ambiente do agente:** **This PC (Windows)** — pasta no **C:** · **não** Cloud Agent.  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
@@ -87,9 +87,9 @@ Invoke-RestMethod -Uri "${GAS}?action=listarAtivas" | ConvertTo-Json -Depth 5
 
 | Camada | Versão | URL / evidência |
 |--------|--------|-----------------|
-| **Frontend** | **v1.9.107** local · Pages **1.9.106** | push I22 bloqueado (2 Ativa 30/08) |
-| **Gestão Pessoas** | **v1.9.107** local | mesmo bump I3 |
-| **Service Worker** | **1.9.107** local | I148 unificado + I149 meta |
+| **Frontend** | **v1.9.107** | https://ribocg-a11y.github.io/movikids/?force=1.9.107 |
+| **Gestão Pessoas** | **v1.9.107** | `gestao-pessoas.html?force=1.9.107` |
+| **Service Worker** | **1.9.107** | I148 unificado + I149 meta |
 | **Apps Script** | repo/Web **v1.5.211** ✅ | ping alinhado · I147 · I143 |
 | **Pasta C** | **`f524e82`** | validado PC 29/08 |
 | **Planilha** | 23 abas | **0** Ativa/Pendente (PC + API 29/08) |
@@ -106,8 +106,8 @@ Invoke-RestMethod -Uri "${GAS}?action=listarAtivas" | ConvertTo-Json -Depth 5
 
 | # | Ação | Quem | Status |
 |---|------|------|--------|
-| **S0–S3** | Código sinergia + I149 meta em **v1.9.107** | Agente | ✅ local · ⏳ push I22 |
-| **T1** | Loja vazia → push + tablet `?force=1.9.107` | Agente + Ops | ⏳ I22 |
+| **S0–S3** | Código sinergia + I149 · FE **v1.9.107** | Agente | ✅ Pages |
+| **T1** | Tablet `?force=1.9.107` | Ops | ⏳ agora |
 | **T2** | Teste offline: avião → salvar → rede → planilha **+1** sem duplicata | Ops | ⏳ |
 | **T3** | Smoke D4 (timer, multi-veículo, idle 10 min) | Ops | ⏳ |
 | **0g** | **I147** Fase 2 offline + idempotência GAS | Agente | ✅ **29/08** |
