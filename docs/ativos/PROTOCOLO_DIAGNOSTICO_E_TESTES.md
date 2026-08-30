@@ -77,7 +77,7 @@ Cada fluxo tem: **arquivos**, **incidentes**, **teste automático**, **tablet ob
 | **F6** | Timer ativo — countdown | `calcRemaining`, anel, stats | `mk-sessao.js`, `mk-home.js` | I16, I20 | paridade cronômetro | ✅ |
 | **F7** | Alertas timer — 5 min / expirado | `checkTimer` → `triggerAlert5` / `triggerAlertExpired` (beep + modal, **sem SMS**) | `mk-sessao.js`, `mk-operacao.js` | — | `TESTE_TABLET_F5_F7_F10_F11` | ✅ |
 | ~~**F8**~~ | ~~SMS operacional~~ | ⏸ **Suspenso** — canal QR · alertas visuais OK | — | SMS P0 | — | — |
-| **F9** | Encerrar / cancelar | drawer → GAS → some do ativo | `mk-drawer.js`, GAS encerrar | I2, I11, I13 | `TESTE_DRAWER_E` | ✅ |
+| **F9** | Encerrar / cancelar | drawer → GAS → some do ativo | `mk-drawer.js`, GAS encerrar | I2, I11, I13, **I148** | `TESTE_DRAWER_E` | ✅ |
 | **F10** | Sync multi-canal | poll + Firebase + merge + BC | `mk-sync.js`, `mk-firebase.js` | I17, I20 | `TESTE_TABLET_F5_F7_F10_F11` (reload OK; 2 abas físico pendente) | ✅ 2 abas |
 | **F11** | Portal responsável | `acompanhar.html` ±2s do balcão | portal + GAS `buscarPortalResponsavel_` | **I16** | `TESTE_PARIDADE_CRONOMETRO` | ✅ celular |
 | **F12** | Admin — KPIs / payback / caixa / cockpit / **folha CLT** | Dashboard (`kpiMes`), Caixa (`resumoDia`), payback, viabilidade | `mk-admin.js`, GAS `buildKpiMesPayload_`, `lerFolhaPlanejamento_`, `repairFolhaAdmin` | I23, **I25**, payback M | `TESTE_KPI_MES_READONLY`, `TESTE_FOLHA_FORMULAS_READONLY`, `TESTE_FASE9_FOLHA_READONLY` | PC admin |

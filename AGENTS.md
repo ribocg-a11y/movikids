@@ -2,13 +2,13 @@
 
 Sistema operacional de locações — balcão (tablet na loja), portal do responsável, painel admin.
 
-**Ciclo ativo (29/08/2026):** Sprint D · FE **v1.9.105** · GAS **v1.5.211** · **I147** / **I146** / **I145** / **I143**
+**Ciclo ativo (30/08/2026):** Sprint D · FE **v1.9.107** local (Pages 1.9.106 até I22) · GAS **v1.5.211** · **I149** / **I148** / **I147**
 
 **Repo neste PC:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`
 
 **Para retomar (agente local PC — pasta C):**
 
-> *Continuar MOVI KIDS **no PC** — workspace `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`. Ler HANDOFF_NOVO_CHAT.md. FE v1.9.105 / GAS v1.5.211 ✅. Planilha 0 abertas. Próximo: smoke tablet D4 + teste offline. **Não Cloud.***
+> *Continuar MOVI KIDS **no PC** — workspace `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`. Ler HANDOFF_NOVO_CHAT.md. FE v1.9.107 local / Pages 1.9.106 até I22 · GAS v1.5.211. Próximo: push 1.9.107 com loja vazia. **Não Cloud.***
 
 ## Produção atual
 

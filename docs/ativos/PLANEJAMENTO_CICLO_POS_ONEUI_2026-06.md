@@ -2,7 +2,8 @@
 
 **Criado:** 27/06/2026 · **Substitui backlog ativo** de `PLANEJAMENTO_ONE_UI_2026-06.md` (Sprints A–C ✅)  
 **Produção (29/08/2026):** FE **v1.9.105** · GAS **v1.5.211** · Pages confirmado · I96–I142 · **I146** P0 local-first ✅ · **I147** Fase 2 offline ✅  
-**Mestre:** `PLANO_PREMIUM_ONEUI_FASES_16_22_2026-06.md` · **Roteiro agente:** `ROTEIRO_AGENTE_OBRIGATORIO.md`
+**Mestre:** `PLANO_PREMIUM_ONEUI_FASES_16_22_2026-06.md` · **Roteiro agente:** `ROTEIRO_AGENTE_OBRIGATORIO.md`  
+**Paralelo (30/08):** pontas de sinergia — `PLANO_SINERGIA_PONTAS_2026-08-30.md` (S0–S3) antes de assinar D4 numa FE velha.
 
 ---
 

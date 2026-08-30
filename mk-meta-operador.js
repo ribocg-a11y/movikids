@@ -145,6 +145,31 @@ function mkMetaInShift_(mins, shift) {
   return mins >= shift[0] * 60 && mins < shift[1] * 60;
 }
 
+/** I109 — sex/sáb/dom com Raykelly+Julia na escala: pote R$50. */
+const MK_META_PAR_IDS_ = { 3: 4, 4: 3 };
+
+function mkMetaFssJuntas_(opId, when) {
+  const id = Number(opId);
+  const par = MK_META_PAR_IDS_[id];
+  if (!par) return false;
+  const dt = when || new Date();
+  const dow = dt.getDay();
+  if (dow !== 0 && dow !== 5 && dow !== 6) return false;
+  const a = mkMetaCfgAtiva_(id);
+  const b = mkMetaCfgAtiva_(par);
+  return !!(a && b && a.escala && a.escala[dow] && b.escala && b.escala[dow]);
+}
+
+/** Valor que a tela mostra: bônus do dia no GAS, ou R$50 no FSS com par, senão R$100. */
+function mkMetaBonusAlvo_(d) {
+  const h = (d && d.hoje) || {};
+  const earned = Number(h.bonusValorHoje);
+  if (earned > 0) return earned;
+  const opId = Number((d && d.operadorId) || mkMetaResolveOperadorId_(d) || 0);
+  if (mkMetaFssJuntas_(opId, new Date())) return 50;
+  return Number(d && d.bonus) || 100;
+}
+
 function mkMetaComputeLocal_(opId) {
   const cfg = mkMetaCfgAtiva_(opId);
   if (!cfg) return null;
@@ -152,32 +177,30 @@ function mkMetaComputeLocal_(opId) {
   const dow = now.getDay();
   const shift = cfg.escala[dow];
   const minsNow = now.getHours() * 60 + now.getMinutes();
-  const list = typeof encHojeData !== 'undefined' ? encHojeData : [];
-  let n = 0;
-  if (shift) {
-    list.forEach((e) => {
-      const hm = mkMetaParseHm_(e.horaFim || e.horaInicio);
-      if (hm != null && mkMetaInShift_(hm, shift)) n++;
-    });
-  }
+  const srv = (typeof window !== 'undefined') ? window._mkLastMetaTurno : null;
+  const sameOp = !!(srv && Number(srv.operadorId) === Number(opId));
+  const hSrv = sameOp ? (srv.hoje || {}) : {};
+  const n = sameOp ? (Number(hSrv.n) || 0) : 0;
+  const bonusAlvo = mkMetaFssJuntas_(opId, now) ? 50 : (Number(cfg.bonus) || 100);
   return {
     ok: true,
     configurado: true,
     operador: cfg.nome,
     operadorId: Number(opId),
     meta: cfg.meta,
-    bonus: cfg.bonus,
-    fonte: 'local',
+    bonus: bonusAlvo,
+    fonte: sameOp ? 'servidor' : 'local',
     hoje: {
       n,
       meta: cfg.meta,
-      metaOk: n >= cfg.meta,
-      atingiu: n > cfg.meta,
+      metaOk: sameOp ? !!hSrv.metaOk : false,
+      atingiu: sameOp ? !!hSrv.atingiu : false,
+      bonusValorHoje: sameOp && hSrv.bonusValorHoje != null ? Number(hSrv.bonusValorHoje) : 0,
       emTurno: mkMetaInShift_(minsNow, shift),
       folga: !shift,
       shiftLabel: mkMetaShiftLabel_(shift)
     },
-    mes: { diasComMeta: 0, diasTrabalhados: 0, bonusEstimado: 0 }
+    mes: sameOp && srv.mes ? srv.mes : { diasComMeta: 0, diasTrabalhados: 0, bonusEstimado: 0 }
   };
 }
 
@@ -328,7 +351,7 @@ function mkMetaRenderHero_(d) {
   const h = d.hoje || {};
   const mes = d.mes || {};
   const meta = Number(d.meta) || 20;
-  const bonusVal = Number(d.bonus) || 100;
+  const bonusVal = typeof mkMetaBonusAlvo_ === 'function' ? mkMetaBonusAlvo_(d) : (Number(d.bonus) || 100);
   const n = Number(h.n) || 0;
   const opId = Number(d.operadorId) || mkMetaResolveOperadorId_();
   const nome = mkMetaFirstName_(d.operador || MK_META_CFG[opId]?.nome || 'Operador');

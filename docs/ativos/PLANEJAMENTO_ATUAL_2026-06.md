@@ -22,7 +22,7 @@
 | FASE 18 Financeiro UI | ✅ Sprint B · complemento Sprint H |
 | Raykelly cadastro | ✅ **100%** 26/06 |
 
-**Próximo passo:** `PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md` → **D2–D4** assinar F17 + smoke tablet v1.9.88 → Sprint E
+**Próximo passo:** `PLANO_SINERGIA_PONTAS_2026-08-30.md` (S0–S3) → depois D4 em `PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`
 
 ---
 

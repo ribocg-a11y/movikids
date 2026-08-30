@@ -136,8 +136,9 @@ flowchart TB
 
 | Canal | Função |
 |-------|--------|
-| **Poll** | `carregarInicio` a cada 5–15s |
-| **Firebase** | `sessoes` → atualiza cards/timer sem esperar poll |
+| **Poll** | `carregarInicio` — **fonte da verdade** no salvar/▶ (I125b) |
+| **listarAtivas** | I148 — fallback se `carregarInicio` atrasar (não traz encHoje) |
+| **Firebase** | Ainda **ouve** `sessoes`; GAS **não grava** no salvar/▶ (I125b). Escreve em encerrar/editar/estender/cancelar |
 | **BroadcastChannel** | Abas do mesmo tablet sincronizadas |
 
 ### Cronômetro — fluxo I20 (v1.5.66+ + FE v1.7.78+; atual v1.7.87) — **zona P0**

@@ -8,6 +8,7 @@
 |-----------|----------|
 | [**ROTEIRO_AGENTE_OBRIGATORIO.md**](ativos/ROTEIRO_AGENTE_OBRIGATORIO.md) | **Agente** — ordem fixa commit/push/verify (I24) |
 | [**HANDOFF_NOVO_CHAT.md**](ativos/HANDOFF_NOVO_CHAT.md) | **Novo chat Cursor** — contexto, produção |
+| [**PLANO_SINERGIA_PONTAS_2026-08-30.md**](ativos/PLANO_SINERGIA_PONTAS_2026-08-30.md) | **Plano ativo** — I148 único · portal `?v=` · mapa honesto · Fase 3 offline depois |
 | [**PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md**](ativos/PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md) | **Ciclo ativo** — Sprint D→G pós v1.9.2 |
 | [**DIAGNOSTICO_SISTEMA_6_CAMADAS_2026-06.md**](ativos/DIAGNOSTICO_SISTEMA_6_CAMADAS_2026-06.md) | **Scorecard 6 camadas** — buracos P0–P2 · rotinas |
 | [**CHECKLIST_FASE17_FECHAMENTO.md**](ativos/CHECKLIST_FASE17_FECHAMENTO.md) | **FASE 17** — critérios assinatura + decisão 17.5 F9 |
