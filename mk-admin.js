@@ -2216,6 +2216,7 @@ function mkCenariosFinanceirosFe_(d) {
   if (d.cenariosFinanceiros && d.cenariosFinanceiros.baseDreMes != null) {
     return d.cenariosFinanceiros;
   }
+  const mes = Number(d.mesAtual) || (new Date().getMonth() + 1);
   const ano = Number(d.anoAtual) || new Date().getFullYear();
   const diasMes = Number(d.diasMes) || new Date(ano, mes, 0).getDate();
   const fatMes = Number(d.fatMes) || 0;
@@ -2255,7 +2256,7 @@ function mkCenariosFinanceirosFe_(d) {
   return {
     baseDreMes: baseDreMes,
     baseDreDiaria: baseDreDiaria,
-    baseDreDetalhe: viab.folhaMensal ? ('DRE · folha ' + R2(folha) + ' + custos + margem 18%') : 'DRE · configure FOLHA B68',
+    baseDreDetalhe: basePack.detalhe || ('DRE · folha ' + R2(folha) + ' + manut. ' + R2(MK_DRE_MANUTENCAO_MENSAL_) + ' + margem 18%'),
     projetado3mMes: proj.mes,
     projetado3mDiaria: proj.diaria,
     projetado3mMeses: proj.meses,
