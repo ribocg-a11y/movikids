@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.214
+// MOVI KIDS — Google Apps Script v1.5.215
+// v1.5.215: I150b — DRE base inclui manutenção fixa R$ 1.200/mês (DRE_MANUTENCAO_MENSAL_)
 // v1.5.214: I150 — cenariosFinanceiros: baseDre (DRE) · projetado3m · ritmo3d (ref mes anterior se <3 dias)
 // v1.5.213: I148 — corrigirCanceladaParaEncerradaAdmin (Cancelada→Encerrada caixa ADM)
 // v1.5.212: I148 — encerrarLocacao cancelarExtras/somentePlano: minUsados let (V8 const crash)
@@ -310,6 +311,9 @@ const CONTRAT_RESERVA_MIN_ = 2500;
 const CONTRAT_MARGEM_MIN_ = 18;
 const CONTRAT_DIAS_MIN_ = 12;
 const CONTRAT_MARGEM_BASE_MIN_ = 10;
+
+/** I150 — manutenção mensal fixa no piso DRE (independe de lançamentos na aba CUSTOS). */
+const DRE_MANUTENCAO_MENSAL_ = 1200;
 
 // ── VEÍCULOS VÁLIDOS — v1.5.111: Carro 04 · v1.5.21: Triciclo 02 ───────
 const VEICULOS_VALIDOS = [
@@ -6214,8 +6218,34 @@ function calcProjetado3mMes_(mes, ano, fatByPayback) {
 }
 
 /**
+ * I150 — piso DRE mensal: folha + custos lançados + manutenção fixa + CTO min · margem alvo.
+ */
+function calcBaseDreMes_(folha, cusMes, ctoMin, diasMes) {
+  const folhaV = Number(folha) || 0;
+  const cus = Number(cusMes) || 0;
+  const cto = Number(ctoMin) || 0;
+  const manut = DRE_MANUTENCAO_MENSAL_;
+  const dm = Number(diasMes) || 30;
+  if (folhaV <= 0) {
+    return { mes: 0, diaria: 0, manutencaoDre: manut, detalhe: '' };
+  }
+  const mes = Math.round((folhaV + cus + manut + cto) / (0.9 - CONTRAT_MARGEM_MIN_ / 100) * 100) / 100;
+  const detalhe = 'DRE: folha R$ ' + fmtMoedaBr_(folhaV)
+    + ' + custos R$ ' + fmtMoedaBr_(cus)
+    + ' + manut. R$ ' + fmtMoedaBr_(manut)
+    + ' + CTO min R$ ' + fmtMoedaBr_(cto)
+    + ' · margem ' + CONTRAT_MARGEM_MIN_ + '%';
+  return {
+    mes: mes,
+    diaria: dm > 0 ? Math.round(mes / dm * 100) / 100 : 0,
+    manutencaoDre: manut,
+    detalhe: detalhe
+  };
+}
+
+/**
  * I150 — cenários financeiros canônicos (Dashboard).
- * Base = piso DRE (fatMinMargem: folha + custos + CTO min, margem alvo).
+ * Base = piso DRE (folha + custos + manut. fixa R$ 1.200 + CTO min, margem alvo).
  * Projetado = média 3 meses anteriores.
  * Ritmo = média últimos 3 dias c/ faturamento; se <3 dias no mês → ref. mês anterior.
  */
@@ -6238,11 +6268,9 @@ function buildCenariosFinanceirosMes_(opts) {
   const diaCal = isCorrente ? hoje.getDate() : diasMes;
   const diasRest = isCorrente ? Math.max(0, diasMes - diaCal) : 0;
 
-  let baseDreMes = Number(viab.fatMinMargem) || 0;
-  if (baseDreMes <= 0 && folha > 0) {
-    baseDreMes = Math.round((folha + cusMes + ctoMin) / (0.9 - CONTRAT_MARGEM_MIN_ / 100) * 100) / 100;
-  }
-  const baseDreDiaria = diasMes > 0 ? Math.round(baseDreMes / diasMes * 100) / 100 : 0;
+  const basePack = calcBaseDreMes_(folha, cusMes, ctoMin, diasMes);
+  const baseDreMes = basePack.mes;
+  const baseDreDiaria = basePack.diaria;
 
   const projPack = calcProjetado3mMes_(mes, ano, fatByPayback);
   const projetado3mMes = projPack.mes;
@@ -6303,7 +6331,8 @@ function buildCenariosFinanceirosMes_(opts) {
   return {
     baseDreMes: baseDreMes,
     baseDreDiaria: baseDreDiaria,
-    baseDreDetalhe: 'DRE: folha R$ ' + fmtMoedaBr_(folha) + ' + custos + CTO min · margem ' + CONTRAT_MARGEM_MIN_ + '%',
+    baseDreManutencao: basePack.manutencaoDre,
+    baseDreDetalhe: basePack.detalhe,
     projetado3mMes: projetado3mMes,
     projetado3mDiaria: projetado3mDiaria,
     projetado3mMeses: projPack.meses,

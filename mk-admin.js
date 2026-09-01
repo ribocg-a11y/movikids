@@ -2145,10 +2145,26 @@ function renderMetaDiaChart_(d) {
   }
 }
 
-/**
- * I150 — cenários financeiros canônicos (espelho GAS buildCenariosFinanceirosMes_).
- * Base = DRE (fatMinMargem) · Projetado = média 3 meses anteriores · Ritmo = média últimos 3 dias c/ fat.
- */
+/** I150 — manutenção mensal fixa no piso DRE (espelho GAS DRE_MANUTENCAO_MENSAL_). */
+const MK_DRE_MANUTENCAO_MENSAL_ = 1200;
+
+function mkCalcBaseDreFe_(folha, cusMes, ctoMin, diasMes) {
+  const folhaV = Number(folha) || 0;
+  const cus = Number(cusMes) || 0;
+  const cto = Number(ctoMin) || 0;
+  const manut = MK_DRE_MANUTENCAO_MENSAL_;
+  const dm = Number(diasMes) || 30;
+  if (folhaV <= 0) {
+    return { mes: 0, diaria: 0, manutencaoDre: manut, detalhe: '' };
+  }
+  const mes = Math.round((folhaV + cus + manut + cto) / 0.72 * 100) / 100;
+  return {
+    mes: mes,
+    diaria: dm > 0 ? Math.round(mes / dm * 100) / 100 : 0,
+    manutencaoDre: manut,
+    detalhe: 'DRE: folha ' + R2(folhaV) + ' + custos ' + R2(cus) + ' + manut. ' + R2(manut) + ' + CTO min ' + R2(cto) + ' · margem 18%'
+  };
+}
 function mkLastNBillingDaysFe_(fatPorDia, n, maxDia, prevFatPorDia) {
   n = n || 3;
   let rows = (fatPorDia || []).slice().sort(function(a, b) { return (a.dia || 0) - (b.dia || 0); });
@@ -2200,7 +2216,6 @@ function mkCenariosFinanceirosFe_(d) {
   if (d.cenariosFinanceiros && d.cenariosFinanceiros.baseDreMes != null) {
     return d.cenariosFinanceiros;
   }
-  const mes = Number(d.mesAtual) || (new Date().getMonth() + 1);
   const ano = Number(d.anoAtual) || new Date().getFullYear();
   const diasMes = Number(d.diasMes) || new Date(ano, mes, 0).getDate();
   const fatMes = Number(d.fatMes) || 0;
@@ -2212,11 +2227,9 @@ function mkCenariosFinanceirosFe_(d) {
   const cusMes = Number(d.cusMes) || 0;
   const ctoMin = Number(d.ctoMinimo) || 0;
   const folha = Number(viab.folhaMensal) || 0;
-  let baseDreMes = Number(viab.fatMinMargem) || Number(d.baselineFatMes) || 0;
-  if (baseDreMes <= 0 && folha > 0) {
-    baseDreMes = Math.round((folha + cusMes + ctoMin) / 0.72 * 100) / 100;
-  }
-  const baseDreDiaria = diasMes > 0 ? Math.round(baseDreMes / diasMes * 100) / 100 : 0;
+  const basePack = mkCalcBaseDreFe_(folha, cusMes, ctoMin, diasMes);
+  const baseDreMes = basePack.mes;
+  const baseDreDiaria = basePack.diaria;
   const proj = mkProjetado3mFe_(d);
   const fatDia = d.fatPorDia || [];
   let acum = 0;
