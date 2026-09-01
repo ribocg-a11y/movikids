@@ -1,6 +1,6 @@
 # MOVI KIDS — Deploy atual (referência única)
 
-**Atualizado:** 30/08/2026 (FE **v1.9.107** Pages ✅ · GAS ping **v1.5.211** · repo **v1.5.213** · I149 / I148 / I147)
+**Atualizado:** 01/09/2026 (FE **v1.9.109** Pages ✅ · GAS ping **v1.5.213** · repo **v1.5.215** · I150 / I150b)
 
 Use **este arquivo** para versão e ordem de publicação.
 
@@ -10,11 +10,11 @@ Use **este arquivo** para versão e ordem de publicação.
 
 | Camada | Repo | Produção (ping / Pages) | Alinhado? |
 |--------|------|-------------------------|-----------|
-| **Frontend** | **v1.9.107** | https://ribocg-a11y.github.io/movikids/?force=1.9.107 | ✅ Pages |
-| **Gestão Pessoas** | **v1.9.107** | `gestao-pessoas.html?force=1.9.107` | ✅ |
-| **Portal acompanhar** | **v1.9.107** | `acompanhar.html?v=1.9.107` | ✅ |
-| **Service Worker** | **1.9.107** | I148 + I149 | ✅ |
-| **GAS** | **v1.5.213** (header `.gs`) | ping **v1.5.211** | ⏳ Nova versão Web |
+| **Frontend** | **v1.9.109** | https://ribocg-a11y.github.io/movikids/?force=1.9.109 | ✅ Pages |
+| **Gestão Pessoas** | **v1.9.109** | `gestao-pessoas.html?force=1.9.109` | ✅ |
+| **Portal acompanhar** | **v1.9.109** | `acompanhar.html?v=1.9.109` | ✅ |
+| **Service Worker** | **1.9.109** | I150 Dashboard cenários | ✅ |
+| **GAS** | **v1.5.215** (header `.gs`) | ping **v1.5.213** · `cenariosFinanceiros` live | ⏳ Nova versão Web (string ping) |
 
 **Ping:** https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec?action=ping
 
@@ -30,22 +30,23 @@ Use **este arquivo** para versão e ordem de publicação.
 C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github\MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs
 ```
 
-**Raw (colar Editor — linha 2 = v1.5.213 no repo; ping produção ainda v1.5.211):**
+**Raw (colar Editor — header v1.5.215):**
 
 https://raw.githubusercontent.com/ribocg-a11y/movikids/main/MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs
 
-**Header repo:** v1.5.213 · I148 admin/minUsados · I147 idempotência · I143 `veiculoJaAberto_`
+**Header repo:** v1.5.215 · I150b manutenção R$1200 · I150 cenários DRE · I148 admin
 
 ---
 
-## Validação 29/08/2026
+## Validação 01/09/2026
 
 | Check | Resultado |
 |-------|-----------|
-| ping | **v1.5.211** ✅ |
-| Pages `mk-version.js` | **1.9.105** ✅ |
+| ping | **v1.5.213** ✅ |
+| Pages `mk-version.js` | **1.9.109** ✅ |
+| `kpiMes` `cenariosFinanceiros` ago/26 | base **11047** · proj **11875** · ritmo **16140** ✅ |
+| `teste-i150-cenarios-financeiros.cjs` | **ok** ✅ |
 | `listarAtivas` | **0** abertas ✅ |
-| Fase 2 offline | FE fila + GAS `clientRequestId` ✅ |
 
 ---
 

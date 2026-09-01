@@ -1,10 +1,10 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 30/08/2026 · FE **v1.9.107** Pages ✅ · GAS ping **v1.5.211** (repo header v1.5.213) · **I149** meta · **I148**  
+**Atualizado:** 01/09/2026 · FE **v1.9.109** Pages ✅ · GAS ping **v1.5.213** (repo header **v1.5.215**) · **I150** / **I150b**  
 **Ambiente do agente:** **This PC (Windows)** — pasta no **C:** · **não** Cloud Agent.  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
-**GitHub:** `ribocg-a11y/movikids` · branch `main` · FE Pages **v1.9.107**
+**GitHub:** `ribocg-a11y/movikids` · branch `main` · FE Pages **v1.9.109**
 
 ---
 
@@ -15,7 +15,7 @@
 | **Workspace obrigatório** | `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github` |
 | **Modo Cursor** | **Agent local / This PC** — o agente precisa rodar `.ps1`, `git`, ping GAS e OAuth no Windows |
 | **Não usar** | Cloud Agent (VM Linux sem pasta C nem `clasp`/OAuth local) |
-| **Confirmar no 1º turno** | `Test-Path .\scripts\relatorio-versoes.ps1` → `True` · Pages **1.9.107** |
+| **Confirmar no 1º turno** | `Test-Path .\scripts\relatorio-versoes.ps1` → `True` · Pages **1.9.109** |
 
 **Sincronizar pasta C antes de codar** (se veio de outro chat / Cloud):
 
@@ -29,7 +29,7 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 
 ## Mensagem para colar no novo chat (PC)
 
-> *Continuar MOVI KIDS **no PC** — workspace pasta C (`movikids-github`). Ler `HANDOFF_NOVO_CHAT.md`. FE **v1.9.107** Pages ✅ · GAS ping **v1.5.211** (repo v1.5.213). Cadeia I146–I149. Tablet `?force=1.9.107`. **Não Cloud — This PC.***
+> *Continuar MOVI KIDS **no PC** — workspace pasta C (`movikids-github`). Ler `HANDOFF_NOVO_CHAT.md`. FE **v1.9.109** Pages ✅ · GAS ping **v1.5.213** (repo v1.5.215). Cadeia I146–I150. Tablet `?force=1.9.109`. **Não Cloud — This PC.***
 
 **Mensagem mínima** (também funciona):
 
@@ -37,36 +37,35 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 
 ---
 
-## Evidência validada no PC (29/08/2026 ~13:03)
-
-Comandos rodados pelo sócio na pasta C — **alinhado com produção**:
+## Evidência validada (01/09/2026 — Cloud + GAS live)
 
 | Check | Resultado |
 |-------|-----------|
-| `relatorio-versoes.ps1 -Markdown` | FE **1.9.105** OK · GAS ping **v1.5.211** alinhado · Pages confirmado |
-| `Invoke-RestMethod "${GAS}?action=ping"` | **v1.5.211** online |
-| `Invoke-RestMethod "${GAS}?action=listarAtivas"` | **total: 0** |
-| Pages `mk-version.js` | **1.9.105** |
+| Pages `mk-version.js` | **1.9.109** ✅ |
+| `ping` GAS | **v1.5.213** online |
+| `kpiMes` ago/26 `cenariosFinanceiros` | baseDre **11047** · proj3m **11875** · ritmo **16140** · manut **1200** ✅ |
+| `teste-i150-cenarios-financeiros.cjs` | **16/16 ok** |
+| `listarAtivas` | **total: 0** |
 
 **Armadilha PowerShell 5.1:** `"$GAS?action=ping"` quebra a URL. Usar **`"${GAS}?action=ping"`** (chaves `${}`).
 
 ```powershell
 $GAS = "https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec"
 Invoke-RestMethod -Uri "${GAS}?action=ping" | ConvertTo-Json
-Invoke-RestMethod -Uri "${GAS}?action=listarAtivas" | ConvertTo-Json -Depth 5
+node scripts\testes\teste-i150-cenarios-financeiros.cjs
 ```
 
 ---
 
 ## Entregas recentes (contexto)
 
-**Fase 2 offline (29/08):** FE **v1.9.104–105** + GAS **v1.5.211** — fila offline salvar/▶ · `clientRequestId` idempotente · badge **Fila offline: N**. Doc: `INCIDENTE_I147_FASE2_OFFLINE_IDEMPOTENCIA_2026-08-29.md`
+**I150 / I150b (01/09):** Dashboard cenários financeiros — Base DRE (folha + custos + manut R$1.200 + CTO ÷ 0,72) · Projetado 3 meses · Ritmo 3 dias. FE **v1.9.108–109** · GAS **v1.5.214–215**. Doc: `INCIDENTE_I150_CENARIOS_FINANCEIROS_DRE_2026-09-01.md`
 
-**P0 local-first Fase 1 (29/08):** FE **v1.9.101–103** — snapshot LS + **IndexedDB** · chip **local · nuvem** · boot sem `mk_sessions` cru · tela sync não trava. Doc: `INCIDENTE_I146_BOOT_MK_SESSIONS_FANTASMA_2026-08-29.md`
+**I149 (30/08):** Meta festeja R$100 com loja inteira — FE **v1.9.107**. Doc: `INCIDENTE_I149_META_FSS_100_2026-08-30.md`
 
-**I145 (13/08):** idle/tela off sem `force=1` · Doc: `INCIDENTE_I145_SYNC_FORCE_IDLE_2026-08-13.md`
+**I148 (29/08):** Encerrar fantasma — FE **v1.9.107**. Doc: `INCIDENTE_I148_ENCERRAR_FANTASMA_2026-08-29.md`
 
-**I143 (06/08):** anti-duplicata salvar/▶ · GAS `veiculoJaAberto_` · Doc: `INCIDENTE_I143_SALVAR_DUP_TIMEOUT_FORCE_2026-08-06.md`
+**I147 (29/08):** Fase 2 offline + idempotência — FE **v1.9.104–105** · GAS **v1.5.211**. Doc: `INCIDENTE_I147_FASE2_OFFLINE_IDEMPOTENCIA_2026-08-29.md`
 
 **GAS canônico (raw):** https://raw.githubusercontent.com/ribocg-a11y/movikids/main/MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs
 
@@ -79,21 +78,21 @@ Invoke-RestMethod -Uri "${GAS}?action=listarAtivas" | ConvertTo-Json -Depth 5
 | **Gestão / dev** | **Computador** (Windows + Cursor **local**) | **Sócio/dev** | Código, `.ps1`, planilha OAuth, browser no PC |
 | **Operação balcão** | **Tablet** fixo no shopping | **Operadores** | Locações, timer, PIN, PWA na loja |
 
-**Tablet (Ops):** https://ribocg-a11y.github.io/movikids/?force=1.9.107
+**Tablet (Ops):** https://ribocg-a11y.github.io/movikids/?force=1.9.109
 
 ---
 
-## Produção (29/08/2026)
+## Produção (01/09/2026)
 
 | Camada | Versão | URL / evidência |
 |--------|--------|-----------------|
-| **Frontend** | **v1.9.107** | https://ribocg-a11y.github.io/movikids/?force=1.9.107 |
-| **Gestão Pessoas** | **v1.9.107** | `gestao-pessoas.html?force=1.9.107` |
-| **Service Worker** | **1.9.107** | I148 unificado + I149 meta |
-| **Apps Script** | repo **v1.5.213** · ping **v1.5.211** | Nova versão Web pendente |
+| **Frontend** | **v1.9.109** | https://ribocg-a11y.github.io/movikids/?force=1.9.109 |
+| **Gestão Pessoas** | **v1.9.109** | `gestao-pessoas.html?force=1.9.109` |
+| **Service Worker** | **1.9.109** | I150 Dashboard cenários |
+| **Apps Script** | repo **v1.5.215** · ping **v1.5.213** | `cenariosFinanceiros` live · string ping ⏳ Nova versão Web |
 | **Pasta C** | este repo | `movikids-github` no C: |
-| **Planilha** | 23 abas | operação viva 30/08 |
-| **Homolog tablet** | ⏳ | smoke D4 + teste offline I147 |
+| **Planilha** | 23 abas | operação viva 01/09 |
+| **Homolog tablet** | ⏳ | smoke D4 + Dashboard admin browser |
 
 **Deploy ID GAS:** `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y`
 
@@ -106,41 +105,29 @@ Invoke-RestMethod -Uri "${GAS}?action=listarAtivas" | ConvertTo-Json -Depth 5
 
 | # | Ação | Quem | Status |
 |---|------|------|--------|
-| **S0–S3** | Código sinergia + I149 · FE **v1.9.107** | Agente | ✅ Pages |
-| **T1** | Tablet `?force=1.9.107` | Ops | ⏳ agora |
-| **T2** | Teste offline: avião → salvar → rede → planilha **+1** sem duplicata | Ops | ⏳ |
+| **I150** | Cenários financeiros Dashboard (DRE / 3m / 3d) | Agente | ✅ FE+GAS |
+| **T1** | Tablet `?force=1.9.109` | Ops | ⏳ |
+| **T2** | Dashboard admin — validar 3 linhas + labels I150 | Sócio PC | ⏳ |
 | **T3** | Smoke D4 (timer, multi-veículo, idle 10 min) | Ops | ⏳ |
-| **0g** | **I147** Fase 2 offline + idempotência GAS | Agente | ✅ **29/08** |
-| **0f** | **I146** P0 local-first · IndexedDB | Agente | ✅ **29/08** |
+| **GAS** | Nova versão Web v1.5.215 (alinhar ping) | Sócio | ⏳ |
 | 2 | Assinar **FASE 17** (decisão **17.5 F9**) | Sócio | ⏳ |
 | 3 | Sprint E — FASE 19 | Agente | 📋 após D4 |
 
 **Paridade diária (PC):** `listarAtivas.total` = número de cards Pendente+Ativa no tablet.
 
-## Cadeia 29–30/08 (quatro falhas)
+## Cadeia 29/08–01/09
 
-| # | ID | O quê | Status |
-|---|-----|------|--------|
-| 1 | **I146** | Cards fantasma no boot (PWA / `mk_sessions`) | ✅ FE 1.9.102+ |
-| 2 | **I147** | Offline duplicava salvar/▶ | ✅ GAS Web 1.5.211 · teste avião Ops ⏳ |
-| 3 | **I148** | Encerrar no servidor, card fica · extra Iza · Home 12 vs caixa 22 (local velho) | ✅ FE 1.9.107 · GAS repo 1.5.213 · Web ⏳ |
-| 4 | **I149** | Meta festeja R$ 100 no domingo com as duas | ✅ FE 1.9.107 · tablet `?force=` ⏳ |
-
-Docs: `INCIDENTE_I149_*` · `INCIDENTE_I148_*` · `INCIDENTE_I147_*` · `INCIDENTE_I146_*` · `PLANO_SINERGIA_PONTAS_2026-08-30.md`
+I146 boot IDB → I147 offline → I148 encerrar fantasma → I149 meta FSS → **I150 cenários DRE**
 
 ---
 
-## Ordem de leitura (obrigatória)
+## Comandos úteis (PC)
 
-| # | Documento | Para quê |
-|---|-----------|----------|
-| 1 | **Este arquivo** | Contexto, produção, pasta C |
-| 2 | **`PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`** | Ciclo ativo Sprint D |
-| 3 | **`DESIGN_SYSTEM_MOVIKIDS.md`** | Cartilha UI |
-| 4 | `ESTADO_ATUAL.md` · `DEPLOY_ATUAL.md` | Versões |
-| 5 | `MAPA_ERROS_FALHAS_BUGS.md` | I* travas |
-| 6 | `ROTEIRO_AGENTE_OBRIGATORIO.md` | commit/push/encerramento |
+```powershell
+.\scripts\encerramento-sessao.ps1
+.\scripts\pre-push-check.ps1
+node scripts\testes\teste-i150-cenarios-financeiros.cjs
+.\scripts\testes\TESTE_DASHBOARD_READONLY.ps1
+```
 
-**Fonte de verdade versão:** `mk-version.js` → ping GAS → `DEPLOY_ATUAL.md` → este handoff.
-
-**Agente no PC:** executar `pre-push-check` · `git push` · `encerramento-sessao.ps1` sem pedir (§7.2). **Só com pedido:** `clasp push`, editar `.gs`, Nova versão Web GAS.
+Ver também: `ROTEIRO_AGENTE_OBRIGATORIO.md` · `PROTOCOLO_ATUALIZAR_TUDO.md` · `ESTADO_ATUAL.md`

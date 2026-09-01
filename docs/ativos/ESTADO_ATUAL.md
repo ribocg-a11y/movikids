@@ -1,8 +1,8 @@
-# MOVI KIDS — Estado atual (30/08/2026 · FE v1.9.107 · I146–I149)
+# MOVI KIDS — Estado atual (01/09/2026 · FE v1.9.109 · I146–I150)
 
 Referência única para alinhamento local × produção.
 
-**Ciclo dev ativo:** **`PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`** — Sprint D · **I147** Fase 2 offline ✅ · **I146** ✅ · **I145** ✅ · **I143** ✅  
+**Ciclo dev ativo:** **`PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`** — Sprint D · **I150** cenários DRE ✅ · **I147** Fase 2 offline ✅ · **I146** ✅  
 **Diagnóstico 6 camadas:** **`DIAGNOSTICO_SISTEMA_6_CAMADAS_2026-06.md`**  
 **Prioridades gerais:** **`PLANEJAMENTO_ATUAL_2026-06.md`** §9
 
@@ -11,7 +11,8 @@ Referência única para alinhamento local × produção.
 **Acessos:** **`ACESSOS_E_AUTORIZACOES.md`** — papéis, PIN admin, agente vs humano  
 **Índice:** `../INDICE.md` · **Prioridades:** **`PLANO_PRIORIDADES_2026-06.md`**  
 **Planejamento ativo:** `PLANEJAMENTO_ATUAL_2026-06.md`  
-**Mapa de erros/bugs:** **`MAPA_ERROS_FALHAS_BUGS.md`** (família I20/I32/I99/I122/I125/I143/I144/**I145**/**I146**/**I147**/**I148**/**I149**)  
+**Mapa de erros/bugs:** **`MAPA_ERROS_FALHAS_BUGS.md`** (família I20/I32/I99/I122/I125/I143/I144/**I145**/**I146**/**I147**/**I148**/**I149**/**I150**)
+**Incidente I150:** **`INCIDENTE_I150_CENARIOS_FINANCEIROS_DRE_2026-09-01.md`**  
 **Incidente I145:** **`INCIDENTE_I145_SYNC_FORCE_IDLE_2026-08-13.md`**  
 **Incidente I144:** **`INCIDENTE_I144_OPS_PIN_1416_LIBERAR_BALCAO_2026-08-12.md`** · `ops-balcao.html`  
 **Incidente I143:** **`INCIDENTE_I143_SALVAR_DUP_TIMEOUT_FORCE_2026-08-06.md`**  
@@ -34,15 +35,14 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 ---
 
-## Produção (29/08/2026)
+## Produção (01/09/2026)
 
 | Camada | Versão | URL / evidência |
 |--------|--------|-----------------|
-| **Frontend** | **v1.9.105** | https://ribocg-a11y.github.io/movikids/?force=1.9.105 |
-| **Gestão Pessoas** | **v1.9.105** | `gestao-pessoas.html?force=1.9.105` |
-| **Portal acompanhar** | **v1.9.96** | `acompanhar.html` |
-| **Service Worker** | **1.9.105** | `sw.js` · Fase 1 IDB + Fase 2 fila |
-| **Apps Script** | **v1.5.211** Web ✅ | ping alinhado · I147 · I143 |
+| **Frontend** | **v1.9.109** | https://ribocg-a11y.github.io/movikids/?force=1.9.109 |
+| **Gestão Pessoas** | **v1.9.109** | `gestao-pessoas.html?force=1.9.109` |
+| **Service Worker** | **1.9.109** | I150 Dashboard cenários |
+| **Apps Script** | repo **v1.5.215** · ping **v1.5.213** | `cenariosFinanceiros` live |
 | **I145 sync idle** | ✅ | idle/visibility **sem** force=1 · warm ~1–2s |
 | **I143 salvar/▶** | ✅ | mediana ~3.9s / ~3.1s · dup 409 · limpeza OK |
 | **Holerite Q1 15/07** | I108–I114+I138 | Ray pacote **R$ 998,40** · Julia **R$ 948,40** (VT fora) |

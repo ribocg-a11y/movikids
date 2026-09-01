@@ -1,6 +1,6 @@
 # MOVI KIDS — Índice de documentação
 
-**Atualizado:** 30/08/2026 (FE **v1.9.107** · I149 / I148 / I147 / I146 · GAS ping v1.5.211)
+**Atualizado:** 01/09/2026 (FE **v1.9.109** · I150 / I149 · GAS ping v1.5.213)
 
 ## Comece aqui
 
@@ -23,6 +23,7 @@
 | [**INCIDENTE_I43_CARREGAR_INICIO_COL_Y_2026-06-23.md**](ativos/INCIDENTE_I43_CARREGAR_INICIO_COL_Y_2026-06-23.md) | **I43** — cronômetro revertia após ▶ |
 | [**INCIDENTE_I53_CONFIG_PLANILHA_REPAIR_2026-06-24.md**](arquivo/incidentes/INCIDENTE_I53_CONFIG_PLANILHA_REPAIR_2026-06-24.md) | **I53** — CONFIG memorial, schema, repair |
 | [**INCIDENTE_I96_I99_MULTI_VEICULO_2026-07-10.md**](arquivo/incidentes/INCIDENTE_I96_I99_MULTI_VEICULO_2026-07-10.md) | **I96–I103** — multi-veículo · overlay · contagem encerradas/caixa |
+| [**INCIDENTE_I150_CENARIOS_FINANCEIROS_DRE_2026-09-01.md**](ativos/INCIDENTE_I150_CENARIOS_FINANCEIROS_DRE_2026-09-01.md) | **I150** — Base DRE · Projetado 3m · Ritmo 3d |
 | [**INCIDENTE_I149_META_FSS_100_2026-08-30.md**](ativos/INCIDENTE_I149_META_FSS_100_2026-08-30.md) | **I149** — meta festeja R$100 no FSS |
 | [**INCIDENTE_I148_ENCERRAR_FANTASMA_2026-08-29.md**](ativos/INCIDENTE_I148_ENCERRAR_FANTASMA_2026-08-29.md) | **I148** — card fantasma · extra Iza · Home 12 vs 22 |
 | [**INCIDENTE_I147_FASE2_OFFLINE_IDEMPOTENCIA_2026-08-29.md**](ativos/INCIDENTE_I147_FASE2_OFFLINE_IDEMPOTENCIA_2026-08-29.md) | **I147** — Fase 2 fila offline + idempotência GAS |

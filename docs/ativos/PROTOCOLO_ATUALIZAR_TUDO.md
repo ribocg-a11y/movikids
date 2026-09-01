@@ -1,6 +1,6 @@
 # MOVI KIDS — Protocolo "Atualize tudo"
 
-**Criado:** 14/06/2026 · **Última execução:** 30/08/2026 (FE **v1.9.107** · GAS ping **v1.5.211** · I149 / I148 / I147 / I146)  
+**Criado:** 14/06/2026 · **Última execução:** 01/09/2026 (FE **v1.9.109** · GAS ping **v1.5.213** · repo **v1.5.215** · I150 / I150b)  
 **Função:** quando o usuário pedir **"atualize tudo"**, o agente segue **esta lista** — não só handoff parcial.  
 **Regra Cursor:** `.cursor/rules/atualize-tudo-movikids.mdc`
 
@@ -17,7 +17,7 @@ Sincronizar **documentação + estado operacional** do projeto com a realidade a
 | Planejamento | `PLANEJAMENTO_ATUAL_2026-06.md`, `PLANO_PRIORIDADES_2026-06.md`, **`MAPA_FASES.md`**, **`PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`** |
 | Deploy atual | **`DEPLOY_ATUAL.md`** |
 | Estrutura repo | **`ESTRUTURA_REPO.md`** |
-| Mapa de erros | `MAPA_ERROS_FALHAS_BUGS.md` (I* até **I149**) |
+| Mapa de erros | `MAPA_ERROS_FALHAS_BUGS.md` (I* até **I150**) |
 | **Design System** | **`docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md`** |
 | Protocolos | `PROTOCOLO_DIAGNOSTICO_E_TESTES.md`, **este arquivo** |
 | Arquitetura / fluxos / diagramas | `MAPA_CODIGO_ARQUITETURA.md`, `FASE_*.md` ativas |
@@ -43,17 +43,17 @@ Sincronizar **documentação + estado operacional** do projeto com a realidade a
 
 ---
 
-## Produção atual (30/08/2026)
+## Produção atual (01/09/2026)
 
 | Camada | Versão | Evidência |
 |--------|--------|-----------|
-| GAS | ping **v1.5.211** · repo **v1.5.213** | Nova versão Web pendente |
-| FE | **v1.9.107** | Pages live · `?force=1.9.107` · I148 + I149 |
+| GAS | ping **v1.5.213** · repo **v1.5.215** | `cenariosFinanceiros` live · Nova versão Web ping ⏳ |
+| FE | **v1.9.109** | Pages live · `?force=1.9.109` · I150 cenários DRE |
 | Planilha FOLHA | **OK** | B9=8,80 · B10/B12=22 · B68=5253,96 |
-| Planilha | **OK** | schema 13/08 · **0** abertas 29/08 |
-| Homolog tablet | **⏳** | smoke D4 · FE **v1.9.105** · teste offline I147 |
+| Planilha | **OK** | schema 13/08 · **0** abertas 01/09 |
+| Homolog tablet | **⏳** | smoke D4 · Dashboard admin I150 browser |
 | Holerite | I138–I142 | Q2 resto · PDF mês Ray/Julia |
-| Perf | I115–I125 · **I143** · **I145** · **I146** · **I147** | salvar/▶ gates · idle warm · boot snapshot · fila offline |
+| Perf | I115–I125 · **I143** · **I145** · **I146** · **I147** · **I150** | salvar/▶ gates · offline · cenários financeiros |
 
 ---
 

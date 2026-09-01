@@ -2,7 +2,9 @@
 
 Scripts em `scripts/testes/`. Documentação: `docs/ativos/PROTOCOLO_DIAGNOSTICO_E_TESTES.md` · **Planilha por aba:** `docs/ativos/PROTOCOLO_AUDITORIA_ABAS_PLANILHA.md` · **"atualize tudo":** `PROTOCOLO_ATUALIZAR_TUDO.md`
 
-**Versões de referência (29/08/2026):** FE **v1.9.105** · GAS ping **v1.5.211** · mínimo operação balcão **v1.7.35** (I15 GET).
+**Versões de referência (01/09/2026):** FE **v1.9.109** · GAS ping **v1.5.213** · mínimo operação balcão **v1.7.35** (I15 GET).
+
+| **I150 cenários DRE** | `node scripts/testes/teste-i150-cenarios-financeiros.cjs` · `TESTE_DASHBOARD_READONLY.ps1` |
 
 | **I141/I142 holerite** | `node scripts/testes/teste-i141-bonus-resto.cjs` · PDFs `entregas/holerite-mes-2026-07/` |
 
