@@ -1809,14 +1809,16 @@ function renderExecCockpit_(d) {
     const diffFat = Math.round(fatMes - fatAnt);
     fatCtx += ' · ' + (diffFat >= 0 ? '+' : '') + R2(diffFat);
   }
-  // I124: no cockpit só REAL + referência ao ritmo (projeção detalhada = seção 2)
+  // I150: cockpit — real vs projetado 3m e ritmo run rate
   const cen = typeof mkDashCenariosMes_ === 'function' ? mkDashCenariosMes_(d) : null;
-  const projShow = cen && cen.ritmoMes > 0 ? cen.ritmoMes : (Number(d.projecaoFat) || 0);
-  if (projShow > 0 && fatMes > 0) {
-    const pctProj = Math.round(fatMes / projShow * 100);
-    fatCtx += ' · ' + pctProj + '% do ritmo projetado (' + R2(projShow) + ')';
-  } else if (projShow > 0) {
-    fatCtx += ' · ritmo projetado ' + R2(projShow);
+  if (cen && cen.projetado3mMes > 0 && fatMes > 0) {
+    const pctProj = Math.round(fatMes / cen.projetado3mMes * 100);
+    fatCtx += ' · ' + pctProj + '% do projetado 3m (' + R2(cen.projetado3mMes) + ')';
+  }
+  if (cen && cen.ritmoMes > 0 && cen.isCorrente) {
+    fatCtx += ' · ritmo ' + R2(cen.ritmoDiaria) + '/dia → ' + R2(cen.ritmoMes);
+  } else if (cen && !cen.isCorrente && cen.ritmoMes > 0) {
+    fatCtx += ' · fechado';
   }
   setCockpitCtx_('mk-exec-fat-d', fatCtx, deltaFat > 0 ? 'up' : deltaFat < 0 ? 'down' : null);
 
@@ -2144,82 +2146,154 @@ function renderMetaDiaChart_(d) {
 }
 
 /**
- * I123 — base de sustentação do mês (âncora histórica), travada no FE.
- * Não usa blend 35/65 — evita a linha ambígua ~491.
- * Chave localStorage: mk_proj_base_AAAA_M
+ * I150 — cenários financeiros canônicos (espelho GAS buildCenariosFinanceirosMes_).
+ * Base = DRE (fatMinMargem) · Projetado = média 3 meses anteriores · Ritmo = média últimos 3 dias c/ fat.
  */
-function mkBaseSustentacaoMes_(d) {
+function mkLastNBillingDaysFe_(fatPorDia, n, maxDia, prevFatPorDia) {
+  n = n || 3;
+  let rows = (fatPorDia || []).slice().sort(function(a, b) { return (a.dia || 0) - (b.dia || 0); });
+  if (maxDia) rows = rows.filter(function(x) { return (x.dia || 0) <= maxDia; });
+  let pos = rows.filter(function(x) { return (Number(x.valor) || 0) > 0; });
+  if (pos.length < n && prevFatPorDia && prevFatPorDia.length) {
+    pos = prevFatPorDia.slice().sort(function(a, b) { return (a.dia || 0) - (b.dia || 0); })
+      .filter(function(x) { return (Number(x.valor) || 0) > 0; });
+  }
+  const pick = pos.slice(-n);
+  if (!pick.length) return { media: 0, dias: [] };
+  const sum = pick.reduce(function(s, x) { return s + (Number(x.valor) || 0); }, 0);
+  return {
+    media: Math.round(sum / pick.length * 100) / 100,
+    dias: pick.map(function(x) { return x.dia; })
+  };
+}
+
+function mkProjetado3mFe_(d) {
   d = d || {};
-  const ritmo = mkRitmoRealistaDash_(d);
-  const diasMes = Number(d.diasMes) || ritmo.diasMes
-    || new Date(d.anoAtual || new Date().getFullYear(), d.mesAtual || 1, 0).getDate();
+  const hist = Array.isArray(d.historicoMeses) ? d.historicoMeses.slice() : [];
   const mes = Number(d.mesAtual) || (new Date().getMonth() + 1);
   const ano = Number(d.anoAtual) || new Date().getFullYear();
-  const key = 'mk_proj_base_' + ano + '_' + mes;
-
-  try {
-    const raw = localStorage.getItem(key);
-    if (raw) {
-      const o = JSON.parse(raw);
-      const diaria = o && Number(o.diaria) > 0 ? Number(o.diaria) : 0;
-      if (diaria > 0) {
-        return {
-          diaria: diaria,
-          mes: Math.round(diaria * diasMes * 100) / 100,
-          locked: true,
-          ref: (o && o.ref) || ritmo.refHist || ''
-        };
-      }
-    }
-  } catch (e) { /* ignore */ }
-
-  let diariaCand = Number(ritmo.mediaHist) || 0;
-  if (diariaCand <= 0) {
-    const fromGas = Number(d.metaProjecaoMes) || Number(d.baselineFatMes) || 0;
-    if (fromGas > 0 && diasMes > 0) {
-      diariaCand = Math.round(fromGas / diasMes * 100) / 100;
-    }
-  }
-  if (diariaCand <= 0) {
-    return { diaria: 0, mes: 0, locked: false, ref: '' };
-  }
-
-  const mesVal = Math.round(diariaCand * diasMes * 100) / 100;
-  try {
-    localStorage.setItem(key, JSON.stringify({
-      diaria: diariaCand,
-      mes: mesVal,
-      ref: ritmo.refHist || '',
-      at: Date.now()
-    }));
-  } catch (e) { /* ignore */ }
-
+  const prior = hist.filter(function(h) {
+    if (!h) return false;
+    if (h.parcial) return false;
+    return (h.ano * 100 + h.mes) < (ano * 100 + mes);
+  }).sort(function(a, b) {
+    return (a.ano * 100 + a.mes) - (b.ano * 100 + b.mes);
+  });
+  const pick = prior.slice(-3);
+  if (pick.length < 3) return { mes: 0, meses: [], diaria: 0 };
+  const meses = pick.map(function(h) {
+    return { mes: h.mes, ano: h.ano, label: h.label, fat: Number(h.fatReal) || 0 };
+  });
+  const sum = meses.reduce(function(s, x) { return s + x.fat; }, 0);
+  const diasMes = Number(d.diasMes)
+    || new Date(ano, mes, 0).getDate();
+  const val = Math.round(sum / 3 * 100) / 100;
   return {
-    diaria: diariaCand,
-    mes: mesVal,
-    locked: false,
-    ref: ritmo.refHist || ''
+    mes: val,
+    meses: meses,
+    diaria: diasMes > 0 ? Math.round(val / diasMes * 100) / 100 : 0
+  };
+}
+
+function mkCenariosFinanceirosFe_(d) {
+  d = d || {};
+  if (d.cenariosFinanceiros && d.cenariosFinanceiros.baseDreMes != null) {
+    return d.cenariosFinanceiros;
+  }
+  const mes = Number(d.mesAtual) || (new Date().getMonth() + 1);
+  const ano = Number(d.anoAtual) || new Date().getFullYear();
+  const diasMes = Number(d.diasMes) || new Date(ano, mes, 0).getDate();
+  const fatMes = Number(d.fatMes) || 0;
+  const hoje = new Date();
+  const isCorrente = mes === hoje.getMonth() + 1 && ano === hoje.getFullYear();
+  const diaCal = isCorrente ? hoje.getDate() : diasMes;
+  const diasRest = isCorrente ? Math.max(0, diasMes - diaCal) : 0;
+  const viab = d.viabilidadeContratacao || {};
+  const cusMes = Number(d.cusMes) || 0;
+  const ctoMin = Number(d.ctoMinimo) || 0;
+  const folha = Number(viab.folhaMensal) || 0;
+  let baseDreMes = Number(viab.fatMinMargem) || Number(d.baselineFatMes) || 0;
+  if (baseDreMes <= 0 && folha > 0) {
+    baseDreMes = Math.round((folha + cusMes + ctoMin) / 0.72 * 100) / 100;
+  }
+  const baseDreDiaria = diasMes > 0 ? Math.round(baseDreMes / diasMes * 100) / 100 : 0;
+  const proj = mkProjetado3mFe_(d);
+  const fatDia = d.fatPorDia || [];
+  let acum = 0;
+  let diasCom = 0;
+  fatDia.forEach(function(x) {
+    if ((x.dia || 0) > diaCal) return;
+    const v = Number(x.valor) || 0;
+    if (v > 0) diasCom++;
+    acum += v;
+  });
+  acum = Math.round(acum * 100) / 100;
+  let prevFat = [];
+  const hist = d.historicoMeses || [];
+  const prevH = hist.filter(function(h) {
+    return h && (h.ano * 100 + h.mes) === ((mes <= 1 ? 12 : mes - 1) * 100 + (mes <= 1 ? ano - 1 : ano));
+  })[0];
+  if (prevH && prevH.fatPorDia) prevFat = prevH.fatPorDia;
+  const ritPack = mkLastNBillingDaysFe_(fatDia, 3, diaCal, diasCom < 3 ? prevFat : null);
+  const ritmoFonte = diasCom >= 3 ? 'mes_atual' : 'referencia_mes_anterior';
+  let ritmo3dMes;
+  if (!isCorrente && diaCal >= diasMes) ritmo3dMes = fatMes;
+  else ritmo3dMes = Math.round((acum + ritPack.media * diasRest) * 100) / 100;
+  return {
+    baseDreMes: baseDreMes,
+    baseDreDiaria: baseDreDiaria,
+    baseDreDetalhe: viab.folhaMensal ? ('DRE · folha ' + R2(folha) + ' + custos + margem 18%') : 'DRE · configure FOLHA B68',
+    projetado3mMes: proj.mes,
+    projetado3mDiaria: proj.diaria,
+    projetado3mMeses: proj.meses,
+    ritmo3dDiaria: ritPack.media,
+    ritmo3dMes: ritmo3dMes,
+    ritmo3dFonte: ritmoFonte,
+    ritmo3dDiasRef: ritPack.dias,
+    ritmo3dAcum: acum,
+    diasRest: diasRest,
+    diaCal: diaCal,
+    diasComMovMes: diasCom,
+    isCorrente: isCorrente
+  };
+}
+window.mkCenariosFinanceirosFe_ = mkCenariosFinanceirosFe_;
+
+/** I150 — Base = piso DRE (sustentar negócio). */
+function mkBaseSustentacaoMes_(d) {
+  const c = mkCenariosFinanceirosFe_(d);
+  return {
+    diaria: Number(c.baseDreDiaria) || 0,
+    mes: Number(c.baseDreMes) || 0,
+    locked: true,
+    ref: 'DRE',
+    detalhe: c.baseDreDetalhe || ''
   };
 }
 window.mkBaseSustentacaoMes_ = mkBaseSustentacaoMes_;
 
-/** I123 — ritmo alcançável = extrapolação se o ritmo atual se mantiver. */
+/** I150 — Ritmo = run rate últimos 3 dias (ref. mês ant. se <3 dias). */
 function mkRitmoAlcancavelMes_(d) {
-  d = d || {};
-  const fatMes = Number(d.fatMes) || 0;
-  const diasOp = Number(d.diasOperando) || 0;
-  const diasMes = Number(d.diasMes)
-    || new Date(d.anoAtual || new Date().getFullYear(), d.mesAtual || 1, 0).getDate();
-  const diaria = diasOp > 0 ? Math.round(fatMes / diasOp * 100) / 100 : 0;
-  const mesVal = Number(d.projecaoFat) > 0
-    ? Number(d.projecaoFat)
-    : (diaria > 0 ? Math.round(diaria * diasMes * 100) / 100 : 0);
+  const c = mkCenariosFinanceirosFe_(d);
   return {
-    diaria: diaria,
-    mes: Math.round(mesVal * 100) / 100
+    diaria: Number(c.ritmo3dDiaria) || 0,
+    mes: Number(c.ritmo3dMes) || 0,
+    fonte: c.ritmo3dFonte || '',
+    diasRef: c.ritmo3dDiasRef || []
   };
 }
 window.mkRitmoAlcancavelMes_ = mkRitmoAlcancavelMes_;
+
+/** I150 — Projetado = média 3 meses anteriores. */
+function mkProjetado3mMes_(d) {
+  const c = mkCenariosFinanceirosFe_(d);
+  return {
+    diaria: Number(c.projetado3mDiaria) || 0,
+    mes: Number(c.projetado3mMes) || 0,
+    meses: c.projetado3mMeses || []
+  };
+}
+window.mkProjetado3mMes_ = mkProjetado3mMes_;
 
 function renderReceitaMesChart_(d) {
   const cv = document.getElementById('chart-receita-mes');
@@ -2234,16 +2308,19 @@ function renderReceitaMesChart_(d) {
   const diasMes = Number(d.diasMes) || new Date(d.anoAtual || new Date().getFullYear(), d.mesAtual || 1, 0).getDate();
   const mesStr = String(d.mesAtual || new Date().getMonth() + 1).padStart(2, '0');
   const fatMes = Number(d.fatMes) || 0;
-  const diasOp = Number(d.diasOperando) || 0;
+  const c = mkCenariosFinanceirosFe_(d);
   const base = mkBaseSustentacaoMes_(d);
   const ritmo = mkRitmoAlcancavelMes_(d);
-  const baseDiaria = Number(base.diaria) || 0;
-  const ritmoDiaria = Number(ritmo.diaria) || 0;
-  const baseMes = Number(base.mes) || 0;
-  const ritmoMes = Number(ritmo.mes) || 0;
+  const proj = mkProjetado3mMes_(d);
+  const baseDiaria = Number(c.baseDreDiaria) || Number(base.diaria) || 0;
+  const ritmoDiaria = Number(c.ritmo3dDiaria) || Number(ritmo.diaria) || 0;
+  const projDiaria = Number(c.projetado3mDiaria) || Number(proj.diaria) || 0;
+  const baseMes = Number(c.baseDreMes) || Number(base.mes) || 0;
+  const ritmoMes = Number(c.ritmo3dMes) || Number(ritmo.mes) || 0;
+  const projMes = Number(c.projetado3mMes) || Number(proj.mes) || 0;
 
-  if (hojeD <= 0 || diasOp <= 0 || (baseDiaria <= 0 && ritmoDiaria <= 0)) {
-    setText2('nk-receita-mes-label', diasOp <= 0 ? 'sem dias com movimento' : 'projeção indisponível');
+  if (hojeD <= 0 || (baseDiaria <= 0 && ritmoDiaria <= 0 && projDiaria <= 0)) {
+    setText2('nk-receita-mes-label', fatMes <= 0 ? 'sem faturamento' : 'projeção indisponível');
     if (ins) ins.style.display = 'none';
     return;
   }
@@ -2265,7 +2342,8 @@ function renderReceitaMesChart_(d) {
     const r = Math.round(fatMap[dd] || 0);
     accReal += r;
     accBase += baseDiaria;
-    accRitmo += ritmoDiaria;
+    const ritDay = (c.ritmoPorDia && c.ritmoPorDia[dd - 1]) ? Number(c.ritmoPorDia[dd - 1].ritmoDiaria) : ritmoDiaria;
+    accRitmo += ritDay > 0 ? ritDay : ritmoDiaria;
     realDia.push(r);
     acumulado.push(Math.round(accReal));
     baseAcum.push(Math.round(accBase));
@@ -2274,23 +2352,23 @@ function renderReceitaMesChart_(d) {
 
   const baseHoje = baseAcum[baseAcum.length - 1] || 0;
   const ritmoHoje = ritmoAcum[ritmoAcum.length - 1] || 0;
-  const diffBase = fatMes - baseHoje;
-  const pctBase = baseHoje > 0 ? Math.round(diffBase / baseHoje * 100) : 0;
-  const diffRitmo = fatMes - ritmoHoje;
-  const pctRitmo = ritmoHoje > 0 ? Math.round(diffRitmo / ritmoHoje * 100) : 0;
+  const diffBase = fatMes - baseMes;
+  const pctBase = baseMes > 0 ? Math.round(diffBase / baseMes * 100) : 0;
+  const diffProj = fatMes - projMes;
+  const pctProj = projMes > 0 ? Math.round(diffProj / projMes * 100) : 0;
 
-  // I123: label com as 3 referências (sem “meta mês” ambígua)
   setText2('nk-receita-mes-label',
     'real ' + R2(fatMes)
-    + ' · base ' + R2(baseHoje) + ' (' + R2(baseDiaria) + '/dia)'
-    + ' · ritmo → ' + R2(ritmoMes) + ' (' + R2(ritmoDiaria) + '/dia)');
+    + ' · base DRE ' + R2(baseMes)
+    + ' · projetado ' + R2(projMes)
+    + ' · ritmo → ' + R2(ritmoMes));
 
   // Pontos: verde se ≥ base; âmbar se abaixo da base (DNA admin)
   const ptBg = acumulado.map(function(v, i) {
     return v >= (baseAcum[i] || 0) ? '#2E7D32' : '#E65100';
   });
   const maxY = Math.max(
-    baseMes, ritmoMes, baseHoje, ritmoHoje,
+    baseMes, ritmoMes, projMes, baseHoje, ritmoHoje,
     Math.max.apply(null, acumulado.concat([1]))
   ) * 1.08;
 
@@ -2313,7 +2391,7 @@ function renderReceitaMesChart_(d) {
   ];
   if (baseDiaria > 0) {
     datasets.push({
-      label: 'Base sustentação',
+      label: 'Base DRE',
       data: baseAcum,
       borderColor: '#E65100',
       borderWidth: 2,
@@ -2326,7 +2404,7 @@ function renderReceitaMesChart_(d) {
   }
   if (ritmoDiaria > 0) {
     datasets.push({
-      label: 'Ritmo alcançável',
+      label: 'Ritmo (3 dias)',
       data: ritmoAcum,
       borderColor: '#29B6F6',
       borderWidth: 2,
@@ -2355,13 +2433,13 @@ function renderReceitaMesChart_(d) {
             label: function(ctx) {
               const i = ctx.dataIndex;
               const y = Math.round(ctx.parsed.y);
-              if (ctx.dataset.label === 'Base sustentação') {
+              if (ctx.dataset.label === 'Base DRE') {
                 return [
                   'Base dia: ' + R2(baseDiaria),
                   'Base acum.: ' + R2(y)
                 ];
               }
-              if (ctx.dataset.label === 'Ritmo alcançável') {
+              if (ctx.dataset.label === 'Ritmo (3 dias)') {
                 return [
                   'Ritmo dia: ' + R2(ritmoDiaria),
                   'Ritmo acum.: ' + R2(y)
@@ -2369,14 +2447,11 @@ function renderReceitaMesChart_(d) {
               }
               const rD = realDia[i] || 0;
               const bA = baseAcum[i] || 0;
-              const rA = ritmoAcum[i] || 0;
               const dB = y - bA;
-              const dR = y - rA;
               return [
                 'Real dia: ' + R2(rD),
                 'Real acum.: ' + R2(y),
-                (dB >= 0 ? '+' + R2(dB) : R2(dB)) + ' vs base',
-                (dR >= 0 ? '+' + R2(dR) : R2(dR)) + ' vs ritmo'
+                (dB >= 0 ? '+' + R2(dB) : R2(dB)) + ' vs base DRE acum.'
               ];
             }
           }
@@ -2403,29 +2478,32 @@ function renderReceitaMesChart_(d) {
 
   if (ins) {
     const msgs = [];
-    if (baseHoje > 0) {
+    if (baseMes > 0) {
       if (diffBase >= 0) {
         msgs.push('Real ' + R2(fatMes) + ' — '
           + (pctBase > 0 ? pctBase + '% acima' : 'no nível')
-          + ' da base no dia ' + hojeD + ' (' + R2(baseHoje) + ').');
+          + ' da base DRE (' + R2(baseMes) + ' piso do mês).');
       } else {
         msgs.push('Real ' + R2(fatMes) + ' — ' + Math.abs(pctBase)
-          + '% abaixo da base (' + R2(baseHoje) + ' esperado até o dia ' + hojeD + ').');
+          + '% abaixo da base DRE (' + R2(baseMes) + ' piso do mês).');
       }
     }
-    if (ritmoHoje > 0) {
-      if (Math.abs(pctRitmo) < 1) {
-        msgs.push('No ritmo atual (' + R2(ritmoDiaria) + '/dia → ' + R2(ritmoMes) + ' no mês).');
-      } else if (diffRitmo >= 0) {
-        msgs.push(pctRitmo + '% acima do ritmo acumulado (' + R2(ritmoHoje) + ').');
+    if (projMes > 0) {
+      if (Math.abs(pctProj) < 2) {
+        msgs.push('Dentro do projetado 3m (' + R2(projMes) + ' — média ' + (proj.meses || []).map(function(m) { return m.label; }).join(', ') + ').');
+      } else if (diffProj >= 0) {
+        msgs.push('+' + R2(diffProj) + ' acima do projetado 3m (' + R2(projMes) + ').');
       } else {
-        msgs.push(Math.abs(pctRitmo) + '% abaixo do ritmo acumulado (' + R2(ritmoHoje) + ').');
+        msgs.push(R2(diffProj) + ' abaixo do projetado 3m (' + R2(projMes) + ').');
       }
     }
-    if (baseMes > 0) {
-      msgs.push('Base do mês: ' + R2(baseMes) + ' (' + R2(baseDiaria) + '/dia'
-        + (base.ref ? ' · ' + base.ref : '') + ', travada).');
+    if (ritmoMes > 0) {
+      const fonteLbl = c.ritmo3dFonte === 'mes_atual'
+        ? ('últimos 3 dias: ' + (c.ritmo3dDiasRef || ritmo.diasRef || []).join(', '))
+        : 'referência mês anterior (menos de 3 dias c/ fat.)';
+      msgs.push('Ritmo run rate: ' + R2(ritmoDiaria) + '/dia → ' + R2(ritmoMes) + ' no mês (' + fonteLbl + ').');
     }
+    if (base.detalhe) msgs.push(base.detalhe);
     ins.style.display = 'block';
     ins.textContent = msgs.join(' ');
   }
@@ -2614,11 +2692,9 @@ function calcFatProjetadoHistoricoFe_(fat, diasOp, diasMes, fatPorDia, mes, ano)
 
 function mkHistoricoRowFromKpi_(item, r, parcial) {
   const fat = Number(r.fatMes) || 0;
-  const diasOp = Number(r.diasOperando) || 0;
   const diasMes = Number(r.diasMes) || new Date(item.ano, item.mes, 0).getDate();
-  const fatProj = parcial
-    ? (Number(r.projecaoFat) || calcFatProjetadoHistoricoFe_(fat, diasOp, diasMes, r.fatPorDia, item.mes, item.ano))
-    : calcFatProjetadoHistoricoFe_(fat, diasOp, diasMes, r.fatPorDia, item.mes, item.ano);
+  const proj = mkProjetado3mMes_(Object.assign({}, r, { mesAtual: item.mes, anoAtual: item.ano }));
+  const fatProj = proj.mes > 0 ? proj.mes : (Number(r.cenariosFinanceiros && r.cenariosFinanceiros.projetado3mMes) || 0);
   return {
     mes: item.mes,
     ano: item.ano,
@@ -2626,7 +2702,7 @@ function mkHistoricoRowFromKpi_(item, r, parcial) {
     fatReal: fat,
     fatProjetado: fatProj,
     parcial: !!parcial,
-    diasOperando: diasOp,
+    diasOperando: Number(r.diasOperando) || 0,
     diasMes: diasMes
   };
 }
@@ -2746,7 +2822,7 @@ function paintHistoricoMesesChart_(rows) {
               const r = rows[ctx.dataIndex];
               const val = Math.round(ctx.parsed.y);
               if (ctx.dataset.label === 'Projetado') {
-                return 'Projetado: ' + R2(val) + (r.parcial ? ' (fechamento)' : '');
+                return 'Projetado: ' + R2(val) + (r.parcial ? ' (mês em curso)' : ' (média 3m ant.)');
               }
               const proj = Math.round(Number(r.fatProjetado) || 0);
               const delta = val - proj;
@@ -2790,7 +2866,7 @@ function paintHistoricoMesesChart_(rows) {
     const ult = rows[rows.length - 1];
     const msgs = [
       comMov > 0
-        ? (acima + ' de ' + comMov + ' meses com movimento bateram a projeção de fechamento.')
+        ? (acima + ' de ' + comMov + ' meses bateram o projetado (média 3 meses anteriores).')
         : 'Nenhum mês com movimento ainda.',
       'Último: ' + ult.label + (ult.parcial ? ' *' : '') + ' — ' + R2(ult.fatReal) + ' real vs ' + R2(ult.fatProjetado) + ' projetado'
         + (ult.parcial ? ' (em andamento).' : '.')
@@ -2998,81 +3074,40 @@ function renderContratacaoPanel_(d) {
 }
 
 /**
- * I124 — fonte única dos cenários de faturamento do Dashboard.
- * Hero = ritmo atual. Base e 7d são cenários laterais (mesma unidade: R$ fim de mês).
- * Resultado projetado = só sobre o ritmo (não mistura com 7d nem GAS paralelo).
+ * I150 — cenários financeiros: Base DRE · Projetado 3m · Ritmo 3d.
  */
 function mkDashCenariosMes_(d) {
   d = d || {};
+  const c = mkCenariosFinanceirosFe_(d);
   const fatMes = Number(d.fatMes) || 0;
   const resultado = Number(d.resultado) || 0;
-  const diasOp = Number(d.diasOperando) || 0;
   const diasMes = Number(d.diasMes)
     || new Date(d.anoAtual || new Date().getFullYear(), d.mesAtual || 1, 0).getDate();
-  const hoje = new Date();
-  const isCorrente = Number(d.mesAtual) === hoje.getMonth() + 1
-    && Number(d.anoAtual) === hoje.getFullYear();
-  const diaCal = isCorrente ? hoje.getDate() : diasMes;
-  const diasRest = isCorrente ? Math.max(0, diasMes - diaCal) : 0;
-
-  const base = typeof mkBaseSustentacaoMes_ === 'function'
-    ? mkBaseSustentacaoMes_(d)
-    : { diaria: 0, mes: 0, ref: '' };
-  const ritmo = typeof mkRitmoAlcancavelMes_ === 'function'
-    ? mkRitmoAlcancavelMes_(d)
-    : { diaria: diasOp > 0 ? fatMes / diasOp : 0, mes: Number(d.projecaoFat) || 0 };
-
-  const fatPorDia = d.fatPorDia || [];
-  const fatMap = {};
-  fatPorDia.forEach(function (x) {
-    const dia = Number(x.dia) || 0;
-    if (dia > 0) fatMap[dia] = Number(x.valor) || 0;
-  });
-  const diaRef = isCorrente
-    ? hoje.getDate()
-    : Object.keys(fatMap).reduce(function (m, k) { return Math.max(m, Number(k)); }, 0);
-  let sum7 = 0;
-  let count7 = 0;
-  for (let i = 0; i < 7; i++) {
-    const dd = diaRef - i;
-    if (dd < 1) break;
-    sum7 += fatMap[dd] || 0;
-    count7++;
-  }
-  const media7 = count7 > 0 ? Math.round(sum7 / count7 * 100) / 100 : 0;
-  const cen7Mes = isCorrente
-    ? Math.round((fatMes + media7 * diasRest) * 100) / 100
-    : Math.round(fatMes * 100) / 100;
-
-  const ritmoDiaria = Number(ritmo.diaria) || 0;
-  const ritmoMes = Number(ritmo.mes) || (ritmoDiaria > 0
-    ? Math.round(ritmoDiaria * diasMes * 100) / 100
-    : 0);
-  const baseDiaria = Number(base.diaria) || 0;
-  const baseMes = Number(base.mes) || (baseDiaria > 0
-    ? Math.round(baseDiaria * diasMes * 100) / 100
-    : 0);
-
   const margem = fatMes > 0 ? resultado / fatMes : 0;
+  const ritmoMes = Number(c.ritmo3dMes) || 0;
   const resProjetado = Math.round(ritmoMes * margem * 100) / 100;
 
   return {
     fatMes: fatMes,
     resultado: resultado,
     margem: margem,
-    baseDiaria: baseDiaria,
-    baseMes: baseMes,
-    baseRef: (base && base.ref) || '',
-    ritmoDiaria: ritmoDiaria,
+    baseDiaria: Number(c.baseDreDiaria) || 0,
+    baseMes: Number(c.baseDreMes) || 0,
+    baseRef: c.baseDreDetalhe || 'DRE',
+    ritmoDiaria: Number(c.ritmo3dDiaria) || 0,
     ritmoMes: ritmoMes,
-    media7: media7,
-    count7: count7,
-    cen7Mes: cen7Mes,
+    projetado3mDiaria: Number(c.projetado3mDiaria) || 0,
+    projetado3mMes: Number(c.projetado3mMes) || 0,
+    projetado3mMeses: c.projetado3mMeses || [],
+    media7: 0,
+    count7: 0,
+    cen7Mes: Number(c.projetado3mMes) || 0,
     resProjetado: resProjetado,
-    diasOp: diasOp,
+    diasOp: Number(c.diasComMovMes) || Number(d.diasOperando) || 0,
     diasMes: diasMes,
-    diasRest: diasRest,
-    isCorrente: isCorrente
+    diasRest: Number(c.diasRest) || 0,
+    isCorrente: !!c.isCorrente,
+    ritmoFonte: c.ritmo3dFonte || ''
   };
 }
 window.mkDashCenariosMes_ = mkDashCenariosMes_;
@@ -3112,31 +3147,39 @@ function renderPrevisaoMes_(d) {
   box.style.display = '';
 
   const c = mkDashCenariosMes_(d);
+  const ritmoPack = mkRitmoAlcancavelMes_(d);
 
   setText2('mk-prev-fat', R2(c.ritmoMes));
+  const ritDias = (d.cenariosFinanceiros && d.cenariosFinanceiros.ritmo3dDiasRef) || ritmoPack.diasRef || [];
+  const ritFonte = c.ritmoFonte || '';
   const fatCtx = c.isCorrente
-    ? (R2(c.ritmoDiaria) + '/dia × ' + c.diasMes + ' dias · já ' + R2(c.fatMes)
-      + ' · faltam ' + c.diasRest + ' dia(s)')
+    ? (R2(c.ritmoDiaria) + '/dia (média 3d'
+      + (ritDias.length ? ' · dias ' + ritDias.join(', ') : '')
+      + (ritFonte.indexOf('referencia') >= 0 ? ' · ref. mês anterior' : '')
+      + ') · já ' + R2(c.fatMes) + ' · faltam ' + c.diasRest + ' dia(s)')
     : ('Mês fechado · real ' + R2(c.fatMes));
   mkPrevSetCtx_('mk-prev-fat-ctx', fatCtx, null);
 
   setText2('mk-prev-base', R2(c.baseMes));
   mkPrevSetCtx_('mk-prev-base-ctx',
-    c.baseDiaria > 0
-      ? (R2(c.baseDiaria) + '/dia' + (c.baseRef ? ' · ' + c.baseRef : '') + ' · travada')
-      : 'Sem âncora ainda',
+    c.baseMes > 0
+      ? (R2(c.baseDiaria) + '/dia · piso DRE · ' + (c.baseRef || 'folha + custos + margem'))
+      : 'Configure aba FOLHA B68',
     null);
 
   setText2('mk-prev-ritmo', R2(c.ritmoMes));
   mkPrevSetCtx_('mk-prev-ritmo-ctx',
-    c.diasOp + ' dias com movimento · ' + R2(c.ritmoDiaria) + '/dia',
+    R2(c.ritmoDiaria) + '/dia · run rate 3 dias',
     null);
 
-  setText2('mk-prev-7d', R2(c.cen7Mes));
+  setText2('mk-prev-7d', R2(c.projetado3mMes));
+  const projLbl = (c.projetado3mMeses || []).map(function(m) {
+    return (m.label || '') + ' ' + R2(m.fat || 0);
+  }).join(' · ');
   mkPrevSetCtx_('mk-prev-7d-ctx',
-    c.count7 > 0
-      ? ('Média ' + R2(c.media7) + '/dia nos últimos ' + c.count7 + 'd')
-      : 'Sem amostra 7d',
+    c.projetado3mMes > 0
+      ? ('Média 3 meses: ' + projLbl)
+      : 'Sem histórico suficiente',
     null);
 
   // legado oculto: mesmo valor do ritmo (evita “número fantasma” paralelo)

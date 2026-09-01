@@ -1390,16 +1390,16 @@
         <span class="mk-dash-step" aria-hidden="true">2</span>
         <div>
           <h2 class="mk-dash-chapter-title" id="mk-chapter-projecao-h">Previsão de faturamento</h2>
-          <p class="mk-dash-chapter-lead">Um número principal (ritmo atual) e dois cenários ao lado — todos em <strong>R$ no fim do mês</strong>. Resultado projetado usa o mesmo cenário principal.</p>
+          <p class="mk-dash-chapter-lead">Três referências fixas: <strong>Base DRE</strong> (piso do negócio) · <strong>Projetado</strong> (média 3 meses) · <strong>Ritmo</strong> (média últimos 3 dias). Hero = ritmo run rate.</p>
         </div>
       </header>
     <div id="mk-previsao-mes" class="mk-previsao-mes mk-glass-card" style="display:none" aria-labelledby="mk-previsao-mes-h" aria-live="polite">
       <header class="mk-previsao-head">
-        <h3 class="mk-previsao-title" id="mk-previsao-mes-h">Cenário principal · ritmo atual</h3>
+        <h3 class="mk-previsao-title" id="mk-previsao-mes-h">Ritmo · run rate (últimos 3 dias)</h3>
         <span class="mk-previsao-badge" id="mk-prev-badge">—</span>
       </header>
       <div class="mk-widget mk-widget--hero mk-previsao-hero">
-        <span class="mk-widget-lbl">Faturamento se mantiver o ritmo</span>
+        <span class="mk-widget-lbl">Faturamento no ritmo (3 dias)</span>
         <span class="mk-widget-val blue" id="mk-prev-fat">—</span>
         <span class="mk-widget-ctx" id="mk-prev-fat-ctx">—</span>
       </div>
@@ -1407,17 +1407,17 @@
         <div class="mk-cenario" role="listitem">
           <span class="mk-cenario-tag mk-cenario-tag-base">Base</span>
           <span class="mk-cenario-val" id="mk-prev-base">—</span>
-          <span class="mk-cenario-ctx" id="mk-prev-base-ctx">Piso / âncora do mês</span>
+          <span class="mk-cenario-ctx" id="mk-prev-base-ctx">Piso DRE · folha + custos + margem</span>
         </div>
         <div class="mk-cenario mk-cenario-ativo" role="listitem">
           <span class="mk-cenario-tag mk-cenario-tag-ritmo">Ritmo</span>
           <span class="mk-cenario-val" id="mk-prev-ritmo">—</span>
-          <span class="mk-cenario-ctx" id="mk-prev-ritmo-ctx">Principal (= hero)</span>
+          <span class="mk-cenario-ctx" id="mk-prev-ritmo-ctx">Run rate · recalcula todo dia</span>
         </div>
         <div class="mk-cenario" role="listitem">
-          <span class="mk-cenario-tag mk-cenario-tag-7d">Últimos 7d</span>
+          <span class="mk-cenario-tag mk-cenario-tag-7d">Projetado</span>
           <span class="mk-cenario-val" id="mk-prev-7d">—</span>
-          <span class="mk-cenario-ctx" id="mk-prev-7d-ctx">Se o fim do mês for como a semana</span>
+          <span class="mk-cenario-ctx" id="mk-prev-7d-ctx">Média dos 3 meses anteriores</span>
         </div>
       </div>
       <!-- ids legados ocultos: scripts antigos / testes não quebram -->
@@ -1649,7 +1649,7 @@
         <span class="mk-dash-step" aria-hidden="true">6</span>
         <div>
           <h2 class="mk-dash-chapter-title" id="mk-chapter-tendencia-h">Gráficos e tendência</h2>
-          <p class="mk-dash-chapter-lead">Visual do mês: semanas, Base × Ritmo × Real (mesmos cenários da seção 2) e detalhe por dia/tipo.</p>
+          <p class="mk-dash-chapter-lead">Visual do mês: semanas, Base DRE × Ritmo 3d × Real e detalhe por dia/tipo.</p>
         </div>
       </header>
 
@@ -1738,16 +1738,16 @@
       <div class="db-insight" id="nk-meta-dia-insight" style="display:none;margin-top:8px"></div>
     </div>
 
-    <!-- I123: Base sustentação × ritmo alcançável × real acumulado -->
+    <!-- I150: Base DRE × ritmo 3d × real acumulado -->
     <div class="new-chart-card mk-meta-chart-card" style="margin-bottom:14px">
       <div class="new-chart-title">
-        Base × ritmo × real acumulado
+        Base DRE × ritmo (3 dias) × real acumulado
         <span class="nct-note" id="nk-receita-mes-label">—</span>
       </div>
       <div class="mk-meta-chart-legend" id="nk-receita-mes-legend" aria-hidden="true">
         <span class="mk-meta-leg mk-meta-leg-real"><i></i> Real acumulado</span>
-        <span class="mk-meta-leg mk-meta-leg-base"><i></i> Base sustentação</span>
-        <span class="mk-meta-leg mk-meta-leg-ritmo"><i></i> Ritmo alcançável</span>
+        <span class="mk-meta-leg mk-meta-leg-base"><i></i> Base DRE</span>
+        <span class="mk-meta-leg mk-meta-leg-ritmo"><i></i> Ritmo (3 dias)</span>
         <span class="mk-meta-leg mk-meta-leg-ok"><i></i> Acima da base</span>
         <span class="mk-meta-leg mk-meta-leg-fail"><i></i> Abaixo da base</span>
       </div>
@@ -1765,7 +1765,7 @@
       </div>
       <div class="mk-meta-chart-legend" id="nk-hist-meses-legend" aria-hidden="true">
         <span class="mk-meta-leg mk-meta-leg-loc"><i></i> Realizado</span>
-        <span class="mk-meta-leg mk-meta-leg-folha"><i></i> Projetado (fechamento)</span>
+        <span class="mk-meta-leg mk-meta-leg-folha"><i></i> Projetado (média 3 meses)</span>
       </div>
       <div style="position:relative;height:260px">
         <canvas id="chart-historico-meses" role="img" aria-label="Comparativo mensal de receita realizada versus projetada">Receita mês a mês.</canvas>

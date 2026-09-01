@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.213
+// MOVI KIDS — Google Apps Script v1.5.214
+// v1.5.214: I150 — cenariosFinanceiros: baseDre (DRE) · projetado3m · ritmo3d (ref mes anterior se <3 dias)
 // v1.5.213: I148 — corrigirCanceladaParaEncerradaAdmin (Cancelada→Encerrada caixa ADM)
 // v1.5.212: I148 — encerrarLocacao cancelarExtras/somentePlano: minUsados let (V8 const crash)
 // v1.5.211: I147 — Fase 2 offline: idempotencia clientRequestId em salvarLocacao + iniciarTimer (Cache 6h)
@@ -6171,6 +6172,154 @@ function comandoOperacional_(p) {
   return ContentService.createTextOutput(out).setMimeType(ContentService.MimeType.JSON);
 }
 
+/** I150 — últimos N dias com faturamento > 0 (mapa dia→valor). */
+function lastNBillingDaysFromFatMap_(fatMap, n, maxDia) {
+  const lim = Math.max(1, Math.min(7, Number(n) || 3));
+  const dias = Object.keys(fatMap || {}).map(function(k) { return parseInt(k, 10); })
+    .filter(function(d) { return d > 0 && (!maxDia || d <= maxDia); })
+    .sort(function(a, b) { return a - b; });
+  const pos = dias.filter(function(d) { return (Number(fatMap[d]) || 0) > 0; });
+  const pick = pos.slice(-lim);
+  if (!pick.length) return { media: 0, dias: [], valores: [] };
+  const vals = pick.map(function(d) { return Number(fatMap[d]) || 0; });
+  const media = Math.round(vals.reduce(function(s, v) { return s + v; }, 0) / vals.length * 100) / 100;
+  return { media: media, dias: pick, valores: vals };
+}
+
+/** I150 — mês calendário anterior. */
+function prevMonthKey_(mes, ano) {
+  const m = mes <= 1 ? 12 : mes - 1;
+  const y = mes <= 1 ? ano - 1 : ano;
+  return { mes: m, ano: y, key: String(m).padStart(2, '0') + '/' + y };
+}
+
+/** I150 — forecast mês: média dos 3 meses calendário anteriores. */
+function calcProjetado3mMes_(mes, ano, fatByPayback) {
+  const det = [];
+  let m = parseInt(mes, 10);
+  let y = parseInt(ano, 10);
+  let sum = 0;
+  for (let i = 0; i < 3; i++) {
+    m--;
+    if (m < 1) { m = 12; y--; }
+    const key = String(m).padStart(2, '0') + '/' + y;
+    const fat = Math.round((Number(fatByPayback[key]) || 0) * 100) / 100;
+    sum += fat;
+    det.unshift({ mes: m, ano: y, label: key, fat: fat });
+  }
+  return {
+    mes: Math.round(sum / 3 * 100) / 100,
+    meses: det
+  };
+}
+
+/**
+ * I150 — cenários financeiros canônicos (Dashboard).
+ * Base = piso DRE (fatMinMargem: folha + custos + CTO min, margem alvo).
+ * Projetado = média 3 meses anteriores.
+ * Ritmo = média últimos 3 dias c/ faturamento; se <3 dias no mês → ref. mês anterior.
+ */
+function buildCenariosFinanceirosMes_(opts) {
+  opts = opts || {};
+  const mes = parseInt(opts.mesAtual, 10);
+  const ano = parseInt(opts.anoAtual, 10);
+  const diasMes = Number(opts.diasMes) || 30;
+  const fatMes = Number(opts.fatMes) || 0;
+  const fatPorDiaMap = opts.fatPorDiaMap || {};
+  const fatPorDiaByMonth = opts.fatPorDiaByMonth || {};
+  const fatByPayback = opts.fatByPayback || {};
+  const hoje = opts.hoje || new Date();
+  const viab = opts.viabilidadeContratacao || {};
+  const cusMes = Number(opts.cusMes) || 0;
+  const ctoMin = Number(opts.ctoMinimo) || 0;
+  const folha = Number(viab.folhaMensal) || 0;
+
+  const isCorrente = mes === hoje.getMonth() + 1 && ano === hoje.getFullYear();
+  const diaCal = isCorrente ? hoje.getDate() : diasMes;
+  const diasRest = isCorrente ? Math.max(0, diasMes - diaCal) : 0;
+
+  let baseDreMes = Number(viab.fatMinMargem) || 0;
+  if (baseDreMes <= 0 && folha > 0) {
+    baseDreMes = Math.round((folha + cusMes + ctoMin) / (0.9 - CONTRAT_MARGEM_MIN_ / 100) * 100) / 100;
+  }
+  const baseDreDiaria = diasMes > 0 ? Math.round(baseDreMes / diasMes * 100) / 100 : 0;
+
+  const projPack = calcProjetado3mMes_(mes, ano, fatByPayback);
+  const projetado3mMes = projPack.mes;
+  const projetado3mDiaria = diasMes > 0 ? Math.round(projetado3mMes / diasMes * 100) / 100 : 0;
+
+  let acum = 0;
+  let diasComMov = 0;
+  for (let d = 1; d <= diaCal; d++) {
+    const dk = String(d).padStart(2, '0');
+    const v = Number(fatPorDiaMap[dk]) || 0;
+    if (v > 0) diasComMov++;
+    acum += v;
+  }
+  acum = Math.round(acum * 100) / 100;
+
+  let ritmoPack = lastNBillingDaysFromFatMap_(fatPorDiaMap, 3, diaCal);
+  let ritmoFonte = 'mes_atual';
+  if (diasComMov < 3) {
+    const prev = prevMonthKey_(mes, ano);
+    const prevMap = fatPorDiaByMonth[prev.key] || {};
+    ritmoPack = lastNBillingDaysFromFatMap_(prevMap, 3, null);
+    ritmoFonte = 'referencia_' + prev.key.replace('/', '_');
+  }
+  const ritmo3dDiaria = ritmoPack.media;
+  let ritmo3dMes;
+  if (!isCorrente && diaCal >= diasMes) {
+    ritmo3dMes = Math.round(fatMes * 100) / 100;
+  } else {
+    ritmo3dMes = Math.round((acum + ritmo3dDiaria * diasRest) * 100) / 100;
+  }
+
+  const ritmoPorDia = [];
+  const prev = prevMonthKey_(mes, ano);
+  const prevMap = fatPorDiaByMonth[prev.key] || {};
+  for (let dd = 1; dd <= diasMes; dd++) {
+    let acumD = 0;
+    let diasComD = 0;
+    const partial = {};
+    for (let d = 1; d <= dd; d++) {
+      const dk = String(d).padStart(2, '0');
+      const v = Number(fatPorDiaMap[dk]) || 0;
+      partial[dk] = v;
+      acumD += v;
+      if (v > 0) diasComD++;
+    }
+    let packD;
+    if (diasComD >= 3) packD = lastNBillingDaysFromFatMap_(partial, 3, dd);
+    else packD = lastNBillingDaysFromFatMap_(prevMap, 3, null);
+    const restD = diasMes - dd;
+    ritmoPorDia.push({
+      dia: dd,
+      acum: Math.round(acumD * 100) / 100,
+      ritmoDiaria: packD.media,
+      ritmoMes: Math.round((acumD + packD.media * restD) * 100) / 100
+    });
+  }
+
+  return {
+    baseDreMes: baseDreMes,
+    baseDreDiaria: baseDreDiaria,
+    baseDreDetalhe: 'DRE: folha R$ ' + fmtMoedaBr_(folha) + ' + custos + CTO min · margem ' + CONTRAT_MARGEM_MIN_ + '%',
+    projetado3mMes: projetado3mMes,
+    projetado3mDiaria: projetado3mDiaria,
+    projetado3mMeses: projPack.meses,
+    ritmo3dDiaria: ritmo3dDiaria,
+    ritmo3dMes: ritmo3dMes,
+    ritmo3dFonte: ritmoFonte,
+    ritmo3dDiasRef: ritmoPack.dias,
+    ritmo3dAcum: acum,
+    ritmoPorDia: ritmoPorDia,
+    diasRest: diasRest,
+    diaCal: diaCal,
+    diasComMovMes: diasComMov,
+    isCorrente: isCorrente
+  };
+}
+
 /** Projeção de fechamento para histórico mensal (mês corrente → fim do mês; fechado → span calendário operado). */
 function calcFatProjetadoHistorico_(fat, diasOp, diasMes, diasMap, mes, ano, hoje) {
   if (diasOp <= 0 || fat <= 0) return 0;
@@ -6219,7 +6368,7 @@ function buildHistoricoFatProjecao_(mesRef, anoRef, fatByPayback, diasOpByMonth,
     const fat = Math.round((Number(fatByPayback[key]) || 0) * 100) / 100;
     const diasMap = diasOpByMonth[key] || {};
     const diasOp = Object.keys(diasMap).length;
-    const fatProj = calcFatProjetadoHistorico_(fat, diasOp, diasMes, diasMap, m, y, hoje);
+    const fatProj = calcProjetado3mMes_(m, y, fatByPayback).mes;
     const parcial = m === hoje.getMonth() + 1 && y === hoje.getFullYear() && m === mesRefInt && y === anoRefInt;
     out.push({
       mes: m,
@@ -7414,6 +7563,7 @@ function buildKpiMesPayload_(p) {
   const fatByPayback = {};
   const cusByPayback = {};
   const diasOpByMonth = {};
+  const fatPorDiaByMonth = {};
 
   const lastLoc = shLoc.getLastRow();
   if (lastLoc >= DATA_ROW) {
@@ -7439,6 +7589,8 @@ function buildKpiMesPayload_(p) {
       const dkOp = pts[0].padStart(2, '0');
       if (!diasOpByMonth[mmyyR]) diasOpByMonth[mmyyR] = {};
       diasOpByMonth[mmyyR][dkOp] = true;
+      if (!fatPorDiaByMonth[mmyyR]) fatPorDiaByMonth[mmyyR] = {};
+      fatPorDiaByMonth[mmyyR][dkOp] = (fatPorDiaByMonth[mmyyR][dkOp] || 0) + vt;
       if (dataR === dataHoje) { fatHoje += vt; contasHoje[cKey] = true; }
 
       const tipo   = String(r[4]);
@@ -7542,8 +7694,8 @@ function buildKpiMesPayload_(p) {
   // v1.5.4: projeção e média diária
   const diasOperando  = diasComMov.size;
   const mediaDiaria   = diasOperando > 0 ? Math.round(fatMes / diasOperando * 100) / 100 : 0;
-  const projecaoFat   = diasOperando > 0 ? Math.round(fatMes / diasOperando * diasMes * 100) / 100 : 0;
-  const projecaoRes   = Math.round((projecaoFat - cusMes - Math.max(ctoMinimo_(mesCto), projecaoFat * 0.10)) * 100) / 100;
+  let projecaoFat   = diasOperando > 0 ? Math.round(fatMes / diasOperando * diasMes * 100) / 100 : 0;
+  let projecaoRes   = Math.round((projecaoFat - cusMes - Math.max(ctoMinimo_(mesCto), projecaoFat * 0.10)) * 100) / 100;
 
   const fatDiaArr = [];
   const extDiaArr = [];
@@ -7621,8 +7773,25 @@ function buildKpiMesPayload_(p) {
   }));
 
   const historicoMeses = buildHistoricoFatProjecao_(mesAtual, anoAtual, fatByPayback, diasOpByMonth, hoje);
-  const metaProjecaoMes = getOrSetMetaProjecaoMes_(mesAtual, anoAtual, projecaoFat, fatDiaArr, diasMes, leadingFinanceiro, diasOperando, hoje.getDate());
-  const projDiariaFixa = metaProjecaoMes > 0 ? Math.round(metaProjecaoMes / diasMes * 100) / 100 : 0;
+  const cenariosFinanceiros = buildCenariosFinanceirosMes_({
+    mesAtual: mesAtual,
+    anoAtual: anoAtual,
+    diasMes: diasMes,
+    fatMes: Math.round(fatMes * 100) / 100,
+    fatPorDiaMap: fatPorDia,
+    fatPorDiaByMonth: fatPorDiaByMonth,
+    fatByPayback: fatByPayback,
+    hoje: hoje,
+    viabilidadeContratacao: viabilidadeContratacao,
+    cusMes: Math.round(cusMes * 100) / 100,
+    ctoMinimo: ctoMin
+  });
+  const metaProjecaoMes = cenariosFinanceiros.baseDreMes;
+  const projDiariaFixa = cenariosFinanceiros.baseDreDiaria;
+  projecaoFat = cenariosFinanceiros.ritmo3dMes;
+  projecaoRes = fatMes > 0
+    ? Math.round(cenariosFinanceiros.ritmo3dMes * (resultado / fatMes) * 100) / 100
+    : Math.round((cenariosFinanceiros.ritmo3dMes - cusMes - Math.max(ctoMinimo_(mesCto), cenariosFinanceiros.ritmo3dMes * 0.10)) * 100) / 100;
   const mesesRecentes = buildMesesRecentesParaSinal_(mesAtual, anoAtual, fatByPayback, cusByPayback);
   const alertaCtx = Object.assign({}, narrativaCtx, {
     cusMes: Math.round(cusMes * 100) / 100,
@@ -7709,6 +7878,7 @@ function buildKpiMesPayload_(p) {
     folhaPlanejamento: folhaPlanejamento,
     viabilidadeContratacao: viabilidadeContratacao,
     historicoMeses: historicoMeses,
+    cenariosFinanceiros: cenariosFinanceiros,
     metaProjecaoMes: metaProjecaoMes,
     projDiariaFixa: projDiariaFixa,
     baselineFatMes: metaProjecaoMes,
