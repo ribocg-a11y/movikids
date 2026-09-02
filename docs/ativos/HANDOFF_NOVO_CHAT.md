@@ -1,10 +1,10 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 02/09/2026 · FE **v1.9.110** Pages · GAS ping **v1.5.213** (repo header **v1.5.215**) · **I151** / **I150**  
-**Ambiente do agente:** **This PC (Windows)** — pasta no **C:** · **não** Cloud Agent.  
+**Atualizado:** 02/09/2026 · FE **v1.9.111** (I151b emergência FE, sem GAS) · ping **v1.5.213** (repo **v1.5.215**) · **I151b** / **I151** / **I150**  
+**Ambiente do agente:** Cloud Agent OK para FE-only · pasta C / AppScript = sócio no PC.  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
-**GitHub:** `ribocg-a11y/movikids` · branch `main` · FE Pages **v1.9.110**
+**GitHub:** `ribocg-a11y/movikids` · branch `main` · FE Pages **aguardando merge I151b → 1.9.111** (live ainda pode ser **1.9.110**)
 
 ---
 
@@ -58,6 +58,8 @@ node scripts\testes\teste-i150-cenarios-financeiros.cjs
 ---
 
 ## Entregas recentes (contexto)
+
+**I151b (02/09):** Emergência **só FE** — invalidate cache + reconcile `listarAtivas` após `carregarInicio` · FE **v1.9.111**. Sem AppScript. Doc: `INCIDENTE_I151b_ENCERRAR_FANTASMA_EMERGENCIA_FE_2026-09-02.md`
 
 **I151 (02/09):** Encerrar fantasma recorrente — purge 409 + cache/snapshot. FE **v1.9.110**. Doc: `INCIDENTE_I151_ENCERRAR_FANTASMA_RECORRENTE_2026-09-02.md`
 

@@ -216,6 +216,11 @@ async function init() {
 
   syncController();
 
+  // I151b emergência: cruzar listarAtivas cedo (não esperar 12s) se há card local
+  setTimeout(function () {
+    if (typeof mkReconcileFantasmasEmergencia_ === 'function') mkReconcileFantasmasEmergencia_({ silent: true });
+  }, 2000);
+
   setTimeout(function () {
     if (typeof mkSyncBootFastPath_ === 'function') mkSyncBootFastPath_();
   }, 12000);

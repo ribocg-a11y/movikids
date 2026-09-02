@@ -103,11 +103,18 @@ async function mkSyncListarAtivasFallback_(opts) {
     const d = await api({ action: 'listarAtivas' }, opts.timeoutMs || MK_LISTAR_ATIVAS_TIMEOUT_MS);
     const payload = mkInicioFromListarAtivas_(d);
     if (!payload) return false;
+    const before = Array.isArray(sessions) ? sessions.length : 0;
+    // I151b: listarAtivas é autoridade do balcão — cache frio de carregarInicio não pode ressuscitar fantasma
+    if (payload.ativos.length === 0 && typeof mkInvalidateInicioCache_ === 'function') {
+      mkInvalidateInicioCache_();
+    }
     aplicarDadosInicio(payload);
     mkSyncClearBootPending_(true);
     setStatus(true);
     if (payload.ativos.length && typeof toast === 'function' && !opts.silent) {
       toast('Locações carregadas (sync completo em segundo plano).', 'success');
+    } else if (!payload.ativos.length && before > 0 && typeof toast === 'function' && !opts.silent) {
+      toast('Servidor sem locações abertas — limpei cards fantasmas.', 'warning');
     }
     return true;
   } catch (e) {
@@ -119,11 +126,30 @@ async function mkSyncListarAtivasFallback_(opts) {
 }
 
 function mkSyncBootFastPath_() {
-  if (!window._mkSyncBootPending && Array.isArray(sessions) && sessions.length) return;
+  // I151b: sempre cruzar com listarAtivas (limpa fantasma mesmo após boot local)
   mkSyncListarAtivasFallback_({ silent: true });
+}
+
+/** I151b emergência: com card local, validar contra listarAtivas (sem AppScript). */
+let _mkFantasmaReconcileTimer = null;
+function mkReconcileFantasmasEmergencia_(opts) {
+  opts = opts || {};
+  if (!Array.isArray(sessions) || !sessions.length) return;
+  const hasOpen = sessions.some(function (s) {
+    return s && (s.status === 'Ativa' || s.status === 'Pendente' || s._optimistic || s._iniciandoTimer);
+  });
+  if (!hasOpen && !opts.force) return;
+  mkSyncListarAtivasFallback_({ silent: opts.silent !== false });
+}
+function mkScheduleFantasmaReconcile_() {
+  clearTimeout(_mkFantasmaReconcileTimer);
+  _mkFantasmaReconcileTimer = setTimeout(function () {
+    mkReconcileFantasmasEmergencia_({ silent: true });
+  }, 2500);
 }
 window.mkSyncListarAtivasFallback_ = mkSyncListarAtivasFallback_;
 window.mkSyncBootFastPath_ = mkSyncBootFastPath_;
+window.mkReconcileFantasmasEmergencia_ = mkReconcileFantasmasEmergencia_;
 
 function mkInicioCacheFresh_(raw) {
   try {
@@ -192,6 +218,7 @@ async function sincronizarServidor(force = false) {
       const fbOk = await mkSyncListarAtivasFallback_({ silent: true });
       if (fbOk) {
         setStatus(true);
+        mkScheduleFantasmaReconcile_();
         return;
       }
       // I122: timeout/erro com loc aberta → NÃO reaplicar mk_inicio_cache (fantasma)
@@ -233,6 +260,8 @@ async function sincronizarServidor(force = false) {
     setStatus(true);
     aplicarDadosInicio(d);
     mkSyncClearBootPending_(false);
+    // I151b: carregarInicio pode vir com ScriptCache velho — cruzar com listarAtivas
+    mkScheduleFantasmaReconcile_();
     if (typeof mkOfflineFlush_ === 'function') mkOfflineFlush_().catch(function () { /* ignore */ });
 
   } catch(e) {
@@ -391,10 +420,13 @@ function aplicarDadosInicio(d) {
     const merged = d.ativos.map(s => mergeSessaoCanonica(s, storedMap[s.rowIndex] || {}));
     const mergedRows = new Set(merged.map(s => s.rowIndex));
     // I122/I143: não apagar Pendente/▶ local enquanto sync lento ainda não listou a linha
+    // I151b: listarAtivas é autoridade — só mantém orphan otimista curto (não 120s de fantasma)
+    const fromListar = d.fonte === 'listarAtivas';
     const orphans = cleanedStored.filter(function (s) {
       if (!s || !s.rowIndex || mergedRows.has(s.rowIndex)) return false;
       if (s._optimistic || s._iniciandoTimer) return true;
       if (window._mkTimerInFlight && s.status === 'Ativa') return true;
+      if (fromListar) return false;
       if (s.status === 'Pendente' || s.status === 'Ativa') {
         const age = Date.now() - Number(s._savedAt || s._criado || 0);
         if (s._savedAt || s._criado) return age < 120000;
@@ -403,6 +435,9 @@ function aplicarDadosInicio(d) {
     });
     sessions = merged.concat(orphans);
     saveSessions();
+    if (fromListar && d.ativos.length === 0 && typeof mkInvalidateInicioCache_ === 'function') {
+      mkInvalidateInicioCache_();
+    }
 
     if (typeof mkShouldRefreshHomeCards_ === 'function' && !mkShouldRefreshHomeCards_()) {
       updateStats();
