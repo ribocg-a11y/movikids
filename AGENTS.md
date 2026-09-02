@@ -2,20 +2,18 @@
 
 Sistema operacional de locações — balcão (tablet na loja), portal do responsável, painel admin.
 
-**Ciclo ativo (02/09/2026):** Sprint D · FE **v1.9.110** Pages · GAS ping **v1.5.213** (repo **v1.5.215**) · **I151** / **I150** / **I149** / **I148** / **I147** / **I146**
-
-**Repo neste PC:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`
+**Ciclo ativo (02/09/2026):** Sprint D · FE **v1.9.111** Pages ✅ · GAS ping **v1.5.213** (repo **v1.5.215**) · **I151b** / **I151** / **I150**
 
 **Para retomar (agente local PC — pasta C):**
 
-> *Continuar MOVI KIDS **no PC** — workspace `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`. Ler HANDOFF_NOVO_CHAT.md. FE v1.9.109 Pages ✅ · GAS ping v1.5.213. Cadeia I146–I150. Tablet ?force=1.9.109. **Não Cloud.***
+> *Continuar MOVI KIDS — FE **v1.9.111** · I151b travas encerrar fantasma · Tablet `?force=1.9.111` · Doc `INCIDENTE_I151_DEFINITIVO_*`*
 
 ## Produção atual
 
 | Camada | Versão | Link |
 |--------|--------|------|
-| Frontend | **v1.9.110** | https://ribocg-a11y.github.io/movikids/?force=1.9.110 |
-| Gestão Pessoas | **v1.9.110** | `gestao-pessoas.html?force=1.9.110` |
+| Frontend | **v1.9.111** | https://ribocg-a11y.github.io/movikids/?force=1.9.111 |
+| Gestão Pessoas | **v1.9.111** | `gestao-pessoas.html?force=1.9.111` |
 | GAS | ping **v1.5.213** · repo **v1.5.215** | `cenariosFinanceiros` live · Nova versão Web ping ⏳ |
 | Design System | **v1.1** | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
 
@@ -29,10 +27,11 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 .\scripts\sync-pasta-c-pc.ps1
 ```
 
-## Estado (01/09/2026)
+## Estado (02/09/2026)
 
 - **Fase 1 local-first:** ✅ IndexedDB + snapshot (**I146**)
 - **Fase 2 offline:** ✅ fila FE + idempotência GAS (**I147**)
+- **Encerrar fantasma:** ✅ travas I151b (**FE v1.9.111**, sem AppScript)
 - **Dashboard cenários:** ✅ Base DRE · Projetado 3m · Ritmo 3d (**I150**)
 - **Próximo (Ops):** tablet smoke D4 · validar Dashboard admin · Nova versão GAS ping · assinar FASE 17
 - **Encerrar toda resposta** com bloco **Versões (encerramento)** + Regra 16

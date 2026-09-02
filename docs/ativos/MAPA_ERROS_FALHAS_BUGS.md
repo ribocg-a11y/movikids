@@ -1,6 +1,7 @@
 # MOVI KIDS — Mapa de erros, falhas e bugs
 
-**Atualizado:** 02/09/2026 — **I151** encerrar fantasma · FE **v1.9.110** · GAS ping **v1.5.213** (repo **v1.5.215**)  
+**Atualizado:** 02/09/2026 — **I151b** travas definitivas · FE **v1.9.111** Pages · GAS ping **v1.5.213** (repo **v1.5.215**)  
+**Uso anterior:** 02/09/2026 — **I151** encerrar fantasma · FE **v1.9.110**  
 **Uso anterior:** 29/08/2026 — **I147** / **I146** · FE **v1.9.105** · GAS Web **v1.5.211**  
 **Uso anterior:** 13/08/2026 — **I145** idle/visibility sem force=1 · FE **v1.9.97** · GAS Web **v1.5.210** ✅
 **Uso anterior:** 06/08/2026 — **I143** salvar/▶ timeout+duplicata · FE **v1.9.96** · GAS Web **v1.5.210** ✅  
@@ -46,6 +47,42 @@
 **Pressão estrutural:** aba LOCAÇÕES ~2400 linhas → `carregarInicio` frio e `listarAtivas` sobem; qualquer `force=1` ou fila RH/admin no mesmo Deploy compete com salvar/▶.
 
 Doc longo: `INCIDENTE_I143_SALVAR_DUP_TIMEOUT_FORCE_2026-08-06.md`
+
+---
+
+## Diagnóstico de família — encerrar fantasma I148 → I151b (02/09/2026)
+
+**Veredito:** o **GAS encerrava certo** (409 / `listarAtivas.total=0`). O tablet **reidrativa** cards por camadas locais desalinhadas — mesma família de I122/I146, mas no **fechamento** da locação.
+
+| Camada local | Papel | Falha que causava fantasma | Correção definitiva (FE **v1.9.111**) |
+|--------------|-------|---------------------------|----------------------------------------|
+| Planilha/GAS | Verdade operacional | OK — linha Encerrada | **Sem mudança AppScript** |
+| `listarAtivas` | Autoridade rápida do balcão | Zera UI mas não invalidava cache | `listarAtivas=0` → **`mkInvalidateInicioCache_`** |
+| `carregarInicio` | Snapshot completo + stats | ScriptCache lento → `ativos[]` velho reaplicado | **`mkScheduleFantasmaReconcile_`** após cada início |
+| `mk_inicio_cache` | Fallback offline | Reaplicado após timeout com Ativa fantasma | Nunca orphan 120s quando **`fonte=listarAtivas`** |
+| `mk_snapshot_v1` / IDB | Boot local-first (I146) | Parcial `[]` não gravava → boot ressuscitava | **`mkSnapshotSave_`** grava parcial vazio |
+| `mk_sessions` | Estado UI + otimistas | Orphans Ativa/Pendente 120s sem linha no servidor | Só otimista/`▶` in-flight; purge **`mkEncerrarPurgeLocal_`** |
+| Encerrar drawer | Ação operador | 409 regex estreita; timeout sem reconcile | Purge 409 amplo + **`mkSyncListarAtivasFallback_`** no erro |
+
+```mermaid
+flowchart LR
+  subgraph autoridade [Autoridade servidor]
+    LA[listarAtivas]
+    CI[carregarInicio]
+  end
+  subgraph local [Camadas locais — ordem de confiança]
+    LA --> UI[sessions / cards]
+    LA --> SNAP[snapshot IDB]
+    CI --> CACHE[mk_inicio_cache]
+  end
+  CI -.->|pode atrasar| CACHE
+  LA -->|total=0| PURGE[invalidate cache + snapshot vazio]
+  PURGE --> UI
+```
+
+**Regra de ouro (I151 definitivo):** se **`listarAtivas.total === 0`**, o balcão **não pode** mostrar Ativa/Pendente — exceto otimista **`▶`/`salvar` ≤90s**.
+
+Docs: `INCIDENTE_I148_*` · `INCIDENTE_I151_*` · `INCIDENTE_I151b_*` · **`INCIDENTE_I151_DEFINITIVO_ENCERRAR_FANTASMA_2026-09-02.md`**
 
 ---
 
@@ -164,7 +201,7 @@ Doc longo: `INCIDENTE_I143_SALVAR_DUP_TIMEOUT_FORCE_2026-08-06.md`
 | **I126c** | **Faixa vermelha “Painel rápido” eterna + Escala OK** | Banner `_partial` em `gp-adm-err`; Escala já vinha do lite; promise resolvida bloqueava Folha full | FE **v1.9.72** remove banner lite · full só Folha/Avaliações · `gpAdmPanelInFlight_` | `mk-gestao-pessoas-admin.js` | sem faixa vermelha · Folha carrega ao abrir |
 | **I127** | **Holerite Q2: adiantamento 1ª = R$ 0** | Cód 410 zerado; DP exige desconto do adiantamento na 2ª (art. 462 CLT / Contábeis) | FE **v1.9.73** `mk-holerite.js` · GAS **v1.5.206** `adiantamentoQ1` | Q2: salário mês − adiantamento 40% − encargos | Raykelly: 410 ≈ R$ 648,40 |
 | **I128** | **Ficha: “Sem dias na competência” com ponto aberto** | Lite deixa `jornada.dias=[]`; full só rodava em Folha/Avaliações | FE **v1.9.74** Ficha pede full + loading jornada | `gpAdmEnsureFullPanel_('presenca')` | Raykelly Jul: 29 dias + 14:04 Aberto |
-| **I151b** | **Fantasma volta após listarAtivas=0 (sem GAS novo)** | `carregarInicio` grava `mk_inicio_cache` velho; listarAtivas zera tela mas não invalidava cache → sync falho ressuscita card | FE **v1.9.111** invalidate + reconcile pós-inicio + orphans só otimistas | `INCIDENTE_I151b_*` · `mk-sync.js` · `mk-core.js` | emergência 02/09 sem AppScript |
+| **I151b** | **Fantasma volta após listarAtivas=0 (sem GAS novo)** | `carregarInicio` grava `mk_inicio_cache` velho; listarAtivas zera tela mas não invalidava cache → sync falho ressuscita card | FE **v1.9.111** invalidate + reconcile pós-inicio + orphans só otimistas · **`guard.i151.*`** · **`TESTE_I151_ENCERRAR_FANTASMA_READONLY`** | `INCIDENTE_I151b_*` · `mk-sync.js` · `mk-core.js` | **definitivo FE** — sem AppScript |
 | **I151** | **Encerrar fantasma recorrente (card Ativa, servidor 0)** | I148 incompleto: timeout sem reconcile; cache/snapshot parcial vazio não limpava | FE **v1.9.110** purge 409 amplo + invalidate cache + snapshot vazio | `INCIDENTE_I151_*` · `mk-drawer.js` · `mk-local-snapshot.js` | 02/09: listarAtivas=0 · card fantasma |
 | **I150** | **Dashboard: Base/Ritmo/Projetado confusos (métricas diferentes)** | Base = localStorage histórico; ritmo = média mês (= real no fechamento); labels contraditórios | GAS **v1.5.214–215** `cenariosFinanceiros` (base DRE + manut R$1200 + projetado 3m + ritmo 3d) · FE **v1.9.109** labels + gráficos | `INCIDENTE_I150_*` · `teste-i150-cenarios-financeiros.cjs` | ago/26: base 11047 · proj 11875 · ritmo=16140 |
 | **I149** | **Meta festeja R$100 com a loja inteira** | Local somava todas as locações do turno; rótulo usava `bonus` 100 e ignorava I109 (FSS R$50) | FE **v1.9.107** local só reusa n do GAS · `mkMetaBonusAlvo_` (50 no FSS com par) | `INCIDENTE_I149_*` · `mk-meta-operador.js` | Raykelly 30/08: 18/20 · R$0 · sem festa |
@@ -247,6 +284,10 @@ Doc longo: `INCIDENTE_I143_SALVAR_DUP_TIMEOUT_FORCE_2026-08-06.md`
 | `../arquivo/incidentes/INCIDENTE_I33_PWA_CACHE_BOOT_LENTO_2026-06-20.md` | **I33** — PWA stale + boot lento |
 | `../arquivo/incidentes/INCIDENTE_I34_HOLERITE_APRESENTACAO_2026-06-20.md` | **I34** — holerite UX + CNPJ |
 | **`INCIDENTE_I43_CARREGAR_INICIO_COL_Y_2026-06-23.md`** | **I43** — regressão I42; col Y fora do getRange |
+| **`INCIDENTE_I151_DEFINITIVO_ENCERRAR_FANTASMA_2026-09-02.md`** | **I148–I151b** — travas + teste + regra ouro |
+| **`INCIDENTE_I151_ENCERRAR_FANTASMA_RECORRENTE_2026-09-02.md`** | **I151** |
+| **`INCIDENTE_I151b_ENCERRAR_FANTASMA_EMERGENCIA_FE_2026-09-02.md`** | **I151b** emergência sem GAS |
+| **`INCIDENTE_I148_ENCERRAR_FANTASMA_2026-08-29.md`** | **I148** |
 | `../arquivo/incidentes/INCIDENTE_I38_PREVIEW_BANNER_PIN_COLAB_2026-06-22.md` | **I38** — banner preview com PIN colab |
 | `../arquivo/incidentes/INCIDENTE_I39_VA_ADMISSAO_PROPORCIONAL_2026-06-22.md` | **I39** — VA proporcional admissão |
 | **`AUDITORIA_RH_FOLHA_PERSISTENCIA_2026-06-22.md`** | Matriz abas RH · I40 · lacunas RH-G1–G15 |
@@ -277,6 +318,16 @@ Doc longo: `INCIDENTE_I143_SALVAR_DUP_TIMEOUT_FORCE_2026-08-06.md`
 | `guard.nova.sms.sem.autoStart` | `mk-nova.js` — cadastro não auto-inicia | I20 |
 | `guard.iniciar.direto` | `iniciarContagemDireto_` sem modal BV | I20 |
 | `guard.idle.locacao` | `mkHasLocacaoAbertaNoTablet_` em mk-auth | I18 |
+| `guard.i145.sync.warm` | idle/visibility sem force=1 | I145 |
+| `guard.i151.reconcile` | `mkReconcileFantasmasEmergencia_` + schedule pós-inicio | I151b |
+| `guard.i151.listar.invalidate` | `listarAtivas=0` invalida `mk_inicio_cache` | I151b |
+| `guard.i151.orphans` | orphans sem grace 120s quando fonte=listarAtivas | I151b |
+| `guard.i151.fallback` | `mkSyncListarAtivasFallback_` presente | I148 |
+| `guard.i151.purge` | `mkEncerrarPurgeLocal_` + invalidate cache | I151 |
+| `guard.i151.purge.409` | regex 409 encerrada/finalizada | I151 |
+| `guard.i151.snapshot` | snapshot parcial vazio grava | I151 |
+| `guard.i151.boot` | boot reconcile 2s | I151b |
+| `teste.i151` | `TESTE_I151_ENCERRAR_FANTASMA_READONLY.ps1` | I151 |
 | `guard.auth.fantasma` | `mkAuthReconcileSessaoFantasma_` em mk-auth | I19 |
 | `guard.idle.wallclock` | `mkAuthIdleRemainingMs_` em mk-auth | I21 |
 | `guard.idle.gas.release` | `mkAuthReleaseBalcaoServer_` em mk-auth | I21 |
@@ -330,6 +381,9 @@ Doc longo: `INCIDENTE_I143_SALVAR_DUP_TIMEOUT_FORCE_2026-08-06.md`
 - [ ] **Dual admin + operador GAS:** faixa laranja Liberar + modal PIN (I28) — `?force=1.8.30`
 - [ ] Operadores → Deslogar balcão → teclado numérico, não `prompt()` nativo (I28)
 - [ ] Dashboard admin carrega KPIs em &lt;15s — não fica em "Calculando..." (I23)
+- [ ] **Encerrar fantasma:** com `listarAtivas=0`, tablet **sem** cards Ativa/Pendente em ≤5s (**I151b**) — `?force=1.9.111`
+- [ ] 409 “já encerrada” remove card + aviso (**I151**) — não fica fantasma
+- [ ] Diagnóstico → **Limpar cache local + sync** zera fantasmas (**I146/I151**)
 - [ ] Ctrl+F5 com `?force=VERSAO_ATUAL`
 
 ---
@@ -384,16 +438,22 @@ Doc longo: `INCIDENTE_I143_SALVAR_DUP_TIMEOUT_FORCE_2026-08-06.md`
 43. **Nunca** passar `C:\Users\...` como link clicável para deploy GAS — usar **raw GitHub** (I76).
 44. **Sempre** atualizar HANDOFF/ESTADO/DEPLOY/AGENTS ao encerrar sessão com mudança de versão (I76).
 45. **Nunca** modo parcial Operadores com `listarOperadoresAdmin` sozinho — **`cadastroPct` vem de `listarColaboradoresGestao`** (I78 · lição I45/I36).
+46. **Nunca** reaplicar `mk_inicio_cache` ou snapshot quando **`listarAtivas.total=0`** — invalidar cache e gravar snapshot vazio (**I151b**).
+47. **Sempre** tratar **`listarAtivas` como autoridade** do balcão sobre `carregarInicio` quando há divergência de ativos (**I148–I151**).
+48. **Nunca** manter orphan Ativa/Pendente 120s após `listarAtivas` confirmar ausência — só otimista/`▶` in-flight (**I151b**).
+49. **Sempre** purge local no 409 encerrada/finalizada + **`mkInvalidateInicioCache_`** (**I151**).
+50. **Sempre** rodar **`TESTE_I151_ENCERRAR_FANTASMA_READONLY.ps1`** após mudança em `mk-sync.js` / `mk-drawer.js` / `mk-local-snapshot.js` (**I151**).
+51. **Operação diária:** tablet com **`?force=`** da versão Pages + chip **local·nuvem** visível — se *local* >5 min e servidor 0, usar Limpar cache (**I146/I151**).
 
 ---
 
-## Versões de referência (23/06/2026)
+## Versões de referência (02/09/2026)
 
 | Camada | Repo / produção | Mínimo operação |
 |--------|-----------------|-----------------|
-| Frontend | **v1.8.115** | `?force=1.8.115` |
-| GAS | repo **v1.5.137** · ping **v1.5.136** | Nova versão Web v1.5.137 (I44) |
+| Frontend | **v1.9.111** | `?force=1.9.111` · travas **I151** |
+| GAS | repo **v1.5.215** · ping **v1.5.213** | Nova versão Web ping ⏳ (não bloqueia I151 FE) |
 | Design System | **`docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md`** | Obrigatório antes de UI |
-| Aba FOLHA | B68 ~5269,96 · `fonte=FOLHA` | `repairFolhaAdmin` após deploy que toque FOLHA |
+| Encerrar fantasma | FE **v1.9.111+** | Sem AppScript para I151b |
 
 Ver `ESTADO_ATUAL.md` para URLs e editor GAS.

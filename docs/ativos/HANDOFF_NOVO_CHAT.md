@@ -1,10 +1,17 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 02/09/2026 · FE **v1.9.111** (I151b emergência FE, sem GAS) · ping **v1.5.213** (repo **v1.5.215**) · **I151b** / **I151** / **I150**  
+**Atualizado:** 02/09/2026 · FE **v1.9.111** Pages ✅ · GAS ping **v1.5.213** (repo **v1.5.215**) · **I151b definitivo** / **I151** / **I150**  
 **Ambiente do agente:** Cloud Agent OK para FE-only · pasta C / AppScript = sócio no PC.  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
-**GitHub:** `ribocg-a11y/movikids` · branch `main` · FE Pages **aguardando merge I151b → 1.9.111** (live ainda pode ser **1.9.110**)
+**GitHub:** `ribocg-a11y/movikids` · branch `main` · FE Pages **v1.9.111**
+
+## Travas definitivas I151 (02/09)
+
+- **`guard.i151.*`** em `pre-push-check.ps1`
+- **`TESTE_I151_ENCERRAR_FANTASMA_READONLY.ps1`**
+- Doc mestre: **`INCIDENTE_I151_DEFINITIVO_ENCERRAR_FANTASMA_2026-09-02.md`**
+- Mapa: **`MAPA_ERROS_FALHAS_BUGS.md`** § família I148–I151b
 
 ---
 
@@ -110,7 +117,7 @@ node scripts\testes\teste-i150-cenarios-financeiros.cjs
 | # | Ação | Quem | Status |
 |---|------|------|--------|
 | **I150** | Cenários financeiros Dashboard (DRE / 3m / 3d) | Agente | ✅ FE+GAS |
-| **T1** | Tablet `?force=1.9.109` | Ops | ⏳ |
+| **T1** | Tablet `?force=1.9.111` · paridade listarAtivas=cards | Ops | ⏳ |
 | **T2** | Dashboard admin — validar 3 linhas + labels I150 | Sócio PC | ⏳ |
 | **T3** | Smoke D4 (timer, multi-veículo, idle 10 min) | Ops | ⏳ |
 | **GAS** | Nova versão Web v1.5.215 (alinhar ping) | Sócio | ⏳ |
@@ -121,7 +128,7 @@ node scripts\testes\teste-i150-cenarios-financeiros.cjs
 
 ## Cadeia 29/08–01/09
 
-I146 boot IDB → I147 offline → I148 encerrar fantasma → I149 meta FSS → **I150 cenários DRE**
+I146 boot IDB → I147 offline → I148 encerrar fantasma → I149 meta FSS → I150 cenários DRE → **I151/I151b travas definitivas**
 
 ---
 

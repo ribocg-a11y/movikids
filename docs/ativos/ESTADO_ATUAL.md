@@ -1,4 +1,4 @@
-# MOVI KIDS — Estado atual (01/09/2026 · FE v1.9.109 · I146–I150)
+# MOVI KIDS — Estado atual (02/09/2026 · FE v1.9.111 · I146–I151b)
 
 Referência única para alinhamento local × produção.
 
@@ -11,8 +11,8 @@ Referência única para alinhamento local × produção.
 **Acessos:** **`ACESSOS_E_AUTORIZACOES.md`** — papéis, PIN admin, agente vs humano  
 **Índice:** `../INDICE.md` · **Prioridades:** **`PLANO_PRIORIDADES_2026-06.md`**  
 **Planejamento ativo:** `PLANEJAMENTO_ATUAL_2026-06.md`  
-**Mapa de erros/bugs:** **`MAPA_ERROS_FALHAS_BUGS.md`** (família I20/I32/I99/I122/I125/I143/I144/**I145**/**I146**/**I147**/**I148**/**I149**/**I150**)
-**Incidente I150:** **`INCIDENTE_I150_CENARIOS_FINANCEIROS_DRE_2026-09-01.md`**  
+**Mapa de erros/bugs:** **`MAPA_ERROS_FALHAS_BUGS.md`** (família I20/I32/I99/I122/I125/I143/I144/**I145**/**I146**/**I147**/**I148**/**I149**/**I150**/**I151**/**I151b**)
+**Incidente I151 definitivo:** **`INCIDENTE_I151_DEFINITIVO_ENCERRAR_FANTASMA_2026-09-02.md`**  
 **Incidente I145:** **`INCIDENTE_I145_SYNC_FORCE_IDLE_2026-08-13.md`**  
 **Incidente I144:** **`INCIDENTE_I144_OPS_PIN_1416_LIBERAR_BALCAO_2026-08-12.md`** · `ops-balcao.html`  
 **Incidente I143:** **`INCIDENTE_I143_SALVAR_DUP_TIMEOUT_FORCE_2026-08-06.md`**  
@@ -35,14 +35,15 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 ---
 
-## Produção (01/09/2026)
+## Produção (02/09/2026)
 
 | Camada | Versão | URL / evidência |
 |--------|--------|-----------------|
-| **Frontend** | **v1.9.109** | https://ribocg-a11y.github.io/movikids/?force=1.9.109 |
-| **Gestão Pessoas** | **v1.9.109** | `gestao-pessoas.html?force=1.9.109` |
-| **Service Worker** | **1.9.109** | I150 Dashboard cenários |
-| **Apps Script** | repo **v1.5.215** · ping **v1.5.213** | `cenariosFinanceiros` live |
+| **Frontend** | **v1.9.111** | https://ribocg-a11y.github.io/movikids/?force=1.9.111 |
+| **Gestão Pessoas** | **v1.9.111** | `gestao-pessoas.html?force=1.9.111` |
+| **Service Worker** | **1.9.111** | I151b encerrar fantasma definitivo |
+| **Apps Script** | repo **v1.5.215** · ping **v1.5.213** | encerrar/listarAtivas OK · Nova versão Web ping ⏳ |
+| **I151 encerrar fantasma** | ✅ FE | travas `guard.i151.*` · teste readonly |
 | **I145 sync idle** | ✅ | idle/visibility **sem** force=1 · warm ~1–2s |
 | **I143 salvar/▶** | ✅ | mediana ~3.9s / ~3.1s · dup 409 · limpeza OK |
 | **Holerite Q1 15/07** | I108–I114+I138 | Ray pacote **R$ 998,40** · Julia **R$ 948,40** (VT fora) |

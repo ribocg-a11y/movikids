@@ -1,6 +1,6 @@
 # MOVI KIDS — Deploy atual (referência única)
 
-**Atualizado:** 02/09/2026 (FE **v1.9.110** · GAS ping **v1.5.213** · repo **v1.5.215** · I151 / I150)
+**Atualizado:** 02/09/2026 (FE **v1.9.111** · GAS ping **v1.5.213** · repo **v1.5.215** · I151b definitivo)
 
 Use **este arquivo** para versão e ordem de publicação.
 
@@ -10,10 +10,10 @@ Use **este arquivo** para versão e ordem de publicação.
 
 | Camada | Repo | Produção (ping / Pages) | Alinhado? |
 |--------|------|-------------------------|-----------|
-| **Frontend** | **v1.9.110** | https://ribocg-a11y.github.io/movikids/?force=1.9.110 | ✅ Pages |
-| **Gestão Pessoas** | **v1.9.110** | `gestao-pessoas.html?force=1.9.110` | ✅ |
-| **Portal acompanhar** | **v1.9.110** | `acompanhar.html?v=1.9.110` | ✅ |
-| **Service Worker** | **1.9.110** | I151 encerrar fantasma | ✅ |
+| **Frontend** | **v1.9.111** | https://ribocg-a11y.github.io/movikids/?force=1.9.111 | ✅ Pages |
+| **Gestão Pessoas** | **v1.9.111** | `gestao-pessoas.html?force=1.9.111` | ✅ |
+| **Portal acompanhar** | **v1.9.111** | `acompanhar.html?v=1.9.111` | ✅ |
+| **Service Worker** | **1.9.111** | I151b encerrar fantasma + travas | ✅ |
 | **GAS** | **v1.5.215** (header `.gs`) | ping **v1.5.213** · `cenariosFinanceiros` live | ⏳ Nova versão Web (string ping) |
 
 **Ping:** https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec?action=ping

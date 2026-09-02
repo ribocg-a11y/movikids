@@ -587,6 +587,70 @@ try {
     } else {
       Add-Check "guard.i145.sync.warm" "ok" "idle/visibility sync warm sem force=1"
     }
+    # I151 — encerrar fantasma: listarAtivas autoridade + reconcile + cache
+    if ($syncRaw -notmatch 'mkReconcileFantasmasEmergencia_') {
+      Add-Check "guard.i151.reconcile" "fail" "mkReconcileFantasmasEmergencia_ ausente (I151b)"
+    } elseif ($syncRaw -notmatch 'mkScheduleFantasmaReconcile_') {
+      Add-Check "guard.i151.reconcile" "fail" "reconcile pos carregarInicio ausente (I151b)"
+    } else {
+      Add-Check "guard.i151.reconcile" "ok" "reconcile listarAtivas pos inicio"
+    }
+    if ($syncRaw -notmatch 'payload\.ativos\.length === 0[\s\S]{0,160}mkInvalidateInicioCache_') {
+      Add-Check "guard.i151.listar.invalidate" "fail" "listarAtivas=0 nao invalida cache (I151b)"
+    } else {
+      Add-Check "guard.i151.listar.invalidate" "ok" "listarAtivas vazio limpa mk_inicio_cache"
+    }
+    if ($syncRaw -notmatch 'fromListar[\s\S]{0,220}return false') {
+      Add-Check "guard.i151.orphans" "fail" "orphans 120s com fonte listarAtivas (I151b)"
+    } else {
+      Add-Check "guard.i151.orphans" "ok" "listarAtivas sem grace 120s"
+    }
+    if ($syncRaw -notmatch 'mkSyncListarAtivasFallback_') {
+      Add-Check "guard.i151.fallback" "fail" "mkSyncListarAtivasFallback_ ausente (I148)"
+    } else {
+      Add-Check "guard.i151.fallback" "ok" "fallback listarAtivas operacional"
+    }
+  }
+
+  $drawerPath = Join-Path $root "mk-drawer.js"
+  if (Test-Path $drawerPath) {
+    $drawerRaw = Get-Content -Path $drawerPath -Raw -Encoding UTF8
+    if ($drawerRaw -notmatch 'function mkEncerrarPurgeLocal_') {
+      Add-Check "guard.i151.purge" "fail" "mkEncerrarPurgeLocal_ ausente (I148)"
+    } elseif ($drawerRaw -notmatch 'mkEncerrarPurgeLocal_[\s\S]{0,400}mkInvalidateInicioCache_') {
+      Add-Check "guard.i151.purge" "fail" "purge encerrar sem invalidate cache (I151)"
+    } else {
+      Add-Check "guard.i151.purge" "ok" "purge encerrar + invalidate cache"
+    }
+    if ($drawerRaw -notmatch 'j[aá]\s+finalizada|locacao\s+ja\s+finalizada') {
+      Add-Check "guard.i151.purge.409" "fail" "regex 409 encerrada estreita (I148/I151)"
+    } else {
+      Add-Check "guard.i151.purge.409" "ok" "409 encerrada/finalizada remove card"
+    }
+  } else {
+    Add-Check "guard.i151.purge" "fail" "mk-drawer.js ausente"
+  }
+
+  $snapPath = Join-Path $root "mk-local-snapshot.js"
+  if (Test-Path $snapPath) {
+    $snapRaw = Get-Content -Path $snapPath -Raw -Encoding UTF8
+    if ($snapRaw -notmatch 'parcial && ativos\.length > 0\) return') {
+      Add-Check "guard.i151.snapshot" "fail" "snapshot parcial vazio nao limpa fantasma (I151)"
+    } else {
+      Add-Check "guard.i151.snapshot" "ok" "snapshot vazio grava no IDB/LS"
+    }
+  } else {
+    Add-Check "guard.i151.snapshot" "fail" "mk-local-snapshot.js ausente"
+  }
+
+  $corePath = Join-Path $root "mk-core.js"
+  if (Test-Path $corePath) {
+    $coreRaw = Get-Content -Path $corePath -Raw -Encoding UTF8
+    if ($coreRaw -notmatch 'mkReconcileFantasmasEmergencia_') {
+      Add-Check "guard.i151.boot" "fail" "boot sem reconcile 2s (I151b)"
+    } else {
+      Add-Check "guard.i151.boot" "ok" "boot reconcile cedo"
+    }
   }
 
   if ($gasRaw -notmatch 'function veiculoJaAberto_') {
@@ -774,6 +838,12 @@ try {
     $i121Out = & $i121 2>&1 | Out-String
     if ($LASTEXITCODE -ne 0) { Add-Check "teste.i121" "fail" "exit $LASTEXITCODE" }
     else { Add-Check "teste.i121" "ok" "TESTE_I121_DASH_SYNC_READONLY" }
+
+    $i151 = Join-Path $testDir "TESTE_I151_ENCERRAR_FANTASMA_READONLY.ps1"
+    if (-not (Test-Path $i151)) { throw "TESTE_I151_ENCERRAR_FANTASMA_READONLY.ps1 nao encontrado" }
+    $i151Out = & $i151 2>&1 | Out-String
+    if ($LASTEXITCODE -ne 0) { Add-Check "teste.i151" "fail" "exit $LASTEXITCODE" }
+    else { Add-Check "teste.i151" "ok" "TESTE_I151_ENCERRAR_FANTASMA_READONLY" }
   } else {
     Add-Check "teste.paridade" "skip" "SkipNetworkTests"
     Add-Check "teste.portal" "skip" "SkipNetworkTests"
@@ -781,6 +851,7 @@ try {
     Add-Check "teste.i43" "skip" "SkipNetworkTests"
     Add-Check "teste.i120" "skip" "SkipNetworkTests"
     Add-Check "teste.i121" "skip" "SkipNetworkTests"
+    Add-Check "teste.i151" "skip" "SkipNetworkTests"
   }
 } catch {
   $result.status = "fail"

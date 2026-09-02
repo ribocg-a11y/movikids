@@ -2,7 +2,9 @@
 
 Scripts em `scripts/testes/`. Documentação: `docs/ativos/PROTOCOLO_DIAGNOSTICO_E_TESTES.md` · **Planilha por aba:** `docs/ativos/PROTOCOLO_AUDITORIA_ABAS_PLANILHA.md` · **"atualize tudo":** `PROTOCOLO_ATUALIZAR_TUDO.md`
 
-**Versões de referência (01/09/2026):** FE **v1.9.109** · GAS ping **v1.5.213** · mínimo operação balcão **v1.7.35** (I15 GET).
+**Versões de referência (02/09/2026):** FE **v1.9.111** · GAS ping **v1.5.213** · mínimo operação balcão **v1.7.35** (I15 GET).
+
+| **I151 encerrar fantasma** | **`TESTE_I151_ENCERRAR_FANTASMA_READONLY.ps1`** · doc `INCIDENTE_I151_DEFINITIVO_*` |
 
 | **I150 cenários DRE** | `node scripts/testes/teste-i150-cenarios-financeiros.cjs` · `TESTE_DASHBOARD_READONLY.ps1` |
 

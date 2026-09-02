@@ -77,7 +77,7 @@ Cada fluxo tem: **arquivos**, **incidentes**, **teste automático**, **tablet ob
 | **F6** | Timer ativo — countdown | `calcRemaining`, anel, stats | `mk-sessao.js`, `mk-home.js` | I16, I20 | paridade cronômetro | ✅ |
 | **F7** | Alertas timer — 5 min / expirado | `checkTimer` → `triggerAlert5` / `triggerAlertExpired` (beep + modal, **sem SMS**) | `mk-sessao.js`, `mk-operacao.js` | — | `TESTE_TABLET_F5_F7_F10_F11` | ✅ |
 | ~~**F8**~~ | ~~SMS operacional~~ | ⏸ **Suspenso** — canal QR · alertas visuais OK | — | SMS P0 | — | — |
-| **F9** | Encerrar / cancelar | drawer → GAS → some do ativo | `mk-drawer.js`, GAS encerrar | I2, I11, I13, **I148** | `TESTE_DRAWER_E` | ✅ |
+| **F9** | Encerrar / cancelar | drawer → GAS → some do ativo | `mk-drawer.js`, `mk-sync.js`, GAS encerrar | I2, I11, I13, **I148**, **I151**, **I151b** | `TESTE_DRAWER_E`, **`TESTE_I151_ENCERRAR_FANTASMA_READONLY`** | ✅ |
 | **F10** | Sync multi-canal | poll + Firebase + merge + BC | `mk-sync.js`, `mk-firebase.js` | I17, I20 | `TESTE_TABLET_F5_F7_F10_F11` (reload OK; 2 abas físico pendente) | ✅ 2 abas |
 | **F11** | Portal responsável | `acompanhar.html` ±2s do balcão | portal + GAS `buscarPortalResponsavel_` | **I16** | `TESTE_PARIDADE_CRONOMETRO` | ✅ celular |
 | **F12** | Admin — KPIs / payback / caixa / cockpit / **folha CLT** | Dashboard (`kpiMes`), Caixa (`resumoDia`), payback, viabilidade | `mk-admin.js`, GAS `buildKpiMesPayload_`, `lerFolhaPlanejamento_`, `repairFolhaAdmin` | I23, **I25**, payback M | `TESTE_KPI_MES_READONLY`, `TESTE_FOLHA_FORMULAS_READONLY`, `TESTE_FASE9_FOLHA_READONLY` | PC admin |
@@ -290,6 +290,7 @@ Detalhe em `CHECKLIST_FASE5_TABLET.md` + `TESTE_TABLET_F5_F7_F10_F11.ps1`. Resum
 | `TESTE_I20_COMPLETO_PROD.ps1` | F2–F5 | I20 |
 | `TESTE_4_FLUXOS_CADASTRO_I20.ps1` | F2, F3 | I20 |
 | `TESTE_DRAWER_E_PACOTE_E.ps1` | F9 | I13, Pacote E |
+| **`TESTE_I151_ENCERRAR_FANTASMA_READONLY.ps1`** | F9 | **I151** — guards FE + paridade listarAtivas |
 | `TESTE_REGRESSAO_MOVIKIDS_PROD_SAFE.ps1` | F0, leituras | geral |
 | `TESTE_RELACIONAMENTO_*` | F13 | K.3 |
 | `TESTE_OPERACAO_CONFIG_READONLY.ps1` | CONFIG frota/preços | FASE 4 |
