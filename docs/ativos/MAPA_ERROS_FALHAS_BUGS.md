@@ -1,6 +1,6 @@
 # MOVI KIDS — Mapa de erros, falhas e bugs
 
-**Atualizado:** 01/09/2026 — **I150** / **I150b** cenários DRE · FE **v1.9.109** Pages · GAS ping **v1.5.213** (repo **v1.5.215**)  
+**Atualizado:** 02/09/2026 — **I151** encerrar fantasma · FE **v1.9.110** · GAS ping **v1.5.213** (repo **v1.5.215**)  
 **Uso anterior:** 29/08/2026 — **I147** / **I146** · FE **v1.9.105** · GAS Web **v1.5.211**  
 **Uso anterior:** 13/08/2026 — **I145** idle/visibility sem force=1 · FE **v1.9.97** · GAS Web **v1.5.210** ✅
 **Uso anterior:** 06/08/2026 — **I143** salvar/▶ timeout+duplicata · FE **v1.9.96** · GAS Web **v1.5.210** ✅  
@@ -164,6 +164,7 @@ Doc longo: `INCIDENTE_I143_SALVAR_DUP_TIMEOUT_FORCE_2026-08-06.md`
 | **I126c** | **Faixa vermelha “Painel rápido” eterna + Escala OK** | Banner `_partial` em `gp-adm-err`; Escala já vinha do lite; promise resolvida bloqueava Folha full | FE **v1.9.72** remove banner lite · full só Folha/Avaliações · `gpAdmPanelInFlight_` | `mk-gestao-pessoas-admin.js` | sem faixa vermelha · Folha carrega ao abrir |
 | **I127** | **Holerite Q2: adiantamento 1ª = R$ 0** | Cód 410 zerado; DP exige desconto do adiantamento na 2ª (art. 462 CLT / Contábeis) | FE **v1.9.73** `mk-holerite.js` · GAS **v1.5.206** `adiantamentoQ1` | Q2: salário mês − adiantamento 40% − encargos | Raykelly: 410 ≈ R$ 648,40 |
 | **I128** | **Ficha: “Sem dias na competência” com ponto aberto** | Lite deixa `jornada.dias=[]`; full só rodava em Folha/Avaliações | FE **v1.9.74** Ficha pede full + loading jornada | `gpAdmEnsureFullPanel_('presenca')` | Raykelly Jul: 29 dias + 14:04 Aberto |
+| **I151** | **Encerrar fantasma recorrente (card Ativa, servidor 0)** | I148 incompleto: timeout sem reconcile; cache/snapshot parcial vazio não limpava | FE **v1.9.110** purge 409 amplo + invalidate cache + snapshot vazio | `INCIDENTE_I151_*` · `mk-drawer.js` · `mk-local-snapshot.js` | 02/09: listarAtivas=0 · card fantasma |
 | **I150** | **Dashboard: Base/Ritmo/Projetado confusos (métricas diferentes)** | Base = localStorage histórico; ritmo = média mês (= real no fechamento); labels contraditórios | GAS **v1.5.214–215** `cenariosFinanceiros` (base DRE + manut R$1200 + projetado 3m + ritmo 3d) · FE **v1.9.109** labels + gráficos | `INCIDENTE_I150_*` · `teste-i150-cenarios-financeiros.cjs` | ago/26: base 11047 · proj 11875 · ritmo=16140 |
 | **I149** | **Meta festeja R$100 com a loja inteira** | Local somava todas as locações do turno; rótulo usava `bonus` 100 e ignorava I109 (FSS R$50) | FE **v1.9.107** local só reusa n do GAS · `mkMetaBonusAlvo_` (50 no FSS com par) | `INCIDENTE_I149_*` · `mk-meta-operador.js` | Raykelly 30/08: 18/20 · R$0 · sem festa |
 | **I148** | **Encerrar fantasma: card Ativa após já Encerrada** | Iza #3112 encerrada 13:33 sem extra; tela 14:20 ainda Ativa +44; 2º encerrar 409 e card ficava | FE **v1.9.107** 409 purge + fallback `listarAtivas` | `INCIDENTE_I148_*` · `mk-drawer.js` · `mk-sync.js` | card some no 409 e no sync lento |

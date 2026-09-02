@@ -332,7 +332,13 @@ async function confirmarEncerrar() {
     });
 
     if (!d.ok) {
-      const jaEnc = /j[aá]\s+foi\s+encerrada|n[aã]o est[aá] ativa/i.test(String(d.erro || ''));
+      // I151: 409 já encerrada/finalizada — purge local (regex I148 era estreita; cache recolocava card)
+      const errStr = String(d.erro || '');
+      const pendenteBloqueia = /ainda\s+pendente/i.test(errStr);
+      const jaEnc = !pendenteBloqueia && (
+        /j[aá]\s+foi\s+encerrada|j[aá]\s+finalizada|n[aã]o est[aá] ativa|locacao\s+ja\s+finalizada/i.test(errStr) ||
+        (Number(d.code) === 409 && /encerrada|finalizada|n[aã]o est[aá] ativa/i.test(errStr))
+      );
       if (jaEnc) {
         mkEncerrarPurgeLocal_(encSession);
         toast('Já estava encerrada no servidor. Tirei o card da tela. Se faltou extra, corrija no Caixa.', 'warning');
@@ -340,11 +346,22 @@ async function confirmarEncerrar() {
         fecharAlerta();
         renderCards();
         updateStats();
-        if (typeof mkInvalidateInicioCache_ === 'function') mkInvalidateInicioCache_();
         if (typeof syncController === 'function') syncController(true, 400);
         return;
       }
       toast('Erro: ' + d.erro, 'error');
+      // I151: reconciliar — se servidor já não tem a linha, card some
+      if (typeof mkSyncListarAtivasFallback_ === 'function') {
+        mkSyncListarAtivasFallback_({ silent: true }).then(function () {
+          const ri = Number(encSession && encSession.rowIndex);
+          if (!ri || !Array.isArray(sessions)) return;
+          if (!sessions.some(function (s) { return Number(s.rowIndex) === ri; })) {
+            fecharSessaoDrawer();
+            fecharAlerta();
+            toast('Card fantasma removido (servidor sem essa locação).', 'warning');
+          }
+        });
+      }
       return;
     }
 
@@ -417,6 +434,22 @@ async function confirmarEncerrar() {
 
   } catch(e) {
     toast('Erro de conexão.', 'error');
+    // I151: timeout comum após servidor já ter encerrado — reconciliar listarAtivas
+    const sessCatch = encSession;
+    if (typeof mkSyncListarAtivasFallback_ === 'function') {
+      mkSyncListarAtivasFallback_({ silent: true }).then(function () {
+        const ri = Number(sessCatch && sessCatch.rowIndex);
+        if (!ri || !Array.isArray(sessions)) return;
+        if (!sessions.some(function (s) { return Number(s.rowIndex) === ri; })) {
+          if (typeof mkEncerrarPurgeLocal_ === 'function') mkEncerrarPurgeLocal_(sessCatch);
+          fecharSessaoDrawer();
+          fecharAlerta();
+          renderCards();
+          updateStats();
+          toast('Servidor já sem essa locação. Card atualizado.', 'warning');
+        }
+      });
+    }
   } finally {
     window._mkEncerrarInFlight = false;
     if (encSession && typeof mkEncExtraRefreshAll_ === 'function') {
@@ -431,9 +464,11 @@ async function confirmarEncerrar() {
 function mkEncerrarPurgeLocal_(sess) {
   if (!sess) return;
   const ri = sess.rowIndex;
-  sessions = sessions.filter(s => s.rowIndex !== ri);
+  sessions = sessions.filter(s => Number(s.rowIndex) !== Number(ri));
   if (typeof saveSessions === 'function') saveSessions();
   if (typeof mkSnapshotDropAtivo_ === 'function') mkSnapshotDropAtivo_(ri);
+  // I151: sem invalidar cache, sync falho recolocava o fantasma
+  if (typeof mkInvalidateInicioCache_ === 'function') mkInvalidateInicioCache_();
 }
 
 window.abrirSessaoDrawer = abrirSessaoDrawer;

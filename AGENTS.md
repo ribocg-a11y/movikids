@@ -2,7 +2,7 @@
 
 Sistema operacional de locações — balcão (tablet na loja), portal do responsável, painel admin.
 
-**Ciclo ativo (01/09/2026):** Sprint D · FE **v1.9.109** Pages ✅ · GAS ping **v1.5.213** (repo **v1.5.215**) · **I150** / **I149** / **I148** / **I147** / **I146**
+**Ciclo ativo (02/09/2026):** Sprint D · FE **v1.9.110** Pages · GAS ping **v1.5.213** (repo **v1.5.215**) · **I151** / **I150** / **I149** / **I148** / **I147** / **I146**
 
 **Repo neste PC:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`
 
@@ -14,8 +14,8 @@ Sistema operacional de locações — balcão (tablet na loja), portal do respon
 
 | Camada | Versão | Link |
 |--------|--------|------|
-| Frontend | **v1.9.109** | https://ribocg-a11y.github.io/movikids/?force=1.9.109 |
-| Gestão Pessoas | **v1.9.109** | `gestao-pessoas.html?force=1.9.109` |
+| Frontend | **v1.9.110** | https://ribocg-a11y.github.io/movikids/?force=1.9.110 |
+| Gestão Pessoas | **v1.9.110** | `gestao-pessoas.html?force=1.9.110` |
 | GAS | ping **v1.5.213** · repo **v1.5.215** | `cenariosFinanceiros` live · Nova versão Web ping ⏳ |
 | Design System | **v1.1** | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
 

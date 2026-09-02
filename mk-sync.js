@@ -424,8 +424,11 @@ function aplicarDadosInicio(d) {
     console.error('aplicarDadosInicio:', e);
     setStatus(false);
   }
-  if (d && Array.isArray(d.ativos) && d.fonte !== 'firebase' && !d.parcial && d.fonte !== 'snapshot' && typeof mkSnapshotSave_ === 'function') {
-    mkSnapshotSave_(Object.assign({ ok: true }, d));
+  // I151: snapshot também quando listarAtivas parcial vem vazio (limpa fantasma)
+  if (d && Array.isArray(d.ativos) && d.fonte !== 'firebase' && d.fonte !== 'snapshot' && typeof mkSnapshotSave_ === 'function') {
+    if (!d.parcial || d.ativos.length === 0) {
+      mkSnapshotSave_(Object.assign({ ok: true }, d));
+    }
   }
 }
 window.aplicarDadosInicio = aplicarDadosInicio;

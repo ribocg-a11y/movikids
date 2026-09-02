@@ -63,11 +63,15 @@ function mkSnapshotDropAtivo_(rowIndex) {
 
 function mkSnapshotSave_(d) {
   if (!d || !d.ok) return;
-  if (d.fonte === 'firebase' || d.parcial) return;
+  if (d.fonte === 'firebase') return;
+  const ativos = Array.isArray(d.ativos) ? d.ativos : [];
+  // I151: parcial COM itens não sobrescreve snapshot completo;
+  // parcial VAZIO (listarAtivas total=0) limpa fantasmas no boot
+  if (d.parcial && ativos.length > 0) return;
   const payload = {
     ts: Date.now(),
     data: {
-      ativos: d.ativos || [],
+      ativos: ativos,
       statsHoje: d.statsHoje || null,
       encHoje: d.encHoje || [],
       operacaoConfig: d.operacaoConfig || null,
