@@ -2,7 +2,7 @@
 
 Sistema operacional de locações — balcão (tablet na loja), portal do responsável, painel admin.
 
-**Ciclo ativo (02/09/2026):** Sprint D · FE **v1.9.111** Pages ✅ · GAS ping **v1.5.213** (repo **v1.5.215**) · **I151b** / **I151** / **I150**
+**Ciclo ativo (02/09/2026):** Sprint D · FE **v1.9.111** Pages ✅ · GAS ping **v1.5.213** (repo **v1.5.216**) · **I152** Karen/Julia · **I151b**
 
 **Para retomar (agente local PC — pasta C):**
 

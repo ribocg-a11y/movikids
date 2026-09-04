@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.215
+// MOVI KIDS — Google Apps Script v1.5.216
+// v1.5.216: I152 — Julia pausa (não reativa RH) · Karen/Freelancer balcão sem cadastro 100% · dedupe RH
 // v1.5.215: I150b — DRE base inclui manutenção fixa R$ 1.200/mês (DRE_MANUTENCAO_MENSAL_)
 // v1.5.214: I150 — cenariosFinanceiros: baseDre (DRE) · projetado3m · ritmo3d (ref mes anterior se <3 dias)
 // v1.5.213: I148 — corrigirCanceladaParaEncerradaAdmin (Cancelada→Encerrada caixa ADM)
@@ -207,8 +208,8 @@
 
 // ── CONSTANTES ───────────────────────────────────────────────
 /** Versão exposta em ping, carregarInicio, validarSchema, gestaoPessoasStatus (bump com header). */
-const MK_GAS_VERSAO_  = 'v1.5.213';
-const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.213';
+const MK_GAS_VERSAO_  = 'v1.5.216';
+const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.216';
 const SHEET_ID   = '1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618';
 const DEPLOY_ID  = 'AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y';
 const WEBAPP_URL = `https://script.google.com/macros/s/${DEPLOY_ID}/exec`;
@@ -704,6 +705,8 @@ function dispatchMoviAction_(p, method) {
       case 'editarOperadorSistema': return editarOperadorSistema_(p);
       case 'excluirOperadorSistema': return excluirOperadorSistema_(p);
       case 'resetarPinOperadorAdmin': return resetarPinOperadorAdmin_(p);
+      case 'configurarModoOperadorRhAdmin': return configurarModoOperadorRhAdmin_(p);
+      case 'deduplicarColaboradoresRhAdmin': return deduplicarColaboradoresRhAdmin_(p);
       case 'corrigirFinanceiroLocacaoAdmin': return corrigirFinanceiroLocacaoAdmin_(p);
       case 'corrigirCanceladaParaEncerradaAdmin': return corrigirCanceladaParaEncerradaAdmin_(p);
       case 'limparLocacoesTesteAdmin': return limparLocacoesTesteAdmin_(p);
@@ -10891,7 +10894,8 @@ function loginOperador_(p) {
   const rh = gpColabRhByOpId_(op.id);
   if (rh) {
     const cad = gpCadastroFromRhObj_(rh);
-    if (!gpCadastroOk_(cad)) {
+    // I152: Freelancer/diarista — balcão liberado sem cadastro RH 100% (folha/CLT fica para depois)
+    if (!gpCadastroOk_(cad) && !gpIsModoOperacaoSoRh_(rh)) {
       return ContentService.createTextOutput(JSON.stringify({
         ok: false,
         erro: 'Cadastro RH incompleto (' + gpCalcCadastroPct_(cad) + '%). Complete em Colaboradores antes de entrar no balcao.',
@@ -11019,9 +11023,12 @@ function excluirOperadorSistema_(p) {
     });
   }
   if (ativos <= 1) return err_('Deve existir pelo menos um operador ativo', 409);
+  const opId = Number(found.data[0]);
   sh.getRange(found.row, 6).setValue('NAO');
   sh.getRange(found.row, 4, 1, 2).setValues([['', '']]);
-  return resp_({ ok: true, id: Number(found.data[0]) });
+  // I152: pausa também no RH (histórico permanece; some do painel ativo)
+  try { gpPatchRhRowFields_(opId, { ativo: 'NAO' }); } catch (e) { /* ok */ }
+  return resp_({ ok: true, id: opId, mensagem: 'Operador desativado no balcao e RH (historico preservado)' });
 }
 
 function resetarPinOperadorAdmin_(p) {
@@ -11367,6 +11374,41 @@ function gpColabRhByOpId_(opId) {
   return null;
 }
 
+/** I152 — Freelancer/diarista: acesso balcão sem exigir cadastro RH 100% / folha CLT. */
+function gpIsModoOperacaoSoRh_(rh) {
+  let f = String((rh && rh.funcao) || '').toLowerCase();
+  try { f = f.normalize('NFD').replace(/[\u0300-\u036f]/g, ''); } catch (e) { /* ok */ }
+  return /freelance|freelancer|frillance|diarista|autonomo|autonoma|operacao\s*so/.test(f);
+}
+
+function gpOperadorSistemaAtivo_(opId) {
+  const found = operadorRowById_(opId);
+  if (!found) return false;
+  return String(found.data[5] || 'SIM').toUpperCase() !== 'NAO' && !!String(found.data[2] || '').trim();
+}
+
+/** Remove linhas duplicadas COLABORADORES_RH do mesmo operadorId (mantém a 1ª). */
+function gpDedupColaboradoresRhOp_(opId) {
+  const id = Number(opId);
+  if (!id) return 0;
+  const sh = gpSheet_(SH_COLAB_RH);
+  const last = sh.getLastRow();
+  if (last < GP_DATA_ROW) return 0;
+  const ids = sh.getRange(GP_DATA_ROW, 1, last, 1).getValues();
+  const rowsToDelete = [];
+  let seen = false;
+  for (let i = 0; i < ids.length; i++) {
+    if (Number(ids[i][0]) !== id) continue;
+    if (!seen) { seen = true; continue; }
+    rowsToDelete.push(GP_DATA_ROW + i);
+  }
+  for (let j = rowsToDelete.length - 1; j >= 0; j--) {
+    sh.deleteRow(rowsToDelete[j]);
+  }
+  if (rowsToDelete.length) gpInvalidateRhCache_();
+  return rowsToDelete.length;
+}
+
 function gpCadastroReqKeys_() {
   return ['nomeCompleto', 'cpf', 'nascimento', 'telefone', 'endereco', 'emergencia', 'admissao', 'pix'];
 }
@@ -11580,6 +11622,13 @@ function salvarDadosContratuaisRhAdmin_(p) {
     if (p.turno != null) {
       sh.getRange(r, 16).setValue(String(p.turno || '').trim());
     }
+    if (p.funcao != null) {
+      sh.getRange(r, 3).setValue(String(p.funcao || '').trim());
+    }
+    if (p.ativo != null) {
+      const a = String(p.ativo || '').trim().toUpperCase();
+      sh.getRange(r, 17).setValue(a === 'NAO' || a === '0' || a === 'FALSE' ? 'NAO' : 'SIM');
+    }
     sh.getRange(r, 19).setValue(fmtData_(new Date()) + ' ' + fmtHoraLocal_(new Date()));
     gpInvalidateRhCache_();
     const atual = gpColabRhByOpId_(opId);
@@ -11591,8 +11640,10 @@ function salvarDadosContratuaisRhAdmin_(p) {
       metaLocDia: atual.metaLocDia,
       bonusMeta: atual.bonusMeta,
       turno: atual.turno,
+      funcao: atual.funcao,
+      ativo: atual.ativo,
       mensagem: 'Dados contratuais gravados na planilha',
-      versao: 'v1.5.140'
+      versao: MK_GAS_VERSAO_
     });
   } catch (ex) {
     return err_('salvarDadosContratuaisRhAdmin: ' + ex.message, 500);
@@ -13338,11 +13389,16 @@ const GP_JULIA_OP_ID_ = 4;
 const GP_JULIA_ADMISSAO_ = '01/07/2026';
 const GP_JULIA_ESCALA_ = ['OFF', '14–22', 'OFF', '14–22', '14–22', '12–22', '13–21'];
 
-/** I79/I80 — Julia Atendente 2: RH + escala + contrato canonico (admissao 01/07/2026). */
+/** I79/I80/I152 — Julia Atendente 2: só sincroniza se OPERADORES_SISTEMA ativa. */
 function gpSyncJuliaPadrao_(ctx, competencia) {
+  const id = GP_JULIA_OP_ID_;
+  // I152: saída temporária 01/09 — não reativar RH/escala enquanto ops.ativo=NAO
+  if (!gpOperadorSistemaAtivo_(id)) {
+    try { gpPatchRhRowFields_(id, { ativo: 'NAO' }); } catch (e) { /* ok */ }
+    return;
+  }
   const comp = competencia || gpCompetenciaAtual_();
   const va = gpVaDiarioCanonico_();
-  const id = GP_JULIA_OP_ID_;
   const rows = (ctx && ctx.rhRows) ? ctx.rhRows : gpRows_(SH_COLAB_RH);
   let rhObj = null;
   for (let i = 0; i < rows.length; i++) {
@@ -13398,6 +13454,116 @@ function gpSyncJuliaPadrao_(ctx, competencia) {
   if (!gpRowExistsByOpId_(SH_BANCO_HORAS, id)) {
     gpEnsureRowByOpId_(SH_BANCO_HORAS, id, [id, '0h00', '']);
   }
+}
+
+/**
+ * I152 — Admin: modo freelancer | clt | inativo no RH (+ balcão).
+ * freelancer: funcao Freelancer, sem folha CLT (salario/meta/bonus/VA=0), turno sex–dom.
+ * inativo: espelha excluirOperadorSistema (balcão NAO + PIN limpo + RH NAO).
+ * clt: volta padrao Operador / Atendente (salario 1621 etc.) — ativacao futura.
+ */
+function configurarModoOperadorRhAdmin_(p) {
+  if (!adminPinOk_(p)) return err_('Acesso negado — PIN administrativo incorreto', 403);
+  const opId = Number(p.operadorId || p.id || 0);
+  if (!opId) return err_('operadorId obrigatorio', 400);
+  const modo = String(p.modo || p.mode || '').trim().toLowerCase();
+  if (modo !== 'freelancer' && modo !== 'clt' && modo !== 'inativo') {
+    return err_('modo invalido — use freelancer, clt ou inativo', 400);
+  }
+  const found = operadorRowById_(opId);
+  if (!found) return err_('Operador nao encontrado', 404);
+  const nome = String(found.data[2] || '').trim() || ('ID ' + opId);
+  const remDup = gpDedupColaboradoresRhOp_(opId);
+  gpEnsureRhColaboradorFromOperador_(opId, nome, modo === 'freelancer' ? 'Freelancer' : 'Operador');
+
+  if (modo === 'inativo') {
+    const sh = operadoresSheet_();
+    const last = sh.getLastRow();
+    const start = opsDataStartRow_();
+    let ativos = 0;
+    if (last >= start) {
+      const rows = sh.getRange(start, 1, last - start + 1, COL_OPS_READ_).getValues();
+      rows.forEach(function (r) {
+        if (String(r[5] || 'SIM').toUpperCase() !== 'NAO' && String(r[2] || '').trim()) ativos++;
+      });
+    }
+    if (ativos <= 1 && gpOperadorSistemaAtivo_(opId)) {
+      return err_('Deve existir pelo menos um operador ativo', 409);
+    }
+    sh.getRange(found.row, 6).setValue('NAO');
+    sh.getRange(found.row, 4, 1, 2).setValues([['', '']]);
+    gpPatchRhRowFields_(opId, { ativo: 'NAO' });
+    return resp_({
+      ok: true, operadorId: opId, modo: 'inativo', duplicatasRemovidas: remDup,
+      mensagem: nome + ' pausada: sem login balcao; RH inativo; historico preservado',
+      versao: MK_GAS_VERSAO_
+    });
+  }
+
+  if (modo === 'freelancer') {
+    // Garante ops ativo (sem forçar PIN)
+    operadoresSheet_().getRange(found.row, 6).setValue('SIM');
+    gpPatchRhRowFields_(opId, {
+      nome: nome,
+      funcao: 'Freelancer',
+      turno: String(p.turno || 'sex–dom (diária)').trim(),
+      salarioBase: 0,
+      vaDiario: 0,
+      metaLocDia: 0,
+      bonusMeta: 0,
+      ativo: 'SIM'
+    });
+    const rh = gpColabRhByOpId_(opId);
+    return resp_({
+      ok: true, operadorId: opId, modo: 'freelancer',
+      hasPin: !!String(found.data[3] || '').trim(),
+      funcao: rh ? rh.funcao : 'Freelancer',
+      cadastroPct: rh ? rh.cadastroPct : 0,
+      duplicatasRemovidas: remDup,
+      mensagem: 'Freelancer: balcão OK apos PIN; folha/CLT nao ativada; cadastro RH pode ficar parcial',
+      versao: MK_GAS_VERSAO_
+    });
+  }
+
+  // clt — reativa padrao (nao inventa CPF; so contrato)
+  operadoresSheet_().getRange(found.row, 6).setValue('SIM');
+  const va = gpVaDiarioCanonico_();
+  gpPatchRhRowFields_(opId, {
+    nome: nome,
+    funcao: String(p.funcao || 'Operador').trim(),
+    turno: String(p.turno || '').trim(),
+    salarioBase: p.salarioBase != null ? Number(p.salarioBase) : 1621,
+    vaDiario: p.vaDiario != null ? Number(p.vaDiario) : va,
+    metaLocDia: p.metaLocDia != null ? Number(p.metaLocDia) : 20,
+    bonusMeta: p.bonusMeta != null ? Number(p.bonusMeta) : 100,
+    ativo: 'SIM'
+  });
+  return resp_({
+    ok: true, operadorId: opId, modo: 'clt', duplicatasRemovidas: remDup,
+    mensagem: 'Modo CLT/colaboradora normal — complete cadastro RH 100% para balcão',
+    versao: MK_GAS_VERSAO_
+  });
+}
+
+function deduplicarColaboradoresRhAdmin_(p) {
+  if (!adminPinOk_(p)) return err_('Acesso negado — PIN administrativo incorreto', 403);
+  const opId = Number(p.operadorId || p.id || 0);
+  if (opId) {
+    const n = gpDedupColaboradoresRhOp_(opId);
+    return resp_({ ok: true, operadorId: opId, removidas: n, versao: MK_GAS_VERSAO_ });
+  }
+  const sh = gpSheet_(SH_COLAB_RH);
+  const last = sh.getLastRow();
+  if (last < GP_DATA_ROW) return resp_({ ok: true, removidas: 0, versao: MK_GAS_VERSAO_ });
+  const ids = sh.getRange(GP_DATA_ROW, 1, last, 1).getValues().map(function (r) { return Number(r[0]); });
+  const uniq = {};
+  let total = 0;
+  ids.forEach(function (id) {
+    if (!id || uniq[id]) return;
+    uniq[id] = true;
+    total += gpDedupColaboradoresRhOp_(id);
+  });
+  return resp_({ ok: true, removidas: total, versao: MK_GAS_VERSAO_ });
 }
 
 function gpRefreshRhCtx_(ctx) {

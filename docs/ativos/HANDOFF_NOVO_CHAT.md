@@ -1,6 +1,13 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 02/09/2026 · FE **v1.9.111** Pages ✅ · GAS ping **v1.5.213** (repo **v1.5.215**) · **I151b definitivo** / **I151** / **I150**  
+**Atualizado:** 04/09/2026 · FE **v1.9.111** Pages ✅ · GAS repo **v1.5.216** (ping Web ainda **v1.5.213**) · **I152** Karen/Julia · **I151b**
+
+## Ops RH (04/09)
+
+| Pessoa | Status |
+|--------|--------|
+| **Karen** id5 | Operadora ativa · **Sem PIN** (1º acesso cria) · RH stub · GAS 216 → modo **Freelancer** |
+| **Julia** id4 | **Pausa** — fora do login balcão (ativo=NAO) · saída 01/09 · Nova versão 216 marca RH NAO |
 **Ambiente do agente:** Cloud Agent OK para FE-only · pasta C / AppScript = sócio no PC.  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
