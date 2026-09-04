@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.216
+// MOVI KIDS — Google Apps Script v1.5.217
+// v1.5.217: I152b — Freelancer: salário/VA/meta/bônus 0 não viram default; cache painel force; list colab v3
 // v1.5.216: I152 — Julia pausa (não reativa RH) · Karen/Freelancer balcão sem cadastro 100% · dedupe RH
 // v1.5.215: I150b — DRE base inclui manutenção fixa R$ 1.200/mês (DRE_MANUTENCAO_MENSAL_)
 // v1.5.214: I150 — cenariosFinanceiros: baseDre (DRE) · projetado3m · ritmo3d (ref mes anterior se <3 dias)
@@ -208,8 +209,8 @@
 
 // ── CONSTANTES ───────────────────────────────────────────────
 /** Versão exposta em ping, carregarInicio, validarSchema, gestaoPessoasStatus (bump com header). */
-const MK_GAS_VERSAO_  = 'v1.5.216';
-const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.216';
+const MK_GAS_VERSAO_  = 'v1.5.217';
+const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.217';
 const SHEET_ID   = '1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618';
 const DEPLOY_ID  = 'AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y';
 const WEBAPP_URL = `https://script.google.com/macros/s/${DEPLOY_ID}/exec`;
@@ -11441,6 +11442,13 @@ function gpCadastroOk_(cad) {
   return gpCalcCadastroPct_(cad) >= 100;
 }
 
+/** Preserva 0 (Freelancer); só usa default se vazio/NaN. */
+function gpNumField_(v, defVal) {
+  if (v === '' || v == null) return defVal;
+  const n = Number(v);
+  return isFinite(n) ? n : defVal;
+}
+
 function gpColabRhObjFromRow_(row, idx) {
   if (!gpRowValid_(row)) return null;
   const rowNum = GP_DATA_ROW + idx;
@@ -11450,9 +11458,10 @@ function gpColabRhObjFromRow_(row, idx) {
     cpf: String(row[3] || '').trim(), nascimento: gpNormAdmissaoStr_(row[4]) || cellToStr_(row[4]),
     telefone: String(row[5] || '').trim(),
     email: String(row[6] || '').trim(), endereco: String(row[7] || '').trim(), emergencia: String(row[8] || '').trim(),
-    admissao: admissao, pix: String(row[10] || '').trim(), salarioBase: Number(row[11]) || 1621,
-    vaDiario: gpVaDiarioCanonico_(),
-    metaLocDia: Number(row[13]) || 20, bonusMeta: Number(row[14]) || 100,
+    admissao: admissao, pix: String(row[10] || '').trim(),
+    salarioBase: gpNumField_(row[11], 1621),
+    vaDiario: gpNumField_(row[12], gpVaDiarioCanonico_()),
+    metaLocDia: gpNumField_(row[13], 20), bonusMeta: gpNumField_(row[14], 100),
     turno: String(row[15] || '').trim(), ativo: String(row[16] || 'SIM').toUpperCase() !== 'NAO',
     row: GP_DATA_ROW + idx
   };
@@ -11466,6 +11475,7 @@ function gpInvalidateRhCache_() {
     const comp = gpNormCompetencia_(gpCompetenciaAtual_());
     cache.remove('gp_list_colab_v1');
     cache.remove('gp_list_colab_v2');
+    cache.remove('gp_list_colab_v3');
     cache.remove('gp_painel_adm_' + comp);
     cache.remove('gp_painel_adm_v2_' + comp);
     cache.remove('gp_painel_adm_lite_' + comp);
@@ -11608,16 +11618,16 @@ function salvarDadosContratuaisRhAdmin_(p) {
     const sh = gpSheet_(SH_COLAB_RH);
     const r = colab.row;
     if (p.salarioBase != null && String(p.salarioBase) !== '') {
-      sh.getRange(r, 12).setValue(Number(p.salarioBase) || 1621);
+      sh.getRange(r, 12).setValue(gpNumField_(p.salarioBase, 1621));
     }
     if (p.vaDiario != null && String(p.vaDiario) !== '') {
-      sh.getRange(r, 13).setValue(Number(p.vaDiario) || 20);
+      sh.getRange(r, 13).setValue(gpNumField_(p.vaDiario, gpVaDiarioCanonico_()));
     }
     if (p.metaLocDia != null && String(p.metaLocDia) !== '') {
-      sh.getRange(r, 14).setValue(Number(p.metaLocDia) || 20);
+      sh.getRange(r, 14).setValue(gpNumField_(p.metaLocDia, 20));
     }
     if (p.bonusMeta != null && String(p.bonusMeta) !== '') {
-      sh.getRange(r, 15).setValue(Number(p.bonusMeta) || 100);
+      sh.getRange(r, 15).setValue(gpNumField_(p.bonusMeta, 100));
     }
     if (p.turno != null) {
       sh.getRange(r, 16).setValue(String(p.turno || '').trim());
@@ -13375,10 +13385,10 @@ function gpPatchRhRowFields_(opId, fields) {
     sh.getRange(r, 10).setValue(String(fields.admissao));
     sh.getRange(r, 10).setNumberFormat('@');
   }
-  if (fields.salarioBase != null) sh.getRange(r, 12).setValue(Number(fields.salarioBase) || 1621);
-  if (fields.vaDiario != null) sh.getRange(r, 13).setValue(Number(fields.vaDiario) || gpVaDiarioCanonico_());
-  if (fields.metaLocDia != null) sh.getRange(r, 14).setValue(Number(fields.metaLocDia) || 20);
-  if (fields.bonusMeta != null) sh.getRange(r, 15).setValue(Number(fields.bonusMeta) || 100);
+  if (fields.salarioBase != null) sh.getRange(r, 12).setValue(gpNumField_(fields.salarioBase, 1621));
+  if (fields.vaDiario != null) sh.getRange(r, 13).setValue(gpNumField_(fields.vaDiario, gpVaDiarioCanonico_()));
+  if (fields.metaLocDia != null) sh.getRange(r, 14).setValue(gpNumField_(fields.metaLocDia, 20));
+  if (fields.bonusMeta != null) sh.getRange(r, 15).setValue(gpNumField_(fields.bonusMeta, 100));
   if (fields.turno != null) sh.getRange(r, 16).setValue(String(fields.turno));
   if (fields.ativo != null) sh.getRange(r, 17).setValue(String(fields.ativo));
   gpInvalidateRhCache_();
@@ -13583,10 +13593,14 @@ function painelGestaoPessoasAdmin_(p) {
   try {
     const comp = String(p.competencia || gpCompetenciaAtual_());
     const lite = String((p && p.lite) || '') === '1' || String((p && p.lite) || '').toLowerCase() === 'true';
+    const force = String((p && p.force) || '') === '1' || p.force === true || p.force === 1;
     const cacheKey = (lite ? 'gp_painel_adm_lite_' : 'gp_painel_adm_v2_') + gpNormCompetencia_(comp);
     try {
-      const hit = CacheService.getScriptCache().get(cacheKey);
-      if (hit) return ContentService.createTextOutput(hit).setMimeType(ContentService.MimeType.JSON);
+      if (force) CacheService.getScriptCache().remove(cacheKey);
+      else {
+        const hit = CacheService.getScriptCache().get(cacheKey);
+        if (hit) return ContentService.createTextOutput(hit).setMimeType(ContentService.MimeType.JSON);
+      }
     } catch (e) { /* ok */ }
     const ctx = gpLoadContext_({ lite: lite });
     gpSyncRhColaboradoresPadrao_(ctx);

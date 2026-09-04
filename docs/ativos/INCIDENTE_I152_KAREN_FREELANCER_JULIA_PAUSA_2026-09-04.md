@@ -87,6 +87,13 @@ Invoke-RestMethod "${GAS}?action=ping"
 
 ---
 
-## Sem AppScript (limitação)
+## Teste pós-colar (04/09 ~12:27 BRT)
 
-Até Nova versão Web: Karen **ainda** toma 428 se tentar balcão com RH incompleto após criar PIN. Contorno temporário: completar cadastro RH 100% **ou** publicar v1.5.216.
+| Check | Resultado |
+|-------|-----------|
+| ping | **v1.5.216** ✅ |
+| Karen `modo=freelancer` | ✅ funcao **Freelancer** · turno **sex–dom (diária)** · 1 duplicata RH removida · cadastroPct **25** · Sem PIN |
+| Julia `modo=inativo` | ✅ fora do login · RH inativo |
+| Login lista | Eduarda · Karen · Milena · Raykelly (sem Julia) ✅ |
+
+**Bug encontrado no teste:** `Number(0) \|\| 1621` — salário/VA/meta/bônus **0** voltavam ao default CLT. Corrigido em **v1.5.217** (`gpNumField_`). Recolar raw + reaplicar `modo=freelancer`.
