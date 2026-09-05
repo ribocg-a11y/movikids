@@ -1,0 +1,43 @@
+# Blast radius P0 — não misturar Dashboard com balcão
+
+## Por que existe (I122 · 16/07/2026)
+
+Correção de **Dashboard / admin** (I121 Meta vs Centro) alterou `invalidateInicioResumoCache_` (caminho compartilhado de **toda escrita de locação**) e depois, sob pressão, `carregarInicio_` + `mk-sync.js`. Resultado: celular com locação fantasma (timeout 25s + cache local).
+
+**Regra:** tarefa admin ≠ licença para editar sync do balcão.
+
+## Zonas P0 — só se a tarefa for explicitamente sobre isso
+
+| Zona | Arquivos / funções | Exemplos de tarefa que AUTORIZA |
+|------|-------------------|----------------------------------|
+| Sync balcão | `carregarInicio_`, `listarAtivas_`, `iniciarTimer_`, `salvarLocacao_`, `encerrarLocacao_`, `cancelarLocacao_`, `estenderLocacao_` | “cronômetro”, “fantasma”, “sync tablet”, I20/I43 |
+| FE sync | `mk-sync.js`, `mk-operacao.js`, `mk-sessao.js`, `mk-api.js` (`api()`) | idem · **`api()` = §7.3** |
+| Auth / PIN | `mk-auth.js`, gates PIN, perfis | só §7.3 |
+
+## Zonas admin — NÃO podem “de raspão” tocar P0
+
+Dashboard, Caixa UI, `kpiMes`, `comandoOperacional`, `painelGestaoPessoasAdmin`, `mk-admin.js`, GP admin.
+
+**Proibido nestas tarefas:**
+
+1. Editar `carregarInicio_` / `listarAtivas_` / `mk-sync.js`
+2. Empilhar trabalho pesado em `invalidateInicioResumoCache_` (ex.: invalidar kpi/comando/dash) sem medir latência de `carregarInicio` frio+warm
+3. Mudar timeout / fallback de cache do sync “porque o admin ficou lento”
+4. Um único PR/commit que mistura Meta/Dashboard + sync balcão
+
+## Se admin e balcão precisarem do mesmo fix
+
+1. **Dois PRs** (ou dois commits claramente separados)
+2. PR balcão: `TESTE_I43` + `TESTE_I122_SYNC_INICIO` (warm &lt;8s com `_t`) **antes** de pedir Nova versão Web
+3. Nunca colar `.gs` com mudança P0 + mudança admin sem evidência de timing
+
+## Checklist obrigatório antes de pedir Nova versão Web
+
+- [ ] Diff do `.gs` lista **só** funções da tarefa (ou justifica cada uma)
+- [ ] Se tocou P0: `TESTE_I43` + `TESTE_I122` verdes contra Web
+- [ ] Se **não** tocou P0: confirmação explícita na resposta: *“Blast radius: zero em carregarInicio/mk-sync”*
+- [ ] Resposta ao usuário: tabela “arquivos tocados” + “por quê”
+
+## Doc
+
+`docs/ativos/TRAVA_BLAST_RADIUS_P0.md` · incidente I122 em `MAPA_ERROS`
