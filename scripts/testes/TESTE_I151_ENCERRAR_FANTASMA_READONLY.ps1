@@ -61,7 +61,7 @@ try {
     Add-I151 "static.purge.cache" "ok" "purge invalida mk_inicio_cache"
   }
 
-  if ($drawer -notmatch 'j[aá]\s+finalizada|locacao\s+ja\s+finalizada') {
+  if ($drawer -notmatch 'j\[aá\]\\s\+finalizada|locacao\\s\+ja\\s\+finalizada') {
     Add-I151 "static.purge.409" "fail" "regex 409 encerrada estreita (I148)"
   } else {
     Add-I151 "static.purge.409" "ok" "409 encerrada/finalizada purge"
