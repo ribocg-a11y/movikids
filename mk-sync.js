@@ -75,8 +75,8 @@ function syncController(force = false, delayMs = 0) {
 /** I122 — timeout dedicado: carregarInicio frio pode passar de 25s; default api() gerava fantasma. */
 const MK_INICIO_API_TIMEOUT_MS = 55000;
 const MK_INICIO_CACHE_MAX_AGE_MS = 3600000;
-/** I148 — listarAtivas ~5–15s vs carregarInicio 25–55s; fallback operacional. */
-const MK_LISTAR_ATIVAS_TIMEOUT_MS = 30000;
+/** I148/I154b — listarAtivas costuma 5–15s; sob carga Google pode passar de 30s. */
+const MK_LISTAR_ATIVAS_TIMEOUT_MS = 45000;
 const MK_BOOT_FAST_PATH_MS = 12000;
 let _listarAtivasInFlight = false;
 

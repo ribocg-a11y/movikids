@@ -92,18 +92,36 @@ async function api(params, timeoutMs = 25000, fetchInit) {
   const action = String((params && params.action) || '');
   const init = Object.assign({ method: 'GET', redirect: 'follow', cache: 'no-store' }, fetchInit || {});
   mkGuardEscritaBrowser_(action, init.method);
-  const payload = Object.assign({ _t: Date.now() }, params);
+  const basePayload = Object.assign({}, params);
   if (MK_WRITE_ACTIONS.has(action) && typeof operadorApiParams_ === 'function') {
-    Object.assign(payload, operadorApiParams_());
+    Object.assign(basePayload, operadorApiParams_());
   }
-  const qs = new URLSearchParams(payload).toString();
+  const buildUrl = function () {
+    const payload = Object.assign({ _t: Date.now() }, basePayload);
+    return gasUrl + '?' + new URLSearchParams(payload).toString();
+  };
+  const isUnstableErr_ = function (err) {
+    const msg = String((err && err.message) || err || '').toLowerCase();
+    return msg.indexOf('gas-unstable') >= 0
+      || msg.indexOf('http 404') >= 0
+      || msg.indexOf('http 5') >= 0;
+  };
   try {
-    return await mkApiFetchJson_(`${gasUrl}?${qs}`, init, timeoutMs);
-  } catch (e) {
-    if (typeof mkOfflineHandleWriteFail_ === 'function' && typeof mkOfflineCanQueue_ === 'function' && mkOfflineCanQueue_(action)) {
-      return mkOfflineHandleWriteFail_(payload, e);
+    return await mkApiFetchJson_(buildUrl(), init, timeoutMs);
+  } catch (e1) {
+    // I154b: 1 retry em HTML/404/5xx (leituras e escritas) antes de fila/erro — GAS oscila
+    if (isUnstableErr_(e1)) {
+      await new Promise(function (r) { setTimeout(r, 700); });
+      try {
+        return await mkApiFetchJson_(buildUrl(), init, timeoutMs);
+      } catch (e2) {
+        e1 = e2;
+      }
     }
-    throw e;
+    if (typeof mkOfflineHandleWriteFail_ === 'function' && typeof mkOfflineCanQueue_ === 'function' && mkOfflineCanQueue_(action)) {
+      return mkOfflineHandleWriteFail_(Object.assign({ _t: Date.now() }, basePayload), e1);
+    }
+    throw e1;
   }
 }
 window.api = api;

@@ -699,6 +699,20 @@ try {
     } else {
       Add-Check "guard.i154.fe.gas404" "ok" "404/HTML GAS enfileira salvar"
     }
+    if ($apiRawI154 -notmatch 'isUnstableErr_' -or $apiRawI154 -notmatch 'I154b') {
+      Add-Check "guard.i154.fe.retry" "fail" "FE sem retry 404/5xx (I154b)"
+    } else {
+      Add-Check "guard.i154.fe.retry" "ok" "api retry 1x em GAS instavel"
+    }
+  }
+  $syncPathI154 = Join-Path $root "mk-sync.js"
+  if (Test-Path $syncPathI154) {
+    $syncRawI154 = Get-Content -Path $syncPathI154 -Raw -Encoding UTF8
+    if ($syncRawI154 -notmatch 'MK_LISTAR_ATIVAS_TIMEOUT_MS = 45000') {
+      Add-Check "guard.i154.listar.timeout" "fail" "listarAtivas timeout <45s (I154b)"
+    } else {
+      Add-Check "guard.i154.listar.timeout" "ok" "listarAtivas timeout 45s"
+    }
   }
 
   $authPath = Join-Path $root "mk-auth.js"
