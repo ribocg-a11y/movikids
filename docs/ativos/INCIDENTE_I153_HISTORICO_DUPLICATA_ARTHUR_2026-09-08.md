@@ -73,3 +73,12 @@ Efeito: status **Cancelada**, valores **0**, obs `[ANULADO ADM I153]…` → som
 ## Regra de ouro
 
 Encerrar com **menos de 90s** do ▶ = suspeito de lançamento por engano → **Cancelar**, não Encerrar (salvo confirmação explícita).
+
+
+## Evidência pós-fix (08/09/2026 13:35)
+
+- ping Web **v1.5.218** ✅
+- `anularLocacaoEncerradaAdmin` id=3465 → Cancelada R$0 ✅
+- `encHoje` sem 3465; nSessoes=5 inclui nova sessão legítima #3468 Benício (não fantasma)
+- `TESTE_I151_ENCERRAR_FANTASMA_READONLY` ok · `pre-push-check -SkipNetworkTests` ok
+- Pages FE **v1.9.112** ✅
