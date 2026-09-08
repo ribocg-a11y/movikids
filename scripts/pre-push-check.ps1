@@ -659,6 +659,29 @@ try {
     Add-Check "guard.i143.gas.veiculo" "ok" "GAS bloqueia veiculo ja aberto"
   }
 
+  # I153 — anular Encerrada duplicata + trava encerrar <90s
+  if ($gasRaw -notmatch 'function anularLocacaoEncerradaAdmin_') {
+    Add-Check "guard.i153.anular" "fail" "anularLocacaoEncerradaAdmin_ ausente (I153)"
+  } elseif ($gasRaw -notmatch "case 'anularLocacaoEncerradaAdmin'") {
+    Add-Check "guard.i153.anular" "fail" "case anularLocacaoEncerradaAdmin ausente (I153)"
+  } else {
+    Add-Check "guard.i153.anular" "ok" "API anular Encerrada duplicata"
+  }
+  if ($gasRaw -notmatch 'encerrarCurto' -or $gasRaw -notmatch 'confirmarCurto') {
+    Add-Check "guard.i153.encerrar.curto" "fail" "trava encerrar <90s ausente (I153)"
+  } else {
+    Add-Check "guard.i153.encerrar.curto" "ok" "encerrar <90s exige confirmarCurto"
+  }
+  $drawerPathI153 = Join-Path $root "mk-drawer.js"
+  if (Test-Path $drawerPathI153) {
+    $drawerI153 = Get-Content -Path $drawerPathI153 -Raw -Encoding UTF8
+    if ($drawerI153 -notmatch 'confirmarCurto' -or $drawerI153 -notmatch 'encerrarCurto') {
+      Add-Check "guard.i153.fe.curto" "fail" "FE sem confirm encerrarCurto (I153)"
+    } else {
+      Add-Check "guard.i153.fe.curto" "ok" "drawer confirma encerrar curto"
+    }
+  }
+
   $authPath = Join-Path $root "mk-auth.js"
   if (Test-Path $authPath) {
     $authRaw = Get-Content -Path $authPath -Raw -Encoding UTF8

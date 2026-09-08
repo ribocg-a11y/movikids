@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.217
+// MOVI KIDS — Google Apps Script v1.5.218
+// v1.5.218: I153 — anular Encerrada duplicata (admin) · encerrar <90s exige confirmarCurto
 // v1.5.217: I152b — Freelancer: salário/VA/meta/bônus 0 não viram default; cache painel force; list colab v3
 // v1.5.216: I152 — Julia pausa (não reativa RH) · Karen/Freelancer balcão sem cadastro 100% · dedupe RH
 // v1.5.215: I150b — DRE base inclui manutenção fixa R$ 1.200/mês (DRE_MANUTENCAO_MENSAL_)
@@ -209,8 +210,8 @@
 
 // ── CONSTANTES ───────────────────────────────────────────────
 /** Versão exposta em ping, carregarInicio, validarSchema, gestaoPessoasStatus (bump com header). */
-const MK_GAS_VERSAO_  = 'v1.5.217';
-const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.217';
+const MK_GAS_VERSAO_  = 'v1.5.218';
+const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.218';
 const SHEET_ID   = '1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618';
 const DEPLOY_ID  = 'AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y';
 const WEBAPP_URL = `https://script.google.com/macros/s/${DEPLOY_ID}/exec`;
@@ -709,6 +710,7 @@ function dispatchMoviAction_(p, method) {
       case 'configurarModoOperadorRhAdmin': return configurarModoOperadorRhAdmin_(p);
       case 'deduplicarColaboradoresRhAdmin': return deduplicarColaboradoresRhAdmin_(p);
       case 'corrigirFinanceiroLocacaoAdmin': return corrigirFinanceiroLocacaoAdmin_(p);
+      case 'anularLocacaoEncerradaAdmin': return anularLocacaoEncerradaAdmin_(p);
       case 'corrigirCanceladaParaEncerradaAdmin': return corrigirCanceladaParaEncerradaAdmin_(p);
       case 'limparLocacoesTesteAdmin': return limparLocacoesTesteAdmin_(p);
       case 'liberarSessaoOperador': return liberarSessaoOperador_(p);
@@ -4042,6 +4044,25 @@ function encerrarLocacao_(p) {
       return err_('Locação ainda pendente. Inicie o timer antes de encerrar.', 409);
     }
     return err_('Locação não está ativa', 409);
+  }
+
+  // I153: encerrar em <90s do ▶ costuma ser lançamento por engano (cobra plano cheio)
+  const startTs = Number(row[24] || 0);
+  const confirmarCurto = String(p.confirmarCurto || '') === '1' || p.confirmarCurto === true
+    || String(p.confirmarCurto || '').toLowerCase() === 'true';
+  if (startTs >= 1e12 && !confirmarCurto) {
+    const elapsedSec = Math.round((Date.now() - startTs) / 1000);
+    if (elapsedSec >= 0 && elapsedSec < 90) {
+      lockE.releaseLock();
+      return ContentService.createTextOutput(JSON.stringify({
+        ok: false,
+        erro: 'Locação com menos de 90s. Se foi por engano, cancele. Se for real, confirme o encerramento curto.',
+        code: 428,
+        encerrarCurto: true,
+        elapsedSec: elapsedSec,
+        rowIndex: rowIndex
+      })).setMimeType(ContentService.MimeType.JSON);
+    }
   }
 
   const tipo    = String(row[4]);
@@ -11200,6 +11221,65 @@ function corrigirFinanceiroLocacaoAdmin_(p) {
     const depois = locacaoObj_(rowAfter, rowIndex);
     registrarAuditoriaLocacao_(rowIndex, 'corrigirFinanceiroLocacaoAdmin', antes, depois, motivo, operadorAudit_(p));
     return resp_({ locacao: depois, mensagem: 'Locacao corrigida. Caixa e historico usam estes valores.' });
+  } finally { lock.releaseLock(); }
+}
+
+/**
+ * I153 — Anula Encerrada indevida (duplicata / 0 min): status Cancelada + valores 0.
+ * Sai do histórico de faturamento (Cancelada fora do caixa).
+ */
+function anularLocacaoEncerradaAdmin_(p) {
+  if (!isAdminRequest_(p) && !adminPinOk_(p)) return err_('Acesso negado — admin necessario', 403);
+  const rowIndex = parseInt(p.rowIndex || '0', 10);
+  const idAlvo = Number(p.id || p.locacaoId || 0);
+  const motivo = String(p.motivo || '').trim();
+  if ((!rowIndex || rowIndex < DATA_ROW) && !idAlvo) return err_('rowIndex ou id obrigatorio', 400);
+  if (motivo.length < 10) return err_('Motivo obrigatorio (min 10 caracteres)', 400);
+  const lock = LockService.getScriptLock();
+  try { lock.waitLock(6000); } catch (ex) { return err_('Sistema ocupado', 503); }
+  try {
+    const sheet = sh_(SH_LOC);
+    let ri = rowIndex;
+    if ((!ri || ri < DATA_ROW) && idAlvo) {
+      const last = sheet.getLastRow();
+      if (last >= DATA_ROW) {
+        const ids = sheet.getRange(DATA_ROW, 1, last - DATA_ROW + 1, 1).getValues();
+        for (let i = ids.length - 1; i >= 0; i--) {
+          if (Number(ids[i][0]) === idAlvo) { ri = DATA_ROW + i; break; }
+        }
+      }
+    }
+    if (!ri || ri < DATA_ROW || ri > sheet.getLastRow()) return err_('Locacao nao encontrada', 404);
+    const row = sheet.getRange(ri, 1, 1, 28).getValues()[0];
+    if (!row[0]) return err_('Locacao nao encontrada', 404);
+    const status = String(row[14] || '').trim();
+    if (status === 'Cancelada' && Number(row[10] || 0) === 0) {
+      return resp_({ ok: true, jaAnulada: true, id: row[0], rowIndex: ri, mensagem: 'Ja estava anulada' });
+    }
+    if (status !== 'Encerrada' && status !== 'Pendente' && status !== 'Ativa') {
+      return err_('Status nao anulavel: ' + status, 409);
+    }
+    const antes = locacaoObj_(row, ri);
+    sheet.getRange(ri, 9, 1, 3).setValues([[0, 0, 0]]);
+    sheet.getRange(ri, 15).setValue('Cancelada');
+    const obs = String(row[17] || '').trim();
+    const tag = '[ANULADO ADM I153] ' + motivo;
+    if (obs.indexOf('[ANULADO ADM') < 0) {
+      sheet.getRange(ri, 18).setValue(obs ? obs + ' | ' + tag : tag);
+    }
+    try { invalidateInicioResumoCache_(fmtData_(new Date())); } catch (e) {}
+    const rowAfter = sheet.getRange(ri, 1, 1, 28).getValues()[0];
+    const depois = locacaoObj_(rowAfter, ri);
+    registrarAuditoriaLocacao_(ri, 'anularLocacaoEncerradaAdmin', antes, depois, motivo, operadorAudit_(p));
+    try { firebaseSyncSessao_(ri, fbDadosSessao_(rowAfter, 'Cancelada', ri)); } catch (eFb) { /* ok */ }
+    return resp_({
+      ok: true,
+      locacao: depois,
+      id: row[0],
+      rowIndex: ri,
+      mensagem: 'Locacao anulada (Cancelada, R$0). Fora do caixa/historico de fat.',
+      versao: MK_GAS_VERSAO_
+    });
   } finally { lock.releaseLock(); }
 }
 

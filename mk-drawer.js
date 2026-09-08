@@ -320,7 +320,7 @@ async function confirmarEncerrar() {
 
     const qrOnly = typeof mkComunicacaoQrOnly_ === 'function' && mkComunicacaoQrOnly_();
     const admEnc = qrOnly || (typeof mkAdminIgnoraSmsObrigatorio_ === 'function' && mkAdminIgnoraSmsObrigatorio_());
-    const d = await api({
+    const payloadEnc = {
       action:    'encerrarLocacao',
       ...operadorApiParams_(),
       ...(admEnc ? { ignorarSmsObrigatorio: true } : {}),
@@ -329,7 +329,23 @@ async function confirmarEncerrar() {
       ...(extraVal.cancelarExtras ? { cancelarExtras: true, justificativaExtras: extraVal.justificativaExtras, minExtraCancelados: fin.minExtraCobrados } : {}),
       rowIndex:  encSession.rowIndex,
       minUsados: minUsadosApi
-    });
+    };
+    let d = await api(payloadEnc);
+
+    // I153: GAS bloqueia encerrar <90s — confirmar só se for real; senão cancele (anti-duplicata)
+    if (!d.ok && (d.encerrarCurto === true || (Number(d.code) === 428 && /menos de 90s|encerrarCurto/i.test(String(d.erro || ''))))) {
+      const sec = d.elapsedSec != null ? (' (' + d.elapsedSec + 's)') : '';
+      const okCurto = confirm(
+        'Locação com menos de 90 segundos' + sec + '.\n\n' +
+        'Se foi por engano: cancele esta locação (não encerre).\n' +
+        'Se a brincadeira foi realmente curta: OK para encerrar mesmo assim.'
+      );
+      if (!okCurto) {
+        toast('Não encerrado. Se foi lançamento errado, use Cancelar.', 'warning');
+        return;
+      }
+      d = await api(Object.assign({}, payloadEnc, { confirmarCurto: '1' }));
+    }
 
     if (!d.ok) {
       // I151: 409 já encerrada/finalizada — purge local (regex I148 era estreita; cache recolocava card)

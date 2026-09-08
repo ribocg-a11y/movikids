@@ -1,6 +1,6 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 04/09/2026 · FE **v1.9.111** Pages ✅ · GAS repo **v1.5.216** (ping Web ainda **v1.5.213**) · **I152** Karen/Julia · **I151b**
+**Atualizado:** 08/09/2026 · FE **v1.9.112** · GAS repo **v1.5.218** (ping Web ainda **v1.5.216** até Nova versão) · **I153** · **I152** · **I151b**
 
 ## Ops RH (04/09)
 
@@ -73,6 +73,10 @@ node scripts\testes\teste-i150-cenarios-financeiros.cjs
 
 ## Entregas recentes (contexto)
 
+**I153 (08/09):** Histórico 2 contas ≠ 5 sessões · anular `#3465` Arthur 12:31 duplicata · trava encerrar &lt;90s · FE **v1.9.112** · GAS **v1.5.218**. Doc: `INCIDENTE_I153_HISTORICO_DUPLICATA_ARTHUR_2026-09-08.md`
+
+**I152 (04/09):** Karen Freelancer + Julia pausa · GAS **v1.5.216–217**. Doc: `INCIDENTE_I152_*`
+
 **I151b (02/09):** Emergência **só FE** — invalidate cache + reconcile `listarAtivas` após `carregarInicio` · FE **v1.9.111**. Sem AppScript. Doc: `INCIDENTE_I151b_ENCERRAR_FANTASMA_EMERGENCIA_FE_2026-09-02.md`
 
 **I151 (02/09):** Encerrar fantasma recorrente — purge 409 + cache/snapshot. FE **v1.9.110**. Doc: `INCIDENTE_I151_ENCERRAR_FANTASMA_RECORRENTE_2026-09-02.md`
@@ -96,17 +100,19 @@ node scripts\testes\teste-i150-cenarios-financeiros.cjs
 | **Gestão / dev** | **Computador** (Windows + Cursor **local**) | **Sócio/dev** | Código, `.ps1`, planilha OAuth, browser no PC |
 | **Operação balcão** | **Tablet** fixo no shopping | **Operadores** | Locações, timer, PIN, PWA na loja |
 
-**Tablet (Ops):** https://ribocg-a11y.github.io/movikids/?force=1.9.110
+**Tablet (Ops):** https://ribocg-a11y.github.io/movikids/?force=1.9.112
 
 ---
 
-## Produção (02/09/2026)
+## Produção (08/09/2026)
 
 | Camada | Versão | URL / evidência |
 |--------|--------|-----------------|
-| **Frontend** | **v1.9.110** | https://ribocg-a11y.github.io/movikids/?force=1.9.110 |
-| **Gestão Pessoas** | **v1.9.110** | `gestao-pessoas.html?force=1.9.110` |
-| **Service Worker** | **1.9.110** | I151 encerrar fantasma |
+| **Frontend** | **v1.9.112** | https://ribocg-a11y.github.io/movikids/?force=1.9.112 |
+| **Gestão Pessoas** | **v1.9.112** | `gestao-pessoas.html?force=1.9.112` |
+| **Service Worker** | **1.9.112** | I153 encerrar curto |
+| **GAS ping Web** | **v1.5.216** (repo **v1.5.218**) | Nova versão Web ⏳ para anular #3465 |
+| **I153** | `#3465` Encerrada fantasma | após Web 218 → `REPARAR_I153_ANULAR_3465.ps1` |
 | **Apps Script** | repo **v1.5.215** · ping **v1.5.213** | `cenariosFinanceiros` live · string ping ⏳ Nova versão Web |
 | **Pasta C** | este repo | `movikids-github` no C: |
 | **Planilha** | 23 abas | operação viva 01/09 |

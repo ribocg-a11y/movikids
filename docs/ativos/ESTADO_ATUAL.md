@@ -1,8 +1,8 @@
-# MOVI KIDS — Estado atual (02/09/2026 · FE v1.9.111 · I146–I151b)
+# MOVI KIDS — Estado atual (08/09/2026 · FE v1.9.112 · I153)
 
 Referência única para alinhamento local × produção.
 
-**Ciclo dev ativo:** **`PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`** — Sprint D · **I150** cenários DRE ✅ · **I147** Fase 2 offline ✅ · **I146** ✅  
+**Ciclo dev ativo:** **`PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`** — Sprint D · **I153** histórico/duplicata · **I150** cenários DRE ✅ · **I147** Fase 2 offline ✅ · **I146** ✅  
 **Diagnóstico 6 camadas:** **`DIAGNOSTICO_SISTEMA_6_CAMADAS_2026-06.md`**  
 **Prioridades gerais:** **`PLANEJAMENTO_ATUAL_2026-06.md`** §9
 
@@ -11,7 +11,8 @@ Referência única para alinhamento local × produção.
 **Acessos:** **`ACESSOS_E_AUTORIZACOES.md`** — papéis, PIN admin, agente vs humano  
 **Índice:** `../INDICE.md` · **Prioridades:** **`PLANO_PRIORIDADES_2026-06.md`**  
 **Planejamento ativo:** `PLANEJAMENTO_ATUAL_2026-06.md`  
-**Mapa de erros/bugs:** **`MAPA_ERROS_FALHAS_BUGS.md`** (família I20/I32/I99/I122/I125/I143/I144/**I145**/**I146**/**I147**/**I148**/**I149**/**I150**/**I151**/**I151b**)
+**Mapa de erros/bugs:** **`MAPA_ERROS_FALHAS_BUGS.md`** (…/**I151**/**I151b**/**I152**/**I153**)
+**Incidente I153:** **`INCIDENTE_I153_HISTORICO_DUPLICATA_ARTHUR_2026-09-08.md`**  
 **Incidente I151 definitivo:** **`INCIDENTE_I151_DEFINITIVO_ENCERRAR_FANTASMA_2026-09-02.md`**  
 **Incidente I145:** **`INCIDENTE_I145_SYNC_FORCE_IDLE_2026-08-13.md`**  
 **Incidente I144:** **`INCIDENTE_I144_OPS_PIN_1416_LIBERAR_BALCAO_2026-08-12.md`** · `ops-balcao.html`  
@@ -35,14 +36,15 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 ---
 
-## Produção (02/09/2026)
+## Produção (08/09/2026)
 
 | Camada | Versão | URL / evidência |
 |--------|--------|-----------------|
-| **Frontend** | **v1.9.111** | https://ribocg-a11y.github.io/movikids/?force=1.9.111 |
-| **Gestão Pessoas** | **v1.9.111** | `gestao-pessoas.html?force=1.9.111` |
-| **Service Worker** | **1.9.111** | I151b encerrar fantasma definitivo |
-| **Apps Script** | repo **v1.5.215** · ping **v1.5.213** | encerrar/listarAtivas OK · Nova versão Web ping ⏳ |
+| **Frontend** | **v1.9.112** | https://ribocg-a11y.github.io/movikids/?force=1.9.112 |
+| **Gestão Pessoas** | **v1.9.112** | `gestao-pessoas.html?force=1.9.112` |
+| **Service Worker** | **1.9.112** | I153 confirm encerrar curto |
+| **Apps Script** | repo **v1.5.218** · ping **v1.5.216** | Nova versão Web ⏳ → anular #3465 |
+| **I153 histórico** | 🟡 | `#3465` duplicata Arthur — após Web 218 `REPARAR_I153_*` |
 | **I151 encerrar fantasma** | ✅ FE | travas `guard.i151.*` · teste readonly |
 | **I145 sync idle** | ✅ | idle/visibility **sem** force=1 · warm ~1–2s |
 | **I143 salvar/▶** | ✅ | mediana ~3.9s / ~3.1s · dup 409 · limpeza OK |
@@ -54,9 +56,9 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 | **FOLHA VT I68** | ✅ 26/06 | B9 **8,80** · B10/B12 **22** · Milena VT **193,60** |
 | **Planilha** | 23 abas | `schemaOk` · `validarSchema` **06/08** |
 | **Homolog tablet** | ✅ 23/06 | smoke **v1.9.96** + I143 no balcão |
-| **Raykelly / Julia** | ✅ | ids 3 / 4 · cadastro OK · meta turno |
+| **Raykelly / Julia** | ✅ | ids 3 / 4 · Julia pausa I152 · Karen id5 Freelancer |
 | **Design System** | **v1.1** | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
-| **Ciclo dev** | Sprint D | One UI ✅ · I125–I143 |
+| **Ciclo dev** | Sprint D | One UI ✅ · I125–I153 |
 | **I103 / I117** | ✅ | Encerradas=contas · Caixa pay-first |
 | **BANCO_HORAS** | ✅ I129 | ops 1–4 **0h00** |
 | **I129 ponto colab** | ✅ | FE v1.9.75+ · GAS Web **v1.5.211** |

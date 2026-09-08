@@ -1,6 +1,7 @@
 # MOVI KIDS — Mapa de erros, falhas e bugs
 
-**Atualizado:** 02/09/2026 — **I151b** travas definitivas · FE **v1.9.111** Pages · GAS ping **v1.5.213** (repo **v1.5.215**)  
+**Atualizado:** 08/09/2026 — **I153** duplicata Arthur / encerrar &lt;90s · FE **v1.9.112** · GAS repo **v1.5.218**  
+**Uso anterior:** 02/09/2026 — **I151b** travas definitivas · FE **v1.9.111** Pages · GAS ping **v1.5.213** (repo **v1.5.215**)  
 **Uso anterior:** 02/09/2026 — **I151** encerrar fantasma · FE **v1.9.110**  
 **Uso anterior:** 29/08/2026 — **I147** / **I146** · FE **v1.9.105** · GAS Web **v1.5.211**  
 **Uso anterior:** 13/08/2026 — **I145** idle/visibility sem force=1 · FE **v1.9.97** · GAS Web **v1.5.210** ✅
@@ -201,6 +202,7 @@ Docs: `INCIDENTE_I148_*` · `INCIDENTE_I151_*` · `INCIDENTE_I151b_*` · **`INCI
 | **I126c** | **Faixa vermelha “Painel rápido” eterna + Escala OK** | Banner `_partial` em `gp-adm-err`; Escala já vinha do lite; promise resolvida bloqueava Folha full | FE **v1.9.72** remove banner lite · full só Folha/Avaliações · `gpAdmPanelInFlight_` | `mk-gestao-pessoas-admin.js` | sem faixa vermelha · Folha carrega ao abrir |
 | **I127** | **Holerite Q2: adiantamento 1ª = R$ 0** | Cód 410 zerado; DP exige desconto do adiantamento na 2ª (art. 462 CLT / Contábeis) | FE **v1.9.73** `mk-holerite.js` · GAS **v1.5.206** `adiantamentoQ1` | Q2: salário mês − adiantamento 40% − encargos | Raykelly: 410 ≈ R$ 648,40 |
 | **I128** | **Ficha: “Sem dias na competência” com ponto aberto** | Lite deixa `jornada.dias=[]`; full só rodava em Folha/Avaliações | FE **v1.9.74** Ficha pede full + loading jornada | `gpAdmEnsureFullPanel_('presenca')` | Raykelly Jul: 29 dias + 14:04 Aberto |
+| **I153** | **Histórico 2 vs 5 + Arthur 12:31 duplicata** | Home `n`=contas; `nSessoes`=Encerradas; `#3465` ▶+Encerrar 0min após Encerrada; sem anular Encerrada | GAS **v1.5.218** `anularLocacaoEncerradaAdmin` + 428 &lt;90s · FE **v1.9.112** confirm curto · `REPARAR_I153_ANULAR_3465` | `INCIDENTE_I153_*` | anular após Nova versão Web |
 | **I152** | **Karen freelance + Julia pausa** | Novo op sem PIN; 428 cadastro 100% bloqueava freelance; `gpSyncJuliaPadrao_` reativava RH | GAS **v1.5.216** modo Freelancer sem 428 · sync Julia respeita ops inativa · `configurarModoOperadorRhAdmin` | `INCIDENTE_I152_*` | Julia fora do login ✅ · Karen id5 Sem PIN |
 | **I151b** | **Fantasma volta após listarAtivas=0 (sem GAS novo)** | `carregarInicio` grava `mk_inicio_cache` velho; listarAtivas zera tela mas não invalidava cache → sync falho ressuscita card | FE **v1.9.111** invalidate + reconcile pós-inicio + orphans só otimistas · **`guard.i151.*`** · **`TESTE_I151_ENCERRAR_FANTASMA_READONLY`** | `INCIDENTE_I151b_*` · `mk-sync.js` · `mk-core.js` | **definitivo FE** — sem AppScript |
 | **I151** | **Encerrar fantasma recorrente (card Ativa, servidor 0)** | I148 incompleto: timeout sem reconcile; cache/snapshot parcial vazio não limpava | FE **v1.9.110** purge 409 amplo + invalidate cache + snapshot vazio | `INCIDENTE_I151_*` · `mk-drawer.js` · `mk-local-snapshot.js` | 02/09: listarAtivas=0 · card fantasma |
@@ -285,6 +287,7 @@ Docs: `INCIDENTE_I148_*` · `INCIDENTE_I151_*` · `INCIDENTE_I151b_*` · **`INCI
 | `../arquivo/incidentes/INCIDENTE_I33_PWA_CACHE_BOOT_LENTO_2026-06-20.md` | **I33** — PWA stale + boot lento |
 | `../arquivo/incidentes/INCIDENTE_I34_HOLERITE_APRESENTACAO_2026-06-20.md` | **I34** — holerite UX + CNPJ |
 | **`INCIDENTE_I43_CARREGAR_INICIO_COL_Y_2026-06-23.md`** | **I43** — regressão I42; col Y fora do getRange |
+| **`INCIDENTE_I153_HISTORICO_DUPLICATA_ARTHUR_2026-09-08.md`** | **I153** — 2 contas vs N sessões + anular #3465 |
 | **`INCIDENTE_I151_DEFINITIVO_ENCERRAR_FANTASMA_2026-09-02.md`** | **I148–I151b** — travas + teste + regra ouro |
 | **`INCIDENTE_I151_ENCERRAR_FANTASMA_RECORRENTE_2026-09-02.md`** | **I151** |
 | **`INCIDENTE_I151b_ENCERRAR_FANTASMA_EMERGENCIA_FE_2026-09-02.md`** | **I151b** emergência sem GAS |
@@ -328,6 +331,9 @@ Docs: `INCIDENTE_I148_*` · `INCIDENTE_I151_*` · `INCIDENTE_I151b_*` · **`INCI
 | `guard.i151.purge.409` | regex 409 encerrada/finalizada | I151 |
 | `guard.i151.snapshot` | snapshot parcial vazio grava | I151 |
 | `guard.i151.boot` | boot reconcile 2s | I151b |
+| `guard.i153.anular` | `anularLocacaoEncerradaAdmin_` | I153 |
+| `guard.i153.encerrar.curto` | encerrar &lt;90s + `confirmarCurto` | I153 |
+| `guard.i153.fe.curto` | drawer confirm curto | I153 |
 | `teste.i151` | `TESTE_I151_ENCERRAR_FANTASMA_READONLY.ps1` | I151 |
 | `guard.auth.fantasma` | `mkAuthReconcileSessaoFantasma_` em mk-auth | I19 |
 | `guard.idle.wallclock` | `mkAuthIdleRemainingMs_` em mk-auth | I21 |
