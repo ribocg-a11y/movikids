@@ -2385,12 +2385,13 @@ function renderReceitaMesChart_(d) {
   const baseAcum = [];
   const ritmoAcum = [];
   const realDia = [];
+  // I157: ritmo no gráfico = ritmo ATUAL × dia (reta legível).
+  // Não misturar ritmo histórico por dia (confundia: linha no meio sem ser “meta”).
   labels.forEach(function(dd) {
     const r = Math.round(fatMap[dd] || 0);
     accReal += r;
     accBase += baseDiaria;
-    const ritDay = (c.ritmoPorDia && c.ritmoPorDia[dd - 1]) ? Number(c.ritmoPorDia[dd - 1].ritmoDiaria) : ritmoDiaria;
-    accRitmo += ritDay > 0 ? ritDay : ritmoDiaria;
+    accRitmo += ritmoDiaria;
     realDia.push(r);
     acumulado.push(Math.round(accReal));
     baseAcum.push(Math.round(accBase));
@@ -2399,25 +2400,31 @@ function renderReceitaMesChart_(d) {
 
   const baseHoje = baseAcum[baseAcum.length - 1] || 0;
   const ritmoHoje = ritmoAcum[ritmoAcum.length - 1] || 0;
-  const diffBase = fatMes - baseMes;
-  const pctBase = baseMes > 0 ? Math.round(diffBase / baseMes * 100) : 0;
+  // Comparar o gráfico com a base ATÉ HOJE (pro-rata), não com o piso do mês inteiro.
+  const diffBaseHoje = fatMes - baseHoje;
+  const pctBaseHoje = baseHoje > 0 ? Math.round(diffBaseHoje / baseHoje * 100) : 0;
+  const diffBaseMes = fatMes - baseMes;
+  const pctBaseMes = baseMes > 0 ? Math.round(diffBaseMes / baseMes * 100) : 0;
   const diffProj = fatMes - projMes;
   const pctProj = projMes > 0 ? Math.round(diffProj / projMes * 100) : 0;
+  const diffRitmoHoje = fatMes - ritmoHoje;
+  const pctRitmoHoje = ritmoHoje > 0 ? Math.round(diffRitmoHoje / ritmoHoje * 100) : 0;
 
   setText2('nk-receita-mes-label',
-    'real ' + R2(fatMes)
-    + ' · base DRE ' + R2(baseMes)
-    + ' · projetado ' + R2(projMes)
+    'hoje: real ' + R2(fatMes)
+    + ' · base ' + R2(baseHoje)
+    + ' · ritmo ' + R2(ritmoHoje)
+    + '  ·  fim do mês: base ' + R2(baseMes)
     + ' · ritmo → ' + R2(ritmoMes));
 
-  // Pontos: verde se ≥ base; âmbar se abaixo da base (DNA admin)
+  // Pontos: verde se ≥ base pro-rata; âmbar se abaixo
   const ptBg = acumulado.map(function(v, i) {
     return v >= (baseAcum[i] || 0) ? '#2E7D32' : '#E65100';
   });
   const maxY = Math.max(
-    baseMes, ritmoMes, projMes, baseHoje, ritmoHoje,
+    baseHoje, ritmoHoje,
     Math.max.apply(null, acumulado.concat([1]))
-  ) * 1.08;
+  ) * 1.12;
 
   const datasets = [
     {
@@ -2438,7 +2445,7 @@ function renderReceitaMesChart_(d) {
   ];
   if (baseDiaria > 0) {
     datasets.push({
-      label: 'Base DRE',
+      label: 'Base DRE (pro-rata)',
       data: baseAcum,
       borderColor: '#E65100',
       borderWidth: 2,
@@ -2451,7 +2458,7 @@ function renderReceitaMesChart_(d) {
   }
   if (ritmoDiaria > 0) {
     datasets.push({
-      label: 'Ritmo (3 dias)',
+      label: 'Ritmo 3d (se todos os dias)',
       data: ritmoAcum,
       borderColor: '#29B6F6',
       borderWidth: 2,
@@ -2480,25 +2487,28 @@ function renderReceitaMesChart_(d) {
             label: function(ctx) {
               const i = ctx.dataIndex;
               const y = Math.round(ctx.parsed.y);
-              if (ctx.dataset.label === 'Base DRE') {
+              if (ctx.dataset.label && ctx.dataset.label.indexOf('Base DRE') === 0) {
                 return [
-                  'Base dia: ' + R2(baseDiaria),
-                  'Base acum.: ' + R2(y)
+                  'Base dia (piso ÷ dias do mês): ' + R2(baseDiaria),
+                  'Base acumulada até hoje: ' + R2(y)
                 ];
               }
-              if (ctx.dataset.label === 'Ritmo (3 dias)') {
+              if (ctx.dataset.label && ctx.dataset.label.indexOf('Ritmo') === 0) {
                 return [
-                  'Ritmo dia: ' + R2(ritmoDiaria),
-                  'Ritmo acum.: ' + R2(y)
+                  'Ritmo dia (média últimos 3 dias): ' + R2(ritmoDiaria),
+                  'Se todo dia fosse assim até hoje: ' + R2(y),
+                  'Não é meta — é termômetro do momento'
                 ];
               }
               const rD = realDia[i] || 0;
               const bA = baseAcum[i] || 0;
+              const rA = ritmoAcum[i] || 0;
               const dB = y - bA;
               return [
                 'Real dia: ' + R2(rD),
-                'Real acum.: ' + R2(y),
-                (dB >= 0 ? '+' + R2(dB) : R2(dB)) + ' vs base DRE acum.'
+                'Real acumulado: ' + R2(y),
+                (dB >= 0 ? '+' + R2(dB) : R2(dB)) + ' vs base pro-rata',
+                (y >= rA ? 'no ritmo ou acima' : R2(y - rA) + ' vs ritmo 3d')
               ];
             }
           }
@@ -2525,31 +2535,43 @@ function renderReceitaMesChart_(d) {
 
   if (ins) {
     const msgs = [];
-    if (baseMes > 0) {
-      if (diffBase >= 0) {
-        msgs.push('Real ' + R2(fatMes) + ' — '
-          + (pctBase > 0 ? pctBase + '% acima' : 'no nível')
-          + ' da base DRE (' + R2(baseMes) + ' piso do mês).');
+    // 1) Leitura do gráfico (pro-rata até hoje) — a que o olho vê
+    if (baseHoje > 0) {
+      if (diffBaseHoje >= 0) {
+        msgs.push('Até hoje: real ' + R2(fatMes) + ' está '
+          + (pctBaseHoje > 0 ? pctBaseHoje + '% acima' : 'no nível')
+          + ' da base pro-rata (' + R2(baseHoje) + ').');
       } else {
-        msgs.push('Real ' + R2(fatMes) + ' — ' + Math.abs(pctBase)
-          + '% abaixo da base DRE (' + R2(baseMes) + ' piso do mês).');
+        msgs.push('Até hoje: real ' + R2(fatMes) + ' está ' + Math.abs(pctBaseHoje)
+          + '% abaixo da base pro-rata (' + R2(baseHoje) + ').');
       }
+    }
+    if (ritmoHoje > 0 && ritmoDiaria > 0) {
+      const refDias = (ritmo.diasRef && ritmo.diasRef.length) ? ritmo.diasRef : (c.ritmo3dDiasRef || []);
+      if (diffRitmoHoje >= 0) {
+        msgs.push('Ritmo dos últimos 3 dias (' + refDias.join(', ') + '): '
+          + R2(ritmoDiaria) + '/dia — o real está no ritmo ou acima desse termômetro.');
+      } else {
+        msgs.push('Ritmo dos últimos 3 dias (' + refDias.join(', ') + '): '
+          + R2(ritmoDiaria) + '/dia — o real está ' + Math.abs(pctRitmoHoje)
+          + '% abaixo desse termômetro (dias fracos no começo do mês puxam a média). '
+          + 'Isso não significa “fora da meta”: ritmo não é meta, é o calor recente.');
+      }
+      msgs.push('Se mantiver ' + R2(ritmoDiaria) + '/dia → ~' + R2(ritmoMes) + ' no fechamento do mês.');
+    }
+    // 2) Contexto de mês inteiro (sócio) — separado de propósito
+    if (baseMes > 0) {
+      msgs.push('Piso DRE do mês inteiro ainda é ' + R2(baseMes)
+        + ' (faltam ' + R2(Math.max(0, baseMes - fatMes)) + ' para fechar o piso).');
     }
     if (projMes > 0) {
       if (Math.abs(pctProj) < 2) {
-        msgs.push('Dentro do projetado 3m (' + R2(projMes) + ' — média ' + (proj.meses || []).map(function(m) { return m.label; }).join(', ') + ').');
+        msgs.push('Projetado 3m (referência histórica): ' + R2(projMes) + '.');
       } else if (diffProj >= 0) {
-        msgs.push('+' + R2(diffProj) + ' acima do projetado 3m (' + R2(projMes) + ').');
+        msgs.push('Projetado 3m: ' + R2(projMes) + ' · real já +' + R2(diffProj) + ' vs essa média.');
       } else {
-        msgs.push(R2(diffProj) + ' abaixo do projetado 3m (' + R2(projMes) + ').');
+        msgs.push('Projetado 3m: ' + R2(projMes) + ' · ainda ' + R2(diffProj) + ' vs essa média de meses anteriores.');
       }
-    }
-    if (ritmoMes > 0 && ritmoDiaria > 0) {
-      const refDias = (ritmo.diasRef && ritmo.diasRef.length) ? ritmo.diasRef : (c.ritmo3dDiasRef || []);
-      const fonteLbl = (c.ritmo3dFonte === 'mes_atual' || !c.ritmo3dFonte || refDias.length)
-        ? ('últimos 3 dias: ' + refDias.join(', '))
-        : 'referência mês anterior (menos de 3 dias c/ fat.)';
-      msgs.push('Ritmo run rate: ' + R2(ritmoDiaria) + '/dia → ' + R2(ritmoMes) + ' no mês (' + fonteLbl + ').');
     }
     if (base.detalhe) msgs.push(base.detalhe);
     ins.style.display = 'block';

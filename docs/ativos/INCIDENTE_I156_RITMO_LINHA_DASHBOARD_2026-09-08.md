@@ -25,10 +25,21 @@ Live (antes do fix): `diasComMovMes=8`, `ritmo3dDiaria=0`, `ritmo3dDiasRef=[]`.
 
 ## Deploy
 
-1. Pages **1.9.115** (fallback imediato)
-2. Colar raw → **Nova versão** Web → ping **v1.5.221**  
-   https://raw.githubusercontent.com/ribocg-a11y/movikids/main/MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs
+1. Pages **1.9.115** (fallback imediato) ✅
+2. Colar raw → **Nova versão** Web → ping **v1.5.221** ✅ (08/09 ~19:43)
 3. Dashboard: linha ciano Ritmo + tooltip · `ritmo3dDiaria` ≈ média dos 3 últimos dias com fat
+
+## Validação live (08/09 ~19:43)
+
+| Check | Resultado |
+|-------|-----------|
+| ping | **v1.5.221** |
+| `kpiMes` set/26 `ritmo3dDiaria` | **785.67** |
+| `ritmo3dDiasRef` | **[6, 7, 8]** |
+| `diasComMovMes` | 8 |
+| FE Pages | **1.9.115** |
+
+Abrir Dashboard com `?force=1.9.115` — linha Ritmo deve aparecer.
 
 ## Regra
 
