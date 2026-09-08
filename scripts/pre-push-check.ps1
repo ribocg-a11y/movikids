@@ -622,7 +622,8 @@ try {
     } else {
       Add-Check "guard.i151.purge" "ok" "purge encerrar + invalidate cache"
     }
-    if ($drawerRaw -notmatch 'j[aá]\s+finalizada|locacao\s+ja\s+finalizada') {
+    # Casa o padrão no SOURCE (regex JS), não o texto já expandido
+    if ($drawerRaw -notmatch 'j\[aá\]\\s\+finalizada|locacao\\s\+ja\\s\+finalizada') {
       Add-Check "guard.i151.purge.409" "fail" "regex 409 encerrada estreita (I148/I151)"
     } else {
       Add-Check "guard.i151.purge.409" "ok" "409 encerrada/finalizada remove card"
