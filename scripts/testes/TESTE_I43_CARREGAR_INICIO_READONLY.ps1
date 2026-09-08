@@ -52,10 +52,13 @@ try {
   if ($gs -match 'function carregarInicio_[\s\S]{0,12000}getRange\([^\)]*COL_CONTA_ID_\)[\s\S]{0,2000}r\[24\]') {
     throw "carregarInicio: getRange COL_CONTA_ID_ com r[24] - regressao I43"
   }
-  if ($gs -notmatch 'function carregarInicio_[\s\S]{0,12000}COL_LOC_READ_') {
-    throw "carregarInicio sem COL_LOC_READ_ (I43)"
+  if ($gs -notmatch 'function carregarInicio_[\s\S]{0,12000}COL_LOC_READ_' -and $gs -notmatch 'function carregarInicio_[\s\S]{0,12000}locSheetTail_') {
+    throw "carregarInicio sem COL_LOC_READ_/locSheetTail_ (I43/I155)"
   }
-  Add-I43Check "static.COL_LOC_READ_" "ok" "28 cols"
+  if ($gs -match 'function locSheetTail_' -and $gs -notmatch 'function locSheetTail_[\s\S]{0,800}COL_LOC_READ_') {
+    throw "locSheetTail_ sem COL_LOC_READ_ (I43/I155)"
+  }
+  Add-I43Check "static.COL_LOC_READ_" "ok" "28 cols (locSheetTail_/carregarInicio)"
 
   $syncFile = Join-Path $RepoRoot "mk-sync.js"
   if (Test-Path $syncFile) {
@@ -66,10 +69,10 @@ try {
     Add-I43Check "static.mk-sync.i43" "ok" "merge preserva ts local"
   }
 
-  if ($gs -notmatch 'function listarAtivas_[\s\S]{0,1200}COL_LOC_READ_') {
-    throw "listarAtivas sem COL_LOC_READ_ (I52)"
+  if ($gs -notmatch 'function listarAtivas_[\s\S]{0,1200}COL_LOC_READ_' -and $gs -notmatch 'function listarAtivas_[\s\S]{0,1200}locSheetTail_') {
+    throw "listarAtivas sem COL_LOC_READ_/locSheetTail_ (I52/I155)"
   }
-  Add-I43Check "static.listarAtivas.COL_LOC_READ_" "ok" "28 cols"
+  Add-I43Check "static.listarAtivas.COL_LOC_READ_" "ok" "28 cols (locSheetTail_)"
 
   $ping = Invoke-MoviApi @{ action = "ping" }
   Assert-Ok $ping "ping"

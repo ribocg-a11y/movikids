@@ -256,23 +256,26 @@ try {
     } else {
       Add-Check "guard.gas.timestamp.noFallback" "ok" "timestampCanonico so col Y"
     }
-    # I43 — carregarInicio: r[24] exige COL_LOC_READ_ (nao so COL_CONTA_ID_)
+    # I43 — carregarInicio: r[24] exige COL_LOC_READ_ (via getRange direto OU locSheetTail_ I155)
     if ($gasRaw -match 'function carregarInicio_') {
       if ($gasRaw -notmatch 'const COL_LOC_READ_\s*=\s*28') {
         Add-Check "guard.gas.carregarInicio.colY" "fail" "COL_LOC_READ_=28 ausente (I43)"
       } elseif ($gasRaw -match 'function carregarInicio_[\s\S]{0,15000}getRange\([^\)]*COL_CONTA_ID_\)[\s\S]{0,3000}r\[24\]') {
         Add-Check "guard.gas.carregarInicio.colY" "fail" "carregarInicio getRange COL_CONTA_ID_ + r[24] (I43)"
-      } elseif ($gasRaw -match 'function carregarInicio_[\s\S]{0,15000}r\[24\]' -and $gasRaw -notmatch 'function carregarInicio_[\s\S]{0,15000}COL_LOC_READ_') {
-        Add-Check "guard.gas.carregarInicio.colY" "fail" "carregarInicio usa r[24] sem COL_LOC_READ_ (I43)"
-    } else {
-      Add-Check "guard.gas.carregarInicio.colY" "ok" "COL_LOC_READ_ em carregarInicio"
+      } elseif ($gasRaw -match 'function carregarInicio_[\s\S]{0,15000}r\[24\]' -and $gasRaw -notmatch 'function carregarInicio_[\s\S]{0,15000}COL_LOC_READ_' -and $gasRaw -notmatch 'function carregarInicio_[\s\S]{0,15000}locSheetTail_') {
+        Add-Check "guard.gas.carregarInicio.colY" "fail" "carregarInicio usa r[24] sem COL_LOC_READ_/locSheetTail_ (I43/I155)"
+      } elseif ($gasRaw -match 'function locSheetTail_' -and $gasRaw -notmatch 'function locSheetTail_[\s\S]{0,800}COL_LOC_READ_') {
+        Add-Check "guard.gas.carregarInicio.colY" "fail" "locSheetTail_ sem COL_LOC_READ_ (I43/I155)"
+      } else {
+        Add-Check "guard.gas.carregarInicio.colY" "ok" "COL_LOC_READ_ via locSheetTail_/carregarInicio"
+      }
     }
     if ($gasRaw -match 'function listarAtivas_[\s\S]{0,1200}getRange\([^\)]*,\s*26\)') {
       Add-Check "guard.gas.listarAtivas.colY" "fail" "listarAtivas getRange 26 cols (I43/I52)"
-    } elseif ($gasRaw -notmatch 'function listarAtivas_[\s\S]{0,1200}COL_LOC_READ_') {
-      Add-Check "guard.gas.listarAtivas.colY" "fail" "listarAtivas sem COL_LOC_READ_ (I52)"
+    } elseif ($gasRaw -notmatch 'function listarAtivas_[\s\S]{0,1200}COL_LOC_READ_' -and $gasRaw -notmatch 'function listarAtivas_[\s\S]{0,1200}locSheetTail_') {
+      Add-Check "guard.gas.listarAtivas.colY" "fail" "listarAtivas sem COL_LOC_READ_/locSheetTail_ (I52/I155)"
     } else {
-      Add-Check "guard.gas.listarAtivas.colY" "ok" "COL_LOC_READ_ em listarAtivas"
+      Add-Check "guard.gas.listarAtivas.colY" "ok" "COL_LOC_READ_ via locSheetTail_/listarAtivas"
     }
     if ($gasRaw -notmatch 'LOC_HEADERS_') {
       Add-Check "guard.gas.validarSchema.loc28" "fail" "LOC_HEADERS_ ausente (I52)"
