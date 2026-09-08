@@ -23,3 +23,8 @@ Sócio via Real entre Base e Ritmo e texto “58% abaixo da base DRE” — cont
 
 Tooltip empilhava 3 séries (~9 linhas). Agora **3 linhas**: Real · Base+Δ · Ritmo.
 Números do print 8/09 conferidos: base 368×8=2944 · ritmo 786×8=6288 · Δ base +1690 · Δ ritmo −1649.
+
+## I157c — ritmo não é linha no passado (08/09)
+
+Regra = média dos **últimos 3 dias com venda**. Desenhar reta desde o dia 1 mentia.
+Agora: gráfico = Base × Real; ritmo = **triângulo só em hoje**; dias da ref. com ponto maior.
