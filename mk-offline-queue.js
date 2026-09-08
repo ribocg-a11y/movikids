@@ -13,7 +13,11 @@ function mkOfflineIsNetworkError_(err) {
   return msg.indexOf('failed to fetch') >= 0
     || msg.indexOf('network') >= 0
     || msg.indexOf('load failed') >= 0
-    || msg.indexOf('networkerror') >= 0;
+    || msg.indexOf('networkerror') >= 0
+    // I154: HTML 404 / GAS instável — enfileira (timeout NÃO: I143 GAS pode ter gravado)
+    || msg.indexOf('gas-unstable') >= 0
+    || msg.indexOf('http 404') >= 0
+    || msg.indexOf('http 5') >= 0;
 }
 
 function mkOfflineCanQueue_(action) {
@@ -80,13 +84,13 @@ async function mkOfflineHandleWriteFail_(params, err) {
   const item = await mkOfflineEnqueue_(action, params);
   if (action === 'salvarLocacao') {
     if (typeof toast === 'function') {
-      toast('Sem internet — locação na fila. Envia quando voltar a rede.', 'warning');
+      toast('Servidor instável — locação na fila. Envia sozinho quando estabilizar.', 'warning');
     }
     return mkOfflineSyntheticSalvar_(params, item.id);
   }
   if (action === 'iniciarTimer') {
     if (typeof toast === 'function') {
-      toast('Sem internet — início na fila. Cronômetro segue no tablet.', 'warning');
+      toast('Servidor instável — início na fila. Cronômetro segue no tablet.', 'warning');
     }
     return { ok: true, _offlineQueued: true, clientRequestId: item.id, queued: true };
   }

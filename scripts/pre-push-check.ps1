@@ -683,6 +683,24 @@ try {
     }
   }
 
+  # I154 — GAS HTML 404 / rede → fila offline; auditoria sort cronológico
+  if ($gasRaw -notmatch 'function auditTsSortKey_') {
+    Add-Check "guard.i154.audit.sort" "fail" "auditTsSortKey_ ausente (I154)"
+  } else {
+    Add-Check "guard.i154.audit.sort" "ok" "auditoria sort por data/hora"
+  }
+  $apiPathI154 = Join-Path $root "mk-api.js"
+  $offPathI154 = Join-Path $root "mk-offline-queue.js"
+  if ((Test-Path $apiPathI154) -and (Test-Path $offPathI154)) {
+    $apiRawI154 = Get-Content -Path $apiPathI154 -Raw -Encoding UTF8
+    $offRawI154 = Get-Content -Path $offPathI154 -Raw -Encoding UTF8
+    if ($apiRawI154 -notmatch 'gas-unstable' -or $offRawI154 -notmatch 'gas-unstable') {
+      Add-Check "guard.i154.fe.gas404" "fail" "FE sem fila em GAS HTML 404 (I154)"
+    } else {
+      Add-Check "guard.i154.fe.gas404" "ok" "404/HTML GAS enfileira salvar"
+    }
+  }
+
   $authPath = Join-Path $root "mk-auth.js"
   if (Test-Path $authPath) {
     $authRaw = Get-Content -Path $authPath -Raw -Encoding UTF8

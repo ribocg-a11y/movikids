@@ -67,6 +67,11 @@ function mkApiFetchJson_(url, init, timeoutMs) {
       const text = await r.text();
       let data;
       try { data = JSON.parse(text); } catch (e) {
+        // I154: GAS às vezes devolve HTML 404 ("unable to open the file") — tratar como rede
+        const low = String(text || '').toLowerCase();
+        if (/page not found|unable to open the file|doctype html|<html/i.test(low) || r.status === 404 || r.status >= 500) {
+          throw new Error('network-gas-unstable HTTP ' + r.status);
+        }
         throw new Error('Resposta invalida do GAS (nao-JSON). Publique Nova versao da Web App.');
       }
       if (!r.ok && !data.erro) throw new Error('HTTP ' + r.status);

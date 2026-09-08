@@ -1,6 +1,7 @@
 # MOVI KIDS — Mapa de erros, falhas e bugs
 
-**Atualizado:** 08/09/2026 — **I153** duplicata Arthur / encerrar &lt;90s · FE **v1.9.112** · GAS repo **v1.5.218**  
+**Atualizado:** 08/09/2026 — **I154** lançamento perdido GAS 404 · FE **v1.9.113** · GAS repo **v1.5.219**  
+**Uso anterior:** 08/09/2026 — **I153** duplicata Arthur / encerrar &lt;90s · FE **v1.9.112** · GAS repo **v1.5.218**  
 **Uso anterior:** 02/09/2026 — **I151b** travas definitivas · FE **v1.9.111** Pages · GAS ping **v1.5.213** (repo **v1.5.215**)  
 **Uso anterior:** 02/09/2026 — **I151** encerrar fantasma · FE **v1.9.110**  
 **Uso anterior:** 29/08/2026 — **I147** / **I146** · FE **v1.9.105** · GAS Web **v1.5.211**  

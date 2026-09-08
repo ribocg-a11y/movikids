@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.218
+// MOVI KIDS — Google Apps Script v1.5.219
+// v1.5.219: I154 — listarAuditoria: cauda real + sort por data/hora (não string DD/MM)
 // v1.5.218: I153 — anular Encerrada duplicata (admin) · encerrar <90s exige confirmarCurto
 // v1.5.217: I152b — Freelancer: salário/VA/meta/bônus 0 não viram default; cache painel force; list colab v3
 // v1.5.216: I152 — Julia pausa (não reativa RH) · Karen/Freelancer balcão sem cadastro 100% · dedupe RH
@@ -210,8 +211,8 @@
 
 // ── CONSTANTES ───────────────────────────────────────────────
 /** Versão exposta em ping, carregarInicio, validarSchema, gestaoPessoasStatus (bump com header). */
-const MK_GAS_VERSAO_  = 'v1.5.218';
-const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.218';
+const MK_GAS_VERSAO_  = 'v1.5.219';
+const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.219';
 const SHEET_ID   = '1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618';
 const DEPLOY_ID  = 'AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y';
 const WEBAPP_URL = `https://script.google.com/macros/s/${DEPLOY_ID}/exec`;
@@ -3853,20 +3854,37 @@ function registrarAuditoriaLocacao_(rowIndex, acao, antes, depois, motivo, opera
   } catch(e) { Logger.log('registrarAuditoriaLocacao_: ' + e.message); }
 }
 
+/** I154 — chave ordenável DD/MM/YYYY[ HH:mm] → YYYYMMDDHHmm (evita 31/08 > 08/09 em string). */
+function auditTsSortKey_(ts) {
+  const s = String(ts || '').trim();
+  const m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\s+(\d{1,2}):(\d{2}))?/);
+  if (!m) return '000000000000';
+  const dd = ('0' + m[1]).slice(-2);
+  const mm = ('0' + m[2]).slice(-2);
+  const hh = m[4] != null ? ('0' + m[4]).slice(-2) : '00';
+  const mi = m[5] != null ? ('0' + m[5]).slice(-2) : '00';
+  return m[3] + mm + dd + hh + mi;
+}
+
 /** B3 — auditoria locações + turnos, filtro por operador (admin). */
 function listarAuditoriaAdmin_(p) {
   if (!isAdminRequest_(p)) return err_('Acesso negado — auditoria so para administrador', 403);
   try {
     const opFiltro = normBusca_(String((p && p.operador) || '').trim());
     const limite = Math.min(Math.max(parseInt((p && p.limite) || '80', 10) || 80, 1), 200);
+    const lookback = Math.min(Math.max(parseInt((p && p.lookback) || '800', 10) || 800, limite), 3000);
     const eventos = [];
     const opsMap = {};
 
     const shAud = ss_().getSheetByName('AUDITORIA');
     if (shAud && shAud.getLastRow() >= 2) {
-      const dados = shAud.getRange(2, 1, shAud.getLastRow() - 1, 8).getValues();
+      const last = shAud.getLastRow();
+      const start = Math.max(2, last - lookback + 1);
+      const nRows = last - start + 1;
+      const dados = shAud.getRange(start, 1, nRows, 8).getValues();
       for (let i = dados.length - 1; i >= 0; i--) {
         const r = dados[i];
+        if (!r[0] && !r[1]) continue;
         const usuario = String(r[7] || '').trim();
         if (usuario) opsMap[usuario] = true;
         if (opFiltro && normBusca_(usuario).indexOf(opFiltro) < 0) continue;
@@ -3884,9 +3902,13 @@ function listarAuditoriaAdmin_(p) {
 
     const shTurno = ss_().getSheetByName('AUD_TURNO');
     if (shTurno && shTurno.getLastRow() >= 2) {
-      const dadosT = shTurno.getRange(2, 1, shTurno.getLastRow() - 1, 7).getValues();
+      const lastT = shTurno.getLastRow();
+      const startT = Math.max(2, lastT - lookback + 1);
+      const nRowsT = lastT - startT + 1;
+      const dadosT = shTurno.getRange(startT, 1, nRowsT, 7).getValues();
       for (let i = dadosT.length - 1; i >= 0; i--) {
         const r = dadosT[i];
+        if (!r[0] && !r[1]) continue;
         const nome = String(r[3] || '').trim();
         const usuario = nome || String(r[2] || '').trim();
         if (usuario) opsMap[usuario] = true;
@@ -3904,12 +3926,22 @@ function listarAuditoriaAdmin_(p) {
       }
     }
 
+    // I154: sort cronológico real (string DD/MM colocava 31/08 acima de 08/09)
     eventos.sort(function(a, b) {
-      return String(b.timestamp || '').localeCompare(String(a.timestamp || ''), 'pt-BR');
+      const kb = auditTsSortKey_(b.timestamp);
+      const ka = auditTsSortKey_(a.timestamp);
+      if (kb !== ka) return kb < ka ? -1 : 1;
+      return 0;
     });
 
     const operadores = Object.keys(opsMap).sort(function(a, b) { return a.localeCompare(b, 'pt-BR'); });
-    return resp_({ eventos: eventos.slice(0, limite), operadores: operadores, total: eventos.length });
+    return resp_({
+      eventos: eventos.slice(0, limite),
+      operadores: operadores,
+      total: eventos.length,
+      lookback: lookback,
+      versao: MK_GAS_VERSAO_
+    });
   } catch (ex) {
     return err_('Erro ao listar auditoria: ' + ex.message, 500);
   }
