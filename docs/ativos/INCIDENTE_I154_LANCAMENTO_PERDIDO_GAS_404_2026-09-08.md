@@ -48,3 +48,26 @@ Não foi “planilha sem ID”: **a gravação nunca chegou** na aba LOCAÇÕES.
 ## Regra de ouro
 
 Resposta GAS **não-JSON** / 404 HTML em escrita = **falha de rede** → enfileirar; **não** descartar o lançamento.
+
+## Validação de estabilidade (08/09 ~18:25)
+
+| Check | Resultado | Nota |
+|-------|-----------|------|
+| Ping x12 | **11/12** OK · 1× HTTP 404 (67s) | Spikes 2s–114s · p50 ~5s |
+| `listarAtivas` x8 | **5/8** OK · **3× HTML 404** | Latência OK 6–7s; pior 26s |
+| `carregarInicio` | OK 17s · parity ativos=listarAtivas | |
+| `resumoDia` / histórico / schema | OK | schemaOk=true |
+| Auditoria I154 | OK · top=`08/09` Raykelly | sort corrigido |
+| Pages FE I154 | **1.9.113** live gas-unstable | |
+| Meta Raykelly | `folga=true` terça · `hoje.n=0` | Escala hardcoded `'2':null` — ela trabalhou mesmo assim |
+
+### Ajuste I154b (FE **v1.9.114**)
+
+- `api()`: **1 retry** (700ms) em HTML/404/5xx antes de fila/erro
+- `MK_LISTAR_ATIVAS_TIMEOUT_MS` **30s → 45s** (viú 44s sob carga)
+
+### Ainda operacional (não código)
+
+- Relançar locs perdidas da tarde se ainda faltarem
+- Tablet `?force=1.9.114`
+- Avaliar escala meta Raykelly terça (folga no cfg vs turno real)
