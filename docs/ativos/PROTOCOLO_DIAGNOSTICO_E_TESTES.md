@@ -1,10 +1,11 @@
 # MOVI KIDS — Protocolo de diagnóstico, testes e maturidade de aprendizado
 
-**Criado:** 07/06/2026 · **Atualizado:** 14/06/2026 (I25 fechado · PROTOCOLO_ATUALIZAR_TUDO)  
+**Criado:** 07/06/2026 · **Atualizado:** 08/09/2026 (I155 estabilidade · I154 fila 404 · PROTOCOLO_ATUALIZAR_TUDO)  
 **Função:** quando o usuário pedir *“rodar teste”*, *“diagnosticar”* ou *“validar deploy”*, o agente **segue este documento** — não improvisa escopo.  
-**Complementa:** `MAPA_ERROS_FALHAS_BUGS.md`, `INCIDENTE_I20_CRONOMETRO_RESOLUCAO_2026-06-07.md`, `MAPA_CODIGO_ARQUITETURA.md`, `CHECKLIST_FASE5_TABLET.md`
+**Complementa:** `MAPA_ERROS_FALHAS_BUGS.md`, `INCIDENTE_I20_CRONOMETRO_RESOLUCAO_2026-06-07.md`, `MAPA_CODIGO_ARQUITETURA.md`, `CHECKLIST_FASE5_TABLET.md` · `EVIDENCIA_ESTABILIDADE_POS_I155_2026-09-08.md`
 
 **Orquestrador:** `scripts/testes/TESTE_PROTOCOLO_DIAGNOSTICO.ps1`  
+**Estabilidade GAS (pós-I155):** `node scripts/testes/teste-estabilidade-pos-i155.cjs`  
 **Planilha por aba:** `docs/ativos/PROTOCOLO_AUDITORIA_ABAS_PLANILHA.md` → `TESTE_PROTOCOLO_ABA_PLANILHA.ps1`
 
 ---

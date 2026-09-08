@@ -1,28 +1,29 @@
 # MOVI KIDS — Planejamento atual (pós-FASE 5)
 
-**Atualizado:** 31/07/2026 · FE **v1.9.88** · GAS **v1.5.209** · **One UI ✅** · **I141/I142 holerite ✅**  
+**Atualizado:** 08/09/2026 · FE **v1.9.114** · GAS **v1.5.220** · **One UI ✅** · **I153–I155 confiabilidade ✅**  
 **Diagnóstico:** [`DIAGNOSTICO_SISTEMA_6_CAMADAS_2026-06.md`](DIAGNOSTICO_SISTEMA_6_CAMADAS_2026-06.md)  
 **Sprint UI:** [`PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`](PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md) ← **ciclo ativo**  
 **One UI (fechado):** [`PLANEJAMENTO_ONE_UI_2026-06.md`](PLANEJAMENTO_ONE_UI_2026-06.md)  
 **Documentos irmãos:** `PLANO_PRIORIDADES_2026-06.md` · `MAPA_FASES.md` · `DEPLOY_ATUAL.md` · `HANDOFF_NOVO_CHAT.md`  
 **Ciclo fechado:** FASE 0–5 · I52–I63 planilha · I64–I67 higiene/auditoria  
-**Ciclo ativo:** **Sprint D** — assinar FASE **16/17** · smoke tablet D4
+**Ciclo ativo:** **Sprint D** — assinar FASE **16/17** · smoke tablet D4 · pós **I155** estabilidade live
 
 ---
 
 ## 1. Resumo executivo
 
-**Modo atual (31/07):** One UI **Sprints A–C ✅**. **Ciclo ativo = Sprint D** (assinar FASE 17 · smoke tablet) · holerite Q2/PDF ✅.
+**Modo atual (08/09):** One UI **Sprints A–C ✅**. Confiabilidade balcão **I153–I155 ✅**. **Ciclo ativo = Sprint D** (assinar FASE 17 · smoke tablet `?force=1.9.114`).
 
 | Área | Status |
 |------|--------|
 | Planilha + GAS + homolog balcão base | ✅ |
+| Confiabilidade sync (I153–I155) | ✅ **0 HTML 404** · ping **v1.5.220** |
 | FASE 16 Centro Comando | ✅ **~98%** — assinatura Sprint D |
 | FASE 17 Alertas + Gestor | 🟡 **~95%** — pills/badges + F9 |
-| FASE 18 Financeiro UI | ✅ Sprint B · complemento Sprint H |
+| FASE 18 Financeiro UI | ✅ Sprint B · I150 cenários DRE |
 | Raykelly cadastro | ✅ **100%** 26/06 |
 
-**Próximo passo:** `PLANO_SINERGIA_PONTAS_2026-08-30.md` (S0–S3) → depois D4 em `PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`
+**Próximo passo:** tablet smoke D4 · assinar FASE 17 · ver `HANDOFF_NOVO_CHAT.md`
 
 ---
 

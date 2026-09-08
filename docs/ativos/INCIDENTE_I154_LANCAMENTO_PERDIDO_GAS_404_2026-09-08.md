@@ -71,3 +71,9 @@ Resposta GAS **não-JSON** / 404 HTML em escrita = **falha de rede** → enfilei
 - Relançar locs perdidas da tarde se ainda faltarem
 - Tablet `?force=1.9.114`
 - Avaliar escala meta Raykelly terça (folga no cfg vs turno real)
+
+### Causa raiz dos 404 (I155 — 08/09 noite) ✅
+
+Full-sheet em `listarAtivas`/`carregarInicio` → GAS **v1.5.220** lookback 600.  
+Bateria: **0 HTML 404** · ver `EVIDENCIA_ESTABILIDADE_POS_I155_2026-09-08.md`.  
+I154 (fila) + I154b (retry) permanecem como rede de segurança.

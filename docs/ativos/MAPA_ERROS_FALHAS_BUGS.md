@@ -1,7 +1,8 @@
 # MOVI KIDS — Mapa de erros, falhas e bugs
 
-**Atualizado:** 08/09/2026 — **I155** lookback ativas/inicio (anti full-sheet 404) · GAS repo **v1.5.220** · FE **v1.9.114**  
+**Atualizado:** 08/09/2026 — **I155** ✅ live (0 HTML 404 · lookback 600) · GAS ping **v1.5.220** · FE **v1.9.114**  
 **Uso anterior:** 08/09/2026 — **I154** lançamento perdido GAS 404 · FE **v1.9.113–114** · GAS **v1.5.219**  
+**Uso anterior:** 08/09/2026 — **I153** duplicata Arthur / encerrar &lt;90s · FE **v1.9.112** · GAS **v1.5.218**  
 **Uso anterior:** 02/09/2026 — **I151b** travas definitivas · FE **v1.9.111** Pages · GAS ping **v1.5.213** (repo **v1.5.215**)  
 **Uso anterior:** 02/09/2026 — **I151** encerrar fantasma · FE **v1.9.110**  
 **Uso anterior:** 29/08/2026 — **I147** / **I146** · FE **v1.9.105** · GAS Web **v1.5.211**  
@@ -85,6 +86,19 @@ flowchart LR
 **Regra de ouro (I151 definitivo):** se **`listarAtivas.total === 0`**, o balcão **não pode** mostrar Ativa/Pendente — exceto otimista **`▶`/`salvar` ≤90s**.
 
 Docs: `INCIDENTE_I148_*` · `INCIDENTE_I151_*` · `INCIDENTE_I151b_*` · **`INCIDENTE_I151_DEFINITIVO_ENCERRAR_FANTASMA_2026-09-02.md`**
+
+## Diagnóstico de família — confiabilidade sync I153 → I155 (08/09/2026)
+
+| ID | Sintoma | Causa | Correção | Status |
+|----|---------|-------|----------|--------|
+| **I153** | Histórico “2 vs 5” + Arthur 12:31 duplicata | `n`=contas; Encerrada fantasma #3465; encerrar 0min | anular Encerrada + 428 &lt;90s · FE confirm | ✅ |
+| **I154** | 2 locações “não registraram” | GAS HTML 404; FE não enfileirava; audit sort DD/MM | fila `gas-unstable` + retry · auditTsSortKey_ | ✅ |
+| **I154b** | Ainda 404/timeout sob carga | 1 tentativa; timeout 30s | retry 1× · timeout **45s** · FE **v1.9.114** | ✅ |
+| **I155** | ~37% HTML 404 em `listarAtivas` | Full-sheet ~3k×28 a cada sync | lookback **600** + cache 8s · GAS **v1.5.220** | ✅ live · **0/10** 404 |
+
+**Regra de ouro (I155):** sync operacional = **cauda**, não planilha inteira. `forceFull=1` só diagnóstico.
+
+Docs: `INCIDENTE_I153_*` · `INCIDENTE_I154_*` · `INCIDENTE_I155_*` · `EVIDENCIA_ESTABILIDADE_POS_I155_*`
 
 ---
 
@@ -203,7 +217,7 @@ Docs: `INCIDENTE_I148_*` · `INCIDENTE_I151_*` · `INCIDENTE_I151b_*` · **`INCI
 | **I126c** | **Faixa vermelha “Painel rápido” eterna + Escala OK** | Banner `_partial` em `gp-adm-err`; Escala já vinha do lite; promise resolvida bloqueava Folha full | FE **v1.9.72** remove banner lite · full só Folha/Avaliações · `gpAdmPanelInFlight_` | `mk-gestao-pessoas-admin.js` | sem faixa vermelha · Folha carrega ao abrir |
 | **I127** | **Holerite Q2: adiantamento 1ª = R$ 0** | Cód 410 zerado; DP exige desconto do adiantamento na 2ª (art. 462 CLT / Contábeis) | FE **v1.9.73** `mk-holerite.js` · GAS **v1.5.206** `adiantamentoQ1` | Q2: salário mês − adiantamento 40% − encargos | Raykelly: 410 ≈ R$ 648,40 |
 | **I128** | **Ficha: “Sem dias na competência” com ponto aberto** | Lite deixa `jornada.dias=[]`; full só rodava em Folha/Avaliações | FE **v1.9.74** Ficha pede full + loading jornada | `gpAdmEnsureFullPanel_('presenca')` | Raykelly Jul: 29 dias + 14:04 Aberto |
-| **I155** | **`listarAtivas`/`carregarInicio` 404 + 6–44s** | Leitura full LOCAÇÕES (~3k×28) a cada sync → carga + HTML 404 | GAS **v1.5.220** `locSheetTail_` lookback 600 + cache ativas 8s · CUSTOS lookback 200 | `INCIDENTE_I155_*` · `guard.i155.*` | ping 220 · lookback=600 · latency↓ |
+| **I155** | **`listarAtivas`/`carregarInicio` 404 + 6–44s** | Leitura full LOCAÇÕES (~3k×28) a cada sync → carga + HTML 404 | GAS **v1.5.220** `locSheetTail_` lookback 600 + cache ativas 8s · CUSTOS lookback 200 | `INCIDENTE_I155_*` · `EVIDENCIA_ESTABILIDADE_POS_I155_*` · `guard.i155.*` | ✅ live · **0 HTML 404** · warm ~1,5s |
 | **I154** | **2 locações Raykelly “não registraram”** | GAS HTML 404 em salvar; FE não enfileirava; auditoria sort DD/MM | GAS **v1.5.219** audit sort · FE **v1.9.113–114** `gas-unstable` + retry + timeout 45s | `INCIDENTE_I154_*` | fila em 404; sort top=hoje |
 | **I153** | **Histórico 2 vs 5 + Arthur 12:31 duplicata** | Home `n`=contas; `nSessoes`=Encerradas; `#3465` ▶+Encerrar 0min após Encerrada; sem anular Encerrada | GAS **v1.5.218** `anularLocacaoEncerradaAdmin` + 428 &lt;90s · FE **v1.9.112** confirm curto · `REPARAR_I153_ANULAR_3465` | `INCIDENTE_I153_*` | anular após Nova versão Web |
 | **I152** | **Karen freelance + Julia pausa** | Novo op sem PIN; 428 cadastro 100% bloqueava freelance; `gpSyncJuliaPadrao_` reativava RH | GAS **v1.5.216** modo Freelancer sem 428 · sync Julia respeita ops inativa · `configurarModoOperadorRhAdmin` | `INCIDENTE_I152_*` | Julia fora do login ✅ · Karen id5 Sem PIN |
@@ -290,6 +304,9 @@ Docs: `INCIDENTE_I148_*` · `INCIDENTE_I151_*` · `INCIDENTE_I151b_*` · **`INCI
 | `../arquivo/incidentes/INCIDENTE_I33_PWA_CACHE_BOOT_LENTO_2026-06-20.md` | **I33** — PWA stale + boot lento |
 | `../arquivo/incidentes/INCIDENTE_I34_HOLERITE_APRESENTACAO_2026-06-20.md` | **I34** — holerite UX + CNPJ |
 | **`INCIDENTE_I43_CARREGAR_INICIO_COL_Y_2026-06-23.md`** | **I43** — regressão I42; col Y fora do getRange |
+| **`INCIDENTE_I155_LOOKBACK_ATIVAS_CARGA_GAS_2026-09-08.md`** | **I155** — lookback causa raiz 404/full-sheet |
+| **`EVIDENCIA_ESTABILIDADE_POS_I155_2026-09-08.md`** | Bateria pós-I155 — 0 HTML 404 |
+| **`INCIDENTE_I154_LANCAMENTO_PERDIDO_GAS_404_2026-09-08.md`** | **I154** — salvar perdido + audit sort |
 | **`INCIDENTE_I153_HISTORICO_DUPLICATA_ARTHUR_2026-09-08.md`** | **I153** — 2 contas vs N sessões + anular #3465 |
 | **`INCIDENTE_I151_DEFINITIVO_ENCERRAR_FANTASMA_2026-09-02.md`** | **I148–I151b** — travas + teste + regra ouro |
 | **`INCIDENTE_I151_ENCERRAR_FANTASMA_RECORRENTE_2026-09-02.md`** | **I151** |

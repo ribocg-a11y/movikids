@@ -1,12 +1,12 @@
 # MOVI KIDS — Mapa de fases (tradução)
 
-**Atualizado:** 31/07/2026 · produção FE **v1.9.88** · GAS **v1.5.209** · ver `DEPLOY_ATUAL.md`
+**Atualizado:** 08/09/2026 · produção FE **v1.9.114** · GAS **v1.5.220** · ver `DEPLOY_ATUAL.md`
 
 Evita confusão entre **três planos** que usam o mesmo número para coisas diferentes.
 
 ---
 
-## Ciclo ativo agora — pós One UI (Sprint D)
+## Ciclo ativo agora — pós One UI (Sprint D) + I153–I155
 
 | Status | Fase | Nome | Doc canônico |
 |--------|------|------|--------------|
@@ -14,9 +14,10 @@ Evita confusão entre **três planos** que usam o mesmo número para coisas dife
 | ✅ | **15b** | RH premium | `PLANO_PREMIUM` §6 — **100%** repo |
 | 🟡 | **16** | One UI + Centro de Comando | **~98%** · assinatura Sprint D · UI ✅ v1.9.2 |
 | 🟡 | **17** | Alertas + Gestor | **~95%** · homolog D1 · `CHECKLIST_FASE17_FECHAMENTO.md` |
-| ✅ | **18** | Financeiro previsão (UI) | Sprint B ✅ · complemento Sprint H |
+| ✅ | **18** | Financeiro previsão (UI) | Sprint B ✅ · I150 cenários DRE |
+| ✅ | **Ops conf.** | I153–I155 | lookback + fila 404 + anular · `EVIDENCIA_ESTABILIDADE_POS_I155_*` |
 
-**Decisão 27/06:** One UI Sprints A–C ✅ **v1.9.2** → **dev ativo = Sprint D** fechar FASE 16/17.
+**Decisão 08/09:** confiabilidade sync **I155 live** → **dev ativo = Sprint D** smoke tablet `?force=1.9.114` + assinar FASE 16/17.
 
 ---
 

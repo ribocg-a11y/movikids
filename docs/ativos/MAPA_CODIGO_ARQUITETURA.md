@@ -1,6 +1,6 @@
 # MOVI KIDS — Mapa do código e arquitetura
 
-**Atualizado:** 29/08/2026 (FE **v1.9.105** · GAS repo/ping **v1.5.211** · I147 Fase 2 offline · I146 P0 local-first · I141–I142 holerite · FASE 15+ One UI)  
+**Atualizado:** 08/09/2026 (FE **v1.9.114** · GAS ping **v1.5.220** · I155 lookback · I154 fila 404 · I147 offline · I146 local-first)  
 **Função:** anatomia do sistema — o que é cada parte, o que liga com o quê, o que é zona sensível.  
 **Complementa:** `ESTADO_ATUAL.md`, `ACESSOS_E_AUTORIZACOES.md`, `REGRAS_DE_PUBLICACAO_SEGURA.md`, `MAPA_ERROS_FALHAS_BUGS.md`, **`PROTOCOLO_DIAGNOSTICO_E_TESTES.md`**
 
@@ -136,8 +136,8 @@ flowchart TB
 
 | Canal | Função |
 |-------|--------|
-| **Poll** | `carregarInicio` — **fonte da verdade** no salvar/▶ (I125b) |
-| **listarAtivas** | I148 — fallback se `carregarInicio` atrasar (não traz encHoje) |
+| **Poll** | `carregarInicio` — lookback **600** (I155) · fonte da verdade no salvar/▶ (I125b) |
+| **listarAtivas** | I155 cauda + cache 8s · I148 fallback se `carregarInicio` atrasar (não traz encHoje) · I151 autoridade fantasma |
 | **Firebase** | Ainda **ouve** `sessoes`; GAS **não grava** no salvar/▶ (I125b). Escreve em encerrar/editar/estender/cancelar |
 | **BroadcastChannel** | Abas do mesmo tablet sincronizadas |
 

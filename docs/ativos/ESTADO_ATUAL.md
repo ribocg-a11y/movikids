@@ -45,9 +45,9 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 | **Frontend** | **v1.9.114** | https://ribocg-a11y.github.io/movikids/?force=1.9.114 |
 | **Gestão Pessoas** | **v1.9.114** | `gestao-pessoas.html?force=1.9.114` |
 | **Service Worker** | **1.9.114** | I154b retry + listarAtivas 45s |
-| **Apps Script** | repo **v1.5.220** · ping até Nova versão | **I155** lookback 600 + cache ativas |
-| **I155 lookback GAS** | 🟡 | Nova versão Web → ping **v1.5.220** · `lookback:600` |
-| **I154 GAS 404 / fila** | ✅ FE | **v1.9.113–114** · GAS audit **219** |
+| **Apps Script** | ping **v1.5.220** = repo | **I155** lookback 600 + cache ativas ✅ |
+| **I155 lookback GAS** | ✅ live | 0 HTML 404 · evidência `EVIDENCIA_ESTABILIDADE_POS_I155_*` |
+| **I154 GAS 404 / fila** | ✅ FE+GAS | **v1.9.113–114** · audit **219** |
 | **I153 histórico** | ✅ | anular Encerrada + trava &lt;90s |
 | **I151 encerrar fantasma** | ✅ FE | travas `guard.i151.*` · teste readonly |
 | **I145 sync idle** | ✅ | idle/visibility **sem** force=1 · warm ~1–2s |
@@ -62,7 +62,7 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 | **Homolog tablet** | ✅ 23/06 | smoke **v1.9.96** + I143 no balcão |
 | **Raykelly / Julia** | ✅ | ids 3 / 4 · Julia pausa I152 · Karen id5 Freelancer |
 | **Design System** | **v1.1** | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
-| **Ciclo dev** | Sprint D | One UI ✅ · I125–I153 |
+| **Ciclo dev** | Sprint D | One UI ✅ · I125–**I155** |
 | **I103 / I117** | ✅ | Encerradas=contas · Caixa pay-first |
 | **BANCO_HORAS** | ✅ I129 | ops 1–4 **0h00** |
 | **I129 ponto colab** | ✅ | FE v1.9.75+ · GAS Web **v1.5.211** |
@@ -72,7 +72,7 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 **Teste rápido GAS (ping):**  
 https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec?action=ping  
-→ ping Web **v1.5.211** · I147 idempotência offline · I143 anti-duplicata
+→ ping Web **v1.5.220** · I155 lookback · I154 fila 404 · I153 anular · I147 idempotência · I143 anti-duplicata
 
 **URL morta (não usar):** `AKfycbzc...` → 404
 

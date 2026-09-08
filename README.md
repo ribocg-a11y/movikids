@@ -22,16 +22,16 @@ Detalhe: [docs/ativos/ESTRUTURA_REPO.md](docs/ativos/ESTRUTURA_REPO.md) · mocku
 
 **Planejamento:** [PLANEJAMENTO_ATUAL_2026-06.md](docs/ativos/PLANEJAMENTO_ATUAL_2026-06.md) · [PLANO_PRIORIDADES](docs/ativos/PLANO_PRIORIDADES_2026-06.md)
 
-## Produção (01/09/2026 — FE v1.9.109 · GAS ping v1.5.213)
+## Produção (08/09/2026 — FE v1.9.114 · GAS ping v1.5.220)
 
 | Camada | Versão repo | Produção |
 |--------|-------------|----------|
-| Frontend | **v1.9.109** | https://ribocg-a11y.github.io/movikids/?force=1.9.109 |
-| Gestão Pessoas | **v1.9.109** | `gestao-pessoas.html?force=1.9.109` |
-| Apps Script | repo **v1.5.215** · ping **v1.5.213** | `cenariosFinanceiros` live · Nova versão Web ping ⏳ |
+| Frontend | **v1.9.114** | https://ribocg-a11y.github.io/movikids/?force=1.9.114 |
+| Gestão Pessoas | **v1.9.114** | `gestao-pessoas.html?force=1.9.114` |
+| Apps Script | **v1.5.220** | ping alinhado · I155 lookback · I154/I153 |
 | Design System | **v1.1** | [DESIGN_SYSTEM_MOVIKIDS.md](docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md) |
 | Holerites PDF | jul/2026 | [entregas/holerite-mes-2026-07](https://ribocg-a11y.github.io/movikids/entregas/holerite-mes-2026-07/) |
-| **Ciclo dev** | Sprint D | [PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md](docs/ativos/PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md) · One UI ✅ |
+| **Ciclo dev** | Sprint D | [PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md](docs/ativos/PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md) · I153–I155 ✅ |
 
 ## Novo chat / agente Cursor
 

@@ -16,7 +16,7 @@ Pacote atual: **`DEPLOY_ATUAL.md`** · histórico **`../arquivo/deploy/DEPLOY_v1
 
 **Publicar em produção (obrigatório — I26):**
 
-**Canônico (sócio):** Editor Apps Script → Implantar → **Editar** Web `AKfycbwakQ...` → **Nova versão** → ping `versao: v1.5.111`.
+**Canônico (sócio):** Editor Apps Script → Implantar → **Editar** Web `AKfycbwakQ...` → **Nova versão** → ping `versao: v1.5.220`.
 
 Alternativa com pedido explícito: `scripts/deploy-gas.ps1` (`clasp push` + `clasp deploy -i` + verify). Agente **não** republica Web sem §7.3.
 

@@ -2,7 +2,11 @@
 
 Scripts em `scripts/testes/`. Documentação: `docs/ativos/PROTOCOLO_DIAGNOSTICO_E_TESTES.md` · **Planilha por aba:** `docs/ativos/PROTOCOLO_AUDITORIA_ABAS_PLANILHA.md` · **"atualize tudo":** `PROTOCOLO_ATUALIZAR_TUDO.md`
 
-**Versões de referência (02/09/2026):** FE **v1.9.111** · GAS ping **v1.5.213** · mínimo operação balcão **v1.7.35** (I15 GET).
+**Versões de referência (08/09/2026):** FE **v1.9.114** · GAS ping **v1.5.220** · mínimo operação balcão **v1.7.35** (I15 GET).
+
+| **I155 estabilidade** | `node scripts/testes/teste-estabilidade-pos-i155.cjs` · doc `EVIDENCIA_ESTABILIDADE_POS_I155_*` |
+
+| **I154 gas-unstable** | guards `guard.i154.*` · FE `mk-api.js` / `mk-offline-queue.js` · doc `INCIDENTE_I154_*` |
 
 | **I151 encerrar fantasma** | **`TESTE_I151_ENCERRAR_FANTASMA_READONLY.ps1`** · doc `INCIDENTE_I151_DEFINITIVO_*` |
 
@@ -14,7 +18,7 @@ Scripts em `scripts/testes/`. Documentação: `docs/ativos/PROTOCOLO_DIAGNOSTICO
 
 | **I125 salvar/▶ perf** | `TESTE_I125_SALVAR_INICIAR_PERF.ps1` (após Nova versão GAS **v1.5.202+**) |
 | **I143 anti-duplicata** | salvar + 2º salvar mesmo veículo → 409; ▶ drift 0; limpar TESTE_ |
-| **I146 P0 local-first** | boot snapshot · IndexedDB · chip local/nuvem · `?force=1.9.102` |
+| **I146 P0 local-first** | boot snapshot · IndexedDB · chip local/nuvem · `?force=1.9.114` |
 
 | **Protocolo mestre (varredura completa)** | **`TESTE_PROTOCOLO_MESTRE.ps1`** ou **`.\protocolo-mestre.ps1`** na raiz do repo |
 
