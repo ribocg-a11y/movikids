@@ -2341,6 +2341,7 @@ function mkProjetado3mMes_(d) {
 }
 window.mkProjetado3mMes_ = mkProjetado3mMes_;
 
+/** I157d: gráfico = Base × Real × Ritmo (3 linhas). Ritmo = reta ritmoAtual×dia. */
 function renderReceitaMesChart_(d) {
   const cv = document.getElementById('chart-receita-mes');
   const ins = document.getElementById('nk-receita-mes-insight');
@@ -2380,30 +2381,28 @@ function renderReceitaMesChart_(d) {
 
   let accReal = 0;
   let accBase = 0;
+  let accRitmo = 0;
   const acumulado = [];
   const baseAcum = [];
+  const ritmoAcum = [];
   const realDia = [];
   const refDiasRitmo = (ritmo.diasRef && ritmo.diasRef.length)
     ? ritmo.diasRef.map(Number)
     : (c.ritmo3dDiasRef || []).map(Number);
+  // I157: ritmo no gráfico = ritmo ATUAL × dia (reta). Base = pro-rata. Real = soma.
   labels.forEach(function(dd) {
     const r = Math.round(fatMap[dd] || 0);
     accReal += r;
     accBase += baseDiaria;
+    accRitmo += ritmoDiaria;
     realDia.push(r);
     acumulado.push(Math.round(accReal));
     baseAcum.push(Math.round(accBase));
-  });
-
-  // I157c: ritmo NÃO é linha desde o dia 1.
-  // Regra = média dos últimos 3 dias c/ venda → marca só em “hoje”
-  // (= “se o mês até hoje tivesse andado nesse ritmo”).
-  const ritmoHoje = ritmoDiaria > 0 ? Math.round(ritmoDiaria * hojeD) : 0;
-  const ritmoSerie = labels.map(function(_dd, idx) {
-    return idx === labels.length - 1 && ritmoHoje > 0 ? ritmoHoje : null;
+    ritmoAcum.push(Math.round(accRitmo));
   });
 
   const baseHoje = baseAcum[baseAcum.length - 1] || 0;
+  const ritmoHoje = ritmoAcum[ritmoAcum.length - 1] || 0;
   const diffBaseHoje = fatMes - baseHoje;
   const pctBaseHoje = baseHoje > 0 ? Math.round(diffBaseHoje / baseHoje * 100) : 0;
   const diffProj = fatMes - projMes;
@@ -2415,18 +2414,13 @@ function renderReceitaMesChart_(d) {
   setText2('nk-receita-mes-label',
     'hoje: real ' + R2(fatMes)
     + ' · base ' + R2(baseHoje)
-    + (ritmoDiaria > 0
-      ? (' · ritmo ' + R2(ritmoDiaria) + '/dia (dias ' + refLbl + ') → ' + R2(ritmoMes) + ' no mês')
-      : ''));
+    + ' · ritmo ' + R2(ritmoHoje)
+    + (ritmoDiaria > 0 ? (' (' + R2(ritmoDiaria) + '/dia · dias ' + refLbl + ')') : '')
+    + '  ·  fim do mês: base ' + R2(baseMes)
+    + ' · ritmo → ' + R2(ritmoMes));
 
   const ptBg = acumulado.map(function(v, i) {
     return v >= (baseAcum[i] || 0) ? '#2E7D32' : '#E65100';
-  });
-  // Destaque visual nos dias que formam o ritmo
-  const ptRadius = acumulado.map(function(_v, i) {
-    const d = labels[i];
-    if (refDiasRitmo.indexOf(d) >= 0) return 7;
-    return labels.length > 20 ? 3 : 5;
   });
   const maxY = Math.max(
     baseHoje, ritmoHoje,
@@ -2440,8 +2434,8 @@ function renderReceitaMesChart_(d) {
       borderColor: '#1565C0',
       backgroundColor: 'rgba(21,101,192,.10)',
       borderWidth: 2.5,
-      pointRadius: ptRadius,
-      pointHoverRadius: 8,
+      pointRadius: labels.length > 20 ? 3 : 5,
+      pointHoverRadius: 7,
       pointBackgroundColor: ptBg,
       pointBorderColor: '#1565C0',
       pointBorderWidth: 2,
@@ -2463,19 +2457,16 @@ function renderReceitaMesChart_(d) {
       order: 0
     });
   }
-  if (ritmoDiaria > 0 && ritmoHoje > 0) {
+  if (ritmoDiaria > 0) {
     datasets.push({
-      label: 'Ritmo agora (últimos 3 dias)',
-      data: ritmoSerie,
+      label: 'Ritmo 3d (se todos os dias)',
+      data: ritmoAcum,
       borderColor: '#29B6F6',
-      backgroundColor: '#29B6F6',
-      borderWidth: 0,
-      pointRadius: 9,
-      pointHoverRadius: 11,
-      pointStyle: 'triangle',
-      pointBorderColor: '#0288D1',
-      pointBorderWidth: 2,
-      showLine: false,
+      borderWidth: 2,
+      borderDash: [3, 4],
+      pointRadius: 0,
+      tension: 0,
+      fill: false,
       order: 1
     });
   }
@@ -2493,6 +2484,7 @@ function renderReceitaMesChart_(d) {
       plugins: {
         legend: { display: false },
         tooltip: {
+          // I157b: um balão compacto (3 linhas), não 3 séries empilhadas
           filter: function(item) {
             return item.dataset && item.dataset.label === 'Real acumulado';
           },
@@ -2502,26 +2494,16 @@ function renderReceitaMesChart_(d) {
             },
             label: function(ctx) {
               const i = ctx.dataIndex;
-              const dia = labels[i];
               const real = acumulado[i] || 0;
-              const rD = realDia[i] || 0;
               const bA = baseAcum[i] || 0;
+              const rA = ritmoAcum[i] || 0;
               const dB = real - bA;
-              const lines = [
-                'Real ' + R2(real) + '  ·  dia ' + R2(rD),
-                'Base ' + R2(bA) + '  ·  ' + (dB >= 0 ? '+' : '') + R2(dB)
+              const dR = real - rA;
+              return [
+                'Real ' + R2(real),
+                'Base ' + R2(bA) + '  ·  Δ ' + (dB >= 0 ? '+' : '') + R2(dB),
+                'Ritmo ' + R2(rA) + '  ·  Δ ' + (dR >= 0 ? '+' : '') + R2(dR)
               ];
-              // Ritmo só no dia de hoje (regra = últimos 3 dias até agora)
-              if (i === labels.length - 1 && ritmoDiaria > 0) {
-                lines.push(
-                  'Ritmo ' + R2(ritmoDiaria) + '/dia (dias ' + refLbl + ')'
-                  + ' → marca ' + R2(ritmoHoje)
-                  + (diffRitmoHoje >= 0 ? ' · real no ritmo' : ' · real ' + R2(diffRitmoHoje))
-                );
-              } else if (refDiasRitmo.indexOf(dia) >= 0) {
-                lines.push('Dia do ritmo (ref. últimos 3 c/ venda)');
-              }
-              return lines;
             }
           }
         }
@@ -2558,17 +2540,16 @@ function renderReceitaMesChart_(d) {
       }
     }
     if (ritmoHoje > 0 && ritmoDiaria > 0) {
-      msgs.push('Ritmo = média dos últimos 3 dias com venda (' + refLbl + '): '
-        + R2(ritmoDiaria) + '/dia. O triângulo ciano em hoje mostra onde o acumulado estaria '
-        + 'se todo o mês até agora andasse nesse ritmo (' + R2(ritmoHoje) + ') — não é linha no passado.');
-      msgs.push('Mantendo isso → ~' + R2(ritmoMes) + ' no fechamento do mês.');
-      if (diffRitmoHoje < 0) {
-        msgs.push('Real ainda ' + Math.abs(pctRitmoHoje) + '% abaixo dessa marca porque os dias '
-          + 'anteriores aos da referência foram mais fracos.');
+      if (diffRitmoHoje >= 0) {
+        msgs.push('Ritmo 3d (' + refLbl + '): ' + R2(ritmoDiaria) + '/dia — real no ritmo ou acima.');
+      } else {
+        msgs.push('Ritmo 3d (' + refLbl + '): ' + R2(ritmoDiaria) + '/dia — real '
+          + Math.abs(pctRitmoHoje) + '% abaixo do termômetro (dias fracos no início puxam a média).');
       }
+      msgs.push('Mantendo → ~' + R2(ritmoMes) + ' no mês.');
     }
     if (baseMes > 0) {
-      msgs.push('Piso DRE do mês inteiro: ' + R2(baseMes)
+      msgs.push('Piso DRE do mês: ' + R2(baseMes)
         + ' (faltam ' + R2(Math.max(0, baseMes - fatMes)) + ').');
     }
     if (projMes > 0) {

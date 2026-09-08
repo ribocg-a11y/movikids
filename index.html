@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Movi Kids">
 <title>Movi Kids</title>
-<script src="mk-canonical-host.js?v=1.9.118"></script>
+<script src="mk-canonical-host.js?v=1.9.119"></script>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png">
@@ -17,17 +17,17 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<script src="mk-stale-sync.js?v=1.9.118"></script>
-<script src="mk-version.js?v=1.9.118"></script>
-<script src="mk-api.js?v=1.9.118"></script>
-<link rel="stylesheet" href="mk-design.css?v=1.9.118">
+<script src="mk-stale-sync.js?v=1.9.119"></script>
+<script src="mk-version.js?v=1.9.119"></script>
+<script src="mk-api.js?v=1.9.119"></script>
+<link rel="stylesheet" href="mk-design.css?v=1.9.119">
 
-<script src="mk-cache-bust.js?v=1.9.118"></script>
+<script src="mk-cache-bust.js?v=1.9.119"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<link rel="stylesheet" href="mk-app.css?v=1.9.118">
-<link rel="stylesheet" href="mk-gestao-pessoas.css?v=1.9.118">
+<link rel="stylesheet" href="mk-app.css?v=1.9.119">
+<link rel="stylesheet" href="mk-gestao-pessoas.css?v=1.9.119">
 <!-- Firebase SDK — Realtime sync canonico para todos os dispositivos -->
-<script type="module" src="mk-firebase.js?v=1.9.118"></script>
+<script type="module" src="mk-firebase.js?v=1.9.119"></script>
 </head>
 
 <body>
@@ -1738,21 +1738,20 @@
       <div class="db-insight" id="nk-meta-dia-insight" style="display:none;margin-top:8px"></div>
     </div>
 
-    <!-- I150/I157c: Base × Real; ritmo = marca só em “hoje” (últimos 3 dias c/ venda) -->
+    <!-- I150/I157d: Base × ritmo × real — três linhas no gráfico -->
     <div class="new-chart-card mk-meta-chart-card" style="margin-bottom:14px">
       <div class="new-chart-title">
-        Base DRE × real acumulado
+        Base DRE × ritmo (3 dias) × real acumulado
         <span class="nct-note" id="nk-receita-mes-label">—</span>
       </div>
       <p class="mk-meta-chart-hint" id="nk-receita-mes-hint" style="margin:0 0 8px;font-size:12px;line-height:1.35;color:var(--mk-muted,#666)">
-        <strong>Real</strong> = o que entrou · <strong>Base</strong> = piso do mês pro-rata até hoje ·
-        <strong>Ritmo</strong> (ponto ciano) = só o termômetro de <em>hoje</em>: média dos <strong>últimos 3 dias com venda</strong>
-        (não desenha desde o dia 1 — isso inventava passado).
+        <strong>Real</strong> = o que entrou · <strong>Base DRE</strong> = piso do mês ÷ dias (pro-rata) ·
+        <strong>Ritmo</strong> = se todo dia fosse igual aos últimos 3 dias com venda (termômetro, não meta).
       </p>
       <div class="mk-meta-chart-legend" id="nk-receita-mes-legend" aria-hidden="true">
         <span class="mk-meta-leg mk-meta-leg-real"><i></i> Real acumulado</span>
         <span class="mk-meta-leg mk-meta-leg-base"><i></i> Base DRE (pro-rata)</span>
-        <span class="mk-meta-leg mk-meta-leg-ritmo"><i></i> Ritmo agora (últimos 3 dias)</span>
+        <span class="mk-meta-leg mk-meta-leg-ritmo"><i></i> Ritmo 3d (se todos os dias)</span>
         <span class="mk-meta-leg mk-meta-leg-ok"><i></i> Real ≥ base</span>
         <span class="mk-meta-leg mk-meta-leg-fail"><i></i> Real &lt; base</span>
       </div>
@@ -2518,31 +2517,31 @@
   </div>
 </div>
 
-<script src="mk-globals.js?v=1.9.118"></script>
-<script src="mk-core.js?v=1.9.118"></script>
-<script src="mk-nav.js?v=1.9.118"></script>
-<script src="mk-admin.js?v=1.9.118"></script>
-<script src="mk-historico.js?v=1.9.118"></script>
-<script src="mk-custos-historico.js?v=1.9.118"></script>
-<script src="mk-sessao.js?v=1.9.118"></script>
-<script src="mk-home.js?v=1.9.118"></script>
-<script src="mk-meta-operador.js?v=1.9.118"></script>
-<script src="mk-custos.js?v=1.9.118"></script>
-<script src="mk-avulso.js?v=1.9.118"></script>
-<script src="mk-sync.js?v=1.9.118"></script>
-<script src="mk-idb-store.js?v=1.9.118"></script>
-<script src="mk-offline-queue.js?v=1.9.118"></script>
-<script src="mk-local-snapshot.js?v=1.9.118"></script>
-<script src="mk-nova.js?v=1.9.118"></script>
-<script src="mk-relacionamento.js?v=1.9.118"></script>
-<script src="mk-operacao.js?v=1.9.118"></script>
-<script src="mk-drawer.js?v=1.9.118"></script>
-<script src="mk-enc-extra.js?v=1.9.118"></script>
-<script src="mk-update.js?v=1.9.118"></script>
-<script src="mk-gestao-pessoas.js?v=1.9.118"></script>
-<script src="mk-holerite.js?v=1.9.118"></script>
-<script src="mk-gestao-pessoas-admin.js?v=1.9.118"></script>
-<script src="mk-auth.js?v=1.9.118"></script>
-<script src="mk-boot.js?v=1.9.118"></script>
+<script src="mk-globals.js?v=1.9.119"></script>
+<script src="mk-core.js?v=1.9.119"></script>
+<script src="mk-nav.js?v=1.9.119"></script>
+<script src="mk-admin.js?v=1.9.119"></script>
+<script src="mk-historico.js?v=1.9.119"></script>
+<script src="mk-custos-historico.js?v=1.9.119"></script>
+<script src="mk-sessao.js?v=1.9.119"></script>
+<script src="mk-home.js?v=1.9.119"></script>
+<script src="mk-meta-operador.js?v=1.9.119"></script>
+<script src="mk-custos.js?v=1.9.119"></script>
+<script src="mk-avulso.js?v=1.9.119"></script>
+<script src="mk-sync.js?v=1.9.119"></script>
+<script src="mk-idb-store.js?v=1.9.119"></script>
+<script src="mk-offline-queue.js?v=1.9.119"></script>
+<script src="mk-local-snapshot.js?v=1.9.119"></script>
+<script src="mk-nova.js?v=1.9.119"></script>
+<script src="mk-relacionamento.js?v=1.9.119"></script>
+<script src="mk-operacao.js?v=1.9.119"></script>
+<script src="mk-drawer.js?v=1.9.119"></script>
+<script src="mk-enc-extra.js?v=1.9.119"></script>
+<script src="mk-update.js?v=1.9.119"></script>
+<script src="mk-gestao-pessoas.js?v=1.9.119"></script>
+<script src="mk-holerite.js?v=1.9.119"></script>
+<script src="mk-gestao-pessoas-admin.js?v=1.9.119"></script>
+<script src="mk-auth.js?v=1.9.119"></script>
+<script src="mk-boot.js?v=1.9.119"></script>
 </body>
 </html>
