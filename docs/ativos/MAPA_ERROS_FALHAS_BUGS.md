@@ -1,7 +1,7 @@
 # MOVI KIDS — Mapa de erros, falhas e bugs
 
-**Atualizado:** 08/09/2026 — **I154** lançamento perdido GAS 404 · FE **v1.9.113** · GAS repo **v1.5.219**  
-**Uso anterior:** 08/09/2026 — **I153** duplicata Arthur / encerrar &lt;90s · FE **v1.9.112** · GAS repo **v1.5.218**  
+**Atualizado:** 08/09/2026 — **I155** lookback ativas/inicio (anti full-sheet 404) · GAS repo **v1.5.220** · FE **v1.9.114**  
+**Uso anterior:** 08/09/2026 — **I154** lançamento perdido GAS 404 · FE **v1.9.113–114** · GAS **v1.5.219**  
 **Uso anterior:** 02/09/2026 — **I151b** travas definitivas · FE **v1.9.111** Pages · GAS ping **v1.5.213** (repo **v1.5.215**)  
 **Uso anterior:** 02/09/2026 — **I151** encerrar fantasma · FE **v1.9.110**  
 **Uso anterior:** 29/08/2026 — **I147** / **I146** · FE **v1.9.105** · GAS Web **v1.5.211**  
@@ -203,6 +203,8 @@ Docs: `INCIDENTE_I148_*` · `INCIDENTE_I151_*` · `INCIDENTE_I151b_*` · **`INCI
 | **I126c** | **Faixa vermelha “Painel rápido” eterna + Escala OK** | Banner `_partial` em `gp-adm-err`; Escala já vinha do lite; promise resolvida bloqueava Folha full | FE **v1.9.72** remove banner lite · full só Folha/Avaliações · `gpAdmPanelInFlight_` | `mk-gestao-pessoas-admin.js` | sem faixa vermelha · Folha carrega ao abrir |
 | **I127** | **Holerite Q2: adiantamento 1ª = R$ 0** | Cód 410 zerado; DP exige desconto do adiantamento na 2ª (art. 462 CLT / Contábeis) | FE **v1.9.73** `mk-holerite.js` · GAS **v1.5.206** `adiantamentoQ1` | Q2: salário mês − adiantamento 40% − encargos | Raykelly: 410 ≈ R$ 648,40 |
 | **I128** | **Ficha: “Sem dias na competência” com ponto aberto** | Lite deixa `jornada.dias=[]`; full só rodava em Folha/Avaliações | FE **v1.9.74** Ficha pede full + loading jornada | `gpAdmEnsureFullPanel_('presenca')` | Raykelly Jul: 29 dias + 14:04 Aberto |
+| **I155** | **`listarAtivas`/`carregarInicio` 404 + 6–44s** | Leitura full LOCAÇÕES (~3k×28) a cada sync → carga + HTML 404 | GAS **v1.5.220** `locSheetTail_` lookback 600 + cache ativas 8s · CUSTOS lookback 200 | `INCIDENTE_I155_*` · `guard.i155.*` | ping 220 · lookback=600 · latency↓ |
+| **I154** | **2 locações Raykelly “não registraram”** | GAS HTML 404 em salvar; FE não enfileirava; auditoria sort DD/MM | GAS **v1.5.219** audit sort · FE **v1.9.113–114** `gas-unstable` + retry + timeout 45s | `INCIDENTE_I154_*` | fila em 404; sort top=hoje |
 | **I153** | **Histórico 2 vs 5 + Arthur 12:31 duplicata** | Home `n`=contas; `nSessoes`=Encerradas; `#3465` ▶+Encerrar 0min após Encerrada; sem anular Encerrada | GAS **v1.5.218** `anularLocacaoEncerradaAdmin` + 428 &lt;90s · FE **v1.9.112** confirm curto · `REPARAR_I153_ANULAR_3465` | `INCIDENTE_I153_*` | anular após Nova versão Web |
 | **I152** | **Karen freelance + Julia pausa** | Novo op sem PIN; 428 cadastro 100% bloqueava freelance; `gpSyncJuliaPadrao_` reativava RH | GAS **v1.5.216** modo Freelancer sem 428 · sync Julia respeita ops inativa · `configurarModoOperadorRhAdmin` | `INCIDENTE_I152_*` | Julia fora do login ✅ · Karen id5 Sem PIN |
 | **I151b** | **Fantasma volta após listarAtivas=0 (sem GAS novo)** | `carregarInicio` grava `mk_inicio_cache` velho; listarAtivas zera tela mas não invalidava cache → sync falho ressuscita card | FE **v1.9.111** invalidate + reconcile pós-inicio + orphans só otimistas · **`guard.i151.*`** · **`TESTE_I151_ENCERRAR_FANTASMA_READONLY`** | `INCIDENTE_I151b_*` · `mk-sync.js` · `mk-core.js` | **definitivo FE** — sem AppScript |
@@ -335,6 +337,8 @@ Docs: `INCIDENTE_I148_*` · `INCIDENTE_I151_*` · `INCIDENTE_I151b_*` · **`INCI
 | `guard.i153.anular` | `anularLocacaoEncerradaAdmin_` | I153 |
 | `guard.i153.encerrar.curto` | encerrar &lt;90s + `confirmarCurto` | I153 |
 | `guard.i153.fe.curto` | drawer confirm curto | I153 |
+| `guard.i154.*` | audit sort + FE gas-unstable/retry | I154 |
+| `guard.i155.*` | locSheetTail + lookback + cache ativas | I155 |
 | `teste.i151` | `TESTE_I151_ENCERRAR_FANTASMA_READONLY.ps1` | I151 |
 | `guard.auth.fantasma` | `mkAuthReconcileSessaoFantasma_` em mk-auth | I19 |
 | `guard.idle.wallclock` | `mkAuthIdleRemainingMs_` em mk-auth | I21 |

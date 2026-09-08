@@ -1,6 +1,6 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 08/09/2026 · FE **v1.9.112** · GAS repo **v1.5.218** (ping Web ainda **v1.5.216** até Nova versão) · **I153** · **I152** · **I151b**
+**Atualizado:** 08/09/2026 · FE **v1.9.114** Pages · GAS repo **v1.5.220** (ping Web até Nova versão) · **I155** · **I154** · **I153**
 
 ## Ops RH (04/09)
 
@@ -11,7 +11,7 @@
 **Ambiente do agente:** Cloud Agent OK para FE-only · pasta C / AppScript = sócio no PC.  
 **Função:** único ponto de entrada para qualquer assistente Cursor continuar o projeto sem perder contexto.
 
-**GitHub:** `ribocg-a11y/movikids` · branch `main` · FE Pages **v1.9.111**
+**GitHub:** `ribocg-a11y/movikids` · branch `main` · FE Pages **v1.9.114**
 
 ## Travas definitivas I151 (02/09)
 
@@ -72,6 +72,10 @@ node scripts\testes\teste-i150-cenarios-financeiros.cjs
 ---
 
 ## Entregas recentes (contexto)
+
+**I155 (08/09):** Causa raiz 404/`listarAtivas` lento — lookback 600 + cache 8s · GAS **v1.5.220**. Doc: `INCIDENTE_I155_LOOKBACK_ATIVAS_CARGA_GAS_2026-09-08.md` · **precisa Nova versão Web**
+
+**I154 (08/09):** Lançamento perdido em GAS HTML 404 → fila offline · FE **v1.9.113–114** · GAS **v1.5.219**. Doc: `INCIDENTE_I154_*`
 
 **I153 (08/09):** Histórico 2 contas ≠ 5 sessões · anular `#3465` Arthur 12:31 duplicata · trava encerrar &lt;90s · FE **v1.9.112** · GAS **v1.5.218**. Doc: `INCIDENTE_I153_HISTORICO_DUPLICATA_ARTHUR_2026-09-08.md`
 

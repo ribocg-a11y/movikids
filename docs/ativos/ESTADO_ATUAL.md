@@ -1,8 +1,8 @@
-# MOVI KIDS — Estado atual (08/09/2026 · FE v1.9.112 · I153)
+# MOVI KIDS — Estado atual (08/09/2026 · FE v1.9.114 · I155)
 
 Referência única para alinhamento local × produção.
 
-**Ciclo dev ativo:** **`PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`** — Sprint D · **I153** histórico/duplicata · **I150** cenários DRE ✅ · **I147** Fase 2 offline ✅ · **I146** ✅  
+**Ciclo dev ativo:** **`PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`** — Sprint D · **I155** lookback GAS · **I154** offline 404 · **I153** · **I150** ✅  
 **Diagnóstico 6 camadas:** **`DIAGNOSTICO_SISTEMA_6_CAMADAS_2026-06.md`**  
 **Prioridades gerais:** **`PLANEJAMENTO_ATUAL_2026-06.md`** §9
 
@@ -11,7 +11,9 @@ Referência única para alinhamento local × produção.
 **Acessos:** **`ACESSOS_E_AUTORIZACOES.md`** — papéis, PIN admin, agente vs humano  
 **Índice:** `../INDICE.md` · **Prioridades:** **`PLANO_PRIORIDADES_2026-06.md`**  
 **Planejamento ativo:** `PLANEJAMENTO_ATUAL_2026-06.md`  
-**Mapa de erros/bugs:** **`MAPA_ERROS_FALHAS_BUGS.md`** (…/**I151**/**I151b**/**I152**/**I153**)
+**Mapa de erros/bugs:** **`MAPA_ERROS_FALHAS_BUGS.md`** (…/**I151**/**I154**/**I155**)
+**Incidente I155:** **`INCIDENTE_I155_LOOKBACK_ATIVAS_CARGA_GAS_2026-09-08.md`**  
+**Incidente I154:** **`INCIDENTE_I154_LANCAMENTO_PERDIDO_GAS_404_2026-09-08.md`**  
 **Incidente I153:** **`INCIDENTE_I153_HISTORICO_DUPLICATA_ARTHUR_2026-09-08.md`**  
 **Incidente I151 definitivo:** **`INCIDENTE_I151_DEFINITIVO_ENCERRAR_FANTASMA_2026-09-02.md`**  
 **Incidente I145:** **`INCIDENTE_I145_SYNC_FORCE_IDLE_2026-08-13.md`**  
@@ -40,11 +42,13 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 | Camada | Versão | URL / evidência |
 |--------|--------|-----------------|
-| **Frontend** | **v1.9.112** | https://ribocg-a11y.github.io/movikids/?force=1.9.112 |
-| **Gestão Pessoas** | **v1.9.112** | `gestao-pessoas.html?force=1.9.112` |
-| **Service Worker** | **1.9.112** | I153 confirm encerrar curto |
-| **Apps Script** | repo **v1.5.218** · ping **v1.5.216** | Nova versão Web ⏳ → anular #3465 |
-| **I153 histórico** | 🟡 | `#3465` duplicata Arthur — após Web 218 `REPARAR_I153_*` |
+| **Frontend** | **v1.9.114** | https://ribocg-a11y.github.io/movikids/?force=1.9.114 |
+| **Gestão Pessoas** | **v1.9.114** | `gestao-pessoas.html?force=1.9.114` |
+| **Service Worker** | **1.9.114** | I154b retry + listarAtivas 45s |
+| **Apps Script** | repo **v1.5.220** · ping até Nova versão | **I155** lookback 600 + cache ativas |
+| **I155 lookback GAS** | 🟡 | Nova versão Web → ping **v1.5.220** · `lookback:600` |
+| **I154 GAS 404 / fila** | ✅ FE | **v1.9.113–114** · GAS audit **219** |
+| **I153 histórico** | ✅ | anular Encerrada + trava &lt;90s |
 | **I151 encerrar fantasma** | ✅ FE | travas `guard.i151.*` · teste readonly |
 | **I145 sync idle** | ✅ | idle/visibility **sem** force=1 · warm ~1–2s |
 | **I143 salvar/▶** | ✅ | mediana ~3.9s / ~3.1s · dup 409 · limpeza OK |

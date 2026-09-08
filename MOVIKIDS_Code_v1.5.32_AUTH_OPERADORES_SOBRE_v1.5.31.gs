@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.219
+// MOVI KIDS — Google Apps Script v1.5.220
+// v1.5.220: I155 — listarAtivas/carregarInicio leem CAUDA (lookback) + cache curto ativas (anti-404)
 // v1.5.219: I154 — listarAuditoria: cauda real + sort por data/hora (não string DD/MM)
 // v1.5.218: I153 — anular Encerrada duplicata (admin) · encerrar <90s exige confirmarCurto
 // v1.5.217: I152b — Freelancer: salário/VA/meta/bônus 0 não viram default; cache painel force; list colab v3
@@ -211,8 +212,8 @@
 
 // ── CONSTANTES ───────────────────────────────────────────────
 /** Versão exposta em ping, carregarInicio, validarSchema, gestaoPessoasStatus (bump com header). */
-const MK_GAS_VERSAO_  = 'v1.5.219';
-const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.219';
+const MK_GAS_VERSAO_  = 'v1.5.220';
+const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.220';
 const SHEET_ID   = '1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618';
 const DEPLOY_ID  = 'AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y';
 const WEBAPP_URL = `https://script.google.com/macros/s/${DEPLOY_ID}/exec`;
@@ -617,7 +618,7 @@ function dispatchMoviAction_(p, method) {
       case 'salvarLocacoesMulti': return salvarLocacoesMulti_(p);
       case 'editarLocacao':       return editarLocacao_(p);
       case 'cancelarLocacao':     return cancelarLocacao_(p);
-      case 'listarAtivas':        return listarAtivas_();
+      case 'listarAtivas':        return listarAtivas_(p);
       case 'encerrarLocacao':     return encerrarLocacao_(p);
       case 'listarHistorico':     return listarHistorico_(p);
       case 'resumoDia':           return resumoDia_(p);
@@ -823,6 +824,15 @@ const LOC_HEADERS_ = [
 /** Col S (19) — id da locação-mestre (I42). Leitura timer: COL_LOC_READ_ (28). */
 const COL_CONTA_ID_ = 19;
 const COL_LOC_READ_ = 28;
+/**
+ * I155 — cauda operacional LOCAÇÕES (~600 linhas ≈ vários dias).
+ * Ativa/Pendente e encerradas do dia ficam no fim; evita ler 3k+×28 a cada sync (causa 404/timeout).
+ * forceFull=1 volta ao scan completo (diagnóstico).
+ */
+const COL_LOC_LOOKBACK_ = 600;
+const COL_CUS_LOOKBACK_ = 200;
+const CACHE_LISTAR_ATIVAS_KEY_ = 'listar_ativas_v2';
+const CACHE_LISTAR_ATIVAS_TTL_ = 8;
 
 /** CUSTOS — memorial 1-3, reservado 4-8, header 9, dados 11 (I55). */
 const CUS_HEADER_ROW_ = 9;
@@ -3762,55 +3772,81 @@ function salvarLocacoesMulti_(p) {
 }
 
 // ── LISTAR ATIVAS ────────────────────────────────────────────
-function listarAtivas_() {
+/** I155 — lê só a cauda de LOCAÇÕES (lookback), não a planilha inteira. */
+function locSheetTail_(sheet, lookback, forceFull) {
+  const last = sheet.getLastRow();
+  if (last < DATA_ROW) return { last: last, start: DATA_ROW, nRows: 0, dados: [] };
+  let start = DATA_ROW;
+  if (!forceFull) {
+    const lb = lookback != null ? lookback : COL_LOC_LOOKBACK_;
+    start = Math.max(DATA_ROW, last - lb + 1);
+  }
+  const nRows = last - start + 1;
+  const dados = sheet.getRange(start, 1, nRows, COL_LOC_READ_).getValues();
+  return { last: last, start: start, nRows: nRows, dados: dados };
+}
+
+function listarAtivas_(p) {
+  p = p || {};
+  const forceBust = String(p.force || '') === '1'
+    || String(p.nocache || '').toLowerCase() === '1'
+    || String(p.nocache || '').toLowerCase() === 'true';
+  const forceFull = String(p.forceFull || '') === '1' || p.forceFull === true;
+  if (!forceBust && !forceFull) {
+    try {
+      const hit = CacheService.getScriptCache().get(CACHE_LISTAR_ATIVAS_KEY_);
+      if (hit) return ContentService.createTextOutput(hit).setMimeType(ContentService.MimeType.JSON);
+    } catch (e) { /* ok */ }
+  }
+
   const sheet = sh_(SH_LOC);
-  const last  = sheet.getLastRow();
-  if (last < DATA_ROW) return resp_({ locacoes: [] });
+  const tail = locSheetTail_(sheet, COL_LOC_LOOKBACK_, forceFull);
+  if (tail.nRows < 1) return resp_({ locacoes: [], total: 0, lookback: COL_LOC_LOOKBACK_, versao: MK_GAS_VERSAO_ });
 
-  const dados = sheet.getRange(DATA_ROW, 1, last - DATA_ROW + 1, COL_LOC_READ_).getValues();
   const ativas = [];
-
-  dados.forEach((r, idx) => {
-    const status = String(r[14]).trim();
-    if (status === 'Ativa' || status === 'Pendente') {
-      const tipo    = String(r[4]);
-      const plano   = String(r[5]);
-      const cfg     = planoCfgOp_(tipo, plano) || {};
-      const ts      = status === 'Ativa' ? timestampCanonico_(r[1], r[2], r[24]) : 0;
-      const veiculo   = String(r[15] || '');
-      const pagamento = String(r[16] || '');
-      ativas.push({
-        rowIndex:        DATA_ROW + idx,
-        id:              r[0],
-        data:            cellToStr_(r[1]),
-        horaInicio:      cellToStr_(r[2]),
-        startTimestamp:  ts,
-        started:         status === 'Ativa' && ts > 0,
-        tipo,
-        plano,
-        veiculo,
-        mins:            Number(r[6]),
-        valorPlano:      Number(r[7]),
-        adicionalPorMin: cfg.adicional || 0,
-        responsavel:     String(r[11]),
-        crianca:         String(r[12]),
-        telefone:        String(r[13]),
-        status,
-        contaId:         contaIdLocRow_(r),
-        extendedMins:    Number(r[25] || 0),
-        extendedValor:   Number(r[26] || 0)
-      });
-    }
+  tail.dados.forEach(function (r, idx) {
+    const status = String(r[14] || '').trim();
+    if (status !== 'Ativa' && status !== 'Pendente') return;
+    const tipo    = String(r[4]);
+    const plano   = String(r[5]);
+    const cfg     = planoCfgOp_(tipo, plano) || {};
+    const ts      = status === 'Ativa' ? timestampCanonico_(r[1], r[2], r[24]) : 0;
+    const veiculo   = String(r[15] || '');
+    const pagamento = String(r[16] || '');
+    ativas.push({
+      rowIndex:        tail.start + idx,
+      id:              r[0],
+      data:            cellToStr_(r[1]),
+      horaInicio:      cellToStr_(r[2]),
+      startTimestamp:  ts,
+      started:         status === 'Ativa' && ts > 0,
+      tipo:            tipo,
+      plano:           plano,
+      veiculo:         veiculo,
+      mins:            Number(r[6]),
+      valorPlano:      Number(r[7]),
+      adicionalPorMin: cfg.adicional || 0,
+      responsavel:     String(r[11]),
+      crianca:         String(r[12]),
+      telefone:        String(r[13]),
+      status:          status,
+      contaId:         contaIdLocRow_(r),
+      extendedMins:    Number(r[25] || 0),
+      extendedValor:   Number(r[26] || 0)
+    });
   });
 
-  // v1.5.31: injetar smsStatus da AUD_SMS para rehidratacao cross-device
+  // v1.5.31 / I155: AUD_SMS só cauda (não a aba inteira)
   if (ativas.length > 0) {
     try {
       const shSms = ss_().getSheetByName(SH_AUD_SMS);
       if (shSms && shSms.getLastRow() >= 2) {
-        const smsRows = shSms.getRange(2, 1, shSms.getLastRow() - 1, 13).getValues();
+        const lastSms = shSms.getLastRow();
+        const startSms = Math.max(2, lastSms - 400 + 1);
+        const nSms = lastSms - startSms + 1;
+        const smsRows = shSms.getRange(startSms, 1, nSms, 13).getValues();
         const smsMap = {};
-        smsRows.forEach(r => {
+        smsRows.forEach(function (r) {
           const tipo = String(r[2] || '').trim();
           const statusCol = String(r[3] || '').trim();
           const ri = String(r[4] || '').trim();
@@ -3819,10 +3855,10 @@ function listarAtivas_() {
           const entrega = statusCol === 'enviado' ? 'Sent' : statusCol;
           const rowNum = Number(r[0] || 0);
           if (!smsMap[ri] || rowNum >= smsMap[ri].rowNum) {
-            smsMap[ri] = { gatewayId, state: entrega, dataHora: r[1], tipo, rowNum };
+            smsMap[ri] = { gatewayId: gatewayId, state: entrega, dataHora: r[1], tipo: tipo, rowNum: rowNum };
           }
         });
-        ativas.forEach(a => {
+        ativas.forEach(function (a) {
           const entry = smsMap[String(a.rowIndex)];
           if (entry) {
             a.smsStatus = { gatewayId: entry.gatewayId, state: entry.state, tipo: entry.tipo, sentAt: null, updatedAt: Date.now() };
@@ -3830,12 +3866,26 @@ function listarAtivas_() {
           a.smsFlags = smsFlagsPorRowIndex_(a.rowIndex);
         });
       }
-    } catch(eSms) {
+    } catch (eSms) {
       Logger.log('listarAtivas smsStatus: ' + eSms.message);
     }
   }
 
-  return resp_({ locacoes: ativas, total: ativas.length });
+  const payload = {
+    ok: true,
+    locacoes: ativas,
+    total: ativas.length,
+    lookback: forceFull ? 0 : COL_LOC_LOOKBACK_,
+    forceFull: !!forceFull,
+    versao: MK_GAS_VERSAO_
+  };
+  const out = JSON.stringify(payload);
+  try {
+    if (!forceFull && out.length < 90000) {
+      CacheService.getScriptCache().put(CACHE_LISTAR_ATIVAS_KEY_, out, CACHE_LISTAR_ATIVAS_TTL_);
+    }
+  } catch (eC) { /* ok */ }
+  return ContentService.createTextOutput(out).setMimeType(ContentService.MimeType.JSON);
 }
 
 function operadorAudit_(p) {
@@ -4707,7 +4757,8 @@ function invalidateInicioResumoCache_(dataFmt, opts) {
       'inicio_v4_g_m0',
       'inicio_v4_o_m0',
       'inicio_v3_g_m0',
-      'inicio_v3_o_m0'
+      'inicio_v3_o_m0',
+      CACHE_LISTAR_ATIVAS_KEY_
     ];
     // operadores 1–8 (metaTurno) — chaves pequenas
     for (let m = 1; m <= 8; m++) {
@@ -8044,21 +8095,25 @@ function carregarInicio_(p) {
   const dataHoje = fmtData_(hoje);
   const shLoc    = sh_(SH_LOC);
   const shCus    = sh_(SH_CUS);
-  const lastLoc  = shLoc.getLastRow();
+  // I155: lookback (não planilha inteira) — forceFull=1 só para admin/diagnóstico.
+  const forceFullInicio = String((p && p.forceFull) || '') === '1'
+    || String((p && p.forceFull) || '').toLowerCase() === 'true';
+  const locPack  = locSheetTail_(shLoc, COL_LOC_LOOKBACK_, forceFullInicio);
+  const lastLoc  = locPack.last;
 
   const ativas = [];
   const encHoje = [];
   const encHojeContas = {};
   let fatHoje = 0, nHoje = 0;
 
-  if (lastLoc >= DATA_ROW) {
-    const dados = shLoc.getRange(DATA_ROW, 1, lastLoc - DATA_ROW + 1, COL_LOC_READ_).getValues();
-    dados.forEach((r, idx) => {
+  if (locPack.dados && locPack.dados.length) {
+    locPack.dados.forEach((r, idx) => {
       if (!r[0]) return;
       const status  = String(r[14]).trim();
       const dataR   = cellToStr_(r[1]);
       const veiculo   = String(r[15] || '');
       const pagamento = String(r[16] || '');
+      const sheetRow  = locPack.start + idx;
 
       if (status === 'Ativa' || status === 'Pendente') {
         const tipo  = String(r[4]);
@@ -8068,7 +8123,7 @@ function carregarInicio_(p) {
         const extMins    = Number(r[25] || 0);
         const ts         = status === 'Ativa' ? timestampCanonico_(r[1], r[2], r[24]) : 0;
         const ativaObj = {
-          rowIndex:        DATA_ROW + idx,
+          rowIndex:        sheetRow,
           id:              r[0],
           data:            dataR,
           horaInicio:      cellToStr_(r[2]),
@@ -8118,9 +8173,15 @@ function carregarInicio_(p) {
   }
 
   const custosHoje = [];
+  // I55/I155: CUSTOS dados a partir de CUS_DATA_ROW_; lookback evita scan completo.
   const lastCus = shCus.getLastRow();
-  if (lastCus >= DATA_ROW) {
-    const dadosCus = shCus.getRange(DATA_ROW, 1, lastCus - DATA_ROW + 1, 6).getValues();
+  if (lastCus >= CUS_DATA_ROW_) {
+    let startCus = CUS_DATA_ROW_;
+    if (!forceFullInicio) {
+      startCus = Math.max(CUS_DATA_ROW_, lastCus - COL_CUS_LOOKBACK_ + 1);
+    }
+    const nCus = lastCus - startCus + 1;
+    const dadosCus = shCus.getRange(startCus, 1, nCus, COL_CUS_READ_).getValues();
     dadosCus.forEach(r => {
       if (!r[0]) return;
       if (cellToStr_(r[1]) !== dataHoje) return;
@@ -8153,7 +8214,11 @@ function carregarInicio_(p) {
     custosHoje: custosPayload,
     encHoje,
     metaTurno:  metaTurno,
-    operacaoConfig: payloadOperacaoConfigFe_(opCfg)
+    operacaoConfig: payloadOperacaoConfigFe_(opCfg),
+    // I155 — diagnóstico: quantas linhas da planilha foram lidas
+    lookback:   forceFullInicio ? 0 : COL_LOC_LOOKBACK_,
+    forceFull:  !!forceFullInicio,
+    locLastRow: lastLoc
   };
   const out = JSON.stringify({ ok: true, ...payload });
   try {

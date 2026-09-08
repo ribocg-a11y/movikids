@@ -715,6 +715,36 @@ try {
     }
   }
 
+  # I155 — lookback listarAtivas/carregarInicio (anti full-sheet 404)
+  if ($gasRaw -notmatch 'function locSheetTail_') {
+    Add-Check "guard.i155.locSheetTail" "fail" "locSheetTail_ ausente (I155)"
+  } else {
+    Add-Check "guard.i155.locSheetTail" "ok" "locSheetTail_ cauda LOCAÇÕES"
+  }
+  if ($gasRaw -notmatch 'COL_LOC_LOOKBACK_\s*=\s*600') {
+    Add-Check "guard.i155.lookback" "fail" "COL_LOC_LOOKBACK_=600 ausente (I155)"
+  } else {
+    Add-Check "guard.i155.lookback" "ok" "lookback 600 LOCAÇÕES"
+  }
+  if ($gasRaw -notmatch "CACHE_LISTAR_ATIVAS_KEY_\s*=\s*'listar_ativas_v2'") {
+    Add-Check "guard.i155.cache.ativas" "fail" "cache listarAtivas ausente (I155)"
+  } else {
+    Add-Check "guard.i155.cache.ativas" "ok" "cache curto listarAtivas"
+  }
+  if ($gasRaw -notmatch 'invalidateInicioResumoCache_' -or $gasRaw -notmatch 'CACHE_LISTAR_ATIVAS_KEY_') {
+    Add-Check "guard.i155.invalidate" "fail" "invalidate sem listarAtivas cache (I155)"
+  } else {
+    Add-Check "guard.i155.invalidate" "ok" "escritas invalidam listarAtivas"
+  }
+  if ($gasRaw -match 'function carregarInicio_' ) {
+    $ciSlice = if ($gasRaw -match '(?s)function carregarInicio_\(p\) \{.{0,4500}') { $Matches[0] } else { '' }
+    if ($ciSlice -notmatch 'locSheetTail_') {
+      Add-Check "guard.i155.inicio.tail" "fail" "carregarInicio sem locSheetTail_ (I155)"
+    } else {
+      Add-Check "guard.i155.inicio.tail" "ok" "carregarInicio usa cauda"
+    }
+  }
+
   $authPath = Join-Path $root "mk-auth.js"
   if (Test-Path $authPath) {
     $authRaw = Get-Content -Path $authPath -Raw -Encoding UTF8
