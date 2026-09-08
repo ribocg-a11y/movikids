@@ -1,0 +1,1114 @@
+{
+  "suite": "ESTABILIDADE_POS_I155",
+  "startedAt": "2026-09-08T22:16:18.555Z",
+  "checks": [
+    {
+      "name": "fe.pages.version",
+      "status": "ok",
+      "detail": "1.9.114"
+    },
+    {
+      "name": "fe.pages.sw",
+      "status": "ok",
+      "detail": "1.9.114"
+    },
+    {
+      "name": "battery.ping",
+      "status": "ok",
+      "detail": "ok=12/12 html404=0 p50=1908ms max=3031ms",
+      "action": "ping",
+      "n": 12,
+      "ok": 12,
+      "html404": 0,
+      "timeouts": 0,
+      "otherFail": 0,
+      "okRate": "100.0%",
+      "html404Rate": "0.0%",
+      "latencyOkMs": {
+        "n": 12,
+        "min": 1304,
+        "p50": 1908,
+        "p90": 2219,
+        "max": 3031,
+        "avg": 1988
+      },
+      "latencyAllMs": {
+        "n": 12,
+        "min": 1304,
+        "p50": 1908,
+        "p90": 2219,
+        "max": 3031,
+        "avg": 1988
+      },
+      "kinds": [
+        "json_ok:1632ms",
+        "json_ok:2219ms",
+        "json_ok:1833ms",
+        "json_ok:1987ms",
+        "json_ok:1908ms",
+        "json_ok:3031ms",
+        "json_ok:1304ms",
+        "json_ok:1875ms",
+        "json_ok:1676ms",
+        "json_ok:2126ms",
+        "json_ok:2320ms",
+        "json_ok:1946ms"
+      ],
+      "lastOk": {
+        "ok": true,
+        "status": "online",
+        "versao": "v1.5.220",
+        "timestamp": "08/09/2026 19:16",
+        "sistema": "MOVI KIDS v1.5.220",
+        "postWriteActions": [
+          "salvarLocacao",
+          "salvarLocacoesMulti",
+          "editarLocacao",
+          "cancelarLocacao",
+          "encerrarLocacao",
+          "estenderLocacao"
+        ]
+      }
+    },
+    {
+      "name": "gas.ping.versao",
+      "status": "ok",
+      "detail": "v1.5.220"
+    },
+    {
+      "name": "battery.listarAtivas",
+      "status": "ok",
+      "detail": "ok=10/10 html404=0 lookback=600 p50=1557ms max=14738ms",
+      "action": "listarAtivas",
+      "n": 10,
+      "ok": 10,
+      "html404": 0,
+      "timeouts": 0,
+      "otherFail": 0,
+      "okRate": "100.0%",
+      "html404Rate": "0.0%",
+      "latencyOkMs": {
+        "n": 10,
+        "min": 1395,
+        "p50": 1557,
+        "p90": 8828,
+        "max": 14738,
+        "avg": 3948
+      },
+      "latencyAllMs": {
+        "n": 10,
+        "min": 1395,
+        "p50": 1557,
+        "p90": 8828,
+        "max": 14738,
+        "avg": 3948
+      },
+      "kinds": [
+        "json_ok:14738ms",
+        "json_ok:1395ms",
+        "json_ok:1493ms",
+        "json_ok:1803ms",
+        "json_ok:1483ms",
+        "json_ok:1636ms",
+        "json_ok:5006ms",
+        "json_ok:1538ms",
+        "json_ok:1557ms",
+        "json_ok:8828ms"
+      ],
+      "lastOk": {
+        "ok": true,
+        "locacoes": [
+          {
+            "rowIndex": 3400,
+            "id": 3492,
+            "data": "08/09/2026",
+            "horaInicio": "18:51",
+            "startTimestamp": 1788904298715,
+            "started": true,
+            "tipo": "Pelúcia",
+            "plano": "30min",
+            "veiculo": "Pelúcia 02",
+            "mins": 30,
+            "valorPlano": 35,
+            "adicionalPorMin": 1.2,
+            "responsavel": "Sueli",
+            "crianca": "Theo",
+            "telefone": "989881020114",
+            "status": "Ativa",
+            "contaId": 3492,
+            "extendedMins": 0,
+            "extendedValor": 0,
+            "smsFlags": {
+              "portal": false,
+              "alerta": false,
+              "esgotado": false,
+              "agradecimento": false,
+              "extensao": false
+            }
+          },
+          {
+            "rowIndex": 3406,
+            "id": 3498,
+            "data": "08/09/2026",
+            "horaInicio": "19:13",
+            "startTimestamp": 1788905621596,
+            "started": true,
+            "tipo": "Carro",
+            "plano": "10min",
+            "veiculo": "Carro 02",
+            "mins": 10,
+            "valorPlano": 12,
+            "adicionalPorMin": 1,
+            "responsavel": "Patrick",
+            "crianca": "Miguel",
+            "telefone": "98999755537",
+            "status": "Ativa",
+            "contaId": 3494,
+            "extendedMins": 0,
+            "extendedValor": 0,
+            "smsFlags": {
+              "portal": false,
+              "alerta": false,
+              "esgotado": false,
+              "agradecimento": false,
+              "extensao": false
+            }
+          },
+          {
+            "rowIndex": 3407,
+            "id": 3499,
+            "data": "08/09/2026",
+            "horaInicio": "19:15",
+            "startTimestamp": 1788905711568,
+            "started": true,
+            "tipo": "Carro",
+            "plano": "20min",
+            "veiculo": "Carro 01",
+            "mins": 20,
+            "valorPlano": 22,
+            "adicionalPorMin": 1,
+            "responsavel": "Cae",
+            "crianca": "Otto",
+            "telefone": "9898863970214",
+            "status": "Ativa",
+            "contaId": 3499,
+            "extendedMins": 0,
+            "extendedValor": 0,
+            "smsFlags": {
+              "portal": false,
+              "alerta": false,
+              "esgotado": false,
+              "agradecimento": false,
+              "extensao": false
+            }
+          },
+          {
+            "rowIndex": 3408,
+            "id": 3500,
+            "data": "08/09/2026",
+            "horaInicio": "",
+            "startTimestamp": 0,
+            "started": false,
+            "tipo": "Pelúcia",
+            "plano": "30min",
+            "veiculo": "Pelúcia 01",
+            "mins": 30,
+            "valorPlano": 35,
+            "adicionalPorMin": 1.2,
+            "responsavel": "Nayane",
+            "crianca": "Isis",
+            "telefone": "9887234726",
+            "status": "Pendente",
+            "contaId": 3500,
+            "extendedMins": 0,
+            "extendedValor": 0,
+            "smsFlags": {
+              "portal": false,
+              "alerta": false,
+              "esgotado": false,
+              "agradecimento": false,
+              "extensao": false
+            }
+          }
+        ],
+        "total": 4,
+        "lookback": 600,
+        "forceFull": false,
+        "versao": "v1.5.220"
+      }
+    },
+    {
+      "name": "i155.lookback.ativas",
+      "status": "ok",
+      "detail": "lookback=600"
+    },
+    {
+      "name": "i155.cache.probe",
+      "status": "ok",
+      "detail": "ms=[16671,1061,2032] (2º/3º esperados <8s se cache 8s)"
+    },
+    {
+      "name": "battery.carregarInicio",
+      "status": "ok",
+      "detail": "ok=5/5 html404=0 lookback=600 p50=6030ms max=15016ms",
+      "action": "carregarInicio",
+      "n": 5,
+      "ok": 5,
+      "html404": 0,
+      "timeouts": 0,
+      "otherFail": 0,
+      "okRate": "100.0%",
+      "html404Rate": "0.0%",
+      "latencyOkMs": {
+        "n": 5,
+        "min": 3296,
+        "p50": 6030,
+        "p90": 12033,
+        "max": 15016,
+        "avg": 8052
+      },
+      "latencyAllMs": {
+        "n": 5,
+        "min": 3296,
+        "p50": 6030,
+        "p90": 12033,
+        "max": 15016,
+        "avg": 8052
+      },
+      "kinds": [
+        "json_ok:15016ms",
+        "json_ok:3884ms",
+        "json_ok:3296ms",
+        "json_ok:12033ms",
+        "json_ok:6030ms"
+      ],
+      "lastOk": {
+        "ok": true,
+        "sistema": "MOVI KIDS v1.5.220",
+        "timestamp": "08/09/2026 19:18",
+        "ativos": [
+          {
+            "rowIndex": 3400,
+            "id": 3492,
+            "data": "08/09/2026",
+            "horaInicio": "18:51",
+            "startTimestamp": 1788904298715,
+            "started": true,
+            "tipo": "Pelúcia",
+            "plano": "30min",
+            "veiculo": "Pelúcia 02",
+            "pagamento": "Crédito",
+            "mins": 30,
+            "originalMins": 30,
+            "extendedMins": 0,
+            "responsavel": "Sueli",
+            "crianca": "Theo",
+            "telefone": "989881020114",
+            "status": "Ativa"
+          },
+          {
+            "rowIndex": 3406,
+            "id": 3498,
+            "data": "08/09/2026",
+            "horaInicio": "19:13",
+            "startTimestamp": 1788905621596,
+            "started": true,
+            "tipo": "Carro",
+            "plano": "10min",
+            "veiculo": "Carro 02",
+            "pagamento": "Débito",
+            "mins": 10,
+            "originalMins": 10,
+            "extendedMins": 0,
+            "responsavel": "Patrick",
+            "crianca": "Miguel",
+            "telefone": "98999755537",
+            "status": "Ativa"
+          },
+          {
+            "rowIndex": 3407,
+            "id": 3499,
+            "data": "08/09/2026",
+            "horaInicio": "19:15",
+            "startTimestamp": 1788905711568,
+            "started": true,
+            "tipo": "Carro",
+            "plano": "20min",
+            "veiculo": "Carro 01",
+            "pagamento": "Crédito",
+            "mins": 20,
+            "originalMins": 20,
+            "extendedMins": 0,
+            "responsavel": "Cae",
+            "crianca": "Otto",
+            "telefone": "9898863970214",
+            "status": "Ativa"
+          },
+          {
+            "rowIndex": 3408,
+            "id": 3500,
+            "data": "08/09/2026",
+            "horaInicio": "19:17",
+            "startTimestamp": 1788905856572,
+            "started": true,
+            "tipo": "Pelúcia",
+            "plano": "30min",
+            "veiculo": "Pelúcia 01",
+            "pagamento": "Débito",
+            "mins": 30,
+            "originalMins": 30,
+            "extendedMins": 0,
+            "responsavel": "Nayane",
+            "crianca": "Isis",
+            "telefone": "9887234726",
+            "status": "Ativa"
+          },
+          {
+            "rowIndex": 3409,
+            "id": 3501,
+            "data": "08/09/2026",
+            "horaInicio": "",
+            "startTimestamp": 0,
+            "started": false,
+            "tipo": "Pelúcia",
+            "plano": "10min",
+            "veiculo": "Pelúcia 03",
+            "pagamento": "Débito",
+            "mins": 10,
+            "originalMins": 10,
+            "extendedMins": 0,
+            "responsavel": "Juliana",
+            "crianca": "Miguel",
+            "telefone": "98988633079",
+            "status": "Pendente"
+          }
+        ],
+        "statsHoje": {
+          "n": 25,
+          "nSessoes": 32
+        },
+        "custosHoje": [],
+        "encHoje": [
+          {
+            "id": 3461,
+            "contaId": 3461,
+            "horaInicio": "10:06",
+            "horaFim": "10:25",
+            "tipo": "Pelúcia",
+            "plano": "20min",
+            "veiculo": "Pelúcia 01",
+            "pagamento": "Débito",
+            "crianca": "Maria Campelo",
+            "responsavel": "Victor",
+            "telefone": "98992295997"
+          },
+          {
+            "id": 3462,
+            "contaId": 3462,
+            "horaInicio": "11:59",
+            "horaFim": "12:06",
+            "tipo": "Pelúcia",
+            "plano": "20min",
+            "veiculo": "Pelúcia 01",
+            "pagamento": "Crédito",
+            "crianca": "Gabriel E Isa",
+            "responsavel": "Julia",
+            "telefone": "98983396917"
+          },
+          {
+            "id": 3463,
+            "contaId": 3462,
+            "horaInicio": "12:01",
+            "horaFim": "12:20",
+            "tipo": "Pelúcia",
+            "plano": "20min",
+            "veiculo": "Pelúcia 02",
+            "pagamento": "Crédito",
+            "crianca": "Gabriel E Isa",
+            "responsavel": "Julia",
+            "telefone": "98983396917"
+          },
+          {
+            "id": 3464,
+            "contaId": 3462,
+            "horaInicio": "12:14",
+            "horaFim": "12:24",
+            "tipo": "Carro",
+            "plano": "10min",
+            "veiculo": "Carro 01",
+            "pagamento": "Crédito",
+            "crianca": "Arthur",
+            "responsavel": "Célio",
+            "telefone": "98983396917"
+          },
+          {
+            "id": 3466,
+            "contaId": 3462,
+            "horaInicio": "13:16",
+            "horaFim": "13:41",
+            "tipo": "Pelúcia",
+            "plano": "30min",
+            "veiculo": "Pelúcia 01",
+            "pagamento": "Crédito",
+            "crianca": "Marina",
+            "responsavel": "Carlos Eduardo",
+            "telefone": "98983396917"
+          },
+          {
+            "id": 3467,
+            "contaId": 3462,
+            "horaInicio": "13:17",
+            "horaFim": "13:47",
+            "tipo": "Carro",
+            "plano": "30min",
+            "veiculo": "Carro 01",
+            "pagamento": "Crédito",
+            "crianca": "Miguel",
+            "responsavel": "Carlos Eduardo",
+            "telefone": "98983396917"
+          },
+          {
+            "id": 3468,
+            "contaId": 3462,
+            "horaInicio": "13:27",
+            "horaFim": "13:32",
+            "tipo": "Pelúcia",
+            "plano": "10min",
+            "veiculo": "Pelúcia 02",
+            "pagamento": "Crédito",
+            "crianca": "Benício",
+            "responsavel": "Vanessa",
+            "telefone": "98983396917"
+          },
+          {
+            "id": 3469,
+            "contaId": 3469,
+            "horaInicio": "13:59",
+            "horaFim": "14:27",
+            "tipo": "Carro",
+            "plano": "30min",
+            "veiculo": "Carro 01",
+            "pagamento": "Crédito",
+            "crianca": "Eric",
+            "responsavel": "Omar",
+            "telefone": "98988084526"
+          },
+          {
+            "id": 3470,
+            "contaId": 3470,
+            "horaInicio": "14:01",
+            "horaFim": "14:12",
+            "tipo": "Carro",
+            "plano": "20min",
+            "veiculo": "Carro 02",
+            "pagamento": "Crédito",
+            "crianca": "Heitor",
+            "responsavel": "Emanuela",
+            "telefone": "98982771464"
+          },
+          {
+            "id": 3471,
+            "contaId": 3471,
+            "horaInicio": "14:57",
+            "horaFim": "15:07",
+            "tipo": "Pelúcia",
+            "plano": "10min",
+            "veiculo": "Pelúcia 01",
+            "pagamento": "Débito",
+            "crianca": "Luna",
+            "responsavel": "Ingrid",
+            "telefone": "98988633594"
+          },
+          {
+            "id": 3472,
+            "contaId": 3472,
+            "horaInicio": "15:01",
+            "horaFim": "15:11",
+            "tipo": "Carro",
+            "plano": "10min",
+            "veiculo": "Carro 01",
+            "pagamento": "Débito",
+            "crianca": "Maia E Amaia",
+            "responsavel": "Estefani",
+            "telefone": "98988633934"
+          },
+          {
+            "id": 3473,
+            "contaId": 3473,
+            "horaInicio": "15:26",
+            "horaFim": "15:41",
+            "tipo": "Carro",
+            "plano": "20min",
+            "veiculo": "Carro 01",
+            "pagamento": "Débito",
+            "crianca": "Rael",
+            "responsavel": "Tomas Algusto",
+            "telefone": "8697841423"
+          },
+          {
+            "id": 3474,
+            "contaId": 3474,
+            "horaInicio": "16:06",
+            "horaFim": "16:36",
+            "tipo": "Pelúcia",
+            "plano": "30min",
+            "veiculo": "Pelúcia 01",
+            "pagamento": "Crédito",
+            "crianca": "Larissa",
+            "responsavel": "Izana",
+            "telefone": "98988187983"
+          },
+          {
+            "id": 3475,
+            "contaId": 3475,
+            "horaInicio": "16:22",
+            "horaFim": "16:28",
+            "tipo": "Carro",
+            "plano": "10min",
+            "veiculo": "Carro 01",
+            "pagamento": "PIX",
+            "crianca": "Paulo Pietro",
+            "responsavel": "Jordana Sousa",
+            "telefone": "98988512472"
+          },
+          {
+            "id": 3476,
+            "contaId": 3476,
+            "horaInicio": "16:30",
+            "horaFim": "16:52",
+            "tipo": "Carro",
+            "plano": "20min",
+            "veiculo": "Carro 02",
+            "pagamento": "Débito",
+            "crianca": "Iae",
+            "responsavel": "Stael",
+            "telefone": "988440033"
+          },
+          {
+            "id": 3477,
+            "contaId": 3477,
+            "horaInicio": "16:40",
+            "horaFim": "16:55",
+            "tipo": "Carro",
+            "plano": "20min",
+            "veiculo": "Carro 01",
+            "pagamento": "Débito",
+            "crianca": "Benicio",
+            "responsavel": "Leissa",
+            "telefone": "989856213"
+          },
+          {
+            "id": 3479,
+            "contaId": 3479,
+            "horaInicio": "16:44",
+            "horaFim": "17:12",
+            "tipo": "Carro",
+            "plano": "30min",
+            "veiculo": "Carro 03",
+            "pagamento": "Débito",
+            "crianca": "Larissa E Ana Vitória",
+            "responsavel": "Stefany",
+            "telefone": "98988933076"
+          },
+          {
+            "id": 3480,
+            "contaId": 3480,
+            "horaInicio": "17:21",
+            "horaFim": "17:30",
+            "tipo": "Carro",
+            "plano": "30min",
+            "veiculo": "Carro 01",
+            "pagamento": "Débito",
+            "crianca": "Maria Beatriz",
+            "responsavel": "Moisés Amorim",
+            "telefone": "98988633073"
+          },
+          {
+            "id": 3481,
+            "contaId": 3481,
+            "horaInicio": "17:45",
+            "horaFim": "17:51",
+            "tipo": "Pelúcia",
+            "plano": "10min",
+            "veiculo": "Pelúcia 01",
+            "pagamento": "Débito",
+            "crianca": "Maria Elena",
+            "responsavel": "Kelly",
+            "telefone": "98988003714"
+          },
+          {
+            "id": 3482,
+            "contaId": 3482,
+            "horaInicio": "17:52",
+            "horaFim": "17:54",
+            "tipo": "Pelúcia",
+            "plano": "10min",
+            "veiculo": "Pelúcia 03",
+            "pagamento": "Crédito",
+            "crianca": "Clara E Teo",
+            "responsavel": "Giulia",
+            "telefone": "8698701325"
+          },
+          {
+            "id": 3483,
+            "contaId": 3482,
+            "horaInicio": "17:52",
+            "horaFim": "17:55",
+            "tipo": "Pelúcia",
+            "plano": "20min",
+            "veiculo": "Pelúcia 04",
+            "pagamento": "Crédito",
+            "crianca": "Clara E Teo",
+            "responsavel": "Giulia",
+            "telefone": "8698701325"
+          },
+          {
+            "id": 3484,
+            "contaId": 3484,
+            "horaInicio": "18:02",
+            "horaFim": "18:13",
+            "tipo": "Carro",
+            "plano": "20min",
+            "veiculo": "Carro 01",
+            "pagamento": "Débito",
+            "crianca": "Enrico E Sara",
+            "responsavel": "Moisés",
+            "telefone": "98988163542"
+          },
+          {
+            "id": 3485,
+            "contaId": 3484,
+            "horaInicio": "18:02",
+            "horaFim": "18:13",
+            "tipo": "Pelúcia",
+            "plano": "20min",
+            "veiculo": "Pelúcia 01",
+            "pagamento": "Débito",
+            "crianca": "Enrico E Sara",
+            "responsavel": "Moisés",
+            "telefone": "98988163542"
+          },
+          {
+            "id": 3486,
+            "contaId": 3486,
+            "horaInicio": "18:08",
+            "horaFim": "18:36",
+            "tipo": "Carro",
+            "plano": "30min",
+            "veiculo": "Carro 02",
+            "pagamento": "Crédito",
+            "crianca": "Ravi E Ayumi",
+            "responsavel": "Altino",
+            "telefone": "11973350513"
+          },
+          {
+            "id": 3487,
+            "contaId": 3487,
+            "horaInicio": "18:14",
+            "horaFim": "18:24",
+            "tipo": "Carro",
+            "plano": "10min",
+            "veiculo": "Carro 03",
+            "pagamento": "Crédito",
+            "crianca": "Lia",
+            "responsavel": "Mairis Freitas",
+            "telefone": "98988363476"
+          },
+          {
+            "id": 3488,
+            "contaId": 3488,
+            "horaInicio": "18:21",
+            "horaFim": "18:31",
+            "tipo": "Carro",
+            "plano": "10min",
+            "veiculo": "Carro 01",
+            "pagamento": "Débito",
+            "crianca": "Isabela",
+            "responsavel": "Gabriela",
+            "telefone": "989876046480"
+          },
+          {
+            "id": 3489,
+            "contaId": 3489,
+            "horaInicio": "18:24",
+            "horaFim": "18:33",
+            "tipo": "Pelúcia",
+            "plano": "10min",
+            "veiculo": "Pelúcia 01",
+            "pagamento": "PIX",
+            "crianca": "Maria Elena",
+            "responsavel": "Eline",
+            "telefone": "98988363079"
+          },
+          {
+            "id": 3490,
+            "contaId": 3490,
+            "horaInicio": "18:47",
+            "horaFim": "18:56",
+            "tipo": "Pelúcia",
+            "plano": "10min",
+            "veiculo": "Pelúcia 01",
+            "pagamento": "Crédito",
+            "crianca": "Melissa",
+            "responsavel": "Pablo",
+            "telefone": "98982683073"
+          },
+          {
+            "id": 3493,
+            "contaId": 3493,
+            "horaInicio": "18:57",
+            "horaFim": "19:02",
+            "tipo": "Pelúcia",
+            "plano": "10min",
+            "veiculo": "Pelúcia 01",
+            "pagamento": "Débito",
+            "crianca": "Zoe",
+            "responsavel": "Ramallya",
+            "telefone": "98985945878"
+          },
+          {
+            "id": 3494,
+            "contaId": 3494,
+            "horaInicio": "18:59",
+            "horaFim": "19:05",
+            "tipo": "Pelúcia",
+            "plano": "10min",
+            "veiculo": "Pelúcia 03",
+            "pagamento": "Débito",
+            "crianca": "Miguel",
+            "responsavel": "Patrick",
+            "telefone": "98999755537"
+          },
+          {
+            "id": 3496,
+            "contaId": 3496,
+            "horaInicio": "19:02",
+            "horaFim": "19:10",
+            "tipo": "Pelúcia",
+            "plano": "10min",
+            "veiculo": "Pelúcia 04",
+            "pagamento": "PIX",
+            "crianca": "Pedro Vinicius",
+            "responsavel": "Leandro Barbosa",
+            "telefone": "98988386475"
+          },
+          {
+            "id": 3497,
+            "contaId": 3497,
+            "horaInicio": "19:03",
+            "horaFim": "19:13",
+            "tipo": "Carro",
+            "plano": "10min",
+            "veiculo": "Carro 01",
+            "pagamento": "PIX",
+            "crianca": "Ravi",
+            "responsavel": "Rayssa",
+            "telefone": "8698147854"
+          }
+        ],
+        "metaTurno": {
+          "ok": true,
+          "configurado": true,
+          "operador": "Raykelly",
+          "operadorId": 3,
+          "meta": 20,
+          "bonus": 100,
+          "hoje": {
+            "n": 0,
+            "meta": 20,
+            "metaOk": false,
+            "atingiu": false,
+            "emTurno": false,
+            "folga": true,
+            "shiftLabel": "folga",
+            "bonusValorHoje": 0
+          },
+          "mes": {
+            "locTotal": 86,
+            "diasComMeta": 2,
+            "diasTrabalhados": 3,
+            "bonusEstimado": 200,
+            "diasBonus": [
+              {
+                "data": "05/09/2026",
+                "loc": 37,
+                "locParceira": 0,
+                "meta": 20,
+                "bonusOk": true,
+                "bonusValor": 100,
+                "fimSemana": true,
+                "juntas": false
+              },
+              {
+                "data": "07/09/2026",
+                "loc": 41,
+                "locParceira": 0,
+                "meta": 20,
+                "bonusOk": true,
+                "bonusValor": 100,
+                "fimSemana": false,
+                "juntas": false
+              }
+            ]
+          }
+        },
+        "operacaoConfig": {
+          "veiculos_validos": [
+            "Carro 01",
+            "Carro 02",
+            "Carro 03",
+            "Carro 04",
+            "Triciclo 01",
+            "Triciclo 02",
+            "Pelúcia 01",
+            "Pelúcia 02",
+            "Pelúcia 03",
+            "Pelúcia 04"
+          ],
+          "veiculosDef": [
+            {
+              "nome": "Carro 01",
+              "tipo": "Carro"
+            },
+            {
+              "nome": "Carro 02",
+              "tipo": "Carro"
+            },
+            {
+              "nome": "Carro 03",
+              "tipo": "Carro"
+            },
+            {
+              "nome": "Carro 04",
+              "tipo": "Carro"
+            },
+            {
+              "nome": "Triciclo 01",
+              "tipo": "Triciclo"
+            },
+            {
+              "nome": "Triciclo 02",
+              "tipo": "Triciclo"
+            },
+            {
+              "nome": "Pelúcia 01",
+              "tipo": "Pelúcia"
+            },
+            {
+              "nome": "Pelúcia 02",
+              "tipo": "Pelúcia"
+            },
+            {
+              "nome": "Pelúcia 03",
+              "tipo": "Pelúcia"
+            },
+            {
+              "nome": "Pelúcia 04",
+              "tipo": "Pelúcia"
+            }
+          ],
+          "precosFe": {
+            "Carro": {
+              "10min": {
+                "v": 12,
+                "m": 10,
+                "a": 1
+              },
+              "20min": {
+                "v": 22,
+                "m": 20,
+                "a": 1
+              },
+              "30min": {
+                "v": 30,
+                "m": 30,
+                "a": 1
+              },
+              "40min": {
+                "v": 40,
+                "m": 40,
+                "a": 1
+              },
+              "60min": {
+                "v": 55,
+                "m": 60,
+                "a": 1
+              },
+              "3h": {
+                "v": 130,
+                "m": 180,
+                "a": 1
+              }
+            },
+            "Triciclo": {
+              "10min": {
+                "v": 12,
+                "m": 10,
+                "a": 1
+              },
+              "20min": {
+                "v": 22,
+                "m": 20,
+                "a": 1
+              },
+              "30min": {
+                "v": 30,
+                "m": 30,
+                "a": 1
+              },
+              "40min": {
+                "v": 40,
+                "m": 40,
+                "a": 1
+              },
+              "60min": {
+                "v": 55,
+                "m": 60,
+                "a": 1
+              },
+              "3h": {
+                "v": 130,
+                "m": 180,
+                "a": 1
+              }
+            },
+            "Pelúcia": {
+              "10min": {
+                "v": 15,
+                "m": 10,
+                "a": 1.2
+              },
+              "20min": {
+                "v": 25,
+                "m": 20,
+                "a": 1.2
+              },
+              "30min": {
+                "v": 35,
+                "m": 30,
+                "a": 1.2
+              },
+              "40min": {
+                "v": 45,
+                "m": 40,
+                "a": 1.2
+              },
+              "60min": {
+                "v": 65,
+                "m": 60,
+                "a": 1.2
+              },
+              "3h": {
+                "v": 150,
+                "m": 180,
+                "a": 1.2
+              }
+            }
+          },
+          "formas_pagamento": [
+            "PIX",
+            "Débito",
+            "Crédito",
+            "Dinheiro"
+          ],
+          "regras": {
+            "alertaMinutosRestantes": 5,
+            "maxMinutosExtras": 720,
+            "bloquearInicioEncerradaCancelada": true,
+            "exigirAvisoExtra": true
+          },
+          "fonte": "config_ou_default",
+          "problemas": []
+        },
+        "lookback": 600,
+        "forceFull": false,
+        "locLastRow": 3409
+      }
+    },
+    {
+      "name": "i155.lookback.inicio",
+      "status": "ok",
+      "detail": "lookback=600"
+    },
+    {
+      "name": "parity.ativas",
+      "status": "ok",
+      "detail": "listar=5 inicio=5"
+    },
+    {
+      "name": "i43.startTimestamp",
+      "status": "ok",
+      "detail": "ativas=4 semTs=0"
+    },
+    {
+      "name": "endpoint.validarSchema",
+      "status": "ok",
+      "detail": "json_ok 30359ms schemaOk=true"
+    },
+    {
+      "name": "endpoint.resumoDia",
+      "status": "fail",
+      "detail": "json_err 1609ms"
+    },
+    {
+      "name": "endpoint.listarHistorico",
+      "status": "fail",
+      "detail": "json_err 2104ms"
+    },
+    {
+      "name": "endpoint.listarAuditoriaAdmin",
+      "status": "ok",
+      "detail": "json_ok 2481ms n=0 top=undefined"
+    },
+    {
+      "name": "endpoint.operacaoConfig",
+      "status": "fail",
+      "detail": "json_err 1846ms"
+    },
+    {
+      "name": "stress.concurrent3",
+      "status": "ok",
+      "detail": "ok=3/3 html404=0 wall=19180ms kinds=json_ok:17816|json_ok:19179|json_ok:15820"
+    },
+    {
+      "name": "fe.i154.gas-unstable",
+      "status": "ok",
+      "detail": "HTML/404 → fila offline"
+    },
+    {
+      "name": "fe.i154b.retry",
+      "status": "ok",
+      "detail": "retry 1x 404/5xx"
+    },
+    {
+      "name": "fe.i154b.timeout45",
+      "status": "ok",
+      "detail": "listarAtivas timeout 45s"
+    },
+    {
+      "name": "fe.i151.reconcile",
+      "status": "ok",
+      "detail": "reconcile fantasma"
+    }
+  ],
+  "status": "ok",
+  "summary": "fail=0 warn=0 (admin endpoints revalidated) · html404=0 · lookback=600",
+  "finishedAt": "2026-09-08T22:20:01.057Z",
+  "diagnosis": {
+    "verdict": "stable_for_ops",
+    "html404_listarAtivas": "0/10 (was ~37%)",
+    "lookback": 600,
+    "gas": "v1.5.220",
+    "fe": "1.9.114",
+    "falsePositivesFixed": [
+      "resumoDia/historico need adminPin",
+      "operacaoConfig via carregarInicio"
+    ],
+    "residual": "cold start 11-18s; cache warm ~1.5-2s",
+    "adjustNow": false,
+    "optional": [
+      "CACHE_LISTAR_ATIVAS_TTL_ 8->15",
+      "avoid parallel listar+inicio"
+    ]
+  }
+}

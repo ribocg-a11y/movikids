@@ -43,6 +43,15 @@ Payload inclui `lookback` / `forceFull` / `locLastRow` para validar.
 4. `listarAtivas` → `lookback: 600` · latência bem menor · 404 rarefeito
 5. Paridade: `carregarInicio.ativos` ≡ `listarAtivas.locacoes`
 
+## Validação estabilidade (08/09 ~19:20) ✅
+
+Ver `EVIDENCIA_ESTABILIDADE_POS_I155_2026-09-08.md`:
+
+- Ping **12/12** · `listarAtivas` **10/10** · **0 HTML 404** (antes ~37%)
+- Warm ~**1,5s** · frio 11–18s (Sheets)
+- Paridade + I43 ts OK · smoke ▶ OK
+- **Ajuste agora:** não · opcional TTL cache 8→15s (P3)
+
 ## Guards
 
 `guard.i155.locSheetTail` · `lookback` · `cache.ativas` · `invalidate` · `inicio.tail`
