@@ -18,3 +18,8 @@ Sócio via Real entre Base e Ritmo e texto “58% abaixo da base DRE” — cont
 - Real R$ 4.624 **acima** da base pro-rata (~R$ 2.946) → bom ritmo vs piso
 - Ritmo 3d (~R$ 782/dia) **acima** do real → últimos dias mais fortes que a média do mês
 - Ainda falta caminho até o piso do **mês** (R$ 11.047) — outra pergunta
+
+## I157b — balão do gráfico (08/09)
+
+Tooltip empilhava 3 séries (~9 linhas). Agora **3 linhas**: Real · Base+Δ · Ritmo.
+Números do print 8/09 conferidos: base 368×8=2944 · ritmo 786×8=6288 · Δ base +1690 · Δ ritmo −1649.
