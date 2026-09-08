@@ -12,7 +12,7 @@
 |-------|----------------------|-------------------|
 | **Cérebro** | Regras de negócio, dados, financeiro, auth servidor | `MOVIKIDS_Code_...gs` (GAS) + planilha `MOVIKIDS_Planilha_Base` |
 | **Coração** | Pulso operacional — sync balcão, timer, locações ativas | `carregarInicio` (GAS) + `syncController` (`mk-sync.js`) + snapshot local (`mk-local-snapshot.js` · `mk-idb-store.js`) + fila offline (`mk-offline-queue.js`) + Firebase `sessoes` |
-| **Sistema nervoso** | Comunicação FE ↔ GAS | `api()` em `mk-api.js` + `doGet`/`dispatchMoviAction_` (GAS) |
+| **Sistema nervoso** | Comunicação FE ↔ GAS | `api()` em `mk-api.js` (I154 `gas-unstable` + retry) + `doGet`/`dispatchMoviAction_` (GAS) |
 | **Rosto / identidade** | Versão, URL GAS, cache | `mk-version.js`, `sw.js`, bloco anti-stale no `index.html` |
 | **Imunológico** | Travas P0, CI, incidentes | `pre-push-check.ps1`, `.cursor/rules/`, `REGRAS_DE_PUBLICACAO_SEGURA.md` |
 | **Mãos (braços)** | Ações do operador no balcão | Nova locação, drawer, encerrar — **comunicação: QR** (SMS/WA pausados) |

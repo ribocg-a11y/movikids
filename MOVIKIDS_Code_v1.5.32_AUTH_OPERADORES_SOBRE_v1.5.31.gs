@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.220
+// MOVI KIDS — Google Apps Script v1.5.221
+// v1.5.221: I156 — ritmo 3d: lastNBillingDays lê chaves "01"/"1" (linha Ritmo sumia no Dashboard)
 // v1.5.220: I155 — listarAtivas/carregarInicio leem CAUDA (lookback) + cache curto ativas (anti-404)
 // v1.5.219: I154 — listarAuditoria: cauda real + sort por data/hora (não string DD/MM)
 // v1.5.218: I153 — anular Encerrada duplicata (admin) · encerrar <90s exige confirmarCurto
@@ -212,8 +213,8 @@
 
 // ── CONSTANTES ───────────────────────────────────────────────
 /** Versão exposta em ping, carregarInicio, validarSchema, gestaoPessoasStatus (bump com header). */
-const MK_GAS_VERSAO_  = 'v1.5.220';
-const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.220';
+const MK_GAS_VERSAO_  = 'v1.5.221';
+const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.221';
 const SHEET_ID   = '1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618';
 const DEPLOY_ID  = 'AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y';
 const WEBAPP_URL = `https://script.google.com/macros/s/${DEPLOY_ID}/exec`;
@@ -6284,16 +6285,34 @@ function comandoOperacional_(p) {
   return ContentService.createTextOutput(out).setMimeType(ContentService.MimeType.JSON);
 }
 
-/** I150 — últimos N dias com faturamento > 0 (mapa dia→valor). */
+/** I150/I156 — valor do dia no mapa (aceita chave 1, "1" ou "01"). */
+function fatMapDiaVal_(fatMap, d) {
+  if (!fatMap) return 0;
+  const n = Number(d);
+  if (!(n > 0)) return 0;
+  let v = Number(fatMap[n]);
+  if (v > 0) return v;
+  v = Number(fatMap[String(n)]);
+  if (v > 0) return v;
+  v = Number(fatMap[String(n).padStart(2, '0')]);
+  return v > 0 ? v : 0;
+}
+
+/** I150 — últimos N dias com faturamento > 0 (mapa dia→valor). I156: chaves padded. */
 function lastNBillingDaysFromFatMap_(fatMap, n, maxDia) {
   const lim = Math.max(1, Math.min(7, Number(n) || 3));
+  const seen = {};
   const dias = Object.keys(fatMap || {}).map(function(k) { return parseInt(k, 10); })
-    .filter(function(d) { return d > 0 && (!maxDia || d <= maxDia); })
+    .filter(function(d) {
+      if (!(d > 0) || (maxDia && d > maxDia) || seen[d]) return false;
+      seen[d] = true;
+      return true;
+    })
     .sort(function(a, b) { return a - b; });
-  const pos = dias.filter(function(d) { return (Number(fatMap[d]) || 0) > 0; });
+  const pos = dias.filter(function(d) { return fatMapDiaVal_(fatMap, d) > 0; });
   const pick = pos.slice(-lim);
   if (!pick.length) return { media: 0, dias: [], valores: [] };
-  const vals = pick.map(function(d) { return Number(fatMap[d]) || 0; });
+  const vals = pick.map(function(d) { return fatMapDiaVal_(fatMap, d); });
   const media = Math.round(vals.reduce(function(s, v) { return s + v; }, 0) / vals.length * 100) / 100;
   return { media: media, dias: pick, valores: vals };
 }

@@ -2287,16 +2287,48 @@ function mkBaseSustentacaoMes_(d) {
 window.mkBaseSustentacaoMes_ = mkBaseSustentacaoMes_;
 
 /** I150 — Ritmo = run rate últimos 3 dias (ref. mês ant. se <3 dias). */
+/** I156 — se GAS devolver 0 (bug chaves "01"), calcula no FE a partir de fatPorDia. */
+function mkRitmoClientFallbackDiaria_(fatDia, hojeD) {
+  const rows = (fatDia || [])
+    .filter(function(x) { return Number(x.dia) > 0 && Number(x.dia) <= hojeD && Number(x.valor) > 0; })
+    .sort(function(a, b) { return Number(a.dia) - Number(b.dia); });
+  const pick = rows.slice(-3);
+  if (!pick.length) return 0;
+  const sum = pick.reduce(function(s, x) { return s + (Number(x.valor) || 0); }, 0);
+  return Math.round((sum / pick.length) * 100) / 100;
+}
+
 function mkRitmoAlcancavelMes_(d) {
   const c = mkCenariosFinanceirosFe_(d);
+  let diaria = Number(c.ritmo3dDiaria) || 0;
+  let mes = Number(c.ritmo3dMes) || 0;
+  let diasRef = c.ritmo3dDiasRef || [];
+  if (diaria <= 0) {
+    const hojeD = (d.mesAtual === new Date().getMonth() + 1 && d.anoAtual === new Date().getFullYear())
+      ? new Date().getDate()
+      : (Number(c.diaCal) || 31);
+    diaria = mkRitmoClientFallbackDiaria_(d.fatPorDia || [], hojeD);
+    if (diaria > 0) {
+      const diasMes = Number(d.diasMes) || 30;
+      const acum = Number(c.ritmo3dAcum) || Number(d.fatMes) || 0;
+      const rest = Math.max(0, diasMes - hojeD);
+      mes = Math.round((acum + diaria * rest) * 100) / 100;
+      diasRef = (d.fatPorDia || [])
+        .filter(function(x) { return Number(x.dia) <= hojeD && Number(x.valor) > 0; })
+        .map(function(x) { return Number(x.dia); })
+        .sort(function(a, b) { return a - b; })
+        .slice(-3);
+    }
+  }
   return {
-    diaria: Number(c.ritmo3dDiaria) || 0,
-    mes: Number(c.ritmo3dMes) || 0,
+    diaria: diaria,
+    mes: mes,
     fonte: c.ritmo3dFonte || '',
-    diasRef: c.ritmo3dDiasRef || []
+    diasRef: diasRef
   };
 }
 window.mkRitmoAlcancavelMes_ = mkRitmoAlcancavelMes_;
+window.mkRitmoClientFallbackDiaria_ = mkRitmoClientFallbackDiaria_;
 
 /** I150 — Projetado = média 3 meses anteriores. */
 function mkProjetado3mMes_(d) {
@@ -2327,10 +2359,11 @@ function renderReceitaMesChart_(d) {
   const ritmo = mkRitmoAlcancavelMes_(d);
   const proj = mkProjetado3mMes_(d);
   const baseDiaria = Number(c.baseDreDiaria) || Number(base.diaria) || 0;
-  const ritmoDiaria = Number(c.ritmo3dDiaria) || Number(ritmo.diaria) || 0;
+  // I156: ritmo.diaria já inclui fallback FE se GAS 0
+  const ritmoDiaria = Number(ritmo.diaria) || Number(c.ritmo3dDiaria) || 0;
   const projDiaria = Number(c.projetado3mDiaria) || Number(proj.diaria) || 0;
   const baseMes = Number(c.baseDreMes) || Number(base.mes) || 0;
-  const ritmoMes = Number(c.ritmo3dMes) || Number(ritmo.mes) || 0;
+  const ritmoMes = Number(ritmo.mes) || Number(c.ritmo3dMes) || 0;
   const projMes = Number(c.projetado3mMes) || Number(proj.mes) || 0;
 
   if (hojeD <= 0 || (baseDiaria <= 0 && ritmoDiaria <= 0 && projDiaria <= 0)) {
@@ -2511,9 +2544,10 @@ function renderReceitaMesChart_(d) {
         msgs.push(R2(diffProj) + ' abaixo do projetado 3m (' + R2(projMes) + ').');
       }
     }
-    if (ritmoMes > 0) {
-      const fonteLbl = c.ritmo3dFonte === 'mes_atual'
-        ? ('últimos 3 dias: ' + (c.ritmo3dDiasRef || ritmo.diasRef || []).join(', '))
+    if (ritmoMes > 0 && ritmoDiaria > 0) {
+      const refDias = (ritmo.diasRef && ritmo.diasRef.length) ? ritmo.diasRef : (c.ritmo3dDiasRef || []);
+      const fonteLbl = (c.ritmo3dFonte === 'mes_atual' || !c.ritmo3dFonte || refDias.length)
+        ? ('últimos 3 dias: ' + refDias.join(', '))
         : 'referência mês anterior (menos de 3 dias c/ fat.)';
       msgs.push('Ritmo run rate: ' + R2(ritmoDiaria) + '/dia → ' + R2(ritmoMes) + ' no mês (' + fonteLbl + ').');
     }

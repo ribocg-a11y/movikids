@@ -1,6 +1,7 @@
 # MOVI KIDS — Mapa de erros, falhas e bugs
 
-**Atualizado:** 08/09/2026 — **I155** ✅ live (0 HTML 404 · lookback 600) · GAS ping **v1.5.220** · FE **v1.9.114**  
+**Atualizado:** 08/09/2026 — **I156** ritmo Dashboard (chaves "01") · FE **v1.9.115** · GAS repo **v1.5.221**  
+**Uso anterior:** 08/09/2026 — **I155** ✅ live (0 HTML 404 · lookback 600) · GAS ping **v1.5.220** · FE **v1.9.114**  
 **Uso anterior:** 08/09/2026 — **I154** lançamento perdido GAS 404 · FE **v1.9.113–114** · GAS **v1.5.219**  
 **Uso anterior:** 08/09/2026 — **I153** duplicata Arthur / encerrar &lt;90s · FE **v1.9.112** · GAS **v1.5.218**  
 **Uso anterior:** 02/09/2026 — **I151b** travas definitivas · FE **v1.9.111** Pages · GAS ping **v1.5.213** (repo **v1.5.215**)  

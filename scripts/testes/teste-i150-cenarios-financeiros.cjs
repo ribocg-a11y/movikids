@@ -84,6 +84,37 @@ function near(a, b, tol = 1) {
       add('ritmo.fechado', 'ok', 'mês fechado = real acumulado');
     }
 
+    // I156 — mês corrente: com ≥3 dias de fat, ritmo3dDiaria deve ser > 0 (bug chaves "01")
+    const kpiNow = await api({
+      action: 'kpiMes',
+      adminPin: ADMIN_PIN,
+      mes: new Date().getMonth() + 1,
+      ano: new Date().getFullYear(),
+    });
+    if (kpiNow.ok && kpiNow.cenariosFinanceiros) {
+      const cfN = kpiNow.cenariosFinanceiros;
+      const diasMov = Number(cfN.diasComMovMes) || 0;
+      if (diasMov >= 3) {
+        if (!(Number(cfN.ritmo3dDiaria) > 0) || !(cfN.ritmo3dDiasRef || []).length) {
+          add(
+            'I156.ritmo.corrente',
+            'fail',
+            `diasComMov=${diasMov} ritmo3dDiaria=${cfN.ritmo3dDiaria} ref=${JSON.stringify(cfN.ritmo3dDiasRef)}`
+          );
+        } else {
+          add(
+            'I156.ritmo.corrente',
+            'ok',
+            `diaria=${cfN.ritmo3dDiaria} ref=${(cfN.ritmo3dDiasRef || []).join(',')}`
+          );
+        }
+      } else {
+        add('I156.ritmo.corrente', 'ok', `diasComMov=${diasMov} (<3 — ref mês ant. ok)`);
+      }
+    } else {
+      add('I156.ritmo.corrente', 'warn', 'kpiMes corrente indisponível');
+    }
+
     if (cf.baseDreMes >= cf.projetado3mMes && cf.projetado3mMes > 0) {
       add('base.lt.projetado.ago', 'warn', 'ago/26 base DRE > projetado 3m (esperado neste mês)');
     } else {

@@ -748,6 +748,27 @@ try {
     }
   }
 
+  # I156 — ritmo 3d lê chaves padded "01"
+  if ($gasRaw -notmatch 'function fatMapDiaVal_') {
+    Add-Check "guard.i156.fatMapDiaVal" "fail" "fatMapDiaVal_ ausente (I156 ritmo)"
+  } else {
+    Add-Check "guard.i156.fatMapDiaVal" "ok" "fatMapDiaVal_ chaves 1/01"
+  }
+  if ($gasRaw -notmatch 'function lastNBillingDaysFromFatMap_[\s\S]{0,800}fatMapDiaVal_') {
+    Add-Check "guard.i156.ritmo.lookup" "fail" "lastNBillingDays sem fatMapDiaVal_ (I156)"
+  } else {
+    Add-Check "guard.i156.ritmo.lookup" "ok" "ritmo 3d usa fatMapDiaVal_"
+  }
+  $admPathI156 = Join-Path $root "mk-admin.js"
+  if (Test-Path $admPathI156) {
+    $admRawI156 = Get-Content -Path $admPathI156 -Raw -Encoding UTF8
+    if ($admRawI156 -notmatch 'mkRitmoClientFallbackDiaria_') {
+      Add-Check "guard.i156.fe.fallback" "fail" "FE sem fallback ritmo (I156)"
+    } else {
+      Add-Check "guard.i156.fe.fallback" "ok" "FE fallback ritmo se GAS 0"
+    }
+  }
+
   $authPath = Join-Path $root "mk-auth.js"
   if (Test-Path $authPath) {
     $authRaw = Get-Content -Path $authPath -Raw -Encoding UTF8
