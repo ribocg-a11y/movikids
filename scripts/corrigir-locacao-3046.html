@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Corrigir locação 3046 — Iza (Lois)</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 620px; margin: 40px auto; padding: 0 16px; line-height: 1.5; }
+    button { font-size: 16px; padding: 12px 20px; width: 100%; cursor: pointer; margin-top: 12px; }
+    pre { background: #f4f4f4; padding: 12px; font-size: 12px; overflow: auto; }
+    .ok { color: #0a7; } .err { color: #c00; } .warn { color: #a60; }
+    table { border-collapse: collapse; width: 100%; margin: 12px 0; font-size: 14px; }
+    th, td { border: 1px solid #ccc; padding: 6px 8px; text-align: left; }
+    th { background: #f0f0f0; }
+  </style>
+</head>
+<body>
+  <h1>Corrigir locação 3046 — Iza (Lois)</h1>
+  <p>Converte <strong>Cancelada → Encerrada</strong>, R$ 22 Débito (plano 20 min, extras não cobrados).</p>
+
+  <h2>Opção A — API (requer GAS v1.5.213+ Web)</h2>
+  <p class="warn">Produção atual v1.5.211 <strong>não</strong> tem esta action. Publique Nova versão Web ou use Opção B/C.</p>
+  <button type="button" id="btn">Corrigir via API (corrigirCanceladaParaEncerradaAdmin)</button>
+
+  <h2>Opção B — Planilha (sem App Script)</h2>
+  <p>Na aba <strong>LOCACOES</strong>, linha <strong>3046</strong> (id 3138):</p>
+  <table>
+    <tr><th>Col</th><th>Campo</th><th>Valor</th></tr>
+    <tr><td>D</td><td>horaFim</td><td><code>18:44</code></td></tr>
+    <tr><td>I</td><td>minAdicionais</td><td><code>0</code></td></tr>
+    <tr><td>J</td><td>valorAdicional</td><td><code>0</code></td></tr>
+    <tr><td>K</td><td>valorTotal</td><td><code>22</code></td></tr>
+    <tr><td>O</td><td>status</td><td><code>Encerrada</code></td></tr>
+    <tr><td>AB</td><td>extras cancelados</td><td><code>EC:10|Nao cobrar minutos extras operacional 29/08</code></td></tr>
+  </table>
+  <p>Obs (col R): acrescentar <code>[CORRECAO ADM encerrar] Encerramento correto Iza 29/08 bug GAS extras nao cobrados</code></p>
+
+  <h2>Opção C — OAuth no PC</h2>
+  <pre>.\scripts\planilha\CORRIGIR_IZA_3046_OAUTH.ps1</pre>
+
+  <p id="status"></p>
+  <pre id="log"></pre>
+  <script>
+    const GAS = 'https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec';
+    document.getElementById('btn').onclick = async () => {
+      const st = document.getElementById('status');
+      const log = document.getElementById('log');
+      st.textContent = 'Enviando...';
+      log.textContent = '';
+      const q = new URLSearchParams({
+        action: 'corrigirCanceladaParaEncerradaAdmin',
+        adminPin: '1421',
+        authRole: 'admin',
+        rowIndex: '3046',
+        motivo: 'Encerramento correto Iza 29/08 bug GAS I148 extras nao cobrados',
+        horaFim: '18:44',
+        cancelarExtras: 'true',
+        justificativaExtras: 'Nao cobrar minutos extras operacional 29/08',
+        valorTotal: '22',
+        minAdicionais: '0',
+        valorAdicional: '0'
+      });
+      try {
+        const r = await fetch(GAS + '?' + q);
+        const d = await r.json();
+        log.textContent = JSON.stringify(d, null, 2);
+        if (d.ok && d.locacao && d.locacao.status === 'Encerrada') {
+          st.textContent = 'Corrigido. Recarregue Caixa do dia.';
+          st.className = 'ok';
+        } else if (d.erro && d.erro.indexOf('desconhecida') >= 0) {
+          st.textContent = 'GAS v1.5.213+ nao publicado — use planilha (Opção B) ou OAuth (Opção C).';
+          st.className = 'warn';
+        } else {
+          st.textContent = d.erro || 'Verifique o log';
+          st.className = 'err';
+        }
+      } catch (e) {
+        st.textContent = e.message;
+        st.className = 'err';
+      }
+    };
+  </script>
+</body>
+</html>
