@@ -476,12 +476,26 @@ try {
     } else {
       Add-Check "guard.i121.dash.invalidate" "ok" "kpiMes+comando invalidados em escrita"
     }
-    if ($gasRaw -notmatch 'I121: pay-first — Ativa/Pendente já pagas \(paridade I117') {
+    if ($gasRaw -notmatch 'I121/I158: pay-first — Ativa/Pendente já pagas' -and $gasRaw -notmatch 'I121: pay-first — Ativa/Pendente já pagas \(paridade I117') {
       Add-Check "guard.i121.kpi.payfirst" "fail" "kpiMes ainda so Encerrada (I121)"
-    } elseif ($gasRaw -notmatch 'function calcLeadingDiaPatch_[\s\S]{0,800}Ativa') {
+    } elseif ($gasRaw -notmatch 'function isStatusFaturavelCaixa_' -and $gasRaw -notmatch 'function calcLeadingDiaPatch_[\s\S]{0,800}Ativa') {
       Add-Check "guard.i121.kpi.payfirst" "fail" "calcLeadingDiaPatch_ sem Ativa (I121)"
     } else {
       Add-Check "guard.i121.kpi.payfirst" "ok" "kpiMes+leading incluem Ativa/Pendente"
+    }
+    # I158 — Golden/relatório nunca conta Cancelada; mesma agregação do kpiMes
+    if ($gasRaw -notmatch 'function isStatusFaturavelCaixa_') {
+      Add-Check "guard.i158.faturavel" "fail" "isStatusFaturavelCaixa_ ausente (I158)"
+    } elseif ($gasRaw -notmatch 'function aggMovimentacaoMesCaixa_') {
+      Add-Check "guard.i158.faturavel" "fail" "aggMovimentacaoMesCaixa_ ausente (I158)"
+    } elseif ($gasRaw -match 'function _gerarHtmlRelatorio_[\s\S]{0,1200}String\(r\[14\]\) === ''Ativa''') {
+      Add-Check "guard.i158.faturavel" "fail" "_gerarHtmlRelatorio_ ainda exclui so Ativa (conta Cancelada) (I158)"
+    } elseif ($gasRaw -match 'function _calcFatMes_[\s\S]{0,500}String\(r\[14\]\) === ''Ativa''') {
+      Add-Check "guard.i158.faturavel" "fail" "_calcFatMes_ ainda conta Cancelada (I158)"
+    } elseif ($gasRaw -notmatch 'function _gerarHtmlRelatorio_[\s\S]{0,800}aggMovimentacaoMesCaixa_') {
+      Add-Check "guard.i158.faturavel" "fail" "_gerarHtmlRelatorio_ nao usa aggMovimentacaoMesCaixa_ (I158)"
+    } else {
+      Add-Check "guard.i158.faturavel" "ok" "Golden/KPI sem Cancelada (I158)"
     }
   } else {
     Add-Check "guard.gas.portal.canon" "warn" ".gs canonico nao encontrado"

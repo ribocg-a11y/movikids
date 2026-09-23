@@ -1,6 +1,20 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 08/09/2026 · FE **v1.9.114** Pages ✅ · GAS ping **v1.5.220** (= repo) · **I155** ✅ · **I154** ✅ · **I153** ✅
+**Atualizado:** 23/09/2026 · FE **v1.9.119** Pages ✅ · GAS repo **v1.5.222** (I158) · ping prod **v1.5.221** ⏳ Nova versão Web
+
+## Travas recentes
+
+| Família | Travas |
+|---------|--------|
+| **I158** Golden vs kpiMes | `isStatusFaturavelCaixa_` · sem Cancelada · `guard.i158.*` · `TESTE_I158_GOLDEN_*` · `INCIDENTE_I158_*` |
+| **I151** encerrar fantasma | `guard.i151.*` · `TESTE_I151_ENCERRAR_FANTASMA_READONLY.ps1` |
+| **I153–I155** | duplicata / 404 / lookback — ver MAPA |
+
+**Próximo (sócio):** Nova versão Web GAS **v1.5.222** → regenerar PDF Golden ago/2026 (fat **R$ 16.140** · CTO **R$ 1.614**)
+
+---
+
+**Atualizado (legado abaixo):** 08/09/2026 · FE **v1.9.114** · GAS ping **v1.5.220** · **I155** ✅ · **I154** ✅ · **I153** ✅
 
 ## Ops RH (04/09)
 
