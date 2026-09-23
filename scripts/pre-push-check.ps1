@@ -476,29 +476,30 @@ try {
     } else {
       Add-Check "guard.i121.dash.invalidate" "ok" "kpiMes+comando invalidados em escrita"
     }
-    if ($gasRaw -notmatch 'I121/I158: pay-first — Ativa/Pendente já pagas' -and $gasRaw -notmatch 'I121: pay-first — Ativa/Pendente já pagas \(paridade I117') {
+    if ($gasRaw -notmatch 'I121: pay-first — Ativa/Pendente já pagas \(paridade I117') {
       Add-Check "guard.i121.kpi.payfirst" "fail" "kpiMes ainda so Encerrada (I121)"
-    } elseif ($gasRaw -notmatch 'function isStatusFaturavelCaixa_' -and $gasRaw -notmatch 'function calcLeadingDiaPatch_[\s\S]{0,800}Ativa') {
+    } elseif ($gasRaw -notmatch 'function calcLeadingDiaPatch_[\s\S]{0,800}Ativa') {
       Add-Check "guard.i121.kpi.payfirst" "fail" "calcLeadingDiaPatch_ sem Ativa (I121)"
     } else {
       Add-Check "guard.i121.kpi.payfirst" "ok" "kpiMes+leading incluem Ativa/Pendente"
     }
-    # I158 — Golden/relatório nunca conta Cancelada; mesma agregação do kpiMes
-    if ($gasRaw -notmatch 'function isStatusFaturavelCaixa_') {
-      Add-Check "guard.i158.faturavel" "fail" "isStatusFaturavelCaixa_ ausente (I158)"
-    } elseif ($gasRaw -notmatch 'function aggMovimentacaoMesCaixa_') {
-      Add-Check "guard.i158.faturavel" "fail" "aggMovimentacaoMesCaixa_ ausente (I158)"
-    } elseif ($gasRaw -match 'function _gerarHtmlRelatorio_[\s\S]{0,1200}String\(r\[14\]\) === ''Ativa''') {
-      Add-Check "guard.i158.faturavel" "fail" "_gerarHtmlRelatorio_ ainda exclui so Ativa (conta Cancelada) (I158)"
-    } elseif ($gasRaw -match 'function _calcFatMes_[\s\S]{0,500}String\(r\[14\]\) === ''Ativa''') {
-      Add-Check "guard.i158.faturavel" "fail" "_calcFatMes_ ainda conta Cancelada (I158)"
-    } elseif ($gasRaw -notmatch 'function _gerarHtmlRelatorio_[\s\S]{0,800}aggMovimentacaoMesCaixa_') {
-      Add-Check "guard.i158.faturavel" "fail" "_gerarHtmlRelatorio_ nao usa aggMovimentacaoMesCaixa_ (I158)"
-    } else {
-      Add-Check "guard.i158.faturavel" "ok" "Golden/KPI sem Cancelada (I158)"
-    }
   } else {
     Add-Check "guard.gas.portal.canon" "warn" ".gs canonico nao encontrado"
+  }
+
+  # I158 — relatório Golden no FE via kpiMes (sem Cancelada); sem depender de Nova versão GAS
+  $adminJsI158 = Join-Path $root "mk-admin.js"
+  if (Test-Path $adminJsI158) {
+    $adminI158 = Get-Content -Path $adminJsI158 -Raw -Encoding UTF8
+    if ($adminI158 -notmatch 'function mkHtmlRelatorioGoldenFromKpi_') {
+      Add-Check "guard.i158.fe.golden" "fail" "mkHtmlRelatorioGoldenFromKpi_ ausente (I158 FE)"
+    } elseif ($adminI158 -notmatch 'carregarPreviewRelatorio[\s\S]{0,1200}mkHtmlRelatorioGoldenFromKpi_') {
+      Add-Check "guard.i158.fe.golden" "fail" "preview Golden ainda usa so buscarPreviewRelatorio GAS (I158)"
+    } elseif ($adminI158 -match 'async function enviarRelatorioEmail[\s\S]{0,800}action:\s*[''\"]gerarRelatorio[''\"]') {
+      Add-Check "guard.i158.fe.golden" "fail" "enviarRelatorioEmail ainda chama gerarRelatorio GAS (conta Cancelada) (I158)"
+    } else {
+      Add-Check "guard.i158.fe.golden" "ok" "Golden FE via kpiMes sem Cancelada (I158)"
+    }
   }
 
   $adminJs = Join-Path $root "mk-admin.js"

@@ -1,6 +1,5 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.222
-// v1.5.222: I158 — relatório Golden/KPI: nunca contar Cancelada; só Encerrada|Ativa|Pendente (ganho real)
+// MOVI KIDS — Google Apps Script v1.5.221
 // v1.5.221: I156 — ritmo 3d: lastNBillingDays lê chaves "01"/"1" (linha Ritmo sumia no Dashboard)
 // v1.5.220: I155 — listarAtivas/carregarInicio leem CAUDA (lookback) + cache curto ativas (anti-404)
 // v1.5.219: I154 — listarAuditoria: cauda real + sort por data/hora (não string DD/MM)
@@ -214,8 +213,8 @@
 
 // ── CONSTANTES ───────────────────────────────────────────────
 /** Versão exposta em ping, carregarInicio, validarSchema, gestaoPessoasStatus (bump com header). */
-const MK_GAS_VERSAO_  = 'v1.5.222';
-const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.222';
+const MK_GAS_VERSAO_  = 'v1.5.221';
+const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.221';
 const SHEET_ID   = '1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618';
 const DEPLOY_ID  = 'AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y';
 const WEBAPP_URL = `https://script.google.com/macros/s/${DEPLOY_ID}/exec`;
@@ -826,67 +825,6 @@ const LOC_HEADERS_ = [
 /** Col S (19) — id da locação-mestre (I42). Leitura timer: COL_LOC_READ_ (28). */
 const COL_CONTA_ID_ = 19;
 const COL_LOC_READ_ = 28;
-
-/**
- * I158 — status que entra em faturamento/caixa/relatório (Golden + kpiMes).
- * Cancelada NUNCA conta. Ativa/Pendente entram (pay-first: já pago na maquininha).
- */
-function isStatusFaturavelCaixa_(status) {
-  const st = String(status || '').trim();
-  return st === 'Encerrada' || st === 'Ativa' || st === 'Pendente';
-}
-
-/** I158 — agrega movimentação do mês (paridade kpiMes × relatório Golden). */
-function aggMovimentacaoMesCaixa_(mes, ano) {
-  const mmyy = String(mes).padStart(2, '0') + '/' + ano;
-  const out = {
-    fatTotal: 0,
-    nContas: 0,
-    fatCarros: 0,
-    fatTricilos: 0,
-    fatPelucias: 0,
-    fatExtra: 0,
-    porPlano: {},
-    porHora: Array(14).fill(0),
-    contas: {}
-  };
-  const shLoc = sh_(SH_LOC);
-  const lastLoc = shLoc.getLastRow();
-  if (lastLoc < DATA_ROW) return out;
-  const dados = shLoc.getRange(DATA_ROW, 1, lastLoc - DATA_ROW + 1, COL_CONTA_ID_).getValues();
-  dados.forEach(function (r) {
-    if (!r[0]) return;
-    if (!isStatusFaturavelCaixa_(r[14])) return;
-    const p = cellToStr_(r[1]).split('/');
-    if (p.length < 3 || p[1].padStart(2, '0') + '/' + p[2] !== mmyy) return;
-    const vt = Number(r[10]) || 0;
-    const tipo = String(r[4]);
-    const plano = String(r[5]);
-    const dataR = cellToStr_(r[1]);
-    out.fatTotal += vt;
-    out.contas[String(contaIdLocRow_(r)) + '|' + dataR] = true;
-    if (tipo === 'Carro') out.fatCarros += vt;
-    if (tipo === 'Triciclo') out.fatTricilos += vt;
-    if (tipo === 'Pelúcia') out.fatPelucias += vt;
-    out.fatExtra += Number(r[9]) || 0;
-    const horaStr2 = cellToStr_(r[2]);
-    const hora = parseInt(String(horaStr2).split(':')[0] || '9', 10);
-    const hIdx = Math.min(Math.max(hora - 9, 0), 13);
-    out.porHora[hIdx] += vt;
-    const k = tipo + ' — ' + plano;
-    if (!out.porPlano[k]) out.porPlano[k] = { qty: 0, valor: 0 };
-    out.porPlano[k].qty++;
-    out.porPlano[k].valor += vt;
-  });
-  out.nContas = Object.keys(out.contas).length;
-  out.fatTotal = Math.round(out.fatTotal * 100) / 100;
-  out.fatCarros = Math.round(out.fatCarros * 100) / 100;
-  out.fatTricilos = Math.round(out.fatTricilos * 100) / 100;
-  out.fatPelucias = Math.round(out.fatPelucias * 100) / 100;
-  out.fatExtra = Math.round(out.fatExtra * 100) / 100;
-  return out;
-}
-
 /**
  * I155 — cauda operacional LOCAÇÕES (~600 linhas ≈ vários dias).
  * Ativa/Pendente e encerradas do dia ficam no fim; evita ler 3k+×28 a cada sync (causa 404/timeout).
@@ -4875,7 +4813,7 @@ function calcResumoDiaCore_(dataFmt) {
       const data = cellToStr_(r[1]);
       if (data !== dataAlvo) continue;
       const status = String(r[14]).trim();
-      if (!isStatusFaturavelCaixa_(status)) continue;
+      if (status !== 'Encerrada' && status !== 'Ativa' && status !== 'Pendente') continue;
       const valorPlano = Number(r[7] || 0) || 0;
       const valorAdic = Number(r[9] || 0) || 0;
       const valorTotal = Number(r[10] || 0) || (valorPlano + valorAdic);
@@ -7660,7 +7598,7 @@ function calcLeadingDiaPatch_(mes, ano) {
     shLoc.getRange(DATA_ROW, 1, lastLoc - DATA_ROW + 1, COL_CONTA_ID_).getValues().forEach(function(r) {
       if (!r[0]) return;
       const st = String(r[14] || '').trim();
-      if (!isStatusFaturavelCaixa_(st)) return;
+      if (st !== 'Encerrada' && st !== 'Ativa' && st !== 'Pendente') return;
       const dataR = cellToStr_(r[1]);
       const pts = dataR.split('/');
       if (pts.length < 3) return;
@@ -7799,8 +7737,8 @@ function buildKpiMesPayload_(p) {
         nCancelMes++;
         return;
       }
-      // I121/I158: pay-first — Ativa/Pendente já pagas; Cancelada nunca entra
-      if (!isStatusFaturavelCaixa_(status)) return;
+      // I121: pay-first — Ativa/Pendente já pagas (paridade I117/resumoDia/comando)
+      if (status !== 'Encerrada' && status !== 'Ativa' && status !== 'Pendente') return;
 
       const vt     = Number(r[10]);
       fatByPayback[mmyyR] = (fatByPayback[mmyyR] || 0) + vt;
@@ -8711,10 +8649,22 @@ function _enviarRelatorioMes_(refDate) {
 }
 
 function _calcFatMes_(refDate) {
-  const mes = refDate.getMonth() + 1;
-  const ano = refDate.getFullYear();
-  // I158: mesma regra do relatório Golden / kpiMes (sem Cancelada)
-  return aggMovimentacaoMesCaixa_(mes, ano).fatTotal;
+  const mes  = refDate.getMonth() + 1;
+  const ano  = refDate.getFullYear();
+  const mmyy = String(mes).padStart(2,'0') + '/' + ano;
+  const shLoc= sh_(SH_LOC);
+  const last = shLoc.getLastRow();
+  let fat = 0;
+  if (last >= DATA_ROW) {
+    const dados = shLoc.getRange(DATA_ROW, 1, last - DATA_ROW + 1, 15).getValues();
+    dados.forEach(r => {
+      if (!r[0] || String(r[14]) === 'Ativa') return;
+      const p = cellToStr_(r[1]).split('/');
+      if (p.length < 3 || p[1].padStart(2,'0') + '/' + p[2] !== mmyy) return;
+      fat += Number(r[10]);
+    });
+  }
+  return fat;
 }
 
 /** FASE 6 — resumo executivo para PDF executivo. */
@@ -8854,14 +8804,32 @@ function _gerarHtmlRelatorio_(refDate, audience) {
   const MESES= ['Janeiro','Fevereiro','Março','Abril','Maio','Junho',
                 'Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
   const nomeMes = MESES[mes - 1];
-  const shCus = sh_(SH_CUS);
-  const lastCus = shCus.getLastRow();
-  // I158: paridade kpiMes — só Encerrada|Ativa|Pendente; n = contas (não linhas); Cancelada fora
-  const mov = aggMovimentacaoMesCaixa_(mes, ano);
-  let fatTotal = mov.fatTotal, nLoc = mov.nContas;
-  let fatCarros = mov.fatCarros, fatTricilos = mov.fatTricilos, fatPelucias = mov.fatPelucias, fatExtra = mov.fatExtra;
-  const porPlano = mov.porPlano;
-  const porHora = mov.porHora;
+  const shLoc = sh_(SH_LOC), shCus = sh_(SH_CUS);
+  const lastLoc = shLoc.getLastRow(), lastCus = shCus.getLastRow();
+  let fatTotal = 0, nLoc = 0, fatCarros = 0, fatTricilos = 0, fatPelucias = 0, fatExtra = 0;
+  const porPlano = {};
+  const porHora = Array(14).fill(0);
+  if (lastLoc >= DATA_ROW) {
+    const dados = shLoc.getRange(DATA_ROW, 1, lastLoc - DATA_ROW + 1, 15).getValues();
+    dados.forEach(r => {
+      if (!r[0] || String(r[14]) === 'Ativa') return;
+      const p = cellToStr_(r[1]).split('/');
+      if (p.length < 3 || p[1].padStart(2,'0') + '/' + p[2] !== mmyy) return;
+      const vt = Number(r[10]), tipo = String(r[4]), plano = String(r[5]);
+      fatTotal += vt; nLoc++;
+      if (tipo === 'Carro')    fatCarros   += vt;
+      if (tipo === 'Triciclo') fatTricilos += vt; // v1.5.3
+      if (tipo === 'Pelúcia')  fatPelucias += vt;
+      fatExtra += Number(r[9]);
+      const horaStr2 = cellToStr_(r[2]);
+      const hora = parseInt(String(horaStr2).split(':')[0] || '9', 10);
+      const hIdx = Math.min(Math.max(hora - 9, 0), 13);
+      porHora[hIdx] += vt;
+      const k = tipo + ' — ' + plano;
+      if (!porPlano[k]) porPlano[k] = { qty:0, valor:0 };
+      porPlano[k].qty++; porPlano[k].valor += vt;
+    });
+  }
   let totalCustos = 0; const custosList = [];
   if (!forGolden && lastCus >= DATA_ROW) {
     const dados = shCus.getRange(DATA_ROW, 1, lastCus - DATA_ROW + 1, 6).getValues();
@@ -8911,10 +8879,10 @@ function _gerarHtmlRelatorio_(refDate, audience) {
       + '<div style="background:linear-gradient(135deg,#1565C0,#E91E8C);padding:32px 28px;text-align:center"><h1 style="margin:0;color:#fff;font-size:26px">🚗 MOVI KIDS</h1>'
       + '<p style="margin:8px 0 0;color:rgba(255,255,255,.85);font-size:14px">Relatório Mensal — ' + nomeMes + ' de ' + ano + '</p>'
       + '<p style="margin:6px 0 0;color:rgba(255,255,255,.7);font-size:11px">Golden Shopping Calhau · movimentação e condições contratuais</p></div>'
-      + '<div style="padding:14px 28px;background:#E3F2FD;font-size:12px;color:#1565C0;line-height:1.5">Apresenta o <strong>fluxo de atendimento</strong> (locações pagas e faturamento) e o <strong>CTO</strong> conforme contrato. <strong>Canceladas não entram</strong> no faturamento.</div>'
+      + '<div style="padding:14px 28px;background:#E3F2FD;font-size:12px;color:#1565C0;line-height:1.5">Apresenta o <strong>fluxo de atendimento</strong> (locações e faturamento) e o <strong>CTO</strong> conforme contrato de locação.</div>'
       + '<div style="display:grid;grid-template-columns:repeat(3,1fr);border-bottom:1px solid #eee">'
       + '<div style="padding:20px;text-align:center;border-right:1px solid #eee"><div style="font-size:22px;font-weight:bold;color:#2E7D32">' + f(fatTotal) + '</div><div style="font-size:11px;color:#888;margin-top:4px">Faturamento bruto</div></div>'
-      + '<div style="padding:20px;text-align:center;border-right:1px solid #eee"><div style="font-size:22px;font-weight:bold;color:#1565C0">' + nLoc + '</div><div style="font-size:11px;color:#888;margin-top:4px">Locações (pagas)</div></div>'
+      + '<div style="padding:20px;text-align:center;border-right:1px solid #eee"><div style="font-size:22px;font-weight:bold;color:#1565C0">' + nLoc + '</div><div style="font-size:11px;color:#888;margin-top:4px">Locações encerradas</div></div>'
       + '<div style="padding:20px;text-align:center"><div style="font-size:22px;font-weight:bold;color:#6A1B9A">' + (nLoc > 0 ? f(fatTotal / nLoc) : 'R$ 0,00') + '</div><div style="font-size:11px;color:#888;margin-top:4px">Ticket médio</div></div></div>'
       + '<div style="padding:20px 28px"><h3 style="margin:0 0 14px;font-size:13px;text-transform:uppercase;color:#555">Movimentação por tipo de veículo</h3>'
       + '<div style="display:grid;grid-template-columns:' + (fatTricilos > 0 ? '1fr 1fr 1fr' : '1fr 1fr') + ';gap:12px">'
@@ -8938,7 +8906,7 @@ function _gerarHtmlRelatorio_(refDate, audience) {
       + '<tr><td style="font-size:12px;color:#888">Vencimento referência:</td><td style="text-align:right;font-size:12px;color:#888">' + vencCto + '</td></tr></table></div>'
       + (forExecutivo ? _htmlSecaoNarrativaExecutiva_(mes, ano) : '')
       + (forExecutivo ? _htmlSecaoPayback_(mes, ano, f) : '')
-      + '<div style="padding:16px 28px 24px;background:#f9f9f9;text-align:center;font-size:11px;color:#aaa;border-top:1px solid #eee">Gerado em ' + fmtData_(new Date()) + ' às ' + fmtHoraLocal_(new Date()) + ' · Movi Kids ' + MK_GAS_VERSAO_ + (forExecutivo ? ' · PDF Executivo' : '') + ' · sem canceladas</div>'
+      + '<div style="padding:16px 28px 24px;background:#f9f9f9;text-align:center;font-size:11px;color:#aaa;border-top:1px solid #eee">Gerado em ' + fmtData_(new Date()) + ' às ' + fmtHoraLocal_(new Date()) + ' · Movi Kids GAS v1.5.73' + (forExecutivo ? ' · PDF Executivo' : '') + '</div>'
       + '</div></body></html>';
   }
 

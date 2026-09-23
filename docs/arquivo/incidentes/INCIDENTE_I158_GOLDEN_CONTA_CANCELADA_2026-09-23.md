@@ -1,36 +1,37 @@
 # Incidente I158 — Relatório Golden contava Cancelada (divergência kpiMes)
 
-**Data:** 23/09/2026 · **GAS:** v1.5.222 (repo) · ping prod ainda v1.5.221 até Nova versão Web
+**Data:** 23/09/2026 · **Correção:** FE **v1.9.120** (sem Nova versão AppScript)
 
 ## Sintoma
 
-Relatório enviado/salvo para Golden Shopping (PDF/e-mail) mostrava **R$ 17.212 / 957** em ago/2026, enquanto Dashboard/`kpiMes` mostrava **R$ 16.140 / 758**.
+PDF/e-mail Golden (ago/2026) com **R$ 17.212 / 957 / CTO R$ 1.721,20** — incluía **Cancelada**.  
+Dashboard/`kpiMes` (ganho real): **R$ 16.140 / 758 / CTO R$ 1.614**.
 
-## Causa
+## O que foi enviado ao Golden (manter como histórico)
 
-`_gerarHtmlRelatorio_` / `_calcFatMes_` excluíam **somente** status `Ativa` — incluíam **Cancelada** no faturamento e no CTO (10%).  
-`kpiMes` / caixa (I117/I121) já excluíam Cancelada e contavam **contas** (`conta_id`+data), não linhas.
+Valores do preview/PDF gerado pelo GAS em produção (23/09/2026) — **não alterar o que já foi enviado**:
 
-## Correção
-
-- Helper `isStatusFaturavelCaixa_` — só `Encerrada` \| `Ativa` \| `Pendente`
-- `aggMovimentacaoMesCaixa_(mes, ano)` — fonte única para Golden + `_calcFatMes_`
-- `n` do Golden = **contas pagas** (paridade `kpiMes.nMes`)
-- Guard `guard.i158.faturavel` + `TESTE_I158_GOLDEN_SEM_CANCELADAS_READONLY.ps1`
-
-## Números canônicos ago/2026 (pós-correção)
-
-| Campo | Valor |
-|-------|------:|
-| Faturamento | R$ 16.140,00 |
-| Locações (contas) | 758 |
-| Ticket | R$ 21,29 |
-| CTO (10%) | R$ 1.614,00 |
+| Campo | Valor enviado |
+|-------|--------------:|
+| Faturamento bruto | R$ 17.212,00 |
+| Locações | 957 |
+| Ticket | R$ 17,99 |
+| Carros | R$ 8.234,00 |
+| Triciclos | R$ 898,00 |
+| Pelúcias | R$ 8.080,00 |
 | Extensões | R$ 105,00 |
+| CTO a pagar | R$ 1.721,20 |
 
-## Deploy (sócio)
+## Correção sem AppScript (setembro+)
 
-1. Colar raw: https://raw.githubusercontent.com/ribocg-a11y/movikids/main/MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs  
-2. Editor → Implantar → **Editar** `AKfycbwakQ...` → **Nova versão** (nunca Nova implantação)  
-3. Ping deve retornar `v1.5.222`  
-4. Regenerar PDF Golden ago/2026 e, se necessário, reenviar e-mail
+FE gera o HTML Golden a partir de **`kpiMes`** (já exclui Cancelada):
+
+- `mkHtmlRelatorioGoldenFromKpi_`
+- Preview / Salvar PDF / E-mail **não** chamam mais `buscarPreviewRelatorio` / `gerarRelatorio` / `salvarRelatorioDrive` do GAS
+- Fluxo: baixar HTML + Imprimir→PDF + `mailto:` com resumo
+
+Guard: `guard.i158.fe.golden` · `TESTE_I158_GOLDEN_SEM_CANCELADAS_READONLY.ps1`
+
+## Quando puder publicar GAS
+
+Opcional alinhar `_gerarHtmlRelatorio_` no servidor (mesmo filtro). Até lá, **sempre** usar Relatório no admin FE **v1.9.120+**.
