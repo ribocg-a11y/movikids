@@ -487,6 +487,21 @@ try {
     Add-Check "guard.gas.portal.canon" "warn" ".gs canonico nao encontrado"
   }
 
+  # I158 — relatório Golden no FE via kpiMes (sem Cancelada); sem depender de Nova versão GAS
+  $adminJsI158 = Join-Path $root "mk-admin.js"
+  if (Test-Path $adminJsI158) {
+    $adminI158 = Get-Content -Path $adminJsI158 -Raw -Encoding UTF8
+    if ($adminI158 -notmatch 'function mkHtmlRelatorioGoldenFromKpi_') {
+      Add-Check "guard.i158.fe.golden" "fail" "mkHtmlRelatorioGoldenFromKpi_ ausente (I158 FE)"
+    } elseif ($adminI158 -notmatch 'carregarPreviewRelatorio[\s\S]{0,1200}mkHtmlRelatorioGoldenFromKpi_') {
+      Add-Check "guard.i158.fe.golden" "fail" "preview Golden ainda usa so buscarPreviewRelatorio GAS (I158)"
+    } elseif ($adminI158 -match 'async function enviarRelatorioEmail[\s\S]{0,800}action:\s*[''\"]gerarRelatorio[''\"]') {
+      Add-Check "guard.i158.fe.golden" "fail" "enviarRelatorioEmail ainda chama gerarRelatorio GAS (conta Cancelada) (I158)"
+    } else {
+      Add-Check "guard.i158.fe.golden" "ok" "Golden FE via kpiMes sem Cancelada (I158)"
+    }
+  }
+
   $adminJs = Join-Path $root "mk-admin.js"
   if (Test-Path $adminJs) {
     $adminRaw = Get-Content -Path $adminJs -Raw -Encoding UTF8

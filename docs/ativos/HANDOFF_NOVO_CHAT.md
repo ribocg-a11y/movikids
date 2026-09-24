@@ -1,6 +1,16 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 08/09/2026 · FE **v1.9.114** Pages ✅ · GAS ping **v1.5.220** (= repo) · **I155** ✅ · **I154** ✅ · **I153** ✅
+**Atualizado:** 23/09/2026 · FE **v1.9.120** Pages (I158 Golden FE) · GAS ping **v1.5.221** (sem mudança AppScript)
+
+## I158 — Relatório Golden
+
+- **Agosto enviado ao Golden (histórico):** R$ **17.212** · 957 · CTO **R$ 1.721,20** (GAS antigo contava Cancelada — não reenviar)
+- **Setembro+:** admin Relatório gera HTML via **kpiMes** no FE (sem canceladas) — baixar/imprimir PDF; e-mail GAS desligado
+- Guard `guard.i158.fe.golden` · `INCIDENTE_I158_*`
+
+---
+
+**Atualizado (legado abaixo):** 08/09/2026 · FE **v1.9.114** · GAS ping **v1.5.220** · **I155** ✅ · **I154** ✅ · **I153** ✅
 
 ## Ops RH (04/09)
 
