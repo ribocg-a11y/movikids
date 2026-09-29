@@ -1,11 +1,12 @@
-/* MOVI KIDS — Multi-unidade (Opção A · I159b preços La Ville)
- * Golden = legado (CONFIG/GAS). La Ville = catálogo FE local até schema+GAS Web.
- * Sem unidadeId → golden (zero regressão).
+/* MOVI KIDS — Multi-unidade (Opção A · I159e unidade_id)
+ * Golden = legado (CONFIG/GAS). La Ville = catálogo FE + GAS.
+ * Sem unidadeId → golden (zero regressão). ADM holding → all.
  */
 (function (w) {
   'use strict';
 
   var STORAGE_KEY = 'mk_unidade_ativa_v1';
+  var FILTRO_ADM_KEY = 'mk_unidade_filtro_adm_v1';
   var DEFAULT_ID = 'golden';
   var _snapGolden_ = null;
 
@@ -28,7 +29,7 @@
   };
 
   /**
-   * Frota provisória (prefixo LV evita colisão com Golden na mesma planilha).
+   * Frota provisória (prefixo LV evita colisão com Carro 01 Golden na mesma planilha).
    * Confirmar quantidade real com o sócio antes de operar em produção.
    */
   var FROTA_LAVILLE_PROVISORIA_ = [
@@ -87,12 +88,14 @@
     var s = String(id || '').trim().toLowerCase();
     if (s === 'golden' || s === 'g' || s === 'calhau') return 'golden';
     if (s === 'laville' || s === 'la-ville' || s === 'la_ville' || s === 'lv') return 'laville';
+    if (s === 'all' || s === 'todas' || s === '*' || s === 'holding') return 'all';
     return '';
   }
 
   function getUnidade(id) {
-    var c = canon_(id) || DEFAULT_ID;
-    return UNIDADES[c] || UNIDADES[DEFAULT_ID];
+    var c = canon_(id);
+    if (c === 'all') return { id: 'all', nome: 'Todas as lojas', nomeCurto: 'Todas', ativa: true, precosProntos: true };
+    return UNIDADES[c || DEFAULT_ID] || UNIDADES[DEFAULT_ID];
   }
 
   function listUnidades() {
@@ -114,7 +117,7 @@
 
   function getUnidadeId() {
     var fromUrl = readUrlUnidade_();
-    if (fromUrl) {
+    if (fromUrl && fromUrl !== 'all') {
       var uUrl = getUnidade(fromUrl);
       if (uUrl.ativa && uUrl.precosProntos) return uUrl.id;
       return DEFAULT_ID;
@@ -122,7 +125,7 @@
     try {
       var raw = localStorage.getItem(STORAGE_KEY);
       var c = canon_(raw);
-      if (c) {
+      if (c && c !== 'all') {
         var u = getUnidade(c);
         if (u.ativa && u.precosProntos) return u.id;
       }
@@ -131,6 +134,11 @@
   }
 
   function setUnidadeId(id) {
+    var c = canon_(id);
+    if (c === 'all') {
+      try { localStorage.setItem(FILTRO_ADM_KEY, 'all'); } catch (eA) { /* ignore */ }
+      return { ok: true, unidade: getUnidade('all') };
+    }
     var u = getUnidade(id);
     if (!u.ativa || !u.precosProntos) {
       return { ok: false, erro: u.bloqueioMotivo || 'Unidade indisponível', unidade: u };
@@ -149,6 +157,21 @@
     try { localStorage.removeItem(STORAGE_KEY); } catch (e) { /* ignore */ }
   }
 
+  function getFiltroAdm_() {
+    try {
+      var f = canon_(localStorage.getItem(FILTRO_ADM_KEY));
+      if (f === 'all' || f === 'golden' || f === 'laville') return f;
+    } catch (e) { /* ignore */ }
+    return 'all';
+  }
+
+  function setFiltroAdm_(id) {
+    var c = canon_(id);
+    if (c !== 'all' && c !== 'golden' && c !== 'laville') c = 'all';
+    try { localStorage.setItem(FILTRO_ADM_KEY, c); } catch (e) { /* ignore */ }
+    return c;
+  }
+
   function label(id) {
     return getUnidade(id || getUnidadeId()).nome;
   }
@@ -160,7 +183,7 @@
   function subLinha(id) {
     var u = getUnidade(id || getUnidadeId());
     var extra = u.frotaProvisoria ? ' · frota provisória' : '';
-    return u.nome + (u.cidade ? ' · ' + u.cidade : '') + extra;
+    return (u.nome || '') + (u.cidade ? ' · ' + u.cidade : '') + extra;
   }
 
   function precisaEscolherUnidade_() {
@@ -175,7 +198,25 @@
     }
   }
 
+  function isAdm_() {
+    return (typeof mkAuthIsAdmin === 'function' && mkAuthIsAdmin()) || !!w.isAdmin;
+  }
+
+  /** Params API: operador = unidade ativa; ADM holding = all; ADM balcão = unidade; caixa/KPI = filtro ADM. */
   function apiParamsUnidade_() {
+    if (isAdm_()) {
+      try {
+        var home = document.getElementById('page-home');
+        if (home && home.classList.contains('active')) {
+          return { unidadeId: getUnidadeId() };
+        }
+        var hold = document.getElementById('page-holding');
+        if (hold && hold.classList.contains('active')) {
+          return { unidadeId: 'all' };
+        }
+      } catch (e) { /* ignore */ }
+      return { unidadeId: getFiltroAdm_() };
+    }
     return { unidadeId: getUnidadeId() };
   }
 
@@ -254,20 +295,32 @@
   w.mkUnidadePrecisaEscolher_ = precisaEscolherUnidade_;
   w.mkUnidadeApiParams_ = apiParamsUnidade_;
   w.mkUnidadeAtivarLaVille_ = ativarLaVilleQuandoPronta_;
+  w.mkUnidadeFiltroAdm_ = getFiltroAdm_;
+  w.mkUnidadeSetFiltroAdm_ = setFiltroAdm_;
+
   function unidadeIdFromVeiculo_(veiculo) {
     var v = String(veiculo || '').trim();
     if (v.indexOf('LV ') === 0) return 'laville';
     return DEFAULT_ID;
   }
 
+  function unidadeIdOfSession_(s) {
+    if (!s) return DEFAULT_ID;
+    var fromCol = canon_(s.unidadeId);
+    if (fromCol && fromCol !== 'all') return fromCol;
+    return unidadeIdFromVeiculo_(s.veiculo);
+  }
+
   function sessionsPorUnidade_(lista, uid) {
     var id = canon_(uid) || DEFAULT_ID;
+    if (id === 'all') return (lista || []).slice();
     return (lista || []).filter(function (s) {
-      return unidadeIdFromVeiculo_(s && s.veiculo) === id;
+      return unidadeIdOfSession_(s) === id;
     });
   }
 
   w.mkUnidadeFromVeiculo_ = unidadeIdFromVeiculo_;
+  w.mkUnidadeOfSession_ = unidadeIdOfSession_;
   w.mkSessionsPorUnidade_ = sessionsPorUnidade_;
   w.mkUnidadeAplicarConfig_ = aplicarConfigLocal_;
   w.mkUnidadeSyncAposGas_ = syncAposGasConfig_;

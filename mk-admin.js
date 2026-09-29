@@ -4279,7 +4279,7 @@ async function carregarPreviewRelatorio() {
   if (btnDrv) btnDrv.disabled = true;
   try {
     // I158: HTML no FE via kpiMes (sem Cancelada) — não usa buscarPreviewRelatorio GAS
-    const d = await api({ action: 'kpiMes', mes: mes, ano: ano, lite: '1', ...apiParamsComAuth_() }, 90000);
+    const d = await api({ action: 'kpiMes', mes: mes, ano: ano, lite: '1', unidadeId: 'golden', ...apiParamsComAuth_() }, 90000);
     if (!d || !d.ok) {
       prev.innerHTML = '<div style="color:var(--red);padding:20px;text-align:center">Erro ao carregar kpiMes: ' + escHtml((d && d.erro) || 'falha') + '</div>';
       return;
@@ -4443,7 +4443,7 @@ function mkDownloadRelatorioHtml_(html, nomeArq) {
 }
 
 async function mkFetchKpiMesRelatorio_(mes, ano) {
-  const d = await api({ action: 'kpiMes', mes: mes, ano: ano, ...apiParamsComAuth_() }, 90000);
+  const d = await api({ action: 'kpiMes', mes: mes, ano: ano, unidadeId: 'golden', ...apiParamsComAuth_() }, 90000);
   if (!d || !d.ok) throw new Error((d && d.erro) || 'kpiMes falhou');
   return d;
 }

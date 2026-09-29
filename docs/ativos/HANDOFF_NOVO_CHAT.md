@@ -1,14 +1,14 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 29/09/2026 · FE **v1.9.124** Pages · GAS repo **v1.5.223** · **I159d** painel holding ADM (2 lojas) · hub 3+2 · **I158** ✅
+**Atualizado:** 29/09/2026 · FE **v1.9.125** Pages · GAS repo **v1.5.224** · **I159e** `unidade_id` col AC · holding filtro · **I158** ✅
 
 ## Produção (agora)
 
 | Camada | Versão | Link |
 |--------|--------|------|
-| Frontend | **v1.9.124** | https://ribocg-a11y.github.io/movikids/?force=1.9.124 |
-| Gestão Pessoas | **v1.9.124** | `gestao-pessoas.html?force=1.9.124` |
-| GAS | ping Web (confirmar **v1.5.223**) · repo **v1.5.223** | I159c La Ville |
+| Frontend | **v1.9.125** | https://ribocg-a11y.github.io/movikids/?force=1.9.125 |
+| Gestão Pessoas | **v1.9.125** | `gestao-pessoas.html?force=1.9.125` |
+| GAS | ping Web (confirmar **v1.5.224** após Nova versão) · repo **v1.5.224** | I159e unidade_id |
 | Design System | v1.1 | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
 
 **GAS raw:** https://raw.githubusercontent.com/ribocg-a11y/movikids/main/MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs  
@@ -17,6 +17,19 @@
 `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github\MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs`
 
 **Deploy ID:** `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y`
+
+---
+
+## I159e — Isolamento hard (esta sessão)
+
+| Item | Status |
+|------|--------|
+| Col AC `unidade_id` · `COL_LOC_READ_=29` | ✅ repo GAS **v1.5.224** |
+| Filtro `listarAtivas` / `carregarInicio` / `kpiMes` | ✅ `all\|golden\|laville` |
+| FE holding pills + ADM `unidadeId=all` | ✅ **v1.9.125** |
+| Relatório Golden força `unidadeId=golden` | ✅ |
+| Backfill `backfillUnidadeIdLocacoesAdmin` | ✅ (após Nova versão Web) |
+| **Nova versão Web GAS** | ⏳ sócio — raw GitHub + Editar lapis |
 
 ---
 

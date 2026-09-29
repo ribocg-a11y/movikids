@@ -256,18 +256,23 @@ try {
     } else {
       Add-Check "guard.gas.timestamp.noFallback" "ok" "timestampCanonico so col Y"
     }
-    # I43 — carregarInicio: r[24] exige COL_LOC_READ_ (via getRange direto OU locSheetTail_ I155)
+    # I43 — carregarInicio: r[24] exige COL_LOC_READ_ ≥28 (via getRange direto OU locSheetTail_ I155; I159e=29)
     if ($gasRaw -match 'function carregarInicio_') {
-      if ($gasRaw -notmatch 'const COL_LOC_READ_\s*=\s*28') {
-        Add-Check "guard.gas.carregarInicio.colY" "fail" "COL_LOC_READ_=28 ausente (I43)"
-      } elseif ($gasRaw -match 'function carregarInicio_[\s\S]{0,15000}getRange\([^\)]*COL_CONTA_ID_\)[\s\S]{0,3000}r\[24\]') {
-        Add-Check "guard.gas.carregarInicio.colY" "fail" "carregarInicio getRange COL_CONTA_ID_ + r[24] (I43)"
-      } elseif ($gasRaw -match 'function carregarInicio_[\s\S]{0,15000}r\[24\]' -and $gasRaw -notmatch 'function carregarInicio_[\s\S]{0,15000}COL_LOC_READ_' -and $gasRaw -notmatch 'function carregarInicio_[\s\S]{0,15000}locSheetTail_') {
-        Add-Check "guard.gas.carregarInicio.colY" "fail" "carregarInicio usa r[24] sem COL_LOC_READ_/locSheetTail_ (I43/I155)"
-      } elseif ($gasRaw -match 'function locSheetTail_' -and $gasRaw -notmatch 'function locSheetTail_[\s\S]{0,800}COL_LOC_READ_') {
-        Add-Check "guard.gas.carregarInicio.colY" "fail" "locSheetTail_ sem COL_LOC_READ_ (I43/I155)"
+      if ($gasRaw -notmatch 'const COL_LOC_READ_\s*=\s*(\d+)') {
+        Add-Check "guard.gas.carregarInicio.colY" "fail" "COL_LOC_READ_ ausente (I43)"
       } else {
-        Add-Check "guard.gas.carregarInicio.colY" "ok" "COL_LOC_READ_ via locSheetTail_/carregarInicio"
+        $colRead = [int]$Matches[1]
+        if ($colRead -lt 28) {
+          Add-Check "guard.gas.carregarInicio.colY" "fail" "COL_LOC_READ_=$colRead < 28 (I43)"
+        } elseif ($gasRaw -match 'function carregarInicio_[\s\S]{0,15000}getRange\([^\)]*COL_CONTA_ID_\)[\s\S]{0,3000}r\[24\]') {
+          Add-Check "guard.gas.carregarInicio.colY" "fail" "carregarInicio getRange COL_CONTA_ID_ + r[24] (I43)"
+        } elseif ($gasRaw -match 'function carregarInicio_[\s\S]{0,15000}r\[24\]' -and $gasRaw -notmatch 'function carregarInicio_[\s\S]{0,15000}COL_LOC_READ_' -and $gasRaw -notmatch 'function carregarInicio_[\s\S]{0,15000}locSheetTail_') {
+          Add-Check "guard.gas.carregarInicio.colY" "fail" "carregarInicio usa r[24] sem COL_LOC_READ_/locSheetTail_ (I43/I155)"
+        } elseif ($gasRaw -match 'function locSheetTail_' -and $gasRaw -notmatch 'function locSheetTail_[\s\S]{0,800}COL_LOC_READ_') {
+          Add-Check "guard.gas.carregarInicio.colY" "fail" "locSheetTail_ sem COL_LOC_READ_ (I43/I155)"
+        } else {
+          Add-Check "guard.gas.carregarInicio.colY" "ok" "COL_LOC_READ_=$colRead via locSheetTail_/carregarInicio"
+        }
       }
     } else {
       Add-Check "guard.gas.carregarInicio.colY" "fail" "carregarInicio_ ausente no GAS"
@@ -526,6 +531,23 @@ try {
       Add-Check "guard.i159.gas.laville" "fail" "La Ville ainda inativa no GAS (I159c)"
     } else {
       Add-Check "guard.i159.gas.laville" "ok" "GAS La Ville precos/frota por unidadeId (I159c)"
+    }
+    if ($gasRawI159 -notmatch "'unidade_id'" -or $gasRawI159 -notmatch 'function unidadeIdOfRow_' -or $gasRawI159 -notmatch 'function locRowMatchesUnidade_' -or $gasRawI159 -notmatch 'const COL_LOC_READ_\s*=\s*29') {
+      Add-Check "guard.i159e.gas.unidade_id" "fail" "GAS sem schema/filtro unidade_id (I159e)"
+    } else {
+      Add-Check "guard.i159e.gas.unidade_id" "ok" "LOCACOES unidade_id + filtro (I159e)"
+    }
+  }
+
+  $holdJs = Join-Path $root "mk-holding.js"
+  $uniJs = Join-Path $root "mk-unidades.js"
+  if ((Test-Path $holdJs) -and (Test-Path $uniJs)) {
+    $holdRaw = Get-Content -Path $holdJs -Raw -Encoding UTF8
+    $uniRaw = Get-Content -Path $uniJs -Raw -Encoding UTF8
+    if ($uniRaw -notmatch 'mkUnidadeFiltroAdm_' -or $uniRaw -notmatch "unidadeId:\s*'all'" -or $holdRaw -notmatch 'mkHoldingSetFiltroCaixa_') {
+      Add-Check "guard.i159e.fe.filtro" "fail" "FE sem filtro ADM all|golden|laville (I159e)"
+    } else {
+      Add-Check "guard.i159e.fe.filtro" "ok" "FE holding filtro + apiParams all (I159e)"
     }
   }
 

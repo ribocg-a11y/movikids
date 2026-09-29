@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.223
+// MOVI KIDS — Google Apps Script v1.5.224
+// v1.5.224: I159e — LOCACOES col AC unidade_id (COL_LOC_READ_=29); filtro ativas/inicio/kpi; backfill
 // v1.5.223: I159c — La Ville preços/frota por unidadeId (CONFIG Golden intocado; LV* provisória)
 // v1.5.222: I159 — fundação multi-unidade (unidadeId soft; golden = legado; La Ville inativa até preços)
 // v1.5.221: I156 — ritmo 3d: lastNBillingDays lê chaves "01"/"1" (linha Ritmo sumia no Dashboard)
@@ -215,8 +216,8 @@
 
 // ── CONSTANTES ───────────────────────────────────────────────
 /** Versão exposta em ping, carregarInicio, validarSchema, gestaoPessoasStatus (bump com header). */
-const MK_GAS_VERSAO_  = 'v1.5.223';
-const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.223';
+const MK_GAS_VERSAO_  = 'v1.5.224';
+const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.224';
 const SHEET_ID   = '1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618';
 const DEPLOY_ID  = 'AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y';
 const WEBAPP_URL = `https://script.google.com/macros/s/${DEPLOY_ID}/exec`;
@@ -399,6 +400,38 @@ function unidadeIdFrom_(p) {
   const u = MK_UNIDADES_[id];
   if (!u || u.ativa === false || u.precosProntos === false) return MK_UNIDADE_DEFAULT_;
   return id;
+}
+
+/** Filtro de leitura: all|golden|laville. ADM holding usa all. */
+function unidadeIdFilterFrom_(p) {
+  const raw = p && (p.unidadeId != null ? p.unidadeId : (p.unidade != null ? p.unidade : p.unit));
+  const s = String(raw || '').trim().toLowerCase();
+  if (s === 'all' || s === 'todas' || s === '*' || s === 'holding') return 'all';
+  return unidadeIdFrom_(p);
+}
+
+/** Escrita: nunca all — usa veiculo se filtro holding. */
+function unidadeIdWriteFrom_(p, veiculo) {
+  const raw = p && (p.unidadeId != null ? p.unidadeId : (p.unidade != null ? p.unidade : p.unit));
+  const s = String(raw || '').trim().toLowerCase();
+  if (s === 'all' || s === 'todas' || s === '*' || s === 'holding' || !s) {
+    return unidadeIdFromVeiculo_(veiculo);
+  }
+  const id = unidadeIdCanon_(raw);
+  if (id) return id;
+  return unidadeIdFromVeiculo_(veiculo);
+}
+
+/** Col AC (índice 28) se preenchida; senão LV* → laville; senão golden. */
+function unidadeIdOfRow_(r) {
+  const fromCol = unidadeIdCanon_(r && r[28]);
+  if (fromCol) return fromCol;
+  return unidadeIdFromVeiculo_(r && r[15]);
+}
+
+function locRowMatchesUnidade_(r, uidFilter) {
+  if (!uidFilter || uidFilter === 'all') return true;
+  return unidadeIdOfRow_(r) === uidFilter;
 }
 
 function unidadeMeta_(id) {
@@ -722,6 +755,7 @@ function dispatchMoviAction_(p, method) {
       case 'salvarDadosContratuaisRhAdmin': return salvarDadosContratuaisRhAdmin_(p);
       case 'repararRhPlanilhaAdmin': return repararRhPlanilhaAdmin_(p);
       case 'repararLocacoesPlanilhaAdmin': return repararLocacoesPlanilhaAdmin_(p);
+      case 'backfillUnidadeIdLocacoesAdmin': return backfillUnidadeIdLocacoesAdmin_(p);
       case 'repararConfigPlanilhaAdmin': return repararConfigPlanilhaAdmin_(p);
       case 'repararOperadoresSistemaPlanilhaAdmin': return repararOperadoresSistemaPlanilhaAdmin_(p);
       case 'repararCustosPlanilhaAdmin': return repararCustosPlanilhaAdmin_(p);
@@ -878,18 +912,20 @@ function diagnosticoSistema_() {
   });
 }
 
-/** Cabeçalho linha 9 — 28 colunas (A–AB). Fonte: MAPA_PLANILHA §6 + COL_LOC_READ_. */
+/** Cabeçalho linha 9 — 29 colunas (A–AC). Fonte: MAPA_PLANILHA §6 + COL_LOC_READ_. I159e: AC=unidade_id. */
 const LOC_HEADER_ROW_ = 9;
 const LOC_HEADERS_ = [
   '#', 'Data', 'Hora inicio', 'Hora fim', 'Tipo', 'Plano', 'Min contratados', 'Valor plano',
   'Min adicionais', 'Valor adicional', 'Valor total', 'Responsavel', 'Crianca', 'Telefone',
   'Status', 'Veiculo', 'Pagamento', 'Observacao',
   'conta_id', 'sync_1', 'sync_2', 'sync_3', 'sync_4', 'sync_5',
-  'startTimestamp', 'extendedMins', 'extendedValor', 'reservado'
+  'startTimestamp', 'extendedMins', 'extendedValor', 'reservado', 'unidade_id'
 ];
-/** Col S (19) — id da locação-mestre (I42). Leitura timer: COL_LOC_READ_ (28). */
+/** Col S (19) — id da locação-mestre (I42). Leitura timer: COL_LOC_READ_ (≥28; I159e=29). */
 const COL_CONTA_ID_ = 19;
-const COL_LOC_READ_ = 28;
+const COL_LOC_READ_ = 29;
+/** Col AC (29) — unidade_id (I159e Opção A). */
+const COL_UNIDADE_ID_ = 29;
 /**
  * I155 — cauda operacional LOCAÇÕES (~600 linhas ≈ vários dias).
  * Ativa/Pendente e encerradas do dia ficam no fim; evita ler 3k+×28 a cada sync (causa 404/timeout).
@@ -1023,13 +1059,13 @@ function validarSchema_() {
   });
 }
 
-/** I52 — memorial linhas 1–8, header 28 cols, congelar linha 9, proteger memorial. */
+/** I52 — memorial linhas 1–8, header 29 cols (I159e), congelar linha 9, proteger memorial. */
 function repairLocacoesMemorialCore_() {
   const sheet = sh_(SH_LOC);
   const memorial = [
   'MOVI KIDS — LOCAÇÕES · dados operacionais (não editar manualmente)',
   'Gravado pelo app balcão / GAS · Mapa: MAPA_PLANILHA_ABAS_MOVIKIDS.md §6',
-  'Cols críticas: S=conta_id (I42) · Y=startTimestamp ms (I43) · Z/AA=extensão',
+  'Cols críticas: S=conta_id (I42) · Y=startTimestamp ms (I43) · Z/AA=extensão · AC=unidade_id (I159e)',
   '', '', '', '', ''
   ];
   memorial.forEach(function (txt, i) {
@@ -1128,6 +1164,7 @@ function repararLocacoesPlanilhaAdmin_(p) {
     const last = sheet.getLastRow();
     const memorial = repairLocacoesMemorialCore_();
     const formatos = repairLocacoesFormatosCore_(last);
+    const backfillUid = backfillUnidadeIdLocacoesCore_(sheet, last);
     let limpeza = null;
     if (String(p.limparTeste || '') === '1' || p.limparTeste === true) {
       const motivo = String(p.motivo || 'Limpeza locacoes teste pos repair I52').trim();
@@ -1140,16 +1177,58 @@ function repararLocacoesPlanilhaAdmin_(p) {
     try { invalidateInicioResumoCache_(fmtData_(new Date())); } catch (e) {}
     const schemaJson = JSON.parse(validarSchema_().getContent());
     return resp_({
-      mensagem: 'LOCACOES reparada (memorial, headers 28 cols, formatos, protecao)',
+      mensagem: 'LOCACOES reparada (memorial, headers 29 cols, formatos, protecao, unidade_id)',
       memorial: memorial,
       formatos: formatos,
+      backfillUnidadeId: backfillUid,
       limpeza: limpeza,
       audit: audit,
       schemaOk: schemaJson.schemaOk,
-      versao: 'v1.5.150'
+      versao: MK_GAS_VERSAO_
     });
   } catch (ex) {
     return err_('repararLocacoesPlanilhaAdmin: ' + ex.message, 500);
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+/** I159e — preenche col AC vazia a partir do veículo (LV* → laville; senão golden). */
+function backfillUnidadeIdLocacoesCore_(sheet, last) {
+  if (!sheet || last < DATA_ROW) return { updated: 0, scanned: 0 };
+  const n = last - DATA_ROW + 1;
+  const dados = sheet.getRange(DATA_ROW, 1, n, COL_LOC_READ_).getValues();
+  let updated = 0;
+  for (let i = 0; i < dados.length; i++) {
+    const r = dados[i];
+    if (!r[0]) continue;
+    const cur = String(r[COL_UNIDADE_ID_ - 1] || '').trim();
+    if (cur) continue;
+    const uid = unidadeIdFromVeiculo_(r[15]);
+    sheet.getRange(DATA_ROW + i, COL_UNIDADE_ID_).setValue(uid);
+    updated++;
+  }
+  return { updated: updated, scanned: dados.length };
+}
+
+function backfillUnidadeIdLocacoesAdmin_(p) {
+  if (!adminPinOk_(p)) return err_('Acesso negado — PIN administrativo incorreto', 403);
+  const lock = LockService.getScriptLock();
+  try { lock.waitLock(15000); } catch (ex) { return err_('Sistema ocupado', 503); }
+  try {
+    const sheet = sh_(SH_LOC);
+    repairLocacoesMemorialCore_();
+    const last = sheet.getLastRow();
+    const result = backfillUnidadeIdLocacoesCore_(sheet, last);
+    try { invalidateInicioResumoCache_(fmtData_(new Date())); } catch (e) {}
+    return resp_({
+      ok: true,
+      mensagem: 'unidade_id backfill',
+      backfillUnidadeId: result,
+      versao: MK_GAS_VERSAO_
+    });
+  } catch (ex) {
+    return err_('backfillUnidadeIdLocacoesAdmin: ' + ex.message, 500);
   } finally {
     lock.releaseLock();
   }
@@ -3700,6 +3779,7 @@ function salvarLocacao_(p) {
   ];
   const newRow = last + 1;
   sheet.getRange(newRow, 1, 1, 25).setValues([fullRow]);
+  sheet.getRange(newRow, COL_UNIDADE_ID_).setValue(uid);
   locBumpLastRow_(newRow);
   try { invalidateInicioResumoCache_(dataFmt); } catch(e) {}
 
@@ -3808,6 +3888,7 @@ function salvarLocacoesMulti_(p) {
       ];
       const newRow = locLastRow_(sheet) + 1;
       sheet.getRange(newRow, 1, 1, 25).setValues([fullRow]);
+      sheet.getRange(newRow, COL_UNIDADE_ID_).setValue(uid);
       locBumpLastRow_(newRow);
 
       const mesmaConta = !!(mestrePre && mestrePre.masterId && mestrePre.masterId !== id) || i > 0;
@@ -3856,29 +3937,33 @@ function locSheetTail_(sheet, lookback, forceFull) {
 
 function listarAtivas_(p) {
   p = p || {};
+  const uidFiltro = unidadeIdFilterFrom_(p);
   const forceBust = String(p.force || '') === '1'
     || String(p.nocache || '').toLowerCase() === '1'
     || String(p.nocache || '').toLowerCase() === 'true';
   const forceFull = String(p.forceFull || '') === '1' || p.forceFull === true;
+  const cacheKey = CACHE_LISTAR_ATIVAS_KEY_ + '_u' + uidFiltro;
   if (!forceBust && !forceFull) {
     try {
-      const hit = CacheService.getScriptCache().get(CACHE_LISTAR_ATIVAS_KEY_);
+      const hit = CacheService.getScriptCache().get(cacheKey);
       if (hit) return ContentService.createTextOutput(hit).setMimeType(ContentService.MimeType.JSON);
     } catch (e) { /* ok */ }
   }
 
   const sheet = sh_(SH_LOC);
   const tail = locSheetTail_(sheet, COL_LOC_LOOKBACK_, forceFull);
-  if (tail.nRows < 1) return resp_({ locacoes: [], total: 0, lookback: COL_LOC_LOOKBACK_, versao: MK_GAS_VERSAO_ });
+  if (tail.nRows < 1) return resp_({ locacoes: [], total: 0, lookback: COL_LOC_LOOKBACK_, unidadeId: uidFiltro, versao: MK_GAS_VERSAO_ });
 
   const ativas = [];
   tail.dados.forEach(function (r, idx) {
     const status = String(r[14] || '').trim();
     if (status !== 'Ativa' && status !== 'Pendente') return;
+    if (!locRowMatchesUnidade_(r, uidFiltro)) return;
     const tipo    = String(r[4]);
     const plano   = String(r[5]);
     const veiculo   = String(r[15] || '');
-    const cfg     = planoCfgOp_(tipo, plano, unidadeIdFromVeiculo_(veiculo)) || {};
+    const uidRow  = unidadeIdOfRow_(r);
+    const cfg     = planoCfgOp_(tipo, plano, uidRow) || {};
     const ts      = status === 'Ativa' ? timestampCanonico_(r[1], r[2], r[24]) : 0;
     const pagamento = String(r[16] || '');
     ativas.push({
@@ -3891,6 +3976,7 @@ function listarAtivas_(p) {
       tipo:            tipo,
       plano:           plano,
       veiculo:         veiculo,
+      unidadeId:       uidRow,
       mins:            Number(r[6]),
       valorPlano:      Number(r[7]),
       adicionalPorMin: cfg.adicional || 0,
@@ -3945,12 +4031,13 @@ function listarAtivas_(p) {
     total: ativas.length,
     lookback: forceFull ? 0 : COL_LOC_LOOKBACK_,
     forceFull: !!forceFull,
+    unidadeId: uidFiltro,
     versao: MK_GAS_VERSAO_
   };
   const out = JSON.stringify(payload);
   try {
     if (!forceFull && out.length < 90000) {
-      CacheService.getScriptCache().put(CACHE_LISTAR_ATIVAS_KEY_, out, CACHE_LISTAR_ATIVAS_TTL_);
+      CacheService.getScriptCache().put(cacheKey, out, CACHE_LISTAR_ATIVAS_TTL_);
     }
   } catch (eC) { /* ok */ }
   return ContentService.createTextOutput(out).setMimeType(ContentService.MimeType.JSON);
@@ -4827,9 +4914,12 @@ function invalidateInicioResumoCache_(dataFmt, opts) {
     const keys = [
       'carregarInicio_v2',
       'resumoDia_' + df,
-      CACHE_LISTAR_ATIVAS_KEY_
+      CACHE_LISTAR_ATIVAS_KEY_,
+      CACHE_LISTAR_ATIVAS_KEY_ + '_ugolden',
+      CACHE_LISTAR_ATIVAS_KEY_ + '_ulaville',
+      CACHE_LISTAR_ATIVAS_KEY_ + '_uall'
     ];
-    // I159c: caches inicio por unidade (golden/laville)
+    // I159c/e: caches inicio por unidade (golden/laville/all)
     for (let m = 0; m <= 8; m++) {
       keys.push('inicio_v4_g_m' + m);
       keys.push('inicio_v4_o_m' + m);
@@ -4837,6 +4927,8 @@ function invalidateInicioResumoCache_(dataFmt, opts) {
       keys.push('inicio_v4_o_m' + m + '_ugolden');
       keys.push('inicio_v4_g_m' + m + '_ulaville');
       keys.push('inicio_v4_o_m' + m + '_ulaville');
+      keys.push('inicio_v4_g_m' + m + '_uall');
+      keys.push('inicio_v4_o_m' + m + '_uall');
       keys.push('inicio_v3_g_m' + m);
       keys.push('inicio_v3_o_m' + m);
     }
@@ -4870,7 +4962,7 @@ function calcResumoDiaCore_(dataFmt) {
 
   // Pay-first: Ativa/Pendente já pagaram o plano na maquininha — entram no caixa/POS.
   // Encerrada inclui plano + extras. Cancelada fora.
-  // COL_LOC_READ_=28: precisa col AB (extras meta) + conta_id — não usar COL_CONTA_ID_=19.
+  // COL_LOC_READ_≥28: precisa col AB (extras meta) + conta_id — não usar COL_CONTA_ID_=19. I159e=29.
   const enc = [];
   let nAbertas = 0;
   let fatAbertas = 0;
@@ -7747,6 +7839,7 @@ function buildKpiMesPayload_(p) {
   const anoAtual = p && p.ano ? parseInt(p.ano) : hoje.getFullYear();
   const mmyy     = String(mesAtual).padStart(2,'0') + '/' + anoAtual;
   const skipAdvanced = p && (String(p.lite || '') === '1' || String(p.lite || '').toLowerCase() === 'true');
+  const uidKpi   = unidadeIdFilterFrom_(p || {});
   const shLoc    = sh_(SH_LOC);
   const shCus    = sh_(SH_CUS);
   const diasMes  = new Date(anoAtual, mesAtual, 0).getDate();
@@ -7797,6 +7890,7 @@ function buildKpiMesPayload_(p) {
     const dados = shLoc.getRange(DATA_ROW, 1, lastLoc - DATA_ROW + 1, COL_CONTA_ID_).getValues();
     dados.forEach(r => {
       if (!r[0]) return;
+      if (!locRowMatchesUnidade_(r, uidKpi)) return;
       const status = String(r[14] || '').trim();
       const dataR = cellToStr_(r[1]);
       const pts   = dataR.split('/');
@@ -8139,7 +8233,8 @@ function kpiMes_(p) {
   const mes = p && p.mes ? parseInt(p.mes) : hoje.getMonth() + 1;
   const ano = p && p.ano ? parseInt(p.ano) : hoje.getFullYear();
   const lite = (p && (String(p.lite || '') === '1' || String(p.lite || '').toLowerCase() === 'true')) ? '1' : '0';
-  const cacheKey = 'kpiMes83_' + mes + '_' + ano + '_L' + lite;
+  const uidKpi = unidadeIdFilterFrom_(p || {});
+  const cacheKey = 'kpiMes83_' + mes + '_' + ano + '_L' + lite + '_u' + uidKpi;
   // I121: mês corrente TTL curto (25s) — Meta/gráficos não ficam atrás do Centro de comando
   const isCorrente = mes === (hoje.getMonth() + 1) && ano === hoje.getFullYear();
   const ttl = isCorrente ? 25 : 90;
@@ -8168,10 +8263,10 @@ function carregarInicio_(p) {
   const adm      = isAdminRequest_(p || {});
   const gestao   = isSupervisorOrAdminRequest_(p || {});
   const metaOpId = metaOperadorIdFromRequest_(p || {}) || 0;
-  const uidInicio = unidadeIdFrom_(p || {});
+  const uidInicio = unidadeIdFilterFrom_(p || {});
   // I122: FE poll a cada 5s sempre manda _t — NÃO bustar. Escritas já chamam invalidateInicioResumoCache_.
   // Sem isso: carregarInicio ~25–36s → timeout FE 25s → cache local = locação fantasma no celular/PWA.
-  // I159c: cache por unidade (operacaoConfig diferente Golden × La Ville)
+  // I159e: cache por unidade (all|golden|laville)
   const cacheKey = 'inicio_v4_' + (gestao ? 'g' : 'o') + '_m' + metaOpId + '_u' + uidInicio;
   const forceBust = String((p && p.force) || '') === '1'
     || String((p && p.nocache) || '').toLowerCase() === '1'
@@ -8201,16 +8296,18 @@ function carregarInicio_(p) {
   if (locPack.dados && locPack.dados.length) {
     locPack.dados.forEach((r, idx) => {
       if (!r[0]) return;
+      if (!locRowMatchesUnidade_(r, uidInicio)) return;
       const status  = String(r[14]).trim();
       const dataR   = cellToStr_(r[1]);
       const veiculo   = String(r[15] || '');
       const pagamento = String(r[16] || '');
       const sheetRow  = locPack.start + idx;
+      const uidRow    = unidadeIdOfRow_(r);
 
       if (status === 'Ativa' || status === 'Pendente') {
         const tipo  = String(r[4]);
         const plano = String(r[5]);
-        const cfg   = planoCfgOp_(tipo, plano, unidadeIdFromVeiculo_(veiculo)) || {};
+        const cfg   = planoCfgOp_(tipo, plano, uidRow) || {};
         const minContrat = Number(r[6] || 0);
         const extMins    = Number(r[25] || 0);
         const ts         = status === 'Ativa' ? timestampCanonico_(r[1], r[2], r[24]) : 0;
@@ -8224,6 +8321,7 @@ function carregarInicio_(p) {
           tipo,
           plano,
           veiculo,
+          unidadeId:       uidRow,
           pagamento,
           mins:            minContrat + extMins,
           originalMins:    minContrat,
@@ -8252,6 +8350,7 @@ function carregarInicio_(p) {
           tipo:        String(r[4]),
           plano:       String(r[5]),
           veiculo:     veiculo,
+          unidadeId:   uidRow,
           pagamento:   pagamento,
           crianca:     String(r[12]),
           responsavel: String(r[11]),

@@ -1954,6 +1954,14 @@ html,body{height:100%;background:var(--bg);color:var(--txt);overflow:hidden}
 .mk-hold-eyebrow{margin:0 0 4px;font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--blue-dk,#0D47A1)}
 .mk-hold-title{margin:0;font-family:'Fredoka One',cursive;font-size:26px;color:var(--blue,#1565C0);line-height:1.15}
 .mk-hold-sub{margin:6px 0 0;font-size:13px;font-weight:700;color:var(--txt2,#546E7A)}
+.mk-hold-pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.mk-hold-pill{
+  border:1.5px solid rgba(21,101,192,.2);background:#fff;color:var(--txt,#1A237E);
+  font-family:'Nunito',sans-serif;font-weight:800;font-size:12px;
+  padding:7px 14px;border-radius:999px;cursor:pointer;
+}
+.mk-hold-pill--on{background:var(--blue,#1565C0);color:#fff;border-color:transparent}
+.mk-hold-filtro-hint{margin:8px 0 0;font-size:11px;font-weight:700;color:var(--txt3,#90A4AE)}
 .mk-hold-hero-kpis{display:flex;gap:18px}
 .mk-hold-hero-kpis div{text-align:right}
 .mk-hold-hero-kpis strong{display:block;font-family:'Nunito',sans-serif;font-weight:900;font-size:20px;color:var(--txt,#1A237E)}

@@ -1,4 +1,4 @@
-/* MOVI KIDS — Painel holding ADM (Golden + La Ville na mesma tela) · I159d */
+/* MOVI KIDS — Painel holding ADM (Golden + La Ville na mesma tela) · I159e */
 (function (w) {
   'use strict';
 
@@ -17,14 +17,19 @@
     return 'R$ ' + v.toFixed(2).replace('.', ',');
   }
 
+  function uidOf_(s) {
+    if (typeof mkUnidadeOfSession_ === 'function') return mkUnidadeOfSession_(s);
+    if (typeof mkUnidadeFromVeiculo_ === 'function') return mkUnidadeFromVeiculo_(s && s.veiculo);
+    return 'golden';
+  }
+
   function packUnidade_(uid) {
-    var fromVeic = typeof mkUnidadeFromVeiculo_ === 'function' ? mkUnidadeFromVeiculo_ : function () { return 'golden'; };
     var sess = (typeof sessions !== 'undefined' && Array.isArray(sessions)) ? sessions : [];
     var enc = (typeof encHojeData !== 'undefined' && Array.isArray(encHojeData)) ? encHojeData : [];
     var ativas = sess.filter(function (s) {
       return s && (s.status === 'Ativa' || s.status === 'Pendente' || s.started || s._optimistic);
-    }).filter(function (s) { return fromVeic(s.veiculo) === uid; });
-    var encU = enc.filter(function (e) { return fromVeic(e.veiculo) === uid; });
+    }).filter(function (s) { return uidOf_(s) === uid; });
+    var encU = enc.filter(function (e) { return uidOf_(e) === uid; });
     var nContas = typeof mkContasEncHoje_ === 'function' ? mkContasEncHoje_(encU) : encU.length;
     var u = typeof mkUnidadeGet_ === 'function' ? mkUnidadeGet_(uid) : { nome: uid, nomeCurto: uid };
     return {
@@ -99,6 +104,14 @@
     );
   }
 
+  function filtroPill_(id, label, cur) {
+    var on = cur === id ? ' mk-hold-pill--on' : '';
+    return (
+      '<button type="button" class="mk-hold-pill' + on + '" data-filtro="' + id + '"' +
+        ' onclick="mkHoldingSetFiltroCaixa_(\'' + id + '\')">' + label + '</button>'
+    );
+  }
+
   function renderHolding_() {
     var root = document.getElementById('mk-holding-root');
     if (!root) return;
@@ -110,12 +123,19 @@
     var l = packUnidade_('laville');
     var totAtivas = g.nAtivas + l.nAtivas;
     var totFat = g.fat + l.fat;
+    var filtro = typeof mkUnidadeFiltroAdm_ === 'function' ? mkUnidadeFiltroAdm_() : 'all';
     root.innerHTML =
       '<div class="mk-hold-hero">' +
         '<div>' +
           '<p class="mk-hold-eyebrow">Administração · holding</p>' +
           '<h1 class="mk-hold-title">As duas lojas agora</h1>' +
           '<p class="mk-hold-sub">Golden e La Ville lado a lado — sem misturar operação.</p>' +
+          '<div class="mk-hold-pills" role="group" aria-label="Filtro caixa e KPI">' +
+            filtroPill_('all', 'Todas', filtro) +
+            filtroPill_('golden', 'Golden', filtro) +
+            filtroPill_('laville', 'La Ville', filtro) +
+          '</div>' +
+          '<p class="mk-hold-filtro-hint">Filtro vale para Caixa / Dashboard / KPI (não para este painel).</p>' +
         '</div>' +
         '<div class="mk-hold-hero-kpis">' +
           '<div><strong>' + totAtivas + '</strong><span>ativas no total</span></div>' +
@@ -134,12 +154,27 @@
       }
     }
     if (typeof showPage === 'function') showPage('home', { adminBalcao: true });
+    if (typeof syncNow === 'function') {
+      try { syncNow(); } catch (eS) { /* ignore */ }
+    } else if (typeof carregarInicio === 'function') {
+      try { carregarInicio(); } catch (eC) { /* ignore */ }
+    }
     if (typeof toast === 'function') {
       var nome = typeof mkUnidadeLabel_ === 'function' ? mkUnidadeLabel_(uid) : uid;
       toast('Balcão: ' + nome, 'info');
     }
   }
 
+  function mkHoldingSetFiltroCaixa_(id) {
+    if (typeof mkUnidadeSetFiltroAdm_ === 'function') mkUnidadeSetFiltroAdm_(id);
+    renderHolding_();
+    if (typeof toast === 'function') {
+      var lbl = id === 'all' ? 'Todas as lojas' : (typeof mkUnidadeLabelCurto_ === 'function' ? mkUnidadeLabelCurto_(id) : id);
+      toast('Filtro Caixa/KPI: ' + lbl, 'info');
+    }
+  }
+
   w.renderHolding_ = renderHolding_;
   w.mkHoldingAbrirBalcao_ = mkHoldingAbrirBalcao_;
+  w.mkHoldingSetFiltroCaixa_ = mkHoldingSetFiltroCaixa_;
 })(typeof window !== 'undefined' ? window : globalThis);

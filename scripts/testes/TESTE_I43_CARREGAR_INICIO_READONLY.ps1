@@ -46,8 +46,12 @@ function Add-I43Check([string]$Name, [string]$Status, [string]$Detail = "") {
 try {
   if (-not (Test-Path $GasFile)) { throw "GAS canonico ausente" }
   $gs = Get-Content -Path $GasFile -Raw -Encoding UTF8
-  if ($gs -notmatch 'const COL_LOC_READ_\s*=\s*28') {
-    throw "COL_LOC_READ_ = 28 ausente no .gs (I43)"
+  if ($gs -notmatch 'const COL_LOC_READ_\s*=\s*(\d+)') {
+    throw "COL_LOC_READ_ ausente no .gs (I43)"
+  }
+  $colReadI43 = [int]$Matches[1]
+  if ($colReadI43 -lt 28) {
+    throw "COL_LOC_READ_ = $colReadI43 < 28 (I43)"
   }
   if ($gs -match 'function carregarInicio_[\s\S]{0,12000}getRange\([^\)]*COL_CONTA_ID_\)[\s\S]{0,2000}r\[24\]') {
     throw "carregarInicio: getRange COL_CONTA_ID_ com r[24] - regressao I43"
@@ -58,7 +62,7 @@ try {
   if ($gs -match 'function locSheetTail_' -and $gs -notmatch 'function locSheetTail_[\s\S]{0,800}COL_LOC_READ_') {
     throw "locSheetTail_ sem COL_LOC_READ_ (I43/I155)"
   }
-  Add-I43Check "static.COL_LOC_READ_" "ok" "28 cols (locSheetTail_/carregarInicio)"
+  Add-I43Check "static.COL_LOC_READ_" "ok" "$colReadI43 cols (locSheetTail_/carregarInicio)"
 
   $syncFile = Join-Path $RepoRoot "mk-sync.js"
   if (Test-Path $syncFile) {
