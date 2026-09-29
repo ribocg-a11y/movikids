@@ -6,7 +6,7 @@ Sistema operacional de locações — balcão (tablet na loja), portal do respon
 
 **Para retomar (agente local PC — pasta C):**
 
-> *Continuar MOVI KIDS — FE **v1.9.120** · GAS **v1.5.221** · I158 Golden via kpiMes · Setembro R$ 14.332 / CTO R$ 1.500 · Tablet `?force=1.9.120`*
+> *Continuar MOVI KIDS — FE **v1.9.120** · GAS **v1.5.221** · I158 Golden via kpiMes · Setembro prévia 29/09 R$ 14.371 / CTO R$ 1.500 (PDF gerado, não enviar) · Tablet `?force=1.9.120`*
 
 ## Produção atual
 
@@ -30,10 +30,10 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 ## Estado (29/09/2026)
 
 - **I158 Golden:** ✅ FE **v1.9.120** — relatório via `kpiMes` (sem Cancelada); AppScript **não** alterado
-- **Setembro prévia correta:** fat **R$ 14.332** · n **673** · CTO **R$ 1.500** (mínimo contratual)
+- **Setembro prévia 29/09:** fat **R$ 14.371** · n **675** · CTO **R$ 1.500** · PDF em `entregas/` — regenerar 01/10 para envio
 - **Agosto histórico enviado:** R$ 17.212 — não reenviar
 - **I156/I155:** ritmo + lookback ✅
-- **Próximo (Ops):** PDF Golden setembro · tablet smoke D4 · assinar FASE 17
+- **Próximo (Ops):** enviar Golden em 01/10 · tablet smoke D4 · assinar FASE 17
 - **Encerrar toda resposta** com bloco **Versões (encerramento)** + Regra 16
 - **§7.2:** FE pronto → push `main` **sem pedir** (não repetir atraso I158)
 

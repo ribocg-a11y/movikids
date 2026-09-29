@@ -27,13 +27,14 @@
 | Problema | PDF/e-mail GAS contava **Cancelada** → fat/CTO inflados |
 | Correção | FE **v1.9.120** — `mkHtmlRelatorioGoldenFromKpi_` via **`kpiMes`** (sem AppScript) |
 | Agosto enviado (histórico) | R$ **17.212** · 957 · CTO **R$ 1.721,20** — **não reenviar** |
-| Setembro correto (prévia) | R$ **14.332** · **673** contas · extra **R$ 8** · CTO **R$ 1.500** (mínimo > 10%) |
+| Setembro prévia **29/09** (`kpiMes`) | R$ **14.371** · **675** contas · extra **R$ 8** · CTO **R$ 1.500** (10% = 1.437,10) |
+| PDF setembro prévia | `entregas/MOVI-KIDS-Relatorio-Setembro-2026-Golden-previa-2026-09-29.pdf` |
 | PDF ago dia a dia | `entregas/MOVI-KIDS-Relatorio-Agosto-2026-Golden-diario.pdf` |
 | Docs | `INCIDENTE_I158_*` · `guard.i158.fe.golden` · `TESTE_I158_GOLDEN_*` |
 
-**CTO R$ 1.500 ≠ caixa R$ 15.000:** é o **mínimo contratual** do mês; 10% de 14.332 = 1.433,20 &lt; mínimo → paga 1.500.
+**CTO R$ 1.500 ≠ caixa R$ 15.000:** é o **mínimo contratual** do mês. Em 29/09, 10% de 14.371 = **1.437,10** &lt; mínimo → paga 1.500. A projeção do `kpiMes` (~R$ 15.028) passa de R$ 15.000: se o fechamento real ultrapassar isso, o CTO vira **10%**.
 
-**Como gerar setembro:** Admin → Relatório → Setembro → Ver → conferir **14.332** → PDF / e-mail (fluxo FE; e-mail GAS legado desligado).
+**PDF prévia gerada em 29/09** (mesmo HTML do botão Salvar PDF Golden + faixa “não enviar”). **Não mandar ao shopping ainda** — falta o dia 30. Em **01/10**: Admin → Relatório → Setembro → conferir o fechamento → PDF / e-mail (fluxo FE; e-mail GAS legado desligado).
 
 ---
 
@@ -90,7 +91,7 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 
 ## Mensagem para colar no novo chat (PC)
 
-> *Continuar MOVI KIDS **no PC** — pasta C (`movikids-github`). Ler `HANDOFF_NOVO_CHAT.md`. FE **v1.9.120** Pages · GAS ping **v1.5.221**. **I158** Golden via kpiMes ✅. Setembro prévia R$ 14.332 / CTO R$ 1.500. Tablet `?force=1.9.120`. Próximo: gerar PDF Golden setembro + smoke tablet D4 / FASE 17. **This PC.***
+> *Continuar MOVI KIDS **no PC** — pasta C (`movikids-github`). Ler `HANDOFF_NOVO_CHAT.md`. FE **v1.9.120** Pages · GAS ping **v1.5.221**. **I158** Golden via kpiMes ✅. Setembro prévia 29/09 R$ 14.371 / 675 / CTO R$ 1.500 (PDF gerado, não enviar). Tablet `?force=1.9.120`. Próximo: regenerar PDF em 01/10 e enviar · smoke tablet D4 / FASE 17. **This PC.***
 
 **Mínima:**
 
@@ -102,7 +103,8 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 
 | # | Ação | Quem |
 |---|------|------|
-| 1 | Gerar/enviar relatório Golden **setembro** (conferir 14.332) | Sócio — admin FE 1.9.120 |
+| 1 | PDF Golden setembro **prévia 29/09** (14.371 / 675 / CTO 1.500) | Agente | ✅ arquivo em `entregas/` — **não enviar** |
+| 1b | Regenerar e enviar o fechamento **01/10** | Sócio — admin FE 1.9.120 |
 | 2 | Tablet smoke D4 · `?force=1.9.120` | Ops |
 | 3 | Assinar FASE 17 (decisão 17.5 F9) | Sócio |
 | 4 | (Opcional) Alinhar `_gerarHtmlRelatorio_` no GAS — só com pedido §7.3 | Sócio+agente |
