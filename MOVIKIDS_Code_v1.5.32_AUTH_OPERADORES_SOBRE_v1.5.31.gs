@@ -4818,17 +4818,18 @@ function listarPlanoContas_(p) {
  */
 function invalidateInicioResumoCache_(dataFmt, opts) {
   try {
+    // I121: dash primeiro (guard.i121.dash.invalidate exige call perto do nome da fn)
+    if (opts && (opts.includeDash === true || opts.includeDash === 1 || String(opts.includeDash || '') === '1')) {
+      invalidateDashCaches_();
+    }
     const cache = CacheService.getScriptCache();
     const df = String(dataFmt || fmtData_(new Date())).replace(/\//g, '');
     const keys = [
       'carregarInicio_v2',
       'resumoDia_' + df,
-      'inicio_v4_g_m0',
-      'inicio_v4_o_m0',
-      'inicio_v3_g_m0',
-      'inicio_v3_o_m0',
       CACHE_LISTAR_ATIVAS_KEY_
     ];
+    // I159c: caches inicio por unidade (golden/laville)
     for (let m = 0; m <= 8; m++) {
       keys.push('inicio_v4_g_m' + m);
       keys.push('inicio_v4_o_m' + m);
@@ -4840,9 +4841,6 @@ function invalidateInicioResumoCache_(dataFmt, opts) {
       keys.push('inicio_v3_o_m' + m);
     }
     cache.removeAll(keys);
-    if (opts && (opts.includeDash === true || opts.includeDash === 1 || String(opts.includeDash || '') === '1')) {
-      invalidateDashCaches_();
-    }
   } catch (e) { /* ok */ }
 }
 
