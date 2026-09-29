@@ -2,6 +2,15 @@
 
 var catSel = 'Energia';
 var custosHoje = [];
+var custoUnidadeSel_ = 'golden';
+
+function mkSelCustoUnidade_(el, uid) {
+  custoUnidadeSel_ = uid === 'laville' ? 'laville' : 'golden';
+  document.querySelectorAll('#custo-unidade-pills .mk-hold-pill').forEach(function (b) {
+    b.classList.toggle('mk-hold-pill--on', b.getAttribute('data-uid') === custoUnidadeSel_);
+  });
+}
+window.mkSelCustoUnidade_ = mkSelCustoUnidade_;
 
 async function loadCustosHoje() {
   // FIX #7: apenas busca custos (stats já vêm de carregarInicio/sincronizarServidor)
@@ -9,7 +18,7 @@ async function loadCustosHoje() {
     const hoje  = new Date();
     const mm    = String(hoje.getMonth()+1).padStart(2,'0');
     const yyyy  = hoje.getFullYear();
-    const dc    = await api({ action: 'listarCustos', mes: mm, ano: yyyy, ...apiParamsComAuth_() });
+    const dc    = await api({ action: 'listarCustos', mes: mm, ano: yyyy, unidadeId: 'all', ...apiParamsComAuth_() });
     if (dc.ok) {
       const dataHoje = String(hoje.getDate()).padStart(2,'0') + '/' + mm + '/' + yyyy;
       custosHoje = dc.custos.filter(c => String(c.data) === dataHoje);
@@ -39,7 +48,9 @@ async function salvarCusto() {
       action:    'salvarCusto',
       descricao: desc,
       categoria: catSel,
-      valor:     val
+      valor:     val,
+      unidadeId: custoUnidadeSel_,
+      ...apiParamsComAuth_()
     });
 
     if (!d.ok) { toast('Erro: ' + d.erro, 'error'); return; }
@@ -63,9 +74,11 @@ function renderCustos() {
   }
   container.innerHTML = custosHoje.slice().reverse().map(c => {
     const v = Number(c.valor).toFixed(2).replace('.',',');
+    const uid = c.unidadeId || 'golden';
+    const badge = uid === 'laville' ? 'La Ville' : 'Golden';
     return `<div class="hist-item">
       <div class="hi-left">
-        <div class="hi-tipo">${c.categoria}</div>
+        <div class="hi-tipo">${c.categoria} <span class="mk-uid-badge">${badge}</span></div>
         <div class="hi-names">${escHtml(c.descricao)}</div>
         <div class="hi-det">📅 ${c.data} · ${c.hora}</div>
       </div>

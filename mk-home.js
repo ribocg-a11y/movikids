@@ -253,47 +253,102 @@ function renderPainel() {
   const grid = document.getElementById('painel-grid');
   if (!grid) return;
 
-  // Mapa veiculo → session ativa
-  const sessMap = {};
-  sessions.forEach(s => {
-    if (s.veiculo && (s.status === 'Ativa' || s.status === 'Pendente')) sessMap[s.veiculo] = s;
+  const pillsHost = document.getElementById('painel-dual-pills');
+  const isAdm = !!(window.isAdmin || (typeof mkAuthIsAdmin === 'function' && mkAuthIsAdmin()));
+  if (pillsHost) {
+    if (isAdm && typeof mkDualMountPills_ === 'function') {
+      pillsHost.style.display = '';
+      mkDualMountPills_(pillsHost, 'mkPainelOnFiltro_');
+    } else {
+      pillsHost.style.display = 'none';
+      pillsHost.innerHTML = '';
+    }
+  }
+
+  const filtro = isAdm && typeof mkDualFiltro_ === 'function' ? mkDualFiltro_() : (typeof mkUnidadeId_ === 'function' ? mkUnidadeId_() : 'golden');
+  const dualHost = document.getElementById('painel-dual-grid');
+
+  function frotaDefFor_(uid) {
+    if (uid === 'laville' && window.MK_UNIDADES && MK_UNIDADES.laville && MK_UNIDADES.laville.veiculosDef) {
+      return MK_UNIDADES.laville.veiculosDef.slice();
+    }
+    return (typeof TODOS_VEICULOS_DEF !== 'undefined' ? TODOS_VEICULOS_DEF : []).filter(function (v) {
+      return String(v.nome || '').indexOf('LV ') !== 0;
+    });
+  }
+
+  function buildGridFor_(uid, frota) {
+    const sessMap = {};
+    (sessions || []).forEach(function (s) {
+      const su = typeof mkDualUidOf_ === 'function' ? mkDualUidOf_(s) : 'golden';
+      if (uid !== 'all' && su !== uid) return;
+      if (s.veiculo && (s.status === 'Ativa' || s.status === 'Pendente')) sessMap[s.veiculo] = s;
+    });
+    const carros = frota.filter(function (v) { return v.tipo === 'Carro'; });
+    const triciclos = frota.filter(function (v) { return v.tipo === 'Triciclo'; });
+    const pelucias = frota.filter(function (v) { return v.tipo === 'Pelúcia'; });
+    const driffyts = frota.filter(function (v) { return v.tipo === 'Driffyt'; });
+    const dinos = frota.filter(function (v) { return v.tipo === 'Dino'; });
+    return (
+      '<div class="painel-sec-label">🚗 Carros</div>' +
+      carros.map(function (v) { return buildPainelCard(v.nome, v.tipo, sessMap[v.nome]); }).join('') +
+      (triciclos.length ? '<div class="painel-sec-label">🛺 Triciclos</div>' +
+        triciclos.map(function (v) { return buildPainelCard(v.nome, v.tipo, sessMap[v.nome]); }).join('') : '') +
+      (pelucias.length ? '<div class="painel-sec-label">🧸 Pelúcias</div>' +
+        pelucias.map(function (v) { return buildPainelCard(v.nome, v.tipo, sessMap[v.nome]); }).join('') : '') +
+      (driffyts.length ? '<div class="painel-sec-label">🛸 Driffyts</div>' +
+        driffyts.map(function (v) { return buildPainelCard(v.nome, v.tipo, sessMap[v.nome]); }).join('') : '') +
+      (dinos.length ? '<div class="painel-sec-label">🦖 Dinos</div>' +
+        dinos.map(function (v) { return buildPainelCard(v.nome, v.tipo, sessMap[v.nome]); }).join('') : '')
+    );
+  }
+
+  const sessFilt = (sessions || []).filter(function (s) {
+    if (filtro === 'all') return true;
+    const su = typeof mkDualUidOf_ === 'function' ? mkDualUidOf_(s) : 'golden';
+    return su === filtro;
   });
+  const ativos = sessFilt.filter(function (s) {
+    return (typeof sessaoTimerIniciado_ === 'function' ? sessaoTimerIniciado_(s) : (s.started && s.status === 'Ativa'));
+  }).length;
+  const pendentes = sessFilt.filter(function (s) {
+    return s.status === 'Pendente' || (!s.started && s.status === 'Ativa');
+  }).length;
+  const encList = (typeof encHojeData !== 'undefined' ? encHojeData : []).filter(function (e) {
+    if (filtro === 'all') return true;
+    const su = typeof mkDualUidOf_ === 'function' ? mkDualUidOf_(e) : 'golden';
+    return su === filtro;
+  });
+  const encHoje = typeof mkContasEncHoje_ === 'function' ? mkContasEncHoje_(encList) : encList.length;
 
-  // Resumo do dia
-  const ativos    = sessions.filter(s =>
-    (typeof sessaoTimerIniciado_ === 'function' ? sessaoTimerIniciado_(s) : (s.started && s.status === 'Ativa'))
-  ).length;
-  const pendentes = sessions.filter(s => s.status === 'Pendente' || (!s.started && s.status === 'Ativa')).length;
-  const encHoje   = typeof mkContasEncHoje_ === 'function'
-    ? mkContasEncHoje_(encHojeData)
-    : (encHojeData ? encHojeData.length : 0);
-
-  const phAtivos  = document.getElementById('ph-ativos');
-  const phEnc     = document.getElementById('ph-enc-hoje');
-  const phPend    = document.getElementById('ph-pendentes');
+  const phAtivos = document.getElementById('ph-ativos');
+  const phEnc = document.getElementById('ph-enc-hoje');
+  const phPend = document.getElementById('ph-pendentes');
   if (phAtivos) phAtivos.textContent = ativos;
-  if (phEnc)    phEnc.textContent    = encHoje;
-  if (phPend)   phPend.textContent   = pendentes;
+  if (phEnc) phEnc.textContent = encHoje;
+  if (phPend) phPend.textContent = pendentes;
 
-  // Rebuild grid
-  const carros     = TODOS_VEICULOS_DEF.filter(v => v.tipo === 'Carro');
-  const triciclos  = TODOS_VEICULOS_DEF.filter(v => v.tipo === 'Triciclo');
-  const pelucias   = TODOS_VEICULOS_DEF.filter(v => v.tipo === 'Pelúcia');
-  const driffyts   = TODOS_VEICULOS_DEF.filter(v => v.tipo === 'Driffyt');
-  const dinos      = TODOS_VEICULOS_DEF.filter(v => v.tipo === 'Dino');
+  if (isAdm && filtro === 'all' && dualHost && typeof mkDualColShell_ === 'function') {
+    dualHost.hidden = false;
+    dualHost.innerHTML =
+      mkDualColShell_('golden', '<div class="painel-grid">' + buildGridFor_('golden', frotaDefFor_('golden')) + '</div>') +
+      mkDualColShell_('laville', '<div class="painel-grid">' + buildGridFor_('laville', frotaDefFor_('laville')) + '</div>');
+    grid.style.display = 'none';
+    grid.innerHTML = '';
+    return;
+  }
 
-  grid.innerHTML =
-    '<div class="painel-sec-label">🚗 Carros elétricos</div>' +
-    carros.map(v => buildPainelCard(v.nome, v.tipo, sessMap[v.nome])).join('') +
-    (triciclos.length ? '<div class="painel-sec-label">🛺 Triciclos elétricos</div>' +
-      triciclos.map(v => buildPainelCard(v.nome, v.tipo, sessMap[v.nome])).join('') : '') +
-    (pelucias.length ? '<div class="painel-sec-label">🧸 Pelúcias elétricas</div>' +
-      pelucias.map(v => buildPainelCard(v.nome, v.tipo, sessMap[v.nome])).join('') : '') +
-    (driffyts.length ? '<div class="painel-sec-label">🛸 Driffyts</div>' +
-      driffyts.map(v => buildPainelCard(v.nome, v.tipo, sessMap[v.nome])).join('') : '') +
-    (dinos.length ? '<div class="painel-sec-label">🦖 Dinos</div>' +
-      dinos.map(v => buildPainelCard(v.nome, v.tipo, sessMap[v.nome])).join('') : '');
+  if (dualHost) { dualHost.hidden = true; dualHost.innerHTML = ''; }
+  grid.style.display = '';
+  const uid = filtro === 'all' ? (typeof mkUnidadeId_ === 'function' ? mkUnidadeId_() : 'golden') : filtro;
+  grid.innerHTML = buildGridFor_(uid, frotaDefFor_(uid));
 }
+
+function mkPainelOnFiltro_(id) {
+  if (typeof mkDualSetFiltro_ === 'function') mkDualSetFiltro_(id);
+  renderPainel();
+}
+window.mkPainelOnFiltro_ = mkPainelOnFiltro_;
 
 function buildPainelCard(nome, tipo, s) {
   const icon    = tipoIcon(tipo);
@@ -401,9 +456,12 @@ function mkEncHojeChaveConta_(e) {
   return '';
 }
 
-/** Contas do dia (telefones/conta_id únicos — I42) — tile Home / Encerradas. */
+/** Contas do dia (telefones/conta_id únicos — I42) — tile Home / Encerradas.
+ * I159f: se o caller passou lista explícita (mesmo vazia), NÃO cai em statsHoje global
+ * (evita La Ville herdar 6 contas do Golden). */
 function mkContasEncHoje_(list) {
-  const data = list || encHojeData || [];
+  const explicit = arguments.length >= 1;
+  const data = explicit ? (list || []) : (encHojeData || []);
   if (data.length) {
     const seen = {};
     data.forEach(function (e) {
@@ -412,6 +470,7 @@ function mkContasEncHoje_(list) {
     });
     return Object.keys(seen).length;
   }
+  if (explicit) return 0;
   if (statsHoje && statsHoje.n != null && statsHoje.n > 0) return statsHoje.n;
   return 0;
 }

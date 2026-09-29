@@ -126,15 +126,15 @@ function showPage(name, opts = {}) {
 function syncSidebar(page) {
   document.querySelectorAll('.sb-btn').forEach(b => b.classList.remove('active'));
   const map = {
-    'home':'sbn-home','holding':'sbn-holding','nova':'sbn-nova','relacionamento':'sbn-relacionamento','custos':'sbn-custos','painel':'sbn-painel','lancamento':'sbn-avulso',
+    'home':'sbn-home','holding':'sbn-home','nova':'sbn-nova','relacionamento':'sbn-relacionamento','custos':'sbn-custos','painel':'sbn-painel','lancamento':'sbn-avulso',
     'admin':'sbn-adm','sistema':'sbn-sys','operadores':'sbn-ops','dashboard':'sbn-dash','relatorio':'sbn-rel','historico':'sbn-hist','custos-historico':'sbn-custos-hist','caixa':'sbn-caixa','config':'sbn-cfg'
   };
   if (map[page]) { const el=document.getElementById(map[page]); if(el) el.classList.add('active'); }
-  /* ADM: botão Lojas visível; Home do sidebar aponta para holding */
+  /* ADM: um só "Lojas" (sbn-home → holding). sbn-holding fica oculto (evita duplicata). */
   const isAdm = !!(window.isAdmin || (typeof mkAuthIsAdmin === 'function' && mkAuthIsAdmin()));
   const holdBtn = document.getElementById('sbn-holding');
   const homeBtn = document.getElementById('sbn-home');
-  if (holdBtn) holdBtn.hidden = !isAdm;
+  if (holdBtn) holdBtn.hidden = true;
   if (homeBtn && isAdm) {
     homeBtn.innerHTML = '<span class="sb-icon">🏬</span>Lojas';
     homeBtn.setAttribute('onclick', "showPage('holding')");

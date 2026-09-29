@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.224
+// MOVI KIDS — Google Apps Script v1.5.225
+// v1.5.225: I159f — resumoDia/comando por unidade; CUSTOS col unidade_id; dual ADM
 // v1.5.224: I159e — LOCACOES col AC unidade_id (COL_LOC_READ_=29); filtro ativas/inicio/kpi; backfill
 // v1.5.223: I159c — La Ville preços/frota por unidadeId (CONFIG Golden intocado; LV* provisória)
 // v1.5.222: I159 — fundação multi-unidade (unidadeId soft; golden = legado; La Ville inativa até preços)
@@ -216,8 +217,8 @@
 
 // ── CONSTANTES ───────────────────────────────────────────────
 /** Versão exposta em ping, carregarInicio, validarSchema, gestaoPessoasStatus (bump com header). */
-const MK_GAS_VERSAO_  = 'v1.5.224';
-const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.224';
+const MK_GAS_VERSAO_  = 'v1.5.225';
+const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.225';
 const SHEET_ID   = '1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618';
 const DEPLOY_ID  = 'AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y';
 const WEBAPP_URL = `https://script.google.com/macros/s/${DEPLOY_ID}/exec`;
@@ -936,11 +937,12 @@ const COL_CUS_LOOKBACK_ = 200;
 const CACHE_LISTAR_ATIVAS_KEY_ = 'listar_ativas_v2';
 const CACHE_LISTAR_ATIVAS_TTL_ = 8;
 
-/** CUSTOS — memorial 1-3, reservado 4-8, header 9, dados 11 (I55). */
+/** CUSTOS — memorial 1-3, reservado 4-8, header 9, dados 11 (I55). I159f: col G unidade_id. */
 const CUS_HEADER_ROW_ = 9;
 const CUS_DATA_ROW_ = 11;
-const COL_CUS_READ_ = 6;
-const CUS_HEADERS_ = ['#', 'Data', 'Hora', 'Descricao', 'Categoria', 'Valor'];
+const COL_CUS_READ_ = 7;
+const COL_CUS_UNIDADE_ID_ = 7;
+const CUS_HEADERS_ = ['#', 'Data', 'Hora', 'Descricao', 'Categoria', 'Valor', 'unidade_id'];
 
 function validarSchema_() {
   const ss = ss_();
@@ -4548,10 +4550,10 @@ function salvarCusto_(p) {
   const sheet = sh_(SH_CUS);
   const id    = nextId_(sheet);
 
-  sheet.appendRow([id, fmtData_(agora), fmtHoraLocal_(agora), descricao, categoria, valor]);
+  sheet.appendRow([id, fmtData_(agora), fmtHoraLocal_(agora), descricao, categoria, valor, unidadeIdWriteFrom_(p, '')]);
   sheet.getRange(sheet.getLastRow(), 6).setNumberFormat('"R$" #,##0.00');
 
-  return resp_({ id, descricao, categoria, valor, data: fmtData_(agora) });
+  return resp_({ id, descricao, categoria, valor, data: fmtData_(agora), unidadeId: unidadeIdWriteFrom_(p, '') });
   } finally { lockC.releaseLock(); }
 }
 
@@ -4568,14 +4570,19 @@ function listarCustos_(p) {
   }
 
   const dados = sheet.getRange(start, 1, last - start + 1, COL_CUS_READ_).getValues();
+  const uidFiltro = unidadeIdFilterFrom_(p || {});
   let lista = dados.filter(r => r[0] !== '' && r[0] !== 0).map(r => ({
     id:        r[0],
     data:      cellToStr_(r[1]),
     hora:      cellToStr_(r[2]),
     descricao: r[3],
     categoria: r[4],
-    valor:     Number(r[5])
-  }));
+    valor:     Number(r[5]),
+    unidadeId: unidadeIdCanon_(r[6]) || MK_UNIDADE_DEFAULT_
+  })).filter(function (row) {
+    if (uidFiltro === 'all') return true;
+    return row.unidadeId === uidFiltro;
+  });
 
   if (!adm) {
     const dataHoje = fmtData_(new Date());
@@ -4914,6 +4921,9 @@ function invalidateInicioResumoCache_(dataFmt, opts) {
     const keys = [
       'carregarInicio_v2',
       'resumoDia_' + df,
+      'resumoDia_' + df + '_ugolden',
+      'resumoDia_' + df + '_ulaville',
+      'resumoDia_' + df + '_uall',
       CACHE_LISTAR_ATIVAS_KEY_,
       CACHE_LISTAR_ATIVAS_KEY_ + '_ugolden',
       CACHE_LISTAR_ATIVAS_KEY_ + '_ulaville',
@@ -4936,8 +4946,9 @@ function invalidateInicioResumoCache_(dataFmt, opts) {
   } catch (e) { /* ok */ }
 }
 
-function calcResumoDiaCore_(dataFmt) {
+function calcResumoDiaCore_(dataFmt, uidFilterOpt) {
   const dataAlvo = String(dataFmt || '').trim();
+  const uidFiltro = uidFilterOpt != null ? uidFilterOpt : 'all';
   const empty = {
     data: dataAlvo,
     n: 0,
@@ -4955,6 +4966,7 @@ function calcResumoDiaCore_(dataFmt) {
     nAbertas: 0,
     fatAbertas: 0,
     caixaIncluiAbertas: true,
+    unidadeId: uidFiltro,
     locacoes: [],
     custos: []
   };
@@ -4973,6 +4985,7 @@ function calcResumoDiaCore_(dataFmt) {
     for (let i = 0; i < dados.length; i++) {
       const r = dados[i];
       if (!r[0]) continue;
+      if (!locRowMatchesUnidade_(r, uidFiltro)) continue;
       const data = cellToStr_(r[1]);
       if (data !== dataAlvo) continue;
       const status = String(r[14]).trim();
@@ -4985,6 +4998,7 @@ function calcResumoDiaCore_(dataFmt) {
         fatAbertas += valorTotal;
       }
       const extraMeta = parseExtraMetaCol_(r[27]);
+      const uidRow = unidadeIdOfRow_(r);
       enc.push({
         rowIndex:      DATA_ROW + i,
         id:            r[0],
@@ -5004,6 +5018,7 @@ function calcResumoDiaCore_(dataFmt) {
         telefone:      String(r[13]),
         status:        status,
         veiculo:       String(r[15] || ''),
+        unidadeId:     uidRow,
         pagamento:     normalizarPagamento_(r[16] || ''),
         observacao:    String(r[17] || ''),
         extraPagamento: extraMeta.extraPagamento,
@@ -5018,18 +5033,21 @@ function calcResumoDiaCore_(dataFmt) {
   const custos = [];
   const shCus = sh_(SH_CUS);
   const lastCus = shCus.getLastRow();
-  if (lastCus >= DATA_ROW) {
-    const dadosC = shCus.getRange(DATA_ROW, 1, lastCus - DATA_ROW + 1, 6).getValues();
+  if (lastCus >= CUS_DATA_ROW_) {
+    const dadosC = shCus.getRange(CUS_DATA_ROW_, 1, lastCus - CUS_DATA_ROW_ + 1, COL_CUS_READ_).getValues();
     dadosC.forEach(function(r) {
       if (!r[0]) return;
       if (cellToStr_(r[1]) !== dataAlvo) return;
+      const uidC = unidadeIdCanon_(r[6]) || MK_UNIDADE_DEFAULT_;
+      if (uidFiltro !== 'all' && uidC !== uidFiltro) return;
       custos.push({
         id: r[0],
         data: cellToStr_(r[1]),
         hora: cellToStr_(r[2]),
         descricao: String(r[3]),
         categoria: String(r[4]),
-        valor: Number(r[5])
+        valor: Number(r[5]),
+        unidadeId: uidC
       });
     });
   }
@@ -5066,6 +5084,7 @@ function calcResumoDiaCore_(dataFmt) {
     nAbertas: nAbertas,
     fatAbertas: Math.round(fatAbertas * 100) / 100,
     caixaIncluiAbertas: true,
+    unidadeId: uidFiltro,
     locacoes: enc,
     custos: custos
   };
@@ -5076,7 +5095,8 @@ function resumoDia_(p) {
   const dataIn = (p.data || '').trim();
   const dataAlvo = dataIn || fmtData_(new Date());
   if (!parseDataStr_(dataAlvo)) return err_('data invalida — use dd/MM/yyyy', 400);
-  const cacheKey = 'resumoDia_' + dataAlvo.replace(/\//g, '');
+  const uidFiltro = unidadeIdFilterFrom_(p || {});
+  const cacheKey = 'resumoDia_' + dataAlvo.replace(/\//g, '') + '_u' + uidFiltro;
   // I121: FE sempre manda _t — não bustar cache (só force=1); escritas já invalidam
   const forceBust = String((p && p.force) || '') === '1'
     || String((p && p.nocache) || '').toLowerCase() === '1'
@@ -5087,8 +5107,9 @@ function resumoDia_(p) {
       if (hit) return ContentService.createTextOutput(hit).setMimeType(ContentService.MimeType.JSON);
     } catch (e) { /* ok */ }
   }
-  const core = calcResumoDiaCore_(dataAlvo);
+  const core = calcResumoDiaCore_(dataAlvo, uidFiltro);
   const enriched = enrichResumoDiaLeading_(core, dataAlvo);
+  enriched.unidadeId = uidFiltro;
   const out = JSON.stringify({ ok: true, ...enriched });
   try { CacheService.getScriptCache().put(cacheKey, out, 25); } catch (e) { /* ok */ }
   return ContentService.createTextOutput(out).setMimeType(ContentService.MimeType.JSON);
@@ -6435,7 +6456,8 @@ function comandoOperacional_(p) {
   const forceBust = String((p && p.force) || '') === '1'
     || String((p && p.nocache) || '').toLowerCase() === '1'
     || String((p && p.nocache) || '').toLowerCase() === 'true';
-  const cacheKey = 'comandoOp_v2_' + fmtData_(new Date()).replace(/\//g, '');
+  const uidCmd = unidadeIdFilterFrom_(p || {});
+  const cacheKey = 'comandoOp_v2_' + fmtData_(new Date()).replace(/\//g, '') + '_u' + uidCmd;
   if (!forceBust) {
     try {
       const hit = CacheService.getScriptCache().get(cacheKey);
@@ -6443,6 +6465,7 @@ function comandoOperacional_(p) {
     } catch (e) { /* ok */ }
   }
   const payload = buildPainelComandoOperacional_();
+  payload.unidadeId = uidCmd;
   const out = JSON.stringify(Object.assign({ ok: true }, payload));
   try { CacheService.getScriptCache().put(cacheKey, out, 40); } catch (e) { /* ok */ }
   return ContentService.createTextOutput(out).setMimeType(ContentService.MimeType.JSON);

@@ -1,6 +1,16 @@
 /* MOVI KIDS - lançamento avulso (Pacote M.15) */
 
 var avulsoState = { tipo: null, plano: null };
+var avulsoUnidadeSel_ = 'golden';
+
+function mkSelAvulsoUnidade_(el, uid) {
+  avulsoUnidadeSel_ = uid === 'laville' ? 'laville' : 'golden';
+  document.querySelectorAll('#avulso-unidade-pills .mk-hold-pill').forEach(function (b) {
+    b.classList.toggle('mk-hold-pill--on', b.getAttribute('data-uid') === avulsoUnidadeSel_);
+  });
+  if (typeof mkUnidadeSet_ === 'function') mkUnidadeSet_(avulsoUnidadeSel_);
+}
+window.mkSelAvulsoUnidade_ = mkSelAvulsoUnidade_;
 
 function resetAvulsoForm_() {
   avulsoState = { tipo: null, plano: null };
@@ -59,6 +69,7 @@ async function salvarLancamentoAvulso() {
       telefone,
       veiculo,
       pagamento,
+      unidadeId: avulsoUnidadeSel_,
       ...operadorApiParams_()
     });
     if (d.ok) {

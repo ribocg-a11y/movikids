@@ -15,7 +15,12 @@ function isLocacaoTesteHist_(l) {
 }
 
 function filtrarLocacoesHistorico_(locacoes) {
-  return (locacoes || []).filter(l => !isLocacaoTesteHist_(l));
+  let list = (locacoes || []).filter(l => !isLocacaoTesteHist_(l));
+  const filtro = typeof mkDualFiltro_ === 'function' ? mkDualFiltro_() : 'all';
+  if (filtro && filtro !== 'all' && typeof mkDualUidOf_ === 'function') {
+    list = list.filter(function (l) { return mkDualUidOf_(l) === filtro; });
+  }
+  return list;
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -30,9 +35,11 @@ function histItemHtml_(l) {
   const vT = Number(l.valorTotal).toFixed(2).replace('.', ',');
   const vE = Number(l.valorAdicional);
   const sc = l.status === 'Ativa' ? 'ativa' : 'encerrada';
+  const uid = (typeof mkDualUidOf_ === 'function' ? mkDualUidOf_(l) : (l.unidadeId || 'golden'));
+  const badge = uid === 'laville' ? 'La Ville' : 'Golden';
   return `<div class="hist-item">
     <div class="hi-left">
-      <div class="hi-tipo">${icon} ${l.tipo}</div>
+      <div class="hi-tipo">${icon} ${l.tipo} <span class="mk-uid-badge">${badge}</span></div>
       <div class="hi-names">${escHtml(l.crianca)}</div>
       <div class="hi-det">👤 ${escHtml(l.responsavel)} · ${l.plano}</div>
       <div class="hi-det">⏰ ${l.horaInicio}${l.horaFim ? ' → ' + l.horaFim : ''} · ${l.data}</div>

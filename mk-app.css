@@ -1943,8 +1943,11 @@ html,body{height:100%;background:var(--bg);color:var(--txt);overflow:hidden}
 .warn-wa:hover{background:#BF360C!important}
 .danger-wa:hover{background:#B71C1C!important}
 
-/* ── Holding ADM dual (I159d) ── */
-.mk-holding-root{max-width:1200px;margin:0 auto;padding:4px 0 24px}
+/* ── Holding ADM dual (I159d/f) — full-bleed na área cinza ── */
+#page-holding.page.mk-admin-soft{
+  padding-left:12px;padding-right:12px;
+}
+.mk-holding-root{max-width:none;width:100%;margin:0;padding:4px 0 24px;box-sizing:border-box}
 .mk-hold-hero{
   display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:16px;
   margin-bottom:18px;padding:16px 18px;border-radius:var(--radius,14px);
@@ -1961,7 +1964,26 @@ html,body{height:100%;background:var(--bg);color:var(--txt);overflow:hidden}
   padding:7px 14px;border-radius:999px;cursor:pointer;
 }
 .mk-hold-pill--on{background:var(--blue,#1565C0);color:#fff;border-color:transparent}
-.mk-hold-filtro-hint{margin:8px 0 0;font-size:11px;font-weight:700;color:var(--txt3,#90A4AE)}
+.mk-dual-pills-host{margin-top:10px}
+.mk-dual-summary{
+  margin:0 0 14px;padding:12px 14px;border-radius:12px;
+  background:var(--blue-lt,#E3F2FD);font-size:13px;font-weight:800;color:var(--blue-dk,#0D47A1);
+}
+.mk-dual-hero{margin:0 0 16px}
+.mk-dual-hero .mk-hold-col{min-height:0}
+.mk-dual-mini-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.mk-dual-mini{background:var(--bg2,#F5F7FA);border-radius:12px;padding:10px;text-align:center}
+.mk-dual-mini-val{display:block;font-weight:900;font-size:16px;color:var(--blue,#1565C0)}
+.mk-dual-mini-lbl{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:var(--txt3,#90A4AE)}
+.mk-uid-badge{
+  display:inline-block;margin-left:6px;padding:1px 7px;border-radius:999px;
+  font-size:10px;font-weight:800;background:rgba(21,101,192,.12);color:var(--blue,#1565C0);vertical-align:middle;
+}
+#page-caixa.mk-admin-page,#page-dashboard.mk-admin-page,#page-admin.mk-admin-page{
+  max-width:none;width:100%;box-sizing:border-box;
+}
+.mk-dual-caixa-grid,.mk-dual-cmd-grid{margin-bottom:14px}
+#painel-dual-grid .painel-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px}
 .mk-hold-hero-kpis{display:flex;gap:18px}
 .mk-hold-hero-kpis div{text-align:right}
 .mk-hold-hero-kpis strong{display:block;font-family:'Nunito',sans-serif;font-weight:900;font-size:20px;color:var(--txt,#1A237E)}

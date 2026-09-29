@@ -818,7 +818,9 @@ async function carregarKPIsDashboard(mes, ano) {
   kpiDashSetLoading_(true);
   const cmdP = carregarCommandCenter_().catch(function () {});
   try {
-    const authP = apiParamsComAuth_();
+    const authP = Object.assign({}, apiParamsComAuth_(), {
+      unidadeId: (typeof mkDualFiltro_ === 'function' ? mkDualFiltro_() : 'all')
+    });
     const base = { action: 'kpiMes', mes: mesEff, ano: anoEff, ...authP };
 
     const dLite = await api(Object.assign({ lite: '1' }, base), 45000);
@@ -1603,6 +1605,34 @@ function renderCommandCenter_(d) {
   if (!box || !d) return;
   box.style.display = '';
 
+  const pillsHost = document.getElementById('dash-dual-pills');
+  if (pillsHost && typeof mkDualMountPills_ === 'function') {
+    mkDualMountPills_(pillsHost, 'mkDashOnFiltro_');
+  }
+  const dualCmd = document.getElementById('dash-dual-cmd');
+  const filtro = typeof mkDualFiltro_ === 'function' ? mkDualFiltro_() : 'all';
+  if (dualCmd && typeof mkDualSplit_ === 'function' && typeof mkDualColShell_ === 'function' && filtro === 'all') {
+    const splitS = mkDualSplit_(typeof sessions !== 'undefined' ? sessions : []);
+    const splitE = mkDualSplit_(typeof encHojeData !== 'undefined' ? encHojeData : []);
+    function cmdMini(sessU, encU) {
+      const nAt = sessU.filter(function (s) {
+        return s && (s.status === 'Ativa' || s.status === 'Pendente' || s.started);
+      }).length;
+      const fat = encU.reduce(function (s, e) { return s + (Number(e.valorTotal) || 0); }, 0);
+      return '<div class="mk-dual-mini-grid">' +
+        '<div class="mk-dual-mini"><span class="mk-dual-mini-val">' + nAt + '</span><span class="mk-dual-mini-lbl">Abertas</span></div>' +
+        '<div class="mk-dual-mini"><span class="mk-dual-mini-val">' + (typeof mkDualFmtMoney_ === 'function' ? mkDualFmtMoney_(fat) : fat) + '</span><span class="mk-dual-mini-lbl">Fat. hoje</span></div>' +
+        '</div>';
+    }
+    dualCmd.hidden = false;
+    dualCmd.innerHTML =
+      mkDualColShell_('golden', cmdMini(splitS.golden, splitE.golden)) +
+      mkDualColShell_('laville', cmdMini(splitS.laville, splitE.laville));
+  } else if (dualCmd) {
+    dualCmd.hidden = true;
+    dualCmd.innerHTML = '';
+  }
+
   setText2('mk-cmd-date', d.data || fmtDataBrHoje_());
 
   const widgets = d.widgets || [];
@@ -1653,7 +1683,8 @@ async function carregarCommandCenter_() {
   const dashPage = document.getElementById('page-dashboard');
   if (!dashPage || !dashPage.classList.contains('active')) return;
   try {
-    const authP = apiParamsComAuth_();
+    const filtro = typeof mkDualFiltro_ === 'function' ? mkDualFiltro_() : 'all';
+    const authP = Object.assign({}, apiParamsComAuth_(), { unidadeId: filtro });
     const d = await api({ action: 'comandoOperacional', ...authP }, 20000);
     if (d && d.ok) {
       commandCenterData = d;
@@ -1665,6 +1696,15 @@ async function carregarCommandCenter_() {
   }
   renderCommandCenterFallback_();
 }
+
+function mkDashOnFiltro_(id) {
+  if (typeof mkDualSetFiltro_ === 'function') mkDualSetFiltro_(id);
+  carregarCommandCenter_().catch(function () {});
+  if (typeof carregarKPIsDashboard === 'function') {
+    try { carregarKPIsDashboard(); } catch (e) { /* ignore */ }
+  }
+}
+window.mkDashOnFiltro_ = mkDashOnFiltro_;
 
 function mkCommandCenterStartRefresh_() {
   if (window._mkCmdRefreshTimer) clearInterval(window._mkCmdRefreshTimer);
@@ -4168,44 +4208,79 @@ async function carregarCaixa() {
   const [y,m,d] = dataEl.value.split('-');
   const dataFmt = `${d}/${m}/${y}`;
   const hoje = fmtDataBrHoje_();
+  const pillsHost = document.getElementById('caixa-dual-pills');
+  if (pillsHost && typeof mkDualMountPills_ === 'function') {
+    mkDualMountPills_(pillsHost, 'mkCaixaOnFiltro_');
+  }
 
   ['cx-total','cx-maq','cx-din','cx-cus','cx-res','cx-nloc','cx-ext'].forEach(id => {
     const el = document.getElementById(id); if(el) el.textContent = '...';
   });
 
-  try {
-    if (dataFmt === hoje && resumoDiaHoje && resumoDiaHoje.ok) {
-      renderCaixaFromResumo_(dataFmt, resumoDiaHoje);
-    } else if (dataFmt === hoje) {
-      const hit = resumoDiaCacheRead_('mk_resumo_dia_' + hoje.replace(/\//g, ''), 5 * 60 * 1000);
-      if (hit) {
-        resumoDiaHoje = hit.data;
-        renderCaixaFromResumo_(dataFmt, hit.data);
-      }
-    }
+  const filtro = typeof mkDualFiltro_ === 'function' ? mkDualFiltro_() : 'all';
+  const dualGrid = document.getElementById('caixa-dual-grid');
+  const dualSum = document.getElementById('caixa-dual-summary');
+  const caixaKpis = document.getElementById('caixa-kpis');
 
-    let r;
-    if (dataFmt === hoje) {
-      r = await carregarResumoHojeAdmin_();
-    } else {
+  try {
+    if (filtro === 'all') {
       const authP = apiParamsComAuth_();
-      r = await api({ action: 'resumoDia', data: dataFmt, ...authP });
-      if (r && r.ok && typeof mkSessCacheSet_ === 'function') {
-        mkSessCacheSet_('mk_resumo_dia_' + dataFmt.replace(/\//g, ''), r);
+      const [rg, rl] = await Promise.all([
+        api({ action: 'resumoDia', data: dataFmt, unidadeId: 'golden', ...authP }),
+        api({ action: 'resumoDia', data: dataFmt, unidadeId: 'laville', ...authP })
+      ]);
+      if (dualGrid && typeof mkDualColShell_ === 'function' && typeof mkDualMiniKpiHtml_ === 'function') {
+        dualGrid.hidden = false;
+        dualGrid.innerHTML =
+          mkDualColShell_('golden', mkDualMiniKpiHtml_(rg)) +
+          mkDualColShell_('laville', mkDualMiniKpiHtml_(rl));
       }
+      if (dualSum) {
+        const fatG = Number(rg && rg.fat) || 0;
+        const fatL = Number(rl && rl.fat) || 0;
+        dualSum.hidden = false;
+        dualSum.innerHTML = '<strong>Holding hoje:</strong> ' +
+          (typeof mkDualFmtMoney_ === 'function' ? mkDualFmtMoney_(fatG + fatL) : ('R$ ' + (fatG + fatL).toFixed(2))) +
+          ' · Golden ' + (rg && rg.n || 0) + ' contas · La Ville ' + (rl && rl.n || 0) + ' contas';
+      }
+      const rAll = await api({ action: 'resumoDia', data: dataFmt, unidadeId: 'all', ...authP });
+      if (!rAll || !rAll.ok) {
+        toast((rAll && rAll.erro) || 'Erro ao carregar caixa', 'error');
+        return;
+      }
+      if (dataFmt === hoje) resumoDiaHoje = rAll;
+      renderCaixaFromResumo_(dataFmt, rAll);
+      if (caixaKpis) caixaKpis.style.display = '';
+    } else {
+      if (dualGrid) { dualGrid.hidden = true; dualGrid.innerHTML = ''; }
+      if (dualSum) { dualSum.hidden = true; dualSum.innerHTML = ''; }
+      const authP = Object.assign({}, apiParamsComAuth_(), { unidadeId: filtro });
+      let r;
+      if (dataFmt === hoje) {
+        r = await api({ action: 'resumoDia', data: dataFmt, force: '1', ...authP });
+      } else {
+        r = await api({ action: 'resumoDia', data: dataFmt, ...authP });
+      }
+      if (!r || !r.ok) {
+        toast((r && r.erro) || 'Erro ao carregar caixa', 'error');
+        return;
+      }
+      if (dataFmt === hoje) resumoDiaHoje = r;
+      renderCaixaFromResumo_(dataFmt, r);
+      if (caixaKpis) caixaKpis.style.display = '';
     }
-    if (!r || !r.ok) {
-      toast((r && r.erro) || 'Erro ao carregar caixa', 'error');
-      return;
-    }
-    if (dataFmt === hoje) resumoDiaHoje = r;
-    renderCaixaFromResumo_(dataFmt, r);
     if (typeof atualizarHubAdmin_ === 'function') atualizarHubAdmin_();
   } catch(e) {
     console.error('carregarCaixa:', e);
     toast('Erro ao carregar caixa', 'error');
   }
 }
+
+function mkCaixaOnFiltro_(id) {
+  if (typeof mkDualSetFiltro_ === 'function') mkDualSetFiltro_(id);
+  carregarCaixa();
+}
+window.mkCaixaOnFiltro_ = mkCaixaOnFiltro_;
 
 function buildFechamentoTexto_() {
   const d = window._caixaData;
@@ -4804,6 +4879,31 @@ function atualizarHubAdmin_() {
   const syncSuffix = (typeof mkSyncAgeSuffix_ === 'function') ? mkSyncAgeSuffix_() : '';
   if (chip) chip.textContent = (gasOnline ? 'Online' : 'Atenção sync') + syncSuffix + ' · app ' + ver;
   if (dot) dot.style.background = gasOnline ? '#2E7D32' : '#E65100';
+
+  const hero = document.getElementById('admin-dual-hero');
+  if (hero && typeof mkDualSplit_ === 'function' && typeof mkDualColShell_ === 'function') {
+    const splitS = mkDualSplit_(typeof sessions !== 'undefined' ? sessions : []);
+    const splitE = mkDualSplit_(typeof encHojeData !== 'undefined' ? encHojeData : []);
+    function pack(uid, sessU, encU) {
+      const nAt = sessU.filter(function (s) {
+        return s && (s.status === 'Ativa' || s.status === 'Pendente' || s.started);
+      }).length;
+      const fat = encU.reduce(function (s, e) { return s + (Number(e.valorTotal) || 0); }, 0);
+      const nC = typeof mkContasEncHoje_ === 'function' ? mkContasEncHoje_(encU) : encU.length;
+      return (
+        '<div class="mk-dual-mini-grid">' +
+          '<div class="mk-dual-mini"><span class="mk-dual-mini-val">' + nAt + '</span><span class="mk-dual-mini-lbl">Ativas</span></div>' +
+          '<div class="mk-dual-mini"><span class="mk-dual-mini-val">' + nC + '</span><span class="mk-dual-mini-lbl">Contas</span></div>' +
+          '<div class="mk-dual-mini"><span class="mk-dual-mini-val">' + (typeof mkDualFmtMoney_ === 'function' ? mkDualFmtMoney_(fat) : fat) + '</span><span class="mk-dual-mini-lbl">Caixa</span></div>' +
+        '</div>'
+      );
+    }
+    hero.innerHTML =
+      '<div class="mk-hold-grid">' +
+        mkDualColShell_('golden', pack('golden', splitS.golden, splitE.golden)) +
+        mkDualColShell_('laville', pack('laville', splitS.laville, splitE.laville)) +
+      '</div>';
+  }
 }
 
 setInterval(() => {

@@ -551,6 +551,24 @@ try {
     }
   }
 
+  $dualJs = Join-Path $root "mk-dual-ui.js"
+  $homeJsI159f = Join-Path $root "mk-home.js"
+  $gasForI159f = Join-Path $root "MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs"
+  if ((Test-Path $dualJs) -and (Test-Path $homeJsI159f) -and (Test-Path $gasForI159f)) {
+    $dualRaw = Get-Content -Path $dualJs -Raw -Encoding UTF8
+    $homeRawI159f = Get-Content -Path $homeJsI159f -Raw -Encoding UTF8
+    $gasRawI159f = Get-Content -Path $gasForI159f -Raw -Encoding UTF8
+    if ($dualRaw -notmatch 'mkDualMountPills_' -or $homeRawI159f -notmatch 'arguments\.length >= 1') {
+      Add-Check "guard.i159f.fe.dual" "fail" "FE dual UI / contas strict ausente (I159f)"
+    } elseif ($gasRawI159f -notmatch 'uidFilterOpt') {
+      Add-Check "guard.i159f.gas.resumo" "fail" "resumoDia sem filtro unidade (I159f)"
+    } elseif ($gasRawI159f -notmatch "'unidade_id'" -or $gasRawI159f -notmatch 'COL_CUS_READ_\s*=\s*7') {
+      Add-Check "guard.i159f.gas.custos" "fail" "CUSTOS sem unidade_id (I159f)"
+    } else {
+      Add-Check "guard.i159f.fe.dual" "ok" "dual UI + contas strict + resumo/CUSTOS por unidade (I159f)"
+    }
+  }
+
   $adminJs = Join-Path $root "mk-admin.js"
   if (Test-Path $adminJs) {
     $adminRaw = Get-Content -Path $adminJs -Raw -Encoding UTF8
