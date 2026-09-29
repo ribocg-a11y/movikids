@@ -1,29 +1,30 @@
 # MOVI KIDS — Planejamento atual (pós-FASE 5)
 
-**Atualizado:** 08/09/2026 · FE **v1.9.114** · GAS **v1.5.220** · **One UI ✅** · **I153–I155 confiabilidade ✅**  
+**Atualizado:** 29/09/2026 · FE **v1.9.120** · GAS **v1.5.221** · **I158 Golden FE ✅** · I153–I157 ✅  
 **Diagnóstico:** [`DIAGNOSTICO_SISTEMA_6_CAMADAS_2026-06.md`](DIAGNOSTICO_SISTEMA_6_CAMADAS_2026-06.md)  
 **Sprint UI:** [`PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`](PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md) ← **ciclo ativo**  
 **One UI (fechado):** [`PLANEJAMENTO_ONE_UI_2026-06.md`](PLANEJAMENTO_ONE_UI_2026-06.md)  
 **Documentos irmãos:** `PLANO_PRIORIDADES_2026-06.md` · `MAPA_FASES.md` · `DEPLOY_ATUAL.md` · `HANDOFF_NOVO_CHAT.md`  
 **Ciclo fechado:** FASE 0–5 · I52–I63 planilha · I64–I67 higiene/auditoria  
-**Ciclo ativo:** **Sprint D** — assinar FASE **16/17** · smoke tablet D4 · pós **I155** estabilidade live
+**Ciclo ativo:** **Sprint D** — PDF Golden setembro · smoke tablet D4 · assinar FASE **17**
 
 ---
 
 ## 1. Resumo executivo
 
-**Modo atual (08/09):** One UI **Sprints A–C ✅**. Confiabilidade balcão **I153–I155 ✅**. **Ciclo ativo = Sprint D** (assinar FASE 17 · smoke tablet `?force=1.9.114`).
+**Modo atual (29/09):** One UI **Sprints A–C ✅**. Confiabilidade **I153–I157 ✅**. **I158** relatório Golden via `kpiMes` (FE) ✅. **Ciclo ativo = Sprint D** (enviar set Golden · smoke `?force=1.9.120` · FASE 17).
 
 | Área | Status |
 |------|--------|
 | Planilha + GAS + homolog balcão base | ✅ |
-| Confiabilidade sync (I153–I155) | ✅ **0 HTML 404** · ping **v1.5.220** |
+| Confiabilidade sync (I153–I155) | ✅ **0 HTML 404** · ping **v1.5.221** |
+| **I158 Relatório Golden** | ✅ FE **v1.9.120** — sem Cancelada · set **14332** / CTO **1500** |
 | FASE 16 Centro Comando | ✅ **~98%** — assinatura Sprint D |
 | FASE 17 Alertas + Gestor | 🟡 **~95%** — pills/badges + F9 |
 | FASE 18 Financeiro UI | ✅ Sprint B · I150 cenários DRE |
 | Raykelly cadastro | ✅ **100%** 26/06 |
 
-**Próximo passo:** tablet smoke D4 · assinar FASE 17 · ver `HANDOFF_NOVO_CHAT.md`
+**Próximo passo:** gerar PDF Golden setembro (14.332) · tablet smoke D4 · assinar FASE 17 · ver `HANDOFF_NOVO_CHAT.md`
 
 ---
 

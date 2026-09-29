@@ -22,16 +22,17 @@ Detalhe: [docs/ativos/ESTRUTURA_REPO.md](docs/ativos/ESTRUTURA_REPO.md) · mocku
 
 **Planejamento:** [PLANEJAMENTO_ATUAL_2026-06.md](docs/ativos/PLANEJAMENTO_ATUAL_2026-06.md) · [PLANO_PRIORIDADES](docs/ativos/PLANO_PRIORIDADES_2026-06.md)
 
-## Produção (08/09/2026 — FE v1.9.114 · GAS ping v1.5.220)
+## Produção (29/09/2026 — FE v1.9.120 · GAS ping v1.5.221)
 
 | Camada | Versão repo | Produção |
 |--------|-------------|----------|
-| Frontend | **v1.9.114** | https://ribocg-a11y.github.io/movikids/?force=1.9.114 |
-| Gestão Pessoas | **v1.9.114** | `gestao-pessoas.html?force=1.9.114` |
-| Apps Script | **v1.5.220** | ping alinhado · I155 lookback · I154/I153 |
+| Frontend | **v1.9.120** | https://ribocg-a11y.github.io/movikids/?force=1.9.120 |
+| Gestão Pessoas | **v1.9.120** | `gestao-pessoas.html?force=1.9.120` |
+| Apps Script | **v1.5.221** | ping alinhado · I156 ritmo · I155 lookback |
 | Design System | **v1.1** | [DESIGN_SYSTEM_MOVIKIDS.md](docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md) |
+| Relatório Golden ago | PDF dia a dia | [entregas/…](https://ribocg-a11y.github.io/movikids/entregas/MOVI-KIDS-Relatorio-Agosto-2026-Golden-diario.pdf) |
 | Holerites PDF | jul/2026 | [entregas/holerite-mes-2026-07](https://ribocg-a11y.github.io/movikids/entregas/holerite-mes-2026-07/) |
-| **Ciclo dev** | Sprint D | [PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md](docs/ativos/PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md) · I153–I155 ✅ |
+| **Ciclo dev** | Sprint D | [PLANEJAMENTO_CICLO_POS_ONEUI](docs/ativos/PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md) · **I158** Golden FE ✅ |
 
 ## Novo chat / agente Cursor
 

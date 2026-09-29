@@ -1,12 +1,12 @@
 # MOVI KIDS — Mapa de fases (tradução)
 
-**Atualizado:** 08/09/2026 · produção FE **v1.9.114** · GAS **v1.5.220** · ver `DEPLOY_ATUAL.md`
+**Atualizado:** 29/09/2026 · produção FE **v1.9.120** · GAS **v1.5.221** · ver `DEPLOY_ATUAL.md`
 
 Evita confusão entre **três planos** que usam o mesmo número para coisas diferentes.
 
 ---
 
-## Ciclo ativo agora — pós One UI (Sprint D) + I153–I155
+## Ciclo ativo agora — pós One UI (Sprint D) + I153–I158
 
 | Status | Fase | Nome | Doc canônico |
 |--------|------|------|--------------|
@@ -16,8 +16,9 @@ Evita confusão entre **três planos** que usam o mesmo número para coisas dife
 | 🟡 | **17** | Alertas + Gestor | **~95%** · homolog D1 · `CHECKLIST_FASE17_FECHAMENTO.md` |
 | ✅ | **18** | Financeiro previsão (UI) | Sprint B ✅ · I150 cenários DRE |
 | ✅ | **Ops conf.** | I153–I155 | lookback + fila 404 + anular · `EVIDENCIA_ESTABILIDADE_POS_I155_*` |
+| ✅ | **Golden** | I158 | Relatório FE via kpiMes · `INCIDENTE_I158_*` |
 
-**Decisão 08/09:** confiabilidade sync **I155 live** → **dev ativo = Sprint D** smoke tablet `?force=1.9.114` + assinar FASE 16/17.
+**Decisão 29/09:** **I158 live** (FE 1.9.120) → **dev ativo = Sprint D** gerar Golden set + smoke tablet `?force=1.9.120` + assinar FASE 16/17.
 
 ---
 

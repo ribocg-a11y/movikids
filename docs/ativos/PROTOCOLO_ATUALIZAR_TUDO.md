@@ -1,6 +1,6 @@
 # MOVI KIDS — Protocolo "Atualize tudo"
 
-**Criado:** 14/06/2026 · **Última execução:** 08/09/2026 (FE **v1.9.114** · GAS ping **v1.5.220** · **I153–I155** confiabilidade + evidência estabilidade)  
+**Criado:** 14/06/2026 · **Última execução:** 29/09/2026 (FE **v1.9.120** · GAS ping **v1.5.221** · **I158** Golden FE ✅ · erros agente registrados no HANDOFF)  
 **Função:** quando o usuário pedir **"atualize tudo"**, o agente segue **esta lista** — não só handoff parcial.  
 **Regra Cursor:** `.cursor/rules/atualize-tudo-movikids.mdc`
 
@@ -17,7 +17,7 @@ Sincronizar **documentação + estado operacional** do projeto com a realidade a
 | Planejamento | `PLANEJAMENTO_ATUAL_2026-06.md`, `PLANO_PRIORIDADES_2026-06.md`, **`MAPA_FASES.md`**, **`PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`** |
 | Deploy atual | **`DEPLOY_ATUAL.md`** |
 | Estrutura repo | **`ESTRUTURA_REPO.md`** |
-| Mapa de erros | `MAPA_ERROS_FALHAS_BUGS.md` (I* até **I155** + famílias fantasma + confiabilidade sync) |
+| Mapa de erros | `MAPA_ERROS_FALHAS_BUGS.md` (I* até **I158** Golden + famílias fantasma + confiabilidade sync) |
 | **Design System** | **`docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md`** |
 | Protocolos | `PROTOCOLO_DIAGNOSTICO_E_TESTES.md`, **este arquivo** |
 | Arquitetura / fluxos / diagramas | `MAPA_CODIGO_ARQUITETURA.md`, `FASE_*.md` ativas |
@@ -43,18 +43,19 @@ Sincronizar **documentação + estado operacional** do projeto com a realidade a
 
 ---
 
-## Produção atual (08/09/2026)
+## Produção atual (29/09/2026)
 
 | Camada | Versão | Evidência |
 |--------|--------|-----------|
-| GAS | ping **v1.5.220** = repo | lookback 600 · cache ativas · **0 HTML 404** bateria |
-| FE | **v1.9.114** | Pages live · `?force=1.9.114` · I154b retry + fila 404 |
-| Planilha | **OK** | operação 08/09 · ativas reais no balcão |
-| Homolog tablet | **⏳** | smoke D4 · paridade cards |
-| Confiabilidade | I153–I155 ✅ | duplicata · fila 404 · lookback causa raiz |
+| GAS | ping **v1.5.221** = repo | I156 ritmo · lookback 600 · **sem** mudança I158 |
+| FE | **v1.9.120** | Pages live · `?force=1.9.120` · **I158** Golden via kpiMes |
+| Golden set (prévia) | R$ **14.332** · CTO **R$ 1.500** | Admin Relatório · sem Cancelada |
+| Homolog tablet | **⏳** | smoke D4 · `?force=1.9.120` |
+| Confiabilidade | I153–I158 ✅ | lookback · fila 404 · Golden FE |
 
 ```powershell
 node scripts\testes\teste-estabilidade-pos-i155.cjs
+.\scripts\testes\TESTE_I158_GOLDEN_SEM_CANCELADAS_READONLY.ps1
 .\scripts\testes\TESTE_I151_ENCERRAR_FANTASMA_READONLY.ps1
 .\scripts\encerramento-sessao.ps1
 ```
@@ -104,13 +105,19 @@ flowchart TD
 
 *Revisar quando mudar versão FE/GAS ou fechar incidente.*
 
-### Registro desta execução (08/09/2026)
+### Registro desta execução (29/09/2026)
 
 | I* | Evento | Doc |
 |----|--------|-----|
-| I153 | Histórico/duplicata Arthur + anular Encerrada | `INCIDENTE_I153_*` |
-| I154/b | Lançamento perdido HTML 404 → fila + retry | `INCIDENTE_I154_*` |
+| **I158** | Golden PDF/e-mail contava Cancelada → FE kpiMes | `INCIDENTE_I158_*` · HANDOFF erros agente |
+| I156 | Ritmo Dashboard fatMap chaves "01" | `INCIDENTE_I156_*` |
 | I155 | Lookback causa raiz full-sheet 404 | `INCIDENTE_I155_*` + `EVIDENCIA_ESTABILIDADE_*` |
+| I154/b | Lançamento perdido HTML 404 → fila + retry | `INCIDENTE_I154_*` |
+| I153 | Histórico/duplicata Arthur + anular Encerrada | `INCIDENTE_I153_*` |
+
+**Erros do agente (sessão I158 — não repetir):** ver tabela em `HANDOFF_NOVO_CHAT.md` § Erros — especialmente **§7.2/I24** (publicar FE sem pedir).
+
+### Registro anterior (08/09/2026)
 
 - Estudo negócio: `ESTUDO_NEGOCIO_BREAK_EVEN_TICKET_2026-07.md`
 - Holerite PDF: `INCIDENTE_I142_*`

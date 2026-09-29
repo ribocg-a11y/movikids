@@ -1,11 +1,11 @@
 # MOVI KIDS — Plano de prioridades (análise de sistemas)
 
-**Data-base:** 09/06/2026 · **Revisado:** 08/09/2026 (Sprint D · I153–I155 · FE v1.9.114 · GAS v1.5.220)  
+**Data-base:** 09/06/2026 · **Revisado:** 29/09/2026 (Sprint D · **I158** Golden FE ✅ · FE v1.9.120 · GAS v1.5.221)  
 **Função:** documento único de **o que fazer agora**, por ordem de prioridade.  
 **Local:** `docs/ativos/` · **Índice:** `../INDICE.md`  
 **Handoff:** `HANDOFF_NOVO_CHAT.md` · **Diagnóstico:** `DIAGNOSTICO_SISTEMA_6_CAMADAS_2026-06.md` · **Complementa:** `ESTADO_ATUAL.md`, `PLANO_CONTINUIDADE_2026-06.md`, `REGRAS_DE_PUBLICACAO_SEGURA.md`.
 
-**Ops imediato (08/09):** tablet `?force=1.9.114` · smoke D4 · assinar FASE 17 — confiabilidade I153–I155 ✅ live.
+**Ops imediato (29/09):** gerar Golden **setembro** (conferir R$ 14.332 / CTO R$ 1.500) · tablet `?force=1.9.120` · smoke D4 · assinar FASE 17 — I153–I158 ✅ live.
 
 ---
 
@@ -31,13 +31,13 @@
 | **FASE 15** Gestão Pessoas | ✅ prod | FE **v1.8.71** · GAS **v1.5.111** Web **165** · homolog tablet **20/06** · `FASE_15_GESTAO_PESSOAS.md` |
 | **Design System v1.0** | ✅ repo | `DESIGN_SYSTEM_MOVIKIDS.md` · regra Cursor obrigatória |
 
-**Próximo passo imediato (10/07 — Sprint D):**
+**Próximo passo imediato (29/09 — Sprint D):**
 
-1. **Ops/sócio:** D2 assinar FASE 17 · D3 decisão **17.5 F9** · D4 smoke tablet **v1.9.39**
-2. **Ops:** validar I103 — Encerradas contas únicas · Caixa todas locações
+1. **Ops/sócio:** gerar/enviar relatório Golden **setembro** no admin FE **v1.9.120** (conferir **14.332**)
+2. **Ops/sócio:** D2 assinar FASE 17 · D3 decisão **17.5 F9** · D4 smoke tablet **`?force=1.9.120`**
 3. **Ops:** Ponto RH diário (`FOLHA_PONTO`)
 
-**Fundação:** GAS **v1.5.187** · FE **v1.9.39** · One UI Sprints A–C ✅ · I96–I103 ✅ · homolog tablet base ✅ · planilha **23/23** · **I68 VT** ✅ · **I24 travas** ✅.
+**Fundação:** GAS **v1.5.221** · FE **v1.9.120** · One UI Sprints A–C ✅ · I96–I158 ✅ · homolog tablet base ✅ · **I24 travas** ✅ · **I158 Golden FE** ✅.
 
 Ver **`PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`** · **`HANDOFF_NOVO_CHAT.md`**
 

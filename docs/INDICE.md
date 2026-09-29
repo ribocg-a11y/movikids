@@ -1,6 +1,6 @@
 # MOVI KIDS — Índice de documentação
 
-**Atualizado:** 08/09/2026 (FE **v1.9.114** · GAS ping **v1.5.220** · I153–I155)
+**Atualizado:** 29/09/2026 (FE **v1.9.120** · GAS ping **v1.5.221** · **I158** Golden FE ✅)
 
 ## Comece aqui
 
@@ -23,6 +23,7 @@
 | [**INCIDENTE_I43_CARREGAR_INICIO_COL_Y_2026-06-23.md**](ativos/INCIDENTE_I43_CARREGAR_INICIO_COL_Y_2026-06-23.md) | **I43** — cronômetro revertia após ▶ |
 | [**INCIDENTE_I53_CONFIG_PLANILHA_REPAIR_2026-06-24.md**](arquivo/incidentes/INCIDENTE_I53_CONFIG_PLANILHA_REPAIR_2026-06-24.md) | **I53** — CONFIG memorial, schema, repair |
 | [**INCIDENTE_I96_I99_MULTI_VEICULO_2026-07-10.md**](arquivo/incidentes/INCIDENTE_I96_I99_MULTI_VEICULO_2026-07-10.md) | **I96–I103** — multi-veículo · overlay · contagem encerradas/caixa |
+| [**INCIDENTE_I158_GOLDEN_CONTA_CANCELADA_2026-09-23.md**](arquivo/incidentes/INCIDENTE_I158_GOLDEN_CONTA_CANCELADA_2026-09-23.md) | **I158** — Golden sem Cancelada · FE kpiMes · set 14332 |
 | [**INCIDENTE_I155_LOOKBACK_ATIVAS_CARGA_GAS_2026-09-08.md**](ativos/INCIDENTE_I155_LOOKBACK_ATIVAS_CARGA_GAS_2026-09-08.md) | **I155** — lookback causa raiz 404/full-sheet |
 | [**EVIDENCIA_ESTABILIDADE_POS_I155_2026-09-08.md**](ativos/EVIDENCIA_ESTABILIDADE_POS_I155_2026-09-08.md) | Bateria estabilidade — **0 HTML 404** |
 | [**INCIDENTE_I154_LANCAMENTO_PERDIDO_GAS_404_2026-09-08.md**](ativos/INCIDENTE_I154_LANCAMENTO_PERDIDO_GAS_404_2026-09-08.md) | **I154** — salvar perdido + audit sort |
