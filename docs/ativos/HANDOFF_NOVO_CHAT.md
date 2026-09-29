@@ -1,6 +1,6 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 23/09/2026 · FE **v1.9.120** Pages (I158 Golden FE) · GAS ping **v1.5.221** (sem mudança AppScript)
+**Atualizado:** 29/09/2026 · FE **v1.9.120** Pages ✅ (I158 Golden FE publicado) · GAS ping **v1.5.221** (sem mudança AppScript)
 
 ## I158 — Relatório Golden
 
