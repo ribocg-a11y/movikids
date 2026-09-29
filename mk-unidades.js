@@ -150,6 +150,9 @@
       }
     } catch (e3) { /* ignore */ }
     aplicarConfigLocal_();
+    if (typeof w.mkRefreshUnidadeUi_ === 'function') {
+      try { w.mkRefreshUnidadeUi_(); } catch (eUi) { /* ignore */ }
+    }
     return { ok: true, unidade: u };
   }
 
@@ -325,7 +328,88 @@
   w.mkUnidadeAplicarConfig_ = aplicarConfigLocal_;
   w.mkUnidadeSyncAposGas_ = syncAposGasConfig_;
 
+  /** Badge/nome da loja no balcão (home, sidebar, header mobile). */
+  function refreshUnidadeUi_() {
+    var uid = getUnidadeId();
+    var u = getUnidade(uid);
+    var nome = u.nomeCurto || u.nome || uid;
+    var sub = subLinha(uid);
+    var banner = document.getElementById('mk-unidade-balcao-banner');
+    var nomeEl = document.getElementById('mk-unidade-balcao-nome');
+    var subEl = document.getElementById('mk-unidade-balcao-sub');
+    if (banner) banner.setAttribute('data-uid', uid);
+    if (nomeEl) nomeEl.textContent = nome;
+    if (subEl) subEl.textContent = sub;
+    var mob = document.getElementById('mk-mob-unidade');
+    if (mob) {
+      mob.hidden = false;
+      mob.textContent = '📍 ' + nome;
+      mob.setAttribute('data-uid', uid);
+    }
+    var sb = document.getElementById('sb-unidade-chip');
+    if (sb) {
+      var holdOn = false;
+      try {
+        holdOn = !!(document.getElementById('page-holding') && document.getElementById('page-holding').classList.contains('active'));
+      } catch (eH) { /* ignore */ }
+      if (holdOn) {
+        sb.hidden = true;
+      } else {
+        sb.hidden = false;
+        sb.textContent = '📍 ' + nome;
+        sb.setAttribute('data-uid', uid);
+      }
+    }
+  }
+  w.mkRefreshUnidadeUi_ = refreshUnidadeUi_;
+
+  /**
+   * I159g — ao trocar de loja no balcão: zera KPIs locais (evita herdar Golden)
+   * e invalida cache inicio sem unidade.
+   */
+  function resetBalcaoParaUnidade_(uid) {
+    var r = setUnidadeId(uid);
+    if (!r || !r.ok) return r;
+    try {
+      if (typeof encHojeData !== 'undefined') w.encHojeData = [];
+    } catch (e1) { /* ignore */ }
+    try {
+      if (typeof statsHoje !== 'undefined' && statsHoje) {
+        statsHoje.n = 0;
+        statsHoje.nSessoes = 0;
+        statsHoje.fat = 0;
+      }
+    } catch (e2) { /* ignore */ }
+    try {
+      if (Array.isArray(w.sessions) && typeof sessionsPorUnidade_ === 'function') {
+        w.sessions = sessionsPorUnidade_(w.sessions, uid);
+      }
+    } catch (e3) { /* ignore */ }
+    var nLoc = document.getElementById('stat-nloc');
+    if (nLoc) nLoc.textContent = '0';
+    var nAt = document.getElementById('stat-ativas');
+    if (nAt) nAt.textContent = '0';
+    var chipFat = document.getElementById('admin-chip-fat');
+    if (chipFat) chipFat.textContent = '0 locações';
+    if (typeof w.mkInvalidateInicioCache_ === 'function') {
+      try { w.mkInvalidateInicioCache_(); } catch (e4) { /* ignore */ }
+    }
+    if (typeof w.renderEncHoje === 'function') {
+      try { w.renderEncHoje([]); } catch (e5) { /* ignore */ }
+    }
+    refreshUnidadeUi_();
+    return r;
+  }
+  w.mkResetBalcaoParaUnidade_ = resetBalcaoParaUnidade_;
+
   try {
     document.documentElement.setAttribute('data-mk-unidade', getUnidadeId());
   } catch (e4) { /* ignore */ }
+  try {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', refreshUnidadeUi_);
+    } else {
+      refreshUnidadeUi_();
+    }
+  } catch (e5) { /* ignore */ }
 })(typeof window !== 'undefined' ? window : globalThis);

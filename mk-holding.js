@@ -146,16 +146,21 @@
   }
 
   function mkHoldingAbrirBalcao_(uid) {
-    if (typeof mkUnidadeSet_ === 'function') {
-      var r = mkUnidadeSet_(uid);
-      if (!r || !r.ok) {
-        if (typeof toast === 'function') toast((r && r.erro) || 'Unidade indisponível', 'warning');
-        return;
-      }
+    var r;
+    if (typeof mkResetBalcaoParaUnidade_ === 'function') {
+      r = mkResetBalcaoParaUnidade_(uid);
+    } else if (typeof mkUnidadeSet_ === 'function') {
+      r = mkUnidadeSet_(uid);
+    }
+    if (r && !r.ok) {
+      if (typeof toast === 'function') toast((r && r.erro) || 'Unidade indisponível', 'warning');
+      return;
     }
     if (typeof showPage === 'function') showPage('home', { adminBalcao: true });
+    if (typeof mkRefreshUnidadeUi_ === 'function') mkRefreshUnidadeUi_();
+    /* force=true: evita reaplicar cache/inicio da outra loja (I159g). */
     if (typeof syncNow === 'function') {
-      try { syncNow(); } catch (eS) { /* ignore */ }
+      try { syncNow(true); } catch (eS) { /* ignore */ }
     } else if (typeof carregarInicio === 'function') {
       try { carregarInicio(); } catch (eC) { /* ignore */ }
     }

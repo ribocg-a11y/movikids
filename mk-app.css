@@ -1979,6 +1979,34 @@ html,body{height:100%;background:var(--bg);color:var(--txt);overflow:hidden}
   display:inline-block;margin-left:6px;padding:1px 7px;border-radius:999px;
   font-size:10px;font-weight:800;background:rgba(21,101,192,.12);color:var(--blue,#1565C0);vertical-align:middle;
 }
+/* I159g — identificação obrigatória da loja no balcão */
+.mk-unidade-balcao-banner{
+  display:flex;align-items:center;gap:10px;margin:0 0 12px;padding:12px 14px;
+  border-radius:14px;background:linear-gradient(135deg,#E3F2FD 0%,#FFF8E1 100%);
+  border:1.5px solid rgba(21,101,192,.18);
+}
+.mk-unidade-balcao-pin{font-size:20px;line-height:1}
+.mk-unidade-balcao-copy{display:flex;flex-direction:column;gap:2px;min-width:0}
+.mk-unidade-balcao-nome{
+  font-family:'Fredoka One',cursive;font-size:18px;font-weight:400;color:var(--txt,#1A237E);
+  letter-spacing:.02em;line-height:1.15;
+}
+.mk-unidade-balcao-sub{font-size:12px;font-weight:700;color:var(--txt2,#546E7A)}
+.mk-unidade-balcao-banner[data-uid="laville"]{
+  background:linear-gradient(135deg,#FFF3E0 0%,#E8F5E9 100%);
+  border-color:rgba(230,81,0,.22);
+}
+.mk-unidade-balcao-banner[data-uid="laville"] .mk-unidade-balcao-nome{color:#E65100}
+.mk-mob-unidade{
+  margin-top:6px;padding:6px 10px;border-radius:999px;display:inline-flex;align-items:center;gap:6px;
+  font-family:'Nunito',sans-serif;font-weight:800;font-size:12px;
+  background:rgba(255,255,255,.14);color:#fff;max-width:100%;
+}
+.mk-mob-unidade[hidden]{display:none!important}
+.sb-unidade-chip{
+  margin:6px 10px 0;padding:6px 10px;border-radius:10px;font-size:12px;font-weight:800;
+  color:#fff;background:rgba(255,255,255,.12);text-align:center;
+}
 #page-caixa.mk-admin-page,#page-dashboard.mk-admin-page,#page-admin.mk-admin-page{
   max-width:none;width:100%;box-sizing:border-box;
 }

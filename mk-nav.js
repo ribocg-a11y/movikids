@@ -79,6 +79,7 @@ function showPage(name, opts = {}) {
   const navId = navMap[name];
   if (navId) document.getElementById(navId)?.classList.add('active');
   syncSidebar(name);
+  if (typeof mkRefreshUnidadeUi_ === 'function') mkRefreshUnidadeUi_();
   if (name === 'lancamento') resetAvulsoForm_();
   if (name==='nova') {
     if (opts.freshNova) {
@@ -134,10 +135,16 @@ function syncSidebar(page) {
   const isAdm = !!(window.isAdmin || (typeof mkAuthIsAdmin === 'function' && mkAuthIsAdmin()));
   const holdBtn = document.getElementById('sbn-holding');
   const homeBtn = document.getElementById('sbn-home');
+  const homeOn = !!document.getElementById('page-home')?.classList.contains('active');
   if (holdBtn) holdBtn.hidden = true;
   if (homeBtn && isAdm) {
-    homeBtn.innerHTML = '<span class="sb-icon">🏬</span>Lojas';
-    homeBtn.setAttribute('onclick', "showPage('holding')");
+    if (homeOn) {
+      homeBtn.innerHTML = '<span class="sb-icon">🏬</span>← Lojas';
+      homeBtn.setAttribute('onclick', "showPage('holding')");
+    } else {
+      homeBtn.innerHTML = '<span class="sb-icon">🏬</span>Lojas';
+      homeBtn.setAttribute('onclick', "showPage('holding')");
+    }
   } else if (homeBtn) {
     homeBtn.innerHTML = '<span class="sb-icon">🏠</span>Home';
     homeBtn.setAttribute('onclick', "showPage('home')");

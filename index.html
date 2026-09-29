@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Movi Kids">
 <title>Movi Kids</title>
-<script src="mk-canonical-host.js?v=1.9.127"></script>
+<script src="mk-canonical-host.js?v=1.9.128"></script>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png">
@@ -17,17 +17,17 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<script src="mk-stale-sync.js?v=1.9.127"></script>
-<script src="mk-version.js?v=1.9.127"></script>
-<script src="mk-api.js?v=1.9.127"></script>
-<link rel="stylesheet" href="mk-design.css?v=1.9.127">
+<script src="mk-stale-sync.js?v=1.9.128"></script>
+<script src="mk-version.js?v=1.9.128"></script>
+<script src="mk-api.js?v=1.9.128"></script>
+<link rel="stylesheet" href="mk-design.css?v=1.9.128">
 
-<script src="mk-cache-bust.js?v=1.9.127"></script>
+<script src="mk-cache-bust.js?v=1.9.128"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<link rel="stylesheet" href="mk-app.css?v=1.9.127">
-<link rel="stylesheet" href="mk-gestao-pessoas.css?v=1.9.127">
+<link rel="stylesheet" href="mk-app.css?v=1.9.128">
+<link rel="stylesheet" href="mk-gestao-pessoas.css?v=1.9.128">
 <!-- Firebase SDK — Realtime sync canonico para todos os dispositivos -->
-<script type="module" src="mk-firebase.js?v=1.9.127"></script>
+<script type="module" src="mk-firebase.js?v=1.9.128"></script>
 </head>
 
 <body>
@@ -189,6 +189,7 @@
     <div class="sb-logo"><img class="mk-brand-img mk-brand-img--xs mk-brand-img--on-dark" src="assets/logo-movi-kids.png" alt="Movi Kids" width="1080" height="1080" loading="lazy" decoding="async">
       <div class="sb-status"><span id="sb-dot" class="dot-online"></span><span id="sb-txt">Online</span><span id="sb-version" style="font-size:10px;opacity:.85;margin-left:5px;color:rgba(255,255,255,.7);font-family:monospace">v1.7.26</span></div>
     </div>
+    <div id="sb-unidade-chip" class="sb-unidade-chip" hidden role="status" aria-live="polite"></div>
     <div class="sb-nav" id="sb-nav" role="navigation" aria-label="Operação">
       <button class="sb-btn active" id="sbn-home" onclick="showPage('home')"><span class="sb-icon">🏠</span>Home</button>
       <button class="sb-btn" id="sbn-holding" onclick="showPage('holding')" hidden><span class="sb-icon">🏬</span>Lojas</button>
@@ -229,7 +230,7 @@
           </div>
         </div>
         <div class="mk-admin-mob-cmd-actions">
-          <button type="button" class="mk-admin-mob-cmd-btn" onclick="showPage('holding')"><span aria-hidden="true">🏬</span> Lojas</button>
+          <button type="button" class="mk-admin-mob-cmd-btn" id="mk-admin-mob-btn-holding" onclick="showPage('holding')"><span aria-hidden="true">🏬</span> Visão holding</button>
           <button type="button" class="mk-admin-mob-cmd-btn mk-admin-mob-cmd-btn--primary" onclick="irAdmin('dashboard')"><span aria-hidden="true">📈</span> Dashboard</button>
         </div>
         <p class="mk-admin-mob-cmd-note">Somente leitura — operação no balcão.</p>
@@ -286,6 +287,7 @@
         <span id="app-version" class="mk-mob-ver"></span>
       </div>
     </div>
+    <div id="mk-mob-unidade" class="mk-mob-unidade" hidden role="status" aria-live="polite"></div>
     <div id="hd-turno-chip" class="mk-mob-turno" hidden role="status" aria-live="polite"></div>
   </header>
 
@@ -307,6 +309,13 @@
 
   <!-- ──────── PAGE: HOME ──────── -->
   <div id="page-home" class="page active">
+    <div id="mk-unidade-balcao-banner" class="mk-unidade-balcao-banner" role="status" aria-live="polite">
+      <span class="mk-unidade-balcao-pin" aria-hidden="true">📍</span>
+      <div class="mk-unidade-balcao-copy">
+        <span class="mk-unidade-balcao-nome" id="mk-unidade-balcao-nome">—</span>
+        <span class="mk-unidade-balcao-sub" id="mk-unidade-balcao-sub"></span>
+      </div>
+    </div>
     <div class="mk-stat-row stats-bar">
       <div class="mk-stat-tile stat-card"><div class="stat-val mk-stat-val" id="stat-ativas">0</div><div class="stat-lbl mk-stat-lbl">Ativas agora</div></div>
       <div class="mk-stat-tile stat-card"><div class="stat-val mk-stat-val" id="stat-nloc">0</div><div class="stat-lbl mk-stat-lbl">Contas hoje</div></div>
@@ -2564,34 +2573,34 @@
   </div>
 </div>
 
-<script src="mk-globals.js?v=1.9.127"></script>
-<script src="mk-unidades.js?v=1.9.127"></script>
-<script src="mk-core.js?v=1.9.127"></script>
-<script src="mk-nav.js?v=1.9.127"></script>
-<script src="mk-admin.js?v=1.9.127"></script>
-<script src="mk-historico.js?v=1.9.127"></script>
-<script src="mk-custos-historico.js?v=1.9.127"></script>
-<script src="mk-sessao.js?v=1.9.127"></script>
-<script src="mk-home.js?v=1.9.127"></script>
-<script src="mk-holding.js?v=1.9.127"></script>
-<script src="mk-dual-ui.js?v=1.9.127"></script>
-<script src="mk-meta-operador.js?v=1.9.127"></script>
-<script src="mk-custos.js?v=1.9.127"></script>
-<script src="mk-avulso.js?v=1.9.127"></script>
-<script src="mk-sync.js?v=1.9.127"></script>
-<script src="mk-idb-store.js?v=1.9.127"></script>
-<script src="mk-offline-queue.js?v=1.9.127"></script>
-<script src="mk-local-snapshot.js?v=1.9.127"></script>
-<script src="mk-nova.js?v=1.9.127"></script>
-<script src="mk-relacionamento.js?v=1.9.127"></script>
-<script src="mk-operacao.js?v=1.9.127"></script>
-<script src="mk-drawer.js?v=1.9.127"></script>
-<script src="mk-enc-extra.js?v=1.9.127"></script>
-<script src="mk-update.js?v=1.9.127"></script>
-<script src="mk-gestao-pessoas.js?v=1.9.127"></script>
-<script src="mk-holerite.js?v=1.9.127"></script>
-<script src="mk-gestao-pessoas-admin.js?v=1.9.127"></script>
-<script src="mk-auth.js?v=1.9.127"></script>
-<script src="mk-boot.js?v=1.9.127"></script>
+<script src="mk-globals.js?v=1.9.128"></script>
+<script src="mk-unidades.js?v=1.9.128"></script>
+<script src="mk-core.js?v=1.9.128"></script>
+<script src="mk-nav.js?v=1.9.128"></script>
+<script src="mk-admin.js?v=1.9.128"></script>
+<script src="mk-historico.js?v=1.9.128"></script>
+<script src="mk-custos-historico.js?v=1.9.128"></script>
+<script src="mk-sessao.js?v=1.9.128"></script>
+<script src="mk-home.js?v=1.9.128"></script>
+<script src="mk-holding.js?v=1.9.128"></script>
+<script src="mk-dual-ui.js?v=1.9.128"></script>
+<script src="mk-meta-operador.js?v=1.9.128"></script>
+<script src="mk-custos.js?v=1.9.128"></script>
+<script src="mk-avulso.js?v=1.9.128"></script>
+<script src="mk-sync.js?v=1.9.128"></script>
+<script src="mk-idb-store.js?v=1.9.128"></script>
+<script src="mk-offline-queue.js?v=1.9.128"></script>
+<script src="mk-local-snapshot.js?v=1.9.128"></script>
+<script src="mk-nova.js?v=1.9.128"></script>
+<script src="mk-relacionamento.js?v=1.9.128"></script>
+<script src="mk-operacao.js?v=1.9.128"></script>
+<script src="mk-drawer.js?v=1.9.128"></script>
+<script src="mk-enc-extra.js?v=1.9.128"></script>
+<script src="mk-update.js?v=1.9.128"></script>
+<script src="mk-gestao-pessoas.js?v=1.9.128"></script>
+<script src="mk-holerite.js?v=1.9.128"></script>
+<script src="mk-gestao-pessoas-admin.js?v=1.9.128"></script>
+<script src="mk-auth.js?v=1.9.128"></script>
+<script src="mk-boot.js?v=1.9.128"></script>
 </body>
 </html>

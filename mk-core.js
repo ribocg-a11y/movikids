@@ -276,8 +276,13 @@ function escHtml(t) {
 }
 
 function updateStats() {
-  const ativas = sessions.filter(s => s.started).length;
-  document.getElementById('stat-ativas').textContent = ativas;
+  const uid = typeof mkUnidadeId_ === 'function' ? mkUnidadeId_() : 'golden';
+  const list = (typeof mkSessionsPorUnidade_ === 'function')
+    ? mkSessionsPorUnidade_(sessions || [], uid)
+    : (sessions || []);
+  const ativas = list.filter(s => s.started).length;
+  const el = document.getElementById('stat-ativas');
+  if (el) el.textContent = ativas;
 }
 
 function toast(msg, type = '') {

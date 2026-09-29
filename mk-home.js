@@ -38,8 +38,12 @@ window.mkShouldRefreshHomeCards_ = mkShouldRefreshHomeCards_;
 
 function renderCards() {
   const container = document.getElementById('sessions-container');
+  const uid = typeof mkUnidadeId_ === 'function' ? mkUnidadeId_() : 'golden';
+  const list = (typeof mkSessionsPorUnidade_ === 'function')
+    ? mkSessionsPorUnidade_(sessions || [], uid)
+    : (sessions || []);
 
-  if (sessions.length === 0) {
+  if (list.length === 0) {
     const syncing = !!window._mkSyncBootPending;
     container.innerHTML = syncing
       ? `<div class="empty">
@@ -60,7 +64,7 @@ function renderCards() {
     return;
   }
 
-  container.innerHTML = sessions.map(s => buildCard(s)).join('');
+  container.innerHTML = list.map(s => buildCard(s)).join('');
 }
 
 function buildCard(s) {
@@ -458,10 +462,14 @@ function mkEncHojeChaveConta_(e) {
 
 /** Contas do dia (telefones/conta_id únicos — I42) — tile Home / Encerradas.
  * I159f: se o caller passou lista explícita (mesmo vazia), NÃO cai em statsHoje global
- * (evita La Ville herdar 6 contas do Golden). */
+ * (evita La Ville herdar 6 contas do Golden).
+ * I159g: sem lista explícita, filtra encHojeData pela unidade ativa do balcão. */
 function mkContasEncHoje_(list) {
   const explicit = arguments.length >= 1;
-  const data = explicit ? (list || []) : (encHojeData || []);
+  let data = explicit ? (list || []) : (encHojeData || []);
+  if (!explicit && typeof mkSessionsPorUnidade_ === 'function' && typeof mkUnidadeId_ === 'function') {
+    data = mkSessionsPorUnidade_(data, mkUnidadeId_());
+  }
   if (data.length) {
     const seen = {};
     data.forEach(function (e) {
@@ -471,7 +479,7 @@ function mkContasEncHoje_(list) {
     return Object.keys(seen).length;
   }
   if (explicit) return 0;
-  if (statsHoje && statsHoje.n != null && statsHoje.n > 0) return statsHoje.n;
+  /* Sem lista local da unidade: NÃO usar statsHoje global (outra loja). */
   return 0;
 }
 
@@ -513,9 +521,14 @@ function mkSessoesEncHoje_(list) {
 }
 
 function mkUpdateEncHojeKpis_(list) {
-  encHojeData = list || [];
+  const raw = list || [];
+  const uid = typeof mkUnidadeId_ === 'function' ? mkUnidadeId_() : 'golden';
+  encHojeData = (typeof mkSessionsPorUnidade_ === 'function')
+    ? mkSessionsPorUnidade_(raw, uid)
+    : raw;
   const nLoc = document.getElementById('stat-nloc');
   if (nLoc) nLoc.textContent = String(mkContasEncHoje_(encHojeData));
+  if (typeof mkRefreshUnidadeUi_ === 'function') mkRefreshUnidadeUi_();
 }
 window.mkUpdateEncHojeKpis_ = mkUpdateEncHojeKpis_;
 window.mkContasEncHoje_ = mkContasEncHoje_;
@@ -652,9 +665,13 @@ function showAdminHomeKpis(d) {
   if (chip) {
     chip.hidden = !homeOn;
     if (homeOn) {
-      const nSess = (d && d.nSessoesHoje != null)
-        ? Number(d.nSessoesHoje)
-        : (typeof mkSessoesEncHoje_ === 'function' ? mkSessoesEncHoje_(encHojeData) : 0);
+      const uid = typeof mkUnidadeId_ === 'function' ? mkUnidadeId_() : 'golden';
+      const encU = (typeof mkSessionsPorUnidade_ === 'function')
+        ? mkSessionsPorUnidade_(typeof encHojeData !== 'undefined' ? encHojeData : [], uid)
+        : (typeof encHojeData !== 'undefined' ? encHojeData : []);
+      const nSess = typeof mkSessoesEncHoje_ === 'function'
+        ? mkSessoesEncHoje_(encU)
+        : encU.length;
       set('admin-chip-fat', nSess + (nSess === 1 ? ' locação' : ' locações'));
     }
   }

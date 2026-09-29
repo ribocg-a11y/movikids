@@ -34,10 +34,23 @@ const _IDLE_MS      = 5 * 60 * 1000;
 const MK_INICIO_CACHE_KEY = 'mk_inicio_cache_v2';
 const MK_INICIO_CACHE_LEGACY = 'mk_inicio_cache';
 
-/** I89 — invalida cache carregarInicio (v2 + legado). Chamar após ▶, nova loc, cancel, encerrar. */
+function mkInicioCacheKeyAtual_() {
+  const u = (typeof mkUnidadeId_ === 'function' ? mkUnidadeId_() : 'golden') || 'golden';
+  return MK_INICIO_CACHE_KEY + '_' + u;
+}
+
+/** I89 — invalida cache carregarInicio (v2 + legado + por unidade). Chamar após ▶, nova loc, cancel, encerrar. */
 function mkInvalidateInicioCache_() {
   try { localStorage.removeItem(MK_INICIO_CACHE_KEY); } catch (e) { /* ignore */ }
   try { localStorage.removeItem(MK_INICIO_CACHE_LEGACY); } catch (e) { /* ignore */ }
+  try {
+    const keys = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (k && k.indexOf(MK_INICIO_CACHE_KEY) === 0) keys.push(k);
+    }
+    keys.forEach(function (k) { localStorage.removeItem(k); });
+  } catch (e2) { /* ignore */ }
 }
 
 /** I90 — operação ativa: nunca servir cache stale (causa cronômetro louco). */
@@ -100,7 +113,7 @@ async function mkSyncListarAtivasFallback_(opts) {
   if (_listarAtivasInFlight) return false;
   _listarAtivasInFlight = true;
   try {
-    const d = await api({ action: 'listarAtivas' }, opts.timeoutMs || MK_LISTAR_ATIVAS_TIMEOUT_MS);
+    const d = await api(Object.assign({ action: 'listarAtivas' }, typeof apiParamsComAuth_ === 'function' ? apiParamsComAuth_() : {}), opts.timeoutMs || MK_LISTAR_ATIVAS_TIMEOUT_MS);
     const payload = mkInicioFromListarAtivas_(d);
     if (!payload) return false;
     const before = Array.isArray(sessions) ? sessions.length : 0;
@@ -186,12 +199,13 @@ async function sincronizarServidor(force = false) {
   }, MK_INICIO_API_TIMEOUT_MS + 10000);
 
   try {
-    const CACHE_KEY = MK_INICIO_CACHE_KEY;
+    const CACHE_KEY = mkInicioCacheKeyAtual_();
     // I122: com operação ativa NUNCA reaplicar cache local (fantasma pós-timeout)
     const skipCache = force || mkSyncOperacaoAtiva_();
 
     if (force) {
       try { localStorage.removeItem(CACHE_KEY); } catch (e) { /* ignore */ }
+      if (typeof mkInvalidateInicioCache_ === 'function') mkInvalidateInicioCache_();
     }
 
     if (_syncBackoffMs > 0) {
@@ -375,6 +389,12 @@ function sanitizarDadosInicioOperador_(d) {
 function aplicarDadosInicio(d) {
   try {
     if (!d || !Array.isArray(d.ativos)) return;
+    /* I159g: resposta de outra loja (sync em voo) não pode sobrescrever KPIs do balcão atual. */
+    const uidNow = typeof mkUnidadeId_ === 'function' ? mkUnidadeId_() : 'golden';
+    if (d.unidadeId && d.unidadeId !== 'all' && uidNow && uidNow !== 'all' && String(d.unidadeId) !== String(uidNow)) {
+      console.warn('[Sync] ignorando inicio unidade', d.unidadeId, '!=', uidNow);
+      return;
+    }
     if (d.operacaoConfig) {
       aplicarOperacaoConfig_(d.operacaoConfig);
       if (typeof mkUnidadeSyncAposGas_ === 'function') mkUnidadeSyncAposGas_();
@@ -620,7 +640,7 @@ function mkSyncRefreshInicioBg_() {
       _syncBackoffMs = 0;
       _lastSyncAt = Date.now();
       try {
-        localStorage.setItem(MK_INICIO_CACHE_KEY, JSON.stringify({ data: d, ts: Date.now() }));
+        localStorage.setItem(mkInicioCacheKeyAtual_(), JSON.stringify({ data: d, ts: Date.now() }));
       } catch (e) { /* ignore */ }
       aplicarDadosInicio(d);
       setStatus(true);
