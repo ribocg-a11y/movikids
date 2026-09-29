@@ -4277,14 +4277,15 @@ async function carregarPreviewRelatorio() {
   if (btnEnv) btnEnv.disabled = true;
   if (btnDrv) btnDrv.disabled = true;
   try {
-    // v1.6.20: preview com HTML real do email (Fase 5)
-    const d = await api({ action:'buscarPreviewRelatorio', mes, ano }, 30000);
-    if (!d.ok || !d.html) {
-      prev.innerHTML = '<div style="color:var(--red);padding:20px;text-align:center">Erro ao gerar preview</div>';
+    // I158: HTML no FE via kpiMes (sem Cancelada) — não usa buscarPreviewRelatorio GAS
+    const d = await api({ action: 'kpiMes', mes: mes, ano: ano, lite: '1', ...apiParamsComAuth_() }, 90000);
+    if (!d || !d.ok) {
+      prev.innerHTML = '<div style="color:var(--red);padding:20px;text-align:center">Erro ao carregar kpiMes: ' + escHtml((d && d.erro) || 'falha') + '</div>';
       return;
     }
-    // Renderiza o HTML completo do email num iframe via Blob
-    const blob = new Blob([d.html], { type:'text/html;charset=utf-8' });
+    const html = mkHtmlRelatorioGoldenFromKpi_(parseInt(mes, 10), parseInt(ano, 10), d, false);
+    _relPreviewHtml = html;
+    const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
     const url  = URL.createObjectURL(blob);
     prev.innerHTML = '<div class="rel-iframe-wrap"><iframe id="preview-iframe" title="Preview do relatório"></iframe></div>';
     document.getElementById('preview-iframe').src = url;
@@ -4299,39 +4300,214 @@ async function carregarPreviewRelatorio() {
   }
 }
 let _relPreviewMes = null, _relPreviewAno = null;
+let _relPreviewHtml = null;
+
+/** I158 — moeda BR para HTML Golden. */
+function mkRelFmtBr_(v) {
+  const n = Number(v) || 0;
+  return 'R$ ' + n.toFixed(2).replace('.', ',');
+}
+
+/**
+ * I158 — HTML do relatório Golden a partir de kpiMes (Cancelada já fora no GAS kpiMes).
+ * Sem AppScript: preview/PDF/e-mail usam isto em vez de buscarPreviewRelatorio/gerarRelatorio.
+ */
+function mkHtmlRelatorioGoldenFromKpi_(mes, ano, d, executivo) {
+  const MESES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho',
+    'Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  const nomeMes = MESES[(mes || 1) - 1] || '';
+  const fatTotal = Math.round((Number(d.fatMes) || 0) * 100) / 100;
+  const nLoc = Number(d.nMes) || 0;
+  const ticket = nLoc > 0 ? fatTotal / nLoc : 0;
+  const tp = d.fatPorTipo || {};
+  const fatCarros = Number(tp.Carro) || 0;
+  const fatTricilos = Number(tp.Triciclo) || 0;
+  const fatPelucias = Number(tp['Pelúcia'] || tp.Pelucia) || 0;
+  const fatExtra = Number(d.extMes) || 0;
+  const f = mkRelFmtBr_;
+  const pct = function (v) { return fatTotal > 0 ? ((v / fatTotal) * 100).toFixed(1) : '0.0'; };
+  const ctoMin = Number(d.ctoMinimo) || 0;
+  const cto10pct = Math.round(fatTotal * 0.10 * 100) / 100;
+  const ctoPagar = (d.ctoPagar != null && d.ctoPagar !== '')
+    ? Math.round(Number(d.ctoPagar) * 100) / 100
+    : Math.max(ctoMin, cto10pct);
+  const mesCto = Number(d.mesContrato) || 1;
+  const nm = mes >= 12 ? 1 : mes + 1;
+  const ny = mes >= 12 ? ano + 1 : ano;
+  const vencCto = '05/' + String(nm).padStart(2, '0') + '/' + ny;
+  const verFe = (typeof MK_VERSION !== 'undefined' ? MK_VERSION : '') || '';
+
+  const planos = d.fatPorPlano || {};
+  const planoRows = Object.keys(planos).map(function (k) {
+    return { k: k, valor: Number(planos[k]) || 0 };
+  }).sort(function (a, b) { return b.valor - a.valor; });
+  let linhasPlano = '';
+  planoRows.forEach(function (p) {
+    linhasPlano += '<tr><td style="padding:6px 10px;border-bottom:1px solid #eee">' + p.k
+      + '</td><td style="padding:6px 10px;text-align:right;border-bottom:1px solid #eee">' + f(p.valor) + '</td></tr>';
+  });
+  if (!linhasPlano) {
+    linhasPlano = '<tr><td colspan="2" style="padding:8px;text-align:center;color:#aaa">Sem locações</td></tr>';
+  }
+
+  const picoList = (d.horasPico || []).map(function (v, i) {
+    return { h: (9 + i) + 'h', v: Number(v) || 0 };
+  }).filter(function (p) { return p.v > 0; })
+    .sort(function (a, b) { return b.v - a.v; })
+    .slice(0, 5);
+  let linhasPico = '';
+  picoList.forEach(function (p) {
+    linhasPico += '<tr><td style="padding:6px 10px;border-bottom:1px solid #eee">' + p.h
+      + '</td><td style="padding:6px 10px;text-align:right;border-bottom:1px solid #eee">' + f(p.v) + '</td></tr>';
+  });
+  if (!linhasPico) {
+    linhasPico = '<tr><td colspan="2" style="padding:8px;text-align:center;color:#aaa">Sem movimento no periodo</td></tr>';
+  }
+
+  const blocoTri = fatTricilos > 0
+    ? '<div style="background:#E8F5E9;border-radius:8px;padding:16px;border-left:4px solid #2E7D32"><div style="font-size:18px;font-weight:bold;color:#2E7D32">' + f(fatTricilos) + '</div><div style="font-size:11px;color:#555;margin-top:4px">🛺 Triciclos — ' + pct(fatTricilos) + '%</div></div>'
+    : '';
+
+  let extraExec = '';
+  if (executivo) {
+    const narr = String(d.narrativaExecutiva || '').trim();
+    if (narr) {
+      extraExec += '<div style="margin:0 28px 20px;background:#EDE7F6;border-radius:8px;padding:18px;border:1px solid #B39DDB">'
+        + '<h3 style="margin:0 0 10px;font-size:13px;text-transform:uppercase;color:#4527A0">Leitura executiva do mes</h3>'
+        + '<p style="margin:0;font-size:13px;color:#333;line-height:1.55">' + narr.replace(/</g, '&lt;') + '</p></div>';
+    }
+    const pb = d.payback || {};
+    if (pb && pb.ok) {
+      const barW = Math.min(100, Math.max(0, Number(pb.pctRecuperado) || 0));
+      extraExec += '<div style="margin:0 28px 20px;background:#E8EAF6;border-radius:8px;padding:18px;border:1px solid #9FA8DA">'
+        + '<h3 style="margin:0 0 6px;font-size:13px;text-transform:uppercase;color:#283593">Payback — uso interno (socio)</h3>'
+        + '<div style="background:#fff;border-radius:6px;height:10px;overflow:hidden;margin-bottom:10px">'
+        + '<div style="width:' + barW + '%;height:100%;background:#1565C0"></div></div>'
+        + '<table style="width:100%;font-size:13px;border-collapse:collapse">'
+        + '<tr><td style="padding:4px 0;color:#555">Investimento total</td><td style="text-align:right;font-weight:bold">' + f(pb.investimentoTotal) + '</td></tr>'
+        + '<tr><td style="padding:4px 0;color:#555">Recuperado</td><td style="text-align:right;font-weight:bold">' + (pb.pctRecuperado || 0) + '%</td></tr>'
+        + '</table></div>';
+    }
+  }
+
+  const agora = new Date();
+  const gerado = String(agora.getDate()).padStart(2, '0') + '/'
+    + String(agora.getMonth() + 1).padStart(2, '0') + '/' + agora.getFullYear()
+    + ' · FE v' + verFe + ' · kpiMes (sem canceladas)';
+
+  return '<!DOCTYPE html><html><body style="margin:0;padding:0;background:#f5f5f5;font-family:Arial,sans-serif"><div style="max-width:640px;margin:20px auto;background:#fff;border-radius:12px;overflow:hidden">'
+    + '<div style="background:linear-gradient(135deg,#1565C0,#E91E8C);padding:32px 28px;text-align:center"><h1 style="margin:0;color:#fff;font-size:26px">🚗 MOVI KIDS</h1>'
+    + '<p style="margin:8px 0 0;color:rgba(255,255,255,.85);font-size:14px">Relatório Mensal — ' + nomeMes + ' de ' + ano + '</p>'
+    + '<p style="margin:6px 0 0;color:rgba(255,255,255,.7);font-size:11px">Golden Shopping Calhau · movimentação e condições contratuais</p></div>'
+    + '<div style="padding:14px 28px;background:#E3F2FD;font-size:12px;color:#1565C0;line-height:1.5">Apresenta o <strong>fluxo de atendimento</strong> (locações pagas e faturamento) e o <strong>CTO</strong>. <strong>Canceladas não entram</strong>.</div>'
+    + '<div style="display:grid;grid-template-columns:repeat(3,1fr);border-bottom:1px solid #eee">'
+    + '<div style="padding:20px;text-align:center;border-right:1px solid #eee"><div style="font-size:22px;font-weight:bold;color:#2E7D32">' + f(fatTotal) + '</div><div style="font-size:11px;color:#888;margin-top:4px">Faturamento bruto</div></div>'
+    + '<div style="padding:20px;text-align:center;border-right:1px solid #eee"><div style="font-size:22px;font-weight:bold;color:#1565C0">' + nLoc + '</div><div style="font-size:11px;color:#888;margin-top:4px">Locações (pagas)</div></div>'
+    + '<div style="padding:20px;text-align:center"><div style="font-size:22px;font-weight:bold;color:#6A1B9A">' + f(ticket) + '</div><div style="font-size:11px;color:#888;margin-top:4px">Ticket médio</div></div></div>'
+    + '<div style="padding:20px 28px"><h3 style="margin:0 0 14px;font-size:13px;text-transform:uppercase;color:#555">Movimentação por tipo de veículo</h3>'
+    + '<div style="display:grid;grid-template-columns:' + (fatTricilos > 0 ? '1fr 1fr 1fr' : '1fr 1fr') + ';gap:12px">'
+    + '<div style="background:#E3F2FD;border-radius:8px;padding:16px;border-left:4px solid #1565C0"><div style="font-size:18px;font-weight:bold;color:#1565C0">' + f(fatCarros) + '</div><div style="font-size:11px;color:#555;margin-top:4px">🚗 Carros — ' + pct(fatCarros) + '%</div></div>'
+    + blocoTri
+    + '<div style="background:#FCE4EC;border-radius:8px;padding:16px;border-left:4px solid #C2185B"><div style="font-size:18px;font-weight:bold;color:#C2185B">' + f(fatPelucias) + '</div><div style="font-size:11px;color:#555;margin-top:4px">🧸 Pelúcias — ' + pct(fatPelucias) + '%</div></div></div>'
+    + (fatExtra > 0 ? '<div style="margin-top:12px;background:#FFF3E0;border-radius:8px;padding:14px;border-left:4px solid #E65100"><span style="font-weight:bold;color:#E65100">⏱ Extensões de tempo (receita adicional): ' + f(fatExtra) + '</span></div>' : '')
+    + '</div>'
+    + '<div style="padding:0 28px 20px"><h3 style="margin:0 0 10px;font-size:13px;text-transform:uppercase;color:#555">Detalhamento por plano</h3>'
+    + '<table style="width:100%;border-collapse:collapse;font-size:13px"><thead><tr style="background:#f8f8f8"><th style="padding:8px 10px;text-align:left">Plano</th><th style="padding:8px 10px;text-align:right">Faturamento</th></tr></thead><tbody>'
+    + linhasPlano + '</tbody></table></div>'
+    + '<div style="padding:0 28px 20px"><h3 style="margin:0 0 10px;font-size:13px;text-transform:uppercase;color:#555">Horários de maior movimento</h3>'
+    + '<table style="width:100%;border-collapse:collapse;font-size:13px"><thead><tr style="background:#f8f8f8"><th style="padding:8px 10px;text-align:left">Faixa</th><th style="padding:8px 10px;text-align:right">Faturamento</th></tr></thead><tbody>' + linhasPico + '</tbody></table></div>'
+    + '<div style="margin:0 28px 20px;background:#FFF8E1;border-radius:8px;padding:18px;border:1px solid #FFE082"><h3 style="margin:0 0 12px;font-size:13px;text-transform:uppercase;color:#E65100">🏬 CTO — Condições contratuais Golden Shopping</h3>'
+    + '<p style="margin:0 0 10px;font-size:12px;color:#555;line-height:1.5">Contrato assinado em 29/04/2026 · prazo 12 meses · paga-se o <strong>maior</strong> entre o mínimo do mês de locação e <strong>10%</strong> do faturamento bruto do mês.</p>'
+    + '<table style="width:100%;font-size:13px;border-collapse:collapse">'
+    + '<tr><td style="padding:4px 0;color:#555">Mês de locação (aniversário contrato):</td><td style="text-align:right;font-weight:bold">' + mesCto + 'º mês</td></tr>'
+    + '<tr><td style="padding:4px 0;color:#555">CTO mínimo do mês:</td><td style="text-align:right">' + f(ctoMin) + '</td></tr>'
+    + '<tr><td style="padding:4px 0;color:#555">10% do faturamento bruto:</td><td style="text-align:right">' + f(cto10pct) + '</td></tr>'
+    + '<tr style="border-top:2px solid #FFE082"><td style="padding:8px 0 4px;font-weight:bold;color:#B71C1C">CTO a pagar neste mês:</td><td style="text-align:right;font-weight:bold;color:#B71C1C;font-size:16px">' + f(ctoPagar) + '</td></tr>'
+    + '<tr><td style="font-size:12px;color:#888">Vencimento referência:</td><td style="text-align:right;font-size:12px;color:#888">' + vencCto + '</td></tr></table></div>'
+    + extraExec
+    + '<div style="padding:16px 28px 24px;background:#f9f9f9;text-align:center;font-size:11px;color:#aaa;border-top:1px solid #eee">Gerado em ' + gerado + (executivo ? ' · PDF Executivo' : '') + '</div>'
+    + '</div></body></html>';
+}
+
+function mkDownloadRelatorioHtml_(html, nomeArq) {
+  const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = nomeArq;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(function () { URL.revokeObjectURL(url); }, 5000);
+}
+
+async function mkFetchKpiMesRelatorio_(mes, ano) {
+  const d = await api({ action: 'kpiMes', mes: mes, ano: ano, ...apiParamsComAuth_() }, 90000);
+  if (!d || !d.ok) throw new Error((d && d.erro) || 'kpiMes falhou');
+  return d;
+}
 
 async function enviarRelatorioEmail() {
-  // v1.6.20: confirmação antes de enviar (Fase 5)
   const mes = document.getElementById('rel-mes').value;
   const ano = document.getElementById('rel-ano').value;
   const meses = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho',
                  'Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-  const nomeMes = meses[parseInt(mes)-1] + '/' + ano;
-  if (!confirm('Enviar relatório de ' + nomeMes + ' para financeiro@goldenshoppingcalhau.com.br?')) return;
+  const nomeMes = meses[parseInt(mes, 10) - 1] + '/' + ano;
+  if (!confirm('Baixar relatório de ' + nomeMes + ' (sem canceladas) para enviar a financeiro@goldenshoppingcalhau.com.br?\n\nO e-mail automático pelo Apps Script está desligado até correção no servidor — anexe o HTML/PDF baixado.')) return;
   const btn = document.getElementById('btn-rel-email');
-  btn.textContent = '⏳ Enviando...'; btn.disabled = true;
+  btn.textContent = '⏳ Gerando...'; btn.disabled = true;
   try {
-    const d = await api({ action:'gerarRelatorio' }, 30000);
-    if (d.ok) { toast('✅ Relatório ' + nomeMes + ' enviado!','success'); carregarHistRelatorios(); }
-    else toast('Erro: '+d.erro,'error');
-  } catch { toast('Erro de conexão','error'); }
-  finally { btn.textContent='📧 Enviar Email'; btn.disabled=false; }
+    const d = await mkFetchKpiMesRelatorio_(mes, ano);
+    const html = mkHtmlRelatorioGoldenFromKpi_(parseInt(mes, 10), parseInt(ano, 10), d, false);
+    _relPreviewHtml = html;
+    const nomeArq = 'Relatorio_MoviKids_' + meses[parseInt(mes, 10) - 1] + '_' + ano + '.html';
+    mkDownloadRelatorioHtml_(html, nomeArq);
+    const assunto = encodeURIComponent('[Movi Kids] Relatório ' + nomeMes + ' — Faturamento: ' + mkRelFmtBr_(d.fatMes));
+    const corpo = encodeURIComponent(
+      'Segue relatório Movi Kids ' + nomeMes + ' (anexar o HTML/PDF baixado).\n\n'
+      + 'Faturamento: ' + mkRelFmtBr_(d.fatMes) + '\n'
+      + 'Locações (pagas): ' + (d.nMes || 0) + '\n'
+      + 'CTO a pagar: ' + mkRelFmtBr_(d.ctoPagar) + '\n'
+      + '(Canceladas não incluídas — FE v' + (typeof MK_VERSION !== 'undefined' ? MK_VERSION : '') + ')\n'
+    );
+    window.open('mailto:financeiro@goldenshoppingcalhau.com.br?subject=' + assunto + '&body=' + corpo, '_blank');
+    toast('✅ HTML baixado — anexe no e-mail aberto', 'success');
+  } catch (e) {
+    toast('Erro: ' + (e.message || e), 'error');
+  } finally {
+    btn.textContent = '📧 Confirmar e Enviar';
+    btn.disabled = false;
+  }
 }
 
 async function salvarRelatorioDrive() {
   const mes = document.getElementById('rel-mes').value;
   const ano = document.getElementById('rel-ano').value;
+  const meses = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho',
+                 'Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
   const btn = document.getElementById('btn-rel-drive');
-  btn.textContent = '⏳ Salvando...'; btn.disabled = true;
+  btn.textContent = '⏳ Gerando...'; btn.disabled = true;
   try {
-    const d = await api({ action:'salvarRelatorioDrive', mes, ano });
-    if (d.ok) {
-      toast('✅ PDF salvo no Drive!','success');
-      carregarHistRelatorios();
-      window.open(d.link,'_blank');
-    } else toast('Erro: '+d.erro,'error');
-  } catch { toast('Erro de conexão','error'); }
-  finally { btn.textContent='💾 Salvar PDF'; btn.disabled=false; }
+    const d = await mkFetchKpiMesRelatorio_(mes, ano);
+    const html = mkHtmlRelatorioGoldenFromKpi_(parseInt(mes, 10), parseInt(ano, 10), d, false);
+    _relPreviewHtml = html;
+    const nomeArq = 'Relatorio_MoviKids_' + meses[parseInt(mes, 10) - 1] + '_' + ano + '.html';
+    mkDownloadRelatorioHtml_(html, nomeArq);
+    // Abre para imprimir → Salvar como PDF (sem AppScript / Drive)
+    const w = window.open('', '_blank');
+    if (w) {
+      w.document.open();
+      w.document.write(html);
+      w.document.close();
+      setTimeout(function () { try { w.print(); } catch (e1) { /* ok */ } }, 400);
+    }
+    toast('✅ Relatório Golden (kpiMes, sem canceladas) — use Imprimir → PDF', 'success');
+  } catch (e) {
+    toast('Erro: ' + (e.message || e), 'error');
+  } finally {
+    btn.textContent = '💾 Salvar PDF Golden';
+    btn.disabled = false;
+  }
 }
 
 async function carregarPreviewRelatorioExecutivo() {
@@ -4343,16 +4519,13 @@ async function carregarPreviewRelatorioExecutivo() {
   prev.innerHTML = '<div style="text-align:center;padding:40px;color:var(--txt3);font-size:13px">⏳ Gerando PDF executivo...</div>';
   if (btn) btn.disabled = true;
   try {
-    const d = await api({ action: 'buscarPreviewRelatorioExecutivo', mes, ano, ...apiParamsComAuth_() }, 30000);
-    if (!d.ok || !d.html) {
-      prev.innerHTML = '<div style="color:var(--red);padding:20px;text-align:center">' + escHtml(d.erro || 'Erro ao gerar preview') + '</div>';
-      return;
-    }
-    const blob = new Blob([d.html], { type: 'text/html;charset=utf-8' });
+    const d = await mkFetchKpiMesRelatorio_(mes, ano);
+    const html = mkHtmlRelatorioGoldenFromKpi_(parseInt(mes, 10), parseInt(ano, 10), d, true);
+    const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     prev.innerHTML = '<div class="rel-iframe-wrap"><iframe title="Preview PDF executivo"></iframe></div>';
     prev.querySelector('iframe').src = url;
-    setTimeout(() => URL.revokeObjectURL(url), 120000);
+    setTimeout(function () { URL.revokeObjectURL(url); }, 120000);
     if (btn) btn.disabled = false;
   } catch (e) {
     prev.innerHTML = '<div style="color:var(--red);padding:20px;text-align:center">Erro: ' + escHtml(e.message) + '</div>';
@@ -4363,26 +4536,36 @@ async function carregarPreviewRelatorioExecutivo() {
 async function salvarRelatorioExecutivoDrive() {
   const mes = document.getElementById('rel-mes').value;
   const ano = document.getElementById('rel-ano').value;
+  const meses = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho',
+                 'Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
   const btn = document.getElementById('btn-rel-exec-drive');
-  if (btn) { btn.textContent = '⏳ Salvando...'; btn.disabled = true; }
+  if (btn) { btn.textContent = '⏳ Gerando...'; btn.disabled = true; }
   try {
-    const d = await api({ action: 'salvarRelatorioExecutivoDrive', mes, ano, ...apiParamsComAuth_() }, 30000);
-    if (d.ok) {
-      toast('✅ PDF executivo salvo!', 'success');
-      carregarHistRelatorios();
-      if (d.link) window.open(d.link, '_blank');
-    } else toast('Erro: ' + (d.erro || 'falha'), 'error');
-  } catch { toast('Erro de conexão', 'error'); }
-  finally {
+    const d = await mkFetchKpiMesRelatorio_(mes, ano);
+    const html = mkHtmlRelatorioGoldenFromKpi_(parseInt(mes, 10), parseInt(ano, 10), d, true);
+    mkDownloadRelatorioHtml_(html, 'Relatorio_Executivo_MoviKids_' + meses[parseInt(mes, 10) - 1] + '_' + ano + '.html');
+    const w = window.open('', '_blank');
+    if (w) {
+      w.document.open();
+      w.document.write(html);
+      w.document.close();
+      setTimeout(function () { try { w.print(); } catch (e1) { /* ok */ } }, 400);
+    }
+    toast('✅ PDF executivo (sem canceladas) — Imprimir → PDF', 'success');
+  } catch (e) {
+    toast('Erro: ' + (e.message || e), 'error');
+  } finally {
     if (btn) { btn.textContent = '📊 Salvar PDF Executivo'; btn.disabled = false; }
   }
 }
+
+/* I158: funções legado GAS (gerarRelatorio/salvarRelatorioDrive) substituídas acima — não reintroduzir */
 
 async function carregarHistRelatorios() {
   const container = document.getElementById('rel-hist-container');
   if (!container) return;
   try {
-    const d = await api({ action:'listarRelatorios' });
+    const d = await api({ action:'listarRelatorios', ...apiParamsComAuth_() });
     if (!d.ok || !d.relatorios.length) {
       container.innerHTML='<div class="empty"><div class="empty-icon">📋</div><h3>Nenhum relatório enviado</h3></div>';
       return;

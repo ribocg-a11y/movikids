@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>MOVI KIDS — Relatório Agosto/2026 (Golden)</title>
+<style>
+  @page { size: A4; margin: 14mm 12mm; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Nunito", "Segoe UI", Arial, sans-serif;
+    color: #1a2340;
+    background: #fff;
+    font-size: 11px;
+    line-height: 1.35;
+  }
+  .hero {
+    background: linear-gradient(135deg, #1565C0, #E91E8C);
+    color: #fff;
+    border-radius: 14px;
+    padding: 18px 20px;
+    margin-bottom: 14px;
+  }
+  .hero h1 {
+    margin: 0;
+    font-family: "Fredoka One", "Nunito", Arial, sans-serif;
+    font-size: 22px;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+  }
+  .hero p { margin: 6px 0 0; opacity: 0.9; font-size: 12px; }
+  .kpis {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .kpi {
+    border: 1px solid #e8ecf4;
+    border-radius: 12px;
+    padding: 10px 12px;
+    background: #f8fafc;
+  }
+  .kpi .lbl { font-size: 10px; color: #667085; text-transform: uppercase; font-weight: 800; }
+  .kpi .val { font-size: 15px; font-weight: 900; margin-top: 2px; color: #0f172a; }
+  .kpi.fat .val { color: #2E7D32; }
+  .kpi.cto .val { color: #B71C1C; }
+  h2 {
+    margin: 0 0 8px;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #475569;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 12px;
+  }
+  th, td {
+    padding: 7px 6px;
+    border-bottom: 1px solid #eef2f7;
+    text-align: left;
+  }
+  th {
+    background: #f1f5f9;
+    font-size: 10px;
+    text-transform: uppercase;
+    color: #64748b;
+    font-weight: 800;
+  }
+  td.n, th.n, td.m, th.m { text-align: right; font-variant-numeric: tabular-nums; }
+  td.d { font-weight: 800; white-space: nowrap; }
+  td.canc { color: #94a3b8; }
+  tbody tr:nth-child(even) { background: #fafbfd; }
+  tfoot td {
+    font-weight: 900;
+    border-top: 2px solid #cbd5e1;
+    background: #f8fafc;
+    padding-top: 9px;
+  }
+  .mix {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 4px;
+  }
+  .card {
+    border: 1px solid #ffe082;
+    background: #fffbeb;
+    border-radius: 12px;
+    padding: 12px 14px;
+  }
+  .card h3 { margin: 0 0 8px; font-size: 12px; color: #E65100; text-transform: uppercase; }
+  .card table th { background: transparent; }
+  .note {
+    margin-top: 10px;
+    font-size: 10px;
+    color: #64748b;
+    border-left: 3px solid #93c5fd;
+    padding-left: 10px;
+  }
+  .foot {
+    margin-top: 14px;
+    text-align: center;
+    font-size: 10px;
+    color: #94a3b8;
+  }
+</style>
+</head>
+<body>
+  <div class="hero">
+    <h1>MOVI KIDS</h1>
+    <p>Relatório Mensal — Agosto de 2026 · Golden Shopping Calhau<br/>
+    Valores alinhados ao PDF enviado · abertura dia a dia</p>
+  </div>
+
+  <div class="kpis">
+    <div class="kpi fat"><div class="lbl">Faturamento</div><div class="val">R$ 17.212,00</div></div>
+    <div class="kpi"><div class="lbl">Locações (PDF)</div><div class="val">957</div></div>
+    <div class="kpi"><div class="lbl">Ticket médio</div><div class="val">R$ 17,99</div></div>
+    <div class="kpi cto"><div class="lbl">CTO a pagar</div><div class="val">R$ 1.721,20</div></div>
+  </div>
+
+  <h2>Abertura diária</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Dia</th>
+        <th>Semana</th>
+        <th class="n">Loc.</th>
+        <th class="m">Faturamento</th>
+        <th class="m">Extra</th>
+        <th class="m">Ticket</th>
+        <th class="n">Canc.</th>
+      </tr>
+    </thead>
+    <tbody><tr>
+    <td class="d">01/08</td>
+    <td>Sábado</td>
+    <td class="n">97</td>
+    <td class="m">R$ 1.551,00</td>
+    <td class="m">—</td>
+    <td class="m">R$ 15,99</td>
+    <td class="n canc">37</td>
+  </tr><tr>
+    <td class="d">02/08</td>
+    <td>Domingo</td>
+    <td class="n">55</td>
+    <td class="m">R$ 987,00</td>
+    <td class="m">—</td>
+    <td class="m">R$ 17,95</td>
+    <td class="n canc">1</td>
+  </tr><tr>
+    <td class="d">03/08</td>
+    <td>Segunda</td>
+    <td class="n">14</td>
+    <td class="m">R$ 239,00</td>
+    <td class="m">—</td>
+    <td class="m">R$ 17,07</td>
+    <td class="n canc">0</td>
+  </tr><tr>
+    <td class="d">04/08</td>
+    <td>Terça</td>
+    <td class="n">18</td>
+    <td class="m">R$ 402,00</td>
+    <td class="m">—</td>
+    <td class="m">R$ 22,33</td>
+    <td class="n canc">2</td>
+  </tr><tr>
+    <td class="d">05/08</td>
+    <td>Quarta</td>
+    <td class="n">16</td>
+    <td class="m">R$ 299,00</td>
+    <td class="m">—</td>
+    <td class="m">R$ 18,69</td>
+    <td class="n canc">4</td>
+  </tr><tr>
+    <td class="d">06/08</td>
+    <td>Quinta</td>
+    <td class="n">22</td>
+    <td class="m">R$ 433,00</td>
+    <td class="m">—</td>
+    <td class="m">R$ 19,68</td>
+    <td class="n canc">4</td>
+  </tr><tr>
+    <td class="d">07/08</td>
+    <td>Sexta</td>
+    <td class="n">35</td>
+    <td class="m">R$ 638,00</td>
+    <td class="m">—</td>
+    <td class="m">R$ 18,23</td>
+    <td class="n canc">1</td>
+  </tr><tr>
+    <td class="d">08/08</td>
+    <td>Sábado</td>
+    <td class="n">90</td>
+    <td class="m">R$ 1.759,00</td>
+    <td class="m">R$ 20,00</td>
+    <td class="m">R$ 19,54</td>
+    <td class="n canc">2</td>
+  </tr><tr>
+    <td class="d">09/08</td>
+    <td>Domingo</td>
+    <td class="n">48</td>
+    <td class="m">R$ 822,00</td>
+    <td class="m">—</td>
+    <td class="m">R$ 17,13</td>
+    <td class="n canc">3</td>
+  </tr><tr>
+    <td class="d">10/08</td>
+    <td>Segunda</td>
+    <td class="n">5</td>
+    <td class="m">R$ 76,00</td>
+    <td class="m">—</td>
+    <td class="m">R$ 15,20</td>
+    <td class="n canc">0</td>
+  </tr><tr>
+    <td class="d">11/08</td>
+    <td>Terça</td>
+    <td class="n">19</td>
+    <td class="m">R$ 310,00</td>
+    <td class="m">—</td>
+    <td class="m">R$ 16,32</td>
+    <td class="n canc">0</td>
+  </tr><tr>
+    <td class="d">12/08</td>
+    <td>Quarta</td>
+    <td class="n">6</td>
+    <td class="m">R$ 78,00</td>
+    <td class="m">—</td>
+    <td class="m">R$ 13,00</td>
+    <td class="n canc">0</td>
+  </tr><tr>
+    <td class="d">13/08</td>
+    <td>Quinta</td>
+    <td class="n">17</td>
+    <td class="m">R$ 288,00</td>
+    <td class="m">—</td>
+    <td class="m">R$ 16,94</td>
+    <td class="n canc">0</td>
+  </tr><tr>
+    <td class="d">14/08</td>
+    <td>Sexta</td>
+    <td class="n">36</td>
+    <td class="m">R$ 680,00</td>
+    <td class="m">—</td>
+    <td class="m">R$ 18,89</td>
+    <td class="n canc">3</td>
+  </tr><tr>
+    <td class="d">15/08</td>
+    <td>Sábado</td>
+    <td class="n">67</td>
+    <td class="m">R$ 1.189,00</td>
+    <td class="m">R$ 14,00</td>
+    <td class="m">R$ 17,75</td>
+    <td class="n canc">0</td>
+  </tr><tr>
+    <td class="d">16/08</td>
+    <td>Domingo</td>
+    <td class="n">25</td>
+    <td class="m">R$ 456,00</td>
+    <td class="m">—</td>
+    <td class="m">R$ 18,24</td>
+    <td class="n canc">0</td>
+  </tr><tr>
+    <td class="d">17/08</td>
+    <td>Segunda</td>
+    <td class="n">12</td>
+    <td class="m">R$ 258,00</td>
+    <td class="m">—</td>
+    <td class="m">R$ 21,50</td>
+    <td class="n canc">0</td>
+  </tr><tr>
+    <td class="d">18/08</td>
+    <td>Terça</td>
+    <td class="n">3</td>
+    <td class="m">R$ 54,00</td>
+    <td class="m">—</td>
+    <td class="m">R$ 18,00</td>
+    <td class="n canc">0</td>
+  </tr><tr>
+    <td class="d">19/08</td>
+    <td>Quarta</td>
+    <td class="n">13</td>
+    <td class="m">R$ 204,00</td>
+    <td class="m">—</td>
+    <td class="m">R$ 15,69</td>
+    <td class="n canc">0</td>
+  </tr><tr>
+    <td class="d">20/08</td>
+    <td>Quinta</td>
+    <td class="n">10</td>
+    <td class="m">R$ 162,00</td>
+    <td class="m">—</td>
+    <td class="m">R$ 16,20</td>
+    <td class="n canc">0</td>
+  </tr><tr>
+    <td class="d">21/08</td>
+    <td>Sexta</td>
+    <td class="n">33</td>
+    <td class="m">R$ 605,00</td>
+    <td class="m">—</td>
+    <td class="m">R$ 18,33</td>
+    <td class="n canc">0</td>
+  </tr><tr>
+    <td class="d">22/08</td>
+    <td>Sábado</td>
+    <td class="n">50</td>
+    <td class="m">R$ 976,00</td>
+    <td class="m">—</td>
+    <td class="m">R$ 19,52</td>
+    <td class="n canc">0</td>
+  </tr><tr>
+    <td class="d">23/08</td>
+    <td>Domingo</td>
+    <td class="n">33</td>
+    <td class="m">R$ 613,00</td>
+    <td class="m">—</td>
+    <td class="m">R$ 18,58</td>
+    <td class="n canc">0</td>
+  </tr><tr>
+    <td class="d">24/08</td>
+    <td>Segunda</td>
+    <td class="n">10</td>
+    <td class="m">R$ 151,00</td>
+    <td class="m">—</td>
+    <td class="m">R$ 15,10</td>
+    <td class="n canc">0</td>
+  </tr><tr>
+    <td class="d">25/08</td>
+    <td>Terça</td>
+    <td class="n">6</td>
+    <td class="m">R$ 112,00</td>
+    <td class="m">—</td>
+    <td class="m">R$ 18,67</td>
+    <td class="n canc">0</td>
+  </tr><tr>
+    <td class="d">26/08</td>
+    <td>Quarta</td>
+    <td class="n">11</td>
+    <td class="m">R$ 187,00</td>
+    <td class="m">R$ 5,00</td>
+    <td class="m">R$ 17,00</td>
+    <td class="n canc">0</td>
+  </tr><tr>
+    <td class="d">27/08</td>
+    <td>Quinta</td>
+    <td class="n">20</td>
+    <td class="m">R$ 354,00</td>
+    <td class="m">R$ 1,00</td>
+    <td class="m">R$ 17,70</td>
+    <td class="n canc">0</td>
+  </tr><tr>
+    <td class="d">28/08</td>
+    <td>Sexta</td>
+    <td class="n">28</td>
+    <td class="m">R$ 655,00</td>
+    <td class="m">R$ 21,00</td>
+    <td class="m">R$ 23,39</td>
+    <td class="n canc">2</td>
+  </tr><tr>
+    <td class="d">29/08</td>
+    <td>Sábado</td>
+    <td class="n">62</td>
+    <td class="m">R$ 1.299,00</td>
+    <td class="m">R$ 44,00</td>
+    <td class="m">R$ 20,95</td>
+    <td class="n canc">2</td>
+  </tr><tr>
+    <td class="d">30/08</td>
+    <td>Domingo</td>
+    <td class="n">63</td>
+    <td class="m">R$ 1.194,00</td>
+    <td class="m">—</td>
+    <td class="m">R$ 18,95</td>
+    <td class="n canc">1</td>
+  </tr><tr>
+    <td class="d">31/08</td>
+    <td>Segunda</td>
+    <td class="n">10</td>
+    <td class="m">R$ 181,00</td>
+    <td class="m">—</td>
+    <td class="m">R$ 18,10</td>
+    <td class="n canc">1</td>
+  </tr></tbody>
+    <tfoot>
+      <tr>
+        <td colspan="2">TOTAL</td>
+        <td class="n">934</td>
+        <td class="m">R$ 17.212,00</td>
+        <td class="m">R$ 105,00</td>
+        <td class="m">R$ 18,43</td>
+        <td class="n">63</td>
+      </tr>
+    </tfoot>
+  </table>
+
+  <div class="mix">
+    <div class="card">
+      <h3>Mix por tipo</h3>
+      <table>
+        <tr><td>Carros</td><td class="m">R$ 8.234,00</td><td class="n">47,8%</td></tr>
+        <tr><td>Pelúcias</td><td class="m">R$ 8.080,00</td><td class="n">46,9%</td></tr>
+        <tr><td>Triciclos</td><td class="m">R$ 898,00</td><td class="n">5,2%</td></tr>
+        <tr><td>Extensões</td><td class="m">R$ 105,00</td><td class="n">—</td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <h3>CTO — Golden Shopping</h3>
+      <table>
+        <tr><td>Mês contrato</td><td class="m">4º mês</td></tr>
+        <tr><td>CTO mínimo</td><td class="m">R$ 1.500,00</td></tr>
+        <tr><td>10% faturamento</td><td class="m">R$ 1.721,20</td></tr>
+        <tr><td><strong>CTO a pagar</strong></td><td class="m"><strong>R$ 1.721,20</strong></td></tr>
+        <tr><td>Vencimento ref.</td><td class="m">05/09/2026</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <p class="note">
+    Melhor dia: <strong>08/08 (Sábado)</strong> R$ 1.759,00 ·
+    Pior dia: <strong>18/08 (Terça)</strong> R$ 54,00.<br/>
+    Soma diária de locações = 934; o PDF mensal Golden listou 957 (≈23 linhas com R$&nbsp;0 — canceladas/teste).
+    <strong>Faturamento bate R$ 17.212,00</strong> com o enviado.
+  </p>
+  <div class="foot">Gerado para download mobile · MOVI KIDS · Agosto/2026</div>
+</body>
+</html>
