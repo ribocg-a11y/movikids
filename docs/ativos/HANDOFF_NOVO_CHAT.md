@@ -1,6 +1,6 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 29/09/2026 · FE **v1.9.122** Pages · GAS repo **v1.5.222** (ping Web **v1.5.221**) · **I159b** preços La Ville no FE · **I158** ✅
+**Atualizado:** 29/09/2026 · FE **v1.9.122** Pages · GAS repo **v1.5.223** (ping Web ainda **v1.5.221** até Nova versão) · **I159c** La Ville no GAS · **I158** ✅
 
 ## Produção (agora)
 
@@ -8,7 +8,7 @@
 |--------|--------|------|
 | Frontend | **v1.9.122** | https://ribocg-a11y.github.io/movikids/?force=1.9.122 |
 | Gestão Pessoas | **v1.9.122** | `gestao-pessoas.html?force=1.9.122` |
-| GAS | ping Web **v1.5.221** · repo **v1.5.222** | La Ville **ainda não** valida frota/preços no Web — pedir §7.3 antes de lançar LV |
+| GAS | ping Web **v1.5.221** · repo **v1.5.223** | I159c no repo — **Nova versão Web** para validar LV* |
 | Design System | v1.1 | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
 
 **GAS raw:** https://raw.githubusercontent.com/ribocg-a11y/movikids/main/MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs  
@@ -104,9 +104,10 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 | # | Ação | Quem | Status |
 |---|------|------|--------|
 | 0 | **I159** hub + `unidadeId` | Agente | ✅ FE **v1.9.121** |
-| 0b | **I159b** tabelas La Ville (Brinquedos + Dinos) no FE | Agente | ✅ FE **v1.9.122** · frota **provisória LV*** |
+| 0b | **I159b** tabelas La Ville no FE | Agente | ✅ FE **v1.9.122** · frota provisória LV* |
 | 0c | Confirmar **quantidade** frota + CTO e-mail La Ville | Sócio | ⏳ |
-| 0d | GAS: validar preços/frota por `unidadeId` + Nova versão Web | Sócio pede §7.3 | ⏳ sem isso não lançar LV em prod |
+| 0d | **I159c** GAS preços/frota por `unidadeId` | Agente | ✅ repo **v1.5.223** — falta **Nova versão Web** |
+| 0e | Sócio: colar raw + Nova versão Web (mesmo Deploy ID) | Sócio | ⏳ liberar lançamentos LV |
 | 1 | PDF Golden setembro prévia 29/09 | Agente | ✅ em `entregas/` — **não enviar** |
 | 1b | Regenerar/enviar fechamento **01/10** | Sócio | Admin FE 1.9.122 |
 | 3 | Tablet smoke D4 · `?force=1.9.122` | Ops | ⏳ |

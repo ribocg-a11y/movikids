@@ -517,6 +517,18 @@ try {
     }
   }
 
+  $gasCanon = Join-Path $root "MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs"
+  if (Test-Path $gasCanon) {
+    $gasRawI159 = Get-Content -Path $gasCanon -Raw -Encoding UTF8
+    if ($gasRawI159 -notmatch 'OPERACAO_CONFIG_LAVILLE_' -or $gasRawI159 -notmatch 'PRECOS_LAVILLE_BRINQUEDOS_' -or $gasRawI159 -notmatch 'unidadeIdFromVeiculo_') {
+      Add-Check "guard.i159.gas.laville" "fail" "GAS sem config La Ville por unidade (I159c)"
+    } elseif ($gasRawI159 -match "laville:\s*\{[^}]*ativa:\s*false") {
+      Add-Check "guard.i159.gas.laville" "fail" "La Ville ainda inativa no GAS (I159c)"
+    } else {
+      Add-Check "guard.i159.gas.laville" "ok" "GAS La Ville precos/frota por unidadeId (I159c)"
+    }
+  }
+
   $adminJs = Join-Path $root "mk-admin.js"
   if (Test-Path $adminJs) {
     $adminRaw = Get-Content -Path $adminJs -Raw -Encoding UTF8

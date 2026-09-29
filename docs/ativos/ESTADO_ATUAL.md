@@ -46,8 +46,8 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 | **Frontend** | **v1.9.122** | https://ribocg-a11y.github.io/movikids/?force=1.9.122 |
 | **Gestão Pessoas** | **v1.9.122** | `gestao-pessoas.html?force=1.9.122` |
 | **Service Worker** | **1.9.122** | I159b preços La Ville FE |
-| **Apps Script** | ping **v1.5.221** · repo **v1.5.222** | I159 soft; LV saves = §7.3 pendente |
-| **I159b La Ville** | ✅ FE preços | Brinquedos + Dinos · frota provisória LV* · hub ativo |
+| **Apps Script** | ping **v1.5.221** · repo **v1.5.223** | I159c La Ville no repo; Web pendente Nova versão |
+| **I159c La Ville GAS** | ✅ repo | `OPERACAO_CONFIG_LAVILLE_` · salvar/inicio por `unidadeId` |
 | **I158 Golden** | ✅ FE live | Relatório via kpiMes · set **14332** / CTO **1500** |
 | **I155 lookback GAS** | ✅ live | 0 HTML 404 · evidência `EVIDENCIA_ESTABILIDADE_POS_I155_*` |
 | **I154 GAS 404 / fila** | ✅ FE+GAS | **v1.9.113–114** · audit **219** |

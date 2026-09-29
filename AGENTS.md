@@ -14,7 +14,7 @@ Sistema operacional de locações — balcão (tablet na loja), portal do respon
 |--------|--------|------|
 | Frontend | **v1.9.122** | https://ribocg-a11y.github.io/movikids/?force=1.9.122 |
 | Gestão Pessoas | **v1.9.122** | `gestao-pessoas.html?force=1.9.122` |
-| GAS | ping **v1.5.221** = Web · repo **v1.5.222** | I159 soft; La Ville saves aguardam §7.3 |
+| GAS | ping **v1.5.221** = Web · repo **v1.5.223** | I159c La Ville; Nova versão Web libera LV* |
 | Design System | **v1.1** | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
 
 **GAS raw:** https://raw.githubusercontent.com/ribocg-a11y/movikids/main/MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs

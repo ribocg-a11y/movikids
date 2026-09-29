@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.222
+// MOVI KIDS — Google Apps Script v1.5.223
+// v1.5.223: I159c — La Ville preços/frota por unidadeId (CONFIG Golden intocado; LV* provisória)
 // v1.5.222: I159 — fundação multi-unidade (unidadeId soft; golden = legado; La Ville inativa até preços)
 // v1.5.221: I156 — ritmo 3d: lastNBillingDays lê chaves "01"/"1" (linha Ritmo sumia no Dashboard)
 // v1.5.220: I155 — listarAtivas/carregarInicio leem CAUDA (lookback) + cache curto ativas (anti-404)
@@ -214,8 +215,8 @@
 
 // ── CONSTANTES ───────────────────────────────────────────────
 /** Versão exposta em ping, carregarInicio, validarSchema, gestaoPessoasStatus (bump com header). */
-const MK_GAS_VERSAO_  = 'v1.5.222';
-const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.221';
+const MK_GAS_VERSAO_  = 'v1.5.223';
+const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.223';
 const SHEET_ID   = '1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618';
 const DEPLOY_ID  = 'AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y';
 const WEBAPP_URL = `https://script.google.com/macros/s/${DEPLOY_ID}/exec`;
@@ -357,7 +358,7 @@ const PRECOS = {
   }
 };
 
-// ── MULTI-UNIDADE I159 (fase 1) — soft; mudanças de isolamento vêm depois da tabela La Ville
+// ── MULTI-UNIDADE I159/I159c — golden = CONFIG planilha; laville = catálogo embutido (LV*)
 const MK_UNIDADE_DEFAULT_ = 'golden';
 const MK_UNIDADES_ = {
   golden: {
@@ -369,11 +370,19 @@ const MK_UNIDADES_ = {
   laville: {
     id: 'laville',
     nome: 'La Ville Mall',
-    ativa: false,
-    precosProntos: false,
-    bloqueioMotivo: 'Aguardando tabela de preços e frota'
+    ativa: true,
+    precosProntos: true,
+    frotaProvisoria: true,
+    bloqueioMotivo: ''
   }
 };
+
+/** Prefixo LV* = frota La Ville (evita colisão com Carro 01 Golden na mesma planilha). */
+function unidadeIdFromVeiculo_(veiculo) {
+  const v = String(veiculo || '').trim();
+  if (v.indexOf('LV ') === 0) return 'laville';
+  return MK_UNIDADE_DEFAULT_;
+}
 
 function unidadeIdCanon_(id) {
   const s = String(id || '').trim().toLowerCase();
@@ -3627,7 +3636,8 @@ function salvarLocacao_(p) {
     return err_('Campos obrigatórios: tipo, plano, responsavel, crianca', 400);
   }
   // I125c: 1× operacaoConfig (antes precos+veiculos = 2× leitura CONFIG)
-  const opCfg = operacaoConfig_();
+  const uid = unidadeIdFrom_(p);
+  const opCfg = operacaoConfig_(uid);
   const precosOp = opCfg.precos;
   const veiculosOp = opCfg.veiculos_validos;
   if (!precosOp[tipo])        return err_('Tipo inválido: ' + tipo, 400);
@@ -3740,8 +3750,9 @@ function salvarLocacoesMulti_(p) {
     if (!responsavel || !crianca || !telefone) return err_('responsavel, crianca, telefone obrigatorios', 400);
     if (!pagamento) return err_('pagamento obrigatorio', 400);
 
-    const precosOp = precosOp_();
-    const veiculosOp = veiculosOp_();
+    const uid = unidadeIdFrom_(p);
+    const precosOp = precosOp_(uid);
+    const veiculosOp = veiculosOp_(uid);
     const agora = new Date();
     const dataFmt = fmtData_(agora);
     const sheet = sh_(SH_LOC);
@@ -3866,9 +3877,9 @@ function listarAtivas_(p) {
     if (status !== 'Ativa' && status !== 'Pendente') return;
     const tipo    = String(r[4]);
     const plano   = String(r[5]);
-    const cfg     = planoCfgOp_(tipo, plano) || {};
-    const ts      = status === 'Ativa' ? timestampCanonico_(r[1], r[2], r[24]) : 0;
     const veiculo   = String(r[15] || '');
+    const cfg     = planoCfgOp_(tipo, plano, unidadeIdFromVeiculo_(veiculo)) || {};
+    const ts      = status === 'Ativa' ? timestampCanonico_(r[1], r[2], r[24]) : 0;
     const pagamento = String(r[16] || '');
     ativas.push({
       rowIndex:        tail.start + idx,
@@ -4113,7 +4124,8 @@ function editarLocacao_(p) {
     if (p.plano !== undefined) {
       if (started) return err_('Plano so pode ser alterado antes de iniciar. Use extensao.', 409);
       const tipo = String(row[4] || ''), plano = String(p.plano || '').trim();
-      const cfg = planoCfgOp_(tipo, plano);
+      const veiculoEd = String(p.veiculo !== undefined ? p.veiculo : row[15] || '').trim();
+      const cfg = planoCfgOp_(tipo, plano, unidadeIdFromVeiculo_(veiculoEd));
       if (!cfg) return err_('Plano invalido', 400);
       sheet.getRange(rowIndex, 6).setValue(plano);
       sheet.getRange(rowIndex, 7).setValue(cfg.mins);
@@ -4207,7 +4219,7 @@ function encerrarLocacao_(p) {
   const tipo    = String(row[4]);
   const plano   = String(row[5]);
   const veiculo = String(row[15] || '');
-  const cfg     = planoCfgOp_(tipo, plano) || {};
+  const cfg     = planoCfgOp_(tipo, plano, unidadeIdFromVeiculo_(veiculo)) || {};
   const minContratados  = Number(row[6]);
   const valorPlano      = Number(row[7]);
   const adicionalPorMin = cfg.adicional || 0;
@@ -4817,10 +4829,15 @@ function invalidateInicioResumoCache_(dataFmt, opts) {
       'inicio_v3_o_m0',
       CACHE_LISTAR_ATIVAS_KEY_
     ];
-    // operadores 1–8 (metaTurno) — chaves pequenas
-    for (let m = 1; m <= 8; m++) {
+    for (let m = 0; m <= 8; m++) {
       keys.push('inicio_v4_g_m' + m);
       keys.push('inicio_v4_o_m' + m);
+      keys.push('inicio_v4_g_m' + m + '_ugolden');
+      keys.push('inicio_v4_o_m' + m + '_ugolden');
+      keys.push('inicio_v4_g_m' + m + '_ulaville');
+      keys.push('inicio_v4_o_m' + m + '_ulaville');
+      keys.push('inicio_v3_g_m' + m);
+      keys.push('inicio_v3_o_m' + m);
     }
     cache.removeAll(keys);
     if (opts && (opts.includeDash === true || opts.includeDash === 1 || String(opts.includeDash || '') === '1')) {
@@ -8153,9 +8170,11 @@ function carregarInicio_(p) {
   const adm      = isAdminRequest_(p || {});
   const gestao   = isSupervisorOrAdminRequest_(p || {});
   const metaOpId = metaOperadorIdFromRequest_(p || {}) || 0;
+  const uidInicio = unidadeIdFrom_(p || {});
   // I122: FE poll a cada 5s sempre manda _t — NÃO bustar. Escritas já chamam invalidateInicioResumoCache_.
   // Sem isso: carregarInicio ~25–36s → timeout FE 25s → cache local = locação fantasma no celular/PWA.
-  const cacheKey = 'inicio_v4_' + (gestao ? 'g' : 'o') + '_m' + metaOpId;
+  // I159c: cache por unidade (operacaoConfig diferente Golden × La Ville)
+  const cacheKey = 'inicio_v4_' + (gestao ? 'g' : 'o') + '_m' + metaOpId + '_u' + uidInicio;
   const forceBust = String((p && p.force) || '') === '1'
     || String((p && p.nocache) || '').toLowerCase() === '1'
     || String((p && p.nocache) || '').toLowerCase() === 'true';
@@ -8193,7 +8212,7 @@ function carregarInicio_(p) {
       if (status === 'Ativa' || status === 'Pendente') {
         const tipo  = String(r[4]);
         const plano = String(r[5]);
-        const cfg   = planoCfgOp_(tipo, plano) || {};
+        const cfg   = planoCfgOp_(tipo, plano, unidadeIdFromVeiculo_(veiculo)) || {};
         const minContrat = Number(r[6] || 0);
         const extMins    = Number(r[25] || 0);
         const ts         = status === 'Ativa' ? timestampCanonico_(r[1], r[2], r[24]) : 0;
@@ -8272,7 +8291,8 @@ function carregarInicio_(p) {
     id: c.id, data: c.data, hora: c.hora, descricao: c.descricao, categoria: c.categoria
   }));
 
-  const opCfg = operacaoConfig_();
+  const uid = uidInicio;
+  const opCfg = operacaoConfig_(uid);
   let metaTurno = null;
   if (metaOpId) {
     try {
@@ -8284,6 +8304,7 @@ function carregarInicio_(p) {
   const payload = {
     sistema:    MK_GAS_SISTEMA_,
     timestamp:  dataHoje + ' ' + fmtHoraLocal_(hoje),
+    unidadeId:  uid,
     ativos:     ativas,
     statsHoje,
     custosHoje: custosPayload,
@@ -9089,6 +9110,46 @@ const OPERACAO_CONFIG_DEFAULTS = {
   }
 };
 
+/** I159c — La Ville: não grava na aba CONFIG (Golden intacto). Sem plano 3h. */
+const PRECOS_LAVILLE_BRINQUEDOS_ = {
+  '10min': { valor: 15, mins: 10, adicional: 1.5 },
+  '20min': { valor: 25, mins: 20, adicional: 1.5 },
+  '30min': { valor: 35, mins: 30, adicional: 1.5 },
+  '40min': { valor: 45, mins: 40, adicional: 1.5 },
+  '60min': { valor: 65, mins: 60, adicional: 1.5 }
+};
+const PRECOS_LAVILLE_DINOS_ = {
+  '10min': { valor: 20, mins: 10, adicional: 2 },
+  '20min': { valor: 35, mins: 20, adicional: 2 },
+  '30min': { valor: 50, mins: 30, adicional: 2 },
+  '40min': { valor: 65, mins: 40, adicional: 2 },
+  '60min': { valor: 90, mins: 60, adicional: 2 }
+};
+const VEICULOS_LAVILLE_ = [
+  'LV Carro 01', 'LV Carro 02', 'LV Carro 03', 'LV Carro 04',
+  'LV Triciclo 01', 'LV Triciclo 02',
+  'LV Pelúcia 01', 'LV Pelúcia 02', 'LV Pelúcia 03', 'LV Pelúcia 04',
+  'LV Driffyt 01', 'LV Driffyt 02',
+  'LV Dino 01', 'LV Dino 02', 'LV Dino 03', 'LV Dino 04'
+];
+const OPERACAO_CONFIG_LAVILLE_ = {
+  veiculos_validos: VEICULOS_LAVILLE_,
+  precos: {
+    Carro: PRECOS_LAVILLE_BRINQUEDOS_,
+    Triciclo: PRECOS_LAVILLE_BRINQUEDOS_,
+    'Pelúcia': PRECOS_LAVILLE_BRINQUEDOS_,
+    Driffyt: PRECOS_LAVILLE_BRINQUEDOS_,
+    Dino: PRECOS_LAVILLE_DINOS_
+  },
+  formas_pagamento: ['PIX', 'Debito', 'Credito', 'Dinheiro'],
+  regras: {
+    alertaMinutosRestantes: 5,
+    maxMinutosExtras: 720,
+    bloquearInicioEncerradaCancelada: true,
+    exigirAvisoExtra: true
+  }
+};
+
 function cfgReadMap_() {
   const out = {};
   const sheet = sh_getOrCreate_(SH_CFG);
@@ -9116,11 +9177,32 @@ function cfgJsonOrDefault_(map, key, fallback, problemas) {
   }
 }
 
-function operacaoConfig_() {
-  // I125c: cache 60s — salvar/▶ não relê CONFIG a cada request
+function operacaoConfig_(unidadeIdOpt) {
+  const uidRaw = unidadeIdCanon_(unidadeIdOpt);
+  const uid = uidRaw || MK_UNIDADE_DEFAULT_;
+  // I159c — La Ville: catálogo embutido (não lê/escreve CONFIG Golden)
+  if (uid === 'laville') {
+    const u = MK_UNIDADES_.laville;
+    if (u && u.ativa && u.precosProntos) {
+      return {
+        veiculos_validos: OPERACAO_CONFIG_LAVILLE_.veiculos_validos.slice(),
+        precos: OPERACAO_CONFIG_LAVILLE_.precos,
+        formas_pagamento: OPERACAO_CONFIG_LAVILLE_.formas_pagamento.slice(),
+        regras: Object.assign({}, OPERACAO_CONFIG_LAVILLE_.regras),
+        fonte: 'unidade_laville',
+        unidadeId: 'laville',
+        problemas: []
+      };
+    }
+  }
+  // I125c: cache 60s — salvar/▶ não relê CONFIG a cada request (só Golden)
   try {
     const hit = CacheService.getScriptCache().get('operacaoConfig_v1');
-    if (hit) return JSON.parse(hit);
+    if (hit) {
+      const cached = JSON.parse(hit);
+      if (!cached.unidadeId) cached.unidadeId = 'golden';
+      return cached;
+    }
   } catch (eC) { /* ok */ }
   const problemas = [];
   const map = cfgReadMap_();
@@ -9142,6 +9224,7 @@ function operacaoConfig_() {
     formas_pagamento: Array.isArray(pagamentos) && pagamentos.length ? pagamentos : OPERACAO_CONFIG_DEFAULTS.formas_pagamento,
     regras: regras && typeof regras === 'object' && !Array.isArray(regras) ? Object.assign({}, OPERACAO_CONFIG_DEFAULTS.regras, regras) : OPERACAO_CONFIG_DEFAULTS.regras,
     fonte: problemas.length ? 'fallback_parcial' : 'config_ou_default',
+    unidadeId: 'golden',
     problemas
   };
   try {
@@ -9151,16 +9234,16 @@ function operacaoConfig_() {
   return out;
 }
 
-function precosOp_() {
-  return operacaoConfig_().precos;
+function precosOp_(unidadeIdOpt) {
+  return operacaoConfig_(unidadeIdOpt).precos;
 }
 
-function veiculosOp_() {
-  return operacaoConfig_().veiculos_validos;
+function veiculosOp_(unidadeIdOpt) {
+  return operacaoConfig_(unidadeIdOpt).veiculos_validos;
 }
 
-function planoCfgOp_(tipo, plano) {
-  const p = precosOp_();
+function planoCfgOp_(tipo, plano, unidadeIdOpt) {
+  const p = precosOp_(unidadeIdOpt);
   return (p[tipo] && p[tipo][plano]) ? p[tipo][plano] : null;
 }
 
@@ -9184,7 +9267,9 @@ function veiculosDefFromList_(veiculos) {
   return (veiculos || []).map(nome => {
     const n = String(nome);
     let tipo = 'Carro';
-    if (n.indexOf('Triciclo') >= 0) tipo = 'Triciclo';
+    if (n.indexOf('Driffyt') >= 0) tipo = 'Driffyt';
+    else if (n.indexOf('Dino') >= 0) tipo = 'Dino';
+    else if (n.indexOf('Triciclo') >= 0) tipo = 'Triciclo';
     else if (n.indexOf('Pel') >= 0) tipo = 'Pelúcia';
     return { nome: n, tipo: tipo };
   });
