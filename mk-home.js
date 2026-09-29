@@ -274,14 +274,20 @@ function renderPainel() {
   const carros     = TODOS_VEICULOS_DEF.filter(v => v.tipo === 'Carro');
   const triciclos  = TODOS_VEICULOS_DEF.filter(v => v.tipo === 'Triciclo');
   const pelucias   = TODOS_VEICULOS_DEF.filter(v => v.tipo === 'Pelúcia');
+  const driffyts   = TODOS_VEICULOS_DEF.filter(v => v.tipo === 'Driffyt');
+  const dinos      = TODOS_VEICULOS_DEF.filter(v => v.tipo === 'Dino');
 
   grid.innerHTML =
     '<div class="painel-sec-label">🚗 Carros elétricos</div>' +
     carros.map(v => buildPainelCard(v.nome, v.tipo, sessMap[v.nome])).join('') +
     (triciclos.length ? '<div class="painel-sec-label">🛺 Triciclos elétricos</div>' +
       triciclos.map(v => buildPainelCard(v.nome, v.tipo, sessMap[v.nome])).join('') : '') +
-    '<div class="painel-sec-label">🧸 Pelúcias elétricas</div>' +
-    pelucias.map(v => buildPainelCard(v.nome, v.tipo, sessMap[v.nome])).join('');
+    (pelucias.length ? '<div class="painel-sec-label">🧸 Pelúcias elétricas</div>' +
+      pelucias.map(v => buildPainelCard(v.nome, v.tipo, sessMap[v.nome])).join('') : '') +
+    (driffyts.length ? '<div class="painel-sec-label">🛸 Driffyts</div>' +
+      driffyts.map(v => buildPainelCard(v.nome, v.tipo, sessMap[v.nome])).join('') : '') +
+    (dinos.length ? '<div class="painel-sec-label">🦖 Dinos</div>' +
+      dinos.map(v => buildPainelCard(v.nome, v.tipo, sessMap[v.nome])).join('') : '');
 }
 
 function buildPainelCard(nome, tipo, s) {

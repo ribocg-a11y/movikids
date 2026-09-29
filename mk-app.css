@@ -335,7 +335,9 @@ html,body{height:100%;background:var(--bg);color:var(--txt);overflow:hidden}
 #page-nova.step-0-veiculo .vc-section-label.nova-vc-outro{opacity:.45}
 #page-nova.step-0-veiculo .veiculo-grid-carros,
 #page-nova.step-0-veiculo .veiculo-grid-triciclos,
-#page-nova.step-0-veiculo .veiculo-grid-pelucias{transition:opacity .2s}
+#page-nova.step-0-veiculo .veiculo-grid-pelucias,
+#page-nova.step-0-veiculo .veiculo-grid-driffyts,
+#page-nova.step-0-veiculo .veiculo-grid-dinos{transition:opacity .2s}
 .nova-rel-block{
   margin-bottom:16px;padding:12px 14px;background:var(--bg2);border:1px solid var(--border);
   border-radius:var(--radius-sm);
@@ -371,6 +373,8 @@ html,body{height:100%;background:var(--bg);color:var(--txt);overflow:hidden}
 .veiculo-grid-carros{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px}
 .veiculo-grid-triciclos{display:grid;grid-template-columns:1fr;gap:8px;margin-bottom:10px}
 .veiculo-grid-pelucias{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px}
+.veiculo-grid-driffyts{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px}
+.veiculo-grid-dinos{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px}
 .vc-card.mk-tile,
 .vc-card{border:1.5px solid var(--border);padding:10px 6px 8px;text-align:center;cursor:pointer;background:var(--card);position:relative}
 .vc-card:hover:not(.vc-busy):not(.vc-busy-pink){border-color:var(--blue);background:var(--blue-lt)}

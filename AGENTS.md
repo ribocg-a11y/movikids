@@ -2,19 +2,19 @@
 
 Sistema operacional de locações — balcão (tablet na loja), portal do responsável, painel admin.
 
-**Ciclo ativo (29/09/2026):** Sprint D · FE **v1.9.120** Pages · GAS ping **v1.5.221** · **I158** Golden FE ✅ · I155–I157 ✅
+**Ciclo ativo (29/09/2026):** Sprint D · FE **v1.9.122** Pages · GAS ping **v1.5.221** · **I159b** preços La Ville FE · **I158** Golden FE ✅
 
 **Para retomar (agente local PC — pasta C):**
 
-> *Continuar MOVI KIDS — FE **v1.9.120** · GAS **v1.5.221** · I158 Golden via kpiMes · Setembro prévia 29/09 R$ 14.371 / CTO R$ 1.500 (PDF gerado, não enviar) · Tablet `?force=1.9.120`*
+> *Continuar MOVI KIDS — FE **v1.9.122** · GAS **v1.5.221** · I159b La Ville preços FE (frota LV* provisória) · I158 Golden via kpiMes · Setembro prévia 29/09 R$ 14.371 / CTO R$ 1.500 · Tablet `?force=1.9.122`*
 
 ## Produção atual
 
 | Camada | Versão | Link |
 |--------|--------|------|
-| Frontend | **v1.9.120** | https://ribocg-a11y.github.io/movikids/?force=1.9.120 |
-| Gestão Pessoas | **v1.9.120** | `gestao-pessoas.html?force=1.9.120` |
-| GAS | ping **v1.5.221** = repo | I156 ritmo · I155 lookback · I158 **sem** mudança GAS |
+| Frontend | **v1.9.122** | https://ribocg-a11y.github.io/movikids/?force=1.9.122 |
+| Gestão Pessoas | **v1.9.122** | `gestao-pessoas.html?force=1.9.122` |
+| GAS | ping **v1.5.221** = Web · repo **v1.5.222** | I159 soft; La Ville saves aguardam §7.3 |
 | Design System | **v1.1** | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
 
 **GAS raw:** https://raw.githubusercontent.com/ribocg-a11y/movikids/main/MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs

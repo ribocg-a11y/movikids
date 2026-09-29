@@ -1,6 +1,7 @@
 /* MOVI KIDS - boot PWA + auth (Pacote M.17) */
 
 document.addEventListener('DOMContentLoaded', () => {
+  if (typeof mkUnidadeAplicarConfig_ === 'function') mkUnidadeAplicarConfig_();
   if (typeof novaRecoveryOverlayStale_ === 'function') novaRecoveryOverlayStale_();
   if (typeof mkWarmGasBatchFlag_ === 'function') mkWarmGasBatchFlag_();
   if (typeof mkAuthBoot === 'function') {

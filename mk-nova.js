@@ -82,7 +82,7 @@ function novaLimparSelecaoAtual_() {
     l.style.display = '';
     l.classList.remove('nova-vc-outro');
   });
-  ['vc-grid-carros', 'vc-grid-triciclos', 'vc-grid-pelucias'].forEach(function(id) {
+  ['vc-grid-carros', 'vc-grid-triciclos', 'vc-grid-pelucias', 'vc-grid-driffyts', 'vc-grid-dinos'].forEach(function(id) {
     const g = document.getElementById(id);
     if (g) g.style.display = '';
   });
@@ -729,6 +729,81 @@ function abrirNovaLocacao() {
   resetNova({ preserveDraft: true });
   showPage('nova', { freshNova: true });
 }
+function rebuildVeiculoGridsFromDef_() {
+  const pick = document.getElementById('nova-pick-panel');
+  const planoSec = document.getElementById('nova-plano-section');
+  if (!pick || !planoSec) return;
+  const defs = (typeof TODOS_VEICULOS_DEF !== 'undefined' && TODOS_VEICULOS_DEF.length)
+    ? TODOS_VEICULOS_DEF
+    : [
+      { nome: 'Carro 01', tipo: 'Carro' }, { nome: 'Carro 02', tipo: 'Carro' },
+      { nome: 'Carro 03', tipo: 'Carro' }, { nome: 'Carro 04', tipo: 'Carro' },
+      { nome: 'Triciclo 01', tipo: 'Triciclo' }, { nome: 'Triciclo 02', tipo: 'Triciclo' },
+      { nome: 'Pelúcia 01', tipo: 'Pelúcia' }, { nome: 'Pelúcia 02', tipo: 'Pelúcia' },
+      { nome: 'Pelúcia 03', tipo: 'Pelúcia' }, { nome: 'Pelúcia 04', tipo: 'Pelúcia' }
+    ];
+  const order = ['Carro', 'Triciclo', 'Pelúcia', 'Driffyt', 'Dino'];
+  const labels = {
+    Carro: 'Carros elétricos',
+    Triciclo: 'Triciclos elétricos',
+    'Pelúcia': 'Pelúcias elétricas',
+    Driffyt: 'Driffyts',
+    Dino: 'Dinos'
+  };
+  const gridClass = {
+    Carro: 'veiculo-grid-carros',
+    Triciclo: 'veiculo-grid-triciclos',
+    'Pelúcia': 'veiculo-grid-pelucias',
+    Driffyt: 'veiculo-grid-driffyts',
+    Dino: 'veiculo-grid-dinos'
+  };
+  const gridId = {
+    Carro: 'vc-grid-carros',
+    Triciclo: 'vc-grid-triciclos',
+    'Pelúcia': 'vc-grid-pelucias',
+    Driffyt: 'vc-grid-driffyts',
+    Dino: 'vc-grid-dinos'
+  };
+  const byTipo = {};
+  defs.forEach(function (v) {
+    const t = v.tipo || 'Carro';
+    if (!byTipo[t]) byTipo[t] = [];
+    byTipo[t].push(v);
+  });
+  Array.from(pick.querySelectorAll('.vc-section-label, .veiculo-grid-carros, .veiculo-grid-triciclos, .veiculo-grid-pelucias, .veiculo-grid-driffyts, .veiculo-grid-dinos')).forEach(function (el) {
+    el.remove();
+  });
+  const frag = document.createDocumentFragment();
+  order.forEach(function (tipo) {
+    const list = byTipo[tipo];
+    if (!list || !list.length) return;
+    const lab = document.createElement('div');
+    lab.className = 'vc-section-label';
+    lab.textContent = labels[tipo] || tipo;
+    frag.appendChild(lab);
+    const grid = document.createElement('div');
+    grid.className = gridClass[tipo] || 'veiculo-grid-carros';
+    grid.id = gridId[tipo] || ('vc-grid-' + tipo.toLowerCase());
+    list.forEach(function (v) {
+      const nome = v.nome;
+      const card = document.createElement('div');
+      card.className = 'vc-card mk-tile';
+      card.id = 'vc-' + nome;
+      card.setAttribute('onclick', "selectVeiculo(this,'" + String(nome).replace(/'/g, "\\'") + "','" + tipo + "')");
+      const icon = (typeof tipoIcon === 'function') ? tipoIcon(tipo) : '🚗';
+      card.innerHTML =
+        '<div class="vc-icon">' + icon + '</div>' +
+        '<div class="vc-name">' + nome + '</div>' +
+        '<div class="vc-status livre" id="vc-st-' + nome + '">✓ Livre</div>';
+      grid.appendChild(card);
+    });
+    frag.appendChild(grid);
+  });
+  pick.insertBefore(frag, planoSec);
+  if (typeof atualizarVeiculoGrid === 'function') atualizarVeiculoGrid();
+}
+window.rebuildVeiculoGridsFromDef_ = rebuildVeiculoGridsFromDef_;
+
 function atualizarVeiculoGridCore_() {
   // Veículos em uso = sessions ativas com veiculo definido
   const emUso = {};
@@ -747,7 +822,7 @@ function atualizarVeiculoGridCore_() {
     const card = document.getElementById('vc-' + nome);
     const stEl = document.getElementById('vc-st-' + nome);
     if (!card || !stEl) return;
-    const isPink = nome.startsWith('Pelúcia');
+    const isPink = nome.indexOf('Pelúcia') >= 0;
     const info   = emUso[nome];
 
     // Remover timer antigo se existir
@@ -801,14 +876,26 @@ function atualizarVeiculoGrid() {
 
 function destacarSecaoVeiculoNova_(tipo) {
   const page = document.getElementById('page-nova');
-  const map = { Carro: 'vc-grid-carros', Triciclo: 'vc-grid-triciclos', 'Pelúcia': 'vc-grid-pelucias' };
+  const map = {
+    Carro: 'vc-grid-carros',
+    Triciclo: 'vc-grid-triciclos',
+    'Pelúcia': 'vc-grid-pelucias',
+    Driffyt: 'vc-grid-driffyts',
+    Dino: 'vc-grid-dinos'
+  };
   const activeId = map[tipo] || '';
   if (page) page.classList.add('step-0-veiculo');
   document.querySelectorAll('#page-nova .vc-section-label').forEach(lab => {
     const next = lab.nextElementSibling;
     const isActive = next && next.id === activeId;
     lab.classList.toggle('nova-vc-outro', !!tipo && !isActive);
-    if (next && next.classList && (next.classList.contains('veiculo-grid-carros') || next.classList.contains('veiculo-grid-triciclos') || next.classList.contains('veiculo-grid-pelucias'))) {
+    if (next && next.classList && (
+      next.classList.contains('veiculo-grid-carros') ||
+      next.classList.contains('veiculo-grid-triciclos') ||
+      next.classList.contains('veiculo-grid-pelucias') ||
+      next.classList.contains('veiculo-grid-driffyts') ||
+      next.classList.contains('veiculo-grid-dinos')
+    )) {
       next.style.display = (!tipo || isActive) ? '' : 'none';
       if (isActive) lab.style.display = '';
       else if (tipo) lab.style.display = 'none';
@@ -953,7 +1040,7 @@ function resetNova(opts = {}) {
   const pageNova = document.getElementById('page-nova');
   if (pageNova) pageNova.classList.remove('step-0-veiculo');
   document.querySelectorAll('#page-nova .vc-section-label').forEach(l => { l.style.display = ''; l.classList.remove('nova-vc-outro'); });
-  ['vc-grid-carros','vc-grid-triciclos','vc-grid-pelucias'].forEach(id => {
+  ['vc-grid-carros','vc-grid-triciclos','vc-grid-pelucias','vc-grid-driffyts','vc-grid-dinos'].forEach(id => {
     const g = document.getElementById(id);
     if (g) g.style.display = '';
   });

@@ -375,7 +375,10 @@ function sanitizarDadosInicioOperador_(d) {
 function aplicarDadosInicio(d) {
   try {
     if (!d || !Array.isArray(d.ativos)) return;
-    if (d.operacaoConfig) aplicarOperacaoConfig_(d.operacaoConfig);
+    if (d.operacaoConfig) {
+      aplicarOperacaoConfig_(d.operacaoConfig);
+      if (typeof mkUnidadeSyncAposGas_ === 'function') mkUnidadeSyncAposGas_();
+    }
     d = sanitizarDadosInicioOperador_(d);
     window._lastSyncSource = d.fonte || 'gas';
     window._lastCanonicalRows = d.ativos.length;

@@ -1,14 +1,14 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 29/09/2026 · FE **v1.9.121** Pages · GAS repo **v1.5.222** (ping Web ainda **v1.5.221** até Nova versão) · **I159** multi-unidade fundação · **I158** ✅
+**Atualizado:** 29/09/2026 · FE **v1.9.122** Pages · GAS repo **v1.5.222** (ping Web **v1.5.221**) · **I159b** preços La Ville no FE · **I158** ✅
 
 ## Produção (agora)
 
 | Camada | Versão | Link |
 |--------|--------|------|
-| Frontend | **v1.9.121** | https://ribocg-a11y.github.io/movikids/?force=1.9.121 |
-| Gestão Pessoas | **v1.9.121** | `gestao-pessoas.html?force=1.9.121` |
-| GAS | ping Web **v1.5.221** · repo **v1.5.222** | Helpers I159 no repo; **Nova versão Web** quando isolar dados |
+| Frontend | **v1.9.122** | https://ribocg-a11y.github.io/movikids/?force=1.9.122 |
+| Gestão Pessoas | **v1.9.122** | `gestao-pessoas.html?force=1.9.122` |
+| GAS | ping Web **v1.5.221** · repo **v1.5.222** | La Ville **ainda não** valida frota/preços no Web — pedir §7.3 antes de lançar LV |
 | Design System | v1.1 | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
 
 **GAS raw:** https://raw.githubusercontent.com/ribocg-a11y/movikids/main/MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs  
@@ -79,7 +79,7 @@
 |------|--------|
 | Workspace | `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github` |
 | Modo | **Agent local / This PC** |
-| 1º turno | `.\scripts\relatorio-versoes.ps1 -Markdown` · Pages **1.9.120** · ping **v1.5.221** |
+| 1º turno | `.\scripts\relatorio-versoes.ps1 -Markdown` · Pages **1.9.122** · ping **v1.5.221** |
 
 ```powershell
 cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github
@@ -91,7 +91,7 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 
 ## Mensagem para colar no novo chat (PC)
 
-> *Continuar MOVI KIDS **no PC** — pasta C (`movikids-github`). Ler `HANDOFF_NOVO_CHAT.md`. FE **v1.9.120** Pages · GAS ping **v1.5.221**. **I158** Golden via kpiMes ✅. Setembro prévia 29/09 R$ 14.371 / 675 / CTO R$ 1.500 (PDF gerado, não enviar). Tablet `?force=1.9.120`. Próximo: regenerar PDF em 01/10 e enviar · smoke tablet D4 / FASE 17. **This PC.***
+> *Continuar MOVI KIDS **no PC** — pasta C (`movikids-github`). Ler `HANDOFF_NOVO_CHAT.md`. FE **v1.9.122** Pages · GAS ping **v1.5.221**. **I159b** preços La Ville no FE (frota provisória LV*) · **I158** ✅. Setembro prévia 29/09 R$ 14.371 / CTO R$ 1.500. Tablet `?force=1.9.122`. Próximo: frota real + §7.3 GAS La Ville · PDF 01/10. **This PC.***
 
 **Mínima:**
 
@@ -103,11 +103,13 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 
 | # | Ação | Quem | Status |
 |---|------|------|--------|
-| 0 | **I159** multi-unidade fundação (hub + `unidadeId`) | Agente | ✅ FE **v1.9.121** · La Ville bloqueada até tabela |
+| 0 | **I159** hub + `unidadeId` | Agente | ✅ FE **v1.9.121** |
+| 0b | **I159b** tabelas La Ville (Brinquedos + Dinos) no FE | Agente | ✅ FE **v1.9.122** · frota **provisória LV*** |
+| 0c | Confirmar **quantidade** frota + CTO e-mail La Ville | Sócio | ⏳ |
+| 0d | GAS: validar preços/frota por `unidadeId` + Nova versão Web | Sócio pede §7.3 | ⏳ sem isso não lançar LV em prod |
 | 1 | PDF Golden setembro prévia 29/09 | Agente | ✅ em `entregas/` — **não enviar** |
-| 1b | Regenerar/enviar fechamento **01/10** | Sócio | Admin FE 1.9.121 |
-| 2 | Entregar tabela preços/frota/CTO **La Ville** | Sócio | ⏳ desbloqueia unidade |
-| 3 | Tablet smoke D4 · `?force=1.9.121` | Ops | ⏳ |
+| 1b | Regenerar/enviar fechamento **01/10** | Sócio | Admin FE 1.9.122 |
+| 3 | Tablet smoke D4 · `?force=1.9.122` | Ops | ⏳ |
 | 4 | Assinar FASE 17 (decisão 17.5 F9) | Sócio | ⏳ |
 
 **Plano:** `docs/ativos/PLANO_MULTI_UNIDADE_GOLDEN_LAVILLE_2026-09.md`

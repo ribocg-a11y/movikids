@@ -1,10 +1,10 @@
 # PLANO — Multi-unidade MOVI KIDS (Golden × La Ville Mall)
 
-**Status:** 📋 **somente planejamento** — **nenhuma alteração de código/produção nesta fase**  
-**Atualizado:** 29/09/2026 · FE **v1.9.120** · GAS **v1.5.221** · planilha única hoje  
+**Status:** 🟡 **I159b** — preços La Ville no FE (v1.9.122); frota provisória LV*; GAS Web ainda Golden-only para saves  
+**Atualizado:** 29/09/2026 · FE **v1.9.122** · GAS Web **v1.5.221** · planilha única  
 **Pedido:** 2ª unidade em **La Ville Mall**; hoje só **Golden Shopping Calhau**. Operadoras escolhem onde logar; unidades **não conversam**; **só ADM** vê as duas juntas. Preços, minutos e frota **diferentes** por unidade.  
 **Arquitetura:** ✅ **Opção A** — **1 planilha** + `unidade_id` + CONFIG/CTO por unidade (sócio 29/09).  
-**Próximo do sócio:** entregar tabela de preços/minutos/brinquedos + CTO La Ville; responder §11 (RH / tablet).
+**Sócio entregou (29/09):** tabelas Brinquedos (R$15–65 + R$1,50/min) e Dinos (R$20–90 + R$2/min). **Falta:** quantidade real da frota + CTO/e-mail.
 
 ---
 

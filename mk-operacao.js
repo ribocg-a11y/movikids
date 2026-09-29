@@ -819,7 +819,8 @@ function abrirEstender(rowIndex, fromDrawer) {
   const tipo = estSession.tipo || estSession.veiculo?.split(' ')[0] || 'Carro';
   const tipoKey = Object.keys(PRECOS).find(k => tipo.includes(k)) || 'Carro';
   const finEst = mkExibirFinanceiro_();
-  const planosDisp = Object.entries(PRECOS[tipoKey]).filter(([k,v]) => k !== '3h');
+  const precosTipo = PRECOS[tipoKey] || {};
+  const planosDisp = Object.entries(precosTipo).filter(([k]) => k !== '3h');
   const precoLbl = (v) => finEst ? `<div style="font-size:11px;opacity:.75">R$ ${v},00</div>` : '';
   document.getElementById('est-opts').innerHTML = planosDisp.map(([plano, cfg]) =>
     `<button class="est-opt-btn" onclick="selecionarEstender('${plano}',${cfg.m},${cfg.v})" id="est-opt-${plano}">
@@ -827,11 +828,14 @@ function abrirEstender(rowIndex, fromDrawer) {
        ${precoLbl(cfg.v)}
      </button>`
   ).join('');
-  document.getElementById('est-opts').innerHTML +=
-    `<button class="est-opt-btn" onclick="selecionarEstender('3h',180,${PRECOS[tipoKey]['3h'].v})" id="est-opt-3h">
-       <div style="font-size:13px;font-weight:700">+3h</div>
-       ${precoLbl(PRECOS[tipoKey]['3h'].v)}
-     </button>`;
+  /* La Ville não tem plano 3h — só renderiza se existir no catálogo da unidade. */
+  if (precosTipo['3h'] && precosTipo['3h'].v != null) {
+    document.getElementById('est-opts').innerHTML +=
+      `<button class="est-opt-btn" onclick="selecionarEstender('3h',180,${precosTipo['3h'].v})" id="est-opt-3h">
+         <div style="font-size:13px;font-weight:700">+3h</div>
+         ${precoLbl(precosTipo['3h'].v)}
+       </button>`;
+  }
 
 }
 

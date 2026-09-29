@@ -540,8 +540,7 @@
     var unidades = mkUnidadeList_();
     var escolhida = null;
     try { escolhida = localStorage.getItem('mk_unidade_ativa_v1'); } catch (e) { /* ignore */ }
-    /* Uma unidade ativa (Golden) → auto-seleciona e mostra as 3 portas (zero atrito).
-       Trocar unidade revela La Ville (ainda bloqueada até tabela de preços). */
+    /* Uma unidade ativa → auto-seleciona. Com Golden+La Ville, pede escolha no hub. */
     if (!escolhida && typeof mkUnidadeListAtivas_ === 'function') {
       var ativas = mkUnidadeListAtivas_();
       if (ativas.length === 1 && typeof mkUnidadeSet_ === 'function') {
@@ -571,6 +570,9 @@
           if (!r || !r.ok) {
             if (typeof toast === 'function') toast((r && r.erro) || 'Unidade indisponível', 'warning');
             return;
+          }
+          if (u.frotaProvisoria && typeof toast === 'function') {
+            toast('La Ville: frota provisória (LV*). Confirme quantidades reais antes de operar.', 'info');
           }
           mkHubShowPortas_(true);
         });
