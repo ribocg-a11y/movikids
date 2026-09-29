@@ -47,6 +47,9 @@ function aplicarOperacaoConfig_(cfg) {
 
 function apiParamsComAuth_() {
   const out = typeof operadorApiParams_ === 'function' ? operadorApiParams_() : {};
+  if (!out.unidadeId && typeof mkUnidadeApiParams_ === 'function') {
+    Object.assign(out, mkUnidadeApiParams_());
+  }
   const isAdm = (typeof mkAuthIsAdmin === 'function' && mkAuthIsAdmin()) || !!window.isAdmin;
   if (isAdm) {
     if (typeof mkAuthAdminPinParams_ === 'function') Object.assign(out, mkAuthAdminPinParams_());

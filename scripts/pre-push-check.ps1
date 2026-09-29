@@ -501,6 +501,22 @@ try {
     }
   }
 
+  # I159 — multi-unidade fundação (catálogo + hub; La Ville inativa até preços)
+  $uniJs = Join-Path $root "mk-unidades.js"
+  if (-not (Test-Path $uniJs)) {
+    Add-Check "guard.i159.fe.unidades" "fail" "mk-unidades.js ausente (I159)"
+  } else {
+    $uniRaw = Get-Content -Path $uniJs -Raw -Encoding UTF8
+    $idxRawI159 = Get-Content -Path (Join-Path $root "index.html") -Raw -Encoding UTF8
+    if ($uniRaw -notmatch 'laville' -or $uniRaw -notmatch 'mkUnidadeId_') {
+      Add-Check "guard.i159.fe.unidades" "fail" "catalogo/API unidade incompleto (I159)"
+    } elseif ($idxRawI159 -notmatch 'mk-unidades\.js' -or $idxRawI159 -notmatch 'mk-hub-unidades') {
+      Add-Check "guard.i159.fe.unidades" "fail" "hub/index sem seletor unidade (I159)"
+    } else {
+      Add-Check "guard.i159.fe.unidades" "ok" "hub multi-unidade + mk-unidades.js (La Ville gate)"
+    }
+  }
+
   $adminJs = Join-Path $root "mk-admin.js"
   if (Test-Path $adminJs) {
     $adminRaw = Get-Content -Path $adminJs -Raw -Encoding UTF8

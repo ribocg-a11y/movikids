@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Movi Kids">
 <title>Movi Kids</title>
-<script src="mk-canonical-host.js?v=1.9.120"></script>
+<script src="mk-canonical-host.js?v=1.9.121"></script>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png">
@@ -17,17 +17,17 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<script src="mk-stale-sync.js?v=1.9.120"></script>
-<script src="mk-version.js?v=1.9.120"></script>
-<script src="mk-api.js?v=1.9.120"></script>
-<link rel="stylesheet" href="mk-design.css?v=1.9.120">
+<script src="mk-stale-sync.js?v=1.9.121"></script>
+<script src="mk-version.js?v=1.9.121"></script>
+<script src="mk-api.js?v=1.9.121"></script>
+<link rel="stylesheet" href="mk-design.css?v=1.9.121">
 
-<script src="mk-cache-bust.js?v=1.9.120"></script>
+<script src="mk-cache-bust.js?v=1.9.121"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<link rel="stylesheet" href="mk-app.css?v=1.9.120">
-<link rel="stylesheet" href="mk-gestao-pessoas.css?v=1.9.120">
+<link rel="stylesheet" href="mk-app.css?v=1.9.121">
+<link rel="stylesheet" href="mk-gestao-pessoas.css?v=1.9.121">
 <!-- Firebase SDK — Realtime sync canonico para todos os dispositivos -->
-<script type="module" src="mk-firebase.js?v=1.9.120"></script>
+<script type="module" src="mk-firebase.js?v=1.9.121"></script>
 </head>
 
 <body>
@@ -71,31 +71,42 @@
   <p>Carregando sistema...</p>
 </div>
 
-<!-- Hub tablet — 3 portas (FASE 15 · mockup aprovado) -->
+<!-- Hub tablet — unidade → 3 portas (multi-unidade fase 1) -->
 <div id="mk-tablet-hub" style="display:none">
   <div class="mk-tablet-hub-inner">
     <div class="mk-logo">
       <img class="mk-brand-img mk-brand-img--md" src="assets/logo-movi-kids.png" alt="Movi Kids" width="1080" height="1080" loading="lazy" decoding="async">
-      <div class="mk-logo-sub">Tablet na loja · Golden Shopping Calhau</div>
+      <div class="mk-logo-sub" id="mk-hub-logo-sub">Escolha a unidade</div>
     </div>
-    <div class="mk-hub-doors">
-      <button type="button" class="mk-hub-door mk-hub-door--dia" id="mk-hub-balcao">
-        <span class="mk-hub-door-icon">🚗</span>
-        <span class="mk-hub-door-title">Entrar no sistema</span>
-        <span class="mk-hub-door-sub">Balcão · locações · 1 operador por vez</span>
-      </button>
-      <button type="button" class="mk-hub-door mk-hub-door--mes" id="mk-hub-colab">
-        <span class="mk-hub-door-icon">👥</span>
-        <span class="mk-hub-door-title">Colaboradores</span>
-        <span class="mk-hub-door-sub">Ponto, metas, escala e pagamento</span>
-      </button>
-      <button type="button" class="mk-hub-door mk-hub-door--sys" id="mk-hub-admin">
-        <span class="mk-hub-door-icon">🔧</span>
-        <span class="mk-hub-door-title">Administração</span>
-        <span class="mk-hub-door-sub">Gestão total · acesso restrito</span>
-      </button>
+
+    <!-- Passo A: escolher unidade (La Ville bloqueada até tabela de preços) -->
+    <div id="mk-hub-unidades" class="mk-hub-unidades" style="display:none">
+      <p class="mk-tablet-hub-note" style="margin-top:0">Onde você está operando hoje?</p>
+      <div class="mk-hub-doors mk-hub-doors--unidades" id="mk-hub-unidade-list" role="list"></div>
     </div>
-    <p class="mk-tablet-hub-note">Escolha uma porta. Para locações use <strong>Entrar no sistema</strong>.</p>
+
+    <!-- Passo B: 3 portas -->
+    <div id="mk-hub-portas" style="display:none">
+      <button type="button" class="mk-hub-back" id="mk-hub-trocar-unidade">← Trocar unidade</button>
+      <div class="mk-hub-doors">
+        <button type="button" class="mk-hub-door mk-hub-door--dia" id="mk-hub-balcao">
+          <span class="mk-hub-door-icon">🚗</span>
+          <span class="mk-hub-door-title">Entrar no sistema</span>
+          <span class="mk-hub-door-sub">Balcão · locações · 1 operador por vez</span>
+        </button>
+        <button type="button" class="mk-hub-door mk-hub-door--mes" id="mk-hub-colab">
+          <span class="mk-hub-door-icon">👥</span>
+          <span class="mk-hub-door-title">Colaboradores</span>
+          <span class="mk-hub-door-sub">Ponto, metas, escala e pagamento</span>
+        </button>
+        <button type="button" class="mk-hub-door mk-hub-door--sys" id="mk-hub-admin">
+          <span class="mk-hub-door-icon">🔧</span>
+          <span class="mk-hub-door-title">Administração</span>
+          <span class="mk-hub-door-sub">Gestão total · acesso restrito</span>
+        </button>
+      </div>
+      <p class="mk-tablet-hub-note">Escolha uma porta. Para locações use <strong>Entrar no sistema</strong>.</p>
+    </div>
   </div>
 </div>
 
@@ -106,7 +117,7 @@
       <button type="button" class="mk-hub-back" id="mk-btn-back-hub">← Voltar ao início</button>
       <div class="mk-logo">
         <img class="mk-brand-img mk-brand-img--md" src="assets/logo-movi-kids.png" alt="Movi Kids" width="1080" height="1080" loading="lazy" decoding="async">
-        <div class="mk-logo-sub">Golden Shopping Calhau · Acesso operacional</div>
+        <div class="mk-logo-sub" id="mk-auth-logo-sub">Acesso operacional</div>
       </div>
       <span class="mk-step-tag">Passo 1 de 2</span>
       <h2>Quem está no balcão?</h2>
@@ -2517,31 +2528,32 @@
   </div>
 </div>
 
-<script src="mk-globals.js?v=1.9.120"></script>
-<script src="mk-core.js?v=1.9.120"></script>
-<script src="mk-nav.js?v=1.9.120"></script>
-<script src="mk-admin.js?v=1.9.120"></script>
-<script src="mk-historico.js?v=1.9.120"></script>
-<script src="mk-custos-historico.js?v=1.9.120"></script>
-<script src="mk-sessao.js?v=1.9.120"></script>
-<script src="mk-home.js?v=1.9.120"></script>
-<script src="mk-meta-operador.js?v=1.9.120"></script>
-<script src="mk-custos.js?v=1.9.120"></script>
-<script src="mk-avulso.js?v=1.9.120"></script>
-<script src="mk-sync.js?v=1.9.120"></script>
-<script src="mk-idb-store.js?v=1.9.120"></script>
-<script src="mk-offline-queue.js?v=1.9.120"></script>
-<script src="mk-local-snapshot.js?v=1.9.120"></script>
-<script src="mk-nova.js?v=1.9.120"></script>
-<script src="mk-relacionamento.js?v=1.9.120"></script>
-<script src="mk-operacao.js?v=1.9.120"></script>
-<script src="mk-drawer.js?v=1.9.120"></script>
-<script src="mk-enc-extra.js?v=1.9.120"></script>
-<script src="mk-update.js?v=1.9.120"></script>
-<script src="mk-gestao-pessoas.js?v=1.9.120"></script>
-<script src="mk-holerite.js?v=1.9.120"></script>
-<script src="mk-gestao-pessoas-admin.js?v=1.9.120"></script>
-<script src="mk-auth.js?v=1.9.120"></script>
-<script src="mk-boot.js?v=1.9.120"></script>
+<script src="mk-globals.js?v=1.9.121"></script>
+<script src="mk-unidades.js?v=1.9.121"></script>
+<script src="mk-core.js?v=1.9.121"></script>
+<script src="mk-nav.js?v=1.9.121"></script>
+<script src="mk-admin.js?v=1.9.121"></script>
+<script src="mk-historico.js?v=1.9.121"></script>
+<script src="mk-custos-historico.js?v=1.9.121"></script>
+<script src="mk-sessao.js?v=1.9.121"></script>
+<script src="mk-home.js?v=1.9.121"></script>
+<script src="mk-meta-operador.js?v=1.9.121"></script>
+<script src="mk-custos.js?v=1.9.121"></script>
+<script src="mk-avulso.js?v=1.9.121"></script>
+<script src="mk-sync.js?v=1.9.121"></script>
+<script src="mk-idb-store.js?v=1.9.121"></script>
+<script src="mk-offline-queue.js?v=1.9.121"></script>
+<script src="mk-local-snapshot.js?v=1.9.121"></script>
+<script src="mk-nova.js?v=1.9.121"></script>
+<script src="mk-relacionamento.js?v=1.9.121"></script>
+<script src="mk-operacao.js?v=1.9.121"></script>
+<script src="mk-drawer.js?v=1.9.121"></script>
+<script src="mk-enc-extra.js?v=1.9.121"></script>
+<script src="mk-update.js?v=1.9.121"></script>
+<script src="mk-gestao-pessoas.js?v=1.9.121"></script>
+<script src="mk-holerite.js?v=1.9.121"></script>
+<script src="mk-gestao-pessoas-admin.js?v=1.9.121"></script>
+<script src="mk-auth.js?v=1.9.121"></script>
+<script src="mk-boot.js?v=1.9.121"></script>
 </body>
 </html>

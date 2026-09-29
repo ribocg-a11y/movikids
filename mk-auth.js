@@ -22,7 +22,12 @@
     if (typeof fn !== 'function') {
       throw new Error('Sistema ainda carregando. Atualize a pagina (Ctrl+F5).');
     }
-    return fn(params, timeoutMs);
+    const merged = Object.assign({}, params);
+    if (!merged.unidadeId) {
+      if (typeof mkUnidadeApiParams_ === 'function') Object.assign(merged, mkUnidadeApiParams_());
+      else if (typeof mkUnidadeId_ === 'function') merged.unidadeId = mkUnidadeId_();
+    }
+    return fn(merged, timeoutMs);
   }
 
   function getSession() {
@@ -277,10 +282,14 @@
 
   window.operadorApiParams_ = function operadorApiParams_() {
     const s = getSession();
-    if (!s) return {};
-    const out = { operador: s.nome };
+    const out = {};
+    if (typeof mkUnidadeApiParams_ === 'function') Object.assign(out, mkUnidadeApiParams_());
+    else if (typeof mkUnidadeId_ === 'function') out.unidadeId = mkUnidadeId_();
+    if (!s) return out;
+    out.operador = s.nome;
     if (s.id && s.id !== 'ADMIN') out.operadorId = s.id;
     if (s.role) out.authRole = s.role;
+    if (s.unidadeId) out.unidadeId = s.unidadeId;
     return out;
   };
 
@@ -496,7 +505,93 @@
     hideApp();
     showGate(false);
     showHub(true);
+    mkHubRenderUnidades_();
   };
+
+  function mkHubApplyBranding_() {
+    var sub = (typeof mkUnidadeSubLinha_ === 'function')
+      ? ('Tablet na loja · ' + mkUnidadeSubLinha_())
+      : 'Tablet na loja';
+    var logo = document.getElementById('mk-hub-logo-sub');
+    if (logo) logo.textContent = sub;
+    var authSub = document.getElementById('mk-auth-logo-sub');
+    if (authSub) {
+      var nome = (typeof mkUnidadeLabel_ === 'function') ? mkUnidadeLabel_() : '';
+      authSub.textContent = nome ? (nome + ' · Acesso operacional') : 'Acesso operacional';
+    }
+    var brand = document.querySelector('.brand-sub');
+    if (brand && typeof mkUnidadeLabel_ === 'function') brand.textContent = mkUnidadeLabel_();
+  }
+
+  function mkHubShowPortas_(showPortas) {
+    var uBox = document.getElementById('mk-hub-unidades');
+    var pBox = document.getElementById('mk-hub-portas');
+    if (uBox) uBox.style.display = showPortas ? 'none' : '';
+    if (pBox) pBox.style.display = showPortas ? '' : 'none';
+    mkHubApplyBranding_();
+  }
+
+  function mkHubRenderUnidades_() {
+    var list = document.getElementById('mk-hub-unidade-list');
+    if (!list || typeof mkUnidadeList_ !== 'function') {
+      mkHubShowPortas_(true);
+      return;
+    }
+    var unidades = mkUnidadeList_();
+    var escolhida = null;
+    try { escolhida = localStorage.getItem('mk_unidade_ativa_v1'); } catch (e) { /* ignore */ }
+    /* Uma unidade ativa (Golden) → auto-seleciona e mostra as 3 portas (zero atrito).
+       Trocar unidade revela La Ville (ainda bloqueada até tabela de preços). */
+    if (!escolhida && typeof mkUnidadeListAtivas_ === 'function') {
+      var ativas = mkUnidadeListAtivas_();
+      if (ativas.length === 1 && typeof mkUnidadeSet_ === 'function') {
+        mkUnidadeSet_(ativas[0].id);
+        escolhida = ativas[0].id;
+      }
+    }
+    var mostrarSeletor = !escolhida;
+    list.innerHTML = '';
+    unidades.forEach(function (u) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'mk-hub-door mk-hub-door--dia';
+      btn.setAttribute('role', 'listitem');
+      btn.dataset.unidadeId = u.id;
+      var ok = !!(u.ativa && u.precosProntos);
+      if (!ok) btn.classList.add('mk-hub-door--unidade-off');
+      btn.innerHTML =
+        '<span class="mk-hub-door-icon">' + (u.id === 'laville' ? '🏬' : '🛍️') + '</span>' +
+        '<span class="mk-hub-door-title">' + u.nome + '</span>' +
+        '<span class="mk-hub-door-sub">' +
+          (ok ? (u.cidade || 'Unidade ativa') : (u.bloqueioMotivo || 'Em breve')) +
+        '</span>';
+      if (ok) {
+        btn.addEventListener('click', function () {
+          var r = typeof mkUnidadeSet_ === 'function' ? mkUnidadeSet_(u.id) : { ok: true };
+          if (!r || !r.ok) {
+            if (typeof toast === 'function') toast((r && r.erro) || 'Unidade indisponível', 'warning');
+            return;
+          }
+          mkHubShowPortas_(true);
+        });
+      } else {
+        btn.addEventListener('click', function () {
+          if (typeof toast === 'function') {
+            toast(u.bloqueioMotivo || 'La Ville ainda não está liberada', 'warning');
+          }
+        });
+      }
+      list.appendChild(btn);
+    });
+    if (mostrarSeletor) {
+      var logo = document.getElementById('mk-hub-logo-sub');
+      if (logo) logo.textContent = 'Escolha a unidade';
+      mkHubShowPortas_(false);
+    } else {
+      mkHubShowPortas_(true);
+    }
+  }
+  window.mkHubRenderUnidades_ = mkHubRenderUnidades_;
 
   let _turnoPollInterval = null;
   function startTurnoPoll_() {
@@ -540,7 +635,9 @@
       sessionStorage.removeItem('mk_gp_adm_preview_v1');
     } catch (e) { /* ignore */ }
     const v = window.MK_VERSION || '1.8.60';
-    location.href = 'gestao-pessoas.html?force=' + encodeURIComponent(v) + '&from=index&_=' + Date.now();
+    const u = (typeof mkUnidadeId_ === 'function') ? mkUnidadeId_() : 'golden';
+    location.href = 'gestao-pessoas.html?force=' + encodeURIComponent(v) +
+      '&unidade=' + encodeURIComponent(u) + '&from=index&_=' + Date.now();
   };
 
   /** Balcão bloqueado por cadastro RH incompleto — abre Colaboradores no fluxo de completar. */
@@ -908,10 +1005,12 @@
     const isAdminRole = role === 'admin';
     const srvAt = sessaoExtra && sessaoExtra.sessaoAtiva ? sessaoExtra.sessaoAtiva : null;
     const loggedAt = (isAdminRole ? Date.now() : (srvAt && srvAt.loggedAt) || Date.now());
+    const unidadeId = (typeof mkUnidadeId_ === 'function') ? mkUnidadeId_() : 'golden';
     setSession({
       id: operador.id,
       nome: operador.nome,
       role: role || 'operador',
+      unidadeId: unidadeId,
       loggedAt: loggedAt
     });
     const splash = document.getElementById('splash');
@@ -973,10 +1072,15 @@
     });
     document.getElementById('mk-btn-back-admin')?.addEventListener('click', () => mkAuthShowTabletHub_());
     document.getElementById('mk-btn-back-hub')?.addEventListener('click', () => mkAuthShowTabletHub_());
+    document.getElementById('mk-hub-trocar-unidade')?.addEventListener('click', () => {
+      if (typeof mkUnidadeClearEscolha_ === 'function') mkUnidadeClearEscolha_();
+      mkHubRenderUnidades_();
+    });
     document.getElementById('mk-hub-balcao')?.addEventListener('click', () => {
       hideApp();
       showGate(true);
       showStep('mk-step-select');
+      mkHubApplyBranding_();
       loadOperadores().catch(() => renderOpList(false));
     });
     document.getElementById('mk-hub-colab')?.addEventListener('click', () => {

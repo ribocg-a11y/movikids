@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.221
+// MOVI KIDS — Google Apps Script v1.5.222
+// v1.5.222: I159 — fundação multi-unidade (unidadeId soft; golden = legado; La Ville inativa até preços)
 // v1.5.221: I156 — ritmo 3d: lastNBillingDays lê chaves "01"/"1" (linha Ritmo sumia no Dashboard)
 // v1.5.220: I155 — listarAtivas/carregarInicio leem CAUDA (lookback) + cache curto ativas (anti-404)
 // v1.5.219: I154 — listarAuditoria: cauda real + sort por data/hora (não string DD/MM)
@@ -213,7 +214,7 @@
 
 // ── CONSTANTES ───────────────────────────────────────────────
 /** Versão exposta em ping, carregarInicio, validarSchema, gestaoPessoasStatus (bump com header). */
-const MK_GAS_VERSAO_  = 'v1.5.221';
+const MK_GAS_VERSAO_  = 'v1.5.222';
 const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.221';
 const SHEET_ID   = '1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618';
 const DEPLOY_ID  = 'AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y';
@@ -355,6 +356,59 @@ const PRECOS = {
     '3h':    { valor: 150, mins: 180, adicional: 1.20 },
   }
 };
+
+// ── MULTI-UNIDADE I159 (fase 1) — soft; mudanças de isolamento vêm depois da tabela La Ville
+const MK_UNIDADE_DEFAULT_ = 'golden';
+const MK_UNIDADES_ = {
+  golden: {
+    id: 'golden',
+    nome: 'Golden Shopping Calhau',
+    ativa: true,
+    precosProntos: true
+  },
+  laville: {
+    id: 'laville',
+    nome: 'La Ville Mall',
+    ativa: false,
+    precosProntos: false,
+    bloqueioMotivo: 'Aguardando tabela de preços e frota'
+  }
+};
+
+function unidadeIdCanon_(id) {
+  const s = String(id || '').trim().toLowerCase();
+  if (s === 'golden' || s === 'g' || s === 'calhau') return 'golden';
+  if (s === 'laville' || s === 'la-ville' || s === 'la_ville' || s === 'lv') return 'laville';
+  return '';
+}
+
+/** Sem unidadeId / desconhecida / La Ville ainda bloqueada → golden (zero regressão). */
+function unidadeIdFrom_(p) {
+  const raw = p && (p.unidadeId != null ? p.unidadeId : (p.unidade != null ? p.unidade : p.unit));
+  const id = unidadeIdCanon_(raw);
+  if (!id) return MK_UNIDADE_DEFAULT_;
+  const u = MK_UNIDADES_[id];
+  if (!u || u.ativa === false || u.precosProntos === false) return MK_UNIDADE_DEFAULT_;
+  return id;
+}
+
+function unidadeMeta_(id) {
+  const c = unidadeIdCanon_(id) || MK_UNIDADE_DEFAULT_;
+  return MK_UNIDADES_[c] || MK_UNIDADES_[MK_UNIDADE_DEFAULT_];
+}
+
+function listarUnidadesMeta_() {
+  return Object.keys(MK_UNIDADES_).map(function (k) {
+    const u = MK_UNIDADES_[k];
+    return {
+      id: u.id,
+      nome: u.nome,
+      ativa: !!u.ativa,
+      precosProntos: !!u.precosProntos,
+      bloqueioMotivo: u.bloqueioMotivo || ''
+    };
+  });
+}
 
 // ── UTILITÁRIOS ───────────────────────────────────────────────
 // I125c: openById 1× por request (antes reabria a planilha em CADA sh_())
@@ -768,7 +822,9 @@ function ping_() {
     versao:  MK_GAS_VERSAO_,
     timestamp: fmtData_(agora) + ' ' + fmtHoraLocal_(agora),
     sistema: MK_GAS_SISTEMA_,
-    postWriteActions: WRITE_ACTIONS_CRITICAS_
+    postWriteActions: WRITE_ACTIONS_CRITICAS_,
+    unidadeDefault: MK_UNIDADE_DEFAULT_,
+    unidades: listarUnidadesMeta_()
   });
 }
 

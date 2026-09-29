@@ -1,14 +1,14 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 29/09/2026 · FE **v1.9.120** Pages ✅ · GAS ping **v1.5.221** · **I158** Golden FE ✅ publicado
+**Atualizado:** 29/09/2026 · FE **v1.9.121** Pages · GAS repo **v1.5.222** (ping Web ainda **v1.5.221** até Nova versão) · **I159** multi-unidade fundação · **I158** ✅
 
 ## Produção (agora)
 
 | Camada | Versão | Link |
 |--------|--------|------|
-| Frontend | **v1.9.120** | https://ribocg-a11y.github.io/movikids/?force=1.9.120 |
-| Gestão Pessoas | **v1.9.120** | `gestao-pessoas.html?force=1.9.120` |
-| GAS | ping **v1.5.221** = repo | **sem mudança** nesta entrega |
+| Frontend | **v1.9.121** | https://ribocg-a11y.github.io/movikids/?force=1.9.121 |
+| Gestão Pessoas | **v1.9.121** | `gestao-pessoas.html?force=1.9.121` |
+| GAS | ping Web **v1.5.221** · repo **v1.5.222** | Helpers I159 no repo; **Nova versão Web** quando isolar dados |
 | Design System | v1.1 | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
 
 **GAS raw:** https://raw.githubusercontent.com/ribocg-a11y/movikids/main/MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs  
@@ -101,13 +101,16 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 
 ## Próximo passo
 
-| # | Ação | Quem |
-|---|------|------|
-| 1 | PDF Golden setembro **prévia 29/09** (14.371 / 675 / CTO 1.500) | Agente | ✅ arquivo em `entregas/` — **não enviar** |
-| 1b | Regenerar e enviar o fechamento **01/10** | Sócio — admin FE 1.9.120 |
-| 2 | Tablet smoke D4 · `?force=1.9.120` | Ops |
-| 3 | Assinar FASE 17 (decisão 17.5 F9) | Sócio |
-| 4 | (Opcional) Alinhar `_gerarHtmlRelatorio_` no GAS — só com pedido §7.3 | Sócio+agente |
+| # | Ação | Quem | Status |
+|---|------|------|--------|
+| 0 | **I159** multi-unidade fundação (hub + `unidadeId`) | Agente | ✅ FE **v1.9.121** · La Ville bloqueada até tabela |
+| 1 | PDF Golden setembro prévia 29/09 | Agente | ✅ em `entregas/` — **não enviar** |
+| 1b | Regenerar/enviar fechamento **01/10** | Sócio | Admin FE 1.9.121 |
+| 2 | Entregar tabela preços/frota/CTO **La Ville** | Sócio | ⏳ desbloqueia unidade |
+| 3 | Tablet smoke D4 · `?force=1.9.121` | Ops | ⏳ |
+| 4 | Assinar FASE 17 (decisão 17.5 F9) | Sócio | ⏳ |
+
+**Plano:** `docs/ativos/PLANO_MULTI_UNIDADE_GOLDEN_LAVILLE_2026-09.md`
 
 ---
 
