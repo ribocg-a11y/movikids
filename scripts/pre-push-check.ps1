@@ -269,6 +269,8 @@ try {
       } else {
         Add-Check "guard.gas.carregarInicio.colY" "ok" "COL_LOC_READ_ via locSheetTail_/carregarInicio"
       }
+    } else {
+      Add-Check "guard.gas.carregarInicio.colY" "fail" "carregarInicio_ ausente no GAS"
     }
     if ($gasRaw -match 'function listarAtivas_[\s\S]{0,1200}getRange\([^\)]*,\s*26\)') {
       Add-Check "guard.gas.listarAtivas.colY" "fail" "listarAtivas getRange 26 cols (I43/I52)"
@@ -410,9 +412,6 @@ try {
       Add-Check "guard.pin.leak.fe" "fail" "PIN 1416 em index/gestao-pessoas/ui (I64)"
     } else {
       Add-Check "guard.pin.leak.fe" "ok" "UI producao sem PIN literal I64"
-    }
-    } else {
-      Add-Check "guard.gas.carregarInicio.colY" "fail" "carregarInicio_ ausente no GAS"
     }
     # I49 — VA teto R$400: gpVaMensalColab_ deve retornar teto (va_diario*só para log/trava)
     if ($gasRaw -notmatch 'function gpVaMensalTeto_') {
