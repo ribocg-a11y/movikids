@@ -521,14 +521,19 @@ function mkSessoesEncHoje_(list) {
 }
 
 function mkUpdateEncHojeKpis_(list) {
-  const raw = list || [];
+  /* I159g fix: guardar TODAS as encerradas (holding precisa Golden+La Ville).
+   * Filtrar só no tile do balcão (stat-nloc) pela unidade ativa. */
+  encHojeData = list || [];
   const uid = typeof mkUnidadeId_ === 'function' ? mkUnidadeId_() : 'golden';
-  encHojeData = (typeof mkSessionsPorUnidade_ === 'function')
-    ? mkSessionsPorUnidade_(raw, uid)
-    : raw;
+  const forBalcao = (typeof mkSessionsPorUnidade_ === 'function')
+    ? mkSessionsPorUnidade_(encHojeData, uid)
+    : encHojeData;
   const nLoc = document.getElementById('stat-nloc');
-  if (nLoc) nLoc.textContent = String(mkContasEncHoje_(encHojeData));
+  if (nLoc) nLoc.textContent = String(mkContasEncHoje_(forBalcao));
   if (typeof mkRefreshUnidadeUi_ === 'function') mkRefreshUnidadeUi_();
+  if (typeof renderHolding_ === 'function' && document.getElementById('page-holding')?.classList.contains('active')) {
+    try { renderHolding_(); } catch (eH) { /* ignore */ }
+  }
 }
 window.mkUpdateEncHojeKpis_ = mkUpdateEncHojeKpis_;
 window.mkContasEncHoje_ = mkContasEncHoje_;

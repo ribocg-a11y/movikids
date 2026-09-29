@@ -370,9 +370,8 @@
   function resetBalcaoParaUnidade_(uid) {
     var r = setUnidadeId(uid);
     if (!r || !r.ok) return r;
-    try {
-      if (typeof encHojeData !== 'undefined') w.encHojeData = [];
-    } catch (e1) { /* ignore */ }
+    /* Não apagar encHojeData global (holding usa as duas lojas).
+     * Só zera os tiles do balcão até o sync da unidade voltar. */
     try {
       if (typeof statsHoje !== 'undefined' && statsHoje) {
         statsHoje.n = 0;
@@ -380,11 +379,6 @@
         statsHoje.fat = 0;
       }
     } catch (e2) { /* ignore */ }
-    try {
-      if (Array.isArray(w.sessions) && typeof sessionsPorUnidade_ === 'function') {
-        w.sessions = sessionsPorUnidade_(w.sessions, uid);
-      }
-    } catch (e3) { /* ignore */ }
     var nLoc = document.getElementById('stat-nloc');
     if (nLoc) nLoc.textContent = '0';
     var nAt = document.getElementById('stat-ativas');
@@ -394,8 +388,15 @@
     if (typeof w.mkInvalidateInicioCache_ === 'function') {
       try { w.mkInvalidateInicioCache_(); } catch (e4) { /* ignore */ }
     }
+    var encU = [];
+    try {
+      if (typeof w.encHojeData !== 'undefined' && Array.isArray(w.encHojeData) && typeof sessionsPorUnidade_ === 'function') {
+        encU = sessionsPorUnidade_(w.encHojeData, uid);
+      }
+    } catch (e5) { /* ignore */ }
+    if (nLoc) nLoc.textContent = String(typeof w.mkContasEncHoje_ === 'function' ? w.mkContasEncHoje_(encU) : encU.length);
     if (typeof w.renderEncHoje === 'function') {
-      try { w.renderEncHoje([]); } catch (e5) { /* ignore */ }
+      try { w.renderEncHoje(encU); } catch (e6) { /* ignore */ }
     }
     refreshUnidadeUi_();
     return r;

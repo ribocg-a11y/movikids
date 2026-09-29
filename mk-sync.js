@@ -386,13 +386,25 @@ function sanitizarDadosInicioOperador_(d) {
   return d;
 }
 
+/** I159g: sync de uma loja não pode apagar enc/ativas da outra. */
+function mkMergeListaPorUnidade_(atual, incoming, uidResp) {
+  const uid = String(uidResp || 'all');
+  if (!uid || uid === 'all') return Array.isArray(incoming) ? incoming.slice() : [];
+  const kept = (atual || []).filter(function (s) {
+    const su = typeof mkUnidadeOfSession_ === 'function' ? mkUnidadeOfSession_(s) : 'golden';
+    return su !== uid;
+  });
+  return kept.concat(Array.isArray(incoming) ? incoming : []);
+}
+
 function aplicarDadosInicio(d) {
   try {
     if (!d || !Array.isArray(d.ativos)) return;
     /* I159g: resposta de outra loja (sync em voo) não pode sobrescrever KPIs do balcão atual. */
     const uidNow = typeof mkUnidadeId_ === 'function' ? mkUnidadeId_() : 'golden';
-    if (d.unidadeId && d.unidadeId !== 'all' && uidNow && uidNow !== 'all' && String(d.unidadeId) !== String(uidNow)) {
-      console.warn('[Sync] ignorando inicio unidade', d.unidadeId, '!=', uidNow);
+    const uidResp = d.unidadeId != null && d.unidadeId !== '' ? String(d.unidadeId) : 'all';
+    if (uidResp !== 'all' && uidNow && uidNow !== 'all' && uidResp !== String(uidNow)) {
+      console.warn('[Sync] ignorando inicio unidade', uidResp, '!=', uidNow);
       return;
     }
     if (d.operacaoConfig) {
@@ -409,7 +421,13 @@ function aplicarDadosInicio(d) {
     stored.forEach(s => storedMap[s.rowIndex] = s);
 
     const serverRows = new Set(d.ativos.map(s => s.rowIndex));
-    const cleanedStored = stored.filter(s => serverRows.has(s.rowIndex));
+    const cleanedStored = stored.filter(function (s) {
+      if (serverRows.has(s.rowIndex)) return true;
+      if (uidResp !== 'all' && typeof mkUnidadeOfSession_ === 'function') {
+        return mkUnidadeOfSession_(s) !== uidResp;
+      }
+      return false;
+    });
     if (cleanedStored.length !== stored.length) {
       try { localStorage.setItem('mk_sessions', JSON.stringify(cleanedStored)); } catch(e) {}
     }
@@ -422,10 +440,15 @@ function aplicarDadosInicio(d) {
     }
 
     if (d.encHoje && d.fonte !== 'firebase') {
-      if (!statsHoje.nSessoes && d.encHoje.length) statsHoje.nSessoes = d.encHoje.length;
-      if (typeof mkUpdateEncHojeKpis_ === 'function') mkUpdateEncHojeKpis_(d.encHoje);
+      const mergedEnc = mkMergeListaPorUnidade_(
+        typeof encHojeData !== 'undefined' ? encHojeData : [],
+        d.encHoje,
+        uidResp
+      );
+      if (!statsHoje.nSessoes && mergedEnc.length) statsHoje.nSessoes = mergedEnc.length;
+      if (typeof mkUpdateEncHojeKpis_ === 'function') mkUpdateEncHojeKpis_(mergedEnc);
       else {
-        encHojeData = d.encHoje;
+        encHojeData = mergedEnc;
         const nLoc = document.getElementById('stat-nloc');
         if (nLoc) {
           const nContas = typeof mkContasEncHoje_ === 'function'
@@ -456,7 +479,17 @@ function aplicarDadosInicio(d) {
       }
       return false;
     });
-    sessions = merged.concat(orphans);
+    if (uidResp !== 'all') {
+      const outras = (sessions || []).filter(function (s) {
+        if (!s || mergedRows.has(s.rowIndex)) return false;
+        return typeof mkUnidadeOfSession_ === 'function'
+          ? mkUnidadeOfSession_(s) !== uidResp
+          : true;
+      });
+      sessions = outras.concat(merged).concat(orphans);
+    } else {
+      sessions = merged.concat(orphans);
+    }
     saveSessions();
     if (fromListar && d.ativos.length === 0 && typeof mkInvalidateInicioCache_ === 'function') {
       mkInvalidateInicioCache_();
@@ -470,8 +503,11 @@ function aplicarDadosInicio(d) {
     }
 
     if (d.encHoje && d.fonte !== 'firebase') {
-      if (typeof renderEncHojeList_ === 'function') renderEncHojeList_(d.encHoje);
-      else if (typeof renderEncHoje === 'function') renderEncHoje(d.encHoje);
+      const encUi = (typeof mkSessionsPorUnidade_ === 'function' && uidNow && uidNow !== 'all')
+        ? mkSessionsPorUnidade_(encHojeData, uidNow)
+        : encHojeData;
+      if (typeof renderEncHojeList_ === 'function') renderEncHojeList_(encUi);
+      else if (typeof renderEncHoje === 'function') renderEncHoje(encUi);
     }
     atualizarVeiculoGrid();
     if (typeof renderHolding_ === 'function' && document.getElementById('page-holding')?.classList.contains('active')) {

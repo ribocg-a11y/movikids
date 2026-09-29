@@ -106,7 +106,13 @@ function showPage(name, opts = {}) {
       if (typeof atualizarVeiculoGrid === 'function') atualizarVeiculoGrid();
     }
   }
-  if (name==='holding' && typeof renderHolding_ === 'function') renderHolding_();
+  if (name === 'holding') {
+    /* Holding precisa encHoje de TODAS as lojas — sync force com unidadeId=all. */
+    if (typeof syncNow === 'function') {
+      try { syncNow(true); } catch (eHold) { /* ignore */ }
+    }
+    if (typeof renderHolding_ === 'function') renderHolding_();
+  }
   if (name==='relacionamento') carregarRelacionamento();
   if (name==='dashboard') {
     if (kpiData && kpiData.ok) renderCharts(kpiData);
