@@ -75,6 +75,10 @@ async function carregarRelacionamento() {
   const q = document.getElementById('rel-busca')?.value.trim() || '';
   const container = document.getElementById('rel-container');
   if (!container) return;
+  const pillsHost = document.getElementById('rel-dual-pills');
+  if (pillsHost && typeof mkDualMountPills_ === 'function') {
+    mkDualMountPills_(pillsHost, 'mkRelOnFiltro_');
+  }
 
   const cacheKey = 'mk_rel_' + (q || '_all');
   if (!q) {
@@ -121,13 +125,30 @@ async function carregarRelacionamento() {
   }
 }
 
+function mkRelOnFiltro_(id) {
+  if (typeof mkDualSetFiltro_ === 'function') mkDualSetFiltro_(id);
+  const container = document.getElementById('rel-container');
+  if (container) renderRelacionamentoList_(container);
+}
+window.mkRelOnFiltro_ = mkRelOnFiltro_;
+
 function renderRelacionamentoList_(container) {
   if (!container) return;
-  if (!relacionamentoCache.length) {
+  const filtro = typeof mkDualFiltro_ === 'function' ? mkDualFiltro_() : 'all';
+  let list = relacionamentoCache || [];
+  if (filtro && filtro !== 'all') {
+    list = list.filter(function (r) {
+      const veic = r.ultimoVeiculo || ((r.historico && r.historico[0] && r.historico[0].veiculo) || '');
+      const uid = typeof mkDualUidOf_ === 'function' ? mkDualUidOf_({ veiculo: veic, unidadeId: r.unidadeId }) : 'golden';
+      return uid === filtro;
+    });
+  }
+  if (!list.length) {
     container.innerHTML = '<div class="empty"><div class="empty-icon">👥</div><h3>Nenhum responsavel encontrado</h3><p>Tente outro nome ou telefone.</p></div>';
     return;
   }
-  container.innerHTML = relacionamentoCache.map((r, idx) => {
+  container.innerHTML = list.map((r) => {
+      const idx = relacionamentoCache.indexOf(r);
       const nome = String(r.responsavel || 'Responsavel sem nome').trim();
       const initial = escHtml((nome.charAt(0) || '?').toUpperCase());
       const kids = (r.criancas || []).map(c => `<span class="rel-kid mk-rel-tab">${escHtml(c)}</span>`).join('') || '<span class="rel-kid mk-rel-tab">Sem crianca</span>';
@@ -141,11 +162,14 @@ function renderRelacionamentoList_(container) {
       const locLabel = totalLoc === 1 ? 'locação' : 'locações';
       const canonBadge = r.cadastroCanonico ? '<span class="rel-badge" title="Cadastro na aba RESPONSAVEIS">Cadastro</span>' : '';
       const recBadge = r.recorrente ? '<span class="rel-badge rel-badge-rec" title="2 ou mais locacoes encerradas">Recorrente</span>' : '';
+      const veic = r.ultimoVeiculo || '';
+      const uid = typeof mkDualUidOf_ === 'function' ? mkDualUidOf_({ veiculo: veic, unidadeId: r.unidadeId }) : 'golden';
+      const uidBadge = '<span class="mk-uid-badge">' + (uid === 'laville' ? 'La Ville' : 'Golden') + '</span>';
       return `<div class="rel-card mk-rel-portal-card mk-glass-card">
         <div class="mk-rel-portal-head">
           <div class="mk-rel-avatar" aria-hidden="true">${initial}</div>
           <div class="mk-rel-portal-meta">
-            <div class="rel-name">${escHtml(nome)}${canonBadge}${recBadge}</div>
+            <div class="rel-name">${escHtml(nome)}${canonBadge}${recBadge}${uidBadge}</div>
             <div class="rel-phone">${relPhone_(r.telefone)}</div>
           </div>
           <div class="rel-metrics mk-rel-portal-stats">${totalLoc} ${locLabel}${encerradas ? (' · ' + encerradas + ' enc.') : ''}<br><strong>${relMoney_(r.faturamento)}</strong></div>

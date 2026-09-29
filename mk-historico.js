@@ -14,8 +14,12 @@ function isLocacaoTesteHist_(l) {
   return false;
 }
 
+function filtrarTestesHistorico_(locacoes) {
+  return (locacoes || []).filter(l => !isLocacaoTesteHist_(l));
+}
+
 function filtrarLocacoesHistorico_(locacoes) {
-  let list = (locacoes || []).filter(l => !isLocacaoTesteHist_(l));
+  let list = filtrarTestesHistorico_(locacoes);
   const filtro = typeof mkDualFiltro_ === 'function' ? mkDualFiltro_() : 'all';
   if (filtro && filtro !== 'all' && typeof mkDualUidOf_ === 'function') {
     list = list.filter(function (l) { return mkDualUidOf_(l) === filtro; });
@@ -72,21 +76,41 @@ function renderHistListLazy_(locacoes, container) {
 function aplicarHistorico_(res) {
   const container = document.getElementById('hist-container');
   if (!container) return;
+  histLocacoesAll = filtrarTestesHistorico_(res.locacoes);
   const limpo = Object.assign({}, res, { locacoes: filtrarLocacoesHistorico_(res.locacoes) });
-  histLocacoesAll = limpo.locacoes || [];
   renderAnalyticsCards(limpo.stats);
   renderHistExtChart_(limpo.stats);
   const vf = document.getElementById('hist-veiculo-filter')?.value || '';
-  const locs = vf ? histLocacoesAll.filter(l => l.veiculo === vf) : histLocacoesAll;
+  const locs = vf ? limpo.locacoes.filter(l => l.veiculo === vf) : limpo.locacoes;
   renderVrankSection(locs);
   renderHistListLazy_(locs, container);
 }
+
+function mkHistOnFiltro_(id) {
+  if (typeof mkDualSetFiltro_ === 'function') mkDualSetFiltro_(id);
+  if (histLocacoesAll && histLocacoesAll.length) {
+    const container = document.getElementById('hist-container');
+    if (!container) return;
+    const limpo = filtrarLocacoesHistorico_(histLocacoesAll);
+    const vf = document.getElementById('hist-veiculo-filter')?.value || '';
+    const locs = vf ? limpo.filter(l => l.veiculo === vf) : limpo;
+    renderVrankSection(locs);
+    renderHistListLazy_(locs, container);
+  } else if (typeof buscarHistorico === 'function') {
+    buscarHistorico();
+  }
+}
+window.mkHistOnFiltro_ = mkHistOnFiltro_;
 
 async function buscarHistorico() {
   const dates = getDates();
   if (!dates) { toast('Selecione as datas', 'error'); return; }
   const container = document.getElementById('hist-container');
   if (!container) return;
+  const pillsHost = document.getElementById('hist-dual-pills');
+  if (pillsHost && typeof mkDualMountPills_ === 'function') {
+    mkDualMountPills_(pillsHost, 'mkHistOnFiltro_');
+  }
 
   const cacheKey = histCacheKey_(dates);
   try {
