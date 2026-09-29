@@ -195,9 +195,10 @@ function adminLogin() {
   wireAdminIdleListeners_();
   if (!adminTimerInt) adminTimerInt = setInterval(tickAdmin, 1000);
   showAdminSidebar();
-  showPage('home');
+  showPage('holding');
   if (!kpiData) carregarKPIs();
   if (typeof syncController === 'function') syncController(false, 0);
+  setTimeout(function () { if (typeof renderHolding_ === 'function') renderHolding_(); }, 400);
   setTimeout(carregarHistRelatorios, 1500);
   setTimeout(carregarConfig, 2000);
   if (typeof refreshOperadoresAdmin_ === 'function') refreshOperadoresAdmin_();

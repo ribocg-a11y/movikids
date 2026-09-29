@@ -63,15 +63,19 @@ function mkPaginaGestaoPermitida_(name) {
 
 function showPage(name, opts = {}) {
   if (window.innerWidth < 1024) mobMenuClose_();
-  const adminPages = ['admin','sistema','operadores','dashboard','relatorio','historico','custos-historico','caixa','config'];
-  if (adminPages.includes(name) && !mkPaginaGestaoPermitida_(name)) { abrirAdmin(); return; }
+  const adminPages = ['admin','sistema','operadores','dashboard','relatorio','historico','custos-historico','caixa','config','holding'];
+  if (adminPages.includes(name) && name !== 'holding' && !mkPaginaGestaoPermitida_(name)) { abrirAdmin(); return; }
+  /* ADM: Home = visão holding (duas lojas). Balcão unitário só com adminBalcao. */
+  const isAdm = !!(window.isAdmin || (typeof mkAuthIsAdmin === 'function' && mkAuthIsAdmin()));
+  if (name === 'home' && isAdm && !opts.adminBalcao) name = 'holding';
+  if (name === 'holding' && !isAdm) { name = 'home'; }
   const wasNovaActive = !!document.getElementById('page-nova')?.classList.contains('active');
   if (wasNovaActive && name !== 'nova') salvarNovaDraft_();
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
   const pg = document.getElementById('page-'+name);
   if(pg) pg.classList.add('active');
-  const navMap = { home: 'nav-home', nova: 'nav-nova', painel: 'nav-painel', relacionamento: 'nav-menu', custos: 'nav-menu', lancamento: 'nav-menu' };
+  const navMap = { home: 'nav-home', holding: 'nav-home', nova: 'nav-nova', painel: 'nav-painel', relacionamento: 'nav-menu', custos: 'nav-menu', lancamento: 'nav-menu' };
   const navId = navMap[name];
   if (navId) document.getElementById(navId)?.classList.add('active');
   syncSidebar(name);
@@ -101,6 +105,7 @@ function showPage(name, opts = {}) {
       if (typeof atualizarVeiculoGrid === 'function') atualizarVeiculoGrid();
     }
   }
+  if (name==='holding' && typeof renderHolding_ === 'function') renderHolding_();
   if (name==='relacionamento') carregarRelacionamento();
   if (name==='dashboard') {
     if (kpiData && kpiData.ok) renderCharts(kpiData);
@@ -121,10 +126,22 @@ function showPage(name, opts = {}) {
 function syncSidebar(page) {
   document.querySelectorAll('.sb-btn').forEach(b => b.classList.remove('active'));
   const map = {
-    'home':'sbn-home','nova':'sbn-nova','relacionamento':'sbn-relacionamento','custos':'sbn-custos','painel':'sbn-painel','lancamento':'sbn-avulso',
+    'home':'sbn-home','holding':'sbn-holding','nova':'sbn-nova','relacionamento':'sbn-relacionamento','custos':'sbn-custos','painel':'sbn-painel','lancamento':'sbn-avulso',
     'admin':'sbn-adm','sistema':'sbn-sys','operadores':'sbn-ops','dashboard':'sbn-dash','relatorio':'sbn-rel','historico':'sbn-hist','custos-historico':'sbn-custos-hist','caixa':'sbn-caixa','config':'sbn-cfg'
   };
   if (map[page]) { const el=document.getElementById(map[page]); if(el) el.classList.add('active'); }
+  /* ADM: botão Lojas visível; Home do sidebar aponta para holding */
+  const isAdm = !!(window.isAdmin || (typeof mkAuthIsAdmin === 'function' && mkAuthIsAdmin()));
+  const holdBtn = document.getElementById('sbn-holding');
+  const homeBtn = document.getElementById('sbn-home');
+  if (holdBtn) holdBtn.hidden = !isAdm;
+  if (homeBtn && isAdm) {
+    homeBtn.innerHTML = '<span class="sb-icon">🏬</span>Lojas';
+    homeBtn.setAttribute('onclick', "showPage('holding')");
+  } else if (homeBtn) {
+    homeBtn.innerHTML = '<span class="sb-icon">🏠</span>Home';
+    homeBtn.setAttribute('onclick', "showPage('home')");
+  }
 }
 
 function syncSidebarStatus(online) {

@@ -454,6 +454,9 @@ function aplicarDadosInicio(d) {
       else if (typeof renderEncHoje === 'function') renderEncHoje(d.encHoje);
     }
     atualizarVeiculoGrid();
+    if (typeof renderHolding_ === 'function' && document.getElementById('page-holding')?.classList.contains('active')) {
+      renderHolding_();
+    }
 
     if (d.custosHoje) { custosHoje = d.custosHoje; renderCustos(); }
     else loadCustosHoje();

@@ -254,6 +254,21 @@
   w.mkUnidadePrecisaEscolher_ = precisaEscolherUnidade_;
   w.mkUnidadeApiParams_ = apiParamsUnidade_;
   w.mkUnidadeAtivarLaVille_ = ativarLaVilleQuandoPronta_;
+  function unidadeIdFromVeiculo_(veiculo) {
+    var v = String(veiculo || '').trim();
+    if (v.indexOf('LV ') === 0) return 'laville';
+    return DEFAULT_ID;
+  }
+
+  function sessionsPorUnidade_(lista, uid) {
+    var id = canon_(uid) || DEFAULT_ID;
+    return (lista || []).filter(function (s) {
+      return unidadeIdFromVeiculo_(s && s.veiculo) === id;
+    });
+  }
+
+  w.mkUnidadeFromVeiculo_ = unidadeIdFromVeiculo_;
+  w.mkSessionsPorUnidade_ = sessionsPorUnidade_;
   w.mkUnidadeAplicarConfig_ = aplicarConfigLocal_;
   w.mkUnidadeSyncAposGas_ = syncAposGasConfig_;
 

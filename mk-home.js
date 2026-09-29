@@ -14,6 +14,11 @@ var TODOS_VEICULOS_DEF = [
   {nome:'Pelúcia 04', tipo:'Pelúcia'},
 ];
 function updateUI() {
+  const holdOn = !!document.getElementById('page-holding')?.classList.contains('active');
+  if (holdOn && typeof renderHolding_ === 'function') {
+    renderHolding_();
+    return;
+  }
   renderCards();
   updateStats();
   // atualizarVeiculoGrid: chamada apenas quando necessário (não a cada 1s)

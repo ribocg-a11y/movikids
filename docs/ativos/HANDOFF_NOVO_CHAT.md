@@ -1,14 +1,14 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 29/09/2026 · FE **v1.9.123** Pages · GAS repo **v1.5.223** (ping Web ainda **v1.5.221** até Nova versão) · **I159c** · hub 3+2 portas · **I158** ✅
+**Atualizado:** 29/09/2026 · FE **v1.9.124** Pages · GAS repo **v1.5.223** · **I159d** painel holding ADM (2 lojas) · hub 3+2 · **I158** ✅
 
 ## Produção (agora)
 
 | Camada | Versão | Link |
 |--------|--------|------|
-| Frontend | **v1.9.123** | https://ribocg-a11y.github.io/movikids/?force=1.9.123 |
-| Gestão Pessoas | **v1.9.123** | `gestao-pessoas.html?force=1.9.123` |
-| GAS | ping Web **v1.5.221** · repo **v1.5.223** | I159c no repo — **Nova versão Web** para validar LV* |
+| Frontend | **v1.9.124** | https://ribocg-a11y.github.io/movikids/?force=1.9.124 |
+| Gestão Pessoas | **v1.9.124** | `gestao-pessoas.html?force=1.9.124` |
+| GAS | ping Web (confirmar **v1.5.223**) · repo **v1.5.223** | I159c La Ville |
 | Design System | v1.1 | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
 
 **GAS raw:** https://raw.githubusercontent.com/ribocg-a11y/movikids/main/MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs  
@@ -107,7 +107,8 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 | 0b | **I159b** tabelas La Ville no FE | Agente | ✅ FE **v1.9.122** · frota provisória LV* |
 | 0c | Confirmar **quantidade** frota + CTO e-mail La Ville | Sócio | ⏳ |
 | 0d | **I159c** GAS preços/frota por `unidadeId` | Agente | ✅ repo **v1.5.223** — falta **Nova versão Web** |
-| 0e | Sócio: colar raw + Nova versão Web (mesmo Deploy ID) | Sócio | ⏳ liberar lançamentos LV |
+| 0e | Sócio: Nova versão Web GAS | Sócio | ✅ publicada (sessão) |
+| 0f | **I159d** painel holding ADM (Golden \| La Ville) | Agente | ✅ FE **v1.9.124** |
 | 1 | PDF Golden setembro prévia 29/09 | Agente | ✅ em `entregas/` — **não enviar** |
 | 1b | Regenerar/enviar fechamento **01/10** | Sócio | Admin FE 1.9.122 |
 | 3 | Tablet smoke D4 · `?force=1.9.122` | Ops | ⏳ |
