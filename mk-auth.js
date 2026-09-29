@@ -508,19 +508,32 @@
     mkHubRenderUnidades_();
   };
 
-  function mkHubApplyBranding_() {
-    var sub = (typeof mkUnidadeSubLinha_ === 'function')
-      ? ('Tablet na loja · ' + mkUnidadeSubLinha_())
-      : 'Tablet na loja';
+  function mkHubApplyBranding_(modo) {
+    /* modo: 'unidades' | 'portas' — nunca mostrar unidade default sob a logo no seletor */
     var logo = document.getElementById('mk-hub-logo-sub');
-    if (logo) logo.textContent = sub;
+    if (logo) {
+      if (modo === 'unidades') {
+        logo.textContent = 'Escolha a unidade';
+      } else if (modo === 'portas') {
+        var nome = (typeof mkUnidadeLabel_ === 'function') ? mkUnidadeLabel_() : '';
+        logo.textContent = nome || 'MOVI KIDS';
+      }
+    }
     var authSub = document.getElementById('mk-auth-logo-sub');
     if (authSub) {
-      var nome = (typeof mkUnidadeLabel_ === 'function') ? mkUnidadeLabel_() : '';
-      authSub.textContent = nome ? (nome + ' · Acesso operacional') : 'Acesso operacional';
+      var nomeAuth = (typeof mkUnidadeLabel_ === 'function') ? mkUnidadeLabel_() : '';
+      var temEscolha = false;
+      try { temEscolha = !!localStorage.getItem('mk_unidade_ativa_v1'); } catch (eA) { /* ignore */ }
+      authSub.textContent = (temEscolha && nomeAuth)
+        ? (nomeAuth + ' · Acesso operacional')
+        : 'Acesso operacional';
     }
     var brand = document.querySelector('.brand-sub');
-    if (brand && typeof mkUnidadeLabel_ === 'function') brand.textContent = mkUnidadeLabel_();
+    if (brand && typeof mkUnidadeLabel_ === 'function') {
+      try {
+        if (localStorage.getItem('mk_unidade_ativa_v1')) brand.textContent = mkUnidadeLabel_();
+      } catch (eB) { /* ignore */ }
+    }
   }
 
   function mkHubShowPortas_(showPortas) {
@@ -528,7 +541,7 @@
     var pBox = document.getElementById('mk-hub-portas');
     if (uBox) uBox.style.display = showPortas ? 'none' : '';
     if (pBox) pBox.style.display = showPortas ? '' : 'none';
-    mkHubApplyBranding_();
+    mkHubApplyBranding_(showPortas ? 'portas' : 'unidades');
   }
 
   function mkHubRenderUnidades_() {
@@ -586,8 +599,6 @@
       list.appendChild(btn);
     });
     if (mostrarSeletor) {
-      var logo = document.getElementById('mk-hub-logo-sub');
-      if (logo) logo.textContent = 'Escolha a unidade';
       mkHubShowPortas_(false);
     } else {
       mkHubShowPortas_(true);
@@ -1082,13 +1093,14 @@
       hideApp();
       showGate(true);
       showStep('mk-step-select');
-      mkHubApplyBranding_();
+      mkHubApplyBranding_('portas');
       loadOperadores().catch(() => renderOpList(false));
     });
     document.getElementById('mk-hub-colab')?.addEventListener('click', () => {
       if (typeof mkAbrirColaboradores_ === 'function') mkAbrirColaboradores_();
     });
     document.getElementById('mk-hub-admin')?.addEventListener('click', () => {
+      showHub(false);
       hideApp();
       showGate(true);
       showErr('mk-admin-err', '');

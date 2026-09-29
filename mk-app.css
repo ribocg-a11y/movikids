@@ -95,8 +95,19 @@ html,body{height:100%;background:var(--bg);color:var(--txt);overflow:hidden}
 #mk-tablet-hub .mk-hub-doors--unidades{
   grid-template-columns:1fr;
 }
+#mk-tablet-hub .mk-hub-unidade-list{
+  display:contents;
+}
 @media (min-width:640px){
   #mk-tablet-hub .mk-hub-doors--unidades{
+    grid-template-columns:repeat(3,minmax(0,1fr));
+  }
+}
+#mk-tablet-hub .mk-hub-doors--duas{
+  grid-template-columns:1fr;
+}
+@media (min-width:640px){
+  #mk-tablet-hub .mk-hub-doors--duas{
     grid-template-columns:repeat(2,minmax(0,1fr));
   }
 }

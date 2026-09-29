@@ -1,13 +1,13 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 29/09/2026 · FE **v1.9.122** Pages · GAS repo **v1.5.223** (ping Web ainda **v1.5.221** até Nova versão) · **I159c** La Ville no GAS · **I158** ✅
+**Atualizado:** 29/09/2026 · FE **v1.9.123** Pages · GAS repo **v1.5.223** (ping Web ainda **v1.5.221** até Nova versão) · **I159c** · hub 3+2 portas · **I158** ✅
 
 ## Produção (agora)
 
 | Camada | Versão | Link |
 |--------|--------|------|
-| Frontend | **v1.9.122** | https://ribocg-a11y.github.io/movikids/?force=1.9.122 |
-| Gestão Pessoas | **v1.9.122** | `gestao-pessoas.html?force=1.9.122` |
+| Frontend | **v1.9.123** | https://ribocg-a11y.github.io/movikids/?force=1.9.123 |
+| Gestão Pessoas | **v1.9.123** | `gestao-pessoas.html?force=1.9.123` |
 | GAS | ping Web **v1.5.221** · repo **v1.5.223** | I159c no repo — **Nova versão Web** para validar LV* |
 | Design System | v1.1 | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
 
