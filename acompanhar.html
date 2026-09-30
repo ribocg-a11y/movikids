@@ -9,12 +9,12 @@
 <meta name="robots" content="noindex,nofollow">
 <title>Movi Kids — Acompanhar</title>
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<script src="mk-version.js?v=1.9.107"></script>
-<script src="mk-canonical-host.js?v=1.9.107"></script>
+<script src="mk-version.js?v=1.9.148"></script>
+<script src="mk-canonical-host.js?v=1.9.148"></script>
 <script>
 /* Portal: bust cache sem perder ?tel= (mk-cache-bust do balcão descarta query) */
 (function () {
-  var CURRENT = (window.MK_VERSION || '1.9.107');
+  var CURRENT = (window.MK_VERSION || '1.9.148');
   var KEY = 'mk_portal_loaded_version';
   try {
     var stored = localStorage.getItem(KEY) || '';
@@ -40,20 +40,36 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="mk-design.css?v=1.9.107">
+<link rel="stylesheet" href="mk-design.css?v=1.9.148">
 </head>
 <body class="mk-portal-page" data-view="gate">
 
 <div class="mk-portal-glow" aria-hidden="true"></div>
-<div class="mk-portal-deco" aria-hidden="true"></div>
+<div class="mk-portal-forest" aria-hidden="true">
+  <div class="mk-portal-sky"></div>
+  <div class="mk-portal-canopy"></div>
+  <div class="mk-portal-fireflies"></div>
+  <div class="mk-portal-friends">
+    <span class="mk-portal-friend mk-portal-friend--dino" title="">🦕</span>
+    <span class="mk-portal-friend mk-portal-friend--car" title="">🚗</span>
+    <span class="mk-portal-friend mk-portal-friend--plush" title="">🧸</span>
+    <span class="mk-portal-friend mk-portal-friend--drift" title="">🏎️</span>
+  </div>
+  <div class="mk-portal-ground"></div>
+</div>
 
 <!-- Entrada: só telefone -->
 <section class="mk-portal-gate" id="sec-gate">
-  <p class="mk-portal-gate-title">Quanto tempo falta? ⏱️</p>
+  <div class="mk-portal-brand-wrap">
+    <img class="mk-brand-img mk-brand-img--md" src="assets/logo-movi-kids.png" width="1080" height="1080" alt="Movi Kids" decoding="async">
+  </div>
+  <p class="mk-portal-gate-kicker">Floresta Movi Kids</p>
+  <p class="mk-portal-gate-title">Quanto tempo falta na aventura?</p>
+  <p class="mk-portal-gate-sub">Dinos, carrinhos e pelúcias — digite o telefone e acompanhe</p>
   <div class="mk-portal-gate-form">
     <input id="telefone" class="mk-portal-input" type="tel" inputmode="tel" autocomplete="tel"
       placeholder="Seu telefone com DDD" maxlength="16" aria-label="Telefone com DDD">
-    <button type="button" class="mk-portal-btn" id="btn">Ver tempo</button>
+    <button type="button" class="mk-portal-btn" id="btn">Entrar na floresta</button>
   </div>
   <p class="mk-portal-gate-err" id="status" role="status" aria-live="polite"></p>
 </section>
@@ -90,9 +106,37 @@ function maskTelInput(raw) {
   return '(' + d.slice(0, 2) + ') ' + d.slice(2, 7) + '-' + d.slice(7);
 }
 function tipoIcon(tipo) {
-  if (String(tipo).indexOf('Triciclo') >= 0) return '🛺';
-  if (String(tipo).indexOf('Pel') >= 0) return '🧸';
+  const t = String(tipo || '');
+  if (/dino/i.test(t)) return '🦕';
+  if (/drift/i.test(t)) return '🏎️';
+  if (t.indexOf('Triciclo') >= 0) return '🛺';
+  if (t.indexOf('Pel') >= 0) return '🧸';
   return '🚗';
+}
+/** I163 — loja da locação (FE: prefixo LV / unidadeId se vier do GAS). */
+function unidadeOfLoc_(l) {
+  if (!l) return 'golden';
+  const raw = l.unidadeId != null ? l.unidadeId : l.unidade;
+  if (String(raw || '').toLowerCase() === 'laville') return 'laville';
+  const v = String(l.veiculo || '').trim();
+  if (v.indexOf('LV ') === 0 || /^LV\b/i.test(v)) return 'laville';
+  return 'golden';
+}
+function unidadeLabelCurto_(uid) {
+  return uid === 'laville' ? 'La Ville' : 'Golden';
+}
+function veiculoLabelPortal_(nome) {
+  const s = String(nome || '').trim();
+  if (s.indexOf('LV ') === 0) return s.slice(3);
+  return s;
+}
+function rideKind_(l) {
+  const t = String((l && l.tipo) || '') + ' ' + String((l && l.veiculo) || '');
+  if (/dino/i.test(t)) return 'dino';
+  if (/pel/i.test(t)) return 'plush';
+  if (/drift/i.test(t)) return 'drift';
+  if (/triciclo/i.test(t)) return 'tri';
+  return 'car';
 }
 const PLAN_LABELS = { '10min': '10 min', '20min': '20 min', '30min': '30 min', '40min': '40 min', '60min': '1 hora', '3h': '3 horas' };
 function planoLabel_(plano) {
@@ -131,7 +175,8 @@ function infoBasicaHtml_(l) {
   const plano = planoLabel_(l.plano);
   const ext = Number(l.extendedMins || 0);
   const planoTxt = ext > 0 ? plano + ' +' + ext + ' min' : plano;
-  const veic = esc(l.veiculo || l.tipo || '—');
+  const veic = esc(veiculoLabelPortal_(l.veiculo) || l.tipo || '—');
+  const loja = unidadeLabelCurto_(unidadeOfLoc_(l));
   const st = esc(l.status || '—');
   const stCls = statusClass_(l.status);
   return `<div class="mk-portal-info-bar">
@@ -142,13 +187,13 @@ function infoBasicaHtml_(l) {
     </div>
     <div class="mk-portal-info-cell">
       <span class="mk-portal-info-ico" aria-hidden="true">${tipoIcon(l.tipo)}</span>
-      <span class="mk-portal-info-lbl">Veículo</span>
+      <span class="mk-portal-info-lbl">Brinquedo</span>
       <strong>${veic}</strong>
     </div>
     <div class="mk-portal-info-cell">
-      <span class="mk-portal-info-ico" aria-hidden="true">🛡️</span>
-      <span class="mk-portal-info-lbl">Status</span>
-      <strong class="mk-portal-status ${stCls}">${st}</strong>
+      <span class="mk-portal-info-ico" aria-hidden="true">📍</span>
+      <span class="mk-portal-info-lbl">Loja</span>
+      <strong class="mk-portal-status ${stCls}">${esc(loja)}</strong>
     </div>
   </div>`;
 }
@@ -170,7 +215,9 @@ function locStats_(l) {
   const quase = warn;
   const lbl = extra ? 'Tempo extra' : (pend ? 'Já já começa' : (quase ? 'Quase lá!' : 'Falta'));
   const lblUpper = extra ? 'TEMPO EXTRA' : (pend ? 'JÁ JÁ COMEÇA' : (quase ? 'QUASE LÁ!' : 'FALTA'));
-  const cardCls = 'mk-portal-play' + (extra ? ' is-extra' : '') + (warn ? ' is-warn' : '') + (pend ? ' is-wait' : '');
+  const ride = rideKind_(l);
+  const cardCls = 'mk-portal-play mk-portal-play--' + ride
+    + (extra ? ' is-extra' : '') + (warn ? ' is-warn' : '') + (pend ? ' is-wait' : '');
   const elapsedFrac = (!extra && !pend && totalSec > 0)
     ? (1 - Math.max(0, Math.min(1, rem / totalSec)))
     : (extra || pend ? 1 : 0);
@@ -178,7 +225,7 @@ function locStats_(l) {
   const nearEnd = !extra && !pend && rem > 0 && rem <= 120;
   return {
     rem, totalSec, extra, pend, warn, quase, mid, nearEnd, elapsedFrac,
-    ringClass, timeTxt, dash, lbl, lblUpper, cardCls
+    ringClass, timeTxt, dash, lbl, lblUpper, cardCls, ride
   };
 }
 function readTrophies_() {
@@ -480,20 +527,31 @@ function render() {
     ? `<p class="mk-portal-alert${alert.extra ? ' is-extra' : ''}">${esc(alert.text)}</p>`
     : '';
   const fotoMuted = stats.pend ? ' style="opacity:.55"' : '';
+  const uid = unidadeOfLoc_(atual);
+  const lojasNoTel = {};
+  locacoes.forEach(function (x) { lojasNoTel[unidadeOfLoc_(x)] = 1; });
+  const multiLoja = Object.keys(lojasNoTel).length > 1;
+  const lojaChip = `<span class="mk-portal-loja mk-portal-loja--${uid}">📍 ${esc(unidadeLabelCurto_(uid))}${multiLoja ? ' · neste telefone há mais de uma loja' : ''}</span>`;
+  const rideBadge = `<span class="mk-portal-ride-badge" aria-hidden="true">${tipoIcon(atual.tipo)}</span>`;
 
   box.innerHTML = `<div class="mk-portal-carousel">
+    <div class="mk-portal-brand-wrap mk-portal-brand-wrap--play">
+      <img class="mk-brand-img mk-brand-img--xs" src="assets/logo-movi-kids.png" width="1080" height="1080" alt="Movi Kids" decoding="async">
+    </div>
     <p class="mk-portal-subtitle">📱 ${esc(telFmt)} · ${brincandoLabel_(n)} · <button type="button" class="mk-portal-tel-link" id="btn-trocar-tel">Trocar telefone</button></p>
+    ${lojaChip}
     ${tabs ? `<div class="mk-portal-tabs" role="tablist">${tabs}</div>` : ''}
     ${n > 1 ? `<p class="mk-portal-counter">Criança ${_carouselIdx + 1} de ${n}</p>` : ''}
     ${alertHtml}
     <article class="${stats.cardCls}">
       <div class="mk-portal-play-hero">
+        ${rideBadge}
         ${avatarHtml_(atual.crianca, 'lg')}
         ${n === 1 ? `<div class="mk-portal-play-name">${esc(atual.crianca)}</div>` : ''}
       </div>
       ${milestone}
       ${ringBlockHtml_(stats)}
-      ${stats.pend ? '<p class="mk-portal-play-msg">Preparando o veículo…</p>' : ''}
+      ${stats.pend ? '<p class="mk-portal-play-msg">Preparando a aventura na floresta…</p>' : ''}
       ${coachHtml_(coach)}
       ${infoBasicaHtml_(atual)}
       ${trophyHtml}

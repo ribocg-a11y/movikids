@@ -1,13 +1,13 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 30/09/2026 · FE **v1.9.147** · GAS **v1.5.231** · **I162c** sem GET extra sessão · I162b balcão · I162 logo · **I161** ✅ · **I160** ✅
+**Atualizado:** 30/09/2026 · FE **v1.9.148** · GAS **v1.5.231** · **I163** portal floresta · I162c · I162 logo · **I161** ✅ · **I160** ✅
 
 ## Produção (agora)
 
 | Camada | Versão | Link |
 |--------|--------|------|
-| Frontend | **v1.9.147** | https://ribocg-a11y.github.io/movikids/?force=1.9.147 |
-| Gestão Pessoas | **v1.9.147** | `gestao-pessoas.html?force=1.9.147` |
+| Frontend | **v1.9.148** | https://ribocg-a11y.github.io/movikids/?force=1.9.148 |
+| Gestão Pessoas | **v1.9.148** | `gestao-pessoas.html?force=1.9.148` |
 | GAS | ping Web **v1.5.231** ✅ | I160 escala null + I159t LV |
 | Design System | v1.1 | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
 
@@ -45,7 +45,7 @@
 | **E** | Tablet smoke D4 · PDF Golden 01/10 · FASE 17 | Ops/Sócio | Ops |
 | **F** | ~~GAS lookback `resumoDia`~~ | ✅ Web **v1.5.226** | dia = cauda 600 |
 
-**Nova versão Web:** ✅ ping **v1.5.231** (I160). FE **v1.9.147** **I162** — logo dino (PNG transparente) + card balcão mostra loja do **operador** (OPS col I / RH col T), não a loja do tablet. **I161** Holding×Balcão. Suite: `entregas/DIAGNOSTICO_LAVILLE_SUITE40_2026-09-30.md`.
+**Nova versão Web:** ✅ ping **v1.5.231** (I160). FE **v1.9.148** **I162** — logo dino (PNG transparente) + card balcão mostra loja do **operador** (OPS col I / RH col T), não a loja do tablet. **I161** Holding×Balcão. Suite: `entregas/DIAGNOSTICO_LAVILLE_SUITE40_2026-09-30.md`.
 
 ### I162 / I162b / I162c — Logo + sessão por loja (smoke PC)
 

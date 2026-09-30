@@ -103,7 +103,7 @@ Portal inclui também Nunito 400.
 | `--pink` | `#F06292` | Acentos |
 | `--orange` | `#FF8A65` | Tempo extra |
 
-**Fundo portal:** gradiente vertical `#1a237e` → `#1565c0` + `.mk-portal-deco` + `.mk-portal-glow`.
+**Fundo portal (I163):** floresta — céu → clareira → chão verde + `.mk-portal-forest` (canopy/fireflies/friends) + `.mk-portal-glow`. Chip loja `.mk-portal-loja--golden|laville`.
 
 ### 3.3 Cores — Admin FASE 9
 
@@ -379,8 +379,8 @@ Nível 3 — DETALHE  → plano, histórico, accordion, tabela secundária
 
 | Vista | Componentes |
 |-------|-------------|
-| Gate | `.mk-portal-gate`, input tel, `.mk-portal-btn` |
-| Play | carrossel, tabs, alert, ring hero, info-bar, others |
+| Gate | logo dino, `.mk-portal-gate`, floresta, input tel, `.mk-portal-btn` |
+| Play | chip loja, carrossel, ride badge, ring hero, info-bar (loja), others |
 
 ### 8.3 `gestao-pessoas.html` — Colaboradores
 
