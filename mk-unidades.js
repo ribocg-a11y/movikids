@@ -319,9 +319,17 @@
     });
   }
 
+  /** Label amigável no balcão — esconde prefixo técnico "LV " (ID interno permanece com LV). */
+  function veiculoLabelUi_(nome) {
+    var s = String(nome || '').trim();
+    if (s.indexOf('LV ') === 0) return s.slice(3);
+    return s;
+  }
+
   w.mkUnidadeFromVeiculo_ = unidadeIdFromVeiculo_;
   w.mkUnidadeOfSession_ = unidadeIdOfSession_;
   w.mkSessionsPorUnidade_ = sessionsPorUnidade_;
+  w.mkVeiculoLabelUi_ = veiculoLabelUi_;
   w.mkUnidadeAplicarConfig_ = aplicarConfigLocal_;
   w.mkUnidadeSyncAposGas_ = syncAposGasConfig_;
 

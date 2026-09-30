@@ -80,7 +80,7 @@ function buildCard(s) {
       <div class="sc-top">
         <div class="sc-tipo">
           <span class="sc-tipo-icon">${icon}</span>
-          <span class="sc-tipo-name">${s.veiculo || s.tipo}</span>
+          <span class="sc-tipo-name">${(typeof mkVeiculoLabelUi_ === 'function' ? mkVeiculoLabelUi_(s.veiculo) : s.veiculo) || s.tipo}</span>
         </div>
         <div class="sc-head-actions">
           <span class="sc-plano-badge ${badgeCls}">${s.plano}</span>
@@ -100,7 +100,7 @@ function buildCard(s) {
       <div class="sc-top">
         <div class="sc-tipo">
           <span class="sc-tipo-icon">${icon}</span>
-          <span class="sc-tipo-name">${s.veiculo || s.tipo}</span>
+          <span class="sc-tipo-name">${(typeof mkVeiculoLabelUi_ === 'function' ? mkVeiculoLabelUi_(s.veiculo) : s.veiculo) || s.tipo}</span>
         </div>
         <div class="sc-head-actions">
           <span class="sc-plano-badge ${badgeCls}">${s.plano}</span>
@@ -356,13 +356,14 @@ window.mkPainelOnFiltro_ = mkPainelOnFiltro_;
 
 function buildPainelCard(nome, tipo, s) {
   const icon    = tipoIcon(tipo);
-  const nomeShort = nome.replace('Pelúcia', 'Pel.'); // abreviação para card compacto
+  const nomeUi  = (typeof mkVeiculoLabelUi_ === 'function') ? mkVeiculoLabelUi_(nome) : nome;
+  const nomeShort = nomeUi.replace('Pelúcia', 'Pel.'); // abreviação para card compacto
 
   // ── LIVRE ───────────────────────────────────────────────
   if (!s) {
     return `<div class="pcard livre mk-tile">
       <div class="pcard-icon">${icon}</div>
-      <div class="pcard-name">${nome}</div>
+      <div class="pcard-name">${nomeUi}</div>
       <div class="pcard-status">✓ Livre</div>
       <button class="pcard-btn nova" onclick="iniciarNovaPeloVeiculo('${escHtml(nome)}','${tipo}')">➕ Nova</button>
     </div>`;
@@ -373,7 +374,7 @@ function buildPainelCard(nome, tipo, s) {
     return `<div class="pcard pendente mk-tile" style="position:relative;overflow:visible">
       <div style="position:absolute;right:6px;top:6px">${menuLocacaoHtml_(s, false)}</div>
       <div class="pcard-icon">${icon}</div>
-      <div class="pcard-name">${nome}</div>
+      <div class="pcard-name">${nomeUi}</div>
       <div class="pcard-status">⏸ Aguardando</div>
       <div class="pcard-frozen">${fmtTime(s.mins * 60)}</div>
       <div class="pcard-crianca">${escHtml(s.crianca)}</div>
@@ -426,7 +427,7 @@ function buildPainelCard(nome, tipo, s) {
   return `<div class="${cardCls} mk-tile" style="position:relative;overflow:visible">
     <div style="position:absolute;right:6px;top:6px">${menuLocacaoHtml_(s, true)}</div>
     <div class="pcard-icon">${icon}</div>
-    <div class="pcard-name">${nome}</div>
+    <div class="pcard-name">${nomeUi}</div>
     ${progressBar}
     <div class="${timerCls}">${timerTxt}</div>
     <div class="pcard-sublabel">${subLbl}</div>

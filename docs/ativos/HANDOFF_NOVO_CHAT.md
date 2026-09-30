@@ -1,14 +1,14 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 30/09/2026 · FE **v1.9.137** Pages · GAS repo **v1.5.226** · Web **pendente Nova versão** · **I159n** · **I158** ✅
+**Atualizado:** 30/09/2026 · FE **v1.9.138** Pages · GAS Web **v1.5.226** ✅ · **I159o** label UI sem LV · **I158** ✅
 
 ## Produção (agora)
 
 | Camada | Versão | Link |
 |--------|--------|------|
-| Frontend | **v1.9.137** | https://ribocg-a11y.github.io/movikids/?force=1.9.137 |
-| Gestão Pessoas | **v1.9.137** | `gestao-pessoas.html?force=1.9.137` |
-| GAS | ping Web **v1.5.225** · repo **v1.5.226** ⏳ | I159n frota + lookback |
+| Frontend | **v1.9.138** | https://ribocg-a11y.github.io/movikids/?force=1.9.138 |
+| Gestão Pessoas | **v1.9.138** | `gestao-pessoas.html?force=1.9.138` |
+| GAS | ping Web **v1.5.226** ✅ · repo **v1.5.226** | I159n frota + lookback |
 | Design System | v1.1 | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
 
 **GAS raw:** https://raw.githubusercontent.com/ribocg-a11y/movikids/main/MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs  
@@ -41,11 +41,11 @@
 |---|------|------|----------|
 | **B** | ~~Backfill `unidade_id` LOCAÇÕES~~ | ✅ 29/09 | **3947** linhas atualizadas / 3950 lidas (`backfillUnidadeIdLocacoesAdmin`) |
 | **C** | Smoke PC: Holding filtro · Caixa Golden ≠ 0 · Avulso tipos LV · balcão LV 0 | Ops/PC | FE **v1.9.135** |
-| **D** | ~~Frota La Ville quantidades~~ · e-mail CTO ainda | ✅ FE+GAS repo 1.9.137 / **v1.5.226** | Web: **Nova versão** sócio |
+| **D** | ~~Frota La Ville~~ · e-mail CTO ainda | ✅ FE+GAS **v1.5.226** | label UI **I159o** (sem LV na tela) |
 | **E** | Tablet smoke D4 · PDF Golden 01/10 · FASE 17 | Ops/Sócio | Ops |
-| **F** | ~~GAS lookback `resumoDia`~~ | ✅ repo **v1.5.226** (dia = cauda 600) | Web: **Nova versão** |
+| **F** | ~~GAS lookback `resumoDia`~~ | ✅ Web **v1.5.226** | dia = cauda 600 |
 
-**Nova versão Web:** ⏳ publicar **v1.5.226** (frota LV oficial + resumoDia lookback). Ping ainda **v1.5.225** até o sócio.
+**Nova versão Web:** ✅ ping **v1.5.226** (30/09). FE **v1.9.138** — cards La Ville mostram `Carro 01` (ID interno `LV Carro 01`).
 
 ### Planilha Google (multi-unidade) — o que mudou / falta
 

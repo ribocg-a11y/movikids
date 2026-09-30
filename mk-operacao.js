@@ -48,7 +48,7 @@ function showAlertModal(s, expired) {
 
   const icon   = tipoIcon(s.tipo);
   let alertHtml =
-    '<div class="modal-info-row"><span>' + icon + ' ' + (s.veiculo||s.tipo) + '</span><span>' + s.plano + '</span></div>' +
+    '<div class="modal-info-row"><span>' + icon + ' ' + ((typeof mkVeiculoLabelUi_ === 'function' ? mkVeiculoLabelUi_(s.veiculo) : s.veiculo) || s.tipo) + '</span><span>' + s.plano + '</span></div>' +
     '<div class="modal-info-row"><span>Criança</span><span>' + s.crianca + '</span></div>' +
     '<div class="modal-info-row"><span>Responsável</span><span>' + s.responsavel + '</span></div>';
   if (mkExibirFinanceiro_()) {
@@ -258,7 +258,7 @@ function renderOperacaoLocacaoForm_(rowIndex, tipo, bodyId) {
     const veiculosTroca = (typeof TODOS_VEICULOS_DEF !== 'undefined' && TODOS_VEICULOS_DEF.length)
       ? TODOS_VEICULOS_DEF.map(function(v) { return v.nome; })
       : ['Carro 01','Carro 02','Carro 03','Carro 04','Triciclo 01','Triciclo 02','Pelúcia 01','Pelúcia 02','Pelúcia 03','Pelúcia 04'];
-    body.innerHTML = `<div class="op-policy">A troca não reinicia o timer nem altera valores automaticamente.</div><div class="op-form"><div class="op-grid"><div class="op-field"><label>Atual</label><input value="${escHtml(opSession.veiculo || opSession.tipo || '')}" disabled></div><div class="op-field"><label>Novo</label><select id="op-veiculo">${veiculosTroca.map(v=>`<option ${normalizarTxt_(opSession.veiculo)===normalizarTxt_(v)?'selected':''}>${v}</option>`).join('')}</select></div></div><div class="op-field"><label>Motivo</label><textarea id="op-motivo">Troca solicitada pelo responsável ou por operação.</textarea></div></div>`;
+    body.innerHTML = `<div class="op-policy">A troca não reinicia o timer nem altera valores automaticamente.</div><div class="op-form"><div class="op-grid"><div class="op-field"><label>Atual</label><input value="${escHtml((typeof mkVeiculoLabelUi_==='function'?mkVeiculoLabelUi_(opSession.veiculo):opSession.veiculo) || opSession.tipo || '')}" disabled></div><div class="op-field"><label>Novo</label><select id="op-veiculo">${veiculosTroca.map(v=>`<option value="${escHtml(v)}" ${normalizarTxt_(opSession.veiculo)===normalizarTxt_(v)?'selected':''}>${escHtml((typeof mkVeiculoLabelUi_==='function'?mkVeiculoLabelUi_(v):v))}</option>`).join('')}</select></div></div><div class="op-field"><label>Motivo</label><textarea id="op-motivo">Troca solicitada pelo responsável ou por operação.</textarea></div></div>`;
   } else if (tipo === 'plano') {
     if (ativa) { toast('Plano só pode ser trocado antes de iniciar. Use Estender tempo.', 'warning'); return false; }
     const planos = Object.keys(PRECOS[opSession.tipo] || {});
@@ -806,7 +806,7 @@ function abrirEstender(rowIndex, fromDrawer) {
 
   const icon = tipoIcon(estSession.tipo);
   document.getElementById('est-info').innerHTML =
-    '<div class="modal-info-row"><span>' + icon + ' ' + escHtml(estSession.veiculo || estSession.tipo) + '</span><span>' + estSession.plano + '</span></div>' +
+    '<div class="modal-info-row"><span>' + icon + ' ' + escHtml((typeof mkVeiculoLabelUi_ === 'function' ? mkVeiculoLabelUi_(estSession.veiculo) : estSession.veiculo) || estSession.tipo) + '</span><span>' + estSession.plano + '</span></div>' +
     '<div class="modal-info-row"><span>Criança</span><span>' + escHtml(estSession.crianca) + '</span></div>' +
     '<div class="modal-info-row"><span>Tempo contratado</span><span>' + estSession.mins + ' min</span></div>';
 

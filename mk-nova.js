@@ -94,7 +94,7 @@ function incluirItemNova_() {
     return false;
   }
   if (novaVeiculoNaCesta_(novaState.veiculo)) {
-    toast(novaState.veiculo + ' já está nesta locação.', 'warning');
+    toast(((typeof mkVeiculoLabelUi_ === 'function') ? mkVeiculoLabelUi_(novaState.veiculo) : novaState.veiculo) + ' já está nesta locação.', 'warning');
     return false;
   }
   if (!novaCfgPlano_(novaState.tipo, novaState.plano)) {
@@ -298,7 +298,7 @@ function novaHtmlItemRow_(it, idx, opts) {
     : '';
   return '<div class="nova-cesta-row">' +
     '<div class="nova-cesta-row-main">' +
-    '<span class="nova-cesta-row-title">' + escHtml(tipoIcon(it.tipo) + ' ' + it.veiculo) + '</span>' +
+    '<span class="nova-cesta-row-title">' + escHtml(tipoIcon(it.tipo) + ' ' + ((typeof mkVeiculoLabelUi_ === 'function') ? mkVeiculoLabelUi_(it.veiculo) : it.veiculo)) + '</span>' +
     '<span class="nova-cesta-row-sub">' + escHtml(planoLbl + (val ? ' · ' + val : '')) + '</span>' +
     '</div>' + rm + '</div>';
 }
@@ -464,12 +464,13 @@ function atualizarNovaSummaryBar_() {
   } else if (itens.length === 1) {
     const it = itens[0];
     const cfg = novaCfgPlano_(it.tipo, it.plano);
-    parts.push(tipoIcon(it.tipo) + ' ' + it.veiculo);
+    parts.push(tipoIcon(it.tipo) + ' ' + ((typeof mkVeiculoLabelUi_ === 'function') ? mkVeiculoLabelUi_(it.veiculo) : it.veiculo));
     parts.push(PLANO_LABELS[it.plano] || it.plano);
     if (cfg && fin) parts.push('R$ ' + cfg.v);
   } else {
     const { tipo, plano, veiculo } = novaState;
-    if (veiculo || tipo) parts.push(tipoIcon(tipo || '') + ' ' + (veiculo || tipo || '—'));
+    const vLab = veiculo && (typeof mkVeiculoLabelUi_ === 'function') ? mkVeiculoLabelUi_(veiculo) : veiculo;
+    if (veiculo || tipo) parts.push(tipoIcon(tipo || '') + ' ' + (vLab || tipo || '—'));
     if (plano && tipo && PRECOS[tipo] && PRECOS[tipo][plano]) {
       parts.push(PLANO_LABELS[plano] || plano);
       if (mkExibirFinanceiro_()) parts.push('R$ ' + PRECOS[tipo][plano].v);
@@ -786,6 +787,7 @@ function rebuildVeiculoGridsFromDef_() {
     grid.id = gridId[tipo] || ('vc-grid-' + tipo.toLowerCase());
     list.forEach(function (v) {
       const nome = v.nome;
+      const label = (typeof mkVeiculoLabelUi_ === 'function') ? mkVeiculoLabelUi_(nome) : nome;
       const card = document.createElement('div');
       card.className = 'vc-card mk-tile';
       card.id = 'vc-' + nome;
@@ -793,7 +795,7 @@ function rebuildVeiculoGridsFromDef_() {
       const icon = (typeof tipoIcon === 'function') ? tipoIcon(tipo) : '🚗';
       card.innerHTML =
         '<div class="vc-icon">' + icon + '</div>' +
-        '<div class="vc-name">' + nome + '</div>' +
+        '<div class="vc-name">' + label + '</div>' +
         '<div class="vc-status livre" id="vc-st-' + nome + '">✓ Livre</div>';
       grid.appendChild(card);
     });
@@ -911,7 +913,7 @@ function selectVeiculo(el, veiculo, tipo) {
   if (novaGuardSaveBusy_()) return;
   if (el.classList.contains('vc-busy') || el.classList.contains('vc-busy-pink')) return;
   if (novaVeiculoNaCesta_(veiculo)) {
-    toast(veiculo + ' já está nesta locação.', 'warning');
+    toast(((typeof mkVeiculoLabelUi_ === 'function') ? mkVeiculoLabelUi_(veiculo) : veiculo) + ' já está nesta locação.', 'warning');
     return;
   }
   document.querySelectorAll('.vc-card').forEach(function(c) { c.classList.remove('vc-sel','vc-sel-pink'); });

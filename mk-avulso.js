@@ -35,9 +35,7 @@ function mkAvulsoRebuildTipoGrid_() {
   if (pg) pg.innerHTML = '';
   const veic = document.getElementById('avulso-veiculo');
   if (veic) {
-    veic.placeholder = avulsoUnidadeSel_ === 'laville'
-      ? 'Ex: LV Carro 01 (opcional)'
-      : 'Ex: Carro 01 (opcional)';
+    veic.placeholder = 'Ex: Carro 01 (opcional)';
   }
 }
 
