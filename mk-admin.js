@@ -4202,7 +4202,110 @@ function renderCaixaFromResumo_(dataFmt, r) {
     window._caixaData = { dataFmt, totalEnt, totalMaq, totalDin, totalCus, saldoDin, resultado, totPag, locacoes, custos, nContasMaq, nContas, nSess };
 }
 
-async function carregarCaixa() {
+/** I159h/I86: 1× resumoDia(all) + fatia no FE — evita 3× ~30s e force=1 no pill (zerava Caixa). */
+window._mkCaixaResumoCache_ = window._mkCaixaResumoCache_ || {};
+
+function mkCaixaUidOfLoc_(l) {
+  if (typeof mkDualUidOf_ === 'function') return mkDualUidOf_(l);
+  if (typeof mkUnidadeOfSession_ === 'function') return mkUnidadeOfSession_(l);
+  return String((l && l.unidadeId) || 'golden');
+}
+
+function mkCaixaSliceResumo_(rAll, uid) {
+  if (!rAll || !rAll.ok) return rAll;
+  const filtro = uid || 'all';
+  if (filtro === 'all') {
+    return Object.assign({}, rAll, { unidadeId: 'all', ok: true });
+  }
+  const locs = (rAll.locacoes || []).filter(function (l) {
+    return mkCaixaUidOfLoc_(l) === filtro;
+  });
+  const custos = (rAll.custos || []).filter(function (c) {
+    const u = String((c && c.unidadeId) || 'golden');
+    return u === filtro;
+  });
+  const porPagamento = {};
+  const extrasPorPagamento = {};
+  let fat = 0;
+  let totalExt = 0;
+  let nExt = 0;
+  let nAbertas = 0;
+  let fatAbertas = 0;
+  const contas = {};
+  locs.forEach(function (l) {
+    const vt = Number(l.valorTotal) || 0;
+    fat += vt;
+    const pag = mkNormPagCaixa_(l.pagamento) || '—';
+    porPagamento[pag] = (porPagamento[pag] || 0) + vt;
+    const ext = Number(l.valorAdicional) || 0;
+    if (ext > 0) {
+      totalExt += ext;
+      nExt++;
+      const ep = mkNormPagCaixa_(l.extraPagamento || l.pagamento) || pag;
+      extrasPorPagamento[ep] = (extrasPorPagamento[ep] || 0) + ext;
+    }
+    const st = String(l.status || '');
+    if (st === 'Ativa' || st === 'Pendente') {
+      nAbertas++;
+      fatAbertas += vt;
+    }
+    const ck = cxChaveConta_(l) || ('i:' + (l.id || locs.indexOf(l)));
+    contas[ck] = true;
+  });
+  let totalCus = 0;
+  let cusDin = 0;
+  custos.forEach(function (c) {
+    const v = Number(c.valor) || 0;
+    totalCus += v;
+    if (String(c.categoria || '').toLowerCase().indexOf('dinheiro') >= 0 || String(c.pagamento || '') === 'Dinheiro') {
+      cusDin += v;
+    }
+  });
+  const totalMaq = (Number(porPagamento.PIX) || 0) + (Number(porPagamento['Débito']) || 0) + (Number(porPagamento['Crédito']) || 0);
+  const totalDin = Number(porPagamento.Dinheiro) || 0;
+  const saldoDin = Math.round((totalDin - cusDin) * 100) / 100;
+  const resultado = Math.round((fat - totalCus) * 100) / 100;
+  return {
+    ok: true,
+    data: rAll.data,
+    unidadeId: filtro,
+    n: Object.keys(contas).length,
+    nSessoes: locs.length,
+    fat: Math.round(fat * 100) / 100,
+    totalExt: Math.round(totalExt * 100) / 100,
+    nExt: nExt,
+    porPagamento: porPagamento,
+    extrasPorPagamento: extrasPorPagamento,
+    totalMaq: Math.round(totalMaq * 100) / 100,
+    totalDin: Math.round(totalDin * 100) / 100,
+    totalCus: Math.round(totalCus * 100) / 100,
+    cusDin: Math.round(cusDin * 100) / 100,
+    saldoDin: saldoDin,
+    resultado: resultado,
+    nAbertas: nAbertas,
+    fatAbertas: Math.round(fatAbertas * 100) / 100,
+    caixaIncluiAbertas: true,
+    locacoes: locs,
+    custos: custos,
+    leadingDia: rAll.leadingDia,
+    alertasInteligentes: filtro === 'all' ? rAll.alertasInteligentes : [],
+    extrasCancelados: (rAll.extrasCancelados || []).filter(function (x) {
+      return mkCaixaUidOfLoc_(x) === filtro;
+    })
+  };
+}
+
+function mkCaixaMiniFromSlice_(slice) {
+  return {
+    ok: !!(slice && slice.ok),
+    fat: slice && slice.fat,
+    n: slice && slice.n,
+    nSessoes: slice && slice.nSessoes,
+    resultado: slice && slice.resultado
+  };
+}
+
+async function carregarCaixa(forceRefresh) {
   const dataEl = document.getElementById('caixa-data');
   if (!dataEl) return;
   const [y,m,d] = dataEl.value.split('-');
@@ -4221,69 +4324,45 @@ async function carregarCaixa() {
   const dualGrid = document.getElementById('caixa-dual-grid');
   const dualSum = document.getElementById('caixa-dual-summary');
   const caixaKpis = document.getElementById('caixa-kpis');
+  const force = forceRefresh === true || forceRefresh === 1 || forceRefresh === '1';
 
   try {
-    if (filtro === 'all') {
+    let rAll = (!force && window._mkCaixaResumoCache_[dataFmt]) || null;
+    if (!rAll || !rAll.ok) {
       const authP = apiParamsComAuth_();
-      let rg;
-      let rl;
-      /* I23/I122: resumoDia frio ~20–30s — no dia atual o dual usa encHoje (1 chamada all). */
-      if (dataFmt === hoje && typeof mkDualResumoFromEncHoje_ === 'function') {
-        rg = mkDualResumoFromEncHoje_('golden');
-        rl = mkDualResumoFromEncHoje_('laville');
-      } else {
-        const pair = await Promise.all([
-          api({ action: 'resumoDia', data: dataFmt, unidadeId: 'golden', ...authP }),
-          api({ action: 'resumoDia', data: dataFmt, unidadeId: 'laville', ...authP })
-        ]);
-        rg = pair[0];
-        rl = pair[1];
-        if (typeof mkDualPreferEncWhenResumoLeak_ === 'function') {
-          const fix = mkDualPreferEncWhenResumoLeak_(rg, rl);
-          rg = fix.golden;
-          rl = fix.laville;
-        }
-      }
-      if (dualGrid && typeof mkDualColShell_ === 'function' && typeof mkDualMiniKpiHtml_ === 'function') {
-        dualGrid.hidden = false;
-        dualGrid.innerHTML =
-          mkDualColShell_('golden', mkDualMiniKpiHtml_(rg)) +
-          mkDualColShell_('laville', mkDualMiniKpiHtml_(rl));
-      }
-      if (dualSum) {
-        const fatG = Number(rg && rg.fat) || 0;
-        const fatL = Number(rl && rl.fat) || 0;
-        dualSum.hidden = false;
-        dualSum.innerHTML = '<strong>Holding hoje:</strong> ' +
-          (typeof mkDualFmtMoney_ === 'function' ? mkDualFmtMoney_(fatG + fatL) : ('R$ ' + (fatG + fatL).toFixed(2))) +
-          ' · Golden ' + (rg && rg.n || 0) + ' contas · La Ville ' + (rl && rl.n || 0) + ' contas';
-      }
-      const rAll = await api({ action: 'resumoDia', data: dataFmt, unidadeId: 'all', ...authP });
+      const req = { action: 'resumoDia', data: dataFmt, unidadeId: 'all', ...authP };
+      /* force só no botão Atualizar — pill/filtro NÃO (I86/I122). */
+      if (force) req.force = '1';
+      rAll = await api(req);
       if (!rAll || !rAll.ok) {
         toast((rAll && rAll.erro) || 'Erro ao carregar caixa', 'error');
         return;
       }
-      if (dataFmt === hoje) resumoDiaHoje = rAll;
-      renderCaixaFromResumo_(dataFmt, rAll);
-      if (caixaKpis) caixaKpis.style.display = '';
+      window._mkCaixaResumoCache_[dataFmt] = rAll;
+    }
+    if (dataFmt === hoje) resumoDiaHoje = rAll;
+
+    const rg = mkCaixaSliceResumo_(rAll, 'golden');
+    const rl = mkCaixaSliceResumo_(rAll, 'laville');
+    if (filtro === 'all' && dualGrid && typeof mkDualColShell_ === 'function' && typeof mkDualMiniKpiHtml_ === 'function') {
+      dualGrid.hidden = false;
+      dualGrid.innerHTML =
+        mkDualColShell_('golden', mkDualMiniKpiHtml_(mkCaixaMiniFromSlice_(rg))) +
+        mkDualColShell_('laville', mkDualMiniKpiHtml_(mkCaixaMiniFromSlice_(rl)));
+      if (dualSum) {
+        dualSum.hidden = false;
+        dualSum.innerHTML = '<strong>Holding:</strong> ' +
+          (typeof mkDualFmtMoney_ === 'function' ? mkDualFmtMoney_((rg.fat || 0) + (rl.fat || 0)) : '') +
+          ' · Golden ' + (rg.n || 0) + ' contas · La Ville ' + (rl.n || 0) + ' contas';
+      }
     } else {
       if (dualGrid) { dualGrid.hidden = true; dualGrid.innerHTML = ''; }
       if (dualSum) { dualSum.hidden = true; dualSum.innerHTML = ''; }
-      const authP = Object.assign({}, apiParamsComAuth_(), { unidadeId: filtro });
-      let r;
-      if (dataFmt === hoje) {
-        r = await api({ action: 'resumoDia', data: dataFmt, force: '1', ...authP });
-      } else {
-        r = await api({ action: 'resumoDia', data: dataFmt, ...authP });
-      }
-      if (!r || !r.ok) {
-        toast((r && r.erro) || 'Erro ao carregar caixa', 'error');
-        return;
-      }
-      if (dataFmt === hoje) resumoDiaHoje = r;
-      renderCaixaFromResumo_(dataFmt, r);
-      if (caixaKpis) caixaKpis.style.display = '';
     }
+
+    const slice = mkCaixaSliceResumo_(rAll, filtro);
+    renderCaixaFromResumo_(dataFmt, slice);
+    if (caixaKpis) caixaKpis.style.display = '';
     if (typeof atualizarHubAdmin_ === 'function') atualizarHubAdmin_();
   } catch(e) {
     console.error('carregarCaixa:', e);
@@ -4293,9 +4372,11 @@ async function carregarCaixa() {
 
 function mkCaixaOnFiltro_(id) {
   if (typeof mkDualSetFiltro_ === 'function') mkDualSetFiltro_(id);
-  carregarCaixa();
+  /* Cache local — troca de pill instantânea, sem novo GAS. */
+  carregarCaixa(false);
 }
 window.mkCaixaOnFiltro_ = mkCaixaOnFiltro_;
+window.mkCaixaSliceResumo_ = mkCaixaSliceResumo_;
 
 function buildFechamentoTexto_() {
   const d = window._caixaData;

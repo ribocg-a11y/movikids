@@ -121,28 +121,34 @@
     }
     var g = packUnidade_('golden');
     var l = packUnidade_('laville');
-    var totAtivas = g.nAtivas + l.nAtivas;
-    var totFat = g.fat + l.fat;
     var filtro = typeof mkUnidadeFiltroAdm_ === 'function' ? mkUnidadeFiltroAdm_() : 'all';
+    var showG = filtro === 'all' || filtro === 'golden';
+    var showL = filtro === 'all' || filtro === 'laville';
+    var totAtivas = (showG ? g.nAtivas : 0) + (showL ? l.nAtivas : 0);
+    var totFat = (showG ? g.fat : 0) + (showL ? l.fat : 0);
+    var heroLbl = filtro === 'all' ? 'caixa combinado' : ('caixa ' + (filtro === 'laville' ? 'La Ville' : 'Golden'));
+    var cols = '';
+    if (showG) cols += colHtml_(g);
+    if (showL) cols += colHtml_(l);
     root.innerHTML =
       '<div class="mk-hold-hero">' +
         '<div>' +
           '<p class="mk-hold-eyebrow">Administração · holding</p>' +
           '<h1 class="mk-hold-title">As duas lojas agora</h1>' +
           '<p class="mk-hold-sub">Golden e La Ville lado a lado — sem misturar operação.</p>' +
-          '<div class="mk-hold-pills" role="group" aria-label="Filtro caixa e KPI">' +
+          '<div class="mk-hold-pills" role="group" aria-label="Filtro unidade holding">' +
             filtroPill_('all', 'Todas', filtro) +
             filtroPill_('golden', 'Golden', filtro) +
             filtroPill_('laville', 'La Ville', filtro) +
           '</div>' +
-          '<p class="mk-hold-filtro-hint">Filtro vale para Caixa / Dashboard / KPI (não para este painel).</p>' +
+          '<p class="mk-hold-filtro-hint">Filtro desta tela e do Caixa / Dashboard / KPI.</p>' +
         '</div>' +
         '<div class="mk-hold-hero-kpis">' +
-          '<div><strong>' + totAtivas + '</strong><span>ativas no total</span></div>' +
-          '<div><strong>' + fmtMoney_(totFat) + '</strong><span>caixa combinado</span></div>' +
+          '<div><strong>' + totAtivas + '</strong><span>ativas</span></div>' +
+          '<div><strong>' + fmtMoney_(totFat) + '</strong><span>' + heroLbl + '</span></div>' +
         '</div>' +
       '</div>' +
-      '<div class="mk-hold-grid">' + colHtml_(g) + colHtml_(l) + '</div>';
+      '<div class="mk-hold-grid' + (filtro !== 'all' ? ' mk-hold-grid--one' : '') + '">' + cols + '</div>';
   }
 
   function mkHoldingAbrirBalcao_(uid) {
@@ -171,11 +177,12 @@
   }
 
   function mkHoldingSetFiltroCaixa_(id) {
-    if (typeof mkUnidadeSetFiltroAdm_ === 'function') mkUnidadeSetFiltroAdm_(id);
+    if (typeof mkDualSetFiltro_ === 'function') mkDualSetFiltro_(id);
+    else if (typeof mkUnidadeSetFiltroAdm_ === 'function') mkUnidadeSetFiltroAdm_(id);
     renderHolding_();
     if (typeof toast === 'function') {
       var lbl = id === 'all' ? 'Todas as lojas' : (typeof mkUnidadeLabelCurto_ === 'function' ? mkUnidadeLabelCurto_(id) : id);
-      toast('Filtro Caixa/KPI: ' + lbl, 'info');
+      toast('Filtro: ' + lbl, 'info');
     }
   }
 

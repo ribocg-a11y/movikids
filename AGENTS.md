@@ -2,19 +2,19 @@
 
 Sistema operacional de locações — balcão (tablet na loja), portal do responsável, painel admin.
 
-**Ciclo ativo (29/09/2026):** Sprint D · FE **v1.9.128** Pages · GAS repo **v1.5.225** · **I159g** badge balcão · **I159f** dual ADM · **I158** Golden FE ✅
+**Ciclo ativo (29/09/2026):** Sprint D · FE **v1.9.132** Pages · GAS Web **v1.5.225** · **I159h** Caixa/holding filtro · **I158** ✅
 
 **Para retomar (agente local PC — pasta C):**
 
-> *Continuar MOVI KIDS — FE **v1.9.128** · GAS **v1.5.225** · I159g balcão com nome da loja (Nova versão Web ⏳ ping v1.5.224) · Tablet `?force=1.9.128`*
+> *Continuar MOVI KIDS — FE **v1.9.132** · GAS **v1.5.225** · I159h filtro holding + Caixa · Tablet `?force=1.9.132`*
 
 ## Produção atual
 
 | Camada | Versão | Link |
 |--------|--------|------|
-| Frontend | **v1.9.128** | https://ribocg-a11y.github.io/movikids/?force=1.9.128 |
-| Gestão Pessoas | **v1.9.128** | `gestao-pessoas.html?force=1.9.128` |
-| GAS | ping Web **v1.5.224** ⏳ Nova versão · repo **v1.5.225** | I159f dual + CUSTOS unidade_id |
+| Frontend | **v1.9.132** | https://ribocg-a11y.github.io/movikids/?force=1.9.132 |
+| Gestão Pessoas | **v1.9.132** | `gestao-pessoas.html?force=1.9.132` |
+| GAS | ping Web **v1.5.225** ✅ · repo **v1.5.225** | dual + CUSTOS unidade_id |
 | Design System | **v1.1** | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
 
 **GAS raw:** https://raw.githubusercontent.com/ribocg-a11y/movikids/main/MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs

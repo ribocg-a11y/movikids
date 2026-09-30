@@ -1,14 +1,14 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 29/09/2026 · FE **v1.9.131** Pages · GAS repo **v1.5.225** · **I159g** holding encHoje (não zerar Golden) · **I159f** dual · **I158** ✅
+**Atualizado:** 29/09/2026 noite · FE **v1.9.132** Pages · GAS Web **v1.5.225** · **I159h** filtro holding + Caixa 1×resumo · **I158** ✅
 
 ## Produção (agora)
 
 | Camada | Versão | Link |
 |--------|--------|------|
-| Frontend | **v1.9.131** | https://ribocg-a11y.github.io/movikids/?force=1.9.131 |
-| Gestão Pessoas | **v1.9.131** | `gestao-pessoas.html?force=1.9.131` |
-| GAS | ping Web **v1.5.224** ⏳ Nova versão → **v1.5.225** · repo **v1.5.225** | I159f dual |
+| Frontend | **v1.9.132** | https://ribocg-a11y.github.io/movikids/?force=1.9.132 |
+| Gestão Pessoas | **v1.9.132** | `gestao-pessoas.html?force=1.9.132` |
+| GAS | ping Web **v1.5.225** ✅ · repo **v1.5.225** | I159f dual |
 | Design System | v1.1 | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
 
 **GAS raw:** https://raw.githubusercontent.com/ribocg-a11y/movikids/main/MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs  
@@ -39,29 +39,44 @@
 
 | # | Item | Quem | Bloqueio |
 |---|------|------|----------|
-| **A** | **Nova versão Web GAS** → ping **v1.5.225** | **Sócio** §7.3 | Sem isso `resumoDia`/comando misturam lojas na Web |
-| **B** | Backfill `unidade_id` nas LOCAÇÕES antigas | Após A | API `backfillUnidadeIdLocacoesAdmin` |
-| **C** | Smoke holding/caixa/dash dual + balcão La Ville 0 + Golden com contas | Ops/PC | Após A + FE atual |
-| **D** | Confirmar frota real La Ville + e-mail CTO | Sócio | Frota ainda provisória |
+| **B** | Backfill `unidade_id` nas LOCAÇÕES antigas (col AC) | Agente (API) ou Sócio | `backfillUnidadeIdLocacoesAdmin` — linhas antigas sem AC usam fallback veículo |
+| **C** | Smoke PC: Holding filtro · Caixa Golden ≠ 0 · Avulso tipos LV · balcão LV 0 | Ops/PC | FE **v1.9.132** |
+| **D** | Frota real La Ville (tirar provisória) + e-mail CTO | Sócio | CONFIG / lista LV* |
 | **E** | Tablet smoke D4 · PDF Golden 01/10 · FASE 17 | Ops/Sócio | Ops |
+| **F** | GAS lookback em `resumoDia` (hoje ~36s frio — scan LOCAÇÕES inteira) | Sócio §7.3 | Família **I23/I86** — FE já mitiga (1 chamada + cache); GAS ainda pesado |
 
 **Nova versão Web:** ✅ ping **v1.5.225** (29/09 noite).
 
-### Páginas FE tocadas (I159f/g)
+### Planilha Google (multi-unidade) — o que mudou / falta
 
-| Página | O que mudou |
-|--------|-------------|
-| Holding / Lojas | Dual colunas · KPIs por loja · sem card sessão |
-| Balcão Home | Badge loja · KPIs isolados · card sessão com unidade |
-| Nova Locação | Frota/preços por `unidadeId` (já I159b/c) |
-| Painel Operação | Pills + dual frota |
-| Relacionamento | Pills + badge unidade |
-| Hist. locações | Pills + badge |
-| Caixa do dia | Dual mini + anti-lentidão (encHoje no dia) |
-| Dashboard / Centro gestão | Dual hero / comando |
-| Registrar Custo / Avulso | Pills unidade · Avulso troca tipos/preços |
-| Colaboradores | URL `?unidade=` + subtítulo loja |
-| Menu | Sem SMS / Sistema · 1× Lojas |
+| Aba | Status | Detalhe |
+|-----|--------|---------|
+| **LOCACOES** | Schema ✅ col **AC `unidade_id`** | Novas locs gravam unidade; **backfill** linhas antigas ainda ⏳ |
+| **CUSTOS** | Schema ✅ col **G `unidade_id`** | Novos custos com unidade; antigos = golden default |
+| **CONFIG** | Ping lista golden + laville | Preços La Ville no GAS (LV*); frota provisória |
+| **DASHBOARD / RELATORIOS / FOLHA** | Sem aba por loja | Filtro por `unidadeId` na API — **não** há sheet “La Ville” separada |
+| **AUD_SMS / SMS** | Fora do menu FE | QR-only; abas podem existir na planilha sem uso operacional |
+
+Diagnóstico 29/09: `diagnosticoPlanilhaCompletoAdmin` → LOCACOES/CUSTOS/CONFIG **ok**. API `resumoDia` hoje: Golden **R$ 178 / 8 contas**; La Ville **0**.
+
+### Matriz páginas (smoke 29/09) — I159h
+
+| Página | Status | Nota |
+|--------|--------|------|
+| Holding / Lojas | ✅ FE 1.9.132 | Filtro Todas/Golden/La Ville **esconde coluna**; sem card sessão |
+| Balcão Home | ✅ | Badge loja + card sessão só aqui |
+| Nova Locação | ✅ | Frota/preços por unidade |
+| Painel Operação | ⚠ smoke | Pills dual — validar frota LV |
+| Relacionamento | ⚠ smoke | Badge unidade |
+| Hist. locações | ⚠ smoke | Pills |
+| **Caixa do dia** | ✅ fix 1.9.132 | 1× `resumoDia(all)` + fatia FE; pill **sem** `force=1` (antes zerava / ~36s) |
+| Dashboard / Centro | ⚠ smoke | Dual; 1ª carga ainda espera GAS frio |
+| Hist. custos | ⚠ lento GAS | Mês vazio = OK rápido; com dados = fila GAS |
+| Registrar Custo | ⚠ smoke | Pills unidade → col G |
+| **Avulso** | ✅ FE 1.9.131+ | Tipos/preços por loja |
+| Colaboradores | ✅ | `?unidade=` + subtítulo |
+| Menu | ✅ | Sem SMS / Sistema |
+| Relatório mensal Golden | ✅ I158 | `kpiMes` FE |
 
 ---
 
