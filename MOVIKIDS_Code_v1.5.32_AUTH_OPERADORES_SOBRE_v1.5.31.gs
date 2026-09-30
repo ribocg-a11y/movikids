@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.230
+// MOVI KIDS — Google Apps Script v1.5.231
+// v1.5.231: I160 — painelGestaoPessoasAdmin: cfg.escala null (Eduarda/Karen sem turno) → crash reading '5'
 // v1.5.230: I159t — padrão RH/escala La Ville (14h–21:30 · folga terça); equipe 0 OK até contratar
 // v1.5.229: I159s — equipe por loja: definirUnidadeEquipeAdmin + seed Milena=all; sync RH
 // v1.5.228: I159r — La Ville tipo Drift/Drifts (ex-Driffyt); IDs LV Drift 01/02
@@ -222,8 +223,8 @@
 
 // ── CONSTANTES ───────────────────────────────────────────────
 /** Versão exposta em ping, carregarInicio, validarSchema, gestaoPessoasStatus (bump com header). */
-const MK_GAS_VERSAO_  = 'v1.5.230';
-const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.230';
+const MK_GAS_VERSAO_  = 'v1.5.231';
+const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.231';
 const SHEET_ID   = '1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618';
 const DEPLOY_ID  = 'AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y';
 const WEBAPP_URL = `https://script.google.com/macros/s/${DEPLOY_ID}/exec`;
@@ -5433,11 +5434,18 @@ function metaBonusAcumularMes_(opId, byDay, cfg, byDayPartner) {
   };
 }
 
+/** I160 — objeto escala sempre indexável (evita null['5'] sexta-feira). */
+function metaOperadorEscalaVazia_() {
+  return { '0': null, '1': null, '2': null, '3': null, '4': null, '5': null, '6': null };
+}
+
 function metaOperadorEscalaFromRh_(turno) {
-  const m = String(turno || '').match(/(\d{1,2})\s*(?:h|:)?\s*[–\-]\s*(\d{1,2})/i);
+  // Aceita 14h–22, 14-22, 14h–21:30
+  const m = String(turno || '').match(/(\d{1,2})\s*(?:h|:)?\s*[–\-]\s*(\d{1,2})(?::\d{2})?/i);
   if (!m) return null;
   const ini = parseInt(m[1], 10);
   const fim = parseInt(m[2], 10);
+  if (!isFinite(ini) || !isFinite(fim)) return null;
   const slot = [ini, fim];
   return { '0': null, '1': slot, '2': slot, '3': slot, '4': slot, '5': slot, '6': null };
 }
@@ -5505,17 +5513,20 @@ function metaOperadorCfg_(opId) {
         cfg.bonus = bonus;
         if (adm) cfg.inicio = adm;
         if (rh.ativo === false) cfg.ativo = false;
+        if (!cfg.escala) cfg.escala = metaOperadorEscalaVazia_();
       } else if (rh.ativo !== false) {
         cfg = {
           ativo: true,
           meta: meta,
           bonus: bonus,
           inicio: adm,
-          escala: metaOperadorEscalaFromRh_(rh.turno)
+          // I160 — nunca escala:null (Eduarda/Karen sync RH sem turno)
+          escala: metaOperadorEscalaFromRh_(rh.turno) || metaOperadorEscalaVazia_()
         };
       }
     }
   } catch (e) { /* ignore */ }
+  if (cfg && !cfg.escala) cfg.escala = metaOperadorEscalaVazia_();
   return cfg;
 }
 
@@ -5617,7 +5628,8 @@ function buildMetaOperadorPayload_(opId) {
   const inicioCmp = dateToCmp_(cfg.inicio);
   const byDay = {};
   const dowHoje = agora.getDay();
-  const shiftHoje = cfg.escala[String(dowHoje)];
+  const escalaMap = cfg.escala || metaOperadorEscalaVazia_();
+  const shiftHoje = escalaMap[String(dowHoje)];
   const minsAgora = agora.getHours() * 60 + agora.getMinutes();
   const emTurno = metaOperadorInShift_(minsAgora, shiftHoje);
   const seenContas = {};
@@ -5627,13 +5639,14 @@ function buildMetaOperadorPayload_(opId) {
     if (shAud && shAud.getLastRow() >= 2) {
       const dados = shAud.getRange(2, 1, shAud.getLastRow() - 1, 8).getValues();
       dados.forEach(function(r) {
+        if (!r || typeof r.length !== 'number') return;
         if (String(r[1] || '').trim() !== 'encerrarLocacao') return;
         if (!metaOperadorNomeMatch_(String(r[7] || ''), op.nome)) return;
         const ts = auditTsMeta_(r[0]);
         if (!ts.data || ts.data.slice(3) !== mesAtual) return;
         if (dateToCmp_(ts.data) < inicioCmp) return;
         const dow = weekdayFromDataStr_(ts.data);
-        const shift = cfg.escala[String(dow)];
+        const shift = escalaMap[String(dow)];
         if (!shift) return;
         if (!metaOperadorInShift_(ts.mins, shift) && !ts.semHora) return;
         if (!metaOperadorSeenMark_(seenContas, ts.data, r)) return;
@@ -5695,14 +5708,16 @@ function metaOperadorLocByDay_(opId, opNome, cfg) {
     const shAud = ss_().getSheetByName('AUDITORIA');
     if (shAud && shAud.getLastRow() >= 2) {
       const dados = shAud.getRange(2, 1, shAud.getLastRow() - 1, 8).getValues();
+      const escalaMap = cfg.escala || metaOperadorEscalaVazia_();
       dados.forEach(function(r) {
+        if (!r || typeof r.length !== 'number') return;
         if (String(r[1] || '').trim() !== 'encerrarLocacao') return;
         if (!metaOperadorNomeMatch_(String(r[7] || ''), opNome)) return;
         const ts = auditTsMeta_(r[0]);
         if (!ts.data || ts.data.slice(3) !== mesAtual) return;
         if (dateToCmp_(ts.data) < inicioCmp) return;
         const dow = weekdayFromDataStr_(ts.data);
-        const shift = cfg.escala[String(dow)];
+        const shift = escalaMap[String(dow)];
         if (!shift) return;
         if (!metaOperadorInShift_(ts.mins, shift) && !ts.semHora) return;
         if (!metaOperadorSeenMark_(seenContas, ts.data, r)) return;
@@ -5732,7 +5747,7 @@ function calcMetaAbaixoAlertas_() {
   hoje.setHours(0, 0, 0, 0);
   gpMetaOperadoresIdsAtivos_().forEach(function(opId) {
     const cfg = metaOperadorCfg_(opId);
-    if (!cfg || cfg.ativo === false || !cfg.inicio) return;
+    if (!cfg || !cfg.escala || cfg.ativo === false || !cfg.inicio) return;
     const found = operadorRowById_(opId);
     if (!found) return;
     const op = operadorObjFromRow_(found.data);
@@ -5771,7 +5786,7 @@ function gpMetaAbaixoAlertasFromCtx_(ctx) {
   const byOp = ctx.metaByDayByOpId || {};
   gpMetaOperadoresIdsAtivos_().forEach(function (opId) {
     const cfg = metaOperadorCfg_(opId);
-    if (!cfg || cfg.ativo === false || !cfg.inicio) return;
+    if (!cfg || !cfg.escala || cfg.ativo === false || !cfg.inicio) return;
     const found = operadorRowById_(opId);
     if (!found) return;
     const op = operadorObjFromRow_(found.data);
@@ -12410,6 +12425,7 @@ function gpEnrichContextAudit_(ctx, competencia, operadores, opts) {
   }
 
   (ctx.auditRows || []).forEach(function (r) {
+    if (!r || typeof r.length !== 'number') return;
     if (String(r[1] || '').trim() !== 'encerrarLocacao') return;
     const usuario = String(r[7] || '');
     const ts = auditTsMeta_(r[0]);
@@ -12428,7 +12444,7 @@ function gpEnrichContextAudit_(ctx, competencia, operadores, opts) {
         }
       }
       const cfg = op.cfg;
-      if (!cfg || cfg.ativo === false || !cfg.inicio) continue;
+      if (!cfg || !cfg.escala || cfg.ativo === false || !cfg.inicio) continue;
       if (ts.data.slice(3) !== compNorm) continue;
       if (dateToCmp_(ts.data) < dateToCmp_(cfg.inicio)) continue;
       const shift = cfg.escala[String(weekdayFromDataStr_(ts.data))];
@@ -12454,7 +12470,8 @@ function gpMetaPayloadFromCtx_(opId, ctx) {
   const agora = new Date();
   const dataHoje = ctx.hoje || fmtData_(agora);
   const dowHoje = agora.getDay();
-  const shiftHoje = cfg.escala[String(dowHoje)];
+  const escalaMap = cfg.escala || metaOperadorEscalaVazia_();
+  const shiftHoje = escalaMap[String(dowHoje)];
   const minsAgora = agora.getHours() * 60 + agora.getMinutes();
   const nHoje = byDay[dataHoje] || 0;
   const partnerByDay = metaParceiraByDay_(opId, ctx);

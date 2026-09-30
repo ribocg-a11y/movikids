@@ -1,6 +1,6 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 30/09/2026 · FE **v1.9.143** · GAS repo **v1.5.230** · Web **v1.5.229** · **I159t** escala LV · **I158** ✅
+**Atualizado:** 30/09/2026 · FE **v1.9.143** · GAS repo **v1.5.231** · Web **v1.5.230** · **I160** painel RH · **I158** ✅
 
 ## Produção (agora)
 
@@ -8,7 +8,7 @@
 |--------|--------|------|
 | Frontend | **v1.9.143** | https://ribocg-a11y.github.io/movikids/?force=1.9.143 |
 | Gestão Pessoas | **v1.9.143** | `gestao-pessoas.html?force=1.9.143` |
-| GAS | ping Web **v1.5.229** · repo **v1.5.230** ⏳ | I159t RH/escala La Ville |
+| GAS | ping Web **v1.5.230** · repo **v1.5.231** ⏳ | I160 painelGestaoPessoasAdmin (escala null) |
 | Design System | v1.1 | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
 
 **GAS raw:** https://raw.githubusercontent.com/ribocg-a11y/movikids/main/MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs  
@@ -45,7 +45,7 @@
 | **E** | Tablet smoke D4 · PDF Golden 01/10 · FASE 17 | Ops/Sócio | Ops |
 | **F** | ~~GAS lookback `resumoDia`~~ | ✅ Web **v1.5.226** | dia = cauda 600 |
 
-**Nova versão Web:** ✅ ping **v1.5.229** (30/09). Repo **v1.5.230** I159t escala LV — falta Nova versão. Suite: `entregas/DIAGNOSTICO_LAVILLE_SUITE40_2026-09-30.md`.
+**Nova versão Web:** ✅ ping **v1.5.230** (30/09 I159t). Repo **v1.5.231** **I160** — toast vermelho `painelGestaoPessoasAdmin … reading '5'` (Eduarda/Karen sem turno → `cfg.escala` null). Colar raw + **Nova versão**. Suite: `entregas/DIAGNOSTICO_LAVILLE_SUITE40_2026-09-30.md`.
 
 ### Planilha Google (multi-unidade) — o que mudou / falta
 
