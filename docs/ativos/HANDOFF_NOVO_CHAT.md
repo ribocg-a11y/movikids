@@ -1,13 +1,13 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 29/09/2026 noite · FE **v1.9.132** Pages · GAS Web **v1.5.225** · **I159h** filtro holding + Caixa 1×resumo · **I158** ✅
+**Atualizado:** 29/09/2026 noite · FE **v1.9.133** Pages · GAS Web **v1.5.225** · **I159i** backfill AC + dual custos/hist · **I158** ✅
 
 ## Produção (agora)
 
 | Camada | Versão | Link |
 |--------|--------|------|
-| Frontend | **v1.9.132** | https://ribocg-a11y.github.io/movikids/?force=1.9.132 |
-| Gestão Pessoas | **v1.9.132** | `gestao-pessoas.html?force=1.9.132` |
+| Frontend | **v1.9.133** | https://ribocg-a11y.github.io/movikids/?force=1.9.133 |
+| Gestão Pessoas | **v1.9.133** | `gestao-pessoas.html?force=1.9.133` |
 | GAS | ping Web **v1.5.225** ✅ · repo **v1.5.225** | I159f dual |
 | Design System | v1.1 | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
 
@@ -39,8 +39,8 @@
 
 | # | Item | Quem | Bloqueio |
 |---|------|------|----------|
-| **B** | Backfill `unidade_id` nas LOCAÇÕES antigas (col AC) | Agente (API) ou Sócio | `backfillUnidadeIdLocacoesAdmin` — linhas antigas sem AC usam fallback veículo |
-| **C** | Smoke PC: Holding filtro · Caixa Golden ≠ 0 · Avulso tipos LV · balcão LV 0 | Ops/PC | FE **v1.9.132** |
+| **B** | ~~Backfill `unidade_id` LOCAÇÕES~~ | ✅ 29/09 | **3947** linhas atualizadas / 3950 lidas (`backfillUnidadeIdLocacoesAdmin`) |
+| **C** | Smoke PC: Holding filtro · Caixa Golden ≠ 0 · Avulso tipos LV · balcão LV 0 | Ops/PC | FE **v1.9.133** |
 | **D** | Frota real La Ville (tirar provisória) + e-mail CTO | Sócio | CONFIG / lista LV* |
 | **E** | Tablet smoke D4 · PDF Golden 01/10 · FASE 17 | Ops/Sócio | Ops |
 | **F** | GAS lookback em `resumoDia` (hoje ~36s frio — scan LOCAÇÕES inteira) | Sócio §7.3 | Família **I23/I86** — FE já mitiga (1 chamada + cache); GAS ainda pesado |
@@ -51,7 +51,7 @@
 
 | Aba | Status | Detalhe |
 |-----|--------|---------|
-| **LOCACOES** | Schema ✅ col **AC `unidade_id`** | Novas locs gravam unidade; **backfill** linhas antigas ainda ⏳ |
+| **LOCACOES** | Schema ✅ col **AC `unidade_id`** | Backfill ✅ **3947** linhas (29/09) · novas locs gravam unidade |
 | **CUSTOS** | Schema ✅ col **G `unidade_id`** | Novos custos com unidade; antigos = golden default |
 | **CONFIG** | Ping lista golden + laville | Preços La Ville no GAS (LV*); frota provisória |
 | **DASHBOARD / RELATORIOS / FOLHA** | Sem aba por loja | Filtro por `unidadeId` na API — **não** há sheet “La Ville” separada |
@@ -68,11 +68,11 @@ Diagnóstico 29/09: `diagnosticoPlanilhaCompletoAdmin` → LOCACOES/CUSTOS/CONFI
 | Nova Locação | ✅ | Frota/preços por unidade |
 | Painel Operação | ⚠ smoke | Pills dual — validar frota LV |
 | Relacionamento | ⚠ smoke | Badge unidade |
-| Hist. locações | ⚠ smoke | Pills |
-| **Caixa do dia** | ✅ fix 1.9.132 | 1× `resumoDia(all)` + fatia FE; pill **sem** `force=1` (antes zerava / ~36s) |
-| Dashboard / Centro | ⚠ smoke | Dual; 1ª carga ainda espera GAS frio |
-| Hist. custos | ⚠ lento GAS | Mês vazio = OK rápido; com dados = fila GAS |
-| Registrar Custo | ⚠ smoke | Pills unidade → col G |
+| Hist. locações | ✅ 1.9.133 | Fetch `all` + filtro dual no FE |
+| **Caixa do dia** | ✅ 1.9.132 | 1× `resumoDia(all)` + fatia FE; pill **sem** `force=1` |
+| Dashboard / Centro | ⚠ smoke | Dual; 1ª carga ainda espera GAS frio (~36s) |
+| Hist. custos | ✅ 1.9.133 | Pills dual + fatia FE; 1ª carga ainda GAS |
+| Registrar Custo | ✅ 1.9.133 | Pills + lista filtrada por loja |
 | **Avulso** | ✅ FE 1.9.131+ | Tipos/preços por loja |
 | Colaboradores | ✅ | `?unidade=` + subtítulo |
 | Menu | ✅ | Sem SMS / Sistema |

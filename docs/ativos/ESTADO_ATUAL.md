@@ -1,8 +1,8 @@
-# MOVI KIDS — Estado atual (29/09/2026 · FE v1.9.132 · I159h)
+# MOVI KIDS — Estado atual (29/09/2026 · FE v1.9.133 · I159i)
 
 Referência única para alinhamento local × produção.
 
-**Ciclo dev ativo:** **`PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`** — Sprint D · **I159h** holding/Caixa dual · GAS Web **v1.5.225** · **I158** ✅  
+**Ciclo dev ativo:** **`PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`** — Sprint D · **I159i** backfill AC + dual custos/hist · GAS Web **v1.5.225** · **I158** ✅  
 **Diagnóstico 6 camadas:** **`DIAGNOSTICO_SISTEMA_6_CAMADAS_2026-06.md`**  
 **Prioridades gerais:** **`PLANEJAMENTO_ATUAL_2026-06.md`** §9
 

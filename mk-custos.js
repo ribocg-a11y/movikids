@@ -68,11 +68,24 @@ async function salvarCusto() {
 
 function renderCustos() {
   const container = document.getElementById('custo-list');
-  if (!custosHoje || custosHoje.length === 0) {
+  if (!container) return;
+  /* Sync pill de gravação com filtro ADM se existir. */
+  if (typeof mkDualFiltro_ === 'function') {
+    const f = mkDualFiltro_();
+    if (f === 'golden' || f === 'laville') custoUnidadeSel_ = f;
+  }
+  document.querySelectorAll('#custo-unidade-pills .mk-hold-pill').forEach(function (b) {
+    b.classList.toggle('mk-hold-pill--on', b.getAttribute('data-uid') === custoUnidadeSel_);
+  });
+  const view = (custosHoje || []).filter(function (c) {
+    if (custoUnidadeSel_ === 'all') return true;
+    return String(c.unidadeId || 'golden') === custoUnidadeSel_;
+  });
+  if (!view.length) {
     container.innerHTML = `<div class="empty"><div class="empty-icon">💰</div><h3>Sem custos hoje</h3></div>`;
     return;
   }
-  container.innerHTML = custosHoje.slice().reverse().map(c => {
+  container.innerHTML = view.slice().reverse().map(c => {
     const v = Number(c.valor).toFixed(2).replace('.',',');
     const uid = c.unidadeId || 'golden';
     const badge = uid === 'laville' ? 'La Ville' : 'Golden';

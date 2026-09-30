@@ -4,6 +4,7 @@ const CUS_HIST_CACHE_TTL_MS = 120000;
 let cusHistPeriod_ = 'mes';
 let cusHistAll_ = [];
 let cusHistStats_ = null;
+let cusHistResFull_ = null;
 let chartCusDia_ = null;
 let chartCusGrupo_ = null;
 let chartCusMeses_ = null;
@@ -651,15 +652,73 @@ function renderCusHistCharts_(stats) {
   }
 }
 
+function cusHistUidOf_(c) {
+  return String((c && c.unidadeId) || 'golden');
+}
+
+function cusHistFiltrarPorUnidade_(list) {
+  const filtro = typeof mkDualFiltro_ === 'function' ? mkDualFiltro_() : 'all';
+  if (!filtro || filtro === 'all') return list || [];
+  return (list || []).filter(function (c) { return cusHistUidOf_(c) === filtro; });
+}
+
+/** Stats leves a partir da lista filtrada (pill unidade sem novo GAS). */
+function cusHistStatsFromList_(list, baseStats) {
+  const custos = list || [];
+  const n = custos.length;
+  let totalCus = 0;
+  const porGrupoDre = { OPEX_FIXO: 0, OPEX_VAR: 0, CMV: 0, INVESTIMENTO: 0 };
+  const dias = {};
+  custos.forEach(function (c) {
+    const v = Number(c.valor) || 0;
+    totalCus += v;
+    const g = c.grupoDre || 'OPEX_VAR';
+    if (porGrupoDre[g] != null) porGrupoDre[g] += v;
+    else porGrupoDre.OPEX_VAR += v;
+    if (c.data) dias[c.data] = true;
+  });
+  const diasComCusto = Object.keys(dias).length;
+  const fixo = Number(porGrupoDre.OPEX_FIXO) || 0;
+  const variavel = (Number(porGrupoDre.OPEX_VAR) || 0) + (Number(porGrupoDre.CMV) || 0);
+  return Object.assign({}, baseStats || {}, {
+    n: n,
+    totalCus: Math.round(totalCus * 100) / 100,
+    diasComCusto: diasComCusto,
+    mediaDiaria: diasComCusto ? Math.round((totalCus / diasComCusto) * 100) / 100 : 0,
+    ticketMedio: n ? Math.round((totalCus / n) * 100) / 100 : 0,
+    pctFixo: totalCus > 0 ? Math.round((fixo / totalCus) * 1000) / 10 : 0,
+    pctVariavel: totalCus > 0 ? Math.round((variavel / totalCus) * 1000) / 10 : 0,
+    porGrupoDre: porGrupoDre
+  });
+}
+
 function aplicarCustosHistorico_(res) {
-  cusHistStats_ = res.stats || null;
-  cusHistAll_ = res.custos || [];
-  const stats = cusHistStats_;
+  if (res && Array.isArray(res.custos)) cusHistResFull_ = res;
+  const src = cusHistResFull_ || res || {};
+  const pillsHost = document.getElementById('cus-hist-dual-pills');
+  if (pillsHost && typeof mkDualMountPills_ === 'function') {
+    mkDualMountPills_(pillsHost, 'mkCusHistOnFiltro_');
+  }
+  cusHistAll_ = src.custos || [];
+  const catF = document.getElementById('cus-hist-cat-filter')?.value || '';
+  const grpF = document.getElementById('cus-hist-grupo-filter')?.value || '';
+  let list = cusHistFiltrarPorUnidade_(cusHistAll_);
+  if (catF) list = list.filter(function (c) { return c.categoria === catF; });
+  if (grpF) list = list.filter(function (c) { return c.grupoDre === grpF; });
+
+  const filtro = typeof mkDualFiltro_ === 'function' ? mkDualFiltro_() : 'all';
+  const stats = (filtro === 'all' && src.stats)
+    ? src.stats
+    : cusHistStatsFromList_(list, src.stats);
+  cusHistStats_ = stats;
   const hasData = !!(stats && stats.n > 0);
 
   cusHistRestoreEmpty_();
   cusHistToggleShell_(hasData);
-  if (!hasData) return;
+  if (!hasData) {
+    renderCusHistLedger_([]);
+    return;
+  }
 
   renderCusHistHero_(stats);
   renderCusHistKpis_(stats);
@@ -668,22 +727,24 @@ function aplicarCustosHistorico_(res) {
   renderCusHistClassifTable_(stats);
   renderCusHistInsights_(stats);
   renderCusHistCharts_(stats);
-  buscarCustosMesesSerie_();
+  if (filtro === 'all') buscarCustosMesesSerie_();
 
-  const catF = document.getElementById('cus-hist-cat-filter')?.value || '';
-  const grpF = document.getElementById('cus-hist-grupo-filter')?.value || '';
-  let list = cusHistAll_;
-  if (catF) list = list.filter(function (c) { return c.categoria === catF; });
-  if (grpF) list = list.filter(function (c) { return c.grupoDre === grpF; });
   renderCusHistLedger_(list);
 
   const planoEl = document.getElementById('cus-hist-plano-badge');
   if (planoEl) {
-    planoEl.textContent = res.planoOk ? 'Plano de contas ativo' : 'Classificação padrão';
-    planoEl.title = res.planoFonte || '';
-    planoEl.classList.toggle('mk-cus-plano-pill--ok', !!res.planoOk);
+    planoEl.textContent = src.planoOk ? 'Plano de contas ativo' : 'Classificação padrão';
+    planoEl.title = src.planoFonte || '';
+    planoEl.classList.toggle('mk-cus-plano-pill--ok', !!src.planoOk);
   }
 }
+
+function mkCusHistOnFiltro_(id) {
+  if (typeof mkDualSetFiltro_ === 'function') mkDualSetFiltro_(id);
+  if (cusHistResFull_) aplicarCustosHistorico_(cusHistResFull_);
+  else if (typeof buscarCustosHistorico === 'function') buscarCustosHistorico();
+}
+window.mkCusHistOnFiltro_ = mkCusHistOnFiltro_;
 
 async function buscarCustosHistorico() {
   const dates = cusHistGetDates();
@@ -704,7 +765,8 @@ async function buscarCustosHistorico() {
   cusHistShowLoading_();
 
   try {
-    const authP = apiParamsComAuth_();
+    /* Sempre all + fatia no FE (I159h) — pill muda sem 2× GAS. */
+    const authP = Object.assign({}, apiParamsComAuth_(), { unidadeId: 'all' });
     const cat = document.getElementById('cus-hist-cat-filter')?.value || '';
     const grp = document.getElementById('cus-hist-grupo-filter')?.value || '';
     const base = {

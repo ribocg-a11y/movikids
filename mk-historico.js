@@ -129,7 +129,8 @@ async function buscarHistorico() {
   if (cards) cards.style.display = 'none';
 
   try {
-    const authP = apiParamsComAuth_();
+    /* all + filtro dual no FE — troca de pill sem novo GAS. */
+    const authP = Object.assign({}, apiParamsComAuth_(), { unidadeId: 'all' });
     const resStatsP = api({ action: 'listarHistorico', startDate: dates.s, endDate: dates.e, statsOnly: '1', ...authP });
     const resFullP = api({ action: 'listarHistorico', startDate: dates.s, endDate: dates.e, ...authP });
     const resStats = await resStatsP;
