@@ -125,10 +125,25 @@ function atualizarOperadorUI_(sessaoServidor) {
   if (empty) empty.hidden = temBalcao || !logadoTablet || holdOn;
 
   if (temBalcao && !holdOn) {
-    const uidLbl = (typeof mkUnidadeLabelCurto_ === 'function') ? mkUnidadeLabelCurto_() : '';
-    set('sb-balcao-nome', srv.nome + (uidLbl && balcaoUnitario ? (' · ' + uidLbl) : ''));
-    const ent = fmtHoraTurno_(srv.loggedAt);
-    set('sb-balcao-horas', ent ? ('Entrou ' + ent + (srv.loggedOutAt ? ' · Saiu ' + fmtHoraTurno_(srv.loggedOutAt) : '')) : '');
+    /* I162 — loja do OPERADOR (OPS/RH), nunca a loja do tablet admin aberto.
+     * Bug: Raykelly Golden aparecia como «· La Ville» só porque o admin abriu balcão LV. */
+    const opUid = (typeof mkSessaoOperadorUnidadeId_ === 'function')
+      ? mkSessaoOperadorUnidadeId_(srv)
+      : (srv && srv.unidadeId ? String(srv.unidadeId) : '');
+    const currUid = (typeof mkUnidadeId_ === 'function') ? mkUnidadeId_() : '';
+    const opLbl = (opUid && typeof mkUnidadeLabelCurto_ === 'function')
+      ? mkUnidadeLabelCurto_(opUid)
+      : '';
+    let nomeBalcao = srv.nome || '—';
+    if (opLbl) nomeBalcao += ' · ' + opLbl;
+    if (balcaoUnitario && opUid && currUid && opUid !== 'all' && currUid !== 'all' && opUid !== currUid) {
+      nomeBalcao += ' (outra loja)';
+      set('sb-balcao-horas', 'Turno ativo em ' + opLbl + ' — não é desta loja');
+    } else {
+      const ent = fmtHoraTurno_(srv.loggedAt);
+      set('sb-balcao-horas', ent ? ('Entrou ' + ent + (srv.loggedOutAt ? ' · Saiu ' + fmtHoraTurno_(srv.loggedOutAt) : '')) : '');
+    }
+    set('sb-balcao-nome', nomeBalcao);
   }
 
   if (temTablet) {

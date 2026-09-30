@@ -1,13 +1,13 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 30/09/2026 · FE **v1.9.144** · GAS **v1.5.231** · **I161** Holding×Balcão · **I160** ✅ · **I158** ✅
+**Atualizado:** 30/09/2026 · FE **v1.9.145** · GAS **v1.5.231** · **I162** logo dino + loja do operador · **I161** ✅ · **I160** ✅
 
 ## Produção (agora)
 
 | Camada | Versão | Link |
 |--------|--------|------|
-| Frontend | **v1.9.144** | https://ribocg-a11y.github.io/movikids/?force=1.9.144 |
-| Gestão Pessoas | **v1.9.144** | `gestao-pessoas.html?force=1.9.144` |
+| Frontend | **v1.9.145** | https://ribocg-a11y.github.io/movikids/?force=1.9.145 |
+| Gestão Pessoas | **v1.9.145** | `gestao-pessoas.html?force=1.9.145` |
 | GAS | ping Web **v1.5.231** ✅ | I160 escala null + I159t LV |
 | Design System | v1.1 | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
 
@@ -45,7 +45,15 @@
 | **E** | Tablet smoke D4 · PDF Golden 01/10 · FASE 17 | Ops/Sócio | Ops |
 | **F** | ~~GAS lookback `resumoDia`~~ | ✅ Web **v1.5.226** | dia = cauda 600 |
 
-**Nova versão Web:** ✅ ping **v1.5.231** (I160). FE **v1.9.144** **I161** Holding×Balcão — chip/menu/filtros separados (não misturar `mk_unidade_ativa` com filtro ADM). Suite: `entregas/DIAGNOSTICO_LAVILLE_SUITE40_2026-09-30.md`.
+**Nova versão Web:** ✅ ping **v1.5.231** (I160). FE **v1.9.145** **I162** — logo dino (PNG transparente) + card balcão mostra loja do **operador** (OPS col I / RH col T), não a loja do tablet. **I161** Holding×Balcão. Suite: `entregas/DIAGNOSTICO_LAVILLE_SUITE40_2026-09-30.md`.
+
+### I162 — Logo + loja do operador (smoke PC)
+
+| Check | Esperado |
+|-------|----------|
+| Empty home / splash / sidebar | Mascote dino + MOVI KIDS (fundo transparente) |
+| Raykelly logada no Golden; admin abre balcão LV | Card: `Raykelly · Golden (outra loja)` — **não** `· La Ville` |
+| RH / OPS | Colunas `unidade_id` já existem (RH **T**, OPS **I**) |
 
 ### I161 — Holding × Balcão (smoke PC)
 

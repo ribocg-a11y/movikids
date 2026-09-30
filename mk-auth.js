@@ -13,9 +13,64 @@
   let selectedOp = null;
   let _lastGasTouchAt = 0;
   let operadoresCache = [];
+  /** I162 — operadorId → unidade_id (OPS col I / RH col T), independente da loja aberta no tablet. */
+  const opsUnidadeById_ = Object.create(null);
   let sessaoAtivaRemota = null;
   let _loadingOps = false;
   let _authBusy = false;
+  let _enrichSessaoUidBusy = false;
+
+  function indexOpsUnidade_(ops) {
+    if (!Array.isArray(ops)) return;
+    ops.forEach(function (op) {
+      if (!op || op.id == null) return;
+      const uid = op.unidadeId != null ? op.unidadeId : op.unidade_id;
+      if (uid == null || uid === '') return;
+      const canon = (typeof mkUnidadeCanon_ === 'function') ? mkUnidadeCanon_(uid) : String(uid);
+      if (canon) opsUnidadeById_[String(op.id)] = canon;
+    });
+  }
+
+  /** Loja do operador da sessão de balcão — nunca a loja do tablet admin. */
+  function mkSessaoOperadorUnidadeId_(srv) {
+    if (!srv) return '';
+    const raw = srv.unidadeId != null ? srv.unidadeId : srv.unidade_id;
+    if (raw != null && String(raw).trim() !== '') {
+      return (typeof mkUnidadeCanon_ === 'function') ? (mkUnidadeCanon_(raw) || String(raw)) : String(raw);
+    }
+    const id = srv.operadorId != null ? String(srv.operadorId) : '';
+    if (id && opsUnidadeById_[id]) return opsUnidadeById_[id];
+    return '';
+  }
+  window.mkSessaoOperadorUnidadeId_ = mkSessaoOperadorUnidadeId_;
+
+  function enrichSessaoComUnidade_(sessao) {
+    if (!sessao || !sessao.nome) return sessao;
+    const uid = mkSessaoOperadorUnidadeId_(sessao);
+    if (uid && !sessao.unidadeId) sessao.unidadeId = uid;
+    return sessao;
+  }
+
+  /** Se a sessão ativa não traz unidadeId (payload GAS legado), resolve via lista all. */
+  async function ensureSessaoUnidadeResolvida_(sessao) {
+    if (!sessao || !sessao.operadorId) return sessao;
+    if (mkSessaoOperadorUnidadeId_(sessao)) {
+      return enrichSessaoComUnidade_(sessao);
+    }
+    if (_enrichSessaoUidBusy) return sessao;
+    _enrichSessaoUidBusy = true;
+    try {
+      const d = await apiCall({ action: 'listarOperadoresLogin', unidadeId: 'all', _t: Date.now() }, 20000);
+      if (d && d.ok) indexOpsUnidade_(d.operadores);
+      enrichSessaoComUnidade_(sessao);
+      if (sessaoAtivaRemota && Number(sessaoAtivaRemota.operadorId) === Number(sessao.operadorId)) {
+        enrichSessaoComUnidade_(sessaoAtivaRemota);
+        if (typeof atualizarOperadorUI_ === 'function') atualizarOperadorUI_(sessaoAtivaRemota);
+      }
+    } catch (e) { /* offline */ }
+    finally { _enrichSessaoUidBusy = false; }
+    return sessao;
+  }
 
   function apiCall(params, timeoutMs) {
     const fn = typeof window !== 'undefined' && window.api;
@@ -361,11 +416,14 @@
 
   /** Atualiza banner, login lock e rodapé (sb-sessao) de uma vez. */
   function mkAuthSyncSessaoBalcaoUI_(sessao) {
-    sessaoAtivaRemota = sessao && sessao.nome ? sessao : null;
+    sessaoAtivaRemota = sessao && sessao.nome ? enrichSessaoComUnidade_(sessao) : null;
     updateSessaoLockUI_();
     updateOperadoresSessaoBanner_(sessaoAtivaRemota);
     if (typeof atualizarOperadorUI_ === 'function') {
       atualizarOperadorUI_(sessaoAtivaRemota);
+    }
+    if (sessaoAtivaRemota && sessaoAtivaRemota.operadorId && !mkSessaoOperadorUnidadeId_(sessaoAtivaRemota)) {
+      ensureSessaoUnidadeResolvida_(sessaoAtivaRemota);
     }
   }
 
@@ -862,6 +920,7 @@
       }
       if (!d || !d.ok) throw new Error((d && d.erro) || 'Falha ao carregar operadores');
       operadoresCache = Array.isArray(d.operadores) ? d.operadores : [];
+      indexOpsUnidade_(operadoresCache);
       applySessaoAtivaFromApi_(d);
       renderOpList(false);
       if (!operadoresCache.length) {
@@ -1030,7 +1089,12 @@
     const isAdminRole = role === 'admin';
     const srvAt = sessaoExtra && sessaoExtra.sessaoAtiva ? sessaoExtra.sessaoAtiva : null;
     const loggedAt = (isAdminRole ? Date.now() : (srvAt && srvAt.loggedAt) || Date.now());
-    const unidadeId = (typeof mkUnidadeId_ === 'function') ? mkUnidadeId_() : 'golden';
+    /* I162 — preferir loja do cadastro (OPS/RH); tablet só como fallback. */
+    const opUidRaw = operador && (operador.unidadeId != null ? operador.unidadeId : operador.unidade_id);
+    const unidadeId = (opUidRaw != null && String(opUidRaw).trim() !== '')
+      ? ((typeof mkUnidadeCanon_ === 'function') ? (mkUnidadeCanon_(opUidRaw) || String(opUidRaw)) : String(opUidRaw))
+      : ((typeof mkUnidadeId_ === 'function') ? mkUnidadeId_() : 'golden');
+    if (operador && operador.id != null) opsUnidadeById_[String(operador.id)] = unidadeId;
     setSession({
       id: operador.id,
       nome: operador.nome,
@@ -1513,6 +1577,7 @@
       }
       applySessaoAtivaFromApi_(d);
       const ops = d.operadores || [];
+      indexOpsUnidade_(ops);
       const sessaoId = sessaoAtivaRemota ? Number(sessaoAtivaRemota.operadorId) : 0;
       if (!ops.length) {
         el.innerHTML = '<p style="color:var(--txt3)">Nenhum operador cadastrado</p>';
