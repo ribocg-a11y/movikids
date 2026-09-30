@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.228
+// MOVI KIDS — Google Apps Script v1.5.229
+// v1.5.229: I159s — equipe por loja: definirUnidadeEquipeAdmin + seed Milena=all; sync RH
 // v1.5.228: I159r — La Ville tipo Drift/Drifts (ex-Driffyt); IDs LV Drift 01/02
 // v1.5.227: I159q — COLABORADORES_RH + OPERADORES_SISTEMA col unidade_id; equipes por loja
 // v1.5.226: I159n — frota La Ville oficial (2/2/2/3/2); frotaProvisoria off; resumoDia lookback no dia
@@ -220,8 +221,8 @@
 
 // ── CONSTANTES ───────────────────────────────────────────────
 /** Versão exposta em ping, carregarInicio, validarSchema, gestaoPessoasStatus (bump com header). */
-const MK_GAS_VERSAO_  = 'v1.5.228';
-const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.227';
+const MK_GAS_VERSAO_  = 'v1.5.229';
+const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.229';
 const SHEET_ID   = '1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618';
 const DEPLOY_ID  = 'AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y';
 const WEBAPP_URL = `https://script.google.com/macros/s/${DEPLOY_ID}/exec`;
@@ -443,6 +444,38 @@ function unidadeIdRhOfCell_(raw) {
   if (s === 'all' || s === 'todas' || s === '*') return 'all';
   const id = unidadeIdCanon_(raw);
   return id || MK_UNIDADE_DEFAULT_;
+}
+
+/** I159s — escrita equipe: golden | laville | all. */
+function unidadeIdEquipeWriteCanon_(raw) {
+  const s = String(raw || '').trim().toLowerCase();
+  if (s === 'all' || s === 'todas' || s === '*' || s === 'holding') return 'all';
+  const id = unidadeIdCanon_(raw);
+  return id || MK_UNIDADE_DEFAULT_;
+}
+
+/** I159s — grava OPS col I + RH col T (mesma unidade). */
+function setOperadorUnidadeIdCore_(opId, unidadeRaw) {
+  const uid = unidadeIdEquipeWriteCanon_(unidadeRaw);
+  const found = operadorRowById_(opId);
+  if (!found) return { ok: false, erro: 'Operador nao encontrado' };
+  const sh = operadoresSheet_();
+  sh.getRange(found.row, 9).setValue(uid);
+  gpEnsureRhColaboradorFromOperador_(opId, String(found.data[2] || '').trim(), 'Operador');
+  try {
+    const colab = gpColabRhByOpId_(opId);
+    if (colab && colab.row) {
+      gpSheet_(SH_COLAB_RH).getRange(colab.row, 20).setValue(uid);
+      gpInvalidateRhCache_();
+    }
+  } catch (e) { Logger.log('setOperadorUnidadeId RH: ' + e.message); }
+  try {
+    CacheService.getScriptCache().remove('gp_list_colab_v4_all');
+    CacheService.getScriptCache().remove('gp_list_colab_v4_golden');
+    CacheService.getScriptCache().remove('gp_list_colab_v4_laville');
+  } catch (e2) { /* ok */ }
+  const op = operadorObjFromRow_(sh.getRange(found.row, 1, 1, COL_OPS_READ_).getValues()[0]);
+  return { ok: true, operador: op, unidadeId: uid };
 }
 
 /**
@@ -833,6 +866,8 @@ function dispatchMoviAction_(p, method) {
       case 'cadastrarOperadorSistema': return cadastrarOperadorSistema_(p);
       case 'listarOperadoresAdmin': return listarOperadoresAdmin_(p);
       case 'editarOperadorSistema': return editarOperadorSistema_(p);
+      case 'definirUnidadeEquipeAdmin': return definirUnidadeEquipeAdmin_(p);
+      case 'seedEquipeHoldingAdmin': return seedEquipeHoldingAdmin_(p);
       case 'excluirOperadorSistema': return excluirOperadorSistema_(p);
       case 'resetarPinOperadorAdmin': return resetarPinOperadorAdmin_(p);
       case 'configurarModoOperadorRhAdmin': return configurarModoOperadorRhAdmin_(p);
@@ -1638,13 +1673,15 @@ function repararOperadoresSistemaPlanilhaAdmin_(p) {
     const memorial = repairOpsMemorialCore_();
     const formatos = repairOpsFormatosCore_();
     const backfillUid = backfillUnidadeIdOpsCore_();
+    const holding = seedEquipeHoldingCore_();
     const audit = auditOpsSampleCore_();
     const schema = validarOpsSchema_(sh_getOrCreate_(SH_OPS));
     return resp_({
-      mensagem: 'OPERADORES_SISTEMA reparada (memorial, headers 9 cols, unidade_id, formatos, protecao)',
+      mensagem: 'OPERADORES_SISTEMA reparada (memorial, headers 9 cols, unidade_id, formatos, protecao, holding)',
       memorial: memorial,
       formatos: formatos,
       backfillUnidadeId: backfillUid,
+      seedHolding: holding,
       audit: audit,
       schemaOk: schema.ok,
       versao: MK_GAS_VERSAO_
@@ -11441,6 +11478,7 @@ function cadastrarOperadorSistema_(p) {
   if (!adminPinOk_(p)) return err_('Acesso negado', 403);
   const nome = String(p.nome || '').trim().slice(0, 40);
   if (!nome) return err_('Nome do operador obrigatorio', 400);
+  const uid = unidadeIdEquipeWriteCanon_(p.unidadeId != null ? p.unidadeId : p.unidade);
   const sh = operadoresSheet_();
   const last = sh.getLastRow();
   const start = opsDataStartRow_();
@@ -11451,9 +11489,10 @@ function cadastrarOperadorSistema_(p) {
   }
   const agora = new Date();
   const id = nextIdOperador_(sh);
-  sh.appendRow([id, fmtData_(agora) + ' ' + fmtHoraLocal_(agora), nome, '', '', 'SIM', '', 'operador']);
+  sh.appendRow([id, fmtData_(agora) + ' ' + fmtHoraLocal_(agora), nome, '', '', 'SIM', '', 'operador', uid]);
   gpEnsureRhColaboradorFromOperador_(id, nome, 'Operador');
-  return resp_({ operador: { id, nome, hasPin: false, ativo: true, perfil: 'operador' } });
+  setOperadorUnidadeIdCore_(id, uid);
+  return resp_({ operador: { id, nome, hasPin: false, ativo: true, perfil: 'operador', unidadeId: uid } });
 }
 
 function operadorNomeDuplicado_(sh, nome, ignorarId) {
@@ -11479,8 +11518,64 @@ function editarOperadorSistema_(p) {
   const sh = operadoresSheet_();
   if (operadorNomeDuplicado_(sh, nome, found.data[0])) return err_('Ja existe operador com este nome', 409);
   sh.getRange(found.row, 3).setValue(nome);
+  if (p.unidadeId != null || p.unidade != null) {
+    setOperadorUnidadeIdCore_(found.data[0], p.unidadeId != null ? p.unidadeId : p.unidade);
+  }
   const op = operadorObjFromRow_(sh.getRange(found.row, 1, 1, COL_OPS_READ_).getValues()[0]);
   return resp_({ operador: op });
+}
+
+/** I159s — admin: golden | laville | all (holding). */
+function definirUnidadeEquipeAdmin_(p) {
+  if (!adminPinOk_(p)) return err_('Acesso negado', 403);
+  const out = setOperadorUnidadeIdCore_(p.operadorId || p.id, p.unidadeId != null ? p.unidadeId : p.unidade);
+  if (!out.ok) return err_(out.erro || 'Falha', 404);
+  return resp_({
+    operador: out.operador,
+    unidadeId: out.unidadeId,
+    mensagem: 'Unidade da equipe: ' + out.unidadeId,
+    versao: MK_GAS_VERSAO_
+  });
+}
+
+/**
+ * I159s — sócia/holding em `all` para login La Ville sem tirar Golden.
+ * Milena (id 2) + qualquer perfil gestor → all.
+ */
+function seedEquipeHoldingCore_() {
+  const sh = operadoresSheet_();
+  const last = sh.getLastRow();
+  const start = opsDataStartRow_();
+  const updated = [];
+  if (last < start) return { atualizados: 0, updated: updated };
+  const rows = sh.getRange(start, 1, last - start + 1, COL_OPS_READ_).getValues();
+  for (let i = 0; i < rows.length; i++) {
+    const r = rows[i];
+    if (!r || !String(r[2] || '').trim()) continue;
+    if (String(r[5] || 'SIM').toUpperCase() === 'NAO') continue;
+    const id = Number(r[0]);
+    const nome = String(r[2] || '').trim().toLowerCase();
+    const perfil = perfilNorm_(r[7]);
+    const cur = unidadeIdRhOfCell_(r[8]);
+    const isHolding = id === 2 || nome.indexOf('milena') >= 0 || perfil === 'gestor';
+    if (!isHolding) continue;
+    if (cur === 'all') continue;
+    const out = setOperadorUnidadeIdCore_(id, 'all');
+    if (out.ok) updated.push({ id: id, nome: out.operador.nome, unidadeId: 'all' });
+  }
+  return { atualizados: updated.length, updated: updated };
+}
+
+function seedEquipeHoldingAdmin_(p) {
+  if (!adminPinOk_(p)) return err_('Acesso negado', 403);
+  const out = seedEquipeHoldingCore_();
+  return resp_({
+    ok: true,
+    mensagem: 'Equipe holding: ' + out.atualizados + ' operador(es) → all',
+    atualizados: out.atualizados,
+    updated: out.updated,
+    versao: MK_GAS_VERSAO_
+  });
 }
 
 function definirPerfilOperadorAdmin_(p) {

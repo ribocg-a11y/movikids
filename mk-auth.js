@@ -1360,6 +1360,33 @@
     return apiCall({ action, ...mkAuthAdminPinParams_(), ...extra });
   }
 
+  window.mkOpSetUnidade = async function mkOpSetUnidade(id, nome, unidadeAtual) {
+    fecharMenusOperador_();
+    const atual = (unidadeAtual === 'laville' || unidadeAtual === 'all') ? unidadeAtual : 'golden';
+    const novo = prompt(
+      'Loja de ' + nome + ':\n\ngolden = so Golden\nlaville = so La Ville\nall = as duas (holding/socio)\n\nDigite golden, laville ou all:',
+      atual
+    );
+    if (novo === null) return;
+    const limpo = String(novo).trim().toLowerCase();
+    if (limpo !== 'golden' && limpo !== 'laville' && limpo !== 'all' && limpo !== 'todas') {
+      toast('Use golden, laville ou all', 'warning');
+      return;
+    }
+    const uid = (limpo === 'todas') ? 'all' : limpo;
+    try {
+      const d = await opAdminApi_('definirUnidadeEquipeAdmin', { operadorId: id, unidadeId: uid });
+      if (!d.ok) {
+        toast(d.erro || 'Erro — precisa GAS v1.5.229+', 'error');
+        return;
+      }
+      toast((nome || 'Operador') + ': loja ' + (d.unidadeId || uid), 'success');
+      await refreshOperadoresAdmin_();
+    } catch (e) {
+      toast('Erro de conexao', 'error');
+    }
+  };
+
   window.mkOpSetPerfil = async function mkOpSetPerfil(id, nome, perfilAtual) {
     fecharMenusOperador_();
     const atual = (perfilAtual === 'supervisor' || perfilAtual === 'gestor') ? perfilAtual : 'operador';
@@ -1472,6 +1499,8 @@
         const badgeCls = op.hasPin ? 'ok' : 'warn';
         const badgeTxt = op.hasPin ? 'PIN definido' : 'Sem PIN';
         const perfil = (op.perfil === 'supervisor') ? 'Supervisor' : ((op.perfil === 'gestor') ? 'Gestor' : 'Operador');
+        const uidOp = (op.unidadeId === 'laville') ? 'laville' : ((op.unidadeId === 'all') ? 'all' : 'golden');
+        const lojaTxt = (uidOp === 'laville') ? 'La Ville' : ((uidOp === 'all') ? 'Todas' : 'Golden');
         const logadoAgora = sessaoId && Number(op.id) === sessaoId;
         const nomeJs = JSON.stringify(op.nome || '');
         return `<div class="mk-op-card" data-id="${op.id}">
@@ -1479,6 +1508,7 @@
             <span class="mk-op-card-name">${escapeHtml_(op.nome)}</span>
             <span class="mk-op-card-badge ${badgeCls}">${badgeTxt}</span>
             <span class="mk-op-card-badge">${perfil}</span>
+            <span class="mk-op-card-badge">${lojaTxt}</span>
             ${logadoAgora ? '<span class="mk-op-card-badge ok">Logado no balcao</span>' : ''}
           </div>
           <div class="mk-op-card-actions">
@@ -1486,6 +1516,7 @@
             <div class="mk-op-menu" id="mk-op-menu-${op.id}">
               ${logadoAgora ? `<button type="button" onclick="event.stopPropagation(); mkOpDeslogarBalcao(${op.id}, ${nomeJs})">🔓 Deslogar do balcao</button>` : ''}
               <button type="button" onclick="event.stopPropagation(); mkOpSetPerfil(${op.id}, ${nomeJs}, ${JSON.stringify(op.perfil || 'operador')})">👤 Perfil</button>
+              <button type="button" onclick="event.stopPropagation(); mkOpSetUnidade(${op.id}, ${nomeJs}, ${JSON.stringify(uidOp)})">🏪 Loja</button>
               ${typeof mkGpAdmVerFicha === 'function' ? `<button type="button" onclick="event.stopPropagation(); mkGpAdmVerFicha(${op.id})">📋 Ficha RH</button>` : ''}
               <button type="button" onclick="event.stopPropagation(); mkOpEditar(${op.id}, ${nomeJs})">✏️ Editar</button>
               <button type="button" onclick="event.stopPropagation(); mkOpResetarPin(${op.id}, ${nomeJs})">🔑 Resetar PIN</button>
