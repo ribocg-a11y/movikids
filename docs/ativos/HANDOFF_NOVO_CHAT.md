@@ -131,14 +131,15 @@ Diagnóstico 29/09: `diagnosticoPlanilhaCompletoAdmin` → LOCACOES/CUSTOS/CONFI
 | Problema | PDF/e-mail GAS contava **Cancelada** → fat/CTO inflados |
 | Correção | FE **v1.9.120** — `mkHtmlRelatorioGoldenFromKpi_` via **`kpiMes`** (sem AppScript) |
 | Agosto enviado (histórico) | R$ **17.212** · 957 · CTO **R$ 1.721,20** — **não reenviar** |
-| Setembro prévia **29/09** (`kpiMes`) | R$ **14.371** · **675** contas · extra **R$ 8** · CTO **R$ 1.500** (10% = 1.437,10) |
-| PDF setembro prévia | `entregas/MOVI-KIDS-Relatorio-Setembro-2026-Golden-previa-2026-09-29.pdf` |
+| Setembro prévia **29/09** | R$ **14.371** · **675** · CTO **R$ 1.500** (10% = 1.437,10) |
+| Setembro prévia **30/09** (`kpiMes`) | R$ **14.525** · **682** · extra **R$ 8** · ticket **R$ 21,30** · CTO **R$ 1.500** (10% = **1.452,50**) |
+| PDF setembro prévia 30/09 | `entregas/MOVI-KIDS-Relatorio-Setembro-2026-Golden-previa-2026-09-30.pdf` |
 | PDF ago dia a dia | `entregas/MOVI-KIDS-Relatorio-Agosto-2026-Golden-diario.pdf` |
 | Docs | `INCIDENTE_I158_*` · `guard.i158.fe.golden` · `TESTE_I158_GOLDEN_*` |
 
-**CTO R$ 1.500 ≠ caixa R$ 15.000:** é o **mínimo contratual** do mês. Em 29/09, 10% de 14.371 = **1.437,10** &lt; mínimo → paga 1.500. A projeção do `kpiMes` (~R$ 15.028) passa de R$ 15.000: se o fechamento real ultrapassar isso, o CTO vira **10%**.
+**CTO R$ 1.500:** mínimo contratual. Em 30/09, 10% de 14.525 = **1.452,50** &lt; mínimo → ainda **R$ 1.500**. Se o fechamento 01/10 ultrapassar **R$ 15.000**, CTO vira **10%**.
 
-**PDF prévia gerada em 29/09** (mesmo HTML do botão Salvar PDF Golden + faixa “não enviar”). **Não mandar ao shopping ainda** — falta o dia 30. Em **01/10**: Admin → Relatório → Setembro → conferir o fechamento → PDF / e-mail (fluxo FE; e-mail GAS legado desligado).
+**Não mandar ao shopping ainda** — regenerar em **01/10** (após fechar o dia 30) como fechamento oficial. E-mail GAS legado desligado; enviar HTML/PDF do FE.
 
 ---
 
@@ -207,14 +208,15 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 
 | Peso | # | Ação | Quem | Status |
 |------|---|------|------|--------|
-| **P0** | 1 | Imprimir cartaz QR La Ville (`qr-balcao-imprimir.html?loja=laville`) + fixar na mesa | Ops | ⏳ FE **v1.9.149** |
-| **P0** | 2 | PDF Golden fechamento **01/10** (não enviar prévia 29/09) | Sócio | ⏳ |
+| **P0** | 1 | Imprimir cartaz QR La Ville (`qr-balcao-imprimir.html?loja=laville`) + fixar na mesa | Ops | ⏳ FE **v1.9.149** · smoke PC ✅ |
+| **P0** | 2 | PDF Golden **fechamento 01/10** (prévia 30/09 pronta — não enviar ainda) | Sócio | ⏳ prévia: fat **R$ 14.525** · n **682** · CTO **R$ 1.500** |
 | **P1** | 3 | Tablet smoke D4 (Turno/timer/idle) `?force=1.9.149` | Ops | ⏳ |
-| **P1** | 4 | Smoke portal+foto La Ville no celular | Ops | ⏳ I163/I164 |
+| **P1** | 4 | Smoke portal+foto La Ville no celular | Ops | ⏳ PC ✅ · falta celular |
 | **P1** | 5 | Assinar FASE 17 (decisão 17.5 F9) | Sócio | ⏳ |
+| **P1** | 5b | Bump **1.9.150** moldura CSS floresta + logo cartaz A5 | Agente | ⏳ I22 Ativa row · polish no push sem bump I3 |
 | **P2** | 6 | Contratar 1ª equipe La Ville (RH `unidade_id=laville`) | Ops/RH | ⏳ escala 14–21:30 / terça OFF |
 | **P2** | 7 | E-mail CTO / frota labels oficiais LV | Sócio | ⏳ |
-| **P3** | 8 | Holding smoke C (Caixa≠0 · Avulso LV) | Ops/PC | ⏳ FE pronto |
+| **P3** | 8 | Holding smoke C (Caixa≠0 · Avulso LV) | Ops/PC | ⏳ `resumoDia` 30/09 Golden fat **45** / LV **0** |
 | **P4** | 9 | F4 WhatsApp/SMS · F9 Supervisor | — | pausado |
 
 **Plano:** `docs/ativos/PLANO_MULTI_UNIDADE_GOLDEN_LAVILLE_2026-09.md`
