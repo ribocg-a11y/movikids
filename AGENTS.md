@@ -2,7 +2,7 @@
 
 Sistema operacional de locações — balcão (tablet na loja), portal do responsável, painel admin.
 
-**Ciclo ativo (29/09/2026):** Sprint D · FE **v1.9.133** Pages · GAS Web **v1.5.225** · **I159h** Caixa/holding filtro · **I158** ✅
+**Ciclo ativo (29/09/2026):** Sprint D · FE **v1.9.133** Pages · GAS Web **v1.5.225** · **I159i** backfill + dual custos · **I158** ✅
 
 **Para retomar (agente local PC — pasta C):**
 
