@@ -1,0 +1,334 @@
+{
+  "suite": "TESTE_LAVILLE_SUITE40_PROD",
+  "startedAt": "2026-09-30 12:40:02",
+  "unidadeId": "laville",
+  "gasVersao": "v1.5.227",
+  "checks": [
+    {
+      "name": "01.ping",
+      "status": "ok",
+      "detail": "v1.5.227"
+    },
+    {
+      "name": "02.ping.versao.min",
+      "status": "ok",
+      "detail": "v1.5.227"
+    },
+    {
+      "name": "03.listarAtivas.laville",
+      "status": "ok",
+      "detail": "n=0"
+    },
+    {
+      "name": "04.ops.login.laville",
+      "status": "ok",
+      "detail": "n=0"
+    },
+    {
+      "name": "05.ops.login.golden",
+      "status": "ok",
+      "detail": "n=4"
+    },
+    {
+      "name": "06.colab.gestao.laville",
+      "status": "ok",
+      "detail": "n=0"
+    },
+    {
+      "name": "7.salvar.Carro.10min",
+      "status": "ok",
+      "detail": "row=3972 valor=15"
+    },
+    {
+      "name": "7b.preco.Carro",
+      "status": "ok",
+      "detail": "R$ 15"
+    },
+    {
+      "name": "7c.mins.Carro",
+      "status": "ok",
+      "detail": "10min"
+    },
+    {
+      "name": "8.salvar.Triciclo.20min",
+      "status": "ok",
+      "detail": "row=3973 valor=25"
+    },
+    {
+      "name": "8b.preco.Triciclo",
+      "status": "ok",
+      "detail": "R$ 25"
+    },
+    {
+      "name": "8c.mins.Triciclo",
+      "status": "ok",
+      "detail": "20min"
+    },
+    {
+      "name": "9.salvar.Pelúcia.30min",
+      "status": "ok",
+      "detail": "row=3974 valor=35"
+    },
+    {
+      "name": "9b.preco.Pelúcia",
+      "status": "ok",
+      "detail": "R$ 35"
+    },
+    {
+      "name": "9c.mins.Pelúcia",
+      "status": "ok",
+      "detail": "30min"
+    },
+    {
+      "name": "10.salvar.Driffyt.40min",
+      "status": "fail",
+      "detail": "GAS HTML (timeout/quota) em salvarLocacao tentativa 3"
+    },
+    {
+      "name": "11.salvar.Dino.10min",
+      "status": "fail",
+      "detail": "GAS HTML (timeout/quota) em salvarLocacao tentativa 3"
+    },
+    {
+      "name": "12.cancelar.pendente.row3972",
+      "status": "ok",
+      "detail": "Cancelada"
+    },
+    {
+      "name": "13.cancelar.pendente.row3973",
+      "status": "ok",
+      "detail": "ja finalizada: Locacao ja finalizada"
+    },
+    {
+      "name": "14.cancelar.pendente.row3974",
+      "status": "ok",
+      "detail": "ja finalizada: Locacao ja finalizada"
+    },
+    {
+      "name": "17.reject.veiculo.golden",
+      "status": "ok",
+      "detail": "Ve├¡culo inv├ílido: Carro 01"
+    },
+    {
+      "name": "18.reject.plano.3h",
+      "status": "ok",
+      "detail": "Plano inv├ílido: 3h"
+    },
+    {
+      "name": "19.salvar.ciclo",
+      "status": "ok",
+      "detail": "row=3977"
+    },
+    {
+      "name": "20.verificar.pendente",
+      "status": "ok",
+      "detail": "ok"
+    },
+    {
+      "name": "20b.verificar.pendente.status",
+      "status": "ok",
+      "detail": "Pendente"
+    },
+    {
+      "name": "21.iniciarTimer",
+      "status": "ok",
+      "detail": "ts=1790783043947"
+    },
+    {
+      "name": "21b.ts.ms",
+      "status": "ok",
+      "detail": "1790783043947"
+    },
+    {
+      "name": "22.iniciar.idempotente",
+      "status": "ok",
+      "detail": "ok"
+    },
+    {
+      "name": "22b.ts.igual",
+      "status": "ok",
+      "detail": "mesmo ts"
+    },
+    {
+      "name": "23.carregarInicio.laville",
+      "status": "ok",
+      "detail": "ativos=3"
+    },
+    {
+      "name": "23b.ativo.na.lista",
+      "status": "ok",
+      "detail": "ts=1790783043947 Ativa"
+    },
+    {
+      "name": "24.estender.10min",
+      "status": "ok",
+      "detail": "totalMins=20"
+    },
+    {
+      "name": "24b.totalMins",
+      "status": "ok",
+      "detail": "20"
+    },
+    {
+      "name": "25.verificar.pos.estender",
+      "status": "ok",
+      "detail": "ok"
+    },
+    {
+      "name": "25b.mins",
+      "status": "ok",
+      "detail": "mins=20"
+    },
+    {
+      "name": "26.encerrar.com.extra",
+      "status": "ok",
+      "detail": "total= status=Encerrada"
+    },
+    {
+      "name": "27.salvar.dino20",
+      "status": "ok",
+      "detail": "valor=35"
+    },
+    {
+      "name": "27b.preco.dino20",
+      "status": "ok",
+      "detail": "R"
+    },
+    {
+      "name": "28.iniciar.dino",
+      "status": "ok",
+      "detail": "ok"
+    },
+    {
+      "name": "29.encerrar.somentePlano",
+      "status": "fail",
+      "detail": "Loca├º├úo com menos de 90s. Se foi por engano, cancele. Se for real, confirme o encerramento curto."
+    },
+    {
+      "name": "30.salvar.cancelExtras",
+      "status": "ok",
+      "detail": "row=3979"
+    },
+    {
+      "name": "31.iniciar.cancelExtras",
+      "status": "ok",
+      "detail": "ok"
+    },
+    {
+      "name": "32.encerrar.cancelarExtras",
+      "status": "fail",
+      "detail": "Loca├º├úo com menos de 90s. Se foi por engano, cancele. Se for real, confirme o encerramento curto."
+    },
+    {
+      "name": "33.multi.2veiculos",
+      "status": "fail",
+      "detail": "Veiculo ja em uso (Pendente): LV Pel├║cia 02"
+    },
+    {
+      "name": "34.multi.mesmaConta",
+      "status": "skip",
+      "detail": "multi falhou"
+    },
+    {
+      "name": "35.cancel.multi",
+      "status": "skip",
+      "detail": "multi falhou"
+    },
+    {
+      "name": "36.salvar.editar",
+      "status": "fail",
+      "detail": "Ve├¡culo j├í em uso (Pendente). N├úo salve de novo ÔÇö use o card na Home."
+    },
+    {
+      "name": "bloco.exception",
+      "status": "fail",
+      "detail": "GAS HTML (timeout/quota) em editarLocacao tentativa 3"
+    },
+    {
+      "name": "39.avulso.laville",
+      "status": "fail",
+      "detail": "Ve├¡culo j├í em uso (Ativa). N├úo salve de novo ÔÇö use o card na Home."
+    },
+    {
+      "name": "40.resumoDia.laville",
+      "status": "ok",
+      "detail": "fat= n="
+    },
+    {
+      "name": "41.resumoDia.golden",
+      "status": "ok",
+      "detail": "fat= n="
+    },
+    {
+      "name": "42.resumoDia.all",
+      "status": "ok",
+      "detail": "fat="
+    },
+    {
+      "name": "43.listarAtivas.final",
+      "status": "ok",
+      "detail": "n=7"
+    },
+    {
+      "name": "44.frota",
+      "status": "ok",
+      "detail": "row=3983"
+    },
+    {
+      "name": "44b.cancel.frota",
+      "status": "ok",
+      "detail": "Cancelada"
+    },
+    {
+      "name": "45.frota",
+      "status": "ok",
+      "detail": "row=3984"
+    },
+    {
+      "name": "45b.cancel.frota",
+      "status": "ok",
+      "detail": "ja finalizada: Locacao ja finalizada"
+    },
+    {
+      "name": "46.salvar.dup.base",
+      "status": "fail",
+      "detail": "Ve├¡culo j├í em uso (Pendente). N├úo salve de novo ÔÇö use o card na Home."
+    },
+    {
+      "name": "47.reject.veiculo.ocupado",
+      "status": "ok",
+      "detail": "Ve├¡culo j├í em uso (Pendente). N├úo salve de novo ÔÇö use o card na Home."
+    },
+    {
+      "name": "48.cancel.dup.base",
+      "status": "skip",
+      "detail": "sem row"
+    },
+    {
+      "name": "49.pag.Credito",
+      "status": "fail",
+      "detail": "Ve├¡culo j├í em uso (Pendente). N├úo salve de novo ÔÇö use o card na Home."
+    },
+    {
+      "name": "49.pag.PIX",
+      "status": "fail",
+      "detail": "Ve├¡culo j├í em uso (Pendente). N├úo salve de novo ÔÇö use o card na Home."
+    },
+    {
+      "name": "99.limpeza.gas",
+      "status": "ok",
+      "detail": "Planilha: executado"
+    },
+    {
+      "name": "99c.operacao.abertas",
+      "status": "ok",
+      "detail": "abertas=0"
+    }
+  ],
+  "pass": 50,
+  "fail": 11,
+  "skip": 3,
+  "status": "fail",
+  "summary": "pass=48 fail=11 skip=3 total=62",
+  "finishedAt": "2026-09-30 13:04:19"
+}

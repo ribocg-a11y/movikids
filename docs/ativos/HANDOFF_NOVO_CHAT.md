@@ -1,6 +1,6 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 30/09/2026 · FE **v1.9.140** · GAS repo **v1.5.227** · Web ⏳ Nova versão · **I159q** equipes por unidade · **I158** ✅
+**Atualizado:** 30/09/2026 · FE **v1.9.140** · GAS Web **v1.5.227** ✅ · **I159q** equipes · suite La Ville ✅ · **I158** ✅
 
 ## Produção (agora)
 
@@ -8,7 +8,7 @@
 |--------|--------|------|
 | Frontend | **v1.9.140** | https://ribocg-a11y.github.io/movikids/?force=1.9.140 |
 | Gestão Pessoas | **v1.9.140** | `gestao-pessoas.html?force=1.9.140` |
-| GAS | ping Web **v1.5.226** · repo **v1.5.227** ⏳ | I159q RH+OPS unidade_id |
+| GAS | ping Web **v1.5.227** ✅ · repo **v1.5.227** | I159q RH+OPS unidade_id |
 | Design System | v1.1 | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
 
 **GAS raw:** https://raw.githubusercontent.com/ribocg-a11y/movikids/main/MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs  
@@ -45,7 +45,7 @@
 | **E** | Tablet smoke D4 · PDF Golden 01/10 · FASE 17 | Ops/Sócio | Ops |
 | **F** | ~~GAS lookback `resumoDia`~~ | ✅ Web **v1.5.226** | dia = cauda 600 |
 
-**Nova versão Web:** ✅ ping **v1.5.226** (30/09). FE **v1.9.138** — cards La Ville mostram `Carro 01` (ID interno `LV Carro 01`).
+**Nova versão Web:** ✅ ping **v1.5.227** (30/09). Suite La Ville real: `entregas/DIAGNOSTICO_LAVILLE_SUITE40_2026-09-30.md` (cronômetro/planos/extra/multi/caixa OK; limpeza 0 abertas).
 
 ### Planilha Google (multi-unidade) — o que mudou / falta
 
@@ -53,8 +53,8 @@
 |-----|--------|---------|
 | **LOCACOES** | Schema ✅ col **AC `unidade_id`** | Backfill ✅ **3947** linhas (29/09) · novas locs gravam unidade |
 | **CUSTOS** | Schema ✅ col **G `unidade_id`** | Novos custos com unidade; antigos = golden default |
-| **COLABORADORES_RH** | ⏳ col **T `unidade_id`** (I159q) | Após Nova Web **v1.5.227** + repair → backfill golden; La Ville vazia até atribuir |
-| **OPERADORES_SISTEMA** | ⏳ col **I `unidade_id`** (I159q) | Idem · login/lista por loja · `all` = sócio em ambas |
+| **COLABORADORES_RH** | ✅ col **T** (repair 30/09) | 20 cols · backfill golden · **La Ville equipe ainda 0** (atribuir) |
+| **OPERADORES_SISTEMA** | ✅ col **I** (repair 30/09) | 9 cols · 4 ativos golden · login LV=0 até marcar `laville`/`all` |
 | **CONFIG** | Ping lista golden + laville | Preços La Ville oficiais (Brinquedos+Dinos); frota LV* |
 | **DASHBOARD / RELATORIOS / FOLHA** | Sem aba por loja | Filtro por `unidadeId` na API — **não** há sheet “La Ville” separada |
 | **AUD_SMS / SMS** | Fora do menu FE | QR-only; abas podem existir na planilha sem uso operacional |
