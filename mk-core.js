@@ -125,8 +125,9 @@ function atualizarOperadorUI_(sessaoServidor) {
       : (srv && srv.unidadeId ? String(srv.unidadeId) : ''))
     : '';
   const currUid = (typeof mkUnidadeId_ === 'function') ? mkUnidadeId_() : '';
-  const sessaoOutraLoja = !!(balcaoUnitario && temBalcaoRaw && opUid && currUid &&
-    opUid !== 'all' && currUid !== 'all' && opUid !== currUid);
+  /* Sem unidade conhecida = não afirmar que é desta loja (evita GET all + _t do I162). */
+  const sessaoOutraLoja = !!(balcaoUnitario && temBalcaoRaw && currUid && currUid !== 'all' &&
+    (!opUid || (opUid !== 'all' && opUid !== currUid)));
   const temBalcao = temBalcaoRaw && !sessaoOutraLoja;
 
   if (card) {

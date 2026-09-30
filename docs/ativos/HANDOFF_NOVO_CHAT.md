@@ -1,13 +1,13 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 30/09/2026 · FE **v1.9.146** · GAS **v1.5.231** · **I162b** balcão só mostra operador da loja · I162 logo · **I161** ✅ · **I160** ✅
+**Atualizado:** 30/09/2026 · FE **v1.9.147** · GAS **v1.5.231** · **I162c** sem GET extra sessão · I162b balcão · I162 logo · **I161** ✅ · **I160** ✅
 
 ## Produção (agora)
 
 | Camada | Versão | Link |
 |--------|--------|------|
-| Frontend | **v1.9.146** | https://ribocg-a11y.github.io/movikids/?force=1.9.146 |
-| Gestão Pessoas | **v1.9.146** | `gestao-pessoas.html?force=1.9.146` |
+| Frontend | **v1.9.147** | https://ribocg-a11y.github.io/movikids/?force=1.9.147 |
+| Gestão Pessoas | **v1.9.147** | `gestao-pessoas.html?force=1.9.147` |
 | GAS | ping Web **v1.5.231** ✅ | I160 escala null + I159t LV |
 | Design System | v1.1 | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
 
@@ -45,15 +45,16 @@
 | **E** | Tablet smoke D4 · PDF Golden 01/10 · FASE 17 | Ops/Sócio | Ops |
 | **F** | ~~GAS lookback `resumoDia`~~ | ✅ Web **v1.5.226** | dia = cauda 600 |
 
-**Nova versão Web:** ✅ ping **v1.5.231** (I160). FE **v1.9.146** **I162** — logo dino (PNG transparente) + card balcão mostra loja do **operador** (OPS col I / RH col T), não a loja do tablet. **I161** Holding×Balcão. Suite: `entregas/DIAGNOSTICO_LAVILLE_SUITE40_2026-09-30.md`.
+**Nova versão Web:** ✅ ping **v1.5.231** (I160). FE **v1.9.147** **I162** — logo dino (PNG transparente) + card balcão mostra loja do **operador** (OPS col I / RH col T), não a loja do tablet. **I161** Holding×Balcão. Suite: `entregas/DIAGNOSTICO_LAVILLE_SUITE40_2026-09-30.md`.
 
-### I162 / I162b — Logo + sessão por loja (smoke PC)
+### I162 / I162b / I162c — Logo + sessão por loja (smoke PC)
 
 | Check | Esperado |
 |-------|----------|
 | Empty home / splash / sidebar | Mascote dino + MOVI KIDS (fundo transparente) |
-| Karen/Ray Golden logada; admin abre balcão LV | Linha **Balcão some** (só TABLET admin) — **não** `Golden (outra loja)` |
+| Karen/Ray Golden logada; admin abre balcão LV | Linha **Balcão some** (só TABLET admin) |
 | Mesma pessoa no balcão Golden | `Karen · Golden` / `Raykelly · Golden` |
+| Carga pós-login (I162c) | **Sem** `listarOperadoresLogin&all&_t` extra · home/sync warm estável (I155) |
 | RH / OPS | Colunas `unidade_id` já existem (RH **T**, OPS **I**) |
 
 ### I161 — Holding × Balcão (smoke PC)

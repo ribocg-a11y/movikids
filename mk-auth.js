@@ -13,22 +13,49 @@
   let selectedOp = null;
   let _lastGasTouchAt = 0;
   let operadoresCache = [];
-  /** I162 — operadorId → unidade_id (OPS col I / RH col T), independente da loja aberta no tablet. */
+  /** I162/I162c — operadorId → unidade (OPS/RH). Só memória + localStorage — zero GET extra. */
+  const OPS_UID_LS_KEY = 'mk_ops_unidade_v1';
   const opsUnidadeById_ = Object.create(null);
   let sessaoAtivaRemota = null;
   let _loadingOps = false;
   let _authBusy = false;
-  let _enrichSessaoUidBusy = false;
+  let _lastTurnoRefreshAt = 0;
+
+  function hydrateOpsUnidadeFromLs_() {
+    try {
+      const raw = localStorage.getItem(OPS_UID_LS_KEY);
+      if (!raw) return;
+      const o = JSON.parse(raw);
+      Object.keys(o || {}).forEach(function (k) {
+        if (o[k]) opsUnidadeById_[String(k)] = String(o[k]);
+      });
+    } catch (e) { /* ignore */ }
+  }
+
+  function persistOpsUnidadeLs_() {
+    try {
+      localStorage.setItem(OPS_UID_LS_KEY, JSON.stringify(opsUnidadeById_));
+    } catch (e) { /* ignore */ }
+  }
+
+  hydrateOpsUnidadeFromLs_();
 
   function indexOpsUnidade_(ops) {
     if (!Array.isArray(ops)) return;
+    let touched = false;
     ops.forEach(function (op) {
       if (!op || op.id == null) return;
       const uid = op.unidadeId != null ? op.unidadeId : op.unidade_id;
       if (uid == null || uid === '') return;
       const canon = (typeof mkUnidadeCanon_ === 'function') ? mkUnidadeCanon_(uid) : String(uid);
-      if (canon) opsUnidadeById_[String(op.id)] = canon;
+      if (!canon) return;
+      const key = String(op.id);
+      if (opsUnidadeById_[key] !== canon) {
+        opsUnidadeById_[key] = canon;
+        touched = true;
+      }
     });
+    if (touched) persistOpsUnidadeLs_();
   }
 
   /** Loja do operador da sessão de balcão — nunca a loja do tablet admin. */
@@ -48,27 +75,6 @@
     if (!sessao || !sessao.nome) return sessao;
     const uid = mkSessaoOperadorUnidadeId_(sessao);
     if (uid && !sessao.unidadeId) sessao.unidadeId = uid;
-    return sessao;
-  }
-
-  /** Se a sessão ativa não traz unidadeId (payload GAS legado), resolve via lista all. */
-  async function ensureSessaoUnidadeResolvida_(sessao) {
-    if (!sessao || !sessao.operadorId) return sessao;
-    if (mkSessaoOperadorUnidadeId_(sessao)) {
-      return enrichSessaoComUnidade_(sessao);
-    }
-    if (_enrichSessaoUidBusy) return sessao;
-    _enrichSessaoUidBusy = true;
-    try {
-      const d = await apiCall({ action: 'listarOperadoresLogin', unidadeId: 'all', _t: Date.now() }, 20000);
-      if (d && d.ok) indexOpsUnidade_(d.operadores);
-      enrichSessaoComUnidade_(sessao);
-      if (sessaoAtivaRemota && Number(sessaoAtivaRemota.operadorId) === Number(sessao.operadorId)) {
-        enrichSessaoComUnidade_(sessaoAtivaRemota);
-        if (typeof atualizarOperadorUI_ === 'function') atualizarOperadorUI_(sessaoAtivaRemota);
-      }
-    } catch (e) { /* offline */ }
-    finally { _enrichSessaoUidBusy = false; }
     return sessao;
   }
 
@@ -416,14 +422,12 @@
 
   /** Atualiza banner, login lock e rodapé (sb-sessao) de uma vez. */
   function mkAuthSyncSessaoBalcaoUI_(sessao) {
+    /* I162c — sem listarOperadoresLogin extra (I120b/I122/I145: não competir com carregarInicio). */
     sessaoAtivaRemota = sessao && sessao.nome ? enrichSessaoComUnidade_(sessao) : null;
     updateSessaoLockUI_();
     updateOperadoresSessaoBanner_(sessaoAtivaRemota);
     if (typeof atualizarOperadorUI_ === 'function') {
       atualizarOperadorUI_(sessaoAtivaRemota);
-    }
-    if (sessaoAtivaRemota && sessaoAtivaRemota.operadorId && !mkSessaoOperadorUnidadeId_(sessaoAtivaRemota)) {
-      ensureSessaoUnidadeResolvida_(sessaoAtivaRemota);
     }
   }
 
@@ -464,10 +468,14 @@
 
   window.mkAuthRefreshSessaoTurno_ = async function mkAuthRefreshSessaoTurno_() {
     if (!mkAuthIsLoggedIn() || _turnoPollBusy) return;
+    /* I162c — visibility/idle não pode spammar listarOperadoresLogin na fila do sync (I145). */
+    if (_lastTurnoRefreshAt && (Date.now() - _lastTurnoRefreshAt) < 45000) return;
     _turnoPollBusy = true;
     try {
       const d = await apiCall({ action: 'listarOperadoresLogin' }, 20000);
+      _lastTurnoRefreshAt = Date.now();
       if (d && d.ok) {
+        indexOpsUnidade_(d.operadores);
         const kicked = await mkAuthReconcileSessaoFantasma_(d);
         if (!kicked) applySessaoAtivaFromApi_(d);
       }
@@ -1094,7 +1102,10 @@
     const unidadeId = (opUidRaw != null && String(opUidRaw).trim() !== '')
       ? ((typeof mkUnidadeCanon_ === 'function') ? (mkUnidadeCanon_(opUidRaw) || String(opUidRaw)) : String(opUidRaw))
       : ((typeof mkUnidadeId_ === 'function') ? mkUnidadeId_() : 'golden');
-    if (operador && operador.id != null) opsUnidadeById_[String(operador.id)] = unidadeId;
+    if (operador && operador.id != null) {
+      opsUnidadeById_[String(operador.id)] = unidadeId;
+      persistOpsUnidadeLs_();
+    }
     setSession({
       id: operador.id,
       nome: operador.nome,
