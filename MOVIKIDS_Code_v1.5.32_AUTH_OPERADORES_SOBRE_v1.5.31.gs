@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.227
+// MOVI KIDS — Google Apps Script v1.5.228
+// v1.5.228: I159r — La Ville tipo Drift/Drifts (ex-Driffyt); IDs LV Drift 01/02
 // v1.5.227: I159q — COLABORADORES_RH + OPERADORES_SISTEMA col unidade_id; equipes por loja
 // v1.5.226: I159n — frota La Ville oficial (2/2/2/3/2); frotaProvisoria off; resumoDia lookback no dia
 // v1.5.225: I159f — resumoDia/comando por unidade; CUSTOS col unidade_id; dual ADM
@@ -219,7 +220,7 @@
 
 // ── CONSTANTES ───────────────────────────────────────────────
 /** Versão exposta em ping, carregarInicio, validarSchema, gestaoPessoasStatus (bump com header). */
-const MK_GAS_VERSAO_  = 'v1.5.227';
+const MK_GAS_VERSAO_  = 'v1.5.228';
 const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.227';
 const SHEET_ID   = '1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618';
 const DEPLOY_ID  = 'AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y';
@@ -9322,7 +9323,7 @@ const VEICULOS_LAVILLE_ = [
   'LV Carro 01', 'LV Carro 02',
   'LV Triciclo 01', 'LV Triciclo 02',
   'LV Pelúcia 01', 'LV Pelúcia 02', 'LV Pelúcia 03',
-  'LV Driffyt 01', 'LV Driffyt 02',
+  'LV Drift 01', 'LV Drift 02',
   'LV Dino 01', 'LV Dino 02'
 ];
 const OPERACAO_CONFIG_LAVILLE_ = {
@@ -9331,6 +9332,8 @@ const OPERACAO_CONFIG_LAVILLE_ = {
     Carro: PRECOS_LAVILLE_BRINQUEDOS_,
     Triciclo: PRECOS_LAVILLE_BRINQUEDOS_,
     'Pelúcia': PRECOS_LAVILLE_BRINQUEDOS_,
+    Drift: PRECOS_LAVILLE_BRINQUEDOS_,
+    // legado testes/planilha: Driffyt → mesmos preços
     Driffyt: PRECOS_LAVILLE_BRINQUEDOS_,
     Dino: PRECOS_LAVILLE_DINOS_
   },
@@ -9460,7 +9463,7 @@ function veiculosDefFromList_(veiculos) {
   return (veiculos || []).map(nome => {
     const n = String(nome);
     let tipo = 'Carro';
-    if (n.indexOf('Driffyt') >= 0) tipo = 'Driffyt';
+    if (n.indexOf('Drift') >= 0 || n.indexOf('Driffyt') >= 0) tipo = 'Drift';
     else if (n.indexOf('Dino') >= 0) tipo = 'Dino';
     else if (n.indexOf('Triciclo') >= 0) tipo = 'Triciclo';
     else if (n.indexOf('Pel') >= 0) tipo = 'Pelúcia';

@@ -292,7 +292,7 @@ function renderPainel() {
     const carros = frota.filter(function (v) { return v.tipo === 'Carro'; });
     const triciclos = frota.filter(function (v) { return v.tipo === 'Triciclo'; });
     const pelucias = frota.filter(function (v) { return v.tipo === 'Pelúcia'; });
-    const driffyts = frota.filter(function (v) { return v.tipo === 'Driffyt'; });
+    const drifts = frota.filter(function (v) { return v.tipo === 'Drift' || v.tipo === 'Driffyt'; });
     const dinos = frota.filter(function (v) { return v.tipo === 'Dino'; });
     return (
       '<div class="painel-sec-label">🚗 Carros</div>' +
@@ -301,8 +301,8 @@ function renderPainel() {
         triciclos.map(function (v) { return buildPainelCard(v.nome, v.tipo, sessMap[v.nome]); }).join('') : '') +
       (pelucias.length ? '<div class="painel-sec-label">🧸 Pelúcias</div>' +
         pelucias.map(function (v) { return buildPainelCard(v.nome, v.tipo, sessMap[v.nome]); }).join('') : '') +
-      (driffyts.length ? '<div class="painel-sec-label">🛸 Driffyts</div>' +
-        driffyts.map(function (v) { return buildPainelCard(v.nome, v.tipo, sessMap[v.nome]); }).join('') : '') +
+      (drifts.length ? '<div class="painel-sec-label">🛸 Drifts</div>' +
+        drifts.map(function (v) { return buildPainelCard(v.nome, v.tipo, sessMap[v.nome]); }).join('') : '') +
       (dinos.length ? '<div class="painel-sec-label">🦖 Dinos</div>' +
         dinos.map(function (v) { return buildPainelCard(v.nome, v.tipo, sessMap[v.nome]); }).join('') : '')
     );

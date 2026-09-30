@@ -44,7 +44,7 @@ function aplicarOperacaoConfig_(cfg) {
     cfg.veiculos_validos.forEach(nome => {
       const n = String(nome);
       let tipo = 'Carro';
-      if (n.includes('Driffyt')) tipo = 'Driffyt';
+      if (n.includes('Drift') || n.includes('Driffyt')) tipo = 'Drift';
       else if (n.includes('Dino')) tipo = 'Dino';
       else if (n.includes('Triciclo')) tipo = 'Triciclo';
       else if (n.includes('Pel')) tipo = 'Pelúcia';
@@ -309,7 +309,7 @@ function tipoIcon(tipo) {
   if (tipo === 'Carro')    return '🚗';
   if (tipo === 'Triciclo') return '🛺';
   if (tipo === 'Dino')     return '🦖';
-  if (tipo === 'Driffyt')  return '🛸';
+  if (tipo === 'Drift' || tipo === 'Driffyt') return '🛸';
   return '🧸';
 }
 
@@ -317,7 +317,7 @@ function tipoCor(tipo) {
   if (tipo === 'Carro')    return '#1565C0';
   if (tipo === 'Triciclo') return '#2E7D32';
   if (tipo === 'Dino')     return '#6A1B9A';
-  if (tipo === 'Driffyt')  return '#00838F';
+  if (tipo === 'Drift' || tipo === 'Driffyt') return '#00838F';
   return '#C2185B';
 }
 
@@ -325,6 +325,6 @@ function tipoLabel(tipo) {
   if (tipo === 'Carro')    return '🚗 Carros';
   if (tipo === 'Triciclo') return '🛺 Triciclos';
   if (tipo === 'Dino')     return '🦖 Dinos';
-  if (tipo === 'Driffyt')  return '🛸 Driffyts';
+  if (tipo === 'Drift' || tipo === 'Driffyt') return '🛸 Drifts';
   return '🧸 Pelúcias';
 }

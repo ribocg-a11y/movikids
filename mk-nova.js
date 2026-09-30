@@ -82,7 +82,7 @@ function novaLimparSelecaoAtual_() {
     l.style.display = '';
     l.classList.remove('nova-vc-outro');
   });
-  ['vc-grid-carros', 'vc-grid-triciclos', 'vc-grid-pelucias', 'vc-grid-driffyts', 'vc-grid-dinos'].forEach(function(id) {
+  ['vc-grid-carros', 'vc-grid-triciclos', 'vc-grid-pelucias', 'vc-grid-drifts', 'vc-grid-driffyts', 'vc-grid-dinos'].forEach(function(id) {
     const g = document.getElementById(id);
     if (g) g.style.display = '';
   });
@@ -755,26 +755,26 @@ function rebuildVeiculoGridsFromDef_() {
       { nome: 'Pelúcia 01', tipo: 'Pelúcia' }, { nome: 'Pelúcia 02', tipo: 'Pelúcia' },
       { nome: 'Pelúcia 03', tipo: 'Pelúcia' }, { nome: 'Pelúcia 04', tipo: 'Pelúcia' }
     ];
-  const order = ['Carro', 'Triciclo', 'Pelúcia', 'Driffyt', 'Dino'];
+  const order = ['Carro', 'Triciclo', 'Pelúcia', 'Drift', 'Dino'];
   const labels = {
     Carro: 'Carros elétricos',
     Triciclo: 'Triciclos elétricos',
     'Pelúcia': 'Pelúcias elétricas',
-    Driffyt: 'Driffyts',
+    Drift: 'Drifts',
     Dino: 'Dinos'
   };
   const gridClass = {
     Carro: 'veiculo-grid-carros',
     Triciclo: 'veiculo-grid-triciclos',
     'Pelúcia': 'veiculo-grid-pelucias',
-    Driffyt: 'veiculo-grid-driffyts',
+    Drift: 'veiculo-grid-drifts',
     Dino: 'veiculo-grid-dinos'
   };
   const gridId = {
     Carro: 'vc-grid-carros',
     Triciclo: 'vc-grid-triciclos',
     'Pelúcia': 'vc-grid-pelucias',
-    Driffyt: 'vc-grid-driffyts',
+    Drift: 'vc-grid-drifts',
     Dino: 'vc-grid-dinos'
   };
   const byTipo = {};
@@ -783,7 +783,7 @@ function rebuildVeiculoGridsFromDef_() {
     if (!byTipo[t]) byTipo[t] = [];
     byTipo[t].push(v);
   });
-  Array.from(pick.querySelectorAll('.vc-section-label, .veiculo-grid-carros, .veiculo-grid-triciclos, .veiculo-grid-pelucias, .veiculo-grid-driffyts, .veiculo-grid-dinos')).forEach(function (el) {
+  Array.from(pick.querySelectorAll('.vc-section-label, .veiculo-grid-carros, .veiculo-grid-triciclos, .veiculo-grid-pelucias, .veiculo-grid-drifts, .veiculo-grid-driffyts, .veiculo-grid-dinos')).forEach(function (el) {
     el.remove();
   });
   const frag = document.createDocumentFragment();
@@ -894,7 +894,8 @@ function destacarSecaoVeiculoNova_(tipo) {
     Carro: 'vc-grid-carros',
     Triciclo: 'vc-grid-triciclos',
     'Pelúcia': 'vc-grid-pelucias',
-    Driffyt: 'vc-grid-driffyts',
+    Drift: 'vc-grid-drifts',
+    Driffyt: 'vc-grid-drifts',
     Dino: 'vc-grid-dinos'
   };
   const activeId = map[tipo] || '';
@@ -907,6 +908,7 @@ function destacarSecaoVeiculoNova_(tipo) {
       next.classList.contains('veiculo-grid-carros') ||
       next.classList.contains('veiculo-grid-triciclos') ||
       next.classList.contains('veiculo-grid-pelucias') ||
+      next.classList.contains('veiculo-grid-drifts') ||
       next.classList.contains('veiculo-grid-driffyts') ||
       next.classList.contains('veiculo-grid-dinos')
     )) {
@@ -1056,7 +1058,7 @@ function resetNova(opts = {}) {
   const pageNova = document.getElementById('page-nova');
   if (pageNova) pageNova.classList.remove('step-0-veiculo');
   document.querySelectorAll('#page-nova .vc-section-label').forEach(l => { l.style.display = ''; l.classList.remove('nova-vc-outro'); });
-  ['vc-grid-carros','vc-grid-triciclos','vc-grid-pelucias','vc-grid-driffyts','vc-grid-dinos'].forEach(id => {
+  ['vc-grid-carros','vc-grid-triciclos','vc-grid-pelucias','vc-grid-drifts','vc-grid-driffyts','vc-grid-dinos'].forEach(id => {
     const g = document.getElementById(id);
     if (g) g.style.display = '';
   });

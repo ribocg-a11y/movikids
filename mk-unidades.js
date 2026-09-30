@@ -10,7 +10,7 @@
   var DEFAULT_ID = 'golden';
   var _snapGolden_ = null;
 
-  /** Brinquedos La Ville: Carro / Triciclo / Pelúcia / Driffyt (sem plano 3h). */
+  /** Brinquedos La Ville: Carro / Triciclo / Pelúcia / Drift (sem plano 3h). */
   var PRECOS_BRINQUEDOS_LV_ = {
     '10min': { v: 15, m: 10, a: 1.5 },
     '20min': { v: 25, m: 20, a: 1.5 },
@@ -41,8 +41,8 @@
     { nome: 'LV Pelúcia 01', tipo: 'Pelúcia' },
     { nome: 'LV Pelúcia 02', tipo: 'Pelúcia' },
     { nome: 'LV Pelúcia 03', tipo: 'Pelúcia' },
-    { nome: 'LV Driffyt 01', tipo: 'Driffyt' },
-    { nome: 'LV Driffyt 02', tipo: 'Driffyt' },
+    { nome: 'LV Drift 01', tipo: 'Drift' },
+    { nome: 'LV Drift 02', tipo: 'Drift' },
     { nome: 'LV Dino 01', tipo: 'Dino' },
     { nome: 'LV Dino 02', tipo: 'Dino' }
   ];
@@ -51,7 +51,7 @@
     Carro: Object.assign({}, PRECOS_BRINQUEDOS_LV_),
     Triciclo: Object.assign({}, PRECOS_BRINQUEDOS_LV_),
     'Pelúcia': Object.assign({}, PRECOS_BRINQUEDOS_LV_),
-    Driffyt: Object.assign({}, PRECOS_BRINQUEDOS_LV_),
+    Drift: Object.assign({}, PRECOS_BRINQUEDOS_LV_),
     Dino: Object.assign({}, PRECOS_DINOS_LV_)
   };
 

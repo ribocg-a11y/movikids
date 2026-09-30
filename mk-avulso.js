@@ -9,7 +9,7 @@ function mkAvulsoTiposDaUnidade_(uid) {
       { tipo: 'Carro', label: '🚗 Carro' },
       { tipo: 'Triciclo', label: '🛺 Triciclo' },
       { tipo: 'Pelúcia', label: '🧸 Pelúcia' },
-      { tipo: 'Driffyt', label: '🛸 Driffyt' },
+      { tipo: 'Drift', label: '🛸 Drift' },
       { tipo: 'Dino', label: '🦖 Dino' }
     ];
   }

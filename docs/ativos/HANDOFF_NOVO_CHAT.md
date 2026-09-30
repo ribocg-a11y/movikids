@@ -1,14 +1,14 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 30/09/2026 · FE **v1.9.140** · GAS Web **v1.5.227** ✅ · **I159q** equipes · suite La Ville ✅ · **I158** ✅
+**Atualizado:** 30/09/2026 · FE **v1.9.141** · GAS repo **v1.5.228** · Web ⏳ Nova versão · **I159r** Drift/Drifts · **I158** ✅
 
 ## Produção (agora)
 
 | Camada | Versão | Link |
 |--------|--------|------|
-| Frontend | **v1.9.140** | https://ribocg-a11y.github.io/movikids/?force=1.9.140 |
-| Gestão Pessoas | **v1.9.140** | `gestao-pessoas.html?force=1.9.140` |
-| GAS | ping Web **v1.5.227** ✅ · repo **v1.5.227** | I159q RH+OPS unidade_id |
+| Frontend | **v1.9.141** | https://ribocg-a11y.github.io/movikids/?force=1.9.141 |
+| Gestão Pessoas | **v1.9.141** | `gestao-pessoas.html?force=1.9.141` |
+| GAS | ping Web **v1.5.227** · repo **v1.5.228** ⏳ | I159r Drift/Drifts (ex-Driffyt) |
 | Design System | v1.1 | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
 
 **GAS raw:** https://raw.githubusercontent.com/ribocg-a11y/movikids/main/MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs  

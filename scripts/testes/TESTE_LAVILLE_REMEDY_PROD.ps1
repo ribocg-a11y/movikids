@@ -93,14 +93,14 @@ try {
   }
   Start-Sleep -Seconds 2
 
-  # D) avulso + Driffyt preco
+  # D) avulso + Drift preco
   $av = Api (@{
-    action = "salvarLancamentoAvulso"; tipo = "Driffyt"; plano = "40min"; veiculo = "LV Driffyt 01"
+    action = "salvarLancamentoAvulso"; tipo = "Drift"; plano = "40min"; veiculo = "LV Drift 01"
     pagamento = "Dinheiro"; responsavel = "TESTE"; crianca = "TESTE_LV_RA_$stamp"
     telefone = "98994$([int](Get-Random -Min 1000 -Max 9999))"
-    motivo = "Remedy avulso Driffyt La Ville"; observacao = "[TESTE] remedy avulso"
+    motivo = "Remedy avulso Drift La Ville"; observacao = "[TESTE] remedy avulso"
   } + $op + $uid)
-  Ok $av "D.avulso.driffyt" ("valor=$($av.valorPlano)")
+  Ok $av "D.avulso.drift" ("valor=$($av.valorPlano)")
   if ([int]$av.valorPlano -eq 45) { $pass++; Write-Host "[OK] D.preco45" } else { $fail++; Write-Host "[FAIL] D.preco45 $($av.valorPlano)" }
   Api (@{ action = "cancelarLocacao"; rowIndex = $av.rowIndex; motivo = "remedy avulso" } + $op) | Out-Null
   Start-Sleep -Seconds 2

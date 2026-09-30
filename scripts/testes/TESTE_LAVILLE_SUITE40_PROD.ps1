@@ -156,7 +156,7 @@ try {
     @{ t = "Carro"; p = "10min"; v = "LV Carro 01"; valor = 15; mins = 10 },
     @{ t = "Triciclo"; p = "20min"; v = "LV Triciclo 01"; valor = 25; mins = 20 },
     @{ t = "Pelúcia"; p = "30min"; v = "LV Pelúcia 01"; valor = 35; mins = 30 },
-    @{ t = "Driffyt"; p = "40min"; v = "LV Driffyt 01"; valor = 45; mins = 40 },
+    @{ t = "Drift"; p = "40min"; v = "LV Drift 01"; valor = 45; mins = 40 },
     @{ t = "Dino"; p = "10min"; v = "LV Dino 01"; valor = 20; mins = 10 }
   )
   $rowsPend = @()
@@ -335,7 +335,7 @@ try {
     {
       foreach ($f in @(
         @{ t = "Pelúcia"; p = "10min"; v = "LV Pelúcia 03"; i = 44 },
-        @{ t = "Driffyt"; p = "10min"; v = "LV Driffyt 02"; i = 45 }
+        @{ t = "Drift"; p = "10min"; v = "LV Drift 02"; i = 45 }
       )) {
         $sf = Invoke-MoviApi (New-SalvarParams -Tipo $f.t -Plano $f.p -Veiculo $f.v -CriancaSuffix ("_F$($f.i)"))
         if (Expect-Ok $sf ("{0}.frota" -f $f.i) ("row=$($sf.rowIndex)")) {

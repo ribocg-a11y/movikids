@@ -347,6 +347,7 @@ html,body{height:100%;background:var(--bg);color:var(--txt);overflow:hidden}
 #page-nova.step-0-veiculo .veiculo-grid-carros,
 #page-nova.step-0-veiculo .veiculo-grid-triciclos,
 #page-nova.step-0-veiculo .veiculo-grid-pelucias,
+#page-nova.step-0-veiculo .veiculo-grid-drifts,
 #page-nova.step-0-veiculo .veiculo-grid-driffyts,
 #page-nova.step-0-veiculo .veiculo-grid-dinos{transition:opacity .2s}
 .nova-rel-block{
@@ -384,7 +385,7 @@ html,body{height:100%;background:var(--bg);color:var(--txt);overflow:hidden}
 .veiculo-grid-carros{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px}
 .veiculo-grid-triciclos{display:grid;grid-template-columns:1fr;gap:8px;margin-bottom:10px}
 .veiculo-grid-pelucias{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px}
-.veiculo-grid-driffyts{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px}
+.veiculo-grid-drifts,.veiculo-grid-driffyts{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px}
 .veiculo-grid-dinos{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px}
 .vc-card.mk-tile,
 .vc-card{border:1.5px solid var(--border);padding:10px 6px 8px;text-align:center;cursor:pointer;background:var(--card);position:relative}
