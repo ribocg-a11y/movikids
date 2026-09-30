@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.225
+// MOVI KIDS — Google Apps Script v1.5.226
+// v1.5.226: I159n — frota La Ville oficial (2/2/2/3/2); frotaProvisoria off; resumoDia lookback no dia
 // v1.5.225: I159f — resumoDia/comando por unidade; CUSTOS col unidade_id; dual ADM
 // v1.5.224: I159e — LOCACOES col AC unidade_id (COL_LOC_READ_=29); filtro ativas/inicio/kpi; backfill
 // v1.5.223: I159c — La Ville preços/frota por unidadeId (CONFIG Golden intocado; LV* provisória)
@@ -217,8 +218,8 @@
 
 // ── CONSTANTES ───────────────────────────────────────────────
 /** Versão exposta em ping, carregarInicio, validarSchema, gestaoPessoasStatus (bump com header). */
-const MK_GAS_VERSAO_  = 'v1.5.225';
-const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.225';
+const MK_GAS_VERSAO_  = 'v1.5.226';
+const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.226';
 const SHEET_ID   = '1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618';
 const DEPLOY_ID  = 'AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y';
 const WEBAPP_URL = `https://script.google.com/macros/s/${DEPLOY_ID}/exec`;
@@ -374,7 +375,7 @@ const MK_UNIDADES_ = {
     nome: 'La Ville Mall',
     ativa: true,
     precosProntos: true,
-    frotaProvisoria: true,
+    frotaProvisoria: false,
     bloqueioMotivo: ''
   }
 };
@@ -4946,7 +4947,7 @@ function invalidateInicioResumoCache_(dataFmt, opts) {
   } catch (e) { /* ok */ }
 }
 
-function calcResumoDiaCore_(dataFmt, uidFilterOpt) {
+function calcResumoDiaCore_(dataFmt, uidFilterOpt, forceFullOpt) {
   const dataAlvo = String(dataFmt || '').trim();
   const uidFiltro = uidFilterOpt != null ? uidFilterOpt : 'all';
   const empty = {
@@ -4975,13 +4976,16 @@ function calcResumoDiaCore_(dataFmt, uidFilterOpt) {
   // Pay-first: Ativa/Pendente já pagaram o plano na maquininha — entram no caixa/POS.
   // Encerrada inclui plano + extras. Cancelada fora.
   // COL_LOC_READ_≥28: precisa col AB (extras meta) + conta_id — não usar COL_CONTA_ID_=19. I159e=29.
+  // I159n: dia de hoje = cauda lookback (anti I23 ~36s); datas passadas / forceFull = planilha inteira.
   const enc = [];
   let nAbertas = 0;
   let fatAbertas = 0;
   const shLoc = sh_(SH_LOC);
-  const lastLoc = shLoc.getLastRow();
-  if (lastLoc >= DATA_ROW) {
-    const dados = shLoc.getRange(DATA_ROW, 1, lastLoc - DATA_ROW + 1, COL_LOC_READ_).getValues();
+  const hojeFmt = fmtData_(new Date());
+  const forceFull = forceFullOpt === true || String(forceFullOpt || '') === '1' || dataAlvo !== hojeFmt;
+  const locPack = locSheetTail_(shLoc, COL_LOC_LOOKBACK_, forceFull);
+  if (locPack.nRows >= 1) {
+    const dados = locPack.dados;
     for (let i = 0; i < dados.length; i++) {
       const r = dados[i];
       if (!r[0]) continue;
@@ -5000,7 +5004,7 @@ function calcResumoDiaCore_(dataFmt, uidFilterOpt) {
       const extraMeta = parseExtraMetaCol_(r[27]);
       const uidRow = unidadeIdOfRow_(r);
       enc.push({
-        rowIndex:      DATA_ROW + i,
+        rowIndex:      locPack.start + i,
         id:            r[0],
         contaId:       contaIdLocRow_(r),
         data:          data,
@@ -5107,9 +5111,11 @@ function resumoDia_(p) {
       if (hit) return ContentService.createTextOutput(hit).setMimeType(ContentService.MimeType.JSON);
     } catch (e) { /* ok */ }
   }
-  const core = calcResumoDiaCore_(dataAlvo, uidFiltro);
+  const forceFull = String((p && p.forceFull) || '') === '1' || (p && p.forceFull) === true;
+  const core = calcResumoDiaCore_(dataAlvo, uidFiltro, forceFull);
   const enriched = enrichResumoDiaLeading_(core, dataAlvo);
   enriched.unidadeId = uidFiltro;
+  enriched.lookback = forceFull || dataAlvo !== fmtData_(new Date()) ? 0 : COL_LOC_LOOKBACK_;
   const out = JSON.stringify({ ok: true, ...enriched });
   try { CacheService.getScriptCache().put(cacheKey, out, 25); } catch (e) { /* ok */ }
   return ContentService.createTextOutput(out).setMimeType(ContentService.MimeType.JSON);
@@ -9245,12 +9251,13 @@ const PRECOS_LAVILLE_DINOS_ = {
   '40min': { valor: 65, mins: 40, adicional: 2 },
   '60min': { valor: 90, mins: 60, adicional: 2 }
 };
+/** Quantidades oficiais sócio (30/09): 2 carros · 2 drifts · 2 triciclos · 3 pelúcias · 2 dinos. */
 const VEICULOS_LAVILLE_ = [
-  'LV Carro 01', 'LV Carro 02', 'LV Carro 03', 'LV Carro 04',
+  'LV Carro 01', 'LV Carro 02',
   'LV Triciclo 01', 'LV Triciclo 02',
-  'LV Pelúcia 01', 'LV Pelúcia 02', 'LV Pelúcia 03', 'LV Pelúcia 04',
+  'LV Pelúcia 01', 'LV Pelúcia 02', 'LV Pelúcia 03',
   'LV Driffyt 01', 'LV Driffyt 02',
-  'LV Dino 01', 'LV Dino 02', 'LV Dino 03', 'LV Dino 04'
+  'LV Dino 01', 'LV Dino 02'
 ];
 const OPERACAO_CONFIG_LAVILLE_ = {
   veiculos_validos: VEICULOS_LAVILLE_,

@@ -2,7 +2,7 @@
 
 Referência única para alinhamento local × produção.
 
-**Ciclo dev ativo:** **`PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`** — Sprint D · **I159i** backfill AC + dual custos/hist · GAS Web **v1.5.225** · **I158** ✅  
+**Ciclo dev ativo:** **`PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`** — Sprint D · **I159n** frota LV + lookback · GAS repo **v1.5.226** · Web ⏳ Nova versão · **I158** ✅  
 **Diagnóstico 6 camadas:** **`DIAGNOSTICO_SISTEMA_6_CAMADAS_2026-06.md`**  
 **Prioridades gerais:** **`PLANEJAMENTO_ATUAL_2026-06.md`** §9
 
