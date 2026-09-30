@@ -73,15 +73,54 @@ function renderHistListLazy_(locacoes, container) {
   requestAnimationFrame(paint);
 }
 
+/** KPIs do período a partir da lista já filtrada (dual unidade). */
+function histStatsFromLocs_(locs) {
+  const list = locs || [];
+  let totalFat = 0;
+  let totalExt = 0;
+  let nComExtra = 0;
+  const extPorDiaMap = {};
+  list.forEach(function (l) {
+    totalFat += Number(l.valorTotal) || 0;
+    const ext = Number(l.valorAdicional) || 0;
+    if (ext > 0) {
+      totalExt += ext;
+      nComExtra++;
+      const d = String(l.data || '');
+      if (d) extPorDiaMap[d] = (extPorDiaMap[d] || 0) + ext;
+    }
+  });
+  const n = list.length;
+  const pctExt = totalFat > 0 ? Math.round((totalExt / totalFat) * 1000) / 10 : 0;
+  const extPorDia = Object.keys(extPorDiaMap).sort().map(function (d) {
+    return { data: d, valor: Math.round(extPorDiaMap[d] * 100) / 100 };
+  });
+  return {
+    n: n,
+    totalFat: Math.round(totalFat * 100) / 100,
+    totalExt: Math.round(totalExt * 100) / 100,
+    nComExtra: nComExtra,
+    ticketMedio: n ? Math.round((totalFat / n) * 100) / 100 : 0,
+    pctExt: pctExt,
+    extPorDia: extPorDia
+  };
+}
+
+function histListaVisivel_() {
+  let list = filtrarLocacoesHistorico_(histLocacoesAll);
+  const vf = document.getElementById('hist-veiculo-filter')?.value || '';
+  if (vf) list = list.filter(function (l) { return l.veiculo === vf; });
+  return list;
+}
+
 function aplicarHistorico_(res) {
   const container = document.getElementById('hist-container');
   if (!container) return;
   histLocacoesAll = filtrarTestesHistorico_(res.locacoes);
-  const limpo = Object.assign({}, res, { locacoes: filtrarLocacoesHistorico_(res.locacoes) });
-  renderAnalyticsCards(limpo.stats);
-  renderHistExtChart_(limpo.stats);
-  const vf = document.getElementById('hist-veiculo-filter')?.value || '';
-  const locs = vf ? limpo.locacoes.filter(l => l.veiculo === vf) : limpo.locacoes;
+  const locs = histListaVisivel_();
+  const stats = histStatsFromLocs_(locs);
+  renderAnalyticsCards(stats);
+  renderHistExtChart_(stats);
   renderVrankSection(locs);
   renderHistListLazy_(locs, container);
 }
@@ -91,11 +130,16 @@ function mkHistOnFiltro_(id) {
   if (histLocacoesAll && histLocacoesAll.length) {
     const container = document.getElementById('hist-container');
     if (!container) return;
-    const limpo = filtrarLocacoesHistorico_(histLocacoesAll);
-    const vf = document.getElementById('hist-veiculo-filter')?.value || '';
-    const locs = vf ? limpo.filter(l => l.veiculo === vf) : limpo;
+    const locs = histListaVisivel_();
+    const stats = histStatsFromLocs_(locs);
+    renderAnalyticsCards(stats);
+    renderHistExtChart_(stats);
     renderVrankSection(locs);
     renderHistListLazy_(locs, container);
+    const pillsHost = document.getElementById('hist-dual-pills');
+    if (pillsHost && typeof mkDualMountPills_ === 'function') {
+      mkDualMountPills_(pillsHost, 'mkHistOnFiltro_');
+    }
   } else if (typeof buscarHistorico === 'function') {
     buscarHistorico();
   }
@@ -160,14 +204,12 @@ var histLocacoesAll = []; // todas as locações do período atual
 
 // ── Filtragem por veículo no Histórico ─────────────────────
 function filtrarPorVeiculo() {
-  const filtro    = document.getElementById('hist-veiculo-filter')?.value || '';
   const container = document.getElementById('hist-container');
   if (!container || !histLocacoesAll.length) return;
-
-  const lista = filtro
-    ? histLocacoesAll.filter(l => l.veiculo === filtro)
-    : histLocacoesAll;
-
+  const lista = histListaVisivel_();
+  const stats = histStatsFromLocs_(lista);
+  renderAnalyticsCards(stats);
+  renderHistExtChart_(stats);
   renderVrankSection(lista);
   renderHistListLazy_(lista, container);
 }

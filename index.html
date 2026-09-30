@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Movi Kids">
 <title>Movi Kids</title>
-<script src="mk-canonical-host.js?v=1.9.134"></script>
+<script src="mk-canonical-host.js?v=1.9.135"></script>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png">
@@ -17,17 +17,17 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<script src="mk-stale-sync.js?v=1.9.134"></script>
-<script src="mk-version.js?v=1.9.134"></script>
-<script src="mk-api.js?v=1.9.134"></script>
-<link rel="stylesheet" href="mk-design.css?v=1.9.134">
+<script src="mk-stale-sync.js?v=1.9.135"></script>
+<script src="mk-version.js?v=1.9.135"></script>
+<script src="mk-api.js?v=1.9.135"></script>
+<link rel="stylesheet" href="mk-design.css?v=1.9.135">
 
-<script src="mk-cache-bust.js?v=1.9.134"></script>
+<script src="mk-cache-bust.js?v=1.9.135"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<link rel="stylesheet" href="mk-app.css?v=1.9.134">
-<link rel="stylesheet" href="mk-gestao-pessoas.css?v=1.9.134">
+<link rel="stylesheet" href="mk-app.css?v=1.9.135">
+<link rel="stylesheet" href="mk-gestao-pessoas.css?v=1.9.135">
 <!-- Firebase SDK — Realtime sync canonico para todos os dispositivos -->
-<script type="module" src="mk-firebase.js?v=1.9.134"></script>
+<script type="module" src="mk-firebase.js?v=1.9.135"></script>
 </head>
 
 <body>
@@ -706,8 +706,9 @@
 
     <div class="sec-title">Centro de gestão</div>
     <p style="font-size:13px;color:var(--txt2);margin:-4px 0 14px;line-height:1.45">
-      Escolha o que precisa: conferência do dia, análise do mês ou status técnico. Números detalhados ficam em Caixa e Dashboard.
+      Escolha o que precisa: conferência do dia ou análise do mês. Números detalhados ficam em Caixa e Dashboard.
     </p>
+    <div id="admin-dual-pills" class="mk-dual-pills-host" style="margin-bottom:10px"></div>
     <div id="admin-dual-hero" class="mk-dual-hero" aria-live="polite"></div>
 
     <button type="button" class="mk-hub-status" id="hub-status-chip" hidden aria-hidden="true" tabindex="-1">
@@ -727,7 +728,8 @@
         <span class="mk-hub-door-title">Gestão do mês</span>
         <span class="mk-hub-door-sub" id="hub-mes-sub">Dashboard, CTO e extras</span>
       </button>
-      <button type="button" class="mk-hub-door mk-hub-door--sys" onclick="irAdmin('sistema')">
+      <!-- Porta Sistema oculta — QR-only / sem mexer pelo app -->
+      <button type="button" class="mk-hub-door mk-hub-door--sys" onclick="irAdmin('sistema')" hidden aria-hidden="true">
         <span class="mk-hub-door-icon">🔧</span>
         <span class="mk-hub-door-title">Sistema</span>
         <span class="mk-hub-door-sub" id="hub-sys-sub">Versão, sync e diagnóstico</span>
@@ -2575,34 +2577,34 @@
   </div>
 </div>
 
-<script src="mk-globals.js?v=1.9.134"></script>
-<script src="mk-unidades.js?v=1.9.134"></script>
-<script src="mk-core.js?v=1.9.134"></script>
-<script src="mk-nav.js?v=1.9.134"></script>
-<script src="mk-admin.js?v=1.9.134"></script>
-<script src="mk-historico.js?v=1.9.134"></script>
-<script src="mk-custos-historico.js?v=1.9.134"></script>
-<script src="mk-sessao.js?v=1.9.134"></script>
-<script src="mk-home.js?v=1.9.134"></script>
-<script src="mk-holding.js?v=1.9.134"></script>
-<script src="mk-dual-ui.js?v=1.9.134"></script>
-<script src="mk-meta-operador.js?v=1.9.134"></script>
-<script src="mk-custos.js?v=1.9.134"></script>
-<script src="mk-avulso.js?v=1.9.134"></script>
-<script src="mk-sync.js?v=1.9.134"></script>
-<script src="mk-idb-store.js?v=1.9.134"></script>
-<script src="mk-offline-queue.js?v=1.9.134"></script>
-<script src="mk-local-snapshot.js?v=1.9.134"></script>
-<script src="mk-nova.js?v=1.9.134"></script>
-<script src="mk-relacionamento.js?v=1.9.134"></script>
-<script src="mk-operacao.js?v=1.9.134"></script>
-<script src="mk-drawer.js?v=1.9.134"></script>
-<script src="mk-enc-extra.js?v=1.9.134"></script>
-<script src="mk-update.js?v=1.9.134"></script>
-<script src="mk-gestao-pessoas.js?v=1.9.134"></script>
-<script src="mk-holerite.js?v=1.9.134"></script>
-<script src="mk-gestao-pessoas-admin.js?v=1.9.134"></script>
-<script src="mk-auth.js?v=1.9.134"></script>
-<script src="mk-boot.js?v=1.9.134"></script>
+<script src="mk-globals.js?v=1.9.135"></script>
+<script src="mk-unidades.js?v=1.9.135"></script>
+<script src="mk-core.js?v=1.9.135"></script>
+<script src="mk-nav.js?v=1.9.135"></script>
+<script src="mk-admin.js?v=1.9.135"></script>
+<script src="mk-historico.js?v=1.9.135"></script>
+<script src="mk-custos-historico.js?v=1.9.135"></script>
+<script src="mk-sessao.js?v=1.9.135"></script>
+<script src="mk-home.js?v=1.9.135"></script>
+<script src="mk-holding.js?v=1.9.135"></script>
+<script src="mk-dual-ui.js?v=1.9.135"></script>
+<script src="mk-meta-operador.js?v=1.9.135"></script>
+<script src="mk-custos.js?v=1.9.135"></script>
+<script src="mk-avulso.js?v=1.9.135"></script>
+<script src="mk-sync.js?v=1.9.135"></script>
+<script src="mk-idb-store.js?v=1.9.135"></script>
+<script src="mk-offline-queue.js?v=1.9.135"></script>
+<script src="mk-local-snapshot.js?v=1.9.135"></script>
+<script src="mk-nova.js?v=1.9.135"></script>
+<script src="mk-relacionamento.js?v=1.9.135"></script>
+<script src="mk-operacao.js?v=1.9.135"></script>
+<script src="mk-drawer.js?v=1.9.135"></script>
+<script src="mk-enc-extra.js?v=1.9.135"></script>
+<script src="mk-update.js?v=1.9.135"></script>
+<script src="mk-gestao-pessoas.js?v=1.9.135"></script>
+<script src="mk-holerite.js?v=1.9.135"></script>
+<script src="mk-gestao-pessoas-admin.js?v=1.9.135"></script>
+<script src="mk-auth.js?v=1.9.135"></script>
+<script src="mk-boot.js?v=1.9.135"></script>
 </body>
 </html>

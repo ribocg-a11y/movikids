@@ -2,18 +2,18 @@
 
 Sistema operacional de locações — balcão (tablet na loja), portal do responsável, painel admin.
 
-**Ciclo ativo (29/09/2026):** Sprint D · FE **v1.9.134** Pages · GAS Web **v1.5.225** · **I159i** backfill + dual custos · **I158** ✅
+**Ciclo ativo (29/09/2026):** Sprint D · FE **v1.9.135** Pages · GAS Web **v1.5.225** · **I159i** backfill + dual custos · **I158** ✅
 
 **Para retomar (agente local PC — pasta C):**
 
-> *Continuar MOVI KIDS — FE **v1.9.134** · GAS **v1.5.225** · I159j Sair menu + dual/hist · Tablet `?force=1.9.134`*
+> *Continuar MOVI KIDS — FE **v1.9.135** · GAS **v1.5.225** · I159j Sair menu + dual/hist · Tablet `?force=1.9.135`*
 
 ## Produção atual
 
 | Camada | Versão | Link |
 |--------|--------|------|
-| Frontend | **v1.9.134** | https://ribocg-a11y.github.io/movikids/?force=1.9.134 |
-| Gestão Pessoas | **v1.9.134** | `gestao-pessoas.html?force=1.9.134` |
+| Frontend | **v1.9.135** | https://ribocg-a11y.github.io/movikids/?force=1.9.135 |
+| Gestão Pessoas | **v1.9.135** | `gestao-pessoas.html?force=1.9.135` |
 | GAS | ping Web **v1.5.225** ✅ · repo **v1.5.225** | dual + CUSTOS unidade_id |
 | Design System | **v1.1** | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
 

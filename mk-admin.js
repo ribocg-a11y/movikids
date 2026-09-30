@@ -4979,8 +4979,13 @@ function atualizarHubAdmin_() {
   if (chip) chip.textContent = (gasOnline ? 'Online' : 'Atenção sync') + syncSuffix + ' · app ' + ver;
   if (dot) dot.style.background = gasOnline ? '#2E7D32' : '#E65100';
 
+  const pillsHost = document.getElementById('admin-dual-pills');
+  if (pillsHost && typeof mkDualMountPills_ === 'function') {
+    mkDualMountPills_(pillsHost, 'mkAdminHubOnFiltro_');
+  }
   const hero = document.getElementById('admin-dual-hero');
   if (hero && typeof mkDualSplit_ === 'function' && typeof mkDualColShell_ === 'function') {
+    const filtro = typeof mkDualFiltro_ === 'function' ? mkDualFiltro_() : 'all';
     const splitS = mkDualSplit_(typeof sessions !== 'undefined' ? sessions : []);
     const splitE = mkDualSplit_(typeof encHojeData !== 'undefined' ? encHojeData : []);
     function pack(uid, sessU, encU) {
@@ -4997,13 +5002,27 @@ function atualizarHubAdmin_() {
         '</div>'
       );
     }
-    hero.innerHTML =
-      '<div class="mk-hold-grid">' +
-        mkDualColShell_('golden', pack('golden', splitS.golden, splitE.golden)) +
-        mkDualColShell_('laville', pack('laville', splitS.laville, splitE.laville)) +
-      '</div>';
+    if (filtro === 'all') {
+      hero.innerHTML =
+        '<div class="mk-hold-grid">' +
+          mkDualColShell_('golden', pack('golden', splitS.golden, splitE.golden)) +
+          mkDualColShell_('laville', pack('laville', splitS.laville, splitE.laville)) +
+        '</div>';
+    } else {
+      const uid = filtro === 'laville' ? 'laville' : 'golden';
+      hero.innerHTML =
+        '<div class="mk-hold-grid mk-hold-grid--one">' +
+          mkDualColShell_(uid, pack(uid, splitS[uid], splitE[uid])) +
+        '</div>';
+    }
   }
 }
+
+function mkAdminHubOnFiltro_(id) {
+  if (typeof mkDualSetFiltro_ === 'function') mkDualSetFiltro_(id);
+  atualizarHubAdmin_();
+}
+window.mkAdminHubOnFiltro_ = mkAdminHubOnFiltro_;
 
 setInterval(() => {
   const adminPage = document.getElementById('page-admin');
