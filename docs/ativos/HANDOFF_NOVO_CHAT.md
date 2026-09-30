@@ -47,6 +47,15 @@
 
 **Nova versão Web:** ✅ ping **v1.5.231** (I160). FE **v1.9.148** **I162** — logo dino (PNG transparente) + card balcão mostra loja do **operador** (OPS col I / RH col T), não a loja do tablet. **I161** Holding×Balcão. Suite: `entregas/DIAGNOSTICO_LAVILLE_SUITE40_2026-09-30.md`.
 
+### I163 — Portal responsáveis floresta (smoke celular)
+
+| Check | Esperado |
+|-------|----------|
+| `acompanhar.html?force=1.9.148` | Floresta + logo dino + “Entrar na floresta” |
+| Loc Golden | Chip **Golden** · brinquedo sem prefixo LV |
+| Loc La Ville (veículo LV *) | Chip **La Ville** · label sem “LV ” |
+| Mesmo tel nas 2 lojas | Ambas no carrossel · chip avisa multi-loja |
+
 ### I162 / I162b / I162c — Logo + sessão por loja (smoke PC)
 
 | Check | Esperado |
