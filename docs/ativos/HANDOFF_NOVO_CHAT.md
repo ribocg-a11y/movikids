@@ -1,14 +1,14 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 30/09/2026 · FE **v1.9.139** Pages · GAS Web **v1.5.226** ✅ · **I159p** frota Golden dual + Voltar · **I158** ✅
+**Atualizado:** 30/09/2026 · FE **v1.9.140** · GAS repo **v1.5.227** · Web ⏳ Nova versão · **I159q** equipes por unidade · **I158** ✅
 
 ## Produção (agora)
 
 | Camada | Versão | Link |
 |--------|--------|------|
-| Frontend | **v1.9.139** | https://ribocg-a11y.github.io/movikids/?force=1.9.139 |
-| Gestão Pessoas | **v1.9.139** | `gestao-pessoas.html?force=1.9.139` |
-| GAS | ping Web **v1.5.226** ✅ · repo **v1.5.226** | I159n frota + lookback |
+| Frontend | **v1.9.140** | https://ribocg-a11y.github.io/movikids/?force=1.9.140 |
+| Gestão Pessoas | **v1.9.140** | `gestao-pessoas.html?force=1.9.140` |
+| GAS | ping Web **v1.5.226** · repo **v1.5.227** ⏳ | I159q RH+OPS unidade_id |
 | Design System | v1.1 | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
 
 **GAS raw:** https://raw.githubusercontent.com/ribocg-a11y/movikids/main/MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs  
@@ -53,6 +53,8 @@
 |-----|--------|---------|
 | **LOCACOES** | Schema ✅ col **AC `unidade_id`** | Backfill ✅ **3947** linhas (29/09) · novas locs gravam unidade |
 | **CUSTOS** | Schema ✅ col **G `unidade_id`** | Novos custos com unidade; antigos = golden default |
+| **COLABORADORES_RH** | ⏳ col **T `unidade_id`** (I159q) | Após Nova Web **v1.5.227** + repair → backfill golden; La Ville vazia até atribuir |
+| **OPERADORES_SISTEMA** | ⏳ col **I `unidade_id`** (I159q) | Idem · login/lista por loja · `all` = sócio em ambas |
 | **CONFIG** | Ping lista golden + laville | Preços La Ville oficiais (Brinquedos+Dinos); frota LV* |
 | **DASHBOARD / RELATORIOS / FOLHA** | Sem aba por loja | Filtro por `unidadeId` na API — **não** há sheet “La Ville” separada |
 | **AUD_SMS / SMS** | Fora do menu FE | QR-only; abas podem existir na planilha sem uso operacional |

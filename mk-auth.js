@@ -828,6 +828,13 @@
     return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   }
 
+  function mkAuthOpsListParams_() {
+    const uid = (typeof mkUnidadeId_ === 'function') ? mkUnidadeId_() : '';
+    const out = { action: 'listarOperadoresLogin' };
+    if (uid && uid !== 'all') out.unidadeId = uid;
+    return out;
+  }
+
   async function loadOperadores() {
     if (_loadingOps) return;
     _loadingOps = true;
@@ -835,14 +842,12 @@
     showErr('mk-login-err', '');
     try {
       let d = null;
-      const pre = typeof window !== 'undefined' && window.__mkLoginOpsPromise;
-      if (pre && typeof pre.then === 'function') {
-        try { d = await pre; } catch (e) { /* retry below */ }
-      }
-      const tries = d && d.ok ? 0 : 3;
+      // Não reutilizar promise boot sem unidade — lista deve seguir a loja ativa.
+      try { window.__mkLoginOpsPromise = null; } catch (eP) { /* ok */ }
+      const tries = 3;
       for (let i = 0; i < tries; i++) {
         try {
-          d = await apiCall({ action: 'listarOperadoresLogin' }, 30000);
+          d = await apiCall(mkAuthOpsListParams_(), 30000);
           if (d && d.ok) break;
         } catch (e) {
           if (i === tries - 1) throw e;

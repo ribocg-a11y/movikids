@@ -11,6 +11,20 @@
     repararRhPlanilhaAdmin: 90000
   };
 
+  function gpUnidadeParams_() {
+    var uid = '';
+    try {
+      var q = new URLSearchParams(global.location && global.location.search || '');
+      uid = q.get('unidade') || q.get('unit') || '';
+    } catch (e) { /* ok */ }
+    if (!uid && typeof global.mkUnidadeId_ === 'function') {
+      try { uid = global.mkUnidadeId_(); } catch (e2) { /* ok */ }
+    }
+    uid = String(uid || '').trim().toLowerCase();
+    if (!uid || uid === 'all') return {};
+    return { unidadeId: uid };
+  }
+
   function gpApi(action, params) {
     if (typeof global.api !== 'function') {
       return Promise.reject(new Error('mk-api.js não carregado'));
@@ -92,7 +106,9 @@
       return (names[m - 1] || String(comp || '').slice(0, 2)) + '/' + (pts[1] || '');
     },
     listarColaboradores: function () {
-      var CACHE_KEY = 'mk_gp_list_colab_v1';
+      var uParams = gpUnidadeParams_();
+      var uidKey = uParams.unidadeId || 'all';
+      var CACHE_KEY = 'mk_gp_list_colab_v2_' + uidKey;
       var CACHE_MS = 120000;
       try {
         var raw = sessionStorage.getItem(CACHE_KEY);
@@ -100,7 +116,7 @@
           var packed = JSON.parse(raw);
           if (packed && packed.at && (Date.now() - packed.at) < CACHE_MS && Array.isArray(packed.list) && packed.list.length) {
             // Refresh em background; devolve cache na hora (I115)
-            gpApi('listarColaboradoresGestao').then(function (r) {
+            gpApi('listarColaboradoresGestao', uParams).then(function (r) {
               var list = (r.colaboradores || r.operadores || []).filter(function (o) { return o.hasPin !== false; });
               try { sessionStorage.setItem(CACHE_KEY, JSON.stringify({ at: Date.now(), list: list })); } catch (e) { /* ok */ }
             }).catch(function () { /* ok */ });
@@ -108,7 +124,7 @@
           }
         }
       } catch (e) { /* ok */ }
-      return gpApi('listarColaboradoresGestao').then(function (r) {
+      return gpApi('listarColaboradoresGestao', uParams).then(function (r) {
         var list = (r.colaboradores || r.operadores || []).filter(function (o) { return o.hasPin !== false; });
         try { sessionStorage.setItem(CACHE_KEY, JSON.stringify({ at: Date.now(), list: list })); } catch (e2) { /* ok */ }
         return list;
@@ -143,7 +159,7 @@
       return gpApi('painelGestaoPessoasAdmin', payload);
     },
     listarColaboradoresPreview: function (adminPin) {
-      return gpApi('listarColaboradoresGestaoPreview', { adminPin: adminPin }).then(function (r) {
+      return gpApi('listarColaboradoresGestaoPreview', Object.assign({ adminPin: adminPin }, gpUnidadeParams_())).then(function (r) {
         return (r.colaboradores || []).filter(function (o) { return o.hasPin !== false; });
       });
     },

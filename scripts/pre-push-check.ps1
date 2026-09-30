@@ -381,6 +381,15 @@ try {
     } else {
       Add-Check "guard.gas.validarSchema.rh" "ok" "Camada 5 RH P0 I62"
     }
+    if ($gasRaw -notmatch 'COL_COLAB_RH_READ_\s*=\s*20') {
+      Add-Check "guard.i159q.rh.unidade" "fail" "COL_COLAB_RH_READ_=20 ausente (I159q)"
+    } elseif ($gasRaw -notmatch 'COL_OPS_READ_\s*=\s*9') {
+      Add-Check "guard.i159q.rh.unidade" "fail" "COL_OPS_READ_=9 ausente (I159q)"
+    } elseif ($gasRaw -notmatch 'backfillUnidadeIdColabRhCore_') {
+      Add-Check "guard.i159q.rh.unidade" "fail" "backfillUnidadeIdColabRhCore_ ausente (I159q)"
+    } else {
+      Add-Check "guard.i159q.rh.unidade" "ok" "RH+OPS unidade_id (I159q)"
+    }
     if ($gasRaw -notmatch 'function validarEscalaSchema_') {
       Add-Check "guard.gas.validarSchema.rhResto" "fail" "validarEscalaSchema_ ausente (I63)"
     } elseif ($gasRaw -notmatch 'function repararRhCamada5RestoPlanilhaAdmin_') {

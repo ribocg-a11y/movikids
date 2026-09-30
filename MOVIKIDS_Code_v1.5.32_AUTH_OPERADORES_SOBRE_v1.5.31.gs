@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.226
+// MOVI KIDS — Google Apps Script v1.5.227
+// v1.5.227: I159q — COLABORADORES_RH + OPERADORES_SISTEMA col unidade_id; equipes por loja
 // v1.5.226: I159n — frota La Ville oficial (2/2/2/3/2); frotaProvisoria off; resumoDia lookback no dia
 // v1.5.225: I159f — resumoDia/comando por unidade; CUSTOS col unidade_id; dual ADM
 // v1.5.224: I159e — LOCACOES col AC unidade_id (COL_LOC_READ_=29); filtro ativas/inicio/kpi; backfill
@@ -218,8 +219,8 @@
 
 // ── CONSTANTES ───────────────────────────────────────────────
 /** Versão exposta em ping, carregarInicio, validarSchema, gestaoPessoasStatus (bump com header). */
-const MK_GAS_VERSAO_  = 'v1.5.226';
-const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.226';
+const MK_GAS_VERSAO_  = 'v1.5.227';
+const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.227';
 const SHEET_ID   = '1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618';
 const DEPLOY_ID  = 'AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y';
 const WEBAPP_URL = `https://script.google.com/macros/s/${DEPLOY_ID}/exec`;
@@ -255,9 +256,9 @@ const COL_AUDR_READ_ = 7;
 const AUDR_HEADERS_ = ['timestamp', 'acao', 'telefone', 'antesJson', 'depoisJson', 'motivo', 'usuario'];
 const AUD_ACOES_LOC_VALIDAS_ = ['salvarLocacao', 'editarLocacao', 'cancelarLocacao', 'encerrarLocacao', 'iniciarTimer', 'estenderLocacao', 'limparLocacaoTesteAdmin', 'corrigirFinanceiroLocacaoAdmin', 'corrigirCanceladaParaEncerradaAdmin', 'lancamentoAvulso'];
 const AUD_ACOES_TURNO_VALIDAS_ = ['login', 'logout', 'logout_admin', 'logout_inatividade'];
-/** Camada 5 RH P0 — header L1, dados L2+ (I62). */
-const COL_COLAB_RH_READ_ = 19;
-const COLAB_RH_HEADERS_ = ['operador_id', 'nome', 'funcao', 'cpf', 'nascimento', 'telefone', 'email', 'endereco', 'emergencia', 'admissao', 'pix', 'salario_base', 'va_diario', 'meta_loc_dia', 'bonus_meta_r$', 'turno', 'ativo', 'cadastro_pct', 'atualizado_em'];
+/** Camada 5 RH P0 — header L1, dados L2+ (I62). I159q: col T unidade_id. */
+const COL_COLAB_RH_READ_ = 20;
+const COLAB_RH_HEADERS_ = ['operador_id', 'nome', 'funcao', 'cpf', 'nascimento', 'telefone', 'email', 'endereco', 'emergencia', 'admissao', 'pix', 'salario_base', 'va_diario', 'meta_loc_dia', 'bonus_meta_r$', 'turno', 'ativo', 'cadastro_pct', 'atualizado_em', 'unidade_id'];
 const COL_FOLHA_PONTO_READ_ = 9;
 const FOLHA_PONTO_HEADERS_ = ['id', 'operador_id', 'data', 'dia_semana', 'entrada', 'saida', 'horas', 'situacao', 'registrado_em'];
 const COL_BANCO_HORAS_READ_ = 3;
@@ -280,9 +281,10 @@ const ADMIN_PIN_PLAIN = '1421'; /* fallback — preferir Script Property ADMIN_P
 /** OPERADORES_SISTEMA — memorial 1-3, header 4, dados 5+ (I54). Legado: header 1, dados 2. */
 const OPS_HEADER_ROW_ = 4;
 const OPS_DATA_ROW_ = 5;
-const COL_OPS_READ_ = 8;
+/** I159q: col I unidade_id (login/equipe por loja). */
+const COL_OPS_READ_ = 9;
 const OPS_HEADERS_ = [
-  'id', 'criadoEm', 'nome', 'pinHash', 'pinSalt', 'ativo', 'ultimoLogin', 'perfil'
+  'id', 'criadoEm', 'nome', 'pinHash', 'pinSalt', 'ativo', 'ultimoLogin', 'perfil', 'unidade_id'
 ];
 const OPS_PERFIS_VALIDOS_ = ['operador', 'gestor', 'supervisor'];
 const DATA_ROW = 11;
@@ -429,6 +431,29 @@ function unidadeIdOfRow_(r) {
   const fromCol = unidadeIdCanon_(r && r[28]);
   if (fromCol) return fromCol;
   return unidadeIdFromVeiculo_(r && r[15]);
+}
+
+/**
+ * I159q — unidade da equipe (display).
+ * vazio → golden; all → all.
+ */
+function unidadeIdRhOfCell_(raw) {
+  const s = String(raw || '').trim().toLowerCase();
+  if (s === 'all' || s === 'todas' || s === '*') return 'all';
+  const id = unidadeIdCanon_(raw);
+  return id || MK_UNIDADE_DEFAULT_;
+}
+
+/**
+ * I159q — filtro equipe/login.
+ * filtro all → todos; célula vazia/all → todas as lojas (sócio); senão match exato.
+ * Backfill grava golden nos legados — La Ville começa vazia até cadastrar/atribuir.
+ */
+function rowMatchesUnidadeEquipe_(uidCell, filtro) {
+  if (filtro == null || filtro === '' || filtro === 'all') return true;
+  const raw = String(uidCell || '').trim().toLowerCase();
+  if (!raw || raw === 'all' || raw === 'todas' || raw === '*') return true;
+  return unidadeIdCanon_(raw) === filtro;
 }
 
 function locRowMatchesUnidade_(r, uidFilter) {
@@ -799,7 +824,7 @@ function dispatchMoviAction_(p, method) {
       case 'buscarPortalResponsavel': return buscarPortalResponsavel_(p);
       case 'listarRetorno':        return listarClientesRetorno_();
       case 'estenderLocacao':      return estenderLocacao_(p);
-      case 'listarOperadoresLogin': return listarOperadoresLogin_();
+      case 'listarOperadoresLogin': return listarOperadoresLogin_(p);
       case 'verificarOperadorLogin': return verificarOperadorLogin_(p);
       case 'definirPinOperador':   return definirPinOperador_(p);
       case 'loginOperador':        return loginOperador_(p);
@@ -823,7 +848,7 @@ function dispatchMoviAction_(p, method) {
       case 'salvarLancamentoAvulso': return salvarLancamentoAvulso_(p);
       case 'controleFinanceiro':     return controleFinanceiro_();
       case 'gestaoPessoasStatus':    return gestaoPessoasStatus_();
-      case 'listarColaboradoresGestao': return gpListarColaboradoresGestao_();
+      case 'listarColaboradoresGestao': return gpListarColaboradoresGestao_(p);
       case 'listarColaboradoresGestaoPreview': return listarColaboradoresGestaoPreview_(p);
       case 'buscarPainelColaborador': return buscarPainelColaborador_(p);
       case 'buscarPainelColaboradorPreview': return buscarPainelColaboradorPreview_(p);
@@ -1611,15 +1636,17 @@ function repararOperadoresSistemaPlanilhaAdmin_(p) {
   try {
     const memorial = repairOpsMemorialCore_();
     const formatos = repairOpsFormatosCore_();
+    const backfillUid = backfillUnidadeIdOpsCore_();
     const audit = auditOpsSampleCore_();
     const schema = validarOpsSchema_(sh_getOrCreate_(SH_OPS));
     return resp_({
-      mensagem: 'OPERADORES_SISTEMA reparada (memorial, headers 8 cols, formatos, protecao)',
+      mensagem: 'OPERADORES_SISTEMA reparada (memorial, headers 9 cols, unidade_id, formatos, protecao)',
       memorial: memorial,
       formatos: formatos,
+      backfillUnidadeId: backfillUid,
       audit: audit,
       schemaOk: schema.ok,
-      versao: 'v1.5.152'
+      versao: MK_GAS_VERSAO_
     });
   } catch (ex) {
     return err_('repararOperadoresSistemaPlanilhaAdmin: ' + ex.message, 500);
@@ -2856,7 +2883,45 @@ function repairColaboradoresRhFormatosCore_() {
   sheet.getRange(2, 5, n, 1).setNumberFormat('@');
   sheet.getRange(2, 10, n, 1).setNumberFormat('@');
   sheet.getRange(2, 19, n, 1).setNumberFormat('@');
+  sheet.getRange(2, 20, n, 1).setNumberFormat('@');
   return { linhas: n };
+}
+
+/** I159q — preenche unidade_id vazio com golden (equipe legado). */
+function backfillUnidadeIdColabRhCore_() {
+  const sheet = sh_getOrCreate_('COLABORADORES_RH');
+  const last = sheet.getLastRow();
+  if (last < 2) return { lidos: 0, atualizados: 0 };
+  const n = last - 1;
+  const colUid = sheet.getRange(2, 20, n, 1).getValues();
+  const ids = sheet.getRange(2, 1, n, 1).getValues();
+  let atualizados = 0;
+  for (let i = 0; i < n; i++) {
+    if (!ids[i][0]) continue;
+    if (String(colUid[i][0] || '').trim()) continue;
+    sheet.getRange(2 + i, 20).setValue(MK_UNIDADE_DEFAULT_);
+    atualizados++;
+  }
+  if (atualizados) gpInvalidateRhCache_();
+  return { lidos: n, atualizados: atualizados };
+}
+
+function backfillUnidadeIdOpsCore_() {
+  const sheet = sh_getOrCreate_(SH_OPS);
+  const start = opsDataStartRow_();
+  const last = sheet.getLastRow();
+  if (last < start) return { lidos: 0, atualizados: 0 };
+  const n = last - start + 1;
+  const colUid = sheet.getRange(start, 9, n, 1).getValues();
+  const ids = sheet.getRange(start, 1, n, 1).getValues();
+  let atualizados = 0;
+  for (let i = 0; i < n; i++) {
+    if (!ids[i][0]) continue;
+    if (String(colUid[i][0] || '').trim()) continue;
+    sheet.getRange(start + i, 9).setValue(MK_UNIDADE_DEFAULT_);
+    atualizados++;
+  }
+  return { lidos: n, atualizados: atualizados };
 }
 
 function repararColaboradoresRhPlanilhaAdmin_(p) {
@@ -2867,7 +2932,7 @@ function repararColaboradoresRhPlanilhaAdmin_(p) {
       dryRun: true,
       audit: auditColaboradoresRhSampleCore_(10),
       schema: validarColaboradoresRhSchema_(sh_getOrCreate_('COLABORADORES_RH')),
-      versao: 'v1.5.160'
+      versao: MK_GAS_VERSAO_
     });
   }
   const lock = LockService.getScriptLock();
@@ -2875,14 +2940,15 @@ function repararColaboradoresRhPlanilhaAdmin_(p) {
   try {
     const header = repairColaboradoresRhHeaderCore_();
     const formatos = repairColaboradoresRhFormatosCore_();
+    const backfillUid = backfillUnidadeIdColabRhCore_();
     gpRepairAllAdmissoesRh_();
     const vaReparados = gpRepairVaDiarioRhRows_();
     const audit = auditColaboradoresRhSampleCore_(10);
     const schema = validarColaboradoresRhSchema_(sh_getOrCreate_('COLABORADORES_RH'));
     return resp_({
-      mensagem: 'COLABORADORES_RH reparada (header, formatos, pct, va_diario)',
-      header: header, formatos: formatos, vaDiarioReparados: vaReparados,
-      audit: audit, schemaOk: schema.ok, registros: audit.registros, versao: 'v1.5.160'
+      mensagem: 'COLABORADORES_RH reparada (header 20 cols, formatos, unidade_id, pct, va_diario)',
+      header: header, formatos: formatos, backfillUnidadeId: backfillUid, vaDiarioReparados: vaReparados,
+      audit: audit, schemaOk: schema.ok, registros: audit.registros, versao: MK_GAS_VERSAO_
     });
   } catch (ex) {
     return err_('repararColaboradoresRhPlanilhaAdmin: ' + ex.message, 500);
@@ -11106,7 +11172,8 @@ function operadorObjFromRow_(data) {
     nome: String(data[2] || '').trim(),
     hasPin: !!String(data[3] || '').trim(),
     ativo: String(data[5] || 'SIM').toUpperCase() !== 'NAO',
-    perfil: perfilNorm_(data[7])
+    perfil: perfilNorm_(data[7]),
+    unidadeId: unidadeIdRhOfCell_(data[8])
   };
 }
 
@@ -11230,7 +11297,13 @@ function assertPodeLoginOperador_(operadorId) {
   return null;
 }
 
-function listarOperadoresLogin_() {
+function listarOperadoresLogin_(p) {
+  p = p || {};
+  // Sem unidadeId na request → all (compat); FE balcão/colab envia unidade explícita.
+  const rawUid = p.unidadeId != null ? p.unidadeId : (p.unidade != null ? p.unidade : p.unit);
+  const uidFiltro = (rawUid == null || String(rawUid).trim() === '')
+    ? 'all'
+    : unidadeIdFilterFrom_(p);
   const sh = operadoresSheet_();
   const last = sh.getLastRow();
   const start = opsDataStartRow_();
@@ -11239,13 +11312,20 @@ function listarOperadoresLogin_() {
     const rows = sh.getRange(start, 1, last - start + 1, COL_OPS_READ_).getValues();
     rows.forEach(function (r) {
       if (!r || typeof r.length !== 'number') return;
+      if (!rowMatchesUnidadeEquipe_(r[8], uidFiltro)) return;
       const op = operadorObjFromRow_(r);
       if (op.nome && op.ativo) operadores.push(op);
     });
   }
   operadores.sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'));
   const todosComPin = operadores.length > 0 && operadores.every(o => o.hasPin);
-  return resp_({ operadores, todosComPin, sessaoAtiva: sessaoOperadorPayload_(), versao: 'v1.5.50' });
+  return resp_({
+    operadores: operadores,
+    todosComPin: todosComPin,
+    sessaoAtiva: sessaoOperadorPayload_(),
+    unidadeId: uidFiltro,
+    versao: MK_GAS_VERSAO_
+  });
 }
 
 function verificarOperadorLogin_(p) {
@@ -11274,7 +11354,7 @@ function definirPinOperador_(p) {
   const sh = operadoresSheet_();
   sh.getRange(found.row, 4, 1, 2).setValues([[hash, salt]]);
   sh.getRange(found.row, 7).setValue(fmtData_(new Date()) + ' ' + fmtHoraLocal_(new Date()));
-  const op = operadorObjFromRow_(sh.getRange(found.row, 1, 1, 8).getValues()[0]);
+  const op = operadorObjFromRow_(sh.getRange(found.row, 1, 1, COL_OPS_READ_).getValues()[0]);
   registrarSessaoOperadorAtiva_(op);
   return resp_({ operador: op, role: roleFromPerfil_(op.perfil), sessaoAtiva: sessaoOperadorPayload_() });
 }
@@ -11396,7 +11476,7 @@ function editarOperadorSistema_(p) {
   const sh = operadoresSheet_();
   if (operadorNomeDuplicado_(sh, nome, found.data[0])) return err_('Ja existe operador com este nome', 409);
   sh.getRange(found.row, 3).setValue(nome);
-  const op = operadorObjFromRow_(sh.getRange(found.row, 1, 1, 8).getValues()[0]);
+  const op = operadorObjFromRow_(sh.getRange(found.row, 1, 1, COL_OPS_READ_).getValues()[0]);
   return resp_({ operador: op });
 }
 
@@ -11410,7 +11490,7 @@ function definirPerfilOperadorAdmin_(p) {
   }
   const sh = operadoresSheet_();
   sh.getRange(found.row, 8).setValue(perfil);
-  const op = operadorObjFromRow_(sh.getRange(found.row, 1, 1, 8).getValues()[0]);
+  const op = operadorObjFromRow_(sh.getRange(found.row, 1, 1, COL_OPS_READ_).getValues()[0]);
   return resp_({ operador: op, mensagem: 'Perfil atualizado para ' + perfil });
 }
 
@@ -11446,7 +11526,7 @@ function resetarPinOperadorAdmin_(p) {
   if (ativa && Number(ativa.operadorId) === opId) liberarSessaoOperadorAtiva_(true);
   const sh = operadoresSheet_();
   sh.getRange(found.row, 4, 1, 2).setValues([['', '']]);
-  const op = operadorObjFromRow_(sh.getRange(found.row, 1, 1, 8).getValues()[0]);
+  const op = operadorObjFromRow_(sh.getRange(found.row, 1, 1, COL_OPS_READ_).getValues()[0]);
   return resp_({ operador: op, mensagem: 'PIN resetado. Operador criara novo PIN no proximo login.' });
 }
 
@@ -11927,6 +12007,7 @@ function gpColabRhObjFromRow_(row, idx) {
     vaDiario: gpNumField_(row[12], gpVaDiarioCanonico_()),
     metaLocDia: gpNumField_(row[13], 20), bonusMeta: gpNumField_(row[14], 100),
     turno: String(row[15] || '').trim(), ativo: String(row[16] || 'SIM').toUpperCase() !== 'NAO',
+    unidadeId: unidadeIdRhOfCell_(row[19]),
     row: GP_DATA_ROW + idx
   };
   obj.cadastroPct = gpCalcCadastroPct_(gpCadastroFromRhObj_(obj));
@@ -11940,6 +12021,9 @@ function gpInvalidateRhCache_() {
     cache.remove('gp_list_colab_v1');
     cache.remove('gp_list_colab_v2');
     cache.remove('gp_list_colab_v3');
+    cache.remove('gp_list_colab_v4_all');
+    cache.remove('gp_list_colab_v4_golden');
+    cache.remove('gp_list_colab_v4_laville');
     cache.remove('gp_painel_adm_' + comp);
     cache.remove('gp_painel_adm_v2_' + comp);
     cache.remove('gp_painel_adm_lite_' + comp);
@@ -11964,7 +12048,7 @@ function gpEnsureRhColaboradorFromOperador_(opId, nome, funcao) {
     const va = gpVaDiarioCanonico_();
     gpEnsureRowByOpId_(SH_COLAB_RH, id, [
       id, String(nome || '').trim() || ('ID ' + id), funcao || 'Operador',
-      '', '', '', '', '', '', hoje, '', 1621, va, 20, 100, '', 'SIM', 0, ''
+      '', '', '', '', '', '', hoje, '', 1621, va, 20, 100, '', 'SIM', 0, '', MK_UNIDADE_DEFAULT_
     ]);
     added = true;
   }
@@ -13261,14 +13345,20 @@ function gpStatusPontoHoje_(opId) {
   return { status: 'fora', entrada: null, saida: null };
 }
 
-function gpListarColaboradoresGestao_() {
+function gpListarColaboradoresGestao_(p) {
   try {
-    const cacheKey = 'gp_list_colab_v3';
+    p = p || {};
+    const rawUid = p.unidadeId != null ? p.unidadeId : (p.unidade != null ? p.unidade : p.unit);
+    const uidFiltro = (rawUid == null || String(rawUid).trim() === '')
+      ? 'all'
+      : unidadeIdFilterFrom_(p);
+    const cacheKey = 'gp_list_colab_v4_' + uidFiltro;
     try {
       const hit = CacheService.getScriptCache().get(cacheKey);
       if (hit) return ContentService.createTextOutput(hit).setMimeType(ContentService.MimeType.JSON);
     } catch (e) { /* ok */ }
-    const ops = listarOperadoresLogin_();
+    // Operadores da loja (ou todos se all)
+    const ops = listarOperadoresLogin_({ unidadeId: uidFiltro });
     const parsed = JSON.parse(ops.getContent());
     if (!parsed.ok) return ops;
     gpSyncOperadoresAtivosToRh_(parsed.operadores || []);
@@ -13281,13 +13371,26 @@ function gpListarColaboradoresGestao_() {
       if (!hasJulia) gpSyncJuliaPadrao_(null, gpCompetenciaAtual_());
     } catch (e) { Logger.log('gpListarColaboradoresGestao_ sync Julia: ' + e.message); }
     const rh = gpRows_(SH_COLAB_RH);
-    const idsRh = rh.map(function (r) { return Number(r[0]); });
+    const idsRhOk = {};
+    rh.forEach(function (r) {
+      if (!gpRowValid_(r)) return;
+      if (!rowMatchesUnidadeEquipe_(r[19], uidFiltro)) return;
+      idsRhOk[Number(r[0])] = true;
+    });
     parsed.colaboradores = (parsed.operadores || []).filter(function (o) {
-      return o.hasPin && idsRh.indexOf(Number(o.id)) >= 0;
+      return o.hasPin && idsRhOk[Number(o.id)];
     }).map(function (o) {
       const c = gpColabRhByOpId_(o.id);
-      return { id: o.id, nome: o.nome, hasPin: o.hasPin, funcao: c ? c.funcao : 'Colaborador', cadastroPct: c ? c.cadastroPct : 0 };
+      return {
+        id: o.id,
+        nome: o.nome,
+        hasPin: o.hasPin,
+        funcao: c ? c.funcao : 'Colaborador',
+        cadastroPct: c ? c.cadastroPct : 0,
+        unidadeId: (c && c.unidadeId) || o.unidadeId || MK_UNIDADE_DEFAULT_
+      };
     });
+    parsed.unidadeId = uidFiltro;
     const out = JSON.stringify(parsed);
     try { CacheService.getScriptCache().put(cacheKey, out, 90); } catch (e) { /* ok */ }
     return ContentService.createTextOutput(out).setMimeType(ContentService.MimeType.JSON);
@@ -13433,7 +13536,7 @@ function buscarPainelColaboradorPreview_(p) {
 
 function listarColaboradoresGestaoPreview_(p) {
   if (!adminPinOk_(p)) return err_('Acesso negado — PIN administrativo incorreto', 403);
-  return gpListarColaboradoresGestao_();
+  return gpListarColaboradoresGestao_(p);
 }
 
 function gpCalcHorasPontoStr_(entrada, saida) {
@@ -13771,8 +13874,8 @@ function gpSyncRhColaboradoresPadrao_(ctx) {
       return rows.some(function (r) { return Number(r[0]) === Number(id) && gpNormCompetencia_(r[1]) === compNorm; });
     };
     const comp = gpCompetenciaAtual_();
-    if (!hasRh(2)) gpEnsureRowByOpId_(SH_COLAB_RH, 2, [2, 'Milena Nunes', 'Socia', '', '', '', '', '', '', '01/01/2020', '', 1621, 20, 20, 100, '10h–14h', 'SIM', 25, '']);
-    if (!hasRh(3)) gpEnsureRowByOpId_(SH_COLAB_RH, 3, [3, 'Raykelly', 'Atendente 1', '', '', '', '', '', '', '15/06/2026', '', 1621, 20, 20, 100, '14h–22h', 'SIM', 25, '']);
+    if (!hasRh(2)) gpEnsureRowByOpId_(SH_COLAB_RH, 2, [2, 'Milena Nunes', 'Socia', '', '', '', '', '', '', '01/01/2020', '', 1621, 20, 20, 100, '10h–14h', 'SIM', 25, '', MK_UNIDADE_DEFAULT_]);
+    if (!hasRh(3)) gpEnsureRowByOpId_(SH_COLAB_RH, 3, [3, 'Raykelly', 'Atendente 1', '', '', '', '', '', '', '15/06/2026', '', 1621, 20, 20, 100, '14h–22h', 'SIM', 25, '', MK_UNIDADE_DEFAULT_]);
     if (!hasEscala(2, comp)) gpEnsureEscalaRow_(2, comp, ['10–14', '10–14', '10–14', '10–14', '10–14', 'OFF', 'OFF'], 'Socia — turno manha');
     if (!hasEscala(3, comp)) gpEnsureEscalaRow_(3, comp, ['14–22', 'OFF', '14–22', 'OFF', '14–22', '10–20', '13–21'], 'Rodizio dom');
     gpSyncJuliaPadrao_(ctx, comp);
@@ -13884,7 +13987,7 @@ function gpSyncJuliaPadrao_(ctx, competencia) {
   }
   if (!rhObj) {
     gpEnsureRowByOpId_(SH_COLAB_RH, id, [
-      id, 'Julia', 'Atendente 2', '', '', '', '', '', '', GP_JULIA_ADMISSAO_, '', 1621, va, 20, 100, '14h–22h', 'SIM', 0, ''
+      id, 'Julia', 'Atendente 2', '', '', '', '', '', '', GP_JULIA_ADMISSAO_, '', 1621, va, 20, 100, '14h–22h', 'SIM', 0, '', MK_UNIDADE_DEFAULT_
     ]);
   } else {
     // I120b: só escreve se divergir — rewrite a cada painel friava admin ~40s+
@@ -14752,11 +14855,11 @@ function instalarAbasGestaoPessoasCore_(opts) {
     return { nome: name, acao: forceClear ? 'reinstalada_force' : 'criada_ou_vazia' };
   }
   const log = [];
-  log.push(ensure(SH_COLAB_RH, '#2196F3', ['operador_id','nome','funcao','cpf','nascimento','telefone','email','endereco','emergencia','admissao','pix','salario_base','va_diario','meta_loc_dia','bonus_meta_r$','turno','ativo','cadastro_pct','atualizado_em'],
+  log.push(ensure(SH_COLAB_RH, '#2196F3', ['operador_id','nome','funcao','cpf','nascimento','telefone','email','endereco','emergencia','admissao','pix','salario_base','va_diario','meta_loc_dia','bonus_meta_r$','turno','ativo','cadastro_pct','atualizado_em','unidade_id'],
     [
-      [2,'Milena Nunes','Socia','','','','','','','01/01/2020','',1621,15.38,20,100,'10h–14h','SIM',25,''],
-      [3,'Raykelly','Atendente 1','','','','','','','15/06/2026','',1621,15.38,20,100,'14h–22h','SIM',25,''],
-      [4,'Julia','Atendente 2','','','','','','','01/07/2026','',1621,15.38,20,100,'14h–22h','SIM',0,'']
+      [2,'Milena Nunes','Socia','','','','','','','01/01/2020','',1621,15.38,20,100,'10h–14h','SIM',25,'',MK_UNIDADE_DEFAULT_],
+      [3,'Raykelly','Atendente 1','','','','','','','15/06/2026','',1621,15.38,20,100,'14h–22h','SIM',25,'',MK_UNIDADE_DEFAULT_],
+      [4,'Julia','Atendente 2','','','','','','','01/07/2026','',1621,15.38,20,100,'14h–22h','SIM',0,'',MK_UNIDADE_DEFAULT_]
     ]));
   log.push(ensure(SH_FOLHA_PONTO, '#4CAF50', ['id','operador_id','data','dia_semana','entrada','saida','horas','situacao','registrado_em'],
     [[1,3,'15/06/2026','Seg','13:58','21:05','7h07','OK','']]));
