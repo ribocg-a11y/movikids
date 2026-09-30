@@ -47,12 +47,13 @@
 
 **Nova versão Web:** ✅ ping **v1.5.231** (I160). FE **v1.9.146** **I162** — logo dino (PNG transparente) + card balcão mostra loja do **operador** (OPS col I / RH col T), não a loja do tablet. **I161** Holding×Balcão. Suite: `entregas/DIAGNOSTICO_LAVILLE_SUITE40_2026-09-30.md`.
 
-### I162 — Logo + loja do operador (smoke PC)
+### I162 / I162b — Logo + sessão por loja (smoke PC)
 
 | Check | Esperado |
 |-------|----------|
 | Empty home / splash / sidebar | Mascote dino + MOVI KIDS (fundo transparente) |
-| Raykelly logada no Golden; admin abre balcão LV | Card: `Raykelly · Golden (outra loja)` — **não** `· La Ville` |
+| Karen/Ray Golden logada; admin abre balcão LV | Linha **Balcão some** (só TABLET admin) — **não** `Golden (outra loja)` |
+| Mesma pessoa no balcão Golden | `Karen · Golden` / `Raykelly · Golden` |
 | RH / OPS | Colunas `unidade_id` já existem (RH **T**, OPS **I**) |
 
 ### I161 — Holding × Balcão (smoke PC)
