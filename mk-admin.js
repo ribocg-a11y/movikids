@@ -154,6 +154,7 @@ function adminTeardownUI_() {
   if (typeof mkInvalidateInicioCache_ === 'function') mkInvalidateInicioCache_();
   else try { localStorage.removeItem('mk_inicio_cache_v2'); localStorage.removeItem('mk_inicio_cache'); } catch (e) {}
   try { localStorage.removeItem('mk_admin_ui_persist'); } catch (e) {}
+  try { localStorage.removeItem('mk_app_modo_v1'); } catch (e2) {}
 }
 window.adminTeardownUI_ = adminTeardownUI_;
 
@@ -195,22 +196,27 @@ function adminLogin() {
   wireAdminIdleListeners_();
   if (!adminTimerInt) adminTimerInt = setInterval(tickAdmin, 1000);
   showAdminSidebar();
+  /* I161 — admin entra em Holding · Todas (não herda chip da última loja do balcão). */
+  if (typeof mkAppModoSet_ === 'function') mkAppModoSet_('holding');
+  if (typeof mkUnidadeSetFiltroAdm_ === 'function') {
+    try {
+      if (!localStorage.getItem('mk_unidade_filtro_adm_v1')) mkUnidadeSetFiltroAdm_('all');
+    } catch (eF) { mkUnidadeSetFiltroAdm_('all'); }
+  }
   showPage('holding');
-  if (!kpiData) carregarKPIs();
   if (typeof syncController === 'function') syncController(false, 0);
   setTimeout(function () { if (typeof renderHolding_ === 'function') renderHolding_(); }, 400);
-  setTimeout(carregarHistRelatorios, 1500);
-  setTimeout(carregarConfig, 2000);
-  if (typeof refreshOperadoresAdmin_ === 'function') refreshOperadoresAdmin_();
-  if (typeof mkPrefetchAdminWarm_ === 'function') mkPrefetchAdminWarm_();
+  /* I161 carga enxuta: sem kpiMes/prefetch/ops no boot — só ao abrir Dashboard/Operadores */
+  setTimeout(carregarHistRelatorios, 2500);
   if (typeof atualizarOperadorUI_ === 'function') atualizarOperadorUI_();
   if (typeof mkAuthRefreshSessaoTurno_ === 'function') mkAuthRefreshSessaoTurno_();
-  if (typeof mkMetaRefresh_ === 'function') mkMetaRefresh_();
   if (typeof applyRoleNav_ === 'function') applyRoleNav_();
   else {
     const gerBtn = document.getElementById('sb-gerenciar-btn');
     if (gerBtn) gerBtn.style.display = 'none';
   }
+  if (typeof mkApplyModoNav_ === 'function') mkApplyModoNav_();
+  if (typeof mkRefreshUnidadeUi_ === 'function') mkRefreshUnidadeUi_();
 }
 
 function adminLogout() {
@@ -867,22 +873,9 @@ async function carregarKPIsDashboard(mes, ano) {
   }
 }
 
-/** Prefetch admin — dashboard lite + painel RH em paralelo (não bloqueia UI). */
+/** I161/I74 — prefetch desligado no login; kpiMes só ao abrir Dashboard. */
 function mkPrefetchAdminWarm_() {
-  if (window._mkPrefetchAdminWarm) return;
-  window._mkPrefetchAdminWarm = true;
-  const authP = typeof apiParamsComAuth_ === 'function' ? apiParamsComAuth_() : {};
-  const hoje = new Date();
-  const mes = hoje.getMonth() + 1;
-  const ano = hoje.getFullYear();
-  const tasks = [];
-  if (!kpiDashCacheGet_(mes, ano)) {
-    tasks.push(api(Object.assign({ action: 'kpiMes', mes: mes, ano: ano, lite: '1' }, authP), 45000)
-      .then(function (d) { if (d && d.ok) kpiDashCacheSet_(mes, ano, d); })
-      .catch(function () {}));
-  }
-  /* I74 — Gestão Pessoas só ao abrir Operadores (evita fila GAS com kpiMes). */
-  Promise.all(tasks).finally(function () { window._mkPrefetchAdminWarm = false; });
+  window._mkPrefetchAdminWarm = false;
 }
 window.mkPrefetchAdminWarm_ = mkPrefetchAdminWarm_;
 // ── NOVO DASHBOARD v1.6.9 ────────────────────────────────────
@@ -1655,7 +1648,10 @@ function renderCommandCenter_(d) {
   renderCommandCenterFrotaStrip_(d.frota);
 
   const alertsEl = document.getElementById('mk-cmd-alerts');
-  const alertas = d.alertas || [];
+  const alertasRaw = d.alertas || [];
+  const alertas = (typeof mkDualFilterAlertas_ === 'function')
+    ? mkDualFilterAlertas_(alertasRaw, filtro)
+    : alertasRaw;
   if (alertsEl) {
     if (!alertas.length) {
       alertsEl.hidden = true;
@@ -1701,7 +1697,19 @@ async function carregarCommandCenter_() {
 }
 
 function mkDashOnFiltro_(id) {
-  if (typeof mkDualSetFiltro_ === 'function') mkDualSetFiltro_(id);
+  if (typeof mkDualAfterFiltroChange_ === 'function') mkDualAfterFiltroChange_(id);
+  else if (typeof mkDualSetFiltro_ === 'function') mkDualSetFiltro_(id);
+  commandCenterData = null;
+  const alertsEl = document.getElementById('mk-cmd-alerts');
+  if (alertsEl) { alertsEl.hidden = true; alertsEl.innerHTML = ''; }
+  ['mk-cmd-loc', 'mk-cmd-fat', 'mk-cmd-equipe', 'mk-cmd-frota'].forEach(function (wid) {
+    const el = document.getElementById(wid);
+    if (el) {
+      const v = el.querySelector('.mk-cmd-val, .mk-widget-val');
+      if (v) v.textContent = '…';
+    }
+  });
+  window._kpiDashInFlight = false;
   carregarCommandCenter_().catch(function () {});
   if (typeof carregarKPIsDashboard === 'function') {
     try { carregarKPIsDashboard(); } catch (e) { /* ignore */ }
@@ -4374,8 +4382,9 @@ async function carregarCaixa(forceRefresh) {
 }
 
 function mkCaixaOnFiltro_(id) {
-  if (typeof mkDualSetFiltro_ === 'function') mkDualSetFiltro_(id);
-  /* Cache local — troca de pill instantânea, sem novo GAS. */
+  if (typeof mkDualAfterFiltroChange_ === 'function') mkDualAfterFiltroChange_(id);
+  else if (typeof mkDualSetFiltro_ === 'function') mkDualSetFiltro_(id);
+  /* Cache local — troca de pill instantânea; fatia FE por unidade. */
   carregarCaixa(false);
 }
 window.mkCaixaOnFiltro_ = mkCaixaOnFiltro_;
@@ -5019,7 +5028,8 @@ function atualizarHubAdmin_() {
 }
 
 function mkAdminHubOnFiltro_(id) {
-  if (typeof mkDualSetFiltro_ === 'function') mkDualSetFiltro_(id);
+  if (typeof mkDualAfterFiltroChange_ === 'function') mkDualAfterFiltroChange_(id);
+  else if (typeof mkDualSetFiltro_ === 'function') mkDualSetFiltro_(id);
   atualizarHubAdmin_();
 }
 window.mkAdminHubOnFiltro_ = mkAdminHubOnFiltro_;

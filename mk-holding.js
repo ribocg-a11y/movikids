@@ -153,7 +153,9 @@
 
   function mkHoldingAbrirBalcao_(uid) {
     var r;
-    if (typeof mkResetBalcaoParaUnidade_ === 'function') {
+    if (typeof mkAppEntrarBalcao_ === 'function') {
+      r = mkAppEntrarBalcao_(uid);
+    } else if (typeof mkResetBalcaoParaUnidade_ === 'function') {
       r = mkResetBalcaoParaUnidade_(uid);
     } else if (typeof mkUnidadeSet_ === 'function') {
       r = mkUnidadeSet_(uid);
@@ -162,8 +164,10 @@
       if (typeof toast === 'function') toast((r && r.erro) || 'Unidade indisponível', 'warning');
       return;
     }
+    if (typeof mkAppModoSet_ === 'function') mkAppModoSet_('balcao');
     if (typeof showPage === 'function') showPage('home', { adminBalcao: true });
     if (typeof mkRefreshUnidadeUi_ === 'function') mkRefreshUnidadeUi_();
+    if (typeof mkApplyModoNav_ === 'function') mkApplyModoNav_();
     /* force=true: evita reaplicar cache/inicio da outra loja (I159g). */
     if (typeof syncNow === 'function') {
       try { syncNow(true); } catch (eS) { /* ignore */ }
@@ -179,7 +183,11 @@
   function mkHoldingSetFiltroCaixa_(id) {
     if (typeof mkDualSetFiltro_ === 'function') mkDualSetFiltro_(id);
     else if (typeof mkUnidadeSetFiltroAdm_ === 'function') mkUnidadeSetFiltroAdm_(id);
+    if (typeof mkAppModoSet_ === 'function') mkAppModoSet_('holding');
     renderHolding_();
+    if (typeof mkRefreshUnidadeUi_ === 'function') mkRefreshUnidadeUi_();
+    if (typeof mkApplyModoNav_ === 'function') mkApplyModoNav_();
+    if (typeof mkDualAfterFiltroChange_ === 'function') mkDualAfterFiltroChange_(id);
     if (typeof toast === 'function') {
       var lbl = id === 'all' ? 'Todas as lojas' : (typeof mkUnidadeLabelCurto_ === 'function' ? mkUnidadeLabelCurto_(id) : id);
       toast('Filtro: ' + lbl, 'info');

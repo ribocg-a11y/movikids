@@ -740,7 +740,8 @@ function aplicarCustosHistorico_(res) {
 }
 
 function mkCusHistOnFiltro_(id) {
-  if (typeof mkDualSetFiltro_ === 'function') mkDualSetFiltro_(id);
+  if (typeof mkDualAfterFiltroChange_ === 'function') mkDualAfterFiltroChange_(id);
+  else if (typeof mkDualSetFiltro_ === 'function') mkDualSetFiltro_(id);
   if (cusHistResFull_) aplicarCustosHistorico_(cusHistResFull_);
   else if (typeof buscarCustosHistorico === 'function') buscarCustosHistorico();
 }

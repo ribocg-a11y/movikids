@@ -126,7 +126,8 @@ async function carregarRelacionamento() {
 }
 
 function mkRelOnFiltro_(id) {
-  if (typeof mkDualSetFiltro_ === 'function') mkDualSetFiltro_(id);
+  if (typeof mkDualAfterFiltroChange_ === 'function') mkDualAfterFiltroChange_(id);
+  else if (typeof mkDualSetFiltro_ === 'function') mkDualSetFiltro_(id);
   const container = document.getElementById('rel-container');
   if (container) renderRelacionamentoList_(container);
 }

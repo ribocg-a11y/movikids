@@ -67,8 +67,28 @@ function showPage(name, opts = {}) {
   if (adminPages.includes(name) && name !== 'holding' && !mkPaginaGestaoPermitida_(name)) { abrirAdmin(); return; }
   /* ADM: Home = visão holding (duas lojas). Balcão unitário só com adminBalcao. */
   const isAdm = !!(window.isAdmin || (typeof mkAuthIsAdmin === 'function' && mkAuthIsAdmin()));
+  const modo = (typeof mkAppModo_ === 'function') ? mkAppModo_() : (isAdm ? 'holding' : 'balcao');
+  if (name === 'holding' && isAdm) {
+    if (typeof mkAppModoSet_ === 'function') mkAppModoSet_('holding');
+  }
+  if (name === 'home' && isAdm && opts.adminBalcao) {
+    if (typeof mkAppModoSet_ === 'function') mkAppModoSet_('balcao');
+  }
   if (name === 'home' && isAdm && !opts.adminBalcao) name = 'holding';
   if (name === 'holding' && !isAdm) { name = 'home'; }
+  /* I161 — ops de loja só no modo balcão */
+  const opsPages = ['nova', 'painel', 'relacionamento', 'custos', 'lancamento'];
+  if (isAdm && modo === 'holding' && !opts.adminBalcao && opsPages.indexOf(name) >= 0) {
+    if (typeof toast === 'function') toast('Abra o balcão de uma loja (Lojas → Abrir balcão) para operar', 'warning');
+    name = 'holding';
+  }
+  /* I161 — no balcão ADM, páginas holding-only voltam para Lojas (exceto caixa/hist opcionais: bloqueia dash/rel/ops) */
+  const holdingOnly = ['dashboard', 'relatorio', 'operadores', 'admin', 'sistema', 'config'];
+  if (isAdm && modo === 'balcao' && holdingOnly.indexOf(name) >= 0 && !opts.forceHolding) {
+    if (typeof toast === 'function') toast('Volte a Lojas (Holding) para ver análise consolidada', 'info');
+    if (typeof mkAppVoltarHolding_ === 'function') mkAppVoltarHolding_();
+    name = 'holding';
+  }
   const wasNovaActive = !!document.getElementById('page-nova')?.classList.contains('active');
   if (wasNovaActive && name !== 'nova') salvarNovaDraft_();
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -79,6 +99,7 @@ function showPage(name, opts = {}) {
   const navId = navMap[name];
   if (navId) document.getElementById(navId)?.classList.add('active');
   syncSidebar(name);
+  if (typeof mkApplyModoNav_ === 'function') mkApplyModoNav_();
   if (typeof mkRefreshUnidadeUi_ === 'function') mkRefreshUnidadeUi_();
   if (name === 'lancamento') {
     if (typeof resetAvulsoForm_ === 'function') resetAvulsoForm_();
@@ -113,12 +134,8 @@ function showPage(name, opts = {}) {
     if (typeof mkRefreshUnidadeUi_ === 'function') mkRefreshUnidadeUi_();
   }
   if (name === 'holding') {
-    /* I122: NÃO force=1 a cada visita — bustava cache e deixava app lento (mapa I122/I23).
-     * Sync warm basta; force só se ainda não há encHoje. */
-    const precisaForce = !(typeof encHojeData !== 'undefined' && Array.isArray(encHojeData) && encHojeData.length);
-    if (typeof syncNow === 'function') {
-      try { syncNow(!!precisaForce); } catch (eHold) { /* ignore */ }
-    }
+    /* I161/I122: holding não dispara sync balcão pesado — só render dual + warm se já há dados. */
+    if (typeof mkAppModoSet_ === 'function') mkAppModoSet_('holding');
     if (typeof renderHolding_ === 'function') renderHolding_();
     if (typeof atualizarOperadorUI_ === 'function') {
       try { atualizarOperadorUI_(); } catch (eUi) { /* ignore */ }
@@ -152,6 +169,7 @@ function syncSidebar(page) {
   const isAdm = !!(window.isAdmin || (typeof mkAuthIsAdmin === 'function' && mkAuthIsAdmin()));
   const holdBtn = document.getElementById('sbn-holding');
   const homeBtn = document.getElementById('sbn-home');
+  const modo = (typeof mkAppModo_ === 'function') ? mkAppModo_() : 'holding';
   const homeOn = !!document.getElementById('page-home')?.classList.contains('active');
   if (holdBtn) {
     holdBtn.hidden = true;
@@ -164,9 +182,9 @@ function syncSidebar(page) {
     if (el) { el.hidden = true; el.style.display = 'none'; el.setAttribute('aria-hidden', 'true'); }
   });
   if (homeBtn && isAdm) {
-    if (homeOn) {
+    if (modo === 'balcao' || homeOn) {
       homeBtn.innerHTML = '<span class="sb-icon">🏬</span>← Lojas';
-      homeBtn.setAttribute('onclick', "showPage('holding')");
+      homeBtn.setAttribute('onclick', "if(typeof mkAppVoltarHolding_==='function')mkAppVoltarHolding_();showPage('holding')");
     } else {
       homeBtn.innerHTML = '<span class="sb-icon">🏬</span>Lojas';
       homeBtn.setAttribute('onclick', "showPage('holding')");
@@ -175,7 +193,86 @@ function syncSidebar(page) {
     homeBtn.innerHTML = '<span class="sb-icon">🏠</span>Home';
     homeBtn.setAttribute('onclick', "showPage('home')");
   }
+  if (typeof mkApplyModoNav_ === 'function') mkApplyModoNav_();
 }
+
+/** I161 — menu por modo: ops só no balcão; holding só páginas agregáveis. */
+function mkApplyModoNav_() {
+  const isAdm = !!(window.isAdmin || (typeof mkAuthIsAdmin === 'function' && mkAuthIsAdmin()));
+  if (!isAdm) {
+    ['sbn-nova', 'sbn-relacionamento', 'sbn-painel', 'sbn-custos', 'sbn-avulso'].forEach(function (id) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.hidden = false;
+      el.style.display = '';
+      el.removeAttribute('aria-hidden');
+    });
+    ['nav-nova', 'nav-painel'].forEach(function (id) {
+      const el = document.getElementById(id);
+      if (el) el.style.display = '';
+    });
+    return;
+  }
+  const modo = (typeof mkAppModo_ === 'function') ? mkAppModo_() : 'holding';
+  const filtro = (typeof mkUnidadeFiltroAdm_ === 'function') ? mkUnidadeFiltroAdm_() : 'all';
+  const opsIds = ['sbn-nova', 'sbn-relacionamento', 'sbn-painel', 'sbn-custos', 'sbn-avulso'];
+  const holdIds = ['sbn-adm', 'sbn-caixa', 'sbn-dash', 'sbn-hist', 'sbn-custos-hist', 'sbn-rel', 'sbn-ops'];
+  const setVis = function (id, on) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.hidden = !on;
+    el.style.display = on ? '' : 'none';
+    el.setAttribute('aria-hidden', on ? 'false' : 'true');
+  };
+  if (modo === 'holding') {
+    opsIds.forEach(function (id) { setVis(id, false); });
+    holdIds.forEach(function (id) { setVis(id, true); });
+    /* Relatório CTO Golden: só com filtro Todas/Golden */
+    setVis('sbn-rel', filtro !== 'laville');
+    const sbColab = document.getElementById('sbn-colab');
+    if (sbColab) {
+      sbColab.hidden = false;
+      sbColab.style.display = '';
+    }
+    ['nav-nova', 'nav-painel'].forEach(function (id) {
+      const el = document.getElementById(id);
+      if (el) el.style.display = 'none';
+    });
+    const navHome = document.getElementById('nav-home');
+    if (navHome) {
+      navHome.querySelector('.nav-icon') && (navHome.innerHTML = '<div class="nav-icon">🏬</div>Lojas');
+      navHome.setAttribute('onclick', "showPage('holding')");
+    }
+  } else {
+    opsIds.forEach(function (id) { setVis(id, true); });
+    holdIds.forEach(function (id) { setVis(id, false); });
+    /* Balcão: Caixa/Hist da loja disponíveis; análise consolidada some */
+    setVis('sbn-caixa', true);
+    setVis('sbn-hist', true);
+    setVis('sbn-custos-hist', false);
+    setVis('sbn-rel', false);
+    setVis('sbn-ops', false);
+    setVis('sbn-adm', false);
+    setVis('sbn-dash', false);
+    const sbColab = document.getElementById('sbn-colab');
+    if (sbColab) {
+      sbColab.hidden = true;
+      sbColab.style.display = 'none';
+    }
+    ['nav-nova', 'nav-painel'].forEach(function (id) {
+      const el = document.getElementById(id);
+      if (el) el.style.display = '';
+    });
+    const navHome = document.getElementById('nav-home');
+    if (navHome) {
+      navHome.innerHTML = '<div class="nav-icon">🏠</div>Home';
+      navHome.setAttribute('onclick', "showPage('home',{adminBalcao:true})");
+    }
+  }
+  /* cfg/sys sempre fora */
+  ['sbn-cfg', 'sbn-sys'].forEach(function (id) { setVis(id, false); });
+}
+window.mkApplyModoNav_ = mkApplyModoNav_;
 
 function syncSidebarStatus(online) {
   const dot=document.getElementById('sb-dot');

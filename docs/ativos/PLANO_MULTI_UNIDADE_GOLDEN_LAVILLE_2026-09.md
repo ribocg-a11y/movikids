@@ -183,12 +183,16 @@ Novo:
 - Ponto/RH: decidir se colaborador é **global** ou **por unidade** (ver §5 RH).  
 - Hub Colaboradores mostra unidade no cabeçalho.
 
-### F4 — Administração
+### F4 — Administração (**I161** Holding × Balcão — FE v1.9.144+)
 
-1. PIN admin.  
-2. Seletor permanente no header admin: **Todas | Golden | La Ville**.  
-3. Dash / caixa / relatório / frota / custos respeitam o seletor.  
-4. Relatório Golden (shopping) **só** faz sentido com filtro Golden (ou template La Ville com CTO próprio).
+1. PIN admin → entra em **modo Holding** (default filtro **Todas**).  
+2. **Dois modos (não misturar):**  
+   - **Holding** — chip `Holding · Todas` / `Visão: Golden|La Ville`; menu só páginas agregáveis (Lojas, Dashboard, Caixa, Hist, Relatório, Operadores, Colaboradores).  
+   - **Balcão** — só após **Abrir balcão** numa loja; chip `📍 loja`; menu Nova/Home/Painel/Relacionamento/Avulso/Custo.  
+3. Pills **Todas | Golden | La Ville** = filtro ADM (storage `mk_unidade_filtro_adm_v1`); unidade do tablet = `mk_unidade_ativa_v1`.  
+4. Dash / caixa / hist / KPI respeitam o filtro; alertas sem `unidadeId` somem no filtro La Ville (anti-salada Golden).  
+5. Relatório Golden (CTO) **só** com filtro Todas/Golden (item some em La Ville).  
+6. Carga enxuta: sem `kpiMes`/ops no boot admin — prefetch só ao abrir Dashboard.
 
 ### F5 — Nova locação / timer / portal
 

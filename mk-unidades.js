@@ -1,12 +1,14 @@
 /* MOVI KIDS — Multi-unidade (Opção A · I159e unidade_id)
  * Golden = legado (CONFIG/GAS). La Ville = catálogo FE + GAS.
- * Sem unidadeId → golden (zero regressão). ADM holding → all.
+ * Sem unidadeId → golden (zero regressão).
+ * I161 — dois modos: holding (filtro ADM) vs balcão (unidade ativa).
  */
 (function (w) {
   'use strict';
 
   var STORAGE_KEY = 'mk_unidade_ativa_v1';
   var FILTRO_ADM_KEY = 'mk_unidade_filtro_adm_v1';
+  var MODO_KEY = 'mk_app_modo_v1';
   var DEFAULT_ID = 'golden';
   var _snapGolden_ = null;
 
@@ -168,6 +170,7 @@
     var c = canon_(id);
     if (c !== 'all' && c !== 'golden' && c !== 'laville') c = 'all';
     try { localStorage.setItem(FILTRO_ADM_KEY, c); } catch (e) { /* ignore */ }
+    if (isAdm_() && getModo_() === 'holding') refreshUnidadeUi_();
     return c;
   }
 
@@ -201,19 +204,52 @@
     return (typeof mkAuthIsAdmin === 'function' && mkAuthIsAdmin()) || !!w.isAdmin;
   }
 
-  /** Params API: operador = unidade ativa; ADM holding = all; ADM balcão = unidade; caixa/KPI = filtro ADM. */
+  /** I161 — holding = visão ADM; balcão = operação de 1 loja. Operador = sempre balcão. */
+  function getModo_() {
+    if (!isAdm_()) return 'balcao';
+    try {
+      var m = String(localStorage.getItem(MODO_KEY) || '').toLowerCase();
+      if (m === 'balcao' || m === 'holding') return m;
+    } catch (e) { /* ignore */ }
+    return 'holding';
+  }
+
+  function setModo_(modo) {
+    var m = (modo === 'balcao') ? 'balcao' : 'holding';
+    try { localStorage.setItem(MODO_KEY, m); } catch (e) { /* ignore */ }
+    try {
+      if (typeof document !== 'undefined') {
+        document.documentElement.setAttribute('data-mk-modo', m);
+      }
+    } catch (e2) { /* ignore */ }
+    if (typeof w.mkApplyModoNav_ === 'function') {
+      try { w.mkApplyModoNav_(); } catch (eNav) { /* ignore */ }
+    }
+    refreshUnidadeUi_();
+    return m;
+  }
+
+  function entrarBalcaoModo_(uid) {
+    var r = setUnidadeId(uid);
+    if (!r || !r.ok) return r;
+    setModo_('balcao');
+    return r;
+  }
+
+  function voltarHoldingModo_() {
+    setModo_('holding');
+    return { ok: true, modo: 'holding', filtro: getFiltroAdm_() };
+  }
+
+  /**
+   * Params API:
+   * - operador → unidade ativa
+   * - ADM holding → filtro ADM (all|golden|laville)
+   * - ADM balcão → unidade ativa da loja aberta
+   */
   function apiParamsUnidade_() {
     if (isAdm_()) {
-      try {
-        var home = document.getElementById('page-home');
-        if (home && home.classList.contains('active')) {
-          return { unidadeId: getUnidadeId() };
-        }
-        var hold = document.getElementById('page-holding');
-        if (hold && hold.classList.contains('active')) {
-          return { unidadeId: 'all' };
-        }
-      } catch (e) { /* ignore */ }
+      if (getModo_() === 'balcao') return { unidadeId: getUnidadeId() };
       return { unidadeId: getFiltroAdm_() };
     }
     return { unidadeId: getUnidadeId() };
@@ -374,7 +410,7 @@
   w.mkUnidadeAplicarConfig_ = aplicarConfigLocal_;
   w.mkUnidadeSyncAposGas_ = syncAposGasConfig_;
 
-  /** Badge/nome da loja no balcão (home, sidebar, header mobile). */
+  /** Chip / banner: Holding usa filtro ADM; balcão usa unidade ativa. */
   function refreshUnidadeUi_() {
     var uid = getUnidadeId();
     var u = getUnidade(uid);
@@ -383,38 +419,69 @@
     var banner = document.getElementById('mk-unidade-balcao-banner');
     var nomeEl = document.getElementById('mk-unidade-balcao-nome');
     var subEl = document.getElementById('mk-unidade-balcao-sub');
-    if (banner) banner.setAttribute('data-uid', uid);
+    var mob = document.getElementById('mk-mob-unidade');
+    var sb = document.getElementById('sb-unidade-chip');
+    var admHolding = isAdm_() && getModo_() === 'holding';
+
+    if (admHolding) {
+      var filtro = getFiltroAdm_();
+      var chipTxt = filtro === 'all'
+        ? 'Holding · Todas'
+        : ('Visão: ' + (filtro === 'laville' ? 'La Ville' : 'Golden'));
+      if (banner) {
+        banner.hidden = true;
+        banner.setAttribute('data-uid', filtro);
+        banner.setAttribute('data-modo', 'holding');
+      }
+      if (nomeEl) nomeEl.textContent = chipTxt;
+      if (subEl) subEl.textContent = 'Filtro da análise — não é balcão';
+      if (mob) {
+        mob.hidden = false;
+        mob.textContent = chipTxt;
+        mob.setAttribute('data-uid', filtro);
+        mob.setAttribute('data-modo', 'holding');
+      }
+      if (sb) {
+        sb.hidden = false;
+        sb.textContent = chipTxt;
+        sb.setAttribute('data-uid', filtro);
+        sb.setAttribute('data-modo', 'holding');
+      }
+      return;
+    }
+
+    if (banner) {
+      banner.hidden = false;
+      banner.setAttribute('data-uid', uid);
+      banner.setAttribute('data-modo', 'balcao');
+    }
     if (nomeEl) nomeEl.textContent = nome;
     if (subEl) subEl.textContent = sub;
-    var mob = document.getElementById('mk-mob-unidade');
     if (mob) {
       mob.hidden = false;
       mob.textContent = '📍 ' + nome;
       mob.setAttribute('data-uid', uid);
+      mob.setAttribute('data-modo', 'balcao');
     }
-    var sb = document.getElementById('sb-unidade-chip');
     if (sb) {
-      var holdOn = false;
-      try {
-        holdOn = !!(document.getElementById('page-holding') && document.getElementById('page-holding').classList.contains('active'));
-      } catch (eH) { /* ignore */ }
-      if (holdOn) {
-        sb.hidden = true;
-      } else {
-        sb.hidden = false;
-        sb.textContent = '📍 ' + nome;
-        sb.setAttribute('data-uid', uid);
-      }
+      sb.hidden = false;
+      sb.textContent = '📍 ' + nome;
+      sb.setAttribute('data-uid', uid);
+      sb.setAttribute('data-modo', 'balcao');
     }
   }
   w.mkRefreshUnidadeUi_ = refreshUnidadeUi_;
+  w.mkAppModo_ = getModo_;
+  w.mkAppModoSet_ = setModo_;
+  w.mkAppEntrarBalcao_ = entrarBalcaoModo_;
+  w.mkAppVoltarHolding_ = voltarHoldingModo_;
 
   /**
    * I159g — ao trocar de loja no balcão: zera KPIs locais (evita herdar Golden)
    * e invalida cache inicio sem unidade.
    */
   function resetBalcaoParaUnidade_(uid) {
-    var r = setUnidadeId(uid);
+    var r = entrarBalcaoModo_(uid);
     if (!r || !r.ok) return r;
     /* Não apagar encHojeData global (holding usa as duas lojas).
      * Só zera os tiles do balcão até o sync da unidade voltar. */

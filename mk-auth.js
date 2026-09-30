@@ -636,6 +636,12 @@
     else if (gestor && typeof showGestorSidebar === 'function') showGestorSidebar();
     else if (supervisor && typeof showSupervisorSidebar === 'function') showSupervisorSidebar();
     else if (typeof hideAdminSidebar === 'function') hideAdminSidebar();
+    if (typeof mkApplyModoNav_ === 'function') {
+      try { mkApplyModoNav_(); } catch (eNav) { /* ignore */ }
+    }
+    if (typeof mkRefreshUnidadeUi_ === 'function') {
+      try { mkRefreshUnidadeUi_(); } catch (eUi) { /* ignore */ }
+    }
   }
 
   /** Colaboradores — sempre exige PIN próprio (não reutiliza sessão do balcão). */

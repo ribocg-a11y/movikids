@@ -135,6 +135,43 @@
     return { golden: g, laville: l };
   }
 
+  /** I161 — no filtro 1 loja, drop alertas sem unidade ou da outra loja (anti-salada Golden). */
+  function filterAlertasPorFiltro_(alertas, filtro) {
+    var f = filtro || filtroAtual_();
+    var list = alertas || [];
+    if (!f || f === 'all') return list;
+    return list.filter(function (a) {
+      if (!a) return false;
+      var uid = a.unidadeId || a.unidade || a.loja || '';
+      if (uid) return String(uid).toLowerCase() === f;
+      /* legado sem unidadeId: só na visão Golden (ops/meta atuais são Golden). */
+      if (f === 'golden') return true;
+      return false;
+    });
+  }
+
+  /** Após trocar pill: chip + menu + invalida cache KPI do mês corrente. */
+  function afterFiltroChange_(id) {
+    var f = setFiltro_(id);
+    if (typeof mkRefreshUnidadeUi_ === 'function') {
+      try { mkRefreshUnidadeUi_(); } catch (e1) { /* ignore */ }
+    }
+    if (typeof mkApplyModoNav_ === 'function') {
+      try { mkApplyModoNav_(); } catch (e2) { /* ignore */ }
+    }
+    try {
+      var agora = new Date();
+      var mes = agora.getMonth() + 1;
+      var ano = agora.getFullYear();
+      ['all', 'golden', 'laville'].forEach(function (uid) {
+        try {
+          sessionStorage.removeItem('mk_kpi_dash_' + mes + '_' + ano + '_u' + uid);
+        } catch (e3) { /* ignore */ }
+      });
+    } catch (e4) { /* ignore */ }
+    return f;
+  }
+
   w.mkDualFiltro_ = filtroAtual_;
   w.mkDualSetFiltro_ = setFiltro_;
   w.mkDualPillsHtml_ = renderPillsHtml_;
@@ -147,4 +184,6 @@
   w.mkDualFmtMoney_ = fmtMoney_;
   w.mkDualResumoFromEncHoje_ = resumoFromEncHoje_;
   w.mkDualPreferEncWhenResumoLeak_ = preferEncWhenResumoLeak_;
+  w.mkDualFilterAlertas_ = filterAlertasPorFiltro_;
+  w.mkDualAfterFiltroChange_ = afterFiltroChange_;
 })(typeof window !== 'undefined' ? window : globalThis);

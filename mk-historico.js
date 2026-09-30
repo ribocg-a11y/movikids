@@ -126,7 +126,8 @@ function aplicarHistorico_(res) {
 }
 
 function mkHistOnFiltro_(id) {
-  if (typeof mkDualSetFiltro_ === 'function') mkDualSetFiltro_(id);
+  if (typeof mkDualAfterFiltroChange_ === 'function') mkDualAfterFiltroChange_(id);
+  else if (typeof mkDualSetFiltro_ === 'function') mkDualSetFiltro_(id);
   if (histLocacoesAll && histLocacoesAll.length) {
     const container = document.getElementById('hist-container');
     if (!container) return;
