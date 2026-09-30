@@ -4225,10 +4225,16 @@ async function carregarCaixa() {
   try {
     if (filtro === 'all') {
       const authP = apiParamsComAuth_();
-      const [rg, rl] = await Promise.all([
+      let [rg, rl] = await Promise.all([
         api({ action: 'resumoDia', data: dataFmt, unidadeId: 'golden', ...authP }),
         api({ action: 'resumoDia', data: dataFmt, unidadeId: 'laville', ...authP })
       ]);
+      /* Web < v1.5.225: resumoDia ignora unidade — usar encHoje local no dual. */
+      if (dataFmt === hoje && typeof mkDualPreferEncWhenResumoLeak_ === 'function') {
+        const fix = mkDualPreferEncWhenResumoLeak_(rg, rl);
+        rg = fix.golden;
+        rl = fix.laville;
+      }
       if (dualGrid && typeof mkDualColShell_ === 'function' && typeof mkDualMiniKpiHtml_ === 'function') {
         dualGrid.hidden = false;
         dualGrid.innerHTML =

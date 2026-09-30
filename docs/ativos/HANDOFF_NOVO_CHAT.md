@@ -1,13 +1,13 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 29/09/2026 · FE **v1.9.129** Pages · GAS repo **v1.5.225** · **I159g** holding encHoje (não zerar Golden) · **I159f** dual · **I158** ✅
+**Atualizado:** 29/09/2026 · FE **v1.9.130** Pages · GAS repo **v1.5.225** · **I159g** holding encHoje (não zerar Golden) · **I159f** dual · **I158** ✅
 
 ## Produção (agora)
 
 | Camada | Versão | Link |
 |--------|--------|------|
-| Frontend | **v1.9.129** | https://ribocg-a11y.github.io/movikids/?force=1.9.129 |
-| Gestão Pessoas | **v1.9.129** | `gestao-pessoas.html?force=1.9.129` |
+| Frontend | **v1.9.130** | https://ribocg-a11y.github.io/movikids/?force=1.9.130 |
+| Gestão Pessoas | **v1.9.130** | `gestao-pessoas.html?force=1.9.130` |
 | GAS | ping Web **v1.5.224** ⏳ Nova versão → **v1.5.225** · repo **v1.5.225** | I159f dual |
 | Design System | v1.1 | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
 
@@ -20,18 +20,37 @@
 
 ---
 
-## I159e — Isolamento hard (esta sessão)
+## I159 — Multi-unidade Golden × La Ville (status 29/09)
 
-| Item | Status |
-|------|--------|
-| Col AC `unidade_id` · `COL_LOC_READ_=29` | ✅ repo GAS **v1.5.224** |
-| Filtro `listarAtivas` / `carregarInicio` / `kpiMes` | ✅ `all\|golden\|laville` |
-| FE holding pills + ADM `unidadeId=all` | ✅ **v1.9.125** |
-| Relatório Golden força `unidadeId=golden` | ✅ |
-| Backfill `backfillUnidadeIdLocacoesAdmin` | ✅ (após Nova versão Web) |
-| **Nova versão Web GAS** | ⏳ sócio — raw GitHub + Editar lapis |
+### Já feito ✅
+
+| # | Item | Onde |
+|---|------|------|
+| I159–b | Hub 3 portas + preços/frota La Ville (LV*) no FE | FE |
+| I159c | GAS preços/frota por `unidadeId` | repo **v1.5.223+** |
+| I159d | Holding ADM lado a lado | FE |
+| I159e | Col AC `unidade_id` · filtro `carregarInicio`/`listarAtivas`/`kpiMes` | repo **v1.5.224** · Web parcial |
+| I159f | Dual ADM (Caixa/Dash/Painel/Hist/Rel/Custo) · La Ville ≠ 6 fantasma · CUSTOS col G | FE **v1.9.126–128** · GAS repo **v1.5.225** |
+| I159g | Badge loja no balcão · holding não zera encerradas Golden | FE **v1.9.130** |
+| I158 | Relatório Golden via `kpiMes` (sem Cancelada) | FE ✅ |
+| Planilha hoje | Golden 6 contas/7 sess/R$116 · La Ville 0 · `carregarInicio` OK | API |
+
+### Ainda falta ⏳
+
+| # | Item | Quem | Bloqueio |
+|---|------|------|----------|
+| **A** | **Nova versão Web GAS** → ping **v1.5.225** | **Sócio** §7.3 | Sem isso `resumoDia`/comando misturam lojas na Web |
+| **B** | Backfill `unidade_id` nas LOCAÇÕES antigas | Após A | API `backfillUnidadeIdLocacoesAdmin` |
+| **C** | Smoke holding/caixa/dash dual + balcão La Ville 0 + Golden com contas | Ops/PC | Após A + FE atual |
+| **D** | Confirmar frota real La Ville + e-mail CTO | Sócio | Frota ainda provisória |
+| **E** | Tablet smoke D4 · PDF Golden 01/10 · FASE 17 | Ops/Sócio | Ops |
+
+**Próximo imediato:** A (Nova versão Web) — raw:  
+https://raw.githubusercontent.com/ribocg-a11y/movikids/main/MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs  
+Editor → Implantar → **Editar** (lápis) `AKfycbwakQ...` → **Nova versão** (nunca Nova implantação).
 
 ---
+
 
 ## I158 — Relatório Golden (fechado nesta sessão)
 
@@ -116,15 +135,12 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 
 | # | Ação | Quem | Status |
 |---|------|------|--------|
-| 0 | **I159** hub + `unidadeId` | Agente | ✅ FE **v1.9.121** |
-| 0b | **I159b** tabelas La Ville no FE | Agente | ✅ FE **v1.9.122** · frota provisória LV* |
-| 0c | Confirmar **quantidade** frota + CTO e-mail La Ville | Sócio | ⏳ |
-| 0d | **I159c** GAS preços/frota por `unidadeId` | Agente | ✅ repo **v1.5.223** — falta **Nova versão Web** |
-| 0e | Sócio: Nova versão Web GAS | Sócio | ✅ publicada (sessão) |
-| 0f | **I159d** painel holding ADM (Golden \| La Ville) | Agente | ✅ FE **v1.9.124** |
-| 1 | PDF Golden setembro prévia 29/09 | Agente | ✅ em `entregas/` — **não enviar** |
-| 1b | Regenerar/enviar fechamento **01/10** | Sócio | Admin FE 1.9.122 |
-| 3 | Tablet smoke D4 · `?force=1.9.122` | Ops | ⏳ |
+| **A** | **Nova versão Web GAS v1.5.225** (ping ainda v1.5.224) | **Sócio** | ⏳ §7.3 |
+| B | Backfill `unidade_id` LOCAÇÕES | Agente após A | ⏳ |
+| C | Smoke dual + balcão La Ville / Golden | Ops | ⏳ FE **v1.9.130+** |
+| D | Frota real La Ville + e-mail CTO | Sócio | ⏳ |
+| 1b | PDF Golden fechamento **01/10** | Sócio | ⏳ não enviar prévia |
+| 3 | Tablet smoke D4 | Ops | ⏳ |
 | 4 | Assinar FASE 17 (decisão 17.5 F9) | Sócio | ⏳ |
 
 **Plano:** `docs/ativos/PLANO_MULTI_UNIDADE_GOLDEN_LAVILLE_2026-09.md`

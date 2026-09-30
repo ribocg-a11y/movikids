@@ -102,6 +102,39 @@
     );
   }
 
+  /** KPIs do dia a partir de encHojeData (anti-vazamento Web resumoDia pré-v1.5.225). */
+  function resumoFromEncHoje_(uid) {
+    var encAll = (typeof encHojeData !== 'undefined' && Array.isArray(encHojeData)) ? encHojeData : [];
+    var enc = typeof mkSessionsPorUnidade_ === 'function'
+      ? mkSessionsPorUnidade_(encAll, uid)
+      : encAll.filter(function (e) { return uidOf_(e) === uid; });
+    var n = typeof mkContasEncHoje_ === 'function' ? mkContasEncHoje_(enc) : enc.length;
+    var fat = enc.reduce(function (s, e) { return s + (Number(e.valorTotal) || 0); }, 0);
+    return {
+      ok: true,
+      n: n,
+      nSessoes: enc.length,
+      fat: fat,
+      resultado: fat,
+      _fonte: 'encHoje'
+    };
+  }
+
+  /** Se laville e golden vierem iguais e encHoje mostra La Ville vazia → Web ainda sem filtro. */
+  function preferEncWhenResumoLeak_(rg, rl) {
+    var g = rg && rg.ok ? rg : null;
+    var l = rl && rl.ok ? rl : null;
+    if (!g || !l) return { golden: g || rg, laville: l || rl };
+    var same = Number(g.n) === Number(l.n) && Math.abs(Number(g.fat) - Number(l.fat)) < 0.009;
+    if (!same) return { golden: g, laville: l };
+    var fromG = resumoFromEncHoje_('golden');
+    var fromL = resumoFromEncHoje_('laville');
+    if (fromL.n === 0 && fromL.nSessoes === 0 && (fromG.n > 0 || fromG.nSessoes > 0 || Number(g.n) > 0)) {
+      return { golden: fromG.nSessoes || fromG.n ? fromG : g, laville: fromL };
+    }
+    return { golden: g, laville: l };
+  }
+
   w.mkDualFiltro_ = filtroAtual_;
   w.mkDualSetFiltro_ = setFiltro_;
   w.mkDualPillsHtml_ = renderPillsHtml_;
@@ -112,4 +145,6 @@
   w.mkDualMiniKpiHtml_ = miniKpiHtml_;
   w.mkDualLabelCurto_ = labelCurto_;
   w.mkDualFmtMoney_ = fmtMoney_;
+  w.mkDualResumoFromEncHoje_ = resumoFromEncHoje_;
+  w.mkDualPreferEncWhenResumoLeak_ = preferEncWhenResumoLeak_;
 })(typeof window !== 'undefined' ? window : globalThis);

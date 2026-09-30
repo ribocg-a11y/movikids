@@ -569,6 +569,21 @@ try {
     }
   }
 
+  # I159g — holding nao perde encHoje ao filtrar balcao; merge por unidade no sync
+  $homeI159g = Join-Path $root "mk-home.js"
+  $syncI159g = Join-Path $root "mk-sync.js"
+  if ((Test-Path $homeI159g) -and (Test-Path $syncI159g)) {
+    $homeRawG = Get-Content -Path $homeI159g -Raw -Encoding UTF8
+    $syncRawG = Get-Content -Path $syncI159g -Raw -Encoding UTF8
+    if ($homeRawG -notmatch 'guardar TODAS as encerradas' -and $homeRawG -notmatch 'I159g fix') {
+      Add-Check "guard.i159g.fe.enc" "fail" "mkUpdateEncHojeKpis_ ainda filtra encHoje global (I159g)"
+    } elseif ($syncRawG -notmatch 'function mkMergeListaPorUnidade_') {
+      Add-Check "guard.i159g.fe.merge" "fail" "mkMergeListaPorUnidade_ ausente (I159g)"
+    } else {
+      Add-Check "guard.i159g.fe.holding" "ok" "encHoje completo + merge sync por unidade (I159g)"
+    }
+  }
+
   $adminJs = Join-Path $root "mk-admin.js"
   if (Test-Path $adminJs) {
     $adminRaw = Get-Content -Path $adminJs -Raw -Encoding UTF8
