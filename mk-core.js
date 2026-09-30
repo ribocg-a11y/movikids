@@ -108,7 +108,7 @@ function atualizarOperadorUI_(sessaoServidor) {
     if (el) el.textContent = text;
   };
 
-  const temBalcao = !!(srv && srv.nome);
+  const temBalcaoRaw = !!(srv && srv.nome);
   const temTablet = logadoTablet;
   /* Holding (duas lojas): sem card de sessão — Sair fica no rodapé sempre. */
   const holdOn = !!(document.getElementById('page-holding') &&
@@ -116,6 +116,18 @@ function atualizarOperadorUI_(sessaoServidor) {
   const homeOn = !!(document.getElementById('page-home') &&
     document.getElementById('page-home').classList.contains('active'));
   const balcaoUnitario = homeOn && !holdOn;
+
+  /* I162b — sessão GAS ainda é global; no balcão de uma loja só mostra
+   * operador cadastrado nessa unidade (OPS/RH). Karen Golden some no La Ville. */
+  const opUid = temBalcaoRaw
+    ? ((typeof mkSessaoOperadorUnidadeId_ === 'function')
+      ? mkSessaoOperadorUnidadeId_(srv)
+      : (srv && srv.unidadeId ? String(srv.unidadeId) : ''))
+    : '';
+  const currUid = (typeof mkUnidadeId_ === 'function') ? mkUnidadeId_() : '';
+  const sessaoOutraLoja = !!(balcaoUnitario && temBalcaoRaw && opUid && currUid &&
+    opUid !== 'all' && currUid !== 'all' && opUid !== currUid);
+  const temBalcao = temBalcaoRaw && !sessaoOutraLoja;
 
   if (card) {
     if (holdOn) card.hidden = true;
@@ -125,25 +137,17 @@ function atualizarOperadorUI_(sessaoServidor) {
   if (empty) empty.hidden = temBalcao || !logadoTablet || holdOn;
 
   if (temBalcao && !holdOn) {
-    /* I162 — loja do OPERADOR (OPS/RH), nunca a loja do tablet admin aberto.
-     * Bug: Raykelly Golden aparecia como «· La Ville» só porque o admin abriu balcão LV. */
-    const opUid = (typeof mkSessaoOperadorUnidadeId_ === 'function')
-      ? mkSessaoOperadorUnidadeId_(srv)
-      : (srv && srv.unidadeId ? String(srv.unidadeId) : '');
-    const currUid = (typeof mkUnidadeId_ === 'function') ? mkUnidadeId_() : '';
     const opLbl = (opUid && typeof mkUnidadeLabelCurto_ === 'function')
       ? mkUnidadeLabelCurto_(opUid)
       : '';
     let nomeBalcao = srv.nome || '—';
     if (opLbl) nomeBalcao += ' · ' + opLbl;
-    if (balcaoUnitario && opUid && currUid && opUid !== 'all' && currUid !== 'all' && opUid !== currUid) {
-      nomeBalcao += ' (outra loja)';
-      set('sb-balcao-horas', 'Turno ativo em ' + opLbl + ' — não é desta loja');
-    } else {
-      const ent = fmtHoraTurno_(srv.loggedAt);
-      set('sb-balcao-horas', ent ? ('Entrou ' + ent + (srv.loggedOutAt ? ' · Saiu ' + fmtHoraTurno_(srv.loggedOutAt) : '')) : '');
-    }
+    const ent = fmtHoraTurno_(srv.loggedAt);
+    set('sb-balcao-horas', ent ? ('Entrou ' + ent + (srv.loggedOutAt ? ' · Saiu ' + fmtHoraTurno_(srv.loggedOutAt) : '')) : '');
     set('sb-balcao-nome', nomeBalcao);
+  } else if (sessaoOutraLoja) {
+    set('sb-balcao-nome', '');
+    set('sb-balcao-horas', '');
   }
 
   if (temTablet) {
@@ -184,7 +188,7 @@ function atualizarOperadorUI_(sessaoServidor) {
         : 'Admin neste aparelho · sem turno no balcão';
     } else {
       const localId = Number(s.id);
-      const srvId = srv && srv.operadorId ? Number(srv.operadorId) : 0;
+      const srvId = (temBalcao && srv && srv.operadorId) ? Number(srv.operadorId) : 0;
       const synced = srvId && srvId === localId;
       chip.hidden = false;
       chip.className = 'mk-mob-turno ' + (synced ? 'is-ok' : 'is-ghost');
