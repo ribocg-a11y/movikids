@@ -80,7 +80,9 @@ function showPage(name, opts = {}) {
   if (navId) document.getElementById(navId)?.classList.add('active');
   syncSidebar(name);
   if (typeof mkRefreshUnidadeUi_ === 'function') mkRefreshUnidadeUi_();
-  if (name === 'lancamento') resetAvulsoForm_();
+  if (name === 'lancamento') {
+    if (typeof resetAvulsoForm_ === 'function') resetAvulsoForm_();
+  }
   if (name==='nova') {
     if (opts.freshNova) {
       limparNovaDraft_();
@@ -105,13 +107,22 @@ function showPage(name, opts = {}) {
       if (typeof updateStats === 'function') updateStats();
       if (typeof atualizarVeiculoGrid === 'function') atualizarVeiculoGrid();
     }
+    if (typeof atualizarOperadorUI_ === 'function') {
+      try { atualizarOperadorUI_(); } catch (eHome) { /* ignore */ }
+    }
+    if (typeof mkRefreshUnidadeUi_ === 'function') mkRefreshUnidadeUi_();
   }
   if (name === 'holding') {
-    /* Holding precisa encHoje de TODAS as lojas — sync force com unidadeId=all. */
+    /* I122: NÃO force=1 a cada visita — bustava cache e deixava app lento (mapa I122/I23).
+     * Sync warm basta; force só se ainda não há encHoje. */
+    const precisaForce = !(typeof encHojeData !== 'undefined' && Array.isArray(encHojeData) && encHojeData.length);
     if (typeof syncNow === 'function') {
-      try { syncNow(true); } catch (eHold) { /* ignore */ }
+      try { syncNow(!!precisaForce); } catch (eHold) { /* ignore */ }
     }
     if (typeof renderHolding_ === 'function') renderHolding_();
+    if (typeof atualizarOperadorUI_ === 'function') {
+      try { atualizarOperadorUI_(); } catch (eUi) { /* ignore */ }
+    }
   }
   if (name==='relacionamento') carregarRelacionamento();
   if (name==='dashboard') {
@@ -137,12 +148,21 @@ function syncSidebar(page) {
     'admin':'sbn-adm','sistema':'sbn-sys','operadores':'sbn-ops','dashboard':'sbn-dash','relatorio':'sbn-rel','historico':'sbn-hist','custos-historico':'sbn-custos-hist','caixa':'sbn-caixa','config':'sbn-cfg'
   };
   if (map[page]) { const el=document.getElementById(map[page]); if(el) el.classList.add('active'); }
-  /* ADM: um só "Lojas" (sbn-home → holding). sbn-holding fica oculto (evita duplicata). */
+  /* ADM: um só "Lojas" (sbn-home → holding). sbn-holding sempre oculto. */
   const isAdm = !!(window.isAdmin || (typeof mkAuthIsAdmin === 'function' && mkAuthIsAdmin()));
   const holdBtn = document.getElementById('sbn-holding');
   const homeBtn = document.getElementById('sbn-home');
   const homeOn = !!document.getElementById('page-home')?.classList.contains('active');
-  if (holdBtn) holdBtn.hidden = true;
+  if (holdBtn) {
+    holdBtn.hidden = true;
+    holdBtn.style.display = 'none';
+    holdBtn.setAttribute('aria-hidden', 'true');
+  }
+  /* SMS / Sistema: fora do menu (QR-only; sem painel Sistema na UI). */
+  ['sbn-cfg', 'sbn-sys'].forEach(function (id) {
+    const el = document.getElementById(id);
+    if (el) { el.hidden = true; el.style.display = 'none'; el.setAttribute('aria-hidden', 'true'); }
+  });
   if (homeBtn && isAdm) {
     if (homeOn) {
       homeBtn.innerHTML = '<span class="sb-icon">🏬</span>← Lojas';

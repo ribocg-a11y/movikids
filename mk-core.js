@@ -109,13 +109,23 @@ function atualizarOperadorUI_(sessaoServidor) {
 
   const temBalcao = !!(srv && srv.nome);
   const temTablet = logadoTablet;
+  /* Holding (duas lojas): não mostrar card de sessão — só no balcão unitário. */
+  const holdOn = !!(document.getElementById('page-holding') &&
+    document.getElementById('page-holding').classList.contains('active'));
+  const homeOn = !!(document.getElementById('page-home') &&
+    document.getElementById('page-home').classList.contains('active'));
+  const balcaoUnitario = homeOn && !holdOn;
 
-  if (card) card.hidden = !temBalcao && !temTablet;
-  if (rowBalcao) rowBalcao.hidden = !temBalcao;
-  if (empty) empty.hidden = temBalcao || !logadoTablet;
+  if (card) {
+    if (holdOn) card.hidden = true;
+    else card.hidden = !temBalcao && !temTablet;
+  }
+  if (rowBalcao) rowBalcao.hidden = !temBalcao || holdOn;
+  if (empty) empty.hidden = temBalcao || !logadoTablet || holdOn;
 
-  if (temBalcao) {
-    set('sb-balcao-nome', srv.nome);
+  if (temBalcao && !holdOn) {
+    const uidLbl = (typeof mkUnidadeLabelCurto_ === 'function') ? mkUnidadeLabelCurto_() : '';
+    set('sb-balcao-nome', srv.nome + (uidLbl && balcaoUnitario ? (' · ' + uidLbl) : ''));
     const ent = fmtHoraTurno_(srv.loggedAt);
     set('sb-balcao-horas', ent ? ('Entrou ' + ent + (srv.loggedOutAt ? ' · Saiu ' + fmtHoraTurno_(srv.loggedOutAt) : '')) : '');
   }

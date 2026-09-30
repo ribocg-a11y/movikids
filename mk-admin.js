@@ -4225,15 +4225,24 @@ async function carregarCaixa() {
   try {
     if (filtro === 'all') {
       const authP = apiParamsComAuth_();
-      let [rg, rl] = await Promise.all([
-        api({ action: 'resumoDia', data: dataFmt, unidadeId: 'golden', ...authP }),
-        api({ action: 'resumoDia', data: dataFmt, unidadeId: 'laville', ...authP })
-      ]);
-      /* Web < v1.5.225: resumoDia ignora unidade — usar encHoje local no dual. */
-      if (dataFmt === hoje && typeof mkDualPreferEncWhenResumoLeak_ === 'function') {
-        const fix = mkDualPreferEncWhenResumoLeak_(rg, rl);
-        rg = fix.golden;
-        rl = fix.laville;
+      let rg;
+      let rl;
+      /* I23/I122: resumoDia frio ~20–30s — no dia atual o dual usa encHoje (1 chamada all). */
+      if (dataFmt === hoje && typeof mkDualResumoFromEncHoje_ === 'function') {
+        rg = mkDualResumoFromEncHoje_('golden');
+        rl = mkDualResumoFromEncHoje_('laville');
+      } else {
+        const pair = await Promise.all([
+          api({ action: 'resumoDia', data: dataFmt, unidadeId: 'golden', ...authP }),
+          api({ action: 'resumoDia', data: dataFmt, unidadeId: 'laville', ...authP })
+        ]);
+        rg = pair[0];
+        rl = pair[1];
+        if (typeof mkDualPreferEncWhenResumoLeak_ === 'function') {
+          const fix = mkDualPreferEncWhenResumoLeak_(rg, rl);
+          rg = fix.golden;
+          rl = fix.laville;
+        }
       }
       if (dualGrid && typeof mkDualColShell_ === 'function' && typeof mkDualMiniKpiHtml_ === 'function') {
         dualGrid.hidden = false;
