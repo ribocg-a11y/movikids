@@ -9,12 +9,12 @@
 <meta name="robots" content="noindex,nofollow">
 <title>Movi Kids — Acompanhar</title>
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<script src="mk-version.js?v=1.9.148"></script>
-<script src="mk-canonical-host.js?v=1.9.148"></script>
+<script src="mk-version.js?v=1.9.149"></script>
+<script src="mk-canonical-host.js?v=1.9.149"></script>
 <script>
 /* Portal: bust cache sem perder ?tel= (mk-cache-bust do balcão descarta query) */
 (function () {
-  var CURRENT = (window.MK_VERSION || '1.9.148');
+  var CURRENT = (window.MK_VERSION || '1.9.149');
   var KEY = 'mk_portal_loaded_version';
   try {
     var stored = localStorage.getItem(KEY) || '';
@@ -40,7 +40,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="mk-design.css?v=1.9.148">
+<link rel="stylesheet" href="mk-design.css?v=1.9.149">
 </head>
 <body class="mk-portal-page" data-view="gate">
 
@@ -449,8 +449,12 @@ function setView(mode) {
 
 function goFotoMoldura_() {
   if (!_telAtual || !locacoes.length) return;
-  const nome = locacoes[_carouselIdx]?.crianca || '';
-  location.href = 'foto-moldura.html?tel=' + encodeURIComponent(_telAtual) + '&nome=' + encodeURIComponent(nome);
+  const atual = locacoes[_carouselIdx] || {};
+  const nome = atual.crianca || '';
+  const uid = unidadeOfLoc_(atual);
+  location.href = 'foto-moldura.html?tel=' + encodeURIComponent(_telAtual)
+    + '&nome=' + encodeURIComponent(nome)
+    + '&unidade=' + encodeURIComponent(uid);
 }
 
 async function loadGasUrl_() {

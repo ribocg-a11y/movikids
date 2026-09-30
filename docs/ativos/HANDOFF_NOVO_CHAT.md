@@ -1,13 +1,13 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 30/09/2026 · FE **v1.9.148** · GAS **v1.5.231** · **I163** portal floresta · I162c · I162 logo · **I161** ✅ · **I160** ✅
+**Atualizado:** 30/09/2026 · FE **v1.9.149** · GAS **v1.5.231** · **I164** cartaz/track/foto multi-loja · **I163** portal floresta · I162c · **I161** ✅ · **I160** ✅
 
 ## Produção (agora)
 
 | Camada | Versão | Link |
 |--------|--------|------|
-| Frontend | **v1.9.148** | https://ribocg-a11y.github.io/movikids/?force=1.9.148 |
-| Gestão Pessoas | **v1.9.148** | `gestao-pessoas.html?force=1.9.148` |
+| Frontend | **v1.9.149** | https://ribocg-a11y.github.io/movikids/?force=1.9.149 |
+| Gestão Pessoas | **v1.9.149** | `gestao-pessoas.html?force=1.9.149` |
 | GAS | ping Web **v1.5.231** ✅ | I160 escala null + I159t LV |
 | Design System | v1.1 | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
 
@@ -45,13 +45,22 @@
 | **E** | Tablet smoke D4 · PDF Golden 01/10 · FASE 17 | Ops/Sócio | Ops |
 | **F** | ~~GAS lookback `resumoDia`~~ | ✅ Web **v1.5.226** | dia = cauda 600 |
 
-**Nova versão Web:** ✅ ping **v1.5.231** (I160). FE **v1.9.148** **I162** — logo dino (PNG transparente) + card balcão mostra loja do **operador** (OPS col I / RH col T), não a loja do tablet. **I161** Holding×Balcão. Suite: `entregas/DIAGNOSTICO_LAVILLE_SUITE40_2026-09-30.md`.
+**Nova versão Web:** ✅ ping **v1.5.231** (I160). FE **v1.9.149** **I164** — cartaz QR Golden/La Ville + `track.html`/`foto-moldura`/`manifest` multi-loja (floresta). **I162** logo dino + loja do operador. **I161** Holding×Balcão. Suite: `entregas/DIAGNOSTICO_LAVILLE_SUITE40_2026-09-30.md`.
+
+### I164 — Cartaz QR + track + foto moldura (smoke)
+
+| Check | Esperado |
+|-------|----------|
+| `assets/qr-balcao-imprimir.html?loja=laville` | Cartaz floresta · venue **La Ville Mall** · mesmo QR portal |
+| `?loja=golden` | Mesmo DNA floresta · venue Golden |
+| `foto-moldura.html?unidade=laville` | Rodapé/legenda **La Ville Mall** · moldura verde floresta |
+| `track.html?s=…&unidade=laville` | Plano/rodapé La Ville (ou detecta LV* da sessão) |
 
 ### I163 — Portal responsáveis floresta (smoke celular)
 
 | Check | Esperado |
 |-------|----------|
-| `acompanhar.html?force=1.9.148` | Floresta + logo dino + “Entrar na floresta” |
+| `acompanhar.html?force=1.9.149` | Floresta + logo dino + “Entrar na floresta” |
 | Loc Golden | Chip **Golden** · brinquedo sem prefixo LV |
 | Loc La Ville (veículo LV *) | Chip **La Ville** · label sem “LV ” |
 | Mesmo tel nas 2 lojas | Ambas no carrossel · chip avisa multi-loja |
@@ -194,17 +203,19 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 
 ---
 
-## Próximo passo
+## Próximo passo (por peso)
 
-| # | Ação | Quem | Status |
-|---|------|------|--------|
-| **A** | **Nova versão Web GAS v1.5.225** (ping ainda v1.5.224) | **Sócio** | ⏳ §7.3 |
-| B | Backfill `unidade_id` LOCAÇÕES | Agente após A | ⏳ |
-| C | Smoke dual + balcão La Ville / Golden | Ops | ⏳ FE **v1.9.131+** |
-| D | Frota real La Ville + e-mail CTO | Sócio | ⏳ |
-| 1b | PDF Golden fechamento **01/10** | Sócio | ⏳ não enviar prévia |
-| 3 | Tablet smoke D4 | Ops | ⏳ |
-| 4 | Assinar FASE 17 (decisão 17.5 F9) | Sócio | ⏳ |
+| Peso | # | Ação | Quem | Status |
+|------|---|------|------|--------|
+| **P0** | 1 | Imprimir cartaz QR La Ville (`qr-balcao-imprimir.html?loja=laville`) + fixar na mesa | Ops | ⏳ FE **v1.9.149** |
+| **P0** | 2 | PDF Golden fechamento **01/10** (não enviar prévia 29/09) | Sócio | ⏳ |
+| **P1** | 3 | Tablet smoke D4 (Turno/timer/idle) `?force=1.9.149` | Ops | ⏳ |
+| **P1** | 4 | Smoke portal+foto La Ville no celular | Ops | ⏳ I163/I164 |
+| **P1** | 5 | Assinar FASE 17 (decisão 17.5 F9) | Sócio | ⏳ |
+| **P2** | 6 | Contratar 1ª equipe La Ville (RH `unidade_id=laville`) | Ops/RH | ⏳ escala 14–21:30 / terça OFF |
+| **P2** | 7 | E-mail CTO / frota labels oficiais LV | Sócio | ⏳ |
+| **P3** | 8 | Holding smoke C (Caixa≠0 · Avulso LV) | Ops/PC | ⏳ FE pronto |
+| **P4** | 9 | F4 WhatsApp/SMS · F9 Supervisor | — | pausado |
 
 **Plano:** `docs/ativos/PLANO_MULTI_UNIDADE_GOLDEN_LAVILLE_2026-09.md`
 

@@ -177,6 +177,67 @@
       margin-bottom: 14px;
     }
 
+    /* I164 — cartaz floresta (Golden + La Ville; DNA portal I163) */
+    .mk-poster-forest {
+      display: none;
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+      background:
+        radial-gradient(ellipse 55% 40% at 78% 14%, rgba(255, 248, 225, 0.9), transparent 55%),
+        radial-gradient(ellipse 70% 42% at -5% 0%, rgba(27, 94, 74, 0.78) 0%, transparent 55%),
+        radial-gradient(ellipse 65% 38% at 105% 4%, rgba(46, 125, 50, 0.72) 0%, transparent 52%);
+    }
+    .mk-poster[data-loja="golden"],
+    .mk-poster[data-loja="laville"] {
+      background: linear-gradient(180deg, #87ceeb 0%, #b3e5fc 22%, #c8e6c9 48%, #81c784 72%, #2e7d32 100%);
+      color: #0d3b2e;
+    }
+    .mk-poster[data-loja="golden"] .mk-poster-forest,
+    .mk-poster[data-loja="laville"] .mk-poster-forest { display: block; }
+    .mk-poster[data-loja="golden"] .mk-poster-deco,
+    .mk-poster[data-loja="laville"] .mk-poster-deco,
+    .mk-poster[data-loja="golden"] .mk-poster-glow,
+    .mk-poster[data-loja="laville"] .mk-poster-glow { opacity: 0.12; }
+    .mk-poster[data-loja="golden"] .mk-portal-gate-title,
+    .mk-poster[data-loja="laville"] .mk-portal-gate-title {
+      color: #0d3b2e;
+      text-shadow: 0 1px 0 rgba(255,255,255,0.35);
+    }
+    .mk-poster[data-loja="golden"] .mk-poster-venue,
+    .mk-poster[data-loja="laville"] .mk-poster-venue {
+      color: #0d3b2e;
+      background: rgba(255,255,255,0.55);
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 999px;
+      opacity: 1;
+    }
+    .mk-poster[data-loja="golden"] .mk-poster-scan,
+    .mk-poster[data-loja="laville"] .mk-poster-scan {
+      color: rgba(13,59,46,0.92);
+      font-weight: 800;
+      opacity: 1;
+    }
+    .mk-poster[data-loja="golden"] .mk-poster-steps,
+    .mk-poster[data-loja="laville"] .mk-poster-steps,
+    .mk-poster[data-loja="golden"] .mk-poster-foot,
+    .mk-poster[data-loja="laville"] .mk-poster-foot,
+    .mk-poster[data-loja="golden"] .mk-poster-hint-print,
+    .mk-poster[data-loja="laville"] .mk-poster-hint-print {
+      color: rgba(13,59,46,0.92);
+    }
+    .mk-poster[data-loja="golden"] .mk-portal-brand-lg,
+    .mk-poster[data-loja="laville"] .mk-portal-brand-lg,
+    .mk-poster[data-loja="golden"] .mk-portal-brand-lg span,
+    .mk-poster[data-loja="laville"] .mk-portal-brand-lg span {
+      color: #0d3b2e;
+      text-shadow: 0 1px 0 rgba(255,255,255,0.4);
+    }
+
     .mk-poster-qr {
       background: #fff;
       border-radius: 20px;
@@ -395,6 +456,8 @@
   <div class="toolbar">
     <p>Cartaz <strong>portal carrossel</strong>. Para PDF bonito: <strong>Ctrl+P</strong> → destino <strong>Salvar como PDF</strong> → papel <strong>A5</strong> → marcar <strong>Gráficos de fundo</strong>.</p>
     <div class="toolbar-btns">
+      <button type="button" id="btn-loja-golden" onclick="setLoja('golden')">Golden</button>
+      <button type="button" id="btn-loja-laville" class="sec" onclick="setLoja('laville')">La Ville</button>
       <button type="button" onclick="printPoster()">Imprimir / PDF</button>
       <button type="button" class="sec" onclick="setPage('a5')">A5 (recomendado)</button>
       <button type="button" class="sec" onclick="setPage('a4')">A4</button>
@@ -406,16 +469,17 @@
     </div>
   </div>
 
-  <article class="mk-poster" id="poster" data-page="a5">
+  <article class="mk-poster" id="poster" data-page="a5" data-loja="golden">
     <div class="mk-poster-deco" aria-hidden="true"></div>
     <div class="mk-poster-glow" aria-hidden="true"></div>
+    <div class="mk-poster-forest" aria-hidden="true"></div>
     <div class="mk-poster-inner">
       <div class="mk-portal-brand-wrap">
         <img class="mk-brand-img mk-brand-img--poster" src="logo-movi-kids.png" alt="Movi Kids" width="1080" height="1080" loading="lazy" decoding="async">
       </div>
-      <p class="mk-poster-venue">Golden Shopping Calhau</p>
-      <p class="mk-portal-gate-title">Quanto tempo falta? ⏱️</p>
-      <p class="mk-poster-scan">Escaneie o QR e veja no celular</p>
+      <p class="mk-poster-venue" id="poster-venue">Golden Shopping Calhau</p>
+      <p class="mk-portal-gate-title" id="poster-title">Quanto tempo falta na aventura?</p>
+      <p class="mk-poster-scan" id="poster-scan">Escaneie o QR e entre na floresta</p>
 
       <div class="mk-poster-qr">
         <!-- PNG imprime melhor que SVG no PDF -->
@@ -451,13 +515,48 @@
       <ol class="mk-poster-steps">
         <li><span class="n">1</span><span>Abra a <strong>câmera</strong> e escaneie o QR.</span></li>
         <li><span class="n">2</span><span>Digite seu <strong>telefone com DDD</strong>.</span></li>
-        <li><span class="n">3</span><span>Toque <strong>Ver tempo</strong>.</span></li>
+        <li><span class="n">3</span><span>Toque <strong>Entrar na floresta</strong>.</span></li>
       </ol>
-      <p class="mk-poster-foot">Sem SMS · Sem WhatsApp · Só o portal Movi Kids</p>
+      <p class="mk-poster-foot" id="poster-foot">Sem SMS · Sem WhatsApp · Só o portal Movi Kids</p>
     </div>
   </article>
 
   <script>
+    var LOJAS_ = {
+      golden: {
+        venue: 'Golden Shopping Calhau',
+        title: 'Quanto tempo falta na aventura?',
+        scan: 'Escaneie o QR e entre na floresta',
+        foot: 'Golden · Sem SMS · Só o portal Movi Kids'
+      },
+      laville: {
+        venue: 'La Ville Mall',
+        title: 'Quanto tempo falta na aventura?',
+        scan: 'Escaneie o QR — dinos, carros e pelúcias',
+        foot: 'La Ville · Sem SMS · Só o portal Movi Kids'
+      }
+    };
+    function setLoja(id) {
+      var loja = (id === 'laville') ? 'laville' : 'golden';
+      var meta = LOJAS_[loja];
+      var poster = document.getElementById('poster');
+      poster.dataset.loja = loja;
+      document.getElementById('poster-venue').textContent = meta.venue;
+      document.getElementById('poster-title').textContent = meta.title;
+      document.getElementById('poster-scan').textContent = meta.scan;
+      document.getElementById('poster-foot').textContent = meta.foot;
+      var g = document.getElementById('btn-loja-golden');
+      var l = document.getElementById('btn-loja-laville');
+      if (g && l) {
+        g.className = loja === 'golden' ? '' : 'sec';
+        l.className = loja === 'laville' ? '' : 'sec';
+      }
+      try {
+        var u = new URL(location.href);
+        u.searchParams.set('loja', loja);
+        history.replaceState(null, '', u.pathname + u.search);
+      } catch (e) {}
+    }
     function setPage(size) {
       document.getElementById('poster').dataset.page = size;
       const style = document.getElementById('print-page-style');
@@ -477,6 +576,11 @@
       }
     }
     setPage('a5');
+    (function bootLoja() {
+      var q = '';
+      try { q = new URLSearchParams(location.search).get('loja') || ''; } catch (e) {}
+      setLoja(q === 'laville' ? 'laville' : 'golden');
+    })();
   </script>
 </body>
 </html>

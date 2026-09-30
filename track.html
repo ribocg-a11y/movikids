@@ -7,9 +7,9 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Movi Kids">
 <title>Movi Kids — Acompanhar Locação</title>
-<meta name="description" content="Acompanhe o tempo de locação do seu filho em tempo real. Movi Kids, Golden Shopping Calhau, São Luís.">
+<meta name="description" content="Acompanhe o tempo de locação do seu filho em tempo real. Movi Kids — Golden Shopping Calhau e La Ville Mall, São Luís.">
 <meta property="og:title" content="Movi Kids — Acompanhar Locação">
-<meta property="og:description" content="Acompanhe o cronômetro da locação do seu filho em tempo real. Movi Kids · Golden Shopping Calhau.">
+<meta property="og:description" content="Acompanhe o cronômetro da locação do seu filho em tempo real. Movi Kids · Golden e La Ville.">
 <meta property="og:image" content="https://ribocg-a11y.github.io/movikids/assets/icon-192.png">
 <meta property="og:image:width" content="192">
 <meta property="og:image:height" content="192">
@@ -91,7 +91,7 @@ footer{margin-top:18px;font-size:11px;color:rgba(255,255,255,0.2);font-weight:60
       <div class="ring-extra-label" id="ring-extra-label" style="display:none"></div>
     </div>
   </div>
-  <div class="plano-info" id="plano-info">Golden Shopping Calhau · São Luís</div>
+  <div class="plano-info" id="plano-info">Movi Kids · São Luís</div>
   <div class="pricing" id="pricing-box">
     <div class="pr-row" id="row-base"><span class="lbl">✅ Plano original</span><span class="v-paid" id="val-base">—</span></div>
     <div class="pr-row" id="row-ext" style="display:none"><span class="lbl">📋 Extensão (+<span id="ext-mins">0</span>min)</span><span class="v-ext" id="val-ext">—</span></div>
@@ -112,14 +112,34 @@ footer{margin-top:18px;font-size:11px;color:rgba(255,255,255,0.2);font-weight:60
   <div class="enc-total-lbl" id="enc-total-lbl" style="display:none">valor total da locação</div>
   <div class="enc-sub" id="enc-sub">Obrigado por escolher a Movi Kids!<br>Esperamos ver você em breve. 🧸</div>
 </div>
-<footer class="track-foot-brand"><img class="mk-brand-img mk-brand-img--track-foot" src="assets/logo-movi-kids.png" alt="" width="1080" height="1080" loading="lazy" decoding="async" aria-hidden="true"><span>Movi Kids · Golden Shopping Calhau · São Luís</span></footer>
+<footer class="track-foot-brand"><img class="mk-brand-img mk-brand-img--track-foot" src="assets/logo-movi-kids.png" alt="" width="1080" height="1080" loading="lazy" decoding="async" aria-hidden="true"><span id="track-foot-txt">Movi Kids · São Luís</span></footer>
 <script>
 // v1.6.29: URL curta ?s=BASE36(rowIndex) — sem dados pessoais na URL
+// I164: texto de loja via ?unidade= ou veiculo/unidadeId da sessão
 const P        = new URLSearchParams(location.search);
 const rowB36   = P.get('s') || '';
 const rowIndex = rowB36 ? parseInt(rowB36, 36) : 0;
 const GAS_URL  = 'https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec';
 const CIRCUM   = 408;
+function unidadeOfTrack_(d) {
+  const q = String(P.get('unidade') || '').toLowerCase();
+  if (q === 'laville') return 'laville';
+  if (q === 'golden') return 'golden';
+  if (!d) return 'golden';
+  const raw = d.unidadeId != null ? d.unidadeId : d.unidade;
+  if (String(raw || '').toLowerCase() === 'laville') return 'laville';
+  const v = String(d.veiculo || d.tipo || '');
+  if (v.indexOf('LV ') === 0 || /^LV\b/i.test(v)) return 'laville';
+  return 'golden';
+}
+function applyUnidadeUI_(uid) {
+  const label = uid === 'laville' ? 'La Ville Mall' : 'Golden Shopping Calhau';
+  const plano = document.getElementById('plano-info');
+  const foot = document.getElementById('track-foot-txt');
+  if (plano) plano.textContent = label + ' · São Luís';
+  if (foot) foot.textContent = 'Movi Kids · ' + label + ' · São Luís';
+}
+applyUnidadeUI_(unidadeOfTrack_(null));
 
 let startTs  = 0;
 let totalMin = 0;
@@ -215,6 +235,7 @@ function applySessionData(d) {
     }
     // Atualizar title da página com nome da criança
     document.title = 'Movi Kids — ' + (d.crianca || 'Acompanhar');
+    applyUnidadeUI_(unidadeOfTrack_(d));
   }
 
   // Atualizar extensão se mudou

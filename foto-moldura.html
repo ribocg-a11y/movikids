@@ -11,11 +11,11 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<link rel="stylesheet" href="mk-design.css?v=1.9.107">
-<script src="mk-version.js?v=1.9.107"></script>
+<link rel="stylesheet" href="mk-design.css?v=1.9.149">
+<script src="mk-version.js?v=1.9.149"></script>
 <script>
 (function () {
-  var CURRENT = (window.MK_VERSION || '1.9.107');
+  var CURRENT = (window.MK_VERSION || '1.9.149');
   var KEY = 'mk_portal_loaded_version';
   try {
     var stored = localStorage.getItem(KEY) || '';
@@ -33,12 +33,24 @@
 })();
 </script>
 </head>
-<body class="mk-portal-page mk-frame-page" data-step="start">
+<body class="mk-portal-page mk-frame-page" data-step="start" data-unidade="golden">
 
-<div class="mk-portal-deco" aria-hidden="true"></div>
+<div class="mk-portal-glow" aria-hidden="true"></div>
+<div class="mk-portal-forest" aria-hidden="true">
+  <div class="mk-portal-sky"></div>
+  <div class="mk-portal-canopy"></div>
+  <div class="mk-portal-fireflies"></div>
+  <div class="mk-portal-friends">
+    <span class="mk-portal-friend mk-portal-friend--dino" title="">🦕</span>
+    <span class="mk-portal-friend mk-portal-friend--car" title="">🚗</span>
+    <span class="mk-portal-friend mk-portal-friend--plush" title="">🧸</span>
+    <span class="mk-portal-friend mk-portal-friend--drift" title="">🏎️</span>
+  </div>
+  <div class="mk-portal-ground"></div>
+</div>
 
 <main class="mk-frame-wrap">
-  <p class="mk-frame-sub" id="frame-subtitle">Sua foto na moldura Movi Kids</p>
+  <p class="mk-frame-sub" id="frame-subtitle">Sua foto na floresta Movi Kids</p>
 
   <div class="mk-frame-switch" id="frame-switch" hidden></div>
 
@@ -50,10 +62,10 @@
       <span class="mk-frame-corner br"></span>
     </div>
     <div class="mk-frame-stickers" aria-hidden="true">
-      <span class="st s1">⭐</span>
+      <span class="st s1">🦕</span>
       <span class="st s2">🚗</span>
       <span class="st s3">✨</span>
-      <span class="st s4">🛺</span>
+      <span class="st s4">🏎️</span>
       <span class="st s5">🧸</span>
       <span class="st s6">🌟</span>
       <span class="st s7">🎉</span>
@@ -70,7 +82,7 @@
     </div>
     <footer class="mk-frame-foot">
       <span class="mk-frame-pill">📸 @movikidsslz</span>
-      <span class="mk-frame-loc">Golden Shopping Calhau</span>
+      <span class="mk-frame-loc" id="frame-loc">Golden Shopping Calhau</span>
     </footer>
   </div>
 
@@ -117,6 +129,20 @@ let lastBlob_ = null;
 let lastSource_ = null;
 let criancas_ = [];
 let kidIdx_ = 0;
+let unidadeId_ = 'golden';
+
+function unidadeLabelLong_(uid) {
+  return uid === 'laville' ? 'La Ville Mall' : 'Golden Shopping Calhau';
+}
+function unidadeHashtag_(uid) {
+  return uid === 'laville' ? '#LaVilleMall' : '#GoldenShoppingCalhau';
+}
+function applyUnidadeUI_(uid) {
+  unidadeId_ = uid === 'laville' ? 'laville' : 'golden';
+  document.body.dataset.unidade = unidadeId_;
+  const loc = document.getElementById('frame-loc');
+  if (loc) loc.textContent = unidadeLabelLong_(unidadeId_);
+}
 
 const video = document.getElementById('frame-video');
 const resultImg = document.getElementById('frame-result');
@@ -160,9 +186,10 @@ function digits(v) { return String(v || '').replace(/\D/g, ''); }
 function nomeAtual_() { return criancas_[kidIdx_] || ''; }
 function igCaption_() {
   const n = nomeAtual_();
+  const tag = unidadeHashtag_(unidadeId_);
   return n
-    ? `${n} se divertiu na @movikidsslz 🚗✨ #MoviKids #GoldenShoppingCalhau`
-    : 'Diversão na @movikidsslz 🚗✨ #MoviKids #GoldenShoppingCalhau';
+    ? `${n} se divertiu na floresta @movikidsslz 🦕🚗🧸 #MoviKids ${tag}`
+    : `Diversão na floresta @movikidsslz 🦕🚗🧸 #MoviKids ${tag}`;
 }
 
 function setStep(step) { document.body.dataset.step = step; }
@@ -179,7 +206,7 @@ function updateNomeUI_() {
     nomeEl.style.opacity = '1';
     nomeEl.style.fontWeight = '900';
   }
-  document.getElementById('frame-subtitle').textContent = nome ? 'Foto de ' + nome : 'Sua foto na moldura Movi Kids';
+  document.getElementById('frame-subtitle').textContent = nome ? 'Foto de ' + nome : 'Sua foto na floresta Movi Kids';
   document.getElementById('frame-caption-hint').textContent = igCaption_();
 }
 
@@ -215,11 +242,12 @@ function roundRect_(c, x, y, w, h, r) {
   c.closePath();
 }
 
-function mkBlueGrad_(c, x0, y0, x1, y1) {
+function mkForestGrad_(c, x0, y0, x1, y1) {
   const g = c.createLinearGradient(x0, y0, x1, y1);
-  g.addColorStop(0, '#1a237e');
-  g.addColorStop(0.5, '#3949ab');
-  g.addColorStop(1, '#1565c0');
+  g.addColorStop(0, '#87ceeb');
+  g.addColorStop(0.35, '#a5d6a7');
+  g.addColorStop(0.7, '#66bb6a');
+  g.addColorStop(1, '#1b5e20');
   return g;
 }
 
@@ -266,7 +294,7 @@ function drawCornerBracket_(c, x, y, flipX, flipY) {
 }
 
 function drawMoldura_(nome) {
-  const bg = mkBlueGrad_(ctx, 0, 0, 0, OUT_H);
+  const bg = mkForestGrad_(ctx, 0, 0, 0, OUT_H);
   ctx.fillStyle = bg;
   ctx.fillRect(0, 0, OUT_W, 250);
   ctx.fillRect(0, 1070, OUT_W, 280);
@@ -275,9 +303,9 @@ function drawMoldura_(nome) {
 
   drawConfetti_(ctx);
   const stickers = [
-    [88, 200, '⭐', 40, -0.3], [995, 320, '🚗', 38, 0.25],
+    [88, 200, '🦕', 40, -0.3], [995, 320, '🚗', 38, 0.25],
     [72, 620, '🧸', 36, 0.15], [1008, 720, '✨', 34, -0.2],
-    [110, 1040, '🌟', 32, 0.35], [970, 1080, '🛺', 36, -0.15],
+    [110, 1040, '🌟', 32, 0.35], [970, 1080, '🏎️', 36, -0.15],
     [85, 420, '🎉', 30, 0.1], [1015, 880, '⭐', 28, -0.25]
   ];
   stickers.forEach(([x, y, ch, sz, rot]) => drawSticker_(ctx, x, y, ch, sz, rot));
@@ -336,22 +364,22 @@ function drawMoldura_(nome) {
   ctx.fill();
   ctx.beginPath();
   ctx.arc(965, 1185, 16, 0, Math.PI * 2);
-  ctx.fillStyle = '#4fc3f7';
+  ctx.fillStyle = '#81c784';
   ctx.fill();
 
   const pw = 380;
   const px = (OUT_W - pw) / 2;
   const py = 1110;
-  ctx.fillStyle = 'rgba(41, 182, 246, 0.95)';
+  ctx.fillStyle = 'rgba(27, 94, 74, 0.92)';
   roundRect_(ctx, px, py, pw, 50, 25);
   ctx.fill();
   ctx.fillStyle = '#fff';
   ctx.font = 'bold 28px Nunito, sans-serif';
   ctx.textAlign = 'center';
   ctx.fillText('📸 @movikidsslz', OUT_W / 2, py + 34);
-  ctx.fillStyle = '#90caf9';
+  ctx.fillStyle = '#e8f5e9';
   ctx.font = 'bold 22px Nunito, sans-serif';
-  ctx.fillText('Golden Shopping Calhau', OUT_W / 2, 1210);
+  ctx.fillText(unidadeLabelLong_(unidadeId_), OUT_W / 2, 1210);
 }
 
 function drawPhotoCover_(source) {
@@ -568,6 +596,8 @@ async function renderExemploPreview_() {
   const tel = digits(p.get('tel') || p.get('telefone') || '');
   const nomeUrl = (p.get('nome') || '').trim();
   const isExemplo = p.get('exemplo') === '1';
+  const uidQ = String(p.get('unidade') || '').toLowerCase();
+  applyUnidadeUI_(uidQ === 'laville' ? 'laville' : 'golden');
 
   if (tel) {
     document.getElementById('link-voltar').href = 'acompanhar.html?tel=' + encodeURIComponent(tel);
