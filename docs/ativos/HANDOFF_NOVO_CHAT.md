@@ -1,13 +1,13 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 29/09/2026 noite · FE **v1.9.135** Pages · GAS Web **v1.5.225** · **I159k** hist KPIs dual + hub sem Sistema · **I158** ✅
+**Atualizado:** 29/09/2026 noite · FE **v1.9.136** Pages · GAS Web **v1.5.225** · **I159l** La Ville frota oficial (sem provisória) · **I158** ✅
 
 ## Produção (agora)
 
 | Camada | Versão | Link |
 |--------|--------|------|
-| Frontend | **v1.9.135** | https://ribocg-a11y.github.io/movikids/?force=1.9.135 |
-| Gestão Pessoas | **v1.9.135** | `gestao-pessoas.html?force=1.9.135` |
+| Frontend | **v1.9.136** | https://ribocg-a11y.github.io/movikids/?force=1.9.136 |
+| Gestão Pessoas | **v1.9.136** | `gestao-pessoas.html?force=1.9.136` |
 | GAS | ping Web **v1.5.225** ✅ · repo **v1.5.225** | I159f dual |
 | Design System | v1.1 | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
 
@@ -41,7 +41,7 @@
 |---|------|------|----------|
 | **B** | ~~Backfill `unidade_id` LOCAÇÕES~~ | ✅ 29/09 | **3947** linhas atualizadas / 3950 lidas (`backfillUnidadeIdLocacoesAdmin`) |
 | **C** | Smoke PC: Holding filtro · Caixa Golden ≠ 0 · Avulso tipos LV · balcão LV 0 | Ops/PC | FE **v1.9.135** |
-| **D** | Frota real La Ville (tirar provisória) + e-mail CTO | Sócio | CONFIG / lista LV* |
+| **D** | ~~Frota/preços La Ville oficiais~~ · e-mail CTO ainda | ✅ preços/tipos 29/09 · FE 1.9.136 sem badge | Falta só e-mail CTO shopping LV |
 | **E** | Tablet smoke D4 · PDF Golden 01/10 · FASE 17 | Ops/Sócio | Ops |
 | **F** | GAS lookback em `resumoDia` (hoje ~36s frio — scan LOCAÇÕES inteira) | Sócio §7.3 | Família **I23/I86** — FE já mitiga (1 chamada + cache); GAS ainda pesado |
 
@@ -53,7 +53,7 @@
 |-----|--------|---------|
 | **LOCACOES** | Schema ✅ col **AC `unidade_id`** | Backfill ✅ **3947** linhas (29/09) · novas locs gravam unidade |
 | **CUSTOS** | Schema ✅ col **G `unidade_id`** | Novos custos com unidade; antigos = golden default |
-| **CONFIG** | Ping lista golden + laville | Preços La Ville no GAS (LV*); frota provisória |
+| **CONFIG** | Ping lista golden + laville | Preços La Ville oficiais (Brinquedos+Dinos); frota LV* |
 | **DASHBOARD / RELATORIOS / FOLHA** | Sem aba por loja | Filtro por `unidadeId` na API — **não** há sheet “La Ville” separada |
 | **AUD_SMS / SMS** | Fora do menu FE | QR-only; abas podem existir na planilha sem uso operacional |
 
@@ -66,7 +66,7 @@ Diagnóstico 29/09: `diagnosticoPlanilhaCompletoAdmin` → LOCACOES/CUSTOS/CONFI
 | Holding / Lojas | ✅ FE 1.9.132 | Filtro Todas/Golden/La Ville **esconde coluna**; sem card sessão |
 | Balcão Home | ✅ | Badge loja + card sessão só aqui |
 | Nova Locação | ✅ | Frota/preços por unidade |
-| Painel Operação | ✅ | Pills dual + frota LV provisória |
+| Painel Operação | ✅ | Pills dual + frota LV oficial |
 | Relacionamento | ✅ | Badge + filtro dual |
 | Hist. locações | ✅ 1.9.135 | KPIs/lista/ranking seguem filtro dual |
 | **Caixa do dia** | ✅ 1.9.132 | 1× `resumoDia(all)` + fatia FE |

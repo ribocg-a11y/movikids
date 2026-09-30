@@ -1,6 +1,6 @@
 # PLANO — Multi-unidade MOVI KIDS (Golden × La Ville Mall)
 
-**Status:** 🟡 **I159b** — preços La Ville no FE (v1.9.122); frota provisória LV*; GAS Web ainda Golden-only para saves  
+**Status:** 🟢 **I159k** — preços/tipos La Ville oficiais (Brinquedos+Dinos); frota LV* sem badge provisória (FE 1.9.136); GAS Web **v1.5.225**  
 **Atualizado:** 29/09/2026 · FE **v1.9.122** · GAS Web **v1.5.221** · planilha única  
 **Pedido:** 2ª unidade em **La Ville Mall**; hoje só **Golden Shopping Calhau**. Operadoras escolhem onde logar; unidades **não conversam**; **só ADM** vê as duas juntas. Preços, minutos e frota **diferentes** por unidade.  
 **Arquitetura:** ✅ **Opção A** — **1 planilha** + `unidade_id` + CONFIG/CTO por unidade (sócio 29/09).  
@@ -297,23 +297,19 @@ Legenda: **Obrigatório** / **Recomendado** / **Shared OK** / **Decisão RH**
 
 **Frota Golden atual:** Carro 01–04 · Triciclo 01–02 · Pelúcia 01–04.
 
-### La Ville — o sócio vai informar
-
-Preencher **depois** deste plano (não inventar):
+### La Ville — entregue pelo sócio (29/09)
 
 | Campo | Valor La Ville |
 |-------|----------------|
-| Tipos de brinquedo (Carro / … / novos?) | _pendente_ |
-| Lista de veículos (nomes) | _pendente_ |
-| Planos (minutos) disponíveis | _pendente_ |
-| Preço por tipo×plano | _pendente_ |
-| Adicional por minuto | _pendente_ |
-| Formas de pagamento (iguais?) | _pendente_ |
-| CTO / aluguel (mínimos × % ) | _pendente_ |
-| E-mail relatório shopping | _pendente_ |
-| Data início contrato | _pendente_ |
+| Tipos | Brinquedos (Carro/Triciclo/Pelúcia/Driffyt) + Dinos |
+| Planos | 10/20/30/40/60 min (**sem** 3h) |
+| Brinquedos | R$ 15/25/35/45/65 · + R$ 1,50/min |
+| Dinos | R$ 20/35/50/65/90 · + R$ 2,00/min |
+| Frota FE | LV* Carro 01–04 · Triciclo 01–02 · Pelúcia 01–04 · Driffyt 01–02 · Dino 01–04 |
+| Formas de pagamento | PIX / Débito / Crédito / Dinheiro |
+| CTO / e-mail shopping | _pendente_ |
 
-Quando esses dados chegarem: gravar em `CONFIG`/`UNIDADES` **sem** hardcode paralelo no FE.
+FE **v1.9.136+**: sem badge “frota provisória”.
 
 ---
 

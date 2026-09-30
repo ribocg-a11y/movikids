@@ -29,10 +29,10 @@
   };
 
   /**
-   * Frota provisória (prefixo LV evita colisão com Carro 01 Golden na mesma planilha).
-   * Confirmar quantidade real com o sócio antes de operar em produção.
+   * Frota La Ville (prefixo LV evita colisão com Golden na mesma planilha).
+   * Tipos/preços oficiais do sócio (29/09): Brinquedos + Dinos.
    */
-  var FROTA_LAVILLE_PROVISORIA_ = [
+  var FROTA_LAVILLE_ = [
     { nome: 'LV Carro 01', tipo: 'Carro' },
     { nome: 'LV Carro 02', tipo: 'Carro' },
     { nome: 'LV Carro 03', tipo: 'Carro' },
@@ -76,11 +76,11 @@
       cidade: 'São Luís/MA',
       ativa: true,
       precosProntos: true,
-      frotaProvisoria: true,
+      frotaProvisoria: false,
       emailRelatorio: '',
       bloqueioMotivo: '',
       precosFe: PRECOS_LAVILLE_FE_,
-      veiculosDef: FROTA_LAVILLE_PROVISORIA_
+      veiculosDef: FROTA_LAVILLE_
     }
   };
 
@@ -279,6 +279,7 @@
   function ativarLaVilleQuandoPronta_() {
     UNIDADES.laville.ativa = true;
     UNIDADES.laville.precosProntos = true;
+    UNIDADES.laville.frotaProvisoria = false;
     UNIDADES.laville.bloqueioMotivo = '';
   }
 

@@ -584,9 +584,6 @@
             if (typeof toast === 'function') toast((r && r.erro) || 'Unidade indisponível', 'warning');
             return;
           }
-          if (u.frotaProvisoria && typeof toast === 'function') {
-            toast('La Ville: frota provisória (LV*). Confirme quantidades reais antes de operar.', 'info');
-          }
           mkHubShowPortas_(true);
         });
       } else {
