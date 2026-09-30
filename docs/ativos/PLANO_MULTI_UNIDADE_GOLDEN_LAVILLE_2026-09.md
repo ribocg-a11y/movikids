@@ -305,7 +305,7 @@ Legenda: **Obrigatório** / **Recomendado** / **Shared OK** / **Decisão RH**
 | Planos | 10/20/30/40/60 min (**sem** 3h) |
 | Brinquedos | R$ 15/25/35/45/65 · + R$ 1,50/min |
 | Dinos | R$ 20/35/50/65/90 · + R$ 2,00/min |
-| Frota FE | LV* Carro 01–04 · Triciclo 01–02 · Pelúcia 01–04 · Driffyt 01–02 · Dino 01–04 |
+| Frota FE | **2** Carro · **2** Triciclo · **3** Pelúcia · **2** Driffyt · **2** Dino (LV*) |
 | Formas de pagamento | PIX / Débito / Crédito / Dinheiro |
 | CTO / e-mail shopping | _pendente_ |
 

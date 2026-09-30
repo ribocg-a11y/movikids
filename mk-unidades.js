@@ -32,23 +32,19 @@
    * Frota La Ville (prefixo LV evita colisão com Golden na mesma planilha).
    * Tipos/preços oficiais do sócio (29/09): Brinquedos + Dinos.
    */
+  /** Quantidades oficiais sócio (30/09): 2 carros · 2 drifts · 2 triciclos · 3 pelúcias · 2 dinos. */
   var FROTA_LAVILLE_ = [
     { nome: 'LV Carro 01', tipo: 'Carro' },
     { nome: 'LV Carro 02', tipo: 'Carro' },
-    { nome: 'LV Carro 03', tipo: 'Carro' },
-    { nome: 'LV Carro 04', tipo: 'Carro' },
     { nome: 'LV Triciclo 01', tipo: 'Triciclo' },
     { nome: 'LV Triciclo 02', tipo: 'Triciclo' },
     { nome: 'LV Pelúcia 01', tipo: 'Pelúcia' },
     { nome: 'LV Pelúcia 02', tipo: 'Pelúcia' },
     { nome: 'LV Pelúcia 03', tipo: 'Pelúcia' },
-    { nome: 'LV Pelúcia 04', tipo: 'Pelúcia' },
     { nome: 'LV Driffyt 01', tipo: 'Driffyt' },
     { nome: 'LV Driffyt 02', tipo: 'Driffyt' },
     { nome: 'LV Dino 01', tipo: 'Dino' },
-    { nome: 'LV Dino 02', tipo: 'Dino' },
-    { nome: 'LV Dino 03', tipo: 'Dino' },
-    { nome: 'LV Dino 04', tipo: 'Dino' }
+    { nome: 'LV Dino 02', tipo: 'Dino' }
   ];
 
   var PRECOS_LAVILLE_FE_ = {

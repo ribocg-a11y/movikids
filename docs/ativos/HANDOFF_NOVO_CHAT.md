@@ -1,13 +1,13 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 29/09/2026 noite · FE **v1.9.136** Pages · GAS Web **v1.5.225** · **I159l** La Ville frota oficial (sem provisória) · **I158** ✅
+**Atualizado:** 30/09/2026 · FE **v1.9.137** Pages · GAS Web **v1.5.225** · **I159m** frota La Ville quantidades reais · **I158** ✅
 
 ## Produção (agora)
 
 | Camada | Versão | Link |
 |--------|--------|------|
-| Frontend | **v1.9.136** | https://ribocg-a11y.github.io/movikids/?force=1.9.136 |
-| Gestão Pessoas | **v1.9.136** | `gestao-pessoas.html?force=1.9.136` |
+| Frontend | **v1.9.137** | https://ribocg-a11y.github.io/movikids/?force=1.9.137 |
+| Gestão Pessoas | **v1.9.137** | `gestao-pessoas.html?force=1.9.137` |
 | GAS | ping Web **v1.5.225** ✅ · repo **v1.5.225** | I159f dual |
 | Design System | v1.1 | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
 
@@ -41,7 +41,7 @@
 |---|------|------|----------|
 | **B** | ~~Backfill `unidade_id` LOCAÇÕES~~ | ✅ 29/09 | **3947** linhas atualizadas / 3950 lidas (`backfillUnidadeIdLocacoesAdmin`) |
 | **C** | Smoke PC: Holding filtro · Caixa Golden ≠ 0 · Avulso tipos LV · balcão LV 0 | Ops/PC | FE **v1.9.135** |
-| **D** | ~~Frota/preços La Ville oficiais~~ · e-mail CTO ainda | ✅ preços/tipos 29/09 · FE 1.9.136 sem badge | Falta só e-mail CTO shopping LV |
+| **D** | ~~Frota La Ville quantidades~~ · e-mail CTO ainda | ✅ 30/09: 2 carro · 2 drift · 2 triciclo · 3 pelúcia · 2 dino | FE 1.9.137 · GAS VEICULOS_LAVILLE_ ainda alinhamento §7.3 |
 | **E** | Tablet smoke D4 · PDF Golden 01/10 · FASE 17 | Ops/Sócio | Ops |
 | **F** | GAS lookback em `resumoDia` (hoje ~36s frio — scan LOCAÇÕES inteira) | Sócio §7.3 | Família **I23/I86** — FE já mitiga (1 chamada + cache); GAS ainda pesado |
 
