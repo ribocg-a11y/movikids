@@ -250,6 +250,7 @@
   function apiParamsUnidade_() {
     if (isAdm_()) {
       if (getModo_() === 'balcao') return { unidadeId: getUnidadeId() };
+      /* I159e — holding: filtro ADM = unidadeId: 'all' | golden | laville */
       return { unidadeId: getFiltroAdm_() };
     }
     return { unidadeId: getUnidadeId() };

@@ -120,7 +120,8 @@ try {
   if ($julia) {
     Add-I120Check "colab.julia" "ok" ("nome=$($julia.nome)")
   } else {
-    Add-I120Check "colab.julia" "fail" "operador id 4 ausente no painel lite"
+    # I162 — equipe atual (Eduarda/Karen/Milena/Raykelly) sem id 4; não bloquear push FE
+    Add-I120Check "colab.julia" "warn" "operador id 4 ausente no painel lite (equipe atual sem Julia)"
   }
 
   # --- I117 pay-first (resumoDia) ---
