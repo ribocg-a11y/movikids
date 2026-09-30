@@ -1861,9 +1861,21 @@ function gpVoltarInicio() {
     gpPreviewVoltarAdmin_();
     return;
   }
+  try {
+    if (gpUrlFromColabNormal_() && global.history && global.history.length > 1) {
+      global.history.back();
+      return;
+    }
+  } catch (eBack) { /* fallback abaixo */ }
   var v = global.MK_VERSION || '1.8.97';
-  global.location.href = 'index.html?force=' + encodeURIComponent(v);
+  var u = '';
+  try {
+    var m = String(global.location.search || '').match(/[?&]unidade=([^&]+)/);
+    if (m && m[1]) u = '&unidade=' + encodeURIComponent(decodeURIComponent(m[1]));
+  } catch (eU) { /* ok */ }
+  global.location.href = 'index.html?force=' + encodeURIComponent(v) + u + '&t=' + Date.now();
 }
+global.gpVoltarInicio = gpVoltarInicio;
 function colabSairProd() {
   colabLogado = null;
   gpSessionPin = '';

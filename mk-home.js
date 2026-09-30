@@ -273,6 +273,7 @@ function renderPainel() {
   const dualHost = document.getElementById('painel-dual-grid');
 
   function frotaDefFor_(uid) {
+    if (typeof mkUnidadeFrotaDef_ === 'function') return mkUnidadeFrotaDef_(uid);
     if (uid === 'laville' && window.MK_UNIDADES && MK_UNIDADES.laville && MK_UNIDADES.laville.veiculosDef) {
       return MK_UNIDADES.laville.veiculosDef.slice();
     }

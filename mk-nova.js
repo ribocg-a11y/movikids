@@ -133,7 +133,10 @@ function novaAtualizarSubModoUI_() {
       ? (n > 0 ? 'O quê — próximo veículo' : 'O quê — escolha o veículo')
       : 'O quê — sua locação';
   }
-  if (btnVoltar) btnVoltar.hidden = !(pick && n > 0);
+  if (btnVoltar) {
+    /* Visível ao adicionar 2º+ veículo OU quando já escolheu um veículo (desistir). */
+    btnVoltar.hidden = !(pick && (n > 0 || !!novaState.veiculo));
+  }
   if (pickLead) {
     pickLead.textContent = n > 0
       ? 'Toque em um veículo livre abaixo e escolha o plano.'
@@ -152,9 +155,18 @@ function novaIniciarPick_() {
 
 function novaVoltarCesta_() {
   if (novaGuardSaveBusy_()) return;
-  if (!(novaState.itens || []).length) return;
-  novaState.subModo = 'cesta';
+  var n = (novaState.itens || []).length;
+  if (n > 0) {
+    novaState.subModo = 'cesta';
+    novaLimparSelecaoAtual_();
+    renderNovaItensBasket_();
+    atualizarNovaSummaryBar_();
+    novaAtualizarSubModoUI_();
+    return;
+  }
+  /* Sem itens na cesta: Voltar só limpa a seleção do veículo/plano. */
   novaLimparSelecaoAtual_();
+  atualizarNovaSummaryBar_();
   novaAtualizarSubModoUI_();
 }
 
@@ -929,6 +941,8 @@ function selectVeiculo(el, veiculo, tipo) {
   aplicarEstiloInputsNova_(tipo);
   atualizarNovaSummaryBar_();
   salvarNovaDraft_();
+  var btnVoltar = document.getElementById('btn-nova-voltar-cesta');
+  if (btnVoltar) btnVoltar.hidden = false;
   scrollParaPlanosNova_();
 }
 

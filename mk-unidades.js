@@ -227,16 +227,56 @@
     return out;
   }
 
+  /** Fallback se snapshot Golden ainda não capturou (ex.: boot direto em La Ville). */
+  var FROTA_GOLDEN_FALLBACK_ = [
+    { nome: 'Carro 01', tipo: 'Carro' },
+    { nome: 'Carro 02', tipo: 'Carro' },
+    { nome: 'Carro 03', tipo: 'Carro' },
+    { nome: 'Carro 04', tipo: 'Carro' },
+    { nome: 'Triciclo 01', tipo: 'Triciclo' },
+    { nome: 'Triciclo 02', tipo: 'Triciclo' },
+    { nome: 'Pelúcia 01', tipo: 'Pelúcia' },
+    { nome: 'Pelúcia 02', tipo: 'Pelúcia' },
+    { nome: 'Pelúcia 03', tipo: 'Pelúcia' },
+    { nome: 'Pelúcia 04', tipo: 'Pelúcia' }
+  ];
+
   function capturarSnapGoldenSePreciso_() {
     if (_snapGolden_) return;
     if (getUnidadeId() !== 'golden') return;
     if (typeof PRECOS === 'undefined' || !PRECOS) return;
+    var defs = (typeof TODOS_VEICULOS_DEF !== 'undefined' && TODOS_VEICULOS_DEF.length)
+      ? TODOS_VEICULOS_DEF.map(function (v) { return { nome: v.nome, tipo: v.tipo }; })
+      : null;
+    if (defs && defs.length) {
+      defs = defs.filter(function (v) { return String(v.nome || '').indexOf('LV ') !== 0; });
+    }
     _snapGolden_ = {
       precosFe: clonePrecos_(PRECOS),
-      veiculosDef: (typeof TODOS_VEICULOS_DEF !== 'undefined' && TODOS_VEICULOS_DEF.length)
-        ? TODOS_VEICULOS_DEF.map(function (v) { return { nome: v.nome, tipo: v.tipo }; })
-        : null
+      veiculosDef: defs && defs.length ? defs : FROTA_GOLDEN_FALLBACK_.slice()
     };
+    UNIDADES.golden.veiculosDef = _snapGolden_.veiculosDef.slice();
+  }
+
+  /** Frota por unidade — não depende de TODOS_VEICULOS_DEF (que troca ao entrar La Ville). */
+  function frotaDefUi_(uid) {
+    var id = canon_(uid) || DEFAULT_ID;
+    if (id === 'laville') {
+      return (UNIDADES.laville.veiculosDef || FROTA_LAVILLE_).slice();
+    }
+    if (UNIDADES.golden.veiculosDef && UNIDADES.golden.veiculosDef.length) {
+      return UNIDADES.golden.veiculosDef.slice();
+    }
+    if (_snapGolden_ && _snapGolden_.veiculosDef && _snapGolden_.veiculosDef.length) {
+      return _snapGolden_.veiculosDef.slice();
+    }
+    if (typeof TODOS_VEICULOS_DEF !== 'undefined' && TODOS_VEICULOS_DEF.length) {
+      var g = TODOS_VEICULOS_DEF.filter(function (v) {
+        return String(v.nome || '').indexOf('LV ') !== 0;
+      });
+      if (g.length) return g.map(function (v) { return { nome: v.nome, tipo: v.tipo }; });
+    }
+    return FROTA_GOLDEN_FALLBACK_.slice();
   }
 
   function aplicarConfigLocal_() {
@@ -330,6 +370,7 @@
   w.mkUnidadeOfSession_ = unidadeIdOfSession_;
   w.mkSessionsPorUnidade_ = sessionsPorUnidade_;
   w.mkVeiculoLabelUi_ = veiculoLabelUi_;
+  w.mkUnidadeFrotaDef_ = frotaDefUi_;
   w.mkUnidadeAplicarConfig_ = aplicarConfigLocal_;
   w.mkUnidadeSyncAposGas_ = syncAposGasConfig_;
 

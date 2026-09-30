@@ -489,6 +489,7 @@ html,body{height:100%;background:var(--bg);color:var(--txt);overflow:hidden}
   font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;cursor:pointer
 }
 .nova-cesta-add-btn:active{transform:scale(.98);background:var(--blue-lt)}
+.nova-cesta-panel[hidden],.nova-pick-panel[hidden]{display:none!important}
 .nova-cesta-panel:not([hidden]){display:block}
 .nova-cesta-lead{font-size:13px;color:var(--txt2);margin:0 0 12px;line-height:1.45}
 .nova-pick-panel:not([hidden]){display:block}
