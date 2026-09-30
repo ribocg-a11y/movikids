@@ -769,8 +769,10 @@ html,body{height:100%;background:var(--bg);color:var(--txt);overflow:hidden}
 .sb-sessao-sair{
   width:100%;border:1px solid rgba(255,255,255,.28);background:rgba(255,255,255,.08);
   color:#fff;border-radius:8px;padding:8px;font-size:12px;font-weight:800;cursor:pointer;
+  margin-bottom:8px;
 }
 .sb-sessao-sair:hover{background:rgba(255,255,255,.16)}
+.sb-sessao-sair[hidden]{display:none!important}
 .sb-sessao-empty{font-size:11px;color:rgba(255,255,255,.5);font-weight:700;padding:4px 0 8px}
 .sb-operator-btn{border:1.5px solid rgba(255,255,255,.35);background:transparent;
   color:#fff;font-family:'Nunito',sans-serif;font-weight:700;font-size:11px;

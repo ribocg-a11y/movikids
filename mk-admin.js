@@ -747,8 +747,11 @@ async function carregarKPIs() {
 const KPI_DASH_CACHE_TTL_MS = 5 * 60 * 1000;
 const KPI_DASH_CACHE_TTL_CORRENTE_MS = 45 * 1000;
 
-function kpiDashCacheKey_(mes, ano) {
-  return 'mk_kpi_dash_' + mes + '_' + ano;
+function kpiDashCacheKey_(mes, ano, uidOpt) {
+  const uid = uidOpt != null
+    ? uidOpt
+    : (typeof mkDualFiltro_ === 'function' ? mkDualFiltro_() : 'all');
+  return 'mk_kpi_dash_' + mes + '_' + ano + '_u' + (uid || 'all');
 }
 
 function kpiDashCacheTtlMs_(mes, ano) {

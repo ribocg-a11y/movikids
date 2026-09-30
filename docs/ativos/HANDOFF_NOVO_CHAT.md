@@ -1,13 +1,13 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 29/09/2026 noite · FE **v1.9.133** Pages · GAS Web **v1.5.225** · **I159i** backfill AC + dual custos/hist · **I158** ✅
+**Atualizado:** 29/09/2026 noite · FE **v1.9.134** Pages · GAS Web **v1.5.225** · **I159j** Sair no menu + cache dash por unidade · **I158** ✅
 
 ## Produção (agora)
 
 | Camada | Versão | Link |
 |--------|--------|------|
-| Frontend | **v1.9.133** | https://ribocg-a11y.github.io/movikids/?force=1.9.133 |
-| Gestão Pessoas | **v1.9.133** | `gestao-pessoas.html?force=1.9.133` |
+| Frontend | **v1.9.134** | https://ribocg-a11y.github.io/movikids/?force=1.9.134 |
+| Gestão Pessoas | **v1.9.134** | `gestao-pessoas.html?force=1.9.134` |
 | GAS | ping Web **v1.5.225** ✅ · repo **v1.5.225** | I159f dual |
 | Design System | v1.1 | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
 
@@ -75,7 +75,7 @@ Diagnóstico 29/09: `diagnosticoPlanilhaCompletoAdmin` → LOCACOES/CUSTOS/CONFI
 | Registrar Custo | ✅ 1.9.133 | Pills + lista filtrada por loja |
 | **Avulso** | ✅ FE 1.9.131+ | Tipos/preços por loja |
 | Colaboradores | ✅ | `?unidade=` + subtítulo |
-| Menu | ✅ | Sem SMS / Sistema |
+| Menu | ✅ 1.9.134 | Sem SMS / Sistema · **Sair do sistema** fixo no rodapé |
 | Relatório mensal Golden | ✅ I158 | `kpiMes` FE |
 
 ---

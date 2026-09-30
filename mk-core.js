@@ -100,7 +100,8 @@ function atualizarOperadorUI_(sessaoServidor) {
   const rowBalcao = document.getElementById('sb-row-balcao');
   const rowTablet = document.getElementById('sb-row-tablet');
   const empty = document.getElementById('sb-sessao-empty');
-  const sairBtn = document.getElementById('sb-sessao-sair-btn');
+  const sairBtn = document.getElementById('sb-footer-sair-btn') ||
+    document.getElementById('sb-sessao-sair-btn');
 
   const set = (id, text) => {
     const el = document.getElementById(id);
@@ -109,7 +110,7 @@ function atualizarOperadorUI_(sessaoServidor) {
 
   const temBalcao = !!(srv && srv.nome);
   const temTablet = logadoTablet;
-  /* Holding (duas lojas): não mostrar card de sessão — só no balcão unitário. */
+  /* Holding (duas lojas): sem card de sessão — Sair fica no rodapé sempre. */
   const holdOn = !!(document.getElementById('page-holding') &&
     document.getElementById('page-holding').classList.contains('active'));
   const homeOn = !!(document.getElementById('page-home') &&
@@ -143,15 +144,15 @@ function atualizarOperadorUI_(sessaoServidor) {
 
   const gerBtn = document.getElementById('sb-gerenciar-btn');
   if (gerBtn) gerBtn.style.display = isAdm ? 'none' : '';
-  if (sairBtn && (temBalcao || temTablet)) {
-    sairBtn.hidden = false;
-    const localOp = !!(s && s.nome && s.role !== 'admin' && s.id !== 'ADMIN');
-    if (localOp) {
-      sairBtn.textContent = 'Encerrar turno';
-    } else if (isAdm) {
-      sairBtn.textContent = 'Sair do admin';
-    } else {
-      sairBtn.textContent = 'Encerrar turno';
+  /* Botão Sair sempre visível com sessão (holding ou balcão). */
+  if (sairBtn) {
+    const podeSair = !!(temBalcao || temTablet || isAdm);
+    sairBtn.hidden = !podeSair;
+    if (podeSair) {
+      const localOp = !!(s && s.nome && s.role !== 'admin' && s.id !== 'ADMIN');
+      if (localOp) sairBtn.textContent = 'Encerrar turno';
+      else if (isAdm) sairBtn.textContent = 'Sair do sistema';
+      else sairBtn.textContent = 'Encerrar turno';
     }
   }
 
