@@ -859,7 +859,11 @@
       applySessaoAtivaFromApi_(d);
       renderOpList(false);
       if (!operadoresCache.length) {
-        showErr('mk-login-err', 'Nenhum operador ativo. Cadastre em Administração > Operadores.');
+        const uidLogin = (typeof mkUnidadeId_ === 'function') ? mkUnidadeId_() : '';
+        const msgLv = (uidLogin === 'laville')
+          ? 'La Ville ainda sem equipe. Cadastre o operador em Administração > Operadores (loja La Ville).'
+          : 'Nenhum operador ativo. Cadastre em Administração > Operadores.';
+        showErr('mk-login-err', msgLv);
       }
       return d;
     } finally {
@@ -1323,17 +1327,30 @@
       toast('Informe o nome do operador', 'warning');
       return;
     }
+    const lojaRaw = prompt(
+      'Loja do novo operador:\n\ngolden = Golden\nlaville = La Ville (escala 14h–21:30 · folga terça)\nall = as duas\n\nDigite golden, laville ou all:',
+      'golden'
+    );
+    if (lojaRaw === null) return;
+    const loja = String(lojaRaw).trim().toLowerCase();
+    const uid = (loja === 'todas' || loja === 'all') ? 'all' : ((loja === 'laville') ? 'laville' : 'golden');
+    if (loja !== 'golden' && loja !== 'laville' && loja !== 'all' && loja !== 'todas') {
+      toast('Use golden, laville ou all', 'warning');
+      return;
+    }
     try {
       const d = await apiCall({
         action: 'cadastrarOperadorSistema',
         nome: n,
+        unidadeId: uid,
         ...mkAuthAdminPinParams_()
       });
       if (!d.ok) {
         toast(d.erro || 'Erro', 'error');
         return;
       }
-      toast('Operador cadastrado: ' + d.operador.nome, 'success');
+      const extra = (uid === 'laville') ? ' · escala La Ville (folga terça)' : '';
+      toast('Operador cadastrado: ' + d.operador.nome + ' (' + uid + ')' + extra, 'success');
       await refreshOperadoresAdmin_();
       if (typeof mkGpAdmLoad_ === 'function') await mkGpAdmLoad_();
     } catch (e) {

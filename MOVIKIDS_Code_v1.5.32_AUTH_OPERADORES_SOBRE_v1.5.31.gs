@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.229
+// MOVI KIDS — Google Apps Script v1.5.230
+// v1.5.230: I159t — padrão RH/escala La Ville (14h–21:30 · folga terça); equipe 0 OK até contratar
 // v1.5.229: I159s — equipe por loja: definirUnidadeEquipeAdmin + seed Milena=all; sync RH
 // v1.5.228: I159r — La Ville tipo Drift/Drifts (ex-Driffyt); IDs LV Drift 01/02
 // v1.5.227: I159q — COLABORADORES_RH + OPERADORES_SISTEMA col unidade_id; equipes por loja
@@ -221,8 +222,8 @@
 
 // ── CONSTANTES ───────────────────────────────────────────────
 /** Versão exposta em ping, carregarInicio, validarSchema, gestaoPessoasStatus (bump com header). */
-const MK_GAS_VERSAO_  = 'v1.5.229';
-const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.229';
+const MK_GAS_VERSAO_  = 'v1.5.230';
+const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.230';
 const SHEET_ID   = '1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618';
 const DEPLOY_ID  = 'AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y';
 const WEBAPP_URL = `https://script.google.com/macros/s/${DEPLOY_ID}/exec`;
@@ -454,6 +455,30 @@ function unidadeIdEquipeWriteCanon_(raw) {
   return id || MK_UNIDADE_DEFAULT_;
 }
 
+/** I159t — RH/escala La Ville: mesmos params Golden (salário/VA/meta); turno 14h–21:30; folga só terça. */
+const MK_LAVILLE_TURNO_RH_ = '14h–21:30';
+const MK_LAVILLE_ESCALA_ = ['14–21:30', 'OFF', '14–21:30', '14–21:30', '14–21:30', '14–21:30', '14–21:30'];
+const MK_LAVILLE_ESCALA_OBS_ = 'La Ville — 14h–21:30 · folga terça (1 folga/semana)';
+
+function gpApplyPadraoLavilleRh_(opId, nome) {
+  const id = Number(opId);
+  if (!id) return false;
+  const n = String(nome || '').trim();
+  gpEnsureRhColaboradorFromOperador_(id, n, 'Operador');
+  try {
+    gpPatchRhRowFields_(id, { turno: MK_LAVILLE_TURNO_RH_ });
+    const colab = gpColabRhByOpId_(id);
+    if (colab && colab.row) {
+      gpSheet_(SH_COLAB_RH).getRange(colab.row, 20).setValue('laville');
+    }
+  } catch (e) { Logger.log('gpApplyPadraoLavilleRh RH: ' + e.message); }
+  try {
+    gpUpsertEscalaRow_(id, gpCompetenciaAtual_(), MK_LAVILLE_ESCALA_, MK_LAVILLE_ESCALA_OBS_, { force: true });
+  } catch (e2) { Logger.log('gpApplyPadraoLavilleRh escala: ' + e2.message); }
+  gpInvalidateRhCache_();
+  return true;
+}
+
 /** I159s — grava OPS col I + RH col T (mesma unidade). */
 function setOperadorUnidadeIdCore_(opId, unidadeRaw) {
   const uid = unidadeIdEquipeWriteCanon_(unidadeRaw);
@@ -461,7 +486,8 @@ function setOperadorUnidadeIdCore_(opId, unidadeRaw) {
   if (!found) return { ok: false, erro: 'Operador nao encontrado' };
   const sh = operadoresSheet_();
   sh.getRange(found.row, 9).setValue(uid);
-  gpEnsureRhColaboradorFromOperador_(opId, String(found.data[2] || '').trim(), 'Operador');
+  const nomeOp = String(found.data[2] || '').trim();
+  gpEnsureRhColaboradorFromOperador_(opId, nomeOp, 'Operador');
   try {
     const colab = gpColabRhByOpId_(opId);
     if (colab && colab.row) {
@@ -469,6 +495,9 @@ function setOperadorUnidadeIdCore_(opId, unidadeRaw) {
       gpInvalidateRhCache_();
     }
   } catch (e) { Logger.log('setOperadorUnidadeId RH: ' + e.message); }
+  if (uid === 'laville') {
+    try { gpApplyPadraoLavilleRh_(opId, nomeOp); } catch (eLv) { /* ok */ }
+  }
   try {
     CacheService.getScriptCache().remove('gp_list_colab_v4_all');
     CacheService.getScriptCache().remove('gp_list_colab_v4_golden');
@@ -11492,7 +11521,11 @@ function cadastrarOperadorSistema_(p) {
   sh.appendRow([id, fmtData_(agora) + ' ' + fmtHoraLocal_(agora), nome, '', '', 'SIM', '', 'operador', uid]);
   gpEnsureRhColaboradorFromOperador_(id, nome, 'Operador');
   setOperadorUnidadeIdCore_(id, uid);
-  return resp_({ operador: { id, nome, hasPin: false, ativo: true, perfil: 'operador', unidadeId: uid } });
+  if (uid === 'laville') gpApplyPadraoLavilleRh_(id, nome);
+  return resp_({
+    operador: { id, nome, hasPin: false, ativo: true, perfil: 'operador', unidadeId: uid },
+    escalaLaville: uid === 'laville' ? { turno: MK_LAVILLE_TURNO_RH_, folga: 'terça', escala: MK_LAVILLE_ESCALA_ } : null
+  });
 }
 
 function operadorNomeDuplicado_(sh, nome, ignorarId) {

@@ -1,14 +1,14 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 30/09/2026 · FE **v1.9.142** · GAS repo **v1.5.229** · Web **v1.5.228** ✅ · **I159s** equipe loja · **I158** ✅
+**Atualizado:** 30/09/2026 · FE **v1.9.143** · GAS repo **v1.5.230** · Web **v1.5.229** · **I159t** escala LV · **I158** ✅
 
 ## Produção (agora)
 
 | Camada | Versão | Link |
 |--------|--------|------|
-| Frontend | **v1.9.142** | https://ribocg-a11y.github.io/movikids/?force=1.9.142 |
-| Gestão Pessoas | **v1.9.142** | `gestao-pessoas.html?force=1.9.142` |
-| GAS | ping Web **v1.5.228** · repo **v1.5.229** ⏳ | I159s equipe loja (Milena→all) |
+| Frontend | **v1.9.143** | https://ribocg-a11y.github.io/movikids/?force=1.9.143 |
+| Gestão Pessoas | **v1.9.143** | `gestao-pessoas.html?force=1.9.143` |
+| GAS | ping Web **v1.5.229** · repo **v1.5.230** ⏳ | I159t RH/escala La Ville |
 | Design System | v1.1 | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
 
 **GAS raw:** https://raw.githubusercontent.com/ribocg-a11y/movikids/main/MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs  
@@ -45,7 +45,7 @@
 | **E** | Tablet smoke D4 · PDF Golden 01/10 · FASE 17 | Ops/Sócio | Ops |
 | **F** | ~~GAS lookback `resumoDia`~~ | ✅ Web **v1.5.226** | dia = cauda 600 |
 
-**Nova versão Web:** ✅ ping **v1.5.228** Drift (30/09). Próximo: **v1.5.229** equipe + `.\scripts\testes\SEED_EQUIPE_HOLDING_ADMIN.ps1`. Suite: `entregas/DIAGNOSTICO_LAVILLE_SUITE40_2026-09-30.md`.
+**Nova versão Web:** ✅ ping **v1.5.229** (30/09). Repo **v1.5.230** I159t escala LV — falta Nova versão. Suite: `entregas/DIAGNOSTICO_LAVILLE_SUITE40_2026-09-30.md`.
 
 ### Planilha Google (multi-unidade) — o que mudou / falta
 
@@ -53,8 +53,9 @@
 |-----|--------|---------|
 | **LOCACOES** | Schema ✅ col **AC `unidade_id`** | Backfill ✅ **3947** linhas (29/09) · novas locs gravam unidade |
 | **CUSTOS** | Schema ✅ col **G `unidade_id`** | Novos custos com unidade; antigos = golden default |
-| **COLABORADORES_RH** | ✅ col **T** | sync com OPS · após **v1.5.229** seed Milena=`all` |
-| **OPERADORES_SISTEMA** | ✅ col **I** | FE menu **Loja** · `seedEquipeHoldingAdmin` · LV vazia até Nova Web **229** |
+| **COLABORADORES_RH** | ✅ col **T** | **La Ville equipe 0 = intencional** (ainda sem contratação) |
+| **OPERADORES_SISTEMA** | ✅ col **I** | Ao contratar: loja `laville` → escala **14h–21:30 · folga terça** (GAS **v1.5.230**) |
+| **ESCALA La Ville** | Padrão I159t | Seg–Dom `14–21:30` · **Ter=OFF** · demais params = Golden (salário/VA/meta 20/bônus) |
 | **CONFIG** | Ping lista golden + laville | Preços La Ville oficiais (Brinquedos+Dinos); frota LV* |
 | **DASHBOARD / RELATORIOS / FOLHA** | Sem aba por loja | Filtro por `unidadeId` na API — **não** há sheet “La Ville” separada |
 | **AUD_SMS / SMS** | Fora do menu FE | QR-only; abas podem existir na planilha sem uso operacional |
