@@ -1,13 +1,13 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 01/10/2026 · FE **v1.9.150** · GAS **v1.5.231** · **Golden set fechamento** ✅ · **I164** cartaz/track/foto · **I163** floresta · **I161** ✅
+**Atualizado:** 01/10/2026 · FE **v1.9.151** · GAS **v1.5.231** · **Golden set fechamento** ✅ · **I164d** track floresta · **I164** cartaz/foto · **I163** · **I161** ✅
 
 ## Produção (agora)
 
 | Camada | Versão | Link |
 |--------|--------|------|
-| Frontend | **v1.9.150** | https://ribocg-a11y.github.io/movikids/?force=1.9.150 |
-| Gestão Pessoas | **v1.9.150** | `gestao-pessoas.html?force=1.9.150` |
+| Frontend | **v1.9.151** | https://ribocg-a11y.github.io/movikids/?force=1.9.151 |
+| Gestão Pessoas | **v1.9.151** | `gestao-pessoas.html?force=1.9.151` |
 | GAS | ping Web **v1.5.231** ✅ | I160 escala null + I159t LV |
 | Design System | v1.1 | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
 
@@ -54,7 +54,7 @@
 | `assets/qr-balcao-imprimir.html?loja=laville` | Cartaz floresta · venue **La Ville Mall** · mesmo QR portal |
 | `?loja=golden` | Mesmo DNA floresta · venue Golden |
 | `foto-moldura.html?unidade=laville` | Rodapé/legenda **La Ville Mall** · moldura verde floresta |
-| `track.html?s=…&unidade=laville` | Plano/rodapé La Ville (ou detecta LV* da sessão) |
+| `track.html?s=…&unidade=laville` | Floresta + plano/rodapé La Ville · link balcão manda `unidade=` |
 
 ### I163 — Portal responsáveis floresta (smoke celular)
 
@@ -211,8 +211,8 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 | Peso | # | Ação | Quem | Status |
 |------|---|------|------|--------|
 | **P0** | 1 | **Enviar** PDF Golden set/2026 ao shopping | **Sócio** | ✅ artefato pronto · fat **R$ 14.577** · n **684** · CTO **R$ 1.500** · `entregas/...fechamento-2026-10-01.pdf` |
-| **P0** | 2 | Imprimir cartaz QR La Ville (`?loja=laville`) + fixar na mesa | Ops | ⏳ FE **v1.9.150** |
-| **P1** | 3 | Tablet smoke D4 `?force=1.9.150` | Ops | ⏳ |
+| **P0** | 2 | Imprimir cartaz QR La Ville (`?loja=laville`) + fixar na mesa | Ops | ⏳ FE **v1.9.151** |
+| **P1** | 3 | Tablet smoke D4 `?force=1.9.151` | Ops | ⏳ |
 | **P1** | 4 | Smoke portal+foto La Ville no celular | Ops | ⏳ PC ✅ · falta celular |
 | **P1** | 5 | Assinar FASE 17 (decisão 17.5 F9) | Sócio | ⏳ |
 | **P1** | 5b | Bump **1.9.150** moldura/cartaz floresta print | Agente | ✅ FE **v1.9.150** |

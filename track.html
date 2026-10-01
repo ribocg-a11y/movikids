@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#1565C0">
+<meta name="theme-color" content="#1b5e20">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Movi Kids">
 <title>Movi Kids — Acompanhar Locação</title>
@@ -20,74 +20,87 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="mk-design.css?v=1.8.50">
+<link rel="stylesheet" href="mk-design.css?v=1.9.151">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;min-height:100dvh;
-  background:linear-gradient(160deg,#0a1628 0%,#132050 25%,#1e1b6e 55%,#4a1060 80%,#6a1030 100%);
-  color:#fff;overflow-x:hidden;display:flex;flex-direction:column;align-items:center;
+html,body{height:100%;min-height:100dvh;position:relative;
+  background:linear-gradient(180deg,#87ceeb 0%,#b3e5fc 22%,#c8e6c9 48%,#81c784 72%,#2e7d32 100%);
+  color:#0d3b2e;overflow-x:hidden;display:flex;flex-direction:column;align-items:center;
   justify-content:center;padding:16px;font-family:'Nunito',sans-serif;-webkit-font-smoothing:antialiased}
-.card{width:100%;max-width:360px;background:rgba(255,255,255,0.10);backdrop-filter:blur(24px);
-  -webkit-backdrop-filter:blur(24px);border-radius:28px;border:1px solid rgba(255,255,255,0.18);
-  box-shadow:0 8px 40px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.15);
-  padding:24px 20px;text-align:center}
-.brand{font-family:'Fredoka One',cursive;font-size:18px;letter-spacing:1px;color:#fff;opacity:.85;
-  margin-bottom:12px;display:flex;align-items:center;justify-content:center;gap:8px}
-.brand span{color:#FFD54F}
-.tipo-badge{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,0.14);
-  border:1px solid rgba(255,255,255,0.2);border-radius:99px;padding:5px 14px;font-size:13px;
-  font-weight:700;margin-bottom:16px}
-.crianca-name{font-size:32px;font-weight:900;letter-spacing:-.5px;line-height:1;margin-bottom:4px}
-.resp-name{font-size:12px;color:rgba(255,255,255,0.5);font-weight:600;margin-bottom:20px}
+.mk-track-forest{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.mk-track-sky{position:absolute;inset:0 0 42% 0;background:
+  radial-gradient(ellipse 55% 40% at 78% 18%,rgba(255,248,225,.95),transparent 55%),
+  radial-gradient(ellipse 40% 30% at 18% 28%,rgba(255,255,255,.55),transparent 50%),
+  linear-gradient(180deg,#4fc3f7 0%,#81d4fa 40%,transparent 100%)}
+.mk-track-canopy{position:absolute;inset:0;background:
+  radial-gradient(ellipse 70% 45% at -5% 0%,rgba(27,94,74,.78) 0%,transparent 58%),
+  radial-gradient(ellipse 65% 42% at 105% 5%,rgba(46,125,50,.72) 0%,transparent 55%)}
+.mk-track-ground{position:absolute;left:0;right:0;bottom:0;height:14%;
+  background:linear-gradient(180deg,transparent 0%,rgba(46,125,50,.35) 18%,#1b5e20 55%,#0d3b2e 100%);
+  border-top-left-radius:40% 28px;border-top-right-radius:40% 28px}
+.card{position:relative;z-index:1;width:100%;max-width:360px;background:rgba(255,255,255,.88);backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);border-radius:28px;border:1px solid rgba(13,59,46,.14);
+  box-shadow:0 12px 36px rgba(13,59,46,.22),inset 0 1px 0 rgba(255,255,255,.7);
+  padding:24px 20px;text-align:center;color:#0d3b2e}
+.tipo-badge{display:inline-flex;align-items:center;gap:7px;background:rgba(27,94,74,.1);
+  border:1px solid rgba(27,94,74,.22);border-radius:99px;padding:5px 14px;font-size:13px;
+  font-weight:800;margin-bottom:16px;color:#0d3b2e}
+.crianca-name{font-size:32px;font-weight:900;letter-spacing:-.5px;line-height:1;margin-bottom:4px;color:#0d3b2e}
+.resp-name{font-size:12px;color:rgba(13,59,46,.55);font-weight:700;margin-bottom:20px}
 .ring-wrap{position:relative;width:150px;height:150px;margin:0 auto 16px}
 .ring-wrap svg{transform:rotate(-90deg);width:150px;height:150px}
-.ring-bg{fill:none;stroke:rgba(255,255,255,0.12);stroke-width:10}
+.ring-bg{fill:none;stroke:rgba(13,59,46,.12);stroke-width:10}
 .ring-prog{fill:none;stroke-width:10;stroke-linecap:round;stroke-dasharray:408;stroke-dashoffset:0;transition:stroke-dashoffset 1s linear,stroke .4s}
 .ring-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
-.ring-label{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,0.5);margin-bottom:3px}
-.ring-time{font-size:34px;font-weight:900;font-variant-numeric:tabular-nums;line-height:1}
-.ring-extra-label{font-size:10px;font-weight:700;color:#FF8A65;margin-top:2px}
-.plano-info{font-size:12px;color:rgba(255,255,255,0.4);font-weight:600;margin-bottom:12px}
-.pricing{margin-bottom:12px;padding:12px 14px;background:rgba(255,255,255,0.07);
-  border-radius:12px;border:1px solid rgba(255,255,255,0.1);text-align:left;display:none}
+.ring-label{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:rgba(13,59,46,.5);margin-bottom:3px}
+.ring-time{font-size:34px;font-weight:900;font-variant-numeric:tabular-nums;line-height:1;color:#0d3b2e}
+.ring-extra-label{font-size:10px;font-weight:700;color:#E65100;margin-top:2px}
+.plano-info{font-size:12px;color:rgba(13,59,46,.55);font-weight:700;margin-bottom:12px}
+.pricing{margin-bottom:12px;padding:12px 14px;background:rgba(27,94,74,.06);
+  border-radius:12px;border:1px solid rgba(13,59,46,.12);text-align:left;display:none}
 .pr-row{display:flex;justify-content:space-between;align-items:center;padding:3px 0;font-size:12px}
-.pr-row .lbl{color:rgba(255,255,255,0.45);font-weight:600}
-.pr-row .v-paid{font-weight:700;color:#69F0AE}
-.pr-row .v-ext{font-weight:700;color:#FFD54F}
-.pr-row .v-extra{font-weight:700;color:#FF5252}
-.pr-divider{height:1px;background:rgba(255,255,255,0.12);margin:6px 0}
-.pr-total{display:flex;justify-content:space-between;font-size:13px;font-weight:800;color:rgba(255,255,255,0.8)}
-.pr-total .val{color:#FFD54F;font-size:15px}
-.pr-note{font-size:10px;color:rgba(255,255,255,0.3);text-align:center;margin-top:5px;font-style:italic}
-.status-row{display:flex;align-items:center;justify-content:center;gap:6px;font-size:11px;color:rgba(255,255,255,0.4);font-weight:600}
-.status-dot{width:7px;height:7px;border-radius:50%;background:#69F0AE;animation:pulse-g 2s infinite;flex-shrink:0}
+.pr-row .lbl{color:rgba(13,59,46,.55);font-weight:700}
+.pr-row .v-paid{font-weight:800;color:#2E7D32}
+.pr-row .v-ext{font-weight:800;color:#F9A825}
+.pr-row .v-extra{font-weight:800;color:#C62828}
+.pr-divider{height:1px;background:rgba(13,59,46,.12);margin:6px 0}
+.pr-total{display:flex;justify-content:space-between;font-size:13px;font-weight:800;color:#0d3b2e}
+.pr-total .val{color:#E65100;font-size:15px}
+.pr-note{font-size:10px;color:rgba(13,59,46,.4);text-align:center;margin-top:5px;font-style:italic}
+.status-row{display:flex;align-items:center;justify-content:center;gap:6px;font-size:11px;color:rgba(13,59,46,.5);font-weight:700}
+.status-dot{width:7px;height:7px;border-radius:50%;background:#43A047;animation:pulse-g 2s infinite;flex-shrink:0}
 @keyframes pulse-g{0%,100%{opacity:1}50%{opacity:.35}}
 .status-dot.off{background:#EF9A9A;animation:none}
-.status-dot.waiting{background:#FFD54F;animation:pulse-g 1s infinite}
-.loading-text{font-size:13px;color:rgba(255,255,255,0.4);animation:pulse-g 1.5s infinite}
+.status-dot.waiting{background:#F9A825;animation:pulse-g 1s infinite}
+.loading-text{font-size:13px;color:rgba(13,59,46,.45);animation:pulse-g 1.5s infinite}
 .enc-card{display:none;text-align:center}
 .enc-icon{font-size:52px;margin-bottom:10px}
 .enc-title{font-size:24px;font-weight:900;margin-bottom:6px}
-.enc-total{font-size:20px;font-weight:800;color:#FFD54F;margin:10px 0 2px}
-.enc-total-lbl{font-size:11px;color:rgba(255,255,255,0.4)}
-.enc-sub{font-size:13px;color:rgba(255,255,255,0.5);line-height:1.5;margin-top:10px}
-footer{margin-top:18px;font-size:11px;color:rgba(255,255,255,0.2);font-weight:600;letter-spacing:.03em;text-align:center}
+.enc-total{font-size:20px;font-weight:800;color:#E65100;margin:10px 0 2px}
+.enc-total-lbl{font-size:11px;color:rgba(13,59,46,.45)}
+.enc-sub{font-size:13px;color:rgba(13,59,46,.55);line-height:1.5;margin-top:10px}
+footer{position:relative;z-index:1;margin-top:18px;font-size:11px;color:rgba(255,255,255,.92);font-weight:700;letter-spacing:.03em;text-align:center;text-shadow:0 1px 2px rgba(0,0,0,.25)}
 </style>
 </head>
 <body>
+<div class="mk-track-forest" aria-hidden="true">
+  <div class="mk-track-sky"></div>
+  <div class="mk-track-canopy"></div>
+  <div class="mk-track-ground"></div>
+</div>
 <div class="card" id="main-card">
   <div class="track-brand"><img class="mk-brand-img mk-brand-img--track" src="assets/logo-movi-kids.png" alt="Movi Kids" width="1080" height="1080" loading="lazy" decoding="async"></div>
   <div class="tipo-badge" id="tipo-badge">Movi Kids</div>
-  <div class="crianca-name" id="crianca-name" style="font-size:20px;color:rgba(255,255,255,0.4)" class="loading-text">Carregando...</div>
+  <div class="crianca-name" id="crianca-name" style="font-size:20px;color:rgba(13,59,46,0.4)" class="loading-text">Carregando...</div>
   <div class="resp-name" id="resp-name" style="display:none">👤 <span id="resp-span">—</span></div>
   <div class="ring-wrap">
     <svg viewBox="0 0 150 150">
       <circle class="ring-bg" cx="75" cy="75" r="65"/>
-      <circle class="ring-prog" id="ring-prog" cx="75" cy="75" r="65" stroke="#29B6F6"/>
+      <circle class="ring-prog" id="ring-prog" cx="75" cy="75" r="65" stroke="#43A047"/>
     </svg>
     <div class="ring-center">
       <div class="ring-label" id="ring-label">RESTANTE</div>
-      <div class="ring-time" id="ring-time" style="font-size:20px;color:rgba(255,255,255,0.3)">- - : - -</div>
+      <div class="ring-time" id="ring-time" style="font-size:20px;color:rgba(13,59,46,0.35)">- - : - -</div>
       <div class="ring-extra-label" id="ring-extra-label" style="display:none"></div>
     </div>
   </div>

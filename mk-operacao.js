@@ -346,10 +346,17 @@ async function salvarOperacaoLocacao() {
 // ── Gera link de acompanhamento ───────────────────────────────────────────
 function gerarTrackUrl(s) {
   // v1.6.29: URL curta — só rowIndex em base36 (?s=1s)
-  // Nenhum dado pessoal na URL — track.html busca tudo do servidor
+  // I164d: ?unidade= para rótulo loja (não é dado pessoal)
   // Motivo: URLs longas com parâmetros são bloqueadas como golpe por WhatsApp/Android
   const rowB36 = s.rowIndex.toString(36);
-  return 'https://ribocg-a11y.github.io/movikids/track.html?s=' + rowB36;
+  let uid = String((s && (s.unidadeId || s.unidade)) || '').toLowerCase();
+  if (uid !== 'laville' && uid !== 'golden') {
+    try {
+      if (typeof mkUnidadeId_ === 'function') uid = String(mkUnidadeId_() || '').toLowerCase();
+    } catch (e) { uid = ''; }
+  }
+  if (uid !== 'laville' && uid !== 'golden') uid = 'golden';
+  return 'https://ribocg-a11y.github.io/movikids/track.html?s=' + rowB36 + '&unidade=' + encodeURIComponent(uid);
 }
 
 function normalizarTelefoneWhatsApp_(tel) {
