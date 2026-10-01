@@ -1367,10 +1367,15 @@
   margin: 0;
   font: inherit;
   font-size: inherit;
-  font-weight: 800;
-  color: #90caf9;
+  font-weight: 900;
+  color: #0d3b2e;
   text-decoration: underline;
+  text-underline-offset: 2px;
   cursor: pointer;
+}
+.mk-portal-tel-link:hover,
+.mk-portal-tel-link:focus-visible {
+  color: #e65100;
 }
 .mk-portal-foto-btn {
   display: block;

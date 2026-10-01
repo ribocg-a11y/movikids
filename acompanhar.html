@@ -9,12 +9,12 @@
 <meta name="robots" content="noindex,nofollow">
 <title>Movi Kids — Acompanhar</title>
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<script src="mk-version.js?v=1.9.152"></script>
-<script src="mk-canonical-host.js?v=1.9.152"></script>
+<script src="mk-version.js?v=1.9.153"></script>
+<script src="mk-canonical-host.js?v=1.9.153"></script>
 <script>
 /* Portal: bust cache sem perder ?tel= (mk-cache-bust do balcão descarta query) */
 (function () {
-  var CURRENT = (window.MK_VERSION || '1.9.152');
+  var CURRENT = (window.MK_VERSION || '1.9.153');
   var KEY = 'mk_portal_loaded_version';
   try {
     var stored = localStorage.getItem(KEY) || '';
@@ -40,7 +40,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="mk-design.css?v=1.9.152">
+<link rel="stylesheet" href="mk-design.css?v=1.9.153">
 </head>
 <body class="mk-portal-page" data-view="gate">
 
@@ -539,9 +539,6 @@ function render() {
   const rideBadge = `<span class="mk-portal-ride-badge" aria-hidden="true">${tipoIcon(atual.tipo)}</span>`;
 
   box.innerHTML = `<div class="mk-portal-carousel">
-    <div class="mk-portal-brand-wrap mk-portal-brand-wrap--play">
-      <img class="mk-brand-img mk-brand-img--xs" src="assets/logo-movi-kids.png" width="1080" height="1080" alt="Movi Kids" decoding="async">
-    </div>
     <p class="mk-portal-subtitle">📱 ${esc(telFmt)} · ${brincandoLabel_(n)} · <button type="button" class="mk-portal-tel-link" id="btn-trocar-tel">Trocar telefone</button></p>
     ${lojaChip}
     ${tabs ? `<div class="mk-portal-tabs" role="tablist">${tabs}</div>` : ''}
