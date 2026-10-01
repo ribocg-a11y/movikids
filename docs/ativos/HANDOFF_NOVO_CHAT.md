@@ -40,7 +40,7 @@
 | # | Item | Quem | Bloqueio |
 |---|------|------|----------|
 | **B** | ~~Backfill `unidade_id` LOCAÇÕES~~ | ✅ 29/09 | **3947** linhas atualizadas / 3950 lidas (`backfillUnidadeIdLocacoesAdmin`) |
-| **C** | Smoke PC: Holding filtro · Caixa Golden ≠ 0 · Avulso tipos LV · balcão LV 0 | Ops/PC | FE **v1.9.135** |
+| **C** | Smoke PC: Holding filtro · Caixa Golden ≠ 0 · Avulso tipos LV · balcão LV 0 | Agente | ✅ **01/10** `TESTE_HOLDING_SMOKE_C_READONLY` · Golden fat **87**/n**3** · LV **0** · Avulso Drift/Dino FE |
 | **D** | ~~Frota La Ville~~ · e-mail CTO ainda | ✅ FE+GAS **v1.5.226** | label UI **I159o** (sem LV na tela) |
 | **E** | Tablet smoke D4 · PDF Golden 01/10 · FASE 17 | Ops/Sócio | Ops |
 | **F** | ~~GAS lookback `resumoDia`~~ | ✅ Web **v1.5.226** | dia = cauda 600 |
@@ -218,7 +218,7 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 | **P1** | 5b | Bump **1.9.150** moldura/cartaz floresta print | Agente | ✅ FE **v1.9.150** |
 | **P2** | 6 | Contratar 1ª equipe La Ville (RH `unidade_id=laville`) | Ops/RH | ⏳ escala 14–21:30 / terça OFF |
 | **P2** | 7 | E-mail CTO / frota labels oficiais LV | Sócio | ⏳ |
-| **P3** | 8 | Holding smoke C (Caixa≠0 · Avulso LV) | Ops/PC | ⏳ FE pronto |
+| **P3** | 8 | Holding smoke C (Caixa≠0 · Avulso LV) | Agente | ✅ 01/10 · Golden fat **R$ 87** · LV **0** · `TESTE_HOLDING_SMOKE_C_READONLY` |
 | **P4** | 9 | F4 WhatsApp/SMS · F9 Supervisor | — | pausado |
 
 **Plano:** `docs/ativos/PLANO_MULTI_UNIDADE_GOLDEN_LAVILLE_2026-09.md`

@@ -1,0 +1,49 @@
+{
+  "suite": "TESTE_HOLDING_SMOKE_C_READONLY",
+  "startedAt": "2026-10-01 19:41:41",
+  "checks": [
+    {
+      "name": "ping",
+      "status": "ok",
+      "detail": "v1.5.231"
+    },
+    {
+      "name": "caixa.golden",
+      "status": "ok",
+      "detail": "fat=87 n=3"
+    },
+    {
+      "name": "caixa.laville",
+      "status": "ok",
+      "detail": "fat=0 n=0"
+    },
+    {
+      "name": "caixa.all",
+      "status": "ok",
+      "detail": "fat=87 n=3"
+    },
+    {
+      "name": "filtro.holding",
+      "status": "ok",
+      "detail": "all ≈ golden quando LV=0 (ou ambos zero)"
+    },
+    {
+      "name": "fe.avulso.laville.tipos",
+      "status": "ok",
+      "detail": "Drift + Dino no grid La Ville"
+    },
+    {
+      "name": "fe.dual.pills",
+      "status": "ok",
+      "detail": "pills dual presentes"
+    },
+    {
+      "name": "ops.laville",
+      "status": "warn",
+      "detail": "equipe LV=0 (P2 contratação)"
+    }
+  ],
+  "status": "ok_with_warnings",
+  "summary": "Smoke C OK com 1 aviso(s)",
+  "finishedAt": "2026-10-01 19:42:40"
+}
