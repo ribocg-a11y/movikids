@@ -472,31 +472,23 @@
 }
 .mk-mob-header-top {
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
+  align-items: center;
+  justify-content: flex-start;
   gap: 12px;
 }
-.mk-mob-brand {
-  font-family: 'Fredoka One', cursive;
-  font-size: 22px;
-  color: #fff;
-  letter-spacing: 0.5px;
-  line-height: 1.1;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
-}
-.mk-mob-brand span { color: var(--gold, #FFD54F); }
 .mk-mob-meta {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  justify-content: flex-end;
+  justify-content: flex-start;
   gap: 5px;
+  width: 100%;
   font-family: 'Nunito', sans-serif;
   font-size: 11px;
   font-weight: 700;
   color: rgba(255, 255, 255, 0.65);
-  margin-top: 4px;
-  text-align: right;
+  margin-top: 0;
+  text-align: left;
 }
 .mk-mob-meta #status-txt {
   color: rgba(255, 255, 255, 0.92);
