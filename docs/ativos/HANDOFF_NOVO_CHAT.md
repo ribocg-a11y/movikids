@@ -1,13 +1,13 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 01/10/2026 · FE **v1.9.152** · GAS **v1.5.231** · **I165** chip Caixa não mistura Golden→LV · Golden fechamento ✅ · I164d · I161 ✅
+**Atualizado:** 01/10/2026 · FE **v1.9.153** · GAS **v1.5.231** · portal sem logo play + Trocar telefone contraste · **I165** · Golden fechamento ✅ · I164d · I161 ✅
 
 ## Produção (agora)
 
 | Camada | Versão | Link |
 |--------|--------|------|
-| Frontend | **v1.9.152** | https://ribocg-a11y.github.io/movikids/?force=1.9.152 |
-| Gestão Pessoas | **v1.9.152** | `gestao-pessoas.html?force=1.9.152` |
+| Frontend | **v1.9.153** | https://ribocg-a11y.github.io/movikids/?force=1.9.153 |
+| Gestão Pessoas | **v1.9.153** | `gestao-pessoas.html?force=1.9.153` |
 | GAS | ping Web **v1.5.231** ✅ | I160 escala null + I159t LV |
 | Design System | v1.1 | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
 
