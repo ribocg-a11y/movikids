@@ -1,8 +1,8 @@
 # CHECKLIST — Fechamento FASE 17 (Alertas + Gestor)
 
-**Atualizado:** 27/06/2026 · FE **v1.9.2** · GAS **v1.5.167**  
+**Atualizado:** 01/10/2026 · FE **v1.9.151** · GAS **v1.5.231**  
 **Referência:** `PLANO_PREMIUM_ONEUI_FASES_16_22_2026-06.md` §7 · `MATRIZ_PERMISSOES_PERFIS_2026-06.md` · Sprint D `PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`  
-**Teste API:** `scripts/testes/TESTE_FASE17_ALERTAS_READONLY.ps1` — ✅ verde (26/06)
+**Teste API:** `scripts/testes/TESTE_FASE17_ALERTAS_READONLY.ps1` — ✅ OK 01/10 (warn intel=0 no comando; kpiMes alertas=5)
 
 ---
 
@@ -15,8 +15,8 @@
 | 3 | Dashboard exibe **≥1 pill** de alerta inteligente com destino (Caixa / Equipe / Comando) | PC homolog 27/06 · pills **→ Comando** / **→ Equipe** / Ver todos (8) | ✅ |
 | 4 | Presença admin — badges inteligentes (banco horas / meta / ponto pendente) | PC 27/06 · Milena: **Meta abaixo** em `.gp-adm-presenca-intel` · badges bar OK | ✅ |
 | 5 | Balcão inalterado — F5/F7/F10/F11 após homolog | Homolog I43/I42 23/06 | ✅ |
-| 6 | `TESTE_FASE17_ALERTAS_READONLY.ps1` verde | 26/06 execução | ✅ |
-| 7 | **17.5** decisão **F9 Supervisor** documentada | `MATRIZ_PERMISSOES` § Decisões pendentes | ⏳ **sócio** |
+| 6 | `TESTE_FASE17_ALERTAS_READONLY.ps1` verde | 26/06 + **revalidado 01/10** | ✅ |
+| 7 | **17.5** decisão **F9 Supervisor** documentada | `MATRIZ_PERMISSOES` § Decisões pendentes | ⏳ **sócio** (única pendência para assinar) |
 
 **Assinatura FASE 17:** ___/___/2026 · Responsável: ___________
 

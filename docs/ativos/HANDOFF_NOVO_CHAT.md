@@ -198,7 +198,7 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 
 ## Mensagem para colar no novo chat (PC)
 
-> *Continuar MOVI KIDS **no PC** — pasta C (`movikids-github`). Ler `HANDOFF_NOVO_CHAT.md`. FE **v1.9.122** Pages · GAS ping **v1.5.221**. **I159b** preços La Ville no FE (frota provisória LV*) · **I158** ✅. Setembro prévia 29/09 R$ 14.371 / CTO R$ 1.500. Tablet `?force=1.9.122`. Próximo: frota real + §7.3 GAS La Ville · PDF 01/10. **This PC.***
+> *Continuar MOVI KIDS **no PC** — pasta C (`movikids-github`). Ler `HANDOFF_NOVO_CHAT.md`. FE **v1.9.151** Pages · GAS ping **v1.5.231**. Golden set fechamento ✅ R$ 14.577 / CTO R$ 1.500. I164 floresta multi-loja ✅. Próximo: enviar PDF Golden · imprimir QR La Ville · tablet D4 · assinar FASE 17 (só 17.5 F9). **This PC.***
 
 **Mínima:**
 
@@ -215,7 +215,7 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 | **P1** | 3 | Tablet smoke D4 `?force=1.9.151` | Ops | ⏳ |
 | **P1** | 4 | Smoke portal+foto La Ville no celular | Ops | ⏳ PC ✅ · falta celular |
 | **P1** | 5 | Assinar FASE 17 (decisão 17.5 F9) | Sócio | ⏳ |
-| **P1** | 5b | Bump **1.9.150** moldura/cartaz floresta print | Agente | ✅ FE **v1.9.150** |
+| **P1** | 5b | Bump moldura/cartaz/track floresta | Agente | ✅ FE **v1.9.151** (I164–I164d) |
 | **P2** | 6 | Contratar 1ª equipe La Ville (RH `unidade_id=laville`) | Ops/RH | ⏳ escala 14–21:30 / terça OFF |
 | **P2** | 7 | E-mail CTO / frota labels oficiais LV | Sócio | ⏳ |
 | **P3** | 8 | Holding smoke C (Caixa≠0 · Avulso LV) | Agente | ✅ 01/10 · Golden fat **R$ 87** · LV **0** · `TESTE_HOLDING_SMOKE_C_READONLY` |

@@ -54,7 +54,7 @@ O sistema **não é um único `:root`**. Há contextos com paletas distintas:
 | **Admin FASE 9** | páginas `mk-admin-page` | `mk-design.css` tokens `--mk-admin-*` | `#29B6F6` (accent) + `#1565C0` (corporate) |
 | **Colaboradores** | `gestao-pessoas.html` | auth = `mk-app.css` `#gp-auth-gate`; painel = `mk-gestao-pessoas.css` | `#1565C0` (auth) |
 | **Exceção financeiro** | `financeiro/index.html` | `financeiro/style.css` | paleta própria — **não estender ao MOVI KIDS** |
-| **Legado SMS** | `track.html` | inline | portal ring `#29B6F6` — migrar ou deprecar |
+| **Track (legado SMS)** | `track.html` | inline floresta (I164d) + `mk-design.css` logo | DNA portal floresta · ring `#43A047` · oficial = `acompanhar.html` |
 
 **Ordem de cascade (padrão MOVI KIDS):**
 ```html
@@ -394,9 +394,9 @@ Nível 3 — DETALHE  → plano, histórico, accordion, tabela secundária
 
 | Página | CSS | Nota |
 |--------|-----|------|
-| `foto-moldura.html` | mk-design `.mk-frame-*` | Reusa portal btn |
-| `assets/qr-balcao-imprimir.html` | inline portal tokens | Cartaz A5 |
-| `track.html` | inline legado | **Migrar** para mk-portal ou deprecar |
+| `foto-moldura.html` | mk-design `.mk-frame-*` + floresta | Moldura redes · `?unidade=` |
+| `assets/qr-balcao-imprimir.html` | inline floresta · `?loja=` | Cartaz A5 Golden/La Ville |
+| `track.html` | inline floresta (I164d) | Legado SMS · visual alinhado ao portal · preferir `acompanhar.html` |
 
 ### 8.5 Fora do design system MOVI KIDS
 
@@ -487,7 +487,7 @@ Nível 3 — DETALHE  → plano, histórico, accordion, tabela secundária
 | Item | Prioridade | Ação |
 |------|------------|------|
 | Unificar `--blue` dual (#1565C0 vs #29B6F6) em doc único de tokens | P2 | Manter contextos §2 até refactor CSS |
-| Migrar `track.html` para `mk-portal-*` | P3 | Deprecar inline |
+| Unificar `track.html` em classes `mk-portal-*` (hoje inline floresta) | P3 | Opcional — visual já alinhado I164d |
 | Documentar contraste WCAG formal | P3 | Auditoria a11y |
 | Ícones SVG nav (substituir emoji gradual) | P4 | Futuro |
 
@@ -500,6 +500,7 @@ Nível 3 — DETALHE  → plano, histórico, accordion, tabela secundária
 | 06/06/2026 | — | `DESIGN_DNA_MOVIKIDS.md` criado (princípios) |
 | 09/06/2026 | — | FASE 9 DNA admin em produção |
 | 18/06/2026 | **1.0** | Auditoria ponta a ponta → **este Design System** + regra Cursor obrigatória |
+| 01/10/2026 | **1.1** | Portal/track/foto/cartaz floresta (I163–I164d) · multi-loja Golden×La Ville |
 
 ---
 
