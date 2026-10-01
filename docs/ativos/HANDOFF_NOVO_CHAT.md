@@ -1,13 +1,13 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 01/10/2026 · FE **v1.9.151** · GAS **v1.5.231** · **Golden set fechamento** ✅ · **I164d** track floresta · **I164** cartaz/foto · **I163** · **I161** ✅
+**Atualizado:** 01/10/2026 · FE **v1.9.152** · GAS **v1.5.231** · **I165** chip Caixa não mistura Golden→LV · Golden fechamento ✅ · I164d · I161 ✅
 
 ## Produção (agora)
 
 | Camada | Versão | Link |
 |--------|--------|------|
-| Frontend | **v1.9.151** | https://ribocg-a11y.github.io/movikids/?force=1.9.151 |
-| Gestão Pessoas | **v1.9.151** | `gestao-pessoas.html?force=1.9.151` |
+| Frontend | **v1.9.152** | https://ribocg-a11y.github.io/movikids/?force=1.9.152 |
+| Gestão Pessoas | **v1.9.152** | `gestao-pessoas.html?force=1.9.152` |
 | GAS | ping Web **v1.5.231** ✅ | I160 escala null + I159t LV |
 | Design System | v1.1 | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
 
@@ -74,6 +74,14 @@
 | Mesma pessoa no balcão Golden | `Karen · Golden` / `Raykelly · Golden` |
 | Carga pós-login (I162c) | **Sem** `listarOperadoresLogin&all&_t` extra · home/sync warm estável (I155) |
 | RH / OPS | Colunas `unidade_id` já existem (RH **T**, OPS **I**) |
+
+### I165 — Chip Caixa por loja (smoke PC) — **obrigatório**
+
+| Check | Esperado |
+|-------|----------|
+| Balcão La Ville (ainda sem operação) | Tiles **0** · chip **Caixa hoje: 0 locações** (não o número do Golden) |
+| Balcão Golden | Chip = locações Golden do dia |
+| Holding Todas | Dual cards; cada loja com seu fat |
 
 ### I161 — Holding × Balcão (smoke PC)
 

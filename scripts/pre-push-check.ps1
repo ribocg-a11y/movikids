@@ -591,6 +591,14 @@ try {
     } else {
       Add-Check "guard.i159g.fe.holding" "ok" "encHoje completo + merge sync por unidade (I159g)"
     }
+    # I165 — chip Caixa hoje La Ville não herda statsHoje Golden
+    if ($homeRawG -notmatch 'I165:\s*lista explícita vazia' -and $homeRawG -notmatch 'explicit\) return 0') {
+      Add-Check "guard.i165.fe.chip" "fail" "mkSessoesEncHoje_ ainda herda statsHoje com lista vazia (I165)"
+    } elseif ($syncRawG -notmatch 'I165:\s*statsHoje é da unidade' -and $syncRawG -notmatch 'sliceEnc') {
+      Add-Check "guard.i165.fe.sync" "fail" "sync statsHoje.nSessoes sem fatia por unidade (I165)"
+    } else {
+      Add-Check "guard.i165.fe.caixa-unidade" "ok" "chip/caixa balcão não mistura Golden→La Ville (I165)"
+    }
   }
 
   $adminJs = Join-Path $root "mk-admin.js"

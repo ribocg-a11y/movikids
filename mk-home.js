@@ -515,10 +515,13 @@ function mkEncHojePorConta_(list) {
   });
 }
 
-/** Todas as sessões encerradas hoje — Caixa / chip admin. */
+/** Todas as sessões encerradas hoje — Caixa / chip admin.
+ * I165: lista explícita vazia (ex.: La Ville sem operação) NÃO herda statsHoje do Golden. */
 function mkSessoesEncHoje_(list) {
-  const data = list || encHojeData || [];
+  const explicit = arguments.length >= 1;
+  const data = explicit ? (list || []) : (encHojeData || []);
   if (data.length) return data.length;
+  if (explicit) return 0;
   if (statsHoje && statsHoje.nSessoes != null && statsHoje.nSessoes > 0) return statsHoje.nSessoes;
   return 0;
 }
@@ -676,7 +679,8 @@ function showAdminHomeKpis(d) {
       const uid = typeof mkUnidadeId_ === 'function' ? mkUnidadeId_() : 'golden';
       const encU = (typeof mkSessionsPorUnidade_ === 'function')
         ? mkSessionsPorUnidade_(typeof encHojeData !== 'undefined' ? encHojeData : [], uid)
-        : (typeof encHojeData !== 'undefined' ? encHojeData : []);
+        : (uid === 'laville' ? [] : (typeof encHojeData !== 'undefined' ? encHojeData : []));
+      /* I165: contar só a fatia da loja aberta — nunca statsHoje global */
       const nSess = typeof mkSessoesEncHoje_ === 'function'
         ? mkSessoesEncHoje_(encU)
         : encU.length;

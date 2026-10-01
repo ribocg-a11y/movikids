@@ -445,7 +445,14 @@ function aplicarDadosInicio(d) {
         d.encHoje,
         uidResp
       );
-      if (!statsHoje.nSessoes && mergedEnc.length) statsHoje.nSessoes = mergedEnc.length;
+      /* I165: statsHoje é da unidade do sync — não preencher com encerradas Golden+LV misturadas */
+      if (!statsHoje.nSessoes && mergedEnc.length) {
+        const uidFill = (uidResp && uidResp !== 'all') ? uidResp : uidNow;
+        const sliceEnc = (typeof mkSessionsPorUnidade_ === 'function')
+          ? mkSessionsPorUnidade_(mergedEnc, uidFill)
+          : mergedEnc;
+        if (sliceEnc.length) statsHoje.nSessoes = sliceEnc.length;
+      }
       if (typeof mkUpdateEncHojeKpis_ === 'function') mkUpdateEncHojeKpis_(mergedEnc);
       else {
         encHojeData = mergedEnc;

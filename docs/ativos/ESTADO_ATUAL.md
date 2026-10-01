@@ -43,9 +43,9 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 | Camada | Versão | URL / evidência |
 |--------|--------|-----------------|
-| **Frontend** | **v1.9.151** | https://ribocg-a11y.github.io/movikids/?force=1.9.151 |
-| **Gestão Pessoas** | **v1.9.151** | `gestao-pessoas.html?force=1.9.151` |
-| **Service Worker** | **1.9.151** | I164d track floresta + unidade na URL |
+| **Frontend** | **v1.9.152** | https://ribocg-a11y.github.io/movikids/?force=1.9.152 |
+| **Gestão Pessoas** | **v1.9.152** | `gestao-pessoas.html?force=1.9.152` |
+| **Service Worker** | **1.9.152** | I165 chip Caixa por unidade (sem vazamento Golden→LV) |
 | **Apps Script** | ping **v1.5.221** · repo **v1.5.223** | I159c La Ville no repo; Web pendente Nova versão |
 | **I159c La Ville GAS** | ✅ repo | `OPERACAO_CONFIG_LAVILLE_` · salvar/inicio por `unidadeId` |
 | **I158 Golden** | ✅ FE live | Fechamento set **14577** / n **684** / CTO **1500** · PDF 01/10 |
