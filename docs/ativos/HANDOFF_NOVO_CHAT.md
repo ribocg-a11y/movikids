@@ -1,13 +1,13 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 30/09/2026 · FE **v1.9.149** · GAS **v1.5.231** · **I164** cartaz/track/foto multi-loja · **I163** portal floresta · I162c · **I161** ✅ · **I160** ✅
+**Atualizado:** 01/10/2026 · FE **v1.9.150** · GAS **v1.5.231** · **Golden set fechamento** ✅ · **I164** cartaz/track/foto · **I163** floresta · **I161** ✅
 
 ## Produção (agora)
 
 | Camada | Versão | Link |
 |--------|--------|------|
-| Frontend | **v1.9.149** | https://ribocg-a11y.github.io/movikids/?force=1.9.149 |
-| Gestão Pessoas | **v1.9.149** | `gestao-pessoas.html?force=1.9.149` |
+| Frontend | **v1.9.150** | https://ribocg-a11y.github.io/movikids/?force=1.9.150 |
+| Gestão Pessoas | **v1.9.150** | `gestao-pessoas.html?force=1.9.150` |
 | GAS | ping Web **v1.5.231** ✅ | I160 escala null + I159t LV |
 | Design System | v1.1 | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
 
@@ -131,15 +131,17 @@ Diagnóstico 29/09: `diagnosticoPlanilhaCompletoAdmin` → LOCACOES/CUSTOS/CONFI
 | Problema | PDF/e-mail GAS contava **Cancelada** → fat/CTO inflados |
 | Correção | FE **v1.9.120** — `mkHtmlRelatorioGoldenFromKpi_` via **`kpiMes`** (sem AppScript) |
 | Agosto enviado (histórico) | R$ **17.212** · 957 · CTO **R$ 1.721,20** — **não reenviar** |
-| Setembro prévia **29/09** | R$ **14.371** · **675** · CTO **R$ 1.500** (10% = 1.437,10) |
-| Setembro prévia **30/09** (`kpiMes`) | R$ **14.525** · **682** · extra **R$ 8** · ticket **R$ 21,30** · CTO **R$ 1.500** (10% = **1.452,50**) |
-| PDF setembro prévia 30/09 | `entregas/MOVI-KIDS-Relatorio-Setembro-2026-Golden-previa-2026-09-30.pdf` |
+| Setembro prévia **29/09** | R$ **14.371** · **675** · CTO **R$ 1.500** |
+| Setembro prévia **30/09** | R$ **14.525** · **682** · CTO **R$ 1.500** |
+| **Setembro FECHAMENTO 01/10** (`kpiMes` golden) | R$ **14.577** · **684** · extra **R$ 8** · ticket **R$ 21,31** · CTO **R$ 1.500** (10% = **1.457,70**) |
+| PDF/HTML fechamento | `entregas/MOVI-KIDS-Relatorio-Setembro-2026-Golden-fechamento-2026-10-01.pdf` (+ `.html`) |
+| JSON evidência | `entregas/kpiMes-golden-2026-09-fechamento-20261001_095523.json` |
 | PDF ago dia a dia | `entregas/MOVI-KIDS-Relatorio-Agosto-2026-Golden-diario.pdf` |
 | Docs | `INCIDENTE_I158_*` · `guard.i158.fe.golden` · `TESTE_I158_GOLDEN_*` |
 
-**CTO R$ 1.500:** mínimo contratual. Em 30/09, 10% de 14.525 = **1.452,50** &lt; mínimo → ainda **R$ 1.500**. Se o fechamento 01/10 ultrapassar **R$ 15.000**, CTO vira **10%**.
+**CTO R$ 1.500:** mínimo contratual. Fechamento: 10% de 14.577 = **1.457,70** &lt; mínimo → **R$ 1.500**. Vencimento ref. **05/10/2026**.
 
-**Não mandar ao shopping ainda** — regenerar em **01/10** (após fechar o dia 30) como fechamento oficial. E-mail GAS legado desligado; enviar HTML/PDF do FE.
+**Pronto para envio ao Golden** — PDF/HTML gerados 01/10 (FE v1.9.149 · kpiMes sem canceladas). E-mail GAS legado desligado; sócio envia o PDF.
 
 ---
 
@@ -208,15 +210,15 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 
 | Peso | # | Ação | Quem | Status |
 |------|---|------|------|--------|
-| **P0** | 1 | Imprimir cartaz QR La Ville (`qr-balcao-imprimir.html?loja=laville`) + fixar na mesa | Ops | ⏳ FE **v1.9.149** · smoke PC ✅ |
-| **P0** | 2 | PDF Golden **fechamento 01/10** (prévia 30/09 pronta — não enviar ainda) | Sócio | ⏳ prévia: fat **R$ 14.525** · n **682** · CTO **R$ 1.500** |
-| **P1** | 3 | Tablet smoke D4 (Turno/timer/idle) `?force=1.9.149` | Ops | ⏳ |
+| **P0** | 1 | **Enviar** PDF Golden set/2026 ao shopping | **Sócio** | ✅ artefato pronto · fat **R$ 14.577** · n **684** · CTO **R$ 1.500** · `entregas/...fechamento-2026-10-01.pdf` |
+| **P0** | 2 | Imprimir cartaz QR La Ville (`?loja=laville`) + fixar na mesa | Ops | ⏳ FE **v1.9.150** |
+| **P1** | 3 | Tablet smoke D4 `?force=1.9.150` | Ops | ⏳ |
 | **P1** | 4 | Smoke portal+foto La Ville no celular | Ops | ⏳ PC ✅ · falta celular |
 | **P1** | 5 | Assinar FASE 17 (decisão 17.5 F9) | Sócio | ⏳ |
-| **P1** | 5b | Bump **1.9.150** moldura CSS floresta + logo cartaz A5 | Agente | ⏳ I22 Ativa row · polish no push sem bump I3 |
+| **P1** | 5b | Bump **1.9.150** moldura/cartaz floresta print | Agente | ✅ FE **v1.9.150** |
 | **P2** | 6 | Contratar 1ª equipe La Ville (RH `unidade_id=laville`) | Ops/RH | ⏳ escala 14–21:30 / terça OFF |
 | **P2** | 7 | E-mail CTO / frota labels oficiais LV | Sócio | ⏳ |
-| **P3** | 8 | Holding smoke C (Caixa≠0 · Avulso LV) | Ops/PC | ⏳ `resumoDia` 30/09 Golden fat **45** / LV **0** |
+| **P3** | 8 | Holding smoke C (Caixa≠0 · Avulso LV) | Ops/PC | ⏳ FE pronto |
 | **P4** | 9 | F4 WhatsApp/SMS · F9 Supervisor | — | pausado |
 
 **Plano:** `docs/ativos/PLANO_MULTI_UNIDADE_GOLDEN_LAVILLE_2026-09.md`

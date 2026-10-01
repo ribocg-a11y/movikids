@@ -43,12 +43,12 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 | Camada | Versão | URL / evidência |
 |--------|--------|-----------------|
-| **Frontend** | **v1.9.149** | https://ribocg-a11y.github.io/movikids/?force=1.9.149 |
-| **Gestão Pessoas** | **v1.9.149** | `gestao-pessoas.html?force=1.9.149` |
-| **Service Worker** | **1.9.149** | I164 cartaz/track/foto multi-loja |
+| **Frontend** | **v1.9.150** | https://ribocg-a11y.github.io/movikids/?force=1.9.150 |
+| **Gestão Pessoas** | **v1.9.150** | `gestao-pessoas.html?force=1.9.150` |
+| **Service Worker** | **1.9.150** | I164 + polish cartaz floresta print |
 | **Apps Script** | ping **v1.5.221** · repo **v1.5.223** | I159c La Ville no repo; Web pendente Nova versão |
 | **I159c La Ville GAS** | ✅ repo | `OPERACAO_CONFIG_LAVILLE_` · salvar/inicio por `unidadeId` |
-| **I158 Golden** | ✅ FE live | Relatório via kpiMes · set **14332** / CTO **1500** |
+| **I158 Golden** | ✅ FE live | Fechamento set **14577** / n **684** / CTO **1500** · PDF 01/10 |
 | **I155 lookback GAS** | ✅ live | 0 HTML 404 · evidência `EVIDENCIA_ESTABILIDADE_POS_I155_*` |
 | **I154 GAS 404 / fila** | ✅ FE+GAS | **v1.9.113–114** · audit **219** |
 | **I153 histórico** | ✅ | anular Encerrada + trava &lt;90s |
