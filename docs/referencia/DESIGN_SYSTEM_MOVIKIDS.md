@@ -370,7 +370,7 @@ Nível 3 — DETALHE  → plano, histórico, accordion, tabela secundária
 | **Caixa** | `#page-caixa` | hero R$ + accordion |
 | **Dashboard** | `#page-dashboard` | `#mk-command-center`, exec cockpit, charts paleta DNA |
 | **Relatório** | `#page-relatorio` | mensal Golden |
-| **Receita dia a dia** | `#page-receita-diaria` | consulta mensal · `.rd-resumo` / `.rd-lista` · sem download |
+| **Receita dia a dia** | `#page-receita-diaria` | consulta mensal · pills dual · `.rd-resumo` / `.rd-lista` · sem download |
 | **Histórico** | `#page-historico` | analytics |
 | **Operadores** | `#page-operadores` | gestão PIN |
 | **Config SMS** | `#page-config` | templates |

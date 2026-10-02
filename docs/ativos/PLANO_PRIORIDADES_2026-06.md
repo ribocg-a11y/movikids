@@ -1,6 +1,6 @@
 # MOVI KIDS — Plano de prioridades (análise de sistemas)
 
-**Data-base:** 09/06/2026 · **Revisado:** 29/09/2026 (Sprint D · **I158** Golden FE ✅ · FE v1.9.120 · GAS v1.5.221)  
+**Data-base:** 09/06/2026 · **Revisado:** 02/10/2026 (Sprint D · La Ville I159–I165 ✅ · FE v1.9.158 · GAS v1.5.231)  
 **Função:** documento único de **o que fazer agora**, por ordem de prioridade.  
 **Local:** `docs/ativos/` · **Índice:** `../INDICE.md`  
 **Handoff:** `HANDOFF_NOVO_CHAT.md` · **Diagnóstico:** `DIAGNOSTICO_SISTEMA_6_CAMADAS_2026-06.md` · **Complementa:** `ESTADO_ATUAL.md`, `PLANO_CONTINUIDADE_2026-06.md`, `REGRAS_DE_PUBLICACAO_SEGURA.md`.
@@ -33,11 +33,11 @@
 
 **Próximo passo imediato (29/09 — Sprint D):**
 
-1. **Ops/sócio:** gerar/enviar relatório Golden **setembro** no admin FE **v1.9.120** (conferir **14.332**)
+1. **Ops/sócio:** enviar PDF Golden set (**14.577** / CTO **1500**) · checklist inauguração La Ville (HANDOFF)
 2. **Ops/sócio:** D2 assinar FASE 17 · D3 decisão **17.5 F9** · D4 smoke tablet **`?force=1.9.120`**
 3. **Ops:** Ponto RH diário (`FOLHA_PONTO`)
 
-**Fundação:** GAS **v1.5.221** · FE **v1.9.120** · One UI Sprints A–C ✅ · I96–I158 ✅ · homolog tablet base ✅ · **I24 travas** ✅ · **I158 Golden FE** ✅.
+**Fundação:** GAS **v1.5.231** · FE **v1.9.158** · One UI A–C ✅ · I96–I165 ✅ · La Ville código ✅ · **I24** ✅ · **I158** Golden ✅.
 
 Ver **`PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`** · **`HANDOFF_NOVO_CHAT.md`**
 
