@@ -1,10 +1,10 @@
 # PLANO — Multi-unidade MOVI KIDS (Golden × La Ville Mall)
 
-**Status:** 🟢 **I159k** — preços/tipos La Ville oficiais (Brinquedos+Dinos); frota LV* sem badge provisória (FE 1.9.136); GAS Web **v1.5.225**  
-**Atualizado:** 29/09/2026 · FE **v1.9.122** · GAS Web **v1.5.221** · planilha única  
-**Pedido:** 2ª unidade em **La Ville Mall**; hoje só **Golden Shopping Calhau**. Operadoras escolhem onde logar; unidades **não conversam**; **só ADM** vê as duas juntas. Preços, minutos e frota **diferentes** por unidade.  
-**Arquitetura:** ✅ **Opção A** — **1 planilha** + `unidade_id` + CONFIG/CTO por unidade (sócio 29/09).  
-**Sócio entregou (29/09):** tabelas Brinquedos (R$15–65 + R$1,50/min) e Dinos (R$20–90 + R$2/min). **Falta:** quantidade real da frota + CTO/e-mail.
+**Status:** 🟢 **Operacional** — multi-loja em produção (I159–I165) · inauguração física / RH / CTO LV ainda abertos  
+**Atualizado:** 02/10/2026 · FE **v1.9.158** · GAS Web **v1.5.231** · planilha única  
+**Pedido:** 2ª unidade em **La Ville Mall**; Golden permanece. Operadoras escolhem onde logar; unidades **não conversam**; **só ADM** vê as duas juntas. Preços, minutos e frota **diferentes** por unidade.  
+**Arquitetura:** ✅ **Opção A** — **1 planilha** + `unidade_id` + CONFIG por unidade (sócio 29/09).  
+**Sócio entregou (29/09):** tabelas Brinquedos + Dinos + frota FE LV*. **Ainda falta:** CTO/e-mail shopping La Ville · 1ª equipe RH.
 
 ---
 
@@ -311,9 +311,9 @@ Legenda: **Obrigatório** / **Recomendado** / **Shared OK** / **Decisão RH**
 | Dinos | R$ 20/35/50/65/90 · + R$ 2,00/min |
 | Frota FE | **2** Carro · **2** Triciclo · **3** Pelúcia · **2** Driffyt · **2** Dino (LV*) |
 | Formas de pagamento | PIX / Débito / Crédito / Dinheiro |
-| CTO / e-mail shopping | _pendente_ |
+| CTO / e-mail shopping | ⏳ **pendente** (bloqueia PDF mensal LV) |
 
-FE **v1.9.136+**: sem badge “frota provisória”.
+FE **v1.9.136+**: sem badge “frota provisória”. Consulta fatura dia a dia = página **Receita dia a dia** (filtro loja) — FE **1.9.157+**.
 
 ---
 
@@ -338,15 +338,15 @@ Ordem após Opção A + dados La Ville:
 
 | # | Ação | Quem | Status |
 |---|------|------|--------|
-| 0 | Confirmar Opção A/B/C + RH | Sócio | ✅ **A** (1 planilha) 29/09 · RH ainda aberto |
-| 0b | Fundação FE/GAS soft (hub + unidadeId + La Ville gate) | Agente | ✅ **FE v1.9.121** · GAS repo **v1.5.222** (Web ⏳) |
-| 1 | Entregar preços/frota/CTO La Ville | Sócio | ⏳ |
-| 2 | Spec final colunas + aba UNIDADES | Agente | após 1 |
-| 3 | Migrar planilha (backfill `golden`) | Agente OAuth | após 2 |
-| 4 | GAS: filtro LOCACOES + config/CTO por unidade | Agente **§7.3** + Nova versão Web | após 3 |
-| 5 | FE: liberar La Ville + ADM filtro Todas | Agente | após 4 |
-| 6 | Portal / QR branding por unidade | Agente | após 5 |
-| 7 | Guards + testes + homolog 2 tablets | Ops | após 6 |
+| 0 | Confirmar Opção A/B/C + RH | Sócio | ✅ **A** 29/09 · RH decisões §11 ainda abertas |
+| 0b | Fundação FE/GAS soft (hub + unidadeId) | Agente | ✅ FE + GAS Web **v1.5.231** |
+| 1 | Preços/frota La Ville | Sócio+Agente | ✅ preços/frota FE+GAS · ⏳ CTO/e-mail |
+| 2 | Spec colunas + `unidade_id` | Agente | ✅ LOC/CUSTOS/RH/OPS |
+| 3 | Backfill `golden` LOCAÇÕES | Agente OAuth | ✅ **3947** linhas (29/09) |
+| 4 | GAS filtro + config por unidade | Agente + Nova versão Web | ✅ Web **v1.5.231** |
+| 5 | FE liberar LV + ADM filtro Todas | Agente | ✅ Holding/balcão/I161/I165 |
+| 6 | Portal / QR branding por unidade | Agente | ✅ I164 floresta · FE **1.9.158** |
+| 7 | Homolog tablet 2 lojas + inauguração | Ops | ⏳ QR mesa · D4 · celular · equipe |
 
 ---
 
@@ -379,11 +379,11 @@ Ordem após Opção A + dados La Ville:
 ## 11. Perguntas ao sócio (responder antes de codar)
 
 1. ~~Confirma **Opção A** (1 planilha + `unidade_id`)?~~ ✅ **A** (29/09)  
-2. Operadora pode trabalhar nas **duas** lojas no mesmo cadastro?  
-3. Ponto RH / meta: **por loja** ou holding?  
-4. No ADM, default do filtro: **Todas** ou última unidade?  
-5. Tablet La Ville: URL já com `?unidade=laville` travada?  
-6. Quando envia a **tabela de preços/minutos/brinquedos** e o **CTO** La Ville?
+2. Operadora pode trabalhar nas **duas** lojas no mesmo cadastro? ⏳  
+3. Ponto RH / meta: **por loja** ou holding? ⏳  
+4. ~~No ADM, default do filtro: **Todas** ou última unidade?~~ ✅ Holding default **Todas** (I161)  
+5. Tablet La Ville: URL `?unidade=laville` — recomendado travar na mesa ⏳ Ops  
+6. ~~Tabela preços/frota~~ ✅ · **CTO/e-mail La Ville** ⏳  
 
 ---
 
@@ -396,8 +396,9 @@ Ordem após Opção A + dados La Ville:
 - CTO Golden: `docs/referencia/CONTRATO_CTO_REFERENCIA.md`  
 - GAS: `MOVIKIDS_Code_…gs` (`PRECOS`, `VEICULOS_VALIDOS`, `LOC_HEADERS_`, `operacaoConfig_`)  
 - Relatório FE I158: `mk-admin.js` `mkHtmlRelatorioGoldenFromKpi_`  
-- Multi-loja futuro (histórico): `PLANO_FASES_6_15_…` Anexo A  
+- Receita dia a dia: `mk-admin.js` `carregarReceitaDiaria` · `#page-receita-diaria`  
+- Handoff inauguração: `docs/ativos/HANDOFF_NOVO_CHAT.md`  
 
 ---
 
-**Próximo passo deste chat:** sócio envia **tabela La Ville** (§6). Fundação I159 já no FE (**v1.9.121**): hub com Trocar unidade; La Ville visível mas bloqueada; APIs mandam `unidadeId=golden` sem filtrar dados. GAS repo **v1.5.222** (helpers soft) — **Nova versão Web** quando for isolar dados.
+**Próximo passo:** Ops — checklist inauguração no HANDOFF (QR · tablet D4 · celular). Sócio — CTO/e-mail LV + 1ª equipe. Agente — sem AppScript até pedido §7.3; PDF mensal LV só após CTO.

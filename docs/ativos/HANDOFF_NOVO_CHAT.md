@@ -1,13 +1,13 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 02/10/2026 · FE **v1.9.155** · GAS **v1.5.231** · receita dia a dia (consulta) · **I165** · Golden fechamento ✅ · I164d · I161 ✅
+**Atualizado:** 02/10/2026 · FE **v1.9.158** · GAS **v1.5.231** · La Ville continuidade · receita dia a dia · **I165** · Golden fechamento ✅ · I164d · I161 ✅
 
 ## Produção (agora)
 
 | Camada | Versão | Link |
 |--------|--------|------|
-| Frontend | **v1.9.155** | https://ribocg-a11y.github.io/movikids/?force=1.9.155 |
-| Gestão Pessoas | **v1.9.155** | `gestao-pessoas.html?force=1.9.155` |
+| Frontend | **v1.9.158** | https://ribocg-a11y.github.io/movikids/?force=1.9.158 |
+| Gestão Pessoas | **v1.9.158** | `gestao-pessoas.html?force=1.9.158` |
 | GAS | ping Web **v1.5.231** ✅ | I160 escala null + I159t LV |
 | Design System | v1.1 | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
 
@@ -126,11 +126,25 @@ Diagnóstico 29/09: `diagnosticoPlanilhaCompletoAdmin` → LOCACOES/CUSTOS/CONFI
 | **Avulso** | ✅ | Tipos/preços por loja |
 | Colaboradores | ✅ | `?unidade=` + subtítulo |
 | Menu | ✅ 1.9.134+ | Sem SMS/Sistema · Sair fixo |
-| Relatório mensal Golden | ✅ I158 | `kpiMes` FE |
+| Relatório mensal Golden | ✅ I158 | `kpiMes` FE · menu oculto no filtro La Ville |
+| **Receita dia a dia** | ✅ FE **1.9.157+** | Consulta por mês · filtro loja · cache local · sem PDF |
 
 ---
 
+## Checklist inauguração La Ville (Ops)
 
+Ordem curta — tablet + mesa:
+
+1. Imprimir cartaz: `assets/qr-balcao-imprimir.html?loja=laville` → fixar na mesa.
+2. Tablet La Ville: `?unidade=laville&force=1.9.158` → login (quando houver operador `laville`) ou admin Abrir balcão LV.
+3. Smoke D4: Nova loc → ▶ → estender → encerrar (1 loc teste).
+4. Conferir chip **Caixa hoje** no balcão LV = locações LV (não número Golden) — **I165**.
+5. Celular: `acompanhar.html` + `foto-moldura.html?unidade=laville` (chip/rodapé La Ville).
+6. Holding: pill La Ville → Caixa/Receita dia a dia isolados; pill Golden sem vazamento.
+
+**Ainda humano / sócio:** enviar PDF Golden set · CTO/e-mail LV · 1ª equipe RH `unidade_id=laville` · assinar FASE 17.
+
+---
 
 ## I158 — Relatório Golden (fechado nesta sessão)
 
@@ -206,7 +220,7 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 
 ## Mensagem para colar no novo chat (PC)
 
-> *Continuar MOVI KIDS **no PC** — pasta C (`movikids-github`). Ler `HANDOFF_NOVO_CHAT.md`. FE **v1.9.151** Pages · GAS ping **v1.5.231**. Golden set fechamento ✅ R$ 14.577 / CTO R$ 1.500. I164 floresta multi-loja ✅. Próximo: enviar PDF Golden · imprimir QR La Ville · tablet D4 · assinar FASE 17 (só 17.5 F9). **This PC.***
+> *Continuar MOVI KIDS **no PC** — pasta C (`movikids-github`). Ler `HANDOFF_NOVO_CHAT.md`. FE **v1.9.158** Pages · GAS ping **v1.5.231**. Golden set ✅ R$ 14.577 / CTO R$ 1.500. La Ville multi-loja ✅ (I159–I165). Próximo Ops: QR mesa LV · tablet D4 · 1ª equipe · CTO LV. **This PC.***
 
 **Mínima:**
 
@@ -218,15 +232,15 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 
 | Peso | # | Ação | Quem | Status |
 |------|---|------|------|--------|
-| **P0** | 1 | **Enviar** PDF Golden set/2026 ao shopping | **Sócio** | ✅ artefato pronto · fat **R$ 14.577** · n **684** · CTO **R$ 1.500** · `entregas/...fechamento-2026-10-01.pdf` |
-| **P0** | 2 | Imprimir cartaz QR La Ville (`?loja=laville`) + fixar na mesa | Ops | ⏳ FE **v1.9.151** |
-| **P1** | 3 | Tablet smoke D4 `?force=1.9.151` | Ops | ⏳ |
+| **P0** | 1 | **Enviar** PDF Golden set/2026 ao shopping | **Sócio** | ✅ artefato pronto · fat **R$ 14.577** · n **684** · CTO **R$ 1.500** |
+| **P0** | 2 | Imprimir cartaz QR La Ville + fixar na mesa | Ops | ⏳ `?loja=laville` · FE **1.9.158** |
+| **P1** | 3 | Tablet smoke D4 La Ville | Ops | ⏳ `?unidade=laville&force=1.9.158` |
 | **P1** | 4 | Smoke portal+foto La Ville no celular | Ops | ⏳ PC ✅ · falta celular |
 | **P1** | 5 | Assinar FASE 17 (decisão 17.5 F9) | Sócio | ⏳ |
-| **P1** | 5b | Bump moldura/cartaz/track floresta | Agente | ✅ FE **v1.9.151** (I164–I164d) |
-| **P2** | 6 | Contratar 1ª equipe La Ville (RH `unidade_id=laville`) | Ops/RH | ⏳ escala 14–21:30 / terça OFF |
-| **P2** | 7 | E-mail CTO / frota labels oficiais LV | Sócio | ⏳ |
-| **P3** | 8 | Holding smoke C (Caixa≠0 · Avulso LV) | Agente | ✅ 01/10 · Golden fat **R$ 87** · LV **0** · `TESTE_HOLDING_SMOKE_C_READONLY` |
+| **P1** | 5b | FE multi-loja + receita dia a dia + I165 | Agente | ✅ FE **1.9.158** |
+| **P2** | 6 | Contratar 1ª equipe La Ville (`unidade_id=laville`) | Ops/RH | ⏳ escala 14–21:30 / terça OFF |
+| **P2** | 7 | CTO + e-mail shopping La Ville | Sócio | ⏳ (PDF LV só depois disto) |
+| **P3** | 8 | Holding smoke C | Agente | ✅ 01/10 |
 | **P4** | 9 | F4 WhatsApp/SMS · F9 Supervisor | — | pausado |
 
 **Plano:** `docs/ativos/PLANO_MULTI_UNIDADE_GOLDEN_LAVILLE_2026-09.md`

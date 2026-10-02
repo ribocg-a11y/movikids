@@ -4534,6 +4534,10 @@ function initReceitaDiariaSel() {
     mesEl.addEventListener('change', auto);
     anoEl.addEventListener('change', auto);
   }
+  const pillsHost = document.getElementById('rd-dual-pills');
+  if (pillsHost && typeof mkDualMountPills_ === 'function') {
+    mkDualMountPills_(pillsHost, 'mkReceitaDiariaOnFiltro_');
+  }
   const lista = document.getElementById('rd-lista');
   const resumo = document.getElementById('rd-resumo');
   const mes = parseInt(mesEl.value, 10);
@@ -4549,6 +4553,15 @@ function initReceitaDiariaSel() {
       + '<p style="color:var(--txt3);font-size:13px;margin-top:6px">1ª carga deste mês pode levar ~20–60s. Depois fica na hora.</p></div>';
   }
 }
+
+function mkReceitaDiariaOnFiltro_(id) {
+  if (typeof mkDualAfterFiltroChange_ === 'function') mkDualAfterFiltroChange_(id);
+  else if (typeof mkDualSetFiltro_ === 'function') mkDualSetFiltro_(id);
+  const lista = document.getElementById('rd-lista');
+  if (lista) lista.dataset.hasData = '';
+  carregarReceitaDiaria({ forceNet: false });
+}
+window.mkReceitaDiariaOnFiltro_ = mkReceitaDiariaOnFiltro_;
 
 function mkReceitaDiariaUnidadeLabel_() {
   try {
@@ -5249,10 +5262,12 @@ function atualizarHubAdmin_() {
   const d = kpiData;
   const dia = document.getElementById('hub-dia-sub');
   const mes = document.getElementById('hub-mes-sub');
+  const filtroHub = typeof mkDualFiltro_ === 'function' ? mkDualFiltro_() : 'all';
+  const lojaLbl = filtroHub === 'laville' ? 'La Ville' : (filtroHub === 'golden' ? 'Golden' : 'holding');
   if (d && d.ok) {
     const nSessHoje = nSessoesHojeCanonica_();
-    if (dia) dia.textContent = nSessHoje + (nSessHoje === 1 ? ' locação hoje' : ' locações hoje') + ' · conferência no caixa';
-    if (mes) mes.textContent = 'KPIs do mês, CTO e gestão avançada';
+    if (dia) dia.textContent = nSessHoje + (nSessHoje === 1 ? ' locação hoje' : ' locações hoje') + ' · ' + lojaLbl;
+    if (mes) mes.textContent = 'KPIs, CTO e receita dia a dia · ' + lojaLbl;
   }
   const gasOnline = typeof _syncFailCount !== 'undefined' && _syncFailCount === 0;
   const chip = document.getElementById('hub-status-txt');
