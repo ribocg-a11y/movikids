@@ -265,6 +265,10 @@ function irAdmin(page) {
     initRelMesSel();
     carregarHistRelatorios();
   }
+  if (page === 'receita-diaria') {
+    initReceitaDiariaSel();
+    carregarReceitaDiaria();
+  }
   if (page === 'config') { irParaConfig(); }
   if (page === 'caixa') inicializarCaixa();
   if (page === 'operadores') {
@@ -4437,6 +4441,107 @@ function enviarFechamentoEmail() {
   const subject = encodeURIComponent('Fechamento Movi Kids — ' + d.dataFmt);
   const body = encodeURIComponent(txt);
   window.location.href = 'mailto:?subject=' + subject + '&body=' + body;
+}
+
+// ── RECEITA DIA A DIA (consulta) ─────────────────────────────
+function initReceitaDiariaSel() {
+  const hoje = new Date();
+  const mesEl = document.getElementById('rd-mes');
+  const anoEl = document.getElementById('rd-ano');
+  if (!mesEl || !anoEl) return;
+  if (!mesEl.dataset.init) {
+    mesEl.value = String(hoje.getMonth() + 1);
+    mesEl.dataset.init = '1';
+  }
+  if (!anoEl.options.length) {
+    for (let a = hoje.getFullYear(); a >= 2026; a--) {
+      anoEl.add(new Option(a, a, a === hoje.getFullYear(), a === hoje.getFullYear()));
+    }
+  }
+}
+
+function mkReceitaDiariaUnidadeLabel_() {
+  try {
+    if (typeof mkUnidadeFiltroAdm_ === 'function') {
+      const f = mkUnidadeFiltroAdm_();
+      if (f === 'golden') return 'Golden';
+      if (f === 'laville') return 'La Ville';
+    }
+  } catch (e) { /* ignore */ }
+  return 'Todas as lojas';
+}
+
+async function carregarReceitaDiaria() {
+  const mesEl = document.getElementById('rd-mes');
+  const anoEl = document.getElementById('rd-ano');
+  const lista = document.getElementById('rd-lista');
+  const resumo = document.getElementById('rd-resumo');
+  const btn = document.getElementById('rd-btn-ver');
+  if (!mesEl || !anoEl || !lista) return;
+  const mes = parseInt(mesEl.value, 10) || (new Date().getMonth() + 1);
+  const ano = parseInt(anoEl.value, 10) || new Date().getFullYear();
+  lista.innerHTML = '<div style="text-align:center;padding:36px 12px;color:var(--txt3);font-size:13px;font-weight:700">⏳ Carregando receita do mês…</div>';
+  if (resumo) resumo.hidden = true;
+  if (btn) btn.disabled = true;
+  try {
+    const authP = typeof apiParamsComAuth_ === 'function' ? apiParamsComAuth_() : {};
+    const d = await api(Object.assign({ action: 'kpiMes', mes: mes, ano: ano, lite: '1' }, authP), 90000);
+    if (!d || !d.ok) {
+      lista.innerHTML = '<div class="empty"><div class="empty-icon">⚠️</div><h3>Não foi possível carregar</h3><p style="color:var(--txt3);font-size:13px">' +
+        (typeof escHtml === 'function' ? escHtml((d && d.erro) || 'Erro') : String((d && d.erro) || 'Erro')) + '</p></div>';
+      return;
+    }
+    renderReceitaDiaria_(mes, ano, d);
+  } catch (e) {
+    lista.innerHTML = '<div class="empty"><div class="empty-icon">⚠️</div><h3>Erro de conexão</h3><p style="color:var(--txt3);font-size:13px">' +
+      (typeof escHtml === 'function' ? escHtml((e && e.message) || e) : String(e)) + '</p></div>';
+  } finally {
+    if (btn) btn.disabled = false;
+  }
+}
+
+function renderReceitaDiaria_(mes, ano, d) {
+  const lista = document.getElementById('rd-lista');
+  const resumo = document.getElementById('rd-resumo');
+  const lbl = document.getElementById('rd-resumo-lbl');
+  const val = document.getElementById('rd-resumo-val');
+  const meta = document.getElementById('rd-resumo-meta');
+  if (!lista) return;
+  const fatDia = d.fatPorDia || [];
+  const locDia = d.locPorDia || [];
+  const nMap = {};
+  locDia.forEach(function (x) { nMap[x.dia] = Number(x.n) || 0; });
+  const fatMap = {};
+  fatDia.forEach(function (x) { fatMap[x.dia] = Number(x.valor) || 0; });
+  const diasMes = fatDia.length || new Date(ano, mes, 0).getDate();
+  const hoje = new Date();
+  const isCorrente = mes === (hoje.getMonth() + 1) && ano === hoje.getFullYear();
+  const nomeMes = (MESES_DB && MESES_DB[mes - 1]) || String(mes);
+  const loja = mkReceitaDiariaUnidadeLabel_();
+  const fatMes = Math.round((Number(d.fatMes) || 0) * 100) / 100;
+  const nMes = Number(d.nMes) || 0;
+  const diasCom = fatDia.filter(function (x) { return (Number(x.valor) || 0) > 0; }).length;
+  if (resumo) resumo.hidden = false;
+  if (lbl) lbl.textContent = nomeMes + ' / ' + ano + ' · ' + loja;
+  if (val) val.textContent = typeof mkRelFmtBr_ === 'function' ? mkRelFmtBr_(fatMes) : ('R$ ' + fatMes.toFixed(2).replace('.', ','));
+  if (meta) meta.textContent = nMes + ' locação' + (nMes === 1 ? '' : 'ões') + ' · ' + diasCom + ' dia' + (diasCom === 1 ? '' : 's') + ' com receita';
+
+  const SEM = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+  let html = '';
+  for (let dia = 1; dia <= diasMes; dia++) {
+    const v = Math.round((fatMap[dia] || 0) * 100) / 100;
+    const n = nMap[dia] || 0;
+    const wd = new Date(ano, mes - 1, dia).getDay();
+    const isHoje = isCorrente && dia === hoje.getDate();
+    const isZero = v <= 0;
+    const cls = 'rd-row' + (isZero ? ' is-zero' : '') + (isHoje ? ' is-hoje' : '');
+    const money = typeof mkRelFmtBr_ === 'function' ? mkRelFmtBr_(v) : ('R$ ' + v.toFixed(2).replace('.', ','));
+    const sub = SEM[wd] + (isHoje ? ' · hoje' : '') + (n > 0 ? (' · ' + n + ' loc') : '');
+    html += '<div class="' + cls + '" role="listitem">'
+      + '<div class="rd-row-left"><span class="rd-row-dia">Dia ' + dia + '</span><span class="rd-row-sub">' + sub + '</span></div>'
+      + '<span class="rd-row-val">' + money + '</span></div>';
+  }
+  lista.innerHTML = html || '<div class="empty"><div class="empty-icon">📅</div><h3>Sem dados neste mês</h3></div>';
 }
 
 // ── RELATÓRIO ────────────────────────────────────────────────

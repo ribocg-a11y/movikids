@@ -1896,6 +1896,93 @@
 }
 
 .mk-admin-page-head { margin-bottom: 12px; }
+/* Receita dia a dia — consulta admin */
+.rd-resumo {
+  margin-bottom: 14px;
+}
+.rd-resumo-hero {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 18px 20px;
+  border-radius: 18px;
+  background: linear-gradient(145deg, rgba(21, 101, 192, 0.12) 0%, rgba(255, 213, 79, 0.18) 100%);
+  border: 1px solid rgba(21, 101, 192, 0.18);
+  box-shadow: 0 8px 24px rgba(6, 13, 31, 0.08);
+}
+.rd-resumo-lbl {
+  font-family: 'Nunito', sans-serif;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--mk-muted, #5c6b7a);
+}
+.rd-resumo-val {
+  font-family: 'Fredoka One', cursive;
+  font-size: clamp(28px, 6vw, 36px);
+  line-height: 1.1;
+  color: #0d2a5c;
+  font-weight: 400;
+}
+.rd-resumo-meta {
+  font-family: 'Nunito', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--txt2, #445);
+}
+.rd-lista {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+.rd-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px 12px;
+  align-items: center;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: var(--card, #fff);
+  border: 1px solid var(--border, rgba(0, 0, 0, 0.08));
+  box-shadow: 0 2px 10px rgba(6, 13, 31, 0.05);
+}
+.rd-row.is-zero {
+  opacity: 0.55;
+  box-shadow: none;
+}
+.rd-row.is-hoje {
+  border-color: rgba(21, 101, 192, 0.45);
+  box-shadow: 0 0 0 2px rgba(21, 101, 192, 0.12);
+}
+.rd-row-left {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.rd-row-dia {
+  font-family: 'Nunito', sans-serif;
+  font-size: 15px;
+  font-weight: 900;
+  color: var(--txt, #122);
+}
+.rd-row-sub {
+  font-family: 'Nunito', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--txt3, #778);
+}
+.rd-row-val {
+  font-family: 'Nunito', sans-serif;
+  font-size: 16px;
+  font-weight: 900;
+  color: #0d3b2e;
+  white-space: nowrap;
+}
+.rd-row.is-zero .rd-row-val {
+  color: var(--txt3, #889);
+}
 .mk-admin-page-lead {
   margin: -6px 0 0;
   font-size: 13px;

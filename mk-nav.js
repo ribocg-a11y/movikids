@@ -53,7 +53,7 @@ function sbSairSessaoClick_() {
 function mkPaginaGestaoPermitida_(name) {
   if (isAdmin || (typeof mkAuthIsAdmin === 'function' && mkAuthIsAdmin())) return true;
   if (typeof mkAuthIsGestor === 'function' && mkAuthIsGestor()) {
-    return ['admin', 'dashboard', 'relatorio', 'historico', 'custos-historico', 'caixa', 'operadores'].indexOf(name) >= 0;
+    return ['admin', 'dashboard', 'relatorio', 'receita-diaria', 'historico', 'custos-historico', 'caixa', 'operadores'].indexOf(name) >= 0;
   }
   if (typeof mkAuthIsSupervisor === 'function' && mkAuthIsSupervisor()) {
     return ['caixa', 'historico'].indexOf(name) >= 0;
@@ -63,7 +63,7 @@ function mkPaginaGestaoPermitida_(name) {
 
 function showPage(name, opts = {}) {
   if (window.innerWidth < 1024) mobMenuClose_();
-  const adminPages = ['admin','sistema','operadores','dashboard','relatorio','historico','custos-historico','caixa','config','holding'];
+  const adminPages = ['admin','sistema','operadores','dashboard','relatorio','receita-diaria','historico','custos-historico','caixa','config','holding'];
   if (adminPages.includes(name) && name !== 'holding' && !mkPaginaGestaoPermitida_(name)) { abrirAdmin(); return; }
   /* ADM: Home = visão holding (duas lojas). Balcão unitário só com adminBalcao. */
   const isAdm = !!(window.isAdmin || (typeof mkAuthIsAdmin === 'function' && mkAuthIsAdmin()));
@@ -83,7 +83,7 @@ function showPage(name, opts = {}) {
     name = 'holding';
   }
   /* I161 — no balcão ADM, páginas holding-only voltam para Lojas (exceto caixa/hist opcionais: bloqueia dash/rel/ops) */
-  const holdingOnly = ['dashboard', 'relatorio', 'operadores', 'admin', 'sistema', 'config'];
+  const holdingOnly = ['dashboard', 'relatorio', 'receita-diaria', 'operadores', 'admin', 'sistema', 'config'];
   if (isAdm && modo === 'balcao' && holdingOnly.indexOf(name) >= 0 && !opts.forceHolding) {
     if (typeof toast === 'function') toast('Volte a Lojas (Holding) para ver análise consolidada', 'info');
     if (typeof mkAppVoltarHolding_ === 'function') mkAppVoltarHolding_();
@@ -162,7 +162,7 @@ function syncSidebar(page) {
   document.querySelectorAll('.sb-btn').forEach(b => b.classList.remove('active'));
   const map = {
     'home':'sbn-home','holding':'sbn-home','nova':'sbn-nova','relacionamento':'sbn-relacionamento','custos':'sbn-custos','painel':'sbn-painel','lancamento':'sbn-avulso',
-    'admin':'sbn-adm','sistema':'sbn-sys','operadores':'sbn-ops','dashboard':'sbn-dash','relatorio':'sbn-rel','historico':'sbn-hist','custos-historico':'sbn-custos-hist','caixa':'sbn-caixa','config':'sbn-cfg'
+    'admin':'sbn-adm','sistema':'sbn-sys','operadores':'sbn-ops','dashboard':'sbn-dash','relatorio':'sbn-rel','receita-diaria':'sbn-rec-dia','historico':'sbn-hist','custos-historico':'sbn-custos-hist','caixa':'sbn-caixa','config':'sbn-cfg'
   };
   if (map[page]) { const el=document.getElementById(map[page]); if(el) el.classList.add('active'); }
   /* ADM: um só "Lojas" (sbn-home → holding). sbn-holding sempre oculto. */
@@ -216,7 +216,7 @@ function mkApplyModoNav_() {
   const modo = (typeof mkAppModo_ === 'function') ? mkAppModo_() : 'holding';
   const filtro = (typeof mkUnidadeFiltroAdm_ === 'function') ? mkUnidadeFiltroAdm_() : 'all';
   const opsIds = ['sbn-nova', 'sbn-relacionamento', 'sbn-painel', 'sbn-custos', 'sbn-avulso'];
-  const holdIds = ['sbn-adm', 'sbn-caixa', 'sbn-dash', 'sbn-hist', 'sbn-custos-hist', 'sbn-rel', 'sbn-ops'];
+  const holdIds = ['sbn-adm', 'sbn-caixa', 'sbn-dash', 'sbn-hist', 'sbn-custos-hist', 'sbn-rel', 'sbn-rec-dia', 'sbn-ops'];
   const setVis = function (id, on) {
     const el = document.getElementById(id);
     if (!el) return;
@@ -251,6 +251,7 @@ function mkApplyModoNav_() {
     setVis('sbn-hist', true);
     setVis('sbn-custos-hist', false);
     setVis('sbn-rel', false);
+    setVis('sbn-rec-dia', false);
     setVis('sbn-ops', false);
     setVis('sbn-adm', false);
     setVis('sbn-dash', false);
@@ -302,7 +303,7 @@ function hideAdminSidebar() {
   if (btn) btn.style.display = '';
   sbSetAdminNavOpen_(false, false);
   if (typeof mkAdminMobCmdOnSidebarHide_ === 'function') mkAdminMobCmdOnSidebarHide_();
-  ['sbn-adm','sbn-dash','sbn-rel','sbn-ops','sbn-cfg','sbn-sys','sbn-caixa','sbn-hist'].forEach(id => {
+  ['sbn-adm','sbn-dash','sbn-rel','sbn-rec-dia','sbn-ops','sbn-cfg','sbn-sys','sbn-caixa','sbn-hist'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.style.display = '';
   });
@@ -314,7 +315,7 @@ function showSupervisorSidebar() {
   if (sec) sec.classList.add('visible');
   if (btn) btn.style.display = 'none';
   sbSetAdminNavOpen_(true, false);
-  const hideIds = ['sbn-adm','sbn-dash','sbn-rel','sbn-ops','sbn-cfg','sbn-sys'];
+  const hideIds = ['sbn-adm','sbn-dash','sbn-rel','sbn-rec-dia','sbn-ops','sbn-cfg','sbn-sys'];
   hideIds.forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
   ['sbn-caixa','sbn-hist'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = ''; });
 }
@@ -327,7 +328,7 @@ function showGestorSidebar() {
   sbSetAdminNavOpen_(true, false);
   const hideIds = ['sbn-cfg', 'sbn-sys'];
   hideIds.forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
-  ['sbn-adm', 'sbn-dash', 'sbn-rel', 'sbn-ops', 'sbn-caixa', 'sbn-hist'].forEach(id => {
+  ['sbn-adm', 'sbn-dash', 'sbn-rel', 'sbn-rec-dia', 'sbn-ops', 'sbn-caixa', 'sbn-hist'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.style.display = '';
   });

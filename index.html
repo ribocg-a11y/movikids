@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Movi Kids">
 <title>Movi Kids</title>
-<script src="mk-canonical-host.js?v=1.9.154"></script>
+<script src="mk-canonical-host.js?v=1.9.155"></script>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png">
@@ -17,17 +17,17 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<script src="mk-stale-sync.js?v=1.9.154"></script>
-<script src="mk-version.js?v=1.9.154"></script>
-<script src="mk-api.js?v=1.9.154"></script>
-<link rel="stylesheet" href="mk-design.css?v=1.9.154">
+<script src="mk-stale-sync.js?v=1.9.155"></script>
+<script src="mk-version.js?v=1.9.155"></script>
+<script src="mk-api.js?v=1.9.155"></script>
+<link rel="stylesheet" href="mk-design.css?v=1.9.155">
 
-<script src="mk-cache-bust.js?v=1.9.154"></script>
+<script src="mk-cache-bust.js?v=1.9.155"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<link rel="stylesheet" href="mk-app.css?v=1.9.154">
-<link rel="stylesheet" href="mk-gestao-pessoas.css?v=1.9.154">
+<link rel="stylesheet" href="mk-app.css?v=1.9.155">
+<link rel="stylesheet" href="mk-gestao-pessoas.css?v=1.9.155">
 <!-- Firebase SDK — Realtime sync canonico para todos os dispositivos -->
-<script type="module" src="mk-firebase.js?v=1.9.154"></script>
+<script type="module" src="mk-firebase.js?v=1.9.155"></script>
 </head>
 
 <body>
@@ -247,6 +247,7 @@
         <button class="sb-btn" id="sbn-hist" onclick="irAdmin('historico')"><span class="sb-icon">🗂️</span>Hist. locações</button>
         <button class="sb-btn" id="sbn-custos-hist" onclick="irAdmin('custos-historico')"><span class="sb-icon">📂</span>Hist. custos</button>
         <button class="sb-btn" id="sbn-rel" onclick="irAdmin('relatorio')"><span class="sb-icon">📋</span>Relatório mensal</button>
+        <button class="sb-btn" id="sbn-rec-dia" onclick="irAdmin('receita-diaria')"><span class="sb-icon">📅</span>Receita dia a dia</button>
         <div class="sb-group-lbl">Pessoas</div>
         <button class="sb-btn" id="sbn-ops" onclick="irAdmin('operadores')"><span class="sb-icon">👤</span>Operadores</button>
         <!-- SMS / Sistema: fora do menu (QR-only) -->
@@ -753,6 +754,11 @@
           <div class="admin-action-card" onclick="irAdmin('relatorio')">
             <div class="aac-icon">📋</div>
             <div class="aac-body"><div class="aac-title">Relatório PDF</div><div class="aac-sub">Mensal no Drive</div></div>
+            <div class="aac-arrow">›</div>
+          </div>
+          <div class="admin-action-card" onclick="irAdmin('receita-diaria')">
+            <div class="aac-icon">📅</div>
+            <div class="aac-body"><div class="aac-title">Receita dia a dia</div><div class="aac-sub">Consulta por mês — sem baixar</div></div>
             <div class="aac-arrow">›</div>
           </div>
         </div>
@@ -1964,6 +1970,40 @@
     </div>
   </div>
 
+  <!-- ──────── PAGE: RECEITA DIA A DIA (consulta) ──────── -->
+  <div id="page-receita-diaria" class="page mk-admin-page">
+    <div class="dash-back" onclick="irAdmin('admin')">← Voltar</div>
+    <div class="mk-admin-page-head">
+      <div class="sec-title">Receita dia a dia</div>
+      <p class="mk-admin-page-lead">Consulta o total faturado em cada dia do mês. Só leitura — sem baixar nem salvar. Canceladas não entram.</p>
+    </div>
+
+    <div class="rel-mes-sel">
+      <select id="rd-mes" aria-label="Mês">
+        <option value="1">Janeiro</option><option value="2">Fevereiro</option>
+        <option value="3">Março</option><option value="4">Abril</option>
+        <option value="5">Maio</option><option value="6">Junho</option>
+        <option value="7">Julho</option><option value="8">Agosto</option>
+        <option value="9">Setembro</option><option value="10">Outubro</option>
+        <option value="11">Novembro</option><option value="12">Dezembro</option>
+      </select>
+      <select id="rd-ano" aria-label="Ano"></select>
+      <button type="button" class="btn btn-primary" id="rd-btn-ver" onclick="carregarReceitaDiaria()" style="padding:10px 16px;font-size:13px;font-weight:800;white-space:nowrap">Ver</button>
+    </div>
+
+    <div id="rd-resumo" class="rd-resumo" hidden>
+      <div class="rd-resumo-hero">
+        <span class="rd-resumo-lbl" id="rd-resumo-lbl">Total do mês</span>
+        <strong class="rd-resumo-val" id="rd-resumo-val">R$ 0,00</strong>
+        <span class="rd-resumo-meta" id="rd-resumo-meta">—</span>
+      </div>
+    </div>
+
+    <div id="rd-lista" class="rd-lista" role="list" aria-live="polite">
+      <div class="empty"><div class="empty-icon">📅</div><h3>Selecione o mês e toque em Ver</h3></div>
+    </div>
+  </div>
+
   <!-- ──────── PAGE: CONFIGURAÇÕES (Fase 6) ──────── -->
   <div id="page-config" class="page mk-admin-page">
     <div class="dash-back" onclick="irAdmin('admin')">← Voltar</div>
@@ -2576,34 +2616,34 @@
   </div>
 </div>
 
-<script src="mk-globals.js?v=1.9.154"></script>
-<script src="mk-unidades.js?v=1.9.154"></script>
-<script src="mk-core.js?v=1.9.154"></script>
-<script src="mk-nav.js?v=1.9.154"></script>
-<script src="mk-admin.js?v=1.9.154"></script>
-<script src="mk-historico.js?v=1.9.154"></script>
-<script src="mk-custos-historico.js?v=1.9.154"></script>
-<script src="mk-sessao.js?v=1.9.154"></script>
-<script src="mk-home.js?v=1.9.154"></script>
-<script src="mk-holding.js?v=1.9.154"></script>
-<script src="mk-dual-ui.js?v=1.9.154"></script>
-<script src="mk-meta-operador.js?v=1.9.154"></script>
-<script src="mk-custos.js?v=1.9.154"></script>
-<script src="mk-avulso.js?v=1.9.154"></script>
-<script src="mk-sync.js?v=1.9.154"></script>
-<script src="mk-idb-store.js?v=1.9.154"></script>
-<script src="mk-offline-queue.js?v=1.9.154"></script>
-<script src="mk-local-snapshot.js?v=1.9.154"></script>
-<script src="mk-nova.js?v=1.9.154"></script>
-<script src="mk-relacionamento.js?v=1.9.154"></script>
-<script src="mk-operacao.js?v=1.9.154"></script>
-<script src="mk-drawer.js?v=1.9.154"></script>
-<script src="mk-enc-extra.js?v=1.9.154"></script>
-<script src="mk-update.js?v=1.9.154"></script>
-<script src="mk-gestao-pessoas.js?v=1.9.154"></script>
-<script src="mk-holerite.js?v=1.9.154"></script>
-<script src="mk-gestao-pessoas-admin.js?v=1.9.154"></script>
-<script src="mk-auth.js?v=1.9.154"></script>
-<script src="mk-boot.js?v=1.9.154"></script>
+<script src="mk-globals.js?v=1.9.155"></script>
+<script src="mk-unidades.js?v=1.9.155"></script>
+<script src="mk-core.js?v=1.9.155"></script>
+<script src="mk-nav.js?v=1.9.155"></script>
+<script src="mk-admin.js?v=1.9.155"></script>
+<script src="mk-historico.js?v=1.9.155"></script>
+<script src="mk-custos-historico.js?v=1.9.155"></script>
+<script src="mk-sessao.js?v=1.9.155"></script>
+<script src="mk-home.js?v=1.9.155"></script>
+<script src="mk-holding.js?v=1.9.155"></script>
+<script src="mk-dual-ui.js?v=1.9.155"></script>
+<script src="mk-meta-operador.js?v=1.9.155"></script>
+<script src="mk-custos.js?v=1.9.155"></script>
+<script src="mk-avulso.js?v=1.9.155"></script>
+<script src="mk-sync.js?v=1.9.155"></script>
+<script src="mk-idb-store.js?v=1.9.155"></script>
+<script src="mk-offline-queue.js?v=1.9.155"></script>
+<script src="mk-local-snapshot.js?v=1.9.155"></script>
+<script src="mk-nova.js?v=1.9.155"></script>
+<script src="mk-relacionamento.js?v=1.9.155"></script>
+<script src="mk-operacao.js?v=1.9.155"></script>
+<script src="mk-drawer.js?v=1.9.155"></script>
+<script src="mk-enc-extra.js?v=1.9.155"></script>
+<script src="mk-update.js?v=1.9.155"></script>
+<script src="mk-gestao-pessoas.js?v=1.9.155"></script>
+<script src="mk-holerite.js?v=1.9.155"></script>
+<script src="mk-gestao-pessoas-admin.js?v=1.9.155"></script>
+<script src="mk-auth.js?v=1.9.155"></script>
+<script src="mk-boot.js?v=1.9.155"></script>
 </body>
 </html>
