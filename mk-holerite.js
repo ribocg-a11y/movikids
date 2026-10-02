@@ -678,37 +678,118 @@
   }
 
   /**
-   * I142b — imprimir em janela isolada (evita página em branco:
-   * visibility:hidden em ancestrais do SPA não deixa o holerite aparecer).
+   * I167 — PDF holerite via Blob URL (não about:blank).
+   * I142b: janela isolada (visibility:hidden no SPA quebrava print).
+   * Chrome + noopener bloqueia document.write → página branca; CSS #gp-app
+   * também não aplica na janela nova — CSS de print embutido abaixo.
    */
+  function mkHolPrintCssInline_() {
+    return [
+      'body{margin:12px;background:#fff;color:#0f172a;font-family:Nunito,Segoe UI,sans-serif}',
+      '.mk-hol{background:#fff;border:1px solid #CBD5E1;border-radius:12px;overflow:hidden;font-size:12px}',
+      '.mk-hol-head{background:linear-gradient(135deg,#0B3D91 0%,#1E6FD9 100%);color:#fff;padding:14px 16px}',
+      '.mk-hol-brand{font-family:"Fredoka One",cursive,sans-serif;font-size:18px}',
+      '.mk-hol-sub{font-size:10px;font-weight:700;opacity:.92;margin-top:4px;line-height:1.45}',
+      '.mk-hol-meta{display:grid;grid-template-columns:1fr 1fr;gap:8px 16px;padding:12px 16px;background:#F8FAFC;border-bottom:1px solid #E2E8F0}',
+      '.mk-hol-meta div{font-weight:700;line-height:1.4}',
+      '.mk-hol-meta span{display:block;font-size:9px;font-weight:800;color:#64748B;text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px}',
+      '.mk-hol-comp{padding:10px 16px;border-bottom:2px solid #1E6FD9;font-size:11px;font-weight:800;color:#0B3D91;text-transform:uppercase;letter-spacing:.05em}',
+      '.mk-hol-tbl{width:100%;border-collapse:collapse;font-size:11px;font-weight:700}',
+      '.mk-hol-tbl th{background:#E8F2FF;color:#0B3D91;font-size:9px;text-transform:uppercase;padding:8px 6px;border:1px solid #E2E8F0;text-align:center}',
+      '.mk-hol-tbl td{padding:7px 6px;border:1px solid #E2E8F0;vertical-align:middle}',
+      '.mk-hol-tbl .c{text-align:center;color:#64748B;font-size:10px}',
+      '.mk-hol-tbl .n{text-align:right;white-space:nowrap}',
+      '.mk-hol-tbl .n.v{color:#1E6FD9}',
+      '.mk-hol-tbl .n.d{color:#DC2626}',
+      '.mk-hol-tbl tr.sec td{background:#F1F5F9;font-size:9px;font-weight:900;color:#64748B;text-transform:uppercase;padding:6px}',
+      '.mk-hol-tot{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;border-top:2px solid #1E6FD9}',
+      '.mk-hol-tot>div{padding:12px 10px;text-align:center;border-right:1px solid #E2E8F0}',
+      '.mk-hol-tot>div:last-child{border-right:none;background:#E8F2FF}',
+      '.mk-hol-tot .lbl{font-size:9px;font-weight:800;color:#64748B;text-transform:uppercase;margin-bottom:4px}',
+      '.mk-hol-tot .val{font-family:"Fredoka One",cursive,sans-serif;font-size:16px;color:#1E6FD9}',
+      '.mk-hol-tot>div:last-child .val{font-size:20px;color:#0B3D91}',
+      '.mk-hol-bases{display:grid;grid-template-columns:repeat(2,1fr);gap:6px 12px;padding:12px 16px;background:#FAFBFC;border-top:1px solid #E2E8F0;font-size:10px;font-weight:700}',
+      '.mk-hol-bases span{color:#64748B;font-weight:800;font-size:9px;text-transform:uppercase;display:block}',
+      '.mk-hol-foot{padding:10px 16px 14px;font-size:10px;font-weight:700;color:#64748B;line-height:1.5;border-top:1px dashed #E2E8F0}',
+      '.mk-hol-note{padding:10px 16px;background:#FFFBEB;border-bottom:1px solid #FDE68A;font-size:11px;font-weight:800;color:#92400E;line-height:1.45}',
+      '.mk-hol-mes-resumo{border-top:2px solid #1E6FD9}',
+      '.mk-hol-mes-note{margin:0;padding:8px 16px 12px;font-size:10px;font-weight:700;color:#64748B;line-height:1.45}',
+      '.mk-hol-tbl-mes th:first-child,.mk-hol-tbl-mes td:first-child{text-align:left}',
+      '.no-print,.mk-hol-toolbar,.gp-hol-detail-lead,.mk-hol-widgets{display:none!important}',
+      '@page{margin:12mm}',
+      '@media print{.mk-hol{box-shadow:none;border:1px solid #CBD5E1}.mk-hol-mes-resumo{break-inside:avoid}}'
+    ].join('');
+  }
+
   function mkHolPrintPdf_() {
-    var wrap = document.querySelector('.mk-hol-print-root');
+    var wrap = document.querySelector('#gp-adm-holerite-content .mk-hol-print-root')
+      || document.querySelector('.mk-hol-print-root');
     var root = (wrap && wrap.querySelector('.mk-hol')) || document.getElementById('mk-hol-doc');
     if (!root) {
       if (typeof global.toast === 'function') global.toast('Holerite não encontrado na tela.', 'warning');
       return;
     }
+    var source = wrap || root;
+    var clone = source.cloneNode(true);
+    var kill = clone.querySelectorAll('.no-print,.mk-hol-toolbar,.gp-hol-detail-lead,.mk-hol-widgets');
+    for (var i = 0; i < kill.length; i++) {
+      if (kill[i] && kill[i].parentNode) kill[i].parentNode.removeChild(kill[i]);
+    }
+    var bodyHtml = (clone.querySelector('.mk-hol') || clone).outerHTML;
     var title = 'MOVI-KIDS-Holerite';
     var meta = root.querySelector('.mk-hol-meta');
-    if (meta) title = 'MOVI-KIDS-Holerite-' + String(meta.textContent || '').replace(/\s+/g, '-').slice(0, 40);
-    var html = '<!DOCTYPE html><html lang="pt-BR"><head><meta charset="utf-8"><title>' +
-      String(title).replace(/[<>&]/g, '') + '</title>' +
-      '<link rel="stylesheet" href="mk-gestao-pessoas.css">' +
-      '<style>body{margin:12px;background:#fff;font-family:Nunito,Segoe UI,sans-serif}' +
-      '.mk-hol{box-shadow:none!important;border:1px solid #CBD5E1}' +
-      '.no-print,.mk-hol-toolbar,.gp-hol-detail-lead,.mk-hol-widgets{display:none!important}' +
-      '@page{margin:12mm}</style></head><body>' +
-      root.outerHTML +
-      '<script>window.onload=function(){setTimeout(function(){window.print()},200)}<\/script>' +
-      '</body></html>';
-    var w = global.open('', '_blank', 'noopener,noreferrer,width=900,height=1000');
+    if (meta) {
+      var nomeEl = meta.querySelector('div');
+      var nomeTxt = nomeEl ? String(nomeEl.textContent || '').split('·')[0].trim() : '';
+      var compEl = null;
+      var metas = meta.querySelectorAll('div');
+      for (var m = 0; m < metas.length; m++) {
+        var sp = metas[m].querySelector('span');
+        if (sp && /compet/i.test(sp.textContent || '')) { compEl = metas[m]; break; }
+      }
+      var compTxt = compEl ? String(compEl.textContent || '').replace(/Compet[^\d]*/i, '').trim() : '';
+      title = 'MOVI-KIDS-Holerite-' + (nomeTxt || 'colab') + (compTxt ? ('-' + compTxt.replace(/\//g, '-')) : '');
+      title = title.replace(/[^\w\-À-ú.]+/g, '-').replace(/-+/g, '-').slice(0, 80);
+    }
+    var safeTitle = String(title).replace(/[<>&"]/g, '');
+    var html = '<!DOCTYPE html><html lang="pt-BR"><head><meta charset="utf-8">'
+      + '<meta name="viewport" content="width=device-width,initial-scale=1">'
+      + '<title>' + safeTitle + '</title>'
+      + '<link rel="preconnect" href="https://fonts.googleapis.com">'
+      + '<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">'
+      + '<style>' + mkHolPrintCssInline_() + '</style></head><body>'
+      + bodyHtml
+      + '<script>window.addEventListener("load",function(){setTimeout(function(){try{window.focus();window.print()}catch(e){}},350)});<\/script>'
+      + '</body></html>';
+
+    var blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+    var url = URL.createObjectURL(blob);
+    var w = global.open(url, '_blank');
     if (!w) {
-      if (typeof global.toast === 'function') global.toast('Permita pop-up para gerar o PDF.', 'warning');
+      // Fallback: baixar HTML se pop-up bloqueado — abre e Imprimir → PDF
+      try {
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = safeTitle + '.html';
+        a.rel = 'noopener';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        if (typeof global.toast === 'function') {
+          global.toast('Pop-up bloqueado — baixei o HTML. Abra o arquivo e use Imprimir → PDF.', 'warning');
+        }
+      } catch (eDl) {
+        URL.revokeObjectURL(url);
+        if (typeof global.toast === 'function') global.toast('Permita pop-up para gerar o PDF.', 'warning');
+        return;
+      }
+      setTimeout(function () { try { URL.revokeObjectURL(url); } catch (e2) {} }, 60000);
       return;
     }
-    w.document.open();
-    w.document.write(html);
-    w.document.close();
+    setTimeout(function () { try { URL.revokeObjectURL(url); } catch (e3) {} }, 120000);
+    if (typeof global.toast === 'function') {
+      global.toast('Na janela: Imprimir → Destino “Salvar como PDF”', 'success');
+    }
   }
 
   global.mkHolFmtMoney_ = mkHolFmtMoney_;

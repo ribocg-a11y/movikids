@@ -1,4 +1,4 @@
-# MOVI KIDS — Estado atual (02/10/2026 · FE v1.9.159 · I166 folha/relatório)
+# MOVI KIDS — Estado atual (02/10/2026 · FE v1.9.160 · I167 PDF holerite)
 
 Referência única para alinhamento local × produção.
 
@@ -46,9 +46,9 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 | Camada | Versão | URL / evidência |
 |--------|--------|-----------------|
-| **Frontend** | **v1.9.159** | https://ribocg-a11y.github.io/movikids/?force=1.9.159 |
-| **Gestão Pessoas** | **v1.9.159** | `gestao-pessoas.html?force=1.9.159` |
-| **Service Worker** | **1.9.159** | I166 folha set + relatório na tela · La Ville |
+| **Frontend** | **v1.9.160** | https://ribocg-a11y.github.io/movikids/?force=1.9.160 |
+| **Gestão Pessoas** | **v1.9.160** | `gestao-pessoas.html?force=1.9.160` |
+| **Service Worker** | **1.9.160** | I167 PDF holerite · I166 folha/relatório |
 | **Apps Script** | ping **v1.5.231** = repo | I160 escala · I159t LV · multi-unidade live |
 | **I159–I165 La Ville** | ✅ FE+GAS | Holding/balcão · QR/portal · chip caixa isolado · receita dia a dia |
 | **I158 Golden** | ✅ FE live | Fechamento set **14577** / n **684** / CTO **1500** · PDF 01/10 |
