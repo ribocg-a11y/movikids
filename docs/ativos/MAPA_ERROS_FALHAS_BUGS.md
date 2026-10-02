@@ -1,6 +1,7 @@
 # MOVI KIDS — Mapa de erros, falhas e bugs
 
-**Atualizado:** 29/09/2026 — **I158** Golden FE via kpiMes ✅ · FE **v1.9.120** Pages · GAS ping **v1.5.221** (sem mudança GAS)  
+**Atualizado:** 02/10/2026 — **I165** caixa unidade ✅ · **I158** Golden ✅ · FE **v1.9.158** · GAS ping **v1.5.231** · La Ville ops  
+
 **Uso anterior:** 08/09/2026 — **I156** ritmo Dashboard (chaves "01") · FE **v1.9.115** · GAS repo **v1.5.221**  
 **Uso anterior:** 08/09/2026 — **I155** ✅ live (0 HTML 404 · lookback 600) · GAS ping **v1.5.220** · FE **v1.9.114**  
 **Uso anterior:** 08/09/2026 — **I154** lançamento perdido GAS 404 · FE **v1.9.113–114** · GAS **v1.5.219**  
@@ -188,7 +189,7 @@ Docs: `INCIDENTE_I153_*` · `INCIDENTE_I154_*` · `INCIDENTE_I155_*` · `EVIDENC
 | **I163** | **Portal × La Ville + visual floresta** | Mesmo telefone lista Golden+LV sem rótulo; layout antigo “céu azul” | FE **v1.9.148** chip loja (prefixo LV) · floresta/dinos/carros/pelúcias em `mk-portal-*` | smoke celular `acompanhar.html` | GAS portal ainda full-sheet — lookback = §7.3 se pedir |
 | **I164** | **Cartaz/track/foto só Golden** | Poster QR, `track.html`, `foto-moldura`, `manifest` sem La Ville / floresta | FE **v1.9.149** `qr-balcao-imprimir?loja=` · moldura floresta · `?unidade=` | imprimir LV + smoke foto | mesmo QR portal nas 2 lojas |
 | **I164d** | **track.html visual legado** | Cronômetro curto ainda céu roxo; link sem `unidade=` | FE **v1.9.151** floresta + `gerarTrackUrl` com unidade | smoke `track.html?s=` | legado SMS — portal oficial = acompanhar |
-| **I165** | **Caixa hoje Golden vaza no balcão La Ville** | La Ville 0 ativas/contas mas chip “Caixa hoje: N locações” com número do Golden | FE **v1.9.152** `mkSessoesEncHoje_` sem fallback `statsHoje` em lista vazia · sync fatia `nSessoes` por unidade | Abrir balcão LV → chip **0 locações** | Holding guarda encHoje das 2 lojas — tile/chip só da aberta |
+| **I165** | **Caixa hoje Golden vaza no balcão La Ville** | La Ville 0 ativas/contas mas chip “Caixa hoje: N locações” com número do Golden | FE **v1.9.152+** `mkSessoesEncHoje_` sem fallback `statsHoje` em lista vazia · sync fatia `nSessoes` por unidade | Abrir balcão LV → chip **0 locações** | ✅ live **1.9.158** · Holding guarda encHoje das 2 lojas — tile/chip só da aberta |
 | **I83** | **Escala/Metas vazias com Folha OK — race quick load FE** | Quick load sobrescrevia painel completo; abas não re-renderizavam | FE **v1.9.15** `gpAdmRenderTab_` · não downgrade painel · cache `v3` | trocar aba Escala/Metas | 3 colaboradores · escala Jul/2026 |
 | **I85** | **Caixa PIX/créd/déb/din abertos + extras pagamento obrigatório** | Encerrar sem dizer pagamento extra; extras cancelados invisíveis | GAS **v1.5.181** col AB `EP:`/`EC:` · FE **v1.9.18** | `resumoDia` extrasPorPagamento | modal encerrar + caixa |
 | **I86** | **Páginas lentas — fila GAS duplicada + sync agressivo** | Dashboard/Caixa/Histórico demoram; spinner longo | FE **v1.9.20** — dedupe dashboard, SWR resumoDia/caixa, hist paralelo, sync defer | `mkSyncDeferHeavy_` | abrir Caixa/Dashboard após admin login |

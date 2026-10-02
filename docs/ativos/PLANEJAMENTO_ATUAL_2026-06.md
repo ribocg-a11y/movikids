@@ -1,30 +1,33 @@
 # MOVI KIDS — Planejamento atual (pós-FASE 5)
 
-**Atualizado:** 29/09/2026 · FE **v1.9.120** · GAS **v1.5.221** · **I158 Golden FE ✅** · I153–I157 ✅  
+**Atualizado:** 02/10/2026 · FE **v1.9.158** · GAS **v1.5.231** · **I158–I165** · La Ville operacional  
 **Diagnóstico:** [`DIAGNOSTICO_SISTEMA_6_CAMADAS_2026-06.md`](DIAGNOSTICO_SISTEMA_6_CAMADAS_2026-06.md)  
 **Sprint UI:** [`PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`](PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md) ← **ciclo ativo**  
 **One UI (fechado):** [`PLANEJAMENTO_ONE_UI_2026-06.md`](PLANEJAMENTO_ONE_UI_2026-06.md)  
+**La Ville:** [`PLANO_MULTI_UNIDADE_GOLDEN_LAVILLE_2026-09.md`](PLANO_MULTI_UNIDADE_GOLDEN_LAVILLE_2026-09.md)  
 **Documentos irmãos:** `PLANO_PRIORIDADES_2026-06.md` · `MAPA_FASES.md` · `DEPLOY_ATUAL.md` · `HANDOFF_NOVO_CHAT.md`  
 **Ciclo fechado:** FASE 0–5 · I52–I63 planilha · I64–I67 higiene/auditoria  
-**Ciclo ativo:** **Sprint D** — enviar Golden em 01/10 (prévia 29/09 pronta) · smoke tablet D4 · assinar FASE **17**
+**Ciclo ativo:** **Sprint D** — inauguração La Ville (Ops) · enviar PDF Golden · assinar FASE **17**
 
 ---
 
 ## 1. Resumo executivo
 
-**Modo atual (29/09):** One UI **Sprints A–C ✅**. Confiabilidade **I153–I157 ✅**. **I158** relatório Golden via `kpiMes` (FE) ✅. **Ciclo ativo = Sprint D** (prévia set 14.371 gerada · enviar 01/10 · smoke `?force=1.9.120` · FASE 17).
+**Modo atual (02/10):** One UI **A–C ✅**. Confiabilidade **I153–I157 ✅**. **I158** Golden ✅. Multi-loja **I159–I165 ✅** (FE **1.9.158** · GAS **1.5.231**). **Ciclo ativo = Sprint D** — Ops inaugura LV · sócio envia PDF set · FASE 17.
 
 | Área | Status |
 |------|--------|
 | Planilha + GAS + homolog balcão base | ✅ |
-| Confiabilidade sync (I153–I155) | ✅ **0 HTML 404** · ping **v1.5.221** |
-| **I158 Relatório Golden** | ✅ FE **v1.9.120** — sem Cancelada · prévia 29/09 **14371** / 675 / CTO **1500** |
-| FASE 16 Centro Comando | ✅ **~98%** — assinatura Sprint D |
-| FASE 17 Alertas + Gestor | 🟡 **~95%** — pills/badges + F9 |
+| Confiabilidade sync (I153–I155) | ✅ ping **v1.5.231** |
+| **I158 Relatório Golden** | ✅ fechamento set **14577** / CTO **1500** · PDF 01/10 |
+| **La Ville multi-loja** | ✅ código · ⏳ QR/tablet/equipe/CTO |
+| **Receita dia a dia** | ✅ FE consulta (pills loja) |
+| FASE 16 Centro Comando | ✅ **~98%** |
+| FASE 17 Alertas + Gestor | 🟡 **~95%** — assinar · F9 |
 | FASE 18 Financeiro UI | ✅ Sprint B · I150 cenários DRE |
 | Raykelly cadastro | ✅ **100%** 26/06 |
 
-**Próximo passo:** regenerar/enviar PDF Golden em 01/10 · tablet smoke D4 · assinar FASE 17 · ver `HANDOFF_NOVO_CHAT.md`
+**Próximo passo:** checklist inauguração La Ville no HANDOFF · enviar PDF Golden · tablet D4 · assinar FASE 17
 
 ---
 

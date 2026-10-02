@@ -1,6 +1,6 @@
 # MOVI KIDS — Protocolo "Atualize tudo"
 
-**Criado:** 14/06/2026 · **Última execução:** 29/09/2026 (FE **v1.9.120** · GAS ping **v1.5.221** · **I158** Golden FE ✅ · erros agente registrados no HANDOFF)  
+**Criado:** 14/06/2026 · **Última execução:** 02/10/2026 (FE **v1.9.158** · GAS ping **v1.5.231** · La Ville I159–I165 · receita dia a dia · sync pasta C)  
 **Função:** quando o usuário pedir **"atualize tudo"**, o agente segue **esta lista** — não só handoff parcial.  
 **Regra Cursor:** `.cursor/rules/atualize-tudo-movikids.mdc`
 
@@ -17,7 +17,8 @@ Sincronizar **documentação + estado operacional** do projeto com a realidade a
 | Planejamento | `PLANEJAMENTO_ATUAL_2026-06.md`, `PLANO_PRIORIDADES_2026-06.md`, **`MAPA_FASES.md`**, **`PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`** |
 | Deploy atual | **`DEPLOY_ATUAL.md`** |
 | Estrutura repo | **`ESTRUTURA_REPO.md`** |
-| Mapa de erros | `MAPA_ERROS_FALHAS_BUGS.md` (I* até **I158** Golden + famílias fantasma + confiabilidade sync) |
+| Mapa de erros | `MAPA_ERROS_FALHAS_BUGS.md` (I* até **I165** caixa unidade + I158 Golden + sync) |
+| La Ville | `PLANO_MULTI_UNIDADE_GOLDEN_LAVILLE_2026-09.md` · checklist inauguração no HANDOFF |
 | **Design System** | **`docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md`** |
 | Protocolos | `PROTOCOLO_DIAGNOSTICO_E_TESTES.md`, **este arquivo** |
 | Arquitetura / fluxos / diagramas | `MAPA_CODIGO_ARQUITETURA.md`, `FASE_*.md` ativas |
@@ -43,20 +44,21 @@ Sincronizar **documentação + estado operacional** do projeto com a realidade a
 
 ---
 
-## Produção atual (29/09/2026)
+## Produção atual (02/10/2026)
 
 | Camada | Versão | Evidência |
 |--------|--------|-----------|
-| GAS | ping **v1.5.221** = repo | I156 ritmo · lookback 600 · **sem** mudança I158 |
-| FE | **v1.9.120** | Pages live · `?force=1.9.120` · **I158** Golden via kpiMes |
-| Golden set (prévia) | R$ **14.332** · CTO **R$ 1.500** | Admin Relatório · sem Cancelada |
-| Homolog tablet | **⏳** | smoke D4 · `?force=1.9.120` |
-| Confiabilidade | I153–I158 ✅ | lookback · fila 404 · Golden FE |
+| GAS | ping **v1.5.231** = repo | multi-unidade · I160 · lookback 600 |
+| FE | **v1.9.158** | Pages live · `?force=1.9.158` · La Ville + receita dia a dia |
+| Golden set (fechamento) | R$ **14.577** · CTO **R$ 1.500** | PDF 01/10 · sócio enviar |
+| La Ville | código ✅ | Ops: QR · tablet D4 · equipe · CTO |
+| Homolog tablet | **⏳** | D4 Golden + LV · `?force=1.9.158` |
+| Confiabilidade | I153–I165 ✅ | I165 caixa · I158 Golden · sync |
 
 ```powershell
 node scripts\testes\teste-estabilidade-pos-i155.cjs
 .\scripts\testes\TESTE_I158_GOLDEN_SEM_CANCELADAS_READONLY.ps1
-.\scripts\testes\TESTE_I151_ENCERRAR_FANTASMA_READONLY.ps1
+.\scripts\testes\TESTE_HOLDING_SMOKE_C_READONLY.ps1
 .\scripts\encerramento-sessao.ps1
 ```
 
@@ -105,17 +107,25 @@ flowchart TD
 
 *Revisar quando mudar versão FE/GAS ou fechar incidente.*
 
-### Registro desta execução (29/09/2026)
+### Registro desta execução (02/10/2026)
+
+| I* / item | Evento | Doc |
+|-----------|--------|-----|
+| **La Ville** | Continuidade: plano §8 fechado no código · checklist inauguração Ops | `PLANO_MULTI_UNIDADE_*` · HANDOFF |
+| **Receita dia a dia** | Página consulta + pills loja + cache local | FE **1.9.157–158** · `#page-receita-diaria` |
+| **I165** | Chip Caixa não mistura Golden→LV | `MAPA_ERROS` I165 · FE **1.9.152+** |
+| **I164** | Cartaz/track/foto floresta multi-loja | FE **1.9.149–151** |
+| **I158** | Golden fechamento set **14577** / CTO **1500** | PDF `entregas/...fechamento-2026-10-01.*` |
+| Sync C | `sync-pasta-c-pc.ps1` nesta execução | pasta C = este repo |
+
+**Erros do agente (não repetir):** §7.2/I24 publicar FE sem pedir · não misturar lojas no chip Caixa (I165).
+
+### Registro anterior (29/09/2026)
 
 | I* | Evento | Doc |
 |----|--------|-----|
-| **I158** | Golden PDF/e-mail contava Cancelada → FE kpiMes | `INCIDENTE_I158_*` · HANDOFF erros agente |
+| **I158** | Golden PDF/e-mail contava Cancelada → FE kpiMes | `INCIDENTE_I158_*` |
 | I156 | Ritmo Dashboard fatMap chaves "01" | `INCIDENTE_I156_*` |
-| I155 | Lookback causa raiz full-sheet 404 | `INCIDENTE_I155_*` + `EVIDENCIA_ESTABILIDADE_*` |
-| I154/b | Lançamento perdido HTML 404 → fila + retry | `INCIDENTE_I154_*` |
-| I153 | Histórico/duplicata Arthur + anular Encerrada | `INCIDENTE_I153_*` |
-
-**Erros do agente (sessão I158 — não repetir):** ver tabela em `HANDOFF_NOVO_CHAT.md` § Erros — especialmente **§7.2/I24** (publicar FE sem pedir).
 
 ### Registro anterior (08/09/2026)
 

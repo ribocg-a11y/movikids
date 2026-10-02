@@ -22,17 +22,17 @@ Detalhe: [docs/ativos/ESTRUTURA_REPO.md](docs/ativos/ESTRUTURA_REPO.md) · mocku
 
 **Planejamento:** [PLANEJAMENTO_ATUAL_2026-06.md](docs/ativos/PLANEJAMENTO_ATUAL_2026-06.md) · [PLANO_PRIORIDADES](docs/ativos/PLANO_PRIORIDADES_2026-06.md)
 
-## Produção (29/09/2026 — FE v1.9.120 · GAS ping v1.5.221)
+## Produção (02/10/2026 — FE v1.9.158 · GAS ping v1.5.231)
 
 | Camada | Versão repo | Produção |
 |--------|-------------|----------|
-| Frontend | **v1.9.120** | https://ribocg-a11y.github.io/movikids/?force=1.9.120 |
-| Gestão Pessoas | **v1.9.120** | `gestao-pessoas.html?force=1.9.120` |
-| Apps Script | **v1.5.221** | ping alinhado · I156 ritmo · I155 lookback |
+| Frontend | **v1.9.158** | https://ribocg-a11y.github.io/movikids/?force=1.9.158 |
+| Gestão Pessoas | **v1.9.158** | `gestao-pessoas.html?force=1.9.158` |
+| Apps Script | **v1.5.231** | ping alinhado · multi-unidade La Ville |
 | Design System | **v1.1** | [DESIGN_SYSTEM_MOVIKIDS.md](docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md) |
-| Relatório Golden ago | PDF dia a dia | [entregas/…](https://ribocg-a11y.github.io/movikids/entregas/MOVI-KIDS-Relatorio-Agosto-2026-Golden-diario.pdf) |
+| Relatório Golden set | PDF fechamento | [entregas/…](https://ribocg-a11y.github.io/movikids/entregas/) · R$ 14.577 / CTO R$ 1.500 |
 | Holerites PDF | jul/2026 | [entregas/holerite-mes-2026-07](https://ribocg-a11y.github.io/movikids/entregas/holerite-mes-2026-07/) |
-| **Ciclo dev** | Sprint D | [PLANEJAMENTO_CICLO_POS_ONEUI](docs/ativos/PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md) · **I158** Golden FE ✅ |
+| **Ciclo dev** | Sprint D | [PLANEJAMENTO_CICLO_POS_ONEUI](docs/ativos/PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md) · La Ville **I159–I165** ✅ |
 
 ## Novo chat / agente Cursor
 

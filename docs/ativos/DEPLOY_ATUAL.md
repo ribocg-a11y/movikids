@@ -1,6 +1,6 @@
 # MOVI KIDS — Deploy atual (referência única)
 
-**Atualizado:** 29/09/2026 (FE **v1.9.120** · GAS ping **v1.5.221** = repo · **I158** Golden FE live)
+**Atualizado:** 02/10/2026 (FE **v1.9.158** · GAS ping **v1.5.231** = repo · La Ville multi-loja · receita dia a dia)
 
 Use **este arquivo** para versão e ordem de publicação.
 
@@ -10,11 +10,11 @@ Use **este arquivo** para versão e ordem de publicação.
 
 | Camada | Repo | Produção (ping / Pages) | Alinhado? |
 |--------|------|-------------------------|-----------|
-| **Frontend** | **v1.9.120** | https://ribocg-a11y.github.io/movikids/?force=1.9.120 | ✅ Pages |
-| **Gestão Pessoas** | **v1.9.120** | `gestao-pessoas.html?force=1.9.120` | ✅ |
-| **Portal acompanhar** | **v1.9.120** | `acompanhar.html?v=1.9.120` | ✅ |
-| **Service Worker** | **1.9.120** | I158 Golden FE + I154b retry | ✅ |
-| **GAS** | **v1.5.221** (header `.gs`) | ping **v1.5.221** · I156 ritmo · lookback 600 | ✅ |
+| **Frontend** | **v1.9.158** | https://ribocg-a11y.github.io/movikids/?force=1.9.158 | ✅ Pages |
+| **Gestão Pessoas** | **v1.9.158** | `gestao-pessoas.html?force=1.9.158` | ✅ |
+| **Portal acompanhar** | **v1.9.158** | `acompanhar.html?v=1.9.158` | ✅ |
+| **Service Worker** | **1.9.158** | I165 · receita dia a dia · floresta | ✅ |
+| **GAS** | **v1.5.231** (header `.gs`) | ping **v1.5.231** · multi-unidade · I160 | ✅ |
 
 **Ping:** https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec?action=ping
 
@@ -30,24 +30,25 @@ Use **este arquivo** para versão e ordem de publicação.
 C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github\MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs
 ```
 
-**Raw (colar Editor — header v1.5.221):**
+**Raw (colar Editor — header v1.5.231):**
 
 https://raw.githubusercontent.com/ribocg-a11y/movikids/main/MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs
 
-**Header repo:** v1.5.221 · I156 ritmo fatMap · I155 lookback · I154 audit sort · I153 anular Encerrada · **I158 sem mudança GAS** (correção só FE)
+**Header repo:** v1.5.231 · I160 escala null · I159t LV · filtro `unidadeId` · I156 ritmo · I155 lookback · **I158 sem mudança GAS** (correção só FE)
 
 ---
 
-## Validação 29/09/2026 (pós-I158)
+## Validação 02/10/2026
 
 | Check | Resultado |
 |-------|-----------|
-| ping | **v1.5.221** ✅ |
-| Pages `mk-version.js` | **1.9.120** ✅ |
-| I158 Golden FE | ✅ `kpiMes` · set prévia **14332** / CTO **1500** |
-| `listarAtivas` (I155) | lookback **600** · **0 HTML 404** (evidência 08/09) |
-| Paridade / I43 ts | ✅ |
-| Evidência I155 | `EVIDENCIA_ESTABILIDADE_POS_I155_2026-09-08.md` |
+| ping | **v1.5.231** ✅ |
+| Pages `mk-version.js` | **1.9.158** ✅ |
+| I158 Golden FE | ✅ fechamento set **14577** / CTO **1500** · PDF 01/10 |
+| I165 chip Caixa | ✅ FE sem vazamento Golden→LV |
+| Receita dia a dia | ✅ pills loja · cache local |
+| La Ville QR/portal | ✅ I164 · inauguração Ops ⏳ |
+| `listarAtivas` (I155) | lookback **600** |
 | Incidente I158 | `INCIDENTE_I158_GOLDEN_CONTA_CANCELADA_2026-09-23.md` |
 
 ---
