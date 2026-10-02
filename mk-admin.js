@@ -796,6 +796,7 @@ function kpiDashCacheSet_(mes, ano, data) {
     if (!data || !data.ok) return;
     sessionStorage.setItem(kpiDashCacheKey_(mes, ano), JSON.stringify({ ts: Date.now(), data: data }));
   } catch (e) {}
+  if (typeof rdFatCacheSet_ === 'function') rdFatCacheSet_(mes, ano, data);
 }
 
 function kpiDashSetLoading_(on) {
@@ -4444,6 +4445,74 @@ function enviarFechamentoEmail() {
 
 // ── RECEITA DIA A DIA (consulta) ─────────────────────────────
 let _rdReqSeq = 0;
+let _rdTickTimer = null;
+const RD_FAT_TTL_FECHADO_MS = 30 * 24 * 60 * 60 * 1000;
+const RD_FAT_TTL_CORRENTE_MS = 10 * 60 * 1000;
+
+function rdFatUid_() {
+  try {
+    if (typeof mkDualFiltro_ === 'function') return mkDualFiltro_() || 'all';
+  } catch (e) { /* ignore */ }
+  return 'all';
+}
+
+function rdFatCacheKey_(mes, ano) {
+  return 'mk_rd_fat_v1_' + mes + '_' + ano + '_u' + rdFatUid_();
+}
+
+function rdMesFechado_(mes, ano) {
+  const h = new Date();
+  return Number(ano) < h.getFullYear()
+    || (Number(ano) === h.getFullYear() && Number(mes) < (h.getMonth() + 1));
+}
+
+function rdFatSlim_(d) {
+  if (!d || !d.ok) return null;
+  return {
+    ok: true,
+    fatMes: d.fatMes,
+    nMes: d.nMes,
+    fatPorDia: d.fatPorDia || [],
+    locPorDia: d.locPorDia || [],
+    mesAtual: d.mesAtual,
+    anoAtual: d.anoAtual
+  };
+}
+
+function rdFatCacheSet_(mes, ano, data) {
+  const slim = rdFatSlim_(data);
+  if (!slim || !slim.fatPorDia || !slim.fatPorDia.length) return;
+  try {
+    localStorage.setItem(rdFatCacheKey_(mes, ano), JSON.stringify({ ts: Date.now(), data: slim }));
+  } catch (e) { /* quota */ }
+}
+
+function rdFatCacheGet_(mes, ano) {
+  try {
+    const raw = localStorage.getItem(rdFatCacheKey_(mes, ano));
+    if (!raw) return null;
+    const o = JSON.parse(raw);
+    if (!o || !o.ts || !o.data || !o.data.ok || !o.data.fatPorDia || !o.data.fatPorDia.length) return null;
+    const ttl = rdMesFechado_(mes, ano) ? RD_FAT_TTL_FECHADO_MS : RD_FAT_TTL_CORRENTE_MS;
+    if (Date.now() - o.ts > ttl) return null;
+    return o.data;
+  } catch (e) { return null; }
+}
+
+function rdPickCache_(mes, ano) {
+  const durable = rdFatCacheGet_(mes, ano);
+  if (durable) return durable;
+  if (typeof kpiDashCacheGet_ === 'function') {
+    const c = kpiDashCacheGet_(mes, ano);
+    if (c && c.ok && c.fatPorDia && c.fatPorDia.length) return c;
+  }
+  if (typeof kpiData !== 'undefined' && kpiData && kpiData.ok
+    && Number(kpiData.mesAtual) === Number(mes) && Number(kpiData.anoAtual) === Number(ano)
+    && kpiData.fatPorDia && kpiData.fatPorDia.length) {
+    return kpiData;
+  }
+  return null;
+}
 
 function initReceitaDiariaSel() {
   const hoje = new Date();
@@ -4459,20 +4528,25 @@ function initReceitaDiariaSel() {
       anoEl.add(new Option(a, a, a === hoje.getFullYear(), a === hoje.getFullYear()));
     }
   }
+  if (!mesEl.dataset.rdBound) {
+    mesEl.dataset.rdBound = '1';
+    const auto = function () { carregarReceitaDiaria({ quiet: true }); };
+    mesEl.addEventListener('change', auto);
+    anoEl.addEventListener('change', auto);
+  }
   const lista = document.getElementById('rd-lista');
   const resumo = document.getElementById('rd-resumo');
-  if (resumo) resumo.hidden = true;
-  if (lista && !lista.dataset.hasData) {
-    lista.innerHTML = '<div class="empty"><div class="empty-icon">📅</div><h3>Selecione o mês e toque em Ver</h3><p style="color:var(--txt3);font-size:13px;margin-top:6px">A consulta pode levar até ~40s na 1ª vez.</p></div>';
-  }
-  /* Cache do Dashboard do mesmo mês: mostra na hora, sem travar botão */
   const mes = parseInt(mesEl.value, 10);
   const ano = parseInt(anoEl.value, 10);
-  if (typeof kpiDashCacheGet_ === 'function') {
-    const cached = kpiDashCacheGet_(mes, ano);
-    if (cached && cached.ok && cached.fatPorDia && cached.fatPorDia.length) {
-      renderReceitaDiaria_(mes, ano, cached);
-    }
+  const cached = rdPickCache_(mes, ano);
+  if (cached) {
+    renderReceitaDiaria_(mes, ano, cached);
+    return;
+  }
+  if (resumo) resumo.hidden = true;
+  if (lista && !lista.dataset.hasData) {
+    lista.innerHTML = '<div class="empty"><div class="empty-icon">📅</div><h3>Selecione o mês e toque em Ver</h3>'
+      + '<p style="color:var(--txt3);font-size:13px;margin-top:6px">1ª carga deste mês pode levar ~20–60s. Depois fica na hora.</p></div>';
   }
 }
 
@@ -4499,7 +4573,29 @@ function mkReceitaDiariaErrHtml_(titulo, detalhe) {
     + '<p style="margin-top:14px"><button type="button" class="btn btn-primary" style="font-size:13px;padding:10px 16px" onclick="carregarReceitaDiaria()">Tentar de novo</button></p></div>';
 }
 
-async function carregarReceitaDiaria() {
+function rdStopTick_() {
+  if (_rdTickTimer) {
+    clearInterval(_rdTickTimer);
+    _rdTickTimer = null;
+  }
+}
+
+function rdStartTick_(lista, seq) {
+  rdStopTick_();
+  const t0 = Date.now();
+  const paint = function () {
+    if (seq !== _rdReqSeq || !lista) return;
+    const s = Math.floor((Date.now() - t0) / 1000);
+    lista.innerHTML = '<div style="text-align:center;padding:36px 12px;color:var(--txt3);font-size:13px;font-weight:700;line-height:1.45">'
+      + '⏳ Buscando receita do mês… <span id="rd-tick">' + s + 's</span><br>'
+      + '<span style="font-weight:700;opacity:.85">1ª vez pode levar até 90s. Nas próximas, abre na hora.</span></div>';
+  };
+  paint();
+  _rdTickTimer = setInterval(paint, 1000);
+}
+
+async function carregarReceitaDiaria(opts) {
+  opts = opts || {};
   const mesEl = document.getElementById('rd-mes');
   const anoEl = document.getElementById('rd-ano');
   const lista = document.getElementById('rd-lista');
@@ -4509,19 +4605,22 @@ async function carregarReceitaDiaria() {
   const mes = parseInt(mesEl.value, 10) || (new Date().getMonth() + 1);
   const ano = parseInt(anoEl.value, 10) || new Date().getFullYear();
   const seq = ++_rdReqSeq;
+  const fechado = rdMesFechado_(mes, ano);
 
-  let hasCache = false;
-  if (typeof kpiDashCacheGet_ === 'function') {
-    const cached = kpiDashCacheGet_(mes, ano);
-    if (cached && cached.ok && cached.fatPorDia && cached.fatPorDia.length) {
-      renderReceitaDiaria_(mes, ano, cached);
-      hasCache = true;
+  const cached = rdPickCache_(mes, ano);
+  if (cached) {
+    renderReceitaDiaria_(mes, ano, cached);
+    rdFatCacheSet_(mes, ano, cached);
+    /* Mês fechado com cache: não espera o GAS de novo */
+    if (fechado && !opts.forceNet) {
+      if (btn) { btn.disabled = false; btn.textContent = 'Ver'; }
+      rdStopTick_();
+      return;
     }
   }
 
-  if (!hasCache) {
-    lista.innerHTML = '<div style="text-align:center;padding:36px 12px;color:var(--txt3);font-size:13px;font-weight:700;line-height:1.45">'
-      + '⏳ Buscando receita do mês…<br><span style="font-weight:700;opacity:.85">Pode levar até 40 segundos.</span></div>';
+  if (!cached) {
+    rdStartTick_(lista, seq);
     if (resumo) resumo.hidden = true;
   }
   if (btn) {
@@ -4532,28 +4631,39 @@ async function carregarReceitaDiaria() {
     const authP = Object.assign({}, typeof apiParamsComAuth_ === 'function' ? apiParamsComAuth_() : {}, {
       unidadeId: (typeof mkDualFiltro_ === 'function' ? mkDualFiltro_() : 'all')
     });
-    const d = await api(Object.assign({ action: 'kpiMes', mes: mes, ano: ano, lite: '1' }, authP), 55000);
+    const d = await api(Object.assign({ action: 'kpiMes', mes: mes, ano: ano, lite: '1' }, authP), 120000);
     if (seq !== _rdReqSeq) return;
+    rdStopTick_();
     if (!d || !d.ok) {
-      lista.innerHTML = mkReceitaDiariaErrHtml_('Não foi possível carregar', (d && d.erro) || 'Sem permissão ou falha no servidor');
-      lista.dataset.hasData = '';
+      if (!cached) {
+        lista.innerHTML = mkReceitaDiariaErrHtml_('Não foi possível carregar', (d && d.erro) || 'Sem permissão ou falha no servidor');
+        lista.dataset.hasData = '';
+      }
       return;
     }
-    if (typeof kpiDashCacheSet_ === 'function') kpiDashCacheSet_(mes, ano, d);
+    rdFatCacheSet_(mes, ano, d);
+    if (typeof kpiDashCacheSet_ === 'function') {
+      try { sessionStorage.setItem(kpiDashCacheKey_(mes, ano), JSON.stringify({ ts: Date.now(), data: d })); } catch (e2) {}
+    }
     renderReceitaDiaria_(mes, ano, d);
   } catch (e) {
     if (seq !== _rdReqSeq) return;
+    rdStopTick_();
+    if (cached) return; /* já está na tela */
     const msg = String((e && e.message) || e || '');
     const isTo = msg.indexOf('timeout') >= 0;
     lista.innerHTML = mkReceitaDiariaErrHtml_(
-      isTo ? 'Demorou demais' : 'Erro de conexão',
-      isTo ? 'O servidor demorou mais de 55s. Toque em Tentar de novo.' : msg
+      isTo ? 'Servidor lento' : 'Erro de conexão',
+      isTo ? 'O Google demorou mais de 90s. Toque em Tentar de novo — na 2ª vez costuma vir mais rápido.' : msg
     );
     lista.dataset.hasData = '';
   } finally {
-    if (seq === _rdReqSeq && btn) {
-      btn.disabled = false;
-      btn.textContent = 'Ver';
+    if (seq === _rdReqSeq) {
+      rdStopTick_();
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = 'Ver';
+      }
     }
   }
 }
