@@ -264,10 +264,7 @@ function irAdmin(page) {
   if (page === 'relatorio') {
     initRelMesSel();
     carregarHistRelatorios();
-    // I166 — abrir já na consulta (sem forçar download); mês fechado nos 1ºs dias
-    setTimeout(function () {
-      if (typeof carregarPreviewRelatorio === 'function') carregarPreviewRelatorio();
-    }, 80);
+    // I168 — NÃO auto-kpiMes ao abrir (I136: fila GAS × Folha/painel = “travou de novo”)
   }
   if (page === 'receita-diaria') {
     initReceitaDiariaSel();
@@ -4756,37 +4753,14 @@ async function carregarPreviewRelatorio() {
   const prev = document.getElementById('rel-preview');
   const btnEnv = document.getElementById('btn-rel-email');
   const btnDrv = document.getElementById('btn-rel-drive');
-  prev.innerHTML = '<div style="text-align:center;padding:40px;color:var(--txt3);font-size:13px">⏳ Carregando relatório na tela… (pode levar ~1 min na 1ª vez)</div>';
+  prev.innerHTML = '<div style="text-align:center;padding:40px;color:var(--txt3);font-size:13px">⏳ Carregando relatório…</div>';
   if (btnEnv) btnEnv.disabled = true;
   if (btnDrv) btnDrv.disabled = true;
-  let d = null;
-  let lastErr = null;
-  for (let attempt = 1; attempt <= 3; attempt++) {
-    try {
-      if (attempt > 1) {
-        prev.innerHTML = '<div style="text-align:center;padding:40px;color:var(--txt3);font-size:13px">⏳ Tentativa ' + attempt + '/3…</div>';
-        await new Promise(function (r) { setTimeout(r, 800 * attempt); });
-      }
-      // I158/I166: consulta na tela via kpiMes — PDF só se quiser baixar/enviar
-      d = await api({ action: 'kpiMes', mes: mes, ano: ano, lite: '1', unidadeId: 'golden', ...apiParamsComAuth_() }, 120000);
-      if (d && d.ok) break;
-      lastErr = (d && d.erro) || 'falha';
-      d = null;
-    } catch (eAtt) {
-      lastErr = eAtt;
-      d = null;
-      const msg = String((eAtt && eAtt.message) || '').toLowerCase();
-      const retryable = msg.indexOf('gas-unstable') >= 0
-        || msg.indexOf('timeout') >= 0
-        || msg.indexOf('http 404') >= 0
-        || msg.indexOf('network') >= 0;
-      if (!retryable || attempt >= 3) break;
-    }
-  }
   try {
+    // I158/I168: 1× kpiMes (api já retenta 404). Sem loop 3× — congestionava GAS (I136).
+    const d = await api({ action: 'kpiMes', mes: mes, ano: ano, lite: '1', unidadeId: 'golden', ...apiParamsComAuth_() }, 120000);
     if (!d || !d.ok) {
-      const errTxt = (d && d.erro) || (lastErr && lastErr.message) || lastErr || 'falha';
-      prev.innerHTML = '<div style="color:var(--red);padding:20px;text-align:center">Erro ao carregar relatório: ' + escHtml(String(errTxt))
+      prev.innerHTML = '<div style="color:var(--red);padding:20px;text-align:center">Erro ao carregar relatório: ' + escHtml((d && d.erro) || 'falha')
         + '<br><button type="button" class="btn btn-secondary" style="margin-top:12px" onclick="carregarPreviewRelatorio()">Tentar de novo</button></div>';
       return;
     }

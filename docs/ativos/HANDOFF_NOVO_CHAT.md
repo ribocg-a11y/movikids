@@ -1,13 +1,13 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 02/10/2026 · FE **v1.9.160** · GAS **v1.5.231** · **I167** PDF holerite · **I166** folha/relatório · La Ville · Golden ✅
+**Atualizado:** 02/10/2026 · FE **v1.9.161** · GAS **v1.5.231** · **I168** folha cache-first (anti-travamento) · I167 PDF · Golden ✅
 
 ## Produção (agora)
 
 | Camada | Versão | Link |
 |--------|--------|------|
-| Frontend | **v1.9.160** | https://ribocg-a11y.github.io/movikids/?force=1.9.160 |
-| Gestão Pessoas | **v1.9.160** | `gestao-pessoas.html?force=1.9.160` |
+| Frontend | **v1.9.161** | https://ribocg-a11y.github.io/movikids/?force=1.9.161 |
+| Gestão Pessoas | **v1.9.161** | `gestao-pessoas.html?force=1.9.161` |
 | GAS | ping Web **v1.5.231** ✅ | I160 escala null + I159t LV |
 | Design System | v1.1 | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
 

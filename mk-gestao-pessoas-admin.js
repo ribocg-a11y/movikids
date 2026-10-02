@@ -21,6 +21,8 @@
 
   // I137 — 15 min: evita re-pedir painel full a cada troca de aba / F5 leve
   const GP_ADM_CACHE_TTL = 15 * 60 * 1000;
+  /** I168 — folha de mês fechado em localStorage (24h) — reabrir sem cold 60s */
+  const GP_ADM_FOLHA_LS_TTL = 24 * 60 * 60 * 1000;
 
   function gpAdmCacheKey_(comp) {
     const raw = comp || gpAdmCompSel_ || '';
@@ -176,6 +178,7 @@
       const el = document.getElementById('gp-adm-escala');
       if (el) el.innerHTML = '<p class="gp-adm-muted gp-adm-loading">Carregando escala da competência…</p>';
     }
+    // I168 — force=1 só no retry explícito do usuário (não na troca de mês)
     window.mkGpAdmLoad_({
       force: true,
       skipLite: gpAdmTab_ === 'folha' || gpAdmHasPanelPayload_(gpAdmData_),
@@ -330,13 +333,56 @@
   }
 
   function gpAdmCacheGet_(comp) {
-    return typeof mkSessCacheGet_ === 'function' ? mkSessCacheGet_(gpAdmCacheKey_(comp), GP_ADM_CACHE_TTL) : null;
+    const c = String(comp || '').trim();
+    let hit = typeof mkSessCacheGet_ === 'function' ? mkSessCacheGet_(gpAdmCacheKey_(c), GP_ADM_CACHE_TTL) : null;
+    if (hit && hit.ok) return hit;
+    // I168 — fallback localStorage (mês já carregado nesta máquina)
+    try {
+      const raw = localStorage.getItem('mk_gp_folha_v1_' + c.replace(/\//g, '-'));
+      if (!raw) return null;
+      const o = JSON.parse(raw);
+      if (!o || !o.ts || !o.data || !o.data.ok) return null;
+      if (Date.now() - o.ts > GP_ADM_FOLHA_LS_TTL) return null;
+      if (!(o.data.folha && o.data.folha.length) || o.data.lite) return null;
+      return o.data;
+    } catch (e) { return null; }
   }
 
   function gpAdmCacheSet_(data) {
-    if (typeof mkSessCacheSet_ === 'function' && data && data.ok) {
-      mkSessCacheSet_(gpAdmCacheKey_(data.competencia || gpAdmCompSel_), data);
+    if (!data || !data.ok) return;
+    const comp = data.competencia || gpAdmCompSel_;
+    if (typeof mkSessCacheSet_ === 'function') {
+      mkSessCacheSet_(gpAdmCacheKey_(comp), data);
     }
+    // I168 — persistir full com folha (fechamento contador / reabrir PC)
+    if (data.folha && data.folha.length && data.lite !== true && !data._partial) {
+      try {
+        localStorage.setItem(
+          'mk_gp_folha_v1_' + String(comp || '').replace(/\//g, '-'),
+          JSON.stringify({ ts: Date.now(), data: data })
+        );
+      } catch (e) { /* quota */ }
+    }
+  }
+
+  function gpAdmHasFullFolhaCache_(comp) {
+    const hit = gpAdmCacheGet_(comp);
+    return !!(hit && hit.ok && hit.folha && hit.folha.length && hit.lite !== true && !hit._partial);
+  }
+
+  function gpAdmPaintFromCache_(cached, compReq) {
+    if (!cached || !cached.ok) return false;
+    cached = Object.assign({}, cached);
+    cached._fromQuick = false;
+    delete cached._partial;
+    cached.lite = false;
+    gpAdmData_ = cached;
+    gpAdmCompSel_ = cached.competencia || compReq || gpAdmCompSel_;
+    gpAdmRestoreFichaJornadasFromCache_();
+    if (typeof applySessaoAtivaFromApi_ === 'function') applySessaoAtivaFromApi_(cached);
+    gpAdmRender_();
+    gpAdmSyncStatusBanner_();
+    return true;
   }
 
   function gpAdmCompOptions_() {
@@ -401,15 +447,23 @@
     gpAdmCompSel_ = next;
     const sel = document.getElementById('gp-adm-comp-sel');
     if (sel) sel.disabled = true;
-    gpAdmShowFolhaLoading_(gpAdmCompLabel_(next));
-    if (typeof sessionStorage !== 'undefined') {
-      try { sessionStorage.removeItem(gpAdmCacheKey_(gpAdmCompSel_)); } catch (e) { /* ignore */ }
-    }
-    // I166 — na Folha, ir direto ao full (lite não traz folha e soma ~50s + risco de 404 a frio)
     const onFolha = gpAdmTab_ === 'folha' || gpAdmTab_ === 'avaliacoes';
+    // I168 — NUNCA apagar cache ao trocar mês (I166 fazia cold ~60s sempre).
+    // Se já temos folha deste mês na máquina → pinta na hora; refresh soft sem force=1.
+    if (gpAdmHasFullFolhaCache_(next)) {
+      gpAdmPaintFromCache_(gpAdmCacheGet_(next), next);
+      window.mkGpAdmLoad_({
+        softRefresh: true,
+        competencia: next,
+        skipLite: true
+      }).finally(function () {
+        if (sel) sel.disabled = false;
+      });
+      return;
+    }
+    if (onFolha) gpAdmShowFolhaLoading_(gpAdmCompLabel_(next));
     window.mkGpAdmLoad_({
-      force: true,
-      competencia: gpAdmCompSel_,
+      competencia: next,
       skipLite: onFolha
     }).finally(function () {
       if (sel) sel.disabled = false;
@@ -1043,7 +1097,7 @@
       // I135 — só inFlight (não LoadPromise: ela fica viva no hydrate e fingia loading eterno)
       if (gpAdmPanelInFlight_) {
         el.innerHTML = '<p class="gp-adm-muted gp-adm-loading">Carregando folha de <strong>' + esc(compLbl) + '</strong>…</p>' +
-          '<p class="gp-adm-muted" style="margin-top:8px;font-size:12px">Pode levar até ~2 min na 1ª carga do mês.</p>';
+          '<p class="gp-adm-muted" style="margin-top:8px;font-size:12px">1ª carga do mês ~1 min. Depois fica na memória do PC (reabre na hora).</p>';
       } else if (gpAdmData_._partial || gpAdmData_.lite === true || gpAdmData_._fromQuick) {
         el.innerHTML = gpAdmRetryPanelHtml_('Folha de ' + compLbl + ' não chegou (timeout ou falha). Tente de novo — a carga completa pode levar ~2 min.');
       } else {
@@ -1496,56 +1550,41 @@
         }
       }
       try {
-        // I166 — full a frio pode 404/timeout; até 3 tentativas com backoff
-        let d = null;
-        let lastFail = null;
-        for (let attempt = 1; attempt <= 3; attempt++) {
-          if (seq !== gpAdmLoadSeq_) return;
-          const apiPayload = Object.assign({ action: 'painelGestaoPessoasAdmin', _t: Date.now() }, gpAdmPinParams_());
-          if (compReq) apiPayload.competencia = compReq;
-          if (attempt > 1) apiPayload.force = '1';
-          if (gpAdmTab_ === 'folha' || gpAdmTab_ === 'avaliacoes') {
-            const lbl = gpAdmCompLabel_(compReq || gpAdmCompSel_ || '');
-            gpAdmShowFolhaLoading_(attempt === 1 ? lbl : (lbl + ' · tentativa ' + attempt + '/3'));
-          }
-          try {
-            // I135/I166 — full ~90–110s a frio; margem + retries
-            d = await api(apiPayload, 150000);
-            if (d && d.ok) break;
-            lastFail = d;
-            d = null;
-          } catch (eAtt) {
-            lastFail = eAtt;
-            d = null;
-            const msg = String((eAtt && eAtt.message) || '').toLowerCase();
-            const retryable = msg.indexOf('gas-unstable') >= 0
-              || msg.indexOf('timeout') >= 0
-              || msg.indexOf('http 404') >= 0
-              || msg.indexOf('network') >= 0
-              || msg.indexOf('failed to fetch') >= 0;
-            if (!retryable || attempt >= 3) throw eAtt;
-          }
-          if (attempt < 3) await new Promise(function (r) { setTimeout(r, 900 * attempt); });
+        // I168 — 1 chamada full (api já retenta 1× em 404). NÃO force=1 em loop:
+        // force mata ScriptCache warm (~2s) e recomeça cold (~60s) — era a regressão I166.
+        if (seq !== gpAdmLoadSeq_) return;
+        const apiPayload = Object.assign({ action: 'painelGestaoPessoasAdmin' }, gpAdmPinParams_());
+        if (compReq) apiPayload.competencia = compReq;
+        // force só pedido explícito (retry usuário) — softRefresh / troca de mês usam cache GAS
+        if (opts && opts.force && !opts.softRefresh) apiPayload.force = '1';
+        if ((gpAdmTab_ === 'folha' || gpAdmTab_ === 'avaliacoes') && !opts?.softRefresh && !gpAdmHasFolhaData_()) {
+          gpAdmShowFolhaLoading_(gpAdmCompLabel_(compReq || gpAdmCompSel_ || ''));
         }
+        const d = await api(apiPayload, 150000);
         if (seq !== gpAdmLoadSeq_) return;
         if (!d || !d.ok) {
-          const errMsg = (d && d.erro) || (lastFail && lastFail.erro) || (lastFail && lastFail.message) || 'Folha indisponível';
-          if (!liteOk && !gpAdmHasPanelPayload_(gpAdmData_)) {
+          const errMsg = (d && d.erro) || 'Folha indisponível';
+          if (!liteOk && !gpAdmHasPanelPayload_(gpAdmData_) && !opts?.softRefresh) {
             gpAdmSetErr_('<strong>Painel RH:</strong> ' + esc(errMsg) + ' · Confira GAS Web (ping) e tente de novo.');
             if (typeof toast === 'function') toast(errMsg || 'Painel RH indisponível', 'error');
-          } else if (gpAdmTab_ === 'folha' || gpAdmTab_ === 'avaliacoes') {
+          } else if ((gpAdmTab_ === 'folha' || gpAdmTab_ === 'avaliacoes') && !opts?.softRefresh) {
             if (typeof toast === 'function') toast(errMsg || 'Folha indisponível — tente de novo', 'error');
           }
           return;
         }
         gpAdmApplyPanelPayload_(d, compReq, {});
         gpAdmCacheSet_(gpAdmData_);
-        if (opts && opts.force && (gpAdmTab_ === 'folha' || gpAdmTab_ === 'avaliacoes') && typeof toast === 'function') {
+        if (opts && opts.force && !opts.softRefresh && (gpAdmTab_ === 'folha' || gpAdmTab_ === 'avaliacoes') && typeof toast === 'function') {
           toast('Folha de ' + gpAdmCompLabel_(gpAdmCompSel_) + ' carregada', 'success');
         }
         if (gpAdmTab_ === 'cadastro' && typeof refreshOperadoresAdmin_ === 'function') await refreshOperadoresAdmin_();
       } catch (e) {
         if (seq !== gpAdmLoadSeq_) return;
+        // softRefresh falhou: mantém cache pintado — sem apagar a folha
+        if (opts && opts.softRefresh && gpAdmHasFolhaData_()) {
+          if (typeof toast === 'function') toast('Folha em cache — atualização em segundo plano falhou', 'warning');
+          return;
+        }
         if (!gpAdmHasPanelPayload_(gpAdmData_)) {
           const msg = (e && e.message) || 'Erro de conexão';
           gpAdmSetErr_(esc(msg) + ' <span class="gp-adm-muted">Modo básico ativo.</span>');
@@ -1567,39 +1606,37 @@
 
   window.mkGpAdmLoad_ = async function mkGpAdmLoad_(opts) {
     // I126b/c: early-return ANTES do seq++; promise resolvida não bloqueia Folha (usa panelInFlight)
-    if (gpAdmPanelInFlight_ && !opts?.force) return gpAdmLoadPromise_ || Promise.resolve();
+    // I168 — softRefresh NÃO cancela voo em andamento (só atualiza depois se ainda precisar)
+    if (gpAdmPanelInFlight_ && !opts?.force) {
+      return gpAdmLoadPromise_ || Promise.resolve();
+    }
     if (gpAdmLoadPromise_ && !opts?.force && !gpAdmPanelInFlight_) {
-      /* hydrate já terminou e painel também — ok reutilizar */
-      if (gpAdmHasFolhaData_() || gpAdmHasPanelPayload_(gpAdmData_)) return gpAdmLoadPromise_;
+      if (gpAdmHasFolhaData_() || gpAdmHasPanelPayload_(gpAdmData_)) {
+        if (!opts?.softRefresh) return gpAdmLoadPromise_;
+      }
     }
     const seq = ++gpAdmLoadSeq_;
     const compReq = (opts && opts.competencia) ? String(opts.competencia).trim() : (gpAdmCompSel_ || '');
     if (compReq) gpAdmCompSel_ = compReq;
-    const cached = !opts?.force ? gpAdmCacheGet_(compReq) : null;
+    const cached = (!opts?.force || opts?.softRefresh) ? gpAdmCacheGet_(compReq) : null;
     if (cached && cached.ok && !(cached._partial || cached.lite === true) && cached.folha && cached.folha.length) {
       if (seq !== gpAdmLoadSeq_) return gpAdmLoadPromise_;
-      cached._fromQuick = false;
-      delete cached._partial;
-      cached.lite = false;
-      gpAdmData_ = cached;
-      gpAdmCompSel_ = cached.competencia || compReq || gpAdmCompSel_;
-      gpAdmRestoreFichaJornadasFromCache_();
-      if (typeof applySessaoAtivaFromApi_ === 'function') applySessaoAtivaFromApi_(cached);
-      gpAdmRender_();
-      gpAdmSyncStatusBanner_();
-      // I137 — cache full hit: NÃO disparar lite+full de novo (era a fila GAS / “Carregando…” eterno)
-      gpAdmLoadPromise_ = Promise.resolve();
-      gpAdmPanelInFlight_ = false;
-      // hydrate leve em paralelo (lista/cadastro) — sem painelGestaoPessoasAdmin
-      gpAdmHydrateColabQuick_().then(function () {
-        if (seq !== gpAdmLoadSeq_) return;
-        gpAdmLoadAlertasQuick_();
-        gpAdmSyncStatusBanner_();
-      }).catch(function () { /* ok */ });
-      return gpAdmLoadPromise_;
-    } else if (opts?.force && opts.skipLite) {
+      gpAdmPaintFromCache_(cached, compReq);
+      // I137 — cache hit puro: não re-bater GAS (fila I136)
+      // I168 — softRefresh: mantém UI e atualiza em bg SEM force=1 (ScriptCache warm ~2s)
+      if (!opts?.softRefresh) {
+        gpAdmLoadPromise_ = Promise.resolve();
+        gpAdmPanelInFlight_ = false;
+        gpAdmHydrateColabQuick_().then(function () {
+          if (seq !== gpAdmLoadSeq_) return;
+          gpAdmLoadAlertasQuick_();
+          gpAdmSyncStatusBanner_();
+        }).catch(function () { /* ok */ });
+        return gpAdmLoadPromise_;
+      }
+    } else if (opts?.force && opts.skipLite && !opts?.softRefresh) {
       gpAdmShowFolhaLoading_(gpAdmCompLabel_(compReq || gpAdmCompSel_ || ''));
-    } else if (!gpAdmHasPanelPayload_(gpAdmData_)) {
+    } else if (!opts?.softRefresh && !gpAdmHasPanelPayload_(gpAdmData_)) {
       gpAdmShowLoading_();
     }
     gpAdmLoadPromise_ = (async function () {

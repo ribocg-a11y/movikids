@@ -2,18 +2,18 @@
 
 Sistema operacional de locações — balcão (tablet na loja), portal do responsável, painel admin.
 
-**Ciclo ativo (02/10/2026):** Sprint D · FE **v1.9.160** · GAS Web **v1.5.231** · **I167** PDF holerite · **I166** · La Ville **I159–I165** ✅ · Golden set ✅
+**Ciclo ativo (02/10/2026):** Sprint D · FE **v1.9.161** · GAS Web **v1.5.231** · **I168** folha cache · **I167** PDF · La Ville **I159–I165** ✅ · Golden ✅
 
 **Para retomar (agente local PC — pasta C):**
 
-> *Continuar MOVI KIDS — FE **v1.9.160** · GAS **v1.5.231** · La Ville ops (QR/tablet D4/equipe) · Tablet `?force=1.9.160`*
+> *Continuar MOVI KIDS — FE **v1.9.161** · GAS **v1.5.231** · La Ville ops (QR/tablet D4/equipe) · Tablet `?force=1.9.161`*
 
 ## Produção atual
 
 | Camada | Versão | Link |
 |--------|--------|------|
-| Frontend | **v1.9.160** | https://ribocg-a11y.github.io/movikids/?force=1.9.160 |
-| Gestão Pessoas | **v1.9.160** | `gestao-pessoas.html?force=1.9.160` |
+| Frontend | **v1.9.161** | https://ribocg-a11y.github.io/movikids/?force=1.9.161 |
+| Gestão Pessoas | **v1.9.161** | `gestao-pessoas.html?force=1.9.161` |
 | GAS | ping Web **v1.5.231** ✅ · repo **v1.5.231** | multi-unidade + I160 |
 | Design System | **v1.1** | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
 
