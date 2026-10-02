@@ -405,7 +405,13 @@
     if (typeof sessionStorage !== 'undefined') {
       try { sessionStorage.removeItem(gpAdmCacheKey_(gpAdmCompSel_)); } catch (e) { /* ignore */ }
     }
-    window.mkGpAdmLoad_({ force: true, competencia: gpAdmCompSel_ }).finally(function () {
+    // I166 — na Folha, ir direto ao full (lite não traz folha e soma ~50s + risco de 404 a frio)
+    const onFolha = gpAdmTab_ === 'folha' || gpAdmTab_ === 'avaliacoes';
+    window.mkGpAdmLoad_({
+      force: true,
+      competencia: gpAdmCompSel_,
+      skipLite: onFolha
+    }).finally(function () {
       if (sel) sel.disabled = false;
     });
   };
@@ -1490,20 +1496,46 @@
         }
       }
       try {
-        const apiPayload = Object.assign({ action: 'painelGestaoPessoasAdmin', _t: Date.now() }, gpAdmPinParams_());
-        if (compReq) apiPayload.competencia = compReq;
-        // I135 — full ~90–110s em Jul/2026; margem para não cair em “Carregando…” eterno
-        const d = await api(apiPayload, 150000);
-        if (seq !== gpAdmLoadSeq_) return;
-        if (!d.ok) {
-          if (!liteOk && !gpAdmHasPanelPayload_(gpAdmData_)) {
-            const errTxt = esc(d.erro || 'Erro painel RH');
-            gpAdmSetErr_('<strong>Painel RH:</strong> ' + errTxt + ' · Confira GAS Web (ping) e tente de novo.');
-            if (typeof toast === 'function') toast(d.erro || 'Painel RH indisponível', 'error');
-          } else if (gpAdmTab_ === 'folha' || gpAdmTab_ === 'avaliacoes') {
-            if (typeof toast === 'function') toast(d.erro || 'Folha indisponível — tente de novo', 'error');
+        // I166 — full a frio pode 404/timeout; até 3 tentativas com backoff
+        let d = null;
+        let lastFail = null;
+        for (let attempt = 1; attempt <= 3; attempt++) {
+          if (seq !== gpAdmLoadSeq_) return;
+          const apiPayload = Object.assign({ action: 'painelGestaoPessoasAdmin', _t: Date.now() }, gpAdmPinParams_());
+          if (compReq) apiPayload.competencia = compReq;
+          if (attempt > 1) apiPayload.force = '1';
+          if (gpAdmTab_ === 'folha' || gpAdmTab_ === 'avaliacoes') {
+            const lbl = gpAdmCompLabel_(compReq || gpAdmCompSel_ || '');
+            gpAdmShowFolhaLoading_(attempt === 1 ? lbl : (lbl + ' · tentativa ' + attempt + '/3'));
           }
-          // sai do finally com inFlight=false → Folha/Escala mostram retry
+          try {
+            // I135/I166 — full ~90–110s a frio; margem + retries
+            d = await api(apiPayload, 150000);
+            if (d && d.ok) break;
+            lastFail = d;
+            d = null;
+          } catch (eAtt) {
+            lastFail = eAtt;
+            d = null;
+            const msg = String((eAtt && eAtt.message) || '').toLowerCase();
+            const retryable = msg.indexOf('gas-unstable') >= 0
+              || msg.indexOf('timeout') >= 0
+              || msg.indexOf('http 404') >= 0
+              || msg.indexOf('network') >= 0
+              || msg.indexOf('failed to fetch') >= 0;
+            if (!retryable || attempt >= 3) throw eAtt;
+          }
+          if (attempt < 3) await new Promise(function (r) { setTimeout(r, 900 * attempt); });
+        }
+        if (seq !== gpAdmLoadSeq_) return;
+        if (!d || !d.ok) {
+          const errMsg = (d && d.erro) || (lastFail && lastFail.erro) || (lastFail && lastFail.message) || 'Folha indisponível';
+          if (!liteOk && !gpAdmHasPanelPayload_(gpAdmData_)) {
+            gpAdmSetErr_('<strong>Painel RH:</strong> ' + esc(errMsg) + ' · Confira GAS Web (ping) e tente de novo.');
+            if (typeof toast === 'function') toast(errMsg || 'Painel RH indisponível', 'error');
+          } else if (gpAdmTab_ === 'folha' || gpAdmTab_ === 'avaliacoes') {
+            if (typeof toast === 'function') toast(errMsg || 'Folha indisponível — tente de novo', 'error');
+          }
           return;
         }
         gpAdmApplyPanelPayload_(d, compReq, {});

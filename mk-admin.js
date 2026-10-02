@@ -264,6 +264,10 @@ function irAdmin(page) {
   if (page === 'relatorio') {
     initRelMesSel();
     carregarHistRelatorios();
+    // I166 — abrir já na consulta (sem forçar download); mês fechado nos 1ºs dias
+    setTimeout(function () {
+      if (typeof carregarPreviewRelatorio === 'function') carregarPreviewRelatorio();
+    }, 80);
   }
   if (page === 'receita-diaria') {
     initReceitaDiariaSel();
@@ -4729,13 +4733,21 @@ function renderReceitaDiaria_(mes, ano, d) {
 // ── RELATÓRIO ────────────────────────────────────────────────
 function initRelMesSel() {
   const hoje = new Date();
-  document.getElementById('rel-mes').value = hoje.getMonth()+1;
+  let mes = hoje.getMonth() + 1;
+  let ano = hoje.getFullYear();
+  // I166 — até dia 7, abrir mês anterior (fechamento contador / Golden)
+  if (hoje.getDate() <= 7) {
+    if (mes <= 1) { mes = 12; ano -= 1; }
+    else mes -= 1;
+  }
+  document.getElementById('rel-mes').value = mes;
   const anoSel = document.getElementById('rel-ano');
   if (!anoSel.options.length) {
-    for (let a=hoje.getFullYear();a>=2026;a--) {
-      anoSel.add(new Option(a,a,a===hoje.getFullYear()));
+    for (let a = hoje.getFullYear(); a >= 2026; a--) {
+      anoSel.add(new Option(a, a, a === ano));
     }
   }
+  anoSel.value = ano;
 }
 
 async function carregarPreviewRelatorio() {
@@ -4744,14 +4756,38 @@ async function carregarPreviewRelatorio() {
   const prev = document.getElementById('rel-preview');
   const btnEnv = document.getElementById('btn-rel-email');
   const btnDrv = document.getElementById('btn-rel-drive');
-  prev.innerHTML = '<div style="text-align:center;padding:40px;color:var(--txt3);font-size:13px">⏳ Gerando preview do relatório...</div>';
+  prev.innerHTML = '<div style="text-align:center;padding:40px;color:var(--txt3);font-size:13px">⏳ Carregando relatório na tela… (pode levar ~1 min na 1ª vez)</div>';
   if (btnEnv) btnEnv.disabled = true;
   if (btnDrv) btnDrv.disabled = true;
+  let d = null;
+  let lastErr = null;
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    try {
+      if (attempt > 1) {
+        prev.innerHTML = '<div style="text-align:center;padding:40px;color:var(--txt3);font-size:13px">⏳ Tentativa ' + attempt + '/3…</div>';
+        await new Promise(function (r) { setTimeout(r, 800 * attempt); });
+      }
+      // I158/I166: consulta na tela via kpiMes — PDF só se quiser baixar/enviar
+      d = await api({ action: 'kpiMes', mes: mes, ano: ano, lite: '1', unidadeId: 'golden', ...apiParamsComAuth_() }, 120000);
+      if (d && d.ok) break;
+      lastErr = (d && d.erro) || 'falha';
+      d = null;
+    } catch (eAtt) {
+      lastErr = eAtt;
+      d = null;
+      const msg = String((eAtt && eAtt.message) || '').toLowerCase();
+      const retryable = msg.indexOf('gas-unstable') >= 0
+        || msg.indexOf('timeout') >= 0
+        || msg.indexOf('http 404') >= 0
+        || msg.indexOf('network') >= 0;
+      if (!retryable || attempt >= 3) break;
+    }
+  }
   try {
-    // I158: HTML no FE via kpiMes (sem Cancelada) — não usa buscarPreviewRelatorio GAS
-    const d = await api({ action: 'kpiMes', mes: mes, ano: ano, lite: '1', unidadeId: 'golden', ...apiParamsComAuth_() }, 90000);
     if (!d || !d.ok) {
-      prev.innerHTML = '<div style="color:var(--red);padding:20px;text-align:center">Erro ao carregar kpiMes: ' + escHtml((d && d.erro) || 'falha') + '</div>';
+      const errTxt = (d && d.erro) || (lastErr && lastErr.message) || lastErr || 'falha';
+      prev.innerHTML = '<div style="color:var(--red);padding:20px;text-align:center">Erro ao carregar relatório: ' + escHtml(String(errTxt))
+        + '<br><button type="button" class="btn btn-secondary" style="margin-top:12px" onclick="carregarPreviewRelatorio()">Tentar de novo</button></div>';
       return;
     }
     const html = mkHtmlRelatorioGoldenFromKpi_(parseInt(mes, 10), parseInt(ano, 10), d, false);
@@ -4764,8 +4800,10 @@ async function carregarPreviewRelatorio() {
     if (btnEnv) { btnEnv.disabled = false; btnEnv.style.display = ''; }
     if (btnDrv) { btnDrv.disabled = false; }
     _relPreviewMes = mes; _relPreviewAno = ano;
-  } catch(e) {
-    prev.innerHTML = '<div style="color:var(--red);padding:20px;text-align:center">Erro de conexão: '+e.message+'</div>';
+  } catch (e) {
+    prev.innerHTML = '<div style="color:var(--red);padding:20px;text-align:center">Erro: ' + escHtml(e.message || String(e))
+      + '<br><button type="button" class="btn btn-secondary" style="margin-top:12px" onclick="carregarPreviewRelatorio()">Tentar de novo</button></div>';
+  } finally {
     if (btnEnv) btnEnv.disabled = false;
     if (btnDrv) btnDrv.disabled = false;
   }
