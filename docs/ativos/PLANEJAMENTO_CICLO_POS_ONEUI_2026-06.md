@@ -1,7 +1,7 @@
 # MOVI KIDS — Planejamento pós One UI (jun–jul/2026)
 
 **Criado:** 27/06/2026 · **Substitui backlog ativo** de `PLANEJAMENTO_ONE_UI_2026-06.md` (Sprints A–C ✅)  
-**Produção (02/10/2026):** FE **v1.9.158** · GAS **v1.5.231** · Pages confirmado · I96–**I165** · La Ville multi-loja ✅ · **I158** Golden ✅ · receita dia a dia ✅  
+**Produção (02/10/2026):** FE **v1.9.161** · GAS **v1.5.231** · Pages confirmado · I96–**I168** · La Ville multi-loja ✅ · **I158** Golden ✅ · receita dia a dia ✅  
 **Mestre:** `PLANO_PREMIUM_ONEUI_FASES_16_22_2026-06.md` · **Roteiro agente:** `ROTEIRO_AGENTE_OBRIGATORIO.md`  
 **Paralelo:** pontas — `PLANO_SINERGIA_PONTAS_2026-08-30.md` · estabilidade `EVIDENCIA_ESTABILIDADE_POS_I155_*`
 
@@ -52,7 +52,7 @@
 | **D1** | Homolog **PC admin** v1.9.2 — comando, pills alerta, presença badges | Agente + sócio | ✅ **27/06** — ver `EVIDENCIA_SPRINT_D1_HOMOLOG_2026-06-27.md` |
 | **D2** | Checklist **FASE 17** critérios 3–4 ✅ | Ops/sócio | Critérios 1–6 ✅ · falta **7 F9** + assinatura |
 | **D3** | Decisão **17.5 F9** Supervisor | **Sócio** | Registro em `MATRIZ_PERMISSOES_PERFIS_2026-06.md` |
-| **D4** | Smoke tablet **v1.9.158** (Golden + La Ville `?unidade=laville`) | Ops loja | F5/F7/F10/F11 + 1 loc teste · checklist HANDOFF inauguração LV |
+| **D4** | Smoke tablet **v1.9.161** (Golden + La Ville `?unidade=laville`) | Ops loja | F5/F7/F10/F11 + 1 loc teste · checklist HANDOFF inauguração LV |
 | **D5** | Marcar FASE 16/17 ✅ em `PLANO_PRIORIDADES` + `MAPA_FASES` | Agente | docs alinhados |
 | **D6** | GAS ping Web **v1.5.167** (se ainda 165) | Sócio | Nova versão Web · ping alinhado |
 

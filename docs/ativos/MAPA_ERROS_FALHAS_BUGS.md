@@ -1,7 +1,8 @@
 # MOVI KIDS — Mapa de erros, falhas e bugs
 
-**Atualizado:** 02/10/2026 — **I165** caixa unidade ✅ · **I158** Golden ✅ · FE **v1.9.158** · GAS ping **v1.5.231** · La Ville ops  
+**Atualizado:** 03/10/2026 — **I166–I168** folha/PDF/cache ✅ · FE **v1.9.161** · GAS ping **v1.5.231** · La Ville ops  
 
+**Uso anterior:** 02/10/2026 — **I165** caixa unidade ✅ · **I158** Golden ✅ · FE **v1.9.158**  
 **Uso anterior:** 08/09/2026 — **I156** ritmo Dashboard (chaves "01") · FE **v1.9.115** · GAS repo **v1.5.221**  
 **Uso anterior:** 08/09/2026 — **I155** ✅ live (0 HTML 404 · lookback 600) · GAS ping **v1.5.220** · FE **v1.9.114**  
 **Uso anterior:** 08/09/2026 — **I154** lançamento perdido GAS 404 · FE **v1.9.113–114** · GAS **v1.5.219**  
@@ -102,6 +103,19 @@ Docs: `INCIDENTE_I148_*` · `INCIDENTE_I151_*` · `INCIDENTE_I151b_*` · **`INCI
 **Regra de ouro (I155):** sync operacional = **cauda**, não planilha inteira. `forceFull=1` só diagnóstico.
 
 Docs: `INCIDENTE_I153_*` · `INCIDENTE_I154_*` · `INCIDENTE_I155_*` · `EVIDENCIA_ESTABILIDADE_POS_I155_*`
+
+## Diagnóstico de família — Folha / holerite / admin lento I166 → I168 (02–03/10/2026)
+
+| ID | Sintoma | Causa | Correção | Status |
+|----|---------|-------|----------|--------|
+| **I166** | Folha set não carregava; relatório “só baixar” | Full frio 404/timeout; lite sem `folha[]`; UX download | skipLite na Folha + preview relatório · FE **v1.9.159** | ⚠️ parcial — retries/`force` pioraram |
+| **I167** | Salvar/Imprimir holerite → `about:blank` | `noopener` + `document.write`; CSS `#gp-app` | Blob URL + CSS embutido · FE **v1.9.160** | ✅ |
+| **I168** | Admin “travou de novo” pós-I166 | Apagar cache + `force=1` + 3 retries + auto-kpiMes (I136) | cache-first + softRefresh + LS 24h · FE **v1.9.161** | ✅ |
+
+**Medição:** full frio ~62s · warm ~2s · `force=1` ~49s.  
+**Regra de ouro:** nunca apagar cache FE nem mandar `force=1` na troca de competência; não empilhar `kpiMes` com `painelGestaoPessoasAdmin`.
+
+Docs: `INCIDENTE_I167_*` · `INCIDENTE_I168_*` · I120/I126/I136/I137
 
 ---
 
@@ -246,8 +260,9 @@ Docs: `INCIDENTE_I153_*` · `INCIDENTE_I154_*` · `INCIDENTE_I155_*` · `EVIDENC
 | **I144** | **Liberar balcão pelo celular falhava (PIN 1416)** | HTML ops ainda mandava `adminPin=1416` (morto I64); 1421 OK | `ops-balcao.html` + liberar-* com PIN digitado · **sem** App Script | `INCIDENTE_I144_*` | liberar com PIN atual → `sessaoAtiva` null |
 | **I143** | **Salvar erro + ▶ some + duplicatas ao retentar** | timeout ▶ 15s → rollback + `force=1` (~80s); unstick pedia “salvar de novo” | FE **v1.9.96** keep-optimistic + dedup 90s · GAS **v1.5.210** `veiculoJaAberto_` Web ✅ | `guard.i143.*` · `INCIDENTE_I143_*` | sem duplicata Carro já aberto · mediana salvar~3.9s ▶~3.1s |
 | **I142b** | **PDF holerite em branco no Chrome** | `visibility:hidden` em ancestrais do SPA — filho `visible` não aparece | FE **v1.9.88** `mkHolPrintPdf_` abre janela isolada | `mk-holerite.js` | Salvar PDF mostra tabelas |
-| **I167** | **Salvar/Imprimir holerite → about:blank** | `window.open(..., noopener)` + `document.write` bloqueado; CSS `#gp-app` não aplica | FE **v1.9.160** Blob URL + CSS embutido | `mk-holerite.js` `mkHolPrintPdf_` | Janela com holerite → Imprimir → PDF |
-| **I168** | **Folha/admin “trava” de novo pós-I166** | Troca de mês apagava cache + `force=1` + 3 retries + auto-kpiMes → sempre cold ~60s e fila GAS (I136) | FE **v1.9.161** cache-first + softRefresh sem force + LS 24h + sem auto-relatório | `mk-gestao-pessoas-admin.js` · I120/I126/I136/I137 | 1ª ~60s · 2ª ~2s (warm) · reabrir PC instant |
+| **I166** | **Folha set + relatório contador (1ª rodada)** | Full frio 404; lite sem folha; UX “tenho que baixar” | FE **v1.9.159** skipLite Folha + preview relatório | `INCIDENTE_I168_*` (regressão) | ⚠️ parcial — ver I168 |
+| **I167** | **Salvar/Imprimir holerite → about:blank** | `window.open(..., noopener)` + `document.write` bloqueado; CSS `#gp-app` não aplica | FE **v1.9.160** Blob URL + CSS embutido | `mk-holerite.js` · `INCIDENTE_I167_*` | Janela com holerite → Imprimir → PDF |
+| **I168** | **Folha/admin “trava” de novo pós-I166** | Troca de mês apagava cache + `force=1` + 3 retries + auto-kpiMes → sempre cold ~60s e fila GAS (I136) | FE **v1.9.161** cache-first + softRefresh sem force + LS 24h + sem auto-relatório | `mk-gestao-pessoas-admin.js` · `INCIDENTE_I168_*` | 1ª ~60s · 2ª ~2s (warm) · reabrir PC instant |
 | **I142** | **Falta conferência mês no PDF (Q1/Q2/Soma + dias bônus)** | Só demonstrativo da quinzena; sócio precisava tabela mês + dias | FE **v1.9.87** `mkHolMesResumo_` + dias via `metaOperadorTurno` · PDFs em `entregas/` | `teste-i141-bonus-resto.cjs` · `gerar-pdf-holerite-mes.cjs` | https://ribocg-a11y.github.io/movikids/entregas/holerite-mes-2026-07/ |
 | **I141** | **Holerite Q2: bônus = 50% do mês final (errado)** | GAS `gpCalcHollerite_` metade; 1ª já pagou acumulado da época (Ray 150≠425) | FE **v1.9.86** `bonusQ2 = mês − Q1 memorial` · Ray 700 · Julia 750 | `mk-holerite.js` · `teste-i141-bonus-resto.cjs` | pacote 31/07: Ray **1652,22** · Julia **1702,22** |
 | **I140** | **FGTS na cesta do holerite** | Encargo empregador misturado com bônus/VA | FE **v1.9.85** FGTS só no rodapé | `mk-holerite.js` | cesta sem cód 503 |

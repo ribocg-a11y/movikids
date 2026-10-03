@@ -1,6 +1,6 @@
 # MOVI KIDS — Índice de documentação
 
-**Atualizado:** 02/10/2026 (FE **v1.9.158** · GAS ping **v1.5.231** · La Ville **I159–I165** ✅ · **I158** Golden ✅)
+**Atualizado:** 03/10/2026 (FE **v1.9.161** · GAS ping **v1.5.231** · **I166–I168** folha/PDF ✅ · La Ville **I159–I165** ✅ · **I158** Golden ✅)
 
 ## Comece aqui
 
@@ -23,7 +23,9 @@
 | [**INCIDENTE_I43_CARREGAR_INICIO_COL_Y_2026-06-23.md**](ativos/INCIDENTE_I43_CARREGAR_INICIO_COL_Y_2026-06-23.md) | **I43** — cronômetro revertia após ▶ |
 | [**INCIDENTE_I53_CONFIG_PLANILHA_REPAIR_2026-06-24.md**](arquivo/incidentes/INCIDENTE_I53_CONFIG_PLANILHA_REPAIR_2026-06-24.md) | **I53** — CONFIG memorial, schema, repair |
 | [**INCIDENTE_I96_I99_MULTI_VEICULO_2026-07-10.md**](arquivo/incidentes/INCIDENTE_I96_I99_MULTI_VEICULO_2026-07-10.md) | **I96–I103** — multi-veículo · overlay · contagem encerradas/caixa |
-| [**INCIDENTE_I158_GOLDEN_CONTA_CANCELADA_2026-09-23.md**](arquivo/incidentes/INCIDENTE_I158_GOLDEN_CONTA_CANCELADA_2026-09-23.md) | **I158** — Golden sem Cancelada · FE kpiMes · set 14332 |
+| [**INCIDENTE_I168_FOLHA_CACHE_FORCE_2026-10-02.md**](ativos/INCIDENTE_I168_FOLHA_CACHE_FORCE_2026-10-02.md) | **I168** — Folha cache-first (anti force/retries) |
+| [**INCIDENTE_I167_HOLERITE_PDF_ABOUT_BLANK_2026-10-02.md**](ativos/INCIDENTE_I167_HOLERITE_PDF_ABOUT_BLANK_2026-10-02.md) | **I167** — PDF holerite about:blank → Blob |
+| [**INCIDENTE_I158_GOLDEN_CONTA_CANCELADA_2026-09-23.md**](arquivo/incidentes/INCIDENTE_I158_GOLDEN_CONTA_CANCELADA_2026-09-23.md) | **I158** — Golden sem Cancelada · FE kpiMes · set 14577 |
 | [**INCIDENTE_I155_LOOKBACK_ATIVAS_CARGA_GAS_2026-09-08.md**](ativos/INCIDENTE_I155_LOOKBACK_ATIVAS_CARGA_GAS_2026-09-08.md) | **I155** — lookback causa raiz 404/full-sheet |
 | [**EVIDENCIA_ESTABILIDADE_POS_I155_2026-09-08.md**](ativos/EVIDENCIA_ESTABILIDADE_POS_I155_2026-09-08.md) | Bateria estabilidade — **0 HTML 404** |
 | [**INCIDENTE_I154_LANCAMENTO_PERDIDO_GAS_404_2026-09-08.md**](ativos/INCIDENTE_I154_LANCAMENTO_PERDIDO_GAS_404_2026-09-08.md) | **I154** — salvar perdido + audit sort |
@@ -84,7 +86,7 @@
 | [**PROTOCOLO_ATUALIZAR_TUDO.md**](ativos/PROTOCOLO_ATUALIZAR_TUDO.md) | **Comando "atualize tudo"** — checklist docs + planilha + pasta C |
 | [REGRAS_DE_PUBLICACAO_SEGURA.md](ativos/REGRAS_DE_PUBLICACAO_SEGURA.md) | Regras P0 deploy |
 | [ACESSOS_E_AUTORIZACOES.md](ativos/ACESSOS_E_AUTORIZACOES.md) | Papéis, PIN, agente vs humano |
-| [MAPA_ERROS_FALHAS_BUGS.md](ativos/MAPA_ERROS_FALHAS_BUGS.md) | Índice I1–I142b |
+| [MAPA_ERROS_FALHAS_BUGS.md](ativos/MAPA_ERROS_FALHAS_BUGS.md) | Índice I1–**I168** (folha/PDF) |
 
 ## Hierarquia (conflito de versão)
 

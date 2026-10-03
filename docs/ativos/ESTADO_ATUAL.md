@@ -1,8 +1,8 @@
-# MOVI KIDS — Estado atual (02/10/2026 · FE v1.9.161 · I168 folha cache)
+# MOVI KIDS — Estado atual (03/10/2026 · FE v1.9.161 · I166–I168)
 
 Referência única para alinhamento local × produção.
 
-**Ciclo dev ativo:** **`PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`** — Sprint D · multi-loja **I159–I165** ✅ · GAS Web **v1.5.231** · **I158** Golden ✅ · receita dia a dia ✅  
+**Ciclo dev ativo:** **`PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`** — Sprint D · multi-loja **I159–I165** ✅ · **I166–I168** folha/PDF ✅ · GAS Web **v1.5.231** · **I158** Golden ✅ · receita dia a dia ✅  
 
 **Diagnóstico 6 camadas:** **`DIAGNOSTICO_SISTEMA_6_CAMADAS_2026-06.md`**  
 **Prioridades gerais:** **`PLANEJAMENTO_ATUAL_2026-06.md`** §9
@@ -12,9 +12,11 @@ Referência única para alinhamento local × produção.
 **Acessos:** **`ACESSOS_E_AUTORIZACOES.md`** — papéis, PIN admin, agente vs humano  
 **Índice:** `../INDICE.md` · **Prioridades:** **`PLANO_PRIORIDADES_2026-06.md`**  
 **Planejamento ativo:** `PLANEJAMENTO_ATUAL_2026-06.md`  
-**Mapa de erros/bugs:** **`MAPA_ERROS_FALHAS_BUGS.md`** (…/**I165** caixa unidade · **I158** Golden)  
+**Mapa de erros/bugs:** **`MAPA_ERROS_FALHAS_BUGS.md`** (…/**I168** folha cache · **I167** PDF · **I165** · **I158**)  
 **Plano La Ville:** **`PLANO_MULTI_UNIDADE_GOLDEN_LAVILLE_2026-09.md`**  
 
+**Incidente I168:** **`INCIDENTE_I168_FOLHA_CACHE_FORCE_2026-10-02.md`**  
+**Incidente I167:** **`INCIDENTE_I167_HOLERITE_PDF_ABOUT_BLANK_2026-10-02.md`**  
 **Incidente I158:** **`../arquivo/incidentes/INCIDENTE_I158_GOLDEN_CONTA_CANCELADA_2026-09-23.md`**  
 **Incidente I155:** **`INCIDENTE_I155_LOOKBACK_ATIVAS_CARGA_GAS_2026-09-08.md`**  
 **Incidente I154:** **`INCIDENTE_I154_LANCAMENTO_PERDIDO_GAS_404_2026-09-08.md`**  
@@ -42,7 +44,7 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 ---
 
-## Produção (02/10/2026)
+## Produção (03/10/2026)
 
 | Camada | Versão | URL / evidência |
 |--------|--------|-----------------|
@@ -50,6 +52,7 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 | **Gestão Pessoas** | **v1.9.161** | `gestao-pessoas.html?force=1.9.161` |
 | **Service Worker** | **1.9.161** | I168 folha cache-first · I167 PDF |
 | **Apps Script** | ping **v1.5.231** = repo | I160 escala · I159t LV · multi-unidade live |
+| **I166–I168 Folha/PDF** | ✅ FE | cache-first · Blob PDF · set R$14.577 |
 | **I159–I165 La Ville** | ✅ FE+GAS | Holding/balcão · QR/portal · chip caixa isolado · receita dia a dia |
 | **I158 Golden** | ✅ FE live | Fechamento set **14577** / n **684** / CTO **1500** · PDF 01/10 |
 | **I155 lookback GAS** | ✅ live | 0 HTML 404 · evidência `EVIDENCIA_ESTABILIDADE_POS_I155_*` |
@@ -68,7 +71,7 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 | **Homolog tablet** | ✅ 23/06 | smoke **v1.9.96** + I143 no balcão |
 | **Raykelly / Julia** | ✅ | ids 3 / 4 · Julia pausa I152 · Karen id5 Freelancer |
 | **Design System** | **v1.1** | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
-| **Ciclo dev** | Sprint D | One UI ✅ · I125–**I165** · La Ville ops · Golden FE ✅ |
+| **Ciclo dev** | Sprint D | One UI ✅ · I125–**I168** · La Ville ops · Golden FE ✅ |
 | **Receita dia a dia** | ✅ FE **1.9.157+** | `#page-receita-diaria` · pills loja · cache local |
 | **I103 / I117** | ✅ | Encerradas=contas · Caixa pay-first |
 | **BANCO_HORAS** | ✅ I129 | ops 1–4 **0h00** |

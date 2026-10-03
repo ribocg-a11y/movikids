@@ -1,6 +1,6 @@
 # MOVI KIDS — Protocolo de diagnóstico, testes e maturidade de aprendizado
 
-**Criado:** 07/06/2026 · **Atualizado:** 29/09/2026 (I158 Golden FE · I155 estabilidade · PROTOCOLO_ATUALIZAR_TUDO)  
+**Criado:** 07/06/2026 · **Atualizado:** 29/09/2026 (I166–I168 folha/PDF · I158 Golden · PROTOCOLO_ATUALIZAR_TUDO)  
 **Função:** quando o usuário pedir *“rodar teste”*, *“diagnosticar”* ou *“validar deploy”*, o agente **segue este documento** — não improvisa escopo.  
 **Complementa:** `MAPA_ERROS_FALHAS_BUGS.md`, `INCIDENTE_I158_*`, `INCIDENTE_I20_CRONOMETRO_RESOLUCAO_2026-06-07.md`, `MAPA_CODIGO_ARQUITETURA.md`, `CHECKLIST_FASE5_TABLET.md` · `EVIDENCIA_ESTABILIDADE_POS_I155_2026-09-08.md`
 

@@ -2,7 +2,9 @@
 
 Scripts em `scripts/testes/`. Documentação: `docs/ativos/PROTOCOLO_DIAGNOSTICO_E_TESTES.md` · **Planilha por aba:** `docs/ativos/PROTOCOLO_AUDITORIA_ABAS_PLANILHA.md` · **"atualize tudo":** `PROTOCOLO_ATUALIZAR_TUDO.md`
 
-**Versões de referência (02/10/2026):** FE **v1.9.158** · GAS ping **v1.5.231** · mínimo operação balcão **v1.7.35** (I15 GET).
+**Versões de referência (03/10/2026):** FE **v1.9.161** · GAS ping **v1.5.231** · mínimo operação balcão **v1.7.35** (I15 GET).
+
+| **I166–I168 Folha/PDF** | docs `INCIDENTE_I167_*` · `INCIDENTE_I168_*` · mapa família I166→I168 · FE cache-first + Blob PDF |
 
 | **I158 Golden** | `TESTE_I158_GOLDEN_SEM_CANCELADAS_READONLY.ps1` · guard `guard.i158.fe.golden` · doc `INCIDENTE_I158_*` |
 

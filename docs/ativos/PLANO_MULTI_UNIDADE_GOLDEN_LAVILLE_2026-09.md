@@ -1,7 +1,7 @@
 # PLANO — Multi-unidade MOVI KIDS (Golden × La Ville Mall)
 
 **Status:** 🟢 **Operacional** — multi-loja em produção (I159–I165) · inauguração física / RH / CTO LV ainda abertos  
-**Atualizado:** 02/10/2026 · FE **v1.9.158** · GAS Web **v1.5.231** · planilha única  
+**Atualizado:** 02/10/2026 · FE **v1.9.161** · GAS Web **v1.5.231** · planilha única  
 **Pedido:** 2ª unidade em **La Ville Mall**; Golden permanece. Operadoras escolhem onde logar; unidades **não conversam**; **só ADM** vê as duas juntas. Preços, minutos e frota **diferentes** por unidade.  
 **Arquitetura:** ✅ **Opção A** — **1 planilha** + `unidade_id` + CONFIG por unidade (sócio 29/09).  
 **Sócio entregou (29/09):** tabelas Brinquedos + Dinos + frota FE LV*. **Ainda falta:** CTO/e-mail shopping La Ville · 1ª equipe RH.
@@ -345,7 +345,7 @@ Ordem após Opção A + dados La Ville:
 | 3 | Backfill `golden` LOCAÇÕES | Agente OAuth | ✅ **3947** linhas (29/09) |
 | 4 | GAS filtro + config por unidade | Agente + Nova versão Web | ✅ Web **v1.5.231** |
 | 5 | FE liberar LV + ADM filtro Todas | Agente | ✅ Holding/balcão/I161/I165 |
-| 6 | Portal / QR branding por unidade | Agente | ✅ I164 floresta · FE **1.9.158** |
+| 6 | Portal / QR branding por unidade | Agente | ✅ I164 floresta · FE **1.9.161** |
 | 7 | Homolog tablet 2 lojas + inauguração | Ops | ⏳ QR mesa · D4 · celular · equipe |
 
 ---

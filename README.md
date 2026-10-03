@@ -1,4 +1,4 @@
-﻿# MOVI KIDS
+# MOVI KIDS
 
 Sistema operacional para locações — balcão (tablet), portal do responsável e painel admin.
 
@@ -22,12 +22,12 @@ Detalhe: [docs/ativos/ESTRUTURA_REPO.md](docs/ativos/ESTRUTURA_REPO.md) · mocku
 
 **Planejamento:** [PLANEJAMENTO_ATUAL_2026-06.md](docs/ativos/PLANEJAMENTO_ATUAL_2026-06.md) · [PLANO_PRIORIDADES](docs/ativos/PLANO_PRIORIDADES_2026-06.md)
 
-## Produção (02/10/2026 — FE v1.9.158 · GAS ping v1.5.231)
+## Produção (02/10/2026 — FE v1.9.161 · GAS ping v1.5.231)
 
 | Camada | Versão repo | Produção |
 |--------|-------------|----------|
-| Frontend | **v1.9.158** | https://ribocg-a11y.github.io/movikids/?force=1.9.158 |
-| Gestão Pessoas | **v1.9.158** | `gestao-pessoas.html?force=1.9.158` |
+| Frontend | **v1.9.161** | https://ribocg-a11y.github.io/movikids/?force=1.9.161 |
+| Gestão Pessoas | **v1.9.161** | `gestao-pessoas.html?force=1.9.161` |
 | Apps Script | **v1.5.231** | ping alinhado · multi-unidade La Ville |
 | Design System | **v1.1** | [DESIGN_SYSTEM_MOVIKIDS.md](docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md) |
 | Relatório Golden set | PDF fechamento | [entregas/…](https://ribocg-a11y.github.io/movikids/entregas/) · R$ 14.577 / CTO R$ 1.500 |

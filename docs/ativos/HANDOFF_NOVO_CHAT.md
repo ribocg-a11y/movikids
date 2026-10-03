@@ -1,6 +1,6 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 02/10/2026 · FE **v1.9.161** · GAS **v1.5.231** · **I168** folha cache-first (anti-travamento) · I167 PDF · Golden ✅
+**Atualizado:** 03/10/2026 · FE **v1.9.161** · GAS **v1.5.231** · **I166–I168** folha/PDF/cache ✅ · La Ville · Golden ✅
 
 ## Produção (agora)
 
@@ -136,7 +136,7 @@ Diagnóstico 29/09: `diagnosticoPlanilhaCompletoAdmin` → LOCACOES/CUSTOS/CONFI
 Ordem curta — tablet + mesa:
 
 1. Imprimir cartaz: `assets/qr-balcao-imprimir.html?loja=laville` → fixar na mesa.
-2. Tablet La Ville: `?unidade=laville&force=1.9.158` → login (quando houver operador `laville`) ou admin Abrir balcão LV.
+2. Tablet La Ville: `?unidade=laville&force=1.9.161` → login (quando houver operador `laville`) ou admin Abrir balcão LV.
 3. Smoke D4: Nova loc → ▶ → estender → encerrar (1 loc teste).
 4. Conferir chip **Caixa hoje** no balcão LV = locações LV (não número Golden) — **I165**.
 5. Celular: `acompanhar.html` + `foto-moldura.html?unidade=laville` (chip/rodapé La Ville).
@@ -175,8 +175,11 @@ Ordem curta — tablet + mesa:
 | 2 | Propôs/alterou `.gs` e depois reverteu; confusão “cadê o código AppScript?” | Usuário: sem AppScript agora | Correção I158 = **só FE** |
 | 3 | **Demorou a publicar FE** (Pages ficou em 1.9.119) esperando o sócio pedir merge | **§7.2 / I24** — commit+push FE **sem pedir** | Merge+push `main` na hora; `encerramento-sessao` exit 0 |
 | 4 | Respostas longas / links misturados (GAS vs FE) | Clareza operacional | Uma frase: “novo código = `mk-admin.js` no GitHub; Code.gs sem mudança” |
+| 5 | **I166** “hardening” Folha: apagar cache + `force=1` + 3 retries + auto-kpiMes | I120 / I126 / **I136** / I137 | **I168** cache-first · softRefresh sem force · sem auto-relatório |
+| 6 | **I167** PDF holerite `noopener` + `document.write` → about:blank | I142b lição incompleta | Blob URL + CSS embutido · FE **1.9.160** |
 
-**Lição:** correção FE pronta → **publicar na mesma sessão**. Não transferir “merge/push” ao usuário.
+**Lição:** correção FE pronta → **publicar na mesma sessão**. Não transferir “merge/push” ao usuário.  
+**Lição I168:** medição primeiro (frio vs warm). Nunca “melhorar” com `force=1`/apagar cache/loops — isso **reabre** a fila GAS.
 
 ---
 
@@ -220,7 +223,7 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 
 ## Mensagem para colar no novo chat (PC)
 
-> *Continuar MOVI KIDS **no PC** — pasta C (`movikids-github`). Ler `HANDOFF_NOVO_CHAT.md`. FE **v1.9.158** Pages · GAS ping **v1.5.231**. Golden set ✅ R$ 14.577 / CTO R$ 1.500. La Ville multi-loja ✅ (I159–I165). Próximo Ops: QR mesa LV · tablet D4 · 1ª equipe · CTO LV. **This PC.***
+> *Continuar MOVI KIDS **no PC** — pasta C (`movikids-github`). Ler `HANDOFF_NOVO_CHAT.md`. FE **v1.9.161** Pages · GAS ping **v1.5.231**. Golden set ✅ R$ 14.577 / CTO R$ 1.500. I166–I168 folha/PDF ✅. La Ville multi-loja ✅ (I159–I165). Próximo Ops: QR mesa LV · tablet D4 · 1ª equipe · CTO LV. **This PC.***
 
 **Mínima:**
 
@@ -233,11 +236,12 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 | Peso | # | Ação | Quem | Status |
 |------|---|------|------|--------|
 | **P0** | 1 | **Enviar** PDF Golden set/2026 ao shopping | **Sócio** | ✅ artefato pronto · fat **R$ 14.577** · n **684** · CTO **R$ 1.500** |
-| **P0** | 2 | Imprimir cartaz QR La Ville + fixar na mesa | Ops | ⏳ `?loja=laville` · FE **1.9.158** |
-| **P1** | 3 | Tablet smoke D4 La Ville | Ops | ⏳ `?unidade=laville&force=1.9.158` |
+| **P0** | 2 | Imprimir cartaz QR La Ville + fixar na mesa | Ops | ⏳ `?loja=laville` · FE **1.9.161** |
+| **P1** | 3 | Tablet smoke D4 La Ville | Ops | ⏳ `?unidade=laville&force=1.9.161` |
 | **P1** | 4 | Smoke portal+foto La Ville no celular | Ops | ⏳ PC ✅ · falta celular |
 | **P1** | 5 | Assinar FASE 17 (decisão 17.5 F9) | Sócio | ⏳ |
-| **P1** | 5b | FE multi-loja + receita dia a dia + I165 | Agente | ✅ FE **1.9.158** |
+| **P1** | 5b | FE multi-loja + receita + I165–I168 | Agente | ✅ FE **1.9.161** |
+| **P1** | 5c | Folha set PDF contadora (I167/I168) | Sócio | ⏳ `?force=1.9.161` · holerite → Salvar PDF |
 | **P2** | 6 | Contratar 1ª equipe La Ville (`unidade_id=laville`) | Ops/RH | ⏳ escala 14–21:30 / terça OFF |
 | **P2** | 7 | CTO + e-mail shopping La Ville | Sócio | ⏳ (PDF LV só depois disto) |
 | **P3** | 8 | Holding smoke C | Agente | ✅ 01/10 |

@@ -1,6 +1,6 @@
 # MOVI KIDS — Protocolo "Atualize tudo"
 
-**Criado:** 14/06/2026 · **Última execução:** 02/10/2026 (FE **v1.9.158** · GAS ping **v1.5.231** · La Ville I159–I165 · receita dia a dia · sync pasta C)  
+**Criado:** 14/06/2026 · **Última execução:** 03/10/2026 (FE **v1.9.161** · GAS ping **v1.5.231** · **I166–I168** folha/PDF/cache · La Ville · Golden · sync pasta C)  
 **Função:** quando o usuário pedir **"atualize tudo"**, o agente segue **esta lista** — não só handoff parcial.  
 **Regra Cursor:** `.cursor/rules/atualize-tudo-movikids.mdc`
 
@@ -17,7 +17,7 @@ Sincronizar **documentação + estado operacional** do projeto com a realidade a
 | Planejamento | `PLANEJAMENTO_ATUAL_2026-06.md`, `PLANO_PRIORIDADES_2026-06.md`, **`MAPA_FASES.md`**, **`PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`** |
 | Deploy atual | **`DEPLOY_ATUAL.md`** |
 | Estrutura repo | **`ESTRUTURA_REPO.md`** |
-| Mapa de erros | `MAPA_ERROS_FALHAS_BUGS.md` (I* até **I165** caixa unidade + I158 Golden + sync) |
+| Mapa de erros | `MAPA_ERROS_FALHAS_BUGS.md` (I* até **I168** folha/PDF + I165 caixa + I158 Golden) |
 | La Ville | `PLANO_MULTI_UNIDADE_GOLDEN_LAVILLE_2026-09.md` · checklist inauguração no HANDOFF |
 | **Design System** | **`docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md`** |
 | Protocolos | `PROTOCOLO_DIAGNOSTICO_E_TESTES.md`, **este arquivo** |
@@ -27,7 +27,7 @@ Sincronizar **documentação + estado operacional** do projeto com a realidade a
 | Planilhas | Memorials `docs/referencia/`, IDs e métricas abas (FOLHA, CONFIG, etc.) |
 | Pasta no C | `scripts/sync-pasta-c-pc.ps1` · caminhos PC em HANDOFF, AGENTS, regras `.cursor/rules/` |
 | Testes | `scripts/testes/README.md`, versões nos `.ps1` · `teste-estabilidade-pos-i155.cjs` |
-| Entregas PDF | `entregas/holerite-mes-2026-07/` |
+| Entregas PDF | `entregas/holerite-mes-2026-07/` · Golden set `entregas/MOVI-KIDS-Relatorio-Setembro-2026-*` |
 
 ---
 
@@ -44,16 +44,17 @@ Sincronizar **documentação + estado operacional** do projeto com a realidade a
 
 ---
 
-## Produção atual (02/10/2026)
+## Produção atual (03/10/2026)
 
 | Camada | Versão | Evidência |
 |--------|--------|-----------|
 | GAS | ping **v1.5.231** = repo | multi-unidade · I160 · lookback 600 |
-| FE | **v1.9.158** | Pages live · `?force=1.9.158` · La Ville + receita dia a dia |
-| Golden set (fechamento) | R$ **14.577** · CTO **R$ 1.500** | PDF 01/10 · sócio enviar |
+| FE | **v1.9.161** | Pages live · `?force=1.9.161` · I168 cache-first |
+| Golden set (fechamento) | R$ **14.577** · CTO **R$ 1.500** | PDF 01/10 · n **684** |
+| Folha / holerite PDF | I166–I168 ✅ | Blob print · cache FE/LS 24h |
 | La Ville | código ✅ | Ops: QR · tablet D4 · equipe · CTO |
-| Homolog tablet | **⏳** | D4 Golden + LV · `?force=1.9.158` |
-| Confiabilidade | I153–I165 ✅ | I165 caixa · I158 Golden · sync |
+| Homolog tablet | **⏳** | D4 Golden + LV · `?force=1.9.161` |
+| Confiabilidade | I153–I168 ✅ | I168 folha · I167 PDF · I165 caixa · I158 Golden |
 
 ```powershell
 node scripts\testes\teste-estabilidade-pos-i155.cjs
@@ -107,18 +108,27 @@ flowchart TD
 
 *Revisar quando mudar versão FE/GAS ou fechar incidente.*
 
-### Registro desta execução (02/10/2026)
+### Registro desta execução (03/10/2026)
+
+| I* / item | Evento | Doc |
+|-----------|--------|-----|
+| **I166** | Folha set + relatório na tela (parcial; retries/`force` regressaram) | FE **1.9.159** · família I168 |
+| **I167** | Holerite Salvar/Imprimir → about:blank → Blob URL | `INCIDENTE_I167_*` · FE **1.9.160** |
+| **I168** | Folha cache-first: sem apagar cache / force / auto-kpiMes | `INCIDENTE_I168_*` · FE **1.9.161** |
+| Medição | full frio ~62s · warm ~2s · force=1 ~49s | `INCIDENTE_I168_*` |
+| Golden set | R$ 14.577 / CTO R$ 1.500 / n 684 | PDF `entregas/...fechamento-2026-10-01.*` |
+| Sync C | `sync-pasta-c-pc.ps1` nesta execução | pasta C = este repo |
+
+**Erros do agente (não repetir):** I166 hardening com `force=1`+apagar cache+3 retries+auto-kpiMes = regressão I120/I136 · I167 `noopener`+`document.write` · §7.2/I24 publicar FE sem pedir · I165 não misturar lojas no chip Caixa.
+
+### Registro anterior (02/10/2026)
 
 | I* / item | Evento | Doc |
 |-----------|--------|-----|
 | **La Ville** | Continuidade: plano §8 fechado no código · checklist inauguração Ops | `PLANO_MULTI_UNIDADE_*` · HANDOFF |
 | **Receita dia a dia** | Página consulta + pills loja + cache local | FE **1.9.157–158** · `#page-receita-diaria` |
 | **I165** | Chip Caixa não mistura Golden→LV | `MAPA_ERROS` I165 · FE **1.9.152+** |
-| **I164** | Cartaz/track/foto floresta multi-loja | FE **1.9.149–151** |
 | **I158** | Golden fechamento set **14577** / CTO **1500** | PDF `entregas/...fechamento-2026-10-01.*` |
-| Sync C | `sync-pasta-c-pc.ps1` nesta execução | pasta C = este repo |
-
-**Erros do agente (não repetir):** §7.2/I24 publicar FE sem pedir · não misturar lojas no chip Caixa (I165).
 
 ### Registro anterior (29/09/2026)
 
@@ -126,9 +136,3 @@ flowchart TD
 |----|--------|-----|
 | **I158** | Golden PDF/e-mail contava Cancelada → FE kpiMes | `INCIDENTE_I158_*` |
 | I156 | Ritmo Dashboard fatMap chaves "01" | `INCIDENTE_I156_*` |
-
-### Registro anterior (08/09/2026)
-
-- Estudo negócio: `ESTUDO_NEGOCIO_BREAK_EVEN_TICKET_2026-07.md`
-- Holerite PDF: `INCIDENTE_I142_*`
-- P0 local-first: `INCIDENTE_I146_*`
