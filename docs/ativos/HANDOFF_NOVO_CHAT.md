@@ -1,6 +1,6 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 03/10/2026 · FE **v1.9.161** · GAS **v1.5.231** · **I166–I168** folha/PDF/cache ✅ · La Ville · Golden ✅
+**Atualizado:** 03/10/2026 · FE **v1.9.161** · GAS **v1.5.231** · **I169** holerites set PDF · I166–I168 ✅ · La Ville · Golden ✅
 
 ## Produção (agora)
 
@@ -241,7 +241,7 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 | **P1** | 4 | Smoke portal+foto La Ville no celular | Ops | ⏳ PC ✅ · falta celular |
 | **P1** | 5 | Assinar FASE 17 (decisão 17.5 F9) | Sócio | ⏳ |
 | **P1** | 5b | FE multi-loja + receita + I165–I168 | Agente | ✅ FE **1.9.161** |
-| **P1** | 5c | Folha set PDF contadora (I167/I168) | Sócio | ⏳ `?force=1.9.161` · holerite → Salvar PDF |
+| **P1** | 5c | Folha set PDF contadora | Sócio+Agente | ✅ pacote **I169** em `entregas/holerite-mes-2026-09/` · ⚠ Milena PIX negativo (faltas) — conferir RH |
 | **P2** | 6 | Contratar 1ª equipe La Ville (`unidade_id=laville`) | Ops/RH | ⏳ escala 14–21:30 / terça OFF |
 | **P2** | 7 | CTO + e-mail shopping La Ville | Sócio | ⏳ (PDF LV só depois disto) |
 | **P3** | 8 | Holding smoke C | Agente | ✅ 01/10 |

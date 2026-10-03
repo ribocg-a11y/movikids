@@ -31,6 +31,7 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 
 - **I158 Golden:** ✅ FE via `kpiMes` · set fechamento **R$ 14.577** / CTO **R$ 1.500** · sócio enviar PDF
 - **I166–I168:** ✅ folha cache-first · PDF holerite Blob · FE **v1.9.161**
+- **I169:** ✅ pacote contadora set `entregas/holerite-mes-2026-09/` (⚠ Milena negativo)
 - **La Ville:** multi-loja operacional · **próximo Ops:** QR mesa · tablet D4 · 1ª equipe · CTO/e-mail
 - **Receita dia a dia:** ✅ consulta admin com pills loja (sem PDF)
 - **I165:** chip Caixa por unidade ✅

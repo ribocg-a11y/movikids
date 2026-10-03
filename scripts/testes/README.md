@@ -5,6 +5,7 @@ Scripts em `scripts/testes/`. Documentação: `docs/ativos/PROTOCOLO_DIAGNOSTICO
 **Versões de referência (03/10/2026):** FE **v1.9.161** · GAS ping **v1.5.231** · mínimo operação balcão **v1.7.35** (I15 GET).
 
 | **I166–I168 Folha/PDF** | docs `INCIDENTE_I167_*` · `INCIDENTE_I168_*` · mapa família I166→I168 · FE cache-first + Blob PDF |
+| **I169 Holerite mês PDF** | `node scripts/gerar-holerite-mes-from-painel.cjs entregas/holerite-mes-2026-09/painel-09-2026.json` · pasta `entregas/holerite-mes-YYYY-MM/` |
 
 | **I158 Golden** | `TESTE_I158_GOLDEN_SEM_CANCELADAS_READONLY.ps1` · guard `guard.i158.fe.golden` · doc `INCIDENTE_I158_*` |
 
