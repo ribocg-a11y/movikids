@@ -247,7 +247,7 @@
             action: 'liberarSessaoOperador',
             operadorId: opId,
             _t: Date.now()
-          }, pinParams), 20000);
+          }, mkAuthUnidadeLoginParams_(), pinParams), 20000);
           if (d && d.ok) {
             sessaoAtivaRemota = d.sessaoAtiva || null;
             mkAuthSyncSessaoBalcaoUI_(sessaoAtivaRemota);
@@ -272,7 +272,7 @@
       const d = await apiCall(Object.assign({
         action: 'liberarSessaoOperadorAdmin',
         _t: Date.now()
-      }, pinParams), 20000);
+      }, mkAuthUnidadeLoginParams_(), pinParams), 20000);
       if (d && d.ok) {
         sessaoAtivaRemota = d.sessaoAtiva || null;
         mkAuthSyncSessaoBalcaoUI_(sessaoAtivaRemota);
@@ -359,9 +359,20 @@
     return Number(sessaoAtivaRemota.operadorId) !== Number(operadorId);
   }
 
-  function msgOperadorJaLogado_(nome) {
+  function mkAuthUnidadeLoginParams_() {
+    let uid = '';
+    try {
+      if (typeof mkUnidadeId_ === 'function') uid = mkUnidadeId_();
+    } catch (e) { /* ok */ }
+    uid = String(uid || '').trim().toLowerCase();
+    if (!uid || uid === 'all') uid = 'golden';
+    return { unidadeId: uid };
+  }
+
+  function msgOperadorJaLogado_(nome, unidadeId) {
     const n = String(nome || 'outro operador').trim();
-    return 'O operador ' + n + ' ja esta logado no sistema. So o administrador pode entrar enquanto isso.';
+    const loja = (String(unidadeId || '').toLowerCase() === 'laville') ? 'La Ville' : 'Golden';
+    return 'O operador ' + n + ' ja esta logado no balcao ' + loja + '. So o administrador pode entrar nessa loja enquanto isso.';
   }
 
   function handleSessaoOcupada_(d, errId) {
@@ -372,7 +383,9 @@
     }
     const nome = (d && d.sessaoAtiva && d.sessaoAtiva.nome) ||
       (d && d.erro && d.erro.replace(/.*operador\s+/i, '').split(' ja')[0]) || 'outro operador';
-    const msg = msgOperadorJaLogado_(nome);
+    const uidLock = (d && d.sessaoAtiva && d.sessaoAtiva.unidadeId) ||
+      (typeof mkUnidadeId_ === 'function' ? mkUnidadeId_() : 'golden');
+    const msg = msgOperadorJaLogado_(nome, uidLock);
     showErr(errId || 'mk-login-err', msg);
     updateSessaoLockUI_();
     if (typeof alert === 'function') alert(msg);
@@ -398,7 +411,7 @@
         el.style.background = '';
         el.style.color = '';
         el.style.borderColor = '';
-        el.textContent = msgOperadorJaLogado_(sessaoAtivaRemota.nome);
+        el.textContent = msgOperadorJaLogado_(sessaoAtivaRemota.nome, sessaoAtivaRemota.unidadeId);
       }
     }
     const bloqueia = !selectedOp || isSessaoBloqueadaPara_(selectedOp.id);
@@ -416,7 +429,8 @@
       el.style.background = '';
       el.style.color = '';
       el.style.borderColor = '';
-      el.textContent = 'Sessão ativa no balcão: ' + sessao.nome + '. Use o botão abaixo para liberar se precisar.';
+      const lojaS = (String(sessao.unidadeId || '').toLowerCase() === 'laville') ? 'La Ville' : 'Golden';
+      el.textContent = 'Sessão ativa no balcão ' + lojaS + ': ' + sessao.nome + '. Use o botão abaixo para liberar se precisar.';
     });
   }
 
@@ -953,7 +967,10 @@
     showErr('mk-login-err', '');
     showErr('mk-create-err', '');
     try {
-      const d = await apiCall({ action: 'verificarOperadorLogin', operadorId: selectedOp.id });
+      const d = await apiCall(Object.assign({
+        action: 'verificarOperadorLogin',
+        operadorId: selectedOp.id
+      }, mkAuthUnidadeLoginParams_()));
       if (!d.ok) {
         if (d.code === 409 || (d.erro && d.erro.indexOf('ja esta logado') >= 0)) {
           handleSessaoOcupada_(d, 'mk-login-err');
@@ -992,12 +1009,12 @@
     }
     _authBusy = true;
     try {
-      const d = await apiCall({
+      const d = await apiCall(Object.assign({
         action: 'definirPinOperador',
         operadorId: selectedOp.id,
         pin,
         pinConfirmar: pin2
-      });
+      }, mkAuthUnidadeLoginParams_()));
       if (!d.ok) {
         if (d.code === 409 || (d.erro && d.erro.indexOf('ja esta logado') >= 0)) {
           handleSessaoOcupada_(d, 'mk-create-err');
@@ -1036,7 +1053,11 @@
     showErr('mk-login-pin-err', '');
     _authBusy = true;
     try {
-      const d = await apiCall({ action: 'loginOperador', operadorId: selectedOp.id, pin });
+      const d = await apiCall(Object.assign({
+        action: 'loginOperador',
+        operadorId: selectedOp.id,
+        pin
+      }, mkAuthUnidadeLoginParams_()));
       if (!d.ok) {
         if (d.code === 428 || d.cadastroIncompleto) {
           mkRedirectCadastroRh_(d.operadorId || selectedOp.id, d.erro || 'Cadastro RH incompleto. Redirecionando para Colaboradores…');
@@ -1318,10 +1339,14 @@
         }
       }
       const pinParams = typeof mkAuthAdminPinParams_ === 'function' ? mkAuthAdminPinParams_() : {};
+      /* I171: balcão libera só a loja; holding libera as duas. */
+      const uidLib = (typeof mkIsBalcaoEstrito_ === 'function' && mkIsBalcaoEstrito_())
+        ? mkAuthUnidadeLoginParams_()
+        : { unidadeId: 'all' };
       const d = await apiCall(Object.assign({
         action: 'liberarSessaoOperadorAdmin',
         _t: Date.now()
-      }, pinParams), 30000);
+      }, uidLib, pinParams), 30000);
       if (!d || !d.ok) {
         const msg = (d && d.erro) || 'Nao foi possivel liberar. Confirme conexao e GAS publicado.';
         mkAuthShowLiberarStatus_(false, 'Falha: ' + msg);
@@ -1364,7 +1389,7 @@
         action: 'liberarSessaoOperador',
         operadorId: id,
         _t: Date.now()
-      }, pinParams), 30000);
+      }, mkAuthUnidadeLoginParams_(), pinParams), 30000);
       if (!d || !d.ok) {
         if (typeof mkAuthEnsureAdminPin_ === 'function') {
           const okPin = await mkAuthEnsureAdminPin_('Deslogar operador do balcao');
@@ -1376,7 +1401,7 @@
         d = await apiCall(Object.assign({
           action: 'liberarSessaoOperadorAdmin',
           _t: Date.now()
-        }, typeof mkAuthAdminPinParams_ === 'function' ? mkAuthAdminPinParams_() : {}), 30000);
+        }, { unidadeId: 'all' }, typeof mkAuthAdminPinParams_ === 'function' ? mkAuthAdminPinParams_() : {}), 30000);
         if (!d || !d.ok) {
           const msg = (d && d.erro) || 'Erro ao deslogar';
           mkAuthShowLiberarStatus_(false, 'Falha: ' + msg);

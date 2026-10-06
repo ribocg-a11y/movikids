@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.231
+// MOVI KIDS — Google Apps Script v1.5.232
+// v1.5.232: I171 — sessão operador por unidade (Golden || La Ville em paralelo; bloqueio só na mesma loja)
 // v1.5.231: I160 — painelGestaoPessoasAdmin: cfg.escala null (Eduarda/Karen sem turno) → crash reading '5'
 // v1.5.230: I159t — padrão RH/escala La Ville (14h–21:30 · folga terça); equipe 0 OK até contratar
 // v1.5.229: I159s — equipe por loja: definirUnidadeEquipeAdmin + seed Milena=all; sync RH
@@ -223,7 +224,7 @@
 
 // ── CONSTANTES ───────────────────────────────────────────────
 /** Versão exposta em ping, carregarInicio, validarSchema, gestaoPessoasStatus (bump com header). */
-const MK_GAS_VERSAO_  = 'v1.5.231';
+const MK_GAS_VERSAO_  = 'v1.5.232';
 const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.231';
 const SHEET_ID   = '1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618';
 const DEPLOY_ID  = 'AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y';
@@ -5580,7 +5581,8 @@ function metaOperadorIdFromRequest_(p) {
   };
   const fromP = tryId(p && p.operadorId);
   if (fromP) return fromP;
-  const srv = getSessaoOperadorAtiva_();
+  const uidMeta = (p && (p.unidadeId || p.unidade)) ? sessaoUnidadeCanon_(p.unidadeId || p.unidade) : null;
+  const srv = uidMeta ? getSessaoOperadorAtiva_(uidMeta) : getSessaoOperadorAtiva_();
   if (srv && srv.operadorId) return tryId(srv.operadorId);
   return 0;
 }
@@ -11102,9 +11104,36 @@ function fbDadosSessao_(row, status, rowIndex) {
 }
 
 // ── OPERADORES / AUTH v1.5.33 ─────────────────────────────────
+/** Legado global (pré-I171) — migrado para …_golden na 1ª leitura. */
 const MK_SESSAO_OPERADOR_KEY = 'MK_SESSAO_OPERADOR_ATIVA';
+const MK_SESSAO_OPERADOR_KEY_PREFIX_ = 'MK_SESSAO_OPERADOR_ATIVA_';
 const MK_SESSAO_OPERADOR_TTL_MS = 18 * 60 * 60 * 1000;
 const MK_SESSAO_OPERADOR_IDLE_MS = 60 * 60 * 1000;
+
+/** I171 — chave de sessão sempre golden|laville (nunca all). */
+function sessaoUnidadeCanon_(raw) {
+  const id = unidadeIdCanon_(raw);
+  return id === 'laville' ? 'laville' : 'golden';
+}
+
+function sessaoOperadorPropKey_(unidadeId) {
+  return MK_SESSAO_OPERADOR_KEY_PREFIX_ + sessaoUnidadeCanon_(unidadeId);
+}
+
+/** Loja do balcão na request (prioridade) — op.all usa a loja onde está entrando. */
+function unidadeIdSessaoBalcaoFrom_(p, op) {
+  p = p || {};
+  const fromP = unidadeIdFilterFrom_(p);
+  if (fromP && fromP !== 'all') return sessaoUnidadeCanon_(fromP);
+  if (op && op.unidadeId && String(op.unidadeId).toLowerCase() !== 'all') {
+    return sessaoUnidadeCanon_(op.unidadeId);
+  }
+  return 'golden';
+}
+
+function labelLojaSessao_(uid) {
+  return sessaoUnidadeCanon_(uid) === 'laville' ? 'La Ville' : 'Golden';
+}
 
 const OPERADORES_PADRAO_ = ['Eduarda', 'Milena Nunes'];
 const OPERADORES_RENOMEAR_LEGADO_ = {
@@ -11270,15 +11299,38 @@ function sessaoOperadorIdleExpirada_(s) {
   return false;
 }
 
-function getSessaoOperadorAtiva_() {
-  const raw = PropertiesService.getScriptProperties().getProperty(MK_SESSAO_OPERADOR_KEY);
+/**
+ * I171 — sessão ativa da loja (golden|laville).
+ * Sem argumento: tenta golden (compat meta/comando) depois laville.
+ */
+function getSessaoOperadorAtiva_(unidadeId) {
+  const props = PropertiesService.getScriptProperties();
+  if (unidadeId == null || String(unidadeId).trim() === '' || String(unidadeId).toLowerCase() === 'all') {
+    const g = getSessaoOperadorAtiva_('golden');
+    if (g) return g;
+    return getSessaoOperadorAtiva_('laville');
+  }
+  const uid = sessaoUnidadeCanon_(unidadeId);
+  const key = sessaoOperadorPropKey_(uid);
+  let raw = props.getProperty(key);
+  /* Migra legado global → golden (1×). */
+  if (!raw && uid === 'golden') {
+    raw = props.getProperty(MK_SESSAO_OPERADOR_KEY);
+    if (raw) {
+      try {
+        props.setProperty(key, raw);
+        props.deleteProperty(MK_SESSAO_OPERADOR_KEY);
+      } catch (eMig) { /* ok */ }
+    }
+  }
   if (!raw) return null;
   try {
     const s = JSON.parse(raw);
     if (!s || !s.operadorId) return null;
+    s.unidadeId = uid;
     if (sessaoOperadorIdleExpirada_(s)) {
-      registrarAuditoriaTurno_('logout_inatividade', s, 'Sessao expirada por inatividade (1h)');
-      PropertiesService.getScriptProperties().deleteProperty(MK_SESSAO_OPERADOR_KEY);
+      registrarAuditoriaTurno_('logout_inatividade', s, 'Sessao expirada por inatividade (1h) · ' + labelLojaSessao_(uid));
+      props.deleteProperty(key);
       return null;
     }
     return s;
@@ -11287,13 +11339,25 @@ function getSessaoOperadorAtiva_() {
   }
 }
 
-function sessaoOperadorPayload_(ativa) {
-  const s = ativa || getSessaoOperadorAtiva_();
+function listarSessoesOperadorAtivas_() {
+  const out = {};
+  const g = getSessaoOperadorAtiva_('golden');
+  const l = getSessaoOperadorAtiva_('laville');
+  if (g) out.golden = sessaoOperadorPayload_(g, 'golden');
+  if (l) out.laville = sessaoOperadorPayload_(l, 'laville');
+  return out;
+}
+
+function sessaoOperadorPayload_(ativa, unidadeId) {
+  let s = ativa;
+  if (s === undefined) s = getSessaoOperadorAtiva_(unidadeId);
   if (!s) return null;
+  const uid = sessaoUnidadeCanon_(s.unidadeId || unidadeId || 'golden');
   return {
     operadorId: Number(s.operadorId),
     nome: String(s.nome || '').trim(),
-    loggedAt: Number(s.loggedAt || 0)
+    loggedAt: Number(s.loggedAt || 0),
+    unidadeId: uid
   };
 }
 
@@ -11322,18 +11386,28 @@ function registrarAuditoriaTurno_(acao, sessao, detalhe) {
   }
 }
 
-function liberarSessaoOperadorAtiva_(force, detalhe) {
-  if (force) {
-    const ativa = getSessaoOperadorAtiva_();
-    if (ativa) registrarAuditoriaTurno_(detalhe || 'logout', ativa, detalhe || '');
-    PropertiesService.getScriptProperties().deleteProperty(MK_SESSAO_OPERADOR_KEY);
-    return true;
+/** I171 — libera só a loja indicada (default golden se omitido). */
+function liberarSessaoOperadorAtiva_(force, detalhe, unidadeId) {
+  if (!force) return false;
+  const uid = sessaoUnidadeCanon_(unidadeId || 'golden');
+  const ativa = getSessaoOperadorAtiva_(uid);
+  if (ativa) registrarAuditoriaTurno_(detalhe || 'logout', ativa, (detalhe || '') + ' · ' + labelLojaSessao_(uid));
+  const props = PropertiesService.getScriptProperties();
+  props.deleteProperty(sessaoOperadorPropKey_(uid));
+  if (uid === 'golden') {
+    try { props.deleteProperty(MK_SESSAO_OPERADOR_KEY); } catch (eL) { /* ok */ }
   }
-  return false;
+  return true;
 }
 
-function ocupadoPorOutroOperador_(operadorId) {
-  const ativa = getSessaoOperadorAtiva_();
+function liberarTodasSessoesOperadorAtiva_(detalhe) {
+  liberarSessaoOperadorAtiva_(true, detalhe || 'logout_admin', 'golden');
+  liberarSessaoOperadorAtiva_(true, detalhe || 'logout_admin', 'laville');
+  return true;
+}
+
+function ocupadoPorOutroOperador_(operadorId, unidadeId) {
+  const ativa = getSessaoOperadorAtiva_(unidadeId);
   if (!ativa) return null;
   if (Number(ativa.operadorId) === Number(operadorId)) return null;
   return ativa;
@@ -11341,42 +11415,47 @@ function ocupadoPorOutroOperador_(operadorId) {
 
 function errOperadorJaLogado_(ativa) {
   const nome = String(ativa.nome || 'outro operador').trim();
+  const loja = labelLojaSessao_(ativa.unidadeId);
   return ContentService.createTextOutput(JSON.stringify({
     ok: false,
-    erro: 'O operador ' + nome + ' ja esta logado no sistema. So o administrador pode entrar enquanto isso.',
+    erro: 'O operador ' + nome + ' ja esta logado no balcao ' + loja + '. So o administrador pode entrar nessa loja enquanto isso.',
     code: 409,
     sessaoAtiva: sessaoOperadorPayload_(ativa)
   })).setMimeType(ContentService.MimeType.JSON);
 }
 
-function registrarSessaoOperadorAtiva_(op) {
+function registrarSessaoOperadorAtiva_(op, unidadeId) {
+  const uid = sessaoUnidadeCanon_(unidadeId || (op && op.unidadeId) || 'golden');
   const now = Date.now();
   const s = {
     operadorId: Number(op.id),
     nome: String(op.nome || '').trim(),
+    unidadeId: uid,
     loggedAt: now,
     lastActivityAt: now,
     expiresAt: now + MK_SESSAO_OPERADOR_TTL_MS
   };
-  PropertiesService.getScriptProperties().setProperty(MK_SESSAO_OPERADOR_KEY, JSON.stringify(s));
-  registrarAuditoriaTurno_('login', s, 'Login balcao');
+  PropertiesService.getScriptProperties().setProperty(sessaoOperadorPropKey_(uid), JSON.stringify(s));
+  registrarAuditoriaTurno_('login', s, 'Login balcao · ' + labelLojaSessao_(uid));
   return s;
 }
 
 function touchSessaoOperador_(p) {
-  const ativa = getSessaoOperadorAtiva_();
-  if (!ativa) return resp_({ mensagem: 'Nenhuma sessao de operador ativa', sessaoAtiva: null });
+  const uid = unidadeIdSessaoBalcaoFrom_(p);
+  const ativa = getSessaoOperadorAtiva_(uid);
+  if (!ativa) return resp_({ mensagem: 'Nenhuma sessao de operador ativa', sessaoAtiva: null, unidadeId: uid });
   const id = Number(p.operadorId || p.id || 0);
   if (!id || Number(ativa.operadorId) !== id) {
-    return err_('Operador nao confere com a sessao ativa do balcao', 409);
+    return err_('Operador nao confere com a sessao ativa do balcao ' + labelLojaSessao_(uid), 409);
   }
   ativa.lastActivityAt = Date.now();
-  PropertiesService.getScriptProperties().setProperty(MK_SESSAO_OPERADOR_KEY, JSON.stringify(ativa));
-  return resp_({ mensagem: 'Atividade registrada', sessaoAtiva: sessaoOperadorPayload_(ativa) });
+  ativa.unidadeId = uid;
+  PropertiesService.getScriptProperties().setProperty(sessaoOperadorPropKey_(uid), JSON.stringify(ativa));
+  return resp_({ mensagem: 'Atividade registrada', sessaoAtiva: sessaoOperadorPayload_(ativa, uid), unidadeId: uid });
 }
 
-function assertPodeLoginOperador_(operadorId) {
-  const outro = ocupadoPorOutroOperador_(operadorId);
+function assertPodeLoginOperador_(operadorId, unidadeId) {
+  const outro = ocupadoPorOutroOperador_(operadorId, unidadeId);
   if (outro) return errOperadorJaLogado_(outro);
   return null;
 }
@@ -11403,10 +11482,12 @@ function listarOperadoresLogin_(p) {
   }
   operadores.sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'));
   const todosComPin = operadores.length > 0 && operadores.every(o => o.hasPin);
+  const uidSess = (uidFiltro === 'all') ? null : sessaoUnidadeCanon_(uidFiltro);
   return resp_({
     operadores: operadores,
     todosComPin: todosComPin,
-    sessaoAtiva: sessaoOperadorPayload_(),
+    sessaoAtiva: uidSess ? sessaoOperadorPayload_(getSessaoOperadorAtiva_(uidSess), uidSess) : null,
+    sessoesAtivas: listarSessoesOperadorAtivas_(),
     unidadeId: uidFiltro,
     versao: MK_GAS_VERSAO_
   });
@@ -11417,16 +11498,22 @@ function verificarOperadorLogin_(p) {
   if (!found) return err_('Operador nao encontrado', 404);
   const op = operadorObjFromRow_(found.data);
   if (!op.ativo) return err_('Operador inativo', 403);
-  const bloqueio = assertPodeLoginOperador_(op.id);
+  const uid = unidadeIdSessaoBalcaoFrom_(p, op);
+  const bloqueio = assertPodeLoginOperador_(op.id, uid);
   if (bloqueio) return bloqueio;
-  return resp_({ operador: op, sessaoAtiva: sessaoOperadorPayload_() });
+  return resp_({
+    operador: op,
+    sessaoAtiva: sessaoOperadorPayload_(getSessaoOperadorAtiva_(uid), uid),
+    unidadeId: uid
+  });
 }
 
 function definirPinOperador_(p) {
   const found = operadorRowById_(p.operadorId || p.id);
   if (!found) return err_('Operador nao encontrado', 404);
   const opCheck = operadorObjFromRow_(found.data);
-  const bloqueio = assertPodeLoginOperador_(opCheck.id);
+  const uid = unidadeIdSessaoBalcaoFrom_(p, opCheck);
+  const bloqueio = assertPodeLoginOperador_(opCheck.id, uid);
   if (bloqueio) return bloqueio;
   const pin = pinDigits_(p.pin);
   const pin2 = pinDigits_(p.pinConfirmar || p.pinConfirm);
@@ -11439,8 +11526,13 @@ function definirPinOperador_(p) {
   sh.getRange(found.row, 4, 1, 2).setValues([[hash, salt]]);
   sh.getRange(found.row, 7).setValue(fmtData_(new Date()) + ' ' + fmtHoraLocal_(new Date()));
   const op = operadorObjFromRow_(sh.getRange(found.row, 1, 1, COL_OPS_READ_).getValues()[0]);
-  registrarSessaoOperadorAtiva_(op);
-  return resp_({ operador: op, role: roleFromPerfil_(op.perfil), sessaoAtiva: sessaoOperadorPayload_() });
+  registrarSessaoOperadorAtiva_(op, uid);
+  return resp_({
+    operador: op,
+    role: roleFromPerfil_(op.perfil),
+    sessaoAtiva: sessaoOperadorPayload_(getSessaoOperadorAtiva_(uid), uid),
+    unidadeId: uid
+  });
 }
 
 function loginOperador_(p) {
@@ -11448,11 +11540,12 @@ function loginOperador_(p) {
   if (!found) return err_('Operador nao encontrado', 404);
   const op = operadorObjFromRow_(found.data);
   if (!op.ativo) return err_('Operador inativo', 403);
-  const bloqueio = assertPodeLoginOperador_(op.id);
+  const uid = unidadeIdSessaoBalcaoFrom_(p, op);
+  const bloqueio = assertPodeLoginOperador_(op.id, uid);
   if (bloqueio) return bloqueio;
-  const ativa = getSessaoOperadorAtiva_();
+  const ativa = getSessaoOperadorAtiva_(uid);
   if (ativa && Number(ativa.operadorId) === Number(op.id)) {
-    liberarSessaoOperadorAtiva_(true);
+    liberarSessaoOperadorAtiva_(true, 'relogin', uid);
   }
   const hash = String(found.data[3] || '').trim().replace(/\s/g, '');
   const salt = String(found.data[4] || '').trim().replace(/\s/g, '');
@@ -11478,44 +11571,69 @@ function loginOperador_(p) {
   }
   const sh = operadoresSheet_();
   sh.getRange(found.row, 7).setValue(fmtData_(new Date()) + ' ' + fmtHoraLocal_(new Date()));
-  registrarSessaoOperadorAtiva_(op);
-  return resp_({ operador: op, role: roleFromPerfil_(op.perfil), sessaoAtiva: sessaoOperadorPayload_() });
+  registrarSessaoOperadorAtiva_(op, uid);
+  return resp_({
+    operador: op,
+    role: roleFromPerfil_(op.perfil),
+    sessaoAtiva: sessaoOperadorPayload_(getSessaoOperadorAtiva_(uid), uid),
+    unidadeId: uid
+  });
 }
 
 function liberarSessaoOperador_(p) {
   const id = Number(p.operadorId || p.id || 0);
-  const ativa = getSessaoOperadorAtiva_();
-  if (!ativa) return resp_({ mensagem: 'Nenhuma sessao de operador ativa', sessaoAtiva: null });
+  const uid = unidadeIdSessaoBalcaoFrom_(p);
+  const ativa = getSessaoOperadorAtiva_(uid);
+  if (!ativa) return resp_({ mensagem: 'Nenhuma sessao de operador ativa nesta loja', sessaoAtiva: null, unidadeId: uid });
   if (adminPinOk_(p)) {
-    liberarSessaoOperadorAtiva_(true, 'logout_admin');
-    return resp_({ mensagem: 'Sessao liberada pelo administrador', sessaoAtiva: null });
+    liberarSessaoOperadorAtiva_(true, 'logout_admin', uid);
+    return resp_({ mensagem: 'Sessao liberada pelo administrador (' + labelLojaSessao_(uid) + ')', sessaoAtiva: null, unidadeId: uid });
   }
   if (!id) return err_('operadorId obrigatorio', 400);
   if (Number(ativa.operadorId) !== id) {
     return errOperadorJaLogado_(ativa);
   }
-  liberarSessaoOperadorAtiva_(true, 'logout');
-  return resp_({ mensagem: 'Sessao de operador encerrada', sessaoAtiva: null });
+  liberarSessaoOperadorAtiva_(true, 'logout', uid);
+  return resp_({ mensagem: 'Sessao de operador encerrada', sessaoAtiva: null, unidadeId: uid });
 }
 
 function liberarSessaoOperadorAdmin_(p) {
   if (!adminPinOk_(p)) return err_('Acesso negado — PIN administrativo incorreto', 403);
-  liberarSessaoOperadorAtiva_(true, 'logout_admin');
-  return resp_({ mensagem: 'Sessao do balcao liberada. Qualquer operador pode entrar.', sessaoAtiva: null });
+  const rawUid = p && (p.unidadeId != null ? p.unidadeId : (p.unidade != null ? p.unidade : p.unit));
+  if (rawUid == null || String(rawUid).trim() === '' || String(rawUid).toLowerCase() === 'all') {
+    liberarTodasSessoesOperadorAtiva_('logout_admin');
+    return resp_({
+      mensagem: 'Sessoes Golden e La Ville liberadas. Qualquer operador pode entrar.',
+      sessaoAtiva: null,
+      sessoesAtivas: {},
+      unidadeId: 'all'
+    });
+  }
+  const uid = sessaoUnidadeCanon_(rawUid);
+  liberarSessaoOperadorAtiva_(true, 'logout_admin', uid);
+  return resp_({
+    mensagem: 'Sessao do balcao ' + labelLojaSessao_(uid) + ' liberada. Qualquer operador pode entrar nesta loja.',
+    sessaoAtiva: null,
+    sessoesAtivas: listarSessoesOperadorAtivas_(),
+    unidadeId: uid
+  });
 }
 
 function loginAdmin_(p) {
   if (!adminPinOk_(p)) return err_('PIN administrativo incorreto', 401);
+  const uid = unidadeIdSessaoBalcaoFrom_(p);
   return resp_({
     operador: { id: 'ADMIN', nome: 'Administrador', hasPin: true, ativo: true },
     role: 'admin',
-    sessaoAtiva: sessaoOperadorPayload_()
+    sessaoAtiva: sessaoOperadorPayload_(getSessaoOperadorAtiva_(uid), uid),
+    sessoesAtivas: listarSessoesOperadorAtivas_(),
+    unidadeId: uid
   });
 }
 
 function listarOperadoresAdmin_(p) {
   if (!adminPinOk_(p)) return err_('Acesso negado', 403);
-  return listarOperadoresLogin_();
+  return listarOperadoresLogin_(p || {});
 }
 
 function cadastrarOperadorSistema_(p) {
@@ -11668,8 +11786,11 @@ function resetarPinOperadorAdmin_(p) {
   const found = operadorRowById_(p.operadorId || p.id);
   if (!found) return err_('Operador nao encontrado', 404);
   const opId = Number(found.data[0]);
-  const ativa = getSessaoOperadorAtiva_();
-  if (ativa && Number(ativa.operadorId) === opId) liberarSessaoOperadorAtiva_(true);
+  /* I171: se o op estiver logado em qualquer loja, libera só essa loja. */
+  ['golden', 'laville'].forEach(function (uid) {
+    const ativa = getSessaoOperadorAtiva_(uid);
+    if (ativa && Number(ativa.operadorId) === opId) liberarSessaoOperadorAtiva_(true, 'reset_pin', uid);
+  });
   const sh = operadoresSheet_();
   sh.getRange(found.row, 4, 1, 2).setValues([['', '']]);
   const op = operadorObjFromRow_(sh.getRange(found.row, 1, 1, COL_OPS_READ_).getValues()[0]);

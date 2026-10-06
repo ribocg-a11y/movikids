@@ -142,7 +142,7 @@ Ordem curta — tablet + mesa:
 5. Celular: `acompanhar.html` + `foto-moldura.html?unidade=laville` (chip/rodapé La Ville).
 6. Holding: pill La Ville → Caixa/Receita dia a dia isolados; pill Golden sem vazamento.
 
-**I170 (06/10):** Contas/Hist Golden vazavam no balcão LV (GAS já filtrava). FE **v1.9.163** fail-closed — abrir `?unidade=laville&force=1.9.163` → Contas **0**. **Jennifer** LV · **Karen** Freelancer RH (I152). **Ainda sócio:** PDF Golden set · CTO/e-mail LV · assinar FASE 17.
+**I171 (06/10):** sessão balcão **por loja** (GAS **v1.5.232** + FE **v1.9.164**) — Jennifer LV e Karen Golden em paralelo. Exige **Nova versão Web** GAS. **I170** Contas/Hist fail-closed. **Ainda sócio:** Nova Web GAS I171 · PDF Golden set · CTO LV.
 
 ---
 

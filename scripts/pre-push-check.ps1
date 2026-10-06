@@ -614,6 +614,18 @@ try {
     } else {
       Add-Check "guard.i170.fe.isolamento" "ok" "balcão estrito + stats tag + hist/tile fail-closed (I170)"
     }
+    # I171 — sessão operador por loja
+    $gasRawG = ""
+    $gasJsG = Join-Path $root "MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs"
+    if (Test-Path $gasJsG) { $gasRawG = Get-Content -Path $gasJsG -Raw -Encoding UTF8 }
+    $authRawG = ""
+    $authJsG = Join-Path $root "mk-auth.js"
+    if (Test-Path $authJsG) { $authRawG = Get-Content -Path $authJsG -Raw -Encoding UTF8 }
+    if ($gasRawG -notmatch 'MK_SESSAO_OPERADOR_KEY_PREFIX_|sessaoUnidadeCanon_|I171' -or $authRawG -notmatch 'mkAuthUnidadeLoginParams_') {
+      Add-Check "guard.i171.sessao.unidade" "fail" "I171 sessao por loja incompleto (GAS prefix / FE unidade login)"
+    } else {
+      Add-Check "guard.i171.sessao.unidade" "ok" "sessao operador namespaced por unidade (I171)"
+    }
   }
 
   $adminJs = Join-Path $root "mk-admin.js"
