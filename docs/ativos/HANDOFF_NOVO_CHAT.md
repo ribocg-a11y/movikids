@@ -1,14 +1,14 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 03/10/2026 · FE **v1.9.161** · GAS **v1.5.231** · **I169** holerites set PDF · I166–I168 ✅ · La Ville · Golden ✅
+**Atualizado:** 06/10/2026 · FE **v1.9.164** · GAS Web **v1.5.232** · repo **v1.5.233** I172 · I170–I171 ✅ · La Ville · Golden ✅
 
 ## Produção (agora)
 
 | Camada | Versão | Link |
 |--------|--------|------|
-| Frontend | **v1.9.161** | https://ribocg-a11y.github.io/movikids/?force=1.9.161 |
-| Gestão Pessoas | **v1.9.161** | `gestao-pessoas.html?force=1.9.161` |
-| GAS | ping Web **v1.5.231** ✅ | I160 escala null + I159t LV |
+| Frontend | **v1.9.164** | https://ribocg-a11y.github.io/movikids/?force=1.9.164 |
+| Gestão Pessoas | **v1.9.164** | `gestao-pessoas.html?force=1.9.164` |
+| GAS | ping Web **v1.5.232** · repo **v1.5.233** (I172) | sessão por loja ✅ · hist unidade ⏳ Nova Web |
 | Design System | v1.1 | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
 
 **GAS raw:** https://raw.githubusercontent.com/ribocg-a11y/movikids/main/MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs  
@@ -142,7 +142,11 @@ Ordem curta — tablet + mesa:
 5. Celular: `acompanhar.html` + `foto-moldura.html?unidade=laville` (chip/rodapé La Ville).
 6. Holding: pill La Ville → Caixa/Receita dia a dia isolados; pill Golden sem vazamento.
 
-**I171 (06/10):** sessão balcão **por loja** (GAS **v1.5.232** + FE **v1.9.164**) — Jennifer LV e Karen Golden em paralelo. Exige **Nova versão Web** GAS. **I170** Contas/Hist fail-closed. **Ainda sócio:** Nova Web GAS I171 · PDF Golden set · CTO LV.
+**I171 (06/10):** sessão balcão **por loja** — Web **v1.5.232** ✅ + FE **v1.9.164**. Jennifer LV ∥ Karen Golden.
+
+**I172 (06/10):** `listarHistorico` ainda **misturava lojas** na API (Web **v1.5.232**). Repo **v1.5.233** filtra `unidade_id` + cache por loja. **Ainda sócio:** Nova versão Web GAS (**v1.5.233**) · PDF Golden set · CTO LV.
+
+**Trava isolamento (audit 06/10):** `carregarInicio` PASS (G nSess=6 · LV=0). `listarHistorico` FAIL até Nova Web I172. FE Contas fail-closed I170.
 
 ---
 

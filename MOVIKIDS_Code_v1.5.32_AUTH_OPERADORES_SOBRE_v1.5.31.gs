@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.232
+// MOVI KIDS — Google Apps Script v1.5.233
+// v1.5.233: I172 — listarHistorico filtra unidade_id (anti-vazamento Golden→La Ville)
 // v1.5.232: I171 — sessão operador por unidade (Golden || La Ville em paralelo; bloqueio só na mesma loja)
 // v1.5.231: I160 — painelGestaoPessoasAdmin: cfg.escala null (Eduarda/Karen sem turno) → crash reading '5'
 // v1.5.230: I159t — padrão RH/escala La Ville (14h–21:30 · folga terça); equipe 0 OK até contratar
@@ -224,7 +225,7 @@
 
 // ── CONSTANTES ───────────────────────────────────────────────
 /** Versão exposta em ping, carregarInicio, validarSchema, gestaoPessoasStatus (bump com header). */
-const MK_GAS_VERSAO_  = 'v1.5.232';
+const MK_GAS_VERSAO_  = 'v1.5.233';
 const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.231';
 const SHEET_ID   = '1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618';
 const DEPLOY_ID  = 'AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y';
@@ -4573,10 +4574,12 @@ function listarHistorico_(p) {
   const endDate    = (p.endDate   || '').trim();
   const statsOnly  = String(p.statsOnly || '') === '1' || p.statsOnly === true;
   const bustCache  = String(p.bustCache || '') === '1';
+  /* I172 — filtro por loja (fail-closed); cache separado por unidade. */
+  const uidFiltro = unidadeIdFilterFrom_(p || {});
 
   const sCmp = filtroData ? dateToCmp_(filtroData) : (startDate ? dateToCmp_(startDate) : '');
   const eCmp = filtroData ? sCmp : (endDate ? dateToCmp_(endDate) : '');
-  const cacheKey = 'hist_v38_' + (filtroData || (startDate + '_' + endDate)) + (statsOnly ? '_s' : '_f');
+  const cacheKey = 'hist_v39_u' + uidFiltro + '_' + (filtroData || (startDate + '_' + endDate)) + (statsOnly ? '_s' : '_f');
   const cache = CacheService.getScriptCache();
   if (!bustCache) {
     const hit = cache.get(cacheKey);
@@ -4588,11 +4591,16 @@ function listarHistorico_(p) {
   const sheet = sh_(SH_LOC);
   const last  = sheet.getLastRow();
   if (last < DATA_ROW) {
-    const empty = { locacoes: [], total: 0, stats: { n: 0, totalFat: 0, totalExt: 0, ticketMedio: 0, porTipo: {}, porPlano: {}, porVeiculo: {}, extPorDia: [] } };
+    const empty = {
+      locacoes: [], total: 0, unidadeId: uidFiltro,
+      stats: { n: 0, totalFat: 0, totalExt: 0, ticketMedio: 0, porTipo: {}, porPlano: {}, porVeiculo: {}, extPorDia: [] }
+    };
     return resp_(empty);
   }
 
-  const dados = sheet.getRange(DATA_ROW, 1, last - DATA_ROW + 1, 18).getValues();
+  /* COL_LOC_READ_=29 inclui AC unidade_id (I159e/I172). */
+  const nCols = Math.max(18, Number(COL_LOC_READ_) || 29);
+  const dados = sheet.getRange(DATA_ROW, 1, last - DATA_ROW + 1, nCols).getValues();
   const lista = [];
   const enc = [];
   const extPorDiaMap = {};
@@ -4600,12 +4608,14 @@ function listarHistorico_(p) {
   for (let i = dados.length - 1; i >= 0; i--) {
     const r = dados[i];
     if (!r[0] || r[0] === 0) continue;
+    if (!locRowMatchesUnidade_(r, uidFiltro)) continue;
     if (isLocacaoTeste_(String(r[12] || ''), String(r[11] || ''), String(r[13] || ''), String(r[17] || ''))) continue;
     const data = cellToStr_(r[1]);
     const dcmp = dateToCmp_(data);
     if (!historicoInRange_(dcmp, filtroData, sCmp, eCmp)) continue;
 
     const status = String(r[14]);
+    const uidRow = unidadeIdOfRow_(r);
     const item = {
       rowIndex:      DATA_ROW + i,
       id:            r[0],
@@ -4625,7 +4635,8 @@ function listarHistorico_(p) {
       status:        status,
       veiculo:       String(r[15] || ''),
       pagamento:     String(r[16] || ''),
-      observacao:    String(r[17] || '')
+      observacao:    String(r[17] || ''),
+      unidadeId:     uidRow
     };
 
     if (status === 'Encerrada') {
@@ -4653,6 +4664,7 @@ function listarHistorico_(p) {
   const payload = {
     locacoes: lista,
     total:    lista.length,
+    unidadeId: uidFiltro,
     stats: {
       n:           enc.length,
       totalFat:    Math.round(totalFat * 100) / 100,

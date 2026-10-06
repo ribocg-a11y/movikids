@@ -1,8 +1,8 @@
-# MOVI KIDS — Estado atual (03/10/2026 · FE v1.9.161 · I166–I168)
+# MOVI KIDS — Estado atual (06/10/2026 · FE v1.9.164 · I170–I172)
 
 Referência única para alinhamento local × produção.
 
-**Ciclo dev ativo:** **`PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`** — Sprint D · multi-loja **I159–I165** ✅ · **I166–I168** folha/PDF ✅ · GAS Web **v1.5.231** · **I158** Golden ✅ · receita dia a dia ✅  
+**Ciclo dev ativo:** **`PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`** — Sprint D · multi-loja **I159–I172** · FE **v1.9.164** · GAS Web **v1.5.232** (repo **v1.5.233** I172 hist) · **I158** Golden ✅ · receita dia a dia ✅  
 
 **Diagnóstico 6 camadas:** **`DIAGNOSTICO_SISTEMA_6_CAMADAS_2026-06.md`**  
 **Prioridades gerais:** **`PLANEJAMENTO_ATUAL_2026-06.md`** §9

@@ -626,6 +626,14 @@ try {
     } else {
       Add-Check "guard.i171.sessao.unidade" "ok" "sessao operador namespaced por unidade (I171)"
     }
+    # I172 — listarHistorico filtra unidade_id (não vaza Golden→La Ville)
+    $fnHist = [regex]::Match($gasRawG, 'function listarHistorico_\([\s\S]{0,14000}?function salvarCusto_')
+    $histBody = if ($fnHist.Success) { $fnHist.Value } else { '' }
+    if (-not $histBody -or $histBody -notmatch 'hist_v39_u' -or $histBody -notmatch 'I172' -or $histBody -notmatch 'locRowMatchesUnidade_' -or $histBody -notmatch 'unidadeIdFilterFrom_' -or $histBody -notmatch 'COL_LOC_READ_') {
+      Add-Check "guard.i172.gas.historico" "fail" "listarHistorico_ sem filtro/cache por unidade (I172)"
+    } else {
+      Add-Check "guard.i172.gas.historico" "ok" "historico GAS filtra unidade_id + cache por loja (I172)"
+    }
   }
 
   $adminJs = Join-Path $root "mk-admin.js"
