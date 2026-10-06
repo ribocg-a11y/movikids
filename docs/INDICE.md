@@ -1,6 +1,6 @@
 # MOVI KIDS — Índice de documentação
 
-**Atualizado:** 03/10/2026 (FE **v1.9.161** · GAS ping **v1.5.231** · **I166–I168** folha/PDF ✅ · La Ville **I159–I165** ✅ · **I158** Golden ✅)
+**Atualizado:** 06/10/2026 (FE **v1.9.164** · GAS Web **v1.5.232** · repo **v1.5.233** · **I172–I178** isolamento · **I170–I171** ✅)
 
 ## Comece aqui
 
@@ -23,6 +23,7 @@
 | [**INCIDENTE_I43_CARREGAR_INICIO_COL_Y_2026-06-23.md**](ativos/INCIDENTE_I43_CARREGAR_INICIO_COL_Y_2026-06-23.md) | **I43** — cronômetro revertia após ▶ |
 | [**INCIDENTE_I53_CONFIG_PLANILHA_REPAIR_2026-06-24.md**](arquivo/incidentes/INCIDENTE_I53_CONFIG_PLANILHA_REPAIR_2026-06-24.md) | **I53** — CONFIG memorial, schema, repair |
 | [**INCIDENTE_I96_I99_MULTI_VEICULO_2026-07-10.md**](arquivo/incidentes/INCIDENTE_I96_I99_MULTI_VEICULO_2026-07-10.md) | **I96–I103** — multi-veículo · overlay · contagem encerradas/caixa |
+| [**AUDITORIA_ISOLAMENTO_MULTIUNIDADE_I172_2026-10-06.md**](ativos/AUDITORIA_ISOLAMENTO_MULTIUNIDADE_I172_2026-10-06.md) | **I172–I178** — furos isolamento Golden×La Ville |
 | [**INCIDENTE_I168_FOLHA_CACHE_FORCE_2026-10-02.md**](ativos/INCIDENTE_I168_FOLHA_CACHE_FORCE_2026-10-02.md) | **I168** — Folha cache-first (anti force/retries) |
 | [**INCIDENTE_I167_HOLERITE_PDF_ABOUT_BLANK_2026-10-02.md**](ativos/INCIDENTE_I167_HOLERITE_PDF_ABOUT_BLANK_2026-10-02.md) | **I167** — PDF holerite about:blank → Blob |
 | [**INCIDENTE_I158_GOLDEN_CONTA_CANCELADA_2026-09-23.md**](arquivo/incidentes/INCIDENTE_I158_GOLDEN_CONTA_CANCELADA_2026-09-23.md) | **I158** — Golden sem Cancelada · FE kpiMes · set 14577 |

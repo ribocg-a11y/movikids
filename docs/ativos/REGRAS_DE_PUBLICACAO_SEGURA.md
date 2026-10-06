@@ -336,3 +336,12 @@ PIN admin deve sobreviver restore PWA por **24h**:
 3. Guards: `guard.auth.deslogar-api-first`, `guard.auth.dual-banner`.
 4. Teste readonly: `scripts/testes/TESTE_SESSAO_LIBERAR_READONLY.ps1`.
 5. Homolog tablet obrigatória após mudança em `mk-auth.js` / `mk-admin.js` auth.
+
+## Regra 20 — Isolamento multi-loja (I165 / I170–I178)
+
+1. **Nunca** declarar isolamento fechado só com Contas/`carregarInicio` — varrer matriz em `PROTOCOLO_DIAGNOSTICO` §1.5.1 e `AUDITORIA_ISOLAMENTO_MULTIUNIDADE_I172_*`.
+2. Toda action pública que lê `LOCACOES`/`CUSTOS` e aceita `unidadeId` deve: (a) `unidadeIdFilterFrom_`, (b) filtrar linhas, (c) cache key com uid, (d) `getRange` ≥ `COL_LOC_READ_=29` se usa `unidadeIdOfRow_` / `r[28]`.
+3. **Proibido** carimbar `payload.unidadeId = uid` sem passar uid ao builder (padrão I173 `comandoOperacional`).
+4. Conta do dia / mestre (`findContaMestreParaNovaLoc_`) deve ser **por unidade** (I174).
+5. FE fail-closed (I170) é rede de segurança — não substitui GAS.
+6. Após Nova versão Web: reteste golden vs laville nas actions da matriz.

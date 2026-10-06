@@ -12,8 +12,9 @@ Referência única para alinhamento local × produção.
 **Acessos:** **`ACESSOS_E_AUTORIZACOES.md`** — papéis, PIN admin, agente vs humano  
 **Índice:** `../INDICE.md` · **Prioridades:** **`PLANO_PRIORIDADES_2026-06.md`**  
 **Planejamento ativo:** `PLANEJAMENTO_ATUAL_2026-06.md`  
-**Mapa de erros/bugs:** **`MAPA_ERROS_FALHAS_BUGS.md`** (…/**I168** folha cache · **I167** PDF · **I165** · **I158**)  
-**Plano La Ville:** **`PLANO_MULTI_UNIDADE_GOLDEN_LAVILLE_2026-09.md`**  
+**Mapa de erros/bugs:** **`MAPA_ERROS_FALHAS_BUGS.md`** (…/**I178** isolamento · **I172** hist · **I170–I171** · **I168** folha)  
+**Auditoria isolamento:** **`AUDITORIA_ISOLAMENTO_MULTIUNIDADE_I172_2026-10-06.md`**  
+**Plano La Ville:** **`PLANO_MULTI_UNIDADE_GOLDEN_LAVILLE_2026-09.md`** (🟡 I173–I178 abertos)  
 
 **Incidente I168:** **`INCIDENTE_I168_FOLHA_CACHE_FORCE_2026-10-02.md`**  
 **Incidente I167:** **`INCIDENTE_I167_HOLERITE_PDF_ABOUT_BLANK_2026-10-02.md`**  

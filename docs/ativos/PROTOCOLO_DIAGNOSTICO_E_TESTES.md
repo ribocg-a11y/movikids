@@ -1,8 +1,8 @@
 # MOVI KIDS — Protocolo de diagnóstico, testes e maturidade de aprendizado
 
-**Criado:** 07/06/2026 · **Atualizado:** 29/09/2026 (I166–I168 folha/PDF · I158 Golden · PROTOCOLO_ATUALIZAR_TUDO)  
+**Criado:** 07/06/2026 · **Atualizado:** 06/10/2026 (I172–I178 isolamento multi-loja · FE 1.9.164 · GAS Web 1.5.232)  
 **Função:** quando o usuário pedir *“rodar teste”*, *“diagnosticar”* ou *“validar deploy”*, o agente **segue este documento** — não improvisa escopo.  
-**Complementa:** `MAPA_ERROS_FALHAS_BUGS.md`, `INCIDENTE_I158_*`, `INCIDENTE_I20_CRONOMETRO_RESOLUCAO_2026-06-07.md`, `MAPA_CODIGO_ARQUITETURA.md`, `CHECKLIST_FASE5_TABLET.md` · `EVIDENCIA_ESTABILIDADE_POS_I155_2026-09-08.md`
+**Complementa:** `MAPA_ERROS_FALHAS_BUGS.md`, `AUDITORIA_ISOLAMENTO_MULTIUNIDADE_I172_2026-10-06.md`, `INCIDENTE_I158_*`, `INCIDENTE_I20_CRONOMETRO_RESOLUCAO_2026-06-07.md`, `MAPA_CODIGO_ARQUITETURA.md`, `CHECKLIST_FASE5_TABLET.md` · `EVIDENCIA_ESTABILIDADE_POS_I155_2026-09-08.md`
 
 **Orquestrador:** `scripts/testes/TESTE_PROTOCOLO_DIAGNOSTICO.ps1`  
 **Estabilidade GAS (pós-I155):** `node scripts/testes/teste-estabilidade-pos-i155.cjs`  
@@ -62,6 +62,24 @@ xychart-beta
 | **Paridade só em ativos** | `TESTE_PARIDADE_CRONOMETRO` não cria locação de teste | `TESTE_I43` salvar→iniciar→carregarInicio |
 | **Mudança I42 sem matriz** | `COL_CONTA_ID_` aplicado em leitura de sync | Separar **gravar** (col S) de **ler** (28 cols) |
 
+### 1.5 Isolamento multi-loja (06/10/2026) — lição I170→I178
+
+| Anti-padrão | O que aconteceu | Regra nova |
+|-------------|-----------------|------------|
+| **Validou só Contas/inicio** | I170 FE + I171 sessão OK; `listarHistorico` ainda misturava | Após qualquer fix multi-loja: rodar **matriz §1.5.1** |
+| **Confiar em carimbo `unidadeId`** | `comandoOperacional` grava uid no JSON mas builder é `all` (I173) | uid no payload **e** uid no core que calcula |
+| **getRange curto + match unidade** | Hist 18 cols / kpiMes col 19 → `r[28]` inexistente (I172/I178) | `locRowMatchesUnidade_` ⇒ **`COL_LOC_READ_=29`** |
+| **FE fail-closed = “fechado”** | Tile Contas 0 escondia API suja | Isolamento fechado só com **GAS + FE + reteste dual** |
+
+#### 1.5.1 Matriz obrigatória (golden vs laville, mesmo dia)
+
+```powershell
+# Para cada action: comparar totais golden ≠ laville quando só Golden tem movimento
+carregarInicio, listarAtivas, listarHistorico, resumoDia, kpiMes, comandoOperacional, listarCustos, listarCustosHistorico
+```
+
+Doc completo: `AUDITORIA_ISOLAMENTO_MULTIUNIDADE_I172_2026-10-06.md` · I* **I172–I178**.
+
 ---
 
 ## 2. Mapa de fluxos do sistema (F0–F14)
@@ -82,7 +100,8 @@ Cada fluxo tem: **arquivos**, **incidentes**, **teste automático**, **tablet ob
 | **F9** | Encerrar / cancelar | drawer → GAS → some do ativo | `mk-drawer.js`, `mk-sync.js`, GAS encerrar | I2, I11, I13, **I148**, **I151**, **I151b** | `TESTE_DRAWER_E`, **`TESTE_I151_ENCERRAR_FANTASMA_READONLY`** | ✅ |
 | **F10** | Sync multi-canal | poll + Firebase + merge + BC | `mk-sync.js`, `mk-firebase.js` | I17, I20 | `TESTE_TABLET_F5_F7_F10_F11` (reload OK; 2 abas físico pendente) | ✅ 2 abas |
 | **F11** | Portal responsável | `acompanhar.html` ±2s do balcão | portal + GAS `buscarPortalResponsavel_` | **I16** | `TESTE_PARIDADE_CRONOMETRO` | ✅ celular |
-| **F12** | Admin — KPIs / payback / caixa / cockpit / **folha CLT** | Dashboard (`kpiMes`), Caixa (`resumoDia`), payback, viabilidade | `mk-admin.js`, GAS `buildKpiMesPayload_`, `lerFolhaPlanejamento_`, `repairFolhaAdmin` | I23, **I25**, payback M | `TESTE_KPI_MES_READONLY`, `TESTE_FOLHA_FORMULAS_READONLY`, `TESTE_FASE9_FOLHA_READONLY` | PC admin |
+| **F12** | Admin — KPIs / payback / caixa / cockpit / **folha CLT** | Dashboard (`kpiMes`), Caixa (`resumoDia`), payback, viabilidade | `mk-admin.js`, GAS `buildKpiMesPayload_`, `lerFolhaPlanejamento_`, `repairFolhaAdmin` | I23, **I25**, payback M, **I173–I178** | `TESTE_KPI_MES_READONLY`, `TESTE_FOLHA_FORMULAS_READONLY`, `TESTE_FASE9_FOLHA_READONLY` · matriz isolamento §1.5.1 | PC admin |
+| **F18** | Multi-loja isolamento | Contas/hist/comando/custos/conta-mestre por `unidadeId` | GAS `locRowMatchesUnidade_`, FE I170/I171 | **I165, I170–I178** | audit dual + `guard.i170`/`i172` | ✅ balcão LV + Holding pills |
 | **F13** | CRM relacionamento | busca responsável, badge cadastro | `index.html` rel, GAS | K.3 | `TESTE_RELACIONAMENTO` | opcional |
 | **F14** | HTTP / escrita browser | GET nas 5 actions críticas | `mk-api.js` | **I15** | `TESTE_PARIDADE_HTTP` | ✅ |
 | **F15** | Gestão Pessoas / RH | abas planilha, login colaborador, alertas ponto ADM | `gestao-pessoas.html`, `mk-gestao-pessoas*.js`, `mk-holerite.js`, GAS RH | I29–I34 | `TESTE_GESTAO_PESSOAS_READONLY` | PC / celular holerite |

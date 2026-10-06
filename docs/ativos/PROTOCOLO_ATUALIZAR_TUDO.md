@@ -1,6 +1,6 @@
 # MOVI KIDS — Protocolo "Atualize tudo"
 
-**Criado:** 14/06/2026 · **Última execução:** 03/10/2026 (FE **v1.9.161** · GAS ping **v1.5.231** · **I166–I168** folha/PDF/cache · La Ville · Golden · sync pasta C)  
+**Criado:** 14/06/2026 · **Última execução:** 06/10/2026 (FE **v1.9.164** · GAS Web **v1.5.232** · repo **v1.5.233** I172 · auditoria **I172–I178** · sync pasta C)  
 **Função:** quando o usuário pedir **"atualize tudo"**, o agente segue **esta lista** — não só handoff parcial.  
 **Regra Cursor:** `.cursor/rules/atualize-tudo-movikids.mdc`
 
@@ -17,7 +17,8 @@ Sincronizar **documentação + estado operacional** do projeto com a realidade a
 | Planejamento | `PLANEJAMENTO_ATUAL_2026-06.md`, `PLANO_PRIORIDADES_2026-06.md`, **`MAPA_FASES.md`**, **`PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`** |
 | Deploy atual | **`DEPLOY_ATUAL.md`** |
 | Estrutura repo | **`ESTRUTURA_REPO.md`** |
-| Mapa de erros | `MAPA_ERROS_FALHAS_BUGS.md` (I* até **I168** folha/PDF + I165 caixa + I158 Golden) |
+| Mapa de erros | `MAPA_ERROS_FALHAS_BUGS.md` (I* até **I178** isolamento + I172 hist + I165–I171) |
+| Isolamento multi-loja | `AUDITORIA_ISOLAMENTO_MULTIUNIDADE_I172_2026-10-06.md` |
 | La Ville | `PLANO_MULTI_UNIDADE_GOLDEN_LAVILLE_2026-09.md` · checklist inauguração no HANDOFF |
 | **Design System** | **`docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md`** |
 | Protocolos | `PROTOCOLO_DIAGNOSTICO_E_TESTES.md`, **este arquivo** |
@@ -44,17 +45,17 @@ Sincronizar **documentação + estado operacional** do projeto com a realidade a
 
 ---
 
-## Produção atual (03/10/2026)
+## Produção atual (06/10/2026)
 
 | Camada | Versão | Evidência |
 |--------|--------|-----------|
-| GAS | ping **v1.5.231** = repo | multi-unidade · I160 · lookback 600 |
-| FE | **v1.9.161** | Pages live · `?force=1.9.161` · I168 cache-first |
+| GAS | ping Web **v1.5.232** · repo **v1.5.233** | I171 sessão ✅ · I172 hist ⏳ Nova Web |
+| FE | **v1.9.164** | Pages live · I170 Contas · I171 login loja |
+| Isolamento | parcial | Contas PASS · hist FAIL até Web 1.5.233 · I173–I178 abertos |
 | Golden set (fechamento) | R$ **14.577** · CTO **R$ 1.500** | PDF 01/10 · n **684** |
 | Folha / holerite PDF | I166–I168 ✅ | Blob print · cache FE/LS 24h |
-| La Ville | código ✅ | Ops: QR · tablet D4 · equipe · CTO |
-| Homolog tablet | **⏳** | D4 Golden + LV · `?force=1.9.161` |
-| Confiabilidade | I153–I168 ✅ | I168 folha · I167 PDF · I165 caixa · I158 Golden |
+| La Ville | código ✅ | Ops: QR · tablet D4 · equipe · CTO · isolamento P0 |
+| Homolog tablet | **⏳** | D4 Golden + LV · `?force=1.9.164` |
 
 ```powershell
 node scripts\testes\teste-estabilidade-pos-i155.cjs
@@ -108,7 +109,19 @@ flowchart TD
 
 *Revisar quando mudar versão FE/GAS ou fechar incidente.*
 
-### Registro desta execução (03/10/2026)
+### Registro desta execução (06/10/2026)
+
+| I* / item | Evento | Doc |
+|-----------|--------|-----|
+| **I170–I171** | Contas fail-closed + sessão por loja | FE **1.9.164** · GAS Web **1.5.232** |
+| **I172** | `listarHistorico` sem filtro unidade | repo **1.5.233** · Nova Web ⏳ |
+| **I173–I178** | Auditoria profunda: comando/conta-mestre/leading/custos hist/kpiMes cols | `AUDITORIA_ISOLAMENTO_MULTIUNIDADE_I172_*` · MAPA |
+| Regra | Regra 20 publicação + protocolo §1.5 matriz dual | `REGRAS_*` · `PROTOCOLO_DIAGNOSTICO` |
+| Sync C | `sync-pasta-c-pc.ps1` nesta execução | pasta C = este repo |
+
+**Erros do agente (não repetir):** declarar isolamento OK só com Contas/inicio · carimbar `unidadeId` sem filtrar builder (I173) · `getRange` curto + `locRowMatches` (I172/I178) · FE fail-closed ≠ GAS fechado.
+
+### Registro anterior (03/10/2026)
 
 | I* / item | Evento | Doc |
 |-----------|--------|-----|

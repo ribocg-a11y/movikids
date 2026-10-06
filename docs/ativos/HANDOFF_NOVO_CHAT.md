@@ -146,7 +146,9 @@ Ordem curta — tablet + mesa:
 
 **I172 (06/10):** `listarHistorico` ainda **misturava lojas** na API (Web **v1.5.232**). Repo **v1.5.233** filtra `unidade_id` + cache por loja. **Ainda sócio:** Nova versão Web GAS (**v1.5.233**) · PDF Golden set · CTO LV.
 
-**Trava isolamento (audit 06/10):** `carregarInicio` PASS (G nSess=6 · LV=0). `listarHistorico` FAIL até Nova Web I172. FE Contas fail-closed I170.
+**Auditoria profunda I172–I178:** o furo **não era só hist**. Abertos: **I173** comandoOperacional (builder global + carimbo uid) · **I174** conta mestre por telefone sem loja · **I175** leading/BE global · **I176** custos histórico · **I177** relatórios GAS legado · **I178** kpiMes lê 19 cols (sem AC). Doc: `AUDITORIA_ISOLAMENTO_MULTIUNIDADE_I172_2026-10-06.md`.
+
+**Trava isolamento (audit 06/10):** `carregarInicio` PASS (G nSess=6 · LV=0). `listarHistorico` FAIL até Nova Web I172. FE Contas fail-closed I170. Centro de comando / conta-mestre ainda **não** à prova de mistura.
 
 ---
 

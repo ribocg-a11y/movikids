@@ -1,6 +1,6 @@
 # PLANO — Multi-unidade MOVI KIDS (Golden × La Ville Mall)
 
-**Status:** 🟢 **Operacional** — multi-loja em produção (I159–I165) · inauguração física / RH / CTO LV ainda abertos  
+**Status:** 🟡 **Operacional com furos de isolamento** — I159–I171 em produção · **I172** hist (repo 1.5.233, Web pendente) · **I173–I178** abertos (comando/conta-mestre/leading/custos/kpiMes cols) · ver `AUDITORIA_ISOLAMENTO_MULTIUNIDADE_I172_2026-10-06.md` · inauguração física / RH / CTO LV ainda abertos  
 **Atualizado:** 02/10/2026 · FE **v1.9.161** · GAS Web **v1.5.231** · planilha única  
 **Pedido:** 2ª unidade em **La Ville Mall**; Golden permanece. Operadoras escolhem onde logar; unidades **não conversam**; **só ADM** vê as duas juntas. Preços, minutos e frota **diferentes** por unidade.  
 **Arquitetura:** ✅ **Opção A** — **1 planilha** + `unidade_id` + CONFIG por unidade (sócio 29/09).  

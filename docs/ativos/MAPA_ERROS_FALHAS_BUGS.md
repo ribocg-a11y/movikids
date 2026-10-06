@@ -1,7 +1,8 @@
 # MOVI KIDS — Mapa de erros, falhas e bugs
 
-**Atualizado:** 03/10/2026 — **I166–I168** folha/PDF/cache ✅ · FE **v1.9.161** · GAS ping **v1.5.231** · La Ville ops  
+**Atualizado:** 06/10/2026 — **I172–I178** auditoria isolamento multi-loja · FE **v1.9.164** · GAS Web **v1.5.232** · repo **v1.5.233**  
 
+**Uso anterior:** 03/10/2026 — **I166–I168** folha/PDF/cache ✅ · FE **v1.9.161** · GAS ping **v1.5.231**  
 **Uso anterior:** 02/10/2026 — **I165** caixa unidade ✅ · **I158** Golden ✅ · FE **v1.9.158**  
 **Uso anterior:** 08/09/2026 — **I156** ritmo Dashboard (chaves "01") · FE **v1.9.115** · GAS repo **v1.5.221**  
 **Uso anterior:** 08/09/2026 — **I155** ✅ live (0 HTML 404 · lookback 600) · GAS ping **v1.5.220** · FE **v1.9.114**  
@@ -268,6 +269,12 @@ Docs: `INCIDENTE_I167_*` · `INCIDENTE_I168_*` · I120/I126/I136/I137
 | **I170** | **Isolamento multi-loja fail-closed** | Contas/Hist/snapshot vazavam Golden→LV mesmo com GAS filtrado | FE **v1.9.163** `mkIsBalcaoEstrito_` · sync replace · hist/API por loja · tile sempre filtrado | `guard.i170` | LV Contas=0 · Hist LV vazio |
 | **I171** | **Sessão balcão global bloqueava a outra loja** | Jennifer LV → Karen Golden 409 | GAS **v1.5.232** sessão `…_golden` / `…_laville` · FE **v1.9.164** `unidadeId` no login | Nova versão Web + force 1.9.164 | 1 op/loja em paralelo |
 | **I172** | **listarHistorico vazava Golden→La Ville** | API lia 18 cols (sem AC) e ignorava `unidadeId` | GAS **v1.5.233** `locRowMatchesUnidade_` + cache `hist_v39_u*` + `unidadeId` no payload | Nova versão Web · `guard.i172` | hist LV `n=0` / sem Carro Golden |
+| **I173** | **comandoOperacional mentia unidadeId** | Cache `_u` + campo `unidadeId`, mas `buildPainelComandoOperacional_()` chama `calcResumoDiaCore_(data)` → **all** e lista Ativa 16 cols sem filtro | ⏳ abrir: passar uid ao builder + filtrar ativas/frota | `AUDITORIA_ISOLAMENTO_MULTIUNIDADE_I172_*` | pill LV ≠ totais Golden |
+| **I174** | **Conta mestre cruza lojas (mesmo telefone)** | `findContaMestreParaNovaLoc_` só telefone+data — sem `unidadeId` | ⏳ abrir: filtrar por unidade na lookback | I42 + I174 | LV não herda conta Golden |
+| **I175** | **Leading / break-even global** | `calcLeadingDiaPatch_` soma LOCAÇÕES+CUSTOS sem uid | ⏳ abrir | enrich `resumoDia` | BE/ticket = loja filtrada |
+| **I176** | **listarCustosHistorico sem unidade** | Cache/lista global; FE não manda `unidadeId` | ⏳ abrir (paridade `listarCustos_`) | `mk-custos-historico.js` | custos LV ≠ Golden |
+| **I177** | **Relatórios GAS legado globais** | `gerarRelatorio_` / `_calcFatMes_` / preview sem unidade | FE Golden via `kpiMes` (I158); GAS ainda holding | deprecar ou filtrar | preview LV isolado |
+| **I178** | **kpiMes filtra sem ler col AC** | `getRange(…, COL_CONTA_ID_=19)` + `locRowMatchesUnidade_` → só fallback veículo | ⏳ `COL_LOC_READ_=29` | paridade I159e | KPI por `unidade_id` real |
 | **I142** | **Falta conferência mês no PDF (Q1/Q2/Soma + dias bônus)** | Só demonstrativo da quinzena; sócio precisava tabela mês + dias | FE **v1.9.87** `mkHolMesResumo_` + dias via `metaOperadorTurno` · PDFs em `entregas/` | `teste-i141-bonus-resto.cjs` · `gerar-pdf-holerite-mes.cjs` | https://ribocg-a11y.github.io/movikids/entregas/holerite-mes-2026-07/ |
 | **I141** | **Holerite Q2: bônus = 50% do mês final (errado)** | GAS `gpCalcHollerite_` metade; 1ª já pagou acumulado da época (Ray 150≠425) | FE **v1.9.86** `bonusQ2 = mês − Q1 memorial` · Ray 700 · Julia 750 | `mk-holerite.js` · `teste-i141-bonus-resto.cjs` | pacote 31/07: Ray **1652,22** · Julia **1702,22** |
 | **I140** | **FGTS na cesta do holerite** | Encargo empregador misturado com bônus/VA | FE **v1.9.85** FGTS só no rodapé | `mk-holerite.js` | cesta sem cód 503 |
