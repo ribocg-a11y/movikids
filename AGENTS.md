@@ -2,19 +2,19 @@
 
 Sistema operacional de locações — balcão (tablet na loja), portal do responsável, painel admin.
 
-**Ciclo ativo (06/10/2026):** Sprint D · FE **v1.9.164** · GAS Web **v1.5.232** · repo **v1.5.233** · **I170–I171** ✅ · **I172** hist ⏳ Nova Web · **I173–I178** abertos (auditoria isolamento)
+**Ciclo ativo (06/10/2026):** Sprint D · FE **v1.9.165** · GAS Web **v1.5.233** · repo **v1.5.234** · I170–I172 ✅ · I173–I178 no repo ⏳ Nova Web
 
 **Para retomar (agente local PC — pasta C):**
 
-> *Continuar MOVI KIDS — FE **v1.9.164** · GAS Web **v1.5.232** / repo **v1.5.233** · Nova Web I172 · depois I173 comando + I174 conta-mestre · Tablet `?force=1.9.164`*
+> *Continuar MOVI KIDS — Nova Web GAS **v1.5.234** · `TESTE_ISOLAMENTO_MULTIUNIDADE_READONLY` · FE `?force=1.9.165`*
 
 ## Produção atual
 
 | Camada | Versão | Link |
 |--------|--------|------|
-| Frontend | **v1.9.164** | https://ribocg-a11y.github.io/movikids/?force=1.9.164 |
-| Gestão Pessoas | **v1.9.164** | `gestao-pessoas.html?force=1.9.164` |
-| GAS | ping Web **v1.5.232** · repo **v1.5.233** | I171 sessão ✅ · I172 hist no GitHub |
+| Frontend | **v1.9.165** | https://ribocg-a11y.github.io/movikids/?force=1.9.165 |
+| Gestão Pessoas | **v1.9.165** | `gestao-pessoas.html?force=1.9.165` |
+| GAS | ping Web **v1.5.233** · repo **v1.5.234** | I173–I178 no GitHub |
 | Design System | **v1.1** | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
 
 **GAS raw:** https://raw.githubusercontent.com/ribocg-a11y/movikids/main/MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs
