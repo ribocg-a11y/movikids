@@ -491,7 +491,7 @@ try {
     }
     if ($gasRaw -notmatch 'I121: pay-first — Ativa/Pendente já pagas \(paridade I117') {
       Add-Check "guard.i121.kpi.payfirst" "fail" "kpiMes ainda so Encerrada (I121)"
-    } elseif ($gasRaw -notmatch 'function calcLeadingDiaPatch_[\s\S]{0,800}Ativa') {
+    } elseif ($gasRaw -notmatch 'function calcLeadingDiaPatch_[\s\S]{0,2000}Ativa') {
       Add-Check "guard.i121.kpi.payfirst" "fail" "calcLeadingDiaPatch_ sem Ativa (I121)"
     } else {
       Add-Check "guard.i121.kpi.payfirst" "ok" "kpiMes+leading incluem Ativa/Pendente"
@@ -633,6 +633,36 @@ try {
       Add-Check "guard.i172.gas.historico" "fail" "listarHistorico_ sem filtro/cache por unidade (I172)"
     } else {
       Add-Check "guard.i172.gas.historico" "ok" "historico GAS filtra unidade_id + cache por loja (I172)"
+    }
+    # I173 — comandoOperacional passa uid ao builder
+    if ($gasRawG -notmatch 'function buildPainelComandoOperacional_\(uidFilterOpt\)' -or $gasRawG -notmatch 'buildPainelComandoOperacional_\(uidCmd\)' -or $gasRawG -notmatch 'comandoOp_v3_') {
+      Add-Check "guard.i173.gas.comando" "fail" "comandoOperacional builder sem uid / cache v3 (I173)"
+    } else {
+      Add-Check "guard.i173.gas.comando" "ok" "comando builder recebe uid + cache v3 (I173)"
+    }
+    # I174 — conta mestre por unidade
+    if ($gasRawG -notmatch 'function findContaMestreParaNovaLoc_\(telefone, dataFmt, agora, unidadeIdOpt\)' -or $gasRawG -notmatch 'findContaMestreParaNovaLoc_\(telefone, dataFmt, agora, uid\)') {
+      Add-Check "guard.i174.gas.conta" "fail" "findContaMestre sem unidadeId (I174)"
+    } else {
+      Add-Check "guard.i174.gas.conta" "ok" "conta mestre filtrada por loja (I174)"
+    }
+    # I175/I178 — leading + kpiMes COL_LOC_READ_
+    if ($gasRawG -notmatch 'function calcLeadingDiaPatch_\(mes, ano, uidFilterOpt\)') {
+      Add-Check "guard.i175.gas.leading" "fail" "calcLeadingDiaPatch sem uid (I175)"
+    } else {
+      Add-Check "guard.i175.gas.leading" "ok" "leading por unidade (I175)"
+    }
+    $fnKpi = [regex]::Match($gasRawG, 'function buildKpiMesPayload_\([\s\S]{0,2500}?locRowMatchesUnidade_')
+    if (-not $fnKpi.Success -or $fnKpi.Value -notmatch 'COL_LOC_READ_') {
+      Add-Check "guard.i178.gas.kpiCols" "fail" "kpiMes getRange sem COL_LOC_READ_ (I178)"
+    } else {
+      Add-Check "guard.i178.gas.kpiCols" "ok" "kpiMes le COL_LOC_READ_ (I178)"
+    }
+    # I176 — custos historico
+    if ($gasRawG -notmatch 'cusHist_v2_u' -or $gasRawG -notmatch 'I176') {
+      Add-Check "guard.i176.gas.custosHist" "fail" "listarCustosHistorico sem filtro unidade (I176)"
+    } else {
+      Add-Check "guard.i176.gas.custosHist" "ok" "custos historico por unidade (I176)"
     }
   }
 
@@ -1103,6 +1133,12 @@ try {
     $i151Out = & $i151 2>&1 | Out-String
     if ($LASTEXITCODE -ne 0) { Add-Check "teste.i151" "fail" "exit $LASTEXITCODE" }
     else { Add-Check "teste.i151" "ok" "TESTE_I151_ENCERRAR_FANTASMA_READONLY" }
+
+    $iso = Join-Path $testDir "TESTE_ISOLAMENTO_MULTIUNIDADE_READONLY.ps1"
+    if (-not (Test-Path $iso)) { throw "TESTE_ISOLAMENTO_MULTIUNIDADE_READONLY.ps1 nao encontrado" }
+    $isoOut = & $iso 2>&1 | Out-String
+    if ($LASTEXITCODE -ne 0) { Add-Check "teste.isolamento" "fail" "exit $LASTEXITCODE" }
+    else { Add-Check "teste.isolamento" "ok" "TESTE_ISOLAMENTO_MULTIUNIDADE_READONLY" }
   } else {
     Add-Check "teste.paridade" "skip" "SkipNetworkTests"
     Add-Check "teste.portal" "skip" "SkipNetworkTests"
@@ -1111,6 +1147,7 @@ try {
     Add-Check "teste.i120" "skip" "SkipNetworkTests"
     Add-Check "teste.i121" "skip" "SkipNetworkTests"
     Add-Check "teste.i151" "skip" "SkipNetworkTests"
+    Add-Check "teste.isolamento" "skip" "SkipNetworkTests"
   }
 } catch {
   $result.status = "fail"

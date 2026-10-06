@@ -501,10 +501,12 @@ async function buscarCustosMesesSerie_() {
 
   try {
     const authP = apiParamsComAuth_();
+    const uidCus = (typeof mkDualFiltro_ === 'function' ? mkDualFiltro_() : (authP && authP.unidadeId) || 'all');
     const base = {
       action: 'listarCustosHistorico',
       startDate: range.s,
       endDate: range.e,
+      unidadeId: uidCus,
       ...authP
     };
     if (cat) base.categoria = cat;

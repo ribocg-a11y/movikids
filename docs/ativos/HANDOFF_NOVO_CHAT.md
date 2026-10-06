@@ -1,14 +1,14 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 06/10/2026 · FE **v1.9.164** · GAS Web **v1.5.232** · repo **v1.5.233** I172 · I170–I171 ✅ · La Ville · Golden ✅
+**Atualizado:** 06/10/2026 · FE **v1.9.165** · GAS Web **v1.5.233** · repo **v1.5.234** (I173–I178) · auditoria protocolo ✅
 
 ## Produção (agora)
 
 | Camada | Versão | Link |
 |--------|--------|------|
-| Frontend | **v1.9.164** | https://ribocg-a11y.github.io/movikids/?force=1.9.164 |
-| Gestão Pessoas | **v1.9.164** | `gestao-pessoas.html?force=1.9.164` |
-| GAS | ping Web **v1.5.232** · repo **v1.5.233** (I172) | sessão por loja ✅ · hist unidade ⏳ Nova Web |
+| Frontend | **v1.9.165** | https://ribocg-a11y.github.io/movikids/?force=1.9.165 |
+| Gestão Pessoas | **v1.9.165** | `gestao-pessoas.html?force=1.9.165` |
+| GAS | ping Web **v1.5.233** · repo **v1.5.234** | I172 hist ✅ · I173–I178 ⏳ Nova Web |
 | Design System | v1.1 | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
 
 **GAS raw:** https://raw.githubusercontent.com/ribocg-a11y/movikids/main/MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs  
@@ -146,9 +146,9 @@ Ordem curta — tablet + mesa:
 
 **I172 (06/10):** `listarHistorico` ainda **misturava lojas** na API (Web **v1.5.232**). Repo **v1.5.233** filtra `unidade_id` + cache por loja. **Ainda sócio:** Nova versão Web GAS (**v1.5.233**) · PDF Golden set · CTO LV.
 
-**Auditoria profunda I172–I178:** o furo **não era só hist**. Abertos: **I173** comandoOperacional (builder global + carimbo uid) · **I174** conta mestre por telefone sem loja · **I175** leading/BE global · **I176** custos histórico · **I177** relatórios GAS legado · **I178** kpiMes lê 19 cols (sem AC). Doc: `AUDITORIA_ISOLAMENTO_MULTIUNIDADE_I172_2026-10-06.md`.
+**Auditoria protocolo (06/10):** cobertura incompleta (sem teste dual / guards I173+) → corrigido. Repo **v1.5.234** fecha I173–I176/I178. Doc: `AUDITORIA_PROTOCOLO_MUDANCA_ISOLAMENTO_2026-10-06.md` · `AUDITORIA_ISOLAMENTO_MULTIUNIDADE_I172_*`.
 
-**Trava isolamento (audit 06/10):** `carregarInicio` PASS (G nSess=6 · LV=0). `listarHistorico` FAIL até Nova Web I172. FE Contas fail-closed I170. Centro de comando / conta-mestre ainda **não** à prova de mistura.
+**Ainda sócio:** Nova Web **v1.5.234** → `.\scripts\testes\TESTE_ISOLAMENTO_MULTIUNIDADE_READONLY.ps1` (comando nHoje G≠L). I177 relatórios GAS legado = P2.
 
 ---
 

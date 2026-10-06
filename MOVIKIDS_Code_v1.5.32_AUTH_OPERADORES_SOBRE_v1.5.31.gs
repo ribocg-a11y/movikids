@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.233
+// MOVI KIDS — Google Apps Script v1.5.234
+// v1.5.234: I173–I178 — comando/conta-mestre/leading/custosHist/kpiMes COL_LOC_READ (isolamento)
 // v1.5.233: I172 — listarHistorico filtra unidade_id (anti-vazamento Golden→La Ville)
 // v1.5.232: I171 — sessão operador por unidade (Golden || La Ville em paralelo; bloqueio só na mesma loja)
 // v1.5.231: I160 — painelGestaoPessoasAdmin: cfg.escala null (Eduarda/Karen sem turno) → crash reading '5'
@@ -225,7 +226,7 @@
 
 // ── CONSTANTES ───────────────────────────────────────────────
 /** Versão exposta em ping, carregarInicio, validarSchema, gestaoPessoasStatus (bump com header). */
-const MK_GAS_VERSAO_  = 'v1.5.233';
+const MK_GAS_VERSAO_  = 'v1.5.234';
 const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.231';
 const SHEET_ID   = '1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618';
 const DEPLOY_ID  = 'AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y';
@@ -3681,11 +3682,15 @@ function contaIdLocRow_(row) {
 }
 
 /** Locação-mestre do mesmo telefone no dia (janela 10h–22h). */
-function findContaMestreParaNovaLoc_(telefone, dataFmt, agora) {
+function findContaMestreParaNovaLoc_(telefone, dataFmt, agora, unidadeIdOpt) {
   const tel = normTel_(telefone);
   if (!tel || tel.length < 8) return null;
   const agoraMin = agora.getHours() * 60 + agora.getMinutes();
   if (!naJanelaOperacionalMin_(agoraMin)) return null;
+  /* I174 — conta do dia só na mesma loja (fail-closed se uid informado). */
+  const uidFiltro = unidadeIdOpt != null && String(unidadeIdOpt).trim() !== ''
+    ? (String(unidadeIdOpt).toLowerCase() === 'all' ? 'all' : (unidadeIdCanon_(unidadeIdOpt) || String(unidadeIdOpt).toLowerCase()))
+    : null;
 
   const sh = sh_(SH_LOC);
   const last = locLastRow_(sh);
@@ -3695,7 +3700,8 @@ function findContaMestreParaNovaLoc_(telefone, dataFmt, agora) {
   const LOOKBACK = 120;
   const startRow = Math.max(DATA_ROW, last - LOOKBACK + 1);
   const nRows = last - startRow + 1;
-  const dados = sh.getRange(startRow, 1, nRows, COL_CONTA_ID_).getValues();
+  /* I174/I178 — COL_LOC_READ_ inclui AC unidade_id. */
+  const dados = sh.getRange(startRow, 1, nRows, COL_LOC_READ_).getValues();
   let bestId = null;
   let bestPag = '';
   let seenToday = false;
@@ -3703,6 +3709,7 @@ function findContaMestreParaNovaLoc_(telefone, dataFmt, agora) {
   for (let i = dados.length - 1; i >= 0; i--) {
     const r = dados[i];
     if (!r[0]) continue;
+    if (uidFiltro && uidFiltro !== 'all' && !locRowMatchesUnidade_(r, uidFiltro)) continue;
     const dataR = cellToStr_(r[1]);
     if (dataR !== dataFmt) {
       if (seenToday) break;
@@ -3878,7 +3885,7 @@ function salvarLocacao_(p) {
       return err_('Veículo já em uso (' + ocup.status + '). Não salve de novo — use o card na Home.', 409);
     }
   }
-  const mestre = findContaMestreParaNovaLoc_(telefone, dataFmt, agora);
+  const mestre = findContaMestreParaNovaLoc_(telefone, dataFmt, agora, uid);
   const id     = nextId_(sheet);
 
   let contaId = id;
@@ -3976,7 +3983,7 @@ function salvarLocacoesMulti_(p) {
     const dataFmt = fmtData_(agora);
     const sheet = sh_(SH_LOC);
     locLastRow_(sheet); // I125d: 1× getLastRow no multi
-    const mestrePre = findContaMestreParaNovaLoc_(telefone, dataFmt, agora);
+    const mestrePre = findContaMestreParaNovaLoc_(telefone, dataFmt, agora, uid);
     let pagFinal = pagamento;
     if (mestrePre && mestrePre.pagamento) pagFinal = mestrePre.pagamento;
 
@@ -4867,7 +4874,9 @@ function listarCustosHistorico_(p) {
   const categoriaFiltro = String(p.categoria || '').trim();
   const grupoFiltro = String(p.grupoDre || '').trim().toUpperCase();
   const bustCache = String(p.bustCache || '') === '1';
-  const cacheKey = 'cusHist_v1_' + startDate.replace(/\//g, '') + '_' + endDate.replace(/\//g, '')
+  /* I176 — filtro + cache por unidade. */
+  const uidFiltro = unidadeIdFilterFrom_(p || {});
+  const cacheKey = 'cusHist_v2_u' + uidFiltro + '_' + startDate.replace(/\//g, '') + '_' + endDate.replace(/\//g, '')
     + (statsOnly ? '_s' : '_f') + '_' + categoriaFiltro + '_' + grupoFiltro;
 
   if (!bustCache) {
@@ -4907,6 +4916,8 @@ function listarCustosHistorico_(p) {
 
   dados.forEach(function (r) {
     if (!r[0] && r[0] !== 0) return;
+    const uidRow = unidadeIdCanon_(r[6]) || MK_UNIDADE_DEFAULT_;
+    if (uidFiltro !== 'all' && uidRow !== uidFiltro) return;
     const data = cellToStr_(r[1]);
     const dcmp = dateToCmp_(data);
     if (!historicoInRange_(dcmp, '', sCmp, eCmp)) return;
@@ -4929,7 +4940,8 @@ function listarCustosHistorico_(p) {
       valor: valor,
       grupoDre: grupo,
       grupoLabel: grupoDreLabel_(grupo),
-      natureza: grupoDreTipoNatureza_(grupo)
+      natureza: grupoDreTipoNatureza_(grupo),
+      unidadeId: uidRow
     };
     all.push(item);
 
@@ -4980,6 +4992,8 @@ function listarCustosHistorico_(p) {
   let prevTotal = 0;
   dados.forEach(function (r) {
     if (!r[0] && r[0] !== 0) return;
+    const uidRow = unidadeIdCanon_(r[6]) || MK_UNIDADE_DEFAULT_;
+    if (uidFiltro !== 'all' && uidRow !== uidFiltro) return;
     const dcmp = dateToCmp_(cellToStr_(r[1]));
     if (!dcmp || dcmp < prevStartCmp || dcmp > prevEndCmp) return;
     const cat = String(r[4] || 'Outros').trim() || 'Outros';
@@ -5015,6 +5029,7 @@ function listarCustosHistorico_(p) {
 
   const payload = {
     ok: true,
+    unidadeId: uidFiltro,
     custos: statsOnly ? [] : all.slice(0, 500),
     total: statsOnly ? n : Math.min(all.length, 500),
     stats: stats,
@@ -6416,8 +6431,9 @@ function getOrSetMetaProjecaoMes_(mes, ano, projecaoFat, fatDiaArr, diasMes, lf,
 }
 
 /** Média de faturamento/dia nos últimos N dias calendário (só dias com movimento). */
-function calcMediaFatDiariaUltimosDias_(nDias) {
+function calcMediaFatDiariaUltimosDias_(nDias, uidFilterOpt) {
   const janela = Math.max(1, Math.min(60, Number(nDias) || 30));
+  const uidFiltro = uidFilterOpt != null ? uidFilterOpt : 'all';
   const hoje = new Date();
   hoje.setHours(0, 0, 0, 0);
   const minTs = hoje.getTime() - (janela - 1) * 86400000;
@@ -6425,10 +6441,11 @@ function calcMediaFatDiariaUltimosDias_(nDias) {
   const shLoc = sh_(SH_LOC);
   const lastLoc = shLoc.getLastRow();
   if (lastLoc >= DATA_ROW) {
-    const rows = shLoc.getRange(DATA_ROW, 1, lastLoc - DATA_ROW + 1, 15).getValues();
+    const rows = shLoc.getRange(DATA_ROW, 1, lastLoc - DATA_ROW + 1, COL_LOC_READ_).getValues();
     for (let i = 0; i < rows.length; i++) {
       const r = rows[i];
       if (!r[0] || String(r[14] || '').trim() !== 'Encerrada') continue;
+      if (!locRowMatchesUnidade_(r, uidFiltro)) continue;
       const dataFmt = cellToStr_(r[1]);
       const dt = parseDataStr_(dataFmt);
       if (!dt) continue;
@@ -6459,13 +6476,15 @@ function fmtComparativoPct_(atual, base, label) {
 }
 
 /** FASE 16 — centro de comando operacional (leitura única, tempo real). */
-function buildPainelComandoOperacional_() {
+function buildPainelComandoOperacional_(uidFilterOpt) {
+  /* I173 — uid obrigatório no builder (não só carimbo no wrapper). */
+  const uidFiltro = uidFilterOpt != null ? uidFilterOpt : 'all';
   const agora = new Date();
   const dataFmt = fmtData_(agora);
-  const core = calcResumoDiaCore_(dataFmt);
+  const core = calcResumoDiaCore_(dataFmt, uidFiltro);
   const mes = agora.getMonth() + 1;
   const ano = agora.getFullYear();
-  const leading = calcLeadingDiaPatch_(mes, ano);
+  const leading = calcLeadingDiaPatch_(mes, ano, uidFiltro);
 
   let nAtiva = 0;
   let nPendente = 0;
@@ -6474,10 +6493,11 @@ function buildPainelComandoOperacional_() {
   const shLoc = sh_(SH_LOC);
   const lastLoc = shLoc.getLastRow();
   if (lastLoc >= DATA_ROW) {
-    const rows = shLoc.getRange(DATA_ROW, 1, lastLoc - DATA_ROW + 1, 16).getValues();
+    const rows = shLoc.getRange(DATA_ROW, 1, lastLoc - DATA_ROW + 1, COL_LOC_READ_).getValues();
     for (let i = 0; i < rows.length; i++) {
       const r = rows[i];
       if (!r[0]) continue;
+      if (!locRowMatchesUnidade_(r, uidFiltro)) continue;
       const st = String(r[14] || '').trim();
       if (st !== 'Ativa' && st !== 'Pendente') continue;
       if (st === 'Ativa') nAtiva++;
@@ -6490,15 +6510,18 @@ function buildPainelComandoOperacional_() {
           status: st,
           crianca: String(r[12] || '').trim(),
           veiculo: veic,
-          responsavel: String(r[11] || '').trim().slice(0, 28)
+          responsavel: String(r[11] || '').trim().slice(0, 28),
+          unidadeId: unidadeIdOfRow_(r)
         });
       }
     }
   }
 
-  const frotaTotal = veiculosOp_().length;
+  const frotaUid = uidFiltro === 'all' ? MK_UNIDADE_DEFAULT_ : uidFiltro;
+  const frotaLista = veiculosOp_(frotaUid);
+  const frotaTotal = frotaLista.length;
   const frotaEmUso = Object.keys(veiculosEmUso).length;
-  const frotaDetalhe = veiculosOp_().map(function(v) {
+  const frotaDetalhe = frotaLista.map(function(v) {
     const nLoc = veiculosEmUso[v] || 0;
     return {
       veiculo: v,
@@ -6529,7 +6552,10 @@ function buildPainelComandoOperacional_() {
     Logger.log('buildPainelComandoOperacional_ RH: ' + e.message);
   }
 
-  const sessao = sessaoOperadorPayload_(getSessaoOperadorAtiva_());
+  const sessaoRaw = uidFiltro === 'all'
+    ? getSessaoOperadorAtiva_()
+    : getSessaoOperadorAtiva_(uidFiltro);
+  const sessao = sessaoOperadorPayload_(sessaoRaw);
   const alertas = [];
   if (nAtiva + nPendente === 0) {
     alertas.push({
@@ -6558,7 +6584,7 @@ function buildPainelComandoOperacional_() {
   const alertasMerged = mergeAlertasLista_(intel, alertas, 6);
   const fatHoje = Math.round(core.fat * 100) / 100;
   const resHoje = Math.round(core.resultado * 100) / 100;
-  const comp30 = calcMediaFatDiariaUltimosDias_(30);
+  const comp30 = calcMediaFatDiariaUltimosDias_(30, uidFiltro);
   const cmpFat = fmtComparativoPct_(fatHoje, comp30.media, 'média 30d');
   let ctxFat = core.n > 0
     ? (core.n + ' loc · resultado ' + (resHoje >= 0 ? '+' : '') + resHoje)
@@ -6585,6 +6611,7 @@ function buildPainelComandoOperacional_() {
 
   return {
     data: dataFmt,
+    unidadeId: uidFiltro,
     locacoes: {
       abertas: nAtiva + nPendente,
       ativas: nAtiva,
@@ -6625,14 +6652,14 @@ function comandoOperacional_(p) {
     || String((p && p.nocache) || '').toLowerCase() === '1'
     || String((p && p.nocache) || '').toLowerCase() === 'true';
   const uidCmd = unidadeIdFilterFrom_(p || {});
-  const cacheKey = 'comandoOp_v2_' + fmtData_(new Date()).replace(/\//g, '') + '_u' + uidCmd;
+  const cacheKey = 'comandoOp_v3_' + fmtData_(new Date()).replace(/\//g, '') + '_u' + uidCmd;
   if (!forceBust) {
     try {
       const hit = CacheService.getScriptCache().get(cacheKey);
       if (hit) return ContentService.createTextOutput(hit).setMimeType(ContentService.MimeType.JSON);
     } catch (e) { /* ok */ }
   }
-  const payload = buildPainelComandoOperacional_();
+  const payload = buildPainelComandoOperacional_(uidCmd);
   payload.unidadeId = uidCmd;
   const out = JSON.stringify(Object.assign({ ok: true }, payload));
   try { CacheService.getScriptCache().put(cacheKey, out, 40); } catch (e) { /* ok */ }
@@ -7936,10 +7963,12 @@ function buildViabilidadeContratacao_(ctx, folha) {
 }
 
 /** FASE 7 lite — leading do dia sem payback/narrativa (evita buildKpiMesPayload_ em resumoDia). */
-function calcLeadingDiaPatch_(mes, ano) {
+function calcLeadingDiaPatch_(mes, ano, uidFilterOpt) {
   const mesAtual = parseInt(mes, 10);
   const anoAtual = parseInt(ano, 10);
   if (!mesAtual || !anoAtual) return null;
+  /* I175 — leading/BE por loja. */
+  const uidFiltro = uidFilterOpt != null ? uidFilterOpt : 'all';
   const mmyy = String(mesAtual).padStart(2, '0') + '/' + anoAtual;
   const diasMes = new Date(anoAtual, mesAtual, 0).getDate();
   let fatMes = 0, nMes = 0;
@@ -7949,8 +7978,9 @@ function calcLeadingDiaPatch_(mes, ano) {
   if (lastLoc >= DATA_ROW) {
     // I121: pay-first + nMes por conta/dia (paridade kpiMes / I42) — não contar sessão
     const contasMes = {};
-    shLoc.getRange(DATA_ROW, 1, lastLoc - DATA_ROW + 1, COL_CONTA_ID_).getValues().forEach(function(r) {
+    shLoc.getRange(DATA_ROW, 1, lastLoc - DATA_ROW + 1, COL_LOC_READ_).getValues().forEach(function(r) {
       if (!r[0]) return;
+      if (!locRowMatchesUnidade_(r, uidFiltro)) return;
       const st = String(r[14] || '').trim();
       if (st !== 'Encerrada' && st !== 'Ativa' && st !== 'Pendente') return;
       const dataR = cellToStr_(r[1]);
@@ -7967,9 +7997,14 @@ function calcLeadingDiaPatch_(mes, ano) {
   let cusMes = 0;
   const shCus = sh_(SH_CUS);
   const lastCus = shCus.getLastRow();
+  const cusCols = Math.max(6, Number(COL_CUS_READ_) || 7);
   if (lastCus >= DATA_ROW) {
-    shCus.getRange(DATA_ROW, 1, lastCus - DATA_ROW + 1, 6).getValues().forEach(function(r) {
+    shCus.getRange(DATA_ROW, 1, lastCus - DATA_ROW + 1, cusCols).getValues().forEach(function(r) {
       if (!r[0]) return;
+      if (uidFiltro && uidFiltro !== 'all') {
+        const uidC = unidadeIdCanon_(r[6]) || MK_UNIDADE_DEFAULT_;
+        if (uidC !== uidFiltro) return;
+      }
       const pts = cellToStr_(r[1]).split('/');
       if (pts.length < 3) return;
       if ((pts[1].padStart(2, '0') + '/' + pts[2]) !== mmyy) return;
@@ -8003,7 +8038,7 @@ function enrichResumoDiaLeading_(core, dataAlvo) {
     const mes = parseInt(pts[1], 10);
     const ano = parseInt(pts[2], 10);
     if (!mes || !ano) return core;
-    const patch = calcLeadingDiaPatch_(mes, ano);
+    const patch = calcLeadingDiaPatch_(mes, ano, core && core.unidadeId);
     if (!patch) return core;
     const nHoje = Number(core.n) || 0;
     return Object.assign({}, core, {
@@ -8078,7 +8113,8 @@ function buildKpiMesPayload_(p) {
 
   const lastLoc = shLoc.getLastRow();
   if (lastLoc >= DATA_ROW) {
-    const dados = shLoc.getRange(DATA_ROW, 1, lastLoc - DATA_ROW + 1, COL_CONTA_ID_).getValues();
+    /* I178 — COL_LOC_READ_ para unidade_id (AC); COL_CONTA_ID_ era curto demais. */
+    const dados = shLoc.getRange(DATA_ROW, 1, lastLoc - DATA_ROW + 1, COL_LOC_READ_).getValues();
     dados.forEach(r => {
       if (!r[0]) return;
       if (!locRowMatchesUnidade_(r, uidKpi)) return;
@@ -8395,7 +8431,8 @@ function buildKpiMesPayload_(p) {
     projDiariaFixa: projDiariaFixa,
     baselineFatMes: metaProjecaoMes,
     caixaIncluiAbertas: true,
-    lite: skipAdvanced || false
+    lite: skipAdvanced || false,
+    unidadeId: uidKpi
   };
 }
 
@@ -8408,13 +8445,23 @@ function invalidateDashCaches_() {
     const ano = hoje.getFullYear();
     const mPrev = mes === 1 ? 12 : mes - 1;
     const aPrev = mes === 1 ? ano - 1 : ano;
+    const uids = ['all', 'golden', 'laville'];
     [mes, mPrev].forEach(function (m, idx) {
       const a = idx === 0 ? ano : aPrev;
+      uids.forEach(function (u) {
+        cache.remove('kpiMes83_' + m + '_' + a + '_L0_u' + u);
+        cache.remove('kpiMes83_' + m + '_' + a + '_L1_u' + u);
+      });
       cache.remove('kpiMes83_' + m + '_' + a + '_L0');
       cache.remove('kpiMes83_' + m + '_' + a + '_L1');
     });
-    cache.remove('comandoOp_v2_' + fmtData_(hoje).replace(/\//g, ''));
-    cache.remove('comandoOp_v1_' + fmtData_(hoje).replace(/\//g, ''));
+    const diaKey = fmtData_(hoje).replace(/\//g, '');
+    uids.forEach(function (u) {
+      cache.remove('comandoOp_v3_' + diaKey + '_u' + u);
+      cache.remove('comandoOp_v2_' + diaKey + '_u' + u);
+    });
+    cache.remove('comandoOp_v2_' + diaKey);
+    cache.remove('comandoOp_v1_' + diaKey);
   } catch (e) { /* ok */ }
 }
 
