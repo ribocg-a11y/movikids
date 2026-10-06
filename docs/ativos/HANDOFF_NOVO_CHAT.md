@@ -142,7 +142,7 @@ Ordem curta — tablet + mesa:
 5. Celular: `acompanhar.html` + `foto-moldura.html?unidade=laville` (chip/rodapé La Ville).
 6. Holding: pill La Ville → Caixa/Receita dia a dia isolados; pill Golden sem vazamento.
 
-**Ainda humano / sócio:** enviar PDF Golden set · CTO/e-mail LV · 1ª equipe RH `unidade_id=laville` · assinar FASE 17.
+**Login LV (06/10):** causa = equipe `laville` vazia (todas as ops estavam `golden`). Seed holding → **Milena Nunes** `unidade_id=all` — aparece no balcão LV. Demais (Eduarda/Karen/Raykelly) só Golden. **Ainda sócio:** 1ª equipe dedicada `unidade_id=laville` · PDF Golden set · CTO/e-mail LV · assinar FASE 17.
 
 ---
 
@@ -242,7 +242,7 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 | **P1** | 5 | Assinar FASE 17 (decisão 17.5 F9) | Sócio | ⏳ |
 | **P1** | 5b | FE multi-loja + receita + I165–I168 | Agente | ✅ FE **1.9.161** |
 | **P1** | 5c | Folha set PDF contadora | Sócio+Agente | ✅ pacote **I169** em `entregas/holerite-mes-2026-09/` · ⚠ Milena PIX negativo (faltas) — conferir RH |
-| **P2** | 6 | Contratar 1ª equipe La Ville (`unidade_id=laville`) | Ops/RH | ⏳ escala 14–21:30 / terça OFF |
+| **P2** | 6 | Contratar 1ª equipe La Ville (`unidade_id=laville`) | Ops/RH | ⏳ holding: Milena=`all` (login LV ok 06/10) · falta op dedicada LV |
 | **P2** | 7 | CTO + e-mail shopping La Ville | Sócio | ⏳ (PDF LV só depois disto) |
 | **P3** | 8 | Holding smoke C | Agente | ✅ 01/10 |
 | **P4** | 9 | F4 WhatsApp/SMS · F9 Supervisor | — | pausado |
