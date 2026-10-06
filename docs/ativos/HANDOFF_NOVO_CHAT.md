@@ -20,7 +20,11 @@
 | Venue | La Ville Mall · `unidadeId=laville` |
 | Sistema | FE **v1.9.165** · GAS **v1.5.234** · isolamento dual validado (`TESTE_ISOLAMENTO_*` PASS) |
 | Evidência dia 1 | API: Contas/hist/comando/kpi separados de Golden (ex.: nHoje G≠L) |
-| Pendências Ops (não bloqueiam abertura) | CTO/e-mail shopping · consolidar equipe RH · cartaz QR mesa se ainda não fixo |
+| CTO / aluguel espaço | **R$ 2.300/mês** · venc. dia **10** · boleto (1º fat. contrato: 25/09 — conferir ano no PDF) |
+| Contrato | Locação espaço temporário / merchandising quiosque · **La Ville Mall** · 4 m² praça alimentação · vigência **12 meses** a partir **01/09/2026** |
+| Partes | Locadora: **EDC Income and Rents Ltda** (CNPJ 49.503.844/0001-44) · Locatária: **A L Vieira Nunes J Ltda** (CNPJ 66.664.255/0001-67) |
+| PDF | `entregas/CONTRATO_MERCHANDISING_QUIOSQUE_MOVIKIDS.pdf` (+ `.txt` extraído) · origem Downloads 06/10/2026 |
+| Pendências Ops (não bloqueiam abertura) | Consolidar equipe RH · cartaz QR mesa se ainda não fixo · e-mail operacional shopping |
 | Design System | v1.1 | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
 
 **GAS raw:** https://raw.githubusercontent.com/ribocg-a11y/movikids/main/MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs  

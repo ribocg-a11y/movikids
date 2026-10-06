@@ -1,10 +1,24 @@
 # PLANO — Multi-unidade MOVI KIDS (Golden × La Ville Mall)
 
-**Status:** 🟢 **La Ville em operação desde 06/10/2026** — isolamento I170–I178 ✅ (GAS Web **v1.5.234** · FE **v1.9.165**) · pendências não bloqueantes: CTO/e-mail shopping · consolidar equipe RH · ver `AUDITORIA_PROTOCOLO_MUDANCA_ISOLAMENTO_2026-10-06.md`  
-**Atualizado:** 02/10/2026 · FE **v1.9.161** · GAS Web **v1.5.231** · planilha única  
+**Status:** 🟢 **La Ville em operação desde 06/10/2026** — isolamento I170–I178 ✅ · CTO contrato **R$ 2.300/mês** registrado · pendências: equipe RH · e-mail ops shopping · ver `AUDITORIA_PROTOCOLO_MUDANCA_ISOLAMENTO_2026-10-06.md`  
+**Atualizado:** 06/10/2026 · FE **v1.9.165** · GAS Web **v1.5.234** · planilha única  
 **Pedido:** 2ª unidade em **La Ville Mall**; Golden permanece. Operadoras escolhem onde logar; unidades **não conversam**; **só ADM** vê as duas juntas. Preços, minutos e frota **diferentes** por unidade.  
 **Arquitetura:** ✅ **Opção A** — **1 planilha** + `unidade_id` + CONFIG por unidade (sócio 29/09).  
-**Sócio entregou (29/09):** tabelas Brinquedos + Dinos + frota FE LV*. **Ainda falta:** CTO/e-mail shopping La Ville · 1ª equipe RH.
+**Sócio entregou:** preços/frota LV* (29/09) · **contrato merchandising/CTO** (PDF 06/10) · ops **06/10/2026**. **Ainda falta:** consolidar 1ª equipe RH · e-mail operacional shopping.
+
+### CTO / contrato La Ville (06/10/2026)
+
+| Item | Valor |
+|------|--------|
+| Tipo | Locação espaço temporário / merchandising quiosque (4 m² · praça alimentação · La Ville Mall) |
+| Locadora | EDC Income and Rents Ltda · CNPJ 49.503.844/0001-44 · José Tomaz Cavalcante Filho |
+| Locatária | A L Vieira Nunes J Ltda · CNPJ 66.664.255/0001-67 |
+| Valor | **R$ 2.300,00/mês** · venc. dia **10** · boleto |
+| Prazo | **12 meses** a partir **01/09/2026** · sem renovação automática · preferência |
+| Multa atraso | 10% + juros **1%/dia** + IGPM · >15 dias → rescisão |
+| Distrato locatária | após 90 dias da inauguração · indenização **3× aluguel** |
+| Multa infracional | **3×** valor mensal |
+| PDF | `entregas/CONTRATO_MERCHANDISING_QUIOSQUE_MOVIKIDS.pdf` (+ `.txt`) |
 
 ---
 
