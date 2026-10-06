@@ -411,6 +411,50 @@
   w.mkUnidadeAplicarConfig_ = aplicarConfigLocal_;
   w.mkUnidadeSyncAposGas_ = syncAposGasConfig_;
 
+  /**
+   * I170 — balcão estrito: 1 loja por vez (operador sempre; ADM só em modo balcão).
+   * Holding pode agregar; qualquer dúvida → fail-closed (tratar como balcão).
+   */
+  function isBalcaoEstrito_() {
+    if (!isAdm_()) return true;
+    return getModo_() === 'balcao';
+  }
+
+  /** Unidade efetiva para KPIs/tiles/histórico no modo atual. */
+  function unidadeContextoKpi_() {
+    if (isBalcaoEstrito_()) return getUnidadeId();
+    return getFiltroAdm_();
+  }
+
+  /**
+   * I170 fail-closed: statsHoje de outra loja (ou sem tag) não vaza no balcão.
+   * Retorna cópia segura { n, nSessoes, fat, unidadeId }.
+   */
+  function statsHojeSeguro_(uidOpt) {
+    var uid = canon_(uidOpt) || getUnidadeId();
+    var empty = { n: 0, nSessoes: 0, fat: 0, unidadeId: uid };
+    try {
+      if (typeof statsHoje === 'undefined' || !statsHoje) return empty;
+      var tagged = canon_(statsHoje.unidadeId);
+      if (isBalcaoEstrito_()) {
+        if (tagged && tagged !== uid) return empty;
+        if (!tagged) return empty; /* sem tag = inseguro */
+      }
+      return {
+        n: Number(statsHoje.n) || 0,
+        nSessoes: Number(statsHoje.nSessoes) || 0,
+        fat: Number(statsHoje.fat) || 0,
+        unidadeId: tagged || uid
+      };
+    } catch (e) {
+      return empty;
+    }
+  }
+
+  w.mkIsBalcaoEstrito_ = isBalcaoEstrito_;
+  w.mkUnidadeContextoKpi_ = unidadeContextoKpi_;
+  w.mkStatsHojeSeguro_ = statsHojeSeguro_;
+
   /** Chip / banner: Holding usa filtro ADM; balcão usa unidade ativa. */
   function refreshUnidadeUi_() {
     var uid = getUnidadeId();
@@ -484,13 +528,18 @@
   function resetBalcaoParaUnidade_(uid) {
     var r = entrarBalcaoModo_(uid);
     if (!r || !r.ok) return r;
-    /* Não apagar encHojeData global (holding usa as duas lojas).
-     * Só zera os tiles do balcão até o sync da unidade voltar. */
+    /* I170: no balcão estrito, descarta encHoje de outras lojas (fail-closed). */
+    try {
+      if (typeof w.encHojeData !== 'undefined' && Array.isArray(w.encHojeData)) {
+        w.encHojeData = sessionsPorUnidade_(w.encHojeData, uid);
+      }
+    } catch (eEnc) { /* ignore */ }
     try {
       if (typeof statsHoje !== 'undefined' && statsHoje) {
         statsHoje.n = 0;
         statsHoje.nSessoes = 0;
         statsHoje.fat = 0;
+        statsHoje.unidadeId = uid;
       }
     } catch (e2) { /* ignore */ }
     var nLoc = document.getElementById('stat-nloc');
@@ -504,7 +553,7 @@
     }
     var encU = [];
     try {
-      if (typeof w.encHojeData !== 'undefined' && Array.isArray(w.encHojeData) && typeof sessionsPorUnidade_ === 'function') {
+      if (typeof w.encHojeData !== 'undefined' && Array.isArray(w.encHojeData)) {
         encU = sessionsPorUnidade_(w.encHojeData, uid);
       }
     } catch (e5) { /* ignore */ }

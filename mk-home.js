@@ -516,13 +516,19 @@ function mkEncHojePorConta_(list) {
 }
 
 /** Todas as sessões encerradas hoje — Caixa / chip admin.
- * I165: lista explícita vazia (ex.: La Ville sem operação) NÃO herda statsHoje do Golden. */
+ * I165: lista explícita vazia (ex.: La Ville sem operação) NÃO herda statsHoje do Golden.
+ * I170: sem lista → só statsHoje se tag unidadeId bater com loja ativa (fail-closed). */
 function mkSessoesEncHoje_(list) {
   const explicit = arguments.length >= 1;
-  const data = explicit ? (list || []) : (encHojeData || []);
+  let data = explicit ? (list || []) : (encHojeData || []);
+  if (!explicit && typeof mkSessionsPorUnidade_ === 'function' && typeof mkUnidadeId_ === 'function') {
+    data = mkSessionsPorUnidade_(data, mkUnidadeId_());
+  }
   if (data.length) return data.length;
   if (explicit) return 0;
-  if (statsHoje && statsHoje.nSessoes != null && statsHoje.nSessoes > 0) return statsHoje.nSessoes;
+  if (typeof mkStatsHojeSeguro_ === 'function') {
+    return Number(mkStatsHojeSeguro_().nSessoes) || 0;
+  }
   return 0;
 }
 

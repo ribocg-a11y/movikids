@@ -594,10 +594,25 @@ try {
     # I165 — chip Caixa hoje La Ville não herda statsHoje Golden
     if ($homeRawG -notmatch 'I165:\s*lista explícita vazia' -and $homeRawG -notmatch 'explicit\) return 0') {
       Add-Check "guard.i165.fe.chip" "fail" "mkSessoesEncHoje_ ainda herda statsHoje com lista vazia (I165)"
-    } elseif ($syncRawG -notmatch 'I165:\s*statsHoje é da unidade' -and $syncRawG -notmatch 'sliceEnc') {
-      Add-Check "guard.i165.fe.sync" "fail" "sync statsHoje.nSessoes sem fatia por unidade (I165)"
+    } elseif ($syncRawG -notmatch 'I165:\s*statsHoje é da unidade' -and $syncRawG -notmatch 'I170:\s*statsHoje sempre recalculado' -and $syncRawG -notmatch 'sliceEnc') {
+      Add-Check "guard.i165.fe.sync" "fail" "sync statsHoje.nSessoes sem fatia por unidade (I165/I170)"
     } else {
       Add-Check "guard.i165.fe.caixa-unidade" "ok" "chip/caixa balcão não mistura Golden→La Ville (I165)"
+    }
+    # I170 — isolamento fail-closed multi-loja
+    $uniRawG = ""
+    $uniJsG = Join-Path $root "mk-unidades.js"
+    if (Test-Path $uniJsG) { $uniRawG = Get-Content -Path $uniJsG -Raw -Encoding UTF8 }
+    $histRawG = ""
+    $histJsG = Join-Path $root "mk-historico.js"
+    if (Test-Path $histJsG) { $histRawG = Get-Content -Path $histJsG -Raw -Encoding UTF8 }
+    $coreRawG = ""
+    $coreJsG = Join-Path $root "mk-core.js"
+    if (Test-Path $coreJsG) { $coreRawG = Get-Content -Path $coreJsG -Raw -Encoding UTF8 }
+    if ($uniRawG -notmatch 'mkIsBalcaoEstrito_|mkStatsHojeSeguro_' -or $syncRawG -notmatch 'I170:\s*balcão = só dados' -or $coreRawG -notmatch 'I170 fail-closed' -or $histRawG -notmatch 'histFiltroUnidade_') {
+      Add-Check "guard.i170.fe.isolamento" "fail" "I170 fail-closed multi-loja incompleto (balcão/stats/hist/tile)"
+    } else {
+      Add-Check "guard.i170.fe.isolamento" "ok" "balcão estrito + stats tag + hist/tile fail-closed (I170)"
     }
   }
 

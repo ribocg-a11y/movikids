@@ -142,7 +142,7 @@ Ordem curta — tablet + mesa:
 5. Celular: `acompanhar.html` + `foto-moldura.html?unidade=laville` (chip/rodapé La Ville).
 6. Holding: pill La Ville → Caixa/Receita dia a dia isolados; pill Golden sem vazamento.
 
-**Login LV (06/10):** seed holding → **Milena** `all`. **Jennifer** (op id 6) `laville` · PIN ok · RH parcial. **Karen** Freelancer: FE **v1.9.162** libera hub/ponto/RH sem cadastro 100% (I152 FE). Folha CLT continua zerada no modo freelancer. **Ainda sócio:** PDF Golden set · CTO/e-mail LV · assinar FASE 17.
+**I170 (06/10):** Contas/Hist Golden vazavam no balcão LV (GAS já filtrava). FE **v1.9.163** fail-closed — abrir `?unidade=laville&force=1.9.163` → Contas **0**. **Jennifer** LV · **Karen** Freelancer RH (I152). **Ainda sócio:** PDF Golden set · CTO/e-mail LV · assinar FASE 17.
 
 ---
 

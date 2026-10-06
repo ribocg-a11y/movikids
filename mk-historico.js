@@ -18,9 +18,18 @@ function filtrarTestesHistorico_(locacoes) {
   return (locacoes || []).filter(l => !isLocacaoTesteHist_(l));
 }
 
+/** I170: balcão = unidade ativa; holding = pills dual. Nunca 'all' no balcão. */
+function histFiltroUnidade_() {
+  if (typeof mkIsBalcaoEstrito_ === 'function' && mkIsBalcaoEstrito_()) {
+    return typeof mkUnidadeId_ === 'function' ? mkUnidadeId_() : 'golden';
+  }
+  if (typeof mkUnidadeContextoKpi_ === 'function') return mkUnidadeContextoKpi_();
+  return typeof mkDualFiltro_ === 'function' ? mkDualFiltro_() : 'all';
+}
+
 function filtrarLocacoesHistorico_(locacoes) {
   let list = filtrarTestesHistorico_(locacoes);
-  const filtro = typeof mkDualFiltro_ === 'function' ? mkDualFiltro_() : 'all';
+  const filtro = histFiltroUnidade_();
   if (filtro && filtro !== 'all' && typeof mkDualUidOf_ === 'function') {
     list = list.filter(function (l) { return mkDualUidOf_(l) === filtro; });
   }
@@ -31,7 +40,8 @@ function filtrarLocacoesHistorico_(locacoes) {
 // HISTÓRICO
 // ═══════════════════════════════════════════════════════════
 function histCacheKey_(dates) {
-  return 'mk_hist_v71_' + dates.s + '_' + dates.e;
+  const uid = histFiltroUnidade_();
+  return 'mk_hist_v72_' + dates.s + '_' + dates.e + '_u' + (uid || 'all');
 }
 
 function histItemHtml_(l) {
@@ -174,12 +184,16 @@ async function buscarHistorico() {
   if (cards) cards.style.display = 'none';
 
   try {
-    /* all + filtro dual no FE — troca de pill sem novo GAS. */
-    const authP = Object.assign({}, apiParamsComAuth_(), { unidadeId: 'all' });
+    /* I170: balcão pede só a loja; holding all + filtro dual no FE. */
+    const uidHist = histFiltroUnidade_();
+    const authP = Object.assign({}, apiParamsComAuth_(), {
+      unidadeId: (typeof mkIsBalcaoEstrito_ === 'function' && mkIsBalcaoEstrito_()) ? uidHist : 'all'
+    });
     const resStatsP = api({ action: 'listarHistorico', startDate: dates.s, endDate: dates.e, statsOnly: '1', ...authP });
     const resFullP = api({ action: 'listarHistorico', startDate: dates.s, endDate: dates.e, ...authP });
     const resStats = await resStatsP;
-    if (resStats.ok && resStats.stats) {
+    /* I170: só pintar stats prévios no balcão (GAS já filtrado). Holding espera lista + filtro FE. */
+    if (resStats.ok && resStats.stats && typeof mkIsBalcaoEstrito_ === 'function' && mkIsBalcaoEstrito_()) {
       renderAnalyticsCards(resStats.stats);
       renderHistExtChart_(resStats.stats);
     }

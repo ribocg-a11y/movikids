@@ -405,12 +405,16 @@ async function confirmarEncerrar() {
     const agora = new Date();
     const hh = String(agora.getHours()).padStart(2,'0');
     const mm2 = String(agora.getMinutes()).padStart(2,'0');
+    const uidEnc = (typeof mkUnidadeOfSession_ === 'function')
+      ? mkUnidadeOfSession_(encSession)
+      : (typeof mkUnidadeId_ === 'function' ? mkUnidadeId_() : 'golden');
     encHojeData.push({
       id:          d.id || encSession.id,
       contaId:     d.contaId || encSession.contaId || d.id || encSession.id,
       tipo:        d.tipo,
       plano:       d.plano,
       veiculo:     d.veiculo || encSession.veiculo || '',
+      unidadeId:   encSession.unidadeId || uidEnc,
       crianca:     d.crianca,
       responsavel: d.responsavel,
       telefone:    d.telefone || encSession.telefone || '',
@@ -420,7 +424,13 @@ async function confirmarEncerrar() {
     });
     if (typeof mkUpdateEncHojeKpis_ === 'function') mkUpdateEncHojeKpis_(encHojeData);
     else if (typeof renderEncHoje === 'function') renderEncHoje(encHojeData);
-    if (typeof mkContasEncHoje_ === 'function') statsHoje.n = mkContasEncHoje_(encHojeData);
+    if (typeof mkContasEncHoje_ === 'function') {
+      const encU = (typeof mkSessionsPorUnidade_ === 'function' && typeof mkUnidadeId_ === 'function')
+        ? mkSessionsPorUnidade_(encHojeData, mkUnidadeId_())
+        : encHojeData;
+      statsHoje.n = mkContasEncHoje_(encU);
+      statsHoje.unidadeId = typeof mkUnidadeId_ === 'function' ? mkUnidadeId_() : uidEnc;
+    }
     if (typeof showAdminHomeKpis === 'function' && mkExibirFinanceiro_()) {
       showAdminHomeKpis(typeof kpiHubStub_ === 'function' ? kpiHubStub_() : { ok: true, nSessoesHoje: encHojeData.length });
     }

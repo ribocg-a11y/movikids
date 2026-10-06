@@ -314,6 +314,17 @@ function updateStats() {
   const ativas = list.filter(s => s.started).length;
   const el = document.getElementById('stat-ativas');
   if (el) el.textContent = ativas;
+  /* I170 fail-closed: tile Contas hoje sempre da unidade ativa — nunca herda Golden. */
+  const nLoc = document.getElementById('stat-nloc');
+  if (nLoc) {
+    const encAll = (typeof encHojeData !== 'undefined' && Array.isArray(encHojeData)) ? encHojeData : [];
+    const encU = (typeof mkSessionsPorUnidade_ === 'function')
+      ? mkSessionsPorUnidade_(encAll, uid)
+      : encAll;
+    nLoc.textContent = String(
+      typeof mkContasEncHoje_ === 'function' ? mkContasEncHoje_(encU) : encU.length
+    );
+  }
 }
 
 function toast(msg, type = '') {

@@ -667,19 +667,35 @@ function fmtDataBrHoje_() {
 }
 
 function nHojeCanonica_() {
+  // I170: no balcão, só fatia da loja — nunca commandCenter/resumoDia de outra unidade.
+  if (typeof mkIsBalcaoEstrito_ === 'function' && mkIsBalcaoEstrito_()) {
+    const uid = typeof mkUnidadeId_ === 'function' ? mkUnidadeId_() : 'golden';
+    const encU = (typeof mkSessionsPorUnidade_ === 'function')
+      ? mkSessionsPorUnidade_(typeof encHojeData !== 'undefined' ? encHojeData : [], uid)
+      : [];
+    if (typeof mkContasEncHoje_ === 'function') return mkContasEncHoje_(encU);
+    return encU.length;
+  }
   // I121: comando/resumoDia (pay-first) antes de kpiMes (pode estar em cache)
   if (typeof commandCenterData !== 'undefined' && commandCenterData && commandCenterData.nHoje != null) {
     return Number(commandCenterData.nHoje);
   }
   if (resumoDiaHoje && resumoDiaHoje.n != null) return Number(resumoDiaHoje.n);
   if (kpiData && kpiData.nHoje != null) return Number(kpiData.nHoje);
-  if (typeof statsHoje !== 'undefined' && statsHoje.n != null) return Number(statsHoje.n);
+  if (typeof mkStatsHojeSeguro_ === 'function') return Number(mkStatsHojeSeguro_().n) || 0;
   return 0;
 }
 
 function nSessoesHojeCanonica_() {
+  if (typeof mkIsBalcaoEstrito_ === 'function' && mkIsBalcaoEstrito_()) {
+    const uid = typeof mkUnidadeId_ === 'function' ? mkUnidadeId_() : 'golden';
+    const encU = (typeof mkSessionsPorUnidade_ === 'function')
+      ? mkSessionsPorUnidade_(typeof encHojeData !== 'undefined' ? encHojeData : [], uid)
+      : [];
+    return encU.length;
+  }
   if (resumoDiaHoje && resumoDiaHoje.nSessoes != null) return Number(resumoDiaHoje.nSessoes);
-  if (typeof statsHoje !== 'undefined' && statsHoje.nSessoes != null) return Number(statsHoje.nSessoes);
+  if (typeof mkStatsHojeSeguro_ === 'function') return Number(mkStatsHojeSeguro_().nSessoes) || 0;
   if (typeof mkSessoesEncHoje_ === 'function') return mkSessoesEncHoje_(typeof encHojeData !== 'undefined' ? encHojeData : []);
   return 0;
 }

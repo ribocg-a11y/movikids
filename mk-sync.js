@@ -432,38 +432,63 @@ function aplicarDadosInicio(d) {
       try { localStorage.setItem('mk_sessions', JSON.stringify(cleanedStored)); } catch(e) {}
     }
 
-    if (d.statsHoje) {
-      statsHoje.n = d.statsHoje.n;
-      statsHoje.nSessoes = Number(d.statsHoje.nSessoes) || 0;
-      if (mkExibirFinanceiro_()) statsHoje.fat = Number(d.statsHoje.fat) || 0;
-      else statsHoje.fat = 0;
-    }
+    const balcaoEstrito = typeof mkIsBalcaoEstrito_ === 'function' ? mkIsBalcaoEstrito_() : true;
 
     if (d.encHoje && d.fonte !== 'firebase') {
-      const mergedEnc = mkMergeListaPorUnidade_(
-        typeof encHojeData !== 'undefined' ? encHojeData : [],
-        d.encHoje,
-        uidResp
-      );
-      /* I165: statsHoje é da unidade do sync — não preencher com encerradas Golden+LV misturadas */
-      if (!statsHoje.nSessoes && mergedEnc.length) {
-        const uidFill = (uidResp && uidResp !== 'all') ? uidResp : uidNow;
-        const sliceEnc = (typeof mkSessionsPorUnidade_ === 'function')
-          ? mkSessionsPorUnidade_(mergedEnc, uidFill)
-          : mergedEnc;
-        if (sliceEnc.length) statsHoje.nSessoes = sliceEnc.length;
+      let mergedEnc;
+      /* I170: balcão = só dados da loja aberta (fail-closed). Holding mantém merge. */
+      if (balcaoEstrito && uidResp !== 'all' && uidResp === String(uidNow)) {
+        mergedEnc = Array.isArray(d.encHoje) ? d.encHoje.slice() : [];
+      } else if (balcaoEstrito && uidResp === 'all') {
+        mergedEnc = (typeof mkSessionsPorUnidade_ === 'function')
+          ? mkSessionsPorUnidade_(d.encHoje || [], uidNow)
+          : [];
+      } else {
+        mergedEnc = mkMergeListaPorUnidade_(
+          typeof encHojeData !== 'undefined' ? encHojeData : [],
+          d.encHoje,
+          uidResp
+        );
       }
       if (typeof mkUpdateEncHojeKpis_ === 'function') mkUpdateEncHojeKpis_(mergedEnc);
       else {
         encHojeData = mergedEnc;
         const nLoc = document.getElementById('stat-nloc');
         if (nLoc) {
+          const encUi = (typeof mkSessionsPorUnidade_ === 'function')
+            ? mkSessionsPorUnidade_(encHojeData, uidNow)
+            : encHojeData;
           const nContas = typeof mkContasEncHoje_ === 'function'
-            ? mkContasEncHoje_(encHojeData)
-            : encHojeData.length;
+            ? mkContasEncHoje_(encUi)
+            : encUi.length;
           nLoc.textContent = String(nContas);
         }
       }
+      /* I170: statsHoje sempre recalculado da fatia da unidade — nunca herdar n do Golden. */
+      const uidFill = balcaoEstrito ? uidNow : ((uidResp && uidResp !== 'all') ? uidResp : uidNow);
+      const sliceEnc = (typeof mkSessionsPorUnidade_ === 'function')
+        ? mkSessionsPorUnidade_(mergedEnc, uidFill)
+        : mergedEnc;
+      statsHoje.n = typeof mkContasEncHoje_ === 'function' ? mkContasEncHoje_(sliceEnc) : sliceEnc.length;
+      statsHoje.nSessoes = sliceEnc.length;
+      statsHoje.unidadeId = uidFill;
+      if (mkExibirFinanceiro_()) {
+        statsHoje.fat = sliceEnc.reduce(function (s, e) { return s + (Number(e.valorTotal) || 0); }, 0);
+      } else {
+        statsHoje.fat = 0;
+      }
+    } else if (d.statsHoje && !balcaoEstrito) {
+      statsHoje.n = d.statsHoje.n;
+      statsHoje.nSessoes = Number(d.statsHoje.nSessoes) || 0;
+      statsHoje.unidadeId = (uidResp && uidResp !== 'all') ? uidResp : uidNow;
+      if (mkExibirFinanceiro_()) statsHoje.fat = Number(d.statsHoje.fat) || 0;
+      else statsHoje.fat = 0;
+    } else if (d.statsHoje && balcaoEstrito && uidResp === String(uidNow)) {
+      statsHoje.n = Number(d.statsHoje.n) || 0;
+      statsHoje.nSessoes = Number(d.statsHoje.nSessoes) || 0;
+      statsHoje.unidadeId = uidNow;
+      if (mkExibirFinanceiro_()) statsHoje.fat = Number(d.statsHoje.fat) || 0;
+      else statsHoje.fat = 0;
     }
     if (typeof showAdminHomeKpis === 'function' && mkExibirFinanceiro_()) {
       showAdminHomeKpis(typeof kpiHubStub_ === 'function' ? kpiHubStub_() : null);

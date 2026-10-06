@@ -1,7 +1,13 @@
 /* MOVI KIDS — P0/P1 local-first: snapshot confiável (LS + IndexedDB) v1.9.102 */
 
-const MK_SNAPSHOT_KEY = 'mk_snapshot_v1';
+const MK_SNAPSHOT_KEY_LEGACY = 'mk_snapshot_v1';
 const MK_SNAPSHOT_MAX_AGE_MS = 24 * 60 * 60 * 1000;
+
+/** I170: snapshot por unidade — La Ville não reaproveita Golden. */
+function mkSnapshotKey_() {
+  const uid = (typeof mkUnidadeId_ === 'function') ? mkUnidadeId_() : 'golden';
+  return 'mk_snapshot_v2_' + (uid || 'golden');
+}
 
 function mkSnapshotNormalize_(o) {
   if (!o || !o.data || o.ts == null) return null;
@@ -11,9 +17,17 @@ function mkSnapshotNormalize_(o) {
 
 function mkSnapshotLoad_() {
   try {
-    const raw = localStorage.getItem(MK_SNAPSHOT_KEY);
+    const raw = localStorage.getItem(mkSnapshotKey_());
     if (!raw) return null;
-    return mkSnapshotNormalize_(JSON.parse(raw));
+    const o = mkSnapshotNormalize_(JSON.parse(raw));
+    if (!o || !o.data) return null;
+    const uidNow = (typeof mkUnidadeId_ === 'function') ? mkUnidadeId_() : 'golden';
+    const uidSnap = o.data.unidadeId != null ? String(o.data.unidadeId) : '';
+    /* I170 fail-closed: snapshot sem tag ou de outra loja não aplica no balcão. */
+    if (typeof mkIsBalcaoEstrito_ === 'function' && mkIsBalcaoEstrito_()) {
+      if (!uidSnap || uidSnap === 'all' || uidSnap !== String(uidNow)) return null;
+    }
+    return o;
   } catch (e) {
     return null;
   }
@@ -39,7 +53,8 @@ async function mkSnapshotLoadAsync_(timeoutMs) {
 
 function mkSnapshotPersist_(payload) {
   try {
-    localStorage.setItem(MK_SNAPSHOT_KEY, JSON.stringify(payload));
+    localStorage.setItem(mkSnapshotKey_(), JSON.stringify(payload));
+    try { localStorage.removeItem(MK_SNAPSHOT_KEY_LEGACY); } catch (eL) { /* ok */ }
   } catch (e) { /* ignore */ }
   if (typeof mkIdbPutSnapshot_ === 'function') {
     mkIdbPutSnapshot_(payload).catch(function () { /* ignore */ });
@@ -68,9 +83,13 @@ function mkSnapshotSave_(d) {
   // I151: parcial COM itens não sobrescreve snapshot completo;
   // parcial VAZIO (listarAtivas total=0) limpa fantasmas no boot
   if (d.parcial && ativos.length > 0) return;
+  const uidSnap = (d.unidadeId != null && d.unidadeId !== '')
+    ? String(d.unidadeId)
+    : ((typeof mkUnidadeId_ === 'function') ? mkUnidadeId_() : 'golden');
   const payload = {
     ts: Date.now(),
     data: {
+      unidadeId: uidSnap,
       ativos: ativos,
       statsHoje: d.statsHoje || null,
       encHoje: d.encHoje || [],
