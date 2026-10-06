@@ -1,17 +1,18 @@
 # MOVI KIDS — Deploy atual (canônico)
 
-**Atualizado:** 06/10/2026 (FE **v1.9.164** · GAS Web **v1.5.232** · repo **v1.5.233** · I170–I178 isolamento)
+**Atualizado:** 06/10/2026 (FE **v1.9.165** · GAS Web **v1.5.234** · **La Ville ops desde 06/10/2026**)
 
 ## Produção
 
 | Camada | Versão | URL / evidência | Status |
 |--------|--------|-----------------|--------|
-| **Frontend** | **v1.9.164** | https://ribocg-a11y.github.io/movikids/?force=1.9.164 | ✅ Pages |
-| **Gestão Pessoas** | **v1.9.164** | `gestao-pessoas.html?force=1.9.164` | ✅ |
-| **Portal acompanhar** | **v1.9.164** | `acompanhar.html?v=1.9.164` | ✅ |
-| **Service Worker** | **1.9.164** | I170 Contas · I171 sessão loja | ✅ |
-| **GAS Web** | **v1.5.232** | I171 ✅ · I172 hist ⏳ | ⚠ atrás do repo |
-| **GAS repo** | **v1.5.233** | I172 `listarHistorico` filtro | raw GitHub |
+| **Frontend** | **v1.9.165** | https://ribocg-a11y.github.io/movikids/?force=1.9.165 | ✅ Pages |
+| **Gestão Pessoas** | **v1.9.165** | `gestao-pessoas.html?force=1.9.165` | ✅ |
+| **Portal acompanhar** | **v1.9.165** | `acompanhar.html?v=1.9.165` | ✅ |
+| **Service Worker** | **1.9.165** | isolamento dual | ✅ |
+| **GAS Web** | **v1.5.234** | I170–I178 isolamento | ✅ = repo |
+| **La Ville** | ops **06/10/2026** | 2ª unidade em operação | ✅ D+0 |
+| **GAS repo** | **v1.5.234** | raw GitHub | ✅ |
 | **GAS raw** | — | https://raw.githubusercontent.com/ribocg-a11y/movikids/main/MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs | |
 | **Planilha** | — | `1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618` | |
 | **Deploy ID** | — | `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y` | |

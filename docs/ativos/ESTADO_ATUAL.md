@@ -1,8 +1,10 @@
-# MOVI KIDS — Estado atual (06/10/2026 · FE v1.9.164 · I170–I172)
+# MOVI KIDS — Estado atual (06/10/2026 · FE v1.9.165 · La Ville D+0)
 
 Referência única para alinhamento local × produção.
 
-**Ciclo dev ativo:** **`PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`** — Sprint D · multi-loja **I159–I172** · FE **v1.9.164** · GAS Web **v1.5.232** (repo **v1.5.233** I172 hist) · **I158** Golden ✅ · receita dia a dia ✅  
+**Ciclo dev ativo:** **`PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`** — Sprint D · **La Ville inaugurou 06/10/2026** · FE **v1.9.165** · GAS Web **v1.5.234** · isolamento **I170–I178** ✅ · **I158** Golden ✅  
+
+**Marco Ops:** **La Ville Mall — início de operações em 06/10/2026** (2ª unidade ao lado do Golden).
 
 **Diagnóstico 6 camadas:** **`DIAGNOSTICO_SISTEMA_6_CAMADAS_2026-06.md`**  
 **Prioridades gerais:** **`PLANEJAMENTO_ATUAL_2026-06.md`** §9
@@ -14,7 +16,7 @@ Referência única para alinhamento local × produção.
 **Planejamento ativo:** `PLANEJAMENTO_ATUAL_2026-06.md`  
 **Mapa de erros/bugs:** **`MAPA_ERROS_FALHAS_BUGS.md`** (…/**I178** isolamento · **I172** hist · **I170–I171** · **I168** folha)  
 **Auditoria isolamento:** **`AUDITORIA_ISOLAMENTO_MULTIUNIDADE_I172_2026-10-06.md`**  
-**Plano La Ville:** **`PLANO_MULTI_UNIDADE_GOLDEN_LAVILLE_2026-09.md`** (🟡 I173–I178 abertos)  
+**Plano La Ville:** **`PLANO_MULTI_UNIDADE_GOLDEN_LAVILLE_2026-09.md`** (🟢 ops desde **06/10/2026**)  
 
 **Incidente I168:** **`INCIDENTE_I168_FOLHA_CACHE_FORCE_2026-10-02.md`**  
 **Incidente I167:** **`INCIDENTE_I167_HOLERITE_PDF_ABOUT_BLANK_2026-10-02.md`**  
@@ -45,16 +47,17 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 ---
 
-## Produção (03/10/2026)
+## Produção (06/10/2026)
 
 | Camada | Versão | URL / evidência |
 |--------|--------|-----------------|
-| **Frontend** | **v1.9.161** | https://ribocg-a11y.github.io/movikids/?force=1.9.161 |
-| **Gestão Pessoas** | **v1.9.161** | `gestao-pessoas.html?force=1.9.161` |
-| **Service Worker** | **1.9.161** | I168 folha cache-first · I167 PDF |
-| **Apps Script** | ping **v1.5.231** = repo | I160 escala · I159t LV · multi-unidade live |
+| **Frontend** | **v1.9.165** | https://ribocg-a11y.github.io/movikids/?force=1.9.165 |
+| **Gestão Pessoas** | **v1.9.165** | `gestao-pessoas.html?force=1.9.165` |
+| **Service Worker** | **1.9.165** | I170 Contas · isolamento dual |
+| **Apps Script** | ping **v1.5.234** = repo | I170–I178 isolamento live |
+| **La Ville ops** | ✅ **06/10/2026** | 2ª unidade em operação (D+0) |
 | **I166–I168 Folha/PDF** | ✅ FE | cache-first · Blob PDF · set R$14.577 |
-| **I159–I165 La Ville** | ✅ FE+GAS | Holding/balcão · QR/portal · chip caixa isolado · receita dia a dia |
+| **I159–I178 La Ville** | ✅ FE+GAS | Holding/balcão · isolamento dual validado |
 | **I158 Golden** | ✅ FE live | Fechamento set **14577** / n **684** / CTO **1500** · PDF 01/10 |
 | **I155 lookback GAS** | ✅ live | 0 HTML 404 · evidência `EVIDENCIA_ESTABILIDADE_POS_I155_*` |
 | **I154 GAS 404 / fila** | ✅ FE+GAS | **v1.9.113–114** · audit **219** |

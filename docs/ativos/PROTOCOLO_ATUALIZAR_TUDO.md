@@ -109,15 +109,22 @@ flowchart TD
 
 *Revisar quando mudar versão FE/GAS ou fechar incidente.*
 
-### Registro desta execução (06/10/2026)
+### Registro desta execução (06/10/2026 — noite)
+
+| I* / item | Evento | Doc |
+|-----------|--------|-----|
+| **La Ville** | **Início de operações 06/10/2026** (registrado sócio) | HANDOFF · ESTADO · PLANO multi-unidade |
+| **I170–I178** | Isolamento dual ✅ Web **v1.5.234** · FE **1.9.165** · teste PASS | `AUDITORIA_PROTOCOLO_MUDANCA_ISOLAMENTO_*` |
+| Sync C | docs + pasta C | este repo |
+
+### Registro anterior (06/10/2026 — tarde)
 
 | I* / item | Evento | Doc |
 |-----------|--------|-----|
 | **I170–I171** | Contas fail-closed + sessão por loja | FE **1.9.164** · GAS Web **1.5.232** |
-| **I172** | `listarHistorico` sem filtro unidade | repo **1.5.233** · Nova Web ⏳ |
-| **I173–I178** | Auditoria profunda: comando/conta-mestre/leading/custos hist/kpiMes cols | `AUDITORIA_ISOLAMENTO_MULTIUNIDADE_I172_*` · MAPA |
-| Regra | Regra 20 publicação + protocolo §1.5 matriz dual | `REGRAS_*` · `PROTOCOLO_DIAGNOSTICO` |
-| Sync C | `sync-pasta-c-pc.ps1` nesta execução | pasta C = este repo |
+| **I172** | `listarHistorico` sem filtro unidade | repo **1.5.233** · depois Web ✅ |
+| **I173–I178** | Auditoria profunda + correção GAS 1.5.234 | `AUDITORIA_ISOLAMENTO_MULTIUNIDADE_I172_*` · MAPA |
+| Regra | Regra 20 + protocolo §1.5 matriz dual | `REGRAS_*` · `PROTOCOLO_DIAGNOSTICO` |
 
 **Erros do agente (não repetir):** declarar isolamento OK só com Contas/inicio · carimbar `unidadeId` sem filtrar builder (I173) · `getRange` curto + `locRowMatches` (I172/I178) · FE fail-closed ≠ GAS fechado.
 

@@ -1,6 +1,6 @@
 # MOVI KIDS — Índice de documentação
 
-**Atualizado:** 06/10/2026 (FE **v1.9.164** · GAS Web **v1.5.232** · repo **v1.5.233** · **I172–I178** isolamento · **I170–I171** ✅)
+**Atualizado:** 06/10/2026 (FE **v1.9.165** · GAS **v1.5.234** · **La Ville ops desde 06/10/2026** · isolamento I170–I178 ✅)
 
 ## Comece aqui
 

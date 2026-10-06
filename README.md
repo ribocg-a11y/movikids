@@ -22,18 +22,19 @@ Detalhe: [docs/ativos/ESTRUTURA_REPO.md](docs/ativos/ESTRUTURA_REPO.md) · mocku
 
 **Planejamento:** [PLANEJAMENTO_ATUAL_2026-06.md](docs/ativos/PLANEJAMENTO_ATUAL_2026-06.md) · [PLANO_PRIORIDADES](docs/ativos/PLANO_PRIORIDADES_2026-06.md)
 
-## Produção (06/10/2026 — FE v1.9.164 · GAS Web v1.5.232 · repo v1.5.233)
+## Produção (06/10/2026 — FE v1.9.165 · GAS v1.5.234 · La Ville ops)
 
 | Camada | Versão repo | Produção |
 |--------|-------------|----------|
-| Frontend | **v1.9.164** | https://ribocg-a11y.github.io/movikids/?force=1.9.164 |
-| Gestão Pessoas | **v1.9.164** | `gestao-pessoas.html?force=1.9.164` |
-| Apps Script | **v1.5.233** repo / **v1.5.232** Web | I172 hist ⏳ Nova Web · I173–I178 abertos |
+| Frontend | **v1.9.165** | https://ribocg-a11y.github.io/movikids/?force=1.9.165 |
+| Gestão Pessoas | **v1.9.165** | `gestao-pessoas.html?force=1.9.165` |
+| Apps Script | **v1.5.234** | ping alinhado · isolamento I170–I178 ✅ |
+| **La Ville Mall** | ops desde **06/10/2026** | 2ª unidade em operação (D+0) |
 | Design System | **v1.1** | [DESIGN_SYSTEM_MOVIKIDS.md](docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md) |
-| Isolamento multi-loja | auditoria | [AUDITORIA_ISOLAMENTO_I172](docs/ativos/AUDITORIA_ISOLAMENTO_MULTIUNIDADE_I172_2026-10-06.md) |
+| Isolamento multi-loja | ✅ | [AUDITORIA_PROTOCOLO](docs/ativos/AUDITORIA_PROTOCOLO_MUDANCA_ISOLAMENTO_2026-10-06.md) |
 | Relatório Golden set | PDF fechamento | [entregas/…](https://ribocg-a11y.github.io/movikids/entregas/) · R$ 14.577 / CTO R$ 1.500 |
 | Holerites PDF | jul/2026 | [entregas/holerite-mes-2026-07](https://ribocg-a11y.github.io/movikids/entregas/holerite-mes-2026-07/) |
-| **Ciclo dev** | Sprint D | La Ville **I159–I178** · Contas OK · hist/comando P0 |
+| **Ciclo dev** | Sprint D | Golden + La Ville em paralelo |
 
 ## Novo chat / agente Cursor
 

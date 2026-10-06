@@ -1,6 +1,6 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 06/10/2026 · FE **v1.9.165** · GAS Web **v1.5.233** · repo **v1.5.234** (I173–I178) · auditoria protocolo ✅
+**Atualizado:** 06/10/2026 · FE **v1.9.165** · GAS Web **v1.5.234** · **La Ville inaugurou operações hoje (06/10/2026)** · isolamento I170–I178 ✅
 
 ## Produção (agora)
 
@@ -8,7 +8,19 @@
 |--------|--------|------|
 | Frontend | **v1.9.165** | https://ribocg-a11y.github.io/movikids/?force=1.9.165 |
 | Gestão Pessoas | **v1.9.165** | `gestao-pessoas.html?force=1.9.165` |
-| GAS | ping Web **v1.5.233** · repo **v1.5.234** | I172 hist ✅ · I173–I178 ⏳ Nova Web |
+| GAS | ping Web **v1.5.234** = repo | isolamento multi-loja live ✅ |
+
+---
+
+## La Ville — início de operações
+
+| Campo | Valor |
+|-------|--------|
+| **Data** | **06/10/2026** (segunda unidade em operação) |
+| Venue | La Ville Mall · `unidadeId=laville` |
+| Sistema | FE **v1.9.165** · GAS **v1.5.234** · isolamento dual validado (`TESTE_ISOLAMENTO_*` PASS) |
+| Evidência dia 1 | API: Contas/hist/comando/kpi separados de Golden (ex.: nHoje G≠L) |
+| Pendências Ops (não bloqueiam abertura) | CTO/e-mail shopping · consolidar equipe RH · cartaz QR mesa se ainda não fixo |
 | Design System | v1.1 | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
 
 **GAS raw:** https://raw.githubusercontent.com/ribocg-a11y/movikids/main/MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs  
@@ -133,22 +145,18 @@ Diagnóstico 29/09: `diagnosticoPlanilhaCompletoAdmin` → LOCACOES/CUSTOS/CONFI
 
 ## Checklist inauguração La Ville (Ops)
 
-Ordem curta — tablet + mesa:
+**Status:** ✅ **Operações iniciadas em 06/10/2026** (registrado pelo sócio nesta data).
 
-1. Imprimir cartaz: `assets/qr-balcao-imprimir.html?loja=laville` → fixar na mesa.
-2. Tablet La Ville: `?unidade=laville&force=1.9.161` → login (quando houver operador `laville`) ou admin Abrir balcão LV.
-3. Smoke D4: Nova loc → ▶ → estender → encerrar (1 loc teste).
-4. Conferir chip **Caixa hoje** no balcão LV = locações LV (não número Golden) — **I165**.
-5. Celular: `acompanhar.html` + `foto-moldura.html?unidade=laville` (chip/rodapé La Ville).
-6. Holding: pill La Ville → Caixa/Receita dia a dia isolados; pill Golden sem vazamento.
+Ordem curta — tablet + mesa (manutenção):
 
-**I171 (06/10):** sessão balcão **por loja** — Web **v1.5.232** ✅ + FE **v1.9.164**. Jennifer LV ∥ Karen Golden.
+1. Cartaz QR: `assets/qr-balcao-imprimir.html?loja=laville` → mesa.
+2. Tablet La Ville: `?unidade=laville&force=1.9.165` → login operador `laville`.
+3. Smoke D4 contínuo: Nova loc → ▶ → estender → encerrar.
+4. Chip **Caixa hoje** = só LV (I165).
+5. Celular: `acompanhar.html` + `foto-moldura.html?unidade=laville`.
+6. Holding: pill La Ville isolada de Golden.
 
-**I172 (06/10):** `listarHistorico` ainda **misturava lojas** na API (Web **v1.5.232**). Repo **v1.5.233** filtra `unidade_id` + cache por loja. **Ainda sócio:** Nova versão Web GAS (**v1.5.233**) · PDF Golden set · CTO LV.
-
-**Auditoria protocolo (06/10):** cobertura incompleta (sem teste dual / guards I173+) → corrigido. Repo **v1.5.234** fecha I173–I176/I178. Doc: `AUDITORIA_PROTOCOLO_MUDANCA_ISOLAMENTO_2026-10-06.md` · `AUDITORIA_ISOLAMENTO_MULTIUNIDADE_I172_*`.
-
-**Ainda sócio:** Nova Web **v1.5.234** → `.\scripts\testes\TESTE_ISOLAMENTO_MULTIUNIDADE_READONLY.ps1` (comando nHoje G≠L). I177 relatórios GAS legado = P2.
+**Isolamento (06/10):** I170–I178 ✅ Web **v1.5.234** · FE **v1.9.165** · `TESTE_ISOLAMENTO_MULTIUNIDADE_READONLY` PASS. Docs: `AUDITORIA_PROTOCOLO_MUDANCA_ISOLAMENTO_2026-10-06.md`. I177 relatórios GAS legado = P2.
 
 ---
 
@@ -242,8 +250,8 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 | Peso | # | Ação | Quem | Status |
 |------|---|------|------|--------|
 | **P0** | 1 | **Enviar** PDF Golden set/2026 ao shopping | **Sócio** | ✅ artefato pronto · fat **R$ 14.577** · n **684** · CTO **R$ 1.500** |
-| **P0** | 2 | Imprimir cartaz QR La Ville + fixar na mesa | Ops | ⏳ `?loja=laville` · FE **1.9.161** |
-| **P1** | 3 | Tablet smoke D4 La Ville | Ops | ⏳ `?unidade=laville&force=1.9.161` |
+| **P0** | 2 | Cartaz QR La Ville na mesa | Ops | ⏳ manter · ops desde **06/10/2026** |
+| **P1** | 3 | Tablet smoke D4 La Ville (contínuo) | Ops | ✅ unidade em operação · `?force=1.9.165` |
 | **P1** | 4 | Smoke portal+foto La Ville no celular | Ops | ⏳ PC ✅ · falta celular |
 | **P1** | 5 | Assinar FASE 17 (decisão 17.5 F9) | Sócio | ⏳ |
 | **P1** | 5b | FE multi-loja + receita + I165–I168 | Agente | ✅ FE **1.9.161** |
