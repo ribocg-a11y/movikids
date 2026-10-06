@@ -554,6 +554,15 @@
       if (p && p.cadastroOk === true) return true;
       return cadastroPct(p) === 100;
     }
+    /** I152 — Freelancer/diarista: hub/ponto/RH liberados sem cadastro 100% (paridade GAS). */
+    function gpModoOperacaoSo_(p) {
+      var f = String((p && p.funcao) || '').toLowerCase();
+      try { f = f.normalize('NFD').replace(/[\u0300-\u036f]/g, ''); } catch (e) { /* ok */ }
+      return /freelance|freelancer|frillance|diarista|autonomo|autonoma|operacao\s*so/.test(f);
+    }
+    function cadastroAcessoLiberado_(p) {
+      return cadastroOk(p) || gpModoOperacaoSo_(p);
+    }
 
     function gpAfterColabLogin_(uid) {
       gpClearAdmPreviewSession_();
@@ -561,7 +570,7 @@
       colabLogado = uid;
       pickColab = uid;
       var p = PESSOAS[uid];
-      if (!cadastroOk(p)) {
+      if (!cadastroAcessoLiberado_(p)) {
         gpCadastroForced_ = true;
         showBloqueio(true);
         return;
@@ -575,7 +584,7 @@
         showBloqueio(true);
         return;
       }
-      go(cadastroOk(PESSOAS[colabLogado]) ? 's-colab-hub' : 's-cadastro-bloq');
+      go(cadastroAcessoLiberado_(PESSOAS[colabLogado]) ? 's-colab-hub' : 's-cadastro-bloq');
     }
 
     let balcaoPins = [];
@@ -1204,7 +1213,7 @@
       const escCtx = folga ? 'Sem turno hoje' : ('Turno ' + escala);
       const escVal = folga ? 'Folga' : escala;
       const escTone = folga ? 'off' : 'blue';
-      const showCta = !gpAdmPreviewMode_ && !folga && p.statusHoje !== 'dentro' && ponto.tone === 'warn' && cadastroOk(p);
+      const showCta = !gpAdmPreviewMode_ && !folga && p.statusHoje !== 'dentro' && ponto.tone === 'warn' && cadastroAcessoLiberado_(p);
       const heroValCls = hero.tone === 'ok' ? ' green' : (hero.tone === 'warn' ? '' : '');
       const heroValStyle = hero.tone === 'warn' ? ' style="color:#E65100"' : (hero.tone === 'off' ? ' style="color:#9AAAC0"' : '');
       el.innerHTML =
@@ -1232,25 +1241,26 @@
 
     function abrirModulo(mod) {
       if (mod === 'dados') {
+        // Freelancer: formulário editável mesmo com acesso liberado (cadastro pode ficar parcial).
         goCadastroForm(!cadastroOk(PESSOAS[colabLogado]));
         go('s-cadastro-form');
         return;
       }
       if (mod === 'ponto') {
         const p = PESSOAS[colabLogado];
-        if (!gpAdmPreviewMode_ && !cadastroOk(p)) { showBloqueio(true); return; }
+        if (!gpAdmPreviewMode_ && !cadastroAcessoLiberado_(p)) { showBloqueio(true); return; }
         go('s-ponto');
       } else if (mod === 'metas') {
-        if (!gpAdmPreviewMode_ && !cadastroOk(PESSOAS[colabLogado])) { showBloqueio(true); return; }
+        if (!gpAdmPreviewMode_ && !cadastroAcessoLiberado_(PESSOAS[colabLogado])) { showBloqueio(true); return; }
         go('s-metas');
       } else if (mod === 'escala') {
-        if (!gpAdmPreviewMode_ && !cadastroOk(PESSOAS[colabLogado])) { showBloqueio(true); return; }
+        if (!gpAdmPreviewMode_ && !cadastroAcessoLiberado_(PESSOAS[colabLogado])) { showBloqueio(true); return; }
         go('s-escala');
       } else if (mod === 'banco') {
-        if (!gpAdmPreviewMode_ && !cadastroOk(PESSOAS[colabLogado])) { showBloqueio(true); return; }
+        if (!gpAdmPreviewMode_ && !cadastroAcessoLiberado_(PESSOAS[colabLogado])) { showBloqueio(true); return; }
         go('s-banco');
       } else if (mod === 'pagamento') {
-        if (!gpAdmPreviewMode_ && !cadastroOk(PESSOAS[colabLogado])) { showBloqueio(true); return; }
+        if (!gpAdmPreviewMode_ && !cadastroAcessoLiberado_(PESSOAS[colabLogado])) { showBloqueio(true); return; }
         go('s-pagamento');
       }
     }

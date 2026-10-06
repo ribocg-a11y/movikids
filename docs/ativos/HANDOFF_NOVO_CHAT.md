@@ -142,7 +142,7 @@ Ordem curta — tablet + mesa:
 5. Celular: `acompanhar.html` + `foto-moldura.html?unidade=laville` (chip/rodapé La Ville).
 6. Holding: pill La Ville → Caixa/Receita dia a dia isolados; pill Golden sem vazamento.
 
-**Login LV (06/10):** seed holding → **Milena** `all`. **Jennifer** (op id 6) cadastrada `unidade_id=laville` · RH linha ok · turno 14h–21:30 · cadastro 25% (falta CPF/nasc/tel/endereço/emergência/PIX) · sem PIN ainda. Fluxo: balcão LV criar PIN → Colaboradores completar 100% → balcão OK. Sessão balcão liberada (Karen bloqueava). **Ainda sócio:** PDF Golden set · CTO/e-mail LV · assinar FASE 17.
+**Login LV (06/10):** seed holding → **Milena** `all`. **Jennifer** (op id 6) `laville` · PIN ok · RH parcial. **Karen** Freelancer: FE **v1.9.162** libera hub/ponto/RH sem cadastro 100% (I152 FE). Folha CLT continua zerada no modo freelancer. **Ainda sócio:** PDF Golden set · CTO/e-mail LV · assinar FASE 17.
 
 ---
 
