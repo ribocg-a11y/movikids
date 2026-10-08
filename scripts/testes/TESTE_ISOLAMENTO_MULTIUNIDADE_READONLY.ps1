@@ -47,10 +47,17 @@ try {
   } else {
     Add-Iso "inicio.unidadeId" "ok" "tags corretas"
   }
-  if ($nG -gt 0 -and $nG -eq $nL) {
-    Add-Iso "inicio.isolamento" "fail" "nSessoes G=L=$nG (mistura)"
+  $idsG = @()
+  $idsL = @()
+  foreach ($e in @($dG.encHoje) + @($dG.ativos)) { if ($e.id) { $idsG += [string]$e.id } }
+  foreach ($e in @($dL.encHoje) + @($dL.ativos)) { if ($e.id) { $idsL += [string]$e.id } }
+  $shared = @($idsG | Where-Object { $idsL -contains $_ })
+  if ($shared.Count -gt 0) {
+    Add-Iso "inicio.isolamento" "fail" ("ids em comum: " + ($shared -join ","))
+  } elseif ($nG -gt 0 -and $nG -eq $nL -and $idsG.Count -eq 0 -and $idsL.Count -eq 0) {
+    Add-Iso "inicio.isolamento" "fail" "nSessoes G=L=$nG sem ids para conferir"
   } else {
-    Add-Iso "inicio.isolamento" "ok" ("G=$nG L=$nL")
+    Add-Iso "inicio.isolamento" "ok" ("G=$nG L=$nL ids distintos")
   }
 
   $hG = Invoke-IsoApi (@{ action = "listarHistorico"; unidadeId = "golden"; startDate = $hoje; endDate = $hoje } + $adm)
