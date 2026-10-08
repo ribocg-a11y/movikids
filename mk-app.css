@@ -764,6 +764,7 @@ html,body{height:100%;background:var(--bg);color:var(--txt);overflow:hidden}
 }
 .sb-sessao-card[hidden]{display:none!important}
 .sb-sessao-row{display:grid;grid-template-columns:auto 1fr;gap:2px 8px;align-items:baseline;margin-bottom:8px}
+.sb-sessao-row[hidden]{display:none!important}
 .sb-sessao-row:last-of-type{margin-bottom:10px}
 .sb-sessao-lbl{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:rgba(255,255,255,.45);grid-column:1}
 .sb-sessao-val{grid-column:2;font-size:13px;font-weight:900;color:#FFD54F;line-height:1.2}

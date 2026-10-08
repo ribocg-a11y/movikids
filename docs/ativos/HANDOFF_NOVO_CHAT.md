@@ -1,13 +1,13 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 08/10/2026 · FE **v1.9.166** · GAS Web **v1.5.234** · **La Ville ops desde 06/10/2026** · isolamento I170–I178 ✅ · balcão Encerradas hoje filtra a loja aberta (I179)
+**Atualizado:** 08/10/2026 · FE **v1.9.167** · GAS Web **v1.5.234** · **La Ville ops desde 06/10/2026** · isolamento I170–I178 ✅ · I179 encerradas por loja · I162d card Balcão respeita hidden
 
 ## Produção (agora)
 
 | Camada | Versão | Link |
 |--------|--------|------|
-| Frontend | **v1.9.166** | https://ribocg-a11y.github.io/movikids/?force=1.9.166 |
-| Gestão Pessoas | **v1.9.166** | `gestao-pessoas.html?force=1.9.166` |
+| Frontend | **v1.9.167** | https://ribocg-a11y.github.io/movikids/?force=1.9.167 |
+| Gestão Pessoas | **v1.9.167** | `gestao-pessoas.html?force=1.9.167` |
 | GAS | ping Web **v1.5.234** = repo | isolamento multi-loja live ✅ |
 
 ---
@@ -18,7 +18,7 @@
 |-------|--------|
 | **Data** | **06/10/2026** (segunda unidade em operação) |
 | Venue | La Ville Mall · `unidadeId=laville` |
-| Sistema | FE **v1.9.166** · GAS **v1.5.234** · isolamento dual validado (`TESTE_ISOLAMENTO_*` PASS) |
+| Sistema | FE **v1.9.167** · GAS **v1.5.234** · isolamento dual validado (`TESTE_ISOLAMENTO_*` PASS) |
 | Evidência dia 1 | API: Contas/hist/comando/kpi separados de Golden (ex.: nHoje G≠L) |
 | CTO / aluguel espaço | **R$ 2.300/mês** · venc. dia **10** · boleto (1º fat. contrato: 25/09 — conferir ano no PDF) |
 | Contrato | Locação espaço temporário / merchandising quiosque · **La Ville Mall** · 4 m² praça alimentação · vigência **12 meses** a partir **01/09/2026** |
@@ -154,13 +154,13 @@ Diagnóstico 29/09: `diagnosticoPlanilhaCompletoAdmin` → LOCACOES/CUSTOS/CONFI
 Ordem curta — tablet + mesa (manutenção):
 
 1. Cartaz QR: `assets/qr-balcao-imprimir.html?loja=laville` → mesa.
-2. Tablet La Ville: `?unidade=laville&force=1.9.166` → login operador `laville`.
+2. Tablet La Ville: `?unidade=laville&force=1.9.167` → login operador `laville`.
 3. Smoke D4 contínuo: Nova loc → ▶ → estender → encerrar.
 4. Chip **Caixa hoje** = só LV (I165).
 5. Celular: `acompanhar.html` + `foto-moldura.html?unidade=laville`.
 6. Holding: pill La Ville isolada de Golden.
 
-**Isolamento (06/10):** I170–I178 ✅ Web **v1.5.234** · FE **v1.9.166** · `TESTE_ISOLAMENTO_MULTIUNIDADE_READONLY` PASS. Docs: `AUDITORIA_PROTOCOLO_MUDANCA_ISOLAMENTO_2026-10-06.md`. I177 relatórios GAS legado = P2.
+**Isolamento (06/10):** I170–I178 ✅ Web **v1.5.234** · FE **v1.9.167** · `TESTE_ISOLAMENTO_MULTIUNIDADE_READONLY` PASS. Docs: `AUDITORIA_PROTOCOLO_MUDANCA_ISOLAMENTO_2026-10-06.md`. I177 relatórios GAS legado = P2.
 
 ---
 
@@ -255,7 +255,7 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 |------|---|------|------|--------|
 | **P0** | 1 | **Enviar** PDF Golden set/2026 ao shopping | **Sócio** | ✅ artefato pronto · fat **R$ 14.577** · n **684** · CTO **R$ 1.500** |
 | **P0** | 2 | Cartaz QR La Ville na mesa | Ops | ⏳ manter · ops desde **06/10/2026** |
-| **P1** | 3 | Tablet smoke D4 La Ville (contínuo) | Ops | ✅ unidade em operação · `?force=1.9.166` |
+| **P1** | 3 | Tablet smoke D4 La Ville (contínuo) | Ops | ✅ unidade em operação · `?force=1.9.167` |
 | **P1** | 4 | Smoke portal+foto La Ville no celular | Ops | ⏳ PC ✅ · falta celular |
 | **P1** | 5 | Assinar FASE 17 (decisão 17.5 F9) | Sócio | ⏳ |
 | **P1** | 5b | FE multi-loja + receita + I165–I168 | Agente | ✅ FE **1.9.161** |
