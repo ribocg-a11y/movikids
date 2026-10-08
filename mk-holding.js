@@ -153,10 +153,9 @@
 
   function mkHoldingAbrirBalcao_(uid) {
     var r;
-    /* Reset antes do sync: zera a lista Encerradas da loja anterior na hora. */
-    if (typeof mkResetBalcaoParaUnidade_ === 'function') {
-      r = mkResetBalcaoParaUnidade_(uid);
-    } else if (typeof mkAppEntrarBalcao_ === 'function') {
+    /* Não usar resetBalcao: ele zera os números e apaga o cache das duas lojas.
+     * A lista Encerradas já é filtrada na hora em renderEncHojeList_. */
+    if (typeof mkAppEntrarBalcao_ === 'function') {
       r = mkAppEntrarBalcao_(uid);
     } else if (typeof mkUnidadeSet_ === 'function') {
       r = mkUnidadeSet_(uid);
@@ -169,9 +168,15 @@
     if (typeof showPage === 'function') showPage('home', { adminBalcao: true });
     if (typeof mkRefreshUnidadeUi_ === 'function') mkRefreshUnidadeUi_();
     if (typeof mkApplyModoNav_ === 'function') mkApplyModoNav_();
-    /* force=true: evita reaplicar cache/inicio da outra loja (I159g). */
+    if (typeof renderEncHojeList_ === 'function') {
+      try { renderEncHojeList_(); } catch (eL) { /* ignore */ }
+    }
+    if (typeof renderCards === 'function') {
+      try { renderCards(); } catch (eR) { /* ignore */ }
+    }
+    /* Cache local já é por loja. force=1 ignorava esse cache e esperava carregarInicio frio. */
     if (typeof syncNow === 'function') {
-      try { syncNow(true); } catch (eS) { /* ignore */ }
+      try { syncNow(false); } catch (eS) { /* ignore */ }
     } else if (typeof carregarInicio === 'function') {
       try { carregarInicio(); } catch (eC) { /* ignore */ }
     }
