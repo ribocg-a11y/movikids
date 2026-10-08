@@ -540,6 +540,13 @@ function aplicarDadosInicio(d) {
         : encHojeData;
       if (typeof renderEncHojeList_ === 'function') renderEncHojeList_(encUi);
       else if (typeof renderEncHoje === 'function') renderEncHoje(encUi);
+    } else if (balcaoEstrito && typeof renderEncHojeList_ === 'function') {
+      /* listarAtivas não traz encerradas. Sem este redraw, o fallback deixa
+       * a lista da loja anterior na tela (Golden e La Ville iguais). */
+      const encUi = (typeof mkSessionsPorUnidade_ === 'function')
+        ? mkSessionsPorUnidade_(typeof encHojeData !== 'undefined' ? encHojeData : [], uidNow)
+        : [];
+      renderEncHojeList_(encUi);
     }
     atualizarVeiculoGrid();
     if (typeof renderHolding_ === 'function' && document.getElementById('page-holding')?.classList.contains('active')) {

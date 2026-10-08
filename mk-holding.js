@@ -153,10 +153,11 @@
 
   function mkHoldingAbrirBalcao_(uid) {
     var r;
-    if (typeof mkAppEntrarBalcao_ === 'function') {
-      r = mkAppEntrarBalcao_(uid);
-    } else if (typeof mkResetBalcaoParaUnidade_ === 'function') {
+    /* Reset antes do sync: zera a lista Encerradas da loja anterior na hora. */
+    if (typeof mkResetBalcaoParaUnidade_ === 'function') {
       r = mkResetBalcaoParaUnidade_(uid);
+    } else if (typeof mkAppEntrarBalcao_ === 'function') {
+      r = mkAppEntrarBalcao_(uid);
     } else if (typeof mkUnidadeSet_ === 'function') {
       r = mkUnidadeSet_(uid);
     }

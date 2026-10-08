@@ -557,7 +557,13 @@ function renderEncHojeList_(list) {
   const container = document.getElementById('enc-hoje-list');
   const lead = document.getElementById('enc-hoje-lead');
   if (!section || !container) return;
-  const data = list || encHojeData || [];
+  /* Balcão: a lista visível é só da loja aberta. Trocar Golden/La Ville não pode
+   * deixar o encerradas da outra loja na tela enquanto o sync completo não volta. */
+  let data = list || encHojeData || [];
+  if (typeof mkIsBalcaoEstrito_ === 'function' && mkIsBalcaoEstrito_()
+      && typeof mkSessionsPorUnidade_ === 'function' && typeof mkUnidadeId_ === 'function') {
+    data = mkSessionsPorUnidade_(data, mkUnidadeId_());
+  }
   if (!data.length) { section.style.display = 'none'; return; }
   section.style.display = 'block';
   const nContas = typeof mkContasEncHoje_ === 'function' ? mkContasEncHoje_(data) : data.length;
