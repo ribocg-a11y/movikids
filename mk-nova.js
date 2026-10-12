@@ -1359,11 +1359,22 @@ async function confirmarLocacao() {
     } else {
       novaLimparOtimistas_();
       mkRefreshHomeUI_();
+      const jaUso = /j[aá]\s+(est[aá]\s+)?em uso|ve[ií]culo j[aá]/i.test(errRaw);
+      const veicInvalido = /ve[ií]culo inv[aá]lido/i.test(errRaw);
       const errMsg = (e && e.veiculo)
         ? ('Erro no veículo ' + e.veiculo + ': ' + e.message)
         : (errRaw || 'Erro de conexão. Tente novamente.');
       toast(errMsg, 'error');
       if (salvos > 0 && n > 1) toast(salvos + ' de ' + n + ' salvos — complete o restante.', 'warning');
+      /* I180b: 409 já em uso / veículo inválido — não insistir no save; Home + listarAtivas. */
+      if (jaUso || veicInvalido) {
+        if (typeof showPage === 'function') showPage('home');
+        if (typeof mkSyncListarAtivasFallback_ === 'function') {
+          mkSyncListarAtivasFallback_({ silent: true });
+        } else if (typeof syncController === 'function') {
+          syncController(false, 200);
+        }
+      }
     }
   } finally {
     if (saveGen === _novaSaveGen) {
