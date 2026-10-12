@@ -344,13 +344,19 @@
   window.operadorApiParams_ = function operadorApiParams_() {
     const s = getSession();
     const out = {};
+    /* I180: unidade da loja ABERTA (balcão/filtro), nunca a da sessão de login.
+     * Admin com sessão golden/all sobrescrevia La Ville → salvar "Veículo inválido"
+     * e sync carregarInicio era IGNORADO (uidResp ≠ uidNow). */
     if (typeof mkUnidadeApiParams_ === 'function') Object.assign(out, mkUnidadeApiParams_());
     else if (typeof mkUnidadeId_ === 'function') out.unidadeId = mkUnidadeId_();
+    if (!out.unidadeId || out.unidadeId === 'all') {
+      const uNow = (typeof mkUnidadeId_ === 'function') ? mkUnidadeId_() : 'golden';
+      out.unidadeId = (uNow && uNow !== 'all') ? uNow : 'golden';
+    }
     if (!s) return out;
     out.operador = s.nome;
     if (s.id && s.id !== 'ADMIN') out.operadorId = s.id;
     if (s.role) out.authRole = s.role;
-    if (s.unidadeId) out.unidadeId = s.unidadeId;
     return out;
   };
 

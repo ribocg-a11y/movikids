@@ -626,6 +626,14 @@ try {
     } else {
       Add-Check "guard.i171.sessao.unidade" "ok" "sessao operador namespaced por unidade (I171)"
     }
+    # I180 — escritas/sync usam loja aberta (não sessão de login do admin)
+    $fnOpParams = [regex]::Match($authRawG, 'operadorApiParams_\s*=\s*function[\s\S]{0,1200}?return out;')
+    $opBody = if ($fnOpParams.Success) { $fnOpParams.Value } else { '' }
+    if (-not $opBody -or $opBody -notmatch 'I180' -or $opBody -match 'if\s*\(\s*s\.unidadeId\s*\)\s*out\.unidadeId\s*=\s*s\.unidadeId') {
+      Add-Check "guard.i180.fe.unidade-escrita" "fail" "operadorApiParams_ ainda sobrescreve unidadeId com sessão (I180)"
+    } else {
+      Add-Check "guard.i180.fe.unidade-escrita" "ok" "escritas/sync usam loja aberta, nao sessao login (I180)"
+    }
     # I172 — listarHistorico filtra unidade_id (não vaza Golden→La Ville)
     $fnHist = [regex]::Match($gasRawG, 'function listarHistorico_\([\s\S]{0,14000}?function salvarCusto_')
     $histBody = if ($fnHist.Success) { $fnHist.Value } else { '' }

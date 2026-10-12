@@ -529,7 +529,13 @@ function upsertSessaoPendenteLocal_(payload) {
   const idx = sessions.findIndex(function(s) {
     return (row && Number(s.rowIndex) === row) || (id && Number(s.id) === id);
   });
-  const merged = Object.assign({}, payload, { _savedAt: Date.now() });
+  const uidStamp = (payload && payload.unidadeId)
+    || ((typeof mkUnidadeId_ === 'function') ? mkUnidadeId_() : '')
+    || ((typeof mkUnidadeFromVeiculo_ === 'function') ? mkUnidadeFromVeiculo_(payload && payload.veiculo) : 'golden');
+  const merged = Object.assign({}, payload, {
+    _savedAt: Date.now(),
+    unidadeId: (uidStamp && uidStamp !== 'all') ? uidStamp : 'golden'
+  });
   if (idx >= 0) sessions[idx] = Object.assign({}, sessions[idx], merged);
   else sessions.push(merged);
 }
@@ -1227,11 +1233,17 @@ async function confirmarLocacao() {
     return;
   }
 
-  // I143: veículo já Ativa/Pendente na sessão local → bloqueia retry cego
+  // I143/I180: só veículos da loja aberta (sessions pode ter as duas lojas em memória)
   const ocupLocal = {};
+  const uidOcup = (typeof mkUnidadeId_ === 'function') ? mkUnidadeId_() : 'golden';
   (typeof sessions !== 'undefined' ? sessions : []).forEach(function (s) {
     const st = String(s.status || '');
-    if ((st === 'Ativa' || st === 'Pendente') && s.veiculo) ocupLocal[String(s.veiculo)] = true;
+    if (st !== 'Ativa' && st !== 'Pendente') return;
+    if (!s.veiculo) return;
+    if (typeof mkUnidadeOfSession_ === 'function' && uidOcup && uidOcup !== 'all') {
+      if (mkUnidadeOfSession_(s) !== uidOcup) return;
+    }
+    ocupLocal[String(s.veiculo)] = true;
   });
   for (let oi = 0; oi < itens.length; oi++) {
     const v = String(itens[oi].veiculo || '');
