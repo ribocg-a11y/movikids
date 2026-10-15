@@ -29,7 +29,7 @@ Competência **10/2026**. A 2ª quinzena (salário 60% − adiantamento − enca
 | **I39** | Admissão no mês: salário e VA = contratual × (dias até o fim do mês ÷ dias do mês), depois aplica 40%/50% | Jennifer 26/31 |
 | **I141** | Na 2ª, bônus = ganho no **mês** − o que **saiu no PIX da 1ª** (nunca 50% do mês final) | gravar Q1 abaixo |
 
-O holerite do app ainda emparelha Raykelly com **Julia** (ids 3↔4) e a escala da Karen está vazia (`-------`), então o GAS deu R$ 100 só para a Raykelly e **R$ 0** para a Karen. O memorial **corrige** isso sem mudar Apps Script.
+Motor no repo **v1.5.235 (I181):** par **Raykelly↔Karen** (3↔5); Julia pausa; Jennifer sem meta. **Web produção ainda v1.5.234** até Nova versão. Até lá o FE **v1.9.171** cobre o PIX de outubro.
 
 ## Bônus 01–14/10 — 4 dias FSS × R$ 50 = R$ 200 cada
 

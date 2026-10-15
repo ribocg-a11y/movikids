@@ -439,6 +439,16 @@ try {
     } else {
       Add-Check "guard.va.teto400" "fail" "gpVaMensalColab_ sem return teto (I49)"
     }
+    # I181 — par FSS Raykelly+Karen; Julia/Jennifer fora do pote
+    if ($gasRaw -match 'META_BONUS_PAR_IDS_\s*=\s*\{\s*3:\s*4') {
+      Add-Check "guard.meta.par.fss" "fail" "par ainda Raykelly+Julia (3:4) — deve ser 3:5 Karen (I181)"
+    } elseif ($gasRaw -notmatch 'META_BONUS_PAR_IDS_\s*=\s*\{\s*3:\s*5\s*,\s*5:\s*3') {
+      Add-Check "guard.meta.par.fss" "fail" "META_BONUS_PAR_IDS_ nao e Raykelly+Karen 3:5 (I181)"
+    } elseif ($gasRaw -notmatch 'META_SEM_BONUS_IDS_\s*=\s*\{\s*4:\s*true\s*,\s*6:\s*true') {
+      Add-Check "guard.meta.par.fss" "fail" "META_SEM_BONUS_IDS_ deve excluir Julia(4)+Jennifer(6)"
+    } else {
+      Add-Check "guard.meta.par.fss" "ok" "FSS par Raykelly+Karen (3:5); Julia/Jennifer sem meta"
+    }
     # I51 — falta automatica em dia de escala sem ponto; abono so ADM
     if ($gasRaw -notmatch "sit = 'Falta'") {
       Add-Check "guard.faltas.auto" "fail" "jornada sem Falta auto (I51)"

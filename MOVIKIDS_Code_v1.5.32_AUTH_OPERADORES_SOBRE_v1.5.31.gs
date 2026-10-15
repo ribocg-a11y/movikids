@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.234
+// MOVI KIDS — Google Apps Script v1.5.235
+// v1.5.235: I181 — par meta FSS Raykelly+Karen (3↔5); Julia pausa; Jennifer La Ville sem meta
 // v1.5.234: I173–I178 — comando/conta-mestre/leading/custosHist/kpiMes COL_LOC_READ (isolamento)
 // v1.5.233: I172 — listarHistorico filtra unidade_id (anti-vazamento Golden→La Ville)
 // v1.5.232: I171 — sessão operador por unidade (Golden || La Ville em paralelo; bloqueio só na mesma loja)
@@ -226,7 +227,7 @@
 
 // ── CONSTANTES ───────────────────────────────────────────────
 /** Versão exposta em ping, carregarInicio, validarSchema, gestaoPessoasStatus (bump com header). */
-const MK_GAS_VERSAO_  = 'v1.5.234';
+const MK_GAS_VERSAO_  = 'v1.5.235';
 const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.231';
 const SHEET_ID   = '1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618';
 const DEPLOY_ID  = 'AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y';
@@ -5362,19 +5363,20 @@ function kpiAvancadosMes_(mmyy, nMes, nCancelMes, diasOperando, nPorVeiculo, min
   };
 }
 
-/** Meta operacional — Milena (2) sócia + Raykelly (3) + Julia (4). Fora: Eduarda (1). */
+/** Meta operacional — Raykelly (3) + Karen (5) Golden. Julia (4) pausa. Jennifer (6) La Ville sem meta. */
 const META_LOC_TURNO_PADRAO_ = 20;
 const META_BONUS_DIA_REAIS_ = 100;
-/** I109 — sex/sáb/dom com o par Raykelly+Julia na escala: metade do bônus cada. */
+/** I109/I181 — sex/sáb/dom com Raykelly+Karen no mesmo turno: pote R$100 → R$50 cada. */
 const META_BONUS_FIM_SEMANA_MEIO_ = 50;
-const META_BONUS_PAR_IDS_ = { 3: 4, 4: 3 };
+const META_BONUS_PAR_IDS_ = { 3: 5, 5: 3 };
+const META_SEM_BONUS_IDS_ = { 4: true, 6: true };
 
 function metaEhFimDeSemanaData_(dataStr) {
   const dow = weekdayFromDataStr_(dataStr);
   return dow === 0 || dow === 5 || dow === 6; // dom · sex · sáb
 }
 
-/** Ambas (Raykelly+Julia) têm turno na escala neste dia de fim de semana. */
+/** Ambas (Raykelly+Karen) têm turno na escala neste dia de fim de semana. */
 function metaParceirasJuntasNoDia_(opId, dataStr) {
   const id = Number(opId);
   const outro = META_BONUS_PAR_IDS_[id];
@@ -5390,6 +5392,7 @@ function metaParceirasJuntasNoDia_(opId, dataStr) {
 
 /** I109b — pot R$100 no FSS: se a meta do dia fecha (eu OU a parceira), as duas levam R$50. */
 function metaBonusValorDoDia_(opId, dataStr, nOwn, nPartner, metaAlvo, bonusCheio) {
+  if (META_SEM_BONUS_IDS_[Number(opId)]) return 0;
   const meta = Number(metaAlvo) > 0 ? Number(metaAlvo) : META_LOC_TURNO_PADRAO_;
   const full = Number(bonusCheio) > 0 ? Number(bonusCheio) : META_BONUS_DIA_REAIS_;
   const nEu = Number(nOwn) || 0;
@@ -5515,19 +5518,35 @@ function metaOperadorCfg_(opId) {
     };
   } else if (id === 4) {
     cfg = {
-      ativo: true,
+      ativo: false,
       meta: META_LOC_TURNO_PADRAO_,
       bonus: META_BONUS_DIA_REAIS_,
       inicio: '01/07/2026',
+      escala: metaOperadorEscalaVazia_()
+    };
+  } else if (id === 5) {
+    cfg = {
+      ativo: true,
+      meta: META_LOC_TURNO_PADRAO_,
+      bonus: META_BONUS_DIA_REAIS_,
+      inicio: '22/09/2026',
       escala: {
         '0': [13, 21],
         '1': null,
-        '2': [14, 22],
+        '2': null,
         '3': null,
-        '4': [14, 22],
+        '4': null,
         '5': [14, 22],
-        '6': [12, 22]
+        '6': [10, 20]
       }
+    };
+  } else if (id === 6) {
+    cfg = {
+      ativo: false,
+      meta: META_LOC_TURNO_PADRAO_,
+      bonus: 0,
+      inicio: '06/10/2026',
+      escala: metaOperadorEscalaVazia_()
     };
   }
   try {
@@ -5555,6 +5574,28 @@ function metaOperadorCfg_(opId) {
     }
   } catch (e) { /* ignore */ }
   if (cfg && !cfg.escala) cfg.escala = metaOperadorEscalaVazia_();
+  if (id === 4 || id === 6) {
+    if (!cfg) cfg = { ativo: false, meta: META_LOC_TURNO_PADRAO_, bonus: 0, inicio: '', escala: metaOperadorEscalaVazia_() };
+    cfg.ativo = false;
+  }
+  if (id === 5 && cfg) {
+    cfg.ativo = true;
+    if (!(Number(cfg.bonus) > 0)) cfg.bonus = META_BONUS_DIA_REAIS_;
+    if (!(Number(cfg.meta) > 0)) cfg.meta = META_LOC_TURNO_PADRAO_;
+    const esc = cfg.escala || {};
+    const temTurno = ['0', '5', '6'].some(function (d) { return !!esc[d]; });
+    if (!temTurno) {
+      cfg.escala = {
+        '0': [13, 21],
+        '1': null,
+        '2': null,
+        '3': null,
+        '4': null,
+        '5': [14, 22],
+        '6': [10, 20]
+      };
+    }
+  }
   return cfg;
 }
 
@@ -5759,10 +5800,10 @@ function metaOperadorLocByDay_(opId, opNome, cfg) {
   return byDay;
 }
 
-/** Operadores com meta turno ativa (FASE 17 + Julia I79). */
+/** Operadores com meta turno ativa — Golden Raykelly+Karen. Julia/Jennifer fora. */
 function gpMetaOperadoresIdsAtivos_() {
   const ids = [];
-  [2, 3, 4].forEach(function (opId) {
+  [2, 3, 5].forEach(function (opId) {
     const cfg = metaOperadorCfg_(opId);
     if (cfg && cfg.ativo !== false && cfg.inicio) ids.push(opId);
   });
