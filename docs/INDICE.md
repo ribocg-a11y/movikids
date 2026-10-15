@@ -1,6 +1,6 @@
 # MOVI KIDS — Índice de documentação
 
-**Atualizado:** 06/10/2026 (FE **v1.9.165** · GAS **v1.5.234** · **La Ville ops desde 06/10/2026** · isolamento I170–I178 ✅)
+**Atualizado:** 15/10/2026 (FE **v1.9.171** · GAS **v1.5.235** · I181 Q1 out/26 · **La Ville ops desde 06/10/2026**)
 
 ## Comece aqui
 
@@ -23,6 +23,8 @@
 | [**INCIDENTE_I43_CARREGAR_INICIO_COL_Y_2026-06-23.md**](ativos/INCIDENTE_I43_CARREGAR_INICIO_COL_Y_2026-06-23.md) | **I43** — cronômetro revertia após ▶ |
 | [**INCIDENTE_I53_CONFIG_PLANILHA_REPAIR_2026-06-24.md**](arquivo/incidentes/INCIDENTE_I53_CONFIG_PLANILHA_REPAIR_2026-06-24.md) | **I53** — CONFIG memorial, schema, repair |
 | [**INCIDENTE_I96_I99_MULTI_VEICULO_2026-07-10.md**](arquivo/incidentes/INCIDENTE_I96_I99_MULTI_VEICULO_2026-07-10.md) | **I96–I103** — multi-veículo · overlay · contagem encerradas/caixa |
+| [**INCIDENTE_I181_META_PAR_KAREN_JENNIFER_2026-10-15.md**](ativos/INCIDENTE_I181_META_PAR_KAREN_JENNIFER_2026-10-15.md) | **I181** — par meta Ray+Karen · Jennifer sem pote · Q1 15/10 |
+| [**MEMORIAL_HOLERITE_Q1_2026-10.md**](ativos/MEMORIAL_HOLERITE_Q1_2026-10.md) | **Folha 15/10** — PIX 748,40 / 748,40 / 543,82 |
 | [**AUDITORIA_ISOLAMENTO_MULTIUNIDADE_I172_2026-10-06.md**](ativos/AUDITORIA_ISOLAMENTO_MULTIUNIDADE_I172_2026-10-06.md) | **I172–I178** — furos isolamento Golden×La Ville |
 | [**INCIDENTE_I168_FOLHA_CACHE_FORCE_2026-10-02.md**](ativos/INCIDENTE_I168_FOLHA_CACHE_FORCE_2026-10-02.md) | **I168** — Folha cache-first (anti force/retries) |
 | [**INCIDENTE_I167_HOLERITE_PDF_ABOUT_BLANK_2026-10-02.md**](ativos/INCIDENTE_I167_HOLERITE_PDF_ABOUT_BLANK_2026-10-02.md) | **I167** — PDF holerite about:blank → Blob |

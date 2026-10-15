@@ -1,6 +1,6 @@
 # MOVI KIDS — Protocolo "Atualize tudo"
 
-**Criado:** 14/06/2026 · **Última execução:** 06/10/2026 (FE **v1.9.164** · GAS Web **v1.5.232** · repo **v1.5.233** I172 · auditoria **I172–I178** · sync pasta C)  
+**Criado:** 14/06/2026 · **Última execução:** 15/10/2026 (FE **v1.9.171** · GAS Web **v1.5.235** I181 · Q1 out/26 · sync pasta C)  
 **Função:** quando o usuário pedir **"atualize tudo"**, o agente segue **esta lista** — não só handoff parcial.  
 **Regra Cursor:** `.cursor/rules/atualize-tudo-movikids.mdc`
 
@@ -45,17 +45,18 @@ Sincronizar **documentação + estado operacional** do projeto com a realidade a
 
 ---
 
-## Produção atual (06/10/2026)
+## Produção atual (15/10/2026)
 
 | Camada | Versão | Evidência |
 |--------|--------|-----------|
-| GAS | ping Web **v1.5.232** · repo **v1.5.233** | I171 sessão ✅ · I172 hist ⏳ Nova Web |
-| FE | **v1.9.164** | Pages live · I170 Contas · I171 login loja |
-| Isolamento | parcial | Contas PASS · hist FAIL até Web 1.5.233 · I173–I178 abertos |
+| GAS | ping Web **v1.5.235** = repo | I181 Ray+Karen · Jennifer sem meta |
+| FE | **v1.9.171** | Pages live · holerite Q1 memorial · tabela 50/100 |
+| Isolamento | ✅ | I170–I178 Web 1.5.234+ |
+| Q1 out/26 | PIX 748,40 / 748,40 / 543,82 | painel 15/10 live |
 | Golden set (fechamento) | R$ **14.577** · CTO **R$ 1.500** | PDF 01/10 · n **684** |
 | Folha / holerite PDF | I166–I168 ✅ | Blob print · cache FE/LS 24h |
-| La Ville | código ✅ | Ops: QR · tablet D4 · equipe · CTO · isolamento P0 |
-| Homolog tablet | **⏳** | D4 Golden + LV · `?force=1.9.164` |
+| La Ville | ops **06/10** | 2ª unidade |
+| Homolog tablet | contínuo | `?force=1.9.171` |
 
 ```powershell
 node scripts\testes\teste-estabilidade-pos-i155.cjs
@@ -109,7 +110,16 @@ flowchart TD
 
 *Revisar quando mudar versão FE/GAS ou fechar incidente.*
 
-### Registro desta execução (06/10/2026 — noite)
+### Registro desta execução (15/10/2026)
+
+| I* / item | Evento | Doc |
+|-----------|--------|-----|
+| **I181** | Par meta Ray↔Karen; Jennifer sem pote; Q1 PIX validado live | `INCIDENTE_I181_*` · `MEMORIAL_HOLERITE_Q1_2026-10.md` |
+| **I180/I180b** | locar/encerrar na loja aberta | FE **1.9.170–171** |
+| Folha | Pagamento 15/10 Ray/Karen **748,40** · Jennifer **543,82** | painel GAS v1.5.235 |
+| Sync C | docs + pasta C | este repo |
+
+### Registro anterior (06/10/2026 — noite)
 
 | I* / item | Evento | Doc |
 |-----------|--------|-----|

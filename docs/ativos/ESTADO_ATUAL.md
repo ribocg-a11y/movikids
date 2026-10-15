@@ -2,7 +2,7 @@
 
 Referência única para alinhamento local × produção.
 
-**Ciclo dev ativo:** **`PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`** — Sprint D · **La Ville inaugurou 06/10/2026** · FE **v1.9.171** · GAS Web **v1.5.234** · isolamento **I170–I178** ✅ · **I158** Golden ✅  
+**Ciclo dev ativo:** **`PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`** — Sprint D · **La Ville inaugurou 06/10/2026** · FE **v1.9.171** · GAS Web **v1.5.235** · **I181** Ray+Karen · isolamento **I170–I178** ✅ · **I158** Golden ✅  
 
 **Marco Ops:** **La Ville Mall — início de operações em 06/10/2026** (2ª unidade ao lado do Golden).  
 **CTO La Ville:** contrato merchandising quiosque **R$ 2.300/mês** · venc. dia 10 · PDF em `entregas/CONTRATO_MERCHANDISING_QUIOSQUE_MOVIKIDS.pdf`.
@@ -15,10 +15,12 @@ Referência única para alinhamento local × produção.
 **Acessos:** **`ACESSOS_E_AUTORIZACOES.md`** — papéis, PIN admin, agente vs humano  
 **Índice:** `../INDICE.md` · **Prioridades:** **`PLANO_PRIORIDADES_2026-06.md`**  
 **Planejamento ativo:** `PLANEJAMENTO_ATUAL_2026-06.md`  
-**Mapa de erros/bugs:** **`MAPA_ERROS_FALHAS_BUGS.md`** (…/**I178** isolamento · **I172** hist · **I170–I171** · **I168** folha)  
+**Mapa de erros/bugs:** **`MAPA_ERROS_FALHAS_BUGS.md`** (…/**I181** meta Ray+Karen · **I180** locar loja · **I178** isolamento)  
 **Auditoria isolamento:** **`AUDITORIA_ISOLAMENTO_MULTIUNIDADE_I172_2026-10-06.md`**  
 **Plano La Ville:** **`PLANO_MULTI_UNIDADE_GOLDEN_LAVILLE_2026-09.md`** (🟢 ops desde **06/10/2026**)  
 
+**Incidente I181:** **`INCIDENTE_I181_META_PAR_KAREN_JENNIFER_2026-10-15.md`**  
+**Memorial Q1 10/2026:** **`MEMORIAL_HOLERITE_Q1_2026-10.md`**  
 **Incidente I168:** **`INCIDENTE_I168_FOLHA_CACHE_FORCE_2026-10-02.md`**  
 **Incidente I167:** **`INCIDENTE_I167_HOLERITE_PDF_ABOUT_BLANK_2026-10-02.md`**  
 **Incidente I158:** **`../arquivo/incidentes/INCIDENTE_I158_GOLDEN_CONTA_CANCELADA_2026-09-23.md`**  
@@ -48,14 +50,14 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 ---
 
-## Produção (06/10/2026)
+## Produção (15/10/2026)
 
 | Camada | Versão | URL / evidência |
 |--------|--------|-----------------|
 | **Frontend** | **v1.9.171** | https://ribocg-a11y.github.io/movikids/?force=1.9.171 |
 | **Gestão Pessoas** | **v1.9.171** | `gestao-pessoas.html?force=1.9.171` |
 | **Service Worker** | **1.9.171** | I170 Contas · isolamento dual |
-| **Apps Script** | ping **v1.5.234** = repo | I170–I178 isolamento live |
+| **Apps Script** | ping **v1.5.235** = repo | I181 meta Ray+Karen · Jennifer sem pote |
 | **La Ville ops** | ✅ **06/10/2026** | 2ª unidade em operação (D+0) |
 | **I166–I168 Folha/PDF** | ✅ FE | cache-first · Blob PDF · set R$14.577 |
 | **I159–I178 La Ville** | ✅ FE+GAS | Holding/balcão · isolamento dual validado |
@@ -66,6 +68,7 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 | **I151 encerrar fantasma** | ✅ FE | travas `guard.i151.*` · teste readonly |
 | **I145 sync idle** | ✅ | idle/visibility **sem** force=1 · warm ~1–2s |
 | **I143 salvar/▶** | ✅ | mediana ~3.9s / ~3.1s · dup 409 · limpeza OK |
+| **Holerite Q1 15/10** | I181 + memorial | Ray **748,40** · Karen **748,40** · Jennifer **543,82** (VA cartão; VT fora) |
 | **Holerite Q1 15/07** | I108–I114+I138 | Ray pacote **R$ 998,40** · Julia **R$ 948,40** (VT fora) |
 | **Holerite Q2 31/07** | I141+I142 | Ray **1652,22** · Julia **1702,22** · bônus resto (700/750) |
 | **PDFs mês** | entregas | https://ribocg-a11y.github.io/movikids/entregas/holerite-mes-2026-07/ |
@@ -74,7 +77,7 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 | **FOLHA VT I68** | ✅ 26/06 | B9 **8,80** · B10/B12 **22** · Milena VT **193,60** |
 | **Planilha** | 23 abas | `schemaOk` · `validarSchema` **06/08** |
 | **Homolog tablet** | ✅ 23/06 | smoke **v1.9.96** + I143 no balcão |
-| **Raykelly / Julia** | ✅ | ids 3 / 4 · Julia pausa I152 · Karen id5 Freelancer |
+| **Equipe folha** | ✅ 15/10 | Raykelly+Karen Golden FSS · Jennifer La Ville sem meta · Julia pausa |
 | **Design System** | **v1.1** | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
 | **Ciclo dev** | Sprint D | One UI ✅ · I125–**I168** · La Ville ops · Golden FE ✅ |
 | **Receita dia a dia** | ✅ FE **1.9.157+** | `#page-receita-diaria` · pills loja · cache local |
@@ -87,7 +90,7 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 **Teste rápido GAS (ping):**  
 https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec?action=ping  
-→ ping Web **v1.5.231** · multi-unidade · I160 · I156 ritmo · I155 lookback · I154 fila 404 · I153 anular
+→ ping Web **v1.5.235** · I181 · isolamento I170–I178 · I160 · I156 ritmo · I155 lookback
 
 **URL morta (não usar):** `AKfycbzc...` → 404
 

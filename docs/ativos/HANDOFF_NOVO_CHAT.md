@@ -18,7 +18,7 @@
 |-------|--------|
 | **Data** | **06/10/2026** (segunda unidade em operação) |
 | Venue | La Ville Mall · `unidadeId=laville` |
-| Sistema | FE **v1.9.170** · GAS **v1.5.234** · isolamento dual validado (`TESTE_ISOLAMENTO_*` PASS) |
+| Sistema | FE **v1.9.171** · GAS **v1.5.235** · isolamento dual validado (`TESTE_ISOLAMENTO_*` PASS) |
 | Evidência dia 1 | API: Contas/hist/comando/kpi separados de Golden (ex.: nHoje G≠L) |
 | CTO / aluguel espaço | **R$ 2.300/mês** · venc. dia **10** · boleto (1º fat. contrato: 25/09 — conferir ano no PDF) |
 | Contrato | Locação espaço temporário / merchandising quiosque · **La Ville Mall** · 4 m² praça alimentação · vigência **12 meses** a partir **01/09/2026** |
@@ -195,6 +195,7 @@ Ordem curta — tablet + mesa (manutenção):
 | 4 | Respostas longas / links misturados (GAS vs FE) | Clareza operacional | Uma frase: “novo código = `mk-admin.js` no GitHub; Code.gs sem mudança” |
 | 5 | **I166** “hardening” Folha: apagar cache + `force=1` + 3 retries + auto-kpiMes | I120 / I126 / **I136** / I137 | **I168** cache-first · softRefresh sem force · sem auto-relatório |
 | 6 | **I167** PDF holerite `noopener` + `document.write` → about:blank | I142b lição incompleta | Blob URL + CSS embutido · FE **1.9.160** |
+| 7 | **I181** holerite ainda par Julia depois da equipe ser Ray+Karen+Jennifer | Motor GAS não atualizado com a regra humana | GAS **v1.5.235** 3↔5 · `guard.meta.par.fss` |
 
 **Lição:** correção FE pronta → **publicar na mesma sessão**. Não transferir “merge/push” ao usuário.  
 **Lição I168:** medição primeiro (frio vs warm). Nunca “melhorar” com `force=1`/apagar cache/loops — isso **reabre** a fila GAS.
@@ -205,8 +206,10 @@ Ordem curta — tablet + mesa (manutenção):
 
 | Pessoa | Status |
 |--------|--------|
-| **Karen** id5 | Operadora ativa · Sem PIN (1º acesso) · Freelancer |
-| **Julia** id4 | **Pausa** — fora do login balcão |
+| **Raykelly** id3 | Golden · CLT · par FSS com Karen (I181) |
+| **Karen** id5 | Golden · freelancer FSS · meta **R$ 50** quando juntas |
+| **Jennifer** id6 | La Ville · admissão **06/10/2026** · **sem meta** (início) |
+| **Julia** id4 | **Pausa** — fora do pote e do login balcão |
 
 **Ambiente:** Cloud Agent OK para FE/docs · pasta C / AppScript = sócio no PC.  
 **GitHub:** `ribocg-a11y/movikids` · `main`
@@ -229,7 +232,7 @@ Ordem curta — tablet + mesa (manutenção):
 |------|--------|
 | Workspace | `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github` |
 | Modo | **Agent local / This PC** |
-| 1º turno | `.\scripts\relatorio-versoes.ps1 -Markdown` · Pages **1.9.122** · ping **v1.5.221** |
+| 1º turno | `.\scripts\relatorio-versoes.ps1 -Markdown` · Pages **1.9.171** · ping **v1.5.235** |
 
 ```powershell
 cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github
@@ -241,7 +244,7 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 
 ## Mensagem para colar no novo chat (PC)
 
-> *Continuar MOVI KIDS **no PC** — pasta C (`movikids-github`). Ler `HANDOFF_NOVO_CHAT.md`. FE **v1.9.161** Pages · GAS ping **v1.5.231**. Golden set ✅ R$ 14.577 / CTO R$ 1.500. I166–I168 folha/PDF ✅. La Ville multi-loja ✅ (I159–I165). Próximo Ops: QR mesa LV · tablet D4 · 1ª equipe · CTO LV. **This PC.***
+> *Continuar MOVI KIDS **no PC** — pasta C (`movikids-github`). FE **v1.9.171** · GAS **v1.5.235** I181. Q1 out/26: Ray/Karen PIX **748,40** · Jennifer **543,82**. La Ville ops 06/10. **This PC.***
 
 **Mínima:**
 
@@ -255,7 +258,8 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 |------|---|------|------|--------|
 | **P0** | 1 | **Enviar** PDF Golden set/2026 ao shopping | **Sócio** | ✅ artefato pronto · fat **R$ 14.577** · n **684** · CTO **R$ 1.500** |
 | **P0** | 2 | Cartaz QR La Ville na mesa | Ops | ⏳ manter · ops desde **06/10/2026** |
-| **P1** | 3 | Tablet smoke D4 La Ville (contínuo) | Ops | ✅ unidade em operação · `?force=1.9.170` |
+| **P0** | 0 | **PIX Q1 15/10** memorial (já validado live) | Sócio | Ray/Karen **748,40** · Jennifer **543,82** · VA no cartão |
+| **P1** | 3 | Tablet smoke D4 La Ville (contínuo) | Ops | ✅ unidade em operação · `?force=1.9.171` |
 | **P1** | 4 | Smoke portal+foto La Ville no celular | Ops | ⏳ PC ✅ · falta celular |
 | **P1** | 5 | Assinar FASE 17 (decisão 17.5 F9) | Sócio | ⏳ |
 | **P1** | 5b | FE multi-loja + receita + I165–I168 | Agente | ✅ FE **1.9.161** |

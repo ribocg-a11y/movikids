@@ -1,6 +1,6 @@
 # MOVI KIDS — Planejamento atual (pós-FASE 5)
 
-**Atualizado:** 03/10/2026 · FE **v1.9.161** · GAS **v1.5.231** · **I158–I168** · La Ville operacional  
+**Atualizado:** 15/10/2026 · FE **v1.9.171** · GAS **v1.5.235** · **I158–I181** · La Ville ops 06/10  
 **Diagnóstico:** [`DIAGNOSTICO_SISTEMA_6_CAMADAS_2026-06.md`](DIAGNOSTICO_SISTEMA_6_CAMADAS_2026-06.md)  
 **Sprint UI:** [`PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`](PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md) ← **ciclo ativo**  
 **One UI (fechado):** [`PLANEJAMENTO_ONE_UI_2026-06.md`](PLANEJAMENTO_ONE_UI_2026-06.md)  
@@ -13,7 +13,7 @@
 
 ## 1. Resumo executivo
 
-**Modo atual (03/10):** One UI **A–C ✅**. Confiabilidade **I153–I157 ✅**. **I158** Golden ✅. **I166–I168** folha/PDF ✅. Multi-loja **I159–I165 ✅** (FE **1.9.161** · GAS **1.5.231**). **Ciclo ativo = Sprint D** — Ops inaugura LV · sócio envia PDF set · FASE 17.
+**Modo atual (15/10):** One UI **A–C ✅**. **I158** Golden ✅. **I166–I168** folha/PDF ✅. Multi-loja **I159–I178 ✅**. **I181** folha Ray+Karen ✅. **Ciclo ativo = Sprint D** — LV em operação · Q1 out/26 paga · FASE 17.
 
 | Área | Status |
 |------|--------|

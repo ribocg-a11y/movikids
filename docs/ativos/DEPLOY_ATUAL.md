@@ -1,29 +1,29 @@
 # MOVI KIDS — Deploy atual (canônico)
 
-**Atualizado:** 06/10/2026 (FE **v1.9.165** · GAS Web **v1.5.234** · **La Ville ops desde 06/10/2026**)
+**Atualizado:** 15/10/2026 (FE **v1.9.171** · GAS Web **v1.5.235** · **La Ville ops desde 06/10/2026**)
 
 ## Produção
 
 | Camada | Versão | URL / evidência | Status |
 |--------|--------|-----------------|--------|
-| **Frontend** | **v1.9.165** | https://ribocg-a11y.github.io/movikids/?force=1.9.165 | ✅ Pages |
-| **Gestão Pessoas** | **v1.9.165** | `gestao-pessoas.html?force=1.9.165` | ✅ |
-| **Portal acompanhar** | **v1.9.165** | `acompanhar.html?v=1.9.165` | ✅ |
-| **Service Worker** | **1.9.165** | isolamento dual | ✅ |
-| **GAS Web** | **v1.5.234** | I170–I178 isolamento | ✅ = repo |
-| **La Ville** | ops **06/10/2026** | 2ª unidade em operação | ✅ D+0 |
-| **GAS repo** | **v1.5.234** | raw GitHub | ✅ |
+| **Frontend** | **v1.9.171** | https://ribocg-a11y.github.io/movikids/?force=1.9.171 | ✅ Pages |
+| **Gestão Pessoas** | **v1.9.171** | `gestao-pessoas.html?force=1.9.171` | ✅ |
+| **Portal acompanhar** | **v1.9.158** cache `?v=` | `acompanhar.html` | ✅ (DNA floresta) |
+| **Service Worker** | **1.9.171** | I181 holerite + I180 loja | ✅ |
+| **GAS Web** | **v1.5.235** | I181 par Ray+Karen | ✅ = repo |
+| **La Ville** | ops **06/10/2026** | 2ª unidade em operação | ✅ |
+| **GAS repo** | **v1.5.235** | raw GitHub | ✅ |
 | **GAS raw** | — | https://raw.githubusercontent.com/ribocg-a11y/movikids/main/MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs | |
 | **Planilha** | — | `1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618` | |
 | **Deploy ID** | — | `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y` | |
 
-## Entregas recentes (06/10)
+## Entregas recentes (15/10)
 
 | I* | Camada | Nota |
 |----|--------|------|
-| I170–I171 | FE 1.9.164 + GAS 1.5.232 | Contas fail-closed · sessão por loja |
-| I172 | GAS repo 1.5.233 | hist filtro — **Nova Web** sócio |
-| I173–I178 | docs | comando/conta-mestre/leading/custos/kpiMes — abertos |
+| **I181** | GAS 1.5.235 + FE 1.9.171 | Par FSS Ray↔Karen; Jennifer sem meta; Q1 PIX 748,40/748,40/543,82 |
+| I180/I180b | FE 1.9.170 | locar/encerrar na loja aberta · 409 → Home |
+| I170–I178 | FE+GAS | Isolamento dual ✅ |
 | I165–I168 | FE | caixa · folha · PDF |
 
 ## Verificação
@@ -36,8 +36,8 @@
 
 | Check | Esperado |
 |-------|----------|
-| Pages `mk-version.js` | **1.9.164** ✅ |
-| GAS ping | **v1.5.232** Web · **v1.5.233** após Nova Web I172 |
+| Pages `mk-version.js` | **1.9.171** ✅ |
+| GAS ping | **v1.5.235** |
 
 ## Publicar FE (I24)
 

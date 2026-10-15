@@ -1,6 +1,6 @@
 # MOVI KIDS — Mapa de erros, falhas e bugs
 
-**Atualizado:** 06/10/2026 — **I172–I178** auditoria isolamento multi-loja · FE **v1.9.164** · GAS Web **v1.5.232** · repo **v1.5.233**  
+**Atualizado:** 15/10/2026 — **I181** par meta Ray+Karen · Q1 out/26 · FE **v1.9.171** · GAS Web **v1.5.235**  
 
 **Uso anterior:** 03/10/2026 — **I166–I168** folha/PDF/cache ✅ · FE **v1.9.161** · GAS ping **v1.5.231**  
 **Uso anterior:** 02/10/2026 — **I165** caixa unidade ✅ · **I158** Golden ✅ · FE **v1.9.158**  
@@ -279,6 +279,7 @@ Docs: `INCIDENTE_I167_*` · `INCIDENTE_I168_*` · I120/I126/I136/I137
 | **I179** | **Encerradas hoje igual nas duas lojas no balcão** | `listarAtivas` não traz `encHoje`; abrir balcão não redesenhava a lista | FE **v1.9.166** filtra a lista pela loja aberta e zera ao trocar | `?force=1.9.166` | Golden ≠ La Ville na home |
 | **I180** | **Admin: locar/encerrar/sync na loja errada** | `operadorApiParams_` sobrescrevia `unidadeId` com a sessão de login (golden/all) | FE **v1.9.170** unidade = loja aberta; ocupação local por loja; stamp `unidadeId` no card | `?force=1.9.170` · `guard.i180` | La Ville salva LV*; sync não ignora inicio |
 | **I180b** | **Nova: 409 já em uso / veículo inválido** | Retry cego após encerrar; GAS recusa veículo LV se uid=golden | FE **v1.9.170** 409 → Home + `listarAtivas` (sem GAS) | `?force=1.9.170` | não duplica save |
+| **I181** | **Holerite Q1: par meta ainda Julia** | `META_BONUS_PAR_IDS_` 3↔4; Karen escala vazia; Jennifer no pote | GAS **v1.5.235** 3↔5 · Jennifer/Julia sem meta · FE **v1.9.171** memorial + tabela 50/100 | `guard.meta.par.fss` · `MEMORIAL_HOLERITE_Q1_2026-10.md` | PIX 748,40 / 748,40 / 543,82 live |
 | **I142** | **Falta conferência mês no PDF (Q1/Q2/Soma + dias bônus)** | Só demonstrativo da quinzena; sócio precisava tabela mês + dias | FE **v1.9.87** `mkHolMesResumo_` + dias via `metaOperadorTurno` · PDFs em `entregas/` | `teste-i141-bonus-resto.cjs` · `gerar-pdf-holerite-mes.cjs` | https://ribocg-a11y.github.io/movikids/entregas/holerite-mes-2026-07/ |
 | **I141** | **Holerite Q2: bônus = 50% do mês final (errado)** | GAS `gpCalcHollerite_` metade; 1ª já pagou acumulado da época (Ray 150≠425) | FE **v1.9.86** `bonusQ2 = mês − Q1 memorial` · Ray 700 · Julia 750 | `mk-holerite.js` · `teste-i141-bonus-resto.cjs` | pacote 31/07: Ray **1652,22** · Julia **1702,22** |
 | **I140** | **FGTS na cesta do holerite** | Encargo empregador misturado com bônus/VA | FE **v1.9.85** FGTS só no rodapé | `mk-holerite.js` | cesta sem cód 503 |

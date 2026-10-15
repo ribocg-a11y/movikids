@@ -2,7 +2,7 @@
 
 Scripts em `scripts/testes/`. Documentação: `docs/ativos/PROTOCOLO_DIAGNOSTICO_E_TESTES.md` · **Planilha por aba:** `docs/ativos/PROTOCOLO_AUDITORIA_ABAS_PLANILHA.md` · **"atualize tudo":** `PROTOCOLO_ATUALIZAR_TUDO.md`
 
-**Versões de referência (03/10/2026):** FE **v1.9.161** · GAS ping **v1.5.231** · mínimo operação balcão **v1.7.35** (I15 GET).
+**Versões de referência (15/10/2026):** FE **v1.9.171** · GAS ping **v1.5.235** · mínimo operação balcão **v1.7.35** (I15 GET).
 
 | **I166–I168 Folha/PDF** | docs `INCIDENTE_I167_*` · `INCIDENTE_I168_*` · mapa família I166→I168 · FE cache-first + Blob PDF |
 | **I169 Holerite mês PDF** | `node scripts/gerar-holerite-mes-from-painel.cjs entregas/holerite-mes-2026-09/painel-09-2026.json` · pasta `entregas/holerite-mes-YYYY-MM/` |
@@ -18,6 +18,7 @@ Scripts em `scripts/testes/`. Documentação: `docs/ativos/PROTOCOLO_DIAGNOSTICO
 | **I150 cenários DRE** | `node scripts/testes/teste-i150-cenarios-financeiros.cjs` · `TESTE_DASHBOARD_READONLY.ps1` |
 
 | **I141/I142 holerite** | `node scripts/testes/teste-i141-bonus-resto.cjs` · PDFs `entregas/holerite-mes-2026-07/` |
+| **I181 par FSS** | `guard.meta.par.fss` no `pre-push-check.ps1` · memorial `MEMORIAL_HOLERITE_Q1_2026-10.md` |
 
 **Repo:** `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github` — scripts `.ps1` exigem `cd` nesta pasta **ou** caminho absoluto.
 
