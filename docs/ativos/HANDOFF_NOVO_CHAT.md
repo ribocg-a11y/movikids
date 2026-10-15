@@ -1,6 +1,6 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 15/10/2026 · FE **v1.9.171** · GAS repo **v1.5.235** (I181 Ray+Karen; Web ainda **v1.5.234** até Nova versão) · holerite Q1 10/2026
+**Atualizado:** 15/10/2026 · FE **v1.9.171** · GAS Web **v1.5.235** I181 (Ray+Karen; Jennifer sem meta)
 
 ## Produção (agora)
 
@@ -8,7 +8,7 @@
 |--------|--------|------|
 | Frontend | **v1.9.171** | https://ribocg-a11y.github.io/movikids/?force=1.9.171 |
 | Gestão Pessoas | **v1.9.171** | `gestao-pessoas.html?force=1.9.171` |
-| GAS | ping Web **v1.5.234** · repo **v1.5.235** I181 | Web pendente Nova versão |
+| GAS | ping Web **v1.5.235** = repo I181 | Ray+Karen meta live ✅ |
 
 ---
 
