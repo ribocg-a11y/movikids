@@ -769,6 +769,27 @@ html.gp-prod #gp-preview-banner {
 }
 #gp-app .mk-hol-tbl-mes th:first-child,
 #gp-app .mk-hol-tbl-mes td:first-child { text-align: left; }
+
+#gp-app .gp-meta-tipo,
+#page-operadores .gp-meta-tipo {
+  display: inline-block;
+  font-family: Nunito, sans-serif;
+  font-weight: 800;
+  font-size: 11px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+#gp-app .gp-meta-tipo--50,
+#page-operadores .gp-meta-tipo--50 {
+  color: #92400E;
+  background: #FEF3C7;
+}
+#gp-app .gp-meta-tipo--100,
+#page-operadores .gp-meta-tipo--100 {
+  color: #166534;
+  background: #DCFCE7;
+}
 @media print {
   body.mk-hol-printing * { visibility: hidden !important; }
   body.mk-hol-printing .mk-hol-print-root,

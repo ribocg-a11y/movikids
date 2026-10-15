@@ -1004,7 +1004,7 @@
     }
     // I135/I139 — stub rápido; badge mostra dias + R$ (FSS = R$50, não 13×R$100)
     const stubOnly = !!(gpAdmData_._fromQuick && !gpAdmHasPanelPayload_(gpAdmData_));
-    const hintFss = '<p class="gp-adm-muted" style="margin:0 0 12px;font-size:12px">Sex/sáb/dom com Raykelly+Julia juntas: pot R$ 100 → <strong>R$ 50 cada</strong> (I109). Dias úteis sozinha: R$ 100.</p>';
+    const hintFss = '<p class="gp-adm-muted" style="margin:0 0 12px;font-size:12px">Sex/sáb/dom com Raykelly+Karen juntas: pote R$ 100 → <strong>R$ 50 cada</strong>. Sozinha acima da meta: R$ 100. Jennifer ainda não entra na meta.</p>';
     el.innerHTML = (stubOnly
       ? '<p class="gp-adm-muted gp-adm-loading" style="margin-bottom:10px">Atualizando metas do mês…</p>'
       : hintFss) +
@@ -1048,6 +1048,8 @@
   /** I142 — enriquece PDF com dias de bônus (metaOperadorTurno · mês corrente). */
   function gpAdmEnrichHoleriteDiasBonus_(id, f, colab, comp, content) {
     if (!content || typeof api !== 'function') return;
+    if (typeof mkHolTemMeta_ === 'function' && !mkHolTemMeta_(id)) return;
+    if (typeof mkHolDiasBonusMemorial_ === 'function' && mkHolDiasBonusMemorial_(id, comp)) return;
     api({ action: 'metaOperadorTurno', operadorId: id, _t: Date.now() }, 20000).then(function (r) {
       const dias = (r && r.ok !== false && r.mes && r.mes.diasBonus) || [];
       if (!dias.length) return;

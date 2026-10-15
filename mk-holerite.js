@@ -86,10 +86,37 @@
    * I138 — pacote real pago no dia 15 (PIX + VA, sem VT).
    * Memorial 07/2026 = pagamento real I111 (Ray 998,40 · Julia 948,40).
    */
+  /** Jennifer (id 6) — início na operação: ainda não entra no pote de meta. */
+  var MK_HOL_SEM_META_IDS_ = { 6: true };
+
   var MK_HOL_Q1_PAGO_MEMORIAL_ = {
     '07/2026': {
       3: { adianta: 648.4, bonus: 150, va: 200, pacote: 998.4 },
       4: { adianta: 648.4, bonus: 100, va: 200, pacote: 948.4 }
+    },
+    '10/2026': {
+      3: { adianta: 648.4, bonus: 100, va: 200, pacote: 948.4, bonusMes: 200, pix: 748.4 },
+      5: { adianta: 648.4, bonus: 100, va: 200, pacote: 948.4, bonusMes: 200, pix: 748.4 },
+      6: { adianta: 543.82, bonus: 0, va: 167.74, pacote: 711.56, bonusMes: 0, pix: 543.82 }
+    }
+  };
+
+  /** Dias de meta conferidos (1–14/10) — FSS juntas = R$ 50. */
+  var MK_HOL_DIAS_BONUS_MEMORIAL_ = {
+    '10/2026': {
+      3: [
+        { data: '03/10/2026', diaSemana: 'Sáb', loc: 21, bonusValor: 50, juntas: true, bonusOk: true },
+        { data: '04/10/2026', diaSemana: 'Dom', loc: 23, bonusValor: 50, juntas: true, bonusOk: true },
+        { data: '10/10/2026', diaSemana: 'Sáb', loc: 21, bonusValor: 50, juntas: true, bonusOk: true },
+        { data: '11/10/2026', diaSemana: 'Dom', loc: 43, bonusValor: 50, juntas: true, bonusOk: true }
+      ],
+      5: [
+        { data: '03/10/2026', diaSemana: 'Sáb', loc: 21, bonusValor: 50, juntas: true, bonusOk: true },
+        { data: '04/10/2026', diaSemana: 'Dom', loc: 23, bonusValor: 50, juntas: true, bonusOk: true },
+        { data: '10/10/2026', diaSemana: 'Sáb', loc: 21, bonusValor: 50, juntas: true, bonusOk: true },
+        { data: '11/10/2026', diaSemana: 'Dom', loc: 43, bonusValor: 50, juntas: true, bonusOk: true }
+      ],
+      6: []
     }
   };
 
@@ -104,6 +131,33 @@
     var byComp = MK_HOL_Q1_PAGO_MEMORIAL_[mkHolCompKey_(comp)];
     if (!byComp) return null;
     return byComp[Number(opId)] || null;
+  }
+
+  function mkHolTemMeta_(opId) {
+    return !MK_HOL_SEM_META_IDS_[Number(opId)];
+  }
+
+  function mkHolDiasBonusMemorial_(opId, comp) {
+    var byComp = MK_HOL_DIAS_BONUS_MEMORIAL_[mkHolCompKey_(comp)];
+    if (!byComp) return null;
+    var id = Number(opId);
+    if (!Object.prototype.hasOwnProperty.call(byComp, id)) return null;
+    return byComp[id];
+  }
+
+  function mkHolMergeDiasBonus_(opId, comp, live) {
+    if (!mkHolTemMeta_(opId)) return [];
+    var mem = mkHolDiasBonusMemorial_(opId, comp);
+    if (mem) return mem;
+    return Array.isArray(live) ? live : [];
+  }
+
+  function mkHolTipoBonusDia_(d) {
+    var bv = Number(d && d.bonusValor) || 0;
+    if (d && d.juntas) return { cls: 'gp-meta-tipo gp-meta-tipo--50', lbl: 'R$ 50 · juntas' };
+    if (bv > 0 && bv < 100) return { cls: 'gp-meta-tipo gp-meta-tipo--50', lbl: 'R$ 50 · juntas' };
+    if (bv >= 100) return { cls: 'gp-meta-tipo gp-meta-tipo--100', lbl: 'R$ 100 · sozinha' };
+    return { cls: 'gp-meta-tipo', lbl: '—' };
   }
 
   /** Resolve bônus já pago na 1ª: memorial → snapshot GAS → null (desconhecido). */
@@ -207,6 +261,30 @@
     // I141 — 2ª = resto (mês − pago na 1ª); nunca 50% do mês final de novo
     var opId = ctx.opId != null ? Number(ctx.opId) : (hol.operadorId != null ? Number(hol.operadorId) : 0);
     var comp = ctx.comp || hol.competencia || '';
+    if (q === 1 && opId) {
+      if (!mkHolTemMeta_(opId)) {
+        hol.bonus = 0;
+        hol.bonusMes = 0;
+        pix = Math.round((Number(hol.liquido) || 0) * 100) / 100;
+        hol.pixQuinzena = pix;
+        hol.pacoteQuinzena = Math.round((pix + (Number(hol.vaTotal) || 0)) * 100) / 100;
+      }
+      var memQ1 = mkHolQ1PagoMemorial_(opId, comp);
+      if (memQ1) {
+        hol.base = Number(memQ1.adianta) || 0;
+        hol.liquido = hol.base;
+        hol.bruto = hol.base;
+        hol.bonus = Number(memQ1.bonus) || 0;
+        if (memQ1.bonusMes != null) hol.bonusMes = Number(memQ1.bonusMes) || 0;
+        hol.vaTotal = Number(memQ1.va) || 0;
+        hol.vtPasses = 0;
+        hol.pixQuinzena = memQ1.pix != null
+          ? Number(memQ1.pix)
+          : Math.round((hol.base + hol.bonus) * 100) / 100;
+        hol.pacoteQuinzena = Number(memQ1.pacote) ||
+          Math.round((hol.pixQuinzena + hol.vaTotal) * 100) / 100;
+      }
+    }
     if (q === 2 && opId) mkHolApplyBonusRegra_(hol, opId, comp);
 
     return hol;
@@ -307,7 +385,12 @@
     };
   }
 
-  function mkHolBuildDiasBonusHtml_(diasBonus, bonusDiasCount, bonusMesVal) {
+  function mkHolBuildDiasBonusHtml_(diasBonus, bonusDiasCount, bonusMesVal, opts) {
+    opts = opts || {};
+    if (opts.semMeta) {
+      return '<div class="mk-hol-comp">Dias com bônus de meta</div>' +
+        '<p class="mk-hol-mes-note">Ainda não entra na meta — início na operação. Quando a meta for liberada, os dias de R$ 100 (sozinha) e R$ 50 (juntas no turno) aparecem nesta tabela.</p>';
+    }
     var dias = [];
     if (Array.isArray(diasBonus) && diasBonus.length) {
       dias = diasBonus.filter(function (d) {
@@ -316,32 +399,40 @@
         return d.bonusOk === true || (Number(d.bonusValor) || 0) > 0;
       });
     }
+    var n100 = dias.filter(function (d) { return Number(d.bonusValor) >= 100 && !d.juntas; }).length;
+    var n50 = dias.filter(function (d) {
+      var bv = Number(d.bonusValor) || 0;
+      return d.juntas || (bv > 0 && bv < 100);
+    }).length;
     var total = dias.reduce(function (s, d) { return s + (Number(d.bonusValor) || 0); }, 0);
     if (!(total > 0) && bonusMesVal != null) total = Number(bonusMesVal) || 0;
     var nDias = dias.length || Number(bonusDiasCount) || 0;
 
     var rows = dias.map(function (d) {
       var data = d.data || '—';
-      var dow = d.diaSemana || mkHolDiaSemana_(data);
+      var dow = d.diaSemana || d.dia || mkHolDiaSemana_(data);
       var loc = d.loc != null ? d.loc : (d.locacoes != null ? d.locacoes : '—');
       var bv = Number(d.bonusValor) || 0;
-      var hint = d.juntas ? ' · FSS' : '';
+      var tipo = mkHolTipoBonusDia_(d);
       return '<tr><td class="c">' + esc(data) + '</td><td class="c">' + esc(dow || '—') + '</td>' +
-        '<td class="c">' + esc(String(loc)) + '</td><td class="n v">' + mkHolFmtMoney_(bv) + hint + '</td></tr>';
+        '<td class="c">' + esc(String(loc)) + '</td>' +
+        '<td class="c"><span class="' + tipo.cls + '">' + esc(tipo.lbl) + '</span></td>' +
+        '<td class="n v">' + mkHolFmtMoney_(bv) + '</td></tr>';
     }).join('');
 
     if (!rows) {
-      rows = '<tr><td colspan="4" class="c">Sem detalhe dia a dia neste painel' +
-        (nDias > 0 ? ' · ' + nDias + ' dia(s) com bônus no mês' : '') +
-        (total > 0 ? ' · total ' + mkHolFmtMoney_(total) : '') +
+      rows = '<tr><td colspan="5" class="c">Nenhum dia com meta neste recorte' +
+        (nDias > 0 ? ' · ' + nDias + ' dia(s) no mês' : '') +
         '</td></tr>';
     }
 
-    return '<div class="mk-hol-comp">Dias com bônus de meta</div>' +
+    return '<div class="mk-hol-comp">Dias com meta · R$ 100 sozinha · R$ 50 juntas no turno</div>' +
+      '<p class="mk-hol-mes-note">' + nDias + ' dia(s) · ' + n100 + ' de R$ 100 · ' + n50 + ' de R$ 50' +
+      (opts.lead ? ' · ' + esc(opts.lead) : '') + '</p>' +
       '<table class="mk-hol-tbl mk-hol-tbl-mes"><thead><tr>' +
-      '<th>Data</th><th>Dia</th><th>Locações</th><th>Bônus do dia</th></tr></thead><tbody>' +
+      '<th>Data</th><th>Dia</th><th>Locações</th><th>Tipo</th><th>Valor</th></tr></thead><tbody>' +
       rows +
-      '<tr class="sec"><td colspan="3">Total bônus do mês · ' + nDias + ' dia(s)</td>' +
+      '<tr class="sec"><td colspan="4">Total bônus do mês</td>' +
       '<td class="n v">' + mkHolFmtMoney_(total) + '</td></tr>' +
       '</tbody></table>';
   }
@@ -382,7 +473,10 @@
       '<td class="n v">' + mkHolFmtMoney_(pac.soma) + '</td></tr>' +
       '</tbody></table>' +
       '<p class="mk-hol-mes-note">' + esc(regraNota) + '</p>' +
-      mkHolBuildDiasBonusHtml_(opts.diasBonus, opts.bonusDias, resumo.bonusMes) +
+      mkHolBuildDiasBonusHtml_(opts.diasBonus, opts.bonusDias, resumo.bonusMes, {
+        semMeta: opts.semMeta,
+        lead: opts.diasLead || ''
+      }) +
       '</div>';
   }
 
@@ -604,12 +698,14 @@
       ? '<div><span>FGTS 8% (encargo empregador)</span>' + mkHolFmtMoney_(fgtsVal) + '</div>'
       : '';
 
-  var diasBonusList = opts.diasBonus ||
-    (colab.metas && colab.metas.diasMes) ||
-    f.diasBonusList ||
-    null;
-  var bonusDiasCount = f.bonusDias != null ? f.bonusDias
-    : (colab.metas && colab.metas.bonusDias != null ? colab.metas.bonusDias : bonusDias);
+  var diasBonusList = mkHolMergeDiasBonus_(
+    opIdHol,
+    comp || hol.competencia || '',
+    opts.diasBonus || (colab.metas && colab.metas.diasMes) || f.diasBonusList || null
+  );
+  var bonusDiasCount = diasBonusList.length || (f.bonusDias != null ? f.bonusDias
+    : (colab.metas && colab.metas.bonusDias != null ? colab.metas.bonusDias : bonusDias));
+  var semMetaHol = !mkHolTemMeta_(opIdHol);
 
   var mesResumoHtml = mkHolBuildMesResumoHtml_({
     opId: opIdHol,
@@ -617,7 +713,8 @@
     nome: nome,
     holerite: hol,
     diasBonus: diasBonusList,
-    bonusDias: bonusDiasCount
+    bonusDias: bonusDiasCount,
+    semMeta: semMetaHol
   });
 
   var toolbar = opts.toolbar !== false
@@ -715,6 +812,9 @@
       '.mk-hol-mes-resumo{border-top:2px solid #1E6FD9}',
       '.mk-hol-mes-note{margin:0;padding:8px 16px 12px;font-size:10px;font-weight:700;color:#64748B;line-height:1.45}',
       '.mk-hol-tbl-mes th:first-child,.mk-hol-tbl-mes td:first-child{text-align:left}',
+      '.gp-meta-tipo{font-weight:800;font-size:10px}',
+      '.gp-meta-tipo--50{color:#B45309}',
+      '.gp-meta-tipo--100{color:#166534}',
       '.no-print,.mk-hol-toolbar,.gp-hol-detail-lead,.mk-hol-widgets{display:none!important}',
       '@page{margin:12mm}',
       '@media print{.mk-hol{box-shadow:none;border:1px solid #CBD5E1}.mk-hol-mes-resumo{break-inside:avoid}}'
@@ -796,6 +896,10 @@
   global.mkHolNormalizeHol_ = mkHolNormalizeHol_;
   global.mkHolBonusRestoQ2_ = mkHolBonusRestoQ2_;
   global.mkHolQ1PagoMemorial_ = mkHolQ1PagoMemorial_;
+  global.mkHolTemMeta_ = mkHolTemMeta_;
+  global.mkHolDiasBonusMemorial_ = mkHolDiasBonusMemorial_;
+  global.mkHolMergeDiasBonus_ = mkHolMergeDiasBonus_;
+  global.mkHolBuildDiasBonusHtml_ = mkHolBuildDiasBonusHtml_;
   global.mkHolApplyBonusRegra_ = mkHolApplyBonusRegra_;
   global.mkHolMesResumo_ = mkHolMesResumo_;
   global.mkHolBuildMesResumoHtml_ = mkHolBuildMesResumoHtml_;

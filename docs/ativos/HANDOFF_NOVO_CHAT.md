@@ -1,13 +1,13 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 12/10/2026 · FE **v1.9.170** · GAS Web **v1.5.234** · **La Ville ops desde 06/10/2026** · I180/I180b locar/encerrar na loja aberta (sem AppScript)
+**Atualizado:** 15/10/2026 · FE **v1.9.171** · GAS Web **v1.5.234** · holerite Q1 10/2026 memorial (Raykelly/Karen R$ 50 FSS · Jennifer sem meta)
 
 ## Produção (agora)
 
 | Camada | Versão | Link |
 |--------|--------|------|
-| Frontend | **v1.9.170** | https://ribocg-a11y.github.io/movikids/?force=1.9.170 |
-| Gestão Pessoas | **v1.9.170** | `gestao-pessoas.html?force=1.9.170` |
+| Frontend | **v1.9.171** | https://ribocg-a11y.github.io/movikids/?force=1.9.171 |
+| Gestão Pessoas | **v1.9.171** | `gestao-pessoas.html?force=1.9.171` |
 | GAS | ping Web **v1.5.234** = repo | isolamento multi-loja live ✅ |
 
 ---

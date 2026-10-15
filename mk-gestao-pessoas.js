@@ -63,12 +63,22 @@
       pontoHoje: (data.ponto && data.ponto.hoje) || null,
       folha: (data.ponto && data.ponto.folha) || [],
       jornada: (data.ponto && data.ponto.jornada) || null,
-      meta: m.alvo ? {
+      meta: (typeof global.mkHolTemMeta_ === 'function' && !global.mkHolTemMeta_(id))
+        ? null
+        : (m.alvo ? {
         alvo: m.alvo, atual: m.atual, bonusValor: m.bonusValor || 100, bonusMin: m.bonusMin || 21,
         admissao: c.admissao, diasMes: (m.diasMes || []).map(function (d) {
-          return { data: d.data, dia: '', loc: d.loc, bonusOk: d.bonusOk };
+          return {
+            data: d.data,
+            dia: d.diaSemana || d.dia || '',
+            loc: d.loc,
+            bonusOk: d.bonusOk,
+            bonusValor: d.bonusValor,
+            juntas: !!d.juntas
+          };
         })
-      } : null,
+      } : null),
+      semMeta: (typeof global.mkHolTemMeta_ === 'function' && !global.mkHolTemMeta_(id)),
       escala: data.escala || [],
       bancoHoras: data.bancoHoras || '0h00',
       pagamento: {

@@ -1519,9 +1519,20 @@
 
     /* ── MÓDULOS PESSOAIS ── */
     function metaBonusTotal(m) {
-      return (m.diasMes || []).filter(d => d.bonusOk).reduce((s, d) => s + m.bonusValor, 0);
+      return (m.diasMes || []).filter(function (d) { return d.bonusOk; }).reduce(function (s, d) {
+        var v = Number(d.bonusValor);
+        return s + (v > 0 ? v : (m.bonusValor || 0));
+      }, 0);
     }
-    function metaDiasOk(m) { return (m.diasMes || []).filter(d => d.bonusOk); }
+    function metaDiasOk(m) { return (m.diasMes || []).filter(function (d) { return d.bonusOk; }); }
+    function gpDiasMetaColab_(p) {
+      var live = (p.meta && p.meta.diasMes) || [];
+      var comp = (p.pagamento && p.pagamento.competencia) || p.competenciaAtiva || '';
+      if (typeof mkHolMergeDiasBonus_ === 'function') {
+        return mkHolMergeDiasBonus_(p.id, comp, live);
+      }
+      return live.filter(function (d) { return d && d.bonusOk; });
+    }
 
     function gpNotaStars_(n) {
       var out = '';
@@ -1584,37 +1595,35 @@
       let html;
       const historico = renderHistoricoDesempenho_(p);
       const avaliacoes = renderAvaliacoesColab_(p);
-      if (!p.meta) {
-        html = '<div class="mock-note info">Milena (sócia) não tem meta de locações por turno.</div>' + historico + avaliacoes;
+      const semMeta = p.semMeta || (typeof mkHolTemMeta_ === 'function' && !mkHolTemMeta_(p.id)) || !p.meta;
+      if (semMeta && (p.semMeta || (typeof mkHolTemMeta_ === 'function' && !mkHolTemMeta_(p.id)))) {
+        html = gpSecHead_('🎯', 'Sua meta', p.label) +
+          '<div class="mock-note info">Você ainda não entra na meta de locações — estamos no início. ' +
+          'Quando a meta for liberada, esta tela lista os dias de <strong>R$ 100</strong> (sozinha) e <strong>R$ 50</strong> (juntas no mesmo turno).</div>' +
+          historico + avaliacoes;
+      } else if (!p.meta) {
+        html = '<div class="mock-note info">' +
+          (p.owner ? 'Milena (sócia) não tem meta de locações por turno.' : 'Sem meta de locações por turno neste perfil.') +
+          '</div>' + historico + avaliacoes;
       } else {
         const m = p.meta;
-        const pct = Math.min(100, Math.round(m.atual / m.alvo * 100));
-        const diasOk = metaDiasOk(m);
-        const totalBonus = metaBonusTotal(m);
-        const rows = diasOk.map(d =>
-          `<tr><td>${d.data}</td><td>${d.dia}</td><td><strong>${d.loc}</strong></td><td style="color:var(--green)">✓ R$ ${fmtBRL(m.bonusValor)}</td></tr>`
-        ).join('');
-        const tabela = diasOk.length
-          ? `<div class="mock-card" style="overflow-x:auto;margin-top:14px">
-              <div class="mock-kpi-lbl" style="margin-bottom:10px">Dias com meta atingida · jun/2026 · ${m.bonusMin}+ loc/turno</div>
-              <table class="mock-table">
-                <thead><tr><th>Data</th><th>Dia</th><th>Locações</th><th>Bônus do dia</th></tr></thead>
-                <tbody>${rows}</tbody>
-              </table>
-            </div>
-            <div class="mock-card" style="background:#E8F5E9;border-color:#A5D6A7">
-              <div style="display:flex;justify-content:space-between;align-items:center">
-                <div><div class="mock-kpi-lbl">Total bônus do mês</div><div style="font-size:13px;font-weight:700;color:var(--txt2)">${diasOk.length} dia(s) × R$ ${fmtBRL(m.bonusValor)}</div></div>
-                <div class="mock-kpi" style="color:var(--green);font-size:28px">R$ ${fmtBRL(totalBonus)}</div>
-              </div>
-            </div>`
-          : `<div class="mock-note info" style="margin-top:14px">Nenhum dia com meta atingida em jun/2026 ainda. Meta: ${m.bonusMin}+ locações no turno → R$ ${fmtBRL(m.bonusValor)} por dia.</div>`;
-        html = `<div class="mock-card">
+        const pct = Math.min(100, Math.round((m.atual || 0) / (m.alvo || 20) * 100));
+        const diasOk = gpDiasMetaColab_(p);
+        const totalBonus = diasOk.reduce(function (s, d) {
+          return s + (Number(d.bonusValor) || m.bonusValor || 0);
+        }, 0);
+        const tabela = (typeof mkHolBuildDiasBonusHtml_ === 'function')
+          ? ('<div class="mk-hol" style="margin-top:14px">' +
+            mkHolBuildDiasBonusHtml_(diasOk, diasOk.length, totalBonus, { lead: 'seu mês' }) +
+            '</div>')
+          : '';
+        html = gpSecHead_('🎯', 'Sua meta', p.label) +
+          `<div class="mock-card">
             <div class="mock-kpi">${m.atual}/${m.alvo}</div>
-            <div class="mock-kpi-lbl">Locações hoje · turno ${p.turno}</div>
+            <div class="mock-kpi-lbl">Locações hoje · turno ${p.turno || '—'}</div>
             <div class="mock-prog" style="margin-top:12px"><div class="mock-prog-fill" style="width:${pct}%"></div></div>
-            <p style="font-size:13px;font-weight:700;margin-top:10px;color:var(--txt2)">Bônus R$ ${fmtBRL(m.bonusValor)} ao fazer ${m.bonusMin}+ locações no turno.</p>
-            <p style="font-size:11px;font-weight:700;margin-top:8px;color:var(--txt3)">Admissão ${m.admissao || p.admissao || '—'} · histórico só a partir desta data</p>
+            <p style="font-size:13px;font-weight:700;margin-top:10px;color:var(--txt2)">Mais de ${m.bonusMin || 20} locações no turno: R$ 100 sozinha · R$ 50 se estiverem juntas.</p>
+            <p style="font-size:11px;font-weight:700;margin-top:8px;color:var(--txt3)">Admissão ${m.admissao || p.admissao || '—'}</p>
           </div>${tabela}${historico}${avaliacoes}`;
       }
       document.getElementById('metas-body').innerHTML = html;
@@ -1738,7 +1747,7 @@
         return;
       }
       if (typeof mkHolBuildHtml_ === 'function' && pg.holerite && (pg.holerite.bruto || pg.holerite.base)) {
-        var diasBonusColab = (p.meta && p.meta.diasMes) ? p.meta.diasMes.filter(function (d) { return d.bonusOk; }) : [];
+        var diasBonusColab = gpDiasMetaColab_(p);
         document.getElementById('pag-body').innerHTML = mkHolBuildHtml_({
           folha: {
             id: p.id,
