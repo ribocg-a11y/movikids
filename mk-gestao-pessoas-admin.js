@@ -1004,7 +1004,7 @@
     }
     // I135/I139 — stub rápido; badge mostra dias + R$ (FSS = R$50, não 13×R$100)
     const stubOnly = !!(gpAdmData_._fromQuick && !gpAdmHasPanelPayload_(gpAdmData_));
-    const hintFss = '<p class="gp-adm-muted" style="margin:0 0 12px;font-size:12px">Sex/sáb/dom com Raykelly+Karen juntas: pote R$ 100 → <strong>R$ 50 cada</strong>. Sozinha acima da meta: R$ 100. Jennifer ainda não entra na meta.</p>';
+    const hintFss = '<p class="gp-adm-muted" style="margin:0 0 12px;font-size:12px">Golden: Raykelly <strong>10h–16h</strong> · Karen <strong>16h–22h</strong> (seg–sáb, folga domingo). Sex/sáb no mesmo dia: pote R$ 100 → <strong>R$ 50 cada</strong>. Sozinha acima da meta: R$ 100. Jennifer ainda não entra na meta.</p>';
     el.innerHTML = (stubOnly
       ? '<p class="gp-adm-muted gp-adm-loading" style="margin-bottom:10px">Atualizando metas do mês…</p>'
       : hintFss) +

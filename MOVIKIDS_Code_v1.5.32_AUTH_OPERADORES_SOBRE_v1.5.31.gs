@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.235
+// MOVI KIDS — Google Apps Script v1.5.236
+// v1.5.236: I182 — escala Golden: Raykelly 10h–16h / Karen 16h–22h seg–sáb · folga domingo
 // v1.5.235: I181 — par meta FSS Raykelly+Karen (3↔5); Julia pausa; Jennifer La Ville sem meta
 // v1.5.234: I173–I178 — comando/conta-mestre/leading/custosHist/kpiMes COL_LOC_READ (isolamento)
 // v1.5.233: I172 — listarHistorico filtra unidade_id (anti-vazamento Golden→La Ville)
@@ -227,7 +228,7 @@
 
 // ── CONSTANTES ───────────────────────────────────────────────
 /** Versão exposta em ping, carregarInicio, validarSchema, gestaoPessoasStatus (bump com header). */
-const MK_GAS_VERSAO_  = 'v1.5.235';
+const MK_GAS_VERSAO_  = 'v1.5.236';
 const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.231';
 const SHEET_ID   = '1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618';
 const DEPLOY_ID  = 'AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y';
@@ -848,6 +849,7 @@ function dispatchMoviAction_(p, method) {
       case 'diagnosticoPlanilhaCompletoAdmin': return diagnosticoPlanilhaCompletoAdmin_(p);
       case 'salvarCadastroRhAdmin': return salvarCadastroRhAdmin_(p);
       case 'salvarDadosContratuaisRhAdmin': return salvarDadosContratuaisRhAdmin_(p);
+      case 'salvarEscalaGoldenTurnosAdmin': return salvarEscalaGoldenTurnosAdmin_(p);
       case 'repararRhPlanilhaAdmin': return repararRhPlanilhaAdmin_(p);
       case 'repararLocacoesPlanilhaAdmin': return repararLocacoesPlanilhaAdmin_(p);
       case 'backfillUnidadeIdLocacoesAdmin': return backfillUnidadeIdLocacoesAdmin_(p);
@@ -5507,13 +5509,13 @@ function metaOperadorCfg_(opId) {
       bonus: META_BONUS_DIA_REAIS_,
       inicio: '16/06/2026',
       escala: {
-        '0': [13, 21],
-        '1': [14, 22],
-        '2': null,
-        '3': [14, 22],
-        '4': null,
-        '5': [14, 22],
-        '6': [10, 20]
+        '0': null,
+        '1': [10, 16],
+        '2': [10, 16],
+        '3': [10, 16],
+        '4': [10, 16],
+        '5': [10, 16],
+        '6': [10, 16]
       }
     };
   } else if (id === 4) {
@@ -5531,13 +5533,13 @@ function metaOperadorCfg_(opId) {
       bonus: META_BONUS_DIA_REAIS_,
       inicio: '22/09/2026',
       escala: {
-        '0': [13, 21],
-        '1': null,
-        '2': null,
-        '3': null,
-        '4': null,
-        '5': [14, 22],
-        '6': [10, 20]
+        '0': null,
+        '1': [16, 22],
+        '2': [16, 22],
+        '3': [16, 22],
+        '4': [16, 22],
+        '5': [16, 22],
+        '6': [16, 22]
       }
     };
   } else if (id === 6) {
@@ -5583,16 +5585,16 @@ function metaOperadorCfg_(opId) {
     if (!(Number(cfg.bonus) > 0)) cfg.bonus = META_BONUS_DIA_REAIS_;
     if (!(Number(cfg.meta) > 0)) cfg.meta = META_LOC_TURNO_PADRAO_;
     const esc = cfg.escala || {};
-    const temTurno = ['0', '5', '6'].some(function (d) { return !!esc[d]; });
+    const temTurno = ['1', '2', '3', '4', '5', '6'].some(function (d) { return !!esc[d]; });
     if (!temTurno) {
       cfg.escala = {
-        '0': [13, 21],
-        '1': null,
-        '2': null,
-        '3': null,
-        '4': null,
-        '5': [14, 22],
-        '6': [10, 20]
+        '0': null,
+        '1': [16, 22],
+        '2': [16, 22],
+        '3': [16, 22],
+        '4': [16, 22],
+        '5': [16, 22],
+        '6': [16, 22]
       };
     }
   }
@@ -12575,6 +12577,46 @@ function salvarDadosContratuaisRhAdmin_(p) {
   }
 }
 
+/** I182 — Raykelly 10h–16h / Karen 16h–22h seg–sáb · domingo OFF (mês atual + seguinte). */
+function salvarEscalaGoldenTurnosAdmin_(p) {
+  if (!adminPinOk_(p)) return err_('Acesso negado — PIN administrativo incorreto', 403);
+  try {
+    const rayDias = ['10–16', '10–16', '10–16', '10–16', '10–16', '10–16', 'OFF'];
+    const karenDias = ['16–22', '16–22', '16–22', '16–22', '16–22', '16–22', 'OFF'];
+    const rayObs = 'Raykelly — 10h–16h seg–sáb · folga domingo';
+    const karenObs = 'Karen — 16h–22h seg–sáb · folga domingo';
+    const now = new Date();
+    const comps = [
+      gpNormCompetencia_(gpCompetenciaAtual_()),
+      gpNormCompetencia_((now.getMonth() === 11 ? 1 : now.getMonth() + 2) + '/' + (now.getMonth() === 11 ? now.getFullYear() + 1 : now.getFullYear()))
+    ];
+    const seen = {};
+    const gravadas = [];
+    comps.forEach(function (comp) {
+      if (!comp || seen[comp]) return;
+      seen[comp] = true;
+      gpUpsertEscalaRow_(3, comp, rayDias, rayObs, { force: true });
+      gpUpsertEscalaRow_(5, comp, karenDias, karenObs, { force: true });
+      gravadas.push(comp);
+    });
+    gpPatchRhRowFields_(3, { turno: '10h–16h' });
+    gpPatchRhRowFields_(5, { turno: '16h–22h' });
+    gpInvalidateRhCache_();
+    gpInvalidateColabPainelCache_(3, null);
+    gpInvalidateColabPainelCache_(5, null);
+    return resp_({
+      ok: true,
+      competencias: gravadas,
+      raykelly: { operadorId: 3, turno: '10h–16h', escala: rayDias },
+      karen: { operadorId: 5, turno: '16h–22h', escala: karenDias },
+      mensagem: 'Escala Golden gravada: Ray 10h–16h · Karen 16h–22h · folga domingo',
+      versao: MK_GAS_VERSAO_
+    });
+  } catch (ex) {
+    return err_('salvarEscalaGoldenTurnosAdmin: ' + ex.message, 500);
+  }
+}
+
 /**
  * Carrega abas RH + cauda AUDITORIA.
  * opts.lite=true (I120b): AUD menor + sem FALTAS/BANCO (1º paint Operadores).
@@ -14244,9 +14286,10 @@ function gpSyncRhColaboradoresPadrao_(ctx) {
     };
     const comp = gpCompetenciaAtual_();
     if (!hasRh(2)) gpEnsureRowByOpId_(SH_COLAB_RH, 2, [2, 'Milena Nunes', 'Socia', '', '', '', '', '', '', '01/01/2020', '', 1621, 20, 20, 100, '10h–14h', 'SIM', 25, '', MK_UNIDADE_DEFAULT_]);
-    if (!hasRh(3)) gpEnsureRowByOpId_(SH_COLAB_RH, 3, [3, 'Raykelly', 'Atendente 1', '', '', '', '', '', '', '15/06/2026', '', 1621, 20, 20, 100, '14h–22h', 'SIM', 25, '', MK_UNIDADE_DEFAULT_]);
+    if (!hasRh(3)) gpEnsureRowByOpId_(SH_COLAB_RH, 3, [3, 'Raykelly', 'Atendente 1', '', '', '', '', '', '', '15/06/2026', '', 1621, 20, 20, 100, '10h–16h', 'SIM', 25, '', MK_UNIDADE_DEFAULT_]);
     if (!hasEscala(2, comp)) gpEnsureEscalaRow_(2, comp, ['10–14', '10–14', '10–14', '10–14', '10–14', 'OFF', 'OFF'], 'Socia — turno manha');
-    if (!hasEscala(3, comp)) gpEnsureEscalaRow_(3, comp, ['14–22', 'OFF', '14–22', 'OFF', '14–22', '10–20', '13–21'], 'Rodizio dom');
+    if (!hasEscala(3, comp)) gpEnsureEscalaRow_(3, comp, ['10–16', '10–16', '10–16', '10–16', '10–16', '10–16', 'OFF'], 'Raykelly — 10h–16h seg–sáb · folga domingo');
+    if (!hasEscala(5, comp)) gpEnsureEscalaRow_(5, comp, ['16–22', '16–22', '16–22', '16–22', '16–22', '16–22', 'OFF'], 'Karen — 16h–22h seg–sáb · folga domingo');
     gpSyncJuliaPadrao_(ctx, comp);
     if (!gpRowExistsByOpId_(SH_BANCO_HORAS, 2)) gpEnsureRowByOpId_(SH_BANCO_HORAS, 2, [2, '0h00', '']);
     if (!gpRowExistsByOpId_(SH_BANCO_HORAS, 3)) gpEnsureRowByOpId_(SH_BANCO_HORAS, 3, [3, '0h00', '']);
@@ -14300,7 +14343,7 @@ function gpUpsertEscalaRow_(opId, competencia, dias, obs, opts) {
       if (Number(rows[i][0]) === Number(opId) && gpNormCompetencia_(rows[i][1]) === comp) {
         if (!opts.force) return false;
         const r = GP_DATA_ROW + i;
-        sh.getRange(r, 3, r, 9).setValues([dias]);
+        sh.getRange(r, 3, 1, 7).setValues([dias]);
         if (obs != null) sh.getRange(r, 10).setValue(obs);
         sh.getRange(r, 2).setNumberFormat('@');
         return true;
@@ -15227,7 +15270,7 @@ function instalarAbasGestaoPessoasCore_(opts) {
   log.push(ensure(SH_COLAB_RH, '#2196F3', ['operador_id','nome','funcao','cpf','nascimento','telefone','email','endereco','emergencia','admissao','pix','salario_base','va_diario','meta_loc_dia','bonus_meta_r$','turno','ativo','cadastro_pct','atualizado_em','unidade_id'],
     [
       [2,'Milena Nunes','Socia','','','','','','','01/01/2020','',1621,15.38,20,100,'10h–14h','SIM',25,'',MK_UNIDADE_DEFAULT_],
-      [3,'Raykelly','Atendente 1','','','','','','','15/06/2026','',1621,15.38,20,100,'14h–22h','SIM',25,'',MK_UNIDADE_DEFAULT_],
+      [3,'Raykelly','Atendente 1','','','','','','','15/06/2026','',1621,15.38,20,100,'10h–16h','SIM',25,'',MK_UNIDADE_DEFAULT_],
       [4,'Julia','Atendente 2','','','','','','','01/07/2026','',1621,15.38,20,100,'14h–22h','SIM',0,'',MK_UNIDADE_DEFAULT_]
     ]));
   log.push(ensure(SH_FOLHA_PONTO, '#4CAF50', ['id','operador_id','data','dia_semana','entrada','saida','horas','situacao','registrado_em'],

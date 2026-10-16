@@ -1,14 +1,14 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 15/10/2026 · FE **v1.9.171** · GAS Web **v1.5.235** I181 (Ray+Karen; Jennifer sem meta)
+**Atualizado:** 16/10/2026 · FE **v1.9.172** · GAS repo **v1.5.236** I182 (escala Golden dois turnos) · Web ainda **v1.5.235** até Nova versão
 
 ## Produção (agora)
 
 | Camada | Versão | Link |
 |--------|--------|------|
-| Frontend | **v1.9.171** | https://ribocg-a11y.github.io/movikids/?force=1.9.171 |
-| Gestão Pessoas | **v1.9.171** | `gestao-pessoas.html?force=1.9.171` |
-| GAS | ping Web **v1.5.235** = repo I181 | Ray+Karen meta live ✅ |
+| Frontend | **v1.9.172** | https://ribocg-a11y.github.io/movikids/?force=1.9.172 |
+| Gestão Pessoas | **v1.9.172** | `gestao-pessoas.html?force=1.9.172` |
+| GAS | ping Web **v1.5.235** · repo **v1.5.236** I182 | Nova versão Web pendente (escala meta) |
 
 ---
 
@@ -206,8 +206,8 @@ Ordem curta — tablet + mesa (manutenção):
 
 | Pessoa | Status |
 |--------|--------|
-| **Raykelly** id3 | Golden · CLT · par FSS com Karen (I181) |
-| **Karen** id5 | Golden · freelancer FSS · meta **R$ 50** quando juntas |
+| **Raykelly** id3 | Golden · CLT · **10h–16h seg–sáb · folga domingo** · par FSS Karen (I181/I182) |
+| **Karen** id5 | Golden · freelancer · **16h–22h seg–sáb · folga domingo** · meta **R$ 50** FSS no mesmo dia |
 | **Jennifer** id6 | La Ville · admissão **06/10/2026** · **sem meta** (início) |
 | **Julia** id4 | **Pausa** — fora do pote e do login balcão |
 
@@ -244,7 +244,7 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 
 ## Mensagem para colar no novo chat (PC)
 
-> *Continuar MOVI KIDS **no PC** — pasta C (`movikids-github`). FE **v1.9.171** · GAS **v1.5.235** I181. Q1 out/26: Ray/Karen PIX **748,40** · Jennifer **543,82**. La Ville ops 06/10. **This PC.***
+> *Continuar MOVI KIDS **no PC** — pasta C (`movikids-github`). FE **v1.9.172** · GAS repo **v1.5.236** I182 (Web 1.5.235 até Nova versão). Ray 10h–16h / Karen 16h–22h seg–sáb · folga domingo. Q1 out/26 PIX 748,40. **This PC.***
 
 **Mínima:**
 

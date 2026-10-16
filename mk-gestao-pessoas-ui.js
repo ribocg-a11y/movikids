@@ -332,7 +332,7 @@
       raykelly: {
         id:'raykelly', label:'Raykelly', letra:'R', owner:false, funcao:'Atendente 1', pin:'1111', pinBalcao:'1111',
         admissao:'2026-06-15',
-        turno:'14h–22h', cadastro:{ ...VAZIO, admissao:'2026-06-15' }, statusHoje:'fora',
+        turno:'10h–16h', cadastro:{ ...VAZIO, admissao:'2026-06-15' }, statusHoje:'fora',
         folha:[
           { data:'15/06', dia:'Seg', entrada:'13:58', saida:'21:05', horas:'7h07', sit:'OK' }
         ],
@@ -342,7 +342,7 @@
             { data:'15/06', dia:'Seg', loc:21, bonusOk:true }
           ]
         },
-        escala:['14–22','OFF','14–22','OFF','14–22','10–20','13–21'],
+        escala:['10–16','10–16','10–16','10–16','10–16','10–16','OFF'],
         bancoHoras:'0h00', pagamento:{
           base:SALARIO_MINIMO_BASE, bonus:100, faltas:0, dependentes:0,
           competencia:'06/2026', pagamentoEm:'05/07/2026', diasTrabalhados:12, diasMes:30,

@@ -1,8 +1,8 @@
-# MOVI KIDS — Estado atual (15/10/2026 · FE v1.9.171 · La Ville D+0)
+# MOVI KIDS — Estado atual (16/10/2026 · FE v1.9.172 · La Ville D+10)
 
 Referência única para alinhamento local × produção.
 
-**Ciclo dev ativo:** **`PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`** — Sprint D · **La Ville inaugurou 06/10/2026** · FE **v1.9.171** · GAS Web **v1.5.235** · **I181** Ray+Karen · isolamento **I170–I178** ✅ · **I158** Golden ✅  
+**Ciclo dev ativo:** **`PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`** — Sprint D · **La Ville inaugurou 06/10/2026** · FE **v1.9.172** · GAS repo **v1.5.236** I182 · Web **v1.5.235** até Nova versão · **I181** Ray+Karen · isolamento **I170–I178** ✅ · **I158** Golden ✅  
 
 **Marco Ops:** **La Ville Mall — início de operações em 06/10/2026** (2ª unidade ao lado do Golden).  
 **CTO La Ville:** contrato merchandising quiosque **R$ 2.300/mês** · venc. dia 10 · PDF em `entregas/CONTRATO_MERCHANDISING_QUIOSQUE_MOVIKIDS.pdf`.
@@ -50,14 +50,14 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 ---
 
-## Produção (15/10/2026)
+## Produção (16/10/2026)
 
 | Camada | Versão | URL / evidência |
 |--------|--------|-----------------|
-| **Frontend** | **v1.9.171** | https://ribocg-a11y.github.io/movikids/?force=1.9.171 |
-| **Gestão Pessoas** | **v1.9.171** | `gestao-pessoas.html?force=1.9.171` |
-| **Service Worker** | **1.9.171** | I170 Contas · isolamento dual |
-| **Apps Script** | ping **v1.5.235** = repo | I181 meta Ray+Karen · Jennifer sem pote |
+| **Frontend** | **v1.9.172** | https://ribocg-a11y.github.io/movikids/?force=1.9.172 |
+| **Gestão Pessoas** | **v1.9.172** | `gestao-pessoas.html?force=1.9.172` |
+| **Service Worker** | **1.9.172** | I182 escala Golden dois turnos |
+| **Apps Script** | ping **v1.5.235** · repo **v1.5.236** | I182 escala — Nova versão Web pendente |
 | **La Ville ops** | ✅ **06/10/2026** | 2ª unidade em operação (D+0) |
 | **I166–I168 Folha/PDF** | ✅ FE | cache-first · Blob PDF · set R$14.577 |
 | **I159–I178 La Ville** | ✅ FE+GAS | Holding/balcão · isolamento dual validado |
