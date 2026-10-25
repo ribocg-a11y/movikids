@@ -2,19 +2,19 @@
 
 Sistema operacional de locações — balcão (tablet na loja), portal do responsável, painel admin.
 
-**Ciclo ativo (16/10/2026):** Sprint D · **La Ville ops desde 06/10/2026** · FE **v1.9.172** · GAS repo **v1.5.236** I182 · Web **v1.5.235** até Nova versão · I181 Ray+Karen · isolamento I170–I178 ✅
+**Ciclo ativo (24/10/2026):** Sprint D · **La Ville ops desde 06/10/2026** · FE **v1.9.173** I183 · GAS **v1.5.236** · I181 Ray+Karen · isolamento I170–I178 ✅
 
 **Para retomar (agente local PC — pasta C):**
 
-> *Continuar MOVI KIDS — La Ville ops 06/10 · FE `?force=1.9.172` · GAS repo **v1.5.236** I182 escala Golden · Web **v1.5.235** até Nova versão · Q1 out/26 PIX Ray/Karen 748,40 · Jennifer 543,82*
+> *Continuar MOVI KIDS — La Ville ops 06/10 · FE `?force=1.9.173` · GAS **v1.5.236** · I183 Holding dual no celular · Q1 out/26 PIX Ray/Karen 748,40 · Jennifer 543,82*
 
 ## Produção atual
 
 | Camada | Versão | Link |
 |--------|--------|------|
-| Frontend | **v1.9.172** | https://ribocg-a11y.github.io/movikids/?force=1.9.172 |
-| Gestão Pessoas | **v1.9.172** | `gestao-pessoas.html?force=1.9.172` |
-| GAS | ping Web **v1.5.235** · repo **v1.5.236** | I182 escala — Nova versão Web pendente |
+| Frontend | **v1.9.173** | https://ribocg-a11y.github.io/movikids/?force=1.9.173 |
+| Gestão Pessoas | **v1.9.173** | `gestao-pessoas.html?force=1.9.173` |
+| GAS | ping/repo **v1.5.236** | I182 escala Golden |
 | Design System | **v1.1** | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
 
 **GAS raw:** https://raw.githubusercontent.com/ribocg-a11y/movikids/main/MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs

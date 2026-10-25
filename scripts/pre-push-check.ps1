@@ -624,6 +624,18 @@ try {
     } else {
       Add-Check "guard.i170.fe.isolamento" "ok" "balcão estrito + stats tag + hist/tile fail-closed (I170)"
     }
+    # I183 — Holding celular: KPIs via resumoDia(all), não só encHoje de 1 loja
+    $navRawG = ""
+    $navJsG = Join-Path $root "mk-nav.js"
+    if (Test-Path $navJsG) { $navRawG = Get-Content -Path $navJsG -Raw -Encoding UTF8 }
+    $holdRawG = ""
+    $holdJsG = Join-Path $root "mk-holding.js"
+    if (Test-Path $holdJsG) { $holdRawG = Get-Content -Path $holdJsG -Raw -Encoding UTF8 }
+    if ($holdRawG -notmatch 'mkHoldingHydrateKpis_' -or $holdRawG -notmatch 'resumoDia' -or $navRawG -notmatch 'mkHoldingHydrateKpis_' -or $uniRawG -notmatch 'mkHoldingHydrateKpis_') {
+      Add-Check "guard.i183.fe.holding-hydrate" "fail" "Holding sem hydrate resumoDia (I183) — Golden zera no celular"
+    } else {
+      Add-Check "guard.i183.fe.holding-hydrate" "ok" "Holding hidrata KPIs dual via resumoDia (I183)"
+    }
     # I171 — sessão operador por loja
     $gasRawG = ""
     $gasJsG = Join-Path $root "MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs"

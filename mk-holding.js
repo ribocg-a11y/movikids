@@ -1,6 +1,14 @@
-/* MOVI KIDS — Painel holding ADM (Golden + La Ville na mesma tela) · I159e */
+/* MOVI KIDS — Painel holding ADM (Golden + La Ville na mesma tela) · I159e
+ * I183: KPIs do dia via resumoDia(all)+fatia — não depender só de encHojeData
+ * (no celular, após Abrir balcão LV, encHoje fica só La Ville e Golden zera).
+ */
 (function (w) {
   'use strict';
+
+  var _holdResumoByUid = { golden: null, laville: null, all: null };
+  var _holdHydrateInFlight = false;
+  var _holdHydrateAt = 0;
+  var HOLD_HYDRATE_TTL_MS = 25000;
 
   function isAdm_() {
     return (typeof mkAuthIsAdmin === 'function' && mkAuthIsAdmin()) || !!w.isAdmin;
@@ -23,6 +31,42 @@
     return 'golden';
   }
 
+  function hojeFmt_() {
+    if (typeof fmtDataBrHoje_ === 'function') return fmtDataBrHoje_();
+    var d = new Date();
+    var dd = String(d.getDate()).padStart(2, '0');
+    var mm = String(d.getMonth() + 1).padStart(2, '0');
+    return dd + '/' + mm + '/' + d.getFullYear();
+  }
+
+  /** Fatia resumoDia(all) → uma loja (paridade Caixa I159h). */
+  function sliceResumoUid_(rAll, uid) {
+    if (typeof mkCaixaSliceResumo_ === 'function') {
+      return mkCaixaSliceResumo_(rAll, uid);
+    }
+    if (!rAll || !rAll.ok) return null;
+    if (uid === 'all') return Object.assign({}, rAll, { unidadeId: 'all' });
+    var locs = (rAll.locacoes || []).filter(function (l) {
+      return uidOf_(l) === uid;
+    });
+    var contas = {};
+    var fat = 0;
+    locs.forEach(function (l) {
+      fat += Number(l.valorTotal) || 0;
+      var ck = (l.contaId != null && l.contaId !== '') ? ('c:' + l.contaId)
+        : (l.telefone ? ('t:' + String(l.telefone).replace(/\D/g, '')) : ('i:' + l.id));
+      contas[ck] = true;
+    });
+    return {
+      ok: true,
+      unidadeId: uid,
+      n: Object.keys(contas).length,
+      nSessoes: locs.length,
+      fat: Math.round(fat * 100) / 100,
+      locacoes: locs
+    };
+  }
+
   function packUnidade_(uid) {
     var sess = (typeof sessions !== 'undefined' && Array.isArray(sessions)) ? sessions : [];
     var enc = (typeof encHojeData !== 'undefined' && Array.isArray(encHojeData)) ? encHojeData : [];
@@ -30,7 +74,19 @@
       return s && (s.status === 'Ativa' || s.status === 'Pendente' || s.started || s._optimistic);
     }).filter(function (s) { return uidOf_(s) === uid; });
     var encU = enc.filter(function (e) { return uidOf_(e) === uid; });
-    var nContas = typeof mkContasEncHoje_ === 'function' ? mkContasEncHoje_(encU) : encU.length;
+    var nContasLocal = typeof mkContasEncHoje_ === 'function' ? mkContasEncHoje_(encU) : encU.length;
+    var nSessoesLocal = encU.length;
+    var fatLocal = fatEnc_(encU);
+    /* I183: resumoDia hidratado prevalece nos KPIs do dia (fonte caixa). */
+    var r = _holdResumoByUid[uid];
+    var nContas = nContasLocal;
+    var nSessoes = nSessoesLocal;
+    var fat = fatLocal;
+    if (r && r.ok) {
+      if (r.n != null) nContas = Number(r.n) || 0;
+      if (r.nSessoes != null) nSessoes = Number(r.nSessoes) || 0;
+      if (r.fat != null) fat = Number(r.fat) || 0;
+    }
     var u = typeof mkUnidadeGet_ === 'function' ? mkUnidadeGet_(uid) : { nome: uid, nomeCurto: uid };
     return {
       id: uid,
@@ -40,9 +96,10 @@
       encHoje: encU,
       nAtivas: ativas.length,
       nContas: nContas,
-      nSessoes: encU.length,
-      fat: fatEnc_(encU),
-      provisoria: !!u.frotaProvisoria
+      nSessoes: nSessoes,
+      fat: fat,
+      provisoria: !!u.frotaProvisoria,
+      _kpiFonte: (r && r.ok) ? 'resumoDia' : 'encHoje'
     };
   }
 
@@ -84,7 +141,7 @@
       : '<div class="mk-hold-empty">Nenhuma locação ativa</div>';
     var badge = p.provisoria ? '<span class="mk-hold-badge">frota provisória</span>' : '';
     return (
-      '<section class="mk-hold-col" data-unidade="' + p.id + '">' +
+      '<section class="mk-hold-col" data-unidade="' + p.id + '" data-kpi-fonte="' + (p._kpiFonte || '') + '">' +
         '<header class="mk-hold-col-head">' +
           '<div>' +
             '<h2 class="mk-hold-col-title">' + (p.id === 'laville' ? '🏬 ' : '🛍️ ') + escHold_(p.nome) + '</h2>' +
@@ -151,6 +208,93 @@
       '<div class="mk-hold-grid' + (filtro !== 'all' ? ' mk-hold-grid--one' : '') + '">' + cols + '</div>';
   }
 
+  /**
+   * I183 — Holding: 1× resumoDia(all) + fatia FE.
+   * Corrige celular onde encHojeData ficou só de uma loja após Abrir balcão.
+   */
+  async function hydrateHoldingKpis_(force) {
+    if (!isAdm_()) return false;
+    var root = document.getElementById('mk-holding-root');
+    if (!root) return false;
+    var pageOn = !!document.getElementById('page-holding')?.classList.contains('active');
+    if (!pageOn && !force) return false;
+    var now = Date.now();
+    if (!force && _holdHydrateInFlight) return false;
+    if (!force && _holdHydrateAt && (now - _holdHydrateAt) < HOLD_HYDRATE_TTL_MS
+        && _holdResumoByUid.golden && _holdResumoByUid.laville) {
+      renderHolding_();
+      return true;
+    }
+    _holdHydrateInFlight = true;
+    try {
+      var dataFmt = hojeFmt_();
+      var rAll = null;
+      if (!force && w._mkCaixaResumoCache_ && w._mkCaixaResumoCache_[dataFmt] && w._mkCaixaResumoCache_[dataFmt].ok) {
+        rAll = w._mkCaixaResumoCache_[dataFmt];
+      }
+      if (!rAll || !rAll.ok) {
+        if (typeof api !== 'function') return false;
+        var authP = typeof apiParamsComAuth_ === 'function' ? apiParamsComAuth_() : {};
+        var req = Object.assign({ action: 'resumoDia', data: dataFmt, unidadeId: 'all' }, authP);
+        if (force) req.force = '1';
+        rAll = await api(req, 55000);
+      }
+      if (!rAll || !rAll.ok) {
+        console.warn('[Holding] resumoDia falhou', rAll && rAll.erro);
+        return false;
+      }
+      try {
+        w._mkCaixaResumoCache_ = w._mkCaixaResumoCache_ || {};
+        w._mkCaixaResumoCache_[dataFmt] = rAll;
+      } catch (eC) { /* ignore */ }
+      if (typeof resumoDiaHoje !== 'undefined') {
+        try { resumoDiaHoje = rAll; } catch (eR) { /* ignore */ }
+      }
+      _holdResumoByUid.all = rAll;
+      _holdResumoByUid.golden = sliceResumoUid_(rAll, 'golden');
+      _holdResumoByUid.laville = sliceResumoUid_(rAll, 'laville');
+      _holdHydrateAt = Date.now();
+
+      /* Em holding: recompõe encHoje das 2 lojas a partir do resumo (sem apagar balcão estrito). */
+      var balcaoEstrito = typeof mkIsBalcaoEstrito_ === 'function' && mkIsBalcaoEstrito_();
+      if (!balcaoEstrito && Array.isArray(rAll.locacoes)) {
+        var encFromResumo = rAll.locacoes.filter(function (l) {
+          var st = String((l && l.status) || 'Encerrada');
+          return st === 'Encerrada' || st === '';
+        }).map(function (l) {
+          return {
+            id: l.id,
+            contaId: l.contaId != null ? l.contaId : l.id,
+            horaInicio: l.horaInicio,
+            horaFim: l.horaFim,
+            tipo: l.tipo,
+            plano: l.plano,
+            veiculo: l.veiculo,
+            unidadeId: uidOf_(l),
+            pagamento: l.pagamento,
+            crianca: l.crianca,
+            responsavel: l.responsavel,
+            telefone: l.telefone || '',
+            valorTotal: Number(l.valorTotal) || 0,
+            status: 'Encerrada'
+          };
+        });
+        if (typeof mkUpdateEncHojeKpis_ === 'function') {
+          mkUpdateEncHojeKpis_(encFromResumo);
+        } else if (typeof encHojeData !== 'undefined') {
+          encHojeData = encFromResumo;
+        }
+      }
+      renderHolding_();
+      return true;
+    } catch (e) {
+      console.warn('[Holding] hydrate', e && e.message ? e.message : e);
+      return false;
+    } finally {
+      _holdHydrateInFlight = false;
+    }
+  }
+
   function mkHoldingAbrirBalcao_(uid) {
     var r;
     /* Não usar resetBalcao: ele zera os números e apaga o cache das duas lojas.
@@ -194,6 +338,7 @@
     if (typeof mkRefreshUnidadeUi_ === 'function') mkRefreshUnidadeUi_();
     if (typeof mkApplyModoNav_ === 'function') mkApplyModoNav_();
     if (typeof mkDualAfterFiltroChange_ === 'function') mkDualAfterFiltroChange_(id);
+    hydrateHoldingKpis_(false);
     if (typeof toast === 'function') {
       var lbl = id === 'all' ? 'Todas as lojas' : (typeof mkUnidadeLabelCurto_ === 'function' ? mkUnidadeLabelCurto_(id) : id);
       toast('Filtro: ' + lbl, 'info');
@@ -203,4 +348,5 @@
   w.renderHolding_ = renderHolding_;
   w.mkHoldingAbrirBalcao_ = mkHoldingAbrirBalcao_;
   w.mkHoldingSetFiltroCaixa_ = mkHoldingSetFiltroCaixa_;
+  w.mkHoldingHydrateKpis_ = hydrateHoldingKpis_;
 })(typeof window !== 'undefined' ? window : globalThis);

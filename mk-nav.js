@@ -134,9 +134,13 @@ function showPage(name, opts = {}) {
     if (typeof mkRefreshUnidadeUi_ === 'function') mkRefreshUnidadeUi_();
   }
   if (name === 'holding') {
-    /* I161/I122: holding não dispara sync balcão pesado — só render dual + warm se já há dados. */
+    /* I161/I122: holding não dispara sync balcão pesado.
+     * I183: hidrata KPIs via resumoDia(all) — encHoje local pode ter só 1 loja no celular. */
     if (typeof mkAppModoSet_ === 'function') mkAppModoSet_('holding');
     if (typeof renderHolding_ === 'function') renderHolding_();
+    if (typeof mkHoldingHydrateKpis_ === 'function') {
+      try { mkHoldingHydrateKpis_(false); } catch (eH) { /* ignore */ }
+    }
     if (typeof atualizarOperadorUI_ === 'function') {
       try { atualizarOperadorUI_(); } catch (eUi) { /* ignore */ }
     }
