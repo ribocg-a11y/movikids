@@ -1,13 +1,13 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 16/10/2026 · FE **v1.9.172** · GAS repo **v1.5.236** I182 (escala Golden dois turnos) · Web ainda **v1.5.235** até Nova versão
+**Atualizado:** 26/10/2026 · FE **v1.9.173** (hist ADM: forma de pagamento) · GAS repo **v1.5.236** I182 · Web ainda **v1.5.235** até Nova versão
 
 ## Produção (agora)
 
 | Camada | Versão | Link |
 |--------|--------|------|
-| Frontend | **v1.9.172** | https://ribocg-a11y.github.io/movikids/?force=1.9.172 |
-| Gestão Pessoas | **v1.9.172** | `gestao-pessoas.html?force=1.9.172` |
+| Frontend | **v1.9.173** | https://ribocg-a11y.github.io/movikids/?force=1.9.173 |
+| Gestão Pessoas | **v1.9.173** | `gestao-pessoas.html?force=1.9.173` |
 | GAS | ping Web **v1.5.235** · repo **v1.5.236** I182 | Nova versão Web pendente (escala meta) |
 
 ---

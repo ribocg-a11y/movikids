@@ -560,6 +560,13 @@ html,body{height:100%;background:var(--bg);color:var(--txt);overflow:hidden}
   color:var(--txt3);text-transform:uppercase;margin-bottom:2px}
 .hi-names{font-size:14px;font-weight:800;color:var(--txt)}
 .hi-det{font-size:11px;color:var(--txt3);margin-top:2px}
+.hi-det-pag{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.hi-pag{font-size:10px;padding:2px 8px;border-radius:99px;font-weight:800;letter-spacing:.02em;display:inline-block}
+.hi-pag--pix{background:#E6F1FB;color:#0C447C}
+.hi-pag--credito{background:#EEEDFE;color:#3C3489}
+.hi-pag--debito{background:#EAF3DE;color:#27500A}
+.hi-pag--dinheiro{background:#FAEEDA;color:#633806}
+.hi-pag--na{background:var(--bg2);color:var(--txt3)}
 .hi-right{text-align:right;flex-shrink:0}
 .hi-valor{font-size:18px;font-weight:900;color:var(--green)}
 .hi-extra{font-size:10px;color:var(--amber);font-weight:700}

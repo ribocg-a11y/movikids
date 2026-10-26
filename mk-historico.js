@@ -44,6 +44,32 @@ function histCacheKey_(dates) {
   return 'mk_hist_v72_' + dates.s + '_' + dates.e + '_u' + (uid || 'all');
 }
 
+/** Forma de pagamento canônica (ADM histórico) — paridade caixa. */
+function histNormPag_(p) {
+  const s = String(p || '').trim();
+  if (!s) return '';
+  const n = s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+  if (n === 'pix') return 'PIX';
+  if (n === 'credito') return 'Crédito';
+  if (n === 'debito') return 'Débito';
+  if (n === 'dinheiro') return 'Dinheiro';
+  if (s === 'Crédito' || s === 'Débito') return s;
+  return s;
+}
+
+function histPagPillHtml_(pagamento) {
+  const pag = histNormPag_(pagamento);
+  if (!pag) {
+    return '<span class="hi-pag hi-pag--na" title="Forma de pagamento">Não informado</span>';
+  }
+  const cls =
+    pag === 'PIX' ? 'hi-pag--pix' :
+    pag === 'Crédito' ? 'hi-pag--credito' :
+    pag === 'Débito' ? 'hi-pag--debito' :
+    pag === 'Dinheiro' ? 'hi-pag--dinheiro' : 'hi-pag--na';
+  return `<span class="hi-pag ${cls}" title="Forma de pagamento">${escHtml(pag)}</span>`;
+}
+
 function histItemHtml_(l) {
   const icon = tipoIcon(l.tipo);
   const vT = Number(l.valorTotal).toFixed(2).replace('.', ',');
@@ -51,12 +77,14 @@ function histItemHtml_(l) {
   const sc = l.status === 'Ativa' ? 'ativa' : 'encerrada';
   const uid = (typeof mkDualUidOf_ === 'function' ? mkDualUidOf_(l) : (l.unidadeId || 'golden'));
   const badge = uid === 'laville' ? 'La Ville' : 'Golden';
+  /* Forma de pagamento: só nesta lista ADM (listarHistorico exige admin). */
   return `<div class="hist-item">
     <div class="hi-left">
       <div class="hi-tipo">${icon} ${l.tipo} <span class="mk-uid-badge">${badge}</span></div>
       <div class="hi-names">${escHtml(l.crianca)}</div>
       <div class="hi-det">👤 ${escHtml(l.responsavel)} · ${l.plano}</div>
       <div class="hi-det">⏰ ${l.horaInicio}${l.horaFim ? ' → ' + l.horaFim : ''} · ${l.data}</div>
+      <div class="hi-det hi-det-pag">Pagamento ${histPagPillHtml_(l.pagamento)}</div>
     </div>
     <div class="hi-right">
       <div class="hi-valor">R$ ${vT}</div>
