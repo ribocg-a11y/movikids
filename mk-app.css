@@ -832,6 +832,7 @@ html,body{height:100%;background:var(--bg);color:var(--txt);overflow:hidden}
 }
 .enc-left .enc-crianca{font-size:14px;font-weight:800;color:var(--txt)}
 .enc-left .enc-det{font-size:11px;color:var(--txt3);margin-top:1px}
+.enc-left .enc-det-pag{margin-top:4px}
 .enc-right{text-align:right;flex-shrink:0}
 .enc-valor{font-size:15px;font-weight:900;color:var(--blue)}
 .enc-horario{font-size:10px;color:var(--txt3)}

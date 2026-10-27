@@ -552,6 +552,29 @@ window.mkContasEncHoje_ = mkContasEncHoje_;
 window.mkSessoesEncHoje_ = mkSessoesEncHoje_;
 window.mkEncHojePorConta_ = mkEncHojePorConta_;
 
+/** Lead ADM: discrimina contas por forma (não só “N na maquininha”). */
+function mkEncHojeLeadAdm_(porConta, nContas) {
+  const order = ['PIX', 'Débito', 'Crédito', 'Dinheiro'];
+  const counts = {};
+  (porConta || []).forEach(function (e) {
+    const norm = (typeof histNormPag_ === 'function')
+      ? histNormPag_(e && e.pagamento)
+      : String((e && e.pagamento) || '').trim();
+    const pag = norm || 'Não informado';
+    counts[pag] = (counts[pag] || 0) + 1;
+  });
+  const parts = [];
+  order.forEach(function (p) {
+    if (counts[p]) parts.push(p + ' ' + counts[p]);
+  });
+  Object.keys(counts).forEach(function (p) {
+    if (order.indexOf(p) < 0) parts.push(p + ' ' + counts[p]);
+  });
+  const nLabel = nContas + (nContas === 1 ? ' conta' : ' contas');
+  if (!parts.length) return nLabel + ' encerradas hoje';
+  return nLabel + ' · ' + parts.join(' · ');
+}
+
 function renderEncHojeList_(list) {
   const section = document.getElementById('enc-hoje-section');
   const container = document.getElementById('enc-hoje-list');
@@ -568,11 +591,16 @@ function renderEncHojeList_(list) {
   section.style.display = 'block';
   const nContas = typeof mkContasEncHoje_ === 'function' ? mkContasEncHoje_(data) : data.length;
   const porConta = typeof mkEncHojePorConta_ === 'function' ? mkEncHojePorConta_(data) : data;
+  const isAdm = (typeof mkAuthIsAdmin === 'function' && mkAuthIsAdmin()) || !!window.isAdmin;
   if (lead) {
-    lead.textContent = nContas + (nContas === 1 ? ' conta na maquininha' : ' contas na maquininha');
+    if (isAdm) {
+      lead.textContent = mkEncHojeLeadAdm_(porConta, nContas);
+    } else {
+      lead.textContent = nContas + (nContas === 1 ? ' conta na maquininha' : ' contas na maquininha');
+    }
   }
   const fin = mkExibirFinanceiro_();
-  const admSms = (typeof mkAuthIsAdmin === 'function' && mkAuthIsAdmin()) || window.isAdmin;
+  const admSms = isAdm;
   container.innerHTML = porConta.map(function (e) {
     const icon = tipoIcon(e.tipo);
     const nGrupo = Number(e._nLocGrupo) || 0;
@@ -582,10 +610,15 @@ function renderEncHojeList_(list) {
     const v = fin && e.valorTotal != null
       ? '<div class="enc-valor">R$ ' + Number(e.valorTotal).toFixed(2).replace('.', ',') + '</div>' : '';
     const detExtra = nGrupo > 1 ? (' · ' + nGrupo + ' veículos') : '';
+    /* Forma de pagamento discriminada por conta — só ADM (operador não vê). */
+    const pagHtml = (isAdm && typeof histPagPillHtml_ === 'function')
+      ? ('<div class="enc-det enc-det-pag">' + histPagPillHtml_(e.pagamento) + '</div>')
+      : '';
     return '<div class="enc-item">'
       + '<div class="enc-left">'
       + '<div class="enc-crianca">' + titulo + '</div>'
       + '<div class="enc-det">👤 ' + escHtml(e.responsavel) + detExtra + ' · ' + escHtml(e.plano || '') + '</div>'
+      + pagHtml
       + '</div>'
       + '<div class="enc-right">'
       + v
