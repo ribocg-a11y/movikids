@@ -1213,7 +1213,16 @@
       const escCtx = folga ? 'Sem turno hoje' : ('Turno ' + escala);
       const escVal = folga ? 'Folga' : escala;
       const escTone = folga ? 'off' : 'blue';
-      const showCta = !gpAdmPreviewMode_ && !folga && p.statusHoje !== 'dentro' && ponto.tone === 'warn' && cadastroAcessoLiberado_(p);
+      /* I184: CTA também se já houve saída cedo — permite nova entrada no mesmo dia. */
+      const precisaPonto = !folga && p.statusHoje !== 'dentro' && cadastroAcessoLiberado_(p)
+        && (ponto.tone === 'warn' || ponto.tone === 'gray');
+      const showCta = !gpAdmPreviewMode_ && !!precisaPonto;
+      const ctaLbl = (ponto.tone === 'gray' && p.statusHoje !== 'dentro')
+        ? 'Registrar nova entrada'
+        : 'Registrar meu ponto';
+      if (!folga && ponto.tone === 'gray' && p.statusHoje !== 'dentro') {
+        lead = 'Turno ainda em curso — se saiu cedo por engano, registre uma nova entrada.';
+      }
       const heroValCls = hero.tone === 'ok' ? ' green' : (hero.tone === 'warn' ? '' : '');
       const heroValStyle = hero.tone === 'warn' ? ' style="color:#E65100"' : (hero.tone === 'off' ? ' style="color:#9AAAC0"' : '');
       el.innerHTML =
@@ -1228,7 +1237,7 @@
         gpHubJornadaWidget_('Ponto', ponto.val, ponto.ctx, ponto.tone, '🕐') +
         gpHubJornadaWidget_('Meta', meta.val, meta.ctx, meta.tone, '🎯') +
         '</div>' +
-        (showCta ? '<button type="button" class="gp-hub-jornada-cta mk-btn" onclick="abrirModulo(\'ponto\')">Registrar meu ponto</button>' : '');
+        (showCta ? '<button type="button" class="gp-hub-jornada-cta mk-btn" onclick="abrirModulo(\'ponto\')">' + ctaLbl + '</button>' : '');
     }
 
     function gpHubJornadaWidget_(lbl, val, ctx, tone, icon) {
@@ -1414,8 +1423,30 @@
         <tbody>${rows||'<tr><td colspan="6">Nenhum registro ainda</td></tr>'}</tbody></table></div>`;
     }
 
+    var gpPontoBusy_ = false;
+    var gpPontoBusyUntil_ = 0;
+
+    function gpParseHoraMinUi_(hhmm) {
+      const m = String(hhmm || '').trim().match(/(\d{1,2}):(\d{2})/);
+      if (!m) return null;
+      return parseInt(m[1], 10) * 60 + parseInt(m[2], 10);
+    }
+
+    /** Minutos desde a entrada de hoje (null se sem entrada). */
+    function gpMinutosDesdeEntrada_(p) {
+      const entrada = p && p.pontoHoje && p.pontoHoje.entrada;
+      if (!entrada) return null;
+      const a = gpParseHoraMinUi_(entrada);
+      const b = gpParseHoraMinUi_(fmtTime());
+      if (a == null || b == null) return null;
+      let d = b - a;
+      if (d < 0) d += 24 * 60;
+      return d;
+    }
+
     function confirmarPonto() {
       const flash = document.getElementById('ponto-flash');
+      const btn = document.getElementById('ponto-btn');
       if (gpAdmPreviewMode_) {
         if (flash) {
           flash.textContent = '👁 Pré-visualização — ponto não é registrado neste modo.';
@@ -1431,6 +1462,15 @@
         }
         return;
       }
+      /* I184 — trava toque duplo (entrada→saída em segundos). */
+      const now = Date.now();
+      if (gpPontoBusy_ || now < gpPontoBusyUntil_) {
+        if (flash) {
+          flash.textContent = 'Aguarde — ponto já está sendo registrado…';
+          flash.hidden = false;
+        }
+        return;
+      }
       if (MK_GP_PROD && window.MK_GestaoPessoas) {
         if (!gpSessionPin) {
           if (flash) {
@@ -1441,6 +1481,23 @@
           return;
         }
         const tipo = p.statusHoje !== 'dentro' ? 'entrada' : 'saida';
+        if (tipo === 'saida') {
+          const mins = gpMinutosDesdeEntrada_(p);
+          if (mins != null && mins < 45) {
+            const ok = window.confirm(
+              'Você entrou há só ' + mins + ' min. Confirma a SAÍDA agora?\n\n'
+              + 'Toque em Cancelar se foi sem querer — senão o turno fecha cedo.'
+            );
+            if (!ok) return;
+          }
+        }
+        gpPontoBusy_ = true;
+        gpPontoBusyUntil_ = now + 2500;
+        if (btn) {
+          btn.disabled = true;
+          btn.setAttribute('aria-busy', 'true');
+          btn.textContent = tipo === 'entrada' ? 'Registrando entrada…' : 'Registrando saída…';
+        }
         MK_GestaoPessoas.registrarPonto(colabLogado, gpSessionPin, tipo).then(function (r) {
           const horaMsg = String((r && r.mensagem) || '').match(/(\d{1,2}:\d{2})/);
           const hora = horaMsg ? horaMsg[1] : fmtTime();
@@ -1464,7 +1521,7 @@
           }
           if (tipo === 'entrada') {
             rowF.entrada = hora;
-            rowF.saida = rowF.saida && rowF.saida !== '—' ? rowF.saida : '—';
+            rowF.saida = '—';
             rowF.sit = 'Aberto';
           } else {
             rowF.saida = hora;
@@ -1500,6 +1557,13 @@
         }).catch(function (e) {
           flash.textContent = '✗ ' + (e.message || 'Erro ao registrar ponto');
           flash.hidden = false;
+          renderPonto();
+        }).then(function () {
+          gpPontoBusy_ = false;
+          if (btn) {
+            btn.disabled = false;
+            btn.removeAttribute('aria-busy');
+          }
           renderPonto();
         });
         return;

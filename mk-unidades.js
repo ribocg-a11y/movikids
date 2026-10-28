@@ -238,6 +238,12 @@
 
   function voltarHoldingModo_() {
     setModo_('holding');
+    /* I183: ao sair do balcão de 1 loja, Holding precisa das 2 — hidrata resumoDia. */
+    if (typeof w.mkHoldingHydrateKpis_ === 'function') {
+      try { w.mkHoldingHydrateKpis_(true); } catch (eH) { /* ignore */ }
+    } else if (typeof w.renderHolding_ === 'function') {
+      try { w.renderHolding_(); } catch (eR) { /* ignore */ }
+    }
     return { ok: true, modo: 'holding', filtro: getFiltroAdm_() };
   }
 

@@ -73,6 +73,20 @@ try {
     Add-C "fe.dual.pills" "ok" "pills dual presentes"
   }
 
+  # I183 — Holding no celular: KPIs via resumoDia(all), não só encHoje de 1 loja
+  $hold = Get-Content (Join-Path $root "mk-holding.js") -Raw -Encoding UTF8
+  if ($hold -notmatch "mkHoldingHydrateKpis_" -or $hold -notmatch "resumoDia") {
+    Add-C "fe.holding.i183.hydrate" "fail" "mk-holding.js sem hydrate resumoDia (I183)"
+  } else {
+    Add-C "fe.holding.i183.hydrate" "ok" "Holding hidrata KPIs via resumoDia"
+  }
+  $nav = Get-Content (Join-Path $root "mk-nav.js") -Raw -Encoding UTF8
+  if ($nav -notmatch "mkHoldingHydrateKpis_") {
+    Add-C "fe.holding.i183.nav" "fail" "showPage holding sem mkHoldingHydrateKpis_"
+  } else {
+    Add-C "fe.holding.i183.nav" "ok" "Lojas dispara hydrate"
+  }
+
   $opsLv = Invoke-SmokeCApi @{ action = "listarOperadoresLogin"; unidadeId = "laville" }
   $nOps = 0
   if ($opsLv.operadores) { $nOps = @($opsLv.operadores).Count }
