@@ -1,0 +1,109 @@
+{
+  "startedAt": "2026-10-28T23:33:58.449Z",
+  "hoje": "28/10/2026",
+  "checks": [
+    {
+      "name": "f0.pages",
+      "status": "ok",
+      "detail": "1.9.175"
+    },
+    {
+      "name": "f0.ping",
+      "status": "ok",
+      "detail": "v1.5.236"
+    },
+    {
+      "name": "i183.inicio.golden",
+      "status": "ok",
+      "detail": "encHoje=9"
+    },
+    {
+      "name": "i183.inicio.laville",
+      "status": "ok",
+      "detail": "encHoje=2"
+    },
+    {
+      "name": "i183.inicio.all",
+      "status": "ok",
+      "detail": "enc=11 expect 9+2=11"
+    },
+    {
+      "name": "i183.inicio.all.uids",
+      "status": "ok",
+      "detail": "{\"golden\":9,\"laville\":2}"
+    },
+    {
+      "name": "i183.resumoDia.all",
+      "status": "ok",
+      "detail": "n=11 nSess=12 fat=239 uids={\"golden\":10,\"laville\":2}"
+    },
+    {
+      "name": "i183.resumoDia.dual",
+      "status": "ok",
+      "detail": "{\"golden\":10,\"laville\":2}"
+    },
+    {
+      "name": "i183.holding.slice.golden",
+      "status": "ok",
+      "detail": "{\"n\":10,\"nSessoes\":10,\"fat\":189}"
+    },
+    {
+      "name": "i183.holding.slice.laville",
+      "status": "ok",
+      "detail": "{\"n\":1,\"nSessoes\":2,\"fat\":50}"
+    },
+    {
+      "name": "i183.holding.naoZera",
+      "status": "ok",
+      "detail": "ambas fatias coerentes"
+    },
+    {
+      "name": "i183.fe.hydrate",
+      "status": "ok",
+      "detail": "mk-holding"
+    },
+    {
+      "name": "i183.fe.nav",
+      "status": "ok",
+      "detail": "showPage holding"
+    },
+    {
+      "name": "i183.fe.voltar",
+      "status": "ok",
+      "detail": "voltarHolding"
+    },
+    {
+      "name": "i184.fe.busy",
+      "status": "ok",
+      "detail": "trava toque duplo"
+    },
+    {
+      "name": "i184.fe.confirm",
+      "status": "ok",
+      "detail": "confirm saida cedo"
+    },
+    {
+      "name": "i184.fe.novaEntrada",
+      "status": "ok",
+      "detail": "CTA hub"
+    },
+    {
+      "name": "i184.jennifer.repair",
+      "status": "ok",
+      "detail": "limpo — pode registrar entrada"
+    },
+    {
+      "name": "i184.karen.status",
+      "status": "ok",
+      "detail": "{\"status\":\"dentro\",\"entrada\":\"16:02\",\"saida\":null}"
+    },
+    {
+      "name": "i184.ray.status",
+      "status": "ok",
+      "detail": "{\"status\":\"fora\",\"entrada\":\"09:50\",\"saida\":\"17:32\"}"
+    }
+  ],
+  "status": "ok",
+  "summary": "I183+I184 validado",
+  "finishedAt": "2026-10-28T23:36:04.000Z"
+}

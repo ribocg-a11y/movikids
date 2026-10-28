@@ -1,0 +1,64 @@
+{
+  "suite": "TESTE_ISOLAMENTO_MULTIUNIDADE_READONLY",
+  "startedAt": "2026-10-28 23:36:09",
+  "checks": [
+    {
+      "name": "ping",
+      "status": "ok",
+      "detail": "v1.5.236"
+    },
+    {
+      "name": "inicio.unidadeId",
+      "status": "ok",
+      "detail": "tags corretas"
+    },
+    {
+      "name": "inicio.isolamento",
+      "status": "ok",
+      "detail": "G=9 L=2 ids distintos"
+    },
+    {
+      "name": "hist.unidadeId",
+      "status": "ok",
+      "detail": "I172 tags"
+    },
+    {
+      "name": "hist.isolamento",
+      "status": "ok",
+      "detail": "statsN G=9 L=2"
+    },
+    {
+      "name": "comando.unidadeId",
+      "status": "ok",
+      "detail": "tags"
+    },
+    {
+      "name": "comando.isolamento",
+      "status": "ok",
+      "detail": "nHoje G=10 L=1"
+    },
+    {
+      "name": "kpi.unidadeId",
+      "status": "ok",
+      "detail": "G=golden L=laville"
+    },
+    {
+      "name": "kpi.isolamento",
+      "status": "ok",
+      "detail": "nHoje G=10 L=1"
+    },
+    {
+      "name": "guard.i173.builder",
+      "status": "ok",
+      "detail": "I173 builder recebe uid"
+    },
+    {
+      "name": "guard.i174.conta",
+      "status": "ok",
+      "detail": "I174 conta por loja"
+    }
+  ],
+  "status": "ok",
+  "finishedAt": "2026-10-28 23:38:15"
+}
+ISO_EXIT:0

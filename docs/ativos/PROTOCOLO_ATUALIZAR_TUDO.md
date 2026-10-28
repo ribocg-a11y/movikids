@@ -1,6 +1,6 @@
 # MOVI KIDS — Protocolo "Atualize tudo"
 
-**Criado:** 14/06/2026 · **Última execução:** 15/10/2026 (FE **v1.9.171** · GAS Web **v1.5.235** I181 · Q1 out/26 · sync pasta C)  
+**Criado:** 14/06/2026 · **Última execução:** 28/10/2026 (FE **v1.9.175** · GAS **v1.5.236** · I183 Holding dual + I184 ponto · validação PASS)  
 **Função:** quando o usuário pedir **"atualize tudo"**, o agente segue **esta lista** — não só handoff parcial.  
 **Regra Cursor:** `.cursor/rules/atualize-tudo-movikids.mdc`
 
@@ -17,7 +17,7 @@ Sincronizar **documentação + estado operacional** do projeto com a realidade a
 | Planejamento | `PLANEJAMENTO_ATUAL_2026-06.md`, `PLANO_PRIORIDADES_2026-06.md`, **`MAPA_FASES.md`**, **`PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`** |
 | Deploy atual | **`DEPLOY_ATUAL.md`** |
 | Estrutura repo | **`ESTRUTURA_REPO.md`** |
-| Mapa de erros | `MAPA_ERROS_FALHAS_BUGS.md` (I* até **I178** isolamento + I172 hist + I165–I171) |
+| Mapa de erros | `MAPA_ERROS_FALHAS_BUGS.md` (I* até **I184** ponto + **I183** Holding dual celular) |
 | Isolamento multi-loja | `AUDITORIA_ISOLAMENTO_MULTIUNIDADE_I172_2026-10-06.md` |
 | La Ville | `PLANO_MULTI_UNIDADE_GOLDEN_LAVILLE_2026-09.md` · checklist inauguração no HANDOFF |
 | **Design System** | **`docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md`** |
@@ -45,18 +45,19 @@ Sincronizar **documentação + estado operacional** do projeto com a realidade a
 
 ---
 
-## Produção atual (15/10/2026)
+## Produção atual (28/10/2026)
 
 | Camada | Versão | Evidência |
 |--------|--------|-----------|
-| GAS | ping Web **v1.5.235** = repo | I181 Ray+Karen · Jennifer sem meta |
-| FE | **v1.9.171** | Pages live · holerite Q1 memorial · tabela 50/100 |
-| Isolamento | ✅ | I170–I178 Web 1.5.234+ |
+| GAS | ping Web **v1.5.236** = repo | I182 escala · I181 Ray+Karen |
+| FE | **v1.9.175** | Pages live · I183 Holding dual · I184 ponto |
+| Isolamento | ✅ | I170–I178 + holding smoke 28/10 PASS |
+| I183/I184 | ✅ | `entregas/VALIDACAO_I183_I184_2026-10-28.json` |
 | Q1 out/26 | PIX 748,40 / 748,40 / 543,82 | painel 15/10 live |
 | Golden set (fechamento) | R$ **14.577** · CTO **R$ 1.500** | PDF 01/10 · n **684** |
 | Folha / holerite PDF | I166–I168 ✅ | Blob print · cache FE/LS 24h |
 | La Ville | ops **06/10** | 2ª unidade |
-| Homolog tablet | contínuo | `?force=1.9.171` |
+| Homolog tablet | contínuo | `?force=1.9.175` |
 
 ```powershell
 node scripts\testes\teste-estabilidade-pos-i155.cjs

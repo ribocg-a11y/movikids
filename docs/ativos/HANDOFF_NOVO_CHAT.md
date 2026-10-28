@@ -1,6 +1,6 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 28/10/2026 · FE **v1.9.175** (I183 Holding dual celular + I184 ponto anti toque-duplo) · GAS Web/repo **v1.5.236**
+**Atualizado:** 28/10/2026 · FE **v1.9.175** (I183 Holding dual + I184 ponto) · GAS Web/repo **v1.5.236** · validação PASS (`entregas/VALIDACAO_I183_I184_2026-10-28.json`)
 
 ## Produção (agora)
 
@@ -9,6 +9,8 @@
 | Frontend | **v1.9.175** | https://ribocg-a11y.github.io/movikids/?force=1.9.175 |
 | Gestão Pessoas | **v1.9.175** | `gestao-pessoas.html?force=1.9.175` |
 | GAS | ping Web **v1.5.236** · repo **v1.5.236** | I182 escala alinhada |
+
+**Homolog celular (obrigatório pós-I183/I184):** Lojas · Todas com Golden+LV · `gestao-pessoas.html?force=1.9.175` ponto sem toque duplo. Doc: `INCIDENTE_I183_I184_HOLDING_PONTO_2026-10-28.md`.
 
 ---
 

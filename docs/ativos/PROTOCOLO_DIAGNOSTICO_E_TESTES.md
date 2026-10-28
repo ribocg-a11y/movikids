@@ -1,6 +1,6 @@
 # MOVI KIDS — Protocolo de diagnóstico, testes e maturidade de aprendizado
 
-**Criado:** 07/06/2026 · **Atualizado:** 15/10/2026 (I181 meta Ray+Karen · FE 1.9.171 · GAS Web 1.5.235)  
+**Criado:** 07/06/2026 · **Atualizado:** 28/10/2026 (I183 Holding dual · I184 ponto · FE 1.9.175 · GAS 1.5.236)  
 **Função:** quando o usuário pedir *“rodar teste”*, *“diagnosticar”* ou *“validar deploy”*, o agente **segue este documento** — não improvisa escopo.  
 **Complementa:** `MAPA_ERROS_FALHAS_BUGS.md`, `AUDITORIA_ISOLAMENTO_MULTIUNIDADE_I172_2026-10-06.md`, `INCIDENTE_I158_*`, `INCIDENTE_I20_CRONOMETRO_RESOLUCAO_2026-06-07.md`, `MAPA_CODIGO_ARQUITETURA.md`, `CHECKLIST_FASE5_TABLET.md` · `EVIDENCIA_ESTABILIDADE_POS_I155_2026-09-08.md`
 

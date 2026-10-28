@@ -1,0 +1,60 @@
+{
+  "suite": "TESTE_HOLDING_SMOKE_C_READONLY",
+  "startedAt": "2026-10-28 23:33:58",
+  "checks": [
+    {
+      "name": "ping",
+      "status": "ok",
+      "detail": "v1.5.236"
+    },
+    {
+      "name": "caixa.golden",
+      "status": "ok",
+      "detail": "fat=189 n=10"
+    },
+    {
+      "name": "caixa.laville",
+      "status": "ok",
+      "detail": "fat=50 n=1"
+    },
+    {
+      "name": "caixa.all",
+      "status": "ok",
+      "detail": "fat=239 n=11"
+    },
+    {
+      "name": "filtro.holding",
+      "status": "ok",
+      "detail": "all ≈ golden quando LV=0 (ou ambos zero)"
+    },
+    {
+      "name": "fe.avulso.laville.tipos",
+      "status": "ok",
+      "detail": "Drift + Dino no grid La Ville"
+    },
+    {
+      "name": "fe.dual.pills",
+      "status": "ok",
+      "detail": "pills dual presentes"
+    },
+    {
+      "name": "fe.holding.i183.hydrate",
+      "status": "ok",
+      "detail": "Holding hidrata KPIs via resumoDia"
+    },
+    {
+      "name": "fe.holding.i183.nav",
+      "status": "ok",
+      "detail": "Lojas dispara hydrate"
+    },
+    {
+      "name": "ops.laville",
+      "status": "ok",
+      "detail": "n=2"
+    }
+  ],
+  "status": "ok",
+  "summary": "Holding smoke C OK",
+  "finishedAt": "2026-10-28 23:34:59"
+}
+HOLD_EXIT:0
