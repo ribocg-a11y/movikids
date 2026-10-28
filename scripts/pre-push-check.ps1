@@ -636,6 +636,18 @@ try {
     } else {
       Add-Check "guard.i183.fe.holding-hydrate" "ok" "Holding hidrata KPIs dual via resumoDia (I183)"
     }
+    # I183b — unidadeId all DEPOIS do authP + não colapsar all→golden no operadorApiParams
+    $authRawI183b = ""
+    $authJsI183b = Join-Path $root "mk-auth.js"
+    if (Test-Path $authJsI183b) { $authRawI183b = Get-Content -Path $authJsI183b -Raw -Encoding UTF8 }
+    $holdAllAfter = ($holdRawG.Contains("Object.assign({}, authP, { action: 'resumoDia'")) -and ($holdRawG.Contains("unidadeId: 'all'"))
+    $authKeepAll = ($authRawI183b.Contains('I183b')) -and (-not $authRawI183b.Contains("if (!out.unidadeId || out.unidadeId === 'all')"))
+    $holdEncList = ($holdRawG.Contains('Encerradas hoje')) -and ($holdRawG.Contains('encRowHtml_'))
+    if (-not $holdAllAfter -or -not $authKeepAll -or -not $holdEncList) {
+      Add-Check "guard.i183b.fe.holding-all" "fail" "I183b: all depois do auth / keep all / Encerradas holding incompleto"
+    } else {
+      Add-Check "guard.i183b.fe.holding-all" "ok" "Holding força all pos-auth + Encerradas dual (I183b)"
+    }
     # I171 — sessão operador por loja
     $gasRawG = ""
     $gasJsG = Join-Path $root "MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs"

@@ -349,7 +349,10 @@
      * e sync carregarInicio era IGNORADO (uidResp ≠ uidNow). */
     if (typeof mkUnidadeApiParams_ === 'function') Object.assign(out, mkUnidadeApiParams_());
     else if (typeof mkUnidadeId_ === 'function') out.unidadeId = mkUnidadeId_();
-    if (!out.unidadeId || out.unidadeId === 'all') {
+    /* I183b: holding + filtro ADM all DEVE permanecer all.
+     * Colapsar all→golden fazia resumoDia/Holding ver só Golden (LV R$0).
+     * Escritas de locação no balcão usam unidade concreta (modo balcão). */
+    if (!out.unidadeId) {
       const uNow = (typeof mkUnidadeId_ === 'function') ? mkUnidadeId_() : 'golden';
       out.unidadeId = (uNow && uNow !== 'all') ? uNow : 'golden';
     }

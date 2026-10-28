@@ -4360,9 +4360,12 @@ async function carregarCaixa(forceRefresh) {
 
   try {
     let rAll = (!force && window._mkCaixaResumoCache_[dataFmt]) || null;
+    /* I183b: cache só se veio de all — senão Holding/Caixa dual herdam 1 loja. */
+    if (rAll && String(rAll.unidadeId || '').toLowerCase() !== 'all') rAll = null;
     if (!rAll || !rAll.ok) {
       const authP = apiParamsComAuth_();
-      const req = { action: 'resumoDia', data: dataFmt, unidadeId: 'all', ...authP };
+      /* I183b: unidadeId all DEPOIS do authP (spread antigo sobrescrevia com golden). */
+      const req = Object.assign({}, authP, { action: 'resumoDia', data: dataFmt, unidadeId: 'all' });
       /* force só no botão Atualizar — pill/filtro NÃO (I86/I122). */
       if (force) req.force = '1';
       rAll = await api(req);
@@ -4370,6 +4373,7 @@ async function carregarCaixa(forceRefresh) {
         toast((rAll && rAll.erro) || 'Erro ao carregar caixa', 'error');
         return;
       }
+      if (!rAll.unidadeId) rAll.unidadeId = 'all';
       window._mkCaixaResumoCache_[dataFmt] = rAll;
     }
     if (dataFmt === hoje) resumoDiaHoje = rAll;

@@ -1,6 +1,7 @@
 /* MOVI KIDS — Painel holding ADM (Golden + La Ville na mesma tela) · I159e
- * I183: KPIs do dia via resumoDia(all)+fatia — não depender só de encHojeData
+ * I183/I183b: KPIs do dia via resumoDia(all)+fatia — não depender só de encHojeData
  * (no celular, após Abrir balcão LV, encHoje fica só La Ville e Golden zera).
+ * I183b: forçar unidadeId:'all' DEPOIS do authP (operadorApiParams não pode sobrescrever).
  */
 (function (w) {
   'use strict';
@@ -9,6 +10,12 @@
   var _holdHydrateInFlight = false;
   var _holdHydrateAt = 0;
   var HOLD_HYDRATE_TTL_MS = 25000;
+
+  /** Cache só serve se veio de resumoDia(all) — senão Holding herda 1 loja. */
+  function isResumoAllCache_(r) {
+    if (!r || !r.ok) return false;
+    return String(r.unidadeId || '').toLowerCase() === 'all';
+  }
 
   function isAdm_() {
     return (typeof mkAuthIsAdmin === 'function' && mkAuthIsAdmin()) || !!w.isAdmin;
@@ -74,11 +81,17 @@
       return s && (s.status === 'Ativa' || s.status === 'Pendente' || s.started || s._optimistic);
     }).filter(function (s) { return uidOf_(s) === uid; });
     var encU = enc.filter(function (e) { return uidOf_(e) === uid; });
+    /* I183: resumoDia hidratado prevalece nos KPIs do dia (fonte caixa). */
+    var r = _holdResumoByUid[uid];
+    if (r && r.ok && Array.isArray(r.locacoes) && r.locacoes.length) {
+      encU = r.locacoes.filter(function (l) {
+        var st = String((l && l.status) || 'Encerrada');
+        return st === 'Encerrada' || st === '';
+      });
+    }
     var nContasLocal = typeof mkContasEncHoje_ === 'function' ? mkContasEncHoje_(encU) : encU.length;
     var nSessoesLocal = encU.length;
     var fatLocal = fatEnc_(encU);
-    /* I183: resumoDia hidratado prevalece nos KPIs do dia (fonte caixa). */
-    var r = _holdResumoByUid[uid];
     var nContas = nContasLocal;
     var nSessoes = nSessoesLocal;
     var fat = fatLocal;
@@ -128,6 +141,33 @@
     );
   }
 
+  function encRowHtml_(e) {
+    var icon = typeof tipoIcon === 'function' ? tipoIcon(e.tipo) : '🚗';
+    var titulo = e.crianca || e.veiculo || '—';
+    var det = [e.responsavel, e.plano].filter(Boolean).join(' · ');
+    var pag = '';
+    if (typeof histPagPillHtml_ === 'function') {
+      pag = '<span class="mk-hold-enc-pag">' + histPagPillHtml_(e.pagamento) + '</span>';
+    } else if (e.pagamento) {
+      pag = '<span class="mk-hold-enc-pag">' + escHold_(e.pagamento) + '</span>';
+    }
+    var horario = (e.horaInicio || '—') + ' → ' + (e.horaFim || '--:--');
+    return (
+      '<div class="mk-hold-row mk-hold-row--enc">' +
+        '<span class="mk-hold-row-ico">' + icon + '</span>' +
+        '<span class="mk-hold-row-main">' +
+          '<strong>' + escHold_(titulo) + '</strong>' +
+          '<span>' + escHold_(det || 'Encerrada') + '</span>' +
+          pag +
+        '</span>' +
+        '<span class="mk-hold-row-meta">' +
+          '<strong>' + fmtMoney_(e.valorTotal) + '</strong>' +
+          '<span>' + escHold_(horario) + '</span>' +
+        '</span>' +
+      '</div>'
+    );
+  }
+
   function escHold_(t) {
     return String(t == null ? '' : t)
       .replace(/&/g, '&amp;')
@@ -139,6 +179,10 @@
     var rows = p.ativas.length
       ? p.ativas.map(rowHtml_).join('')
       : '<div class="mk-hold-empty">Nenhuma locação ativa</div>';
+    var encList = Array.isArray(p.encHoje) ? p.encHoje : [];
+    var encRows = encList.length
+      ? encList.map(encRowHtml_).join('')
+      : '<div class="mk-hold-empty mk-hold-empty--sm">Nenhuma encerrada hoje</div>';
     var badge = p.provisoria ? '<span class="mk-hold-badge">frota provisória</span>' : '';
     return (
       '<section class="mk-hold-col" data-unidade="' + p.id + '" data-kpi-fonte="' + (p._kpiFonte || '') + '">' +
@@ -157,6 +201,8 @@
         '</div>' +
         '<div class="mk-hold-sec-lbl">Sessões abertas</div>' +
         '<div class="mk-hold-list">' + rows + '</div>' +
+        '<div class="mk-hold-sec-lbl">Encerradas hoje</div>' +
+        '<div class="mk-hold-list mk-hold-list--enc">' + encRows + '</div>' +
       '</section>'
     );
   }
@@ -209,8 +255,9 @@
   }
 
   /**
-   * I183 — Holding: 1× resumoDia(all) + fatia FE.
+   * I183/I183b — Holding: 1× resumoDia(all) + fatia FE.
    * Corrige celular onde encHojeData ficou só de uma loja após Abrir balcão.
+   * I183b: unidadeId:'all' SEMPRE por último no Object.assign (authP não sobrescreve).
    */
   async function hydrateHoldingKpis_(force) {
     if (!isAdm_()) return false;
@@ -221,7 +268,8 @@
     var now = Date.now();
     if (!force && _holdHydrateInFlight) return false;
     if (!force && _holdHydrateAt && (now - _holdHydrateAt) < HOLD_HYDRATE_TTL_MS
-        && _holdResumoByUid.golden && _holdResumoByUid.laville) {
+        && _holdResumoByUid.golden && _holdResumoByUid.laville
+        && isResumoAllCache_(_holdResumoByUid.all)) {
       renderHolding_();
       return true;
     }
@@ -229,13 +277,14 @@
     try {
       var dataFmt = hojeFmt_();
       var rAll = null;
-      if (!force && w._mkCaixaResumoCache_ && w._mkCaixaResumoCache_[dataFmt] && w._mkCaixaResumoCache_[dataFmt].ok) {
+      if (!force && w._mkCaixaResumoCache_ && isResumoAllCache_(w._mkCaixaResumoCache_[dataFmt])) {
         rAll = w._mkCaixaResumoCache_[dataFmt];
       }
       if (!rAll || !rAll.ok) {
         if (typeof api !== 'function') return false;
         var authP = typeof apiParamsComAuth_ === 'function' ? apiParamsComAuth_() : {};
-        var req = Object.assign({ action: 'resumoDia', data: dataFmt, unidadeId: 'all' }, authP);
+        /* I183b: all DEPOIS do auth — senão unidadeId da loja aberta ganha. */
+        var req = Object.assign({}, authP, { action: 'resumoDia', data: dataFmt, unidadeId: 'all' });
         if (force) req.force = '1';
         rAll = await api(req, 55000);
       }
@@ -243,6 +292,8 @@
         console.warn('[Holding] resumoDia falhou', rAll && rAll.erro);
         return false;
       }
+      /* Garantir carimbo all no cache FE (mesmo se GAS antigo omitir). */
+      if (!rAll.unidadeId) rAll.unidadeId = 'all';
       try {
         w._mkCaixaResumoCache_ = w._mkCaixaResumoCache_ || {};
         w._mkCaixaResumoCache_[dataFmt] = rAll;
