@@ -54,8 +54,8 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 | Camada | Versão | URL / evidência |
 |--------|--------|-----------------|
-| **Frontend** | **v1.9.176** | https://ribocg-a11y.github.io/movikids/?force=1.9.175 |
-| **Gestão Pessoas** | **v1.9.176** | `gestao-pessoas.html?force=1.9.175` |
+| **Frontend** | **v1.9.176** | https://ribocg-a11y.github.io/movikids/?force=1.9.176 |
+| **Gestão Pessoas** | **v1.9.176** | `gestao-pessoas.html?force=1.9.176` |
 | **Service Worker** | **1.9.172** | I182 escala Golden dois turnos |
 | **Apps Script** | ping **v1.5.235** · repo **v1.5.236** | I182 escala — Nova versão Web pendente |
 | **La Ville ops** | ✅ **06/10/2026** | 2ª unidade em operação (D+0) |
