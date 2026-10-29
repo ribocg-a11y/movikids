@@ -1,0 +1,23 @@
+{
+  "id": "I183b",
+  "fecha": "2026-10-28",
+  "fe": "1.9.176",
+  "gas": "v1.5.236",
+  "pages": "1.9.176",
+  "commit": "9ba9333",
+  "checks": {
+    "pre-push": "ok",
+    "guard.i183b.fe.holding-all": "ok",
+    "TESTE_HOLDING_SMOKE_C": "ok",
+    "verify-publish-complete": "ok",
+    "pages.live": "1.9.176"
+  },
+  "fix": [
+    "Object.assign({}, authP, {unidadeId:'all'}) holding+caixa",
+    "operadorApiParams keep all",
+    "cache only if unidadeId===all",
+    "Encerradas hoje nas 2 colunas Holding"
+  ],
+  "homolog": "https://ribocg-a11y.github.io/movikids/?force=1.9.176",
+  "recordedAtUtc": "2026-10-29T00:07:17Z"
+}
