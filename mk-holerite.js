@@ -95,26 +95,31 @@
       4: { adianta: 648.4, bonus: 100, va: 200, pacote: 948.4 }
     },
     '10/2026': {
-      3: { adianta: 648.4, bonus: 100, va: 200, pacote: 948.4, bonusMes: 200, pix: 748.4 },
-      5: { adianta: 648.4, bonus: 100, va: 200, pacote: 948.4, bonusMes: 200, pix: 748.4 },
+      /* Q1 pago 15/10; bonusMes = ganho no mês fechado 31/10 (I141 resto = bonusMes − bonus). */
+      3: { adianta: 648.4, bonus: 100, va: 200, pacote: 948.4, bonusMes: 250, pix: 748.4 },
+      5: { adianta: 648.4, bonus: 100, va: 200, pacote: 948.4, bonusMes: 350, pix: 748.4 },
       6: { adianta: 543.82, bonus: 0, va: 167.74, pacote: 711.56, bonusMes: 0, pix: 543.82 }
     }
   };
 
-  /** Dias de meta conferidos (1–14/10) — FSS juntas = R$ 50. */
+  /** Dias de meta conferidos 10/2026 (fechamento 31/10) — live metaOperadorTurno + I141.
+   * Q1 pago: 100 cada (Ray/Karen). Mês: Ray 250 · Karen 350 · Jennifer 0. */
   var MK_HOL_DIAS_BONUS_MEMORIAL_ = {
     '10/2026': {
       3: [
-        { data: '03/10/2026', diaSemana: 'Sáb', loc: 21, bonusValor: 50, juntas: true, bonusOk: true },
-        { data: '04/10/2026', diaSemana: 'Dom', loc: 23, bonusValor: 50, juntas: true, bonusOk: true },
-        { data: '10/10/2026', diaSemana: 'Sáb', loc: 21, bonusValor: 50, juntas: true, bonusOk: true },
-        { data: '11/10/2026', diaSemana: 'Dom', loc: 43, bonusValor: 50, juntas: true, bonusOk: true }
+        { data: '03/10/2026', diaSemana: 'Sáb', loc: 8, locParceira: 22, bonusValor: 50, juntas: true, bonusOk: true },
+        { data: '10/10/2026', diaSemana: 'Sáb', loc: 9, locParceira: 14, bonusValor: 50, juntas: true, bonusOk: true },
+        { data: '16/10/2026', diaSemana: 'Sex', loc: 3, locParceira: 28, bonusValor: 50, juntas: true, bonusOk: true },
+        { data: '17/10/2026', diaSemana: 'Sáb', loc: 6, locParceira: 43, bonusValor: 50, juntas: true, bonusOk: true },
+        { data: '24/10/2026', diaSemana: 'Sáb', loc: 13, locParceira: 21, bonusValor: 50, juntas: true, bonusOk: true }
       ],
       5: [
-        { data: '03/10/2026', diaSemana: 'Sáb', loc: 21, bonusValor: 50, juntas: true, bonusOk: true },
-        { data: '04/10/2026', diaSemana: 'Dom', loc: 23, bonusValor: 50, juntas: true, bonusOk: true },
-        { data: '10/10/2026', diaSemana: 'Sáb', loc: 21, bonusValor: 50, juntas: true, bonusOk: true },
-        { data: '11/10/2026', diaSemana: 'Dom', loc: 43, bonusValor: 50, juntas: true, bonusOk: true }
+        { data: '03/10/2026', diaSemana: 'Sáb', loc: 22, locParceira: 8, bonusValor: 50, juntas: true, bonusOk: true },
+        { data: '10/10/2026', diaSemana: 'Sáb', loc: 14, locParceira: 9, bonusValor: 50, juntas: true, bonusOk: true },
+        { data: '12/10/2026', diaSemana: 'Seg', loc: 50, locParceira: 20, bonusValor: 100, juntas: false, bonusOk: true },
+        { data: '16/10/2026', diaSemana: 'Sex', loc: 28, locParceira: 3, bonusValor: 50, juntas: true, bonusOk: true },
+        { data: '17/10/2026', diaSemana: 'Sáb', loc: 43, locParceira: 6, bonusValor: 50, juntas: true, bonusOk: true },
+        { data: '24/10/2026', diaSemana: 'Sáb', loc: 21, locParceira: 13, bonusValor: 50, juntas: true, bonusOk: true }
       ],
       6: []
     }

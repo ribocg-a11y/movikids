@@ -1,0 +1,36 @@
+{
+  "id": "MEMORIAL_Q2_2026-10",
+  "pagamentoEm": "31/10/2026",
+  "competencia": "10/2026",
+  "gas": "v1.5.236",
+  "fe": "1.9.177",
+  "pix": {
+    "Raykelly": 902.22,
+    "Karen": 1002.22,
+    "Jennifer": 632.19,
+    "soma": 2536.63
+  },
+  "va": {
+    "Raykelly": 200,
+    "Karen": 200,
+    "Jennifer": 167.74,
+    "soma": 567.74
+  },
+  "bonusMes": {
+    "Raykelly": 250,
+    "Karen": 350,
+    "Jennifer": 0
+  },
+  "bonusQ2": {
+    "Raykelly": 150,
+    "Karen": 250,
+    "Jennifer": 0
+  },
+  "q1Pago": {
+    "Raykelly": 748.4,
+    "Karen": 748.4,
+    "Jennifer": 543.82
+  },
+  "faltasMemorial": 0,
+  "doc": "docs/ativos/MEMORIAL_HOLERITE_Q2_2026-10.md"
+}

@@ -1,16 +1,16 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 28/10/2026 · FE **v1.9.176** (I183b Holding all pós-auth + Encerradas dual) · GAS Web/repo **v1.5.236** · I183/I184 + I183b
+**Atualizado:** 31/10/2026 · FE **v1.9.177** (memorial Q2 out/26) · GAS Web/repo **v1.5.236** · **PIX 2ª 31/10**
 
 ## Produção (agora)
 
 | Camada | Versão | Link |
 |--------|--------|------|
-| Frontend | **v1.9.176** | https://ribocg-a11y.github.io/movikids/?force=1.9.176 |
-| Gestão Pessoas | **v1.9.176** | `gestao-pessoas.html?force=1.9.176` |
+| Frontend | **v1.9.177** | https://ribocg-a11y.github.io/movikids/?force=1.9.177 |
+| Gestão Pessoas | **v1.9.177** | `gestao-pessoas.html?force=1.9.177` |
 | GAS | ping Web **v1.5.236** · repo **v1.5.236** | I182 escala alinhada |
 
-**Homolog celular (obrigatório pós-I183b):** Lojas · Todas → Golden **e** La Ville com caixa + Encerradas · `?force=1.9.176`. Doc: `INCIDENTE_I183_I184_HOLDING_PONTO_2026-10-28.md`.
+**Pagamento 31/10 (Q2 10/2026):** memorial `MEMORIAL_HOLERITE_Q2_2026-10.md` — PIX Ray **902,22** · Karen **1.002,22** · Jennifer **632,19** (VA cartão; VT fora; **não** usar PIX do app).
 
 ---
 

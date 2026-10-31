@@ -1,6 +1,6 @@
 # MOVI KIDS — Índice de documentação
 
-**Atualizado:** 28/10/2026 (FE **v1.9.175** · GAS **v1.5.236** · I183/I184 · I181 · **La Ville ops desde 06/10/2026**)
+**Atualizado:** 31/10/2026 (FE **v1.9.177** · GAS **v1.5.236** · memorial Q2 31/10 · I181 · **La Ville ops desde 06/10/2026**)
 
 ## Comece aqui
 
@@ -26,6 +26,7 @@
 | [**INCIDENTE_I183_I184_HOLDING_PONTO_2026-10-28.md**](ativos/INCIDENTE_I183_I184_HOLDING_PONTO_2026-10-28.md) | **I183/I184** — Holding dual celular · ponto toque-duplo · FE 1.9.175 |
 | [**INCIDENTE_I181_META_PAR_KAREN_JENNIFER_2026-10-15.md**](ativos/INCIDENTE_I181_META_PAR_KAREN_JENNIFER_2026-10-15.md) | **I181** — par meta Ray+Karen · Jennifer sem pote · Q1 15/10 |
 | [**MEMORIAL_HOLERITE_Q1_2026-10.md**](ativos/MEMORIAL_HOLERITE_Q1_2026-10.md) | **Folha 15/10** — PIX 748,40 / 748,40 / 543,82 |
+| [**MEMORIAL_HOLERITE_Q2_2026-10.md**](ativos/MEMORIAL_HOLERITE_Q2_2026-10.md) | **Folha 31/10** — PIX 902,22 / 1.002,22 / 632,19 |
 | [**AUDITORIA_ISOLAMENTO_MULTIUNIDADE_I172_2026-10-06.md**](ativos/AUDITORIA_ISOLAMENTO_MULTIUNIDADE_I172_2026-10-06.md) | **I172–I178** — furos isolamento Golden×La Ville |
 | [**INCIDENTE_I168_FOLHA_CACHE_FORCE_2026-10-02.md**](ativos/INCIDENTE_I168_FOLHA_CACHE_FORCE_2026-10-02.md) | **I168** — Folha cache-first (anti force/retries) |
 | [**INCIDENTE_I167_HOLERITE_PDF_ABOUT_BLANK_2026-10-02.md**](ativos/INCIDENTE_I167_HOLERITE_PDF_ABOUT_BLANK_2026-10-02.md) | **I167** — PDF holerite about:blank → Blob |

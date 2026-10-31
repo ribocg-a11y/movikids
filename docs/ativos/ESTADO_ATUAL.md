@@ -1,8 +1,8 @@
-# MOVI KIDS — Estado atual (28/10/2026 · FE v1.9.176 · La Ville)
+# MOVI KIDS — Estado atual (31/10/2026 · FE v1.9.177 · La Ville)
 
 Referência única para alinhamento local × produção.
 
-**Ciclo dev ativo:** **`PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`** — Sprint D · **La Ville inaugurou 06/10/2026** · FE **v1.9.176** (I183 Holding dual + I184 ponto) · GAS **v1.5.236** · **I181** Ray+Karen · isolamento **I170–I178** ✅ · **I158** Golden ✅  
+**Ciclo dev ativo:** **`PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`** — Sprint D · **La Ville inaugurou 06/10/2026** · FE **v1.9.177** (memorial Q2 31/10) · GAS **v1.5.236** · **I181** Ray+Karen · isolamento **I170–I178** ✅ · **I158** Golden ✅  
 
 **Marco Ops:** **La Ville Mall — início de operações em 06/10/2026** (2ª unidade ao lado do Golden).  
 **CTO La Ville:** contrato merchandising quiosque **R$ 2.300/mês** · venc. dia 10 · PDF em `entregas/CONTRATO_MERCHANDISING_QUIOSQUE_MOVIKIDS.pdf`.
@@ -20,7 +20,8 @@ Referência única para alinhamento local × produção.
 **Plano La Ville:** **`PLANO_MULTI_UNIDADE_GOLDEN_LAVILLE_2026-09.md`** (🟢 ops desde **06/10/2026**)  
 
 **Incidente I181:** **`INCIDENTE_I181_META_PAR_KAREN_JENNIFER_2026-10-15.md`**  
-**Memorial Q1 10/2026:** **`MEMORIAL_HOLERITE_Q1_2026-10.md`**  
+**Memorial Q1 10/2026:** **`MEMORIAL_HOLERITE_Q1_2026-10.md`** (pago 15/10)  
+**Memorial Q2 10/2026:** **`MEMORIAL_HOLERITE_Q2_2026-10.md`** — PIX 31/10 Ray **902,22** · Karen **1.002,22** · Jennifer **632,19**  
 **Incidente I168:** **`INCIDENTE_I168_FOLHA_CACHE_FORCE_2026-10-02.md`**  
 **Incidente I167:** **`INCIDENTE_I167_HOLERITE_PDF_ABOUT_BLANK_2026-10-02.md`**  
 **Incidente I158:** **`../arquivo/incidentes/INCIDENTE_I158_GOLDEN_CONTA_CANCELADA_2026-09-23.md`**  
@@ -54,8 +55,8 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 | Camada | Versão | URL / evidência |
 |--------|--------|-----------------|
-| **Frontend** | **v1.9.176** | https://ribocg-a11y.github.io/movikids/?force=1.9.176 |
-| **Gestão Pessoas** | **v1.9.176** | `gestao-pessoas.html?force=1.9.176` |
+| **Frontend** | **v1.9.177** | https://ribocg-a11y.github.io/movikids/?force=1.9.177 |
+| **Gestão Pessoas** | **v1.9.177** | `gestao-pessoas.html?force=1.9.177` |
 | **Service Worker** | **1.9.172** | I182 escala Golden dois turnos |
 | **Apps Script** | ping **v1.5.235** · repo **v1.5.236** | I182 escala — Nova versão Web pendente |
 | **La Ville ops** | ✅ **06/10/2026** | 2ª unidade em operação (D+0) |
@@ -69,6 +70,7 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 | **I145 sync idle** | ✅ | idle/visibility **sem** force=1 · warm ~1–2s |
 | **I143 salvar/▶** | ✅ | mediana ~3.9s / ~3.1s · dup 409 · limpeza OK |
 | **Holerite Q1 15/10** | I181 + memorial | Ray **748,40** · Karen **748,40** · Jennifer **543,82** (VA cartão; VT fora) |
+| **Holerite Q2 31/10** | I141 + memorial | Ray **902,22** · Karen **1.002,22** · Jennifer **632,19** (faltas tablet zeradas no PIX) |
 | **Holerite Q1 15/07** | I108–I114+I138 | Ray pacote **R$ 998,40** · Julia **R$ 948,40** (VT fora) |
 | **Holerite Q2 31/07** | I141+I142 | Ray **1652,22** · Julia **1702,22** · bônus resto (700/750) |
 | **PDFs mês** | entregas | https://ribocg-a11y.github.io/movikids/entregas/holerite-mes-2026-07/ |
