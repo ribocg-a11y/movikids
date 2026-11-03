@@ -313,6 +313,9 @@ async function salvarOperacaoLocacao() {
       }
     }
     const payload = { action: opTipo === 'cancelar' ? 'cancelarLocacao' : 'editarLocacao', rowIndex: opSession.rowIndex, motivo, ...operadorApiParams_() };
+    if (opTipo === 'cancelar' && typeof mkOfflineGenRequestId_ === 'function') {
+      payload.clientRequestId = mkOfflineGenRequestId_();
+    }
     if (opTipo === 'pagamento') payload.pagamento = document.getElementById('op-pagamento')?.value || '';
     else if (opTipo === 'veiculo') payload.veiculo = document.getElementById('op-veiculo')?.value || '';
     else if (opTipo === 'plano') payload.plano = document.getElementById('op-plano')?.value || '';
@@ -325,6 +328,9 @@ async function salvarOperacaoLocacao() {
     }
     const d = await api(payload);
     if (!d.ok) { toast('Erro: ' + (d.erro || 'falha ao salvar'), 'error'); return; }
+    if (d._offlineQueued && opTipo === 'cancelar') {
+      toast('Sem rede — cancelamento na fila. Card some; sobe quando voltar.', 'warning');
+    }
     if (opTipo === 'cancelar') sessions = sessions.filter(s => Number(s.rowIndex) !== Number(opSession.rowIndex));
     else {
       const idx = sessions.findIndex(s => Number(s.rowIndex) === Number(opSession.rowIndex));

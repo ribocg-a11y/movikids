@@ -1,6 +1,14 @@
-/* MOVI KIDS — Fase 2: fila offline salvar/▶ (FE v1.9.104) */
+/* MOVI KIDS — Fase 2+ offline: fila salvar/▶/encerrar/cancelar (I147 · I187)
+ * I187 (03/11/2026): short-circuit sem rede + encerrar/cancelar na fila.
+ * Estender/editar ainda exigem rede (sem idempotência GAS).
+ */
 
-const MK_OFFLINE_QUEUE_ACTIONS = new Set(['salvarLocacao', 'iniciarTimer']);
+const MK_OFFLINE_QUEUE_ACTIONS = new Set([
+  'salvarLocacao',
+  'iniciarTimer',
+  'encerrarLocacao',
+  'cancelarLocacao'
+]);
 const MK_OFFLINE_MAX_ATTEMPTS = 8;
 
 function mkOfflineIsOffline_() {
@@ -10,11 +18,11 @@ function mkOfflineIsOffline_() {
 function mkOfflineIsNetworkError_(err) {
   if (mkOfflineIsOffline_()) return true;
   const msg = String((err && err.message) || err || '').toLowerCase();
-  return msg.indexOf('failed to fetch') >= 0
+  return msg.indexOf('offline-navigator') >= 0
+    || msg.indexOf('failed to fetch') >= 0
     || msg.indexOf('network') >= 0
     || msg.indexOf('load failed') >= 0
     || msg.indexOf('networkerror') >= 0
-    // I154: HTML 404 / GAS instável — enfileira (timeout NÃO: I143 GAS pode ter gravado)
     || msg.indexOf('gas-unstable') >= 0
     || msg.indexOf('http 404') >= 0
     || msg.indexOf('http 5') >= 0;
@@ -77,22 +85,79 @@ function mkOfflineSyntheticSalvar_(params, reqId) {
   };
 }
 
+function mkOfflineSyntheticEncerrar_(params, reqId) {
+  const mins = Number(params.minUsados || params.mins || 0);
+  const val = Number(params.valorPlano || 0);
+  return {
+    ok: true,
+    _offlineQueued: true,
+    clientRequestId: reqId,
+    queued: true,
+    valorTotal: val,
+    minUsados: mins,
+    status: 'Encerrada'
+  };
+}
+
+function mkOfflineSyntheticCancelar_(params, reqId) {
+  return {
+    ok: true,
+    _offlineQueued: true,
+    clientRequestId: reqId,
+    queued: true,
+    status: 'Cancelada'
+  };
+}
+
+function mkOfflineFlushOk_(action, d) {
+  if (d && d.ok) return true;
+  const err = String((d && d.erro) || '').toLowerCase();
+  const code = Number(d && d.code) || 0;
+  /* Replay encerrar/cancelar: já feito no servidor = sucesso (anti-duplicata). */
+  if (action === 'encerrarLocacao') {
+    if (code === 409) return true;
+    if (/j[aá]\s+foi\s+encerrada|j[aá]\s+finalizada|n[aã]o est[aá] ativa|locacao\s+ja\s+finalizada/.test(err)) return true;
+  }
+  if (action === 'cancelarLocacao') {
+    if (code === 409) return true;
+    if (/j[aá]\s+cancelada|n[aã]o est[aá] ativa/.test(err)) return true;
+  }
+  return false;
+}
+
 async function mkOfflineHandleWriteFail_(params, err) {
   const action = String((params && params.action) || '');
+  /* Durante flush: não reenfileirar (senão remove o item original achando sucesso). */
+  if (window._mkOfflineFlushing) throw err;
   if (!mkOfflineCanQueue_(action) || !mkOfflineIsNetworkError_(err)) throw err;
 
   const item = await mkOfflineEnqueue_(action, params);
+  const offlineNow = mkOfflineIsOffline_();
+  const prefix = offlineNow ? 'Sem internet' : 'Servidor instável';
+
   if (action === 'salvarLocacao') {
     if (typeof toast === 'function') {
-      toast('Servidor instável — locação na fila. Envia sozinho quando estabilizar.', 'warning');
+      toast(prefix + ' — locação na fila. Sobe sozinha quando voltar a rede.', 'warning');
     }
     return mkOfflineSyntheticSalvar_(params, item.id);
   }
   if (action === 'iniciarTimer') {
     if (typeof toast === 'function') {
-      toast('Servidor instável — início na fila. Cronômetro segue no tablet.', 'warning');
+      toast(prefix + ' — início na fila. Cronômetro segue no tablet.', 'warning');
     }
     return { ok: true, _offlineQueued: true, clientRequestId: item.id, queued: true };
+  }
+  if (action === 'encerrarLocacao') {
+    if (typeof toast === 'function') {
+      toast(prefix + ' — encerramento na fila. Card some; sobe quando voltar a rede.', 'warning');
+    }
+    return mkOfflineSyntheticEncerrar_(params, item.id);
+  }
+  if (action === 'cancelarLocacao') {
+    if (typeof toast === 'function') {
+      toast(prefix + ' — cancelamento na fila. Sobe quando voltar a rede.', 'warning');
+    }
+    return mkOfflineSyntheticCancelar_(params, item.id);
   }
   throw err;
 }
@@ -138,6 +203,8 @@ async function mkOfflineFlush_() {
   let flushed = 0;
   try {
     const queue = await mkIdbQueueList_();
+    /* FIFO: salvar → ▶ → encerrar/cancelar (remap de rowIndex temp). */
+    queue.sort(function (a, b) { return (a.createdAt || 0) - (b.createdAt || 0); });
     for (let i = 0; i < queue.length; i++) {
       const item = queue[i];
       if (!item || !item.params) continue;
@@ -148,11 +215,29 @@ async function mkOfflineFlush_() {
       }
       try {
         const d = await api(item.params, 55000);
-        if (!d || !d.ok) break;
-        if (item.action === 'salvarLocacao' && d.rowIndex) {
+        if (!mkOfflineFlushOk_(item.action, d)) break;
+        if (item.action === 'salvarLocacao' && d && d.rowIndex) {
           const tempRow = mkOfflineTempRowIndex_(item.id);
           await mkOfflineRemapRowInQueue_(tempRow, d.rowIndex);
           await mkOfflineReplaceTempSession_(tempRow, Object.assign({}, d, { clientRequestId: item.id }));
+        }
+        if (item.action === 'iniciarTimer' && Array.isArray(sessions)) {
+          const ri = Number(item.params && item.params.rowIndex);
+          const s = sessions.find(function (x) {
+            return x && (Number(x.rowIndex) === ri || x._clientRequestId === item.id);
+          });
+          if (s) {
+            delete s._offlineTimerPending;
+            delete s._iniciandoTimer;
+            if (d && Number(d.startTimestamp) > 1e12) {
+              s.startTimestamp = Number(d.startTimestamp);
+              s._localTimerStart = s.startTimestamp;
+              if (d.horaInicio) s.horaInicio = d.horaInicio;
+            }
+            s.status = 'Ativa';
+            s.started = true;
+            if (typeof saveSessions === 'function') saveSessions();
+          }
         }
         await mkIdbQueueRemove_(item.id);
         flushed++;
@@ -164,7 +249,12 @@ async function mkOfflineFlush_() {
     const rest = await mkIdbQueueList_();
     window._mkOfflineQueueCount = rest.length;
     if (typeof mkOfflineRefreshUi_ === 'function') mkOfflineRefreshUi_();
-    if (flushed > 0 && typeof syncController === 'function') syncController(false, 500);
+    if (flushed > 0) {
+      if (typeof toast === 'function') {
+        try { toast('Fila offline: ' + flushed + ' item(ns) enviados à nuvem', 'success'); } catch (eT) { /* ok */ }
+      }
+      if (typeof syncController === 'function') syncController(false, 500);
+    }
   } finally {
     window._mkOfflineFlushing = false;
   }
@@ -179,16 +269,35 @@ async function mkOfflineRefreshUi_() {
     el.textContent = n > 0 ? ('Fila offline: ' + n) : '';
     el.style.display = n > 0 ? '' : 'none';
   }
+  const chip = document.getElementById('mk-net-chip');
+  if (chip) {
+    if (mkOfflineIsOffline_()) {
+      chip.textContent = n > 0 ? ('Offline · fila ' + n) : 'Offline';
+      chip.dataset.state = 'off';
+    } else if (n > 0) {
+      chip.textContent = 'Online · sync ' + n;
+      chip.dataset.state = 'sync';
+    }
+  }
 }
 
 function mkOfflineWire_() {
   window.addEventListener('online', function () {
+    if (typeof toast === 'function') {
+      try { toast('Internet voltou — sincronizando fila…', 'info'); } catch (e1) { /* ok */ }
+    }
     mkOfflineFlush_().catch(function () { /* ignore */ });
+  });
+  window.addEventListener('offline', function () {
+    if (typeof toast === 'function') {
+      try { toast('Sem internet — balcão segue; fila guarda salvar/▶/encerrar', 'warning'); } catch (e2) { /* ok */ }
+    }
+    mkOfflineRefreshUi_().catch(function () { /* ignore */ });
   });
   mkOfflineRefreshUi_().catch(function () { /* ignore */ });
   setInterval(function () {
     if (!mkOfflineIsOffline_()) mkOfflineFlush_().catch(function () { /* ignore */ });
-  }, 45000);
+  }, 30000);
 }
 
 window.mkOfflineHandleWriteFail_ = mkOfflineHandleWriteFail_;
@@ -196,3 +305,4 @@ window.mkOfflineFlush_ = mkOfflineFlush_;
 window.mkOfflineWire_ = mkOfflineWire_;
 window.mkOfflineIsOffline_ = mkOfflineIsOffline_;
 window.mkOfflineCanQueue_ = mkOfflineCanQueue_;
+window.mkOfflineGenRequestId_ = mkOfflineGenRequestId_;

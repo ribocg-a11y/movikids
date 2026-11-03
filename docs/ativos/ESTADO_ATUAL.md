@@ -2,7 +2,7 @@
 
 Referência única para alinhamento local × produção.
 
-**Ciclo dev ativo:** **`PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`** — Sprint D · **La Ville inaugurou 06/10/2026** · FE **v1.9.179** (I186 Receita filtros/Ver) · GAS **v1.5.236** · **I181** Ray+Karen · isolamento **I170–I178** ✅ · **I158** Golden ✅  
+**Ciclo dev ativo:** **`PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`** — Sprint D · **La Ville inaugurou 06/10/2026** · FE **v1.9.181** (I187 offline) · GAS **v1.5.237** · **I181** Ray+Karen · isolamento **I170–I178** ✅ · **I158** Golden ✅  
 
 **Marco Ops:** **La Ville Mall — início de operações em 06/10/2026** (2ª unidade ao lado do Golden).  
 **CTO La Ville:** contrato merchandising quiosque **R$ 2.300/mês** · venc. dia 10 · PDF em `entregas/CONTRATO_MERCHANDISING_QUIOSQUE_MOVIKIDS.pdf`.
@@ -57,7 +57,7 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 |--------|--------|-----------------|
 | **Frontend** | **v1.9.179** | https://ribocg-a11y.github.io/movikids/?force=1.9.179 |
 | **Gestão Pessoas** | **v1.9.179** | `gestao-pessoas.html?force=1.9.179` |
-| **Service Worker** | **1.9.179** | I186 Receita filtros/Ver |
+| **Service Worker** | **1.9.181** | I187 offline shell + fila encerrar |
 | **Apps Script** | ping **v1.5.236** · repo **v1.5.236** | I182 escala alinhada |
 | **La Ville ops** | ✅ **06/10/2026** | 2ª unidade em operação (D+0) |
 | **I166–I168 Folha/PDF** | ✅ FE | cache-first · Blob PDF · set R$14.577 |
@@ -82,7 +82,8 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 | **Equipe folha** | ✅ 15/10 | Raykelly+Karen Golden FSS · Jennifer La Ville sem meta · Julia pausa |
 | **Design System** | **v1.1** | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
 | **Ciclo dev** | Sprint D | One UI ✅ · I125–**I168** · La Ville ops · Golden FE ✅ |
-| **Receita dia a dia** | ✅ FE **1.9.179** I186 | `#page-receita-diaria` · pills remount · Ver forceNet · cache por loja |
+| **Receita dia a dia** | ✅ FE **1.9.181** I186 | `#page-receita-diaria` · pills remount · Ver forceNet · cache por loja |
+| **Offline balcão** | ✅ parcial FE **1.9.181** I187 | fila salvar/▶/encerrar/cancelar · short-circuit · SW shell |
 | **I103 / I117** | ✅ | Encerradas=contas · Caixa pay-first |
 | **BANCO_HORAS** | ✅ I129 | ops 1–4 **0h00** |
 | **I129 ponto colab** | ✅ | FE v1.9.75+ · GAS Web **v1.5.211** |

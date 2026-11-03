@@ -1,7 +1,8 @@
 # MOVI KIDS — Mapa de erros, falhas e bugs
 
-**Atualizado:** 03/11/2026 — **I186** Receita filtros/Ver · **I185** cache celular · FE **v1.9.179** · GAS ping/repo **v1.5.236**  
+**Atualizado:** 03/11/2026 — **I187** offline short-circuit + fila encerrar/cancelar · FE **v1.9.181** · GAS ping/repo **v1.5.237**  
 
+**Uso anterior:** 03/11/2026 — **I186** Receita filtros/Ver · **I185** cache celular · FE **v1.9.179–180** · GAS **v1.5.236–237**  
 **Uso anterior:** 28/10/2026 — **I183/I183b/I184** Holding dual + ponto · FE **v1.9.176** · GAS **v1.5.236**  
 **Uso anterior:** 16/10/2026 — **I182** escala Golden dois turnos · FE **v1.9.172** · GAS repo **v1.5.236**  
 **Uso anterior:** 03/10/2026 — **I166–I168** folha/PDF/cache ✅ · FE **v1.9.161** · GAS ping **v1.5.231**  
@@ -141,6 +142,19 @@ Docs: `INCIDENTE_I148_*` · `INCIDENTE_I151_*` · `INCIDENTE_I151b_*` · **`INCI
 **Regra de ouro (I155):** sync operacional = **cauda**, não planilha inteira. `forceFull=1` só diagnóstico.
 
 Docs: `INCIDENTE_I153_*` · `INCIDENTE_I154_*` · `INCIDENTE_I155_*` · `EVIDENCIA_ESTABILIDADE_POS_I155_*`
+
+## Diagnóstico de família — offline / sync I146 → I187 (03/11/2026)
+
+| ID | Sintoma | Causa | Correção | Status |
+|----|---------|-------|----------|--------|
+| **I146** | Boot frio sem nuvem | Só LS frágil | snapshot LS+IDB + chip local/nuvem | ✅ |
+| **I147** | Replay duplicava salvar/▶ | Sem idempotência | `clientRequestId` + GAS Cache 6h | ✅ |
+| **I154** | Salvar perdido em 404 | Fila só timeout genérico | `gas-unstable` + retry | ✅ |
+| **I187** | Offline: timeout 25s; encerrar/cancelar sem fila; sync apagava card temp | Fila só salvar/▶; `rowIndexFromSalvar_` NaN; orphans I151 | short-circuit `api()`; fila encerrar/cancelar; preservar orphans offline; SW shell cache · FE **v1.9.181** | ✅ FE |
+
+**Veredito offline:** balcão **parcial** — Nova + ▶ + Encerrar + Cancelar enfileiram e sobem ao voltar rede. Estender/editar/admin/login ainda exigem rede. SMS/WhatsApp ignorados (`qr_only`).
+
+Docs: `AUDITORIA_REGRESSAO_OFFLINE_I187_2026-11-03.md` · `mk-offline-queue.js` · `mk-api.js`
 
 ## Diagnóstico de família — Folha / holerite / admin lento I166 → I168 (02–03/10/2026)
 

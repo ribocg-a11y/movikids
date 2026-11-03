@@ -88,7 +88,6 @@ function mkApiWarm_() {
 }
 
 async function api(params, timeoutMs = 25000, fetchInit) {
-  const gasUrl = await resolveGasUrl_();
   const action = String((params && params.action) || '');
   const init = Object.assign({ method: 'GET', redirect: 'follow', cache: 'no-store' }, fetchInit || {});
   mkGuardEscritaBrowser_(action, init.method);
@@ -96,6 +95,17 @@ async function api(params, timeoutMs = 25000, fetchInit) {
   if (MK_WRITE_ACTIONS.has(action) && typeof operadorApiParams_ === 'function') {
     Object.assign(basePayload, operadorApiParams_());
   }
+  /* I187: sem rede → enfileira na hora (não espera timeout do fetch). Flush não short-circuita. */
+  if (!window._mkOfflineFlushing
+      && typeof mkOfflineIsOffline_ === 'function' && mkOfflineIsOffline_()
+      && typeof mkOfflineCanQueue_ === 'function' && mkOfflineCanQueue_(action)
+      && typeof mkOfflineHandleWriteFail_ === 'function') {
+    return mkOfflineHandleWriteFail_(
+      Object.assign({ _t: Date.now() }, basePayload),
+      new Error('offline-navigator')
+    );
+  }
+  const gasUrl = await resolveGasUrl_();
   const buildUrl = function () {
     const payload = Object.assign({ _t: Date.now() }, basePayload);
     return gasUrl + '?' + new URLSearchParams(payload).toString();
@@ -110,7 +120,7 @@ async function api(params, timeoutMs = 25000, fetchInit) {
     return await mkApiFetchJson_(buildUrl(), init, timeoutMs);
   } catch (e1) {
     // I154b: 1 retry em HTML/404/5xx (leituras e escritas) antes de fila/erro — GAS oscila
-    if (isUnstableErr_(e1)) {
+    if (isUnstableErr_(e1) && !window._mkOfflineFlushing) {
       await new Promise(function (r) { setTimeout(r, 700); });
       try {
         return await mkApiFetchJson_(buildUrl(), init, timeoutMs);
@@ -118,7 +128,10 @@ async function api(params, timeoutMs = 25000, fetchInit) {
         e1 = e2;
       }
     }
-    if (typeof mkOfflineHandleWriteFail_ === 'function' && typeof mkOfflineCanQueue_ === 'function' && mkOfflineCanQueue_(action)) {
+    if (!window._mkOfflineFlushing
+        && typeof mkOfflineHandleWriteFail_ === 'function'
+        && typeof mkOfflineCanQueue_ === 'function'
+        && mkOfflineCanQueue_(action)) {
       return mkOfflineHandleWriteFail_(Object.assign({ _t: Date.now() }, basePayload), e1);
     }
     throw e1;

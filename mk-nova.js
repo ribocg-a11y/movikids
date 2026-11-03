@@ -525,9 +525,12 @@ function toggleBotoesConfirmarNova_() {
 
 function upsertSessaoPendenteLocal_(payload) {
   const row = Number(payload && payload.rowIndex || 0);
-  const id = Number(payload && payload.id || 0);
+  const idStr = String((payload && payload.id) != null ? payload.id : '');
   const idx = sessions.findIndex(function(s) {
-    return (row && Number(s.rowIndex) === row) || (id && Number(s.id) === id);
+    if (row && Number(s.rowIndex) === row) return true;
+    if (idStr && String(s.id) === idStr) return true;
+    if (payload && payload._clientRequestId && s._clientRequestId === payload._clientRequestId) return true;
+    return false;
   });
   const uidStamp = (payload && payload.unidadeId)
     || ((typeof mkUnidadeId_ === 'function') ? mkUnidadeId_() : '')
@@ -549,8 +552,11 @@ function mkRefreshHomeUI_() {
 
 function rowIndexFromSalvar_(d) {
   const ri = Number(d && d.rowIndex);
-  if (ri >= 11) return ri;
-  return 11 + Number(d && d.id || 0);
+  /* I187: rowIndex negativo = card temp da fila offline — preservar. */
+  if (Number.isFinite(ri) && (ri < 0 || ri >= 11)) return ri;
+  const idNum = Number(d && d.id);
+  if (Number.isFinite(idNum) && idNum >= 0) return 11 + idNum;
+  return -Math.abs(Date.now());
 }
 
 function aplicarPrefillResponsavel_() {

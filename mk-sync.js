@@ -421,8 +421,17 @@ function aplicarDadosInicio(d) {
     stored.forEach(s => storedMap[s.rowIndex] = s);
 
     const serverRows = new Set(d.ativos.map(s => s.rowIndex));
+    const mkSessaoFilaOffline_ = function (s) {
+      if (!s) return false;
+      if (s._offlinePending || s._offlineTimerPending || s._offlineQueued) return true;
+      if (Number(s.rowIndex) < 0) return true;
+      if (s._clientRequestId && (s.status === 'Pendente' || s.status === 'Ativa')) return true;
+      return false;
+    };
     const cleanedStored = stored.filter(function (s) {
       if (serverRows.has(s.rowIndex)) return true;
+      /* I187: não apagar cards ainda só no tablet (fila IDB / temp row). */
+      if (mkSessaoFilaOffline_(s)) return true;
       if (uidResp !== 'all' && typeof mkUnidadeOfSession_ === 'function') {
         return mkUnidadeOfSession_(s) !== uidResp;
       }
@@ -504,6 +513,8 @@ function aplicarDadosInicio(d) {
       if (!s || !s.rowIndex || mergedRows.has(s.rowIndex)) return false;
       if (s._optimistic || s._iniciandoTimer) return true;
       if (window._mkTimerInFlight && s.status === 'Ativa') return true;
+      /* I187: fila offline sobrevive sync/listarAtivas=0 até flush remap. */
+      if (mkSessaoFilaOffline_(s)) return true;
       if (fromListar) return false;
       if (s.status === 'Pendente' || s.status === 'Ativa') {
         const age = Date.now() - Number(s._savedAt || s._criado || 0);

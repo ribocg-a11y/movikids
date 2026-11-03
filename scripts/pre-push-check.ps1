@@ -949,6 +949,17 @@ try {
     } else {
       Add-Check "guard.i154.fe.retry" "ok" "api retry 1x em GAS instavel"
     }
+    # I187 — short-circuit offline + fila encerrar/cancelar + orphans fila
+    if ($apiRawI154 -notmatch 'offline-navigator' -or $apiRawI154 -notmatch '_mkOfflineFlushing') {
+      Add-Check "guard.i187.api.shortcircuit" "fail" "api() sem short-circuit offline (I187)"
+    } else {
+      Add-Check "guard.i187.api.shortcircuit" "ok" "api short-circuit sem rede"
+    }
+    if ($offRawI154 -notmatch 'encerrarLocacao' -or $offRawI154 -notmatch 'cancelarLocacao' -or $offRawI154 -notmatch 'mkOfflineFlushOk_') {
+      Add-Check "guard.i187.fila.encerrar" "fail" "fila offline sem encerrar/cancelar (I187)"
+    } else {
+      Add-Check "guard.i187.fila.encerrar" "ok" "fila salvar/▶/encerrar/cancelar"
+    }
   }
   $syncPathI154 = Join-Path $root "mk-sync.js"
   if (Test-Path $syncPathI154) {
@@ -957,6 +968,20 @@ try {
       Add-Check "guard.i154.listar.timeout" "fail" "listarAtivas timeout <45s (I154b)"
     } else {
       Add-Check "guard.i154.listar.timeout" "ok" "listarAtivas timeout 45s"
+    }
+    if ($syncRawI154 -notmatch 'mkSessaoFilaOffline_' -or $syncRawI154 -notmatch '_offlinePending') {
+      Add-Check "guard.i187.sync.orphans" "fail" "sync apaga orphans da fila offline (I187)"
+    } else {
+      Add-Check "guard.i187.sync.orphans" "ok" "orphans fila offline preservados"
+    }
+  }
+  $novaPathI187 = Join-Path $root "mk-nova.js"
+  if (Test-Path $novaPathI187) {
+    $novaRawI187 = Get-Content -Path $novaPathI187 -Raw -Encoding UTF8
+    if ($novaRawI187 -notmatch 'rowIndexFromSalvar_' -or $novaRawI187 -notmatch 'ri < 0') {
+      Add-Check "guard.i187.nova.rowtemp" "fail" "rowIndexFromSalvar_ sem temp negativo (I187)"
+    } else {
+      Add-Check "guard.i187.nova.rowtemp" "ok" "rowIndex temp offline preservado"
     }
   }
 

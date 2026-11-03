@@ -322,13 +322,18 @@ async function confirmarEncerrar() {
     const admEnc = qrOnly || (typeof mkAdminIgnoraSmsObrigatorio_ === 'function' && mkAdminIgnoraSmsObrigatorio_());
     const payloadEnc = {
       action:    'encerrarLocacao',
+      clientRequestId: (typeof mkOfflineGenRequestId_ === 'function')
+        ? mkOfflineGenRequestId_()
+        : ('mkenc_' + encSession.rowIndex + '_' + Date.now()),
       ...operadorApiParams_(),
       ...(admEnc ? { ignorarSmsObrigatorio: true } : {}),
       ...(fin.somentePlano ? { somentePlano: true } : {}),
       ...(extraVal.extraPagamento ? { extraPagamento: extraVal.extraPagamento } : {}),
       ...(extraVal.cancelarExtras ? { cancelarExtras: true, justificativaExtras: extraVal.justificativaExtras, minExtraCancelados: fin.minExtraCobrados } : {}),
       rowIndex:  encSession.rowIndex,
-      minUsados: minUsadosApi
+      minUsados: minUsadosApi,
+      valorPlano: encSession.valorPlano || 0,
+      mins: encSession.mins || 0
     };
     let d = await api(payloadEnc);
 
