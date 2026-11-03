@@ -1,7 +1,9 @@
 # MOVI KIDS — Mapa de erros, falhas e bugs
 
-**Atualizado:** 16/10/2026 — **I182** escala Golden dois turnos · FE **v1.9.172** · GAS repo **v1.5.236** (Web 1.5.235 até Nova versão)  
+**Atualizado:** 03/11/2026 — **I186** Receita filtros/Ver · **I185** cache celular · FE **v1.9.179** · GAS ping/repo **v1.5.236**  
 
+**Uso anterior:** 28/10/2026 — **I183/I183b/I184** Holding dual + ponto · FE **v1.9.176** · GAS **v1.5.236**  
+**Uso anterior:** 16/10/2026 — **I182** escala Golden dois turnos · FE **v1.9.172** · GAS repo **v1.5.236**  
 **Uso anterior:** 03/10/2026 — **I166–I168** folha/PDF/cache ✅ · FE **v1.9.161** · GAS ping **v1.5.231**  
 **Uso anterior:** 02/10/2026 — **I165** caixa unidade ✅ · **I158** Golden ✅ · FE **v1.9.158**  
 **Uso anterior:** 08/09/2026 — **I156** ritmo Dashboard (chaves "01") · FE **v1.9.115** · GAS repo **v1.5.221**  
@@ -55,6 +57,41 @@
 **Pressão estrutural:** aba LOCAÇÕES ~2400 linhas → `carregarInicio` frio e `listarAtivas` sobem; qualquer `force=1` ou fila RH/admin no mesmo Deploy compete com salvar/▶.
 
 Doc longo: `INCIDENTE_I143_SALVAR_DUP_TIMEOUT_FORCE_2026-08-06.md`
+
+---
+
+## Diagnóstico de família — Receita dia a dia I185 → I186 (03/11/2026)
+
+**Veredito:** I185 fechou o **cache truncado** no celular (mês fechado preso em ~5 dias). I186 fechou o **fluxo da página** (filtros/pills/Ver) que ainda parecia “não faz nada” depois do I185.
+
+| Camada | Falha | Correção |
+|--------|-------|----------|
+| `localStorage` v1 | Array curto / `diasMes=fatDia.length` | Cache **v2** + `rdFatCompleto_` exige calendário cheio (I185) |
+| Botão **Ver** | Mês fechado + cache hit → sem rede | `forceNet:true` só no Ver/retry + toast (I185/I186) |
+| Pills dual | Clique mudava filtro interno sem remount | `rdMountPills_` no clique e na carga (I186) |
+| `forceNet \|\| quiet≠true` | Filtro com `forceNet:false` ainda ia à rede | `forceNet = opts.forceNet === true` apenas (I186) |
+| `rdPickCache_` / `kpiData` | Fallback sem bater `unidadeId` da pill | `rdMatchUid_` + chave por loja (I186) |
+| Heurística “esparso” | `diasCom<10 && soma<5000` rejeitava La Ville legítima | Removida — só rejeita array truncado (I186) |
+| Auth params | `unidadeId` engolido por sessão golden (família I183b) | `Object.assign({}, authP, { unidadeId: uid })` (I186) |
+
+**Não repetir:** espelhar cache do Dashboard na Receita sem carimbar loja · remount de pills só no `init` · misturar `quiet` com `forceNet` via `||`.
+
+Doc: `INCIDENTE_I185_I186_RECEITA_DIARIA_2026-11-03.md`
+
+---
+
+## Diagnóstico de família — Holding dual celular I183 → I183b (28/10/2026)
+
+**Veredito:** I183 hidratava KPIs via `resumoDia`, mas o **spread auth** ainda colapsava `unidadeId:all` → `golden` (mesmo padrão que Caixa I183b). Celular mostrava uma loja OK e a outra R$0.
+
+| Camada | Falha | Correção |
+|--------|-------|----------|
+| Holding local | Só `encHojeData` da loja aberta | `mkHoldingHydrateKpis_` + `resumoDia(all)` (I183) |
+| `Object.assign({all}, authP)` | auth sobrescrevia `all` | all **depois** do auth (I183b) |
+| `operadorApiParams_` | `all`→`golden` default | keep `all` quando Holding pede (I183b) |
+| Cache Caixa | Cache 1-loja herdado no dual | Só aceitar cache com `unidadeId=all` (I183b) |
+
+Doc: `INCIDENTE_I183_I184_HOLDING_PONTO_2026-10-28.md`
 
 ---
 
@@ -207,11 +244,11 @@ Docs: `INCIDENTE_I167_*` · `INCIDENTE_I168_*` · I120/I126/I136/I137
 | **I164d** | **track.html visual legado** | Cronômetro curto ainda céu roxo; link sem `unidade=` | FE **v1.9.151** floresta + `gerarTrackUrl` com unidade | smoke `track.html?s=` | legado SMS — portal oficial = acompanhar |
 | **I165** | **Caixa hoje Golden vaza no balcão La Ville** | La Ville 0 ativas/contas mas chip “Caixa hoje: N locações” com número do Golden | FE **v1.9.152+** `mkSessoesEncHoje_` sem fallback `statsHoje` em lista vazia · sync fatia `nSessoes` por unidade | Abrir balcão LV → chip **0 locações** | ✅ live **1.9.158** · Holding guarda encHoje das 2 lojas — tile/chip só da aberta |
 | **I170** | **Contas hoje / Histórico Golden no balcão La Ville** | GAS LV `encHoje=0` mas tile **4 CONTAS** + histórico Golden; chip Caixa já 0 (I165 parcial) | FE **v1.9.163** fail-closed: balcão só dados da loja · `statsHoje.unidadeId` · snapshot/hist por unidade · `updateStats` refresh tile | LV `?force=1.9.163` → Contas **0** · Hist vazio | `guard.i170.fe.isolamento` |
-| **I183** | **Holding Lojas: Golden zera no celular** | La Ville OK (25/R$670) · Golden 0 apesar da API ter caixa; Holding lia só `encHojeData` local (após Abrir balcão LV fica 1 loja) e não re-hidratava | FE **v1.9.175** `mkHoldingHydrateKpis_` via `resumoDia(all)` + fatia · Lojas/voltar Holding dispara hydrate | `?force=1.9.175` · Lojas Todas → Golden+LV | `guard.i183.fe.holding-hydrate` · PR #47 ficou sem merge até 28/10 |
-| **I183b** | **Holding ainda LV R$0 após I183** | `Object.assign({all}, authP)` + `operadorApiParams_` colapsava `all`→`golden`; cache Caixa 1-loja | FE **v1.9.176** all **depois** do auth · keep `all` · Encerradas nas 2 colunas | `?force=1.9.176` · Lojas Todas → G+LV caixa+lista | `guard.i183b.fe.holding-all` |
+| **I183** | **Holding Lojas: Golden zera no celular** | La Ville OK (25/R$670) · Golden 0 apesar da API ter caixa; Holding lia só `encHojeData` local (após Abrir balcão LV fica 1 loja) e não re-hidratava | FE **v1.9.175** `mkHoldingHydrateKpis_` via `resumoDia(all)` + fatia · Lojas/voltar Holding dispara hydrate | `?force=1.9.175` · Lojas Todas → Golden+LV | `guard.i183.fe.holding-hydrate` · `INCIDENTE_I183_I184_*` |
+| **I183b** | **Holding ainda LV R$0 após I183** | `Object.assign({all}, authP)` + `operadorApiParams_` colapsava `all`→`golden`; cache Caixa 1-loja | FE **v1.9.176** all **depois** do auth · keep `all` · Encerradas nas 2 colunas | `?force=1.9.176` · Lojas Todas → G+LV caixa+lista | `guard.i183b.fe.holding-all` · ✅ live |
 | **I184** | **Ponto: toque duplo fecha turno cedo** | Entrada+saída em segundos (ex. Jennifer 15:01→15:22); hub escondia CTA após “turno encerrado” | FE **v1.9.175** trava 2,5s + confirma saída <45min + CTA “nova entrada” | `gestao-pessoas.html?force=1.9.175` | reparar saida fantasma via `excluirPontoRhAdmin` se preciso |
-| **I185** | **Receita dia a dia no celular: 5 dias / ~2k** | PC OK (~17k/30d out/26); celular cache incompleto + mês fechado sem refetch + `diasMes=fatDia.length` | FE **v1.9.178** cache `v2` + `rdFatCompleto_` + Ver `forceNet` + dias do calendário | `?force=1.9.178` · Outubro · Ver | `guard.i185.fe.receita-diaria` |
-| **I186** | **Receita dia a dia: filtros + Ver inertes** | Pills sem remount; `forceNet\|\|quiet` forçava rede no filtro; cache cruzava loja (`kpiData`); heurística esparsa rejeitava La Ville | FE **v1.9.179** `rdMountPills_` · forceNet só no Ver · cache por `unidadeId` · `unidadeId` pós-auth | `?force=1.9.179` · pills + Ver | `guard.i186.fe.receita-filtros` |
+| **I185** | **Receita dia a dia no celular: 5 dias / ~2k** | PC OK (~17k/30d out/26); celular cache incompleto + mês fechado sem refetch + `diasMes=fatDia.length` | FE **v1.9.178** cache `v2` + `rdFatCompleto_` + Ver `forceNet` + dias do calendário | `?force=1.9.178` · Outubro · Ver | `guard.i185.fe.receita-diaria` · família → **I186** |
+| **I186** | **Receita dia a dia: filtros + Ver inertes** | Pills sem remount; `forceNet\|\|quiet` forçava rede no filtro; cache cruzava loja (`kpiData`); heurística esparsa rejeitava La Ville | FE **v1.9.179** `rdMountPills_` · forceNet só no Ver · cache por `unidadeId` · `unidadeId` pós-auth | `?force=1.9.179` · pills + Ver | `guard.i186.fe.receita-filtros` · `INCIDENTE_I185_I186_*` |
 | **I83** | **Escala/Metas vazias com Folha OK — race quick load FE** | Quick load sobrescrevia painel completo; abas não re-renderizavam | FE **v1.9.15** `gpAdmRenderTab_` · não downgrade painel · cache `v3` | trocar aba Escala/Metas | 3 colaboradores · escala Jul/2026 |
 | **I85** | **Caixa PIX/créd/déb/din abertos + extras pagamento obrigatório** | Encerrar sem dizer pagamento extra; extras cancelados invisíveis | GAS **v1.5.181** col AB `EP:`/`EC:` · FE **v1.9.18** | `resumoDia` extrasPorPagamento | modal encerrar + caixa |
 | **I86** | **Páginas lentas — fila GAS duplicada + sync agressivo** | Dashboard/Caixa/Histórico demoram; spinner longo | FE **v1.9.20** — dedupe dashboard, SWR resumoDia/caixa, hist paralelo, sync defer | `mkSyncDeferHeavy_` | abrir Caixa/Dashboard após admin login |
@@ -527,16 +564,24 @@ Docs: `INCIDENTE_I167_*` · `INCIDENTE_I168_*` · I120/I126/I136/I137
 49. **Sempre** purge local no 409 encerrada/finalizada + **`mkInvalidateInicioCache_`** (**I151**).
 50. **Sempre** rodar **`TESTE_I151_ENCERRAR_FANTASMA_READONLY.ps1`** após mudança em `mk-sync.js` / `mk-drawer.js` / `mk-local-snapshot.js` (**I151**).
 51. **Operação diária:** tablet com **`?force=`** da versão Pages + chip **local·nuvem** visível — se *local* >5 min e servidor 0, usar Limpar cache (**I146/I151**).
+52. **Sempre** `unidadeId: 'all'` **depois** de `apiParamsComAuth_` / `operadorApiParams_` em Holding/Caixa dual — senão colapsa para golden (**I183b**).
+53. **Nunca** cache de Caixa/Receita com `unidadeId≠all` quando a tela pede dual/Todas (**I183b** / **I186**).
+54. **Nunca** `forceNet = x || quiet!==true` — `forceNet` só com `opts.forceNet===true` (Ver); filtro/select usam cache da loja (**I186**).
+55. **Sempre** remontar pills dual após clique de filtro (`mkDualMountPills_` / `rdMountPills_`) (**I186**).
+56. **Nunca** fallback `kpiData`/dash na Receita sem `rdMatchUid_` da pill ativa (**I186**).
+57. **Nunca** rejeitar mês com calendário completo só porque tem poucos dias com receita (La Ville / loja nova) — só array truncado (**I185/I186**).
+58. **Sempre** trava anti toque-duplo no ponto + confirmação de saída precoce (**I184**).
 
 ---
 
-## Versões de referência (02/09/2026)
+## Versões de referência (03/11/2026)
 
 | Camada | Repo / produção | Mínimo operação |
 |--------|-----------------|-----------------|
-| Frontend | **v1.9.111** | `?force=1.9.111` · travas **I151** |
-| GAS | repo **v1.5.215** · ping **v1.5.213** | Nova versão Web ping ⏳ (não bloqueia I151 FE) |
+| Frontend | **v1.9.179** | `?force=1.9.179` · **I186** Receita + **I183b** Holding |
+| GAS | repo/ping **v1.5.236** | Isolamento I170–I178 · I181/I182 |
 | Design System | **`docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md`** | Obrigatório antes de UI |
-| Encerrar fantasma | FE **v1.9.111+** | Sem AppScript para I151b |
+| Receita dia a dia | FE **v1.9.179+** | Sem AppScript para I185/I186 |
+| Holding dual | FE **v1.9.176+** | `resumoDia(all)` pós-auth |
 
 Ver `ESTADO_ATUAL.md` para URLs e editor GAS.

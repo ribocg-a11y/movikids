@@ -12,6 +12,10 @@
 
 **I186:** Receita dia a dia — pills remount + filtro por loja + **Ver** força rede com toast. Abrir `?force=1.9.179` → Outubro → trocar Todas/Golden/La Ville → **Ver**.
 
+**Folha Q2 31/10:** PIX Ray **902,22** · Karen **1.002,22** · Jennifer **632,19** — `MEMORIAL_HOLERITE_Q2_2026-10.md`.  
+**Holding/ponto:** I183b FE **1.9.176+** · I184 anti toque-duplo.  
+**MAPA:** famílias I183→I183b · I185→I186 · regras 52–58.
+
 ---
 
 ## La Ville — início de operações

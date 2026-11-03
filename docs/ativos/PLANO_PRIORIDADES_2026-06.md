@@ -1,6 +1,6 @@
 # MOVI KIDS — Plano de prioridades (análise de sistemas)
 
-**Data-base:** 09/06/2026 · **Revisado:** 15/10/2026 (Sprint D · LV ops · I181 folha · FE v1.9.171 · GAS v1.5.235)  
+**Data-base:** 09/06/2026 · **Revisado:** 03/11/2026 (Sprint D · LV ops · I186 Receita · I183b Holding · FE v1.9.179 · GAS v1.5.236)  
 **Função:** documento único de **o que fazer agora**, por ordem de prioridade.  
 **Local:** `docs/ativos/` · **Índice:** `../INDICE.md`  
 **Handoff:** `HANDOFF_NOVO_CHAT.md` · **Diagnóstico:** `DIAGNOSTICO_SISTEMA_6_CAMADAS_2026-06.md` · **Complementa:** `ESTADO_ATUAL.md`, `PLANO_CONTINUIDADE_2026-06.md`, `REGRAS_DE_PUBLICACAO_SEGURA.md`.

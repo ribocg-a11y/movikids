@@ -1,6 +1,6 @@
 # MOVI KIDS — Mapa de fases (tradução)
 
-**Atualizado:** 02/10/2026 · produção FE **v1.9.161** · GAS **v1.5.231** · ver `DEPLOY_ATUAL.md`
+**Atualizado:** 03/11/2026 · produção FE **v1.9.179** · GAS **v1.5.236** · ver `DEPLOY_ATUAL.md`
 
 Evita confusão entre **três planos** que usam o mesmo número para coisas diferentes.
 

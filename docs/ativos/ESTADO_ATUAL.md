@@ -51,14 +51,14 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 ---
 
-## Produção (16/10/2026)
+## Produção (03/11/2026)
 
 | Camada | Versão | URL / evidência |
 |--------|--------|-----------------|
 | **Frontend** | **v1.9.179** | https://ribocg-a11y.github.io/movikids/?force=1.9.179 |
 | **Gestão Pessoas** | **v1.9.179** | `gestao-pessoas.html?force=1.9.179` |
-| **Service Worker** | **1.9.172** | I182 escala Golden dois turnos |
-| **Apps Script** | ping **v1.5.235** · repo **v1.5.236** | I182 escala — Nova versão Web pendente |
+| **Service Worker** | **1.9.179** | I186 Receita filtros/Ver |
+| **Apps Script** | ping **v1.5.236** · repo **v1.5.236** | I182 escala alinhada |
 | **La Ville ops** | ✅ **06/10/2026** | 2ª unidade em operação (D+0) |
 | **I166–I168 Folha/PDF** | ✅ FE | cache-first · Blob PDF · set R$14.577 |
 | **I159–I178 La Ville** | ✅ FE+GAS | Holding/balcão · isolamento dual validado |
@@ -92,7 +92,7 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 **Teste rápido GAS (ping):**  
 https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec?action=ping  
-→ ping Web **v1.5.235** · I181 · isolamento I170–I178 · I160 · I156 ritmo · I155 lookback
+→ ping Web **v1.5.236** · I186/I185 Receita · I183b Holding · I181 · isolamento I170–I178
 
 **URL morta (não usar):** `AKfycbzc...` → 404
 

@@ -1,6 +1,6 @@
 # MOVI KIDS — Índice de documentação
 
-**Atualizado:** 31/10/2026 (FE **v1.9.177** · GAS **v1.5.236** · memorial Q2 31/10 · I181 · **La Ville ops desde 06/10/2026**)
+**Atualizado:** 03/11/2026 (FE **v1.9.179** · GAS **v1.5.236** · I186 Receita · I185 cache · I183b Holding · memorial Q2 31/10 · **La Ville ops desde 06/10/2026**)
 
 ## Comece aqui
 
@@ -23,7 +23,8 @@
 | [**INCIDENTE_I43_CARREGAR_INICIO_COL_Y_2026-06-23.md**](ativos/INCIDENTE_I43_CARREGAR_INICIO_COL_Y_2026-06-23.md) | **I43** — cronômetro revertia após ▶ |
 | [**INCIDENTE_I53_CONFIG_PLANILHA_REPAIR_2026-06-24.md**](arquivo/incidentes/INCIDENTE_I53_CONFIG_PLANILHA_REPAIR_2026-06-24.md) | **I53** — CONFIG memorial, schema, repair |
 | [**INCIDENTE_I96_I99_MULTI_VEICULO_2026-07-10.md**](arquivo/incidentes/INCIDENTE_I96_I99_MULTI_VEICULO_2026-07-10.md) | **I96–I103** — multi-veículo · overlay · contagem encerradas/caixa |
-| [**INCIDENTE_I183_I184_HOLDING_PONTO_2026-10-28.md**](ativos/INCIDENTE_I183_I184_HOLDING_PONTO_2026-10-28.md) | **I183/I184** — Holding dual celular · ponto toque-duplo · FE 1.9.175 |
+| [**INCIDENTE_I185_I186_RECEITA_DIARIA_2026-11-03.md**](ativos/INCIDENTE_I185_I186_RECEITA_DIARIA_2026-11-03.md) | **I185/I186** — Receita cache celular + filtros/Ver · FE 1.9.179 |
+| [**INCIDENTE_I183_I184_HOLDING_PONTO_2026-10-28.md**](ativos/INCIDENTE_I183_I184_HOLDING_PONTO_2026-10-28.md) | **I183/I184** — Holding dual celular · ponto toque-duplo · FE 1.9.175–176 |
 | [**INCIDENTE_I181_META_PAR_KAREN_JENNIFER_2026-10-15.md**](ativos/INCIDENTE_I181_META_PAR_KAREN_JENNIFER_2026-10-15.md) | **I181** — par meta Ray+Karen · Jennifer sem pote · Q1 15/10 |
 | [**MEMORIAL_HOLERITE_Q1_2026-10.md**](ativos/MEMORIAL_HOLERITE_Q1_2026-10.md) | **Folha 15/10** — PIX 748,40 / 748,40 / 543,82 |
 | [**MEMORIAL_HOLERITE_Q2_2026-10.md**](ativos/MEMORIAL_HOLERITE_Q2_2026-10.md) | **Folha 31/10** — PIX 902,22 / 1.002,22 / 632,19 |

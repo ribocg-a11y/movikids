@@ -1,6 +1,6 @@
 # MOVI KIDS — Planejamento atual (pós-FASE 5)
 
-**Atualizado:** 15/10/2026 · FE **v1.9.171** · GAS **v1.5.235** · **I158–I181** · La Ville ops 06/10  
+**Atualizado:** 03/11/2026 · FE **v1.9.179** · GAS **v1.5.236** · **I158–I186** · La Ville ops 06/10  
 **Diagnóstico:** [`DIAGNOSTICO_SISTEMA_6_CAMADAS_2026-06.md`](DIAGNOSTICO_SISTEMA_6_CAMADAS_2026-06.md)  
 **Sprint UI:** [`PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`](PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md) ← **ciclo ativo**  
 **One UI (fechado):** [`PLANEJAMENTO_ONE_UI_2026-06.md`](PLANEJAMENTO_ONE_UI_2026-06.md)  
@@ -13,15 +13,15 @@
 
 ## 1. Resumo executivo
 
-**Modo atual (15/10):** One UI **A–C ✅**. **I158** Golden ✅. **I166–I168** folha/PDF ✅. Multi-loja **I159–I178 ✅**. **I181** folha Ray+Karen ✅. **Ciclo ativo = Sprint D** — LV em operação · Q1 out/26 paga · FASE 17.
+**Modo atual (03/11):** One UI **A–C ✅**. **I158** Golden ✅. **I166–I168** folha/PDF ✅. Multi-loja **I159–I178 ✅**. **I181–I186** folha/Holding/Receita ✅. **Ciclo ativo = Sprint D** — LV em operação · Q1+Q2 out/26 · FASE 17.
 
 | Área | Status |
 |------|--------|
 | Planilha + GAS + homolog balcão base | ✅ |
-| Confiabilidade sync (I153–I155) | ✅ ping **v1.5.231** |
+| Confiabilidade sync (I153–I155) | ✅ ping **v1.5.236** |
 | **I158 Relatório Golden** | ✅ fechamento set **14577** / CTO **1500** · PDF 01/10 |
-| **La Ville multi-loja** | ✅ código · ⏳ QR/tablet/equipe/CTO |
-| **Receita dia a dia** | ✅ FE consulta (pills loja) |
+| **La Ville multi-loja** | ✅ ops 06/10 · Holding dual I183b |
+| **Receita dia a dia** | ✅ FE **1.9.179** I186 (pills + Ver + cache por loja) |
 | FASE 16 Centro Comando | ✅ **~98%** |
 | FASE 17 Alertas + Gestor | 🟡 **~95%** — assinar · F9 |
 | FASE 18 Financeiro UI | ✅ Sprint B · I150 cenários DRE |
