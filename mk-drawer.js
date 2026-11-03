@@ -60,6 +60,8 @@ function abrirSessaoDrawer(rowIndex, tab) {
       toast('Envie o aviso de minutos extras antes de encerrar.', 'error');
       return;
     }
+    /* I188: pré-seleciona mesmo pagamento do plano nos extras — libera Confirmar. */
+    if (typeof mkEncExtraAutofillSamePag_ === 'function') mkEncExtraAutofillSamePag_(s);
   }
   sessDrawerRow = rowIndex;
   menuLocacaoAbertoKey = null;

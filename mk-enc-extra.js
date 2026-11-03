@@ -352,6 +352,52 @@ function mkEncExtraOnJustInput_(scope) {
   mkEncExtraRefreshAll_(session, { light: true, skipCards: true, skipRestore: true });
 }
 
+/** I188: escolher pagamento do extra direto no card (sem abrir drawer primeiro). */
+function mkEncExtraPickPagForRow_(pag, rowIndex) {
+  if (typeof event !== 'undefined' && event) {
+    try { event.preventDefault(); event.stopPropagation(); } catch (e0) { /* ok */ }
+  }
+  const ri = Number(rowIndex);
+  const session = (typeof sessions !== 'undefined' && Array.isArray(sessions))
+    ? sessions.find(function (x) { return Number(x.rowIndex) === ri; })
+    : null;
+  if (!session) return;
+  session._extraPagamento = String(pag || '').trim();
+  session._cancelarExtras = false;
+  session._justificativaExtras = '';
+  mkExtraPagPersist_(session);
+  if (typeof renderCards === 'function') renderCards();
+  if (typeof toast === 'function') {
+    toast('Extra: ' + session._extraPagamento + ' — agora toque Encerrar', 'success');
+  }
+}
+
+function mkEncExtraPickSamePagForRow_(rowIndex) {
+  const ri = Number(rowIndex);
+  const session = (typeof sessions !== 'undefined' && Array.isArray(sessions))
+    ? sessions.find(function (x) { return Number(x.rowIndex) === ri; })
+    : null;
+  if (!session) return;
+  const pag = mkEncExtraSamePagLabel_(session);
+  if (!pag) return;
+  mkEncExtraPickPagForRow_(pag, ri);
+}
+
+/** I188: se já tem pagamento do plano e extra pendente, pré-seleciona o mesmo. */
+function mkEncExtraAutofillSamePag_(session) {
+  if (!session) return false;
+  mkExtraPagRestore_(session);
+  const fin = mkEncExtraFinForSession_(session, false);
+  if (!mkEncExtraNeedsInput_(fin)) return false;
+  if (mkEncExtraValidateState_(session, fin).ok) return true;
+  const same = mkEncExtraSamePagLabel_(session);
+  if (!same) return false;
+  session._extraPagamento = same;
+  session._cancelarExtras = false;
+  mkExtraPagPersist_(session);
+  return true;
+}
+
 function mkEncExtraCardBannerHtml_(s) {
   if (!s || !s.started) return '';
   const rem = typeof calcRemaining === 'function' ? calcRemaining(s) : 0;
@@ -363,8 +409,20 @@ function mkEncExtraCardBannerHtml_(s) {
     const label = s._cancelarExtras ? 'Extra não cobrado ✓' : ('Extra: ' + s._extraPagamento + ' ✓');
     return '<div class="sc-extra-pay-ok">' + label + ' · toque Encerrar</div>';
   }
+  const ri = Number(s.rowIndex);
+  const same = mkEncExtraSamePagLabel_(s);
+  const pags = ['PIX', 'Crédito', 'Débito', 'Dinheiro'];
+  const btns = pags.map(function (p) {
+    return '<button type="button" class="sc-extra-pag-btn" onclick="mkEncExtraPickPagForRow_(\'' +
+      p + '\',' + ri + ')">' + p + '</button>';
+  }).join('');
+  const sameBtn = same
+    ? '<button type="button" class="sc-extra-pag-btn sc-extra-pag-same" onclick="mkEncExtraPickSamePagForRow_(' +
+      ri + ')">↩ Mesmo (' + same + ')</button>'
+    : '';
   return '<div class="sc-extra-pay-warn">⏱ ' + fin.minExtraCobrados +
-    ' min extra · toque como pagou antes de encerrar</div>';
+    ' min extra · escolha como pagou:</div>' +
+    '<div class="sc-extra-pag-grid" onclick="event.stopPropagation()">' + sameBtn + btns + '</div>';
 }
 
 function mkEncExtraInitForSession_(session, scope) {
@@ -377,6 +435,9 @@ function mkEncExtraInitForSession_(session, scope) {
 }
 
 window.mkEncExtraPickPag_ = mkEncExtraPickPag_;
+window.mkEncExtraPickPagForRow_ = mkEncExtraPickPagForRow_;
+window.mkEncExtraPickSamePagForRow_ = mkEncExtraPickSamePagForRow_;
+window.mkEncExtraAutofillSamePag_ = mkEncExtraAutofillSamePag_;
 window.mkEncExtraPickSamePag_ = mkEncExtraPickSamePag_;
 window.mkEncExtraToggleCancel_ = mkEncExtraToggleCancel_;
 window.mkEncExtraOnJustInput_ = mkEncExtraOnJustInput_;
