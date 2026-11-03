@@ -244,8 +244,55 @@ function renderEncerrarModal_(session, fin) {
   }
 }
 
+/**
+ * I189 — Encerrar no card = desligar.
+ * Se pagamento do extra já está resolvido (ou dá para herdar o do plano),
+ * chama confirmarEncerrar na hora. Só abre drawer se ainda faltar resposta.
+ */
 function pedirEncerrar(rowIndex) {
+  const s = (typeof sessions !== 'undefined' && Array.isArray(sessions))
+    ? sessions.find(function (x) { return Number(x.rowIndex) === Number(rowIndex); })
+    : null;
+  if (!s || !s.started) {
+    abrirSessaoDrawer(rowIndex, 'encerrar');
+    return;
+  }
+
+  const rem = typeof calcRemaining === 'function' ? calcRemaining(s) : 0;
+  const qrOnly = typeof mkComunicacaoQrOnly_ === 'function' && mkComunicacaoQrOnly_();
+  const admIgnoraSms = qrOnly || (typeof mkAdminIgnoraSmsObrigatorio_ === 'function' && mkAdminIgnoraSmsObrigatorio_());
+  if (rem <= 0 && typeof extraWaFoiEnviado_ === 'function' && !extraWaFoiEnviado_(s) && !admIgnoraSms) {
+    if (typeof alertSession !== 'undefined') alertSession = s;
+    if (typeof showAlertModal === 'function') showAlertModal(s, true);
+    if (typeof toast === 'function') toast('Envie o aviso de minutos extras antes de encerrar.', 'error');
+    return;
+  }
+
+  if (typeof mkEncExtraAutofillSamePag_ === 'function') mkEncExtraAutofillSamePag_(s);
+  if (typeof mkExtraPagRestore_ === 'function') mkExtraPagRestore_(s);
+
+  const fin = typeof resolverMinUsadosEncerrar_ === 'function'
+    ? resolverMinUsadosEncerrar_(s, false)
+    : { minUsados: s.mins, somentePlano: false, minExtraCobrados: 0 };
+  const ready = (typeof mkEncExtraValidateState_ === 'function')
+    ? mkEncExtraValidateState_(s, fin).ok
+    : true;
+
+  if (ready) {
+    encSession = s;
+    encSession._minUsados = fin.minUsados;
+    encSession._somentePlanoEnc = !!fin.somentePlano;
+    if (typeof toast === 'function' && fin.minExtraCobrados > 0 && s._extraPagamento) {
+      try { toast('Encerrando · extra via ' + s._extraPagamento, 'info'); } catch (eT) { /* ok */ }
+    }
+    confirmarEncerrar();
+    return;
+  }
+
   abrirSessaoDrawer(rowIndex, 'encerrar');
+  if (typeof toast === 'function') {
+    toast('Falta informar como pagaram os minutos extras.', 'warning');
+  }
 }
 
 function fecharEncModal() {
@@ -282,7 +329,7 @@ async function confirmarEncerrar() {
   if (window._mkEncerrarInFlight) return;
   window._mkEncerrarInFlight = true;
   const btn = document.getElementById('btn-enc-confirm');
-  btn.textContent = '⏳ Encerrando...'; btn.disabled = true;
+  if (btn) { btn.textContent = '⏳ Encerrando...'; btn.disabled = true; }
 
   try {
     const admChk = document.getElementById('enc-adm-extra-local');
@@ -299,6 +346,10 @@ async function confirmarEncerrar() {
       if (box) box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       const just = document.getElementById('enc-extra-just');
       if (just && extraVal.field === 'just') just.focus();
+      /* Sem drawer aberto: abre para completar resposta (I189). */
+      if (!document.getElementById('sess-drawer')?.classList.contains('show')) {
+        abrirSessaoDrawer(encSession.rowIndex, 'encerrar');
+      }
       return;
     }
 
@@ -487,7 +538,7 @@ async function confirmarEncerrar() {
     window._mkEncerrarInFlight = false;
     if (encSession && typeof mkEncExtraRefreshAll_ === 'function') {
       mkEncExtraRefreshAll_(encSession);
-    } else {
+    } else if (btn) {
       btn.textContent = '✓ Confirmar encerramento';
       btn.disabled = false;
     }

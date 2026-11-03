@@ -985,6 +985,38 @@ try {
     }
   }
 
+  # I188/I189 — encerrar EXTRA: pagamento no card + 1 toque se pronto
+  $encExtraPath = Join-Path $root "mk-enc-extra.js"
+  $drawerPathI189 = Join-Path $root "mk-drawer.js"
+  $homePathI189 = Join-Path $root "mk-home.js"
+  if (Test-Path $encExtraPath) {
+    $encExtraRaw = Get-Content -Path $encExtraPath -Raw -Encoding UTF8
+    if ($encExtraRaw -notmatch 'mkEncExtraPickPagForRow_' -or $encExtraRaw -notmatch 'sc-extra-pag-grid') {
+      Add-Check "guard.i188.card.pag" "fail" "card EXTRA sem botoes de pagamento (I188)"
+    } else {
+      Add-Check "guard.i188.card.pag" "ok" "pagamento extra no card"
+    }
+    if ($encExtraRaw -notmatch 'mkEncExtraAutofillSamePag_') {
+      Add-Check "guard.i188.autofill" "fail" "autofill mesmo pagamento do plano ausente (I188)"
+    } else {
+      Add-Check "guard.i188.autofill" "ok" "autofill pagamento plano→extra"
+    }
+  }
+  if ((Test-Path $drawerPathI189) -and (Test-Path $homePathI189)) {
+    $drawerI189 = Get-Content -Path $drawerPathI189 -Raw -Encoding UTF8
+    $homeI189 = Get-Content -Path $homePathI189 -Raw -Encoding UTF8
+    if ($drawerI189 -notmatch 'function pedirEncerrar' -or $drawerI189 -notmatch 'confirmarEncerrar\(\)') {
+      Add-Check "guard.i189.pedir.direto" "fail" "pedirEncerrar nao desliga direto quando pronto (I189)"
+    } else {
+      Add-Check "guard.i189.pedir.direto" "ok" "Encerrar 1 toque se validacao OK"
+    }
+    if ($homeI189 -notmatch 'pedirEncerrar\(') {
+      Add-Check "guard.i189.home.btn" "fail" "card Encerrar nao chama pedirEncerrar (I189)"
+    } else {
+      Add-Check "guard.i189.home.btn" "ok" "card Encerrar → pedirEncerrar"
+    }
+  }
+
   # I155 — lookback listarAtivas/carregarInicio (anti full-sheet 404)
   if ($gasRaw -notmatch 'function locSheetTail_') {
     Add-Check "guard.i155.locSheetTail" "fail" "locSheetTail_ ausente (I155)"

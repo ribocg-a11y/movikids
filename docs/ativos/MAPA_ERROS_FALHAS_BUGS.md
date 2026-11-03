@@ -1,7 +1,8 @@
 # MOVI KIDS — Mapa de erros, falhas e bugs
 
-**Atualizado:** 03/11/2026 — **I187** offline short-circuit + fila encerrar/cancelar · FE **v1.9.181** · GAS ping/repo **v1.5.237**  
+**Atualizado:** 03/11/2026 — **I189** Encerrar 1 toque se extra OK · **I188** pag. no card · FE **v1.9.184** · GAS **v1.5.237**  
 
+**Uso anterior:** 03/11/2026 — **I187** offline short-circuit + fila · FE **v1.9.181–182** · GAS **v1.5.237**  
 **Uso anterior:** 03/11/2026 — **I186** Receita filtros/Ver · **I185** cache celular · FE **v1.9.179–180** · GAS **v1.5.236–237**  
 **Uso anterior:** 28/10/2026 — **I183/I183b/I184** Holding dual + ponto · FE **v1.9.176** · GAS **v1.5.236**  
 **Uso anterior:** 16/10/2026 — **I182** escala Golden dois turnos · FE **v1.9.172** · GAS repo **v1.5.236**  
@@ -155,6 +156,18 @@ Docs: `INCIDENTE_I153_*` · `INCIDENTE_I154_*` · `INCIDENTE_I155_*` · `EVIDENC
 **Veredito offline:** balcão **parcial** — Nova + ▶ + Encerrar + Cancelar enfileiram e sobem ao voltar rede. Estender/editar/admin/login ainda exigem rede. SMS/WhatsApp ignorados (`qr_only`).
 
 Docs: `AUDITORIA_REGRESSAO_OFFLINE_I187_2026-11-03.md` · `mk-offline-queue.js` · `mk-api.js`
+
+## Diagnóstico de família — encerrar / minutos extras I85 → I189 (03/11/2026)
+
+| ID | Sintoma | Causa | Correção | Status |
+|----|---------|-------|----------|--------|
+| **I85** | Caixa sem forma do extra | Encerrar sem perguntar pagamento extra | Drawer/alert com PIX… + justificativa | ✅ |
+| **I188** | EXTRA “não encerra” no balcão | Aviso no card **sem** botões; pagamento só no drawer | Pagamento no card + autofill plano · FE **v1.9.183** | ✅ |
+| **I189** | Encerrar = 2 passos mesmo com resposta pronta | Card só abria drawer | `pedirEncerrar` → `confirmarEncerrar` se validação OK · FE **v1.9.184** | ✅ |
+
+**Regra de ouro:** Encerrar no card **desliga** se pagamento/justificativa já resolvidos (ou herdáveis do plano). Nunca bloquear só com texto sem controle na mesma superfície.
+
+Docs: `INCIDENTE_I188_I189_ENCERRAR_EXTRA_TRAVADO_2026-11-03.md` · guards `guard.i188.*` / `guard.i189.*`
 
 ## Diagnóstico de família — Folha / holerite / admin lento I166 → I168 (02–03/10/2026)
 

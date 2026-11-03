@@ -218,7 +218,7 @@ function buildCard(s) {
                Enviar SMS
              </button>`
       )}
-      <button class="btn btn-encerrar ${isOver?'danger':''}" onclick="abrirSessaoDrawer(${s.rowIndex},'encerrar')">
+      <button class="btn btn-encerrar ${isOver?'danger':''}" onclick="pedirEncerrar(${s.rowIndex})">
         ✓ Encerrar
       </button>
     </div>
@@ -437,7 +437,7 @@ function buildPainelCard(nome, tipo, s) {
     <div class="pcard-crianca">${escHtml(s.crianca)}</div>
     <div class="pcard-resp">👤 ${escHtml(s.responsavel)}</div>
     <div class="pcard-btns">
-      <button class="pcard-btn enc" onclick="abrirSessaoDrawer(${s.rowIndex},'encerrar')">✓ Enc.</button>
+      <button class="pcard-btn enc" onclick="pedirEncerrar(${s.rowIndex})">✓ Enc.</button>
       <button class="pcard-btn est" onclick="abrirSessaoDrawer(${s.rowIndex},'estender')">⏱ +Tempo</button>
     </div>
   </div>`;

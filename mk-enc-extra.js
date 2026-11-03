@@ -368,7 +368,7 @@ function mkEncExtraPickPagForRow_(pag, rowIndex) {
   mkExtraPagPersist_(session);
   if (typeof renderCards === 'function') renderCards();
   if (typeof toast === 'function') {
-    toast('Extra: ' + session._extraPagamento + ' — agora toque Encerrar', 'success');
+    toast('Extra: ' + session._extraPagamento + ' — Encerrar já desliga', 'success');
   }
 }
 
