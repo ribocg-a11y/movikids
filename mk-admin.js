@@ -4477,14 +4477,43 @@ function rdFatUid_() {
   return 'all';
 }
 
+/** v2 — invalida cache celular incompleto (I185: mês fechado com 5 dias / ~2k). */
 function rdFatCacheKey_(mes, ano) {
-  return 'mk_rd_fat_v1_' + mes + '_' + ano + '_u' + rdFatUid_();
+  return 'mk_rd_fat_v2_' + mes + '_' + ano + '_u' + rdFatUid_();
 }
 
 function rdMesFechado_(mes, ano) {
   const h = new Date();
   return Number(ano) < h.getFullYear()
     || (Number(ano) === h.getFullYear() && Number(mes) < (h.getMonth() + 1));
+}
+
+function rdDiasNoMes_(mes, ano) {
+  return new Date(Number(ano), Number(mes), 0).getDate();
+}
+
+/** Cache só vale se fatPorDia cobre o mês inteiro (GAS sempre manda 28–31). */
+function rdFatCompleto_(d, mes, ano) {
+  if (!d || !d.ok) return false;
+  const fp = d.fatPorDia || [];
+  const precisa = rdDiasNoMes_(mes, ano);
+  if (fp.length < precisa) return false;
+  let maxDia = 0;
+  let soma = 0;
+  let diasCom = 0;
+  for (let i = 0; i < fp.length; i++) {
+    const dia = Number(fp[i] && fp[i].dia) || 0;
+    const v = Number(fp[i] && fp[i].valor) || 0;
+    if (dia > maxDia) maxDia = dia;
+    soma += v;
+    if (v > 0) diasCom++;
+  }
+  if (maxDia < precisa) return false;
+  /* Recusa lixo típico do celular: só 1ª semana / total irrisório no mês fechado. */
+  if (rdMesFechado_(mes, ano) && precisa >= 28 && diasCom > 0 && diasCom < 10 && soma < 5000) {
+    return false;
+  }
+  return true;
 }
 
 function rdFatSlim_(d) {
@@ -4496,13 +4525,14 @@ function rdFatSlim_(d) {
     fatPorDia: d.fatPorDia || [],
     locPorDia: d.locPorDia || [],
     mesAtual: d.mesAtual,
-    anoAtual: d.anoAtual
+    anoAtual: d.anoAtual,
+    unidadeId: d.unidadeId
   };
 }
 
 function rdFatCacheSet_(mes, ano, data) {
   const slim = rdFatSlim_(data);
-  if (!slim || !slim.fatPorDia || !slim.fatPorDia.length) return;
+  if (!slim || !rdFatCompleto_(slim, mes, ano)) return;
   try {
     localStorage.setItem(rdFatCacheKey_(mes, ano), JSON.stringify({ ts: Date.now(), data: slim }));
   } catch (e) { /* quota */ }
@@ -4513,7 +4543,7 @@ function rdFatCacheGet_(mes, ano) {
     const raw = localStorage.getItem(rdFatCacheKey_(mes, ano));
     if (!raw) return null;
     const o = JSON.parse(raw);
-    if (!o || !o.ts || !o.data || !o.data.ok || !o.data.fatPorDia || !o.data.fatPorDia.length) return null;
+    if (!o || !o.ts || !o.data || !rdFatCompleto_(o.data, mes, ano)) return null;
     const ttl = rdMesFechado_(mes, ano) ? RD_FAT_TTL_FECHADO_MS : RD_FAT_TTL_CORRENTE_MS;
     if (Date.now() - o.ts > ttl) return null;
     return o.data;
@@ -4525,11 +4555,11 @@ function rdPickCache_(mes, ano) {
   if (durable) return durable;
   if (typeof kpiDashCacheGet_ === 'function') {
     const c = kpiDashCacheGet_(mes, ano);
-    if (c && c.ok && c.fatPorDia && c.fatPorDia.length) return c;
+    if (c && rdFatCompleto_(c, mes, ano)) return c;
   }
   if (typeof kpiData !== 'undefined' && kpiData && kpiData.ok
     && Number(kpiData.mesAtual) === Number(mes) && Number(kpiData.anoAtual) === Number(ano)
-    && kpiData.fatPorDia && kpiData.fatPorDia.length) {
+    && rdFatCompleto_(kpiData, mes, ano)) {
     return kpiData;
   }
   return null;
@@ -4604,7 +4634,7 @@ function mkReceitaDiariaErrHtml_(titulo, detalhe) {
   const safe = typeof escHtml === 'function' ? escHtml(detalhe || '') : String(detalhe || '');
   return '<div class="empty"><div class="empty-icon">⚠️</div><h3>' + titulo + '</h3>'
     + '<p style="color:var(--txt3);font-size:13px;margin:8px 12px 0;line-height:1.4">' + safe + '</p>'
-    + '<p style="margin-top:14px"><button type="button" class="btn btn-primary" style="font-size:13px;padding:10px 16px" onclick="carregarReceitaDiaria()">Tentar de novo</button></p></div>';
+    + '<p style="margin-top:14px"><button type="button" class="btn btn-primary" style="font-size:13px;padding:10px 16px" onclick="carregarReceitaDiaria({forceNet:true})">Tentar de novo</button></p></div>';
 }
 
 function rdStopTick_() {
@@ -4640,13 +4670,16 @@ async function carregarReceitaDiaria(opts) {
   const ano = parseInt(anoEl.value, 10) || new Date().getFullYear();
   const seq = ++_rdReqSeq;
   const fechado = rdMesFechado_(mes, ano);
+  /* I185: toque em Ver / Tentar de novo sempre busca rede — cache incompleto no celular
+   * travava mês fechado em 5 dias / ~2 mil. quiet=true (change do select) pode usar cache. */
+  const forceNet = opts.forceNet === true || opts.quiet !== true;
 
-  const cached = rdPickCache_(mes, ano);
+  const cached = !forceNet ? rdPickCache_(mes, ano) : null;
   if (cached) {
     renderReceitaDiaria_(mes, ano, cached);
     rdFatCacheSet_(mes, ano, cached);
-    /* Mês fechado com cache: não espera o GAS de novo */
-    if (fechado && !opts.forceNet) {
+    /* Mês fechado + cache completo + quiet: não espera o GAS de novo */
+    if (fechado && !forceNet) {
       if (btn) { btn.disabled = false; btn.textContent = 'Ver'; }
       rdStopTick_();
       return;
@@ -4665,12 +4698,24 @@ async function carregarReceitaDiaria(opts) {
     const authP = Object.assign({}, typeof apiParamsComAuth_ === 'function' ? apiParamsComAuth_() : {}, {
       unidadeId: (typeof mkDualFiltro_ === 'function' ? mkDualFiltro_() : 'all')
     });
-    const d = await api(Object.assign({ action: 'kpiMes', mes: mes, ano: ano, lite: '1' }, authP), 120000);
+    const req = Object.assign({ action: 'kpiMes', mes: mes, ano: ano, lite: '1' }, authP);
+    if (forceNet) req.force = '1';
+    const d = await api(req, 120000);
     if (seq !== _rdReqSeq) return;
     rdStopTick_();
     if (!d || !d.ok) {
       if (!cached) {
         lista.innerHTML = mkReceitaDiariaErrHtml_('Não foi possível carregar', (d && d.erro) || 'Sem permissão ou falha no servidor');
+        lista.dataset.hasData = '';
+      }
+      return;
+    }
+    if (!rdFatCompleto_(d, mes, ano)) {
+      if (!cached) {
+        lista.innerHTML = mkReceitaDiariaErrHtml_(
+          'Resposta incompleta',
+          'O servidor devolveu poucos dias do mês. Toque em Tentar de novo.'
+        );
         lista.dataset.hasData = '';
       }
       return;
@@ -4712,17 +4757,26 @@ function renderReceitaDiaria_(mes, ano, d) {
   const fatDia = d.fatPorDia || [];
   const locDia = d.locPorDia || [];
   const nMap = {};
-  locDia.forEach(function (x) { nMap[x.dia] = Number(x.n) || 0; });
+  locDia.forEach(function (x) { nMap[Number(x.dia)] = Number(x.n) || 0; });
   const fatMap = {};
-  fatDia.forEach(function (x) { fatMap[x.dia] = Number(x.valor) || 0; });
-  const diasMes = fatDia.length || new Date(ano, mes, 0).getDate();
+  fatDia.forEach(function (x) { fatMap[Number(x.dia)] = Number(x.valor) || 0; });
+  /* I185: sempre dias do calendário — nunca fatDia.length (cache curto cortava o mês). */
+  const diasMes = rdDiasNoMes_(mes, ano);
   const hoje = new Date();
   const isCorrente = mes === (hoje.getMonth() + 1) && ano === hoje.getFullYear();
   const nomeMes = (MESES_DB && MESES_DB[mes - 1]) || String(mes);
   const loja = mkReceitaDiariaUnidadeLabel_();
-  const fatMes = Math.round((Number(d.fatMes) || 0) * 100) / 100;
+  let fatMes = Math.round((Number(d.fatMes) || 0) * 100) / 100;
+  if (!(fatMes > 0)) {
+    fatMes = Math.round(Object.keys(fatMap).reduce(function (s, k) {
+      return s + (Number(fatMap[k]) || 0);
+    }, 0) * 100) / 100;
+  }
   const nMes = Number(d.nMes) || 0;
-  const diasCom = fatDia.filter(function (x) { return (Number(x.valor) || 0) > 0; }).length;
+  let diasCom = 0;
+  for (let dia = 1; dia <= diasMes; dia++) {
+    if ((fatMap[dia] || 0) > 0) diasCom++;
+  }
   if (resumo) resumo.hidden = false;
   if (lbl) lbl.textContent = nomeMes + ' / ' + ano + ' · ' + loja;
   if (val) val.textContent = typeof mkRelFmtBr_ === 'function' ? mkRelFmtBr_(fatMes) : ('R$ ' + fatMes.toFixed(2).replace('.', ','));
