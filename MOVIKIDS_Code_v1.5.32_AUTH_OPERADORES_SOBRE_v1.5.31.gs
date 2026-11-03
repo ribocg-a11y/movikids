@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.236
+// MOVI KIDS — Google Apps Script v1.5.237
+// v1.5.237: frota Golden — Triciclo 03 em VEICULOS_VALIDOS (CONFIG planilha já live)
 // v1.5.236: I182 — escala Golden: Raykelly 10h–16h / Karen 16h–22h seg–sáb · folga domingo
 // v1.5.235: I181 — par meta FSS Raykelly+Karen (3↔5); Julia pausa; Jennifer La Ville sem meta
 // v1.5.234: I173–I178 — comando/conta-mestre/leading/custosHist/kpiMes COL_LOC_READ (isolamento)
@@ -228,7 +229,7 @@
 
 // ── CONSTANTES ───────────────────────────────────────────────
 /** Versão exposta em ping, carregarInicio, validarSchema, gestaoPessoasStatus (bump com header). */
-const MK_GAS_VERSAO_  = 'v1.5.236';
+const MK_GAS_VERSAO_  = 'v1.5.237';
 const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.231';
 const SHEET_ID   = '1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618';
 const DEPLOY_ID  = 'AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y';
@@ -337,10 +338,10 @@ const CONTRAT_MARGEM_BASE_MIN_ = 10;
 /** I150 — manutenção mensal fixa no piso DRE (independe de lançamentos na aba CUSTOS). */
 const DRE_MANUTENCAO_MENSAL_ = 1200;
 
-// ── VEÍCULOS VÁLIDOS — v1.5.111: Carro 04 · v1.5.21: Triciclo 02 ───────
+// ── VEÍCULOS VÁLIDOS — v1.5.111: Carro 04 · v1.5.21: Triciclo 02 · 03/11: Triciclo 03 ─
 const VEICULOS_VALIDOS = [
   'Carro 01','Carro 02','Carro 03','Carro 04',
-  'Triciclo 01','Triciclo 02',
+  'Triciclo 01','Triciclo 02','Triciclo 03',
   'Pelúcia 01','Pelúcia 02','Pelúcia 03','Pelúcia 04'
 ];
 

@@ -758,6 +758,7 @@ function rebuildVeiculoGridsFromDef_() {
       { nome: 'Carro 01', tipo: 'Carro' }, { nome: 'Carro 02', tipo: 'Carro' },
       { nome: 'Carro 03', tipo: 'Carro' }, { nome: 'Carro 04', tipo: 'Carro' },
       { nome: 'Triciclo 01', tipo: 'Triciclo' }, { nome: 'Triciclo 02', tipo: 'Triciclo' },
+      { nome: 'Triciclo 03', tipo: 'Triciclo' },
       { nome: 'Pelúcia 01', tipo: 'Pelúcia' }, { nome: 'Pelúcia 02', tipo: 'Pelúcia' },
       { nome: 'Pelúcia 03', tipo: 'Pelúcia' }, { nome: 'Pelúcia 04', tipo: 'Pelúcia' }
     ];
@@ -837,7 +838,7 @@ function atualizarVeiculoGridCore_() {
 
   const todosVeiculos = (typeof TODOS_VEICULOS_DEF !== 'undefined' && TODOS_VEICULOS_DEF.length)
     ? TODOS_VEICULOS_DEF.map(function(v) { return v.nome; })
-    : ['Carro 01','Carro 02','Carro 03','Carro 04','Triciclo 01','Triciclo 02','Pelúcia 01','Pelúcia 02','Pelúcia 03','Pelúcia 04'];
+    : ['Carro 01','Carro 02','Carro 03','Carro 04','Triciclo 01','Triciclo 02','Triciclo 03','Pelúcia 01','Pelúcia 02','Pelúcia 03','Pelúcia 04'];
   todosVeiculos.forEach(nome => {
     const card = document.getElementById('vc-' + nome);
     const stEl = document.getElementById('vc-st-' + nome);

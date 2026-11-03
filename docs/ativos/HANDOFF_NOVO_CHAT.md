@@ -1,14 +1,14 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 03/11/2026 · FE **v1.9.179** (I186 Receita filtros/Ver) · GAS Web/repo **v1.5.236**
+**Atualizado:** 03/11/2026 · FE **v1.9.180** (Triciclo 03 Golden) · GAS repo **v1.5.237** · Web **v1.5.236** até Nova versão
 
 ## Produção (agora)
 
 | Camada | Versão | Link |
 |--------|--------|------|
-| Frontend | **v1.9.179** | https://ribocg-a11y.github.io/movikids/?force=1.9.179 |
-| Gestão Pessoas | **v1.9.179** | `gestao-pessoas.html?force=1.9.179` |
-| GAS | ping Web **v1.5.236** · repo **v1.5.236** | I182 escala alinhada |
+| Frontend | **v1.9.180** | https://ribocg-a11y.github.io/movikids/?force=1.9.180 |
+| Gestão Pessoas | **v1.9.180** | `gestao-pessoas.html?force=1.9.180` |
+| GAS | ping Web **v1.5.236** · repo **v1.5.237** | Triciclo 03 — Nova versão Web pendente |
 
 **I186:** Receita dia a dia — pills remount + filtro por loja + **Ver** força rede com toast. Abrir `?force=1.9.179` → Outubro → trocar Todas/Golden/La Ville → **Ver**.
 

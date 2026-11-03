@@ -8,6 +8,7 @@ var TODOS_VEICULOS_DEF = [
   {nome:'Carro 04',   tipo:'Carro'},
   {nome:'Triciclo 01', tipo:'Triciclo'},
   {nome:'Triciclo 02', tipo:'Triciclo'},
+  {nome:'Triciclo 03', tipo:'Triciclo'},
   {nome:'Pelúcia 01', tipo:'Pelúcia'},
   {nome:'Pelúcia 02', tipo:'Pelúcia'},
   {nome:'Pelúcia 03', tipo:'Pelúcia'},
