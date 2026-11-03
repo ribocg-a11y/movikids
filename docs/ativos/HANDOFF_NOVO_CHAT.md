@@ -1,17 +1,17 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 03/11/2026 · FE **v1.9.181** (I187 offline) · GAS Web/repo **v1.5.237**
+**Atualizado:** 03/11/2026 · FE **v1.9.182** (I187 offline) · GAS Web/repo **v1.5.237**
 
 ## Produção (agora)
 
 | Camada | Versão | Link |
 |--------|--------|------|
-| Frontend | **v1.9.181** | https://ribocg-a11y.github.io/movikids/?force=1.9.181 |
-| Gestão Pessoas | **v1.9.181** | `gestao-pessoas.html?force=1.9.181` |
+| Frontend | **v1.9.182** | https://ribocg-a11y.github.io/movikids/?force=1.9.182 |
+| Gestão Pessoas | **v1.9.182** | `gestao-pessoas.html?force=1.9.182` |
 | GAS | ping Web **v1.5.237** · repo **v1.5.237** | Triciclo 03 alinhado |
 
-**Frota Golden:** 4 carros · **3 triciclos** (01–03) · 4 pelúcias — CONFIG live + FE **1.9.181**.  
-**I187:** offline short-circuit + fila salvar/▶/encerrar/cancelar · `?force=1.9.181` · `AUDITORIA_REGRESSAO_OFFLINE_I187_2026-11-03.md`.  
+**Frota Golden:** 4 carros · **3 triciclos** (01–03) · 4 pelúcias — CONFIG live + FE **1.9.182**.  
+**I187/I187b:** offline short-circuit + fila + boot reidrata fila · `?force=1.9.182` · `AUDITORIA_REGRESSAO_OFFLINE_I187_2026-11-03.md`.
 **I186:** Receita dia a dia — pills + **Ver**.
 
 **Folha Q2 31/10:** PIX Ray **902,22** · Karen **1.002,22** · Jennifer **632,19**.  

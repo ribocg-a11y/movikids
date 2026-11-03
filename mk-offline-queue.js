@@ -306,3 +306,4 @@ window.mkOfflineWire_ = mkOfflineWire_;
 window.mkOfflineIsOffline_ = mkOfflineIsOffline_;
 window.mkOfflineCanQueue_ = mkOfflineCanQueue_;
 window.mkOfflineGenRequestId_ = mkOfflineGenRequestId_;
+window.mkOfflineSyntheticSalvar_ = mkOfflineSyntheticSalvar_;

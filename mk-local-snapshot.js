@@ -125,14 +125,75 @@ function mkBootLocalFirstCore_() {
   } catch (e) {
     stored = [];
   }
+  /* I187b: não descartar fila offline / temp row no boot (só otimista ▶ antes). */
   const inflight = stored.filter(function (s) {
-    return s._iniciandoTimer || s._optimistic;
+    if (!s) return false;
+    if (s._iniciandoTimer || s._optimistic) return true;
+    if (s._offlinePending || s._offlineTimerPending || s._offlineQueued) return true;
+    if (Number(s.rowIndex) < 0) return true;
+    if (s._clientRequestId && (s.status === 'Pendente' || s.status === 'Ativa')) return true;
+    return false;
   });
 
   try { localStorage.removeItem('mk_sessions'); } catch (e) { /* ignore */ }
   if (typeof mkInvalidateInicioCache_ === 'function') mkInvalidateInicioCache_();
 
   return { inflight: inflight };
+}
+
+/** I187b: cards sintéticos a partir da fila IDB se o boot limpou mk_sessions. */
+async function mkBootRehydrateFromQueue_() {
+  if (typeof mkIdbQueueList_ !== 'function') return 0;
+  let n = 0;
+  try {
+    const queue = await mkIdbQueueList_();
+    if (!Array.isArray(queue) || !queue.length) return 0;
+    if (!Array.isArray(sessions)) sessions = [];
+    for (let i = 0; i < queue.length; i++) {
+      const item = queue[i];
+      if (!item || !item.params) continue;
+      const reqId = item.id || item.params.clientRequestId;
+      const exists = sessions.some(function (s) {
+        return (s && s._clientRequestId && s._clientRequestId === reqId)
+          || (item.params.rowIndex && Number(s.rowIndex) === Number(item.params.rowIndex));
+      });
+      if (exists) continue;
+      if (item.action === 'salvarLocacao' && typeof mkOfflineSyntheticSalvar_ === 'function') {
+        const syn = mkOfflineSyntheticSalvar_(item.params, reqId);
+        sessions.push(Object.assign({}, syn, {
+          started: false,
+          alertFired5: false,
+          alertFiredExp: false,
+          _offlinePending: true,
+          _clientRequestId: reqId,
+          _savedAt: item.createdAt || Date.now(),
+          unidadeId: item.params.unidadeId
+            || ((typeof mkUnidadeId_ === 'function') ? mkUnidadeId_() : 'golden')
+        }));
+        n++;
+      } else if (item.action === 'iniciarTimer') {
+        const ri = Number(item.params.rowIndex);
+        const s = sessions.find(function (x) { return Number(x.rowIndex) === ri; });
+        if (s) {
+          s._offlineTimerPending = true;
+          s.status = 'Ativa';
+          s.started = true;
+          if (!s.startTimestamp && item.params.timestamp) {
+            s.startTimestamp = Number(item.params.timestamp);
+            s._localTimerStart = s.startTimestamp;
+          }
+          n++;
+        }
+      }
+    }
+    if (n > 0) {
+      if (typeof saveSessions === 'function') saveSessions();
+      if (typeof renderCards === 'function') renderCards();
+      if (typeof updateStats === 'function') updateStats();
+      if (typeof mkOfflineRefreshUi_ === 'function') mkOfflineRefreshUi_();
+    }
+  } catch (e) { /* ignore */ }
+  return n;
 }
 
 function mkBootLocalFirstFinish_(snap, inflight) {
@@ -167,14 +228,18 @@ function mkBootLocalFirstFinish_(snap, inflight) {
 /** Boot sync (fallback). */
 function mkBootLocalFirst_() {
   const core = mkBootLocalFirstCore_();
-  return mkBootLocalFirstFinish_(mkSnapshotLoad_(), core.inflight);
+  const applied = mkBootLocalFirstFinish_(mkSnapshotLoad_(), core.inflight);
+  mkBootRehydrateFromQueue_().catch(function () { /* ignore */ });
+  return applied;
 }
 
 /** Boot Fase 1 — IndexedDB primeiro, depois LS. */
 async function mkBootLocalFirstAsync_() {
   const core = mkBootLocalFirstCore_();
   const snap = await mkSnapshotLoadAsync_(800);
-  return mkBootLocalFirstFinish_(snap, core.inflight);
+  const applied = mkBootLocalFirstFinish_(snap, core.inflight);
+  await mkBootRehydrateFromQueue_();
+  return applied;
 }
 
 function mkSnapshotApplyFallback_() {
@@ -186,7 +251,8 @@ function mkSnapshotApplyFallback_() {
 }
 
 async function mkSnapshotClearLocal_(reload) {
-  try { localStorage.removeItem(MK_SNAPSHOT_KEY); } catch (e) { /* ignore */ }
+  try { localStorage.removeItem(mkSnapshotKey_()); } catch (e) { /* ignore */ }
+  try { localStorage.removeItem(MK_SNAPSHOT_KEY_LEGACY); } catch (e2) { /* ignore */ }
   if (typeof mkIdbClearSnapshot_ === 'function') {
     try { await mkIdbClearSnapshot_(); } catch (e) { /* ignore */ }
   }

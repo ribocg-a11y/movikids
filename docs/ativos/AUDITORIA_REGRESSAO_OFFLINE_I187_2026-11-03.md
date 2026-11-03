@@ -1,7 +1,7 @@
 # Auditoria MAPA + Offline — I187 (03/11/2026)
 
 **Escopo:** varredura regressão MAPA (exceto SMS/WhatsApp/`qr_only`) + capacidade de operar sem internet.  
-**FE:** **v1.9.181** · **GAS:** ping/repo **v1.5.237** (sem mudança AppScript nesta entrega)
+**FE:** **v1.9.182** · **GAS:** ping/repo **v1.5.237** (sem mudança AppScript nesta entrega)
 
 ---
 
