@@ -23,7 +23,8 @@ Não foi queda de GAS/Pages (online, v1.9.182, sync ok). Foi **desenho de UX da 
 | ID | FE | O quê |
 |----|-----|--------|
 | **I188** | **v1.9.183** | Pagamento do extra **no card** + autofill “mesmo do plano” ao abrir drawer |
-| **I189** | **v1.9.184** | `pedirEncerrar(row)`: se respostas OK (ou herdáveis) → **`confirmarEncerrar()` na hora**; drawer só se faltar dado |
+| **I189** | **v1.9.184** | `pedirEncerrar(row)`: se respostas OK → **`confirmarEncerrar()` na hora**; drawer só se faltar dado |
+| **I190** | **v1.9.185** | **Sem autofill** do pagamento do plano; extra só no fim (toque explícito); **Não cobrar** no card + justificativa |
 
 ## Como impedir de novo (camadas)
 

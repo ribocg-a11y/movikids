@@ -60,8 +60,7 @@ function abrirSessaoDrawer(rowIndex, tab) {
       toast('Envie o aviso de minutos extras antes de encerrar.', 'error');
       return;
     }
-    /* I188: pré-seleciona mesmo pagamento do plano nos extras — libera Confirmar. */
-    if (typeof mkEncExtraAutofillSamePag_ === 'function') mkEncExtraAutofillSamePag_(s);
+    /* I190: NÃO autofill do plano — forma do extra só no fim, com o responsável. */
   }
   sessDrawerRow = rowIndex;
   menuLocacaoAbertoKey = null;
@@ -245,9 +244,9 @@ function renderEncerrarModal_(session, fin) {
 }
 
 /**
- * I189 — Encerrar no card = desligar.
- * Se pagamento do extra já está resolvido (ou dá para herdar o do plano),
- * chama confirmarEncerrar na hora. Só abre drawer se ainda faltar resposta.
+ * I189/I190 — Encerrar no card = desligar só se a operadora JÁ escolheu
+ * no fim da locação (pagamento do extra OU não cobrar + justificativa).
+ * Nunca herdar sozinho o pagamento do plano (isso só no toque "Mesmo").
  */
 function pedirEncerrar(rowIndex) {
   const s = (typeof sessions !== 'undefined' && Array.isArray(sessions))
@@ -268,22 +267,27 @@ function pedirEncerrar(rowIndex) {
     return;
   }
 
-  if (typeof mkEncExtraAutofillSamePag_ === 'function') mkEncExtraAutofillSamePag_(s);
   if (typeof mkExtraPagRestore_ === 'function') mkExtraPagRestore_(s);
 
   const fin = typeof resolverMinUsadosEncerrar_ === 'function'
     ? resolverMinUsadosEncerrar_(s, false)
     : { minUsados: s.mins, somentePlano: false, minExtraCobrados: 0 };
-  const ready = (typeof mkEncExtraValidateState_ === 'function')
+  const needsExtra = typeof mkEncExtraNeedsInput_ === 'function'
+    ? mkEncExtraNeedsInput_(fin)
+    : (fin.minExtraCobrados > 0);
+  const ready = !needsExtra || ((typeof mkEncExtraValidateState_ === 'function')
     ? mkEncExtraValidateState_(s, fin).ok
-    : true;
+    : false);
 
   if (ready) {
     encSession = s;
     encSession._minUsados = fin.minUsados;
     encSession._somentePlanoEnc = !!fin.somentePlano;
-    if (typeof toast === 'function' && fin.minExtraCobrados > 0 && s._extraPagamento) {
-      try { toast('Encerrando · extra via ' + s._extraPagamento, 'info'); } catch (eT) { /* ok */ }
+    if (typeof toast === 'function' && needsExtra) {
+      const msg = s._cancelarExtras
+        ? 'Encerrando · extras não cobrados'
+        : ('Encerrando · extra via ' + (s._extraPagamento || ''));
+      try { toast(msg, 'info'); } catch (eT) { /* ok */ }
     }
     confirmarEncerrar();
     return;
@@ -291,7 +295,7 @@ function pedirEncerrar(rowIndex) {
 
   abrirSessaoDrawer(rowIndex, 'encerrar');
   if (typeof toast === 'function') {
-    toast('Falta informar como pagaram os minutos extras.', 'warning');
+    toast('Pergunte ao responsável: como paga o extra — ou marque não cobrar.', 'warning');
   }
 }
 

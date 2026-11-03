@@ -383,19 +383,44 @@ function mkEncExtraPickSamePagForRow_(rowIndex) {
   mkEncExtraPickPagForRow_(pag, ri);
 }
 
-/** I188: se já tem pagamento do plano e extra pendente, pré-seleciona o mesmo. */
+/**
+ * I190: NÃO pré-preencher pagamento do extra com o do plano.
+ * Pagamento do plano ≠ decisão do responsável no fim (pode ser outra forma ou não cobrar).
+ * "Mesmo (PIX/Débito…)" continua disponível como toque explícito.
+ */
 function mkEncExtraAutofillSamePag_(session) {
-  if (!session) return false;
-  mkExtraPagRestore_(session);
-  const fin = mkEncExtraFinForSession_(session, false);
-  if (!mkEncExtraNeedsInput_(fin)) return false;
-  if (mkEncExtraValidateState_(session, fin).ok) return true;
-  const same = mkEncExtraSamePagLabel_(session);
-  if (!same) return false;
-  session._extraPagamento = same;
-  session._cancelarExtras = false;
+  return false;
+}
+
+/** I190: no card — "Não cobrar" abre drawer para justificativa (obrigatória). */
+function mkEncExtraStartCancelForRow_(rowIndex) {
+  if (typeof event !== 'undefined' && event) {
+    try { event.preventDefault(); event.stopPropagation(); } catch (e0) { /* ok */ }
+  }
+  const ri = Number(rowIndex);
+  const session = (typeof sessions !== 'undefined' && Array.isArray(sessions))
+    ? sessions.find(function (x) { return Number(x.rowIndex) === ri; })
+    : null;
+  if (!session) return;
+  session._cancelarExtras = true;
+  session._extraPagamento = '';
   mkExtraPagPersist_(session);
-  return true;
+  if (typeof abrirSessaoDrawer === 'function') abrirSessaoDrawer(ri, 'encerrar');
+  if (typeof toast === 'function') {
+    toast('Não cobrar extras: escreva o motivo (mín. 5 letras) e confirme.', 'warning');
+  }
+  setTimeout(function () {
+    const cancel = document.getElementById('enc-extra-cancel');
+    if (cancel) cancel.checked = true;
+    const justWrap = document.getElementById('enc-extra-just-wrap');
+    if (justWrap) justWrap.hidden = false;
+    const just = document.getElementById('enc-extra-just');
+    if (just) {
+      just.focus();
+      just.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    if (typeof mkEncExtraRefreshAll_ === 'function') mkEncExtraRefreshAll_(session);
+  }, 80);
 }
 
 function mkEncExtraCardBannerHtml_(s) {
@@ -418,11 +443,14 @@ function mkEncExtraCardBannerHtml_(s) {
   }).join('');
   const sameBtn = same
     ? '<button type="button" class="sc-extra-pag-btn sc-extra-pag-same" onclick="mkEncExtraPickSamePagForRow_(' +
-      ri + ')">↩ Mesmo (' + same + ')</button>'
+      ri + ')">↩ Mesmo do plano (' + same + ')</button>'
     : '';
+  const noCobrar = '<button type="button" class="sc-extra-pag-btn sc-extra-pag-cancel" onclick="mkEncExtraStartCancelForRow_(' +
+    ri + ')">Não cobrar extras</button>';
   return '<div class="sc-extra-pay-warn">⏱ ' + fin.minExtraCobrados +
-    ' min extra · escolha como pagou:</div>' +
-    '<div class="sc-extra-pag-grid" onclick="event.stopPropagation()">' + sameBtn + btns + '</div>';
+    ' min extra · pergunte ao responsável e registre:</div>' +
+    '<div class="sc-extra-pag-grid" onclick="event.stopPropagation()">' +
+    sameBtn + btns + noCobrar + '</div>';
 }
 
 function mkEncExtraInitForSession_(session, scope) {
@@ -437,7 +465,10 @@ function mkEncExtraInitForSession_(session, scope) {
 window.mkEncExtraPickPag_ = mkEncExtraPickPag_;
 window.mkEncExtraPickPagForRow_ = mkEncExtraPickPagForRow_;
 window.mkEncExtraPickSamePagForRow_ = mkEncExtraPickSamePagForRow_;
+window.mkEncExtraStartCancelForRow_ = mkEncExtraStartCancelForRow_;
 window.mkEncExtraAutofillSamePag_ = mkEncExtraAutofillSamePag_;
 window.mkEncExtraPickSamePag_ = mkEncExtraPickSamePag_;
 window.mkEncExtraToggleCancel_ = mkEncExtraToggleCancel_;
 window.mkEncExtraOnJustInput_ = mkEncExtraOnJustInput_;
+window.mkEncExtraNeedsInput_ = mkEncExtraNeedsInput_;
+window.mkEncExtraValidateState_ = mkEncExtraValidateState_;

@@ -1,6 +1,6 @@
 # MOVI KIDS — Mapa de erros, falhas e bugs
 
-**Atualizado:** 03/11/2026 — **I189** Encerrar 1 toque se extra OK · **I188** pag. no card · FE **v1.9.184** · GAS **v1.5.237**  
+**Atualizado:** 03/11/2026 — **I190** extra só no fim · **I189/I188** · FE **v1.9.185** · GAS **v1.5.237**  
 
 **Uso anterior:** 03/11/2026 — **I187** offline short-circuit + fila · FE **v1.9.181–182** · GAS **v1.5.237**  
 **Uso anterior:** 03/11/2026 — **I186** Receita filtros/Ver · **I185** cache celular · FE **v1.9.179–180** · GAS **v1.5.236–237**  
@@ -163,7 +163,8 @@ Docs: `AUDITORIA_REGRESSAO_OFFLINE_I187_2026-11-03.md` · `mk-offline-queue.js` 
 |----|---------|-------|----------|--------|
 | **I85** | Caixa sem forma do extra | Encerrar sem perguntar pagamento extra | Drawer/alert com PIX… + justificativa | ✅ |
 | **I188** | EXTRA “não encerra” no balcão | Aviso no card **sem** botões; pagamento só no drawer | Pagamento no card + autofill plano · FE **v1.9.183** | ✅ |
-| **I189** | Encerrar = 2 passos mesmo com resposta pronta | Card só abria drawer | `pedirEncerrar` → `confirmarEncerrar` se validação OK · FE **v1.9.184** | ✅ |
+| **I189** | Encerrar = 2 passos mesmo com resposta pronta | Card só abria drawer | `pedirEncerrar` → `confirmarEncerrar` se escolha explícita OK · FE **v1.9.184** | ✅ |
+| **I190** | Autofill plano≠decisão do responsável no fim | Herdava Débito/PIX do plano | Sem autofill; Mesmo/Não cobrar explícitos · FE **v1.9.185** | ✅ |
 
 **Regra de ouro:** Encerrar no card **desliga** se pagamento/justificativa já resolvidos (ou herdáveis do plano). Nunca bloquear só com texto sem controle na mesma superfície.
 

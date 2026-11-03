@@ -996,19 +996,30 @@ try {
     } else {
       Add-Check "guard.i188.card.pag" "ok" "pagamento extra no card"
     }
-    if ($encExtraRaw -notmatch 'mkEncExtraAutofillSamePag_') {
-      Add-Check "guard.i188.autofill" "fail" "autofill mesmo pagamento do plano ausente (I188)"
+    if ($encExtraRaw -notmatch 'mkEncExtraStartCancelForRow_' -or $encExtraRaw -notmatch 'Nao cobrar extras|Não cobrar extras') {
+      Add-Check "guard.i190.card.nocobrar" "fail" "card EXTRA sem Não cobrar (I190)"
     } else {
-      Add-Check "guard.i188.autofill" "ok" "autofill pagamento plano→extra"
+      Add-Check "guard.i190.card.nocobrar" "ok" "Não cobrar extras no card"
+    }
+    # I190: autofill do plano deve estar desligado (return false)
+    if ($encExtraRaw -match 'function mkEncExtraAutofillSamePag_' -and $encExtraRaw -notmatch 'function mkEncExtraAutofillSamePag_[\s\S]{0,200}return false') {
+      Add-Check "guard.i190.no-autofill" "fail" "autofill plano→extra ainda ativo (I190)"
+    } else {
+      Add-Check "guard.i190.no-autofill" "ok" "extra nao herda plano sozinho"
     }
   }
   if ((Test-Path $drawerPathI189) -and (Test-Path $homePathI189)) {
     $drawerI189 = Get-Content -Path $drawerPathI189 -Raw -Encoding UTF8
     $homeI189 = Get-Content -Path $homePathI189 -Raw -Encoding UTF8
+    if ($drawerI189 -match 'mkEncExtraAutofillSamePag_\(s\)') {
+      Add-Check "guard.i190.pedir.noautofill" "fail" "pedirEncerrar/abrirDrawer ainda chama autofill (I190)"
+    } else {
+      Add-Check "guard.i190.pedir.noautofill" "ok" "Encerrar sem autofill do plano"
+    }
     if ($drawerI189 -notmatch 'function pedirEncerrar' -or $drawerI189 -notmatch 'confirmarEncerrar\(\)') {
       Add-Check "guard.i189.pedir.direto" "fail" "pedirEncerrar nao desliga direto quando pronto (I189)"
     } else {
-      Add-Check "guard.i189.pedir.direto" "ok" "Encerrar 1 toque se validacao OK"
+      Add-Check "guard.i189.pedir.direto" "ok" "Encerrar 1 toque se escolha explicita OK"
     }
     if ($homeI189 -notmatch 'pedirEncerrar\(') {
       Add-Check "guard.i189.home.btn" "fail" "card Encerrar nao chama pedirEncerrar (I189)"
