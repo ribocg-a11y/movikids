@@ -811,6 +811,10 @@ function kpiDashCacheInvalidate_(mes, ano) {
 function kpiDashCacheSet_(mes, ano, data) {
   try {
     if (!data || !data.ok) return;
+    /* I186: carimba unidade antes de espelhar no cache da Receita. */
+    if (!data.unidadeId && typeof mkDualFiltro_ === 'function') {
+      data.unidadeId = mkDualFiltro_() || 'all';
+    }
     sessionStorage.setItem(kpiDashCacheKey_(mes, ano), JSON.stringify({ ts: Date.now(), data: data }));
   } catch (e) {}
   if (typeof rdFatCacheSet_ === 'function') rdFatCacheSet_(mes, ano, data);
@@ -4465,21 +4469,36 @@ function enviarFechamentoEmail() {
 }
 
 // ── RECEITA DIA A DIA (consulta) ─────────────────────────────
+/* I185 cache incompleto · I186 filtros/Ver/pills/unidade */
 let _rdReqSeq = 0;
 let _rdTickTimer = null;
 const RD_FAT_TTL_FECHADO_MS = 30 * 24 * 60 * 60 * 1000;
 const RD_FAT_TTL_CORRENTE_MS = 10 * 60 * 1000;
+const _mkRdMem_ = Object.create(null);
 
 function rdFatUid_() {
   try {
-    if (typeof mkDualFiltro_ === 'function') return mkDualFiltro_() || 'all';
+    if (typeof mkDualFiltro_ === 'function') {
+      const f = String(mkDualFiltro_() || 'all').toLowerCase();
+      if (f === 'golden' || f === 'laville' || f === 'all') return f;
+    }
   } catch (e) { /* ignore */ }
   return 'all';
 }
 
-/** v2 — invalida cache celular incompleto (I185: mês fechado com 5 dias / ~2k). */
-function rdFatCacheKey_(mes, ano) {
-  return 'mk_rd_fat_v2_' + mes + '_' + ano + '_u' + rdFatUid_();
+function rdUidCanon_(raw) {
+  const u = String(raw == null ? 'all' : raw).toLowerCase();
+  if (u === 'golden' || u === 'laville') return u;
+  return 'all';
+}
+
+/** v2 — chave por mês+ano+loja (I185/I186). */
+function rdFatCacheKey_(mes, ano, uidOpt) {
+  return 'mk_rd_fat_v2_' + mes + '_' + ano + '_u' + rdUidCanon_(uidOpt != null ? uidOpt : rdFatUid_());
+}
+
+function rdMemKey_(mes, ano, uid) {
+  return String(mes) + '_' + String(ano) + '_' + rdUidCanon_(uid);
 }
 
 function rdMesFechado_(mes, ano) {
@@ -4492,28 +4511,21 @@ function rdDiasNoMes_(mes, ano) {
   return new Date(Number(ano), Number(mes), 0).getDate();
 }
 
-/** Cache só vale se fatPorDia cobre o mês inteiro (GAS sempre manda 28–31). */
+/**
+ * Cache só vale se fatPorDia cobre o calendário do mês (GAS manda 28–31).
+ * I186: NÃO rejeitar mês esparso legítimo (La Ville / loja nova) — só array truncado.
+ */
 function rdFatCompleto_(d, mes, ano) {
   if (!d || !d.ok) return false;
   const fp = d.fatPorDia || [];
   const precisa = rdDiasNoMes_(mes, ano);
   if (fp.length < precisa) return false;
   let maxDia = 0;
-  let soma = 0;
-  let diasCom = 0;
   for (let i = 0; i < fp.length; i++) {
     const dia = Number(fp[i] && fp[i].dia) || 0;
-    const v = Number(fp[i] && fp[i].valor) || 0;
     if (dia > maxDia) maxDia = dia;
-    soma += v;
-    if (v > 0) diasCom++;
   }
-  if (maxDia < precisa) return false;
-  /* Recusa lixo típico do celular: só 1ª semana / total irrisório no mês fechado. */
-  if (rdMesFechado_(mes, ano) && precisa >= 28 && diasCom > 0 && diasCom < 10 && soma < 5000) {
-    return false;
-  }
-  return true;
+  return maxDia >= precisa;
 }
 
 function rdFatSlim_(d) {
@@ -4526,43 +4538,80 @@ function rdFatSlim_(d) {
     locPorDia: d.locPorDia || [],
     mesAtual: d.mesAtual,
     anoAtual: d.anoAtual,
-    unidadeId: d.unidadeId
+    unidadeId: rdUidCanon_(d.unidadeId)
   };
+}
+
+function rdMatchUid_(d, uid) {
+  if (!d) return false;
+  return rdUidCanon_(d.unidadeId) === rdUidCanon_(uid);
 }
 
 function rdFatCacheSet_(mes, ano, data) {
   const slim = rdFatSlim_(data);
   if (!slim || !rdFatCompleto_(slim, mes, ano)) return;
+  const uid = rdUidCanon_(slim.unidadeId || rdFatUid_());
+  slim.unidadeId = uid;
+  _mkRdMem_[rdMemKey_(mes, ano, uid)] = slim;
   try {
-    localStorage.setItem(rdFatCacheKey_(mes, ano), JSON.stringify({ ts: Date.now(), data: slim }));
+    localStorage.setItem(rdFatCacheKey_(mes, ano, uid), JSON.stringify({ ts: Date.now(), data: slim }));
   } catch (e) { /* quota */ }
 }
 
-function rdFatCacheGet_(mes, ano) {
+function rdFatCacheGet_(mes, ano, uidOpt) {
+  const uid = rdUidCanon_(uidOpt != null ? uidOpt : rdFatUid_());
+  const mem = _mkRdMem_[rdMemKey_(mes, ano, uid)];
+  if (mem && rdFatCompleto_(mem, mes, ano) && rdMatchUid_(mem, uid)) return mem;
   try {
-    const raw = localStorage.getItem(rdFatCacheKey_(mes, ano));
+    const raw = localStorage.getItem(rdFatCacheKey_(mes, ano, uid));
     if (!raw) return null;
     const o = JSON.parse(raw);
     if (!o || !o.ts || !o.data || !rdFatCompleto_(o.data, mes, ano)) return null;
+    if (!rdMatchUid_(o.data, uid) && o.data.unidadeId != null) return null;
     const ttl = rdMesFechado_(mes, ano) ? RD_FAT_TTL_FECHADO_MS : RD_FAT_TTL_CORRENTE_MS;
     if (Date.now() - o.ts > ttl) return null;
+    o.data.unidadeId = uid;
+    _mkRdMem_[rdMemKey_(mes, ano, uid)] = o.data;
     return o.data;
   } catch (e) { return null; }
 }
 
-function rdPickCache_(mes, ano) {
-  const durable = rdFatCacheGet_(mes, ano);
+/** Só cache da loja pedida — nunca kpiData/dash de outra unidade (I186). */
+function rdPickCache_(mes, ano, uidOpt) {
+  const uid = rdUidCanon_(uidOpt != null ? uidOpt : rdFatUid_());
+  const durable = rdFatCacheGet_(mes, ano, uid);
   if (durable) return durable;
   if (typeof kpiDashCacheGet_ === 'function') {
-    const c = kpiDashCacheGet_(mes, ano);
-    if (c && rdFatCompleto_(c, mes, ano)) return c;
+    let c = null;
+    try {
+      const raw = sessionStorage.getItem(kpiDashCacheKey_(mes, ano, uid));
+      if (raw) {
+        const o = JSON.parse(raw);
+        if (o && o.ts && o.data && o.data.ok
+          && Date.now() - o.ts <= (typeof kpiDashCacheTtlMs_ === 'function' ? kpiDashCacheTtlMs_(mes, ano) : 300000)) {
+          c = o.data;
+        }
+      }
+    } catch (eC) { c = null; }
+    if (c && rdFatCompleto_(c, mes, ano) && (c.unidadeId == null || rdMatchUid_(c, uid))) {
+      c.unidadeId = uid;
+      return c;
+    }
   }
   if (typeof kpiData !== 'undefined' && kpiData && kpiData.ok
     && Number(kpiData.mesAtual) === Number(mes) && Number(kpiData.anoAtual) === Number(ano)
-    && rdFatCompleto_(kpiData, mes, ano)) {
+    && rdFatCompleto_(kpiData, mes, ano)
+    && rdMatchUid_(kpiData, uid)) {
     return kpiData;
   }
   return null;
+}
+
+function rdMountPills_() {
+  const pillsHost = document.getElementById('rd-dual-pills');
+  if (pillsHost && typeof mkDualMountPills_ === 'function') {
+    mkDualMountPills_(pillsHost, 'mkReceitaDiariaOnFiltro_');
+  }
 }
 
 function initReceitaDiariaSel() {
@@ -4594,15 +4643,20 @@ function initReceitaDiariaSel() {
     mesEl.addEventListener('change', auto);
     anoEl.addEventListener('change', auto);
   }
-  const pillsHost = document.getElementById('rd-dual-pills');
-  if (pillsHost && typeof mkDualMountPills_ === 'function') {
-    mkDualMountPills_(pillsHost, 'mkReceitaDiariaOnFiltro_');
+  const btn = document.getElementById('rd-btn-ver');
+  if (btn && !btn.dataset.rdBound) {
+    btn.dataset.rdBound = '1';
+    btn.addEventListener('click', function (ev) {
+      ev.preventDefault();
+      carregarReceitaDiaria({ forceNet: true });
+    });
   }
+  rdMountPills_();
   const lista = document.getElementById('rd-lista');
   const resumo = document.getElementById('rd-resumo');
   const mes = parseInt(mesEl.value, 10);
   const ano = parseInt(anoEl.value, 10);
-  const cached = rdPickCache_(mes, ano);
+  const cached = rdPickCache_(mes, ano, rdFatUid_());
   if (cached) {
     renderReceitaDiaria_(mes, ano, cached);
     return;
@@ -4610,15 +4664,18 @@ function initReceitaDiariaSel() {
   if (resumo) resumo.hidden = true;
   if (lista && !lista.dataset.hasData) {
     lista.innerHTML = '<div class="empty"><div class="empty-icon">📅</div><h3>Selecione o mês e toque em Ver</h3>'
-      + '<p style="color:var(--txt3);font-size:13px;margin-top:6px">1ª carga deste mês pode levar ~20–60s. Depois fica na hora.</p></div>';
+      + '<p style="color:var(--txt3);font-size:13px;margin-top:6px">1ª carga deste mês pode levar ~20–60s. Depois a troca de loja fica na hora.</p></div>';
   }
 }
 
 function mkReceitaDiariaOnFiltro_(id) {
   if (typeof mkDualAfterFiltroChange_ === 'function') mkDualAfterFiltroChange_(id);
   else if (typeof mkDualSetFiltro_ === 'function') mkDualSetFiltro_(id);
+  /* I186: remonta pills já no clique — estado visual não fica preso em Todas. */
+  rdMountPills_();
   const lista = document.getElementById('rd-lista');
   if (lista) lista.dataset.hasData = '';
+  /* Cache da loja se existir; senão rede. Nunca forceNet cego (bug I185 || quiet). */
   carregarReceitaDiaria({ forceNet: false });
 }
 window.mkReceitaDiariaOnFiltro_ = mkReceitaDiariaOnFiltro_;
@@ -4678,66 +4735,69 @@ async function carregarReceitaDiaria(opts) {
   const mes = parseInt(mesEl.value, 10) || (new Date().getMonth() + 1);
   const ano = parseInt(anoEl.value, 10) || new Date().getFullYear();
   const seq = ++_rdReqSeq;
-  const fechado = rdMesFechado_(mes, ano);
-  /* I185: toque em Ver / Tentar de novo sempre busca rede — cache incompleto no celular
-   * travava mês fechado em 5 dias / ~2 mil. quiet=true (change do select) pode usar cache. */
-  const forceNet = opts.forceNet === true || opts.quiet !== true;
+  const uid = rdFatUid_();
+  /* I186: forceNet SÓ quando Ver / Tentar de novo. quiet e filtro usam cache da loja. */
+  const forceNet = opts.forceNet === true;
 
-  const cached = !forceNet ? rdPickCache_(mes, ano) : null;
-  if (cached) {
+  rdMountPills_();
+
+  const cached = !forceNet ? rdPickCache_(mes, ano, uid) : null;
+  if (cached && !forceNet) {
     renderReceitaDiaria_(mes, ano, cached);
     rdFatCacheSet_(mes, ano, cached);
-    /* Mês fechado + cache completo + quiet: não espera o GAS de novo */
-    if (fechado && !forceNet) {
-      if (btn) { btn.disabled = false; btn.textContent = 'Ver'; }
-      rdStopTick_();
-      return;
-    }
+    if (btn) { btn.disabled = false; btn.textContent = 'Ver'; }
+    rdStopTick_();
+    return;
   }
 
-  if (!cached) {
-    rdStartTick_(lista, seq);
-    if (resumo) resumo.hidden = true;
-  }
+  rdStartTick_(lista, seq);
+  if (resumo) resumo.hidden = true;
   if (btn) {
     btn.disabled = true;
-    btn.textContent = 'Aguarde…';
+    btn.textContent = forceNet ? 'Atualizando…' : 'Aguarde…';
+  }
+  if (forceNet && typeof toast === 'function') {
+    try { toast('Atualizando receita…', 'info'); } catch (eT) { /* ok */ }
   }
   try {
-    const authP = Object.assign({}, typeof apiParamsComAuth_ === 'function' ? apiParamsComAuth_() : {}, {
-      unidadeId: (typeof mkDualFiltro_ === 'function' ? mkDualFiltro_() : 'all')
+    /* I183b/I186: unidadeId DEPOIS do auth — senão sessão golden engole Todas. */
+    const authP = typeof apiParamsComAuth_ === 'function' ? apiParamsComAuth_() : {};
+    const req = Object.assign({}, authP, {
+      action: 'kpiMes',
+      mes: mes,
+      ano: ano,
+      lite: '1',
+      unidadeId: uid
     });
-    const req = Object.assign({ action: 'kpiMes', mes: mes, ano: ano, lite: '1' }, authP);
     if (forceNet) req.force = '1';
     const d = await api(req, 120000);
     if (seq !== _rdReqSeq) return;
     rdStopTick_();
     if (!d || !d.ok) {
-      if (!cached) {
-        lista.innerHTML = mkReceitaDiariaErrHtml_('Não foi possível carregar', (d && d.erro) || 'Sem permissão ou falha no servidor');
-        lista.dataset.hasData = '';
-      }
+      lista.innerHTML = mkReceitaDiariaErrHtml_('Não foi possível carregar', (d && d.erro) || 'Sem permissão ou falha no servidor');
+      lista.dataset.hasData = '';
       return;
     }
+    d.unidadeId = uid;
     if (!rdFatCompleto_(d, mes, ano)) {
-      if (!cached) {
-        lista.innerHTML = mkReceitaDiariaErrHtml_(
-          'Resposta incompleta',
-          'O servidor devolveu poucos dias do mês. Toque em Tentar de novo.'
-        );
-        lista.dataset.hasData = '';
-      }
+      lista.innerHTML = mkReceitaDiariaErrHtml_(
+        'Resposta incompleta',
+        'O servidor devolveu poucos dias do mês. Toque em Tentar de novo.'
+      );
+      lista.dataset.hasData = '';
       return;
     }
     rdFatCacheSet_(mes, ano, d);
-    if (typeof kpiDashCacheSet_ === 'function') {
-      try { sessionStorage.setItem(kpiDashCacheKey_(mes, ano), JSON.stringify({ ts: Date.now(), data: d })); } catch (e2) {}
-    }
+    try {
+      sessionStorage.setItem(kpiDashCacheKey_(mes, ano, uid), JSON.stringify({ ts: Date.now(), data: d }));
+    } catch (e2) { /* ok */ }
     renderReceitaDiaria_(mes, ano, d);
+    if (forceNet && typeof toast === 'function') {
+      try { toast('Receita atualizada · ' + mkReceitaDiariaUnidadeLabel_(), 'success'); } catch (e3) { /* ok */ }
+    }
   } catch (e) {
     if (seq !== _rdReqSeq) return;
     rdStopTick_();
-    if (cached) return; /* já está na tela */
     const msg = String((e && e.message) || e || '');
     const isTo = msg.indexOf('timeout') >= 0;
     lista.innerHTML = mkReceitaDiariaErrHtml_(
@@ -4755,6 +4815,7 @@ async function carregarReceitaDiaria(opts) {
     }
   }
 }
+window.carregarReceitaDiaria = carregarReceitaDiaria;
 
 function renderReceitaDiaria_(mes, ano, d) {
   const lista = document.getElementById('rd-lista');

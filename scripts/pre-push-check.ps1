@@ -652,15 +652,22 @@ try {
     $admRawI185 = ""
     $admJsI185 = Join-Path $root "mk-admin.js"
     if (Test-Path $admJsI185) { $admRawI185 = Get-Content -Path $admJsI185 -Raw -Encoding UTF8 }
-    $idxRawI185 = ""
-    $idxI185 = Join-Path $root "index.html"
-    if (Test-Path $idxI185) { $idxRawI185 = Get-Content -Path $idxI185 -Raw -Encoding UTF8 }
     $rdV2 = $admRawI185.Contains('mk_rd_fat_v2_') -and $admRawI185.Contains('rdFatCompleto_') -and $admRawI185.Contains('rdDiasNoMes_')
-    $rdVer = $idxRawI185.Contains("carregarReceitaDiaria({forceNet:true})")
+    $rdVer = ($admRawI185.Contains('forceNet: true') -or $admRawI185.Contains('forceNet:true')) -and $admRawI185.Contains('rd-btn-ver')
     if (-not $rdV2 -or -not $rdVer) {
       Add-Check "guard.i185.fe.receita-diaria" "fail" "I185 receita dia a dia: cache v2/completo/Ver forceNet incompleto"
     } else {
       Add-Check "guard.i185.fe.receita-diaria" "ok" "Receita dia a dia cache completo + Ver forceNet (I185)"
+    }
+    # I186 — filtros/pills/Ver: remount + forceNet só no Ver + unidadeId pos-auth + cache por loja
+    $rdMount = $admRawI185.Contains('rdMountPills_') -and $admRawI185.Contains('mkReceitaDiariaOnFiltro_')
+    $rdForceOnly = $admRawI185.Contains('const forceNet = opts.forceNet === true')
+    $rdUidAfter = $admRawI185.Contains('Object.assign({}, authP') -and $admRawI185.Contains('unidadeId: uid')
+    $rdMatch = $admRawI185.Contains('rdMatchUid_') -and $admRawI185.Contains('window.carregarReceitaDiaria')
+    if (-not $rdMount -or -not $rdForceOnly -or -not $rdUidAfter -or -not $rdMatch) {
+      Add-Check "guard.i186.fe.receita-filtros" "fail" "I186 receita filtros/Ver/pills/unidade incompleto"
+    } else {
+      Add-Check "guard.i186.fe.receita-filtros" "ok" "Receita dia a dia pills+filtro+Ver (I186)"
     }
     # I171 — sessão operador por loja
     $gasRawG = ""
