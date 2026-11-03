@@ -1,6 +1,6 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 03/11/2026 · FE **v1.9.180** (Triciclo 03 Golden) · GAS repo **v1.5.237** · Web **v1.5.236** até Nova versão
+**Atualizado:** 03/11/2026 · FE **v1.9.180** (Triciclo 03 Golden) · GAS Web/repo **v1.5.237**
 
 ## Produção (agora)
 
@@ -8,13 +8,13 @@
 |--------|--------|------|
 | Frontend | **v1.9.180** | https://ribocg-a11y.github.io/movikids/?force=1.9.180 |
 | Gestão Pessoas | **v1.9.180** | `gestao-pessoas.html?force=1.9.180` |
-| GAS | ping Web **v1.5.236** · repo **v1.5.237** | Triciclo 03 — Nova versão Web pendente |
+| GAS | ping Web **v1.5.237** · repo **v1.5.237** | Triciclo 03 alinhado |
 
-**I186:** Receita dia a dia — pills remount + filtro por loja + **Ver** força rede com toast. Abrir `?force=1.9.179` → Outubro → trocar Todas/Golden/La Ville → **Ver**.
+**Frota Golden:** 4 carros · **3 triciclos** (01–03) · 4 pelúcias — CONFIG live + FE **1.9.180**.  
+**I186:** Receita dia a dia — pills + **Ver** · `?force=1.9.180`.
 
-**Folha Q2 31/10:** PIX Ray **902,22** · Karen **1.002,22** · Jennifer **632,19** — `MEMORIAL_HOLERITE_Q2_2026-10.md`.  
-**Holding/ponto:** I183b FE **1.9.176+** · I184 anti toque-duplo.  
-**MAPA:** famílias I183→I183b · I185→I186 · regras 52–58.
+**Folha Q2 31/10:** PIX Ray **902,22** · Karen **1.002,22** · Jennifer **632,19**.  
+**Holding/ponto:** I183b · I184.
 
 ---
 
