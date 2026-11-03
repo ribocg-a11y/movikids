@@ -4570,6 +4570,15 @@ function initReceitaDiariaSel() {
   const mesEl = document.getElementById('rd-mes');
   const anoEl = document.getElementById('rd-ano');
   if (!mesEl || !anoEl) return;
+  /* I185: limpa cache v1 incompleto que travava o celular. */
+  try {
+    const kill = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (k && k.indexOf('mk_rd_fat_v1_') === 0) kill.push(k);
+    }
+    kill.forEach(function (k) { localStorage.removeItem(k); });
+  } catch (eKill) { /* ignore */ }
   if (!mesEl.dataset.init) {
     mesEl.value = String(hoje.getMonth() + 1);
     mesEl.dataset.init = '1';

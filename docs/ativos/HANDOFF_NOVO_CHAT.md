@@ -1,16 +1,16 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 31/10/2026 · FE **v1.9.177** (memorial Q2 out/26) · GAS Web/repo **v1.5.236** · **PIX 2ª 31/10**
+**Atualizado:** 03/11/2026 · FE **v1.9.178** (I185 Receita dia a dia celular) · GAS Web/repo **v1.5.236**
 
 ## Produção (agora)
 
 | Camada | Versão | Link |
 |--------|--------|------|
-| Frontend | **v1.9.177** | https://ribocg-a11y.github.io/movikids/?force=1.9.177 |
-| Gestão Pessoas | **v1.9.177** | `gestao-pessoas.html?force=1.9.177` |
+| Frontend | **v1.9.178** | https://ribocg-a11y.github.io/movikids/?force=1.9.178 |
+| Gestão Pessoas | **v1.9.178** | `gestao-pessoas.html?force=1.9.178` |
 | GAS | ping Web **v1.5.236** · repo **v1.5.236** | I182 escala alinhada |
 
-**Pagamento 31/10 (Q2 10/2026):** memorial `MEMORIAL_HOLERITE_Q2_2026-10.md` — PIX Ray **902,22** · Karen **1.002,22** · Jennifer **632,19** (VA cartão; VT fora; **não** usar PIX do app).
+**I185:** celular Receita dia a dia com cache curto — abrir `?force=1.9.178` → Outubro → **Ver** (força rede).
 
 ---
 

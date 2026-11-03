@@ -648,6 +648,20 @@ try {
     } else {
       Add-Check "guard.i183b.fe.holding-all" "ok" "Holding força all pos-auth + Encerradas dual (I183b)"
     }
+    # I185 — Receita dia a dia: cache completo + Ver força rede (anti 5 dias no celular)
+    $admRawI185 = ""
+    $admJsI185 = Join-Path $root "mk-admin.js"
+    if (Test-Path $admJsI185) { $admRawI185 = Get-Content -Path $admJsI185 -Raw -Encoding UTF8 }
+    $idxRawI185 = ""
+    $idxI185 = Join-Path $root "index.html"
+    if (Test-Path $idxI185) { $idxRawI185 = Get-Content -Path $idxI185 -Raw -Encoding UTF8 }
+    $rdV2 = $admRawI185.Contains('mk_rd_fat_v2_') -and $admRawI185.Contains('rdFatCompleto_') -and $admRawI185.Contains('rdDiasNoMes_')
+    $rdVer = $idxRawI185.Contains("carregarReceitaDiaria({forceNet:true})")
+    if (-not $rdV2 -or -not $rdVer) {
+      Add-Check "guard.i185.fe.receita-diaria" "fail" "I185 receita dia a dia: cache v2/completo/Ver forceNet incompleto"
+    } else {
+      Add-Check "guard.i185.fe.receita-diaria" "ok" "Receita dia a dia cache completo + Ver forceNet (I185)"
+    }
     # I171 — sessão operador por loja
     $gasRawG = ""
     $gasJsG = Join-Path $root "MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs"
