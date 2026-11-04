@@ -1,8 +1,8 @@
-# MOVI KIDS — Estado atual (03/11/2026 · FE v1.9.179 · La Ville)
+# MOVI KIDS — Estado atual (04/11/2026 · FE v1.9.192 · La Ville)
 
 Referência única para alinhamento local × produção.
 
-**Ciclo dev ativo:** **`PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`** — Sprint D · **La Ville inaugurou 06/10/2026** · FE **v1.9.187** (I192 Encerradas) · GAS **v1.5.237** · **I181** Ray+Karen · isolamento **I170–I178** ✅ · **I158** Golden ✅  
+**Ciclo dev ativo:** **`PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`** — Sprint D · **La Ville inaugurou 06/10/2026** · FE **v1.9.192** (I198) · GAS **v1.5.237** · **I191–I198** dual-loja/fantasma · **I181** Ray+Karen · isolamento **I170–I178** ✅ · **I158** Golden ✅  
 
 **Marco Ops:** **La Ville Mall — início de operações em 06/10/2026** (2ª unidade ao lado do Golden).  
 **CTO La Ville:** contrato merchandising quiosque **R$ 2.300/mês** · venc. dia 10 · PDF em `entregas/CONTRATO_MERCHANDISING_QUIOSQUE_MOVIKIDS.pdf`.
@@ -11,11 +11,12 @@ Referência única para alinhamento local × produção.
 **Prioridades gerais:** **`PLANEJAMENTO_ATUAL_2026-06.md`** §9
 
 **Handoff (novo chat PC):** **`HANDOFF_NOVO_CHAT.md`** ← ler primeiro · workspace C: `movikids-github` · **não Cloud**  
+**Aprendizado agente:** **`APRENDIZADO_AGENTE_MOVIKIDS.md`** · **`EVOLUCAO_ESTRATEGICA_POS_I197.md`**  
 **Design System (UI):** **`../referencia/DESIGN_SYSTEM_MOVIKIDS.md`** ← antes de qualquer tela  
 **Acessos:** **`ACESSOS_E_AUTORIZACOES.md`** — papéis, PIN admin, agente vs humano  
 **Índice:** `../INDICE.md` · **Prioridades:** **`PLANO_PRIORIDADES_2026-06.md`**  
 **Planejamento ativo:** `PLANEJAMENTO_ATUAL_2026-06.md`  
-**Mapa de erros/bugs:** **`MAPA_ERROS_FALHAS_BUGS.md`** (…/**I181** meta Ray+Karen · **I180** locar loja · **I178** isolamento)  
+**Mapa de erros/bugs:** **`MAPA_ERROS_FALHAS_BUGS.md`** (…/**I198** política cache · **I191–I197** dual-loja)  
 **Auditoria isolamento:** **`AUDITORIA_ISOLAMENTO_MULTIUNIDADE_I172_2026-10-06.md`**  
 **Plano La Ville:** **`PLANO_MULTI_UNIDADE_GOLDEN_LAVILLE_2026-09.md`** (🟢 ops desde **06/10/2026**)  
 
@@ -51,14 +52,14 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 ---
 
-## Produção (03/11/2026)
+## Produção (04/11/2026)
 
 | Camada | Versão | URL / evidência |
 |--------|--------|-----------------|
-| **Frontend** | **v1.9.179** | https://ribocg-a11y.github.io/movikids/?force=1.9.179 |
-| **Gestão Pessoas** | **v1.9.179** | `gestao-pessoas.html?force=1.9.179` |
-| **Service Worker** | **1.9.181** | I187 offline shell + fila encerrar |
-| **Apps Script** | ping **v1.5.236** · repo **v1.5.236** | I182 escala alinhada |
+| **Frontend** | **v1.9.192** | https://ribocg-a11y.github.io/movikids/?force=1.9.192 |
+| **Gestão Pessoas** | **v1.9.192** | `gestao-pessoas.html?force=1.9.192` |
+| **Service Worker** | **1.9.192** | I198 + I187 offline shell |
+| **Apps Script** | ping **v1.5.237** · repo **v1.5.237** | Triciclo 03 · I182 escala |
 | **La Ville ops** | ✅ **06/10/2026** | 2ª unidade em operação (D+0) |
 | **I166–I168 Folha/PDF** | ✅ FE | cache-first · Blob PDF · set R$14.577 |
 | **I159–I178 La Ville** | ✅ FE+GAS | Holding/balcão · isolamento dual validado |

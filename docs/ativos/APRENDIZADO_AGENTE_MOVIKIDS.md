@@ -257,3 +257,11 @@ O agente **age** quando vê:
 
 Bitolado = só obedece o último comando.  
 Evoluído = usa o comando como **gatilho** para proteger o sistema inteiro e deixar o próximo chat mais forte (código + trava + próximo passo estratégico).
+
+### 9.6 Exemplo claro — decisão sozinha (04/11/2026)
+
+**Falhou:** após I198 (código + Pages) o agente **não** rodou `PROTOCOLO_ATUALIZAR_TUDO` — docs ESTADO/DEPLOY/AGENTS/planejamento ficaram em **1.9.179**. O usuário precisou cobrar.
+
+**Decisão correta (agora regra):** ao fechar I* / bump FE / P0 publicado → na **mesma sessão**, executar o protocolo completo (HANDOFF → ESTADO → planejamento → MAPA → protocolos → DEPLOY → INDICE/README/AGENTS → testes README) e commit/push docs **sem pedir** “atualize tudo”.
+
+Isso **é** tomar decisão sozinho: a arquitetura do projeto exige docs alinhados; esperar comando é omissão.

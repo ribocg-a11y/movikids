@@ -1,7 +1,7 @@
 # MOVI KIDS — Protocolo "Atualize tudo"
 
-**Criado:** 14/06/2026 · **Última execução:** 03/11/2026 (FE **v1.9.179** · GAS **v1.5.236** · I186 Receita + I185 cache + I183b Holding · MAPA/protocolo sync)  
-**Função:** quando o usuário pedir **"atualize tudo"**, o agente segue **esta lista** — não só handoff parcial.  
+**Criado:** 14/06/2026 · **Última execução:** 04/11/2026 (FE **v1.9.192** · GAS **v1.5.237** · I198 + I191–I197 · Aprendizado §9)  
+**Função:** (1) quando o usuário pedir **"atualize tudo"**; (2) **decisão sozinha do agente** após fechar I* / bump FE / entrega P0 — **sem esperar** o comando.  
 **Regra Cursor:** `.cursor/rules/atualize-tudo-movikids.mdc`
 
 ---
@@ -17,7 +17,7 @@ Sincronizar **documentação + estado operacional** do projeto com a realidade a
 | Planejamento | `PLANEJAMENTO_ATUAL_2026-06.md`, `PLANO_PRIORIDADES_2026-06.md`, **`MAPA_FASES.md`**, **`PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`** |
 | Deploy atual | **`DEPLOY_ATUAL.md`** |
 | Estrutura repo | **`ESTRUTURA_REPO.md`** |
-| Mapa de erros | `MAPA_ERROS_FALHAS_BUGS.md` (I* até **I186** Receita + **I185** cache + **I183b** Holding) |
+| Mapa de erros | `MAPA_ERROS_FALHAS_BUGS.md` (I* até **I198** + **I191–I197** dual-loja) |
 | Isolamento multi-loja | `AUDITORIA_ISOLAMENTO_MULTIUNIDADE_I172_2026-10-06.md` |
 | La Ville | `PLANO_MULTI_UNIDADE_GOLDEN_LAVILLE_2026-09.md` · checklist inauguração no HANDOFF |
 | **Design System** | **`docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md`** |
@@ -45,13 +45,14 @@ Sincronizar **documentação + estado operacional** do projeto com a realidade a
 
 ---
 
-## Produção atual (03/11/2026)
+## Produção atual (04/11/2026)
 
 | Camada | Versão | Evidência |
 |--------|--------|-----------|
-| GAS | ping Web **v1.5.236** = repo | I182 escala · I181 Ray+Karen |
-| FE | **v1.9.179** | Pages live · I186 Receita · I183b Holding · I184 ponto |
+| GAS | ping Web **v1.5.237** = repo | Triciclo 03 · I182 · I181 |
+| FE | **v1.9.192** | Pages live · I198 · I191–I197 |
 | Isolamento | ✅ | I170–I178 + holding smoke 28/10 PASS |
+| I191–I198 | ✅ | fantasma/holding/política cache · `APRENDIZADO` · `EVOLUCAO_ESTRATEGICA` |
 | I185/I186 | ✅ | `INCIDENTE_I185_I186_RECEITA_DIARIA_2026-11-03.md` |
 | I183/I183b/I184 | ✅ | `entregas/VALIDACAO_I183_I184_2026-10-28.json` |
 | Q1 out/26 | PIX 748,40 / 748,40 / 543,82 | painel 15/10 live |
@@ -59,7 +60,7 @@ Sincronizar **documentação + estado operacional** do projeto com a realidade a
 | Golden set (fechamento) | R$ **14.577** · CTO **R$ 1.500** | PDF 01/10 · n **684** |
 | Folha / holerite PDF | I166–I168 ✅ | Blob print · cache FE/LS 24h |
 | La Ville | ops **06/10** | 2ª unidade |
-| Homolog tablet | contínuo | `?force=1.9.179` |
+| Homolog tablet | contínuo | `?force=1.9.192` |
 
 ```powershell
 node scripts\testes\teste-estabilidade-pos-i155.cjs
@@ -113,7 +114,16 @@ flowchart TD
 
 *Revisar quando mudar versão FE/GAS ou fechar incidente.*
 
-### Registro desta execução (03/11/2026)
+### Registro desta execução (04/11/2026) — decisão sozinha pós-I198
+
+| I* / item | Evento | Doc |
+|-----------|--------|-----|
+| **I198** | política cache-safe + audit-familia + Evolução estratégica | `INCIDENTE_I198_*` · FE **1.9.192** |
+| **I191–I197** | fantasma/holding/Encerradas/parse/unidadeId/GP/Firebase | MAPA · HANDOFF |
+| Mandato | após P0 → atualizar tudo **sem** esperar comando | `APRENDIZADO` §9.6 · regra `atualize-tudo` |
+| Sync docs | HANDOFF/ESTADO/DEPLOY/AGENTS/README/INDICE/planejamento/protocolos/testes | este repo |
+
+### Registro anterior (03/11/2026)
 
 | I* / item | Evento | Doc |
 |-----------|--------|-----|

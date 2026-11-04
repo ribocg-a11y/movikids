@@ -2,9 +2,10 @@
 
 Scripts em `scripts/testes/`. Documentação: `docs/ativos/PROTOCOLO_DIAGNOSTICO_E_TESTES.md` · **Planilha por aba:** `docs/ativos/PROTOCOLO_AUDITORIA_ABAS_PLANILHA.md` · **"atualize tudo":** `PROTOCOLO_ATUALIZAR_TUDO.md`
 
-**Versões de referência (03/11/2026):** FE **v1.9.179** · GAS ping **v1.5.236** · mínimo operação balcão **v1.7.35** (I15 GET).
+**Versões de referência (04/11/2026):** FE **v1.9.192** · GAS ping **v1.5.237** · mínimo operação balcão **v1.7.35** (I15 GET).
 
-| **I185/I186 Receita** | guards `guard.i185` / `guard.i186` · doc `INCIDENTE_I185_I186_*` · `?force=1.9.179` |
+| **I198 família dual-loja** | `../audit-familia-dual-loja.ps1` · `guard.i198.*` · `?force=1.9.192` |
+| **I185/I186 Receita** | guards `guard.i185` / `guard.i186` · doc `INCIDENTE_I185_I186_*` · `?force=1.9.179+` |
 | **I183/I183b/I184** | guards holding/ponto · `TESTE_HOLDING_SMOKE_C_READONLY.ps1` · `INCIDENTE_I183_I184_*` |
 | **I166–I168 Folha/PDF** | docs `INCIDENTE_I167_*` · `INCIDENTE_I168_*` · mapa família I166→I168 · FE cache-first + Blob PDF |
 | **I169 Holerite mês PDF** | `node scripts/gerar-holerite-mes-from-painel.cjs entregas/holerite-mes-2026-09/painel-09-2026.json` · pasta `entregas/holerite-mes-YYYY-MM/` |

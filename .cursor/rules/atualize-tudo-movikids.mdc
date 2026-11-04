@@ -1,44 +1,45 @@
 ---
-description: Comando "atualize tudo" — checklist obrigatório de documentação e estado MOVI KIDS
+description: Protocolo atualizar documentação — sob comando OU decisão sozinha pós-P0
 alwaysApply: true
 ---
 
 # "Atualize tudo" — MOVI KIDS
 
-Quando o usuário disser **"atualize tudo"**, **"registre tudo"**, **"atualize documentação"** ou equivalente — **executar este checklist completo**, sem pedir confirmação item a item.
+## Quando executar (sem pedir)
+
+1. Usuário disse **"atualize tudo"**, **"registre tudo"**, **"atualize documentação"** ou equivalente  
+2. **Decisão sozinha:** acabou de fechar I* / bump FE / entrega P0 / publicar Pages — **rodar este checklist na mesma sessão**, sem esperar o comando
+
+Exemplo claro de autonomia: após I198 o agente **deve** sincronizar ESTADO/DEPLOY/AGENTS/protocolos — não só o HANDOFF parcial.
 
 ## Repo (pasta no C)
 
-**Caminho canônico:**
-
 `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`
 
-**GAS canônico:**
-
-`C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github\MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs`
+**GAS canônico:**  
+`...\movikids-github\MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs`
 
 ## Checklist (ordem)
 
-1. **Handoff** — `docs/ativos/HANDOFF_NOVO_CHAT.md` (produção, próximo passo, comandos)
-2. **Estado** — `docs/ativos/ESTADO_ATUAL.md` (versões, entregas, validação)
-3. **Planejamento** — `PLANEJAMENTO_ATUAL_2026-06.md`, `PLANO_PRIORIDADES_2026-06.md`
-4. **Mapa de erros** — `MAPA_ERROS_FALHAS_BUGS.md` (I*, versões de referência)
-5. **Protocolos** — `PROTOCOLO_DIAGNOSTICO_E_TESTES.md`, `PROTOCOLO_ATUALIZAR_TUDO.md`
-6. **Arquitetura / fluxos / diagramas** — `MAPA_CODIGO_ARQUITETURA.md`, fases ativas (`FASE_*.md`)
-7. **Deploy / processos** — `DEPLOY_*.md` da versão atual, `DEPLOY_GAS_v1.5.32_AUTH.md`, `scripts/deploy-gas.ps1`
-8. **Histórico** — `docs/arquivo/incidentes/INCIDENTE_*.md` se houve incidente ou re-validação
-9. **Planilhas** — memorial e estado abas; **comunicação:** `OPERACAO_COMUNICACAO_QR_ONLY.md`
+1. **Handoff** — `docs/ativos/HANDOFF_NOVO_CHAT.md`
+2. **Estado** — `docs/ativos/ESTADO_ATUAL.md`
+3. **Planejamento** — `PLANEJAMENTO_ATUAL_2026-06.md`, `PLANO_PRIORIDADES_2026-06.md`, ciclo One UI / `MAPA_FASES.md`
+4. **Mapa de erros** — `MAPA_ERROS_FALHAS_BUGS.md`
+5. **Protocolos** — `PROTOCOLO_DIAGNOSTICO_E_TESTES.md`, `PROTOCOLO_ATUALIZAR_TUDO.md` (registrar execução)
+6. **Arquitetura** — `MAPA_CODIGO_ARQUITETURA.md`, fases ativas
+7. **Deploy** — `DEPLOY_ATUAL.md`, `DEPLOY_GAS_v1.5.32_AUTH.md` se GAS mudou
+8. **Histórico** — `INCIDENTE_*.md` da leva
+9. **Planilhas / comunicação** — memorials se folha mudou; QR-only se aplicável
 10. **Índice e entrada** — `docs/INDICE.md`, `README.md`, `AGENTS.md`
-11. **Testes** — `scripts/testes/README.md`; alinhar versões esperadas nos `.ps1` se mudou GAS/FE
+11. **Testes** — `scripts/testes/README.md`; versões nos `.ps1` se mudou GAS/FE
 
-## Evidência
+## Publicar docs (§7.2)
 
-Se o usuário colou output de teste ou repair — registrar data, métricas (B68, ping, gates) nos docs ativos e no incidente se aplicável.
+Commit + push `main` dos docs **sem pedir** (alinha próximo chat). Não confundir com §7.3 GAS.
 
-## Não fazer sem pedido explícito
+## Não fazer sem §7.3 / humano
 
-- `git commit` / `git push` (regra do usuário)
-- Editar planilha Google diretamente (só documentar estado)
-- `clasp deploy`
+- Editar planilha Google diretamente (só documentar)
+- `clasp deploy` / Nova versão Web GAS
 
 Doc mestre: `docs/ativos/PROTOCOLO_ATUALIZAR_TUDO.md`

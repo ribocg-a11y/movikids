@@ -13,10 +13,11 @@
 **Frota Golden:** 4 carros · **3 triciclos** (01–03) · 4 pelúcias — CONFIG live + FE **1.9.192**.  
 **I198:** política `mkInicioCacheSafeForApply_` + `audit-familia-dual-loja.ps1` · ir além do patch · `EVOLUCAO_ESTRATEGICA_POS_I197.md`.  
 **I197:** Firebase/GP/fantasma/IDB · **I196** unidadeId auth · **I195–I192** holding/Encerradas/parse.  
-**Agente:** Aprendizado §9 — comparar · prever · modernizar · **não esperar comando**; cada erro → proteção definitiva.
+**Agente:** Aprendizado §9 — comparar · prever · modernizar · **não esperar comando**; após P0 → **PROTOCOLO_ATUALIZAR_TUDO** sozinho.
 
 **Folha Q2 31/10:** PIX Ray **902,22** · Karen **1.002,22** · Jennifer **632,19**.  
-**Holding/ponto:** I183b · I184.
+**Holding/ponto:** I183b · I184.  
+**Próximo FE (E1):** `mkMergeInicioPayload_` · tablet `?force=1.9.192`.
 
 ---
 

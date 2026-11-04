@@ -1,6 +1,6 @@
 # MOVI KIDS — Mapa do código e arquitetura
 
-**Atualizado:** 15/10/2026 (FE **v1.9.171** · GAS ping **v1.5.235** · I181 folha Ray+Karen · I155 lookback · I154 fila 404)  
+**Atualizado:** 04/11/2026 (FE **v1.9.192** · GAS ping **v1.5.237** · I198 cache-safe · I191–I197 dual-loja · I181 folha · I155 lookback)  
 **Função:** anatomia do sistema — o que é cada parte, o que liga com o quê, o que é zona sensível.  
 **Complementa:** `ESTADO_ATUAL.md`, `ACESSOS_E_AUTORIZACOES.md`, `REGRAS_DE_PUBLICACAO_SEGURA.md`, `MAPA_ERROS_FALHAS_BUGS.md`, **`PROTOCOLO_DIAGNOSTICO_E_TESTES.md`**
 

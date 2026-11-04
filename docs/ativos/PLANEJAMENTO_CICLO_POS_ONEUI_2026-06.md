@@ -1,7 +1,7 @@
 # MOVI KIDS — Planejamento pós One UI (jun–jul/2026)
 
 **Criado:** 27/06/2026 · **Substitui backlog ativo** de `PLANEJAMENTO_ONE_UI_2026-06.md` (Sprints A–C ✅)  
-**Produção (03/11/2026):** FE **v1.9.179** · GAS **v1.5.236** · Pages confirmado · I96–**I186** · La Ville ops 06/10 · **I158** Golden ✅ · Q1+Q2 out/26 ✅  
+**Produção (04/11/2026):** FE **v1.9.192** · GAS **v1.5.237** · Pages confirmado · I96–**I198** · La Ville ops 06/10 · **I158** Golden ✅ · Q1+Q2 out/26 ✅  
 **Mestre:** `PLANO_PREMIUM_ONEUI_FASES_16_22_2026-06.md` · **Roteiro agente:** `ROTEIRO_AGENTE_OBRIGATORIO.md`  
 **Paralelo:** pontas — `PLANO_SINERGIA_PONTAS_2026-08-30.md` · estabilidade `EVIDENCIA_ESTABILIDADE_POS_I155_*`
 
