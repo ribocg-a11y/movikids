@@ -31,8 +31,9 @@ Este roteiro é a **ordem fixa** — não opcional.
 
 1. Repo: `C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikids\movikids-github`
 2. Ler `HANDOFF_NOVO_CHAT.md` → sprint/ciclo ativo
-3. Se UI: `DESIGN_SYSTEM_MOVIKIDS.md` §0 **antes** de codar
-4. `.\scripts\relatorio-versoes.ps1` — baseline Pages vs local
+3. Ler `APRENDIZADO_AGENTE_MOVIKIDS.md` — família + proatividade (I191→I197); se a tarefa for sync/sessão/holding/fantasma/unidadeId, aplicar §2.1 **antes** de declarar done
+4. Se UI: `DESIGN_SYSTEM_MOVIKIDS.md` §0 **antes** de codar
+5. `.\scripts\relatorio-versoes.ps1` — baseline Pages vs local
 
 ---
 
@@ -136,3 +137,5 @@ Tabela markdown + `Mudança no AppScript` + link `.gs` — `.cursor/rules/encerr
 - [ ] HANDOFF/ESTADO atualizados?
 - [ ] Não pedi push/commit desnecessariamente?
 - [ ] Não transferi ao usuário o que está em §7.2?
+- [ ] Família varrida (`APRENDIZADO_AGENTE` §2.1) — não só o sintoma?
+- [ ] Entrega P0 lista “feito sem pedido”?

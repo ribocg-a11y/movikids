@@ -7,6 +7,7 @@
 | Documento | Para quê |
 |-----------|----------|
 | [**ROTEIRO_AGENTE_OBRIGATORIO.md**](ativos/ROTEIRO_AGENTE_OBRIGATORIO.md) | **Agente** — ordem fixa commit/push/verify (I24) |
+| [**APRENDIZADO_AGENTE_MOVIKIDS.md**](ativos/APRENDIZADO_AGENTE_MOVIKIDS.md) | **Agente** — família I191–I197 · proatividade · auto-regulação |
 | [**HANDOFF_NOVO_CHAT.md**](ativos/HANDOFF_NOVO_CHAT.md) | **Novo chat Cursor** — contexto, produção |
 | [**PLANO_SINERGIA_PONTAS_2026-08-30.md**](ativos/PLANO_SINERGIA_PONTAS_2026-08-30.md) | **Plano ativo** — I148 único · portal `?v=` · mapa honesto · Fase 3 offline depois |
 | [**PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md**](ativos/PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md) | **Ciclo ativo** — Sprint D→G pós v1.9.2 |

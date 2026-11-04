@@ -1,0 +1,32 @@
+# Aprendizado do agente — MOVI KIDS (família + proatividade)
+
+**Fonte:** `docs/ativos/APRENDIZADO_AGENTE_MOVIKIDS.md`  
+**Marco:** I191→I197 (04/11/2026)
+
+## Ler na Fase A
+
+Além do HANDOFF: abrir `APRENDIZADO_AGENTE_MOVIKIDS.md` quando a tarefa tocar sync, sessão, holding, fantasma, offline, unidadeId, cache ou admin “logado”.
+
+## Regra dura — sintoma ≠ família
+
+Corrigir o bug pedido **e**, na mesma sessão, varrer a família (§2.1 do doc):
+
+1. Quem é autoridade (não reidratar Ativa de Firebase/cache/snapshot)
+2. Parcial não apaga rico (`encHoje` / stats)
+3. Holding = `sessoesAtivas` mapa (não só `sessaoAtiva`)
+4. Nunca `all→golden` em liberar/deslogar
+5. `unidadeId` depois do auth
+6. Boot/timeout/backoff/offline
+7. Irmãos no admin/GP/hist/custos
+8. Guard no pre-push
+
+Se o usuário precisar dizer “veja o que você deixou passar” — a sessão falhou o gate de evolução.
+
+## Proatividade (§7.2)
+
+Sem pedir: bump+push FE, audit→código P0/P1 FE, guards, HANDOFF/MAPA, `encerramento-sessao` exit 0.  
+Não transferir scripts que o agente pode rodar.
+
+## Encerrar entrega P0
+
+Incluir bullets **Feito sem pedido** + checklist família (template §6 do doc).

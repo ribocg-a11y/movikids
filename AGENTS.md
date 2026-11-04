@@ -2,20 +2,21 @@
 
 Sistema operacional de locações — balcão (tablet na loja), portal do responsável, painel admin.
 
-**Ciclo ativo (03/11/2026):** Sprint D · **La Ville ops desde 06/10/2026** · FE **v1.9.181** I187 offline · GAS Web/repo **v1.5.237** · I186 Receita · I181 Ray+Karen · isolamento I170–I178 ✅
+**Ciclo ativo (04/11/2026):** Sprint D · **La Ville ops desde 06/10/2026** · FE **v1.9.191** I197 · GAS Web/repo **v1.5.237** · ler `docs/ativos/APRENDIZADO_AGENTE_MOVIKIDS.md`
 
 **Para retomar (agente local PC — pasta C):**
 
-> *Continuar MOVI KIDS — La Ville ops 06/10 · FE `?force=1.9.181` · GAS **v1.5.237** · I187 offline fila salvar/▶/encerrar/cancelar*
+> *Continuar MOVI KIDS — La Ville ops 06/10 · FE `?force=1.9.191` · GAS **v1.5.237** · I197 dual-loja · APRENDIZADO_AGENTE (sintoma ≠ família)*
 
 ## Produção atual
 
 | Camada | Versão | Link |
 |--------|--------|------|
-| Frontend | **v1.9.181** | https://ribocg-a11y.github.io/movikids/?force=1.9.181 |
-| Gestão Pessoas | **v1.9.181** | `gestao-pessoas.html?force=1.9.181` |
+| Frontend | **v1.9.191** | https://ribocg-a11y.github.io/movikids/?force=1.9.191 |
+| Gestão Pessoas | **v1.9.191** | `gestao-pessoas.html?force=1.9.191` |
 | GAS | ping Web **v1.5.237** · repo **v1.5.237** | Triciclo 03 |
 | Design System | **v1.1** | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
+| Aprendizado agente | **I191–I197** | `docs/ativos/APRENDIZADO_AGENTE_MOVIKIDS.md` |
 
 **GAS raw:** https://raw.githubusercontent.com/ribocg-a11y/movikids/main/MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs
 

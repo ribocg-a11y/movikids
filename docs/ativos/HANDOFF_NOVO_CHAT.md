@@ -1,6 +1,6 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 04/11/2026 · FE **v1.9.191** (I197 audit dual-loja) · GAS Web/repo **v1.5.237**
+**Atualizado:** 04/11/2026 · FE **v1.9.191** (I197) · GAS Web/repo **v1.5.237** · **ler** `APRENDIZADO_AGENTE_MOVIKIDS.md`
 
 ## Produção (agora)
 
@@ -13,7 +13,8 @@
 **Frota Golden:** 4 carros · **3 triciclos** (01–03) · 4 pelúcias — CONFIG live + FE **1.9.191**.  
 **I197:** Firebase sem ativos · GP `sessoesAtivas` · fantasma map-wide · IDB por loja · cache frio sem Ativa · `INCIDENTE_I197_*`.  
 **I196:** `unidadeId` depois do auth · **I195** deslogar holding · **I194** sessoesAtivas · **I193** parse · **I192** Encerradas.  
-**I186:** Receita dia a dia — pills + **Ver**.
+**I186:** Receita dia a dia — pills + **Ver**.  
+**Agente:** `docs/ativos/APRENDIZADO_AGENTE_MOVIKIDS.md` — sintoma ≠ família; proatividade §7.2; template “feito sem pedido”.
 
 **Folha Q2 31/10:** PIX Ray **902,22** · Karen **1.002,22** · Jennifer **632,19**.  
 **Holding/ponto:** I183b · I184.

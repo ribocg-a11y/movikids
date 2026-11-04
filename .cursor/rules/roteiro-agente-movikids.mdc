@@ -21,8 +21,9 @@ Permissoes: `ACESSOS_E_AUTORIZACOES.md` §7.2 (fazer) · §7.3 (so com pedido)
 ## Fase A — Entrada (todo chat)
 
 1. Confirmar repo `movikids-github`
-2. Ler: `HANDOFF_NOVO_CHAT.md` → sprint ativo → `DESIGN_SYSTEM_MOVIKIDS.md` §0 se UI
+2. Ler: `HANDOFF_NOVO_CHAT.md` → `APRENDIZADO_AGENTE_MOVIKIDS.md` → sprint ativo → `DESIGN_SYSTEM_MOVIKIDS.md` §0 se UI
 3. `.\scripts\relatorio-versoes.ps1` — saber Pages vs local
+4. Em P0 sync/sessão/holding/fantasma: varrer família (§2.1 aprendizado) sem esperar o usuário pedir
 
 ---
 
