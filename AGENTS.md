@@ -40,6 +40,7 @@ cd C:\Users\riboc\Documents\Codex\2026-05-30\files-mentioned-by-the-user-movikid
 - **I158 Golden:** ✅ set fechamento **R$ 14.577** / CTO **R$ 1.500**
 - **Encerrar toda resposta** com bloco **Versões (encerramento)** + Regra 16
 - **§7.2:** FE pronto → push `main` **sem pedir**
-- **Não repetir:** `unidadeId all` depois do auth (I183b) · forceNet só no Ver (I186) · isolamento só com Contas · `getRange` curto + match unidade (I172/I178)
+- **Evolução:** P0 = sintoma **+** família (`APRENDIZADO_AGENTE_MOVIKIDS.md` §2.1) · listar “feito sem pedido”
+- **Não repetir:** parcial apagar rico (I192) · holding só `sessaoAtiva` (I194) · `all→golden` (I195) · auth engolir `unidadeId` (I196) · `getRange` curto (I172/I178)
 
-Ver `docs/ativos/HANDOFF_NOVO_CHAT.md` · `docs/ativos/PROTOCOLO_ATUALIZAR_TUDO.md` · `docs/ativos/AUDITORIA_ISOLAMENTO_MULTIUNIDADE_I172_2026-10-06.md`
+Ver `docs/ativos/HANDOFF_NOVO_CHAT.md` · `docs/ativos/APRENDIZADO_AGENTE_MOVIKIDS.md` · `docs/ativos/PROTOCOLO_ATUALIZAR_TUDO.md`
