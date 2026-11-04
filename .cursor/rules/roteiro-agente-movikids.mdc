@@ -69,6 +69,7 @@ encerramento-sessao.ps1     # exit 0 obrigatorio
 | I24 | Bump sem push / Pages velha | `guard-i24-publicacao` + `encerramento-sessao` |
 | I15 | POST no browser | `guard.post.escritas` |
 | I22 | Push FE critico com loc aberta | `check-operacao-livre` |
+| **I193** | FE JS com SyntaxError (`*/` em comentário) | `guard-js-syntax` + `guard.i193` — **código base não muda sem parse OK** |
 
 ---
 
