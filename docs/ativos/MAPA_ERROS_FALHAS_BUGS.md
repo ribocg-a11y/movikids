@@ -156,6 +156,8 @@ Docs: `INCIDENTE_I153_*` · `INCIDENTE_I154_*` · `INCIDENTE_I155_*` · `EVIDENC
 | **I192** | La Ville Encerradas vazias + fantasma persiste | `listarAtivas` gravava snapshot `encHoje:[]`; timeout inicio só listar; boot reidratava Ativa do snapshot | preservar encHoje no parcial; repair `carregarInicio`; snapshot sem Ativa ri&gt;0 · **v1.9.187** | ✅ FE |
 | **I193** | Sync/FE morto no tablet após I191 (todos reclamando) | Comentário `_offline*/` **dentro** de `/* */` → **SyntaxError** em `mk-sync.js` + `mk-local-snapshot.js`; pre-push **sem** `node --check` | `guard-js-syntax.ps1` + `guard.i193.js.syntax` no pre-push; Regra 21 | ✅ trava |
 | **I194** | Admin “ninguém logado” com Karen/Jennifer no balcão | Holding: `sessaoAtiva=null`; FE ignorava `sessoesAtivas` | banner/cards via mapa; refresh com unidade · FE **v1.9.188** | ✅ FE |
+| **I195** | Deslogar/liberar holding errado + banner pós-liberar | `all→golden`; fallback libera 2 lojas; mapa não zerava | loja do operador; `applySessaoAposLiberar_` · FE **v1.9.189** | ✅ FE |
+| **I196** | Custos/relatório/fat/hist com loja errada | `...apiParamsComAuth_()` **depois** de `unidadeId` explícito | Object.assign auth→unidadeId; fat balcão; hist por pill · FE **v1.9.190** | ✅ FE |
 
 **Veredito offline:** balcão **parcial** — Nova + ▶ + Encerrar + Cancelar enfileiram e sobem ao voltar rede. Estender/editar/admin/login ainda exigem rede. SMS/WhatsApp ignorados (`qr_only`). **Regra I191:** flag offline em linha real (ri>0) **não** vence `listarAtivas`. **Regra I192:** parcial/`listarAtivas` **não** apaga Encerradas do dia. **Regra I193:** **nunca** push FE com parse quebrado.
 

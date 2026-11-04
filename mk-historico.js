@@ -212,16 +212,17 @@ async function buscarHistorico() {
   if (cards) cards.style.display = 'none';
 
   try {
-    /* I170: balcão pede só a loja; holding all + filtro dual no FE. */
-    const uidHist = histFiltroUnidade_();
-    const authP = Object.assign({}, apiParamsComAuth_(), {
-      unidadeId: (typeof mkIsBalcaoEstrito_ === 'function' && mkIsBalcaoEstrito_()) ? uidHist : 'all'
+    /* I170/I196: pedir a loja do filtro (pill/balcão). Holding “Todas”=all;
+     * pill Golden/LV evita cap 100 misturado esconder La Ville. */
+    const uidHist = histFiltroUnidade_() || 'all';
+    const authP = Object.assign({}, typeof apiParamsComAuth_ === 'function' ? apiParamsComAuth_() : {}, {
+      unidadeId: uidHist
     });
-    const resStatsP = api({ action: 'listarHistorico', startDate: dates.s, endDate: dates.e, statsOnly: '1', ...authP });
-    const resFullP = api({ action: 'listarHistorico', startDate: dates.s, endDate: dates.e, ...authP });
+    const resStatsP = api(Object.assign({ action: 'listarHistorico', startDate: dates.s, endDate: dates.e, statsOnly: '1' }, authP));
+    const resFullP = api(Object.assign({ action: 'listarHistorico', startDate: dates.s, endDate: dates.e }, authP));
     const resStats = await resStatsP;
-    /* I170: só pintar stats prévios no balcão (GAS já filtrado). Holding espera lista + filtro FE. */
-    if (resStats.ok && resStats.stats && typeof mkIsBalcaoEstrito_ === 'function' && mkIsBalcaoEstrito_()) {
+    /* Stats do GAS já filtrados quando uid ≠ all — pode pintar no balcão e no holding pill. */
+    if (resStats.ok && resStats.stats && uidHist !== 'all') {
       renderAnalyticsCards(resStats.stats);
       renderHistExtChart_(resStats.stats);
     }

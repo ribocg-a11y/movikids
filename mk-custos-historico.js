@@ -500,13 +500,14 @@ async function buscarCustosMesesSerie_() {
   } catch (e) { /* ignora */ }
 
   try {
-    const authP = apiParamsComAuth_();
-    const uidCus = (typeof mkDualFiltro_ === 'function' ? mkDualFiltro_() : (authP && authP.unidadeId) || 'all');
+    /* I196/I183b: série mensal — all DEPOIS do auth (paridade com ledger). */
+    const authP = Object.assign({}, typeof apiParamsComAuth_ === 'function' ? apiParamsComAuth_() : {}, {
+      unidadeId: 'all'
+    });
     const base = {
       action: 'listarCustosHistorico',
       startDate: range.s,
       endDate: range.e,
-      unidadeId: uidCus,
       ...authP
     };
     if (cat) base.categoria = cat;

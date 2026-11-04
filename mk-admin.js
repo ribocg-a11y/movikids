@@ -701,6 +701,21 @@ function nSessoesHojeCanonica_() {
 }
 
 function fatHojeCanonica_(d) {
+  /* I196: balcão — nunca herdar fat do holding (resumoDiaHoje=all). */
+  if (typeof mkIsBalcaoEstrito_ === 'function' && mkIsBalcaoEstrito_()) {
+    const uid = typeof mkUnidadeId_ === 'function' ? mkUnidadeId_() : 'golden';
+    if (resumoDiaHoje && resumoDiaHoje.fat != null
+        && String(resumoDiaHoje.unidadeId || '') === String(uid)) {
+      return Number(resumoDiaHoje.fat);
+    }
+    const encU = (typeof mkSessionsPorUnidade_ === 'function')
+      ? mkSessionsPorUnidade_(typeof encHojeData !== 'undefined' ? encHojeData : [], uid)
+      : [];
+    if (typeof mkExibirFinanceiro_ === 'function' && mkExibirFinanceiro_()) {
+      return encU.reduce(function (s, e) { return s + (Number(e.valorTotal) || 0); }, 0);
+    }
+    return 0;
+  }
   if (typeof commandCenterData !== 'undefined' && commandCenterData && commandCenterData.fatHoje != null) {
     return Number(commandCenterData.fatHoje);
   }
@@ -729,7 +744,16 @@ function resumoDiaCacheRead_(cacheKey, staleMs) {
 async function carregarResumoHojeAdmin_(opts) {
   const force = !!(opts && opts.force);
   const dataHoje = fmtDataBrHoje_();
-  const cacheKey = 'mk_resumo_dia_' + dataHoje.replace(/\//g, '');
+  /* I196: cache por unidade — senão troca Golden↔LV reusa resumo errado. */
+  let uidCache = 'all';
+  try {
+    if (typeof mkIsBalcaoEstrito_ === 'function' && mkIsBalcaoEstrito_() && typeof mkUnidadeId_ === 'function') {
+      uidCache = mkUnidadeId_() || 'golden';
+    } else if (typeof mkDualFiltro_ === 'function') {
+      uidCache = mkDualFiltro_() || 'all';
+    }
+  } catch (eU) { uidCache = 'all'; }
+  const cacheKey = 'mk_resumo_dia_' + dataHoje.replace(/\//g, '') + '_u' + uidCache;
   const RESUMO_FRESH_MS = 60000;
   const RESUMO_STALE_MS = 5 * 60 * 1000;
   if (!force) {
@@ -746,8 +770,12 @@ async function carregarResumoHojeAdmin_(opts) {
       return hit.data;
     }
   }
-  const authP = apiParamsComAuth_();
-  const resumo = await api({ action: 'resumoDia', data: dataHoje, ...authP });
+  const authP = typeof apiParamsComAuth_ === 'function' ? apiParamsComAuth_() : {};
+  const resumo = await api(Object.assign({}, authP, {
+    action: 'resumoDia',
+    data: dataHoje,
+    unidadeId: uidCache
+  }));
   if (resumo && resumo.ok) {
     resumoDiaHoje = resumo;
     if (typeof mkSessCacheSet_ === 'function') mkSessCacheSet_(cacheKey, resumo);
@@ -4323,7 +4351,8 @@ function mkCaixaSliceResumo_(rAll, uid) {
     caixaIncluiAbertas: true,
     locacoes: locs,
     custos: custos,
-    leadingDia: rAll.leadingDia,
+    /* I196: leadingDia do holding não serve para pill de 1 loja. */
+    leadingDia: filtro === 'all' ? rAll.leadingDia : null,
     alertasInteligentes: filtro === 'all' ? rAll.alertasInteligentes : [],
     extrasCancelados: (rAll.extrasCancelados || []).filter(function (x) {
       return mkCaixaUidOfLoc_(x) === filtro;
@@ -4902,7 +4931,11 @@ async function carregarPreviewRelatorio() {
   if (btnDrv) btnDrv.disabled = true;
   try {
     // I158/I168: 1× kpiMes (api já retenta 404). Sem loop 3× — congestionava GAS (I136).
-    const d = await api({ action: 'kpiMes', mes: mes, ano: ano, lite: '1', unidadeId: 'golden', ...apiParamsComAuth_() }, 120000);
+    /* I196/I183b: Relatório Golden — forçar golden DEPOIS do auth. */
+    const authRel = typeof apiParamsComAuth_ === 'function' ? apiParamsComAuth_() : {};
+    const d = await api(Object.assign({}, authRel, {
+      action: 'kpiMes', mes: mes, ano: ano, lite: '1', unidadeId: 'golden'
+    }), 120000);
     if (!d || !d.ok) {
       prev.innerHTML = '<div style="color:var(--red);padding:20px;text-align:center">Erro ao carregar relatório: ' + escHtml((d && d.erro) || 'falha')
         + '<br><button type="button" class="btn btn-secondary" style="margin-top:12px" onclick="carregarPreviewRelatorio()">Tentar de novo</button></div>';
@@ -5069,7 +5102,11 @@ function mkDownloadRelatorioHtml_(html, nomeArq) {
 }
 
 async function mkFetchKpiMesRelatorio_(mes, ano) {
-  const d = await api({ action: 'kpiMes', mes: mes, ano: ano, unidadeId: 'golden', ...apiParamsComAuth_() }, 90000);
+  /* I196/I183b: golden por último — balcão LV não pode engolir o relatório. */
+  const authRel = typeof apiParamsComAuth_ === 'function' ? apiParamsComAuth_() : {};
+  const d = await api(Object.assign({}, authRel, {
+    action: 'kpiMes', mes: mes, ano: ano, unidadeId: 'golden'
+  }), 90000);
   if (!d || !d.ok) throw new Error((d && d.erro) || 'kpiMes falhou');
   return d;
 }

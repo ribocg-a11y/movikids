@@ -18,7 +18,14 @@ async function loadCustosHoje() {
     const hoje  = new Date();
     const mm    = String(hoje.getMonth()+1).padStart(2,'0');
     const yyyy  = hoje.getFullYear();
-    const dc    = await api({ action: 'listarCustos', mes: mm, ano: yyyy, unidadeId: 'all', ...apiParamsComAuth_() });
+    /* I196/I183b: unidadeId DEPOIS do auth — senão balcão LV engole o all. */
+    const authP = typeof apiParamsComAuth_ === 'function' ? apiParamsComAuth_() : {};
+    const dc = await api(Object.assign({}, authP, {
+      action: 'listarCustos',
+      mes: mm,
+      ano: yyyy,
+      unidadeId: 'all'
+    }));
     if (dc.ok) {
       const dataHoje = String(hoje.getDate()).padStart(2,'0') + '/' + mm + '/' + yyyy;
       custosHoje = dc.custos.filter(c => String(c.data) === dataHoje);
@@ -44,14 +51,15 @@ async function salvarCusto() {
   btn.textContent = '⏳ Salvando...'; btn.disabled = true;
 
   try {
-    const d = await api({
-      action:    'salvarCusto',
+    /* I196/I183b: pill da loja DEPOIS do auth — senão grava na loja da sessão. */
+    const authP = typeof apiParamsComAuth_ === 'function' ? apiParamsComAuth_() : {};
+    const d = await api(Object.assign({}, authP, {
+      action: 'salvarCusto',
       descricao: desc,
       categoria: catSel,
-      valor:     val,
-      unidadeId: custoUnidadeSel_,
-      ...apiParamsComAuth_()
-    });
+      valor: val,
+      unidadeId: custoUnidadeSel_
+    }));
 
     if (!d.ok) { toast('Erro: ' + d.erro, 'error'); return; }
 

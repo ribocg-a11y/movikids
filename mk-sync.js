@@ -677,8 +677,19 @@ function aplicarDadosInicio(d) {
       renderHolding_();
     }
 
-    if (d.custosHoje) { custosHoje = d.custosHoje; renderCustos(); }
-    else loadCustosHoje();
+    /* I196: carregarInicio pode trazer custos sem unidadeId (mistura lojas).
+     * Se não vierem todos tagueados, preferir listarCustos(all). */
+    if (d.custosHoje && Array.isArray(d.custosHoje) && d.custosHoje.length) {
+      const tagged = d.custosHoje.every(function (c) { return c && c.unidadeId; });
+      if (tagged || uidResp === 'all') {
+        custosHoje = d.custosHoje;
+        if (typeof renderCustos === 'function') renderCustos();
+      } else if (typeof loadCustosHoje === 'function') {
+        loadCustosHoje();
+      }
+    } else if (typeof loadCustosHoje === 'function') {
+      loadCustosHoje();
+    }
     agendarProximoPoll();
   } catch(e) {
     console.error('aplicarDadosInicio:', e);

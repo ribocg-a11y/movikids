@@ -1090,6 +1090,46 @@ try {
       Add-Check "guard.i195.boot.opsparams" "ok" "boot prefetch com unidade"
     }
   }
+  # I196 — auth não pode sobrescrever unidadeId explícito (custos/relatório/hist)
+  $cusPathI196 = Join-Path $root "mk-custos.js"
+  if (Test-Path $cusPathI196) {
+    $cusRawI196 = Get-Content -Path $cusPathI196 -Raw -Encoding UTF8
+    if ($cusRawI196 -match 'unidadeId:\s*custoUnidadeSel_\s*,\s*\.\.\.apiParamsComAuth_' -or
+        $cusRawI196 -match "unidadeId:\s*'all'\s*,\s*\.\.\.apiParamsComAuth_") {
+      Add-Check "guard.i196.custos.auth" "fail" "salvarCusto/listarCustos com auth depois do unidadeId (I196)"
+    } elseif ($cusRawI196 -notmatch 'I196/I183b' -or $cusRawI196 -notmatch 'Object\.assign\(\{\}, authP') {
+      Add-Check "guard.i196.custos.auth" "fail" "custos sem Object.assign auth+unidadeId (I196)"
+    } else {
+      Add-Check "guard.i196.custos.auth" "ok" "custos forcam unidadeId apos auth"
+    }
+  }
+  $admPathI196 = Join-Path $root "mk-admin.js"
+  if (Test-Path $admPathI196) {
+    $admRawI196 = Get-Content -Path $admPathI196 -Raw -Encoding UTF8
+    if ($admRawI196 -match "unidadeId:\s*'golden'\s*,\s*\.\.\.apiParamsComAuth_") {
+      Add-Check "guard.i196.relatorio.auth" "fail" "relatorio kpiMes golden engolido pelo auth (I196)"
+    } elseif ($admRawI196 -notmatch 'I196/I183b: Relatório Golden' -and $admRawI196 -notmatch 'I196/I183b: golden por último') {
+      Add-Check "guard.i196.relatorio.auth" "fail" "relatorio sem forcar golden apos auth (I196)"
+    } else {
+      Add-Check "guard.i196.relatorio.auth" "ok" "relatorio Golden apos auth"
+    }
+    if ($admRawI196 -notmatch 'fatHojeCanonica_' -or $admRawI196 -notmatch 'I196: balcão — nunca herdar fat') {
+      Add-Check "guard.i196.fat.balcao" "fail" "fatHojeCanonica_ sem trava balcão (I196)"
+    } else {
+      Add-Check "guard.i196.fat.balcao" "ok" "fatHoje fail-closed no balcão"
+    }
+  }
+  $histPathI196 = Join-Path $root "mk-historico.js"
+  if (Test-Path $histPathI196) {
+    $histRawI196 = Get-Content -Path $histPathI196 -Raw -Encoding UTF8
+    if ($histRawI196 -match 'mkIsBalcaoEstrito_.*\? uidHist : ''all''' -or $histRawI196 -match 'mkIsBalcaoEstrito_\(\)\) \? uidHist : ''all''') {
+      Add-Check "guard.i196.hist.uid" "fail" "hist holding ainda forca all com pill loja (I196)"
+    } elseif ($histRawI196 -notmatch 'I170/I196') {
+      Add-Check "guard.i196.hist.uid" "fail" "hist sem pedido por pill (I196)"
+    } else {
+      Add-Check "guard.i196.hist.uid" "ok" "hist pede unidade do filtro/pill"
+    }
+  }
   $novaPathI187 = Join-Path $root "mk-nova.js"
   if (Test-Path $novaPathI187) {
     $novaRawI187 = Get-Content -Path $novaPathI187 -Raw -Encoding UTF8
