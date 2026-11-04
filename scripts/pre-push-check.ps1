@@ -1004,6 +1004,29 @@ try {
       Add-Check "guard.i191.boot.autopurge" "ok" "boot chama auto-purge I191"
     }
   }
+  # I192 — listarAtivas não pode apagar Encerradas (La Ville hist vazio)
+  if (Test-Path $snapPathI191) {
+    $snapRawI192 = Get-Content -Path $snapPathI191 -Raw -Encoding UTF8
+    if ($snapRawI192 -notmatch 'I192' -or $snapRawI192 -notmatch 'encHojeData') {
+      Add-Check "guard.i192.snapshot.enchoje" "fail" "snapshot parcial apaga encHoje (I192)"
+    } else {
+      Add-Check "guard.i192.snapshot.enchoje" "ok" "snapshot preserva encHoje em parcial"
+    }
+    if ($snapRawI192 -notmatch 'listarAtivas é autoridade' -and $snapRawI192 -notmatch 'I151/I191') {
+      Add-Check "guard.i192.snapshot.ativos" "fail" "snapshot ainda reidrata Ativa fantasma"
+    } else {
+      Add-Check "guard.i192.snapshot.ativos" "ok" "boot snapshot nao reidrata Ativa ri>0"
+    }
+  }
+  $syncPathI192 = Join-Path $root "mk-sync.js"
+  if (Test-Path $syncPathI192) {
+    $syncRawI192 = Get-Content -Path $syncPathI192 -Raw -Encoding UTF8
+    if ($syncRawI192 -notmatch 'mkScheduleEncHojeRepair_' -or $syncRawI192 -notmatch 'mkRepairEncHojeFromInicio_') {
+      Add-Check "guard.i192.enchoje.repair" "fail" "repair encHoje apos listarAtivas ausente (I192)"
+    } else {
+      Add-Check "guard.i192.enchoje.repair" "ok" "repair encHoje apos listarAtivas-only"
+    }
+  }
   $novaPathI187 = Join-Path $root "mk-nova.js"
   if (Test-Path $novaPathI187) {
     $novaRawI187 = Get-Content -Path $novaPathI187 -Raw -Encoding UTF8

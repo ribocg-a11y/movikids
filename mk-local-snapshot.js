@@ -86,15 +86,63 @@ function mkSnapshotSave_(d) {
   const uidSnap = (d.unidadeId != null && d.unidadeId !== '')
     ? String(d.unidadeId)
     : ((typeof mkUnidadeId_ === 'function') ? mkUnidadeId_() : 'golden');
+
+  /* I192: listarAtivas / parcial NÃO traz encHoje — nunca gravar [] por cima do histórico do dia.
+   * Sintoma: La Ville operadora via Encerradas vazias após reconcile/fantasma. */
+  let encHoje;
+  if (Array.isArray(d.encHoje)) {
+    encHoje = d.encHoje;
+  } else {
+    encHoje = (typeof encHojeData !== 'undefined' && Array.isArray(encHojeData) && encHojeData.length)
+      ? encHojeData.slice()
+      : null;
+    if (!encHoje || !encHoje.length) {
+      try {
+        const prev = mkSnapshotLoad_();
+        if (prev && prev.data && Array.isArray(prev.data.encHoje) && prev.data.encHoje.length) {
+          encHoje = prev.data.encHoje;
+        }
+      } catch (ePrev) { /* ignore */ }
+    }
+    if (!encHoje) encHoje = [];
+  }
+
+  let statsHojeSnap = (d.statsHoje != null) ? d.statsHoje : null;
+  if (!statsHojeSnap && d.parcial) {
+    if (typeof statsHoje === 'object' && statsHoje) {
+      statsHojeSnap = {
+        n: Number(statsHoje.n) || 0,
+        nSessoes: Number(statsHoje.nSessoes) || 0,
+        fat: Number(statsHoje.fat) || 0,
+        unidadeId: statsHoje.unidadeId
+      };
+    } else {
+      try {
+        const prev2 = mkSnapshotLoad_();
+        if (prev2 && prev2.data && prev2.data.statsHoje) statsHojeSnap = prev2.data.statsHoje;
+      } catch (eS2) { /* ignore */ }
+    }
+  }
+
+  let operacaoConfig = d.operacaoConfig || null;
+  let custosHojeSnap = d.custosHoje || null;
+  if (d.parcial) {
+    try {
+      const prev3 = mkSnapshotLoad_();
+      if (!operacaoConfig && prev3 && prev3.data) operacaoConfig = prev3.data.operacaoConfig || null;
+      if (!custosHojeSnap && prev3 && prev3.data) custosHojeSnap = prev3.data.custosHoje || null;
+    } catch (eP3) { /* ignore */ }
+  }
+
   const payload = {
     ts: Date.now(),
     data: {
       unidadeId: uidSnap,
       ativos: ativos,
-      statsHoje: d.statsHoje || null,
-      encHoje: d.encHoje || [],
-      operacaoConfig: d.operacaoConfig || null,
-      custosHoje: d.custosHoje || null
+      statsHoje: statsHojeSnap,
+      encHoje: encHoje,
+      operacaoConfig: operacaoConfig,
+      custosHoje: custosHojeSnap
     }
   };
   window._mkSnapshotTs = payload.ts;
@@ -113,7 +161,18 @@ function mkSnapshotApply_(snap) {
   if (!snap || typeof aplicarDadosInicio !== 'function') return false;
   window._mkBootFromSnapshot = true;
   window._mkSnapshotTs = snap.ts;
-  aplicarDadosInicio(Object.assign({ ok: true }, snap.data, { fonte: 'snapshot' }));
+  /* I192: snapshot pode ter Ativa fantasma — aplicar só enc/stats/config;
+   * ativos só se ainda não houver listarAtivas recente (reconcile no boot). */
+  const data = Object.assign({ ok: true }, snap.data, { fonte: 'snapshot' });
+  if (Array.isArray(data.ativos) && data.ativos.length) {
+    data.ativos = data.ativos.filter(function (s) {
+      if (!s) return false;
+      if (Number(s.rowIndex) < 0) return true;
+      /* Não reidratar Ativa/Pendente reais do snapshot — listarAtivas é autoridade (I151/I191). */
+      return false;
+    });
+  }
+  aplicarDadosInicio(data);
   return true;
 }
 
@@ -126,7 +185,7 @@ function mkBootLocalFirstCore_() {
     stored = [];
   }
   /* I187b: temp row (ri<0) + otimista curto.
-   * I191: flags _offline*/_clientRequestId em ri>0 NÃO sobrevivem ao boot — fantasma. */
+   * I191: flags offline/_clientRequestId em ri>0 NÃO sobrevivem ao boot — fantasma. */
   const inflight = stored.filter(function (s) {
     if (!s) return false;
     if (Number(s.rowIndex) < 0) return true;
@@ -318,8 +377,14 @@ async function mkPurgeLocacoesFantasmaHard_(opts) {
   if (typeof mkSyncListarAtivasFallback_ === 'function') {
     try { ok = !!(await mkSyncListarAtivasFallback_({ silent: !!opts.silent })); } catch (eS) { ok = false; }
   }
+  /* I192: purge via listarAtivas zera Encerradas — forçar carregarInicio em seguida */
+  if (typeof mkScheduleEncHojeRepair_ === 'function') {
+    try { mkScheduleEncHojeRepair_(400); } catch (eRpr) { /* ignore */ }
+  } else if (typeof syncController === 'function') {
+    try { syncController(true, 400); } catch (eC) { /* ignore */ }
+  }
   if (!ok && typeof syncController === 'function') {
-    try { syncController(true, 300); } catch (eC) { /* ignore */ }
+    try { syncController(true, 300); } catch (eC2) { /* ignore */ }
   }
   if (opts.reload) {
     try { location.reload(); } catch (eR) { /* ignore */ }

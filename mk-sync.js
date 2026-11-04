@@ -121,6 +121,19 @@ async function mkSyncListarAtivasFallback_(opts) {
     if (payload.ativos.length === 0 && typeof mkInvalidateInicioCache_ === 'function') {
       mkInvalidateInicioCache_();
     }
+    /* I192: anexar encHoje em memória para o snapshot parcial não gravar histórico vazio */
+    if (typeof encHojeData !== 'undefined' && Array.isArray(encHojeData) && encHojeData.length) {
+      payload.encHoje = encHojeData.slice();
+    }
+    if (typeof statsHoje === 'object' && statsHoje && (statsHoje.n || statsHoje.nSessoes)) {
+      payload.statsHoje = {
+        n: Number(statsHoje.n) || 0,
+        nSessoes: Number(statsHoje.nSessoes) || 0,
+        fat: Number(statsHoje.fat) || 0,
+        unidadeId: statsHoje.unidadeId
+      };
+    }
+    if (typeof mkUnidadeId_ === 'function') payload.unidadeId = mkUnidadeId_();
     aplicarDadosInicio(payload);
     mkSyncClearBootPending_(true);
     setStatus(true);
@@ -129,6 +142,9 @@ async function mkSyncListarAtivasFallback_(opts) {
     } else if (!payload.ativos.length && before > 0 && typeof toast === 'function' && !opts.silent) {
       toast('Servidor sem locações abertas — limpei cards fantasmas.', 'warning');
     }
+    /* Sem Encerradas em memória → pedir carregarInicio (não ficar com lista vazia na operadora). */
+    const encN = (typeof encHojeData !== 'undefined' && Array.isArray(encHojeData)) ? encHojeData.length : 0;
+    if (encN === 0) mkScheduleEncHojeRepair_();
     return true;
   } catch (e) {
     console.warn('[Sync] listarAtivas fallback', e.message || e);
@@ -137,6 +153,89 @@ async function mkSyncListarAtivasFallback_(opts) {
     _listarAtivasInFlight = false;
   }
 }
+
+/** I192: após listarAtivas-only, buscar encHoje via carregarInicio (sem loop infinito). */
+let _mkEncHojeRepairTimer = null;
+let _mkEncHojeRepairInFlight = false;
+function mkScheduleEncHojeRepair_(delayMs) {
+  clearTimeout(_mkEncHojeRepairTimer);
+  _mkEncHojeRepairTimer = setTimeout(function () {
+    mkRepairEncHojeFromInicio_().catch(function () { /* ignore */ });
+  }, delayMs == null ? 1200 : delayMs);
+}
+async function mkRepairEncHojeFromInicio_() {
+  if (_mkEncHojeRepairInFlight) return false;
+  if (_syncInFlight) {
+    mkScheduleEncHojeRepair_(2500);
+    return false;
+  }
+  _mkEncHojeRepairInFlight = true;
+  try {
+    const d = await api(
+      Object.assign({ action: 'carregarInicio' }, typeof apiParamsComAuth_ === 'function' ? apiParamsComAuth_() : {}),
+      MK_INICIO_API_TIMEOUT_MS
+    );
+    if (!d || !d.ok || !Array.isArray(d.encHoje)) return false;
+    /* Só aplica enc/stats — não reidratar ativos do ScriptCache por cima do listarAtivas. */
+    const uidNow = typeof mkUnidadeId_ === 'function' ? mkUnidadeId_() : 'golden';
+    const uidResp = d.unidadeId != null && d.unidadeId !== '' ? String(d.unidadeId) : 'all';
+    if (uidResp !== 'all' && uidNow && uidNow !== 'all' && uidResp !== String(uidNow)) return false;
+    const balcaoEstrito = typeof mkIsBalcaoEstrito_ === 'function' ? mkIsBalcaoEstrito_() : true;
+    let mergedEnc;
+    if (balcaoEstrito && uidResp !== 'all' && uidResp === String(uidNow)) {
+      mergedEnc = d.encHoje.slice();
+    } else if (balcaoEstrito && uidResp === 'all') {
+      mergedEnc = (typeof mkSessionsPorUnidade_ === 'function')
+        ? mkSessionsPorUnidade_(d.encHoje || [], uidNow)
+        : [];
+    } else {
+      mergedEnc = typeof mkMergeListaPorUnidade_ === 'function'
+        ? mkMergeListaPorUnidade_(typeof encHojeData !== 'undefined' ? encHojeData : [], d.encHoje, uidResp)
+        : (d.encHoje || []);
+    }
+    if (typeof mkUpdateEncHojeKpis_ === 'function') mkUpdateEncHojeKpis_(mergedEnc);
+    else encHojeData = mergedEnc;
+    const uidFill = balcaoEstrito ? uidNow : ((uidResp && uidResp !== 'all') ? uidResp : uidNow);
+    const sliceEnc = (typeof mkSessionsPorUnidade_ === 'function')
+      ? mkSessionsPorUnidade_(mergedEnc, uidFill)
+      : mergedEnc;
+    statsHoje.n = typeof mkContasEncHoje_ === 'function' ? mkContasEncHoje_(sliceEnc) : sliceEnc.length;
+    statsHoje.nSessoes = sliceEnc.length;
+    statsHoje.unidadeId = uidFill;
+    if (typeof mkExibirFinanceiro_ === 'function' && mkExibirFinanceiro_()) {
+      statsHoje.fat = sliceEnc.reduce(function (s, e) { return s + (Number(e.valorTotal) || 0); }, 0);
+    }
+    const encUi = sliceEnc;
+    if (typeof renderEncHojeList_ === 'function') renderEncHojeList_(encUi);
+    else if (typeof renderEncHoje === 'function') renderEncHoje(encUi);
+    if (typeof mkSnapshotSave_ === 'function') {
+      mkSnapshotSave_({
+        ok: true,
+        unidadeId: uidFill,
+        ativos: Array.isArray(sessions) ? sessions.filter(function (s) {
+          return s && (s.status === 'Ativa' || s.status === 'Pendente');
+        }) : [],
+        encHoje: mergedEnc,
+        statsHoje: {
+          n: statsHoje.n,
+          nSessoes: statsHoje.nSessoes,
+          fat: statsHoje.fat,
+          unidadeId: statsHoje.unidadeId
+        },
+        parcial: false,
+        fonte: 'carregarInicio'
+      });
+    }
+    return true;
+  } catch (e) {
+    console.warn('[Sync] repair encHoje', e && e.message ? e.message : e);
+    return false;
+  } finally {
+    _mkEncHojeRepairInFlight = false;
+  }
+}
+window.mkScheduleEncHojeRepair_ = mkScheduleEncHojeRepair_;
+window.mkRepairEncHojeFromInicio_ = mkRepairEncHojeFromInicio_;
 
 function mkSyncBootFastPath_() {
   // I151b: sempre cruzar com listarAtivas (limpa fantasma mesmo após boot local)
@@ -233,6 +332,8 @@ async function sincronizarServidor(force = false) {
       if (fbOk) {
         setStatus(true);
         mkScheduleFantasmaReconcile_();
+        /* I192: listarAtivas não traz Encerradas — completar encHoje em background */
+        mkScheduleEncHojeRepair_();
         return;
       }
       // I122: timeout/erro com loc aberta → NÃO reaplicar mk_inicio_cache (fantasma)
@@ -422,7 +523,7 @@ function aplicarDadosInicio(d) {
 
     const serverRows = new Set(d.ativos.map(s => s.rowIndex));
     /* I187: preservar card temp da fila (ri < 0).
-     * I191: NÃO preservar ri>0 só por _offline*/_clientRequestId — isso ressuscitava fantasma
+     * I191: NÃO preservar ri>0 só por flags offline/_clientRequestId — isso ressuscitava fantasma
      * (ex.: Triciclo João Encerrada no servidor, Ativa no tablet). */
     const mkSessaoFilaOffline_ = function (s) {
       if (!s) return false;
