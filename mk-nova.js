@@ -532,12 +532,20 @@ function upsertSessaoPendenteLocal_(payload) {
     if (payload && payload._clientRequestId && s._clientRequestId === payload._clientRequestId) return true;
     return false;
   });
-  const uidStamp = (payload && payload.unidadeId)
-    || ((typeof mkUnidadeId_ === 'function') ? mkUnidadeId_() : '')
-    || ((typeof mkUnidadeFromVeiculo_ === 'function') ? mkUnidadeFromVeiculo_(payload && payload.veiculo) : 'golden');
+  /* I197: payload concreto → veículo (LV ) → tablet; nunca stamp 'all'. */
+  let uidStamp = '';
+  if (payload && payload.unidadeId && payload.unidadeId !== 'all') uidStamp = String(payload.unidadeId);
+  if (!uidStamp && typeof mkUnidadeFromVeiculo_ === 'function') {
+    uidStamp = mkUnidadeFromVeiculo_(payload && payload.veiculo) || '';
+  }
+  if (!uidStamp || uidStamp === 'all') {
+    const uNow = (typeof mkUnidadeId_ === 'function') ? mkUnidadeId_() : '';
+    if (uNow && uNow !== 'all') uidStamp = String(uNow);
+  }
+  if (!uidStamp || uidStamp === 'all') uidStamp = 'golden';
   const merged = Object.assign({}, payload, {
     _savedAt: Date.now(),
-    unidadeId: (uidStamp && uidStamp !== 'all') ? uidStamp : 'golden'
+    unidadeId: uidStamp
   });
   if (idx >= 0) sessions[idx] = Object.assign({}, sessions[idx], merged);
   else sessions.push(merged);

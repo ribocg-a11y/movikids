@@ -422,24 +422,35 @@
   function updateSessaoLockUI_() {
     const el = document.getElementById('mk-sessao-lock');
     const btn = document.getElementById('mk-btn-proceed');
-    if (!sessaoAtivaRemota) {
+    /* I197: lock pela sessão da loja (mapa), não só sessaoAtiva singular (null no holding). */
+    let uid = '';
+    try {
+      if (typeof mkUnidadeId_ === 'function') uid = String(mkUnidadeId_() || '').toLowerCase();
+    } catch (eU) { uid = ''; }
+    let srv = null;
+    if (uid && uid !== 'all' && sessoesAtivasRemotas && sessoesAtivasRemotas[uid]) {
+      srv = sessoesAtivasRemotas[uid];
+    } else {
+      srv = sessaoAtivaRemota;
+    }
+    if (!srv || !srv.operadorId) {
       if (el) { el.style.display = 'none'; el.textContent = ''; }
       if (btn && selectedOp) btn.disabled = false;
       return;
     }
-    const mesmoOperador = selectedOp && Number(selectedOp.id) === Number(sessaoAtivaRemota.operadorId);
+    const mesmoOperador = selectedOp && Number(selectedOp.id) === Number(srv.operadorId);
     if (el) {
       el.style.display = 'block';
       if (mesmoOperador) {
         el.style.background = 'var(--blue-lt)';
         el.style.color = 'var(--blue-dk)';
         el.style.borderColor = 'var(--blue)';
-        el.textContent = sessaoAtivaRemota.nome + ' pode entrar de novo (sessao sera renovada).';
+        el.textContent = srv.nome + ' pode entrar de novo (sessao sera renovada).';
       } else {
         el.style.background = '';
         el.style.color = '';
         el.style.borderColor = '';
-        el.textContent = msgOperadorJaLogado_(sessaoAtivaRemota.nome, sessaoAtivaRemota.unidadeId);
+        el.textContent = msgOperadorJaLogado_(srv.nome, srv.unidadeId || uid);
       }
     }
     const bloqueia = !selectedOp || isSessaoBloqueadaPara_(selectedOp.id);
@@ -520,9 +531,30 @@
   }
 
   function applySessaoAtivaFromApi_(d) {
+    if (!d || !d.ok) return;
+    /* I197: payloads sem sessoesAtivas (ex. painel RH) não podem zerar o mapa holding. */
+    const hasMap = d.sessoesAtivas != null && typeof d.sessoesAtivas === 'object';
+    const hasOne = !!(d.sessaoAtiva && d.sessaoAtiva.nome);
+    if (!hasMap && !hasOne) return;
     const picked = mkAuthPickSessaoFromApi_(d);
-    sessoesAtivasRemotas = picked.map || {};
-    mkAuthSyncSessaoBalcaoUI_(picked.sessao, picked.map);
+    if (hasMap) {
+      /* Resposta all/holding: substitui. Resposta de 1 loja: merge (não apaga a outra). */
+      const keys = Object.keys(picked.map || {});
+      const scoped = keys.length === 1 && keys[0] !== 'all';
+      if (scoped) {
+        sessoesAtivasRemotas = Object.assign({}, sessoesAtivasRemotas || {}, picked.map);
+      } else {
+        sessoesAtivasRemotas = picked.map || {};
+      }
+    } else if (hasOne) {
+      const one = enrichSessaoComUnidade_(d.sessaoAtiva);
+      const uid = String(one.unidadeId || 'golden').toLowerCase();
+      if (uid === 'golden' || uid === 'laville') {
+        sessoesAtivasRemotas = Object.assign({}, sessoesAtivasRemotas || {});
+        sessoesAtivasRemotas[uid] = one;
+      }
+    }
+    mkAuthSyncSessaoBalcaoUI_(picked.sessao, sessoesAtivasRemotas);
   }
 
   /** I195: após liberar/deslogar — sempre aplicar mapa (mesmo vazio), senão banner fantasma. */
@@ -584,23 +616,25 @@
     if (s.role === 'admin' || s.id === 'ADMIN' || mkAuthIsAdmin()) return false;
     if (!d || !d.ok) return false;
 
-    /* I194: sem unidadeId o GAS devolve sessaoAtiva=null — olhar sessoesAtivas da loja. */
+    /* I197: presente em QUALQUER loja do mapa = não fantasma (holding / troca de filtro). */
     const picked = mkAuthPickSessaoFromApi_(d);
-    let srv = picked.sessao;
-    if (!srv || !srv.operadorId) {
-      let uidLocal = '';
-      try {
-        if (typeof mkUnidadeId_ === 'function') uidLocal = String(mkUnidadeId_() || '').toLowerCase();
-      } catch (e1) { uidLocal = ''; }
-      if ((!uidLocal || uidLocal === 'all') && s.id && opsUnidadeById_[String(s.id)]) {
-        uidLocal = String(opsUnidadeById_[String(s.id)] || '').toLowerCase();
-      }
-      if (uidLocal && picked.map && picked.map[uidLocal]) srv = picked.map[uidLocal];
-    }
     const localId = Number(s.id);
-    const srvId = srv && srv.operadorId ? Number(srv.operadorId) : 0;
-    const fantasma = !srvId || srvId !== localId;
-    if (!fantasma) return false;
+    const logados = {};
+    Object.keys(picked.map || {}).forEach(function (uid) {
+      const sessao = picked.map[uid];
+      if (sessao && sessao.operadorId) logados[Number(sessao.operadorId)] = uid;
+    });
+    if (picked.sessao && picked.sessao.operadorId) {
+      logados[Number(picked.sessao.operadorId)] = String(picked.sessao.unidadeId || 'golden');
+    }
+    if (logados[localId]) return false;
+
+    /* Sem o operador em lugar nenhum do mapa → fantasma. */
+    const algumLogado = Object.keys(logados).length > 0;
+    if (!algumLogado && !picked.sessao) {
+      /* Resposta vazia ambígua (rede/all sem dados) — não kickar. */
+      if (d.sessoesAtivas == null && !d.sessaoAtiva) return false;
+    }
 
     _reconcileBusy = true;
     try {
@@ -611,6 +645,8 @@
     }
   }
   window.mkAuthReconcileSessaoFantasma_ = mkAuthReconcileSessaoFantasma_;
+  window.applySessaoAtivaFromApi_ = applySessaoAtivaFromApi_;
+  window.mkAuthOperadorIdsLogados_ = mkAuthOperadorIdsLogados_;
 
   window.mkAuthRefreshSessaoTurno_ = async function mkAuthRefreshSessaoTurno_() {
     if (!mkAuthIsLoggedIn() || _turnoPollBusy) return;
@@ -1049,8 +1085,15 @@
   }
 
   function mkAuthOpsListParams_() {
-    const uid = (typeof mkUnidadeId_ === 'function') ? mkUnidadeId_() : '';
     const out = { action: 'listarOperadoresLogin' };
+    /* I197: holding → all (mapa completo); balcão → loja concreta. */
+    const balcao = (typeof mkIsBalcaoEstrito_ === 'function') ? mkIsBalcaoEstrito_() : true;
+    if (!balcao && typeof mkUnidadeApiParams_ === 'function') {
+      Object.assign(out, mkUnidadeApiParams_());
+      if (!out.unidadeId) out.unidadeId = 'all';
+      return out;
+    }
+    const uid = (typeof mkUnidadeId_ === 'function') ? mkUnidadeId_() : '';
     if (uid && uid !== 'all') out.unidadeId = uid;
     return out;
   }
@@ -1524,15 +1567,26 @@
     fecharMenusOperador_();
     if (!confirm('Deslogar ' + nome + ' do balcao?\n\nLibera a sessao para outro operador entrar.')) return;
     const pinParams = typeof mkAuthAdminPinParams_ === 'function' ? mkAuthAdminPinParams_() : {};
-    /* I195: NÃO usar mkAuthUnidadeLoginParams_ (holding → golden). Loja real do operador. */
+    /* I197: loja viva do mapa; cadastro all sem mapa → tenta as 2 lojas (nunca inventa golden só). */
     let uidOp = mkAuthUnidadeDoOperadorId_(id);
-    if (!uidOp || uidOp === 'all') uidOp = 'golden';
+    const tryUids = [];
+    if (uidOp && uidOp !== 'all') {
+      tryUids.push(uidOp);
+    } else {
+      tryUids.push('golden', 'laville');
+    }
     try {
-      let d = await apiCall(Object.assign({
-        action: 'liberarSessaoOperador',
-        operadorId: id,
-        _t: Date.now()
-      }, { unidadeId: uidOp }, pinParams), 30000);
+      let d = null;
+      let uidUsed = tryUids[0];
+      for (let i = 0; i < tryUids.length; i++) {
+        uidUsed = tryUids[i];
+        d = await apiCall(Object.assign({
+          action: 'liberarSessaoOperador',
+          operadorId: id,
+          _t: Date.now()
+        }, { unidadeId: uidUsed }, pinParams), 30000);
+        if (d && d.ok) break;
+      }
       if (!d || !d.ok) {
         if (typeof mkAuthEnsureAdminPin_ === 'function') {
           const okPin = await mkAuthEnsureAdminPin_('Deslogar operador do balcao');
@@ -1542,10 +1596,14 @@
           }
         }
         /* Só a loja do operador — NÃO unidadeId=all (derrubaria a outra loja). */
-        d = await apiCall(Object.assign({
-          action: 'liberarSessaoOperadorAdmin',
-          _t: Date.now()
-        }, { unidadeId: uidOp }, typeof mkAuthAdminPinParams_ === 'function' ? mkAuthAdminPinParams_() : {}), 30000);
+        for (let j = 0; j < tryUids.length; j++) {
+          uidUsed = tryUids[j];
+          d = await apiCall(Object.assign({
+            action: 'liberarSessaoOperadorAdmin',
+            _t: Date.now()
+          }, { unidadeId: uidUsed }, typeof mkAuthAdminPinParams_ === 'function' ? mkAuthAdminPinParams_() : {}), 30000);
+          if (d && d.ok) break;
+        }
         if (!d || !d.ok) {
           const msg = (d && d.erro) || 'Erro ao deslogar';
           mkAuthShowLiberarStatus_(false, 'Falha: ' + msg);
@@ -1558,7 +1616,7 @@
       if (typeof refreshOperadoresAdmin_ === 'function') await refreshOperadoresAdmin_();
       else await mkAuthRefreshSessoesMapSilent_();
       if (mkAuthOperadorIdsLogados_()[Number(id)]) {
-        const aviso = 'Servidor ainda mostra ' + nome + ' logado(a) em ' + mkAuthLabelLojaSessao_(uidOp) + '.';
+        const aviso = 'Servidor ainda mostra ' + nome + ' logado(a) em ' + mkAuthLabelLojaSessao_(uidUsed) + '.';
         mkAuthShowLiberarStatus_(false, aviso);
         toast(aviso, 'error');
         return;

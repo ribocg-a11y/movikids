@@ -1140,6 +1140,58 @@ try {
     }
   }
 
+  # I197 — audit follow-up: Firebase sem ativos; IDB por uid; GP sessoesAtivas; fantasma map-wide
+  $fbPathI197 = Join-Path $root "mk-firebase.js"
+  if (Test-Path $fbPathI197) {
+    $fbRawI197 = Get-Content -Path $fbPathI197 -Raw -Encoding UTF8
+    if ($fbRawI197 -match 'aplicarDadosInicio\(\{[^}]*ativos') {
+      Add-Check "guard.i197.firebase.ativos" "fail" "Firebase ainda aplica ativos (fantasma I197)"
+    } elseif ($fbRawI197 -notmatch 'mkSyncListarAtivasFallback_') {
+      Add-Check "guard.i197.firebase.ativos" "fail" "Firebase sem reconcile listarAtivas (I197)"
+    } else {
+      Add-Check "guard.i197.firebase.ativos" "ok" "Firebase so dispara listarAtivas"
+    }
+  }
+  $idbPathI197 = Join-Path $root "mk-idb-store.js"
+  if (Test-Path $idbPathI197) {
+    $idbRawI197 = Get-Content -Path $idbPathI197 -Raw -Encoding UTF8
+    if ($idbRawI197 -notmatch 'mkIdbSnapshotKey_' -or $idbRawI197 -notmatch 'snapshot_v1_') {
+      Add-Check "guard.i197.idb.uid" "fail" "IDB snapshot ainda global snapshot_v1 (I197)"
+    } else {
+      Add-Check "guard.i197.idb.uid" "ok" "IDB snapshot por unidade"
+    }
+  }
+  $gpPathI197 = Join-Path $root "mk-gestao-pessoas-admin.js"
+  if (Test-Path $gpPathI197) {
+    $gpRawI197 = Get-Content -Path $gpPathI197 -Raw -Encoding UTF8
+    if ($gpRawI197 -notmatch 'gpAdmLogadosBalcaoIds_' -or $gpRawI197 -match 'logadoBalcao: sessaoId === Number') {
+      Add-Check "guard.i197.gp.sessoes" "fail" "GP badges ainda so sessaoAtiva singular (I197)"
+    } else {
+      Add-Check "guard.i197.gp.sessoes" "ok" "GP badges via sessoesAtivas"
+    }
+  }
+  if (Test-Path $authPathI194) {
+    $authRawI197 = Get-Content -Path $authPathI194 -Raw -Encoding UTF8
+    if ($authRawI197 -notmatch 'window\.applySessaoAtivaFromApi_' -or $authRawI197 -notmatch 'window\.mkAuthOperadorIdsLogados_') {
+      Add-Check "guard.i197.auth.export" "fail" "applySessaoAtivaFromApi_/idsLogados nao exportados (I197)"
+    } elseif ($authRawI197 -notmatch 'presente em QUALQUER loja' -and $authRawI197 -notmatch 'QUALQUER loja do mapa') {
+      Add-Check "guard.i197.fantasma.map" "fail" "reconcile fantasma nao e map-wide (I197)"
+    } else {
+      Add-Check "guard.i197.auth.export" "ok" "exports + fantasma map-wide"
+    }
+  }
+  $syncPathI197 = Join-Path $root "mk-sync.js"
+  if (Test-Path $syncPathI197) {
+    $syncRawI197 = Get-Content -Path $syncPathI197 -Raw -Encoding UTF8
+    if ($syncRawI197 -match 'if \(cached\) aplicarDadosInicio\(cached\);' ) {
+      Add-Check "guard.i197.cache.ativos" "fail" "sync ainda reidrata Ativa do cache frio (I197)"
+    } elseif ($syncRawI197 -notmatch 'ativos: \[\]' -or $syncRawI197 -notmatch '_syncGeneration') {
+      Add-Check "guard.i197.cache.ativos" "fail" "sync sem strip ativos / generation (I197)"
+    } else {
+      Add-Check "guard.i197.cache.ativos" "ok" "cache frio sem Ativa + gen stale"
+    }
+  }
+
   # I188/I189 — encerrar EXTRA: pagamento no card + 1 toque se pronto
   $encExtraPath = Join-Path $root "mk-enc-extra.js"
   $drawerPathI189 = Join-Path $root "mk-drawer.js"

@@ -23,17 +23,19 @@ onValue(ref(fbDb, 'sessoes'), (snapshot) => {
     return pad(d.getDate()) + '/' + pad(d.getMonth() + 1) + '/' + d.getFullYear();
   })();
 
-  const ativos = Object.values(sessoes).filter(s =>
+  /* I197: Firebase NÃO é autoridade de Ativa/Pendente (I151/I191).
+   * RTDB fica stale (salvar/▶ não escrevem; encerrar pode falhar) e ressuscita fantasma.
+   * Só dispara reconcile via listarAtivas. */
+  const nAtivas = Object.values(sessoes).filter(s =>
     s.status === 'Ativa' || s.status === 'Pendente'
-  );
-  const encHoje = Object.values(sessoes).filter(s =>
-    s.status === 'Encerrada' && s.data === hoje
-  );
-
-  if (typeof aplicarDadosInicio === 'function') {
-    aplicarDadosInicio({ ok: true, ativos, encHoje, fonte: 'firebase', canonical: true, parcial: true });
-    if (typeof setStatus === 'function') setStatus(true);
-    if (typeof _lastSyncAt !== 'undefined') window._fbLastUpdate = Date.now();
+  ).length;
+  window._fbLastUpdate = Date.now();
+  window._fbAtivasHint = nAtivas;
+  if (typeof setStatus === 'function') setStatus(true);
+  if (typeof mkSyncListarAtivasFallback_ === 'function') {
+    mkSyncListarAtivasFallback_({ silent: true });
+  } else if (typeof mkScheduleFantasmaReconcile_ === 'function') {
+    mkScheduleFantasmaReconcile_();
   }
 }, (error) => {
   console.warn('[Firebase] Erro ao ouvir sessoes:', error.message);

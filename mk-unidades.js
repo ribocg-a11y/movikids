@@ -384,7 +384,9 @@
 
   function unidadeIdFromVeiculo_(veiculo) {
     var v = String(veiculo || '').trim();
+    if (!v) return '';
     if (v.indexOf('LV ') === 0) return 'laville';
+    /* Prefixo LV = La Ville; demais nomes da frota Golden (não inventar sem veículo). */
     return DEFAULT_ID;
   }
 
@@ -392,7 +394,14 @@
     if (!s) return DEFAULT_ID;
     var fromCol = canon_(s.unidadeId);
     if (fromCol && fromCol !== 'all') return fromCol;
-    return unidadeIdFromVeiculo_(s.veiculo);
+    var fromVeic = unidadeIdFromVeiculo_(s.veiculo);
+    if (fromVeic) return fromVeic;
+    /* I197: sem unidadeId e sem veículo → fail-closed no balcão estrito. */
+    if (typeof mkIsBalcaoEstrito_ === 'function' && mkIsBalcaoEstrito_()) {
+      var now = canon_(getUnidadeId());
+      if (now && now !== 'all') return now;
+    }
+    return DEFAULT_ID;
   }
 
   function sessionsPorUnidade_(lista, uid) {

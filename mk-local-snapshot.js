@@ -46,7 +46,14 @@ async function mkSnapshotLoadAsync_(timeoutMs) {
       })
     ]);
     const norm = mkSnapshotNormalize_(idb);
-    if (norm && (!ls || Number(norm.ts) >= Number(ls.ts))) return norm;
+    if (!norm || !norm.data) return ls;
+    /* I197: mesma trava I170 do LS — IDB de outra loja não vence. */
+    const uidNow = (typeof mkUnidadeId_ === 'function') ? mkUnidadeId_() : 'golden';
+    const uidSnap = norm.data.unidadeId != null ? String(norm.data.unidadeId) : '';
+    if (typeof mkIsBalcaoEstrito_ === 'function' && mkIsBalcaoEstrito_()) {
+      if (!uidSnap || uidSnap === 'all' || uidSnap !== String(uidNow)) return ls;
+    }
+    if (!ls || Number(norm.ts) >= Number(ls.ts)) return norm;
   } catch (e) { /* fallback LS */ }
   return ls;
 }
@@ -159,6 +166,12 @@ function mkSnapshotAgeLabel_(ts) {
 
 function mkSnapshotApply_(snap) {
   if (!snap || typeof aplicarDadosInicio !== 'function') return false;
+  /* I197: mismatch de unidade → não limpar boot-pending (falso “sync ok”). */
+  const uidNow = (typeof mkUnidadeId_ === 'function') ? mkUnidadeId_() : 'golden';
+  const uidSnap = snap.data && snap.data.unidadeId != null ? String(snap.data.unidadeId) : '';
+  if (typeof mkIsBalcaoEstrito_ === 'function' && mkIsBalcaoEstrito_()) {
+    if (!uidSnap || uidSnap === 'all' || uidSnap !== String(uidNow)) return false;
+  }
   window._mkBootFromSnapshot = true;
   window._mkSnapshotTs = snap.ts;
   /* I192: snapshot pode ter Ativa fantasma — aplicar só enc/stats/config;
@@ -172,7 +185,12 @@ function mkSnapshotApply_(snap) {
       return false;
     });
   }
+  const beforeOk = !!(window._mkSyncBootPending);
   aplicarDadosInicio(data);
+  /* Se aplicarDadosInicio rejeitou (unidade), boot-pending permanece — sinalizar falha. */
+  if (beforeOk && window._mkSyncBootPending && typeof mkIsBalcaoEstrito_ === 'function' && mkIsBalcaoEstrito_()) {
+    /* aplicarDadosInicio pode ter aplicado parcial; confiar no filtro acima. */
+  }
   return true;
 }
 
@@ -185,7 +203,7 @@ function mkBootLocalFirstCore_() {
     stored = [];
   }
   /* I187b: temp row (ri<0) + otimista curto.
-   * I191: flags offline/_clientRequestId em ri>0 NÃO sobrevivem ao boot — fantasma. */
+   * I191: flags _offline / _clientRequestId em ri>0 NÃO sobrevivem ao boot — fantasma. */
   const inflight = stored.filter(function (s) {
     if (!s) return false;
     if (Number(s.rowIndex) < 0) return true;
@@ -440,6 +458,11 @@ async function mkAutoPurgeFantasmaOnVersionBump_() {
       } catch (eQ) { /* ignore */ }
     }
     try { localStorage.setItem(key, String(ver)); } catch (eV) { /* ignore */ }
+    /* I197: wipe de Ativa não pode deixar Encerradas vazias até o próximo carregarInicio. */
+    if (typeof mkScheduleEncHojeRepair_ === 'function') mkScheduleEncHojeRepair_(400);
+    else if (typeof mkSyncListarAtivasFallback_ === 'function') {
+      try { mkSyncListarAtivasFallback_({ silent: true }); } catch (eF) { /* ok */ }
+    }
     return true;
   } catch (e) {
     return false;

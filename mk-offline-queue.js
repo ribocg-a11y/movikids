@@ -61,6 +61,15 @@ async function mkOfflineEnqueue_(action, params) {
 function mkOfflineSyntheticSalvar_(params, reqId) {
   const cfgMins = Number(params.mins || 0);
   const cfgVal = Number(params.valorPlano || 0);
+  /* I197: stamp unidade no card sintético (prune/filtro dual-loja). */
+  let uid = params.unidadeId || '';
+  if ((!uid || uid === 'all') && typeof mkUnidadeFromVeiculo_ === 'function') {
+    uid = mkUnidadeFromVeiculo_(params.veiculo);
+  }
+  if ((!uid || uid === 'all') && typeof mkUnidadeId_ === 'function') {
+    uid = mkUnidadeId_();
+  }
+  if (!uid || uid === 'all') uid = 'golden';
   return {
     ok: true,
     _offlineQueued: true,
@@ -81,7 +90,8 @@ function mkOfflineSyntheticSalvar_(params, reqId) {
     horaInicio: '',
     data: '',
     startTimestamp: 0,
-    status: 'Pendente'
+    status: 'Pendente',
+    unidadeId: uid
   };
 }
 
@@ -243,6 +253,12 @@ async function mkOfflineFlush_() {
         flushed++;
       } catch (e) {
         if (mkOfflineIsNetworkError_(e)) break;
+        /* I197: erro de negócio em encerrar/cancelar — NÃO dropar (retry); demais removem. */
+        const keep = item.action === 'encerrarLocacao' || item.action === 'cancelarLocacao';
+        if (keep) {
+          console.warn('[Offline] keep queue item after error', item.action, e && e.message);
+          break;
+        }
         await mkIdbQueueRemove_(item.id);
       }
     }
@@ -261,10 +277,12 @@ async function mkOfflineFlush_() {
   return { ok: true, flushed: flushed };
 }
 
-/** I191: após listarAtivas, descarta fila de ri>0 que o servidor já não tem aberta. */
-async function mkOfflinePruneStaleQueue_(serverRows) {
+/** I191: após listarAtivas, descarta fila de ri>0 que o servidor já não tem aberta.
+ * I197: escopo por unidade — listarAtivas de 1 loja não pode apagar fila da outra. */
+async function mkOfflinePruneStaleQueue_(serverRows, unidadeScope) {
   if (typeof mkIdbQueueList_ !== 'function' || typeof mkIdbQueueRemove_ !== 'function') return 0;
   const alive = serverRows instanceof Set ? serverRows : new Set(serverRows || []);
+  const scope = unidadeScope != null ? String(unidadeScope) : 'all';
   let removed = 0;
   try {
     const queue = await mkIdbQueueList_();
@@ -275,8 +293,19 @@ async function mkOfflinePruneStaleQueue_(serverRows) {
       if (item.action === 'salvarLocacao' && (!ri || ri < 0)) continue;
       if (ri < 0) continue;
       if (!ri || alive.has(ri) || alive.has(item.params.rowIndex)) continue;
-      /* encerrar/cancelar/iniciar de linha já fechada no servidor = lixo que alimenta fantasma */
-      if (item.action === 'encerrarLocacao' || item.action === 'cancelarLocacao' || item.action === 'iniciarTimer') {
+      if (scope && scope !== 'all') {
+        let itemUid = item.params.unidadeId || '';
+        if ((!itemUid || itemUid === 'all') && typeof mkUnidadeFromVeiculo_ === 'function') {
+          itemUid = mkUnidadeFromVeiculo_(item.params.veiculo);
+        }
+        if ((!itemUid || itemUid === 'all') && typeof mkUnidadeOfSession_ === 'function') {
+          itemUid = mkUnidadeOfSession_(item.params);
+        }
+        if (itemUid && itemUid !== 'all' && String(itemUid) !== scope) continue;
+      }
+      /* encerrar/cancelar/iniciar/salvar de linha já fechada no servidor = lixo fantasma */
+      if (item.action === 'encerrarLocacao' || item.action === 'cancelarLocacao'
+          || item.action === 'iniciarTimer' || item.action === 'salvarLocacao') {
         await mkIdbQueueRemove_(item.id);
         removed++;
       }

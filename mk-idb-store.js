@@ -55,9 +55,24 @@ function mkIdbDel_(key) {
   });
 }
 
+/** I197: chave IDB por unidade — espelha mk_snapshot_v2_<uid> (não misturar lojas). */
+function mkIdbSnapshotKey_() {
+  const uid = (typeof mkUnidadeId_ === 'function') ? mkUnidadeId_() : 'golden';
+  return 'snapshot_v1_' + (uid || 'golden');
+}
+
 async function mkIdbGetSnapshot_() {
   try {
-    return await mkIdbGet_('snapshot_v1');
+    const keyed = await mkIdbGet_(mkIdbSnapshotKey_());
+    if (keyed) return keyed;
+    /* Migração one-shot do blob legado global. */
+    const legacy = await mkIdbGet_('snapshot_v1');
+    if (!legacy) return null;
+    const uidNow = (typeof mkUnidadeId_ === 'function') ? String(mkUnidadeId_() || '') : 'golden';
+    const uidSnap = legacy && legacy.data && legacy.data.unidadeId != null
+      ? String(legacy.data.unidadeId) : '';
+    if (uidSnap && uidSnap !== 'all' && uidSnap !== uidNow) return null;
+    return legacy;
   } catch (e) {
     return null;
   }
@@ -65,7 +80,8 @@ async function mkIdbGetSnapshot_() {
 
 async function mkIdbPutSnapshot_(payload) {
   try {
-    await mkIdbPut_('snapshot_v1', payload);
+    await mkIdbPut_(mkIdbSnapshotKey_(), payload);
+    try { await mkIdbDel_('snapshot_v1'); } catch (eL) { /* ok */ }
     return true;
   } catch (e) {
     return false;
@@ -74,7 +90,8 @@ async function mkIdbPutSnapshot_(payload) {
 
 async function mkIdbClearSnapshot_() {
   try {
-    await mkIdbDel_('snapshot_v1');
+    await mkIdbDel_(mkIdbSnapshotKey_());
+    try { await mkIdbDel_('snapshot_v1'); } catch (eL) { /* ok */ }
     return true;
   } catch (e) {
     return false;

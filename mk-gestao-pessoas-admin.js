@@ -1354,14 +1354,37 @@
     }
   };
 
-  function gpAdmMapColabQuick_(c, sessaoId) {
+  /** I197: ids logados no balcão via sessoesAtivas (holding) + sessaoAtiva singular. */
+  function gpAdmLogadosBalcaoIds_(payload) {
+    const ids = {};
+    if (typeof mkAuthOperadorIdsLogados_ === 'function') {
+      try {
+        const live = mkAuthOperadorIdsLogados_() || {};
+        Object.keys(live).forEach(function (k) { ids[Number(k)] = live[k]; });
+      } catch (eL) { /* ok */ }
+    }
+    if (payload && payload.sessoesAtivas && typeof payload.sessoesAtivas === 'object') {
+      Object.keys(payload.sessoesAtivas).forEach(function (uid) {
+        const s = payload.sessoesAtivas[uid];
+        if (s && s.operadorId) ids[Number(s.operadorId)] = uid;
+      });
+    }
+    if (payload && payload.sessaoAtiva && payload.sessaoAtiva.operadorId) {
+      ids[Number(payload.sessaoAtiva.operadorId)] =
+        String(payload.sessaoAtiva.unidadeId || 'golden');
+    }
+    return ids;
+  }
+
+  function gpAdmMapColabQuick_(c, logados) {
     const pct = typeof c.cadastroPct === 'number' ? c.cadastroPct : 0;
+    const map = logados || {};
     return {
       id: c.id, nome: c.nome, hasPin: c.hasPin !== false, perfil: c.perfil || 'operador',
       funcao: c.funcao || 'Operador', turno: c.turno || '', admissao: c.admissao || '',
       cadastroPct: pct, cadastroOk: pct >= 100, temRh: true,
       ponto: { status: 'fora', entrada: null, saida: null, _provisorio: true },
-      logadoBalcao: sessaoId === Number(c.id),
+      logadoBalcao: !!map[Number(c.id)],
       metas: { alvo: 20, atual: 0, locMes: 0, bonusDias: 0, bonusTotal: 0 },
       folhaPonto: []
     };
@@ -1371,12 +1394,19 @@
     if (window.MK_GestaoPessoas && typeof MK_GestaoPessoas.listarColaboradores === 'function') {
       const list = await MK_GestaoPessoas.listarColaboradores();
       let sessaoAtiva = null;
+      let sessoesAtivas = null;
       try {
         const pin = gpAdmPinParams_();
-        const ops = await api(Object.assign({ action: 'listarOperadoresAdmin', _t: Date.now() }, pin), 15000);
-        if (ops && ops.ok) sessaoAtiva = ops.sessaoAtiva || null;
+        const opsParams = Object.assign({ action: 'listarOperadoresAdmin', _t: Date.now() }, pin);
+        if (typeof mkUnidadeApiParams_ === 'function') Object.assign(opsParams, mkUnidadeApiParams_());
+        else opsParams.unidadeId = 'all';
+        const ops = await api(opsParams, 15000);
+        if (ops && ops.ok) {
+          sessaoAtiva = ops.sessaoAtiva || null;
+          sessoesAtivas = ops.sessoesAtivas || null;
+        }
       } catch (e) { /* ok */ }
-      return { ok: true, colaboradores: list, sessaoAtiva: sessaoAtiva };
+      return { ok: true, colaboradores: list, sessaoAtiva: sessaoAtiva, sessoesAtivas: sessoesAtivas };
     }
     return api({ action: 'listarColaboradoresGestao', _t: Date.now() }, 30000);
   }
@@ -1385,9 +1415,9 @@
     try {
       const r = await gpAdmFetchColabListRh_();
       if (!r || !r.ok) return false;
-      const sessaoId = r.sessaoAtiva && r.sessaoAtiva.operadorId ? Number(r.sessaoAtiva.operadorId) : 0;
+      const logados = gpAdmLogadosBalcaoIds_(r);
       const cols = (r.colaboradores || []).filter(function (c) { return c.hasPin !== false; })
-        .map(function (c) { return gpAdmMapColabQuick_(c, sessaoId); });
+        .map(function (c) { return gpAdmMapColabQuick_(c, logados); });
       cols.sort(function (a, b) { return String(a.nome).localeCompare(String(b.nome), 'pt-BR'); });
       gpAdmQuickCols_ = cols;
       const now = new Date();
@@ -1420,7 +1450,8 @@
             alertas: (gpAdmData_ && gpAdmData_.kpis && gpAdmData_.kpis.alertas) || 0,
             alertasIntel: 0
           },
-          sessaoAtiva: r.sessaoAtiva, _partial: true, _fromQuick: true
+          sessaoAtiva: r.sessaoAtiva, sessoesAtivas: r.sessoesAtivas,
+          _partial: true, _fromQuick: true
         };
       }
       gpAdmCompSel_ = comp;
@@ -1438,30 +1469,33 @@
 
   async function gpAdmLoadFallback_(errMsg) {
     const pin = gpAdmPinParams_();
-    let rh = { ok: false, colaboradores: [], sessaoAtiva: null };
+    let rh = { ok: false, colaboradores: [], sessaoAtiva: null, sessoesAtivas: null };
     try {
       rh = await gpAdmFetchColabListRh_();
     } catch (e) { /* fallback operadores */ }
+    const opsParams = Object.assign({ action: 'listarOperadoresAdmin', _t: Date.now() }, pin);
+    if (typeof mkUnidadeApiParams_ === 'function') Object.assign(opsParams, mkUnidadeApiParams_());
+    else opsParams.unidadeId = 'all';
     const ops = rh.ok && rh.colaboradores.length
       ? rh
-      : await api(Object.assign({ action: 'listarOperadoresAdmin', _t: Date.now() }, pin), 30000);
+      : await api(opsParams, 30000);
     if (!ops.ok) throw new Error(ops.erro || errMsg);
     let alertas = { alertas: [], total: 0 };
     try {
       alertas = await api(Object.assign({ action: 'alertasPontoGestaoAdmin' }, pin), 20000);
     } catch (e) { /* v1.5.98+ */ }
-    const sessaoId = ops.sessaoAtiva && ops.sessaoAtiva.operadorId ? Number(ops.sessaoAtiva.operadorId) : 0;
+    const logados = gpAdmLogadosBalcaoIds_(ops);
     const now = new Date();
     const comp = String(now.getMonth() + 1).padStart(2, '0') + '/' + now.getFullYear();
     const src = ops.colaboradores || ops.operadores || [];
     const colaboradores = src.filter(function (c) { return c.hasPin !== false; }).map(function (c) {
       return typeof c.cadastroPct === 'number'
-        ? gpAdmMapColabQuick_(c, sessaoId)
+        ? gpAdmMapColabQuick_(c, logados)
         : {
           id: c.id, nome: c.nome, hasPin: c.hasPin, perfil: c.perfil || 'operador',
           funcao: 'Operador', turno: '', admissao: '', cadastroPct: 0, temRh: false,
           ponto: { status: 'fora', entrada: null, saida: null },
-          logadoBalcao: sessaoId === Number(c.id),
+          logadoBalcao: !!logados[Number(c.id)],
           metas: { alvo: 20, atual: 0, locMes: 0, bonusDias: 0, bonusTotal: 0 },
           folhaPonto: []
         };
@@ -1477,7 +1511,8 @@
         comTurno: colaboradores.filter(function (c) { return !!c.turno; }).length,
         alertas: alertas.total || 0
       },
-      sessaoAtiva: ops.sessaoAtiva, _fallback: true, _fromQuick: true, _partial: true
+      sessaoAtiva: ops.sessaoAtiva, sessoesAtivas: ops.sessoesAtivas,
+      _fallback: true, _fromQuick: true, _partial: true
     };
     if (typeof applySessaoAtivaFromApi_ === 'function') applySessaoAtivaFromApi_(ops);
     gpAdmRender_();

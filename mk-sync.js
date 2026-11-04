@@ -95,8 +95,11 @@ let _listarAtivasInFlight = false;
 
 function mkInicioFromListarAtivas_(d) {
   if (!d || !d.ok || !Array.isArray(d.locacoes)) return null;
+  /* I197: preservar unidadeId do GAS (incl. all) — não restampar loja do tablet. */
+  const uidSrv = (d.unidadeId != null && d.unidadeId !== '') ? String(d.unidadeId) : '';
   return {
     ok: true,
+    unidadeId: uidSrv || undefined,
     ativos: d.locacoes.map(function (s) {
       const ext = Number(s.extendedMins || 0);
       const base = Number(s.mins || 0);
@@ -133,7 +136,10 @@ async function mkSyncListarAtivasFallback_(opts) {
         unidadeId: statsHoje.unidadeId
       };
     }
-    if (typeof mkUnidadeId_ === 'function') payload.unidadeId = mkUnidadeId_();
+    /* I197: só completa unidadeId se o GAS não mandou (nunca sobrescrever all/loja). */
+    if (!payload.unidadeId && typeof mkUnidadeId_ === 'function') {
+      payload.unidadeId = mkUnidadeId_();
+    }
     aplicarDadosInicio(payload);
     mkSyncClearBootPending_(true);
     setStatus(true);
@@ -142,9 +148,9 @@ async function mkSyncListarAtivasFallback_(opts) {
     } else if (!payload.ativos.length && before > 0 && typeof toast === 'function' && !opts.silent) {
       toast('Servidor sem locações abertas — limpei cards fantasmas.', 'warning');
     }
-    /* Sem Encerradas em memória → pedir carregarInicio (não ficar com lista vazia na operadora). */
-    const encN = (typeof encHojeData !== 'undefined' && Array.isArray(encHojeData)) ? encHojeData.length : 0;
-    if (encN === 0) mkScheduleEncHojeRepair_();
+    /* I197: listarAtivas nunca traz encHoje — repair sempre (não só se memória vazia;
+     * memória pode estar stale/outra loja). */
+    mkScheduleEncHojeRepair_();
     return true;
   } catch (e) {
     console.warn('[Sync] listarAtivas fallback', e.message || e);
@@ -279,16 +285,18 @@ function mkSyncClearBootPending_(rerender) {
 }
 window.mkSyncClearBootPending_ = mkSyncClearBootPending_;
 
+let _syncGeneration = 0;
 async function sincronizarServidor(force = false) {
   if (_syncInFlight) {
     if (force) _syncPending = true;
     return;
   }
   _syncInFlight = true;
+  const myGen = ++_syncGeneration;
   clearTimeout(_syncSafetyTimer);
   // I122: safety > timeout API (não cortar sync legítimo em ~30s)
   _syncSafetyTimer = setTimeout(() => {
-    if (_syncInFlight) {
+    if (_syncInFlight && myGen === _syncGeneration) {
       console.warn('[Sync] safety timeout — liberando lock travado');
       _syncInFlight = false;
       _syncFailCount++;
@@ -313,7 +321,12 @@ async function sincronizarServidor(force = false) {
         if (!skipCache) {
           const raw = localStorage.getItem(CACHE_KEY);
           const cached = raw ? mkInicioCacheFresh_(raw) : null;
-          if (cached) aplicarDadosInicio(cached);
+          if (cached) {
+            /* I197: backoff também não pode reidratar Ativa do cache frio. */
+            const safe = Object.assign({}, cached, { ativos: [], parcial: true, fonte: cached.fonte || 'cache' });
+            aplicarDadosInicio(safe);
+            mkScheduleEncHojeRepair_();
+          }
         }
         return;
       }
@@ -326,7 +339,10 @@ async function sincronizarServidor(force = false) {
       const inicioParams = Object.assign({ action: 'carregarInicio' }, apiParamsComAuth_());
       if (force) inicioParams.force = '1';
       d = await api(inicioParams, MK_INICIO_API_TIMEOUT_MS);
+      /* I197: safety timer liberou lock — resposta tardia não sobrescreve estado novo. */
+      if (myGen !== _syncGeneration) return;
     } catch (apiErr) {
+      if (myGen !== _syncGeneration) return;
       // I148: carregarInicio lento/timeout — listarAtivas traz sessões ativas mais rápido
       const fbOk = await mkSyncListarAtivasFallback_({ silent: true });
       if (fbOk) {
@@ -341,13 +357,17 @@ async function sincronizarServidor(force = false) {
         const raw = localStorage.getItem(CACHE_KEY);
         const cached = raw ? mkInicioCacheFresh_(raw) : null;
         if (cached) {
-          aplicarDadosInicio(cached);
+          /* I197: cache frio não pode reidratar Ativa (fantasma). Só enc/stats/config. */
+          const safe = Object.assign({}, cached, { ativos: [], parcial: true, fonte: cached.fonte || 'cache' });
+          aplicarDadosInicio(safe);
           setStatus(true);
+          mkScheduleEncHojeRepair_();
           return;
         }
         if (typeof mkSnapshotApplyFallback_ === 'function' && mkSnapshotApplyFallback_()) {
           setStatus(true);
           mkSyncClearBootPending_(true);
+          mkScheduleEncHojeRepair_();
           return;
         }
       }
@@ -362,7 +382,11 @@ async function sincronizarServidor(force = false) {
       if (!skipCache) {
         const raw = localStorage.getItem(CACHE_KEY);
         const cached = raw ? mkInicioCacheFresh_(raw) : null;
-        if (cached) aplicarDadosInicio(cached);
+        if (cached) {
+          const safe = Object.assign({}, cached, { ativos: [], parcial: true, fonte: cached.fonte || 'cache' });
+          aplicarDadosInicio(safe);
+          mkScheduleEncHojeRepair_();
+        }
       }
       return;
     }
@@ -446,10 +470,20 @@ function mergeSessaoCanonica(serverSession, localSession = {}) {
 
   const mergedStarted = isAtiva && startTimestamp >= 1e12;
 
+  /* I197: não perder stamp local de unidade quando o servidor omite a coluna. */
+  let uidMerged = serverSession.unidadeId || localSession.unidadeId || '';
+  if (!uidMerged || uidMerged === 'all') {
+    if (typeof mkUnidadeFromVeiculo_ === 'function') {
+      uidMerged = mkUnidadeFromVeiculo_(serverSession.veiculo || localSession.veiculo);
+    }
+  }
+  if (!uidMerged || uidMerged === 'all') uidMerged = 'golden';
+
   return {
     ...serverSession,
     status,
     startTimestamp,
+    unidadeId: uidMerged,
     _localTimerStart: localStart >= 1e12 ? localStart : localSession._localTimerStart,
     _iniciandoTimer: localSession._iniciandoTimer,
     mins: canon.mins,
@@ -552,7 +586,7 @@ function aplicarDadosInicio(d) {
       try { localStorage.setItem('mk_sessions', JSON.stringify(cleanedStored)); } catch(e) {}
     }
     if (d.fonte === 'listarAtivas' && typeof mkOfflinePruneStaleQueue_ === 'function') {
-      try { mkOfflinePruneStaleQueue_(serverRows); } catch (ePrune) { /* ignore */ }
+      try { mkOfflinePruneStaleQueue_(serverRows, uidResp); } catch (ePrune) { /* ignore */ }
     }
 
     const balcaoEstrito = typeof mkIsBalcaoEstrito_ === 'function' ? mkIsBalcaoEstrito_() : true;
