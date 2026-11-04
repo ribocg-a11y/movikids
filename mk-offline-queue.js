@@ -261,6 +261,31 @@ async function mkOfflineFlush_() {
   return { ok: true, flushed: flushed };
 }
 
+/** I191: após listarAtivas, descarta fila de ri>0 que o servidor já não tem aberta. */
+async function mkOfflinePruneStaleQueue_(serverRows) {
+  if (typeof mkIdbQueueList_ !== 'function' || typeof mkIdbQueueRemove_ !== 'function') return 0;
+  const alive = serverRows instanceof Set ? serverRows : new Set(serverRows || []);
+  let removed = 0;
+  try {
+    const queue = await mkIdbQueueList_();
+    for (let i = 0; i < (queue || []).length; i++) {
+      const item = queue[i];
+      if (!item || !item.params) continue;
+      const ri = Number(item.params.rowIndex);
+      if (item.action === 'salvarLocacao' && (!ri || ri < 0)) continue;
+      if (ri < 0) continue;
+      if (!ri || alive.has(ri) || alive.has(item.params.rowIndex)) continue;
+      /* encerrar/cancelar/iniciar de linha já fechada no servidor = lixo que alimenta fantasma */
+      if (item.action === 'encerrarLocacao' || item.action === 'cancelarLocacao' || item.action === 'iniciarTimer') {
+        await mkIdbQueueRemove_(item.id);
+        removed++;
+      }
+    }
+    if (removed > 0 && typeof mkOfflineRefreshUi_ === 'function') mkOfflineRefreshUi_();
+  } catch (e) { /* ignore */ }
+  return removed;
+}
+
 async function mkOfflineRefreshUi_() {
   const n = typeof mkIdbQueueCount_ === 'function' ? await mkIdbQueueCount_() : (window._mkOfflineQueueCount || 0);
   window._mkOfflineQueueCount = n;
@@ -302,6 +327,7 @@ function mkOfflineWire_() {
 
 window.mkOfflineHandleWriteFail_ = mkOfflineHandleWriteFail_;
 window.mkOfflineFlush_ = mkOfflineFlush_;
+window.mkOfflinePruneStaleQueue_ = mkOfflinePruneStaleQueue_;
 window.mkOfflineWire_ = mkOfflineWire_;
 window.mkOfflineIsOffline_ = mkOfflineIsOffline_;
 window.mkOfflineCanQueue_ = mkOfflineCanQueue_;

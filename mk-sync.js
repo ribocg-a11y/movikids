@@ -421,17 +421,27 @@ function aplicarDadosInicio(d) {
     stored.forEach(s => storedMap[s.rowIndex] = s);
 
     const serverRows = new Set(d.ativos.map(s => s.rowIndex));
+    /* I187: preservar card temp da fila (ri < 0).
+     * I191: NÃO preservar ri>0 só por _offline*/_clientRequestId — isso ressuscitava fantasma
+     * (ex.: Triciclo João Encerrada no servidor, Ativa no tablet). */
     const mkSessaoFilaOffline_ = function (s) {
       if (!s) return false;
-      if (s._offlinePending || s._offlineTimerPending || s._offlineQueued) return true;
       if (Number(s.rowIndex) < 0) return true;
-      if (s._clientRequestId && (s.status === 'Pendente' || s.status === 'Ativa')) return true;
+      return false;
+    };
+    const mkSessaoOrphanOtimista_ = function (s) {
+      if (!s) return false;
+      if (s._optimistic || s._iniciandoTimer) {
+        const age = Date.now() - Number(s._savedAt || s._criado || s._optimisticAt || 0);
+        return age < 90000;
+      }
+      if (window._mkTimerInFlight && s.status === 'Ativa') return true;
       return false;
     };
     const cleanedStored = stored.filter(function (s) {
       if (serverRows.has(s.rowIndex)) return true;
-      /* I187: não apagar cards ainda só no tablet (fila IDB / temp row). */
       if (mkSessaoFilaOffline_(s)) return true;
+      if (mkSessaoOrphanOtimista_(s)) return true;
       if (uidResp !== 'all' && typeof mkUnidadeOfSession_ === 'function') {
         return mkUnidadeOfSession_(s) !== uidResp;
       }
@@ -439,6 +449,9 @@ function aplicarDadosInicio(d) {
     });
     if (cleanedStored.length !== stored.length) {
       try { localStorage.setItem('mk_sessions', JSON.stringify(cleanedStored)); } catch(e) {}
+    }
+    if (d.fonte === 'listarAtivas' && typeof mkOfflinePruneStaleQueue_ === 'function') {
+      try { mkOfflinePruneStaleQueue_(serverRows); } catch (ePrune) { /* ignore */ }
     }
 
     const balcaoEstrito = typeof mkIsBalcaoEstrito_ === 'function' ? mkIsBalcaoEstrito_() : true;
@@ -508,13 +521,12 @@ function aplicarDadosInicio(d) {
     const mergedRows = new Set(merged.map(s => s.rowIndex));
     // I122/I143: não apagar Pendente/▶ local enquanto sync lento ainda não listou a linha
     // I151b: listarAtivas é autoridade — só mantém orphan otimista curto (não 120s de fantasma)
+    // I191: ri>0 fora do servidor nunca fica por flag offline stale
     const fromListar = d.fonte === 'listarAtivas';
     const orphans = cleanedStored.filter(function (s) {
       if (!s || !s.rowIndex || mergedRows.has(s.rowIndex)) return false;
-      if (s._optimistic || s._iniciandoTimer) return true;
-      if (window._mkTimerInFlight && s.status === 'Ativa') return true;
-      /* I187: fila offline sobrevive sync/listarAtivas=0 até flush remap. */
       if (mkSessaoFilaOffline_(s)) return true;
+      if (mkSessaoOrphanOtimista_(s)) return true;
       if (fromListar) return false;
       if (s.status === 'Pendente' || s.status === 'Ativa') {
         const age = Date.now() - Number(s._savedAt || s._criado || 0);

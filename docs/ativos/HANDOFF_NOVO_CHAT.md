@@ -1,17 +1,18 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 03/11/2026 · FE **v1.9.185** (I187 offline) · GAS Web/repo **v1.5.237**
+**Atualizado:** 04/11/2026 · FE **v1.9.186** (I191 fantasma) · GAS Web/repo **v1.5.237**
 
 ## Produção (agora)
 
 | Camada | Versão | Link |
 |--------|--------|------|
-| Frontend | **v1.9.185** | https://ribocg-a11y.github.io/movikids/?force=1.9.185 |
-| Gestão Pessoas | **v1.9.185** | `gestao-pessoas.html?force=1.9.185` |
+| Frontend | **v1.9.186** | https://ribocg-a11y.github.io/movikids/?force=1.9.186 |
+| Gestão Pessoas | **v1.9.186** | `gestao-pessoas.html?force=1.9.186` |
 | GAS | ping Web **v1.5.237** · repo **v1.5.237** | Triciclo 03 alinhado |
 
-**Frota Golden:** 4 carros · **3 triciclos** (01–03) · 4 pelúcias — CONFIG live + FE **1.9.185**.  
-**I190:** extra só no fim (sem herdar plano) + não cobrar · **I189:** Encerrar 1 toque se extra OK · **I188:** encerrar EXTRA — pagamento no card + autofill plano · **I187/I187b:** offline short-circuit + fila + boot reidrata fila · `?force=1.9.185` · `AUDITORIA_REGRESSAO_OFFLINE_I187_2026-11-03.md`.
+**Frota Golden:** 4 carros · **3 triciclos** (01–03) · 4 pelúcias — CONFIG live + FE **1.9.186**.  
+**I191:** fantasma João — orphans offline só ri&lt;0 + purge duro + auto bump · `?force=1.9.186` · `INCIDENTE_I191_*`.  
+**I190:** extra só no fim (sem herdar plano) + não cobrar · **I189/I188:** encerrar EXTRA · **I187/I187b:** offline.  
 **I186:** Receita dia a dia — pills + **Ver**.
 
 **Folha Q2 31/10:** PIX Ray **902,22** · Karen **1.002,22** · Jennifer **632,19**.  

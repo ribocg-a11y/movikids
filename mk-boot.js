@@ -4,14 +4,24 @@ document.addEventListener('DOMContentLoaded', () => {
   if (typeof mkUnidadeAplicarConfig_ === 'function') mkUnidadeAplicarConfig_();
   if (typeof novaRecoveryOverlayStale_ === 'function') novaRecoveryOverlayStale_();
   if (typeof mkWarmGasBatchFlag_ === 'function') mkWarmGasBatchFlag_();
-  if (typeof mkAuthBoot === 'function') {
-    mkAuthBoot().catch(e => {
-      console.error('[mk-auth]', e);
-      const el = document.getElementById('mk-login-err');
-      if (el) { el.textContent = (e && e.message) || 'Erro ao iniciar login'; el.style.display = 'block'; }
-    });
-  } else if (typeof init === 'function') init();
-  if (typeof mkApplyComunicacaoModoUi_ === 'function') mkApplyComunicacaoModoUi_();
+  const bootAuth_ = function () {
+    if (typeof mkAuthBoot === 'function') {
+      mkAuthBoot().catch(e => {
+        console.error('[mk-auth]', e);
+        const el = document.getElementById('mk-login-err');
+        if (el) { el.textContent = (e && e.message) || 'Erro ao iniciar login'; el.style.display = 'block'; }
+      });
+    } else if (typeof init === 'function') init();
+    if (typeof mkApplyComunicacaoModoUi_ === 'function') mkApplyComunicacaoModoUi_();
+  };
+  /* I191: await purge ANTES do boot auth — senão snapshot reidrata João fantasma */
+  if (typeof mkAutoPurgeFantasmaOnVersionBump_ === 'function') {
+    Promise.resolve(mkAutoPurgeFantasmaOnVersionBump_())
+      .catch(function () { /* ignore */ })
+      .then(bootAuth_);
+  } else {
+    bootAuth_();
+  }
 });
 
 if ('serviceWorker' in navigator) {

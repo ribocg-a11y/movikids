@@ -125,13 +125,15 @@ function mkBootLocalFirstCore_() {
   } catch (e) {
     stored = [];
   }
-  /* I187b: não descartar fila offline / temp row no boot (só otimista ▶ antes). */
+  /* I187b: temp row (ri<0) + otimista curto.
+   * I191: flags _offline*/_clientRequestId em ri>0 NÃO sobrevivem ao boot — fantasma. */
   const inflight = stored.filter(function (s) {
     if (!s) return false;
-    if (s._iniciandoTimer || s._optimistic) return true;
-    if (s._offlinePending || s._offlineTimerPending || s._offlineQueued) return true;
     if (Number(s.rowIndex) < 0) return true;
-    if (s._clientRequestId && (s.status === 'Pendente' || s.status === 'Ativa')) return true;
+    if (s._iniciandoTimer || s._optimistic) {
+      const age = Date.now() - Number(s._savedAt || s._criado || s._optimisticAt || 0);
+      return age < 90000;
+    }
     return false;
   });
 
@@ -269,6 +271,116 @@ async function mkSnapshotClearLocal_(reload) {
   }
 }
 
+/**
+ * I191 — limpeza dura de fantasma em UM aparelho (LS + snapshot + fila stale).
+ * Preserva só salvarLocacao temp (ri<0) na fila IDB.
+ * listarAtivas em seguida restaura Aurora / ativas reais.
+ */
+async function mkPurgeLocacoesFantasmaHard_(opts) {
+  opts = opts || {};
+  try { localStorage.removeItem(mkSnapshotKey_()); } catch (e) { /* ignore */ }
+  try { localStorage.removeItem(MK_SNAPSHOT_KEY_LEGACY); } catch (e2) { /* ignore */ }
+  if (typeof mkIdbClearSnapshot_ === 'function') {
+    try { await mkIdbClearSnapshot_(); } catch (e3) { /* ignore */ }
+  }
+  try { localStorage.removeItem('mk_sessions'); } catch (e4) { /* ignore */ }
+  if (typeof mkInvalidateInicioCache_ === 'function') mkInvalidateInicioCache_();
+  try { localStorage.removeItem('mk_inicio_cache'); } catch (e5) { /* ignore */ }
+  window._mkSnapshotTs = 0;
+
+  if (typeof mkIdbQueueList_ === 'function' && typeof mkIdbQueueRemove_ === 'function') {
+    try {
+      const queue = await mkIdbQueueList_();
+      for (let i = 0; i < (queue || []).length; i++) {
+        const item = queue[i];
+        if (!item) continue;
+        const ri = Number(item.params && item.params.rowIndex);
+        const keepSalvarTemp = item.action === 'salvarLocacao' && (!ri || ri < 0);
+        if (keepSalvarTemp) continue;
+        await mkIdbQueueRemove_(item.id);
+      }
+      if (typeof mkOfflineRefreshUi_ === 'function') mkOfflineRefreshUi_();
+    } catch (eQ) { /* ignore */ }
+  }
+
+  sessions = [];
+  if (typeof renderCards === 'function') renderCards();
+  if (typeof updateStats === 'function') updateStats();
+
+  const ver = (typeof APP_VERSION !== 'undefined' && APP_VERSION)
+    || (typeof MK_VERSION !== 'undefined' && MK_VERSION)
+    || '';
+  if (ver) {
+    try { localStorage.setItem('mk_i191_fantasma_purge_ver', String(ver)); } catch (eV) { /* ignore */ }
+  }
+
+  let ok = false;
+  if (typeof mkSyncListarAtivasFallback_ === 'function') {
+    try { ok = !!(await mkSyncListarAtivasFallback_({ silent: !!opts.silent })); } catch (eS) { ok = false; }
+  }
+  if (!ok && typeof syncController === 'function') {
+    try { syncController(true, 300); } catch (eC) { /* ignore */ }
+  }
+  if (opts.reload) {
+    try { location.reload(); } catch (eR) { /* ignore */ }
+  }
+  return ok;
+}
+
+/** I191: wipe local rápido 1× por versão (não bloqueia login com listarAtivas). */
+async function mkAutoPurgeFantasmaOnVersionBump_() {
+  try {
+    const ver = (typeof APP_VERSION !== 'undefined' && APP_VERSION)
+      || (typeof MK_VERSION !== 'undefined' && MK_VERSION)
+      || '';
+    if (!ver) return false;
+    const key = 'mk_i191_fantasma_purge_ver';
+    const params = new URLSearchParams((location && location.search) || '');
+    const forceUrl = params.get('purgeGhosts') === '1' || params.get('purgeGhosts') === 'true';
+    if (!forceUrl && localStorage.getItem(key) === String(ver)) return false;
+
+    if (forceUrl) {
+      await mkPurgeLocacoesFantasmaHard_({ silent: false });
+      try {
+        params.delete('purgeGhosts');
+        const q = params.toString();
+        const url = location.pathname + (q ? '?' + q : '') + (location.hash || '');
+        history.replaceState(null, '', url);
+      } catch (eU) { /* ignore */ }
+      return true;
+    }
+
+    /* Bump FE: só limpa storage/fila stale — sync pós-login reidrata Aurora. */
+    try { localStorage.removeItem(mkSnapshotKey_()); } catch (e1) { /* ignore */ }
+    try { localStorage.removeItem(MK_SNAPSHOT_KEY_LEGACY); } catch (e2) { /* ignore */ }
+    if (typeof mkIdbClearSnapshot_ === 'function') {
+      try { await mkIdbClearSnapshot_(); } catch (e3) { /* ignore */ }
+    }
+    try { localStorage.removeItem('mk_sessions'); } catch (e4) { /* ignore */ }
+    if (typeof mkInvalidateInicioCache_ === 'function') mkInvalidateInicioCache_();
+    try { localStorage.removeItem('mk_inicio_cache'); } catch (e5) { /* ignore */ }
+    window._mkSnapshotTs = 0;
+    if (typeof mkIdbQueueList_ === 'function' && typeof mkIdbQueueRemove_ === 'function') {
+      try {
+        const queue = await mkIdbQueueList_();
+        for (let i = 0; i < (queue || []).length; i++) {
+          const item = queue[i];
+          if (!item) continue;
+          const ri = Number(item.params && item.params.rowIndex);
+          if (item.action === 'salvarLocacao' && (!ri || ri < 0)) continue;
+          if (item.action === 'encerrarLocacao' || item.action === 'cancelarLocacao' || item.action === 'iniciarTimer') {
+            await mkIdbQueueRemove_(item.id);
+          }
+        }
+      } catch (eQ) { /* ignore */ }
+    }
+    try { localStorage.setItem(key, String(ver)); } catch (eV) { /* ignore */ }
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
 window.mkSnapshotLoad_ = mkSnapshotLoad_;
 window.mkSnapshotLoadAsync_ = mkSnapshotLoadAsync_;
 window.mkSnapshotSave_ = mkSnapshotSave_;
@@ -277,4 +389,6 @@ window.mkBootLocalFirst_ = mkBootLocalFirst_;
 window.mkBootLocalFirstAsync_ = mkBootLocalFirstAsync_;
 window.mkSnapshotApplyFallback_ = mkSnapshotApplyFallback_;
 window.mkSnapshotClearLocal_ = mkSnapshotClearLocal_;
+window.mkPurgeLocacoesFantasmaHard_ = mkPurgeLocacoesFantasmaHard_;
+window.mkAutoPurgeFantasmaOnVersionBump_ = mkAutoPurgeFantasmaOnVersionBump_;
 window.mkSnapshotAgeLabel_ = mkSnapshotAgeLabel_;

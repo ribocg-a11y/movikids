@@ -969,10 +969,39 @@ try {
     } else {
       Add-Check "guard.i154.listar.timeout" "ok" "listarAtivas timeout 45s"
     }
-    if ($syncRawI154 -notmatch 'mkSessaoFilaOffline_' -or $syncRawI154 -notmatch '_offlinePending') {
-      Add-Check "guard.i187.sync.orphans" "fail" "sync apaga orphans da fila offline (I187)"
+    if ($syncRawI154 -notmatch 'mkSessaoFilaOffline_' -or $syncRawI154 -notmatch 'Number\(s\.rowIndex\) < 0') {
+      Add-Check "guard.i187.sync.orphans" "fail" "sync apaga orphans temp ri<0 (I187/I191)"
     } else {
-      Add-Check "guard.i187.sync.orphans" "ok" "orphans fila offline preservados"
+      Add-Check "guard.i187.sync.orphans" "ok" "orphans temp ri<0 preservados"
+    }
+    # I191 — fantasma ri>0 não sobrevive a listarAtivas / boot por flag offline stale
+    if ($syncRawI154 -notmatch 'I191' -or $syncRawI154 -notmatch 'mkSessaoOrphanOtimista_' -or $syncRawI154 -notmatch 'mkOfflinePruneStaleQueue_') {
+      Add-Check "guard.i191.fantasma.orphans" "fail" "I191 orphans/prune ausente (fantasma João)"
+    } else {
+      Add-Check "guard.i191.fantasma.orphans" "ok" "listarAtivas dropa ri>0 stale"
+    }
+  }
+  $snapPathI191 = Join-Path $root "mk-local-snapshot.js"
+  if (Test-Path $snapPathI191) {
+    $snapRawI191 = Get-Content -Path $snapPathI191 -Raw -Encoding UTF8
+    if ($snapRawI191 -notmatch 'mkPurgeLocacoesFantasmaHard_' -or $snapRawI191 -notmatch 'mkAutoPurgeFantasmaOnVersionBump_') {
+      Add-Check "guard.i191.fantasma.purge" "fail" "purge duro / auto bump ausente (I191)"
+    } else {
+      Add-Check "guard.i191.fantasma.purge" "ok" "purge fantasma + auto por versão"
+    }
+    if ($snapRawI191 -notmatch 'I191: flags _offline' -or $snapRawI191 -notmatch 'Number\(s\.rowIndex\) < 0\) return true') {
+      Add-Check "guard.i191.boot.inflight" "fail" "boot inflight sem trava I191 ri<0"
+    } else {
+      Add-Check "guard.i191.boot.inflight" "ok" "boot inflight só ri<0 / otimista 90s"
+    }
+  }
+  $bootPathI191 = Join-Path $root "mk-boot.js"
+  if (Test-Path $bootPathI191) {
+    $bootRawI191 = Get-Content -Path $bootPathI191 -Raw -Encoding UTF8
+    if ($bootRawI191 -notmatch 'mkAutoPurgeFantasmaOnVersionBump_') {
+      Add-Check "guard.i191.boot.autopurge" "fail" "boot sem auto-purge I191"
+    } else {
+      Add-Check "guard.i191.boot.autopurge" "ok" "boot chama auto-purge I191"
     }
   }
   $novaPathI187 = Join-Path $root "mk-nova.js"
