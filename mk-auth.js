@@ -17,6 +17,8 @@
   const OPS_UID_LS_KEY = 'mk_ops_unidade_v1';
   const opsUnidadeById_ = Object.create(null);
   let sessaoAtivaRemota = null;
+  /** I194 — mapa golden/laville (holding). sessaoAtiva é null quando unidadeId=all. */
+  let sessoesAtivasRemotas = {};
   let _loadingOps = false;
   let _authBusy = false;
   let _lastTurnoRefreshAt = 0;
@@ -364,8 +366,20 @@
   };
 
   function isSessaoBloqueadaPara_(operadorId) {
-    if (!sessaoAtivaRemota || !operadorId) return false;
-    return Number(sessaoAtivaRemota.operadorId) !== Number(operadorId);
+    if (!operadorId) return false;
+    /* I194: bloquear pela sessão da loja atual (mapa), não só sessaoAtiva singular. */
+    let uid = '';
+    try {
+      if (typeof mkUnidadeId_ === 'function') uid = String(mkUnidadeId_() || '').toLowerCase();
+    } catch (e) { uid = ''; }
+    let srv = null;
+    if (uid && uid !== 'all' && sessoesAtivasRemotas && sessoesAtivasRemotas[uid]) {
+      srv = sessoesAtivasRemotas[uid];
+    } else {
+      srv = sessaoAtivaRemota;
+    }
+    if (!srv || !srv.operadorId) return false;
+    return Number(srv.operadorId) !== Number(operadorId);
   }
 
   function mkAuthUnidadeLoginParams_() {
@@ -427,9 +441,51 @@
     if (btn) btn.disabled = bloqueia;
   }
 
-  function updateOperadoresSessaoBanner_(sessao) {
+  function mkAuthLabelLojaSessao_(uid) {
+    return (String(uid || '').toLowerCase() === 'laville') ? 'La Ville' : 'Golden';
+  }
+
+  function mkAuthNormalizeSessoesMap_(map) {
+    const out = {};
+    if (!map || typeof map !== 'object') return out;
+    ['golden', 'laville'].forEach(function (uid) {
+      const s = map[uid];
+      if (s && s.nome) out[uid] = enrichSessaoComUnidade_(Object.assign({}, s, { unidadeId: uid }));
+    });
+    return out;
+  }
+
+  /** I194: com unidadeId=all o GAS devolve sessaoAtiva=null e preenche sessoesAtivas. */
+  function mkAuthPickSessaoFromApi_(d) {
+    if (!d || !d.ok) return { sessao: null, map: {} };
+    const map = mkAuthNormalizeSessoesMap_(d.sessoesAtivas);
+    if (d.sessaoAtiva && d.sessaoAtiva.nome) {
+      const one = enrichSessaoComUnidade_(d.sessaoAtiva);
+      const uid = String(one.unidadeId || 'golden').toLowerCase();
+      if (uid === 'golden' || uid === 'laville') map[uid] = one;
+      return { sessao: one, map: map };
+    }
+    let uidNow = '';
+    try {
+      if (typeof mkUnidadeId_ === 'function') uidNow = String(mkUnidadeId_() || '').toLowerCase();
+    } catch (eU) { uidNow = ''; }
+    if (uidNow && uidNow !== 'all' && map[uidNow]) {
+      return { sessao: map[uidNow], map: map };
+    }
+    /* Holding: sem sessao unica — banner usa o mapa. */
+    return { sessao: null, map: map };
+  }
+
+  function updateOperadoresSessaoBanner_(sessao, map) {
     document.querySelectorAll('.mk-ops-sessao-banner').forEach(el => {
-      if (!sessao || !sessao.nome) {
+      const parts = [];
+      const m = map || sessoesAtivasRemotas || {};
+      if (m.golden && m.golden.nome) parts.push('Golden: ' + m.golden.nome);
+      if (m.laville && m.laville.nome) parts.push('La Ville: ' + m.laville.nome);
+      if (!parts.length && sessao && sessao.nome) {
+        parts.push(mkAuthLabelLojaSessao_(sessao.unidadeId) + ': ' + sessao.nome);
+      }
+      if (!parts.length) {
         el.style.display = 'none';
         el.textContent = '';
         return;
@@ -438,24 +494,43 @@
       el.style.background = '';
       el.style.color = '';
       el.style.borderColor = '';
-      const lojaS = (String(sessao.unidadeId || '').toLowerCase() === 'laville') ? 'La Ville' : 'Golden';
-      el.textContent = 'Sessão ativa no balcão ' + lojaS + ': ' + sessao.nome + '. Use o botão abaixo para liberar se precisar.';
+      el.textContent = (parts.length > 1 ? 'Sessões ativas — ' : 'Sessão ativa — ')
+        + parts.join(' · ')
+        + '. Use o botão abaixo para liberar se precisar.';
     });
   }
 
   /** Atualiza banner, login lock e rodapé (sb-sessao) de uma vez. */
-  function mkAuthSyncSessaoBalcaoUI_(sessao) {
+  function mkAuthSyncSessaoBalcaoUI_(sessao, mapOpt) {
     /* I162c — sem listarOperadoresLogin extra (I120b/I122/I145: não competir com carregarInicio). */
+    if (mapOpt && typeof mapOpt === 'object') {
+      sessoesAtivasRemotas = mkAuthNormalizeSessoesMap_(mapOpt);
+    }
     sessaoAtivaRemota = sessao && sessao.nome ? enrichSessaoComUnidade_(sessao) : null;
     updateSessaoLockUI_();
-    updateOperadoresSessaoBanner_(sessaoAtivaRemota);
+    updateOperadoresSessaoBanner_(sessaoAtivaRemota, sessoesAtivasRemotas);
     if (typeof atualizarOperadorUI_ === 'function') {
       atualizarOperadorUI_(sessaoAtivaRemota);
     }
   }
 
   function applySessaoAtivaFromApi_(d) {
-    mkAuthSyncSessaoBalcaoUI_((d && d.sessaoAtiva) ? d.sessaoAtiva : null);
+    const picked = mkAuthPickSessaoFromApi_(d);
+    sessoesAtivasRemotas = picked.map || {};
+    mkAuthSyncSessaoBalcaoUI_(picked.sessao, picked.map);
+  }
+
+  function mkAuthOperadorIdsLogados_() {
+    const ids = {};
+    const m = sessoesAtivasRemotas || {};
+    Object.keys(m).forEach(function (uid) {
+      const s = m[uid];
+      if (s && s.operadorId) ids[Number(s.operadorId)] = uid;
+    });
+    if (sessaoAtivaRemota && sessaoAtivaRemota.operadorId) {
+      ids[Number(sessaoAtivaRemota.operadorId)] = String(sessaoAtivaRemota.unidadeId || 'golden');
+    }
+    return ids;
   }
 
   window.mkAuthGetSessaoServidor_ = function mkAuthGetSessaoServidor_() {
@@ -473,7 +548,19 @@
     if (s.role === 'admin' || s.id === 'ADMIN' || mkAuthIsAdmin()) return false;
     if (!d || !d.ok) return false;
 
-    const srv = d.sessaoAtiva;
+    /* I194: sem unidadeId o GAS devolve sessaoAtiva=null — olhar sessoesAtivas da loja. */
+    const picked = mkAuthPickSessaoFromApi_(d);
+    let srv = picked.sessao;
+    if (!srv || !srv.operadorId) {
+      let uidLocal = '';
+      try {
+        if (typeof mkUnidadeId_ === 'function') uidLocal = String(mkUnidadeId_() || '').toLowerCase();
+      } catch (e1) { uidLocal = ''; }
+      if ((!uidLocal || uidLocal === 'all') && s.id && opsUnidadeById_[String(s.id)]) {
+        uidLocal = String(opsUnidadeById_[String(s.id)] || '').toLowerCase();
+      }
+      if (uidLocal && picked.map && picked.map[uidLocal]) srv = picked.map[uidLocal];
+    }
     const localId = Number(s.id);
     const srvId = srv && srv.operadorId ? Number(srv.operadorId) : 0;
     const fantasma = !srvId || srvId !== localId;
@@ -495,7 +582,8 @@
     if (_lastTurnoRefreshAt && (Date.now() - _lastTurnoRefreshAt) < 45000) return;
     _turnoPollBusy = true;
     try {
-      const d = await apiCall({ action: 'listarOperadoresLogin' }, 20000);
+      /* I194: sempre com unidade da loja — senão sessaoAtiva=null e UI/admin “ninguém logado”. */
+      const d = await apiCall(mkAuthOpsListParams_(), 20000);
       _lastTurnoRefreshAt = Date.now();
       if (d && d.ok) {
         indexOpsUnidade_(d.operadores);
@@ -522,6 +610,7 @@
     const s = getSession();
     if (s && s.role === 'admin' && typeof mkAuthExitAdmin_ === 'function') mkAuthExitAdmin_();
     sessaoAtivaRemota = null;
+    sessoesAtivasRemotas = {};
     clearSession();
     selectedOp = null;
     if (typeof mobMenuClose_ === 'function') mobMenuClose_();
@@ -1623,7 +1712,7 @@
       applySessaoAtivaFromApi_(d);
       const ops = d.operadores || [];
       indexOpsUnidade_(ops);
-      const sessaoId = sessaoAtivaRemota ? Number(sessaoAtivaRemota.operadorId) : 0;
+      const logados = mkAuthOperadorIdsLogados_();
       if (!ops.length) {
         el.innerHTML = '<p style="color:var(--txt3)">Nenhum operador cadastrado</p>';
         return;
@@ -1634,7 +1723,11 @@
         const perfil = (op.perfil === 'supervisor') ? 'Supervisor' : ((op.perfil === 'gestor') ? 'Gestor' : 'Operador');
         const uidOp = (op.unidadeId === 'laville') ? 'laville' : ((op.unidadeId === 'all') ? 'all' : 'golden');
         const lojaTxt = (uidOp === 'laville') ? 'La Ville' : ((uidOp === 'all') ? 'Todas' : 'Golden');
-        const logadoAgora = sessaoId && Number(op.id) === sessaoId;
+        const uidLog = logados[Number(op.id)];
+        const logadoAgora = !!uidLog;
+        const logadoLoja = logadoAgora
+          ? ('Logado · ' + mkAuthLabelLojaSessao_(uidLog))
+          : '';
         const nomeJs = JSON.stringify(op.nome || '');
         return `<div class="mk-op-card" data-id="${op.id}">
           <div class="mk-op-card-main">
@@ -1642,7 +1735,7 @@
             <span class="mk-op-card-badge ${badgeCls}">${badgeTxt}</span>
             <span class="mk-op-card-badge">${perfil}</span>
             <span class="mk-op-card-badge">${lojaTxt}</span>
-            ${logadoAgora ? '<span class="mk-op-card-badge ok">Logado no balcao</span>' : ''}
+            ${logadoAgora ? '<span class="mk-op-card-badge ok">' + logadoLoja + '</span>' : ''}
           </div>
           <div class="mk-op-card-actions">
             <button type="button" class="mk-op-menu-btn" aria-label="Acoes" onclick="mkOpToggleMenu(event, ${op.id})">⋮</button>

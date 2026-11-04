@@ -1062,6 +1062,21 @@ try {
       Add-Check "guard.i192.enchoje.repair" "ok" "repair encHoje apos listarAtivas-only"
     }
   }
+  # I194 — admin holding: sessoesAtivas (não só sessaoAtiva=null)
+  $authPathI194 = Join-Path $root "mk-auth.js"
+  if (Test-Path $authPathI194) {
+    $authRawI194 = Get-Content -Path $authPathI194 -Raw -Encoding UTF8
+    if ($authRawI194 -notmatch 'mkAuthPickSessaoFromApi_' -or $authRawI194 -notmatch 'sessoesAtivasRemotas' -or $authRawI194 -notmatch 'mkAuthOperadorIdsLogados_') {
+      Add-Check "guard.i194.sessoes.mapa" "fail" "FE ignora sessoesAtivas no holding (I194)"
+    } else {
+      Add-Check "guard.i194.sessoes.mapa" "ok" "banner/admin usam sessoesAtivas"
+    }
+    if ($authRawI194 -notmatch 'mkAuthRefreshSessaoTurno_' -or $authRawI194 -notmatch 'mkAuthOpsListParams_\(\)') {
+      Add-Check "guard.i194.refresh.unidade" "fail" "refresh turno sem unidade (sessaoAtiva null)"
+    } else {
+      Add-Check "guard.i194.refresh.unidade" "ok" "refresh turno com mkAuthOpsListParams_"
+    }
+  }
   $novaPathI187 = Join-Path $root "mk-nova.js"
   if (Test-Path $novaPathI187) {
     $novaRawI187 = Get-Content -Path $novaPathI187 -Raw -Encoding UTF8
