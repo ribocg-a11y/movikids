@@ -162,7 +162,19 @@ Erros cometidos neste projeto que nao devem se repetir:
 - calcular tempo do portal sem `canonLoc_` / paridade com `mergeSessaoCanonica` do balcao (I16);
 - liberar sessao operador sem `cache: 'no-store'` e sem atualizar UI do balcao (I17);
 - deslogar por inatividade com locacao Ativa/Pendente no tablet (I18);
-- gravar Hora Inicio (col C) no cadastro ou inferir startTimestamp por data+hora sem col Y (I20).
+- gravar Hora Inicio (col C) no cadastro ou inferir startTimestamp por data+hora sem col Y (I20);
+- publicar `mk-*.js` com **SyntaxError** (I193 — comentário `_offline*/` dentro de `/* */` em I191, 04/11/2026: sync morto no tablet).
+
+## Regra 21 — Parse JS FE obrigatório (I193) — código base validado
+
+**Regra de ouro (não negociável):** o código base FE **não** é alterado/publicado se houver erro de parse.
+
+1. Após **qualquer** edição em `mk-*.js` / `sw.js`: `.\scripts\guard-js-syntax.ps1` (ou `node --check <arquivo>`).
+2. `pre-push-check.ps1` → **`guard.i193.js.syntax`** deve ser **ok** — senão **não push**.
+3. Em comentário `/* */`, **nunca** escrever a sequência `*/` no meio do texto.
+4. Validação parcial (só diff visual / só bump) **não** substitui parse.
+
+Incidente: `INCIDENTE_I193_JS_SYNTAX_COMENTARIO_2026-11-04.md` · regra Cursor `fe-js-syntax-obrigatorio-i193.mdc`.
 
 ## Regra 10 - Cronometro portal x balcao (I16)
 

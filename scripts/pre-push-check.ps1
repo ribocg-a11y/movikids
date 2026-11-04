@@ -95,6 +95,41 @@ try {
     Add-Check "versao.gestao-pessoas-cache-bust" "fail" "gestao-pessoas.html ausente"
   }
 
+  # I193 — parse JS obrigatório ANTES de qualquer push FE (I191 quebrou prod com `*/` em comentário)
+  $jsSyntaxScript = Join-Path $root "scripts\guard-js-syntax.ps1"
+  if (Test-Path $jsSyntaxScript) {
+    $jsOut = & $jsSyntaxScript -Quiet 2>&1 | Out-String
+    if ($LASTEXITCODE -ne 0) {
+      $jsDetail = (($jsOut.Trim() -replace '\s+', ' '))
+      if ($jsDetail.Length -gt 180) { $jsDetail = $jsDetail.Substring(0, 180) }
+      if ([string]::IsNullOrWhiteSpace($jsDetail)) { $jsDetail = "node --check falhou — rode scripts/guard-js-syntax.ps1" }
+      Add-Check "guard.i193.js.syntax" "fail" ("I193: " + $jsDetail)
+    } else {
+      Add-Check "guard.i193.js.syntax" "ok" "mk-*.js + sw.js parse OK"
+    }
+  } else {
+    $nodeCmd = Get-Command node -ErrorAction SilentlyContinue
+    if (-not $nodeCmd) {
+      Add-Check "guard.i193.js.syntax" "fail" "node ausente — nao da para validar parse JS (I193)"
+    } else {
+      $jsFail = @()
+      Get-ChildItem -Path $root -Filter "mk-*.js" -File | ForEach-Object {
+        & node --check $_.FullName 2>&1 | Out-Null
+        if ($LASTEXITCODE -ne 0) { $jsFail += $_.Name }
+      }
+      $swJs = Join-Path $root "sw.js"
+      if (Test-Path $swJs) {
+        & node --check $swJs 2>&1 | Out-Null
+        if ($LASTEXITCODE -ne 0) { $jsFail += "sw.js" }
+      }
+      if ($jsFail.Count -gt 0) {
+        Add-Check "guard.i193.js.syntax" "fail" ("SyntaxError: " + ($jsFail -join ", "))
+      } else {
+        Add-Check "guard.i193.js.syntax" "ok" "mk-*.js + sw.js parse OK"
+      }
+    }
+  }
+
   $i24Guard = Join-Path $root "scripts\guard-i24-publicacao.ps1"
   if (Test-Path $i24Guard) {
     & $i24Guard -Mode PrePush -SkipNetwork 2>&1 | Out-Null

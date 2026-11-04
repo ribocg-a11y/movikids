@@ -1,0 +1,31 @@
+# I193 — Parse JS FE obrigatório (código base validado)
+
+## Regra de ouro
+
+**Não alterar / não publicar FE** se `node --check` falhar em qualquer `mk-*.js` ou `sw.js`.
+
+Código base **só muda** quando a mudança está **validada sem erros de parse**. Comentário que quebra o arquivo = regressão P0 em produção.
+
+## Por que existe
+
+**04/11/2026 — I191:** comentário com `_offline*/` dentro de `/* … */` em `mk-sync.js` e `mk-local-snapshot.js` → **SyntaxError** no tablet → sync morto → fantasma + Encerradas vazias. O pre-push **não** rodava parse. Usuário teve que pedir check.
+
+## Agente — executar SEMPRE após editar JS FE (sem pedir)
+
+```powershell
+.\scripts\guard-js-syntax.ps1
+# ou
+node --check mk-sync.js
+```
+
+`pre-push-check.ps1` inclui **`guard.i193.js.syntax`** — exit ≠ 0 → **não push**.
+
+## Armadilha
+
+Em comentário de bloco `/* */`, **nunca** escrever a sequência `*/` no meio do texto (ex.: `_offline*/_client`). Use `_offline` / `offline flags` por extenso.
+
+## Não fazer
+
+- Push FE “rápido” sem `pre-push-check` / sem parse
+- Assumir que lint do editor basta
+- Encerrar com Pages nova se `node --check` local falha

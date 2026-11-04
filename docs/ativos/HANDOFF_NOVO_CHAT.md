@@ -11,7 +11,8 @@
 | GAS | ping Web **v1.5.237** · repo **v1.5.237** | Triciclo 03 alinhado |
 
 **Frota Golden:** 4 carros · **3 triciclos** (01–03) · 4 pelúcias — CONFIG live + FE **1.9.187**.  
-**I192:** Encerradas La Ville + fantasma — snapshot não apaga encHoje; repair pós-listarAtivas · `?force=1.9.187` · `INCIDENTE_I192_*`.  
+**I193:** parse JS obrigatório (`guard-js-syntax` / Regra 21) — I191 quebrou prod com `*/` em comentário.  
+**I192:** Encerradas La Ville + fantasma · `?force=1.9.187` · `INCIDENTE_I192_*`.  
 **I191:** orphans offline só ri&lt;0 + purge · **I190/I189/I188** encerrar EXTRA · **I187** offline.  
 **I186:** Receita dia a dia — pills + **Ver**.
 

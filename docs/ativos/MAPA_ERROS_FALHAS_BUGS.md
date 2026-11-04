@@ -154,10 +154,11 @@ Docs: `INCIDENTE_I153_*` · `INCIDENTE_I154_*` · `INCIDENTE_I155_*` · `EVIDENC
 | **I187** | Offline: timeout 25s; encerrar/cancelar sem fila; sync apagava card temp | Fila só salvar/▶; `rowIndexFromSalvar_` NaN; orphans I151 | short-circuit `api()`; fila encerrar/cancelar; preservar orphans offline; SW shell cache · FE **v1.9.181** | ✅ FE |
 | **I191** | Fantasma Triciclo João (ri>0 Encerrada no GAS, Ativa no tablet) | I187 preservava `_offline*`/`_clientRequestId` em **ri>0** + boot inflight | orphans offline **só ri&lt;0**; purge duro + auto bump FE · **v1.9.186** | ✅ FE |
 | **I192** | La Ville Encerradas vazias + fantasma persiste | `listarAtivas` gravava snapshot `encHoje:[]`; timeout inicio só listar; boot reidratava Ativa do snapshot | preservar encHoje no parcial; repair `carregarInicio`; snapshot sem Ativa ri&gt;0 · **v1.9.187** | ✅ FE |
+| **I193** | Sync/FE morto no tablet após I191 (todos reclamando) | Comentário `_offline*/` **dentro** de `/* */` → **SyntaxError** em `mk-sync.js` + `mk-local-snapshot.js`; pre-push **sem** `node --check` | `guard-js-syntax.ps1` + `guard.i193.js.syntax` no pre-push; Regra 21 | ✅ trava |
 
-**Veredito offline:** balcão **parcial** — Nova + ▶ + Encerrar + Cancelar enfileiram e sobem ao voltar rede. Estender/editar/admin/login ainda exigem rede. SMS/WhatsApp ignorados (`qr_only`). **Regra I191:** flag offline em linha real (ri>0) **não** vence `listarAtivas`. **Regra I192:** parcial/`listarAtivas` **não** apaga Encerradas do dia.
+**Veredito offline:** balcão **parcial** — Nova + ▶ + Encerrar + Cancelar enfileiram e sobem ao voltar rede. Estender/editar/admin/login ainda exigem rede. SMS/WhatsApp ignorados (`qr_only`). **Regra I191:** flag offline em linha real (ri>0) **não** vence `listarAtivas`. **Regra I192:** parcial/`listarAtivas` **não** apaga Encerradas do dia. **Regra I193:** **nunca** push FE com parse quebrado.
 
-Docs: `AUDITORIA_REGRESSAO_OFFLINE_I187_2026-11-03.md` · `INCIDENTE_I191_*` · `INCIDENTE_I192_ENCHOJE_LISTARATIVAS_2026-11-04.md` · `mk-offline-queue.js` · `mk-api.js`
+Docs: `AUDITORIA_REGRESSAO_OFFLINE_I187_2026-11-03.md` · `INCIDENTE_I191_*` · `INCIDENTE_I192_*` · `INCIDENTE_I193_JS_SYNTAX_COMENTARIO_2026-11-04.md` · `mk-offline-queue.js` · `mk-api.js`
 
 ## Diagnóstico de família — encerrar / minutos extras I85 → I189 (03/11/2026)
 
