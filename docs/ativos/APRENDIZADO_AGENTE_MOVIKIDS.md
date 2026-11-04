@@ -1,16 +1,17 @@
 # Aprendizado do agente — MOVI KIDS
 
-**Criado:** 04/11/2026 · **Origem:** sessão I191→I197 (fantasma, Encerradas LV, “ninguém logado”, audit dual-loja)  
+**Criado:** 04/11/2026 · **Origem:** sessão I191→I198 (fantasma → família → evolução estratégica)  
 **Uso:** ler na **Fase A** de todo chat · atualizar quando um padrão novo se repetir 2×  
+**Companheiro:** `EVOLUCAO_ESTRATEGICA_POS_I197.md` (ir além do fix)  
 **Não substitui:** `ROTEIRO_AGENTE_OBRIGATORIO.md` · `MAPA_ERROS_FALHAS_BUGS.md` · `ACESSOS_E_AUTORIZACOES.md`
 
 ---
 
 ## 0. Por que este arquivo existe
 
-O usuário pediu evolução **visível**: não só “consertar o sintoma pedido”, mas **perceber omissões**, **agir sem pedido** quando a arquitetura exige, e **auto-regular** falhas próprias.
+O usuário pediu evolução **visível**: não só “consertar o sintoma pedido”, mas **perceber omissões**, **agir sem pedido**, **comparar com outros sistemas**, **prever modernização**, e transformar cada erro em **proteção definitiva**.
 
-Hoje (04/11) a cadeia I191→I197 mostrou o mesmo padrão: o agente fechava o bug apontado e **deixava irmãos latentes** no mesmo fluxo (parcial vs rico, singular vs mapa, all→golden, cache/Firebase reidratando Ativa). Isso **não é evolução** — é reativo.
+Hoje (04/11) a cadeia I191→I197 mostrou o padrão reativo (fechar 1 if, deixar irmãos). O mandato seguinte foi explícito: **não ficar bitolado esperando comando** — proteger e modernizar sempre; o fix pontual é o mínimo, não a entrega.
 
 Este doc é a memória operacional do que o agente **já deveria saber sozinho**.
 
@@ -154,6 +155,7 @@ Se o usuário ainda precisar dizer “veja outras coisas que você deixou passar
 | 03–04/11 | I187→I193 | Offline + **nunca** push com SyntaxError |
 | 04/11 | I194→I197 | Holding = mapa; parcial ≠ apagar rico; audit→código na mesma sessão |
 | 04/11 | Este doc | Família obrigatória + proatividade explícita |
+| 04/11 | **I198 + mandato §9** | Comparar/prever/modernizar; helper + audit-família; não esperar comando |
 
 ---
 
@@ -164,9 +166,12 @@ No fim de entrega P0, incluir bloco curto:
 ```markdown
 ### Feito sem pedido (arquitetura)
 - …
-- …
+### Além do fix (definitivo / modernização)
+- política nomeada / guard / movimento E* ou P*
 ### Família varrida
-- [ ] autoridade · [ ] parcial · [ ] mapa · [ ] all/golden · [ ] assign order · [ ] boot/cache/offline
+- [ ] autoridade · [ ] parcial · [ ] mapa · [ ] all/golden · [ ] assign · [ ] boot/cache/offline
+### Comparativo / próximo estratégico
+- o que sistemas maduros fazem · próximo E*/G*/P* (ver EVOLUCAO_ESTRATEGICA)
 ### Ainda §7.3 / só humano
 - …
 ```
@@ -179,9 +184,10 @@ No fim de entrega P0, incluir bloco curto:
 |-----|-------|
 | `ROTEIRO_AGENTE_OBRIGATORIO.md` | Ordem commit/push (como publicar) |
 | Este arquivo | **Como pensar** e o que fazer além do pedido |
+| `EVOLUCAO_ESTRATEGICA_POS_I197.md` | Comparar · movimentos E*/G*/P* · critério “fomos além” |
 | `MAPA_ERROS_FALHAS_BUGS.md` | Incidentes e travas |
 | `AUDITORIA_LATENTE_POS_I194_I195_2026-11-04.md` | Achados vivos dual-loja |
-| `INCIDENTE_I197_*` | Última leva FE de família |
+| `INCIDENTE_I197_*` | Família FE |
 | `.cursor/rules/agente-aprendizado-movikids.mdc` | Lembrete always-apply |
 
 ---
@@ -192,6 +198,62 @@ Quando:
 
 - O mesmo padrão falhar 2×, **ou**
 - Nascer I* novo da família dual-loja / fantasma / parcial / parse, **ou**
-- O usuário cobrar evolução de novo
+- O usuário cobrar evolução / modernização de novo
 
-→ acrescentar linha na §1 / §5 **na mesma sessão** do fix. Não deixar só no chat.
+→ acrescentar linha na §1 / §5 / §9 **na mesma sessão**. Não deixar só no chat.
+
+---
+
+## 9. Mandato — ir além do erro (04/11/2026)
+
+Pedido do usuário (essência): decisões baseadas nos **próprios erros**; **comparar** com outros sistemas; **prever** mudanças estratégicas; **modernizar**; **não esperar comando**; cada erro = crescimento, não só correção.
+
+### 9.1 Ciclo obrigatório por P0
+
+```
+erro / sintoma
+  → fix mínimo (parar o sangramento)
+  → família (§2.1)
+  → política nomeada no código (helper/contrato)
+  → trava automática (guard / audit-familia)
+  → 1 movimento de modernização (E* FE ou propor G*/P*)
+  → publicar + reportar “além do fix”
+```
+
+Parar no primeiro passo = **regredir**.
+
+### 9.2 Comparar (sempre)
+
+Perguntas mínimas:
+
+1. Como um app multi-loja maduro modelaria isso (tenant explícito, sem default store)?
+2. Como offline-first serio faria outbox (idempotência + escopo)?
+3. Como sync maduro faria merge parcial (campo a campo, não replace cego)?
+4. O que podemos **importar como contrato** sem reinventar moda?
+
+Respostas alimentam `EVOLUCAO_ESTRATEGICA_POS_I197.md`.
+
+### 9.3 Prever e modernizar (sem pedido)
+
+O agente **age** quando vê:
+
+| Sinal | Ação autônoma |
+|-------|----------------|
+| 3+ patches no mesmo fluxo | Extrair política/helper (ex. I198 `mkInicioCacheSafeForApply_`) |
+| Anti-padrão grepável | Script/guard no pre-push |
+| Dual-loja + campo singular | Migrar UI para mapa na mesma sessão |
+| Fonte secundária escrevendo estado crítico | Rebaixar a read-only / hint |
+| Documento só “monitorar” P0 | Virar E* com código ou G* com texto §7.3 |
+
+### 9.4 O que NÃO é evolução
+
+- Esperar “pode olhar o Firebase?”  
+- Entregar só relatório de audit  
+- “Mitigação / monitorar” em P0 FE  
+- Patch sem guard  
+- Guard sem política nomeada quando o padrão já repetiu 2×  
+
+### 9.5 Auto-regulação emocional-operacional
+
+Bitolado = só obedece o último comando.  
+Evoluído = usa o comando como **gatilho** para proteger o sistema inteiro e deixar o próximo chat mais forte (código + trava + próximo passo estratégico).

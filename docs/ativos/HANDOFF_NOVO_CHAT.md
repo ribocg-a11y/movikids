@@ -1,20 +1,19 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 04/11/2026 · FE **v1.9.191** (I197) · GAS Web/repo **v1.5.237** · **ler** `APRENDIZADO_AGENTE_MOVIKIDS.md`
+**Atualizado:** 04/11/2026 · FE **v1.9.192** (I198) · GAS Web/repo **v1.5.237** · **ler** `APRENDIZADO_AGENTE` + `EVOLUCAO_ESTRATEGICA_POS_I197`
 
 ## Produção (agora)
 
 | Camada | Versão | Link |
 |--------|--------|------|
-| Frontend | **v1.9.191** | https://ribocg-a11y.github.io/movikids/?force=1.9.191 |
-| Gestão Pessoas | **v1.9.191** | `gestao-pessoas.html?force=1.9.191` |
+| Frontend | **v1.9.192** | https://ribocg-a11y.github.io/movikids/?force=1.9.192 |
+| Gestão Pessoas | **v1.9.192** | `gestao-pessoas.html?force=1.9.192` |
 | GAS | ping Web **v1.5.237** · repo **v1.5.237** | Triciclo 03 alinhado |
 
-**Frota Golden:** 4 carros · **3 triciclos** (01–03) · 4 pelúcias — CONFIG live + FE **1.9.191**.  
-**I197:** Firebase sem ativos · GP `sessoesAtivas` · fantasma map-wide · IDB por loja · cache frio sem Ativa · `INCIDENTE_I197_*`.  
-**I196:** `unidadeId` depois do auth · **I195** deslogar holding · **I194** sessoesAtivas · **I193** parse · **I192** Encerradas.  
-**I186:** Receita dia a dia — pills + **Ver**.  
-**Agente:** `docs/ativos/APRENDIZADO_AGENTE_MOVIKIDS.md` — sintoma ≠ família; proatividade §7.2; template “feito sem pedido”.
+**Frota Golden:** 4 carros · **3 triciclos** (01–03) · 4 pelúcias — CONFIG live + FE **1.9.192**.  
+**I198:** política `mkInicioCacheSafeForApply_` + `audit-familia-dual-loja.ps1` · ir além do patch · `EVOLUCAO_ESTRATEGICA_POS_I197.md`.  
+**I197:** Firebase/GP/fantasma/IDB · **I196** unidadeId auth · **I195–I192** holding/Encerradas/parse.  
+**Agente:** Aprendizado §9 — comparar · prever · modernizar · **não esperar comando**; cada erro → proteção definitiva.
 
 **Folha Q2 31/10:** PIX Ray **902,22** · Karen **1.002,22** · Jennifer **632,19**.  
 **Holding/ponto:** I183b · I184.

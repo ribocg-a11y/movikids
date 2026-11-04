@@ -1,32 +1,31 @@
-# Aprendizado do agente — MOVI KIDS (família + proatividade)
+# Aprendizado do agente — MOVI KIDS (família + ir além)
 
-**Fonte:** `docs/ativos/APRENDIZADO_AGENTE_MOVIKIDS.md`  
-**Marco:** I191→I197 (04/11/2026)
+**Fonte:** `docs/ativos/APRENDIZADO_AGENTE_MOVIKIDS.md` · `docs/ativos/EVOLUCAO_ESTRATEGICA_POS_I197.md`  
+**Marco:** I191→I198 (04/11/2026)
 
 ## Ler na Fase A
 
-Além do HANDOFF: abrir `APRENDIZADO_AGENTE_MOVIKIDS.md` quando a tarefa tocar sync, sessão, holding, fantasma, offline, unidadeId, cache ou admin “logado”.
+Além do HANDOFF: abrir Aprendizado (+ Evolução estratégica se sync/sessão/holding/fantasma/unidadeId/offline).
 
-## Regra dura — sintoma ≠ família
+## Regra dura — sintoma ≠ família ≠ fim
 
-Corrigir o bug pedido **e**, na mesma sessão, varrer a família (§2.1 do doc):
+1. Fixar o bug pedido  
+2. Varrer a família (autoridade, parcial, mapa, all/golden, assign, boot/cache/offline, irmãos)  
+3. **Ir além:** política nomeada **ou** guard/audit **ou** movimento E* do doc de evolução  
+4. Publicar FE se mudou código · reportar “além do fix”
 
-1. Quem é autoridade (não reidratar Ativa de Firebase/cache/snapshot)
-2. Parcial não apaga rico (`encHoje` / stats)
-3. Holding = `sessoesAtivas` mapa (não só `sessaoAtiva`)
-4. Nunca `all→golden` em liberar/deslogar
-5. `unidadeId` depois do auth
-6. Boot/timeout/backoff/offline
-7. Irmãos no admin/GP/hist/custos
-8. Guard no pre-push
-
-Se o usuário precisar dizer “veja o que você deixou passar” — a sessão falhou o gate de evolução.
+Se o usuário precisar dizer “veja o que deixou passar” ou “não fique esperando comando” — a sessão falhou.
 
 ## Proatividade (§7.2)
 
-Sem pedir: bump+push FE, audit→código P0/P1 FE, guards, HANDOFF/MAPA, `encerramento-sessao` exit 0.  
+Sem pedir: bump+push FE, audit→código P0/P1, `audit-familia-dual-loja.ps1`, helpers/contratos, HANDOFF/MAPA/EVOLUCAO, encerramento exit 0.  
+Comparar com padrões maduros (multi-tenant, outbox, merge por campo) e **escrever/implementar** o próximo passo.  
 Não transferir scripts que o agente pode rodar.
 
-## Encerrar entrega P0
+## Não é evolução
 
-Incluir bullets **Feito sem pedido** + checklist família (template §6 do doc).
+Relatório sem código · “monitorar” P0 FE · patch sem trava · esperar autorização para §7.2.
+
+## Encerrar P0
+
+Template §6 do Aprendizado: feito sem pedido · além do fix · família · comparativo/próximo · §7.3.

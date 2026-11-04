@@ -1190,6 +1190,28 @@ try {
     } else {
       Add-Check "guard.i197.cache.ativos" "ok" "cache frio sem Ativa + gen stale"
     }
+    if ($syncRawI197 -notmatch 'mkInicioCacheSafeForApply_') {
+      Add-Check "guard.i198.cache.policy" "fail" "sync sem politica unica mkInicioCacheSafeForApply_ (I198)"
+    } else {
+      Add-Check "guard.i198.cache.policy" "ok" "politica cache-safe I198"
+    }
+  }
+
+  # I198 — audit família dual-loja (ir além dos guards pontuais)
+  $familiaAudit = Join-Path $root "scripts\audit-familia-dual-loja.ps1"
+  if (Test-Path $familiaAudit) {
+    try {
+      $famOut = & pwsh -NoProfile -File $familiaAudit -Root $root 2>&1 | Out-String
+      if ($LASTEXITCODE -ne 0) {
+        Add-Check "guard.i198.familia" "fail" ("anti-padrao familia: " + ($famOut.Trim().Substring(0, [Math]::Min(180, $famOut.Trim().Length))))
+      } else {
+        Add-Check "guard.i198.familia" "ok" "audit-familia dual-loja limpo"
+      }
+    } catch {
+      Add-Check "guard.i198.familia" "fail" ("audit-familia erro: " + $_.Exception.Message)
+    }
+  } else {
+    Add-Check "guard.i198.familia" "fail" "scripts/audit-familia-dual-loja.ps1 ausente (I198)"
   }
 
   # I188/I189 — encerrar EXTRA: pagamento no card + 1 toque se pronto

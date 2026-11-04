@@ -278,6 +278,21 @@ function mkInicioCacheFresh_(raw) {
   } catch (e) { return null; }
 }
 
+/**
+ * I198 — política definitiva: cache/snapshot frio NUNCA reidrata Ativa/Pendente.
+ * Autoridade = listarAtivas. Usar em todo fallback (timeout, !ok, backoff).
+ * Ir além do patch I197: um helper, não 3 cópias do Object.assign.
+ */
+function mkInicioCacheSafeForApply_(cached) {
+  if (!cached || typeof cached !== 'object') return null;
+  return Object.assign({}, cached, {
+    ativos: [],
+    parcial: true,
+    fonte: cached.fonte || 'cache'
+  });
+}
+window.mkInicioCacheSafeForApply_ = mkInicioCacheSafeForApply_;
+
 function mkSyncClearBootPending_(rerender) {
   if (!window._mkSyncBootPending) return;
   window._mkSyncBootPending = false;
@@ -322,10 +337,11 @@ async function sincronizarServidor(force = false) {
           const raw = localStorage.getItem(CACHE_KEY);
           const cached = raw ? mkInicioCacheFresh_(raw) : null;
           if (cached) {
-            /* I197: backoff também não pode reidratar Ativa do cache frio. */
-            const safe = Object.assign({}, cached, { ativos: [], parcial: true, fonte: cached.fonte || 'cache' });
-            aplicarDadosInicio(safe);
-            mkScheduleEncHojeRepair_();
+            const safe = mkInicioCacheSafeForApply_(cached);
+            if (safe) {
+              aplicarDadosInicio(safe);
+              mkScheduleEncHojeRepair_();
+            }
           }
         }
         return;
@@ -357,11 +373,12 @@ async function sincronizarServidor(force = false) {
         const raw = localStorage.getItem(CACHE_KEY);
         const cached = raw ? mkInicioCacheFresh_(raw) : null;
         if (cached) {
-          /* I197: cache frio não pode reidratar Ativa (fantasma). Só enc/stats/config. */
-          const safe = Object.assign({}, cached, { ativos: [], parcial: true, fonte: cached.fonte || 'cache' });
-          aplicarDadosInicio(safe);
-          setStatus(true);
-          mkScheduleEncHojeRepair_();
+          const safe = mkInicioCacheSafeForApply_(cached);
+          if (safe) {
+            aplicarDadosInicio(safe);
+            setStatus(true);
+            mkScheduleEncHojeRepair_();
+          }
           return;
         }
         if (typeof mkSnapshotApplyFallback_ === 'function' && mkSnapshotApplyFallback_()) {
@@ -383,9 +400,11 @@ async function sincronizarServidor(force = false) {
         const raw = localStorage.getItem(CACHE_KEY);
         const cached = raw ? mkInicioCacheFresh_(raw) : null;
         if (cached) {
-          const safe = Object.assign({}, cached, { ativos: [], parcial: true, fonte: cached.fonte || 'cache' });
-          aplicarDadosInicio(safe);
-          mkScheduleEncHojeRepair_();
+          const safe = mkInicioCacheSafeForApply_(cached);
+          if (safe) {
+            aplicarDadosInicio(safe);
+            mkScheduleEncHojeRepair_();
+          }
         }
       }
       return;
