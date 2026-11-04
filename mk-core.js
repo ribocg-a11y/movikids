@@ -184,8 +184,18 @@ function atualizarOperadorUI_(sessaoServidor) {
     } else if (isAdm) {
       chip.hidden = false;
       chip.className = 'mk-mob-turno is-admin';
-      chip.textContent = temBalcao
-        ? ('Admin · balcão: ' + srv.nome)
+      /* I195: holding — listar as duas lojas; não mentir “sem turno”. */
+      let admParts = [];
+      try {
+        const map = (typeof mkAuthGetSessoesAtivas_ === 'function') ? mkAuthGetSessoesAtivas_() : null;
+        if (map && map.golden && map.golden.nome) admParts.push('Golden: ' + map.golden.nome);
+        if (map && map.laville && map.laville.nome) admParts.push('La Ville: ' + map.laville.nome);
+      } catch (eChip) { admParts = []; }
+      if (!admParts.length && temBalcao && srv && srv.nome) {
+        admParts.push(String(srv.nome));
+      }
+      chip.textContent = admParts.length
+        ? ('Admin · ' + admParts.join(' · '))
         : 'Admin neste aparelho · sem turno no balcão';
     } else {
       const localId = Number(s.id);

@@ -1076,6 +1076,19 @@ try {
     } else {
       Add-Check "guard.i194.refresh.unidade" "ok" "refresh turno com mkAuthOpsListParams_"
     }
+    # I195 — boot/deslogar holding não pode usar all→golden nem liberar as duas lojas
+    if ($authRawI194 -notmatch 'I195' -or $authRawI194 -notmatch 'applySessaoAposLiberar_' -or $authRawI194 -notmatch 'mkAuthUnidadeDoOperadorId_') {
+      Add-Check "guard.i195.liberar.loja" "fail" "deslogar holding sem loja do operador (I195)"
+    } else {
+      Add-Check "guard.i195.liberar.loja" "ok" "deslogar usa loja do operador"
+    }
+    if ($authRawI194 -match '__mkLoginOpsPromise = apiCall\(\{ action: ''listarOperadoresLogin'' \}') {
+      Add-Check "guard.i195.boot.opsparams" "fail" "boot prefetch listarOperadoresLogin sem unidade (I195)"
+    } elseif ($authRawI194 -notmatch '__mkLoginOpsPromise = apiCall\(mkAuthOpsListParams_') {
+      Add-Check "guard.i195.boot.opsparams" "fail" "boot prefetch sem mkAuthOpsListParams_ (I195)"
+    } else {
+      Add-Check "guard.i195.boot.opsparams" "ok" "boot prefetch com unidade"
+    }
   }
   $novaPathI187 = Join-Path $root "mk-nova.js"
   if (Test-Path $novaPathI187) {

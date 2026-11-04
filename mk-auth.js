@@ -251,9 +251,9 @@
             _t: Date.now()
           }, mkAuthUnidadeLoginParams_(), pinParams), 20000);
           if (d && d.ok) {
-            sessaoAtivaRemota = d.sessaoAtiva || null;
-            mkAuthSyncSessaoBalcaoUI_(sessaoAtivaRemota);
-            if (!sessaoAtivaRemota) return true;
+            applySessaoAposLiberar_(d);
+            await mkAuthRefreshSessoesMapSilent_();
+            return !mkAuthOperadorIdsLogados_()[opId] && !sessaoAtivaRemota;
           }
         } catch (e) { /* tenta admin abaixo */ }
       }
@@ -261,6 +261,7 @@
 
     // 2) Admin libera qualquer sessao no GAS
     const needAdmin = forceAdmin || !!(srv && srv.nome) ||
+      Object.keys(sessoesAtivasRemotas || {}).length > 0 ||
       window.isAdmin || mkAuthIsAdmin() || (s && s.role === 'admin');
     if (!needAdmin) return false;
 
@@ -271,14 +272,18 @@
     }
 
     try {
+      /* Holding: liberar as duas; balcão: só a loja aberta. */
+      const uidLib = (typeof mkIsBalcaoEstrito_ === 'function' && mkIsBalcaoEstrito_())
+        ? mkAuthUnidadeLoginParams_()
+        : { unidadeId: 'all' };
       const d = await apiCall(Object.assign({
         action: 'liberarSessaoOperadorAdmin',
         _t: Date.now()
-      }, mkAuthUnidadeLoginParams_(), pinParams), 20000);
+      }, uidLib, pinParams), 20000);
       if (d && d.ok) {
-        sessaoAtivaRemota = d.sessaoAtiva || null;
-        mkAuthSyncSessaoBalcaoUI_(sessaoAtivaRemota);
-        return !sessaoAtivaRemota;
+        applySessaoAposLiberar_(d);
+        await mkAuthRefreshSessoesMapSilent_();
+        return Object.keys(mkAuthOperadorIdsLogados_()).length === 0;
       }
     } catch (e) { /* offline */ }
     return false;
@@ -520,6 +525,25 @@
     mkAuthSyncSessaoBalcaoUI_(picked.sessao, picked.map);
   }
 
+  /** I195: após liberar/deslogar — sempre aplicar mapa (mesmo vazio), senão banner fantasma. */
+  function applySessaoAposLiberar_(d) {
+    if (d && d.sessoesAtivas != null) {
+      applySessaoAtivaFromApi_(Object.assign({ ok: true }, d));
+      return;
+    }
+    /* liberarSessaoOperador_ (GAS) ainda não devolve sessoesAtivas — zera e reconsulta. */
+    sessoesAtivasRemotas = {};
+    sessaoAtivaRemota = null;
+    mkAuthSyncSessaoBalcaoUI_(null, {});
+  }
+
+  async function mkAuthRefreshSessoesMapSilent_() {
+    try {
+      const d = await apiCall(mkAuthOpsListParams_(), 20000);
+      if (d && d.ok) applySessaoAtivaFromApi_(d);
+    } catch (e) { /* offline */ }
+  }
+
   function mkAuthOperadorIdsLogados_() {
     const ids = {};
     const m = sessoesAtivasRemotas || {};
@@ -533,8 +557,20 @@
     return ids;
   }
 
+  function mkAuthUnidadeDoOperadorId_(operadorId) {
+    const id = Number(operadorId);
+    if (!id) return '';
+    const logados = mkAuthOperadorIdsLogados_();
+    if (logados[id]) return String(logados[id]);
+    if (opsUnidadeById_[String(id)]) return String(opsUnidadeById_[String(id)]);
+    return '';
+  }
+
   window.mkAuthGetSessaoServidor_ = function mkAuthGetSessaoServidor_() {
     return sessaoAtivaRemota;
+  };
+  window.mkAuthGetSessoesAtivas_ = function mkAuthGetSessoesAtivas_() {
+    return sessoesAtivasRemotas || {};
   };
 
   let _turnoPollBusy = false;
@@ -1323,8 +1359,9 @@
   }
 
   window.mkAuthBoot = async function mkAuthBoot() {
+    /* I195: prefetch COM unidade — sem unidade → sessaoAtiva=null e reconcile/UI mentem. */
     if (!window.__mkLoginOpsPromise && typeof window.api === 'function') {
-      window.__mkLoginOpsPromise = apiCall({ action: 'listarOperadoresLogin' }, 30000);
+      window.__mkLoginOpsPromise = apiCall(mkAuthOpsListParams_(), 30000);
     }
     if (typeof window.mkRestoreAuthSession === 'function') window.mkRestoreAuthSession();
     if (typeof mkAuthRestoreAdminPin_ === 'function') mkAuthRestoreAdminPin_();
@@ -1356,7 +1393,7 @@
       }
       let bootOps = null;
       try {
-        bootOps = await (window.__mkLoginOpsPromise || apiCall({ action: 'listarOperadoresLogin' }, 30000));
+        bootOps = await (window.__mkLoginOpsPromise || apiCall(mkAuthOpsListParams_(), 30000));
       } catch (e) { /* offline */ }
       if (bootOps && bootOps.ok && await mkAuthReconcileSessaoFantasma_(bootOps)) return;
       if (bootOps && bootOps.ok) applySessaoAtivaFromApi_(bootOps);
@@ -1452,12 +1489,17 @@
         alert(msg);
         return;
       }
-      const srvLivre = !d.sessaoAtiva;
-      mkAuthSyncSessaoBalcaoUI_(srvLivre ? null : d.sessaoAtiva);
+      applySessaoAposLiberar_(d);
       if (typeof refreshOperadoresAdmin_ === 'function') await refreshOperadoresAdmin_();
-      const ainda = sessaoAtivaRemota && sessaoAtivaRemota.nome;
-      if (ainda) {
-        const aviso = 'Servidor ainda mostra ' + ainda.nome + ' logado(a). Tente de novo ou peca para encerrar turno no tablet.';
+      else await mkAuthRefreshSessoesMapSilent_();
+      const aindaMap = mkAuthOperadorIdsLogados_();
+      const aindaNomes = Object.keys(aindaMap).map(function (id) {
+        const uid = aindaMap[id];
+        const s = sessoesAtivasRemotas[uid];
+        return s && s.nome ? s.nome : ('id ' + id);
+      });
+      if (aindaNomes.length) {
+        const aviso = 'Servidor ainda mostra logado(a): ' + aindaNomes.join(', ') + '. Tente de novo ou peca para encerrar turno no tablet.';
         mkAuthShowLiberarStatus_(false, aviso);
         toast(aviso, 'error');
         alert(aviso);
@@ -1482,12 +1524,15 @@
     fecharMenusOperador_();
     if (!confirm('Deslogar ' + nome + ' do balcao?\n\nLibera a sessao para outro operador entrar.')) return;
     const pinParams = typeof mkAuthAdminPinParams_ === 'function' ? mkAuthAdminPinParams_() : {};
+    /* I195: NÃO usar mkAuthUnidadeLoginParams_ (holding → golden). Loja real do operador. */
+    let uidOp = mkAuthUnidadeDoOperadorId_(id);
+    if (!uidOp || uidOp === 'all') uidOp = 'golden';
     try {
       let d = await apiCall(Object.assign({
         action: 'liberarSessaoOperador',
         operadorId: id,
         _t: Date.now()
-      }, mkAuthUnidadeLoginParams_(), pinParams), 30000);
+      }, { unidadeId: uidOp }, pinParams), 30000);
       if (!d || !d.ok) {
         if (typeof mkAuthEnsureAdminPin_ === 'function') {
           const okPin = await mkAuthEnsureAdminPin_('Deslogar operador do balcao');
@@ -1496,10 +1541,11 @@
             return;
           }
         }
+        /* Só a loja do operador — NÃO unidadeId=all (derrubaria a outra loja). */
         d = await apiCall(Object.assign({
           action: 'liberarSessaoOperadorAdmin',
           _t: Date.now()
-        }, { unidadeId: 'all' }, typeof mkAuthAdminPinParams_ === 'function' ? mkAuthAdminPinParams_() : {}), 30000);
+        }, { unidadeId: uidOp }, typeof mkAuthAdminPinParams_ === 'function' ? mkAuthAdminPinParams_() : {}), 30000);
         if (!d || !d.ok) {
           const msg = (d && d.erro) || 'Erro ao deslogar';
           mkAuthShowLiberarStatus_(false, 'Falha: ' + msg);
@@ -1508,10 +1554,11 @@
           return;
         }
       }
-      mkAuthSyncSessaoBalcaoUI_(d.sessaoAtiva || null);
+      applySessaoAposLiberar_(d);
       if (typeof refreshOperadoresAdmin_ === 'function') await refreshOperadoresAdmin_();
-      if (sessaoAtivaRemota && sessaoAtivaRemota.nome) {
-        const aviso = 'Servidor ainda mostra ' + sessaoAtivaRemota.nome + ' logado(a).';
+      else await mkAuthRefreshSessoesMapSilent_();
+      if (mkAuthOperadorIdsLogados_()[Number(id)]) {
+        const aviso = 'Servidor ainda mostra ' + nome + ' logado(a) em ' + mkAuthLabelLojaSessao_(uidOp) + '.';
         mkAuthShowLiberarStatus_(false, aviso);
         toast(aviso, 'error');
         return;

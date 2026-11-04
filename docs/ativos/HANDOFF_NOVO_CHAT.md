@@ -1,18 +1,18 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 04/11/2026 · FE **v1.9.188** (I194 sessões) · GAS Web/repo **v1.5.237**
+**Atualizado:** 04/11/2026 · FE **v1.9.189** (I195 audit) · GAS Web/repo **v1.5.237**
 
 ## Produção (agora)
 
 | Camada | Versão | Link |
 |--------|--------|------|
-| Frontend | **v1.9.188** | https://ribocg-a11y.github.io/movikids/?force=1.9.188 |
-| Gestão Pessoas | **v1.9.188** | `gestao-pessoas.html?force=1.9.188` |
+| Frontend | **v1.9.189** | https://ribocg-a11y.github.io/movikids/?force=1.9.189 |
+| Gestão Pessoas | **v1.9.189** | `gestao-pessoas.html?force=1.9.189` |
 | GAS | ping Web **v1.5.237** · repo **v1.5.237** | Triciclo 03 alinhado |
 
-**Frota Golden:** 4 carros · **3 triciclos** (01–03) · 4 pelúcias — CONFIG live + FE **1.9.188**.  
-**I194:** admin holding via `sessoesAtivas` (Karen Golden + Jennifer La Ville) — não só `sessaoAtiva`.  
-**I193:** parse JS obrigatório · **I192** Encerradas · **I191** fantasma · **I190–I187** encerrar/offline.  
+**Frota Golden:** 4 carros · **3 triciclos** (01–03) · 4 pelúcias — CONFIG live + FE **1.9.189**.  
+**I195:** audit latente — deslogar holding por loja; liberar zera mapa; boot com unidade · `AUDITORIA_LATENTE_POS_I194_I195_*`.  
+**I194:** `sessoesAtivas` · **I193** parse · **I192** Encerradas · **I191** fantasma.  
 **I186:** Receita dia a dia — pills + **Ver**.
 
 **Folha Q2 31/10:** PIX Ray **902,22** · Karen **1.002,22** · Jennifer **632,19**.  

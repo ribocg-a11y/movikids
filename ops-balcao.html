@@ -156,10 +156,15 @@
 
         const ops = await api({ action: 'listarOperadoresLogin' });
         const sess = ops && ops.sessaoAtiva;
+        const map = (ops && ops.sessoesAtivas) || {};
         const sessEl = document.getElementById('st-sessao');
-        if (sess && sess.nome) {
-          const when = sess.loggedAt ? new Date(Number(sess.loggedAt)).toLocaleString('pt-BR') : '';
-          sessEl.innerHTML = '<span class="pill warn">' + sess.nome + '</span><div style="font-size:0.8rem;color:var(--muted);margin-top:4px">' + when + '</div>';
+        /* I195: holding — sessaoAtiva é null; usar sessoesAtivas. */
+        const parts = [];
+        if (map.golden && map.golden.nome) parts.push('Golden: ' + map.golden.nome);
+        if (map.laville && map.laville.nome) parts.push('La Ville: ' + map.laville.nome);
+        if (!parts.length && sess && sess.nome) parts.push(sess.nome);
+        if (parts.length) {
+          sessEl.innerHTML = '<span class="pill warn">' + parts.join(' · ') + '</span>';
         } else {
           sessEl.innerHTML = '<span class="pill ok">livre</span>';
         }
