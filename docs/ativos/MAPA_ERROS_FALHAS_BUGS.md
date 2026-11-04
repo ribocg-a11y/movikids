@@ -1,6 +1,7 @@
 # MOVI KIDS — Mapa de erros, falhas e bugs
 
-**Atualizado:** 03/11/2026 — **I190** extra só no fim · **I189/I188** · FE **v1.9.185** · GAS **v1.5.237**  
+**Atualizado:** 04/11/2026 — **I198** política cache + audit família · **I191–I197** dual-loja · FE **v1.9.192** · GAS **v1.5.237**  
+**Uso anterior:** 03/11/2026 — **I190** extra só no fim · **I189/I188** · FE **v1.9.185** · GAS **v1.5.237**  
 
 **Uso anterior:** 03/11/2026 — **I187** offline short-circuit + fila · FE **v1.9.181–182** · GAS **v1.5.237**  
 **Uso anterior:** 03/11/2026 — **I186** Receita filtros/Ver · **I185** cache celular · FE **v1.9.179–180** · GAS **v1.5.236–237**  
