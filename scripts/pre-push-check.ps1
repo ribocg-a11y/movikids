@@ -1197,6 +1197,19 @@ try {
     }
   }
 
+  # I199 — folha: competência do voo + match mês (Outubro não herda Novembro)
+  $gpAdmPathI199 = Join-Path $root "mk-gestao-pessoas-admin.js"
+  if (Test-Path $gpAdmPathI199) {
+    $gpAdmRawI199 = Get-Content -Path $gpAdmPathI199 -Raw -Encoding UTF8
+    if ($gpAdmRawI199 -notmatch 'gpAdmPanelCompInFlight_' -or $gpAdmRawI199 -notmatch 'gpAdmHasFolhaForComp_' -or $gpAdmRawI199 -notmatch 'switchComp') {
+      Add-Check "guard.i199.folha.comp" "fail" "folha sem trava competencia/switchComp (I199)"
+    } elseif ($gpAdmRawI199 -notmatch '180000') {
+      Add-Check "guard.i199.folha.comp" "fail" "folha sem timeout 180s (I199)"
+    } else {
+      Add-Check "guard.i199.folha.comp" "ok" "folha match competencia + cancel switch"
+    }
+  }
+
   # I198 — audit família dual-loja (ir além dos guards pontuais)
   $familiaAudit = Join-Path $root "scripts\audit-familia-dual-loja.ps1"
   if (Test-Path $familiaAudit) {

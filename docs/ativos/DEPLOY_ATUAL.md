@@ -1,15 +1,15 @@
 # MOVI KIDS — Deploy atual (canônico)
 
-**Atualizado:** 04/11/2026 (FE **v1.9.192** · GAS Web/repo **v1.5.237** · I198 política cache + audit família · I191–I197 dual-loja · **La Ville ops desde 06/10/2026**)
+**Atualizado:** 05/11/2026 (FE **v1.9.193** · GAS Web/repo **v1.5.237** · I199 folha Outubro · I198 audit família · **La Ville ops desde 06/10/2026**)
 
 ## Produção
 
 | Camada | Versão | URL / evidência | Status |
 |--------|--------|-----------------|--------|
-| **Frontend** | **v1.9.192** | https://ribocg-a11y.github.io/movikids/?force=1.9.192 | Pages ✅ |
-| **Gestão Pessoas** | **v1.9.192** | `gestao-pessoas.html?force=1.9.192` | I197 badges mapa |
+| **Frontend** | **v1.9.193** | https://ribocg-a11y.github.io/movikids/?force=1.9.193 | Pages ✅ |
+| **Gestão Pessoas** | **v1.9.193** | `gestao-pessoas.html?force=1.9.193` | I199 Folha Out |
 | **Portal acompanhar** | cache `?v=` | `acompanhar.html` | DNA floresta |
-| **Service Worker** | **1.9.192** | I198 | após push |
+| **Service Worker** | **1.9.193** | I199 | após push |
 | **GAS Web** | **v1.5.237** | ping alinhado repo | ✅ |
 | **La Ville** | ops **06/10/2026** | 2ª unidade em operação | ✅ |
 | **GAS repo** | **v1.5.237** | Triciclo 03 | raw |
@@ -17,10 +17,11 @@
 | **Planilha** | — | `1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618` | |
 | **Deploy ID** | — | `AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y` | |
 
-## Entregas recentes (04/11)
+## Entregas recentes (05/11)
 
 | I* | Camada | Nota |
 |----|--------|------|
+| **I199** | FE 1.9.193 | Folha Outubro: switch competência + match mês + timeout 180s |
 | **I198** | FE 1.9.192 | `mkInicioCacheSafeForApply_` + `audit-familia-dual-loja.ps1` · Evolução estratégica |
 | **I197** | FE 1.9.191 | Firebase/GP/fantasma map-wide/IDB por loja |
 | **I196** | FE 1.9.190 | unidadeId depois do auth (custos/rel/hist) |
@@ -42,7 +43,7 @@
 
 | Check | Esperado |
 |-------|----------|
-| Pages `mk-version.js` | **1.9.192** ✅ |
+| Pages `mk-version.js` | **1.9.193** ✅ |
 | GAS ping | **v1.5.237** ✅ |
 | audit-familia | status ok |
 

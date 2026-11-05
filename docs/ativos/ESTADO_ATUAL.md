@@ -1,8 +1,8 @@
-# MOVI KIDS — Estado atual (04/11/2026 · FE v1.9.192 · La Ville)
+# MOVI KIDS — Estado atual (05/11/2026 · FE v1.9.193 · La Ville)
 
 Referência única para alinhamento local × produção.
 
-**Ciclo dev ativo:** **`PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`** — Sprint D · **La Ville inaugurou 06/10/2026** · FE **v1.9.192** (I198) · GAS **v1.5.237** · **I191–I198** dual-loja/fantasma · **I181** Ray+Karen · isolamento **I170–I178** ✅ · **I158** Golden ✅  
+**Ciclo dev ativo:** **`PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`** — Sprint D · **La Ville inaugurou 06/10/2026** · FE **v1.9.193** (I199 folha Outubro) · GAS **v1.5.237** · **I191–I199** · **I181** Ray+Karen · isolamento **I170–I178** ✅ · **I158** Golden ✅  
 
 **Marco Ops:** **La Ville Mall — início de operações em 06/10/2026** (2ª unidade ao lado do Golden).  
 **CTO La Ville:** contrato merchandising quiosque **R$ 2.300/mês** · venc. dia 10 · PDF em `entregas/CONTRATO_MERCHANDISING_QUIOSQUE_MOVIKIDS.pdf`.
@@ -52,13 +52,13 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 ---
 
-## Produção (04/11/2026)
+## Produção (05/11/2026)
 
 | Camada | Versão | URL / evidência |
 |--------|--------|-----------------|
-| **Frontend** | **v1.9.192** | https://ribocg-a11y.github.io/movikids/?force=1.9.192 |
-| **Gestão Pessoas** | **v1.9.192** | `gestao-pessoas.html?force=1.9.192` |
-| **Service Worker** | **1.9.192** | I198 + I187 offline shell |
+| **Frontend** | **v1.9.193** | https://ribocg-a11y.github.io/movikids/?force=1.9.193 |
+| **Gestão Pessoas** | **v1.9.193** | `gestao-pessoas.html?force=1.9.193` |
+| **Service Worker** | **1.9.193** | I199 folha Outubro |
 | **Apps Script** | ping **v1.5.237** · repo **v1.5.237** | Triciclo 03 · I182 escala |
 | **La Ville ops** | ✅ **06/10/2026** | 2ª unidade em operação (D+0) |
 | **I166–I168 Folha/PDF** | ✅ FE | cache-first · Blob PDF · set R$14.577 |

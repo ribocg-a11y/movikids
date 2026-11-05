@@ -1,23 +1,23 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 04/11/2026 · FE **v1.9.192** (I198) · GAS Web/repo **v1.5.237** · **ler** `APRENDIZADO_AGENTE` + `EVOLUCAO_ESTRATEGICA_POS_I197`
+**Atualizado:** 05/11/2026 · FE **v1.9.193** (I199 folha Outubro) · GAS Web/repo **v1.5.237** · **ler** `APRENDIZADO_AGENTE`
 
 ## Produção (agora)
 
 | Camada | Versão | Link |
 |--------|--------|------|
-| Frontend | **v1.9.192** | https://ribocg-a11y.github.io/movikids/?force=1.9.192 |
-| Gestão Pessoas | **v1.9.192** | `gestao-pessoas.html?force=1.9.192` |
+| Frontend | **v1.9.193** | https://ribocg-a11y.github.io/movikids/?force=1.9.193 |
+| Gestão Pessoas | **v1.9.193** | `gestao-pessoas.html?force=1.9.193` |
 | GAS | ping Web **v1.5.237** · repo **v1.5.237** | Triciclo 03 alinhado |
 
-**Frota Golden:** 4 carros · **3 triciclos** (01–03) · 4 pelúcias — CONFIG live + FE **1.9.192**.  
-**I198:** política `mkInicioCacheSafeForApply_` + `audit-familia-dual-loja.ps1` · ir além do patch · `EVOLUCAO_ESTRATEGICA_POS_I197.md`.  
-**I197:** Firebase/GP/fantasma/IDB · **I196** unidadeId auth · **I195–I192** holding/Encerradas/parse.  
-**Agente:** Aprendizado §9 — comparar · prever · modernizar · **não esperar comando**; após P0 → **PROTOCOLO_ATUALIZAR_TUDO** sozinho.
+**Frota Golden:** 4 carros · **3 triciclos** (01–03) · 4 pelúcias — CONFIG live + FE **1.9.193**.  
+**I199:** Folha Outubro — troca de competência não herda voo; match mês; timeout 180s · `INCIDENTE_I199_*`.  
+**I198:** política cache + audit-família · **I191–I197** dual-loja.  
+**Agente:** após P0 → **PROTOCOLO_ATUALIZAR_TUDO** sozinho.
 
-**Folha Q2 31/10:** PIX Ray **902,22** · Karen **1.002,22** · Jennifer **632,19**.  
+**Folha Q2 31/10:** PIX memorial Ray **902,22** · Karen **1.002,22** · Jennifer **632,19**.  
 **Holding/ponto:** I183b · I184.  
-**Próximo FE (E1):** `mkMergeInicioPayload_` · tablet `?force=1.9.192`.
+**Teste Folha:** `?force=1.9.193` → Out/2026 → Folha (~1 min 1ª vez).
 
 ---
 

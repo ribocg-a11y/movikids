@@ -1,6 +1,7 @@
 # MOVI KIDS — Mapa de erros, falhas e bugs
 
-**Atualizado:** 04/11/2026 — **I198** política cache + audit família · **I191–I197** dual-loja · FE **v1.9.192** · GAS **v1.5.237**  
+**Atualizado:** 05/11/2026 — **I199** folha Outubro troca competência · FE **v1.9.193** · GAS **v1.5.237**  
+**Uso anterior:** 04/11/2026 — **I198** política cache + audit família · **I191–I197** dual-loja · FE **v1.9.192** · GAS **v1.5.237**  
 **Uso anterior:** 03/11/2026 — **I190** extra só no fim · **I189/I188** · FE **v1.9.185** · GAS **v1.5.237**  
 
 **Uso anterior:** 03/11/2026 — **I187** offline short-circuit + fila · FE **v1.9.181–182** · GAS **v1.5.237**  
@@ -161,6 +162,7 @@ Docs: `INCIDENTE_I153_*` · `INCIDENTE_I154_*` · `INCIDENTE_I155_*` · `EVIDENC
 | **I196** | Custos/relatório/fat/hist com loja errada | `...apiParamsComAuth_()` **depois** de `unidadeId` explícito | Object.assign auth→unidadeId; fat balcão; hist por pill · FE **v1.9.190** | ✅ FE |
 | **I197** | Latentes dual-loja pós-auditoria (fantasma/GP/Firebase/IDB) | Firebase+cache Ativa; GP só `sessaoAtiva`; fantasma unit-scoped; IDB global; prune cross-loja | FE **v1.9.191** · `guard.i197.*` | ✅ FE |
 | **I198** | Patches I197 ainda espalhados + regressão só por sintoma | 3× Object.assign cache; audit família manual | `mkInicioCacheSafeForApply_` + `audit-familia-dual-loja.ps1` · FE **v1.9.192** | ✅ FE |
+| **I199** | Folha Outubro “não carrega” PC+celular | Troca de mês herda voo; folha de outro mês conta como pronta; fila hydrate | cancel+match competência · serialize Folha · timeout 180s · FE **v1.9.193** | ✅ FE |
 
 **Veredito offline:** balcão **parcial** — Nova + ▶ + Encerrar + Cancelar enfileiram e sobem ao voltar rede. Estender/editar/admin/login ainda exigem rede. SMS/WhatsApp ignorados (`qr_only`). **Regra I191:** flag offline em linha real (ri>0) **não** vence `listarAtivas`. **Regra I192:** parcial/`listarAtivas` **não** apaga Encerradas do dia. **Regra I193:** **nunca** push FE com parse quebrado. **Regra I197:** Firebase/cache **nunca** autoridade de Ativa; holding lê **mapa** `sessoesAtivas`. **Regra I198:** erro → política nomeada + audit família + movimento estratégico (`EVOLUCAO_ESTRATEGICA_POS_I197.md`).
 
