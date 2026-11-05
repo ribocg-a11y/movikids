@@ -31,8 +31,11 @@ try {
   $ping = Invoke-ResumoApi @{ action = "ping" }
   if (-not $ping.ok) { throw "ping falhou" }
   Add-RCheck "ping" "ok" $ping.versao
-  if ($ping.versao -notmatch 'v1\.5\.7[0-9]') {
+  # I201 — resumoDia existe desde v1.5.70; prod atual 1.5.237 (não alertar 1.5.1xx/2xx)
+  if ($ping.versao -notmatch 'v1\.5\.(7[0-9]|[8-9][0-9]|[1-9][0-9]{2})') {
     Add-RCheck "gas.versao" "warn" "publique GAS v1.5.70+ (Nova versao Web) para resumoDia"
+  } else {
+    Add-RCheck "gas.versao" "ok" $ping.versao
   }
 
   $kpi = Invoke-ResumoApi @{ action = "buscarKPIsAdmin"; adminPin = $AdminPin }

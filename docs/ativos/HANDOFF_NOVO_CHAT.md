@@ -1,6 +1,6 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 05/11/2026 · FE **v1.9.195** (I200 paint-only + guard) · GAS Web/repo **v1.5.237** · **ler** `APRENDIZADO_AGENTE` §9.7
+**Atualizado:** 05/11/2026 · FE **v1.9.195** · GAS **v1.5.237** · auditoria sistema ✅ `AUDITORIA_SISTEMA_2026-11-05` · I201 tooling · **ler** `APRENDIZADO` §9.7
 
 ## Produção (agora)
 

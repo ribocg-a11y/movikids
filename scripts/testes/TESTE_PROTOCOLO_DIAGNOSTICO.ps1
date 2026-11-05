@@ -72,7 +72,9 @@ try {
   if (Should-Run @("F0")) {
     $preArgs = @("-NoProfile", "-File", (Join-Path $root "scripts\pre-push-check.ps1"))
     if ($SkipNetworkTests) { $preArgs += "-SkipNetworkTests" }
-    $preOut = & powershell @preArgs 2>&1 | Out-String
+    # I201 — Linux/CI usa pwsh; Windows aceita pwsh ou powershell
+    $psHost = if (Get-Command pwsh -ErrorAction SilentlyContinue) { "pwsh" } else { "powershell" }
+    $preOut = & $psHost @preArgs 2>&1 | Out-String
     $preExit = $LASTEXITCODE
     Add-Fase "F0" "Infra / pre-push / versoes" $(if ($preExit -eq 0) { "ok" } else { "fail" }) "exit=$preExit" @("pre-push-check.ps1")
 

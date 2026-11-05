@@ -365,7 +365,8 @@ try {
     }
     if ($cfg.fluxoTeste -and (Test-Path (Join-Path $PSScriptRoot $cfg.fluxoTeste))) {
       if (-not $SomenteLeitura -and -not $DryRun) {
-        $fluxoOut = & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot $cfg.fluxoTeste) 2>&1 | Out-String
+        $psHost = if (Get-Command pwsh -ErrorAction SilentlyContinue) { "pwsh" } else { "powershell" }
+        $fluxoOut = & $psHost -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot $cfg.fluxoTeste) 2>&1 | Out-String
         if ($fluxoOut -match '"status"\s*:\s*"ok"') {
           Add-Check "fluxo.consumidor" "ok" $cfg.fluxoNome
         } else {

@@ -100,7 +100,8 @@ try {
   try {
     $parityScript = Join-Path $PSScriptRoot "TESTE_PARIDADE_HTTP_BROWSER_GAS.ps1"
     if (Test-Path $parityScript) {
-      $parityJson = & powershell -NoProfile -File $parityScript -BaseUrl $BaseUrl | Out-String
+      $psHost = if (Get-Command pwsh -ErrorAction SilentlyContinue) { "pwsh" } else { "powershell" }
+      $parityJson = & $psHost -NoProfile -File $parityScript -BaseUrl $BaseUrl | Out-String
       $parity = $parityJson | ConvertFrom-Json
       if ($parity.status -eq "ok") {
         Add-Check "paridade HTTP browser" "ok" "curl POST != JSON; GET ok"

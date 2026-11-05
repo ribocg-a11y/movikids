@@ -67,7 +67,8 @@ function Run-TestScript {
   }
   Write-Host ""
   Write-Host "[$Grupo] $name" -ForegroundColor Cyan
-  $out = & powershell -NoProfile -File $path @ExtraArgs 2>&1 | Out-String
+  $psHost = if (Get-Command pwsh -ErrorAction SilentlyContinue) { "pwsh" } else { "powershell" }
+  $out = & $psHost -NoProfile -File $path @ExtraArgs 2>&1 | Out-String
   $exit = $LASTEXITCODE
   $tail = ($out.Trim() -split "`n" | Select-Object -Last 3) -join " | "
   if ($tail.Length -gt 280) { $tail = $tail.Substring($tail.Length - 280) }
@@ -91,7 +92,8 @@ function Run-RootScript {
   }
   Write-Host ""
   Write-Host "[$Grupo] $name" -ForegroundColor Cyan
-  $out = & powershell -NoProfile -File $path @ExtraArgs 2>&1 | Out-String
+  $psHost = if (Get-Command pwsh -ErrorAction SilentlyContinue) { "pwsh" } else { "powershell" }
+  $out = & $psHost -NoProfile -File $path @ExtraArgs 2>&1 | Out-String
   $exit = $LASTEXITCODE
   $tail = ($out.Trim() -split "`n" | Select-Object -Last 2) -join " | "
   $st = if ($exit -eq 0) { "ok" } else { "fail" }
