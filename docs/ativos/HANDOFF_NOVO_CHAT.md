@@ -1,23 +1,23 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 05/11/2026 · FE **v1.9.193** (I199 folha Outubro) · GAS Web/repo **v1.5.237** · **ler** `APRENDIZADO_AGENTE`
+**Atualizado:** 05/11/2026 · FE **v1.9.194** (I200 folha loading) · GAS Web/repo **v1.5.237** · **ler** `APRENDIZADO_AGENTE`
 
 ## Produção (agora)
 
 | Camada | Versão | Link |
 |--------|--------|------|
-| Frontend | **v1.9.193** | https://ribocg-a11y.github.io/movikids/?force=1.9.193 |
-| Gestão Pessoas | **v1.9.193** | `gestao-pessoas.html?force=1.9.193` |
+| Frontend | **v1.9.194** | https://ribocg-a11y.github.io/movikids/?force=1.9.194 |
+| Gestão Pessoas | **v1.9.194** | `gestao-pessoas.html?force=1.9.194` |
 | GAS | ping Web **v1.5.237** · repo **v1.5.237** | Triciclo 03 alinhado |
 
-**Frota Golden:** 4 carros · **3 triciclos** (01–03) · 4 pelúcias — CONFIG live + FE **1.9.193**.  
-**I199:** Folha Outubro — troca de competência não herda voo; match mês; timeout 180s · `INCIDENTE_I199_*`.  
-**I198:** política cache + audit-família · **I191–I197** dual-loja.  
+**Frota Golden:** 4 carros · **3 triciclos** (01–03) · 4 pelúcias — CONFIG live + FE **1.9.194**.  
+**I200:** Folha Out — fim do loop `ensureFull` no render · watchdog · `INCIDENTE_I200_*`.  
+**I199:** troca competência / match mês / 180s · **I198** cache+audit · **I191–I197** dual-loja.  
 **Agente:** após P0 → **PROTOCOLO_ATUALIZAR_TUDO** sozinho.
 
 **Folha Q2 31/10:** PIX memorial Ray **902,22** · Karen **1.002,22** · Jennifer **632,19**.  
 **Holding/ponto:** I183b · I184.  
-**Teste Folha:** `?force=1.9.193` → Out/2026 → Folha (~1 min 1ª vez).
+**Teste Folha:** `?force=1.9.194` → **Concluir atualização** → Out/2026 → Folha (~1 min ou retry).
 
 ---
 

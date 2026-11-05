@@ -20,6 +20,8 @@
   let gpAdmFichaJornadaCache_ = {};
   /** Última lista rápida (inclui órfãos fora do painel RH, ex. cadastro incompleto). */
   let gpAdmQuickCols_ = null;
+  /** I200 — watchdog: se inFlight/folha travar além do timeout da api, sai do “Carregando…”. */
+  let gpAdmFolhaWatchdog_ = null;
 
   // I137 — 15 min: evita re-pedir painel full a cada troca de aba / F5 leve
   const GP_ADM_CACHE_TTL = 15 * 60 * 1000;
@@ -164,6 +166,35 @@
     const c = selId ? gpAdmColabById_(selId) : null;
     if (c && c.jornada && c.jornada.dias && c.jornada.dias.length && !c.jornada._lite) return;
     el.innerHTML = '<p class="gp-adm-muted gp-adm-loading">Carregando jornada / ponto da competência…</p>';
+  }
+
+  function gpAdmClearFolhaWatchdog_() {
+    if (gpAdmFolhaWatchdog_) {
+      clearTimeout(gpAdmFolhaWatchdog_);
+      gpAdmFolhaWatchdog_ = null;
+    }
+  }
+
+  function gpAdmArmFolhaWatchdog_(comp) {
+    gpAdmClearFolhaWatchdog_();
+    const want = gpAdmNormComp_(comp || gpAdmCompSel_ || '');
+    if (!want) return;
+    /* I200: api Folha = 180s (+1 retry possível). Watchdog 195s abandona UI travada. */
+    gpAdmFolhaWatchdog_ = setTimeout(function () {
+      gpAdmFolhaWatchdog_ = null;
+      if (!gpAdmPanelInFlight_) return;
+      if (!gpAdmCompEq_(gpAdmPanelCompInFlight_, want)) return;
+      if (gpAdmTab_ !== 'folha' && gpAdmTab_ !== 'avaliacoes') return;
+      gpAdmLoadSeq_++;
+      gpAdmPanelInFlight_ = false;
+      gpAdmPanelCompInFlight_ = '';
+      gpAdmLoadPromise_ = null;
+      if (typeof toast === 'function') {
+        toast('Folha ' + gpAdmCompLabel_(want) + ' demorou demais — toque em Tentar de novo', 'error');
+      }
+      if (gpAdmTab_ === 'folha') gpAdmRenderFolha_();
+      else if (typeof gpAdmRenderAvaliacoes_ === 'function') gpAdmRenderAvaliacoes_();
+    }, 195000);
   }
 
   function gpAdmEnsureFullPanel_(reason) {
@@ -468,7 +499,8 @@
   function gpAdmShowFolhaLoading_(compLabel) {
     const folha = document.getElementById('gp-adm-folha');
     if (folha) {
-      folha.innerHTML = '<p class="gp-adm-muted gp-adm-loading">Carregando folha de ' + esc(compLabel || '…') + '…</p>';
+      folha.innerHTML = '<p class="gp-adm-muted gp-adm-loading">Carregando folha de <strong>' + esc(compLabel || '…') + '</strong>…</p>' +
+        '<p class="gp-adm-muted" style="margin-top:8px;font-size:12px">1ª carga do mês ~1 min. Se passar de 2 min, use Tentar de novo.</p>';
     }
     mkGpAdmFecharHolerite_();
   }
@@ -1130,7 +1162,7 @@
     const want = gpAdmNormComp_(gpAdmCompSel_ || '');
     const got = gpAdmNormComp_(gpAdmData_.competencia || '');
     const compLbl = gpAdmCompLabel_(want || got || '');
-    /* I199: dados de outro mês na memória → não pintar como Outubro. */
+    /* I199/I200: dados de outro mês → NÃO chamar ensureFull daqui (loop eterno: loading→falha→ensureFull). */
     if (want && got && want !== got) {
       if (gpAdmPanelInFlight_ && gpAdmCompEq_(gpAdmPanelCompInFlight_, want)) {
         el.innerHTML = '<p class="gp-adm-muted gp-adm-loading">Carregando folha de <strong>' + esc(compLbl) + '</strong>…</p>' +
@@ -1138,7 +1170,6 @@
       } else {
         el.innerHTML = gpAdmRetryPanelHtml_('Folha de ' + compLbl + ' ainda não carregou (há dados de ' +
           gpAdmCompLabel_(got) + ' na tela). Toque para buscar ' + compLbl + '.');
-        gpAdmEnsureFullPanel_('folha');
       }
       return;
     }
@@ -1626,6 +1657,15 @@
   function gpAdmLoadPainelBackground_(seq, compReq, opts) {
     gpAdmPanelInFlight_ = true;
     gpAdmPanelCompInFlight_ = gpAdmNormComp_(compReq || gpAdmCompSel_ || '');
+    const pin = gpAdmPinParams_() || {};
+    if ((gpAdmTab_ === 'folha' || gpAdmTab_ === 'avaliacoes' || (opts && opts.skipLite)) &&
+        !(pin.adminPin || pin.authRole === 'gestor')) {
+      /* I200: sem PIN admin a API devolve !ok e o render antigo reabria loading em loop. */
+      if (typeof toast === 'function') toast('Entre como Admin (PIN) para carregar a folha', 'warning');
+    }
+    if (gpAdmTab_ === 'folha' || gpAdmTab_ === 'avaliacoes' || (opts && opts.skipLite)) {
+      gpAdmArmFolhaWatchdog_(gpAdmPanelCompInFlight_);
+    }
     return (async function () {
       let liteOk = false;
       const skipLite = !!(opts && opts.skipLite);
@@ -1695,6 +1735,7 @@
         }
       } finally {
         if (seq === gpAdmLoadSeq_) {
+          gpAdmClearFolhaWatchdog_();
           gpAdmPanelInFlight_ = false;
           gpAdmPanelCompInFlight_ = '';
           // I135 — re-pinta Folha/Escala após timeout (sai do “Carregando…” eterno)
@@ -1775,6 +1816,7 @@
         gpAdmSyncStatusBanner_();
       } finally {
         if (seq === gpAdmLoadSeq_) {
+          gpAdmClearFolhaWatchdog_();
           gpAdmLoadPromise_ = null;
           gpAdmPanelInFlight_ = false;
           gpAdmPanelCompInFlight_ = '';

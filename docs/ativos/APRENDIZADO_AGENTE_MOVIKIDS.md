@@ -156,6 +156,7 @@ Se o usuário ainda precisar dizer “veja outras coisas que você deixou passar
 | 04/11 | I194→I197 | Holding = mapa; parcial ≠ apagar rico; audit→código na mesma sessão |
 | 04/11 | Este doc | Família obrigatória + proatividade explícita |
 | 04/11 | **I198 + mandato §9** | Comparar/prever/modernizar; helper + audit-família; não esperar comando |
+| 05/11 | **I200** | Render **nunca** re-dispara load (ensureFull no paint = loop eterno) |
 
 ---
 
