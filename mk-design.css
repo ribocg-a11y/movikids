@@ -839,7 +839,7 @@
 }
 .mk-portal-gate .mk-portal-brand-wrap { margin-bottom: 4px; }
 .mk-portal-gate .mk-brand-img {
-  max-height: 112px;
+  max-height: 132px;
   width: auto;
   filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.18));
 }
@@ -855,9 +855,9 @@
 .mk-portal-brand-lg span { color: var(--gold); }
 .mk-portal-gate-kicker {
   margin: 0 0 6px;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 900;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: #fff8e1;
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
@@ -871,8 +871,8 @@
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.35);
 }
 .mk-portal-gate-sub {
-  margin: 0 0 16px;
-  font-size: 14px;
+  margin: 0 0 18px;
+  font-size: 15px;
   font-weight: 700;
   line-height: 1.35;
   color: rgba(13, 59, 46, 0.82);
@@ -880,7 +880,7 @@
 .mk-portal-gate-form {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
 .mk-portal-input {
   width: 100%;
@@ -918,12 +918,18 @@
   margin-top: 14px;
   font-size: 14px;
   font-weight: 800;
-  min-height: 1.3em;
   color: #b71c1c;
   background: rgba(255, 255, 255, 0.72);
   border-radius: 12px;
   padding: 8px 10px;
   line-height: 1.35;
+}
+/* I202 — caixa branca fantasma quando status vazio (print gate) */
+.mk-portal-gate-err:empty {
+  display: none;
+  margin: 0;
+  padding: 0;
+  background: none;
 }
 .mk-portal-btn {
   background: linear-gradient(180deg, #ffe082 0%, #ffd54f 45%, #ffca28 100%);
@@ -935,11 +941,96 @@
   width: 100%;
   max-width: 380px;
   z-index: 1;
+  padding-bottom: 72px; /* espaço do rodapé sticky */
 }
 .mk-portal-carousel {
   width: 100%;
   text-align: center;
   animation: mk-portal-pop 0.45s cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+/* I202 — empty state (telefone ok, ninguém brincando) */
+.mk-portal-empty {
+  text-align: center;
+  padding: 28px 18px 22px;
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 16px 40px rgba(13, 59, 46, 0.2);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+.mk-portal-empty-ico {
+  font-size: 42px;
+  line-height: 1;
+  margin-bottom: 10px;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.15));
+}
+.mk-portal-empty-title {
+  font-family: 'Fredoka One', cursive;
+  font-size: clamp(20px, 5.5vw, 24px);
+  color: #0d3b2e;
+  margin: 0 0 8px;
+  line-height: 1.2;
+}
+.mk-portal-empty-sub {
+  margin: 0 0 18px;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.4;
+  color: rgba(13, 59, 46, 0.82);
+}
+.mk-portal-empty .mk-portal-btn {
+  margin-top: 4px;
+}
+/* I202 — Trocar telefone fixo (DS § design-visual) */
+.mk-portal-foot {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 5;
+  display: flex;
+  justify-content: center;
+  padding: 10px 16px max(14px, env(safe-area-inset-bottom));
+  background: linear-gradient(180deg, transparent 0%, rgba(13, 59, 46, 0.55) 40%, rgba(13, 59, 46, 0.82) 100%);
+  pointer-events: none;
+}
+.mk-portal-foot-btn {
+  pointer-events: auto;
+  min-width: min(100%, 320px);
+  height: 48px;
+  border-radius: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.55);
+  background: rgba(255, 255, 255, 0.92);
+  color: #0d3b2e;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.2);
+}
+.mk-portal-foot-btn:active { transform: scale(0.98); }
+.mk-portal-page[data-view="gate"] .mk-portal-foot { display: none; }
+.mk-portal-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0 0 10px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 900;
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+}
+.mk-portal-status-pill.is-ativa {
+  background: rgba(76, 175, 80, 0.35);
+  border-color: rgba(129, 199, 132, 0.7);
+}
+.mk-portal-status-pill.is-pend {
+  background: rgba(255, 213, 79, 0.3);
+  border-color: rgba(255, 213, 79, 0.55);
+  color: #fff8e1;
 }
 .mk-portal-brand-play {
   font-size: 38px;

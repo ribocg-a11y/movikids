@@ -9,12 +9,12 @@
 <meta name="robots" content="noindex,nofollow">
 <title>Movi Kids — Acompanhar</title>
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<script src="mk-version.js?v=1.9.158"></script>
-<script src="mk-canonical-host.js?v=1.9.158"></script>
+<script src="mk-version.js?v=1.9.196"></script>
+<script src="mk-canonical-host.js?v=1.9.196"></script>
 <script>
 /* Portal: bust cache sem perder ?tel= (mk-cache-bust do balcão descarta query) */
 (function () {
-  var CURRENT = (window.MK_VERSION || '1.9.158');
+  var CURRENT = (window.MK_VERSION || '1.9.196');
   var KEY = 'mk_portal_loaded_version';
   try {
     var stored = localStorage.getItem(KEY) || '';
@@ -40,7 +40,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="mk-design.css?v=1.9.158">
+<link rel="stylesheet" href="mk-design.css?v=1.9.196">
 </head>
 <body class="mk-portal-page" data-view="gate">
 
@@ -76,6 +76,11 @@
 
 <!-- Timer: uma ou mais locações, só o relógio -->
 <main class="mk-portal-stage" id="resultado" hidden aria-live="polite"></main>
+
+<!-- I202 — Trocar telefone sticky (DS mobile responsável) -->
+<footer class="mk-portal-foot" id="portal-foot" hidden>
+  <button type="button" class="mk-portal-foot-btn" id="btn-trocar-tel-foot">Trocar telefone</button>
+</footer>
 
 <script>
 const PORTAL_FALLBACK_GAS = 'https://script.google.com/macros/s/AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y/exec';
@@ -171,14 +176,19 @@ function statusClass_(st) {
   if (s === 'pendente') return 'is-pend';
   return '';
 }
+function statusPillHtml_(l) {
+  const st = String(l.status || '').trim();
+  if (!st) return '';
+  const cls = statusClass_(st);
+  const label = st === 'Ativa' ? 'Brincando agora' : (st === 'Pendente' ? 'Aguardando início' : st);
+  return `<span class="mk-portal-status-pill ${cls}">${esc(label)}</span>`;
+}
 function infoBasicaHtml_(l) {
   const plano = planoLabel_(l.plano);
   const ext = Number(l.extendedMins || 0);
   const planoTxt = ext > 0 ? plano + ' +' + ext + ' min' : plano;
   const veic = esc(veiculoLabelPortal_(l.veiculo) || l.tipo || '—');
   const loja = unidadeLabelCurto_(unidadeOfLoc_(l));
-  const st = esc(l.status || '—');
-  const stCls = statusClass_(l.status);
   return `<div class="mk-portal-info-bar">
     <div class="mk-portal-info-cell">
       <span class="mk-portal-info-ico" aria-hidden="true">🕐</span>
@@ -193,9 +203,20 @@ function infoBasicaHtml_(l) {
     <div class="mk-portal-info-cell">
       <span class="mk-portal-info-ico" aria-hidden="true">📍</span>
       <span class="mk-portal-info-lbl">Loja</span>
-      <strong class="mk-portal-status ${stCls}">${esc(loja)}</strong>
+      <strong>${esc(loja)}</strong>
     </div>
   </div>`;
+}
+function pwaHintHtml_() {
+  try {
+    if (localStorage.getItem('mk_portal_pwa_hint_v1') === '1') return '';
+    localStorage.setItem('mk_portal_pwa_hint_v1', '1');
+  } catch (e) {}
+  return '<p class="mk-portal-pwa-hint">💡 Dica: adicione à tela inicial e deixe aberto no corredor</p>';
+}
+function setFootVisible_(on) {
+  const foot = document.getElementById('portal-foot');
+  if (foot) foot.hidden = !on;
 }
 function brincandoLabel_(n) {
   return n === 1 ? '1 brincando' : n + ' brincando';
@@ -443,8 +464,23 @@ function setView(mode) {
   document.body.dataset.view = mode;
   const gate = document.getElementById('sec-gate');
   const stage = document.getElementById('resultado');
-  if (gate) gate.hidden = mode === 'play';
-  if (stage) stage.hidden = mode !== 'play';
+  if (gate) gate.hidden = mode === 'play' || mode === 'empty';
+  if (stage) stage.hidden = mode === 'gate';
+  setFootVisible_(mode === 'play' || mode === 'empty');
+}
+
+function renderEmpty_(telDigits) {
+  const box = document.getElementById('resultado');
+  if (!box) return;
+  setView('empty');
+  setStatus('');
+  const telFmt = maskTelInput(telDigits || _telAtual || '');
+  box.innerHTML = `<div class="mk-portal-empty">
+    <div class="mk-portal-empty-ico" aria-hidden="true">🌲</div>
+    <p class="mk-portal-empty-title">Ninguém brincando agora</p>
+    <p class="mk-portal-empty-sub">Telefone ${esc(telFmt)} — quando o operador iniciar a aventura, o tempo aparece aqui.</p>
+    <button type="button" class="mk-portal-btn" id="btn-empty-retry">Buscar de novo</button>
+  </div>`;
 }
 
 function goFotoMoldura_() {
@@ -471,8 +507,11 @@ function render() {
   if (!box) return;
 
   if (!locacoes.length) {
+    if (_telAtual) {
+      renderEmpty_(_telAtual);
+      return;
+    }
     setView('gate');
-    setStatus('Nenhuma brincadeira ativa agora. Confira o telefone ou fale com o operador.');
     box.innerHTML = '';
     return;
   }
@@ -539,7 +578,7 @@ function render() {
   const rideBadge = `<span class="mk-portal-ride-badge" aria-hidden="true">${tipoIcon(atual.tipo)}</span>`;
 
   box.innerHTML = `<div class="mk-portal-carousel">
-    <p class="mk-portal-subtitle">📱 ${esc(telFmt)} · ${brincandoLabel_(n)} · <button type="button" class="mk-portal-tel-link" id="btn-trocar-tel">Trocar telefone</button></p>
+    <p class="mk-portal-subtitle">📱 ${esc(telFmt)} · ${brincandoLabel_(n)}</p>
     ${lojaChip}
     ${tabs ? `<div class="mk-portal-tabs" role="tablist">${tabs}</div>` : ''}
     ${n > 1 ? `<p class="mk-portal-counter">Criança ${_carouselIdx + 1} de ${n}</p>` : ''}
@@ -548,7 +587,8 @@ function render() {
       <div class="mk-portal-play-hero">
         ${rideBadge}
         ${avatarHtml_(atual.crianca, 'lg')}
-        ${n === 1 ? `<div class="mk-portal-play-name">${esc(atual.crianca)}</div>` : ''}
+        <div class="mk-portal-play-name">${esc(atual.crianca)}</div>
+        ${statusPillHtml_(atual)}
       </div>
       ${milestone}
       ${ringBlockHtml_(stats)}
@@ -558,7 +598,7 @@ function render() {
       ${trophyHtml}
       <button type="button" class="mk-portal-foto-btn" data-action="foto"${fotoMuted}>${fotoLabelFor_(stats)}</button>
       ${extendHtml}
-      <p class="mk-portal-pwa-hint">💡 Dica: adicione à tela inicial e deixe aberto no corredor</p>
+      ${pwaHintHtml_()}
     </article>
     ${dots ? `<div class="mk-portal-dots">${dots}</div>` : ''}
     ${swipeHint}
@@ -589,7 +629,11 @@ async function buscar(silent) {
     _carouselIdx = 0;
     render();
     if (locacoes.length) iniciarAutoRefresh(tel);
-    else clearInterval(_refreshTimer);
+    else {
+      clearInterval(_refreshTimer);
+      /* empty state: reconsulta leve a cada 20s por se o operador iniciar */
+      iniciarAutoRefresh(tel);
+    }
   } catch (e) {
     if (!silent) setStatus(portalErro_(e.data, e));
   } finally {
@@ -605,6 +649,8 @@ function voltarGate_() {
   setView('gate');
   setStatus('');
   document.getElementById('resultado').innerHTML = '';
+  const inp = document.getElementById('telefone');
+  if (inp) inp.focus();
 }
 
 function iniciarAutoRefresh(tel) {
@@ -642,6 +688,8 @@ function applyDeepLink_() {
 }
 
 document.getElementById('btn').addEventListener('click', () => buscar(false));
+const footBtn = document.getElementById('btn-trocar-tel-foot');
+if (footBtn) footBtn.addEventListener('click', () => voltarGate_());
 document.getElementById('resultado').addEventListener('click', (e) => {
   if (e.target.closest('[data-action="foto"]')) {
     goFotoMoldura_();
@@ -651,6 +699,10 @@ document.getElementById('resultado').addEventListener('click', (e) => {
     const toast = document.getElementById('extend-toast');
     if (toast) toast.hidden = false;
     if (navigator.vibrate) { try { navigator.vibrate(20); } catch (err) {} }
+    return;
+  }
+  if (e.target.id === 'btn-empty-retry' || e.target.closest('#btn-empty-retry')) {
+    buscar(false);
     return;
   }
   if (e.target.id === 'btn-trocar-tel' || e.target.closest('#btn-trocar-tel')) {

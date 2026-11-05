@@ -195,6 +195,19 @@ try {
     } else {
       Add-Check "guard.portal.canon" "ok" "canonLoc_ presente"
     }
+    # I202 — portal não pode ficar em ?v= antigo (Pages 1.9.158 enquanto FE 1.9.195+)
+    $mkVerRaw = Get-Content -Path (Join-Path $root "mk-version.js") -Raw -Encoding UTF8
+    $mkVer = if ($mkVerRaw -match "MK_VERSION\s*=\s*'([\d.]+)'") { $Matches[1] } else { "" }
+    $designPortal = ""
+    $designPath = Join-Path $root "mk-design.css"
+    if (Test-Path $designPath) { $designPortal = Get-Content -Path $designPath -Raw -Encoding UTF8 }
+    if ($mkVer -and $portalRaw -notmatch [regex]::Escape("?v=$mkVer")) {
+      Add-Check "guard.portal.version" "fail" ("acompanhar.html ?v= desalinhado de mk-version $mkVer (I202)")
+    } elseif ($portalRaw -notmatch 'mk-portal-foot' -or $portalRaw -notmatch 'renderEmpty_' -or $designPortal -notmatch 'mk-portal-gate-err:empty') {
+      Add-Check "guard.portal.version" "fail" "portal sem melhorias I202 (foot/empty/err:empty)"
+    } else {
+      Add-Check "guard.portal.version" "ok" ("portal ?v=$mkVer + I202 UX")
+    }
   } else {
     Add-Check "guard.portal.canon" "fail" "acompanhar.html ausente"
   }

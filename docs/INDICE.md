@@ -1,6 +1,6 @@
 # MOVI KIDS — Índice de documentação
 
-**Atualizado:** 05/11/2026 (FE **v1.9.195** · GAS **v1.5.237** · I200 paint-only · I199–I198 · Aprendizado §9.7 · **La Ville ops desde 06/10/2026**)
+**Atualizado:** 05/11/2026 (FE **v1.9.196** · GAS **v1.5.237** · I200 paint-only · I199–I198 · Aprendizado §9.7 · **La Ville ops desde 06/10/2026**)
 
 ## Comece aqui
 

@@ -1,15 +1,15 @@
 # MOVI KIDS — Deploy atual (canônico)
 
-**Atualizado:** 05/11/2026 (FE **v1.9.195** · GAS Web/repo **v1.5.237** · I200 folha paint-only · I199/I198 · **La Ville ops desde 06/10/2026**)
+**Atualizado:** 05/11/2026 (FE **v1.9.196** · GAS Web/repo **v1.5.237** · I200 folha paint-only · I199/I198 · **La Ville ops desde 06/10/2026**)
 
 ## Produção
 
 | Camada | Versão | URL / evidência | Status |
 |--------|--------|-----------------|--------|
-| **Frontend** | **v1.9.195** | https://ribocg-a11y.github.io/movikids/?force=1.9.195 | Pages ✅ |
-| **Gestão Pessoas** | **v1.9.195** | `gestao-pessoas.html?force=1.9.195` | I200 Folha paint |
+| **Frontend** | **v1.9.196** | https://ribocg-a11y.github.io/movikids/?force=1.9.196 | Pages ✅ |
+| **Gestão Pessoas** | **v1.9.196** | `gestao-pessoas.html?force=1.9.196` | I200 Folha paint |
 | **Portal acompanhar** | cache `?v=` | `acompanhar.html` | DNA floresta |
-| **Service Worker** | **1.9.195** | I200 | após push |
+| **Service Worker** | **1.9.196** | I200 | após push |
 | **GAS Web** | **v1.5.237** | ping alinhado repo | ✅ |
 | **La Ville** | ops **06/10/2026** | 2ª unidade em operação | ✅ |
 | **GAS repo** | **v1.5.237** | Triciclo 03 | raw |
@@ -21,6 +21,7 @@
 
 | I* | Camada | Nota |
 |----|--------|------|
+| **I202** | FE 1.9.196 | Portal responsável: versão+empty+foot sticky |
 | **I200** | FE 1.9.194–195 | Folha: paint-only + watchdog + elapsed + `guard.i200` |
 | **I199** | FE 1.9.193 | Folha Outubro: switch competência + match mês + timeout 180s |
 | **I198** | FE 1.9.192 | `mkInicioCacheSafeForApply_` + `audit-familia-dual-loja.ps1` · Evolução estratégica |
@@ -44,7 +45,7 @@
 
 | Check | Esperado |
 |-------|----------|
-| Pages `mk-version.js` | **1.9.195** ✅ |
+| Pages `mk-version.js` | **1.9.196** ✅ |
 | GAS ping | **v1.5.237** ✅ |
 | audit-familia | status ok |
 
