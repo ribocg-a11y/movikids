@@ -1,6 +1,6 @@
 # MOVI KIDS — Índice de documentação
 
-**Atualizado:** 04/11/2026 (FE **v1.9.192** · GAS **v1.5.237** · I198 · I191–I197 · Aprendizado/Evolução · **La Ville ops desde 06/10/2026**)
+**Atualizado:** 05/11/2026 (FE **v1.9.195** · GAS **v1.5.237** · I200 paint-only · I199–I198 · Aprendizado §9.7 · **La Ville ops desde 06/10/2026**)
 
 ## Comece aqui
 
@@ -25,6 +25,7 @@
 | [**INCIDENTE_I43_CARREGAR_INICIO_COL_Y_2026-06-23.md**](ativos/INCIDENTE_I43_CARREGAR_INICIO_COL_Y_2026-06-23.md) | **I43** — cronômetro revertia após ▶ |
 | [**INCIDENTE_I53_CONFIG_PLANILHA_REPAIR_2026-06-24.md**](arquivo/incidentes/INCIDENTE_I53_CONFIG_PLANILHA_REPAIR_2026-06-24.md) | **I53** — CONFIG memorial, schema, repair |
 | [**INCIDENTE_I96_I99_MULTI_VEICULO_2026-07-10.md**](arquivo/incidentes/INCIDENTE_I96_I99_MULTI_VEICULO_2026-07-10.md) | **I96–I103** — multi-veículo · overlay · contagem encerradas/caixa |
+| [**INCIDENTE_I200_FOLHA_LOADING_LOOP_ENSUREFULL_2026-11-05.md**](ativos/INCIDENTE_I200_FOLHA_LOADING_LOOP_ENSUREFULL_2026-11-05.md) | **I200** — Folha paint≠rede / loop Carregando · FE 1.9.194–195 |
 | [**INCIDENTE_I198_POLITICA_CACHE_AUDIT_FAMILIA_2026-11-04.md**](ativos/INCIDENTE_I198_POLITICA_CACHE_AUDIT_FAMILIA_2026-11-04.md) | **I198** — política cache-safe + audit família · FE 1.9.192 |
 | [**INCIDENTE_I185_I186_RECEITA_DIARIA_2026-11-03.md**](ativos/INCIDENTE_I185_I186_RECEITA_DIARIA_2026-11-03.md) | **I185/I186** — Receita cache celular + filtros/Ver · FE 1.9.179 |
 | [**INCIDENTE_I183_I184_HOLDING_PONTO_2026-10-28.md**](ativos/INCIDENTE_I183_I184_HOLDING_PONTO_2026-10-28.md) | **I183/I184** — Holding dual celular · ponto toque-duplo · FE 1.9.175–176 |

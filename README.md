@@ -22,12 +22,12 @@ Detalhe: [docs/ativos/ESTRUTURA_REPO.md](docs/ativos/ESTRUTURA_REPO.md) · mocku
 
 **Planejamento:** [PLANEJAMENTO_ATUAL_2026-06.md](docs/ativos/PLANEJAMENTO_ATUAL_2026-06.md) · [PLANO_PRIORIDADES](docs/ativos/PLANO_PRIORIDADES_2026-06.md)
 
-## Produção (04/11/2026 — FE v1.9.192 · GAS v1.5.237 · La Ville ops)
+## Produção (05/11/2026 — FE v1.9.195 · GAS v1.5.237 · La Ville ops)
 
 | Camada | Versão repo | Produção |
 |--------|-------------|----------|
-| Frontend | **v1.9.192** | https://ribocg-a11y.github.io/movikids/?force=1.9.192 |
-| Gestão Pessoas | **v1.9.192** | `gestao-pessoas.html?force=1.9.192` |
+| Frontend | **v1.9.195** | https://ribocg-a11y.github.io/movikids/?force=1.9.195 |
+| Gestão Pessoas | **v1.9.195** | `gestao-pessoas.html?force=1.9.195` |
 | Apps Script | **v1.5.237** | ping alinhado · I198 audit-família · I191–I197 dual-loja · I181 ✅ |
 | **La Ville Mall** | ops desde **06/10/2026** | 2ª unidade em operação (D+0) |
 | Design System | **v1.1** | [DESIGN_SYSTEM_MOVIKIDS.md](docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md) |

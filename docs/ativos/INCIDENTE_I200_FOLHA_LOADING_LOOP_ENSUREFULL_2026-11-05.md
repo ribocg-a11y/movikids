@@ -1,6 +1,6 @@
 # I200 — Folha Out/2026 “Carregando…” eterno (loop ensureFull)
 
-**Data:** 05/11/2026 · **FE:** **v1.9.194** · **GAS:** sem mudança (v1.5.237)
+**Data:** 05/11/2026 · **FE:** **v1.9.195** · **GAS:** sem mudança (v1.5.237)
 
 ## Sintoma
 
@@ -18,7 +18,7 @@ GAS full Outubro **ok** (~62s, folha=5) — falha era **FE**.
 
 I199 corrigiu herança de voo; **não** cortou o auto-restart no render.
 
-## Correção FE (v1.9.194)
+## Correção FE (v1.9.194–195)
 
 | Item | Onde |
 |------|------|
@@ -31,7 +31,15 @@ Carga continua só por: troca de competência, aba Folha (`setTab` → `ensureFu
 
 ## Como testar
 
-1. Banner **Nova versão** / `?force=1.9.194` + **Concluir atualização**
+1. Banner **Nova versão** / `?force=1.9.195` + **Concluir atualização**
 2. Operadores → **Out/2026** → Folha
 3. Esperar ~1 min **ou** ver botão retry (nunca loading infinito)
 4. 2ª abertura = cache local
+
+
+### Além (05/11 — mandato §9)
+
+- Contrato paint-only + `guard.i200.folha.paint`
+- Contador de segundos no loading (E5)
+- A9 + §9.7 em `APRENDIZADO_AGENTE_MOVIKIDS.md`
+- PROTOCOLO docs alinhados 1.9.195

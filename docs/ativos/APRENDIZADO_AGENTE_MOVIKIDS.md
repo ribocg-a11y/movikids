@@ -31,6 +31,7 @@ Este doc é a memória operacional do que o agente **já deveria saber sozinho**
 | A6 | **Parse JS quebrado = FE morto no tablet** | Comentário `*/` dentro de bloco = SyntaxError (I193) — pior que bug de lógica |
 | A7 | **PC ≠ tablet** | Sync “ok” no PowerShell não prova balcão; fantasma vive no PWA/LS/IDB |
 | A8 | **FE sem push = banner nunca aparece** | I24 — bump local sem Pages é entrega falsa |
+| A9 | **Paint/render NUNCA dispara rede** | `renderX` que chama `ensure*`/`load` após falha = “Carregando…” eterno (I200). Rede só por intenção: tab, select, botão retry |
 
 ### 1.2 Família de falha (como eu erro)
 
@@ -58,6 +59,8 @@ usuário reclama de NOVO sintoma = mesma família
 | I195: deslogar holding | Fallback “seguro” all→golden | **Nunca** inventar golden; loja viva ou tentar as 2 |
 | I196: unidadeId engolido | Object.assign/spread sem olhar ordem | Auth **primeiro**, unidade **por último** |
 | I197: Firebase/IDB/GP/cache ainda latentes | Auditei só depois do usuário pedir “veja o que deixou passar” | **Audit da família deve ser meu**, não pedido |
+| I199→I200: Folha ainda “Carregando…” | Fixei race de mês; **não** varri o paint que re-pedia full após `!ok` | Após fix de loading: perguntar **quem re-dispara load?** Render pode? Se sim → loop |
+| Usuário: **“nada”** pós-entrega | Tratei I199 como fechado sem provar UI fora do loading | “nada” / print stuck = **família incompleta** — abrir imediatamente, não defender o fix |
 
 ---
 
@@ -75,6 +78,7 @@ Antes de dizer “concluído” / “pode testar”, o agente **obrigatoriamente
 6. **Boot / timeout / backoff / offline** ainda podem reidratar o estado velho?
 7. **Mesmo padrão em outro arquivo?** (admin, GP, hist, custos, ops-balcao, firebase)
 8. **Guard + teste** que impede regressão? Se não existe → criar no mesmo commit
+9. **Paint/render chama `load`/`ensure*`?** (I200) → proibido; só tab/select/retry/boot explícito
 
 ### 2.2 Gate de honestidade
 
@@ -157,6 +161,7 @@ Se o usuário ainda precisar dizer “veja outras coisas que você deixou passar
 | 04/11 | Este doc | Família obrigatória + proatividade explícita |
 | 04/11 | **I198 + mandato §9** | Comparar/prever/modernizar; helper + audit-família; não esperar comando |
 | 05/11 | **I200** | Render **nunca** re-dispara load (ensureFull no paint = loop eterno) |
+| 05/11 | **A9 + guard.i200** | Contrato paint-only + trava pre-push; “nada” do usuário = gatilho de família |
 
 ---
 
@@ -264,5 +269,18 @@ Evoluído = usa o comando como **gatilho** para proteger o sistema inteiro e dei
 **Falhou:** após I198 (código + Pages) o agente **não** rodou `PROTOCOLO_ATUALIZAR_TUDO` — docs ESTADO/DEPLOY/AGENTS/planejamento ficaram em **1.9.179**. O usuário precisou cobrar.
 
 **Decisão correta (agora regra):** ao fechar I* / bump FE / P0 publicado → na **mesma sessão**, executar o protocolo completo (HANDOFF → ESTADO → planejamento → MAPA → protocolos → DEPLOY → INDICE/README/AGENTS → testes README) e commit/push docs **sem pedir** “atualize tudo”.
+
+### 9.7 Exemplo claro — I199→I200 (05/11/2026)
+
+**Falhou de novo no mesmo mandato:** GAS já devolvia Outubro (~62s). I199 fechou a **race de competência**, subi 1.9.193 e tratei como feito. O paint da Folha ainda chamava `ensureFull` após `!ok` → loop “Carregando…”. O usuário só precisou dizer **“nada”** + print.
+
+**O que eu deveria ter feito sozinho antes de declarar I199 ok:**
+
+1. Simular mismatch (want=Out, got=Nov, inFlight=false) no caminho `renderFolha` — ver se re-dispara rede  
+2. Perguntar: após timeout/`!ok`, a UI mostra **retry** ou **loading**? Loading sem botão = loop  
+3. Comparar com UI madura: *render is pure; effects are intentional*  
+4. Guard + watchdog **na mesma entrega** do I199 — não na do “nada”
+
+**Decisão agora:** todo fix de “não carrega / Carregando eterno” **inclui** varredura paint→load + guard. Usuário dizer “nada”/colar print stuck = **reabrir família**, não insistir que o fix anterior bastou.
 
 Isso **é** tomar decisão sozinho: a arquitetura do projeto exige docs alinhados; esperar comando é omissão.

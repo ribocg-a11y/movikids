@@ -1,23 +1,23 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 05/11/2026 · FE **v1.9.194** (I200 folha loading) · GAS Web/repo **v1.5.237** · **ler** `APRENDIZADO_AGENTE`
+**Atualizado:** 05/11/2026 · FE **v1.9.195** (I200 paint-only + guard) · GAS Web/repo **v1.5.237** · **ler** `APRENDIZADO_AGENTE` §9.7
 
 ## Produção (agora)
 
 | Camada | Versão | Link |
 |--------|--------|------|
-| Frontend | **v1.9.194** | https://ribocg-a11y.github.io/movikids/?force=1.9.194 |
-| Gestão Pessoas | **v1.9.194** | `gestao-pessoas.html?force=1.9.194` |
+| Frontend | **v1.9.195** | https://ribocg-a11y.github.io/movikids/?force=1.9.195 |
+| Gestão Pessoas | **v1.9.195** | `gestao-pessoas.html?force=1.9.195` |
 | GAS | ping Web **v1.5.237** · repo **v1.5.237** | Triciclo 03 alinhado |
 
-**Frota Golden:** 4 carros · **3 triciclos** (01–03) · 4 pelúcias — CONFIG live + FE **1.9.194**.  
-**I200:** Folha Out — fim do loop `ensureFull` no render · watchdog · `INCIDENTE_I200_*`.  
-**I199:** troca competência / match mês / 180s · **I198** cache+audit · **I191–I197** dual-loja.  
-**Agente:** após P0 → **PROTOCOLO_ATUALIZAR_TUDO** sozinho.
+**Frota Golden:** 4 carros · **3 triciclos** (01–03) · 4 pelúcias — CONFIG live + FE **1.9.195**.  
+**I200:** Folha — paint ≠ rede · `guard.i200` · elapsed ~62s · A9 em `APRENDIZADO`.  
+**I199:** race competência · **I198** cache+audit · **I191–I197** dual-loja.  
+**Agente:** “nada”/print stuck = reabrir família; após P0 → **PROTOCOLO_ATUALIZAR_TUDO**.
 
 **Folha Q2 31/10:** PIX memorial Ray **902,22** · Karen **1.002,22** · Jennifer **632,19**.  
 **Holding/ponto:** I183b · I184.  
-**Teste Folha:** `?force=1.9.194` → **Concluir atualização** → Out/2026 → Folha (~1 min ou retry).
+**Teste Folha:** `?force=1.9.195` → **Concluir atualização** → Out/2026 → Folha (contador de segundos ou retry).
 
 ---
 

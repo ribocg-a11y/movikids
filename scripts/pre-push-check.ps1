@@ -1208,6 +1208,17 @@ try {
     } else {
       Add-Check "guard.i199.folha.comp" "ok" "folha match competencia + cancel switch"
     }
+    # I200 — paint/render NUNCA dispara ensureFull (loop Carregando eterno pós-I199)
+    $folhaFn = [regex]::Match($gpAdmRawI199, 'function gpAdmRenderFolha_\(\)\s*\{[\s\S]*?\n  function ').Value
+    if (-not $folhaFn) {
+      Add-Check "guard.i200.folha.paint" "fail" "gpAdmRenderFolha_ nao encontrado (I200)"
+    } elseif ($folhaFn -match 'gpAdmEnsureFullPanel_|mkGpAdmLoad_\(') {
+      Add-Check "guard.i200.folha.paint" "fail" "renderFolha dispara rede/ensureFull — loop Carregando (I200)"
+    } elseif ($gpAdmRawI199 -notmatch 'gpAdmArmFolhaWatchdog_') {
+      Add-Check "guard.i200.folha.paint" "fail" "folha sem watchdog I200"
+    } else {
+      Add-Check "guard.i200.folha.paint" "ok" "renderFolha so pinta; load so por tab/comp/retry"
+    }
   }
 
   # I198 — audit família dual-loja (ir além dos guards pontuais)

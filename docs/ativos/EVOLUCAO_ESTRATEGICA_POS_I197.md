@@ -1,6 +1,6 @@
 # Evolução estratégica — além do fix (pós I191–I198)
 
-**Atualizado:** 04/11/2026 · **FE:** v1.9.192 · **Mandato:** `APRENDIZADO_AGENTE_MOVIKIDS.md` §9  
+**Atualizado:** 05/11/2026 · **FE:** v1.9.194 · **Mandato:** `APRENDIZADO_AGENTE_MOVIKIDS.md` §9  
 **Princípio:** cada erro deve gerar **proteção definitiva** + **modernização**, não só patch.
 
 ---
@@ -16,8 +16,9 @@
 | Regressão só descoberta pelo usuário | Contract tests + lint de anti-padrão | Guards pontuais | `audit-familia-dual-loja.ps1` no pre-push (I198) |
 | Offline fila frágil | Outbox pattern + idempotência + escopo tenant | Prune cross-loja | Escopo por `unidadeId` (I197) |
 | Tablet ≠ PC | Device lab / smoke PWA | Testes API ≠ balcão | Homologação tablet obrigatória em P0 cronômetro/fantasma |
+| Loading eterno em admin RH | UI = paint puro; fetch só em eventos (React Query / SWR / “request ≠ render”) | `renderFolha` → `ensureFull` (I200) | Contrato paint-only + `guard.i200` · retry explícito |
 
-Não copiar moda: **importar o contrato** (uma autoridade, merge por campo, multi-tenant explícito, outbox, gates).
+Não copiar moda: **importar o contrato** (uma autoridade, merge por campo, multi-tenant explícito, outbox, gates, **render sem side-effect**).
 
 ---
 
@@ -30,6 +31,7 @@ Não copiar moda: **importar o contrato** (uma autoridade, merge por campo, mult
 | I193 | Parse JS no pre-push | ✅ |
 | I194–I197 | Mapa holding + família FE | ✅ |
 | **I198** | Helper único cache-safe + `audit-familia-dual-loja.ps1` | ✅ FE v1.9.192 |
+| **I199–I200** | Folha competência + paint-only + watchdog + `guard.i200` | ✅ FE v1.9.194 |
 
 ### Próximos (FE — agente sozinho §7.2)
 
@@ -39,6 +41,7 @@ Não copiar moda: **importar o contrato** (uma autoridade, merge por campo, mult
 | E2 | Deprecar leitura Firebase de sessões (flag off) | RTDB não é autoridade | Manter listen só métrica/`_fbAtivasHint` (já quase) |
 | E3 | Contract test JSON: `listarAtivas` / `carregarInicio` / `sessoesAtivas` | Quebra de contrato GAS detectada no CI local | Fixture + schema no `scripts/testes/` |
 | E4 | Banner holding sempre de `mkAuthGetSessoesAtivas_` | Uma API UI | Grep residual `sessaoAtivaRemota` em render |
+| E5 | Skeleton Folha com progresso (~62s cold) | “Carregando” sem feedback = abandono | Barra/tempo estimado + cache I168 já ajuda; UI honesta |
 
 ### Com pedido §7.3 (GAS / produto)
 

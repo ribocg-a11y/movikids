@@ -22,6 +22,9 @@
   let gpAdmQuickCols_ = null;
   /** I200 — watchdog: se inFlight/folha travar além do timeout da api, sai do “Carregando…”. */
   let gpAdmFolhaWatchdog_ = null;
+  /** E5/I200 — segundos decorridos no loading da Folha (feedback honesto ~62s cold). */
+  let gpAdmFolhaElapsedTimer_ = null;
+  let gpAdmFolhaElapsedSec_ = 0;
 
   // I137 — 15 min: evita re-pedir painel full a cada troca de aba / F5 leve
   const GP_ADM_CACHE_TTL = 15 * 60 * 1000;
@@ -168,11 +171,20 @@
     el.innerHTML = '<p class="gp-adm-muted gp-adm-loading">Carregando jornada / ponto da competência…</p>';
   }
 
+  function gpAdmClearFolhaElapsed_() {
+    if (gpAdmFolhaElapsedTimer_) {
+      clearInterval(gpAdmFolhaElapsedTimer_);
+      gpAdmFolhaElapsedTimer_ = null;
+    }
+    gpAdmFolhaElapsedSec_ = 0;
+  }
+
   function gpAdmClearFolhaWatchdog_() {
     if (gpAdmFolhaWatchdog_) {
       clearTimeout(gpAdmFolhaWatchdog_);
       gpAdmFolhaWatchdog_ = null;
     }
+    gpAdmClearFolhaElapsed_();
   }
 
   function gpAdmArmFolhaWatchdog_(comp) {
@@ -500,9 +512,22 @@
     const folha = document.getElementById('gp-adm-folha');
     if (folha) {
       folha.innerHTML = '<p class="gp-adm-muted gp-adm-loading">Carregando folha de <strong>' + esc(compLabel || '…') + '</strong>…</p>' +
-        '<p class="gp-adm-muted" style="margin-top:8px;font-size:12px">1ª carga do mês ~1 min. Se passar de 2 min, use Tentar de novo.</p>';
+        '<p class="gp-adm-muted" style="margin-top:8px;font-size:12px">1ª carga do mês ~1 min. Se passar de 2 min, use Tentar de novo.</p>' +
+        '<p id="gp-adm-folha-elapsed" class="gp-adm-muted" style="margin-top:6px;font-size:12px">0s</p>';
     }
     mkGpAdmFecharHolerite_();
+    gpAdmClearFolhaElapsed_();
+    gpAdmFolhaElapsedSec_ = 0;
+    gpAdmFolhaElapsedTimer_ = setInterval(function () {
+      gpAdmFolhaElapsedSec_ += 1;
+      const el = document.getElementById('gp-adm-folha-elapsed');
+      if (!el) {
+        gpAdmClearFolhaElapsed_();
+        return;
+      }
+      const s = gpAdmFolhaElapsedSec_;
+      el.textContent = s < 60 ? (s + 's') : (Math.floor(s / 60) + ' min ' + (s % 60) + 's');
+    }, 1000);
   }
 
   window.mkGpAdmCompChange_ = function (comp) {
@@ -1156,6 +1181,11 @@
     }
   };
 
+  /**
+   * I200 — CONTRATO: paint-only.
+   * Rede só via mkGpAdmSetTab / mkGpAdmCompChange_ / mkGpAdmRetryPanel_ / ensureFull chamado por eles.
+   * Guard: guard.i200.folha.paint (pre-push).
+   */
   function gpAdmRenderFolha_() {
     const el = document.getElementById('gp-adm-folha');
     if (!el || !gpAdmData_) return;
