@@ -1,23 +1,19 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 06/11/2026 · FE **v1.9.197** · GAS repo **v1.5.238** I203 · Web **v1.5.237** até Nova versão · **ler** `APRENDIZADO` §9.7
+**Atualizado:** 06/11/2026 · FE **v1.9.198** · GAS Web **v1.5.238** · repo **v1.5.239** I203b · **ler** `APRENDIZADO` A10/A11
 
 ## Produção (agora)
 
 | Camada | Versão | Link |
 |--------|--------|------|
-| Frontend | **v1.9.197** | https://ribocg-a11y.github.io/movikids/?force=1.9.197 |
-| Gestão Pessoas | **v1.9.197** | `gestao-pessoas.html?force=1.9.197` |
-| GAS | ping Web **v1.5.237** · repo **v1.5.238** | I203 paridade — Nova versão pendente |
+| Frontend | **v1.9.198** | https://ribocg-a11y.github.io/movikids/?force=1.9.198 |
+| Gestão Pessoas | **v1.9.198** | `gestao-pessoas.html?force=1.9.198` |
+| GAS | ping Web **v1.5.238** · repo **v1.5.239** | I203b — Nova versão (custos backfill) |
 
-**Frota Golden (CONFIG live):** 4 carros · 3 triciclos · 4 pelúcias · **2 dinos** · preços = La Ville (15…65 / Dino 20…90 · sem 3h).  
-**I203:** `INCIDENTE_I203_GOLDEN_PARIDADE_LAVILLE_PRECOS_DINOS_2026-11-06.md` · após Nova versão Web → `alinharGoldenLavilleConfigAdmin`.  
-**I200:** Folha paint-only · **I202** portal · **I201** tooling.  
-**Agente:** após P0 → **PROTOCOLO_ATUALIZAR_TUDO**.
-
-**Folha Q2 31/10:** PIX memorial Ray **902,22** · Karen **1.002,22** · Jennifer **632,19**.  
-**Holding/ponto:** I183b · I184.  
-**Teste:** `?force=1.9.197` → Nova locação Golden — grade Dinos + valores LV.
+**Frota Golden (CONFIG live):** 4 carros · 3 triciclos · **4 pelúcias** · **Dino 01/02** · preços = La Ville · sem 3h.  
+**I203b:** paridade só valores/tempos — **não** copiar qtd LV; CUSTOS `unidade_id` reparado; admin OPCFG não apaga Dino.  
+**Sócio:** Nova versão Web raw → v1.5.239 (backfill CUSTOS G + trava 4 pelúcias no alinhar).  
+**Teste:** `TESTE_I203_GOLDEN_PARIDADE_LAVILLE_READONLY.ps1` · `?force=1.9.198`.
 
 ---
 

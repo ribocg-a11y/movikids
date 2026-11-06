@@ -1,6 +1,6 @@
 # I203 — Golden = La Ville (preços/tempos + 2 dinos)
 
-**Data:** 06/11/2026 (America/Fortaleza) · **FE:** **v1.9.197** · **GAS repo:** **v1.5.238** · Web até Nova versão: **v1.5.237**
+**Data:** 06/11/2026 (America/Fortaleza) · **FE:** **v1.9.198** · **GAS Web:** **v1.5.238** · repo **v1.5.239**
 
 ## Pedido
 
@@ -35,6 +35,15 @@ Após Nova versão Web:
 ?action=alinharGoldenLavilleConfigAdmin&adminPin=****
 ```
 
+## I203b — impacto sistêmico (mesma sessão)
+
+- **Frota Golden própria:** 4 carros · 3 triciclos · **4 pelúcias** · 2 dinos (LV continua 3 pelúcias)
+- IDs limpos `Dino 01`/`Dino 02` após Web **v1.5.238** + `alinharGoldenLavilleConfigAdmin`
+- Planilha: CONFIG atualizado · CUSTOS header `unidade_id` reparado (`schemaOk`)
+- FE: `mk-globals` sem tabela 12/55/3h · fallbacks home/nova/operacao · admin OPCFG tipos Dino/Drift + strip 3h
+- Guard `guard.i203.*` + `TESTE_I203_GOLDEN_PARIDADE_LAVILLE_READONLY.ps1`
+- Repo **v1.5.239:** backfill CUSTOS col G + trava nPel===4 no alinhar (sócio: Nova versão)
+
 ## FE
 
-Fallback frota Golden + label UI · bump **1.9.197**.
+Fallbacks + admin seguro · bump **1.9.198**.

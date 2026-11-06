@@ -1,6 +1,7 @@
 /* MOVI KIDS — Home, cards, painel ao vivo (Pacote M.9) */
 var encHojeData = [];
 var menuLocacaoAbertoKey = null;
+/** I203 — fallback Golden: 4 carros · 3 triciclos · 4 pelúcias · 2 dinos (CONFIG é autoridade). */
 var TODOS_VEICULOS_DEF = [
   {nome:'Carro 01',   tipo:'Carro'},
   {nome:'Carro 02',   tipo:'Carro'},
@@ -13,6 +14,8 @@ var TODOS_VEICULOS_DEF = [
   {nome:'Pelúcia 02', tipo:'Pelúcia'},
   {nome:'Pelúcia 03', tipo:'Pelúcia'},
   {nome:'Pelúcia 04', tipo:'Pelúcia'},
+  {nome:'Dino 01', tipo:'Dino'},
+  {nome:'Dino 02', tipo:'Dino'}
 ];
 function updateUI() {
   const holdOn = !!document.getElementById('page-holding')?.classList.contains('active');

@@ -257,7 +257,7 @@ function renderOperacaoLocacaoForm_(rowIndex, tipo, bodyId) {
   } else if (tipo === 'veiculo') {
     const veiculosTroca = (typeof TODOS_VEICULOS_DEF !== 'undefined' && TODOS_VEICULOS_DEF.length)
       ? TODOS_VEICULOS_DEF.map(function(v) { return v.nome; })
-      : ['Carro 01','Carro 02','Carro 03','Carro 04','Triciclo 01','Triciclo 02','Triciclo 03','Pelúcia 01','Pelúcia 02','Pelúcia 03','Pelúcia 04'];
+      : ['Carro 01','Carro 02','Carro 03','Carro 04','Triciclo 01','Triciclo 02','Triciclo 03','Pelúcia 01','Pelúcia 02','Pelúcia 03','Pelúcia 04','Dino 01','Dino 02'];
     body.innerHTML = `<div class="op-policy">A troca não reinicia o timer nem altera valores automaticamente.</div><div class="op-form"><div class="op-grid"><div class="op-field"><label>Atual</label><input value="${escHtml((typeof mkVeiculoLabelUi_==='function'?mkVeiculoLabelUi_(opSession.veiculo):opSession.veiculo) || opSession.tipo || '')}" disabled></div><div class="op-field"><label>Novo</label><select id="op-veiculo">${veiculosTroca.map(v=>`<option value="${escHtml(v)}" ${normalizarTxt_(opSession.veiculo)===normalizarTxt_(v)?'selected':''}>${escHtml((typeof mkVeiculoLabelUi_==='function'?mkVeiculoLabelUi_(v):v))}</option>`).join('')}</select></div></div><div class="op-field"><label>Motivo</label><textarea id="op-motivo">Troca solicitada pelo responsável ou por operação.</textarea></div></div>`;
   } else if (tipo === 'plano') {
     if (ativa) { toast('Plano só pode ser trocado antes de iniciar. Use Estender tempo.', 'warning'); return false; }
