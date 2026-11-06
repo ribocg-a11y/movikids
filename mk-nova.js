@@ -774,7 +774,8 @@ function rebuildVeiculoGridsFromDef_() {
       { nome: 'Triciclo 01', tipo: 'Triciclo' }, { nome: 'Triciclo 02', tipo: 'Triciclo' },
       { nome: 'Triciclo 03', tipo: 'Triciclo' },
       { nome: 'Pelúcia 01', tipo: 'Pelúcia' }, { nome: 'Pelúcia 02', tipo: 'Pelúcia' },
-      { nome: 'Pelúcia 03', tipo: 'Pelúcia' }, { nome: 'Pelúcia 04', tipo: 'Pelúcia' }
+      { nome: 'Pelúcia 03', tipo: 'Pelúcia' }, { nome: 'Pelúcia 04', tipo: 'Pelúcia' },
+      { nome: 'Dino 01', tipo: 'Dino' }, { nome: 'Dino 02', tipo: 'Dino' }
     ];
   const order = ['Carro', 'Triciclo', 'Pelúcia', 'Drift', 'Dino'];
   const labels = {
