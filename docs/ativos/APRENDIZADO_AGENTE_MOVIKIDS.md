@@ -34,6 +34,8 @@ Este doc é a memória operacional do que o agente **já deveria saber sozinho**
 | A9 | **Paint/render NUNCA dispara rede** | `renderX` que chama `ensure*`/`load` após falha = “Carregando…” eterno (I200). Rede só por intenção: tab, select, botão retry |
 | A10 | **Paridade de preços ≠ copiar frota** | Golden=LV em **valores/tempos**; quantidades são por loja (Golden **4 pelúcias**, LV 3). Mudar tabela = varrer CONFIG + `mk-globals` + admin OPCFG + fallbacks + schema CUSTOS |
 | A11 | **CONFIG/admin pode reverter o live** | Editor OPCFG que só conhece Carro/Triciclo/Pelúcia+3h **apaga Dino** e **recria 3h** no save — strip vazios + tipos completos no mesmo commit |
+| A12 | **Toda superfície que vende plano** | Nova · **Avulso** · Estender · Admin OPCFG · fallbacks — protocolo `PROTOCOLO_MUDANCA_TABELA_PRECOS_FROTA.md` |
+| A13 | **Virada de preço no meio do dia** | Locações já cobradas no real → corrigir **valorPlano + valorTotal** na planilha na mesma sessão (não só CONFIG) |
 
 ### 1.2 Família de falha (como eu erro)
 

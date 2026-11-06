@@ -598,14 +598,21 @@ try {
     $hRaw203 = Get-Content -Path $homeI203 -Raw -Encoding UTF8
     $gas203 = Get-Content -Path $gasI203Path -Raw -Encoding UTF8
     $uni203 = Get-Content -Path $uniJs -Raw -Encoding UTF8
+    $avulso203 = ""
+    $avulsoPath = Join-Path $root "mk-avulso.js"
+    if (Test-Path $avulsoPath) { $avulso203 = Get-Content -Path $avulsoPath -Raw -Encoding UTF8 }
     if ($gRaw203 -match "'10min':\{v:12," -or $gRaw203 -notmatch "'Dino':") {
       Add-Check "guard.i203.fe.precos" "fail" "mk-globals PRECOS ainda tabela antiga ou sem Dino (I203)"
     } elseif ($hRaw203 -notmatch "Dino 01" -or $hRaw203 -notmatch "Pelúcia 04" -or $uni203 -notmatch "Pelúcia 04" -or $uni203 -notmatch "Dino 01") {
       Add-Check "guard.i203.fe.frota" "fail" "fallback frota Golden sem 4 pelúcias + 2 dinos (I203b)"
     } elseif ($gas203 -notmatch "'Pelúcia 04'" -or $gas203 -notmatch "'Dino 01'" -or $gas203 -notmatch "alinharGoldenLavilleConfigAdmin_" -or $gas203 -notmatch "nPel !== 4") {
       Add-Check "guard.i203.gas.frota" "fail" "GAS VEICULOS/alinhar sem trava 4 pelúcias (I203b)"
+    } elseif ($avulso203 -notmatch 'mkAvulsoTiposDaUnidade_' -or ($avulso203 -notmatch 'labels\.Dino' -and $avulso203 -notmatch '🦖 Dino')) {
+      Add-Check "guard.i203.fe.avulso" "fail" "mk-avulso Golden sem Dino (I203c)"
+    } elseif ($gas203 -notmatch 'p\.valorPlano !== undefined') {
+      Add-Check "guard.i203.gas.corrigir" "fail" "corrigirFinanceiro sem valorPlano (I203c)"
     } else {
-      Add-Check "guard.i203.paridade" "ok" "FE+GAS Golden preços LV · 4 pelúcias · 2 dinos"
+      Add-Check "guard.i203.paridade" "ok" "FE+GAS+avulso Golden Dino · 4 pelúcias · corrigir valorPlano"
     }
   } else {
     Add-Check "guard.i203.paridade" "fail" "arquivos I203 ausentes"

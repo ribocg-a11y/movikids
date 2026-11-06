@@ -3,20 +3,43 @@
 var avulsoState = { tipo: null, plano: null };
 var avulsoUnidadeSel_ = 'golden';
 
+/** I203c — tipos por loja a partir da tabela PRECOS (não hardcode). Golden inclui Dino. */
 function mkAvulsoTiposDaUnidade_(uid) {
+  const labels = {
+    Carro: '🚗 Carro',
+    Triciclo: '🛺 Triciclo',
+    'Pelúcia': '🧸 Pelúcia',
+    Drift: '🛸 Drift',
+    Driffyt: '🛸 Drift',
+    Dino: '🦖 Dino'
+  };
+  const order = ['Carro', 'Triciclo', 'Pelúcia', 'Drift', 'Dino'];
+  const precos = (typeof PRECOS !== 'undefined' && PRECOS) ? PRECOS : null;
+  if (precos && typeof precos === 'object') {
+    const fromTable = order.filter(function (t) {
+      return precos[t] && typeof precos[t] === 'object' && Object.keys(precos[t]).length;
+    });
+    if (fromTable.length) {
+      return fromTable.map(function (t) {
+        return { tipo: t, label: labels[t] || t };
+      });
+    }
+  }
+  // Fallbacks se PRECOS ainda não hidratou
   if (uid === 'laville') {
     return [
-      { tipo: 'Carro', label: '🚗 Carro' },
-      { tipo: 'Triciclo', label: '🛺 Triciclo' },
-      { tipo: 'Pelúcia', label: '🧸 Pelúcia' },
-      { tipo: 'Drift', label: '🛸 Drift' },
-      { tipo: 'Dino', label: '🦖 Dino' }
+      { tipo: 'Carro', label: labels.Carro },
+      { tipo: 'Triciclo', label: labels.Triciclo },
+      { tipo: 'Pelúcia', label: labels['Pelúcia'] },
+      { tipo: 'Drift', label: labels.Drift },
+      { tipo: 'Dino', label: labels.Dino }
     ];
   }
   return [
-    { tipo: 'Carro', label: '🚗 Carro' },
-    { tipo: 'Triciclo', label: '🛺 Triciclo' },
-    { tipo: 'Pelúcia', label: '🧸 Pelúcia' }
+    { tipo: 'Carro', label: labels.Carro },
+    { tipo: 'Triciclo', label: labels.Triciclo },
+    { tipo: 'Pelúcia', label: labels['Pelúcia'] },
+    { tipo: 'Dino', label: labels.Dino }
   ];
 }
 

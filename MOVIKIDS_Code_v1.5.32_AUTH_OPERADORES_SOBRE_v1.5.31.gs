@@ -1,6 +1,6 @@
 // ═══════════════════════════════════════════════════════════
 // MOVI KIDS — Google Apps Script v1.5.239
-// v1.5.239: I203b — frota Golden ≠ quantidades LV (mantém 4 pelúcias); CUSTOS header 7 cols; pós-alinhar
+// v1.5.239: I203b/c — 4 pelúcias; CUSTOS G; corrigirFinanceiro valorPlano; avulso Golden+Dino (FE)
 // v1.5.238: I203 — Golden = La Ville (preços/tempos; Dino 01/02; validar Dino/Drift; cache CONFIG)
 // v1.5.237: frota Golden — Triciclo 03 em VEICULOS_VALIDOS (CONFIG planilha já live)
 // v1.5.236: I182 — escala Golden: Raykelly 10h–16h / Karen 16h–22h seg–sáb · folga domingo
@@ -3784,11 +3784,16 @@ function agregarCaixaPorConta_(enc) {
     }
   });
   enc.forEach(function (i) {
-    const vPlano = Number(i.valorPlano) || 0;
+    // I203c: autoridade do caixa = valorTotal (K). valorPlano desatualizado
+    // (ex.: correção ADM só no total) não pode derrubar fat vs kpiMes.
     const vExt = Number(i.valorAdicional) || 0;
+    const vTotalRaw = Number(i.valorTotal);
+    const vPlanoRaw = Number(i.valorPlano) || 0;
+    const vTotal = !isNaN(vTotalRaw) ? vTotalRaw : (vPlanoRaw + vExt);
+    const vPlano = Math.max(0, Math.round((vTotal - vExt) * 100) / 100);
     const pagPlano = normalizarPagamento_(i.pagamento) || 'Não informado';
     const pagExt = i.extraPagamento ? normalizarPagamento_(i.extraPagamento) : pagPlano;
-    fat += vPlano + vExt;
+    fat += vTotal;
     porPagamento[pagPlano] = (porPagamento[pagPlano] || 0) + vPlano;
     if (vExt > 0) {
       totalExt += vExt;
@@ -12073,7 +12078,15 @@ function corrigirFinanceiroLocacaoAdmin_(p) {
     if (status !== 'Encerrada') return err_('Somente locacoes Encerrada podem ser corrigidas por esta acao', 409);
     const antes = locacaoObj_(row, rowIndex);
     const minContratados = Number(row[6] || 0);
-    const valorPlano = Number(row[7] || 0);
+    let valorPlano = Number(row[7] || 0);
+    // I203c — ADM pode realinhar valorPlano (ex.: tabela Golden 12→15)
+    if (p.valorPlano !== undefined) {
+      const vp = Number(p.valorPlano);
+      if (isNaN(vp) || vp < 0) return err_('valorPlano invalido', 400);
+      valorPlano = Math.round(vp * 100) / 100;
+      sheet.getRange(rowIndex, 8).setValue(valorPlano);
+      sheet.getRange(rowIndex, 8).setNumberFormat('"R$" #,##0.00');
+    }
     if (p.horaFim !== undefined) {
       const hf = String(p.horaFim || '').trim();
       if (!/^\d{1,2}:\d{2}$/.test(hf)) return err_('horaFim invalida (use HH:mm)', 400);
@@ -12099,6 +12112,10 @@ function corrigirFinanceiroLocacaoAdmin_(p) {
           sheet.getRange(rowIndex, 4).setValue(fmtHoraLocal_(d));
         }
       }
+    }
+    // Se valorPlano mudou e valorTotal nao veio explicito, realinha total = plano + extra
+    if (p.valorPlano !== undefined && p.valorTotal === undefined) {
+      valTotal = Math.round((valorPlano + valAdic) * 100) / 100;
     }
     sheet.getRange(rowIndex, 9).setValue(minAdic);
     sheet.getRange(rowIndex, 10).setValue(valAdic);
