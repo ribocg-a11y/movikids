@@ -1,19 +1,19 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 06/11/2026 · FE **v1.9.198** · GAS Web **v1.5.238** · repo **v1.5.239** I203b · **ler** `APRENDIZADO` A10/A11
+**Atualizado:** 06/11/2026 · FE **v1.9.199** · GAS Web **v1.5.238** · repo **v1.5.239** I203c · **ler** `PROTOCOLO_MUDANCA_TABELA_PRECOS_FROTA.md`
 
 ## Produção (agora)
 
 | Camada | Versão | Link |
 |--------|--------|------|
-| Frontend | **v1.9.198** | https://ribocg-a11y.github.io/movikids/?force=1.9.198 |
-| Gestão Pessoas | **v1.9.198** | `gestao-pessoas.html?force=1.9.198` |
-| GAS | ping Web **v1.5.238** · repo **v1.5.239** | I203b — Nova versão (custos backfill) |
+| Frontend | **v1.9.199** | https://ribocg-a11y.github.io/movikids/?force=1.9.199 |
+| Gestão Pessoas | **v1.9.199** | `gestao-pessoas.html?force=1.9.199` |
+| GAS | ping Web **v1.5.238** · repo **v1.5.239** | I203c — Nova versão (valorPlano + avulso) |
 
-**Frota Golden (CONFIG live):** 4 carros · 3 triciclos · **4 pelúcias** · **Dino 01/02** · preços = La Ville · sem 3h.  
-**I203b:** paridade só valores/tempos — **não** copiar qtd LV; CUSTOS `unidade_id` reparado; admin OPCFG não apaga Dino.  
-**Sócio:** Nova versão Web raw → v1.5.239 (backfill CUSTOS G + trava 4 pelúcias no alinhar).  
-**Teste:** `TESTE_I203_GOLDEN_PARIDADE_LAVILLE_READONLY.ps1` · `?force=1.9.198`.
+**Frota Golden:** 4 carros · 3 triciclos · **4 pelúcias** · Dino 01/02 · preços=LV.  
+**I203c:** Avulso Golden+Dino · loc 5356 total R$15 (valorPlano H após Web 239) · protocolo tabela.  
+**Sócio:** raw → Nova versão **v1.5.239** → agente roda `CORRIGIR_I203_VALOR_PLANO_POS_WEB.ps1`.  
+**Teste:** `?force=1.9.199` · Lanç. Avulso Golden mostra 🦖 Dino.
 
 ---
 

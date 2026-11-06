@@ -44,6 +44,18 @@ Após Nova versão Web:
 - Guard `guard.i203.*` + `TESTE_I203_GOLDEN_PARIDADE_LAVILLE_READONLY.ps1`
 - Repo **v1.5.239:** backfill CUSTOS col G + trava nPel===4 no alinhar (sócio: Nova versão)
 
+## I203c — omissão Avulso + locações do dia (06/11)
+
+**Falha de mapa:** `mk-avulso.js` só listava Dino em La Ville; Golden ficou sem Dino na página Lanç. Avulso.
+
+**Locações pré-virada cobradas no real com tabela nova:**
+| id | Veículo | Plano | Antes | Depois |
+|----|---------|-------|-------|--------|
+| 5355 | Pelúcia 01 | 10min | 15 | 15 (confirmado) |
+| 5356 | Carro 01 | 10min | plano 12 / total→15 | total **15**; valorPlano **15** após Web 239 (`corrigir` + `valorPlano`) |
+
+Protocolo novo: `PROTOCOLO_MUDANCA_TABELA_PRECOS_FROTA.md`.
+
 ## FE
 
-Fallbacks + admin seguro · bump **1.9.198**.
+Fallbacks + admin + **avulso Golden+Dino** · bump **1.9.199**.
