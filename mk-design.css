@@ -701,6 +701,7 @@
 
 /* ── Portal responsável — floresta Movi Kids (acompanhar.html) I163 ── */
 .mk-portal-page {
+  --mk-portal-max: 380px; /* sobe nos breakpoints — coluna legível, não “fio” no desktop */
   --blue: #29B6F6;
   --blue-dk: #1565C0;
   --gold: #FFD54F;
@@ -823,10 +824,10 @@
   50% { transform: translateY(-8px); }
 }
 
-/* Entrada */
+/* Entrada — largura fluida (antes travada em 360px = “não responsivo” no PC) */
 .mk-portal-gate {
-  width: 100%;
-  max-width: 360px;
+  width: min(100%, var(--mk-portal-max, 380px));
+  max-width: 100%;
   text-align: center;
   z-index: 1;
   padding: 18px 16px 22px;
@@ -836,6 +837,7 @@
   box-shadow: 0 16px 40px rgba(13, 59, 46, 0.22);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
+  box-sizing: border-box;
 }
 .mk-portal-gate .mk-portal-brand-wrap { margin-bottom: 4px; }
 .mk-portal-gate .mk-brand-img {
@@ -936,12 +938,36 @@
   box-shadow: 0 8px 22px rgba(27, 94, 74, 0.28);
 }
 
-/* Palco do cronômetro — carrossel (1 ou N crianças) */
+/* Palco do cronômetro — carrossel (1 ou N crianças); largura acompanha viewport */
 .mk-portal-stage {
-  width: 100%;
-  max-width: 380px;
+  width: min(100%, var(--mk-portal-max, 380px));
+  max-width: 100%;
   z-index: 1;
-  padding-bottom: 72px; /* espaço do rodapé sticky */
+  padding-bottom: calc(88px + env(safe-area-inset-bottom, 0px)); /* rodapé sticky sem cortar CTA */
+  box-sizing: border-box;
+}
+@media (min-width: 480px) {
+  .mk-portal-page { --mk-portal-max: 440px; }
+}
+@media (min-width: 768px) {
+  .mk-portal-page {
+    --mk-portal-max: 480px;
+    padding-left: max(24px, env(safe-area-inset-left));
+    padding-right: max(24px, env(safe-area-inset-right));
+  }
+}
+@media (min-width: 1024px) {
+  .mk-portal-page { --mk-portal-max: 520px; }
+  .mk-portal-play {
+    padding: 20px 18px 22px;
+  }
+  .mk-portal-play-ring {
+    width: min(70vw, 340px);
+    height: min(70vw, 340px);
+  }
+  .mk-portal-ring-time {
+    font-size: clamp(52px, 8vw, 72px);
+  }
 }
 .mk-portal-carousel {
   width: 100%;
@@ -982,7 +1008,7 @@
 .mk-portal-empty .mk-portal-btn {
   margin-top: 4px;
 }
-/* I202 — Trocar telefone fixo (DS § design-visual) */
+/* I202 — Trocar telefone fixo (DS § design-visual); largura = coluna do portal */
 .mk-portal-foot {
   position: fixed;
   left: 0;
@@ -991,13 +1017,15 @@
   z-index: 5;
   display: flex;
   justify-content: center;
-  padding: 10px 16px max(14px, env(safe-area-inset-bottom));
+  padding: 10px 16px max(16px, env(safe-area-inset-bottom));
   background: linear-gradient(180deg, transparent 0%, rgba(13, 59, 46, 0.55) 40%, rgba(13, 59, 46, 0.82) 100%);
   pointer-events: none;
+  box-sizing: border-box;
 }
 .mk-portal-foot-btn {
   pointer-events: auto;
-  min-width: min(100%, 320px);
+  width: min(100%, var(--mk-portal-max, 380px));
+  max-width: 100%;
   height: 48px;
   border-radius: 14px;
   border: 2px solid rgba(255, 255, 255, 0.55);
@@ -1008,6 +1036,7 @@
   font-weight: 900;
   cursor: pointer;
   box-shadow: 0 8px 22px rgba(0, 0, 0, 0.2);
+  box-sizing: border-box;
 }
 .mk-portal-foot-btn:active { transform: scale(0.98); }
 .mk-portal-page[data-view="gate"] .mk-portal-foot { display: none; }
@@ -1306,8 +1335,8 @@
 }
 .mk-portal-play-ring {
   position: relative;
-  width: min(78vw, 280px);
-  height: min(78vw, 280px);
+  width: min(78vw, calc(var(--mk-portal-max, 380px) * 0.72), 320px);
+  height: min(78vw, calc(var(--mk-portal-max, 380px) * 0.72), 320px);
   margin: 0 auto;
 }
 .mk-portal-play-ring svg {

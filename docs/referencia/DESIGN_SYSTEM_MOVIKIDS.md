@@ -383,6 +383,8 @@ Nível 3 — DETALHE  → plano, histórico, accordion, tabela secundária
 | Gate | logo dino, `.mk-portal-gate`, floresta, input tel, `.mk-portal-btn` |
 | Play | chip loja, carrossel, ride badge, ring hero, info-bar (loja), others |
 
+**Largura:** coluna única via `--mk-portal-max` (380 → 440 → 480 → 520px nos breakpoints). Não fixar `max-width: 360/380` sem media query — no desktop vira “fio” no meio da tela. Rodapé sticky `.mk-portal-foot` herda a mesma largura.
+
 ### 8.3 `gestao-pessoas.html` — Colaboradores
 
 | Camada | Componentes |
