@@ -2102,3 +2102,14 @@ html,body{height:100%;background:var(--bg);color:var(--txt);overflow:hidden}
 .mk-hold-row-time{font-size:12px;font-weight:900;color:var(--blue-dk);font-variant-numeric:tabular-nums}
 .mk-hold-empty{padding:28px 12px;text-align:center;font-size:13px;font-weight:700;color:var(--txt3);background:var(--bg2);border-radius:12px}
 .mk-hold-denied{padding:24px;text-align:center;font-weight:800;color:var(--txt2)}
+
+/* Gestão decisão — Base+Ritmo (sem 3ª coluna) · meta 1 card · extras Caixa recolhidos */
+.mk-cenarios-row--2{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+.mk-meta-hoje-grid--1{grid-template-columns:1fr!important;max-width:420px}
+.mk-decisao-panel--simples .mk-decisao-tr-head .mk-decisao-th:not(.mk-decisao-th-label):not([hidden]){flex:1}
+.mk-caixa-extras-acc{margin:8px 0 12px;border:1px solid var(--border,#E0E0E0);border-radius:12px;background:var(--bg2,#F5F7FA);padding:0 10px}
+.mk-caixa-extras-sum{cursor:pointer;list-style:none;font-size:12px;font-weight:800;color:var(--txt2,#546E7A);padding:10px 4px;display:flex;align-items:center;gap:8px}
+.mk-caixa-extras-sum::-webkit-details-marker{display:none}
+.mk-caixa-extras-sum-val{font-weight:900;color:var(--blue,#1565C0)}
+.mk-caixa-extras-acc[open] .mk-caixa-extras-sum{border-bottom:1px solid var(--border,#E0E0E0);margin-bottom:8px}
+.mk-caixa-extras-acc .mk-caixa-extras-pay-grid{padding-bottom:10px}

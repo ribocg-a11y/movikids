@@ -1940,16 +1940,12 @@ function renderExecCockpit_(d) {
     const diffFat = Math.round(fatMes - fatAnt);
     fatCtx += ' · ' + (diffFat >= 0 ? '+' : '') + R2(diffFat);
   }
-  // I150: cockpit — real vs projetado 3m e ritmo run rate
+  // Cockpit — ritmo (3d) vs mês anterior; projetado 3m fora da narrativa principal
   const cen = typeof mkDashCenariosMes_ === 'function' ? mkDashCenariosMes_(d) : null;
-  if (cen && cen.projetado3mMes > 0 && fatMes > 0) {
-    const pctProj = Math.round(fatMes / cen.projetado3mMes * 100);
-    fatCtx += ' · ' + pctProj + '% do projetado 3m (' + R2(cen.projetado3mMes) + ')';
-  }
   if (cen && cen.ritmoMes > 0 && cen.isCorrente) {
     fatCtx += ' · ritmo ' + R2(cen.ritmoDiaria) + '/dia → ' + R2(cen.ritmoMes);
-  } else if (cen && !cen.isCorrente && cen.ritmoMes > 0) {
-    fatCtx += ' · fechado';
+  } else if (cen && !cen.isCorrente && fatMes > 0) {
+    fatCtx += ' · mês fechado';
   }
   setCockpitCtx_('mk-exec-fat-d', fatCtx, deltaFat > 0 ? 'up' : deltaFat < 0 ? 'down' : null);
 
@@ -1976,31 +1972,42 @@ function renderExecCockpit_(d) {
     setCockpitCtx_('mk-exec-res-d', resCtx, trendRes);
   }
 
-  const pb = d.payback;
+  /* CTO + % Base DRE no hero (payback/ocupação saíram — não decidem o dia). */
+  const ctoPagar = Number(d.ctoPagar) || 0;
   const pbEl = document.getElementById('mk-exec-payback');
   const pbD = document.getElementById('mk-exec-pb-d');
-  if (pb && pb.ok && pb.investimentoTotal > 0) {
-    if (pbEl) {
-      pbEl.textContent = pb.paybackAtingido ? '100%' : ((pb.pctRecuperado || 0) + '%');
-      pbEl.className = 'mk-exec-kpi-val ' + (pb.paybackAtingido ? 'green' : 'purple');
-    }
-    if (pbD) {
-      pbD.textContent = pb.paybackAtingido ? 'Investimento recuperado' : ('Faltam ' + R2(pb.faltaRecuperar || 0));
-      pbD.className = 'mk-exec-kpi-delta' + (pb.paybackAtingido ? ' up' : '');
-    }
-  } else {
-    if (pbEl) { pbEl.textContent = '—'; pbEl.className = 'mk-exec-kpi-val purple'; }
-    if (pbD) pbD.textContent = 'Cadastre aba INVESTIMENTO';
+  if (pbEl) {
+    pbEl.textContent = R2(ctoPagar);
+    pbEl.className = 'mk-exec-kpi-val purple';
+  }
+  if (pbD) {
+    const ctoPct = Number(d.ctoPct) || Number(d.ctoAliquota) || 0;
+    const ctoLbl = d.ctoLabel || d.unidadeCtoNome || '';
+    let ctoCtx = ctoPct > 0 ? (ctoPct + '% do faturamento') : 'CTO do mês';
+    if (ctoLbl) ctoCtx += ' · ' + ctoLbl;
+    pbD.textContent = ctoCtx;
+    pbD.className = 'mk-exec-kpi-delta';
   }
 
-  const occ = d.ocupacaoMediaFrota != null ? d.ocupacaoMediaFrota : ck.ocupacaoMediaFrota;
-  setText2('mk-exec-ocup', occ != null ? (occ + '%') : '—');
+  const baseMes = cen && cen.baseMes > 0 ? cen.baseMes : (Number(d.baseDreMes) || 0);
+  const pctBase = baseMes > 0 ? Math.round(fatMes / baseMes * 100) : null;
+  const ocupEl = document.getElementById('mk-exec-ocup');
+  if (ocupEl) {
+    ocupEl.textContent = pctBase != null ? (pctBase + '%') : '—';
+    ocupEl.className = 'mk-exec-kpi-val ' + (pctBase == null ? 'blue' : pctBase >= 100 ? 'green' : pctBase >= 80 ? 'blue' : 'purple');
+  }
   const occD = document.getElementById('mk-exec-ocup-d');
   if (occD) {
-    const o = Number(occ) || 0;
-    let occCtx = o >= 40 ? 'Boa utilização da frota' : o >= 25 ? 'Espaço para crescer' : o > 0 ? 'Ocupação baixa — revisar horários' : 'Sem locações no mês';
-    if (d.diasOperando > 0) occCtx += ' · ' + d.diasOperando + ' dias com movimento';
-    setCockpitCtx_('mk-exec-ocup-d', occCtx, o >= 40 ? 'up' : o < 25 && o > 0 ? 'down' : null);
+    let occCtx = '—';
+    if (pctBase != null) {
+      occCtx = pctBase >= 100
+        ? ('Acima do piso · base ' + R2(baseMes))
+        : ('Abaixo do piso · faltam ' + R2(Math.max(0, baseMes - fatMes)));
+      if (d.diasOperando > 0) occCtx += ' · ' + d.diasOperando + ' dias';
+    } else {
+      occCtx = 'Base DRE ainda sem piso configurado';
+    }
+    setCockpitCtx_('mk-exec-ocup-d', occCtx, pctBase != null && pctBase >= 100 ? 'up' : pctBase != null && pctBase < 80 ? 'down' : null);
   }
 
   const nar = document.getElementById('mk-exec-narrativa');
@@ -2095,24 +2102,23 @@ function renderMetaHoje_(d) {
   const cardSem = document.getElementById('mk-meta-hoje-sem');
   setText2('mk-meta-hoje-sem-val', nHoje + ' / ' + beSem + (stSem.ok ? ' ✓' : ' ✗'));
   setText2('mk-meta-hoje-sem-sub', stSem.ok
-    ? ('Meta sem folha batida (+ ' + (nHoje - beSem) + ' loc)')
+    ? ('Meta do dia batida (+ ' + (nHoje - beSem) + ' loc)')
     : ('Faltam ' + stSem.faltam + ' loc para o break-even do dia'));
   if (cardSem) cardSem.classList.toggle('ok', !!stSem.ok);
   if (cardSem) cardSem.classList.toggle('fail', stSem.ok === false);
 
+  /* Folha simulada: ids legados preenchidos, card permanece hidden. */
   const cardFolha = document.getElementById('mk-meta-hoje-folha');
+  if (cardFolha) { cardFolha.hidden = true; cardFolha.setAttribute('aria-hidden', 'true'); }
   if (beFolha == null) {
     setText2('mk-meta-hoje-folha-val', '—');
-    setText2('mk-meta-hoje-folha-sub', 'Configure aba FOLHA para simular');
-    if (cardFolha) { cardFolha.classList.remove('ok', 'fail'); }
+    setText2('mk-meta-hoje-folha-sub', '');
   } else {
     const stF = mkMetaStatus_(nHoje, beFolha);
     setText2('mk-meta-hoje-folha-val', nHoje + ' / ' + beFolha + (stF.ok ? ' ✓' : ' ✗'));
     setText2('mk-meta-hoje-folha-sub', stF.ok
       ? ('Meta com folha batida (+ ' + (nHoje - beFolha) + ' loc)')
       : ('Faltam ' + stF.faltam + ' loc com folha simulada'));
-    if (cardFolha) cardFolha.classList.toggle('ok', !!stF.ok);
-    if (cardFolha) cardFolha.classList.toggle('fail', stF.ok === false);
   }
 }
 
@@ -3143,32 +3149,25 @@ function renderDecisaoPanel_(d) {
 
   const base = document.getElementById('mk-decisao-base');
   if (base) {
-    base.textContent = 'Linha 1 = realizado até hoje'
-      + (folhaOk ? ' (folha proporcional ' + diasOp + '/' + diasMes + ' dias)' : '')
-      + '. Linha 2 = mesma projeção da seção 2 (ritmo atual)'
-      + (folhaOk ? ', com folha mensal integral na coluna da direita.' : '.');
+    base.textContent = 'Linha 1 = lucro real até hoje · Linha 2 = se o mês fechar no ritmo atual · Meta = locações/dia para cobrir custos + CTO.';
   }
 
   const foot = document.getElementById('mk-decisao-foot');
   if (foot) {
-    if (folhaOk && v.label) {
-      foot.textContent = 'Semáforo contratação: ' + v.label + ' — ' + (v.recomendacao || v.motivo || '');
-    } else if (be != null && beFolha != null) {
-      foot.textContent = 'Meta loc/dia referencia custos do mês inteiro. Com folha: ' + beFolha + ' loc/dia vs sem folha: ' + be + ' loc/dia.';
+    if (be != null) {
+      foot.textContent = 'Meta do dia: ' + be + ' locações para o mês fechar no azul (custos + CTO). Ritmo atual: ' + mediaLocDia + ' loc/dia.';
     } else foot.textContent = '';
   }
 }
 
 function renderLeadingFinanceiro_(d) {
-  const lf = d.leadingFinanceiro;
+  /* Ticket/R$/h/sensibilidade: fora da UI de decisão (ids legados preenchidos p/ export/testes). */
+  const lf = d && d.leadingFinanceiro;
   const row = document.getElementById('mk-leading-row');
   const sens = document.getElementById('mk-leading-sens');
-  if (!row || !lf) {
-    if (row) row.style.display = 'none';
-    if (sens) sens.style.display = 'none';
-    return;
-  }
-  row.style.display = '';
+  if (row) { row.style.display = 'none'; row.hidden = true; }
+  if (sens) { sens.style.display = 'none'; sens.hidden = true; }
+  if (!lf) return;
   setText2('mk-lead-ticket', R2(lf.ticketMedio || 0));
   setText2('mk-lead-ticket-sub', (d.nMes || 0) + ' loc no mês');
   setText2('mk-lead-rhora', R2(lf.receitaPorHoraOperada || 0));
@@ -3181,17 +3180,6 @@ function renderLeadingFinanceiro_(d) {
   const beF = lf.breakEvenComFolha;
   setText2('mk-lead-be-folha', beF != null ? (beF + ' loc') : '—');
   setText2('mk-lead-be-folha-sub', lf.custoDiaComFolha != null ? ('custo dia c/ folha ~' + R2(lf.custoDiaComFolha)) : (lf.folhaMensalSimulada ? ('folha ' + R2(lf.folhaMensalSimulada)) : '—'));
-  if (sens && lf.sensibilidade) {
-    const s = lf.sensibilidade;
-    const parts = [];
-    if (s.fatMais10Pct) parts.push('Fat +10% → resultado ' + R2(s.fatMais10Pct.resultado) + ' (' + (s.fatMais10Pct.deltaResultado >= 0 ? '+' : '') + R2(s.fatMais10Pct.deltaResultado) + ')');
-    if (s.custosMais10Pct) parts.push('Custos +10% → ' + R2(s.custosMais10Pct.resultado) + ' (Δ ' + R2(s.custosMais10Pct.deltaResultado) + ')');
-    if (lf.impactoOcupacao5pp != null) parts.push('+5 pp ocupação ≈ ' + R2(lf.impactoOcupacao5pp) + ' no resultado/mês');
-    if (parts.length) {
-      sens.style.display = 'block';
-      sens.textContent = parts.join(' · ');
-    } else sens.style.display = 'none';
-  }
 }
 
 var MK_GATE_LABELS_ = {
@@ -3203,15 +3191,15 @@ var MK_GATE_LABELS_ = {
   fatProjMinimo: 'Faturamento projetado no piso sugerido'
 };
 
-/** FASE 9 — painel viabilidade contratação (aba FOLHA + P&L). */
+/** FASE 9 — CLT simulado fora da UI de decisão do quiosque (ainda preenche ids legados). */
 function renderContratacaoPanel_(d) {
   const panel = document.getElementById('mk-contratacao-panel');
   const v = d && d.viabilidadeContratacao;
-  if (!panel || !v || !v.ok) {
-    if (panel) panel.style.display = 'none';
-    return;
+  if (panel) {
+    panel.style.display = 'none';
+    panel.hidden = true;
   }
-  panel.style.display = '';
+  if (!panel || !v || !v.ok) return;
   panel.classList.remove('mk-contrat-verde', 'mk-contrat-amarelo', 'mk-contrat-vermelho');
   const cls = v.nivel === 'verde' ? 'mk-contrat-verde' : v.nivel === 'amarelo' ? 'mk-contrat-amarelo' : 'mk-contrat-vermelho';
   panel.classList.add(cls);
@@ -4110,8 +4098,10 @@ function renderCaixaFromResumo_(dataFmt, r) {
     if (totalExt > 0) {
       const pct = totalEnt > 0 ? Math.round(totalExt / totalEnt * 1000) / 10 : 0;
       setText('cx-ext-ctx', nExt + ' loc · ' + pct + '% do fat.');
+      setText('cx-ext-sum-val', '· ' + fmtR(totalExt));
     } else {
       setText('cx-ext-ctx', 'Sem extras hoje');
+      setText('cx-ext-sum-val', '');
     }
     const cxExtIns = document.getElementById('cx-ext-insight');
     const extrasCancel = r.extrasCancelados || [];

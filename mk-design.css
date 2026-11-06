@@ -2449,6 +2449,9 @@
   gap: 10px;
   margin: 14px 0 12px;
 }
+.mk-cenarios-row--2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
 .mk-cenario {
   background: rgba(255, 255, 255, 0.55);
   border: 1px solid rgba(21, 101, 192, 0.12);

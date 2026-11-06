@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Movi Kids">
 <title>Movi Kids</title>
-<script src="mk-canonical-host.js?v=1.9.200"></script>
+<script src="mk-canonical-host.js?v=1.9.201"></script>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png">
@@ -17,17 +17,17 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<script src="mk-stale-sync.js?v=1.9.200"></script>
-<script src="mk-version.js?v=1.9.200"></script>
-<script src="mk-api.js?v=1.9.200"></script>
-<link rel="stylesheet" href="mk-design.css?v=1.9.200">
+<script src="mk-stale-sync.js?v=1.9.201"></script>
+<script src="mk-version.js?v=1.9.201"></script>
+<script src="mk-api.js?v=1.9.201"></script>
+<link rel="stylesheet" href="mk-design.css?v=1.9.201">
 
-<script src="mk-cache-bust.js?v=1.9.200"></script>
+<script src="mk-cache-bust.js?v=1.9.201"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<link rel="stylesheet" href="mk-app.css?v=1.9.200">
-<link rel="stylesheet" href="mk-gestao-pessoas.css?v=1.9.200">
+<link rel="stylesheet" href="mk-app.css?v=1.9.201">
+<link rel="stylesheet" href="mk-gestao-pessoas.css?v=1.9.201">
 <!-- Firebase SDK — Realtime sync canonico para todos os dispositivos -->
-<script type="module" src="mk-firebase.js?v=1.9.200"></script>
+<script type="module" src="mk-firebase.js?v=1.9.201"></script>
 </head>
 
 <body>
@@ -738,7 +738,7 @@
       <button type="button" class="mk-hub-door mk-hub-door--mes" onclick="irAdmin('dashboard')">
         <span class="mk-hub-door-icon">📈</span>
         <span class="mk-hub-door-title">Gestão do mês</span>
-        <span class="mk-hub-door-sub" id="hub-mes-sub">Dashboard, CTO e extras</span>
+        <span class="mk-hub-door-sub" id="hub-mes-sub">Lucro, CTO, ritmo e alertas</span>
       </button>
       <!-- Porta Sistema oculta — QR-only / sem mexer pelo app -->
       <button type="button" class="mk-hub-door mk-hub-door--sys" onclick="irAdmin('sistema')" hidden aria-hidden="true">
@@ -748,29 +748,29 @@
       </button>
     </div>
 
-    <div class="sec-title" style="margin-top:8px">Atalhos</div>
+    <div class="sec-title" style="margin-top:8px">Atalhos que ajudam a decidir</div>
     <div class="mk-hub-groups">
       <div class="mk-hub-group">
-        <div class="mk-hub-group-lbl">Financeiro</div>
+        <div class="mk-hub-group-lbl">Dinheiro</div>
         <div class="admin-cards" style="margin:0">
-          <div class="admin-action-card" onclick="irAdmin('historico')">
-            <div class="aac-icon">🗂️</div>
-            <div class="aac-body"><div class="aac-title">Hist. locações</div><div class="aac-sub">Período e analytics</div></div>
+          <div class="admin-action-card" onclick="irAdmin('receita-diaria')">
+            <div class="aac-icon">📅</div>
+            <div class="aac-body"><div class="aac-title">Receita dia a dia</div><div class="aac-sub">Onde o mês foi ganhando ou perdendo</div></div>
             <div class="aac-arrow">›</div>
           </div>
           <div class="admin-action-card" onclick="irAdmin('custos-historico')">
             <div class="aac-icon">📂</div>
-            <div class="aac-body"><div class="aac-title">Hist. custos</div><div class="aac-sub">Classificação e insights</div></div>
+            <div class="aac-body"><div class="aac-title">Custos</div><div class="aac-sub">O que saiu · por categoria</div></div>
             <div class="aac-arrow">›</div>
           </div>
           <div class="admin-action-card" onclick="irAdmin('relatorio')">
             <div class="aac-icon">📋</div>
-            <div class="aac-body"><div class="aac-title">Relatório PDF</div><div class="aac-sub">Mensal no Drive</div></div>
+            <div class="aac-body"><div class="aac-title">Relatório PDF</div><div class="aac-sub">Enviar ao shopping / contador</div></div>
             <div class="aac-arrow">›</div>
           </div>
-          <div class="admin-action-card" onclick="irAdmin('receita-diaria')">
-            <div class="aac-icon">📅</div>
-            <div class="aac-body"><div class="aac-title">Receita dia a dia</div><div class="aac-sub">Por loja · mês · sem baixar</div></div>
+          <div class="admin-action-card" onclick="irAdmin('historico')">
+            <div class="aac-icon">🗂️</div>
+            <div class="aac-body"><div class="aac-title">Hist. locações</div><div class="aac-sub">Busca e conferência de período</div></div>
             <div class="aac-arrow">›</div>
           </div>
         </div>
@@ -785,7 +785,8 @@
           </div>
         </div>
       </div>
-      <div class="mk-hub-group">
+      <!-- SMS/WhatsApp: operação QR-only — fora do hub de decisão -->
+      <div class="mk-hub-group" hidden aria-hidden="true">
         <div class="mk-hub-group-lbl">Mensagens</div>
         <div class="admin-cards" style="margin:0">
           <div class="admin-action-card" onclick="irAdmin('config')">
@@ -1171,30 +1172,32 @@
           <span class="mk-widget-ctx" id="cx-maq-ctx">PIX + débito + crédito</span>
         </div>
       </div>
-      <div class="mk-caixa-section-lbl">Minutos extras por forma de pagamento</div>
-      <div class="mk-cmd-grid mk-caixa-widgets-grid mk-caixa-pay-grid mk-caixa-extras-pay-grid">
-        <div class="mk-widget mk-widget--pay mk-widget--ext">
-          <span class="mk-widget-lbl">Extras PIX</span>
-          <span class="mk-widget-val purple" id="cx-ext-pix">R$ 0,00</span>
+      <details class="mk-caixa-extras-acc">
+        <summary class="mk-caixa-extras-sum">Minutos extras por forma de pagamento <span id="cx-ext-sum-val" class="mk-caixa-extras-sum-val"></span></summary>
+        <div class="mk-cmd-grid mk-caixa-widgets-grid mk-caixa-pay-grid mk-caixa-extras-pay-grid">
+          <div class="mk-widget mk-widget--pay mk-widget--ext">
+            <span class="mk-widget-lbl">Extras PIX</span>
+            <span class="mk-widget-val purple" id="cx-ext-pix">R$ 0,00</span>
+          </div>
+          <div class="mk-widget mk-widget--pay mk-widget--ext">
+            <span class="mk-widget-lbl">Extras débito</span>
+            <span class="mk-widget-val purple" id="cx-ext-deb">R$ 0,00</span>
+          </div>
+          <div class="mk-widget mk-widget--pay mk-widget--ext">
+            <span class="mk-widget-lbl">Extras crédito</span>
+            <span class="mk-widget-val purple" id="cx-ext-cred">R$ 0,00</span>
+          </div>
+          <div class="mk-widget mk-widget--pay mk-widget--ext">
+            <span class="mk-widget-lbl">Extras dinheiro</span>
+            <span class="mk-widget-val purple" id="cx-ext-din">R$ 0,00</span>
+          </div>
+          <div class="mk-widget mk-widget--pay mk-widget--ext mk-widget--ext-tot">
+            <span class="mk-widget-lbl">Total extras</span>
+            <span class="mk-widget-val purple" id="cx-ext">R$ 0,00</span>
+            <span class="mk-widget-ctx" id="cx-ext-ctx">Minutos adicionais</span>
+          </div>
         </div>
-        <div class="mk-widget mk-widget--pay mk-widget--ext">
-          <span class="mk-widget-lbl">Extras débito</span>
-          <span class="mk-widget-val purple" id="cx-ext-deb">R$ 0,00</span>
-        </div>
-        <div class="mk-widget mk-widget--pay mk-widget--ext">
-          <span class="mk-widget-lbl">Extras crédito</span>
-          <span class="mk-widget-val purple" id="cx-ext-cred">R$ 0,00</span>
-        </div>
-        <div class="mk-widget mk-widget--pay mk-widget--ext">
-          <span class="mk-widget-lbl">Extras dinheiro</span>
-          <span class="mk-widget-val purple" id="cx-ext-din">R$ 0,00</span>
-        </div>
-        <div class="mk-widget mk-widget--pay mk-widget--ext mk-widget--ext-tot">
-          <span class="mk-widget-lbl">Total extras</span>
-          <span class="mk-widget-val purple" id="cx-ext">R$ 0,00</span>
-          <span class="mk-widget-ctx" id="cx-ext-ctx">Minutos adicionais</span>
-        </div>
-      </div>
+      </details>
       <div class="mk-cmd-grid mk-caixa-widgets-grid mk-caixa-summary-grid">
         <div class="mk-widget mk-widget--hero mk-widget--fat">
           <span class="mk-widget-lbl">Faturamento do dia</span>
@@ -1290,16 +1293,10 @@
       </div>
     </div>
 
-    <!-- Resultado Final -->
-    <div style="background:var(--bg2);border-radius:var(--radius-sm);padding:16px;display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;border:1px solid var(--border)">
-      <div>
-        <div style="font-size:13px;color:var(--txt2)">Resultado do dia</div>
-        <div style="font-size:11px;color:var(--txt3);margin-top:2px">Total entradas − custos</div>
-      </div>
-      <div style="text-align:right">
-        <div style="font-size:22px;font-weight:500" id="cx-resultado-final">R$ 0,00</div>
-        <div style="font-size:11px;color:var(--txt3)" id="cx-resultado-calc"></div>
-      </div>
+    <!-- Resultado já no hero #cx-res — ids legados ocultos p/ scripts/export -->
+    <div hidden aria-hidden="true">
+      <div id="cx-resultado-final">R$ 0,00</div>
+      <div id="cx-resultado-calc"></div>
     </div>
 
     <!-- Export fechamento -->
@@ -1345,7 +1342,7 @@
         <span class="mk-dash-step mk-dash-step-live" aria-hidden="true">●</span>
         <div>
           <h2 class="mk-dash-chapter-title" id="mk-chapter-comando-h">Agora na operação</h2>
-          <p class="mk-dash-chapter-lead">Tempo real: locações, equipe, faturamento de hoje e alertas críticos.</p>
+          <p class="mk-dash-chapter-lead">Só o que está rodando agora. Conferência de dinheiro do dia fica em <strong>Caixa</strong>.</p>
           <div id="dash-dual-pills" class="mk-dual-pills-host"></div>
         </div>
       </header>
@@ -1387,14 +1384,14 @@
       <header class="mk-dash-chapter-head">
         <span class="mk-dash-step" aria-hidden="true">1</span>
         <div>
-          <h2 class="mk-dash-chapter-title" id="mk-chapter-inicio-h">Realizado este mês</h2>
-          <p class="mk-dash-chapter-lead">Só o que já aconteceu: faturamento, lucro <strong>sem folha</strong>, margem, payback e ocupação. Projeções ficam na seção 2.</p>
+          <h2 class="mk-dash-chapter-title" id="mk-chapter-inicio-h">Saúde financeira do mês</h2>
+          <p class="mk-dash-chapter-lead">O que já entrou e o que sobrou depois de custos + CTO. Sem simulação de folha — só dinheiro real da operação.</p>
         </div>
       </header>
     <div id="mk-exec-cockpit" class="mk-exec-cockpit" style="display:none" aria-live="polite">
       <div class="mk-exec-head">
         <div>
-          <div class="mk-exec-label">Cockpit executivo</div>
+          <div class="mk-exec-label">Saúde do mês</div>
           <div class="mk-exec-periodo" id="mk-exec-periodo">—</div>
         </div>
         <span class="mk-exec-badge" id="mk-exec-badge">Gestão</span>
@@ -1406,17 +1403,17 @@
           <div class="mk-exec-kpi-delta" id="mk-exec-fat-d">—</div>
         </div>
         <div class="mk-exec-kpi" id="mk-exec-kpi-lucro">
-          <div class="mk-exec-kpi-lbl">Lucro líquido · sem folha</div>
+          <div class="mk-exec-kpi-lbl">Lucro · após custos e CTO</div>
           <div class="mk-exec-kpi-val green" id="mk-exec-resultado">—</div>
           <div class="mk-exec-kpi-delta" id="mk-exec-res-d">—</div>
         </div>
         <div class="mk-exec-kpi">
-          <div class="mk-exec-kpi-lbl">Payback investimento</div>
+          <div class="mk-exec-kpi-lbl">CTO a pagar</div>
           <div class="mk-exec-kpi-val purple" id="mk-exec-payback">—</div>
           <div class="mk-exec-kpi-delta" id="mk-exec-pb-d">—</div>
         </div>
         <div class="mk-exec-kpi">
-          <div class="mk-exec-kpi-lbl">Ocupação média frota</div>
+          <div class="mk-exec-kpi-lbl">% da Base DRE</div>
           <div class="mk-exec-kpi-val blue" id="mk-exec-ocup">—</div>
           <div class="mk-exec-kpi-delta" id="mk-exec-ocup-d">—</div>
         </div>
@@ -1468,32 +1465,33 @@
       <header class="mk-dash-chapter-head">
         <span class="mk-dash-step" aria-hidden="true">2</span>
         <div>
-          <h2 class="mk-dash-chapter-title" id="mk-chapter-projecao-h">Previsão de faturamento</h2>
-          <p class="mk-dash-chapter-lead">Três referências fixas: <strong>Base DRE</strong> (piso do negócio) · <strong>Projetado</strong> (média 3 meses) · <strong>Ritmo</strong> (média últimos 3 dias). Hero = ritmo run rate.</p>
+          <h2 class="mk-dash-chapter-title" id="mk-chapter-projecao-h">Ritmo vs piso do negócio</h2>
+          <p class="mk-dash-chapter-lead">Duas âncoras só: <strong>Base</strong> (mínimo para sustentar) e <strong>Ritmo</strong> (média dos últimos 3 dias com venda). Sem terceira projeção.</p>
         </div>
       </header>
     <div id="mk-previsao-mes" class="mk-previsao-mes mk-glass-card" style="display:none" aria-labelledby="mk-previsao-mes-h" aria-live="polite">
       <header class="mk-previsao-head">
-        <h3 class="mk-previsao-title" id="mk-previsao-mes-h">Ritmo · run rate (últimos 3 dias)</h3>
+        <h3 class="mk-previsao-title" id="mk-previsao-mes-h">Ritmo · últimos 3 dias com venda</h3>
         <span class="mk-previsao-badge" id="mk-prev-badge">—</span>
       </header>
       <div class="mk-widget mk-widget--hero mk-previsao-hero">
-        <span class="mk-widget-lbl">Faturamento no ritmo (3 dias)</span>
+        <span class="mk-widget-lbl">Se o mês fechar no ritmo de agora</span>
         <span class="mk-widget-val blue" id="mk-prev-fat">—</span>
         <span class="mk-widget-ctx" id="mk-prev-fat-ctx">—</span>
       </div>
-      <div class="mk-cenarios-row" role="list" aria-label="Cenários de faturamento no fim do mês">
+      <div class="mk-cenarios-row mk-cenarios-row--2" role="list" aria-label="Base e ritmo no fim do mês">
         <div class="mk-cenario" role="listitem">
           <span class="mk-cenario-tag mk-cenario-tag-base">Base</span>
           <span class="mk-cenario-val" id="mk-prev-base">—</span>
-          <span class="mk-cenario-ctx" id="mk-prev-base-ctx">Piso DRE · folha + custos + margem</span>
+          <span class="mk-cenario-ctx" id="mk-prev-base-ctx">Piso para cobrir custos + CTO</span>
         </div>
         <div class="mk-cenario mk-cenario-ativo" role="listitem">
           <span class="mk-cenario-tag mk-cenario-tag-ritmo">Ritmo</span>
           <span class="mk-cenario-val" id="mk-prev-ritmo">—</span>
-          <span class="mk-cenario-ctx" id="mk-prev-ritmo-ctx">Run rate · recalcula todo dia</span>
+          <span class="mk-cenario-ctx" id="mk-prev-ritmo-ctx">Média 3 dias · recalcula todo dia</span>
         </div>
-        <div class="mk-cenario" role="listitem">
+        <!-- Projetado 3m: ruído para decisão diária — id legado oculto -->
+        <div class="mk-cenario" role="listitem" hidden aria-hidden="true">
           <span class="mk-cenario-tag mk-cenario-tag-7d">Projetado</span>
           <span class="mk-cenario-val" id="mk-prev-7d">—</span>
           <span class="mk-cenario-ctx" id="mk-prev-7d-ctx">Média dos 3 meses anteriores</span>
@@ -1519,24 +1517,25 @@
       <header class="mk-dash-chapter-head">
         <span class="mk-dash-step" aria-hidden="true">3</span>
         <div>
-          <h2 class="mk-dash-chapter-title" id="mk-chapter-lucro-h">Resultado e meta de locações</h2>
-          <p class="mk-dash-chapter-lead"><strong>Até hoje</strong> (real) vs <strong>projeção no ritmo</strong> — sem e com folha. Meta loc/dia = break-even do mês.</p>
+          <h2 class="mk-dash-chapter-title" id="mk-chapter-lucro-h">Meta do dia · break-even</h2>
+          <p class="mk-dash-chapter-lead">Quantas locações o dia precisa para o mês fechar no azul (depois de custos + CTO). Uma coluna só — operação real.</p>
         </div>
       </header>
 
-      <div id="mk-dash-decisao" class="mk-decisao-panel" style="display:none">
+      <div id="mk-dash-decisao" class="mk-decisao-panel mk-decisao-panel--simples" style="display:none">
         <div id="mk-meta-hoje" class="mk-meta-hoje" style="display:none" aria-live="polite">
           <div class="mk-meta-hoje-head">
             <span class="mk-meta-hoje-title">Meta de hoje</span>
             <span class="mk-meta-hoje-date" id="mk-meta-hoje-data">—</span>
           </div>
-          <div class="mk-meta-hoje-grid">
+          <div class="mk-meta-hoje-grid mk-meta-hoje-grid--1">
             <div class="mk-meta-hoje-card" id="mk-meta-hoje-sem">
-              <span class="mk-meta-hoje-lbl">Sem folha CLT</span>
+              <span class="mk-meta-hoje-lbl">Locações para o break-even</span>
               <span class="mk-meta-hoje-val" id="mk-meta-hoje-sem-val">—</span>
               <span class="mk-meta-hoje-sub" id="mk-meta-hoje-sem-sub">—</span>
             </div>
-            <div class="mk-meta-hoje-card mk-meta-hoje-card-folha" id="mk-meta-hoje-folha">
+            <!-- CLT simulado: fora da decisão diária -->
+            <div class="mk-meta-hoje-card mk-meta-hoje-card-folha" id="mk-meta-hoje-folha" hidden aria-hidden="true">
               <span class="mk-meta-hoje-lbl">Com folha simulada</span>
               <span class="mk-meta-hoje-val" id="mk-meta-hoje-folha-val">—</span>
               <span class="mk-meta-hoje-sub" id="mk-meta-hoje-folha-sub">—</span>
@@ -1544,33 +1543,33 @@
           </div>
         </div>
         <p class="mk-decisao-base" id="mk-decisao-base"></p>
-        <div class="mk-decisao-table" role="table" aria-label="Comparativo sem e com folha CLT">
+        <div class="mk-decisao-table" role="table" aria-label="Lucro e meta de locações">
           <div class="mk-decisao-tr mk-decisao-tr-head" role="row">
             <div class="mk-decisao-th mk-decisao-th-label" role="columnheader"></div>
-            <div class="mk-decisao-th" role="columnheader">Sem folha CLT</div>
-            <div class="mk-decisao-th mk-decisao-th-folha" role="columnheader">Com folha simulada</div>
+            <div class="mk-decisao-th" role="columnheader">Operação</div>
+            <div class="mk-decisao-th mk-decisao-th-folha" role="columnheader" hidden aria-hidden="true">Com folha simulada</div>
           </div>
           <div class="mk-decisao-tr" role="row">
             <div class="mk-decisao-row-lbl" role="rowheader">Até hoje <span id="mk-dec-dias-label" class="mk-decisao-dias">—</span></div>
             <div class="mk-decisao-cell" id="mk-dec-par-sem" role="cell">—</div>
-            <div class="mk-decisao-cell mk-decisao-cell-folha" id="mk-dec-par-folha" role="cell">—</div>
+            <div class="mk-decisao-cell mk-decisao-cell-folha" id="mk-dec-par-folha" role="cell" hidden aria-hidden="true">—</div>
           </div>
           <div class="mk-decisao-tr" role="row">
-            <div class="mk-decisao-row-lbl" role="rowheader">Projeção mês cheio</div>
+            <div class="mk-decisao-row-lbl" role="rowheader">Se fechar no ritmo</div>
             <div class="mk-decisao-cell" id="mk-dec-proj-sem" role="cell">—</div>
-            <div class="mk-decisao-cell mk-decisao-cell-folha" id="mk-dec-proj-folha" role="cell">—</div>
+            <div class="mk-decisao-cell mk-decisao-cell-folha" id="mk-dec-proj-folha" role="cell" hidden aria-hidden="true">—</div>
           </div>
           <div class="mk-decisao-tr" role="row">
-            <div class="mk-decisao-row-lbl" role="rowheader">Meta loc/dia <span class="mk-decisao-hint">(break-even mês)</span></div>
+            <div class="mk-decisao-row-lbl" role="rowheader">Meta loc/dia <span class="mk-decisao-hint">(break-even)</span></div>
             <div class="mk-decisao-cell" id="mk-dec-be-sem" role="cell">—</div>
-            <div class="mk-decisao-cell mk-decisao-cell-folha" id="mk-dec-be-folha" role="cell">—</div>
+            <div class="mk-decisao-cell mk-decisao-cell-folha" id="mk-dec-be-folha" role="cell" hidden aria-hidden="true">—</div>
           </div>
         </div>
         <p class="mk-decisao-foot" id="mk-decisao-foot"></p>
       </div>
 
-    <!-- FASE 9 — Viabilidade contratação CLT (aba FOLHA) -->
-    <div id="mk-contratacao-panel" class="mk-contratacao-panel" style="display:none" aria-live="polite">
+    <!-- FASE 9 CLT — oculto: não decide operação do quiosque no dia a dia -->
+    <div id="mk-contratacao-panel" class="mk-contratacao-panel" style="display:none" hidden aria-hidden="true" aria-live="polite">
       <div class="mk-contrat-head">
         <div>
           <div class="mk-contrat-label">Checklist — posso contratar CLT?</div>
@@ -1595,8 +1594,8 @@
       <header class="mk-dash-chapter-head">
         <span class="mk-dash-step" aria-hidden="true">4</span>
         <div>
-          <h2 class="mk-dash-chapter-title" id="mk-chapter-alertas-h">O que exige atenção agora</h2>
-          <p class="mk-dash-chapter-lead">Alertas automáticos — resolva ou monitore antes de decidir contratar.</p>
+          <h2 class="mk-dash-chapter-title" id="mk-chapter-alertas-h">O que exige atenção</h2>
+          <p class="mk-dash-chapter-lead">Só alertas que pedem ação — ritmo baixo, custo alto, CTO, operação.</p>
         </div>
       </header>
     <div id="mk-alert-strip" class="mk-alert-strip" style="display:none" aria-live="polite"></div>
@@ -1607,12 +1606,13 @@
       <header class="mk-dash-chapter-head">
         <span class="mk-dash-step" aria-hidden="true">5</span>
         <div>
-          <h2 class="mk-dash-chapter-title" id="mk-chapter-detalhe-h">Detalhe operacional</h2>
-          <p class="mk-dash-chapter-lead">Ticket, produtividade, break-even, CTO e indicadores complementares — sem nova projeção de faturamento.</p>
+          <h2 class="mk-dash-chapter-title" id="mk-chapter-detalhe-h">CTO e volume</h2>
+          <p class="mk-dash-chapter-lead">Quanto o shopping leva e quantas locações o mês fez. Ticket/R$/h e payback ficam fora — não mudam a decisão do dia.</p>
         </div>
       </header>
 
-    <div id="mk-leading-row" class="mk-leading-row" style="display:none">
+    <!-- Leading acadêmico oculto (ids legados p/ scripts) -->
+    <div id="mk-leading-row" class="mk-leading-row" style="display:none" hidden aria-hidden="true">
       <div class="mk-leading-kpi">
         <div class="mk-leading-lbl">Ticket médio</div>
         <div class="mk-leading-val" id="mk-lead-ticket">—</div>
@@ -1639,52 +1639,18 @@
         <div class="mk-leading-sub" id="mk-lead-be-folha-sub">—</div>
       </div>
     </div>
-    <div class="mk-leading-sens" id="mk-leading-sens" style="display:none"></div>
+    <div class="mk-leading-sens" id="mk-leading-sens" style="display:none" hidden aria-hidden="true"></div>
 
-    <!-- Alerta diário (Fase 5) -->
     <div id="nk-alerta" class="alerta-banner warn" style="display:none">
       <span class="alerta-icon">⚠️</span>
       <span id="nk-alerta-msg">Faturamento hoje abaixo da média</span>
     </div>
 
-    <details class="mk-admin-acc">
-      <summary class="mk-admin-acc-sum"><span class="mk-admin-acc-ico">📊</span> Indicadores complementares, CTO e payback</summary>
-      <div class="mk-admin-acc-body">
-
-    <!-- KPIs -->
-    <div class="new-kpi-row">
-      <div class="new-kpi">
-        <label>Faturamento do ano</label>
-        <div class="nkv purple" id="nk-fatano">...</div>
-        <div class="nks" id="nk-fatano-sub">acumulado do ano</div>
-      </div>
-      <div class="new-kpi">
-        <label>Locações no mês</label>
-        <div class="nkv blue" id="nk-nloc">...</div>
-        <div class="nks" id="nk-nloc-sub">dias com movimento</div>
-      </div>
-      <div class="new-kpi">
-        <label>Cancelamentos</label>
-        <div class="nkv red" id="nk-canc">...</div>
-        <div class="nks" id="nk-canc-sub">no mês</div>
-      </div>
-      <div class="new-kpi">
-        <label>Extras no mês</label>
-        <div class="nkv green" id="nk-extmes">...</div>
-        <div class="nks" id="nk-extmes-sub">minutos adicionais</div>
-      </div>
-      <div class="new-kpi new-kpi-link" role="button" tabindex="0" onclick="irAdmin('caixa')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();irAdmin('caixa')}" title="Abrir Caixa do dia — locações, pagamentos e conferência">
-        <label>Caixa de hoje</label>
-        <div class="nkv blue" id="nk-fathoje">—</div>
-        <div class="nks" id="nk-cushoje">locações hoje · ver detalhes</div>
-      </div>
-    </div>
-
-    <!-- CTO -->
+    <!-- CTO em evidência (decisão mensal) -->
     <div class="cto-strip" id="nk-cto-strip" style="margin-bottom:14px">
       <div class="cto-strip-top">
         <div>
-          <div class="cto-strip-label">CTO — Golden Shopping</div>
+          <div class="cto-strip-label">CTO — quanto o shopping leva</div>
           <div class="cto-strip-title" id="nk-cto-title">Calculando...</div>
         </div>
         <span class="cto-pill" id="nk-cto-mes">—º mês</span>
@@ -1693,14 +1659,42 @@
         <div class="cto-n"><div class="cto-n-val blue" id="nk-cto-fat">—</div><div class="cto-n-lbl">Faturamento</div></div>
         <div class="cto-n"><div class="cto-n-val" style="color:#E65100" id="nk-cto-val">—</div><div class="cto-n-lbl">CTO a pagar</div></div>
         <div class="cto-n"><div class="cto-n-val" style="color:#c62828" id="nk-cto-cus">—</div><div class="cto-n-lbl">Custos operac.</div></div>
-        <div class="cto-n"><div class="cto-n-val" style="color:#2E7D32" id="nk-cto-disp">—</div><div class="cto-n-lbl">Lucro sem folha</div></div>
+        <div class="cto-n"><div class="cto-n-val" style="color:#2E7D32" id="nk-cto-disp">—</div><div class="cto-n-lbl">Lucro após CTO</div></div>
       </div>
       <div class="cto-bar-bg"><div class="cto-bar-fill" id="nk-cto-bar" style="width:0%"></div></div>
       <div class="cto-note" id="nk-cto-note">CTO = 0% do faturamento</div>
     </div>
 
-    <!-- Payback investimento -->
-    <div class="payback-strip" id="nk-payback-strip" style="display:none">
+    <div class="new-kpi-row">
+      <div class="new-kpi">
+        <label>Locações no mês</label>
+        <div class="nkv blue" id="nk-nloc">...</div>
+        <div class="nks" id="nk-nloc-sub">dias com movimento</div>
+      </div>
+      <div class="new-kpi">
+        <label>Extras no mês</label>
+        <div class="nkv green" id="nk-extmes">...</div>
+        <div class="nks" id="nk-extmes-sub">minutos adicionais</div>
+      </div>
+      <div class="new-kpi">
+        <label>Cancelamentos</label>
+        <div class="nkv red" id="nk-canc">...</div>
+        <div class="nks" id="nk-canc-sub">no mês</div>
+      </div>
+      <div class="new-kpi new-kpi-link" role="button" tabindex="0" onclick="irAdmin('caixa')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();irAdmin('caixa')}" title="Abrir Caixa do dia">
+        <label>Caixa de hoje</label>
+        <div class="nkv blue" id="nk-fathoje">—</div>
+        <div class="nks" id="nk-cushoje">abrir conferência</div>
+      </div>
+      <!-- Fat ano / payback: não mudam a rotina do quiosque -->
+      <div class="new-kpi" hidden aria-hidden="true">
+        <label>Faturamento do ano</label>
+        <div class="nkv purple" id="nk-fatano">...</div>
+        <div class="nks" id="nk-fatano-sub">acumulado do ano</div>
+      </div>
+    </div>
+
+    <div class="payback-strip" id="nk-payback-strip" style="display:none" hidden aria-hidden="true">
       <div class="payback-strip-top">
         <div>
           <div class="payback-strip-label">Payback do investimento</div>
@@ -1717,9 +1711,6 @@
       <div class="payback-bar-bg"><div class="payback-bar-fill" id="nk-pb-bar" style="width:0%"></div></div>
       <div class="payback-note" id="nk-pb-note">—</div>
     </div>
-
-      </div>
-    </details>
     </section>
 
     <!-- 6 · GRÁFICOS -->
@@ -1727,8 +1718,8 @@
       <header class="mk-dash-chapter-head">
         <span class="mk-dash-step" aria-hidden="true">6</span>
         <div>
-          <h2 class="mk-dash-chapter-title" id="mk-chapter-tendencia-h">Gráficos e tendência</h2>
-          <p class="mk-dash-chapter-lead">Visual do mês: semanas, Base DRE × Ritmo 3d × Real e detalhe por dia/tipo.</p>
+          <h2 class="mk-dash-chapter-title" id="mk-chapter-tendencia-h">Gráficos que importam</h2>
+          <p class="mk-dash-chapter-lead">Semana a semana, dia a dia e ritmo vs piso. O resto (extras, ranking, pico) fica recolhido.</p>
         </div>
       </header>
 
@@ -1775,18 +1766,43 @@
       </div>
     </div>
 
-    <!-- Faturamento diário -->
+    <!-- Essenciais: diário + Base×Ritmo×Real -->
     <div class="new-chart-card" style="margin-bottom:14px">
       <div class="new-chart-title">
         Faturamento diário
-        <span class="nct-note" id="nk-avg-label">ritmo do mês · âncora histórica</span>
+        <span class="nct-note" id="nk-avg-label">ritmo do mês</span>
       </div>
       <div style="position:relative;height:300px">
         <canvas id="chart-diario" role="img" aria-label="Faturamento diário do mês">Faturamento diário.</canvas>
       </div>
     </div>
 
-    <!-- Extras por dia (mês) -->
+    <div class="new-chart-card mk-meta-chart-card" style="margin-bottom:14px">
+      <div class="new-chart-title">
+        Base × ritmo × real acumulado
+        <span class="nct-note" id="nk-receita-mes-label">—</span>
+      </div>
+      <p class="mk-meta-chart-hint" id="nk-receita-mes-hint" style="margin:0 0 8px;font-size:12px;line-height:1.35;color:var(--mk-muted,#666)">
+        <strong>Real</strong> = o que entrou · <strong>Base</strong> = piso do mês ·
+        <strong>Ritmo</strong> = se todo dia fosse igual aos últimos 3 dias com venda.
+      </p>
+      <div class="mk-meta-chart-legend" id="nk-receita-mes-legend" aria-hidden="true">
+        <span class="mk-meta-leg mk-meta-leg-real"><i></i> Real acumulado</span>
+        <span class="mk-meta-leg mk-meta-leg-base"><i></i> Base DRE (pro-rata)</span>
+        <span class="mk-meta-leg mk-meta-leg-ritmo"><i></i> Ritmo 3d</span>
+        <span class="mk-meta-leg mk-meta-leg-ok"><i></i> Real ≥ base</span>
+        <span class="mk-meta-leg mk-meta-leg-fail"><i></i> Real &lt; base</span>
+      </div>
+      <div style="position:relative;height:280px">
+        <canvas id="chart-receita-mes" role="img" aria-label="Base, ritmo e real acumulado">Base × ritmo × real.</canvas>
+      </div>
+      <div class="db-insight" id="nk-receita-mes-insight" style="display:none;margin-top:8px"></div>
+    </div>
+
+    <details class="mk-admin-acc">
+      <summary class="mk-admin-acc-sum"><span class="mk-admin-acc-ico">📉</span> Mais gráficos — extras, meta, tipo, pico, operador</summary>
+      <div class="mk-admin-acc-body">
+
     <div class="new-chart-card" style="margin-bottom:14px">
       <div class="new-chart-title">
         Minutos extras — receita por dia
@@ -1798,7 +1814,6 @@
       <div class="db-insight" id="nk-ext-insight" style="display:none;margin-top:8px"></div>
     </div>
 
-    <!-- Meta locações — dia a dia -->
     <div class="new-chart-card mk-meta-chart-card" style="margin-bottom:14px">
       <div class="new-chart-title">
         Meta de locações — dia a dia
@@ -1806,57 +1821,32 @@
       </div>
       <div class="mk-meta-chart-legend" id="nk-meta-dia-legend" aria-hidden="true">
         <span class="mk-meta-leg mk-meta-leg-loc"><i></i> Locações do dia</span>
-        <span class="mk-meta-leg mk-meta-leg-sem"><i></i> Meta sem folha</span>
-        <span class="mk-meta-leg mk-meta-leg-folha"><i></i> Meta com folha</span>
+        <span class="mk-meta-leg mk-meta-leg-sem"><i></i> Meta break-even</span>
+        <span class="mk-meta-leg mk-meta-leg-folha" hidden aria-hidden="true"><i></i> Meta com folha</span>
         <span class="mk-meta-leg mk-meta-leg-ok"><i></i> Bateu a meta</span>
         <span class="mk-meta-leg mk-meta-leg-fail"><i></i> Abaixo da meta</span>
       </div>
       <div style="position:relative;height:280px">
-        <canvas id="chart-meta-dia" role="img" aria-label="Locações diárias versus meta sem e com folha">Meta de locações por dia.</canvas>
+        <canvas id="chart-meta-dia" role="img" aria-label="Locações diárias versus meta">Meta de locações por dia.</canvas>
       </div>
       <div class="db-insight" id="nk-meta-dia-insight" style="display:none;margin-top:8px"></div>
     </div>
 
-    <!-- I150/I157d: Base × ritmo × real — três linhas no gráfico -->
     <div class="new-chart-card mk-meta-chart-card" style="margin-bottom:14px">
       <div class="new-chart-title">
-        Base DRE × ritmo (3 dias) × real acumulado
-        <span class="nct-note" id="nk-receita-mes-label">—</span>
-      </div>
-      <p class="mk-meta-chart-hint" id="nk-receita-mes-hint" style="margin:0 0 8px;font-size:12px;line-height:1.35;color:var(--mk-muted,#666)">
-        <strong>Real</strong> = o que entrou · <strong>Base DRE</strong> = piso do mês ÷ dias (pro-rata) ·
-        <strong>Ritmo</strong> = se todo dia fosse igual aos últimos 3 dias com venda (termômetro, não meta).
-      </p>
-      <div class="mk-meta-chart-legend" id="nk-receita-mes-legend" aria-hidden="true">
-        <span class="mk-meta-leg mk-meta-leg-real"><i></i> Real acumulado</span>
-        <span class="mk-meta-leg mk-meta-leg-base"><i></i> Base DRE (pro-rata)</span>
-        <span class="mk-meta-leg mk-meta-leg-ritmo"><i></i> Ritmo 3d (se todos os dias)</span>
-        <span class="mk-meta-leg mk-meta-leg-ok"><i></i> Real ≥ base</span>
-        <span class="mk-meta-leg mk-meta-leg-fail"><i></i> Real &lt; base</span>
-      </div>
-      <div style="position:relative;height:280px">
-        <canvas id="chart-receita-mes" role="img" aria-label="Base de sustentação, ritmo alcançável e real acumulado dia a dia">Base × ritmo × real.</canvas>
-      </div>
-      <div class="db-insight" id="nk-receita-mes-insight" style="display:none;margin-top:8px"></div>
-    </div>
-
-    <!-- Receita mês a mês — realizado vs projetado -->
-    <div class="new-chart-card mk-meta-chart-card" style="margin-bottom:14px">
-      <div class="new-chart-title">
-        Receita mês a mês — realizado vs projetado
+        Receita mês a mês
         <span class="nct-note" id="nk-hist-meses-label">—</span>
       </div>
       <div class="mk-meta-chart-legend" id="nk-hist-meses-legend" aria-hidden="true">
         <span class="mk-meta-leg mk-meta-leg-loc"><i></i> Realizado</span>
-        <span class="mk-meta-leg mk-meta-leg-folha"><i></i> Projetado (média 3 meses)</span>
+        <span class="mk-meta-leg mk-meta-leg-folha"><i></i> Média 3 meses</span>
       </div>
       <div style="position:relative;height:260px">
-        <canvas id="chart-historico-meses" role="img" aria-label="Comparativo mensal de receita realizada versus projetada">Receita mês a mês.</canvas>
+        <canvas id="chart-historico-meses" role="img" aria-label="Receita mês a mês">Receita mês a mês.</canvas>
       </div>
       <div class="db-insight" id="nk-hist-meses-insight" style="display:none;margin-top:8px"></div>
     </div>
 
-    <!-- Por tipo + Pico -->
     <div class="new-row">
       <div class="new-chart-card">
         <div class="new-chart-title">Por tipo de veículo</div>
@@ -1872,7 +1862,6 @@
       </div>
     </div>
 
-    <!-- Ranking veículos + Pagamento+Plano -->
     <div class="new-row">
       <div class="new-chart-card">
         <div class="new-chart-title">Ranking por veículo</div>
@@ -1887,10 +1876,6 @@
       </div>
     </div>
 
-    <!-- Pacote F — gestão avançada do mês -->
-    <details class="mk-admin-acc">
-      <summary class="mk-admin-acc-sum"><span class="mk-admin-acc-ico">🔬</span> Gestão avançada — Operador · Cancel · Ocupação · Custos · Recorrência</summary>
-      <div class="mk-admin-acc-body">
     <div class="new-row">
       <div class="new-chart-card">
         <div class="new-chart-title">Desempenho por operador</div>
@@ -1904,7 +1889,7 @@
       </div>
     </div>
     <div class="new-chart-card" style="margin-bottom:14px">
-      <div class="new-chart-title">Ocupação da frota <span class="nct-note">minutos usados / capacidade estimada (12h·dia)</span></div>
+      <div class="new-chart-title">Ocupação da frota <span class="nct-note">minutos usados / capacidade (12h·dia)</span></div>
       <div class="vrank-grid" id="nk-ocupacao-grid"></div>
       <div class="db-insight" id="nk-ocupacao-insight" style="display:none"></div>
     </div>
@@ -1914,7 +1899,8 @@
         <div id="nk-custo-cat-rows"><div class="nks" style="padding:8px 0">Carregando...</div></div>
         <div class="db-insight" id="nk-custo-insight" style="display:none"></div>
       </div>
-      <div class="new-chart-card">
+      <!-- Recorrência: pouco acionável no quiosque — id legado oculto -->
+      <div class="new-chart-card" hidden aria-hidden="true">
         <div class="new-chart-title">Recorrência de clientes</div>
         <div id="nk-recorrencia-summary" class="nks" style="padding:4px 0 10px">—</div>
         <div class="db-insight" id="nk-recorrencia-insight" style="display:none"></div>
@@ -2634,34 +2620,34 @@
   </div>
 </div>
 
-<script src="mk-globals.js?v=1.9.200"></script>
-<script src="mk-unidades.js?v=1.9.200"></script>
-<script src="mk-core.js?v=1.9.200"></script>
-<script src="mk-nav.js?v=1.9.200"></script>
-<script src="mk-admin.js?v=1.9.200"></script>
-<script src="mk-historico.js?v=1.9.200"></script>
-<script src="mk-custos-historico.js?v=1.9.200"></script>
-<script src="mk-sessao.js?v=1.9.200"></script>
-<script src="mk-home.js?v=1.9.200"></script>
-<script src="mk-holding.js?v=1.9.200"></script>
-<script src="mk-dual-ui.js?v=1.9.200"></script>
-<script src="mk-meta-operador.js?v=1.9.200"></script>
-<script src="mk-custos.js?v=1.9.200"></script>
-<script src="mk-avulso.js?v=1.9.200"></script>
-<script src="mk-sync.js?v=1.9.200"></script>
-<script src="mk-idb-store.js?v=1.9.200"></script>
-<script src="mk-offline-queue.js?v=1.9.200"></script>
-<script src="mk-local-snapshot.js?v=1.9.200"></script>
-<script src="mk-nova.js?v=1.9.200"></script>
-<script src="mk-relacionamento.js?v=1.9.200"></script>
-<script src="mk-operacao.js?v=1.9.200"></script>
-<script src="mk-drawer.js?v=1.9.200"></script>
-<script src="mk-enc-extra.js?v=1.9.200"></script>
-<script src="mk-update.js?v=1.9.200"></script>
-<script src="mk-gestao-pessoas.js?v=1.9.200"></script>
-<script src="mk-holerite.js?v=1.9.200"></script>
-<script src="mk-gestao-pessoas-admin.js?v=1.9.200"></script>
-<script src="mk-auth.js?v=1.9.200"></script>
-<script src="mk-boot.js?v=1.9.200"></script>
+<script src="mk-globals.js?v=1.9.201"></script>
+<script src="mk-unidades.js?v=1.9.201"></script>
+<script src="mk-core.js?v=1.9.201"></script>
+<script src="mk-nav.js?v=1.9.201"></script>
+<script src="mk-admin.js?v=1.9.201"></script>
+<script src="mk-historico.js?v=1.9.201"></script>
+<script src="mk-custos-historico.js?v=1.9.201"></script>
+<script src="mk-sessao.js?v=1.9.201"></script>
+<script src="mk-home.js?v=1.9.201"></script>
+<script src="mk-holding.js?v=1.9.201"></script>
+<script src="mk-dual-ui.js?v=1.9.201"></script>
+<script src="mk-meta-operador.js?v=1.9.201"></script>
+<script src="mk-custos.js?v=1.9.201"></script>
+<script src="mk-avulso.js?v=1.9.201"></script>
+<script src="mk-sync.js?v=1.9.201"></script>
+<script src="mk-idb-store.js?v=1.9.201"></script>
+<script src="mk-offline-queue.js?v=1.9.201"></script>
+<script src="mk-local-snapshot.js?v=1.9.201"></script>
+<script src="mk-nova.js?v=1.9.201"></script>
+<script src="mk-relacionamento.js?v=1.9.201"></script>
+<script src="mk-operacao.js?v=1.9.201"></script>
+<script src="mk-drawer.js?v=1.9.201"></script>
+<script src="mk-enc-extra.js?v=1.9.201"></script>
+<script src="mk-update.js?v=1.9.201"></script>
+<script src="mk-gestao-pessoas.js?v=1.9.201"></script>
+<script src="mk-holerite.js?v=1.9.201"></script>
+<script src="mk-gestao-pessoas-admin.js?v=1.9.201"></script>
+<script src="mk-auth.js?v=1.9.201"></script>
+<script src="mk-boot.js?v=1.9.201"></script>
 </body>
 </html>

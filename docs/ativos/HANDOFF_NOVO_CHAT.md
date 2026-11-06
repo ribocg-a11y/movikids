@@ -1,19 +1,19 @@
 # MOVI KIDS — Handoff para novo chat (ativo)
 
-**Atualizado:** 06/11/2026 · FE **v1.9.200** · GAS Web **v1.5.239** · repo **v1.5.239** I203c · **ler** `PROTOCOLO_MUDANCA_TABELA_PRECOS_FROTA.md`
+**Atualizado:** 06/11/2026 · FE **v1.9.201** · GAS Web **v1.5.239** · repo **v1.5.239** I203c · **ler** `PROTOCOLO_MUDANCA_TABELA_PRECOS_FROTA.md`
 
 ## Produção (agora)
 
 | Camada | Versão | Link |
 |--------|--------|------|
-| Frontend | **v1.9.200** | https://ribocg-a11y.github.io/movikids/?force=1.9.200 |
-| Gestão Pessoas | **v1.9.200** | `gestao-pessoas.html?force=1.9.200` |
+| Frontend | **v1.9.201** | https://ribocg-a11y.github.io/movikids/?force=1.9.201 |
+| Gestão Pessoas | **v1.9.201** | `gestao-pessoas.html?force=1.9.201` |
 | GAS | ping Web **v1.5.239** · repo **v1.5.239** | I203c live — valorPlano + avulso |
 
 **Frota Golden:** 4 carros · 3 triciclos · **4 pelúcias** · Dino 01/02 · preços=LV.  
-**I203c:** Avulso Golden+Dino · loc 5355/5356 **vp=vt=15** · fat Golden **R$ 130** · `TESTE_I203` PASS · `CORRIGIR_I203_VALOR_PLANO_POS_WEB` OK.  
-**UI 06/11:** colaborador **dentro** do card da loja (Holding) + strip no balcão — menu “Colaboradores” não é mais irmão de Lojas.  
-**Teste:** `?force=1.9.200` · Holding mostra Raykelly em Golden · Lanç. Avulso 🦖 Dino.
+**I203c:** Avulso Golden+Dino · loc 5355/5356 **vp=vt=15** · fat Golden **R$ 130** · `TESTE_I203` PASS.  
+**UI 06/11:** colaborador **dentro** da loja · Dashboard **decisão-first** (saúde/CTO/ritmo vs base; sem CLT/payback/3ª projeção na frente).  
+**Teste:** `?force=1.9.201` · Holding Raykelly · Dashboard sem ruído CLT.
 
 ---
 
