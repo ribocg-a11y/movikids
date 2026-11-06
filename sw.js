@@ -1,6 +1,6 @@
 // MOVI KIDS - Service Worker 1.7.12 · I187 shell cache
 
-const SW_VERSION = '1.9.196';
+const SW_VERSION = '1.9.197';
 const MK_SHELL_CACHE = 'mk-shell-' + SW_VERSION;
 
 const NETWORK_FIRST = [

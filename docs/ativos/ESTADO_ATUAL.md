@@ -1,8 +1,8 @@
-# MOVI KIDS — Estado atual (05/11/2026 · FE v1.9.196 · La Ville)
+# MOVI KIDS — Estado atual (06/11/2026 · FE v1.9.197 · La Ville)
 
 Referência única para alinhamento local × produção.
 
-**Ciclo dev ativo:** **`PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`** — Sprint D · **La Ville inaugurou 06/10/2026** · FE **v1.9.196** (I200 paint-only + guard) · GAS **v1.5.237** · **I191–I200** · **I181** Ray+Karen · isolamento **I170–I178** ✅ · **I158** Golden ✅  
+**Ciclo dev ativo:** **`PLANEJAMENTO_CICLO_POS_ONEUI_2026-06.md`** — Sprint D · **La Ville inaugurou 06/10/2026** · FE **v1.9.197** (I203 Golden=LV) · GAS repo **v1.5.238** · Web **v1.5.237** · **I191–I203** · **I181** Ray+Karen · isolamento **I170–I178** ✅ · **I158** Golden ✅  
 
 **Marco Ops:** **La Ville Mall — início de operações em 06/10/2026** (2ª unidade ao lado do Golden).  
 **CTO La Ville:** contrato merchandising quiosque **R$ 2.300/mês** · venc. dia 10 · PDF em `entregas/CONTRATO_MERCHANDISING_QUIOSQUE_MOVIKIDS.pdf`.
@@ -52,14 +52,15 @@ FE mínimo em operação: **v1.7.35** (recomendado **v1.7.41+**). Teste tablet o
 
 ---
 
-## Produção (05/11/2026)
+## Produção (06/11/2026)
 
 | Camada | Versão | URL / evidência |
 |--------|--------|-----------------|
-| **Frontend** | **v1.9.196** | https://ribocg-a11y.github.io/movikids/?force=1.9.196 |
-| **Gestão Pessoas** | **v1.9.196** | `gestao-pessoas.html?force=1.9.196` |
-| **Service Worker** | **1.9.196** | I200 paint-only + guard.i200 |
-| **Apps Script** | ping **v1.5.237** · repo **v1.5.237** | Triciclo 03 · I182 escala |
+| **Frontend** | **v1.9.197** | https://ribocg-a11y.github.io/movikids/?force=1.9.197 |
+| **Gestão Pessoas** | **v1.9.197** | `gestao-pessoas.html?force=1.9.197` |
+| **Service Worker** | **1.9.197** | I203 Golden=LV + label Dino |
+| **Apps Script** | ping **v1.5.237** · repo **v1.5.238** | I203 — Nova versão Web pendente |
+| **CONFIG Golden** | ✅ live I203 | preços=LV · +Dino 01/02 |
 | **La Ville ops** | ✅ **06/10/2026** | 2ª unidade em operação (D+0) |
 | **I166–I168 Folha/PDF** | ✅ FE | cache-first · Blob PDF · set R$14.577 |
 | **I159–I178 La Ville** | ✅ FE+GAS | Holding/balcão · isolamento dual validado |

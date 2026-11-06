@@ -1,6 +1,6 @@
 # MOVI KIDS — Mapa de erros, falhas e bugs
 
-**Atualizado:** 05/11/2026 — **I202** portal responsável UX/versão · FE **v1.9.196**
+**Atualizado:** 06/11/2026 — **I203** Golden=La Ville preços/dinos · FE **v1.9.197** · GAS repo **v1.5.238**
 **Uso anterior:** 05/11/2026 — **I201** tooling pwsh + auditoria · FE **v1.9.195** · GAS **v1.5.237**  
 **Uso anterior:** 05/11/2026 — **I200** folha loading loop ensureFull · FE **v1.9.195** · GAS **v1.5.237**  
 **Uso anterior:** 05/11/2026 — **I199** folha Outubro troca competência · FE **v1.9.193** · GAS **v1.5.237**  
@@ -168,6 +168,7 @@ Docs: `INCIDENTE_I153_*` · `INCIDENTE_I154_*` · `INCIDENTE_I155_*` · `EVIDENC
 | **I199** | Folha Outubro “não carrega” PC+celular | Troca de mês herda voo; folha de outro mês conta como pronta; fila hydrate | cancel+match competência · serialize Folha · timeout 180s · FE **v1.9.193** | ✅ FE |
 | **I200** | Folha Out “Carregando…” eterno pós-I199 | `renderFolha` mismatch → `ensureFull` → loading → falha → loop | render sem ensureFull · watchdog 195s · tip loading · FE **v1.9.195** | ✅ FE |
 | **I202** | Portal responsável defasado + gate/empty fracos | `?v=1.9.158` · caixa err vazia · sem foot Trocar | alinhamento I3 portal · empty/foot/nome · `guard.portal.version` · FE **v1.9.196** | ✅ FE |
+| **I203** | Golden ≠ La Ville (valores/tempos) + sem dinos | CONFIG antiga 12–55+3h · validator sem Dino | CONFIG live LV · GAS **v1.5.238** validator/Dino · FE label · **v1.9.197** | ✅ CONFIG+FE · Web 238 pendente |
 | **I201** | Protocolo diagnóstico FAIL no Linux/CI | Scripts orquestram com `powershell` (só Windows) | `pwsh` + fallback · regex GAS 1.5.2xx nos testes · `AUDITORIA_SISTEMA_2026-11-05` | ✅ scripts |
 
 **Veredito offline:** balcão **parcial** — Nova + ▶ + Encerrar + Cancelar enfileiram e sobem ao voltar rede. Estender/editar/admin/login ainda exigem rede. SMS/WhatsApp ignorados (`qr_only`). **Regra I191:** flag offline em linha real (ri>0) **não** vence `listarAtivas`. **Regra I192:** parcial/`listarAtivas` **não** apaga Encerradas do dia. **Regra I193:** **nunca** push FE com parse quebrado. **Regra I197:** Firebase/cache **nunca** autoridade de Ativa; holding lê **mapa** `sessoesAtivas`. **Regra I198:** erro → política nomeada + audit família + movimento estratégico (`EVOLUCAO_ESTRATEGICA_POS_I197.md`).

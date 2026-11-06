@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.237
+// MOVI KIDS — Google Apps Script v1.5.238
+// v1.5.238: I203 — Golden = La Ville (preços/tempos; Dino 01/02; validar Dino/Drift; cache CONFIG)
 // v1.5.237: frota Golden — Triciclo 03 em VEICULOS_VALIDOS (CONFIG planilha já live)
 // v1.5.236: I182 — escala Golden: Raykelly 10h–16h / Karen 16h–22h seg–sáb · folga domingo
 // v1.5.235: I181 — par meta FSS Raykelly+Karen (3↔5); Julia pausa; Jennifer La Ville sem meta
@@ -229,7 +230,7 @@
 
 // ── CONSTANTES ───────────────────────────────────────────────
 /** Versão exposta em ping, carregarInicio, validarSchema, gestaoPessoasStatus (bump com header). */
-const MK_GAS_VERSAO_  = 'v1.5.237';
+const MK_GAS_VERSAO_  = 'v1.5.238';
 const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.231';
 const SHEET_ID   = '1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618';
 const DEPLOY_ID  = 'AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y';
@@ -338,39 +339,35 @@ const CONTRAT_MARGEM_BASE_MIN_ = 10;
 /** I150 — manutenção mensal fixa no piso DRE (independe de lançamentos na aba CUSTOS). */
 const DRE_MANUTENCAO_MENSAL_ = 1200;
 
-// ── VEÍCULOS VÁLIDOS — v1.5.111: Carro 04 · v1.5.21: Triciclo 02 · 03/11: Triciclo 03 ─
+// ── VEÍCULOS VÁLIDOS — v1.5.238 I203: + Dino 01/02 (paridade La Ville tempos/valores)
 const VEICULOS_VALIDOS = [
   'Carro 01','Carro 02','Carro 03','Carro 04',
   'Triciclo 01','Triciclo 02','Triciclo 03',
-  'Pelúcia 01','Pelúcia 02','Pelúcia 03','Pelúcia 04'
+  'Pelúcia 01','Pelúcia 02','Pelúcia 03','Pelúcia 04',
+  'Dino 01','Dino 02'
 ];
 
-// ── TABELA DE PREÇOS — v1.5.3: Triciclo = mesmos valores de Carro
+// ── TABELA DE PREÇOS — v1.5.238 I203: mesma grade La Ville (sem plano 3h)
+const PRECOS_GOLDEN_BRINQUEDOS_ = {
+  '10min': { valor: 15, mins: 10, adicional: 1.5 },
+  '20min': { valor: 25, mins: 20, adicional: 1.5 },
+  '30min': { valor: 35, mins: 30, adicional: 1.5 },
+  '40min': { valor: 45, mins: 40, adicional: 1.5 },
+  '60min': { valor: 65, mins: 60, adicional: 1.5 }
+};
+const PRECOS_GOLDEN_DINOS_ = {
+  '10min': { valor: 20, mins: 10, adicional: 2 },
+  '20min': { valor: 35, mins: 20, adicional: 2 },
+  '30min': { valor: 50, mins: 30, adicional: 2 },
+  '40min': { valor: 65, mins: 40, adicional: 2 },
+  '60min': { valor: 90, mins: 60, adicional: 2 }
+};
 const PRECOS = {
-  'Carro': {
-    '10min': { valor: 12,  mins: 10,  adicional: 1.00 },
-    '20min': { valor: 22,  mins: 20,  adicional: 1.00 },
-    '30min': { valor: 30,  mins: 30,  adicional: 1.00 },
-    '40min': { valor: 40,  mins: 40,  adicional: 1.00 },
-    '60min': { valor: 55,  mins: 60,  adicional: 1.00 },
-    '3h':    { valor: 130, mins: 180, adicional: 1.00 },
-  },
-  'Triciclo': {
-    '10min': { valor: 12,  mins: 10,  adicional: 1.00 },
-    '20min': { valor: 22,  mins: 20,  adicional: 1.00 },
-    '30min': { valor: 30,  mins: 30,  adicional: 1.00 },
-    '40min': { valor: 40,  mins: 40,  adicional: 1.00 },
-    '60min': { valor: 55,  mins: 60,  adicional: 1.00 },
-    '3h':    { valor: 130, mins: 180, adicional: 1.00 },
-  },
-  'Pelúcia': {
-    '10min': { valor: 15,  mins: 10,  adicional: 1.20 },
-    '20min': { valor: 25,  mins: 20,  adicional: 1.20 },
-    '30min': { valor: 35,  mins: 30,  adicional: 1.20 },
-    '40min': { valor: 45,  mins: 40,  adicional: 1.20 },
-    '60min': { valor: 65,  mins: 60,  adicional: 1.20 },
-    '3h':    { valor: 150, mins: 180, adicional: 1.20 },
-  }
+  'Carro': PRECOS_GOLDEN_BRINQUEDOS_,
+  'Triciclo': PRECOS_GOLDEN_BRINQUEDOS_,
+  'Pelúcia': PRECOS_GOLDEN_BRINQUEDOS_,
+  'Drift': PRECOS_GOLDEN_BRINQUEDOS_,
+  'Dino': PRECOS_GOLDEN_DINOS_
 };
 
 // ── MULTI-UNIDADE I159/I159c — golden = CONFIG planilha; laville = catálogo embutido (LV*)
@@ -883,6 +880,7 @@ function dispatchMoviAction_(p, method) {
       case 'carregarOperacaoConfig': return carregarOperacaoConfig_();
       case 'diagnosticoConfigOperacional': return diagnosticoConfigOperacional_();
       case 'salvarOperacaoConfigAdmin': return salvarOperacaoConfigAdmin_(p);
+      case 'alinharGoldenLavilleConfigAdmin': return alinharGoldenLavilleConfigAdmin_(p);
       case 'definirPerfilOperadorAdmin': return definirPerfilOperadorAdmin_(p);
       case 'listarResponsaveis': return listarResponsaveis_(p);
       case 'salvarResponsavel': return salvarResponsavel_(p);
@@ -9671,7 +9669,7 @@ function payloadOperacaoConfigFe_(cfg) {
 }
 
 const OPCFG_PLANOS_SCHEMA_ = ['10min', '20min', '30min', '40min', '60min', '3h'];
-const OPCFG_TIPOS_SCHEMA_ = ['Carro', 'Triciclo', 'Pelúcia'];
+const OPCFG_TIPOS_SCHEMA_ = ['Carro', 'Triciclo', 'Pelúcia', 'Drift', 'Dino'];
 
 function validarVeiculosConfig_(veiculos) {
   const erros = [];
@@ -9688,10 +9686,21 @@ function validarVeiculosConfig_(veiculos) {
     }
     if (seen[nome]) erros.push('Veiculo duplicado: ' + nome);
     seen[nome] = true;
-    const tipoOk = nome.indexOf('Carro') >= 0 || nome.indexOf('Triciclo') >= 0 || nome.indexOf('Pel') >= 0;
-    if (!tipoOk) erros.push(nome + ': nome deve indicar Carro, Triciclo ou Pelucia');
+    // I203: Dino/Drift (Golden + La Ville) — além de Carro/Triciclo/Pelúcia
+    const tipoOk = nome.indexOf('Carro') >= 0
+      || nome.indexOf('Triciclo') >= 0
+      || nome.indexOf('Pel') >= 0
+      || nome.indexOf('Dino') >= 0
+      || nome.indexOf('Drift') >= 0
+      || nome.indexOf('Driffyt') >= 0;
+    if (!tipoOk) erros.push(nome + ': nome deve indicar Carro, Triciclo, Pelucia, Dino ou Drift');
   });
   return erros;
+}
+
+/** I203 — invalida cache 60s da CONFIG Golden após escrita admin. */
+function invalidateOperacaoConfigCache_() {
+  try { CacheService.getScriptCache().remove('operacaoConfig_v1'); } catch (eInv) { /* ok */ }
 }
 
 function validarPrecosConfig_(precos) {
@@ -9782,10 +9791,41 @@ function salvarOperacaoConfigAdmin_(p) {
     cfgSetValue_('precos_json', JSON.stringify(precos));
   }
   if (veiculos === null && precos === null) return err_('Informe veiculos_validos_json e/ou precos_json', 400);
+  try { invalidateOperacaoConfigCache_(); } catch (e0) {}
   try { invalidateInicioResumoCache_(fmtData_(new Date())); } catch (e) {}
   const cfg = operacaoConfig_();
   return resp_({
     mensagem: 'Configuracao operacional salva',
+    config: payloadOperacaoConfigFe_(cfg)
+  });
+}
+
+/**
+ * I203 — alinha frota/preços Golden = grade La Ville (CONFIG planilha).
+ * Após Nova versão Web v1.5.238+: renomeia "Dino 0N Carro" → "Dino 0N".
+ */
+function alinharGoldenLavilleConfigAdmin_(p) {
+  if (!isAdminRequest_(p) && !adminPinOk_(p)) return err_('Acesso negado — somente admin', 403);
+  const limpos = VEICULOS_VALIDOS.slice();
+  const errosV = validarVeiculosConfig_(limpos);
+  if (errosV.length) return err_(errosV.join(' · '), 400);
+  const precos = {
+    Carro: PRECOS_GOLDEN_BRINQUEDOS_,
+    Triciclo: PRECOS_GOLDEN_BRINQUEDOS_,
+    'Pelúcia': PRECOS_GOLDEN_BRINQUEDOS_,
+    Drift: PRECOS_GOLDEN_BRINQUEDOS_,
+    Dino: PRECOS_GOLDEN_DINOS_
+  };
+  const errosP = validarPrecosConfig_(precos);
+  if (errosP.length) return err_(errosP.join(' · '), 400);
+  cfgSetValue_('veiculos_validos_json', JSON.stringify(limpos));
+  cfgSetValue_('precos_json', JSON.stringify(precos));
+  try { invalidateOperacaoConfigCache_(); } catch (e0) {}
+  try { invalidateInicioResumoCache_(fmtData_(new Date())); } catch (e) {}
+  const cfg = operacaoConfig_();
+  return resp_({
+    mensagem: 'Golden alinhado a La Ville (preços/tempos + Dino 01/02)',
+    versao: 'v1.5.238',
     config: payloadOperacaoConfigFe_(cfg)
   });
 }

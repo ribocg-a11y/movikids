@@ -282,7 +282,9 @@
     { nome: 'Pelúcia 01', tipo: 'Pelúcia' },
     { nome: 'Pelúcia 02', tipo: 'Pelúcia' },
     { nome: 'Pelúcia 03', tipo: 'Pelúcia' },
-    { nome: 'Pelúcia 04', tipo: 'Pelúcia' }
+    { nome: 'Pelúcia 04', tipo: 'Pelúcia' },
+    { nome: 'Dino 01', tipo: 'Dino' },
+    { nome: 'Dino 02', tipo: 'Dino' }
   ];
 
   function capturarSnapGoldenSePreciso_() {
@@ -412,10 +414,16 @@
     });
   }
 
-  /** Label amigável no balcão — esconde prefixo técnico "LV " (ID interno permanece com LV). */
+  /**
+   * Label amigável no balcão:
+   * - esconde prefixo técnico "LV " (ID interno permanece com LV)
+   * - I203 interim: "Dino 0N Carro" (bypass validador Web antigo) → "Dino 0N"
+   */
   function veiculoLabelUi_(nome) {
     var s = String(nome || '').trim();
-    if (s.indexOf('LV ') === 0) return s.slice(3);
+    if (s.indexOf('LV ') === 0) s = s.slice(3);
+    var mDino = /^Dino\s+(\d+)\s+Carro$/i.exec(s);
+    if (mDino) return 'Dino ' + mDino[1];
     return s;
   }
 
