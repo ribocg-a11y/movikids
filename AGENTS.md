@@ -2,19 +2,19 @@
 
 Sistema operacional de locações — balcão (tablet na loja), portal do responsável, painel admin.
 
-**Ciclo ativo (06/11/2026):** Sprint D · **La Ville ops desde 06/10/2026** · FE **v1.9.197** I203 · GAS repo **v1.5.238** · Web **v1.5.237** · ler `APRENDIZADO_AGENTE`
+**Ciclo ativo (06/11/2026):** Sprint D · **La Ville ops desde 06/10/2026** · FE **v1.9.198** I203b · GAS Web **v1.5.238** · repo **v1.5.239** · ler `APRENDIZADO` A10/A11
 
 **Para retomar (agente local PC — pasta C):**
 
-> *Continuar MOVI KIDS — La Ville ops 06/10 · FE `?force=1.9.197` · GAS repo **v1.5.238** I203 · Web **v1.5.237** até Nova versão · Golden=LV preços+dinos*
+> *Continuar MOVI KIDS — La Ville ops 06/10 · FE `?force=1.9.198` · GAS Web **v1.5.238** · repo **v1.5.239** I203b · Golden 4 pelúcias+2 dinos preços=LV*
 
 ## Produção atual
 
 | Camada | Versão | Link |
 |--------|--------|------|
-| Frontend | **v1.9.197** | https://ribocg-a11y.github.io/movikids/?force=1.9.197 |
-| Gestão Pessoas | **v1.9.197** | `gestao-pessoas.html?force=1.9.197` |
-| GAS | ping Web **v1.5.237** · repo **v1.5.238** | I203 Golden=LV — Nova versão pendente |
+| Frontend | **v1.9.198** | https://ribocg-a11y.github.io/movikids/?force=1.9.198 |
+| Gestão Pessoas | **v1.9.198** | `gestao-pessoas.html?force=1.9.198` |
+| GAS | ping Web **v1.5.238** · repo **v1.5.239** | I203b — Nova versão 239 |
 | Design System | **v1.1** | `docs/referencia/DESIGN_SYSTEM_MOVIKIDS.md` |
 | Aprendizado agente | **I191–I198** | `docs/ativos/APRENDIZADO_AGENTE_MOVIKIDS.md` |
 | Evolução estratégica | E*/G*/P* | `docs/ativos/EVOLUCAO_ESTRATEGICA_POS_I197.md` |

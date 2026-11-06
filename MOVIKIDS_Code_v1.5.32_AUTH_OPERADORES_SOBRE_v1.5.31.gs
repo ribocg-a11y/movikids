@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// MOVI KIDS — Google Apps Script v1.5.238
+// MOVI KIDS — Google Apps Script v1.5.239
+// v1.5.239: I203b — frota Golden ≠ quantidades LV (mantém 4 pelúcias); CUSTOS header 7 cols; pós-alinhar
 // v1.5.238: I203 — Golden = La Ville (preços/tempos; Dino 01/02; validar Dino/Drift; cache CONFIG)
 // v1.5.237: frota Golden — Triciclo 03 em VEICULOS_VALIDOS (CONFIG planilha já live)
 // v1.5.236: I182 — escala Golden: Raykelly 10h–16h / Karen 16h–22h seg–sáb · folga domingo
@@ -230,7 +231,7 @@
 
 // ── CONSTANTES ───────────────────────────────────────────────
 /** Versão exposta em ping, carregarInicio, validarSchema, gestaoPessoasStatus (bump com header). */
-const MK_GAS_VERSAO_  = 'v1.5.238';
+const MK_GAS_VERSAO_  = 'v1.5.239';
 const MK_GAS_SISTEMA_ = 'MOVI KIDS v1.5.231';
 const SHEET_ID   = '1ULMUx8AqZkZ75Ed0iRK_lQWc3I7YV9Itfoe-1JY5618';
 const DEPLOY_ID  = 'AKfycbwakQ-_aWsF5lFGLsiwB5UvJ4AlpW88krSv8daPeMvULwX5FOIdMhGVgdGd0G35270Y';
@@ -1854,7 +1855,20 @@ function repairCustosFormatosCore_() {
   sheet.getRange(start, 3, n, 1).setNumberFormat('hh:mm');
   sheet.getRange(start, 4, n, 2).setNumberFormat('@');
   sheet.getRange(start, 6, n, 1).setNumberFormat('"R$" #,##0.00');
-  return { linhas: n };
+  // I203b — backfill unidade_id (col G) vazio → golden (legado pré-dual)
+  let filledUid = 0;
+  const uidRange = sheet.getRange(start, COL_CUS_UNIDADE_ID_, n, 1);
+  const uidVals = uidRange.getValues();
+  for (let i = 0; i < uidVals.length; i++) {
+    const idCell = sheet.getRange(start + i, 1).getValue();
+    if (idCell === '' || idCell === null || idCell === undefined) continue;
+    if (!String(uidVals[i][0] || '').trim()) {
+      uidVals[i][0] = MK_UNIDADE_DEFAULT_;
+      filledUid++;
+    }
+  }
+  if (filledUid) uidRange.setValues(uidVals);
+  return { linhas: n, unidadeIdBackfill: filledUid };
 }
 
 function auditCustosSampleCore_(amostra) {
@@ -1903,12 +1917,12 @@ function repararCustosPlanilhaAdmin_(p) {
     try { invalidateInicioResumoCache_(fmtData_(new Date())); } catch (e) {}
     const schema = validarCustosSchema_(sh_getOrCreate_(SH_CUS));
     return resp_({
-      mensagem: 'CUSTOS reparada (memorial, headers 6 cols, formatos, protecao)',
+      mensagem: 'CUSTOS reparada (memorial, headers 7 cols + unidade_id, formatos, protecao)',
       memorial: memorial,
       formatos: formatos,
       audit: audit,
       schemaOk: schema.ok,
-      versao: 'v1.5.152'
+      versao: MK_GAS_VERSAO_
     });
   } catch (ex) {
     return err_('repararCustosPlanilhaAdmin: ' + ex.message, 500);
@@ -9801,12 +9815,16 @@ function salvarOperacaoConfigAdmin_(p) {
 }
 
 /**
- * I203 — alinha frota/preços Golden = grade La Ville (CONFIG planilha).
- * Após Nova versão Web v1.5.238+: renomeia "Dino 0N Carro" → "Dino 0N".
+ * I203/I203b — preços/tempos Golden = grade La Ville; frota Golden própria
+ * (4 carros · 3 triciclos · 4 pelúcias · 2 dinos — NÃO copiar quantidades LV).
  */
 function alinharGoldenLavilleConfigAdmin_(p) {
   if (!isAdminRequest_(p) && !adminPinOk_(p)) return err_('Acesso negado — somente admin', 403);
   const limpos = VEICULOS_VALIDOS.slice();
+  const nPel = limpos.filter(function (n) { return String(n).indexOf('Pel') >= 0; }).length;
+  if (nPel !== 4) return err_('I203b: frota Golden deve ter 4 pelúcias (achou ' + nPel + ')', 400);
+  const nDino = limpos.filter(function (n) { return String(n).indexOf('Dino') >= 0; }).length;
+  if (nDino !== 2) return err_('I203b: frota Golden deve ter 2 dinos (achou ' + nDino + ')', 400);
   const errosV = validarVeiculosConfig_(limpos);
   if (errosV.length) return err_(errosV.join(' · '), 400);
   const precos = {
@@ -9824,8 +9842,8 @@ function alinharGoldenLavilleConfigAdmin_(p) {
   try { invalidateInicioResumoCache_(fmtData_(new Date())); } catch (e) {}
   const cfg = operacaoConfig_();
   return resp_({
-    mensagem: 'Golden alinhado a La Ville (preços/tempos + Dino 01/02)',
-    versao: 'v1.5.238',
+    mensagem: 'Golden: preços=LV · frota própria (4 pelúcias + Dino 01/02)',
+    versao: MK_GAS_VERSAO_,
     config: payloadOperacaoConfigFe_(cfg)
   });
 }

@@ -286,14 +286,18 @@ function irAdmin(page) {
   }
 }
 
-const OPCFG_TIPOS_ = ['Carro', 'Triciclo', 'Pelúcia'];
-const OPCFG_PLANOS_ = ['10min', '20min', '30min', '40min', '60min', '3h'];
+/** I203 — tipos Golden/LV; planos ativos sem 3h (legado 3h só se vier no CONFIG). */
+const OPCFG_TIPOS_ = ['Carro', 'Triciclo', 'Pelúcia', 'Drift', 'Dino'];
+const OPCFG_PLANOS_ = ['10min', '20min', '30min', '40min', '60min'];
+const OPCFG_PLANOS_LEGACY_ = ['10min', '20min', '30min', '40min', '60min', '3h'];
 let opCfgEditorTab_ = 'Carro';
 let opCfgPreviewTab_ = 'Carro';
 let opCfgDraftPrecos_ = null;
 
 function opCfgInferTipo_(nome) {
   const n = String(nome || '');
+  if (n.indexOf('Drift') >= 0 || n.indexOf('Driffyt') >= 0) return 'Drift';
+  if (n.indexOf('Dino') >= 0) return 'Dino';
   if (n.indexOf('Triciclo') >= 0) return 'Triciclo';
   if (n.indexOf('Pel') >= 0) return 'Pelúcia';
   return 'Carro';
@@ -313,14 +317,15 @@ function opCfgNormalizePrecos_(src) {
   if (!src || typeof src !== 'object') return out;
   OPCFG_TIPOS_.forEach(tipo => {
     const plans = src[tipo] || {};
-    OPCFG_PLANOS_.forEach(pl => {
+    OPCFG_PLANOS_LEGACY_.forEach(pl => {
       const c = plans[pl];
       if (!c) return;
-      out[tipo][pl] = {
-        valor: Number(c.valor != null ? c.valor : c.v),
-        mins: Number(c.mins != null ? c.mins : c.m),
-        adicional: Number(c.adicional != null ? c.adicional : c.a)
-      };
+      const valor = Number(c.valor != null ? c.valor : c.v);
+      const mins = Number(c.mins != null ? c.mins : c.m);
+      const adicional = Number(c.adicional != null ? c.adicional : c.a);
+      if (!(valor > 0 && mins > 0) && pl === '3h') return; // I203: não recriar 3h zerado
+      if (!out[tipo][pl]) out[tipo][pl] = { valor: 0, mins: 0, adicional: 0 };
+      out[tipo][pl] = { valor: valor, mins: mins, adicional: adicional };
     });
   });
   return out;
@@ -546,10 +551,30 @@ function opCfgLoadIntoEditor_(cfg) {
   opCfgAtualizarPreview_();
 }
 
+function opCfgStripPrecosVazios_(precos) {
+  const out = {};
+  Object.keys(precos || {}).forEach(tipo => {
+    const plans = precos[tipo] || {};
+    const keep = {};
+    Object.keys(plans).forEach(pl => {
+      const c = plans[pl] || {};
+      if (Number(c.valor) > 0 && Number(c.mins) > 0) {
+        keep[pl] = {
+          valor: Number(c.valor),
+          mins: Number(c.mins),
+          adicional: Number(c.adicional) || 0
+        };
+      }
+    });
+    if (Object.keys(keep).length) out[tipo] = keep;
+  });
+  return out;
+}
+
 function opCfgCollectFromDom_(validate) {
   opCfgSavePrecosPanelToDraft_();
   const veiculos = opCfgCollectVeiculosFromDom_();
-  const precos = JSON.parse(JSON.stringify(opCfgDraftPrecosEnsure_()));
+  const precosRaw = JSON.parse(JSON.stringify(opCfgDraftPrecosEnsure_()));
   if (validate) {
     if (!veiculos.length) throw new Error('Adicione pelo menos um veículo.');
     const seen = {};
@@ -560,7 +585,7 @@ function opCfgCollectFromDom_(validate) {
     let temPlano = false;
     OPCFG_TIPOS_.forEach(tipo => {
       OPCFG_PLANOS_.forEach(pl => {
-        const c = precos[tipo][pl];
+        const c = (precosRaw[tipo] && precosRaw[tipo][pl]) || { valor: 0, mins: 0, adicional: 0 };
         if (c.valor > 0 && c.mins > 0) temPlano = true;
         if ((c.valor > 0 || c.mins > 0 || c.adicional > 0) && !(c.valor > 0 && c.mins > 0)) {
           throw new Error('Plano incompleto: ' + tipo + ' · ' + (PLANO_LABELS[pl] || pl));
@@ -569,7 +594,8 @@ function opCfgCollectFromDom_(validate) {
     });
     if (!temPlano) throw new Error('Informe valor e minutos em pelo menos um plano.');
   }
-  return { veiculos, precos };
+  // I203: não gravar 3h/zerados — evita regressão da tabela LV no CONFIG
+  return { veiculos, precos: opCfgStripPrecosVazios_(precosRaw) };
 }
 
 async function carregarResumoOperacaoConfig_() {

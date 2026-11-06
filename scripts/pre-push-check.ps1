@@ -589,6 +589,28 @@ try {
     }
   }
 
+  # I203/I203b — Golden preços=LV; frota própria (4 pelúcias + 2 dinos); FE fallback sem tabela antiga
+  $globalsI203 = Join-Path $root "mk-globals.js"
+  $homeI203 = Join-Path $root "mk-home.js"
+  $gasI203Path = Join-Path $root "MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs"
+  if ((Test-Path $globalsI203) -and (Test-Path $homeI203) -and (Test-Path $gasI203Path) -and (Test-Path $uniJs)) {
+    $gRaw203 = Get-Content -Path $globalsI203 -Raw -Encoding UTF8
+    $hRaw203 = Get-Content -Path $homeI203 -Raw -Encoding UTF8
+    $gas203 = Get-Content -Path $gasI203Path -Raw -Encoding UTF8
+    $uni203 = Get-Content -Path $uniJs -Raw -Encoding UTF8
+    if ($gRaw203 -match "'10min':\{v:12," -or $gRaw203 -notmatch "'Dino':") {
+      Add-Check "guard.i203.fe.precos" "fail" "mk-globals PRECOS ainda tabela antiga ou sem Dino (I203)"
+    } elseif ($hRaw203 -notmatch "Dino 01" -or $hRaw203 -notmatch "Pelúcia 04" -or $uni203 -notmatch "Pelúcia 04" -or $uni203 -notmatch "Dino 01") {
+      Add-Check "guard.i203.fe.frota" "fail" "fallback frota Golden sem 4 pelúcias + 2 dinos (I203b)"
+    } elseif ($gas203 -notmatch "'Pelúcia 04'" -or $gas203 -notmatch "'Dino 01'" -or $gas203 -notmatch "alinharGoldenLavilleConfigAdmin_" -or $gas203 -notmatch "nPel !== 4") {
+      Add-Check "guard.i203.gas.frota" "fail" "GAS VEICULOS/alinhar sem trava 4 pelúcias (I203b)"
+    } else {
+      Add-Check "guard.i203.paridade" "ok" "FE+GAS Golden preços LV · 4 pelúcias · 2 dinos"
+    }
+  } else {
+    Add-Check "guard.i203.paridade" "fail" "arquivos I203 ausentes"
+  }
+
   $gasCanon = Join-Path $root "MOVIKIDS_Code_v1.5.32_AUTH_OPERADORES_SOBRE_v1.5.31.gs"
   if (Test-Path $gasCanon) {
     $gasRawI159 = Get-Content -Path $gasCanon -Raw -Encoding UTF8
@@ -1531,6 +1553,12 @@ try {
     if ($LASTEXITCODE -ne 0) { Add-Check "teste.i151" "fail" "exit $LASTEXITCODE" }
     else { Add-Check "teste.i151" "ok" "TESTE_I151_ENCERRAR_FANTASMA_READONLY" }
 
+    $i203 = Join-Path $testDir "TESTE_I203_GOLDEN_PARIDADE_LAVILLE_READONLY.ps1"
+    if (-not (Test-Path $i203)) { throw "TESTE_I203_GOLDEN_PARIDADE_LAVILLE_READONLY.ps1 nao encontrado" }
+    $i203Out = & $i203 2>&1 | Out-String
+    if ($LASTEXITCODE -ne 0) { Add-Check "teste.i203" "fail" "exit $LASTEXITCODE" }
+    else { Add-Check "teste.i203" "ok" "TESTE_I203_GOLDEN_PARIDADE_LAVILLE_READONLY" }
+
     $iso = Join-Path $testDir "TESTE_ISOLAMENTO_MULTIUNIDADE_READONLY.ps1"
     if (-not (Test-Path $iso)) { throw "TESTE_ISOLAMENTO_MULTIUNIDADE_READONLY.ps1 nao encontrado" }
     $isoOut = & $iso 2>&1 | Out-String
@@ -1544,6 +1572,7 @@ try {
     Add-Check "teste.i120" "skip" "SkipNetworkTests"
     Add-Check "teste.i121" "skip" "SkipNetworkTests"
     Add-Check "teste.i151" "skip" "SkipNetworkTests"
+    Add-Check "teste.i203" "skip" "SkipNetworkTests"
     Add-Check "teste.isolamento" "skip" "SkipNetworkTests"
   }
 } catch {

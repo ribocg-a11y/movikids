@@ -32,6 +32,8 @@ Este doc é a memória operacional do que o agente **já deveria saber sozinho**
 | A7 | **PC ≠ tablet** | Sync “ok” no PowerShell não prova balcão; fantasma vive no PWA/LS/IDB |
 | A8 | **FE sem push = banner nunca aparece** | I24 — bump local sem Pages é entrega falsa |
 | A9 | **Paint/render NUNCA dispara rede** | `renderX` que chama `ensure*`/`load` após falha = “Carregando…” eterno (I200). Rede só por intenção: tab, select, botão retry |
+| A10 | **Paridade de preços ≠ copiar frota** | Golden=LV em **valores/tempos**; quantidades são por loja (Golden **4 pelúcias**, LV 3). Mudar tabela = varrer CONFIG + `mk-globals` + admin OPCFG + fallbacks + schema CUSTOS |
+| A11 | **CONFIG/admin pode reverter o live** | Editor OPCFG que só conhece Carro/Triciclo/Pelúcia+3h **apaga Dino** e **recria 3h** no save — strip vazios + tipos completos no mesmo commit |
 
 ### 1.2 Família de falha (como eu erro)
 
@@ -98,6 +100,7 @@ Quando a arquitetura **exige**, o agente age sozinho:
 | Fixou fantasma / sync | Varrer Firebase, cache, snapshot, offline prune, boot |
 | Fixou sessão/login holding | Varrer banner, chip, GP badges, deslogar, lock UI, ops-balcao |
 | Fixou `unidadeId` | Grep `apiParamsComAuth_` / `Object.assign` / `all→golden` |
+| Mudou preços/frota | Planilha CONFIG via API · `mk-globals` · admin OPCFG · fallbacks home/nova/operacao · `validarSchema` abas · teste I203 |
 | Novo incidente I* | Entrada no MAPA + guard no pre-push + HANDOFF |
 | Audit achou P0/P1 FE | Implementar na mesma sessão (não só relatório) |
 | `encerramento-sessao` exit ≠ 0 | Push / alinhar Pages — não explicar e parar |
