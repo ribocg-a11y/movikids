@@ -3784,11 +3784,16 @@ function agregarCaixaPorConta_(enc) {
     }
   });
   enc.forEach(function (i) {
-    const vPlano = Number(i.valorPlano) || 0;
+    // I203c: autoridade do caixa = valorTotal (K). valorPlano desatualizado
+    // (ex.: correção ADM só no total) não pode derrubar fat vs kpiMes.
     const vExt = Number(i.valorAdicional) || 0;
+    const vTotalRaw = Number(i.valorTotal);
+    const vPlanoRaw = Number(i.valorPlano) || 0;
+    const vTotal = !isNaN(vTotalRaw) ? vTotalRaw : (vPlanoRaw + vExt);
+    const vPlano = Math.max(0, Math.round((vTotal - vExt) * 100) / 100);
     const pagPlano = normalizarPagamento_(i.pagamento) || 'Não informado';
     const pagExt = i.extraPagamento ? normalizarPagamento_(i.extraPagamento) : pagPlano;
-    fat += vPlano + vExt;
+    fat += vTotal;
     porPagamento[pagPlano] = (porPagamento[pagPlano] || 0) + vPlano;
     if (vExt > 0) {
       totalExt += vExt;
