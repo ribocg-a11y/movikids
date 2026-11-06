@@ -101,6 +101,9 @@
       if (r.fat != null) fat = Number(r.fat) || 0;
     }
     var u = typeof mkUnidadeGet_ === 'function' ? mkUnidadeGet_(uid) : { nome: uid, nomeCurto: uid };
+    /* Colaborador do turno pertence à loja (mapa sessoesAtivas) — não ao menu holding. */
+    var map = (typeof mkAuthGetSessoesAtivas_ === 'function') ? mkAuthGetSessoesAtivas_() : null;
+    var sessOp = (map && map[uid] && map[uid].nome) ? map[uid] : null;
     return {
       id: uid,
       nome: u.nome || uid,
@@ -112,8 +115,41 @@
       nSessoes: nSessoes,
       fat: fat,
       provisoria: !!u.frotaProvisoria,
+      colab: sessOp
+        ? { nome: sessOp.nome, loggedAt: sessOp.loggedAt, operadorId: sessOp.operadorId }
+        : null,
       _kpiFonte: (r && r.ok) ? 'resumoDia' : 'encHoje'
     };
+  }
+
+  function fmtHoraColab_(ms) {
+    var n = Number(ms || 0);
+    if (!n) return '';
+    try {
+      return new Date(n).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    } catch (e) {
+      return '';
+    }
+  }
+
+  function colabHtml_(p) {
+    var c = p && p.colab;
+    var ent = c ? fmtHoraColab_(c.loggedAt) : '';
+    var nome = c && c.nome ? escHold_(c.nome) : 'Nenhum turno neste balcão';
+    var meta = c
+      ? (ent ? ('No balcão desde ' + escHold_(ent)) : 'Turno ativo nesta loja')
+      : 'Abra o balcão para o colaborador entrar';
+    return (
+      '<div class="mk-hold-colab' + (c ? ' mk-hold-colab--on' : '') + '">' +
+        '<div class="mk-hold-colab-main">' +
+          '<span class="mk-hold-colab-lbl">Colaborador</span>' +
+          '<strong class="mk-hold-colab-nome">' + nome + '</strong>' +
+          '<span class="mk-hold-colab-meta">' + meta + '</span>' +
+        '</div>' +
+        '<button type="button" class="btn btn-secondary mk-hold-colab-btn"' +
+          ' onclick="mkHoldingAbrirColaboradores_(\'' + p.id + '\')">Equipe</button>' +
+      '</div>'
+    );
   }
 
   function rowHtml_(s) {
@@ -199,6 +235,7 @@
           '<div class="mk-hold-kpi"><span class="mk-hold-kpi-val">' + p.nSessoes + '</span><span class="mk-hold-kpi-lbl">Locações</span></div>' +
           '<div class="mk-hold-kpi mk-hold-kpi--fat"><span class="mk-hold-kpi-val">' + fmtMoney_(p.fat) + '</span><span class="mk-hold-kpi-lbl">Caixa hoje</span></div>' +
         '</div>' +
+        colabHtml_(p) +
         '<div class="mk-hold-sec-lbl">Sessões abertas</div>' +
         '<div class="mk-hold-list">' + rows + '</div>' +
         '<div class="mk-hold-sec-lbl">Encerradas hoje</div>' +
@@ -346,6 +383,17 @@
     }
   }
 
+  /** Abre hub Colaboradores no contexto da loja (não como irmão de Lojas no menu). */
+  function mkHoldingAbrirColaboradores_(uid) {
+    var id = String(uid || '').toLowerCase();
+    if (id === 'golden' || id === 'laville') {
+      if (typeof mkUnidadeSet_ === 'function') {
+        try { mkUnidadeSet_(id); } catch (eU) { /* ignore */ }
+      }
+    }
+    if (typeof mkAbrirColaboradores_ === 'function') mkAbrirColaboradores_();
+  }
+
   function mkHoldingAbrirBalcao_(uid) {
     var r;
     /* Não usar resetBalcao: ele zera os números e apaga o cache das duas lojas.
@@ -398,6 +446,7 @@
 
   w.renderHolding_ = renderHolding_;
   w.mkHoldingAbrirBalcao_ = mkHoldingAbrirBalcao_;
+  w.mkHoldingAbrirColaboradores_ = mkHoldingAbrirColaboradores_;
   w.mkHoldingSetFiltroCaixa_ = mkHoldingSetFiltroCaixa_;
   w.mkHoldingHydrateKpis_ = hydrateHoldingKpis_;
 })(typeof window !== 'undefined' ? window : globalThis);

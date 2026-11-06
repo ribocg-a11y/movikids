@@ -208,6 +208,39 @@ function atualizarOperadorUI_(sessaoServidor) {
         : ('Turno inválido — ' + s.nome + ' não está no servidor. Faça login de novo.');
     }
   }
+
+  /* Colaborador DENTRO da loja (home balcão) — não só no rodapé do menu. */
+  const colabStrip = document.getElementById('mk-balcao-colab');
+  if (colabStrip) {
+    if (holdOn || !homeOn) {
+      colabStrip.hidden = true;
+    } else {
+      let colabSess = null;
+      try {
+        const mapC = (typeof mkAuthGetSessoesAtivas_ === 'function') ? mkAuthGetSessoesAtivas_() : null;
+        if (currUid && mapC && mapC[currUid] && mapC[currUid].nome) colabSess = mapC[currUid];
+      } catch (eMap) { colabSess = null; }
+      if (!colabSess && temBalcao && srv && srv.nome) colabSess = srv;
+      colabStrip.hidden = false;
+      const nomeEl = document.getElementById('mk-balcao-colab-nome');
+      const metaEl = document.getElementById('mk-balcao-colab-meta');
+      if (colabSess && colabSess.nome) {
+        colabStrip.classList.remove('mk-balcao-colab--empty');
+        if (nomeEl) nomeEl.textContent = colabSess.nome;
+        const entC = fmtHoraTurno_(colabSess.loggedAt);
+        if (metaEl) metaEl.textContent = entC ? ('No balcão desde ' + entC) : 'Turno ativo';
+      } else {
+        colabStrip.classList.add('mk-balcao-colab--empty');
+        if (nomeEl) nomeEl.textContent = 'Nenhum turno neste balcão';
+        if (metaEl) metaEl.textContent = '';
+      }
+    }
+  }
+
+  /* Holding: cards por loja precisam refletir o mapa de turnos. */
+  if (holdOn && typeof renderHolding_ === 'function') {
+    try { renderHolding_(); } catch (eHold) { /* ignore */ }
+  }
 }
 window.atualizarOperadorUI_ = atualizarOperadorUI_;
 

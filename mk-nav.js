@@ -233,10 +233,12 @@ function mkApplyModoNav_() {
     holdIds.forEach(function (id) { setVis(id, true); });
     /* Relatório CTO Golden: só com filtro Todas/Golden */
     setVis('sbn-rel', filtro !== 'laville');
+    /* Colaborador fica DENTRO de cada card de loja (Equipe) — não irmão de Lojas. */
     const sbColab = document.getElementById('sbn-colab');
     if (sbColab) {
-      sbColab.hidden = false;
-      sbColab.style.display = '';
+      sbColab.hidden = true;
+      sbColab.style.display = 'none';
+      sbColab.setAttribute('aria-hidden', 'true');
     }
     ['nav-nova', 'nav-painel'].forEach(function (id) {
       const el = document.getElementById(id);

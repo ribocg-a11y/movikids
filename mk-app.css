@@ -2056,6 +2056,29 @@ html,body{height:100%;background:var(--bg);color:var(--txt);overflow:hidden}
 .mk-hold-kpi-val{display:block;font-weight:900;font-size:18px;color:var(--blue,#1565C0);line-height:1.2}
 .mk-hold-kpi--fat .mk-hold-kpi-val{font-size:14px}
 .mk-hold-kpi-lbl{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:var(--txt3,#90A4AE)}
+.mk-hold-colab{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  margin:0 0 12px;padding:10px 12px;border-radius:12px;
+  background:var(--bg2,#F5F7FA);border:1px solid var(--border,#E0E0E0);
+}
+.mk-hold-colab--on{
+  background:var(--blue-lt,#E3F2FD);border-color:rgba(21,101,192,.28);
+}
+.mk-hold-colab-main{min-width:0;display:flex;flex-direction:column;gap:2px}
+.mk-hold-colab-lbl{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--txt3,#90A4AE)}
+.mk-hold-colab-nome{font-size:14px;font-weight:900;color:var(--txt,#1A237E);line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mk-hold-colab-meta{font-size:11px;font-weight:700;color:var(--txt2,#546E7A)}
+.mk-hold-colab-btn{flex:0 0 auto;padding:7px 12px;font-size:12px;width:auto;min-width:0}
+.mk-balcao-colab{
+  display:flex;align-items:baseline;flex-wrap:wrap;gap:6px 10px;
+  margin:0 0 12px;padding:10px 14px;border-radius:14px;
+  background:var(--blue-lt,#E3F2FD);border:1.5px solid rgba(21,101,192,.22);
+}
+.mk-balcao-colab-lbl{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--blue-dk,#0D47A1)}
+.mk-balcao-colab-nome{font-size:15px;font-weight:900;color:var(--txt,#1A237E);font-family:'Nunito',sans-serif}
+.mk-balcao-colab-meta{font-size:12px;font-weight:700;color:var(--txt2,#546E7A)}
+.mk-balcao-colab--empty{background:var(--bg2,#F5F7FA);border-color:var(--border,#E0E0E0)}
+.mk-balcao-colab--empty .mk-balcao-colab-nome{color:var(--txt3,#90A4AE);font-weight:800}
 .mk-hold-sec-lbl{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--txt2);margin:12px 0 8px}
 .mk-hold-sec-lbl:first-of-type{margin-top:0}
 .mk-hold-list{display:flex;flex-direction:column;gap:6px;flex:1;overflow:auto;max-height:220px}
